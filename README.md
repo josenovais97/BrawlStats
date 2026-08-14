@@ -113,6 +113,16 @@ npm run dev
    npm run db:migrate
    ```
 
+   > Migrations run over `DATABASE_URL_UNPOOLED`, falling back to `DATABASE_URL`
+   > (see `prisma.config.ts`). Neon's pooled endpoint is PgBouncer in transaction
+   > mode and does not hold the session state migrations need. The Neon
+   > integration injects both variables, so this works without extra setup — but
+   > if you copy a connection string by hand, use the **unpooled** one for
+   > migrations and the pooled one for `DATABASE_URL` at runtime.
+   >
+   > Quote the values in `.env.local` (`DATABASE_URL="postgres://…"`). The pooled
+   > URL contains `&`, which breaks `source .env.local` in a shell if unquoted.
+
 5. Seed the sampling pool and collect the first batch:
 
    ```bash
@@ -131,8 +141,13 @@ Set these in **Vercel → Settings → Environment Variables** before the first 
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `BRAWL_STARS_API_KEY` | yes | Whitelisted against the RoyaleAPI proxy IP |
-| `DATABASE_URL` | for the tier list | Injected automatically by the Neon integration |
+| `DATABASE_URL` | for the tier list | Pooled connection; injected by the Neon integration |
+| `DATABASE_URL_UNPOOLED` | for migrations | Direct connection; injected by the Neon integration |
 | `CRON_SECRET` | auto | Vercel provisions this for projects with cron jobs |
+
+Adding the database **after** a deployment does not retrofit the env vars into it —
+redeploy so the build picks them up, otherwise the tier list keeps rendering its
+"Database not configured" state from the older build.
 
 `vercel.json` declares one daily cron job. The Hobby plan allows **one run per day per job**,
 which is why the schedule is `0 4 * * *` rather than hourly.
