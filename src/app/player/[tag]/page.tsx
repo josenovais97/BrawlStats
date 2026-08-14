@@ -108,11 +108,11 @@ export default async function PlayerPage({ params }: PageProps) {
       />
       <PlayerStats player={player} />
       <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
+      <PlayerProgression progression={progression} playtime={playtime} />
 
       <Suspense fallback={<InsightsSkeleton />}>
         <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
       </Suspense>
-      <PlayerProgression progression={progression} playtime={playtime} />
 
       <section>
         <SectionHeading title="Recent battles" />

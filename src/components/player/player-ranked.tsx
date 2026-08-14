@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import { TrophyIcon } from '@/components/game-icons';
 import { rankedTierIconUrl } from '@/lib/brawlapi';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 import type { TrophyStanding } from '@/types/stats';
 
@@ -141,7 +141,7 @@ function Cell({
         <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">
           {label}
         </p>
-        <p className="truncate text-lg font-bold capitalize">{value.toLowerCase()}</p>
+        <p className="truncate text-lg font-bold">{titleCaseLabel(value)}</p>
         {hint ? <p className="truncate text-xs text-muted">{hint}</p> : null}
       </div>
     </div>

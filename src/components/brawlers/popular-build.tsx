@@ -92,7 +92,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="truncate text-sm font-medium capitalize">
                           {name.toLowerCase()}
-                          {index === 0 && !isGear ? (
+                          {index === 0 && options.length > 1 && option.share > 0.55 ? (
                             <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-[10px] font-bold uppercase text-brand">
                               Most picked
                             </span>
@@ -118,7 +118,8 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       })}
 
       <p className="text-xs text-muted">
-        Based on {formatNumber(build.sampleSize)} tracked players who own this brawler.
+        Share of unlocks within each category, across{' '}
+        {formatNumber(build.sampleSize)} tracked players who own this brawler.
       </p>
     </div>
   );

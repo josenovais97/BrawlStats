@@ -104,6 +104,29 @@ export function humanizeMode(mode: string | null | undefined): string {
     .replace(/^./, (c) => c.toUpperCase());
 }
 
+/**
+ * Title-cases an API label while keeping roman numerals upright.
+ *
+ * The API shouts its ranks ("GOLD III"). Naive lowercasing plus a CSS
+ * `capitalize` turns that into "Gold Iii", so numerals are detected and
+ * uppercased explicitly.
+ */
+const ROMAN_NUMERAL = /^(?=[IVXLCDM]+$)M*(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+
+export function titleCaseLabel(value: string | null | undefined): string {
+  if (!value) return '';
+
+  return value
+    .trim()
+    .split(/\s+/)
+    .map((word) => {
+      const upper = word.toUpperCase();
+      if (ROMAN_NUMERAL.test(upper)) return upper;
+      return upper.charAt(0) + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
 /** Rank suffix for showdown placements: 1 -> "1st". */
 export function ordinal(n: number): string {
   const rem100 = n % 100;

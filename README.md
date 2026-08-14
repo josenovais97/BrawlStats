@@ -17,6 +17,7 @@ Neon Postgres.
 | `/brawlers` | Every brawler, filterable by rarity and class |
 | `/brawlers/[id]` | Star powers, gadgets, win/pick rate, popular build, and the global top 10 on that brawler |
 | `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
+| `/release-notes` | The latest official update notes, resolved automatically |
 | `/updates` | Detected game changes and meta movers (see below) |
 | `/events` | Live and upcoming event rotation with map art |
 | `/leaderboard` | Top 100 players or clubs, filterable across all ~250 ISO countries |
@@ -258,6 +259,19 @@ not just the top: pull from regional leaderboards at several trophy bands, keep 
 larger pool, and let the window run long enough that low-usage brawlers clear the threshold.
 The current setup is a working pipeline with an honest caveat, not a finished methodology.
 
+## Release notes
+
+Supercell publishes one post per update at a predictable URL
+(`/blog/release-notes/release-notes-<month>-<year>/`) with no index endpoint, so
+`src/lib/release-notes.ts` walks backwards from the current month until one responds — up
+to 14 months. When September's notes ship, the September URL starts returning 200 and the
+page follows automatically with no code change.
+
+The body is Contentful rich text inside the page's `__NEXT_DATA__` payload, parsed into a
+small typed tree (paragraphs, headings, lists, bold/italic/underline) and rendered with a
+sticky table of contents. Unknown node types are unwrapped rather than dropped, so new
+block types still surface their text.
+
 ## Updates page: what it can and cannot know
 
 There is no Brawl Stars patch-notes, changelog or balance API, and nothing to mirror. So
@@ -297,11 +311,17 @@ representative CDN asset as the generic category mark.
 Brawler pages show unlock rates for each star power, gadget and gear, with real artwork
 from the CDN.
 
-> The API never reports which option a player has **equipped** — only what they own. So
-> these are unlock rates, not pick rates. For gears, where players buy a couple out of six
-> or seven, that is a strong preference signal; for star powers on maxed accounts it is
-> weaker. `player_brawler_snapshots` stores the owned ability ids, and `recomputeBuildStats`
-> aggregates them with `unnest` in Postgres.
+Shares are normalised **within a category**, so the options for a kind sum to 100%.
+
+> The API never reports which option a player has **equipped** — only what they own, and
+> players who invest in a brawler tend to unlock everything. Dividing by all owners of the
+> brawler therefore gave every option a similar small number (two star powers both showing
+> ~16%), which reads like a bug. Normalising within the category answers the question being
+> asked instead: of everyone who unlocked one of these, which do they have?
+>
+> A 50/50 split on star powers is a real answer — it means players unlock both. Gears are
+> where the signal lives, because players buy a couple out of six or seven: a typical spread
+> is 30/26/23/10/7/5.
 
 ## Cron budget
 

@@ -301,14 +301,31 @@ export async function getBrawlerBuild(brawlerId: number): Promise<BrawlerBuild |
     });
     if (rows.length === 0) return null;
 
-    const pick = (kind: string) =>
-      rows
-        .filter((r) => r.kind === kind)
-        .map((r) => ({
-          itemId: r.itemId,
-          share: r.totalOwners > 0 ? r.owners / r.totalOwners : 0,
-          owners: r.owners,
-        }));
+    /**
+     * Share is normalised *within a kind*, not against every owner of the
+     * brawler.
+     *
+     * The raw unlock rate is misleading here: most sampled players own a
+     * brawler without having unlocked anything on it, so every option lands on
+     * a similar small number (two star powers both showing ~16% of all
+     * owners), which reads like a broken percentage rather than a comparison.
+     * Dividing by the total unlocks of that kind makes the options sum to
+     * 100% and answers the question actually being asked — of everyone who has
+     * unlocked one of these, which do they have?
+     *
+     * A genuine 50/50 is a real answer: it means players unlock both.
+     */
+    const pick = (kind: string) => {
+      const ofKind = rows.filter((r) => r.kind === kind);
+      const totalPicks = ofKind.reduce((sum, r) => sum + r.owners, 0);
+
+      return ofKind.map((r) => ({
+        itemId: r.itemId,
+        share: totalPicks > 0 ? r.owners / totalPicks : 0,
+        unlockRate: r.totalOwners > 0 ? r.owners / r.totalOwners : 0,
+        owners: r.owners,
+      }));
+    };
 
     return {
       brawlerId,

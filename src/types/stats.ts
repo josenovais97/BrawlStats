@@ -78,8 +78,13 @@ export interface BrawlerPlacement {
 
 export interface BuildOption {
   itemId: number;
-  /** 0–1 share of sampled owners who have this ability unlocked. */
+  /**
+   * 0–1 share of all unlocks of this kind for this brawler. Options of the
+   * same kind sum to 1, so they can be compared directly.
+   */
   share: number;
+  /** 0–1 share of every sampled owner of the brawler. Context, not comparison. */
+  unlockRate: number;
   owners: number;
 }
 
