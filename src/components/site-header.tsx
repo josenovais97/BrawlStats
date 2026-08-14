@@ -34,7 +34,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
           <BrandMark className="size-9 shrink-0" />
           <span className="text-lg">
-            Brawl<span className="text-brand">Stats</span>
+            Brawl<span className="text-brand">Zone</span>
           </span>
         </Link>
 

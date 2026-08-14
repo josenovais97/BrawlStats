@@ -4,10 +4,13 @@ import type { BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client'
 import { getPrisma } from '@/lib/prisma';
 import type {
   AggregationRunSummary,
+  BrawlerBuild,
+  BrawlerPlacement,
   BrawlerStatRow,
   CatalogChangeEntry,
   MetaMover,
   Tier,
+  TrophyStanding,
 } from '@/types/stats';
 
 /**
@@ -246,6 +249,128 @@ export async function getCatalogChanges(limit = 40): Promise<CatalogChangeEntry[
     }));
   } catch {
     return [];
+  }
+}
+
+/**
+ * Every global brawler leaderboard this player appears on.
+ *
+ * The rankings endpoint tops out at 200 entries, so 200 is the deepest
+ * placement that exists — there is no top-500 to show.
+ */
+export async function getPlayerBrawlerPlacements(
+  playerTag: string,
+): Promise<BrawlerPlacement[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.brawlerRankingEntry.findMany({
+      where: { playerTag, region: 'global' },
+      orderBy: { rank: 'asc' },
+    });
+
+    return rows.map((row) => ({
+      brawlerId: row.brawlerId,
+      brawlerName: row.brawlerName,
+      rank: row.rank,
+      trophies: row.trophies,
+      region: row.region,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** Ability-ownership rates for one brawler, newest snapshot. */
+export async function getBrawlerBuild(brawlerId: number): Promise<BrawlerBuild | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const latest = await prisma.brawlerBuildStat.findFirst({
+      where: { brawlerId },
+      orderBy: { snapshotDate: 'desc' },
+      select: { snapshotDate: true },
+    });
+    if (!latest) return null;
+
+    const rows = await prisma.brawlerBuildStat.findMany({
+      where: { brawlerId, snapshotDate: latest.snapshotDate },
+      orderBy: { owners: 'desc' },
+    });
+    if (rows.length === 0) return null;
+
+    const pick = (kind: string) =>
+      rows
+        .filter((r) => r.kind === kind)
+        .map((r) => ({
+          itemId: r.itemId,
+          share: r.totalOwners > 0 ? r.owners / r.totalOwners : 0,
+          owners: r.owners,
+        }));
+
+    return {
+      brawlerId,
+      sampleSize: rows[0].totalOwners,
+      starPowers: pick('starPower'),
+      gadgets: pick('gadget'),
+      gears: pick('gear'),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Where a trophy count sits against every player we have sampled.
+ *
+ * Returns null below a minimum population, because a percentile drawn from a
+ * handful of rows says nothing.
+ */
+export async function getTrophyPercentile(trophies: number): Promise<TrophyStanding | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const total = await prisma.sampledPlayer.count({ where: { trophies: { not: null } } });
+    if (total < 100) return null;
+
+    const below = await prisma.sampledPlayer.count({
+      where: { trophies: { not: null, lt: trophies } },
+    });
+
+    return { percentile: below / total, population: total };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * How many distinct buffies have actually been observed across the sampled
+ * population, per kind.
+ *
+ * The API publishes no buffie catalogue, and assuming three per brawler
+ * overstates the total — not every brawler has one released. Counting the
+ * distinct (brawler, kind) pairs anyone in a large maxed-out sample owns is a
+ * far closer denominator, and it self-corrects as more ship.
+ */
+export async function getReleasedBuffieCount(): Promise<number | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const rows = await prisma.$queryRaw<{ total: bigint }[]>`
+      SELECT
+        COUNT(DISTINCT CASE WHEN buffie_gadget      THEN brawler_id END) +
+        COUNT(DISTINCT CASE WHEN buffie_star_power  THEN brawler_id END) +
+        COUNT(DISTINCT CASE WHEN buffie_hyper_charge THEN brawler_id END) AS total
+      FROM player_brawler_snapshots
+    `;
+    const total = Number(rows[0]?.total ?? 0);
+    return total > 0 ? total : null;
+  } catch {
+    return null;
   }
 }
 

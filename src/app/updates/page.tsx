@@ -3,7 +3,6 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Cog,
-  Info,
   Minus,
   Sparkles,
   Star,
@@ -14,9 +13,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, relativeTime } from '@/lib/format';
+import { formatNumber, formatPercent } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
-import { getCatalogChanges, getLastAggregationRun, getMetaMovers } from '@/lib/stats';
+import { getCatalogChanges, getMetaMovers } from '@/lib/stats';
 import type { CatalogChangeEntry, MetaMover } from '@/types/stats';
 
 export const metadata: Metadata = {
@@ -38,7 +37,6 @@ export default async function UpdatesPage() {
     getBrawlerMap().catch(() => new Map()),
   ]);
   const changes = await getCatalogChanges(40);
-  const lastRun = await getLastAggregationRun();
 
   const rising = movers.filter((m) => m.winRateDelta > 0).slice(0, MOVER_LIMIT);
   const falling = movers
@@ -53,44 +51,18 @@ export default async function UpdatesPage() {
       <header>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Updates</h1>
         <p className="mt-2 max-w-3xl text-muted">
-          What changed in the game, and which brawlers are trending in our sampled meta.
+          New brawlers and abilities, and which brawlers are rising or falling.
         </p>
       </header>
 
-      <div className="card flex gap-3 p-4 text-sm">
-        <Info className="mt-0.5 size-5 shrink-0 text-accent" />
-        <div className="space-y-1 text-muted">
-          <p>
-            <span className="font-semibold text-foreground">
-              This is derived, not official patch notes.
-            </span>{' '}
-            Supercell publishes no changelog or balance API. We snapshot the brawler
-            catalogue every day and diff it, which reliably catches new brawlers, star
-            powers, gadgets and hypercharges.
-          </p>
-          <p>
-            Balance tuning — damage, health, reload — is not exposed by the API and cannot
-            be detected here. The movers below are the closest proxy: shifts in observed
-            win rate after a patch usually mean something was tuned.
-          </p>
-          {lastRun ? (
-            <p className="text-xs">
-              Last checked {relativeTime(lastRun.finishedAt ?? lastRun.startedAt)}.
-            </p>
-          ) : null}
-        </div>
-      </div>
-
       <section>
         <h2 className="mb-1 text-2xl font-bold tracking-tight">Meta movers</h2>
-        <p className="mb-4 text-sm text-muted">
-          Change in baseline-adjusted win rate over the last 7 days of sampling.
-        </p>
+        <p className="mb-4 text-sm text-muted">Win rate change over the last 7 days.</p>
 
         {movers.length === 0 ? (
           <EmptyNote
             configured={hasDatabase()}
-            what="Movers need at least two daily snapshots with enough battles on both sides."
+            what="Not enough data collected yet — check back tomorrow."
           />
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
@@ -115,13 +87,13 @@ export default async function UpdatesPage() {
       <section>
         <h2 className="mb-1 text-2xl font-bold tracking-tight">Detected game changes</h2>
         <p className="mb-4 text-sm text-muted">
-          Roster and kit differences found by comparing daily catalogue snapshots.
+          New brawlers, star powers, gadgets and hypercharges.
         </p>
 
         {changes.length === 0 ? (
           <EmptyNote
             configured={hasDatabase()}
-            what="Changes appear once two daily snapshots exist and the game actually ships something new."
+            what="No changes detected yet."
           />
         ) : (
           <ol className="space-y-2">
@@ -302,14 +274,7 @@ function ChangeRow({
 function EmptyNote({ configured, what }: { configured: boolean; what: string }) {
   return (
     <p className="card p-6 text-sm text-muted">
-      {configured ? (
-        what
-      ) : (
-        <>
-          No database configured. Provision Neon and run the migrations to enable this —
-          see the README.
-        </>
-      )}
+{configured ? what : 'Not available right now.'}
     </p>
   );
 }

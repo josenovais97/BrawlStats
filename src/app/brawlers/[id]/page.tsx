@@ -5,15 +5,18 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
+import { PopularBuild } from '@/components/brawlers/popular-build';
 import { ErrorState } from '@/components/ui/error-state';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
 import { getBrawler } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
+import { getOfficialBrawlers } from '@/lib/bs-api';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
   assignTier,
+  getBrawlerBuild,
   getBrawlerStat,
   normalizeWinRate,
 } from '@/lib/stats';
@@ -71,7 +74,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     );
   }
 
+  // Sequential database reads keep the page to a single connection.
   const stat = await getBrawlerStat(brawlerId);
+  const build = await getBrawlerBuild(brawlerId);
+
+  // Gear names live only in the official catalogue, not in the artwork source.
+  const gearNames = await getOfficialBrawlers()
+    .then((r) => {
+      const entry = r.items.find((b) => b.id === brawlerId);
+      return new Map((entry?.gears ?? []).map((g) => [g.id, g.name]));
+    })
+    .catch(() => new Map<number, string>());
   const normalizedWinRate = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate)
     : null;
@@ -142,21 +155,21 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       </header>
 
       <section>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">Aggregated stats</h2>
+        <h2 className="mb-4 text-2xl font-bold tracking-tight">Performance</h2>
         {stat ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard
               icon={BarChart3}
-              label="Win rate (adj.)"
+              label="Win rate"
               value={formatPercent(normalizedWinRate)}
-              hint={`${formatPercent(stat.winRate)} raw · ${formatNumber(stat.decidedSampleSize)} decided`}
+              hint={`${formatNumber(stat.decidedSampleSize)} battles`}
               tone="text-victory"
             />
             <StatCard
               icon={Users}
-              label="Usage rate"
+              label="Pick rate"
               value={formatPercent(stat.usageRate)}
-              hint={`${stat.windowDays}-day window`}
+              hint="Last 7 days"
               tone="text-accent"
             />
             <StatCard
@@ -165,25 +178,25 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               value={
                 stat.avgTrophies === null ? '—' : formatNumber(Math.round(stat.avgTrophies))
               }
-              hint={`${formatNumber(stat.ownerSampleSize)} owners sampled`}
+              hint="Across tracked players"
             />
             <StatCard
               icon={Sparkles}
               label="Avg rank"
               value={stat.avgRank === null ? '—' : stat.avgRank.toFixed(1)}
-              hint={`Snapshot ${stat.snapshotDate}`}
+              hint="Across tracked players"
             />
           </div>
         ) : (
           <p className="card p-6 text-sm text-muted">
-            No aggregated data for this brawler yet. Stats appear once the daily sampling job
-            has collected enough battles — see the{' '}
-            <Link href="/tier-list" className="text-brand hover:underline">
-              tier list
-            </Link>{' '}
-            for pipeline status.
+            Not enough data for this brawler yet.
           </p>
         )}
+      </section>
+
+      <section>
+        <h2 className="mb-4 text-2xl font-bold tracking-tight">Popular build</h2>
+        <PopularBuild build={build} meta={brawler} gearNames={gearNames} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">

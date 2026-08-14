@@ -42,6 +42,20 @@ model PlayerBrawlerSnapshot {
   highestTroph Int      @map("highest_trophies")
   rank         Int
   power        Int
+
+  /// Which abilities this player owns on this brawler. The API never reports
+  /// what is *equipped*, so ownership is the only available signal for which
+  /// options players actually invest in.
+  starPowerIds Int[]    @map("star_power_ids")
+  gadgetIds    Int[]    @map("gadget_ids")
+  gearIds      Int[]    @map("gear_ids")
+
+  /// Buffies owned, as three flags. Used to derive which buffies exist at all,
+  /// since the API publishes no buffie catalogue.
+  buffieGadget      Boolean @default(false) @map("buffie_gadget")
+  buffieStarPower   Boolean @default(false) @map("buffie_star_power")
+  buffieHyperCharge Boolean @default(false) @map("buffie_hyper_charge")
+
   snapshotDate DateTime @map("snapshot_date") @db.Date
   createdAt    DateTime @default(now()) @map("created_at")
 
@@ -155,6 +169,47 @@ model CatalogChange {
   @@unique([detectedOn, kind, brawlerId, itemId])
   @@index([detectedOn])
   @@map("catalog_changes")
+}
+
+/// Cached global top-200 for each brawler.
+///
+/// The rankings endpoint caps at 200 entries and would cost one call per
+/// brawler per lookup, so the cron job caches the whole board daily. A profile
+/// page then resolves every placement a player holds with a single indexed
+/// query instead of ~106 API calls.
+model BrawlerRankingEntry {
+  id          Int      @id @default(autoincrement())
+  brawlerId   Int      @map("brawler_id")
+  brawlerName String   @map("brawler_name")
+  region      String   @default("global")
+  rank        Int
+  playerTag   String   @map("player_tag")
+  playerName  String   @map("player_name")
+  trophies    Int
+  refreshedAt DateTime @default(now()) @map("refreshed_at")
+
+  @@unique([brawlerId, region, rank])
+  @@index([playerTag])
+  @@map("brawler_ranking_entries")
+}
+
+/// Aggregated ability-ownership rates per brawler, powering popular builds.
+model BrawlerBuildStat {
+  id           Int      @id @default(autoincrement())
+  brawlerId    Int      @map("brawler_id")
+  snapshotDate DateTime @map("snapshot_date") @db.Date
+  /// "starPower" | "gadget" | "gear"
+  kind         String
+  itemId       Int      @map("item_id")
+  /// Sampled owners of this brawler who have this specific ability.
+  owners       Int
+  /// Sampled owners of the brawler overall, i.e. the denominator.
+  totalOwners  Int      @map("total_owners")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([brawlerId, snapshotDate, kind, itemId])
+  @@index([snapshotDate])
+  @@map("brawler_build_stats")
 }
 
 /// Audit trail for cron runs, so a stale tier list can be explained.

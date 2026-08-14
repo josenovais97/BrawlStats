@@ -76,14 +76,59 @@ export interface ProgressionSummary {
   totalsUnavailable: boolean;
 }
 
+/* -------------------------------- playtime -------------------------------- */
+
 /**
- * @param player    Player payload from the official API.
- * @param catalogue Full brawler list from the official API, which is the only
- *                  source that reports gears and hypercharges per brawler.
+ * Typical match lengths in minutes. 3v3 modes usually run to roughly two
+ * minutes; showdown drags a little longer.
+ */
+const MINUTES_PER_3V3 = 2;
+const MINUTES_PER_SHOWDOWN = 2.5;
+
+/**
+ * Matches played per recorded victory.
+ *
+ * The API reports wins, never games played, so this inverts an assumed win
+ * rate: 3v3 is symmetric so wins are about half of games; solo showdown pays a
+ * win to 1 of 10, duo to 1 of 5. Rough by construction, and labelled as an
+ * estimate wherever it is shown.
+ */
+const GAMES_PER_3V3_WIN = 2;
+const GAMES_PER_SOLO_WIN = 10;
+const GAMES_PER_DUO_WIN = 5;
+
+export interface PlaytimeEstimate {
+  matches: number;
+  hours: number;
+}
+
+export function estimatePlaytime(player: BSPlayer): PlaytimeEstimate {
+  const teamGames = (player['3vs3Victories'] ?? 0) * GAMES_PER_3V3_WIN;
+  const soloGames = (player.soloVictories ?? 0) * GAMES_PER_SOLO_WIN;
+  const duoGames = (player.duoVictories ?? 0) * GAMES_PER_DUO_WIN;
+
+  const minutes =
+    teamGames * MINUTES_PER_3V3 + (soloGames + duoGames) * MINUTES_PER_SHOWDOWN;
+
+  return {
+    matches: teamGames + soloGames + duoGames,
+    hours: minutes / 60,
+  };
+}
+
+/**
+ * @param player           Player payload from the official API.
+ * @param catalogue        Full brawler list from the official API, the only
+ *                         source reporting gears and hypercharges per brawler.
+ * @param releasedBuffies  Distinct buffies observed across the sampled
+ *                         population. The API has no buffie catalogue, and
+ *                         assuming three per brawler overstates the total, so
+ *                         an observed count is preferred when available.
  */
 export function computeProgression(
   player: BSPlayer,
   catalogue: BSBrawler[],
+  releasedBuffies?: number | null,
 ): ProgressionSummary {
   const totalsUnavailable = catalogue.length === 0;
 
@@ -96,7 +141,21 @@ export function computeProgression(
     (n, b) => n + (b.hyperCharges?.length ?? 0),
     0,
   );
-  const totalBuffies = totalBrawlers * BUFFIES_PER_BRAWLER;
+  // A buffie exists per ability *type* a brawler actually has, and only for
+  // brawlers that have shipped one. The observed count is the better
+  // denominator; the catalogue cap is the fallback before enough data exists.
+  const buffieCap = catalogue.reduce(
+    (n, b) =>
+      n +
+      ((b.starPowers?.length ?? 0) > 0 ? 1 : 0) +
+      ((b.gadgets?.length ?? 0) > 0 ? 1 : 0) +
+      ((b.hyperCharges?.length ?? 0) > 0 ? 1 : 0),
+    0,
+  );
+  const totalBuffies =
+    releasedBuffies && releasedBuffies > 0
+      ? releasedBuffies
+      : buffieCap || totalBrawlers * BUFFIES_PER_BRAWLER;
 
   // What the player actually has.
   let ownedStarPowers = 0;

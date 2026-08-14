@@ -1,4 +1,4 @@
-# BrawlStats
+# Brawl Zone
 
 A Brawl Stars stats site in the spirit of brawlify.com — player and club lookup, a brawler
 database, live event rotation, leaderboards, and a tier list built from aggregated battle
@@ -12,14 +12,31 @@ Neon Postgres.
 | Page | What it does |
 | --- | --- |
 | `/` | Tag search for players and clubs, plus a global top-5 preview |
-| `/player/[tag]` | Trophies, level, 3v3 / showdown records, ranked, club, battle log, full brawler grid, and a progression breakdown |
+| `/player/[tag]` | Trophies, ranked tiers, world/brawler rankings, standing, battle log, brawler grid and a progression breakdown |
 | `/club/[tag]` | Club info, requirements, and a searchable member list with roles |
 | `/brawlers` | Every brawler, filterable by rarity and class |
-| `/brawlers/[id]` | Star powers, gadgets, aggregated win/usage rate, and the global top 10 on that brawler |
+| `/brawlers/[id]` | Star powers, gadgets, win/pick rate, popular build, and the global top 10 on that brawler |
 | `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
 | `/updates` | Detected game changes and meta movers (see below) |
 | `/events` | Live and upcoming event rotation with map art |
 | `/leaderboard` | Top 100 players or clubs, filterable across all ~250 ISO countries |
+
+### Player rankings and standing
+
+Profiles surface three kinds of position:
+
+- **Ranked tiers** — current, season-best and all-time-best, with elo.
+- **World rank** — global trophy leaderboard position, when in the top 200.
+- **Brawler placements** — every global brawler leaderboard the player appears on,
+  banded by top 10 / 25 / 50 / 100 / 200.
+
+> The rankings endpoint hard-caps at **200 entries**, so top-200 is the deepest placement
+> that exists — there is no top-250 or top-500 to show. Boards are cached daily by the cron
+> job into `brawler_ranking_entries`: resolving placements live would cost ~106 API calls
+> per profile view, versus one indexed query against the cache.
+
+Trophy standing is a percentile against every player we have sampled, and is suppressed
+below a population of 100 rather than shown from a handful of rows.
 
 ### Progression breakdown
 
@@ -28,8 +45,15 @@ power 11, star powers, gadgets, gears, hypercharges and buffies, each against th
 game currently has, plus an overall completion percentage counting every power-level step
 and every unlockable ability.
 
-It also estimates coins and power points invested, and the coins still needed to take every
-unlocked brawler to power 11.
+It also estimates coins and power points invested, time played, matches played, and the
+coins still needed to take every unlocked brawler to power 11.
+
+Playtime inverts an assumed win rate, since the API reports victories but never games
+played: 3v3 is symmetric so wins are roughly half of games, solo showdown pays 1 in 10 and
+duo 1 in 5, multiplied by typical match lengths. Rough by construction and labelled as an
+estimate.
+
+**Bling is not exposed by the API** and cannot be derived, so there is no bling figure.
 
 > **These are estimates.** `src/lib/progression.ts` holds a hard-coded economy table and is
 > the one file to update when Supercell changes upgrade costs. The per-level values there
@@ -38,6 +62,11 @@ unlocked brawler to power 11.
 > but excluded from the coin estimate, because they also come from keys and drops. The API
 > reports only the skin *currently equipped* on each brawler, never the full wardrobe, so
 > there is no "skins owned" figure — claiming one would be fiction.
+>
+> **Buffie totals are derived, not assumed.** There is no buffie catalogue in the API, and
+> assuming three per brawler badly overstates the denominator (318 when the observed number
+> is 63). `getReleasedBuffieCount()` counts the distinct (brawler, kind) pairs anyone in the
+> sampled population owns, which self-corrects as more ship.
 
 ### Recent searches
 
@@ -107,7 +136,7 @@ as `%23ABC123` for the upstream path.
 ### 2. Install and configure
 
 ```bash
-git clone <your-repo> && cd brawlstats
+git clone <your-repo> && cd brawlzone
 npm install
 cp .env.local.example .env.local
 ```
@@ -239,6 +268,29 @@ masquerade as a balance change, and both sides must clear the 30-battle floor.
 The first cron run only seeds the catalogue baseline — recording all ~106 existing brawlers
 as "new" would be noise. Changes appear from the second run onwards, and movers need at
 least two daily snapshots with enough battles on both.
+
+## Popular builds
+
+Brawler pages show unlock rates for each star power, gadget and gear, with real artwork
+from the CDN.
+
+> The API never reports which option a player has **equipped** — only what they own. So
+> these are unlock rates, not pick rates. For gears, where players buy a couple out of six
+> or seven, that is a strong preference signal; for star powers on maxed accounts it is
+> weaker. `player_brawler_snapshots` stores the owned ability ids, and `recomputeBuildStats`
+> aggregates them with `unnest` in Postgres.
+
+## Cron budget
+
+Vercel caps a serverless invocation at 60s, and the run does real work against a remote
+database, so two things matter:
+
+- **Writes are batched.** Recomputing stats with per-row upserts meant ~1,200 sequential
+  round trips and took 112s. Delete-then-`createMany` is two round trips per table and
+  brought the same run to 22s.
+- **The ranking pass is time-boxed and resumable.** It costs ~106 API calls, refreshes only
+  brawlers not already done today, and stops at its budget — whatever does not fit is
+  picked up next run, so a timeout can never leave the cache permanently half-built.
 
 ### Tuning
 

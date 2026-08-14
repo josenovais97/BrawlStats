@@ -1,17 +1,16 @@
 import type { Metadata } from 'next';
-import { Database, Info } from 'lucide-react';
+import { Database } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, relativeTime } from '@/lib/format';
+import { formatNumber, formatPercent } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
   TIER_ORDER,
   assignTier,
-  getLastAggregationRun,
   getLatestBrawlerStats,
   normalizeWinRate,
 } from '@/lib/stats';
@@ -33,7 +32,6 @@ export default async function TierListPage() {
     getLatestBrawlerStats(),
     getBrawlerMap().catch(() => new Map()),
   ]);
-  const lastRun = await getLastAggregationRun();
 
   const entries: TierListEntry[] = rows.map((row) => {
     const meta = brawlerMeta.get(row.brawlerId);
@@ -56,25 +54,14 @@ export default async function TierListPage() {
   const rated = entries.filter(isRated);
   const unrated = entries.filter((e) => !isRated(e));
 
-  const totalBattles = rows.reduce((sum, r) => sum + r.sampleSize, 0);
-
   return (
     <div className="space-y-8">
       <header>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Tier list</h1>
         <p className="mt-2 max-w-3xl text-muted">
-          Built from battle logs sampled daily across a rotating pool of players, aggregated
-          into win and usage rates. Reads from the database, not the live API.
+          Win rates and pick rates for every brawler, refreshed daily.
         </p>
       </header>
-
-      <MethodologyNote
-        lastRunAt={lastRun?.finishedAt ?? lastRun?.startedAt ?? null}
-        totalBattles={totalBattles}
-        windowDays={rows[0]?.windowDays ?? 7}
-        snapshotDate={rows[0]?.snapshotDate ?? null}
-        baselineWinRate={rows[0]?.baselineWinRate ?? null}
-      />
 
       {rated.length === 0 ? (
         <EmptyState />
@@ -94,7 +81,7 @@ export default async function TierListPage() {
         <section>
           <h2 className="text-xl font-bold tracking-tight">Not enough data</h2>
           <p className="mt-1 text-sm text-muted">
-            Fewer than {MIN_SAMPLE_FOR_TIER} decided battles sampled — no tier assigned yet.
+            Not played often enough yet to rank.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {unrated.map((entry) => (
@@ -173,56 +160,6 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
   );
 }
 
-function MethodologyNote({
-  lastRunAt,
-  totalBattles,
-  windowDays,
-  snapshotDate,
-  baselineWinRate,
-}: {
-  lastRunAt: string | null;
-  totalBattles: number;
-  windowDays: number;
-  snapshotDate: string | null;
-  baselineWinRate: number | null;
-}) {
-  return (
-    <div className="card flex gap-3 p-4 text-sm">
-      <Info className="mt-0.5 size-5 shrink-0 text-accent" />
-      <div className="space-y-1 text-muted">
-        <p>
-          <span className="font-semibold text-foreground">How this is built:</span> a daily
-          cron job samples battle logs from a rotating pool of players and aggregates the
-          last {windowDays} days. Win rate counts only modes that report a win or loss;
-          showdown placements count toward usage only.
-        </p>
-        <p>
-          <span className="font-semibold text-foreground">Percentages are adjusted.</span>{' '}
-          The pool is seeded from top ladder and club rosters, and those players win{' '}
-          {baselineWinRate !== null ? formatPercent(baselineWinRate) : 'well above 50%'} of
-          their games with any brawler. Each rate is re-centred on that baseline, so 50%
-          means &quot;average within this sample&quot;, not average across all players.
-        </p>
-        <p>
-          {snapshotDate ? (
-            <>
-              Snapshot {snapshotDate} · {formatNumber(totalBattles)} sampled battles
-              {lastRunAt ? ` · last refreshed ${relativeTime(lastRunAt)}` : ''}
-            </>
-          ) : (
-            'No snapshot has been generated yet.'
-          )}
-        </p>
-        <p className="text-xs">
-          Re-centring removes the cohort&apos;s skill bias, not its taste: which brawlers
-          top players choose to run is still baked in. Treat this as directional until the
-          sample is broadened.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function EmptyState() {
   const configured = hasDatabase();
 
@@ -235,24 +172,9 @@ function EmptyState() {
         {configured ? 'No aggregated data yet' : 'Database not configured'}
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        {configured ? (
-          <>
-            The tier list fills in after the first aggregation run. Trigger it manually with{' '}
-            <code className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-xs">
-              curl -H &quot;Authorization: Bearer $CRON_SECRET&quot;
-              .../api/cron/refresh-stats
-            </code>
-            , or wait for the daily cron job.
-          </>
-        ) : (
-          <>
-            Provision Neon Postgres through the Vercel Marketplace, set{' '}
-            <code className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-xs">
-              DATABASE_URL
-            </code>
-            , and run the migrations. See the README for the full sequence.
-          </>
-        )}
+        {configured
+          ? 'Rankings are still being collected. Check back shortly.'
+          : 'Rankings are not available right now.'}
       </p>
       <Link
         href="/brawlers"

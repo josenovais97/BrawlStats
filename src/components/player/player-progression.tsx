@@ -1,6 +1,8 @@
 import {
+  Clock,
   Coins,
   Gem,
+  Swords,
   Shirt,
   Sparkles,
   Star,
@@ -11,13 +13,18 @@ import {
 } from 'lucide-react';
 
 import { formatNumber, formatPercent } from '@/lib/format';
-import type { OwnershipStat, ProgressionSummary } from '@/lib/progression';
+import type {
+  OwnershipStat,
+  PlaytimeEstimate,
+  ProgressionSummary,
+} from '@/lib/progression';
 
 interface Props {
   progression: ProgressionSummary;
+  playtime: PlaytimeEstimate;
 }
 
-export function PlayerProgression({ progression }: Props) {
+export function PlayerProgression({ progression, playtime }: Props) {
   const rows: { icon: typeof Star; label: string; stat: OwnershipStat; tone: string }[] = [
     { icon: Star, label: 'Brawlers', stat: progression.brawlers, tone: 'text-brand' },
     {
@@ -64,10 +71,6 @@ export function PlayerProgression({ progression }: Props) {
             </span>
           </div>
           <Bar value={progression.completion} />
-          <p className="mt-2 text-xs text-muted">
-            Counts every power-level step plus every star power, gadget, gear, hypercharge
-            and buffie in the game.
-          </p>
         </div>
 
         <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
@@ -88,7 +91,7 @@ export function PlayerProgression({ progression }: Props) {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-3">
+        <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-5">
           <Investment
             icon={Coins}
             label="Coins invested"
@@ -97,8 +100,20 @@ export function PlayerProgression({ progression }: Props) {
           />
           <Investment
             icon={Sparkles}
-            label="Power points used"
+            label="Power points"
             value={formatNumber(progression.powerPointsInvested)}
+            hint="Estimated"
+          />
+          <Investment
+            icon={Clock}
+            label="Time played"
+            value={`${formatNumber(Math.round(playtime.hours))} h`}
+            hint="Estimated"
+          />
+          <Investment
+            icon={Swords}
+            label="Matches"
+            value={formatNumber(playtime.matches)}
             hint="Estimated"
           />
           <Investment
@@ -118,12 +133,6 @@ export function PlayerProgression({ progression }: Props) {
           </p>
         ) : null}
 
-        <p className="mt-3 text-xs leading-relaxed text-muted/80">
-          Coin and power-point figures are estimates from the published upgrade table and
-          will drift when Supercell changes the economy. Buffies are excluded from the coin
-          total because they can also come from keys and drops. The API only reports the
-          skin currently equipped on each brawler, never the full wardrobe.
-        </p>
       </div>
     </section>
   );

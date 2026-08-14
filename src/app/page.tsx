@@ -39,7 +39,7 @@ export default function HomePage() {
       <section className="card card-glow overflow-hidden p-6 sm:p-10">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-widest text-brand">
-            Brawl Stars stats
+            Brawl Zone
           </p>
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
             Look up any player or club.

@@ -2,13 +2,15 @@ import 'server-only';
 
 import {
   getBattleLog,
+  getBrawlerRankings,
   getClub,
   getClubRankings,
+  getOfficialBrawlers,
   getPlayer,
   getPlayerRankings,
 } from '@/lib/bs-api';
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
-import { toApiError } from '@/lib/errors';
+import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
 import { normalizeTag } from '@/lib/tags';
 import { parseApiDate } from '@/lib/format';
@@ -41,6 +43,12 @@ const CONCURRENCY = 2;
 /** Retries per player when the API throttles or times out. */
 const MAX_RETRIES = 3;
 
+/**
+ * Ranking refreshes issue one call each rather than two, so they can run wider
+ * than player sampling without doubling the real request rate.
+ */
+const RANKING_CONCURRENCY = 6;
+
 /** How many days of battle samples feed win/usage rates. */
 const WINDOW_DAYS = 7;
 
@@ -54,6 +62,10 @@ export interface AggregationResult {
   seeded: number;
   /** Roster/kit differences detected against yesterday's catalogue snapshot. */
   catalogChanges: number;
+  /** Cached brawler-leaderboard rows stored this run. */
+  rankingsCached: number;
+  /** Ability-ownership rows recomputed for popular builds. */
+  buildRowsUpdated: number;
   status: 'ok' | 'partial' | 'failed';
   notes?: string;
 }
@@ -208,7 +220,8 @@ async function samplePlayer(tag: string) {
 
   const snapshotDate = todayUtc();
 
-  // Trophy/rank distribution for every brawler this player owns.
+  // Trophy/rank distribution plus which abilities this player owns, which is
+  // what the popular-build percentages are computed from.
   if (player.brawlers.length > 0) {
     await prisma.playerBrawlerSnapshot.createMany({
       data: player.brawlers.map((b) => ({
@@ -219,6 +232,12 @@ async function samplePlayer(tag: string) {
         highestTroph: b.highestTrophies,
         rank: b.rank,
         power: b.power,
+        starPowerIds: (b.starPowers ?? []).map((x) => x.id),
+        gadgetIds: (b.gadgets ?? []).map((x) => x.id),
+        gearIds: (b.gears ?? []).map((x) => x.id),
+        buffieGadget: Boolean(b.buffies?.gadget),
+        buffieStarPower: Boolean(b.buffies?.starPower),
+        buffieHyperCharge: Boolean(b.buffies?.hyperCharge),
         snapshotDate,
       })),
       skipDuplicates: true,
@@ -343,7 +362,23 @@ export async function recomputeBrawlerStats(): Promise<number> {
   const owners = new Map(ownerGroups.map((g) => [g.brawlerId, g]));
   const brawlerIds = new Set([...byBrawler.keys(), ...owners.keys()]);
 
-  let updated = 0;
+  // Same batching rationale as build stats: one delete plus one insert instead
+  // of ~106 sequential upserts against a remote database.
+  const pendingStats: {
+    brawlerId: number;
+    brawlerName: string;
+    snapshotDate: Date;
+    winRate: number | null;
+    baselineWinRate: number | null;
+    usageRate: number | null;
+    avgTrophies: number | null;
+    avgRank: number | null;
+    sampleSize: number;
+    decidedSampleSize: number;
+    ownerSampleSize: number;
+    windowDays: number;
+  }[] = [];
+
   for (const brawlerId of brawlerIds) {
     const battles = byBrawler.get(brawlerId);
     const owner = owners.get(brawlerId);
@@ -356,7 +391,9 @@ export async function recomputeBrawlerStats(): Promise<number> {
 
     const name = battles?.name ?? owner?.brawlerName ?? `Brawler ${brawlerId}`;
 
-    const values = {
+    pendingStats.push({
+      brawlerId,
+      snapshotDate,
       brawlerName: name,
       winRate,
       baselineWinRate,
@@ -367,22 +404,184 @@ export async function recomputeBrawlerStats(): Promise<number> {
       decidedSampleSize: decided,
       ownerSampleSize: owner?._count._all ?? 0,
       windowDays: WINDOW_DAYS,
-    };
-
-    await prisma.brawlerStat.upsert({
-      where: { brawlerId_snapshotDate: { brawlerId, snapshotDate } },
-      create: { brawlerId, snapshotDate, ...values },
-      update: values,
     });
-    updated++;
   }
 
-  return updated;
+  if (pendingStats.length === 0) return 0;
+
+  await prisma.brawlerStat.deleteMany({ where: { snapshotDate } });
+  const created = await prisma.brawlerStat.createMany({
+    data: pendingStats,
+    skipDuplicates: true,
+  });
+
+  return created.count;
+}
+
+/* ---------------------------- brawler rankings ---------------------------- */
+
+/**
+ * Caches the global top-200 for every brawler.
+ *
+ * One API call per brawler (~106), which is why it lives in the daily cron and
+ * not on the request path: resolving a player's placements would otherwise
+ * cost 106 calls per profile view.
+ */
+export async function refreshBrawlerRankings(budgetMs = 20_000): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const catalogue = await getOfficialBrawlers()
+    .then((r) => r.items)
+    .catch(() => []);
+  if (catalogue.length === 0) return 0;
+
+  // Refresh only what is stale. Combined with the time budget this makes the
+  // pass resumable: whatever does not fit in one run is picked up by the next,
+  // so a serverless timeout can never leave the cache permanently half-built.
+  const startOfDay = todayUtc();
+  const fresh = await prisma.brawlerRankingEntry.findMany({
+    where: { refreshedAt: { gte: startOfDay } },
+    distinct: ['brawlerId'],
+    select: { brawlerId: true },
+  });
+  const freshIds = new Set(fresh.map((r) => r.brawlerId));
+  const pending = catalogue.filter((b) => !freshIds.has(b.id));
+  if (pending.length === 0) return 0;
+
+  const deadline = Date.now() + budgetMs;
+  let stored = 0;
+
+  const results = await mapLimit(pending, RANKING_CONCURRENCY, async (brawler) => {
+    if (Date.now() > deadline) return 0;
+    const board = await withRetry(() => getBrawlerRankings(brawler.id, 'global', 200));
+    if (board.items.length === 0) return 0;
+
+    // Replace wholesale: ranks shift every day and stale rows would otherwise
+    // linger as phantom placements.
+    await prisma.brawlerRankingEntry.deleteMany({
+      where: { brawlerId: brawler.id, region: 'global' },
+    });
+    const created = await prisma.brawlerRankingEntry.createMany({
+      data: board.items.map((entry) => ({
+        brawlerId: brawler.id,
+        brawlerName: brawler.name,
+        region: 'global',
+        rank: entry.rank,
+        playerTag: normalizeTag(entry.tag),
+        playerName: entry.name,
+        trophies: entry.trophies,
+        refreshedAt: new Date(),
+      })),
+      skipDuplicates: true,
+    });
+    return created.count;
+  });
+
+  for (const result of results) {
+    if (result.status === 'fulfilled') stored += result.value;
+  }
+  return stored;
+}
+
+/* ------------------------------ popular builds ---------------------------- */
+
+/**
+ * Recomputes ability-ownership rates per brawler from the trailing window.
+ *
+ * Uses `unnest` so Postgres does the array expansion — doing this in
+ * application code would mean pulling every snapshot row over the wire.
+ */
+export async function recomputeBuildStats(): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const snapshotDate = todayUtc();
+  const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000);
+  const sinceDate = new Date(since.toISOString().slice(0, 10));
+
+  // Denominator: distinct sampled players per brawler in the window.
+  const totals = await prisma.$queryRaw<{ brawler_id: number; total: bigint }[]>`
+    SELECT brawler_id, COUNT(DISTINCT player_tag) AS total
+    FROM player_brawler_snapshots
+    WHERE snapshot_date >= ${sinceDate}
+    GROUP BY brawler_id
+  `;
+  const totalByBrawler = new Map(totals.map((r) => [r.brawler_id, Number(r.total)]));
+  if (totalByBrawler.size === 0) return 0;
+
+  const kinds: { kind: string; column: string }[] = [
+    { kind: 'starPower', column: 'star_power_ids' },
+    { kind: 'gadget', column: 'gadget_ids' },
+    { kind: 'gear', column: 'gear_ids' },
+  ];
+
+  // Collected and written in one batch. Upserting row by row meant ~1,000
+  // sequential round trips to a remote database, which dominated the whole
+  // run; delete-then-insert is two round trips and just as idempotent.
+  const pending: {
+    brawlerId: number;
+    snapshotDate: Date;
+    kind: string;
+    itemId: number;
+    owners: number;
+    totalOwners: number;
+  }[] = [];
+
+  for (const { kind, column } of kinds) {
+    // The column name is from this fixed list, never user input.
+    const rows = await prisma.$queryRawUnsafe<
+      { brawler_id: number; item_id: number; owners: bigint }[]
+    >(
+      `SELECT brawler_id, item_id, COUNT(DISTINCT player_tag) AS owners
+       FROM (
+         SELECT player_tag, brawler_id, unnest(${column}) AS item_id
+         FROM player_brawler_snapshots
+         WHERE snapshot_date >= $1
+       ) expanded
+       GROUP BY brawler_id, item_id`,
+      sinceDate,
+    );
+
+    for (const row of rows) {
+      const totalOwners = totalByBrawler.get(row.brawler_id) ?? 0;
+      if (totalOwners === 0) continue;
+
+      pending.push({
+        brawlerId: row.brawler_id,
+        snapshotDate,
+        kind,
+        itemId: row.item_id,
+        owners: Number(row.owners),
+        totalOwners,
+      });
+    }
+  }
+
+  if (pending.length === 0) return 0;
+
+  await prisma.brawlerBuildStat.deleteMany({ where: { snapshotDate } });
+  const created = await prisma.brawlerBuildStat.createMany({
+    data: pending,
+    skipDuplicates: true,
+  });
+
+  return created.count;
 }
 
 /* --------------------------------- driver --------------------------------- */
 
+/**
+ * Wall-clock budget for a whole run, kept under Vercel's 60s ceiling with room
+ * for the response to be written.
+ */
+const RUN_BUDGET_MS = 50_000;
+
+/** Always give rankings at least this long, even on a slow run. */
+const RANKING_MIN_BUDGET_MS = 5_000;
+
 export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<AggregationResult> {
+  const deadline = Date.now() + RUN_BUDGET_MS;
   const prisma = getPrisma();
   if (!prisma) {
     return {
@@ -391,6 +590,8 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated: 0,
       seeded: 0,
       catalogChanges: 0,
+      rankingsCached: 0,
+      buildRowsUpdated: 0,
       status: 'failed',
       notes: 'DATABASE_URL is not set — provision Neon before running the cron job.',
     };
@@ -416,7 +617,15 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       select: { tag: true },
     });
 
-    const results = await mapLimit(targets, CONCURRENCY, (t) => samplePlayer(t.tag));
+    // Leave room for aggregation and the ranking pass: sampling stops early
+    // rather than starving the steps that turn samples into readable data.
+    const samplingDeadline = deadline - RANKING_MIN_BUDGET_MS - 8_000;
+    const results = await mapLimit(targets, CONCURRENCY, (t) => {
+      if (Date.now() > samplingDeadline) {
+        throw new BrawlApiError('timeout', 'Run budget exhausted before sampling this player');
+      }
+      return samplePlayer(t.tag);
+    });
 
     const fulfilled = results.filter((r) => r.status === 'fulfilled');
     const battlesRecorded = fulfilled.reduce(
@@ -442,6 +651,13 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     });
 
     const brawlersUpdated = await recomputeBrawlerStats();
+    const buildRowsUpdated = await recomputeBuildStats().catch(() => 0);
+
+    // Last and time-boxed, because it is the most API-expensive step. Vercel
+    // caps a serverless invocation at 60s, so it gets whatever is left of the
+    // budget and resumes on the next run.
+    const remainingMs = Math.max(RANKING_MIN_BUDGET_MS, deadline - Date.now());
+    const rankingsCached = await refreshBrawlerRankings(remainingMs).catch(() => 0);
 
     const status: AggregationResult['status'] =
       failures === 0 ? 'ok' : fulfilled.length === 0 ? 'failed' : 'partial';
@@ -470,6 +686,8 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated,
       seeded,
       catalogChanges: catalog.changes,
+      rankingsCached,
+      buildRowsUpdated,
       status,
       notes,
     };

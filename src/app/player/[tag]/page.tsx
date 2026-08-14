@@ -10,11 +10,18 @@ import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton } from '@/components/ui/skeletons';
 import { PlayerProgression } from '@/components/player/player-progression';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
-import { getOfficialBrawlers, getPlayer } from '@/lib/bs-api';
+import { PlayerPlacements } from '@/components/player/player-placements';
+import { PlayerRanked } from '@/components/player/player-ranked';
+import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { computeProgression } from '@/lib/progression';
+import { computeProgression, estimatePlaytime } from '@/lib/progression';
 import { toApiError } from '@/lib/errors';
-import { recordLookup } from '@/lib/stats';
+import {
+  getPlayerBrawlerPlacements,
+  getReleasedBuffieCount,
+  getTrophyPercentile,
+  recordLookup,
+} from '@/lib/stats';
 import { displayTag, normalizeTag } from '@/lib/tags';
 
 interface PageProps {
@@ -63,25 +70,43 @@ export default async function PlayerPage({ params }: PageProps) {
   // page still renders — brawler cards just fall back to CDN-pattern URLs.
   // The official catalogue supplies the per-brawler totals that progression
   // needs (gears and hypercharges are not in the brawlapi payload).
-  const [brawlerMeta, catalogue] = await Promise.all([
+  const normalizedTag = normalizeTag(player.tag);
+
+  const [brawlerMeta, catalogue, globalRank] = await Promise.all([
     getBrawlerMap().catch(() => new Map()),
     getOfficialBrawlers()
       .then((r) => r.items)
       .catch(() => []),
+    // The global board only goes 200 deep, so most players are simply absent.
+    getPlayerRankings('global', 200)
+      .then((r) => r.items.find((p) => normalizeTag(p.tag) === normalizedTag)?.rank ?? null)
+      .catch(() => null),
   ]);
 
-  const progression = computeProgression(player, catalogue);
+  // Database reads run one at a time so the page never needs more than one
+  // connection, and each degrades to null/empty on its own.
+  const placements = await getPlayerBrawlerPlacements(normalizedTag);
+  const standing = await getTrophyPercentile(player.trophies);
+  const releasedBuffies = await getReleasedBuffieCount();
+
+  const progression = computeProgression(player, catalogue, releasedBuffies);
+  const playtime = estimatePlaytime(player);
 
   return (
     <div className="space-y-8">
       <RecentSearchRecorder
         kind="player"
-        tag={normalizeTag(player.tag)}
+        tag={normalizedTag}
         name={player.name}
       />
       <PlayerHeader player={player} />
       <PlayerStats player={player} />
-      <PlayerProgression progression={progression} />
+      <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
+      <PlayerPlacements
+        placements={placements}
+        iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
+      />
+      <PlayerProgression progression={progression} playtime={playtime} />
 
       <section>
         <h2 className="mb-4 text-2xl font-bold tracking-tight">Recent battles</h2>

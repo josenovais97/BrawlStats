@@ -11,8 +11,8 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 
 export const metadata: Metadata = {
   title: {
-    default: 'Brawl Stats — Brawl Stars player, club and brawler stats',
-    template: '%s · Brawl Stats',
+    default: 'Brawl Zone — Brawl Stars player, club and brawler stats',
+    template: '%s · Brawl Zone',
   },
   description:
     'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',

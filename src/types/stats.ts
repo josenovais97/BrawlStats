@@ -67,6 +67,39 @@ export interface CatalogChangeEntry {
   itemName: string | null;
 }
 
+/** A player's position on a single brawler's global leaderboard (top 200). */
+export interface BrawlerPlacement {
+  brawlerId: number;
+  brawlerName: string;
+  rank: number;
+  trophies: number;
+  region: string;
+}
+
+export interface BuildOption {
+  itemId: number;
+  /** 0–1 share of sampled owners who have this ability unlocked. */
+  share: number;
+  owners: number;
+}
+
+/** Ability-ownership rates for one brawler. */
+export interface BrawlerBuild {
+  brawlerId: number;
+  /** Sampled players who own this brawler. */
+  sampleSize: number;
+  starPowers: BuildOption[];
+  gadgets: BuildOption[];
+  gears: BuildOption[];
+}
+
+/** Where a trophy count sits within the sampled population. */
+export interface TrophyStanding {
+  /** 0–1 fraction of sampled players with fewer trophies. */
+  percentile: number;
+  population: number;
+}
+
 export interface AggregationRunSummary {
   startedAt: string;
   finishedAt: string | null;
