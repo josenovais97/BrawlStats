@@ -391,6 +391,44 @@ export async function getReleasedBuffieCount(): Promise<number | null> {
   }
 }
 
+export interface CoverageStats {
+  brawlers: number;
+  players: number;
+  battles: number;
+  placements: number;
+}
+
+/**
+ * Headline counts for the landing page.
+ *
+ * Real numbers rather than invented ones — if the database is empty the
+ * homepage falls back to the brawler count alone rather than showing zeroes.
+ */
+export async function getCoverageStats(): Promise<CoverageStats | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    // Sequential so the page never needs more than one connection.
+    const players = await prisma.sampledPlayer.count();
+    const battles = await prisma.battleSample.count();
+    const placements = await prisma.brawlerRankingEntry.count();
+    const brawlers = await prisma.brawlerCatalogEntry.findMany({
+      distinct: ['brawlerId'],
+      select: { brawlerId: true },
+    });
+
+    return {
+      brawlers: brawlers.length,
+      players,
+      battles,
+      placements,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** Most recent cron run, used to show data freshness on the tier list. */
 export async function getLastAggregationRun(): Promise<AggregationRunSummary | null> {
   const prisma = getPrisma();

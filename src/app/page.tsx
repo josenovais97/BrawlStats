@@ -2,6 +2,7 @@ import { ArrowRight, CalendarClock, Newspaper, Podium, Swords, Trophy } from 'lu
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import { HomeCoverage } from '@/components/home/home-coverage';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeTopBrawlers } from '@/components/home/home-top-brawlers';
@@ -10,30 +11,38 @@ import { TopPlayersPreview } from '@/components/home/top-players-preview';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { Skeleton, TableSkeleton } from '@/components/ui/skeletons';
 
+/**
+ * Each shortcut carries its own accent so the row reads as four distinct
+ * destinations rather than four identical grey boxes.
+ */
 const SHORTCUTS = [
   {
     href: '/brawlers',
     icon: Swords,
-    title: 'Brawler database',
+    title: 'Brawlers',
     body: 'Stats, star powers, gadgets and popular builds.',
+    accent: '#ffc53d',
   },
   {
     href: '/tier-list',
     icon: Podium,
     title: 'Tier list',
     body: 'Win and pick rates, refreshed daily.',
+    accent: '#ff5c72',
   },
   {
     href: '/release-notes',
     icon: Newspaper,
     title: 'Release notes',
     body: 'The latest official update, in full.',
+    accent: '#8b6bff',
   },
   {
     href: '/events',
     icon: CalendarClock,
     title: 'Events',
     body: 'Live and upcoming maps across every slot.',
+    accent: '#35d0ff',
   },
 ];
 
@@ -44,17 +53,46 @@ export default function HomePage() {
 
       <FavoritesList />
 
+      <Suspense fallback={<Skeleton className="h-[6.5rem] rounded-2xl" />}>
+        <HomeCoverage />
+      </Suspense>
+
       {/* What you get */}
       <section>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SHORTCUTS.map(({ href, icon: Icon, title, body }) => (
-            <Link key={href} href={href} className="card card-interactive group p-5">
-              <span className="grid size-11 place-items-center rounded-xl bg-surface-2 text-brand transition-colors group-hover:bg-brand group-hover:text-[#1a1200]">
-                <Icon className="size-5" />
+          {SHORTCUTS.map(({ href, icon: Icon, title, body, accent }) => (
+            <Link
+              key={href}
+              href={href}
+              className="card card-interactive group relative overflow-hidden p-5"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-1"
+                style={{ background: accent }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -right-8 -top-8 size-28 rounded-full opacity-20 blur-2xl transition-opacity group-hover:opacity-40"
+                style={{ background: accent }}
+              />
+
+              <span
+                className="relative grid size-12 place-items-center rounded-xl"
+                style={{
+                  background: `color-mix(in srgb, ${accent} 18%, transparent)`,
+                  color: accent,
+                }}
+              >
+                <Icon className="size-6" />
               </span>
-              <h2 className="display mt-4 text-lg">{title}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
-              <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand opacity-0 transition-opacity group-hover:opacity-100">
+
+              <h2 className="display relative mt-4 text-lg">{title}</h2>
+              <p className="relative mt-1 text-sm leading-relaxed text-muted">{body}</p>
+              <span
+                className="relative mt-3 inline-flex items-center gap-1 text-sm font-semibold opacity-0 transition-opacity group-hover:opacity-100"
+                style={{ color: accent }}
+              >
                 Open
                 <ArrowRight className="size-3.5" />
               </span>
