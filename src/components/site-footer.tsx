@@ -1,4 +1,5 @@
 import { Coffee, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 import { AppStoreBadge, GooglePlayBadge } from '@/components/store-badges';
 
@@ -51,6 +52,14 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-8 border-t border-border/70 pt-6 text-sm text-muted">
+          <p className="mb-3">
+            <Link
+              href="/about"
+              className="font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-brand"
+            >
+              About Brawl Zone
+            </Link>
+          </p>
           <p>
             Data from the official{' '}
             <a

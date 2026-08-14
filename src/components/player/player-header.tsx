@@ -47,7 +47,7 @@ export function PlayerHeader({ player }: { player: BSPlayer }) {
 
         <div className="min-w-0 flex-1">
           <h1
-            className="truncate text-3xl font-black tracking-tight sm:text-4xl"
+            className="display truncate text-4xl uppercase sm:text-5xl"
             style={{ color: nameColor }}
           >
             {player.name}

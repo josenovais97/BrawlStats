@@ -20,7 +20,7 @@ export function SectionHeading({
       <div className="flex items-start gap-3">
         <span className="rule mt-1" aria-hidden />
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+          <h2 className="display text-2xl uppercase">{title}</h2>
           {subtitle ? <p className="mt-1 text-sm text-muted">{subtitle}</p> : null}
         </div>
       </div>
@@ -42,7 +42,7 @@ export function PageHeading({
   return (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{title}</h1>
+        <h1 className="display text-3xl uppercase sm:text-4xl">{title}</h1>
         {subtitle ? (
           <p className="mt-2 max-w-3xl text-muted">{subtitle}</p>
         ) : null}

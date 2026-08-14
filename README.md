@@ -18,6 +18,7 @@ Neon Postgres.
 | `/brawlers/[id]` | Star powers, gadgets, win/pick rate, popular build, and the global top 10 on that brawler |
 | `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
 | `/release-notes` | The latest official update notes, resolved automatically |
+| `/about` | What the site is, where data comes from, and its known limits |
 | `/updates` | Detected game changes and meta movers (see below) |
 | `/events` | Live and upcoming event rotation with map art |
 | `/leaderboard` | Top 100 players or clubs, filterable across all ~250 ISO countries |
@@ -387,6 +388,10 @@ src/types/                  Interfaces for every API response and DB row
 ## Notes
 
 - Icons are [lucide-react](https://lucide.dev) throughout; there are no emoji in the UI.
+- Headings and the wordmark use **Lilita One** (`--font-display`), the closest free match
+  to the game's heavy rounded display type. Body copy stays on Geist for readability. The
+  `display`, `display-hero` and `btn-game` utilities in `globals.css` are what give the UI
+  its game feel — use them rather than restyling per component.
 - Brawler, map and mode artwork comes from Brawlify's CDN via brawlapi.com metadata.
   `next/image` is configured for those hosts in `next.config.ts` and uses `unoptimized` for
   CDN sprites to avoid burning Vercel's image-optimisation quota on assets that are already

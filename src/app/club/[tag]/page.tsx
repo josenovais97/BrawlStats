@@ -93,7 +93,7 @@ export default async function ClubPage({ params }: PageProps) {
           </div>
 
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-3xl font-black tracking-tight sm:text-4xl">
+            <h1 className="display truncate text-4xl uppercase sm:text-5xl">
               {club.name}
             </h1>
             <p className="mt-1 font-mono text-sm text-muted">{club.tag}</p>
