@@ -27,18 +27,26 @@ function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 }
 
+/** Stable empty array — `useSyncExternalStore` compares snapshots by reference. */
+const EMPTY: RecentSearch[] = [];
+
+let cachedRaw: string | null = null;
+let cachedValue: RecentSearch[] = EMPTY;
+
 export function readRecentSearches(): RecentSearch[] {
-  if (!isBrowser()) return [];
+  if (!isBrowser()) return EMPTY;
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) return EMPTY;
+    if (raw === cachedRaw) return cachedValue;
 
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) return EMPTY;
 
     // Storage is user-writable, so validate rather than trust the shape.
-    return parsed
+    cachedRaw = raw;
+    cachedValue = parsed
       .filter(
         (entry): entry is RecentSearch =>
           !!entry &&
@@ -48,15 +56,31 @@ export function readRecentSearches(): RecentSearch[] {
             (entry as RecentSearch).kind === 'club'),
       )
       .slice(0, MAX_ENTRIES);
+    return cachedValue;
   } catch {
-    return [];
+    return EMPTY;
   }
+}
+
+/** Server render has no storage, so it always starts empty. */
+export function serverRecentSearches(): RecentSearch[] {
+  return EMPTY;
+}
+
+export function subscribeRecentSearches(onChange: () => void): () => void {
+  window.addEventListener(RECENT_SEARCHES_EVENT, onChange);
+  window.addEventListener('storage', onChange);
+  return () => {
+    window.removeEventListener(RECENT_SEARCHES_EVENT, onChange);
+    window.removeEventListener('storage', onChange);
+  };
 }
 
 function write(entries: RecentSearch[]) {
   if (!isBrowser()) return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
+    cachedRaw = null;
     window.dispatchEvent(new Event(RECENT_SEARCHES_EVENT));
   } catch {
     // Quota exceeded or storage disabled — recents are a convenience, not a

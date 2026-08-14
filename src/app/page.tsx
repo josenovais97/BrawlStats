@@ -1,9 +1,10 @@
-import { ArrowRight, CalendarClock, Crown, Newspaper, Swords, Trophy } from 'lucide-react';
+import { ArrowRight, CalendarClock, Newspaper, Podium, Swords, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeTopBrawlers } from '@/components/home/home-top-brawlers';
+import { FavoritesList } from '@/components/favorites-list';
 import { SearchBar } from '@/components/search-bar';
 import { TopPlayersPreview } from '@/components/home/top-players-preview';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -18,7 +19,7 @@ const SHORTCUTS = [
   },
   {
     href: '/tier-list',
-    icon: Crown,
+    icon: Podium,
     title: 'Tier list',
     body: 'Win and pick rates, refreshed daily.',
   },
@@ -76,6 +77,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <FavoritesList />
 
       {/* What you get */}
       <section>

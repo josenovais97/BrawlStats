@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Lock, Shield, Trophy, UserPlus, Users } from 'lucide-react';
 
+import { FavoriteButton } from '@/components/favorite-button';
 import { TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 
@@ -103,12 +104,15 @@ export default async function ClubPage({ params }: PageProps) {
             ) : null}
           </div>
 
-          <div className="flex shrink-0 flex-col items-end gap-1 rounded-2xl border border-border bg-surface-2/60 px-5 py-4">
-            <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand sm:text-4xl">
-              <TrophyIcon className="size-7" />
-              {formatNumber(club.trophies)}
-            </span>
-            <span className="text-xs text-muted">Club trophies</span>
+          <div className="flex shrink-0 flex-col items-stretch gap-2.5">
+            <div className="flex flex-col items-end gap-1 rounded-2xl border border-border bg-surface-2/60 px-5 py-4">
+              <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand sm:text-4xl">
+                <TrophyIcon className="size-7" />
+                {formatNumber(club.trophies)}
+              </span>
+              <span className="text-xs text-muted">Club trophies</span>
+            </div>
+            <FavoriteButton kind="club" tag={normalizeTag(club.tag)} name={club.name} />
           </div>
         </div>
       </header>

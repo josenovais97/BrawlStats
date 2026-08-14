@@ -2,14 +2,14 @@
 
 import { Clock, Shield, User, X } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 import {
-  RECENT_SEARCHES_EVENT,
   clearRecentSearches,
   readRecentSearches,
   removeRecentSearch,
-  type RecentSearch,
+  serverRecentSearches,
+  subscribeRecentSearches,
 } from '@/lib/recent-searches';
 
 /**
@@ -18,22 +18,13 @@ import {
  * available during SSR.
  */
 export function RecentSearches() {
-  const [entries, setEntries] = useState<RecentSearch[] | null>(null);
+  const entries = useSyncExternalStore(
+    subscribeRecentSearches,
+    readRecentSearches,
+    serverRecentSearches,
+  );
 
-  useEffect(() => {
-    const sync = () => setEntries(readRecentSearches());
-    sync();
-
-    window.addEventListener(RECENT_SEARCHES_EVENT, sync);
-    // Keep tabs in sync when a lookup happens in another one.
-    window.addEventListener('storage', sync);
-    return () => {
-      window.removeEventListener(RECENT_SEARCHES_EVENT, sync);
-      window.removeEventListener('storage', sync);
-    };
-  }, []);
-
-  if (!entries || entries.length === 0) return null;
+  if (entries.length === 0) return null;
 
   return (
     <div className="mt-6">

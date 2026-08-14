@@ -68,11 +68,9 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
             <ul className="space-y-2">
               {options.map((option, index) => {
                 // Only crown a favourite when the leader is clearly ahead;
-                // near-identical unlock rates mean players take both.
+                // a near-even split means players take both.
                 const leadMargin =
-                  options.length > 1
-                    ? options[0].unlockRate - options[1].unlockRate
-                    : 0;
+                  options.length > 1 ? options[0].share - options[1].share : 0;
                 const accessory = accessoryById.get(option.itemId);
                 const isGear = title === 'Gears';
                 const name =
@@ -104,14 +102,19 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                             </span>
                           ) : null}
                         </span>
-                        <span className="shrink-0 text-sm font-bold tabular-nums">
-                          {formatPercent(option.unlockRate)}
+                        <span className="flex shrink-0 items-baseline gap-2">
+                          <span className="text-xs text-muted">
+                            {formatNumber(option.owners)} unlocks
+                          </span>
+                          <span className="text-sm font-bold tabular-nums">
+                            {formatPercent(option.share)}
+                          </span>
                         </span>
                       </div>
                       <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-brand-strong to-brand"
-                          style={{ width: `${Math.round(option.unlockRate * 100)}%` }}
+                          style={{ width: `${Math.round(option.share * 100)}%` }}
                         />
                       </div>
                     </div>
@@ -124,8 +127,8 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       })}
 
       <p className="text-xs text-muted">
-        Share of {formatNumber(build.sampleSize)} tracked players who own this brawler and
-        have each option unlocked.
+        Split of unlocks within each category, across {formatNumber(build.sampleSize)}{' '}
+        tracked players who own this brawler.
       </p>
     </div>
   );

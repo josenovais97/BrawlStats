@@ -2,6 +2,7 @@ import { Shield, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { FavoriteButton } from '@/components/favorite-button';
 import { TrophyIcon } from '@/components/game-icons';
 import { playerIconUrl, prestigeIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
@@ -96,14 +97,21 @@ export function PlayerHeader({ player }: { player: BSPlayer }) {
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-1 rounded-2xl border border-border bg-surface-2/60 px-5 py-4">
-          <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand sm:text-4xl">
-            <TrophyIcon className="size-7" />
-            {formatNumber(player.trophies)}
-          </span>
-          <span className="text-xs text-muted">
-            Peak {formatNumber(player.highestTrophies)}
-          </span>
+        <div className="flex shrink-0 flex-col items-stretch gap-2.5">
+          <div className="flex flex-col items-end gap-1 rounded-2xl border border-border bg-surface-2/60 px-5 py-4">
+            <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand sm:text-4xl">
+              <TrophyIcon className="size-7" />
+              {formatNumber(player.trophies)}
+            </span>
+            <span className="text-xs text-muted">
+              Peak {formatNumber(player.highestTrophies)}
+            </span>
+          </div>
+          <FavoriteButton
+            kind="player"
+            tag={normalizeTag(player.tag)}
+            name={player.name}
+          />
         </div>
       </div>
     </header>

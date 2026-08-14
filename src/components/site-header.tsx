@@ -2,9 +2,9 @@
 
 import {
   CalendarClock,
-  Crown,
   Menu,
   Newspaper,
+  Podium,
   ScrollText,
   Search,
   Swords,
@@ -19,9 +19,9 @@ import { BrandMark } from '@/components/brand-mark';
 
 const NAV = [
   { href: '/brawlers', label: 'Brawlers', icon: Swords },
-  { href: '/tier-list', label: 'Tier List', icon: Crown },
+  { href: '/tier-list', label: 'Tier List', icon: Podium },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
-  { href: '/updates', label: 'Updates', icon: Newspaper },
+  { href: '/news', label: 'News', icon: Newspaper },
   { href: '/events', label: 'Events', icon: CalendarClock },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];

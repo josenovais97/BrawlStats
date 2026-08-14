@@ -21,7 +21,7 @@ import { getCatalogChanges, getMetaMovers } from '@/lib/stats';
 import type { CatalogChangeEntry, MetaMover } from '@/types/stats';
 
 export const metadata: Metadata = {
-  title: 'Updates',
+  title: 'News',
   description:
     'Detected Brawl Stars roster and kit changes, plus which brawlers are trending up or down in the sampled meta.',
 };
@@ -63,7 +63,7 @@ export default async function UpdatesPage() {
   return (
     <div className="space-y-10">
       <header>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Updates</h1>
+        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">News</h1>
         <p className="mt-2 max-w-3xl text-muted">
           New brawlers and abilities, and which brawlers are rising or falling.
         </p>
