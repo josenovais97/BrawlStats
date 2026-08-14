@@ -1,0 +1,133 @@
+// Neon Postgres, provisioned through the Vercel Marketplace integration.
+// See the README for setup and migration steps.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Prisma 7 takes the connection URL from prisma.config.ts for migrations and
+// from the driver adapter at runtime, so no `url` belongs here.
+datasource db {
+  provider = "postgresql"
+}
+
+/// The rotating pool of player tags the sampler walks through.
+///
+/// Seeded from global/regional trophy rankings and from the clubs those
+/// players belong to, plus anyone looked up on the site. `lastSampledAt`
+/// drives a least-recently-sampled queue so one cron run never re-reads the
+/// same players.
+model SampledPlayer {
+  tag           String    @id
+  name          String?
+  trophies      Int?
+  /// Where the tag came from: "ranking", "club", "lookup".
+  source        String    @default("ranking")
+  lastSampledAt DateTime? @map("last_sampled_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([lastSampledAt])
+  @@map("sampled_players")
+}
+
+/// One row per (player, brawler, day): the trophy and rank distribution that
+/// feeds avg trophies and rank counts.
+model PlayerBrawlerSnapshot {
+  id           Int      @id @default(autoincrement())
+  playerTag    String   @map("player_tag")
+  brawlerId    Int      @map("brawler_id")
+  brawlerName  String   @map("brawler_name")
+  trophies     Int
+  highestTroph Int      @map("highest_trophies")
+  rank         Int
+  power        Int
+  snapshotDate DateTime @map("snapshot_date") @db.Date
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([playerTag, brawlerId, snapshotDate])
+  @@index([snapshotDate, brawlerId])
+  @@map("player_brawler_snapshots")
+}
+
+/// One row per battle *as played by a sampled player*, recording which brawler
+/// they used and how it went.
+///
+/// Only the sampled player's own entry is stored, never their teammates' —
+/// counting every participant would inflate the sample with correlated rows
+/// and skew usage toward whatever the sampled cohort tends to face.
+model BattleSample {
+  id          Int      @id @default(autoincrement())
+  /// "<battleTime>:<playerTag>" — the natural key that makes re-runs idempotent.
+  battleKey   String   @unique @map("battle_key")
+  playerTag   String   @map("player_tag")
+  brawlerId   Int      @map("brawler_id")
+  brawlerName String   @map("brawler_name")
+  /// "victory" | "defeat" | "draw"
+  result      String
+  /// Showdown placement when the mode reports a rank instead of a result.
+  rank        Int?
+  mode        String
+  battleType  String   @map("battle_type")
+  trophyChange Int?    @map("trophy_change")
+  battleTime  DateTime @map("battle_time")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([battleTime])
+  @@index([brawlerId, battleTime])
+  @@map("battle_samples")
+}
+
+/// Daily aggregate the tier list reads. Recomputed by the cron job from the
+/// trailing sampling window, never queried live from the game API.
+model BrawlerStat {
+  id           Int      @id @default(autoincrement())
+  brawlerId    Int      @map("brawler_id")
+  brawlerName  String   @map("brawler_name")
+  snapshotDate DateTime @map("snapshot_date") @db.Date
+
+  /// Fraction 0–1 of decided sampled battles with this brawler that were wins.
+  winRate     Float? @map("win_rate")
+  /// Mean win rate across the entire sample on this snapshot.
+  ///
+  /// The pool skews toward strong players, who win most games regardless of
+  /// brawler, so raw win rate sits far above 50%. Tiers are assigned on the
+  /// gap between `winRate` and this baseline, which cancels that bias out.
+  baselineWinRate Float? @map("baseline_win_rate")
+  /// Fraction 0–1 of all sampled battles that featured this brawler.
+  usageRate   Float? @map("usage_rate")
+  /// Mean trophies across sampled players who own this brawler.
+  avgTrophies Float? @map("avg_trophies")
+  /// Mean brawler rank across the same population.
+  avgRank     Float? @map("avg_rank")
+
+  /// Battles counted for usageRate (includes showdown placements).
+  sampleSize      Int @default(0) @map("sample_size")
+  /// Battles that reported a win or loss — the denominator behind winRate.
+  decidedSampleSize Int @default(0) @map("decided_sample_size")
+  /// Player-brawler snapshots counted for avgTrophies/avgRank.
+  ownerSampleSize Int @default(0) @map("owner_sample_size")
+  /// Number of days of battle data folded into this row.
+  windowDays      Int @default(7) @map("window_days")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([brawlerId, snapshotDate])
+  @@index([snapshotDate])
+  @@map("brawler_stats")
+}
+
+/// Audit trail for cron runs, so a stale tier list can be explained.
+model AggregationRun {
+  id              Int      @id @default(autoincrement())
+  startedAt       DateTime @default(now()) @map("started_at")
+  finishedAt      DateTime? @map("finished_at")
+  playersSampled  Int      @default(0) @map("players_sampled")
+  battlesRecorded Int      @default(0) @map("battles_recorded")
+  brawlersUpdated Int      @default(0) @map("brawlers_updated")
+  /// "ok" | "partial" | "failed"
+  status          String   @default("ok")
+  notes           String?
+
+  @@map("aggregation_runs")
+}

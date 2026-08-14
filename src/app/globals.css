@@ -1,26 +1,100 @@
 @import "tailwindcss";
 
+/*
+ * Game-inspired dark theme. The palette is committed to dark only: Brawl Stars
+ * artwork is drawn on dark backgrounds and reads poorly on white.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b1020;
+  --surface: #141a2e;
+  --surface-2: #1c2440;
+  --border: #2a3352;
+  --foreground: #e8ecf8;
+  --muted: #97a2c4;
+  --brand: #ffc53d;
+  --brand-strong: #ffab00;
+  --accent: #7c5cff;
+  --victory: #35d07f;
+  --defeat: #ff5c72;
+  --draw: #8b95b8;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-accent: var(--accent);
+  --color-victory: var(--victory);
+  --color-defeat: var(--defeat);
+  --color-draw: var(--draw);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background:
+    radial-gradient(ellipse 90rem 40rem at 50% -10%, #1d2547 0%, transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+/* Reusable surface treatment for the card-based layout. */
+@utility card {
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+/* Subtle sheen used on hero / header cards. */
+@utility card-glow {
+  box-shadow:
+    0 1px 0 0 color-mix(in srgb, #ffffff 8%, transparent) inset,
+    0 20px 40px -24px rgb(0 0 0 / 0.8);
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Loading skeleton block with a travelling highlight. */
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border-radius: 0.5rem;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, #ffffff 7%, transparent),
+      transparent
+    );
+    animation: shimmer 1.6s infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand) 35%, transparent);
 }

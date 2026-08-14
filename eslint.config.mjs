@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Prisma 7 emits TypeScript sources; they are generated, not authored.
+    "src/generated/**",
   ]),
 ]);
 
