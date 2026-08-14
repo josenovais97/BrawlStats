@@ -1,7 +1,7 @@
-import { Trophy } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { TrophyIcon } from '@/components/game-icons';
 import { getPlayerRankings } from '@/lib/bs-api';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
@@ -31,7 +31,7 @@ export async function TopPlayersPreview() {
           <li key={player.tag}>
             <Link
               href={`/player/${tag}`}
-              className="card flex items-center gap-4 p-3 transition-colors hover:border-brand/40"
+              className="card card-interactive flex items-center gap-4 p-3"
             >
               <span className="w-8 shrink-0 text-center text-lg font-black tabular-nums text-muted">
                 {player.rank}
@@ -56,7 +56,7 @@ export async function TopPlayersPreview() {
                 ) : null}
               </div>
               <span className="flex shrink-0 items-center gap-1.5 font-bold tabular-nums text-brand">
-                <Trophy className="size-4" />
+                <TrophyIcon className="size-4" />
                 {formatNumber(player.trophies)}
               </span>
             </Link>

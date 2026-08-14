@@ -1,10 +1,11 @@
 'use client';
 
-import { ArrowUpDown, Search, Star, Trophy } from 'lucide-react';
+import { ArrowUpDown, Search, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { TrophyIcon } from '@/components/game-icons';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
@@ -113,7 +114,7 @@ function BrawlerTile({
   return (
     <Link
       href={`/brawlers/${brawler.id}`}
-      className="card group relative overflow-hidden p-3 transition-transform hover:-translate-y-0.5"
+      className="card card-interactive group relative overflow-hidden p-3"
       style={{ borderColor: `color-mix(in srgb, ${accent} 35%, transparent)` }}
     >
       <span
@@ -144,7 +145,7 @@ function BrawlerTile({
 
       <div className="mt-2 flex items-center justify-center gap-3 text-xs">
         <span className="flex items-center gap-1 tabular-nums text-brand">
-          <Trophy className="size-3" />
+          <TrophyIcon className="size-3" />
           {formatNumber(brawler.trophies)}
         </span>
         <span className="flex items-center gap-1 tabular-nums text-muted">

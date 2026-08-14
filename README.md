@@ -21,6 +21,18 @@ Neon Postgres.
 | `/events` | Live and upcoming event rotation with map art |
 | `/leaderboard` | Top 100 players or clubs, filterable across all ~250 ISO countries |
 
+### Recent form
+
+Built from the battle log (~25 battles, which is all the API keeps):
+
+- Win/loss split, net trophy swing and star-player count
+- Most played brawlers with per-brawler win rate and trophy change
+- Repeat teammates and opponents, linked to their profiles
+- Activity: battles in the last 24h, battles per day, last seen
+
+Everything here is labelled "recent" because the window genuinely is — there is no
+endpoint for career battle history.
+
 ### Player rankings and standing
 
 Profiles surface three kinds of position:
@@ -268,6 +280,17 @@ masquerade as a balance change, and both sides must clear the 30-battle floor.
 The first cron run only seeds the catalogue baseline — recording all ~106 existing brawlers
 as "new" would be noise. Changes appear from the second run onwards, and movers need at
 least two daily snapshots with enough battles on both.
+
+## Icons
+
+| Asset | Source |
+| --- | --- |
+| Brawlers, star powers, gadgets, gears, ranked tiers, prestiges, club badges, profile icons, maps, game modes | [Brawlify CDN](https://github.com/Brawlify/CDN) |
+| Hypercharge, buffie, coins, power points | `public/icons/*` — the CDN does not publish these |
+| Trophy | Inline SVG in `src/components/game-icons.tsx` — no standalone asset exists |
+
+`game-icons.tsx` is the single place these are wired up. Star power, gadget and gear use a
+representative CDN asset as the generic category mark.
 
 ## Popular builds
 

@@ -88,7 +88,7 @@ export default async function TierListPage() {
               <Link
                 key={entry.brawlerId}
                 href={`/brawlers/${entry.brawlerId}`}
-                className="card flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:border-brand/40"
+                className="card card-interactive flex items-center gap-2 px-3 py-2 text-sm"
               >
                 {entry.imageUrl ? (
                   <Image

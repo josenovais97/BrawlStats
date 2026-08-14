@@ -36,21 +36,31 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <div className="space-y-12">
-      <section className="card card-glow overflow-hidden p-6 sm:p-10">
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-brand">
+      <section className="card card-glow relative overflow-hidden p-6 sm:p-12">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 size-[28rem] rounded-full opacity-[0.14] blur-3xl"
+          style={{ background: 'radial-gradient(circle, #ffc53d, transparent 65%)' }}
+        />
+
+        <div className="relative max-w-2xl">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-brand">
             Brawl Zone
-          </p>
-          <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
-            Look up any player or club.
+          </span>
+          <h1 className="mt-4 text-4xl font-black leading-[1.05] tracking-tight sm:text-6xl">
+            Every stat,
+            <br />
+            <span className="bg-gradient-to-r from-brand via-brand-strong to-accent bg-clip-text text-transparent">
+              one search away.
+            </span>
           </h1>
-          <p className="mt-4 text-lg leading-relaxed text-muted">
-            Trophies, brawler progression, battle history and club rosters — pulled live
-            from the official Brawl Stars API.
+          <p className="mt-5 text-lg leading-relaxed text-muted">
+            Trophies, progression, world rankings, recent form and club rosters — pulled
+            live from the official Brawl Stars API.
           </p>
         </div>
 
-        <div className="mt-8 max-w-2xl">
+        <div className="relative mt-8 max-w-2xl">
           <SearchBar autoFocus showRecent />
         </div>
       </section>
@@ -61,7 +71,7 @@ export default function HomePage() {
             <Link
               key={href}
               href={href}
-              className="card group p-5 transition-colors hover:border-brand/40"
+              className="card card-interactive group p-5"
             >
               <span className="grid size-10 place-items-center rounded-lg bg-surface-2 text-brand transition-colors group-hover:bg-brand group-hover:text-[#1a1200]">
                 <Icon className="size-5" />

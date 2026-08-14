@@ -81,7 +81,7 @@ export default async function UpdatesPage() {
                 href={post.url}
                 target="_blank"
                 rel="noreferrer"
-                className="card group overflow-hidden transition-colors hover:border-brand/40"
+                className="card card-interactive group overflow-hidden"
               >
                 {post.imageUrl ? (
                   <Image
@@ -299,7 +299,7 @@ function ChangeRow({
   return (
     <Link
       href={`/brawlers/${change.brawlerId}`}
-      className="card flex items-center gap-3 p-3 transition-colors hover:border-brand/40"
+      className="card card-interactive flex items-center gap-3 p-3"
     >
       {imageUrl ? (
         <Image

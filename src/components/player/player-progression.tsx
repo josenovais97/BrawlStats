@@ -1,12 +1,16 @@
-import { Clock, Shirt, Sparkles, Star, Wrench, Cog, Swords, TrendingUp } from 'lucide-react';
+import { Clock, Shirt, Star, Swords, TrendingUp } from 'lucide-react';
 
 import {
   BuffieIcon,
   CoinIcon,
+  GadgetIcon,
+  GearIcon,
   HyperchargeIcon,
   PowerPointIcon,
+  StarPowerIcon,
 } from '@/components/game-icons';
 
+import { SectionHeading } from '@/components/ui/section-heading';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type {
   OwnershipStat,
@@ -35,13 +39,23 @@ export function PlayerProgression({ progression, playtime }: Props) {
       tone: 'text-victory',
     },
     {
-      icon: Sparkles,
+      node: <StarPowerIcon className="size-4" />,
       label: 'Star powers',
       stat: progression.starPowers,
       tone: 'text-brand',
     },
-    { icon: Wrench, label: 'Gadgets', stat: progression.gadgets, tone: 'text-accent' },
-    { icon: Cog, label: 'Gears', stat: progression.gears, tone: 'text-muted' },
+    {
+      node: <GadgetIcon className="size-4" />,
+      label: 'Gadgets',
+      stat: progression.gadgets,
+      tone: 'text-accent',
+    },
+    {
+      node: <GearIcon className="size-4" />,
+      label: 'Gears',
+      stat: progression.gears,
+      tone: 'text-muted',
+    },
     {
       node: <HyperchargeIcon className="size-4" />,
       label: 'Hypercharges',
@@ -58,14 +72,14 @@ export function PlayerProgression({ progression, playtime }: Props) {
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h2 className="text-2xl font-bold tracking-tight">Progression</h2>
-        <p className="text-sm text-muted">
-          {progression.totalsUnavailable
+      <SectionHeading
+        title="Progression"
+        aside={
+          progression.totalsUnavailable
             ? 'Totals unavailable right now'
-            : `${formatPercent(progression.completion)} of everything unlocked`}
-        </p>
-      </div>
+            : `${formatPercent(progression.completion)} of everything unlocked`
+        }
+      />
 
       <div className="card card-glow p-5">
         {/* Headline completion bar. */}

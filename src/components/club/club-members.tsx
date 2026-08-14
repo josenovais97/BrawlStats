@@ -1,10 +1,11 @@
 'use client';
 
-import { Crown, Search, Shield, Star, Trophy, User } from 'lucide-react';
+import { Crown, Search, Shield, Star, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { TrophyIcon } from '@/components/game-icons';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, humanizeRole, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
@@ -101,7 +102,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
-                  className="card flex items-center gap-3 p-3 transition-colors hover:border-brand/40"
+                  className="card card-interactive flex items-center gap-3 p-3"
                 >
                   <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums text-muted">
                     {index + 1}
@@ -130,7 +131,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
                     {humanizeRole(member.role)}
                   </span>
                   <span className="flex w-24 shrink-0 items-center justify-end gap-1.5 font-bold tabular-nums text-brand">
-                    <Trophy className="size-4" />
+                    <TrophyIcon className="size-4" />
                     {formatNumber(member.trophies)}
                   </span>
                 </Link>

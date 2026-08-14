@@ -1,140 +1,82 @@
+import Image from 'next/image';
+
 /**
- * Game-flavoured icons for things the public asset CDN does not publish.
+ * Real in-game artwork, used everywhere a stat refers to a game concept.
  *
- * Brawlify's CDN covers brawlers, star powers, gadgets, gears, ranked tiers,
- * prestiges and profile icons — those are used directly as images elsewhere.
- * It has nothing for hypercharge, buffies or the currencies, so these are
- * drawn here in the same visual language rather than shipping a generic glyph
- * or hotlinking assets from someone's site.
+ * Two sources:
+ *  - `public/icons/*` for hypercharge, buffie, coins and power points, which
+ *    the public asset CDN does not publish.
+ *  - Brawlify's CDN (https://github.com/Brawlify/CDN) for star power, gadget
+ *    and gear, where a representative asset stands in as the generic mark.
  *
- * Each takes a className so it can be sized like any other icon.
+ * All render with `unoptimized` because they are already small, pre-compressed
+ * PNGs; running them through the image optimiser would spend Vercel quota for
+ * no gain.
  */
 
 interface IconProps {
   className?: string;
 }
 
-/** Hypercharge: the lightning bolt in its charged ring. */
-export function HyperchargeIcon({ className = 'size-5' }: IconProps) {
+/** Representative CDN assets used as generic category marks. */
+const GENERIC_STAR_POWER =
+  'https://cdn.brawlify.com/star-powers/borderless/23000076.png';
+const GENERIC_GADGET = 'https://cdn.brawlify.com/gadgets/borderless/23000255.png';
+const GENERIC_GEAR = 'https://cdn.brawlify.com/gears/regular/62000000.png';
+
+function GameIcon({
+  src,
+  alt,
+  className = 'size-5',
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
   return (
-    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Hypercharge">
-      <defs>
-        <linearGradient id="hc-grad" x1="0" y1="0" x2="0.4" y2="1">
-          <stop offset="0" stopColor="#8ef6ff" />
-          <stop offset="0.5" stopColor="#39c9f5" />
-          <stop offset="1" stopColor="#9d5cff" />
-        </linearGradient>
-      </defs>
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="url(#hc-grad)"
-        strokeWidth="2"
-        opacity="0.55"
-      />
-      <path
-        d="M13.4 2.6 6.2 13.2h4.3l-1 8.2 7.4-10.8h-4.4z"
-        fill="url(#hc-grad)"
-        stroke="#0b1020"
-        strokeWidth="0.9"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <Image
+      src={src}
+      alt={alt}
+      width={64}
+      height={64}
+      className={`${className} object-contain`}
+      unoptimized
+    />
   );
 }
 
-/** Buffie: a small companion orb with a plus, matching the in-game framing. */
-export function BuffieIcon({ className = 'size-5' }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Buffie">
-      <defs>
-        <radialGradient id="buffie-grad" cx="0.35" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#ffe6a3" />
-          <stop offset="0.55" stopColor="#ff9bd2" />
-          <stop offset="1" stopColor="#a054ff" />
-        </radialGradient>
-      </defs>
-      <circle
-        cx="12"
-        cy="12.6"
-        r="8.4"
-        fill="url(#buffie-grad)"
-        stroke="#0b1020"
-        strokeWidth="1.4"
-      />
-      <circle cx="9.2" cy="9.6" r="1.9" fill="#ffffff" opacity="0.75" />
-      <path
-        d="M12 8.6v8M8 12.6h8"
-        stroke="#0b1020"
-        strokeWidth="2"
-        strokeLinecap="round"
-        opacity="0.65"
-      />
-    </svg>
-  );
+export function HyperchargeIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/hypercharge.png" alt="Hypercharge" className={className} />;
 }
 
-/** Coin: the gold currency. */
-export function CoinIcon({ className = 'size-5' }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Coins">
-      <defs>
-        <linearGradient id="coin-grad" x1="0.2" y1="0" x2="0.7" y2="1">
-          <stop offset="0" stopColor="#ffe27a" />
-          <stop offset="0.55" stopColor="#f7c948" />
-          <stop offset="1" stopColor="#e09b16" />
-        </linearGradient>
-      </defs>
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="url(#coin-grad)"
-        stroke="#7a4c06"
-        strokeWidth="1.5"
-      />
-      <circle cx="12" cy="12" r="5.8" fill="none" stroke="#c98a10" strokeWidth="1.2" />
-      <path
-        d="M12 8.4c-1.7 0-2.7.9-2.7 2s.9 1.6 2.7 2 2.7.9 2.7 2-1 2-2.7 2m0-8v8m0-8V7m0 9.4v1.2"
-        fill="none"
-        stroke="#7a4c06"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
+export function BuffieIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/buffie.png" alt="Buffie" className={className} />;
 }
 
-/** Power point: the blue upgrade currency. */
-export function PowerPointIcon({ className = 'size-5' }: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Power points">
-      <defs>
-        <linearGradient id="pp-grad" x1="0.2" y1="0" x2="0.7" y2="1">
-          <stop offset="0" stopColor="#a5e5ff" />
-          <stop offset="0.55" stopColor="#3fa9f5" />
-          <stop offset="1" stopColor="#1c62c9" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M12 2.5 21 8v8l-9 5.5L3 16V8z"
-        fill="url(#pp-grad)"
-        stroke="#0d3a70"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12.9 6.8 8.4 13.3h3l-.6 4.6 4.7-6.9h-3z"
-        fill="#ffffff"
-        opacity="0.9"
-      />
-    </svg>
-  );
+export function CoinIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/coin.png" alt="Coins" className={className} />;
 }
 
-/** Trophy, used where the road/ranking context wants a game-styled mark. */
+export function PowerPointIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/power-point.png" alt="Power points" className={className} />;
+}
+
+export function StarPowerIcon({ className }: IconProps) {
+  return <GameIcon src={GENERIC_STAR_POWER} alt="Star power" className={className} />;
+}
+
+export function GadgetIcon({ className }: IconProps) {
+  return <GameIcon src={GENERIC_GADGET} alt="Gadget" className={className} />;
+}
+
+export function GearIcon({ className }: IconProps) {
+  return <GameIcon src={GENERIC_GEAR} alt="Gear" className={className} />;
+}
+
+/**
+ * Trophy. Brawlify's CDN has no standalone trophy asset, so this stays drawn —
+ * it is a simple enough shape to match the rest without looking out of place.
+ */
 export function TrophyIcon({ className = 'size-5' }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Trophies">

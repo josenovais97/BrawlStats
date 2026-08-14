@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Lock, Shield, Trophy, UserPlus, Users } from 'lucide-react';
+
+import { TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 
 import { ClubMembers } from '@/components/club/club-members';
@@ -85,7 +87,7 @@ export default async function ClubPage({ params }: PageProps) {
 
           <div className="flex flex-col items-end gap-1">
             <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand">
-              <Trophy className="size-7" />
+              <TrophyIcon className="size-7" />
               {formatNumber(club.trophies)}
             </span>
             <span className="text-xs text-muted">Club trophies</span>

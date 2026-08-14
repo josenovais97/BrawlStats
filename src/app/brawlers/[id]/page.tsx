@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowLeft, BarChart3, Sparkles, Trophy, Users, Wrench } from 'lucide-react';
+import { ArrowLeft, BarChart3, Sparkles, Trophy, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -9,6 +9,7 @@ import { PopularBuild } from '@/components/brawlers/popular-build';
 import { ErrorState } from '@/components/ui/error-state';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
+import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
 import { getBrawler } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { getOfficialBrawlers } from '@/lib/bs-api';
@@ -202,13 +203,13 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       <section className="grid gap-6 lg:grid-cols-2">
         <AccessoryList
           title="Star powers"
-          icon={Sparkles}
+          node={<StarPowerIcon className="size-5" />}
           items={brawler.starPowers}
           emptyLabel="No star powers released."
         />
         <AccessoryList
           title="Gadgets"
-          icon={Wrench}
+          node={<GadgetIcon className="size-5" />}
           items={brawler.gadgets}
           emptyLabel="No gadgets released."
         />
@@ -228,19 +229,19 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
 function AccessoryList({
   title,
-  icon: Icon,
+  node,
   items,
   emptyLabel,
 }: {
   title: string;
-  icon: typeof Sparkles;
+  node: React.ReactNode;
   items: BAAccessory[];
   emptyLabel: string;
 }) {
   return (
     <div>
       <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-        <Icon className="size-5 text-brand" />
+        {node}
         {title}
       </h2>
 

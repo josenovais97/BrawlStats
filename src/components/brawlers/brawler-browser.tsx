@@ -1,9 +1,11 @@
 'use client';
 
-import { Search, Sparkles, Wrench } from 'lucide-react';
+import { Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+
+import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
 
 /** Only what the grid renders — keeps the client payload small. */
 export interface BrawlerCardData {
@@ -97,7 +99,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             <Link
               key={brawler.id}
               href={`/brawlers/${brawler.id}`}
-              className="card group overflow-hidden p-3 transition-transform hover:-translate-y-0.5"
+              className="card card-interactive group overflow-hidden p-3"
               style={{
                 borderColor: `color-mix(in srgb, ${brawler.rarityColor} 35%, transparent)`,
               }}
@@ -124,11 +126,11 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               </p>
               <div className="mt-2 flex items-center justify-center gap-3 text-xs text-muted">
                 <span className="flex items-center gap-1" title="Star powers">
-                  <Sparkles className="size-3" />
+                  <StarPowerIcon className="size-3" />
                   {brawler.starPowers}
                 </span>
                 <span className="flex items-center gap-1" title="Gadgets">
-                  <Wrench className="size-3" />
+                  <GadgetIcon className="size-3" />
                   {brawler.gadgets}
                 </span>
               </div>

@@ -58,3 +58,20 @@ export function TableSkeleton({ rows = 10 }: { rows?: number }) {
     </div>
   );
 }
+
+export function InsightsSkeleton() {
+  return (
+    <section>
+      <Skeleton className="mb-4 h-8 w-40" />
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Skeleton className="h-56 rounded-2xl" />
+        <Skeleton className="h-56 rounded-2xl lg:col-span-2" />
+      </div>
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        {Array.from({ length: 3 }, (_, i) => (
+          <Skeleton key={i} className="h-44 rounded-2xl" />
+        ))}
+      </div>
+    </section>
+  );
+}

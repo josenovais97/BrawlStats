@@ -1,5 +1,6 @@
-import { Cog, Sparkles, Wrench } from 'lucide-react';
 import Image from 'next/image';
+
+import { GadgetIcon, GearIcon, StarPowerIcon } from '@/components/game-icons';
 
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
@@ -40,24 +41,27 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
 
   const groups: {
     title: string;
-    icon: typeof Sparkles;
-    tone: string;
+    node: React.ReactNode;
     options: BuildOption[];
   }[] = [
-    { title: 'Star power', icon: Sparkles, tone: 'text-brand', options: build.starPowers },
-    { title: 'Gadget', icon: Wrench, tone: 'text-accent', options: build.gadgets },
-    { title: 'Gears', icon: Cog, tone: 'text-muted', options: build.gears },
+    {
+      title: 'Star power',
+      node: <StarPowerIcon className="size-5" />,
+      options: build.starPowers,
+    },
+    { title: 'Gadget', node: <GadgetIcon className="size-5" />, options: build.gadgets },
+    { title: 'Gears', node: <GearIcon className="size-5" />, options: build.gears },
   ];
 
   return (
     <div className="space-y-4">
-      {groups.map(({ title, icon: Icon, tone, options }) => {
+      {groups.map(({ title, node, options }) => {
         if (options.length === 0) return null;
 
         return (
           <div key={title} className="card p-4">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-bold">
-              <Icon className={`size-4 ${tone}`} />
+              {node}
               {title}
             </h3>
 

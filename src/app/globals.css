@@ -1,19 +1,26 @@
 @import "tailwindcss";
 
 /*
- * Game-inspired dark theme. The palette is committed to dark only: Brawl Stars
- * artwork is drawn on dark backgrounds and reads poorly on white.
+ * Game-inspired dark theme. Committed to dark only: Brawl Stars artwork is
+ * drawn on dark backgrounds and reads poorly on white.
+ *
+ * The palette is built from a deep indigo base with a warm gold accent, so
+ * brawler art (which is saturated and warm) sits on a cool ground and pops
+ * rather than competing.
  */
 :root {
-  --background: #0b1020;
-  --surface: #141a2e;
-  --surface-2: #1c2440;
-  --border: #2a3352;
-  --foreground: #e8ecf8;
-  --muted: #97a2c4;
+  --background: #080b16;
+  --surface: #121729;
+  --surface-2: #1b2136;
+  --surface-3: #242b45;
+  --border: #262d47;
+  --border-strong: #38416a;
+  --foreground: #eef1fa;
+  --muted: #98a3c4;
   --brand: #ffc53d;
   --brand-strong: #ffab00;
-  --accent: #7c5cff;
+  --accent: #8b6bff;
+  --accent-2: #35d0ff;
   --victory: #35d07f;
   --defeat: #ff5c72;
   --draw: #8b95b8;
@@ -23,12 +30,15 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
   --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
   --color-victory: var(--victory);
   --color-defeat: var(--defeat);
   --color-draw: var(--draw);
@@ -38,27 +48,65 @@
 
 body {
   background:
-    radial-gradient(ellipse 90rem 40rem at 50% -10%, #1d2547 0%, transparent 60%),
+    radial-gradient(60rem 30rem at 12% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 65%),
+    radial-gradient(52rem 28rem at 92% -4%, color-mix(in srgb, var(--accent-2) 11%, transparent), transparent 62%),
     var(--background);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Reusable surface treatment for the card-based layout. */
+/*
+ * Card: a subtle top-light gradient plus a hairline highlight along the top
+ * edge, which is what stops large flat panels reading as cheap.
+ */
 @utility card {
-  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, #ffffff 4%, transparent) 0%,
+      transparent 42%
+    ),
+    var(--surface);
   border: 1px solid var(--border);
   border-radius: 1rem;
-  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
-/* Subtle sheen used on hero / header cards. */
+/* Deeper treatment for hero and headline panels. */
 @utility card-glow {
   box-shadow:
-    0 1px 0 0 color-mix(in srgb, #ffffff 8%, transparent) inset,
-    0 20px 40px -24px rgb(0 0 0 / 0.8);
+    inset 0 1px 0 0 color-mix(in srgb, #ffffff 9%, transparent),
+    0 24px 48px -28px rgb(0 0 0 / 0.9),
+    0 2px 6px -2px rgb(0 0 0 / 0.4);
+}
+
+/* Interactive lift, applied to cards that are links. */
+@utility card-interactive {
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+    box-shadow:
+      0 14px 30px -18px rgb(0 0 0 / 0.85),
+      0 0 0 1px color-mix(in srgb, var(--brand) 18%, transparent);
+  }
+}
+
+/* Section heading accent bar. */
+@utility rule {
+  display: inline-block;
+  width: 0.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--brand), var(--brand-strong));
 }
 
 @keyframes shimmer {
@@ -67,12 +115,11 @@ body {
   }
 }
 
-/* Loading skeleton block with a travelling highlight. */
 @utility skeleton {
   position: relative;
   overflow: hidden;
   background: var(--surface-2);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 
   &::after {
     content: "";
@@ -90,11 +137,37 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton::after {
+  .skeleton::after,
+  .card-interactive {
     animation: none;
+    transition: none;
   }
 }
 
 ::selection {
   background: color-mix(in srgb, var(--brand) 35%, transparent);
+  color: #1a1200;
+}
+
+/* Restrained scrollbars so overflowing filter rows do not look unfinished. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }

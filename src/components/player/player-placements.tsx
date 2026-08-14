@@ -84,7 +84,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
             <Link
               key={placement.brawlerId}
               href={`/brawlers/${placement.brawlerId}`}
-              className="card flex items-center gap-2 py-1.5 pl-1.5 pr-3 transition-colors hover:border-brand/40"
+              className="card card-interactive flex items-center gap-2 py-1.5 pl-1.5 pr-3"
               title={`#${placement.rank} in the world on ${placement.brawlerName}`}
             >
               <Image

@@ -7,9 +7,11 @@ import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerStats } from '@/components/player/player-stats';
 import { ErrorState } from '@/components/ui/error-state';
-import { BattleLogSkeleton } from '@/components/ui/skeletons';
+import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { PlayerProgression } from '@/components/player/player-progression';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
+import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
@@ -106,22 +108,24 @@ export default async function PlayerPage({ params }: PageProps) {
       />
       <PlayerStats player={player} />
       <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
+
+      <Suspense fallback={<InsightsSkeleton />}>
+        <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+      </Suspense>
       <PlayerProgression progression={progression} playtime={playtime} />
 
       <section>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">Recent battles</h2>
+        <SectionHeading title="Recent battles" />
         <Suspense fallback={<BattleLogSkeleton />}>
           <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
         </Suspense>
       </section>
 
       <section>
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-2xl font-bold tracking-tight">Brawlers</h2>
-          <p className="text-sm text-muted">
-            {player.brawlers.length} unlocked
-          </p>
-        </div>
+        <SectionHeading
+          title="Brawlers"
+          aside={`${player.brawlers.length} unlocked`}
+        />
         <PlayerBrawlers
           brawlers={player.brawlers}
           meta={Object.fromEntries(

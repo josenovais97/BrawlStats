@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
-import { Shield, Trophy, Users } from 'lucide-react';
+import { Shield, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { LeaderboardControls } from '@/components/leaderboard/leaderboard-controls';
 import { ErrorState } from '@/components/ui/error-state';
+import { TrophyIcon } from '@/components/game-icons';
 import { clubBadgeUrl, playerIconUrl } from '@/lib/brawlapi';
 import { getClubRankings, getPlayerRankings } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
@@ -70,7 +71,7 @@ async function PlayerBoard({ region }: { region: string }) {
           <li key={player.tag}>
             <Link
               href={`/player/${normalizeTag(player.tag)}`}
-              className="card flex items-center gap-3 p-3 transition-colors hover:border-brand/40"
+              className="card card-interactive flex items-center gap-3 p-3"
             >
               <RankBadge rank={player.rank} />
               <Image
@@ -93,7 +94,7 @@ async function PlayerBoard({ region }: { region: string }) {
                 </p>
               </div>
               <span className="flex shrink-0 items-center gap-1.5 font-bold tabular-nums text-brand">
-                <Trophy className="size-4" />
+                <TrophyIcon className="size-4" />
                 {formatNumber(player.trophies)}
               </span>
             </Link>
@@ -121,7 +122,7 @@ async function ClubBoard({ region }: { region: string }) {
           <li key={club.tag}>
             <Link
               href={`/club/${normalizeTag(club.tag)}`}
-              className="card flex items-center gap-3 p-3 transition-colors hover:border-brand/40"
+              className="card card-interactive flex items-center gap-3 p-3"
             >
               <RankBadge rank={club.rank} />
               <Image
@@ -140,7 +141,7 @@ async function ClubBoard({ region }: { region: string }) {
                 </p>
               </div>
               <span className="flex shrink-0 items-center gap-1.5 font-bold tabular-nums text-brand">
-                <Trophy className="size-4" />
+                <TrophyIcon className="size-4" />
                 {formatNumber(club.trophies)}
               </span>
             </Link>
