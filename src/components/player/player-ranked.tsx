@@ -2,7 +2,7 @@ import { Crown, Medal, TrendingUp, Users } from 'lucide-react';
 import Image from 'next/image';
 
 import { TrophyIcon } from '@/components/game-icons';
-import { rankedTierIconUrl } from '@/lib/brawlapi';
+import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 import type { TrophyStanding } from '@/types/stats';
@@ -38,7 +38,10 @@ export function PlayerRanked({ player, globalRank, standing }: Props) {
               value={player.rankedRankName ?? 'Unranked'}
               hint={player.rankedElo ? `${formatNumber(player.rankedElo)} elo` : undefined}
               tone="text-accent"
-              badgeUrl={rankedTierIconUrl(player.rankedRank)}
+              badgeUrl={
+                rankedTierIconUrl(player.rankedRank) ??
+                rankedLeagueIconUrl(player.rankedRankName)
+              }
             />
             <Cell
               icon={TrendingUp}
@@ -50,7 +53,10 @@ export function PlayerRanked({ player, globalRank, standing }: Props) {
                   : undefined
               }
               tone="text-victory"
-              badgeUrl={rankedTierIconUrl(player.highestSeasonRankedRank)}
+              badgeUrl={
+                rankedTierIconUrl(player.highestSeasonRankedRank) ??
+                rankedLeagueIconUrl(player.highestSeasonRankedRankName)
+              }
             />
             <Cell
               icon={Crown}
@@ -62,7 +68,10 @@ export function PlayerRanked({ player, globalRank, standing }: Props) {
                   : undefined
               }
               tone="text-brand"
-              badgeUrl={rankedTierIconUrl(player.highestAllTimeRankedRank)}
+              badgeUrl={
+                rankedTierIconUrl(player.highestAllTimeRankedRank) ??
+                rankedLeagueIconUrl(player.highestAllTimeRankedRankName)
+              }
             />
           </>
         ) : null}

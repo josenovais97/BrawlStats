@@ -13,7 +13,7 @@ Neon Postgres.
 | --- | --- |
 | `/` | Tag search for players and clubs, plus a global top-5 preview |
 | `/player/[tag]` | Trophies, ranked tiers, world/brawler rankings, standing, battle log, brawler grid and a progression breakdown |
-| `/club/[tag]` | Club info, requirements, and a searchable member list with roles |
+| `/club/[tag]` | Club info, roster insights (trophy spread, composition, top contributors) and a searchable member list |
 | `/brawlers` | Every brawler, filterable by rarity and class |
 | `/brawlers/[id]` | Star powers, gadgets, win/pick rate, popular build, and the global top 10 on that brawler |
 | `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
@@ -311,17 +311,21 @@ representative CDN asset as the generic category mark.
 Brawler pages show unlock rates for each star power, gadget and gear, with real artwork
 from the CDN.
 
-Shares are normalised **within a category**, so the options for a kind sum to 100%.
+Percentages are unlock rates: the share of tracked owners of that brawler who have the
+option unlocked.
 
-> The API never reports which option a player has **equipped** — only what they own, and
-> players who invest in a brawler tend to unlock everything. Dividing by all owners of the
-> brawler therefore gave every option a similar small number (two star powers both showing
-> ~16%), which reads like a bug. Normalising within the category answers the question being
-> asked instead: of everyone who unlocked one of these, which do they have?
+> **Denominators only count rows that actually recorded abilities.** Snapshots written
+> before the ability columns existed have `NULL` arrays, and counting those as
+> "owns nothing" put ~440 phantom rows behind every Shelly percentage — dragging a true 98%
+> unlock rate down to 16%. `NULL` means *not recorded*, not *owns nothing*, so each kind's
+> denominator counts only rows where its column is populated.
 >
-> A 50/50 split on star powers is a real answer — it means players unlock both. Gears are
-> where the signal lives, because players buy a couple out of six or seven: a typical spread
-> is 30/26/23/10/7/5.
+> The API never reports which option a player has **equipped**, only what they own, and
+> invested players unlock everything. So star powers and gadgets land near 97–99% for every
+> option — an honest "players take both" rather than a preference. **Gears are where the
+> signal lives**, because players buy a couple out of six or seven: a real spread is
+> 74 / 64 / 56 / 27 / 16 / 11%. The "Most picked" badge only appears when the leader is
+> more than 10 points clear.
 
 ## Cron budget
 

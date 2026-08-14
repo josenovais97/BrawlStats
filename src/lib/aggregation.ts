@@ -500,21 +500,34 @@ export async function recomputeBuildStats(): Promise<number> {
   const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000);
   const sinceDate = new Date(since.toISOString().slice(0, 10));
 
-  // Denominator: distinct sampled players per brawler in the window.
-  const totals = await prisma.$queryRaw<{ brawler_id: number; total: bigint }[]>`
-    SELECT brawler_id, COUNT(DISTINCT player_tag) AS total
-    FROM player_brawler_snapshots
-    WHERE snapshot_date >= ${sinceDate}
-    GROUP BY brawler_id
-  `;
-  const totalByBrawler = new Map(totals.map((r) => [r.brawler_id, Number(r.total)]));
-  if (totalByBrawler.size === 0) return 0;
-
   const kinds: { kind: string; column: string }[] = [
     { kind: 'starPower', column: 'star_power_ids' },
     { kind: 'gadget', column: 'gadget_ids' },
     { kind: 'gear', column: 'gear_ids' },
   ];
+
+  /*
+   * The denominator is counted per kind, over rows where that column is
+   * actually populated.
+   *
+   * Snapshots written before the ability columns existed have NULL arrays.
+   * Counting them as owners-with-no-unlocks put ~440 phantom rows behind every
+   * Shelly percentage and dragged a true ~97% unlock rate down to ~16%. A NULL
+   * means "not recorded", not "owns nothing", and must not be a denominator.
+   */
+  const totalsByKind = new Map<string, Map<number, number>>();
+  for (const { kind, column } of kinds) {
+    const rows = await prisma.$queryRawUnsafe<{ brawler_id: number; total: bigint }[]>(
+      `SELECT brawler_id, COUNT(DISTINCT player_tag) AS total
+       FROM player_brawler_snapshots
+       WHERE snapshot_date >= $1 AND ${column} IS NOT NULL
+       GROUP BY brawler_id`,
+      sinceDate,
+    );
+    totalsByKind.set(kind, new Map(rows.map((r) => [r.brawler_id, Number(r.total)])));
+  }
+
+  if ([...totalsByKind.values()].every((m) => m.size === 0)) return 0;
 
   // Collected and written in one batch. Upserting row by row meant ~1,000
   // sequential round trips to a remote database, which dominated the whole
@@ -537,14 +550,15 @@ export async function recomputeBuildStats(): Promise<number> {
        FROM (
          SELECT player_tag, brawler_id, unnest(${column}) AS item_id
          FROM player_brawler_snapshots
-         WHERE snapshot_date >= $1
+         WHERE snapshot_date >= $1 AND ${column} IS NOT NULL
        ) expanded
        GROUP BY brawler_id, item_id`,
       sinceDate,
     );
 
+    const totalByBrawler = totalsByKind.get(kind);
     for (const row of rows) {
-      const totalOwners = totalByBrawler.get(row.brawler_id) ?? 0;
+      const totalOwners = totalByBrawler?.get(row.brawler_id) ?? 0;
       if (totalOwners === 0) continue;
 
       pending.push({

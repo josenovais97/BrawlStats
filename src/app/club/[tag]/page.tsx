@@ -4,9 +4,11 @@ import { Lock, Shield, Trophy, UserPlus, Users } from 'lucide-react';
 import { TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 
+import { ClubInsights } from '@/components/club/club-insights';
 import { ClubMembers } from '@/components/club/club-members';
 import { ErrorState } from '@/components/ui/error-state';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { clubBadgeUrl } from '@/lib/brawlapi';
 import { getClub } from '@/lib/bs-api';
@@ -63,20 +65,36 @@ export default async function ClubPage({ params }: PageProps) {
         tag={normalizeTag(club.tag)}
         name={club.name}
       />
-      <header className="card card-glow p-6">
-        <div className="flex flex-wrap items-center gap-5">
-          <Image
-            src={clubBadgeUrl(club.badgeId)}
-            alt=""
-            width={80}
-            height={80}
-            className="size-20 shrink-0 rounded-2xl bg-surface-2 p-1"
-            priority
-            unoptimized
-          />
+      <header className="card card-glow relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 opacity-[0.14]"
+          style={{
+            background:
+              'radial-gradient(40rem 12rem at 18% 0%, var(--accent), transparent 70%)',
+          }}
+        />
+        <div className="relative flex flex-wrap items-center gap-5 p-6 sm:p-7">
+          <div className="relative shrink-0">
+            <span
+              aria-hidden
+              className="absolute -inset-1.5 rounded-[1.4rem] bg-accent opacity-25 blur-md"
+            />
+            <Image
+              src={clubBadgeUrl(club.badgeId)}
+              alt=""
+              width={88}
+              height={88}
+              className="relative size-[88px] rounded-2xl bg-surface-2 p-1 ring-1 ring-border-strong"
+              priority
+              unoptimized
+            />
+          </div>
 
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-3xl font-black tracking-tight">{club.name}</h1>
+            <h1 className="truncate text-3xl font-black tracking-tight sm:text-4xl">
+              {club.name}
+            </h1>
             <p className="mt-1 font-mono text-sm text-muted">{club.tag}</p>
             {club.description ? (
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
@@ -85,8 +103,8 @@ export default async function ClubPage({ params }: PageProps) {
             ) : null}
           </div>
 
-          <div className="flex flex-col items-end gap-1">
-            <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand">
+          <div className="flex shrink-0 flex-col items-end gap-1 rounded-2xl border border-border bg-surface-2/60 px-5 py-4">
+            <span className="flex items-center gap-2 text-3xl font-black tabular-nums text-brand sm:text-4xl">
               <TrophyIcon className="size-7" />
               {formatNumber(club.trophies)}
             </span>
@@ -122,8 +140,10 @@ export default async function ClubPage({ params }: PageProps) {
         />
       </section>
 
+      <ClubInsights club={club} />
+
       <section>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">Members</h2>
+        <SectionHeading title="Members" aside={`${members.length} of 30`} />
         <ClubMembers members={members} />
       </section>
     </div>

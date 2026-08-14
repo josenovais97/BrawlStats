@@ -11,7 +11,8 @@ const TAG_ALPHABET = '0289PYLQGRJCUV';
  * Strips "#", uppercases, and maps the digits people commonly mistype.
  * O -> 0 and I -> 1 are safe because neither letter appears in real tags.
  */
-export function normalizeTag(input: string): string {
+export function normalizeTag(input: string | null | undefined): string {
+  if (!input) return '';
   return input
     .trim()
     .replace(/^#/, '')

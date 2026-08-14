@@ -9,9 +9,16 @@ export interface BSIconRef {
   id: number;
 }
 
+/**
+ * A club reference on a player payload.
+ *
+ * Both fields are optional: for a player with no club the API returns an empty
+ * object `{}` rather than null, so presence of `club` proves nothing and `tag`
+ * must be checked before use.
+ */
 export interface BSClubRef {
-  tag: string;
-  name: string;
+  tag?: string;
+  name?: string;
 }
 
 export interface BSAccessory {

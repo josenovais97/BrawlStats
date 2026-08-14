@@ -74,7 +74,7 @@ export function PlayerHeader({ player }: { player: BSPlayer }) {
               </span>
             ) : null}
 
-            {player.club ? (
+            {player.club?.tag ? (
               <Link
                 href={`/club/${normalizeTag(player.club.tag)}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium transition-colors hover:border-accent/60 hover:text-foreground"
