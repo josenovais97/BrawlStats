@@ -12,13 +12,38 @@ Neon Postgres.
 | Page | What it does |
 | --- | --- |
 | `/` | Tag search for players and clubs, plus a global top-5 preview |
-| `/player/[tag]` | Trophies, level, 3v3 / showdown records, ranked, club, battle log, full brawler grid |
+| `/player/[tag]` | Trophies, level, 3v3 / showdown records, ranked, club, battle log, full brawler grid, and a progression breakdown |
 | `/club/[tag]` | Club info, requirements, and a searchable member list with roles |
 | `/brawlers` | Every brawler, filterable by rarity and class |
 | `/brawlers/[id]` | Star powers, gadgets, aggregated win/usage rate, and the global top 10 on that brawler |
 | `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
+| `/updates` | Detected game changes and meta movers (see below) |
 | `/events` | Live and upcoming event rotation with map art |
-| `/leaderboard` | Top 100 players or clubs, filterable by region |
+| `/leaderboard` | Top 100 players or clubs, filterable across all ~250 ISO countries |
+
+### Progression breakdown
+
+The player page reports how much of the game an account has unlocked: brawlers, brawlers at
+power 11, star powers, gadgets, gears, hypercharges and buffies, each against the total the
+game currently has, plus an overall completion percentage counting every power-level step
+and every unlockable ability.
+
+It also estimates coins and power points invested, and the coins still needed to take every
+unlocked brawler to power 11.
+
+> **These are estimates.** `src/lib/progression.ts` holds a hard-coded economy table and is
+> the one file to update when Supercell changes upgrade costs. The per-level values there
+> were validated against two independently published totals (3,740 power points / 7,765
+> coins for power 1→11, and 310/560 to reach power 6). Buffies are counted for completion
+> but excluded from the coin estimate, because they also come from keys and drops. The API
+> reports only the skin *currently equipped* on each brawler, never the full wardrobe, so
+> there is no "skins owned" figure — claiming one would be fiction.
+
+### Recent searches
+
+Looked-up tags are remembered in `localStorage` and offered under the search bar, so nobody
+has to memorise their own tag or a friend's. This is device-local and anonymous: nothing is
+sent to the server, and "Clear all" removes it.
 
 ## Architecture
 
@@ -192,6 +217,29 @@ not just the top: pull from regional leaderboards at several trophy bands, keep 
 larger pool, and let the window run long enough that low-usage brawlers clear the threshold.
 The current setup is a working pipeline with an honest caveat, not a finished methodology.
 
+## Updates page: what it can and cannot know
+
+There is no Brawl Stars patch-notes, changelog or balance API, and nothing to mirror. So
+`/updates` is built from data we collect ourselves, in two halves:
+
+**Detected game changes.** The cron job snapshots the official brawler catalogue daily into
+`brawler_catalog_entries` and diffs consecutive days. That reliably catches new brawlers and
+new or removed star powers, gadgets, gears and hypercharges — these are real ids appearing
+in the API, not a scrape.
+
+It **cannot** detect balance tuning. Damage, health, reload and range are not exposed by the
+API at all, so a pure number change is invisible here. The page says so directly rather than
+implying it is a full changelog.
+
+**Meta movers.** The closest available proxy for balance changes: the shift in each
+brawler's baseline-adjusted win rate between the latest snapshot and the one ~7 days back.
+Both sides are adjusted before comparison, so a change in *who* got sampled cannot
+masquerade as a balance change, and both sides must clear the 30-battle floor.
+
+The first cron run only seeds the catalogue baseline — recording all ~106 existing brawlers
+as "new" would be noise. Changes appear from the second run onwards, and movers need at
+least two daily snapshots with enough battles on both.
+
 ### Tuning
 
 - Batch size: `POST /api/cron/refresh-stats?batch=50` (1–100, default 25).
@@ -227,7 +275,11 @@ scripts/seed-stats.ts       Fills the sampling pool without a full run
 src/lib/bs-api.ts           Official API client (server-only, via RoyaleAPI proxy)
 src/lib/brawlapi.ts         Keyless artwork/metadata client
 src/lib/aggregation.ts      Sampling + aggregation pipeline (write side)
-src/lib/stats.ts            Tier-list reads, normalisation, tier assignment
+src/lib/catalog.ts          Catalogue snapshot + diff, powering detected changes
+src/lib/stats.ts            Tier-list reads, normalisation, tiers, meta movers
+src/lib/progression.ts      Economy table and account-completion maths
+src/lib/regions.ts          Full ISO country list for the leaderboard
+src/lib/recent-searches.ts  localStorage-backed recent tags (client-only)
 src/lib/tags.ts             Tag normalise / validate / encode
 src/lib/errors.ts           Shared error vocabulary and user-facing copy
 src/types/                  Interfaces for every API response and DB row

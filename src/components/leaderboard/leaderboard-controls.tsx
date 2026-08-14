@@ -1,10 +1,10 @@
 'use client';
 
-import { Globe, Shield, User } from 'lucide-react';
+import { Shield, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
-import { FEATURED_REGIONS } from '@/lib/regions';
+import { RegionPicker } from '@/components/leaderboard/region-picker';
 
 interface LeaderboardControlsProps {
   region: string;
@@ -56,21 +56,13 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
         })}
       </div>
 
-      <label className="flex flex-1 items-center gap-2 sm:justify-end">
-        <Globe className="size-4 shrink-0 text-muted" />
-        <span className="sr-only">Region</span>
-        <select
+      <div className="flex flex-1 sm:justify-end">
+        <RegionPicker
           value={region}
-          onChange={(e) => navigate({ region: e.target.value })}
-          className="rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none transition-colors focus:border-brand/60"
-        >
-          {FEATURED_REGIONS.map((r) => (
-            <option key={r.code} value={r.code}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          onChange={(code) => navigate({ region: code })}
+          disabled={pending}
+        />
+      </div>
     </div>
   );
 }

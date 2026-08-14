@@ -1,13 +1,25 @@
 'use client';
 
-import { CalendarClock, Crown, Menu, Search, Swords, Trophy, X } from 'lucide-react';
+import {
+  CalendarClock,
+  Crown,
+  Menu,
+  Newspaper,
+  Search,
+  Swords,
+  Trophy,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
+import { BrandMark } from '@/components/brand-mark';
+
 const NAV = [
   { href: '/brawlers', label: 'Brawlers', icon: Swords },
   { href: '/tier-list', label: 'Tier List', icon: Crown },
+  { href: '/updates', label: 'Updates', icon: Newspaper },
   { href: '/events', label: 'Events', icon: CalendarClock },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
@@ -20,9 +32,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
-          <span className="grid size-9 place-items-center rounded-xl bg-brand text-[#1a1200] shadow-lg shadow-brand/20">
-            <Swords className="size-5" strokeWidth={2.5} />
-          </span>
+          <BrandMark className="size-9 shrink-0" />
           <span className="text-lg">
             Brawl<span className="text-brand">Stats</span>
           </span>

@@ -4,6 +4,7 @@ import { Loader2, Search, Shield, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition, type FormEvent } from 'react';
 
+import { RecentSearches } from '@/components/recent-searches';
 import { isValidTag, normalizeTag } from '@/lib/tags';
 
 type Mode = 'player' | 'club';
@@ -11,6 +12,8 @@ type Mode = 'player' | 'club';
 interface SearchBarProps {
   defaultMode?: Mode;
   autoFocus?: boolean;
+  /** Shows tags previously looked up on this device. */
+  showRecent?: boolean;
 }
 
 /**
@@ -18,7 +21,11 @@ interface SearchBarProps {
  * the API, but this component never touches the API itself — it just navigates
  * to a server-rendered page.
  */
-export function SearchBar({ defaultMode = 'player', autoFocus = false }: SearchBarProps) {
+export function SearchBar({
+  defaultMode = 'player',
+  autoFocus = false,
+  showRecent = false,
+}: SearchBarProps) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [value, setValue] = useState('');
@@ -115,6 +122,8 @@ export function SearchBar({ defaultMode = 'player', autoFocus = false }: SearchB
           Find your tag in-game under your profile, below your name.
         </p>
       )}
+
+      {showRecent ? <RecentSearches /> : null}
     </div>
   );
 }

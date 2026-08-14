@@ -8,8 +8,11 @@ import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerStats } from '@/components/player/player-stats';
 import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton } from '@/components/ui/skeletons';
-import { getPlayer } from '@/lib/bs-api';
+import { PlayerProgression } from '@/components/player/player-progression';
+import { RecentSearchRecorder } from '@/components/recent-search-recorder';
+import { getOfficialBrawlers, getPlayer } from '@/lib/bs-api';
 import { getBrawlerMap } from '@/lib/brawlapi';
+import { computeProgression } from '@/lib/progression';
 import { toApiError } from '@/lib/errors';
 import { recordLookup } from '@/lib/stats';
 import { displayTag, normalizeTag } from '@/lib/tags';
@@ -58,12 +61,27 @@ export default async function PlayerPage({ params }: PageProps) {
 
   // Artwork metadata is a separate, keyless source. If it is unavailable the
   // page still renders — brawler cards just fall back to CDN-pattern URLs.
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map());
+  // The official catalogue supplies the per-brawler totals that progression
+  // needs (gears and hypercharges are not in the brawlapi payload).
+  const [brawlerMeta, catalogue] = await Promise.all([
+    getBrawlerMap().catch(() => new Map()),
+    getOfficialBrawlers()
+      .then((r) => r.items)
+      .catch(() => []),
+  ]);
+
+  const progression = computeProgression(player, catalogue);
 
   return (
     <div className="space-y-8">
+      <RecentSearchRecorder
+        kind="player"
+        tag={normalizeTag(player.tag)}
+        name={player.name}
+      />
       <PlayerHeader player={player} />
       <PlayerStats player={player} />
+      <PlayerProgression progression={progression} />
 
       <section>
         <h2 className="mb-4 text-2xl font-bold tracking-tight">Recent battles</h2>

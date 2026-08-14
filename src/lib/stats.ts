@@ -5,6 +5,8 @@ import { getPrisma } from '@/lib/prisma';
 import type {
   AggregationRunSummary,
   BrawlerStatRow,
+  CatalogChangeEntry,
+  MetaMover,
   Tier,
 } from '@/types/stats';
 
@@ -132,6 +134,118 @@ export async function getBrawlerStat(brawlerId: number): Promise<BrawlerStatRow 
     return row ? toStatRow(row) : null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Brawlers whose adjusted win rate moved most between the latest snapshot and
+ * the closest one at least `lookbackDays` old.
+ *
+ * Both sides are baseline-adjusted before comparison. Without that a shift in
+ * who happened to get sampled would masquerade as a balance change.
+ */
+export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const latest = await prisma.brawlerStat.findFirst({
+      orderBy: { snapshotDate: 'desc' },
+      select: { snapshotDate: true },
+    });
+    if (!latest) return [];
+
+    const cutoff = new Date(latest.snapshotDate);
+    cutoff.setUTCDate(cutoff.getUTCDate() - lookbackDays);
+
+    // Nearest snapshot at or before the cutoff; falls back to the oldest one
+    // available so a young dataset still shows movement.
+    const earlier =
+      (await prisma.brawlerStat.findFirst({
+        where: { snapshotDate: { lte: cutoff } },
+        orderBy: { snapshotDate: 'desc' },
+        select: { snapshotDate: true },
+      })) ??
+      (await prisma.brawlerStat.findFirst({
+        where: { snapshotDate: { lt: latest.snapshotDate } },
+        orderBy: { snapshotDate: 'asc' },
+        select: { snapshotDate: true },
+      }));
+
+    if (!earlier) return [];
+
+    const nowRows = await prisma.brawlerStat.findMany({
+      where: { snapshotDate: latest.snapshotDate },
+    });
+    const thenRows = await prisma.brawlerStat.findMany({
+      where: { snapshotDate: earlier.snapshotDate },
+    });
+
+    const before = new Map(thenRows.map((r) => [r.brawlerId, r]));
+    const movers: MetaMover[] = [];
+
+    for (const row of nowRows) {
+      const prev = before.get(row.brawlerId);
+      if (!prev) continue;
+
+      const nowRate = normalizeWinRate(row.winRate, row.baselineWinRate);
+      const prevRate = normalizeWinRate(prev.winRate, prev.baselineWinRate);
+      if (nowRate === null || prevRate === null) continue;
+
+      // Both sides must clear the sample floor, or the "movement" is noise.
+      if (
+        row.decidedSampleSize < MIN_SAMPLE_FOR_TIER ||
+        prev.decidedSampleSize < MIN_SAMPLE_FOR_TIER
+      ) {
+        continue;
+      }
+
+      movers.push({
+        brawlerId: row.brawlerId,
+        brawlerName: row.brawlerName,
+        winRateNow: nowRate,
+        winRateBefore: prevRate,
+        winRateDelta: nowRate - prevRate,
+        usageNow: row.usageRate,
+        usageBefore: prev.usageRate,
+        usageDelta:
+          row.usageRate !== null && prev.usageRate !== null
+            ? row.usageRate - prev.usageRate
+            : null,
+        sampleSize: row.decidedSampleSize,
+        fromDate: toIsoDate(earlier.snapshotDate),
+        toDate: toIsoDate(latest.snapshotDate),
+      });
+    }
+
+    return movers.sort((a, b) => Math.abs(b.winRateDelta) - Math.abs(a.winRateDelta));
+  } catch {
+    return [];
+  }
+}
+
+/** Most recent detected catalogue changes, newest first. */
+export async function getCatalogChanges(limit = 40): Promise<CatalogChangeEntry[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.catalogChange.findMany({
+      orderBy: [{ detectedOn: 'desc' }, { id: 'desc' }],
+      take: limit,
+    });
+
+    return rows.map((row) => ({
+      id: row.id,
+      detectedOn: toIsoDate(row.detectedOn),
+      kind: row.kind,
+      brawlerId: row.brawlerId,
+      brawlerName: row.brawlerName,
+      itemId: row.itemId,
+      itemName: row.itemName,
+    }));
+  } catch {
+    return [];
   }
 }
 

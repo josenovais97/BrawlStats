@@ -40,6 +40,33 @@ export interface TierListSnapshot {
   isEmpty: boolean;
 }
 
+/** A brawler whose aggregated numbers moved between two snapshots. */
+export interface MetaMover {
+  brawlerId: number;
+  brawlerName: string;
+  /** Baseline-adjusted win rates, so cohort skill drift does not show up here. */
+  winRateNow: number;
+  winRateBefore: number;
+  winRateDelta: number;
+  usageNow: number | null;
+  usageBefore: number | null;
+  usageDelta: number | null;
+  sampleSize: number;
+  fromDate: string;
+  toDate: string;
+}
+
+/** One detected difference between two brawler-catalogue snapshots. */
+export interface CatalogChangeEntry {
+  id: number;
+  detectedOn: string;
+  kind: string;
+  brawlerId: number;
+  brawlerName: string;
+  itemId: number | null;
+  itemName: string | null;
+}
+
 export interface AggregationRunSummary {
   startedAt: string;
   finishedAt: string | null;

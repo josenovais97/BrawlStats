@@ -7,6 +7,7 @@ import {
   getPlayer,
   getPlayerRankings,
 } from '@/lib/bs-api';
+import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
 import { normalizeTag } from '@/lib/tags';
@@ -51,6 +52,8 @@ export interface AggregationResult {
   battlesRecorded: number;
   brawlersUpdated: number;
   seeded: number;
+  /** Roster/kit differences detected against yesterday's catalogue snapshot. */
+  catalogChanges: number;
   status: 'ok' | 'partial' | 'failed';
   notes?: string;
 }
@@ -387,6 +390,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       battlesRecorded: 0,
       brawlersUpdated: 0,
       seeded: 0,
+      catalogChanges: 0,
       status: 'failed',
       notes: 'DATABASE_URL is not set — provision Neon before running the cron job.',
     };
@@ -395,6 +399,13 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
   const run = await prisma.aggregationRun.create({ data: {} });
 
   try {
+    // Cheap (one API call) and independent of sampling, so it runs first and
+    // is never starved by a slow or failing batch.
+    const catalog = await snapshotAndDiffCatalog().catch(() => ({
+      brawlers: 0,
+      changes: 0,
+    }));
+
     const seeded = await seedSamplePool();
 
     // Least-recently-sampled first, so the pool rotates instead of re-reading
@@ -458,6 +469,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       battlesRecorded,
       brawlersUpdated,
       seeded,
+      catalogChanges: catalog.changes,
       status,
       notes,
     };

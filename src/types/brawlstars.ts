@@ -46,6 +46,16 @@ export interface BSPlayerBrawler {
   starPowers: BSAccessory[];
   gears: BSGear[];
   hyperCharges?: BSAccessory[];
+  /**
+   * Buffies (added December 2025): one per ability type, each buffing the
+   * brawler's gadgets, star powers or hypercharge. The API reports them as
+   * three booleans rather than a list.
+   */
+  buffies?: {
+    gadget?: boolean;
+    starPower?: boolean;
+    hyperCharge?: boolean;
+  };
 }
 
 export interface BSPlayer {

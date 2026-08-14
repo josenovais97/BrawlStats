@@ -4,12 +4,13 @@ import Image from 'next/image';
 
 import { ClubMembers } from '@/components/club/club-members';
 import { ErrorState } from '@/components/ui/error-state';
+import { RecentSearchRecorder } from '@/components/recent-search-recorder';
 import { StatCard } from '@/components/ui/stat-card';
 import { clubBadgeUrl } from '@/lib/brawlapi';
 import { getClub } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { formatNumber, humanizeRole } from '@/lib/format';
-import { displayTag } from '@/lib/tags';
+import { displayTag, normalizeTag } from '@/lib/tags';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -55,6 +56,11 @@ export default async function ClubPage({ params }: PageProps) {
 
   return (
     <div className="space-y-8">
+      <RecentSearchRecorder
+        kind="club"
+        tag={normalizeTag(club.tag)}
+        name={club.name}
+      />
       <header className="card card-glow p-6">
         <div className="flex flex-wrap items-center gap-5">
           <Image

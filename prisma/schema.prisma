@@ -117,6 +117,46 @@ model BrawlerStat {
   @@map("brawler_stats")
 }
 
+/// Daily snapshot of the official brawler catalogue.
+///
+/// There is no patch-notes API, so the "what changed in the game" feed is
+/// built by diffing this table against yesterday: a new brawler id, a new star
+/// power, a hypercharge appearing on an existing brawler. It records what the
+/// game API exposes, which is roster and kit changes — not balance numbers.
+model BrawlerCatalogEntry {
+  id             Int      @id @default(autoincrement())
+  snapshotDate   DateTime @map("snapshot_date") @db.Date
+  brawlerId      Int      @map("brawler_id")
+  brawlerName    String   @map("brawler_name")
+  starPowerIds   Int[]    @map("star_power_ids")
+  gadgetIds      Int[]    @map("gadget_ids")
+  gearIds        Int[]    @map("gear_ids")
+  hyperChargeIds Int[]    @map("hyper_charge_ids")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([brawlerId, snapshotDate])
+  @@index([snapshotDate])
+  @@map("brawler_catalog_entries")
+}
+
+/// A single detected change between two catalogue snapshots.
+model CatalogChange {
+  id          Int      @id @default(autoincrement())
+  detectedOn  DateTime @map("detected_on") @db.Date
+  /// "brawlerAdded" | "starPowerAdded" | "gadgetAdded" | "hyperchargeAdded"
+  /// | "gearAdded" | "brawlerRemoved" | "abilityRemoved"
+  kind        String
+  brawlerId   Int      @map("brawler_id")
+  brawlerName String   @map("brawler_name")
+  itemId      Int?     @map("item_id")
+  itemName    String?  @map("item_name")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([detectedOn, kind, brawlerId, itemId])
+  @@index([detectedOn])
+  @@map("catalog_changes")
+}
+
 /// Audit trail for cron runs, so a stale tier list can be explained.
 model AggregationRun {
   id              Int      @id @default(autoincrement())

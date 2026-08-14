@@ -51,7 +51,7 @@ export default function HomePage() {
         </div>
 
         <div className="mt-8 max-w-2xl">
-          <SearchBar autoFocus />
+          <SearchBar autoFocus showRecent />
         </div>
       </section>
 
