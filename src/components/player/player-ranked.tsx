@@ -1,5 +1,8 @@
-import { Crown, Medal, TrendingUp, Trophy, Users } from 'lucide-react';
+import { Crown, Medal, TrendingUp, Users } from 'lucide-react';
+import Image from 'next/image';
 
+import { TrophyIcon } from '@/components/game-icons';
+import { rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 import type { TrophyStanding } from '@/types/stats';
@@ -35,6 +38,7 @@ export function PlayerRanked({ player, globalRank, standing }: Props) {
               value={player.rankedRankName ?? 'Unranked'}
               hint={player.rankedElo ? `${formatNumber(player.rankedElo)} elo` : undefined}
               tone="text-accent"
+              badgeUrl={rankedTierIconUrl(player.rankedRank)}
             />
             <Cell
               icon={TrendingUp}
@@ -46,6 +50,7 @@ export function PlayerRanked({ player, globalRank, standing }: Props) {
                   : undefined
               }
               tone="text-victory"
+              badgeUrl={rankedTierIconUrl(player.highestSeasonRankedRank)}
             />
             <Cell
               icon={Crown}
@@ -57,14 +62,16 @@ export function PlayerRanked({ player, globalRank, standing }: Props) {
                   : undefined
               }
               tone="text-brand"
+              badgeUrl={rankedTierIconUrl(player.highestAllTimeRankedRank)}
             />
           </>
         ) : null}
 
         {globalRank !== null ? (
           <Cell
-            icon={Trophy}
+            icon={Medal}
             label="World rank"
+            gameIcon={<TrophyIcon className="size-5" />}
             value={`#${globalRank}`}
             hint="Global trophies"
             tone="text-brand"
@@ -102,17 +109,33 @@ function Cell({
   value,
   hint,
   tone,
+  badgeUrl,
+  gameIcon,
 }: {
   icon: typeof Medal;
   label: string;
   value: string;
   hint?: string;
   tone: string;
+  /** Real tier artwork from the CDN; preferred over the glyph when present. */
+  badgeUrl?: string | null;
+  gameIcon?: React.ReactNode;
 }) {
   return (
     <div className="card card-glow flex items-center gap-3 p-4">
       <span className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${tone}`}>
-        <Icon className="size-5" />
+        {badgeUrl ? (
+          <Image
+            src={badgeUrl}
+            alt=""
+            width={32}
+            height={32}
+            className="size-8 object-contain"
+            unoptimized
+          />
+        ) : (
+          gameIcon ?? <Icon className="size-5" />
+        )}
       </span>
       <div className="min-w-0">
         <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">

@@ -111,3 +111,50 @@ export function brawlerIconUrl(brawlerId: number): string {
 export function brawlerPortraitUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/borderless/${brawlerId}.png`;
 }
+
+/**
+ * Ranked tier badge.
+ *
+ * The CDN publishes 22 tier images keyed from 58000000, matching the API's
+ * 1-based `rankedRank`. Returns null for an unranked player so callers can
+ * skip the image instead of rendering a broken one.
+ */
+const RANKED_TIER_BASE_ID = 58000000;
+const RANKED_TIER_COUNT = 22;
+
+export function rankedTierIconUrl(rank: number | undefined | null): string | null {
+  if (!rank || rank < 1 || rank > RANKED_TIER_COUNT) return null;
+  return `https://cdn.brawlify.com/ranked/tiered/${RANKED_TIER_BASE_ID + rank - 1}.png`;
+}
+
+/** Broad ranked league badge, e.g. "Bronze" or "Masters". */
+export function rankedLeagueIconUrl(rankName: string | undefined | null): string | null {
+  if (!rankName) return null;
+  // "BRONZE I" -> "Bronze"
+  const league = rankName.trim().split(/\s+/)[0];
+  if (!league) return null;
+  const normalized = league.charAt(0).toUpperCase() + league.slice(1).toLowerCase();
+  return `https://cdn.brawlify.com/ranked/regular/${normalized}.png`;
+}
+
+/** Prestige badge, 0–6. */
+export function prestigeIconUrl(level: number | undefined | null): string | null {
+  if (level === undefined || level === null) return null;
+  const capped = Math.min(Math.max(level, 0), 6);
+  return `https://cdn.brawlify.com/prestiges/regular/${capped}.png`;
+}
+
+/** Star power artwork, by accessory id. */
+export function starPowerIconUrl(id: number): string {
+  return `https://cdn.brawlify.com/star-powers/borderless/${id}.png`;
+}
+
+/** Gadget artwork, by accessory id. */
+export function gadgetIconUrl(id: number): string {
+  return `https://cdn.brawlify.com/gadgets/borderless/${id}.png`;
+}
+
+/** Gear artwork, by gear id. */
+export function gearIconUrl(id: number): string {
+  return `https://cdn.brawlify.com/gears/regular/${id}.png`;
+}

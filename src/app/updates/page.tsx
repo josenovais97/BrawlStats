@@ -3,6 +3,7 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Cog,
+  ExternalLink,
   Minus,
   Sparkles,
   Star,
@@ -13,6 +14,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { getBrawlerMap } from '@/lib/brawlapi';
+import { getOfficialNews } from '@/lib/news';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
 import { getCatalogChanges, getMetaMovers } from '@/lib/stats';
@@ -29,12 +31,24 @@ export const revalidate = 3600;
 /** How many movers to show on each side. */
 const MOVER_LIMIT = 8;
 
+/** "2026-08-10T14:00:00.000+02:00" -> "10 Aug 2026" */
+function formatNewsDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default async function UpdatesPage() {
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after another so the page never needs more than one connection.
-  const [movers, brawlerMeta] = await Promise.all([
+  const [movers, brawlerMeta, news] = await Promise.all([
     getMetaMovers(7),
     getBrawlerMap().catch(() => new Map()),
+    getOfficialNews(6),
   ]);
   const changes = await getCatalogChanges(40);
 
@@ -54,6 +68,55 @@ export default async function UpdatesPage() {
           New brawlers and abilities, and which brawlers are rising or falling.
         </p>
       </header>
+
+      {news.length > 0 ? (
+        <section>
+          <h2 className="mb-1 text-2xl font-bold tracking-tight">Official news</h2>
+          <p className="mb-4 text-sm text-muted">Straight from the Brawl Stars team.</p>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {news.map((post) => (
+              <a
+                key={post.url}
+                href={post.url}
+                target="_blank"
+                rel="noreferrer"
+                className="card group overflow-hidden transition-colors hover:border-brand/40"
+              >
+                {post.imageUrl ? (
+                  <Image
+                    src={post.imageUrl}
+                    alt=""
+                    width={400}
+                    height={222}
+                    className="aspect-[16/9] w-full bg-surface-2 object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="aspect-[16/9] w-full bg-surface-2" />
+                )}
+                <div className="p-4">
+                  <div className="flex items-center gap-2 text-xs text-muted">
+                    {post.category ? (
+                      <span className="rounded-full bg-surface-2 px-2 py-0.5 font-semibold text-brand">
+                        {post.category}
+                      </span>
+                    ) : null}
+                    {post.publishedAt ? <span>{formatNewsDate(post.publishedAt)}</span> : null}
+                  </div>
+                  <p className="mt-2 line-clamp-2 font-semibold leading-snug group-hover:text-brand">
+                    {post.title}
+                  </p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs text-muted">
+                    Read on supercell.com
+                    <ExternalLink className="size-3" />
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section>
         <h2 className="mb-1 text-2xl font-bold tracking-tight">Meta movers</h2>

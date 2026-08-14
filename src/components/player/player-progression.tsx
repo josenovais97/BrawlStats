@@ -1,16 +1,11 @@
+import { Clock, Shirt, Sparkles, Star, Wrench, Cog, Swords, TrendingUp } from 'lucide-react';
+
 import {
-  Clock,
-  Coins,
-  Gem,
-  Swords,
-  Shirt,
-  Sparkles,
-  Star,
-  Wrench,
-  Zap,
-  Cog,
-  TrendingUp,
-} from 'lucide-react';
+  BuffieIcon,
+  CoinIcon,
+  HyperchargeIcon,
+  PowerPointIcon,
+} from '@/components/game-icons';
 
 import { formatNumber, formatPercent } from '@/lib/format';
 import type {
@@ -25,7 +20,13 @@ interface Props {
 }
 
 export function PlayerProgression({ progression, playtime }: Props) {
-  const rows: { icon: typeof Star; label: string; stat: OwnershipStat; tone: string }[] = [
+  const rows: {
+    icon?: typeof Star;
+    node?: React.ReactNode;
+    label: string;
+    stat: OwnershipStat;
+    tone: string;
+  }[] = [
     { icon: Star, label: 'Brawlers', stat: progression.brawlers, tone: 'text-brand' },
     {
       icon: TrendingUp,
@@ -42,12 +43,17 @@ export function PlayerProgression({ progression, playtime }: Props) {
     { icon: Wrench, label: 'Gadgets', stat: progression.gadgets, tone: 'text-accent' },
     { icon: Cog, label: 'Gears', stat: progression.gears, tone: 'text-muted' },
     {
-      icon: Zap,
+      node: <HyperchargeIcon className="size-4" />,
       label: 'Hypercharges',
       stat: progression.hyperCharges,
       tone: 'text-defeat',
     },
-    { icon: Gem, label: 'Buffies', stat: progression.buffies, tone: 'text-accent' },
+    {
+      node: <BuffieIcon className="size-4" />,
+      label: 'Buffies',
+      stat: progression.buffies,
+      tone: 'text-accent',
+    },
   ];
 
   return (
@@ -74,10 +80,12 @@ export function PlayerProgression({ progression, playtime }: Props) {
         </div>
 
         <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-          {rows.map(({ icon: Icon, label, stat, tone }) => (
+          {rows.map(({ icon: Icon, node, label, stat, tone }) => (
             <div key={label}>
               <div className="mb-1.5 flex items-center gap-2 text-sm">
-                <Icon className={`size-4 shrink-0 ${tone}`} />
+                <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>
+                  {node ?? (Icon ? <Icon className="size-4" /> : null)}
+                </span>
                 <span className="flex-1 font-medium">{label}</span>
                 <span className="tabular-nums text-muted">
                   {formatNumber(stat.owned)}
@@ -93,13 +101,13 @@ export function PlayerProgression({ progression, playtime }: Props) {
 
         <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-5">
           <Investment
-            icon={Coins}
+            node={<CoinIcon className="size-5" />}
             label="Coins invested"
             value={formatNumber(progression.coinsInvested)}
             hint="Estimated"
           />
           <Investment
-            icon={Sparkles}
+            node={<PowerPointIcon className="size-5" />}
             label="Power points"
             value={formatNumber(progression.powerPointsInvested)}
             hint="Estimated"
@@ -158,11 +166,13 @@ function Bar({ value, thin = false }: { value: number; thin?: boolean }) {
 
 function Investment({
   icon: Icon,
+  node,
   label,
   value,
   hint,
 }: {
-  icon: typeof Coins;
+  icon?: typeof Clock;
+  node?: React.ReactNode;
   label: string;
   value: string;
   hint: string;
@@ -170,7 +180,7 @@ function Investment({
   return (
     <div className="flex items-center gap-3">
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 text-brand">
-        <Icon className="size-5" />
+        {node ?? (Icon ? <Icon className="size-5" /> : null)}
       </span>
       <div className="min-w-0">
         <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">

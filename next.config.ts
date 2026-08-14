@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'cdn.brawlify.com', pathname: '/**' },
       { protocol: 'https', hostname: 'cdn-misc.brawlify.com', pathname: '/**' },
       { protocol: 'https', hostname: 'cdn-old.brawlify.com', pathname: '/**' },
+      // Thumbnails on official Brawl Stars news posts.
+      { protocol: 'https', hostname: 'brawlstars.inbox.supercell.com', pathname: '/**' },
     ],
   },
 };

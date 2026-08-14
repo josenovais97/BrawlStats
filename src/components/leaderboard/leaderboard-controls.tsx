@@ -31,7 +31,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
 
   return (
     <div
-      className={`card flex flex-col gap-4 p-4 transition-opacity sm:flex-row sm:items-center ${
+      className={`card relative z-30 flex flex-col gap-4 p-4 transition-opacity sm:flex-row sm:items-center ${
         pending ? 'opacity-60' : ''
       }`}
     >

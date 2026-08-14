@@ -100,12 +100,12 @@ export default async function PlayerPage({ params }: PageProps) {
         name={player.name}
       />
       <PlayerHeader player={player} />
-      <PlayerStats player={player} />
-      <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
       <PlayerPlacements
         placements={placements}
         iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
       />
+      <PlayerStats player={player} />
+      <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
       <PlayerProgression progression={progression} playtime={playtime} />
 
       <section>

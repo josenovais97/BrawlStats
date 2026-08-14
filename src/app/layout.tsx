@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import { InstallPrompt } from '@/components/install-prompt';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 
@@ -31,6 +32,7 @@ export default function RootLayout({
           </main>
           <SiteFooter />
         </div>
+        <InstallPrompt />
       </body>
     </html>
   );
