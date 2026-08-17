@@ -61,6 +61,11 @@ export function PowerPointIcon({ className }: IconProps) {
   return <GameIcon src="/icons/power-point.png" alt="Power points" className={className} />;
 }
 
+/** The in-game power 11 badge. */
+export function Power11Icon({ className }: IconProps) {
+  return <GameIcon src="/icons/power-11.png" alt="Power 11" className={className} />;
+}
+
 export function StarPowerIcon({ className }: IconProps) {
   return <GameIcon src={GENERIC_STAR_POWER} alt="Star power" className={className} />;
 }

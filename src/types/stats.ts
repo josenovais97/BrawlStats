@@ -117,3 +117,40 @@ export interface AggregationRunSummary {
   status: string;
   notes: string | null;
 }
+
+/** One player's trophy movement between two consecutive daily snapshots. */
+export interface TrophyGain {
+  tag: string;
+  name: string | null;
+  /** Trophies on the newer snapshot. */
+  trophies: number;
+  /** Newer minus older. Always positive in the published list. */
+  gain: number;
+  /** ISO dates of the two snapshots being compared. */
+  from: string;
+  to: string;
+  /** Days between them. Spans vary because sampling rotates through the pool. */
+  days: number;
+}
+
+/** A brawler's record inside a single game mode. */
+export interface ModePick {
+  brawlerId: number;
+  brawlerName: string;
+  /** Baseline-adjusted, shrunk win rate. Comparable across modes. */
+  score: number;
+  /** Raw win rate within this mode. */
+  winRate: number;
+  /** Share of this mode's sampled battles. */
+  pickRate: number;
+  decidedSampleSize: number;
+}
+
+/** Best picks for one mode, plus the evidence behind them. */
+export interface ModeBestPicks {
+  mode: string;
+  picks: ModePick[];
+  /** Decided battles sampled in this mode, across all brawlers. */
+  sampleSize: number;
+  baselineWinRate: number;
+}

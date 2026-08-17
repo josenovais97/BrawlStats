@@ -9,7 +9,10 @@ import type {
   BrawlerStatRow,
   CatalogChangeEntry,
   MetaMover,
+  ModeBestPicks,
+  ModePick,
   Tier,
+  TrophyGain,
   TrophyStanding,
 } from '@/types/stats';
 
@@ -24,6 +27,26 @@ import type {
  * shows the brawler as unrated rather than pretending to rank it.
  */
 export const MIN_SAMPLE_FOR_TIER = 20;
+
+/**
+ * Battle types the win rate is computed from, shared by the write side
+ * (`lib/aggregation.ts`) and every read that ranks brawlers.
+ *
+ * The API's `"ranked"` type is the trophy ladder, not the competitive mode, and
+ * the distinction decides whether a ranking means anything. Measured over a
+ * week of our own samples: trophy-ladder battles came back at a 78.0% win rate,
+ * because a pool seeded from the global trophy leaderboard is mostly strong
+ * players farming weaker lobbies. The same players in competitive Ranked won
+ * 54.3%, where matchmaking pairs comparable opponents, so what is left is
+ * closer to the brawler's own contribution.
+ */
+export const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'] as const;
+
+/**
+ * Floor for per-mode picks. Lower than MIN_SAMPLE_FOR_TIER because splitting by
+ * mode divides the sample thirteen ways; shrinkage carries more of the load.
+ */
+const MIN_SAMPLE_FOR_MODE_PICK = 12;
 
 /**
  * Strength of the prior pulling a brawler's win rate toward the cohort mean,
@@ -502,5 +525,345 @@ export async function recordLookup(tag: string, name?: string, trophies?: number
     });
   } catch {
     // Intentionally silent.
+  }
+}
+
+/**
+ * How stale a player's newest snapshot may be and still count as "climbing".
+ */
+const GAIN_FRESHNESS_DAYS = 3;
+
+/** Widest gap between two snapshots that still yields a meaningful rate. */
+const GAIN_MAX_SPAN_DAYS = 7;
+
+/**
+ * Biggest trophy climbers, from each player's own two most recent snapshots.
+ *
+ * `player_brawler_snapshots` stores per-brawler trophies per player per day, so
+ * summing a player's rows for a date reconstructs their total on that date.
+ *
+ * Note this deliberately does *not* compare the two most recent snapshot
+ * *dates*. Sampling walks the pool least-recently-sampled first, so any two
+ * consecutive days are mostly disjoint sets of players by design: measured on
+ * real data, two adjacent snapshot dates covering 535 and 224 players shared
+ * exactly one. Pairing each player against their own previous snapshot instead
+ * means everyone sampled twice contributes.
+ *
+ * Because those spans differ per player, ranking is by trophies per day. A
+ * five-day gap would otherwise always outrank a one-day gap.
+ */
+export async function getTrophyGains(limit = 10): Promise<TrophyGain[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.playerBrawlerSnapshot.groupBy({
+      by: ['playerTag', 'snapshotDate'],
+      _sum: { trophies: true },
+    });
+    if (rows.length === 0) return [];
+
+    // Newest snapshot date in the table anchors freshness, so a stale database
+    // does not silently publish month-old movement as today's.
+    let newestOverall = 0;
+    const byPlayer = new Map<string, { date: number; total: number }[]>();
+    for (const row of rows) {
+      const date = row.snapshotDate.getTime();
+      if (date > newestOverall) newestOverall = date;
+      const list = byPlayer.get(row.playerTag) ?? [];
+      list.push({ date, total: row._sum.trophies ?? 0 });
+      byPlayer.set(row.playerTag, list);
+    }
+
+    const cutoff = newestOverall - GAIN_FRESHNESS_DAYS * 86_400_000;
+    const gains: (TrophyGain & { perDay: number })[] = [];
+
+    for (const [tag, snapshots] of byPlayer) {
+      if (snapshots.length < 2) continue;
+      snapshots.sort((a, b) => b.date - a.date);
+      const [latest, previous] = snapshots;
+
+      if (latest.date < cutoff) continue;
+
+      const days = Math.round((latest.date - previous.date) / 86_400_000);
+      if (days < 1 || days > GAIN_MAX_SPAN_DAYS) continue;
+
+      const gain = latest.total - previous.total;
+      if (gain <= 0) continue;
+
+      gains.push({
+        tag,
+        name: null,
+        trophies: latest.total,
+        gain,
+        perDay: gain / days,
+        days,
+        from: toIsoDate(new Date(previous.date)),
+        to: toIsoDate(new Date(latest.date)),
+      });
+    }
+
+    const top = gains.sort((a, b) => b.perDay - a.perDay).slice(0, limit);
+    if (top.length === 0) return [];
+
+    // One lookup for the names rather than one per row.
+    const named = await prisma.sampledPlayer.findMany({
+      where: { tag: { in: top.map((g) => g.tag) } },
+      select: { tag: true, name: true },
+    });
+    const names = new Map(named.map((n) => [n.tag, n.name]));
+
+    return top.map((gain) => ({
+      tag: gain.tag,
+      name: names.get(gain.tag) ?? null,
+      trophies: gain.trophies,
+      gain: gain.gain,
+      days: gain.days,
+      from: gain.from,
+      to: gain.to,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Below this many competitive battles in a mode, fall back to every battle.
+ */
+const MIN_COMPETITIVE_FOR_MODE = 40;
+
+/**
+ * Placement at or above which a showdown finish counts as a win.
+ *
+ * Showdown reports `result: "rank"` and a placement instead of victory/defeat,
+ * so without this every showdown brawler has zero decided battles and the mode
+ * can never show picks. The cut-offs match where the game itself starts
+ * awarding trophies: top 4 of 10 in solo, top 2 of 5 teams in duo.
+ */
+const SHOWDOWN_WIN_RANK: Record<string, number> = {
+  soloShowdown: 4,
+  duoShowdown: 2,
+};
+
+/**
+ * Best brawlers per game mode, computed in one pass.
+ *
+ * The events page renders several slots at once, so this deliberately groups
+ * every mode in a single pair of queries rather than issuing one per event.
+ *
+ * Win rate prefers competitive battles, for the same reason the tier list does:
+ * ladder battles measure who was playing, not what they played. But competitive
+ * Ranked is 3v3 only, so showdown modes have no ranked data at all and would
+ * otherwise never show picks. Those fall back to every battle, where the
+ * per-mode baseline still does most of the corrective work.
+ *
+ * Each mode is scored against its own baseline, because modes are not equally
+ * winnable: a 30% win rate is strong in solo showdown and dreadful in gem grab,
+ * and one global threshold would rank every showdown brawler last.
+ */
+export async function getBestPicksByMode(
+  perMode = 3,
+  windowDays = 7,
+): Promise<Map<string, ModeBestPicks>> {
+  const prisma = getPrisma();
+  const out = new Map<string, ModeBestPicks>();
+  if (!prisma) return out;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const where = { battleTime: { gte: since } };
+
+    // `rank` is in the grouping so showdown placements can be folded into
+    // wins and losses; it is null for every mode that reports a result.
+    const [rankedGroups, allGroups] = await Promise.all([
+      prisma.battleSample.groupBy({
+        by: ['mode', 'brawlerId', 'brawlerName', 'result', 'rank'],
+        where: { ...where, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
+        _count: { _all: true },
+      }),
+      prisma.battleSample.groupBy({
+        by: ['mode', 'brawlerId', 'brawlerName', 'result', 'rank'],
+        where,
+        _count: { _all: true },
+      }),
+    ]);
+
+    type Acc = { name: string; wins: number; losses: number; total: number };
+    type Groups = typeof allGroups;
+
+    function fold(groups: Groups): Map<string, Map<number, Acc>> {
+      const byMode = new Map<string, Map<number, Acc>>();
+      for (const g of groups) {
+        const mode = byMode.get(g.mode) ?? new Map<number, Acc>();
+        const acc = mode.get(g.brawlerId) ?? {
+          name: g.brawlerName,
+          wins: 0,
+          losses: 0,
+          total: 0,
+        };
+        const n = g._count._all;
+        const winRank = SHOWDOWN_WIN_RANK[g.mode];
+
+        if (g.result === 'victory') acc.wins += n;
+        else if (g.result === 'defeat') acc.losses += n;
+        else if (g.result === 'rank' && winRank !== undefined && g.rank !== null) {
+          if (g.rank <= winRank) acc.wins += n;
+          else acc.losses += n;
+        }
+
+        acc.total += n;
+        mode.set(g.brawlerId, acc);
+        byMode.set(g.mode, mode);
+      }
+      return byMode;
+    }
+
+    const rankedByMode = fold(rankedGroups);
+    const allByMode = fold(allGroups);
+
+    for (const [mode, everything] of allByMode) {
+      const competitive = rankedByMode.get(mode);
+      const competitiveDecided = competitive
+        ? [...competitive.values()].reduce((s, a) => s + a.wins + a.losses, 0)
+        : 0;
+
+      const brawlers =
+        competitiveDecided >= MIN_COMPETITIVE_FOR_MODE ? competitive! : everything;
+
+      let popWins = 0;
+      let popDecided = 0;
+      let popTotal = 0;
+      for (const acc of brawlers.values()) {
+        popWins += acc.wins;
+        popDecided += acc.wins + acc.losses;
+        popTotal += acc.total;
+      }
+      if (popDecided === 0) continue;
+      const baseline = popWins / popDecided;
+
+      const picks: ModePick[] = [...brawlers]
+        .map(([brawlerId, acc]) => {
+          const decided = acc.wins + acc.losses;
+          const raw = decided > 0 ? acc.wins / decided : 0;
+          return {
+            brawlerId,
+            brawlerName: acc.name,
+            winRate: raw,
+            pickRate: popTotal > 0 ? acc.total / popTotal : 0,
+            decidedSampleSize: decided,
+            score: normalizeWinRate(raw, baseline, decided) ?? 0.5,
+          };
+        })
+        .filter((p) => p.decidedSampleSize >= MIN_SAMPLE_FOR_MODE_PICK)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, perMode);
+
+      if (picks.length === 0) continue;
+      out.set(mode, { mode, picks, sampleSize: popDecided, baselineWinRate: baseline });
+    }
+
+    return out;
+  } catch {
+    return out;
+  }
+}
+
+/** Windows the tier list can be viewed over. */
+export const TIER_WINDOWS = {
+  '24h': { days: 1, label: 'Meta', sublabel: '24h' },
+  '7d': { days: 7, label: 'Recent', sublabel: '7d' },
+  '30d': { days: 30, label: 'General', sublabel: '30d' },
+} as const;
+
+export type TierWindowKey = keyof typeof TIER_WINDOWS;
+
+export function isTierWindow(value: string | undefined): value is TierWindowKey {
+  return value !== undefined && value in TIER_WINDOWS;
+}
+
+/**
+ * Recomputes brawler win and pick rates over an arbitrary window, straight from
+ * `battle_samples`.
+ *
+ * The cron writes one precomputed row per brawler per day at a fixed 7-day
+ * window, which is what the homepage and brawler pages read. The tier list
+ * needs three windows side by side, and storing three rows per brawler per day
+ * would mean widening the table's unique key. Recomputing instead is a single
+ * grouped query over a table in the tens of thousands of rows, and the page
+ * that calls it revalidates hourly, so it runs about once an hour.
+ *
+ * Deliberately mirrors `recomputeBrawlerStats`: competitive battles for the win
+ * rate, every battle for the pick rate, one baseline across the window.
+ */
+export async function getBrawlerStatsForWindow(
+  windowDays: number,
+): Promise<BrawlerStatRow[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    const [allGroups, rankedGroups, totalBattles] = await Promise.all([
+      prisma.battleSample.groupBy({
+        by: ['brawlerId', 'brawlerName'],
+        where: { battleTime: { gte: since } },
+        _count: { _all: true },
+      }),
+      prisma.battleSample.groupBy({
+        by: ['brawlerId', 'brawlerName', 'result'],
+        where: {
+          battleTime: { gte: since },
+          battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
+        },
+        _count: { _all: true },
+      }),
+      prisma.battleSample.count({ where: { battleTime: { gte: since } } }),
+    ]);
+
+    const ranked = new Map<number, { name: string; wins: number; losses: number }>();
+    for (const g of rankedGroups) {
+      const acc = ranked.get(g.brawlerId) ?? { name: g.brawlerName, wins: 0, losses: 0 };
+      if (g.result === 'victory') acc.wins += g._count._all;
+      else if (g.result === 'defeat') acc.losses += g._count._all;
+      ranked.set(g.brawlerId, acc);
+    }
+
+    let popWins = 0;
+    let popDecided = 0;
+    for (const acc of ranked.values()) {
+      popWins += acc.wins;
+      popDecided += acc.wins + acc.losses;
+    }
+    const baselineWinRate = popDecided > 0 ? popWins / popDecided : null;
+
+    const usage = new Map(
+      allGroups.map((g) => [g.brawlerId, { name: g.brawlerName, total: g._count._all }]),
+    );
+    const ids = new Set([...usage.keys(), ...ranked.keys()]);
+    const snapshotDate = toIsoDate(new Date());
+
+    return [...ids].map((brawlerId) => {
+      const all = usage.get(brawlerId);
+      const comp = ranked.get(brawlerId);
+      const decided = comp ? comp.wins + comp.losses : 0;
+
+      return {
+        brawlerId,
+        brawlerName: all?.name ?? comp?.name ?? `Brawler ${brawlerId}`,
+        snapshotDate,
+        winRate: decided > 0 ? comp!.wins / decided : null,
+        baselineWinRate,
+        usageRate: totalBattles > 0 && all ? all.total / totalBattles : null,
+        avgTrophies: null,
+        avgRank: null,
+        sampleSize: all?.total ?? 0,
+        decidedSampleSize: decided,
+        ownerSampleSize: 0,
+        windowDays,
+      };
+    });
+  } catch {
+    return [];
   }
 }

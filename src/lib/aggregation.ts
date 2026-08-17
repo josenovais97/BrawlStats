@@ -12,6 +12,7 @@ import {
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
+import { COMPETITIVE_BATTLE_TYPES } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
 import { parseApiDate } from '@/lib/format';
 import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
@@ -58,22 +59,6 @@ const RANKING_CONCURRENCY = 6;
 
 /** How many days of battle samples feed win/usage rates. */
 const WINDOW_DAYS = 7;
-
-/**
- * Battle types the win rate is computed from.
- *
- * The API's `"ranked"` type is the trophy ladder, not the competitive mode,
- * and the distinction decides whether the tier list means anything. Measured
- * over a week of our own samples: trophy-ladder battles came back at a 78.0%
- * win rate, because a pool seeded from the global trophy leaderboard is mostly
- * strong players farming weaker lobbies. The same players in competitive
- * Ranked (`soloRanked`) won 54.3% — matchmaking there pairs comparable
- * opponents, so what is left is closer to the brawler's own contribution.
- *
- * Pick rate still counts every battle: what people choose to play is
- * interesting on the ladder too, and it is not distorted by who they faced.
- */
-const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'];
 
 /**
  * Stop seeding once the pool is at least this big.
@@ -348,7 +333,7 @@ export async function recomputeBrawlerStats(): Promise<number> {
   // Competitive battles only, for win rate. See COMPETITIVE_BATTLE_TYPES.
   const competitiveGroups = await prisma.battleSample.groupBy({
     by: ['brawlerId', 'brawlerName', 'result'],
-    where: { battleTime: { gte: since }, battleType: { in: COMPETITIVE_BATTLE_TYPES } },
+    where: { battleTime: { gte: since }, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
     _count: { _all: true },
   });
 

@@ -2,12 +2,15 @@ import type { Metadata } from 'next';
 import { CalendarClock, Clock, Radio } from 'lucide-react';
 import Image from 'next/image';
 
+import { ModeBestPicks } from '@/components/events/mode-best-picks';
 import { ErrorState } from '@/components/ui/error-state';
-import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { getEventRotation } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
-import type { BAGameMode, BAMap } from '@/types/brawlapi';
+import { getBestPicksByMode } from '@/lib/stats';
+import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
+import type { ModeBestPicks as ModeBestPicksData } from '@/types/stats';
 import type { BSRotationSlot } from '@/types/brawlstars';
 
 export const metadata: Metadata = {
@@ -26,9 +29,12 @@ export default async function EventsPage() {
   }
 
   // Cosmetic metadata is optional — the page still works without artwork.
-  const [mapMeta, modeMeta] = await Promise.all([
+  const [mapMeta, modeMeta, brawlerMeta, bestPicks] = await Promise.all([
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    // Our own aggregate; an empty map just hides the picks strip.
+    getBestPicksByMode(3).catch(() => new Map<string, ModeBestPicksData>()),
   ]);
 
   const { active, upcoming } = partitionRotation(rotation);
@@ -49,6 +55,8 @@ export default async function EventsPage() {
         slots={active}
         mapMeta={mapMeta}
         modeMeta={modeMeta}
+        brawlerMeta={brawlerMeta}
+        bestPicks={bestPicks}
         emptyLabel="No active events reported right now."
         showEndsIn
       />
@@ -59,6 +67,8 @@ export default async function EventsPage() {
         slots={upcoming}
         mapMeta={mapMeta}
         modeMeta={modeMeta}
+        brawlerMeta={brawlerMeta}
+        bestPicks={bestPicks}
         emptyLabel="No upcoming events announced yet."
       />
     </div>
@@ -71,6 +81,8 @@ function EventSection({
   slots,
   mapMeta,
   modeMeta,
+  brawlerMeta,
+  bestPicks,
   emptyLabel,
   showEndsIn = false,
 }: {
@@ -79,6 +91,8 @@ function EventSection({
   slots: BSRotationSlot[];
   mapMeta: Map<number, BAMap>;
   modeMeta: Map<string, BAGameMode>;
+  brawlerMeta: Map<number, BABrawler>;
+  bestPicks: Map<string, ModeBestPicksData>;
   emptyLabel: string;
   showEndsIn?: boolean;
 }) {
@@ -100,6 +114,8 @@ function EventSection({
               slot={slot}
               map={mapMeta.get(slot.event.id)}
               mode={modeMeta.get((slot.event.mode ?? '').toLowerCase())}
+              brawlerMeta={brawlerMeta}
+              picks={bestPicks.get(slot.event.mode ?? '')}
               showEndsIn={showEndsIn}
             />
           ))}
@@ -113,18 +129,22 @@ function EventCard({
   slot,
   map,
   mode,
+  brawlerMeta,
+  picks,
   showEndsIn,
 }: {
   slot: BSRotationSlot;
   map?: BAMap;
   mode?: BAGameMode;
+  brawlerMeta: Map<number, BABrawler>;
+  picks?: ModeBestPicksData;
   showEndsIn: boolean;
 }) {
   const accent = mode?.color ?? '#8b95b8';
   const modeLabel = mode?.name ?? humanizeMode(slot.event.mode);
 
   return (
-    <article className="card overflow-hidden">
+    <article className="card flex flex-col overflow-hidden">
       <div
         className="flex items-center gap-3 px-4 py-3"
         style={{ background: `color-mix(in srgb, ${accent} 18%, transparent)` }}
@@ -162,7 +182,7 @@ function EventCard({
         </div>
       )}
 
-      <div className="p-4">
+      <div className="flex-1 p-4">
         <p className="truncate font-semibold">{slot.event.map ?? 'Unknown map'}</p>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
           <Clock className="size-3.5" />
@@ -171,6 +191,8 @@ function EventCard({
             : `Starts in ${timeUntil(slot.startTime)}`}
         </p>
       </div>
+
+      <ModeBestPicks data={picks} brawlerMeta={brawlerMeta} accent={accent} />
     </article>
   );
 }

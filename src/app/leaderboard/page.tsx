@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Shield, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { LeaderboardControls } from '@/components/leaderboard/leaderboard-controls';
+import { TrophyGains } from '@/components/leaderboard/trophy-gains';
 import { ErrorState } from '@/components/ui/error-state';
 import { TrophyIcon } from '@/components/game-icons';
 import { clubBadgeUrl, playerIconUrl } from '@/lib/brawlapi';
@@ -34,7 +36,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
   const board: Board = params.type === 'clubs' ? 'clubs' : 'players';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <header>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Leaderboard</h1>
         <p className="mt-2 text-muted">
@@ -43,6 +45,18 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
       </header>
 
       <LeaderboardControls region={region} board={board} />
+
+      {/*
+        Above the board on purpose. It is the one thing here that is ours rather
+        than a mirror of the game API, and below a hundred rows nobody would
+        ever reach it. Streamed separately so our aggregate never delays the
+        live board. Players only: clubs have no per-member trophy history.
+      */}
+      {board === 'players' ? (
+        <Suspense fallback={null}>
+          <TrophyGains />
+        </Suspense>
+      ) : null}
 
       {board === 'players' ? (
         <PlayerBoard region={region} />

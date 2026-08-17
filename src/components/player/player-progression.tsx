@@ -1,4 +1,4 @@
-import { Clock, Shirt, Star, Swords, TrendingUp } from 'lucide-react';
+import { Clock, Shirt, Star, Swords } from 'lucide-react';
 
 import {
   BuffieIcon,
@@ -6,6 +6,7 @@ import {
   GadgetIcon,
   GearIcon,
   HyperchargeIcon,
+  Power11Icon,
   PowerPointIcon,
   StarPowerIcon,
 } from '@/components/game-icons';
@@ -33,7 +34,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
   }[] = [
     { icon: Star, label: 'Brawlers', stat: progression.brawlers, tone: 'text-brand' },
     {
-      icon: TrendingUp,
+      node: <Power11Icon className="size-4" />,
       label: 'At power 11',
       stat: progression.maxedBrawlers,
       tone: 'text-victory',

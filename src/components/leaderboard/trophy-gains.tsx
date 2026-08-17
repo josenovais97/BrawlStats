@@ -1,0 +1,120 @@
+import { Flame } from 'lucide-react';
+import Link from 'next/link';
+
+import { TrophyIcon } from '@/components/game-icons';
+import { formatNumber } from '@/lib/format';
+import { getTrophyGains } from '@/lib/stats';
+
+/** Podium colours for the first three. Everything below is neutral. */
+const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
+
+/**
+ * Fewer rows than this and the section is hidden rather than shown half empty.
+ *
+ * A gain needs two snapshots of the same player, and sampling walks the pool
+ * least-recently-sampled first, so nobody has a second snapshot until the
+ * rotation wraps all the way round. One lonely row reads as broken; no section
+ * reads as intentional, which matches how the rest of the site degrades.
+ */
+const MIN_ROWS = 3;
+
+/** Biggest trophy climbers, from each player's own two most recent snapshots. */
+export async function TrophyGains({ limit = 5 }: { limit?: number }) {
+  const gains = await getTrophyGains(limit);
+  if (gains.length < MIN_ROWS) return null;
+
+  // Bars are scaled on the daily rate, which is also what the list is ranked
+  // by, so the longest bar is always the top row.
+  const topRate = gains[0].gain / gains[0].days;
+  const uniformSpan = gains.every((g) => g.days === gains[0].days) ? gains[0].days : null;
+
+  return (
+    <section aria-labelledby="trophy-gains" className="reveal">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div className="min-w-0">
+          <p className="eyebrow flex items-center gap-2 text-defeat">
+            <Flame className="size-3.5" />
+            Climbing fastest
+          </p>
+          <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
+            Biggest trophy gains{uniformSpan === 1 ? ' today' : ''}
+          </h2>
+          <p className="mt-2 text-sm text-muted">
+            From our own snapshots, ranked by trophies per day since each player was
+            last sampled.
+          </p>
+        </div>
+      </div>
+
+      <ol className="card divide-y divide-border overflow-hidden">
+        {gains.map((player, index) => {
+          const podium = PODIUM[index];
+          // Bar length is relative to the biggest gain, so the leader always
+          // fills the row and the rest are legible as a proportion of it.
+          const width =
+            topRate > 0 ? Math.max(4, (player.gain / player.days / topRate) * 100) : 0;
+
+          return (
+            <li key={player.tag} className="relative">
+              {/*
+                The bar sits behind the row rather than beside it: a separate
+                chart column would squeeze the name on a phone, and this way the
+                magnitude reads at any width.
+              */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 left-0 bg-defeat/[0.07]"
+                style={{ width: `${width}%` }}
+              />
+              <Link
+                href={`/player/${player.tag}`}
+                className="row-interactive relative flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
+              >
+                <span
+                  className="grid size-7 shrink-0 place-items-center rounded-lg text-sm font-black tabular-nums sm:size-8"
+                  style={
+                    podium
+                      ? {
+                          background: `color-mix(in srgb, ${podium} 18%, transparent)`,
+                          color: podium,
+                          boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${podium} 35%, transparent)`,
+                        }
+                      : { color: 'var(--muted)' }
+                  }
+                >
+                  {index + 1}
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold leading-tight">
+                    {player.name ?? `#${player.tag}`}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-muted">
+                    <TrophyIcon className="size-3" />
+                    <span className="tabular-nums">{formatNumber(player.trophies)}</span>
+                    <span aria-hidden>total</span>
+                  </p>
+                </div>
+
+                <div className="shrink-0 text-right">
+                  <p className="display text-base leading-none tabular-nums text-victory sm:text-lg">
+                    +{formatNumber(player.gain)}
+                  </p>
+                  {/*
+                    Spans differ per player because sampling rotates, so each
+                    row states its own. Hidden when every row shares one.
+                  */}
+                  {uniformSpan === null ? (
+                    <p className="mt-1 text-[0.625rem] uppercase tracking-wide text-muted">
+                      {player.days === 1 ? 'in 1 day' : `in ${player.days} days`}
+                    </p>
+                  ) : null}
+                </div>
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}

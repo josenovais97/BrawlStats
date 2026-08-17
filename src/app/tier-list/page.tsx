@@ -3,16 +3,21 @@ import { Database } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { WindowTabs } from '@/components/tier-list/window-tabs';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent, relativeTime } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
   TIER_ORDER,
+  TIER_WINDOWS,
   assignTier,
-  getLatestBrawlerStats,
+  getBrawlerStatsForWindow,
+  getLastAggregationRun,
+  isTierWindow,
   normalizeWinRate,
+  type TierWindowKey,
 } from '@/lib/stats';
 import type { Tier, TierListEntry } from '@/types/stats';
 
@@ -25,12 +30,21 @@ export const metadata: Metadata = {
 /** Reads the aggregate table, never the live API — cheap to revalidate hourly. */
 export const revalidate = 3600;
 
-export default async function TierListPage() {
+interface PageProps {
+  searchParams: Promise<{ window?: string }>;
+}
+
+export default async function TierListPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const windowKey: TierWindowKey = isTierWindow(params.window) ? params.window : '7d';
+  const { days } = TIER_WINDOWS[windowKey];
+
   // Artwork (HTTP) overlaps with the database work, but the two database reads
   // run one after the other so the page never needs more than one connection.
-  const [rows, brawlerMeta] = await Promise.all([
-    getLatestBrawlerStats(),
+  const [rows, brawlerMeta, lastRun] = await Promise.all([
+    getBrawlerStatsForWindow(days),
     getBrawlerMap().catch(() => new Map()),
+    getLastAggregationRun(),
   ]);
 
   const entries: TierListEntry[] = rows.map((row) => {
@@ -61,14 +75,29 @@ export default async function TierListPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Tier list</h1>
-        <p className="mt-2 max-w-3xl text-muted">
-          Win rates and pick rates for every brawler, refreshed daily.
+        <h1 className="display text-3xl uppercase sm:text-4xl">Brawl Stars tier list</h1>
+
+        <p className="mt-3 max-w-3xl leading-relaxed text-muted">
+          The current Brawl Stars tier list, built from win rates and pick rates in the
+          recent ranked battles of players on the{' '}
+          <Link href="/leaderboard" className="font-medium text-brand hover:underline">
+            global leaderboard
+          </Link>
+          . Rankings refresh several times a day to track the latest meta.
+          {lastRun ? ` Updated ${relativeTime(lastRun.startedAt)}.` : ''}
         </p>
+
+        <p className="mt-2 text-sm text-muted">
+          Tap or hover a brawler to see their sample size and raw win rate.
+        </p>
+
+        <div className="mt-5">
+          <WindowTabs active={windowKey} />
+        </div>
       </header>
 
       {rated.length === 0 ? (
-        <EmptyState />
+        <EmptyState windowLabel={`${TIER_WINDOWS[windowKey].sublabel} window`} />
       ) : (
         <div className="space-y-4">
           {TIER_ORDER.map((tier) => {
@@ -164,7 +193,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
   );
 }
 
-function EmptyState() {
+function EmptyState({ windowLabel }: { windowLabel: string }) {
   const configured = hasDatabase();
 
   return (
@@ -177,7 +206,7 @@ function EmptyState() {
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-muted">
         {configured
-          ? 'Rankings are still being collected. Check back shortly.'
+          ? `Not enough ranked battles sampled in the ${windowLabel} yet. Try a longer window, or check back shortly.`
           : 'Rankings are not available right now.'}
       </p>
       <Link
