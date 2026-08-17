@@ -21,23 +21,35 @@ export async function HomeCoverage() {
   ];
 
   return (
-    <section className="card card-glow overflow-hidden">
-      <ul className="grid divide-y divide-border sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
+    <section aria-label="Data coverage" className="card overflow-hidden">
+      {/*
+        Two columns on a phone rather than four stacked rows: these are four
+        short numbers, and stacking them turns a one-line credibility strip
+        into half a screen of scrolling.
+      */}
+      <ul className="grid grid-cols-2 md:grid-cols-4">
         {items.map(({ icon: Icon, label, value }, index) => (
           <li
             key={label}
-            className={`flex items-center gap-3 p-5 ${
-              index > 0 ? 'lg:border-l lg:border-border' : ''
-            } ${index === 1 ? 'sm:border-l sm:border-border' : ''} ${
-              index === 3 ? 'sm:border-l sm:border-border' : ''
+            className={`flex items-center gap-2.5 p-3.5 sm:gap-3 sm:p-4 sm:px-5 ${
+              index % 2 === 1 ? 'border-l border-border' : ''
+            } ${index > 1 ? 'border-t border-border md:border-t-0' : ''} ${
+              index === 2 ? 'md:border-l md:border-border' : ''
             }`}
           >
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-brand">
-              <Icon className="size-5" />
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-brand sm:size-11">
+              <Icon className="size-4.5 sm:size-5" />
             </span>
             <div className="min-w-0">
-              <p className="display text-2xl leading-none">{value}</p>
-              <p className="mt-1.5 truncate text-xs uppercase tracking-wide text-muted">
+              <p className="display text-xl leading-none tabular-nums sm:text-2xl">
+                {value}
+              </p>
+              {/*
+                Wrapping rather than truncating: at 320px "Ranked placements"
+                does not fit on one line, and a clipped label is worse than a
+                two-line one.
+              */}
+              <p className="mt-1.5 text-[0.625rem] font-medium uppercase leading-tight tracking-wide text-muted sm:text-xs">
                 {label}
               </p>
             </div>

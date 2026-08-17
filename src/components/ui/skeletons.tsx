@@ -59,6 +59,29 @@ export function TableSkeleton({ rows = 10 }: { rows?: number }) {
   );
 }
 
+/**
+ * Matches the homepage ranked lists, which are one card with divided rows
+ * rather than separate cards, so the fallback and the real list occupy the
+ * same box and nothing jumps when the data lands.
+ */
+export function RankedListSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <div className="card divide-y divide-border overflow-hidden">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5">
+          <Skeleton className="size-7 rounded-lg sm:size-8" />
+          <Skeleton className="size-10 rounded-lg sm:size-11" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3.5 w-28 rounded" />
+            <Skeleton className="h-3 w-16 rounded" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function InsightsSkeleton() {
   return (
     <section>

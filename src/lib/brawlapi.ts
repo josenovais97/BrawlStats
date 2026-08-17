@@ -107,9 +107,19 @@ export function brawlerIconUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/borders/${brawlerId}.png`;
 }
 
-/** Borderless brawler portrait, by id. */
+/** Borderless brawler portrait, by id. Still a square tile, just unframed. */
 export function brawlerPortraitUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/borderless/${brawlerId}.png`;
+}
+
+/**
+ * Full-body character render on a transparent background.
+ *
+ * Roughly ten times the weight of a portrait tile, so this is for decorative
+ * hero art only — never for lists.
+ */
+export function brawlerModelUrl(brawlerId: number): string {
+  return `https://cdn.brawlify.com/brawlers/model/${brawlerId}.png`;
 }
 
 /**

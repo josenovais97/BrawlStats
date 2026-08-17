@@ -5,6 +5,7 @@ import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
 import { InstallPrompt } from '@/components/install-prompt';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { SITE_URL } from '@/lib/site';
 
 import './globals.css';
 
@@ -25,8 +26,9 @@ const lilita = Lilita_One({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Brawl Zone — Brawl Stars player, club and brawler stats',
+    default: 'Brawl Zone: Brawl Stars player, club and brawler stats',
     template: '%s · Brawl Zone',
   },
   description:
@@ -37,10 +39,18 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${lilita.variable} antialiased`}
-      >
+    /*
+      The font variables have to land on <html>, not <body>. Tailwind's theme
+      maps `--font-sans` to `--font-geist-sans` at `:root`, and a custom
+      property that references an undefined variable computes to
+      guaranteed-invalid and stays that way for every descendant — which
+      silently dropped Geist and Lilita One across the whole site.
+    */
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${lilita.variable}`}
+    >
+      <body className="antialiased">
         <div className="flex min-h-dvh flex-col">
           <SiteHeader />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">

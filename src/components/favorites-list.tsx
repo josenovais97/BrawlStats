@@ -26,21 +26,21 @@ export function FavoritesList() {
   if (entries.length === 0) return null;
 
   return (
-    <section>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="rule mt-1" aria-hidden />
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">Saved</h2>
-            <p className="mt-1 text-sm text-muted">
-              Profiles you keep an eye on, stored on this device.
-            </p>
-          </div>
+    <section aria-labelledby="saved-profiles">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0">
+          <p className="eyebrow">On this device</p>
+          <h2
+            id="saved-profiles"
+            className="display mt-2.5 text-2xl uppercase sm:text-3xl"
+          >
+            Saved profiles
+          </h2>
         </div>
         <button
           type="button"
           onClick={clearFavorites}
-          className="text-sm text-muted transition-colors hover:text-foreground"
+          className="shrink-0 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-muted transition-colors hover:border-defeat/50 hover:text-foreground"
         >
           Clear all
         </button>

@@ -6,7 +6,7 @@ import type { MetadataRoute } from 'next';
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Brawl Zone — Brawl Stars stats',
+    name: 'Brawl Zone: Brawl Stars stats',
     short_name: 'Brawl Zone',
     description:
       'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',

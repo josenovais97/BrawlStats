@@ -1,8 +1,8 @@
 'use client';
 
-import { Loader2, Search, Shield, User } from 'lucide-react';
+import { ArrowRight, Loader2, Search, Shield, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition, type FormEvent } from 'react';
+import { useId, useState, useTransition, type FormEvent } from 'react';
 
 import { RecentSearches } from '@/components/recent-searches';
 import { isValidTag, normalizeTag } from '@/lib/tags';
@@ -14,7 +14,18 @@ interface SearchBarProps {
   autoFocus?: boolean;
   /** Shows tags previously looked up on this device. */
   showRecent?: boolean;
+  /**
+   * `hero` is the landing-page treatment: larger type, a full-width submit on
+   * mobile and more generous padding. `default` stays compact for the places
+   * the search sits inside another page.
+   */
+  size?: 'default' | 'hero';
 }
+
+const PLACEHOLDER: Record<Mode, string> = {
+  player: '2V0UL0GQV8',
+  club: '808VR8JGR',
+};
 
 /**
  * Client-side tag entry. Validation happens here so obvious typos never reach
@@ -25,12 +36,16 @@ export function SearchBar({
   defaultMode = 'player',
   autoFocus = false,
   showRecent = false,
+  size = 'default',
 }: SearchBarProps) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const hintId = useId();
+
+  const hero = size === 'hero';
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -41,7 +56,7 @@ export function SearchBar({
       return;
     }
     if (!isValidTag(tag)) {
-      setError('Tags only use the characters 0289PYLQGRJCUV — check for typos.');
+      setError('Tags only use the characters 0289PYLQGRJCUV, so check for typos.');
       return;
     }
 
@@ -53,21 +68,31 @@ export function SearchBar({
 
   return (
     <div id="search" className="w-full scroll-mt-24">
-      <div className="mb-3 flex gap-2">
+      {/*
+        Segmented control rather than two loose buttons: the sliding pill makes
+        it obvious the two options are one setting with one active value.
+      */}
+      <div
+        role="group"
+        aria-label="Search type"
+        className="inline-flex rounded-xl border border-border bg-surface-2/70 p-1"
+      >
         {(['player', 'club'] as const).map((m) => {
           const Icon = m === 'player' ? User : Shield;
+          const active = mode === m;
           return (
             <button
               key={m}
               type="button"
+              aria-pressed={active}
               onClick={() => {
                 setMode(m);
                 setError(null);
               }}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium capitalize transition-colors ${
-                mode === m
-                  ? 'bg-brand text-[#1a1200]'
-                  : 'border border-border text-muted hover:text-foreground'
+              className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold capitalize transition-colors ${
+                active
+                  ? 'bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]'
+                  : 'text-muted hover:text-foreground'
               }`}
             >
               <Icon className="size-4" />
@@ -77,9 +102,21 @@ export function SearchBar({
         })}
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-muted">
+      <form
+        onSubmit={onSubmit}
+        className={`mt-3 flex flex-col gap-3 ${hero ? 'sm:flex-row' : 'sm:flex-row'}`}
+      >
+        {/*
+          The focus ring lives on this wrapper, not the input, so the whole
+          field including the leading hash lights up as one control.
+        */}
+        <div className="group relative flex-1 rounded-xl transition-shadow duration-200 focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--brand)_18%,transparent)]">
+          <span
+            aria-hidden
+            className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted transition-colors group-focus-within:text-brand ${
+              hero ? 'text-xl' : 'text-lg'
+            }`}
+          >
             #
           </span>
           <input
@@ -89,20 +126,26 @@ export function SearchBar({
               setValue(e.target.value);
               if (error) setError(null);
             }}
-            placeholder={mode === 'player' ? '2V0UL0GQV8' : '808VR8JGR'}
+            placeholder={PLACEHOLDER[mode]}
             aria-label={`${mode} tag`}
             aria-invalid={error ? true : undefined}
+            aria-describedby={hintId}
             spellCheck={false}
             autoCapitalize="characters"
             autoComplete="off"
-            className="w-full rounded-xl border border-border bg-surface py-3.5 pl-9 pr-4 font-mono text-lg uppercase tracking-wider outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-muted/60 focus:border-brand/60 focus:ring-2 focus:ring-brand/20"
+            enterKeyHint="search"
+            className={`w-full rounded-xl border bg-surface font-mono uppercase tracking-wider outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-muted/50 focus:border-brand/70 ${
+              error ? 'border-defeat/60' : 'border-border-strong/70'
+            } ${hero ? 'py-4 pl-10 pr-4 text-lg sm:text-xl' : 'py-3.5 pl-9 pr-4 text-lg'}`}
           />
         </div>
 
         <button
           type="submit"
           disabled={pending}
-          className="btn-game inline-flex items-center justify-center gap-2 bg-brand px-7 py-3.5 text-lg uppercase text-[#1a1200] hover:bg-brand-strong disabled:opacity-70"
+          className={`btn-game inline-flex shrink-0 items-center justify-center gap-2 bg-brand uppercase text-brand-ink hover:bg-brand-strong disabled:opacity-70 ${
+            hero ? 'px-8 py-4 text-lg' : 'px-7 py-3.5 text-lg'
+          }`}
         >
           {pending ? (
             <Loader2 className="size-5 animate-spin" />
@@ -110,16 +153,19 @@ export function SearchBar({
             <Search className="size-5" />
           )}
           Search
+          {hero ? <ArrowRight className="size-5 sm:hidden" /> : null}
         </button>
       </form>
 
       {error ? (
-        <p role="alert" className="mt-2 text-sm text-defeat">
+        <p role="alert" className="mt-3 text-sm font-medium text-defeat">
           {error}
         </p>
       ) : (
-        <p className="mt-2 text-sm text-muted">
-          Find your tag in-game under your profile, below your name.
+        <p id={hintId} className="mt-3 text-sm text-muted">
+          {mode === 'player'
+            ? 'Your tag is on your in-game profile, just below your name.'
+            : 'A club tag is shown on the club screen, under the club name.'}
         </p>
       )}
 

@@ -1,190 +1,134 @@
-import { ArrowRight, CalendarClock, Newspaper, Podium, Swords, Trophy } from 'lucide-react';
-import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
+import { FavoritesList } from '@/components/favorites-list';
 import { HomeCoverage } from '@/components/home/home-coverage';
+import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
+import { HomeSection } from '@/components/home/home-section';
 import { HomeTopBrawlers } from '@/components/home/home-top-brawlers';
-import { FavoritesList } from '@/components/favorites-list';
+import { HomeValueProps } from '@/components/home/home-value-props';
 import { TopPlayersPreview } from '@/components/home/top-players-preview';
-import { SectionHeading } from '@/components/ui/section-heading';
-import { Skeleton, TableSkeleton } from '@/components/ui/skeletons';
+import { RankedListSkeleton, Skeleton } from '@/components/ui/skeletons';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
+
+export const metadata: Metadata = {
+  title: 'BrawlZone: Brawl Stars stats, tier list and leaderboards',
+  description:
+    'Look up Brawl Stars player and club stats by tag. Track trophies, rankings and progression, follow the live event rotation, check brawler win rates and browse the global leaderboard.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: 'BrawlZone: Brawl Stars stats, tier list and leaderboards',
+    description:
+      'Brawl Stars player stats, club stats, brawler win rates, live events and global leaderboards, all in one search.',
+  },
+};
 
 /**
- * Each shortcut carries its own accent so the row reads as four distinct
- * destinations rather than four identical grey boxes.
+ * Structured data for the search box, so the site can surface a search action
+ * directly in results. The target has to be an absolute URL template.
  */
-const SHORTCUTS = [
-  {
-    href: '/brawlers',
-    icon: Swords,
-    title: 'Brawlers',
-    body: 'Stats, star powers, gadgets and popular builds.',
-    accent: '#ffc53d',
+const WEBSITE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  url: SITE_URL,
+  description:
+    'Brawl Stars player and club statistics, brawler win rates, live event rotation and global leaderboards.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${SITE_URL}/player/{search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
   },
-  {
-    href: '/tier-list',
-    icon: Podium,
-    title: 'Tier list',
-    body: 'Win and pick rates, refreshed daily.',
-    accent: '#ff5c72',
-  },
-  {
-    href: '/release-notes',
-    icon: Newspaper,
-    title: 'Release notes',
-    body: 'The latest official update, in full.',
-    accent: '#8b6bff',
-  },
-  {
-    href: '/events',
-    icon: CalendarClock,
-    title: 'Events',
-    body: 'Live and upcoming maps across every slot.',
-    accent: '#35d0ff',
-  },
-];
+};
 
 export default function HomePage() {
   return (
-    <div className="space-y-14">
-      <HomeHero />
+    <div className="space-y-16 sm:space-y-20 lg:space-y-24">
+      <script
+        type="application/ld+json"
+        // Static object, no user input, so there is nothing to escape here.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_SCHEMA) }}
+      />
+
+      <HomeHero
+        stats={
+          <Suspense fallback={<Skeleton className="h-[7.5rem] rounded-2xl" />}>
+            <HomeCoverage />
+          </Suspense>
+        }
+      />
 
       <FavoritesList />
 
-      <Suspense fallback={<Skeleton className="h-[6.5rem] rounded-2xl" />}>
-        <HomeCoverage />
-      </Suspense>
+      <HomeValueProps />
 
-      {/* What you get */}
-      <section>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SHORTCUTS.map(({ href, icon: Icon, title, body, accent }) => (
-            <Link
-              key={href}
-              href={href}
-              className="card card-interactive group relative overflow-hidden p-5"
-            >
-              <span
-                aria-hidden
-                className="absolute inset-x-0 top-0 h-1"
-                style={{ background: accent }}
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -right-8 -top-8 size-28 rounded-full opacity-20 blur-2xl transition-opacity group-hover:opacity-40"
-                style={{ background: accent }}
-              />
-
-              <span
-                className="relative grid size-12 place-items-center rounded-xl"
-                style={{
-                  background: `color-mix(in srgb, ${accent} 18%, transparent)`,
-                  color: accent,
-                }}
-              >
-                <Icon className="size-6" />
-              </span>
-
-              <h2 className="display relative mt-4 text-lg">{title}</h2>
-              <p className="relative mt-1 text-sm leading-relaxed text-muted">{body}</p>
-              <span
-                className="relative mt-3 inline-flex items-center gap-1 text-sm font-semibold opacity-0 transition-opacity group-hover:opacity-100"
-                style={{ color: accent }}
-              >
-                Open
-                <ArrowRight className="size-3.5" />
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Live now */}
-      <section>
-        <SectionHeading
-          title="Live now"
-          subtitle="Maps currently in rotation."
-          aside={
-            <Link href="/events" className="font-medium text-brand hover:underline">
-              All events
-            </Link>
-          }
-        />
+      <HomeSection
+        id="live-now"
+        eyebrow={
+          <span className="inline-flex items-center gap-2 text-victory">
+            <span className="live-dot" />
+            In rotation now
+          </span>
+        }
+        title="Live Brawl Stars events"
+        subtitle="The maps everyone is playing this slot, straight from the game API."
+        ctaHref="/events"
+        ctaLabel="View all events"
+      >
         <Suspense
           fallback={
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }, (_, i) => (
-                <Skeleton key={i} className="h-40 rounded-2xl" />
+                <Skeleton key={i} className="h-64 rounded-2xl" />
               ))}
             </div>
           }
         >
           <HomeLiveEvents />
         </Suspense>
-      </section>
+      </HomeSection>
 
-      {/* Meta + leaderboard, side by side */}
-      <section className="grid gap-8 lg:grid-cols-2">
-        <div>
-          <SectionHeading
-            title="Top of the meta"
-            subtitle="Highest win rates right now."
-            aside={
-              <Link href="/tier-list" className="font-medium text-brand hover:underline">
-                Tier list
-              </Link>
-            }
-          />
-          <Suspense fallback={<TableSkeleton rows={5} />}>
+      {/*
+        Meta and leaderboard sit side by side on desktop: they are the same
+        shape (a short ranked list) and reading them as a pair is the point.
+      */}
+      <div className="grid gap-16 sm:gap-20 lg:grid-cols-2 lg:gap-8">
+        <HomeSection
+          id="top-meta"
+          eyebrow="Brawler meta"
+          title="Top of the meta"
+          subtitle="Highest win rates right now, adjusted for the sampled player pool."
+          ctaHref="/tier-list"
+          ctaLabel="Explore the tier list"
+        >
+          <Suspense fallback={<RankedListSkeleton />}>
             <HomeTopBrawlers />
           </Suspense>
-        </div>
+        </HomeSection>
 
-        <div>
-          <SectionHeading
-            title="Top players"
-            subtitle="Global trophy leaderboard."
-            aside={
-              <Link href="/leaderboard" className="font-medium text-brand hover:underline">
-                Full board
-              </Link>
-            }
-          />
-          <Suspense fallback={<TableSkeleton rows={5} />}>
+        <HomeSection
+          id="top-players"
+          eyebrow="Leaderboard"
+          title="Top players"
+          subtitle="The highest trophy counts in the world, updated through the day."
+          ctaHref="/leaderboard"
+          ctaLabel="View global leaderboard"
+        >
+          <Suspense fallback={<RankedListSkeleton />}>
             <TopPlayersPreview />
           </Suspense>
-        </div>
-      </section>
+        </HomeSection>
+      </div>
 
-      {/* Closing call to action */}
-      <section className="card card-glow relative overflow-hidden p-8 text-center sm:p-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.12]"
-          style={{
-            background:
-              'radial-gradient(30rem 14rem at 50% 0%, #ffc53d, transparent 70%)',
-          }}
-        />
-        <div className="relative">
-          <Trophy className="mx-auto size-8 text-brand" />
-          <h2 className="display mt-4 text-3xl uppercase sm:text-4xl">
-            Find your tag, track your climb
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-muted">
-            Your tag is on your in-game profile, just below your name.
-          </p>
-          <Link
-            href="/#search"
-            className="btn-game mt-7 inline-flex items-center gap-2 bg-brand px-7 py-3.5 text-lg uppercase text-[#1a1200] hover:bg-brand-strong"
-          >
-            Search a player
-            <ArrowRight className="size-5" />
-          </Link>
-        </div>
-      </section>
+      <HomeCta />
     </div>
   );
 }

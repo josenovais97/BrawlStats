@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { brawlerIconUrl, getBrawlerMap } from '@/lib/brawlapi';
-import { formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent } from '@/lib/format';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
@@ -10,6 +10,9 @@ import {
   getLatestBrawlerStats,
   normalizeWinRate,
 } from '@/lib/stats';
+
+/** Podium colours for the first three rows. Everything below is neutral. */
+const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
 
 /**
  * Top five brawlers by win rate. Renders nothing until the aggregation has
@@ -40,45 +43,80 @@ export async function HomeTopBrawlers() {
   }
 
   return (
-    <ol className="space-y-2">
+    <ol className="card divide-y divide-border overflow-hidden">
       {ranked.map((row, index) => {
         const tier = assignTier(row.normalized) ?? 'D';
         const meta = brawlerMeta.get(row.brawlerId);
+        const podium = PODIUM[index];
 
         return (
           <li key={row.brawlerId}>
             <Link
               href={`/brawlers/${row.brawlerId}`}
-              className="card card-interactive flex items-center gap-3 p-3"
+              title={`${row.brawlerName}: ${formatPercent(row.normalized)} adjusted win rate over ${formatNumber(row.decidedSampleSize)} decided battles`}
+              className="row-interactive flex items-center gap-3 border-l-2 border-transparent p-3 sm:gap-4 sm:p-3.5"
             >
-              <span className="w-6 shrink-0 text-center text-sm font-black tabular-nums text-muted">
+              {/*
+                Rank first, and weighted: the top three carry a filled chip in
+                podium colours, the rest just a number. That single difference
+                does the whole hierarchy job without changing row heights.
+              */}
+              <span
+                className="grid size-7 shrink-0 place-items-center rounded-lg text-sm font-black tabular-nums sm:size-8"
+                style={
+                  podium
+                    ? {
+                        background: `color-mix(in srgb, ${podium} 18%, transparent)`,
+                        color: podium,
+                        boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${podium} 35%, transparent)`,
+                      }
+                    : { color: 'var(--muted)' }
+                }
+              >
                 {index + 1}
               </span>
+
               <Image
                 src={meta?.imageUrl ?? brawlerIconUrl(row.brawlerId)}
                 alt=""
-                width={40}
-                height={40}
-                className="size-10 shrink-0"
+                width={44}
+                height={44}
+                className="size-10 shrink-0 rounded-lg sm:size-11"
+                loading="lazy"
                 unoptimized
               />
+
               <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold capitalize">
+                <p className="truncate font-semibold capitalize leading-tight">
                   {row.brawlerName.toLowerCase()}
                 </p>
-                <p className="truncate text-xs text-muted">
-                  {formatPercent(row.usageRate)} pick rate
+                <p className="mt-1 flex items-center gap-2 text-xs text-muted">
+                  <span
+                    className="rounded px-1.5 py-0.5 text-[0.625rem] font-black leading-none"
+                    style={{
+                      background: `color-mix(in srgb, ${TIER_COLOR[tier]} 16%, transparent)`,
+                      color: TIER_COLOR[tier],
+                    }}
+                  >
+                    {tier}
+                  </span>
+                  <span className="truncate tabular-nums">
+                    {formatPercent(row.usageRate)} pick
+                  </span>
                 </p>
               </div>
-              <span
-                className="shrink-0 rounded-lg px-2.5 py-1 text-sm font-bold tabular-nums"
-                style={{
-                  background: `color-mix(in srgb, ${TIER_COLOR[tier]} 18%, transparent)`,
-                  color: TIER_COLOR[tier],
-                }}
-              >
-                {formatPercent(row.normalized)}
-              </span>
+
+              <div className="shrink-0 text-right">
+                <p
+                  className="display text-lg leading-none tabular-nums sm:text-xl"
+                  style={{ color: TIER_COLOR[tier] }}
+                >
+                  {formatPercent(row.normalized)}
+                </p>
+                <p className="mt-1 text-[0.625rem] font-medium uppercase tracking-wider text-muted">
+                  Win rate
+                </p>
+              </div>
             </Link>
           </li>
         );
