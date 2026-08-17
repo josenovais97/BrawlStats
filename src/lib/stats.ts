@@ -797,35 +797,52 @@ export function isTierWindow(value: string | undefined): value is TierWindowKey 
  */
 export async function getBrawlerStatsForWindow(
   windowDays: number,
+  mode?: string,
 ): Promise<BrawlerStatRow[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
   try {
     const since = new Date(Date.now() - windowDays * 86_400_000);
+    const scope = mode ? { battleTime: { gte: since }, mode } : { battleTime: { gte: since } };
 
+    // `rank` is grouped so showdown placements can be folded into wins and
+    // losses; it is null for every mode that reports a result.
     const [allGroups, rankedGroups, totalBattles] = await Promise.all([
       prisma.battleSample.groupBy({
         by: ['brawlerId', 'brawlerName'],
-        where: { battleTime: { gte: since } },
+        where: scope,
         _count: { _all: true },
       }),
       prisma.battleSample.groupBy({
-        by: ['brawlerId', 'brawlerName', 'result'],
-        where: {
-          battleTime: { gte: since },
-          battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
-        },
+        by: ['brawlerId', 'brawlerName', 'result', 'rank', 'mode'],
+        where: { ...scope, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
         _count: { _all: true },
       }),
-      prisma.battleSample.count({ where: { battleTime: { gte: since } } }),
+      prisma.battleSample.count({ where: scope }),
     ]);
 
+    // Showdown is never played in competitive Ranked, so a showdown-only view
+    // has to read every battle or it would always be empty.
+    const groups =
+      rankedGroups.length === 0 && mode
+        ? await prisma.battleSample.groupBy({
+            by: ['brawlerId', 'brawlerName', 'result', 'rank', 'mode'],
+            where: scope,
+            _count: { _all: true },
+          })
+        : rankedGroups;
+
     const ranked = new Map<number, { name: string; wins: number; losses: number }>();
-    for (const g of rankedGroups) {
+    for (const g of groups) {
       const acc = ranked.get(g.brawlerId) ?? { name: g.brawlerName, wins: 0, losses: 0 };
+      const winRank = SHOWDOWN_WIN_RANK[g.mode];
       if (g.result === 'victory') acc.wins += g._count._all;
       else if (g.result === 'defeat') acc.losses += g._count._all;
+      else if (g.result === 'rank' && winRank !== undefined && g.rank !== null) {
+        if (g.rank <= winRank) acc.wins += g._count._all;
+        else acc.losses += g._count._all;
+      }
       ranked.set(g.brawlerId, acc);
     }
 
@@ -863,6 +880,35 @@ export async function getBrawlerStatsForWindow(
         windowDays,
       };
     });
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Modes with enough sampled battles to be worth offering as a tier-list filter,
+ * most-played first. Returned from the data rather than hard-coded so a mode
+ * leaving rotation drops out on its own.
+ */
+export async function getFilterableModes(
+  windowDays = 30,
+  minBattles = 150,
+): Promise<{ mode: string; battles: number }[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const groups = await prisma.battleSample.groupBy({
+      by: ['mode'],
+      where: { battleTime: { gte: since } },
+      _count: { _all: true },
+    });
+
+    return groups
+      .map((g) => ({ mode: g.mode, battles: g._count._all }))
+      .filter((m) => m.battles >= minBattles)
+      .sort((a, b) => b.battles - a.battles);
   } catch {
     return [];
   }

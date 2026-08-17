@@ -3,9 +3,10 @@ import { Database } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { ModeFilter } from '@/components/tier-list/mode-filter';
 import { WindowTabs } from '@/components/tier-list/window-tabs';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, relativeTime } from '@/lib/format';
+import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
 import {
   MIN_SAMPLE_FOR_TIER,
@@ -14,6 +15,7 @@ import {
   TIER_WINDOWS,
   assignTier,
   getBrawlerStatsForWindow,
+  getFilterableModes,
   getLastAggregationRun,
   isTierWindow,
   normalizeWinRate,
@@ -31,7 +33,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 interface PageProps {
-  searchParams: Promise<{ window?: string }>;
+  searchParams: Promise<{ window?: string; mode?: string }>;
 }
 
 export default async function TierListPage({ searchParams }: PageProps) {
@@ -39,10 +41,15 @@ export default async function TierListPage({ searchParams }: PageProps) {
   const windowKey: TierWindowKey = isTierWindow(params.window) ? params.window : '7d';
   const { days } = TIER_WINDOWS[windowKey];
 
+  const modes = await getFilterableModes();
+  // Only honour a mode we actually have data for, so a hand-edited query string
+  // cannot produce a permanently empty page.
+  const mode = modes.some((m) => m.mode === params.mode) ? params.mode : undefined;
+
   // Artwork (HTTP) overlaps with the database work, but the two database reads
   // run one after the other so the page never needs more than one connection.
   const [rows, brawlerMeta, lastRun] = await Promise.all([
-    getBrawlerStatsForWindow(days),
+    getBrawlerStatsForWindow(days, mode),
     getBrawlerMap().catch(() => new Map()),
     getLastAggregationRun(),
   ]);
@@ -83,7 +90,8 @@ export default async function TierListPage({ searchParams }: PageProps) {
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
             global leaderboard
           </Link>
-          . Rankings refresh several times a day to track the latest meta.
+          {mode ? `, filtered to ${humanizeMode(mode)}` : ''}. Rankings refresh several
+          times a day to track the latest meta.
           {lastRun ? ` Updated ${relativeTime(lastRun.startedAt)}.` : ''}
         </p>
 
@@ -91,13 +99,20 @@ export default async function TierListPage({ searchParams }: PageProps) {
           Tap or hover a brawler to see their sample size and raw win rate.
         </p>
 
-        <div className="mt-5">
+        <div className="mt-5 space-y-3">
           <WindowTabs active={windowKey} />
+          <ModeFilter modes={modes} active={mode} windowKey={windowKey} />
         </div>
       </header>
 
       {rated.length === 0 ? (
-        <EmptyState windowLabel={`${TIER_WINDOWS[windowKey].sublabel} window`} />
+        <EmptyState
+          windowLabel={
+            mode
+              ? `${humanizeMode(mode)} over the ${TIER_WINDOWS[windowKey].sublabel} window`
+              : `${TIER_WINDOWS[windowKey].sublabel} window`
+          }
+        />
       ) : (
         <div className="space-y-4">
           {TIER_ORDER.map((tier) => {

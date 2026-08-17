@@ -78,51 +78,34 @@ export function GearIcon({ className }: IconProps) {
   return <GameIcon src={GENERIC_GEAR} alt="Gear" className={className} />;
 }
 
-/**
- * Trophy. Brawlify's CDN has no standalone trophy asset, so this stays drawn —
- * it is a simple enough shape to match the rest without looking out of place.
- */
+/** The game's own trophy asset, replacing the previously hand-drawn SVG. */
 export function TrophyIcon({ className = 'size-5' }: IconProps) {
+  return <GameIcon src="/icons/trophy.png" alt="Trophies" className={className} />;
+}
+
+/** 3v3 victories. */
+export function Battle3v3Icon({ className }: IconProps) {
+  return <GameIcon src="/icons/battle-3v3.png" alt="3v3 wins" className={className} />;
+}
+
+/** Solo showdown. */
+export function SoloShowdownIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" className={className} role="img" aria-label="Trophies">
-      <defs>
-        <linearGradient id="trophy-grad" x1="0.2" y1="0" x2="0.7" y2="1">
-          <stop offset="0" stopColor="#ffe27a" />
-          <stop offset="0.6" stopColor="#f7c948" />
-          <stop offset="1" stopColor="#dd9412" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M7 3.5h10v4a5 5 0 0 1-10 0z"
-        fill="url(#trophy-grad)"
-        stroke="#7a4c06"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M7 5H4.6v1.6A3.4 3.4 0 0 0 7.6 10M17 5h2.4v1.6A3.4 3.4 0 0 1 16.4 10"
-        fill="none"
-        stroke="#7a4c06"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10.4 12.4h3.2l.5 3.6h-4.2z"
-        fill="url(#trophy-grad)"
-        stroke="#7a4c06"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <rect
-        x="7.4"
-        y="16"
-        width="9.2"
-        height="3.4"
-        rx="1.2"
-        fill="url(#trophy-grad)"
-        stroke="#7a4c06"
-        strokeWidth="1.3"
-      />
-    </svg>
+    <GameIcon src="/icons/solo-showdown.png" alt="Solo showdown" className={className} />
   );
+}
+
+/** Brawler roster. */
+export function BrawlersIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/brawlers.png" alt="Brawlers" className={className} />;
+}
+
+/** Experience. */
+export function ExperienceIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/experience.png" alt="Experience" className={className} />;
+}
+
+/** Club badge placeholder. */
+export function ClubIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/club.png" alt="Club" className={className} />;
 }
