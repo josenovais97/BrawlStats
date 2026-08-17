@@ -6,9 +6,11 @@ import { hasDatabase } from '@/lib/prisma';
 /**
  * POST/GET /api/cron/refresh-stats
  *
- * Triggered daily by Vercel Cron (see vercel.json). Vercel sends
- * `Authorization: Bearer <CRON_SECRET>` using the secret it auto-provisions
- * for projects that declare cron jobs.
+ * Triggered daily by Vercel Cron (see vercel.json). Vercel attaches
+ * `Authorization: Bearer <CRON_SECRET>` only when a CRON_SECRET environment
+ * variable exists on the project. It is not provisioned automatically: if it
+ * is missing in Production, the nightly request arrives with no header and
+ * every run dies at the 401 below without ever reaching runAggregation.
  *
  * Not cached, and always dynamic: a cached cron endpoint would silently stop
  * doing work.
