@@ -87,7 +87,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     })
     .catch(() => new Map<number, string>());
   const normalizedWinRate = stat
-    ? normalizeWinRate(stat.winRate, stat.baselineWinRate)
+    ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
   const tier =
     stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER

@@ -23,26 +23,50 @@ import type {
  * Below this many *decided* battles the win rate is noise, so the tier list
  * shows the brawler as unrated rather than pretending to rank it.
  */
-export const MIN_SAMPLE_FOR_TIER = 30;
+export const MIN_SAMPLE_FOR_TIER = 20;
 
 /**
- * Re-centres a brawler's win rate on the sampled population's mean.
+ * Strength of the prior pulling a brawler's win rate toward the cohort mean,
+ * expressed in pseudo-battles.
  *
- * The sampling pool is seeded from top ladder, and those players win most of
- * their games with anything — raw win rates come back in the 70–90% range and
- * every brawler would land in S tier. Subtracting the cohort baseline and
- * re-centring on 50% turns the number back into "better or worse than average
- * *within this sample*", which is the comparison a tier list is actually
- * making. It does not fix the bias in *which* brawlers get played, only the
- * bias in how often the sampled players win.
+ * Without it the top of the tier list is whichever rarely-played brawler had a
+ * lucky week: a 90% win rate over 50 battles outranked an 86% rate over 1,300.
+ * At k=50 a brawler needs roughly 50 decided battles before its own record
+ * outweighs the prior, which is about where the noise stops dominating.
+ */
+const PRIOR_BATTLES = 50;
+
+/**
+ * Re-centres a brawler's win rate on the sampled population's mean, damped by
+ * how much evidence there actually is.
+ *
+ * Two corrections happen here. First, empirical-Bayes shrinkage: a brawler
+ * with few battles is pulled toward the cohort baseline, so thin samples
+ * cannot reach the top of the list on noise alone. Second, the baseline is
+ * subtracted and the result re-centred on 50%, turning the number into "better
+ * or worse than average *within this sample*", which is the comparison a tier
+ * list is actually making.
+ *
+ * Neither fixes bias in *which* brawlers get played, only in how often the
+ * sampled players win. The cohort bias itself is handled upstream, by
+ * computing win rates from competitive battles only — see
+ * COMPETITIVE_BATTLE_TYPES in `lib/aggregation.ts`.
  */
 export function normalizeWinRate(
   winRate: number | null,
   baselineWinRate: number | null,
+  decidedSampleSize = 0,
 ): number | null {
   if (winRate === null) return null;
   if (baselineWinRate === null || baselineWinRate <= 0) return winRate;
-  return Math.min(Math.max(winRate - baselineWinRate + 0.5, 0), 1);
+
+  const shrunk =
+    decidedSampleSize > 0
+      ? (winRate * decidedSampleSize + baselineWinRate * PRIOR_BATTLES) /
+        (decidedSampleSize + PRIOR_BATTLES)
+      : baselineWinRate;
+
+  return Math.min(Math.max(shrunk - baselineWinRate + 0.5, 0), 1);
 }
 
 /**
@@ -191,8 +215,16 @@ export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
       const prev = before.get(row.brawlerId);
       if (!prev) continue;
 
-      const nowRate = normalizeWinRate(row.winRate, row.baselineWinRate);
-      const prevRate = normalizeWinRate(prev.winRate, prev.baselineWinRate);
+      const nowRate = normalizeWinRate(
+        row.winRate,
+        row.baselineWinRate,
+        row.decidedSampleSize,
+      );
+      const prevRate = normalizeWinRate(
+        prev.winRate,
+        prev.baselineWinRate,
+        prev.decidedSampleSize,
+      );
       if (nowRate === null || prevRate === null) continue;
 
       // Both sides must clear the sample floor, or the "movement" is noise.

@@ -28,7 +28,11 @@ export async function HomeTopBrawlers() {
     .filter((row) => row.decidedSampleSize >= MIN_SAMPLE_FOR_TIER)
     .map((row) => ({
       ...row,
-      normalized: normalizeWinRate(row.winRate, row.baselineWinRate),
+      normalized: normalizeWinRate(
+        row.winRate,
+        row.baselineWinRate,
+        row.decidedSampleSize,
+      ),
     }))
     .filter((row) => row.normalized !== null)
     .sort((a, b) => (b.normalized ?? 0) - (a.normalized ?? 0))

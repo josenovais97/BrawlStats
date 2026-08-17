@@ -60,6 +60,22 @@ const RANKING_CONCURRENCY = 6;
 const WINDOW_DAYS = 7;
 
 /**
+ * Battle types the win rate is computed from.
+ *
+ * The API's `"ranked"` type is the trophy ladder, not the competitive mode,
+ * and the distinction decides whether the tier list means anything. Measured
+ * over a week of our own samples: trophy-ladder battles came back at a 78.0%
+ * win rate, because a pool seeded from the global trophy leaderboard is mostly
+ * strong players farming weaker lobbies. The same players in competitive
+ * Ranked (`soloRanked`) won 54.3% — matchmaking there pairs comparable
+ * opponents, so what is left is closer to the brawler's own contribution.
+ *
+ * Pick rate still counts every battle: what people choose to play is
+ * interesting on the ladder too, and it is not distorted by who they faced.
+ */
+const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'];
+
+/**
  * Stop seeding once the pool is at least this big.
  *
  * Deliberately kept near twice the daily sample rate. A battle log only holds
@@ -322,9 +338,17 @@ export async function recomputeBrawlerStats(): Promise<number> {
   // Run sequentially rather than in parallel: this executes once a day, and
   // serialising it keeps the job within a single connection, which matters on
   // connection-capped free-tier Postgres.
+  // Every battle, for pick rate.
   const battleGroups = await prisma.battleSample.groupBy({
     by: ['brawlerId', 'brawlerName', 'result'],
     where: { battleTime: { gte: since } },
+    _count: { _all: true },
+  });
+
+  // Competitive battles only, for win rate. See COMPETITIVE_BATTLE_TYPES.
+  const competitiveGroups = await prisma.battleSample.groupBy({
+    by: ['brawlerId', 'brawlerName', 'result'],
+    where: { battleTime: { gte: since }, battleType: { in: COMPETITIVE_BATTLE_TYPES } },
     _count: { _all: true },
   });
 
@@ -339,36 +363,42 @@ export async function recomputeBrawlerStats(): Promise<number> {
     where: { battleTime: { gte: since } },
   });
 
-  // Fold the per-result groups into one accumulator per brawler.
-  const byBrawler = new Map<
-    number,
-    { name: string; wins: number; losses: number; draws: number; total: number }
-  >();
+  // Fold the per-result groups into one accumulator per brawler. Two passes
+  // over the same shape: `byBrawler` counts everything and feeds pick rate,
+  // `competitive` counts only ranked play and feeds win rate.
+  type Acc = { name: string; wins: number; losses: number; draws: number; total: number };
 
-  for (const group of battleGroups) {
-    const current = byBrawler.get(group.brawlerId) ?? {
-      name: group.brawlerName,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-      total: 0,
-    };
-    const count = group._count._all;
+  function fold(groups: typeof battleGroups): Map<number, Acc> {
+    const out = new Map<number, Acc>();
+    for (const group of groups) {
+      const current = out.get(group.brawlerId) ?? {
+        name: group.brawlerName,
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        total: 0,
+      };
+      const count = group._count._all;
 
-    if (group.result === 'victory') current.wins += count;
-    else if (group.result === 'defeat') current.losses += count;
-    else if (group.result === 'draw') current.draws += count;
+      if (group.result === 'victory') current.wins += count;
+      else if (group.result === 'defeat') current.losses += count;
+      else if (group.result === 'draw') current.draws += count;
 
-    current.total += count;
-    byBrawler.set(group.brawlerId, current);
+      current.total += count;
+      out.set(group.brawlerId, current);
+    }
+    return out;
   }
 
-  // Population baseline: how often the sampled cohort wins overall, across
-  // every brawler. Tiers are assigned relative to this, because the pool is
-  // drawn from top ladder and wins far more than an average player would.
+  const byBrawler = fold(battleGroups);
+  const competitive = fold(competitiveGroups);
+
+  // Population baseline: how often the sampled cohort wins in competitive
+  // play, across every brawler. Tiers are assigned relative to this, because
+  // even in Ranked the pool is drawn from the top of the ladder.
   let populationWins = 0;
   let populationDecided = 0;
-  for (const acc of byBrawler.values()) {
+  for (const acc of competitive.values()) {
     populationWins += acc.wins;
     populationDecided += acc.wins + acc.losses;
   }
@@ -396,15 +426,16 @@ export async function recomputeBrawlerStats(): Promise<number> {
 
   for (const brawlerId of brawlerIds) {
     const battles = byBrawler.get(brawlerId);
+    const ranked = competitive.get(brawlerId);
     const owner = owners.get(brawlerId);
 
     // Draws are excluded from the denominator: a draw is neither a win nor a
     // loss, and including them drags every brawler toward the mean.
-    const decided = battles ? battles.wins + battles.losses : 0;
-    const winRate = decided > 0 ? battles!.wins / decided : null;
+    const decided = ranked ? ranked.wins + ranked.losses : 0;
+    const winRate = decided > 0 ? ranked!.wins / decided : null;
     const usageRate = totalBattles > 0 && battles ? battles.total / totalBattles : null;
 
-    const name = battles?.name ?? owner?.brawlerName ?? `Brawler ${brawlerId}`;
+    const name = battles?.name ?? ranked?.name ?? owner?.brawlerName ?? `Brawler ${brawlerId}`;
 
     pendingStats.push({
       brawlerId,

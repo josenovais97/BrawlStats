@@ -117,7 +117,8 @@ model BrawlerStat {
 
   /// Battles counted for usageRate (includes showdown placements).
   sampleSize      Int @default(0) @map("sample_size")
-  /// Battles that reported a win or loss — the denominator behind winRate.
+  /// Competitive battles that reported a win or loss: the denominator behind
+  /// winRate. Ladder battles count toward sampleSize but not this.
   decidedSampleSize Int @default(0) @map("decided_sample_size")
   /// Player-brawler snapshots counted for avgTrophies/avgRank.
   ownerSampleSize Int @default(0) @map("owner_sample_size")

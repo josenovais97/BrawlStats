@@ -35,7 +35,11 @@ export default async function TierListPage() {
 
   const entries: TierListEntry[] = rows.map((row) => {
     const meta = brawlerMeta.get(row.brawlerId);
-    const normalizedWinRate = normalizeWinRate(row.winRate, row.baselineWinRate);
+    const normalizedWinRate = normalizeWinRate(
+      row.winRate,
+      row.baselineWinRate,
+      row.decidedSampleSize,
+    );
     return {
       ...row,
       normalizedWinRate,

@@ -15,7 +15,10 @@ export interface BrawlerStatRow {
   avgRank: number | null;
   /** Battles counted toward usage, including showdown placements. */
   sampleSize: number;
-  /** Battles that reported a win or loss — the denominator behind winRate. */
+  /**
+   * Competitive battles that reported a win or loss: the denominator behind
+   * winRate. Smaller than `sampleSize`, which counts ladder play too.
+   */
   decidedSampleSize: number;
   ownerSampleSize: number;
   windowDays: number;
