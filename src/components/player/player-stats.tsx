@@ -38,15 +38,15 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
         value={formatNumber(player.brawlers.length)}
         hint={`${player.brawlers.filter((b) => b.power === 11).length} at power 11`}
       />
+      {/*
+        No hint here. `totalPrestigeLevel` is prestige, not fame, and the header
+        chip already shows it, so repeating it under exp points was both
+        duplicated and mislabelled.
+      */}
       <StatCard
         node={<ExperienceIcon className="size-8" />}
         label="Exp points"
         value={formatNumber(player.expPoints)}
-        hint={
-          player.totalPrestigeLevel
-            ? `Fame ${formatNumber(player.totalPrestigeLevel)}`
-            : undefined
-        }
       />
     </section>
   );
