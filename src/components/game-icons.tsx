@@ -95,6 +95,13 @@ export function SoloShowdownIcon({ className }: IconProps) {
   );
 }
 
+/** Duo showdown. */
+export function DuoShowdownIcon({ className }: IconProps) {
+  return (
+    <GameIcon src="/icons/duo-showdown.png" alt="Duo showdown" className={className} />
+  );
+}
+
 /** Brawler roster. */
 export function BrawlersIcon({ className }: IconProps) {
   return <GameIcon src="/icons/brawlers.png" alt="Brawlers" className={className} />;
@@ -103,6 +110,11 @@ export function BrawlersIcon({ className }: IconProps) {
 /** Experience. */
 export function ExperienceIcon({ className }: IconProps) {
   return <GameIcon src="/icons/experience.png" alt="Experience" className={className} />;
+}
+
+/** Skins. */
+export function SkinsIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/skins.png" alt="Skins" className={className} />;
 }
 
 /** Club badge placeholder. */

@@ -1,6 +1,8 @@
 'use client';
 
-import { Shield, User } from 'lucide-react';
+import { User } from 'lucide-react';
+
+import { ClubIcon } from '@/components/game-icons';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
@@ -37,7 +39,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
     >
       <div className="flex gap-2">
         {(['players', 'clubs'] as const).map((type) => {
-          const Icon = type === 'players' ? User : Shield;
+          const isClub = type === 'clubs';
           return (
             <button
               key={type}
@@ -49,7 +51,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
                   : 'border border-border text-muted hover:text-foreground'
               }`}
             >
-              <Icon className="size-4" />
+              {isClub ? <ClubIcon className="size-4" /> : <User className="size-4" />}
               {type}
             </button>
           );

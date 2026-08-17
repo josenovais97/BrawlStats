@@ -1,9 +1,10 @@
 'use client';
 
-import { Clock, Shield, User, X } from 'lucide-react';
+import { Clock, User, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 
+import { ClubIcon } from '@/components/game-icons';
 import {
   clearRecentSearches,
   readRecentSearches,
@@ -42,18 +43,18 @@ export function RecentSearches() {
 
       <ul className="flex flex-wrap gap-2">
         {entries.map((entry) => {
-          const Icon = entry.kind === 'player' ? User : Shield;
+          const isClub = entry.kind === 'club';
           return (
             <li key={`${entry.kind}:${entry.tag}`} className="group relative">
               <Link
                 href={`/${entry.kind}/${entry.tag}`}
                 className="flex items-center gap-2 rounded-lg border border-border bg-surface py-1.5 pl-3 pr-8 text-sm transition-colors hover:border-brand/50"
               >
-                <Icon
-                  className={`size-3.5 shrink-0 ${
-                    entry.kind === 'player' ? 'text-brand' : 'text-accent'
-                  }`}
-                />
+                {isClub ? (
+                  <ClubIcon className="size-3.5 shrink-0" />
+                ) : (
+                  <User className="size-3.5 shrink-0 text-brand" />
+                )}
                 <span className="max-w-[12rem] truncate font-medium">
                   {entry.name || `#${entry.tag}`}
                 </span>

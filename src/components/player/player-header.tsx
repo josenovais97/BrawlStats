@@ -1,9 +1,9 @@
-import { Shield, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { FavoriteButton } from '@/components/favorite-button';
-import { TrophyIcon } from '@/components/game-icons';
+import { ClubIcon, TrophyIcon } from '@/components/game-icons';
 import { playerIconUrl, prestigeIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
@@ -80,7 +80,7 @@ export function PlayerHeader({ player }: { player: BSPlayer }) {
                 href={`/club/${normalizeTag(player.club.tag)}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium transition-colors hover:border-accent/60 hover:text-foreground"
               >
-                <Shield className="size-3.5 text-accent" />
+                <ClubIcon className="size-4" />
                 {player.club.name}
               </Link>
             ) : (

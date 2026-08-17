@@ -1,6 +1,7 @@
-import { Clock, Shirt, Star, Swords } from 'lucide-react';
+import { Clock, Star, Swords } from 'lucide-react';
 
 import {
+  BrawlersIcon,
   BuffieIcon,
   CoinIcon,
   GadgetIcon,
@@ -8,6 +9,7 @@ import {
   HyperchargeIcon,
   Power11Icon,
   PowerPointIcon,
+  SkinsIcon,
   StarPowerIcon,
 } from '@/components/game-icons';
 
@@ -32,7 +34,12 @@ export function PlayerProgression({ progression, playtime }: Props) {
     stat: OwnershipStat;
     tone: string;
   }[] = [
-    { icon: Star, label: 'Brawlers', stat: progression.brawlers, tone: 'text-brand' },
+    {
+      node: <BrawlersIcon className="size-4" />,
+      label: 'Brawlers',
+      stat: progression.brawlers,
+      tone: 'text-brand',
+    },
     {
       node: <Power11Icon className="size-4" />,
       label: 'At power 11',
@@ -140,7 +147,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
             hint="Estimated"
           />
           <Investment
-            icon={Shirt}
+            node={<SkinsIcon className="size-5" />}
             label="Skins equipped"
             value={formatNumber(progression.skinsEquipped)}
             hint="Currently in use"

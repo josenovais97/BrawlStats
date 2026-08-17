@@ -1,8 +1,7 @@
-import { Bot, Users } from 'lucide-react';
-
 import {
   Battle3v3Icon,
   BrawlersIcon,
+  DuoShowdownIcon,
   ExperienceIcon,
   SoloShowdownIcon,
 } from '@/components/game-icons';
@@ -10,21 +9,12 @@ import { StatCard } from '@/components/ui/stat-card';
 import { formatNumber } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 
-/** Seconds -> "1m 05s", for the Robo Rumble best time. */
-function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  return `${minutes}m ${String(seconds % 60).padStart(2, '0')}s`;
-}
-
 export function PlayerStats({ player }: { player: BSPlayer }) {
   // Ranked deliberately absent: the Ranking section directly below shows the
   // current, season-best and all-time-best tiers with their elo, so a card
   // repeating just the current tier was the weakest thing in this row.
-  const roboRumble = player.bestRoboRumbleTime;
-
   return (
-    <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {/* The game's own marks, so the row reads as Brawl Stars rather than as a
           generic dashboard of line icons. */}
       <StatCard
@@ -38,10 +28,9 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
         value={formatNumber(player.soloVictories)}
       />
       <StatCard
-        icon={Users}
+        node={<DuoShowdownIcon className="size-8" />}
         label="Duo SD wins"
         value={formatNumber(player.duoVictories)}
-        tone="text-victory"
       />
       <StatCard
         node={<BrawlersIcon className="size-8" />}
@@ -58,18 +47,6 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
             ? `Fame ${formatNumber(player.totalPrestigeLevel)}`
             : undefined
         }
-      />
-      {/*
-        Robo Rumble takes the slot Ranked used to. It is one of the few
-        genuinely "best ever" numbers the API exposes and nothing else on the
-        profile showed it.
-      */}
-      <StatCard
-        icon={Bot}
-        label="Robo Rumble"
-        value={roboRumble ? formatDuration(roboRumble) : 'None'}
-        hint={roboRumble ? 'Best survival time' : 'Never played'}
-        tone="text-accent"
       />
     </section>
   );

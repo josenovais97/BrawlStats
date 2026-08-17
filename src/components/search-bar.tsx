@@ -1,9 +1,10 @@
 'use client';
 
-import { ArrowRight, Loader2, Search, Shield, User } from 'lucide-react';
+import { ArrowRight, Loader2, Search, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useId, useState, useTransition, type FormEvent } from 'react';
 
+import { ClubIcon } from '@/components/game-icons';
 import { RecentSearches } from '@/components/recent-searches';
 import { isValidTag, normalizeTag } from '@/lib/tags';
 
@@ -78,7 +79,7 @@ export function SearchBar({
         className="inline-flex rounded-xl border border-border bg-surface-2/70 p-1"
       >
         {(['player', 'club'] as const).map((m) => {
-          const Icon = m === 'player' ? User : Shield;
+          const isClub = m === 'club';
           const active = mode === m;
           return (
             <button
@@ -95,7 +96,7 @@ export function SearchBar({
                   : 'text-muted hover:text-foreground'
               }`}
             >
-              <Icon className="size-4" />
+              {isClub ? <ClubIcon className="size-4" /> : <User className="size-4" />}
               {m}
             </button>
           );
