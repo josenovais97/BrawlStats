@@ -6,8 +6,9 @@ import { formatNumber, formatPercent } from '@/lib/format';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
-  assignTier,
+  assignTierFromScore,
   getLatestBrawlerStats,
+  metaScore,
   normalizeWinRate,
 } from '@/lib/stats';
 
@@ -26,16 +27,17 @@ export async function HomeTopBrawlers() {
 
   const ranked = rows
     .filter((row) => row.decidedSampleSize >= MIN_SAMPLE_FOR_TIER)
-    .map((row) => ({
-      ...row,
-      normalized: normalizeWinRate(
+    .map((row) => {
+      const normalized = normalizeWinRate(
         row.winRate,
         row.baselineWinRate,
         row.decidedSampleSize,
-      ),
-    }))
-    .filter((row) => row.normalized !== null)
-    .sort((a, b) => (b.normalized ?? 0) - (a.normalized ?? 0))
+      );
+      // Same ordering as the tier list, so the two pages never disagree.
+      return { ...row, normalized, score: metaScore(normalized, row.usageRate) };
+    })
+    .filter((row) => row.score !== null)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
     .slice(0, 5);
 
   if (ranked.length === 0) {
@@ -49,7 +51,7 @@ export async function HomeTopBrawlers() {
   return (
     <ol className="card divide-y divide-border overflow-hidden">
       {ranked.map((row, index) => {
-        const tier = assignTier(row.normalized) ?? 'D';
+        const tier = assignTierFromScore(row.score) ?? 'D';
         const meta = brawlerMeta.get(row.brawlerId);
         const podium = PODIUM[index];
 
@@ -57,7 +59,7 @@ export async function HomeTopBrawlers() {
           <li key={row.brawlerId}>
             <Link
               href={`/brawlers/${row.brawlerId}`}
-              title={`${row.brawlerName}: ${formatPercent(row.normalized)} adjusted win rate over ${formatNumber(row.decidedSampleSize)} decided battles`}
+              title={`${row.brawlerName}: meta score ${row.score ?? '?'} from ${formatPercent(row.normalized)} adjusted win rate and ${formatPercent(row.usageRate)} pick rate, over ${formatNumber(row.decidedSampleSize)} decided battles`}
               className="row-interactive flex items-center gap-3 border-l-2 border-transparent p-3 sm:gap-4 sm:p-3.5"
             >
               {/*
@@ -115,10 +117,10 @@ export async function HomeTopBrawlers() {
                   className="display text-lg leading-none tabular-nums sm:text-xl"
                   style={{ color: TIER_COLOR[tier] }}
                 >
-                  {formatPercent(row.normalized)}
+                  {row.score?.toFixed(1) ?? '—'}
                 </p>
                 <p className="mt-1 text-[0.625rem] font-medium uppercase tracking-wider text-muted">
-                  Win rate
+                  Meta score
                 </p>
               </div>
             </Link>

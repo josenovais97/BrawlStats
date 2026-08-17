@@ -284,6 +284,10 @@ async function samplePlayer(tag: string) {
       result: entry.battle.result ?? 'rank',
       rank: entry.battle.rank ?? null,
       mode: entry.battle.mode ?? entry.event.mode ?? 'unknown',
+      // Recorded so the ranked map pages can rank brawlers per map. Older
+      // rows predate this and stay null, which those pages filter out.
+      mapName: entry.event.map ?? null,
+      eventId: entry.event.id ?? null,
       battleType: type,
       trophyChange: entry.battle.trophyChange ?? null,
       battleTime,

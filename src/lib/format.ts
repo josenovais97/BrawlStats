@@ -177,3 +177,16 @@ export function formatPercent(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
   return `${(value * 100).toFixed(1)}%`;
 }
+
+/**
+ * Minutes elapsed since `value`, or null if it cannot be parsed.
+ *
+ * Lives here rather than inline in a component because reading the clock during
+ * render is impure, and the React Compiler lint correctly rejects it.
+ */
+export function minutesSince(value: string | Date | null | undefined): number | null {
+  if (!value) return null;
+  const date = value instanceof Date ? value : parseApiDate(value);
+  if (!date) return null;
+  return (Date.now() - date.getTime()) / 60_000;
+}

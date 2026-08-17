@@ -13,11 +13,12 @@ import {
   TIER_COLOR,
   TIER_ORDER,
   TIER_WINDOWS,
-  assignTier,
+  assignTierFromScore,
   getBrawlerStatsForWindow,
   getFilterableModes,
   getLastAggregationRun,
   isTierWindow,
+  metaScore,
   normalizeWinRate,
   type TierWindowKey,
 } from '@/lib/stats';
@@ -61,10 +62,12 @@ export default async function TierListPage({ searchParams }: PageProps) {
       row.baselineWinRate,
       row.decidedSampleSize,
     );
+    const score = metaScore(normalizedWinRate, row.usageRate);
     return {
       ...row,
       normalizedWinRate,
-      tier: assignTier(normalizedWinRate) ?? 'D',
+      metaScore: score,
+      tier: assignTierFromScore(score) ?? 'D',
       imageUrl: meta?.imageUrl,
       rarityName: meta?.rarity?.name,
       rarityColor: meta?.rarity?.color,
@@ -95,8 +98,12 @@ export default async function TierListPage({ searchParams }: PageProps) {
           {lastRun ? ` Updated ${relativeTime(lastRun.startedAt)}.` : ''}
         </p>
 
-        <p className="mt-2 text-sm text-muted">
-          Tap or hover a brawler to see their sample size and raw win rate.
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
+          Brawlers are ranked by <strong className="font-semibold text-foreground">meta
+          score</strong> out of 10, which combines an adjusted win rate with a
+          log-scaled pick rate. Win rate alone would rate a brawler nobody plays the
+          same as a staple with identical results, so popularity breaks the ties. Tap
+          or hover a brawler for the full breakdown.
         </p>
 
         <div className="mt-5 space-y-3">
@@ -118,7 +125,7 @@ export default async function TierListPage({ searchParams }: PageProps) {
           {TIER_ORDER.map((tier) => {
             const inTier = rated
               .filter((e) => e.tier === tier)
-              .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0));
+              .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
             if (inTier.length === 0) return null;
             return <TierRow key={tier} tier={tier} entries={inTier} />;
           })}
@@ -180,7 +187,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
               key={entry.brawlerId}
               href={`/brawlers/${entry.brawlerId}`}
               className="group w-[86px] rounded-xl bg-surface-2 p-2 transition-transform hover:-translate-y-0.5"
-              title={`${entry.brawlerName} — ${formatPercent(entry.normalizedWinRate)} adjusted (${formatPercent(entry.winRate)} raw) over ${formatNumber(entry.decidedSampleSize)} decided battles`}
+              title={`${entry.brawlerName}: meta score ${entry.metaScore ?? '?'} from ${formatPercent(entry.normalizedWinRate)} adjusted win rate (${formatPercent(entry.winRate)} raw) and ${formatPercent(entry.usageRate)} pick rate, over ${formatNumber(entry.decidedSampleSize)} decided battles`}
             >
               {entry.imageUrl ? (
                 <Image
@@ -197,8 +204,13 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
               <p className="mt-1 truncate text-center text-[11px] font-semibold capitalize">
                 {entry.brawlerName.toLowerCase()}
               </p>
-              <p className="text-center text-[11px] font-bold tabular-nums" style={{ color }}>
-                {formatPercent(entry.normalizedWinRate)}
+              {/* Score leads, because it is what the ordering uses. The two
+                  inputs sit underneath so the number is never a black box. */}
+              <p className="text-center text-sm font-black tabular-nums" style={{ color }}>
+                {entry.metaScore?.toFixed(1) ?? '—'}
+              </p>
+              <p className="text-center text-[10px] tabular-nums text-muted">
+                {formatPercent(entry.normalizedWinRate)} · {formatPercent(entry.usageRate)}
               </p>
             </Link>
           ))}

@@ -82,6 +82,11 @@ model BattleSample {
   /// Showdown placement when the mode reports a rank instead of a result.
   rank        Int?
   mode        String
+  /// Map name from the battle's event. Null on rows sampled before map
+  /// recording was added, and on battles the API reports without an event.
+  mapName     String?  @map("map_name")
+  /// Brawlify event id for the map, for artwork lookups.
+  eventId     Int?     @map("event_id")
   battleType  String   @map("battle_type")
   trophyChange Int?    @map("trophy_change")
   battleTime  DateTime @map("battle_time")
@@ -89,6 +94,8 @@ model BattleSample {
 
   @@index([battleTime])
   @@index([brawlerId, battleTime])
+  /// Drives the per-map ranked tier list.
+  @@index([battleType, mapName, battleTime])
   @@map("battle_samples")
 }
 

@@ -10,6 +10,7 @@ import type {
   CatalogChangeEntry,
   MetaMover,
   ModeBestPicks,
+  RankedMapPicks,
   ModePick,
   Tier,
   TrophyGain,
@@ -90,6 +91,72 @@ export function normalizeWinRate(
       : baselineWinRate;
 
   return Math.min(Math.max(shrunk - baselineWinRate + 0.5, 0), 1);
+}
+
+/**
+ * Meta score: one 0-10 number combining how well a brawler performs with how
+ * much it is actually played.
+ *
+ * Ranking on win rate alone has a specific failure mode. Shrinkage stops a
+ * 20-battle fluke reaching the top, but it cannot distinguish a genuinely
+ * strong staple from a niche pick that happens to win: a brawler played in
+ * 0.13% of battles at 52% and one played in 3.4% at 52% get the same score,
+ * even though only the second is actually shaping the meta.
+ *
+ * Pick rate is deliberately log-scaled. The roster spans two orders of
+ * magnitude of usage (roughly 0.1% to 17%), so on a linear scale every brawler
+ * outside the top handful would collapse into the same value.
+ */
+
+/** Pick rate mapping to 0-1. Anchored absolutely so scores stay comparable
+ *  between windows and modes rather than being rescaled by whoever is present. */
+const PICK_FLOOR = 0.001; // 0.1% -> 0
+const PICK_CEILING = 0.05; // 5%   -> 1
+
+/** Adjusted win rate mapping to 0-1. The band is where real separation lives. */
+const WIN_FLOOR = 0.42;
+const WIN_CEILING = 0.6;
+
+/** Performance carries most of the weight; popularity breaks the ties. */
+const WIN_WEIGHT = 0.65;
+const PICK_WEIGHT = 0.35;
+
+const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
+
+export function metaScore(
+  normalizedWinRate: number | null,
+  usageRate: number | null,
+): number | null {
+  if (normalizedWinRate === null) return null;
+
+  const win = clamp01((normalizedWinRate - WIN_FLOOR) / (WIN_CEILING - WIN_FLOOR));
+
+  const pick =
+    usageRate && usageRate > 0
+      ? clamp01(
+          (Math.log10(usageRate) - Math.log10(PICK_FLOOR)) /
+            (Math.log10(PICK_CEILING) - Math.log10(PICK_FLOOR)),
+        )
+      : 0;
+
+  return Math.round((win * WIN_WEIGHT + pick * PICK_WEIGHT) * 10 * 10) / 10;
+}
+
+/**
+ * Cut-offs on the meta score, replacing the old win-rate-only thresholds.
+ */
+const SCORE_THRESHOLDS: { tier: Tier; minScore: number }[] = [
+  { tier: 'S', minScore: 7.5 },
+  { tier: 'A', minScore: 6.5 },
+  { tier: 'B', minScore: 5.5 },
+  { tier: 'C', minScore: 4.0 },
+  { tier: 'D', minScore: 0 },
+];
+
+/** Expects a meta score from `metaScore`. */
+export function assignTierFromScore(score: number | null): Tier | null {
+  if (score === null) return null;
+  return SCORE_THRESHOLDS.find((t) => score >= t.minScore)?.tier ?? 'D';
 }
 
 /**
@@ -909,6 +976,128 @@ export async function getFilterableModes(
       .map((g) => ({ mode: g.mode, battles: g._count._all }))
       .filter((m) => m.battles >= minBattles)
       .sort((a, b) => b.battles - a.battles);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Minimum decided battles a brawler needs on a map before it can be listed.
+ *
+ * Far lower than the roster-wide floor because splitting by map divides the
+ * sample perhaps thirty ways. Shrinkage does the heavy lifting instead, and
+ * every row publishes its own sample size so a thin one is visible rather than
+ * disguised.
+ */
+const MIN_SAMPLE_FOR_MAP_PICK = 4;
+
+/** Maps needing at least this many decided battles to appear at all. */
+const MIN_SAMPLE_FOR_MAP = 12;
+
+/**
+ * Best brawlers per map, from competitive (Ranked) battles only.
+ *
+ * Map is recorded per battle sample, so this can only see battles collected
+ * after that column was added. Rows without a map are excluded rather than
+ * bucketed into an "unknown map", which would quietly poison every ranking.
+ */
+export async function getRankedMapPicks(
+  perMap = 3,
+  windowDays = 14,
+): Promise<RankedMapPicks[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const groups = await prisma.battleSample.groupBy({
+      by: ['mapName', 'eventId', 'mode', 'brawlerId', 'brawlerName', 'result', 'rank'],
+      where: {
+        battleTime: { gte: since },
+        mapName: { not: null },
+        battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
+      },
+      _count: { _all: true },
+    });
+
+    type Acc = { name: string; wins: number; losses: number; total: number };
+    type MapAcc = {
+      mapName: string;
+      eventId: number | null;
+      mode: string;
+      brawlers: Map<number, Acc>;
+    };
+    const byMap = new Map<string, MapAcc>();
+
+    for (const g of groups) {
+      if (!g.mapName) continue;
+      const key = `${g.mapName}::${g.mode}`;
+      const entry =
+        byMap.get(key) ??
+        { mapName: g.mapName, eventId: g.eventId, mode: g.mode, brawlers: new Map<number, Acc>() };
+
+      const acc =
+        entry.brawlers.get(g.brawlerId) ??
+        { name: g.brawlerName, wins: 0, losses: 0, total: 0 };
+      const n = g._count._all;
+      const winRank = SHOWDOWN_WIN_RANK[g.mode];
+
+      if (g.result === 'victory') acc.wins += n;
+      else if (g.result === 'defeat') acc.losses += n;
+      else if (g.result === 'rank' && winRank !== undefined && g.rank !== null) {
+        if (g.rank <= winRank) acc.wins += n;
+        else acc.losses += n;
+      }
+
+      acc.total += n;
+      entry.brawlers.set(g.brawlerId, acc);
+      byMap.set(key, entry);
+    }
+
+    const out: RankedMapPicks[] = [];
+
+    for (const entry of byMap.values()) {
+      let popWins = 0;
+      let popDecided = 0;
+      let popTotal = 0;
+      for (const acc of entry.brawlers.values()) {
+        popWins += acc.wins;
+        popDecided += acc.wins + acc.losses;
+        popTotal += acc.total;
+      }
+      if (popDecided < MIN_SAMPLE_FOR_MAP) continue;
+      const baseline = popWins / popDecided;
+
+      const picks: ModePick[] = [...entry.brawlers]
+        .map(([brawlerId, acc]) => {
+          const decided = acc.wins + acc.losses;
+          const raw = decided > 0 ? acc.wins / decided : 0;
+          return {
+            brawlerId,
+            brawlerName: acc.name,
+            winRate: raw,
+            pickRate: popTotal > 0 ? acc.total / popTotal : 0,
+            decidedSampleSize: decided,
+            score: normalizeWinRate(raw, baseline, decided) ?? 0.5,
+          };
+        })
+        .filter((p) => p.decidedSampleSize >= MIN_SAMPLE_FOR_MAP_PICK)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, perMap);
+
+      if (picks.length === 0) continue;
+      out.push({
+        mapName: entry.mapName,
+        eventId: entry.eventId,
+        mode: entry.mode,
+        picks,
+        sampleSize: popDecided,
+        baselineWinRate: baseline,
+      });
+    }
+
+    // Most-sampled maps first: those rankings are the ones worth trusting.
+    return out.sort((a, b) => b.sampleSize - a.sampleSize);
   } catch {
     return [];
   }

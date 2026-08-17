@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { after } from 'next/server';
 
 import { BattleLog } from '@/components/player/battle-log';
+import { LastOnline } from '@/components/player/last-online';
 import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerStats } from '@/components/player/player-stats';
@@ -101,7 +102,14 @@ export default async function PlayerPage({ params }: PageProps) {
         tag={normalizedTag}
         name={player.name}
       />
-      <PlayerHeader player={player} />
+      <PlayerHeader
+        player={player}
+        lastOnline={
+          <Suspense fallback={null}>
+            <LastOnline tag={tag} />
+          </Suspense>
+        }
+      />
       <PlayerPlacements
         placements={placements}
         iconFor={(id) => brawlerMeta.get(id)?.imageUrl}

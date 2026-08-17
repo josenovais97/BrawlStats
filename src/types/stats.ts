@@ -28,6 +28,8 @@ export interface TierListEntry extends BrawlerStatRow {
   tier: Tier;
   /** winRate re-centred on the sample baseline, i.e. what a 50%-mean would be. */
   normalizedWinRate: number | null;
+  /** 0-10, combining adjusted win rate with log-scaled pick rate. */
+  metaScore: number | null;
   /** Artwork, joined in from brawlapi. Absent if the brawler is unknown there. */
   imageUrl?: string;
   rarityName?: string;
@@ -151,6 +153,18 @@ export interface ModeBestPicks {
   mode: string;
   picks: ModePick[];
   /** Decided battles sampled in this mode, across all brawlers. */
+  sampleSize: number;
+  baselineWinRate: number;
+}
+
+/** Best brawlers on one ranked map. */
+export interface RankedMapPicks {
+  mapName: string;
+  /** Brawlify event id, for map artwork. Null when the API omitted it. */
+  eventId: number | null;
+  mode: string;
+  picks: ModePick[];
+  /** Decided ranked battles sampled on this map, across all brawlers. */
   sampleSize: number;
   baselineWinRate: number;
 }

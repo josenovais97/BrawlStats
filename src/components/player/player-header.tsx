@@ -9,7 +9,14 @@ import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 
-export function PlayerHeader({ player }: { player: BSPlayer }) {
+export function PlayerHeader({
+  player,
+  lastOnline,
+}: {
+  player: BSPlayer;
+  /** Streamed in separately; derived from the battle log, not the player payload. */
+  lastOnline?: React.ReactNode;
+}) {
   const nameColor = nameColorToCss(player.nameColor);
   const prestige = prestigeIconUrl(player.totalPrestigeLevel);
 
@@ -88,6 +95,8 @@ export function PlayerHeader({ player }: { player: BSPlayer }) {
                 No club
               </span>
             )}
+
+            {lastOnline}
 
             {player.isQualifiedFromChampionshipChallenge ? (
               <span className="rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-medium text-brand">
