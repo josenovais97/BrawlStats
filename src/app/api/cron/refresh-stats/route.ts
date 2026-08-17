@@ -17,8 +17,15 @@ import { hasDatabase } from '@/lib/prisma';
  */
 export const dynamic = 'force-dynamic';
 
-/** Sampling is I/O-bound across dozens of upstream calls. */
-export const maxDuration = 60;
+/**
+ * Sampling is I/O-bound across hundreds of upstream calls.
+ *
+ * 300s is both the default and the hard maximum on Hobby, so this is as far as
+ * the plan goes. `RUN_BUDGET_MS` stops the work 30s earlier; the gap is what
+ * guarantees the response is written instead of the invocation being killed
+ * mid-flight, which Vercel would never retry.
+ */
+export const maxDuration = 300;
 
 function isAuthorized(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET;
@@ -51,11 +58,16 @@ async function handle(req: NextRequest) {
     );
   }
 
-  const batchSize = Number(req.nextUrl.searchParams.get('batch') ?? 25);
+  // Omitting ?batch= uses the module default. The upper bound is generous
+  // because the run budget, not this number, is what actually stops sampling.
+  const raw = req.nextUrl.searchParams.get('batch');
+  const batchSize = raw === null ? undefined : Number(raw);
 
   try {
     const result = await runAggregation(
-      Number.isFinite(batchSize) ? Math.min(Math.max(batchSize, 1), 100) : 25,
+      batchSize !== undefined && Number.isFinite(batchSize)
+        ? Math.min(Math.max(batchSize, 1), 500)
+        : undefined,
     );
     return NextResponse.json({ ok: true, ...result }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {

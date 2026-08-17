@@ -217,8 +217,13 @@ Adding the database **after** a deployment does not retrofit the env vars into i
 redeploy so the build picks them up, otherwise the tier list keeps rendering its
 "Database not configured" state from the older build.
 
-`vercel.json` declares one daily cron job. The Hobby plan allows **one run per day per job**,
-which is why the schedule is `0 4 * * *` rather than hourly.
+`vercel.json` declares four cron jobs, all pointing at the same route. The Hobby plan allows
+**one run per day per job**, and that ceiling is enforced per cron expression, so four daily
+expressions six hours apart (`0 2/8/14/20 * * *`) stay inside the limit while refreshing the
+sample four times a day. Hobby fires within the stated hour rather than on the minute.
+
+`vercel.json` also pins functions to `fra1`. The Neon database lives in `eu-central-1`, and
+the default region (`iad1`) put every query on a transatlantic round trip.
 
 ## The tier list, honestly
 
@@ -330,8 +335,8 @@ option unlocked.
 
 ## Cron budget
 
-Vercel caps a serverless invocation at 60s, and the run does real work against a remote
-database, so two things matter:
+Vercel's Hobby plan caps an invocation at 300s (both the default and the maximum), and the
+run does real work against a remote database, so two things matter:
 
 - **Writes are batched.** Recomputing stats with per-row upserts meant ~1,200 sequential
   round trips and took 112s. Delete-then-`createMany` is two round trips per table and
@@ -342,14 +347,20 @@ database, so two things matter:
 
 ### Tuning
 
-- Batch size: `POST /api/cron/refresh-stats?batch=50` (1–100, default 25).
+- Batch size: `POST /api/cron/refresh-stats?batch=200` (1–500, default 100). This is a
+  ceiling, not a target: `RUN_BUDGET_MS` stops sampling first, so an over-large batch costs
+  nothing beyond a shorter ranking pass.
+- Run budget, ranking floor and recompute reserve: `RUN_BUDGET_MS`,
+  `RANKING_MIN_BUDGET_MS` and `RECOMPUTE_RESERVE_MS` in `src/lib/aggregation.ts`. Keep
+  `RUN_BUDGET_MS` meaningfully below the route's `maxDuration`; overshooting returns a 504
+  and Vercel never retries a cron, so the slot is simply lost.
 - Window, concurrency, pool target and retry count: constants at the top of
-  `src/lib/aggregation.ts`.
+  `src/lib/aggregation.ts`. `POOL_TARGET` is deliberately near twice the daily sample rate:
+  a battle log only holds ~25 recent battles, so a pool too large to revisit every couple of
+  days drops battles between visits.
 - Tier thresholds and the sample floor: `src/lib/stats.ts`.
 
-Note the Hobby plan's one-run-per-day cron limit caps how fast the sample grows. Raising
-`batch` is the lever; watch for `partial` runs in `aggregation_runs`, which record why
-samples failed.
+Watch for `partial` runs in `aggregation_runs`, which record why samples failed.
 
 ## API routes
 

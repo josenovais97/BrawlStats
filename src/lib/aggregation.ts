@@ -30,8 +30,15 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  * to grow the sample honestly.
  */
 
-/** Players sampled per run. 2 API calls each. */
-const DEFAULT_BATCH_SIZE = 25;
+/**
+ * Players sampled per run. 2 API calls each.
+ *
+ * This is an upper bound, not a target: sampling stops at `samplingDeadline`
+ * regardless, so a slow upstream night simply samples fewer players rather
+ * than overrunning the function. Sized so a healthy run finishes in roughly
+ * half the budget, which keeps Active CPU well inside the Hobby allowance.
+ */
+const DEFAULT_BATCH_SIZE = 100;
 
 /**
  * Concurrent players in flight. Each one issues two API calls at once, so the
@@ -52,8 +59,16 @@ const RANKING_CONCURRENCY = 6;
 /** How many days of battle samples feed win/usage rates. */
 const WINDOW_DAYS = 7;
 
-/** Stop seeding once the pool is at least this big. */
-const POOL_TARGET = 500;
+/**
+ * Stop seeding once the pool is at least this big.
+ *
+ * Deliberately kept near twice the daily sample rate. A battle log only holds
+ * a player's most recent ~25 battles, so a pool large enough that each tag is
+ * revisited less often than every couple of days starts silently dropping
+ * battles between visits. Breadth past that point costs accuracy rather than
+ * adding it.
+ */
+const POOL_TARGET = 800;
 
 export interface AggregationResult {
   playersSampled: number;
@@ -586,13 +601,27 @@ export async function recomputeBuildStats(): Promise<number> {
 /* --------------------------------- driver --------------------------------- */
 
 /**
- * Wall-clock budget for a whole run, kept under Vercel's 60s ceiling with room
- * for the response to be written.
+ * Wall-clock budget for a whole run.
+ *
+ * Vercel's Hobby ceiling is 300s (both the default and the maximum), and the
+ * route declares `maxDuration = 300` to match. This sits 30s under it so the
+ * response still gets written if the last step runs long: overshooting means a
+ * 504 and, because Vercel never retries a cron, a whole slot of coverage lost.
  */
-const RUN_BUDGET_MS = 50_000;
+const RUN_BUDGET_MS = 270_000;
 
 /** Always give rankings at least this long, even on a slow run. */
-const RANKING_MIN_BUDGET_MS = 5_000;
+const RANKING_MIN_BUDGET_MS = 15_000;
+
+/**
+ * Held back for `recomputeBrawlerStats` and `recomputeBuildStats`.
+ *
+ * Both scale with the number of battle samples in the trailing window, so this
+ * reserve has to grow with the batch size. Starving them is the worst possible
+ * failure: the samples land in the database but nothing turns them into the
+ * rows the tier list actually reads.
+ */
+const RECOMPUTE_RESERVE_MS = 40_000;
 
 export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<AggregationResult> {
   const deadline = Date.now() + RUN_BUDGET_MS;
@@ -633,7 +662,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
 
     // Leave room for aggregation and the ranking pass: sampling stops early
     // rather than starving the steps that turn samples into readable data.
-    const samplingDeadline = deadline - RANKING_MIN_BUDGET_MS - 8_000;
+    const samplingDeadline = deadline - RANKING_MIN_BUDGET_MS - RECOMPUTE_RESERVE_MS;
     const results = await mapLimit(targets, CONCURRENCY, (t) => {
       if (Date.now() > samplingDeadline) {
         throw new BrawlApiError('timeout', 'Run budget exhausted before sampling this player');
@@ -667,9 +696,9 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     const brawlersUpdated = await recomputeBrawlerStats();
     const buildRowsUpdated = await recomputeBuildStats().catch(() => 0);
 
-    // Last and time-boxed, because it is the most API-expensive step. Vercel
-    // caps a serverless invocation at 60s, so it gets whatever is left of the
-    // budget and resumes on the next run.
+    // Last and time-boxed, because it is the most API-expensive step. It gets
+    // whatever is left of the run budget and resumes where it stopped on the
+    // next run, so a short night costs freshness rather than correctness.
     const remainingMs = Math.max(RANKING_MIN_BUDGET_MS, deadline - Date.now());
     const rankingsCached = await refreshBrawlerRankings(remainingMs).catch(() => 0);
 
