@@ -262,11 +262,28 @@ export async function getBrawlerStat(brawlerId: number): Promise<BrawlerStatRow 
 }
 
 /**
- * Brawlers whose adjusted win rate moved most between the latest snapshot and
- * the closest one at least `lookbackDays` old.
+ * How far the cohort baseline may move between two snapshots before they stop
+ * being comparable at all.
  *
- * Both sides are baseline-adjusted before comparison. Without that a shift in
- * who happened to get sampled would masquerade as a balance change.
+ * The baseline is a one-number summary of *what was measured*: the mean win
+ * rate across the whole sample. Real cohort drift between daily snapshots is
+ * a fraction of a point. A large jump means the pipeline itself changed —
+ * which is exactly what happened when win rates moved to competitive-only
+ * battles and the baseline fell from 72.8% to 53.7% overnight. Re-centring
+ * cancels the mean shift but not the change in what is being counted, so
+ * every brawler appeared to move by up to 14 points. Snapshots either side of
+ * such a jump are not comparable and are skipped.
+ */
+const MAX_BASELINE_SHIFT = 0.08;
+
+/**
+ * Which brawlers gained or lost ground since the last comparable snapshot.
+ *
+ * Movement is measured on the **meta score**, not on win rate alone. The tier
+ * list ranks and assigns tiers on that score, so ranking movers on win rate
+ * meant the two disagreed: a brawler whose win rate held while its pick rate
+ * collapsed is falling down the tier list without ever showing up here. Both
+ * inputs are still returned so a move can be explained rather than asserted.
  */
 export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
   const prisma = getPrisma();
@@ -275,28 +292,36 @@ export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
   try {
     const latest = await prisma.brawlerStat.findFirst({
       orderBy: { snapshotDate: 'desc' },
-      select: { snapshotDate: true },
+      select: { snapshotDate: true, baselineWinRate: true },
     });
-    if (!latest) return [];
+    if (!latest || latest.baselineWinRate === null) return [];
 
     const cutoff = new Date(latest.snapshotDate);
     cutoff.setUTCDate(cutoff.getUTCDate() - lookbackDays);
 
-    // Nearest snapshot at or before the cutoff; falls back to the oldest one
-    // available so a young dataset still shows movement.
-    const earlier =
-      (await prisma.brawlerStat.findFirst({
-        where: { snapshotDate: { lte: cutoff } },
-        orderBy: { snapshotDate: 'desc' },
-        select: { snapshotDate: true },
-      })) ??
-      (await prisma.brawlerStat.findFirst({
-        where: { snapshotDate: { lt: latest.snapshotDate } },
-        orderBy: { snapshotDate: 'asc' },
-        select: { snapshotDate: true },
-      }));
+    // Every older snapshot with the baseline it was computed under, newest
+    // first. One row per date is enough: the baseline is sample-wide, so it is
+    // identical across a snapshot's rows.
+    const candidates = await prisma.brawlerStat.groupBy({
+      by: ['snapshotDate'],
+      where: { snapshotDate: { lt: latest.snapshotDate } },
+      _max: { baselineWinRate: true },
+      orderBy: { snapshotDate: 'desc' },
+    });
 
-    if (!earlier) return [];
+    const comparable = candidates.filter((c) => {
+      const baseline = c._max.baselineWinRate;
+      if (baseline === null) return false;
+      return Math.abs(baseline - latest.baselineWinRate!) <= MAX_BASELINE_SHIFT;
+    });
+    if (comparable.length === 0) return [];
+
+    // Prefer the newest comparable snapshot at or before the cutoff; if the
+    // dataset is too young for that, fall back to the oldest comparable one,
+    // which is the widest honest span available.
+    const earlier =
+      comparable.find((c) => c.snapshotDate <= cutoff) ??
+      comparable[comparable.length - 1];
 
     const nowRows = await prisma.brawlerStat.findMany({
       where: { snapshotDate: latest.snapshotDate },
@@ -332,9 +357,18 @@ export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
         continue;
       }
 
+      const nowScore = metaScore(nowRate, row.usageRate);
+      const prevScore = metaScore(prevRate, prev.usageRate);
+      if (nowScore === null || prevScore === null) continue;
+
       movers.push({
         brawlerId: row.brawlerId,
         brawlerName: row.brawlerName,
+        metaScoreNow: nowScore,
+        metaScoreBefore: prevScore,
+        metaScoreDelta: nowScore - prevScore,
+        tierNow: assignTierFromScore(nowScore) ?? 'D',
+        tierBefore: assignTierFromScore(prevScore) ?? 'D',
         winRateNow: nowRate,
         winRateBefore: prevRate,
         winRateDelta: nowRate - prevRate,
@@ -350,7 +384,9 @@ export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
       });
     }
 
-    return movers.sort((a, b) => Math.abs(b.winRateDelta) - Math.abs(a.winRateDelta));
+    return movers.sort(
+      (a, b) => Math.abs(b.metaScoreDelta) - Math.abs(a.metaScoreDelta),
+    );
   } catch {
     return [];
   }

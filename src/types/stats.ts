@@ -49,7 +49,23 @@ export interface TierListSnapshot {
 export interface MetaMover {
   brawlerId: number;
   brawlerName: string;
-  /** Baseline-adjusted win rates, so cohort skill drift does not show up here. */
+  /**
+   * Meta score, 0-10 — the same number the tier list ranks and assigns tiers
+   * on. This is what a mover is sorted by: tracking win rate alone missed a
+   * brawler whose win rate held while its pick rate collapsed, even though
+   * that is exactly a brawler falling down the tier list.
+   */
+  metaScoreNow: number;
+  metaScoreBefore: number;
+  metaScoreDelta: number;
+  /** Tier implied by each score, so a move that crossed a boundary can say so. */
+  tierNow: Tier;
+  tierBefore: Tier;
+  /**
+   * The two inputs behind the score, carried so a move can be explained rather
+   * than asserted. Win rates are baseline-adjusted, so cohort skill drift does
+   * not show up here.
+   */
   winRateNow: number;
   winRateBefore: number;
   winRateDelta: number;

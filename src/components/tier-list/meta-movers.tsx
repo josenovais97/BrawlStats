@@ -2,6 +2,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { TIER_COLOR } from '@/lib/stats';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BABrawler } from '@/types/brawlapi';
 import type { MetaMover } from '@/types/stats';
@@ -32,9 +33,9 @@ export function MetaMovers({
   /** True when a mode filter is active on the page around this section. */
   modeFiltered: boolean;
 }) {
-  const rising = movers.filter((m) => m.winRateDelta > 0).slice(0, limit);
+  const rising = movers.filter((m) => m.metaScoreDelta > 0).slice(0, limit);
   const falling = movers
-    .filter((m) => m.winRateDelta < 0)
+    .filter((m) => m.metaScoreDelta < 0)
     .slice(0, limit)
     .reverse();
 
@@ -59,11 +60,14 @@ export function MetaMovers({
         Meta movers
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+        Change in <strong className="font-semibold text-foreground">meta score</strong>{' '}
+        — the same 0&ndash;10 number the tiers above are assigned from, so a mover
+        is a brawler visibly climbing or sliding this page.{' '}
         {span
-          ? `Adjusted win rate change over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
-          : 'Adjusted win rate change between the two most recent snapshots.'}{' '}
-        Both sides clear the same sample floor as the tier list, so a move here
-        is a brawler genuinely drifting rather than a thin week.
+          ? `Measured over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
+          : 'Measured between the two most recent snapshots.'}{' '}
+        Both sides clear the same sample floor as the tier list, and snapshots
+        computed under different methodologies are never compared.
         {modeFiltered ? (
           <>
             {' '}
@@ -82,14 +86,14 @@ export function MetaMovers({
           tone="text-victory"
           movers={rising}
           iconFor={iconFor}
-          emptyLabel="Nothing gained ground this week."
+          emptyLabel="Nothing gained ground over this span."
         />
         <MoverList
           title="Trending down"
           tone="text-defeat"
           movers={falling}
           iconFor={iconFor}
-          emptyLabel="Nothing lost ground this week."
+          emptyLabel="Nothing lost ground over this span."
         />
       </div>
     </section>
@@ -111,6 +115,9 @@ function MoverList({
 }) {
   return (
     <div className="card p-4">
+      {/* The unit lives in the header rather than on every row: "+1.3" next to
+          a percentage reads as percentage points unless something says
+          otherwise, and this column is meta score. */}
       <h3 className={`mb-3 flex items-center gap-2 font-bold ${tone}`}>
         {tone.includes('victory') ? (
           <ArrowUpRight className="size-4" />
@@ -118,6 +125,9 @@ function MoverList({
           <ArrowDownRight className="size-4" />
         )}
         {title}
+        <span className="ml-auto text-[0.625rem] font-semibold uppercase tracking-wide text-muted">
+          Meta score /10
+        </span>
       </h3>
 
       {movers.length === 0 ? (
@@ -126,7 +136,8 @@ function MoverList({
         <ul className="space-y-1">
           {movers.map((mover) => {
             const url = iconFor(mover.brawlerId);
-            const up = mover.winRateDelta > 0;
+            const up = mover.metaScoreDelta > 0;
+            const changedTier = mover.tierNow !== mover.tierBefore;
             return (
               <li key={mover.brawlerId}>
                 <Link
@@ -146,22 +157,51 @@ function MoverList({
                     <span className="size-8 shrink-0 rounded bg-surface-2" />
                   )}
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold capitalize">
-                      {mover.brawlerName.toLowerCase()}
+                    <span className="flex items-center gap-1.5">
+                      <span className="truncate text-sm font-semibold capitalize">
+                        {mover.brawlerName.toLowerCase()}
+                      </span>
+                      {/* A move that crossed a tier boundary is the most
+                          concrete thing that can be said about it. */}
+                      {changedTier ? (
+                        <span className="shrink-0 text-[0.625rem] font-bold tabular-nums">
+                          <span style={{ color: TIER_COLOR[mover.tierBefore] }}>
+                            {mover.tierBefore}
+                          </span>
+                          <span className="text-muted">→</span>
+                          <span style={{ color: TIER_COLOR[mover.tierNow] }}>
+                            {mover.tierNow}
+                          </span>
+                        </span>
+                      ) : null}
                     </span>
+                    {/* The two inputs to the score, so the move is explained
+                        rather than asserted. */}
                     <span className="block truncate text-xs text-muted">
                       {formatPercent(mover.winRateBefore)} →{' '}
-                      {formatPercent(mover.winRateNow)} ·{' '}
-                      {formatNumber(mover.sampleSize)} battles
+                      {formatPercent(mover.winRateNow)} win ·{' '}
+                      {formatPercent(mover.usageBefore)} →{' '}
+                      {formatPercent(mover.usageNow)} pick
+                    </span>
+                    <span className="block truncate text-[0.625rem] tabular-nums text-muted">
+                      {formatNumber(mover.sampleSize)} decided battles
                     </span>
                   </span>
-                  <span
-                    className={`shrink-0 text-sm font-bold tabular-nums ${
-                      up ? 'text-victory' : 'text-defeat'
-                    }`}
-                  >
-                    {up ? '+' : ''}
-                    {(mover.winRateDelta * 100).toFixed(1)} pts
+                  <span className="shrink-0 text-right">
+                    <span
+                      className={`block text-sm font-bold tabular-nums ${
+                        up ? 'text-victory' : 'text-defeat'
+                      }`}
+                    >
+                      {up ? '+' : '−'}
+                      {Math.abs(mover.metaScoreDelta).toFixed(1)}
+                    </span>
+                    {/* Not smaller than this: at 10px the decimal point in
+                        "8.4 → 7.3" disappears and it reads as "84 → 73". */}
+                    <span className="block text-[0.6875rem] tabular-nums text-muted">
+                      {mover.metaScoreBefore.toFixed(1)} →{' '}
+                      {mover.metaScoreNow.toFixed(1)}
+                    </span>
                   </span>
                 </Link>
               </li>

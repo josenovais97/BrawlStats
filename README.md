@@ -270,20 +270,42 @@ The current setup is a working pipeline with an honest caveat, not a finished me
 
 Movers sit at the bottom of `/tier-list` rather than on the news page, because they are
 this table seen over time: `getMetaMovers` reads the same `brawler_stats` rows, re-centres
-them with the same `normalizeWinRate`, and applies the same sample floor. A mover is a
-brawler whose tier-list position is drifting.
+them with the same `normalizeWinRate`, and applies the same sample floor.
 
-It is also the closest available proxy for a balance change, given that the API exposes no
-damage, health, reload or range numbers at all. Both snapshots are baseline-adjusted before
-being compared, so a shift in *who* got sampled cannot masquerade as a balance change, and
-both sides must clear the same 20-battle floor the tiers use.
+**Movement is measured on the meta score, not on win rate.** The tiers are assigned from
+the score, so ranking movers on win rate alone let the two disagree — a brawler whose win
+rate held while its pick rate collapsed is sliding down the page without ever appearing
+here. The row shows the score change as the headline, both inputs beneath it, and the tier
+transition when the move crossed a boundary.
+
+**Snapshots computed under different methodologies are never compared.** The baseline is a
+one-number summary of what was measured, and a large jump in it means the pipeline changed
+rather than the meta. This is not hypothetical: when win rates moved to competitive-only
+battles the sample baseline fell from 72.8% to 53.7% overnight, and because `getMetaMovers`
+falls back to the oldest snapshot available when the full lookback is missing, it was
+comparing straight across that change. Re-centring cancels the mean shift but not the shift
+in *what is being counted*, so brawlers appeared to move by up to 14 points of win rate
+where matched snapshots differ by at most 3. Candidate snapshots whose baseline sits more
+than 8 points from the latest are now skipped.
 
 It does **not** follow the window and mode controls above it, and the caption says so.
 Those recompute rates live from `battle_samples` over a trailing window; movers compare two
 stored daily snapshots, which are written at a fixed 7-day window and have no mode
 dimension. The caption also reports the span it actually used rather than assuming seven
-days — the lookback falls back to the oldest snapshot available, so on a young dataset the
-real gap is shorter.
+days.
+
+### Why so much of the roster is unrated
+
+Win rates are computed from competitive Ranked battles only, and those are a small slice of
+what gets sampled — roughly **17%** of rows, with the trophy ladder making up most of the
+rest. Over a 7-day window that leaves ~5,000 decided battles spread across ~106 brawlers: a
+median of about 20 per brawler, which is exactly the floor. So roughly half the roster sits
+at or below the line, and the `Not enough Ranked data` section lists each one's progress
+toward it rather than a bare count.
+
+Widening the window barely helps yet (30 days yields 5,269 decided battles against 4,998
+for 7) because sampling only scaled up recently. It is a pool-size problem, not a window
+problem: the fix is more sampled players per run, and history.
 
 ### Ranked maps: a per-map split makes the sample tiny
 

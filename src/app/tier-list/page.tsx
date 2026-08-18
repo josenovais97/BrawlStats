@@ -144,31 +144,46 @@ export default async function TierListPage({ searchParams }: PageProps) {
 
       {unrated.length > 0 ? (
         <section>
-          <h2 className="text-xl font-bold tracking-tight">Not enough data</h2>
-          <p className="mt-1 text-sm text-muted">
-            Not played often enough yet to rank.
+          <h2 className="text-xl font-bold tracking-tight">Not enough Ranked data</h2>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+            Win rates come from competitive Ranked battles only, which are a small
+            slice of what gets sampled — so plenty of brawlers that see regular
+            ladder play still have too few Ranked battles to rank. Each needs{' '}
+            {MIN_SAMPLE_FOR_TIER} decided battles in the{' '}
+            {TIER_WINDOWS[windowKey].sublabel} window; the count below is how far
+            along it is. Closest first.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {unrated.map((entry) => (
-              <Link
-                key={entry.brawlerId}
-                href={`/brawlers/${entry.brawlerId}`}
-                className="card card-interactive flex items-center gap-2 px-3 py-2 text-sm"
-              >
-                {entry.imageUrl ? (
-                  <Image
-                    src={entry.imageUrl}
-                    alt=""
-                    width={28}
-                    height={28}
-                    className="size-7"
-                    unoptimized
-                  />
-                ) : null}
-                <span className="capitalize">{entry.brawlerName.toLowerCase()}</span>
-                <span className="text-xs text-muted">{entry.decidedSampleSize}</span>
-              </Link>
-            ))}
+            {/* Sorted by progress toward the floor, so the brawlers about to be
+                rated lead and the never-picked ones sit at the end. An
+                unsorted wall of names hid both facts. */}
+            {[...unrated]
+              .sort((a, b) => b.decidedSampleSize - a.decidedSampleSize)
+              .map((entry) => (
+                <Link
+                  key={entry.brawlerId}
+                  href={`/brawlers/${entry.brawlerId}`}
+                  title={`${entry.brawlerName}: ${entry.decidedSampleSize} of ${MIN_SAMPLE_FOR_TIER} decided Ranked battles needed to be ranked`}
+                  className="card card-interactive flex items-center gap-2 px-3 py-2 text-sm"
+                >
+                  {entry.imageUrl ? (
+                    <Image
+                      src={entry.imageUrl}
+                      alt=""
+                      width={28}
+                      height={28}
+                      className="size-7"
+                      unoptimized
+                    />
+                  ) : null}
+                  <span className="capitalize">{entry.brawlerName.toLowerCase()}</span>
+                  {/* A bare "18" reads as a stat about the brawler. Showing the
+                      denominator makes it a progress bar in text form. */}
+                  <span className="text-xs tabular-nums text-muted">
+                    {entry.decidedSampleSize}/{MIN_SAMPLE_FOR_TIER}
+                  </span>
+                </Link>
+              ))}
           </div>
         </section>
       ) : null}
