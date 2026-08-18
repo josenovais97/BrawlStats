@@ -28,10 +28,23 @@ model SampledPlayer {
   /// account level. Recorded so icon popularity can be ranked; null on rows
   /// written before this was tracked.
   iconId        Int?      @map("icon_id")
+
+  /// Ranked standing at the last sample.
+  ///
+  /// The game API publishes trophy leaderboards but no Ranked one — there is no
+  /// endpoint that returns the top players by elo. Recording it per sample is
+  /// the only way to have that board at all, so it ranks our sampled pool
+  /// rather than the world, and the page says so.
+  rankedElo             Int?    @map("ranked_elo")
+  rankedRankName        String? @map("ranked_rank_name")
+  highestRankedElo      Int?    @map("highest_ranked_elo")
+  highestRankedRankName String? @map("highest_ranked_rank_name")
   lastSampledAt DateTime? @map("last_sampled_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 
   @@index([lastSampledAt])
+  /// Drives the Ranked board.
+  @@index([highestRankedElo])
   @@map("sampled_players")
 }
 

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { CosmeticsBoard } from '@/components/leaderboard/cosmetics-board';
+import { RankedBoard } from '@/components/leaderboard/ranked-board';
 import {
   LeaderboardControls,
   type LeaderboardBoard,
@@ -36,7 +37,9 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
   const region =
     params.region && isSupportedRegion(params.region) ? params.region.toLowerCase() : 'global';
   const board: LeaderboardBoard =
-    params.type === 'clubs' || params.type === 'cosmetics' ? params.type : 'players';
+    params.type === 'clubs' || params.type === 'cosmetics' || params.type === 'ranked'
+      ? params.type
+      : 'players';
 
   return (
     <div className="space-y-10">
@@ -45,7 +48,9 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
         <p className="mt-2 text-muted">
           {board === 'cosmetics'
             ? 'What the sampled player pool is wearing — built from our own daily samples, not from the game API.'
-            : `Top ${board} by trophies in ${regionName(region)}.`}
+            : board === 'ranked'
+              ? 'Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.'
+              : `Top ${board} by trophies in ${regionName(region)}.`}
         </p>
       </header>
 
@@ -65,6 +70,11 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
 
       {board === 'players' ? <PlayerBoard region={region} /> : null}
       {board === 'clubs' ? <ClubBoard region={region} /> : null}
+      {board === 'ranked' ? (
+        <Suspense fallback={null}>
+          <RankedBoard />
+        </Suspense>
+      ) : null}
       {board === 'cosmetics' ? (
         <Suspense fallback={null}>
           <CosmeticsBoard />

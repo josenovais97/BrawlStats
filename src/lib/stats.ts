@@ -679,17 +679,40 @@ export async function recordLookup(reading: {
   highestTrophies: number;
   brawlerCount: number;
   iconId?: number;
+  rankedElo?: number;
+  rankedRankName?: string;
+  highestRankedElo?: number;
+  highestRankedRankName?: string;
 }) {
   const prisma = getPrisma();
   if (!prisma) return;
 
-  const { tag, name, trophies, highestTrophies, brawlerCount, iconId } = reading;
+  const {
+    tag,
+    name,
+    trophies,
+    highestTrophies,
+    brawlerCount,
+    iconId,
+    rankedElo,
+    rankedRankName,
+    highestRankedElo,
+    highestRankedRankName,
+  } = reading;
+
+  const standing = {
+    iconId,
+    rankedElo,
+    rankedRankName,
+    highestRankedElo,
+    highestRankedRankName,
+  };
 
   try {
     await prisma.sampledPlayer.upsert({
       where: { tag },
-      create: { tag, name, trophies, iconId, source: 'lookup' },
-      update: { name, trophies, iconId },
+      create: { tag, name, trophies, source: 'lookup', ...standing },
+      update: { name, trophies, ...standing },
     });
 
     // The row above is overwritten on every visit, so it can only say "how
@@ -1221,6 +1244,77 @@ export async function getMetaIndex(
 ): Promise<Map<number, ScoredBrawler>> {
   const rows = await getBrawlerStatsForWindow(windowDays, undefined, format);
   return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
+}
+
+/** A player's Ranked standing, for the Ranked board. */
+export interface RankedStanding {
+  tag: string;
+  name: string | null;
+  iconId: number | null;
+  trophies: number | null;
+  elo: number;
+  rankName: string | null;
+  peakElo: number;
+  peakRankName: string | null;
+}
+
+/**
+ * Top sampled players by peak Ranked elo.
+ *
+ * There is no upstream equivalent: the game API publishes trophy leaderboards
+ * for players, clubs and individual brawlers, but nothing for Ranked. This is
+ * assembled from the standing recorded on each sample, so it ranks the pool we
+ * have seen rather than the world — the page says as much rather than dressing
+ * it up as global.
+ *
+ * Ordered on the all-time peak rather than the current season, because elo
+ * resets and a board rebuilt from scratch every season would be empty for
+ * weeks at a time.
+ */
+export async function getRankedLeaderboard(
+  limit = 100,
+): Promise<{ players: RankedStanding[]; pool: number }> {
+  const prisma = getPrisma();
+  if (!prisma) return { players: [], pool: 0 };
+
+  try {
+    const rows = await prisma.sampledPlayer.findMany({
+      where: { highestRankedElo: { gt: 0 } },
+      orderBy: [{ highestRankedElo: 'desc' }, { rankedElo: 'desc' }],
+      take: limit,
+      select: {
+        tag: true,
+        name: true,
+        iconId: true,
+        trophies: true,
+        rankedElo: true,
+        rankedRankName: true,
+        highestRankedElo: true,
+        highestRankedRankName: true,
+      },
+    });
+
+    // The pool this ranks, which is not the same as the number of rows shown.
+    const pool = await prisma.sampledPlayer.count({
+      where: { highestRankedElo: { gt: 0 } },
+    });
+
+    return {
+      pool,
+      players: rows.map((row) => ({
+        tag: row.tag,
+        name: row.name,
+        iconId: row.iconId,
+        trophies: row.trophies,
+        elo: row.rankedElo ?? 0,
+        rankName: row.rankedRankName,
+        peakElo: row.highestRankedElo ?? 0,
+        peakRankName: row.highestRankedRankName,
+      })),
+    };
+  } catch {
+    return { players: [], pool: 0 };
+  }
 }
 
 /** One cosmetic and how much of the sampled population is wearing it. */

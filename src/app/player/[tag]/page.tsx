@@ -82,6 +82,10 @@ export default async function PlayerPage({ params }: PageProps) {
       highestTrophies: player.highestTrophies,
       brawlerCount: player.brawlers.length,
       iconId: player.icon?.id,
+      rankedElo: player.rankedElo,
+      rankedRankName: player.rankedRankName,
+      highestRankedElo: player.highestAllTimeRankedElo,
+      highestRankedRankName: player.highestAllTimeRankedRankName,
     }),
   );
 

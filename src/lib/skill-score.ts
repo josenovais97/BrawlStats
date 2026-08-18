@@ -45,26 +45,66 @@ function linear(value: number, floor: number, ceiling: number): number {
 }
 
 /**
- * Ranked elo anchors.
+ * Ranked standing, mapped to where each tier actually sits in the population
+ * rather than to raw elo.
  *
- * Set against the ladder as a whole, not against our sampled pool. Measured
- * elo by tier across the sample: Gold near 2,900, Diamond near 4,200, Mythic
- * 4,500-6,000, Legendary 6,500-8,000, Masters 8,000-11,000, Pro above 11,000.
+ * Elo was the wrong axis for two reasons. It is not linear in skill — the gap
+ * between Bronze and Gold is a fraction of the gap between Legendary and
+ * Masters — and the tiers overlap in elo anyway: measured across our sample,
+ * Masters I accounts ranged from 8,263 to 11,237 while Legendary III reached
+ * 8,621, because peak rank and peak elo can come from different seasons. A
+ * linear elo band consequently rated Masters at about 0.81, which undersells
+ * what reaching it takes.
  *
- * The floor is below Bronze and the ceiling at Masters rather than Pro, which
- * puts Gold near 0.2, Mythic near 0.5 and Legendary near 0.7 — a spread that
- * matches how players actually talk about those tiers. An earlier cut anchored
- * the floor at Gold and the ceiling at Pro; it was arithmetically fine and
- * scored a Diamond player 2.1 out of 10, which is not what Diamond means.
+ * These values are anchored to published tier distributions instead: roughly
+ * 1% of Ranked players reach Masters and about 5% reach Legendary. So Masters
+ * sits near the ceiling, Legendary just below it, and the lower tiers spread
+ * across the bottom half where most of the population actually is.
  */
-const ELO_FLOOR = 1_000;
-const ELO_CEILING = 13_000;
+const RANK_TIERS: { name: string; value: number }[] = [
+  { name: 'BRONZE', value: 0.1 },
+  { name: 'SILVER', value: 0.2 },
+  { name: 'GOLD', value: 0.34 },
+  { name: 'DIAMOND', value: 0.5 },
+  { name: 'MYTHIC', value: 0.68 },
+  { name: 'LEGENDARY', value: 0.85 },
+  { name: 'MASTERS', value: 0.95 },
+  { name: 'PRO', value: 1 },
+];
+
+const DIVISIONS: Record<string, number> = { I: 1, II: 2, III: 3 };
 
 /**
- * Peak elo counts for more than current.
+ * "MASTERS II" -> 0.967. Divisions interpolate toward the next tier, so a
+ * Masters III outranks a Masters I without needing an elo tiebreak.
+ */
+function rankValue(rankName: string | undefined): number | null {
+  if (!rankName) return null;
+
+  const [tierWord, divisionWord] = rankName.trim().toUpperCase().split(/\s+/);
+  const index = RANK_TIERS.findIndex((t) => t.name === tierWord);
+  if (index === -1) return null;
+
+  const tier = RANK_TIERS[index];
+  const next = RANK_TIERS[index + 1];
+  if (!next) return tier.value;
+
+  const division = DIVISIONS[divisionWord ?? 'I'] ?? 1;
+  return tier.value + ((division - 1) / 3) * (next.value - tier.value);
+}
+
+/**
+ * Fallback elo anchors, for the rare payload carrying elo but no rank name.
+ * Deliberately generous at the top for the same reason as the table above.
+ */
+const ELO_FLOOR = 1_000;
+const ELO_CEILING = 11_000;
+
+/**
+ * Peak standing counts for more than current.
  *
- * Elo decays between seasons and a strong player mid-reset would otherwise
- * read as weak, but season-best alone would let a single good run stand
+ * Rank resets between seasons and a strong player mid-reset would otherwise
+ * read as weak, but all-time best alone would let a single good run stand
  * forever. Both are used, weighted toward the peak.
  */
 const PEAK_ELO_WEIGHT = 0.65;
@@ -166,9 +206,17 @@ const EXPECTED_ELO_SPAN = 8_500;
 /** Elo above expectation, in points, that counts as one unit of surprise. */
 const ELO_SURPRISE_UNIT = 2_500;
 
-/** Surprise needed to flag, and the investment ceiling for calling it a smurf. */
-const SMURF_SURPRISE = 0.75;
-const SMURF_MAX_INVESTMENT = 0.55;
+/**
+ * Surprise needed to flag, and the investment ceiling for calling it a smurf.
+ *
+ * The ceiling does most of the work. A smurf is specifically a *young* account
+ * playing above its age; a level-140 account with 70 brawlers is an ordinary
+ * established one, and at an earlier 0.55 ceiling it got called a smurf merely
+ * for being good at Ranked. 0.40 keeps the label on accounts that are actually
+ * too small to explain the results.
+ */
+const SMURF_SURPRISE = 0.8;
+const SMURF_MAX_INVESTMENT = 0.4;
 const AHEAD_SURPRISE = 0.9;
 const AHEAD_MAX_INVESTMENT = 0.85;
 
@@ -207,13 +255,21 @@ export function computeSkillScore(player: BSPlayer): SkillScore {
 
   const peakElo = player.highestAllTimeRankedElo ?? 0;
   const currentElo = player.rankedElo ?? 0;
+  // Zero elo means the account has never actually played a Ranked match, even
+  // when the payload still carries a Bronze I rank name.
   const rankedUnavailable = peakElo === 0 && currentElo === 0;
 
-  const blendedElo =
-    peakElo > 0 && currentElo > 0
-      ? peakElo * PEAK_ELO_WEIGHT + currentElo * (1 - PEAK_ELO_WEIGHT)
-      : Math.max(peakElo, currentElo);
-  const rankedValue = band(blendedElo, ELO_FLOOR, ELO_CEILING);
+  const peakRank = rankValue(player.highestAllTimeRankedRankName);
+  const currentRank = rankValue(player.rankedRankName);
+
+  const rankedValue = rankedUnavailable
+    ? 0
+    : peakRank !== null && currentRank !== null
+      ? peakRank * PEAK_ELO_WEIGHT + currentRank * (1 - PEAK_ELO_WEIGHT)
+      : (peakRank ??
+        currentRank ??
+        // No rank name at all: fall back to the elo band.
+        band(Math.max(peakElo, currentElo), ELO_FLOOR, ELO_CEILING));
 
   /* ----------------------------- trophies ----------------------------- */
 
@@ -245,11 +301,11 @@ export function computeSkillScore(player: BSPlayer): SkillScore {
       value: rankedValue,
       detail: rankedUnavailable
         ? 'No Ranked elo on record'
-        : `${Math.round(blendedElo).toLocaleString('en-US')} elo${
+        : `${
             player.highestAllTimeRankedRankName
-              ? ` · peak ${titleCase(player.highestAllTimeRankedRankName)}`
-              : ''
-          }`,
+              ? `peak ${titleCase(player.highestAllTimeRankedRankName)}`
+              : 'Ranked'
+          } · ${Math.max(peakElo, currentElo).toLocaleString('en-US')} elo`,
     },
     {
       key: 'trophies',

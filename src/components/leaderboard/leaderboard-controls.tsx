@@ -1,6 +1,6 @@
 'use client';
 
-import { Shirt, User } from 'lucide-react';
+import { Medal, Shirt, User } from 'lucide-react';
 
 import { ClubIcon } from '@/components/game-icons';
 import { useRouter } from 'next/navigation';
@@ -8,7 +8,7 @@ import { useTransition } from 'react';
 
 import { RegionPicker } from '@/components/leaderboard/region-picker';
 
-export type LeaderboardBoard = 'players' | 'clubs' | 'cosmetics';
+export type LeaderboardBoard = 'players' | 'clubs' | 'ranked' | 'cosmetics';
 
 interface LeaderboardControlsProps {
   region: string;
@@ -23,6 +23,7 @@ const BOARDS: {
 }[] = [
   { key: 'players', icon: User },
   { key: 'clubs', icon: ClubIcon },
+  { key: 'ranked', icon: Medal },
   { key: 'cosmetics', icon: Shirt },
 ];
 
@@ -68,10 +69,10 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
         ))}
       </div>
 
-      {/* Hidden on the cosmetics board: it is built from our own sampled pool,
-          which has no region dimension, so the picker would be a control that
-          changes nothing. */}
-      {board === 'cosmetics' ? null : (
+      {/* Hidden on the two boards built from our own sampled pool: neither has
+          a region dimension, so the picker would be a control that changes
+          nothing. */}
+      {board === 'cosmetics' || board === 'ranked' ? null : (
         <div className="flex flex-1 sm:justify-end">
           <RegionPicker
             value={region}

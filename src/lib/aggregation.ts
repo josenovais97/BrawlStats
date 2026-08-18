@@ -316,6 +316,10 @@ async function samplePlayer(tag: string) {
       name: player.name,
       trophies: player.trophies,
       iconId: player.icon?.id ?? null,
+      rankedElo: player.rankedElo ?? null,
+      rankedRankName: player.rankedRankName ?? null,
+      highestRankedElo: player.highestAllTimeRankedElo ?? null,
+      highestRankedRankName: player.highestAllTimeRankedRankName ?? null,
     },
   });
 
