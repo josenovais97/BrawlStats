@@ -46,6 +46,23 @@ const GEAR_COINS = 1000;
 /** Every brawler has three buffies: gadget, star power and hypercharge. */
 export const BUFFIES_PER_BRAWLER = 3;
 
+/**
+ * Gear slots a brawler can actually equip at once.
+ *
+ * This, not the catalogue, is the denominator for gear completion. Gears are
+ * the one category where owning everything is *irrational*: a brawler can field
+ * two, so buying the other four is dead coin. Counting against the full
+ * catalogue therefore punished exactly the players who spend well — measured
+ * across real rosters, a Pro account with every brawler at power 11, every
+ * hypercharge and every buffie sat at 2.51 gears per brawler and scored 40% on
+ * gears, while a collector who had bought all six scored 98%.
+ *
+ * Owned gears are counted per brawler and capped at this, so the collector is
+ * not pushed over 100% either. Both halves have to change together or the
+ * ratio stops meaning anything.
+ */
+export const EQUIPPABLE_GEARS = 2;
+
 /** Cumulative coins spent to reach a given power level from level 1. */
 function coinsToReachLevel(level: number): number {
   return COIN_COST_PER_LEVEL.slice(0, Math.max(0, level - 1)).reduce((a, b) => a + b, 0);
@@ -147,7 +164,9 @@ export function computeProgression(
   const totalBrawlers = catalogue.length || player.brawlers.length;
   const totalStarPowers = catalogue.reduce((n, b) => n + (b.starPowers?.length ?? 0), 0);
   const totalGadgets = catalogue.reduce((n, b) => n + (b.gadgets?.length ?? 0), 0);
-  const totalGears = catalogue.reduce((n, b) => n + (b.gears?.length ?? 0), 0);
+  // Two per brawler in the catalogue, not every gear that exists. See
+  // EQUIPPABLE_GEARS for why the catalogue is the wrong denominator here.
+  const totalGears = catalogue.length * EQUIPPABLE_GEARS;
   const totalHyperCharges = catalogue.reduce(
     (n, b) => n + (b.hyperCharges?.length ?? 0),
     0,
@@ -194,16 +213,22 @@ export function computeProgression(
     const starPowers = brawler.starPowers?.length ?? 0;
     const gadgets = brawler.gadgets?.length ?? 0;
     const gears = brawler.gears?.length ?? 0;
+    // Counted toward completion only up to what can be equipped, so a full
+    // set of six reads as "done", not as 300% of one brawler's share.
+    const usefulGears = Math.min(gears, EQUIPPABLE_GEARS);
     const hyperCharges = brawler.hyperCharges?.length ?? 0;
 
     ownedStarPowers += starPowers;
     ownedGadgets += gadgets;
-    ownedGears += gears;
+    ownedGears += usefulGears;
     ownedHyperCharges += hyperCharges;
 
     coinsInvested +=
       starPowers * STAR_POWER_COINS +
       gadgets * GADGET_COINS +
+      // Deliberately the raw count, not `usefulGears`: completion asks what a
+      // player needs, but coins invested asks what they actually spent, and a
+      // collector who bought all six really did pay for all six.
       gears * GEAR_COINS +
       hyperCharges * HYPERCHARGE_COINS;
 
