@@ -12,7 +12,7 @@ import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/ranked' },
-  title: 'Ranked maps',
+  title: 'Brawl Stars Ranked maps',
   description:
     'Best Brawl Stars brawlers for every map in the Ranked rotation, from sampled competitive battles.',
 };

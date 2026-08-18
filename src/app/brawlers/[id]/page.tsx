@@ -40,7 +40,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!brawler) return { title: 'Brawler' };
 
   return {
-    title: brawler.name,
+    // The brawler's name alone loses to every wiki and fan site. People search
+    // "shelly brawl stars", so the title carries both.
+    title: `${brawler.name} — Brawl Stars stats and build`,
     description: brawler.description,
     alternates: { canonical: `/brawlers/${id}` },
   };

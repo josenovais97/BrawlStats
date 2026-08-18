@@ -12,7 +12,7 @@ import {
 
 export const metadata: Metadata = {
   alternates: { canonical: '/release-notes' },
-  title: 'Release notes',
+  title: 'Brawl Stars update notes',
   description:
     'The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.',
 };

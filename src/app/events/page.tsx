@@ -15,7 +15,7 @@ import type { BSRotationSlot } from '@/types/brawlstars';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/events' },
-  title: 'Events',
+  title: 'Brawl Stars events',
   description: 'Current and upcoming Brawl Stars event rotation across every mode slot.',
 };
 

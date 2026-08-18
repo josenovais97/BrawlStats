@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { TierListView } from '@/components/tier-list/tier-list-view';
 
 export const metadata: Metadata = {
-  title: 'Ranked tier list',
+  title: 'Brawl Stars Ranked tier list',
   description:
     'Brawl Stars Ranked tier list, built from win and pick rates in sampled competitive Ranked battles.',
   alternates: { canonical: '/tier-list/ranked' },

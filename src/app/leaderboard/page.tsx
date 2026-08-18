@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   // hundred URLs. Without this every one of them competes as a separate
   // result.
   alternates: { canonical: '/leaderboard' },
-  title: 'Leaderboard',
+  title: 'Brawl Stars leaderboard',
   description: 'Top Brawl Stars players and clubs by trophies, filterable by region.',
 };
 

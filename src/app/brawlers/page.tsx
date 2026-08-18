@@ -6,7 +6,7 @@ import { getBrawlers } from '@/lib/brawlapi';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/brawlers' },
-  title: 'Brawler database',
+  title: 'Brawl Stars brawlers',
   description:
     'Every Brawl Stars brawler with class, rarity, star powers and gadgets.',
 };
