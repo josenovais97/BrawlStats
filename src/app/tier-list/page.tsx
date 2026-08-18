@@ -3,6 +3,7 @@ import { Database } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { ModeFilter } from '@/components/tier-list/mode-filter';
 import { WindowTabs } from '@/components/tier-list/window-tabs';
 import { getBrawlerMap } from '@/lib/brawlapi';
@@ -17,11 +18,13 @@ import {
   getBrawlerStatsForWindow,
   getFilterableModes,
   getLastAggregationRun,
+  getMetaMovers,
   isTierWindow,
   metaScore,
   normalizeWinRate,
   type TierWindowKey,
 } from '@/lib/stats';
+import type { BABrawler } from '@/types/brawlapi';
 import type { Tier, TierListEntry } from '@/types/stats';
 
 export const metadata: Metadata = {
@@ -32,6 +35,9 @@ export const metadata: Metadata = {
 
 /** Reads the aggregate table, never the live API — cheap to revalidate hourly. */
 export const revalidate = 3600;
+
+/** How many meta movers to show on each side. */
+const MOVER_LIMIT = 8;
 
 interface PageProps {
   searchParams: Promise<{ window?: string; mode?: string }>;
@@ -49,10 +55,14 @@ export default async function TierListPage({ searchParams }: PageProps) {
 
   // Artwork (HTTP) overlaps with the database work, but the two database reads
   // run one after the other so the page never needs more than one connection.
-  const [rows, brawlerMeta, lastRun] = await Promise.all([
+  const [rows, brawlerMeta, lastRun, movers] = await Promise.all([
     getBrawlerStatsForWindow(days, mode),
-    getBrawlerMap().catch(() => new Map()),
+    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
     getLastAggregationRun(),
+    // Snapshot-to-snapshot movement in the same table this page ranks from.
+    // Deliberately unfiltered: `brawler_stats` has no mode column, and the
+    // section says so rather than pretending to follow the controls above it.
+    getMetaMovers(7),
   ]);
 
   const entries: TierListEntry[] = rows.map((row) => {
@@ -161,6 +171,17 @@ export default async function TierListPage({ searchParams }: PageProps) {
             ))}
           </div>
         </section>
+      ) : null}
+
+      {/* Last, because it is the tier list over time rather than the tier list
+          itself: you read the tiers, then ask who is moving. */}
+      {movers.length > 0 ? (
+        <MetaMovers
+          movers={movers}
+          brawlerMeta={brawlerMeta}
+          limit={MOVER_LIMIT}
+          modeFiltered={Boolean(mode)}
+        />
       ) : null}
     </div>
   );

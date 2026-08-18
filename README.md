@@ -16,11 +16,11 @@ Neon Postgres.
 | `/club/[tag]` | Club info, roster insights (trophy spread, composition, top contributors) and a searchable member list |
 | `/brawlers` | Every brawler, filterable by rarity and class |
 | `/brawlers/[id]` | Star powers, gadgets, win/pick rate, popular build, and the global top 10 on that brawler |
-| `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
+| `/tier-list` | S–D tiers from aggregated battle samples, plus which brawlers are moving |
 | `/ranked` | Best brawlers per map in the Ranked rotation, from competitive battles only |
 | `/release-notes` | The latest official update notes, resolved automatically |
 | `/about` | What the site is, where data comes from, and its known limits |
-| `/updates` | Detected game changes and meta movers (see below) |
+| `/news` | Official Supercell announcements and detected game changes (see below) |
 | `/events` | Live and upcoming event rotation with map art |
 | `/leaderboard` | Top 100 players or clubs, filterable across all ~250 ISO countries |
 
@@ -258,13 +258,32 @@ headline, raw in the tooltip and on the brawler page.
 
 Re-centring removes the cohort's *skill* bias. It does not remove its *taste*: which
 brawlers top players choose to run is still baked into the usage rate, and into which
-brawlers clear the sample threshold at all. Brawlers with fewer than 30 decided battles are
+brawlers clear the sample threshold at all. Brawlers with fewer than 20 decided battles are
 listed as unrated rather than given a tier.
 
 **To make this genuinely representative** you would need to sample across the trophy range,
 not just the top: pull from regional leaderboards at several trophy bands, keep a much
 larger pool, and let the window run long enough that low-usage brawlers clear the threshold.
 The current setup is a working pipeline with an honest caveat, not a finished methodology.
+
+### Meta movers
+
+Movers sit at the bottom of `/tier-list` rather than on the news page, because they are
+this table seen over time: `getMetaMovers` reads the same `brawler_stats` rows, re-centres
+them with the same `normalizeWinRate`, and applies the same sample floor. A mover is a
+brawler whose tier-list position is drifting.
+
+It is also the closest available proxy for a balance change, given that the API exposes no
+damage, health, reload or range numbers at all. Both snapshots are baseline-adjusted before
+being compared, so a shift in *who* got sampled cannot masquerade as a balance change, and
+both sides must clear the same 20-battle floor the tiers use.
+
+It does **not** follow the window and mode controls above it, and the caption says so.
+Those recompute rates live from `battle_samples` over a trailing window; movers compare two
+stored daily snapshots, which are written at a fixed 7-day window and have no mode
+dimension. The caption also reports the span it actually used rather than assuming seven
+days — the lookback falls back to the oldest snapshot available, so on a young dataset the
+real gap is shorter.
 
 ### Ranked maps: a per-map split makes the sample tiny
 
@@ -310,10 +329,10 @@ small typed tree (paragraphs, headings, lists, bold/italic/underline) and render
 sticky table of contents. Unknown node types are unwrapped rather than dropped, so new
 block types still surface their text.
 
-## Updates page: what it can and cannot know
+## News page: what it can and cannot know
 
-There is no Brawl Stars patch-notes, changelog or balance API, and nothing to mirror. So
-`/updates` is built from data we collect ourselves, in two halves:
+Supercell publishes announcement posts, but there is no patch-notes, changelog or balance
+API to mirror. So the detected-changes half of `/news` is built from data we collect ourselves:
 
 **Detected game changes.** The cron job snapshots the official brawler catalogue daily into
 `brawler_catalog_entries` and diffs consecutive days. That reliably catches new brawlers and
@@ -324,14 +343,8 @@ It **cannot** detect balance tuning. Damage, health, reload and range are not ex
 API at all, so a pure number change is invisible here. The page says so directly rather than
 implying it is a full changelog.
 
-**Meta movers.** The closest available proxy for balance changes: the shift in each
-brawler's baseline-adjusted win rate between the latest snapshot and the one ~7 days back.
-Both sides are adjusted before comparison, so a change in *who* got sampled cannot
-masquerade as a balance change, and both sides must clear the 30-battle floor.
-
 The first cron run only seeds the catalogue baseline — recording all ~106 existing brawlers
-as "new" would be noise. Changes appear from the second run onwards, and movers need at
-least two daily snapshots with enough battles on both.
+as "new" would be noise. Changes appear from the second run onwards.
 
 ## Icons
 

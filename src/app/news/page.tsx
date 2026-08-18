@@ -1,35 +1,21 @@
 import type { Metadata } from 'next';
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Cog,
-  ExternalLink,
-  Minus,
-  Sparkles,
-  Star,
-  Wrench,
-  Zap,
-} from 'lucide-react';
+import { Cog, ExternalLink, Minus, Sparkles, Star, Wrench, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { getOfficialNews } from '@/lib/news';
-import { formatNumber, formatPercent } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
-import { getCatalogChanges, getMetaMovers } from '@/lib/stats';
-import type { CatalogChangeEntry, MetaMover } from '@/types/stats';
+import { getCatalogChanges } from '@/lib/stats';
+import type { CatalogChangeEntry } from '@/types/stats';
 
 export const metadata: Metadata = {
   title: 'News',
   description:
-    'Detected Brawl Stars roster and kit changes, plus which brawlers are trending up or down in the sampled meta.',
+    'Official Brawl Stars announcements, plus roster and kit changes detected from the game API.',
 };
 
 export const revalidate = 3600;
-
-/** How many movers to show on each side. */
-const MOVER_LIMIT = 8;
 
 /** "2026-08-10T14:00:00.000+02:00" -> "10 Aug 2026" */
 function formatNewsDate(value: string): string {
@@ -45,18 +31,11 @@ function formatNewsDate(value: string): string {
 export default async function UpdatesPage() {
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after another so the page never needs more than one connection.
-  const [movers, brawlerMeta, news] = await Promise.all([
-    getMetaMovers(7),
+  const [brawlerMeta, news] = await Promise.all([
     getBrawlerMap().catch(() => new Map()),
     getOfficialNews(6),
   ]);
   const changes = await getCatalogChanges(40);
-
-  const rising = movers.filter((m) => m.winRateDelta > 0).slice(0, MOVER_LIMIT);
-  const falling = movers
-    .filter((m) => m.winRateDelta < 0)
-    .slice(0, MOVER_LIMIT)
-    .reverse();
 
   const iconFor = (id: number) => brawlerMeta.get(id)?.imageUrl;
 
@@ -65,7 +44,12 @@ export default async function UpdatesPage() {
       <header>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">News</h1>
         <p className="mt-2 max-w-3xl text-muted">
-          New brawlers and abilities, and which brawlers are rising or falling.
+          Announcements from the Brawl Stars team, and the new brawlers and abilities
+          detected from the game API. For how the sampled meta is shifting, see the{' '}
+          <Link href="/tier-list" className="font-medium text-brand hover:underline">
+            tier list
+          </Link>
+          .
         </p>
       </header>
 
@@ -119,35 +103,6 @@ export default async function UpdatesPage() {
       ) : null}
 
       <section>
-        <h2 className="mb-1 text-2xl font-bold tracking-tight">Meta movers</h2>
-        <p className="mb-4 text-sm text-muted">Win rate change over the last 7 days.</p>
-
-        {movers.length === 0 ? (
-          <EmptyNote
-            configured={hasDatabase()}
-            what="Not enough data collected yet — check back tomorrow."
-          />
-        ) : (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <MoverList
-              title="Trending up"
-              tone="text-victory"
-              movers={rising}
-              iconFor={iconFor}
-              emptyLabel="Nothing gained ground this week."
-            />
-            <MoverList
-              title="Trending down"
-              tone="text-defeat"
-              movers={falling}
-              iconFor={iconFor}
-              emptyLabel="Nothing lost ground this week."
-            />
-          </div>
-        )}
-      </section>
-
-      <section>
         <h2 className="mb-1 text-2xl font-bold tracking-tight">Detected game changes</h2>
         <p className="mb-4 text-sm text-muted">
           New brawlers, star powers, gadgets and hypercharges.
@@ -168,82 +123,6 @@ export default async function UpdatesPage() {
           </ol>
         )}
       </section>
-    </div>
-  );
-}
-
-function MoverList({
-  title,
-  tone,
-  movers,
-  iconFor,
-  emptyLabel,
-}: {
-  title: string;
-  tone: string;
-  movers: MetaMover[];
-  iconFor: (id: number) => string | undefined;
-  emptyLabel: string;
-}) {
-  return (
-    <div className="card p-4">
-      <h3 className={`mb-3 flex items-center gap-2 font-bold ${tone}`}>
-        {tone.includes('victory') ? (
-          <ArrowUpRight className="size-4" />
-        ) : (
-          <ArrowDownRight className="size-4" />
-        )}
-        {title}
-      </h3>
-
-      {movers.length === 0 ? (
-        <p className="py-4 text-center text-sm text-muted">{emptyLabel}</p>
-      ) : (
-        <ul className="space-y-1">
-          {movers.map((mover) => {
-            const url = iconFor(mover.brawlerId);
-            const up = mover.winRateDelta > 0;
-            return (
-              <li key={mover.brawlerId}>
-                <Link
-                  href={`/brawlers/${mover.brawlerId}`}
-                  className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-surface-2"
-                >
-                  {url ? (
-                    <Image
-                      src={url}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="size-8 shrink-0"
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="size-8 shrink-0 rounded bg-surface-2" />
-                  )}
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold capitalize">
-                      {mover.brawlerName.toLowerCase()}
-                    </span>
-                    <span className="block truncate text-xs text-muted">
-                      {formatPercent(mover.winRateBefore)} → {formatPercent(mover.winRateNow)}{' '}
-                      · {formatNumber(mover.sampleSize)} battles
-                    </span>
-                  </span>
-                  <span
-                    className={`shrink-0 text-sm font-bold tabular-nums ${
-                      up ? 'text-victory' : 'text-defeat'
-                    }`}
-                  >
-                    {up ? '+' : ''}
-                    {(mover.winRateDelta * 100).toFixed(1)} pts
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
     </div>
   );
 }

@@ -1,0 +1,174 @@
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { formatNumber, formatPercent } from '@/lib/format';
+import type { BABrawler } from '@/types/brawlapi';
+import type { MetaMover } from '@/types/stats';
+
+/**
+ * Which brawlers gained or lost ground since the last comparable snapshot.
+ *
+ * Lives with the tier list because it is the tier list's own data seen over
+ * time: `getMetaMovers` reads the same `brawler_stats` table, re-centres with
+ * the same `normalizeWinRate`, and applies the same sample floor. A mover is
+ * literally a brawler whose tier-list position is drifting.
+ *
+ * It does *not* follow the window or mode controls above it, and says so.
+ * Those recompute rates live from `battle_samples` over a trailing window;
+ * this compares two stored daily snapshots, which are written at a fixed
+ * 7-day window with no mode dimension at all. Silently ignoring the filters
+ * would be the worse failure, so the caption states the span it actually used.
+ */
+export function MetaMovers({
+  movers,
+  brawlerMeta,
+  limit,
+  modeFiltered,
+}: {
+  movers: MetaMover[];
+  brawlerMeta: Map<number, BABrawler>;
+  limit: number;
+  /** True when a mode filter is active on the page around this section. */
+  modeFiltered: boolean;
+}) {
+  const rising = movers.filter((m) => m.winRateDelta > 0).slice(0, limit);
+  const falling = movers
+    .filter((m) => m.winRateDelta < 0)
+    .slice(0, limit)
+    .reverse();
+
+  const iconFor = (id: number) => brawlerMeta.get(id)?.imageUrl;
+
+  // The span is read off the data rather than assumed: `getMetaMovers` falls
+  // back to the oldest snapshot it has when the full lookback is not available,
+  // so a hardcoded "last 7 days" would be wrong on a young dataset.
+  const span = movers[0];
+  const days = span
+    ? Math.max(
+        1,
+        Math.round(
+          (Date.parse(span.toDate) - Date.parse(span.fromDate)) / 86_400_000,
+        ),
+      )
+    : 0;
+
+  return (
+    <section aria-labelledby="meta-movers">
+      <h2 id="meta-movers" className="display text-2xl uppercase">
+        Meta movers
+      </h2>
+      <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+        {span
+          ? `Adjusted win rate change over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
+          : 'Adjusted win rate change between the two most recent snapshots.'}{' '}
+        Both sides clear the same sample floor as the tier list, so a move here
+        is a brawler genuinely drifting rather than a thin week.
+        {modeFiltered ? (
+          <>
+            {' '}
+            <strong className="font-semibold text-foreground">
+              Across all modes
+            </strong>{' '}
+            — the daily snapshots this compares are not split by mode, so the
+            filter above does not apply here.
+          </>
+        ) : null}
+      </p>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <MoverList
+          title="Trending up"
+          tone="text-victory"
+          movers={rising}
+          iconFor={iconFor}
+          emptyLabel="Nothing gained ground this week."
+        />
+        <MoverList
+          title="Trending down"
+          tone="text-defeat"
+          movers={falling}
+          iconFor={iconFor}
+          emptyLabel="Nothing lost ground this week."
+        />
+      </div>
+    </section>
+  );
+}
+
+function MoverList({
+  title,
+  tone,
+  movers,
+  iconFor,
+  emptyLabel,
+}: {
+  title: string;
+  tone: string;
+  movers: MetaMover[];
+  iconFor: (id: number) => string | undefined;
+  emptyLabel: string;
+}) {
+  return (
+    <div className="card p-4">
+      <h3 className={`mb-3 flex items-center gap-2 font-bold ${tone}`}>
+        {tone.includes('victory') ? (
+          <ArrowUpRight className="size-4" />
+        ) : (
+          <ArrowDownRight className="size-4" />
+        )}
+        {title}
+      </h3>
+
+      {movers.length === 0 ? (
+        <p className="py-4 text-center text-sm text-muted">{emptyLabel}</p>
+      ) : (
+        <ul className="space-y-1">
+          {movers.map((mover) => {
+            const url = iconFor(mover.brawlerId);
+            const up = mover.winRateDelta > 0;
+            return (
+              <li key={mover.brawlerId}>
+                <Link
+                  href={`/brawlers/${mover.brawlerId}`}
+                  className="row-interactive flex items-center gap-3 rounded-lg p-2"
+                >
+                  {url ? (
+                    <Image
+                      src={url}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="size-8 shrink-0"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className="size-8 shrink-0 rounded bg-surface-2" />
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold capitalize">
+                      {mover.brawlerName.toLowerCase()}
+                    </span>
+                    <span className="block truncate text-xs text-muted">
+                      {formatPercent(mover.winRateBefore)} →{' '}
+                      {formatPercent(mover.winRateNow)} ·{' '}
+                      {formatNumber(mover.sampleSize)} battles
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 text-sm font-bold tabular-nums ${
+                      up ? 'text-victory' : 'text-defeat'
+                    }`}
+                  >
+                    {up ? '+' : ''}
+                    {(mover.winRateDelta * 100).toFixed(1)} pts
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
