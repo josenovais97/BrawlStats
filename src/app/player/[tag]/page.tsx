@@ -115,8 +115,10 @@ export default async function PlayerPage({ params }: PageProps) {
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
-  // Pure function over the payload we already have — no database, no extra call.
-  const skill = computeSkillScore(player);
+  // Pure function over the payload we already have — no database, no extra
+  // call. The catalogue length is passed so roster-completeness scales as
+  // Supercell adds brawlers instead of being pinned to today's count.
+  const skill = computeSkillScore(player, catalogue.length || undefined);
 
   return (
     <div className="space-y-8">

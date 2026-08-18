@@ -60,7 +60,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
     },
     {
       node: <GearIcon className="size-4" />,
-      label: 'Gears',
+      label: 'Gears equipped',
       stat: progression.gears,
       tone: 'text-muted',
     },
@@ -113,6 +113,18 @@ export function PlayerProgression({ progression, playtime }: Props) {
                   {formatNumber(stat.owned)}
                   {stat.total > 0 ? (
                     <span className="text-muted/60"> / {formatNumber(stat.total)}</span>
+                  ) : null}
+                  {/* Gears only: completion counts the two a brawler can
+                      equip, but plenty of players own more and the page should
+                      say so rather than silently dropping the extras. */}
+                  {stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned ? (
+                    <span
+                      className="text-muted/60"
+                      title={`${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`}
+                    >
+                      {' '}
+                      · {formatNumber(stat.ownedRaw)} owned
+                    </span>
                   ) : null}
                 </span>
               </div>

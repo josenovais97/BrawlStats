@@ -256,9 +256,21 @@ export interface SkillScore {
   flag: AccountFlag | null;
 }
 
-export function computeSkillScore(player: BSPlayer): SkillScore {
+export function computeSkillScore(
+  player: BSPlayer,
+  /**
+   * How many brawlers exist right now, from the official catalogue.
+   *
+   * Passed in rather than assumed: Supercell adds brawlers steadily, so any
+   * absolute roster figure baked in here silently drifts. When it is missing
+   * the player's own roster is treated as complete, which understates nothing
+   * and only makes the smurf check more conservative.
+   */
+  rosterSize?: number,
+): SkillScore {
   const brawlers = player.brawlers;
   const owned = Math.max(brawlers.length, 1);
+  const roster = Math.max(rosterSize ?? 0, owned);
 
   /* ------------------------------ ranked ------------------------------ */
 
@@ -356,7 +368,7 @@ export function computeSkillScore(player: BSPlayer): SkillScore {
     components,
     rankedUnavailable,
     capped,
-    flag: detectFlag({ player, masteryValue, rankedUnavailable }),
+    flag: detectFlag({ player, masteryValue, rankedUnavailable, roster }),
   };
 }
 
@@ -372,10 +384,12 @@ function detectFlag({
   player,
   masteryValue,
   rankedUnavailable,
+  roster,
 }: {
   player: BSPlayer;
   masteryValue: number;
   rankedUnavailable: boolean;
+  roster: number;
 }): AccountFlag | null {
   // Without a Ranked history there is no performance signal independent of
   // account size, and every remaining number is investment. Nothing honest can
@@ -388,7 +402,8 @@ function detectFlag({
   // roster has been taken. None of this is performance.
   const investment = clamp01(
     linear(player.expLevel, 20, 300) * 0.45 +
-      linear(owned, 15, 95) * 0.3 +
+      // A share of the live roster, never a raw count — see `rosterSize`.
+      linear(owned / roster, 0.15, 0.9) * 0.3 +
       masteryValue * 0.25,
   );
 

@@ -77,8 +77,17 @@ function powerPointsToReachLevel(level: number): number {
 }
 
 export interface OwnershipStat {
+  /** Counted toward completion. May be capped — see `ownedRaw`. */
   owned: number;
   total: number;
+  /**
+   * Everything actually owned, when that can exceed what completion counts.
+   *
+   * Only gears differ today: completion counts two per brawler because that is
+   * all one can equip, but plenty of players own more and the profile should
+   * still say so rather than quietly hiding the extras.
+   */
+  ownedRaw?: number;
 }
 
 export interface ProgressionSummary {
@@ -191,6 +200,7 @@ export function computeProgression(
   let ownedStarPowers = 0;
   let ownedGadgets = 0;
   let ownedGears = 0;
+  let ownedGearsRaw = 0;
   let ownedHyperCharges = 0;
   let ownedBuffies = 0;
   let skinsEquipped = 0;
@@ -221,6 +231,7 @@ export function computeProgression(
     ownedStarPowers += starPowers;
     ownedGadgets += gadgets;
     ownedGears += usefulGears;
+    ownedGearsRaw += gears;
     ownedHyperCharges += hyperCharges;
 
     coinsInvested +=
@@ -268,7 +279,7 @@ export function computeProgression(
     maxedBrawlers: { owned: maxedBrawlers, total: totalBrawlers },
     starPowers: { owned: ownedStarPowers, total: totalStarPowers },
     gadgets: { owned: ownedGadgets, total: totalGadgets },
-    gears: { owned: ownedGears, total: totalGears },
+    gears: { owned: ownedGears, total: totalGears, ownedRaw: ownedGearsRaw },
     hyperCharges: { owned: ownedHyperCharges, total: totalHyperCharges },
     buffies: { owned: ownedBuffies, total: totalBuffies },
     skinsEquipped,
