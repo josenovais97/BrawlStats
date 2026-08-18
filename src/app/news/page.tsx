@@ -46,8 +46,8 @@ export default async function UpdatesPage() {
         <p className="mt-2 max-w-3xl text-muted">
           Announcements from the Brawl Stars team, and the new brawlers and abilities
           detected from the game API. For how the sampled meta is shifting, see the{' '}
-          <Link href="/tier-list" className="font-medium text-brand hover:underline">
-            tier list
+          <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
+            Ranked tier list
           </Link>
           .
         </p>

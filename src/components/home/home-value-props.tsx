@@ -18,7 +18,7 @@ const PROPS = [
     accent: '#ffc53d',
   },
   {
-    href: '/tier-list',
+    href: '/tier-list/ranked',
     icon: Podium,
     title: 'Brawler meta',
     body: 'Win rates, pick rates, tier rankings and the builds people run.',

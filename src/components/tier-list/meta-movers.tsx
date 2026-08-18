@@ -10,16 +10,21 @@ import type { MetaMover } from '@/types/stats';
 /**
  * Which brawlers gained or lost ground since the last comparable snapshot.
  *
- * Lives with the tier list because it is the tier list's own data seen over
- * time: `getMetaMovers` reads the same `brawler_stats` table, re-centres with
- * the same `normalizeWinRate`, and applies the same sample floor. A mover is
- * literally a brawler whose tier-list position is drifting.
+ * Rendered on the Ranked list only. The stored `brawler_stats` snapshots this
+ * reads take their win rate from competitive battles alone, so there is no
+ * trophy-ladder equivalent to show — putting this under the ladder list would
+ * caption Ranked movement as ladder movement.
  *
  * It does *not* follow the window or mode controls above it, and says so.
  * Those recompute rates live from `battle_samples` over a trailing window;
  * this compares two stored daily snapshots, which are written at a fixed
  * 7-day window with no mode dimension at all. Silently ignoring the filters
  * would be the worse failure, so the caption states the span it actually used.
+ *
+ * For the same reason the deltas are self-contained: both sides come from the
+ * snapshot table and are scored identically, so the *change* is exact, but the
+ * absolute scores are not the ones the tiers above are drawn on and the
+ * caption does not claim they are.
  */
 export function MetaMovers({
   movers,
@@ -61,8 +66,9 @@ export function MetaMovers({
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
         Change in <strong className="font-semibold text-foreground">meta score</strong>{' '}
-        — the same 0&ndash;10 number the tiers above are assigned from, so a mover
-        is a brawler visibly climbing or sliding this page.{' '}
+        — the same 0&ndash;10 scale the tiers above use, measured on the stored
+        daily snapshots, so a mover is a brawler visibly climbing or sliding the
+        Ranked meta.{' '}
         {span
           ? `Measured over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
           : 'Measured between the two most recent snapshots.'}{' '}

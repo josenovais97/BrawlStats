@@ -46,6 +46,37 @@ export const MIN_SAMPLE_FOR_TIER = 20;
 export const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'] as const;
 
 /**
+ * Which half of the sample a tier list is built from.
+ *
+ * The two are genuinely different games and were never comparable, which is
+ * why they get a page each rather than a toggle over one ranking:
+ *
+ * - `ranked` — competitive Ranked only (COMPETITIVE_BATTLE_TYPES). Matchmaking
+ *   pairs comparable opponents, 3v3 modes only, no showdown. This is the list
+ *   that answers "what is strong when both teams are trying".
+ * - `trophy` — everything else, i.e. the trophy ladder. Far more data (roughly
+ *   5x), the whole roster clears the sample floor, and showdown exists here.
+ *   It answers "what is strong on ladder", where the answer is legitimately
+ *   different.
+ *
+ * The format scopes *both* rates. Mixing them — a Ranked win rate against a
+ * pick rate counted over every battle, which is what the single page used to
+ * do — describes no population at all.
+ */
+export type TierFormat = 'ranked' | 'trophy';
+
+export function isTierFormat(value: string | undefined): value is TierFormat {
+  return value === 'ranked' || value === 'trophy';
+}
+
+/** Prisma `battleType` filter selecting one side of the split. */
+function battleTypeFilter(format: TierFormat) {
+  return format === 'ranked'
+    ? { in: [...COMPETITIVE_BATTLE_TYPES] }
+    : { notIn: [...COMPETITIVE_BATTLE_TYPES] };
+}
+
+/**
  * Floor for per-mode picks. Lower than MIN_SAMPLE_FOR_TIER because splitting by
  * mode divides the sample thirteen ways; shrinkage carries more of the load.
  */
@@ -115,14 +146,35 @@ export function normalizeWinRate(
  * outside the top handful would collapse into the same value.
  */
 
-/** Pick rate mapping to 0-1. Anchored absolutely so scores stay comparable
- *  between windows and modes rather than being rescaled by whoever is present. */
-const PICK_FLOOR = 0.001; // 0.1% -> 0
-const PICK_CEILING = 0.05; // 5%   -> 1
-
-/** Adjusted win rate mapping to 0-1. The band is where real separation lives. */
-const WIN_FLOOR = 0.42;
-const WIN_CEILING = 0.6;
+/**
+ * Score anchors, per tier-list format.
+ *
+ * Within a format these stay absolute, for the original reason: a brawler's
+ * score should mean the same thing across windows and modes rather than being
+ * rescaled by whoever happens to be present. Across formats they cannot be
+ * shared, because Ranked and the trophy ladder are different populations
+ * measured against different denominators — the two pages never put their
+ * numbers side by side, so one scale per page is the honest arrangement.
+ *
+ * Both sets are anchored just outside the format's own 5th-95th percentile,
+ * measured over the sampled data:
+ *
+ *   ranked  pick 0.42%-4.27%   adjusted win 42.1%-56.1%
+ *   trophy  pick 0.31%-1.45%   adjusted win 39.2%-55.0%
+ *
+ * Trophy sits lower and tighter on both axes, and reusing the Ranked anchors
+ * put 62% of the ladder roster in D. The floors are the same judgement call in
+ * each case, just made against the right distribution.
+ */
+const SCORE_ANCHORS = {
+  ranked: { pickFloor: 0.001, pickCeiling: 0.05, winFloor: 0.42, winCeiling: 0.6 },
+  trophy: { pickFloor: 0.0015, pickCeiling: 0.015, winFloor: 0.39, winCeiling: 0.57 },
+} as const satisfies Record<TierFormat, {
+  pickFloor: number;
+  pickCeiling: number;
+  winFloor: number;
+  winCeiling: number;
+}>;
 
 /** Performance carries most of the weight; popularity breaks the ties. */
 const WIN_WEIGHT = 0.65;
@@ -133,16 +185,19 @@ const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
 export function metaScore(
   normalizedWinRate: number | null,
   usageRate: number | null,
+  format: TierFormat = 'ranked',
 ): number | null {
   if (normalizedWinRate === null) return null;
 
-  const win = clamp01((normalizedWinRate - WIN_FLOOR) / (WIN_CEILING - WIN_FLOOR));
+  const { pickFloor, pickCeiling, winFloor, winCeiling } = SCORE_ANCHORS[format];
+
+  const win = clamp01((normalizedWinRate - winFloor) / (winCeiling - winFloor));
 
   const pick =
     usageRate && usageRate > 0
       ? clamp01(
-          (Math.log10(usageRate) - Math.log10(PICK_FLOOR)) /
-            (Math.log10(PICK_CEILING) - Math.log10(PICK_FLOOR)),
+          (Math.log10(usageRate) - Math.log10(pickFloor)) /
+            (Math.log10(pickCeiling) - Math.log10(pickFloor)),
         )
       : 0;
 
@@ -893,32 +948,41 @@ export function isTierWindow(value: string | undefined): value is TierWindowKey 
 
 /**
  * Recomputes brawler win and pick rates over an arbitrary window, straight from
- * `battle_samples`.
+ * `battle_samples`, for one tier-list format.
  *
  * The cron writes one precomputed row per brawler per day at a fixed 7-day
  * window, which is what the homepage and brawler pages read. The tier list
- * needs three windows side by side, and storing three rows per brawler per day
- * would mean widening the table's unique key. Recomputing instead is a single
- * grouped query over a table in the tens of thousands of rows, and the page
- * that calls it revalidates hourly, so it runs about once an hour.
+ * needs three windows side by side for each of two formats, and storing six
+ * rows per brawler per day would mean widening the table's unique key.
+ * Recomputing instead is a single grouped query over a table in the tens of
+ * thousands of rows, and the page that calls it revalidates hourly, so it runs
+ * about once an hour.
  *
- * Deliberately mirrors `recomputeBrawlerStats`: competitive battles for the win
- * rate, every battle for the pick rate, one baseline across the window.
+ * Unlike `recomputeBrawlerStats`, both rates are scoped to the same battles —
+ * see TierFormat for why the old mixed pairing was not measuring anything.
  */
 export async function getBrawlerStatsForWindow(
   windowDays: number,
   mode?: string,
+  format: TierFormat = 'ranked',
 ): Promise<BrawlerStatRow[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
   try {
     const since = new Date(Date.now() - windowDays * 86_400_000);
-    const scope = mode ? { battleTime: { gte: since }, mode } : { battleTime: { gte: since } };
+    const scope = {
+      battleTime: { gte: since },
+      battleType: battleTypeFilter(format),
+      ...(mode ? { mode } : {}),
+    };
 
-    // `rank` is grouped so showdown placements can be folded into wins and
-    // losses; it is null for every mode that reports a result.
-    const [allGroups, rankedGroups, totalBattles] = await Promise.all([
+    // `mode` and `rank` are grouped so showdown placements can be folded into
+    // wins and losses, and so each mode can be scored against its own
+    // baseline. Both are only load-bearing on the trophy side; Ranked is 3v3
+    // throughout, where `rank` is always null and the modes sit within a point
+    // or two of each other.
+    const [allGroups, resultGroups, totalBattles] = await Promise.all([
       prisma.battleSample.groupBy({
         by: ['brawlerId', 'brawlerName'],
         where: scope,
@@ -926,61 +990,99 @@ export async function getBrawlerStatsForWindow(
       }),
       prisma.battleSample.groupBy({
         by: ['brawlerId', 'brawlerName', 'result', 'rank', 'mode'],
-        where: { ...scope, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
+        where: scope,
         _count: { _all: true },
       }),
       prisma.battleSample.count({ where: scope }),
     ]);
 
-    // Showdown is never played in competitive Ranked, so a showdown-only view
-    // has to read every battle or it would always be empty.
-    const groups =
-      rankedGroups.length === 0 && mode
-        ? await prisma.battleSample.groupBy({
-            by: ['brawlerId', 'brawlerName', 'result', 'rank', 'mode'],
-            where: scope,
-            _count: { _all: true },
-          })
-        : rankedGroups;
+    // Wins and losses twice over: once per (brawler, mode) and once per mode
+    // across every brawler. The second is what each brawler is measured
+    // against.
+    type Tally = { wins: number; losses: number };
+    const byBrawlerMode = new Map<string, Tally>();
+    const byMode = new Map<string, Tally>();
+    const names = new Map<number, string>();
 
-    const ranked = new Map<number, { name: string; wins: number; losses: number }>();
-    for (const g of groups) {
-      const acc = ranked.get(g.brawlerId) ?? { name: g.brawlerName, wins: 0, losses: 0 };
-      const winRank = SHOWDOWN_WIN_RANK[g.mode];
-      if (g.result === 'victory') acc.wins += g._count._all;
-      else if (g.result === 'defeat') acc.losses += g._count._all;
-      else if (g.result === 'rank' && winRank !== undefined && g.rank !== null) {
-        if (g.rank <= winRank) acc.wins += g._count._all;
-        else acc.losses += g._count._all;
-      }
-      ranked.set(g.brawlerId, acc);
+    for (const group of resultGroups) {
+      names.set(group.brawlerId, group.brawlerName);
+
+      const winRank = SHOWDOWN_WIN_RANK[group.mode];
+      const count = group._count._all;
+      let wins = 0;
+      let losses = 0;
+
+      if (group.result === 'victory') wins = count;
+      else if (group.result === 'defeat') losses = count;
+      else if (group.result === 'rank' && winRank !== undefined && group.rank !== null) {
+        if (group.rank <= winRank) wins = count;
+        else losses = count;
+      } else continue; // draws, and placements in modes with no win cut-off
+
+      const key = `${group.brawlerId}\u0000${group.mode}`;
+      const cell = byBrawlerMode.get(key) ?? { wins: 0, losses: 0 };
+      cell.wins += wins;
+      cell.losses += losses;
+      byBrawlerMode.set(key, cell);
+
+      const modeTotal = byMode.get(group.mode) ?? { wins: 0, losses: 0 };
+      modeTotal.wins += wins;
+      modeTotal.losses += losses;
+      byMode.set(group.mode, modeTotal);
     }
 
     let popWins = 0;
     let popDecided = 0;
-    for (const acc of ranked.values()) {
-      popWins += acc.wins;
-      popDecided += acc.wins + acc.losses;
+    for (const total of byMode.values()) {
+      popWins += total.wins;
+      popDecided += total.wins + total.losses;
     }
-    const baselineWinRate = popDecided > 0 ? popWins / popDecided : null;
+    const globalBaseline = popDecided > 0 ? popWins / popDecided : null;
+
+    const modeBaseline = new Map(
+      [...byMode].map(([mode_, total]) => {
+        const decided = total.wins + total.losses;
+        return [mode_, decided > 0 ? total.wins / decided : globalBaseline] as const;
+      }),
+    );
+
+    // Fold the per-mode cells back up per brawler, carrying the battles each
+    // mode contributed so the baseline can follow the brawler's own mix.
+    const perBrawler = new Map<number, Tally & { expectedWins: number }>();
+    for (const [key, cell] of byBrawlerMode) {
+      const [idPart, mode_] = key.split('\u0000');
+      const brawlerId = Number(idPart);
+      const acc = perBrawler.get(brawlerId) ?? { wins: 0, losses: 0, expectedWins: 0 };
+      acc.wins += cell.wins;
+      acc.losses += cell.losses;
+      acc.expectedWins +=
+        (cell.wins + cell.losses) * (modeBaseline.get(mode_) ?? globalBaseline ?? 0.5);
+      perBrawler.set(brawlerId, acc);
+    }
 
     const usage = new Map(
       allGroups.map((g) => [g.brawlerId, { name: g.brawlerName, total: g._count._all }]),
     );
-    const ids = new Set([...usage.keys(), ...ranked.keys()]);
+    const ids = new Set([...usage.keys(), ...perBrawler.keys()]);
     const snapshotDate = toIsoDate(new Date());
 
     return [...ids].map((brawlerId) => {
       const all = usage.get(brawlerId);
-      const comp = ranked.get(brawlerId);
-      const decided = comp ? comp.wins + comp.losses : 0;
+      const acc = perBrawler.get(brawlerId);
+      const decided = acc ? acc.wins + acc.losses : 0;
 
       return {
         brawlerId,
-        brawlerName: all?.name ?? comp?.name ?? `Brawler ${brawlerId}`,
+        brawlerName: all?.name ?? names.get(brawlerId) ?? `Brawler ${brawlerId}`,
         snapshotDate,
-        winRate: decided > 0 ? comp!.wins / decided : null,
-        baselineWinRate,
+        winRate: decided > 0 ? acc!.wins / decided : null,
+        // Not the sample-wide mean but this brawler's own: the win rate its
+        // mode mix would produce at exactly average performance. A showdown
+        // main is judged against showdown, where finishing top 4 of 10 caps
+        // the ceiling near 40%, and a Brawl Ball main against Brawl Ball,
+        // where this cohort wins closer to 78%. One number for both put every
+        // showdown brawler at the bottom of the ladder list.
+        baselineWinRate: decided > 0 ? acc!.expectedWins / decided : globalBaseline,
         usageRate: totalBattles > 0 && all ? all.total / totalBattles : null,
         avgTrophies: null,
         avgRank: null,
@@ -999,10 +1101,16 @@ export async function getBrawlerStatsForWindow(
  * Modes with enough sampled battles to be worth offering as a tier-list filter,
  * most-played first. Returned from the data rather than hard-coded so a mode
  * leaving rotation drops out on its own.
+ *
+ * Scoped to the format, because the two rotations barely overlap: Ranked is six
+ * 3v3 modes, while the ladder adds showdown, duels, wipeout and the rest. The
+ * unscoped version offered Solo Showdown on a Ranked-only ranking, which could
+ * only ever come back empty.
  */
 export async function getFilterableModes(
   windowDays = 30,
   minBattles = 150,
+  format: TierFormat = 'ranked',
 ): Promise<{ mode: string; battles: number }[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
@@ -1011,7 +1119,7 @@ export async function getFilterableModes(
     const since = new Date(Date.now() - windowDays * 86_400_000);
     const groups = await prisma.battleSample.groupBy({
       by: ['mode'],
-      where: { battleTime: { gte: since } },
+      where: { battleTime: { gte: since }, battleType: battleTypeFilter(format) },
       _count: { _all: true },
     });
 

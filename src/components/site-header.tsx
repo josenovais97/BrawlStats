@@ -20,7 +20,9 @@ import { BrandMark } from '@/components/brand-mark';
 
 const NAV = [
   { href: '/brawlers', label: 'Brawlers', icon: Swords },
-  { href: '/tier-list', label: 'Tier List', icon: Podium },
+  // Points straight at the Ranked list so the nav does not bounce through the
+  // /tier-list redirect, but stays highlighted on the trophy list too.
+  { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },
   { href: '/ranked', label: 'Ranked', icon: Medal },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
   { href: '/news', label: 'News', icon: Newspaper },
@@ -28,8 +30,10 @@ const NAV = [
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
 
-function isActive(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
+/** `match` overrides `href` when a nav entry links into a section. */
+function isActive(pathname: string, href: string, match?: string) {
+  const prefix = match ?? href;
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
 
 export function SiteHeader() {
@@ -65,8 +69,8 @@ export function SiteHeader() {
           were what pushed it into overflow between 768px and 1100px.
         */}
         <nav aria-label="Main" className="ml-auto hidden items-center lg:flex">
-          {NAV.map(({ href, label }) => {
-            const active = isActive(pathname, href);
+          {NAV.map(({ href, match, label }) => {
+            const active = isActive(pathname, href, match);
             return (
               <Link
                 key={href}
@@ -129,8 +133,8 @@ export function SiteHeader() {
             clipped in a two-column grid on the narrowest phones.
           */}
           <ul className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2 px-4 py-4 min-[380px]:grid-cols-2 sm:px-6">
-            {NAV.map(({ href, label, icon: Icon }) => {
-              const active = isActive(pathname, href);
+            {NAV.map(({ href, match, label, icon: Icon }) => {
+              const active = isActive(pathname, href, match);
               return (
                 <li key={href}>
                   <Link

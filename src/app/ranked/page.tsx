@@ -80,10 +80,10 @@ export default async function RankedPage() {
             the sampler works through the pool.
           </p>
           <Link
-            href="/tier-list"
+            href="/tier-list/ranked"
             className="mt-6 inline-flex rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
           >
-            See the overall tier list
+            See the Ranked tier list
           </Link>
         </div>
       ) : (

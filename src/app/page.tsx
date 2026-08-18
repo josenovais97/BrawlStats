@@ -106,8 +106,8 @@ export default function HomePage() {
           eyebrow="Brawler meta"
           title="Top of the meta"
           subtitle="Highest win rates right now, adjusted for the sampled player pool."
-          ctaHref="/tier-list"
-          ctaLabel="Explore the tier list"
+          ctaHref="/tier-list/ranked"
+          ctaLabel="Explore the Ranked tier list"
         >
           <Suspense fallback={<RankedListSkeleton />}>
             <HomeTopBrawlers />
