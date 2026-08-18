@@ -124,25 +124,28 @@ const ELO_CEILING = 11_000;
 const AVG_BRAWLER_FLOOR = 150;
 const AVG_BRAWLER_CEILING = 2_400;
 
-/**
- * Trophies earned per account level: the efficiency signal.
- *
- * Two accounts at 200,000 trophies are not equal if one took twice the levels
- * to get there. Measured across the sample this ran from about 80 (a fresh
- * account) to 860 (an efficient pusher); the ceiling sits inside that range so
- * the component separates ordinary accounts rather than only extreme ones.
- */
-const PER_LEVEL_FLOOR = 80;
-const PER_LEVEL_CEILING = 900;
 
 /**
  * Weights. Ranked leads because it is the only skill-isolating signal; mastery
  * is capped at 15% precisely because it is the one component money can buy.
+ *
+ * There used to be a fourth, "efficiency" — trophies per account level — meant
+ * to separate skill from grind. It was removed after being measured: across a
+ * 60-player sample it moved the score by 0.29 points on average while
+ * reordering 51 of 60 players, and it pushed in the wrong direction. Account
+ * level is a lifetime counter with no decay, so it penalised exactly the
+ * strongest, longest-serving players and rewarded thin accounts that had
+ * pushed trophies without investing. Perter (#2R8QLCUG0) — Pro, 11,729 elo,
+ * every brawler at power 11 — scored 100% on all three remaining components
+ * and 72% on efficiency, which alone cost him 0.4 points.
+ *
+ * Nothing was lost by dropping it. Separating skill from grind is Ranked's
+ * job, and elo does it properly because matchmaking normalises it; efficiency
+ * was a weak proxy for something already measured well.
  */
 const WEIGHTS = {
-  ranked: 0.45,
-  trophies: 0.25,
-  efficiency: 0.15,
+  ranked: 0.55,
+  trophies: 0.3,
   mastery: 0.15,
 } as const;
 
@@ -282,11 +285,6 @@ export function computeSkillScore(player: BSPlayer): SkillScore {
   const avgBrawlerTrophies = player.trophies / owned;
   const trophyValue = band(avgBrawlerTrophies, AVG_BRAWLER_FLOOR, AVG_BRAWLER_CEILING);
 
-  /* ---------------------------- efficiency ---------------------------- */
-
-  const perLevel = player.trophies / Math.max(player.expLevel, 1);
-  const efficiencyValue = band(perLevel, PER_LEVEL_FLOOR, PER_LEVEL_CEILING);
-
   /* ------------------------------ mastery ----------------------------- */
 
   // Fractions of the *owned* roster, not of the whole game: a player with 40
@@ -318,12 +316,6 @@ export function computeSkillScore(player: BSPlayer): SkillScore {
       label: 'Trophy push',
       value: trophyValue,
       detail: `${Math.round(avgBrawlerTrophies).toLocaleString('en-US')} avg per brawler`,
-    },
-    {
-      key: 'efficiency',
-      label: 'Efficiency',
-      value: efficiencyValue,
-      detail: `${Math.round(perLevel).toLocaleString('en-US')} trophies per level`,
     },
     {
       key: 'mastery',
