@@ -17,6 +17,7 @@ Neon Postgres.
 | `/brawlers` | Every brawler, filterable by rarity and class |
 | `/brawlers/[id]` | Star powers, gadgets, win/pick rate, popular build, and the global top 10 on that brawler |
 | `/tier-list` | S–D tiers from aggregated battle samples, read from Postgres |
+| `/ranked` | Best brawlers per map in the Ranked rotation, from competitive battles only |
 | `/release-notes` | The latest official update notes, resolved automatically |
 | `/about` | What the site is, where data comes from, and its known limits |
 | `/updates` | Detected game changes and meta movers (see below) |
@@ -264,6 +265,37 @@ listed as unrated rather than given a tier.
 not just the top: pull from regional leaderboards at several trophy bands, keep a much
 larger pool, and let the window run long enough that low-usage brawlers clear the threshold.
 The current setup is a working pipeline with an honest caveat, not a finished methodology.
+
+### Ranked maps: a per-map split makes the sample tiny
+
+`/ranked` runs the same idea one level down, and that level is where the numbers get
+thin. Only competitive battles count (`soloRanked`/`teamRanked`, never the trophy
+ladder), and the map name is recorded per battle sample, so the page can only see
+battles collected after that column existed. Splitting those across ~27 maps and ~100
+brawlers leaves each brawler four to nine decided battles on a given map.
+
+Two things follow, and getting either wrong produces confident nonsense:
+
+- **The baseline is sample-wide, not per-map.** Ranked matchmaking is symmetric, so the
+  true average win rate is the same on every map — a per-map figure computed from forty
+  battles is measuring our sampling, not the map. Measured on a live window, per-map
+  averages ranged from **27% to 71%** while the sample as a whole sat at **53.6%** over
+  5,231 decided battles. Scoring against the per-map number meant subtracting noise: on
+  a map whose sample happened to read 27%, a brawler losing two games in three cleared
+  the bar and got published as that map's best pick.
+- **The prior is the brawler, not the population.** Shrinking five battles toward the
+  population mean discards the most informative thing available — how that brawler does
+  in Ranked generally. So the estimate is hierarchical: the brawler's overall ranked
+  record is shrunk toward the sample baseline, and its handful of battles on the map are
+  shrunk toward *that*. A brawler has to beat its own form here to rise above itself, and
+  the card shows the gap (`+1.4 vs usual`) so the map-specific part of the claim is
+  visible rather than implied.
+
+A pick is published only if it lands above the baseline. Maps where nothing clears it
+say so instead of ranking noise — currently about a fifth of them — and every card
+carries its sample size, distinct brawlers seen, and a `thin sample` / `building` /
+`well sampled` label. As the sampler accumulates map-tagged battles the priors matter
+less and the maps speak for themselves.
 
 ## Release notes
 

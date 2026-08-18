@@ -8,8 +8,10 @@ import type {
   BrawlerPlacement,
   BrawlerStatRow,
   CatalogChangeEntry,
+  MapConfidence,
   MetaMover,
   ModeBestPicks,
+  RankedMapPick,
   RankedMapPicks,
   ModePick,
   Tier,
@@ -60,6 +62,11 @@ const MIN_SAMPLE_FOR_MODE_PICK = 12;
  */
 const PRIOR_BATTLES = 50;
 
+/** Keeps a re-centred rate inside 0-1 after the baseline has been shifted out. */
+function clampRate(rate: number): number {
+  return Math.min(Math.max(rate, 0), 1);
+}
+
 /**
  * Re-centres a brawler's win rate on the sampled population's mean, damped by
  * how much evidence there actually is.
@@ -90,7 +97,7 @@ export function normalizeWinRate(
         (decidedSampleSize + PRIOR_BATTLES)
       : baselineWinRate;
 
-  return Math.min(Math.max(shrunk - baselineWinRate + 0.5, 0), 1);
+  return clampRate(shrunk - baselineWinRate + 0.5);
 }
 
 /**
@@ -982,17 +989,38 @@ export async function getFilterableModes(
 }
 
 /**
- * Minimum decided battles a brawler needs on a map before it can be listed.
+ * Minimum decided battles a brawler needs *on this map* before it can be
+ * listed.
  *
- * Far lower than the roster-wide floor because splitting by map divides the
- * sample perhaps thirty ways. Shrinkage does the heavy lifting instead, and
- * every row publishes its own sample size so a thin one is visible rather than
- * disguised.
+ * This is an eligibility gate, not a confidence gate. Its only job is to keep
+ * the list drawn from brawlers actually played here rather than from the
+ * roster at large; the estimate itself is what handles thin evidence, by
+ * shrinking toward the brawler's overall ranked form (see below).
  */
 const MIN_SAMPLE_FOR_MAP_PICK = 4;
 
 /** Maps needing at least this many decided battles to appear at all. */
-const MIN_SAMPLE_FOR_MAP = 12;
+const MIN_SAMPLE_FOR_MAP = 20;
+
+/**
+ * Strength of the map-level prior, in pseudo-battles.
+ *
+ * Deliberately large relative to the four-to-nine battles a brawler actually
+ * has on one map: at n=5 roughly five sixths of the estimate is still the
+ * brawler's overall form, which is the correct weighting when five battles is
+ * all the evidence there is. As a map fills in, its own record takes over.
+ */
+const MAP_PRIOR_BATTLES = 25;
+
+/** Decided battles at which a map's own ranking starts carrying real weight. */
+const MAP_CONFIDENCE_MEDIUM = 60;
+const MAP_CONFIDENCE_HIGH = 150;
+
+function mapConfidence(decided: number): MapConfidence {
+  if (decided >= MAP_CONFIDENCE_HIGH) return 'high';
+  if (decided >= MAP_CONFIDENCE_MEDIUM) return 'medium';
+  return 'low';
+}
 
 /**
  * Best brawlers per map, from competitive (Ranked) battles only.
@@ -1000,6 +1028,32 @@ const MIN_SAMPLE_FOR_MAP = 12;
  * Map is recorded per battle sample, so this can only see battles collected
  * after that column was added. Rows without a map are excluded rather than
  * bucketed into an "unknown map", which would quietly poison every ranking.
+ *
+ * Two things make a per-map ranking different from the per-mode one, and both
+ * were getting it wrong before:
+ *
+ * 1. **The baseline is sample-wide, not per-map.** Ranked matchmaking is
+ *    symmetric, so the true average win rate is the same on every map — any
+ *    difference between maps is our sampling, not the map. Measured over the
+ *    current window the per-map figures ranged from 27% to 71% on forty-odd
+ *    battles each, while the sample as a whole sat at 53.6% over 5,231. Scoring
+ *    against the per-map number meant subtracting noise: on a map whose sample
+ *    happened to read 27%, a brawler losing two games in three cleared the bar
+ *    and was published as the map's best pick. Every map is now scored against
+ *    the one sample-wide baseline.
+ *
+ * 2. **The prior is the brawler, not the population.** Splitting by map leaves
+ *    each brawler four to nine decided battles. Shrinking that toward the
+ *    population mean throws away the most informative thing we know — how the
+ *    brawler performs in Ranked generally — and leaves the ordering to
+ *    whichever coin flips landed. So the estimate is hierarchical: the
+ *    brawler's overall ranked record is itself shrunk toward the sample
+ *    baseline, and the map's handful of battles are then shrunk toward *that*.
+ *    A brawler needs to beat its own form on this map to rise above itself.
+ *
+ * A pick is only published if it comes out above the baseline. Ranking within
+ * a thin list is one thing; presenting a below-average brawler as a "best
+ * pick" is simply wrong, and is what the empty state exists for.
  */
 export async function getRankedMapPicks(
   perMap = 3,
@@ -1010,17 +1064,62 @@ export async function getRankedMapPicks(
 
   try {
     const since = new Date(Date.now() - windowDays * 86_400_000);
-    const groups = await prisma.battleSample.groupBy({
-      by: ['mapName', 'eventId', 'mode', 'brawlerId', 'brawlerName', 'result', 'rank'],
-      where: {
-        battleTime: { gte: since },
-        mapName: { not: null },
-        battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
-      },
-      _count: { _all: true },
-    });
+    const competitive = {
+      battleTime: { gte: since },
+      battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
+    };
 
-    type Acc = { name: string; wins: number; losses: number; total: number };
+    // Two groupings, one round trip. The first is every ranked battle in the
+    // window regardless of map — it is what the per-brawler prior is built
+    // from, and it deliberately includes rows sampled before map recording
+    // started, since a prior wants all the evidence it can get.
+    const [overallGroups, mapGroups] = await Promise.all([
+      prisma.battleSample.groupBy({
+        by: ['brawlerId', 'result'],
+        where: competitive,
+        _count: { _all: true },
+      }),
+      prisma.battleSample.groupBy({
+        by: ['mapName', 'eventId', 'mode', 'brawlerId', 'brawlerName', 'result'],
+        where: { ...competitive, mapName: { not: null } },
+        _count: { _all: true },
+      }),
+    ]);
+
+    // Ranked is 3v3 only, so `result` is always victory/defeat/draw here and
+    // the showdown placement handling the per-mode picks need does not apply.
+    let sampleWins = 0;
+    let sampleDecided = 0;
+    const overall = new Map<number, { wins: number; decided: number }>();
+
+    for (const g of overallGroups) {
+      if (g.result !== 'victory' && g.result !== 'defeat') continue;
+      const n = g._count._all;
+      const acc = overall.get(g.brawlerId) ?? { wins: 0, decided: 0 };
+      acc.decided += n;
+      sampleDecided += n;
+      if (g.result === 'victory') {
+        acc.wins += n;
+        sampleWins += n;
+      }
+      overall.set(g.brawlerId, acc);
+    }
+
+    if (sampleDecided === 0) return [];
+    const baseline = sampleWins / sampleDecided;
+
+    /** The brawler's overall ranked form, shrunk toward the sample baseline. */
+    function priorFor(brawlerId: number): { rate: number; decided: number } {
+      const acc = overall.get(brawlerId);
+      if (!acc || acc.decided === 0) return { rate: baseline, decided: 0 };
+      return {
+        rate:
+          (acc.wins + baseline * PRIOR_BATTLES) / (acc.decided + PRIOR_BATTLES),
+        decided: acc.decided,
+      };
+    }
+
+    type Acc = { name: string; wins: number; decided: number; total: number };
     type MapAcc = {
       mapName: string;
       eventId: number | null;
@@ -1029,24 +1128,31 @@ export async function getRankedMapPicks(
     };
     const byMap = new Map<string, MapAcc>();
 
-    for (const g of groups) {
+    for (const g of mapGroups) {
       if (!g.mapName) continue;
       const key = `${g.mapName}::${g.mode}`;
       const entry =
         byMap.get(key) ??
-        { mapName: g.mapName, eventId: g.eventId, mode: g.mode, brawlers: new Map<number, Acc>() };
+        {
+          mapName: g.mapName,
+          eventId: g.eventId,
+          mode: g.mode,
+          brawlers: new Map<number, Acc>(),
+        };
+      // Artwork is keyed on the event id, so never let a null row overwrite a
+      // real one just because it was grouped first.
+      if (entry.eventId === null && g.eventId !== null) entry.eventId = g.eventId;
 
       const acc =
         entry.brawlers.get(g.brawlerId) ??
-        { name: g.brawlerName, wins: 0, losses: 0, total: 0 };
+        { name: g.brawlerName, wins: 0, decided: 0, total: 0 };
       const n = g._count._all;
-      const winRank = SHOWDOWN_WIN_RANK[g.mode];
 
-      if (g.result === 'victory') acc.wins += n;
-      else if (g.result === 'defeat') acc.losses += n;
-      else if (g.result === 'rank' && winRank !== undefined && g.rank !== null) {
-        if (g.rank <= winRank) acc.wins += n;
-        else acc.losses += n;
+      if (g.result === 'victory') {
+        acc.wins += n;
+        acc.decided += n;
+      } else if (g.result === 'defeat') {
+        acc.decided += n;
       }
 
       acc.total += n;
@@ -1057,47 +1163,63 @@ export async function getRankedMapPicks(
     const out: RankedMapPicks[] = [];
 
     for (const entry of byMap.values()) {
-      let popWins = 0;
-      let popDecided = 0;
-      let popTotal = 0;
+      let mapWins = 0;
+      let mapDecided = 0;
+      let mapTotal = 0;
       for (const acc of entry.brawlers.values()) {
-        popWins += acc.wins;
-        popDecided += acc.wins + acc.losses;
-        popTotal += acc.total;
+        mapWins += acc.wins;
+        mapDecided += acc.decided;
+        mapTotal += acc.total;
       }
-      if (popDecided < MIN_SAMPLE_FOR_MAP) continue;
-      const baseline = popWins / popDecided;
+      if (mapDecided < MIN_SAMPLE_FOR_MAP) continue;
 
-      const picks: ModePick[] = [...entry.brawlers]
+      const picks: RankedMapPick[] = [...entry.brawlers]
+        .filter(([, acc]) => acc.decided >= MIN_SAMPLE_FOR_MAP_PICK)
         .map(([brawlerId, acc]) => {
-          const decided = acc.wins + acc.losses;
-          const raw = decided > 0 ? acc.wins / decided : 0;
+          const prior = priorFor(brawlerId);
+          const raw = acc.decided > 0 ? acc.wins / acc.decided : 0;
+          const estimate =
+            (acc.wins + prior.rate * MAP_PRIOR_BATTLES) /
+            (acc.decided + MAP_PRIOR_BATTLES);
+
           return {
             brawlerId,
             brawlerName: acc.name,
             winRate: raw,
-            pickRate: popTotal > 0 ? acc.total / popTotal : 0,
-            decidedSampleSize: decided,
-            score: normalizeWinRate(raw, baseline, decided) ?? 0.5,
+            pickRate: mapTotal > 0 ? acc.total / mapTotal : 0,
+            decidedSampleSize: acc.decided,
+            score: clampRate(estimate - baseline + 0.5),
+            overallScore: clampRate(prior.rate - baseline + 0.5),
+            overallSampleSize: prior.decided,
           };
         })
-        .filter((p) => p.decidedSampleSize >= MIN_SAMPLE_FOR_MAP_PICK)
+        // Above the sample baseline or it is not a "best pick" at all.
+        .filter((p) => p.score > 0.5)
         .sort((a, b) => b.score - a.score)
         .slice(0, perMap);
 
-      if (picks.length === 0) continue;
       out.push({
         mapName: entry.mapName,
         eventId: entry.eventId,
         mode: entry.mode,
         picks,
-        sampleSize: popDecided,
+        sampleSize: mapDecided,
         baselineWinRate: baseline,
+        mapWinRate: mapDecided > 0 ? mapWins / mapDecided : 0,
+        confidence: mapConfidence(mapDecided),
+        brawlersSeen: entry.brawlers.size,
       });
     }
 
-    // Most-sampled maps first: those rankings are the ones worth trusting.
-    return out.sort((a, b) => b.sampleSize - a.sampleSize);
+    // Maps that can say something come first, then the best-sampled of the
+    // rest. A map with no qualifying pick is still worth a card: it names what
+    // is in the rotation and shows how far along its sample is.
+    return out.sort((a, b) => {
+      if ((a.picks.length > 0) !== (b.picks.length > 0)) {
+        return a.picks.length > 0 ? -1 : 1;
+      }
+      return b.sampleSize - a.sampleSize;
+    });
   } catch {
     return [];
   }

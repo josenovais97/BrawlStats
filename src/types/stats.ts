@@ -157,14 +157,54 @@ export interface ModeBestPicks {
   baselineWinRate: number;
 }
 
+/**
+ * One brawler's record on a single ranked map.
+ *
+ * Carries more context than a plain `ModePick` because a per-map split leaves
+ * so little evidence per brawler that the raw number alone is misleading: the
+ * card has to be able to show what the estimate was pulled toward and how
+ * much of it is actually this map talking.
+ */
+export interface RankedMapPick extends ModePick {
+  /**
+   * The brawler's baseline-adjusted form across *all* ranked battles, which is
+   * the prior this map's estimate is shrunk toward. Rendering both makes the
+   * map-specific part of the claim visible instead of implied.
+   */
+  overallScore: number;
+  /** Decided ranked battles behind `overallScore`, across every map. */
+  overallSampleSize: number;
+}
+
+/**
+ * How much of a map's ranking is its own evidence rather than the prior.
+ *
+ * Published per map so a thin card can say so in words. Nothing is hidden on
+ * the strength of this — it only changes the wording.
+ */
+export type MapConfidence = 'low' | 'medium' | 'high';
+
 /** Best brawlers on one ranked map. */
 export interface RankedMapPicks {
   mapName: string;
   /** Brawlify event id, for map artwork. Null when the API omitted it. */
   eventId: number | null;
   mode: string;
-  picks: ModePick[];
+  picks: RankedMapPick[];
   /** Decided ranked battles sampled on this map, across all brawlers. */
   sampleSize: number;
+  /**
+   * The sample-wide ranked win rate, *not* this map's own average.
+   *
+   * Ranked matchmaking is symmetric, so every map's true average is the same
+   * number; a per-map figure computed from forty battles is noise, and
+   * re-centring on it used to promote genuinely losing brawlers to "best
+   * pick". See `getRankedMapPicks`.
+   */
   baselineWinRate: number;
+  /** This map's own raw win rate. Shown as sample colour, never ranked on. */
+  mapWinRate: number;
+  confidence: MapConfidence;
+  /** Distinct brawlers with at least one decided battle sampled here. */
+  brawlersSeen: number;
 }

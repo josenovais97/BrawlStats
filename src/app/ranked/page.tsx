@@ -3,11 +3,12 @@ import { Swords } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { getBrawlerMap, getMapMap } from '@/lib/brawlapi';
+import { MapPreview } from '@/components/ranked/map-preview';
+import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { getRankedMapPicks } from '@/lib/stats';
-import type { BABrawler, BAMap } from '@/types/brawlapi';
-import type { RankedMapPicks } from '@/types/stats';
+import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
+import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 
 export const metadata: Metadata = {
   title: 'Ranked maps',
@@ -18,10 +19,17 @@ export const metadata: Metadata = {
 /** Own aggregate plus artwork, so an hour is plenty. */
 export const revalidate = 3600;
 
+const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
+  low: 'Thin sample',
+  medium: 'Building',
+  high: 'Well sampled',
+};
+
 export default async function RankedPage() {
-  const [maps, mapMeta, brawlerMeta] = await Promise.all([
+  const [maps, mapMeta, modeMeta, brawlerMeta] = await Promise.all([
     getRankedMapPicks(3),
     getMapMap().catch(() => new Map<number, BAMap>()),
+    getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     getBrawlerMap().catch(() => new Map<number, BABrawler>()),
   ]);
 
@@ -35,6 +43,8 @@ export default async function RankedPage() {
   }
 
   const totalSamples = maps.reduce((sum, m) => sum + m.sampleSize, 0);
+  const baseline = maps[0]?.baselineWinRate ?? 0;
+  const rated = maps.filter((m) => m.picks.length > 0).length;
 
   return (
     <div className="space-y-10">
@@ -50,6 +60,15 @@ export default async function RankedPage() {
           excluded entirely: Ranked matchmaking pairs comparable opponents, so what is
           left reflects the brawler rather than who was holding it.
         </p>
+        {maps.length > 0 ? (
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted">
+            Every map is scored against the same {formatPercent(baseline)} sample-wide
+            Ranked average, and each brawler&rsquo;s handful of battles here is weighed
+            against its overall Ranked form — a map needs real evidence to move a
+            brawler off that. {rated} of {maps.length} maps have enough to name a pick
+            so far.
+          </p>
+        ) : null}
       </header>
 
       {maps.length === 0 ? (
@@ -68,24 +87,45 @@ export default async function RankedPage() {
           </Link>
         </div>
       ) : (
-        [...byMode].map(([mode, list]) => (
-          <section key={mode} aria-labelledby={`mode-${mode}`}>
-            <h2
-              id={`mode-${mode}`}
-              className="display mb-4 text-2xl uppercase sm:text-3xl"
-            >
-              {humanizeMode(mode)}
-            </h2>
+        [...byMode].map(([mode, list]) => {
+          const meta = modeMeta.get(mode.toLowerCase());
+          const accent = meta?.color ?? '#8b95b8';
 
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {list.map((map) => (
-                <li key={`${map.mode}-${map.mapName}`}>
-                  <MapCard map={map} mapMeta={mapMeta} brawlerMeta={brawlerMeta} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
+          return (
+            <section key={mode} aria-labelledby={`mode-${mode}`}>
+              <h2
+                id={`mode-${mode}`}
+                className="display mb-4 flex items-center gap-2.5 text-2xl uppercase sm:text-3xl"
+              >
+                {meta?.imageUrl ? (
+                  <Image
+                    src={meta.imageUrl}
+                    alt=""
+                    width={32}
+                    height={32}
+                    className="size-8 shrink-0 object-contain"
+                    unoptimized
+                  />
+                ) : null}
+                <span style={{ color: accent }}>{meta?.name ?? humanizeMode(mode)}</span>
+              </h2>
+
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {list.map((map) => (
+                  <li key={`${map.mode}-${map.mapName}`}>
+                    <MapCard
+                      map={map}
+                      art={map.eventId ? mapMeta.get(map.eventId) : undefined}
+                      modeLabel={meta?.name ?? humanizeMode(mode)}
+                      accent={accent}
+                      brawlerMeta={brawlerMeta}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })
       )}
     </div>
   );
@@ -93,82 +133,127 @@ export default async function RankedPage() {
 
 function MapCard({
   map,
-  mapMeta,
+  art,
+  modeLabel,
+  accent,
   brawlerMeta,
 }: {
   map: RankedMapPicks;
-  mapMeta: Map<number, BAMap>;
+  art?: BAMap;
+  modeLabel: string;
+  accent: string;
   brawlerMeta: Map<number, BABrawler>;
 }) {
-  const art = map.eventId ? mapMeta.get(map.eventId) : undefined;
-
   return (
     <article className="card flex h-full flex-col overflow-hidden">
-      <div className="relative h-28 shrink-0 overflow-hidden bg-surface-2">
-        {art?.imageUrl ? (
-          <Image
-            src={art.imageUrl}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 92vw"
-            className="object-cover object-center opacity-70"
-            loading="lazy"
-            unoptimized
-          />
-        ) : null}
-        <span
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-surface via-surface/70 to-transparent"
-        />
-        <div className="absolute inset-x-0 bottom-0 p-3">
-          <p className="display truncate text-base leading-none">{map.mapName}</p>
-          <p className="mt-1 text-[0.625rem] uppercase tracking-wide text-muted">
-            {formatNumber(map.sampleSize)} ranked battles ·{' '}
-            {formatPercent(map.baselineWinRate)} map avg
-          </p>
+      {/* The map itself gets the top of the card, drawn whole rather than
+          cropped: a Brawl Stars map is read by its layout, and the old
+          faded-and-cropped banner made every card look alike. */}
+      <MapPreview
+        imageUrl={art?.imageUrl}
+        mapName={map.mapName}
+        modeLabel={modeLabel}
+        accent={accent}
+      />
+
+      <div className="border-y border-border px-3.5 py-3">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="display min-w-0 flex-1 truncate text-base leading-tight">
+            {map.mapName}
+          </h3>
+          {/* Deliberately quiet at "low": a caveat should not be the brightest
+              thing on the card, and right now every map carries one. It picks
+              up the mode colour once the map has earned it. */}
+          <span
+            className="shrink-0 rounded-md px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-wide"
+            style={
+              map.confidence === 'low'
+                ? { color: 'var(--muted)', background: 'var(--surface-2)' }
+                : { color: accent, background: `color-mix(in srgb, ${accent} 16%, transparent)` }
+            }
+          >
+            {CONFIDENCE_LABEL[map.confidence]}
+          </span>
         </div>
+        <p className="mt-1.5 text-[0.625rem] uppercase tracking-wide text-muted">
+          {formatNumber(map.sampleSize)} ranked battles · {map.brawlersSeen} brawlers
+          seen
+        </p>
       </div>
 
-      <ol className="flex-1 divide-y divide-border">
-        {map.picks.map((pick, index) => {
-          const meta = brawlerMeta.get(pick.brawlerId);
-          return (
-            <li key={pick.brawlerId}>
-              <Link
-                href={`/brawlers/${pick.brawlerId}`}
-                title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} win rate over ${pick.decidedSampleSize} sampled Ranked battles on this map`}
-                className="row-interactive flex items-center gap-2.5 px-3 py-2"
-              >
-                <span className="w-3 shrink-0 text-center text-[0.625rem] font-black tabular-nums text-muted">
-                  {index + 1}
-                </span>
-                <Image
-                  src={meta?.imageUrl ?? ''}
-                  alt=""
-                  width={30}
-                  height={30}
-                  className="size-[30px] shrink-0 rounded-md bg-surface-2"
-                  loading="lazy"
-                  unoptimized
-                />
-                <span className="min-w-0 flex-1 truncate text-sm font-semibold capitalize">
-                  {pick.brawlerName.toLowerCase()}
-                </span>
-                <span className="shrink-0 text-right">
-                  <span className="block text-xs font-bold tabular-nums text-victory">
-                    {formatPercent(pick.winRate)}
+      {map.picks.length === 0 ? (
+        /* Naming a "best pick" the sample cannot support is worse than naming
+           none, so a thin map says so instead of ranking noise. */
+        <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
+          No brawler is clearly above average here yet. The map has been sampled{' '}
+          {formatNumber(map.sampleSize)} times, spread across {map.brawlersSeen}{' '}
+          brawlers — not enough for any one of them to separate from the pack.
+        </p>
+      ) : (
+        <ol className="flex-1 divide-y divide-border">
+          {map.picks.map((pick, index) => {
+            const meta = brawlerMeta.get(pick.brawlerId);
+            // Positive means the brawler does better here than it does in
+            // Ranked overall, which is the only genuinely map-specific claim
+            // on the card.
+            const edge = pick.score - pick.overallScore;
+
+            return (
+              <li key={pick.brawlerId}>
+                <Link
+                  href={`/brawlers/${pick.brawlerId}`}
+                  title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} raw win rate over ${pick.decidedSampleSize} sampled Ranked battles on this map, against ${formatPercent(pick.overallScore)} adjusted form over ${formatNumber(pick.overallSampleSize)} Ranked battles overall`}
+                  className="row-interactive flex items-center gap-2.5 px-3.5 py-2"
+                >
+                  <span className="w-3 shrink-0 text-center text-[0.625rem] font-black tabular-nums text-muted">
+                    {index + 1}
                   </span>
-                  {/* Sample size is never hidden: on a per-map split it is the
-                      difference between a signal and a coin flip. */}
-                  <span className="block text-[0.5625rem] tabular-nums text-muted">
-                    {pick.decidedSampleSize} battles
+                  <Image
+                    src={meta?.imageUrl ?? brawlerIconUrl(pick.brawlerId)}
+                    alt=""
+                    width={30}
+                    height={30}
+                    className="size-[30px] shrink-0 rounded-md bg-surface-2"
+                    loading="lazy"
+                    unoptimized
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold capitalize">
+                      {pick.brawlerName.toLowerCase()}
+                    </span>
+                    {/* Sample size is never hidden: on a per-map split it is
+                        the difference between a signal and a coin flip. */}
+                    <span className="block text-[0.5625rem] tabular-nums text-muted">
+                      {pick.decidedSampleSize} battles here
+                    </span>
                   </span>
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
+                  <span className="shrink-0 text-right">
+                    {/* The adjusted score, not the raw rate: ranking is by
+                        adjusted score, and printing the raw one makes the
+                        column read as mis-sorted whenever a five-battle
+                        sample had a flattering record. */}
+                    <span className="block text-xs font-bold tabular-nums text-victory">
+                      {formatPercent(pick.score)}
+                    </span>
+                    {/* Signed both ways. A pick can still be worth listing
+                        while doing slightly worse here than it does in Ranked
+                        generally, and hiding that half of the comparison was
+                        what made the column unreadable. */}
+                    <span
+                      className={`block text-[0.5625rem] tabular-nums ${
+                        edge >= 0.005 ? 'text-victory/80' : 'text-muted'
+                      }`}
+                    >
+                      {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
+                      {Math.abs(edge * 100).toFixed(1)} vs usual
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </article>
   );
 }
