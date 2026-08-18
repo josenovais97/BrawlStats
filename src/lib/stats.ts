@@ -1347,11 +1347,14 @@ export interface CosmeticUsage {
 /**
  * How many days back a cosmetic reading still counts as current.
  *
- * The sampler walks a least-recently-sampled queue, so on any single day it
- * only reaches part of the pool. One day of snapshots would rank whoever
- * happened to be sampled this morning.
+ * The sampler walks a least-recently-sampled queue, so a single day would rank
+ * whoever happened to be sampled that morning. It now covers the whole pool
+ * comfortably within a day, so a week is ample — and it keeps this inside the
+ * snapshot retention window, which is set by storage rather than by this query.
+ * The `DISTINCT ON` below takes only the newest row per player-brawler anyway,
+ * so extra depth costs scan time and buys nothing.
  */
-const COSMETIC_WINDOW_DAYS = 14;
+const COSMETIC_WINDOW_DAYS = 7;
 
 /**
  * The most-worn skins across the sampled population.

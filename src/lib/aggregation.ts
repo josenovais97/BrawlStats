@@ -36,10 +36,20 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  *
  * This is an upper bound, not a target: sampling stops at `samplingDeadline`
  * regardless, so a slow upstream night simply samples fewer players rather
- * than overrunning the function. Sized so a healthy run finishes in roughly
- * half the budget, which keeps Active CPU well inside the Hobby allowance.
+ * than overrunning the function.
+ *
+ * Raised from 100 because 100 was leaving most of the budget unused while
+ * actively losing data. A battle log holds only a player's last ~25 matches,
+ * and at 100 per run each tag was revisited about every two days — measured
+ * against live data, **48% of sampled players came back sitting on the 25-match
+ * cap**, meaning everything they played in the gap was gone for good.
+ *
+ * Sizing: 100 players took ~50s of the ~215s available for sampling (the run
+ * budget less the recompute and ranking reserves), so ~0.5s each. 350 lands
+ * near 175s and leaves real headroom; overrunning is safe anyway, since
+ * sampling stops at the deadline rather than the batch size.
  */
-const DEFAULT_BATCH_SIZE = 100;
+const DEFAULT_BATCH_SIZE = 350;
 
 /**
  * Concurrent players in flight. Each one issues two API calls at once, so the
@@ -78,6 +88,35 @@ const WINDOW_DAYS = 7;
 const POOL_TARGET = 800;
 
 /**
+ * How long raw observations are kept.
+ *
+ * Sized against measured row costs rather than round numbers, because at the
+ * sampling rate above the two tables dominate the database:
+ *
+ *   player_brawler_snapshots  257 B/row, ~86k rows/day  ->  ~22 MB/day
+ *   battle_samples            365 B/row, ~23k rows/day  ->  ~8 MB/day
+ *
+ * Snapshots are the expensive one — one row per player per brawler per day —
+ * and nothing reads them beyond a week except `getSkinUsage`, which takes only
+ * the newest row per player-brawler and so does not need depth at all. Ten days
+ * leaves three days of margin over the longest meaningful read.
+ *
+ * Battles are queried over at most 30 days (the tier list's widest window and
+ * `getFilterableModes`), so 35 leaves five days of margin.
+ *
+ * Getting these wrong is unrecoverable — the game API serves only a player's
+ * last ~25 battles and has no history endpoint — so the margins are the point,
+ * and they are the smallest that are still safe rather than the largest that
+ * would fit.
+ *
+ * Aggregates are never pruned: `brawler_stats`, `brawler_build_stats` and
+ * `player_trophy_points` are small, and the last is the long history the site
+ * exists to accumulate.
+ */
+const BATTLE_RETENTION_DAYS = 35;
+const SNAPSHOT_RETENTION_DAYS = 10;
+
+/**
  * A pool member producing no battles in this many days is inactive.
  *
  * They still cost two API calls per visit and contribute nothing, so they are
@@ -101,6 +140,8 @@ export interface AggregationResult {
   seeded: number;
   /** Pool members dropped this run to keep the pool at POOL_TARGET. */
   evicted: number;
+  /** Raw observation rows deleted as past their retention window. */
+  pruned: number;
   /** Roster/kit differences detected against yesterday's catalogue snapshot. */
   catalogChanges: number;
   /** Cached brawler-leaderboard rows stored this run. */
@@ -241,6 +282,39 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
   });
 
   return { seeded: result.count, ranked };
+}
+
+/**
+ * Deletes raw observations past their retention window.
+ *
+ * Without this the two biggest tables grow forever while only their most recent
+ * weeks are ever read — at the sampling rate this file now runs at, that is
+ * roughly a hundred thousand dead rows a week on a 512 MB free-tier database.
+ *
+ * Deliberately conservative: see BATTLE_RETENTION_DAYS. Nothing here can be
+ * undone, because the game API serves only a player's last ~25 battles and has
+ * no history endpoint at all.
+ */
+export async function pruneOldSamples(): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const battleCutoff = new Date(Date.now() - BATTLE_RETENTION_DAYS * 86_400_000);
+  const snapshotCutoff = new Date(Date.now() - SNAPSHOT_RETENTION_DAYS * 86_400_000);
+
+  try {
+    const battles = await prisma.battleSample.deleteMany({
+      where: { battleTime: { lt: battleCutoff } },
+    });
+    const snapshots = await prisma.playerBrawlerSnapshot.deleteMany({
+      where: { snapshotDate: { lt: snapshotCutoff } },
+    });
+
+    return battles.count + snapshots.count;
+  } catch {
+    // A failed prune costs disk, not correctness, so it never fails a run.
+    return 0;
+  }
 }
 
 /**
@@ -756,6 +830,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated: 0,
       seeded: 0,
       evicted: 0,
+      pruned: 0,
       catalogChanges: 0,
       rankingsCached: 0,
       buildRowsUpdated: 0,
@@ -826,6 +901,10 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     const brawlersUpdated = await recomputeBrawlerStats();
     const buildRowsUpdated = await recomputeBuildStats().catch(() => 0);
 
+    // After the recomputes, so a prune can never remove rows the aggregates in
+    // this same run were about to read.
+    const pruned = await pruneOldSamples();
+
     // Last and time-boxed, because it is the most API-expensive step. It gets
     // whatever is left of the run budget and resumes where it stopped on the
     // next run, so a short night costs freshness rather than correctness.
@@ -859,6 +938,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated,
       seeded,
       evicted,
+      pruned,
       catalogChanges: catalog.changes,
       rankingsCached,
       buildRowsUpdated,
