@@ -10,6 +10,7 @@ import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
 import { PlayerSkillScore } from '@/components/player/player-skill-score';
 import { PlayerTrophyHistory } from '@/components/player/player-trophy-history';
+import { PlayerUpgradeGap } from '@/components/player/player-upgrade-gap';
 import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -20,7 +21,7 @@ import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { computeProgression, estimatePlaytime } from '@/lib/progression';
+import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
 import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
 import {
@@ -146,6 +147,14 @@ export default async function PlayerPage({ params }: PageProps) {
       <PlayerRecords player={player} />
       <PlayerTrophyHistory points={trophyHistory} />
       <PlayerProgression progression={progression} playtime={playtime} />
+
+      {/* Directly after progression: it is the same subject narrowed to the
+          brawlers where finishing the job unlocks something already owned. */}
+      <PlayerUpgradeGap
+        brawlers={player.brawlers}
+        brawlerMeta={brawlerMeta}
+        coinsPerLevel={coinsToMaxFrom}
+      />
 
       <PlayerMetaFit
         brawlers={player.brawlers}

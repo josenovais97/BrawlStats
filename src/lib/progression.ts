@@ -21,6 +21,17 @@ const POWER_POINT_COST_PER_LEVEL = [20, 30, 50, 80, 130, 210, 340, 550, 890, 144
 
 export const MAX_POWER_LEVEL = 11;
 
+/**
+ * Coins to take one brawler from `level` to power 11.
+ *
+ * Exported so callers that talk about a subset of the roster — the stranded
+ * hypercharges on the profile, say — price it from the same economy table as
+ * `coinsToMaxOwned` rather than keeping a second copy of it.
+ */
+export function coinsToMaxFrom(level: number): number {
+  return coinsToReachLevel(MAX_POWER_LEVEL) - coinsToReachLevel(level);
+}
+
 /** Coin prices for unlockable abilities. */
 const STAR_POWER_COINS = 2000;
 const GADGET_COINS = 1000;
