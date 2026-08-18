@@ -190,3 +190,16 @@ export function minutesSince(value: string | Date | null | undefined): number | 
   if (!date) return null;
   return (Date.now() - date.getTime()) / 60_000;
 }
+
+/**
+ * Seconds as `m:ss`, for the survival-mode records the API reports.
+ *
+ * Returns null at zero rather than "0:00": the API uses zero to mean "never
+ * played", and a rendered 0:00 reads as a genuinely terrible run.
+ */
+export function formatDuration(seconds: number | null | undefined): string | null {
+  if (!seconds || seconds <= 0) return null;
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return `${minutes}:${String(rest).padStart(2, '0')}`;
+}

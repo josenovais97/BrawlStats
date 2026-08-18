@@ -9,8 +9,13 @@ import type { TrophyStanding } from '@/types/stats';
 
 interface Props {
   player: BSPlayer;
-  /** Global trophy leaderboard position, when the player is in the top 200. */
-  globalRank: number | null;
+  /**
+   * Global trophy leaderboard position, when the player is in the top 200.
+   * Optional because the board is streamed in: the fallback renders this
+   * section without it, so the rest of the ranking appears immediately and the
+   * rank fills in when the board resolves.
+   */
+  globalRank?: number | null;
   standing: TrophyStanding | null;
 }
 
@@ -21,7 +26,7 @@ interface Props {
  * touched ranked and is not on any leaderboard gets nothing rather than a row
  * of dashes.
  */
-export function PlayerRanked({ player, globalRank, standing }: Props) {
+export function PlayerRanked({ player, globalRank = null, standing }: Props) {
   const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
   if (!hasRanked && globalRank === null && !standing) return null;
 

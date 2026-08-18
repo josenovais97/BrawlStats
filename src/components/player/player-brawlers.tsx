@@ -8,13 +8,27 @@ import { useMemo, useState } from 'react';
 import { TrophyIcon } from '@/components/game-icons';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
+import { TIER_COLOR } from '@/lib/tiers';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
+import type { Tier } from '@/types/stats';
+
+/** How far below its own record a brawler currently sits. Never negative. */
+function peakGap(brawler: BSPlayerBrawler): number {
+  return Math.max(0, brawler.highestTrophies - brawler.trophies);
+}
 
 /** Trimmed artwork metadata — the full brawler payload is far too big to ship. */
 export interface BrawlerMetaLite {
   imageUrl: string;
   rarityColor: string;
   rarityName: string;
+  /**
+   * Standing on the current trophy tier list. Absent when the brawler is below
+   * the sample floor, or when no database is configured — the tile then simply
+   * shows no chip rather than an invented one.
+   */
+  tier?: Tier;
+  metaScore?: number;
 }
 
 interface PlayerBrawlersProps {
@@ -22,10 +36,16 @@ interface PlayerBrawlersProps {
   meta: Record<string, BrawlerMetaLite>;
 }
 
-type SortKey = 'trophies' | 'rank' | 'power' | 'name';
+type SortKey = 'trophies' | 'meta' | 'peak' | 'rank' | 'power' | 'name';
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: 'trophies', label: 'Trophies' },
+  // The reason the tier list exists, applied to the roster: "which of mine are
+  // actually good right now".
+  { key: 'meta', label: 'Meta' },
+  // Sorts by how far below their own peak each brawler sits, which is where a
+  // losing streak or a fresh reset shows up.
+  { key: 'peak', label: 'Off peak' },
   { key: 'rank', label: 'Rank' },
   { key: 'power', label: 'Power' },
   { key: 'name', label: 'Name' },
@@ -49,11 +69,20 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
           return b.power - a.power || b.trophies - a.trophies;
         case 'rank':
           return b.rank - a.rank || b.trophies - a.trophies;
+        case 'meta': {
+          // Unrated brawlers sort last rather than as zero, so "no data" never
+          // reads as "worst in the game".
+          const sa = meta[a.id]?.metaScore ?? -1;
+          const sb = meta[b.id]?.metaScore ?? -1;
+          return sb - sa || b.trophies - a.trophies;
+        }
+        case 'peak':
+          return peakGap(b) - peakGap(a) || b.trophies - a.trophies;
         default:
           return b.trophies - a.trophies;
       }
     });
-  }, [brawlers, query, sort]);
+  }, [brawlers, meta, query, sort]);
 
   return (
     <div>
@@ -110,17 +139,38 @@ function BrawlerTile({
 }) {
   const accent = meta?.rarityColor ?? '#8b95b8';
   const gearCount = brawler.gears?.length ?? 0;
+  const gap = peakGap(brawler);
+  const tier = meta?.tier;
 
   return (
     <Link
       href={`/brawlers/${brawler.id}`}
       className="card card-interactive group relative overflow-hidden p-3"
       style={{ borderColor: `color-mix(in srgb, ${accent} 35%, transparent)` }}
+      title={
+        tier
+          ? `${brawler.name}: ${tier} tier on the trophy list, meta score ${meta?.metaScore?.toFixed(1) ?? '?'}`
+          : `${brawler.name}: not enough sampled battles to rate`
+      }
     >
       <span
         className="absolute inset-x-0 top-0 h-px opacity-70"
         style={{ background: accent }}
       />
+
+      {/* Corner rather than inline: the tile is 96px wide and the chip has to
+          not compete with the power badge or the name. */}
+      {tier ? (
+        <span
+          className="absolute right-2 top-2 z-10 grid size-5 place-items-center rounded text-[0.625rem] font-black"
+          style={{
+            color: TIER_COLOR[tier],
+            background: `color-mix(in srgb, ${TIER_COLOR[tier]} 22%, var(--surface))`,
+          }}
+        >
+          {tier}
+        </span>
+      ) : null}
 
       <div className="relative">
         <Image
@@ -153,6 +203,18 @@ function BrawlerTile({
           {brawler.rank}
         </span>
       </div>
+
+      {/* Only when it is actually off peak. A "−0" under every maxed brawler
+          would be noise on 106 tiles. */}
+      <p className="mt-1 text-center text-[11px] tabular-nums text-muted">
+        {gap > 0 ? (
+          <span title={`Peak ${formatNumber(brawler.highestTrophies)}`}>
+            −{formatNumber(gap)} off peak
+          </span>
+        ) : (
+          <span className="text-victory/80">At peak</span>
+        )}
+      </p>
 
       <div className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted">
         <span title="Star powers">{brawler.starPowers.length} SP</span>

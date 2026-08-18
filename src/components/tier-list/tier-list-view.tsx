@@ -12,14 +12,12 @@ import {
   TIER_COLOR,
   TIER_ORDER,
   TIER_WINDOWS,
-  assignTierFromScore,
   getBrawlerStatsForWindow,
   getFilterableModes,
   getLastAggregationRun,
   getMetaMovers,
   isTierWindow,
-  metaScore,
-  normalizeWinRate,
+  scoreBrawlers,
   type TierFormat,
   type TierWindowKey,
 } from '@/lib/stats';
@@ -108,19 +106,18 @@ export async function TierListView({
     format === 'ranked' ? getMetaMovers(7) : Promise.resolve([]),
   ]);
 
-  const entries: TierListEntry[] = rows.map((row) => {
-    const meta = brawlerMeta.get(row.brawlerId);
-    const normalizedWinRate = normalizeWinRate(
-      row.winRate,
-      row.baselineWinRate,
-      row.decidedSampleSize,
-    );
-    const score = metaScore(normalizedWinRate, row.usageRate, format);
+  // `scoreBrawlers` leaves `tier` null below the sample floor, which is what
+  // splits the page: rated brawlers get a row, the rest get the progress list.
+  const scored = scoreBrawlers(rows, format);
+  const byId = new Map(rows.map((row) => [row.brawlerId, row]));
+
+  const entries: TierListEntry[] = scored.map((entry) => {
+    const meta = brawlerMeta.get(entry.brawlerId);
     return {
-      ...row,
-      normalizedWinRate,
-      metaScore: score,
-      tier: assignTierFromScore(score) ?? 'D',
+      ...byId.get(entry.brawlerId)!,
+      normalizedWinRate: entry.normalizedWinRate,
+      metaScore: entry.metaScore,
+      tier: entry.tier ?? 'D',
       imageUrl: meta?.imageUrl,
       rarityName: meta?.rarity?.name,
       rarityColor: meta?.rarity?.color,
@@ -128,12 +125,11 @@ export async function TierListView({
     };
   });
 
-  // Anything under the sample floor is shown separately rather than ranked on
-  // a win rate that is mostly noise.
-  const isRated = (e: TierListEntry) =>
-    e.normalizedWinRate !== null && e.decidedSampleSize >= MIN_SAMPLE_FOR_TIER;
-  const rated = entries.filter(isRated);
-  const unrated = entries.filter((e) => !isRated(e));
+  const ratedIds = new Set(
+    scored.filter((e) => e.tier !== null).map((e) => e.brawlerId),
+  );
+  const rated = entries.filter((e) => ratedIds.has(e.brawlerId));
+  const unrated = entries.filter((e) => !ratedIds.has(e.brawlerId));
   const sampled = entries.reduce((sum, e) => sum + e.sampleSize, 0);
 
   const Icon = copy.icon;

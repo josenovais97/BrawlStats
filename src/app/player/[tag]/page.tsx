@@ -6,7 +6,9 @@ import { BattleLog } from '@/components/player/battle-log';
 import { LastOnline } from '@/components/player/last-online';
 import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
-import { PlayerStats } from '@/components/player/player-stats';
+import { PlayerMetaFit } from '@/components/player/player-meta-fit';
+import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
+import { PlayerTrophyHistory } from '@/components/player/player-trophy-history';
 import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -20,12 +22,15 @@ import { getBrawlerMap } from '@/lib/brawlapi';
 import { computeProgression, estimatePlaytime } from '@/lib/progression';
 import { toApiError } from '@/lib/errors';
 import {
+  getMetaIndex,
   getPlayerBrawlerPlacements,
   getReleasedBuffieCount,
+  getTrophyHistory,
   getTrophyPercentile,
   recordLookup,
 } from '@/lib/stats';
 import { displayTag, normalizeTag } from '@/lib/tags';
+import type { BSPlayer } from '@/types/brawlstars';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -67,7 +72,15 @@ export default async function PlayerPage({ params }: PageProps) {
 
   // Every successful lookup widens the sampling pool the tier list draws on.
   // `after` runs it once the response is sent, so it never delays the page.
-  after(() => recordLookup(normalizeTag(player.tag), player.name, player.trophies));
+  after(() =>
+    recordLookup({
+      tag: normalizeTag(player.tag),
+      name: player.name,
+      trophies: player.trophies,
+      highestTrophies: player.highestTrophies,
+      brawlerCount: player.brawlers.length,
+    }),
+  );
 
   // Artwork metadata is a separate, keyless source. If it is unavailable the
   // page still renders — brawler cards just fall back to CDN-pattern URLs.
@@ -75,15 +88,11 @@ export default async function PlayerPage({ params }: PageProps) {
   // needs (gears and hypercharges are not in the brawlapi payload).
   const normalizedTag = normalizeTag(player.tag);
 
-  const [brawlerMeta, catalogue, globalRank] = await Promise.all([
+  const [brawlerMeta, catalogue] = await Promise.all([
     getBrawlerMap().catch(() => new Map()),
     getOfficialBrawlers()
       .then((r) => r.items)
       .catch(() => []),
-    // The global board only goes 200 deep, so most players are simply absent.
-    getPlayerRankings('global', 200)
-      .then((r) => r.items.find((p) => normalizeTag(p.tag) === normalizedTag)?.rank ?? null)
-      .catch(() => null),
   ]);
 
   // Database reads run one at a time so the page never needs more than one
@@ -91,6 +100,10 @@ export default async function PlayerPage({ params }: PageProps) {
   const placements = await getPlayerBrawlerPlacements(normalizedTag);
   const standing = await getTrophyPercentile(player.trophies);
   const releasedBuffies = await getReleasedBuffieCount();
+  const trophyHistory = await getTrophyHistory(normalizedTag);
+  // The trophy tier list, joined against this roster below and onto every tile
+  // in the grid. Empty without a database, which every consumer handles.
+  const metaIndex = await getMetaIndex('trophy', 7);
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
@@ -115,8 +128,18 @@ export default async function PlayerPage({ params }: PageProps) {
         iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
       />
       <PlayerStats player={player} />
-      <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
+      <Suspense fallback={<PlayerRanked player={player} standing={standing} />}>
+        <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
+      </Suspense>
+      <PlayerRecords player={player} />
+      <PlayerTrophyHistory points={trophyHistory} />
       <PlayerProgression progression={progression} playtime={playtime} />
+
+      <PlayerMetaFit
+        brawlers={player.brawlers}
+        meta={metaIndex}
+        brawlerMeta={brawlerMeta}
+      />
 
       <Suspense fallback={<InsightsSkeleton />}>
         <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
@@ -139,11 +162,43 @@ export default async function PlayerPage({ params }: PageProps) {
           meta={Object.fromEntries(
             [...brawlerMeta.entries()].map(([id, b]) => [
               id,
-              { imageUrl: b.imageUrl, rarityColor: b.rarity.color, rarityName: b.rarity.name },
+              {
+                imageUrl: b.imageUrl,
+                rarityColor: b.rarity.color,
+                rarityName: b.rarity.name,
+                // `tier` is undefined below the sample floor, which the tile
+                // renders as no chip rather than as a bottom-tier one.
+                tier: metaIndex.get(id)?.tier ?? undefined,
+                metaScore: metaIndex.get(id)?.metaScore ?? undefined,
+              },
             ]),
           )}
         />
       </section>
     </div>
   );
+}
+
+/**
+ * The global top-200 board, streamed rather than blocking the page.
+ *
+ * It resolves to a rank for 200 players worldwide and to null for everyone
+ * else, so awaiting it before first paint made every profile wait on an answer
+ * that is almost always "not on the board". The fallback is the same section
+ * without the rank, so nothing shifts when it arrives.
+ */
+async function RankedWithBoard({
+  player,
+  standing,
+  tag,
+}: {
+  player: BSPlayer;
+  standing: Awaited<ReturnType<typeof getTrophyPercentile>>;
+  tag: string;
+}) {
+  const globalRank = await getPlayerRankings('global', 200)
+    .then((r) => r.items.find((p) => normalizeTag(p.tag) === tag)?.rank ?? null)
+    .catch(() => null);
+
+  return <PlayerRanked player={player} globalRank={globalRank} standing={standing} />;
 }

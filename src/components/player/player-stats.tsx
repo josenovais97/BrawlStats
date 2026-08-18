@@ -1,3 +1,5 @@
+import { Bot, Timer } from 'lucide-react';
+
 import {
   Battle3v3Icon,
   BrawlersIcon,
@@ -6,7 +8,8 @@ import {
   SoloShowdownIcon,
 } from '@/components/game-icons';
 import { StatCard } from '@/components/ui/stat-card';
-import { formatNumber } from '@/lib/format';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { formatDuration, formatNumber } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 
 export function PlayerStats({ player }: { player: BSPlayer }) {
@@ -48,6 +51,45 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
         label="Exp points"
         value={formatNumber(player.expPoints)}
       />
+    </section>
+  );
+}
+
+/**
+ * The two survival records the API reports and nothing on the site showed.
+ *
+ * Their own strip rather than two more cards in the row above: that row is
+ * lifetime counters, these are single best runs, and appending them made a
+ * five-column grid wrap to five-plus-two. Rendered only when at least one is
+ * set — the API reports zero for "never played", which as a time would read as
+ * an impressively bad run rather than as absence.
+ */
+export function PlayerRecords({ player }: { player: BSPlayer }) {
+  const robo = formatDuration(player.bestRoboRumbleTime);
+  const bigBrawler = formatDuration(player.bestTimeAsBigBrawler);
+  if (!robo && !bigBrawler) return null;
+
+  return (
+    <section>
+      <SectionHeading title="Personal bests" aside="Survival modes" />
+      <div className="grid gap-3 sm:grid-cols-2">
+        {robo ? (
+          <StatCard
+            node={<Bot className="size-8 text-accent" />}
+            label="Robo Rumble"
+            value={robo}
+            hint="Longest survival"
+          />
+        ) : null}
+        {bigBrawler ? (
+          <StatCard
+            node={<Timer className="size-8 text-brand" />}
+            label="Big Brawler"
+            value={bigBrawler}
+            hint="Longest time as the Big Brawler"
+          />
+        ) : null}
+      </div>
     </section>
   );
 }

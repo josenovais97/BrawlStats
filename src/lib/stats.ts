@@ -240,15 +240,9 @@ export function assignTier(normalizedWinRate: number | null): Tier | null {
   return TIER_THRESHOLDS.find((t) => normalizedWinRate >= t.minWinRate)?.tier ?? 'D';
 }
 
-export const TIER_ORDER: Tier[] = ['S', 'A', 'B', 'C', 'D'];
-
-export const TIER_COLOR: Record<Tier, string> = {
-  S: '#ff5c72',
-  A: '#ff9f45',
-  B: '#ffc53d',
-  C: '#7ad97a',
-  D: '#7fb3ff',
-};
+// Re-exported so the many server callers keep importing tiers from one place,
+// while `lib/tiers` stays importable from client components.
+export { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 
 function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -678,9 +672,17 @@ export async function getLastAggregationRun(): Promise<AggregationRunSummary | n
  * Records a looked-up tag in the sampling pool. Fire-and-forget: a failure
  * here should never affect the page the visitor asked for.
  */
-export async function recordLookup(tag: string, name?: string, trophies?: number) {
+export async function recordLookup(reading: {
+  tag: string;
+  name?: string;
+  trophies: number;
+  highestTrophies: number;
+  brawlerCount: number;
+}) {
   const prisma = getPrisma();
   if (!prisma) return;
+
+  const { tag, name, trophies, highestTrophies, brawlerCount } = reading;
 
   try {
     await prisma.sampledPlayer.upsert({
@@ -688,8 +690,68 @@ export async function recordLookup(tag: string, name?: string, trophies?: number
       create: { tag, name, trophies, source: 'lookup' },
       update: { name, trophies },
     });
+
+    // The row above is overwritten on every visit, so it can only say "how
+    // many now". This one keeps the history: one point per day, last reading
+    // of the day wins, so a refreshed page cannot write unbounded rows.
+    await prisma.playerTrophyPoint.upsert({
+      where: { playerTag_recordedOn: { playerTag: tag, recordedOn: todayUtcDate() } },
+      create: {
+        playerTag: tag,
+        recordedOn: todayUtcDate(),
+        trophies,
+        highestTrophies,
+        brawlerCount,
+      },
+      update: { trophies, highestTrophies, brawlerCount },
+    });
   } catch {
     // Intentionally silent.
+  }
+}
+
+/** Midnight UTC today, matching the `@db.Date` columns. */
+function todayUtcDate(): Date {
+  return new Date(`${toIsoDate(new Date())}T00:00:00.000Z`);
+}
+
+export interface TrophyPoint {
+  date: string;
+  trophies: number;
+  highestTrophies: number;
+  brawlerCount: number;
+}
+
+/**
+ * A player's recorded trophy history, oldest first.
+ *
+ * Returns fewer than two points far more often than not — the history only
+ * starts the first time a profile is viewed, so a first-time visitor has
+ * exactly one. Callers are expected to render nothing rather than a chart of
+ * one dot.
+ */
+export async function getTrophyHistory(
+  tag: string,
+  days = 90,
+): Promise<TrophyPoint[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = new Date(Date.now() - days * 86_400_000);
+    const rows = await prisma.playerTrophyPoint.findMany({
+      where: { playerTag: tag, recordedOn: { gte: since } },
+      orderBy: { recordedOn: 'asc' },
+    });
+
+    return rows.map((row) => ({
+      date: toIsoDate(row.recordedOn),
+      trophies: row.trophies,
+      highestTrophies: row.highestTrophies,
+      brawlerCount: row.brawlerCount,
+    }));
+  } catch {
+    return [];
   }
 }
 
@@ -1095,6 +1157,69 @@ export async function getBrawlerStatsForWindow(
   } catch {
     return [];
   }
+}
+
+/**
+ * A brawler's standing in one tier list: the scored form of a `BrawlerStatRow`.
+ *
+ * `tier` is null below the sample floor rather than 'D'. The distinction
+ * matters everywhere this is read — "we have not measured this" and "we
+ * measured this and it is bad" are different claims, and collapsing them was
+ * how the old page ended up implying the second about brawlers it had 3
+ * battles for.
+ */
+export interface ScoredBrawler {
+  brawlerId: number;
+  brawlerName: string;
+  normalizedWinRate: number | null;
+  metaScore: number | null;
+  tier: Tier | null;
+  usageRate: number | null;
+  winRate: number | null;
+  baselineWinRate: number | null;
+  decidedSampleSize: number;
+}
+
+/** Applies the scoring pipeline to raw rows. Pure; no artwork, no database. */
+export function scoreBrawlers(
+  rows: BrawlerStatRow[],
+  format: TierFormat,
+): ScoredBrawler[] {
+  return rows.map((row) => {
+    const normalizedWinRate = normalizeWinRate(
+      row.winRate,
+      row.baselineWinRate,
+      row.decidedSampleSize,
+    );
+    const score = metaScore(normalizedWinRate, row.usageRate, format);
+    const rated =
+      normalizedWinRate !== null && row.decidedSampleSize >= MIN_SAMPLE_FOR_TIER;
+
+    return {
+      brawlerId: row.brawlerId,
+      brawlerName: row.brawlerName,
+      normalizedWinRate,
+      metaScore: score,
+      tier: rated ? (assignTierFromScore(score) ?? 'D') : null,
+      usageRate: row.usageRate,
+      winRate: row.winRate,
+      baselineWinRate: row.baselineWinRate,
+      decidedSampleSize: row.decidedSampleSize,
+    };
+  });
+}
+
+/**
+ * The current tier list keyed by brawler id, for pages that need to look up a
+ * few brawlers rather than render the whole ranking — the profile page joining
+ * a player's roster against the meta, mainly.
+ */
+export async function getMetaIndex(
+  format: TierFormat = 'ranked',
+  windowDays = 7,
+): Promise<Map<number, ScoredBrawler>> {
+  const rows = await getBrawlerStatsForWindow(windowDays, undefined, format);
+  return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
 }
 
 /**

@@ -99,6 +99,34 @@ model BattleSample {
   @@map("battle_samples")
 }
 
+/// One trophy reading per player per day, appended whenever a profile is viewed.
+///
+/// `sampled_players.trophies` is overwritten on every lookup, so it can only
+/// ever answer "how many now" — a player who visits weekly leaves no trace of
+/// having moved. This table is the history behind that number.
+///
+/// Keyed by day rather than by lookup on purpose: a profile refreshed forty
+/// times in an afternoon should not write forty rows, and a chart wants one
+/// point per day anyway. The last reading of a day wins, so a row is the
+/// player's standing at the end of that day.
+///
+/// Unlike `player_brawler_snapshots`, which only covers the sampled pool, this
+/// fills in for anyone who is ever looked up.
+model PlayerTrophyPoint {
+  id              Int      @id @default(autoincrement())
+  playerTag       String   @map("player_tag")
+  recordedOn      DateTime @map("recorded_on") @db.Date
+  trophies        Int
+  highestTrophies Int      @map("highest_trophies")
+  /// Brawlers unlocked at the time, so the curve can be read against roster size.
+  brawlerCount    Int      @map("brawler_count")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([playerTag, recordedOn])
+  @@index([playerTag, recordedOn])
+  @@map("player_trophy_points")
+}
+
 /// Daily aggregate the tier list reads. Recomputed by the cron job from the
 /// trailing sampling window, never queried live from the game API.
 model BrawlerStat {
