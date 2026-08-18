@@ -101,13 +101,19 @@ const ELO_FLOOR = 1_000;
 const ELO_CEILING = 11_000;
 
 /**
- * Peak standing counts for more than current.
+ * Ranked is scored on the all-time peak alone.
  *
- * Rank resets between seasons and a strong player mid-reset would otherwise
- * read as weak, but all-time best alone would let a single good run stand
- * forever. Both are used, weighted toward the peak.
+ * Ranked resets roughly every three months and drops everyone to the 750 floor,
+ * so current standing measures how much of *this season* someone has played,
+ * not how good they are. Blending it in produced exactly the wrong answer on
+ * the accounts that matter most: a player with a peak of Pro sitting at Silver
+ * I mid-reset scored 0.72 on this component instead of 1.00, docking a
+ * top-0.1% account more than a point for not having re-climbed yet.
+ *
+ * Reaching a tier is not undone by the calendar, so the peak is the claim and
+ * the current season is left to the Ranked leaderboard, which is where "who is
+ * on top right now" belongs.
  */
-const PEAK_ELO_WEIGHT = 0.65;
 
 /**
  * Average trophies per owned brawler, which is trophy performance with roster
@@ -259,17 +265,17 @@ export function computeSkillScore(player: BSPlayer): SkillScore {
   // when the payload still carries a Bronze I rank name.
   const rankedUnavailable = peakElo === 0 && currentElo === 0;
 
+  // Peak first, current only as a fallback for payloads missing the all-time
+  // name — never blended in. See the note above NO_RANKED_CAP's neighbours.
   const peakRank = rankValue(player.highestAllTimeRankedRankName);
   const currentRank = rankValue(player.rankedRankName);
 
   const rankedValue = rankedUnavailable
     ? 0
-    : peakRank !== null && currentRank !== null
-      ? peakRank * PEAK_ELO_WEIGHT + currentRank * (1 - PEAK_ELO_WEIGHT)
-      : (peakRank ??
-        currentRank ??
-        // No rank name at all: fall back to the elo band.
-        band(Math.max(peakElo, currentElo), ELO_FLOOR, ELO_CEILING));
+    : (peakRank ??
+      currentRank ??
+      // No rank name at all: fall back to the elo band on the peak elo.
+      band(Math.max(peakElo, currentElo), ELO_FLOOR, ELO_CEILING));
 
   /* ----------------------------- trophies ----------------------------- */
 
