@@ -61,21 +61,46 @@ const RANKING_CONCURRENCY = 6;
 const WINDOW_DAYS = 7;
 
 /**
- * Stop seeding once the pool is at least this big.
+ * How big the sampling pool is held at.
  *
  * Deliberately kept near twice the daily sample rate. A battle log only holds
  * a player's most recent ~25 battles, so a pool large enough that each tag is
  * revisited less often than every couple of days starts silently dropping
  * battles between visits. Breadth past that point costs accuracy rather than
  * adding it.
+ *
+ * This is a steady-state size, not a stopping point. An earlier version
+ * returned early once the pool reached it, which froze the pool permanently:
+ * the top-200 seed became a one-off snapshot, nobody new could enter, and
+ * every meta number on the site described the same 800 accounts forever. The
+ * cap is now maintained by eviction instead — see `evictStalePool`.
  */
 const POOL_TARGET = 800;
+
+/**
+ * A pool member producing no battles in this many days is inactive.
+ *
+ * They still cost two API calls per visit and contribute nothing, so they are
+ * the first thing evicted when the pool is over its cap.
+ */
+const INACTIVE_AFTER_DAYS = 14;
+
+/**
+ * Club rosters are only pulled when the pool actually needs filling.
+ *
+ * Refreshing the top-200 costs one call and is what keeps the cohort current;
+ * walking ten club rosters costs eleven more and only widens it. Freshness is
+ * worth paying for every run, breadth is not.
+ */
+const CLUBS_TO_SEED = 10;
 
 export interface AggregationResult {
   playersSampled: number;
   battlesRecorded: number;
   brawlersUpdated: number;
   seeded: number;
+  /** Pool members dropped this run to keep the pool at POOL_TARGET. */
+  evicted: number;
   /** Roster/kit differences detected against yesterday's catalogue snapshot. */
   catalogChanges: number;
   /** Cached brawler-leaderboard rows stored this run. */
@@ -154,53 +179,56 @@ async function mapLimit<T, R>(
  * battle constantly, but it is not a representative sample of the whole
  * player base — see the README.
  */
-export async function seedSamplePool(): Promise<number> {
+export async function seedSamplePool(): Promise<{ seeded: number; ranked: string[] }> {
   const prisma = getPrisma();
-  if (!prisma) return 0;
-
-  const existing = await prisma.sampledPlayer.count();
-  if (existing >= POOL_TARGET) return 0;
+  if (!prisma) return { seeded: 0, ranked: [] };
 
   const candidates = new Map<string, { name?: string; trophies?: number; source: string }>();
+  const ranked: string[] = [];
 
+  // Refreshed on every run, not once. One API call, and it is the whole point
+  // of rotation: the global top 200 changes, and a pool seeded from a frozen
+  // snapshot slowly becomes a list of who used to be good.
   try {
     const topPlayers = await getPlayerRankings('global', 200);
     for (const p of topPlayers.items) {
-      candidates.set(normalizeTag(p.tag), {
-        name: p.name,
-        trophies: p.trophies,
-        source: 'ranking',
-      });
+      const tag = normalizeTag(p.tag);
+      ranked.push(tag);
+      candidates.set(tag, { name: p.name, trophies: p.trophies, source: 'ranking' });
     }
   } catch {
     // Seeding is best-effort; sampling can still proceed with the existing pool.
   }
 
-  // Club rosters widen the pool past the leaderboard's 200-player ceiling.
-  try {
-    const topClubs = await getClubRankings('global', 10);
-    for (const club of topClubs.items) {
-      try {
-        const full = await getClub(normalizeTag(club.tag));
-        for (const member of full.members ?? []) {
-          const tag = normalizeTag(member.tag);
-          if (!candidates.has(tag)) {
-            candidates.set(tag, {
-              name: member.name,
-              trophies: member.trophies,
-              source: 'club',
-            });
+  // Club rosters widen the pool past the leaderboard's 200-player ceiling, and
+  // are only worth their eleven API calls while the pool is short.
+  const existing = await prisma.sampledPlayer.count();
+  if (existing < POOL_TARGET) {
+    try {
+      const topClubs = await getClubRankings('global', CLUBS_TO_SEED);
+      for (const club of topClubs.items) {
+        try {
+          const full = await getClub(normalizeTag(club.tag));
+          for (const member of full.members ?? []) {
+            const tag = normalizeTag(member.tag);
+            if (!candidates.has(tag)) {
+              candidates.set(tag, {
+                name: member.name,
+                trophies: member.trophies,
+                source: 'club',
+              });
+            }
           }
+        } catch {
+          continue;
         }
-      } catch {
-        continue;
       }
+    } catch {
+      // Ignore — the ranking seed above is enough to make progress.
     }
-  } catch {
-    // Ignore — the ranking seed above is enough to make progress.
   }
 
-  if (candidates.size === 0) return 0;
+  if (candidates.size === 0) return { seeded: 0, ranked };
 
   const result = await prisma.sampledPlayer.createMany({
     data: [...candidates.entries()].map(([tag, meta]) => ({
@@ -210,6 +238,66 @@ export async function seedSamplePool(): Promise<number> {
       source: meta.source,
     })),
     skipDuplicates: true,
+  });
+
+  return { seeded: result.count, ranked };
+}
+
+/**
+ * Trims the pool back to POOL_TARGET, dropping the least useful members.
+ *
+ * Only removes the `sampled_players` row. Battle samples, brawler snapshots
+ * and trophy history are all keyed by tag with no foreign key, so an evicted
+ * player keeps every observation already recorded — they simply stop being
+ * re-read. A tag can also come straight back on a later run if it re-enters
+ * the top 200, or the moment anyone looks it up.
+ *
+ * Two groups are never evicted:
+ *
+ * - anyone in the current global top 200, which is the cohort the meta pages
+ *   are explicitly about;
+ * - anyone whose row came from a `lookup`, because a visitor asked for them by
+ *   name and their trophy history only continues while they stay in the pool.
+ *
+ * Everyone else is ordered by whether they have produced a battle recently and
+ * then by trophies, so the first to go are the accounts costing two API calls
+ * a visit and returning nothing.
+ */
+export async function evictStalePool(protectedTags: string[]): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const total = await prisma.sampledPlayer.count();
+  const excess = total - POOL_TARGET;
+  if (excess <= 0) return 0;
+
+  const since = new Date(Date.now() - INACTIVE_AFTER_DAYS * 86_400_000);
+  const activeGroups = await prisma.battleSample.groupBy({
+    by: ['playerTag'],
+    where: { battleTime: { gte: since } },
+    _count: { _all: true },
+  });
+  const active = new Set(activeGroups.map((g) => g.playerTag));
+  const keep = new Set(protectedTags);
+
+  const evictable = await prisma.sampledPlayer.findMany({
+    where: { source: { not: 'lookup' }, tag: { notIn: [...keep] } },
+    select: { tag: true, trophies: true },
+  });
+
+  const ordered = evictable
+    .map((row) => ({ ...row, active: active.has(row.tag) }))
+    .sort((a, b) => {
+      // Inactive first, then the lowest trophies among the rest.
+      if (a.active !== b.active) return a.active ? 1 : -1;
+      return (a.trophies ?? 0) - (b.trophies ?? 0);
+    })
+    .slice(0, excess);
+
+  if (ordered.length === 0) return 0;
+
+  const result = await prisma.sampledPlayer.deleteMany({
+    where: { tag: { in: ordered.map((row) => row.tag) } },
   });
 
   return result.count;
@@ -667,6 +755,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       battlesRecorded: 0,
       brawlersUpdated: 0,
       seeded: 0,
+      evicted: 0,
       catalogChanges: 0,
       rankingsCached: 0,
       buildRowsUpdated: 0,
@@ -685,7 +774,13 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       changes: 0,
     }));
 
-    const seeded = await seedSamplePool();
+    const { seeded, ranked } = await seedSamplePool();
+
+    // Seeding runs every time now, so the pool grows past its cap on any run
+    // where the top 200 has moved. Trimming immediately keeps the revisit
+    // interval — and therefore how many battles are lost between visits —
+    // exactly where POOL_TARGET says it should be.
+    const evicted = await evictStalePool(ranked).catch(() => 0);
 
     // Least-recently-sampled first, so the pool rotates instead of re-reading
     // the same players every day.
@@ -763,6 +858,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       battlesRecorded,
       brawlersUpdated,
       seeded,
+      evicted,
       catalogChanges: catalog.changes,
       rankingsCached,
       buildRowsUpdated,
