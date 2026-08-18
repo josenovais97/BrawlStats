@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { FavoritesList } from '@/components/favorites-list';
@@ -6,6 +7,7 @@ import { HomeCoverage } from '@/components/home/home-coverage';
 import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
+import { HomeProfileDepth } from '@/components/home/home-profile-depth';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeTopBrawlers } from '@/components/home/home-top-brawlers';
 import { HomeValueProps } from '@/components/home/home-value-props';
@@ -14,17 +16,17 @@ import { RankedListSkeleton, Skeleton } from '@/components/ui/skeletons';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'BrawlZone: Brawl Stars stats, tier list and leaderboards',
+  title: 'BrawlZone: Brawl Stars stats, tier lists and leaderboards',
   description:
-    'Look up Brawl Stars player and club stats by tag. Track trophies, rankings and progression, follow the live event rotation, check brawler win rates and browse the global leaderboard.',
+    'Look up any Brawl Stars player by tag for a skill score out of 10, their roster read against the meta and trophy history over time. Separate Ranked and trophy tier lists, a Ranked elo leaderboard the game API does not publish, and the live event rotation.',
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: 'BrawlZone: Brawl Stars stats, tier list and leaderboards',
+    title: 'BrawlZone: Brawl Stars stats, tier lists and leaderboards',
     description:
-      'Brawl Stars player stats, club stats, brawler win rates, live events and global leaderboards, all in one search.',
+      'Skill scores, separate Ranked and trophy tier lists, a Ranked elo leaderboard, live events and player stats — all from one tag.',
   },
 };
 
@@ -70,6 +72,11 @@ export default function HomePage() {
 
       <HomeValueProps />
 
+      {/* Straight after the value props: those say what the site covers, this
+          says what the visitor personally gets, which is the thing that makes
+          them type a tag rather than bounce. */}
+      <HomeProfileDepth />
+
       <HomeSection
         id="live-now"
         eyebrow={
@@ -105,7 +112,19 @@ export default function HomePage() {
           id="top-meta"
           eyebrow="Brawler meta"
           title="Top of the meta"
-          subtitle="Highest win rates right now, adjusted for the sampled player pool."
+          subtitle={
+            <>
+              Highest win rates in competitive Ranked, adjusted for the sampled
+              player pool. The{' '}
+              <Link
+                href="/tier-list/trophy"
+                className="font-medium text-brand hover:underline"
+              >
+                trophy ladder
+              </Link>{' '}
+              is scored separately, and the answers are not the same.
+            </>
+          }
           ctaHref="/tier-list/ranked"
           ctaLabel="Explore the Ranked tier list"
         >
@@ -118,7 +137,19 @@ export default function HomePage() {
           id="top-players"
           eyebrow="Leaderboard"
           title="Top players"
-          subtitle="The highest trophy counts in the world, updated through the day."
+          subtitle={
+            <>
+              The highest trophy counts in the world, updated through the day —
+              plus our own{' '}
+              <Link
+                href="/leaderboard?type=ranked"
+                className="font-medium text-brand hover:underline"
+              >
+                Ranked elo board
+              </Link>
+              , which the game API does not publish at all.
+            </>
+          }
           ctaHref="/leaderboard"
           ctaLabel="View global leaderboard"
         >

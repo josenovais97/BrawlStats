@@ -22,7 +22,7 @@ export function HomeSection({
   id: string;
   eyebrow?: ReactNode;
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   ctaHref: string;
   ctaLabel: string;
   children: ReactNode;

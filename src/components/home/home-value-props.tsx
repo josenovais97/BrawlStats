@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarClock, Podium, Trophy, User } from 'lucide-react';
+import { ArrowRight, CalendarClock, Medal, Podium, User } from 'lucide-react';
 import Link from 'next/link';
 
 /**
@@ -8,35 +8,41 @@ import Link from 'next/link';
  * destinations rather than four identical grey boxes, but the accent is
  * confined to the icon and the hover edge — a fully tinted card would turn
  * this strip into the loudest thing on the page.
+ *
+ * The copy names what is *different* here rather than the category. Every
+ * Brawl Stars site has player stats, a tier list, events and a leaderboard, so
+ * a row of category names tells a first-time visitor nothing about whether to
+ * stay. Each line below points at something this site has that the game API
+ * does not hand out for free.
  */
 const PROPS = [
   {
     href: '/#search',
     icon: User,
     title: 'Player stats',
-    body: 'Trophies, rankings, progression and recent form for any tag.',
+    body: 'Skill score out of 10, your roster read against the meta, and trophy history over time.',
     accent: '#ffc53d',
   },
   {
     href: '/tier-list/ranked',
     icon: Podium,
-    title: 'Brawler meta',
-    body: 'Win rates, pick rates, tier rankings and the builds people run.',
+    title: 'Two tier lists',
+    body: 'Ranked and trophy ladder scored separately — they are different games, and the answers differ.',
     accent: '#ff5c72',
+  },
+  {
+    href: '/leaderboard?type=ranked',
+    icon: Medal,
+    title: 'Ranked elo board',
+    body: 'The game publishes no Ranked leaderboard. This one is built from our own daily samples.',
+    accent: '#8b6bff',
   },
   {
     href: '/events',
     icon: CalendarClock,
     title: 'Live events',
-    body: 'What is in rotation right now, and what comes next.',
+    body: 'What is in rotation right now, with the best brawlers for each map in the Ranked pool.',
     accent: '#35d0ff',
-  },
-  {
-    href: '/leaderboard',
-    icon: Trophy,
-    title: 'Leaderboards',
-    body: 'The best players and clubs, globally and by country.',
-    accent: '#8b6bff',
   },
 ];
 
@@ -46,7 +52,7 @@ export function HomeValueProps() {
       <div className="max-w-2xl">
         <p className="eyebrow">Why BrawlZone</p>
         <h2 id="what-you-get" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
-          Everything you need to track the game
+          Stats the game does not give you
         </h2>
       </div>
 
