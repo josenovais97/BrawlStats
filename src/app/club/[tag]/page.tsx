@@ -28,6 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: `${club.name} (${displayTag(club.tag)})`,
       description: club.description || `${club.name} club stats and member list.`,
+      alternates: { canonical: `/club/${normalizeTag(club.tag)}` },
     };
   } catch {
     return { title: `Club ${displayTag(tag)}` };

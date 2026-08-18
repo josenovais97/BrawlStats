@@ -10,6 +10,7 @@ import { getCatalogChanges } from '@/lib/stats';
 import type { CatalogChangeEntry } from '@/types/stats';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/news' },
   title: 'News',
   description:
     'Official Brawl Stars announcements, plus roster and kit changes detected from the game API.',

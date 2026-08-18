@@ -14,6 +14,7 @@ import type { ModeBestPicks as ModeBestPicksData } from '@/types/stats';
 import type { BSRotationSlot } from '@/types/brawlstars';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/events' },
   title: 'Events',
   description: 'Current and upcoming Brawl Stars event rotation across every mode slot.',
 };

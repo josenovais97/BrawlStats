@@ -46,6 +46,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: `${player.name} (${displayTag(player.tag)})`,
       description: `${player.name} has ${player.trophies.toLocaleString('en-US')} trophies and ${player.brawlers.length} brawlers.`,
+      // Normalised, so #ABC, %23ABC and abc all resolve to one indexable URL
+      // rather than three competing ones.
+      alternates: { canonical: `/player/${normalizeTag(player.tag)}` },
     };
   } catch {
     return { title: `Player ${displayTag(tag)}` };

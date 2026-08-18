@@ -5,6 +5,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { getBrawlers } from '@/lib/brawlapi';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/brawlers' },
   title: 'Brawler database',
   description:
     'Every Brawl Stars brawler with class, rarity, star powers and gadgets.',

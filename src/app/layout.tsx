@@ -5,7 +5,7 @@ import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
 import { InstallPrompt } from '@/components/install-prompt';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { SITE_URL } from '@/lib/site';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 import './globals.css';
 
@@ -33,6 +33,26 @@ export const metadata: Metadata = {
   },
   description:
     'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',
+
+  /** Google Search Console ownership. Rendered as the verification meta tag. */
+  verification: {
+    google: 'MiIdig1YXgfLeQWD89d1Kagjh5w1wiXivuByKgHHHsw',
+  },
+
+  /*
+   * Site-wide social defaults, so a page that sets no `openGraph` of its own
+   * still unfurls as this site rather than as a bare link. Individual pages
+   * override the title and description; only the home page and player profiles
+   * currently override the image.
+   */
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default function RootLayout({

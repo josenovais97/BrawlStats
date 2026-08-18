@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/about' },
   title: 'About',
   description:
     'What Brawl Zone is, where its data comes from, and what it can and cannot tell you.',

@@ -21,6 +21,11 @@ import { isSupportedRegion, regionName } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
 
 export const metadata: Metadata = {
+  // Self-canonical, which is doing real work here: region and board type
+  // are query parameters, so the same page is reachable at well over a
+  // hundred URLs. Without this every one of them competes as a separate
+  // result.
+  alternates: { canonical: '/leaderboard' },
   title: 'Leaderboard',
   description: 'Top Brawl Stars players and clubs by trophies, filterable by region.',
 };

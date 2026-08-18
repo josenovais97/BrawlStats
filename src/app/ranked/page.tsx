@@ -11,6 +11,7 @@ import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/ranked' },
   title: 'Ranked maps',
   description:
     'Best Brawl Stars brawlers for every map in the Ranked rotation, from sampled competitive battles.',
