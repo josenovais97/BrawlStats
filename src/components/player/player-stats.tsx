@@ -1,4 +1,4 @@
-import { Bot, Timer } from 'lucide-react';
+import { Bot, Flame, Medal, Timer } from 'lucide-react';
 
 import {
   Battle3v3Icon,
@@ -6,10 +6,11 @@ import {
   DuoShowdownIcon,
   ExperienceIcon,
   SoloShowdownIcon,
+  TrophyIcon,
 } from '@/components/game-icons';
 import { StatCard } from '@/components/ui/stat-card';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { formatDuration, formatNumber } from '@/lib/format';
+import { formatDuration, formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 
 export function PlayerStats({ player }: { player: BSPlayer }) {
@@ -67,29 +68,74 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
 export function PlayerRecords({ player }: { player: BSPlayer }) {
   const robo = formatDuration(player.bestRoboRumbleTime);
   const bigBrawler = formatDuration(player.bestTimeAsBigBrawler);
-  if (!robo && !bigBrawler) return null;
+
+  // All-time bests hiding in the per-brawler payload. `maxWinStreak` and the
+  // per-brawler `highestTrophies` have always been in the response and were
+  // never shown anywhere — on a long-lived account they are usually the two
+  // most impressive numbers on the page.
+  const bestStreak = player.brawlers.reduce<BSPlayer['brawlers'][number] | null>(
+    (best, b) => ((b.maxWinStreak ?? 0) > (best?.maxWinStreak ?? 0) ? b : best),
+    null,
+  );
+  const bestBrawler = player.brawlers.reduce<BSPlayer['brawlers'][number] | null>(
+    (best, b) => (b.highestTrophies > (best?.highestTrophies ?? 0) ? b : best),
+    null,
+  );
+
+  const cards = [
+    bestBrawler && bestBrawler.highestTrophies > 0 ? (
+      <StatCard
+        key="best-brawler"
+        node={<TrophyIcon className="size-8" />}
+        label="Best brawler"
+        value={formatNumber(bestBrawler.highestTrophies)}
+        hint={titleCaseLabel(bestBrawler.name)}
+      />
+    ) : null,
+    bestStreak && (bestStreak.maxWinStreak ?? 0) > 0 ? (
+      <StatCard
+        key="streak"
+        node={<Flame className="size-8 text-defeat" />}
+        label="Best win streak"
+        value={formatNumber(bestStreak.maxWinStreak ?? 0)}
+        hint={titleCaseLabel(bestStreak.name)}
+      />
+    ) : null,
+    player.totalPrestigeLevel ? (
+      <StatCard
+        key="prestige"
+        node={<Medal className="size-8 text-accent" />}
+        label="Total prestige"
+        value={formatNumber(player.totalPrestigeLevel)}
+        hint="Across every brawler"
+      />
+    ) : null,
+    robo ? (
+      <StatCard
+        key="robo"
+        node={<Bot className="size-8 text-accent" />}
+        label="Robo Rumble"
+        value={robo}
+        hint="Longest survival"
+      />
+    ) : null,
+    bigBrawler ? (
+      <StatCard
+        key="big"
+        node={<Timer className="size-8 text-brand" />}
+        label="Big Brawler"
+        value={bigBrawler}
+        hint="Longest time as the Big Brawler"
+      />
+    ) : null,
+  ].filter(Boolean);
+
+  if (cards.length === 0) return null;
 
   return (
     <section>
-      <SectionHeading title="Personal bests" aside="Survival modes" />
-      <div className="grid gap-3 sm:grid-cols-2">
-        {robo ? (
-          <StatCard
-            node={<Bot className="size-8 text-accent" />}
-            label="Robo Rumble"
-            value={robo}
-            hint="Longest survival"
-          />
-        ) : null}
-        {bigBrawler ? (
-          <StatCard
-            node={<Timer className="size-8 text-brand" />}
-            label="Big Brawler"
-            value={bigBrawler}
-            hint="Longest time as the Big Brawler"
-          />
-        ) : null}
-      </div>
+      <SectionHeading title="Personal bests" aside="All-time" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{cards}</div>
     </section>
   );
 }

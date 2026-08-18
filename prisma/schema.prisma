@@ -24,6 +24,10 @@ model SampledPlayer {
   trophies      Int?
   /// Where the tag came from: "ranking", "club", "lookup".
   source        String    @default("ranking")
+  /// Equipped profile icon, the only cosmetic the player payload reports at
+  /// account level. Recorded so icon popularity can be ranked; null on rows
+  /// written before this was tracked.
+  iconId        Int?      @map("icon_id")
   lastSampledAt DateTime? @map("last_sampled_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 
@@ -56,11 +60,24 @@ model PlayerBrawlerSnapshot {
   buffieStarPower   Boolean @default(false) @map("buffie_star_power")
   buffieHyperCharge Boolean @default(false) @map("buffie_hyper_charge")
 
+  /// The skin equipped on this brawler on this day.
+  ///
+  /// The API reports only what is *equipped*, never what is owned, so a single
+  /// read cannot answer "which skins does this player have". Recording it daily
+  /// turns that into a question the data can answer over time: the union across
+  /// snapshots is skins seen, and the distribution across players is which
+  /// skins people actually use. Null on rows written before this was tracked,
+  /// which can never be backfilled.
+  skinId       Int?     @map("skin_id")
+  skinName     String?  @map("skin_name")
+
   snapshotDate DateTime @map("snapshot_date") @db.Date
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@unique([playerTag, brawlerId, snapshotDate])
   @@index([snapshotDate, brawlerId])
+  /// Drives the skin popularity board.
+  @@index([snapshotDate, skinId])
   @@map("player_brawler_snapshots")
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from 'lucide-react';
+import { Shirt, User } from 'lucide-react';
 
 import { ClubIcon } from '@/components/game-icons';
 import { useRouter } from 'next/navigation';
@@ -8,10 +8,23 @@ import { useTransition } from 'react';
 
 import { RegionPicker } from '@/components/leaderboard/region-picker';
 
+export type LeaderboardBoard = 'players' | 'clubs' | 'cosmetics';
+
 interface LeaderboardControlsProps {
   region: string;
-  board: 'players' | 'clubs';
+  board: LeaderboardBoard;
 }
+
+// Typed structurally rather than as a lucide icon: ClubIcon is one of our own
+// SVG components, not a lucide forwardRef, and the two only agree on this.
+const BOARDS: {
+  key: LeaderboardBoard;
+  icon: (props: { className?: string }) => React.ReactNode;
+}[] = [
+  { key: 'players', icon: User },
+  { key: 'clubs', icon: ClubIcon },
+  { key: 'cosmetics', icon: Shirt },
+];
 
 /**
  * Drives the leaderboard purely through the URL, so the server component above
@@ -38,33 +51,35 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
       }`}
     >
       <div className="flex gap-2">
-        {(['players', 'clubs'] as const).map((type) => {
-          const isClub = type === 'clubs';
-          return (
-            <button
-              key={type}
-              type="button"
-              onClick={() => navigate({ type })}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-colors ${
-                board === type
-                  ? 'bg-brand text-[#1a1200]'
-                  : 'border border-border text-muted hover:text-foreground'
-              }`}
-            >
-              {isClub ? <ClubIcon className="size-4" /> : <User className="size-4" />}
-              {type}
-            </button>
-          );
-        })}
+        {BOARDS.map(({ key, icon: Icon }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => navigate({ type: key })}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-colors ${
+              board === key
+                ? 'bg-brand text-[#1a1200]'
+                : 'border border-border text-muted hover:text-foreground'
+            }`}
+          >
+            <Icon className="size-4" />
+            {key}
+          </button>
+        ))}
       </div>
 
-      <div className="flex flex-1 sm:justify-end">
-        <RegionPicker
-          value={region}
-          onChange={(code) => navigate({ region: code })}
-          disabled={pending}
-        />
-      </div>
+      {/* Hidden on the cosmetics board: it is built from our own sampled pool,
+          which has no region dimension, so the picker would be a control that
+          changes nothing. */}
+      {board === 'cosmetics' ? null : (
+        <div className="flex flex-1 sm:justify-end">
+          <RegionPicker
+            value={region}
+            onChange={(code) => navigate({ region: code })}
+            disabled={pending}
+          />
+        </div>
+      )}
     </div>
   );
 }

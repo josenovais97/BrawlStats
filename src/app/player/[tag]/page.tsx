@@ -8,6 +8,7 @@ import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
+import { PlayerSkillScore } from '@/components/player/player-skill-score';
 import { PlayerTrophyHistory } from '@/components/player/player-trophy-history';
 import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
@@ -20,6 +21,7 @@ import { PlayerRanked } from '@/components/player/player-ranked';
 import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { computeProgression, estimatePlaytime } from '@/lib/progression';
+import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
 import {
   getMetaIndex,
@@ -79,6 +81,7 @@ export default async function PlayerPage({ params }: PageProps) {
       trophies: player.trophies,
       highestTrophies: player.highestTrophies,
       brawlerCount: player.brawlers.length,
+      iconId: player.icon?.id,
     }),
   );
 
@@ -107,6 +110,8 @@ export default async function PlayerPage({ params }: PageProps) {
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
+  // Pure function over the payload we already have — no database, no extra call.
+  const skill = computeSkillScore(player);
 
   return (
     <div className="space-y-8">
@@ -128,6 +133,9 @@ export default async function PlayerPage({ params }: PageProps) {
         iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
       />
       <PlayerStats player={player} />
+      {/* Directly under the headline counters: it is the one number here that
+          is a judgement rather than a readout, so it earns the top slot. */}
+      <PlayerSkillScore skill={skill} />
       <Suspense fallback={<PlayerRanked player={player} standing={standing} />}>
         <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
       </Suspense>

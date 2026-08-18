@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpDown, Search, Star } from 'lucide-react';
+import { ArrowUpDown, Flame, Search, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -36,7 +36,7 @@ interface PlayerBrawlersProps {
   meta: Record<string, BrawlerMetaLite>;
 }
 
-type SortKey = 'trophies' | 'meta' | 'peak' | 'rank' | 'power' | 'name';
+type SortKey = 'trophies' | 'meta' | 'streak' | 'prestige' | 'peak' | 'rank' | 'power' | 'name';
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: 'trophies', label: 'Trophies' },
@@ -46,6 +46,11 @@ const SORTS: { key: SortKey; label: string }[] = [
   // Sorts by how far below their own peak each brawler sits, which is where a
   // losing streak or a fresh reset shows up.
   { key: 'peak', label: 'Off peak' },
+  // Both were in the payload and in our types from the start and had never
+  // been rendered anywhere. A 233-game streak is the most impressive number on
+  // some accounts.
+  { key: 'streak', label: 'Win streak' },
+  { key: 'prestige', label: 'Prestige' },
   { key: 'rank', label: 'Rank' },
   { key: 'power', label: 'Power' },
   { key: 'name', label: 'Name' },
@@ -78,6 +83,10 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
         }
         case 'peak':
           return peakGap(b) - peakGap(a) || b.trophies - a.trophies;
+        case 'streak':
+          return (b.maxWinStreak ?? 0) - (a.maxWinStreak ?? 0) || b.trophies - a.trophies;
+        case 'prestige':
+          return (b.prestigeLevel ?? 0) - (a.prestigeLevel ?? 0) || b.trophies - a.trophies;
         default:
           return b.trophies - a.trophies;
       }
@@ -141,6 +150,9 @@ function BrawlerTile({
   const gearCount = brawler.gears?.length ?? 0;
   const gap = peakGap(brawler);
   const tier = meta?.tier;
+  const prestige = brawler.prestigeLevel ?? 0;
+  const streak = brawler.maxWinStreak ?? 0;
+  const onStreak = brawler.currentWinStreak ?? 0;
 
   return (
     <Link
@@ -187,6 +199,17 @@ function BrawlerTile({
         >
           {brawler.power}
         </span>
+
+        {/* Prestige sits opposite the tier chip. Only past level 0, which is
+            most brawlers on most accounts. */}
+        {prestige > 0 ? (
+          <span
+            className="absolute left-0 top-0 rounded-md bg-surface-3 px-1.5 py-0.5 text-[0.625rem] font-black text-accent"
+            title={`Prestige ${prestige}`}
+          >
+            P{prestige}
+          </span>
+        ) : null}
       </div>
 
       <p className="mt-3 truncate text-center text-sm font-bold capitalize">
@@ -215,6 +238,18 @@ function BrawlerTile({
           <span className="text-victory/80">At peak</span>
         )}
       </p>
+
+      {streak > 0 ? (
+        <p
+          className="mt-0.5 flex items-center justify-center gap-1 text-[11px] tabular-nums text-muted"
+          title={`Best win streak ${streak}${onStreak > 0 ? `, currently on ${onStreak}` : ''}`}
+        >
+          <Flame className={`size-3 ${onStreak > 0 ? 'text-defeat' : 'text-muted'}`} />
+          {/* The live streak leads when there is one — it is the only number on
+              this tile that is true right now rather than ever. */}
+          {onStreak > 0 ? `${onStreak} · best ${streak}` : `best ${streak}`}
+        </p>
+      ) : null}
 
       <div className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted">
         <span title="Star powers">{brawler.starPowers.length} SP</span>

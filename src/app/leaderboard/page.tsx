@@ -4,7 +4,11 @@ import { Shield, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { LeaderboardControls } from '@/components/leaderboard/leaderboard-controls';
+import { CosmeticsBoard } from '@/components/leaderboard/cosmetics-board';
+import {
+  LeaderboardControls,
+  type LeaderboardBoard,
+} from '@/components/leaderboard/leaderboard-controls';
 import { TrophyGains } from '@/components/leaderboard/trophy-gains';
 import { ErrorState } from '@/components/ui/error-state';
 import { TrophyIcon } from '@/components/game-icons';
@@ -22,8 +26,6 @@ export const metadata: Metadata = {
 
 export const revalidate = 120;
 
-type Board = 'players' | 'clubs';
-
 interface PageProps {
   searchParams: Promise<{ region?: string; type?: string }>;
 }
@@ -33,14 +35,17 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
 
   const region =
     params.region && isSupportedRegion(params.region) ? params.region.toLowerCase() : 'global';
-  const board: Board = params.type === 'clubs' ? 'clubs' : 'players';
+  const board: LeaderboardBoard =
+    params.type === 'clubs' || params.type === 'cosmetics' ? params.type : 'players';
 
   return (
     <div className="space-y-10">
       <header>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Leaderboard</h1>
         <p className="mt-2 text-muted">
-          Top {board} by trophies in {regionName(region)}.
+          {board === 'cosmetics'
+            ? 'What the sampled player pool is wearing — built from our own daily samples, not from the game API.'
+            : `Top ${board} by trophies in ${regionName(region)}.`}
         </p>
       </header>
 
@@ -58,11 +63,13 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
         </Suspense>
       ) : null}
 
-      {board === 'players' ? (
-        <PlayerBoard region={region} />
-      ) : (
-        <ClubBoard region={region} />
-      )}
+      {board === 'players' ? <PlayerBoard region={region} /> : null}
+      {board === 'clubs' ? <ClubBoard region={region} /> : null}
+      {board === 'cosmetics' ? (
+        <Suspense fallback={null}>
+          <CosmeticsBoard />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

@@ -678,17 +678,18 @@ export async function recordLookup(reading: {
   trophies: number;
   highestTrophies: number;
   brawlerCount: number;
+  iconId?: number;
 }) {
   const prisma = getPrisma();
   if (!prisma) return;
 
-  const { tag, name, trophies, highestTrophies, brawlerCount } = reading;
+  const { tag, name, trophies, highestTrophies, brawlerCount, iconId } = reading;
 
   try {
     await prisma.sampledPlayer.upsert({
       where: { tag },
-      create: { tag, name, trophies, source: 'lookup' },
-      update: { name, trophies },
+      create: { tag, name, trophies, iconId, source: 'lookup' },
+      update: { name, trophies, iconId },
     });
 
     // The row above is overwritten on every visit, so it can only say "how
@@ -1220,6 +1221,126 @@ export async function getMetaIndex(
 ): Promise<Map<number, ScoredBrawler>> {
   const rows = await getBrawlerStatsForWindow(windowDays, undefined, format);
   return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
+}
+
+/** One cosmetic and how much of the sampled population is wearing it. */
+export interface CosmeticUsage {
+  id: number;
+  name: string;
+  /** For skins: which brawler it belongs to. */
+  brawlerId?: number;
+  brawlerName?: string;
+  /** Sampled slots using it. */
+  users: number;
+  /** Fraction 0-1 of all comparable slots. */
+  share: number;
+}
+
+/**
+ * How many days back a cosmetic reading still counts as current.
+ *
+ * The sampler walks a least-recently-sampled queue, so on any single day it
+ * only reaches part of the pool. One day of snapshots would rank whoever
+ * happened to be sampled this morning.
+ */
+const COSMETIC_WINDOW_DAYS = 14;
+
+/**
+ * The most-worn skins across the sampled population.
+ *
+ * Base skins are excluded from the ranking but *not* from the denominator: a
+ * skin worn by 3% of players is a claim about all players, including the ones
+ * wearing nothing. Dropping the default from both halves would inflate every
+ * share by however many people never bought a skin, which on this dataset is
+ * most of them.
+ *
+ * Counted from each player's most recent snapshot per brawler, so a player who
+ * has been sampled thirty times still contributes one vote per brawler.
+ */
+export async function getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = new Date(Date.now() - COSMETIC_WINDOW_DAYS * 86_400_000);
+
+    const rows = await prisma.$queryRaw<
+      { skin_id: number; skin_name: string; brawler_id: number; brawler_name: string; users: bigint }[]
+    >`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag, brawler_id)
+               player_tag, brawler_id, brawler_name, skin_id, skin_name
+        FROM player_brawler_snapshots
+        WHERE snapshot_date >= ${since} AND skin_id IS NOT NULL
+        ORDER BY player_tag, brawler_id, snapshot_date DESC
+      )
+      SELECT skin_id, skin_name, brawler_id, brawler_name, COUNT(*) AS users
+      FROM latest
+      -- The default skin carries the brawler's own name. Excluded from the
+      -- ranking, still counted in the total below.
+      WHERE upper(regexp_replace(skin_name, '\s+', ' ', 'g')) <> upper(brawler_name)
+      GROUP BY skin_id, skin_name, brawler_id, brawler_name
+      ORDER BY users DESC
+      LIMIT ${limit}
+    `;
+
+    const [{ total }] = await prisma.$queryRaw<{ total: bigint }[]>`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag, brawler_id) player_tag, brawler_id
+        FROM player_brawler_snapshots
+        WHERE snapshot_date >= ${since} AND skin_id IS NOT NULL
+        ORDER BY player_tag, brawler_id, snapshot_date DESC
+      )
+      SELECT COUNT(*) AS total FROM latest
+    `;
+
+    const denominator = Number(total) || 1;
+
+    return rows.map((row) => ({
+      id: row.skin_id,
+      name: row.skin_name.replace(/\s+/g, ' ').trim(),
+      brawlerId: row.brawler_id,
+      brawlerName: row.brawler_name,
+      users: Number(row.users),
+      share: Number(row.users) / denominator,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The most-worn profile icons.
+ *
+ * Simpler than skins: the icon lives on the account rather than per brawler,
+ * and `sampled_players` already holds one row per player, so the latest reading
+ * is just the column. No default to exclude — every account has one.
+ */
+export async function getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const groups = await prisma.sampledPlayer.groupBy({
+      by: ['iconId'],
+      where: { iconId: { not: null } },
+      _count: { _all: true },
+      orderBy: { _count: { iconId: 'desc' } },
+      take: limit,
+    });
+
+    const total = await prisma.sampledPlayer.count({ where: { iconId: { not: null } } });
+    if (total === 0) return [];
+
+    return groups.map((group) => ({
+      id: group.iconId!,
+      name: `Icon #${group.iconId}`,
+      users: group._count._all,
+      share: group._count._all / total,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /**

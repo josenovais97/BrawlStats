@@ -254,6 +254,12 @@ async function samplePlayer(tag: string) {
         buffieGadget: Boolean(b.buffies?.gadget),
         buffieStarPower: Boolean(b.buffies?.starPower),
         buffieHyperCharge: Boolean(b.buffies?.hyperCharge),
+        // Equipped skin, including the default one. Base skins are filtered at
+        // read time rather than dropped here, so the denominator stays honest:
+        // "3% of players use this skin" needs to count the players who use
+        // none.
+        skinId: b.skin?.id ?? null,
+        skinName: b.skin?.name ?? null,
         snapshotDate,
       })),
       skipDuplicates: true,
@@ -305,7 +311,12 @@ async function samplePlayer(tag: string) {
 
   await prisma.sampledPlayer.update({
     where: { tag: normalized },
-    data: { lastSampledAt: new Date(), name: player.name, trophies: player.trophies },
+    data: {
+      lastSampledAt: new Date(),
+      name: player.name,
+      trophies: player.trophies,
+      iconId: player.icon?.id ?? null,
+    },
   });
 
   return { battles: recorded };
