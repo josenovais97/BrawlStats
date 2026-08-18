@@ -18,8 +18,9 @@ import { displayTag } from '@/lib/tags';
  * Said plainly at the top rather than left for someone to work out from a
  * missing name.
  *
- * Ordered on all-time peak: elo resets each season, and a board rebuilt from
- * scratch every reset would sit empty for weeks.
+ * Ordered on the live season standing, the same thing the trophy board does.
+ * All-time peak rides along on each row as context rather than as the sort
+ * key — "who is on top now" is what a leaderboard is for.
  */
 export async function RankedBoard() {
   const { players, pool } = await getRankedLeaderboard(100);
@@ -42,15 +43,15 @@ export async function RankedBoard() {
   return (
     <section>
       <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
-        Ranked by all-time peak elo. The game API publishes no Ranked
-        leaderboard, so this one is built from the {formatNumber(pool)} players
-        we have sampled a Ranked standing for — the top {players.length} of
-        those, not a global board. Looking up a profile adds it to the pool.
+        Current season standing. The game API publishes no Ranked leaderboard,
+        so this one is built from the {formatNumber(pool)} sampled players who
+        have played Ranked this season — the top {players.length} of those, not
+        a global board. Looking up a profile adds it to the pool.
       </p>
 
       <ol className="space-y-1.5">
         {players.map((player, index) => {
-          const tier = player.peakRankName ?? player.rankName;
+          const tier = player.rankName ?? player.peakRankName;
           const badge = rankedLeagueIconUrl(tier);
           return (
             <li key={player.tag}>
@@ -104,13 +105,13 @@ export async function RankedBoard() {
 
                 <span className="w-20 shrink-0 text-right">
                   <span className="block text-sm font-bold tabular-nums text-brand">
-                    {formatNumber(player.peakElo)}
+                    {formatNumber(player.elo)}
                   </span>
-                  {/* Current elo only when it differs, so a player sitting at
-                      their peak does not show the same number twice. */}
-                  {player.elo > 0 && player.elo !== player.peakElo ? (
+                  {/* Peak only when it is actually higher, so a player at their
+                      all-time best does not show the same number twice. */}
+                  {player.peakElo > player.elo ? (
                     <span className="block text-[0.6875rem] tabular-nums text-muted">
-                      now {formatNumber(player.elo)}
+                      peak {formatNumber(player.peakElo)}
                     </span>
                   ) : null}
                 </span>

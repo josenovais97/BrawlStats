@@ -1246,6 +1246,14 @@ export async function getMetaIndex(
   return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
 }
 
+/**
+ * Elo every account is placed at when a Ranked season resets.
+ *
+ * Sitting on it means "has not played this season", not "is ranked last", so
+ * the board excludes it rather than filling up with tied 750s.
+ */
+const RANKED_RESET_ELO = 750;
+
 /** A player's Ranked standing, for the Ranked board. */
 export interface RankedStanding {
   tag: string;
@@ -1259,7 +1267,7 @@ export interface RankedStanding {
 }
 
 /**
- * Top sampled players by peak Ranked elo.
+ * Top sampled players by *current* Ranked elo.
  *
  * There is no upstream equivalent: the game API publishes trophy leaderboards
  * for players, clubs and individual brawlers, but nothing for Ranked. This is
@@ -1267,9 +1275,12 @@ export interface RankedStanding {
  * have seen rather than the world — the page says as much rather than dressing
  * it up as global.
  *
- * Ordered on the all-time peak rather than the current season, because elo
- * resets and a board rebuilt from scratch every season would be empty for
- * weeks at a time.
+ * Ordered on the live season standing, matching what the trophy board does:
+ * a leaderboard answers "who is on top now". The all-time peak is carried
+ * alongside each row rather than used for ordering, because it is context
+ * about the player rather than their current position. The consequence is that
+ * the board thins out just after a season reset, when most of the pool sits at
+ * the 750 floor — which is the same thing the in-game ladder does.
  */
 export async function getRankedLeaderboard(
   limit = 100,
@@ -1279,8 +1290,11 @@ export async function getRankedLeaderboard(
 
   try {
     const rows = await prisma.sampledPlayer.findMany({
-      where: { highestRankedElo: { gt: 0 } },
-      orderBy: [{ highestRankedElo: 'desc' }, { rankedElo: 'desc' }],
+      // The reset floor is 750 and everyone lands there, so it is not a
+      // standing anyone climbed to — requiring more than it keeps the board to
+      // players who have actually played this season.
+      where: { rankedElo: { gt: RANKED_RESET_ELO } },
+      orderBy: [{ rankedElo: 'desc' }, { highestRankedElo: 'desc' }],
       take: limit,
       select: {
         tag: true,
@@ -1296,7 +1310,7 @@ export async function getRankedLeaderboard(
 
     // The pool this ranks, which is not the same as the number of rows shown.
     const pool = await prisma.sampledPlayer.count({
-      where: { highestRankedElo: { gt: 0 } },
+      where: { rankedElo: { gt: RANKED_RESET_ELO } },
     });
 
     return {
