@@ -22,6 +22,7 @@ import {
   normalizeWinRate,
 } from '@/lib/stats';
 import type { BAAccessory } from '@/types/brawlapi';
+import type { BSAccessory } from '@/types/brawlstars';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -82,13 +83,15 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const stat = await getBrawlerStat(brawlerId);
   const build = await getBrawlerBuild(brawlerId);
 
-  // Gear names live only in the official catalogue, not in the artwork source.
-  const gearNames = await getOfficialBrawlers()
-    .then((r) => {
-      const entry = r.items.find((b) => b.id === brawlerId);
-      return new Map((entry?.gears ?? []).map((g) => [g.id, g.name]));
-    })
-    .catch(() => new Map<number, string>());
+  // The official catalogue is the authority on which kit belongs to whom, and
+  // it is also the only place gear names appear.
+  const official = await getOfficialBrawlers()
+    .then((r) => r.items.find((b) => b.id === brawlerId))
+    .catch(() => undefined);
+
+  const gearNames = new Map((official?.gears ?? []).map((g) => [g.id, g.name]));
+  const starPowers = ownedBy(brawler.starPowers, official?.starPowers);
+  const gadgets = ownedBy(brawler.gadgets, official?.gadgets);
   const normalizedWinRate = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
@@ -200,20 +203,24 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
       <section>
         <h2 className="mb-4 text-2xl font-bold tracking-tight">Popular build</h2>
-        <PopularBuild build={build} meta={brawler} gearNames={gearNames} />
+        <PopularBuild
+          build={build}
+          meta={{ ...brawler, starPowers, gadgets }}
+          gearNames={gearNames}
+        />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <AccessoryList
           title="Star powers"
           node={<StarPowerIcon className="size-5" />}
-          items={brawler.starPowers}
+          items={starPowers}
           emptyLabel="No star powers released."
         />
         <AccessoryList
           title="Gadgets"
           node={<GadgetIcon className="size-5" />}
-          items={brawler.gadgets}
+          items={gadgets}
           emptyLabel="No gadgets released."
         />
       </section>
@@ -228,6 +235,19 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       </section>
     </div>
   );
+}
+
+/**
+ * The artwork source occasionally lists an accessory under the wrong brawler
+ * (Bolt carries two of Brock's gadgets), so membership is taken from the
+ * official catalogue and the artwork source only supplies the art. Falls back
+ * to the artwork source when the official entry is missing, which is the case
+ * for limited-time brawlers it never lists.
+ */
+function ownedBy(items: BAAccessory[], official: BSAccessory[] | undefined): BAAccessory[] {
+  if (!official?.length) return items;
+  const allowed = new Set(official.map((a) => a.id));
+  return items.filter((item) => allowed.has(item.id));
 }
 
 function AccessoryList({

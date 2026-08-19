@@ -1,4 +1,5 @@
 import type {
+  BAAccessory,
   BABrawler,
   BABrawlerList,
   BAGameMode,
@@ -35,7 +36,47 @@ async function baFetch<T>(path: string): Promise<T> {
 
 export async function getBrawlers(): Promise<BABrawler[]> {
   const data = await baFetch<BABrawlerList>('/brawlers');
-  return [...data.list].sort((a, b) => a.id - b.id);
+  return [...data.list]
+    .sort((a, b) => a.id - b.id)
+    .map((b) => ({
+      ...b,
+      starPowers: b.starPowers.map((a) => normalizeAccessory(a, starPowerIconUrl)),
+      gadgets: b.gadgets.map((a) => normalizeAccessory(a, gadgetIconUrl)),
+    }));
+}
+
+/**
+ * Accessory descriptions arrive with the game's own markup still in them:
+ * colour tags (`<cFFBB00>…</c>`) and value placeholders (`<!card.value1>`,
+ * `<VALUE>`) that neither upstream API ever resolves to a number — the damage
+ * and duration figures simply are not published anywhere. Rendered raw they
+ * leak engine internals into the page, so colour tags are dropped and the
+ * unresolved numbers become a plain "?".
+ */
+export function sanitizeDescription(text: string): string {
+  return text
+    .replace(/<\/?c[0-9a-fA-F]*>/g, '')
+    .replace(/<![^<>]*>|<VALUE>/gi, '?')
+    // The placeholder often sits in "<!token> %", which now reads "? %".
+    .replace(/\s+%/g, '%')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/**
+ * brawlapi hands out `borderless` artwork URLs, which 404 for every recently
+ * released accessory, so the URL is rebuilt from the id against the variant
+ * that is actually complete.
+ */
+function normalizeAccessory(
+  accessory: BAAccessory,
+  iconUrl: (id: number) => string,
+): BAAccessory {
+  return {
+    ...accessory,
+    imageUrl: iconUrl(accessory.id),
+    description: sanitizeDescription(accessory.description),
+  };
 }
 
 export async function getBrawler(id: number): Promise<BABrawler | undefined> {
@@ -154,14 +195,19 @@ export function prestigeIconUrl(level: number | undefined | null): string | null
   return `https://cdn.brawlify.com/prestiges/regular/${capped}.png`;
 }
 
-/** Star power artwork, by accessory id. */
+/**
+ * Star power artwork, by accessory id.
+ *
+ * `regular` rather than `borderless`: the borderless set stops being published
+ * a few releases back, so newer star powers render as broken images there.
+ */
 export function starPowerIconUrl(id: number): string {
-  return `https://cdn.brawlify.com/star-powers/borderless/${id}.png`;
+  return `https://cdn.brawlify.com/star-powers/regular/${id}.png`;
 }
 
-/** Gadget artwork, by accessory id. */
+/** Gadget artwork, by accessory id. Same `borderless` gap as star powers. */
 export function gadgetIconUrl(id: number): string {
-  return `https://cdn.brawlify.com/gadgets/borderless/${id}.png`;
+  return `https://cdn.brawlify.com/gadgets/regular/${id}.png`;
 }
 
 /** Gear artwork, by gear id. */
