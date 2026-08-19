@@ -13,6 +13,7 @@ import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
 import { COMPETITIVE_BATTLE_TYPES } from '@/lib/stats';
+import { POPULAR_REGION_CODES } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
 import { parseApiDate } from '@/lib/format';
 import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
@@ -44,33 +45,35 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  * against live data, **48% of sampled players came back sitting on the 25-match
  * cap**, meaning everything they played in the gap was gone for good.
  *
- * Sizing: 100 players took ~50s of the ~215s available for sampling (the run
- * budget less the recompute and ranking reserves), so ~0.5s each at
- * CONCURRENCY 2. 350 landed near 175s, and observed runs finished in 53–183s.
+ * Sized to cover the whole pool in one run, which is the point.
  *
- * Raised again to 500 alongside CONCURRENCY, not instead of it: the two have to
- * move together or the batch simply runs past its deadline. At 3 in flight the
- * same per-player cost puts 500 back near 167s, which is where 350 already sat.
- * Overrunning is safe anyway, since sampling stops at the deadline rather than
- * at the batch size.
+ * Measured on live data, the previous cadence was losing battles outright:
+ * across 1,545 visits the average player came back with 24.9 new battles, and
+ * 68% of them were sitting on the log's 25-match ceiling. A player at the
+ * ceiling has played more than we can read, and everything past 25 is gone for
+ * good. Sampling half the pool per run meant a six-hour revisit interval, and
+ * an active account plays through 25 matches well inside that.
+ *
+ * So the batch now matches POOL_TARGET rather than a fraction of it: every
+ * member is read every run, and the revisit interval becomes the gap between
+ * runs instead of a multiple of it. Overrunning is safe either way, since
+ * sampling stops at the deadline rather than at the batch size.
  */
-const DEFAULT_BATCH_SIZE = 500;
+const DEFAULT_BATCH_SIZE = 1000;
 
 /**
- * Concurrent players in flight. Each one issues two API calls at once, so the
- * real request concurrency is double this.
+ * Concurrent players in flight. Each issues two API calls at once, so the real
+ * request concurrency is double this.
  *
- * Still deliberately low — the API throttles aggressively — but 2 was leaving
- * the per-run ceiling as the binding constraint on every downstream number.
- * Vercel's cron allowance caps how *often* a run happens, so the only way to
- * collect more is for one run to do more, and wall-clock was the thing in the
- * way. 3 buys ~40% more players per run at 6 requests in flight rather than 4.
+ * Raised with the batch, because the two only work together: a thousand
+ * players at 3 in flight overruns the sampling budget, and the deadline then
+ * truncates the run, reintroducing the partial coverage this change exists to
+ * remove. At 5 the same thousand lands near 200s, inside the ~215s available.
  *
- * Cheap to walk back if the API starts throttling: `withRetry` already backs
- * off on `rateLimited`, so the failure mode is a slower run rather than lost
- * samples, and a run that overruns just samples fewer players.
+ * `withRetry` still backs off on throttling, so pushing this too far costs a
+ * slower run rather than lost samples.
  */
-const CONCURRENCY = 3;
+const CONCURRENCY = 5;
 
 /** Retries per player when the API throttles or times out. */
 const MAX_RETRIES = 3;
@@ -99,13 +102,15 @@ const WINDOW_DAYS = 7;
  * every meta number on the site described the same 800 accounts forever. The
  * cap is now maintained by eviction instead — see `evictStalePool`.
  *
- * Moved with DEFAULT_BATCH_SIZE so the ratio between them holds: 500 of 1150
- * is the same share of the pool per run as 350 of 800 was, which is what fixes
- * the revisit interval. Growing the pool without growing the batch would slow
- * the rotation and start dropping battles between visits — the exact failure
- * the paragraph above is about.
+ * Held at what one run can actually read, since the batch above is now the
+ * whole pool by design. Growing this past a run's wall clock would quietly
+ * reintroduce the partial coverage that was losing battles.
+ *
+ * Breadth now comes from *which* accounts are in the pool rather than from how
+ * many: see `seedSamplePool`, which draws on regional leaderboards as well as
+ * the global one.
  */
-const POOL_TARGET = 1150;
+const POOL_TARGET = 1000;
 
 /**
  * How long raw observations are kept.
@@ -152,6 +157,17 @@ const INACTIVE_AFTER_DAYS = 14;
  * worth paying for every run, breadth is not.
  */
 const CLUBS_TO_SEED = 10;
+
+/**
+ * Regional leaderboards read per run, and how fast the window advances.
+ *
+ * Six calls a run against the ~4,200 the sampler already makes, covering the
+ * twenty-one highest-population regions in about four runs. Slow rotation is
+ * deliberate: a region's top 200 barely moves hour to hour, so re-reading the
+ * same one repeatedly would add cost without adding accounts.
+ */
+const REGIONS_PER_RUN = 6;
+const REGION_ROTATION_MS = 4 * 3600_000;
 
 export interface AggregationResult {
   playersSampled: number;
@@ -259,6 +275,43 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
     }
   } catch {
     // Seeding is best-effort; sampling can still proceed with the existing pool.
+  }
+
+  /*
+   * Regional leaderboards, a rotating handful per run.
+   *
+   * The global top 200 plus their clubs is a narrow slice: a few hundred of
+   * the highest-trophy accounts in the world, who play a particular way and
+   * favour particular modes. That bias is why per-map and per-mode samples stay
+   * thin for anything they do not touch.
+   *
+   * Every supported country publishes its own top 200, and those lists barely
+   * overlap with the global one or with each other, so each is a few hundred
+   * genuinely different accounts for one API call. Fetching all of them every
+   * run would be 250 calls, so a window rotates: the offset advances with the
+   * clock, and the whole list is covered over a day or so.
+   */
+  const offset = Math.floor(Date.now() / REGION_ROTATION_MS) % POPULAR_REGION_CODES.length;
+  const regions = Array.from(
+    { length: REGIONS_PER_RUN },
+    (_, i) => POPULAR_REGION_CODES[(offset + i) % POPULAR_REGION_CODES.length],
+  );
+
+  for (const region of regions) {
+    try {
+      const board = await getPlayerRankings(region, 200);
+      for (const p of board.items) {
+        const tag = normalizeTag(p.tag);
+        // Never downgrade a global-ranked entry to a regional one; `ranked`
+        // is what eviction protects.
+        if (!candidates.has(tag)) {
+          candidates.set(tag, { name: p.name, trophies: p.trophies, source: 'region' });
+        }
+      }
+    } catch {
+      // One unavailable region costs its own share, never the run.
+      continue;
+    }
   }
 
   // Club rosters widen the pool past the leaderboard's 200-player ceiling, and
@@ -396,7 +449,9 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
       _count: { _all: true },
     }),
   ]);
-  const active = new Set(activeGroups.map((g) => g.playerTag));
+  // Battles produced, not just whether any were: how much a member actually
+  // contributes is what decides whether they earn their two API calls.
+  const produced = new Map(activeGroups.map((g) => [g.playerTag, g._count._all]));
   const competitive = new Set(competitiveGroups.map((g) => g.playerTag));
   const keep = new Set(protectedTags);
 
@@ -408,17 +463,29 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   const ordered = evictable
     .map((row) => ({
       ...row,
-      active: active.has(row.tag),
+      battles: produced.get(row.tag) ?? 0,
       competitive: competitive.has(row.tag),
     }))
     .sort((a, b) => {
-      // Inactive first: an account producing nothing costs two API calls a
+      // Silent accounts first: one producing nothing costs two API calls a
       // visit and returns no data at all.
-      if (a.active !== b.active) return a.active ? 1 : -1;
-      // Then ladder-only before Ranked players, which is what tilts the pool.
+      const aSilent = a.battles === 0;
+      const bSilent = b.battles === 0;
+      if (aSilent !== bSilent) return aSilent ? -1 : 1;
+      // Then ladder-only before Ranked players, which is what tilts the pool
+      // toward the competitive battles every per-map ranking is built from.
       if (a.competitive !== b.competitive) return a.competitive ? 1 : -1;
-      // Lowest trophies among the rest.
-      return (a.trophies ?? 0) - (b.trophies ?? 0);
+      /*
+       * Then fewest battles produced, rather than fewest trophies.
+       *
+       * Trophies were the wrong tiebreaker and actively worked against the
+       * pool: regional leaderboard entries sit far below the global top 200,
+       * so ranking on trophies evicted every regionally-seeded account almost
+       * as fast as seeding added it, and the pool converged back onto the same
+       * few hundred high-trophy players. What the pool is for is battles, so
+       * that is what decides who stays.
+       */
+      return a.battles - b.battles;
     })
     .slice(0, excess);
 
