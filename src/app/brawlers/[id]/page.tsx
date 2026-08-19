@@ -136,9 +136,6 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const hyperCharges = official?.hyperCharges ?? [];
   const buffies = await getBrawlerBuffies(brawlerId);
   const hyperChargeOwnership = await getHyperChargeOwnership(brawlerId);
-  const hasBuffies =
-    buffies !== null &&
-    (buffies.gadget > 0 || buffies.starPower > 0 || buffies.hyperCharge > 0);
 
   // Where the brawler is strong, how it has moved, and who it beats. All three
   // degrade to empty on their own, so a missing database costs sections rather
@@ -503,55 +500,55 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                     <BuffieIcon className="size-6" />
                     Buffies
                   </h2>
-                  <div className="card p-4">
-                    {hasBuffies ? (
-                      <>
-                        <ul className="space-y-3">
-                          {(
-                            [
-                              ['Gadget buffie', buffies.gadget],
-                              ['Star power buffie', buffies.starPower],
-                              ['Hypercharge buffie', buffies.hyperCharge],
-                            ] as const
-                          ).map(([label, share]) => (
-                            <li key={label}>
-                              <div className="flex items-baseline justify-between gap-2 text-sm">
-                                <span className="font-medium">{label}</span>
-                                <span className="font-bold tabular-nums">
-                                  {formatPercent(share)}
-                                </span>
-                              </div>
-                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
-                                <div
-                                  className="h-full rounded-full"
-                                  style={{
-                                    width: `${Math.round(share * 100)}%`,
-                                    background: accent,
-                                  }}
-                                />
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                        <p className="mt-4 text-xs leading-relaxed text-muted">
-                          Share of the {formatNumber(buffies.owners)} sampled players who
-                          own {name} and have each buffie unlocked. A buffie strengthens
-                          the ability it belongs to; the game API reports only whether a
-                          player has one, never what it does, so there is nothing more to
-                          show than this.
-                        </p>
-                      </>
-                    ) : (
-                      /* Zero across thousands of owners is a fact about the
-                         brawler, not missing data: buffies release per brawler. */
-                      <p className="text-sm leading-relaxed text-muted">
-                        No buffies released for {name} yet. None of the{' '}
-                        {formatNumber(buffies.owners)} sampled players who own{' '}
-                        {name.toLowerCase()} has one, which is what an unreleased buffie
-                        looks like — they are rolled out brawler by brawler.
+
+                  {/*
+                    Existence, not adoption. A buffie is binary and permanent —
+                    nothing to choose between, nothing to equip — so an
+                    ownership percentage measures how long it has been out, not
+                    anything about the brawler. The only question worth asking
+                    of this data is whether one exists yet.
+                  */}
+                  {buffies.none ? (
+                    <p className="card px-4 py-3 text-sm text-muted">
+                      <span className="font-semibold text-foreground">Unreleased.</span>{' '}
+                      {name} has no buffies yet.
+                    </p>
+                  ) : (
+                    <>
+                      <ul className="card divide-y divide-border overflow-hidden">
+                        {(
+                          [
+                            ['Gadget', buffies.gadget],
+                            ['Star power', buffies.starPower],
+                            ['Hypercharge', buffies.hyperCharge],
+                          ] as const
+                        ).map(([label, released]) => (
+                          <li
+                            key={label}
+                            className="flex items-center justify-between gap-3 px-4 py-2.5"
+                          >
+                            <span className="text-sm font-medium">{label} buffie</span>
+                            <span
+                              className={`shrink-0 rounded-md px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide ${
+                                released
+                                  ? 'bg-victory/15 text-victory'
+                                  : 'bg-surface-2 text-muted'
+                              }`}
+                            >
+                              {released ? 'Released' : 'Unreleased'}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-xs leading-relaxed text-muted">
+                        A buffie strengthens the ability it belongs to. What each one
+                        actually does is not published anywhere — the official brawler
+                        catalogue does not list buffies at all, and they appear only as
+                        three flags on a player&rsquo;s own brawler — so which exist is
+                        as far as this can go.
                       </p>
-                    )}
-                  </div>
+                    </>
+                  )}
                 </div>
               ) : null}
             </div>

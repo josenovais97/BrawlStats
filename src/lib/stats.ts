@@ -1495,26 +1495,43 @@ export async function getFilterableModes(
 /* --------------------------------- buffies -------------------------------- */
 
 /**
- * How many sampled owners of a brawler have each of its buffies unlocked.
+ * Which of a brawler's three buffies exist, derived from who owns them.
  *
- * Buffies are the one part of a loadout the catalogue says nothing about: the
- * official API reports them as three booleans on a *player's* brawler and
- * publishes no list of what any of them does, and the artwork mirror does not
- * carry them at all. So there is no way to describe a buffie — but there is a
- * way to say whether one exists and how far it has spread, because that falls
- * straight out of the snapshots the popular-build percentages already use.
+ * Buffies are the one part of a loadout nothing describes. The official
+ * catalogue does not list them at all — they appear only as three booleans on
+ * a *player's* brawler — and there is no buffie endpoint on the artwork mirror
+ * either. So what a buffie does cannot be shown; whether one exists can, and
+ * that falls straight out of the snapshots the popular-build percentages
+ * already use.
  *
- * A flat zero is meaningful here rather than missing data: buffies are released
- * per brawler, so 0% across thousands of owners means this brawler has none yet.
+ * Reported as existence rather than as a percentage, deliberately. A buffie is
+ * binary and permanent — there is nothing to choose between and nothing to
+ * equip — so an ownership share says something about how long the buffie has
+ * been out and nothing at all about the brawler. The only question the data can
+ * answer is "does this exist yet", so that is the only question it is asked.
  */
 export interface BrawlerBuffies {
   /** Sampled players who own this brawler. */
   owners: number;
-  /** 0–1 share of those owners with the buffie unlocked. */
-  gadget: number;
-  starPower: number;
-  hyperCharge: number;
+  gadget: boolean;
+  starPower: boolean;
+  hyperCharge: boolean;
+  /** True when none of the three has been released for this brawler. */
+  none: boolean;
 }
+
+/**
+ * Share of owners that has to hold a buffie before it counts as released.
+ *
+ * Not zero: one stray row — a mis-sampled account, a mid-write snapshot —
+ * should not flip a brawler to "released". The real distribution is nowhere
+ * near this line: measured across the pool, a released buffie sits around
+ * 65–90% of owners and an unreleased one at a flat 0%.
+ */
+const BUFFIE_RELEASED_SHARE = 0.02;
+
+/** Below this many owners the sample cannot say either way. */
+const MIN_OWNERS_FOR_BUFFIES = 50;
 
 export async function getBrawlerBuffies(
   brawlerId: number,
@@ -1547,13 +1564,21 @@ export async function getBrawlerBuffies(
     `;
 
     const owners = Number(rows[0]?.owners ?? 0);
-    if (owners === 0) return null;
+    if (owners < MIN_OWNERS_FOR_BUFFIES) return null;
+
+    const released = (count: bigint | undefined) =>
+      Number(count ?? 0) / owners >= BUFFIE_RELEASED_SHARE;
+
+    const gadget = released(rows[0].gadget);
+    const starPower = released(rows[0].star_power);
+    const hyperCharge = released(rows[0].hyper_charge);
 
     return {
       owners,
-      gadget: Number(rows[0].gadget) / owners,
-      starPower: Number(rows[0].star_power) / owners,
-      hyperCharge: Number(rows[0].hyper_charge) / owners,
+      gadget,
+      starPower,
+      hyperCharge,
+      none: !gadget && !starPower && !hyperCharge,
     };
   } catch {
     return null;
@@ -1567,8 +1592,12 @@ export async function getBrawlerBuffies(
  * are genuinely different and only one of them is a fact: hypercharge
  * ownership started being recorded later than the rest of the loadout, so a
  * flat zero usually means "measured before we tracked it", not "nobody owns
- * it". Guarding on that is what keeps a brand-new column from printing 0% on
+ * it". Guarding on that is what keeps a newly added column from printing 0% on
  * every brawler for a day.
+ *
+ * Unlike a buffie, this one is worth a percentage: a hypercharge is bought and
+ * plenty of owners have not, so the share says something about the brawler's
+ * investment curve rather than about how long the feature has existed.
  */
 export async function getHyperChargeOwnership(
   brawlerId: number,
