@@ -1,0 +1,62 @@
+# Sampling schedule.
+#
+# Vercel's scheduler is not reliable for this project: the Hobby plan permits
+# two cron jobs triggered once a day, and the four declared in vercel.json
+# stopped firing entirely (logs show no vercel-cron requests at the scheduled
+# times). One run a day is not enough. A Brawl Stars battle log holds only a
+# player's last ~25 matches, and measured across 1,545 visits, 68% of sampled
+# players already come back sitting on that ceiling. Everything past it is lost
+# for good, so the gap between runs is the gap in the data.
+#
+# GitHub Actions costs nothing here: the job is a single HTTP request that
+# finishes in seconds, well inside the free minutes even on a private repo, and
+# it has no cron-count limit. The vercel.json entries stay as a fallback, so a
+# failure here degrades to Vercel's schedule rather than to nothing.
+name: Refresh stats
+
+on:
+  schedule:
+    # Every three hours. The sampler reads the whole pool in one run, so this
+    # is also the revisit interval for every tracked player.
+    - cron: '0 */3 * * *'
+  # Manual trigger, for testing a change without waiting for the schedule.
+  workflow_dispatch:
+
+# Two runs overlapping would double the upstream call rate for no extra data,
+# since the second would re-read players the first is already walking.
+concurrency:
+  group: refresh-stats
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    # The endpoint self-limits to a 270s budget; this only guards a hang.
+    timeout-minutes: 10
+    steps:
+      - name: Trigger sampling run
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET is not set in this repository's Actions secrets."
+            exit 1
+          fi
+
+          # --max-time is above the endpoint's own budget so a slow run is
+          # reported by the endpoint rather than cut off mid-write here.
+          status=$(curl -sS -o /tmp/body -w '%{http_code}' \
+            --max-time 300 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            https://brawlzone.vercel.app/api/cron/refresh-stats)
+
+          echo "HTTP $status"
+          cat /tmp/body
+          echo
+
+          # A non-2xx is a real failure worth a red run: silent sampling
+          # failures are how the data quietly goes stale.
+          case "$status" in
+            2*) exit 0 ;;
+            *)  echo "::error::Sampling run failed with HTTP $status"; exit 1 ;;
+          esac
