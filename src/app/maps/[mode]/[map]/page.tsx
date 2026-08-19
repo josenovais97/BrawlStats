@@ -9,10 +9,11 @@ import { MapPreview } from '@/components/ranked/map-preview';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent, minutesSince } from '@/lib/format';
 import { getActiveMaps, resolveMap } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
 import {
+  MAP_ROTATION_GRACE_DAYS,
   RANKED_MAP_WINDOW_DAYS,
   getBestPicksByMode,
   getRankedMapPicks,
@@ -82,7 +83,13 @@ export default async function MapPage({ params }: PageProps) {
         .catch(() => null)
     : null;
 
-  const hasMapPicks = (mapPicks?.picks.length ?? 0) > 0;
+  // A map can be inside the sampling window without being in the current
+  // Ranked season's pool. Its old numbers are real but describe a map nobody
+  // can queue for, so the page says that rather than ranking on them.
+  const sinceLastSeen = minutesSince(mapPicks?.lastSeen);
+  const inRotation =
+    sinceLastSeen !== null && sinceLastSeen < MAP_ROTATION_GRACE_DAYS * 24 * 60;
+  const hasMapPicks = inRotation && (mapPicks?.picks.length ?? 0) > 0;
   const siblings = await getActiveMaps()
     .then((all) =>
       all.filter((m) => m.modeSlug === entry.modeSlug && m.mapSlug !== entry.mapSlug),
@@ -94,7 +101,9 @@ export default async function MapPage({ params }: PageProps) {
       question: `What are the best brawlers on ${entry.map.name}?`,
       answer: hasMapPicks
         ? `${listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName)))} ${mapPicks!.picks.length === 1 ? 'has the strongest adjusted win rate' : 'have the strongest adjusted win rates'} on ${entry.map.name}, from ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on the map.`
-        : `${entry.map.name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in ${modeLabel} overall are the best available answer until it fills in.`,
+        : mapPicks && !inRotation
+          ? `${entry.map.name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in ${modeLabel} overall are the best available answer while it is out.`
+          : `${entry.map.name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in ${modeLabel} overall are the best available answer until it fills in.`,
     },
     {
       question: `What game mode is ${entry.map.name}?`,
@@ -179,7 +188,9 @@ export default async function MapPage({ params }: PageProps) {
           subtitle={
             hasMapPicks
               ? `From ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.`
-              : `${entry.map.name} has too few sampled battles to rank on its own yet, so these are ${modeLabel} picks across every map in the mode.`
+              : mapPicks && !inRotation
+                ? `${entry.map.name} is not in the current Ranked rotation, so these are ${modeLabel} picks across every map in the mode instead.`
+                : `${entry.map.name} has too few sampled battles to rank on its own yet, so these are ${modeLabel} picks across every map in the mode.`
           }
           aside={
             hasMapPicks ? (

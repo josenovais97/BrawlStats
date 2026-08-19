@@ -223,4 +223,13 @@ export interface RankedMapPicks {
   confidence: MapConfidence;
   /** Distinct brawlers with at least one decided battle sampled here. */
   brawlersSeen: number;
+  /**
+   * ISO timestamp of the newest sampled battle on this map.
+   *
+   * The window a map's numbers are computed over is longer than the Ranked
+   * season, so this is what separates "in rotation" from "still inside the
+   * window": the board drops anything not played recently, and a map page can
+   * say which of the two an empty ranking is.
+   */
+  lastSeen: string;
 }

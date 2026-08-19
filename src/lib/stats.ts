@@ -1983,6 +1983,22 @@ const MIN_SAMPLE_FOR_MAP = 20;
 export const RANKED_MAP_WINDOW_DAYS = 21;
 
 /**
+ * How recently a map must have been played to count as in rotation.
+ *
+ * The window above is three weeks, but the Ranked map pool is set per season
+ * and does change — so a window that deep can outlive a rotation and leave
+ * retired maps sitting on the board with numbers nobody can act on. This is
+ * the guard: depth of evidence from the full window, membership from the last
+ * few days only.
+ *
+ * Four days rather than one, because it has to survive a quiet sampling day.
+ * The pool is only sampled a few hundred players at a time and a map with a
+ * thin slot can genuinely go a day without appearing; dropping it for that
+ * would flicker the board.
+ */
+export const MAP_ROTATION_GRACE_DAYS = 4;
+
+/**
  * Strength of the map-level prior, in pseudo-battles.
  *
  * Deliberately large relative to the four-to-nine battles a brawler actually
@@ -2074,6 +2090,9 @@ export async function getRankedMapPicks(
           ...(only?.mode ? { mode: only.mode } : {}),
         },
         _count: { _all: true },
+        // Newest battle per group, folded up per map below: this is what says
+        // whether the map is still in the rotation or just still in the window.
+        _max: { battleTime: true },
       }),
     ]);
 
@@ -2098,6 +2117,7 @@ export async function getRankedMapPicks(
 
     if (sampleDecided === 0) return [];
     const baseline = sampleWins / sampleDecided;
+    const rotationCutoff = Date.now() - MAP_ROTATION_GRACE_DAYS * 86_400_000;
 
     /** The brawler's overall ranked form, shrunk toward the sample baseline. */
     function priorFor(brawlerId: number): { rate: number; decided: number } {
@@ -2115,6 +2135,8 @@ export async function getRankedMapPicks(
       mapName: string;
       eventId: number | null;
       mode: string;
+      /** Newest sampled battle on this map, for the rotation check. */
+      lastSeen: number;
       brawlers: Map<number, Acc>;
     };
     const byMap = new Map<string, MapAcc>();
@@ -2128,8 +2150,11 @@ export async function getRankedMapPicks(
           mapName: g.mapName,
           eventId: g.eventId,
           mode: g.mode,
+          lastSeen: 0,
           brawlers: new Map<number, Acc>(),
         };
+      const seen = g._max.battleTime?.getTime() ?? 0;
+      if (seen > entry.lastSeen) entry.lastSeen = seen;
       // Artwork is keyed on the event id, so never let a null row overwrite a
       // real one just because it was grouped first.
       if (entry.eventId === null && g.eventId !== null) entry.eventId = g.eventId;
@@ -2163,6 +2188,12 @@ export async function getRankedMapPicks(
         mapTotal += acc.total;
       }
       if (!only && mapDecided < MIN_SAMPLE_FOR_MAP) continue;
+      // Out of rotation: its numbers are real but they describe a map nobody
+      // can queue for, which is worse than showing nothing. Dropped from the
+      // board; a single-map request still gets the row, so the map's own page
+      // can say *why* it has no current ranking rather than implying the
+      // sample is thin.
+      if (!only && entry.lastSeen < rotationCutoff) continue;
 
       const picks: RankedMapPick[] = [...entry.brawlers]
         .filter(([, acc]) => acc.decided >= MIN_SAMPLE_FOR_MAP_PICK)
@@ -2199,6 +2230,7 @@ export async function getRankedMapPicks(
         mapWinRate: mapDecided > 0 ? mapWins / mapDecided : 0,
         confidence: mapConfidence(mapDecided),
         brawlersSeen: entry.brawlers.size,
+        lastSeen: new Date(entry.lastSeen).toISOString(),
       });
     }
 
