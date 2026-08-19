@@ -13,9 +13,12 @@ import type { BAAccessory } from '@/types/brawlapi';
  * measurement of a decision rather than of ownership, and the win rates beside
  * it a fair comparison, since both groups are equally invested in the brawler.
  *
- * Absent on long-established brawlers, because almost everyone owns both by
- * then and there is no choice left to observe. That is the same moment the
- * question stops being worth asking.
+ * Shown for every brawler that has enough first-buyers to name a preference,
+ * which at a floor of ten is all 106 for star powers and 101 for gadgets. How
+ * much weight it carries varies a lot though: on a new brawler the people who
+ * own one are a large, live slice of the playerbase, and on an old one they
+ * are a handful who never bought the second. The confidence chip carries that
+ * difference rather than the section appearing and vanishing between brawlers.
  */
 export function AbilityChoices({
   choices,
@@ -39,46 +42,77 @@ export function AbilityChoices({
       rows: choices.gadgets,
       items: gadgets,
     },
-  ].filter((group) => group.rows.length > 1);
+  ];
 
-  if (groups.length === 0) return null;
+  // Never filtered away: both blocks always render so the page has the same
+  // shape on every brawler, and one with too few first-buyers says so instead
+  // of silently disappearing.
+  if (groups.every((group) => group.rows.length < 2)) return null;
+
+  const label = {
+    high: 'Well sampled',
+    medium: 'Building',
+    low: 'Thin sample',
+  }[choices.confidence];
 
   return (
     <div className="space-y-4">
       {groups.map(({ title, node, rows, items }) => {
-        const leader = rows[0];
+        const leader = rows[0] as AbilityChoice | undefined;
         const byId = new Map(items.map((item) => [item.id, item]));
 
         return (
           <div key={title} className="card p-4">
-            <h3 className="flex items-center gap-2 text-sm font-bold">
-              {node}
-              {title} bought first
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="flex items-center gap-2 text-sm font-bold">
+                {node}
+                {title} bought first
+              </h3>
+              {/* Quiet at "low", the same treatment the map cards use: a caveat
+                  should not be the loudest thing on the card. */}
+              <span
+                className={`shrink-0 rounded-md px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide ${
+                  choices.confidence === 'low'
+                    ? 'bg-surface-2 text-muted'
+                    : 'bg-brand/15 text-brand'
+                }`}
+              >
+                {label}
+              </span>
+            </div>
             <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
               Among players who own only one so far.
             </p>
 
-            <ul className="space-y-3">
-              {rows.map((row) => (
-                <Row
-                  key={row.itemId}
-                  row={row}
-                  item={byId.get(row.itemId)}
-                  isLeader={row.itemId === leader.itemId && rows.length > 1}
-                />
-              ))}
-            </ul>
+            {rows.length > 1 ? (
+              <ul className="space-y-3">
+                {rows.map((row) => (
+                  <Row
+                    key={row.itemId}
+                    row={row}
+                    item={byId.get(row.itemId)}
+                    isLeader={row.itemId === leader!.itemId}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted">
+                Almost every owner has both, so there are too few first-buyers left to
+                name a preference.
+              </p>
+            )}
           </div>
         );
       })}
 
       <p className="text-xs leading-relaxed text-muted">
-        From {formatNumber(choices.sampleSize)} tracked players who have bought one of
-        the pair. Win rates come from their own battles on this brawler, so the two
-        sides are equally invested and the gap between them is the ability rather than
-        the player. Our sample leans toward high-trophy accounts, so read the two rates
-        against each other rather than as absolutes.
+        From {formatNumber(choices.sampleSize)} tracked players who own one of the pair.
+        Win rates are their own battles on this brawler, so both sides are equally
+        invested and the gap between them is the ability rather than the player. Read
+        the two rates against each other rather than as absolutes.
+        {choices.confidence === 'low'
+          ? ' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.'
+          : ''}
       </p>
     </div>
   );

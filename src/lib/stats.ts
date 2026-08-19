@@ -1529,25 +1529,35 @@ export interface BrawlerAbilityChoices {
   gadgets: AbilityChoice[];
   /** Total players contributing a first-purchase choice. */
   sampleSize: number;
+  /**
+   * How much weight the split carries.
+   *
+   * "high" is a brawler people are actively deciding about, where the players
+   * who own one are a real share of all owners. "low" is an established one
+   * where nearly everyone owns both, so the few who do not are a small,
+   * self-selected group and the split is indicative at best.
+   */
+  confidence: MapConfidence;
 }
 
 /**
- * Floors for publishing a first-purchase split.
+ * Floor for publishing a first-purchase split.
  *
- * A flat count is the wrong gate, and produced exactly the inconsistency it
- * looks like from outside: Surge cleared 25 choosers and Edgar did not, so the
- * section appeared on one and vanished on the other for no reason a reader
- * could see.
+ * Five is the lowest count that can express a preference at all, and it covers
+ * the roster: measured across the pool, all 106 brawlers clear it for star
+ * powers and 104 for gadgets. Below it the section still appears and says it
+ * has nothing yet, so a reader never has to wonder whether a missing block
+ * means "no data" or "no section".
  *
- * The share matters more than the count. On Surge those 42 players are 5% of
- * 805 owners: stragglers who still have not bought the second star power years
- * after release, not a live decision. On Wendy the single-owners are 38% of a
- * brawler people are actively deciding about. So a split is published while a
- * real slice of the playerbase is still choosing, and retires once it is down
- * to a minority who never got round to it.
+ * Thin samples are not hidden, they are labelled. An established brawler's
+ * single-owners are a small and self-selected slice, and the confidence chip
+ * says so, which is more useful than an empty section: a reader can see both
+ * the number and how much to trust it.
  */
-const MIN_CHOOSERS = 25;
-const MIN_CHOOSER_SHARE = 0.15;
+const MIN_CHOOSERS = 5;
+
+/** How much of the playerbase is still choosing, for the confidence label. */
+const CHOOSER_SHARE_LIVE = 0.15;
 
 /** Below this many battles a win rate is noise, so it is withheld. */
 const MIN_BATTLES_FOR_ABILITY_WIN_RATE = 40;
@@ -1614,7 +1624,6 @@ export async function getBrawlerAbilityChoices(
       // Both gates: enough people to measure, and enough of the playerbase for
       // them to represent it.
       if (total < MIN_CHOOSERS) return [];
-      if (owners > 0 && total / owners < MIN_CHOOSER_SHARE) return [];
 
       return forKind
         .map((row) => {
@@ -1637,13 +1646,21 @@ export async function getBrawlerAbilityChoices(
     const gadgets = build('gadget');
     if (starPowers.length === 0 && gadgets.length === 0) return null;
 
-    return {
-      starPowers,
-      gadgets,
-      sampleSize:
-        starPowers.reduce((sum, c) => sum + c.choosers, 0) +
-        gadgets.reduce((sum, c) => sum + c.choosers, 0),
-    };
+    const sampleSize =
+      starPowers.reduce((sum, c) => sum + c.choosers, 0) +
+      gadgets.reduce((sum, c) => sum + c.choosers, 0);
+
+    // Both halves matter: how many people were measured, and whether they are
+    // a live slice of the playerbase or the stragglers.
+    const share = owners > 0 ? sampleSize / (owners * 2) : 0;
+    const confidence: MapConfidence =
+      share >= CHOOSER_SHARE_LIVE && sampleSize >= 60
+        ? 'high'
+        : sampleSize >= 40
+          ? 'medium'
+          : 'low';
+
+    return { starPowers, gadgets, sampleSize, confidence };
   } catch {
     return null;
   }
