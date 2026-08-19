@@ -8,7 +8,7 @@ import { SeasonPanel } from '@/components/ranked/season-panel';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
-import { getSeasonState } from '@/lib/ranked-seasons';
+import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
 import { slugify } from '@/lib/slugs';
 import { getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
@@ -36,7 +36,16 @@ export default async function RankedPage() {
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     getBrawlerMap().catch(() => new Map<number, BABrawler>()),
-    getSeasonState().catch(() => ({ current: null, next: null, daysUntilNext: null })),
+    getSeasonState().catch(
+      (): SeasonState => ({
+        current: null,
+        next: null,
+        daysUntilNext: null,
+        mapPool: [],
+        mapPoolSeason: null,
+        source: 'fallback',
+      }),
+    ),
   ]);
 
   // Grouped by mode so the page reads like the in-game rotation rather than a
@@ -89,7 +98,20 @@ export default async function RankedPage() {
 
       {/* Above the maps: which season it is decides which maps are even in the
           pool, so it is context for everything below rather than a footnote. */}
-      <SeasonPanel state={season} />
+      <SeasonPanel
+        state={season}
+        mapHref={(mode, map) => {
+          // Wiki names are the game's display names, which slug to the same
+          // segments our own map routes use — but only link the ones we can
+          // actually resolve, so a renamed or retired map is plain text
+          // rather than a 404.
+          const match = activeMaps.find(
+            (entry) =>
+              entry.mapSlug === slugify(map) && entry.modeSlug === slugify(mode),
+          );
+          return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
+        }}
+      />
 
       {maps.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">

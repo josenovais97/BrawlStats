@@ -23,6 +23,17 @@ export function slugify(value: string): string {
       // Strip accents, which map names use freely ("Café", "Böse").
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
+      /*
+       * Apostrophes are dropped, not turned into a separator.
+       *
+       * Sources disagree on them for the same name — the artwork mirror calls
+       * a map "Belles Rock" and the wiki calls it "Belle's Rock" — and a
+       * separator makes those slug differently ("belles-rock" versus
+       * "belle-s-rock"), so a name that matches to a reader fails to match
+       * here. Removing the character makes both sides agree, and no name in
+       * either catalogue relies on one to stay distinct.
+       */
+      .replace(/['\u2019]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
   );
