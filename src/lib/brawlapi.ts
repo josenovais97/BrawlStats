@@ -1,3 +1,4 @@
+import { stripGameMarkup } from '@/lib/format';
 import type {
   BAAccessory,
   BABrawler,
@@ -54,8 +55,7 @@ export async function getBrawlers(): Promise<BABrawler[]> {
  * unresolved numbers become a plain "?".
  */
 export function sanitizeDescription(text: string): string {
-  return text
-    .replace(/<\/?c[0-9a-fA-F]*>/g, '')
+  return stripGameMarkup(text)
     .replace(/<![^<>]*>|<VALUE>/gi, '?')
     // The placeholder often sits in "<!token> %", which now reads "? %".
     .replace(/\s+%/g, '%')

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type { BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
+import { stripGameMarkup } from '@/lib/format';
 import { getPrisma } from '@/lib/prisma';
 import type {
   AggregationRunSummary,
@@ -862,7 +863,9 @@ export async function getTrophyGains(limit = 10): Promise<TrophyGain[]> {
       where: { tag: { in: top.map((g) => g.tag) } },
       select: { tag: true, name: true },
     });
-    const names = new Map(named.map((n) => [n.tag, n.name]));
+    // Rows sampled before names were sanitised still carry the game's colour
+    // markup, so it is stripped on the way out too.
+    const names = new Map(named.map((n) => [n.tag, n.name && stripGameMarkup(n.name)]));
 
     return top.map((gain) => ({
       tag: gain.tag,
@@ -1317,7 +1320,7 @@ export async function getRankedLeaderboard(
       pool,
       players: rows.map((row) => ({
         tag: row.tag,
-        name: row.name,
+        name: row.name && stripGameMarkup(row.name),
         iconId: row.iconId,
         trophies: row.trophies,
         elo: row.rankedElo ?? 0,

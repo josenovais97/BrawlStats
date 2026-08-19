@@ -87,6 +87,20 @@ export function nameColorToCss(color: string | null | undefined): string {
   return '#ffffff';
 }
 
+/**
+ * Player and club names carry the game's own colour markup — "<c3>Stylërz</c>",
+ * "<c5>ST</c>ORM" — which the client renders as coloured text and every other
+ * surface renders as literal angle brackets. The tags are stripped rather than
+ * translated: the API gives no palette for `<c0>`–`<c9>`, and a name is already
+ * coloured as a whole through `nameColor`.
+ *
+ * Deliberately narrow, because names are player-authored and often contain
+ * stray brackets of their own ("Jarne=Trash>.<"), which must survive untouched.
+ */
+export function stripGameMarkup(value: string): string {
+  return value.replace(/<\/?c[0-9a-fA-F]*>/g, '').trim();
+}
+
 /** "vicePresident" -> "Vice President" */
 export function humanizeRole(role: string): string {
   return role

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { BrawlApiError } from '@/lib/errors';
+import { stripGameMarkup } from '@/lib/format';
 import { encodeTagForApi, isValidTag } from '@/lib/tags';
 import type {
   BSBattleLog,
@@ -65,7 +66,27 @@ async function bsFetch<T>(path: string, options: FetchOptions = {}): Promise<T> 
 
   if (!res.ok) throw mapStatus(res.status);
 
-  return (await res.json()) as T;
+  return cleanMarkup(await res.json()) as T;
+}
+
+/**
+ * Player-authored text reaches the site through a dozen different payload
+ * shapes — profiles, clubs, members, rankings, every participant of every
+ * battle — so the game's colour markup is stripped once here, at the boundary,
+ * rather than at each of the places a name is eventually rendered.
+ */
+function cleanMarkup(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(cleanMarkup);
+  if (value === null || typeof value !== 'object') return value;
+
+  const out: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    out[key] =
+      typeof entry === 'string' && (key === 'name' || key === 'description')
+        ? stripGameMarkup(entry)
+        : cleanMarkup(entry);
+  }
+  return out;
 }
 
 function mapStatus(status: number): BrawlApiError {
