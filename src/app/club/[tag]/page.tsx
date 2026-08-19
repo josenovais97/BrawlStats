@@ -29,6 +29,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${club.name} (${displayTag(club.tag)})`,
       description: club.description || `${club.name} club stats and member list.`,
       alternates: { canonical: `/club/${normalizeTag(club.tag)}` },
+      // Indexable pages must be a deliberate set. This one is not: the
+      // combinations are effectively unbounded, and a crawler walking them costs
+      // real API and function budget for pages nobody searched for. `follow` is
+      // kept so the links out of them still pass value to the pages that matter.
+      robots: { index: false, follow: true },
     };
   } catch {
     return { title: `Club ${displayTag(tag)}` };

@@ -1,11 +1,10 @@
 import type { MetadataRoute } from 'next';
 
-import { getClubRankings, getOfficialBrawlers, getPlayerRankings } from '@/lib/bs-api';
+import { getOfficialBrawlers } from '@/lib/bs-api';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
 import { getFilterableModes } from '@/lib/stats';
-import { normalizeTag } from '@/lib/tags';
 
 /**
  * The site's fixed routes, plus a page per brawler, map, mode and top-ranked
@@ -21,13 +20,6 @@ import { normalizeTag } from '@/lib/tags';
  * already cached, and the list re-narrows itself every day as the boards move.
  */
 export const revalidate = 86400;
-
-/** Ranks worth listing. The boards themselves are capped at 200 by the API. */
-const TOP_PLAYERS = 200;
-const TOP_CLUBS = 100;
-
-/** Matches this route's own revalidate, so neither call shortens it. */
-const SITEMAP_TTL = 86_400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -92,19 +84,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  const players = await getPlayerRankings('global', TOP_PLAYERS, SITEMAP_TTL)
-    .then((r) => r.items)
-    .catch(() => []);
-  for (const player of players) {
-    add(`/player/${normalizeTag(player.tag)}`, 'daily', 0.5);
-  }
-
-  const clubs = await getClubRankings('global', TOP_CLUBS, SITEMAP_TTL)
-    .then((r) => r.items)
-    .catch(() => []);
-  for (const club of clubs) {
-    add(`/club/${normalizeTag(club.tag)}`, 'daily', 0.4);
-  }
+  /*
+   * Player and club pages are deliberately absent.
+   *
+   * They now carry `noindex, follow` — there is one URL per tag in existence,
+   * they cannot be enumerated, and each costs an upstream API call to render,
+   * so they are a tool rather than a document set. Listing pages in a sitemap
+   * while asking search engines not to index them is a contradiction, so the
+   * listing goes rather than the directive.
+   */
 
   return entries;
 }

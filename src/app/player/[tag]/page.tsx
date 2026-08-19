@@ -51,6 +51,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       // Normalised, so #ABC, %23ABC and abc all resolve to one indexable URL
       // rather than three competing ones.
       alternates: { canonical: `/player/${normalizeTag(player.tag)}` },
+      // Indexable pages must be a deliberate set. This one is not: the
+      // combinations are effectively unbounded, and a crawler walking them costs
+      // real API and function budget for pages nobody searched for. `follow` is
+      // kept so the links out of them still pass value to the pages that matter.
+      robots: { index: false, follow: true },
     };
   } catch {
     return { title: `Player ${displayTag(tag)}` };

@@ -513,7 +513,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       ) : null}
 
       <section>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">Popular build</h2>
+        <SectionHeading
+          title="Upgrade ownership"
+          subtitle="Which upgrades sampled owners have unlocked. The API never reports what anyone equips in a battle, so this is ownership — not usage."
+        />
         <PopularBuild
           build={build}
           meta={{ ...brawler, starPowers, gadgets }}
@@ -575,7 +578,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               </ul>
               <p className="mt-2 text-xs text-muted">
                 Every gear this brawler can equip, from the official catalogue. Which
-                ones players actually run is in the popular build above.
+                ones sampled owners have unlocked is above — which is not the same as
+                which they equip, since the API never reports that.
               </p>
             </div>
           ) : null}

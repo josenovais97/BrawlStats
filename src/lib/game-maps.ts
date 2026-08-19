@@ -6,9 +6,15 @@ import type { BAGameMode, BAMap } from '@/types/brawlapi';
  * The map catalogue, resolved into something routable.
  *
  * brawlapi lists every map ever published — around 1,200, five sixths of them
- * retired. Only the active ones get pages: a retired map has no rotation to
- * appear in and no fresh battles to rank brawlers from, so its page would be a
- * title and an empty state.
+ * flagged `disabled`. The ~400 that are not are the *catalogue of maps still in
+ * the game*, which is emphatically not the same as "in rotation": every one of
+ * them reports `lastActive: 0`, so the field cannot tell them apart either.
+ * Calling all 400 "currently in rotation" was simply wrong, and the pages that
+ * say so now say what this list actually is.
+ *
+ * What genuinely *is* in rotation comes from two other sources, and the maps
+ * index labels them separately: the official event rotation (live right now)
+ * and the wiki's published Ranked pool (this season's competitive maps).
  *
  * A map's mode is joined by numeric id rather than by name. The `gameMode`
  * object hanging off a map is a partial one and does not carry `scHash`, which
@@ -35,6 +41,8 @@ export async function getActiveMaps(): Promise<GameMap[]> {
     getGameModeIdMap().catch(() => new Map<number, BAGameMode>()),
   ]);
 
+  const seen = new Set<string>();
+
   return maps
     .filter((map) => !map.disabled)
     .map((map) => {
@@ -46,6 +54,21 @@ export async function getActiveMaps(): Promise<GameMap[]> {
         mapSlug: slugify(map.name),
         scHash: mode?.scHash,
       };
+    })
+    /*
+     * One entry per map, keyed on what the URL is built from.
+     *
+     * The source publishes the same map more than once — "Skull Creek" appears
+     * twice under Trio Showdown with different numeric ids — and two records
+     * that resolve to the same route would render the same page twice in the
+     * index and emit a duplicate sitemap URL. The first wins; they are the same
+     * map either way.
+     */
+    .filter((entry) => {
+      const key = `${entry.modeSlug}/${entry.mapSlug}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
     })
     .sort((a, b) => a.map.name.localeCompare(b.map.name));
 }

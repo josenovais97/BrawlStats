@@ -17,10 +17,19 @@ interface Props {
 }
 
 /**
- * The most commonly unlocked star power, gadget and gears among sampled
- * players. The API never reports which option a player has *equipped*, so
- * unlock rates are the available signal — and for gears, where players pick a
- * handful from many, that signal is strong.
+ * The most commonly *unlocked* star power, gadget and gears among sampled
+ * players.
+ *
+ * Deliberately never called a "build", and never phrased as what players run.
+ * The API reports what a player owns on a brawler and nothing about what they
+ * took into a match — there is no equipped-loadout field anywhere in the
+ * player or battle payloads. Ownership correlates with usage, but it is not
+ * usage, and a section headed "popular build" was claiming a measurement the
+ * data cannot make.
+ *
+ * Ownership is still worth showing: for gears especially, where a player picks
+ * a couple from nineteen, choosing to unlock one is a real signal. It just has
+ * to be labelled as the thing it is.
  */
 export function PopularBuild({ build, meta, gearNames }: Props) {
   if (!build || build.sampleSize === 0) {
@@ -54,12 +63,16 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
     options: BuildOption[];
   }[] = [
     {
-      title: 'Star power',
+      title: 'Star powers unlocked',
       node: <StarPowerIcon className="size-5" />,
       options: build.starPowers,
     },
-    { title: 'Gadget', node: <GadgetIcon className="size-5" />, options: build.gadgets },
-    { title: 'Gears', node: <GearIcon className="size-5" />, options: build.gears },
+    {
+      title: 'Gadgets unlocked',
+      node: <GadgetIcon className="size-5" />,
+      options: build.gadgets,
+    },
+    { title: 'Gears unlocked', node: <GearIcon className="size-5" />, options: build.gears },
   ];
 
   return (
@@ -81,7 +94,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                 const leadMargin =
                   options.length > 1 ? options[0].share - options[1].share : 0;
                 const accessory = accessoryById.get(option.itemId);
-                const isGear = title === 'Gears';
+                const isGear = title.startsWith('Gears');
                 const name =
                   accessory?.name ?? gearNames.get(option.itemId) ?? `#${option.itemId}`;
                 const imageUrl = accessory?.imageUrl ?? (isGear ? gearIconUrl(option.itemId) : null);
@@ -135,9 +148,15 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
         );
       })}
 
-      <p className="text-xs text-muted">
-        Split of unlocks within each category, across {formatNumber(build.sampleSize)}{' '}
-        tracked players who own this brawler.
+      <p className="text-xs leading-relaxed text-muted">
+        Share of unlocks within each category, across {formatNumber(build.sampleSize)}{' '}
+        tracked players who own this brawler.{' '}
+        <strong className="font-semibold text-foreground">
+          This is what players have unlocked, not what they equip.
+        </strong>{' '}
+        The Brawl Stars API reports ownership only — no endpoint exposes the loadout a
+        player actually took into a battle — so a high share here means the upgrade is
+        widely owned, which usually but not always means widely used.
       </p>
     </div>
   );

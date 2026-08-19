@@ -39,6 +39,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: `${a} vs ${b} — which is better in Brawl Stars?`,
     description: `${a} and ${b} compared: win rates, pick rates, tiers, best modes and their head-to-head record from sampled Brawl Stars battles.`,
     alternates: { canonical: `/compare/${resolved.slug}` },
+    // Indexable pages must be a deliberate set. This one is not: the
+    // combinations are effectively unbounded, and a crawler walking them costs
+    // real API and function budget for pages nobody searched for. `follow` is
+    // kept so the links out of them still pass value to the pages that matter.
+    robots: { index: false, follow: true },
   };
 }
 

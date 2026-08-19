@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: 'Brawl Stars draft helper — pick against the enemy team',
   description:
     'Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.',
+  // Self-canonical, and deliberately so: every map and enemy combination is
+  // its own URL — that is the point of the tool — but only the empty state is
+  // worth indexing. The rest are a tool's working state, not documents.
   alternates: { canonical: '/draft' },
 };
 
