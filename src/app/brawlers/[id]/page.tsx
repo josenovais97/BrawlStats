@@ -25,6 +25,7 @@ import { gearIconUrl, getBrawler, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
   getBrawlerWiki,
+  getGearDescriptions,
   wikiPageUrl,
   type BrawlerWiki,
 } from '@/lib/brawler-wiki';
@@ -52,11 +53,29 @@ interface PageProps {
 }
 
 /**
- * Rendered on demand and cached for a day, rather than pre-rendering all ~90
- * brawlers at build time — each page makes a ranking call, and doing that once
- * per brawler during a build risks tripping the API rate limit.
+ * Rendered on demand, never pre-rendered: each page makes a ranking call, and
+ * doing that once per brawler during a build risks tripping the API rate limit.
+ *
+ * Six hours rather than the day this used to be. The page cache is the binding
+ * constraint on freshness — a shorter TTL on the wiki fetch underneath it does
+ * nothing while the HTML itself is a day old — and a day is the wrong window
+ * for two things on this page: combat stats, which move on balance-patch day
+ * and are most wrong exactly when they matter most, and our own win rates,
+ * which the sampler already recomputes four to six times a day.
+ *
+ * The cost is one ranking call per brawler per regeneration: ~430 a day across
+ * the roster against the ~4,200 the sampler already makes, and only for pages
+ * someone actually opens.
  */
-export const revalidate = 86400;
+export const revalidate = 21600;
+
+/**
+ * Balance changes shown, newest first.
+ *
+ * A brawler can carry ninety of them going back to 2017; the recent ones are
+ * what tells a reader whether the numbers above just moved.
+ */
+const BALANCE_CHANGES_SHOWN = 8;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
@@ -142,6 +161,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Combat stats and resolved ability text. Nothing else publishes these —
   // see lib/brawler-wiki. Null costs the sections that use it, not the page.
   const wiki = await getBrawlerWiki(brawler.name).catch(() => null);
+  // One page for the whole game, so this is shared across every brawler.
+  const gearText = await getGearDescriptions().catch(() => new Map<string, string>());
   const buffies = await getBrawlerBuffies(brawlerId);
   const hyperChargeOwnership = await getHyperChargeOwnership(brawlerId);
 
@@ -484,9 +505,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 <GearIcon className="size-5" />
                 Gears
               </h2>
-              <ul className="card grid grid-cols-2 gap-2 p-3 sm:grid-cols-3">
+              <ul className="card grid grid-cols-1 gap-3 p-3 sm:grid-cols-2">
                 {gears.map((gear) => (
-                  <li key={gear.id} className="flex items-center gap-2">
+                  <li key={gear.id} className="flex gap-2">
                     <Image
                       src={gearIconUrl(gear.id)}
                       alt=""
@@ -496,8 +517,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                       loading="lazy"
                       unoptimized
                     />
-                    <span className="min-w-0 truncate text-sm font-medium capitalize">
-                      {gear.name.toLowerCase()}
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium capitalize">
+                        {gear.name.toLowerCase()}
+                      </span>
+                      {/* The catalogue names a gear but never says what it
+                          does, which left this list as six bare words. */}
+                      {gearText.get(slugify(gear.name)) ? (
+                        <span className="block text-xs leading-snug text-muted">
+                          {gearText.get(slugify(gear.name))}
+                        </span>
+                      ) : null}
                     </span>
                   </li>
                 ))}
@@ -619,12 +649,49 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         </Suspense>
       </section>
 
+      {wiki && wiki.history.length > 0 ? (
+        <section>
+          <SectionHeading
+            title="Balance history"
+            subtitle={`The last changes Supercell made to ${name}. Cosmetic releases are left out.`}
+            aside={`${wiki.history.length} recorded`}
+          />
+          <ol className="card divide-y divide-border overflow-hidden">
+            {wiki.history.slice(0, BALANCE_CHANGES_SHOWN).map((change, index) => (
+              <li
+                key={`${change.date}-${index}`}
+                className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3"
+              >
+                <span className="w-20 shrink-0 text-xs tabular-nums text-muted">
+                  {change.date}
+                </span>
+                <span
+                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide ${
+                    change.kind === 'Buff'
+                      ? 'bg-victory/15 text-victory'
+                      : change.kind === 'Nerf'
+                        ? 'bg-defeat/15 text-defeat'
+                        : 'bg-surface-2 text-muted'
+                  }`}
+                >
+                  {change.kind}
+                </span>
+                <span className="min-w-0 flex-1 text-sm leading-relaxed">
+                  {change.text}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
       {wiki ? (
         /* Attribution, once, for everything on this page that came from the
            wiki: the combat stats, the resolved ability text, the hypercharge
            effect and the buffie effects. Their text is CC-BY-SA. */
         <p className="text-xs leading-relaxed text-muted">
-          Combat stats, ability descriptions, hypercharge and buffie effects from the{' '}
+          Combat stats, ability and gear descriptions, hypercharge and buffie effects,{' '}
+          and balance history from the{' '}
           <a
             href={wikiPageUrl(wiki.title)}
             rel="noreferrer noopener"

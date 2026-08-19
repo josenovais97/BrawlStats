@@ -22,8 +22,13 @@ import { slugify } from '@/lib/slugs';
 
 const WIKI_API = 'https://brawlstars.fandom.com/api.php';
 
-/** Stats change only on balance patches; a day is plenty. */
-const REVALIDATE_WIKI = 86_400;
+/**
+ * Stats change only on balance patches, but patch day is when being wrong
+ * matters most, so this is sized to the page that renders it rather than to
+ * how often the numbers move. Kept in step with the brawler page's own
+ * revalidate: a fetch TTL shorter than the page cache above it buys nothing.
+ */
+const REVALIDATE_WIKI = 21_600;
 
 export interface BrawlerStats {
   health: string | null;
@@ -44,6 +49,14 @@ export interface WikiAbility {
   buffie: string | null;
 }
 
+/** One line of a brawler's balance history. */
+export interface BalanceChange {
+  /** ISO date. */
+  date: string;
+  kind: 'Buff' | 'Nerf' | 'Neutral';
+  text: string;
+}
+
 export interface BrawlerWiki {
   /** Wiki page title, for attribution links. */
   title: string;
@@ -51,6 +64,8 @@ export interface BrawlerWiki {
   /** Keyed by slugged ability name, covering gadgets and star powers. */
   abilities: Map<string, WikiAbility>;
   hypercharge: (WikiAbility & { name: string }) | null;
+  /** Balance changes, newest first. */
+  history: BalanceChange[];
 }
 
 /* -------------------------------- wikitext -------------------------------- */
@@ -195,6 +210,64 @@ function subsections(wikitext: string): { heading: string; body: string }[] {
   return out;
 }
 
+/**
+ * Parses the balance history.
+ *
+ * The section is a date-headed list of tagged changes:
+ *
+ *   *21/05/18:
+ *   **{{Balance|Buff|Shelly's health was increased to 3600 (from 3200).}}
+ *
+ * This is the one thing on the site that answers "was my brawler nerfed", and
+ * it is flatly impossible from the game API — the catalogue publishes names and
+ * ids, so `lib/catalog` can see a gadget appear but never a number change.
+ *
+ * Dates are `DD/MM/YY`, which is unambiguous here only because the day always
+ * leads; a two-digit year is read as 20YY, the game having launched in 2017.
+ */
+const COSMETIC_CHANGE =
+  /\b(skin|pin|spray|emote|profile icon|voice ?line|remodel)/i;
+
+function parseHistory(wikitext: string): BalanceChange[] {
+  const start = wikitext.indexOf('==History==');
+  if (start === -1) return [];
+  const end = wikitext.indexOf('\n==', start + 5);
+  const section = wikitext.slice(start, end === -1 ? undefined : end);
+
+  const out: BalanceChange[] = [];
+  let date: string | null = null;
+
+  for (const line of section.split('\n')) {
+    const heading = /^\*\s*(\d{2})\/(\d{2})\/(\d{2}):/.exec(line);
+    if (heading) {
+      date = `20${heading[3]}-${heading[2]}-${heading[1]}`;
+      continue;
+    }
+
+    const change = /\{\{Balance\|(Buff|Nerf|Neutral)\|/.exec(line);
+    if (!change || !date) continue;
+
+    const block = balancedTemplate(line, change.index);
+    if (!block) continue;
+
+    const body = block.slice(change.index === 0 ? change[0].length : change[0].length, -2);
+    const text = toPlainText(body);
+    if (!text) continue;
+
+    const kind = change[1] as BalanceChange['kind'];
+    // Cosmetic releases are filed in the same list and are not balance
+    // changes: "The Cyber Shelly skin was added" tells a reader nothing about
+    // whether the brawler got stronger. Only ever dropped from Neutral rows —
+    // a Buff or Nerf mentioning a skin is a real change to one.
+    if (kind === 'Neutral' && COSMETIC_CHANGE.test(text)) continue;
+
+    out.push({ date, kind, text });
+  }
+
+  // The wiki lists oldest first; a reader wants the most recent change.
+  return out.reverse();
+}
+
 function parseHypercharge(wikitext: string): (WikiAbility & { name: string }) | null {
   const match = /^==\s*Hypercharge:\s*([^=]+?)\s*==$/m.exec(wikitext);
   if (!match) return null;
@@ -287,12 +360,41 @@ export async function getBrawlerWiki(name: string): Promise<BrawlerWiki | null> 
   };
 
   const hypercharge = parseHypercharge(wikitext);
+  const history = parseHistory(wikitext);
 
   // A page that yielded nothing usable is reported as nothing, so callers do
   // not have to distinguish "fetched but empty" from "not fetched".
-  if (!stats.health && abilities.size === 0 && !hypercharge) return null;
+  if (!stats.health && abilities.size === 0 && !hypercharge && history.length === 0) {
+    return null;
+  }
 
-  return { title: page.title, stats, abilities, hypercharge };
+  return { title: page.title, stats, abilities, hypercharge, history };
+}
+
+/**
+ * What each gear does, keyed by slugged gear name.
+ *
+ * The official catalogue names a brawler's gears but never says what any of
+ * them does, which left the gear list on a brawler page as six bare words.
+ * One page covers the whole game, so this is a single cached request shared by
+ * every brawler rather than anything per-brawler.
+ *
+ * Keyed on the name with "Gear" stripped, because the catalogue says "SPEED"
+ * where the wiki heading says "Speed Gear".
+ */
+export async function getGearDescriptions(): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const page = await fetchPage('Gears');
+  if (!page) return out;
+
+  for (const { heading, body } of subsections(page.wikitext)) {
+    if (!/\{\{Gear\|/.test(body)) continue;
+    const description = leadQuote(body);
+    if (!description) continue;
+    out.set(slugify(heading.replace(/\s*Gears?\s*$/i, '')), description);
+  }
+
+  return out;
 }
 
 /** Public URL of a wiki page, for attribution. */
