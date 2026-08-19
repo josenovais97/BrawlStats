@@ -1531,8 +1531,23 @@ export interface BrawlerAbilityChoices {
   sampleSize: number;
 }
 
-/** Below this many first-buyers the split is not worth publishing. */
+/**
+ * Floors for publishing a first-purchase split.
+ *
+ * A flat count is the wrong gate, and produced exactly the inconsistency it
+ * looks like from outside: Surge cleared 25 choosers and Edgar did not, so the
+ * section appeared on one and vanished on the other for no reason a reader
+ * could see.
+ *
+ * The share matters more than the count. On Surge those 42 players are 5% of
+ * 805 owners: stragglers who still have not bought the second star power years
+ * after release, not a live decision. On Wendy the single-owners are 38% of a
+ * brawler people are actively deciding about. So a split is published while a
+ * real slice of the playerbase is still choosing, and retires once it is down
+ * to a minority who never got round to it.
+ */
 const MIN_CHOOSERS = 25;
+const MIN_CHOOSER_SHARE = 0.15;
 
 /** Below this many battles a win rate is noise, so it is withheld. */
 const MIN_BATTLES_FOR_ABILITY_WIN_RATE = 40;
@@ -1548,7 +1563,14 @@ export async function getBrawlerAbilityChoices(
     const since = new Date(Date.now() - windowDays * 86_400_000);
 
     const rows = await prisma.$queryRaw<
-      { kind: string; item_id: number; choosers: bigint; wins: bigint; decided: bigint }[]
+      {
+        kind: string;
+        item_id: number;
+        choosers: bigint;
+        wins: bigint;
+        decided: bigint;
+        owners: bigint;
+      }[]
     >`
       WITH latest AS (
         SELECT DISTINCT ON (player_tag)
@@ -1576,16 +1598,23 @@ export async function getBrawlerAbilityChoices(
       SELECT p.kind, p.item_id,
              COUNT(*) AS choosers,
              COALESCE(SUM(b.wins), 0) AS wins,
-             COALESCE(SUM(b.decided), 0) AS decided
+             COALESCE(SUM(b.decided), 0) AS decided,
+             (SELECT COUNT(*) FROM latest) AS owners
       FROM picked p
       LEFT JOIN battles b ON b.player_tag = p.player_tag
       GROUP BY p.kind, p.item_id
     `;
 
+    const owners = Number(rows[0]?.owners ?? 0);
+
     const build = (kind: string): AbilityChoice[] => {
       const forKind = rows.filter((row) => row.kind === kind);
       const total = forKind.reduce((sum, row) => sum + Number(row.choosers), 0);
+
+      // Both gates: enough people to measure, and enough of the playerbase for
+      // them to represent it.
       if (total < MIN_CHOOSERS) return [];
+      if (owners > 0 && total / owners < MIN_CHOOSER_SHARE) return [];
 
       return forKind
         .map((row) => {
