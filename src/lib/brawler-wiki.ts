@@ -1,4 +1,18 @@
 import { slugify } from '@/lib/slugs';
+import {
+  WIKI_API,
+  balancedTemplate,
+  fetchWikiJson,
+  firstPage,
+  leadQuote,
+  parseInfobox,
+  subsections,
+  toPlainText,
+  type WikiPage,
+  type WikiPagesResponse,
+} from '@/lib/wiki';
+
+export { wikiPageUrl } from '@/lib/wiki';
 
 /**
  * Brawler combat stats and resolved ability text, from the community wiki.
@@ -19,8 +33,6 @@ import { slugify } from '@/lib/slugs';
  * an unreachable wiki costs the sections that depend on it, never the page.
  * Wiki text is CC-BY-SA and is attributed wherever it is rendered.
  */
-
-const WIKI_API = 'https://brawlstars.fandom.com/api.php';
 
 /**
  * Stats change only on balance patches, but patch day is when being wrong
@@ -68,32 +80,6 @@ export interface BrawlerWiki {
   history: BalanceChange[];
 }
 
-/* -------------------------------- wikitext -------------------------------- */
-
-/**
- * Reduces wikitext to plain prose.
- *
- * Order matters: templates are stripped before links, because a template can
- * contain a link but not the reverse, and `<br>` becomes a space last so the
- * multi-line infobox values collapse into one readable line.
- */
-function toPlainText(value: string): string {
-  return value
-    .replace(/\{\{[^{}]*\}\}/g, '')
-    // [[Target|Label]] keeps the label; [[Target]] keeps the target.
-    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '$2')
-    .replace(/\[\[([^\]]+)\]\]/g, '$1')
-    .replace(/'''?/g, '')
-    // `[\s\S]` rather than the `s` flag: the project targets a lower lib
-    // level than dotAll, and this is the portable equivalent.
-    .replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, '')
-    .replace(/<ref[^>]*\/>/g, '')
-    .replace(/<br\s*\/?>/gi, ' ')
-    .replace(/<[^>]+>/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 /**
  * The first value of a multi-value infobox field.
  *
@@ -104,67 +90,8 @@ function toPlainText(value: string): string {
  */
 function firstValue(value: string | undefined): string | null {
   if (!value) return null;
-  const first = value.split(/<br\s*\/?>/i)[0];
-  const text = toPlainText(first);
+  const text = toPlainText(value.split(/<br\s*\/?>/i)[0]);
   return text || null;
-}
-
-/** Extracts a balanced `{{…}}` block starting at `from`. */
-function balancedTemplate(text: string, from: number): string | null {
-  let depth = 0;
-  let i = from;
-  while (i < text.length) {
-    if (text.startsWith('{{', i)) {
-      depth += 1;
-      i += 2;
-      continue;
-    }
-    if (text.startsWith('}}', i)) {
-      depth -= 1;
-      i += 2;
-      if (depth === 0) return text.slice(from, i);
-      continue;
-    }
-    i += 1;
-  }
-  return null;
-}
-
-/**
- * Parses the brawler infobox.
- *
- * Matched by suffix rather than by exact name: brawlers with a second form
- * carry their own template — `{{Chester Infobox}}`, `{{Kaze Infobox}}`,
- * `{{BuzzLightyear Infobox}}` — with the same parameter names as the shared
- * one, so keying on "Infobox" picks all of them up.
- */
-function parseInfobox(wikitext: string): Record<string, string> {
-  const match = /\{\{[A-Za-z ]*Infobox/.exec(wikitext);
-  if (!match) return {};
-
-  const box = balancedTemplate(wikitext, match.index);
-  if (!box) return {};
-
-  const body = box.slice(box.indexOf('|') + 1, -2);
-  const params: Record<string, string> = {};
-
-  // Split on pipes that are not inside a nested link or template.
-  for (const part of body.split(/\|(?![^[{]*[\]}]\})/)) {
-    const eq = part.indexOf('=');
-    if (eq === -1) continue;
-    params[part.slice(0, eq).trim()] = part.slice(eq + 1).trim();
-  }
-
-  return params;
-}
-
-/** The `{{Quote|…}}` immediately opening a section, i.e. the in-game text. */
-function leadQuote(section: string): string | null {
-  const at = section.indexOf('{{Quote|');
-  if (at === -1) return null;
-  const block = balancedTemplate(section, at);
-  if (!block) return null;
-  return toPlainText(block.slice('{{Quote|'.length, -2)) || null;
 }
 
 /**
@@ -185,29 +112,6 @@ function buffieQuote(section: string): string | null {
   const block = balancedTemplate(before, at);
   if (!block) return null;
   return toPlainText(block.slice('{{Quote|'.length, -2)) || null;
-}
-
-/** Splits a page into its `===Heading===` sections. */
-function subsections(wikitext: string): { heading: string; body: string }[] {
-  const out: { heading: string; body: string }[] = [];
-  const pattern = /^===\s*([^=]+?)\s*===$/gm;
-
-  let match: RegExpExecArray | null;
-  const marks: { heading: string; start: number }[] = [];
-  while ((match = pattern.exec(wikitext)) !== null) {
-    marks.push({ heading: match[1], start: match.index + match[0].length });
-  }
-
-  for (let i = 0; i < marks.length; i += 1) {
-    // A subsection runs to the next subsection or the next top-level heading,
-    // whichever comes first.
-    const nextMark = marks[i + 1]?.start ?? wikitext.length;
-    const nextTop = wikitext.indexOf('\n==', marks[i].start);
-    const end = nextTop === -1 ? nextMark : Math.min(nextMark, nextTop);
-    out.push({ heading: marks[i].heading, body: wikitext.slice(marks[i].start, end) });
-  }
-
-  return out;
 }
 
 /**
@@ -285,66 +189,13 @@ function parseHypercharge(wikitext: string): (WikiAbility & { name: string }) | 
 
 /* --------------------------------- fetching -------------------------------- */
 
-/**
- * Fetches JSON, and never lets a failure stick.
- *
- * Next's data cache stores what a `fetch` with `revalidate` returned — status
- * included — so a wiki 5xx during a regeneration would be replayed for the
- * whole TTL, hiding a section for hours after the wiki itself recovered. A
- * non-OK response is therefore retried once with `cache: 'no-store'`, which
- * bypasses that entry entirely: the render gets live data the moment the wiki
- * is healthy again, at the cost of one extra request per render while it is
- * not.
- */
-async function fetchNeverCachingFailure(
-  url: string,
-  revalidate: number,
-): Promise<Response | null> {
-  const init = {
-    headers: {
-      // Identify ourselves rather than pretending to be a browser.
-      'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
-      Accept: 'application/json',
-    },
-    signal: AbortSignal.timeout(10_000),
-  } as const;
-
-  const cached = await fetch(url, { ...init, next: { revalidate } });
-  if (cached.ok) return cached;
-
-  const live = await fetch(url, { ...init, cache: 'no-store' });
-  return live.ok ? live : null;
-}
-
-async function fetchPage(name: string): Promise<{ title: string; wikitext: string } | null> {
-  const url =
+async function fetchPage(name: string): Promise<WikiPage | null> {
+  const body = await fetchWikiJson<WikiPagesResponse>(
     `${WIKI_API}?action=query&prop=revisions&rvslots=main&rvprop=content` +
-    `&format=json&redirects=1&titles=${encodeURIComponent(name)}`;
-
-  try {
-    const res = await fetchNeverCachingFailure(url, REVALIDATE_WIKI);
-    if (!res) return null;
-
-    const body = (await res.json()) as {
-      query?: {
-        pages?: Record<
-          string,
-          { title?: string; revisions?: { slots?: { main?: { '*'?: unknown } } }[] }
-        >;
-      };
-    };
-
-    const pages = Object.values(body.query?.pages ?? {});
-    for (const page of pages) {
-      const wikitext = page.revisions?.[0]?.slots?.main?.['*'];
-      if (typeof wikitext === 'string' && wikitext.length > 0) {
-        return { title: page.title ?? name, wikitext };
-      }
-    }
-    return null;
-  } catch {
-    return null;
-  }
+      `&format=json&redirects=1&titles=${encodeURIComponent(name)}`,
+    REVALIDATE_WIKI,
+  );
+  return firstPage(body);
 }
 
 /**
@@ -418,9 +269,4 @@ export async function getGearDescriptions(): Promise<Map<string, string>> {
   }
 
   return out;
-}
-
-/** Public URL of a wiki page, for attribution. */
-export function wikiPageUrl(title: string): string {
-  return `https://brawlstars.fandom.com/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
 }

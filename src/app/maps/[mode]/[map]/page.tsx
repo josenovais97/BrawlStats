@@ -11,6 +11,8 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, minutesSince } from '@/lib/format';
 import { getActiveMaps, resolveMap } from '@/lib/game-maps';
+import { getMapWiki } from '@/lib/map-wiki';
+import { wikiPageUrl } from '@/lib/wiki';
 import { slugify } from '@/lib/slugs';
 import {
   MAP_ROTATION_GRACE_DAYS,
@@ -64,6 +66,9 @@ export default async function MapPage({ params }: PageProps) {
   const accent = entry.mode?.color ?? '#8b95b8';
 
   const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+  // Layout and environment. The mode is passed so a map name shared across
+  // modes cannot pick up the wrong page's description.
+  const mapWiki = await getMapWiki(entry.map.name, modeLabel).catch(() => null);
 
   // Database reads run one after the other so the page never needs more than
   // one connection, and each degrades to empty on its own.
@@ -107,8 +112,16 @@ export default async function MapPage({ params }: PageProps) {
     },
     {
       question: `What game mode is ${entry.map.name}?`,
-      answer: `${entry.map.name} is a ${modeLabel} map in Brawl Stars.`,
+      answer: `${entry.map.name} is a ${modeLabel} map in Brawl Stars${mapWiki?.environment ? `, set in the ${mapWiki.environment} environment` : ''}.`,
     },
+    ...(mapWiki?.layout
+      ? [
+          {
+            question: `How is ${entry.map.name} laid out?`,
+            answer: mapWiki.layout,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -160,6 +173,14 @@ export default async function MapPage({ params }: PageProps) {
               ) : null}
               {modeLabel}
             </Link>
+            {/* The artwork mirror stores an internal asset id here
+                ("Katanakingdomnn2"), which is why this chip was dropped
+                before; the wiki has the name the game actually shows. */}
+            {mapWiki?.environment ? (
+              <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
+                {mapWiki.environment}
+              </span>
+            ) : null}
             {entry.map.new ? (
               <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold uppercase text-brand">
                 New
@@ -216,6 +237,33 @@ export default async function MapPage({ params }: PageProps) {
           </p>
         ) : null}
       </section>
+
+      {mapWiki?.layout ? (
+        <section>
+          <SectionHeading
+            title="Layout"
+            subtitle="How the map is built, and what that rewards."
+          />
+          <div className="card space-y-3 p-5">
+            {mapWiki.intro ? (
+              <p className="text-sm leading-relaxed text-muted">{mapWiki.intro}</p>
+            ) : null}
+            <p className="leading-relaxed">{mapWiki.layout}</p>
+            <p className="text-xs text-muted">
+              Layout description from the{' '}
+              <a
+                href={wikiPageUrl(mapWiki.title)}
+                rel="noreferrer noopener"
+                target="_blank"
+                className="font-medium text-brand hover:underline"
+              >
+                Brawl Stars Wiki
+              </a>
+              , CC-BY-SA. The rankings above are our own.
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       {/* Answers the two questions the page is found by, in the page's own
           copy rather than only in its structured data. */}

@@ -1,5 +1,6 @@
 import { getBrawlers } from '@/lib/brawlapi';
 import { slugify } from '@/lib/slugs';
+import { WIKI_API, fetchWikiJson } from '@/lib/wiki';
 import type { BABrawler } from '@/types/brawlapi';
 
 /**
@@ -21,8 +22,7 @@ import type { BABrawler } from '@/types/brawlapi';
  * Wiki text is CC-BY-SA, which the season panel attributes on the page.
  */
 
-const WIKI_API =
-  'https://brawlstars.fandom.com/api.php?action=parse&page=Ranked&prop=wikitext&format=json';
+const WIKI_API_PAGE = `${WIKI_API}?action=parse&page=Ranked&prop=wikitext&format=json`;
 
 /** Seasons turn over monthly; twice a day is far more than enough. */
 const REVALIDATE_SEASONS = 43_200;
@@ -270,50 +270,17 @@ function toIsoDate(value: string): string | null {
   return new Date(parsed).toISOString().slice(0, 10);
 }
 
-/**
- * Fetches JSON, and never lets a failure stick.
- *
- * Next's data cache stores what a `fetch` with `revalidate` returned — status
- * included — so a wiki 5xx during a regeneration would be replayed for the
- * whole TTL, hiding a section for hours after the wiki itself recovered. A
- * non-OK response is therefore retried once with `cache: 'no-store'`, which
- * bypasses that entry entirely: the render gets live data the moment the wiki
- * is healthy again, at the cost of one extra request per render while it is
- * not.
- */
-async function fetchNeverCachingFailure(
-  url: string,
-  revalidate: number,
-): Promise<Response | null> {
-  const init = {
-    headers: {
-      // Identify ourselves rather than pretending to be a browser.
-      'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
-      Accept: 'application/json',
-    },
-    signal: AbortSignal.timeout(10_000),
-  } as const;
-
-  const cached = await fetch(url, { ...init, next: { revalidate } });
-  if (cached.ok) return cached;
-
-  const live = await fetch(url, { ...init, cache: 'no-store' });
-  return live.ok ? live : null;
-}
-
 async function fetchWiki(): Promise<{
   seasons: RankedSeason[];
   mapPool: MapPoolEntry[];
   mapPoolSeason: number | null;
 } | null> {
   try {
-    const res = await fetchNeverCachingFailure(WIKI_API, REVALIDATE_SEASONS);
-    if (!res) return null;
-
-    const body = (await res.json()) as {
-      parse?: { wikitext?: { '*'?: unknown } };
-    };
-    const wikitext = body.parse?.wikitext?.['*'];
+    const body = await fetchWikiJson<{ parse?: { wikitext?: { '*'?: unknown } } }>(
+      WIKI_API_PAGE,
+      REVALIDATE_SEASONS,
+    );
+    const wikitext = body?.parse?.wikitext?.['*'];
     if (typeof wikitext !== 'string') return null;
 
     const seasons = parseSeasons(wikitext);
