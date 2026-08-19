@@ -2,6 +2,7 @@ import { Medal, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
 import { humanizeMode } from '@/lib/format';
+import { slugify } from '@/lib/slugs';
 import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from '@/lib/stats';
 
 /**
@@ -19,12 +20,16 @@ export function tierListHref(
   windowKey: TierWindowKey,
   mode?: string,
 ): string {
-  const params = new URLSearchParams();
+  // The mode is a path segment, not a parameter: each one is a page people
+  // search for by name ("best brawlers for gem grab"), and a query string is a
+  // single URL to a crawler no matter how many values it takes. The window
+  // stays a parameter, because it narrows the same page rather than naming a
+  // different one.
+  const path = mode
+    ? `/tier-list/${format}/${slugify(mode)}`
+    : `/tier-list/${format}`;
   // 7d is the default the page falls back to, so it stays out of the URL.
-  if (windowKey !== '7d') params.set('window', windowKey);
-  if (mode) params.set('mode', mode);
-  const query = params.toString();
-  return query ? `/tier-list/${format}?${query}` : `/tier-list/${format}`;
+  return windowKey === '7d' ? path : `${path}?window=${windowKey}`;
 }
 
 const FORMATS: {

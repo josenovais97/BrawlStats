@@ -46,6 +46,7 @@ export function PlayerHeader({
             alt=""
             width={88}
             height={88}
+            sizes="88px"
             className="relative size-[88px] rounded-2xl bg-surface-2 ring-1 ring-border-strong"
             priority
             unoptimized

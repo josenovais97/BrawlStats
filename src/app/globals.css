@@ -199,6 +199,17 @@ body {
   background: linear-gradient(180deg, var(--brand), var(--brand-strong));
 }
 
+/*
+ * Clearance for the sticky section nav on a profile.
+ *
+ * An anchor jump scrolls the target to the very top of the viewport, which on
+ * these pages is underneath the nav bar itself — the heading you asked for
+ * ends up hidden behind the control you used to ask for it.
+ */
+@utility scroll-anchor {
+  scroll-margin-top: 4rem;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);

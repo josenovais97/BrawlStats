@@ -2,6 +2,8 @@
 
 import {
   CalendarClock,
+  GitCompareArrows,
+  Map,
   Medal,
   Menu,
   Newspaper,
@@ -9,6 +11,7 @@ import {
   ScrollText,
   Search,
   Swords,
+  Target,
   Trophy,
   X,
 } from 'lucide-react';
@@ -24,6 +27,9 @@ const NAV = [
   // /tier-list redirect, but stays highlighted on the trophy list too.
   { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },
   { href: '/ranked', label: 'Ranked', icon: Medal },
+  { href: '/maps', label: 'Maps', icon: Map },
+  { href: '/draft', label: 'Draft', icon: Target },
+  { href: '/compare', label: 'Compare', icon: GitCompareArrows },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
   { href: '/news', label: 'News', icon: Newspaper },
   { href: '/events', label: 'Events', icon: CalendarClock },

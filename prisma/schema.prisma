@@ -129,6 +129,45 @@ model BattleSample {
   @@map("battle_samples")
 }
 
+/// One row per sampled 3v3 battle, recording who the sampled player's brawler
+/// stood beside and who it stood against.
+///
+/// Deliberately separate from `BattleSample`, and never read by anything that
+/// computes usage or win rates. The reason `BattleSample` stores only the
+/// sampled player's own entry is that counting every participant inflates the
+/// sample with correlated rows and skews usage toward whatever the cohort
+/// happens to face — that objection still stands, and this table does not
+/// change it. Matchups are a different question ("how does Shelly do *against*
+/// Colt"), and it is the only question this table answers.
+///
+/// Both id lists are from the sampled player's perspective: `result` is their
+/// team's, so an enemy brawler in a row with result "victory" is one this
+/// brawler beat. Free-for-all modes are skipped entirely — there are no teams
+/// to take sides of, and a showdown placement is not a matchup.
+model BattleTeamSample {
+  id          Int      @id @default(autoincrement())
+  /// Same natural key as `battle_samples`, so re-runs are idempotent.
+  battleKey   String   @unique @map("battle_key")
+  playerTag   String   @map("player_tag")
+  /// The sampled player's brawler: the subject of every pairing in this row.
+  brawlerId   Int      @map("brawler_id")
+  /// "victory" | "defeat" | "draw", from the sampled player's side.
+  result      String
+  mode        String
+  mapName     String?  @map("map_name")
+  battleType  String   @map("battle_type")
+  /// Team-mates' brawlers, excluding the subject.
+  allyBrawlerIds  Int[] @map("ally_brawler_ids")
+  /// Every brawler on the opposing team(s).
+  enemyBrawlerIds Int[] @map("enemy_brawler_ids")
+  battleTime  DateTime @map("battle_time")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([brawlerId, battleTime])
+  @@index([battleTime])
+  @@map("battle_team_samples")
+}
+
 /// One trophy reading per player per day, appended whenever a profile is viewed.
 ///
 /// `sampled_players.trophies` is overwritten on every lookup, so it can only

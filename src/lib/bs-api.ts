@@ -148,20 +148,27 @@ export function getClub(tag: string): Promise<BSClub> {
 export function getPlayerRankings(
   region = 'global',
   limit = 50,
+  /**
+   * Overridable because Next takes a route's revalidate from the shortest-lived
+   * fetch inside it: left at the default, one ranking call would pull the whole
+   * sitemap down to two minutes.
+   */
+  revalidate = REVALIDATE_SLOW,
 ): Promise<BSListResponse<BSPlayerRanking>> {
   return bsFetch<BSListResponse<BSPlayerRanking>>(
     `/rankings/${encodeURIComponent(region)}/players?limit=${limit}`,
-    { revalidate: REVALIDATE_SLOW },
+    { revalidate },
   );
 }
 
 export function getClubRankings(
   region = 'global',
   limit = 50,
+  revalidate = REVALIDATE_SLOW,
 ): Promise<BSListResponse<BSClubRanking>> {
   return bsFetch<BSListResponse<BSClubRanking>>(
     `/rankings/${encodeURIComponent(region)}/clubs?limit=${limit}`,
-    { revalidate: REVALIDATE_SLOW },
+    { revalidate },
   );
 }
 

@@ -1,7 +1,9 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { GadgetIcon, GearIcon, StarPowerIcon } from '@/components/game-icons';
 
+import { gearIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
 import type { BrawlerBuild, BuildOption } from '@/types/stats';
@@ -14,11 +16,6 @@ interface Props {
   gearNames: Map<number, string>;
 }
 
-/** Gear artwork follows a stable CDN pattern, keyed by gear id. */
-function gearIconUrl(id: number): string {
-  return `https://cdn.brawlify.com/gears/regular/${id}.png`;
-}
-
 /**
  * The most commonly unlocked star power, gadget and gears among sampled
  * players. The API never reports which option a player has *equipped*, so
@@ -28,9 +25,21 @@ function gearIconUrl(id: number): string {
 export function PopularBuild({ build, meta, gearNames }: Props) {
   if (!build || build.sampleSize === 0) {
     return (
-      <p className="card p-6 text-sm text-muted">
-        Not enough data collected for this brawler yet.
-      </p>
+      /* An empty state that ends the visit is a wasted one, so it says what is
+         missing and offers a page that does have an answer. */
+      <div className="card p-6">
+        <p className="text-sm leading-relaxed text-muted">
+          No sampled player owns this brawler yet, so there is nothing to build a
+          popular loadout from. Ownership is read from the profiles the sampler walks
+          through, which fills in over the following days for a new release.
+        </p>
+        <Link
+          href="/tier-list/trophy"
+          className="mt-4 inline-flex rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+        >
+          See what is strong right now
+        </Link>
+      </div>
     );
   }
 

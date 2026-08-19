@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { MapPreview } from '@/components/ranked/map-preview';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import { getActiveMaps } from '@/lib/game-maps';
+import { slugify } from '@/lib/slugs';
 import { getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
@@ -42,6 +44,16 @@ export default async function RankedPage() {
     list.push(map);
     byMode.set(map.mode, list);
   }
+
+  // Sampled maps are matched to the catalogue by name and mode, so a map that
+  // has since left rotation simply loses its link rather than 404ing.
+  const activeMaps = await getActiveMaps().catch(() => []);
+  const hrefFor = (map: RankedMapPicks): string | null => {
+    const match = activeMaps.find(
+      (entry) => entry.mapSlug === slugify(map.mapName) && entry.scHash === map.mode,
+    );
+    return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
+  };
 
   const totalSamples = maps.reduce((sum, m) => sum + m.sampleSize, 0);
   const baseline = maps[0]?.baselineWinRate ?? 0;
@@ -120,6 +132,7 @@ export default async function RankedPage() {
                       modeLabel={meta?.name ?? humanizeMode(mode)}
                       accent={accent}
                       brawlerMeta={brawlerMeta}
+                      mapHref={hrefFor(map)}
                     />
                   </li>
                 ))}
@@ -138,12 +151,14 @@ function MapCard({
   modeLabel,
   accent,
   brawlerMeta,
+  mapHref,
 }: {
   map: RankedMapPicks;
   art?: BAMap;
   modeLabel: string;
   accent: string;
   brawlerMeta: Map<number, BABrawler>;
+  mapHref: string | null;
 }) {
   return (
     <article className="card flex h-full flex-col overflow-hidden">
@@ -160,7 +175,17 @@ function MapCard({
       <div className="border-y border-border px-3.5 py-3">
         <div className="flex items-start justify-between gap-3">
           <h3 className="display min-w-0 flex-1 truncate text-base leading-tight">
-            {map.mapName}
+            {/* The card is a summary; the map's own page is the full ranking,
+                the layout at size and the answer to the search that brings
+                people here. Absent when the map is out of rotation, since
+                there is no page to send them to. */}
+            {mapHref ? (
+              <Link href={mapHref} className="hover:text-brand">
+                {map.mapName}
+              </Link>
+            ) : (
+              map.mapName
+            )}
           </h3>
           {/* Deliberately quiet at "low": a caveat should not be the brightest
               thing on the card, and right now every map carries one. It picks

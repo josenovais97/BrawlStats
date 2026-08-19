@@ -111,6 +111,12 @@ export async function getGameModeMap(): Promise<Map<string, BAGameMode>> {
   return map;
 }
 
+/** id -> mode. Maps reference their mode by numeric id, not by name. */
+export async function getGameModeIdMap(): Promise<Map<number, BAGameMode>> {
+  const modes = await getGameModes();
+  return new Map(modes.map((m) => [m.id, m]));
+}
+
 /* ---------------------------------- maps ---------------------------------- */
 
 export async function getMaps(): Promise<BAMap[]> {

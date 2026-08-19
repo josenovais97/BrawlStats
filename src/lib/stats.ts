@@ -1492,6 +1492,458 @@ export async function getFilterableModes(
   }
 }
 
+/* ----------------------- per-brawler meta breakdowns ---------------------- */
+
+/**
+ * Minimum decided battles before a brawler's record in one mode or on one map
+ * is shown on its page.
+ *
+ * Higher than the per-map *eligibility* floor used by the map pages, because
+ * this list is read the other way round — "where is this brawler good" invites
+ * acting on the top row, and a four-battle top row is a coin flip wearing a
+ * percentage sign.
+ */
+const MIN_SAMPLE_FOR_BRAWLER_SPLIT = 15;
+
+/** One slice of a brawler's record: a mode, or a map within a mode. */
+export interface BrawlerSplit {
+  /** Mode id as the API reports it, e.g. "gemGrab". */
+  mode: string;
+  /** Null on a mode-level split. */
+  mapName: string | null;
+  eventId: number | null;
+  winRate: number;
+  /** Win rate re-centred on the same slice's own average, so slices compare. */
+  score: number;
+  decidedSampleSize: number;
+}
+
+/**
+ * Where a brawler actually performs: its record per mode, and per map.
+ *
+ * Each slice is scored against *that slice's own* average rather than a global
+ * one, for the same reason the mode picks are: modes are not equally winnable,
+ * and a raw 34% in solo showdown is a better showing than a raw 48% in gem
+ * grab. Without that, every showdown map sorts to the bottom of every brawler's
+ * page and the list says nothing.
+ */
+export async function getBrawlerSplits(
+  brawlerId: number,
+  windowDays = 14,
+): Promise<{ modes: BrawlerSplit[]; maps: BrawlerSplit[] }> {
+  const prisma = getPrisma();
+  const empty = { modes: [], maps: [] };
+  if (!prisma) return empty;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const where = { battleTime: { gte: since } };
+
+    // Both groupings cover every brawler, not just this one: the averages each
+    // slice is scored against have to come from the whole population, or a
+    // brawler would be measured against itself.
+    const [modeGroups, mapGroups] = await Promise.all([
+      prisma.battleSample.groupBy({
+        by: ['mode', 'brawlerId', 'result', 'rank'],
+        where,
+        _count: { _all: true },
+      }),
+      prisma.battleSample.groupBy({
+        by: ['mode', 'mapName', 'eventId', 'brawlerId', 'result', 'rank'],
+        where: { ...where, mapName: { not: null } },
+        _count: { _all: true },
+      }),
+    ]);
+
+    type Tally = { wins: number; decided: number };
+    const add = (into: Map<string, Tally>, key: string, wins: number, decided: number) => {
+      const acc = into.get(key) ?? { wins: 0, decided: 0 };
+      acc.wins += wins;
+      acc.decided += decided;
+      into.set(key, acc);
+    };
+
+    /**
+     * Folds one grouping into "this brawler here" and "everyone here", keyed
+     * the same way, so a slice's score is a difference of two numbers that
+     * were counted identically.
+     */
+    function fold<G extends { mode: string; brawlerId: number; result: string; rank: number | null; _count: { _all: number } }>(
+      groups: G[],
+      keyOf: (g: G) => string,
+    ) {
+      const mine = new Map<string, Tally>();
+      const all = new Map<string, Tally>();
+
+      for (const g of groups) {
+        const n = g._count._all;
+        const winRank = SHOWDOWN_WIN_RANK[g.mode];
+        let wins = 0;
+        let decided = 0;
+
+        if (g.result === 'victory') {
+          wins = n;
+          decided = n;
+        } else if (g.result === 'defeat') {
+          decided = n;
+        } else if (g.result === 'rank' && winRank !== undefined && g.rank !== null) {
+          decided = n;
+          if (g.rank <= winRank) wins = n;
+        }
+        if (decided === 0) continue;
+
+        const key = keyOf(g);
+        add(all, key, wins, decided);
+        if (g.brawlerId === brawlerId) add(mine, key, wins, decided);
+      }
+
+      return { mine, all };
+    }
+
+    /** Shrinks the slice toward its own average before re-centring on 50%. */
+    function toSplit(
+      mine: Tally,
+      all: Tally | undefined,
+      parts: { mode: string; mapName: string | null; eventId: number | null },
+    ): BrawlerSplit | null {
+      if (mine.decided < MIN_SAMPLE_FOR_BRAWLER_SPLIT) return null;
+      const average = all && all.decided > 0 ? all.wins / all.decided : 0.5;
+      const raw = mine.wins / mine.decided;
+      const shrunk =
+        (mine.wins + average * PRIOR_BATTLES) / (mine.decided + PRIOR_BATTLES);
+
+      return {
+        ...parts,
+        winRate: raw,
+        score: clampRate(shrunk - average + 0.5),
+        decidedSampleSize: mine.decided,
+      };
+    }
+
+    const byMode = fold(modeGroups, (g) => g.mode);
+    const modes: BrawlerSplit[] = [];
+    for (const [mode, mine] of byMode.mine) {
+      const split = toSplit(mine, byMode.all.get(mode), {
+        mode,
+        mapName: null,
+        eventId: null,
+      });
+      if (split) modes.push(split);
+    }
+
+    const byMap = fold(mapGroups, (g) => `${g.mode}\u0000${g.mapName}`);
+    const eventIds = new Map<string, number | null>();
+    for (const g of mapGroups) {
+      const key = `${g.mode}\u0000${g.mapName}`;
+      if (g.eventId !== null && !eventIds.get(key)) eventIds.set(key, g.eventId);
+    }
+
+    const maps: BrawlerSplit[] = [];
+    for (const [key, mine] of byMap.mine) {
+      const [mode, mapName] = key.split('\u0000');
+      const split = toSplit(mine, byMap.all.get(key), {
+        mode,
+        mapName,
+        eventId: eventIds.get(key) ?? null,
+      });
+      if (split) maps.push(split);
+    }
+
+    const byScore = (a: BrawlerSplit, b: BrawlerSplit) => b.score - a.score;
+    return { modes: modes.sort(byScore), maps: maps.sort(byScore) };
+  } catch {
+    return empty;
+  }
+}
+
+/** One point on a brawler's meta-score history. */
+export interface BrawlerTrendPoint {
+  date: string;
+  winRate: number | null;
+  /** Baseline-adjusted, so cohort drift does not show up as a trend. */
+  normalizedWinRate: number | null;
+  usageRate: number | null;
+  decidedSampleSize: number;
+}
+
+/**
+ * A brawler's daily snapshots, oldest first.
+ *
+ * Read straight from the stored `brawler_stats` rows rather than recomputed:
+ * those snapshots are what the tier list showed on each day, so a chart of
+ * them is a chart of what the site said, not a retroactive re-scoring.
+ */
+export async function getBrawlerTrend(
+  brawlerId: number,
+  days = 30,
+): Promise<BrawlerTrendPoint[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = new Date(Date.now() - days * 86_400_000);
+    const rows = await prisma.brawlerStat.findMany({
+      where: { brawlerId, snapshotDate: { gte: since } },
+      orderBy: { snapshotDate: 'asc' },
+    });
+
+    return rows.map((row) => ({
+      date: toIsoDate(row.snapshotDate),
+      winRate: row.winRate,
+      normalizedWinRate: normalizeWinRate(
+        row.winRate,
+        row.baselineWinRate,
+        row.decidedSampleSize,
+      ),
+      usageRate: row.usageRate,
+      decidedSampleSize: row.decidedSampleSize,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/* -------------------------- matchups and synergies ------------------------- */
+
+/**
+ * Minimum decided battles behind a single pairing.
+ *
+ * A matchup splits an already-thin sample by a second brawler, so the floor is
+ * what stops the list being a ranking of noise. Pairings below it are dropped
+ * entirely rather than shown greyed out: an unreliable counter is worse than
+ * no counter, because it will be acted on.
+ */
+const MIN_SAMPLE_FOR_PAIRING = 20;
+
+export interface BrawlerPairing {
+  brawlerId: number;
+  winRate: number;
+  /** Percentage points above or below this brawler's own overall win rate. */
+  edge: number;
+  decidedSampleSize: number;
+}
+
+export interface BrawlerPairings {
+  /** This brawler's win rate across every battle counted here. */
+  baseline: number;
+  sampleSize: number;
+  /** Enemy brawlers, best matchup first. */
+  strongAgainst: BrawlerPairing[];
+  /** Enemy brawlers, worst matchup first. */
+  weakAgainst: BrawlerPairing[];
+  /** Team-mates, best synergy first. */
+  bestWith: BrawlerPairing[];
+}
+
+/**
+ * Who this brawler beats, who beats it, and who it wants beside it.
+ *
+ * Reads `battle_team_samples`, which stores one row per battle from the
+ * sampled player's perspective — so a pairing is counted once, from one side,
+ * and never enters the usage or win-rate aggregates that `battle_samples`
+ * feeds. The id arrays are expanded with `unnest`, which is why this is raw
+ * SQL rather than a `groupBy`.
+ *
+ * Every rate is reported as an edge against the brawler's own average in the
+ * same sample, not as an absolute. A brawler that wins 58% of everything is
+ * not "strong against" the opponent it wins 55% against, and the absolute
+ * number would say it was.
+ */
+export async function getBrawlerPairings(
+  brawlerId: number,
+  windowDays = 21,
+  limit = 5,
+): Promise<BrawlerPairings | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    const [totals, enemies, allies] = await Promise.all([
+      prisma.$queryRaw<{ wins: bigint; decided: bigint }[]>`
+        SELECT
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples
+        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+      `,
+      prisma.$queryRaw<{ other: number; wins: bigint; decided: bigint }[]>`
+        SELECT other,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples, unnest(enemy_brawler_ids) AS other
+        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+        GROUP BY other
+        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
+      `,
+      prisma.$queryRaw<{ other: number; wins: bigint; decided: bigint }[]>`
+        SELECT other,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples, unnest(ally_brawler_ids) AS other
+        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+        GROUP BY other
+        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
+      `,
+    ]);
+
+    const sampleSize = Number(totals[0]?.decided ?? 0);
+    if (sampleSize < MIN_SAMPLE_FOR_PAIRING) return null;
+    const baseline = Number(totals[0]?.wins ?? 0) / sampleSize;
+
+    const toPairings = (rows: { other: number; wins: bigint; decided: bigint }[]) =>
+      rows
+        .map((row) => {
+          const decided = Number(row.decided);
+          const winRate = Number(row.wins) / decided;
+          return {
+            brawlerId: row.other,
+            winRate,
+            edge: winRate - baseline,
+            decidedSampleSize: decided,
+          };
+        })
+        // A pairing that lands on the brawler's own average is not a matchup,
+        // it is the absence of one.
+        .filter((p) => Math.abs(p.edge) >= 0.02);
+
+    const versus = toPairings(enemies);
+    const with_ = toPairings(allies);
+
+    return {
+      baseline,
+      sampleSize,
+      strongAgainst: [...versus].sort((a, b) => b.edge - a.edge).slice(0, limit),
+      weakAgainst: [...versus].sort((a, b) => a.edge - b.edge).slice(0, limit),
+      bestWith: [...with_].sort((a, b) => b.edge - a.edge).slice(0, limit),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** How a brawler does against a specific set of opponents. */
+export interface CounterScore {
+  brawlerId: number;
+  /** Win rate when at least one of the named opponents was on the other team. */
+  winRate: number;
+  /** That rate minus the brawler's own overall rate in the same window. */
+  edge: number;
+  decidedSampleSize: number;
+}
+
+/**
+ * Every brawler's record against a given enemy line-up, in two queries.
+ *
+ * The draft helper needs this for the whole roster at once, which is why it is
+ * one grouped query over an array overlap rather than a head-to-head lookup per
+ * candidate — that would be a hundred round trips per draft.
+ *
+ * Reported as an edge against the brawler's own overall rate, so a brawler that
+ * simply wins a lot does not appear to counter everything.
+ */
+export async function getCounterScores(
+  enemyIds: number[],
+  windowDays = 21,
+): Promise<Map<number, CounterScore>> {
+  const out = new Map<number, CounterScore>();
+  const prisma = getPrisma();
+  if (!prisma || enemyIds.length === 0) return out;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    const [overall, versus] = await Promise.all([
+      prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
+        SELECT brawler_id,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples
+        WHERE battle_time >= ${since}
+        GROUP BY brawler_id
+      `,
+      prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
+        SELECT brawler_id,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples
+        WHERE battle_time >= ${since}
+          AND enemy_brawler_ids && ${enemyIds}::int[]
+        GROUP BY brawler_id
+        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
+      `,
+    ]);
+
+    const base = new Map(
+      overall.map((row) => [
+        row.brawler_id,
+        Number(row.decided) > 0 ? Number(row.wins) / Number(row.decided) : null,
+      ]),
+    );
+
+    for (const row of versus) {
+      const decided = Number(row.decided);
+      const winRate = Number(row.wins) / decided;
+      const own = base.get(row.brawler_id);
+      if (own === null || own === undefined) continue;
+
+      out.set(row.brawler_id, {
+        brawlerId: row.brawler_id,
+        winRate,
+        edge: winRate - own,
+        decidedSampleSize: decided,
+      });
+    }
+
+    return out;
+  } catch {
+    return out;
+  }
+}
+
+/** One brawler's record against one specific other brawler. */
+export interface HeadToHead {
+  winRate: number;
+  decidedSampleSize: number;
+}
+
+/**
+ * How brawler A does with brawler B on the other team.
+ *
+ * Separate from `getBrawlerPairings` because that one only publishes pairings
+ * far enough from the brawler's own average to be worth calling a matchup. A
+ * comparison page asks about one specific pair, and "these two are even" is a
+ * real answer there.
+ */
+export async function getHeadToHead(
+  brawlerId: number,
+  opponentId: number,
+  windowDays = 21,
+): Promise<HeadToHead | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const rows = await prisma.$queryRaw<{ wins: bigint; decided: bigint }[]>`
+      SELECT
+        COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+        COUNT(*) AS decided
+      FROM battle_team_samples
+      WHERE brawler_id = ${brawlerId}
+        AND battle_time >= ${since}
+        AND ${opponentId} = ANY(enemy_brawler_ids)
+    `;
+
+    const decided = Number(rows[0]?.decided ?? 0);
+    if (decided < MIN_SAMPLE_FOR_PAIRING) return null;
+    return { winRate: Number(rows[0]?.wins ?? 0) / decided, decidedSampleSize: decided };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Minimum decided battles a brawler needs *on this map* before it can be
  * listed.
@@ -1562,6 +2014,13 @@ function mapConfidence(decided: number): MapConfidence {
 export async function getRankedMapPicks(
   perMap = 3,
   windowDays = 14,
+  /**
+   * Narrows the map half of the query to one map, for its own page. The
+   * per-brawler prior is deliberately left unfiltered: it is the brawler's
+   * form across all of Ranked, which is exactly what a single map's handful of
+   * battles has to be weighed against.
+   */
+  only?: { mapName: string; mode?: string },
 ): Promise<RankedMapPicks[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
@@ -1585,7 +2044,11 @@ export async function getRankedMapPicks(
       }),
       prisma.battleSample.groupBy({
         by: ['mapName', 'eventId', 'mode', 'brawlerId', 'brawlerName', 'result'],
-        where: { ...competitive, mapName: { not: null } },
+        where: {
+          ...competitive,
+          mapName: only ? only.mapName : { not: null },
+          ...(only?.mode ? { mode: only.mode } : {}),
+        },
         _count: { _all: true },
       }),
     ]);
@@ -1675,7 +2138,7 @@ export async function getRankedMapPicks(
         mapDecided += acc.decided;
         mapTotal += acc.total;
       }
-      if (mapDecided < MIN_SAMPLE_FOR_MAP) continue;
+      if (!only && mapDecided < MIN_SAMPLE_FOR_MAP) continue;
 
       const picks: RankedMapPick[] = [...entry.brawlers]
         .filter(([, acc]) => acc.decided >= MIN_SAMPLE_FOR_MAP_PICK)

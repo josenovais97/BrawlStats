@@ -6,6 +6,8 @@ import { BattleLog } from '@/components/player/battle-log';
 import { LastOnline } from '@/components/player/last-online';
 import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
+import { PlayerNav } from '@/components/player/player-nav';
+import { PlayerProgress } from '@/components/player/player-progress';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
 import { PlayerSkillScore } from '@/components/player/player-skill-score';
@@ -138,11 +140,14 @@ export default async function PlayerPage({ params }: PageProps) {
           </Suspense>
         }
       />
+      <PlayerNav />
       <PlayerPlacements
         placements={placements}
         iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
       />
-      <PlayerStats player={player} />
+      <div id="stats" className="scroll-anchor">
+        <PlayerStats player={player} />
+      </div>
       {/* Directly under the headline counters: it is the one number here that
           is a judgement rather than a readout, so it earns the top slot. */}
       <PlayerSkillScore skill={skill} />
@@ -150,7 +155,10 @@ export default async function PlayerPage({ params }: PageProps) {
         <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
       </Suspense>
       <PlayerRecords player={player} />
-      <PlayerTrophyHistory points={trophyHistory} />
+      <div id="progress" className="scroll-anchor space-y-8">
+        <PlayerProgress points={trophyHistory} playerName={player.name} />
+        <PlayerTrophyHistory points={trophyHistory} />
+      </div>
       <PlayerProgression progression={progression} playtime={playtime} />
 
       {/* Directly after progression: it is the same subject narrowed to the
@@ -171,14 +179,14 @@ export default async function PlayerPage({ params }: PageProps) {
         <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
       </Suspense>
 
-      <section>
+      <section id="battles" className="scroll-anchor">
         <SectionHeading title="Recent battles" />
         <Suspense fallback={<BattleLogSkeleton />}>
           <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
         </Suspense>
       </section>
 
-      <section>
+      <section id="brawlers" className="scroll-anchor">
         <SectionHeading
           title="Brawlers"
           aside={`${player.brawlers.length} unlocked`}

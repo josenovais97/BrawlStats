@@ -1,12 +1,19 @@
 import { Database, Medal, Trophy } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
+import {
+  JsonLd,
+  breadcrumbSchema,
+  itemListSchema,
+} from '@/components/seo/structured-data';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
+import { slugify } from '@/lib/slugs';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
@@ -80,9 +87,16 @@ const COPY: Record<
 export async function TierListView({
   format,
   searchParams,
+  modeSlug,
 }: {
   format: TierFormat;
   searchParams: Promise<{ window?: string; mode?: string }>;
+  /**
+   * Set by the `/tier-list/[format]/[mode]` routes. A mode in the path is a
+   * page in its own right — "best brawlers for gem grab" is the search, and a
+   * query parameter is one URL to a crawler however many values it takes.
+   */
+  modeSlug?: string;
 }) {
   const params = await searchParams;
   const windowKey: TierWindowKey = isTierWindow(params.window) ? params.window : '7d';
@@ -90,9 +104,18 @@ export async function TierListView({
   const copy = COPY[format];
 
   const modes = await getFilterableModes(30, 150, format);
-  // Only honour a mode we actually have data for, so a hand-edited query string
-  // cannot produce a permanently empty page.
-  const mode = modes.some((m) => m.mode === params.mode) ? params.mode : undefined;
+  // Only honour a mode we actually have data for, so neither a hand-edited
+  // query string nor a stale link can produce a permanently empty page.
+  const mode = modeSlug
+    ? modes.find((m) => slugify(m.mode) === slugify(modeSlug))?.mode
+    : modes.some((m) => m.mode === params.mode)
+      ? params.mode
+      : undefined;
+
+  // A mode path that resolves to nothing is a 404, not an empty tier list: it
+  // is a URL that does not name anything, and soft-404ing it would put an
+  // indexable empty page behind every typo.
+  if (modeSlug && !mode) notFound();
 
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after the other so the page never needs more than one connection.
@@ -136,15 +159,45 @@ export async function TierListView({
   const scopeLabel = mode
     ? `${humanizeMode(mode)} over the ${TIER_WINDOWS[windowKey].sublabel} window`
     : `${TIER_WINDOWS[windowKey].sublabel} window`;
+  // A mode page is about that mode, so it says so in the heading rather than
+  // carrying the generic title with a filter chip lit up below it.
+  const heading = mode ? `${humanizeMode(mode)} ${copy.heading.toLowerCase()}` : copy.heading;
 
   return (
     <div className="space-y-8">
+      {rated.length > 0 ? (
+        <JsonLd
+          data={itemListSchema(
+            heading,
+            `Brawl Stars brawlers ranked by meta score${mode ? ` in ${humanizeMode(mode)}` : ''}.`,
+            rated
+              .slice()
+              .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
+              .map((entry) => ({
+                name: entry.brawlerName,
+                path: `/brawlers/${entry.brawlerId}`,
+              })),
+          )}
+        />
+      ) : null}
+      {mode ? (
+        <JsonLd
+          data={breadcrumbSchema([
+            { name: copy.heading, path: `/tier-list/${format}` },
+            {
+              name: humanizeMode(mode),
+              path: `/tier-list/${format}/${slugify(mode)}`,
+            },
+          ])}
+        />
+      ) : null}
+
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <Icon className="size-3.5" />
           {copy.eyebrow}
         </p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{copy.heading}</h1>
+        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{heading}</h1>
 
         <p className="mt-3 max-w-3xl leading-relaxed text-muted">
           {copy.intro} Built from{' '}

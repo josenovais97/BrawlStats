@@ -1,8 +1,8 @@
-import { ArrowRight, CalendarClock, Medal, Podium, User } from 'lucide-react';
+import { ArrowRight, CalendarClock, Map, Medal, Podium, Target, User } from 'lucide-react';
 import Link from 'next/link';
 
 /**
- * The four things the site is for, stated once, near the top.
+ * What the site is for, stated once, near the top.
  *
  * Each card carries its own accent so the row reads as four distinct
  * destinations rather than four identical grey boxes, but the accent is
@@ -44,6 +44,20 @@ const PROPS = [
     body: 'What is in rotation right now, with the best brawlers for each map in the Ranked pool.',
     accent: '#35d0ff',
   },
+  {
+    href: '/draft',
+    icon: Target,
+    title: 'Draft helper',
+    body: 'Pick the map, name what the enemy took, and the list reorders around both.',
+    accent: '#35d07f',
+  },
+  {
+    href: '/maps',
+    icon: Map,
+    title: 'Every map',
+    body: 'A page per map in rotation, ranking the brawlers that actually win on it.',
+    accent: '#ffab00',
+  },
 ];
 
 export function HomeValueProps() {
@@ -56,13 +70,13 @@ export function HomeValueProps() {
         </h2>
       </div>
 
-      <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+      <ul className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {PROPS.map(({ href, icon: Icon, title, body, accent }) => (
           <li key={title}>
             {/*
-              A row on a phone and a tile from `sm` up. Four stacked tiles is
-              most of a phone screen spent on navigation the visitor has not
-              asked for yet; four rows is a glanceable list.
+              A row on a phone and a tile from `sm` up. Six stacked tiles is
+              more than a phone screen spent on navigation the visitor has not
+              asked for yet; six rows is a glanceable list.
             */}
             <Link
               href={href}

@@ -306,11 +306,16 @@ export async function pruneOldSamples(): Promise<number> {
     const battles = await prisma.battleSample.deleteMany({
       where: { battleTime: { lt: battleCutoff } },
     });
+    // Same retention as the battles they describe; matchup stats read the same
+    // window, so a row outliving its sample would never be used.
+    const teams = await prisma.battleTeamSample.deleteMany({
+      where: { battleTime: { lt: battleCutoff } },
+    });
     const snapshots = await prisma.playerBrawlerSnapshot.deleteMany({
       where: { snapshotDate: { lt: snapshotCutoff } },
     });
 
-    return battles.count + snapshots.count;
+    return battles.count + teams.count + snapshots.count;
   } catch {
     // A failed prune costs disk, not correctness, so it never fails a run.
     return 0;
@@ -386,6 +391,38 @@ function findSelf(entry: BSBattleLogEntry, playerTag: string): BSBattlePlayer | 
   return all.find((p) => normalizeTag(p.tag) === playerTag);
 }
 
+/**
+ * Splits a team battle into the sampled player's side and the other one.
+ *
+ * Returns null for anything without exactly two teams — free-for-all showdown
+ * has no "against", and a payload we cannot read confidently is better skipped
+ * than guessed at. The subject's own brawler is excluded from `allies`, so a
+ * brawler is never counted as its own team-mate.
+ */
+function splitSides(
+  entry: BSBattleLogEntry,
+  playerTag: string,
+): { allies: number[]; enemies: number[] } | null {
+  const teams = entry.battle.teams;
+  if (!teams || teams.length !== 2) return null;
+
+  const ownIndex = teams.findIndex((team) =>
+    team.some((p) => normalizeTag(p.tag) === playerTag),
+  );
+  if (ownIndex === -1) return null;
+
+  const brawlerIdsOf = (team: BSBattlePlayer[], skipTag?: string) =>
+    team
+      .filter((p) => !skipTag || normalizeTag(p.tag) !== skipTag)
+      .map((p) => p.brawler?.id ?? p.brawlers?.[0]?.id)
+      .filter((id): id is number => typeof id === 'number');
+
+  return {
+    allies: brawlerIdsOf(teams[ownIndex], playerTag),
+    enemies: brawlerIdsOf(teams[ownIndex === 0 ? 1 : 0]),
+  };
+}
+
 async function samplePlayer(tag: string) {
   const prisma = getPrisma();
   if (!prisma) return { battles: 0 };
@@ -430,6 +467,9 @@ async function samplePlayer(tag: string) {
 
   // One battle sample per match, recording only this player's own brawler.
   const samples = [];
+  // Team composition for the same battles, kept in its own list because it
+  // only exists for team modes and is only ever read by matchup stats.
+  const teamSamples = [];
   for (const entry of log.items) {
     const self = findSelf(entry, normalized);
     const brawler = self?.brawler ?? self?.brawlers?.[0];
@@ -459,6 +499,31 @@ async function samplePlayer(tag: string) {
       battleType: type,
       trophyChange: entry.battle.trophyChange ?? null,
       battleTime,
+    });
+
+    const sides = splitSides(entry, normalized);
+    // Only team modes, and only decided ones: a draw pairs a brawler with an
+    // opponent it neither beat nor lost to, which is not a matchup.
+    if (sides && (entry.battle.result === 'victory' || entry.battle.result === 'defeat')) {
+      teamSamples.push({
+        battleKey: `${entry.battleTime}:${normalized}`,
+        playerTag: normalized,
+        brawlerId: brawler.id,
+        result: entry.battle.result,
+        mode: entry.battle.mode ?? entry.event.mode ?? 'unknown',
+        mapName: entry.event.map ?? null,
+        battleType: type,
+        allyBrawlerIds: sides.allies,
+        enemyBrawlerIds: sides.enemies,
+        battleTime,
+      });
+    }
+  }
+
+  if (teamSamples.length > 0) {
+    await prisma.battleTeamSample.createMany({
+      data: teamSamples,
+      skipDuplicates: true,
     });
   }
 

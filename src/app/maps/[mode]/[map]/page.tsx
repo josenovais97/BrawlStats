@@ -1,0 +1,265 @@
+import type { Metadata } from 'next';
+import { ArrowLeft, Swords } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { MapPickList } from '@/components/maps/map-pick-list';
+import { MapPreview } from '@/components/ranked/map-preview';
+import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { getBrawlerMap } from '@/lib/brawlapi';
+import { formatNumber, formatPercent } from '@/lib/format';
+import { getActiveMaps, resolveMap } from '@/lib/game-maps';
+import { slugify } from '@/lib/slugs';
+import { getBestPicksByMode, getRankedMapPicks } from '@/lib/stats';
+import type { BABrawler } from '@/types/brawlapi';
+import type { ModeBestPicks } from '@/types/stats';
+
+interface PageProps {
+  params: Promise<{ mode: string; map: string }>;
+}
+
+/**
+ * Own aggregate plus static artwork. An hour keeps the picks fresh enough
+ * without regenerating four hundred pages on every sampler run.
+ */
+export const revalidate = 3600;
+
+/** How many brawlers a map page ranks. Deeper than the three-up card on /ranked. */
+const PICK_COUNT = 10;
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { mode, map } = await params;
+  const entry = await resolveMap(mode, map).catch(() => undefined);
+  if (!entry) return { title: 'Map' };
+
+  const modeLabel = entry.mode?.name ?? entry.map.gameMode.name;
+
+  return {
+    // Written as the query, because that is how this page is found: people
+    // search the map name plus the thing they want to know about it.
+    title: `${entry.map.name} best brawlers — ${modeLabel} map guide`,
+    description: `The strongest brawlers on ${entry.map.name} (${modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.`,
+    alternates: { canonical: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
+    openGraph: {
+      title: `${entry.map.name} best brawlers`,
+      description: `Best Brawl Stars brawlers on ${entry.map.name} (${modeLabel}), from sampled battles.`,
+      images: entry.map.imageUrl ? [{ url: entry.map.imageUrl }] : undefined,
+    },
+  };
+}
+
+export default async function MapPage({ params }: PageProps) {
+  const { mode: modeSlug, map: mapSlug } = await params;
+  const entry = await resolveMap(modeSlug, mapSlug).catch(() => undefined);
+  if (!entry) notFound();
+
+  const modeLabel = entry.mode?.name ?? entry.map.gameMode.name;
+  const accent = entry.mode?.color ?? '#8b95b8';
+
+  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+
+  // Database reads run one after the other so the page never needs more than
+  // one connection, and each degrades to empty on its own.
+  const mapPicks = entry.scHash
+    ? await getRankedMapPicks(PICK_COUNT, 14, {
+        mapName: entry.map.name,
+        mode: entry.scHash,
+      }).then((rows) => rows[0] ?? null)
+    : null;
+
+  // The fallback, and the reason a brand-new map is still worth a page: the
+  // mode's own picks are a weaker answer than the map's, but they are a real
+  // one, and every map page can offer them.
+  const modePicks: ModeBestPicks | null = entry.scHash
+    ? await getBestPicksByMode(PICK_COUNT)
+        .then((byMode) => byMode.get(entry.scHash!) ?? null)
+        .catch(() => null)
+    : null;
+
+  const hasMapPicks = (mapPicks?.picks.length ?? 0) > 0;
+  const siblings = await getActiveMaps()
+    .then((all) =>
+      all.filter((m) => m.modeSlug === entry.modeSlug && m.mapSlug !== entry.mapSlug),
+    )
+    .catch(() => []);
+
+  const faq = [
+    {
+      question: `What are the best brawlers on ${entry.map.name}?`,
+      answer: hasMapPicks
+        ? `${listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName)))} have the strongest adjusted win rates on ${entry.map.name}, from ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on the map.`
+        : `${entry.map.name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in ${modeLabel} overall are the best available answer until it fills in.`,
+    },
+    {
+      question: `What game mode is ${entry.map.name}?`,
+      answer: `${entry.map.name} is a ${modeLabel} map in Brawl Stars.`,
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Maps', path: '/maps' },
+          { name: modeLabel, path: `/maps/${entry.modeSlug}` },
+          { name: entry.map.name, path: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
+        ])}
+      />
+      <JsonLd data={faqSchema(faq)} />
+
+      <Link
+        href={`/maps/${entry.modeSlug}`}
+        className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" />
+        All {modeLabel} maps
+      </Link>
+
+      <header className="card card-glow overflow-hidden">
+        <span className="block h-1 w-full" style={{ background: accent }} />
+        <MapPreview
+          imageUrl={entry.map.imageUrl}
+          mapName={entry.map.name}
+          modeLabel={modeLabel}
+          accent={accent}
+        />
+        <div className="p-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/maps/${entry.modeSlug}`}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide transition-opacity hover:opacity-80"
+              style={{
+                background: `color-mix(in srgb, ${accent} 20%, transparent)`,
+                color: accent,
+              }}
+            >
+              {entry.mode?.imageUrl ? (
+                <Image
+                  src={entry.mode.imageUrl}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="size-4 object-contain"
+                  unoptimized
+                />
+              ) : null}
+              {modeLabel}
+            </Link>
+            {entry.map.new ? (
+              <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold uppercase text-brand">
+                New
+              </span>
+            ) : null}
+          </div>
+
+          <h1 className="display mt-3 text-3xl uppercase sm:text-4xl">
+            {entry.map.name}
+          </h1>
+          <p className="mt-3 max-w-3xl leading-relaxed text-muted">
+            The brawlers with the best records on {entry.map.name}, a {modeLabel} map.
+            Ranked from battles sampled off the global leaderboard pool, scored against
+            the sample-wide average rather than the map&rsquo;s own — so a pick has to
+            beat the field, not just the lobby.
+          </p>
+          {entry.map.credit ? (
+            <p className="mt-2 text-xs text-muted">Map by {entry.map.credit}</p>
+          ) : null}
+        </div>
+      </header>
+
+      <section>
+        <SectionHeading
+          title={hasMapPicks ? 'Best brawlers here' : `Best brawlers in ${modeLabel}`}
+          subtitle={
+            hasMapPicks
+              ? `From ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.`
+              : `${entry.map.name} has too few sampled battles to rank on its own yet, so these are ${modeLabel} picks across every map in the mode.`
+          }
+          aside={
+            hasMapPicks ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Swords className="size-3.5" />
+                {mapPicks!.brawlersSeen} brawlers seen
+              </span>
+            ) : null
+          }
+        />
+        <MapPickList
+          picks={hasMapPicks ? mapPicks!.picks : (modePicks?.picks ?? [])}
+          brawlerMeta={brawlerMeta}
+          emptyLabel={`No sampled battles for ${modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.`}
+        />
+
+        {hasMapPicks ? (
+          <p className="mt-3 text-xs leading-relaxed text-muted">
+            Scores are shown against a {formatPercent(mapPicks!.baselineWinRate)}{' '}
+            sample-wide Ranked average. A brawler with a handful of battles here is
+            pulled toward its overall Ranked form, so the map has to produce real
+            evidence before it moves anyone.
+          </p>
+        ) : null}
+      </section>
+
+      {/* Answers the two questions the page is found by, in the page's own
+          copy rather than only in its structured data. */}
+      <section>
+        <SectionHeading title={`${entry.map.name} FAQ`} />
+        <dl className="card divide-y divide-border">
+          {faq.map((item) => (
+            <div key={item.question} className="p-4">
+              <dt className="font-semibold">{item.question}</dt>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {siblings.length > 0 ? (
+        <section>
+          <SectionHeading
+            title={`Other ${modeLabel} maps`}
+            aside={
+              <Link
+                href={
+                  entry.scHash
+                    ? `/tier-list/ranked/${slugify(entry.scHash)}`
+                    : '/tier-list/ranked'
+                }
+                className="hover:text-foreground"
+              >
+                {modeLabel} tier list
+              </Link>
+            }
+          />
+          <ul className="flex flex-wrap gap-2">
+            {siblings.slice(0, 24).map((sibling) => (
+              <li key={sibling.map.id}>
+                <Link
+                  href={`/maps/${sibling.modeSlug}/${sibling.mapSlug}`}
+                  className="card card-interactive block px-3 py-2 text-sm font-medium"
+                >
+                  {sibling.map.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </div>
+  );
+}
+
+/** ["A", "B", "C"] -> "A, B and C". */
+function listOf(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? '';
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+
+/** "HARD LANDING" -> "Hard Landing", for prose that quotes an API name. */
+function titleCase(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+}
