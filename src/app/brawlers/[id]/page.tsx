@@ -23,6 +23,11 @@ import {
 } from '@/components/game-icons';
 import { gearIconUrl, getBrawler, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import {
+  getBrawlerWiki,
+  wikiPageUrl,
+  type BrawlerWiki,
+} from '@/lib/brawler-wiki';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
@@ -134,6 +139,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const gadgets = ownedBy(brawler.gadgets, official?.gadgets);
   const gears = official?.gears ?? [];
   const hyperCharges = official?.hyperCharges ?? [];
+  // Combat stats and resolved ability text. Nothing else publishes these —
+  // see lib/brawler-wiki. Null costs the sections that use it, not the page.
+  const wiki = await getBrawlerWiki(brawler.name).catch(() => null);
   const buffies = await getBrawlerBuffies(brawlerId);
   const hyperChargeOwnership = await getHyperChargeOwnership(brawlerId);
 
@@ -158,6 +166,26 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       : null;
   const accent = brawler.rarity?.color ?? '#8b95b8';
   const name = titleCase(brawler.name);
+
+  // A buffie is named for the ability type it upgrades, so each one is listed
+  // against the gadget or star power it actually changes.
+  const buffieEffects: { kind: string; ability: string; effect: string }[] = [];
+  for (const [kind, items] of [
+    ['Gadget', gadgets],
+    ['Star power', starPowers],
+  ] as const) {
+    for (const item of items) {
+      const effect = wiki?.abilities.get(slugify(item.name))?.buffie;
+      if (effect) buffieEffects.push({ kind, ability: item.name, effect });
+    }
+  }
+  if (wiki?.hypercharge?.buffie) {
+    buffieEffects.push({
+      kind: 'Hypercharge',
+      ability: wiki.hypercharge.name,
+      effect: wiki.hypercharge.buffie,
+    });
+  }
 
   // Built from what the page renders, never in addition to it: a FAQ block
   // that only exists in the markup is the thing Google demotes sites for, and
@@ -287,6 +315,40 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         </div>
       </header>
 
+      {wiki && wiki.stats.health ? (
+        <section>
+          <SectionHeading
+            title="Combat stats"
+            subtitle="Base values at Power 11, before gears and star powers."
+          />
+          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {(
+              [
+                ['Health', wiki.stats.health],
+                [wiki.stats.attackLabel ?? 'Attack', wiki.stats.attack],
+                [wiki.stats.superLabel ?? 'Super', wiki.stats.super],
+                ['Reload', wiki.stats.reload],
+                ['Range', wiki.stats.attackRange],
+                ['Speed', wiki.stats.movementSpeed],
+              ] as const
+            )
+              // Not every brawler has every stat: a super that deals no direct
+              // damage has no super damage, and the infobox simply omits it.
+              .filter(([, value]) => Boolean(value))
+              .map(([label, value]) => (
+                <div key={label} className="card p-3">
+                  <dt className="truncate text-xs font-medium uppercase tracking-wide text-muted">
+                    {label}
+                  </dt>
+                  <dd className="mt-0.5 truncate text-lg font-bold tabular-nums">
+                    {value}
+                  </dd>
+                </div>
+              ))}
+          </dl>
+        </section>
+      ) : null}
+
       <section>
         <h2 className="mb-4 text-2xl font-bold tracking-tight">Performance</h2>
         {stat ? (
@@ -403,16 +465,18 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           node={<StarPowerIcon className="size-5" />}
           items={starPowers}
           emptyLabel="No star powers released."
+          wiki={wiki}
         />
         <AccessoryList
           title="Gadgets"
           node={<GadgetIcon className="size-5" />}
           items={gadgets}
           emptyLabel="No gadgets released."
+          wiki={wiki}
         />
       </section>
 
-      {gears.length > 0 || hyperCharges.length > 0 || buffies ? (
+      {gears.length > 0 || hyperCharges.length > 0 || buffies || buffieEffects.length > 0 ? (
         <section className="grid gap-6 lg:grid-cols-2">
           {gears.length > 0 ? (
             <div>
@@ -473,9 +537,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                             {hyper.name.toLowerCase()}
                           </p>
                           <p className="mt-1 text-sm leading-relaxed text-muted">
-                            Unlocked at Power 11. Charges from dealing and taking damage,
-                            then boosts {name}&rsquo;s speed, damage and shield for a few
-                            seconds.
+                            {wiki?.hypercharge?.description ??
+                              `Unlocked at Power 11. Charges from dealing and taking damage, then boosts ${name}'s speed, damage and shield for a few seconds.`}
                             {hyperChargeOwnership !== null
                               ? ` ${formatPercent(hyperChargeOwnership)} of sampled owners have unlocked it.`
                               : ''}
@@ -484,17 +547,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                       </li>
                     ))}
                   </ul>
-                  {/* Said once, plainly, rather than repeated per row: the exact
-                      boost figures differ per brawler and no source publishes
-                      them, so claiming specifics would be inventing them. */}
-                  <p className="mt-2 text-xs leading-relaxed text-muted">
-                    The exact boost percentages vary per brawler and are not published by
-                    the game API or by any artwork source, so they are not listed here.
-                  </p>
+                  {!wiki?.hypercharge?.description ? (
+                    <p className="mt-2 text-xs leading-relaxed text-muted">
+                      The exact boost percentages vary per brawler and are not published
+                      by the game API or by any artwork source, so they are not listed
+                      here.
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
 
-              {buffies ? (
+              {buffies || buffieEffects.length > 0 ? (
                 <div>
                   <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
                     <BuffieIcon className="size-6" />
@@ -502,52 +565,43 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   </h2>
 
                   {/*
-                    Existence, not adoption. A buffie is binary and permanent —
-                    nothing to choose between, nothing to equip — so an
-                    ownership percentage measures how long it has been out, not
-                    anything about the brawler. The only question worth asking
-                    of this data is whether one exists yet.
+                    What each buffie does, per ability — the question the
+                    ownership percentages never answered. A brawler has one
+                    buffie per ability type, but its effect differs by which
+                    gadget or star power it is buffing, so they are listed
+                    against the ability rather than as three flat rows.
                   */}
-                  {buffies.none ? (
+                  {buffieEffects.length > 0 ? (
+                    <ul className="card divide-y divide-border overflow-hidden">
+                      {buffieEffects.map((entry) => (
+                        <li key={`${entry.kind}-${entry.ability}`} className="p-4">
+                          <p className="flex flex-wrap items-baseline gap-2">
+                            <span className="font-semibold capitalize">
+                              {entry.ability.toLowerCase()}
+                            </span>
+                            <span className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-muted">
+                              {entry.kind}
+                            </span>
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-muted">
+                            {entry.effect}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (buffies?.none ?? true) ? (
                     <p className="card px-4 py-3 text-sm text-muted">
                       <span className="font-semibold text-foreground">Unreleased.</span>{' '}
                       {name} has no buffies yet.
                     </p>
                   ) : (
-                    <>
-                      <ul className="card divide-y divide-border overflow-hidden">
-                        {(
-                          [
-                            ['Gadget', buffies.gadget],
-                            ['Star power', buffies.starPower],
-                            ['Hypercharge', buffies.hyperCharge],
-                          ] as const
-                        ).map(([label, released]) => (
-                          <li
-                            key={label}
-                            className="flex items-center justify-between gap-3 px-4 py-2.5"
-                          >
-                            <span className="text-sm font-medium">{label} buffie</span>
-                            <span
-                              className={`shrink-0 rounded-md px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide ${
-                                released
-                                  ? 'bg-victory/15 text-victory'
-                                  : 'bg-surface-2 text-muted'
-                              }`}
-                            >
-                              {released ? 'Released' : 'Unreleased'}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="mt-2 text-xs leading-relaxed text-muted">
-                        A buffie strengthens the ability it belongs to. What each one
-                        actually does is not published anywhere — the official brawler
-                        catalogue does not list buffies at all, and they appear only as
-                        three flags on a player&rsquo;s own brawler — so which exist is
-                        as far as this can go.
-                      </p>
-                    </>
+                    /* Our own samples say buffies exist here, but the wiki has
+                       no text for them — a brand-new release, most likely. */
+                    <p className="card px-4 py-3 text-sm text-muted">
+                      <span className="font-semibold text-foreground">Released.</span>{' '}
+                      {name} has buffies, but their effects have not been documented
+                      yet.
+                    </p>
                   )}
                 </div>
               ) : null}
@@ -564,6 +618,24 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           <BrawlerLeaderboard brawlerId={brawlerId} />
         </Suspense>
       </section>
+
+      {wiki ? (
+        /* Attribution, once, for everything on this page that came from the
+           wiki: the combat stats, the resolved ability text, the hypercharge
+           effect and the buffie effects. Their text is CC-BY-SA. */
+        <p className="text-xs leading-relaxed text-muted">
+          Combat stats, ability descriptions, hypercharge and buffie effects from the{' '}
+          <a
+            href={wikiPageUrl(wiki.title)}
+            rel="noreferrer noopener"
+            target="_blank"
+            className="font-medium text-brand hover:underline"
+          >
+            Brawl Stars Wiki
+          </a>
+          , CC-BY-SA. Win rates, pick rates and matchups are our own.
+        </p>
+      ) : null}
 
       <section>
         <SectionHeading title={`${name} FAQ`} />
@@ -610,11 +682,13 @@ function AccessoryList({
   node,
   items,
   emptyLabel,
+  wiki,
 }: {
   title: string;
   node: React.ReactNode;
   items: BAAccessory[];
   emptyLabel: string;
+  wiki: BrawlerWiki | null;
 }) {
   return (
     <div>
@@ -640,8 +714,13 @@ function AccessoryList({
               <div className="min-w-0">
                 <p className="font-bold capitalize">{item.name.toLowerCase()}</p>
                 <p className="mt-1 text-sm leading-relaxed text-muted">
-                  {/* Descriptions carry inline markup tokens; the plain text field is safe to render as-is. */}
-                  {item.description}
+                  {/*
+                    The wiki's copy of the in-game text has its numbers filled
+                    in; the artwork source ships the same sentence with the
+                    game's own placeholders still in it, which we can only
+                    render as "?". Prefer the readable one, fall back to ours.
+                  */}
+                  {wiki?.abilities.get(slugify(item.name))?.description ?? item.description}
                 </p>
               </div>
             </li>
