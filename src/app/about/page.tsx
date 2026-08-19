@@ -46,7 +46,7 @@ export default function AboutPage() {
     <div className="space-y-12">
       <PageHeading
         title="About Brawl Zone"
-        subtitle="A fast, honest stats site for Brawl Stars — built for players who want to know exactly where they stand."
+        subtitle="A fast, honest stats site for Brawl Stars. Built for players who want to know exactly where they stand."
       />
 
       <section>
@@ -60,7 +60,7 @@ export default function AboutPage() {
           <Card
             icon={Database}
             title="Track the meta"
-            body="Tier lists and per-map picks aggregated from thousands of sampled battles, refreshed daily — plus upgrade-ownership rates, release notes and news in one place."
+            body="Tier lists and per-map picks aggregated from thousands of sampled battles, refreshed daily. Plus upgrade-ownership rates, release notes and news in one place."
           />
         </div>
       </section>
@@ -98,7 +98,7 @@ export default function AboutPage() {
           {[
             [
               'Battle history only goes back ~25 matches',
-              'That is everything the API keeps. Anything labelled “recent” genuinely is — there is no career match history to show.',
+              'That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.',
             ],
             [
               'Leaderboards stop at 200',
@@ -106,7 +106,7 @@ export default function AboutPage() {
             ],
             [
               'Loadouts are not published',
-              'The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match — no endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler\u2019s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.',
+              'The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler\u2019s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.',
             ],
             [
               'Tier list percentages are adjusted',
@@ -142,7 +142,7 @@ export default function AboutPage() {
             ],
             [
               'Full catalogue',
-              'Every map still in the game — around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.',
+              'Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.',
             ],
             [
               'Map picks vs mode picks',
@@ -150,7 +150,7 @@ export default function AboutPage() {
             ],
             [
               'Confidence labels',
-              'Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking — nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.',
+              'Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.',
             ],
           ].map(([title, body]) => (
             <li key={title} className="p-5">
@@ -171,7 +171,7 @@ export default function AboutPage() {
             <p>
               There is no account system, so there is nothing to sign up for and no
               password to store. Your recent searches and saved profiles live in your
-              own browser&apos;s local storage and are never sent to us — clearing your
+              own browser&apos;s local storage and are never sent to us. Clearing your
               browser data removes them for good.
             </p>
             <p>
@@ -180,7 +180,7 @@ export default function AboutPage() {
                   of this page. */}
               The site does use Vercel&apos;s privacy-friendly analytics to count page
               views. It records no cookies and does not build a profile of you or follow
-              you across other sites — it is a visit counter, not ad tracking.
+              you across other sites. It is a visit counter, not ad tracking.
             </p>
             <p>
               Looking up a tag is a public action: the same data is available to anyone

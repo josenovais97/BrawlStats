@@ -62,7 +62,7 @@ const COPY: Record<
     heading: 'Ranked tier list',
     battles: 'Ranked battles',
     intro:
-      'How brawlers perform in competitive Ranked, where matchmaking pairs comparable opponents — so what is left reflects the brawler rather than who was holding it.',
+      'How brawlers perform in competitive Ranked, where matchmaking pairs comparable opponents. So what is left reflects the brawler rather than who was holding it.',
     caveat:
       'Ranked is 3v3 modes only and a small slice of what gets sampled, so the list is shorter and moves faster than the ladder one.',
     unratedHeading: 'Not enough Ranked data',
@@ -75,7 +75,7 @@ const COPY: Record<
     heading: 'Trophy tier list',
     battles: 'trophy-ladder battles',
     intro:
-      'How brawlers perform on the trophy ladder — the games most people actually play, showdown included, where you pick what you own rather than what the draft leaves you.',
+      'How brawlers perform on the trophy ladder. The games most people actually play, showdown included, where you pick what you own rather than what the draft leaves you.',
     caveat:
       'Ladder matchmaking is looser than Ranked, so some of a brawler’s record here is the lobby rather than the brawler. Each mode is scored against its own average to keep that from deciding the list.',
     unratedHeading: 'Not enough ladder data',
@@ -352,7 +352,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
               {/* Score leads, because it is what the ordering uses. The two
                   inputs sit underneath so the number is never a black box. */}
               <p className="text-center text-sm font-black tabular-nums" style={{ color }}>
-                {entry.metaScore?.toFixed(1) ?? '—'}
+                {entry.metaScore?.toFixed(1) ?? '–'}
               </p>
               <p className="text-center text-[10px] tabular-nums text-muted">
                 {formatPercent(entry.normalizedWinRate)} · {formatPercent(entry.usageRate)}

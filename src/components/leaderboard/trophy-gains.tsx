@@ -51,7 +51,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
             <Link href="/about" className="font-medium text-brand hover:underline">
               sampled player pool
             </Link>
-            , ranked by trophies per day since each player was last read — a different
+            , ranked by trophies per day since each player was last read. A different
             population from the official top 100 below, so these names mostly do not
             appear there.
           </p>

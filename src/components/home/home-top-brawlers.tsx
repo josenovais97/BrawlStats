@@ -117,7 +117,7 @@ export async function HomeTopBrawlers() {
                   className="display text-lg leading-none tabular-nums sm:text-xl"
                   style={{ color: TIER_COLOR[tier] }}
                 >
-                  {row.score?.toFixed(1) ?? '—'}
+                  {row.score?.toFixed(1) ?? '–'}
                 </p>
                 <p className="mt-1 text-[0.625rem] font-medium uppercase tracking-wider text-muted">
                   Meta score

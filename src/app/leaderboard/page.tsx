@@ -57,7 +57,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Leaderboard</h1>
         <p className="mt-3 max-w-3xl leading-relaxed text-muted">
           {board === 'cosmetics'
-            ? 'What the sampled player pool is wearing — built from our own daily samples, not from the game API.'
+            ? 'What the sampled player pool is wearing. Built from our own daily samples, not from the game API.'
             : board === 'ranked'
               ? 'Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.'
               : `The official top 100 ${board} by trophies in ${regionName(region)}, straight from the game API.`}
@@ -110,7 +110,7 @@ async function PlayerBoard({ region }: { region: string }) {
     <section aria-labelledby="player-board">
       {/* Headed explicitly, and named for its population. Unheaded, it ran
           straight on from the trophy-gains list above and read as more of the
-          same ranking — which it is not: that list is our sampled pool, this
+          same ranking. Which it is not: that list is our sampled pool, this
           one is the game's own top 100. */}
       <div id="player-board">
         <SectionHeading

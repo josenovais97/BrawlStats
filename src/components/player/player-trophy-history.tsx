@@ -103,7 +103,7 @@ export function PlayerTrophyHistory({ points }: { points: TrophyPoint[] }) {
         <p className="mt-4 flex items-start gap-2 rounded-lg bg-surface-2 px-4 py-3 text-xs leading-relaxed text-muted">
           <LineChart className="mt-0.5 size-4 shrink-0 text-accent" />
           <span>
-            One point per day, recorded when this profile is viewed — so the line
+            One point per day, recorded when this profile is viewed. So the line
             covers the days someone checked, not every day played. It fills in as
             the profile gets looked at.
           </span>

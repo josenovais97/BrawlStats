@@ -44,7 +44,7 @@ export function BrawlerSplits({
         empty="Not enough battles on any one map yet."
         rows={maps.slice(0, 6).map((split) => ({
           key: `${split.mode}-${split.mapName}`,
-          label: split.mapName ?? '—',
+          label: split.mapName ?? '–',
           sublabel: humanizeMode(split.mode),
           href: mapSlugFor(split),
           split,

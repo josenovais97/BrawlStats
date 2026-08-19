@@ -47,7 +47,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     ? [
         ['Win rate', formatPercent(adjusted)],
         ['Pick rate', formatPercent(stat.usageRate)],
-        ['Tier', tier ?? '—'],
+        ['Tier', tier ?? '–'],
       ]
     : [];
 

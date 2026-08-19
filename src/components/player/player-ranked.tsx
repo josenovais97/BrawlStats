@@ -51,7 +51,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
             <Cell
               icon={TrendingUp}
               label="Season best"
-              value={player.highestSeasonRankedRankName ?? '—'}
+              value={player.highestSeasonRankedRankName ?? '–'}
               hint={
                 player.highestSeasonRankedElo
                   ? `${formatNumber(player.highestSeasonRankedElo)} elo`
@@ -66,7 +66,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
             <Cell
               icon={Crown}
               label="All-time best"
-              value={player.highestAllTimeRankedRankName ?? '—'}
+              value={player.highestAllTimeRankedRankName ?? '–'}
               hint={
                 player.highestAllTimeRankedElo
                   ? `${formatNumber(player.highestAllTimeRankedElo)} elo`

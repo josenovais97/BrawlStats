@@ -105,7 +105,7 @@ export function BrawlerMatchups({
         {formatPercent(pairings.baseline)} win rate across{' '}
         {formatNumber(pairings.sampleSize)} sampled team battles. Counted once per
         battle from one player&rsquo;s side, and kept out of the win-rate and pick-rate
-        numbers above — those would be skewed by counting every participant.
+        numbers above. Those would be skewed by counting every participant.
       </p>
     </div>
   );

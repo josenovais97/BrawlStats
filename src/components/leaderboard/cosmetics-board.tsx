@@ -46,7 +46,7 @@ export async function CosmeticsBoard() {
         <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
           Share of sampled brawlers wearing each skin. Default skins are left out
           of the list but still counted in the total, so a 2% share means two in
-          every hundred brawlers we saw — not two in every hundred that had a
+          every hundred brawlers we saw. Not two in every hundred that had a
           skin on at all.
         </p>
 

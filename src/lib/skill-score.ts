@@ -418,7 +418,7 @@ function detectFlag({
     return {
       kind: 'smurf',
       label: 'Likely smurf',
-      detail: `Peaked at ${peakElo.toLocaleString('en-US')} elo on a level ${player.expLevel} account with ${owned} brawlers — far above where accounts this size usually land. Either a second account, or someone who already knew the game.`,
+      detail: `Peaked at ${peakElo.toLocaleString('en-US')} elo on a level ${player.expLevel} account with ${owned} brawlers. Far above where accounts this size usually land. Either a second account, or someone who already knew the game.`,
     };
   }
 

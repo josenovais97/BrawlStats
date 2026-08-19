@@ -27,7 +27,7 @@ const PROPS = [
     href: '/tier-list/ranked',
     icon: Podium,
     title: 'Two tier lists',
-    body: 'Ranked and trophy ladder scored separately — they are different games, and the answers differ.',
+    body: 'Ranked and trophy ladder scored separately. They are different games, and the answers differ.',
     accent: '#ff5c72',
   },
   {
@@ -55,7 +55,7 @@ const PROPS = [
     href: '/maps',
     icon: Map,
     title: 'Every map',
-    body: 'Live events, the Ranked pool and the full catalogue — each map ranking the brawlers that win on it.',
+    body: 'Live events, the Ranked pool and the full catalogue. Each map ranking the brawlers that win on it.',
     accent: '#ffab00',
   },
 ];

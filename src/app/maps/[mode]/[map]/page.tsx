@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     // Written as the query, because that is how this page is found: people
     // search the map name plus the thing they want to know about it.
-    title: `${entry.map.name} best brawlers — ${modeLabel} map guide`,
+    title: `${entry.map.name} best brawlers, ${modeLabel} map guide`,
     description: `The strongest brawlers on ${entry.map.name} (${modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.`,
     alternates: { canonical: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
     openGraph: {
@@ -194,7 +194,7 @@ export default async function MapPage({ params }: PageProps) {
           <p className="mt-3 max-w-3xl leading-relaxed text-muted">
             The brawlers with the best records on {entry.map.name}, a {modeLabel} map.
             Ranked from battles sampled off the global leaderboard pool, scored against
-            the sample-wide average rather than the map&rsquo;s own — so a pick has to
+            the sample-wide average rather than the map&rsquo;s own. So a pick has to
             beat the field, not just the lobby.
           </p>
           {entry.map.credit ? (

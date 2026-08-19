@@ -66,7 +66,7 @@ export function MetaMovers({
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
         Change in <strong className="font-semibold text-foreground">meta score</strong>{' '}
-        — the same 0&ndash;10 scale the tiers above use, measured on the stored
+. The same 0&ndash;10 scale the tiers above use, measured on the stored
         daily snapshots, so a mover is a brawler visibly climbing or sliding the
         Ranked meta.{' '}
         {span
@@ -80,7 +80,7 @@ export function MetaMovers({
             <strong className="font-semibold text-foreground">
               Across all modes
             </strong>{' '}
-            — the daily snapshots this compares are not split by mode, so the
+. The daily snapshots this compares are not split by mode, so the
             filter above does not apply here.
           </>
         ) : null}

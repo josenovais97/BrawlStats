@@ -39,7 +39,7 @@ export function PlayerProgress({
   const headline = month ?? week!;
   const shareText = `${playerName} is ${headline.change >= 0 ? 'up' : 'down'} ${formatNumber(
     Math.abs(headline.change),
-  )} trophies over the last ${headline.days} days — now on ${formatNumber(last.trophies)}.`;
+  )} trophies over the last ${headline.days} days. Now on ${formatNumber(last.trophies)}.`;
 
   return (
     <section>

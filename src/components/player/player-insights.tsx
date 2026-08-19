@@ -179,7 +179,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
             <Row label="Battles per day" value={perDay.toFixed(1)} />
             <Row
               label="Last seen"
-              value={insights.lastBattleAt ? relativeTime(insights.lastBattleAt) : '—'}
+              value={insights.lastBattleAt ? relativeTime(insights.lastBattleAt) : ', '}
             />
             {insights.modes[0] ? (
               <Row label="Top mode" value={humanizeMode(insights.modes[0].mode)} />

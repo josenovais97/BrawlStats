@@ -11,7 +11,7 @@ import { getSeasonState } from '@/lib/ranked-seasons';
 import { slugify } from '@/lib/slugs';
 
 export const metadata: Metadata = {
-  title: 'Brawl Stars maps — best brawlers for every map',
+  title: 'Brawl Stars maps. Best brawlers for every map',
   description:
     'Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles.',
   alternates: { canonical: '/maps' },
@@ -105,7 +105,7 @@ export default async function MapsIndexPage() {
           <div>
             <SectionHeading
               title="Full catalogue"
-              subtitle="Every map still in the game, grouped by mode. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today — the two sections above can."
+              subtitle="Every map still in the game, grouped by mode. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can."
             />
           </div>
           {groups.map((group) => (

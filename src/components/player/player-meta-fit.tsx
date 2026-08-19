@@ -99,7 +99,7 @@ export function PlayerMetaFit({
           icon={ArrowUpRight}
           tone="text-victory"
           empty="Every top-tier brawler you own is at power 11."
-          hint="Top-tier brawlers you own below power 11 — the cheapest upgrades on this account."
+          hint="Top-tier brawlers you own below power 11. The cheapest upgrades on this account."
         >
           {underlevelled.map((entry) => {
             const brawler = owned.get(entry.brawlerId)!;
@@ -238,7 +238,7 @@ function Row({
             className="text-sm font-black tabular-nums"
             style={{ color: tier ? TIER_COLOR[tier] : undefined }}
           >
-            {score?.toFixed(1) ?? '—'}
+            {score?.toFixed(1) ?? '–'}
           </span>
           {tier ? (
             <span

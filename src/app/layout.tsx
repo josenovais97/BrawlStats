@@ -63,7 +63,7 @@ export default function RootLayout({
       The font variables have to land on <html>, not <body>. Tailwind's theme
       maps `--font-sans` to `--font-geist-sans` at `:root`, and a custom
       property that references an undefined variable computes to
-      guaranteed-invalid and stays that way for every descendant — which
+      guaranteed-invalid and stays that way for every descendant. Which
       silently dropped Geist and Lilita One across the whole site.
     */
     <html

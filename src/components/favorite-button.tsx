@@ -38,7 +38,7 @@ export function FavoriteButton({ kind, tag, name }: Props) {
       onClick={() => toggleFavorite({ kind, tag, name })}
       aria-pressed={saved}
       aria-label={saved ? `Remove ${name} from favourites` : `Save ${name} to favourites`}
-      title={saved ? 'Saved — click to remove' : 'Save to favourites'}
+      title={saved ? 'Saved. Click to remove' : 'Save to favourites'}
       className={`inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${
         saved
           ? 'border-brand/50 bg-brand/15 text-brand'

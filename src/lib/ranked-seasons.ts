@@ -70,7 +70,7 @@ const FALLBACK_SEASONS: RankedSeason[] = [
 export const TRIAL_BRAWLER_RULES = [
   'Playable in Ranked even if you have not unlocked them.',
   'Fielded at Power 11 with every Gadget, Star Power, Gear, Buffie and their Hypercharge, exactly as in Friendly Battles.',
-  'They count toward the Power 11 brawler requirement for each rank — Mythic and above need more than 12.',
+  'They count toward the Power 11 brawler requirement for each rank, Mythic and above need more than 12.',
 ] as const;
 
 /**

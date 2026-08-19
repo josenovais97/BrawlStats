@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const label = humanizeMode(match?.mode ?? mode);
 
   return {
-    title: `Best Brawl Stars brawlers for ${label} — Trophy tier list`,
+    title: `Best Brawl Stars brawlers for ${label}, Trophy tier list`,
     description: `Which brawlers win most in ${label}, ranked by meta score from sampled trophy-ladder battles.`,
     alternates: { canonical: `/tier-list/trophy/${slugify(match?.mode ?? mode)}` },
   };

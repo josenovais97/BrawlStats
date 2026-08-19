@@ -61,7 +61,7 @@ export const ERROR_COPY: Record<ApiErrorCode, { title: string; detail: string }>
   upstreamDown: {
     title: 'Brawl Stars API unavailable',
     detail:
-      'The game API or the proxy is not responding. This usually clears up on its own — try again shortly.',
+      'The game API or the proxy is not responding. This usually clears up on its own. Try again shortly.',
   },
   timeout: {
     title: 'Request timed out',

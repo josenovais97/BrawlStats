@@ -45,7 +45,7 @@ export async function RankedBoard() {
       <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
         Current season standing. The game API publishes no Ranked leaderboard,
         so this one is built from the {formatNumber(pool)} sampled players who
-        have played Ranked this season — the top {players.length} of those, not
+        have played Ranked this season. The top {players.length} of those, not
         a global board. Looking up a profile adds it to the pool.
       </p>
 

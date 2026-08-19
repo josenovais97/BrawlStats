@@ -147,7 +147,7 @@ export default async function PlayerPage({ params }: PageProps) {
         }
       />
       {/* High in the page on purpose: a returning visitor's first question is
-          "what changed", and it costs nothing to answer — every number here is
+          "what changed", and it costs nothing to answer. Every number here is
           already on screen below. */}
       <SinceLastVisit
         tag={normalizedTag}

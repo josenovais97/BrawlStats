@@ -20,7 +20,7 @@ const FEATURES = [
     icon: Gauge,
     accent: '#ff5c72',
     title: 'Skill score out of 10',
-    body: 'Weighted toward Ranked, the only mode where matchmaking pairs comparable opponents — so it reflects how you play, not how long you have played. Smurfs and collectors get called out.',
+    body: 'Weighted toward Ranked, the only mode where matchmaking pairs comparable opponents. So it reflects how you play, not how long you have played. Smurfs and collectors get called out.',
   },
   {
     icon: Swords,

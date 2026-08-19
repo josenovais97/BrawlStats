@@ -20,7 +20,7 @@ import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { ModePick, RankedMapPick, RankedMapPicks } from '@/types/stats';
 
 export const metadata: Metadata = {
-  title: 'Brawl Stars draft helper — pick against the enemy team',
+  title: 'Brawl Stars draft helper. Pick against the enemy team',
   description:
     'Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.',
   // Self-canonical, and deliberately so: every map and enemy combination is
@@ -301,7 +301,7 @@ export default async function DraftPage({ searchParams }: PageProps) {
             <p className="mt-3 text-xs leading-relaxed text-muted">
               Map score is a brawler&rsquo;s adjusted win rate here, weighed against its
               overall Ranked form. The matchup figure is its win rate when one of the
-              brawlers you named was on the other team, minus its own average — so a
+              brawlers you named was on the other team, minus its own average. So a
               brawler that simply wins a lot does not appear to counter everything.
             </p>
           </section>

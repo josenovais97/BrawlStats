@@ -17,19 +17,23 @@ interface Props {
 }
 
 /**
- * The most commonly *unlocked* star power, gadget and gears among sampled
- * players.
+ * Which gears this brawler's owners spend their coins on.
  *
- * Deliberately never called a "build", and never phrased as what players run.
- * The API reports what a player owns on a brawler and nothing about what they
- * took into a match — there is no equipped-loadout field anywhere in the
- * player or battle payloads. Ownership correlates with usage, but it is not
- * usage, and a section headed "popular build" was claiming a measurement the
- * data cannot make.
+ * Gears are the part of a loadout that is actually a choice. A player picks
+ * two from nineteen and pays for them, so what experienced owners have bought
+ * is a revealed preference worth reading: on Shelly the spread runs from 25%
+ * down to 7%, and the top of that list is a real recommendation.
  *
- * Ownership is still worth showing: for gears especially, where a player picks
- * a couple from nineteen, choosing to unlock one is a real signal. It just has
- * to be labelled as the thing it is.
+ * Star powers and gadgets are not, which is why they are treated differently
+ * below. Measured across the sampled pool, between 74% and 99% of a brawler's
+ * owners have unlocked *both* options, so the split between them is always
+ * near enough to 50/50 to be noise. Presenting that as a build recommendation
+ * would be dressing up a coin flip. They are shown only when the two options
+ * genuinely diverge, and summarised in a line otherwise.
+ *
+ * None of this is usage. The API publishes what a player owns on a brawler and
+ * nothing about what they took into a match, and there is no field for it
+ * anywhere in the player or battle payloads.
  */
 export function PopularBuild({ build, meta, gearNames }: Props) {
   if (!build || build.sampleSize === 0) {
@@ -38,9 +42,8 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
          missing and offers a page that does have an answer. */
       <div className="card p-6">
         <p className="text-sm leading-relaxed text-muted">
-          No sampled player owns this brawler yet, so there is nothing to build a
-          popular loadout from. Ownership is read from the profiles the sampler walks
-          through, which fills in over the following days for a new release.
+          No sampled player owns this brawler yet, so there is nothing to measure.
+          This fills in over the next few days as the sampler works through profiles.
         </p>
         <Link
           href="/tier-list/trophy"
@@ -57,35 +60,71 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
     accessoryById.set(a.id, a);
   }
 
+  /*
+   * How far apart the two options have to be before the split says anything.
+   *
+   * Below this the difference is smaller than the week-to-week wobble in the
+   * sample, so the row would be ranking noise.
+   */
+  const MEANINGFUL_GAP = 0.08;
+
+  const spread = (options: BuildOption[]) =>
+    options.length > 1 ? Math.abs(options[0].share - options[1].share) : 0;
+
+  const starPowersSplit = spread(build.starPowers) >= MEANINGFUL_GAP;
+  const gadgetsSplit = spread(build.gadgets) >= MEANINGFUL_GAP;
+
   const groups: {
     title: string;
     node: React.ReactNode;
     options: BuildOption[];
+    /** Shown above the bars when the split needs framing. */
+    note?: string;
   }[] = [
     {
-      title: 'Star powers unlocked',
-      node: <StarPowerIcon className="size-5" />,
-      options: build.starPowers,
+      title: 'Gears owners buy',
+      node: <GearIcon className="size-5" />,
+      options: build.gears,
+      note: 'Gears cost coins and you can only run two, so what owners have bought is a real preference.',
     },
-    {
-      title: 'Gadgets unlocked',
-      node: <GadgetIcon className="size-5" />,
-      options: build.gadgets,
-    },
-    { title: 'Gears unlocked', node: <GearIcon className="size-5" />, options: build.gears },
+    ...(starPowersSplit
+      ? [
+          {
+            title: 'Star powers',
+            node: <StarPowerIcon className="size-5" />,
+            options: build.starPowers,
+            note: 'One of these is noticeably more common than the other, which usually means it came first or is the one people buy.',
+          },
+        ]
+      : []),
+    ...(gadgetsSplit
+      ? [
+          {
+            title: 'Gadgets',
+            node: <GadgetIcon className="size-5" />,
+            options: build.gadgets,
+            note: undefined,
+          },
+        ]
+      : []),
   ];
 
   return (
     <div className="space-y-4">
-      {groups.map(({ title, node, options }) => {
+      {groups.map(({ title, node, options, note }) => {
         if (options.length === 0) return null;
 
         return (
           <div key={title} className="card p-4">
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold">
+            <h3 className="flex items-center gap-2 text-sm font-bold">
               {node}
               {title}
             </h3>
+            {note ? (
+              <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{note}</p>
+            ) : (
+              <div className="mb-3" />
+            )}
 
             <ul className="space-y-2">
               {options.map((option, index) => {
@@ -149,14 +188,22 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       })}
 
       <p className="text-xs leading-relaxed text-muted">
-        Share of unlocks within each category, across {formatNumber(build.sampleSize)}{' '}
-        tracked players who own this brawler.{' '}
-        <strong className="font-semibold text-foreground">
-          This is what players have unlocked, not what they equip.
-        </strong>{' '}
-        The Brawl Stars API reports ownership only — no endpoint exposes the loadout a
-        player actually took into a battle — so a high share here means the upgrade is
-        widely owned, which usually but not always means widely used.
+        Measured across {formatNumber(build.sampleSize)} tracked players who own this
+        brawler.
+        {!starPowersSplit || !gadgetsSplit ? (
+          <>
+            {' '}
+            {`Almost every owner has unlocked both ${
+              !starPowersSplit && !gadgetsSplit
+                ? 'star powers and both gadgets'
+                : !starPowersSplit
+                  ? 'star powers'
+                  : 'gadgets'
+            }, so there is no meaningful split to show there.`}
+          </>
+        ) : null}{' '}
+        These are unlocks, not picks. The game API never says which loadout a player
+        took into a match.
       </p>
     </div>
   );

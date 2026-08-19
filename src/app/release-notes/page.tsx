@@ -97,7 +97,7 @@ export default async function ReleaseNotesPage() {
       </div>
 
       <p className="text-xs text-muted">
-        Published by Supercell. Reproduced here for convenience —{' '}
+        Published by Supercell, reproduced here for convenience.{' '}
         <Link href="/news" className="text-brand hover:underline">
           see detected in-game changes
         </Link>{' '}

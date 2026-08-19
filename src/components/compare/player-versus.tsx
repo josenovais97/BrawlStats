@@ -61,7 +61,7 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
           a: Math.round(left.averageTrophies).toLocaleString('en-US'),
           b: Math.round(right.averageTrophies).toLocaleString('en-US'),
           leader: higher(left.averageTrophies, right.averageTrophies),
-          hint: 'Total trophies divided by brawlers unlocked — a rough measure of depth rather than breadth.',
+          hint: 'Total trophies divided by brawlers unlocked. A rough measure of depth rather than breadth.',
         },
       ],
     },
@@ -118,8 +118,8 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
         },
         {
           label: 'Peak Ranked',
-          a: titleCaseLabel(left.player.highestAllTimeRankedRankName ?? '') || '—',
-          b: titleCaseLabel(right.player.highestAllTimeRankedRankName ?? '') || '—',
+          a: titleCaseLabel(left.player.highestAllTimeRankedRankName ?? '') || '–',
+          b: titleCaseLabel(right.player.highestAllTimeRankedRankName ?? '') || '–',
           leader: higher(
             left.player.highestAllTimeRankedElo ?? 0,
             right.player.highestAllTimeRankedElo ?? 0,
@@ -136,7 +136,7 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
           a: formatNumber(left.bestWinStreak),
           b: formatNumber(right.bestWinStreak),
           leader: higher(left.bestWinStreak, right.bestWinStreak),
-          hint: 'The highest streak on any single brawler — the API publishes no account-wide streak.',
+          hint: 'The highest streak on any single brawler. The API publishes no account-wide streak.',
         },
       ],
     },
@@ -215,7 +215,7 @@ function SideStatus({
       <div className="card p-4">
         <p className="text-xs uppercase tracking-wide text-muted">{position}</p>
         <p className="mt-1 font-bold">{outcome.side.player.name}</p>
-        <p className="text-sm text-muted">Ready — waiting on the other player.</p>
+        <p className="text-sm text-muted">Ready. Waiting on the other player.</p>
       </div>
     );
   }

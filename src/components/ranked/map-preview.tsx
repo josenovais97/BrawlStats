@@ -61,7 +61,7 @@ export function MapPreview({
       >
         {/* Maps are portrait and the card is landscape, so drawing one whole
             leaves two dead columns either side. The same image, blown up and
-            blurred behind it, fills them with the map's own colours — the card
+            blurred behind it, fills them with the map's own colours. The card
             picks up the environment's palette instead of a grey void. */}
         <Image
           src={imageUrl}

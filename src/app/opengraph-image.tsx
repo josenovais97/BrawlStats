@@ -14,7 +14,7 @@ import { SITE_NAME } from '@/lib/site';
  * which is why the wash below is linear.
  */
 
-export const alt = 'BrawlZone — Brawl Stars stats, tier lists and leaderboards';
+export const alt = 'BrawlZone, Brawl Stars stats, tier lists and leaderboards';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

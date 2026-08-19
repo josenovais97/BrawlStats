@@ -105,11 +105,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     // The brawler's name alone loses to every wiki and fan site. People search
     // "shelly brawl stars", so the title carries both.
-    title: `${name} — Brawl Stars stats, build and best maps`,
+    title: `${name}, Brawl Stars stats, build and best maps`,
     description,
     alternates: { canonical: `/brawlers/${id}` },
     openGraph: {
-      title: `${name} — Brawl Stars stats and build`,
+      title: `${name}, Brawl Stars stats and build`,
       description,
     },
   };
@@ -452,14 +452,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               icon={Trophy}
               label="Avg trophies"
               value={
-                stat.avgTrophies === null ? '—' : formatNumber(Math.round(stat.avgTrophies))
+                stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))
               }
               hint="Across tracked players"
             />
             <StatCard
               icon={Sparkles}
               label="Avg rank"
-              value={stat.avgRank === null ? '—' : stat.avgRank.toFixed(1)}
+              value={stat.avgRank === null ? ', ' : stat.avgRank.toFixed(1)}
               hint="Across tracked players"
             />
           </div>
@@ -533,8 +533,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
       <section>
         <SectionHeading
-          title="Upgrade ownership"
-          subtitle="Which upgrades sampled owners have unlocked. The API never reports what anyone equips in a battle, so this is ownership — not usage."
+          title="What owners invest in"
+          subtitle="Where sampled owners of this brawler have actually spent their coins."
         />
         <PopularBuild
           build={build}
@@ -596,9 +596,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 ))}
               </ul>
               <p className="mt-2 text-xs text-muted">
-                Every gear this brawler can equip, from the official catalogue. Which
-                ones sampled owners have unlocked is above — which is not the same as
-                which they equip, since the API never reports that.
+                Every gear this brawler can equip. Which ones owners actually buy is
+                further up the page.
               </p>
             </div>
           ) : null}
@@ -659,7 +658,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   </h2>
 
                   {/*
-                    What each buffie does, per ability — the question the
+                    What each buffie does, per ability. The question the
                     ownership percentages never answered. A brawler has one
                     buffie per ability type, but its effect differs by which
                     gadget or star power it is buffing, so they are listed
@@ -690,7 +689,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                     </p>
                   ) : (
                     /* Our own samples say buffies exist here, but the wiki has
-                       no text for them — a brand-new release, most likely. */
+                       no text for them. A brand-new release, most likely. */
                     <p className="card px-4 py-3 text-sm text-muted">
                       <span className="font-semibold text-foreground">Released.</span>{' '}
                       {name} has buffies, but their effects have not been documented

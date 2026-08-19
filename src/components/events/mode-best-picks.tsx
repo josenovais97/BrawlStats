@@ -63,7 +63,7 @@ export function ModeBestPicks({
           their mode changes what the list is worth. */}
       {scope === 'mode' ? (
         <p className="mt-1 text-[0.625rem] leading-snug text-muted">
-          Map sample too small — using mode-wide data.
+          Map sample too small. Using mode-wide data.
         </p>
       ) : null}
 

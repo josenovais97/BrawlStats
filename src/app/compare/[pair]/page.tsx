@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const b = titleCase(resolved.b.name);
 
   return {
-    title: `${a} vs ${b} — which is better in Brawl Stars?`,
+    title: `${a} vs ${b}. Which is better in Brawl Stars?`,
     description: `${a} and ${b} compared: win rates, pick rates, tiers, best modes and their head-to-head record from sampled Brawl Stars battles.`,
     alternates: { canonical: `/compare/${resolved.slug}` },
     // Indexable pages must be a deliberate set. This one is not: the
@@ -159,8 +159,8 @@ export default async function ComparePage({ params }: PageProps) {
                 },
                 {
                   label: 'Tier',
-                  a: left.tier ?? '—',
-                  b: right.tier ?? '—',
+                  a: left.tier ?? '–',
+                  b: right.tier ?? '–',
                   leader: null,
                 },
                 {
@@ -177,20 +177,20 @@ export default async function ComparePage({ params }: PageProps) {
               metrics: [
                 {
                   label: 'Rarity',
-                  a: left.brawler.rarity?.name ?? '—',
-                  b: right.brawler.rarity?.name ?? '—',
+                  a: left.brawler.rarity?.name ?? '–',
+                  b: right.brawler.rarity?.name ?? '–',
                   leader: null,
                 },
                 {
                   label: 'Class',
-                  a: left.brawler.class?.name ?? '—',
-                  b: right.brawler.class?.name ?? '—',
+                  a: left.brawler.class?.name ?? '–',
+                  b: right.brawler.class?.name ?? '–',
                   leader: null,
                 },
                 {
                   label: 'Best mode',
-                  a: left.splits[0] ? humanizeMode(left.splits[0].mode) : '—',
-                  b: right.splits[0] ? humanizeMode(right.splits[0].mode) : '—',
+                  a: left.splits[0] ? humanizeMode(left.splits[0].mode) : '–',
+                  b: right.splits[0] ? humanizeMode(right.splits[0].mode) : '–',
                   leader: null,
                 },
               ],
@@ -325,7 +325,7 @@ function buildVerdict(left: Side, right: Side): string {
   }
 
   if (gap < 0.005) {
-    return `${nameA} and ${nameB} are level on current data — their adjusted win rates are within half a percentage point of each other, which is inside the noise of the sample. Pick on mode and map instead.`;
+    return `${nameA} and ${nameB} are level on current data. Their adjusted win rates are within half a percentage point of each other, which is inside the noise of the sample. Pick on mode and map instead.`;
   }
 
   const aheadSide = left.adjusted >= right.adjusted ? left : right;

@@ -227,7 +227,7 @@ function EventCard({
       {/*
         Always mode-scoped today, and now says so. Per-map picks exist for the
         six competitive modes, but they are computed from Ranked battles and
-        this is the ladder rotation — showing one against the other would swap
+        this is the ladder rotation. Showing one against the other would swap
         a stated overclaim for a hidden one.
       */}
       <ModeBestPicks

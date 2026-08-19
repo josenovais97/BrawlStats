@@ -58,7 +58,7 @@ export function PlayerUpgradeGap({
 
       <div className="card p-5">
         <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
-          These carry a hypercharge or a buffie — the rarest upgrades in the game —
+          These carry a hypercharge or a buffie, the rarest upgrades in the game, 
           on a brawler still below power {MAX_POWER_LEVEL}. A hypercharge does not
           require a maxed brawler, so it is easy to end up holding the best upgrade
           available on something that loses the fight before it charges.

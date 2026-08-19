@@ -950,7 +950,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       rankingsCached: 0,
       buildRowsUpdated: 0,
       status: 'failed',
-      notes: 'DATABASE_URL is not set — provision Neon before running the cron job.',
+      notes: 'DATABASE_URL is not set. Provision Neon before running the cron job.',
     };
   }
 

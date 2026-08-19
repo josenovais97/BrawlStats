@@ -91,7 +91,7 @@ export default async function RankedPage() {
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted">
             Every map is scored against the same {formatPercent(baseline)} sample-wide
             Ranked average, and each brawler&rsquo;s handful of battles here is weighed
-            against its overall Ranked form — a map needs real evidence to move a
+            against its overall Ranked form. A map needs real evidence to move a
             brawler off that. {rated} of {maps.length} maps have enough to name a pick
             so far.
           </p>
@@ -244,7 +244,7 @@ function MapCard({
         <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
           No brawler is clearly above average here yet. The map has been sampled{' '}
           {formatNumber(map.sampleSize)} times, spread across {map.brawlersSeen}{' '}
-          brawlers — not enough for any one of them to separate from the pack.
+          brawlers. Not enough for any one of them to separate from the pack.
         </p>
       ) : (
         <ol className="flex-1 divide-y divide-border">

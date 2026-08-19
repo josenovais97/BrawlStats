@@ -2,13 +2,13 @@
 
 /** 317840 -> "317,840" */
 export function formatNumber(n: number | null | undefined): string {
-  if (n === null || n === undefined || Number.isNaN(n)) return '—';
+  if (n === null || n === undefined || Number.isNaN(n)) return '–';
   return n.toLocaleString('en-US');
 }
 
 /** 317840 -> "317.8K", for tight card layouts. */
 export function compactNumber(n: number | null | undefined): string {
-  if (n === null || n === undefined || Number.isNaN(n)) return '—';
+  if (n === null || n === undefined || Number.isNaN(n)) return '–';
   if (Math.abs(n) < 1000) return String(n);
   return new Intl.NumberFormat('en-US', {
     notation: 'compact',
@@ -34,9 +34,9 @@ export function parseApiDate(value: string): Date | null {
 
 /** "3h ago", "2d ago". Returns "—" for unparseable input. */
 export function relativeTime(value: string | Date | null | undefined): string {
-  if (!value) return '—';
+  if (!value) return '–';
   const date = typeof value === 'string' ? parseApiDate(value) : value;
-  if (!date) return '—';
+  if (!date) return '–';
 
   const diffMs = date.getTime() - Date.now();
   const abs = Math.abs(diffMs);
@@ -58,9 +58,9 @@ export function relativeTime(value: string | Date | null | undefined): string {
 
 /** Countdown label like "4h 12m" until the given time. */
 export function timeUntil(value: string | Date | null | undefined): string {
-  if (!value) return '—';
+  if (!value) return '–';
   const date = typeof value === 'string' ? parseApiDate(value) : value;
-  if (!date) return '—';
+  if (!date) return '–';
 
   const ms = date.getTime() - Date.now();
   if (ms <= 0) return 'ending now';
@@ -188,7 +188,7 @@ export function partitionRotation<T extends { startTime: string }>(
 
 /** Percentage with one decimal, e.g. 0.5432 -> "54.3%". */
 export function formatPercent(value: number | null | undefined): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '—';
+  if (value === null || value === undefined || Number.isNaN(value)) return '–';
   return `${(value * 100).toFixed(1)}%`;
 }
 

@@ -109,7 +109,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
           {skill.rankedUnavailable
             ? ` This account has no Ranked elo on record, so that weight is spread across the rest${
                 skill.capped
-                  ? ' and the score is held at 6.5 — without a Ranked record there is nothing here that can certify more'
+                  ? ' and the score is held at 6.5. Without a Ranked record there is nothing here that can certify more'
                   : ''
               }.`
             : ''}

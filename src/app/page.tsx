@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: 'BrawlZone: Brawl Stars stats, tier lists and leaderboards',
     description:
-      'Skill scores, separate Ranked and trophy tier lists, a Ranked elo leaderboard, live events and player stats — all from one tag.',
+      'Skill scores, separate Ranked and trophy tier lists, a Ranked elo leaderboard, live events and player stats. All from one tag.',
   },
 };
 
@@ -139,7 +139,7 @@ export default function HomePage() {
           title="Top players"
           subtitle={
             <>
-              The highest trophy counts in the world, updated through the day —
+              The highest trophy counts in the world, updated through the day,
               plus our own{' '}
               <Link
                 href="/leaderboard?type=ranked"
