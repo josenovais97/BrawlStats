@@ -285,22 +285,45 @@ function parseHypercharge(wikitext: string): (WikiAbility & { name: string }) | 
 
 /* --------------------------------- fetching -------------------------------- */
 
+/**
+ * Fetches JSON, and never lets a failure stick.
+ *
+ * Next's data cache stores what a `fetch` with `revalidate` returned — status
+ * included — so a wiki 5xx during a regeneration would be replayed for the
+ * whole TTL, hiding a section for hours after the wiki itself recovered. A
+ * non-OK response is therefore retried once with `cache: 'no-store'`, which
+ * bypasses that entry entirely: the render gets live data the moment the wiki
+ * is healthy again, at the cost of one extra request per render while it is
+ * not.
+ */
+async function fetchNeverCachingFailure(
+  url: string,
+  revalidate: number,
+): Promise<Response | null> {
+  const init = {
+    headers: {
+      // Identify ourselves rather than pretending to be a browser.
+      'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
+      Accept: 'application/json',
+    },
+    signal: AbortSignal.timeout(10_000),
+  } as const;
+
+  const cached = await fetch(url, { ...init, next: { revalidate } });
+  if (cached.ok) return cached;
+
+  const live = await fetch(url, { ...init, cache: 'no-store' });
+  return live.ok ? live : null;
+}
+
 async function fetchPage(name: string): Promise<{ title: string; wikitext: string } | null> {
   const url =
     `${WIKI_API}?action=query&prop=revisions&rvslots=main&rvprop=content` +
     `&format=json&redirects=1&titles=${encodeURIComponent(name)}`;
 
   try {
-    const res = await fetch(url, {
-      headers: {
-        // Identify ourselves rather than pretending to be a browser.
-        'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
-        Accept: 'application/json',
-      },
-      signal: AbortSignal.timeout(10_000),
-      next: { revalidate: REVALIDATE_WIKI },
-    });
-    if (!res.ok) return null;
+    const res = await fetchNeverCachingFailure(url, REVALIDATE_WIKI);
+    if (!res) return null;
 
     const body = (await res.json()) as {
       query?: {
