@@ -222,7 +222,7 @@ function MapCard({
               thing on the card, and right now every map carries one. It picks
               up the mode colour once the map has earned it. */}
           <span
-            className="shrink-0 rounded-md px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-wide"
+            className="shrink-0 rounded-md px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide"
             style={
               map.confidence === 'low'
                 ? { color: 'var(--muted)', background: 'var(--surface-2)' }
@@ -280,7 +280,7 @@ function MapCard({
                     </span>
                     {/* Sample size is never hidden: on a per-map split it is
                         the difference between a signal and a coin flip. */}
-                    <span className="block text-[0.5625rem] tabular-nums text-muted">
+                    <span className="block text-[0.625rem] tabular-nums text-muted">
                       {pick.decidedSampleSize} battles here
                     </span>
                   </span>
@@ -297,7 +297,7 @@ function MapCard({
                         generally, and hiding that half of the comparison was
                         what made the column unreadable. */}
                     <span
-                      className={`block text-[0.5625rem] tabular-nums ${
+                      className={`block text-[0.625rem] tabular-nums ${
                         edge >= 0.005 ? 'text-victory/80' : 'text-muted'
                       }`}
                     >

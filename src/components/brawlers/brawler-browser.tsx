@@ -138,7 +138,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               {brawler.status === 'legacy' ? (
                 <p className="mt-1 text-center">
                   <span
-                    className="rounded bg-surface-2 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-wide text-muted"
+                    className="rounded bg-surface-2 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-muted"
                     title="No longer available in the game. Kept for its history."
                   >
                     Legacy

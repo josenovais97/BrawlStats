@@ -2,28 +2,54 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ComparePicker } from '@/components/brawlers/compare-picker';
+import { PlayerCompareForm } from '@/components/compare/player-compare-form';
+import { PlayerVersus } from '@/components/compare/player-versus';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { loadComparison } from '@/lib/player-compare';
 import { comparePath } from '@/lib/compare';
 import { slugify } from '@/lib/slugs';
 import { getMetaIndex } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 
-export const metadata: Metadata = {
-  title: 'Compare Brawl Stars brawlers side by side',
-  description:
-    'Put any two Brawl Stars brawlers side by side: win rates, pick rates, tiers, best modes and their head-to-head record from sampled battles.',
-  alternates: { canonical: '/compare' },
-};
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const comparing = Boolean(params.player1 && params.player2);
+
+  return {
+    title: 'Compare Brawl Stars players and brawlers side by side',
+    description:
+      'Put two Brawl Stars players or two brawlers side by side: trophies, Ranked, skill score, account completion, win rates and head-to-head records.',
+    // Always the bare tool page: a specific pairing is one of unbounded many
+    // and should consolidate onto the page that explains the tool.
+    alternates: { canonical: '/compare' },
+    // The tool page is worth indexing; an arbitrary pair of player tags is not
+    // — there is one such URL per pair of accounts in existence.
+    ...(comparing ? { robots: { index: false, follow: true } } : {}),
+  };
+}
 
 export const revalidate = 3600;
 
 /** How many of the current top brawlers to pair up as suggestions. */
 const SUGGESTION_SEED = 8;
 
-export default async function CompareIndexPage() {
+interface PageProps {
+  searchParams: Promise<{ player1?: string; player2?: string }>;
+}
+
+export default async function CompareIndexPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const tagA = params.player1?.trim() ?? '';
+  const tagB = params.player2?.trim() ?? '';
+  const comparing = Boolean(tagA && tagB);
+
+  // Only loaded when both tags are present, so the bare /compare page costs no
+  // player API calls at all — which is what keeps a crawler on this route
+  // cheap.
+  const comparison = comparing ? await loadComparison(tagA, tagB) : null;
   // Withdrawn brawlers are not comparable options.
   const brawlers = (await getBrawlerCatalog()).current;
   const meta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
@@ -53,11 +79,29 @@ export default async function CompareIndexPage() {
       <JsonLd data={breadcrumbSchema([{ name: 'Compare', path: '/compare' }])} />
 
       <PageHeading
-        title="Compare brawlers"
-        subtitle="Two brawlers side by side: win and pick rates, tier, where each one performs best, and how they do against each other in sampled battles."
+        title="Compare"
+        subtitle="Two players or two brawlers, side by side. Player comparisons live entirely in the URL, so they are shareable and nothing is stored."
       />
 
-      <ComparePicker brawlers={options} />
+      <section>
+        <SectionHeading
+          title="Compare players"
+          subtitle="Enter two tags. Works with or without the #."
+        />
+        <PlayerCompareForm initialA={tagA} initialB={tagB} />
+      </section>
+
+      {comparison ? (
+        <PlayerVersus a={comparison.a} b={comparison.b} />
+      ) : null}
+
+      <section>
+        <SectionHeading
+          title="Compare brawlers"
+          subtitle="Win and pick rates, tier, where each performs best, and their head-to-head record."
+        />
+        <ComparePicker brawlers={options} />
+      </section>
 
       {suggestions.length > 0 ? (
         <section>

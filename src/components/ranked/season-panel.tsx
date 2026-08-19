@@ -161,7 +161,7 @@ export function SeasonPanel({
                 <span className="w-24 shrink-0 text-sm font-semibold">
                   {entry.mode}
                   {entry.featured ? (
-                    <span className="ml-1.5 rounded bg-brand/15 px-1 py-0.5 text-[0.5625rem] font-bold uppercase text-brand">
+                    <span className="ml-1.5 rounded bg-brand/15 px-1 py-0.5 text-[0.625rem] font-bold uppercase text-brand">
                       Featured
                     </span>
                   ) : null}

@@ -8,6 +8,7 @@ import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerNav } from '@/components/player/player-nav';
 import { PlayerProgress } from '@/components/player/player-progress';
+import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
 import { PlayerSkillScore } from '@/components/player/player-skill-score';
@@ -144,6 +145,20 @@ export default async function PlayerPage({ params }: PageProps) {
             <LastOnline tag={tag} />
           </Suspense>
         }
+      />
+      {/* High in the page on purpose: a returning visitor's first question is
+          "what changed", and it costs nothing to answer — every number here is
+          already on screen below. */}
+      <SinceLastVisit
+        tag={normalizedTag}
+        trophies={player.trophies}
+        brawlers={player.brawlers.length}
+        power11={player.brawlers.filter((b) => b.power >= 11).length}
+        hyperCharges={player.brawlers.reduce(
+          (sum, b) => sum + (b.hyperCharges?.length ?? 0),
+          0,
+        )}
+        skill={skill.score}
       />
       <PlayerNav />
       <PlayerPlacements

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
+import { VersusList } from '@/components/compare/versus-list';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { resolvePair } from '@/lib/compare';
@@ -129,61 +130,73 @@ export default async function ComparePage({ params }: PageProps) {
           title="Side by side"
           subtitle="Win rate is adjusted against the sample average, so both columns are on the same scale."
         />
-        <div className="card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-xs uppercase tracking-wide text-muted">
-                <th className="p-3 text-left font-semibold">Metric</th>
-                <th className="p-3 text-right font-semibold capitalize">{nameA}</th>
-                <th className="p-3 text-right font-semibold capitalize">{nameB}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              <Row
-                label="Adjusted win rate"
-                a={formatPercent(left.adjusted)}
-                b={formatPercent(right.adjusted)}
-                betterA={compare(left.adjusted, right.adjusted)}
-              />
-              <Row
-                label="Pick rate"
-                a={formatPercent(left.stat?.usageRate ?? null)}
-                b={formatPercent(right.stat?.usageRate ?? null)}
-                betterA={compare(left.stat?.usageRate ?? null, right.stat?.usageRate ?? null)}
-              />
-              <Row
-                label="Tier"
-                a={left.tier ?? '—'}
-                b={right.tier ?? '—'}
-                betterA={null}
-              />
-              <Row
-                label="Rarity"
-                a={left.brawler.rarity?.name ?? '—'}
-                b={right.brawler.rarity?.name ?? '—'}
-                betterA={null}
-              />
-              <Row
-                label="Class"
-                a={left.brawler.class?.name ?? '—'}
-                b={right.brawler.class?.name ?? '—'}
-                betterA={null}
-              />
-              <Row
-                label="Best mode"
-                a={left.splits[0] ? humanizeMode(left.splits[0].mode) : '—'}
-                b={right.splits[0] ? humanizeMode(right.splits[0].mode) : '—'}
-                betterA={null}
-              />
-              <Row
-                label="Sampled battles"
-                a={formatNumber(left.stat?.decidedSampleSize ?? null)}
-                b={formatNumber(right.stat?.decidedSampleSize ?? null)}
-                betterA={null}
-              />
-            </tbody>
-          </table>
-        </div>
+        {/* Stacked rows rather than a three-column table: at 320px a table
+            either scrolls sideways or crushes the labels, and a comparison
+            with half of it off-screen is not a comparison. */}
+        <VersusList
+          labelA={nameA}
+          labelB={nameB}
+          accentA={left.brawler.rarity?.color ?? 'var(--brand)'}
+          accentB={right.brawler.rarity?.color ?? 'var(--accent-2)'}
+          sections={[
+            {
+              title: 'Performance',
+              metrics: [
+                {
+                  label: 'Adjusted win rate',
+                  a: formatPercent(left.adjusted),
+                  b: formatPercent(right.adjusted),
+                  leader: compareLeader(left.adjusted, right.adjusted),
+                },
+                {
+                  label: 'Pick rate',
+                  a: formatPercent(left.stat?.usageRate ?? null),
+                  b: formatPercent(right.stat?.usageRate ?? null),
+                  leader: compareLeader(
+                    left.stat?.usageRate ?? null,
+                    right.stat?.usageRate ?? null,
+                  ),
+                },
+                {
+                  label: 'Tier',
+                  a: left.tier ?? '—',
+                  b: right.tier ?? '—',
+                  leader: null,
+                },
+                {
+                  label: 'Sampled battles',
+                  a: formatNumber(left.stat?.decidedSampleSize ?? null),
+                  b: formatNumber(right.stat?.decidedSampleSize ?? null),
+                  leader: null,
+                  hint: 'More battles means a more reliable rate, not a better brawler.',
+                },
+              ],
+            },
+            {
+              title: 'Profile',
+              metrics: [
+                {
+                  label: 'Rarity',
+                  a: left.brawler.rarity?.name ?? '—',
+                  b: right.brawler.rarity?.name ?? '—',
+                  leader: null,
+                },
+                {
+                  label: 'Class',
+                  a: left.brawler.class?.name ?? '—',
+                  b: right.brawler.class?.name ?? '—',
+                  leader: null,
+                },
+                {
+                  label: 'Best mode',
+                  a: left.splits[0] ? humanizeMode(left.splits[0].mode) : '—',
+                  b: right.splits[0] ? humanizeMode(right.splits[0].mode) : '—',
+                  leader: null,
+                },
+              ],
+            },
+          ]}
+        />
       </section>
 
       <section>
@@ -321,33 +334,10 @@ function buildVerdict(left: Side, right: Side): string {
   return `${ahead} is ahead of ${behind} on current data, by ${(gap * 100).toFixed(1)} percentage points of adjusted win rate${mode ? `, and is strongest in ${mode}` : ''}. Both numbers are re-centred on the sample average, so this compares the brawlers rather than who happened to be playing them.`;
 }
 
-function compare(a: number | null, b: number | null): boolean | null {
+/** Which side leads, or null when they are level or a value is missing. */
+function compareLeader(a: number | null, b: number | null): 'a' | 'b' | null {
   if (a === null || b === null || Math.abs(a - b) < 0.002) return null;
-  return a > b;
-}
-
-function Row({
-  label,
-  a,
-  b,
-  betterA,
-}: {
-  label: string;
-  a: string;
-  b: string;
-  /** True when the left column wins this row, false when the right one does. */
-  betterA: boolean | null;
-}) {
-  const win = 'font-bold text-victory';
-  return (
-    <tr>
-      <th scope="row" className="p-3 text-left font-medium text-muted">
-        {label}
-      </th>
-      <td className={`p-3 text-right tabular-nums ${betterA === true ? win : ''}`}>{a}</td>
-      <td className={`p-3 text-right tabular-nums ${betterA === false ? win : ''}`}>{b}</td>
-    </tr>
-  );
+  return a > b ? 'a' : 'b';
 }
 
 function HeadToHeadCard({
