@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
+import { AbilityChoices } from '@/components/brawlers/ability-choices';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
@@ -37,6 +38,7 @@ import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
   assignTier,
+  getBrawlerAbilityChoices,
   getBrawlerBuffies,
   getBrawlerBuild,
   getBrawlerPairings,
@@ -168,6 +170,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // One page for the whole game, so this is shared across every brawler.
   const gearText = await getGearDescriptions().catch(() => new Map<string, string>());
   const buffies = await getBrawlerBuffies(brawlerId);
+  // Which star power and gadget people actually buy first, from players who
+  // own exactly one of the pair.
+  const abilityChoices = await getBrawlerAbilityChoices(brawlerId);
   const hyperChargeOwnership = await getHyperChargeOwnership(brawlerId);
 
   // Where the brawler is strong, how it has moved, and who it beats. All three
@@ -534,8 +539,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       <section>
         <SectionHeading
           title="What owners invest in"
-          subtitle="Where sampled owners of this brawler have actually spent their coins."
+          subtitle="Which upgrades players buy first, how those choices perform, and where the coins go."
         />
+        {abilityChoices ? (
+          <div className="mb-4">
+            <AbilityChoices
+              choices={abilityChoices}
+              starPowers={starPowers}
+              gadgets={gadgets}
+            />
+          </div>
+        ) : null}
         <PopularBuild
           build={build}
           meta={{ ...brawler, starPowers, gadgets }}

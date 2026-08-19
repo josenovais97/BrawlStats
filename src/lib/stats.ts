@@ -1492,6 +1492,134 @@ export async function getFilterableModes(
   }
 }
 
+/* ------------------------------ ability choice ----------------------------- */
+
+/**
+ * Which star power or gadget players buy first, and how it performs.
+ *
+ * The game API never reports an equipped loadout, so a direct usage rate is
+ * not obtainable. This is the next best thing, and it is a real measurement
+ * rather than a proxy: a player who owns exactly *one* of a brawler's two star
+ * powers has chosen that one, and every battle they play on that brawler is
+ * played with it. Both halves of that are already recorded, so the join costs
+ * nothing new.
+ *
+ * The comparison is fair in a way an ownership split is not. Everyone counted
+ * here owns exactly one, so the two groups are equally invested in the brawler
+ * and the difference between them is the ability rather than the player.
+ *
+ * It has data precisely when the question is live. On a brawler released years
+ * ago almost everyone owns both, so there is nothing to measure, but nobody is
+ * asking which to buy either. On a recent one the split is wide open: Wendy
+ * had over nine hundred attributable battles within three weeks of release.
+ */
+export interface AbilityChoice {
+  itemId: number;
+  /** Players who own this one and not the other. */
+  choosers: number;
+  /** 0-1 share of single-option owners who picked this one. */
+  share: number;
+  /** Win rate in their battles, or null below the sample floor. */
+  winRate: number | null;
+  decidedSampleSize: number;
+}
+
+export interface BrawlerAbilityChoices {
+  starPowers: AbilityChoice[];
+  gadgets: AbilityChoice[];
+  /** Total players contributing a first-purchase choice. */
+  sampleSize: number;
+}
+
+/** Below this many first-buyers the split is not worth publishing. */
+const MIN_CHOOSERS = 25;
+
+/** Below this many battles a win rate is noise, so it is withheld. */
+const MIN_BATTLES_FOR_ABILITY_WIN_RATE = 40;
+
+export async function getBrawlerAbilityChoices(
+  brawlerId: number,
+  windowDays = 21,
+): Promise<BrawlerAbilityChoices | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    const rows = await prisma.$queryRaw<
+      { kind: string; item_id: number; choosers: bigint; wins: bigint; decided: bigint }[]
+    >`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag)
+               player_tag, star_power_ids, gadget_ids
+        FROM player_brawler_snapshots
+        WHERE brawler_id = ${brawlerId} AND snapshot_date >= ${since}
+        ORDER BY player_tag, snapshot_date DESC
+      ),
+      -- Only players who own exactly one, so the choice is unambiguous.
+      picked AS (
+        SELECT player_tag, 'starPower' AS kind, star_power_ids[1] AS item_id
+        FROM latest WHERE cardinality(star_power_ids) = 1
+        UNION ALL
+        SELECT player_tag, 'gadget' AS kind, gadget_ids[1] AS item_id
+        FROM latest WHERE cardinality(gadget_ids) = 1
+      ),
+      battles AS (
+        SELECT player_tag,
+               COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+               COUNT(*) FILTER (WHERE result IN ('victory','defeat')) AS decided
+        FROM battle_samples
+        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+        GROUP BY player_tag
+      )
+      SELECT p.kind, p.item_id,
+             COUNT(*) AS choosers,
+             COALESCE(SUM(b.wins), 0) AS wins,
+             COALESCE(SUM(b.decided), 0) AS decided
+      FROM picked p
+      LEFT JOIN battles b ON b.player_tag = p.player_tag
+      GROUP BY p.kind, p.item_id
+    `;
+
+    const build = (kind: string): AbilityChoice[] => {
+      const forKind = rows.filter((row) => row.kind === kind);
+      const total = forKind.reduce((sum, row) => sum + Number(row.choosers), 0);
+      if (total < MIN_CHOOSERS) return [];
+
+      return forKind
+        .map((row) => {
+          const decided = Number(row.decided);
+          return {
+            itemId: row.item_id,
+            choosers: Number(row.choosers),
+            share: Number(row.choosers) / total,
+            winRate:
+              decided >= MIN_BATTLES_FOR_ABILITY_WIN_RATE
+                ? Number(row.wins) / decided
+                : null,
+            decidedSampleSize: decided,
+          };
+        })
+        .sort((a, b) => b.share - a.share);
+    };
+
+    const starPowers = build('starPower');
+    const gadgets = build('gadget');
+    if (starPowers.length === 0 && gadgets.length === 0) return null;
+
+    return {
+      starPowers,
+      gadgets,
+      sampleSize:
+        starPowers.reduce((sum, c) => sum + c.choosers, 0) +
+        gadgets.reduce((sum, c) => sum + c.choosers, 0),
+    };
+  } catch {
+    return null;
+  }
+}
+
 /* --------------------------------- buffies -------------------------------- */
 
 /**

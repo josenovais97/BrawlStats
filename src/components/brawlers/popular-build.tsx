@@ -187,23 +187,14 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
         );
       })}
 
+      {/* What the numbers are, in one line. The methodology behind them lives
+          on the About page rather than under every chart. */}
       <p className="text-xs leading-relaxed text-muted">
-        Measured across {formatNumber(build.sampleSize)} tracked players who own this
-        brawler.
-        {!starPowersSplit || !gadgetsSplit ? (
-          <>
-            {' '}
-            {`Almost every owner has unlocked both ${
-              !starPowersSplit && !gadgetsSplit
-                ? 'star powers and both gadgets'
-                : !starPowersSplit
-                  ? 'star powers'
-                  : 'gadgets'
-            }, so there is no meaningful split to show there.`}
-          </>
-        ) : null}{' '}
-        These are unlocks, not picks. The game API never says which loadout a player
-        took into a match.
+        {`Measured across ${formatNumber(build.sampleSize)} tracked players who own this brawler.${
+          !starPowersSplit && !gadgetsSplit
+            ? ' Almost all of them own both star powers and both gadgets.'
+            : ''
+        }`}
       </p>
     </div>
   );
