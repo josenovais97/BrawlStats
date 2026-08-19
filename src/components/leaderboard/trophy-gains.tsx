@@ -39,9 +39,21 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
           <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
             Biggest trophy gains{uniformSpan === 1 ? ' today' : ''}
           </h2>
-          <p className="mt-2 text-sm text-muted">
-            From our own snapshots, ranked by trophies per day since each player was
-            last sampled.
+          {/*
+            The population is stated up front because this list sits directly
+            above the official top 100 and looked like a re-ordering of it. It
+            is not: these are the players we sample daily, most of whom are
+            nowhere near the global board, and a name appearing here while
+            missing below is the expected case rather than a bug.
+          */}
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+            From our own daily snapshots of the{' '}
+            <Link href="/about" className="font-medium text-brand hover:underline">
+              sampled player pool
+            </Link>
+            , ranked by trophies per day since each player was last read — a different
+            population from the official top 100 below, so these names mostly do not
+            appear there.
           </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Shield, Users } from 'lucide-react';
+import { Shield, Trophy, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -12,6 +12,7 @@ import {
 } from '@/components/leaderboard/leaderboard-controls';
 import { TrophyGains } from '@/components/leaderboard/trophy-gains';
 import { ErrorState } from '@/components/ui/error-state';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { TrophyIcon } from '@/components/game-icons';
 import { clubBadgeUrl, playerIconUrl } from '@/lib/brawlapi';
 import { getClubRankings, getPlayerRankings } from '@/lib/bs-api';
@@ -49,13 +50,17 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-10">
       <header>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Leaderboard</h1>
-        <p className="mt-2 text-muted">
+        <p className="eyebrow flex items-center gap-2 text-accent">
+          <Trophy className="size-3.5" />
+          {board === 'cosmetics' || board === 'ranked' ? 'Our own data' : 'Official rankings'}
+        </p>
+        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Leaderboard</h1>
+        <p className="mt-3 max-w-3xl leading-relaxed text-muted">
           {board === 'cosmetics'
             ? 'What the sampled player pool is wearing — built from our own daily samples, not from the game API.'
             : board === 'ranked'
               ? 'Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.'
-              : `Top ${board} by trophies in ${regionName(region)}.`}
+              : `The official top 100 ${board} by trophies in ${regionName(region)}, straight from the game API.`}
         </p>
       </header>
 
@@ -102,7 +107,19 @@ async function PlayerBoard({ region }: { region: string }) {
   }
 
   return (
-    <ol className="space-y-2">
+    <section aria-labelledby="player-board">
+      {/* Headed explicitly, and named for its population. Unheaded, it ran
+          straight on from the trophy-gains list above and read as more of the
+          same ranking — which it is not: that list is our sampled pool, this
+          one is the game's own top 100. */}
+      <div id="player-board">
+        <SectionHeading
+          title={`Top players in ${regionName(region)}`}
+          subtitle="By total trophies, from the game API's own ranking."
+          aside={`${items.length} shown`}
+        />
+      </div>
+      <ol className="space-y-2">
         {items.map((player) => (
           <li key={player.tag}>
             <Link
@@ -134,9 +151,10 @@ async function PlayerBoard({ region }: { region: string }) {
                 {formatNumber(player.trophies)}
               </span>
             </Link>
-        </li>
-      ))}
-    </ol>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 
@@ -153,8 +171,16 @@ async function ClubBoard({ region }: { region: string }) {
   }
 
   return (
-    <ol className="space-y-2">
-      {items.map((club) => (
+    <section aria-labelledby="club-board">
+      <div id="club-board">
+        <SectionHeading
+          title={`Top clubs in ${regionName(region)}`}
+          subtitle="By combined member trophies, from the game API's own ranking."
+          aside={`${items.length} shown`}
+        />
+      </div>
+      <ol className="space-y-2">
+        {items.map((club) => (
           <li key={club.tag}>
             <Link
               href={`/club/${normalizeTag(club.tag)}`}
@@ -181,9 +207,10 @@ async function ClubBoard({ region }: { region: string }) {
                 {formatNumber(club.trophies)}
               </span>
             </Link>
-        </li>
-      ))}
-    </ol>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 

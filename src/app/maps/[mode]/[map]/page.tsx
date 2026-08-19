@@ -12,7 +12,11 @@ import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { getActiveMaps, resolveMap } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
-import { getBestPicksByMode, getRankedMapPicks } from '@/lib/stats';
+import {
+  RANKED_MAP_WINDOW_DAYS,
+  getBestPicksByMode,
+  getRankedMapPicks,
+} from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import type { ModeBestPicks } from '@/types/stats';
 
@@ -63,7 +67,7 @@ export default async function MapPage({ params }: PageProps) {
   // Database reads run one after the other so the page never needs more than
   // one connection, and each degrades to empty on its own.
   const mapPicks = entry.scHash
-    ? await getRankedMapPicks(PICK_COUNT, 14, {
+    ? await getRankedMapPicks(PICK_COUNT, RANKED_MAP_WINDOW_DAYS, {
         mapName: entry.map.name,
         mode: entry.scHash,
       }).then((rows) => rows[0] ?? null)
@@ -89,7 +93,7 @@ export default async function MapPage({ params }: PageProps) {
     {
       question: `What are the best brawlers on ${entry.map.name}?`,
       answer: hasMapPicks
-        ? `${listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName)))} have the strongest adjusted win rates on ${entry.map.name}, from ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on the map.`
+        ? `${listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName)))} ${mapPicks!.picks.length === 1 ? 'has the strongest adjusted win rate' : 'have the strongest adjusted win rates'} on ${entry.map.name}, from ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on the map.`
         : `${entry.map.name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in ${modeLabel} overall are the best available answer until it fills in.`,
     },
     {

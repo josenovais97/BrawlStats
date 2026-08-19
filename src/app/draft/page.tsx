@@ -10,6 +10,7 @@ import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
 import {
+  RANKED_MAP_WINDOW_DAYS,
   getBestPicksByMode,
   getCounterScores,
   getRankedMapPicks,
@@ -59,7 +60,7 @@ export default async function DraftPage({ searchParams }: PageProps) {
   // Sequential database reads keep the page to a single connection.
   const mapPicks =
     selected?.scHash
-      ? await getRankedMapPicks(60, 14, {
+      ? await getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS, {
           mapName: selected.map.name,
           mode: selected.scHash,
         }).then((rows) => rows[0] ?? null)

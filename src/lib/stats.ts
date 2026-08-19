@@ -1952,11 +1952,35 @@ export async function getHeadToHead(
  * the list drawn from brawlers actually played here rather than from the
  * roster at large; the estimate itself is what handles thin evidence, by
  * shrinking toward the brawler's overall ranked form (see below).
+ *
+ * Raised from 4 to 8 because 4 was letting a four-battle record take the top
+ * row of a map — a coin flip wearing a percentage sign, and the first thing a
+ * reader sees. Shrinkage kept the *number* honest but not the *ordering*.
+ *
+ * 8 costs nothing today: measured over the current 21-day window, all 27
+ * sampled maps still field at least three eligible brawlers at 8 (the
+ * thinnest, Undermine, has four), while 12 would empty half of them. Worth
+ * re-measuring with the same query if the sampling rate changes.
  */
-const MIN_SAMPLE_FOR_MAP_PICK = 4;
+const MIN_SAMPLE_FOR_MAP_PICK = 8;
 
 /** Maps needing at least this many decided battles to appear at all. */
 const MIN_SAMPLE_FOR_MAP = 20;
+
+/**
+ * How far back the per-map ranking looks.
+ *
+ * Longer than the tier lists' seven days, and deliberately so: a map ranking is
+ * the most thinly-evidenced number on the site — competitive Ranked is under a
+ * fifth of what gets sampled, and that fifth is then split across ~27 maps and
+ * the whole roster. Widening the window is the one lever that thickens it
+ * without another API call, and the Ranked map rotation barely moves inside
+ * three weeks, so the extra days describe the same maps rather than stale ones.
+ *
+ * Bounded by BATTLE_RETENTION_DAYS (35) in `lib/aggregation`, which is what
+ * actually limits how far this can go.
+ */
+export const RANKED_MAP_WINDOW_DAYS = 21;
 
 /**
  * Strength of the map-level prior, in pseudo-battles.
@@ -2013,7 +2037,7 @@ function mapConfidence(decided: number): MapConfidence {
  */
 export async function getRankedMapPicks(
   perMap = 3,
-  windowDays = 14,
+  windowDays = RANKED_MAP_WINDOW_DAYS,
   /**
    * Narrows the map half of the query to one map, for its own page. The
    * per-brawler prior is deliberately left unfiltered: it is the brawler's

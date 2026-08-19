@@ -45,18 +45,32 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  * cap**, meaning everything they played in the gap was gone for good.
  *
  * Sizing: 100 players took ~50s of the ~215s available for sampling (the run
- * budget less the recompute and ranking reserves), so ~0.5s each. 350 lands
- * near 175s and leaves real headroom; overrunning is safe anyway, since
- * sampling stops at the deadline rather than the batch size.
+ * budget less the recompute and ranking reserves), so ~0.5s each at
+ * CONCURRENCY 2. 350 landed near 175s, and observed runs finished in 53–183s.
+ *
+ * Raised again to 500 alongside CONCURRENCY, not instead of it: the two have to
+ * move together or the batch simply runs past its deadline. At 3 in flight the
+ * same per-player cost puts 500 back near 167s, which is where 350 already sat.
+ * Overrunning is safe anyway, since sampling stops at the deadline rather than
+ * at the batch size.
  */
-const DEFAULT_BATCH_SIZE = 350;
+const DEFAULT_BATCH_SIZE = 500;
 
 /**
  * Concurrent players in flight. Each one issues two API calls at once, so the
- * real request concurrency is double this. Kept deliberately low: the API
- * throttles aggressively, and a failed sample costs a whole day of coverage.
+ * real request concurrency is double this.
+ *
+ * Still deliberately low — the API throttles aggressively — but 2 was leaving
+ * the per-run ceiling as the binding constraint on every downstream number.
+ * Vercel's cron allowance caps how *often* a run happens, so the only way to
+ * collect more is for one run to do more, and wall-clock was the thing in the
+ * way. 3 buys ~40% more players per run at 6 requests in flight rather than 4.
+ *
+ * Cheap to walk back if the API starts throttling: `withRetry` already backs
+ * off on `rateLimited`, so the failure mode is a slower run rather than lost
+ * samples, and a run that overruns just samples fewer players.
  */
-const CONCURRENCY = 2;
+const CONCURRENCY = 3;
 
 /** Retries per player when the API throttles or times out. */
 const MAX_RETRIES = 3;
@@ -84,8 +98,14 @@ const WINDOW_DAYS = 7;
  * the top-200 seed became a one-off snapshot, nobody new could enter, and
  * every meta number on the site described the same 800 accounts forever. The
  * cap is now maintained by eviction instead — see `evictStalePool`.
+ *
+ * Moved with DEFAULT_BATCH_SIZE so the ratio between them holds: 500 of 1150
+ * is the same share of the pool per run as 350 of 800 was, which is what fixes
+ * the revisit interval. Growing the pool without growing the batch would slow
+ * the rotation and start dropping battles between visits — the exact failure
+ * the paragraph above is about.
  */
-const POOL_TARGET = 800;
+const POOL_TARGET = 1150;
 
 /**
  * How long raw observations are kept.
@@ -351,12 +371,33 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   if (excess <= 0) return 0;
 
   const since = new Date(Date.now() - INACTIVE_AFTER_DAYS * 86_400_000);
-  const activeGroups = await prisma.battleSample.groupBy({
-    by: ['playerTag'],
-    where: { battleTime: { gte: since } },
-    _count: { _all: true },
-  });
+  const [activeGroups, competitiveGroups] = await Promise.all([
+    prisma.battleSample.groupBy({
+      by: ['playerTag'],
+      where: { battleTime: { gte: since } },
+      _count: { _all: true },
+    }),
+    /*
+     * Who has actually queued competitive Ranked lately.
+     *
+     * The pool is seeded from the *trophy* leaderboard, so it fills with ladder
+     * grinders: measured over a fortnight, competitive Ranked was 8.7k of the
+     * 49k battles sampled. Every per-map ranking on the site is built from that
+     * 18% slice, and it is split again across 27 maps and the whole roster — so
+     * a map's evidence is the thinnest number on the site, and this is the only
+     * lever that thickens it without spending another API call.
+     *
+     * The pool therefore drifts toward accounts that play Ranked: when it has
+     * to shed members, a ladder-only player goes before a Ranked one.
+     */
+    prisma.battleSample.groupBy({
+      by: ['playerTag'],
+      where: { battleTime: { gte: since }, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
+      _count: { _all: true },
+    }),
+  ]);
   const active = new Set(activeGroups.map((g) => g.playerTag));
+  const competitive = new Set(competitiveGroups.map((g) => g.playerTag));
   const keep = new Set(protectedTags);
 
   const evictable = await prisma.sampledPlayer.findMany({
@@ -365,10 +406,18 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   });
 
   const ordered = evictable
-    .map((row) => ({ ...row, active: active.has(row.tag) }))
+    .map((row) => ({
+      ...row,
+      active: active.has(row.tag),
+      competitive: competitive.has(row.tag),
+    }))
     .sort((a, b) => {
-      // Inactive first, then the lowest trophies among the rest.
+      // Inactive first: an account producing nothing costs two API calls a
+      // visit and returns no data at all.
       if (a.active !== b.active) return a.active ? 1 : -1;
+      // Then ladder-only before Ranked players, which is what tilts the pool.
+      if (a.competitive !== b.competitive) return a.competitive ? 1 : -1;
+      // Lowest trophies among the rest.
       return (a.trophies ?? 0) - (b.trophies ?? 0);
     })
     .slice(0, excess);

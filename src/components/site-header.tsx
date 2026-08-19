@@ -2,6 +2,7 @@
 
 import {
   CalendarClock,
+  ChevronDown,
   GitCompareArrows,
   Map,
   Medal,
@@ -21,20 +22,49 @@ import { useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
 
-const NAV = [
+interface NavItem {
+  href: string;
+  /** Overrides `href` for the active check, when an entry links into a section. */
+  match?: string;
+  label: string;
+  icon: typeof Swords;
+}
+
+/**
+ * The desktop bar fits six labelled items beside the wordmark and the search
+ * button, and not one more: at ten it wrapped "Tier List" and "Release Notes"
+ * onto two lines each and pushed the bar to double height.
+ *
+ * So the bar is curated rather than complete. These six are the destinations
+ * worth a permanent slot — the ones people arrive looking for.
+ */
+const NAV: NavItem[] = [
   { href: '/brawlers', label: 'Brawlers', icon: Swords },
   // Points straight at the Ranked list so the nav does not bounce through the
   // /tier-list redirect, but stays highlighted on the trophy list too.
   { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },
-  { href: '/ranked', label: 'Ranked', icon: Medal },
   { href: '/maps', label: 'Maps', icon: Map },
   { href: '/draft', label: 'Draft', icon: Target },
-  { href: '/compare', label: 'Compare', icon: GitCompareArrows },
-  { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
-  { href: '/news', label: 'News', icon: Newspaper },
   { href: '/events', label: 'Events', icon: CalendarClock },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
+
+/**
+ * Everything else, behind "More".
+ *
+ * Not a junk drawer: each of these is either reached from somewhere more
+ * relevant (a map page links to the Ranked map board, a brawler page to a
+ * comparison) or is a page people come back to rather than look for.
+ */
+const MORE: NavItem[] = [
+  { href: '/ranked', label: 'Ranked maps', icon: Medal },
+  { href: '/compare', label: 'Compare', icon: GitCompareArrows },
+  { href: '/news', label: 'News', icon: Newspaper },
+  { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
+];
+
+/** The mobile panel has room for the lot, so it never hides anything. */
+const ALL_NAV: NavItem[] = [...NAV, ...MORE];
 
 /** `match` overrides `href` when a nav entry links into a section. */
 function isActive(pathname: string, href: string, match?: string) {
@@ -45,15 +75,19 @@ function isActive(pathname: string, href: string, match?: string) {
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
 
-  // Any route change closes the panel, including a browser back that no link
+  // Any route change closes both panels, including a browser back that no link
   // handler ever sees. Adjusting during render rather than in an effect keeps
   // the closed panel out of the committed frame.
   if (lastPath !== pathname) {
     setLastPath(pathname);
     setOpen(false);
+    setMoreOpen(false);
   }
+
+  const moreActive = MORE.some((item) => isActive(pathname, item.href, item.match));
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
@@ -73,6 +107,11 @@ export function SiteHeader() {
           Icons are dropped from the desktop bar on purpose: six labelled items
           plus a brand plus a button is already the full width, and the icons
           were what pushed it into overflow between 768px and 1100px.
+
+          `whitespace-nowrap` is the backstop. Without it a label that no longer
+          fits breaks across two lines rather than overflowing, which doubles the
+          height of the whole bar and is far harder to notice in review than a
+          crowded one.
         */}
         <nav aria-label="Main" className="ml-auto hidden items-center lg:flex">
           {NAV.map(({ href, match, label }) => {
@@ -82,7 +121,7 @@ export function SiteHeader() {
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                className={`relative rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                className={`relative whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                   active ? 'text-brand' : 'text-muted hover:text-foreground'
                 }`}
               >
@@ -98,9 +137,69 @@ export function SiteHeader() {
             );
           })}
 
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMoreOpen((v) => !v)}
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
+              className={`relative flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                moreActive || moreOpen ? 'text-brand' : 'text-muted hover:text-foreground'
+              }`}
+            >
+              More
+              <ChevronDown
+                className={`size-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`}
+              />
+              <span
+                aria-hidden
+                className={`absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand transition-opacity ${
+                  moreActive ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            </button>
+
+            {moreOpen ? (
+              <>
+                {/* Catches the click that should dismiss the menu. Sits under
+                    the panel and over everything else, which is the cheapest
+                    correct way to do outside-click without a global listener. */}
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  aria-hidden
+                  onClick={() => setMoreOpen(false)}
+                  className="fixed inset-0 z-0 cursor-default"
+                />
+                <ul className="absolute right-0 z-10 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-surface shadow-lg shadow-black/40">
+                  {MORE.map(({ href, match, label, icon: Icon }) => {
+                    const active = isActive(pathname, href, match);
+                    return (
+                      <li key={href}>
+                        <Link
+                          href={href}
+                          aria-current={active ? 'page' : undefined}
+                          onClick={() => setMoreOpen(false)}
+                          className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold transition-colors ${
+                            active
+                              ? 'bg-brand/10 text-brand'
+                              : 'text-muted hover:bg-surface-2 hover:text-foreground'
+                          }`}
+                        >
+                          <Icon className="size-4 shrink-0" />
+                          {label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : null}
+          </div>
+
           <Link
             href="/#search"
-            className="ml-3 inline-flex items-center gap-2 rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink shadow-[0_2px_0_0_#b87d00] transition-colors hover:bg-brand-strong"
+            className="ml-3 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink shadow-[0_2px_0_0_#b87d00] transition-colors hover:bg-brand-strong"
           >
             <Search className="size-4" />
             Search
@@ -139,7 +238,7 @@ export function SiteHeader() {
             clipped in a two-column grid on the narrowest phones.
           */}
           <ul className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2 px-4 py-4 min-[380px]:grid-cols-2 sm:px-6">
-            {NAV.map(({ href, match, label, icon: Icon }) => {
+            {ALL_NAV.map(({ href, match, label, icon: Icon }) => {
               const active = isActive(pathname, href, match);
               return (
                 <li key={href}>
