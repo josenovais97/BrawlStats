@@ -43,6 +43,7 @@ import {
   getBrawlerStat,
   getBrawlerTrend,
   getHyperChargeOwnership,
+  getMetaIndex,
   normalizeWinRate,
 } from '@/lib/stats';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
@@ -160,6 +161,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const hyperCharges = official?.hyperCharges ?? [];
   // Combat stats and resolved ability text. Nothing else publishes these —
   // see lib/brawler-wiki. Null costs the sections that use it, not the page.
+  const metaIndex = await getMetaIndex('ranked', 7);
   const wiki = await getBrawlerWiki(brawler.name).catch(() => null);
   // One page for the whole game, so this is shared across every brawler.
   const gearText = await getGearDescriptions().catch(() => new Map<string, string>());
@@ -181,12 +183,35 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const normalizedWinRate = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
+  // Tier and meta score come from the same scoring pass the tier lists use, so
+  // the chip here cannot disagree with the chip there. Falls back to scoring
+  // this brawler's own row when it is not in the index at all.
+  const scored = metaIndex.get(brawlerId);
   const tier =
-    stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER
+    scored?.tier ??
+    (stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER
       ? assignTier(normalizedWinRate)
-      : null;
-  const accent = brawler.rarity?.color ?? '#8b95b8';
+      : null);
+  const metaScore = scored?.metaScore ?? null;
+
+  /*
+   * The artwork source ships at least one malformed colour — Pierce's rarity
+   * is "#fff11ev" — and an invalid value inside `color-mix()` drops the whole
+   * declaration, taking the header wash with it. Anything that is not a plain
+   * hex colour falls back to the neutral accent.
+   */
+  const rarityColor = brawler.rarity?.color;
+  const accent =
+    rarityColor && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(rarityColor)
+      ? rarityColor
+      : '#8b95b8';
   const name = titleCase(brawler.name);
+
+  // "Unknown" is a real value upstream, not a missing one: unclassified
+  // brawlers come back as `{ id: 0, name: "Unknown" }`, and a chip reading
+  // "Unknown" says less than no chip at all.
+  const className =
+    brawler.class?.name && brawler.class.name !== 'Unknown' ? brawler.class.name : null;
 
   // A buffie is named for the ability type it upgrades, so each one is listed
   // against the gadget or star power it actually changes.
@@ -310,18 +335,28 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               >
                 {brawler.rarity?.name ?? 'Unknown'}
               </span>
-              <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
-                {brawler.class?.name ?? 'Unknown'}
-              </span>
+              {className ? (
+                <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
+                  {className}
+                </span>
+              ) : null}
               {tier ? (
                 <span
-                  className="rounded-full px-3 py-1 text-xs font-bold"
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
                   style={{
                     background: `color-mix(in srgb, ${TIER_COLOR[tier]} 20%, transparent)`,
                     color: TIER_COLOR[tier],
                   }}
                 >
                   {tier} tier
+                  {/* The score the tier is assigned from, on the card rather
+                      than three sections down: it is what the tier lists rank
+                      by, and a bare letter hides how close the call was. */}
+                  {metaScore !== null ? (
+                    <span className="tabular-nums opacity-80">
+                      {metaScore.toFixed(1)}
+                    </span>
+                  ) : null}
                 </span>
               ) : null}
             </div>
@@ -356,16 +391,22 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               // Not every brawler has every stat: a super that deals no direct
               // damage has no super damage, and the infobox simply omits it.
               .filter(([, value]) => Boolean(value))
-              .map(([label, value]) => (
-                <div key={label} className="card p-3">
-                  <dt className="truncate text-xs font-medium uppercase tracking-wide text-muted">
-                    {label}
-                  </dt>
-                  <dd className="mt-0.5 truncate text-lg font-bold tabular-nums">
-                    {value}
-                  </dd>
-                </div>
-              ))}
+              .map(([label, value]) => {
+                const { main, hint } = splitStat(value!);
+                return (
+                  <div key={label} className="card p-3">
+                    <dt className="truncate text-xs font-medium uppercase tracking-wide text-muted">
+                      {label}
+                    </dt>
+                    <dd className="mt-0.5 text-lg font-bold leading-tight tabular-nums">
+                      {main}
+                    </dd>
+                    {hint ? (
+                      <dd className="text-xs leading-tight text-muted">{hint}</dd>
+                    ) : null}
+                  </div>
+                );
+              })}
           </dl>
         </section>
       ) : null}
@@ -730,6 +771,21 @@ function ownedBy(items: BAAccessory[], official: BSAccessory[] | undefined): BAA
   if (!official?.length) return items;
   const allowed = new Set(official.map((a) => a.id));
   return items.filter((item) => allowed.has(item.id));
+}
+
+/**
+ * Splits a wiki stat into a headline number and its qualifier.
+ *
+ * The infobox writes these as one string — "0.7 seconds (Very Fast)",
+ * "7.67 (Long)" — which at heading size in a six-across grid truncated to
+ * something unreadable on every card. The parenthetical is the part that can
+ * wrap to a second line, and "seconds" shortens to "s" so the number itself
+ * always fits.
+ */
+function splitStat(value: string): { main: string; hint: string | null } {
+  const match = /^(.*?)\s*\((.+)\)\s*$/.exec(value);
+  const main = (match ? match[1] : value).replace(/\s*seconds?$/i, 's');
+  return { main: main.trim() || value, hint: match ? match[2].trim() : null };
 }
 
 /** "HARD LANDING" -> "Hard Landing", for prose that quotes an API name. */
