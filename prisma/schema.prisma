@@ -66,6 +66,10 @@ model PlayerBrawlerSnapshot {
   starPowerIds Int[]    @map("star_power_ids")
   gadgetIds    Int[]    @map("gadget_ids")
   gearIds      Int[]    @map("gear_ids")
+  /// Hypercharges owned. Recorded late, so rows written before this exist with
+  /// an empty array — which is indistinguishable from "owns none". Reads guard
+  /// against that by ignoring brawlers where *nobody* has one recorded.
+  hyperChargeIds Int[]  @map("hyper_charge_ids")
 
   /// Buffies owned, as three flags. Used to derive which buffies exist at all,
   /// since the API publishes no buffie catalogue.

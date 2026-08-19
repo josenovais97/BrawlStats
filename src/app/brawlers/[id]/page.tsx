@@ -15,6 +15,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
 import {
+  BuffieIcon,
   GadgetIcon,
   GearIcon,
   HyperchargeIcon,
@@ -29,11 +30,13 @@ import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
   assignTier,
+  getBrawlerBuffies,
   getBrawlerBuild,
   getBrawlerPairings,
   getBrawlerSplits,
   getBrawlerStat,
   getBrawlerTrend,
+  getHyperChargeOwnership,
   normalizeWinRate,
 } from '@/lib/stats';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
@@ -131,6 +134,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const gadgets = ownedBy(brawler.gadgets, official?.gadgets);
   const gears = official?.gears ?? [];
   const hyperCharges = official?.hyperCharges ?? [];
+  const buffies = await getBrawlerBuffies(brawlerId);
+  const hyperChargeOwnership = await getHyperChargeOwnership(brawlerId);
+  const hasBuffies =
+    buffies !== null &&
+    (buffies.gadget > 0 || buffies.starPower > 0 || buffies.hyperCharge > 0);
 
   // Where the brawler is strong, how it has moved, and who it beats. All three
   // degrade to empty on their own, so a missing database costs sections rather
@@ -407,7 +415,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         />
       </section>
 
-      {gears.length > 0 || hyperCharges.length > 0 ? (
+      {gears.length > 0 || hyperCharges.length > 0 || buffies ? (
         <section className="grid gap-6 lg:grid-cols-2">
           {gears.length > 0 ? (
             <div>
@@ -440,26 +448,112 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             </div>
           ) : null}
 
-          {hyperCharges.length > 0 ? (
-            <div>
-              <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-                <HyperchargeIcon className="size-5" />
-                Hypercharge
-              </h2>
-              <ul className="card divide-y divide-border">
-                {hyperCharges.map((hyper) => (
-                  <li key={hyper.id} className="p-4">
-                    <p className="font-bold capitalize">{hyper.name.toLowerCase()}</p>
-                    {/* No description and no artwork: the official API publishes
-                        the name only, and the artwork CDN has no hypercharge
-                        set at all. Stating that beats an empty card. */}
-                    <p className="mt-1 text-sm text-muted">
-                      Unlocked at power 11. Neither the game API nor the artwork source
-                      publishes hypercharge effects, so only the name is available.
-                    </p>
-                  </li>
-                ))}
-              </ul>
+          {hyperCharges.length > 0 || buffies ? (
+            <div className="space-y-6">
+              {hyperCharges.length > 0 ? (
+                <div>
+                  <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <HyperchargeIcon className="size-6" />
+                    Hypercharge
+                  </h2>
+                  <ul className="card divide-y divide-border">
+                    {hyperCharges.map((hyper) => (
+                      <li key={hyper.id} className="flex items-center gap-4 p-4">
+                        {/* The game's own hypercharge mark, shipped with the
+                            site. There is no per-hypercharge artwork to use:
+                            the artwork CDN has no hypercharge set under any
+                            path, so one icon stands for the ability. */}
+                        <span
+                          className="grid size-12 shrink-0 place-items-center rounded-xl"
+                          style={{
+                            background: `color-mix(in srgb, ${accent} 18%, transparent)`,
+                          }}
+                        >
+                          <HyperchargeIcon className="size-7" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="font-bold capitalize">
+                            {hyper.name.toLowerCase()}
+                          </p>
+                          <p className="mt-1 text-sm leading-relaxed text-muted">
+                            Unlocked at Power 11. Charges from dealing and taking damage,
+                            then boosts {name}&rsquo;s speed, damage and shield for a few
+                            seconds.
+                            {hyperChargeOwnership !== null
+                              ? ` ${formatPercent(hyperChargeOwnership)} of sampled owners have unlocked it.`
+                              : ''}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {/* Said once, plainly, rather than repeated per row: the exact
+                      boost figures differ per brawler and no source publishes
+                      them, so claiming specifics would be inventing them. */}
+                  <p className="mt-2 text-xs leading-relaxed text-muted">
+                    The exact boost percentages vary per brawler and are not published by
+                    the game API or by any artwork source, so they are not listed here.
+                  </p>
+                </div>
+              ) : null}
+
+              {buffies ? (
+                <div>
+                  <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
+                    <BuffieIcon className="size-6" />
+                    Buffies
+                  </h2>
+                  <div className="card p-4">
+                    {hasBuffies ? (
+                      <>
+                        <ul className="space-y-3">
+                          {(
+                            [
+                              ['Gadget buffie', buffies.gadget],
+                              ['Star power buffie', buffies.starPower],
+                              ['Hypercharge buffie', buffies.hyperCharge],
+                            ] as const
+                          ).map(([label, share]) => (
+                            <li key={label}>
+                              <div className="flex items-baseline justify-between gap-2 text-sm">
+                                <span className="font-medium">{label}</span>
+                                <span className="font-bold tabular-nums">
+                                  {formatPercent(share)}
+                                </span>
+                              </div>
+                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${Math.round(share * 100)}%`,
+                                    background: accent,
+                                  }}
+                                />
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mt-4 text-xs leading-relaxed text-muted">
+                          Share of the {formatNumber(buffies.owners)} sampled players who
+                          own {name} and have each buffie unlocked. A buffie strengthens
+                          the ability it belongs to; the game API reports only whether a
+                          player has one, never what it does, so there is nothing more to
+                          show than this.
+                        </p>
+                      </>
+                    ) : (
+                      /* Zero across thousands of owners is a fact about the
+                         brawler, not missing data: buffies release per brawler. */
+                      <p className="text-sm leading-relaxed text-muted">
+                        No buffies released for {name} yet. None of the{' '}
+                        {formatNumber(buffies.owners)} sampled players who own{' '}
+                        {name.toLowerCase()} has one, which is what an unreleased buffie
+                        looks like — they are rolled out brawler by brawler.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </section>

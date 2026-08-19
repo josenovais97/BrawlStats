@@ -1492,6 +1492,118 @@ export async function getFilterableModes(
   }
 }
 
+/* --------------------------------- buffies -------------------------------- */
+
+/**
+ * How many sampled owners of a brawler have each of its buffies unlocked.
+ *
+ * Buffies are the one part of a loadout the catalogue says nothing about: the
+ * official API reports them as three booleans on a *player's* brawler and
+ * publishes no list of what any of them does, and the artwork mirror does not
+ * carry them at all. So there is no way to describe a buffie — but there is a
+ * way to say whether one exists and how far it has spread, because that falls
+ * straight out of the snapshots the popular-build percentages already use.
+ *
+ * A flat zero is meaningful here rather than missing data: buffies are released
+ * per brawler, so 0% across thousands of owners means this brawler has none yet.
+ */
+export interface BrawlerBuffies {
+  /** Sampled players who own this brawler. */
+  owners: number;
+  /** 0–1 share of those owners with the buffie unlocked. */
+  gadget: number;
+  starPower: number;
+  hyperCharge: number;
+}
+
+export async function getBrawlerBuffies(
+  brawlerId: number,
+  windowDays = 7,
+): Promise<BrawlerBuffies | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    // One row per player per brawler per day, so a player sampled repeatedly
+    // would otherwise vote once per day. Counted from each player's most recent
+    // snapshot, matching how skin usage is counted.
+    const rows = await prisma.$queryRaw<
+      { owners: bigint; gadget: bigint; star_power: bigint; hyper_charge: bigint }[]
+    >`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag)
+               player_tag, buffie_gadget, buffie_star_power, buffie_hyper_charge
+        FROM player_brawler_snapshots
+        WHERE brawler_id = ${brawlerId} AND snapshot_date >= ${since}
+        ORDER BY player_tag, snapshot_date DESC
+      )
+      SELECT COUNT(*) AS owners,
+             COUNT(*) FILTER (WHERE buffie_gadget) AS gadget,
+             COUNT(*) FILTER (WHERE buffie_star_power) AS star_power,
+             COUNT(*) FILTER (WHERE buffie_hyper_charge) AS hyper_charge
+      FROM latest
+    `;
+
+    const owners = Number(rows[0]?.owners ?? 0);
+    if (owners === 0) return null;
+
+    return {
+      owners,
+      gadget: Number(rows[0].gadget) / owners,
+      starPower: Number(rows[0].star_power) / owners,
+      hyperCharge: Number(rows[0].hyper_charge) / owners,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Share of sampled owners who have unlocked this brawler's hypercharge.
+ *
+ * Returns null rather than zero when nobody has one recorded, because the two
+ * are genuinely different and only one of them is a fact: hypercharge
+ * ownership started being recorded later than the rest of the loadout, so a
+ * flat zero usually means "measured before we tracked it", not "nobody owns
+ * it". Guarding on that is what keeps a brand-new column from printing 0% on
+ * every brawler for a day.
+ */
+export async function getHyperChargeOwnership(
+  brawlerId: number,
+  windowDays = 7,
+): Promise<number | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const since = new Date(Date.now() - windowDays * 86_400_000);
+
+    // One vote per player, from their most recent snapshot — matching how
+    // buffies and skins are counted.
+    const rows = await prisma.$queryRaw<{ owners: bigint; with_hyper: bigint }[]>`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag) player_tag, hyper_charge_ids
+        FROM player_brawler_snapshots
+        WHERE brawler_id = ${brawlerId} AND snapshot_date >= ${since}
+        ORDER BY player_tag, snapshot_date DESC
+      )
+      SELECT COUNT(*) AS owners,
+             COUNT(*) FILTER (WHERE cardinality(hyper_charge_ids) > 0) AS with_hyper
+      FROM latest
+    `;
+
+    const owners = Number(rows[0]?.owners ?? 0);
+    const withHyper = Number(rows[0]?.with_hyper ?? 0);
+    if (owners === 0 || withHyper === 0) return null;
+
+    return withHyper / owners;
+  } catch {
+    return null;
+  }
+}
+
 /* ----------------------- per-brawler meta breakdowns ---------------------- */
 
 /**

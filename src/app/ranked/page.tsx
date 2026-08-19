@@ -4,9 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
+import { SeasonPanel } from '@/components/ranked/season-panel';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
+import { getSeasonState } from '@/lib/ranked-seasons';
 import { slugify } from '@/lib/slugs';
 import { getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
@@ -29,11 +31,12 @@ const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
 };
 
 export default async function RankedPage() {
-  const [maps, mapMeta, modeMeta, brawlerMeta] = await Promise.all([
+  const [maps, mapMeta, modeMeta, brawlerMeta, season] = await Promise.all([
     getRankedMapPicks(3),
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getSeasonState().catch(() => ({ current: null, next: null, daysUntilNext: null })),
   ]);
 
   // Grouped by mode so the page reads like the in-game rotation rather than a
@@ -83,6 +86,10 @@ export default async function RankedPage() {
           </p>
         ) : null}
       </header>
+
+      {/* Above the maps: which season it is decides which maps are even in the
+          pool, so it is context for everything below rather than a footnote. */}
+      <SeasonPanel state={season} />
 
       {maps.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">

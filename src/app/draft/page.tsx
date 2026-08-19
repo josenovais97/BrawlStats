@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
-import { Swords, X } from 'lucide-react';
+import { ArrowRight, Swords, Target, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
-import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { brawlerIconUrl, getBrawlerMap } from '@/lib/brawlapi';
+import { PageHeading } from '@/components/ui/section-heading';
+import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
-import { getActiveMaps } from '@/lib/game-maps';
+import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
 import {
   RANKED_MAP_WINDOW_DAYS,
@@ -15,8 +15,8 @@ import {
   getCounterScores,
   getRankedMapPicks,
 } from '@/lib/stats';
-import type { BABrawler } from '@/types/brawlapi';
-import type { ModePick, RankedMapPick } from '@/types/stats';
+import type { BABrawler, BAGameMode } from '@/types/brawlapi';
+import type { ModePick, RankedMapPick, RankedMapPicks } from '@/types/stats';
 
 export const metadata: Metadata = {
   title: 'Brawl Stars draft helper — pick against the enemy team',
@@ -40,14 +40,35 @@ interface PageProps {
 export default async function DraftPage({ searchParams }: PageProps) {
   const params = await searchParams;
 
-  const maps = await getActiveMaps().catch(() => []);
-  const selected = params.map
-    ? maps.find(
-        (entry) =>
-          entry.mapSlug === slugify(params.map!) &&
-          (!params.mode || entry.modeSlug === slugify(params.mode)),
-      )
-    : undefined;
+  /*
+   * The map list is the Ranked pool, not the whole catalogue.
+   *
+   * It used to be every active map — four hundred of them across forty-one
+   * modes, rendered as a wall of text links, for a tool that only works on the
+   * six competitive modes. `getRankedMapPicks` already returns exactly the maps
+   * in the current rotation with sampled data behind them, which is both the
+   * right list and a twelfth of the length.
+   */
+  const [pool, catalogue, brawlerMeta, modeMeta] = await Promise.all([
+    getRankedMapPicks(CANDIDATES, RANKED_MAP_WINDOW_DAYS).catch(() => []),
+    getActiveMaps().catch(() => []),
+    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+  ]);
+
+  const artFor = (map: RankedMapPicks): GameMap | undefined =>
+    catalogue.find(
+      (entry) => entry.mapSlug === slugify(map.mapName) && entry.scHash === map.mode,
+    );
+
+  const wantedMap = params.map ? slugify(params.map) : null;
+  const selected = wantedMap
+    ? (pool.find(
+        (map) =>
+          slugify(map.mapName) === wantedMap &&
+          (!params.mode || slugify(map.mode) === slugify(params.mode)),
+      ) ?? null)
+    : null;
 
   const enemies = (params.enemy ?? '')
     .split(',')
@@ -55,31 +76,20 @@ export default async function DraftPage({ searchParams }: PageProps) {
     .filter((id) => Number.isFinite(id) && id > 0)
     .slice(0, MAX_ENEMIES);
 
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
-
   // Sequential database reads keep the page to a single connection.
-  const mapPicks =
-    selected?.scHash
-      ? await getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS, {
-          mapName: selected.map.name,
-          mode: selected.scHash,
-        }).then((rows) => rows[0] ?? null)
-      : null;
-
-  const modePicks = selected?.scHash
-    ? await getBestPicksByMode(60)
-        .then((byMode) => byMode.get(selected.scHash!) ?? null)
+  const modePicks = selected
+    ? await getBestPicksByMode(CANDIDATES)
+        .then((byMode) => byMode.get(selected.mode) ?? null)
         .catch(() => null)
     : null;
-
   const counters = await getCounterScores(enemies);
 
   // The map's own ranking is the starting order; the enemy line-up reorders it.
-  // Both halves stay visible in the row, because a pick that is good here and a
-  // pick that is good against them are different claims and a reader drafting
-  // in ninety seconds needs to see which one is carrying the recommendation.
+  // Both halves stay visible on the row, because "good here" and "good against
+  // them" are different claims and someone drafting in ninety seconds needs to
+  // see which one is carrying the recommendation.
   const basePicks: (ModePick | RankedMapPick)[] =
-    (mapPicks?.picks.length ?? 0) > 0 ? mapPicks!.picks : (modePicks?.picks ?? []);
+    (selected?.picks.length ?? 0) > 0 ? selected!.picks : (modePicks?.picks ?? []);
 
   const ranked = basePicks
     .map((pick) => {
@@ -96,13 +106,13 @@ export default async function DraftPage({ searchParams }: PageProps) {
     .sort((a, b) => b.total - a.total)
     .slice(0, CANDIDATES);
 
-  const hrefFor = (next: { map?: string; mode?: string; enemy?: number[] }) => {
+  const hrefFor = (next: { enemy?: number[] }) => {
     const query = new URLSearchParams();
-    const map = next.map ?? selected?.mapSlug;
-    const mode = next.mode ?? selected?.modeSlug;
+    if (selected) {
+      query.set('map', slugify(selected.mapName));
+      query.set('mode', slugify(selected.mode));
+    }
     const enemyList = next.enemy ?? enemies;
-    if (map) query.set('map', map);
-    if (mode) query.set('mode', mode);
     if (enemyList.length > 0) query.set('enemy', enemyList.join(','));
     const string = query.toString();
     return string ? `/draft?${string}` : '/draft';
@@ -116,104 +126,99 @@ export default async function DraftPage({ searchParams }: PageProps) {
         title="Draft helper"
         subtitle="Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen."
         aside={
-          <span className="inline-flex items-center gap-2 text-sm text-muted">
+          <Link
+            href="/ranked"
+            className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
+          >
             <Swords className="size-4" />
-            Ranked
-          </span>
+            Ranked pool
+          </Link>
         }
       />
 
-      <section>
-        <SectionHeading
-          title="1. The map"
-          aside={selected ? <Link href="/draft" className="hover:text-foreground">Clear</Link> : null}
-        />
-        {selected ? (
-          <div className="card flex items-center gap-4 p-4">
-            {selected.map.imageUrl ? (
-              <Image
-                src={selected.map.imageUrl}
-                alt=""
-                width={96}
-                height={64}
-                sizes="96px"
-                className="h-16 w-24 shrink-0 rounded-lg bg-surface-2 object-contain"
-                unoptimized
-              />
-            ) : null}
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-bold">{selected.map.name}</p>
-              <p className="text-sm text-muted">
-                {selected.mode?.name ?? selected.map.gameMode.name}
-                {mapPicks
-                  ? ` · ${formatNumber(mapPicks.sampleSize)} sampled Ranked battles`
-                  : ' · using mode-wide picks'}
-              </p>
-            </div>
-            <Link
-              href={`/maps/${selected.modeSlug}/${selected.mapSlug}`}
-              className="shrink-0 text-sm font-medium text-muted hover:text-foreground"
-            >
-              Map page
-            </Link>
-          </div>
-        ) : (
-          <MapChooser maps={maps} />
-        )}
-      </section>
-
-      {selected ? (
+      {pool.length === 0 ? (
+        <p className="card p-6 text-sm leading-relaxed text-muted">
+          No Ranked maps have enough sampled battles yet. The sampler works through the
+          leaderboard pool continuously, so this fills in over the next day or two.
+        </p>
+      ) : !selected ? (
+        <MapChooser pool={pool} artFor={artFor} modeMeta={modeMeta} />
+      ) : (
         <>
+          <SelectedMap map={selected} art={artFor(selected)} modeMeta={modeMeta} />
+
           <section>
-            <SectionHeading
-              title="2. The enemy team"
-              subtitle={`Add up to ${MAX_ENEMIES} brawlers the other side has drafted. Each one reweighs the list by how candidates actually do against it.`}
+            <StepHeading
+              step={2}
+              title="Enemy team"
+              hint={`Up to ${MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.`}
             />
 
-            {enemies.length > 0 ? (
-              <ul className="mb-3 flex flex-wrap gap-2">
-                {enemies.map((id) => {
-                  const meta = brawlerMeta.get(id);
-                  return (
-                    <li key={id}>
-                      <Link
-                        href={hrefFor({ enemy: enemies.filter((other) => other !== id) })}
-                        className="card card-interactive flex items-center gap-2 px-3 py-2 text-sm font-semibold capitalize"
-                      >
-                        <Image
-                          src={meta?.imageUrl ?? brawlerIconUrl(id)}
-                          alt=""
-                          width={24}
-                          height={24}
-                          className="size-6 rounded"
-                          unoptimized
-                        />
-                        {(meta?.name ?? `#${id}`).toLowerCase()}
-                        <X className="size-3.5 text-muted" />
-                      </Link>
-                    </li>
+            <div className="card p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {Array.from({ length: MAX_ENEMIES }).map((_, slot) => {
+                  const id = enemies[slot];
+                  const meta = id ? brawlerMeta.get(id) : undefined;
+
+                  // Three fixed slots rather than a growing list: a Ranked
+                  // draft has exactly three enemies, and empty slots show how
+                  // much of the picture is still missing.
+                  return id ? (
+                    <Link
+                      key={slot}
+                      href={hrefFor({ enemy: enemies.filter((other) => other !== id) })}
+                      title={`Remove ${meta?.name ?? id}`}
+                      className="group flex items-center gap-2 rounded-xl border border-defeat/40 bg-defeat/10 px-2.5 py-2 text-sm font-semibold capitalize"
+                    >
+                      <Image
+                        src={meta?.imageUrl ?? brawlerIconUrl(id)}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="size-8 rounded-lg"
+                        unoptimized
+                      />
+                      {(meta?.name ?? `#${id}`).toLowerCase()}
+                      <X className="size-4 text-muted transition-colors group-hover:text-defeat" />
+                    </Link>
+                  ) : (
+                    <span
+                      key={slot}
+                      className="flex items-center gap-2 rounded-xl border border-dashed border-border px-2.5 py-2 text-sm text-muted"
+                    >
+                      <span className="grid size-8 place-items-center rounded-lg bg-surface-2">
+                        <Target className="size-4" />
+                      </span>
+                      Empty slot
+                    </span>
                   );
                 })}
-              </ul>
-            ) : null}
 
-            {enemies.length < MAX_ENEMIES ? (
-              <EnemyChooser
-                brawlerMeta={brawlerMeta}
-                enemies={enemies}
-                hrefFor={hrefFor}
-              />
-            ) : (
-              <p className="text-sm text-muted">
-                Enemy team full. Remove one to swap it out.
-              </p>
-            )}
+                {enemies.length > 0 ? (
+                  <Link
+                    href={hrefFor({ enemy: [] })}
+                    className="ml-auto text-sm font-medium text-muted hover:text-foreground"
+                  >
+                    Clear
+                  </Link>
+                ) : null}
+              </div>
+
+              {enemies.length < MAX_ENEMIES ? (
+                <EnemyChooser
+                  brawlerMeta={brawlerMeta}
+                  enemies={enemies}
+                  hrefFor={hrefFor}
+                />
+              ) : null}
+            </div>
           </section>
 
           <section>
-            <SectionHeading
-              title="3. Your pick"
-              subtitle={
+            <StepHeading
+              step={3}
+              title="Your pick"
+              hint={
                 enemies.length > 0
                   ? 'Map score plus how each candidate does against the brawlers you named.'
                   : 'Ranked by record on this map. Add enemy picks above to reweigh it.'
@@ -222,9 +227,7 @@ export default async function DraftPage({ searchParams }: PageProps) {
 
             {ranked.length === 0 ? (
               <p className="card p-6 text-sm leading-relaxed text-muted">
-                No sampled battles for this map or mode yet. The sampler works through
-                the leaderboard pool continuously, so this fills in over the next day or
-                two.
+                No sampled battles for this map or mode yet.
               </p>
             ) : (
               <ol className="card divide-y divide-border overflow-hidden">
@@ -236,7 +239,11 @@ export default async function DraftPage({ searchParams }: PageProps) {
                         href={`/brawlers/${pick.brawlerId}`}
                         className="row-interactive flex items-center gap-3 px-4 py-3"
                       >
-                        <span className="w-5 shrink-0 text-center text-sm font-black tabular-nums text-muted">
+                        <span
+                          className={`w-6 shrink-0 text-center text-sm font-black tabular-nums ${
+                            index === 0 ? 'text-brand' : 'text-muted'
+                          }`}
+                        >
                           {index + 1}
                         </span>
                         <Image
@@ -290,54 +297,208 @@ export default async function DraftPage({ searchParams }: PageProps) {
             </p>
           </section>
         </>
-      ) : null}
+      )}
     </div>
   );
 }
 
-/** Map picker: every active map, grouped by mode, as plain links. */
-function MapChooser({ maps }: { maps: Awaited<ReturnType<typeof getActiveMaps>> }) {
-  const byMode = new Map<string, typeof maps>();
-  for (const entry of maps) {
-    const list = byMode.get(entry.modeSlug) ?? [];
-    list.push(entry);
-    byMode.set(entry.modeSlug, list);
-  }
+function StepHeading({
+  step,
+  title,
+  hint,
+  aside,
+}: {
+  step: number;
+  title: string;
+  hint: string;
+  aside?: React.ReactNode;
+}) {
+  return (
+    <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+      <div className="flex items-start gap-3">
+        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-brand text-sm font-black text-brand-ink">
+          {step}
+        </span>
+        <div>
+          <h2 className="display text-xl uppercase leading-none">{title}</h2>
+          <p className="mt-1.5 max-w-xl text-sm text-muted">{hint}</p>
+        </div>
+      </div>
+      {aside}
+    </div>
+  );
+}
 
-  if (maps.length === 0) {
-    return (
-      <p className="card p-6 text-sm text-muted">
-        The map catalogue is unavailable right now.
-      </p>
-    );
+/** The chosen map, with its art and what is behind its ranking. */
+function SelectedMap({
+  map,
+  art,
+  modeMeta,
+}: {
+  map: RankedMapPicks;
+  art?: GameMap;
+  modeMeta: Map<string, BAGameMode>;
+}) {
+  const mode = modeMeta.get(map.mode.toLowerCase());
+  const accent = mode?.color ?? '#8b95b8';
+
+  return (
+    <section>
+      <StepHeading
+        step={1}
+        title="Map"
+        hint="The Ranked rotation only. Every map here has sampled competitive battles behind it."
+        aside={
+          <Link
+            href="/draft"
+            className="text-sm font-medium text-muted hover:text-foreground"
+          >
+            Change map
+          </Link>
+        }
+      />
+
+      <div className="card overflow-hidden">
+        <span className="block h-1 w-full" style={{ background: accent }} />
+        <div className="flex flex-wrap items-center gap-4 p-4">
+          {art?.map.imageUrl ? (
+            <Image
+              src={art.map.imageUrl}
+              alt=""
+              width={140}
+              height={96}
+              sizes="140px"
+              className="h-24 w-32 shrink-0 rounded-xl bg-surface-2 object-contain p-1"
+              priority
+              unoptimized
+            />
+          ) : null}
+
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
+              {mode?.name ?? humanizeMode(map.mode)}
+            </p>
+            <h3 className="display mt-1 truncate text-2xl uppercase">{map.mapName}</h3>
+            <p className="mt-1 text-sm text-muted">
+              {formatNumber(map.sampleSize)} sampled Ranked battles ·{' '}
+              {map.brawlersSeen} brawlers seen
+            </p>
+          </div>
+
+          {art ? (
+            <Link
+              href={`/maps/${art.modeSlug}/${art.mapSlug}`}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+            >
+              Map page
+              <ArrowRight className="size-4" />
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Map picker: the Ranked pool as cards, grouped by mode. */
+function MapChooser({
+  pool,
+  artFor,
+  modeMeta,
+}: {
+  pool: RankedMapPicks[];
+  artFor: (map: RankedMapPicks) => GameMap | undefined;
+  modeMeta: Map<string, BAGameMode>;
+}) {
+  const byMode = new Map<string, RankedMapPicks[]>();
+  for (const map of pool) {
+    const list = byMode.get(map.mode) ?? [];
+    list.push(map);
+    byMode.set(map.mode, list);
   }
 
   return (
-    <div className="space-y-4">
-      {[...byMode].map(([mode, list]) => (
-        <div key={mode}>
-          <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
-            {list[0].mode?.name ?? humanizeMode(mode)}
-          </h3>
-          <ul className="flex flex-wrap gap-2">
-            {list.map((entry) => (
-              <li key={entry.map.id}>
-                <Link
-                  href={`/draft?map=${entry.mapSlug}&mode=${entry.modeSlug}`}
-                  className="card card-interactive block px-3 py-2 text-sm font-medium"
-                >
-                  {entry.map.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+    <section>
+      <StepHeading
+        step={1}
+        title="Pick the map"
+        hint="The current Ranked rotation. Everything after this step follows from it."
+      />
+
+      <div className="space-y-6">
+        {[...byMode].map(([mode, list]) => {
+          const meta = modeMeta.get(mode.toLowerCase());
+          const accent = meta?.color ?? '#8b95b8';
+
+          return (
+            <div key={mode}>
+              <h3
+                className="mb-2.5 flex items-center gap-2 text-sm font-bold uppercase tracking-wide"
+                style={{ color: accent }}
+              >
+                {meta?.imageUrl ? (
+                  <Image
+                    src={meta.imageUrl}
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="size-5 object-contain"
+                    unoptimized
+                  />
+                ) : null}
+                {meta?.name ?? humanizeMode(mode)}
+              </h3>
+
+              <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                {list.map((map) => {
+                  const art = artFor(map);
+                  return (
+                    <li key={`${map.mode}-${map.mapName}`}>
+                      <Link
+                        href={`/draft?map=${slugify(map.mapName)}&mode=${slugify(map.mode)}`}
+                        className="card card-interactive block h-full overflow-hidden"
+                      >
+                        {art?.map.imageUrl ? (
+                          <Image
+                            src={art.map.imageUrl}
+                            alt=""
+                            width={160}
+                            height={104}
+                            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                            className="h-24 w-full bg-surface-2 object-contain p-1"
+                            loading="lazy"
+                            unoptimized
+                          />
+                        ) : (
+                          <div className="h-24 w-full bg-surface-2" />
+                        )}
+                        <span className="block truncate px-3 pt-2 text-sm font-semibold">
+                          {map.mapName}
+                        </span>
+                        <span className="block px-3 pb-2 text-[0.625rem] tabular-nums text-muted">
+                          {formatNumber(map.sampleSize)} battles
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
-/** Enemy picker: the full roster as links that append to the query string. */
+/**
+ * Enemy picker: the roster as a labelled grid.
+ *
+ * Named tiles rather than a bare wall of portraits — a hundred unlabelled
+ * icons is a memory test, and the whole point of this step is finding one
+ * specific brawler quickly. Capped in height so it never buries the result
+ * list underneath it.
+ */
 function EnemyChooser({
   brawlerMeta,
   enemies,
@@ -352,26 +513,33 @@ function EnemyChooser({
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <ul className="flex flex-wrap gap-1.5">
-      {options.map((brawler) => (
-        <li key={brawler.id}>
-          <Link
-            href={hrefFor({ enemy: [...enemies, brawler.id] })}
-            title={`Add ${brawler.name} to the enemy team`}
-            className="block rounded-lg bg-surface-2 p-1 transition-transform hover:-translate-y-0.5"
-          >
-            <Image
-              src={brawler.imageUrl}
-              alt={brawler.name}
-              width={40}
-              height={40}
-              className="size-10"
-              loading="lazy"
-              unoptimized
-            />
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <div className="mt-4 border-t border-border pt-4">
+      <p className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">
+        Add an enemy brawler
+      </p>
+      <ul className="grid max-h-80 grid-cols-3 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-5 lg:grid-cols-8">
+        {options.map((brawler) => (
+          <li key={brawler.id}>
+            <Link
+              href={hrefFor({ enemy: [...enemies, brawler.id] })}
+              className="flex flex-col items-center gap-1 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
+            >
+              <Image
+                src={brawler.imageUrl}
+                alt=""
+                width={40}
+                height={40}
+                className="size-10 shrink-0"
+                loading="lazy"
+                unoptimized
+              />
+              <span className="w-full truncate text-center text-[0.625rem] font-medium capitalize text-muted">
+                {brawler.name.toLowerCase()}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

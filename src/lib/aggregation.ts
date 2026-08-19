@@ -499,6 +499,7 @@ async function samplePlayer(tag: string) {
         starPowerIds: (b.starPowers ?? []).map((x) => x.id),
         gadgetIds: (b.gadgets ?? []).map((x) => x.id),
         gearIds: (b.gears ?? []).map((x) => x.id),
+        hyperChargeIds: (b.hyperCharges ?? []).map((x) => x.id),
         buffieGadget: Boolean(b.buffies?.gadget),
         buffieStarPower: Boolean(b.buffies?.starPower),
         buffieHyperCharge: Boolean(b.buffies?.hyperCharge),
