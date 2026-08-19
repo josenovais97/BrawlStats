@@ -1468,7 +1468,9 @@ export async function getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
  * only ever come back empty.
  */
 export async function getFilterableModes(
-  windowDays = 30,
+  // Inside BATTLE_RETENTION_DAYS: asking for more than is kept would quietly
+  // narrow to whatever exists, which is fine but hides the real window.
+  windowDays = 21,
   minBattles = 150,
   format: TierFormat = 'ranked',
 ): Promise<{ mode: string; battles: number }[]> {

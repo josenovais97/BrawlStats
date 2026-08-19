@@ -115,6 +115,10 @@ const POOL_TARGET = 1000;
 /**
  * How long raw observations are kept.
  *
+ * Trimmed from 35 days to 24 when the sampling rate roughly tripled. Nothing
+ * reads further back than the 21-day ranked-map window, so the extra fortnight
+ * was storage spent on rows no query would ever open.
+ *
  * Sized against measured row costs rather than round numbers, because at the
  * sampling rate above the two tables dominate the database:
  *
@@ -138,8 +142,26 @@ const POOL_TARGET = 1000;
  * `player_trophy_points` are small, and the last is the long history the site
  * exists to accumulate.
  */
-const BATTLE_RETENTION_DAYS = 35;
-const SNAPSHOT_RETENTION_DAYS = 10;
+const BATTLE_RETENTION_DAYS = 24;
+
+/**
+ * Snapshots are kept for days, not weeks, and full-pool sampling is why.
+ *
+ * The old ten days existed to accumulate coverage: sampling a fraction of the
+ * pool per run meant it took over a week before every member had been seen
+ * once, and the reads that count owners needed that whole span to be looking
+ * at everybody. Now every member is read every run, so a single day already
+ * contains the entire pool and the extra days are duplicates of it.
+ *
+ * That matters because this is by far the largest table: one row per player
+ * per brawler per day, which at a thousand mostly-complete accounts is over a
+ * hundred thousand rows a day. At ten days it alone was heading for ~275MB and
+ * would have pushed the database past its free-tier ceiling within a fortnight.
+ *
+ * Four rather than one so a couple of consecutive failed runs cannot empty it,
+ * and so the reads that ask for a week still find every player they need.
+ */
+const SNAPSHOT_RETENTION_DAYS = 4;
 
 /**
  * A pool member producing no battles in this many days is inactive.
