@@ -100,9 +100,21 @@ export interface MapPoolEntry {
 }
 
 export interface SeasonState {
+  /** The season running today, when one is known. */
   current: ResolvedSeason | null;
+  /** The announced successor, when the wiki lists one. */
   next: ResolvedSeason | null;
-  /** Whole days until the next season starts. Null when none is scheduled. */
+  /**
+   * The newest season we have data for, running or not.
+   *
+   * Distinct from `current` so the panel can say "season 48 has ended and 49
+   * is not published yet" instead of either going blank or carrying on calling
+   * a finished season the current one.
+   */
+  latest: ResolvedSeason | null;
+  /** The next turnover date, announced or derived from the schedule. */
+  nextStartsOn: string | null;
+  /** Whole days until that turnover. Never negative. */
   daysUntilNext: number | null;
   /** Active map pool, when the wiki published one. */
   mapPool: MapPoolEntry[];
@@ -136,6 +148,23 @@ export function thirdThursday(year: number, month: number): string {
 function nextBoundary(startsOn: string): string {
   const start = new Date(`${startsOn}T00:00:00Z`);
   return thirdThursday(start.getUTCFullYear(), start.getUTCMonth() + 1);
+}
+
+/**
+ * The first scheduled turnover strictly after `today`.
+ *
+ * Used when the newest season we know of has already ended and no successor
+ * has been published. Without it the countdown is computed against a boundary
+ * in the past and renders as a negative number of days, which is how a stale
+ * source turns into a visibly broken panel rather than a quietly old one.
+ */
+function boundaryAfter(today: number): string {
+  const day = new Date(today);
+  let candidate = thirdThursday(day.getUTCFullYear(), day.getUTCMonth());
+  if (Date.parse(`${candidate}T00:00:00Z`) <= today) {
+    candidate = thirdThursday(day.getUTCFullYear(), day.getUTCMonth() + 1);
+  }
+  return candidate;
 }
 
 /* -------------------------------- wiki parse ------------------------------- */
@@ -307,25 +336,33 @@ export async function getSeasonState(now: Date = new Date()): Promise<SeasonStat
       .filter((b): b is BABrawler => Boolean(b)),
   });
 
-  let current: ResolvedSeason | null = null;
+  let latest: ResolvedSeason | null = null;
   let next: ResolvedSeason | null = null;
 
   for (let i = 0; i < seasons.length; i += 1) {
     const start = Date.parse(`${seasons[i].startsOn}T00:00:00Z`);
-    if (start <= today) current = resolve(seasons[i], i);
+    if (start <= today) latest = resolve(seasons[i], i);
     else if (!next) next = resolve(seasons[i], i);
   }
 
-  // With no announced successor, the schedule still gives a date — so the
-  // panel can count down to a turnover whose line-up is not yet published.
-  const nextStart = next?.startsOn ?? (current ? current.endsOn : null);
-  const daysUntilNext = nextStart
-    ? Math.round((Date.parse(`${nextStart}T00:00:00Z`) - today) / 86_400_000)
-    : null;
+  // Only genuinely current if today falls inside it. A season whose end has
+  // passed with nothing published to replace it has ended — saying otherwise
+  // would keep naming last month's trial brawlers indefinitely.
+  const hasEnded =
+    latest !== null && Date.parse(`${latest.endsOn}T00:00:00Z`) <= today;
+  const current = latest && !hasEnded ? latest : null;
+
+  const nextStartsOn = next?.startsOn ?? (current ? current.endsOn : boundaryAfter(today));
+  const daysUntilNext = Math.max(
+    0,
+    Math.round((Date.parse(`${nextStartsOn}T00:00:00Z`) - today) / 86_400_000),
+  );
 
   return {
     current,
     next,
+    latest,
+    nextStartsOn,
     daysUntilNext,
     mapPool: wiki?.mapPool ?? [],
     mapPoolSeason: wiki?.mapPoolSeason ?? null,

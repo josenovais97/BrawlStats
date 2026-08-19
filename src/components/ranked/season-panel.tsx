@@ -22,13 +22,22 @@ export function SeasonPanel({
   /** Resolves a wiki map name to one of our map pages, or null if unknown. */
   mapHref: (mode: string, map: string) => string | null;
 }) {
-  const { current, next, daysUntilNext } = state;
-  if (!current && !next) return null;
+  const { current, next, latest, daysUntilNext } = state;
+  const season = current ?? next ?? latest;
+  if (!season) return null;
 
-  // Between one season ending and the next being announced there is no current
-  // season; the upcoming one is then the only thing worth showing.
-  const season = current ?? next!;
-  const isPreview = !current;
+  /*
+   * Three states, because the source can be ahead of the game or behind it.
+   *
+   * - running: today falls inside a season we know about.
+   * - preview: the next season is published but has not started.
+   * - awaiting: the newest season we know of has ended and nothing has replaced
+   *   it yet. A new one *is* running — the schedule guarantees that — we just
+   *   cannot name it, and saying so is better than carrying on calling the
+   *   finished one current.
+   */
+  const isPreview = !current && Boolean(next);
+  const awaiting = !current && !next;
 
   return (
     <section className="card card-glow overflow-hidden" aria-labelledby="ranked-season">
@@ -38,14 +47,24 @@ export function SeasonPanel({
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-accent">
             <Sparkles className="size-3.5" />
-            {isPreview ? 'Next season' : 'Current season'}
+            {isPreview ? 'Next season' : awaiting ? 'Season in progress' : 'Current season'}
           </p>
           <h2 id="ranked-season" className="display mt-2 text-2xl uppercase sm:text-3xl">
-            Ranked season {season.number}
+            {awaiting ? `After season ${season.number}` : `Ranked season ${season.number}`}
           </h2>
-          <p className="mt-2 text-sm text-muted">
-            {formatRange(season.startsOn, season.endsOn)}
-            {season.featuredMode ? ` · ${season.featuredMode} featured` : ''}
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+            {awaiting ? (
+              <>
+                Season {season.number} ended on {formatDay(season.endsOn)}. A new season
+                started that day, but its number and trial brawlers have not been
+                published yet.
+              </>
+            ) : (
+              <>
+                {formatRange(season.startsOn, season.endsOn)}
+                {season.featuredMode ? ` · ${season.featuredMode} featured` : ''}
+              </>
+            )}
           </p>
         </div>
 
@@ -57,7 +76,9 @@ export function SeasonPanel({
                 ? 'Starts'
                 : next
                   ? `Season ${next.number} starts`
-                  : 'Season ends'}
+                  : awaiting
+                    ? 'Next turnover'
+                    : 'Season ends'}
             </p>
             <p className="mt-1 text-2xl font-black tabular-nums text-brand">
               {daysUntilNext === 0
@@ -69,7 +90,7 @@ export function SeasonPanel({
             {/* Said plainly when the successor has not been announced: the date
                 comes from the published cadence, not from a line-up anyone has
                 seen. */}
-            {!next && !isPreview ? (
+            {!next && !isPreview && !awaiting ? (
               <p className="mt-0.5 text-[0.625rem] text-muted">
                 third Thursday, line-up unannounced
               </p>
@@ -78,7 +99,7 @@ export function SeasonPanel({
         ) : null}
       </div>
 
-      {season.brawlers.length > 0 ? (
+      {season.brawlers.length > 0 && !awaiting ? (
         <div className="border-t border-border p-5 sm:p-6">
           <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-muted">
             <Power11Icon className="size-4" />
@@ -195,6 +216,17 @@ export function SeasonPanel({
       ) : null}
     </section>
   );
+}
+
+/** "17 September 2026". */
+function formatDay(iso: string | null): string {
+  if (!iso) return 'an unknown date';
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
 }
 
 /** "16 July – 19 August 2026", or an open-ended range when the end is unknown. */

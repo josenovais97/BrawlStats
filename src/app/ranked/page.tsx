@@ -40,6 +40,8 @@ export default async function RankedPage() {
       (): SeasonState => ({
         current: null,
         next: null,
+        latest: null,
+        nextStartsOn: null,
         daysUntilNext: null,
         mapPool: [],
         mapPoolSeason: null,
