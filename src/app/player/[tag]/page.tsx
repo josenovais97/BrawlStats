@@ -161,33 +161,50 @@ export default async function PlayerPage({ params }: PageProps) {
         skill={skill.score}
       />
       <PlayerNav />
-      <PlayerPlacements
-        placements={placements}
-        iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
-      />
-      <div id="stats" className="scroll-anchor">
-        <PlayerStats player={player} />
-      </div>
-      {/* Directly under the headline counters: it is the one number here that
-          is a judgement rather than a readout, so it earns the top slot. */}
+
+      {/*
+       * Ordered by the questions a visitor actually arrives with.
+       *
+       * The header answers "who is this". These two answer "how strong is the
+       * account" and "where do they stand", which is what someone opening a
+       * profile wants before anything else, and both used to sit below a grid
+       * of lifetime counters. On a phone that meant scrolling past most of a
+       * screen of readouts to reach the only two numbers that are judgements.
+       *
+       * The counters are not demoted for being uninteresting, they are
+       * demoted for being reference: you look them up, you do not open a
+       * profile to find them.
+       */}
       <PlayerSkillScore skill={skill} />
       <Suspense fallback={<PlayerRanked player={player} standing={standing} />}>
         <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
       </Suspense>
-      <PlayerRecords player={player} />
-      <div id="progress" className="scroll-anchor space-y-8">
-        <PlayerProgress points={trophyHistory} playerName={player.name} />
-        <PlayerTrophyHistory points={trophyHistory} />
-      </div>
-      <PlayerProgression progression={progression} playtime={playtime} />
 
-      {/* Directly after progression: it is the same subject narrowed to the
-          brawlers where finishing the job unlocks something already owned. */}
+      {/* What to do next, while the account's strength is still on screen.
+          Both render nothing when they have nothing to say, so a maxed account
+          does not carry an empty prompt. */}
       <PlayerUpgradeGap
         brawlers={player.brawlers}
         brawlerMeta={brawlerMeta}
         coinsPerLevel={coinsToMaxFrom}
       />
+
+      <div id="stats" className="scroll-anchor space-y-8">
+        <PlayerStats player={player} />
+        <PlayerRecords player={player} />
+        {/* Only ever populated for the couple of hundred players holding a
+            global brawler placement, so it sits with the other reference
+            readouts rather than above them. */}
+        <PlayerPlacements
+          placements={placements}
+          iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
+        />
+      </div>
+      <div id="progress" className="scroll-anchor space-y-8">
+        <PlayerProgress points={trophyHistory} playerName={player.name} />
+        <PlayerTrophyHistory points={trophyHistory} />
+      </div>
+      <PlayerProgression progression={progression} playtime={playtime} />
 
       <PlayerMetaFit
         brawlers={player.brawlers}

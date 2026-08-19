@@ -2089,6 +2089,11 @@ export async function getBrawlerPairings(
           COUNT(*) AS decided
         FROM battle_team_samples, unnest(enemy_brawler_ids) AS other
         WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+          -- Mirrors are excluded. A brawler against itself sits at 50% by
+          -- construction, so for anything with an above-average record the
+          -- mirror always reads as its worst matchup, which is an artifact of
+          -- the arithmetic rather than anything about the brawler.
+          AND other <> ${brawlerId}
         GROUP BY other
         HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
       `,
@@ -2098,6 +2103,7 @@ export async function getBrawlerPairings(
           COUNT(*) AS decided
         FROM battle_team_samples, unnest(ally_brawler_ids) AS other
         WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+          AND other <> ${brawlerId}
         GROUP BY other
         HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
       `,
@@ -2126,11 +2132,26 @@ export async function getBrawlerPairings(
     const versus = toPairings(enemies);
     const with_ = toPairings(allies);
 
+    /*
+     * Split by sign, not by sort order.
+     *
+     * Taking the best and worst of one list put the same matchup in both
+     * columns whenever only one cleared the sample floor: Edgar's only pairing
+     * showed as both his strongest and his weakest, at the same negative edge.
+     * A favourable matchup is one he wins more than usual, so the sign decides
+     * the column and a brawler can only ever appear in one.
+     */
     return {
       baseline,
       sampleSize,
-      strongAgainst: [...versus].sort((a, b) => b.edge - a.edge).slice(0, limit),
-      weakAgainst: [...versus].sort((a, b) => a.edge - b.edge).slice(0, limit),
+      strongAgainst: versus
+        .filter((p) => p.edge > 0)
+        .sort((a, b) => b.edge - a.edge)
+        .slice(0, limit),
+      weakAgainst: versus
+        .filter((p) => p.edge < 0)
+        .sort((a, b) => a.edge - b.edge)
+        .slice(0, limit),
       bestWith: [...with_].sort((a, b) => b.edge - a.edge).slice(0, limit),
     };
   } catch {
