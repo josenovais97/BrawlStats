@@ -12,9 +12,12 @@ export interface BrawlerCardData {
   id: number;
   name: string;
   imageUrl: string;
-  className: string;
-  rarityName: string;
+  /** Null when no source knows it — rendered as nothing, never as "Unknown". */
+  className: string | null;
+  rarityName: string | null;
   rarityColor: string;
+  /** "legacy" brawlers are kept for their history but are not playable. */
+  status: 'current' | 'legacy';
   starPowers: number;
   gadgets: number;
 }
@@ -36,14 +39,17 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
   const [brawlerClass, setBrawlerClass] = useState('all');
 
   const rarities = useMemo(() => {
-    const present = new Set(brawlers.map((b) => b.rarityName));
+    const present = new Set(
+      brawlers.map((b) => b.rarityName).filter((r): r is string => Boolean(r)),
+    );
     const known = RARITY_ORDER.filter((r) => present.has(r));
     const extra = [...present].filter((r) => !RARITY_ORDER.includes(r)).sort();
     return [...known, ...extra];
   }, [brawlers]);
 
   const classes = useMemo(
-    () => [...new Set(brawlers.map((b) => b.className))].sort(),
+    () =>
+      [...new Set(brawlers.map((b) => b.className).filter((c): c is string => Boolean(c)))].sort(),
     [brawlers],
   );
 
@@ -115,15 +121,30 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               <p className="mt-2 truncate text-center font-bold capitalize">
                 {brawler.name.toLowerCase()}
               </p>
-              <p
-                className="mt-0.5 truncate text-center text-xs font-semibold"
-                style={{ color: brawler.rarityColor }}
-              >
-                {brawler.rarityName}
-              </p>
-              <p className="mt-0.5 truncate text-center text-xs text-muted">
-                {brawler.className}
-              </p>
+              {brawler.rarityName ? (
+                <p
+                  className="mt-0.5 truncate text-center text-xs font-semibold"
+                  style={{ color: brawler.rarityColor }}
+                >
+                  {brawler.rarityName}
+                </p>
+              ) : null}
+              {/* Omitted rather than shown as a placeholder when unknown. */}
+              {brawler.className ? (
+                <p className="mt-0.5 truncate text-center text-xs text-muted">
+                  {brawler.className}
+                </p>
+              ) : null}
+              {brawler.status === 'legacy' ? (
+                <p className="mt-1 text-center">
+                  <span
+                    className="rounded bg-surface-2 px-1.5 py-0.5 text-[0.5625rem] font-bold uppercase tracking-wide text-muted"
+                    title="No longer available in the game. Kept for its history."
+                  >
+                    Legacy
+                  </span>
+                </p>
+              ) : null}
               <div className="mt-2 flex items-center justify-center gap-3 text-xs text-muted">
                 <span className="flex items-center gap-1" title="Star powers">
                   <StarPowerIcon className="size-3" />

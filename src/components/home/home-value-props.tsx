@@ -55,7 +55,7 @@ const PROPS = [
     href: '/maps',
     icon: Map,
     title: 'Every map',
-    body: 'A page per map in rotation, ranking the brawlers that actually win on it.',
+    body: 'Live events, the Ranked pool and the full catalogue — each map ranking the brawlers that win on it.',
     accent: '#ffab00',
   },
 ];

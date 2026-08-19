@@ -29,6 +29,7 @@ import {
   wikiPageUrl,
   type BrawlerWiki,
 } from '@/lib/brawler-wiki';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
@@ -162,6 +163,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Combat stats and resolved ability text. Nothing else publishes these —
   // see lib/brawler-wiki. Null costs the sections that use it, not the page.
   const metaIndex = await getMetaIndex('ranked', 7);
+  const catalogEntry = (await getBrawlerCatalog()).byId.get(brawlerId);
   const wiki = await getBrawlerWiki(brawler.name).catch(() => null);
   // One page for the whole game, so this is shared across every brawler.
   const gearText = await getGearDescriptions().catch(() => new Map<string, string>());
@@ -210,8 +212,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // "Unknown" is a real value upstream, not a missing one: unclassified
   // brawlers come back as `{ id: 0, name: "Unknown" }`, and a chip reading
   // "Unknown" says less than no chip at all.
+  // The artwork source says "Unknown" for every recent brawler; the wiki
+  // infobox has the real class, and that page is already fetched above.
   const className =
-    brawler.class?.name && brawler.class.name !== 'Unknown' ? brawler.class.name : null;
+    (brawler.class?.name && brawler.class.name !== 'Unknown'
+      ? brawler.class.name
+      : null) ?? wiki?.stats.className ?? null;
+  const rarityName =
+    (brawler.rarity?.name && brawler.rarity.name !== 'Unknown'
+      ? brawler.rarity.name
+      : null) ?? wiki?.stats.rarityName ?? null;
+  const isLegacy = catalogEntry?.status === 'legacy';
 
   // A buffie is named for the ability type it upgrades, so each one is listed
   // against the gadget or star power it actually changes.
@@ -333,8 +344,16 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   color: accent,
                 }}
               >
-                {brawler.rarity?.name ?? 'Unknown'}
+                {rarityName ?? 'Brawler'}
               </span>
+              {isLegacy ? (
+                <span
+                  className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase tracking-wide text-muted"
+                  title="No longer available in the game. This page is kept for its history."
+                >
+                  Legacy
+                </span>
+              ) : null}
               {className ? (
                 <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
                   {className}

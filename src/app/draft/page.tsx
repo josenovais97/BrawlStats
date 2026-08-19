@@ -7,6 +7,7 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
 import {
@@ -58,6 +59,11 @@ export default async function DraftPage({ searchParams }: PageProps) {
     getBrawlerMap().catch(() => new Map<number, BABrawler>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
   ]);
+
+  // Only brawlers you can actually field. The artwork mirror still lists
+  // withdrawn ones, and offering Buzz Lightyear as an enemy pick is offering a
+  // draft nobody can face.
+  const catalog = await getBrawlerCatalog();
 
   const artFor = (map: RankedMapPicks): GameMap | undefined =>
     catalogue.find(
@@ -209,7 +215,7 @@ export default async function DraftPage({ searchParams }: PageProps) {
 
               {enemies.length < MAX_ENEMIES ? (
                 <EnemyChooser
-                  brawlerMeta={brawlerMeta}
+                  options={catalog.current}
                   enemies={enemies}
                   hrefFor={hrefFor}
                 />
@@ -503,15 +509,15 @@ function MapChooser({
  * list underneath it.
  */
 function EnemyChooser({
-  brawlerMeta,
+  options: pool,
   enemies,
   hrefFor,
 }: {
-  brawlerMeta: Map<number, BABrawler>;
+  options: CatalogBrawler[];
   enemies: number[];
   hrefFor: (next: { enemy?: number[] }) => string;
 }) {
-  const options = [...brawlerMeta.values()]
+  const options = pool
     .filter((brawler) => !enemies.includes(brawler.id))
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -528,7 +534,7 @@ function EnemyChooser({
               className="flex flex-col items-center gap-1 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
             >
               <Image
-                src={brawler.imageUrl}
+                src={brawler.meta?.imageUrl ?? brawlerIconUrl(brawler.id)}
                 alt=""
                 width={40}
                 height={40}

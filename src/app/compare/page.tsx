@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { ComparePicker } from '@/components/brawlers/compare-picker';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getBrawlerMap, getBrawlers } from '@/lib/brawlapi';
+import { getBrawlerMap } from '@/lib/brawlapi';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { comparePath } from '@/lib/compare';
 import { slugify } from '@/lib/slugs';
 import { getMetaIndex } from '@/lib/stats';
@@ -23,7 +24,8 @@ export const revalidate = 3600;
 const SUGGESTION_SEED = 8;
 
 export default async function CompareIndexPage() {
-  const brawlers = await getBrawlers().catch(() => [] as BABrawler[]);
+  // Withdrawn brawlers are not comparable options.
+  const brawlers = (await getBrawlerCatalog()).current;
   const meta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
   const metaIndex = await getMetaIndex('ranked', 7);
 

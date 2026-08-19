@@ -60,7 +60,7 @@ export default function AboutPage() {
           <Card
             icon={Database}
             title="Track the meta"
-            body="A tier list and popular builds aggregated from thousands of sampled battles, refreshed daily — plus the full official release notes and news in one place."
+            body="Tier lists and per-map picks aggregated from thousands of sampled battles, refreshed daily — plus upgrade-ownership rates, release notes and news in one place."
           />
         </div>
       </section>
@@ -106,7 +106,7 @@ export default function AboutPage() {
             ],
             [
               'Loadouts are not published',
-              'The API reports which star powers, gadgets and gears a player owns, never which are equipped. Build percentages are unlock splits, not pick rates.',
+              'The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match — no endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler\u2019s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.',
             ],
             [
               'Tier list percentages are adjusted',
@@ -126,6 +126,42 @@ export default function AboutPage() {
       </section>
 
       <section>
+        <SectionHeading
+          title="Reading the map pages"
+          subtitle="Four different things get called “maps”, and they mean different things."
+        />
+        <ul className="card divide-y divide-border">
+          {[
+            [
+              'Live now',
+              'The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.',
+            ],
+            [
+              'Ranked pool',
+              'The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.',
+            ],
+            [
+              'Full catalogue',
+              'Every map still in the game — around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.',
+            ],
+            [
+              'Map picks vs mode picks',
+              'A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.',
+            ],
+            [
+              'Confidence labels',
+              'Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking — nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.',
+            ],
+          ].map(([title, body]) => (
+            <li key={title} className="p-5">
+              <p className="font-semibold">{title}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section>
         <SectionHeading title="Privacy" />
         <div className="card flex gap-4 p-6">
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-victory">
@@ -133,9 +169,18 @@ export default function AboutPage() {
           </span>
           <div className="space-y-2 text-sm leading-relaxed text-muted">
             <p>
-              There are no accounts and no tracking. Your recent searches and saved
-              profiles live in your own browser&apos;s local storage and are never sent to
-              us — clearing them removes them for good.
+              There is no account system, so there is nothing to sign up for and no
+              password to store. Your recent searches and saved profiles live in your
+              own browser&apos;s local storage and are never sent to us — clearing your
+              browser data removes them for good.
+            </p>
+            <p>
+              {/* Previously this said "no tracking", which was not true while
+                  Vercel Analytics is enabled. Stating it plainly is the point
+                  of this page. */}
+              The site does use Vercel&apos;s privacy-friendly analytics to count page
+              views. It records no cookies and does not build a profile of you or follow
+              you across other sites — it is a visit counter, not ad tracking.
             </p>
             <p>
               Looking up a tag is a public action: the same data is available to anyone

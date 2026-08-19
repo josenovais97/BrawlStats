@@ -43,6 +43,15 @@ export { wikiPageUrl } from '@/lib/wiki';
 const REVALIDATE_WIKI = 21_600;
 
 export interface BrawlerStats {
+  /**
+   * Class and rarity, as a fallback.
+   *
+   * The artwork mirror reports `class: "Unknown"` for every brawler released
+   * since Meeple — twenty of them — while the wiki infobox has the real value.
+   * Free to take: the page is already fetched for the combat stats.
+   */
+  className: string | null;
+  rarityName: string | null;
   health: string | null;
   /** The infobox labels this per brawler — "Damage per shell", "Healing". */
   attackLabel: string | null;
@@ -223,6 +232,8 @@ export async function getBrawlerWiki(name: string): Promise<BrawlerWiki | null> 
   }
 
   const stats: BrawlerStats = {
+    className: firstValue(box.Class),
+    rarityName: firstValue(box.Rarity),
     health: firstValue(box.Health),
     attackLabel: firstValue(box.AttackLabel),
     attack: firstValue(box.Attack),
