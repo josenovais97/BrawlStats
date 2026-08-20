@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import { CalendarClock, Clock, Radio } from 'lucide-react';
+import { CalendarClock, Radio } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { ModeBestPicks } from '@/components/events/mode-best-picks';
+import { ClockIcon } from '@/components/game-icons';
 import { ErrorState } from '@/components/ui/error-state';
 import { getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { getEventRotation } from '@/lib/bs-api';
@@ -217,7 +218,7 @@ function EventCard({
           <p className="truncate font-semibold">{slot.event.map ?? 'Unknown map'}</p>
         )}
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
-          <Clock className="size-3.5" />
+          <ClockIcon className="size-4" />
           {showEndsIn
             ? `Ends in ${timeUntil(slot.endTime)}`
             : `Starts in ${timeUntil(slot.startTime)}`}

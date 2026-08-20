@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react';
+import { ClockIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -96,7 +96,7 @@ export async function HomeLiveEvents() {
                     <span className="eyebrow text-victory">Live</span>
                   </span>
                   <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold tabular-nums text-muted">
-                    <Clock className="size-3.5" />
+                    <ClockIcon className="size-4" />
                     {timeUntil(slot.endTime)}
                   </span>
                 </div>
