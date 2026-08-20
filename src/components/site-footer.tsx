@@ -59,7 +59,7 @@ export function SiteFooter() {
       />
 
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10">
           {/* Brand */}
           <div className="min-w-0">
             <Link
@@ -104,7 +104,7 @@ export function SiteFooter() {
             <p id="footer-explore" className="eyebrow">
               Explore
             </p>
-            <ul className="mt-3 grid grid-cols-2 gap-x-4 sm:grid-cols-1">
+            <ul className="mt-3 grid grid-cols-2 gap-x-4">
               {EXPLORE.map(({ href, label }) => (
                 <li key={href}>
                   <Link
@@ -147,15 +147,22 @@ export function SiteFooter() {
 
             {/* Support, deliberately quiet: it is a thank-you, not the thing
                 the site is for. The page's own call to action is the search. */}
+            {/*
+              Given a warm tint so it reads as an offer rather than as one more
+              grey link, but never the solid brand fill — that belongs to the
+              search button, and a donation should not be the loudest control
+              on a page about looking up players.
+            */}
             <a
               href={BUY_ME_A_COFFEE_URL}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-brand"
+              className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/35 bg-brand/10 px-3.5 text-sm font-bold text-brand transition-colors hover:border-brand/60 hover:bg-brand/15"
             >
               <Coffee aria-hidden className="size-4" />
               Buy me a coffee
             </a>
+            <p className="mt-2 text-xs text-muted/80">Free, ad-free, no paywall.</p>
           </div>
         </div>
 

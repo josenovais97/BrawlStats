@@ -80,7 +80,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
         The art column comes in at `md`. Held back to `lg` it left tablets
         staring at half an empty hero, which is the widest gap on the page.
       */}
-      <div className="relative grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,17rem)] md:gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-10 xl:grid-cols-[minmax(0,1fr)_minmax(0,25rem)]">
+      <div className="relative grid items-end gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)] md:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,23rem)]">
         {/* Copy + search */}
         <div className="reveal-now">
           <span className="inline-flex items-center gap-2 rounded-full border border-border-strong/70 bg-surface/80 px-3.5 py-1.5 backdrop-blur">
@@ -88,15 +88,29 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             <span className="eyebrow text-brand">Live Brawl Stars data</span>
           </span>
 
-          <h1 className="display-hero mt-4 text-balance text-[2.5rem] uppercase leading-[0.94] sm:text-5xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-6xl">
+          {/*
+            Two lines, not four.
+            
+            At 60px in a half-width column this ran to four lines and became
+            the whole hero, pushing the search card and the proof strip off a
+            laptop screen. The break is forced so the gold half is always its
+            own line rather than wherever the wrap happens to fall.
+          */}
+          <h1 className="display-hero mt-4 text-[2.25rem] uppercase leading-[0.95] sm:text-[2.5rem] md:text-[2rem] lg:text-[2.875rem]">
             Brawl Stars stats that
             <br />
-            <span className="bg-gradient-to-b from-brand via-brand to-brand-strong bg-clip-text text-transparent">
+            {/*
+              A tight, bright gradient. The old one ran to `brand-strong` at
+              the bottom, which at this size rendered the last line closer to
+              brown than to gold — the darkest text on the page was the thing
+              meant to catch the eye.
+            */}
+            <span className="bg-gradient-to-b from-[#ffe9a8] to-[#ffb524] bg-clip-text text-transparent">
               show where you stand
             </span>
           </h1>
 
-          <p className="mt-3.5 max-w-xl text-balance leading-relaxed text-muted">
+          <p className="mt-3 max-w-lg leading-relaxed text-muted">
             One tag gives you a skill score out of 10, your roster read against the
             live meta, and your progression tracked over time.
           </p>
@@ -105,7 +119,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             The search panel is raised off the hero rather than sunk into it, so
             it reads as the one thing on the page you are meant to touch first.
           */}
-          <div className="card card-glow mt-6 border-border-strong/60 p-4 sm:p-5">
+          <div className="card card-glow mt-5 border-border-strong/60 p-4 sm:p-5">
             <SearchBar
               autoFocus
               showRecent
@@ -135,7 +149,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
         {/* Character art */}
         <div
           aria-hidden
-          className="relative mx-auto hidden h-[19rem] w-full max-w-md md:block lg:h-[23rem] xl:h-[26rem]"
+          className="relative mx-auto hidden h-[20rem] w-full max-w-md md:block lg:h-[25rem] xl:h-[28rem]"
         >
           {/* Ground glow, so the group reads as standing rather than floating. */}
           <span
@@ -171,7 +185,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
         </div>
       </div>
 
-      {stats ? <div className="mt-8 sm:mt-10">{stats}</div> : null}
+      {stats ? <div className="mt-6 sm:mt-7">{stats}</div> : null}
     </section>
   );
 }
