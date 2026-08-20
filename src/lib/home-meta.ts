@@ -7,9 +7,11 @@ import {
   MIN_SAMPLE_FOR_TIER,
   assignTierFromScore,
   getLatestBrawlerStats,
+  getMetaIndex,
   metaScore,
   normalizeWinRate,
 } from '@/lib/stats';
+import { TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 
 /**
@@ -75,3 +77,68 @@ export const getTopMetaBrawlers = cache(
       });
   },
 );
+
+/**
+ * Brawlers the two tier lists disagree about most.
+ *
+ * This is the site's one genuinely uncopyable fact. Ranked and the trophy
+ * ladder are different games — one drafts and bans between comparable
+ * opponents, the other does not — and BrawlZone scores them from two separate
+ * halves of its own sample. Every competitor publishes a single list, because
+ * a single list is all you can build from a source that does not split.
+ *
+ * So the disagreement is the product, stated as data rather than as a claim.
+ * A brawler that is S in Ranked and C on ladder is a fact about the game that
+ * one list structurally cannot show you.
+ *
+ * Only brawlers rated in both lists count: an unrated tier is missing
+ * evidence, not a disagreement, and reading it as one would manufacture the
+ * very gap this is meant to reveal.
+ */
+export interface MetaSplit {
+  brawlerId: number;
+  name: string;
+  imageUrl: string;
+  ranked: { tier: Tier; score: number };
+  trophy: { tier: Tier; score: number };
+  /** Positions apart on the S-D scale. Always at least 1. */
+  gap: number;
+  /** Which list rates it higher. */
+  favours: 'ranked' | 'trophy';
+}
+
+export const getMetaSplit = cache(async (limit = 3): Promise<MetaSplit[]> => {
+  const [ranked, trophy, brawlerMeta] = await Promise.all([
+    getMetaIndex('ranked', 7),
+    getMetaIndex('trophy', 7),
+    getBrawlerMap().catch(() => new Map()),
+  ]);
+
+  const rank = (tier: Tier) => TIER_ORDER.indexOf(tier);
+  const out: MetaSplit[] = [];
+
+  for (const [brawlerId, r] of ranked) {
+    const t = trophy.get(brawlerId);
+    if (!r.tier || !t?.tier || r.metaScore === null || t.metaScore === null) continue;
+
+    const gap = Math.abs(rank(r.tier) - rank(t.tier));
+    if (gap < 1) continue;
+
+    const meta = brawlerMeta.get(brawlerId);
+    out.push({
+      brawlerId,
+      name: r.brawlerName,
+      imageUrl: meta?.imageUrl ?? brawlerIconUrl(brawlerId),
+      ranked: { tier: r.tier, score: r.metaScore },
+      trophy: { tier: t.tier, score: t.metaScore },
+      gap,
+      // A lower index is a better tier, so the smaller rank wins.
+      favours: rank(r.tier) < rank(t.tier) ? 'ranked' : 'trophy',
+    });
+  }
+
+  return out
+    // Biggest disagreement first, then the better-sampled of equal gaps.
+    .sort((a, b) => b.gap - a.gap || b.ranked.score - a.ranked.score)
+    .slice(0, limit);
+});

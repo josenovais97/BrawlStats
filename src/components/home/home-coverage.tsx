@@ -4,8 +4,9 @@ import {
   PlayersIcon,
   RankedIcon,
 } from '@/components/game-icons';
-import { compactNumber } from '@/lib/format';
-import { getCoverageStats } from '@/lib/stats';
+import { RelativeTime } from '@/components/ui/relative-time';
+import { compactNumber, relativeTime } from '@/lib/format';
+import { getCoverageStats, getLastAggregationRun } from '@/lib/stats';
 
 /**
  * Real coverage numbers, straight from the database.
@@ -14,7 +15,10 @@ import { getCoverageStats } from '@/lib/stats';
  * of zeroes would undercut the credibility it exists to build.
  */
 export async function HomeCoverage() {
-  const stats = await getCoverageStats();
+  const [stats, lastRun] = await Promise.all([
+    getCoverageStats(),
+    getLastAggregationRun(),
+  ]);
   if (!stats || stats.battles === 0) return null;
 
   const items = [
@@ -60,6 +64,29 @@ export async function HomeCoverage() {
           </li>
         ))}
       </ul>
+
+      {/*
+        The line that makes the four numbers above mean something.
+        
+        Anyone can print a big number. Saying when it was last checked is a
+        claim only a site that actually samples can make, and it is the closest
+        thing this page has to a proof of life. The instant is rendered by
+        `RelativeTime` so a cached page never shows a stale "20 minutes ago".
+      */}
+      {lastRun ? (
+        <p className="flex items-center gap-2 border-t border-border px-3.5 py-2.5 text-xs text-muted sm:px-5">
+          <span className="live-dot shrink-0" />
+          <span className="min-w-0">
+            Last sampled{' '}
+            <RelativeTime
+              iso={lastRun.startedAt}
+              fallback={relativeTime(lastRun.startedAt)}
+              className="font-semibold text-foreground"
+            />
+            {' '}&middot; we re-read the pool every three hours
+          </span>
+        </p>
+      ) : null}
     </section>
   );
 }

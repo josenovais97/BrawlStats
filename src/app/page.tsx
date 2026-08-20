@@ -10,6 +10,7 @@ import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeSnapshot } from '@/components/home/home-snapshot';
+import { HomeSplit } from '@/components/home/home-split';
 import { HomeTools } from '@/components/home/home-tools';
 import { Skeleton } from '@/components/ui/skeletons';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -134,6 +135,15 @@ export default function HomePage() {
 
       <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
         <HomeSnapshot />
+      </Suspense>
+
+      {/*
+        Straight after the snapshot, because it is the footnote the snapshot
+        earns: those are the Ranked numbers, and the ladder disagrees. Placed
+        anywhere earlier it would be an argument before any evidence.
+      */}
+      <Suspense fallback={null}>
+        <HomeSplit />
       </Suspense>
 
       <HomeCta />

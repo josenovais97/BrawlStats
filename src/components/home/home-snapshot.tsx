@@ -24,7 +24,7 @@ import { TIER_COLOR } from '@/lib/tiers';
  * section read, so the extra prominence costs nothing upstream.
  */
 export async function HomeSnapshot() {
-  const top = await getTopMetaBrawlers(5).catch(() => []);
+  const top = await getTopMetaBrawlers(4).catch(() => []);
   const [leader, ...rest] = top;
 
   return (
