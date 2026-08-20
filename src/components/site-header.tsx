@@ -4,7 +4,6 @@ import {
   CalendarClock,
   ChevronDown,
   GitCompareArrows,
-  Map,
   Menu,
   Newspaper,
   Podium,
@@ -21,6 +20,7 @@ import { BrandMark } from '@/components/brand-mark';
 import {
   BrawlersIcon,
   LeaderboardIcon,
+  MapsIcon,
   RankedIcon,
 } from '@/components/game-icons';
 
@@ -50,7 +50,7 @@ const NAV: NavItem[] = [
   // /tier-list redirect, but stays highlighted on the trophy list too.
   { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },
   { href: '/ranked', label: 'Ranked', icon: RankedIcon },
-  { href: '/maps', label: 'Maps', icon: Map },
+  { href: '/maps', label: 'Maps', icon: MapsIcon },
   { href: '/draft', label: 'Draft', icon: Target },
   { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon },
 ];

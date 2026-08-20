@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { Map as MapIcon } from 'lucide-react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getEventRotation } from '@/lib/bs-api';
+import { MapsIcon } from '@/components/game-icons';
 import { getActiveMaps, groupByMode, type GameMap } from '@/lib/game-maps';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { slugify } from '@/lib/slugs';
@@ -72,7 +73,7 @@ export default async function MapsIndexPage() {
         subtitle="What is live right now, this season's Ranked pool, and the full catalogue of maps still in the game. Each map page ranks the brawlers with the best records on it, from sampled battles."
         aside={
           <span className="inline-flex items-center gap-2 text-sm text-muted">
-            <MapIcon className="size-4" />
+            <MapsIcon className="size-4" />
             {maps.length} maps
           </span>
         }

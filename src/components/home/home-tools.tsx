@@ -1,7 +1,7 @@
-import { ArrowRight, Map, Podium, Scale, Target } from 'lucide-react';
+import { ArrowRight, Podium, Scale, Target } from 'lucide-react';
 import Link from 'next/link';
 
-import { BrawlersIcon, LeaderboardIcon } from '@/components/game-icons';
+import { BrawlersIcon, LeaderboardIcon, MapsIcon } from '@/components/game-icons';
 
 /**
  * The tools, as a toolbar rather than as six more cards.
@@ -33,7 +33,7 @@ const TOOLS = [
   },
   {
     href: '/maps',
-    icon: Map,
+    icon: MapsIcon,
     title: 'Maps',
     body: 'Best picks map by map',
     accent: '#ffab00',

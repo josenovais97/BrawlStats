@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 import { prestigeTier } from '@/lib/prestige';
+import { slugify } from '@/lib/slugs';
 
 /**
  * Real in-game artwork, used everywhere a stat refers to a game concept.
@@ -157,6 +158,42 @@ export function LeaderboardIcon({ className }: IconProps) {
 /** Skins, pins and the rest of the cosmetic collection. */
 export function CosmeticsIcon({ className }: IconProps) {
   return <GameIcon src="/icons/cosmetics.png" alt="Cosmetics" className={className} />;
+}
+
+/**
+ * The seven brawler classes, as the game draws them.
+ *
+ * From the community wiki: neither the official catalogue nor the artwork
+ * mirror publishes a class icon — the mirror's own `icons` endpoint is profile
+ * pictures and club badges only, and every plausible CDN path for a class 404s.
+ *
+ * Renders nothing for an unknown class rather than a placeholder, which is the
+ * same rule the class label itself follows: the artwork mirror reports
+ * "Unknown" for every brawler released since Meeple, and a generic badge on a
+ * fifth of the roster says less than no badge.
+ */
+const CLASS_ICONS = new Set([
+  'artillery',
+  'assassin',
+  'controller',
+  'damage-dealer',
+  'marksman',
+  'support',
+  'tank',
+]);
+
+export function ClassIcon({
+  name,
+  className,
+}: IconProps & { name: string | null | undefined }) {
+  const slug = name ? slugify(name) : null;
+  if (!slug || !CLASS_ICONS.has(slug)) return null;
+  return <GameIcon src={`/icons/class-${slug}.png`} alt={name!} className={className} />;
+}
+
+/** The map catalogue. */
+export function MapsIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/maps.png" alt="Maps" className={className} />;
 }
 
 /** Longest run as the Big Brawler. */

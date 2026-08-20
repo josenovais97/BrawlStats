@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useId, useMemo, useState } from 'react';
 
+import { ClassIcon } from '@/components/game-icons';
+
 /** Only what the grid renders — keeps the client payload small. */
 export interface BrawlerCardData {
   id: number;
@@ -181,6 +183,9 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             options={classes}
             value={brawlerClass}
             onChange={setBrawlerClass}
+            /* The class marks are distinctive enough to be recognised before
+               the word is read, which is most of the point of a filter row. */
+            renderIcon={(option) => <ClassIcon name={option} className="size-4" />}
           />
         </div>
 
@@ -298,7 +303,10 @@ function BrawlerCard({ brawler }: { brawler: BrawlerCardData }) {
         ) : null}
         {/* Omitted rather than shown as a placeholder when unknown. */}
         {brawler.className ? (
-          <span className="truncate text-muted">{brawler.className}</span>
+          <span className="inline-flex min-w-0 items-center gap-1 text-muted">
+            <ClassIcon name={brawler.className} className="size-3.5 shrink-0" />
+            <span className="truncate">{brawler.className}</span>
+          </span>
         ) : null}
       </p>
     </Link>
@@ -310,11 +318,14 @@ function FilterRow({
   options,
   value,
   onChange,
+  renderIcon,
 }: {
   label: string;
   options: string[];
   value: string;
   onChange: (next: string) => void;
+  /** Optional artwork for a pill. Returning null just leaves the label. */
+  renderIcon?: (option: string) => React.ReactNode;
 }) {
   return (
     /* The label sits above the pills on a phone: a fixed label column plus a
@@ -340,12 +351,13 @@ function FilterRow({
               type="button"
               aria-pressed={active}
               onClick={() => onChange(option)}
-              className={`inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 text-xs font-semibold transition-colors ${
+              className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors ${
                 active
                   ? 'bg-brand text-brand-ink'
                   : 'border border-border bg-surface-2/60 text-muted hover:border-border-strong hover:text-foreground'
               }`}
             >
+              {option === 'all' ? null : renderIcon?.(option)}
               {option === 'all' ? 'All' : option}
             </button>
           );

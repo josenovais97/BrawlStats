@@ -14,7 +14,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
-import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
+import { ClassIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import { getBrawler, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
@@ -358,7 +358,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 </span>
               ) : null}
               {className ? (
-                <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
+                  <ClassIcon name={className} className="size-4" />
                   {className}
                 </span>
               ) : null}
