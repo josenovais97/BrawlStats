@@ -14,7 +14,12 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
-import { ClassIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
+import {
+  ClassIcon,
+  CombatStatIcon,
+  PlayersIcon,
+  TrophyIcon,
+} from '@/components/game-icons';
 import { getBrawler, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
@@ -416,37 +421,42 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {(
               [
-                ['Health', wiki.stats.health],
+                ['Health', wiki.stats.health, 'health'],
                 /* The infobox labels these two independently and often gives
                    them the same words, so the grid used to print "Damage per
                    bullet" twice with different numbers under it. See
-                   `combatStatLabels`. */
-                [statLabels.attack, wiki.stats.attack],
-                [statLabels.super, wiki.stats.super],
-                ['Reload', wiki.stats.reload],
-                ['Range', wiki.stats.attackRange],
-                ['Speed', wiki.stats.movementSpeed],
+                   `combatStatLabels`. The gold Super mark carries the same
+                   distinction a second way, in colour. */
+                [statLabels.attack, wiki.stats.attack, 'damage'],
+                [statLabels.super, wiki.stats.super, 'super-damage'],
+                ['Reload', wiki.stats.reload, 'cooldown'],
+                ['Range', wiki.stats.attackRange, 'ranged'],
+                ['Speed', wiki.stats.movementSpeed, 'speed'],
               ] as const
             )
               // Not every brawler has every stat: a super that deals no direct
               // damage has no super damage, and the infobox simply omits it.
               .filter(([, value]) => Boolean(value))
-              .map(([label, value]) => {
+              .map(([label, value, stat]) => {
                 const { main, hint } = splitStat(value!);
                 return (
-                  <div key={label} className="card flex flex-col p-3">
+                  <div key={label} className="card p-3">
                     {/* Wraps rather than truncates: the qualified damage
                         labels are the longest text on the card, and clipping
                         one to "Main attack damage per…" puts the ambiguity
-                        straight back. */}
+                        straight back. So the label gets the full width and the
+                        mark sits with the number, which is always short. */}
                     <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
                       {label}
                     </dt>
-                    <dd className="mt-1 text-lg font-bold leading-tight tabular-nums">
-                      {main}
+                    <dd className="mt-1.5 flex items-center gap-2">
+                      <CombatStatIcon stat={stat} className="size-6 shrink-0" />
+                      <span className="min-w-0 text-lg font-bold leading-tight tabular-nums">
+                        {main}
+                      </span>
                     </dd>
                     {hint ? (
-                      <dd className="text-xs leading-tight text-muted">{hint}</dd>
+                      <dd className="mt-0.5 text-xs leading-tight text-muted">{hint}</dd>
                     ) : null}
                   </div>
                 );

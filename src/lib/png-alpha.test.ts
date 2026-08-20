@@ -14,9 +14,12 @@ import { readPngAlpha } from '@/lib/png-alpha';
  * that renders as a white box on a dark page. `trophy-gain.png` shipped that
  * way and was only caught by somebody looking at it.
  *
- * The corners are the tell. Every one of these assets is a cut-out mark on
- * nothing, so all four corners should be empty; a fully opaque corner means a
- * background came along for the ride.
+ * Two checks, because the icon set has two legitimate shapes. Most are marks
+ * floating on nothing, but the combat-stat tiles are full-bleed slanted
+ * squares whose artwork genuinely reaches two of the four corners. So the
+ * decisive test is that *some* transparency exists at all — a baked-in
+ * background has none anywhere — and the corner test only requires that the
+ * image is not boxed in on all four, which no cut-out or slanted tile ever is.
  */
 const ICONS = path.join(process.cwd(), 'public', 'icons');
 
@@ -41,11 +44,13 @@ test('every icon has a transparent background', () => {
   for (const name of files) {
     const png = readPngAlpha(readFileSync(path.join(ICONS, name)));
 
-    assert.ok(png.hasTransparency, `${name} has no transparent pixel at all`);
-    assert.deepEqual(
-      png.corners,
-      [0, 0, 0, 0],
-      `${name} has an opaque corner — a background was baked into the export`,
+    assert.ok(
+      png.hasTransparency,
+      `${name} is opaque everywhere — a background was baked into the export`,
+    );
+    assert.ok(
+      png.corners.some((alpha) => alpha === 0),
+      `${name} is opaque in all four corners — a background was baked into the export`,
     );
   }
 });
@@ -60,6 +65,8 @@ test('the reader spots an opaque image', () => {
   assert.equal(png.colorType, 6);
   assert.deepEqual(png.corners, [255, 255, 255, 255]);
   assert.equal(png.hasTransparency, false);
+  // Which is exactly what the icon check rejects.
+  assert.ok(!png.corners.some((alpha) => alpha === 0));
 });
 
 test('the reader spots a transparent image', () => {

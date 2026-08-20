@@ -191,6 +191,32 @@ export function ClassIcon({
   return <GameIcon src={`/icons/class-${slug}.png`} alt={name!} className={className} />;
 }
 
+/**
+ * The game's own combat-stat marks, from the brawler info screen.
+ *
+ * Colour is the categorisation and it is the game's, not ours: red for what
+ * the brawler does with its main attack, green for what keeps it alive and
+ * moving, gold for the Super. That is why they are worth using over a set of
+ * neutral glyphs — the grid groups itself before a single label is read.
+ */
+export type CombatStat =
+  | 'health'
+  | 'damage'
+  | 'super-damage'
+  | 'cooldown'
+  | 'ranged'
+  | 'speed'
+  | 'super-cooldown';
+
+export function CombatStatIcon({
+  stat,
+  className,
+}: IconProps & { stat: CombatStat }) {
+  /* Empty alt: the stat's label sits right beside it, and announcing both
+     reads the same thing twice. */
+  return <GameIcon src={`/icons/stat-${stat}.png`} alt="" className={className} />;
+}
+
 /** The map catalogue. */
 export function MapsIcon({ className }: IconProps) {
   return <GameIcon src="/icons/maps.png" alt="Maps" className={className} />;
