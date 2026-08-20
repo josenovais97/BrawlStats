@@ -1,8 +1,12 @@
 'use client';
 
-import { Medal, Shirt, User } from 'lucide-react';
+import { User } from 'lucide-react';
 
-import { ClubIcon } from '@/components/game-icons';
+import {
+  ClubIcon,
+  CosmeticsIcon,
+  RankedIcon,
+} from '@/components/game-icons';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
@@ -23,8 +27,8 @@ const BOARDS: {
 }[] = [
   { key: 'players', icon: User },
   { key: 'clubs', icon: ClubIcon },
-  { key: 'ranked', icon: Medal },
-  { key: 'cosmetics', icon: Shirt },
+  { key: 'ranked', icon: RankedIcon },
+  { key: 'cosmetics', icon: CosmeticsIcon },
 ];
 
 /**

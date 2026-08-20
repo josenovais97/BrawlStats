@@ -194,13 +194,6 @@ export function rankedLeagueIconUrl(rankName: string | undefined | null): string
   return `https://cdn.brawlify.com/ranked/regular/${normalized}.png`;
 }
 
-/** Prestige badge, 0–6. */
-export function prestigeIconUrl(level: number | undefined | null): string | null {
-  if (level === undefined || level === null) return null;
-  const capped = Math.min(Math.max(level, 0), 6);
-  return `https://cdn.brawlify.com/prestiges/regular/${capped}.png`;
-}
-
 /**
  * Star power artwork, by accessory id.
  *

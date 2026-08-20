@@ -1,11 +1,11 @@
 'use client';
 
-import { ArrowUpDown, Flame, Search, Star } from 'lucide-react';
+import { ArrowUpDown, Search, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
-import { TrophyIcon } from '@/components/game-icons';
+import { TrophyIcon, WinStreakIcon } from '@/components/game-icons';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import { TIER_COLOR } from '@/lib/tiers';
@@ -244,7 +244,7 @@ function BrawlerTile({
           className="mt-0.5 flex items-center justify-center gap-1 text-xs tabular-nums text-muted"
           title={`Best win streak ${streak}${onStreak > 0 ? `, currently on ${onStreak}` : ''}`}
         >
-          <Flame className={`size-3 ${onStreak > 0 ? 'text-defeat' : 'text-muted'}`} />
+          <WinStreakIcon className="size-3.5" />
           {/* The live streak leads when there is one — it is the only number on
               this tile that is true right now rather than ever. */}
           {onStreak > 0 ? `${onStreak} · best ${streak}` : `best ${streak}`}

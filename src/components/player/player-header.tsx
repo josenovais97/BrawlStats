@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { FavoriteButton } from '@/components/favorite-button';
-import { ClubIcon, TrophyIcon } from '@/components/game-icons';
-import { playerIconUrl, prestigeIconUrl } from '@/lib/brawlapi';
+import { ClubIcon, PrestigeIcon, TrophyIcon } from '@/components/game-icons';
+import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
@@ -18,7 +18,6 @@ export function PlayerHeader({
   lastOnline?: React.ReactNode;
 }) {
   const nameColor = nameColorToCss(player.nameColor);
-  const prestige = prestigeIconUrl(player.totalPrestigeLevel);
 
   return (
     <header className="card card-glow relative overflow-hidden">
@@ -108,16 +107,11 @@ export function PlayerHeader({
             Level {player.expLevel}
           </span>
 
-          {prestige && player.totalPrestigeLevel ? (
+          {/* The badge is the milestone reached (1, 25, 50, 100, 200), the
+              number beside it is the exact total. */}
+          {player.totalPrestigeLevel ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium">
-              <Image
-                src={prestige}
-                alt=""
-                width={16}
-                height={16}
-                className="size-4 object-contain"
-                unoptimized
-              />
+              <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />
               Prestige {formatNumber(player.totalPrestigeLevel)}
             </span>
           ) : null}

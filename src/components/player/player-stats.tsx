@@ -1,12 +1,15 @@
-import { Bot, Flame, Medal, Timer } from 'lucide-react';
+import { Timer } from 'lucide-react';
 
 import {
   Battle3v3Icon,
   BrawlersIcon,
   DuoShowdownIcon,
   ExperienceIcon,
+  PrestigeIcon,
+  RoboRumbleIcon,
   SoloShowdownIcon,
   TrophyIcon,
+  WinStreakIcon,
 } from '@/components/game-icons';
 import { StatCard } from '@/components/ui/stat-card';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -95,7 +98,7 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     bestStreak && (bestStreak.maxWinStreak ?? 0) > 0 ? (
       <StatCard
         key="streak"
-        node={<Flame className="size-8 text-defeat" />}
+        node={<WinStreakIcon className="size-8" />}
         label="Best win streak"
         value={formatNumber(bestStreak.maxWinStreak ?? 0)}
         hint={titleCaseLabel(bestStreak.name)}
@@ -104,7 +107,7 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     player.totalPrestigeLevel ? (
       <StatCard
         key="prestige"
-        node={<Medal className="size-8 text-accent" />}
+        node={<PrestigeIcon total={player.totalPrestigeLevel} className="size-8" />}
         label="Total prestige"
         value={formatNumber(player.totalPrestigeLevel)}
         hint="Across every brawler"
@@ -113,7 +116,7 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     robo ? (
       <StatCard
         key="robo"
-        node={<Bot className="size-8 text-accent" />}
+        node={<RoboRumbleIcon className="size-8" />}
         label="Robo Rumble"
         value={robo}
         hint="Longest survival"

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowLeft, BarChart3, Sparkles, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, BarChart3, Sparkles, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -14,6 +14,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
+import { TrophyIcon } from '@/components/game-icons';
 import { getBrawler, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
@@ -499,7 +500,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               tone="text-accent"
             />
             <StatCard
-              icon={Trophy}
+              node={<TrophyIcon className="size-6" />}
               label="Avg trophies"
               value={
                 stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))

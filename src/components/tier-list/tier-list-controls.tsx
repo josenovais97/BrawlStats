@@ -1,4 +1,4 @@
-import { Medal, Trophy } from 'lucide-react';
+import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import Link from 'next/link';
 
 import { humanizeMode } from '@/lib/format';
@@ -36,10 +36,10 @@ const FORMATS: {
   key: TierFormat;
   label: string;
   sublabel: string;
-  icon: typeof Medal;
+  icon: (props: { className?: string }) => React.ReactNode;
 }[] = [
-  { key: 'ranked', label: 'Ranked', sublabel: 'Competitive', icon: Medal },
-  { key: 'trophy', label: 'Trophy', sublabel: 'Ladder', icon: Trophy },
+  { key: 'ranked', label: 'Ranked', sublabel: 'Competitive', icon: RankedIcon },
+  { key: 'trophy', label: 'Trophy', sublabel: 'Ladder', icon: TrophyIcon },
 ];
 
 export function TierListControls({

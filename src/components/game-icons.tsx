@@ -1,5 +1,7 @@
 import Image from 'next/image';
 
+import { prestigeTier } from '@/lib/prestige';
+
 /**
  * Real in-game artwork, used everywhere a stat refers to a game concept.
  *
@@ -120,4 +122,57 @@ export function SkinsIcon({ className }: IconProps) {
 /** Club badge placeholder. */
 export function ClubIcon({ className }: IconProps) {
   return <GameIcon src="/icons/club.png" alt="Club" className={className} />;
+}
+
+/** Time played. */
+export function ClockIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/clock.png" alt="Time played" className={className} />;
+}
+
+/** Win streak. */
+export function WinStreakIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/win-streak.png" alt="Win streak" className={className} />;
+}
+
+/** Robo Rumble. */
+export function RoboRumbleIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/robo-rumble.png" alt="Robo Rumble" className={className} />;
+}
+
+/** Battles played. */
+export function BattlesIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/battles.png" alt="Battles" className={className} />;
+}
+
+/** Ranked. */
+export function RankedIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/ranked.png" alt="Ranked" className={className} />;
+}
+
+/** Leaderboards. */
+export function LeaderboardIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/leaderboard.png" alt="Leaderboard" className={className} />;
+}
+
+/** Skins, pins and the rest of the cosmetic collection. */
+export function CosmeticsIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/cosmetics.png" alt="Cosmetics" className={className} />;
+}
+
+/**
+ * Prestige badge for a total prestige level.
+ *
+ * The milestone lives in `lib/prestige` rather than here: it is arithmetic
+ * with boundaries worth testing, and a component file that imports
+ * `next/image` cannot be loaded by the test runner.
+ */
+export function PrestigeIcon({
+  total,
+  className,
+}: IconProps & { total: number | undefined | null }) {
+  const tier = prestigeTier(total);
+  if (tier === null) return null;
+  return (
+    <GameIcon src={`/icons/prestige-${tier}.png`} alt="Prestige" className={className} />
+  );
 }

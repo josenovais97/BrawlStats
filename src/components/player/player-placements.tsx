@@ -1,4 +1,6 @@
-import { Globe, Medal } from 'lucide-react';
+import { Globe } from 'lucide-react';
+
+import { LeaderboardIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -34,7 +36,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
     <section>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-          <Medal className="size-6 text-brand" />
+          <LeaderboardIcon className="size-6" />
           World ranked
         </h2>
         <p className="text-sm text-muted">

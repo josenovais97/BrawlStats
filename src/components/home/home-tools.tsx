@@ -1,5 +1,7 @@
-import { ArrowRight, Map, Medal, Podium, Scale, Swords, Target } from 'lucide-react';
+import { ArrowRight, Map, Podium, Scale, Target } from 'lucide-react';
 import Link from 'next/link';
+
+import { BrawlersIcon, LeaderboardIcon } from '@/components/game-icons';
 
 /**
  * The tools, as a toolbar rather than as six more cards.
@@ -45,14 +47,14 @@ const TOOLS = [
   },
   {
     href: '/leaderboard',
-    icon: Medal,
+    icon: LeaderboardIcon,
     title: 'Leaderboards',
     body: 'Trophies, and our Ranked elo',
     accent: '#8b6bff',
   },
   {
     href: '/brawlers',
-    icon: Swords,
+    icon: BrawlersIcon,
     title: 'Brawlers',
     body: 'Stats, builds and matchups',
     accent: '#ffc53d',

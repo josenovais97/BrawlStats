@@ -1,4 +1,6 @@
-import { Shirt, UserCircle } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
+
+import { CosmeticsIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -26,7 +28,7 @@ export async function CosmeticsBoard() {
     return (
       <div className="card card-glow mx-auto max-w-xl p-8 text-center">
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2 text-accent">
-          <Shirt className="size-7" />
+          <CosmeticsIcon className="size-7" />
         </span>
         <h2 className="mt-4 text-xl font-bold">Collecting cosmetics</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">

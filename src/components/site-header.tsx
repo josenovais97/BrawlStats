@@ -5,7 +5,6 @@ import {
   ChevronDown,
   GitCompareArrows,
   Map,
-  Medal,
   Menu,
   Newspaper,
   Podium,
@@ -13,7 +12,6 @@ import {
   Search,
   Swords,
   Target,
-  Trophy,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -21,13 +19,18 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
+import { LeaderboardIcon, RankedIcon } from '@/components/game-icons';
 
 interface NavItem {
   href: string;
   /** Overrides `href` for the active check, when an entry links into a section. */
   match?: string;
   label: string;
-  icon: typeof Swords;
+  /*
+   * Structural rather than `typeof Swords`: the game-artwork icons are our own
+   * components, not lucide forwardRefs, and a `className` is all the two share.
+   */
+  icon: (props: { className?: string }) => React.ReactNode;
 }
 
 /**
@@ -43,10 +46,10 @@ const NAV: NavItem[] = [
   // Points straight at the Ranked list so the nav does not bounce through the
   // /tier-list redirect, but stays highlighted on the trophy list too.
   { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },
-  { href: '/ranked', label: 'Ranked', icon: Medal },
+  { href: '/ranked', label: 'Ranked', icon: RankedIcon },
   { href: '/maps', label: 'Maps', icon: Map },
   { href: '/draft', label: 'Draft', icon: Target },
-  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+  { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon },
 ];
 
 /**

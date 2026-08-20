@@ -1,5 +1,10 @@
-import { Swords, Trophy, Users, Zap } from 'lucide-react';
+import { Users } from 'lucide-react';
 
+import {
+  BattlesIcon,
+  BrawlersIcon,
+  RankedIcon,
+} from '@/components/game-icons';
 import { compactNumber } from '@/lib/format';
 import { getCoverageStats } from '@/lib/stats';
 
@@ -14,10 +19,10 @@ export async function HomeCoverage() {
   if (!stats || stats.battles === 0) return null;
 
   const items = [
-    { icon: Swords, label: 'Brawlers tracked', value: compactNumber(stats.brawlers) },
+    { icon: BrawlersIcon, label: 'Brawlers tracked', value: compactNumber(stats.brawlers) },
     { icon: Users, label: 'Players sampled', value: compactNumber(stats.players) },
-    { icon: Zap, label: 'Battles analysed', value: compactNumber(stats.battles) },
-    { icon: Trophy, label: 'Ranked placements', value: compactNumber(stats.placements) },
+    { icon: BattlesIcon, label: 'Battles analysed', value: compactNumber(stats.battles) },
+    { icon: RankedIcon, label: 'Ranked placements', value: compactNumber(stats.placements) },
   ];
 
   return (

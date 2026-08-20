@@ -1,7 +1,7 @@
-import { Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { HyperchargeIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
@@ -163,7 +163,7 @@ function Row({
         <span className="flex items-center gap-2 text-xs">
           {hyper ? (
             <span className="inline-flex items-center gap-1 text-defeat">
-              <Zap className="size-3" />
+              <HyperchargeIcon className="size-3.5" />
               Hypercharge
             </span>
           ) : null}

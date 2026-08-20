@@ -1,7 +1,7 @@
-import { Crown, Medal, TrendingUp, Users } from 'lucide-react';
+import { Crown, TrendingUp, Users } from 'lucide-react';
 import Image from 'next/image';
 
-import { TrophyIcon } from '@/components/game-icons';
+import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
@@ -38,7 +38,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
         {hasRanked ? (
           <>
             <Cell
-              icon={Medal}
+              gameIcon={<RankedIcon className="size-6" />}
               label="Current ranked"
               value={player.rankedRankName ?? 'Unranked'}
               hint={player.rankedElo ? `${formatNumber(player.rankedElo)} elo` : undefined}
@@ -83,7 +83,6 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
 
         {globalRank !== null ? (
           <Cell
-            icon={Medal}
             label="World rank"
             gameIcon={<TrophyIcon className="size-5" />}
             value={`#${globalRank}`}
@@ -126,7 +125,8 @@ function Cell({
   badgeUrl,
   gameIcon,
 }: {
-  icon: typeof Medal;
+  /** Last-resort glyph, for cells with neither tier art nor a game icon. */
+  icon?: typeof Crown;
   label: string;
   value: string;
   hint?: string;
@@ -148,7 +148,7 @@ function Cell({
             unoptimized
           />
         ) : (
-          gameIcon ?? <Icon className="size-5" />
+          (gameIcon ?? (Icon ? <Icon className="size-5" /> : null))
         )}
       </span>
       <div className="min-w-0">

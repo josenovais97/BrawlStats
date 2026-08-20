@@ -1,8 +1,8 @@
-import { Clock, Star, Swords } from 'lucide-react';
-
 import {
+  BattlesIcon,
   BrawlersIcon,
   BuffieIcon,
+  ClockIcon,
   CoinIcon,
   GadgetIcon,
   GearIcon,
@@ -28,8 +28,7 @@ interface Props {
 
 export function PlayerProgression({ progression, playtime }: Props) {
   const rows: {
-    icon?: typeof Star;
-    node?: React.ReactNode;
+    node: React.ReactNode;
     label: string;
     stat: OwnershipStat;
     tone: string;
@@ -102,11 +101,11 @@ export function PlayerProgression({ progression, playtime }: Props) {
         </div>
 
         <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-          {rows.map(({ icon: Icon, node, label, stat, tone }) => (
+          {rows.map(({ node, label, stat, tone }) => (
             <div key={label}>
               <div className="mb-1.5 flex items-center gap-2 text-sm">
                 <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>
-                  {node ?? (Icon ? <Icon className="size-4" /> : null)}
+                  {node}
                 </span>
                 <span className="flex-1 font-medium">{label}</span>
                 <span className="tabular-nums text-muted">
@@ -147,13 +146,13 @@ export function PlayerProgression({ progression, playtime }: Props) {
             hint="Estimated"
           />
           <Investment
-            icon={Clock}
+            node={<ClockIcon className="size-5" />}
             label="Time played"
             value={`${formatNumber(Math.round(playtime.hours))} h`}
             hint="Estimated"
           />
           <Investment
-            icon={Swords}
+            node={<BattlesIcon className="size-5" />}
             label="Matches"
             value={formatNumber(playtime.matches)}
             hint="Estimated"
@@ -199,14 +198,12 @@ function Bar({ value, thin = false }: { value: number; thin?: boolean }) {
 }
 
 function Investment({
-  icon: Icon,
   node,
   label,
   value,
   hint,
 }: {
-  icon?: typeof Clock;
-  node?: React.ReactNode;
+  node: React.ReactNode;
   label: string;
   value: string;
   hint: string;
@@ -214,7 +211,7 @@ function Investment({
   return (
     <div className="flex items-center gap-3">
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 text-brand">
-        {node ?? (Icon ? <Icon className="size-5" /> : null)}
+        {node}
       </span>
       <div className="min-w-0">
         <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">

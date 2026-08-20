@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Swords } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
 import { SeasonPanel } from '@/components/ranked/season-panel';
+import { RankedIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
@@ -101,7 +101,7 @@ export default async function RankedPage() {
       */}
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
-          <Swords className="size-3.5" />
+          <RankedIcon className="size-4" />
           Competitive only
         </p>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Ranked maps</h1>

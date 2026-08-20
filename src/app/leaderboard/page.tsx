@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Shield, Trophy, Users } from 'lucide-react';
+import { Shield, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -51,7 +51,7 @@ export default async function LeaderboardPage({ searchParams }: PageProps) {
     <div className="space-y-10">
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
-          <Trophy className="size-3.5" />
+          <TrophyIcon className="size-4" />
           {board === 'cosmetics' || board === 'ranked' ? 'Our own data' : 'Official rankings'}
         </p>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Leaderboard</h1>

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Lock, Shield, Trophy, UserPlus, Users } from 'lucide-react';
+import { Lock, Shield, UserPlus, Users } from 'lucide-react';
 
 import { FavoriteButton } from '@/components/favorite-button';
 import { TrophyIcon } from '@/components/game-icons';
@@ -132,7 +132,7 @@ export default async function ClubPage({ params }: PageProps) {
           tone="text-accent"
         />
         <StatCard
-          icon={Trophy}
+          node={<TrophyIcon className="size-6" />}
           label="Avg trophies"
           value={formatNumber(averageTrophies)}
         />

@@ -1,4 +1,4 @@
-import { Database, Medal, Trophy } from 'lucide-react';
+import { Database } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -8,6 +8,7 @@ import {
   breadcrumbSchema,
   itemListSchema,
 } from '@/components/seo/structured-data';
+import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { Disclosure } from '@/components/ui/disclosure';
 import { RelativeTime } from '@/components/ui/relative-time';
@@ -47,7 +48,7 @@ const COPY: Record<
   TierFormat,
   {
     eyebrow: string;
-    icon: typeof Medal;
+    icon: (props: { className?: string }) => React.ReactNode;
     heading: string;
     /** Names the battles counted, mid-sentence. */
     battles: string;
@@ -60,7 +61,7 @@ const COPY: Record<
 > = {
   ranked: {
     eyebrow: 'Competitive only',
-    icon: Medal,
+    icon: RankedIcon,
     heading: 'Ranked tier list',
     battles: 'Ranked battles',
     intro:
@@ -73,7 +74,7 @@ const COPY: Record<
   },
   trophy: {
     eyebrow: 'Trophy ladder',
-    icon: Trophy,
+    icon: TrophyIcon,
     heading: 'Trophy tier list',
     battles: 'trophy-ladder battles',
     intro:
