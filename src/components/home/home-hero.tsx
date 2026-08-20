@@ -8,143 +8,185 @@ import { brawlerModelUrl } from '@/lib/brawlapi';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 
 /**
- * Landing hero.
+ * Landing hero, built as a full-bleed stage.
  *
- * Deliberately asymmetric: copy and search on the left, character art on the
- * right. A centred headline over a centred search box is the default shape of
- * every SaaS template, and it is what made this read as generic.
+ * The version this replaced was boxed inside the site's 72rem content column,
+ * which is why no amount of tuning made it feel like anything: on a wide
+ * screen it was a small rectangle of content floating in the middle of an
+ * empty page, and every light, every character and every panel was confined to
+ * it. Content that stops short of the edges reads as a document. Content that
+ * runs to them reads as a product.
  *
- * The art uses the full-body character renders rather than the square portrait
- * tiles. The tiles carry their own rarity-coloured background, so overlapping
- * them just produced a pile of rotated rectangles; the renders are cut out and
- * can stand on the page as a group.
+ * So the section escapes the column and the copy does not. The background,
+ * the stage lighting and the cast run edge to edge; the headline, the search
+ * and the proof band stay on the same alignment line as every other section on
+ * the page, because breaking that would be chaos rather than drama.
+ *
+ * The cast uses full-body renders rather than the square portrait tiles. The
+ * tiles carry their own rarity-coloured background, so overlapping them just
+ * produced a pile of rotated rectangles; the renders are cut out and can stand
+ * on a stage as a group.
  */
 
-/** A line-up standing on the hero's baseline, drawn back to front. */
+/**
+ * The line-up, drawn back to front.
+ *
+ * Positioned as percentages of the art stage rather than of the page, so the
+ * group holds its composition from a 20rem column up to a 46rem one instead of
+ * drifting apart on wide screens.
+ */
 const CAST = [
   {
     id: 16000024,
     name: 'Crow',
     glow: '#8b6bff',
-    className: 'left-0 bottom-0 w-[38%] opacity-80 z-10',
+    className: 'left-[2%] bottom-0 w-[34%] opacity-85 z-10',
   },
   {
     id: 16000019,
     name: 'Spike',
     glow: '#35d07f',
-    className: 'right-0 bottom-[3%] w-[40%] opacity-90 z-20',
+    className: 'right-[1%] bottom-[2%] w-[36%] opacity-90 z-20',
   },
   {
     id: 16000000,
     name: 'Shelly',
     glow: '#ffc53d',
-    className: 'left-[24%] bottom-0 w-[50%] z-30',
+    className: 'left-[22%] bottom-0 w-[48%] z-30',
   },
 ];
 
 export function HomeHero({ stats }: { stats?: ReactNode }) {
   return (
-    <section className="relative -mt-2 sm:mt-0">
-      {/* Full-bleed wash, escaping the page container and fading into the page. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[34rem] w-screen -translate-x-1/2 -translate-y-28 overflow-hidden sm:h-[46rem] sm:-translate-y-32"
-      >
+    /*
+      `w-screen` centred on the page is the escape hatch out of `main`'s
+      column. Safe because the body clips horizontal overflow — see
+      `globals.css` — which is the one thing that makes this pattern viable
+      without a scrollbar appearing on desktop.
+    */
+    <section className="relative left-1/2 -mt-8 w-screen -translate-x-1/2 overflow-hidden">
+      {/* ---------------------------- the stage ---------------------------- */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div
           className="absolute inset-0"
           style={{
             background:
               /*
-               * Three lights rather than two: a purple key behind the copy, a
-               * warm rim just under the headline so the gold has something to
-               * sit on, and a cool spotlight over the cast. The linear stop at
-               * the end is what stops the wash becoming a visible band where
-               * it meets the page.
+               * Four lights. A purple key over the copy, a warm rim under the
+               * headline so the gold has something to sit on, a cool spot over
+               * the cast, and a linear fade into the page so the stage ends
+               * without a seam.
                */
-              'radial-gradient(46rem 22rem at 26% 26%, color-mix(in srgb, #8b6bff 34%, transparent), transparent 64%),' +
-              'radial-gradient(26rem 12rem at 22% 46%, color-mix(in srgb, #ffc53d 14%, transparent), transparent 70%),' +
-              'radial-gradient(30rem 26rem at 76% 30%, color-mix(in srgb, #35d0ff 12%, transparent), transparent 66%),' +
-              'linear-gradient(180deg, transparent 52%, var(--background) 94%)',
+              'radial-gradient(52rem 26rem at 22% 22%, color-mix(in srgb, #8b6bff 36%, transparent), transparent 66%),' +
+              'radial-gradient(30rem 14rem at 18% 44%, color-mix(in srgb, #ffc53d 15%, transparent), transparent 70%),' +
+              'radial-gradient(38rem 30rem at 78% 26%, color-mix(in srgb, #35d0ff 13%, transparent), transparent 68%),' +
+              'linear-gradient(180deg, transparent 55%, var(--background) 96%)',
           }}
         />
+
         {/*
-          A faint square grid, faded out towards the edges. It gives the glow
-          something to sit on so the top of the page does not read as an empty
-          gradient, and it costs nothing: two repeating gradients, no image.
+          A faint square grid, masked to the middle. It gives the light
+          something to fall on so the top of the page is not an empty
+          gradient, and it costs two repeating gradients rather than an image.
+          Dropped on phones, where it is invisible and only costs paint.
         */}
         <div
-          className="absolute inset-0 hidden opacity-[0.28] sm:block"
+          className="absolute inset-0 hidden opacity-[0.25] sm:block"
           style={{
             backgroundImage:
               'linear-gradient(to right, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
+            backgroundSize: '72px 72px',
             maskImage:
-              'radial-gradient(38rem 22rem at 50% 34%, #000 20%, transparent 78%)',
+              'radial-gradient(46rem 26rem at 45% 30%, #000 15%, transparent 75%)',
             WebkitMaskImage:
-              'radial-gradient(38rem 22rem at 50% 34%, #000 20%, transparent 78%)',
+              'radial-gradient(46rem 26rem at 45% 30%, #000 15%, transparent 75%)',
           }}
         />
       </div>
 
+      {/* ------------------------------ the cast ---------------------------- */}
       {/*
-        The art column comes in at `md`. Held back to `lg` it left tablets
-        staring at half an empty hero, which is the widest gap on the page.
+        Anchored to the section rather than to a grid column, which is the
+        whole point of going full bleed: on a wide screen the group stands
+        outside the content column instead of being squeezed beside it, and it
+        is bottom-aligned to the search panel so the two read as one scene.
       */}
-      <div className="relative grid items-end gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)] md:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,23rem)]">
-        {/* Copy + search */}
-        <div className="reveal-now">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border-strong/70 bg-surface/80 px-3.5 py-1.5 backdrop-blur">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-0 hidden h-[26rem] w-[46%] max-w-[44rem] md:block lg:h-[31rem]"
+      >
+        {/* Ground light, so the group is standing rather than floating. */}
+        <span
+          className="absolute inset-x-[12%] bottom-6 h-20 rounded-[50%] opacity-55 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(closest-side, #8b6bff, color-mix(in srgb, #8b6bff 25%, transparent), transparent)',
+          }}
+        />
+
+        {CAST.map((brawler) => (
+          <div key={brawler.id} className={`absolute ${brawler.className}`}>
+            <span
+              className="absolute inset-x-[10%] bottom-[8%] top-[16%] rounded-full opacity-30 blur-3xl"
+              style={{ background: brawler.glow }}
+            />
+            <Image
+              src={brawlerModelUrl(brawler.id)}
+              alt=""
+              width={520}
+              height={760}
+              className="relative h-auto w-full select-none object-contain drop-shadow-[0_22px_36px_rgba(0,0,0,0.7)]"
+              /*
+               * Decorative and desktop-only. Left lazy on purpose: a phone
+               * never paints this column, so it should never pay for it.
+               */
+              loading="lazy"
+              fetchPriority="low"
+              unoptimized
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ----------------------------- the copy ----------------------------- */}
+      <div className="mx-auto w-full max-w-6xl px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8">
+        <div className="reveal-now max-w-xl md:max-w-lg lg:max-w-xl">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border-strong/70 bg-surface/70 px-3.5 py-1.5 backdrop-blur">
             <span className="live-dot" />
             <span className="eyebrow text-brand">Live Brawl Stars data</span>
           </span>
 
           {/*
-            Two lines, not four.
-            
-            At 60px in a half-width column this ran to four lines and became
-            the whole hero, pushing the search card and the proof strip off a
-            laptop screen. The break is forced so the gold half is always its
-            own line rather than wherever the wrap happens to fall.
+            Both lines take the game's own chunky lettering. The gold half used
+            to be a clipped gradient, which needs `text-transparent` — so
+            `display-hero`'s black drop shadow was painted straight through the
+            glyphs and the line rendered brown. Solid colour, same shadow.
           */}
-          <h1 className="display-hero mt-4 text-[2.25rem] uppercase leading-[0.95] sm:text-[2.5rem] md:text-[2rem] lg:text-[2.875rem]">
+          <h1 className="display-hero mt-5 text-[2.25rem] uppercase leading-[0.95] sm:text-[2.5rem] md:text-[2rem] lg:text-[2.875rem]">
             Brawl Stars stats that
             <br />
-            {/*
-              Solid gold, not a clipped gradient.
-              
-              `display-hero` carries the game's own drop shadow, and a gradient
-              needs `text-transparent` to show through — which means that black
-              shadow was being painted *through* the glyphs. The white line
-              rendered crisp and the gold line rendered brown, and no amount of
-              tuning the gradient stops could fix it because the gradient was
-              never the problem.
-              
-              Both lines now take the same chunky in-game lettering.
-            */}
             <span className="text-brand">show where you stand</span>
           </h1>
 
-          <p className="mt-3 max-w-lg leading-relaxed text-muted">
+          <p className="mt-3.5 max-w-lg leading-relaxed text-muted">
             One tag gives you a skill score out of 10, your roster read against the
             live meta, and your progression tracked over time.
           </p>
 
           {/*
-            The one thing on the page you are meant to touch, lit like it.
-            
-            A gold hairline along the top edge and a warm bloom behind the
-            panel: the game's own panels are lit from above, and without it
-            this was a grey rectangle sitting on a dark page. The glow is a
-            sibling rather than a box-shadow so it can spill past the card's
-            rounded corners without being clipped by them.
+            The one thing on the page you are meant to touch, lit like it: a
+            gold hairline along the top edge and a warm bloom behind the panel,
+            the way the game lights its own panels. The bloom is a sibling
+            rather than a box-shadow so it can spill past the rounded corners
+            instead of being clipped by them.
           */}
-          <div className="relative mt-5">
+          <div className="relative mt-6">
             <span
               aria-hidden
-              className="pointer-events-none absolute -inset-x-6 -bottom-6 -top-4 -z-10 rounded-[2rem] opacity-70 blur-2xl"
+              className="pointer-events-none absolute -inset-x-8 -bottom-8 -top-5 -z-10 rounded-[2.5rem] opacity-70 blur-3xl"
               style={{
                 background:
-                  'radial-gradient(60% 60% at 30% 0%, color-mix(in srgb, #ffc53d 22%, transparent), transparent 70%)',
+                  'radial-gradient(58% 58% at 28% 0%, color-mix(in srgb, #ffc53d 26%, transparent), transparent 72%)',
               }}
             />
             <div className="card card-glow overflow-hidden border-border-strong/60 p-4 sm:p-5">
@@ -153,76 +195,49 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
                 className="pointer-events-none absolute inset-x-0 top-0 h-px"
                 style={{
                   background:
-                    'linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 70%, transparent) 30%, color-mix(in srgb, var(--brand) 45%, transparent) 70%, transparent)',
+                    'linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 75%, transparent) 28%, color-mix(in srgb, var(--brand) 45%, transparent) 72%, transparent)',
                 }}
               />
-            <SearchBar
-              autoFocus
-              showRecent
-              size="hero"
-              footer={
-                /*
-                  Secondary to the search and to the recent row below it, so it
-                  is a line of text rather than a button — but it opens a real
-                  profile rather than a mock-up, which is the only way to show
-                  what a lookup returns without inventing numbers for it.
-                */
-                <p className="mt-2.5 text-sm text-muted">
-                  No tag handy?{' '}
-                  <Link
-                    href={`/player/${SAMPLE_PLAYER_TAG}`}
-                    className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
-                  >
-                    Try a sample profile
-                    <ArrowUpRight className="size-3.5" />
-                  </Link>
-                </p>
-              }
+              <SearchBar
+                autoFocus
+                showRecent
+                size="hero"
+                footer={
+                  /*
+                    Secondary to the search and to the recent row below it, so
+                    it is a line of text rather than a button — but it opens a
+                    real profile rather than a mock-up, which is the only way
+                    to show what a lookup returns without inventing numbers.
+                  */
+                  <p className="mt-2.5 text-sm text-muted">
+                    No tag handy?{' '}
+                    <Link
+                      href={`/player/${SAMPLE_PLAYER_TAG}`}
+                      className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
+                    >
+                      Try a sample profile
+                      <ArrowUpRight className="size-3.5" />
+                    </Link>
+                  </p>
+                }
               />
             </div>
           </div>
         </div>
-
-        {/* Character art */}
-        <div
-          aria-hidden
-          className="relative mx-auto hidden h-[20rem] w-full max-w-md md:block lg:h-[25rem] xl:h-[28rem]"
-        >
-          {/* Ground glow, so the group reads as standing rather than floating. */}
-          <span
-            className="absolute inset-x-4 bottom-2 h-16 rounded-[50%] opacity-50 blur-2xl"
-            style={{
-              background:
-                'radial-gradient(closest-side, #8b6bff, color-mix(in srgb, #8b6bff 20%, transparent), transparent)',
-            }}
-          />
-
-          {CAST.map((brawler) => (
-            <div key={brawler.id} className={`absolute ${brawler.className}`}>
-              <span
-                className="absolute inset-x-[10%] bottom-[8%] top-[18%] rounded-full opacity-30 blur-3xl"
-                style={{ background: brawler.glow }}
-              />
-              <Image
-                src={brawlerModelUrl(brawler.id)}
-                alt=""
-                width={420}
-                height={620}
-                className="relative h-auto w-full select-none object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.65)]"
-                /*
-                 * Decorative and desktop-only. Left lazy on purpose: a phone
-                 * never paints this column, so it should never pay for it.
-                 */
-                loading="lazy"
-                fetchPriority="low"
-                unoptimized
-              />
-            </div>
-          ))}
-        </div>
       </div>
 
-      {stats ? <div className="mt-6 sm:mt-7">{stats}</div> : null}
+      {/* ---------------------------- the proof ----------------------------- */}
+      {/*
+        A band that runs the full width under the stage, the way a scoreboard
+        does. Its numbers stay on the content column so they line up with
+        everything below, but the rule and ground behind them do not — which is
+        what makes the hero end on a line rather than on a floating box.
+      */}
+      {stats ? (
+        <div className="relative mt-10 border-t border-border/70 bg-background/40 backdrop-blur-sm sm:mt-14">
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{stats}</div>
+        </div>
+      ) : null}
     </section>
   );
 }
