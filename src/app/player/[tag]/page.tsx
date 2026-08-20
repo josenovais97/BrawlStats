@@ -12,7 +12,6 @@ import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
 import { PlayerSkillScore } from '@/components/player/player-skill-score';
-import { PlayerTrophyHistory } from '@/components/player/player-trophy-history';
 import { PlayerUpgradeGap } from '@/components/player/player-upgrade-gap';
 import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
@@ -194,7 +193,6 @@ export default async function PlayerPage({ params }: PageProps) {
       </div>
       <div id="progress" className="scroll-anchor space-y-8">
         <PlayerProgress points={trophyHistory} playerName={player.name} />
-        <PlayerTrophyHistory points={trophyHistory} />
         <PlayerProgression progression={progression} playtime={playtime} />
 
         {/* Immediately after Progression, because it is the same subject read
