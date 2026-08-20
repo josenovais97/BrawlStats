@@ -74,8 +74,6 @@ export default async function RankedPage() {
   const totalSamples = maps.reduce((sum, m) => sum + m.sampleSize, 0);
   const baseline = maps[0]?.baselineWinRate ?? 0;
   const rated = maps.filter((m) => m.picks.length > 0).length;
-  const seasonNumber = (season.current ?? season.next ?? season.latest)?.number ?? null;
-
   // In-page navigation, so a visitor after one mode does not scroll past five.
   const modeNav = [...byMode].map(([mode, list]) => {
     const meta = modeMeta.get(mode.toLowerCase());
@@ -115,7 +113,6 @@ export default async function RankedPage() {
         <ul className="mt-4 flex flex-wrap items-center gap-1.5">
           <Fact tone="brand">{formatNumber(totalSamples)} Ranked battles</Fact>
           {lastRun ? <Fact>Updated {relativeTime(lastRun.startedAt)}</Fact> : null}
-          {seasonNumber !== null ? <Fact>Season {seasonNumber}</Fact> : null}
           {maps.length > 0 ? (
             <Fact>
               {rated} of {maps.length} maps well enough sampled to name a pick
@@ -123,6 +120,26 @@ export default async function RankedPage() {
           ) : null}
         </ul>
       </header>
+
+      {/* Which season it is decides which maps are in the pool at all, so it
+          leads. Compressed to a summary row with the detail folded, which is
+          what lets it sit here without costing a screen: the old full-height
+          panel in this position pushed the first recommendation below the fold
+          on a phone. */}
+      <SeasonPanel
+        state={season}
+        mapHref={(mode, map) => {
+          // Wiki names are the game's display names, which slug to the same
+          // segments our own map routes use — but only link the ones we can
+          // actually resolve, so a renamed or retired map is plain text rather
+          // than a 404.
+          const match = activeMaps.find(
+            (entry) =>
+              entry.mapSlug === slugify(map) && entry.modeSlug === slugify(mode),
+          );
+          return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
+        }}
+      />
 
       {modeNav.length > 1 ? (
         <nav aria-label="Jump to a mode" className="-mx-4 px-4 sm:mx-0 sm:px-0">
@@ -211,24 +228,6 @@ export default async function RankedPage() {
           );
         })
       )}
-
-      {/* Context, after the answer rather than in front of it. Which season it
-          is decides which maps are in the pool at all, so it stays on the page
-          — it just no longer costs a screen to get past. */}
-      <SeasonPanel
-        state={season}
-        mapHref={(mode, map) => {
-          // Wiki names are the game's display names, which slug to the same
-          // segments our own map routes use — but only link the ones we can
-          // actually resolve, so a renamed or retired map is plain text rather
-          // than a 404.
-          const match = activeMaps.find(
-            (entry) =>
-              entry.mapSlug === slugify(map) && entry.modeSlug === slugify(mode),
-          );
-          return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
-        }}
-      />
 
       <Disclosure summary="How these picks are chosen">
         <p>

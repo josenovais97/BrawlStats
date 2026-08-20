@@ -2,7 +2,6 @@ import { CalendarClock, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Power11Icon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
 import { TRIAL_BRAWLER_RULES, type SeasonState } from '@/lib/ranked-seasons';
 
@@ -109,7 +108,11 @@ export function SeasonPanel({
 
       {season.brawlers.length > 0 && !awaiting ? (
         <div className="border-t border-border px-4 sm:px-5">
+          {/* Open by default: who you can field this month is the part of the
+              panel people come back for, and three portraits plus three lines
+              is small enough to leave standing. Still foldable. */}
           <Disclosure
+            defaultOpen
             tone="bare"
             summary={`Trial brawlers: ${season.brawlers
               .map((b) => titleCase(b.name))
@@ -149,7 +152,10 @@ export function SeasonPanel({
             <ul className="mt-4 space-y-1.5">
               {TRIAL_BRAWLER_RULES.map((rule) => (
                 <li key={rule} className="flex gap-2">
-                  <Power11Icon aria-hidden className="mt-0.5 size-3.5 shrink-0" />
+                  <span
+                    aria-hidden
+                    className="mt-2 size-1 shrink-0 rounded-full bg-brand"
+                  />
                   {rule}
                 </li>
               ))}

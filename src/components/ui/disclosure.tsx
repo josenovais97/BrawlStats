@@ -19,15 +19,23 @@ export function Disclosure({
   children,
   className = '',
   tone = 'card',
+  defaultOpen = false,
 }: {
   summary: ReactNode;
   children: ReactNode;
   className?: string;
   /** `card` sits on a surface of its own; `bare` inherits the parent's. */
   tone?: 'card' | 'bare';
+  /**
+   * Starts open, for content that is worth showing but still worth being able
+   * to fold away. Uncontrolled after the first render — the browser owns the
+   * state from then on, exactly as with a plain `<details open>`.
+   */
+  defaultOpen?: boolean;
 }) {
   return (
     <details
+      open={defaultOpen}
       className={`group ${tone === 'card' ? 'card overflow-hidden' : ''} ${className}`}
     >
       <summary
