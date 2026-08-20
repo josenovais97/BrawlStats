@@ -1,11 +1,15 @@
 import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 
 import { SearchBar } from '@/components/search-bar';
 import { brawlerModelUrl } from '@/lib/brawlapi';
+import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
+import { brawlerPath } from '@/lib/slugs';
+import { TIER_COLOR } from '@/lib/tiers';
 
 /**
  * The hero, as a command centre.
@@ -27,32 +31,19 @@ import { SAMPLE_PLAYER_TAG } from '@/lib/site';
  */
 
 /**
- * The line-up, drawn back to front and sized as a share of the stage.
+ * The stand-in cast, used only when the meta is unreadable.
  *
- * Widths are deliberately modest: the tallest render is 22rem inside a 28rem
- * stage, leaving headroom above the group. A cast cropped by the header looks
- * like a mistake, and one filling every pixel looks like a banner.
+ * Three brawlers with strong silhouettes, and no ranks or tiers attached —
+ * without data there is nothing to rank, and a podium with invented numbers on
+ * it would be worse than a podium with none.
+ *
+ * The ids the hardcoded version used were mislabelled: the array said Crow and
+ * Spike while pointing at 16000024 and 16000019, which are neither.
  */
-const CAST = [
-  {
-    id: 16000024,
-    name: 'Crow',
-    glow: '#8b6bff',
-    // Feet land 5px inside the wing plinth's top face, so nobody floats.
-    className: 'left-0 bottom-[16%] w-[34%] opacity-80 z-20',
-  },
-  {
-    id: 16000019,
-    name: 'Spike',
-    glow: '#35d0ff',
-    className: 'right-0 bottom-[16%] w-[34%] opacity-85 z-20',
-  },
-  {
-    id: 16000000,
-    name: 'Shelly',
-    glow: '#ffc53d',
-    className: 'left-[24%] bottom-[21%] w-[52%] z-30',
-  },
+const FALLBACK_CAST = [
+  { id: 16000011, name: 'Mortis' },
+  { id: 16000023, name: 'Leon' },
+  { id: 16000043, name: 'Edgar' },
 ];
 
 export function HomeHero({ stats }: { stats?: ReactNode }) {
@@ -102,9 +93,15 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             </div>
 
             {/* The stage. Hidden below `lg`, where a three-figure group in a
-                narrow column becomes three slivers. */}
+                narrow column becomes three slivers.
+                
+                Streamed: it reads the meta to decide who is standing on it, and
+                the search must never wait on a database. The column keeps its
+                height either way, so nothing shifts when the cast arrives. */}
             <div className="relative hidden h-[27rem] lg:block">
-              <Stage />
+              <Suspense fallback={null}>
+                <Stage />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -207,20 +204,50 @@ function Console() {
 }
 
 /**
- * The character stage: an arena floor, a spotlight, and the cast standing on
+ * The character stage: the current top three in Ranked, standing on a podium.
+ *
+ * This is the idea the hero is built on. Every other Brawl Stars site puts
+ * whichever brawlers the designer liked into its header and leaves them there
+ * for a year. These three are the actual top of our Ranked list, read from the
+ * same cached ranking the tools preview, the meta snapshot and the split
+ * section all use — so the artwork changes when the meta changes, and the
+ * headline's promise is demonstrated by the picture rather than described by
  * it.
  *
- * Deliberately nothing else. A readout floated here for a while — the current
- * number-one Ranked brawler — and it was real data, but it hung in the middle
- * of the scene attached to nothing, competing with the console for the one
- * focal point the hero is allowed. The same figure is on the page twice
- * already, in the tools preview and the meta snapshot, where it has a heading
- * to belong to.
+ * The podium arrangement is the real one: second on the left, first on the
+ * raised centre, third on the right. Each step's lip and each figure's rim
+ * light take that brawler's live tier colour, so the lighting is data too.
+ *
+ * Zero upstream cost: the query is already made three times further down the
+ * page and `cache` collapses them into one.
  */
-function Stage() {
+async function Stage() {
+  const top = await getTopMetaBrawlers(3).catch(() => []);
+  const ranked = top.length === 3;
+
+  /*
+   * Podium order, not list order: 2 — 1 — 3. Without live data the same three
+   * slots carry the stand-in cast, with no numerals and no caption, because
+   * there is no ranking to claim.
+   */
+  const slots = ranked
+    ? [
+        { ...top[1], rank: 2 },
+        { ...top[0], rank: 1 },
+        { ...top[2], rank: 3 },
+      ]
+    : FALLBACK_CAST.map((b) => ({
+        brawlerId: b.id,
+        name: b.name,
+        tier: null,
+        rank: null,
+      }));
+
+  const [left, centre, right] = slots;
+
   return (
     <>
-      {/* Spotlight from above, narrowing toward the floor. */}
+      {/* Spotlight from above, narrowing toward the podium. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-[8%] -top-6 bottom-[16%] opacity-70"
@@ -230,18 +257,7 @@ function Stage() {
         }}
       />
 
-      {/*
-        The podium.
-        
-        A tiered stand rather than a flat floor, because the headline is "where
-        you stand" and the product is a ranking — the scene may as well mean
-        something. The centre plinth is 1.5rem taller than the wings, which is
-        what puts Shelly above the other two without resizing anybody.
-        
-        Each plinth is three pieces: a body, an elliptical top face, and a lit
-        lip where the two meet. The ellipse is what sells the perspective; a
-        plain rectangle reads as a box.
-      */}
+      {/* Floor bloom under the whole stand. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-[6%] bottom-[3%] h-16 rounded-[50%] opacity-60 blur-2xl"
@@ -251,64 +267,129 @@ function Stage() {
         }}
       />
 
-      <Plinth className="bottom-[6%] left-0 h-12 w-[34%]" />
-      <Plinth className="bottom-[6%] right-0 h-12 w-[34%]" />
-      <Plinth className="bottom-[6%] left-[28%] h-[4.5rem] w-[44%]" centre />
+      <Plinth className="bottom-[6%] left-0 h-14 w-[34%]" rank={left.rank} tier={left.tier} />
+      <Plinth
+        className="bottom-[6%] left-[28%] h-20 w-[44%]"
+        rank={centre.rank}
+        tier={centre.tier}
+        centre
+      />
+      <Plinth className="bottom-[6%] right-0 h-14 w-[34%]" rank={right.rank} tier={right.tier} />
 
-      {/* Contact shadows, one per plinth top, so each figure is planted on the
+      {/* Contact shadows, one per step, so each figure is planted on the
           surface it is standing on rather than on the stage floor. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[16%] left-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
+        className="pointer-events-none absolute bottom-[18%] left-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[16%] right-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
+        className="pointer-events-none absolute bottom-[18%] right-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[21%] left-[33%] z-10 h-3.5 w-[34%] rounded-[50%] bg-black/60 blur-[6px]"
+        className="pointer-events-none absolute bottom-[23%] left-[33%] z-10 h-3.5 w-[34%] rounded-[50%] bg-black/60 blur-[6px]"
       />
 
-      {CAST.map((brawler) => (
-        <div key={brawler.id} className={`absolute ${brawler.className}`}>
-          <span
-            aria-hidden
-            className="absolute inset-x-[12%] bottom-[10%] top-[18%] rounded-full opacity-30 blur-3xl"
-            style={{ background: brawler.glow }}
-          />
-          <Image
-            src={brawlerModelUrl(brawler.id)}
-            alt=""
-            width={460}
-            height={670}
-            /*
-             * Decorative and desktop-only. Left lazy on purpose: a phone never
-             * paints this column, so it should never pay for it.
-             */
-            loading="lazy"
-            fetchPriority="low"
-            unoptimized
-            className="relative h-auto w-full select-none object-contain drop-shadow-[0_22px_34px_rgba(0,0,0,0.7)]"
-          />
-        </div>
-      ))}
+      <Figure slot={left} className="bottom-[18%] left-0 h-52 w-[34%] z-20" />
+      <Figure slot={right} className="bottom-[18%] right-0 h-52 w-[34%] z-20" />
+      <Figure slot={centre} className="bottom-[23%] left-[24%] h-76 w-[52%] z-30" />
+
+      {/* The six words that explain the whole conceit. Anchored under the
+          podium rather than floated beside it. */}
+      {ranked ? (
+        <p className="absolute inset-x-0 bottom-0 text-center text-xs font-semibold uppercase tracking-[0.16em] text-muted/80">
+          Top 3 in Ranked right now
+        </p>
+      ) : null}
     </>
+  );
+}
+
+/** Types the two shapes a podium slot can take: ranked, or a stand-in. */
+interface Slot {
+  brawlerId: number;
+  name: string;
+  tier: keyof typeof TIER_COLOR | null;
+  rank: number | null;
+}
+
+/**
+ * One figure on the podium.
+ *
+ * A fixed box with `object-contain object-bottom` rather than a width and an
+ * automatic height: the renders are not a consistent aspect — some brawlers
+ * are wide, some are tall — and anchoring the bottom edge is what keeps every
+ * one of them standing on the step no matter which three the meta sends.
+ */
+function Figure({ slot, className }: { slot: Slot; className: string }) {
+  const rim = slot.tier ? TIER_COLOR[slot.tier] : '#8b6bff';
+
+  const art = (
+    <>
+      <span
+        aria-hidden
+        className="absolute inset-x-[12%] bottom-[10%] top-[18%] rounded-full opacity-30 blur-3xl"
+        style={{ background: rim }}
+      />
+      <Image
+        src={brawlerModelUrl(slot.brawlerId)}
+        alt=""
+        width={460}
+        height={670}
+        /*
+         * Decorative and desktop-only. Left lazy on purpose: a phone never
+         * paints this column, so it should never pay for it.
+         */
+        loading="lazy"
+        fetchPriority="low"
+        unoptimized
+        className="relative h-full w-full select-none object-contain object-bottom drop-shadow-[0_22px_34px_rgba(0,0,0,0.7)]"
+      />
+    </>
+  );
+
+  // Ranked figures are real rows and link like it; stand-ins are decoration.
+  return slot.rank ? (
+    <Link
+      href={brawlerPath(slot.brawlerId, slot.name)}
+      title={`${slot.name}: number ${slot.rank} in Ranked`}
+      className={`absolute block ${className}`}
+    >
+      {art}
+    </Link>
+  ) : (
+    <span aria-hidden className={`absolute block ${className}`}>
+      {art}
+    </span>
   );
 }
 
 /**
  * One step of the podium.
  *
- * Body, top face, lit lip. The top face is an ellipse overlapping the body's
- * top edge, which is the cheapest convincing way to imply a viewing angle
- * without a 3D transform — and unlike `rotateX`, it costs no compositing layer
- * and cannot blur the artwork standing on it.
+ * Body, top face, lit lip, and the rank carved into the face. The top face is
+ * an ellipse overlapping the body's top edge, which is the cheapest convincing
+ * way to imply a viewing angle without a 3D transform — and unlike `rotateX`,
+ * it costs no compositing layer and cannot blur the artwork standing on it.
  *
- * The centre step gets a gold lip and the wings a neutral one, so first place
- * reads as first place at a glance.
+ * The lip takes the brawler's live tier colour, so an S-tier first place is lit
+ * differently from a B-tier one. Without a tier it falls back to the brand
+ * accent, and without a rank the step carries no numeral at all.
  */
-function Plinth({ className, centre = false }: { className: string; centre?: boolean }) {
+function Plinth({
+  className,
+  centre = false,
+  rank,
+  tier,
+}: {
+  className: string;
+  centre?: boolean;
+  rank: number | null;
+  tier: keyof typeof TIER_COLOR | null;
+}) {
+  const accent = tier ? TIER_COLOR[tier] : centre ? 'var(--brand)' : 'var(--accent)';
+
   return (
     <span aria-hidden className={`pointer-events-none absolute ${className}`}>
       {/* Body, darkening toward the floor. */}
@@ -320,11 +401,10 @@ function Plinth({ className, centre = false }: { className: string; centre?: boo
 
       {/* The lit lip where the top face meets the body. */}
       <span
-        className={`absolute inset-x-0 top-2 h-px ${
-          centre
-            ? 'bg-gradient-to-r from-transparent via-brand/60 to-transparent'
-            : 'bg-gradient-to-r from-transparent via-accent/35 to-transparent'
-        }`}
+        className="absolute inset-x-0 top-2 h-px"
+        style={{
+          background: `linear-gradient(90deg, transparent, color-mix(in srgb, ${accent} 65%, transparent), transparent)`,
+        }}
       />
 
       {/* Top face. */}
@@ -332,11 +412,21 @@ function Plinth({ className, centre = false }: { className: string; centre?: boo
       <span
         className="absolute inset-x-[12%] top-[0.35rem] h-2 rounded-[50%] opacity-70 blur-[3px]"
         style={{
-          background: centre
-            ? 'radial-gradient(closest-side, color-mix(in srgb, var(--brand) 30%, transparent), transparent)'
-            : 'radial-gradient(closest-side, color-mix(in srgb, var(--accent) 28%, transparent), transparent)',
+          background: `radial-gradient(closest-side, color-mix(in srgb, ${accent} 30%, transparent), transparent)`,
         }}
       />
+
+      {/* The rank, on the face of the step. */}
+      {rank ? (
+        <span
+          className={`display absolute inset-x-0 bottom-0 top-4 grid place-items-center leading-none ${
+            centre ? 'text-3xl' : 'text-xl'
+          }`}
+          style={{ color: `color-mix(in srgb, ${accent} 70%, var(--muted))` }}
+        >
+          {rank}
+        </span>
+      ) : null}
     </span>
   );
 }
