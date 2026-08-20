@@ -38,19 +38,20 @@ const CAST = [
     id: 16000024,
     name: 'Crow',
     glow: '#8b6bff',
-    className: 'left-0 bottom-[6%] w-[40%] opacity-80 z-10',
+    // Feet land 5px inside the wing plinth's top face, so nobody floats.
+    className: 'left-0 bottom-[16%] w-[34%] opacity-80 z-20',
   },
   {
     id: 16000019,
     name: 'Spike',
     glow: '#35d0ff',
-    className: 'right-[1%] bottom-[7%] w-[42%] opacity-85 z-20',
+    className: 'right-0 bottom-[16%] w-[34%] opacity-85 z-20',
   },
   {
     id: 16000000,
     name: 'Shelly',
     glow: '#ffc53d',
-    className: 'left-[20%] bottom-[3%] w-[56%] z-30',
+    className: 'left-[24%] bottom-[21%] w-[52%] z-30',
   },
 ];
 
@@ -229,27 +230,44 @@ function Stage() {
         }}
       />
 
-      {/* Arena floor: concentric ellipses, brightest at the group's feet. */}
+      {/*
+        The podium.
+        
+        A tiered stand rather than a flat floor, because the headline is "where
+        you stand" and the product is a ranking — the scene may as well mean
+        something. The centre plinth is 1.5rem taller than the wings, which is
+        what puts Shelly above the other two without resizing anybody.
+        
+        Each plinth is three pieces: a body, an elliptical top face, and a lit
+        lip where the two meet. The ellipse is what sells the perspective; a
+        plain rectangle reads as a box.
+      */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-[4%] bottom-[8%] h-24 rounded-[50%] border border-accent/25"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-[16%] bottom-[11%] h-16 rounded-[50%] border border-accent/20"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-[10%] bottom-[9%] h-20 rounded-[50%] opacity-70 blur-2xl"
+        className="pointer-events-none absolute inset-x-[6%] bottom-[3%] h-16 rounded-[50%] opacity-60 blur-2xl"
         style={{
           background:
-            'radial-gradient(closest-side, color-mix(in srgb, #8b6bff 75%, transparent), transparent)',
+            'radial-gradient(closest-side, color-mix(in srgb, #8b6bff 80%, transparent), transparent)',
         }}
       />
-      {/* Contact shadow, tight and dark, so the group is planted. */}
+
+      <Plinth className="bottom-[6%] left-0 h-12 w-[34%]" />
+      <Plinth className="bottom-[6%] right-0 h-12 w-[34%]" />
+      <Plinth className="bottom-[6%] left-[28%] h-[4.5rem] w-[44%]" centre />
+
+      {/* Contact shadows, one per plinth top, so each figure is planted on the
+          surface it is standing on rather than on the stage floor. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-[22%] bottom-[9%] h-6 rounded-[50%] bg-black/60 blur-md"
+        className="pointer-events-none absolute bottom-[16%] left-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute bottom-[16%] right-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute bottom-[21%] left-[33%] z-10 h-3.5 w-[34%] rounded-[50%] bg-black/60 blur-[6px]"
       />
 
       {CAST.map((brawler) => (
@@ -276,6 +294,50 @@ function Stage() {
         </div>
       ))}
     </>
+  );
+}
+
+/**
+ * One step of the podium.
+ *
+ * Body, top face, lit lip. The top face is an ellipse overlapping the body's
+ * top edge, which is the cheapest convincing way to imply a viewing angle
+ * without a 3D transform — and unlike `rotateX`, it costs no compositing layer
+ * and cannot blur the artwork standing on it.
+ *
+ * The centre step gets a gold lip and the wings a neutral one, so first place
+ * reads as first place at a glance.
+ */
+function Plinth({ className, centre = false }: { className: string; centre?: boolean }) {
+  return (
+    <span aria-hidden className={`pointer-events-none absolute ${className}`}>
+      {/* Body, darkening toward the floor. */}
+      <span className="absolute inset-x-0 bottom-0 top-2 rounded-b-xl bg-gradient-to-b from-surface-3 via-surface-2 to-[#0a0d18] shadow-[0_18px_30px_-16px_rgb(0_0_0/0.9)]" />
+
+      {/* Side walls, so the step has thickness rather than being a silhouette. */}
+      <span className="absolute inset-y-2 left-0 w-px bg-white/[0.06]" />
+      <span className="absolute inset-y-2 right-0 w-px bg-white/[0.06]" />
+
+      {/* The lit lip where the top face meets the body. */}
+      <span
+        className={`absolute inset-x-0 top-2 h-px ${
+          centre
+            ? 'bg-gradient-to-r from-transparent via-brand/60 to-transparent'
+            : 'bg-gradient-to-r from-transparent via-accent/35 to-transparent'
+        }`}
+      />
+
+      {/* Top face. */}
+      <span className="absolute inset-x-0 top-0 h-4 rounded-[50%] bg-surface-3 shadow-[inset_0_1px_0_0_rgb(255_255_255/0.09)]" />
+      <span
+        className="absolute inset-x-[12%] top-[0.35rem] h-2 rounded-[50%] opacity-70 blur-[3px]"
+        style={{
+          background: centre
+            ? 'radial-gradient(closest-side, color-mix(in srgb, var(--brand) 30%, transparent), transparent)'
+            : 'radial-gradient(closest-side, color-mix(in srgb, var(--accent) 28%, transparent), transparent)',
+        }}
+      />
+    </span>
   );
 }
 
