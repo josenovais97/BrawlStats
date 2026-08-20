@@ -6,7 +6,7 @@ import { HomeCoverage } from '@/components/home/home-coverage';
 import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
-import { HomeProfileDepth } from '@/components/home/home-profile-depth';
+import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeSnapshot } from '@/components/home/home-snapshot';
@@ -66,7 +66,7 @@ const WEBSITE_SCHEMA = {
  */
 export default function HomePage() {
   return (
-    <div className="space-y-12 sm:space-y-14 lg:space-y-16">
+    <div className="space-y-14 sm:space-y-16">
       <script
         type="application/ld+json"
         // Static object, no user input, so there is nothing to escape here.
@@ -82,8 +82,20 @@ export default function HomePage() {
       />
 
       {/* Renders nothing until the visitor has saved someone, so a first-time
-          view goes straight from the search box to live data. */}
+          view goes straight from the search box to the product. */}
       <FavoritesList />
+
+      {/*
+        The flagship, immediately after the search that feeds it.
+        
+        Live events used to hold this slot, which meant the first thing the
+        page demonstrated was a rotation anyone can see in the game. What a
+        visitor cannot see anywhere else is what BrawlZone does with their tag,
+        so that goes first now.
+      */}
+      <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
+        <HomeAccountPreview />
+      </Suspense>
 
       <HomeSection
         id="live-now"
@@ -102,7 +114,7 @@ export default function HomePage() {
           fallback={
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }, (_, i) => (
-                <Skeleton key={i} className="h-64 rounded-2xl" />
+                <Skeleton key={i} className="h-56 rounded-2xl" />
               ))}
             </div>
           }
@@ -111,21 +123,18 @@ export default function HomePage() {
         </Suspense>
       </HomeSection>
 
-      {/*
-        A band, so the page has somewhere to change gear.
-        
-        Tools and the profile preview are the two blocks that are *about* the
-        product rather than live data, and grouping them on their own ground
-        breaks up what was otherwise six card grids in a row.
-      */}
+      {/* One change of ground on the page, between the live data above and the
+          snapshot below. Any more dividing than this and the rhythm becomes
+          the decoration. */}
       <HomeBand>
-        <div className="space-y-12 sm:space-y-14">
+        <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
           <HomeTools />
-          <HomeProfileDepth />
-        </div>
+        </Suspense>
       </HomeBand>
 
-      <HomeSnapshot />
+      <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
+        <HomeSnapshot />
+      </Suspense>
 
       <HomeCta />
     </div>

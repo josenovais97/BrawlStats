@@ -2,7 +2,13 @@
 
 import { ArrowRight, Loader2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useId, useState, useTransition, type FormEvent } from 'react';
+import {
+  useId,
+  useState,
+  useTransition,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 
 import { ClubIcon, PlayersIcon } from '@/components/game-icons';
 import { RecentSearches } from '@/components/recent-searches';
@@ -21,6 +27,11 @@ interface SearchBarProps {
    * the search sits inside another page.
    */
   size?: 'default' | 'hero';
+  /**
+   * Rendered under the hint and above the recent row, for a secondary action
+   * that belongs to the search rather than to the page around it.
+   */
+  footer?: ReactNode;
 }
 
 const PLACEHOLDER: Record<Mode, string> = {
@@ -38,6 +49,7 @@ export function SearchBar({
   autoFocus = false,
   showRecent = false,
   size = 'default',
+  footer,
 }: SearchBarProps) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(defaultMode);
@@ -169,6 +181,8 @@ export function SearchBar({
             : 'A club tag is shown on the club screen, under the club name.'}
         </p>
       )}
+
+      {footer}
 
       {showRecent ? <RecentSearches /> : null}
     </div>

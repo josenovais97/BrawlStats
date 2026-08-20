@@ -14,10 +14,10 @@ const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
  * Homepage teaser. A failure here must not take down the landing page, so any
  * error degrades to a quiet inline notice rather than an error boundary.
  */
-export async function TopPlayersPreview() {
+export async function TopPlayersPreview({ limit = 5 }: { limit?: number } = {}) {
   let players;
   try {
-    players = (await getPlayerRankings('global', 5)).items;
+    players = (await getPlayerRankings('global', limit)).items;
   } catch {
     return (
       <div className="card p-6 text-sm text-muted">

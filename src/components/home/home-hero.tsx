@@ -106,23 +106,29 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             it reads as the one thing on the page you are meant to touch first.
           */}
           <div className="card card-glow mt-6 border-border-strong/60 p-4 sm:p-5">
-            <SearchBar autoFocus showRecent size="hero" />
-
-            {/*
-              For the visitor who has not got a tag to hand. It opens a real
-              profile rather than a mock-up, which is the only way to show what
-              a lookup returns without inventing numbers for it.
-            */}
-            <p className="mt-4 border-t border-border pt-3.5 text-sm text-muted">
-              Haven&rsquo;t got a tag handy?{' '}
-              <Link
-                href={`/player/${SAMPLE_PLAYER_TAG}`}
-                className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
-              >
-                Try a sample profile
-                <ArrowUpRight className="size-3.5" />
-              </Link>
-            </p>
+            <SearchBar
+              autoFocus
+              showRecent
+              size="hero"
+              footer={
+                /*
+                  Secondary to the search and to the recent row below it, so it
+                  is a line of text rather than a button — but it opens a real
+                  profile rather than a mock-up, which is the only way to show
+                  what a lookup returns without inventing numbers for it.
+                */
+                <p className="mt-2.5 text-sm text-muted">
+                  No tag handy?{' '}
+                  <Link
+                    href={`/player/${SAMPLE_PLAYER_TAG}`}
+                    className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
+                  >
+                    Try a sample profile
+                    <ArrowUpRight className="size-3.5" />
+                  </Link>
+                </p>
+              }
+            />
           </div>
         </div>
 

@@ -1,23 +1,35 @@
 'use client';
 
-import { Clock, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 
 import { ClubIcon, PlayersIcon } from '@/components/game-icons';
+import { playerIconUrl } from '@/lib/brawlapi';
 import {
   clearRecentSearches,
   readRecentSearches,
-  removeRecentSearch,
   serverRecentSearches,
   subscribeRecentSearches,
 } from '@/lib/recent-searches';
 
 /**
- * Shows tags looked up on this device. Renders nothing until mounted so the
- * server-rendered HTML and the first client render agree — localStorage is not
- * available during SSR.
+ * Tags looked up on this device, as a one-line shortcut rather than a section.
+ *
+ * It used to be a labelled block inside the hero's search card — heading,
+ * wrapped chips, a clear-all — which made the card tall enough to push the
+ * metrics strip off a laptop screen. The information is a shortcut, not a
+ * feature, so it now reads as one: a short row you either recognise and tap or
+ * ignore entirely.
+ *
+ * Renders nothing until mounted, so the server HTML and the first client
+ * render agree — localStorage does not exist during SSR.
  */
+
+/** Two fit a 320px row beside the label; three is the most that stays scannable. */
+const SHOWN = 3;
+
 export function RecentSearches() {
   const entries = useSyncExternalStore(
     subscribeRecentSearches,
@@ -26,55 +38,63 @@ export function RecentSearches() {
   );
 
   if (entries.length === 0) return null;
+  const shown = entries.slice(0, SHOWN);
 
   return (
-    <div className="mt-6">
-      <div className="mb-2 flex items-center gap-2">
-        <Clock className="size-4 text-muted" />
-        <span className="text-sm font-medium text-muted">Recent</span>
-        <button
-          type="button"
-          onClick={clearRecentSearches}
-          className="ml-auto text-xs text-muted transition-colors hover:text-foreground"
-        >
-          Clear all
-        </button>
-      </div>
+    <div className="mt-3 flex items-center gap-2.5 border-t border-border pt-3">
+      <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:inline">
+        Continue with
+      </span>
 
-      <ul className="flex flex-wrap gap-2">
-        {entries.map((entry) => {
+      {/* Scrolls rather than wraps: a second row here is the height this was
+          meant to remove. The negative margin lets chips run to the card edge
+          instead of stopping short of it. */}
+      <ul className="-mx-1 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto px-1 py-0.5">
+        {shown.map((entry) => {
           const isClub = entry.kind === 'club';
           return (
-            <li key={`${entry.kind}:${entry.tag}`} className="group relative">
+            <li key={`${entry.kind}:${entry.tag}`} className="shrink-0">
               <Link
                 href={`/${entry.kind}/${entry.tag}`}
-                className="flex items-center gap-2 rounded-lg border border-border bg-surface py-1.5 pl-3 pr-8 text-sm transition-colors hover:border-brand/50"
+                className="flex min-h-9 items-center gap-2 rounded-lg border border-border bg-surface-2/60 py-1 pl-1 pr-2.5 text-sm transition-colors hover:border-brand/50"
               >
-                {isClub ? (
-                  <ClubIcon className="size-3.5 shrink-0" />
+                {entry.icon && !isClub ? (
+                  <Image
+                    src={playerIconUrl(entry.icon)}
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="size-6 shrink-0 rounded bg-surface-2"
+                    loading="lazy"
+                    unoptimized
+                  />
                 ) : (
-                  <PlayersIcon className="size-4 shrink-0" />
+                  <span className="grid size-6 shrink-0 place-items-center rounded bg-surface-2">
+                    {isClub ? (
+                      <ClubIcon className="size-3.5" />
+                    ) : (
+                      <PlayersIcon className="size-3.5" />
+                    )}
+                  </span>
                 )}
-                <span className="max-w-[12rem] truncate font-medium">
+                <span className="max-w-[7rem] truncate font-medium">
                   {entry.name || `#${entry.tag}`}
                 </span>
-                {entry.name ? (
-                  <span className="font-mono text-xs text-muted">#{entry.tag}</span>
-                ) : null}
               </Link>
-
-              <button
-                type="button"
-                aria-label={`Remove ${entry.name || entry.tag}`}
-                onClick={() => removeRecentSearch(entry.kind, entry.tag)}
-                className="absolute right-1.5 top-1/2 grid size-5 -translate-y-1/2 place-items-center rounded text-muted opacity-0 transition-opacity hover:bg-surface-2 hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
-              >
-                <X className="size-3.5" />
-              </button>
             </li>
           );
         })}
       </ul>
+
+      <button
+        type="button"
+        onClick={clearRecentSearches}
+        aria-label="Clear recent profiles"
+        title="Clear recent profiles"
+        className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+      >
+        <X className="size-4" />
+      </button>
     </div>
   );
 }

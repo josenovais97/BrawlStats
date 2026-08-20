@@ -25,8 +25,17 @@ export async function HomeLiveEvents() {
   const slots = active.sort((a, b) => a.slotId - b.slotId).slice(0, 3);
   if (slots.length === 0) return null;
 
+  /*
+   * A snap carousel on a phone, a three-across grid from `sm`.
+   *
+   * Stacked, three of these were most of a screen for a rotation that is a
+   * supporting detail on this page; swiped, they are one card tall and the
+   * artwork still gets its full width. The negative margin lets the strip run
+   * to the screen edge so the next card peeks in, which is what tells anyone
+   * it scrolls without needing an arrow or a row of dots.
+   */
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+    <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-3">
       {slots.map((slot) => {
         const map = mapMeta.get(slot.event.id);
         const mode = modeMeta.get((slot.event.mode ?? '').toLowerCase());
@@ -34,7 +43,7 @@ export async function HomeLiveEvents() {
         const modeName = mode?.name ?? humanizeMode(slot.event.mode);
 
         return (
-          <li key={`${slot.slotId}-${slot.event.id}`}>
+          <li className="w-[85%] shrink-0 snap-start sm:w-auto sm:shrink" key={`${slot.slotId}-${slot.event.id}`}>
             {/*
               Two shapes from one set of elements: a wide row on a phone, where
               a poster card would burn most of the screen on empty margin round
@@ -89,7 +98,7 @@ export async function HomeLiveEvents() {
                 />
               </div>
 
-              <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-3.5 sm:gap-3 sm:p-4">
+              <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3 sm:gap-2.5 sm:p-3.5">
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-victory/25 bg-victory/10 px-2 py-1">
                     <span className="live-dot" />
