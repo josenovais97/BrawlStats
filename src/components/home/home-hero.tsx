@@ -1,10 +1,8 @@
 import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 
-import { HomeHeroInsight } from '@/components/home/home-hero-insight';
 import { SearchBar } from '@/components/search-bar';
 import { brawlerModelUrl } from '@/lib/brawlapi';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
@@ -209,7 +207,14 @@ function Console() {
 
 /**
  * The character stage: an arena floor, a spotlight, and the cast standing on
- * it, with one real readout pinned clear of every face.
+ * it.
+ *
+ * Deliberately nothing else. A readout floated here for a while — the current
+ * number-one Ranked brawler — and it was real data, but it hung in the middle
+ * of the scene attached to nothing, competing with the console for the one
+ * focal point the hero is allowed. The same figure is on the page twice
+ * already, in the tools preview and the meta snapshot, where it has a heading
+ * to belong to.
  */
 function Stage() {
   return (
@@ -270,14 +275,6 @@ function Stage() {
           />
         </div>
       ))}
-
-      {/* Real product evidence, pinned top-left — clear of every face, and
-          streamed so the search never waits on a database. */}
-      <div className="pointer-events-none absolute -left-6 top-2 z-40">
-        <Suspense fallback={null}>
-          <HomeHeroInsight />
-        </Suspense>
-      </div>
     </>
   );
 }
