@@ -10,6 +10,7 @@ import {
 } from '@/components/seo/structured-data';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { Disclosure } from '@/components/ui/disclosure';
+import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
@@ -217,7 +218,18 @@ export async function TierListView({
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
             global-leaderboard
           </Link>{' '}
-          players.{lastRun ? ` Updated ${relativeTime(lastRun.startedAt)}.` : ''}
+          players.
+          {lastRun ? (
+            <>
+              {' '}
+              Sampled{' '}
+              <RelativeTime
+                iso={lastRun.startedAt}
+                fallback={relativeTime(lastRun.startedAt)}
+              />
+              .
+            </>
+          ) : null}
         </p>
 
         <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { MapPreview } from '@/components/ranked/map-preview';
 import { SeasonPanel } from '@/components/ranked/season-panel';
 import { Disclosure } from '@/components/ui/disclosure';
+import { RelativeTime } from '@/components/ui/relative-time';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
@@ -112,7 +113,15 @@ export default async function RankedPage() {
         {/* Everything needed to judge the numbers below, on one line. */}
         <ul className="mt-4 flex flex-wrap items-center gap-1.5">
           <Fact tone="brand">{formatNumber(totalSamples)} Ranked battles</Fact>
-          {lastRun ? <Fact>Updated {relativeTime(lastRun.startedAt)}</Fact> : null}
+          {lastRun ? (
+            <Fact>
+              Sampled{' '}
+              <RelativeTime
+                iso={lastRun.startedAt}
+                fallback={relativeTime(lastRun.startedAt)}
+              />
+            </Fact>
+          ) : null}
           {maps.length > 0 ? (
             <Fact>
               {rated} of {maps.length} maps well enough sampled to name a pick
