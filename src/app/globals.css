@@ -291,6 +291,49 @@ body {
 }
 
 /*
+ * The lookup console's cut corners.
+ *
+ * BrawlZone's one structural signature: a panel with the top-right and
+ * bottom-left corners sliced off, the way an in-game HUD frame is built. It is
+ * the difference between "a form in a rounded rectangle", which every stats
+ * site has, and a console.
+ *
+ * Drawn as two stacked clipped surfaces rather than with a border, because a
+ * border follows the box and not the clip — the diagonal would simply be
+ * unpainted. The outer element is the edge colour, the inner one sits a pixel
+ * inside it, and the 1px difference reads as a hairline that follows the notch
+ * exactly.
+ */
+@utility clip-console {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 1.5rem) 0,
+    100% 1.5rem,
+    100% 100%,
+    1.5rem 100%,
+    0 calc(100% - 1.5rem)
+  );
+}
+
+/*
+ * The scanning edge along the console's top.
+ *
+ * A single hairline that brightens toward the middle, so the panel reads as
+ * lit from above rather than outlined. Static: the light does not travel,
+ * because a looping animation behind a text field is a distraction, not a
+ * signature.
+ */
+@utility console-edge {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--brand) 80%, transparent) 22%,
+    color-mix(in srgb, var(--brand) 35%, transparent) 62%,
+    transparent
+  );
+}
+
+/*
  * Chunky game button: a solid colour with a darker bottom edge that collapses
  * when pressed, which is what makes it feel like a game control rather than a
  * flat web button.

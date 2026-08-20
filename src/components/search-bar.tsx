@@ -88,7 +88,7 @@ export function SearchBar({
       <div
         role="group"
         aria-label="Search type"
-        className="inline-flex rounded-xl border border-border bg-surface-2/70 p-1"
+        className="inline-flex rounded-xl border border-border/80 bg-background/70 p-1 shadow-[inset_0_1px_3px_rgb(0_0_0/0.5)]"
       >
         {(['player', 'club'] as const).map((m) => {
           const isClub = m === 'club';
@@ -123,10 +123,10 @@ export function SearchBar({
           The focus ring lives on this wrapper, not the input, so the whole
           field including the leading hash lights up as one control.
         */}
-        <div className="group relative flex-1 rounded-xl transition-shadow duration-200 focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--brand)_18%,transparent)]">
+        <div className="group relative flex-1 rounded-xl transition-shadow duration-200 focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_22%,transparent)]">
           <span
             aria-hidden
-            className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted transition-colors group-focus-within:text-brand ${
+            className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono font-bold text-muted/70 transition-colors group-focus-within:text-brand ${
               hero ? 'text-xl' : 'text-lg'
             }`}
           >
@@ -147,9 +147,9 @@ export function SearchBar({
             autoCapitalize="characters"
             autoComplete="off"
             enterKeyHint="search"
-            className={`w-full rounded-xl border bg-surface font-mono uppercase tracking-wider outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-muted/50 focus:border-brand/70 ${
-              error ? 'border-defeat/60' : 'border-border-strong/70'
-            } ${hero ? 'py-4 pl-10 pr-4 text-lg sm:text-xl' : 'py-3.5 pl-9 pr-4 text-lg'}`}
+            className={`w-full rounded-xl border bg-background/70 font-mono uppercase tracking-wider shadow-[inset_0_2px_6px_rgb(0_0_0/0.45)] outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-muted/40 focus:border-brand/80 ${
+              error ? 'border-defeat/60' : 'border-border-strong/60'
+            } ${hero ? 'py-4 pl-11 pr-4 text-lg sm:text-xl' : 'py-3.5 pl-9 pr-4 text-lg'}`}
           />
         </div>
 

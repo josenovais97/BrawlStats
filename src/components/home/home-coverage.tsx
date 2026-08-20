@@ -1,15 +1,25 @@
+import { RelativeTime } from '@/components/ui/relative-time';
 import {
   BattlesIcon,
   BrawlersIcon,
   PlayersIcon,
   RankedIcon,
 } from '@/components/game-icons';
-import { RelativeTime } from '@/components/ui/relative-time';
 import { compactNumber, relativeTime } from '@/lib/format';
 import { getCoverageStats, getLastAggregationRun } from '@/lib/stats';
 
 /**
- * Real coverage numbers, straight from the database.
+ * The live-data rail at the base of the hero.
+ *
+ * One continuous surface with hairline separators, not four cards. The
+ * difference matters: four cards is a dashboard someone assembled, a rail is
+ * an instrument reading out. It closes the command-centre scene above it — the
+ * console asks a question, the rail says how much evidence stands behind the
+ * answer.
+ *
+ * The sampling status leads rather than trailing. Anyone can print a large
+ * number; saying when it was last checked is the claim only a site that
+ * actually samples can make, and it belongs at the front of the readout.
  *
  * Renders nothing when there is no database or nothing collected yet — a strip
  * of zeroes would undercut the credibility it exists to build.
@@ -29,71 +39,57 @@ export async function HomeCoverage() {
   ];
 
   return (
-    /*
-      Proof, not a spec sheet.
-      
-      This was four icon-and-label cells inside a bordered box. The numbers are
-      the whole point, so they take the display face at a size you cannot miss
-      and the icons drop to a quiet mark beside them. No card of its own: the
-      hero's full-width band supplies the ground and the rule, and a rounded
-      box floating inside a band would be two containers doing one job.
-    */
     <section aria-label="Data coverage" className="relative">
-      {/*
-        Two columns on a phone rather than four stacked rows: these are four
-        short numbers, and stacking them turns a one-line credibility strip
-        into half a screen of scrolling.
-      */}
-      <ul className="grid grid-cols-2 md:grid-cols-4">
-        {items.map(({ icon: Icon, label, value }, index) => (
-          <li
-            key={label}
-            className={`relative flex items-center gap-3 py-4 ${
-              index % 2 === 1 ? 'border-l border-border/60 pl-4 sm:pl-6' : ''
-            } ${index > 1 ? 'border-t border-border/60 md:border-t-0' : ''} ${
-              index === 2 ? 'md:border-l md:border-border/60 md:pl-4 lg:pl-6' : ''
-            } ${index % 2 === 0 ? 'pr-4' : ''}`}
-          >
-            <Icon className="size-7 shrink-0 opacity-90 sm:size-8" />
-            <div className="min-w-0">
-              <p className="display text-2xl leading-none tabular-nums text-foreground sm:text-3xl">
-                {value}
-              </p>
-              {/*
-                Wrapping rather than truncating: at 320px "Ranked placements"
-                does not fit on one line, and a clipped label is worse than a
-                two-line one.
-              */}
-              <p className="mt-1.5 text-xs font-medium uppercase leading-tight tracking-wide text-muted">
-                {label}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {/*
-        The line that makes the four numbers above mean something.
-        
-        Anyone can print a big number. Saying when it was last checked is a
-        claim only a site that actually samples can make, and it is the closest
-        thing this page has to a proof of life. The instant is rendered by
-        `RelativeTime` so a cached page never shows a stale "20 minutes ago".
-      */}
-      {lastRun ? (
-        <p className="flex items-center gap-2 border-t border-border/60 py-2.5 text-xs text-muted">
+      <div className="flex flex-col lg:flex-row lg:items-stretch">
+        {/* Status, at the head of the readout. */}
+        <p className="flex items-center gap-2.5 py-3.5 text-xs text-muted lg:w-56 lg:shrink-0 lg:border-r lg:border-border/60 lg:py-5 lg:pr-6">
           <span className="live-dot shrink-0" />
           <span className="min-w-0">
-            Last sampled{' '}
-            <RelativeTime
-              iso={lastRun.startedAt}
-              fallback={relativeTime(lastRun.startedAt)}
-              className="font-semibold text-foreground"
-            />
-            {' '}&middot; we re-read the pool every three hours
+            {lastRun ? (
+              <>
+                Sampled{' '}
+                <RelativeTime
+                  iso={lastRun.startedAt}
+                  fallback={relativeTime(lastRun.startedAt)}
+                  className="font-semibold text-foreground"
+                />
+                <span className="block text-muted/75">Re-read every three hours</span>
+              </>
+            ) : (
+              <span className="font-semibold text-foreground">Live sample</span>
+            )}
           </span>
         </p>
-      ) : null}
+
+        {/*
+          Two across on a phone, four across from `lg`. The separators are
+          drawn per cell rather than with `divide-x`, because the wrap point
+          differs between the two layouts and `divide` would leave a rule
+          hanging at the end of the first row.
+        */}
+        <ul className="grid flex-1 grid-cols-2 border-t border-border/60 lg:grid-cols-4 lg:border-t-0">
+          {items.map(({ icon: Icon, label, value }, index) => (
+            <li
+              key={label}
+              className={`flex items-center gap-3 py-4 lg:py-5 lg:pl-6 ${
+                index % 2 === 1 ? 'border-l border-border/60 pl-4 sm:pl-6 lg:pl-6' : ''
+              } ${index > 1 ? 'border-t border-border/60 lg:border-t-0' : ''} ${
+                index === 2 ? 'lg:border-l lg:border-border/60' : ''
+              } ${index === 3 ? 'lg:border-l lg:border-border/60' : ''}`}
+            >
+              <Icon className="size-7 shrink-0 opacity-90 sm:size-8" />
+              <div className="min-w-0">
+                <p className="display text-2xl leading-none tabular-nums text-foreground sm:text-[1.75rem]">
+                  {value}
+                </p>
+                <p className="mt-1.5 truncate text-xs font-medium uppercase tracking-wide text-muted">
+                  {label}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }
