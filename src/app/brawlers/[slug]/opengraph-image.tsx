@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og';
 
 import { brawlerPortraitUrl, getBrawler } from '@/lib/brawlapi';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { slugify } from '@/lib/slugs';
 import { formatPercent } from '@/lib/format';
 import { SITE_NAME } from '@/lib/site';
 import {
@@ -26,9 +28,14 @@ export const contentType = 'image/png';
 /** Matches the page it represents, so a shared card is never wildly stale. */
 export const revalidate = 3600;
 
-export default async function Image({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const brawlerId = Number(id);
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  /* The route accepts both forms, so the image does too: a numeric path is
+     still live until search engines have followed the redirect. */
+  const catalog = await getBrawlerCatalog().catch(() => null);
+  const brawlerId = Number.isFinite(Number(slug))
+    ? Number(slug)
+    : (catalog?.bySlug.get(slugify(slug))?.id ?? Number.NaN);
   const brawler = await getBrawler(brawlerId).catch(() => undefined);
 
   if (!brawler) return fallback();

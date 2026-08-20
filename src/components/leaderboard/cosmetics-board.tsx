@@ -2,6 +2,7 @@ import { CosmeticsIcon, PlayersIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, titleCaseLabel } from '@/lib/format';
 import { getIconUsage, getSkinUsage, type CosmeticUsage } from '@/lib/stats';
@@ -54,7 +55,7 @@ export async function CosmeticsBoard() {
           {skins.map((skin, index) => (
             <li key={skin.id}>
               <Link
-                href={`/brawlers/${skin.brawlerId}`}
+                href={brawlerPath(skin.brawlerId ?? 0, skin.brawlerName)}
                 className="row-interactive flex items-center gap-3 rounded-xl p-2.5"
               >
                 <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums text-muted">

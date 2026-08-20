@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { SectionHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import { MAX_POWER_LEVEL } from '@/lib/progression';
@@ -216,7 +217,7 @@ function Row({
   return (
     <li>
       <Link
-        href={`/brawlers/${id}`}
+        href={brawlerPath(id, name)}
         className="row-interactive flex items-center gap-3 rounded-lg p-2"
       >
         <Image

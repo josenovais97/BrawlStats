@@ -54,3 +54,15 @@ export function findBySlug<T>(
   const wanted = slugify(slug);
   return items.find((item) => slugify(nameOf(item)) === wanted);
 }
+
+/**
+ * The canonical path for a brawler page.
+ *
+ * Slug rather than id, because the path is the strongest keyword signal a page
+ * has and `/brawlers/16000003` carries none. The id still resolves — the route
+ * permanently redirects it — so a link built without a name in hand is a
+ * redirect rather than a break.
+ */
+export function brawlerPath(id: number, name?: string | null): string {
+  return `/brawlers/${name ? slugify(name) : id}`;
+}

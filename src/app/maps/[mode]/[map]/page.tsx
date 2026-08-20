@@ -9,6 +9,7 @@ import { MapPickList } from '@/components/maps/map-pick-list';
 import { MapPreview } from '@/components/ranked/map-preview';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { currentMonth } from '@/lib/site';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, minutesSince } from '@/lib/format';
 import { getActiveMaps, resolveMap } from '@/lib/game-maps';
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     // Written as the query, because that is how this page is found: people
     // search the map name plus the thing they want to know about it.
-    title: `${entry.map.name} best brawlers, ${modeLabel} map guide`,
+    title: `${entry.map.name} best brawlers, ${modeLabel} (${currentMonth()})`,
     description: `The strongest brawlers on ${entry.map.name} (${modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.`,
     alternates: { canonical: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
     openGraph: {

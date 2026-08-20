@@ -13,6 +13,7 @@ import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { Disclosure } from '@/components/ui/disclosure';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
+import { brawlerPath } from '@/lib/slugs';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
@@ -178,7 +179,7 @@ export async function TierListView({
               .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
               .map((entry) => ({
                 name: entry.brawlerName,
-                path: `/brawlers/${entry.brawlerId}`,
+                path: brawlerPath(entry.brawlerId, entry.brawlerName),
               })),
           )}
         />
@@ -312,7 +313,7 @@ export async function TierListView({
               .map((entry) => (
                 <Link
                   key={entry.brawlerId}
-                  href={`/brawlers/${entry.brawlerId}`}
+                  href={brawlerPath(entry.brawlerId, entry.brawlerName)}
                   title={`${entry.brawlerName}: ${entry.decidedSampleSize} of ${MIN_SAMPLE_FOR_TIER} decided ${copy.battles} needed to be ranked`}
                   className="card card-interactive flex items-center gap-2 px-3 py-2 text-sm"
                 >
@@ -371,7 +372,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
           {entries.map((entry) => (
             <Link
               key={entry.brawlerId}
-              href={`/brawlers/${entry.brawlerId}`}
+              href={brawlerPath(entry.brawlerId, entry.brawlerName)}
               className="group w-[92px] rounded-xl bg-surface-2 p-2 transition-transform hover:-translate-y-0.5"
               title={`${entry.brawlerName}: meta score ${entry.metaScore ?? '?'} from ${formatPercent(entry.normalizedWinRate)} adjusted win rate (${formatPercent(entry.winRate)} raw, against a ${formatPercent(entry.baselineWinRate)} average for the modes it is played in) and ${formatPercent(entry.usageRate)} pick rate, over ${formatNumber(entry.decidedSampleSize)} decided battles`}
             >

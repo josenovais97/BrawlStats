@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { HyperchargeIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import { MAX_POWER_LEVEL } from '@/lib/progression';
@@ -139,7 +140,7 @@ function Row({
 
   return (
     <Link
-      href={`/brawlers/${brawler.id}`}
+      href={brawlerPath(brawler.id, brawler.name)}
       title={
         cost
           ? `${brawler.name}: about ${formatNumber(cost)} coins from power ${brawler.power} to ${MAX_POWER_LEVEL}`

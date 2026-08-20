@@ -4,14 +4,17 @@ import { redirect } from 'next/navigation';
 
 import { tierListHref } from '@/components/tier-list/tier-list-controls';
 import { TierListView } from '@/components/tier-list/tier-list-view';
+import { currentMonth } from '@/lib/site';
 import { isTierWindow } from '@/lib/stats';
 
-export const metadata: Metadata = {
-  title: 'Brawl Stars trophy tier list',
-  description:
-    'Brawl Stars trophy tier list, built from win and pick rates in sampled trophy-ladder battles, showdown included.',
-  alternates: { canonical: '/tier-list/trophy' },
-};
+/* See the Ranked list: a function so the month tracks the regeneration. */
+export function generateMetadata(): Metadata {
+  return {
+    title: `Brawl Stars trophy tier list (${currentMonth()})`,
+    description: `The best Brawl Stars brawlers on the trophy ladder, ${currentMonth()}. Built from win and pick rates in sampled ladder battles, showdown included, and updated every few hours.`,
+    alternates: { canonical: '/tier-list/trophy' },
+  };
+}
 
 /** Reads aggregated samples, never the live API — cheap to revalidate hourly. */
 export const revalidate = 3600;

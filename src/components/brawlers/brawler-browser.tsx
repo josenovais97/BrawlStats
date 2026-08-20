@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useId, useMemo, useState } from 'react';
 
 import { ClassIcon } from '@/components/game-icons';
+import { brawlerPath } from '@/lib/slugs';
 
 /** Only what the grid renders — keeps the client payload small. */
 export interface BrawlerCardData {
@@ -247,7 +248,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
 function BrawlerCard({ brawler }: { brawler: BrawlerCardData }) {
   return (
     <Link
-      href={`/brawlers/${brawler.id}`}
+      href={brawlerPath(brawler.id, brawler.name)}
       className="card card-interactive group relative flex h-full flex-col overflow-hidden p-2.5 sm:p-3"
       style={{
         borderColor: `color-mix(in srgb, ${brawler.rarityColor} 32%, transparent)`,

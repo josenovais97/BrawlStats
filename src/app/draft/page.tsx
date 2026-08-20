@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { RankedIcon } from '@/components/game-icons';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
@@ -246,7 +247,7 @@ export default async function DraftPage({ searchParams }: PageProps) {
                   return (
                     <li key={pick.brawlerId}>
                       <Link
-                        href={`/brawlers/${pick.brawlerId}`}
+                        href={brawlerPath(pick.brawlerId, pick.brawlerName)}
                         className="row-interactive flex items-center gap-3 px-4 py-3"
                       >
                         <span

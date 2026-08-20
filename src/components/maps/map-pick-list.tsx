@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BABrawler } from '@/types/brawlapi';
@@ -40,7 +41,7 @@ export function MapPickList({
         return (
           <li key={pick.brawlerId}>
             <Link
-              href={`/brawlers/${pick.brawlerId}`}
+              href={brawlerPath(pick.brawlerId, pick.brawlerName)}
               className="row-interactive flex items-center gap-3 px-4 py-3"
             >
               <span className="w-5 shrink-0 text-center text-sm font-black tabular-nums text-muted">

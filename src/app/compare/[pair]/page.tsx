@@ -7,6 +7,7 @@ import { notFound, redirect } from 'next/navigation';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { VersusList } from '@/components/compare/versus-list';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { resolvePair } from '@/lib/compare';
 import {
@@ -393,7 +394,7 @@ function Portrait({ side, align }: { side: Side; align: 'start' | 'end' }) {
         unoptimized
       />
       <Link
-        href={`/brawlers/${side.brawler.id}`}
+        href={brawlerPath(side.brawler.id, side.brawler.name)}
         className="display truncate text-lg uppercase hover:underline sm:text-2xl"
       >
         {side.brawler.name}

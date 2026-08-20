@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { TrophyIcon, WinStreakIcon } from '@/components/game-icons';
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import { TIER_COLOR } from '@/lib/tiers';
@@ -156,7 +157,7 @@ function BrawlerTile({
 
   return (
     <Link
-      href={`/brawlers/${brawler.id}`}
+      href={brawlerPath(brawler.id, brawler.name)}
       className="card card-interactive group relative overflow-hidden p-3"
       style={{ borderColor: `color-mix(in srgb, ${accent} 35%, transparent)` }}
       title={

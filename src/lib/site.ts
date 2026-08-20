@@ -23,3 +23,18 @@ export const SITE_NAME = 'BrawlZone';
  * a second one to keep an eye on.
  */
 export const SAMPLE_PLAYER_TAG = '2V0UL0GQV8';
+
+/**
+ * The month a page is being served in, for titles.
+ *
+ * A freshness signal, and one this site can actually make good on: the sampler
+ * runs every three hours and these pages revalidate hourly to daily, so a
+ * month in the title is a claim the data backs rather than decoration. Every
+ * competitor that outranks us on "<brawler> build" carries one.
+ *
+ * Deliberately not the day. A date that specific reads as stale the moment it
+ * is a day old, and the underlying numbers move on a slower cadence than that.
+ */
+export function currentMonth(): string {
+  return new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}

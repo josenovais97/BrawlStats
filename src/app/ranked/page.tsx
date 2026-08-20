@@ -7,6 +7,8 @@ import { SeasonPanel } from '@/components/ranked/season-panel';
 import { RankedIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
 import { RelativeTime } from '@/components/ui/relative-time';
+import { currentMonth } from '@/lib/site';
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
@@ -16,12 +18,14 @@ import { getLastAggregationRun, getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 
-export const metadata: Metadata = {
-  alternates: { canonical: '/ranked' },
-  title: 'Brawl Stars Ranked maps',
-  description:
-    'Best Brawl Stars brawlers for every map in the Ranked rotation, from sampled competitive battles.',
-};
+/* A function, so the month is the month the page was last regenerated. */
+export function generateMetadata(): Metadata {
+  return {
+    alternates: { canonical: '/ranked' },
+    title: `Brawl Stars Ranked maps and best brawlers (${currentMonth()})`,
+    description: `The best brawlers for every map in the current Ranked rotation, ${currentMonth()}. From sampled competitive battles, updated every few hours.`,
+  };
+}
 
 /** Own aggregate plus artwork, so an hour is plenty. */
 export const revalidate = 3600;
@@ -501,7 +505,7 @@ function MapCard({
             return (
               <li key={pick.brawlerId}>
                 <Link
-                  href={`/brawlers/${pick.brawlerId}`}
+                  href={brawlerPath(pick.brawlerId, pick.brawlerName)}
                   title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} raw win rate over ${pick.decidedSampleSize} sampled Ranked battles on this map, against ${formatPercent(pick.overallScore)} adjusted form over ${formatNumber(pick.overallSampleSize)} Ranked battles overall`}
                   className="row-interactive flex items-center gap-2.5 px-3.5 py-2"
                 >

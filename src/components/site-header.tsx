@@ -1,15 +1,11 @@
 'use client';
 
 import {
-  CalendarClock,
   ChevronDown,
-  GitCompareArrows,
   Menu,
   Newspaper,
-  Podium,
   ScrollText,
   Search,
-  Target,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -19,9 +15,13 @@ import { useState } from 'react';
 import { BrandMark } from '@/components/brand-mark';
 import {
   BrawlersIcon,
+  CompareIcon,
+  DraftIcon,
+  EventsIcon,
   LeaderboardIcon,
   MapsIcon,
   RankedIcon,
+  TierListIcon,
 } from '@/components/game-icons';
 
 interface NavItem {
@@ -48,10 +48,10 @@ const NAV: NavItem[] = [
   { href: '/brawlers', label: 'Brawlers', icon: BrawlersIcon },
   // Points straight at the Ranked list so the nav does not bounce through the
   // /tier-list redirect, but stays highlighted on the trophy list too.
-  { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },
+  { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: TierListIcon },
   { href: '/ranked', label: 'Ranked', icon: RankedIcon },
   { href: '/maps', label: 'Maps', icon: MapsIcon },
-  { href: '/draft', label: 'Draft', icon: Target },
+  { href: '/draft', label: 'Draft', icon: DraftIcon },
   { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon },
 ];
 
@@ -66,8 +66,8 @@ const MORE: NavItem[] = [
   // Events is the one demotion that costs something: it is a page people do
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.
-  { href: '/events', label: 'Events', icon: CalendarClock },
-  { href: '/compare', label: 'Compare', icon: GitCompareArrows },
+  { href: '/events', label: 'Events', icon: EventsIcon },
+  { href: '/compare', label: 'Compare', icon: CompareIcon },
   { href: '/news', label: 'News', icon: Newspaper },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
 ];

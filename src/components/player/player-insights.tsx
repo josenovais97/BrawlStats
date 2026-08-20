@@ -9,6 +9,7 @@ import {
   PlayersIcon,
 } from '@/components/game-icons';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
 import { computeBattleInsights, type PlayerAssociation } from '@/lib/battle-insights';
@@ -123,7 +124,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
               return (
                 <li key={brawler.brawlerId}>
                   <Link
-                    href={`/brawlers/${brawler.brawlerId}`}
+                    href={brawlerPath(brawler.brawlerId, brawler.brawlerName)}
                     className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-surface-2"
                   >
                     <Image

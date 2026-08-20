@@ -10,6 +10,9 @@ import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
 import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
+import { cache } from 'react';
+import { notFound, permanentRedirect } from 'next/navigation';
+
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
@@ -29,6 +32,7 @@ import {
   wikiPageUrl,
 } from '@/lib/brawler-wiki';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { currentMonth } from '@/lib/site';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
@@ -50,7 +54,48 @@ import type { BAAccessory, BABrawler } from '@/types/brawlapi';
 import type { BSAccessory } from '@/types/brawlstars';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
+}
+
+/**
+ * Resolves the URL segment to a brawler.
+ *
+ * Accepts both forms on purpose. `/brawlers/brock` is the canonical path and
+ * the one every internal link and the sitemap now emit, but `/brawlers/16000003`
+ * is what was indexed and shared for months, so it still resolves — the page
+ * permanently redirects it rather than 404ing a live URL.
+ */
+type Resolved =
+  | { kind: 'ok'; id: number; slug: string; numeric: boolean }
+  /** The catalogue is readable and has no such brawler. A real 404. */
+  | { kind: 'unknown' }
+  /** The catalogue could not be read, so absence proves nothing. */
+  | { kind: 'unavailable' };
+
+async function resolveBrawler(handle: string): Promise<Resolved> {
+  const asId = Number(handle);
+  const catalog = await getBrawlerCatalog().catch(() => null);
+
+  if (Number.isFinite(asId) && handle.trim() !== '') {
+    if (!catalog) {
+      /*
+       * No catalogue means no slug to redirect to. Serving the page at its
+       * numeric URL is right here — redirecting an id to itself is an
+       * infinite loop, which is what this branch used to do.
+       */
+      return { kind: 'ok', id: asId, slug: String(asId), numeric: false };
+    }
+
+    const entry = catalog.byId.get(asId);
+    if (!entry) return { kind: 'unknown' };
+    return { kind: 'ok', id: asId, slug: slugify(entry.name), numeric: true };
+  }
+
+  const entry = catalog?.bySlug.get(slugify(handle));
+  if (entry) {
+    return { kind: 'ok', id: entry.id, slug: slugify(entry.name), numeric: false };
+  }
+  return catalog ? { kind: 'unknown' } : { kind: 'unavailable' };
 }
 
 /**
@@ -70,6 +115,43 @@ interface PageProps {
  */
 export const revalidate = 21600;
 
+/*
+ * `generateMetadata` and the page body want the same rows — the snippet quotes
+ * the build the page renders. Both run inside one request, so caching here
+ * means the second caller pays nothing rather than the queries running twice.
+ */
+const brawlerStat = cache(getBrawlerStat);
+const brawlerBuild = cache(getBrawlerBuild);
+const abilityChoicesFor = cache(getBrawlerAbilityChoices);
+
+/**
+ * "Rocket Laces gadget and More Rockets star power", from what owners bought.
+ *
+ * Drawn from players who own exactly one of a pair, which is a measurement of
+ * a decision rather than of ownership — see `getBrawlerAbilityChoices`. Null
+ * when nothing is clearly ahead, so the snippet never invents a recommendation.
+ */
+function buildSentence(
+  name: string,
+  choices: Awaited<ReturnType<typeof getBrawlerAbilityChoices>>,
+  accessories: Map<number, string>,
+): string | null {
+  if (!choices) return null;
+
+  const pick = (rows: { itemId: number; share: number }[]) =>
+    rows.length > 1 ? accessories.get(rows[0].itemId) : undefined;
+
+  const gadget = pick(choices.gadgets);
+  const starPower = pick(choices.starPowers);
+  const parts = [
+    gadget ? `the ${titleCase(gadget)} gadget` : null,
+    starPower ? `the ${titleCase(starPower)} star power` : null,
+  ].filter(Boolean);
+
+  if (parts.length === 0) return null;
+  return `Most ${name} owners buy ${parts.join(' and ')} first.`;
+}
+
 /**
  * Balance changes shown, newest first.
  *
@@ -79,57 +161,103 @@ export const revalidate = 21600;
 const BALANCE_CHANGES_SHOWN = 8;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-  const brawlerId = Number(id);
+  const { slug } = await params;
+  const resolved = await resolveBrawler(slug);
+  if (resolved.kind !== 'ok') return { title: 'Brawler' };
+
+  const brawlerId = resolved.id;
   const brawler = await getBrawler(brawlerId).catch(() => undefined);
   if (!brawler) return { title: 'Brawler' };
 
   const name = titleCase(brawler.name);
-  const stat = await getBrawlerStat(brawlerId);
+  const [stat, choices] = await Promise.all([
+    brawlerStat(brawlerId),
+    abilityChoicesFor(brawlerId),
+  ]);
   const adjusted = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
 
+  const accessories = new Map(
+    [...brawler.starPowers, ...brawler.gadgets].map((a) => [a.id, a.name]),
+  );
+
   /*
-   * The flavour text used to be the description, and it carries no search
-   * intent at all — "Edgar believes nobody understands him" answers nothing
-   * anyone typed. What people want from a snippet is the number, so the number
-   * leads whenever there is one.
+   * The snippet has to answer the query in its first clause.
+   *
+   * The flavour text used to be the description and carries no search intent
+   * at all — "Edgar believes nobody understands him" answers nothing anyone
+   * typed. The query is "brock build", so the build leads, then the number
+   * that makes it more than an opinion: ours is measured across sampled
+   * players rather than voted on.
    */
-  const description =
+  const recommendation = buildSentence(name, choices, accessories);
+  const performance =
     stat && adjusted !== null
-      ? `${name} has a ${formatPercent(adjusted)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate in Brawl Stars, from ${formatNumber(stat.decidedSampleSize)} sampled battles. Best modes and maps, star powers, gadgets, gears and the most popular build.`
-      : `${name} in Brawl Stars: star powers, gadgets, gears, the most popular build and where the brawler performs best, from sampled battles.`;
+      ? `${formatPercent(adjusted)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled battles.`
+      : null;
+
+  const description =
+    [
+      recommendation,
+      performance,
+      'Gears, star powers, gadgets, best modes and maps, updated daily from real battles.',
+    ]
+      .filter(Boolean)
+      .join(' ');
 
   return {
-    // The brawler's name alone loses to every wiki and fan site. People search
-    // "shelly brawl stars", so the title carries both.
-    title: `${name}, Brawl Stars stats, build and best maps`,
+    /*
+     * Built to match the query rather than to describe the page. "Best <name>
+     * build in Brawl Stars" is what gets typed, and the month is the freshness
+     * signal every page outranking us carries — see `currentMonth`.
+     */
+    title: `Best ${name} build in Brawl Stars (${currentMonth()})`,
     description,
-    alternates: { canonical: `/brawlers/${id}` },
+    alternates: { canonical: `/brawlers/${resolved.slug}` },
     openGraph: {
-      title: `${name}, Brawl Stars stats and build`,
+      title: `${name} build and stats, ${currentMonth()}`,
       description,
     },
   };
 }
 
 export default async function BrawlerDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const brawlerId = Number(id);
+  const { slug } = await params;
+  const resolved = await resolveBrawler(slug);
 
-  if (!Number.isFinite(brawlerId)) {
+  /*
+   * A real 404, not a page that says "not found" with a 200 beside it.
+   *
+   * The slug space is unbounded — every typo and every stale link is a URL —
+   * so soft-404ing them would put an indexable page behind each one. Only for
+   * `unknown`: when the catalogue itself is unreachable, absence proves
+   * nothing and telling a crawler the brawler is gone would be a lie.
+   */
+  if (resolved.kind === 'unknown') notFound();
+
+  if (resolved.kind === 'unavailable') {
     return (
       <ErrorState
-        code="notFound"
-        title="Unknown brawler"
-        detail="That brawler id is not valid."
+        code="upstreamDown"
+        title="Brawler data unavailable"
+        detail="The brawler catalogue is not responding, so this page cannot be resolved. Try again shortly."
         backHref="/brawlers"
         backLabel="Back to brawlers"
       />
     );
   }
 
+  /*
+   * One canonical URL per brawler, permanently.
+   *
+   * A 308 rather than a canonical tag alone: the numeric paths are already
+   * indexed and shared, and consolidating them onto the slug is the point of
+   * moving. `permanentRedirect` throws, so nothing below it runs.
+   */
+  if (resolved.numeric) permanentRedirect(`/brawlers/${resolved.slug}`);
+
+  const brawlerId = resolved.id;
   const brawler = await getBrawler(brawlerId).catch(() => undefined);
 
   if (!brawler) {
@@ -145,8 +273,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   }
 
   // Sequential database reads keep the page to a single connection.
-  const stat = await getBrawlerStat(brawlerId);
-  const build = await getBrawlerBuild(brawlerId);
+  const stat = await brawlerStat(brawlerId);
+  const build = await brawlerBuild(brawlerId);
 
   // The official catalogue is the authority on which kit belongs to whom, and
   // it is also the only place gear names appear.
@@ -169,7 +297,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const buffies = await getBrawlerBuffies(brawlerId);
   // Which star power and gadget people actually buy first, from players who
   // own exactly one of the pair.
-  const abilityChoices = await getBrawlerAbilityChoices(brawlerId);
+  const abilityChoices = await abilityChoicesFor(brawlerId);
 
   // Where the brawler is strong, how it has moved, and who it beats. All three
   // degrade to empty on their own, so a missing database costs sections rather
@@ -295,7 +423,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       <JsonLd
         data={breadcrumbSchema([
           { name: 'Brawlers', path: '/brawlers' },
-          { name, path: `/brawlers/${brawlerId}` },
+          { name, path: `/brawlers/${resolved.slug}` },
         ])}
       />
       <JsonLd data={faqSchema(faq)} />

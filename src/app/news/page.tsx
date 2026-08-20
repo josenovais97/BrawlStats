@@ -3,6 +3,7 @@ import { Cog, ExternalLink, Minus, Sparkles, Star, Wrench, Zap } from 'lucide-re
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { getOfficialNews } from '@/lib/news';
 import { hasDatabase } from '@/lib/prisma';
@@ -178,7 +179,7 @@ function ChangeRow({
 
   return (
     <Link
-      href={`/brawlers/${change.brawlerId}`}
+      href={brawlerPath(change.brawlerId, change.brawlerName)}
       className="card card-interactive flex items-center gap-3 p-3"
     >
       {imageUrl ? (

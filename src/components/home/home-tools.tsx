@@ -1,7 +1,14 @@
-import { ArrowRight, Podium, Scale, Target } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { BrawlersIcon, LeaderboardIcon, MapsIcon } from '@/components/game-icons';
+import {
+  BrawlersIcon,
+  CompareIcon,
+  DraftIcon,
+  LeaderboardIcon,
+  MapsIcon,
+  TierListIcon,
+} from '@/components/game-icons';
 
 /**
  * The tools, as a toolbar rather than as six more cards.
@@ -19,14 +26,14 @@ import { BrawlersIcon, LeaderboardIcon, MapsIcon } from '@/components/game-icons
 const TOOLS = [
   {
     href: '/tier-list/ranked',
-    icon: Podium,
+    icon: TierListIcon,
     title: 'Tier lists',
     body: 'Ranked and trophy, scored apart',
     accent: '#ff5c72',
   },
   {
     href: '/draft',
-    icon: Target,
+    icon: DraftIcon,
     title: 'Draft helper',
     body: 'Counter what the enemy took',
     accent: '#35d07f',
@@ -40,7 +47,7 @@ const TOOLS = [
   },
   {
     href: '/compare',
-    icon: Scale,
+    icon: CompareIcon,
     title: 'Compare',
     body: 'Two players, side by side',
     accent: '#35d0ff',

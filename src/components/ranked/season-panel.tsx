@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Disclosure } from '@/components/ui/disclosure';
+import { brawlerPath } from '@/lib/slugs';
 import { TRIAL_BRAWLER_RULES, type SeasonState } from '@/lib/ranked-seasons';
 
 /**
@@ -124,7 +125,7 @@ export function SeasonPanel({
                 return (
                   <li key={brawler.id}>
                     <Link
-                      href={`/brawlers/${brawler.id}`}
+                      href={brawlerPath(brawler.id, brawler.name)}
                       className="card card-interactive flex h-full flex-col items-center gap-1.5 p-2.5"
                     >
                       <Image

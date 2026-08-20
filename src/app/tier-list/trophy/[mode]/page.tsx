@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { TierListView } from '@/components/tier-list/tier-list-view';
+import { currentMonth } from '@/lib/site';
 import { humanizeMode } from '@/lib/format';
 import { findBySlug, slugify } from '@/lib/slugs';
 import { getFilterableModes } from '@/lib/stats';
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const label = humanizeMode(match?.mode ?? mode);
 
   return {
-    title: `Best Brawl Stars brawlers for ${label}, Trophy tier list`,
+    title: `Best Brawl Stars brawlers for ${label}, trophy ladder (${currentMonth()})`,
     description: `Which brawlers win most in ${label}, ranked by meta score from sampled trophy-ladder battles.`,
     alternates: { canonical: `/tier-list/trophy/${slugify(match?.mode ?? mode)}` },
   };

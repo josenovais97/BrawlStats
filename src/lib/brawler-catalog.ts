@@ -1,5 +1,6 @@
 import { getBrawlers } from '@/lib/brawlapi';
 import { getOfficialBrawlers } from '@/lib/bs-api';
+import { slugify } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
 
 /**
@@ -53,6 +54,14 @@ export interface BrawlerCatalog {
   /** Withdrawn, but preserved so historical battles still render. */
   legacy: CatalogBrawler[];
   byId: Map<number, CatalogBrawler>;
+  /**
+   * Keyed by slugged name, which is what the brawler page is addressed by.
+   *
+   * `/brawlers/brock` rather than `/brawlers/16000003`: the id says nothing to
+   * a reader or to a search engine, and every competitor for "brock build"
+   * carries the name in the path.
+   */
+  bySlug: Map<string, CatalogBrawler>;
 }
 
 /** "Unknown" is a placeholder upstream, not a value. */
@@ -112,6 +121,9 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
     current: all.filter((b) => b.status === 'current'),
     legacy: all.filter((b) => b.status === 'legacy'),
     byId: new Map(all.map((b) => [b.id, b])),
+    // Later entries win on a slug collision, which cannot happen with the
+    // current roster and would resolve to the newer brawler if it ever did.
+    bySlug: new Map(all.map((b) => [slugify(b.name), b])),
   };
 }
 

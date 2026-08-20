@@ -217,6 +217,26 @@ export function CombatStatIcon({
   return <GameIcon src={`/icons/stat-${stat}.png`} alt="" className={className} />;
 }
 
+/** The tier lists. */
+export function TierListIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/tier-list.png" alt="Tier list" className={className} />;
+}
+
+/** The draft helper. */
+export function DraftIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/draft.png" alt="Draft" className={className} />;
+}
+
+/** Head-to-head comparison. */
+export function CompareIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/compare.png" alt="Compare" className={className} />;
+}
+
+/** The live event rotation. */
+export function EventsIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/events.png" alt="Events" className={className} />;
+}
+
 /** The map catalogue. */
 export function MapsIcon({ className }: IconProps) {
   return <GameIcon src="/icons/maps.png" alt="Maps" className={className} />;

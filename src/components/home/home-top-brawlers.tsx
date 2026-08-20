@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import {
@@ -58,7 +59,7 @@ export async function HomeTopBrawlers() {
         return (
           <li key={row.brawlerId}>
             <Link
-              href={`/brawlers/${row.brawlerId}`}
+              href={brawlerPath(row.brawlerId, row.brawlerName)}
               title={`${row.brawlerName}: meta score ${row.score ?? '?'} from ${formatPercent(row.normalized)} adjusted win rate and ${formatPercent(row.usageRate)} pick rate, over ${formatNumber(row.decidedSampleSize)} decided battles`}
               className="row-interactive flex items-center gap-3 border-l-2 border-transparent p-3 sm:gap-4 sm:p-3.5"
             >

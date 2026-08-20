@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BrawlerPairing, BrawlerPairings } from '@/lib/stats';
@@ -62,7 +63,7 @@ export function BrawlerMatchups({
                 return (
                   <li key={row.brawlerId}>
                     <Link
-                      href={`/brawlers/${row.brawlerId}`}
+                      href={brawlerPath(row.brawlerId, meta?.name)}
                       className="row-interactive flex items-center gap-3 px-3 py-2"
                       title={`${formatPercent(row.winRate)} win rate over ${formatNumber(row.decidedSampleSize)} sampled battles, against a ${formatPercent(pairings.baseline)} average for this brawler`}
                     >

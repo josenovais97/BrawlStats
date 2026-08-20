@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { getOfficialBrawlers } from '@/lib/bs-api';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
@@ -57,12 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({ url: `${SITE_URL}${path}`, lastModified: now, changeFrequency, priority });
   };
 
-  // Bounded (~106) and stable, so worth listing individually.
-  const brawlers = await getOfficialBrawlers()
-    .then((r) => r.items)
-    .catch(() => []);
-  for (const brawler of brawlers) {
-    add(`/brawlers/${brawler.id}`, 'weekly', 0.7);
+  /*
+   * Bounded (~106) and stable, so worth listing individually — and listed by
+   * slug, which is the canonical form. The numeric paths permanently redirect,
+   * and a sitemap full of redirects wastes the crawl it is meant to direct.
+   */
+  const catalog = await getBrawlerCatalog().catch(() => null);
+  for (const brawler of catalog?.current ?? []) {
+    add(`/brawlers/${slugify(brawler.name)}`, 'weekly', 0.8);
   }
 
   // Maps and their mode indexes: the largest indexable surface on the site,

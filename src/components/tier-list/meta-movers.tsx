@@ -2,6 +2,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/stats';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BABrawler } from '@/types/brawlapi';
@@ -147,7 +148,7 @@ function MoverList({
             return (
               <li key={mover.brawlerId}>
                 <Link
-                  href={`/brawlers/${mover.brawlerId}`}
+                  href={brawlerPath(mover.brawlerId, mover.brawlerName)}
                   className="row-interactive flex items-center gap-3 rounded-lg p-2"
                 >
                   {url ? (

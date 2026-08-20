@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatPercent } from '@/lib/format';
 import type { BABrawler } from '@/types/brawlapi';
@@ -73,7 +74,7 @@ export function ModeBestPicks({
           return (
             <li key={pick.brawlerId}>
               <Link
-                href={`/brawlers/${pick.brawlerId}`}
+                href={brawlerPath(pick.brawlerId, pick.brawlerName)}
                 title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} win rate over ${pick.decidedSampleSize} sampled ranked battles in this mode`}
                 className="group flex items-center gap-2.5 rounded-lg px-1 py-1 transition-colors hover:bg-surface-2"
               >

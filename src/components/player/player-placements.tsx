@@ -4,6 +4,7 @@ import { LeaderboardIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import type { BrawlerPlacement } from '@/types/stats';
@@ -85,7 +86,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
           return (
             <Link
               key={placement.brawlerId}
-              href={`/brawlers/${placement.brawlerId}`}
+              href={brawlerPath(placement.brawlerId, placement.brawlerName)}
               className="card card-interactive flex items-center gap-2 py-1.5 pl-1.5 pr-3"
               title={`#${placement.rank} in the world on ${placement.brawlerName}`}
             >
