@@ -29,7 +29,27 @@ export async function HomeCoverage() {
   ];
 
   return (
-    <section aria-label="Data coverage" className="card overflow-hidden">
+    /*
+      A ribbon, not a table.
+      
+      This was four icon-and-label cells inside a bordered box, which read as a
+      spec sheet. The numbers are the proof, so they get the display face at a
+      size you cannot miss, the icons drop to a quiet tint behind them, and the
+      container loses its border in favour of a translucent surface with one
+      lit top edge.
+    */
+    <section
+      aria-label="Data coverage"
+      className="relative overflow-hidden rounded-2xl bg-surface/60 backdrop-blur-sm"
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 40%, transparent), color-mix(in srgb, var(--accent) 30%, transparent), transparent)',
+        }}
+      />
       {/*
         Two columns on a phone rather than four stacked rows: these are four
         short numbers, and stacking them turns a one-line credibility strip
@@ -39,17 +59,15 @@ export async function HomeCoverage() {
         {items.map(({ icon: Icon, label, value }, index) => (
           <li
             key={label}
-            className={`flex items-center gap-2.5 p-3.5 sm:gap-3 sm:p-4 sm:px-5 ${
-              index % 2 === 1 ? 'border-l border-border' : ''
-            } ${index > 1 ? 'border-t border-border md:border-t-0' : ''} ${
-              index === 2 ? 'md:border-l md:border-border' : ''
+            className={`relative flex items-center gap-3 p-3.5 sm:p-4 sm:px-5 ${
+              index % 2 === 1 ? 'border-l border-border/60' : ''
+            } ${index > 1 ? 'border-t border-border/60 md:border-t-0' : ''} ${
+              index === 2 ? 'md:border-l md:border-border/60' : ''
             }`}
           >
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-brand sm:size-11">
-              <Icon className="size-4.5 sm:size-5" />
-            </span>
+            <Icon className="size-7 shrink-0 opacity-90 sm:size-8" />
             <div className="min-w-0">
-              <p className="display text-xl leading-none tabular-nums sm:text-2xl">
+              <p className="display text-2xl leading-none tabular-nums text-foreground sm:text-3xl">
                 {value}
               </p>
               {/*
@@ -74,7 +92,7 @@ export async function HomeCoverage() {
         `RelativeTime` so a cached page never shows a stale "20 minutes ago".
       */}
       {lastRun ? (
-        <p className="flex items-center gap-2 border-t border-border px-3.5 py-2.5 text-xs text-muted sm:px-5">
+        <p className="flex items-center gap-2 border-t border-border/60 bg-background/30 px-3.5 py-2.5 text-xs text-muted sm:px-5">
           <span className="live-dot shrink-0" />
           <span className="min-w-0">
             Last sampled{' '}

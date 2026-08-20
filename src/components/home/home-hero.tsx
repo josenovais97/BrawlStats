@@ -54,7 +54,17 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(48rem 24rem at 32% 32%, color-mix(in srgb, #8b6bff 30%, transparent), transparent 66%), radial-gradient(36rem 20rem at 78% 22%, color-mix(in srgb, #ffc53d 16%, transparent), transparent 68%), linear-gradient(180deg, transparent 55%, var(--background) 94%)',
+              /*
+               * Three lights rather than two: a purple key behind the copy, a
+               * warm rim just under the headline so the gold has something to
+               * sit on, and a cool spotlight over the cast. The linear stop at
+               * the end is what stops the wash becoming a visible band where
+               * it meets the page.
+               */
+              'radial-gradient(46rem 22rem at 26% 26%, color-mix(in srgb, #8b6bff 34%, transparent), transparent 64%),' +
+              'radial-gradient(26rem 12rem at 22% 46%, color-mix(in srgb, #ffc53d 14%, transparent), transparent 70%),' +
+              'radial-gradient(30rem 26rem at 76% 30%, color-mix(in srgb, #35d0ff 12%, transparent), transparent 66%),' +
+              'linear-gradient(180deg, transparent 52%, var(--background) 94%)',
           }}
         />
         {/*
@@ -100,14 +110,18 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             Brawl Stars stats that
             <br />
             {/*
-              A tight, bright gradient. The old one ran to `brand-strong` at
-              the bottom, which at this size rendered the last line closer to
-              brown than to gold — the darkest text on the page was the thing
-              meant to catch the eye.
+              Solid gold, not a clipped gradient.
+              
+              `display-hero` carries the game's own drop shadow, and a gradient
+              needs `text-transparent` to show through — which means that black
+              shadow was being painted *through* the glyphs. The white line
+              rendered crisp and the gold line rendered brown, and no amount of
+              tuning the gradient stops could fix it because the gradient was
+              never the problem.
+              
+              Both lines now take the same chunky in-game lettering.
             */}
-            <span className="bg-gradient-to-b from-[#ffe9a8] to-[#ffb524] bg-clip-text text-transparent">
-              show where you stand
-            </span>
+            <span className="text-brand">show where you stand</span>
           </h1>
 
           <p className="mt-3 max-w-lg leading-relaxed text-muted">
@@ -116,10 +130,32 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
           </p>
 
           {/*
-            The search panel is raised off the hero rather than sunk into it, so
-            it reads as the one thing on the page you are meant to touch first.
+            The one thing on the page you are meant to touch, lit like it.
+            
+            A gold hairline along the top edge and a warm bloom behind the
+            panel: the game's own panels are lit from above, and without it
+            this was a grey rectangle sitting on a dark page. The glow is a
+            sibling rather than a box-shadow so it can spill past the card's
+            rounded corners without being clipped by them.
           */}
-          <div className="card card-glow mt-5 border-border-strong/60 p-4 sm:p-5">
+          <div className="relative mt-5">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -inset-x-6 -bottom-6 -top-4 -z-10 rounded-[2rem] opacity-70 blur-2xl"
+              style={{
+                background:
+                  'radial-gradient(60% 60% at 30% 0%, color-mix(in srgb, #ffc53d 22%, transparent), transparent 70%)',
+              }}
+            />
+            <div className="card card-glow overflow-hidden border-border-strong/60 p-4 sm:p-5">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-px"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 70%, transparent) 30%, color-mix(in srgb, var(--brand) 45%, transparent) 70%, transparent)',
+                }}
+              />
             <SearchBar
               autoFocus
               showRecent
@@ -142,7 +178,8 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
                   </Link>
                 </p>
               }
-            />
+              />
+            </div>
           </div>
         </div>
 
