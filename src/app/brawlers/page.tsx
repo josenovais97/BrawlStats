@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { BrawlerBrowser } from '@/components/brawlers/brawler-browser';
 import { ErrorState } from '@/components/ui/error-state';
+import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 
@@ -32,19 +33,17 @@ export default async function BrawlersPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Brawlers</h1>
-        {/* The count is the playable roster, not the row count: the artwork
-            source still lists withdrawn brawlers, and they are shown here with
-            a Legacy badge rather than counted as current. */}
-        <p className="mt-2 text-muted">
-          {`All ${catalog.current.length} current brawlers, with class, rarity, star powers and gadgets${
-            catalog.legacy.length > 0
-              ? `, plus ${catalog.legacy.length} no longer playable.`
-              : '.'
-          }`}
-        </p>
-      </header>
+      {/* The count is the playable roster, not the row count: the artwork
+          source still lists withdrawn brawlers, and they are shown here with
+          a Legacy badge rather than counted as current. */}
+      <PageHeading
+        title="Brawlers"
+        subtitle={`All ${catalog.current.length} current brawlers by class and rarity, each linking to its stats, build and best maps${
+          catalog.legacy.length > 0
+            ? `. Plus ${catalog.legacy.length} no longer playable.`
+            : '.'
+        }`}
+      />
 
       <BrawlerBrowser
         brawlers={catalog.all.map((b) => ({
@@ -58,8 +57,6 @@ export default async function BrawlersPage() {
           rarityName: b.rarityName,
           rarityColor: b.rarityColor ?? '#8b95b8',
           status: b.status,
-          starPowers: b.meta?.starPowers.length ?? 0,
-          gadgets: b.meta?.gadgets.length ?? 0,
         }))}
       />
     </div>

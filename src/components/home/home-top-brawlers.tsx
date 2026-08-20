@@ -98,7 +98,7 @@ export async function HomeTopBrawlers() {
                 </p>
                 <p className="mt-1 flex items-center gap-2 text-xs text-muted">
                   <span
-                    className="rounded px-1.5 py-0.5 text-[0.625rem] font-black leading-none"
+                    className="rounded px-1.5 py-0.5 text-xs font-black leading-none"
                     style={{
                       background: `color-mix(in srgb, ${TIER_COLOR[tier]} 16%, transparent)`,
                       color: TIER_COLOR[tier],
@@ -119,7 +119,7 @@ export async function HomeTopBrawlers() {
                 >
                   {row.score?.toFixed(1) ?? '–'}
                 </p>
-                <p className="mt-1 text-[0.625rem] font-medium uppercase tracking-wider text-muted">
+                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted">
                   Meta score
                 </p>
               </div>

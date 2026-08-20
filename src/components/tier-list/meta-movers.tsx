@@ -131,7 +131,7 @@ function MoverList({
           <ArrowDownRight className="size-4" />
         )}
         {title}
-        <span className="ml-auto text-[0.625rem] font-semibold uppercase tracking-wide text-muted">
+        <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-muted">
           Meta score /10
         </span>
       </h3>
@@ -170,7 +170,7 @@ function MoverList({
                       {/* A move that crossed a tier boundary is the most
                           concrete thing that can be said about it. */}
                       {changedTier ? (
-                        <span className="shrink-0 text-[0.625rem] font-bold tabular-nums">
+                        <span className="shrink-0 text-xs font-bold tabular-nums">
                           <span style={{ color: TIER_COLOR[mover.tierBefore] }}>
                             {mover.tierBefore}
                           </span>
@@ -189,7 +189,7 @@ function MoverList({
                       {formatPercent(mover.usageBefore)} →{' '}
                       {formatPercent(mover.usageNow)} pick
                     </span>
-                    <span className="block truncate text-[0.625rem] tabular-nums text-muted">
+                    <span className="block truncate text-xs tabular-nums text-muted">
                       {formatNumber(mover.sampleSize)} decided battles
                     </span>
                   </span>
@@ -204,7 +204,7 @@ function MoverList({
                     </span>
                     {/* Not smaller than this: at 10px the decimal point in
                         "8.4 → 7.3" disappears and it reads as "84 → 73". */}
-                    <span className="block text-[0.6875rem] tabular-nums text-muted">
+                    <span className="block text-xs tabular-nums text-muted">
                       {mover.metaScoreBefore.toFixed(1)} →{' '}
                       {mover.metaScoreNow.toFixed(1)}
                     </span>

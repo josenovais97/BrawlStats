@@ -49,7 +49,7 @@ export async function HomeCoverage() {
                 does not fit on one line, and a clipped label is worse than a
                 two-line one.
               */}
-              <p className="mt-1.5 text-[0.625rem] font-medium uppercase leading-tight tracking-wide text-muted sm:text-xs">
+              <p className="mt-1.5 text-xs font-medium uppercase leading-tight tracking-wide text-muted">
                 {label}
               </p>
             </div>

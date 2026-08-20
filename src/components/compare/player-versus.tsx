@@ -194,7 +194,7 @@ function Identity({ side, align }: { side: PlayerSide; align: 'start' | 'end' })
         >
           {side.player.name}
         </span>
-        <span className="block truncate font-mono text-[0.625rem] text-muted">
+        <span className="block truncate font-mono text-xs text-muted">
           {displayTag(side.player.tag)}
         </span>
       </span>

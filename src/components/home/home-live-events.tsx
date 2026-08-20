@@ -115,7 +115,7 @@ export async function HomeLiveEvents() {
                   ) : null}
                   <div className="min-w-0 flex-1">
                     <p
-                      className="truncate text-[0.625rem] font-bold uppercase tracking-[0.14em] sm:text-[0.6875rem]"
+                      className="truncate text-xs font-bold uppercase tracking-[0.14em]"
                       style={{ color: accent }}
                     >
                       {modeName}

@@ -9,6 +9,7 @@ import {
   itemListSchema,
 } from '@/components/seo/structured-data';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
+import { Disclosure } from '@/components/ui/disclosure';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
@@ -199,38 +200,65 @@ export async function TierListView({
         </p>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{heading}</h1>
 
+        {/*
+          Two sentences, then the controls.
+          
+          This used to be two full paragraphs of methodology, which on a phone
+          put the filters and the first tier below the fold — the reader had to
+          scroll past an explanation of the ranking to reach the ranking. What
+          the numbers are and where they came from is worth two lines; how they
+          are computed is worth a disclosure, and nothing has been dropped from
+          it.
+        */}
         <p className="mt-3 max-w-3xl leading-relaxed text-muted">
-          {copy.intro} Built from{' '}
-          {sampled > 0 ? `${formatNumber(sampled)} sampled ` : 'sampled '}
+          Based on {sampled > 0 ? `${formatNumber(sampled)} sampled ` : 'sampled '}
           {copy.battles}
-          {mode ? ` in ${humanizeMode(mode)}` : ''} played by people on the{' '}
+          {mode ? ` in ${humanizeMode(mode)}` : ''} from{' '}
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
-            global leaderboard
-          </Link>
-          .{lastRun ? ` Updated ${relativeTime(lastRun.startedAt)}.` : ''}
+            global-leaderboard
+          </Link>{' '}
+          players.{lastRun ? ` Updated ${relativeTime(lastRun.startedAt)}.` : ''}
         </p>
 
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-          Brawlers are ranked by <strong className="font-semibold text-foreground">meta
-          score</strong> out of 10, which combines an adjusted win rate with a
-          log-scaled pick rate. Win rate alone would rate a brawler nobody plays the
-          same as a staple with identical results, so popularity breaks the ties.{' '}
-          {copy.caveat}{' '}
-          {/* The scale is set per format, so the same 7.4 on both pages does not
-              mean the same thing. Said plainly, rather than left for a reader to
-              discover by comparing. */}
-          The scale is calibrated within this list, so scores rank brawlers against
-          each other here and are not comparable to the{' '}
+        <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">
+          Meta score combines adjusted win rate and pick rate. Scores are relative to
+          this {format === 'ranked' ? 'Ranked' : 'trophy'} list, not the{' '}
           <Link
             href={format === 'ranked' ? '/tier-list/trophy' : '/tier-list/ranked'}
             className="font-medium text-brand hover:underline"
           >
-            {format === 'ranked' ? 'trophy list' : 'Ranked list'}
+            {format === 'ranked' ? 'trophy tier list' : 'Ranked tier list'}
           </Link>
-          . Tap or hover a brawler for the full breakdown.
+          .
         </p>
 
-        <div className="mt-5">
+        <Disclosure className="mt-2" tone="bare" summary="How the meta score works">
+          <p>
+            {copy.intro} Brawlers are ranked by{' '}
+            <strong className="font-semibold text-foreground">meta score</strong> out
+            of 10, which combines an adjusted win rate with a log-scaled pick rate.
+            Win rate alone would rate a brawler nobody plays the same as a staple with
+            identical results, so popularity breaks the ties.
+          </p>
+          <p className="mt-2">{copy.caveat}</p>
+          <p className="mt-2">
+            {/* The scale is set per format, so the same 7.4 on both pages does
+                not mean the same thing. Said plainly, rather than left for a
+                reader to discover by comparing. */}
+            The scale is calibrated within this list, so scores rank brawlers against
+            each other here and cannot be compared with the{' '}
+            <Link
+              href={format === 'ranked' ? '/tier-list/trophy' : '/tier-list/ranked'}
+              className="font-medium text-brand hover:underline"
+            >
+              {format === 'ranked' ? 'trophy list' : 'Ranked list'}
+            </Link>
+            . A brawler needs {MIN_SAMPLE_FOR_TIER} decided battles in the window
+            before it is rated at all. Tap or hover a brawler for the full breakdown.
+          </p>
+        </Disclosure>
+
+        <div className="mt-4">
           <TierListControls
             format={format}
             windowKey={windowKey}
@@ -331,7 +359,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
             <Link
               key={entry.brawlerId}
               href={`/brawlers/${entry.brawlerId}`}
-              className="group w-[86px] rounded-xl bg-surface-2 p-2 transition-transform hover:-translate-y-0.5"
+              className="group w-[92px] rounded-xl bg-surface-2 p-2 transition-transform hover:-translate-y-0.5"
               title={`${entry.brawlerName}: meta score ${entry.metaScore ?? '?'} from ${formatPercent(entry.normalizedWinRate)} adjusted win rate (${formatPercent(entry.winRate)} raw, against a ${formatPercent(entry.baselineWinRate)} average for the modes it is played in) and ${formatPercent(entry.usageRate)} pick rate, over ${formatNumber(entry.decidedSampleSize)} decided battles`}
             >
               {entry.imageUrl ? (
@@ -346,7 +374,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
               ) : (
                 <div className="mx-auto aspect-square w-full rounded-lg bg-surface" />
               )}
-              <p className="mt-1 truncate text-center text-[11px] font-semibold capitalize">
+              <p className="mt-1 truncate text-center text-xs font-semibold capitalize">
                 {entry.brawlerName.toLowerCase()}
               </p>
               {/* Score leads, because it is what the ordering uses. The two
@@ -354,7 +382,7 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
               <p className="text-center text-sm font-black tabular-nums" style={{ color }}>
                 {entry.metaScore?.toFixed(1) ?? '–'}
               </p>
-              <p className="text-center text-[10px] tabular-nums text-muted">
+              <p className="text-center text-xs tabular-nums text-muted">
                 {formatPercent(entry.normalizedWinRate)} · {formatPercent(entry.usageRate)}
               </p>
             </Link>

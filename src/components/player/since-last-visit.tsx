@@ -93,7 +93,7 @@ export function SinceLastVisit({
           <History className="size-3.5" />
           Since your last visit
         </p>
-        <p className="text-[0.625rem] text-muted">
+        <p className="text-xs text-muted">
           {delta.days === 1 ? '1 day ago' : `${delta.days} days ago`} · kept in this
           browser only
         </p>
@@ -104,7 +104,7 @@ export function SinceLastVisit({
       <dl className="flex flex-wrap gap-x-6 gap-y-3 px-4 py-3">
         {rows.map((row) => (
           <div key={row.label}>
-            <dt className="text-[0.625rem] uppercase tracking-wide text-muted">
+            <dt className="text-xs uppercase tracking-wide text-muted">
               {row.label}
             </dt>
             <dd

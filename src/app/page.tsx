@@ -9,8 +9,8 @@ import { HomeHero } from '@/components/home/home-hero';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeProfileDepth } from '@/components/home/home-profile-depth';
 import { HomeSection } from '@/components/home/home-section';
+import { HomeTools } from '@/components/home/home-tools';
 import { HomeTopBrawlers } from '@/components/home/home-top-brawlers';
-import { HomeValueProps } from '@/components/home/home-value-props';
 import { TopPlayersPreview } from '@/components/home/top-players-preview';
 import { RankedListSkeleton, Skeleton } from '@/components/ui/skeletons';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -51,9 +51,23 @@ const WEBSITE_SCHEMA = {
   },
 };
 
+/*
+ * Order is the whole design here.
+ *
+ * Search first, then anything the visitor already has (saved profiles), then
+ * live data, then the tools, then the pitch. The page used to run the pitch
+ * before the product: two full sections of prose sat between the hero and the
+ * first real number, so the things that prove the site works were the things
+ * you had to scroll past marketing to reach.
+ *
+ * Nothing was added to fix that. The six "why BrawlZone" cards became a
+ * six-cell toolbar and the four prose cards became four lines beside a link to
+ * a real profile, which is why the page is shorter than it was despite showing
+ * the same content.
+ */
 export default function HomePage() {
   return (
-    <div className="space-y-16 sm:space-y-20 lg:space-y-24">
+    <div className="space-y-12 sm:space-y-14 lg:space-y-16">
       <script
         type="application/ld+json"
         // Static object, no user input, so there is nothing to escape here.
@@ -68,14 +82,9 @@ export default function HomePage() {
         }
       />
 
+      {/* Renders nothing until the visitor has saved someone, so a first-time
+          view goes straight from the search box to live data. */}
       <FavoritesList />
-
-      <HomeValueProps />
-
-      {/* Straight after the value props: those say what the site covers, this
-          says what the visitor personally gets, which is the thing that makes
-          them type a tag rather than bounce. */}
-      <HomeProfileDepth />
 
       <HomeSection
         id="live-now"
@@ -103,11 +112,15 @@ export default function HomePage() {
         </Suspense>
       </HomeSection>
 
+      <HomeTools />
+
+      <HomeProfileDepth />
+
       {/*
         Meta and leaderboard sit side by side on desktop: they are the same
         shape (a short ranked list) and reading them as a pair is the point.
       */}
-      <div className="grid gap-16 sm:gap-20 lg:grid-cols-2 lg:gap-8">
+      <div className="grid gap-12 sm:gap-14 lg:grid-cols-2 lg:gap-8">
         <HomeSection
           id="top-meta"
           eyebrow="Brawler meta"

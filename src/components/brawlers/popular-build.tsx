@@ -110,7 +110,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {groups.map(({ title, node, options, note }) => {
         if (options.length === 0) return null;
 
@@ -158,7 +158,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                         <span className="truncate text-sm font-medium capitalize">
                           {name.toLowerCase()}
                           {index === 0 && options.length > 1 && leadMargin > 0.1 ? (
-                            <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-[10px] font-bold uppercase text-brand">
+                            <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">
                               Most picked
                             </span>
                           ) : null}

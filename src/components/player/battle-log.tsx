@@ -251,7 +251,7 @@ function Lineup({
                             />
                           ) : null}
                         </span>
-                        <span className="block truncate text-[0.6875rem] capitalize text-muted">
+                        <span className="block truncate text-xs capitalize text-muted">
                           {brawler ? brawler.name.toLowerCase() : 'Unknown brawler'}
                           {brawler?.power ? ` · power ${brawler.power}` : ''}
                         </span>

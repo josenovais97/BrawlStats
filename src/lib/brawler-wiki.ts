@@ -281,3 +281,74 @@ export async function getGearDescriptions(): Promise<Map<string, string>> {
 
   return out;
 }
+
+/* ------------------------------ stat labelling ----------------------------- */
+
+/**
+ * Display labels for the two damage rows, guaranteed to be different.
+ *
+ * The infobox labels the main attack and the Super independently, and for a
+ * large part of the roster it gives them the *same* words: Colt's box says
+ * "Damage per bullet" for both, because both fire bullets. Printed as-is, the
+ * combat grid shows "Damage per bullet 360" next to "Damage per bullet 320",
+ * two different statistics wearing one name.
+ *
+ * The fix is not a per-brawler table. The wiki's own wording already carries
+ * the attack type — bullet, shell, projectile, hit, blade — and that is the
+ * part worth keeping, so this only qualifies *whose* damage it is:
+ *
+ *   Colt      "Damage per bullet" / "Damage per bullet"
+ *             -> "Main attack damage per bullet" / "Super damage per bullet"
+ *   Shelly    "Damage per shell"  / "Damage per shell"
+ *             -> "Main attack damage per shell"  / "Super damage per shell"
+ *   Poco      "Damage"            / "Healing"
+ *             -> "Damage"                        / "Super healing"
+ *
+ * The Super row is always marked as the Super, since "Healing" alone in a grid
+ * of six numbers does not say which half of the kit it belongs to. The attack
+ * row is only qualified when it would otherwise collide, so brawlers whose two
+ * labels already differ keep the wiki's shorter wording.
+ */
+export function combatStatLabels(
+  attackLabel: string | null | undefined,
+  superLabel: string | null | undefined,
+): { attack: string; super: string } {
+  const attackBase = tidyLabel(attackLabel) ?? 'Attack';
+  const superBase = tidyLabel(superLabel) ?? 'Super';
+
+  // "Super damage" from the wiki must not become "Super super damage".
+  let sup = /^super\b/i.test(superBase) ? superBase : `Super ${lowerFirst(superBase)}`;
+  let attack =
+    sameLabel(attackBase, superBase) && !/^main attack\b/i.test(attackBase)
+      ? `Main attack ${lowerFirst(attackBase)}`
+      : attackBase;
+
+  // Belt and braces. Whatever the wiki puts in those two fields, these two
+  // rows cannot leave here sharing a label — that is the bug this exists for.
+  if (sameLabel(attack, sup)) {
+    attack = `Main attack ${lowerFirst(attack)}`;
+    sup = `Super ${lowerFirst(sup)}`;
+  }
+
+  return { attack, super: sup };
+}
+
+/** Trimmed, or null when the field is missing or empty. */
+function tidyLabel(value: string | null | undefined): string | null {
+  const text = value?.replace(/\s+/g, ' ').trim();
+  return text ? text : null;
+}
+
+/** Compares labels the way a reader does: case and spacing do not distinguish. */
+function sameLabel(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+/**
+ * "Damage per bullet" -> "damage per bullet", so it reads as one phrase once
+ * prefixed. Acronyms and already-lowercase words are left alone.
+ */
+function lowerFirst(value: string): string {
+  if (/^[A-Z]{2,}/.test(value)) return value;
+  return value.charAt(0).toLowerCase() + value.slice(1);
+}

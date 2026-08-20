@@ -107,7 +107,7 @@ function FormatTabs({
             <span className="text-left leading-tight">
               <span className="block text-sm font-bold">{label}</span>
               <span
-                className={`block text-[0.6875rem] font-semibold ${
+                className={`block text-xs font-semibold ${
                   current ? 'text-brand-ink/70' : 'text-muted/70'
                 }`}
               >
@@ -157,7 +157,7 @@ function WindowTabs({
           >
             {label}
             <span
-              className={`text-[0.6875rem] font-bold ${
+              className={`text-xs font-bold ${
                 current ? 'text-muted' : 'text-muted/70'
               }`}
             >

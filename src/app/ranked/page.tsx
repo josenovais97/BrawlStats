@@ -5,12 +5,13 @@ import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
 import { SeasonPanel } from '@/components/ranked/season-panel';
+import { Disclosure } from '@/components/ui/disclosure';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
 import { slugify } from '@/lib/slugs';
-import { getRankedMapPicks } from '@/lib/stats';
+import { getLastAggregationRun, getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 
@@ -31,7 +32,7 @@ const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
 };
 
 export default async function RankedPage() {
-  const [maps, mapMeta, modeMeta, brawlerMeta, season] = await Promise.all([
+  const [maps, mapMeta, modeMeta, brawlerMeta, season, lastRun] = await Promise.all([
     getRankedMapPicks(3),
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
@@ -48,6 +49,7 @@ export default async function RankedPage() {
         source: 'fallback',
       }),
     ),
+    getLastAggregationRun(),
   ]);
 
   // Grouped by mode so the page reads like the in-game rotation rather than a
@@ -72,48 +74,83 @@ export default async function RankedPage() {
   const totalSamples = maps.reduce((sum, m) => sum + m.sampleSize, 0);
   const baseline = maps[0]?.baselineWinRate ?? 0;
   const rated = maps.filter((m) => m.picks.length > 0).length;
+  const seasonNumber = (season.current ?? season.next ?? season.latest)?.number ?? null;
+
+  // In-page navigation, so a visitor after one mode does not scroll past five.
+  const modeNav = [...byMode].map(([mode, list]) => {
+    const meta = modeMeta.get(mode.toLowerCase());
+    return {
+      mode,
+      label: meta?.name ?? humanizeMode(mode),
+      icon: meta?.imageUrl,
+      color: meta?.color ?? '#8b95b8',
+      count: list.length,
+    };
+  });
 
   return (
     <div className="space-y-10">
+      {/*
+        Answer first.
+        
+        The page opened with two paragraphs of scoring methodology and then a
+        full-height season panel, so on a phone the first actual recommendation
+        was three screens down. Everything is still here — the sentence, the
+        counts, the season, the methodology — but in the order the visit
+        happens: what this is, how much evidence is behind it, which mode, then
+        the picks.
+      */}
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <Swords className="size-3.5" />
           Competitive only
         </p>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Ranked maps</h1>
-        <p className="mt-3 max-w-3xl leading-relaxed text-muted">
-          The strongest brawlers on each map in the Ranked rotation, from{' '}
-          {formatNumber(totalSamples)} sampled Ranked battles. Trophy-ladder games are
-          excluded entirely: Ranked matchmaking pairs comparable opponents, so what is
-          left reflects the brawler rather than who was holding it.
+        <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">
+          The strongest brawlers on each map in the current Ranked rotation, from
+          sampled competitive battles only.
         </p>
-        {maps.length > 0 ? (
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted">
-            Every map is scored against the same {formatPercent(baseline)} sample-wide
-            Ranked average, and each brawler&rsquo;s handful of battles here is weighed
-            against its overall Ranked form. A map needs real evidence to move a
-            brawler off that. {rated} of {maps.length} maps have enough to name a pick
-            so far.
-          </p>
-        ) : null}
+
+        {/* Everything needed to judge the numbers below, on one line. */}
+        <ul className="mt-4 flex flex-wrap items-center gap-1.5">
+          <Fact tone="brand">{formatNumber(totalSamples)} Ranked battles</Fact>
+          {lastRun ? <Fact>Updated {relativeTime(lastRun.startedAt)}</Fact> : null}
+          {seasonNumber !== null ? <Fact>Season {seasonNumber}</Fact> : null}
+          {maps.length > 0 ? (
+            <Fact>
+              {rated} of {maps.length} maps well enough sampled to name a pick
+            </Fact>
+          ) : null}
+        </ul>
       </header>
 
-      {/* Above the maps: which season it is decides which maps are even in the
-          pool, so it is context for everything below rather than a footnote. */}
-      <SeasonPanel
-        state={season}
-        mapHref={(mode, map) => {
-          // Wiki names are the game's display names, which slug to the same
-          // segments our own map routes use — but only link the ones we can
-          // actually resolve, so a renamed or retired map is plain text
-          // rather than a 404.
-          const match = activeMaps.find(
-            (entry) =>
-              entry.mapSlug === slugify(map) && entry.modeSlug === slugify(mode),
-          );
-          return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
-        }}
-      />
+      {modeNav.length > 1 ? (
+        <nav aria-label="Jump to a mode" className="-mx-4 px-4 sm:mx-0 sm:px-0">
+          <ul className="flex gap-2 overflow-x-auto pb-1">
+            {modeNav.map(({ mode, label, icon, count, color }) => (
+              <li key={mode}>
+                <a
+                  href={`#mode-${mode}`}
+                  className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-3 text-sm font-semibold transition-colors hover:border-brand/50"
+                >
+                  {icon ? (
+                    <Image
+                      src={icon}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="size-5 shrink-0 object-contain"
+                      unoptimized
+                    />
+                  ) : null}
+                  <span style={{ color }}>{label}</span>
+                  <span className="text-xs tabular-nums text-muted">{count}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
 
       {maps.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
@@ -136,11 +173,13 @@ export default async function RankedPage() {
           const accent = meta?.color ?? '#8b95b8';
 
           return (
-            <section key={mode} aria-labelledby={`mode-${mode}`}>
-              <h2
-                id={`mode-${mode}`}
-                className="display mb-4 flex items-center gap-2.5 text-2xl uppercase sm:text-3xl"
-              >
+            <section
+              key={mode}
+              aria-labelledby={`mode-${mode}`}
+              id={`mode-${mode}`}
+              className="scroll-anchor"
+            >
+              <h2 className="display mb-4 flex items-center gap-2.5 text-2xl uppercase sm:text-3xl">
                 {meta?.imageUrl ? (
                   <Image
                     src={meta.imageUrl}
@@ -172,7 +211,71 @@ export default async function RankedPage() {
           );
         })
       )}
+
+      {/* Context, after the answer rather than in front of it. Which season it
+          is decides which maps are in the pool at all, so it stays on the page
+          — it just no longer costs a screen to get past. */}
+      <SeasonPanel
+        state={season}
+        mapHref={(mode, map) => {
+          // Wiki names are the game's display names, which slug to the same
+          // segments our own map routes use — but only link the ones we can
+          // actually resolve, so a renamed or retired map is plain text rather
+          // than a 404.
+          const match = activeMaps.find(
+            (entry) =>
+              entry.mapSlug === slugify(map) && entry.modeSlug === slugify(mode),
+          );
+          return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
+        }}
+      />
+
+      <Disclosure summary="How these picks are chosen">
+        <p>
+          Trophy-ladder games are excluded entirely. Ranked matchmaking pairs
+          comparable opponents, so what is left reflects the brawler rather than who
+          was holding it, and Ranked has carried no modifiers since the February 2025
+          rework &mdash; every battle counted here is the plain mode on the plain map.
+        </p>
+        {maps.length > 0 ? (
+          <p className="mt-2">
+            Every map is scored against the same {formatPercent(baseline)} sample-wide
+            Ranked average, and each brawler&rsquo;s handful of battles on one map is
+            weighed against its overall Ranked form. A map needs real evidence to move
+            a brawler off that.
+            {rated < maps.length
+              ? ` ${maps.length - rated} of ${maps.length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.`
+              : ''}
+          </p>
+        ) : null}
+        <p className="mt-2">
+          Map names are recorded on newly sampled battles only, and a battle log
+          reaches back about 25 matches, so a map that has just entered the rotation
+          fills in over the following day or two.
+        </p>
+      </Disclosure>
     </div>
+  );
+}
+
+/** One fact from the data row under the title. */
+function Fact({
+  children,
+  tone = 'plain',
+}: {
+  children: React.ReactNode;
+  tone?: 'plain' | 'brand';
+}) {
+  return (
+    <li
+      className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold ${
+        tone === 'brand'
+          ? 'bg-brand/15 text-brand'
+          : 'border border-border bg-surface-2/60 text-muted'
+      }`}
+    >
+      {children}
+    </li>
   );
 }
 
@@ -222,7 +325,7 @@ function MapCard({
               thing on the card, and right now every map carries one. It picks
               up the mode colour once the map has earned it. */}
           <span
-            className="shrink-0 rounded-md px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide"
+            className="shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide"
             style={
               map.confidence === 'low'
                 ? { color: 'var(--muted)', background: 'var(--surface-2)' }
@@ -232,7 +335,7 @@ function MapCard({
             {CONFIDENCE_LABEL[map.confidence]}
           </span>
         </div>
-        <p className="mt-1.5 text-[0.625rem] uppercase tracking-wide text-muted">
+        <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">
           {formatNumber(map.sampleSize)} ranked battles · {map.brawlersSeen} brawlers
           seen
         </p>
@@ -262,7 +365,7 @@ function MapCard({
                   title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} raw win rate over ${pick.decidedSampleSize} sampled Ranked battles on this map, against ${formatPercent(pick.overallScore)} adjusted form over ${formatNumber(pick.overallSampleSize)} Ranked battles overall`}
                   className="row-interactive flex items-center gap-2.5 px-3.5 py-2"
                 >
-                  <span className="w-3 shrink-0 text-center text-[0.625rem] font-black tabular-nums text-muted">
+                  <span className="w-3 shrink-0 text-center text-xs font-black tabular-nums text-muted">
                     {index + 1}
                   </span>
                   <Image
@@ -280,7 +383,7 @@ function MapCard({
                     </span>
                     {/* Sample size is never hidden: on a per-map split it is
                         the difference between a signal and a coin flip. */}
-                    <span className="block text-[0.625rem] tabular-nums text-muted">
+                    <span className="block text-xs tabular-nums text-muted">
                       {pick.decidedSampleSize} battles here
                     </span>
                   </span>
@@ -297,7 +400,7 @@ function MapCard({
                         generally, and hiding that half of the comparison was
                         what made the column unreadable. */}
                     <span
-                      className={`block text-[0.625rem] tabular-nums ${
+                      className={`block text-xs tabular-nums ${
                         edge >= 0.005 ? 'text-victory/80' : 'text-muted'
                       }`}
                     >

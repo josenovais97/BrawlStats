@@ -13,6 +13,13 @@ export interface RecentSearch {
   /** Normalised, without the leading "#". */
   tag: string;
   name?: string;
+  /**
+   * Profile-icon id for a player, badge id for a club.
+   *
+   * Optional, and read as optional: entries written before this existed are
+   * still valid and simply render the fallback glyph.
+   */
+  icon?: number;
   /** Epoch milliseconds of the most recent visit. */
   at: number;
 }

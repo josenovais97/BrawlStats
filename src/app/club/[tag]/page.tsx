@@ -71,6 +71,7 @@ export default async function ClubPage({ params }: PageProps) {
         kind="club"
         tag={normalizeTag(club.tag)}
         name={club.name}
+        icon={club.badgeId}
       />
       <header className="card card-glow relative overflow-hidden">
         <div

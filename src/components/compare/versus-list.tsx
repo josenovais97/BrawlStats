@@ -65,7 +65,7 @@ export function VersusList({
           <dl className="card divide-y divide-border overflow-hidden">
             {/* Sticky within its own card so the reader never loses track of
                 which column is whom while scanning a long section. */}
-            <div className="sticky top-0 z-10 grid grid-cols-2 gap-2 bg-surface-2/95 px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-wide backdrop-blur">
+            <div className="sticky top-0 z-10 grid grid-cols-2 gap-2 bg-surface-2/95 px-3 py-1.5 text-xs font-bold uppercase tracking-wide backdrop-blur">
               <span className="truncate" style={{ color: accentA }}>
                 {labelA}
               </span>
@@ -94,7 +94,7 @@ export function VersusList({
                   </span>
                 </dd>
                 {metric.hint ? (
-                  <p className="mt-0.5 text-[0.625rem] leading-snug text-muted">
+                  <p className="mt-0.5 text-xs leading-snug text-muted">
                     {metric.hint}
                   </p>
                 ) : null}

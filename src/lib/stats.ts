@@ -1761,54 +1761,6 @@ export async function getBrawlerBuffies(
   }
 }
 
-/**
- * Share of sampled owners who have unlocked this brawler's hypercharge.
- *
- * Returns null rather than zero when nobody has one recorded, because the two
- * are genuinely different and only one of them is a fact: hypercharge
- * ownership started being recorded later than the rest of the loadout, so a
- * flat zero usually means "measured before we tracked it", not "nobody owns
- * it". Guarding on that is what keeps a newly added column from printing 0% on
- * every brawler for a day.
- *
- * Unlike a buffie, this one is worth a percentage: a hypercharge is bought and
- * plenty of owners have not, so the share says something about the brawler's
- * investment curve rather than about how long the feature has existed.
- */
-export async function getHyperChargeOwnership(
-  brawlerId: number,
-  windowDays = 7,
-): Promise<number | null> {
-  const prisma = getPrisma();
-  if (!prisma) return null;
-
-  try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
-
-    // One vote per player, from their most recent snapshot — matching how
-    // buffies and skins are counted.
-    const rows = await prisma.$queryRaw<{ owners: bigint; with_hyper: bigint }[]>`
-      WITH latest AS (
-        SELECT DISTINCT ON (player_tag) player_tag, hyper_charge_ids
-        FROM player_brawler_snapshots
-        WHERE brawler_id = ${brawlerId} AND snapshot_date >= ${since}
-        ORDER BY player_tag, snapshot_date DESC
-      )
-      SELECT COUNT(*) AS owners,
-             COUNT(*) FILTER (WHERE cardinality(hyper_charge_ids) > 0) AS with_hyper
-      FROM latest
-    `;
-
-    const owners = Number(rows[0]?.owners ?? 0);
-    const withHyper = Number(rows[0]?.with_hyper ?? 0);
-    if (owners === 0 || withHyper === 0) return null;
-
-    return withHyper / owners;
-  } catch {
-    return null;
-  }
-}
-
 /* ----------------------- per-brawler meta breakdowns ---------------------- */
 
 /**

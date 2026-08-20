@@ -79,7 +79,7 @@ export function BrawlerMatchups({
                         <span className="block truncate text-sm font-semibold capitalize">
                           {(meta?.name ?? `#${row.brawlerId}`).toLowerCase()}
                         </span>
-                        <span className="block text-[0.625rem] tabular-nums text-muted">
+                        <span className="block text-xs tabular-nums text-muted">
                           {formatNumber(row.decidedSampleSize)} battles
                         </span>
                       </span>

@@ -1,8 +1,11 @@
+import { ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { SearchBar } from '@/components/search-bar';
 import { brawlerModelUrl } from '@/lib/brawlapi';
+import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 
 /**
  * Landing hero.
@@ -85,25 +88,41 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             <span className="eyebrow text-brand">Live Brawl Stars data</span>
           </span>
 
-          <h1 className="display-hero mt-5 text-balance text-[2.75rem] uppercase leading-[0.92] sm:text-6xl md:text-5xl lg:text-6xl xl:text-[4.5rem]">
-            Know exactly
+          <h1 className="display-hero mt-5 text-balance text-[2.5rem] uppercase leading-[0.94] sm:text-5xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-6xl">
+            Brawl Stars stats that
             <br />
             <span className="bg-gradient-to-b from-brand via-brand to-brand-strong bg-clip-text text-transparent">
-              where you stand
+              show where you stand
             </span>
           </h1>
 
-          <p className="mt-5 max-w-2xl text-balance text-base leading-relaxed text-muted sm:text-lg">
-            Track trophies, rankings, progression and performance for any Brawl Stars
-            player or club, in seconds.
+          <p className="mt-4 max-w-xl text-balance leading-relaxed text-muted">
+            One tag gives you a skill score out of 10, your roster read against the
+            live meta, and your progression tracked over time.
           </p>
 
           {/*
             The search panel is raised off the hero rather than sunk into it, so
             it reads as the one thing on the page you are meant to touch first.
           */}
-          <div className="card card-glow mt-8 border-border-strong/60 p-4 sm:p-6">
+          <div className="card card-glow mt-7 border-border-strong/60 p-4 sm:p-6">
             <SearchBar autoFocus showRecent size="hero" />
+
+            {/*
+              For the visitor who has not got a tag to hand. It opens a real
+              profile rather than a mock-up, which is the only way to show what
+              a lookup returns without inventing numbers for it.
+            */}
+            <p className="mt-4 border-t border-border pt-3.5 text-sm text-muted">
+              Haven&rsquo;t got a tag handy?{' '}
+              <Link
+                href={`/player/${SAMPLE_PLAYER_TAG}`}
+                className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
+              >
+                Try a sample profile
+                <ArrowUpRight className="size-3.5" />
+              </Link>
+            </p>
           </div>
         </div>
 

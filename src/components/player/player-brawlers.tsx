@@ -174,7 +174,7 @@ function BrawlerTile({
           not compete with the power badge or the name. */}
       {tier ? (
         <span
-          className="absolute right-2 top-2 z-10 grid size-5 place-items-center rounded text-[0.625rem] font-black"
+          className="absolute right-2 top-2 z-10 grid size-5 place-items-center rounded text-xs font-black"
           style={{
             color: TIER_COLOR[tier],
             background: `color-mix(in srgb, ${TIER_COLOR[tier]} 22%, var(--surface))`,
@@ -204,7 +204,7 @@ function BrawlerTile({
             most brawlers on most accounts. */}
         {prestige > 0 ? (
           <span
-            className="absolute left-0 top-0 rounded-md bg-surface-3 px-1.5 py-0.5 text-[0.625rem] font-black text-accent"
+            className="absolute left-0 top-0 rounded-md bg-surface-3 px-1.5 py-0.5 text-xs font-black text-accent"
             title={`Prestige ${prestige}`}
           >
             P{prestige}
@@ -229,7 +229,7 @@ function BrawlerTile({
 
       {/* Only when it is actually off peak. A "−0" under every maxed brawler
           would be noise on 106 tiles. */}
-      <p className="mt-1 text-center text-[11px] tabular-nums text-muted">
+      <p className="mt-1 text-center text-xs tabular-nums text-muted">
         {gap > 0 ? (
           <span title={`Peak ${formatNumber(brawler.highestTrophies)}`}>
             −{formatNumber(gap)} off peak
@@ -241,7 +241,7 @@ function BrawlerTile({
 
       {streak > 0 ? (
         <p
-          className="mt-0.5 flex items-center justify-center gap-1 text-[11px] tabular-nums text-muted"
+          className="mt-0.5 flex items-center justify-center gap-1 text-xs tabular-nums text-muted"
           title={`Best win streak ${streak}${onStreak > 0 ? `, currently on ${onStreak}` : ''}`}
         >
           <Flame className={`size-3 ${onStreak > 0 ? 'text-defeat' : 'text-muted'}`} />
@@ -251,7 +251,7 @@ function BrawlerTile({
         </p>
       ) : null}
 
-      <div className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted">
+      <div className="mt-2 flex items-center justify-center gap-1 text-xs text-muted">
         <span title="Star powers">{brawler.starPowers.length} SP</span>
         <span aria-hidden>·</span>
         <span title="Gadgets">{brawler.gadgets.length} GD</span>

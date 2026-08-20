@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
+import { Disclosure } from '@/components/ui/disclosure';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { AbilityChoice, BrawlerAbilityChoices } from '@/lib/stats';
 import type { BAAccessory } from '@/types/brawlapi';
@@ -20,6 +21,21 @@ import type { BAAccessory } from '@/types/brawlapi';
  * are a handful who never bought the second. The confidence chip carries that
  * difference rather than the section appearing and vanishing between brawlers.
  */
+/**
+ * Whether there is a preference worth showing at all.
+ *
+ * Exported so the surrounding layout can decide how many columns it needs
+ * without rendering the component to find out — on a long-established brawler
+ * nearly every owner has both options, which leaves no first-buyers to
+ * measure, and a half-empty two-column row is the visible result.
+ */
+export function hasAbilityChoices(choices: BrawlerAbilityChoices | null): boolean {
+  return (
+    choices !== null &&
+    (choices.starPowers.length > 1 || choices.gadgets.length > 1)
+  );
+}
+
 export function AbilityChoices({
   choices,
   starPowers,
@@ -47,7 +63,7 @@ export function AbilityChoices({
   // Never filtered away: both blocks always render so the page has the same
   // shape on every brawler, and one with too few first-buyers says so instead
   // of silently disappearing.
-  if (groups.every((group) => group.rows.length < 2)) return null;
+  if (!hasAbilityChoices(choices)) return null;
 
   const label = {
     high: 'Well sampled',
@@ -56,7 +72,7 @@ export function AbilityChoices({
   }[choices.confidence];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {groups.map(({ title, node, rows, items }) => {
         const leader = rows[0] as AbilityChoice | undefined;
         const byId = new Map(items.map((item) => [item.id, item]));
@@ -71,7 +87,7 @@ export function AbilityChoices({
               {/* Quiet at "low", the same treatment the map cards use: a caveat
                   should not be the loudest thing on the card. */}
               <span
-                className={`shrink-0 rounded-md px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide ${
+                className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
                   choices.confidence === 'low'
                     ? 'bg-surface-2 text-muted'
                     : 'bg-brand/15 text-brand'
@@ -81,7 +97,7 @@ export function AbilityChoices({
               </span>
             </div>
             <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
-              Among players who own only one so far.
+              Among owners who have only one so far.
             </p>
 
             {rows.length > 1 ? (
@@ -105,15 +121,21 @@ export function AbilityChoices({
         );
       })}
 
-      <p className="text-xs leading-relaxed text-muted">
-        From {formatNumber(choices.sampleSize)} tracked players who own one of the pair.
-        Win rates are their own battles on this brawler, so both sides are equally
-        invested and the gap between them is the ability rather than the player. Read
-        the two rates against each other rather than as absolutes.
+      {/* The methodology is worth keeping and is not worth three paragraphs
+          above the numbers it explains. */}
+      <Disclosure
+        tone="bare"
+        summary={`Read from ${formatNumber(choices.sampleSize)} first-buyers`}
+      >
+        Counted from tracked players who own exactly one of the pair: they chose it,
+        and every battle they played on this brawler was played with it. Both sides
+        are equally invested in the brawler, so the gap between the two win rates is
+        the ability rather than the player &mdash; read them against each other
+        rather than as absolutes.
         {choices.confidence === 'low'
           ? ' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.'
           : ''}
-      </p>
+      </Disclosure>
     </div>
   );
 }
@@ -148,7 +170,7 @@ function Row({
           <span className="truncate text-sm font-medium capitalize">
             {(item?.name ?? `#${row.itemId}`).toLowerCase()}
             {isLeader ? (
-              <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase text-brand">
+              <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">
                 Most picked
               </span>
             ) : null}

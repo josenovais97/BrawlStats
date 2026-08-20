@@ -242,7 +242,7 @@ function Row({
           </span>
           {tier ? (
             <span
-              className="grid size-5 place-items-center rounded text-[0.625rem] font-black"
+              className="grid size-5 place-items-center rounded text-xs font-black"
               style={{
                 color: TIER_COLOR[tier],
                 background: `color-mix(in srgb, ${TIER_COLOR[tier]} 20%, transparent)`,

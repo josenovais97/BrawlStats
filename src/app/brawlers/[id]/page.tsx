@@ -5,30 +5,22 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
-import { AbilityChoices } from '@/components/brawlers/ability-choices';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
-import { PopularBuild } from '@/components/brawlers/popular-build';
+import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
-import {
-  BuffieIcon,
-  GadgetIcon,
-  GearIcon,
-  HyperchargeIcon,
-  StarPowerIcon,
-} from '@/components/game-icons';
-import { gearIconUrl, getBrawler, getBrawlerMap } from '@/lib/brawlapi';
+import { getBrawler, getBrawlerMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
+  combatStatLabels,
   getBrawlerWiki,
   getGearDescriptions,
   wikiPageUrl,
-  type BrawlerWiki,
 } from '@/lib/brawler-wiki';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps } from '@/lib/game-maps';
@@ -45,7 +37,6 @@ import {
   getBrawlerSplits,
   getBrawlerStat,
   getBrawlerTrend,
-  getHyperChargeOwnership,
   getMetaIndex,
   normalizeWinRate,
 } from '@/lib/stats';
@@ -173,7 +164,6 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Which star power and gadget people actually buy first, from players who
   // own exactly one of the pair.
   const abilityChoices = await getBrawlerAbilityChoices(brawlerId);
-  const hyperChargeOwnership = await getHyperChargeOwnership(brawlerId);
 
   // Where the brawler is strong, how it has moved, and who it beats. All three
   // degrade to empty on their own, so a missing database costs sections rather
@@ -228,6 +218,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       ? brawler.rarity.name
       : null) ?? wiki?.stats.rarityName ?? null;
   const isLegacy = catalogEntry?.status === 'legacy';
+  const statLabels = combatStatLabels(wiki?.stats.attackLabel, wiki?.stats.superLabel);
 
   // A buffie is named for the ability type it upgrades, so each one is listed
   // against the gadget or star power it actually changes.
@@ -324,14 +315,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             background: `radial-gradient(120% 90% at 12% 0%, color-mix(in srgb, ${accent} 26%, transparent) 0%, transparent 62%)`,
           }}
         />
-        <div className="relative flex flex-wrap items-center gap-6 p-6">
+        <div className="relative flex flex-wrap items-center gap-5 p-5 sm:gap-6 sm:p-6">
           <Image
             src={brawler.imageUrl}
             alt={brawler.name}
             width={144}
             height={144}
             sizes="(max-width: 640px) 128px, 144px"
-            className="size-32 shrink-0 rounded-2xl object-contain sm:size-36"
+            className="size-28 shrink-0 rounded-2xl object-contain sm:size-36"
             style={{
               background: `color-mix(in srgb, ${accent} 14%, transparent)`,
               boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 28%, transparent)`,
@@ -340,8 +331,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             unoptimized
           />
 
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
+          {/*
+            `basis` is what keeps the pills readable on a phone: below about
+            15rem of space the whole text column wraps under the portrait and
+            gets the full card width, instead of four pills queueing up in the
+            160px left beside a 112px portrait.
+          */}
+          <div className="min-w-0 flex-1 basis-60">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span
                 className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
                 style={{
@@ -364,31 +361,44 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   {className}
                 </span>
               ) : null}
+              {/*
+                Tier and score are two facts and used to be one pill reading
+                "C tier 4.8", which asks the reader to work out what the number
+                measures and how it relates to the letter. Split, and the score
+                says what it is: 4.8 out of 10 is a meta score, not a rating
+                anyone gave this brawler out of five.
+              */}
               {tier ? (
                 <span
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
+                  className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
                   style={{
                     background: `color-mix(in srgb, ${TIER_COLOR[tier]} 20%, transparent)`,
                     color: TIER_COLOR[tier],
                   }}
                 >
                   {tier} tier
-                  {/* The score the tier is assigned from, on the card rather
-                      than three sections down: it is what the tier lists rank
-                      by, and a bare letter hides how close the call was. */}
-                  {metaScore !== null ? (
-                    <span className="tabular-nums opacity-80">
-                      {metaScore.toFixed(1)}
-                    </span>
-                  ) : null}
+                </span>
+              ) : null}
+              {metaScore !== null ? (
+                /* Same scoring pass the Ranked tier list uses, so the number
+                   here cannot disagree with the number there. */
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted"
+                  title="Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list"
+                >
+                  Meta score
+                  <span className="font-bold tabular-nums text-foreground">
+                    {metaScore.toFixed(1)}
+                    <span className="font-semibold text-muted">/10</span>
+                  </span>
                 </span>
               ) : null}
             </div>
 
-            <h1 className="mt-3 text-4xl font-black capitalize tracking-tight">
+            <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">
               {brawler.name.toLowerCase()}
             </h1>
-            <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+            <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">
               {brawler.description}
             </p>
           </div>
@@ -405,8 +415,12 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             {(
               [
                 ['Health', wiki.stats.health],
-                [wiki.stats.attackLabel ?? 'Attack', wiki.stats.attack],
-                [wiki.stats.superLabel ?? 'Super', wiki.stats.super],
+                /* The infobox labels these two independently and often gives
+                   them the same words, so the grid used to print "Damage per
+                   bullet" twice with different numbers under it. See
+                   `combatStatLabels`. */
+                [statLabels.attack, wiki.stats.attack],
+                [statLabels.super, wiki.stats.super],
                 ['Reload', wiki.stats.reload],
                 ['Range', wiki.stats.attackRange],
                 ['Speed', wiki.stats.movementSpeed],
@@ -418,11 +432,15 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               .map(([label, value]) => {
                 const { main, hint } = splitStat(value!);
                 return (
-                  <div key={label} className="card p-3">
-                    <dt className="truncate text-xs font-medium uppercase tracking-wide text-muted">
+                  <div key={label} className="card flex flex-col p-3">
+                    {/* Wraps rather than truncates: the qualified damage
+                        labels are the longest text on the card, and clipping
+                        one to "Main attack damage per…" puts the ambiguity
+                        straight back. */}
+                    <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
                       {label}
                     </dt>
-                    <dd className="mt-0.5 text-lg font-bold leading-tight tabular-nums">
+                    <dd className="mt-1 text-lg font-bold leading-tight tabular-nums">
                       {main}
                     </dd>
                     {hint ? (
@@ -434,6 +452,33 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           </dl>
         </section>
       ) : null}
+
+      {/*
+        Abilities, upgrades and what owners buy, together and directly after
+        the combat stats.
+        
+        Performance used to come first, which put three win-rate tables between
+        a reader and the answer to "what do I build on this". Somebody who has
+        just unlocked a brawler wants the kit; the win rates are for deciding
+        whether to unlock it at all, and that reader scrolls.
+      */}
+      <BuildAndUpgrades
+        name={name}
+        brawler={brawler}
+        starPowers={starPowers}
+        gadgets={gadgets}
+        gears={gears}
+        gearNames={gearNames}
+        gearText={gearText}
+        hyperCharges={hyperCharges}
+        hyperchargeName={wiki?.hypercharge?.name ?? null}
+        hyperchargeDescription={wiki?.hypercharge?.description ?? null}
+        buffieEffects={buffieEffects}
+        buffies={buffies}
+        build={build}
+        abilityChoices={abilityChoices}
+        wiki={wiki}
+      />
 
       <section>
         <h2 className="mb-4 text-2xl font-bold tracking-tight">Performance</h2>
@@ -537,187 +582,6 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       ) : null}
 
       <section>
-        <SectionHeading
-          title="What owners invest in"
-          subtitle="Which upgrades players buy first, how those choices perform, and where the coins go."
-        />
-        {abilityChoices ? (
-          <div className="mb-4">
-            <AbilityChoices
-              choices={abilityChoices}
-              starPowers={starPowers}
-              gadgets={gadgets}
-            />
-          </div>
-        ) : null}
-        <PopularBuild
-          build={build}
-          meta={{ ...brawler, starPowers, gadgets }}
-          gearNames={gearNames}
-        />
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <AccessoryList
-          title="Star powers"
-          node={<StarPowerIcon className="size-5" />}
-          items={starPowers}
-          emptyLabel="No star powers released."
-          wiki={wiki}
-        />
-        <AccessoryList
-          title="Gadgets"
-          node={<GadgetIcon className="size-5" />}
-          items={gadgets}
-          emptyLabel="No gadgets released."
-          wiki={wiki}
-        />
-      </section>
-
-      {gears.length > 0 || hyperCharges.length > 0 || buffies || buffieEffects.length > 0 ? (
-        <section className="grid gap-6 lg:grid-cols-2">
-          {gears.length > 0 ? (
-            <div>
-              <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-                <GearIcon className="size-5" />
-                Gears
-              </h2>
-              <ul className="card grid grid-cols-1 gap-3 p-3 sm:grid-cols-2">
-                {gears.map((gear) => (
-                  <li key={gear.id} className="flex gap-2">
-                    <Image
-                      src={gearIconUrl(gear.id)}
-                      alt=""
-                      width={32}
-                      height={32}
-                      className="size-8 shrink-0 object-contain"
-                      loading="lazy"
-                      unoptimized
-                    />
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium capitalize">
-                        {gear.name.toLowerCase()}
-                      </span>
-                      {/* The catalogue names a gear but never says what it
-                          does, which left this list as six bare words. */}
-                      {gearText.get(slugify(gear.name)) ? (
-                        <span className="block text-xs leading-snug text-muted">
-                          {gearText.get(slugify(gear.name))}
-                        </span>
-                      ) : null}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-2 text-xs text-muted">
-                Every gear this brawler can equip. Which ones owners actually buy is
-                further up the page.
-              </p>
-            </div>
-          ) : null}
-
-          {hyperCharges.length > 0 || buffies ? (
-            <div className="space-y-6">
-              {hyperCharges.length > 0 ? (
-                <div>
-                  <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-                    <HyperchargeIcon className="size-6" />
-                    Hypercharge
-                  </h2>
-                  <ul className="card divide-y divide-border">
-                    {hyperCharges.map((hyper) => (
-                      <li key={hyper.id} className="flex items-center gap-4 p-4">
-                        {/* The game's own hypercharge mark, shipped with the
-                            site. There is no per-hypercharge artwork to use:
-                            the artwork CDN has no hypercharge set under any
-                            path, so one icon stands for the ability. */}
-                        <span
-                          className="grid size-12 shrink-0 place-items-center rounded-xl"
-                          style={{
-                            background: `color-mix(in srgb, ${accent} 18%, transparent)`,
-                          }}
-                        >
-                          <HyperchargeIcon className="size-7" />
-                        </span>
-                        <div className="min-w-0">
-                          <p className="font-bold capitalize">
-                            {hyper.name.toLowerCase()}
-                          </p>
-                          <p className="mt-1 text-sm leading-relaxed text-muted">
-                            {wiki?.hypercharge?.description ??
-                              `Unlocked at Power 11. Charges from dealing and taking damage, then boosts ${name}'s speed, damage and shield for a few seconds.`}
-                            {hyperChargeOwnership !== null
-                              ? ` ${formatPercent(hyperChargeOwnership)} of sampled owners have unlocked it.`
-                              : ''}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                  {!wiki?.hypercharge?.description ? (
-                    <p className="mt-2 text-xs leading-relaxed text-muted">
-                      The exact boost percentages vary per brawler and are not published
-                      by the game API or by any artwork source, so they are not listed
-                      here.
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {buffies || buffieEffects.length > 0 ? (
-                <div>
-                  <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-                    <BuffieIcon className="size-6" />
-                    Buffies
-                  </h2>
-
-                  {/*
-                    What each buffie does, per ability. The question the
-                    ownership percentages never answered. A brawler has one
-                    buffie per ability type, but its effect differs by which
-                    gadget or star power it is buffing, so they are listed
-                    against the ability rather than as three flat rows.
-                  */}
-                  {buffieEffects.length > 0 ? (
-                    <ul className="card divide-y divide-border overflow-hidden">
-                      {buffieEffects.map((entry) => (
-                        <li key={`${entry.kind}-${entry.ability}`} className="p-4">
-                          <p className="flex flex-wrap items-baseline gap-2">
-                            <span className="font-semibold capitalize">
-                              {entry.ability.toLowerCase()}
-                            </span>
-                            <span className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-muted">
-                              {entry.kind}
-                            </span>
-                          </p>
-                          <p className="mt-1 text-sm leading-relaxed text-muted">
-                            {entry.effect}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (buffies?.none ?? true) ? (
-                    <p className="card px-4 py-3 text-sm text-muted">
-                      <span className="font-semibold text-foreground">Unreleased.</span>{' '}
-                      {name} has no buffies yet.
-                    </p>
-                  ) : (
-                    /* Our own samples say buffies exist here, but the wiki has
-                       no text for them. A brand-new release, most likely. */
-                    <p className="card px-4 py-3 text-sm text-muted">
-                      <span className="font-semibold text-foreground">Released.</span>{' '}
-                      {name} has buffies, but their effects have not been documented
-                      yet.
-                    </p>
-                  )}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </section>
-      ) : null}
-
-      <section>
         <h2 className="mb-4 text-2xl font-bold tracking-tight">
           Top players with {brawler.name.toLowerCase()}
         </h2>
@@ -743,7 +607,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   {change.date}
                 </span>
                 <span
-                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide ${
+                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
                     change.kind === 'Buff'
                       ? 'bg-victory/15 text-victory'
                       : change.kind === 'Nerf'
@@ -834,58 +698,4 @@ function listOf(items: string[]): string {
   if (items.length === 0) return 'none yet';
   if (items.length === 1) return items[0];
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
-}
-
-function AccessoryList({
-  title,
-  node,
-  items,
-  emptyLabel,
-  wiki,
-}: {
-  title: string;
-  node: React.ReactNode;
-  items: BAAccessory[];
-  emptyLabel: string;
-  wiki: BrawlerWiki | null;
-}) {
-  return (
-    <div>
-      <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-        {node}
-        {title}
-      </h2>
-
-      {items.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">{emptyLabel}</p>
-      ) : (
-        <ul className="space-y-3">
-          {items.map((item) => (
-            <li key={item.id} className="card flex gap-4 p-4">
-              <Image
-                src={item.imageUrl}
-                alt=""
-                width={48}
-                height={48}
-                className="size-12 shrink-0 object-contain"
-                unoptimized
-              />
-              <div className="min-w-0">
-                <p className="font-bold capitalize">{item.name.toLowerCase()}</p>
-                <p className="mt-1 text-sm leading-relaxed text-muted">
-                  {/*
-                    The wiki's copy of the in-game text has its numbers filled
-                    in; the artwork source ships the same sentence with the
-                    game's own placeholders still in it, which we can only
-                    render as "?". Prefer the readable one, fall back to ours.
-                  */}
-                  {wiki?.abilities.get(slugify(item.name))?.description ?? item.description}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
 }

@@ -12,14 +12,17 @@ export function RecentSearchRecorder({
   kind,
   tag,
   name,
+  icon,
 }: {
   kind: RecentKind;
   tag: string;
   name: string;
+  /** Profile-icon id for a player, badge id for a club. */
+  icon?: number;
 }) {
   useEffect(() => {
-    addRecentSearch({ kind, tag, name });
-  }, [kind, tag, name]);
+    addRecentSearch({ kind, tag, name, ...(icon ? { icon } : {}) });
+  }, [kind, tag, name, icon]);
 
   return null;
 }

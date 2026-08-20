@@ -86,7 +86,7 @@ export default async function CompareIndexPage({ searchParams }: PageProps) {
       <section>
         <SectionHeading
           title="Compare players"
-          subtitle="Enter two tags. Works with or without the #."
+          subtitle="Pick from the profiles you have looked up on this device, or type a tag. Works with or without the #."
         />
         <PlayerCompareForm initialA={tagA} initialB={tagB} />
       </section>

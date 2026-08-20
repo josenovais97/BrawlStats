@@ -137,6 +137,7 @@ export default async function PlayerPage({ params }: PageProps) {
         kind="player"
         tag={normalizedTag}
         name={player.name}
+        icon={player.icon?.id}
       />
       <PlayerHeader
         player={player}
@@ -180,15 +181,6 @@ export default async function PlayerPage({ params }: PageProps) {
         <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
       </Suspense>
 
-      {/* What to do next, while the account's strength is still on screen.
-          Both render nothing when they have nothing to say, so a maxed account
-          does not carry an empty prompt. */}
-      <PlayerUpgradeGap
-        brawlers={player.brawlers}
-        brawlerMeta={brawlerMeta}
-        coinsPerLevel={coinsToMaxFrom}
-      />
-
       <div id="stats" className="scroll-anchor space-y-8">
         <PlayerStats player={player} />
         <PlayerRecords player={player} />
@@ -203,8 +195,21 @@ export default async function PlayerPage({ params }: PageProps) {
       <div id="progress" className="scroll-anchor space-y-8">
         <PlayerProgress points={trophyHistory} playerName={player.name} />
         <PlayerTrophyHistory points={trophyHistory} />
+        <PlayerProgression progression={progression} playtime={playtime} />
+
+        {/* Immediately after Progression, because it is the same subject read
+            the other way round: Progression says how much of the account is
+            finished and what finishing the rest costs, this names the specific
+            brawlers worth finishing first. It used to sit near the top of the
+            page, half a screen of its own, where nothing around it explained
+            what the coins were for. Renders nothing on a maxed account rather
+            than carrying an empty prompt. */}
+        <PlayerUpgradeGap
+          brawlers={player.brawlers}
+          brawlerMeta={brawlerMeta}
+          coinsPerLevel={coinsToMaxFrom}
+        />
       </div>
-      <PlayerProgression progression={progression} playtime={playtime} />
 
       <PlayerMetaFit
         brawlers={player.brawlers}
