@@ -1,7 +1,7 @@
-import { Crown, TrendingUp, Users } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 
-import { RankedIcon, TrophyIcon } from '@/components/game-icons';
+import { CrownIcon, PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
@@ -64,7 +64,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
               }
             />
             <Cell
-              icon={Crown}
+              gameIcon={<CrownIcon className="size-6" />}
               label="All-time best"
               value={player.highestAllTimeRankedRankName ?? '–'}
               hint={
@@ -93,7 +93,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
 
         {standing ? (
           <Cell
-            icon={Users}
+            gameIcon={<PlayersIcon className="size-5" />}
             label="Trophy standing"
             value={`Top ${formatPercentileLabel(standing.percentile)}`}
             hint={`Of ${formatNumber(standing.population)} tracked players`}
@@ -126,7 +126,7 @@ function Cell({
   gameIcon,
 }: {
   /** Last-resort glyph, for cells with neither tier art nor a game icon. */
-  icon?: typeof Crown;
+  icon?: typeof TrendingUp;
   label: string;
   value: string;
   hint?: string;

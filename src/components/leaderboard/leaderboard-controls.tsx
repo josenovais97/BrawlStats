@@ -1,10 +1,9 @@
 'use client';
 
-import { User } from 'lucide-react';
-
 import {
   ClubIcon,
   CosmeticsIcon,
+  PlayersIcon,
   RankedIcon,
 } from '@/components/game-icons';
 import { useRouter } from 'next/navigation';
@@ -25,7 +24,7 @@ const BOARDS: {
   key: LeaderboardBoard;
   icon: (props: { className?: string }) => React.ReactNode;
 }[] = [
-  { key: 'players', icon: User },
+  { key: 'players', icon: PlayersIcon },
   { key: 'clubs', icon: ClubIcon },
   { key: 'ranked', icon: RankedIcon },
   { key: 'cosmetics', icon: CosmeticsIcon },

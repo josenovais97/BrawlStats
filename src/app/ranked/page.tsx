@@ -53,39 +53,99 @@ export default async function RankedPage() {
     getLastAggregationRun(),
   ]);
 
-  // Grouped by mode so the page reads like the in-game rotation rather than a
-  // flat list of thirty maps.
-  const byMode = new Map<string, RankedMapPicks[]>();
-  for (const map of maps) {
-    const list = byMode.get(map.mode) ?? [];
-    list.push(map);
-    byMode.set(map.mode, list);
-  }
-
   // Sampled maps are matched to the catalogue by name and mode, so a map that
   // has since left rotation simply loses its link rather than 404ing.
   const activeMaps = await getActiveMaps().catch(() => []);
-  const hrefFor = (map: RankedMapPicks): string | null => {
-    const match = activeMaps.find(
-      (entry) => entry.mapSlug === slugify(map.mapName) && entry.scHash === map.mode,
-    );
-    return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
-  };
 
-  const totalSamples = maps.reduce((sum, m) => sum + m.sampleSize, 0);
-  const baseline = maps[0]?.baselineWinRate ?? 0;
-  const rated = maps.filter((m) => m.picks.length > 0).length;
-  // In-page navigation, so a visitor after one mode does not scroll past five.
-  const modeNav = [...byMode].map(([mode, list]) => {
-    const meta = modeMeta.get(mode.toLowerCase());
+  /*
+   * The board is the season's published map pool, not the set of maps we
+   * happen to have battles for.
+   *
+   * Those two drift apart at every season turnover, in both directions, and
+   * for the same reason: a map only enters our data once someone we sample has
+   * played it, and only leaves after four days without a sighting. So for the
+   * first days of a season the board showed last season's retired maps and was
+   * missing the new ones — a page titled "the current Ranked rotation" that
+   * disagreed with the game.
+   *
+   * The wiki publishes the pool the day it changes, and this page already
+   * fetches it for the season panel, so it costs nothing to make it the
+   * authority on membership. Our own samples stay the authority on everything
+   * else: which brawlers are strong, and how much evidence is behind that.
+   */
+  const key = (mode: string, map: string) => `${slugify(mode)}/${slugify(map)}`;
+  const sampled = new Map(maps.map((m) => [key(m.mode, m.mapName), m]));
+
+  /*
+   * Only trusted when it overlaps what we have sampled. A wiki table that has
+   * been restructured, or whose map names have diverged from the API's, would
+   * otherwise filter the board down to nothing — an empty page is a worse
+   * failure than a slightly stale one.
+   */
+  const poolMatches = season.mapPool.reduce(
+    (n, entry) => n + entry.maps.filter((m) => sampled.has(key(entry.mode, m))).length,
+    0,
+  );
+  const usePool = poolMatches > 0;
+
+  /** One mode's row on the board, in the order the pool lists them. */
+  const board = (
+    usePool
+      ? season.mapPool.map((entry) => ({
+          modeSlug: slugify(entry.mode),
+          names: entry.maps,
+        }))
+      : // No usable pool: fall back to grouping whatever has been sampled.
+        [...new Set(maps.map((m) => slugify(m.mode)))].map((modeSlug) => ({
+          modeSlug,
+          names: maps
+            .filter((m) => slugify(m.mode) === modeSlug)
+            .map((m) => m.mapName),
+        }))
+  ).map(({ modeSlug, names }) => {
+    // The mode id our samples use, taken from a sampled map where there is one
+    // and from the map catalogue otherwise — a mode can be in the pool with
+    // nothing sampled in it yet.
+    const modeId =
+      maps.find((m) => slugify(m.mode) === modeSlug)?.mode ??
+      activeMaps.find((a) => a.modeSlug === modeSlug)?.scHash ??
+      modeSlug;
+    const meta = modeMeta.get(modeId.toLowerCase());
+
     return {
-      mode,
-      label: meta?.name ?? humanizeMode(mode),
+      modeSlug,
+      label: meta?.name ?? humanizeMode(modeId),
       icon: meta?.imageUrl,
-      color: meta?.color ?? '#8b95b8',
-      count: list.length,
+      accent: meta?.color ?? '#8b95b8',
+      maps: names.map((name) => {
+        const catalogue = activeMaps.find(
+          (a) => a.modeSlug === modeSlug && a.mapSlug === slugify(name),
+        );
+        const picks = sampled.get(key(modeSlug, name)) ?? null;
+        return {
+          name: picks?.mapName ?? name,
+          picks,
+          // Prefer the id recorded on our own battles; fall back to the
+          // catalogue, which is the only source for a map with no battles yet.
+          art: picks?.eventId ? mapMeta.get(picks.eventId) : catalogue?.map,
+          href: catalogue ? `/maps/${catalogue.modeSlug}/${catalogue.mapSlug}` : null,
+        };
+      }),
     };
   });
+
+  const onBoard = board.flatMap((row) => row.maps);
+  const totalSamples = onBoard.reduce((sum, m) => sum + (m.picks?.sampleSize ?? 0), 0);
+  const baseline = maps[0]?.baselineWinRate ?? 0;
+  const rated = onBoard.filter((m) => (m.picks?.picks.length ?? 0) > 0).length;
+  // In-page navigation, so a visitor after one mode does not scroll past five.
+  const modeNav = board.map((row) => ({
+    mode: row.modeSlug,
+    label: row.label,
+    icon: row.icon,
+    color: row.accent,
+    count: row.maps.length,
+  }));
 
   return (
     <div className="space-y-10">
@@ -122,9 +182,9 @@ export default async function RankedPage() {
               />
             </Fact>
           ) : null}
-          {maps.length > 0 ? (
+          {onBoard.length > 0 ? (
             <Fact>
-              {rated} of {maps.length} maps well enough sampled to name a pick
+              {rated} of {onBoard.length} maps with a pick
             </Fact>
           ) : null}
         </ul>
@@ -178,7 +238,7 @@ export default async function RankedPage() {
         </nav>
       ) : null}
 
-      {maps.length === 0 ? (
+      {onBoard.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
           <h2 className="display text-xl uppercase">Collecting map data</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -194,48 +254,60 @@ export default async function RankedPage() {
           </Link>
         </div>
       ) : (
-        [...byMode].map(([mode, list]) => {
-          const meta = modeMeta.get(mode.toLowerCase());
-          const accent = meta?.color ?? '#8b95b8';
-
-          return (
-            <section
-              key={mode}
-              aria-labelledby={`mode-${mode}`}
-              id={`mode-${mode}`}
-              className="scroll-anchor"
+        board.map((row) => (
+          <section
+            key={row.modeSlug}
+            aria-labelledby={`mode-${row.modeSlug}`}
+            id={`mode-${row.modeSlug}`}
+            className="scroll-anchor"
+          >
+            <h2
+              id={`mode-${row.modeSlug}-heading`}
+              className="display mb-4 flex items-center gap-2.5 text-2xl uppercase sm:text-3xl"
             >
-              <h2 className="display mb-4 flex items-center gap-2.5 text-2xl uppercase sm:text-3xl">
-                {meta?.imageUrl ? (
-                  <Image
-                    src={meta.imageUrl}
-                    alt=""
-                    width={32}
-                    height={32}
-                    className="size-8 shrink-0 object-contain"
-                    unoptimized
-                  />
-                ) : null}
-                <span style={{ color: accent }}>{meta?.name ?? humanizeMode(mode)}</span>
-              </h2>
+              {row.icon ? (
+                <Image
+                  src={row.icon}
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="size-8 shrink-0 object-contain"
+                  unoptimized
+                />
+              ) : null}
+              <span style={{ color: row.accent }}>{row.label}</span>
+            </h2>
 
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {list.map((map) => (
-                  <li key={`${map.mode}-${map.mapName}`}>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {row.maps.map((entry) => (
+                <li key={`${row.modeSlug}-${entry.name}`}>
+                  {entry.picks ? (
                     <MapCard
-                      map={map}
-                      art={map.eventId ? mapMeta.get(map.eventId) : undefined}
-                      modeLabel={meta?.name ?? humanizeMode(mode)}
-                      accent={accent}
+                      map={entry.picks}
+                      art={entry.art}
+                      modeLabel={row.label}
+                      accent={row.accent}
                       brawlerMeta={brawlerMeta}
-                      mapHref={hrefFor(map)}
+                      mapHref={entry.href}
                     />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })
+                  ) : (
+                    /* In the pool, not yet in our data. Shown rather than
+                       omitted: the board claims to be the current rotation,
+                       and a map missing from it reads as "not in Ranked"
+                       rather than as "no battles sampled here yet". */
+                    <PendingMapCard
+                      mapName={entry.name}
+                      art={entry.art}
+                      modeLabel={row.label}
+                      accent={row.accent}
+                      mapHref={entry.href}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
       )}
 
       <Disclosure summary="How these picks are chosen">
@@ -245,21 +317,23 @@ export default async function RankedPage() {
           was holding it, and Ranked has carried no modifiers since the February 2025
           rework &mdash; every battle counted here is the plain mode on the plain map.
         </p>
-        {maps.length > 0 ? (
+        {onBoard.length > 0 ? (
           <p className="mt-2">
             Every map is scored against the same {formatPercent(baseline)} sample-wide
             Ranked average, and each brawler&rsquo;s handful of battles on one map is
             weighed against its overall Ranked form. A map needs real evidence to move
             a brawler off that.
-            {rated < maps.length
-              ? ` ${maps.length - rated} of ${maps.length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.`
+            {rated < onBoard.length
+              ? ` ${onBoard.length - rated} of ${onBoard.length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.`
               : ''}
           </p>
         ) : null}
         <p className="mt-2">
-          Map names are recorded on newly sampled battles only, and a battle log
-          reaches back about 25 matches, so a map that has just entered the rotation
-          fills in over the following day or two.
+          Which maps appear is taken from the season&rsquo;s published pool rather than
+          from our own samples, so the board matches the rotation the day it changes.
+          Map names are recorded on newly sampled battles only and a battle log reaches
+          back about 25 matches, so a map that has just entered the pool carries no
+          picks for a day or two after it does.
         </p>
       </Disclosure>
     </div>
@@ -284,6 +358,64 @@ function Fact({
     >
       {children}
     </li>
+  );
+}
+
+/**
+ * A map that is in the season's pool but has no sampled battles yet.
+ *
+ * Deliberately quiet — no confidence chip, no placeholder numbers, no bars
+ * drawn at zero. The card exists to say the map is live and that we have
+ * nothing to say about it yet, which is a different statement from the
+ * thin-sample cards and should not look like one.
+ */
+function PendingMapCard({
+  mapName,
+  art,
+  modeLabel,
+  accent,
+  mapHref,
+}: {
+  mapName: string;
+  art?: BAMap;
+  modeLabel: string;
+  accent: string;
+  mapHref: string | null;
+}) {
+  return (
+    <article className="card flex h-full flex-col overflow-hidden opacity-80">
+      <MapPreview
+        imageUrl={art?.imageUrl}
+        mapName={mapName}
+        modeLabel={modeLabel}
+        accent={accent}
+      />
+
+      <div className="border-y border-border px-3.5 py-3">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="display min-w-0 flex-1 truncate text-base leading-tight">
+            {mapHref ? (
+              <Link href={mapHref} className="hover:text-brand">
+                {mapName}
+              </Link>
+            ) : (
+              mapName
+            )}
+          </h3>
+          <span className="shrink-0 rounded-md bg-surface-2 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted">
+            New this season
+          </span>
+        </div>
+        <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">
+          No sampled battles yet
+        </p>
+      </div>
+
+      <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
+        In the season pool, but nobody we sample has played it yet. A battle log
+        reaches back about 25 matches, so this fills in over the next day or two.
+      </p>
+    </article>
   );
 }
 

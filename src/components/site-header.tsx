@@ -10,7 +10,6 @@ import {
   Podium,
   ScrollText,
   Search,
-  Swords,
   Target,
   X,
 } from 'lucide-react';
@@ -19,7 +18,11 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
-import { LeaderboardIcon, RankedIcon } from '@/components/game-icons';
+import {
+  BrawlersIcon,
+  LeaderboardIcon,
+  RankedIcon,
+} from '@/components/game-icons';
 
 interface NavItem {
   href: string;
@@ -27,7 +30,7 @@ interface NavItem {
   match?: string;
   label: string;
   /*
-   * Structural rather than `typeof Swords`: the game-artwork icons are our own
+   * Structural rather than a lucide type: the game-artwork icons are our own
    * components, not lucide forwardRefs, and a `className` is all the two share.
    */
   icon: (props: { className?: string }) => React.ReactNode;
@@ -42,7 +45,7 @@ interface NavItem {
  * worth a permanent slot — the ones people arrive looking for.
  */
 const NAV: NavItem[] = [
-  { href: '/brawlers', label: 'Brawlers', icon: Swords },
+  { href: '/brawlers', label: 'Brawlers', icon: BrawlersIcon },
   // Points straight at the Ranked list so the nav does not bounce through the
   // /tier-list redirect, but stays highlighted on the trophy list too.
   { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: Podium },

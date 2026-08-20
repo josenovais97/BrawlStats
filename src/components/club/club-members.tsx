@@ -1,9 +1,11 @@
 'use client';
 
-import { Crown, Search, Shield, Star, User } from 'lucide-react';
+import { Search, Shield, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+
+import { CrownIcon, PlayersIcon } from '@/components/game-icons';
 
 import { TrophyIcon } from '@/components/game-icons';
 import { playerIconUrl } from '@/lib/brawlapi';
@@ -19,11 +21,14 @@ const ROLE_WEIGHT: Record<string, number> = {
   member: 1,
 };
 
-const ROLE_STYLE: Record<string, { icon: typeof Crown; className: string }> = {
-  president: { icon: Crown, className: 'bg-brand/15 text-brand' },
+const ROLE_STYLE: Record<
+  string,
+  { icon: (props: { className?: string }) => React.ReactNode; className: string }
+> = {
+  president: { icon: CrownIcon, className: 'bg-brand/15 text-brand' },
   vicePresident: { icon: Shield, className: 'bg-accent/20 text-accent' },
   senior: { icon: Star, className: 'bg-victory/15 text-victory' },
-  member: { icon: User, className: 'bg-surface-2 text-muted' },
+  member: { icon: PlayersIcon, className: 'bg-surface-2 text-muted' },
 };
 
 export function ClubMembers({ members }: { members: BSClubMember[] }) {

@@ -159,6 +159,26 @@ export function CosmeticsIcon({ className }: IconProps) {
   return <GameIcon src="/icons/cosmetics.png" alt="Cosmetics" className={className} />;
 }
 
+/** Longest run as the Big Brawler. */
+export function BigBrawlerIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/big-brawler.png" alt="Big Brawler" className={className} />;
+}
+
+/** A player, wherever a profile or a count of profiles is meant. */
+export function PlayersIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/players.png" alt="Players" className={className} />;
+}
+
+/** Trophies climbing: gains, streaks and best days. */
+export function TrophyGainIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/trophy-gain.png" alt="Trophy gain" className={className} />;
+}
+
+/** Club president, and anything else that ranks first. */
+export function CrownIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/crown.png" alt="President" className={className} />;
+}
+
 /**
  * Prestige badge for a total prestige level.
  *

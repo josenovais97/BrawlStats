@@ -1,8 +1,8 @@
-import { ChevronDown, Crown, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { ChevronDown, Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { TrophyIcon } from '@/components/game-icons';
+import { CrownIcon, TrophyIcon } from '@/components/game-icons';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
@@ -125,7 +125,7 @@ function BattleRow({
             </span>
             {isStarPlayer ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
-                <Crown className="size-3" />
+                <CrownIcon className="size-3.5" />
                 Star player
               </span>
             ) : null}
@@ -245,10 +245,7 @@ function Lineup({
                             {participant.name}
                           </span>
                           {isStar ? (
-                            <Crown
-                              className="size-3 shrink-0 text-brand"
-                              aria-label="Star player"
-                            />
+                            <CrownIcon className="size-3.5 shrink-0" />
                           ) : null}
                         </span>
                         <span className="block truncate text-xs capitalize text-muted">

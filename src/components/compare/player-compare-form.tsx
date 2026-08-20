@@ -1,10 +1,11 @@
 'use client';
 
-import { ArrowLeftRight, Check, Clock, Share2, User, X } from 'lucide-react';
+import { ArrowLeftRight, Check, Clock, Share2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useId, useState, useSyncExternalStore } from 'react';
 
+import { PlayersIcon } from '@/components/game-icons';
 import { playerIconUrl } from '@/lib/brawlapi';
 import {
   clearRecentSearches,
@@ -310,7 +311,7 @@ function Side({
                     />
                   ) : (
                     <span className="grid size-7 shrink-0 place-items-center rounded-md bg-surface-2 text-muted">
-                      <User className="size-3.5" />
+                      <PlayersIcon className="size-4" />
                     </span>
                   )}
 

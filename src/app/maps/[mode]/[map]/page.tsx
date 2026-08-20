@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import { ArrowLeft, Swords } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { BrawlersIcon } from '@/components/game-icons';
 import { MapPickList } from '@/components/maps/map-pick-list';
 import { MapPreview } from '@/components/ranked/map-preview';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
@@ -216,7 +217,7 @@ export default async function MapPage({ params }: PageProps) {
           aside={
             hasMapPicks ? (
               <span className="inline-flex items-center gap-1.5">
-                <Swords className="size-3.5" />
+                <BrawlersIcon className="size-4" />
                 {mapPicks!.brawlersSeen} brawlers seen
               </span>
             ) : null

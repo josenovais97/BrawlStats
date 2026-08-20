@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { Lock, Shield, UserPlus, Users } from 'lucide-react';
+import { Lock, Shield, UserPlus } from 'lucide-react';
 
 import { FavoriteButton } from '@/components/favorite-button';
-import { TrophyIcon } from '@/components/game-icons';
+import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 
 import { ClubInsights } from '@/components/club/club-insights';
@@ -126,7 +126,7 @@ export default async function ClubPage({ params }: PageProps) {
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
-          icon={Users}
+          node={<PlayersIcon className="size-6" />}
           label="Members"
           value={`${members.length}/30`}
           tone="text-accent"

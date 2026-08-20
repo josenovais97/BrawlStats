@@ -1,4 +1,4 @@
-import { Flame } from 'lucide-react';
+import { TrophyGainIcon } from '@/components/game-icons';
 import Link from 'next/link';
 
 import { TrophyIcon } from '@/components/game-icons';
@@ -33,7 +33,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-defeat">
-            <Flame className="size-3.5" />
+            <TrophyGainIcon className="size-4" />
             Climbing fastest
           </p>
           <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">

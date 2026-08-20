@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { ArrowRight, Swords, Target, X } from 'lucide-react';
+import { ArrowRight, Target, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { RankedIcon } from '@/components/game-icons';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
@@ -139,7 +140,7 @@ export default async function DraftPage({ searchParams }: PageProps) {
             href="/ranked"
             className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
           >
-            <Swords className="size-4" />
+            <RankedIcon className="size-4" />
             Ranked pool
           </Link>
         }

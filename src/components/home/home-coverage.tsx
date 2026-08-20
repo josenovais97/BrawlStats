@@ -1,8 +1,7 @@
-import { Users } from 'lucide-react';
-
 import {
   BattlesIcon,
   BrawlersIcon,
+  PlayersIcon,
   RankedIcon,
 } from '@/components/game-icons';
 import { compactNumber } from '@/lib/format';
@@ -20,7 +19,7 @@ export async function HomeCoverage() {
 
   const items = [
     { icon: BrawlersIcon, label: 'Brawlers tracked', value: compactNumber(stats.brawlers) },
-    { icon: Users, label: 'Players sampled', value: compactNumber(stats.players) },
+    { icon: PlayersIcon, label: 'Players sampled', value: compactNumber(stats.players) },
     { icon: BattlesIcon, label: 'Battles analysed', value: compactNumber(stats.battles) },
     { icon: RankedIcon, label: 'Ranked placements', value: compactNumber(stats.placements) },
   ];

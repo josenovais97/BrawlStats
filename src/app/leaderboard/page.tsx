@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Shield, Users } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,7 +13,7 @@ import {
 import { TrophyGains } from '@/components/leaderboard/trophy-gains';
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { TrophyIcon } from '@/components/game-icons';
+import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import { clubBadgeUrl, playerIconUrl } from '@/lib/brawlapi';
 import { getClubRankings, getPlayerRankings } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
@@ -198,7 +198,7 @@ async function ClubBoard({ region }: { region: string }) {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{club.name}</p>
                 <p className="flex items-center gap-1 truncate text-xs text-muted">
-                  <Users className="size-3" />
+                  <PlayersIcon className="size-3.5" />
                   {club.memberCount}/30 members
                 </p>
               </div>

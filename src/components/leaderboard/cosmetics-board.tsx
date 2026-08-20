@@ -1,6 +1,4 @@
-import { UserCircle } from 'lucide-react';
-
-import { CosmeticsIcon } from '@/components/game-icons';
+import { CosmeticsIcon, PlayersIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -121,7 +119,7 @@ export async function CosmeticsBoard() {
         </section>
       ) : (
         <p className="flex items-center gap-2 text-sm text-muted">
-          <UserCircle className="size-4" />
+          <PlayersIcon className="size-4" />
           Profile icons are still being recorded.
         </p>
       )}

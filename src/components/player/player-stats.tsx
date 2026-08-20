@@ -1,7 +1,6 @@
-import { Timer } from 'lucide-react';
-
 import {
   Battle3v3Icon,
+  BigBrawlerIcon,
   BrawlersIcon,
   DuoShowdownIcon,
   ExperienceIcon,
@@ -125,7 +124,7 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     bigBrawler ? (
       <StatCard
         key="big"
-        node={<Timer className="size-8 text-brand" />}
+        node={<BigBrawlerIcon className="size-8" />}
         label="Big Brawler"
         value={bigBrawler}
         hint="Longest time as the Big Brawler"

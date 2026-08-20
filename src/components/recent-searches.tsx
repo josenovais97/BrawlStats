@@ -1,10 +1,10 @@
 'use client';
 
-import { Clock, User, X } from 'lucide-react';
+import { Clock, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 
-import { ClubIcon } from '@/components/game-icons';
+import { ClubIcon, PlayersIcon } from '@/components/game-icons';
 import {
   clearRecentSearches,
   readRecentSearches,
@@ -53,7 +53,7 @@ export function RecentSearches() {
                 {isClub ? (
                   <ClubIcon className="size-3.5 shrink-0" />
                 ) : (
-                  <User className="size-3.5 shrink-0 text-brand" />
+                  <PlayersIcon className="size-4 shrink-0" />
                 )}
                 <span className="max-w-[12rem] truncate font-medium">
                   {entry.name || `#${entry.tag}`}

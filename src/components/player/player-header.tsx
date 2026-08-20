@@ -1,9 +1,13 @@
-import { Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { FavoriteButton } from '@/components/favorite-button';
-import { ClubIcon, PrestigeIcon, TrophyIcon } from '@/components/game-icons';
+import {
+  ClubIcon,
+  ExperienceIcon,
+  PrestigeIcon,
+  TrophyIcon,
+} from '@/components/game-icons';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
@@ -103,7 +107,7 @@ export function PlayerHeader({
 
         <div className="flex w-full flex-wrap items-center gap-2 text-sm">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium">
-            <Sparkles className="size-3.5 text-brand" />
+            <ExperienceIcon className="size-4" />
             Level {player.expLevel}
           </span>
 

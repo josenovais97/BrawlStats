@@ -1,10 +1,10 @@
 'use client';
 
-import { Star, User, X } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 
-import { ClubIcon } from '@/components/game-icons';
+import { ClubIcon, PlayersIcon } from '@/components/game-icons';
 import {
   clearFavorites,
   readFavorites,
@@ -61,7 +61,7 @@ export function FavoritesList() {
                     entry.kind === 'player' ? 'text-brand' : 'text-accent'
                   }`}
                 >
-                  {isClub ? <ClubIcon className="size-5" /> : <User className="size-5" />}
+                  {isClub ? <ClubIcon className="size-5" /> : <PlayersIcon className="size-5" />}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">

@@ -1,7 +1,13 @@
-import { Activity, Crown, Swords, TrendingDown, TrendingUp, Users } from 'lucide-react';
+import { Activity, TrendingDown, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import {
+  BattlesIcon,
+  BrawlersIcon,
+  CrownIcon,
+  PlayersIcon,
+} from '@/components/game-icons';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
@@ -97,7 +103,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
             <div>
               <p className="text-xs uppercase tracking-wide text-muted">Star player</p>
               <p className="flex items-center gap-1 text-lg font-bold tabular-nums">
-                <Crown className="size-4 text-brand" />
+                <CrownIcon className="size-4" />
                 {insights.starPlayerCount}
               </p>
             </div>
@@ -107,7 +113,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         {/* Most played brawlers */}
         <div className="card p-5 lg:col-span-2">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <Swords className="size-4 text-brand" />
+            <BrawlersIcon className="size-4" />
             Most played
           </h3>
 
@@ -158,13 +164,13 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <AssociationList
           title="Played with"
-          icon={Users}
+          icon={PlayersIcon}
           people={insights.teammates.slice(0, 5)}
           emptyLabel="No repeat teammates in this window."
         />
         <AssociationList
           title="Faced most"
-          icon={Swords}
+          icon={BattlesIcon}
           people={insights.opponents.slice(0, 5)}
           emptyLabel="No repeat opponents in this window."
         />
@@ -207,7 +213,7 @@ function AssociationList({
   emptyLabel,
 }: {
   title: string;
-  icon: typeof Users;
+  icon: (props: { className?: string }) => React.ReactNode;
   people: PlayerAssociation[];
   emptyLabel: string;
 }) {

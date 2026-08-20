@@ -1,4 +1,6 @@
-import { CalendarDays, Flame, TrendingUp } from 'lucide-react';
+import { CalendarDays, TrendingUp } from 'lucide-react';
+
+import { TrophyGainIcon } from '@/components/game-icons';
 
 import { ShareButton } from '@/components/player/share-button';
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -84,7 +86,7 @@ export function PlayerProgress({
         ) : null}
         {best ? (
           <StatCard
-            icon={Flame}
+            node={<TrophyGainIcon className="size-5" />}
             label="Best tracked day"
             value={signed(best.change)}
             hint={best.date}

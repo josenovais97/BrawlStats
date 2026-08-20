@@ -1,6 +1,7 @@
-import { ArrowRight, Gauge, LineChart, Sparkles, Swords } from 'lucide-react';
+import { ArrowRight, Gauge, LineChart, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
+import { BrawlersIcon } from '@/components/game-icons';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 
 /**
@@ -26,7 +27,7 @@ const FEATURES = [
     hash: '',
   },
   {
-    icon: Swords,
+    icon: BrawlersIcon,
     accent: '#ffc53d',
     title: 'Roster read against the meta',
     body: 'Which of your brawlers are strong now, which top picks you are missing.',

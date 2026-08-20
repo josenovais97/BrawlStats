@@ -1,4 +1,6 @@
-import { Crown, Shield, Star, TrendingUp, User, Users } from 'lucide-react';
+import { Shield, Star, TrendingUp } from 'lucide-react';
+
+import { CrownIcon, PlayersIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -68,17 +70,17 @@ export function ClubInsights({ club }: { club: BSClub }) {
         {/* Composition */}
         <div className="card p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <Users className="size-4 text-accent" />
+            <PlayersIcon className="size-4" />
             Composition
           </h3>
 
           <ul className="space-y-3">
             {(
               [
-                ['president', Crown, 'text-brand'],
+                ['president', CrownIcon, 'text-brand'],
                 ['vicePresident', Shield, 'text-accent'],
                 ['senior', Star, 'text-victory'],
-                ['member', User, 'text-muted'],
+                ['member', PlayersIcon, 'text-muted'],
               ] as const
             ).map(([role, Icon, tone]) => {
               const count = roleCounts[role] ?? 0;
