@@ -1,50 +1,58 @@
-import { ArrowRight, Gauge, LineChart, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { BrawlersIcon } from '@/components/game-icons';
+import {
+  BattlesIcon,
+  BrawlersIcon,
+  HyperchargeIcon,
+  Power11Icon,
+  TrophyIcon,
+} from '@/components/game-icons';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 
 /**
  * What a visitor actually gets for typing their tag in.
  *
- * The hero asks for a tag; this is the answer to "and then what". It used to
- * be four cards of prose, which is the wrong shape for a question about a
- * product — so the claims are now four short lines and the proof is a real
- * profile you can open, deep-linked to the sections named on the left.
+ * Built from the profile's own furniture rather than from marketing icons: the
+ * accent rule, the display heading, the real section names and the real game
+ * marks are the same ones the page uses, so this reads as a preview of the
+ * product instead of a feature list about it.
  *
- * Deliberately not a screenshot and deliberately not a mock-up: profiles
+ * Nothing here is a screenshot and nothing is a made-up number. Profiles
  * differ enormously between accounts, a stale image would represent nobody,
- * and inventing numbers to fill a preview panel would be worse than either.
- * The sample profile is the same server-rendered page every other lookup gets.
+ * and inventing a completion percentage to fill a progress bar would be worse
+ * than either. The proof is a real profile, one click away, deep-linked to the
+ * section each card names.
  */
-const FEATURES = [
+const MODULES = [
   {
-    icon: Gauge,
-    accent: '#ff5c72',
-    title: 'Skill score out of 10',
-    body: 'Weighted toward Ranked, so it reflects how you play rather than how long you have played.',
-    /* Anchors are the profile page's own section ids. */
+    title: 'Skill score',
+    icon: <TrophyIcon className="size-5" />,
+    body: 'Out of 10, weighted toward Ranked — how you play, not how long you have played.',
     hash: '',
   },
   {
-    icon: BrawlersIcon,
-    accent: '#ffc53d',
-    title: 'Roster read against the meta',
-    body: 'Which of your brawlers are strong now, which top picks you are missing.',
+    title: 'Roster vs the meta',
+    icon: <BrawlersIcon className="size-5" />,
+    body: 'Every brawler you own, tiered against the current list. Strong picks, and the ones you are missing.',
     hash: '#brawlers',
   },
   {
-    icon: Sparkles,
-    accent: '#8b6bff',
-    title: 'Progression and unfinished upgrades',
-    body: 'Account completion, coins still needed, and hypercharges stranded below power 11.',
+    title: 'Progression',
+    icon: <Power11Icon className="size-5" />,
+    body: 'Account completion, coins invested, and what finishing the rest would cost.',
     hash: '#progress',
   },
   {
-    icon: LineChart,
-    accent: '#35d0ff',
-    title: 'History the game does not keep',
-    body: 'Trophy curve, best win streak and recent battles, recorded on every visit.',
+    title: 'Upgraded but not maxed',
+    icon: <HyperchargeIcon className="size-5" />,
+    body: 'Hypercharges and buffies stranded on brawlers below power 11, cheapest to finish first.',
+    hash: '#progress',
+  },
+  {
+    title: 'Recent battles',
+    icon: <BattlesIcon className="size-5" />,
+    body: 'Your last matches with the brawlers, maps and star players, plus who you keep running into.',
     hash: '#battles',
   },
 ];
@@ -52,65 +60,49 @@ const FEATURES = [
 export function HomeProfileDepth() {
   return (
     <section className="reveal" aria-labelledby="profile-depth">
-      <div className="card card-glow overflow-hidden lg:grid lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-        <div className="p-5 sm:p-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0">
           <p className="eyebrow text-accent">After you search</p>
           <h2 id="profile-depth" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
             What a profile gives you
           </h2>
-
-          <ul className="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2">
-            {FEATURES.map(({ icon: Icon, accent, title, body }) => (
-              <li key={title} className="flex gap-3">
-                <span
-                  className="grid size-9 shrink-0 place-items-center rounded-lg"
-                  style={{
-                    background: `color-mix(in srgb, ${accent} 16%, transparent)`,
-                    color: accent,
-                  }}
-                >
-                  <Icon className="size-4.5" />
-                </span>
-                <span className="min-w-0">
-                  <h3 className="text-sm font-bold leading-tight">{title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted">{body}</p>
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
-
-        {/* The proof, not a mock-up of it. */}
-        <div className="border-t border-border bg-surface-2/40 p-5 sm:p-6 lg:border-l lg:border-t-0">
-          <p className="eyebrow">See it live</p>
-          <p className="mt-2.5 text-sm leading-relaxed text-muted">
-            Every section on the left is on the sample profile below, filled in with
-            that account&rsquo;s real data.
-          </p>
-
-          <ul className="mt-4 space-y-1.5">
-            {FEATURES.map(({ title, hash }) => (
-              <li key={title}>
-                <Link
-                  href={`/player/${SAMPLE_PLAYER_TAG}${hash}`}
-                  className="row-interactive flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-muted hover:text-foreground"
-                >
-                  <ArrowRight aria-hidden className="size-3.5 shrink-0 text-brand" />
-                  <span className="min-w-0 truncate">{title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <Link
-            href={`/player/${SAMPLE_PLAYER_TAG}`}
-            className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border-strong/70 bg-surface px-4 text-sm font-bold transition-colors hover:border-brand/60 hover:text-brand"
-          >
-            Open the sample profile
-            <ArrowRight className="size-4" />
-          </Link>
-        </div>
+        <Link
+          href={`/player/${SAMPLE_PLAYER_TAG}`}
+          className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-border-strong/70 bg-surface px-4 text-sm font-bold transition-colors hover:border-brand/60 hover:text-brand"
+        >
+          Open a sample profile
+          <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
+        </Link>
       </div>
+
+      {/*
+        One panel of hairline-divided rows rather than five more cards. The
+        page already has three card grids; this is the block that most needed
+        to stop being another one.
+      */}
+      <ul className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+        {MODULES.map(({ title, icon, body, hash }) => (
+          <li key={title} className="bg-surface">
+            <Link
+              href={`/player/${SAMPLE_PLAYER_TAG}${hash}`}
+              className="group flex h-full flex-col p-4 transition-colors hover:bg-surface-2 sm:p-5"
+            >
+              {/* The profile's own section heading, at a smaller size. */}
+              <span className="flex items-center gap-2.5">
+                <span aria-hidden className="rule" />
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-surface-2">
+                  {icon}
+                </span>
+                <span className="display min-w-0 flex-1 truncate text-base uppercase leading-none">
+                  {title}
+                </span>
+              </span>
+              <span className="mt-2.5 text-sm leading-relaxed text-muted">{body}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

@@ -6,46 +6,47 @@ import { TrophyIcon } from '@/components/game-icons';
 /**
  * Closing call to action.
  *
- * The hero search is the primary path in; this is the second one, for people
- * who scrolled the whole page first. It intentionally echoes the hero's glow
- * and gold button so the page reads as bookended rather than as two unrelated
- * pitches.
+ * The hero search is the way in; this is the second one, for people who read
+ * the whole page first. It used to be a full-height glowing card with its own
+ * headline block, which made the bottom of the page compete with the top for
+ * the same job.
+ *
+ * Now it is one row: the ask, the button, and a hairline that hands over to
+ * the footer directly beneath it. Same message, a fifth of the height.
  */
 export function HomeCta() {
   return (
     <section
       aria-labelledby="closing-cta"
-      className="card card-glow reveal relative overflow-hidden px-6 py-12 text-center sm:px-12 sm:py-16"
+      className="card card-glow reveal relative overflow-hidden"
     >
-      <div
+      <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.14]"
+        className="pointer-events-none absolute inset-0 opacity-[0.16]"
         style={{
           background:
-            'radial-gradient(32rem 15rem at 50% 0%, #ffc53d, transparent 70%), radial-gradient(26rem 13rem at 15% 110%, #8b6bff, transparent 70%)',
+            'radial-gradient(28rem 12rem at 15% 0%, #ffc53d, transparent 70%), radial-gradient(24rem 12rem at 85% 110%, #8b6bff, transparent 70%)',
         }}
       />
 
-      <div className="relative mx-auto max-w-xl">
-        <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-brand/15 text-brand">
-          <TrophyIcon className="size-6" />
-        </span>
-
-        <h2
-          id="closing-cta"
-          className="display mt-5 text-balance text-3xl uppercase leading-tight sm:text-4xl"
-        >
-          Your next milestone starts here
-        </h2>
-
-        <p className="mt-4 text-pretty leading-relaxed text-muted">
-          Search your Brawl Stars tag and see exactly how you are progressing. Your tag
-          is on your in-game profile, just below your name.
-        </p>
+      <div className="relative flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-7">
+        <div className="flex min-w-0 items-center gap-4">
+          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand/15">
+            <TrophyIcon className="size-7" />
+          </span>
+          <div className="min-w-0">
+            <h2 id="closing-cta" className="display text-xl uppercase sm:text-2xl">
+              See where you stand
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              Your tag is on your in-game profile, just below your name.
+            </p>
+          </div>
+        </div>
 
         <Link
           href="/#search"
-          className="btn-game mt-8 inline-flex items-center gap-2.5 bg-brand px-8 py-4 text-lg uppercase text-brand-ink hover:bg-brand-strong"
+          className="btn-game inline-flex shrink-0 items-center justify-center gap-2.5 bg-brand px-6 py-3.5 text-base uppercase text-brand-ink hover:bg-brand-strong"
         >
           <Search className="size-5" />
           Search a player

@@ -17,7 +17,7 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISSED_KEY = 'brawlzone:install-dismissed';
 
 /**
- * Offers to install Brawl Zone as an app on mobile.
+ * Offers to install BrawlZone as an app on mobile.
  *
  * Only shows when the browser says the site is actually installable, which
  * rules out desktop, already-installed sessions and browsers that do not
@@ -68,7 +68,7 @@ export function InstallPrompt() {
       <div className="card card-glow flex items-center gap-3 p-3 shadow-2xl shadow-black/60">
         <BrandMark className="size-10 shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold">Install Brawl Zone</p>
+          <p className="text-sm font-bold">Install BrawlZone</p>
           <p className="truncate text-xs text-muted">Add it to your home screen</p>
         </div>
         <button

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { FavoritesList } from '@/components/favorites-list';
@@ -8,11 +7,11 @@ import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeProfileDepth } from '@/components/home/home-profile-depth';
+import { HomeBand } from '@/components/home/home-band';
 import { HomeSection } from '@/components/home/home-section';
+import { HomeSnapshot } from '@/components/home/home-snapshot';
 import { HomeTools } from '@/components/home/home-tools';
-import { HomeTopBrawlers } from '@/components/home/home-top-brawlers';
-import { TopPlayersPreview } from '@/components/home/top-players-preview';
-import { RankedListSkeleton, Skeleton } from '@/components/ui/skeletons';
+import { Skeleton } from '@/components/ui/skeletons';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -112,65 +111,21 @@ export default function HomePage() {
         </Suspense>
       </HomeSection>
 
-      <HomeTools />
-
-      <HomeProfileDepth />
-
       {/*
-        Meta and leaderboard sit side by side on desktop: they are the same
-        shape (a short ranked list) and reading them as a pair is the point.
+        A band, so the page has somewhere to change gear.
+        
+        Tools and the profile preview are the two blocks that are *about* the
+        product rather than live data, and grouping them on their own ground
+        breaks up what was otherwise six card grids in a row.
       */}
-      <div className="grid gap-12 sm:gap-14 lg:grid-cols-2 lg:gap-8">
-        <HomeSection
-          id="top-meta"
-          eyebrow="Brawler meta"
-          title="Top of the meta"
-          subtitle={
-            <>
-              Highest win rates in competitive Ranked, adjusted for the sampled
-              player pool. The{' '}
-              <Link
-                href="/tier-list/trophy"
-                className="font-medium text-brand hover:underline"
-              >
-                trophy ladder
-              </Link>{' '}
-              is scored separately, and the answers are not the same.
-            </>
-          }
-          ctaHref="/tier-list/ranked"
-          ctaLabel="Explore the Ranked tier list"
-        >
-          <Suspense fallback={<RankedListSkeleton />}>
-            <HomeTopBrawlers />
-          </Suspense>
-        </HomeSection>
+      <HomeBand>
+        <div className="space-y-12 sm:space-y-14">
+          <HomeTools />
+          <HomeProfileDepth />
+        </div>
+      </HomeBand>
 
-        <HomeSection
-          id="top-players"
-          eyebrow="Leaderboard"
-          title="Top players"
-          subtitle={
-            <>
-              The highest trophy counts in the world, updated through the day,
-              plus our own{' '}
-              <Link
-                href="/leaderboard?type=ranked"
-                className="font-medium text-brand hover:underline"
-              >
-                Ranked elo board
-              </Link>
-              , which the game API does not publish at all.
-            </>
-          }
-          ctaHref="/leaderboard"
-          ctaLabel="View global leaderboard"
-        >
-          <Suspense fallback={<RankedListSkeleton />}>
-            <TopPlayersPreview />
-          </Suspense>
-        </HomeSection>
-      </div>
+      <HomeSnapshot />
 
       <HomeCta />
     </div>

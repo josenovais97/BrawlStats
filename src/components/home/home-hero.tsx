@@ -44,11 +44,11 @@ const CAST = [
 
 export function HomeHero({ stats }: { stats?: ReactNode }) {
   return (
-    <section className="relative pt-2 sm:pt-4 lg:pt-6">
+    <section className="relative -mt-2 sm:mt-0">
       {/* Full-bleed wash, escaping the page container and fading into the page. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[46rem] w-screen -translate-x-1/2 -translate-y-32 overflow-hidden"
+        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[34rem] w-screen -translate-x-1/2 -translate-y-28 overflow-hidden sm:h-[46rem] sm:-translate-y-32"
       >
         <div
           className="absolute inset-0"
@@ -63,7 +63,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
           gradient, and it costs nothing: two repeating gradients, no image.
         */}
         <div
-          className="absolute inset-0 opacity-[0.28]"
+          className="absolute inset-0 hidden opacity-[0.28] sm:block"
           style={{
             backgroundImage:
               'linear-gradient(to right, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px)',
@@ -88,7 +88,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             <span className="eyebrow text-brand">Live Brawl Stars data</span>
           </span>
 
-          <h1 className="display-hero mt-5 text-balance text-[2.5rem] uppercase leading-[0.94] sm:text-5xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-6xl">
+          <h1 className="display-hero mt-4 text-balance text-[2.5rem] uppercase leading-[0.94] sm:text-5xl md:text-[2.75rem] lg:text-[3.5rem] xl:text-6xl">
             Brawl Stars stats that
             <br />
             <span className="bg-gradient-to-b from-brand via-brand to-brand-strong bg-clip-text text-transparent">
@@ -96,7 +96,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             </span>
           </h1>
 
-          <p className="mt-4 max-w-xl text-balance leading-relaxed text-muted">
+          <p className="mt-3.5 max-w-xl text-balance leading-relaxed text-muted">
             One tag gives you a skill score out of 10, your roster read against the
             live meta, and your progression tracked over time.
           </p>
@@ -105,7 +105,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             The search panel is raised off the hero rather than sunk into it, so
             it reads as the one thing on the page you are meant to touch first.
           */}
-          <div className="card card-glow mt-7 border-border-strong/60 p-4 sm:p-6">
+          <div className="card card-glow mt-6 border-border-strong/60 p-4 sm:p-5">
             <SearchBar autoFocus showRecent size="hero" />
 
             {/*
@@ -129,7 +129,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
         {/* Character art */}
         <div
           aria-hidden
-          className="relative mx-auto hidden h-[21rem] w-full max-w-md md:block lg:h-[26rem] xl:h-[30rem]"
+          className="relative mx-auto hidden h-[19rem] w-full max-w-md md:block lg:h-[23rem] xl:h-[26rem]"
         >
           {/* Ground glow, so the group reads as standing rather than floating. */}
           <span
@@ -165,7 +165,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
         </div>
       </div>
 
-      {stats ? <div className="mt-10 sm:mt-12">{stats}</div> : null}
+      {stats ? <div className="mt-8 sm:mt-10">{stats}</div> : null}
     </section>
   );
 }

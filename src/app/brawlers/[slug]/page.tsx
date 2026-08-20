@@ -23,7 +23,7 @@ import {
   PlayersIcon,
   TrophyIcon,
 } from '@/components/game-icons';
-import { getBrawler, getBrawlerMap } from '@/lib/brawlapi';
+import { getBrawler, getBrawlerMap, rarityColor } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
   combatStatLabels,
@@ -325,17 +325,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       : null);
   const metaScore = scored?.metaScore ?? null;
 
-  /*
-   * The artwork source ships at least one malformed colour — Pierce's rarity
-   * is "#fff11ev" — and an invalid value inside `color-mix()` drops the whole
-   * declaration, taking the header wash with it. Anything that is not a plain
-   * hex colour falls back to the neutral accent.
-   */
-  const rarityColor = brawler.rarity?.color;
-  const accent =
-    rarityColor && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(rarityColor)
-      ? rarityColor
-      : '#8b95b8';
+  // Cleaned at the source now — see `rarityColor` — so this only picks the
+  // value up. It is interpolated into `color-mix()` below, which a malformed
+  // colour would take down along with the whole header wash.
+  const accent = rarityColor(brawler.rarity?.color);
   const name = titleCase(brawler.name);
 
   // "Unknown" is a real value upstream, not a missing one: unclassified

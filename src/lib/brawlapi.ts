@@ -35,12 +35,37 @@ async function baFetch<T>(path: string): Promise<T> {
 
 /* -------------------------------- brawlers -------------------------------- */
 
+/** The neutral stand-in for a rarity whose colour cannot be trusted. */
+export const FALLBACK_RARITY_COLOR = '#8b95b8';
+
+/**
+ * A rarity colour that is safe to interpolate into CSS.
+ *
+ * The artwork source ships at least one malformed value — Pierce's Legendary
+ * rarity is `#fff11ev`, a typo for `#fff11e` — and it is not a harmless one.
+ * An invalid colour inside `color-mix()` drops the *whole declaration*, so a
+ * single stray character silently removes a card's border, plate or wash
+ * wherever that brawler appears. It was reaching the page 43 times on a large
+ * profile.
+ *
+ * Cleaned once here rather than guarded at each call site, because the call
+ * sites are the problem: three of them checked and the rest did not.
+ */
+export function rarityColor(value: string | undefined | null): string {
+  return value && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)
+    ? value
+    : FALLBACK_RARITY_COLOR;
+}
+
 export async function getBrawlers(): Promise<BABrawler[]> {
   const data = await baFetch<BABrawlerList>('/brawlers');
   return [...data.list]
     .sort((a, b) => a.id - b.id)
     .map((b) => ({
       ...b,
+      // Every consumer reads `rarity.color` straight into a style, so it is
+      // normalised at the source and never arrives broken.
+      rarity: { ...b.rarity, color: rarityColor(b.rarity?.color) },
       starPowers: b.starPowers.map((a) => normalizeAccessory(a, starPowerIconUrl)),
       gadgets: b.gadgets.map((a) => normalizeAccessory(a, gadgetIconUrl)),
     }));

@@ -59,6 +59,15 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  /*
+   * Full-bleed bands escape the content column with `w-screen`, and 100vw
+   * includes the scrollbar — so on a desktop with one, every band was a few
+   * pixels wider than the viewport and the page could scroll sideways.
+   *
+   * `clip` rather than `hidden`: `hidden` makes the body a scroll container,
+   * which silently breaks `position: sticky` on the header.
+   */
+  overflow-x: clip;
 }
 
 /*

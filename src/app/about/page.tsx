@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/about' },
   title: 'About',
   description:
-    'What Brawl Zone is, where its data comes from, and what it can and cannot tell you.',
+    'What BrawlZone is, where its data comes from, and what it can and cannot tell you.',
 };
 
 const SOURCES = [
@@ -45,7 +45,7 @@ export default function AboutPage() {
   return (
     <div className="space-y-12">
       <PageHeading
-        title="About Brawl Zone"
+        title="About BrawlZone"
         subtitle="A fast, honest stats site for Brawl Stars. Built for players who want to know exactly where they stand."
       />
 
@@ -204,7 +204,7 @@ export default function AboutPage() {
             Built by one person
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-muted">
-            Brawl Zone is free, ad-free and has no paywall. If it saved you some time,
+            BrawlZone is free, ad-free and has no paywall. If it saved you some time,
             a coffee goes a long way.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">

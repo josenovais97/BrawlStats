@@ -4,6 +4,7 @@ import { LeaderboardIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Disclosure } from '@/components/ui/disclosure';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
@@ -14,6 +15,14 @@ interface Props {
   /** brawlerId -> artwork URL. */
   iconFor: (id: number) => string | undefined;
 }
+
+/**
+ * Placements shown before the rest fold away.
+ *
+ * Eight fits two rows on a phone and one on a desktop, which is the point:
+ * the section should read as a highlight, not as an inventory.
+ */
+const SHOWN = 8;
 
 /** Colour bands so a top-10 placement reads differently from a top-200 one. */
 function band(rank: number): { label: string; color: string } {
@@ -32,6 +41,9 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
   if (placements.length === 0) return null;
 
   const best = placements[0];
+  // Already ordered best-first by the query.
+  const shown = placements.slice(0, SHOWN);
+  const rest = placements.slice(SHOWN);
 
   return (
     <section>
@@ -80,34 +92,70 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {placements.map((placement) => {
-          const { color } = band(placement.rank);
-          return (
-            <Link
-              key={placement.brawlerId}
-              href={brawlerPath(placement.brawlerId, placement.brawlerName)}
-              className="card card-interactive flex items-center gap-2 py-1.5 pl-1.5 pr-3"
-              title={`#${placement.rank} in the world on ${placement.brawlerName}`}
-            >
-              <Image
-                src={iconFor(placement.brawlerId) ?? brawlerIconUrl(placement.brawlerId)}
-                alt=""
-                width={28}
-                height={28}
-                className="size-7 shrink-0"
-                unoptimized
-              />
-              <span className="text-sm font-bold tabular-nums" style={{ color }}>
-                #{placement.rank}
-              </span>
-              <span className="text-sm capitalize text-muted">
-                {placement.brawlerName.toLowerCase()}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      {/*
+        Capped, because the very players this section exists for are the ones
+        it breaks on: a top-200 regular holds dozens of placements — 61 on the
+        profile that prompted this — and an uncapped wrap of chips pushed
+        Progression and everything under it most of a screen down. The best
+        ones are the point; the rest are a list you open if you want it.
+      */}
+      <ul className="flex flex-wrap gap-2">
+        {shown.map((placement) => (
+          <li key={placement.brawlerId}>
+            <Chip placement={placement} iconFor={iconFor} />
+          </li>
+        ))}
+      </ul>
+
+      {rest.length > 0 ? (
+        <Disclosure
+          tone="bare"
+          className="mt-1"
+          summary={`Show all ${placements.length} placements`}
+        >
+          <ul className="flex flex-wrap gap-2">
+            {rest.map((placement) => (
+              <li key={placement.brawlerId}>
+                <Chip placement={placement} iconFor={iconFor} />
+              </li>
+            ))}
+          </ul>
+        </Disclosure>
+      ) : null}
     </section>
+  );
+}
+
+/** One placement: rank band colour, portrait, brawler. */
+function Chip({
+  placement,
+  iconFor,
+}: {
+  placement: BrawlerPlacement;
+  iconFor: (id: number) => string | undefined;
+}) {
+  const { color } = band(placement.rank);
+  return (
+    <Link
+      href={brawlerPath(placement.brawlerId, placement.brawlerName)}
+      className="card card-interactive flex items-center gap-2 py-1.5 pl-1.5 pr-3"
+      title={`#${placement.rank} in the world on ${placement.brawlerName}`}
+    >
+      <Image
+        src={iconFor(placement.brawlerId) ?? brawlerIconUrl(placement.brawlerId)}
+        alt=""
+        width={28}
+        height={28}
+        className="size-7 shrink-0"
+        loading="lazy"
+        unoptimized
+      />
+      <span className="text-sm font-bold tabular-nums" style={{ color }}>
+        #{placement.rank}
+      </span>
+      <span className="text-sm capitalize text-muted">
+        {placement.brawlerName.toLowerCase()}
+      </span>
+    </Link>
   );
 }

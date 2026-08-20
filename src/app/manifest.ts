@@ -1,13 +1,13 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Web app manifest. Makes Brawl Zone installable, which is what lets the
+ * Web app manifest. Makes BrawlZone installable, which is what lets the
  * mobile install prompt appear at all.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Brawl Zone: Brawl Stars stats',
-    short_name: 'Brawl Zone',
+    name: 'BrawlZone: Brawl Stars stats',
+    short_name: 'BrawlZone',
     description:
       'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',
     start_url: '/',

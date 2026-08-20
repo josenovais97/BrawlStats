@@ -28,8 +28,8 @@ const lilita = Lilita_One({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Brawl Zone: Brawl Stars player, club and brawler stats',
-    template: '%s · Brawl Zone',
+    default: 'BrawlZone: Brawl Stars player, club and brawler stats',
+    template: '%s · BrawlZone',
   },
   description:
     'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',

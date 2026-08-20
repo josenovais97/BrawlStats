@@ -10,7 +10,7 @@ export function BrandMark({ className = 'size-8' }: { className?: string }) {
       viewBox="0 0 64 64"
       className={className}
       role="img"
-      aria-label="Brawl Zone"
+      aria-label="BrawlZone"
       fill="none"
     >
       <defs>
