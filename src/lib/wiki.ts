@@ -121,12 +121,22 @@ export function balancedTemplate(text: string, from: number): string | null {
 /**
  * Parses a named infobox template into its parameters.
  *
- * Matched loosely on purpose: brawlers with a second form carry their own
+ * Matched loosely on purpose, in two ways.
+ *
+ * The prefix is open because brawlers with a second form carry their own
  * template — `{{Chester Infobox}}`, `{{Kaze Infobox}}` — with the same
  * parameter names as the shared one.
+ *
+ * And spaces in a template name are matched as "space or underscore", because
+ * MediaWiki treats the two as the same character in a page title and editors
+ * use them interchangeably. Brock's page says `{{Brawler_Infobox`, everyone
+ * else's says `{{Brawler Infobox`, and it is the same template: a pattern that
+ * only allowed the space silently dropped every combat stat on that page while
+ * the rest of it carried on working.
  */
 export function parseInfobox(wikitext: string, kind = 'Infobox'): Record<string, string> {
-  const match = new RegExp(`\\{\\{[A-Za-z ]*${kind}`).exec(wikitext);
+  const name = kind.replace(/[ _]+/g, '[ _]+');
+  const match = new RegExp(`\\{\\{[A-Za-z _-]*?${name}`).exec(wikitext);
   if (!match) return {};
 
   const box = balancedTemplate(wikitext, match.index);

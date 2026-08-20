@@ -118,7 +118,7 @@ export function BuildAndUpgrades({
           />
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid items-start gap-4 lg:grid-cols-2">
           <AbilityCard
             title="Star powers"
             kind="starPower"
@@ -137,8 +137,12 @@ export function BuildAndUpgrades({
           />
         </div>
 
+        {/* `items-start`, like the pair above: a hypercharge is one paragraph
+            and a buffie list is one row per ability, so stretching them to
+            match left the hypercharge card as a caption floating in three
+            hundred pixels of empty surface. */}
         {hasHypercharge || hasBuffies ? (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid items-start gap-4 lg:grid-cols-2">
             {hasHypercharge ? (
               <UpgradeCard
                 title="Hypercharge"
@@ -236,11 +240,21 @@ export function BuildAndUpgrades({
             icon={<GearIcon className="size-5" />}
             aside={`${gears.length} equippable`}
           >
-            <ul className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
+            {/*
+              Separate tiles rather than cells divided by hairlines. A brawler
+              has seven gears and the grid runs two or three across, so the
+              last row is nearly always short — and with the dividers drawn by
+              the container's background, every unfilled cell rendered as a
+              blank panel sitting in the row.
+            */}
+            <ul className="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
               {gears.map((gear) => {
                 const text = gearText.get(slugify(gear.name));
                 return (
-                  <li key={gear.id} className="flex gap-3 bg-surface p-3.5">
+                  <li
+                    key={gear.id}
+                    className="flex gap-3 rounded-xl bg-surface-2/50 p-3"
+                  >
                     <Image
                       src={gearIconUrl(gear.id)}
                       alt=""
@@ -289,7 +303,7 @@ function UpgradeCard({
 }) {
   const { accent } = KIND[kind];
   return (
-    <div className="card flex h-full flex-col overflow-hidden">
+    <div className="card flex flex-col overflow-hidden">
       <span aria-hidden className="block h-0.5 w-full" style={{ background: accent }} />
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
         <span
