@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getStarrDrops, type DropTable, type DropType } from '@/lib/starr-drops';
+import { getStarrDrops, type DropReward, type DropTable, type DropType } from '@/lib/starr-drops';
 
 export const metadata: Metadata = {
   title: 'Brawl Stars Starr Drop odds. Every drop rate and what is inside',
@@ -102,41 +103,59 @@ export default async function StarrDropsPage() {
   );
 }
 
+/**
+ * One drop type: its artwork, what it is, and the tables behind it.
+ *
+ * The artwork is the point. A drop is a physical object in the game — people
+ * recognise a Chaos Drop by its shape long before they read the word — and the
+ * first version of this page was a wall of percentages that could have been
+ * about anything. Leading each section with the real image is what makes it
+ * scannable.
+ */
 function DropSection({ type }: { type: DropType }) {
   return (
-    <section aria-labelledby={type.slug} className="reveal space-y-4">
-      <div className="flex items-start gap-3">
-        <span className="rule mt-1" aria-hidden />
+    <section aria-labelledby={type.slug} className="reveal card overflow-hidden">
+      <header className="flex items-center gap-4 border-b border-border bg-surface-2/40 p-4 sm:gap-5 sm:p-5">
+        {type.imageUrl ? (
+          <Image
+            src={type.imageUrl}
+            alt=""
+            width={96}
+            height={96}
+            className="size-16 shrink-0 object-contain drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)] sm:size-20"
+            unoptimized
+          />
+        ) : null}
+
         <div className="min-w-0">
-          <h2 id={type.slug} className="display text-2xl uppercase">
+          <h2 id={type.slug} className="display text-xl uppercase sm:text-2xl">
             {type.name}
           </h2>
           {type.description ? (
-            <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
               {type.description}
             </p>
           ) : null}
         </div>
+      </header>
+
+      <div className="space-y-4 p-4 sm:p-5">
+        {type.rarityOdds.length > 0 ? <RarityBar type={type} /> : null}
+
+        {/* `items-start` so a five-row table does not stretch to match a
+            seven-row one beside it and end in dead space. */}
+        {type.tables.length > 0 ? (
+          <div className="grid items-start gap-3 lg:grid-cols-2">
+            {type.tables.map((table, index) => (
+              <RewardTable key={table.rarity ?? index} table={table} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted">
+            The wiki publishes no reward table for this drop.
+          </p>
+        )}
       </div>
-
-      {/* How often the drop rolls each rarity. A bar rather than a table: the
-          whole point is that Legendary is a sliver, and 2% in a cell does not
-          land the way 2% of a width does. */}
-      {type.rarityOdds.length > 0 ? <RarityBar type={type} /> : null}
-
-      {/* `items-start` so a five-row table does not stretch to match a
-          seven-row one beside it and end in dead space. */}
-      {type.tables.length > 0 ? (
-        <div className="grid items-start gap-4 lg:grid-cols-2">
-          {type.tables.map((table, index) => (
-            <RewardTable key={table.rarity ?? index} table={table} />
-          ))}
-        </div>
-      ) : (
-        <p className="card p-4 text-sm text-muted">
-          The wiki publishes no reward table for this drop.
-        </p>
-      )}
     </section>
   );
 }
@@ -155,6 +174,7 @@ const RARITY_COLOR: Record<string, string> = {
   Mythic: '#ff4d6d',
   Legendary: '#ffc53d',
   Ultra: '#ff8a3d',
+  'Ultra Legendary': '#ff8a3d',
   Angelic: '#ffe9a8',
   Demonic: '#ff5c72',
 };
@@ -165,11 +185,11 @@ function rarityColor(rarity: string | null): string {
 
 function RarityBar({ type }: { type: DropType }) {
   return (
-    <div className="card overflow-hidden p-4">
-      <p className="eyebrow mb-3">Chance of rolling each rarity</p>
+    <div>
+      <p className="eyebrow mb-2.5">Chance of rolling each rarity</p>
 
       <div
-        className="flex h-3 w-full overflow-hidden rounded-full bg-surface-2"
+        className="flex h-2.5 w-full gap-0.5 overflow-hidden rounded-full bg-surface-2"
         role="img"
         aria-label={type.rarityOdds
           .map((odd) => `${odd.rarity} ${(odd.chance * 100).toFixed(0)}%`)
@@ -178,6 +198,7 @@ function RarityBar({ type }: { type: DropType }) {
         {type.rarityOdds.map((odd) => (
           <span
             key={odd.rarity}
+            className="first:rounded-l-full last:rounded-r-full"
             style={{
               width: `${odd.chance * 100}%`,
               background: rarityColor(odd.rarity),
@@ -186,12 +207,12 @@ function RarityBar({ type }: { type: DropType }) {
         ))}
       </div>
 
-      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
+      <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5">
         {type.rarityOdds.map((odd) => (
-          <li key={odd.rarity} className="flex items-center gap-1.5 text-sm">
+          <li key={odd.rarity} className="flex items-baseline gap-1.5 text-sm">
             <span
               aria-hidden
-              className="size-2.5 shrink-0 rounded-full"
+              className="size-2 shrink-0 translate-y-[-1px] rounded-full"
               style={{ background: rarityColor(odd.rarity) }}
             />
             <span className="text-muted">{odd.rarity}</span>
@@ -212,40 +233,19 @@ function RewardTable({ table }: { table: DropTable }) {
   const most = Math.max(...table.rewards.map((reward) => reward.chance ?? 0), 0);
 
   return (
-    <div className="card overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-border bg-surface-2/20">
       {table.rarity ? (
         <p
-          className="border-b border-border px-4 py-2.5 text-xs font-bold uppercase tracking-wide"
-          style={{ color, background: `color-mix(in srgb, ${color} 10%, transparent)` }}
+          className="border-b border-border px-3.5 py-2 text-xs font-bold uppercase tracking-wide"
+          style={{ color, background: `color-mix(in srgb, ${color} 12%, transparent)` }}
         >
           {table.rarity}
         </p>
       ) : null}
 
-      <ul className="divide-y divide-border">
+      <ul className="divide-y divide-border/60">
         {table.rewards.map((reward) => (
-          <li key={reward.reward} className="relative flex items-center gap-3 px-4 py-2.5">
-            {/* The chance as a width behind the row, so a column of numbers
-                also reads as a shape. Scaled to the biggest row rather than to
-                100%, or every row in a long table would be a sliver. */}
-            {reward.chance !== null && most > 0 ? (
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0"
-                style={{
-                  width: `${(reward.chance / most) * 100}%`,
-                  background: `color-mix(in srgb, ${color} 8%, transparent)`,
-                }}
-              />
-            ) : null}
-
-            <span className="relative min-w-0 flex-1 truncate text-sm">
-              {reward.reward}
-            </span>
-            <span className="relative shrink-0 text-sm font-bold tabular-nums">
-              {reward.chance === null ? '–' : `${(reward.chance * 100).toFixed(2)}%`}
-            </span>
-          </li>
+          <RewardRow key={reward.reward} reward={reward} color={color} most={most} />
         ))}
       </ul>
 
@@ -255,12 +255,67 @@ function RewardTable({ table }: { table: DropTable }) {
         percentages has no other way to notice.
       */}
       {short ? (
-        <p className="border-t border-border bg-surface-2/40 px-4 py-2.5 text-xs leading-relaxed text-muted">
+        <p className="border-t border-border bg-surface-2/60 px-3.5 py-2.5 text-xs leading-relaxed text-muted">
           These add up to {(table.listed * 100).toFixed(1)}%, not 100% — the wiki is
           missing a row here, so something else drops the remaining{' '}
           {((1 - table.listed) * 100).toFixed(1)}% of the time.
         </p>
       ) : null}
     </div>
+  );
+}
+
+function RewardRow({
+  reward,
+  color,
+  most,
+}: {
+  reward: DropReward;
+  color: string;
+  /** The biggest chance in this table, which the bars are scaled against. */
+  most: number;
+}) {
+  return (
+    <li className="relative flex items-center gap-3 px-3.5 py-2">
+      {/* The chance as a width behind the row, so a column of numbers also
+          reads as a shape. Scaled to the biggest row rather than to 100%, or
+          every row in a long table would be a sliver. */}
+      {reward.chance !== null && most > 0 ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0"
+          style={{
+            width: `${(reward.chance / most) * 100}%`,
+            background: `color-mix(in srgb, ${color} 9%, transparent)`,
+          }}
+        />
+      ) : null}
+
+      {reward.iconUrl ? (
+        <Image
+          src={reward.iconUrl}
+          alt=""
+          width={28}
+          height={28}
+          className="relative size-6 shrink-0 object-contain sm:size-7"
+          loading="lazy"
+          unoptimized
+        />
+      ) : (
+        /* Keeps the column aligned when a one-off event reward has no mark. */
+        <span aria-hidden className="relative size-6 shrink-0 sm:size-7" />
+      )}
+
+      <span className="relative min-w-0 flex-1 truncate text-sm">
+        {reward.amount ? (
+          <span className="font-bold tabular-nums">{reward.amount} </span>
+        ) : null}
+        <span className={reward.amount ? 'text-muted' : ''}>{reward.label}</span>
+      </span>
+
+      <span className="relative shrink-0 text-sm font-bold tabular-nums">
+        {reward.chance === null ? '–' : `${(reward.chance * 100).toFixed(2)}%`}
+      </span>
+    </li>
   );
 }

@@ -29,6 +29,21 @@ const REVALIDATE_DROPS = 43_200;
 export interface DropReward {
   /** What you get, e.g. "50 Coins" or "Ranked Spray". */
   reward: string;
+  /** The leading quantity, split off so it can be set as a figure: "50". */
+  amount: string | null;
+  /** What the quantity is of: "Coins". Equals `reward` when there is none. */
+  label: string;
+  /**
+   * The `{{Icon|…}}` name the wiki tagged this row with, e.g. "Coin".
+   *
+   * Kept as the wiki's own name rather than resolved here: the artwork is
+   * chosen at render time, where local assets beat remote ones and a missing
+   * icon can fall back to its category. Stripping this was why every row on
+   * the first version of the page was a line of text.
+   */
+  icon: string | null;
+  /** Artwork for `icon`, resolved to a real URL. Null when nothing matched. */
+  iconUrl: string | null;
   /** 0–1, or null when the wiki gave something unparseable. */
   chance: number | null;
 }
@@ -53,6 +68,8 @@ export interface DropTable {
 export interface DropType {
   name: string;
   slug: string;
+  /** The drop's own artwork, resolved from the wiki's `[[File:…]]`. */
+  imageUrl: string | null;
   /** One or two sentences of plain prose. */
   description: string;
   /** Chance of the drop rolling each rarity, 0–1. Empty when not stated. */
@@ -104,12 +121,46 @@ function parseChance(cell: string): number | null {
  * Common Power League Season 15 Common …". The collapsed content is dropped
  * before anything else runs, which leaves the label the row is actually about.
  */
+/** The `{{Icon|Coin}}` a row is tagged with, before the markup is stripped. */
+function rewardIcon(cell: string): string | null {
+  const match = cell.match(/\{\{\s*Icon\s*\|\s*([^}|]+?)\s*\}\}/i);
+  return match ? match[1] : null;
+}
+
+/**
+ * Splits "50 Coins" into a figure and a thing.
+ *
+ * Worth doing because it is the difference between a row of sentences and a
+ * row of numbers: set as a figure, the quantity lines up down the column and
+ * the eye can compare it. Ranges ("100-300 XP Doublers") count as one figure.
+ * A reward with no leading quantity — "Epic Brawler" — keeps its whole name.
+ */
+function splitAmount(reward: string): { amount: string | null; label: string } {
+  const match = reward.match(/^([\d,]+(?:\s*-\s*[\d,]+)?)\s+(.+)$/);
+  return match
+    ? { amount: match[1].replace(/\s+/g, ''), label: match[2] }
+    : { amount: null, label: reward };
+}
+
 function cleanReward(cell: string): string {
   const withoutCollapsed = cell.replace(
     /<div class="mw-collapsible-content"[\s\S]*/i,
     '',
   );
-  return toPlainText(withoutCollapsed).replace(/\s{2,}/g, ' ').trim();
+
+  return (
+    toPlainText(withoutCollapsed)
+      .replace(/\s{2,}/g, ' ')
+      /*
+       * A row that can pay out in more than one rarity writes both marks
+       * separated by a slash — `{{Icon|Rare skin}}/{{Icon|Super Rare skin}}
+       * Skin 30-79 Gem` — so removing the templates leaves the separator
+       * stranded at the front, and the reward rendered as "/ Skin 30-79 Gem".
+       * The label is what survives the marks, not the punctuation between them.
+       */
+      .replace(/^[^\p{L}\p{N}(]+/u, '')
+      .trim()
+  );
 }
 
 /** Every `{|class="article-table"…|}` block in a chunk of wikitext. */
@@ -154,7 +205,14 @@ function parseTable(text: string): DropReward[] {
     const reward = cleanReward(cells[0]);
     if (!reward) continue;
 
-    rewards.push({ reward, chance: parseChance(cells.slice(1).join('||')) });
+    rewards.push({
+      reward,
+      ...splitAmount(reward),
+      icon: rewardIcon(cells[0]),
+      // Filled in once every image on the page is resolved together.
+      iconUrl: null,
+      chance: parseChance(cells.slice(1).join('||')),
+    });
   }
 
   return rewards;
@@ -217,6 +275,99 @@ function slugify(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
+/**
+ * Artwork for a reward, in order of preference.
+ *
+ * Local first. `public/icons` already holds proper transparent PNGs for the
+ * resources that make up most of every table — coins, power points, XP — and
+ * they load from our own origin at a size chosen for this use. Reaching for
+ * the wiki's copy of an asset we already ship would be slower and worse.
+ *
+ * Gadget is the one exception that is neither: Brawlify publishes a
+ * representative gadget asset that `game-icons.tsx` already uses as the
+ * generic mark, and matching it here keeps one idea looking like one idea
+ * across the site.
+ *
+ * The rest are wiki file *names* rather than URLs, because the URL is
+ * content-hashed and would rot the first time someone re-uploads the image.
+ * They resolve through the same batched call as the drop artwork.
+ */
+const LOCAL_ICON: Record<string, string> = {
+  Gadget: 'https://cdn.brawlify.com/gadgets/borderless/23000255.png',
+  Coin: '/icons/coin.png',
+  'Power Point': '/icons/power-point.png',
+  'XP Doubler': '/icons/experience.png',
+  Hypercharge: '/icons/hypercharge.png',
+  'Hypercharge skin': '/icons/hypercharge.png',
+  Buffie: '/icons/buffie.png',
+  'Profile Icon': '/icons/cosmetics.png',
+  Trophy: '/icons/trophy.png',
+};
+
+const WIKI_ICON: Record<string, string> = {
+  Credit: 'Icon-Credit.png',
+  Bling: 'Bling.png',
+  Gem: 'Icon-Gem.png',
+  Mutation: 'Mutation.png',
+  'Pro Pass XP': 'Pro Pass XP.png',
+  'Star Power': 'Star Power.png',
+  Spray: 'Sprays.png',
+};
+
+/**
+ * Whole families share one mark.
+ *
+ * The wiki distinguishes a Rare Brawler from a Legendary Brawler in the icon
+ * name, but there is no separate artwork for them and the rarity is already
+ * in the row's own label — so every `… Brawler` gets the brawler mark, every
+ * `… skin` the skin mark, every `… Pin` the pin. Checked after the exact maps,
+ * so "Hypercharge skin" still gets its own icon.
+ */
+function familyIcon(icon: string): { local?: string; wiki?: string } | null {
+  if (/\bBrawler$/i.test(icon)) return { local: '/icons/brawlers.png' };
+  if (/\bskins?$/i.test(icon) || icon === 'Skin Upgrade') return { local: '/icons/skins.png' };
+  if (/\bPin$/i.test(icon)) return { wiki: 'Pin.png' };
+  if (/\bDrop$|\bEgg$|\bBox$|\bPresent$/i.test(icon)) return { wiki: `${icon}.png` };
+  return null;
+}
+
+/** The `[[File:Starr Drop.png|right|110px]]` a section opens with. */
+function artworkFile(body: string): string | null {
+  const match = body.match(/\[\[File:([^|\]]+?\.(?:png|jpg|gif))/i);
+  return match ? match[1].trim() : null;
+}
+
+/**
+ * Turns wiki file names into image URLs, in one request for the whole page.
+ *
+ * `[[File:Starr Drop.png]]` is a *name*, not an address — the real URL is a
+ * content-hashed path on the wiki's CDN. The API resolves them in bulk, so
+ * thirteen drop types cost one call rather than thirteen, and a failure here
+ * costs artwork rather than the page.
+ */
+async function resolveArtwork(files: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const unique = [...new Set(files)];
+  if (unique.length === 0) return out;
+
+  const titles = unique.map((file) => `File:${file}`).join('|');
+  const url = `${WIKI_API}?action=query&titles=${encodeURIComponent(
+    titles,
+  )}&prop=imageinfo&iiprop=url&format=json`;
+
+  const body = await fetchWikiJson<{
+    query?: { pages?: Record<string, { title?: string; imageinfo?: { url?: string }[] }> };
+  }>(url, REVALIDATE_DROPS);
+
+  for (const page of Object.values(body?.query?.pages ?? {})) {
+    const name = page.title?.replace(/^File:/, '');
+    const src = page.imageinfo?.[0]?.url;
+    if (name && src) out.set(name, src);
+  }
+
+  return out;
+}
+
 function parseGroup(wikitext: string, heading: string, group: DropType['group']): DropType[] {
   const at = wikitext.search(new RegExp(`^==\\s*${heading}\\s*==\\s*$`, 'm'));
   if (at === -1) return [];
@@ -241,6 +392,8 @@ function parseGroup(wikitext: string, heading: string, group: DropType['group'])
       return {
         name: name.trim(),
         slug: slugify(name),
+        // Filled in once every file on the page has been resolved together.
+        imageUrl: artworkFile(body),
         description: parseDescription(body),
         rarityOdds: parseRarityOdds(body),
         // An empty table is a parse failure and is not shown. A short one is
@@ -253,6 +406,16 @@ function parseGroup(wikitext: string, heading: string, group: DropType['group'])
 }
 
 /* ---------------------------------- read ---------------------------------- */
+
+function localIconPath(icon: string | null): string | null {
+  if (!icon) return null;
+  return LOCAL_ICON[icon] ?? familyIcon(icon)?.local ?? null;
+}
+
+function wikiIconFile(icon: string | null): string | null {
+  if (!icon || localIconPath(icon)) return null;
+  return WIKI_ICON[icon] ?? familyIcon(icon)?.wiki ?? null;
+}
 
 interface WikiParseResponse {
   parse?: { wikitext?: { '*'?: string } };
@@ -269,6 +432,36 @@ export async function getStarrDrops(): Promise<StarrDropData | null> {
   ];
 
   if (types.length === 0) return null;
+
+  /*
+   * One request for every image on the page: the drop artwork and any reward
+   * icon we do not ship ourselves. Resolving these per row would be a hundred
+   * calls to render one page.
+   */
+  const wanted = new Set<string>();
+  for (const type of types) {
+    if (type.imageUrl) wanted.add(type.imageUrl);
+    for (const table of type.tables) {
+      for (const reward of table.rewards) {
+        const file = wikiIconFile(reward.icon);
+        if (file) wanted.add(file);
+      }
+    }
+  }
+
+  const artwork = await resolveArtwork([...wanted]);
+
+  // `imageUrl` currently holds the file *name*; swap each for its real URL.
+  for (const type of types) {
+    type.imageUrl = type.imageUrl ? (artwork.get(type.imageUrl) ?? null) : null;
+    for (const table of type.tables) {
+      for (const reward of table.rewards) {
+        const local = localIconPath(reward.icon);
+        const file = wikiIconFile(reward.icon);
+        reward.iconUrl = local ?? (file ? (artwork.get(file) ?? null) : null);
+      }
+    }
+  }
 
   return {
     types,

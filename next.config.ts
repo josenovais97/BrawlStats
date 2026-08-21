@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'cdn-old.brawlify.com', pathname: '/**' },
       // Thumbnails on official Brawl Stars news posts.
       { protocol: 'https', hostname: 'brawlstars.inbox.supercell.com', pathname: '/**' },
+      // Drop artwork and reward marks on the Starr Drops page, from the wiki
+      // the odds themselves come from.
+      { protocol: 'https', hostname: 'static.wikia.nocookie.net', pathname: '/**' },
     ],
   },
 };
