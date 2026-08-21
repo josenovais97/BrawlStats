@@ -2,6 +2,7 @@
 
 import {
   ChevronDown,
+  Gift,
   Menu,
   Newspaper,
   ScrollText,
@@ -79,6 +80,8 @@ const MORE: NavItem[] = [
    */
   { href: '/leaderboard?type=clubs', match: '/club', label: 'Clubs', icon: ClubIcon },
   { href: '/compare', label: 'Compare', icon: CompareIcon },
+  { href: '/tier-list/maker', label: 'Tier List Maker', icon: TierListIcon },
+  { href: '/starr-drops', label: 'Starr Drops', icon: Gift },
   { href: '/news', label: 'News', icon: Newspaper },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
 ];

@@ -29,6 +29,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/tier-list/ranked', 'daily', 0.9],
     ['/tier-list/trophy', 'daily', 0.9],
     ['/maps', 'weekly', 0.85],
+    ['/starr-drops', 'weekly', 0.8],
+    ['/tier-list/maker', 'monthly', 0.75],
     ['/ranked', 'daily', 0.8],
     ['/brawlers', 'weekly', 0.8],
     ['/draft', 'weekly', 0.8],

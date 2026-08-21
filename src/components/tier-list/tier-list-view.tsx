@@ -244,6 +244,15 @@ export async function TierListView({
           >
             {format === 'ranked' ? 'trophy tier list' : 'Ranked tier list'}
           </Link>
+          .{' '}
+          {/* The measured list is the one worth disagreeing with, so the place
+              to disagree belongs next to it rather than buried in a menu. */}
+          <Link
+            href="/tier-list/maker"
+            className="font-medium text-brand hover:underline"
+          >
+            Disagree? Build your own
+          </Link>
           .
         </p>
 
