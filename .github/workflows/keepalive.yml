@@ -1,0 +1,76 @@
+# Keeps the sampling schedule from being switched off for being quiet.
+#
+# GitHub disables scheduled workflows on public repositories after 60 days with
+# no repository activity. This repository's data collection *is* a scheduled
+# workflow (`refresh-stats.yml`), so once the project is in maintenance and
+# nobody is committing, the 60-day rule is a timer counting down to the site's
+# numbers silently freezing — the pages keep serving, the data just stops
+# moving, and nothing announces it.
+#
+# So this pushes an empty commit when, and only when, the repository has gone
+# quiet enough to be at risk. It changes no code and carries `[skip ci]`, so
+# Vercel does not spend a build on it either.
+#
+# If you would rather not have the bot commit at all, delete this file: GitHub
+# emails the repository owner before it disables anything, and re-enabling is
+# one click in the Actions tab.
+name: Keepalive
+
+on:
+  # 06:41 every Monday.
+  #
+  # Weekly rather than monthly, and that is not caution — monthly does not
+  # work. Checks 30 days apart can straddle the deadline: a repository last
+  # touched on the 21st gets looked at on day 11, day 41 and day 72, and the
+  # only one over any sensible threshold lands twelve days after GitHub has
+  # already switched the schedule off. Weekly checks guarantee one inside the
+  # window whatever day the last commit fell on.
+  #
+  # An odd minute keeps it off the top of the hour, where GitHub's shared
+  # scheduler is busiest and runs are most likely to be dropped.
+  schedule:
+    - cron: '41 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    # Never on a fork: a fork inherits the schedule but not the intent, and
+    # this job's whole effect is to write to the repository it runs in.
+    if: github.repository == 'josenovais97/BrawlStats'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The commit history is what this measures, so a shallow clone would
+          # leave it reading the wrong date.
+          fetch-depth: 0
+
+      - name: Push an empty commit if the repository has gone quiet
+        run: |
+          set -euo pipefail
+
+          last=$(git log -1 --format=%ct)
+          days=$(( ( $(date +%s) - last ) / 86400 ))
+          echo "Last commit was $days days ago."
+
+          # 40 of the 60 available. Weekly checks mean the first one past this
+          # threshold lands by day 46 at the latest, which leaves a fortnight —
+          # two more scheduled runs — before GitHub's cutoff. That margin is
+          # the point: its shared scheduler drops runs under load, so the plan
+          # has to survive missing a couple.
+          if [ "$days" -lt 40 ]; then
+            echo "Recent enough. Nothing to do."
+            exit 0
+          fi
+
+          echo "Quiet for $days days — pushing an empty commit to reset the timer."
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "Keep scheduled workflows alive [skip ci]"
+          # Explicit rather than a bare `git push`, which relies on the branch
+          # having upstream tracking set up by the checkout step.
+          git push origin "HEAD:${GITHUB_REF_NAME}"
