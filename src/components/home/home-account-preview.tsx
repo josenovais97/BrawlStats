@@ -35,7 +35,7 @@ export async function HomeAccountPreview() {
     <section className="reveal" aria-labelledby="account-preview">
       <div className="mb-6 max-w-2xl">
         <p className="eyebrow text-accent">After you search</p>
-        <h2 id="account-preview" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
+        <h2 id="account-preview" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
           Your account, explained
         </h2>
         <p className="mt-3 leading-relaxed text-muted">

@@ -97,8 +97,13 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
                 
                 Streamed: it reads the meta to decide who is standing on it, and
                 the search must never wait on a database. The column keeps its
-                height either way, so nothing shifts when the cast arrives. */}
-            <div className="relative hidden h-[27rem] lg:block">
+                height either way, so nothing shifts when the cast arrives.
+                
+                `drift-fore` lifts it against the page as you scroll, on the
+                compositor's scroll timeline rather than a scroll handler — the
+                copy stays put, the cast rises, and the two columns stop reading
+                as one flat picture. */}
+            <div className="drift-fore relative hidden h-[27rem] lg:block">
               <Suspense fallback={null}>
                 <Stage />
               </Suspense>

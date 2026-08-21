@@ -32,8 +32,11 @@ export async function HomeSplit() {
     <section className="reveal" aria-labelledby="split">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:items-center lg:gap-10">
         <div className="min-w-0">
-          <p className="eyebrow text-accent">Why the numbers differ here</p>
-          <h2 id="split" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
+          <p className="flex items-center gap-2.5">
+            <span aria-hidden className="rule h-4" />
+            <span className="eyebrow text-accent">Why the numbers differ here</span>
+          </p>
+          <h2 id="split" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
             Two games.
             <br />
             Two answers.

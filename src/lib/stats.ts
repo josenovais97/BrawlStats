@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { cache } from 'react';
+
 import type { BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
 import { stripGameMarkup } from '@/lib/format';
 import { getPrisma } from '@/lib/prisma';
@@ -1241,13 +1243,15 @@ export function scoreBrawlers(
  * few brawlers rather than render the whole ranking — the profile page joining
  * a player's roster against the meta, mainly.
  */
-export async function getMetaIndex(
-  format: TierFormat = 'ranked',
-  windowDays = 7,
-): Promise<Map<number, ScoredBrawler>> {
-  const rows = await getBrawlerStatsForWindow(windowDays, undefined, format);
-  return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
-}
+export const getMetaIndex = cache(
+  async (
+    format: TierFormat = 'ranked',
+    windowDays = 7,
+  ): Promise<Map<number, ScoredBrawler>> => {
+    const rows = await getBrawlerStatsForWindow(windowDays, undefined, format);
+    return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
+  },
+);
 
 /**
  * Elo every account is placed at when a Ranked season resets.

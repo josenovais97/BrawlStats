@@ -5,6 +5,13 @@
  * follow the familiar badge layout; if you want strict brand compliance,
  * replace these with the official artwork from Apple's Marketing Resources
  * and Google Play's badge generator — the components are swappable in place.
+ *
+ * Every label is pinned with `textLength`, and that is load-bearing rather
+ * than tidy. The labels are set in `system-ui`, which is a different typeface
+ * on every platform: the widths that fit inside the 135-unit badge on one
+ * machine ran past its right edge on another, and "Google Play" was rendering
+ * with the "y" sliced off. Pinning the advance width makes the fit a property
+ * of the badge instead of a property of whoever is looking at it.
  */
 
 interface BadgeProps {
@@ -43,6 +50,8 @@ export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fill="#ffffff"
         fontFamily="system-ui, -apple-system, Helvetica, Arial, sans-serif"
         fontSize="8.5"
+        textLength="60"
+        lengthAdjust="spacingAndGlyphs"
       >
         Download on the
       </text>
@@ -53,6 +62,8 @@ export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fontFamily="system-ui, -apple-system, Helvetica, Arial, sans-serif"
         fontSize="16"
         fontWeight="600"
+        textLength="78"
+        lengthAdjust="spacingAndGlyphs"
       >
         App Store
       </text>
@@ -90,11 +101,11 @@ export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fill="#ffffff"
         fontFamily="system-ui, -apple-system, Helvetica, Arial, sans-serif"
         fontSize="8.5"
+        textLength="44"
+        lengthAdjust="spacingAndGlyphs"
       >
         GET IT ON
       </text>
-      {/* Slightly tighter than the App Store label: "Google Play" is a longer
-          string and would otherwise graze the badge's right edge. */}
       <text
         x="45"
         y="30"
@@ -102,6 +113,8 @@ export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fontFamily="system-ui, -apple-system, Helvetica, Arial, sans-serif"
         fontSize="14.5"
         fontWeight="600"
+        textLength="78"
+        lengthAdjust="spacingAndGlyphs"
       >
         Google Play
       </text>

@@ -35,7 +35,7 @@ export async function HomeSnapshot() {
             <span className="live-dot" />
             Live snapshot
           </p>
-          <h2 id="snapshot" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
+          <h2 id="snapshot" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
             Where things stand
           </h2>
         </div>
@@ -44,7 +44,7 @@ export async function HomeSnapshot() {
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
+      <div className="reveal-row grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
         <div className="min-w-0">
           {leader ? (
             <>

@@ -35,7 +35,7 @@ export async function HomeLiveEvents() {
    * it scrolls without needing an arrow or a row of dots.
    */
   return (
-    <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-3">
+    <ul className="reveal-row -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-3">
       {slots.map((slot) => {
         const map = mapMeta.get(slot.event.id);
         const mode = modeMeta.get((slot.event.mode ?? '').toLowerCase());

@@ -199,6 +199,114 @@ body {
   animation: reveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/*
+ * The same reveal, dealt out across a row instead of landing on it all at
+ * once.
+ *
+ * Each child animates on its *own* view timeline, and since the children of a
+ * row share a vertical position their timelines run in lockstep — so the
+ * stagger has to come from the range rather than from a delay, which a scroll
+ * timeline has no concept of. Shifting each child's range 7% later down the
+ * entry is what makes a four-card grid arrive as four cards.
+ *
+ * Capped at six. Past that the last card is still faded in when the first is
+ * long finished, and the row reads as broken rather than choreographed.
+ */
+@utility reveal-row {
+  @supports (animation-timeline: view()) {
+    & > * {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+    & > *:nth-child(2) {
+      animation-range: entry 7% entry 62%;
+    }
+    & > *:nth-child(3) {
+      animation-range: entry 14% entry 69%;
+    }
+    & > *:nth-child(4) {
+      animation-range: entry 21% entry 76%;
+    }
+    & > *:nth-child(5) {
+      animation-range: entry 28% entry 83%;
+    }
+    & > *:nth-child(n + 6) {
+      animation-range: entry 35% entry 90%;
+    }
+  }
+}
+
+/*
+ * Parallax, on the scroll timeline rather than a scroll listener.
+ *
+ * `scroll()` reports the root scroller's progress, so this is the one piece of
+ * depth on the page that costs no JavaScript and cannot jank: it is driven by
+ * the compositor, not by an event handler racing the frame. The range is short
+ * on purpose — the effect belongs to the first screen, and a drift that keeps
+ * going for the whole document is a distraction three sections later.
+ */
+@keyframes drift-up {
+  to {
+    transform: translateY(-2rem);
+  }
+}
+
+@keyframes drift-down {
+  to {
+    transform: translateY(1.25rem);
+  }
+}
+
+@utility drift-fore {
+  @supports (animation-timeline: scroll()) {
+    animation: drift-up linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 70vh;
+    will-change: transform;
+  }
+}
+
+@utility drift-back {
+  @supports (animation-timeline: scroll()) {
+    animation: drift-down linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 70vh;
+    will-change: transform;
+  }
+}
+
+/*
+ * The header's own surface, faded in over the first inch of scroll.
+ *
+ * At the very top there is nothing to separate the bar from, and painting a
+ * bar and a rule there anyway is what stopped the hero's lighting from
+ * reaching the top of the window — the scene began an inch below the fold of
+ * its own page. Once anything is scrolling underneath, the surface is what
+ * keeps the nav readable, so it arrives exactly then.
+ *
+ * The fallback is the important half: without a scroll timeline the veil is
+ * simply opaque, which is the solid bar this replaced. Nothing is ever
+ * illegible because the effect is unavailable.
+ */
+@keyframes veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility header-veil {
+  @supports (animation-timeline: scroll()) {
+    opacity: 0;
+    animation: veil-in linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 4.5rem;
+  }
+}
+
 /* Section heading accent bar. */
 @utility rule {
   display: inline-block;
@@ -261,10 +369,25 @@ body {
    * the end state explicitly or the content never appears.
    */
   .reveal,
-  .reveal-now {
+  .reveal-now,
+  .reveal-row > * {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  /* Parallax is motion for its own sake, which is exactly what this query is
+     asking us not to do. */
+  .drift-fore,
+  .drift-back {
+    animation: none;
+    transform: none;
+  }
+
+  /* The veil is legibility, not decoration, so it stays — just permanently. */
+  .header-veil {
+    animation: none;
+    opacity: 1;
   }
 }
 

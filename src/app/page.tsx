@@ -67,7 +67,7 @@ const WEBSITE_SCHEMA = {
  */
 export default function HomePage() {
   return (
-    <div className="space-y-14 sm:space-y-16">
+    <div className="space-y-14 sm:space-y-20">
       <script
         type="application/ld+json"
         // Static object, no user input, so there is nothing to escape here.
@@ -124,9 +124,9 @@ export default function HomePage() {
         </Suspense>
       </HomeSection>
 
-      {/* One change of ground on the page, between the live data above and the
-          snapshot below. Any more dividing than this and the rhythm becomes
-          the decoration. */}
+      {/* The first of two changes of ground: this one raised, under the tools.
+          The other sinks, under the argument near the foot of the page. Two is
+          the limit — a third and the rhythm becomes the decoration. */}
       <HomeBand>
         <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
           <HomeTools />
@@ -141,10 +141,15 @@ export default function HomePage() {
         Straight after the snapshot, because it is the footnote the snapshot
         earns: those are the Ranked numbers, and the ladder disagrees. Placed
         anywhere earlier it would be an argument before any evidence.
+        
+        On the deep band because it is the only section that argues rather than
+        reports, and the page should look different where it changes register.
       */}
-      <Suspense fallback={null}>
-        <HomeSplit />
-      </Suspense>
+      <HomeBand tone="deep">
+        <Suspense fallback={null}>
+          <HomeSplit />
+        </Suspense>
+      </HomeBand>
 
       <HomeCta />
     </div>

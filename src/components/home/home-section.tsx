@@ -9,6 +9,11 @@ import type { ReactNode } from 'react';
  * This is separate from the site-wide `SectionHeading` on purpose — the
  * landing page runs a looser vertical rhythm and a trailing call to action
  * that the dense stat pages do not want.
+ *
+ * The gold rule before the eyebrow is the hero's own marker, repeated. It is
+ * the cheapest way to make six independent blocks read as one page: an eyebrow
+ * on its own is a label, and the same lit bar in front of every one of them is
+ * a signature the reader learns by the second section.
  */
 export function HomeSection({
   id,
@@ -37,8 +42,13 @@ export function HomeSection({
     <section className="reveal min-w-0" aria-labelledby={id}>
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-          <h2 id={id} className="display mt-2.5 text-2xl uppercase sm:text-3xl">
+          {eyebrow ? (
+            <p className="flex items-center gap-2.5">
+              <span aria-hidden className="rule h-4" />
+              <span className="eyebrow">{eyebrow}</span>
+            </p>
+          ) : null}
+          <h2 id={id} className="display mt-2.5 text-2xl uppercase sm:text-4xl">
             {title}
           </h2>
           {subtitle ? (

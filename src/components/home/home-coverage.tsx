@@ -1,3 +1,4 @@
+import { CountUp } from '@/components/ui/count-up';
 import { RelativeTime } from '@/components/ui/relative-time';
 import {
   BattlesIcon,
@@ -5,7 +6,7 @@ import {
   PlayersIcon,
   RankedIcon,
 } from '@/components/game-icons';
-import { compactNumber, relativeTime } from '@/lib/format';
+import { relativeTime } from '@/lib/format';
 import { getCoverageStats, getLastAggregationRun } from '@/lib/stats';
 
 /**
@@ -32,10 +33,10 @@ export async function HomeCoverage() {
   if (!stats || stats.battles === 0) return null;
 
   const items = [
-    { icon: BrawlersIcon, label: 'Brawlers tracked', value: compactNumber(stats.brawlers) },
-    { icon: PlayersIcon, label: 'Players sampled', value: compactNumber(stats.players) },
-    { icon: BattlesIcon, label: 'Battles analysed', value: compactNumber(stats.battles) },
-    { icon: RankedIcon, label: 'Ranked placements', value: compactNumber(stats.placements) },
+    { icon: BrawlersIcon, label: 'Brawlers tracked', value: stats.brawlers },
+    { icon: PlayersIcon, label: 'Players sampled', value: stats.players },
+    { icon: BattlesIcon, label: 'Battles analysed', value: stats.battles },
+    { icon: RankedIcon, label: 'Ranked placements', value: stats.placements },
   ];
 
   return (
@@ -79,8 +80,10 @@ export async function HomeCoverage() {
             >
               <Icon className="size-7 shrink-0 opacity-90 sm:size-8" />
               <div className="min-w-0">
+                {/* `tabular-nums` is what keeps the label below from shuffling
+                    sideways while the digits above it are still moving. */}
                 <p className="display text-2xl leading-none tabular-nums text-foreground sm:text-[1.75rem]">
-                  {value}
+                  <CountUp value={value} />
                 </p>
                 <p className="mt-1.5 truncate text-xs font-medium uppercase tracking-wide text-muted">
                   {label}

@@ -99,8 +99,16 @@ export function SiteHeader() {
   const moreActive = MORE.some((item) => isActive(pathname, item.href, item.match));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40">
+      {/* The bar's surface is a layer rather than the header's own background,
+          so it can fade in on scroll while the nav sitting on it never moves.
+          See `header-veil` in globals.css. */}
+      <span
+        aria-hidden
+        className="header-veil pointer-events-none absolute inset-0 -z-10 border-b border-border/70 bg-background/85 backdrop-blur-md"
+      />
+
+      <div className="relative mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="group flex shrink-0 items-center gap-2.5"

@@ -39,14 +39,20 @@ export async function HomeTools() {
   return (
     <section className="reveal" aria-labelledby="tools">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-        <h2 id="tools" className="display text-2xl uppercase">
-          Tools
-        </h2>
+        <div className="min-w-0">
+          <p className="flex items-center gap-2.5">
+            <span aria-hidden className="rule h-4" />
+            <span className="eyebrow">Everything else</span>
+          </p>
+          <h2 id="tools" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
+            Tools
+          </h2>
+        </div>
         <p className="text-sm text-muted">All of it from our own sampled battles.</p>
       </div>
 
       {/* Two featured, then four compact. The proportions are the hierarchy. */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="reveal-row grid gap-4 md:grid-cols-2">
         <Featured
           href="/tier-list/ranked"
           icon={<TierListIcon className="size-6" />}
@@ -107,22 +113,32 @@ export async function HomeTools() {
         container's hairline background renders that hole as a visible empty
         panel. The last item spans the gap instead.
       */}
-      <ul className="mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
+      <ul className="reveal-row mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
         {SECONDARY.map(({ href, icon: Icon, title, body }) => (
           <li
             key={href}
             className="bg-surface last:col-span-full sm:last:col-span-2 lg:last:col-span-1"
           >
+            {/*
+              A row on a phone, a card from `lg`. The strip used to be a row at
+              every width, which at full width is five lines of small text
+              pretending to be navigation — the same five destinations read as
+              tools once each one has a lit tile and room to breathe.
+            */}
             <Link
               href={href}
-              className="group flex h-full items-center gap-3 p-3.5 transition-colors hover:bg-surface-2"
+              className="group flex h-full items-center gap-3 p-3.5 transition-colors hover:bg-surface-2 lg:flex-col lg:items-start lg:gap-2.5 lg:p-4"
             >
-              <Icon className="size-7 shrink-0" />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-bold leading-tight">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 transition-colors group-hover:bg-surface-3">
+                <Icon className="size-6" />
+              </span>
+              <span className="min-w-0 flex-1 lg:flex-none">
+                <span className="block truncate text-sm font-bold leading-tight transition-colors group-hover:text-brand">
                   {title}
                 </span>
-                <span className="mt-0.5 block truncate text-xs text-muted">{body}</span>
+                <span className="mt-0.5 block truncate text-xs text-muted lg:whitespace-normal">
+                  {body}
+                </span>
               </span>
             </Link>
           </li>
