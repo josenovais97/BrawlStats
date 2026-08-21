@@ -298,9 +298,26 @@ const LOCAL_ICON: Record<string, string> = {
   'Power Point': '/icons/power-point.png',
   'XP Doubler': '/icons/experience.png',
   Hypercharge: '/icons/hypercharge.png',
-  'Hypercharge skin': '/icons/hypercharge.png',
+
+  /*
+   * Skins by rarity, because the rarity is the whole point of the row.
+   *
+   * A Legendary skin and a Rare skin are wildly different rewards and the
+   * table already sets them apart by chance — one generic hanger on both said
+   * only "a skin", which is the least interesting half of the answer. These
+   * are the game's own coloured marks, so the colour carries the rarity before
+   * the label is read. The Hypercharge one is the same hanger inside a flame.
+   */
+  'Rare skin': '/icons/skin-rare.png',
+  'Super Rare skin': '/icons/skin-super-rare.png',
+  'Epic skin': '/icons/skin-epic.png',
+  'Mythic skin': '/icons/skin-mythic.png',
+  'Legendary skin': '/icons/skin-legendary.png',
+  'Hypercharge skin': '/icons/skin-hypercharge.png',
   Buffie: '/icons/buffie.png',
-  'Profile Icon': '/icons/cosmetics.png',
+  // The game's own profile-icon tile. `cosmetics.png` is the clothes-hanger
+  // mark for skins, which is a different reward entirely.
+  'Profile Icon': '/icons/profile-icon.png',
   Trophy: '/icons/trophy.png',
 };
 
@@ -325,6 +342,8 @@ const WIKI_ICON: Record<string, string> = {
  */
 function familyIcon(icon: string): { local?: string; wiki?: string } | null {
   if (/\bBrawler$/i.test(icon)) return { local: '/icons/brawlers.png' };
+  // Catches anything the exact map above does not, such as "Skin Upgrade" and
+  // any rarity the game adds later.
   if (/\bskins?$/i.test(icon) || icon === 'Skin Upgrade') return { local: '/icons/skins.png' };
   if (/\bPin$/i.test(icon)) return { wiki: 'Pin.png' };
   if (/\bDrop$|\bEgg$|\bBox$|\bPresent$/i.test(icon)) return { wiki: `${icon}.png` };
