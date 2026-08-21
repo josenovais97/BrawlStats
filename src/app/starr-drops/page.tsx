@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -59,16 +60,28 @@ export default async function StarrDropsPage() {
         subtitle="What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki."
       />
 
-      {/* The permanent drops first. Event drops are the long tail: interesting,
-          but most of them have not been obtainable for a year. */}
-      <div className="space-y-8">
-        {core.map((type) => (
-          <DropSection key={type.slug} type={type} />
+      {/*
+        Every drop is folded shut, and the whole page is the list of them.
+        
+        Expanded, thirteen drop types ran to seventeen thousand pixels — so
+        finding the Legendary Chaos Drop table meant scrolling past nine event
+        drops that have not been obtainable in a year. Closed, the page is a
+        contents page: you see every drop at once and open the one you came
+        for. The first is open because a page that answers nothing until you
+        click is its own kind of unhelpful.
+      */}
+      <section aria-labelledby="permanent" className="space-y-3">
+        <SectionHeading
+          title="Permanent drops"
+          subtitle="Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop."
+        />
+        {core.map((type, index) => (
+          <DropSection key={type.slug} type={type} defaultOpen={index === 0} />
         ))}
-      </div>
+      </section>
 
       {event.length > 0 ? (
-        <div className="space-y-8">
+        <section aria-labelledby="event" className="space-y-3">
           <SectionHeading
             title="Event drops"
             subtitle="Limited-time drops from past events. Kept for reference — most are no longer obtainable."
@@ -77,7 +90,7 @@ export default async function StarrDropsPage() {
           {event.map((type) => (
             <DropSection key={type.slug} type={type} />
           ))}
-        </div>
+        </section>
       ) : null}
 
       <p className="text-xs leading-relaxed text-muted">
@@ -112,40 +125,84 @@ export default async function StarrDropsPage() {
  * about anything. Leading each section with the real image is what makes it
  * scannable.
  */
-function DropSection({ type }: { type: DropType }) {
+function DropSection({
+  type,
+  defaultOpen = false,
+}: {
+  type: DropType;
+  defaultOpen?: boolean;
+}) {
+  const rewardCount = type.tables.reduce(
+    (sum, table) => sum + table.rewards.length,
+    0,
+  );
+
   return (
-    <section aria-labelledby={type.slug} className="reveal card overflow-hidden">
-      <header className="flex items-center gap-4 border-b border-border bg-surface-2/40 p-4 sm:gap-5 sm:p-5">
+    <details open={defaultOpen} className="group card overflow-hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/40 sm:gap-4 sm:p-4 [&::-webkit-details-marker]:hidden">
         {type.imageUrl ? (
           <Image
             src={type.imageUrl}
             alt=""
-            width={96}
-            height={96}
-            className="size-16 shrink-0 object-contain drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)] sm:size-20"
+            width={80}
+            height={80}
+            className="size-11 shrink-0 object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] sm:size-14"
             unoptimized
           />
         ) : null}
 
-        <div className="min-w-0">
-          <h2 id={type.slug} className="display text-xl uppercase sm:text-2xl">
-            {type.name}
-          </h2>
-          {type.description ? (
-            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">
-              {type.description}
-            </p>
-          ) : null}
+        <div className="min-w-0 flex-1">
+          <h3 className="display text-base uppercase sm:text-lg">{type.name}</h3>
+          {/*
+            One line closed, the whole thing open. The description is the only
+            place that says where a drop comes from, so it is worth a glance in
+            the summary without letting it set the row height.
+          */}
+          <p className="mt-0.5 line-clamp-1 text-xs leading-relaxed text-muted group-open:line-clamp-none sm:text-sm">
+            {type.description}
+          </p>
         </div>
-      </header>
 
-      <div className="space-y-4 p-4 sm:p-5">
+        {/* What is behind the fold, so the row is worth reading closed. */}
+        <span className="hidden shrink-0 text-right text-xs text-muted sm:block">
+          {rewardCount > 0 ? (
+            <>
+              <span className="font-bold tabular-nums text-foreground">
+                {rewardCount}
+              </span>{' '}
+              rewards
+              {type.rarityOdds.length > 0 ? (
+                <span className="block">
+                  {type.rarityOdds.length} rarities
+                </span>
+              ) : null}
+            </>
+          ) : (
+            'No table'
+          )}
+        </span>
+
+        <ChevronDown
+          aria-hidden
+          className="size-4 shrink-0 text-muted duration-200 group-open:rotate-180 motion-safe:transition-transform"
+        />
+      </summary>
+
+      <div className="space-y-4 border-t border-border p-3 sm:p-4">
         {type.rarityOdds.length > 0 ? <RarityBar type={type} /> : null}
 
-        {/* `items-start` so a five-row table does not stretch to match a
-            seven-row one beside it and end in dead space. */}
+        {/*
+          Auto-fit rather than a fixed column count.
+          
+          Five rarity tables in a two-column grid is 2 + 2 + 1, and that last
+          one sits alone against half a row of nothing — which was most of what
+          made this page look unfinished. `auto-fit` puts down as many columns
+          as the width allows and stretches them to fill it, so a drop with
+          five tables gets five columns and one with three gets three. There is
+          never a hole, because there is never a leftover.
+        */}
         {type.tables.length > 0 ? (
-          <div className="grid items-start gap-3 lg:grid-cols-2">
+          <div className="grid items-start gap-3 [grid-template-columns:repeat(auto-fit,minmax(11.5rem,1fr))]">
             {type.tables.map((table, index) => (
               <RewardTable key={table.rarity ?? index} table={table} />
             ))}
@@ -156,7 +213,7 @@ function DropSection({ type }: { type: DropType }) {
           </p>
         )}
       </div>
-    </section>
+    </details>
   );
 }
 
@@ -255,10 +312,11 @@ function RewardTable({ table }: { table: DropTable }) {
         percentages has no other way to notice.
       */}
       {short ? (
-        <p className="border-t border-border bg-surface-2/60 px-3.5 py-2.5 text-xs leading-relaxed text-muted">
-          These add up to {(table.listed * 100).toFixed(1)}%, not 100% — the wiki is
-          missing a row here, so something else drops the remaining{' '}
-          {((1 - table.listed) * 100).toFixed(1)}% of the time.
+        <p
+          className="border-t border-border bg-surface-2/60 px-2.5 py-2 text-[0.6875rem] leading-snug text-muted"
+          title={`The wiki lists rewards totalling ${(table.listed * 100).toFixed(1)}%, so a row covering the other ${((1 - table.listed) * 100).toFixed(1)}% is missing from the source.`}
+        >
+          Wiki lists {(table.listed * 100).toFixed(1)}% — a row is missing.
         </p>
       ) : null}
     </div>
@@ -276,46 +334,72 @@ function RewardRow({
   most: number;
 }) {
   return (
-    <li className="relative flex items-center gap-3 px-3.5 py-2">
-      {/* The chance as a width behind the row, so a column of numbers also
-          reads as a shape. Scaled to the biggest row rather than to 100%, or
-          every row in a long table would be a sliver. */}
-      {reward.chance !== null && most > 0 ? (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0"
-          style={{
-            width: `${(reward.chance / most) * 100}%`,
-            background: `color-mix(in srgb, ${color} 9%, transparent)`,
-          }}
-        />
-      ) : null}
-
+    <li className="flex items-start gap-2 px-2.5 py-2">
       {reward.iconUrl ? (
         <Image
           src={reward.iconUrl}
           alt=""
-          width={28}
-          height={28}
-          className="relative size-6 shrink-0 object-contain sm:size-7"
+          width={32}
+          height={32}
+          className="size-7 shrink-0 object-contain"
           loading="lazy"
           unoptimized
         />
       ) : (
         /* Keeps the column aligned when a one-off event reward has no mark. */
-        <span aria-hidden className="relative size-6 shrink-0 sm:size-7" />
+        <span aria-hidden className="size-7 shrink-0" />
       )}
 
-      <span className="relative min-w-0 flex-1 truncate text-sm">
-        {reward.amount ? (
-          <span className="font-bold tabular-nums">{reward.amount} </span>
-        ) : null}
-        <span className={reward.amount ? 'text-muted' : ''}>{reward.label}</span>
-      </span>
+      <div className="min-w-0 flex-1">
+        {/*
+          The reward gets a line to itself, and wraps rather than truncating.
+          
+          Fitting five rarity columns across meant a column is about 190px, and
+          putting the name and the percentage on one line clipped sixty-odd
+          reward names to things like "200 Power Poi…". A drop table whose
+          rewards cannot be read is not a drop table, so the name takes the
+          width and the number moves down beside its own bar.
+        */}
+        <p className="text-sm leading-tight">
+          {reward.amount ? (
+            <span className="font-bold tabular-nums">{reward.amount} </span>
+          ) : null}
+          <span className={reward.amount ? 'text-muted' : ''}>{reward.label}</span>
+        </p>
 
-      <span className="relative shrink-0 text-sm font-bold tabular-nums">
-        {reward.chance === null ? '–' : `${(reward.chance * 100).toFixed(2)}%`}
-      </span>
+        <div className="mt-1.5 flex items-center gap-2">
+          {/*
+            A real track, rather than a tint behind the row.
+            
+            Drawn as a background fill the likeliest reward filled its row edge
+            to edge — which reads as no bar at all — and every other row looked
+            like a panel with a piece missing. A track makes the empty part of
+            the bar as explicit as the full part.
+            
+            Scaled to the biggest row rather than to 100%: at true scale a 1.3%
+            reward is too short to see, and the comparison worth making here is
+            between the rows of one table.
+          */}
+          <span
+            aria-hidden
+            className="h-[3px] flex-1 overflow-hidden rounded-full bg-surface-3/70"
+          >
+            {reward.chance !== null && most > 0 ? (
+              <span
+                className="block h-full rounded-full"
+                style={{
+                  width: `${Math.max((reward.chance / most) * 100, 2)}%`,
+                  background: color,
+                }}
+              />
+            ) : null}
+          </span>
+
+          <span className="shrink-0 text-xs font-bold tabular-nums">
+            {reward.chance === null ? '–' : `${(reward.chance * 100).toFixed(2)}%`}
+          </span>
+        </div>
+      </div>
     </li>
   );
 }

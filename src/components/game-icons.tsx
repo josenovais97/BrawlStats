@@ -60,6 +60,10 @@ export function CoinIcon({ className }: IconProps) {
   return <GameIcon src="/icons/coin.png" alt="Coins" className={className} />;
 }
 
+export function StarrDropIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/starr-drop.png" alt="Starr Drop" className={className} />;
+}
+
 export function PowerPointIcon({ className }: IconProps) {
   return <GameIcon src="/icons/power-point.png" alt="Power points" className={className} />;
 }
