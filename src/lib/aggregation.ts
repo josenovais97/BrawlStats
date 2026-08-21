@@ -172,6 +172,41 @@ const SNAPSHOT_RETENTION_DAYS = 4;
 const INACTIVE_AFTER_DAYS = 14;
 
 /**
+ * How long a looked-up tag stays safe from eviction.
+ *
+ * Lookups used to be protected *forever*, and that made the pool unbounded —
+ * which made the database unbounded, on a plan with a hard 512 MB ceiling.
+ * Every `/player/[tag]` render adds a row, `robots.ts` allows those pages to be
+ * crawled, and the site links to thousands of tags from leaderboards, club
+ * rosters and battle logs. A discovery crawl therefore enrolls players into the
+ * sampling pool faster than any human ever could: on 2026-08-21 that ran at
+ * roughly 500 new tags a day against a pool meant to hold a thousand, and each
+ * one costs about 110 KB in daily brawler snapshots for as long as it stays.
+ *
+ * Two weeks, because that is `INACTIVE_AFTER_DAYS` — the same span the rest of
+ * this file uses to mean "recently". A profile nobody has opened in a fortnight
+ * stops being re-read, which pauses its trophy history rather than deleting it:
+ * the rows already recorded stay, and the tag comes straight back the moment
+ * anyone opens the page again.
+ */
+const LOOKUP_PROTECTION_DAYS = 14;
+
+/**
+ * And a hard ceiling on how many lookups that window may protect at once.
+ *
+ * A window alone does not bound anything, which is the trap this originally
+ * fell into: at a thousand crawled profiles a day, every one of them is
+ * "opened recently" for the next fortnight, so a fortnight's protection is a
+ * protected set of fourteen thousand. The window decides *who* is worth
+ * keeping; this decides *how many*, and only the second one is a bound.
+ *
+ * A quarter of the pool. Enough that the profiles real visitors return to keep
+ * their history running, small enough that the pool — and therefore the
+ * database — cannot be grown by anyone who simply requests a lot of pages.
+ */
+const LOOKUP_PROTECTION_SLOTS = 250;
+
+/**
  * Club rosters are only pulled when the pool actually needs filling.
  *
  * Refreshing the top-200 costs one call and is what keeps the cohort current;
@@ -380,6 +415,42 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
 }
 
 /**
+ * The storage ceiling this project is built to live under, and the level at
+ * which the prune starts defending it.
+ *
+ * The database is a free Neon instance with a hard 512 MB limit and no
+ * intention of ever costing anything, so "we will notice before it fills" is
+ * not a plan — nobody is watching, and the failure mode is writes being
+ * refused. Above the high-water mark the prune tightens the snapshot window
+ * instead, which is the one lever that frees real space immediately:
+ * `player_brawler_snapshots` is around 60% of the database at any time.
+ *
+ * Tightening costs accuracy, not correctness. Every read of that table takes
+ * the newest row per player-brawler, and full-pool sampling means a single day
+ * already contains everybody — the extra days are margin, so spending them
+ * under pressure is the cheapest thing available.
+ */
+const STORAGE_LIMIT_BYTES = 512 * 1024 * 1024;
+const STORAGE_HIGH_WATER = 0.75;
+const SNAPSHOT_RETENTION_DAYS_UNDER_PRESSURE = 2;
+
+/** Bytes on disk, or null when the question cannot be asked. */
+export async function databaseBytes(): Promise<number | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+  try {
+    const rows = await prisma.$queryRaw<
+      { bytes: bigint }[]
+    >`SELECT pg_database_size(current_database()) AS bytes`;
+    const bytes = Number(rows[0]?.bytes ?? 0);
+    return Number.isFinite(bytes) && bytes > 0 ? bytes : null;
+  } catch {
+    // Reporting is not worth failing a run over.
+    return null;
+  }
+}
+
+/**
  * Deletes raw observations past their retention window.
  *
  * Without this the two biggest tables grow forever while only their most recent
@@ -388,14 +459,21 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  *
  * Deliberately conservative: see BATTLE_RETENTION_DAYS. Nothing here can be
  * undone, because the game API serves only a player's last ~25 battles and has
- * no history endpoint at all.
+ * no history endpoint at all — except under storage pressure, where a shorter
+ * snapshot window is still preferable to a database that refuses writes.
  */
 export async function pruneOldSamples(): Promise<number> {
   const prisma = getPrisma();
   if (!prisma) return 0;
 
+  const bytes = await databaseBytes();
+  const pressured = bytes !== null && bytes > STORAGE_LIMIT_BYTES * STORAGE_HIGH_WATER;
+  const snapshotDays = pressured
+    ? SNAPSHOT_RETENTION_DAYS_UNDER_PRESSURE
+    : SNAPSHOT_RETENTION_DAYS;
+
   const battleCutoff = new Date(Date.now() - BATTLE_RETENTION_DAYS * 86_400_000);
-  const snapshotCutoff = new Date(Date.now() - SNAPSHOT_RETENTION_DAYS * 86_400_000);
+  const snapshotCutoff = new Date(Date.now() - snapshotDays * 86_400_000);
 
   try {
     const battles = await prisma.battleSample.deleteMany({
@@ -477,10 +555,33 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   const competitive = new Set(competitiveGroups.map((g) => g.playerTag));
   const keep = new Set(protectedTags);
 
-  const evictable = await prisma.sampledPlayer.findMany({
-    where: { source: { not: 'lookup' }, tag: { notIn: [...keep] } },
-    select: { tag: true, trophies: true },
+  /*
+   * Lookups are protected while warm, not permanently.
+   *
+   * `player_trophy_points` is written by `recordLookup` and by nothing else, so
+   * the newest row for a tag is exactly when that profile was last opened —
+   * which makes it the recency signal without a column or a migration.
+   */
+  const lookupCutoff = new Date(Date.now() - LOOKUP_PROTECTION_DAYS * 86_400_000);
+  const warmLookups = await prisma.playerTrophyPoint.groupBy({
+    by: ['playerTag'],
+    where: { recordedOn: { gte: lookupCutoff } },
+    _max: { createdAt: true },
+    orderBy: { _max: { createdAt: 'desc' } },
+    take: LOOKUP_PROTECTION_SLOTS,
   });
+  for (const row of warmLookups) keep.add(row.playerTag);
+
+  /*
+   * Filtered here rather than in the query. The protected set is now the top
+   * 200 plus every tag opened in a fortnight, which a crawl can push into the
+   * thousands, and `NOT IN (...)` with thousands of literals is a query nobody
+   * wants to plan. The pool itself is capped, so this reads about a thousand
+   * rows either way.
+   */
+  const evictable = (
+    await prisma.sampledPlayer.findMany({ select: { tag: true, trophies: true } })
+  ).filter((row) => !keep.has(row.tag));
 
   const ordered = evictable
     .map((row) => ({
@@ -1117,12 +1218,28 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
 
     const status: AggregationResult['status'] =
       failures === 0 ? 'ok' : fulfilled.length === 0 ? 'failed' : 'partial';
-    const notes =
+
+    /*
+     * Storage goes in the audit trail on every run, not just when it is a
+     * problem. This project is meant to run unattended and free, and the one
+     * way it can actually break is filling a 512 MB disk — so the number that
+     * would explain that afterwards is recorded before it happens, next to the
+     * run that caused it.
+     */
+    const bytes = await databaseBytes();
+    const storage =
+      bytes === null
+        ? null
+        : `db ${(bytes / 1_048_576).toFixed(0)}MB (${((bytes / STORAGE_LIMIT_BYTES) * 100).toFixed(0)}% of free tier)`;
+
+    const failureNote =
       failures > 0
         ? `${failures} of ${results.length} player samples failed (${[...reasons]
             .map(([code, count]) => `${code}: ${count}`)
             .join(', ')})`
-        : undefined;
+        : null;
+
+    const notes = [failureNote, storage].filter(Boolean).join(' · ') || undefined;
 
     await prisma.aggregationRun.update({
       where: { id: run.id },
