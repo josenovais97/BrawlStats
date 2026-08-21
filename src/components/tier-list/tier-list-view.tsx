@@ -11,6 +11,7 @@ import {
 import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { Disclosure } from '@/components/ui/disclosure';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { brawlerPath } from '@/lib/slugs';
@@ -298,12 +299,16 @@ export async function TierListView({
 
       {unrated.length > 0 ? (
         <section>
-          <h2 className="text-xl font-bold tracking-tight">{copy.unratedHeading}</h2>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-            {copy.unratedBody} Each needs {MIN_SAMPLE_FOR_TIER} decided battles in the{' '}
-            {TIER_WINDOWS[windowKey].sublabel} window; the count below is how far along
-            it is. Closest first.
-          </p>
+          <SectionHeading
+            title={copy.unratedHeading}
+            subtitle={
+              <>
+                {copy.unratedBody} Each needs {MIN_SAMPLE_FOR_TIER} decided battles in
+                the {TIER_WINDOWS[windowKey].sublabel} window; the count below is how far
+                along it is. Closest first.
+              </>
+            }
+          />
           <div className="mt-4 flex flex-wrap gap-2">
             {/* Sorted by progress toward the floor, so the brawlers about to be
                 rated lead and the never-picked ones sit at the end. An
@@ -396,8 +401,23 @@ function TierRow({ tier, entries }: { tier: Tier; entries: TierListEntry[] }) {
               <p className="text-center text-sm font-black tabular-nums" style={{ color }}>
                 {entry.metaScore?.toFixed(1) ?? '–'}
               </p>
-              <p className="text-center text-xs tabular-nums text-muted">
-                {formatPercent(entry.normalizedWinRate)} · {formatPercent(entry.usageRate)}
+              {/*
+                Labelled and spaced rather than "55.1% · 2.0%".
+                
+                At 12px the period between two digits all but disappears in this
+                face — "53.9%" reads as 539% — and two bare percentages a middot
+                apart give no clue which is which. A slightly larger figure, a
+                real gap, and a one-letter label each solves both at once.
+              */}
+              <p className="flex items-center justify-center gap-2.5 text-[0.6875rem] tabular-nums tracking-tight text-muted">
+                <span title="Adjusted win rate">
+                  <span className="text-muted/60">W</span>{' '}
+                  {formatPercent(entry.normalizedWinRate)}
+                </span>
+                <span title="Pick rate">
+                  <span className="text-muted/60">P</span>{' '}
+                  {formatPercent(entry.usageRate)}
+                </span>
               </p>
             </Link>
           ))}

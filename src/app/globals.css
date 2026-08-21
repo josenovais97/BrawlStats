@@ -49,6 +49,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+ * Emoji are part of the data, not decoration.
+ *
+ * Geist is loaded latin-only and player and club names come from the game, so
+ * they routinely carry emoji, flags and CJK — "Heaven 🍁", "орешник 🇺🇦". With
+ * only `system-ui, sans-serif` behind it, whether those render at all is left
+ * to whatever the platform happens to pick. Naming the colour-emoji faces
+ * explicitly makes it the stack's decision instead of the platform's.
+ */
 body {
   background:
     radial-gradient(60rem 30rem at 12% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 65%),
@@ -56,7 +65,13 @@ body {
     var(--background);
   background-attachment: fixed;
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji";
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   /*
@@ -327,6 +342,16 @@ body {
   scroll-margin-top: 4rem;
 }
 
+/*
+ * Clearance for anchors on a page that stacks a second sticky bar under the
+ * header — the profile's section nav. One header plus one nav plus a little
+ * air, or the heading you asked for arrives hidden behind the control you
+ * used to ask for it.
+ */
+@utility scroll-anchor-nav {
+  scroll-margin-top: 7.25rem;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -397,7 +422,13 @@ body {
  * rather than a flat webfont.
  */
 @utility display {
-  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-family:
+    var(--font-display),
+    var(--font-sans),
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji";
   font-weight: 400;
   letter-spacing: 0.01em;
   text-shadow: 0 2px 0 rgb(0 0 0 / 0.35);

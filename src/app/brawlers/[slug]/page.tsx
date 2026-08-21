@@ -23,7 +23,13 @@ import {
   PlayersIcon,
   TrophyIcon,
 } from '@/components/game-icons';
-import { getBrawler, getBrawlerMap, rarityColor } from '@/lib/brawlapi';
+import {
+  brawlerModelUrl,
+  getBrawler,
+  getBrawlerMap,
+  hasBrawlerModel,
+  rarityColor,
+} from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import {
   combatStatLabels,
@@ -329,6 +335,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // value up. It is interpolated into `color-mix()` below, which a malformed
   // colour would take down along with the whole header wash.
   const accent = rarityColor(brawler.rarity?.color);
+  const hasModel = await hasBrawlerModel(brawler.id);
   const name = titleCase(brawler.name);
 
   // "Unknown" is a real value upstream, not a missing one: unclassified
@@ -443,20 +450,51 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           }}
         />
         <div className="relative flex flex-wrap items-center gap-5 p-5 sm:gap-6 sm:p-6">
-          <Image
-            src={brawler.imageUrl}
-            alt={brawler.name}
-            width={144}
-            height={144}
-            sizes="(max-width: 640px) 128px, 144px"
-            className="size-28 shrink-0 rounded-2xl object-contain sm:size-36"
-            style={{
-              background: `color-mix(in srgb, ${accent} 14%, transparent)`,
-              boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 28%, transparent)`,
-            }}
-            priority
-            unoptimized
-          />
+          {/*
+            The full-body render where the CDN has one, the portrait tile where
+            it does not. This card is the full content width and used to spend
+            it on a 144px square: the page about a brawler never showed the
+            brawler.
+
+            `hasBrawlerModel` is the same probe the home page's podium uses —
+            the render is published weeks behind a release, so the two newest
+            brawlers 404 and have to fall back. Lit from the accent behind it so
+            the cut-out has a ground rather than floating on the card.
+          */}
+          {hasModel ? (
+            <div className="relative shrink-0">
+              <span
+                aria-hidden
+                className="absolute inset-x-2 bottom-2 top-6 rounded-full opacity-40 blur-2xl"
+                style={{ background: accent }}
+              />
+              <Image
+                src={brawlerModelUrl(brawler.id)}
+                alt={brawler.name}
+                width={320}
+                height={380}
+                sizes="(max-width: 640px) 9rem, 13rem"
+                className="relative h-36 w-36 select-none object-contain object-bottom drop-shadow-[0_18px_28px_rgba(0,0,0,0.6)] sm:h-52 sm:w-52"
+                priority
+                unoptimized
+              />
+            </div>
+          ) : (
+            <Image
+              src={brawler.imageUrl}
+              alt={brawler.name}
+              width={144}
+              height={144}
+              sizes="(max-width: 640px) 128px, 144px"
+              className="size-28 shrink-0 rounded-2xl object-contain sm:size-36"
+              style={{
+                background: `color-mix(in srgb, ${accent} 14%, transparent)`,
+                boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 28%, transparent)`,
+              }}
+              priority
+              unoptimized
+            />
+          )}
 
           {/*
             `basis` is what keeps the pills readable on a phone: below about
@@ -614,7 +652,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       />
 
       <section>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">Performance</h2>
+        <SectionHeading title="Performance" />
         {stat ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard
@@ -715,9 +753,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       ) : null}
 
       <section>
-        <h2 className="mb-4 text-2xl font-bold tracking-tight">
-          Top players with {brawler.name.toLowerCase()}
-        </h2>
+        <SectionHeading title={`Top players with ${brawler.name.toLowerCase()}`} />
         <Suspense fallback={<TableSkeleton rows={5} />}>
           <BrawlerLeaderboard brawlerId={brawlerId} />
         </Suspense>

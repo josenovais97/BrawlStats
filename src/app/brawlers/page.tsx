@@ -5,6 +5,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getMetaIndex } from '@/lib/stats';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/brawlers' },
@@ -13,8 +14,13 @@ export const metadata: Metadata = {
     'Every Brawl Stars brawler with class, rarity, star powers and gadgets.',
 };
 
-/** Static metadata — rebuild daily rather than on every request. */
-export const revalidate = 86400;
+/*
+ * Hourly rather than daily, since the tier on each card comes from a sampler
+ * that runs every three hours. The artwork half of the page would happily sit
+ * for a day; the half that says how strong a brawler is would be a day stale,
+ * and would disagree with the tier list it links to.
+ */
+export const revalidate = 3600;
 
 export default async function BrawlersPage() {
   let catalog;
@@ -31,6 +37,14 @@ export default async function BrawlersPage() {
     );
   }
 
+  /*
+   * The same ranking the tier list renders, joined onto the catalogue. Falls
+   * back to an empty index rather than an error: a brawler index without tiers
+   * is still a brawler index, and the artwork source and the database fail
+   * independently of each other.
+   */
+  const meta = await getMetaIndex('ranked', 7).catch(() => new Map());
+
   return (
     <div className="space-y-6">
       {/* The count is the playable roster, not the row count: the artwork
@@ -38,7 +52,7 @@ export default async function BrawlersPage() {
           a Legacy badge rather than counted as current. */}
       <PageHeading
         title="Brawlers"
-        subtitle={`All ${catalog.current.length} current brawlers by class and rarity, each linking to its stats, build and best maps${
+        subtitle={`All ${catalog.current.length} current brawlers with their Ranked tier, sortable by how strong they are right now${
           catalog.legacy.length > 0
             ? `. Plus ${catalog.legacy.length} no longer playable.`
             : '.'
@@ -57,6 +71,8 @@ export default async function BrawlersPage() {
           rarityName: b.rarityName,
           rarityColor: b.rarityColor ?? '#8b95b8',
           status: b.status,
+          tier: meta.get(b.id)?.tier ?? null,
+          metaScore: meta.get(b.id)?.metaScore ?? null,
         }))}
       />
     </div>

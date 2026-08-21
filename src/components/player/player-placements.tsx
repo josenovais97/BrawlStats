@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Disclosure } from '@/components/ui/disclosure';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
@@ -47,17 +48,15 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-          <LeaderboardIcon className="size-6" />
-          World ranked
-        </h2>
-        <p className="text-sm text-muted">
-          {placements.length === 1
+      <SectionHeading
+        icon={<LeaderboardIcon className="size-6" />}
+        title="World ranked"
+        aside={
+          placements.length === 1
             ? 'On 1 global brawler leaderboard'
-            : `On ${placements.length} global brawler leaderboards`}
-        </p>
-      </div>
+            : `On ${placements.length} global brawler leaderboards`
+        }
+      />
 
       <div
         className="card card-glow mb-3 flex items-center gap-4 p-5"

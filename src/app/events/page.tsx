@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ModeBestPicks } from '@/components/events/mode-best-picks';
 import { ClockIcon } from '@/components/game-icons';
 import { ErrorState } from '@/components/ui/error-state';
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { getEventRotation } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
@@ -59,12 +60,11 @@ export default async function EventsPage() {
 
   return (
     <div className="space-y-10">
-      <header>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">Events</h1>
-        <p className="mt-2 text-muted">
-          The live rotation straight from the game API, with map art from BrawlAPI.
-        </p>
-      </header>
+      <PageHeading
+        eyebrow="In rotation now"
+        title="Events"
+        subtitle="The live rotation straight from the game API, with map art from BrawlAPI."
+      />
 
       <EventSection
         title="Live now"
@@ -120,11 +120,11 @@ function EventSection({
 }) {
   return (
     <section>
-      <h2 className="mb-4 flex items-center gap-2 text-2xl font-bold tracking-tight">
-        <Icon className="size-5 text-brand" />
-        {title}
-        <span className="text-base font-normal text-muted">({slots.length})</span>
-      </h2>
+      <SectionHeading
+        icon={<Icon className="size-5 text-brand" />}
+        title={title}
+        count={slots.length}
+      />
 
       {slots.length === 0 ? (
         <p className="card p-6 text-sm text-muted">{emptyLabel}</p>

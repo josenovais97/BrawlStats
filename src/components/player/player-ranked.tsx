@@ -2,6 +2,7 @@ import { TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 
 import { CrownIcon, PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
+import { SectionHeading } from '@/components/ui/section-heading';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
@@ -32,7 +33,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
 
   return (
     <section>
-      <h2 className="mb-4 text-2xl font-bold tracking-tight">Ranking</h2>
+      <SectionHeading title="Ranking" />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {hasRanked ? (

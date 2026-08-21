@@ -57,9 +57,24 @@ const SORTS: { key: SortKey; label: string }[] = [
   { key: 'name', label: 'Name' },
 ];
 
+/**
+ * How many tiles a first look is worth.
+ *
+ * A full roster is 107 tiles and every one of them was in the document at
+ * load, on a page that was already the heaviest on the site. Two rows at the
+ * widest layout is enough to show what the sort is doing, and the sort is what
+ * makes the first two rows the interesting ones — searching or sorting reaches
+ * the rest without ever pressing the button.
+ */
+const FIRST_LOOK = 24;
+
 export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
   const [sort, setSort] = useState<SortKey>('trophies');
   const [query, setQuery] = useState('');
+  const [showAll, setShowAll] = useState(false);
+
+  // A search is already a request for a subset, so it is never capped again.
+  const searching = query.trim().length > 0;
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -94,9 +109,13 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
     });
   }, [brawlers, meta, query, sort]);
 
+  const capped = !searching && !showAll && visible.length > FIRST_LOOK;
+  const shown = capped ? visible.slice(0, FIRST_LOOK) : visible;
+  const hidden = visible.length - shown.length;
+
   return (
-    <div>
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
           <input
@@ -130,11 +149,23 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
       {visible.length === 0 ? (
         <p className="card p-6 text-sm text-muted">No brawlers match “{query}”.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {visible.map((brawler) => (
-            <BrawlerTile key={brawler.id} brawler={brawler} meta={meta[brawler.id]} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {shown.map((brawler) => (
+              <BrawlerTile key={brawler.id} brawler={brawler} meta={meta[brawler.id]} />
+            ))}
+          </div>
+
+          {hidden > 0 ? (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="min-h-11 w-full rounded-xl border border-border bg-surface-2/60 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+            >
+              Show {hidden} more {hidden === 1 ? 'brawler' : 'brawlers'}
+            </button>
+          ) : null}
+        </>
       )}
     </div>
   );

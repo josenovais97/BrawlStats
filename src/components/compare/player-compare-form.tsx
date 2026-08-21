@@ -135,7 +135,7 @@ export function PlayerCompareForm({
           disabled={!one && !two}
           aria-label="Swap the two players"
           title="Swap players"
-          className="flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-border text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground disabled:opacity-40 sm:mt-6 sm:w-11 sm:self-start"
+          className="flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-border text-sm font-semibold text-muted transition-colors enabled:hover:border-brand/50 enabled:hover:text-foreground disabled:cursor-not-allowed disabled:text-muted/45 sm:mt-6 sm:w-11 sm:self-start"
         >
           <ArrowLeftRight className="size-4" />
           <span className="sm:hidden">Swap players</span>
@@ -178,10 +178,16 @@ export function PlayerCompareForm({
       )}
 
       <div className="flex flex-wrap gap-2">
+        {/*
+          The disabled state is its own set of colours, not the live one faded.
+          `bg-brand` at 40% over a dark surface resolves to a muddy olive that
+          is in no palette on the site — as the widest object on the page it
+          read as a rendering fault rather than as a control waiting for input.
+        */}
         <button
           type="submit"
           disabled={!one || !two}
-          className="min-h-11 flex-1 rounded-xl bg-brand px-4 text-sm font-bold text-brand-ink transition-opacity disabled:opacity-40"
+          className="min-h-11 flex-1 rounded-xl px-4 text-sm font-bold transition-colors enabled:bg-brand enabled:text-brand-ink enabled:hover:bg-brand-strong disabled:cursor-not-allowed disabled:border disabled:border-border disabled:bg-surface-2 disabled:text-muted"
         >
           Compare
         </button>

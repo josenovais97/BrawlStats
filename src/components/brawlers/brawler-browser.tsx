@@ -1,9 +1,12 @@
 'use client';
 
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useId, useMemo, useState } from 'react';
+
+import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
+import type { Tier } from '@/types/stats';
 
 import { ClassIcon } from '@/components/game-icons';
 import { brawlerPath } from '@/lib/slugs';
@@ -19,6 +22,17 @@ export interface BrawlerCardData {
   rarityColor: string;
   /** "legacy" brawlers are kept for their history but are not playable. */
   status: 'current' | 'legacy';
+  /**
+   * Ranked tier and meta score, or null below the sample floor.
+   *
+   * This index used to show rarity and class and nothing else — both printed in
+   * the game itself — so the page a visitor lands on from "brawl stars
+   * brawlers" was a catalogue they could have got from the wiki. The tier is
+   * the one thing here nobody else computes, and it belongs on the card that
+   * sends people to the brawler.
+   */
+  tier: Tier | null;
+  metaScore: number | null;
 }
 
 /** Ordered by in-game progression so the filter row reads naturally. */
@@ -35,11 +49,17 @@ const RARITY_ORDER = [
 /**
  * Sorts built from data the page already has.
  *
- * Nothing here needs a win rate or a fetch: ids are release order, which is
- * the one ordering people ask for by name ("what came out last"), and rarity
- * is already on every card.
+ * Ids are release order, which is the one ordering people ask for by name
+ * ("what came out last"), and rarity and meta score are both on every card.
+ * Unrated brawlers sort last under "Strongest" rather than as zero — "we have
+ * not measured this" is not the same claim as "this is bad".
  */
 const SORTS = {
+  meta: {
+    label: 'Strongest',
+    compare: (a: BrawlerCardData, b: BrawlerCardData) =>
+      (b.metaScore ?? -1) - (a.metaScore ?? -1) || a.id - b.id,
+  },
   release: { label: 'Release order', compare: (a: BrawlerCardData, b: BrawlerCardData) => a.id - b.id },
   newest: { label: 'Newest first', compare: (a: BrawlerCardData, b: BrawlerCardData) => b.id - a.id },
   name: {
@@ -75,9 +95,9 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
   const [query, setQuery] = useState('');
   const [rarity, setRarity] = useState('all');
   const [brawlerClass, setBrawlerClass] = useState('all');
+  const [tier, setTier] = useState('all');
   const [sort, setSort] = useState<SortKey>('release');
   const searchId = useId();
-  const sortId = useId();
 
   const rarities = useMemo(() => {
     const present = new Set(
@@ -94,6 +114,11 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
     [brawlers],
   );
 
+  const tiers = useMemo(
+    () => TIER_ORDER.filter((t) => brawlers.some((b) => b.tier === t)),
+    [brawlers],
+  );
+
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return brawlers
@@ -101,17 +126,20 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
         (b) =>
           (!q || b.name.toLowerCase().includes(q)) &&
           (rarity === 'all' || b.rarityName === rarity) &&
-          (brawlerClass === 'all' || b.className === brawlerClass),
+          (brawlerClass === 'all' || b.className === brawlerClass) &&
+          (tier === 'all' || b.tier === tier),
       )
       .sort(SORTS[sort].compare);
-  }, [brawlers, query, rarity, brawlerClass, sort]);
+  }, [brawlers, query, rarity, brawlerClass, tier, sort]);
 
-  const filtered = query.trim() !== '' || rarity !== 'all' || brawlerClass !== 'all';
+  const filtered =
+    query.trim() !== '' || rarity !== 'all' || brawlerClass !== 'all' || tier !== 'all';
 
   const reset = () => {
     setQuery('');
     setRarity('all');
     setBrawlerClass('all');
+    setTier('all');
   };
 
   return (
@@ -149,30 +177,32 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             ) : null}
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
-            <label
-              htmlFor={sortId}
-              className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted"
-            >
-              <SlidersHorizontal aria-hidden className="size-4" />
-              Sort
-            </label>
-            <select
-              id={sortId}
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="min-h-12 flex-1 rounded-xl border border-border bg-surface-2 px-3 text-sm font-medium outline-none transition-colors focus:border-brand/70 sm:flex-none"
-            >
-              {Object.entries(SORTS).map(([key, { label }]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div className="space-y-2 border-t border-border p-3 sm:p-4">
+          <FilterRow
+            label="Sort"
+            options={Object.keys(SORTS)}
+            value={sort}
+            onChange={(next) => setSort(next as SortKey)}
+            includeAll={false}
+            labelFor={(key) => SORTS[key as SortKey].label}
+          />
+          {tiers.length > 0 ? (
+            <FilterRow
+              label="Tier"
+              options={tiers}
+              value={tier}
+              onChange={setTier}
+              renderIcon={(option) => (
+                <span
+                  aria-hidden
+                  className="size-2 rounded-full"
+                  style={{ background: TIER_COLOR[option as Tier] }}
+                />
+              )}
+            />
+          ) : null}
           <FilterRow
             label="Rarity"
             options={rarities}
@@ -287,39 +317,68 @@ function BrawlerCard({ brawler }: { brawler: BrawlerCardData }) {
         {brawler.name.toLowerCase()}
       </p>
 
-      {/* One line, not three: rarity carries the colour, class stays quiet. */}
-      <p className="relative mt-0.5 flex min-w-0 items-center justify-center gap-1.5 text-xs">
+      {/*
+        Rarity carries the colour, class stays quiet — but on two lines rather
+        than one. Squeezed side by side, "Super Rare · Damage Dealer" did not
+        fit a five-across cell and truncated to "Super Ra… Damage Deal…", which
+        is the wrong way round: the *widest* layout was the one that could not
+        show its labels. Wrapping costs a line of height and lets every label
+        say what it is at every breakpoint.
+      */}
+      {brawler.tier ? (
+        /* Corner chip, matching the profile grid and the tier list, so the
+           same letter always means the same thing across the site. */
+        <span
+          className="absolute right-1.5 top-1.5 z-10 grid size-5 place-items-center rounded-md text-[0.625rem] font-black"
+          style={{
+            background: `color-mix(in srgb, ${TIER_COLOR[brawler.tier]} 18%, transparent)`,
+            color: TIER_COLOR[brawler.tier],
+          }}
+          title={`${brawler.tier} tier in Ranked${
+            brawler.metaScore !== null ? `, meta score ${brawler.metaScore.toFixed(1)}` : ''
+          }`}
+        >
+          {brawler.tier}
+        </span>
+      ) : null}
+
+      <div className="relative mt-1 flex min-w-0 flex-col items-center gap-0.5 text-xs">
         {brawler.rarityName ? (
           <span
-            className="truncate font-semibold"
+            className="max-w-full truncate font-semibold"
             style={{ color: brawler.rarityColor }}
           >
             {brawler.rarityName}
           </span>
         ) : null}
-        {brawler.rarityName && brawler.className ? (
-          <span aria-hidden className="text-muted/40">
-            ·
-          </span>
-        ) : null}
         {/* Omitted rather than shown as a placeholder when unknown. */}
         {brawler.className ? (
-          <span className="inline-flex min-w-0 items-center gap-1 text-muted">
+          <span className="inline-flex max-w-full min-w-0 items-center gap-1 text-muted">
             <ClassIcon name={brawler.className} className="size-3.5 shrink-0" />
             <span className="truncate">{brawler.className}</span>
           </span>
         ) : null}
-      </p>
+      </div>
     </Link>
   );
 }
 
+/**
+ * A labelled row of pills, used for every control on this page.
+ *
+ * `includeAll` and `labelFor` are what let sort join the row rather than stay a
+ * native select: sort has no "all", and its values are keys that need friendly
+ * labels. Four sort options fit in a pill row comfortably, and the page then
+ * has one control idiom instead of two.
+ */
 function FilterRow({
   label,
   options,
   value,
   onChange,
   renderIcon,
+  includeAll = true,
+  labelFor,
 }: {
   label: string;
   options: string[];
@@ -327,6 +386,10 @@ function FilterRow({
   onChange: (next: string) => void;
   /** Optional artwork for a pill. Returning null just leaves the label. */
   renderIcon?: (option: string) => React.ReactNode;
+  /** Filters lead with "All"; a one-of-N choice like sort does not. */
+  includeAll?: boolean;
+  /** Maps a value to its pill text, for options that are keys. */
+  labelFor?: (option: string) => string;
 }) {
   return (
     /* The label sits above the pills on a phone: a fixed label column plus a
@@ -344,7 +407,7 @@ function FilterRow({
         aria-labelledby={`filter-${label}`}
         className="-mx-3 mt-1.5 flex items-center gap-1.5 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mt-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0"
       >
-        {['all', ...options].map((option) => {
+        {(includeAll ? ['all', ...options] : options).map((option) => {
           const active = value === option;
           return (
             <button
@@ -359,7 +422,7 @@ function FilterRow({
               }`}
             >
               {option === 'all' ? null : renderIcon?.(option)}
-              {option === 'all' ? 'All' : option}
+              {option === 'all' ? 'All' : (labelFor?.(option) ?? option)}
             </button>
           );
         })}

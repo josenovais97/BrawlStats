@@ -3,6 +3,7 @@ import { Cog, ExternalLink, Minus, Sparkles, Star, Wrench, Zap } from 'lucide-re
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { brawlerPath } from '@/lib/slugs';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { getOfficialNews } from '@/lib/news';
@@ -43,22 +44,27 @@ export default async function UpdatesPage() {
 
   return (
     <div className="space-y-10">
-      <header>
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">News</h1>
-        <p className="mt-2 max-w-3xl text-muted">
-          Announcements from the Brawl Stars team, and the new brawlers and abilities
-          detected from the game API. For how the sampled meta is shifting, see the{' '}
-          <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-            Ranked tier list
-          </Link>
-          .
-        </p>
-      </header>
+      <PageHeading
+        eyebrow="Straight from the game"
+        title="News"
+        subtitle={
+          <>
+            Announcements from the Brawl Stars team, and the new brawlers and abilities
+            detected from the game API. For how the sampled meta is shifting, see the{' '}
+            <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
+              Ranked tier list
+            </Link>
+            .
+          </>
+        }
+      />
 
       {news.length > 0 ? (
         <section>
-          <h2 className="mb-1 text-2xl font-bold tracking-tight">Official news</h2>
-          <p className="mb-4 text-sm text-muted">Straight from the Brawl Stars team.</p>
+          <SectionHeading
+            title="Official news"
+            subtitle="Straight from the Brawl Stars team."
+          />
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {news.map((post) => (
@@ -105,10 +111,10 @@ export default async function UpdatesPage() {
       ) : null}
 
       <section>
-        <h2 className="mb-1 text-2xl font-bold tracking-tight">Detected game changes</h2>
-        <p className="mb-4 text-sm text-muted">
-          New brawlers, star powers, gadgets and hypercharges.
-        </p>
+        <SectionHeading
+          title="Detected game changes"
+          subtitle="New brawlers, star powers, gadgets and hypercharges."
+        />
 
         {changes.length === 0 ? (
           <EmptyNote

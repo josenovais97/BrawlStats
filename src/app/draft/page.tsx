@@ -3,12 +3,13 @@ import { ArrowRight, Target, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { DraftPicks } from '@/components/draft/draft-picks';
+import { MapArt } from '@/components/maps/map-art';
 import { RankedIcon } from '@/components/game-icons';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
-import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import { formatNumber, humanizeMode } from '@/lib/format';
 import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
@@ -241,63 +242,22 @@ export default async function DraftPage({ searchParams }: PageProps) {
                 No sampled battles for this map or mode yet.
               </p>
             ) : (
-              <ol className="card divide-y divide-border overflow-hidden">
-                {ranked.map(({ pick, counter }, index) => {
-                  const meta = brawlerMeta.get(pick.brawlerId);
-                  return (
-                    <li key={pick.brawlerId}>
-                      <Link
-                        href={brawlerPath(pick.brawlerId, pick.brawlerName)}
-                        className="row-interactive flex items-center gap-3 px-4 py-3"
-                      >
-                        <span
-                          className={`w-6 shrink-0 text-center text-sm font-black tabular-nums ${
-                            index === 0 ? 'text-brand' : 'text-muted'
-                          }`}
-                        >
-                          {index + 1}
-                        </span>
-                        <Image
-                          src={meta?.imageUrl ?? brawlerIconUrl(pick.brawlerId)}
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="size-10 shrink-0 rounded-lg bg-surface-2"
-                          loading="lazy"
-                          unoptimized
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-semibold capitalize">
-                            {pick.brawlerName.toLowerCase()}
-                          </span>
-                          <span className="block text-xs tabular-nums text-muted">
-                            {formatNumber(pick.decidedSampleSize)} battles here
-                          </span>
-                        </span>
-                        <span className="shrink-0 text-right">
-                          <span className="block text-sm font-bold tabular-nums text-victory">
-                            {formatPercent(pick.score)}
-                          </span>
-                          {counter ? (
-                            <span
-                              className={`block text-[0.625rem] tabular-nums ${
-                                counter.edge > 0 ? 'text-victory/80' : 'text-defeat/80'
-                              }`}
-                            >
-                              {counter.edge > 0 ? '+' : '−'}
-                              {Math.abs(counter.edge * 100).toFixed(1)} vs their picks
-                            </span>
-                          ) : enemies.length > 0 ? (
-                            <span className="block text-[0.625rem] text-muted">
-                              no matchup data
-                            </span>
-                          ) : null}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ol>
+              /* Client-side because the "brawlers I own" filter reads a roster
+                 kept in the visitor's own browser. Only the fields a row draws
+                 cross the boundary. */
+              <DraftPicks
+                hasEnemies={enemies.length > 0}
+                picks={ranked.map(({ pick, counter }) => ({
+                  brawlerId: pick.brawlerId,
+                  brawlerName: pick.brawlerName,
+                  iconUrl:
+                    brawlerMeta.get(pick.brawlerId)?.imageUrl ??
+                    brawlerIconUrl(pick.brawlerId),
+                  score: pick.score,
+                  decidedSampleSize: pick.decidedSampleSize,
+                  edge: counter ? counter.edge : null,
+                }))}
+              />
             )}
 
             <p className="mt-3 text-xs leading-relaxed text-muted">
@@ -373,15 +333,12 @@ function SelectedMap({
         <span className="block h-1 w-full" style={{ background: accent }} />
         <div className="flex flex-wrap items-center gap-4 p-4">
           {art?.map.imageUrl ? (
-            <Image
+            <MapArt
               src={art.map.imageUrl}
-              alt=""
-              width={140}
-              height={96}
+              alt={`${map.mapName} map layout`}
+              height="h-24"
               sizes="140px"
-              className="h-24 w-32 shrink-0 rounded-xl bg-surface-2 object-contain p-1"
-              priority
-              unoptimized
+              className="w-32 shrink-0 rounded-xl"
             />
           ) : null}
 
@@ -467,22 +424,14 @@ function MapChooser({
                     <li key={`${map.mode}-${map.mapName}`}>
                       <Link
                         href={`/draft?map=${slugify(map.mapName)}&mode=${slugify(map.mode)}`}
-                        className="card card-interactive block h-full overflow-hidden"
+                        className="card card-interactive group block h-full overflow-hidden"
                       >
-                        {art?.map.imageUrl ? (
-                          <Image
-                            src={art.map.imageUrl}
-                            alt=""
-                            width={160}
-                            height={104}
-                            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
-                            className="h-24 w-full bg-surface-2 object-contain p-1"
-                            loading="lazy"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="h-24 w-full bg-surface-2" />
-                        )}
+                        <MapArt
+                          src={art?.map.imageUrl}
+                          alt=""
+                          height="h-28"
+                          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                        />
                         <span className="block truncate px-3 pt-2 text-sm font-semibold">
                           {map.mapName}
                         </span>

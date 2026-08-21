@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { BrandMark } from '@/components/brand-mark';
 import {
   BrawlersIcon,
+  ClubIcon,
   CompareIcon,
   DraftIcon,
   EventsIcon,
@@ -67,6 +68,16 @@ const MORE: NavItem[] = [
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.
   { href: '/events', label: 'Events', icon: EventsIcon },
+  /*
+   * Clubs had full pages and no way in from anywhere but a profile's club
+   * chip. The board is the honest destination: there is no club index to point
+   * at, and the leaderboard's Clubs tab is the closest thing to one.
+   *
+   * Player rows elsewhere still show club names as plain text, and that is not
+   * an oversight — the game's ranking payload carries `club.name` with no tag,
+   * so there is no URL to link to. Only a profile knows its club's tag.
+   */
+  { href: '/leaderboard?type=clubs', match: '/club', label: 'Clubs', icon: ClubIcon },
   { href: '/compare', label: 'Compare', icon: CompareIcon },
   { href: '/news', label: 'News', icon: Newspaper },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },

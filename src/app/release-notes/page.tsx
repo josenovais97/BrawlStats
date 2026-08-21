@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { CalendarDays, ExternalLink, FileText } from 'lucide-react';
 import Link from 'next/link';
 
-import { PageHeading } from '@/components/ui/section-heading';
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import {
   getLatestReleaseNotes,
+  type RichHeading,
   type RichNode,
   type RichText,
   type ReleaseSection,
@@ -84,13 +85,8 @@ export default async function ReleaseNotesPage() {
               id={sectionId(section, index)}
               className="card scroll-mt-24 p-6"
             >
-              {section.title ? (
-                <h2 className="mb-4 flex items-center gap-3 text-xl font-bold tracking-tight">
-                  <span className="rule" aria-hidden />
-                  {section.title}
-                </h2>
-              ) : null}
-              <RichContent nodes={section.nodes} />
+              {section.title ? <SectionHeading title={section.title} /> : null}
+              <RichContent nodes={section.nodes} startLevel={section.title ? 3 : 2} />
             </section>
           ))}
         </div>
@@ -146,27 +142,56 @@ function Contents({ sections }: { sections: ReleaseSection[] }) {
   );
 }
 
-function RichContent({ nodes }: { nodes: RichNode[] }) {
+/**
+ * Supercell's own heading levels are not a contiguous scale.
+ *
+ * A section's body can contain level-3 headings with no level 2 anywhere above
+ * them, and mapping level to tag directly emitted h2 -> h4 seven times over on
+ * this page. Heading level is how a screen reader moves through a long
+ * document, and this is the longest text page on the site.
+ *
+ * So the levels present are ranked rather than translated: whatever is
+ * shallowest in *this* section becomes the first tag below its wrapper, and
+ * anything deeper becomes exactly one step further down. The outline is then
+ * contiguous no matter what the source did.
+ */
+function RichContent({
+  nodes,
+  startLevel = 3,
+}: {
+  nodes: RichNode[];
+  /** h3 under a titled section's h2; h2 when the section has no title. */
+  startLevel?: 2 | 3;
+}) {
+  const present = [
+    ...new Set(nodes.flatMap((node) => (node.type === 'heading' ? [node.level] : []))),
+  ].sort((a, b) => a - b);
+
+  const deepest = (level: RichHeading['level']) => present.indexOf(level) > 0;
+
+  const tagFor = (level: RichHeading['level']) =>
+    (deepest(level) ? `h${startLevel + 1}` : `h${startLevel}`) as 'h2' | 'h3' | 'h4';
+
   return (
     <div className="space-y-3">
       {nodes.map((node, index) => {
         switch (node.type) {
-          case 'heading':
-            return node.level === 2 ? (
-              <h3
+          case 'heading': {
+            const Tag = tagFor(node.level);
+            const deep = deepest(node.level);
+            return (
+              <Tag
                 key={index}
-                className="mt-6 text-lg font-bold tracking-tight first:mt-0"
+                className={
+                  deep
+                    ? 'mt-5 font-bold capitalize text-brand first:mt-0'
+                    : 'mt-6 text-lg font-bold tracking-tight first:mt-0'
+                }
               >
                 <Spans spans={node.spans} />
-              </h3>
-            ) : (
-              <h4
-                key={index}
-                className="mt-5 font-bold capitalize text-brand first:mt-0"
-              >
-                <Spans spans={node.spans} />
-              </h4>
+              </Tag>
             );
+          }
 
           case 'list':
             return (

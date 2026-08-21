@@ -72,11 +72,27 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                 The bar sits behind the row rather than beside it: a separate
                 chart column would squeeze the name on a phone, and this way the
                 magnitude reads at any width.
+
+                It fades out rather than stopping, and carries a lit cap at its
+                end. A flat fill ending on a hard vertical edge gave four rows
+                four unexplained vertical lines at four different positions,
+                which read as a rendering fault rather than as a chart — the
+                more so because the leader's bar is full width and so has no
+                edge at all to compare them to.
               */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0 bg-defeat/[0.07]"
-                style={{ width: `${width}%` }}
+                className="pointer-events-none absolute inset-y-0 left-0"
+                style={{
+                  width: `${width}%`,
+                  background:
+                    'linear-gradient(90deg, color-mix(in srgb, var(--defeat) 13%, transparent), color-mix(in srgb, var(--defeat) 4%, transparent))',
+                }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-1 w-px rounded-full bg-defeat/40"
+                style={{ left: `calc(${width}% - 1px)` }}
               />
               <Link
                 href={`/player/${player.tag}`}

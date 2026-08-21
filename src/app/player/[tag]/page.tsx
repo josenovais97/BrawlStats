@@ -18,6 +18,7 @@ import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { PlayerProgression } from '@/components/player/player-progression';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
+import { RosterRecorder } from '@/components/player/roster-recorder';
 import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
@@ -138,6 +139,15 @@ export default async function PlayerPage({ params }: PageProps) {
         name={player.name}
         icon={player.icon?.id}
       />
+      {/* Remembers the roster on this device so the draft helper can offer to
+          recommend only from brawlers this account owns. Nothing leaves the
+          browser — see `lib/roster`. */}
+      <RosterRecorder
+        tag={normalizedTag}
+        name={player.name}
+        owned={player.brawlers.map((b) => b.id)}
+        power11={player.brawlers.filter((b) => b.power >= 11).map((b) => b.id)}
+      />
       <PlayerHeader
         player={player}
         lastOnline={
@@ -180,7 +190,7 @@ export default async function PlayerPage({ params }: PageProps) {
         <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
       </Suspense>
 
-      <div id="stats" className="scroll-anchor space-y-8">
+      <div id="stats" className="scroll-anchor-nav space-y-8">
         <PlayerStats player={player} />
         <PlayerRecords player={player} />
         {/* Only ever populated for the couple of hundred players holding a
@@ -191,7 +201,7 @@ export default async function PlayerPage({ params }: PageProps) {
           iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
         />
       </div>
-      <div id="progress" className="scroll-anchor space-y-8">
+      <div id="progress" className="scroll-anchor-nav space-y-8">
         <PlayerProgress points={trophyHistory} playerName={player.name} />
         <PlayerProgression progression={progression} playtime={playtime} />
 
@@ -219,14 +229,14 @@ export default async function PlayerPage({ params }: PageProps) {
         <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
       </Suspense>
 
-      <section id="battles" className="scroll-anchor">
+      <section id="battles" className="scroll-anchor-nav">
         <SectionHeading title="Recent battles" />
         <Suspense fallback={<BattleLogSkeleton />}>
           <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
         </Suspense>
       </section>
 
-      <section id="brawlers" className="scroll-anchor">
+      <section id="brawlers" className="scroll-anchor-nav">
         <SectionHeading
           title="Brawlers"
           aside={`${player.brawlers.length} unlocked`}
