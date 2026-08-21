@@ -37,6 +37,7 @@ export async function TopPlayersPreview({ limit = 5 }: { limit?: number } = {}) 
           <li key={player.tag}>
             <Link
               href={`/player/${tag}`}
+                prefetch={false}
               className="row-interactive flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
             >
               <span

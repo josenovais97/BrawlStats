@@ -34,6 +34,7 @@ export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
         <li key={player.tag}>
           <Link
             href={`/player/${normalizeTag(player.tag)}`}
+                prefetch={false}
             className="card card-interactive flex items-center gap-4 p-3"
           >
             <span className="w-8 shrink-0 text-center text-lg font-black tabular-nums text-muted">

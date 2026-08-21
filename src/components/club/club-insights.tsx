@@ -130,6 +130,7 @@ export function ClubInsights({ club }: { club: BSClub }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
+                prefetch={false}
                   className="flex items-center gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
                 >
                   <span className="w-4 shrink-0 text-center text-xs font-black tabular-nums text-muted">

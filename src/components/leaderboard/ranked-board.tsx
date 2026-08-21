@@ -57,6 +57,7 @@ export async function RankedBoard() {
             <li key={player.tag}>
               <Link
                 href={`/player/${player.tag}`}
+                prefetch={false}
                 className="row-interactive flex items-center gap-3 rounded-xl p-2.5"
               >
                 <span className="w-8 shrink-0 text-center text-sm font-bold tabular-nums text-muted">

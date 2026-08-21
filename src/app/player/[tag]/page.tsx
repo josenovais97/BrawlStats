@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { after } from 'next/server';
 
 import { BattleLog } from '@/components/player/battle-log';
@@ -84,22 +85,41 @@ export default async function PlayerPage({ params }: PageProps) {
     );
   }
 
-  // Every successful lookup widens the sampling pool the tier list draws on.
-  // `after` runs it once the response is sent, so it never delays the page.
-  after(() =>
-    recordLookup({
-      tag: normalizeTag(player.tag),
-      name: player.name,
-      trophies: player.trophies,
-      highestTrophies: player.highestTrophies,
-      brawlerCount: player.brawlers.length,
-      iconId: player.icon?.id,
-      rankedElo: player.rankedElo,
-      rankedRankName: player.rankedRankName,
-      highestRankedElo: player.highestAllTimeRankedElo,
-      highestRankedRankName: player.highestAllTimeRankedRankName,
-    }),
-  );
+  /*
+   * Every successful lookup widens the sampling pool the tier list draws on —
+   * but only a lookup somebody actually asked for.
+   *
+   * `<Link>` prefetches, and a prefetch renders this page on the server exactly
+   * like a visit. The leaderboard lists a hundred players, so one visitor
+   * scrolling it quietly enrolled a hundred accounts into the sampling pool,
+   * each costing ~110 KB a day in brawler snapshots and two API calls per run.
+   * Measured on 2026-08-21: scrolling `/leaderboard` once fires 101 of them.
+   *
+   * A prefetch is a guess that someone might click, not a visit, and Next says
+   * which is which in the request headers. Reading them here is the rule in one
+   * place; `prefetch={false}` on the big lists is the same rule enforced early,
+   * where it also saves the render.
+   *
+   * `after` runs it once the response is sent, so it never delays the page.
+   */
+  const isPrefetch = (await headers()).get('next-router-prefetch') === '1';
+
+  if (!isPrefetch) {
+    after(() =>
+      recordLookup({
+        tag: normalizeTag(player.tag),
+        name: player.name,
+        trophies: player.trophies,
+        highestTrophies: player.highestTrophies,
+        brawlerCount: player.brawlers.length,
+        iconId: player.icon?.id,
+        rankedElo: player.rankedElo,
+        rankedRankName: player.rankedRankName,
+        highestRankedElo: player.highestAllTimeRankedElo,
+        highestRankedRankName: player.highestAllTimeRankedRankName,
+      }),
+    );
+  }
 
   // Artwork metadata is a separate, keyless source. If it is unavailable the
   // page still renders — brawler cards just fall back to CDN-pattern URLs.

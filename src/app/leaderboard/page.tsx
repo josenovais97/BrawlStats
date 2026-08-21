@@ -124,6 +124,7 @@ async function PlayerBoard({ region }: { region: string }) {
           <li key={player.tag}>
             <Link
               href={`/player/${normalizeTag(player.tag)}`}
+                prefetch={false}
               className="card card-interactive flex items-center gap-3 p-3"
             >
               <RankBadge rank={player.rank} />
@@ -184,6 +185,7 @@ async function ClubBoard({ region }: { region: string }) {
           <li key={club.tag}>
             <Link
               href={`/club/${normalizeTag(club.tag)}`}
+                prefetch={false}
               className="card card-interactive flex items-center gap-3 p-3"
             >
               <RankBadge rank={club.rank} />

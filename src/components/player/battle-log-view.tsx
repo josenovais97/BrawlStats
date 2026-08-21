@@ -416,6 +416,7 @@ function Lineup({
                 <li key={participant.tag}>
                   <Link
                     href={`/player/${normalizeTag(participant.tag)}`}
+                prefetch={false}
                     className={`flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-3 ${
                       participant.isSelf
                         ? 'bg-brand/10 ring-1 ring-inset ring-brand/25'

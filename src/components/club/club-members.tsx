@@ -107,6 +107,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
+                prefetch={false}
                   className="card card-interactive flex items-center gap-3 p-3"
                 >
                   <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums text-muted">

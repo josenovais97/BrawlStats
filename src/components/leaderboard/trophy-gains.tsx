@@ -96,6 +96,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
               />
               <Link
                 href={`/player/${player.tag}`}
+                prefetch={false}
                 className="row-interactive relative flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
               >
                 <span
