@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 
 import { SearchBar } from '@/components/search-bar';
-import { brawlerModelUrl } from '@/lib/brawlapi';
+import { brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
 import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
@@ -215,8 +215,9 @@ function Console() {
  * it.
  *
  * The podium arrangement is the real one: second on the left, first on the
- * raised centre, third on the right. Each step's lip and each figure's rim
- * light take that brawler's live tier colour, so the lighting is data too.
+ * raised centre, third on the right. Each step carries that brawler's name,
+ * tier and rank, and each step's lip and each figure's rim light take the tier
+ * colour, so the lighting is data too.
  *
  * Zero upstream cost: the query is already made three times further down the
  * page and `cache` collapses them into one.
@@ -230,7 +231,7 @@ async function Stage() {
    * slots carry the stand-in cast, with no numerals and no caption, because
    * there is no ranking to claim.
    */
-  const slots = ranked
+  const slots: Slot[] = ranked
     ? [
         { ...top[1], rank: 2 },
         { ...top[0], rank: 1 },
@@ -242,6 +243,19 @@ async function Stage() {
         tier: null,
         rank: null,
       }));
+
+  /*
+   * The cast is chosen by the meta, so the stage cannot assume its art exists:
+   * whoever is winning this week is exactly the brawler whose full-body render
+   * the CDN has not published yet. Asking first is what stopped the third slot
+   * rendering a broken-image box.
+   *
+   * Decided for the whole podium rather than per figure, and by the weakest
+   * link. One framed portrait standing between two full bodies reads as a
+   * failure; three framed portraits read as a deliberate treatment.
+   */
+  const available = await Promise.all(slots.map((s) => hasBrawlerModel(s.brawlerId)));
+  const treatment: Treatment = available.every(Boolean) ? 'model' : 'portrait';
 
   const [left, centre, right] = slots;
 
@@ -267,33 +281,30 @@ async function Stage() {
         }}
       />
 
-      <Plinth className="bottom-[6%] left-0 h-14 w-[34%]" rank={left.rank} tier={left.tier} />
-      <Plinth
-        className="bottom-[6%] left-[28%] h-20 w-[44%]"
-        rank={centre.rank}
-        tier={centre.tier}
-        centre
-      />
-      <Plinth className="bottom-[6%] right-0 h-14 w-[34%]" rank={right.rank} tier={right.tier} />
+      {/* Three steps that meet exactly — 31 / 38 / 31 — so no edge is drawn
+          over its neighbour and the podium reads as one object. */}
+      <Plinth className="bottom-[8%] left-0 h-20 w-[31%]" slot={left} place="left" />
+      <Plinth className="bottom-[8%] left-[31%] h-32 w-[38%]" slot={centre} place="centre" />
+      <Plinth className="bottom-[8%] right-0 h-20 w-[31%]" slot={right} place="right" />
 
       {/* Contact shadows, one per step, so each figure is planted on the
           surface it is standing on rather than on the stage floor. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[18%] left-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
+        className="pointer-events-none absolute bottom-[26%] left-[2%] z-10 h-3 w-[27%] rounded-[50%] bg-black/55 blur-[6px]"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[18%] right-[4%] z-10 h-3 w-[26%] rounded-[50%] bg-black/55 blur-[6px]"
+        className="pointer-events-none absolute bottom-[26%] right-[2%] z-10 h-3 w-[27%] rounded-[50%] bg-black/55 blur-[6px]"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[23%] left-[33%] z-10 h-3.5 w-[34%] rounded-[50%] bg-black/60 blur-[6px]"
+        className="pointer-events-none absolute bottom-[37%] left-[33%] z-10 h-3.5 w-[34%] rounded-[50%] bg-black/60 blur-[6px]"
       />
 
-      <Figure slot={left} className="bottom-[18%] left-0 h-52 w-[34%] z-20" />
-      <Figure slot={right} className="bottom-[18%] right-0 h-52 w-[34%] z-20" />
-      <Figure slot={centre} className="bottom-[23%] left-[24%] h-76 w-[52%] z-30" />
+      <Figure slot={left} treatment={treatment} className={`z-20 ${FIGURE[treatment].left}`} />
+      <Figure slot={right} treatment={treatment} className={`z-20 ${FIGURE[treatment].right}`} />
+      <Figure slot={centre} treatment={treatment} className={`z-30 ${FIGURE[treatment].centre}`} />
 
       {/* The six words that explain the whole conceit. Anchored under the
           podium rather than floated beside it. */}
@@ -315,46 +326,137 @@ interface Slot {
 }
 
 /**
+ * How the cast is drawn.
+ *
+ * `model` is the full-body render the stage is designed around. `portrait` is
+ * the framed head shot, and exists because the render does not always: the CDN
+ * ships `/model/` weeks after a release, and the two newest brawlers 404 today.
+ * Falling back to the portrait keeps the *right* three on the podium, which
+ * matters more than the pose — swapping in a fourth-place brawler with nicer
+ * art would quietly make the caption a lie.
+ */
+type Treatment = 'model' | 'portrait';
+
+/** Which step of the podium, which decides its scale and its outside edge. */
+type Place = 'left' | 'centre' | 'right';
+
+/**
+ * Each treatment needs its own geometry, not a shared box.
+ *
+ * A render is a tall irregular silhouette standing on the step, so its box is
+ * anchored at the step's surface and overlaps its neighbours to read as a
+ * group. A disc has no feet: it hangs above its step, centred on it, and the
+ * step's face stays clear underneath to carry the placing. Same podium, two
+ * sets of numbers.
+ */
+const FIGURE: Record<Treatment, { left: string; centre: string; right: string }> = {
+  model: {
+    left: 'bottom-[26%] left-0 h-52 w-[36%]',
+    centre: 'bottom-[37%] left-[24%] h-64 w-[52%]',
+    right: 'bottom-[26%] right-0 h-52 w-[36%]',
+  },
+  /*
+   * Every offset here clears the step below it. Sitting a disc down on the step
+   * the way a render stands on it buries the face, and the rank, name and tier
+   * go with it.
+   */
+  portrait: {
+    left: 'bottom-[29%] left-[0.5%] size-[7.5rem]',
+    centre: 'bottom-[40%] left-1/2 size-[10rem] -translate-x-1/2',
+    right: 'bottom-[29%] right-[0.5%] size-[7.5rem]',
+  },
+};
+
+/**
  * One figure on the podium.
  *
- * A fixed box with `object-contain object-bottom` rather than a width and an
- * automatic height: the renders are not a consistent aspect — some brawlers
- * are wide, some are tall — and anchoring the bottom edge is what keeps every
- * one of them standing on the step no matter which three the meta sends.
+ * The render uses a fixed box with `object-contain object-bottom` rather than a
+ * width and an automatic height: the renders are not a consistent aspect — some
+ * brawlers are wide, some are tall — and anchoring the bottom edge is what keeps
+ * every one of them standing on the step no matter which three the meta sends.
+ *
+ * The portrait is a 170px tile with an opaque background, so it cannot simply be
+ * dropped in where a cut-out was; it is framed as a lit disc, rimmed in the
+ * brawler's tier colour, which is a thing the stage can light rather than a
+ * square photograph balanced on a step.
  */
-function Figure({ slot, className }: { slot: Slot; className: string }) {
+function Figure({
+  slot,
+  treatment,
+  className,
+}: {
+  slot: Slot;
+  treatment: Treatment;
+  className: string;
+}) {
   const rim = slot.tier ? TIER_COLOR[slot.tier] : '#8b6bff';
 
-  const art = (
-    <>
-      <span
-        aria-hidden
-        className="absolute inset-x-[12%] bottom-[10%] top-[18%] rounded-full opacity-30 blur-3xl"
-        style={{ background: rim }}
-      />
-      <Image
-        src={brawlerModelUrl(slot.brawlerId)}
-        alt=""
-        width={460}
-        height={670}
-        /*
-         * Decorative and desktop-only. Left lazy on purpose: a phone never
-         * paints this column, so it should never pay for it.
-         */
-        loading="lazy"
-        fetchPriority="low"
-        unoptimized
-        className="relative h-full w-full select-none object-contain object-bottom drop-shadow-[0_22px_34px_rgba(0,0,0,0.7)]"
-      />
-    </>
-  );
+  const art =
+    treatment === 'model' ? (
+      <>
+        <span
+          aria-hidden
+          className="absolute inset-x-[12%] bottom-[10%] top-[18%] rounded-full opacity-30 blur-3xl"
+          style={{ background: rim }}
+        />
+        <Image
+          src={brawlerModelUrl(slot.brawlerId)}
+          alt=""
+          width={460}
+          height={670}
+          /*
+           * Decorative and desktop-only. Left lazy on purpose: a phone never
+           * paints this column, so it should never pay for it.
+           */
+          loading="lazy"
+          fetchPriority="low"
+          unoptimized
+          className="relative h-full w-full select-none object-contain object-bottom drop-shadow-[0_22px_34px_rgba(0,0,0,0.7)]"
+        />
+      </>
+    ) : (
+      <>
+        <span
+          aria-hidden
+          className="absolute inset-[-16%] rounded-full opacity-45 blur-2xl"
+          style={{ background: rim }}
+        />
+        <span
+          className="relative block h-full w-full overflow-hidden rounded-full"
+          style={{
+            /*
+             * Three rings, outside in: a dark separator so overlapping discs
+             * do not melt into each other, the tier colour, and the drop.
+             */
+            boxShadow: `0 0 0 3px #070a12, inset 0 0 0 2px color-mix(in srgb, ${rim} 85%, transparent), 0 20px 34px -14px rgb(0 0 0 / 0.9)`,
+          }}
+        >
+          <Image
+            src={brawlerPortraitUrl(slot.brawlerId)}
+            alt=""
+            width={170}
+            height={170}
+            loading="lazy"
+            fetchPriority="low"
+            unoptimized
+            className="h-full w-full select-none object-cover"
+          />
+          {/* Lit from above and grounded at the bottom, like everything else
+              standing on this stage. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/15 via-transparent to-black/25"
+          />
+        </span>
+      </>
+    );
 
   // Ranked figures are real rows and link like it; stand-ins are decoration.
   return slot.rank ? (
     <Link
       href={brawlerPath(slot.brawlerId, slot.name)}
-      title={`${slot.name}: number ${slot.rank} in Ranked`}
-      className={`absolute block ${className}`}
+      title={`${slot.name}: number ${slot.rank} in Ranked${slot.tier ? `, tier ${slot.tier}` : ''}`}
+      className={`absolute block transition-transform duration-300 hover:-translate-y-1.5 ${className}`}
     >
       {art}
     </Link>
@@ -368,36 +470,58 @@ function Figure({ slot, className }: { slot: Slot; className: string }) {
 /**
  * One step of the podium.
  *
- * Body, top face, lit lip, and the rank carved into the face. The top face is
- * an ellipse overlapping the body's top edge, which is the cheapest convincing
- * way to imply a viewing angle without a 3D transform — and unlike `rotateX`,
- * it costs no compositing layer and cannot blur the artwork standing on it.
+ * Body, top face, lit lip, and the brawler's placing carved into the face. The
+ * top face is an ellipse overlapping the body's top edge, which is the cheapest
+ * convincing way to imply a viewing angle without a 3D transform — and unlike
+ * `rotateX`, it costs no compositing layer and cannot blur the artwork standing
+ * on it.
  *
- * The lip takes the brawler's live tier colour, so an S-tier first place is lit
- * differently from a B-tier one. Without a tier it falls back to the brand
- * accent, and without a rank the step carries no numeral at all.
+ * The face carries the rank, the name and the tier letter, because a podium
+ * that shows three unnamed characters is decoration and a podium that names
+ * them is the tier list in miniature. The lip takes the live tier colour, so an
+ * S-tier first place is lit differently from a B-tier one — and the letter
+ * beside the name is what stops that colour being a private code. Without a
+ * rank the step carries nothing at all.
+ *
+ * Hidden from assistive tech as a whole: every fact on it is already the
+ * accessible name of the figure standing above it.
  */
-function Plinth({
-  className,
-  centre = false,
-  rank,
-  tier,
-}: {
-  className: string;
-  centre?: boolean;
-  rank: number | null;
-  tier: keyof typeof TIER_COLOR | null;
-}) {
-  const accent = tier ? TIER_COLOR[tier] : centre ? 'var(--brand)' : 'var(--accent)';
+function Plinth({ className, place, slot }: { className: string; place: Place; slot: Slot }) {
+  const centre = place === 'centre';
+  const accent = slot.tier ? TIER_COLOR[slot.tier] : centre ? 'var(--brand)' : 'var(--accent)';
+
+  /*
+   * Only the outside of the podium is rounded. Rounding every step put a notch
+   * at each junction where two corners curved away from each other, which read
+   * as three blocks pushed together rather than one stand.
+   */
+  const round =
+    place === 'left' ? 'rounded-bl-xl' : place === 'right' ? 'rounded-br-xl' : '';
 
   return (
     <span aria-hidden className={`pointer-events-none absolute ${className}`}>
       {/* Body, darkening toward the floor. */}
-      <span className="absolute inset-x-0 bottom-0 top-2 rounded-b-xl bg-gradient-to-b from-surface-3 via-surface-2 to-[#0a0d18] shadow-[0_18px_30px_-16px_rgb(0_0_0/0.9)]" />
+      <span
+        className={`absolute inset-x-0 bottom-0 top-2 bg-gradient-to-b from-surface-3 via-surface-2 to-[#0a0d18] shadow-[0_18px_30px_-16px_rgb(0_0_0/0.9)] ${round}`}
+      />
 
-      {/* Side walls, so the step has thickness rather than being a silhouette. */}
-      <span className="absolute inset-y-2 left-0 w-px bg-white/[0.06]" />
-      <span className="absolute inset-y-2 right-0 w-px bg-white/[0.06]" />
+      {/* The first step is the tallest, which stretches the same gradient over
+          half again the height and leaves it reading darker than the steps
+          beside it. A sheen puts the light back where the eye expects it. */}
+      {centre ? (
+        <span className="absolute inset-x-0 bottom-0 top-2 bg-gradient-to-b from-white/[0.055] to-transparent" />
+      ) : null}
+
+      {/* Walls, so the stand has thickness rather than being a silhouette —
+          drawn only where a wall is actually exposed. Two steps that meet do
+          not each need an edge; the centre keeps both because it stands proud
+          of the steps beside it. */}
+      {place !== 'right' ? (
+        <span className="absolute inset-y-2 left-0 w-px bg-white/[0.06]" />
+      ) : null}
+      {place !== 'left' ? (
+        <span className="absolute inset-y-2 right-0 w-px bg-white/[0.06]" />
+      ) : null}
 
       {/* The lit lip where the top face meets the body. */}
       <span
@@ -416,15 +540,26 @@ function Plinth({
         }}
       />
 
-      {/* The rank, on the face of the step. */}
-      {rank ? (
-        <span
-          className={`display absolute inset-x-0 bottom-0 top-4 grid place-items-center leading-none ${
-            centre ? 'text-3xl' : 'text-xl'
-          }`}
-          style={{ color: `color-mix(in srgb, ${accent} 70%, var(--muted))` }}
-        >
-          {rank}
+      {/* The placing, on the face of the step. */}
+      {slot.rank ? (
+        <span className="absolute inset-x-0 bottom-1.5 top-5 flex flex-col items-center justify-center gap-1">
+          <span
+            className={`display leading-none ${centre ? 'text-3xl' : 'text-2xl'}`}
+            style={{
+              color: accent,
+              textShadow: `0 2px 16px color-mix(in srgb, ${accent} 45%, transparent)`,
+            }}
+          >
+            {slot.rank}
+          </span>
+          <span className="flex max-w-full items-baseline gap-1 px-1.5 text-[0.55rem] font-semibold uppercase leading-none tracking-[0.12em] text-muted">
+            <span className="min-w-0 truncate">{slot.name}</span>
+            {slot.tier ? (
+              <span className="shrink-0" style={{ color: accent }}>
+                {slot.tier}
+              </span>
+            ) : null}
+          </span>
         </span>
       ) : null}
     </span>

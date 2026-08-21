@@ -194,6 +194,63 @@ export function brawlerModelUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/model/${brawlerId}.png`;
 }
 
+/** A render that exists will not stop existing; a missing one might land. */
+const MODEL_TTL_FOUND = 86_400_000;
+const MODEL_TTL_MISSING = 3_600_000;
+
+interface ModelProbe {
+  expires: number;
+  result: Promise<boolean>;
+}
+
+const modelProbes = new Map<number, ModelProbe>();
+
+/**
+ * Whether a full-body render actually exists for a brawler.
+ *
+ * The CDN publishes `/model/` weeks behind a release — Nori and Wendy both 404
+ * today — and nothing in the metadata says so: the payload hands out an
+ * `imageUrl` for the portrait and never mentions the render at all. So the only
+ * honest answer comes from asking, which is one HEAD request.
+ *
+ * Worth asking because the hero puts the live top three on a podium: whoever is
+ * winning this week is exactly the brawler whose art has not landed yet, and a
+ * broken image is the one thing a landing page cannot show.
+ *
+ * Memoised in-process rather than through the data cache, which only stores
+ * GET. Left on default fetch semantics deliberately — `no-store` would opt the
+ * whole landing page out of static rendering to ask a question whose answer
+ * changes once per brawler, ever.
+ */
+export function hasBrawlerModel(brawlerId: number): Promise<boolean> {
+  const cached = modelProbes.get(brawlerId);
+  if (cached && cached.expires > Date.now()) return cached.result;
+
+  const result: Promise<boolean> = fetch(brawlerModelUrl(brawlerId), {
+    method: 'HEAD',
+    signal: AbortSignal.timeout(5_000),
+  })
+    .then((res) => res.ok)
+    /*
+     * A failed probe counts as a hit. A timeout is not evidence of a missing
+     * file, and hiding artwork that exists over one flaky request is the worse
+     * mistake of the two.
+     */
+    .catch(() => true)
+    .then((found) => {
+      modelProbes.set(brawlerId, {
+        expires: Date.now() + (found ? MODEL_TTL_FOUND : MODEL_TTL_MISSING),
+        result,
+      });
+      return found;
+    });
+
+  // Held on the short life while in flight, so a hung request cannot pin an
+  // answer nobody has given yet.
+  modelProbes.set(brawlerId, { expires: Date.now() + MODEL_TTL_MISSING, result });
+  return result;
+}
+
 /**
  * Ranked tier badge.
  *
