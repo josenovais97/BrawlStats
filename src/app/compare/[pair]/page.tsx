@@ -17,6 +17,7 @@ import {
   getBrawlerSplits,
   getBrawlerStat,
   getHeadToHead,
+  getIndexablePairs,
   normalizeWinRate,
   type BrawlerSplit,
 } from '@/lib/stats';
@@ -37,15 +38,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const a = titleCase(resolved.a.name);
   const b = titleCase(resolved.b.name);
 
+  /*
+   * Indexable only for the bounded set in `getIndexablePairs`.
+   *
+   * Every combination renders and is shareable; that is not the question. The
+   * question is which are worth a crawler's budget, and the answer cannot be
+   * "all of them": there are 5,565, each server-rendered against the database.
+   */
+  const indexable = await getIndexablePairs()
+    .then((pairs) =>
+      pairs.some(
+        ([x, y]) =>
+          (x === resolved.a.id && y === resolved.b.id) ||
+          (x === resolved.b.id && y === resolved.a.id),
+      ),
+    )
+    .catch(() => false);
+
   return {
     title: `${a} vs ${b}. Which is better in Brawl Stars?`,
     description: `${a} and ${b} compared: win rates, pick rates, tiers, best modes and their head-to-head record from sampled Brawl Stars battles.`,
     alternates: { canonical: `/compare/${resolved.slug}` },
-    // Indexable pages must be a deliberate set. This one is not: the
-    // combinations are effectively unbounded, and a crawler walking them costs
-    // real API and function budget for pages nobody searched for. `follow` is
-    // kept so the links out of them still pass value to the pages that matter.
-    robots: { index: false, follow: true },
+    /*
+     * Indexable pages must be a deliberate set, and this is how that set is
+     * drawn: both brawlers popular enough to be searched for, and the pairing
+     * itself actually measured. Everything else stays out — the combinations
+     * are effectively unbounded, and a crawler walking them costs real
+     * function and database budget for pages nobody searched for.
+     *
+     * `follow` either way, so the links out of an unindexed comparison still
+     * pass value to the brawler pages that matter.
+     */
+    robots: { index: indexable, follow: true },
   };
 }
 

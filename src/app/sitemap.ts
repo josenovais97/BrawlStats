@@ -4,7 +4,8 @@ import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
-import { getFilterableModes } from '@/lib/stats';
+import { PAIR_SEPARATOR } from '@/lib/compare';
+import { getFilterableModes, getIndexablePairs } from '@/lib/stats';
 
 /**
  * The site's fixed routes, plus a page per brawler, map, mode and top-ranked
@@ -86,6 +87,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const mode of modes) {
       add(`/tier-list/${format}/${slugify(mode.mode)}`, 'daily', 0.75);
     }
+  }
+
+  /*
+   * Head-to-head comparisons, for the bounded set that is worth indexing.
+   *
+   * Listed from the same `getIndexablePairs` the route marks `index` with, so
+   * the sitemap and the robots directive cannot disagree — a listed page that
+   * says `noindex` is a contradiction a crawler pays to resolve. Bounded by
+   * brawler popularity rather than by evidence: every one of the 5,565
+   * possible pairings has been sampled, so evidence alone excludes almost
+   * nothing.
+   */
+  const catalogById = new Map(
+    (catalog?.current ?? []).map((brawler) => [brawler.id, brawler.name]),
+  );
+  const pairs = await getIndexablePairs().catch(() => []);
+  for (const [a, b] of pairs) {
+    const nameA = catalogById.get(a);
+    const nameB = catalogById.get(b);
+    // Skip a pairing whose brawlers are not in the catalogue: the URL is built
+    // from names, so without both there is no address to list.
+    if (!nameA || !nameB) continue;
+    add(`/compare/${slugify(nameA)}${PAIR_SEPARATOR}${slugify(nameB)}`, 'weekly', 0.5);
   }
 
   /*

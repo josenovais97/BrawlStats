@@ -2614,6 +2614,76 @@ async function computeRankedMapPicks(
   }
 }
 
+/* ---------------------------- indexable pairings --------------------------- */
+
+/**
+ * How many brawlers, by pick rate, are popular enough for their pairings to be
+ * worth indexing.
+ *
+ * The bound is popularity rather than sample size, and that is the whole
+ * point. Measured 2026-08-24, *every* one of the 5,565 possible pairings had
+ * been sampled and 4,601 cleared MIN_SAMPLE_FOR_PAIRING — so gating on
+ * evidence bounds nothing, and indexing on it would have multiplied the site's
+ * crawlable surface roughly eightfold. Each of those is a server-rendered page
+ * that queries the database, which is exactly what put public network transfer
+ * on course to overrun its allowance in the first place.
+ *
+ * What actually varies is demand: people search "shelly vs colt", not
+ * "gus vs buzz". Pick rate is the closest proxy the data has for that, and it
+ * is self-limiting — the top 30 yields at most 435 pairings, a surface the
+ * crawl budget can absorb.
+ */
+const PAIR_INDEX_TOP_BRAWLERS = 30;
+
+/**
+ * The pairings worth letting search engines index.
+ *
+ * One source of truth for two callers that must agree: the sitemap lists these,
+ * and `/compare/[pair]` marks exactly these `index`. A page in the sitemap that
+ * says `noindex`, or an indexable page absent from the sitemap, are both
+ * contradictions a crawler has to spend budget resolving.
+ *
+ * Returns unordered pairs of brawler ids; the route turns them into slugs.
+ */
+async function computeIndexablePairs(): Promise<[number, number][]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(RANKED_MAP_WINDOW_DAYS);
+
+    // Popularity first, so the pairing query only considers a bounded set.
+    const popular = await prisma.battleDailyStat.groupBy({
+      by: ['brawlerId'],
+      where: { day: { gte: since } },
+      _sum: { battles: true },
+      orderBy: { _sum: { battles: 'desc' } },
+      take: PAIR_INDEX_TOP_BRAWLERS,
+    });
+    const ids = popular.map((row) => row.brawlerId);
+    if (ids.length < 2) return [];
+
+    // Both sides popular, and the pairing itself actually measured. `LEAST`
+    // and `GREATEST` collapse the two directions into one unordered pair, so a
+    // comparison yields a single URL rather than two that mirror each other.
+    const rows = await prisma.$queryRaw<{ a: number; b: number }[]>`
+      SELECT LEAST(brawler_id, other_brawler_id) AS a,
+             GREATEST(brawler_id, other_brawler_id) AS b
+      FROM brawler_pair_daily
+      WHERE side = 'enemy'
+        AND day >= ${since}
+        AND brawler_id = ANY(${ids}::int[])
+        AND other_brawler_id = ANY(${ids}::int[])
+      GROUP BY 1, 2
+      HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
+    `;
+
+    return rows.map((row) => [row.a, row.b] as [number, number]);
+  } catch {
+    return [];
+  }
+}
+
 /* ------------------------------ cached reads ------------------------------ */
 
 /**
@@ -2741,3 +2811,4 @@ export const getReleasedBuffieCount = cachedRead('released-buffie-count', comput
 export const getRankedLeaderboard = cachedRead('ranked-leaderboard', compute_getRankedLeaderboard);
 export const getCatalogChanges = cachedRead('catalog-changes', compute_getCatalogChanges);
 export const getLastAggregationRun = cachedRead('last-aggregation-run', compute_getLastAggregationRun);
+export const getIndexablePairs = cachedRead('indexable-pairs', computeIndexablePairs);
