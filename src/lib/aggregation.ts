@@ -157,6 +157,12 @@ const ROLLUP_RETENTION_DAYS = 30;
  */
 const PAIRING_ROLLUP_RETENTION_DAYS = 24;
 
+/*
+ * Both roll-up windows above are the `ok` row of RETENTION_UNDER_PRESSURE,
+ * which is what the prune actually reads. They are named here because that is
+ * where the reasoning for the numbers lives.
+ */
+
 /**
  * How long raw battle rows are kept.
  *
@@ -465,18 +471,77 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  * The database is a free Neon instance with a hard 512 MB limit and no
  * intention of ever costing anything, so "we will notice before it fills" is
  * not a plan — nobody is watching, and the failure mode is writes being
- * refused. Above the high-water mark the prune tightens the snapshot window
- * instead, which is the one lever that frees real space immediately:
- * `player_brawler_snapshots` is around 60% of the database at any time.
+ * refused. Above the high-water mark the prune shortens its retention windows
+ * instead, spending accuracy to hold the line — see RETENTION_UNDER_PRESSURE
+ * for which windows, in which order, and what each one costs.
  *
- * Tightening costs accuracy, not correctness. Every read of that table takes
- * the newest row per player-brawler, and full-pool sampling means a single day
- * already contains everybody — the extra days are margin, so spending them
- * under pressure is the cheapest thing available.
+ * Tightening costs accuracy, not correctness: every window it touches is one
+ * where the data is still there, just shallower. Nothing it does can lose an
+ * observation that cannot be re-derived, which is why the raw battle window is
+ * the one thing it will not touch.
  */
 const STORAGE_LIMIT_BYTES = 512 * 1024 * 1024;
+
+/**
+ * Two levels, because there is no useful third one at the top.
+ *
+ * A valve that waits until the disk is nearly full cannot save anything, and
+ * this is the part that is easy to get wrong: deleting rows does not shrink a
+ * Postgres table. `DELETE` frees pages *inside* the file for reuse, which stops
+ * growth; the file itself only shrinks under `VACUUM FULL`, which rewrites the
+ * table and therefore needs room to write the copy into. At 95% there is no
+ * such room. Measured on 2026-08-24: pruning 240k rows moved the reported size
+ * from 464 MB to 464 MB, and the rewrite that followed took it to 270 MB.
+ *
+ * So the job here is to stop growth while there is still slack, not to recover
+ * from having run out. 75% is where defending starts and 88% is where it gets
+ * expensive; both are far enough down that the plateau lands under the ceiling
+ * rather than at it.
+ */
 const STORAGE_HIGH_WATER = 0.75;
-const SNAPSHOT_RETENTION_DAYS_UNDER_PRESSURE = 2;
+const STORAGE_CRITICAL = 0.88;
+
+type StoragePressure = 'ok' | 'high' | 'critical';
+
+/**
+ * What the prune is allowed to spend, at each level of pressure.
+ *
+ * Ordered by what the loss actually costs, cheapest first, which is not the
+ * same as biggest first:
+ *
+ * - Snapshots are the cheapest days on the site. Every read of that table takes
+ *   the newest row per player-brawler, and full-pool sampling means one day
+ *   already contains everybody — the rest is margin against failed runs.
+ * - The pairing roll-ups thin the matchup numbers, a secondary feature, and
+ *   they are the fastest-growing table (one battle becomes several pairings).
+ * - `battle_daily_stats` is last and barely moves: cutting it to 21 days costs
+ *   the tier list's 30-day option but keeps RANKED_MAP_WINDOW_DAYS intact,
+ *   which is the feature the whole roll-up exists to serve.
+ *
+ * The raw window is deliberately absent. It is the margin that keeps a failed
+ * roll-up from destroying battles the game API cannot serve again, and trading
+ * an unrecoverable loss for a few megabytes is never the right trade.
+ */
+const RETENTION_UNDER_PRESSURE: Record<
+  StoragePressure,
+  { snapshots: number; pairing: number; rollup: number }
+> = {
+  ok: {
+    snapshots: SNAPSHOT_RETENTION_DAYS,
+    pairing: PAIRING_ROLLUP_RETENTION_DAYS,
+    rollup: ROLLUP_RETENTION_DAYS,
+  },
+  high: { snapshots: 2, pairing: 14, rollup: 30 },
+  critical: { snapshots: 1, pairing: 10, rollup: 21 },
+};
+
+/** Where the database sits against its ceiling, or 'ok' when unmeasurable. */
+export function pressureFor(bytes: number | null): StoragePressure {
+  if (bytes === null) return 'ok';
+  if (bytes > STORAGE_LIMIT_BYTES * STORAGE_CRITICAL) return 'critical';
+  if (bytes > STORAGE_LIMIT_BYTES * STORAGE_HIGH_WATER) return 'high';
+  return 'ok';
+}
 
 /** Bytes on disk, or null when the question cannot be asked. */
 export async function databaseBytes(): Promise<number | null> {
@@ -661,18 +726,13 @@ export async function pruneOldSamples(): Promise<number> {
   if (!prisma) return 0;
 
   const bytes = await databaseBytes();
-  const pressured = bytes !== null && bytes > STORAGE_LIMIT_BYTES * STORAGE_HIGH_WATER;
-  const snapshotDays = pressured
-    ? SNAPSHOT_RETENTION_DAYS_UNDER_PRESSURE
-    : SNAPSHOT_RETENTION_DAYS;
+  const windows = RETENTION_UNDER_PRESSURE[pressureFor(bytes)];
 
-  const battleCutoff = new Date(Date.now() - RAW_BATTLE_RETENTION_DAYS * 86_400_000);
-  const snapshotCutoff = new Date(Date.now() - snapshotDays * 86_400_000);
-
-  const rollupCutoff = new Date(Date.now() - ROLLUP_RETENTION_DAYS * 86_400_000);
-  const pairingCutoff = new Date(
-    Date.now() - PAIRING_ROLLUP_RETENTION_DAYS * 86_400_000,
-  );
+  const day = 86_400_000;
+  const battleCutoff = new Date(Date.now() - RAW_BATTLE_RETENTION_DAYS * day);
+  const snapshotCutoff = new Date(Date.now() - windows.snapshots * day);
+  const rollupCutoff = new Date(Date.now() - windows.rollup * day);
+  const pairingCutoff = new Date(Date.now() - windows.pairing * day);
 
   try {
     /*
@@ -1491,10 +1551,16 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
      * run that caused it.
      */
     const bytes = await databaseBytes();
+    const pressure = pressureFor(bytes);
     const storage =
       bytes === null
         ? null
-        : `db ${(bytes / 1_048_576).toFixed(0)}MB (${((bytes / STORAGE_LIMIT_BYTES) * 100).toFixed(0)}% of free tier)`;
+        : `db ${(bytes / 1_048_576).toFixed(0)}MB (${((bytes / STORAGE_LIMIT_BYTES) * 100).toFixed(0)}% of free tier)` +
+          // Named only when it is not 'ok', so the common case stays quiet and
+          // a shortened window never happens silently: if the site is serving
+          // ten days of matchups instead of twenty-four, the run that decided
+          // that says so.
+          (pressure === 'ok' ? '' : ` · storage pressure: ${pressure}, windows tightened`);
 
     const failureNote =
       failures > 0
