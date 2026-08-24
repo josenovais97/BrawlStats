@@ -5,6 +5,7 @@ import {
   Database,
   ExternalLink,
   Lock,
+  Mail,
   RefreshCw,
   Search,
   Shield,
@@ -12,6 +13,7 @@ import {
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { CONTACT_EMAIL } from '@/lib/site';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/about' },
@@ -187,6 +189,44 @@ export default function AboutPage() {
               through the official API.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/*
+        Contact lives here rather than on a page of its own.
+        
+        A `/contact` route holding a single address is the thinnest kind of page
+        there is, and this site's whole approach is pages with something on
+        them. It also belongs next to "built by one person": the reason to write
+        in is that a person reads it, and that context is on this page already.
+      */}
+      <section>
+        <SectionHeading
+          title="Get in touch"
+          subtitle="Wrong number, a brawler missing from a list, or something that should exist and doesn't — all of it is useful."
+        />
+        <div className="card p-6">
+          <span className="grid size-11 place-items-center rounded-xl bg-surface-2 text-brand">
+            <Mail className="size-5" />
+          </span>
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="display mt-4 inline-block text-lg text-brand hover:underline"
+          >
+            {CONTACT_EMAIL}
+          </a>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+            One person reads this, so a reply may take a few days. If you are reporting
+            a number that looks wrong, the page it was on and roughly when you saw it
+            are the two things that make it findable &mdash; most pages here are built
+            from a rolling sample window, so &ldquo;the tier list&rdquo; on its own is
+            usually not enough to reproduce it.
+          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+            Account help, bans and purchases are Supercell&apos;s, not ours &mdash;
+            this site only reads the public API and cannot change anything about your
+            account.
+          </p>
         </div>
       </section>
 

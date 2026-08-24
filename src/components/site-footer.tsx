@@ -1,9 +1,9 @@
-import { Coffee, ExternalLink } from 'lucide-react';
+import { Coffee, ExternalLink, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
 import { AppStoreBadge, GooglePlayBadge } from '@/components/store-badges';
-import { SITE_NAME } from '@/lib/site';
+import { CONTACT_EMAIL, SITE_NAME } from '@/lib/site';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/brawl-stars/id1229016807';
 const GOOGLE_PLAY_URL =
@@ -129,6 +129,18 @@ export function SiteFooter() {
                 >
                   About {SITE_NAME}
                 </Link>
+              </li>
+              {/* Directly above the data sources on purpose: someone who has
+                  just read where a number came from is exactly the person who
+                  wants to tell us it looks wrong. */}
+              <li>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="inline-flex min-h-9 items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
+                >
+                  <Mail aria-hidden className="size-3.5 shrink-0" />
+                  Contact
+                </a>
               </li>
               {SOURCES.map(({ href, label }) => (
                 <li key={href}>

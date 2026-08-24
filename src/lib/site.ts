@@ -13,6 +13,18 @@ export const SITE_URL = (
 export const SITE_NAME = 'BrawlZone';
 
 /**
+ * Where to write in.
+ *
+ * A real, monitored address rather than a form. A contact form needs a POST
+ * handler, spam defences and somewhere to put the submissions — all of which
+ * this site would have to build and maintain — and a `mailto:` needs none of
+ * it. It is also the trust signal search engines look for: a site publishing
+ * numbers about other people's accounts should say who is behind it and how to
+ * reach them.
+ */
+export const CONTACT_EMAIL = 'contact@brawlzone.net';
+
+/**
  * How this site identifies itself to the APIs it reads.
  *
  * Built from the origin above rather than written out, because it had been
