@@ -121,9 +121,22 @@ directly.
 | Rankings, event rotation | 120s |
 | Brawler metadata (brawlapi) | 24h |
 | Tier list (reads Postgres) | 1h |
+| Aggregate database reads | 1h (`READ_CACHE_SECONDS`) |
 
 Short windows keep lookups fresh while collapsing bursts of traffic into one upstream call,
 which is what keeps the site inside the API rate limit.
+
+The last row is about Neon, not the game API. Most content routes are server-rendered per
+request — `/maps/[mode]/[map]` alone is 400+ URLs — so before caching, every crawler hit
+re-ran the aggregate queries. That was measured at 0.37 GB/day of egress against a 5 GB
+monthly allowance. The reads in `src/lib/stats.ts` are wrapped with `cachedRead`, so many
+renders share one query; `getBestPicksByMode` in particular is identical for every map page
+in a mode.
+
+`getLastAggregationRun` is deliberately **not** cached. It is the site's own freshness claim
+("Sampled 2 hours ago"), and a cached freshness claim is a contradiction — it reported
+superseded runs until it was excluded. Anything keyed by player tag is uncached too: those
+answer "how am *I* doing" for someone who has usually just played.
 
 ### Error handling
 
@@ -203,6 +216,12 @@ npm run dev
 > Prisma 7 takes the migration URL from `prisma.config.ts` and the runtime connection from a
 > driver adapter (`@prisma/adapter-pg`) — there is no `url` in `schema.prisma`.
 
+> `SITE_URL` in `src/lib/site.ts` falls back to the production origin when
+> `NEXT_PUBLIC_SITE_URL` is unset, so local development needs no extra configuration. Set it
+> in Vercel, and everything derived from it — canonicals, sitemap, Open Graph, and the
+> `User-Agent` sent to the wiki and news APIs — follows automatically. It is the only place
+> the domain is written down.
+
 ### 4. Deploy
 
 Set these in **Vercel → Settings → Environment Variables** before the first deploy:
@@ -212,37 +231,63 @@ Set these in **Vercel → Settings → Environment Variables** before the first 
 | `BRAWL_STARS_API_KEY` | yes | Whitelisted against the RoyaleAPI proxy IP |
 | `DATABASE_URL` | for the tier list | Pooled connection; injected by the Neon integration |
 | `DATABASE_URL_UNPOOLED` | for migrations | Direct connection; injected by the Neon integration |
-| `CRON_SECRET` | auto | Vercel provisions this for projects with cron jobs |
+| `CRON_SECRET` | yes | Also add it as a **GitHub Actions secret** — the sampling workflow sends it |
+| `NEXT_PUBLIC_SITE_URL` | yes | Canonical origin, e.g. `https://brawlzone.net`. Feeds every canonical tag, the sitemap, OG tags and the outbound `User-Agent` |
 
 Adding the database **after** a deployment does not retrofit the env vars into it —
 redeploy so the build picks them up, otherwise the tier list keeps rendering its
 "Database not configured" state from the older build.
 
-`vercel.json` declares four cron jobs, all pointing at the same route. The Hobby plan allows
-**one run per day per job**, and that ceiling is enforced per cron expression, so four daily
-expressions six hours apart (`0 2/8/14/20 * * *`) stay inside the limit while refreshing the
-sample four times a day. Hobby fires within the stated hour rather than on the minute.
+Sampling is driven by **GitHub Actions**, not Vercel Cron — see
+[the tier list](#the-tier-list-honestly) for why. `CRON_SECRET` therefore has to exist in two
+places: Vercel, where the route checks it, and the repository's Actions secrets, where the
+workflow reads it from. A missing Actions secret fails the run loudly rather than silently
+skipping it.
+
+The workflow must also point at the **canonical domain**. It called the old `*.vercel.app`
+host until that was set to redirect, at which point every run failed: `curl` without `-L`
+sees the `308` and stops. Adding `-L` would not have helped either — the redirect crosses
+hosts, and curl drops the `Authorization` header on a cross-host redirect, trading the 308
+for a 401.
+
+`vercel.json` still declares two cron entries as a fallback, though they have not been
+observed firing.
 
 `vercel.json` also pins functions to `fra1`. The Neon database lives in `eu-central-1`, and
 the default region (`iad1`) put every query on a transatlantic round trip.
 
 ## The tier list, honestly
 
-`vercel.json` triggers `/api/cron/refresh-stats` daily. The route checks
-`Authorization: Bearer $CRON_SECRET` and **fails closed** if `CRON_SECRET` is unset,
-so the endpoint is never an open trigger. Each run:
+`.github/workflows/refresh-stats.yml` calls `/api/cron/refresh-stats` every three hours
+(`17 */3 * * *`). The route checks `Authorization: Bearer $CRON_SECRET` and **fails closed**
+if `CRON_SECRET` is unset, so the endpoint is never an open trigger.
 
-1. **Seeds** `sampled_players` from the global leaderboard and top club rosters, up to 500.
-2. **Samples** the 25 least-recently-sampled players (2 API calls each, concurrency 2, with
+GitHub Actions rather than Vercel Cron: the Hobby plan allows two cron jobs triggered once a
+day, and once a day is not enough — a battle log holds only a player's last ~25 matches, so
+anything played between visits is lost for good. The `vercel.json` entries remain as a
+nominal fallback, though in practice they have not been observed firing. Note that GitHub's
+scheduler delivers late under load — delays of an hour or more are normal, and its own docs
+warn that queued jobs may be dropped entirely.
+
+Each run:
+
+1. **Seeds** `sampled_players` from global and regional leaderboards plus top club rosters,
+   holding the pool at `POOL_TARGET` (1,000) by evicting the least useful members.
+2. **Samples** the pool least-recently-sampled first (2 API calls each, concurrency 5, with
    backoff on throttling), writing:
-   - `player_brawler_snapshots` — trophies, rank and power per brawler per day,
+   - `player_brawler_snapshots` — trophies, rank, power and equipped skin per brawler per day,
    - `battle_samples` — one row per battle recording only *that player's own* brawler and
      result. Teammates are excluded: counting every participant inflates the sample with
      correlated rows.
-3. **Aggregates** the trailing 7 days into `brawler_stats` (win rate, usage rate, avg
+   - `battle_team_samples` — who stood beside and against that brawler, for matchups only.
+3. **Rolls up** the raw rows into daily aggregates (see [Storage](#storage)). Only days whose
+   raw rows have actually changed are refolded.
+4. **Aggregates** the trailing 7 days into `brawler_stats` (win rate, usage rate, avg
    trophies, avg rank, sample sizes). Idempotent — re-running overwrites the day's row.
+5. **Prunes** anything past its retention window, refusing to delete raw days that have not
+   been rolled up yet.
 
-The tier list page reads only `brawler_stats`, so it is fast and costs no API quota.
+The tier list page reads `brawler_stats` and the daily roll-ups, never the live API.
 
 ### Why the percentages are "adjusted"
 
@@ -289,7 +334,7 @@ where matched snapshots differ by at most 3. Candidate snapshots whose baseline 
 than 8 points from the latest are now skipped.
 
 It does **not** follow the window and mode controls above it, and the caption says so.
-Those recompute rates live from `battle_samples` over a trailing window; movers compare two
+Those recompute rates live from `battle_daily_stats` over a trailing window; movers compare two
 stored daily snapshots, which are written at a fixed 7-day window and have no mode
 dimension. The caption also reports the span it actually used rather than assuming seven
 days.
@@ -400,6 +445,65 @@ option unlocked.
 > 74 / 64 / 56 / 27 / 16 / 11%. The "Most picked" badge only appears when the leader is
 > more than 10 points clear.
 
+## Storage
+
+The database is a free Neon instance: **512 MB of data** (`neon.max_cluster_size`, the limit
+that actually refuses writes) and a **0.5 GB plan allowance** that counts data *plus*
+retained WAL history. Those are two different numbers and it is easy to chase the wrong one
+— `pg_database_size` cannot see history at all, so the console can read 98% while Postgres
+reports 300 MB.
+
+### Raw rows are staging, not data
+
+Every read of `battle_samples` and `battle_team_samples` is a `GROUP BY` or a `COUNT`; none
+opens an individual row. So the long windows the site reads come from daily roll-ups, and
+the raw tables live just long enough to be folded into them:
+
+| Table | Grain | Kept |
+| --- | --- | --- |
+| `battle_samples`, `battle_team_samples` | one row per battle | 3 days |
+| `battle_daily_stats` | day × type × mode × map × brawler × result | 30 days |
+| `player_battle_daily` | day × player × brawler | 22 days |
+| `brawler_pair_daily` | day × brawler × opponent × side × result | 22 days |
+| `brawler_team_daily` | day × brawler (the pairing baseline) | 22 days |
+| `player_brawler_snapshots` | day × player × brawler | 2 days |
+
+The old 24-day raw window was sized for a sampling rate that had since quadrupled, and
+projected to ~990 MB against a 512 MB ceiling. Pruning harder could not fix it: 21 days is
+what the per-map ranked tier list reads, so the window could not shrink without cutting the
+feature. On real data the roll-up is 6.5× fewer rows and far narrower ones.
+
+Two invariants hold this together, and both are easy to break by accident:
+
+- **The prune deletes a raw day only if it exists in the roll-up.** The game API serves a
+  player's last ~25 battles and has no history endpoint, so a run that sampled but failed to
+  fold must not be allowed to delete its own evidence. The flip side is that a persistently
+  failing roll-up parks the prune while the sampler keeps writing — which is why a fold
+  failure forces run status to `partial` and the workflow fails on it.
+- **`RAW_BATTLE_RETENTION_DAYS` must not drop below `ROLLUP_REBUILD_DAYS`.** The prune cuts
+  at a 72-hour timestamp while the fold rebuilds whole dates, so the oldest day in raw is
+  always partially pruned. That is safe only because it sits outside the rebuild window. If
+  those cross, a partially-pruned day gets refolded from what survived and is silently
+  undercounted forever.
+
+### The pressure valve
+
+Above 80% of the data budget the prune shortens its windows rather than waiting to be
+noticed; above 93% it spends more. Cheapest loss first: snapshots (one day already contains
+the whole pool), then the pairing roll-ups, then `battle_daily_stats` last because cutting
+it to 21 days costs the tier list's 30-day option. The raw window is never touched — trading
+an unrecoverable loss for a few megabytes is not a trade worth making.
+
+It defends early on purpose. **Deleting rows does not shrink a Postgres table**: `DELETE`
+frees pages inside the file for reuse, which stops growth, but the file only shrinks under
+`VACUUM FULL`, which needs free space to copy into. Measured once: pruning 240k rows moved
+the reported size from 464 MB to 464 MB, and the rewrite that followed took it to 270 MB. A
+valve that waits until the disk is nearly full cannot save anything.
+
+`npm run db:storage` reports table sizes, reclaimable space and (with `NEON_API_KEY` set)
+Neon's own billed figures. `-- --reclaim` rebuilds bloated tables and indexes; it takes an
+exclusive lock, so it is opt-in and not something the cron does.
+
 ## Cron budget
 
 Vercel's Hobby plan caps an invocation at 300s (both the default and the maximum), and the
@@ -422,7 +526,11 @@ run does real work against a remote database, so two things matter:
   `RUN_BUDGET_MS` meaningfully below the route's `maxDuration`; overshooting returns a 504
   and Vercel never retries a cron, so the slot is simply lost.
 - Window, concurrency, pool target and retry count: constants at the top of
-  `src/lib/aggregation.ts`. `POOL_TARGET` is deliberately near twice the daily sample rate:
+  `src/lib/aggregation.ts`. Retention and the storage valve live there too —
+  `ROLLUP_RETENTION_DAYS`, `PAIRING_ROLLUP_RETENTION_DAYS`, `SNAPSHOT_RETENTION_DAYS`,
+  `STORAGE_HIGH_WATER` and `STORAGE_CRITICAL`. Raising a retention default without
+  re-checking that the projected plateau still sits below the high-water mark turns the
+  valve into an oscillator; a test in `storage-pressure.test.ts` guards exactly that. `POOL_TARGET` is deliberately near twice the daily sample rate:
   a battle log only holds ~25 recent battles, so a pool too large to revisit every couple of
   days drops battles between visits.
 - Tier thresholds and the sample floor: `src/lib/stats.ts`.
@@ -447,14 +555,15 @@ Tags are passed without `#`. Errors return
 ## Project layout
 
 ```
-prisma/schema.prisma        Neon Postgres schema (snapshots, samples, aggregates)
+prisma/schema.prisma        Neon Postgres schema (raw samples, daily roll-ups, aggregates)
 prisma.config.ts            Prisma 7 config — migration datasource
 scripts/seed-stats.ts       Fills the sampling pool without a full run
+scripts/db-storage.ts       Storage report + opt-in reclaim (npm run db:storage)
 src/lib/bs-api.ts           Official API client (server-only, via RoyaleAPI proxy)
 src/lib/brawlapi.ts         Keyless artwork/metadata client
 src/lib/aggregation.ts      Sampling + aggregation pipeline (write side)
 src/lib/catalog.ts          Catalogue snapshot + diff, powering detected changes
-src/lib/stats.ts            Tier-list reads, normalisation, tiers, meta movers
+src/lib/stats.ts            Tier-list reads, normalisation, tiers, meta movers, read caching
 src/lib/progression.ts      Economy table and account-completion maths
 src/lib/regions.ts          Full ISO country list for the leaderboard
 src/lib/recent-searches.ts  localStorage-backed recent tags (client-only)
