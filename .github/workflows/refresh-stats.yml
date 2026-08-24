@@ -58,12 +58,26 @@ jobs:
             exit 1
           fi
 
+          # Always the canonical domain, never brawlzone.vercel.app.
+          #
+          # This pointed at the vercel.app host until 2026-08-24, when that
+          # domain was set to 308-redirect to brawlzone.net and every run began
+          # failing: curl does not follow redirects without -L, so the workflow
+          # saw a 308, failed its 2* test, and sampling stopped silently apart
+          # from a red run in the Actions tab.
+          #
+          # Adding -L would not have fixed it either. The redirect crosses
+          # hosts, and curl drops the Authorization header on a cross-host
+          # redirect unless --location-trusted is used — so it would have
+          # traded the 308 for a 401. Sending the credential only to the host
+          # it belongs to is the correct behaviour; the URL is what was wrong.
+          #
           # --max-time is above the endpoint's own budget so a slow run is
           # reported by the endpoint rather than cut off mid-write here.
           status=$(curl -sS -o /tmp/body -w '%{http_code}' \
             --max-time 300 \
             -H "Authorization: Bearer $CRON_SECRET" \
-            https://brawlzone.vercel.app/api/cron/refresh-stats)
+            https://brawlzone.net/api/cron/refresh-stats)
 
           echo "HTTP $status"
           cat /tmp/body
