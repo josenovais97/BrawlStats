@@ -203,7 +203,7 @@ export default function AboutPage() {
       <section>
         <SectionHeading
           title="Get in touch"
-          subtitle="Wrong number, a brawler missing from a list, or something that should exist and doesn't — all of it is useful."
+          subtitle="Ideas, corrections, or just to say hello."
         />
         <div className="card p-6">
           <span className="grid size-11 place-items-center rounded-xl bg-surface-2 text-brand">
@@ -215,17 +215,20 @@ export default function AboutPage() {
           >
             {CONTACT_EMAIL}
           </a>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            One person reads this, so a reply may take a few days. If you are reporting
-            a number that looks wrong, the page it was on and roughly when you saw it
-            are the two things that make it findable &mdash; most pages here are built
-            from a rolling sample window, so &ldquo;the tier list&rdquo; on its own is
-            usually not enough to reproduce it.
+          <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+            Is there a feature you would like to see on BrawlZone? Something that looks
+            wrong, or a page you wish existed? Send it over &mdash; ideas for what this
+            site should do next are the most useful thing you can put in my inbox.
           </p>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            Account help, bans and purchases are Supercell&apos;s, not ours &mdash;
-            this site only reads the public API and cannot change anything about your
-            account.
+            One person reads every message, so a reply can take a few days.
+          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted/80">
+            {/* Kept, and kept last: without it this address collects &ldquo;unban
+                me&rdquo; mail, which is neither answerable here nor a good use of
+                anyone&apos;s time. */}
+            Account help, bans and purchases are Supercell&apos;s &mdash; this site only
+            reads the public API and cannot change anything about your account.
           </p>
         </div>
       </section>
