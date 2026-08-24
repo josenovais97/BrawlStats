@@ -48,8 +48,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     // Written as the query, because that is how this page is found: people
     // search the map name plus the thing they want to know about it.
-    title: `${entry.map.name} best brawlers, ${modeLabel} (${currentMonth()})`,
-    description: `The strongest brawlers on ${entry.map.name} (${modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.`,
+    //
+    // A retired map drops the month. The date is a freshness claim, and there
+    // is nothing fresh to claim about a map that no longer exists — the page
+    // stays useful, but as a record rather than as this month's answer.
+    title: entry.retired
+      ? `${entry.map.name} (${modeLabel}) — retired Brawl Stars map`
+      : `${entry.map.name} best brawlers, ${modeLabel} (${currentMonth()})`,
+    description: entry.retired
+      ? `${entry.map.name} was a ${modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in ${modeLabel} generally.`
+      : `The strongest brawlers on ${entry.map.name} (${modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.`,
     alternates: { canonical: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
     openGraph: {
       title: `${entry.map.name} best brawlers`,
@@ -94,8 +102,14 @@ export default async function MapPage({ params }: PageProps) {
   // Ranked season's pool. Its old numbers are real but describe a map nobody
   // can queue for, so the page says that rather than ranking on them.
   const sinceLastSeen = minutesSince(mapPicks?.lastSeen);
+  // A retired map is never "in rotation", even for the few days its last
+  // battles stay inside the grace window. Without this a map disabled
+  // yesterday would carry a Retired badge and a live per-map ranking at the
+  // same time, and one of the two would be lying.
   const inRotation =
-    sinceLastSeen !== null && sinceLastSeen < MAP_ROTATION_GRACE_DAYS * 24 * 60;
+    !entry.retired &&
+    sinceLastSeen !== null &&
+    sinceLastSeen < MAP_ROTATION_GRACE_DAYS * 24 * 60;
   const hasMapPicks = inRotation && (mapPicks?.picks.length ?? 0) > 0;
   const siblings = await getActiveMaps()
     .then((all) =>
@@ -106,7 +120,9 @@ export default async function MapPage({ params }: PageProps) {
   const faq = [
     {
       question: `What are the best brawlers on ${entry.map.name}?`,
-      answer: hasMapPicks
+      answer: entry.retired
+        ? `${entry.map.name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in ${modeLabel} overall are the closest answer.`
+        : hasMapPicks
         ? `${listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName)))} ${mapPicks!.picks.length === 1 ? 'has the strongest adjusted win rate' : 'have the strongest adjusted win rates'} on ${entry.map.name}, from ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on the map.`
         : mapPicks && !inRotation
           ? `${entry.map.name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in ${modeLabel} overall are the best available answer while it is out.`
@@ -114,7 +130,7 @@ export default async function MapPage({ params }: PageProps) {
     },
     {
       question: `What game mode is ${entry.map.name}?`,
-      answer: `${entry.map.name} is a ${modeLabel} map in Brawl Stars${mapWiki?.environment ? `, set in the ${mapWiki.environment} environment` : ''}.`,
+      answer: `${entry.map.name} ${entry.retired ? 'was' : 'is'} a ${modeLabel} map in Brawl Stars${mapWiki?.environment ? `, set in the ${mapWiki.environment} environment` : ''}${entry.retired ? ', and has since been retired' : ''}.`,
     },
     ...(mapWiki?.layout
       ? [
@@ -188,16 +204,35 @@ export default async function MapPage({ params }: PageProps) {
                 New
               </span>
             ) : null}
+            {/* Stated up front rather than left for the reader to infer from
+                stale numbers further down. */}
+            {entry.retired ? (
+              <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase text-muted">
+                Retired
+              </span>
+            ) : null}
           </div>
 
           <h1 className="display mt-3 text-3xl uppercase sm:text-4xl">
             {entry.map.name}
           </h1>
           <p className="mt-3 max-w-3xl leading-relaxed text-muted">
-            The brawlers with the best records on {entry.map.name}, a {modeLabel} map.
-            Ranked from battles sampled off the global leaderboard pool, scored against
-            the sample-wide average rather than the map&rsquo;s own. So a pick has to
-            beat the field, not just the lobby.
+            {entry.retired ? (
+              <>
+                {entry.map.name} was a {modeLabel} map and has been retired from Brawl
+                Stars, so it can no longer be played. Its layout and environment are
+                below, along with the brawlers that perform best in {modeLabel} as a
+                whole &mdash; the closest thing to a ranking now that the map itself
+                sees no battles.
+              </>
+            ) : (
+              <>
+                The brawlers with the best records on {entry.map.name}, a {modeLabel}{' '}
+                map. Ranked from battles sampled off the global leaderboard pool, scored
+                against the sample-wide average rather than the map&rsquo;s own. So a
+                pick has to beat the field, not just the lobby.
+              </>
+            )}
           </p>
           {entry.map.credit ? (
             <p className="mt-2 text-xs text-muted">Map by {entry.map.credit}</p>
@@ -211,7 +246,9 @@ export default async function MapPage({ params }: PageProps) {
           subtitle={
             hasMapPicks
               ? `From ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.`
-              : mapPicks && !inRotation
+              : entry.retired
+                ? `${entry.map.name} has been retired from Brawl Stars, so these are ${modeLabel} picks across every map in the mode instead.`
+                : mapPicks && !inRotation
                 ? `${entry.map.name} is not in the current Ranked rotation, so these are ${modeLabel} picks across every map in the mode instead.`
                 : `${entry.map.name} has too few sampled battles to rank on its own yet, so these are ${modeLabel} picks across every map in the mode.`
           }

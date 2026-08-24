@@ -33,9 +33,25 @@ export interface GameMap {
    * mode could not be joined, which leaves the map page to its artwork.
    */
   scHash: string | undefined;
+  /**
+   * True for a map brawlapi flags `disabled` — retired from the game rather
+   * than merely out of this week's rotation.
+   *
+   * Never true for anything `getActiveMaps` returns; only `resolveMap` can
+   * produce one, and only when the URL asks for it by name.
+   */
+  retired: boolean;
 }
 
-export async function getActiveMaps(): Promise<GameMap[]> {
+/**
+ * The map catalogue, optionally including maps retired from the game.
+ *
+ * Retired maps are excluded by default and that is right for every *listing*:
+ * the index, the mode pages and the sitemap should offer maps you can go and
+ * play. It was wrong for the *route*, which is a different question — see
+ * `resolveMap`.
+ */
+async function buildCatalogue(includeRetired: boolean): Promise<GameMap[]> {
   const [maps, modes] = await Promise.all([
     getMaps().catch(() => [] as BAMap[]),
     getGameModeIdMap().catch(() => new Map<number, BAGameMode>()),
@@ -44,7 +60,11 @@ export async function getActiveMaps(): Promise<GameMap[]> {
   const seen = new Set<string>();
 
   return maps
-    .filter((map) => !map.disabled)
+    .filter((map) => includeRetired || !map.disabled)
+    // Live maps first, so that when a slug exists in both states the dedup
+    // below keeps the playable one and `retired` is never set on a map you
+    // could still queue into.
+    .sort((a, b) => Number(Boolean(a.disabled)) - Number(Boolean(b.disabled)))
     .map((map) => {
       const mode = map.gameMode.id ? modes.get(map.gameMode.id) : undefined;
       return {
@@ -53,6 +73,7 @@ export async function getActiveMaps(): Promise<GameMap[]> {
         modeSlug: slugify(mode?.name ?? map.gameMode.name),
         mapSlug: slugify(map.name),
         scHash: mode?.scHash,
+        retired: Boolean(map.disabled),
       };
     })
     /*
@@ -73,23 +94,44 @@ export async function getActiveMaps(): Promise<GameMap[]> {
     .sort((a, b) => a.map.name.localeCompare(b.map.name));
 }
 
+export async function getActiveMaps(): Promise<GameMap[]> {
+  return buildCatalogue(false);
+}
+
 /**
- * Resolves a `/maps/[mode]/[map]` pair.
+ * Resolves a `/maps/[mode]/[map]` pair, retired maps included.
  *
  * Both halves are matched, not just the map: map names repeat across modes
  * (there is a "Double Trouble" in three of them), which is the whole reason
  * the mode is in the path.
+ *
+ * Retired maps resolve on purpose. This used to consult the live catalogue
+ * only, so the day Supercell disabled a map its page began returning 404 — and
+ * these are the most-indexed pages on the site, one per map, each ranking for
+ * "<map> best brawlers". Every rotation therefore converted accumulated search
+ * ranking into dead URLs, which Search Console duly reported.
+ *
+ * A retired map is not a URL that names nothing: people still search it, the
+ * layout and the wiki notes still describe it, and the mode's own picks still
+ * answer the question the page exists to answer. So the page keeps working and
+ * says the map has been retired. A genuinely unknown slug still 404s, which is
+ * the case a 404 is actually for.
+ *
+ * Listings are unaffected — they call `getActiveMaps`, so the index and the
+ * sitemap continue to offer only maps you can go and play.
  */
 export async function resolveMap(
   modeSlug: string,
   mapSlug: string,
 ): Promise<GameMap | undefined> {
-  const all = await getActiveMaps();
   const wantedMode = slugify(modeSlug);
   const wantedMap = slugify(mapSlug);
-  return all.find(
-    (entry) => entry.modeSlug === wantedMode && entry.mapSlug === wantedMap,
-  );
+  const matches = (entry: GameMap) =>
+    entry.modeSlug === wantedMode && entry.mapSlug === wantedMap;
+
+  // Live catalogue first: it is the common case and the smaller list.
+  const active = await buildCatalogue(false);
+  return active.find(matches) ?? (await buildCatalogue(true)).find(matches);
 }
 
 /** Active maps grouped by mode, in rotation-size order. */

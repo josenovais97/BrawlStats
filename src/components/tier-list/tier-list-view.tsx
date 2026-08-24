@@ -10,6 +10,7 @@ import {
 } from '@/components/seo/structured-data';
 import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
+import { MostPicked } from '@/components/tier-list/most-picked';
 import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
@@ -38,6 +39,15 @@ import type { Tier, TierListEntry } from '@/types/stats';
 
 /** How many meta movers to show on each side. */
 const MOVER_LIMIT = 8;
+
+/**
+ * How many brawlers the most-picked list names.
+ *
+ * Ten, laid out two-up, so the section is five rows on a phone and does not
+ * push the tier list it belongs to off the screen. Past about ten the pick
+ * rates flatten into a long indistinguishable tail anyway.
+ */
+const MOST_PICKED_LIMIT = 10;
 
 /**
  * Everything that differs between the two lists, in one place.
@@ -305,6 +315,22 @@ export async function TierListView({
           })}
         </div>
       )}
+
+      {/*
+        Placed under the tiers rather than above them: the ranking is what the
+        page is for and what the URL promises, and popularity is the follow-up
+        question. Above, it would be the first thing read and would be mistaken
+        for the ranking itself.
+      */}
+      {rated.length > 0 ? (
+        <MostPicked
+          entries={entries}
+          limit={MOST_PICKED_LIMIT}
+          mode={mode}
+          windowLabel={TIER_WINDOWS[windowKey].sublabel}
+          battlesLabel={copy.battles}
+        />
+      ) : null}
 
       {unrated.length > 0 ? (
         <section>
