@@ -12,7 +12,7 @@ import {
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
-import { COMPETITIVE_BATTLE_TYPES } from '@/lib/stats';
+import { COMPETITIVE_BATTLE_TYPES, windowStartUtc } from '@/lib/stats';
 import { POPULAR_REGION_CODES } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
 import { parseApiDate } from '@/lib/format';
@@ -113,36 +113,78 @@ const WINDOW_DAYS = 7;
 const POOL_TARGET = 1000;
 
 /**
- * How long raw observations are kept.
+ * How many trailing days of roll-up are rebuilt from raw rows each run.
  *
- * Trimmed from 35 days to 24 when the sampling rate roughly tripled. Nothing
- * reads further back than the 21-day ranked-map window, so the extra fortnight
- * was storage spent on rows no query would ever open.
+ * A day is only final once it is over, and battles keep arriving into the
+ * current one all day, so today and yesterday are always recomputed. The third
+ * day is slack: it means a run can fail, or land late enough to straddle a
+ * date boundary, without leaving a day permanently half-counted.
  *
- * Sized against measured row costs rather than round numbers, because at the
- * sampling rate above the two tables dominate the database:
- *
- *   player_brawler_snapshots  257 B/row, ~86k rows/day  ->  ~22 MB/day
- *   battle_samples            365 B/row, ~23k rows/day  ->  ~8 MB/day
- *
- * Snapshots are the expensive one — one row per player per brawler per day —
- * and nothing reads them beyond a week except `getSkinUsage`, which takes only
- * the newest row per player-brawler and so does not need depth at all. Ten days
- * leaves three days of margin over the longest meaningful read.
- *
- * Battles are queried over at most 30 days (the tier list's widest window and
- * `getFilterableModes`), so 35 leaves five days of margin.
- *
- * Getting these wrong is unrecoverable — the game API serves only a player's
- * last ~25 battles and has no history endpoint — so the margins are the point,
- * and they are the smallest that are still safe rather than the largest that
- * would fit.
- *
- * Aggregates are never pruned: `brawler_stats`, `brawler_build_stats` and
- * `player_trophy_points` are small, and the last is the long history the site
- * exists to accumulate.
+ * Rebuilt rather than incremented because rebuilding is idempotent and
+ * incrementing is not. The sampler re-reads players whose battle logs overlap
+ * what it already has, and `skipDuplicates` silently drops those — an
+ * incremental counter has no way to tell a dropped duplicate from a new
+ * battle, so it would drift upward on exactly the rows the raw table was
+ * careful to deduplicate.
  */
-const BATTLE_RETENTION_DAYS = 24;
+const ROLLUP_REBUILD_DAYS = 3;
+
+/**
+ * How long the roll-ups are kept.
+ *
+ * This is the window the site actually reads, so it is set by the longest
+ * read rather than by storage: RANKED_MAP_WINDOW_DAYS is 21, and the tier
+ * list offers a 30-day option. That option had been quietly reading 24 days,
+ * because BATTLE_RETENTION_DAYS was 24 and nothing warned that the request was
+ * being truncated. At roll-up sizes 30 days is affordable, so the option now
+ * gets the window it claims.
+ */
+const ROLLUP_RETENTION_DAYS = 30;
+
+/**
+ * How long the pairing and per-player roll-ups are kept.
+ *
+ * Shorter than the above because nothing reads them that far back: the deepest
+ * caller is the 21-day matchup window, and the 30-day tier-list option only
+ * ever touches `battle_daily_stats`. Three days of margin over 21, matching
+ * ROLLUP_REBUILD_DAYS.
+ *
+ * Worth separating because these are the expensive roll-ups, not the cheap
+ * one. `brawler_pair_daily` produces ~30k rows a day against
+ * `battle_daily_stats`'s ~8k — one battle becomes several pairings — so the
+ * six days between 30 and 24 cost more there than the whole of the table this
+ * exists to serve.
+ */
+const PAIRING_ROLLUP_RETENTION_DAYS = 24;
+
+/**
+ * How long raw battle rows are kept.
+ *
+ * Days, not weeks, because nothing reads them any more. Every query against
+ * `battle_samples` and `battle_team_samples` is a GROUP BY or a COUNT, so the
+ * long windows the site reads are served by the daily roll-ups instead (see
+ * `rollUpBattles`), and raw rows only have to survive long enough to be folded
+ * into them.
+ *
+ * The previous 24 days was sized for a sampling rate that no longer exists.
+ * Measured on 2026-08-24 the rate had roughly quadrupled inside a week — 15k
+ * battles/day on the 17th, 55k by the 23rd — and at 370 B/row, 21 days of raw
+ * battles is ~430 MB against a 512 MB ceiling. The old windows projected to
+ * ~990 MB, a wall about three weeks out, and no pruning schedule could have
+ * moved it: 21 days is what the per-map ranked tier list reads, so the window
+ * could not be cut without cutting the feature.
+ *
+ * Three days is ROLLUP_REBUILD_DAYS: raw rows are kept exactly as long as they
+ * are still being folded, and no longer. The prune additionally refuses to
+ * delete any day that has not been rolled up, so this is a ceiling on how long
+ * rows live rather than a promise that they die on schedule.
+ *
+ * Getting this wrong is unrecoverable — the game API serves only a player's
+ * last ~25 battles and has no history endpoint — which is why the roll-up runs
+ * before the prune in `runAggregation`, and why the prune checks its work
+ * rather than trusting the clock.
+ */
+const RAW_BATTLE_RETENTION_DAYS = ROLLUP_REBUILD_DAYS;
 
 /**
  * Snapshots are kept for days, not weeks, and full-pool sampling is why.
@@ -233,6 +275,8 @@ export interface AggregationResult {
   seeded: number;
   /** Pool members dropped this run to keep the pool at POOL_TARGET. */
   evicted: number;
+  /** Roll-up rows written this run by `rollUpBattles`. */
+  rolledUp: number;
   /** Raw observation rows deleted as past their retention window. */
   pruned: number;
   /** Roster/kit differences detected against yesterday's catalogue snapshot. */
@@ -451,13 +495,163 @@ export async function databaseBytes(): Promise<number | null> {
 }
 
 /**
+ * Folds raw battles into the daily roll-ups the site reads.
+ *
+ * Entirely server-side: each day is one DELETE and one INSERT ... SELECT, so
+ * nothing crosses the wire but row counts. That matters because the raw rows
+ * being folded are tens of thousands per day, and this runs on a serverless
+ * function against a remote database.
+ *
+ * Days are chosen as the recent ones (see ROLLUP_REBUILD_DAYS) plus any day
+ * still present in raw that has no roll-up rows at all. The second clause is
+ * what makes an outage recoverable: if the cron is down for a week, the days
+ * it missed are still sitting in `battle_samples`, and the next successful run
+ * picks them up instead of losing them to the prune.
+ *
+ * Never throws. A failed roll-up leaves the previous roll-up rows in place and
+ * the raw rows unpruned, which is stale data rather than lost data — and the
+ * prune below refuses to advance past what has been rolled up, so a run that
+ * cannot fold cannot delete either.
+ */
+export async function rollUpBattles(): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const competitive = [...COMPETITIVE_BATTLE_TYPES];
+
+  try {
+    // Raw days worth folding: recent ones always, older ones only if they were
+    // never folded. `day` is a DATE and `battle_time` a UTC timestamp, and the
+    // session runs in GMT, so the cast lines the two grains up exactly.
+    const days = await prisma.$queryRaw<{ day: Date }[]>`
+      SELECT DISTINCT battle_time::date AS day
+      FROM battle_samples b
+      WHERE battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
+         OR NOT EXISTS (
+           SELECT 1 FROM battle_daily_stats d WHERE d.day = b.battle_time::date
+         )
+      ORDER BY day
+    `;
+
+    let rows = 0;
+
+    for (const { day } of days) {
+      // Delete-then-insert rather than upsert: `map_name` and `event_id` are
+      // nullable, and a unique constraint over nullable columns does not
+      // constrain anything useful in Postgres, where NULLs are distinct.
+      //
+      // Wrapped in a transaction so the pair is atomic. Apart is worse than
+      // either alone: a DELETE that lands without its INSERT leaves the day
+      // missing from the roll-up, and the site would read a hole in its window
+      // until the next run noticed and refilled it.
+      const [, battleRows] = await prisma.$transaction([
+        prisma.$executeRaw`DELETE FROM battle_daily_stats WHERE day = ${day}`,
+        prisma.$executeRaw`
+        INSERT INTO battle_daily_stats
+          (day, battle_type, mode, map_name, event_id, brawler_id, brawler_name,
+           result, rank, battles, last_battle_time)
+        SELECT battle_time::date, battle_type, mode, map_name, event_id, brawler_id,
+               brawler_name, result, rank, COUNT(*), MAX(battle_time)
+        FROM battle_samples
+        WHERE battle_time::date = ${day}
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+      `,
+      ]);
+
+      const [, playerRows] = await prisma.$transaction([
+        prisma.$executeRaw`DELETE FROM player_battle_daily WHERE day = ${day}`,
+        prisma.$executeRaw`
+        INSERT INTO player_battle_daily
+          (day, player_tag, brawler_id, battles, competitive_battles, wins, decided)
+        SELECT battle_time::date, player_tag, brawler_id,
+               COUNT(*),
+               COUNT(*) FILTER (WHERE battle_type = ANY(${competitive}::text[])),
+               COUNT(*) FILTER (WHERE result = 'victory'),
+               COUNT(*) FILTER (WHERE result IN ('victory', 'defeat'))
+        FROM battle_samples
+        WHERE battle_time::date = ${day}
+        GROUP BY 1, 2, 3
+      `,
+      ]);
+
+      rows += battleRows + playerRows;
+    }
+
+    // Team samples are folded on their own day list: they are written only for
+    // 3v3 battles, so a day can legitimately exist in one table and not the
+    // other, and pairing the two loops would skip or redo days.
+    const teamDays = await prisma.$queryRaw<{ day: Date }[]>`
+      SELECT DISTINCT battle_time::date AS day
+      FROM battle_team_samples b
+      WHERE battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
+         OR NOT EXISTS (
+           SELECT 1 FROM brawler_team_daily d WHERE d.day = b.battle_time::date
+         )
+      ORDER BY day
+    `;
+
+    for (const { day } of teamDays) {
+      // One INSERT for both sides: `unnest` is applied twice over the same
+      // scan rather than once per side, which halves the work on the table's
+      // widest columns.
+      const [, pairRows] = await prisma.$transaction([
+        prisma.$executeRaw`DELETE FROM brawler_pair_daily WHERE day = ${day}`,
+        prisma.$executeRaw`
+        INSERT INTO brawler_pair_daily
+          (day, brawler_id, other_brawler_id, side, result, battles)
+        SELECT battle_time::date, brawler_id, other_id, side, result, COUNT(*)
+        FROM battle_team_samples,
+             LATERAL (
+               SELECT unnest(enemy_brawler_ids) AS other_id, 'enemy' AS side
+               UNION ALL
+               SELECT unnest(ally_brawler_ids), 'ally'
+             ) expanded
+        WHERE battle_time::date = ${day}
+          -- Mirrors carry no information: a brawler is 50% against itself by
+          -- construction, and every read excluded them anyway.
+          AND other_id <> brawler_id
+        GROUP BY 1, 2, 3, 4, 5
+      `,
+      ]);
+
+      const [, teamRows] = await prisma.$transaction([
+        prisma.$executeRaw`DELETE FROM brawler_team_daily WHERE day = ${day}`,
+        prisma.$executeRaw`
+        INSERT INTO brawler_team_daily (day, brawler_id, wins, decided)
+        SELECT battle_time::date, brawler_id,
+               COUNT(*) FILTER (WHERE result = 'victory'),
+               -- Every sampled team battle, draws included. Not a slip: the
+               -- pairing rows are summed the same way, and every read reports
+               -- a pairing as an edge against this baseline. Matching
+               -- denominators is what makes that subtraction mean anything;
+               -- excluding draws from one side and not the other would bias
+               -- every matchup on the site by the draw rate.
+               COUNT(*)
+        FROM battle_team_samples
+        WHERE battle_time::date = ${day}
+        GROUP BY 1, 2
+      `,
+      ]);
+
+      rows += pairRows + teamRows;
+    }
+
+    return rows;
+  } catch {
+    // Stale roll-ups are recoverable on the next run; see the note above about
+    // the prune refusing to advance past them.
+    return 0;
+  }
+}
+
+/**
  * Deletes raw observations past their retention window.
  *
  * Without this the two biggest tables grow forever while only their most recent
  * weeks are ever read — at the sampling rate this file now runs at, that is
  * roughly a hundred thousand dead rows a week on a 512 MB free-tier database.
  *
- * Deliberately conservative: see BATTLE_RETENTION_DAYS. Nothing here can be
+ * Deliberately conservative: see RAW_BATTLE_RETENTION_DAYS. Nothing here can be
  * undone, because the game API serves only a player's last ~25 battles and has
  * no history endpoint at all — except under storage pressure, where a shorter
  * snapshot window is still preferable to a database that refuses writes.
@@ -472,23 +666,66 @@ export async function pruneOldSamples(): Promise<number> {
     ? SNAPSHOT_RETENTION_DAYS_UNDER_PRESSURE
     : SNAPSHOT_RETENTION_DAYS;
 
-  const battleCutoff = new Date(Date.now() - BATTLE_RETENTION_DAYS * 86_400_000);
+  const battleCutoff = new Date(Date.now() - RAW_BATTLE_RETENTION_DAYS * 86_400_000);
   const snapshotCutoff = new Date(Date.now() - snapshotDays * 86_400_000);
 
+  const rollupCutoff = new Date(Date.now() - ROLLUP_RETENTION_DAYS * 86_400_000);
+  const pairingCutoff = new Date(
+    Date.now() - PAIRING_ROLLUP_RETENTION_DAYS * 86_400_000,
+  );
+
   try {
-    const battles = await prisma.battleSample.deleteMany({
-      where: { battleTime: { lt: battleCutoff } },
-    });
-    // Same retention as the battles they describe; matchup stats read the same
-    // window, so a row outliving its sample would never be used.
-    const teams = await prisma.battleTeamSample.deleteMany({
-      where: { battleTime: { lt: battleCutoff } },
-    });
+    /*
+     * Raw battles go only once their day exists in the roll-up.
+     *
+     * The clock says which days are old enough; this says which are actually
+     * safe, and they are not the same question. A run that sampled fine but
+     * failed to fold would otherwise delete the only copy of a day's battles,
+     * and the game API has no history endpoint to re-read them from. Checking
+     * costs one indexed anti-join and removes the only unrecoverable failure
+     * in the pipeline.
+     */
+    const battles = await prisma.$executeRaw`
+      DELETE FROM battle_samples
+      WHERE battle_time < ${battleCutoff}
+        AND EXISTS (
+          SELECT 1 FROM battle_daily_stats d WHERE d.day = battle_time::date
+        )
+    `;
+    // Same rule for the team rows, against their own roll-up: they are folded
+    // on a separate day list, so a day can be safe in one table and not yet in
+    // the other.
+    const teams = await prisma.$executeRaw`
+      DELETE FROM battle_team_samples
+      WHERE battle_time < ${battleCutoff}
+        AND EXISTS (
+          SELECT 1 FROM brawler_team_daily d WHERE d.day = battle_time::date
+        )
+    `;
+
     const snapshots = await prisma.playerBrawlerSnapshot.deleteMany({
       where: { snapshotDate: { lt: snapshotCutoff } },
     });
 
-    return battles.count + teams.count + snapshots.count;
+    // The roll-ups themselves age out on the window the site reads. Nothing
+    // guards these: they are derived, and a lost day costs a thinner average
+    // rather than an unrecoverable observation.
+    const [dailyStats, playerDaily, pairDaily, teamDaily] = await Promise.all([
+      prisma.battleDailyStat.deleteMany({ where: { day: { lt: rollupCutoff } } }),
+      prisma.playerBattleDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
+      prisma.brawlerPairDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
+      prisma.brawlerTeamDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
+    ]);
+
+    return (
+      battles +
+      teams +
+      snapshots.count +
+      dailyStats.count +
+      playerDaily.count +
+      pairDaily.count +
+      teamDaily.count
+    );
   } catch {
     // A failed prune costs disk, not correctness, so it never fails a run.
     return 0;
@@ -523,12 +760,17 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   const excess = total - POOL_TARGET;
   if (excess <= 0) return 0;
 
-  const since = new Date(Date.now() - INACTIVE_AFTER_DAYS * 86_400_000);
+  const since = windowStartUtc(INACTIVE_AFTER_DAYS);
+  // Read from the per-player roll-up, not the raw battles: raw rows only live
+  // ROLLUP_REBUILD_DAYS now, which is far short of the fortnight this window
+  // asks about. The roll-up carries the same counts for the full window at
+  // about a twentieth of the storage, so eviction keeps judging members over
+  // two weeks rather than over three days.
   const [activeGroups, competitiveGroups] = await Promise.all([
-    prisma.battleSample.groupBy({
+    prisma.playerBattleDaily.groupBy({
       by: ['playerTag'],
-      where: { battleTime: { gte: since } },
-      _count: { _all: true },
+      where: { day: { gte: since } },
+      _sum: { battles: true },
     }),
     /*
      * Who has actually queued competitive Ranked lately.
@@ -543,15 +785,15 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
      * The pool therefore drifts toward accounts that play Ranked: when it has
      * to shed members, a ladder-only player goes before a Ranked one.
      */
-    prisma.battleSample.groupBy({
+    prisma.playerBattleDaily.groupBy({
       by: ['playerTag'],
-      where: { battleTime: { gte: since }, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
-      _count: { _all: true },
+      where: { day: { gte: since }, competitiveBattles: { gt: 0 } },
+      _sum: { competitiveBattles: true },
     }),
   ]);
   // Battles produced, not just whether any were: how much a member actually
   // contributes is what decides whether they earn their two API calls.
-  const produced = new Map(activeGroups.map((g) => [g.playerTag, g._count._all]));
+  const produced = new Map(activeGroups.map((g) => [g.playerTag, g._sum.battles ?? 0]));
   const competitive = new Set(competitiveGroups.map((g) => g.playerTag));
   const keep = new Set(protectedTags);
 
@@ -804,35 +1046,44 @@ export async function recomputeBrawlerStats(): Promise<number> {
   if (!prisma) return 0;
 
   const snapshotDate = todayUtc();
-  const since = new Date(Date.now() - WINDOW_DAYS * 86_400_000);
+  // Whole UTC days: both sources are keyed on a DATE, and a timestamp cutoff
+  // against a date column quietly drops the oldest day. See `windowStartUtc`.
+  const since = windowStartUtc(WINDOW_DAYS);
 
   // Run sequentially rather than in parallel: this executes once a day, and
   // serialising it keeps the job within a single connection, which matters on
   // connection-capped free-tier Postgres.
+  //
+  // Sourced from the daily roll-up rather than the raw battles, which no
+  // longer reach back WINDOW_DAYS. The grain is the same one this already
+  // grouped by, so the numbers are identical — `_sum: battles` replaces
+  // `_count` because a roll-up row already stands for many battles.
   // Every battle, for pick rate.
-  const battleGroups = await prisma.battleSample.groupBy({
+  const battleGroups = await prisma.battleDailyStat.groupBy({
     by: ['brawlerId', 'brawlerName', 'result'],
-    where: { battleTime: { gte: since } },
-    _count: { _all: true },
+    where: { day: { gte: since } },
+    _sum: { battles: true },
   });
 
   // Competitive battles only, for win rate. See COMPETITIVE_BATTLE_TYPES.
-  const competitiveGroups = await prisma.battleSample.groupBy({
+  const competitiveGroups = await prisma.battleDailyStat.groupBy({
     by: ['brawlerId', 'brawlerName', 'result'],
-    where: { battleTime: { gte: since }, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
-    _count: { _all: true },
+    where: { day: { gte: since }, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
+    _sum: { battles: true },
   });
 
   const ownerGroups = await prisma.playerBrawlerSnapshot.groupBy({
     by: ['brawlerId', 'brawlerName'],
-    where: { snapshotDate: { gte: new Date(since.toISOString().slice(0, 10)) } },
+    where: { snapshotDate: { gte: since } },
     _avg: { trophies: true, rank: true },
     _count: { _all: true },
   });
 
-  const totalBattles = await prisma.battleSample.count({
-    where: { battleTime: { gte: since } },
+  const totalBattlesAgg = await prisma.battleDailyStat.aggregate({
+    where: { day: { gte: since } },
+    _sum: { battles: true },
   });
+  const totalBattles = totalBattlesAgg._sum.battles ?? 0;
 
   // Fold the per-result groups into one accumulator per brawler. Two passes
   // over the same shape: `byBrawler` counts everything and feeds pick rate,
@@ -849,7 +1100,7 @@ export async function recomputeBrawlerStats(): Promise<number> {
         draws: 0,
         total: 0,
       };
-      const count = group._count._all;
+      const count = group._sum.battles ?? 0;
 
       if (group.result === 'victory') current.wins += count;
       else if (group.result === 'defeat') current.losses += count;
@@ -1116,14 +1367,20 @@ const RUN_BUDGET_MS = 270_000;
 const RANKING_MIN_BUDGET_MS = 15_000;
 
 /**
- * Held back for `recomputeBrawlerStats` and `recomputeBuildStats`.
+ * Held back for `recomputeBrawlerStats`, `recomputeBuildStats` and
+ * `rollUpBattles`.
  *
- * Both scale with the number of battle samples in the trailing window, so this
- * reserve has to grow with the batch size. Starving them is the worst possible
- * failure: the samples land in the database but nothing turns them into the
- * rows the tier list actually reads.
+ * All three scale with the number of battle samples in the trailing window, so
+ * this reserve has to grow with the batch size. Starving them is the worst
+ * possible failure: the samples land in the database but nothing turns them
+ * into the rows the tier list actually reads.
+ *
+ * Raised from 40s when the roll-up joined this phase. Measured against a full
+ * day of samples it folds three days in about 6s, so 55s keeps roughly the
+ * same headroom over the phase as before rather than quietly spending the
+ * recomputes' margin on it.
  */
-const RECOMPUTE_RESERVE_MS = 40_000;
+const RECOMPUTE_RESERVE_MS = 55_000;
 
 export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<AggregationResult> {
   const deadline = Date.now() + RUN_BUDGET_MS;
@@ -1135,6 +1392,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated: 0,
       seeded: 0,
       evicted: 0,
+      rolledUp: 0,
       pruned: 0,
       catalogChanges: 0,
       rankingsCached: 0,
@@ -1206,6 +1464,12 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     const brawlersUpdated = await recomputeBrawlerStats();
     const buildRowsUpdated = await recomputeBuildStats().catch(() => 0);
 
+    // Fold this run's raw battles into the daily roll-ups before anything is
+    // deleted. The prune checks the roll-up's own contents rather than
+    // assuming this succeeded, so the ordering is an optimisation and the
+    // check is the guarantee.
+    const rolledUp = await rollUpBattles();
+
     // After the recomputes, so a prune can never remove rows the aggregates in
     // this same run were about to read.
     const pruned = await pruneOldSamples();
@@ -1259,6 +1523,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated,
       seeded,
       evicted,
+      rolledUp,
       pruned,
       catalogChanges: catalog.changes,
       rankingsCached,

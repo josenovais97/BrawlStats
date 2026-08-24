@@ -335,3 +335,155 @@ model AggregationRun {
 
   @@map("aggregation_runs")
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              daily roll-ups                                */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Why these four tables exist.
+ *
+ * `battle_samples` and `battle_team_samples` are written once and then only
+ * ever read in aggregate: every query against them is a `groupBy` or a
+ * `COUNT`, and not one of them opens an individual row. They were nonetheless
+ * kept for 24 days, because the per-map ranked tier list reads a 21-day
+ * window — so the database was storing three weeks of per-battle detail purely
+ * to answer questions about counts.
+ *
+ * That was affordable when the sampler was slower. Measured on 2026-08-24 the
+ * rate had roughly quadrupled inside a week (15k battles/day on the 17th, 55k
+ * by the 23rd), and the old windows projected to ~990 MB against a 512 MB
+ * ceiling — a wall roughly three weeks out that no amount of pruning could
+ * move, because 21 days of raw battles is ~430 MB on its own and the 21 days
+ * are what the site's main feature reads.
+ *
+ * So the window and the detail were separated. These tables hold one row per
+ * distinct *combination* per day instead of one row per battle, which on real
+ * data is 6.5x fewer rows (52,763 battles -> 8,036 groups) and far narrower
+ * ones: no 30-character battle key, no player tag, no trophy delta. The raw
+ * tables now live just long enough to be rolled up and to survive a couple of
+ * failed runs; the roll-ups carry the long window at roughly a twentieth of
+ * the size, and their cost is flat in time rather than growing with it.
+ *
+ * Roll-ups are rebuilt per day rather than upserted, matching `brawler_stats`:
+ * a day is deleted and re-inserted from the raw rows in one statement, which
+ * is idempotent and sidesteps the fact that `map_name` and `event_id` are
+ * nullable and so cannot carry a useful unique constraint.
+ */
+
+/// Daily roll-up of `battle_samples`: the grain every usage and win-rate read
+/// actually groups by.
+///
+/// `rank` is kept because showdown placements are folded into wins and losses
+/// at read time, and `brawlerName` because the reads project it without
+/// joining a catalogue. `lastBattleTime` preserves the one non-count aggregate
+/// any caller asked for — `getRankedMapTiers` uses `MAX(battleTime)` to tell a
+/// map still in rotation from a map merely still inside the window.
+model BattleDailyStat {
+  id             Int      @id @default(autoincrement())
+  day            DateTime @db.Date
+  battleType     String   @map("battle_type")
+  mode           String
+  mapName        String?  @map("map_name")
+  eventId        Int?     @map("event_id")
+  brawlerId      Int      @map("brawler_id")
+  brawlerName    String   @map("brawler_name")
+  /// "victory" | "defeat" | "draw"
+  result         String
+  /// Showdown placement; null for every mode that reports a result.
+  rank           Int?
+  /// Battles in this combination on this day.
+  battles        Int
+  /// Newest battle folded into this row, for rotation freshness.
+  lastBattleTime DateTime @map("last_battle_time")
+
+  @@index([day, battleType])
+  @@map("battle_daily_stats")
+}
+
+/// Daily roll-up of `battle_samples` keyed by player, which is the only thing
+/// the raw table was still needed for.
+///
+/// Two callers care who played, not just what: `evictStalePool` ranks pool
+/// members by battles produced over `INACTIVE_AFTER_DAYS`, and
+/// `getBrawlerAbilityChoices` joins a player's owned abilities to how that
+/// player actually performed on the brawler. Both want counts per player, and
+/// at ~13k (player, brawler) pairs a day this answers them for about a
+/// twentieth of what keeping the battles themselves would cost — which is what
+/// lets the raw window shrink to days without shortening either feature's
+/// window.
+model PlayerBattleDaily {
+  day                DateTime @db.Date
+  playerTag          String   @map("player_tag")
+  brawlerId          Int      @map("brawler_id")
+  /// Every battle, matching the pick-rate denominator.
+  battles            Int
+  /// Of those, the ones in COMPETITIVE_BATTLE_TYPES.
+  competitiveBattles Int      @map("competitive_battles")
+  wins               Int
+  /// Battles that reported a win or a loss, i.e. the win-rate denominator.
+  decided            Int
+
+  /*
+   * The natural key *is* the key. A surrogate id would add four bytes a row
+   * plus a whole index that nothing looks anything up by — these rows are
+   * derived, rebuilt per day, and never referenced from anywhere else.
+   *
+   * Ordered day-first so the prune and the pool-eviction scan, which both
+   * filter on a day range and nothing else, ride the primary key. The one read
+   * that starts from a brawler gets the index below.
+   */
+  @@id([day, playerTag, brawlerId])
+  @@index([brawlerId, day])
+  @@map("player_battle_daily")
+}
+
+/// Daily roll-up of `battle_team_samples`, one row per (subject, other)
+/// pairing rather than one per battle.
+///
+/// The raw table stores two id arrays per battle and every read `unnest`s
+/// them, so the pairing is already the real grain — this just stops
+/// re-expanding it on every query. Row count only falls about 2x, but the row
+/// is a fifth the width once the arrays, the battle key and the player tag are
+/// gone, which is where the saving is.
+model BrawlerPairDaily {
+  day            DateTime @db.Date
+  /// The sampled player's brawler: the subject of the pairing.
+  brawlerId      Int      @map("brawler_id")
+  otherBrawlerId Int      @map("other_brawler_id")
+  /// "enemy" | "ally", from the subject's perspective.
+  side           String
+  /// "victory" | "defeat" | "draw", from the subject's side.
+  result         String
+  battles        Int
+
+  /*
+   * The largest of the roll-ups, and the one where this matters most: measured
+   * with a surrogate id, its indexes cost more than its data (18.3 MB against
+   * 12.0 MB), because a five-column unique constraint and a primary key were
+   * describing the same rows twice over. Promoting the natural key to the
+   * primary key removes the duplicate outright.
+   */
+  @@id([day, brawlerId, otherBrawlerId, side, result])
+  @@index([brawlerId, day])
+  @@map("brawler_pair_daily")
+}
+
+/// Each brawler's own record in the team sample, per day.
+///
+/// Every pairing read reports an *edge* against the brawler's average in the
+/// same sample rather than an absolute rate, so all of them need this baseline
+/// alongside the pairings. It cannot be recovered by summing
+/// `brawler_pair_daily`, where one battle contributes several pairs, so it is
+/// counted once here — about 106 rows a day.
+model BrawlerTeamDaily {
+  day       DateTime @db.Date
+  brawlerId Int      @map("brawler_id")
+  wins      Int
+  /// Every sampled team battle, draws included — the denominator the pairing
+  /// reads use, which sum `brawler_pair_daily.battles` the same way.
+  decided   Int
+
+  @@id([day, brawlerId])
+  @@map("brawler_team_daily")
+}

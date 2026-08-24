@@ -251,6 +251,28 @@ function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+/**
+ * The first day a `windowDays` window covers, as UTC midnight.
+ *
+ * The roll-ups key on a `DATE`, and comparing one against a timestamp is a
+ * quiet bug: Postgres widens the date to midnight, so `day >= now() - 7 days`
+ * drops the oldest day for any request made after 00:00 and the window
+ * silently narrows as the day goes on. A page rendered at 23:00 would measure
+ * less than one rendered at 01:00, from the same data.
+ *
+ * Flooring to a UTC day fixes both halves of that: the window is exactly
+ * `windowDays` calendar days ending today, and it is the same window for every
+ * request made on that day — which also means two callers asking for the same
+ * window get byte-identical results, rather than results that drift apart by a
+ * day's worth of battles.
+ */
+export function windowStartUtc(windowDays: number): Date {
+  const now = new Date();
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (windowDays - 1)),
+  );
+}
+
 /** Prisma row -> plain serialisable shape the pages render. */
 function toStatRow(row: BrawlerStatModel): BrawlerStatRow {
   return {
@@ -628,7 +650,11 @@ export async function getCoverageStats(): Promise<CoverageStats | null> {
   try {
     // Sequential so the page never needs more than one connection.
     const players = await prisma.sampledPlayer.count();
-    const battles = await prisma.battleSample.count();
+    // Summed from the roll-up, which is now the only table that spans the
+    // whole retained window — counting `battle_samples` would report the last
+    // few days and read as a collapse in coverage.
+    const battleAgg = await prisma.battleDailyStat.aggregate({ _sum: { battles: true } });
+    const battles = battleAgg._sum.battles ?? 0;
     const placements = await prisma.brawlerRankingEntry.count();
     const brawlers = await prisma.brawlerCatalogEntry.findMany({
       distinct: ['brawlerId'],
@@ -926,21 +952,21 @@ export async function getBestPicksByMode(
   if (!prisma) return out;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
-    const where = { battleTime: { gte: since } };
+    const since = windowStartUtc(windowDays);
+    const where = { day: { gte: since } };
 
     // `rank` is in the grouping so showdown placements can be folded into
     // wins and losses; it is null for every mode that reports a result.
     const [rankedGroups, allGroups] = await Promise.all([
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['mode', 'brawlerId', 'brawlerName', 'result', 'rank'],
         where: { ...where, battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['mode', 'brawlerId', 'brawlerName', 'result', 'rank'],
         where,
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
     ]);
 
@@ -957,7 +983,7 @@ export async function getBestPicksByMode(
           losses: 0,
           total: 0,
         };
-        const n = g._count._all;
+        const n = g._sum.battles ?? 0;
         const winRank = SHOWDOWN_WIN_RANK[g.mode];
 
         if (g.result === 'victory') acc.wins += n;
@@ -1039,7 +1065,7 @@ export function isTierWindow(value: string | undefined): value is TierWindowKey 
 
 /**
  * Recomputes brawler win and pick rates over an arbitrary window, straight from
- * `battle_samples`, for one tier-list format.
+ * `battle_daily_stats`, for one tier-list format.
  *
  * The cron writes one precomputed row per brawler per day at a fixed 7-day
  * window, which is what the homepage and brawler pages read. The tier list
@@ -1061,9 +1087,9 @@ export async function getBrawlerStatsForWindow(
   if (!prisma) return [];
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
     const scope = {
-      battleTime: { gte: since },
+      day: { gte: since },
       battleType: battleTypeFilter(format),
       ...(mode ? { mode } : {}),
     };
@@ -1073,19 +1099,20 @@ export async function getBrawlerStatsForWindow(
     // baseline. Both are only load-bearing on the trophy side; Ranked is 3v3
     // throughout, where `rank` is always null and the modes sit within a point
     // or two of each other.
-    const [allGroups, resultGroups, totalBattles] = await Promise.all([
-      prisma.battleSample.groupBy({
+    const [allGroups, resultGroups, totalAgg] = await Promise.all([
+      prisma.battleDailyStat.groupBy({
         by: ['brawlerId', 'brawlerName'],
         where: scope,
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['brawlerId', 'brawlerName', 'result', 'rank', 'mode'],
         where: scope,
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
-      prisma.battleSample.count({ where: scope }),
+      prisma.battleDailyStat.aggregate({ where: scope, _sum: { battles: true } }),
     ]);
+    const totalBattles = totalAgg._sum.battles ?? 0;
 
     // Wins and losses twice over: once per (brawler, mode) and once per mode
     // across every brawler. The second is what each brawler is measured
@@ -1099,7 +1126,7 @@ export async function getBrawlerStatsForWindow(
       names.set(group.brawlerId, group.brawlerName);
 
       const winRank = SHOWDOWN_WIN_RANK[group.mode];
-      const count = group._count._all;
+      const count = group._sum.battles ?? 0;
       let wins = 0;
       let losses = 0;
 
@@ -1152,7 +1179,7 @@ export async function getBrawlerStatsForWindow(
     }
 
     const usage = new Map(
-      allGroups.map((g) => [g.brawlerId, { name: g.brawlerName, total: g._count._all }]),
+      allGroups.map((g) => [g.brawlerId, { name: g.brawlerName, total: g._sum.battles ?? 0 }]),
     );
     const ids = new Set([...usage.keys(), ...perBrawler.keys()]);
     const snapshotDate = toIsoDate(new Date());
@@ -1380,7 +1407,7 @@ export async function getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
   if (!prisma) return [];
 
   try {
-    const since = new Date(Date.now() - COSMETIC_WINDOW_DAYS * 86_400_000);
+    const since = windowStartUtc(COSMETIC_WINDOW_DAYS);
 
     const rows = await prisma.$queryRaw<
       { skin_id: number; skin_name: string; brawler_id: number; brawler_name: string; users: bigint }[]
@@ -1472,7 +1499,7 @@ export async function getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
  * only ever come back empty.
  */
 export async function getFilterableModes(
-  // Inside BATTLE_RETENTION_DAYS: asking for more than is kept would quietly
+  // Inside ROLLUP_RETENTION_DAYS: asking for more than is kept would quietly
   // narrow to whatever exists, which is fine but hides the real window.
   windowDays = 21,
   minBattles = 150,
@@ -1482,15 +1509,15 @@ export async function getFilterableModes(
   if (!prisma) return [];
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
-    const groups = await prisma.battleSample.groupBy({
+    const since = windowStartUtc(windowDays);
+    const groups = await prisma.battleDailyStat.groupBy({
       by: ['mode'],
-      where: { battleTime: { gte: since }, battleType: battleTypeFilter(format) },
-      _count: { _all: true },
+      where: { day: { gte: since }, battleType: battleTypeFilter(format) },
+      _sum: { battles: true },
     });
 
     return groups
-      .map((g) => ({ mode: g.mode, battles: g._count._all }))
+      .map((g) => ({ mode: g.mode, battles: g._sum.battles ?? 0 }))
       .filter((m) => m.battles >= minBattles)
       .sort((a, b) => b.battles - a.battles);
   } catch {
@@ -1576,7 +1603,7 @@ export async function getBrawlerAbilityChoices(
   if (!prisma) return null;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
 
     const rows = await prisma.$queryRaw<
       {
@@ -1603,12 +1630,16 @@ export async function getBrawlerAbilityChoices(
         SELECT player_tag, 'gadget' AS kind, gadget_ids[1] AS item_id
         FROM latest WHERE cardinality(gadget_ids) = 1
       ),
+      -- From the per-player roll-up rather than the battles themselves: this
+      -- window is 21 days and raw rows now live three. The roll-up already
+      -- carries wins and decided per (player, brawler, day), which is exactly
+      -- the grain this CTE was building.
       battles AS (
         SELECT player_tag,
-               COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-               COUNT(*) FILTER (WHERE result IN ('victory','defeat')) AS decided
-        FROM battle_samples
-        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+               SUM(wins) AS wins,
+               SUM(decided) AS decided
+        FROM player_battle_daily
+        WHERE brawler_id = ${brawlerId} AND day >= ${since}
         GROUP BY player_tag
       )
       SELECT p.kind, p.item_id,
@@ -1721,7 +1752,7 @@ export async function getBrawlerBuffies(
   if (!prisma) return null;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
 
     // One row per player per brawler per day, so a player sampled repeatedly
     // would otherwise vote once per day. Counted from each player's most recent
@@ -1809,22 +1840,22 @@ export async function getBrawlerSplits(
   if (!prisma) return empty;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
-    const where = { battleTime: { gte: since } };
+    const since = windowStartUtc(windowDays);
+    const where = { day: { gte: since } };
 
     // Both groupings cover every brawler, not just this one: the averages each
     // slice is scored against have to come from the whole population, or a
     // brawler would be measured against itself.
     const [modeGroups, mapGroups] = await Promise.all([
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['mode', 'brawlerId', 'result', 'rank'],
         where,
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['mode', 'mapName', 'eventId', 'brawlerId', 'result', 'rank'],
         where: { ...where, mapName: { not: null } },
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
     ]);
 
@@ -1841,7 +1872,7 @@ export async function getBrawlerSplits(
      * the same way, so a slice's score is a difference of two numbers that
      * were counted identically.
      */
-    function fold<G extends { mode: string; brawlerId: number; result: string; rank: number | null; _count: { _all: number } }>(
+    function fold<G extends { mode: string; brawlerId: number; result: string; rank: number | null; _sum: { battles: number | null } }>(
       groups: G[],
       keyOf: (g: G) => string,
     ) {
@@ -1849,7 +1880,7 @@ export async function getBrawlerSplits(
       const all = new Map<string, Tally>();
 
       for (const g of groups) {
-        const n = g._count._all;
+        const n = g._sum.battles ?? 0;
         const winRank = SHOWDOWN_WIN_RANK[g.mode];
         let wins = 0;
         let decided = 0;
@@ -2011,11 +2042,11 @@ export interface BrawlerPairings {
 /**
  * Who this brawler beats, who beats it, and who it wants beside it.
  *
- * Reads `battle_team_samples`, which stores one row per battle from the
- * sampled player's perspective — so a pairing is counted once, from one side,
- * and never enters the usage or win-rate aggregates that `battle_samples`
- * feeds. The id arrays are expanded with `unnest`, which is why this is raw
- * SQL rather than a `groupBy`.
+ * Reads `brawler_pair_daily`, the daily roll-up of `battle_team_samples` —
+ * so a pairing is counted once, from one side, and never enters the usage or
+ * win-rate aggregates that `battle_daily_stats` feeds. The `unnest` that used
+ * to expand the id arrays now happens once at roll-up time instead of on every
+ * read; this stays raw SQL because the baseline comes from a second table.
  *
  * Every rate is reported as an edge against the brawler's own average in the
  * same sample, not as an absolute. A brawler that wins 58% of everything is
@@ -2031,39 +2062,38 @@ export async function getBrawlerPairings(
   if (!prisma) return null;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
 
     const [totals, enemies, allies] = await Promise.all([
+      // The brawler's own record, which every edge below is measured against.
+      // It cannot be recovered from the pairing roll-up, where one battle
+      // contributes several pairs, so it is counted once in its own table.
       prisma.$queryRaw<{ wins: bigint; decided: bigint }[]>`
-        SELECT
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-          COUNT(*) AS decided
-        FROM battle_team_samples
-        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
+        SELECT COALESCE(SUM(wins), 0) AS wins, COALESCE(SUM(decided), 0) AS decided
+        FROM brawler_team_daily
+        WHERE brawler_id = ${brawlerId} AND day >= ${since}
+      `,
+      // Mirrors are excluded at roll-up time rather than here. A brawler
+      // against itself sits at 50% by construction, so for anything with an
+      // above-average record the mirror always read as its worst matchup —
+      // an artifact of the arithmetic rather than anything about the brawler.
+      prisma.$queryRaw<{ other: number; wins: bigint; decided: bigint }[]>`
+        SELECT other_brawler_id AS other,
+          COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+          SUM(battles) AS decided
+        FROM brawler_pair_daily
+        WHERE brawler_id = ${brawlerId} AND day >= ${since} AND side = 'enemy'
+        GROUP BY other_brawler_id
+        HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
       `,
       prisma.$queryRaw<{ other: number; wins: bigint; decided: bigint }[]>`
-        SELECT other,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-          COUNT(*) AS decided
-        FROM battle_team_samples, unnest(enemy_brawler_ids) AS other
-        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
-          -- Mirrors are excluded. A brawler against itself sits at 50% by
-          -- construction, so for anything with an above-average record the
-          -- mirror always reads as its worst matchup, which is an artifact of
-          -- the arithmetic rather than anything about the brawler.
-          AND other <> ${brawlerId}
-        GROUP BY other
-        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
-      `,
-      prisma.$queryRaw<{ other: number; wins: bigint; decided: bigint }[]>`
-        SELECT other,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-          COUNT(*) AS decided
-        FROM battle_team_samples, unnest(ally_brawler_ids) AS other
-        WHERE brawler_id = ${brawlerId} AND battle_time >= ${since}
-          AND other <> ${brawlerId}
-        GROUP BY other
-        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
+        SELECT other_brawler_id AS other,
+          COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+          SUM(battles) AS decided
+        FROM brawler_pair_daily
+        WHERE brawler_id = ${brawlerId} AND day >= ${since} AND side = 'ally'
+        GROUP BY other_brawler_id
+        HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
       `,
     ]);
 
@@ -2120,7 +2150,16 @@ export async function getBrawlerPairings(
 /** How a brawler does against a specific set of opponents. */
 export interface CounterScore {
   brawlerId: number;
-  /** Win rate when at least one of the named opponents was on the other team. */
+  /**
+   * Win rate across the named opponents, weighted by how often each was faced.
+   *
+   * Previously "the rate in battles where at least one of them was present",
+   * counting such a battle once. The pairing roll-up counts per pairing, so a
+   * battle against two of the named opponents now contributes twice — once per
+   * matchup. That makes this a per-matchup average rather than a per-battle
+   * one, which is the more useful reading for a draft anyway: facing two of
+   * the enemy's picks is two matchups, and weighting it as one understated it.
+   */
   winRate: number;
   /** That rate minus the brawler's own overall rate in the same window. */
   edge: number;
@@ -2146,26 +2185,30 @@ export async function getCounterScores(
   if (!prisma || enemyIds.length === 0) return out;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
 
     const [overall, versus] = await Promise.all([
       prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
         SELECT brawler_id,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-          COUNT(*) AS decided
-        FROM battle_team_samples
-        WHERE battle_time >= ${since}
+          COALESCE(SUM(wins), 0) AS wins,
+          COALESCE(SUM(decided), 0) AS decided
+        FROM brawler_team_daily
+        WHERE day >= ${since}
         GROUP BY brawler_id
       `,
+      // One row per (brawler, opponent) pairing, summed over the named
+      // opponents. See CounterScore.winRate: a battle against two of them
+      // lands in two pairings and so is counted twice, deliberately.
       prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
         SELECT brawler_id,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-          COUNT(*) AS decided
-        FROM battle_team_samples
-        WHERE battle_time >= ${since}
-          AND enemy_brawler_ids && ${enemyIds}::int[]
+          COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+          SUM(battles) AS decided
+        FROM brawler_pair_daily
+        WHERE day >= ${since}
+          AND side = 'enemy'
+          AND other_brawler_id = ANY(${enemyIds}::int[])
         GROUP BY brawler_id
-        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_PAIRING}
+        HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
       `,
     ]);
 
@@ -2219,15 +2262,16 @@ export async function getHeadToHead(
   if (!prisma) return null;
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
     const rows = await prisma.$queryRaw<{ wins: bigint; decided: bigint }[]>`
       SELECT
-        COUNT(*) FILTER (WHERE result = 'victory') AS wins,
-        COUNT(*) AS decided
-      FROM battle_team_samples
+        COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+        COALESCE(SUM(battles), 0) AS decided
+      FROM brawler_pair_daily
       WHERE brawler_id = ${brawlerId}
-        AND battle_time >= ${since}
-        AND ${opponentId} = ANY(enemy_brawler_ids)
+        AND day >= ${since}
+        AND side = 'enemy'
+        AND other_brawler_id = ${opponentId}
     `;
 
     const decided = Number(rows[0]?.decided ?? 0);
@@ -2271,8 +2315,9 @@ const MIN_SAMPLE_FOR_MAP = 20;
  * without another API call, and the Ranked map rotation barely moves inside
  * three weeks, so the extra days describe the same maps rather than stale ones.
  *
- * Bounded by BATTLE_RETENTION_DAYS (35) in `lib/aggregation`, which is what
- * actually limits how far this can go.
+ * Bounded by ROLLUP_RETENTION_DAYS (30) in `lib/aggregation`, which is what
+ * actually limits how far this can go. The raw battles are gone long before
+ * that; what this window reads is `battle_daily_stats`.
  */
 export const RANKED_MAP_WINDOW_DAYS = 21;
 
@@ -2360,9 +2405,9 @@ export async function getRankedMapPicks(
   if (!prisma) return [];
 
   try {
-    const since = new Date(Date.now() - windowDays * 86_400_000);
+    const since = windowStartUtc(windowDays);
     const competitive = {
-      battleTime: { gte: since },
+      day: { gte: since },
       battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
     };
 
@@ -2371,22 +2416,24 @@ export async function getRankedMapPicks(
     // from, and it deliberately includes rows sampled before map recording
     // started, since a prior wants all the evidence it can get.
     const [overallGroups, mapGroups] = await Promise.all([
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['brawlerId', 'result'],
         where: competitive,
-        _count: { _all: true },
+        _sum: { battles: true },
       }),
-      prisma.battleSample.groupBy({
+      prisma.battleDailyStat.groupBy({
         by: ['mapName', 'eventId', 'mode', 'brawlerId', 'brawlerName', 'result'],
         where: {
           ...competitive,
           mapName: only ? only.mapName : { not: null },
           ...(only?.mode ? { mode: only.mode } : {}),
         },
-        _count: { _all: true },
+        _sum: { battles: true },
         // Newest battle per group, folded up per map below: this is what says
         // whether the map is still in the rotation or just still in the window.
-        _max: { battleTime: true },
+        // The roll-up carries the real battle timestamp, not the day it was
+        // filed under, so the rotation cut-off keeps its original precision.
+        _max: { lastBattleTime: true },
       }),
     ]);
 
@@ -2398,7 +2445,7 @@ export async function getRankedMapPicks(
 
     for (const g of overallGroups) {
       if (g.result !== 'victory' && g.result !== 'defeat') continue;
-      const n = g._count._all;
+      const n = g._sum.battles ?? 0;
       const acc = overall.get(g.brawlerId) ?? { wins: 0, decided: 0 };
       acc.decided += n;
       sampleDecided += n;
@@ -2447,7 +2494,7 @@ export async function getRankedMapPicks(
           lastSeen: 0,
           brawlers: new Map<number, Acc>(),
         };
-      const seen = g._max.battleTime?.getTime() ?? 0;
+      const seen = g._max.lastBattleTime?.getTime() ?? 0;
       if (seen > entry.lastSeen) entry.lastSeen = seen;
       // Artwork is keyed on the event id, so never let a null row overwrite a
       // real one just because it was grouped first.
@@ -2456,7 +2503,7 @@ export async function getRankedMapPicks(
       const acc =
         entry.brawlers.get(g.brawlerId) ??
         { name: g.brawlerName, wins: 0, decided: 0, total: 0 };
-      const n = g._count._all;
+      const n = g._sum.battles ?? 0;
 
       if (g.result === 'victory') {
         acc.wins += n;
