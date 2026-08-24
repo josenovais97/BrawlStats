@@ -573,14 +573,18 @@ export async function databaseBytes(): Promise<number | null> {
  * it missed are still sitting in `battle_samples`, and the next successful run
  * picks them up instead of losing them to the prune.
  *
- * Never throws. A failed roll-up leaves the previous roll-up rows in place and
- * the raw rows unpruned, which is stale data rather than lost data — and the
- * prune below refuses to advance past what has been rolled up, so a run that
- * cannot fold cannot delete either.
+ * Never throws, but never fails quietly either, and the difference matters
+ * more than it looks. The prune refuses to advance past what has been rolled
+ * up, so a run that cannot fold cannot delete — which is the right call for
+ * the battles (they are unrecoverable) and a slow leak for the disk: sampling
+ * keeps writing raw rows that nothing is now allowed to remove, at roughly
+ * 35 MB a day. That is the one remaining path to a full database, and it would
+ * otherwise look exactly like a healthy run. So the reason comes back with the
+ * count, and the caller reports it.
  */
-export async function rollUpBattles(): Promise<number> {
+export async function rollUpBattles(): Promise<{ rows: number; error: string | null }> {
   const prisma = getPrisma();
-  if (!prisma) return 0;
+  if (!prisma) return { rows: 0, error: null };
 
   const competitive = [...COMPETITIVE_BATTLE_TYPES];
 
@@ -701,11 +705,14 @@ export async function rollUpBattles(): Promise<number> {
       rows += pairRows + teamRows;
     }
 
-    return rows;
-  } catch {
-    // Stale roll-ups are recoverable on the next run; see the note above about
-    // the prune refusing to advance past them.
-    return 0;
+    return { rows, error: null };
+  } catch (err) {
+    // Stale roll-ups are recoverable on the next run; an unnoticed run of them
+    // is not, because the prune stays parked for as long as this keeps failing.
+    return {
+      rows: 0,
+      error: err instanceof Error ? err.message : 'unknown roll-up failure',
+    };
   }
 }
 
@@ -1528,7 +1535,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     // deleted. The prune checks the roll-up's own contents rather than
     // assuming this succeeded, so the ordering is an optimisation and the
     // check is the guarantee.
-    const rolledUp = await rollUpBattles();
+    const rollUp = await rollUpBattles();
 
     // After the recomputes, so a prune can never remove rows the aggregates in
     // this same run were about to read.
@@ -1540,8 +1547,10 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     const remainingMs = Math.max(RANKING_MIN_BUDGET_MS, deadline - Date.now());
     const rankingsCached = await refreshBrawlerRankings(remainingMs).catch(() => 0);
 
+    // A run that sampled cleanly but could not fold is not an 'ok' run: it has
+    // left the prune unable to delete anything it collected.
     const status: AggregationResult['status'] =
-      failures === 0 ? 'ok' : fulfilled.length === 0 ? 'failed' : 'partial';
+      fulfilled.length === 0 ? 'failed' : failures === 0 && !rollUp.error ? 'ok' : 'partial';
 
     /*
      * Storage goes in the audit trail on every run, not just when it is a
@@ -1562,6 +1571,13 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
           // that says so.
           (pressure === 'ok' ? '' : ` · storage pressure: ${pressure}, windows tightened`);
 
+    /*
+     * A stalled roll-up outranks the sampling summary, because it is the more
+     * expensive failure: samples that fail are simply missing, whereas a fold
+     * that fails parks the prune and starts filling the disk.
+     */
+    const rollUpNote = rollUp.error ? `roll-up FAILED (${rollUp.error})` : null;
+
     const failureNote =
       failures > 0
         ? `${failures} of ${results.length} player samples failed (${[...reasons]
@@ -1569,7 +1585,8 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
             .join(', ')})`
         : null;
 
-    const notes = [failureNote, storage].filter(Boolean).join(' · ') || undefined;
+    const notes =
+      [rollUpNote, failureNote, storage].filter(Boolean).join(' · ') || undefined;
 
     await prisma.aggregationRun.update({
       where: { id: run.id },
@@ -1589,7 +1606,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       brawlersUpdated,
       seeded,
       evicted,
-      rolledUp,
+      rolledUp: rollUp.rows,
       pruned,
       catalogChanges: catalog.changes,
       rankingsCached,
