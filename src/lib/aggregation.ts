@@ -583,6 +583,28 @@ const RETENTION_UNDER_PRESSURE: Record<
   critical: { snapshots: 1, pairing: 10, rollup: 21 },
 };
 
+/**
+ * A floor no roll-up retention window may go below, whatever the pressure.
+ *
+ * The roll-ups are the only copy. Raw battles live three days, and the game
+ * API serves a player's last ~25 battles with no history endpoint, so once a
+ * day ages out of raw its roll-up row is the sole record that it happened —
+ * measured 2026-08-24, 24 of 28 roll-up days had no raw copy left.
+ *
+ * That was survivable while Neon kept a day of history to rewind through. With
+ * point-in-time recovery set to zero it is not: a mistyped constant here would
+ * delete weeks of irreplaceable aggregates on the next cron run, unattended and
+ * unrecoverable. The fold cannot cause that — it only ever rewrites days that
+ * still exist in raw — so the prune is the whole risk surface, and this is the
+ * cheapest possible guard on it.
+ *
+ * Seven days is well under every window the valve legitimately uses (the
+ * tightest is `critical`, at 10), so it never interferes with real pressure
+ * handling. It exists purely to turn "someone set this to 0" from a disaster
+ * into a clamp and a note in the run log.
+ */
+const MIN_ROLLUP_RETENTION_DAYS = 7;
+
 /** Where the database sits against its ceiling, or 'ok' when unmeasurable. */
 export function pressureFor(bytes: number | null): StoragePressure {
   if (bytes === null) return 'ok';
@@ -817,10 +839,26 @@ export async function pruneOldSamples(): Promise<number> {
   const windows = RETENTION_UNDER_PRESSURE[pressureFor(bytes)];
 
   const day = 86_400_000;
+  // Clamped, not trusted. See MIN_ROLLUP_RETENTION_DAYS: these two windows
+  // delete the only surviving copy of their data, so they are the one place
+  // where a wrong number cannot be walked back.
+  const rollupDays = Math.max(windows.rollup, MIN_ROLLUP_RETENTION_DAYS);
+  const pairingDays = Math.max(windows.pairing, MIN_ROLLUP_RETENTION_DAYS);
+  const clamped = rollupDays !== windows.rollup || pairingDays !== windows.pairing;
+
   const battleCutoff = new Date(Date.now() - RAW_BATTLE_RETENTION_DAYS * day);
   const snapshotCutoff = new Date(Date.now() - windows.snapshots * day);
-  const rollupCutoff = new Date(Date.now() - windows.rollup * day);
-  const pairingCutoff = new Date(Date.now() - windows.pairing * day);
+  const rollupCutoff = new Date(Date.now() - rollupDays * day);
+  const pairingCutoff = new Date(Date.now() - pairingDays * day);
+
+  if (clamped) {
+    // Not thrown: a clamp means the prune is about to do the *safe* thing, and
+    // failing the run would only stop the sampling that pays for the site.
+    console.error(
+      `[prune] roll-up retention below the ${MIN_ROLLUP_RETENTION_DAYS}-day floor ` +
+        `(rollup=${windows.rollup}, pairing=${windows.pairing}); clamped. Check the retention constants.`,
+    );
+  }
 
   try {
     /*

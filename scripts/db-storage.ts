@@ -51,6 +51,66 @@ const LEAF_DENSITY_THRESHOLD = 70;
 
 const mb = (bytes: number) => `${(bytes / 1_048_576).toFixed(1)} MB`;
 
+/**
+ * What Neon itself thinks the project costs, which is not what Postgres says.
+ *
+ * Neon bills data plus retained WAL, and only the first half is visible from
+ * inside the database — so `pg_database_size` can read 298 MB while the console
+ * shows 98% of the plan and both are correct. That gap cost real time to
+ * diagnose on 2026-08-24: the fix in the end was the project's history
+ * retention, a control-plane setting no SQL query can see.
+ *
+ * So when a key is available this prints the authoritative numbers next to the
+ * local ones. Optional on purpose — a NEON_API_KEY is a broader credential than
+ * a connection string, and nothing else in this script needs it.
+ *
+ * `synthetic_storage_size` is the figure the plan is measured against.
+ * `history_retention_seconds` is the lever: on a database whose every row is
+ * re-derivable, a long window is pure cost.
+ */
+async function reportNeonStorage(): Promise<void> {
+  const key = process.env.NEON_API_KEY;
+  if (!key) {
+    console.log('  (set NEON_API_KEY to also show Neon\'s own storage + history figures)');
+    return;
+  }
+
+  const api = async (path: string) => {
+    const res = await fetch(`https://console.neon.tech/api/v2/${path}`, {
+      headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+    });
+    if (!res.ok) throw new Error(`${path} -> HTTP ${res.status}`);
+    return res.json();
+  };
+
+  try {
+    // Vercel-managed orgs require the org id even to list projects.
+    const orgs = await api('users/me/organizations');
+    const orgId = orgs.organizations?.[0]?.id;
+    const list = await api(`projects${orgId ? `?org_id=${orgId}` : ''}`);
+    const summary = list.projects?.[0];
+    if (!summary) return;
+
+    const { project } = await api(`projects/${summary.id}`);
+    const retention = project.history_retention_seconds ?? 0;
+    const storage = project.synthetic_storage_size ?? 0;
+
+    console.log(
+      `neon "${project.name}": ${mb(storage)} billed storage · ` +
+        `history retention ${(retention / 3600).toFixed(2)}h · ` +
+        `period ends ${String(project.consumption_period_end).slice(0, 10)}`,
+    );
+    if (retention > 6 * 3600) {
+      console.log(
+        '  NOTE: retention above 6h. Retained WAL is billed, and this project' +
+          '\n  writes ~250 MB of it a day, so this can dominate the plan.',
+      );
+    }
+  } catch (err) {
+    console.log(`  (neon api unavailable: ${err instanceof Error ? err.message : 'error'})`);
+  }
+}
+
 interface TableRow {
   relname: string;
   total_bytes: string;
@@ -83,8 +143,11 @@ async function main() {
     const before = await dbBytes();
     console.log(
       `database: ${mb(before)} of ${mb(STORAGE_LIMIT_BYTES)} ` +
-        `(${((before / STORAGE_LIMIT_BYTES) * 100).toFixed(0)}%)\n`,
+        `(${((before / STORAGE_LIMIT_BYTES) * 100).toFixed(0)}%)`,
     );
+
+    await reportNeonStorage();
+    console.log('');
 
     const { rows: tables } = await client.query<TableRow>(`
       SELECT c.relname,
