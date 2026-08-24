@@ -113,18 +113,38 @@ async function main() {
     // big enough for the answer to matter.
     await client.query('CREATE EXTENSION IF NOT EXISTS pgstattuple');
 
-    const bloated: string[] = [];
-    console.log('\nfree space inside tables');
+    /*
+     * Dead space counts as reclaimable, not just free space.
+     *
+     * Right after a large prune the deleted rows are *dead*, not *free*:
+     * nothing is reusable until a vacuum processes them, so `free_percent`
+     * alone reads near zero on a table that was just halved. Judging on that
+     * would skip exactly the table the prune had emptied — which is the moment
+     * this script is most likely to be run. Both halves are reclaimable, so
+     * both count.
+     */
+    const bloated: { name: string; bytes: number; wasted: number }[] = [];
+    console.log('\nreclaimable space inside tables (free + not-yet-vacuumed)');
     for (const t of tables) {
       if (Number(t.total_bytes) < 8 * 1024 * 1024) continue;
-      const { rows } = await client.query<{ free_percent: number }>(
-        'SELECT free_percent FROM pgstattuple($1)',
-        [t.relname],
+      const { rows } = await client.query<{
+        free_percent: number;
+        dead_tuple_percent: number;
+      }>('SELECT free_percent, dead_tuple_percent FROM pgstattuple($1)', [t.relname]);
+      const wasted = rows[0].free_percent + rows[0].dead_tuple_percent;
+      console.log(
+        `  ${t.relname.padEnd(28)}${wasted.toFixed(1).padStart(6)}%` +
+          `  (free ${rows[0].free_percent.toFixed(1)}%, dead ${rows[0].dead_tuple_percent.toFixed(1)}%)`,
       );
-      const free = rows[0].free_percent;
-      console.log(`  ${t.relname.padEnd(28)}${free.toFixed(1).padStart(6)}%`);
-      if (free >= BLOAT_THRESHOLD_PERCENT) bloated.push(t.relname);
+      if (wasted >= BLOAT_THRESHOLD_PERCENT) {
+        bloated.push({ name: t.relname, bytes: Number(t.heap_bytes), wasted });
+      }
     }
+    // Smallest first, for the same reason the indexes are: a rewrite needs room
+    // for a second copy of the table, and each one finished frees space for the
+    // next. On a database this close to its ceiling that ordering is what keeps
+    // the peak under the limit.
+    bloated.sort((a, b) => a.bytes - b.bytes);
 
     // Smallest first: each rebuild frees its own slack before the next starts.
     const { rows: indexes } = await client.query<{
@@ -161,6 +181,23 @@ async function main() {
     }
 
     let running = before;
+
+    /*
+     * A plain VACUUM before anything else, because it is free.
+     *
+     * It rewrites nothing and takes no exclusive lock, but it turns dead rows
+     * into reusable space and hands back any wholly-empty pages at the end of
+     * the file. That shrinks what the rewrites below have to copy — and on a
+     * table pruned down to its last few days, the emptied tail is often most
+     * of the file, so this alone can do most of the work.
+     */
+    for (const t of bloated) {
+      await client.query(`VACUUM (ANALYZE) "${t.name}"`);
+    }
+    const afterVacuum = await dbBytes();
+    console.log(`\nvacuum: ${mb(running)} -> ${mb(afterVacuum)}`);
+    running = afterVacuum;
+
     for (const i of looseIndexes) {
       // CONCURRENTLY so readers are never blocked. It cannot run inside a
       // transaction, which is why these are issued one statement at a time.
@@ -170,12 +207,13 @@ async function main() {
       running = now;
     }
 
-    for (const table of bloated) {
-      // Needs room for a second copy of the live rows. Reindexing first is
-      // what makes that room on a database close to its ceiling.
-      await client.query(`VACUUM FULL "${table}"`);
+    for (const t of bloated) {
+      // Needs room for a second copy of the live rows. The plain vacuum and
+      // the reindexes above are what make that room on a database close to its
+      // ceiling.
+      await client.query(`VACUUM FULL "${t.name}"`);
       const now = await dbBytes();
-      console.log(`vacuum full ${table}: ${mb(running)} -> ${mb(now)}`);
+      console.log(`vacuum full ${t.name}: ${mb(running)} -> ${mb(now)}`);
       running = now;
     }
 
