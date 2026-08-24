@@ -86,6 +86,45 @@ jobs:
           # A non-2xx is a real failure worth a red run: silent sampling
           # failures are how the data quietly goes stale.
           case "$status" in
-            2*) exit 0 ;;
+            2*) ;;
             *)  echo "::error::Sampling run failed with HTTP $status"; exit 1 ;;
           esac
+
+          # A 200 is not the same as a good run.
+          #
+          # The endpoint answers 200 whenever it completed, whatever it managed
+          # to do — so the checks below read the body, because the failures that
+          # actually cost something all come back green otherwise.
+          #
+          # `status: partial` is deliberately NOT one of them: roughly 30 of
+          # 1,000 sampled tags 404 on any given run (deleted accounts), so
+          # partial is the normal state and alerting on it would train everyone
+          # to ignore this job.
+          rolled=$(jq -r '.rolledUp // 0' /tmp/body)
+          battles=$(jq -r '.battlesRecorded // 0' /tmp/body)
+          runstatus=$(jq -r '.status // "unknown"' /tmp/body)
+
+          # Nothing sampled at all. Every tag failed, or the batch never ran.
+          if [ "$runstatus" = "failed" ]; then
+            echo "::error::Sampling run completed but sampled no players at all."
+            exit 1
+          fi
+
+          # The expensive one. `pruneOldSamples` refuses to delete raw days that
+          # were never folded, so a roll-up that keeps failing parks the prune
+          # while the sampler keeps writing — about 35 MB/day, roughly a week to
+          # a full database, with nothing else to announce it.
+          if grep -q 'roll-up FAILED' /tmp/body; then
+            echo "::error::Roll-up failed. The prune is now parked and raw rows will accumulate (~35MB/day, ~1 week to full). See aggregation_runs.notes."
+            exit 1
+          fi
+
+          # Same failure caught from the other side, in case the roll-up returns
+          # cleanly but writes nothing: new battles always move a day's
+          # watermark, so folding them can never legitimately yield zero rows.
+          if [ "$battles" -gt 0 ] && [ "$rolled" -eq 0 ]; then
+            echo "::error::Recorded $battles battles but rolled up 0 rows — the roll-up is not keeping up with the sampler."
+            exit 1
+          fi
+
+          exit 0
