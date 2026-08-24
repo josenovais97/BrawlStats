@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { unstable_cache } from 'next/cache';
+
 import { cache } from 'react';
 
 import type { BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
@@ -46,6 +48,29 @@ export const MIN_SAMPLE_FOR_TIER = 20;
  * 54.3%, where matchmaking pairs comparable opponents, so what is left is
  * closer to the brawler's own contribution.
  */
+/**
+ * How long a computed read is reused before the database is asked again.
+ *
+ * These pages are server-rendered per request — `/maps/[mode]/[map]` alone is
+ * 400+ URLs, `/brawlers/[slug]` another 106 — so before this, every crawler
+ * hit ran the aggregate queries again. Measured 2026-08-24 that was 0.37 GB a
+ * day of Neon egress against a 5 GB monthly allowance, on course to overrun it
+ * with a week of the billing period still to go. The queries are not expensive
+ * *individually*; there are simply thousands of them answering with the same
+ * numbers.
+ *
+ * An hour, because that is the freshness the pages already claim (`revalidate`
+ * is 3600 on the ones that can be static) and the sampler only moves these
+ * numbers every three hours anyway — so a shorter window would re-read the
+ * database to produce a byte-identical answer.
+ *
+ * `unstable_cache` rather than the `use cache` directive that supersedes it:
+ * `use cache` requires opting the whole app into Cache Components, which
+ * changes how every route renders. That is a large change to make on a project
+ * in maintenance for what is, here, a caching problem in four functions.
+ */
+const READ_CACHE_SECONDS = 3600;
+
 export const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'] as const;
 
 /**
@@ -943,7 +968,7 @@ const SHOWDOWN_WIN_RANK: Record<string, number> = {
  * winnable: a 30% win rate is strong in solo showdown and dreadful in gem grab,
  * and one global threshold would rank every showdown brawler last.
  */
-export async function getBestPicksByMode(
+async function computeBestPicksByMode(
   perMode = 3,
   windowDays = 7,
 ): Promise<Map<string, ModeBestPicks>> {
@@ -1078,7 +1103,7 @@ export function isTierWindow(value: string | undefined): value is TierWindowKey 
  * Unlike `recomputeBrawlerStats`, both rates are scoped to the same battles —
  * see TierFormat for why the old mixed pairing was not measuring anything.
  */
-export async function getBrawlerStatsForWindow(
+async function computeBrawlerStatsForWindow(
   windowDays: number,
   mode?: string,
   format: TierFormat = 'ranked',
@@ -1498,7 +1523,7 @@ export async function getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
  * unscoped version offered Solo Showdown on a Ranked-only ranking, which could
  * only ever come back empty.
  */
-export async function getFilterableModes(
+async function computeFilterableModes(
   // Inside ROLLUP_RETENTION_DAYS: asking for more than is kept would quietly
   // narrow to whatever exists, which is fine but hides the real window.
   windowDays = 21,
@@ -2390,7 +2415,7 @@ function mapConfidence(decided: number): MapConfidence {
  * a thin list is one thing; presenting a below-average brawler as a "best
  * pick" is simply wrong, and is what the empty state exists for.
  */
-export async function getRankedMapPicks(
+async function computeRankedMapPicks(
   perMap = 3,
   windowDays = RANKED_MAP_WINDOW_DAYS,
   /**
@@ -2587,4 +2612,87 @@ export async function getRankedMapPicks(
   } catch {
     return [];
   }
+}
+
+/* ------------------------------ cached reads ------------------------------ */
+
+/*
+ * The four reads that dominate database egress, wrapped so that many renders
+ * share one query. See READ_CACHE_SECONDS for the measurement behind this.
+ *
+ * Wrapped at the export rather than at each call site: these are read from
+ * pages, opengraph images and the sitemap, and a cache that only some callers
+ * remember to use is not a cache. The `compute*` functions above stay
+ * uncached and unexported, so there is exactly one way to reach them.
+ */
+
+const cachedBestPicksByMode = unstable_cache(
+  // `unstable_cache` serialises through JSON, and a Map does not survive that
+  // — it would come back as `{}`. Entries go in and out instead, and the Map
+  // is rebuilt on this side so callers see no difference.
+  async (perMode: number, windowDays: number) => [
+    ...(await computeBestPicksByMode(perMode, windowDays)),
+  ],
+  ['best-picks-by-mode'],
+  { revalidate: READ_CACHE_SECONDS },
+);
+
+/**
+ * Best picks per mode. Identical for every map page in a mode, which is what
+ * makes this the single biggest saving: one query an hour instead of one per
+ * map render.
+ */
+export async function getBestPicksByMode(
+  perMode = 3,
+  windowDays = 7,
+): Promise<Map<string, ModeBestPicks>> {
+  return new Map(await cachedBestPicksByMode(perMode, windowDays));
+}
+
+const cachedBrawlerStatsForWindow = unstable_cache(
+  async (windowDays: number, mode: string | undefined, format: TierFormat) =>
+    computeBrawlerStatsForWindow(windowDays, mode, format),
+  ['brawler-stats-for-window'],
+  { revalidate: READ_CACHE_SECONDS },
+);
+
+export async function getBrawlerStatsForWindow(
+  windowDays: number,
+  mode?: string,
+  format: TierFormat = 'ranked',
+): Promise<BrawlerStatRow[]> {
+  return cachedBrawlerStatsForWindow(windowDays, mode, format);
+}
+
+const cachedFilterableModes = unstable_cache(
+  async (windowDays: number, minBattles: number, format: TierFormat) =>
+    computeFilterableModes(windowDays, minBattles, format),
+  ['filterable-modes'],
+  { revalidate: READ_CACHE_SECONDS },
+);
+
+export async function getFilterableModes(
+  windowDays = 21,
+  minBattles = 150,
+  format: TierFormat = 'ranked',
+): Promise<{ mode: string; battles: number }[]> {
+  return cachedFilterableModes(windowDays, minBattles, format);
+}
+
+const cachedRankedMapPicks = unstable_cache(
+  async (
+    perMap: number,
+    windowDays: number,
+    only: { mapName: string; mode?: string } | undefined,
+  ) => computeRankedMapPicks(perMap, windowDays, only),
+  ['ranked-map-picks'],
+  { revalidate: READ_CACHE_SECONDS },
+);
+
+export async function getRankedMapPicks(
+  perMap = 3,
+  windowDays = RANKED_MAP_WINDOW_DAYS,
+  only?: { mapName: string; mode?: string },
+): Promise<RankedMapPicks[]> {
+  return cachedRankedMapPicks(perMap, windowDays, only);
 }
