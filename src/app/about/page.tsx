@@ -5,11 +5,11 @@ import {
   Database,
   ExternalLink,
   Lock,
-  Mail,
   RefreshCw,
   Search,
   Shield,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
@@ -206,9 +206,16 @@ export default function AboutPage() {
           subtitle="Ideas, corrections, or just to say hello."
         />
         <div className="card p-6">
-          <span className="grid size-11 place-items-center rounded-xl bg-surface-2 text-brand">
-            <Mail className="size-5" />
-          </span>
+          {/* Alt is empty on purpose: the artwork repeats what the heading and
+              the address next to it already say, so a screen reader announcing
+              it would only add noise. */}
+          <Image
+            src="/art/contact-bubble.png"
+            alt=""
+            width={430}
+            height={397}
+            className="h-auto w-20 sm:w-24"
+          />
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className="display mt-4 inline-block text-lg text-brand hover:underline"
