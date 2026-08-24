@@ -698,7 +698,20 @@ async function compute_getCoverageStats(): Promise<CoverageStats | null> {
 }
 
 /** Most recent cron run, used to show data freshness on the tier list. */
-async function compute_getLastAggregationRun(): Promise<AggregationRunSummary | null> {
+/*
+ * Deliberately NOT cached, unlike every other read in this file.
+ *
+ * This is the site's freshness claim — "Sampled 2 hours ago" under the
+ * numbers — and a cached freshness claim is a contradiction. Wrapping it at
+ * the same one-hour TTL as everything else made the homepage report a run that
+ * had already been superseded, so a sampling run could finish and the page
+ * would still insist the data was two hours old.
+ *
+ * It costs nothing to leave uncached: one row, ordered by a column with an
+ * index on it. The bytes saved by caching it would not register against the
+ * transfer budget; the credibility lost does.
+ */
+export async function getLastAggregationRun(): Promise<AggregationRunSummary | null> {
   const prisma = getPrisma();
   if (!prisma) return null;
 
@@ -2810,5 +2823,4 @@ export const getIconUsage = cachedRead('icon-usage', compute_getIconUsage);
 export const getReleasedBuffieCount = cachedRead('released-buffie-count', compute_getReleasedBuffieCount);
 export const getRankedLeaderboard = cachedRead('ranked-leaderboard', compute_getRankedLeaderboard);
 export const getCatalogChanges = cachedRead('catalog-changes', compute_getCatalogChanges);
-export const getLastAggregationRun = cachedRead('last-aggregation-run', compute_getLastAggregationRun);
 export const getIndexablePairs = cachedRead('indexable-pairs', computeIndexablePairs);
