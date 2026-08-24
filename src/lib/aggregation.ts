@@ -152,10 +152,15 @@ const ROLLUP_RETENTION_DAYS = 30;
  * Worth separating because these are the expensive roll-ups, not the cheap
  * one. `brawler_pair_daily` produces ~30k rows a day against
  * `battle_daily_stats`'s ~8k — one battle becomes several pairings — so the
- * six days between 30 and 24 cost more there than the whole of the table this
+ * days between 30 and 22 cost more there than the whole of the table this
  * exists to serve.
+ *
+ * Twenty-two, not twenty-one: one day of margin over the read window. Setting
+ * retention *equal* to it would mean the oldest day the reads ask for is the
+ * same day the prune is entitled to delete, and a matchup window would quietly
+ * shrink or not depending on the order the two ran in.
  */
-const PAIRING_ROLLUP_RETENTION_DAYS = 24;
+const PAIRING_ROLLUP_RETENTION_DAYS = 22;
 
 /*
  * Both roll-up windows above are the `ok` row of RETENTION_UNDER_PRESSURE,
@@ -206,10 +211,18 @@ const RAW_BATTLE_RETENTION_DAYS = ROLLUP_REBUILD_DAYS;
  * hundred thousand rows a day. At ten days it alone was heading for ~275MB and
  * would have pushed the database past its free-tier ceiling within a fortnight.
  *
- * Four rather than one so a couple of consecutive failed runs cannot empty it,
- * and so the reads that ask for a week still find every player they need.
+ * Two rather than one so a couple of consecutive failed runs cannot empty it —
+ * runs are twice daily, so this is four of them — and so the reads that ask
+ * for a week still find every player they need.
+ *
+ * Was four. Cut to two because the storage pressure valve had been holding it
+ * at two for weeks anyway: the value it was defending was one the database
+ * could not actually afford, so "four" described an intention rather than what
+ * the site ran on. Making it the default costs ~40 MB less at the plateau and
+ * makes the valve's own snapshot lever honest — it now only moves this under
+ * genuine pressure, rather than every single run.
  */
-const SNAPSHOT_RETENTION_DAYS = 4;
+const SNAPSHOT_RETENTION_DAYS = 2;
 
 /**
  * A pool member producing no battles in this many days is inactive.
@@ -498,8 +511,43 @@ const STORAGE_LIMIT_BYTES = 512 * 1024 * 1024;
  * expensive; both are far enough down that the plateau lands under the ceiling
  * rather than at it.
  */
-const STORAGE_HIGH_WATER = 0.75;
-const STORAGE_CRITICAL = 0.88;
+/**
+ * The plan allowance covers data *and* history, but only data is measurable
+ * from inside Postgres, so the valve is given a budget rather than the limit.
+ *
+ * Neon bills "Storage" as the database plus retained WAL, and the two are not
+ * independent: `VACUUM FULL` rewrites every page of a table, and every
+ * rewritten page becomes WAL. On 2026-08-24 the rewrite that took the data
+ * from 460 MB to 284 MB pushed history to 0.18 GB, and the console still read
+ * 98% — the saving moved from one column to the other. `pg_database_size` sees
+ * none of that, so a valve pointed at the raw limit would defend a number
+ * nobody is billed for.
+ *
+ * Hence a reserve. It is sized for history *after* the incremental fold, which
+ * removed the standing churn that was feeding it — not for the 0.18 GB
+ * measured during the migration, which was one-off. Whether it holds depends
+ * on the project's history-retention setting, which lives in the Neon console
+ * and cannot be read or set from here: a long PITR window on a database whose
+ * every row is re-derivable will overrun this reserve no matter what the
+ * pruner does.
+ *
+ * `neon.max_cluster_size` (512 MB, data only) is the separate limit that
+ * actually refuses writes. Data staying inside the budget below keeps a wide
+ * margin on it.
+ */
+const HISTORY_RESERVE_BYTES = 52 * 1024 * 1024;
+const DATA_BUDGET_BYTES = STORAGE_LIMIT_BYTES - HISTORY_RESERVE_BYTES;
+
+/*
+ * Set so the *baseline* plateau sits below the high-water mark, which is the
+ * property that makes this a valve rather than an oscillator. Projected at the
+ * 2026-08-24 sampling rate the baseline windows plateau near 330 MB, against a
+ * high-water mark of ~368 MB — so under normal growth the windows never move,
+ * and pressure means the sampling rate genuinely changed rather than that the
+ * defaults were set too generously.
+ */
+const STORAGE_HIGH_WATER = 0.80;
+const STORAGE_CRITICAL = 0.93;
 
 type StoragePressure = 'ok' | 'high' | 'critical';
 
@@ -538,8 +586,8 @@ const RETENTION_UNDER_PRESSURE: Record<
 /** Where the database sits against its ceiling, or 'ok' when unmeasurable. */
 export function pressureFor(bytes: number | null): StoragePressure {
   if (bytes === null) return 'ok';
-  if (bytes > STORAGE_LIMIT_BYTES * STORAGE_CRITICAL) return 'critical';
-  if (bytes > STORAGE_LIMIT_BYTES * STORAGE_HIGH_WATER) return 'high';
+  if (bytes > DATA_BUDGET_BYTES * STORAGE_CRITICAL) return 'critical';
+  if (bytes > DATA_BUDGET_BYTES * STORAGE_HIGH_WATER) return 'high';
   return 'ok';
 }
 
@@ -592,19 +640,31 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
     // Raw days worth folding: recent ones always, older ones only if they were
     // never folded. `day` is a DATE and `battle_time` a UTC timestamp, and the
     // session runs in GMT, so the cast lines the two grains up exactly.
-    const days = await prisma.$queryRaw<{ day: Date }[]>`
-      SELECT DISTINCT battle_time::date AS day
-      FROM battle_samples b
-      WHERE battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
-         OR NOT EXISTS (
-           SELECT 1 FROM battle_daily_stats d WHERE d.day = b.battle_time::date
-         )
-      ORDER BY day
+    const days = await prisma.$queryRaw<{ day: Date; watermark: Date }[]>`
+      WITH candidates AS (
+        SELECT b.battle_time::date AS day, MAX(b.created_at) AS watermark
+        FROM battle_samples b
+        WHERE b.battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
+           OR NOT EXISTS (
+             SELECT 1 FROM battle_daily_stats d WHERE d.day = b.battle_time::date
+           )
+        GROUP BY 1
+      )
+      -- Skip days no battle has been added to since they were last folded.
+      -- The sampler only appends, so an unmoved watermark means the fold would
+      -- write back exactly the rows already there — pure WAL, and on Neon WAL
+      -- is billed storage. IS DISTINCT FROM rather than <>, so a day with no
+      -- watermark row at all (never folded) still counts as changed.
+      SELECT c.day, c.watermark
+      FROM candidates c
+      LEFT JOIN rollup_watermarks w ON w.day = c.day AND w.source = 'battles'
+      WHERE w.raw_watermark IS DISTINCT FROM c.watermark
+      ORDER BY c.day
     `;
 
     let rows = 0;
 
-    for (const { day } of days) {
+    for (const { day, watermark } of days) {
       // Delete-then-insert rather than upsert: `map_name` and `event_id` are
       // nullable, and a unique constraint over nullable columns does not
       // constrain anything useful in Postgres, where NULLs are distinct.
@@ -643,23 +703,37 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
       `,
       ]);
 
+      await prisma.$executeRaw`
+        INSERT INTO rollup_watermarks (day, source, raw_watermark, folded_at)
+        VALUES (${day}, 'battles', ${watermark}, now())
+        ON CONFLICT (day, source)
+        DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
+      `;
+
       rows += battleRows + playerRows;
     }
 
     // Team samples are folded on their own day list: they are written only for
     // 3v3 battles, so a day can legitimately exist in one table and not the
     // other, and pairing the two loops would skip or redo days.
-    const teamDays = await prisma.$queryRaw<{ day: Date }[]>`
-      SELECT DISTINCT battle_time::date AS day
-      FROM battle_team_samples b
-      WHERE battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
-         OR NOT EXISTS (
-           SELECT 1 FROM brawler_team_daily d WHERE d.day = b.battle_time::date
-         )
-      ORDER BY day
+    const teamDays = await prisma.$queryRaw<{ day: Date; watermark: Date }[]>`
+      WITH candidates AS (
+        SELECT b.battle_time::date AS day, MAX(b.created_at) AS watermark
+        FROM battle_team_samples b
+        WHERE b.battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
+           OR NOT EXISTS (
+             SELECT 1 FROM brawler_team_daily d WHERE d.day = b.battle_time::date
+           )
+        GROUP BY 1
+      )
+      SELECT c.day, c.watermark
+      FROM candidates c
+      LEFT JOIN rollup_watermarks w ON w.day = c.day AND w.source = 'teams'
+      WHERE w.raw_watermark IS DISTINCT FROM c.watermark
+      ORDER BY c.day
     `;
 
-    for (const { day } of teamDays) {
+    for (const { day, watermark } of teamDays) {
       // One INSERT for both sides: `unnest` is applied twice over the same
       // scan rather than once per side, which halves the work on the table's
       // widest columns.
@@ -701,6 +775,13 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
         GROUP BY 1, 2
       `,
       ]);
+
+      await prisma.$executeRaw`
+        INSERT INTO rollup_watermarks (day, source, raw_watermark, folded_at)
+        VALUES (${day}, 'teams', ${watermark}, now())
+        ON CONFLICT (day, source)
+        DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
+      `;
 
       rows += pairRows + teamRows;
     }
@@ -1564,7 +1645,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     const storage =
       bytes === null
         ? null
-        : `db ${(bytes / 1_048_576).toFixed(0)}MB (${((bytes / STORAGE_LIMIT_BYTES) * 100).toFixed(0)}% of free tier)` +
+        : `db ${(bytes / 1_048_576).toFixed(0)}MB (${((bytes / DATA_BUDGET_BYTES) * 100).toFixed(0)}% of data budget; history is billed on top)` +
           // Named only when it is not 'ok', so the common case stays quiet and
           // a shortened window never happens silently: if the site is serving
           // ten days of matchups instead of twenty-four, the run that decided

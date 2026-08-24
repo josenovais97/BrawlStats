@@ -487,3 +487,34 @@ model BrawlerTeamDaily {
   @@id([day, brawlerId])
   @@map("brawler_team_daily")
 }
+
+/// What each roll-up day was last built from, so unchanged days are not
+/// rebuilt.
+///
+/// The fold is idempotent, which made rebuilding the trailing days every run
+/// look free. It is not: rewriting ~123k identical rows twice a day is ~123k
+/// rows of write-ahead log twice a day, and on Neon the retained WAL is
+/// *billed storage* — the console's "Storage" figure is data plus history, so
+/// churn that never changes an answer still fills the plan. Measured on
+/// 2026-08-24, history was 0.18 GB of a 0.49 GB total.
+///
+/// `rawWatermark` is the newest `created_at` among the raw rows folded into
+/// this day. The sampler only ever appends, so if it has not moved, no battle
+/// has been added to that day since it was last folded and the fold would
+/// reproduce the rows already there.
+///
+/// Safe only because a day inside the rebuild window is never partially
+/// pruned: the prune cuts at a 72-hour timestamp, and the oldest rebuildable
+/// day starts at midnight two days back, which is always later. If those two
+/// windows ever cross, a pruned day would look "changed" and be re-folded from
+/// what survived — undercounting it permanently. See RAW_BATTLE_RETENTION_DAYS.
+model RollupWatermark {
+  day          DateTime @db.Date
+  /// "battles" | "teams" — the two raw tables, folded on separate day lists.
+  source       String
+  rawWatermark DateTime @map("raw_watermark")
+  foldedAt     DateTime @updatedAt @map("folded_at")
+
+  @@id([day, source])
+  @@map("rollup_watermarks")
+}
