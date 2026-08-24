@@ -1,4 +1,5 @@
 import 'server-only';
+import { USER_AGENT } from '@/lib/site';
 
 /**
  * Official Brawl Stars news, read from Supercell's own blog.
@@ -47,7 +48,7 @@ export async function getOfficialNews(limit = 6): Promise<NewsPost[]> {
     const res = await fetch(BLOG_URL, {
       headers: {
         // Identify ourselves rather than pretending to be a browser.
-        'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
+        'User-Agent': USER_AGENT,
         Accept: 'text/html',
       },
       signal: AbortSignal.timeout(10_000),

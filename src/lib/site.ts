@@ -7,10 +7,24 @@
  * it is set.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://brawlzone.vercel.app'
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://brawlzone.net'
 ).replace(/\/$/, '');
 
 export const SITE_NAME = 'BrawlZone';
+
+/**
+ * How this site identifies itself to the APIs it reads.
+ *
+ * Built from the origin above rather than written out, because it had been
+ * written out — three times, in three files, all still naming the old
+ * vercel.app host after the move. A contact URL exists so an operator whose
+ * API we are calling can reach us; one that 404s is worse than none, and
+ * nothing about a hardcoded copy would ever have told us it had gone stale.
+ *
+ * The wiki and news endpoints this is sent to ask for a real identifier and a
+ * way to get in touch, which is what this is.
+ */
+export const USER_AGENT = `${SITE_NAME}/1.0 (+${SITE_URL})`;
 
 /**
  * A real account to show the product on, for visitors who have not got their

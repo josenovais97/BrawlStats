@@ -9,6 +9,8 @@
  * Wiki text is CC-BY-SA and is attributed wherever it is rendered.
  */
 
+import { USER_AGENT } from '@/lib/site';
+
 export const WIKI_API = 'https://brawlstars.fandom.com/api.php';
 
 /**
@@ -29,7 +31,7 @@ export async function fetchWikiJson<T>(
   const init = {
     headers: {
       // Identify ourselves rather than pretending to be a browser.
-      'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
+      'User-Agent': USER_AGENT,
       Accept: 'application/json',
     },
     signal: AbortSignal.timeout(10_000),

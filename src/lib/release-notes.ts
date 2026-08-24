@@ -1,4 +1,5 @@
 import 'server-only';
+import { USER_AGENT } from '@/lib/site';
 
 /**
  * Official release notes, resolved automatically.
@@ -171,7 +172,7 @@ async function fetchNotes(slug: string): Promise<ReleaseNotes | null> {
   try {
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'BrawlZone/1.0 (+https://brawlzone.vercel.app)',
+        'User-Agent': USER_AGENT,
         Accept: 'text/html',
       },
       signal: AbortSignal.timeout(12_000),
