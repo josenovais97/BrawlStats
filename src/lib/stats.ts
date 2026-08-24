@@ -321,7 +321,7 @@ function toStatRow(row: BrawlerStatModel): BrawlerStatRow {
  * empty array both when there is no database and when nothing has been
  * aggregated yet — callers distinguish via `hasDatabase()` if they care.
  */
-export async function getLatestBrawlerStats(): Promise<BrawlerStatRow[]> {
+async function compute_getLatestBrawlerStats(): Promise<BrawlerStatRow[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -345,7 +345,7 @@ export async function getLatestBrawlerStats(): Promise<BrawlerStatRow[]> {
 }
 
 /** Latest aggregated row for a single brawler, or null if there is none. */
-export async function getBrawlerStat(brawlerId: number): Promise<BrawlerStatRow | null> {
+async function compute_getBrawlerStat(brawlerId: number): Promise<BrawlerStatRow | null> {
   const prisma = getPrisma();
   if (!prisma) return null;
 
@@ -384,7 +384,7 @@ const MAX_BASELINE_SHIFT = 0.08;
  * collapsed is falling down the tier list without ever showing up here. Both
  * inputs are still returned so a move can be explained rather than asserted.
  */
-export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
+async function compute_getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -492,7 +492,7 @@ export async function getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
 }
 
 /** Most recent detected catalogue changes, newest first. */
-export async function getCatalogChanges(limit = 40): Promise<CatalogChangeEntry[]> {
+async function compute_getCatalogChanges(limit = 40): Promise<CatalogChangeEntry[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -636,7 +636,7 @@ export async function getTrophyPercentile(trophies: number): Promise<TrophyStand
  * distinct (brawler, kind) pairs anyone in a large maxed-out sample owns is a
  * far closer denominator, and it self-corrects as more ship.
  */
-export async function getReleasedBuffieCount(): Promise<number | null> {
+async function compute_getReleasedBuffieCount(): Promise<number | null> {
   const prisma = getPrisma();
   if (!prisma) return null;
 
@@ -668,7 +668,7 @@ export interface CoverageStats {
  * Real numbers rather than invented ones — if the database is empty the
  * homepage falls back to the brawler count alone rather than showing zeroes.
  */
-export async function getCoverageStats(): Promise<CoverageStats | null> {
+async function compute_getCoverageStats(): Promise<CoverageStats | null> {
   const prisma = getPrisma();
   if (!prisma) return null;
 
@@ -698,7 +698,7 @@ export async function getCoverageStats(): Promise<CoverageStats | null> {
 }
 
 /** Most recent cron run, used to show data freshness on the tier list. */
-export async function getLastAggregationRun(): Promise<AggregationRunSummary | null> {
+async function compute_getLastAggregationRun(): Promise<AggregationRunSummary | null> {
   const prisma = getPrisma();
   if (!prisma) return null;
 
@@ -857,7 +857,7 @@ const GAIN_MAX_SPAN_DAYS = 7;
  * Because those spans differ per player, ranking is by trophies per day. A
  * five-day gap would otherwise always outrank a one-day gap.
  */
-export async function getTrophyGains(limit = 10): Promise<TrophyGain[]> {
+async function compute_getTrophyGains(limit = 10): Promise<TrophyGain[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -1341,7 +1341,7 @@ export interface RankedStanding {
  * the board thins out just after a season reset, when most of the pool sits at
  * the 750 floor — which is the same thing the in-game ladder does.
  */
-export async function getRankedLeaderboard(
+async function compute_getRankedLeaderboard(
   limit = 100,
 ): Promise<{ players: RankedStanding[]; pool: number }> {
   const prisma = getPrisma();
@@ -1427,7 +1427,7 @@ const COSMETIC_WINDOW_DAYS = 7;
  * Counted from each player's most recent snapshot per brawler, so a player who
  * has been sampled thirty times still contributes one vote per brawler.
  */
-export async function getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
+async function compute_getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -1486,7 +1486,7 @@ export async function getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
  * and `sampled_players` already holds one row per player, so the latest reading
  * is just the column. No default to exclude — every account has one.
  */
-export async function getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
+async function compute_getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -1620,7 +1620,7 @@ const CHOOSER_SHARE_LIVE = 0.15;
 /** Below this many battles a win rate is noise, so it is withheld. */
 const MIN_BATTLES_FOR_ABILITY_WIN_RATE = 40;
 
-export async function getBrawlerAbilityChoices(
+async function compute_getBrawlerAbilityChoices(
   brawlerId: number,
   windowDays = 21,
 ): Promise<BrawlerAbilityChoices | null> {
@@ -1769,7 +1769,7 @@ const BUFFIE_RELEASED_SHARE = 0.02;
 /** Below this many owners the sample cannot say either way. */
 const MIN_OWNERS_FOR_BUFFIES = 50;
 
-export async function getBrawlerBuffies(
+async function compute_getBrawlerBuffies(
   brawlerId: number,
   windowDays = 7,
 ): Promise<BrawlerBuffies | null> {
@@ -1856,7 +1856,7 @@ export interface BrawlerSplit {
  * grab. Without that, every showdown map sorts to the bottom of every brawler's
  * page and the list says nothing.
  */
-export async function getBrawlerSplits(
+async function compute_getBrawlerSplits(
   brawlerId: number,
   windowDays = 14,
 ): Promise<{ modes: BrawlerSplit[]; maps: BrawlerSplit[] }> {
@@ -2002,7 +2002,7 @@ export interface BrawlerTrendPoint {
  * those snapshots are what the tier list showed on each day, so a chart of
  * them is a chart of what the site said, not a retroactive re-scoring.
  */
-export async function getBrawlerTrend(
+async function compute_getBrawlerTrend(
   brawlerId: number,
   days = 30,
 ): Promise<BrawlerTrendPoint[]> {
@@ -2078,7 +2078,7 @@ export interface BrawlerPairings {
  * not "strong against" the opponent it wins 55% against, and the absolute
  * number would say it was.
  */
-export async function getBrawlerPairings(
+async function compute_getBrawlerPairings(
   brawlerId: number,
   windowDays = 21,
   limit = 5,
@@ -2616,6 +2616,33 @@ async function computeRankedMapPicks(
 
 /* ------------------------------ cached reads ------------------------------ */
 
+/**
+ * Wraps a read so many renders share one query.
+ *
+ * Generic because there are two dozen of these and hand-writing a wrapper each
+ * time is how half of them end up uncached. The cache key is the supplied
+ * name plus the call arguments, so one entry exists per distinct set of
+ * arguments — 106 for a per-brawler read, one for a global one.
+ *
+ * Deliberately NOT applied to anything keyed by player tag
+ * (`getTrophyHistory`, `getTrophyPercentile`, `getPlayerBrawlerPlacements`).
+ * Those answer "how am *I* doing", the person asking has usually just played,
+ * and serving them an hour-old answer to save bytes is the wrong trade — their
+ * pages are `noindex` and barely crawled, so they are not what costs anything.
+ */
+function cachedRead<A extends unknown[], R>(
+  key: string,
+  fn: (...args: A) => Promise<R>,
+): (...args: A) => Promise<R> {
+  const wrapped = unstable_cache(
+    fn as (...args: unknown[]) => Promise<R>,
+    [key],
+    { revalidate: READ_CACHE_SECONDS },
+  );
+  return (...args: A) => wrapped(...(args as unknown[]));
+}
+
+
 /*
  * The four reads that dominate database egress, wrapped so that many renders
  * share one query. See READ_CACHE_SECONDS for the measurement behind this.
@@ -2696,3 +2723,21 @@ export async function getRankedMapPicks(
 ): Promise<RankedMapPicks[]> {
   return cachedRankedMapPicks(perMap, windowDays, only);
 }
+
+/* The reads above, cached. See `cachedRead`. */
+export const getBrawlerSplits = cachedRead('brawler-splits', compute_getBrawlerSplits);
+export const getBrawlerPairings = cachedRead('brawler-pairings', compute_getBrawlerPairings);
+export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
+export const getBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
+export const getBrawlerAbilityChoices = cachedRead('brawler-ability-choices', compute_getBrawlerAbilityChoices);
+export const getLatestBrawlerStats = cachedRead('latest-brawler-stats', compute_getLatestBrawlerStats);
+export const getBrawlerStat = cachedRead('brawler-stat', compute_getBrawlerStat);
+export const getMetaMovers = cachedRead('meta-movers', compute_getMetaMovers);
+export const getCoverageStats = cachedRead('coverage-stats', compute_getCoverageStats);
+export const getTrophyGains = cachedRead('trophy-gains', compute_getTrophyGains);
+export const getSkinUsage = cachedRead('skin-usage', compute_getSkinUsage);
+export const getIconUsage = cachedRead('icon-usage', compute_getIconUsage);
+export const getReleasedBuffieCount = cachedRead('released-buffie-count', compute_getReleasedBuffieCount);
+export const getRankedLeaderboard = cachedRead('ranked-leaderboard', compute_getRankedLeaderboard);
+export const getCatalogChanges = cachedRead('catalog-changes', compute_getCatalogChanges);
+export const getLastAggregationRun = cachedRead('last-aggregation-run', compute_getLastAggregationRun);
