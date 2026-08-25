@@ -1611,12 +1611,23 @@ export async function recomputeBuildStats(): Promise<number> {
 /**
  * Wall-clock budget for a whole run.
  *
- * Vercel's Hobby ceiling is 300s (both the default and the maximum), and the
- * route declares `maxDuration = 300` to match. This sits 30s under it so the
- * response still gets written if the last step runs long: overshooting means a
- * 504 and, because Vercel never retries a cron, a whole slot of coverage lost.
+ * Was 270s, and that number was never about the work — it was Vercel's Hobby
+ * function ceiling of 300s, minus 30s so the response still got written. The
+ * sampler does not run on Vercel any more (.github/workflows/refresh-stats.yml
+ * runs it in the runner), so the ceiling that chose this value is gone.
+ *
+ * Ten minutes, sitting under the job's own `timeout-minutes: 15`. The first CI
+ * run made the case: 438 of 1,000 player samples timed out against 8 on the
+ * same code from a local machine twelve minutes earlier, and the run hit the
+ * budget having sampled 560 players instead of 992. GitHub's runners are a
+ * slower path to the API than Vercel's fra1 was, and the old budget left no
+ * room to absorb that.
+ *
+ * Affordable because the repository is public, where Actions minutes are
+ * unmetered. On a private repo this would be ~2,400 minutes a month against a
+ * 2,000 allowance, and the frequency would have to come down to pay for it.
  */
-const RUN_BUDGET_MS = 270_000;
+const RUN_BUDGET_MS = 600_000;
 
 /** Always give rankings at least this long, even on a slow run. */
 const RANKING_MIN_BUDGET_MS = 15_000;

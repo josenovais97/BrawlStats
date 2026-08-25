@@ -31,7 +31,21 @@ const API_BASE = process.env.BRAWL_STARS_API_BASE ?? 'https://bsproxy.royaleapi.
 export const REVALIDATE_LIVE = 60;
 export const REVALIDATE_SLOW = 120;
 
-const REQUEST_TIMEOUT_MS = 10_000;
+/**
+ * Twenty seconds, not ten.
+ *
+ * Ten was comfortable while sampling ran on Vercel in fra1. From a GitHub
+ * runner it is not: the first CI run timed out on 438 of 1,000 player samples
+ * where a local machine managed 8. These are genuine aborts rather than
+ * connection failures — the catch below separates the two — so the requests
+ * were arriving, just past the deadline.
+ *
+ * Raising it is strictly better than leaving it here. A request that needs
+ * twelve seconds fails three times over at ten (MAX_RETRIES with backoff, so
+ * ~31s of wasted budget) and still returns nothing; at twenty it succeeds once
+ * and costs twelve.
+ */
+const REQUEST_TIMEOUT_MS = 20_000;
 
 interface FetchOptions {
   /** Seconds of ISR caching. */
