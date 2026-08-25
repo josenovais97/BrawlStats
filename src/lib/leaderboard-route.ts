@@ -92,27 +92,62 @@ export function resolveLeaderboardRoute(
 /**
  * Title, description and indexing directive for one leaderboard URL.
  *
- * Only the bare page is indexable. That is not new — every variant already
- * carried `canonical: '/leaderboard'` for the reason the old comment gave,
- * that region and board are "well over a hundred URLs" of the same page — this
- * just says it with a directive as well as a hint, now that each of those
- * variants is a real path a crawler could otherwise spend budget on.
+ * The four boards are indexable; the region variants are not.
+ *
+ * That split is the whole point. "brawl stars club leaderboard" and "brawl
+ * stars ranked leaderboard" are distinct searches with distinct answers, and
+ * the boards are not the same page with a filter applied — two of them are the
+ * game's own rankings and two are built from our own sample. The Ranked board
+ * in particular is not published anywhere else: the game API has no Ranked
+ * leaderboard endpoint, so that page exists only because this project records
+ * elo per sample.
+ *
+ * The regions are the opposite case. There are well over a hundred, every one
+ * of them the same board over a smaller population, and nobody searches for
+ * them by name. They stay `noindex, follow` and point their canonical at the
+ * board they narrow.
  */
-export function leaderboardMetadata({ board, region }: LeaderboardRoute): Metadata {
-  const isDefault = board === DEFAULT_BOARD && region === DEFAULT_REGION;
+const BOARD_COPY: Record<LeaderboardBoard, { title: string; description: string }> = {
+  players: {
+    title: 'Brawl Stars leaderboard',
+    description:
+      'The top Brawl Stars players by trophies, from the game API\'s own global ranking, with per-region boards.',
+  },
+  clubs: {
+    title: 'Brawl Stars club leaderboard',
+    description:
+      'The top Brawl Stars clubs by combined member trophies, from the game API\'s own global ranking, with per-region boards.',
+  },
+  ranked: {
+    title: 'Brawl Stars Ranked leaderboard',
+    description:
+      'The highest Ranked elo among the players BrawlZone samples. The game API publishes no Ranked leaderboard, so this board is built from our own daily samples rather than mirrored from Supercell.',
+  },
+  cosmetics: {
+    title: 'Brawl Stars skin and icon popularity',
+    description:
+      'Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone\'s own daily samples of the player pool.',
+  },
+};
 
-  const title = isDefault
-    ? 'Brawl Stars leaderboard'
-    : board === 'ranked'
-      ? 'Brawl Stars Ranked leaderboard'
-      : board === 'cosmetics'
-        ? 'Brawl Stars cosmetics leaderboard'
-        : `Top Brawl Stars ${board} in ${regionName(region)}`;
+export function leaderboardMetadata({ board, region }: LeaderboardRoute): Metadata {
+  const copy = BOARD_COPY[board];
+  const atDefaultRegion = region === DEFAULT_REGION;
+
+  if (atDefaultRegion) {
+    return {
+      title: copy.title,
+      description: copy.description,
+      alternates: { canonical: leaderboardHref(board) },
+    };
+  }
 
   return {
-    title,
-    description: 'Top Brawl Stars players and clubs by trophies, filterable by region.',
-    alternates: { canonical: '/leaderboard' },
-    ...(isDefault ? {} : { robots: { index: false, follow: true } }),
+    title: `${copy.title} — ${regionName(region)}`,
+    description: copy.description,
+    // The board it narrows, not itself: one of these per supported region is
+    // over a hundred URLs of the same page.
+    alternates: { canonical: leaderboardHref(board) },
+    robots: { index: false, follow: true },
   };
 }

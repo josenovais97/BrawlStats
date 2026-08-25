@@ -38,6 +38,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/compare', 'weekly', 0.7],
     ['/events', 'hourly', 0.7],
     ['/leaderboard', 'daily', 0.7],
+    /*
+     * The other three boards, listed because they are separate answers rather
+     * than the same page filtered: two mirror the game's own rankings, two are
+     * built from our own sample. The Ranked board exists nowhere else — the
+     * game API has no Ranked leaderboard endpoint at all.
+     *
+     * The per-region variants are deliberately absent and carry `noindex`:
+     * over a hundred URLs of one board over a smaller population.
+     */
+    ['/leaderboard/clubs', 'daily', 0.65],
+    ['/leaderboard/ranked', 'daily', 0.65],
+    ['/leaderboard/cosmetics', 'weekly', 0.6],
     ['/news', 'daily', 0.6],
     ['/release-notes', 'weekly', 0.5],
     ['/about', 'monthly', 0.3],

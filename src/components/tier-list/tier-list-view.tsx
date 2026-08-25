@@ -12,6 +12,7 @@ import {
 import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
 import { MostPicked } from '@/components/tier-list/most-picked';
+import { Underrated } from '@/components/tier-list/underrated';
 import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
@@ -54,6 +55,15 @@ const MOVER_LIMIT = 8;
  * rates flatten into a long indistinguishable tail anyway.
  */
 const MOST_PICKED_LIMIT = 10;
+
+/**
+ * How many under-picked winners to name.
+ *
+ * Six rather than ten: the point is a short list of picks worth trying, and a
+ * longer one runs down into brawlers whose win rate is barely above the
+ * cohort mean, where the claim stops being interesting.
+ */
+const UNDERRATED_LIMIT = 6;
 
 /**
  * Everything that differs between the two lists, in one place.
@@ -376,6 +386,19 @@ export async function TierListView({
         <MostPicked
           entries={entries}
           limit={MOST_PICKED_LIMIT}
+          mode={mode}
+          windowLabel={TIER_WINDOWS[windowKey].sublabel}
+          battlesLabel={copy.battles}
+        />
+      ) : null}
+
+      {/* After Most picked, because it is the answer to the question that one
+          raises: popularity and strength diverge, and this is where they
+          diverge most. Rated entries only — the claim is about a win rate. */}
+      {rated.length > 0 ? (
+        <Underrated
+          entries={rated}
+          limit={UNDERRATED_LIMIT}
           mode={mode}
           windowLabel={TIER_WINDOWS[windowKey].sublabel}
           battlesLabel={copy.battles}
