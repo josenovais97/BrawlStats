@@ -2245,13 +2245,42 @@ export interface CounterScore {
  * Reported as an edge against the brawler's own overall rate, so a brawler that
  * simply wins a lot does not appear to counter everything.
  */
-export async function getCounterScores(
+export function getCounterScores(
   enemyIds: number[],
   windowDays = 21,
 ): Promise<Map<number, CounterScore>> {
+  return pairingScores(enemyIds, 'enemy', windowDays);
+}
+
+/**
+ * The same measurement from the other side: how a brawler does *alongside* a
+ * given line-up rather than against it.
+ *
+ * A Ranked draft alternates picks, so by the time you choose you usually know
+ * some of your own team as well as some of theirs — and the two questions have
+ * different answers. A brawler can counter the enemy's comp and still be a poor
+ * fit beside your own. The roll-up already stores both sides (`side = 'ally'`
+ * comes from `allyBrawlerIds`), so this costs nothing new to collect.
+ *
+ * Same edge semantics: the rate alongside those brawlers minus the brawler's
+ * own overall rate, so a brawler that simply wins a lot does not appear to
+ * synergise with everything.
+ */
+export function getAllyScores(
+  allyIds: number[],
+  windowDays = 21,
+): Promise<Map<number, CounterScore>> {
+  return pairingScores(allyIds, 'ally', windowDays);
+}
+
+async function pairingScores(
+  otherIds: number[],
+  side: 'enemy' | 'ally',
+  windowDays: number,
+): Promise<Map<number, CounterScore>> {
   const out = new Map<number, CounterScore>();
   const prisma = getPrisma();
-  if (!prisma || enemyIds.length === 0) return out;
+  if (!prisma || otherIds.length === 0) return out;
 
   try {
     const since = windowStartUtc(windowDays);
@@ -2274,8 +2303,8 @@ export async function getCounterScores(
           SUM(battles) AS decided
         FROM brawler_pair_daily
         WHERE day >= ${since}
-          AND side = 'enemy'
-          AND other_brawler_id = ANY(${enemyIds}::int[])
+          AND side = ${side}
+          AND other_brawler_id = ANY(${otherIds}::int[])
         GROUP BY brawler_id
         HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
       `,

@@ -11,7 +11,9 @@ import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured
 import { SectionHeading } from '@/components/ui/section-heading';
 import { currentMonth } from '@/lib/site';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, minutesSince } from '@/lib/format';
+import { formatNumber, formatPercent, minutesSince,
+  titleCase,
+} from '@/lib/format';
 import { getActiveMaps, resolveMap } from '@/lib/game-maps';
 import { getMapWiki } from '@/lib/map-wiki';
 import { wikiPageUrl } from '@/lib/wiki';
@@ -374,9 +376,3 @@ function listOf(items: string[]): string {
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
 
-/** "HARD LANDING" -> "Hard Landing", for prose that quotes an API name. */
-function titleCase(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
-}

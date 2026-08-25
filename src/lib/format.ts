@@ -127,6 +127,23 @@ export function humanizeMode(mode: string | null | undefined): string {
  */
 const ROMAN_NUMERAL = /^(?=[IVXLCDM]+$)M*(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
 
+/**
+ * "HARD ROCK MINE" -> "Hard Rock Mine", for prose that quotes an API name.
+ *
+ * The game returns names in caps, and three copies of this had grown up in
+ * separate files, each tuned to the content in front of it and each wrong on
+ * the other's. The map page's version broke brawler names ("8-BIT" -> "8-bit",
+ * "R-T" -> "R-t"); the brawler page's broke map names ("BELLE'S ROCK" ->
+ * "Belle'S Rock").
+ *
+ * A hyphen starts a new word and an apostrophe does not, which is what both
+ * cases actually need. For rank labels, where roman numerals must survive
+ * ("GOLD III"), use `titleCaseLabel` below instead.
+ */
+export function titleCase(value: string): string {
+  return value.toLowerCase().replace(/(^|[\s-])\S/g, (c) => c.toUpperCase());
+}
+
 export function titleCaseLabel(value: string | null | undefined): string {
   if (!value) return '';
 

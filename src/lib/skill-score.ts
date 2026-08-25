@@ -19,6 +19,7 @@
  */
 
 import type { BSPlayer } from '@/types/brawlstars';
+import { titleCaseLabel } from '@/lib/format';
 
 const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
 
@@ -319,7 +320,7 @@ export function computeSkillScore(
         ? 'No Ranked elo on record'
         : `${
             player.highestAllTimeRankedRankName
-              ? `peak ${titleCase(player.highestAllTimeRankedRankName)}`
+              ? `peak ${titleCaseLabel(player.highestAllTimeRankedRankName)}`
               : 'Ranked'
           } · ${Math.max(peakElo, currentElo).toLocaleString('en-US')} elo`,
     },
@@ -446,14 +447,3 @@ function detectFlag({
 }
 
 /** "MASTERS II" -> "Masters II". Roman numerals stay upper-case. */
-function titleCase(value: string): string {
-  return value
-    .toLowerCase()
-    .split(' ')
-    .map((word) =>
-      /^[ivx]+$/.test(word)
-        ? word.toUpperCase()
-        : word.charAt(0).toUpperCase() + word.slice(1),
-    )
-    .join(' ');
-}

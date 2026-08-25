@@ -14,10 +14,20 @@ import { formatNumber, humanizeMode } from '@/lib/format';
 import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
+
+/**
+ * How many team-mates a draft can name.
+ *
+ * Two, not three: a 3v3 team is you and two others, and the third slot is the
+ * pick this page exists to make. `MAX_ENEMIES` is three because all three of
+ * theirs are somebody else's.
+ */
+const MAX_ALLIES = 2;
 import { slugify } from '@/lib/slugs';
 import {
   RANKED_MAP_WINDOW_DAYS,
   getBestPicksByMode,
+  getAllyScores,
   getCounterScores,
   getRankedMapPicks,
 } from '@/lib/stats';
@@ -56,6 +66,8 @@ interface PageProps {
 export default async function DraftPage({ params }: PageProps) {
   const { state } = await params;
   const route = resolveDraftRoute(state);
+  // A path shape the tool does not have. See `resolveDraftRoute`.
+  if (!route) notFound();
 
   /*
    * The map list is the Ranked pool, not the whole catalogue.
@@ -96,6 +108,7 @@ export default async function DraftPage({ params }: PageProps) {
   if (route.mapSlug && !selected) notFound();
 
   const enemies = route.enemies;
+  const allies = route.allies;
 
   // Sequential database reads keep the page to a single connection.
   const modePicks = selected
@@ -103,7 +116,9 @@ export default async function DraftPage({ params }: PageProps) {
         .then((byMode) => byMode.get(selected.mode) ?? null)
         .catch(() => null)
     : null;
+  // Sequential, like every other read here, so the page holds one connection.
   const counters = await getCounterScores(enemies);
+  const synergies = await getAllyScores(allies);
 
   // The map's own ranking is the starting order; the enemy line-up reorders it.
   // Both halves stay visible on the row, because "good here" and "good against
@@ -115,23 +130,30 @@ export default async function DraftPage({ params }: PageProps) {
   const ranked = basePicks
     .map((pick) => {
       const counter = counters.get(pick.brawlerId);
+      const synergy = synergies.get(pick.brawlerId);
       return {
         pick,
         counter,
-        // Half a point of counter edge is worth about as much as half a point
-        // of map score, so they are simply added. Nothing subtler is defensible
-        // on samples this size.
-        total: pick.score + (counter?.edge ?? 0),
+        synergy,
+        /*
+         * Half a point of counter edge is worth about as much as half a point
+         * of map score, so they are simply added. Nothing subtler is defensible
+         * on samples this size, and the same holds for the ally edge — both are
+         * measured the same way, against the brawler's own overall rate, so
+         * they are already on one scale.
+         */
+        total: pick.score + (counter?.edge ?? 0) + (synergy?.edge ?? 0),
       };
     })
     .sort((a, b) => b.total - a.total)
     .slice(0, CANDIDATES);
 
-  const hrefFor = (next: { enemy?: number[] }) =>
+  const hrefFor = (next: { enemy?: number[]; ally?: number[] }) =>
     draftHref({
       mode: selected?.mode,
       map: selected?.mapName,
       enemies: next.enemy ?? enemies,
+      allies: next.ally ?? allies,
     });
 
   return (
@@ -221,10 +243,11 @@ export default async function DraftPage({ params }: PageProps) {
               </div>
 
               {enemies.length < MAX_ENEMIES ? (
-                <EnemyChooser
+                <BrawlerChooser
                   options={catalog.current}
-                  enemies={enemies}
-                  hrefFor={hrefFor}
+                  taken={[...enemies, ...allies]}
+                  label="Add an enemy brawler"
+                  onPick={(id) => hrefFor({ enemy: [...enemies, id] })}
                 />
               ) : null}
             </div>
@@ -233,11 +256,82 @@ export default async function DraftPage({ params }: PageProps) {
           <section>
             <StepHeading
               step={3}
+              title="Your team"
+              hint={`Up to ${MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.`}
+            />
+
+            <div className="card p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {Array.from({ length: MAX_ALLIES }).map((_, slot) => {
+                  const id = allies[slot];
+                  const meta = id ? brawlerMeta.get(id) : undefined;
+
+                  return id ? (
+                    <Link
+                      key={slot}
+                      href={hrefFor({ ally: allies.filter((other) => other !== id) })}
+                      prefetch={false}
+                      title={`Remove ${meta?.name ?? id}`}
+                      className="group flex items-center gap-2 rounded-xl border border-victory/40 bg-victory/10 px-2.5 py-2 text-sm font-semibold capitalize"
+                    >
+                      <Image
+                        src={meta?.imageUrl ?? brawlerIconUrl(id)}
+                        alt=""
+                        width={32}
+                        height={32}
+                        className="size-8 rounded-lg"
+                        unoptimized
+                      />
+                      {(meta?.name ?? `#${id}`).toLowerCase()}
+                      <X className="size-4 text-muted transition-colors group-hover:text-victory" />
+                    </Link>
+                  ) : (
+                    <span
+                      key={slot}
+                      className="flex items-center gap-2 rounded-xl border border-dashed border-border px-2.5 py-2 text-sm text-muted"
+                    >
+                      <span className="grid size-8 place-items-center rounded-lg bg-surface-2">
+                        <Target className="size-4" />
+                      </span>
+                      Empty slot
+                    </span>
+                  );
+                })}
+
+                {allies.length > 0 ? (
+                  <Link
+                    href={hrefFor({ ally: [] })}
+                    prefetch={false}
+                    className="ml-auto text-sm font-medium text-muted hover:text-foreground"
+                  >
+                    Clear
+                  </Link>
+                ) : null}
+              </div>
+
+              {allies.length < MAX_ALLIES ? (
+                <BrawlerChooser
+                  options={catalog.current}
+                  taken={[...enemies, ...allies]}
+                  label="Add a team-mate"
+                  onPick={(id) => hrefFor({ ally: [...allies, id] })}
+                />
+              ) : null}
+            </div>
+          </section>
+
+          <section>
+            <StepHeading
+              step={4}
               title="Your pick"
               hint={
-                enemies.length > 0
-                  ? 'Map score plus how each candidate does against the brawlers you named.'
-                  : 'Ranked by record on this map. Add enemy picks above to reweigh it.'
+                enemies.length > 0 && allies.length > 0
+                  ? 'Map score, plus how each candidate does against their picks and beside yours.'
+                  : enemies.length > 0
+                    ? 'Map score plus how each candidate does against the brawlers you named.'
+                    : allies.length > 0
+                      ? 'Map score plus how each candidate does beside your team-mates.'
+                      : 'Ranked by record on this map. Name either team above to reweigh it.'
               }
             />
 
@@ -456,36 +550,40 @@ function MapChooser({
 }
 
 /**
- * Enemy picker: the roster as a labelled grid.
+ * Brawler picker: the roster as a labelled grid, for either side of the draft.
  *
  * Named tiles rather than a bare wall of portraits — a hundred unlabelled
  * icons is a memory test, and the whole point of this step is finding one
  * specific brawler quickly. Capped in height so it never buries the result
  * list underneath it.
  */
-function EnemyChooser({
+function BrawlerChooser({
   options: pool,
-  enemies,
-  hrefFor,
+  taken,
+  label,
+  onPick,
 }: {
   options: CatalogBrawler[];
-  enemies: number[];
-  hrefFor: (next: { enemy?: number[] }) => string;
+  /** Everyone already named, on either side — nobody is drafted twice. */
+  taken: number[];
+  label: string;
+  onPick: (brawlerId: number) => string;
 }) {
   const options = pool
-    .filter((brawler) => !enemies.includes(brawler.id))
+    .filter((brawler) => !taken.includes(brawler.id))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="mt-4 border-t border-border pt-4">
       <p className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">
-        Add an enemy brawler
+        {label}
       </p>
       <ul className="grid max-h-80 grid-cols-3 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-5 lg:grid-cols-8">
         {options.map((brawler) => (
           <li key={brawler.id}>
             <Link
-              href={hrefFor({ enemy: [...enemies, brawler.id] })}
+              href={onPick(brawler.id)}
+              prefetch={false}
               className="flex flex-col items-center gap-1 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
             >
               <Image
