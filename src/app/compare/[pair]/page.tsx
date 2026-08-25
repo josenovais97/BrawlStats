@@ -28,7 +28,17 @@ interface PageProps {
   params: Promise<{ pair: string }>;
 }
 
-export const revalidate = 3600;
+/**
+ * Twelve hours, for the reason spelled out on `/maps/[mode]/[map]`: the
+ * sampler runs twice a day, so anything shorter rebuilds identical HTML and
+ * spends ISR write units doing it.
+ *
+ * The count matters more here than the traffic does. 435 pairings are
+ * indexable and all 5,565 are reachable, so this route can hold more cache
+ * entries than any other on the site — and every one of them is a page whose
+ * numbers only change when the aggregate underneath it does.
+ */
+export const revalidate = 43200;
 
 /*
  * Runtime ISR. See `/brawlers/[slug]` for why the empty array is required.

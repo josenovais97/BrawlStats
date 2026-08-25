@@ -30,10 +30,29 @@ interface PageProps {
 }
 
 /**
- * Own aggregate plus static artwork. An hour keeps the picks fresh enough
- * without regenerating four hundred pages on every sampler run.
+ * Twelve hours, matching the sampler rather than beating it.
+ *
+ * This was an hour, which sounded conservative and was the opposite. The cron
+ * runs twice a day (`vercel.json`: 02:00 and 14:00 UTC), so an hourly window
+ * regenerated four hundred pages up to twenty-four times a day to produce
+ * byte-identical HTML on twenty-two of them.
+ *
+ * That is not free, and the meter it lands on is not the one this whole change
+ * was about. Every regeneration is an ISR write, billed in 8 KB units, so a
+ * 26 KB page costs about four per rebuild:
+ *
+ *   400 paths x 24/day x 30 days x 4 units  ~= 1.15M units
+ *   400 paths x  2/day x 30 days x 4 units  ~=   96K units   (the plan allows 200K)
+ *
+ * Those are ceilings — a page only regenerates when a request arrives after it
+ * has gone stale, so sparse pages rebuild at their traffic rate rather than at
+ * the window rate. The direction is the point: an hourly window on a route with
+ * this many paths trades a transfer overage for a write overage.
+ *
+ * The freshness given up is real but small. The picks move when the sampler
+ * moves, and the page's own title claims a month, not an hour.
  */
-export const revalidate = 3600;
+export const revalidate = 43200;
 
 /*
  * Runtime ISR. See `/brawlers/[slug]` for why the empty array is required.
