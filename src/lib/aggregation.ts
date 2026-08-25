@@ -299,6 +299,26 @@ export function shouldSnapshot(tag: string, day: Date, rate = SNAPSHOT_SAMPLE_RA
 const INACTIVE_AFTER_DAYS = 14;
 
 /**
+ * How long a player's daily trophy readings are kept.
+ *
+ * This table was the one thing here with no ceiling. Every other table is
+ * bounded by a retention window and plateaus; `player_trophy_points` was
+ * written by `recordLookup` on every profile view and pruned by nothing, so it
+ * only ever grew — measured on Neon at 178,080 rows over eleven days, about
+ * 2.65 MB a day, which reaches a 500 MB plan on its own inside seven months.
+ *
+ * Most of that was crawlers walking profile pages, which `robots.txt` now
+ * disallows, so the rate should fall sharply. That fixes the slope and not the
+ * shape: an unbounded table on a fixed plan is a deadline either way.
+ *
+ * 120 days because `getTrophyHistory` reads 90 and nothing reads further back
+ * — everything past that was stored and never looked at. The extra month is
+ * margin, so a chart at the edge of its window is never trimmed by a rounding
+ * difference between the reader and the prune.
+ */
+const TROPHY_POINT_RETENTION_DAYS = 120;
+
+/**
  * How long a looked-up tag stays safe from eviction.
  *
  * Lookups used to be protected *forever*, and that made the pool unbounded —
@@ -959,6 +979,16 @@ export async function pruneOldSamples(): Promise<number> {
       where: { snapshotDate: { lt: snapshotCutoff } },
     });
 
+    // The only table here that grows without a window of its own. Kept well
+    // past what any chart reads — see TROPHY_POINT_RETENTION_DAYS.
+    const trophyPoints = await prisma.playerTrophyPoint.deleteMany({
+      where: {
+        recordedOn: {
+          lt: new Date(Date.now() - TROPHY_POINT_RETENTION_DAYS * 24 * 60 * 60 * 1000),
+        },
+      },
+    });
+
     // The roll-ups themselves age out on the window the site reads. Nothing
     // guards these: they are derived, and a lost day costs a thinner average
     // rather than an unrecoverable observation.
@@ -973,6 +1003,7 @@ export async function pruneOldSamples(): Promise<number> {
       battles +
       teams +
       snapshots.count +
+      trophyPoints.count +
       dailyStats.count +
       playerDaily.count +
       pairDaily.count +
