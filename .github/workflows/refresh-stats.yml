@@ -70,6 +70,11 @@ jobs:
 
       - name: Run sampling
         env:
+          # The direct (non-pooled) Neon endpoint. This job holds one
+          # connection for minutes and pushes the roll-up's large statements
+          # through it, which is not what PgBouncer is for — see the note in
+          # scripts/refresh-stats.ts. DATABASE_URL is accepted as a fallback.
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           BRAWL_STARS_API_KEY: ${{ secrets.BRAWL_STARS_API_KEY }}
         # The script checks its own result and exits non-zero on the failures

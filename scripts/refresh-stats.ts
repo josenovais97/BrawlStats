@@ -35,25 +35,41 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 
 /*
- * Imported after the environment is loaded, not at the top of the file.
+ * Prefer the direct endpoint over the pooled one.
  *
- * `lib/prisma` reads DATABASE_URL when its client is first constructed, and
- * `lib/bs-api` reads BRAWL_STARS_API_KEY per call — a static import would hoist
- * above the `config()` calls above and, for anything that captures at module
- * scope, capture nothing.
+ * `lib/prisma` reads DATABASE_URL and nothing else, so the choice has to be
+ * made here, before its client is constructed. Neon's pooled URL fronts
+ * PgBouncer, which exists for serverless callers opening a connection per
+ * request — the opposite of this job, which holds one connection for minutes
+ * and runs the roll-up's large `INSERT INTO ... SELECT` statements through it.
+ * `scripts/db-storage.ts` makes the same choice for the same reason.
+ *
+ * Falls back to DATABASE_URL, so setting only that still works.
  */
-const { runAggregation } = await import('@/lib/aggregation');
+const connectionString =
+  process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+if (connectionString) process.env.DATABASE_URL = connectionString;
 
-function requireEnv(name: string): void {
+function requireEnv(name: string, hint: string): void {
   if (process.env[name]) return;
-  console.error(
-    `::error::${name} is not set. In CI, add it under Settings -> Secrets and variables -> Actions.`,
-  );
+  console.error(`::error::${name} is not set. ${hint}`);
   process.exit(1);
 }
 
-requireEnv('DATABASE_URL');
-requireEnv('BRAWL_STARS_API_KEY');
+const SECRETS_HINT =
+  'In CI, add it under Settings -> Secrets and variables -> Actions -> New repository secret.';
+
+requireEnv('DATABASE_URL', `Set DATABASE_URL_UNPOOLED (preferred) or DATABASE_URL. ${SECRETS_HINT}`);
+requireEnv('BRAWL_STARS_API_KEY', SECRETS_HINT);
+
+/*
+ * Imported after the environment is settled, not at the top of the file.
+ *
+ * `lib/prisma` captures the connection string when its client is first
+ * constructed, so a static import would hoist above the `config()` calls and
+ * the override just above, and capture whatever was there before.
+ */
+const { runAggregation } = await import('@/lib/aggregation');
 
 const started = Date.now();
 const result = await runAggregation();
