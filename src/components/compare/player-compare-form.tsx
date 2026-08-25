@@ -59,9 +59,11 @@ export function PlayerCompareForm({
   const one = clean(a);
   const two = clean(b);
 
+  // A path, not a query string: the pairing is its own route so that the tool
+  // page it navigates from can stay static. See `/compare/players/[a]/[b]`.
   const go = (first: string, second: string) => {
     router.push(
-      `/compare?player1=${encodeURIComponent(first)}&player2=${encodeURIComponent(second)}`,
+      `/compare/players/${encodeURIComponent(first)}/${encodeURIComponent(second)}`,
     );
   };
 

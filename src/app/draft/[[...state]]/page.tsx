@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ArrowRight, Target, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 import { DraftPicks } from '@/components/draft/draft-picks';
 import { MapArt } from '@/components/maps/map-art';
@@ -12,6 +13,7 @@ import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, humanizeMode } from '@/lib/format';
 import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
+import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
 import { slugify } from '@/lib/slugs';
 import {
   RANKED_MAP_WINDOW_DAYS,
@@ -34,18 +36,26 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-/** How many enemy picks a Ranked draft can have. */
-const MAX_ENEMIES = 3;
+/*
+ * Only the bare board is built ahead of time; every picked state renders on
+ * first visit and is cached from then on. Returning a param rather than an
+ * empty array is what prerenders `/draft` itself, which is the URL that is
+ * linked, indexed and crawled.
+ */
+export async function generateStaticParams() {
+  return [{ state: [] as string[] }];
+}
 
 /** How many candidates to rank. */
 const CANDIDATES = 12;
 
 interface PageProps {
-  searchParams: Promise<{ map?: string; mode?: string; enemy?: string }>;
+  params: Promise<{ state?: string[] }>;
 }
 
-export default async function DraftPage({ searchParams }: PageProps) {
-  const params = await searchParams;
+export default async function DraftPage({ params }: PageProps) {
+  const { state } = await params;
+  const route = resolveDraftRoute(state);
 
   /*
    * The map list is the Ranked pool, not the whole catalogue.
@@ -73,20 +83,19 @@ export default async function DraftPage({ searchParams }: PageProps) {
       (entry) => entry.mapSlug === slugify(map.mapName) && entry.scHash === map.mode,
     );
 
-  const wantedMap = params.map ? slugify(params.map) : null;
-  const selected = wantedMap
+  const selected = route.mapSlug
     ? (pool.find(
         (map) =>
-          slugify(map.mapName) === wantedMap &&
-          (!params.mode || slugify(map.mode) === slugify(params.mode)),
+          slugify(map.mapName) === route.mapSlug &&
+          (!route.modeSlug || slugify(map.mode) === route.modeSlug),
       ) ?? null)
     : null;
 
-  const enemies = (params.enemy ?? '')
-    .split(',')
-    .map((value) => Number(value))
-    .filter((id) => Number.isFinite(id) && id > 0)
-    .slice(0, MAX_ENEMIES);
+  // A map segment naming no map in the Ranked pool is a URL that does not
+  // address anything, the same judgement `/maps/[mode]/[map]` makes.
+  if (route.mapSlug && !selected) notFound();
+
+  const enemies = route.enemies;
 
   // Sequential database reads keep the page to a single connection.
   const modePicks = selected
@@ -118,17 +127,12 @@ export default async function DraftPage({ searchParams }: PageProps) {
     .sort((a, b) => b.total - a.total)
     .slice(0, CANDIDATES);
 
-  const hrefFor = (next: { enemy?: number[] }) => {
-    const query = new URLSearchParams();
-    if (selected) {
-      query.set('map', slugify(selected.mapName));
-      query.set('mode', slugify(selected.mode));
-    }
-    const enemyList = next.enemy ?? enemies;
-    if (enemyList.length > 0) query.set('enemy', enemyList.join(','));
-    const string = query.toString();
-    return string ? `/draft?${string}` : '/draft';
-  };
+  const hrefFor = (next: { enemy?: number[] }) =>
+    draftHref({
+      mode: selected?.mode,
+      map: selected?.mapName,
+      enemies: next.enemy ?? enemies,
+    });
 
   return (
     <div className="space-y-8">
@@ -423,7 +427,7 @@ function MapChooser({
                   return (
                     <li key={`${map.mode}-${map.mapName}`}>
                       <Link
-                        href={`/draft?map=${slugify(map.mapName)}&mode=${slugify(map.mode)}`}
+                        href={draftHref({ mode: map.mode, map: map.mapName })}
                         className="card card-interactive group block h-full overflow-hidden"
                       >
                         <MapArt

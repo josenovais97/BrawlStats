@@ -10,8 +10,11 @@ import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
 import { RegionPicker } from '@/components/leaderboard/region-picker';
+import { leaderboardHref, type LeaderboardBoard } from '@/lib/leaderboard-route';
 
-export type LeaderboardBoard = 'players' | 'clubs' | 'ranked' | 'cosmetics';
+/* Defined with the URL scheme it is a segment of; re-exported so the callers
+   that already import it from here keep working. */
+export type { LeaderboardBoard };
 
 interface LeaderboardControlsProps {
   region: string;
@@ -38,13 +41,14 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
-  function navigate(next: { region?: string; type?: string }) {
-    const params = new URLSearchParams({
-      region: next.region ?? region,
-      type: next.type ?? board,
-    });
+  // Paths, not a query string: the board is what makes this page cacheable,
+  // and `?type=` is what stopped it being. `leaderboardHref` drops the region
+  // for the boards that have none, so switching to one cannot leave a segment
+  // behind that names nothing.
+  function navigate(next: { region?: string; type?: LeaderboardBoard }) {
+    const target = leaderboardHref(next.type ?? board, next.region ?? region);
     startTransition(() => {
-      router.push(`/leaderboard?${params.toString()}`);
+      router.push(target);
     });
   }
 

@@ -78,7 +78,7 @@ const MORE: NavItem[] = [
    * an oversight — the game's ranking payload carries `club.name` with no tag,
    * so there is no URL to link to. Only a profile knows its club's tag.
    */
-  { href: '/leaderboard?type=clubs', match: '/club', label: 'Clubs', icon: ClubIcon },
+  { href: '/leaderboard/clubs', match: '/club', label: 'Clubs', icon: ClubIcon },
   { href: '/compare', label: 'Compare', icon: CompareIcon },
   { href: '/tier-list/maker', label: 'Tier List Maker', icon: TierListIcon },
   { href: '/starr-drops', label: 'Starr Drops', icon: StarrDropIcon },

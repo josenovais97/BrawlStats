@@ -1,9 +1,11 @@
 'use client';
 
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import { Check, Link2, RotateCcw, Sparkles } from 'lucide-react';
 
+import { decodeBoard, decodeOrder, encodeBoard } from '@/lib/tier-board';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 
@@ -54,15 +56,25 @@ const ROW_LABEL: Record<Tier, string> = {
   D: 'D',
 };
 
-export function TierMaker({
-  brawlers,
-  initial,
-}: {
-  brawlers: MakerBrawler[];
-  /** Decoded from the URL on the server, so a shared link renders correctly. */
-  initial: Record<number, Tier>;
-}) {
-  const [placed, setPlaced] = useState<Record<number, Tier>>(initial);
+export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
+  /*
+   * The shared board is read here rather than passed down from the page.
+   *
+   * It used to be decoded on the server, which meant the route read
+   * `searchParams` and so was re-rendered per request — a page whose whole
+   * state is in the URL, whose board is client-side either way, and which
+   * therefore had nothing to gain from being dynamic. Reading it in the
+   * browser is what lets the page itself be served from cache.
+   */
+  const searchParams = useSearchParams();
+  const known = useMemo(
+    () => new Set(brawlers.map((brawler) => brawler.id)),
+    [brawlers],
+  );
+
+  const [placed, setPlaced] = useState<Record<number, Tier>>(() =>
+    decodeBoard(searchParams, known),
+  );
   const [selected, setSelected] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -77,7 +89,7 @@ export function TierMaker({
    * object key order for integer-like keys is numeric, so the order is carried
    * separately.
    */
-  const [order, setOrder] = useState<number[]>(() => Object.keys(initial).map(Number));
+  const [order, setOrder] = useState<number[]>(() => decodeOrder(searchParams, known));
 
   const rows = useMemo(() => {
     const out: Record<Tier, MakerBrawler[]> = { S: [], A: [], B: [], C: [], D: [] };
@@ -131,14 +143,10 @@ export function TierMaker({
 
   /** Writes the board into the URL and puts that URL on the clipboard. */
   const share = useCallback(async () => {
-    const params = new URLSearchParams();
-    for (const tier of TIER_ORDER) {
-      const ids = rows[tier].map((brawler) => brawler.id - 16_000_000);
-      if (ids.length > 0) params.set(tier.toLowerCase(), ids.join('.'));
-    }
+    const query = encodeBoard(rows);
 
-    const url = params.toString()
-      ? `${window.location.origin}${window.location.pathname}?${params}`
+    const url = query
+      ? `${window.location.origin}${window.location.pathname}?${query}`
       : `${window.location.origin}${window.location.pathname}`;
 
     window.history.replaceState(null, '', url);

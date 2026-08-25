@@ -98,3 +98,28 @@ export function InsightsSkeleton() {
     </section>
   );
 }
+
+/**
+ * Mirrors the tier maker: a control row, five tier rows, then the pool grid.
+ *
+ * Shown while the board decodes, which happens in the browser — the share link
+ * *is* the document, and reading it on the server is what used to make that
+ * page uncacheable.
+ */
+export function TierMakerSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <Skeleton className="h-11 w-36 rounded-xl" />
+        <Skeleton className="h-11 w-28 rounded-xl" />
+        <Skeleton className="h-11 w-24 rounded-xl" />
+      </div>
+      <div className="space-y-2">
+        {Array.from({ length: 5 }, (_, i) => (
+          <Skeleton key={i} className="h-20 rounded-xl" />
+        ))}
+      </div>
+      <BrawlerGridSkeleton count={24} />
+    </div>
+  );
+}
