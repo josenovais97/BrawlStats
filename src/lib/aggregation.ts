@@ -579,7 +579,7 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  * observation that cannot be re-derived, which is why the raw battle window is
  * the one thing it will not touch.
  */
-const STORAGE_LIMIT_BYTES = 512 * 1024 * 1024;
+const STORAGE_LIMIT_BYTES = 500 * 1024 * 1024;
 
 /**
  * Two levels, because there is no useful third one at the top.
@@ -621,8 +621,22 @@ const STORAGE_LIMIT_BYTES = 512 * 1024 * 1024;
  * actually refuses writes. Data staying inside the budget below keeps a wide
  * margin on it.
  */
-const HISTORY_RESERVE_BYTES = 52 * 1024 * 1024;
-const DATA_BUDGET_BYTES = STORAGE_LIMIT_BYTES - HISTORY_RESERVE_BYTES;
+/*
+ * Retargeted from Neon to Supabase on 2026-08-25.
+ *
+ * The reserve existed because Neon billed "Storage" as the database *plus*
+ * retained WAL, and only the first half is visible from inside Postgres — so
+ * the valve was given a budget below the limit to cover the half it could not
+ * see. Supabase bills database size alone, which `pg_database_size` reports
+ * directly, so that blind spot is gone.
+ *
+ * Kept at a smaller figure rather than dropped to zero. A valve that only
+ * begins defending at the plan limit has no room to act in: freeing pages does
+ * not shrink a Postgres file, and the rewrite that does needs somewhere to
+ * write the copy. This is that somewhere.
+ */
+const HISTORY_RESERVE_BYTES = 25 * 1024 * 1024;
+export const DATA_BUDGET_BYTES = STORAGE_LIMIT_BYTES - HISTORY_RESERVE_BYTES;
 
 /*
  * Set so the *baseline* plateau sits below the high-water mark, which is the

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { pressureFor } from '@/lib/aggregation';
+import { DATA_BUDGET_BYTES, pressureFor } from '@/lib/aggregation';
 
 /**
  * The storage valve, which is the one piece of this project that deletes data
@@ -20,8 +20,14 @@ import { pressureFor } from '@/lib/aggregation';
  */
 
 const MB = 1024 * 1024;
-/** Mirrors STORAGE_LIMIT_BYTES - HISTORY_RESERVE_BYTES in `lib/aggregation`. */
-const DATA_BUDGET = 512 * MB - 52 * MB;
+/*
+ * Imported, not transcribed. This was a copy of the two constants, which meant
+ * the comment above ("derived rather than transcribed") was untrue and the
+ * suite broke the moment the budget was retargeted from Neon to Supabase for a
+ * perfectly deliberate reason. Deriving it means a budget change moves the
+ * thresholds with it, and only a change to the *ratios* has to be argued for.
+ */
+const DATA_BUDGET = DATA_BUDGET_BYTES;
 const HIGH_WATER = DATA_BUDGET * 0.8;
 const CRITICAL = DATA_BUDGET * 0.93;
 
