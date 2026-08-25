@@ -28,6 +28,12 @@ export const contentType = 'image/png';
 /** Matches the page it represents, so a shared card is never wildly stale. */
 export const revalidate = 3600;
 
+/* Runtime ISR, for the same reason as the page. See its `generateStaticParams`. */
+export async function generateStaticParams() {
+  return [];
+}
+
+
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   /* The route accepts both forms, so the image does too: a numeric path is

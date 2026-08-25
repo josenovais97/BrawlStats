@@ -2,7 +2,7 @@ import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import Link from 'next/link';
 
 import { humanizeMode } from '@/lib/format';
-import { slugify } from '@/lib/slugs';
+import { tierListHref } from '@/lib/tier-list-route';
 import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from '@/lib/stats';
 
 /**
@@ -15,22 +15,8 @@ import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from '@/lib/stats';
  * meant three copies of the query-string logic drifting apart.
  */
 
-export function tierListHref(
-  format: TierFormat,
-  windowKey: TierWindowKey,
-  mode?: string,
-): string {
-  // The mode is a path segment, not a parameter: each one is a page people
-  // search for by name ("best brawlers for gem grab"), and a query string is a
-  // single URL to a crawler no matter how many values it takes. The window
-  // stays a parameter, because it narrows the same page rather than naming a
-  // different one.
-  const path = mode
-    ? `/tier-list/${format}/${slugify(mode)}`
-    : `/tier-list/${format}`;
-  // 7d is the default the page falls back to, so it stays out of the URL.
-  return windowKey === '7d' ? path : `${path}?window=${windowKey}`;
-}
+/* The URL scheme lives with the routes that implement it. */
+export { tierListHref };
 
 const FORMATS: {
   key: TierFormat;

@@ -29,7 +29,6 @@ import {
   getFilterableModes,
   getLastAggregationRun,
   getMetaMovers,
-  isTierWindow,
   scoreBrawlers,
   type TierFormat,
   type TierWindowKey,
@@ -101,11 +100,17 @@ const COPY: Record<
 
 export async function TierListView({
   format,
-  searchParams,
+  windowKey,
   modeSlug,
 }: {
   format: TierFormat;
-  searchParams: Promise<{ window?: string; mode?: string }>;
+  /**
+   * Already resolved from the path by `resolveTierRoute`. Taken as a prop
+   * rather than read here, because reading `searchParams` — which is where
+   * this used to come from — makes the whole route dynamic, and these pages
+   * are the site's most crawled.
+   */
+  windowKey: TierWindowKey;
   /**
    * Set by the `/tier-list/[format]/[mode]` routes. A mode in the path is a
    * page in its own right — "best brawlers for gem grab" is the search, and a
@@ -113,19 +118,15 @@ export async function TierListView({
    */
   modeSlug?: string;
 }) {
-  const params = await searchParams;
-  const windowKey: TierWindowKey = isTierWindow(params.window) ? params.window : '7d';
   const { days } = TIER_WINDOWS[windowKey];
   const copy = COPY[format];
 
   const modes = await getFilterableModes(30, 150, format);
-  // Only honour a mode we actually have data for, so neither a hand-edited
-  // query string nor a stale link can produce a permanently empty page.
+  // Only honour a mode we actually have data for, so a stale link cannot
+  // produce a permanently empty page.
   const mode = modeSlug
     ? modes.find((m) => slugify(m.mode) === slugify(modeSlug))?.mode
-    : modes.some((m) => m.mode === params.mode)
-      ? params.mode
-      : undefined;
+    : undefined;
 
   // A mode path that resolves to nothing is a 404, not an empty tier list: it
   // is a URL that does not name anything, and soft-404ing it would put an

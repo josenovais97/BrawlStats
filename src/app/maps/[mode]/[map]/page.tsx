@@ -35,6 +35,18 @@ interface PageProps {
  */
 export const revalidate = 3600;
 
+/*
+ * Runtime ISR. See `/brawlers/[slug]` for why the empty array is required.
+ *
+ * This is the route it matters most on: 400-odd URLs, all of them in the
+ * sitemap, all of them previously re-rendered against the database on every
+ * single crawler hit.
+ */
+export async function generateStaticParams() {
+  return [];
+}
+
+
 /** How many brawlers a map page ranks. Deeper than the three-up card on /ranked. */
 const PICK_COUNT = 10;
 

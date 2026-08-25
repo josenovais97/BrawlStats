@@ -1,0 +1,36 @@
+import type { Metadata } from 'next';
+
+import { TierListView } from '@/components/tier-list/tier-list-view';
+import { resolveTierRoute, tierListMetadata } from '@/lib/tier-list-route';
+
+/** Reads aggregated samples, never the live API — cheap to revalidate hourly. */
+export const revalidate = 3600;
+
+/* Runtime ISR. Without an empty `generateStaticParams` a dynamic segment is
+   re-rendered per request however short its `revalidate` is. */
+export async function generateStaticParams() {
+  return [];
+}
+
+interface PageProps {
+  params: Promise<{ scope: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { scope } = await params;
+  return tierListMetadata('ranked', resolveTierRoute('ranked', [scope]));
+}
+
+/**
+ * One page per mode, because "best brawlers for gem grab" is its own search
+ * and its own answer. The list itself is the shared `TierListView`; only the
+ * scope differs.
+ *
+ * The segment is a window key when it names one, and a mode slug otherwise —
+ * see `resolveTierRoute`, which owns that decision.
+ */
+export default async function RankedScopedTierListPage({ params }: PageProps) {
+  const { scope } = await params;
+  const route = resolveTierRoute('ranked', [scope]);
+  return <TierListView format="ranked" windowKey={route.windowKey} modeSlug={route.modeSlug} />;
+}

@@ -122,6 +122,26 @@ async function resolveBrawler(handle: string): Promise<Resolved> {
 export const revalidate = 21600;
 
 /*
+ * Empty on purpose, and load-bearing.
+ *
+ * A dynamic segment with `revalidate` but no `generateStaticParams` at all is
+ * not ISR — Next renders it fresh on every request, and the build marks it
+ * `ƒ (Dynamic)`. Returning an empty array is what the framework documents as
+ * "all paths at runtime": nothing is generated during the build, and the first
+ * visitor to a path renders it into the cache that everyone after them is
+ * served from, until `revalidate` expires.
+ *
+ * Which is exactly the shape this page wanted. The note above about not
+ * pre-rendering still holds — no ranking call happens at build time — but the
+ * ranking call now happens once per brawler per six hours instead of once per
+ * request, and a crawler walking all 106 no longer costs 106 renders a pass.
+ */
+export async function generateStaticParams() {
+  return [];
+}
+
+
+/*
  * `generateMetadata` and the page body want the same rows — the snippet quotes
  * the build the page renders. Both run inside one request, so caching here
  * means the second caller pays nothing rather than the queries running twice.

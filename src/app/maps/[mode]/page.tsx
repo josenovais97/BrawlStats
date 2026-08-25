@@ -20,6 +20,12 @@ interface PageProps {
 
 export const revalidate = 3600;
 
+/* Runtime ISR. See `/brawlers/[slug]` for why the empty array is required. */
+export async function generateStaticParams() {
+  return [];
+}
+
+
 /** Resolves the mode slug against the modes that actually have active maps. */
 async function resolveMode(slug: string) {
   const maps = await getActiveMaps().catch(() => []);

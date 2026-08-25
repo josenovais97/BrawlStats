@@ -55,10 +55,11 @@ test('a longer window always starts earlier', () => {
 
 test('the site’s real windows stay inside what the prune keeps', () => {
   /*
-   * RANKED_MAP_WINDOW_DAYS is 21 and the tier list offers 30, against roll-up
-   * retention of 30 days (and 22 for the pairing tables). Asking for more than
-   * is kept does not error — it silently returns a thinner answer, which is
-   * how the old "30d" option came to be quietly reading 24 days.
+   * RANKED_MAP_WINDOW_DAYS is 21 and `getFilterableModes` reaches back 30,
+   * against roll-up retention of 30 days (and 22 for the pairing tables).
+   * Asking for more than is kept does not error — it silently returns a
+   * thinner answer, which is how the tier list's since-removed "30d" option
+   * came to be quietly reading 24 days.
    */
   const OLDEST_ROLLUP_DAY = 30;
   for (const days of [7, 21, 30]) {

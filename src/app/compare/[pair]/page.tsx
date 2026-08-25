@@ -30,6 +30,18 @@ interface PageProps {
 
 export const revalidate = 3600;
 
+/*
+ * Runtime ISR. See `/brawlers/[slug]` for why the empty array is required.
+ *
+ * 435 pairings are indexable and every one of the 5,565 is reachable, so a
+ * cache that fills on first visit is the only version of this page that does
+ * not pay the full render cost per request.
+ */
+export async function generateStaticParams() {
+  return [];
+}
+
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { pair } = await params;
   const resolved = await resolvePair(pair).catch(() => null);

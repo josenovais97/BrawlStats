@@ -1088,14 +1088,40 @@ async function computeBestPicksByMode(
   }
 }
 
-/** Windows the tier list can be viewed over. */
+/**
+ * Windows the tier list can be viewed over.
+ *
+ * 30d is gone. It was the widest window and the least asked for, and every
+ * window costs a distinct URL now that the choice lives in the path rather
+ * than a query string — three windows across two formats and a dozen modes is
+ * a lot of pages for a view nobody opened.
+ *
+ * 24h stays, but as a variant rather than the default, because the sample does
+ * not support it as one. Measured 2026-08-25: over 24h, 28 of 106 brawlers
+ * clear MIN_SAMPLE_FOR_TIER in Ranked against 105 over 7d, and per mode it is
+ * a single brawler against 65-76. A default that ranks a quarter of the roster
+ * and empties every mode page is a worse answer than a slightly older one.
+ *
+ * Note that a `days` of 1 means "since UTC midnight", not a trailing 24 hours
+ * — see `windowStartUtc`. So the 24h view holds anywhere from minutes to a
+ * full day of battles depending on when it is opened, which is the other
+ * reason it is not the default.
+ */
 export const TIER_WINDOWS = {
   '24h': { days: 1, label: 'Meta', sublabel: '24h' },
   '7d': { days: 7, label: 'Recent', sublabel: '7d' },
-  '30d': { days: 30, label: 'General', sublabel: '30d' },
 } as const;
 
 export type TierWindowKey = keyof typeof TIER_WINDOWS;
+
+/**
+ * The window a bare tier-list URL means.
+ *
+ * Load-bearing for the URL scheme: this is the one window that does *not* get
+ * a path segment, so that `/tier-list/ranked` and `/tier-list/ranked/7d` never
+ * both exist as pages ranking against each other.
+ */
+export const DEFAULT_TIER_WINDOW: TierWindowKey = '7d';
 
 export function isTierWindow(value: string | undefined): value is TierWindowKey {
   return value !== undefined && value in TIER_WINDOWS;
