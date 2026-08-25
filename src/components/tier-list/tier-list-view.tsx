@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import {
   JsonLd,
   breadcrumbSchema,
+  faqSchema,
   itemListSchema,
 } from '@/components/seo/structured-data';
 import { RankedIcon, TrophyIcon } from '@/components/game-icons';
@@ -17,7 +18,13 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { brawlerPath } from '@/lib/slugs';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
+import {
+  formatNumber,
+  formatPercent,
+  humanizeMode,
+  relativeTime,
+  titleCaseLabel,
+} from '@/lib/format';
 import { hasDatabase } from '@/lib/prisma';
 import { slugify } from '@/lib/slugs';
 import {
@@ -179,6 +186,41 @@ export async function TierListView({
   // carrying the generic title with a filter chip lit up below it.
   const heading = mode ? `${humanizeMode(mode)} ${copy.heading.toLowerCase()}` : copy.heading;
 
+  /*
+   * Answers to what people actually type, in the words they type them.
+   *
+   * These two pages are the highest-priority entries in the sitemap and had the
+   * least structured data on the site — an ItemList and, on mode pages only, a
+   * breadcrumb. Brawler and map pages already carry an FAQPage; this is the
+   * query ("what is the best brawler in brawl stars") those pages do not answer
+   * and this one is built to.
+   *
+   * Every figure is measured and degrades honestly: no rated brawlers means the
+   * question is answered with why, rather than omitted or invented.
+   */
+  const best = rated.slice().sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
+  const scopeName = mode ? `${humanizeMode(mode)} in ${copy.eyebrow.toLowerCase()}` : copy.battles;
+
+  const faq = [
+    {
+      question: mode
+        ? `What is the best brawler for ${humanizeMode(mode)} in Brawl Stars?`
+        : `What is the best brawler in Brawl Stars ${format === 'ranked' ? 'Ranked' : 'on the trophy ladder'}?`,
+      answer:
+        best.length > 0
+          ? `${titleCaseLabel(best[0].brawlerName)} ranks highest${mode ? ` in ${humanizeMode(mode)}` : ''}, with an adjusted win rate of ${formatPercent(best[0].normalizedWinRate)} across ${formatNumber(best[0].decidedSampleSize)} decided ${copy.battles} over the last ${TIER_WINDOWS[windowKey].sublabel}.${best.length > 2 ? ` ${titleCaseLabel(best[1].brawlerName)} and ${titleCaseLabel(best[2].brawlerName)} follow.` : ''}`
+          : `Not enough ${copy.battles} have been sampled${mode ? ` in ${humanizeMode(mode)}` : ''} over the last ${TIER_WINDOWS[windowKey].sublabel} to rank brawlers yet. A brawler needs ${MIN_SAMPLE_FOR_TIER} decided battles before it is placed.`,
+    },
+    {
+      question: 'How is this tier list made?',
+      answer: `From ${formatNumber(sampled)} ${scopeName} sampled from real matches, not from votes or opinion. Win rate is adjusted against the average of the same sample, because the sampled pool wins more than half its games regardless of brawler — so a tier reflects the brawler rather than who was holding it. A brawler needs ${MIN_SAMPLE_FOR_TIER} decided battles in the window before it is rated at all.`,
+    },
+    {
+      question: 'How often is the tier list updated?',
+      answer: `The sampler collects new battles every few hours and this page is rebuilt from the latest aggregate, so it never trails the data by more than a few hours.`,
+    },
+  ];
+
   return (
     <div className="space-y-8">
       {rated.length > 0 ? (
@@ -196,17 +238,24 @@ export async function TierListView({
           )}
         />
       ) : null}
-      {mode ? (
-        <JsonLd
-          data={breadcrumbSchema([
-            { name: copy.heading, path: `/tier-list/${format}` },
-            {
-              name: humanizeMode(mode),
-              path: `/tier-list/${format}/${slugify(mode)}`,
-            },
-          ])}
-        />
-      ) : null}
+      {/* On the index too, not only mode pages: the index is the entry the
+          sitemap ranks highest, and a breadcrumb is what puts /tier-list above
+          it in a result rather than a bare URL. */}
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Tier list', path: '/tier-list' },
+          { name: copy.heading, path: `/tier-list/${format}` },
+          ...(mode
+            ? [
+                {
+                  name: humanizeMode(mode),
+                  path: `/tier-list/${format}/${slugify(mode)}`,
+                },
+              ]
+            : []),
+        ])}
+      />
+      <JsonLd data={faqSchema(faq)} />
 
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
