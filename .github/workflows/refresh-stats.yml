@@ -58,15 +58,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 24, matching the version the lock file is generated with locally.
+      #
+      # Not cosmetic. `npm ci` refuses to run when the lock disagrees with
+      # package.json, and npm 10 and 11 resolve the optional wasm peer deps
+      # under @tailwindcss/oxide-wasm32-wasi differently — which is exactly
+      # what failed here twice, on @emnapi/core and @emnapi/runtime. Keeping
+      # CI on the same major as whoever regenerates the lock removes the
+      # disagreement rather than papering over it.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
 
       # `npm ci` runs `postinstall`, which is `prisma generate` — so the client
       # in src/generated exists before the script imports it.
+      #
+      # The fallback is deliberate. `npm ci` is the right default: it is fast
+      # and it installs exactly what the lock says. But it also *refuses to
+      # run* on any disagreement between the lock and package.json, and that
+      # took sampling down twice on 2026-08-25 over two optional wasm peer
+      # deps that this job never loads — it talks to Postgres and one HTTP API
+      # and does not build CSS.
+      #
+      # Weigh the two failure modes. A stale lock here means slightly drifted
+      # dev dependencies in a script with no user-facing output. A refused
+      # install means no sampling at all, and the battle log only holds a
+      # player's last ~25 matches, so every missed run is data that cannot be
+      # recovered. The warning keeps the drift visible instead of silent.
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci || {
+            echo "::warning::npm ci refused the lock file; falling back to npm install. Regenerate the lock with 'npm install' and commit it."
+            npm install --no-audit --no-fund
+          }
 
       - name: Run sampling
         env:
