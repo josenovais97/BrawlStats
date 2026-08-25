@@ -29,14 +29,46 @@ import { SITE_URL } from '@/lib/site';
  *
  * The pages stay shareable either way — a blocked path only stops discovery
  * crawls, never a direct visit.
+ *
+ * Except that it very nearly did stop one. Social unfurlers obey robots.txt
+ * too, and a profile carries both a Share button and its own `opengraph-image`
+ * — so a single `Disallow: /player/` also blocked Discord, Twitter, WhatsApp
+ * and Telegram from fetching the card, and a profile pasted into a club chat
+ * would have unfurled as nothing. That is the site's most-used feature and its
+ * whole word-of-mouth loop, given away to save crawl budget it never spent.
+ *
+ * Hence the named groups below. A crawler obeys the most specific group that
+ * matches its own user agent and ignores `*` entirely, so naming these five
+ * gives them the run of the site while search engines stay out of the
+ * unbounded per-tag pages. The distinction is exactly right: an unfurler
+ * fetches one URL somebody deliberately shared, a search crawler walks every
+ * URL it can find.
  */
+
+/** Unfurlers, which fetch one deliberately-shared URL rather than crawling. */
+const SOCIAL_AGENTS = [
+  'Twitterbot',
+  'facebookexternalhit',
+  'Discordbot',
+  'WhatsApp',
+  'TelegramBot',
+];
+
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', '/player/', '/club/'],
-    },
+    rules: [
+      ...SOCIAL_AGENTS.map((userAgent) => ({
+        userAgent,
+        allow: '/',
+        // The API is not a document set for anyone, unfurler or otherwise.
+        disallow: ['/api/'],
+      })),
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/api/', '/player/', '/club/'],
+      },
+    ],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

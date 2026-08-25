@@ -1,4 +1,4 @@
-import { Coffee, ExternalLink, Mail } from 'lucide-react';
+import { Coffee, ExternalLink, Mail, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -9,6 +9,12 @@ const APP_STORE_URL = 'https://apps.apple.com/app/brawl-stars/id1229016807';
 const GOOGLE_PLAY_URL =
   'https://play.google.com/store/apps/details?id=com.supercell.brawlstars';
 const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/josenovais';
+
+/**
+ * `?sub_confirmation=1` opens YouTube's subscribe dialog straight away rather
+ * than dropping the visitor on the channel to find the button themselves.
+ */
+const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
 
 /**
@@ -175,6 +181,22 @@ export function SiteFooter() {
               Buy me a coffee
             </a>
             <p className="mt-2 text-xs text-muted/80">Free, ad-free, no paywall.</p>
+
+            {/* Below the coffee link and styled quieter than it, for the same
+                reason that one is quieter than the search: the page is for
+                looking up players, and neither of these should outrank it. */}
+            <a
+              href={YOUTUBE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-border px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+            >
+              {/* lucide dropped its brand icons, so this is the generic play mark
+                  rather than YouTube's own — which is trademarked, and only
+                  licensed for use unmodified. */}
+              <PlayCircle aria-hidden className="size-4" />
+              Subscribe on YouTube
+            </a>
           </div>
         </div>
 
