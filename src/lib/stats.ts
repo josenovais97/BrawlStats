@@ -59,17 +59,22 @@ export const MIN_SAMPLE_FOR_TIER = 20;
  * *individually*; there are simply thousands of them answering with the same
  * numbers.
  *
- * An hour, because that is the freshness the pages already claim (`revalidate`
- * is 3600 on the ones that can be static) and the sampler only moves these
- * numbers every three hours anyway — so a shorter window would re-read the
- * database to produce a byte-identical answer.
+ * Three hours, because that is exactly how often the sampler moves these
+ * numbers (.github/workflows/refresh-stats.yml). It was an hour, which re-read
+ * the database three times to produce one distinct answer.
+ *
+ * This value is also a ceiling on the *pages*, which is easy to miss: Next
+ * takes a route's revalidate from the shortest-lived cache inside it, so a
+ * page declaring twelve hours while calling one of these reads was silently
+ * regenerating hourly. The build output prints the effective number — that is
+ * the only reliable check.
  *
  * `unstable_cache` rather than the `use cache` directive that supersedes it:
  * `use cache` requires opting the whole app into Cache Components, which
  * changes how every route renders. That is a large change to make on a project
  * in maintenance for what is, here, a caching problem in four functions.
  */
-const READ_CACHE_SECONDS = 3600;
+const READ_CACHE_SECONDS = 10800;
 
 export const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'] as const;
 

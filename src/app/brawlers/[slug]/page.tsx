@@ -118,8 +118,14 @@ async function resolveBrawler(handle: string): Promise<Resolved> {
  * The cost is one ranking call per brawler per regeneration: ~430 a day across
  * the roster against the ~4,200 the sampler already makes, and only for pages
  * someone actually opens.
+ *
+ * Declared as three hours rather than six because that is what it resolves to:
+ * `READ_CACHE_SECONDS` is three hours and a route takes its revalidate from the
+ * shortest-lived cache inside it. Worth stating, because the budget above was
+ * fiction until 2026-08-25 — `getBrawlerRankings` used the 120s default, which
+ * pinned every page here to a two-minute cycle and the ranking calls with it.
  */
-export const revalidate = 21600;
+export const revalidate = 10800;
 
 /*
  * Empty on purpose, and load-bearing.

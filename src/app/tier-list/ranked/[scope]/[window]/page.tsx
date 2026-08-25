@@ -3,8 +3,14 @@ import type { Metadata } from 'next';
 import { TierListView } from '@/components/tier-list/tier-list-view';
 import { resolveTierRoute, tierListMetadata } from '@/lib/tier-list-route';
 
-/** Reads aggregated samples, never the live API — cheap to revalidate hourly. */
-export const revalidate = 3600;
+/*
+ * Three hours, matching both the sampler and `READ_CACHE_SECONDS`.
+ *
+ * Declaring longer achieves nothing: these pages read cached aggregates, and a
+ * route's revalidate is the shortest-lived cache inside it. This value was
+ * briefly 43200, which the build reported as 1h.
+ */
+export const revalidate = 10800;
 
 /* Runtime ISR. See the parent route. */
 export async function generateStaticParams() {

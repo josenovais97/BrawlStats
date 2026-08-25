@@ -40,8 +40,10 @@ export function MapPickList({
 
         return (
           <li key={pick.brawlerId}>
+            {/* Not prefetched: ten brawler links per map page. */}
             <Link
               href={brawlerPath(pick.brawlerId, pick.brawlerName)}
+              prefetch={false}
               className="row-interactive flex items-center gap-3 px-4 py-3"
             >
               <span className="w-5 shrink-0 text-center text-sm font-black tabular-nums text-muted">

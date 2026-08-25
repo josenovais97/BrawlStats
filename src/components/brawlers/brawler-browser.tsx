@@ -276,9 +276,12 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
  * to fit four cards on a screen.
  */
 function BrawlerCard({ brawler }: { brawler: BrawlerCardData }) {
+  // Not prefetched: the full roster is 106 links on one grid. See the map
+  // catalogue for the same reasoning at more length.
   return (
     <Link
       href={brawlerPath(brawler.id, brawler.name)}
+      prefetch={false}
       className="card card-interactive group relative flex h-full flex-col overflow-hidden p-2.5 sm:p-3"
       style={{
         borderColor: `color-mix(in srgb, ${brawler.rarityColor} 32%, transparent)`,

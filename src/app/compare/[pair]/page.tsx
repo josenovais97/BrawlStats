@@ -28,17 +28,14 @@ interface PageProps {
   params: Promise<{ pair: string }>;
 }
 
-/**
- * Twelve hours, for the reason spelled out on `/maps/[mode]/[map]`: the
- * sampler runs twice a day, so anything shorter rebuilds identical HTML and
- * spends ISR write units doing it.
+/*
+ * Three hours, matching both the sampler and `READ_CACHE_SECONDS`.
  *
- * The count matters more here than the traffic does. 435 pairings are
- * indexable and all 5,565 are reachable, so this route can hold more cache
- * entries than any other on the site — and every one of them is a page whose
- * numbers only change when the aggregate underneath it does.
+ * Declaring longer achieves nothing: these pages read cached aggregates, and a
+ * route's revalidate is the shortest-lived cache inside it. This value was
+ * briefly 43200, which the build reported as 1h.
  */
-export const revalidate = 43200;
+export const revalidate = 10800;
 
 /*
  * Runtime ISR. See `/brawlers/[slug]` for why the empty array is required.

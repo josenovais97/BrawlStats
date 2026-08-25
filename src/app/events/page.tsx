@@ -24,12 +24,24 @@ export const metadata: Metadata = {
   description: 'Current and upcoming Brawl Stars event rotation across every mode slot.',
 };
 
-export const revalidate = 120;
+/*
+ * Ten minutes. The rotation changes on the game's schedule, not continuously,
+ * so a two-minute window spent ISR writes redrawing an identical grid — see
+ * the leaderboard for the same reasoning at more length.
+ *
+ * `ROTATION_REVALIDATE` below has to match: Next takes a route's revalidate
+ * from the shortest-lived fetch inside it, so the rotation call's own TTL is
+ * what actually decides this.
+ */
+export const revalidate = 600;
+
+/** Must match `revalidate` above. See the note there. */
+const ROTATION_REVALIDATE = 600;
 
 export default async function EventsPage() {
   let rotation: BSRotationSlot[];
   try {
-    rotation = await getEventRotation();
+    rotation = await getEventRotation(ROTATION_REVALIDATE);
   } catch (err) {
     return <ErrorState code={toApiError(err).code} title="Event rotation unavailable" />;
   }

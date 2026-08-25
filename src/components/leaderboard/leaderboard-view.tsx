@@ -21,6 +21,16 @@ import { regionName } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
 
 /**
+ * Must match `revalidate` on the three leaderboard routes.
+ *
+ * Not decorative: Next takes a route's revalidate from the shortest-lived
+ * fetch inside it, so leaving these calls on the 120s default pinned the pages
+ * to two minutes no matter what they exported. The build output is the check —
+ * the route table prints the effective value, not the declared one.
+ */
+const RANKING_REVALIDATE = 900;
+
+/**
  * The leaderboard, for one already-resolved board and region.
  *
  * Both used to be read here from `searchParams`, which is what kept this page
@@ -85,7 +95,7 @@ export async function LeaderboardView({
 async function PlayerBoard({ region }: { region: string }) {
   let items;
   try {
-    ({ items } = await getPlayerRankings(region, 100));
+    ({ items } = await getPlayerRankings(region, 100, RANKING_REVALIDATE));
   } catch (err) {
     return <ErrorState code={toApiError(err).code} backHref="/leaderboard" backLabel="Reset" />;
   }
@@ -150,7 +160,7 @@ async function PlayerBoard({ region }: { region: string }) {
 async function ClubBoard({ region }: { region: string }) {
   let items;
   try {
-    ({ items } = await getClubRankings(region, 100));
+    ({ items } = await getClubRankings(region, 100, RANKING_REVALIDATE));
   } catch (err) {
     return <ErrorState code={toApiError(err).code} backHref="/leaderboard" backLabel="Reset" />;
   }

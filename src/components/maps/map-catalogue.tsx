@@ -184,8 +184,12 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
 function MapCard({ map, sublabel }: { map: CatalogueMap; sublabel?: string }) {
   return (
     <li>
+      {/* Not prefetched. /maps lists the whole catalogue — around 400 of
+          these — and each is a cold ISR entry, so prefetching a screenful
+          renders map pages nobody opened and pays an ISR write for each. */}
       <Link
         href={`/maps/${map.modeSlug}/${map.mapSlug}`}
+        prefetch={false}
         className="card card-interactive group block h-full overflow-hidden"
       >
         <MapArt

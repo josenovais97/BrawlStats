@@ -1,17 +1,22 @@
 # Sampling schedule.
 #
-# Vercel's scheduler is not reliable for this project: the Hobby plan permits
-# two cron jobs triggered once a day, and the four declared in vercel.json
-# stopped firing entirely (logs show no vercel-cron requests at the scheduled
-# times). One run a day is not enough. A Brawl Stars battle log holds only a
-# player's last ~25 matches, and measured across 1,545 visits, 68% of sampled
-# players already come back sitting on that ceiling. Everything past it is lost
-# for good, so the gap between runs is the gap in the data.
+# The work runs *here*, in the runner, rather than being POSTed to the deployed
+# site. It used to be a `curl` at https://brawlzone.net/api/cron/refresh-stats,
+# which made a Vercel Function do the sampling — and a Vercel Function is the
+# most expensive place this project can put CPU. Measured 2026-08-25: ~184s a
+# run at eight runs a day is ~12.3 hours a month against a 4-hour Fluid Active
+# CPU allowance on Hobby, so the batch job alone could exceed the entire plan
+# before a single page was rendered. GitHub's minutes are free at this cadence
+# and have no 300-second ceiling.
 #
-# GitHub Actions costs nothing here: the job is a single HTTP request that
-# finishes in seconds, well inside the free minutes even on a private repo, and
-# it has no cron-count limit. The vercel.json entries stay as a fallback, so a
-# failure here degrades to Vercel's schedule rather than to nothing.
+# Vercel's scheduler was never the right home for it anyway: the Hobby plan
+# permits two cron jobs triggered once a day, and the entries in vercel.json
+# stopped firing entirely (18 invocations in a 30-day window where 60 were
+# due). Those entries have now been removed rather than kept as a fallback —
+# a fallback that fires unpredictably and costs 184s of function time when it
+# does is worse than none, and this workflow runs eight times as often.
+#
+# The route itself is kept as a manual trigger. See app/api/cron/refresh-stats.
 name: Refresh stats
 
 on:
@@ -29,9 +34,9 @@ on:
     # minute is far likelier to fire on time.
     #
     # Costs, all inside free tiers at this cadence:
-    #   Actions   ~3 min/run x 8/day  = ~745 min/month (2,000 free, private repo)
+    #   Actions   ~5 min/run x 8/day  = ~1,200 min/month (2,000 free, private)
     #   Brawl API ~2,018 calls/run    = ~16k/day, ~11/s only during a run
-    #   Vercel    ~184s of a 300s Hobby function ceiling, 8 invocations/day
+    #   Vercel    nothing at all, which is the point of this file
     # Halving the frequency to '17 */6 * * *' halves all three if any gets tight.
     - cron: '17 */3 * * *'
   # Manual trigger, for testing a change without waiting for the schedule.
@@ -46,85 +51,27 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    # The endpoint self-limits to a 270s budget; this only guards a hang.
-    timeout-minutes: 10
+    # The run self-limits to a 270s work budget; this only guards a hang, and
+    # allows for install and Prisma generation on top of it.
+    timeout-minutes: 15
+
     steps:
-      - name: Trigger sampling run
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` runs `postinstall`, which is `prisma generate` — so the client
+      # in src/generated exists before the script imports it.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run sampling
         env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          if [ -z "$CRON_SECRET" ]; then
-            echo "::error::CRON_SECRET is not set in this repository's Actions secrets."
-            exit 1
-          fi
-
-          # Always the canonical domain, never brawlzone.vercel.app.
-          #
-          # This pointed at the vercel.app host until 2026-08-24, when that
-          # domain was set to 308-redirect to brawlzone.net and every run began
-          # failing: curl does not follow redirects without -L, so the workflow
-          # saw a 308, failed its 2* test, and sampling stopped silently apart
-          # from a red run in the Actions tab.
-          #
-          # Adding -L would not have fixed it either. The redirect crosses
-          # hosts, and curl drops the Authorization header on a cross-host
-          # redirect unless --location-trusted is used — so it would have
-          # traded the 308 for a 401. Sending the credential only to the host
-          # it belongs to is the correct behaviour; the URL is what was wrong.
-          #
-          # --max-time is above the endpoint's own budget so a slow run is
-          # reported by the endpoint rather than cut off mid-write here.
-          status=$(curl -sS -o /tmp/body -w '%{http_code}' \
-            --max-time 300 \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            https://brawlzone.net/api/cron/refresh-stats)
-
-          echo "HTTP $status"
-          cat /tmp/body
-          echo
-
-          # A non-2xx is a real failure worth a red run: silent sampling
-          # failures are how the data quietly goes stale.
-          case "$status" in
-            2*) ;;
-            *)  echo "::error::Sampling run failed with HTTP $status"; exit 1 ;;
-          esac
-
-          # A 200 is not the same as a good run.
-          #
-          # The endpoint answers 200 whenever it completed, whatever it managed
-          # to do — so the checks below read the body, because the failures that
-          # actually cost something all come back green otherwise.
-          #
-          # `status: partial` is deliberately NOT one of them: roughly 30 of
-          # 1,000 sampled tags 404 on any given run (deleted accounts), so
-          # partial is the normal state and alerting on it would train everyone
-          # to ignore this job.
-          rolled=$(jq -r '.rolledUp // 0' /tmp/body)
-          battles=$(jq -r '.battlesRecorded // 0' /tmp/body)
-          runstatus=$(jq -r '.status // "unknown"' /tmp/body)
-
-          # Nothing sampled at all. Every tag failed, or the batch never ran.
-          if [ "$runstatus" = "failed" ]; then
-            echo "::error::Sampling run completed but sampled no players at all."
-            exit 1
-          fi
-
-          # The expensive one. `pruneOldSamples` refuses to delete raw days that
-          # were never folded, so a roll-up that keeps failing parks the prune
-          # while the sampler keeps writing — about 35 MB/day, roughly a week to
-          # a full database, with nothing else to announce it.
-          if grep -q 'roll-up FAILED' /tmp/body; then
-            echo "::error::Roll-up failed. The prune is now parked and raw rows will accumulate (~35MB/day, ~1 week to full). See aggregation_runs.notes."
-            exit 1
-          fi
-
-          # Same failure caught from the other side, in case the roll-up returns
-          # cleanly but writes nothing: new battles always move a day's
-          # watermark, so folding them can never legitimately yield zero rows.
-          if [ "$battles" -gt 0 ] && [ "$rolled" -eq 0 ]; then
-            echo "::error::Recorded $battles battles but rolled up 0 rows — the roll-up is not keeping up with the sampler."
-            exit 1
-          fi
-
-          exit 0
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BRAWL_STARS_API_KEY: ${{ secrets.BRAWL_STARS_API_KEY }}
+        # The script checks its own result and exits non-zero on the failures
+        # worth a red run; see scripts/refresh-stats.ts for which and why.
+        run: npm run stats:refresh

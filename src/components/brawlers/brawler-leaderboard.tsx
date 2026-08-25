@@ -4,6 +4,14 @@ import Link from 'next/link';
 import { TrophyIcon } from '@/components/game-icons';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerRankings } from '@/lib/bs-api';
+
+/**
+ * Must match `revalidate` on `/brawlers/[slug]`, the only page that renders
+ * this. A route takes its revalidate from the shortest-lived fetch inside it,
+ * so at the 120s default this one call pinned all 106 brawler pages — and the
+ * ranking call each of them makes — to a two-minute cycle.
+ */
+const RANKING_REVALIDATE = 21600;
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 
@@ -11,7 +19,7 @@ import { normalizeTag } from '@/lib/tags';
 export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
   let players;
   try {
-    players = (await getBrawlerRankings(brawlerId, 'global', 10)).items;
+    players = (await getBrawlerRankings(brawlerId, 'global', 10, RANKING_REVALIDATE)).items;
   } catch {
     return (
       <p className="card p-6 text-sm text-muted">

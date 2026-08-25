@@ -6,14 +6,27 @@ import { hasDatabase } from '@/lib/prisma';
 /**
  * POST/GET /api/cron/refresh-stats
  *
- * Triggered daily by Vercel Cron (see vercel.json). Vercel attaches
- * `Authorization: Bearer <CRON_SECRET>` only when a CRON_SECRET environment
- * variable exists on the project. It is not provisioned automatically: if it
- * is missing in Production, the nightly request arrives with no header and
- * every run dies at the 401 below without ever reaching runAggregation.
+ * A manual trigger. Nothing calls this on a schedule any more.
  *
- * Not cached, and always dynamic: a cached cron endpoint would silently stop
- * doing work.
+ * Sampling runs in GitHub Actions now, and runs the work *in the runner*
+ * rather than POSTing here — see .github/workflows/refresh-stats.yml and
+ * scripts/refresh-stats.ts. The reason is cost: this route made a Vercel
+ * Function do ~184s of sampling eight times a day, ~12.3 hours a month against
+ * a 4-hour Fluid Active CPU allowance, for a batch job that needs no web
+ * server at all. The `crons` entries in vercel.json are gone with it.
+ *
+ * Kept because a one-off run against production is occasionally what you want
+ * — after a schema change, or to confirm a fix without waiting three hours:
+ *
+ *   curl -X POST -H "Authorization: Bearer $CRON_SECRET" \
+ *     https://brawlzone.net/api/cron/refresh-stats
+ *
+ * CRON_SECRET must exist as a Production environment variable; without it this
+ * fails closed at the 401 below rather than becoming an open trigger that
+ * burns the upstream rate limit for anyone who finds the URL.
+ *
+ * Not cached, and always dynamic: a cached trigger would silently stop doing
+ * work.
  */
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +37,9 @@ export const dynamic = 'force-dynamic';
  * the plan goes. `RUN_BUDGET_MS` stops the work 30s earlier; the gap is what
  * guarantees the response is written instead of the invocation being killed
  * mid-flight, which Vercel would never retry.
+ *
+ * Only binds a manual run now. The scheduled path has no such ceiling, which
+ * is a second reason the work moved off this route.
  */
 export const maxDuration = 300;
 

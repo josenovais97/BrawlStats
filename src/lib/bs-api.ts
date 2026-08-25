@@ -176,17 +176,30 @@ export function getBrawlerRankings(
   brawlerId: number,
   region = 'global',
   limit = 50,
+  /**
+   * Overridable, and it matters more here than anywhere else this pattern
+   * appears. `/brawlers/[slug]` declares a six-hour revalidate, but a route
+   * takes its revalidate from the shortest-lived fetch inside it — so at the
+   * 120s default this single call quietly pinned all 106 brawler pages to a
+   * two-minute cycle, along with the ranking call each one makes. The page's
+   * own note budgets "~430 [ranking calls] a day across the roster"; at two
+   * minutes it was nowhere near that.
+   */
+  revalidate = REVALIDATE_SLOW,
 ): Promise<BSListResponse<BSPlayerRanking>> {
   return bsFetch<BSListResponse<BSPlayerRanking>>(
     `/rankings/${encodeURIComponent(region)}/brawlers/${brawlerId}?limit=${limit}`,
-    { revalidate: REVALIDATE_SLOW },
+    { revalidate },
   );
 }
 
 /* --------------------------------- events --------------------------------- */
 
-export function getEventRotation(): Promise<BSRotationSlot[]> {
-  return bsFetch<BSRotationSlot[]>('/events/rotation', { revalidate: REVALIDATE_SLOW });
+export function getEventRotation(
+  /** Overridable for the same reason as the ranking calls above. */
+  revalidate = REVALIDATE_SLOW,
+): Promise<BSRotationSlot[]> {
+  return bsFetch<BSRotationSlot[]>('/events/rotation', { revalidate });
 }
 
 /* -------------------------------- brawlers -------------------------------- */

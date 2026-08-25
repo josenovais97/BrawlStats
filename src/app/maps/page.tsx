@@ -22,6 +22,13 @@ export const metadata: Metadata = {
 /** Artwork only; the per-map numbers live on the map pages themselves. */
 export const revalidate = 86400;
 
+/*
+ * The rotation call's own TTL, which is what actually decides this page: at the
+ * 120s default it pinned a route declaring a full day down to two minutes.
+ * An hour is plenty for the "live now" marks the catalogue shows.
+ */
+const ROTATION_REVALIDATE = 3600;
+
 export default async function MapsIndexPage() {
   const maps = await getActiveMaps().catch(() => []);
 
@@ -37,7 +44,7 @@ export default async function MapsIndexPage() {
    *   in months.
    */
   const [rotation, season] = await Promise.all([
-    getEventRotation().catch(() => []),
+    getEventRotation(ROTATION_REVALIDATE).catch(() => []),
     getSeasonState().catch(() => null),
   ]);
 
