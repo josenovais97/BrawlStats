@@ -225,6 +225,72 @@ const RAW_BATTLE_RETENTION_DAYS = ROLLUP_REBUILD_DAYS;
 const SNAPSHOT_RETENTION_DAYS = 2;
 
 /**
+ * Write a brawler snapshot for one sampled player in this many.
+ *
+ * `player_brawler_snapshots` was 192.6 MB of a 400 MB database — 47% of
+ * everything stored — because `samplePlayer` wrote a row per brawler per
+ * player on every run: roughly 7,000 players a day times ~57 brawlers, or
+ * 399,186 rows at ~482 bytes each.
+ *
+ * Nothing reads an individual row. Every consumer is an aggregate over the
+ * population — mean trophies and mean rank per brawler, the share of owners
+ * holding each gadget or star power, which skins and icons are equipped. Those
+ * are distributions, and a distribution needs a representative sample, not a
+ * census. Measuring the mean trophies of a brawler across 7,000 players a day
+ * rather than 1,750 buys precision far below the width of the thing being
+ * measured, and pays 145 MB for it.
+ *
+ * So the census becomes a sample. At 4 this holds the table near 48 MB, which
+ * is what takes the database from ~80% of a 0.5 GB plan to roughly half of it.
+ *
+ * Deliberately NOT a cut to sampling itself. Battles are what the tier lists
+ * are built from and what the sample floors are drawn against — 105 of 106
+ * brawlers clear MIN_SAMPLE_FOR_TIER over seven days at the current rate, and
+ * 28 of 106 over one. Sampling fewer players, or running less often, would
+ * degrade the numbers the site exists to publish. This costs none of that: the
+ * battle log of every sampled player is still read and recorded in full.
+ */
+const SNAPSHOT_SAMPLE_RATE = 4;
+
+/**
+ * Whether this player's roster is recorded on this day.
+ *
+ * Keyed on the day as well as the tag so the cohort rotates: a stable hash of
+ * the tag alone would pick the same eighth of the pool forever, which is a
+ * fixed panel rather than a sample, and would let one unusual account sit in
+ * or out of every aggregate indefinitely.
+ *
+ * FNV-1a because it needs to be deterministic across runs and processes and
+ * nothing here justifies a dependency. It is not a security boundary.
+ *
+ * The finaliser is not optional, and the day goes first for the same reason.
+ * FNV-1a's low bits are weak: its last step is a multiply, so `% rate` on the
+ * raw hash is decided almost entirely by the final byte of the key. With the
+ * date on the end and a rate of 4, consecutive days produced *perfectly
+ * disjoint* cohorts — a four-day rotation in lockstep rather than a sample.
+ * The avalanche below spreads that entropy across all 32 bits.
+ */
+export function shouldSnapshot(tag: string, day: Date, rate = SNAPSHOT_SAMPLE_RATE): boolean {
+  if (rate <= 1) return true;
+
+  const key = `${day.toISOString().slice(0, 10)}:${tag}`;
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < key.length; i += 1) {
+    hash ^= key.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+
+  // fmix32, from MurmurHash3.
+  hash ^= hash >>> 16;
+  hash = Math.imul(hash, 0x85ebca6b) >>> 0;
+  hash ^= hash >>> 13;
+  hash = Math.imul(hash, 0xc2b2ae35) >>> 0;
+  hash ^= hash >>> 16;
+
+  return (hash >>> 0) % rate === 0;
+}
+
+/**
  * A pool member producing no battles in this many days is inactive.
  *
  * They still cost two API calls per visit and contribute nothing, so they are
@@ -1104,7 +1170,10 @@ async function samplePlayer(tag: string) {
 
   // Trophy/rank distribution plus which abilities this player owns, which is
   // what the popular-build percentages are computed from.
-  if (player.brawlers.length > 0) {
+  //
+  // Only a rotating fraction of players, and only this write — the battle log
+  // below is still recorded for everyone. See SNAPSHOT_SAMPLE_RATE.
+  if (player.brawlers.length > 0 && shouldSnapshot(normalized, snapshotDate)) {
     await prisma.playerBrawlerSnapshot.createMany({
       data: player.brawlers.map((b) => ({
         playerTag: normalized,

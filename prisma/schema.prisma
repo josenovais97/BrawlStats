@@ -48,8 +48,21 @@ model SampledPlayer {
   @@map("sampled_players")
 }
 
-/// One row per (player, brawler, day): the trophy and rank distribution that
-/// feeds avg trophies and rank counts.
+/// One row per (player, brawler, day), for a rotating quarter of the sampled
+/// players: the trophy and rank distribution that feeds avg trophies and rank
+/// counts.
+///
+/// A sample, not a census, and that word is doing real work. Written for every
+/// sampled player it reached 192.6 MB — 47% of a 400 MB database — while every
+/// consumer of it is an aggregate over the population: mean trophies and rank
+/// per brawler, the share of owners holding each ability, skin and icon
+/// popularity. None of those need every player, and paying half the plan for
+/// precision below the width of what is being measured is the wrong trade.
+///
+/// `SNAPSHOT_SAMPLE_RATE` in lib/aggregation picks who is recorded, rotating
+/// the cohort daily so the aggregates are not measured on a fixed panel.
+/// Battles are unaffected — every sampled player's log is still read in full,
+/// because that is what the tier lists are actually built from.
 model PlayerBrawlerSnapshot {
   id           Int      @id @default(autoincrement())
   playerTag    String   @map("player_tag")
