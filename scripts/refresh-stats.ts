@@ -63,58 +63,77 @@ requireEnv('DATABASE_URL', `Set DATABASE_URL_UNPOOLED (preferred) or DATABASE_UR
 requireEnv('BRAWL_STARS_API_KEY', SECRETS_HINT);
 
 /*
- * Imported after the environment is settled, not at the top of the file.
+ * Wrapped in a function rather than run at module scope.
  *
- * `lib/prisma` captures the connection string when its client is first
- * constructed, so a static import would hoist above the `config()` calls and
- * the override just above, and capture whatever was there before.
+ * `package.json` has no `"type": "module"`, so tsx transforms this to
+ * CommonJS, where top-level `await` is a parse error — the file fails before
+ * running a line. That is invisible to `tsc --noEmit` and to eslint, both of
+ * which type-check happily; only executing it shows the problem.
  */
-const { runAggregation } = await import('@/lib/aggregation');
+async function main(): Promise<number> {
+  /*
+   * Imported here, after the environment is settled, rather than at the top of
+   * the file. `lib/prisma` reads the connection string when its client is
+   * first constructed, so a static import would hoist above the `config()`
+   * calls and the override above.
+   */
+  const { runAggregation } = await import('@/lib/aggregation');
 
-const started = Date.now();
-const result = await runAggregation();
-const seconds = ((Date.now() - started) / 1000).toFixed(1);
+  const started = Date.now();
+  const result = await runAggregation();
+  const seconds = ((Date.now() - started) / 1000).toFixed(1);
 
-console.log(JSON.stringify(result, null, 2));
-console.log(`\nCompleted in ${seconds}s.`);
+  console.log(JSON.stringify(result, null, 2));
+  console.log(`\nCompleted in ${seconds}s.`);
 
-/*
- * The checks below were bash in the workflow, reading this object back out of
- * an HTTP response. They live here now because this is where the object is —
- * and because a green run that did nothing is the failure mode that actually
- * costs something here.
- *
- * `status: 'partial'` is deliberately not one of them: roughly 30 of 1,000
- * sampled tags 404 on any given run (deleted accounts), so partial is the
- * normal state, and alerting on it would train everyone to ignore this job.
- */
+  /*
+   * The checks below were bash in the workflow, reading this object back out
+   * of an HTTP response. They live here now because this is where the object
+   * is — and because a green run that did nothing is the failure mode that
+   * actually costs something here.
+   *
+   * `status: 'partial'` is deliberately not one of them: roughly 30 of 1,000
+   * sampled tags 404 on any given run (deleted accounts), so partial is the
+   * normal state, and alerting on it would train everyone to ignore this job.
+   */
 
-if (result.status === 'failed') {
-  console.error(`::error::Sampling run completed but sampled no players at all. ${result.notes ?? ''}`);
-  process.exit(1);
+  if (result.status === 'failed') {
+    console.error(
+      `::error::Sampling run completed but sampled no players at all. ${result.notes ?? ''}`,
+    );
+    return 1;
+  }
+
+  /*
+   * The expensive one. `pruneOldSamples` refuses to delete raw days that were
+   * never folded, so a roll-up that keeps failing parks the prune while the
+   * sampler keeps writing — about 35 MB/day, roughly a week to a full
+   * database, with nothing else to announce it.
+   */
+  if (result.notes?.includes('roll-up FAILED')) {
+    console.error(
+      '::error::Roll-up failed. The prune is now parked and raw rows will accumulate (~35MB/day, ~1 week to full). See aggregation_runs.notes.',
+    );
+    return 1;
+  }
+
+  // The same failure caught from the other side, in case the roll-up returns
+  // cleanly but writes nothing: new battles always move a day's watermark, so
+  // folding them can never legitimately yield zero rows.
+  if (result.battlesRecorded > 0 && result.rolledUp === 0) {
+    console.error(
+      `::error::Recorded ${result.battlesRecorded} battles but rolled up 0 rows — the roll-up is not keeping up with the sampler.`,
+    );
+    return 1;
+  }
+
+  return 0;
 }
 
-/*
- * The expensive one. `pruneOldSamples` refuses to delete raw days that were
- * never folded, so a roll-up that keeps failing parks the prune while the
- * sampler keeps writing — about 35 MB/day, roughly a week to a full database,
- * with nothing else to announce it.
- */
-if (result.notes?.includes('roll-up FAILED')) {
-  console.error(
-    '::error::Roll-up failed. The prune is now parked and raw rows will accumulate (~35MB/day, ~1 week to full). See aggregation_runs.notes.',
-  );
-  process.exit(1);
-}
-
-// The same failure caught from the other side, in case the roll-up returns
-// cleanly but writes nothing: new battles always move a day's watermark, so
-// folding them can never legitimately yield zero rows.
-if (result.battlesRecorded > 0 && result.rolledUp === 0) {
-  console.error(
-    `::error::Recorded ${result.battlesRecorded} battles but rolled up 0 rows — the roll-up is not keeping up with the sampler.`,
-  );
-  process.exit(1);
-}
-
-process.exit(0);
+main()
+  .then((code) => process.exit(code))
+  .catch((err) => {
+    console.error(`::error::Sampling run threw: ${err instanceof Error ? err.message : err}`);
+    console.error(err);
+    process.exit(1);
+  });
