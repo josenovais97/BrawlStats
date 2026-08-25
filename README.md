@@ -5,7 +5,7 @@ database, live event rotation, leaderboards, and a tier list built from aggregat
 samples.
 
 Built with Next.js (App Router) + TypeScript + Tailwind CSS, deployable free on Vercel with
-Neon Postgres.
+Supabase Postgres.
 
 ## Features
 
@@ -126,7 +126,7 @@ directly.
 Short windows keep lookups fresh while collapsing bursts of traffic into one upstream call,
 which is what keeps the site inside the API rate limit.
 
-The last row is about Neon, not the game API. Most content routes are server-rendered per
+The last row is about the database, not the game API. Most content routes are server-rendered per
 request — `/maps/[mode]/[map]` alone is 400+ URLs — so before caching, every crawler hit
 re-ran the aggregate queries. That was measured at 0.37 GB/day of egress against a 5 GB
 monthly allowance. The reads in `src/lib/stats.ts` are wrapped with `cachedRead`, so many
@@ -176,16 +176,26 @@ the aggregated stats on brawler pages need one.
 npm run dev
 ```
 
-### 3. Provision Neon Postgres (optional, for the tier list)
+### 3. Provision Supabase Postgres (optional, for the tier list)
 
-1. In the Vercel dashboard: **Storage → Create Database → Neon** (Marketplace integration,
-   free tier).
-2. Connect it to your project. Vercel injects `DATABASE_URL` into every environment.
-3. Pull it locally:
+1. [supabase.com](https://supabase.com) → **New project**, free tier. Pick a region near
+   your functions — `vercel.json` pins them to `fra1`.
+2. Project Settings → **Database** → Connection string. You need **two**, and both must be
+   pooler URLs:
 
    ```bash
-   npx vercel env pull .env.local
+   # transaction pooler, port 6543 — the running app
+   DATABASE_URL=postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:6543/postgres?pgbouncer=true
+   # session pooler, port 5432 — migrations and the sampler
+   DATABASE_URL_UNPOOLED=postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:5432/postgres
    ```
+
+   > **Do not use the "direct connection" string.** `db.<ref>.supabase.co` resolves to IPv6
+   > only, and both Vercel functions and GitHub runners are IPv4 — it fails with
+   > `ENETUNREACH` from either. The pooler is IPv4.
+
+3. Put both in `.env.local`, and set the same two in the Vercel project
+   (`vercel env add`) plus `DATABASE_URL_UNPOOLED` in the repository's Actions secrets.
 
 4. Apply the schema:
 
@@ -196,11 +206,9 @@ npm run dev
    ```
 
    > Migrations run over `DATABASE_URL_UNPOOLED`, falling back to `DATABASE_URL`
-   > (see `prisma.config.ts`). Neon's pooled endpoint is PgBouncer in transaction
-   > mode and does not hold the session state migrations need. The Neon
-   > integration injects both variables, so this works without extra setup — but
-   > if you copy a connection string by hand, use the **unpooled** one for
-   > migrations and the pooled one for `DATABASE_URL` at runtime.
+   > (see `prisma.config.ts`). A transaction-mode pooler does not hold the session
+   > state migrations need — advisory locks, prepared statements across a DDL
+   > transaction — which is why the session pooler is the one that goes there.
    >
    > Quote the values in `.env.local` (`DATABASE_URL="postgres://…"`). The pooled
    > URL contains `&`, which breaks `source .env.local` in a shell if unquoted.
@@ -229,8 +237,8 @@ Set these in **Vercel → Settings → Environment Variables** before the first 
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `BRAWL_STARS_API_KEY` | yes | Whitelisted against the RoyaleAPI proxy IP |
-| `DATABASE_URL` | for the tier list | Pooled connection; injected by the Neon integration |
-| `DATABASE_URL_UNPOOLED` | for migrations | Direct connection; injected by the Neon integration |
+| `DATABASE_URL` | for the tier list | Supabase **transaction** pooler, port 6543 |
+| `DATABASE_URL_UNPOOLED` | migrations and the sampler | Supabase **session** pooler, port 5432 (not the IPv6 direct URL) |
 | `CRON_SECRET` | yes | Also add it as a **GitHub Actions secret** — the sampling workflow sends it |
 | `NEXT_PUBLIC_SITE_URL` | yes | Canonical origin, e.g. `https://brawlzone.net`. Feeds every canonical tag, the sitemap, OG tags and the outbound `User-Agent` |
 
@@ -239,22 +247,12 @@ redeploy so the build picks them up, otherwise the tier list keeps rendering its
 "Database not configured" state from the older build.
 
 Sampling is driven by **GitHub Actions**, not Vercel Cron — see
-[the tier list](#the-tier-list-honestly) for why. `CRON_SECRET` therefore has to exist in two
-places: Vercel, where the route checks it, and the repository's Actions secrets, where the
-workflow reads it from. A missing Actions secret fails the run loudly rather than silently
-skipping it.
+[the tier list](#the-tier-list-honestly) for why. The workflow runs the sampler **in the runner** rather than calling the site, so it needs
+`DATABASE_URL_UNPOOLED` and `BRAWL_STARS_API_KEY` as Actions secrets. `CRON_SECRET` is only
+needed by Vercel now, where it guards the manual trigger route.
 
-The workflow must also point at the **canonical domain**. It called the old `*.vercel.app`
-host until that was set to redirect, at which point every run failed: `curl` without `-L`
-sees the `308` and stops. Adding `-L` would not have helped either — the redirect crosses
-hosts, and curl drops the `Authorization` header on a cross-host redirect, trading the 308
-for a 401.
-
-`vercel.json` still declares two cron entries as a fallback, though they have not been
-observed firing.
-
-`vercel.json` also pins functions to `fra1`. The Neon database lives in `eu-central-1`, and
-the default region (`iad1`) put every query on a transatlantic round trip.
+`vercel.json` declares **no crons**. It only pins functions to `fra1`; the default region
+(`iad1`) put every query on a transatlantic round trip.
 
 ## The tier list, honestly
 
@@ -447,11 +445,19 @@ option unlocked.
 
 ## Storage
 
-The database is a free Neon instance: **512 MB of data** (`neon.max_cluster_size`, the limit
-that actually refuses writes) and a **0.5 GB plan allowance** that counts data *plus*
-retained WAL history. Those are two different numbers and it is easy to chase the wrong one
-— `pg_database_size` cannot see history at all, so the console can read 98% while Postgres
-reports 300 MB.
+The database is a free **Supabase** instance: **500 MB**, measured as database size and
+nothing else, which is what `pg_database_size` reports — so the console figure and Postgres
+agree.
+
+> Moved from Neon on 2026-08-25, after Neon's 5 GB/month egress cap suspended the database
+> mid-cycle. Comments elsewhere in this repo may still say Neon; the connection details in
+> `AGENTS.md` are authoritative. Neon billed data *plus* retained WAL, which
+> `pg_database_size` could not see — hence `HISTORY_RESERVE_BYTES`, kept at a smaller value
+> now only so the storage valve has room to act before the plan limit.
+
+Supabase's direct connection is IPv6-only and unreachable from Vercel or GitHub runners;
+everything uses the pooler. Session mode (5432) for migrations and the sampler, transaction
+mode (6543) for the app.
 
 ### Raw rows are staging, not data
 
@@ -466,7 +472,8 @@ the raw tables live just long enough to be folded into them:
 | `player_battle_daily` | day × player × brawler | 22 days |
 | `brawler_pair_daily` | day × brawler × opponent × side × result | 22 days |
 | `brawler_team_daily` | day × brawler (the pairing baseline) | 22 days |
-| `player_brawler_snapshots` | day × player × brawler | 2 days |
+| `player_brawler_snapshots` | day × player × brawler, **1 in 4 players** | 2 days |
+| `player_trophy_points` | day × player (written on profile views) | 120 days |
 
 The old 24-day raw window was sized for a sampling rate that had since quadrupled, and
 projected to ~990 MB against a 512 MB ceiling. Pruning harder could not fix it: 21 days is
@@ -500,14 +507,26 @@ frees pages inside the file for reuse, which stops growth, but the file only shr
 the reported size from 464 MB to 464 MB, and the rewrite that followed took it to 270 MB. A
 valve that waits until the disk is nearly full cannot save anything.
 
-`npm run db:storage` reports table sizes, reclaimable space and (with `NEON_API_KEY` set)
-Neon's own billed figures. `-- --reclaim` rebuilds bloated tables and indexes; it takes an
+`npm run db:storage` reports table sizes and reclaimable space. (The optional `NEON_API_KEY`
+path is a leftover from Neon and does nothing on Supabase, whose console figure and
+`pg_database_size` already agree.) `-- --reclaim` rebuilds bloated tables and indexes; it takes an
 exclusive lock, so it is opt-in and not something the cron does.
 
-## Cron budget
+## Sampling budget
 
-Vercel's Hobby plan caps an invocation at 300s (both the default and the maximum), and the
-run does real work against a remote database, so two things matter:
+Sampling runs in **GitHub Actions** (`.github/workflows/refresh-stats.yml`), every three
+hours, executing `npm run stats:refresh` in the runner. It does *not* run on Vercel and
+`vercel.json` declares no crons.
+
+> It used to `curl` `/api/cron/refresh-stats`, which made a Vercel Function do the work —
+> ~184s a run, eight times a day, or ~12.3 hours a month against a 4-hour Fluid Active CPU
+> allowance. The batch job alone could exceed the whole plan before a page rendered. The
+> route survives as a manual trigger.
+
+Because the 300s function ceiling no longer applies, `RUN_BUDGET_MS` is 600s (under the
+job's own `timeout-minutes: 15`) and `REQUEST_TIMEOUT_MS` is 20s. Both were raised after the
+first CI run timed out on 438 of 1,000 samples where a local machine managed 8 — GitHub's
+runners are a slower path to the API than Vercel's `fra1` was. Two things still matter:
 
 - **Writes are batched.** Recomputing stats with per-row upserts meant ~1,200 sequential
   round trips and took 112s. Delete-then-`createMany` is two round trips per table and
@@ -518,13 +537,13 @@ run does real work against a remote database, so two things matter:
 
 ### Tuning
 
-- Batch size: `POST /api/cron/refresh-stats?batch=200` (1–500, default 100). This is a
-  ceiling, not a target: `RUN_BUDGET_MS` stops sampling first, so an over-large batch costs
-  nothing beyond a shorter ranking pass.
+- Batch size: `DEFAULT_BATCH_SIZE` in `src/lib/aggregation.ts`, or `?batch=` on the manual
+  route (1–500). This is a ceiling, not a target: `RUN_BUDGET_MS` stops sampling first, so
+  an over-large batch costs nothing beyond a shorter ranking pass.
 - Run budget, ranking floor and recompute reserve: `RUN_BUDGET_MS`,
   `RANKING_MIN_BUDGET_MS` and `RECOMPUTE_RESERVE_MS` in `src/lib/aggregation.ts`. Keep
-  `RUN_BUDGET_MS` meaningfully below the route's `maxDuration`; overshooting returns a 504
-  and Vercel never retries a cron, so the slot is simply lost.
+  `RUN_BUDGET_MS` below the workflow's `timeout-minutes`; overshooting means the runner
+  kills the job mid-write and the slot is simply lost.
 - Window, concurrency, pool target and retry count: constants at the top of
   `src/lib/aggregation.ts`. Retention and the storage valve live there too —
   `ROLLUP_RETENTION_DAYS`, `PAIRING_ROLLUP_RETENTION_DAYS`, `SNAPSHOT_RETENTION_DAYS`,
@@ -555,7 +574,7 @@ Tags are passed without `#`. Errors return
 ## Project layout
 
 ```
-prisma/schema.prisma        Neon Postgres schema (raw samples, daily roll-ups, aggregates)
+prisma/schema.prisma        Postgres schema (raw samples, daily roll-ups, aggregates)
 prisma.config.ts            Prisma 7 config — migration datasource
 scripts/seed-stats.ts       Fills the sampling pool without a full run
 scripts/db-storage.ts       Storage report + opt-in reclaim (npm run db:storage)
