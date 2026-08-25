@@ -1,5 +1,14 @@
 import 'dotenv/config';
+
+import { config } from 'dotenv';
 import { defineConfig } from 'prisma/config';
+
+// `dotenv/config` only reads `.env`; Next.js projects keep secrets in
+// `.env.local`, so load that too without clobbering real env vars. Every other
+// script in this repo does the same — without it, `prisma migrate deploy` on a
+// developer machine fails with "datasource.url property is required" even
+// though the URL is sitting right there in .env.local.
+config({ path: '.env.local' });
 
 /**
  * Prisma 7 reads the migration connection URL from here rather than from
