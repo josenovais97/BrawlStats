@@ -7,11 +7,20 @@ import { getEventRotation } from '@/lib/bs-api';
 import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
 import type { BAGameMode, BAMap } from '@/types/brawlapi';
 
-/** Three live maps as a homepage teaser. Silent if the rotation is unavailable. */
-export async function HomeLiveEvents() {
+/**
+ * Three live maps as a homepage teaser. Silent if the rotation is unavailable.
+ *
+ * The TTL comes from the caller rather than the default, because a route's
+ * revalidate is the shortest-lived fetch inside it — and this component is the
+ * only thing on the homepage that fetches anything time-sensitive, so its TTL
+ * decides the whole route's. `/events` and `/maps` pass one for the same
+ * reason; leaving the 120s default here silently pinned the homepage to two
+ * minutes, which was ~21,600 ISR writes a month for one URL.
+ */
+export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
   let rotation;
   try {
-    rotation = await getEventRotation();
+    rotation = await getEventRotation(revalidate);
   } catch {
     return null;
   }

@@ -30,6 +30,31 @@ export const metadata: Metadata = {
   },
 };
 
+/*
+ * Ten minutes, and the constant below has to match.
+ *
+ * The homepage declared no revalidate at all, which does not mean "never
+ * revalidate" — it means the route inherits the shortest-lived fetch inside
+ * it, and `getEventRotation()` defaults to 120s. So the busiest URL on the
+ * site was rebuilding every two minutes: ~21,600 ISR writes and 0.6 GB of
+ * origin transfer a month for one page, which is 7% of the whole site's
+ * ceiling. `/maps` carries a comment about being caught by exactly this.
+ *
+ * Ten minutes rather than longer because the two genuinely live things here —
+ * the event rotation and the global top three — are the only reason this page
+ * is not simply static. It matches what `/events` shows. Everything else on
+ * the page reads the 1-hour data cache and never wanted two minutes.
+ */
+export const revalidate = 600;
+
+/**
+ * Must match `revalidate` above, and must be passed to every component that
+ * fetches something timed. Both `getEventRotation` and `getPlayerRankings`
+ * default to 120s, and either one left at its default silently sets the whole
+ * route — which is how this page came to rebuild every two minutes.
+ */
+const LIVE_REVALIDATE = 600;
+
 /**
  * Structured data for the search box, so the site can surface a search action
  * directly in results. The target has to be an absolute URL template.
@@ -120,7 +145,7 @@ export default function HomePage() {
             </div>
           }
         >
-          <HomeLiveEvents />
+          <HomeLiveEvents revalidate={LIVE_REVALIDATE} />
         </Suspense>
       </HomeSection>
 
@@ -134,7 +159,7 @@ export default function HomePage() {
       </HomeBand>
 
       <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
-        <HomeSnapshot />
+        <HomeSnapshot revalidate={LIVE_REVALIDATE} />
       </Suspense>
 
       {/*

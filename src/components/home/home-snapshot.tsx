@@ -23,7 +23,7 @@ import { TIER_COLOR } from '@/lib/tiers';
  * The ranking is the same cached query the account preview and the tools
  * section read, so the extra prominence costs nothing upstream.
  */
-export async function HomeSnapshot() {
+export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
   const top = await getTopMetaBrawlers(4).catch(() => []);
   const [leader, ...rest] = top;
 
@@ -173,7 +173,7 @@ export async function HomeSnapshot() {
             <TrophyIcon className="ml-auto size-4" />
           </p>
           <Suspense fallback={<Skeleton className="h-40 rounded-2xl" />}>
-            <TopPlayersPreview limit={3} />
+            <TopPlayersPreview limit={3} revalidate={revalidate} />
           </Suspense>
           <Link
             href="/leaderboard"

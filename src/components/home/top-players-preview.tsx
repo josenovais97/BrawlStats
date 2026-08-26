@@ -14,10 +14,23 @@ const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
  * Homepage teaser. A failure here must not take down the landing page, so any
  * error degrades to a quiet inline notice rather than an error boundary.
  */
-export async function TopPlayersPreview({ limit = 5 }: { limit?: number } = {}) {
+export async function TopPlayersPreview({
+  limit = 5,
+  /*
+   * Required rather than defaulted, deliberately. `getPlayerRankings` defaults
+   * to 120s and its own comment warns that one such call pins a whole route to
+   * two minutes — which is exactly what this component was doing to the
+   * homepage. A required prop makes the next caller state a TTL instead of
+   * inheriting that by omission.
+   */
+  revalidate,
+}: {
+  limit?: number;
+  revalidate: number;
+}) {
   let players;
   try {
-    players = (await getPlayerRankings('global', limit)).items;
+    players = (await getPlayerRankings('global', limit, revalidate)).items;
   } catch {
     return (
       <div className="card p-6 text-sm text-muted">
