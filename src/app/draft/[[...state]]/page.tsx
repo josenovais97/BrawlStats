@@ -76,8 +76,25 @@ export async function generateStaticParams() {
   return [{ state: [] as string[] }];
 }
 
-/** How many candidates to rank. */
+/** How many candidates to show. */
 const CANDIDATES = 12;
+
+/**
+ * How many to *consider* before the line-ups reorder them.
+ *
+ * Wider than `CANDIDATES` on purpose, and the distinction is the whole feature.
+ * Both pick queries cap what they return, so fetching `CANDIDATES` and then
+ * slicing to `CANDIDATES` after reordering made that slice a no-op: the counter
+ * and ally edges could only permute the map's top twelve. A brawler that hard-
+ * counters the enemy comp but sits thirteenth on the map could never appear,
+ * which is precisely the recommendation somebody opens this page for.
+ *
+ * Forty rather than everything because `getRankedMapPicks` publishes only picks
+ * above the map's baseline, so this is closer to "all of them" than it looks.
+ * With no enemies or allies named, every edge is zero and the order is
+ * unchanged from the map's own ranking — widening costs nothing there.
+ */
+const POOL = 40;
 
 export default async function DraftPage({ params }: PageProps) {
   const { state } = await params;
@@ -95,7 +112,7 @@ export default async function DraftPage({ params }: PageProps) {
    * right list and a twelfth of the length.
    */
   const [pool, catalogue, brawlerMeta, modeMeta] = await Promise.all([
-    getRankedMapPicks(CANDIDATES, RANKED_MAP_WINDOW_DAYS).catch(() => []),
+    getRankedMapPicks(POOL, RANKED_MAP_WINDOW_DAYS).catch(() => []),
     getActiveMaps().catch(() => []),
     getBrawlerMap().catch(() => new Map<number, BABrawler>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
@@ -128,7 +145,7 @@ export default async function DraftPage({ params }: PageProps) {
 
   // Sequential database reads keep the page to a single connection.
   const modePicks = selected
-    ? await getBestPicksByMode(CANDIDATES)
+    ? await getBestPicksByMode(POOL)
         .then((byMode) => byMode.get(selected.mode) ?? null)
         .catch(() => null)
     : null;

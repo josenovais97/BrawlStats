@@ -885,8 +885,6 @@ function splitStat(value: string): { main: string; hint: string | null } {
   return { main: main.trim() || value, hint: match ? match[2].trim() : null };
 }
 
-/** "HARD LANDING" -> "Hard Landing", for prose that quotes an API name. */
-
 /** ["A", "B", "C"] -> "A, B and C". Returns "none yet" for an empty list. */
 function listOf(items: string[]): string {
   if (items.length === 0) return 'none yet';

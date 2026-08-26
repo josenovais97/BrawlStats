@@ -115,28 +115,101 @@ directly.
 
 ### Caching
 
-| Data | Revalidate |
-| --- | --- |
-| Player, battle log, club | 60s |
-| Rankings, event rotation | 120s |
-| Brawler metadata (brawlapi) | 24h |
-| Tier list (reads Postgres) | 1h |
-| Aggregate database reads | 1h (`READ_CACHE_SECONDS`) |
+| Data | Revalidate | Where |
+| --- | --- | --- |
+| Player, battle log, club | 60s | `REVALIDATE_LIVE` in `lib/bs-api` |
+| Rankings, event rotation | 120s **default** | `REVALIDATE_SLOW` — every page overrides it, see below |
+| Brawler metadata (brawlapi) | 24h | `REVALIDATE_STATIC` in `lib/brawlapi` |
+| Aggregate database reads | 3h | `READ_CACHE_SECONDS` in `lib/stats` |
+| Tier lists, brawler pages, map pages, comparisons | 3h | route `revalidate` |
+| Home | 10m | route `revalidate` |
+| Leaderboards | 15m | route `revalidate` |
 
 Short windows keep lookups fresh while collapsing bursts of traffic into one upstream call,
 which is what keeps the site inside the API rate limit.
 
-The last row is about the database, not the game API. Most content routes are server-rendered per
-request — `/maps/[mode]/[map]` alone is 400+ URLs — so before caching, every crawler hit
-re-ran the aggregate queries. That was measured at 0.37 GB/day of egress against a 5 GB
-monthly allowance. The reads in `src/lib/stats.ts` are wrapped with `cachedRead`, so many
-renders share one query; `getBestPicksByMode` in particular is identical for every map page
-in a mode.
+The database rows are not about the game API. Content routes are ISR — `/maps/[mode]/[map]`
+alone is 400+ URLs — so before caching, every crawler hit re-ran the aggregate queries. That
+was measured at 0.37 GB/day of egress against a 5 GB monthly allowance. The reads in
+`src/lib/stats.ts` are wrapped with `cachedRead`, so many renders share one query;
+`getBestPicksByMode` in particular is identical for every map page in a mode.
+
+> **A route's revalidate is the shortest cache inside it, and the declaration is not
+> evidence.** `REVALIDATE_SLOW` is a *default*, and any page that leaves it alone is pinned
+> to two minutes however long its own `revalidate` says. This has now caught four routes.
+> `/maps` declared a full day and served an hour; the home page declared nothing and served
+> two minutes, because `getEventRotation` and `getPlayerRankings` were both left at their
+> defaults inside it — and fixing only one of them changed nothing, since the other still
+> set the floor.
+>
+> The build table reports the effective number, but only for statically rendered routes —
+> for ISR ones (`●`) the Revalidate column is blank, so those have to be read off a running
+> server:
+>
+> ```bash
+> npm run build
+> PID=$(ss -ltnp | grep ':3111' | grep -oP 'pid=\K[0-9]+'); [ -n "$PID" ] && kill "$PID"
+> npx next start -p 3111 &
+> curl -sI localhost:3111/ | grep -i cache-control
+> ```
+>
+> **Kill the old server by port, not by name.** `next start` renames its process to
+> `next-server`, so `pkill -f "next start"` silently misses it; the stale server keeps the
+> port, the new one dies on `EADDRINUSE`, and you spend an hour measuring the previous
+> build. That is not hypothetical — it produced three contradictory readings before anyone
+> noticed the server had never restarted.
 
 `getLastAggregationRun` is deliberately **not** cached. It is the site's own freshness claim
 ("Sampled 2 hours ago"), and a cached freshness claim is a contradiction — it reported
 superseded runs until it was excluded. Anything keyed by player tag is uncached too: those
 answer "how am *I* doing" for someone who has usually just played.
+
+### What crawlers are allowed to reach
+
+Egress does not scale with visitors — pages are served from ISR — but it *does* scale with
+the number of distinct URLs a crawler can reach, and nothing about adding a route makes that
+number visible. On 2026-08-25 the draft helper moved its state from query parameters into the
+path, which is correct for caching (`searchParams` opts a route out of it entirely) and
+turned an unenumerable tool into roughly 3x10^11 addressable URLs, each linking to ~212
+others. A crawler walked in and exhausted the Vercel plan's CPU and origin-transfer
+allowances inside a day.
+
+One policy, in `src/lib/crawl-policy.ts`, enforced twice:
+
+| | |
+| --- | --- |
+| `robots.txt` | `src/app/robots.ts` prints `CRAWLER_DISALLOW` for `*`, and `SOCIAL_DISALLOW` for the named unfurlers |
+| The edge | `src/proxy.ts` answers 404 before any render, for anything the same policy forbids |
+
+`robots.txt` is the fix; the proxy is the enforcement, for crawlers that ignore it and for
+the day or so where a well-behaved one is still working from a cached copy. Refusing at the
+edge turns a page view costing a database round trip, an ISR write and ~200 KB into a regex
+test — measured at 70,108 bytes down to 11.
+
+Two rules make this work and are easy to break:
+
+- **`noindex` cannot help here.** A crawler has to fetch the URL to read the directive, and
+  the fetch *is* the cost. Only `robots.txt` prevents the request.
+- **Unfurlers are exempt, and that is deliberate.** Twitter, Facebook, Discord, WhatsApp and
+  Telegram fetch one URL somebody chose to share; a search crawler walks every URL it can
+  find. Blocking them would mean a profile pasted into a club chat unfurls as nothing, which
+  is the site's whole word-of-mouth loop. They are still kept out of `/api/`.
+
+`crawl-policy.test.ts` fails if the proxy matcher stops covering a disallowed prefix — the
+two cannot be built from one list, because `config.matcher` has to be statically analysable.
+
+**Measure it rather than reasoning about it:**
+
+```bash
+npm run build && npx next start -p 3111 &
+npm run crawl:budget
+```
+
+It walks the site the way a crawler does — same origin, `<a href>` only, obeying `robots.txt`
+and `rel="nofollow"` — and prints the reachable set per section. It exits non-zero if the
+walk does not terminate. Currently **421 URLs** link-reachable, ~1,000 counting the sitemap.
+Run it after adding any route with a dynamic segment, and check the new route's count is a
+number you can explain.
 
 ### Error handling
 
@@ -578,6 +651,7 @@ prisma/schema.prisma        Postgres schema (raw samples, daily roll-ups, aggreg
 prisma.config.ts            Prisma 7 config — migration datasource
 scripts/seed-stats.ts       Fills the sampling pool without a full run
 scripts/db-storage.ts       Storage report + opt-in reclaim (npm run db:storage)
+scripts/crawl-budget.mjs    What a crawler can reach (npm run crawl:budget)
 src/lib/bs-api.ts           Official API client (server-only, via RoyaleAPI proxy)
 src/lib/brawlapi.ts         Keyless artwork/metadata client
 src/lib/aggregation.ts      Sampling + aggregation pipeline (write side)
@@ -587,6 +661,9 @@ src/lib/progression.ts      Economy table and account-completion maths
 src/lib/regions.ts          Full ISO country list for the leaderboard
 src/lib/recent-searches.ts  localStorage-backed recent tags (client-only)
 src/lib/tags.ts             Tag normalise / validate / encode
+src/lib/crawl-policy.ts     Disallowed paths + unfurler exemption, read by robots and proxy
+src/lib/draft-route.ts      The draft helper's URL scheme
+src/proxy.ts                Legacy query-string redirects, and the edge crawl guard
 src/lib/errors.ts           Shared error vocabulary and user-facing copy
 src/types/                  Interfaces for every API response and DB row
 ```

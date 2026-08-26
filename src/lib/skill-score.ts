@@ -446,4 +446,3 @@ function detectFlag({
   return null;
 }
 
-/** "MASTERS II" -> "Masters II". Roman numerals stay upper-case. */

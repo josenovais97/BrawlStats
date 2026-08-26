@@ -19,14 +19,24 @@ export const metadata: Metadata = {
   alternates: { canonical: '/maps' },
 };
 
-/** Artwork only; the per-map numbers live on the map pages themselves. */
-export const revalidate = 86400;
-
 /*
- * The rotation call's own TTL, which is what actually decides this page: at the
- * 120s default it pinned a route declaring a full day down to two minutes.
- * An hour is plenty for the "live now" marks the catalogue shows.
+ * One hour, and it says one hour because that is what it is.
+ *
+ * This declared 86400 while `ROTATION_REVALIDATE` below held the route to
+ * 3600 — the comment there already knew the rotation call decides the page,
+ * but the declaration was never brought into line, so the file claimed a day
+ * and delivered an hour. Harmless in cost (this is one URL) and misleading to
+ * read, which is the failure mode the whole trap is about: a declaration is
+ * not evidence, and one that disagrees with the served `s-maxage` is worse
+ * than none.
+ *
+ * An hour is the right number. The artwork is static and the per-map figures
+ * live on the map pages, but the catalogue also marks what is live right now,
+ * and that is worth an hour rather than a day.
  */
+export const revalidate = 3600;
+
+/** Must match `revalidate` above: this is the call that decides the route. */
 const ROTATION_REVALIDATE = 3600;
 
 export default async function MapsIndexPage() {

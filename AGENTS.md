@@ -50,6 +50,17 @@ ran at **120 seconds** because one ranking call used the default. **The build
 output prints the effective number; the declaration is not evidence.** For ISR
 routes the table shows no value, so read `s-maxage` off a running server.
 
+Since then, three more. `/maps` declared 86400 and served 3600. The home page
+declared *nothing* — which is not "never revalidate" but "inherit the shortest
+fetch inside me" — and served 120 from two separate defaults, so fixing one
+changed nothing because the other still set the floor. Fix every one of them,
+then re-measure; one page can have more than one.
+
+When you re-measure, kill the old server **by port**. `next start` renames its
+process to `next-server`, so `pkill -f "next start"` silently misses it, the new
+server dies on `EADDRINUSE`, and you read the previous build's headers while
+believing you rebuilt.
+
 **3. Scripts importing `lib/` need `--conditions=react-server`.** `lib/stats`,
 `lib/bs-api` and `lib/prisma` all `import 'server-only'`, which throws outside a
 server bundle. The condition resolves it to an empty module. `npm test` and
