@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 
+import { CRAWLER_DISALLOW, SOCIAL_AGENTS, SOCIAL_DISALLOW } from '@/lib/crawl-policy';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -45,15 +46,6 @@ import { SITE_URL } from '@/lib/site';
  * URL it can find.
  */
 
-/** Unfurlers, which fetch one deliberately-shared URL rather than crawling. */
-const SOCIAL_AGENTS = [
-  'Twitterbot',
-  'facebookexternalhit',
-  'Discordbot',
-  'WhatsApp',
-  'TelegramBot',
-];
-
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -61,33 +53,20 @@ export default function robots(): MetadataRoute.Robots {
         userAgent,
         allow: '/',
         // The API is not a document set for anyone, unfurler or otherwise.
-        disallow: ['/api/'],
+        disallow: [...SOCIAL_DISALLOW],
       })),
       {
         userAgent: '*',
         allow: '/',
         /*
-         * Three unbounded spaces, blocked at the door rather than at the page.
-         *
-         * `/player/` and `/club/` are one URL per tag in existence. `/draft/`
-         * and `/compare/players/` are worse than that: they are *combinatorial*.
-         * A draft state spells map, up to three enemies and up to two allies
-         * into the path, and every draft page links to every next state — ~212
-         * of them — so the reachable set is ~27 maps x 1.2M enemy orderings x
-         * ~10k ally orderings. Every one of those is a real 200 with a full
-         * render and an ISR write behind it.
-         *
-         * `noindex` on the page cannot help here: a crawler has to fetch the
-         * URL to read the directive, and the fetch is the entire cost. Only
-         * robots.txt stops the request from being made. The states are still
-         * shareable and still work for anyone who opens one — see the comment
-         * above about a blocked path never stopping a direct visit.
-         *
-         * `/draft` itself is deliberately not blocked. A robots.txt rule is a
-         * prefix match, so `/draft/` leaves the bare board — the URL that is
-         * linked, listed in the sitemap and worth indexing — crawlable.
+         * Both lists live in `@/lib/crawl-policy`, which explains what is on
+         * them and why. They are shared because `src/proxy.ts` enforces the
+         * same policy at the edge for crawlers that ignore this file, and the
+         * two cannot be allowed to drift: a path blocked here but served there
+         * is the cost this file exists to remove, and a path served here but
+         * blocked there is a feature quietly broken.
          */
-        disallow: ['/api/', '/player/', '/club/', '/draft/', '/compare/players/'],
+        disallow: [...CRAWLER_DISALLOW],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

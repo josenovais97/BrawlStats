@@ -33,7 +33,7 @@ functions and GitHub runners are IPv4, so it is unreachable from both. Everythin
 goes through the pooler: session mode (5432) for migrations and the sampler,
 transaction mode (6543) for the app.
 
-## Four traps that cost real outages
+## Five traps that cost real outages
 
 **1. `revalidate` does nothing without `generateStaticParams`.** A dynamic route
 that exports `revalidate` but no `generateStaticParams` is *not* ISR — Next
@@ -59,6 +59,22 @@ server bundle. The condition resolves it to an empty module. `npm test` and
 compiles to CommonJS where top-level `await` is a *parse* error. `tsc --noEmit`,
 eslint and `next build` all pass on it because none of them execute the file.
 
+**5. Moving a tool's state from the query string into the path makes it
+crawlable.** Query parameters are one URL; path segments are a URL each, and
+`next build` prints the same single line for `/draft/[[...state]]` whether that
+route addresses one page or 3x10^11. On 2026-08-25 the draft helper made that
+move — correctly, since `searchParams` opts a route out of caching — and every
+draft page links to every next state, so a crawler found ~27 maps x 1.2M enemy
+orderings x 10k ally orderings, each a full render plus an ISR write plus
+~200 KB. It exhausted the Hobby plan's Fluid CPU and origin transfer inside a
+day and paused the site for the rest of the cycle.
+
+`noindex` is not the fix — a crawler has to fetch the URL to read it, and the
+fetch is the whole cost. The fix is `robots.txt`, enforced at the edge by
+`src/proxy.ts` for anything that ignores it. Both read `CRAWLER_DISALLOW` in
+`lib/crawl-policy`; `crawl-policy.test.ts` fails if the proxy matcher stops
+covering a blocked prefix.
+
 ## Limits, and which defend themselves
 
 Storage **self-corrects**: `pressureFor()` in `lib/aggregation` shortens
@@ -71,6 +87,19 @@ reads are served from ISR plus a 3-hour data cache, so egress is driven by the
 sampler's fixed 8 runs/day and does *not* scale with visitors. That is reasoning,
 not a measurement. If egress climbs, the first thing to check is whether
 something started reading uncached.
+
+That reasoning has one load-bearing assumption, and trap 5 is what happens when
+it quietly stops holding: egress does not scale with visitors, but it scales
+with the number of *distinct URLs* a crawler can reach, and nothing about
+adding a route makes that number visible. So it is now measured rather than
+argued. `npm run crawl:budget` walks the site the way a crawler does — same
+origin, `<a href>` only, obeying `robots.txt` and `rel="nofollow"` — and prints
+the reachable set per section, currently **421 URLs** link-reachable and ~1,000
+counting the sitemap. It exits non-zero if the walk does not terminate.
+
+**Run it against a local `next start` after adding any route with a dynamic
+segment**, and check the new route's count is a number you can explain. The
+answer to "is this bounded?" is the output of that command, not an argument.
 
 **Do not raise sampling frequency, pool size, or any retention window without
 re-deriving the plateau.** `storage-pressure.test.ts` and

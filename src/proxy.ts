@@ -8,6 +8,7 @@ import {
   leaderboardHref,
 } from '@/lib/leaderboard-route';
 import { MAX_ENEMIES, draftHref } from '@/lib/draft-route';
+import { shouldBlockCrawl } from '@/lib/crawl-policy';
 import { slugify } from '@/lib/slugs';
 
 /**
@@ -111,8 +112,36 @@ function canonicalPath(pathname: string, searchParams: URLSearchParams): string 
   return null;
 }
 
+/**
+ * Answered before anything renders, which is the entire point.
+ *
+ * A crawler reaching a disallowed path has already ignored `robots.txt`, or is
+ * working from a cached copy of it and a queue of URLs discovered before the
+ * rule existed. Either way the page behind it costs a database round trip, an
+ * ISR write and a couple of hundred kilobytes of origin transfer, and refusing
+ * here costs a regex test.
+ *
+ * 404 rather than 403: it is the same answer the draft page already gives a
+ * path shape it does not have, and it is the one a crawler responds to by
+ * dropping the URL rather than retrying it. No body, because the recipient is
+ * a machine and every byte here is billed as origin transfer.
+ */
+const CRAWLER_REFUSED = 'Not found.\n';
+
 export function proxy(request: NextRequest): NextResponse | undefined {
   const { pathname, searchParams } = request.nextUrl;
+
+  if (shouldBlockCrawl(pathname, request.headers.get('user-agent'))) {
+    return new NextResponse(CRAWLER_REFUSED, {
+      status: 404,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        // Nothing downstream should hold this: the same URL served to a person
+        // is a real page, and only the user agent decided otherwise.
+        'cache-control': 'no-store',
+      },
+    });
+  }
 
   const target = canonicalPath(pathname, searchParams);
   if (!target) return;
@@ -127,6 +156,29 @@ export function proxy(request: NextRequest): NextResponse | undefined {
   return NextResponse.redirect(url, 308);
 }
 
+/**
+ * Two jobs, so two sets of paths.
+ *
+ * The first four are the legacy query-string redirects above. The rest are
+ * `CRAWLER_DISALLOW`, spelled as matchers because this file cannot read that
+ * list at build time — `config` has to be statically analysable, so a
+ * mismatch is caught by `crawl-policy.test.ts` rather than by the compiler.
+ *
+ * `/player/:path*` is on the hot path and the cost of putting it here is one
+ * regex test per profile view. It earns that many times over: `/player/[tag]`
+ * is the only route on the site that renders fully per request *and* makes an
+ * upstream API call, so it is the most expensive thing a crawler can find.
+ */
 export const config = {
-  matcher: ['/tier-list/:path*', '/compare', '/leaderboard', '/draft'],
+  matcher: [
+    '/tier-list/:path*',
+    '/compare',
+    '/leaderboard',
+    '/draft',
+    '/api/:path*',
+    '/player/:path*',
+    '/club/:path*',
+    '/draft/:path*',
+    '/compare/players/:path*',
+  ],
 };

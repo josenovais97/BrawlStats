@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx scripts/seed-stats.ts",
     "db:storage": "tsx scripts/db-storage.ts",
-    "stats:refresh": "node --import tsx --conditions=react-server scripts/refresh-stats.ts"
+    "stats:refresh": "node --import tsx --conditions=react-server scripts/refresh-stats.ts",
+    "crawl:budget": "node scripts/crawl-budget.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
