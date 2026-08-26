@@ -34,15 +34,35 @@ import {
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { ModePick, RankedMapPick, RankedMapPicks } from '@/types/stats';
 
-export const metadata: Metadata = {
-  title: 'Brawl Stars draft helper. Pick against the enemy team',
-  description:
-    'Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.',
-  // Self-canonical, and deliberately so: every map and enemy combination is
-  // its own URL — that is the point of the tool — but only the empty state is
-  // worth indexing. The rest are a tool's working state, not documents.
-  alternates: { canonical: '/draft' },
-};
+interface PageProps {
+  params: Promise<{ state?: string[] }>;
+}
+
+/**
+ * Only the bare board is a document; every picked state is working state.
+ *
+ * Self-canonical and `noindex` for anything below `/draft`, which matches what
+ * `/compare/[pair]` and `/compare/players/[a]/[b]` already do. `robots.txt`
+ * blocks these paths outright and is what actually saves the render — this is
+ * the belt to that pair of braces, for a crawler that ignores robots.txt and
+ * for anything that reaches a state by other means.
+ *
+ * `follow: false` as well as `index: false`, unlike the compare routes: those
+ * link outward to pages worth discovering, whereas every link on a picked
+ * draft state points at another draft state.
+ */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { state } = await params;
+  const picked = (state ?? []).length > 0;
+
+  return {
+    title: 'Brawl Stars draft helper. Pick against the enemy team',
+    description:
+      'Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.',
+    alternates: { canonical: '/draft' },
+    ...(picked ? { robots: { index: false, follow: false } } : {}),
+  };
+}
 
 export const revalidate = 3600;
 
@@ -58,10 +78,6 @@ export async function generateStaticParams() {
 
 /** How many candidates to rank. */
 const CANDIDATES = 12;
-
-interface PageProps {
-  params: Promise<{ state?: string[] }>;
-}
 
 export default async function DraftPage({ params }: PageProps) {
   const { state } = await params;
@@ -205,6 +221,8 @@ export default async function DraftPage({ params }: PageProps) {
                     <Link
                       key={slot}
                       href={hrefFor({ enemy: enemies.filter((other) => other !== id) })}
+                      rel="nofollow"
+                      prefetch={false}
                       title={`Remove ${meta?.name ?? id}`}
                       className="group flex items-center gap-2 rounded-xl border border-defeat/40 bg-defeat/10 px-2.5 py-2 text-sm font-semibold capitalize"
                     >
@@ -235,6 +253,8 @@ export default async function DraftPage({ params }: PageProps) {
                 {enemies.length > 0 ? (
                   <Link
                     href={hrefFor({ enemy: [] })}
+                    rel="nofollow"
+                    prefetch={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
                   >
                     Clear
@@ -270,6 +290,7 @@ export default async function DraftPage({ params }: PageProps) {
                     <Link
                       key={slot}
                       href={hrefFor({ ally: allies.filter((other) => other !== id) })}
+                      rel="nofollow"
                       prefetch={false}
                       title={`Remove ${meta?.name ?? id}`}
                       className="group flex items-center gap-2 rounded-xl border border-victory/40 bg-victory/10 px-2.5 py-2 text-sm font-semibold capitalize"
@@ -301,6 +322,7 @@ export default async function DraftPage({ params }: PageProps) {
                 {allies.length > 0 ? (
                   <Link
                     href={hrefFor({ ally: [] })}
+                    rel="nofollow"
                     prefetch={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
                   >
@@ -522,6 +544,8 @@ function MapChooser({
                     <li key={`${map.mode}-${map.mapName}`}>
                       <Link
                         href={draftHref({ mode: map.mode, map: map.mapName })}
+                        rel="nofollow"
+                        prefetch={false}
                         className="card card-interactive group block h-full overflow-hidden"
                       >
                         <MapArt
@@ -583,6 +607,7 @@ function BrawlerChooser({
           <li key={brawler.id}>
             <Link
               href={onPick(brawler.id)}
+              rel="nofollow"
               prefetch={false}
               className="flex flex-col items-center gap-1 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
             >

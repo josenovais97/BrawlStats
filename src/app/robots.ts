@@ -66,7 +66,28 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/player/', '/club/'],
+        /*
+         * Three unbounded spaces, blocked at the door rather than at the page.
+         *
+         * `/player/` and `/club/` are one URL per tag in existence. `/draft/`
+         * and `/compare/players/` are worse than that: they are *combinatorial*.
+         * A draft state spells map, up to three enemies and up to two allies
+         * into the path, and every draft page links to every next state — ~212
+         * of them — so the reachable set is ~27 maps x 1.2M enemy orderings x
+         * ~10k ally orderings. Every one of those is a real 200 with a full
+         * render and an ISR write behind it.
+         *
+         * `noindex` on the page cannot help here: a crawler has to fetch the
+         * URL to read the directive, and the fetch is the entire cost. Only
+         * robots.txt stops the request from being made. The states are still
+         * shareable and still work for anyone who opens one — see the comment
+         * above about a blocked path never stopping a direct visit.
+         *
+         * `/draft` itself is deliberately not blocked. A robots.txt rule is a
+         * prefix match, so `/draft/` leaves the bare board — the URL that is
+         * linked, listed in the sitemap and worth indexing — crawlable.
+         */
+        disallow: ['/api/', '/player/', '/club/', '/draft/', '/compare/players/'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

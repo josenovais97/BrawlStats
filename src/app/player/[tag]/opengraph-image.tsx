@@ -33,6 +33,16 @@ export const contentType = 'image/png';
 /** Matches the page it represents, so a shared card is never wildly stale. */
 export const revalidate = 3600;
 
+/*
+ * Runtime ISR. Without this the `revalidate` above does nothing: a dynamic
+ * route with no `generateStaticParams` is re-rendered per request, and this
+ * one rasterises a 1200x630 PNG through Satori on every one of them. Same
+ * trap the four other image routes carry this same line to avoid.
+ */
+export async function generateStaticParams() {
+  return [];
+}
+
 export default async function Image({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params;
 
