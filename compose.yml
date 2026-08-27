@@ -103,11 +103,13 @@ services:
   # Batch sampler. Built from the `builder` stage because it needs tsx, the dev
   # dependencies and scripts/ -- none of which survive into the standalone
   # runtime image. Behind a profile so it never starts with the stack; a
-  # systemd timer runs it every three hours via `docker compose run --rm`.
+  # systemd timer runs it every two hours via `docker compose run --rm`.
   #
-  # Three hours is set by the battle log, not by cost: it holds a player's last
-  # ~25 matches and there is no history endpoint, so anything played beyond
-  # that between samples is lost permanently.
+  # The interval is set by the battle log, not by cost: it holds a player's
+  # last ~25 matches with no history endpoint, so anything beyond that between
+  # samples is lost permanently. Measured on the box 2026-08-27, 13.2% of
+  # active player-windows were already at or past 25 battles in three hours
+  # (p95 30, max 59), so the interval halved.
   sampler:
     build:
       context: .
