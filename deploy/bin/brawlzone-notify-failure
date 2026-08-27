@@ -1,17 +1,39 @@
 #!/usr/bin/env bash
-# Called by systemd OnFailure=. Emails the failed unit's recent log.
+# Called by systemd OnFailure=. Emails the failed unit's recent log as HTML.
 set -uo pipefail
+# shellcheck disable=SC1091
+. /usr/local/lib/brawlzone-html.sh
+
 unit="${1:?unit name required}"
 name="${unit%.service}"; name="${name#brawlzone-}"
+logfile="/var/log/brawlzone/${name}.log"
+
+result=$(systemctl show "$unit" -p Result --value 2>/dev/null)
+status=$(systemctl show "$unit" -p ExecMainStatus --value 2>/dev/null)
+when=$(systemctl show "$unit" -p ExecMainExitTimestamp --value 2>/dev/null)
 
 {
-  echo "Unit:   $unit"
-  echo "Result: $(systemctl show "$unit" -p Result --value 2>/dev/null)"
-  echo "Exit:   $(systemctl show "$unit" -p ExecMainStatus --value 2>/dev/null)"
-  echo "When:   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  echo
-  echo "--- last 40 lines of /var/log/brawlzone/${name}.log ---"
-  # Colour codes are in the file; strip them so the email is readable.
-  tail -40 "/var/log/brawlzone/${name}.log" 2>/dev/null | sed -E 's/\x1b\[[0-9;]*m//g' \
-    || echo "(no file log; see journalctl -u $unit)"
-} | /usr/local/bin/brawlzone-alert "FAILED: $unit"
+  html_open "Job failed &mdash; $name" "$unit &middot; exit $status" "$BAD"
+
+  html_section "What happened"
+  html_rows_open
+  html_row "Unit" "$unit"
+  html_row "Result" "${result:-unknown}" "$BAD"
+  html_row "Exit code" "${status:-?}" "$BAD"
+  html_row "Failed at" "${when:-just now}"
+  html_rows_close
+
+  html_section "Last 40 log lines"
+  # Colour codes live in the file; strip them or the mail shows escape noise.
+  if [ -r "$logfile" ]; then
+    tail -40 "$logfile" | sed -E 's/\x1b\[[0-9;]*m//g' | html_pre
+  else
+    printf 'No file log at %s -- try: journalctl -u %s -n 50\n' "$logfile" "$unit" | html_pre
+  fi
+
+  html_section "Next steps"
+  printf 'ssh brawlzone\n  brawlzone-log %s          # full log, coloured\n  sudo systemctl status %s\n  sudo systemctl start %s   # retry\n' \
+    "$name" "$unit" "$unit" | html_pre
+
+  html_close "brawlzone-web &middot; sent because $unit exited non-zero.<br>The daily digest arrives separately at 08:00 UTC."
+} | /usr/local/bin/brawlzone-alert --html "[brawlzone] FAILED: $name (exit $status)"

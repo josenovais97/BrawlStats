@@ -1,0 +1,7 @@
+[Unit]
+Description=BrawlZone daily status email
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/brawlzone-run digest /usr/local/bin/brawlzone-digest

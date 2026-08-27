@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily status email at 08:00 UTC
+
+[Timer]
+# After the 03:30 backup and the 06:17 sampler run, so the digest reports on a
+# complete night rather than mid-cycle.
+OnCalendar=*-*-* 08:00:00
+Persistent=true
+Unit=brawlzone-digest.service
+
+[Install]
+WantedBy=timers.target

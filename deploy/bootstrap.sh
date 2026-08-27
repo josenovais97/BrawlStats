@@ -66,7 +66,10 @@ sudo install -d -o "$USER_NAME" -g "$USER_NAME" -m 755 /var/lib/brawlzone
 sudo usermod -aG adm "$USER_NAME"
 
 say "Scripts"
+sudo install -d -m 755 /usr/local/lib
+sudo install -m 644 "$REPO_DIR/deploy/bin/brawlzone-html.sh" /usr/local/lib/brawlzone-html.sh
 for f in "$REPO_DIR"/deploy/bin/brawlzone-*; do
+  [ "$(basename "$f")" = "brawlzone-html.sh" ] && continue
   sudo install -m 755 "$f" "/usr/local/bin/$(basename "$f")"
 done
 install -m 755 "$REPO_DIR/deploy/bin/auto-deploy.sh" "$HOME/auto-deploy.sh"
@@ -116,6 +119,10 @@ EOF
   sudo chmod 600 /etc/brawlzone/msmtprc
   printf 'SMTP_USER=REPLACE_WITH_YOUR_GMAIL\nALERT_TO=contacts@brawlzone.net\n' \
     | sudo tee /etc/brawlzone/alert.conf >/dev/null
+  # alert.conf carries no secret, so group-readable: a non-root caller then
+  # gets a clear error instead of silently dropping the mail. msmtprc holds
+  # the app password and stays 600 root, which is why the digest runs as root.
+  sudo chgrp adm /etc/brawlzone/alert.conf
   sudo chmod 640 /etc/brawlzone/alert.conf
 fi
 sudo touch /var/log/brawlzone/alert.log
@@ -123,7 +130,8 @@ sudo chgrp adm /var/log/brawlzone/alert.log && sudo chmod 660 /var/log/brawlzone
 
 say "Timers"
 sudo systemctl enable --now brawlzone-deploy.timer brawlzone-sampler.timer \
-                            brawlzone-backup.timer brawlzone-health.timer >/dev/null
+                            brawlzone-backup.timer brawlzone-health.timer \
+                            brawlzone-digest.timer >/dev/null
 
 cat <<EOF
 

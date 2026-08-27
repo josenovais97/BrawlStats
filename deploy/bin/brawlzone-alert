@@ -1,44 +1,52 @@
 #!/usr/bin/env bash
-# Send an alert email. Body is read from stdin.
+# Send an alert or digest email. Body is read from stdin.
 #
-#   brawlzone-alert "subject" < body.txt
-#   echo "text" | brawlzone-alert "subject"
+#   brawlzone-alert "subject" < body.txt          # plain text
+#   brawlzone-alert --html "subject" < body.html  # pre-rendered HTML
 #
 # Port 25 outbound is blocked by Oracle and Cloudflare Email Routing is
 # receive-only, so this relays through Gmail on 587. contacts@brawlzone.net is
-# the destination, not the sender -- you cannot send *from* a Cloudflare
-# routing address.
+# the destination, never the sender.
 #
-# Exits 0 even when mail fails: this is called from systemd OnFailure= handlers,
-# and an alerter that itself fails loudly just adds a second broken unit. The
-# failure is logged instead.
+# Exits 0 even when mail fails: it is called from systemd OnFailure= handlers,
+# and an alerter that fails loudly just adds a second broken unit.
 set -uo pipefail
 
 CONF=/etc/brawlzone/alert.conf
-TO="${ALERT_TO:-contacts@brawlzone.net}"
-host=$(hostname)
+html=0
+[ "${1:-}" = "--html" ] && { html=1; shift; }
 
-[ -r "$CONF" ] || { echo "no $CONF -- alerting not configured yet" >&2; exit 0; }
+TO="${ALERT_TO:-contacts@brawlzone.net}"
+
+# Read stdin FIRST, before anything that can exit. Exiting early closes the
+# pipe and SIGPIPEs whatever is still writing -- which is how a misconfigured
+# alerter turned into "brawlzone-digest fails with Broken pipe" and hid its own
+# cause. Whatever happens below, the caller gets to finish writing.
+body=$(cat)
+
+[ -r "$CONF" ] || { echo "no $CONF (or not readable as $(id -un)) -- alert dropped" >&2; exit 0; }
 # shellcheck disable=SC1090
 . "$CONF"
 
 subject="${1:-BrawlZone alert}"
-body=$(cat)
+host=$(hostname)
+log=/var/log/brawlzone/alert.log
 
-if ! command -v msmtp >/dev/null; then
-  echo "msmtp not installed; alert dropped: $subject" >&2
-  exit 0
-fi
+command -v msmtp >/dev/null || { echo "msmtp missing; dropped: $subject" >&2; exit 0; }
 
 {
   printf 'From: BrawlZone <%s>\n' "$SMTP_USER"
   printf 'To: %s\n' "$TO"
-  printf 'Subject: [brawlzone] %s\n' "$subject"
-  printf 'Content-Type: text/plain; charset=utf-8\n'
-  printf '\n'
-  printf '%s\n' "$body"
-  printf '\n-- \n%s at %s\n' "$host" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-} | msmtp --file=/etc/brawlzone/msmtprc "$TO" 2>>/var/log/brawlzone/alert.log \
-  && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  sent: $subject" >> /var/log/brawlzone/alert.log \
-  || echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  FAILED to send: $subject" >> /var/log/brawlzone/alert.log
+  printf 'Subject: %s\n' "$subject"
+  printf 'MIME-Version: 1.0\n'
+  if [ "$html" -eq 1 ]; then
+    printf 'Content-Type: text/html; charset=utf-8\n\n'
+    printf '%s\n' "$body"
+  else
+    printf 'Content-Type: text/plain; charset=utf-8\n\n'
+    printf '%s\n\n-- \n%s at %s\n' "$body" "$host" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  fi
+} | msmtp --file=/etc/brawlzone/msmtprc "$TO" 2>>"$log" \
+  && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  sent: $subject" >> "$log" \
+  || echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  FAILED to send: $subject" >> "$log"
 exit 0

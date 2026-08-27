@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# Daily status email: what the box did in the last 24 hours.
+#
+# Deliberately a digest rather than a dashboard. The point is that reading it
+# takes ten seconds and anything wrong is obvious without clicking anything --
+# a daily mail nobody reads is worse than no mail.
+set -uo pipefail
+# shellcheck disable=SC1091
+. /usr/local/lib/brawlzone-html.sh
+
+REPO=/home/ubuntu/brawlstats
+ACCESS=/var/log/brawlzone/access.log
+psql() { (cd "$REPO" && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc "$1" 2>/dev/null); }
+
+# ---- gather -----------------------------------------------------------------
+code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://brawlzone.net/ || echo 000)
+ttfb=$(curl -s -o /dev/null -w '%{time_total}' --max-time 20 https://brawlzone.net/ || echo 0)
+[ "$code" = "200" ] && { site_c=$OK; site_v="$code &middot; $(printf '%.0f' "$(echo "$ttfb*1000" | bc -l 2>/dev/null || echo 0)")ms"; } \
+                    || { site_c=$BAD; site_v="HTTP $code"; }
+
+disk_pct=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+disk_h=$(df -h --output=used,size / | tail -1 | tr -s ' ' | sed 's/^ //;s/ / of /')
+mem=$(free -m | awk 'NR==2{printf "%.1f of %.1f GB (%d%%)", $3/1024, $2/1024, ($2-$7)*100/$2}')
+load=$(uptime | sed -E 's/.*load average: //')
+up=$(uptime -p | sed 's/^up //')
+
+containers=$(cd "$REPO" && docker compose ps --format '{{.Service}} {{.Status}}' 2>/dev/null)
+unhealthy=$(printf '%s\n' "$containers" | grep -vc 'Up ' || true)
+
+db_size=$(psql "select pg_size_pretty(pg_database_size(current_database()));")
+runs24=$(psql "select count(*) from aggregation_runs where started_at > now() - interval '24 hours';")
+players24=$(psql "select coalesce(sum(players_sampled),0) from aggregation_runs where started_at > now() - interval '24 hours';")
+battles24=$(psql "select coalesce(sum(battles_recorded),0) from aggregation_runs where started_at > now() - interval '24 hours';")
+last_run=$(psql "select to_char(max(started_at),'YYYY-MM-DD HH24:MI')||' UTC' from aggregation_runs;")
+last_age=$(psql "select extract(epoch from (now()-max(started_at)))::int from aggregation_runs;")
+last_status=$(psql "select status from aggregation_runs order by started_at desc limit 1;")
+battles_total=$(psql "select to_char(count(*),'FM999G999G999') from battle_samples;")
+
+bk_n=$(ls -1 /home/ubuntu/backups/brawlzone-*.sql.gz 2>/dev/null | wc -l)
+bk_new=$(ls -1t /home/ubuntu/backups/brawlzone-*.sql.gz 2>/dev/null | head -1)
+bk_when=$([ -n "$bk_new" ] && date -u -r "$bk_new" +'%Y-%m-%d %H:%M UTC' || echo 'none')
+bk_size=$(du -sh /home/ubuntu/backups 2>/dev/null | cut -f1)
+
+reqs=$(wc -l < "$ACCESS" 2>/dev/null || echo 0)
+if [ "$reqs" -gt 0 ] && command -v jq >/dev/null; then
+  codes=$(jq -r '.status' "$ACCESS" 2>/dev/null | sort | uniq -c | sort -rn | head -5 \
+          | awk '{printf "%s x%s   ", $2, $1}')
+  agents=$(jq -r '.request.headers["User-Agent"][0] // "none"' "$ACCESS" 2>/dev/null \
+          | sed -E 's/.*(Googlebot|bingbot|Bytespider|GPTBot|ClaudeBot|meta-externalagent|Amazonbot|SemrushBot|AhrefsBot|YandexBot|Discordbot|Twitterbot|facebookexternalhit).*/\1 (bot)/; s/.*(Chrome|Safari|Firefox|Edg).*/\1/; s/^curl.*/curl/' \
+          | sort | uniq -c | sort -rn | head -6 | awk '{printf "%-26s %s\n", $2" "$3, $1}')
+  paths=$(jq -r '.request.uri' "$ACCESS" 2>/dev/null \
+          | sed -E 's#/player/.*#/player/*#; s#/brawlers/[^/]+.*#/brawlers/*#; s#/maps/.+#/maps/*#; s#/_next/.*#/_next/*#; s#\?.*##' \
+          | sort | uniq -c | sort -rn | head -6 | awk '{printf "%-26s %s\n", $2, $1}')
+else
+  codes="no requests logged"; agents=""; paths=""
+fi
+
+bans=$(sudo -n fail2ban-client status sshd 2>/dev/null | awk -F'\t' '/Total banned/{print $2}' | tr -d ' ')
+deploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | head -6)
+ndeploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | wc -l)
+
+# ---- verdict ----------------------------------------------------------------
+problems=0
+[ "$code" = "200" ] || problems=$((problems+1))
+[ "$disk_pct" -lt 85 ] || problems=$((problems+1))
+[ "$unhealthy" -eq 0 ] || problems=$((problems+1))
+[ -n "$last_age" ] && [ "$last_age" -lt 18000 ] || problems=$((problems+1))
+[ "$bk_n" -gt 0 ] || problems=$((problems+1))
+
+if [ "$problems" -eq 0 ]; then
+  hdr_c=$OK; verdict="All systems healthy"; subj="[brawlzone] Daily status - all healthy"
+else
+  hdr_c=$BAD; verdict="$problems check(s) need attention"; subj="[brawlzone] Daily status - $problems issue(s)"
+fi
+
+# ---- render -----------------------------------------------------------------
+{
+html_open "BrawlZone &mdash; daily status" "$(date -u +'%A %e %B %Y') &middot; last 24 hours" "$hdr_c"
+
+html_section "Overview"
+html_rows_open
+html_row "Site" "$site_v" "$site_c"
+html_row "Verdict" "$verdict" "$hdr_c"
+html_row "Uptime" "$up"
+html_row "Load average" "$load"
+html_rows_close
+
+html_section "Sampler"
+html_rows_open
+html_row "Runs (24h)" "$runs24 of 8 expected" "$([ "${runs24:-0}" -ge 7 ] && echo "$OK" || echo "$WARN")"
+html_row "Players sampled" "$players24"
+html_row "Battles recorded" "$battles24"
+html_row "Last run" "$last_run ($last_status)"
+html_rows_close
+
+html_section "Database &amp; backups"
+html_rows_open
+html_row "Size" "$db_size of 8 GB budget"
+html_row "Battles stored" "$battles_total"
+html_row "Backups on box" "$bk_n files, $bk_size"
+html_row "Newest backup" "$bk_when" "$([ "${bk_n:-0}" -gt 0 ] && echo "$OK" || echo "$BAD")"
+html_rows_close
+
+html_section "Machine"
+html_rows_open
+html_row "Disk" "$disk_h ($disk_pct%)" "$([ "${disk_pct:-0}" -lt 85 ] && echo "$OK" || echo "$BAD")"
+html_row "Memory" "$mem"
+html_row "Containers" "$(printf '%s' "$containers" | wc -l) up, $unhealthy down" "$([ "${unhealthy:-0}" -eq 0 ] && echo "$OK" || echo "$BAD")"
+html_row "SSH bans (total)" "${bans:-0}"
+html_rows_close
+
+html_section "Traffic since last log rotation"
+html_rows_open
+html_row "Requests" "$reqs"
+html_row "Status codes" "$codes"
+html_rows_close
+[ -n "$agents" ] && { html_section "Top clients"; printf '%s\n' "$agents" | html_pre; }
+[ -n "$paths" ]  && { html_section "Top paths";   printf '%s\n' "$paths"  | html_pre; }
+
+if [ "${ndeploys:-0}" -gt 0 ]; then
+  html_section "Deploys (24h): $ndeploys"
+  printf '%s\n' "$deploys" | html_pre
+fi
+
+html_close "brawlzone-web &middot; Oracle A1, eu-frankfurt-1 &middot; generated $(date -u +%Y-%m-%dT%H:%M:%SZ)<br>Sent by brawlzone-digest.timer. Failures are mailed separately as they happen."
+} | /usr/local/bin/brawlzone-alert --html "$subj"
