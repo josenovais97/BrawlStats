@@ -117,7 +117,7 @@ password        REPLACE_WITH_APP_PASSWORD
 account default : gmail
 EOF
   sudo chmod 600 /etc/brawlzone/msmtprc
-  printf 'SMTP_USER=REPLACE_WITH_YOUR_GMAIL\nALERT_TO=contacts@brawlzone.net\n' \
+  printf 'SMTP_USER=REPLACE_WITH_YOUR_GMAIL\nALERT_TO=REPLACE_WITH_A_REAL_MAILBOX\n' \
     | sudo tee /etc/brawlzone/alert.conf >/dev/null
   # alert.conf carries no secret, so group-readable: a non-root caller then
   # gets a clear error instead of silently dropping the mail. msmtprc holds

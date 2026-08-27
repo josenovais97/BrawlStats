@@ -16,8 +16,6 @@ CONF=/etc/brawlzone/alert.conf
 html=0
 [ "${1:-}" = "--html" ] && { html=1; shift; }
 
-TO="${ALERT_TO:-contacts@brawlzone.net}"
-
 # Read stdin FIRST, before anything that can exit. Exiting early closes the
 # pipe and SIGPIPEs whatever is still writing -- which is how a misconfigured
 # alerter turned into "brawlzone-digest fails with Broken pipe" and hid its own
@@ -27,6 +25,11 @@ body=$(cat)
 [ -r "$CONF" ] || { echo "no $CONF (or not readable as $(id -un)) -- alert dropped" >&2; exit 0; }
 # shellcheck disable=SC1090
 . "$CONF"
+
+# Resolved AFTER sourcing the config -- computing it before meant ALERT_TO in
+# the file was silently ignored and the fallback always won, which is how mail
+# kept going to a bounced address after the config was corrected.
+TO="${ALERT_TO:?ALERT_TO not set in $CONF}"
 
 subject="${1:-BrawlZone alert}"
 host=$(hostname)
