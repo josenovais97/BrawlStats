@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Send an alert email. Body is read from stdin.
+#
+#   brawlzone-alert "subject" < body.txt
+#   echo "text" | brawlzone-alert "subject"
+#
+# Port 25 outbound is blocked by Oracle and Cloudflare Email Routing is
+# receive-only, so this relays through Gmail on 587. contacts@brawlzone.net is
+# the destination, not the sender -- you cannot send *from* a Cloudflare
+# routing address.
+#
+# Exits 0 even when mail fails: this is called from systemd OnFailure= handlers,
+# and an alerter that itself fails loudly just adds a second broken unit. The
+# failure is logged instead.
+set -uo pipefail
+
+CONF=/etc/brawlzone/alert.conf
+TO="${ALERT_TO:-contacts@brawlzone.net}"
+host=$(hostname)
+
+[ -r "$CONF" ] || { echo "no $CONF -- alerting not configured yet" >&2; exit 0; }
+# shellcheck disable=SC1090
+. "$CONF"
+
+subject="${1:-BrawlZone alert}"
+body=$(cat)
+
+if ! command -v msmtp >/dev/null; then
+  echo "msmtp not installed; alert dropped: $subject" >&2
+  exit 0
+fi
+
+{
+  printf 'From: BrawlZone <%s>\n' "$SMTP_USER"
+  printf 'To: %s\n' "$TO"
+  printf 'Subject: [brawlzone] %s\n' "$subject"
+  printf 'Content-Type: text/plain; charset=utf-8\n'
+  printf '\n'
+  printf '%s\n' "$body"
+  printf '\n-- \n%s at %s\n' "$host" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} | msmtp --file=/etc/brawlzone/msmtprc "$TO" 2>>/var/log/brawlzone/alert.log \
+  && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  sent: $subject" >> /var/log/brawlzone/alert.log \
+  || echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  FAILED to send: $subject" >> /var/log/brawlzone/alert.log
+exit 0

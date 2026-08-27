@@ -1,0 +1,8 @@
+[Unit]
+Description=Health check every 10 minutes
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+Unit=brawlzone-health.service
+[Install]
+WantedBy=timers.target

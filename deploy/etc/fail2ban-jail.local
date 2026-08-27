@@ -1,0 +1,16 @@
+[DEFAULT]
+# findtime is an hour, not ten minutes, because the scanners pace themselves.
+# Observed 2026-08-27: the same handful of IPs retried every ~2 minutes, which
+# kept each of them under a 10-minute window -- 85 failures produced only 2
+# bans. An hour-wide window catches that without punishing a fumbled password.
+#
+# bantime is deliberately only an hour. A ban is enforced at the firewall and
+# blocks key auth too, so an over-long ban locks the owner out of his own box
+# from whatever IP he is on. Recovery would mean the OCI serial console.
+bantime  = 1h
+findtime = 1h
+maxretry = 4
+backend  = systemd
+
+[sshd]
+enabled = true

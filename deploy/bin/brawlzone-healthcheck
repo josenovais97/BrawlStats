@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Check the things that fail silently, and email only on a CHANGE of state.
+#
+# Alerting every run would send six mails an hour while a problem persists,
+# which trains you to ignore them. This keeps a state file and mails once when
+# something breaks and once when it recovers.
+set -uo pipefail
+
+STATE=/var/lib/brawlzone/health.state
+SITE=https://brawlzone.net
+mkdir -p "$(dirname "$STATE")"
+
+problems=()
+
+# 1. Is the site actually serving?
+code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SITE/" || echo 000)
+[ "$code" = "200" ] || problems+=("site returned HTTP $code")
+
+# 2. Is the data fresh? The sampler runs every 3h; 5h means runs are failing
+#    or the timer stopped, which the OnFailure hook cannot catch because a
+#    timer that never fires never fails.
+last=$(cd /home/ubuntu/brawlstats && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
+  "select extract(epoch from (now() - max(started_at)))::int from aggregation_runs;" 2>/dev/null || echo "")
+if [ -n "$last" ] && [ "$last" -gt 18000 ]; then
+  problems+=("last sampler run was $((last/3600))h ago (expected under 3h)")
+fi
+
+# 3. Disk. Postgres, Docker and the dumps all share one volume; a full disk
+#    takes all three down at once.
+use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+[ "$use" -lt 85 ] || problems+=("disk at ${use}%")
+
+# 4. Are all containers up?
+down=$(cd /home/ubuntu/brawlstats && docker compose ps --status exited --status dead -q 2>/dev/null | wc -l)
+[ "$down" -eq 0 ] || problems+=("$down container(s) not running")
+
+prev=$(cat "$STATE" 2>/dev/null || echo ok)
+
+if [ ${#problems[@]} -eq 0 ]; then
+  if [ "$prev" != "ok" ]; then
+    printf 'Recovered at %s.\n\nAll checks passing:\n  site HTTP 200\n  data fresh\n  disk %s%%\n  containers up\n' \
+      "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$use" | /usr/local/bin/brawlzone-alert "RECOVERED"
+  fi
+  echo ok > "$STATE"
+  exit 0
+fi
+
+if [ "$prev" = "ok" ]; then
+  { printf 'Health check failed at %s.\n\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    for p in "${problems[@]}"; do printf '  - %s\n' "$p"; done
+    printf '\nContainers:\n'; (cd /home/ubuntu/brawlstats && docker compose ps 2>&1 | head -8)
+  } | /usr/local/bin/brawlzone-alert "UNHEALTHY: ${problems[0]}"
+fi
+echo failed > "$STATE"
+# Exit 0: the alert is the output. A non-zero exit would also trip OnFailure
+# and send a second, less useful mail about the checker itself.
+exit 0

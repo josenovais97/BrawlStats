@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Run a scheduled job, appending levelled, timestamped, COLOURED output to
+# /var/log/brawlzone/<name>.log
+#
+#   2026-08-27T11:47:29Z  [INFO ] wrote /home/ubuntu/backups/....sql.gz
+#
+# The ANSI codes are written into the file on purpose, so `tail`, `tail -f`,
+# `cat` and `less -R` all show colour with no wrapper to remember. The cost is
+# that a naive parser sees escape codes -- acceptable here because these logs
+# are read by humans. The one log that IS machine-read, Caddy's access.log,
+# stays plain JSON so jq keeps working.
+#
+# grep is unaffected: the escapes sit outside the bracket, so `grep '[ERROR]'`
+# still matches. `brawlzone-log` strips colour when piped.
+#
+# Levels are derived from content, not from stdout-vs-stderr: splitting the
+# streams into two writers races and scrambles ordering, and tools lie anyway
+# (docker and npm both write progress to stderr). Treat [WARN] as "worth a
+# glance". Only the end-marker level is authoritative -- it comes from the
+# real exit code.
+set -uo pipefail
+
+name=$1; shift
+log="/var/log/brawlzone/${name}.log"
+E=$'\033'
+DIM="${E}[2m"; OFF="${E}[0m"
+RED="${E}[1;31m"; YEL="${E}[1;33m"; CYN="${E}[0;36m"; GRN="${E}[1;32m"
+
+now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
+
+emit() { # level colour text
+  printf "%s%s%s  %s[%-5s]%s %s\n" "$DIM" "$(now)" "$OFF" "$2" "$1" "$OFF" "$3" >> "$log"
+}
+
+classify() {
+  while IFS= read -r line; do
+    case "$line" in
+      *ERROR*|*Error*|*error:*|*"npm ERR"*|*FATAL*|*fatal*|*"failed to"*|*Failed*|*Traceback*)
+        emit ERROR "$RED" "$line" ;;
+      *WARN*|*warn*|*Warning*|*deprecated*)
+        emit WARN "$YEL" "$line" ;;
+      *)
+        emit INFO "$CYN" "$line" ;;
+    esac
+  done
+}
+
+emit INFO "$GRN" "===== start: $* ====="
+"$@" 2>&1 | classify
+rc=${PIPESTATUS[0]}
+if [ "$rc" -eq 0 ]; then
+  emit INFO "$GRN" "===== end rc=0 ====="
+else
+  emit ERROR "$RED" "===== end rc=$rc ====="
+fi
+printf "\n" >> "$log"
+exit "$rc"

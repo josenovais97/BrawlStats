@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for new BrawlZone commits every 5 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+Unit=brawlzone-deploy.service
+
+[Install]
+WantedBy=timers.target

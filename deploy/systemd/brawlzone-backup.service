@@ -1,0 +1,7 @@
+[Unit]
+Description=BrawlZone database backup
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-run backup /home/ubuntu/backup-db.sh

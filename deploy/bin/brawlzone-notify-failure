@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Called by systemd OnFailure=. Emails the failed unit's recent log.
+set -uo pipefail
+unit="${1:?unit name required}"
+name="${unit%.service}"; name="${name#brawlzone-}"
+
+{
+  echo "Unit:   $unit"
+  echo "Result: $(systemctl show "$unit" -p Result --value 2>/dev/null)"
+  echo "Exit:   $(systemctl show "$unit" -p ExecMainStatus --value 2>/dev/null)"
+  echo "When:   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo
+  echo "--- last 40 lines of /var/log/brawlzone/${name}.log ---"
+  # Colour codes are in the file; strip them so the email is readable.
+  tail -40 "/var/log/brawlzone/${name}.log" 2>/dev/null | sed -E 's/\x1b\[[0-9;]*m//g' \
+    || echo "(no file log; see journalctl -u $unit)"
+} | /usr/local/bin/brawlzone-alert "FAILED: $unit"

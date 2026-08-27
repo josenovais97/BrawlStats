@@ -1,0 +1,18 @@
+# Scheduled-job logs written by /usr/local/bin/brawlzone-run.
+#
+# copytruncate because a job may be mid-run when logrotate fires: the wrapper
+# holds the file open, so renaming it would leave systemd writing to an
+# unlinked inode and the rest of that run would vanish.
+/var/log/brawlzone/*.log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    dateext
+    dateformat -%Y-%m-%d
+    su root adm
+    create 0664 root adm
+}

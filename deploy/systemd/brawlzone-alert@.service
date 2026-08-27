@@ -1,0 +1,6 @@
+[Unit]
+Description=Email an alert about %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/brawlzone-notify-failure %i

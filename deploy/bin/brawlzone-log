@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Filter the BrawlZone logs. The files already carry colour, so this exists for
+# selecting levels, not for adding colour -- `tail`/`less -R` work directly.
+#
+#   brawlzone-log                 # list what is available
+#   brawlzone-log sampler ERROR   # only errors
+#   brawlzone-log sampler -f      # follow
+#
+# Strips colour when piped, so `brawlzone-log sampler | grep x` stays clean.
+set -uo pipefail
+DIR=/var/log/brawlzone
+plain() { if [ -t 1 ]; then cat; else sed -E 's/\x1b\[[0-9;]*m//g'; fi; }
+
+if [ $# -eq 0 ]; then
+  echo "logs in $DIR:"
+  for f in "$DIR"/*.log; do
+    [ -e "$f" ] || continue
+    printf "  %-10s %8s   last write %s\n" "$(basename "$f" .log)" \
+      "$(du -h "$f" | cut -f1)" "$(date -u -r "$f" +%Y-%m-%dT%H:%M:%SZ)"
+  done
+  echo
+  echo "these are coloured in the file: plain 'tail -f' and 'less -R' work"
+  exit 0
+fi
+
+name=$1; shift
+f="$DIR/${name}.log"
+[ -r "$f" ] || { echo "no readable log at $f" >&2; exit 1; }
+case "${1:-}" in
+  -f|--follow)     tail -f "$f" | plain ;;
+  ERROR|WARN|INFO) grep -F "[$1" "$f" | tail -200 | plain ;;
+  "")              tail -200 "$f" | plain ;;
+  *)               tail -n "$1" "$f" | plain ;;
+esac

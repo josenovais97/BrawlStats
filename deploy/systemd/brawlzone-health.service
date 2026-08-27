@@ -1,0 +1,6 @@
+[Unit]
+Description=BrawlZone health check
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-run health /usr/local/bin/brawlzone-healthcheck

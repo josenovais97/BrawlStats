@@ -1,0 +1,10 @@
+[Unit]
+Description=Sample every three hours at :17
+
+[Timer]
+OnCalendar=*-*-* 00/3:17:00
+Persistent=true
+Unit=brawlzone-sampler.service
+
+[Install]
+WantedBy=timers.target
