@@ -20,6 +20,11 @@ services:
       - work_mem=16MB
       - -c
       - max_connections=50
+    ports:
+      # Loopback only. Not a public surface -- this exists so `docker build`,
+      # which does not join the compose network, can reach the database to
+      # prerender pages.
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -32,6 +37,9 @@ services:
   app:
     build:
       context: .
+      network: host
+      secrets:
+        - build_env
       args:
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://brawlzone.net}
     restart: unless-stopped
@@ -79,6 +87,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+secrets:
+  build_env:
+    file: ./.env.production
 
 volumes:
   pgdata:

@@ -38,7 +38,20 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 
 # `npm run build` is `prisma generate && next build`; the generated client
 # lands in src/generated, which is gitignored and must be built here.
-RUN npm run build
+#
+# The build needs real credentials: pages with `revalidate` and no dynamic
+# segment are PRERENDERED HERE, so a build without a database bakes "not enough
+# data" into the shipped HTML and a build without the API key bakes "key is not
+# set". On Vercel these were present at build time and it was invisible.
+#
+# Mounted as a BuildKit secret rather than an ARG/ENV so nothing lands in an
+# image layer. BUILD_DATABASE_URL overrides DATABASE_URL because the runtime
+# value (db:5432) resolves only on the compose network, which a build does not
+# join; it points at the loopback-published port instead.
+RUN --mount=type=secret,id=build_env,uid=0 \
+    set -a && . /run/secrets/build_env && set +a && \
+    export DATABASE_URL="${BUILD_DATABASE_URL:-$DATABASE_URL}" && \
+    npm run build
 
 # ---- runtime ----------------------------------------------------------------
 FROM base AS runner
