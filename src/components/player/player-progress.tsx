@@ -2,7 +2,6 @@ import { CalendarDays, TrendingUp } from 'lucide-react';
 
 import { TrophyGainIcon } from '@/components/game-icons';
 
-import { ShareButton } from '@/components/player/share-button';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { formatNumber } from '@/lib/format';
@@ -26,10 +25,8 @@ import type { TrophyPoint } from '@/lib/stats';
  */
 export function PlayerProgress({
   points,
-  playerName,
 }: {
   points: TrophyPoint[];
-  playerName: string;
 }) {
   if (points.length < 2) return null;
 
@@ -52,17 +49,11 @@ export function PlayerProgress({
   // A row of zeroes reads as a broken feature rather than an honest one.
   if (week === null && month === null && overall === 0) return null;
 
-  const headline = month ?? week ?? { change: overall, days: tracked };
-  const shareText = `${playerName} is ${headline.change >= 0 ? 'up' : 'down'} ${formatNumber(
-    Math.abs(headline.change),
-  )} trophies over the last ${headline.days} days. Now on ${formatNumber(last.trophies)}.`;
-
   return (
     <section>
       <SectionHeading
         title="Recent progress"
         subtitle="From the trophy points recorded on each profile view."
-        aside={<ShareButton title={`${playerName} on BrawlZone`} text={shareText} />}
       />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">

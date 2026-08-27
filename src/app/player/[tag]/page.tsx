@@ -222,7 +222,7 @@ export default async function PlayerPage({ params }: PageProps) {
         />
       </div>
       <div id="progress" className="scroll-anchor-nav space-y-8">
-        <PlayerProgress points={trophyHistory} playerName={player.name} />
+        <PlayerProgress points={trophyHistory} />
         <PlayerProgression progression={progression} playtime={playtime} />
 
         {/* Immediately after Progression, because it is the same subject read

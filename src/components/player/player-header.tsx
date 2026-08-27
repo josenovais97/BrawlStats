@@ -10,6 +10,7 @@ import {
 } from '@/components/game-icons';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
+import { ShareButton } from '@/components/player/share-button';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 
@@ -102,6 +103,19 @@ export function PlayerHeader({
             kind="player"
             tag={normalizeTag(player.tag)}
             name={player.name}
+          />
+          {/*
+            Share lives here, beside Favourite, because it belongs to the
+            profile rather than to any one section of it. It used to sit on the
+            trophy-progress heading, which returns null for anyone with fewer
+            than two days of sampled history -- so three of the four profiles
+            checked on 2026-08-27 had no share button at all, including the
+            top-ranked player. A share action that is missing from most of the
+            pages it applies to is not a feature.
+          */}
+          <ShareButton
+            title={`${player.name} on BrawlZone`}
+            text={`${player.name} (${player.tag}) has ${formatNumber(player.trophies)} trophies on BrawlZone`}
           />
         </div>
 
