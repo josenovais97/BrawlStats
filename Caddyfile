@@ -22,7 +22,18 @@
 
 	# Next sets its own cache headers per route (see AGENTS.md trap 2) and
 	# Caddy must not override them.
-	reverse_proxy app:3000 {
+	reverse_proxy {
+		# Resolved per-refresh rather than once at startup. Docker gives a
+		# recreated container a NEW IP, and a statically-resolved upstream
+		# keeps dialling the dead one -- which fails instantly instead of
+		# being retried, so lb_try_duration never got a chance and deploys
+		# still emitted a 502. Measured 2026-08-27.
+		dynamic a {
+			name app
+			port 3000
+			refresh 1s
+		}
+
 		# Every deploy recreates the app container, and Caddy returned 502 for
 		# the few seconds it was gone -- the access log caught real requests
 		# hitting that window. Retrying a refused connection for 30s turns a
