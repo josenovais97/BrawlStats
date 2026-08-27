@@ -104,6 +104,16 @@ services:
     build:
       context: .
       target: builder
+      # Must match the app's build config exactly. The builder stage ends in
+      # `RUN --mount=type=secret,id=build_env ... npm run build`, so without the
+      # secret the mount point does not exist, `. /run/secrets/build_env` fails,
+      # and sh returns 2 -- which is what broke the sampler on 2026-08-27.
+      # Matching also means both services share one set of cached layers.
+      network: host
+      secrets:
+        - build_env
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://brawlzone.net}
     profiles: ["tools"]
     restart: "no"
     env_file: .env.production
