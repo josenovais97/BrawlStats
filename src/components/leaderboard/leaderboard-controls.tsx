@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import {
   ClubIcon,
   CosmeticsIcon,
@@ -60,10 +62,24 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
     >
       <div className="flex gap-2">
         {BOARDS.map(({ key, icon: Icon }) => (
-          <button
+          /*
+            A real link that behaves like a tab. As a <button> these were the
+            only route to the board pages, so the served HTML contained zero
+            /leaderboard/<board> links and every board except the default was
+            orphaned -- taking the 100 ranked players it lists with it, which
+            is the whole set the crawler is allowed to index.
+
+            The handler keeps the client-side transition, and bails on modified
+            clicks so ctrl/cmd/middle-click still open a board in a new tab.
+          */
+          <Link
             key={key}
-            type="button"
-            onClick={() => navigate({ type: key })}
+            href={leaderboardHref(key, region)}
+            onClick={(event) => {
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+              event.preventDefault();
+              navigate({ type: key });
+            }}
             className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-colors ${
               board === key
                 ? 'bg-brand text-[#1a1200]'
@@ -72,7 +88,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
           >
             <Icon className="size-4" />
             {key}
-          </button>
+          </Link>
         ))}
       </div>
 

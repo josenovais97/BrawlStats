@@ -30,19 +30,46 @@ const BASE = (process.argv[2] ?? 'http://localhost:3111').replace(/\/$/, '');
 const CAP = 5_000;
 const CONCURRENCY = 8;
 
-/** Only the `*` group matters: this is asking what an ordinary crawler sees. */
-async function disallowedPrefixes() {
+/**
+ * Only the `*` group matters: this is asking what an ordinary crawler sees.
+ *
+ * Both lists, not just Disallow. `/player/` is disallowed as a prefix while a
+ * bounded allowlist of individual tags is permitted (see
+ * scripts/gen-indexable-players.ts), and a reader that ignored Allow would
+ * report a smaller surface than a real crawler walks -- which is the one
+ * mistake this script must not make, since its output is the answer to "is
+ * this bounded?".
+ */
+async function robotsRules() {
   const text = await fetch(`${BASE}/robots.txt`).then((r) => r.text());
-  const prefixes = [];
+  const disallow = [];
+  const allow = [];
   let inStar = false;
   for (const line of text.split('\n')) {
     const [rawKey, ...rest] = line.split(':');
     const key = rawKey.trim().toLowerCase();
     const value = rest.join(':').trim();
     if (key === 'user-agent') inStar = value === '*';
-    else if (inStar && key === 'disallow' && value) prefixes.push(value);
+    else if (inStar && key === 'disallow' && value) disallow.push(value);
+    else if (inStar && key === 'allow' && value) allow.push(value);
   }
-  return prefixes;
+  return { disallow, allow };
+}
+
+/**
+ * Longest match wins, which is how every major crawler resolves a conflict
+ * between an Allow and a Disallow that both match a path.
+ */
+function isBlocked({ disallow, allow }, pathname) {
+  let blockedBy = 0;
+  for (const prefix of disallow) {
+    if (pathname.startsWith(prefix) && prefix.length > blockedBy) blockedBy = prefix.length;
+  }
+  if (blockedBy === 0) return false;
+  for (const prefix of allow) {
+    if (pathname.startsWith(prefix) && prefix.length >= blockedBy) return false;
+  }
+  return true;
 }
 
 /*
@@ -83,7 +110,8 @@ function section(pathname) {
 }
 
 async function main() {
-  const disallow = await disallowedPrefixes();
+  const rules = await robotsRules();
+  const disallow = rules.disallow;
   console.log(`base      ${BASE}`);
   console.log(`disallow  ${disallow.join(' ') || '(none)'}\n`);
 
@@ -110,7 +138,7 @@ async function main() {
 
     for (const pathname of found.flatMap((set) => [...set])) {
       if (seen.has(pathname)) continue;
-      if (disallow.some((prefix) => pathname.startsWith(prefix))) continue;
+      if (isBlocked(rules, pathname)) continue;
       seen.add(pathname);
       queue.push(pathname);
       if (seen.size > CAP) {
