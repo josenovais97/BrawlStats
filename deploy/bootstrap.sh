@@ -139,5 +139,6 @@ $(printf '\033[1;32mBox provisioned.\033[0m') Three things this script cannot do
                          and your address in /etc/brawlzone/alert.conf
 
 Then:  cd $REPO_DIR && docker compose up -d --build
-And point DNS at \$(curl -s ifconfig.me) before expecting TLS to issue.
+And point brawlzone.net at this box's public IP before expecting TLS to issue --
+Caddy cannot get a certificate until the name resolves here.
 EOF
