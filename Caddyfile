@@ -22,7 +22,18 @@
 
 	# Next sets its own cache headers per route (see AGENTS.md trap 2) and
 	# Caddy must not override them.
-	reverse_proxy app:3000
+	reverse_proxy app:3000 {
+		# Every deploy recreates the app container, and Caddy returned 502 for
+		# the few seconds it was gone -- the access log caught real requests
+		# hitting that window. Retrying a refused connection for 30s turns a
+		# deploy from a visible error into a short wait.
+		#
+		# Safe here because Caddy only retries when the connection itself
+		# failed, so no request is ever delivered twice, and this site is
+		# read-only GET traffic regardless.
+		lb_try_duration 30s
+		lb_try_interval 250ms
+	}
 }
 
 # www redirects to the canonical host instead of serving a second copy. Two
