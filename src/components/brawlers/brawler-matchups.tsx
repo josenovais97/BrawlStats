@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { comparePath } from '@/lib/compare';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
@@ -17,13 +18,29 @@ import type { BABrawler } from '@/types/brawlapi';
  */
 export function BrawlerMatchups({
   pairings,
+  brawlerId,
   brawlerName,
   brawlerMeta,
+  indexablePairs,
 }: {
   pairings: BrawlerPairings;
+  brawlerId: number;
   brawlerName: string;
   brawlerMeta: Map<number, BABrawler>;
+  /**
+   * The pairs that are in the sitemap, as `min:max` keys.
+   *
+   * Every row links to its comparison page, because "loses to Colt by 3.2
+   * points" wants to be clickable through to the full head-to-head -- but
+   * `/compare/[pair]` renders any of the 5,565 possible pairs, and only ~400
+   * are indexable. Linking all of them without care would hand crawlers 13x
+   * the reachable surface for pages the sitemap never claimed. So a
+   * non-indexable pair still links for a reader and carries `rel="nofollow"`
+   * for a crawler, which is the same mechanism `crawl:budget` obeys.
+   */
+  indexablePairs: ReadonlySet<string>;
 }) {
+  const self = brawlerMeta.get(brawlerId);
   const name = brawlerName.toLowerCase();
   const columns: { title: string; hint: string; rows: BrawlerPairing[] }[] = [
     {
@@ -59,11 +76,21 @@ export function BrawlerMatchups({
               {column.rows.map((row) => {
                 const meta = brawlerMeta.get(row.brawlerId);
                 const positive = row.edge > 0;
+                const key =
+                  row.brawlerId < brawlerId
+                    ? `${row.brawlerId}:${brawlerId}`
+                    : `${brawlerId}:${row.brawlerId}`;
+                // Falls back to the brawler page when either side lacks the
+                // artwork metadata comparePath needs to build a slug.
+                const href =
+                  self && meta ? comparePath(self, meta) : brawlerPath(row.brawlerId, meta?.name);
+                const followable = self && meta ? indexablePairs.has(key) : true;
 
                 return (
                   <li key={row.brawlerId}>
                     <Link
-                      href={brawlerPath(row.brawlerId, meta?.name)}
+                      href={href}
+                      rel={followable ? undefined : 'nofollow'}
                       className="row-interactive flex items-center gap-3 px-3 py-2"
                       title={`${formatPercent(row.winRate)} win rate over ${formatNumber(row.decidedSampleSize)} sampled battles, against a ${formatPercent(pairings.baseline)} average for this brawler`}
                     >

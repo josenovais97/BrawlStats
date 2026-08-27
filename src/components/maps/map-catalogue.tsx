@@ -40,9 +40,13 @@ export interface CatalogueGroup {
  * because when you know the name the mode is not what you are looking for. A
  * chosen mode gives that mode whole. Neither gives the directory.
  *
- * Nothing is hidden from a crawler by any of it: every map has its own URL in
- * the sitemap, and every mode's full list is a server-rendered page at
- * `/maps/[mode]` that each directory card links to.
+ * Nothing is hidden from a crawler by any of it -- but only because the
+ * directory cards are real links. They were `<button onClick={setMode}>` until
+ * 2026-08-27, which meant the served HTML contained zero `/maps/[mode]` links
+ * and the mode pages, plus the ~400 map pages they list, were reachable only
+ * from the sitemap. The comment above this one had claimed otherwise for
+ * weeks; a claim about crawlability is worth a `curl | grep`, because nothing
+ * else fails when it stops being true.
  */
 export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
   const [query, setQuery] = useState('');
@@ -155,9 +159,27 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {groups.map((group) => (
             <li key={group.mode}>
-              <button
-                type="button"
-                onClick={() => setMode(group.mode)}
+              {/*
+                A real link that behaves like a button. It has to be an <a
+                href> because a crawler cannot click: as a plain <button> this
+                directory was the only route to 41 mode pages and, through
+                them, ~400 map pages -- and every one of them was orphaned,
+                sitting in the sitemap with nothing linking to it. Measured
+                2026-08-27: 0 mode links in the served HTML against 41 in the
+                sitemap.
+
+                The click handler keeps the in-place open for anyone with JS,
+                and bails on modified clicks so ctrl/cmd/middle-click still
+                open the mode page in a new tab like any other link.
+              */}
+              <Link
+                href={`/maps/${group.mode}`}
+                prefetch={false}
+                onClick={(event) => {
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                  event.preventDefault();
+                  setMode(group.mode);
+                }}
                 className="card card-interactive group block h-full w-full overflow-hidden text-left"
               >
                 <MapArt
@@ -172,7 +194,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                 <span className="block px-3 pb-2 text-[0.625rem] uppercase tracking-wide text-muted">
                   {group.maps.length} {group.maps.length === 1 ? 'map' : 'maps'}
                 </span>
-              </button>
+              </Link>
             </li>
           ))}
         </ul>

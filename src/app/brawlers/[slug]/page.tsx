@@ -55,6 +55,7 @@ import {
   getBrawlerSplits,
   getBrawlerStat,
   getBrawlerTrend,
+  getIndexablePairs,
   getMetaIndex,
   normalizeWinRate,
 } from '@/lib/stats';
@@ -338,7 +339,16 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // than the page.
   const splits = await getBrawlerSplits(brawlerId);
   const trend = await getBrawlerTrend(brawlerId);
-  const pairings = await getBrawlerPairings(brawlerId);
+  // Fetched together: the matchup rows need to know which of their pairs the
+  // sitemap actually claims, so a non-indexable one can be nofollowed rather
+  // than quietly widening the crawlable set. See BrawlerMatchups.
+  const [pairings, indexable] = await Promise.all([
+    getBrawlerPairings(brawlerId),
+    getIndexablePairs(),
+  ]);
+  const indexablePairs = new Set(
+    indexable.map(([a, b]) => (a < b ? `${a}:${b}` : `${b}:${a}`)),
+  );
 
   // Maps come and go from rotation; a split naming a retired one still has a
   // real record behind it, so the row stays and only the link is dropped.
@@ -774,8 +784,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           />
           <BrawlerMatchups
             pairings={pairings}
+            brawlerId={brawlerId}
             brawlerName={brawler.name}
             brawlerMeta={brawlerMeta}
+            indexablePairs={indexablePairs}
           />
         </section>
       ) : null}

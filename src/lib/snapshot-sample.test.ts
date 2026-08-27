@@ -21,12 +21,18 @@ const BYTES_PER_ROW = 482;
 /** Distinct players sampled per day, and brawlers each, at the current cadence. */
 const PLAYERS_PER_DAY = 7_000;
 const BRAWLERS_PER_PLAYER = 57;
-/** `SNAPSHOT_RETENTION_DAYS`, which the prune holds the table to. */
-const RETENTION_DAYS = 2;
-/** The free plan this project is built to live inside. */
-const PLAN_BYTES = 512 * 1024 * 1024;
-/** Everything in the database that is not this table, measured the same day. */
-const OTHER_TABLES_BYTES = 208 * 1024 * 1024;
+/*
+ * Imported, not transcribed -- the same lesson storage-pressure.test.ts learned.
+ * This file hardcoded a 2-day retention and a 512 MB plan, so when the database
+ * moved onto the box and both changed, it went on asserting against a world
+ * that no longer existed and passed while meaning nothing. Deriving means a
+ * deliberate change moves the threshold with it, and only a change to the
+ * *ratio* has to be argued for.
+ */
+const RETENTION_DAYS = SNAPSHOT_RETENTION_DAYS;
+const PLAN_BYTES = DATA_BUDGET_BYTES;
+/** Everything in the database that is not this table. Measured 2026-08-27. */
+const OTHER_TABLES_BYTES = 400 * 1024 * 1024;
 
 function projectedBytes(rate: number): number {
   const rowsPerDay = (PLAYERS_PER_DAY / rate) * BRAWLERS_PER_PLAYER;
@@ -53,9 +59,11 @@ test('a census costs four times the sample, which is why the rate exists', () =>
   const total = projectedBytes(1) + OTHER_TABLES_BYTES;
 
   assert.ok(
-    total > projectedBytes(4) + OTHER_TABLES_BYTES,
-    'a census was supposed to cost far more than the sample; if it no longer does, these constants are stale',
+    projectedBytes(1) > projectedBytes(4) * 3.5,
+    `a census projects ${(projectedBytes(1) / 1048576).toFixed(0)} MB against the sample's ` +
+      `${(projectedBytes(4) / 1048576).toFixed(0)} MB; the ratio is the reason the rate exists`,
   );
+  assert.ok(total > 0);
 });
 
 test('roughly one player in four is recorded', () => {

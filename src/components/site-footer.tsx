@@ -38,6 +38,13 @@ const EXPLORE = [
   { href: '/compare', label: 'Compare' },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/events', label: 'Events' },
+  // Added 2026-08-27. These three were live, in the sitemap, and reachable
+  // from nowhere on the site -- `npm run crawl:budget` never found them
+  // because no page linked to them. A route with no inbound link is a page
+  // nobody can arrive at except by typing it.
+  { href: '/news', label: 'News' },
+  { href: '/starr-drops', label: 'Starr Drops' },
+  { href: '/release-notes', label: 'Release Notes' },
 ];
 
 /** Where the numbers and the artwork come from. Required attribution. */
