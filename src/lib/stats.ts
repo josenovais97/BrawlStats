@@ -25,6 +25,22 @@ import type {
 } from '@/types/stats';
 
 /**
+ * Records a read failure that is being degraded to an empty result.
+ *
+ * Every database read in this file falls back rather than throwing, because
+ * the site is built to work without a database — that behaviour is deliberate
+ * and stays. What was wrong was doing it *silently*. On 2026-08-27 a Docker
+ * build with no DATABASE_URL prerendered empty tier lists into the shipped
+ * HTML, and because these catches said nothing the logs were clean, so the
+ * cause took a long hunt to find. An empty page with a clean log is the worst
+ * possible combination to debug.
+ */
+function swallow(where: string, error: unknown): void {
+  console.error(`[stats] ${where} degraded to an empty result:`, error);
+}
+
+
+/**
  * Read side of the aggregation pipeline. Every function returns null (or an
  * empty result) when no database is configured, so the site stays functional
  * before Neon is provisioned.
@@ -343,7 +359,8 @@ async function compute_getLatestBrawlerStats(): Promise<BrawlerStatRow[]> {
     });
 
     return rows.map(toStatRow);
-  } catch {
+  } catch (error) {
+    swallow('compute_getLatestBrawlerStats', error);
     // A missing table or an unreachable database must not break the page.
     return [];
   }
@@ -360,7 +377,8 @@ async function compute_getBrawlerStat(brawlerId: number): Promise<BrawlerStatRow
       orderBy: { snapshotDate: 'desc' },
     });
     return row ? toStatRow(row) : null;
-  } catch {
+  } catch (error) {
+    swallow('compute_getBrawlerStat', error);
     return null;
   }
 }
@@ -491,7 +509,8 @@ async function compute_getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
     return movers.sort(
       (a, b) => Math.abs(b.metaScoreDelta) - Math.abs(a.metaScoreDelta),
     );
-  } catch {
+  } catch (error) {
+    swallow('compute_getMetaMovers', error);
     return [];
   }
 }
@@ -516,7 +535,8 @@ async function compute_getCatalogChanges(limit = 40): Promise<CatalogChangeEntry
       itemId: row.itemId,
       itemName: row.itemName,
     }));
-  } catch {
+  } catch (error) {
+    swallow('compute_getCatalogChanges', error);
     return [];
   }
 }
@@ -546,7 +566,8 @@ export async function getPlayerBrawlerPlacements(
       trophies: row.trophies,
       region: row.region,
     }));
-  } catch {
+  } catch (error) {
+    swallow('getPlayerBrawlerPlacements', error);
     return [];
   }
 }
@@ -603,7 +624,8 @@ export async function getBrawlerBuild(brawlerId: number): Promise<BrawlerBuild |
       gadgets: pick('gadget'),
       gears: pick('gear'),
     };
-  } catch {
+  } catch (error) {
+    swallow('getBrawlerBuild', error);
     return null;
   }
 }
@@ -627,7 +649,8 @@ export async function getTrophyPercentile(trophies: number): Promise<TrophyStand
     });
 
     return { percentile: below / total, population: total };
-  } catch {
+  } catch (error) {
+    swallow('getTrophyPercentile', error);
     return null;
   }
 }
@@ -655,7 +678,8 @@ async function compute_getReleasedBuffieCount(): Promise<number | null> {
     `;
     const total = Number(rows[0]?.total ?? 0);
     return total > 0 ? total : null;
-  } catch {
+  } catch (error) {
+    swallow('compute_getReleasedBuffieCount', error);
     return null;
   }
 }
@@ -697,7 +721,8 @@ async function compute_getCoverageStats(): Promise<CoverageStats | null> {
       battles,
       placements,
     };
-  } catch {
+  } catch (error) {
+    swallow('compute_getCoverageStats', error);
     return null;
   }
 }
@@ -735,7 +760,8 @@ export async function getLastAggregationRun(): Promise<AggregationRunSummary | n
       status: run.status,
       notes: run.notes,
     };
-  } catch {
+  } catch (error) {
+    swallow('getLastAggregationRun', error);
     return null;
   }
 }
@@ -801,7 +827,8 @@ export async function recordLookup(reading: {
       },
       update: { trophies, highestTrophies, brawlerCount },
     });
-  } catch {
+  } catch (error) {
+    swallow('recordLookup', error);
     // Intentionally silent.
   }
 }
@@ -846,7 +873,8 @@ export async function getTrophyHistory(
       highestTrophies: row.highestTrophies,
       brawlerCount: row.brawlerCount,
     }));
-  } catch {
+  } catch (error) {
+    swallow('getTrophyHistory', error);
     return [];
   }
 }
@@ -947,7 +975,8 @@ async function compute_getTrophyGains(limit = 10): Promise<TrophyGain[]> {
       from: gain.from,
       to: gain.to,
     }));
-  } catch {
+  } catch (error) {
+    swallow('compute_getTrophyGains', error);
     return [];
   }
 }
@@ -1088,7 +1117,8 @@ async function computeBestPicksByMode(
     }
 
     return out;
-  } catch {
+  } catch (error) {
+    swallow('computeBestPicksByMode', error);
     return out;
   }
 }
@@ -1279,7 +1309,8 @@ async function computeBrawlerStatsForWindow(
         windowDays,
       };
     });
-  } catch {
+  } catch (error) {
+    swallow('computeBrawlerStatsForWindow', error);
     return [];
   }
 }
@@ -1429,7 +1460,8 @@ async function compute_getRankedLeaderboard(
         peakRankName: row.highestRankedRankName,
       })),
     };
-  } catch {
+  } catch (error) {
+    swallow('compute_getRankedLeaderboard', error);
     return { players: [], pool: 0 };
   }
 }
@@ -1518,7 +1550,8 @@ async function compute_getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
       users: Number(row.users),
       share: Number(row.users) / denominator,
     }));
-  } catch {
+  } catch (error) {
+    swallow('compute_getSkinUsage', error);
     return [];
   }
 }
@@ -1552,7 +1585,8 @@ async function compute_getIconUsage(limit = 12): Promise<CosmeticUsage[]> {
       users: group._count._all,
       share: group._count._all / total,
     }));
-  } catch {
+  } catch (error) {
+    swallow('compute_getIconUsage', error);
     return [];
   }
 }
@@ -1589,7 +1623,8 @@ async function computeFilterableModes(
       .map((g) => ({ mode: g.mode, battles: g._sum.battles ?? 0 }))
       .filter((m) => m.battles >= minBattles)
       .sort((a, b) => b.battles - a.battles);
-  } catch {
+  } catch (error) {
+    swallow('computeFilterableModes', error);
     return [];
   }
 }
@@ -1767,7 +1802,8 @@ async function compute_getBrawlerAbilityChoices(
           : 'low';
 
     return { starPowers, gadgets, sampleSize, confidence };
-  } catch {
+  } catch (error) {
+    swallow('compute_getBrawlerAbilityChoices', error);
     return null;
   }
 }
@@ -1860,7 +1896,8 @@ async function compute_getBrawlerBuffies(
       hyperCharge,
       none: !gadget && !starPower && !hyperCharge,
     };
-  } catch {
+  } catch (error) {
+    swallow('compute_getBrawlerBuffies', error);
     return null;
   }
 }
@@ -2024,7 +2061,8 @@ async function compute_getBrawlerSplits(
 
     const byScore = (a: BrawlerSplit, b: BrawlerSplit) => b.score - a.score;
     return { modes: modes.sort(byScore), maps: maps.sort(byScore) };
-  } catch {
+  } catch (error) {
+    swallow('compute_getBrawlerSplits', error);
     return empty;
   }
 }
@@ -2071,7 +2109,8 @@ async function compute_getBrawlerTrend(
       usageRate: row.usageRate,
       decidedSampleSize: row.decidedSampleSize,
     }));
-  } catch {
+  } catch (error) {
+    swallow('compute_getBrawlerTrend', error);
     return [];
   }
 }
@@ -2211,7 +2250,8 @@ async function compute_getBrawlerPairings(
         .slice(0, limit),
       bestWith: [...with_].sort((a, b) => b.edge - a.edge).slice(0, limit),
     };
-  } catch {
+  } catch (error) {
+    swallow('compute_getBrawlerPairings', error);
     return null;
   }
 }
@@ -2332,7 +2372,8 @@ async function pairingScores(
     }
 
     return out;
-  } catch {
+  } catch (error) {
+    swallow('pairingScores', error);
     return out;
   }
 }
@@ -2375,7 +2416,8 @@ export async function getHeadToHead(
     const decided = Number(rows[0]?.decided ?? 0);
     if (decided < MIN_SAMPLE_FOR_PAIRING) return null;
     return { winRate: Number(rows[0]?.wins ?? 0) / decided, decidedSampleSize: decided };
-  } catch {
+  } catch (error) {
+    swallow('getHeadToHead', error);
     return null;
   }
 }
@@ -2682,7 +2724,8 @@ async function computeRankedMapPicks(
       }
       return b.sampleSize - a.sampleSize;
     });
-  } catch {
+  } catch (error) {
+    swallow('computeRankedMapPicks', error);
     return [];
   }
 }
@@ -2752,7 +2795,8 @@ async function computeIndexablePairs(): Promise<[number, number][]> {
     `;
 
     return rows.map((row) => [row.a, row.b] as [number, number]);
-  } catch {
+  } catch (error) {
+    swallow('computeIndexablePairs', error);
     return [];
   }
 }

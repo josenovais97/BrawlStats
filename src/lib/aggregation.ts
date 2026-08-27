@@ -567,19 +567,42 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  * The storage ceiling this project is built to live under, and the level at
  * which the prune starts defending it.
  *
- * The database is a free Neon instance with a hard 512 MB limit and no
- * intention of ever costing anything, so "we will notice before it fills" is
- * not a plan — nobody is watching, and the failure mode is writes being
- * refused. Above the high-water mark the prune shortens its retention windows
- * instead, spending accuracy to hold the line — see RETENTION_UNDER_PRESSURE
- * for which windows, in which order, and what each one costs.
+ * Retargeted 2026-08-27 when Postgres moved onto the Oracle A1 box. It was
+ * 500 MB, which was never a property of this project — it was Neon's free
+ * tier, then Supabase's. Self-hosted on a 45 GB volume the real constraint is
+ * the *disk*, shared with Docker images, build cache and the nightly dumps,
+ * so the ceiling is now a slice of that rather than someone else's plan limit.
+ *
+ * 8 GB, derived rather than picked. Measured on the box 2026-08-27, every
+ * table is window-bounded and the whole database plateaus near 150 MB:
+ *
+ *   battle_daily_stats   ~97 KB/day  x 30d  =  ~2.9 MB
+ *   brawler_pair_daily  ~429 KB/day  x 22d  =  ~9.4 MB
+ *   battle_samples       ~10 MB/day  x  3d  =   ~30 MB
+ *   player_brawler_snapshots, 2d                ~24 MB
+ *   the rest, all bounded                       ~80 MB
+ *
+ * So 8 GB is ~50x the plateau: the valve becomes an emergency brake for a
+ * genuine runaway rather than something that fires during normal operation,
+ * which is what it was doing at 500 MB. It is deliberately NOT the whole disk
+ * — a database allowed to fill the volume takes Docker, the deploy timer and
+ * the backups down with it, which is strictly worse than shortening a window.
+ *
+ * Note that raising this does not lengthen retention by itself. The `ok` row
+ * of RETENTION_UNDER_PRESSURE is what bounds history, and at ~98 MB the valve
+ * is already idle. Widening those windows is a separate decision about what
+ * the site shows, and AGENTS.md asks for the plateau to be re-derived first.
+ *
+ * Above the high-water mark the prune shortens its retention windows instead,
+ * spending accuracy to hold the line — see RETENTION_UNDER_PRESSURE for which
+ * windows, in which order, and what each one costs.
  *
  * Tightening costs accuracy, not correctness: every window it touches is one
  * where the data is still there, just shallower. Nothing it does can lose an
  * observation that cannot be re-derived, which is why the raw battle window is
  * the one thing it will not touch.
  */
-const STORAGE_LIMIT_BYTES = 500 * 1024 * 1024;
+const STORAGE_LIMIT_BYTES = 8 * 1024 * 1024 * 1024;
 
 /**
  * Two levels, because there is no useful third one at the top.
