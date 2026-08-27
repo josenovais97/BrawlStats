@@ -10,30 +10,58 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Operations: where this actually runs
 
-Written 2026-08-25, after the free tiers on both Vercel and the database were
-breached in the same week. If you are picking this project up, read this before
-changing anything about caching, sampling or retention — most of it is
-counter-intuitive and was learned expensively.
+Written 2026-08-25 after the free tiers on both Vercel and the database were
+breached in the same week; rewritten 2026-08-27 when everything moved onto one
+box. If you are picking this project up, read this before changing anything
+about caching, sampling or retention — most of it is counter-intuitive and was
+learned expensively.
 
-## The stack, and what changed
+## The stack
 
 | | |
 | --- | --- |
-| Host | Vercel, **Hobby** |
-| Database | **Supabase** (Postgres 17, `eu-west-2`) — *not Neon, despite older comments* |
-| Sampler | **GitHub Actions**, every 3h — *not Vercel Cron; `vercel.json` has no `crons`* |
-| Repo | public, so Actions minutes are unmetered |
+| Host | **Oracle Cloud Always Free**, VM.Standard.A1.Flex (2 OCPU / 12 GB, aarch64), `eu-frankfurt-1` |
+| Serving | Docker Compose — Caddy (TLS) -> Next standalone -> Postgres, all on the box |
+| Database | **Postgres 17, on the box**, container-only with no published port except loopback |
+| Sampler | **systemd timer on the box**, `brawlzone-sampler`, every 3h at :17 |
+| Deploys | **systemd timer**, `brawlzone-deploy`, every 5 min: resets to `origin/main` and rebuilds if HEAD moved |
+| Backups | **systemd timer**, `brawlzone-backup`, nightly 03:30 UTC, 7 daily + 4 weekly |
+| DNS | Cloudflare, A records **DNS-only (grey cloud)** for apex and `www` |
 
-Neon was abandoned on 2026-08-25 after its 5 GB/month egress cap suspended the
-database mid-billing-cycle. The old project may still exist, blocked; it holds
-~11 days of history nobody imported. See "What was deliberately not done".
+The box is a mirror of `origin/main` — the deploy timer resets to it, so **never
+edit files on the box**; they are silently wiped on the next cycle. The one
+exception is `.env.production`, which is untracked and therefore survives.
 
-**Supabase's direct connection (`db.<ref>.supabase.co`) is IPv6-only.** Vercel
-functions and GitHub runners are IPv4, so it is unreachable from both. Everything
-goes through the pooler: session mode (5432) for migrations and the sampler,
-transaction mode (6543) for the app.
+Superseded, in order: Vercel Hobby (paused 2026-08-26 for CPU and origin
+transfer — see trap 5), Neon (5 GB/month egress cap suspended it mid-cycle),
+Supabase (500 MB, and its direct connection is IPv6-only so everything had to
+go through the pooler). Vercel and Supabase both still exist untouched as
+fallbacks; DNS no longer points at either.
 
-## Five traps that cost real outages
+## What moving off a PaaS actually changed
+
+**Backups are yours now.** Supabase did them invisibly. `~/backup-db.sh` dumps
+from inside the container and refuses to promote a dump with fewer than 17
+tables. Restore has been tested into a scratch database, not assumed. The dumps
+still sit on the same disk as the database, so they defend against operator
+error but **not** against losing the box — an off-box copy is still owed.
+
+**Storage stopped being someone else's plan limit.** `STORAGE_LIMIT_BYTES` is
+now 8 GB, a slice of the 45 GB volume rather than a free tier, and is ~50x the
+measured plateau. Raising it did not lengthen retention: the `ok` row of
+`RETENTION_UNDER_PRESSURE` bounds history, and the valve is idle at ~100 MB.
+
+**Docker build cache is not covered by `docker image prune`.** It reached
+11.77 GB — a quarter of the disk — in a single day of rebuilds before anyone
+looked. `auto-deploy.sh` now runs `docker builder prune --filter until=168h`.
+
+**Oracle reclaims idle Always Free instances.** If CPU 95th percentile, network
+*and* memory all sit under 20% across a continuous 7-day window, the instance
+can be stopped. This box idles near zero load and ~13% memory, so it is inside
+that window. Nothing on the box is reproducible from the repo alone —
+`.env.production` and every dump live only there.
+
+## Six traps that cost real outages
 
 **1. `revalidate` does nothing without `generateStaticParams`.** A dynamic route
 that exports `revalidate` but no `generateStaticParams` is *not* ISR — Next
@@ -86,6 +114,29 @@ fetch is the whole cost. The fix is `robots.txt`, enforced at the edge by
 `lib/crawl-policy`; `crawl-policy.test.ts` fails if the proxy matcher stops
 covering a blocked prefix.
 
+**6. Env vars the *build* needs, and their absence failing silently.** Routes
+with `revalidate` and no dynamic segment are PRERENDERED during `next build`.
+On Vercel the project's env vars were present at build time, so this coupling
+was invisible; in Docker they were not, and the first images shipped with
+"Not enough data" baked into both tier lists and "BRAWL_STARS_API_KEY is not
+set" baked into the leaderboard. The pages returned 200 and the logs were
+clean.
+
+`.env.production` is now mounted into the builder as a **BuildKit secret**
+(never an `ARG` or `ENV`, so nothing lands in an image layer), and
+`BUILD_DATABASE_URL` points at the loopback-published `127.0.0.1:5432` because
+a build does not join the compose network.
+
+Two things made this much harder to find than it should have been, both worth
+knowing before debugging anything similar:
+
+- **The app image has no `curl` and no `wget`.** An in-container fetch returns
+  an empty string, which reads exactly like "the page rendered without data".
+  Measure through Caddy from outside instead.
+- **`.next/cache` is a named volume and survives rebuilds.** A fixed build
+  keeps serving the old broken page until the volume is cleared or `s-maxage`
+  expires.
+
 ## Limits, and which defend themselves
 
 Storage **self-corrects**: `pressureFor()` in `lib/aggregation` shortens
@@ -93,11 +144,16 @@ retention windows at 80% and 93% of `DATA_BUDGET_BYTES`. Every table has a
 retention bound — `player_trophy_points` was the last exception and now prunes
 at 120 days (charts read 90).
 
-Egress **has no guard**. It is safe by structure rather than by control: page
-reads are served from ISR plus a 3-hour data cache, so egress is driven by the
-sampler's fixed 8 runs/day and does *not* scale with visitors. That is reasoning,
-not a measurement. If egress climbs, the first thing to check is whether
-something started reading uncached.
+Egress **has no guard**, and since 2026-08-27 it is no longer metered by
+anyone — the box has fixed monthly bandwidth rather than a per-GB bill, so the
+failure mode changed rather than disappeared. What the crawlable-URL bound
+protects now is **CPU**: two shared Ampere cores rendering pages, where the old
+Vercel bill has become a saturated box and a slow site.
+
+Page reads are served from ISR plus a 3-hour data cache, so work is driven by
+the sampler's fixed 8 runs/day and does *not* scale with visitors. That is
+reasoning, not a measurement. If the box starts working hard, the first thing
+to check is whether something started reading uncached.
 
 That reasoning has one load-bearing assumption, and trap 5 is what happens when
 it quietly stops holding: egress does not scale with visitors, but it scales
