@@ -10,3 +10,13 @@
 	# Caddy must not override them.
 	reverse_proxy app:3000
 }
+
+# www redirects to the canonical host instead of serving a second copy. Two
+# hostnames answering with identical content doubles the crawlable URL set,
+# and hosting cost here scales with that number rather than with visitors.
+#
+# Defaults to an unused internal port so the block is inert during raw-IP
+# verification, when there is no www hostname to answer for.
+{$WWW_ADDRESS::8443} {
+	redir https://{$SITE_ADDRESS}{uri} permanent
+}
