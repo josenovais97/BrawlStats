@@ -74,7 +74,25 @@ export default async function Image({ params }: { params: Promise<{ tag: string 
    * which is most active accounts, and a card showing one number twice wastes
    * a quarter of itself.
    */
+  /*
+   * Peak Ranked leads, when there is one.
+   *
+   * The card had trophies, brawlers and 3v3 wins -- three numbers that mostly
+   * measure how long an account has existed. Ranked is the only mode where
+   * matchmaking pairs comparable opponents, so it is the one line on here that
+   * says the account is *good* rather than *old*, and it is what people quote
+   * at each other. Omitted rather than shown empty for the many accounts that
+   * have never played it: a blank row invites the reader to wonder what is
+   * broken.
+   *
+   * The all-time peak rather than the current standing, because the season
+   * resets everyone to the floor and a card shared in week one would otherwise
+   * flatter nobody.
+   */
+  const peakRank = player.highestAllTimeRankedRankName ?? player.highestSeasonRankedRankName;
+
   const stats: [string, string][] = [
+    ...(peakRank ? ([['Peak Ranked', peakRank]] as [string, string][]) : []),
     ['Trophies', number(player.trophies)],
     ['Brawlers', String(player.brawlers.length)],
     ['3v3 wins', number(player['3vs3Victories'])],
