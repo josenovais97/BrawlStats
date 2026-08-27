@@ -65,32 +65,14 @@ export const MIN_SAMPLE_FOR_TIER = 20;
  * closer to the brawler's own contribution.
  */
 /**
- * How long a computed read is reused before the database is asked again.
+ * How long a computed read is cached.
  *
- * These pages are server-rendered per request — `/maps/[mode]/[map]` alone is
- * 400+ URLs, `/brawlers/[slug]` another 106 — so before this, every crawler
- * hit ran the aggregate queries again. Measured 2026-08-24 that was 0.37 GB a
- * day of Neon egress against a 5 GB monthly allowance, on course to overrun it
- * with a week of the billing period still to go. The queries are not expensive
- * *individually*; there are simply thousands of them answering with the same
- * numbers.
- *
- * Three hours, because that is exactly how often the sampler moves these
- * numbers (.github/workflows/refresh-stats.yml). It was an hour, which re-read
- * the database three times to produce one distinct answer.
- *
- * This value is also a ceiling on the *pages*, which is easy to miss: Next
- * takes a route's revalidate from the shortest-lived cache inside it, so a
- * page declaring twelve hours while calling one of these reads was silently
- * regenerating hourly. The build output prints the effective number — that is
- * the only reliable check.
- *
- * `unstable_cache` rather than the `use cache` directive that supersedes it:
- * `use cache` requires opting the whole app into Cache Components, which
- * changes how every route renders. That is a large change to make on a project
- * in maintenance for what is, here, a caching problem in four functions.
+ * Matched to the sampler: caching longer than the data changes means serving
+ * numbers that are stale for no reason, and caching shorter means recomputing
+ * an answer that cannot have moved. The sampler went from three hours to two
+ * on 2026-08-27, so this followed it.
  */
-const READ_CACHE_SECONDS = 10800;
+const READ_CACHE_SECONDS = 7200;
 
 export const COMPETITIVE_BATTLE_TYPES = ['soloRanked', 'teamRanked'] as const;
 

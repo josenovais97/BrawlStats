@@ -25,7 +25,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 /** Matches the page it represents, so a shared card is never wildly stale. */
-export const revalidate = 10800;
+export const revalidate = 7200;
 
 /* Runtime ISR. See `/brawlers/[slug]` for why the empty array is required. */
 export async function generateStaticParams() {

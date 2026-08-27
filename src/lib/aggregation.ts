@@ -139,7 +139,18 @@ const ROLLUP_REBUILD_DAYS = 3;
  * being truncated. At roll-up sizes 30 days is affordable, so the option now
  * gets the window it claims.
  */
-const ROLLUP_RETENTION_DAYS = 30;
+const ROLLUP_RETENTION_DAYS = 120;
+
+/*
+ * Raised from 30 on 2026-08-27, when the database moved onto the box's own
+ * disk and STORAGE_LIMIT_BYTES stopped being someone else's free tier.
+ *
+ * `battle_daily_stats` costs ~97 KB/day measured, so 120 days is ~12 MB --
+ * against an 8 GB budget this is free, and it is the cheapest roll-up by an
+ * order of magnitude. Retention no longer has to be argued down to what is
+ * read *today*: a longer window is now something the site can choose to read
+ * rather than something storage forbids.
+ */
 
 /**
  * How long the pairing and per-player roll-ups are kept.
@@ -160,7 +171,16 @@ const ROLLUP_RETENTION_DAYS = 30;
  * same day the prune is entitled to delete, and a matchup window would quietly
  * shrink or not depending on the order the two ran in.
  */
-const PAIRING_ROLLUP_RETENTION_DAYS = 22;
+const PAIRING_ROLLUP_RETENTION_DAYS = 45;
+
+/*
+ * Raised from 22 on 2026-08-27. Still deliberately shorter than the roll-up
+ * above -- one battle becomes several pairings, so this table grows ~4x faster
+ * (~429 KB/day measured, ~19 MB at 45 days). The margin over the 21-day read
+ * is now two dozen days rather than one, which is the point: the old value sat
+ * one day clear of the deepest read, so any new window that reached further
+ * would have silently returned thinner data rather than failing.
+ */
 
 /*
  * Both roll-up windows above are the `ok` row of RETENTION_UNDER_PRESSURE,
@@ -195,7 +215,25 @@ const PAIRING_ROLLUP_RETENTION_DAYS = 22;
  * before the prune in `runAggregation`, and why the prune checks its work
  * rather than trusting the clock.
  */
-const RAW_BATTLE_RETENTION_DAYS = ROLLUP_REBUILD_DAYS;
+const RAW_BATTLE_RETENTION_DAYS = 14;
+
+/*
+ * Decoupled from ROLLUP_REBUILD_DAYS on 2026-08-27, and raised from 3 to 14.
+ *
+ * The invariant is one-directional: raw retention must be >= the rebuild
+ * window, or the fold has no source to rebuild from. Keeping it *longer* than
+ * the rebuild window costs storage and buys recovery, which is the trade the
+ * 512 MB ceiling could not afford and 8 GB can. Measured ~15 MB/day of raw
+ * across both tables, so 14 days is ~215 MB.
+ *
+ * Worth buying because this is the only irreplaceable data in the system. The
+ * roll-ups are derived and can be rebuilt from raw; raw cannot be rebuilt from
+ * anything, because the game API serves a player's last ~25 battles and has no
+ * history endpoint. At three days, a fold that broke on a Friday and went
+ * unnoticed over a weekend would have destroyed battles permanently. At
+ * fourteen there is a fortnight to notice -- and since 2026-08-27 a failed run
+ * also emails, so noticing is no longer a matter of luck.
+ */
 
 /**
  * Snapshots are kept for days, not weeks, and full-pool sampling is why.
@@ -222,7 +260,25 @@ const RAW_BATTLE_RETENTION_DAYS = ROLLUP_REBUILD_DAYS;
  * makes the valve's own snapshot lever honest — it now only moves this under
  * genuine pressure, rather than every single run.
  */
-const SNAPSHOT_RETENTION_DAYS = 2;
+export const SNAPSHOT_RETENTION_DAYS = 8;
+
+/*
+ * Raised from 2 on 2026-08-27, for a correctness reason rather than a storage
+ * one: `getMetaMovers(7)` asks for a week of snapshot-to-snapshot movement,
+ * and with two days kept it silently compared against yesterday instead. It
+ * did not error -- reaching past retention never does, it just returns a
+ * thinner answer, which is the same trap the tier list's old "30d" option fell
+ * into. Eight days gives the seven that read wants plus a day of margin.
+ *
+ * The old comment justified two days as "four runs, since runs are twice
+ * daily". Runs have been eight times daily for some time and are twelve from
+ * 2026-08-27, so that arithmetic had drifted badly: two days is now sixteen
+ * runs of margin, not four.
+ *
+ * Still the largest table -- one row per sampled player per brawler per day --
+ * but SNAPSHOT_SAMPLE_RATE keeps it to a rotating quarter of the pool, so this
+ * is ~12 MB/day and ~96 MB at eight days.
+ */
 
 /**
  * Write a brawler snapshot for one sampled player in this many.
@@ -702,8 +758,12 @@ const RETENTION_UNDER_PRESSURE: Record<
     pairing: PAIRING_ROLLUP_RETENTION_DAYS,
     rollup: ROLLUP_RETENTION_DAYS,
   },
-  high: { snapshots: 2, pairing: 14, rollup: 30 },
-  critical: { snapshots: 1, pairing: 10, rollup: 21 },
+  // Scaled with the baselines on 2026-08-27. These stay meaningful reductions
+  // rather than fixed numbers that happen to sit below the new defaults --
+  // `critical` still serves the 21-day matchup and 30-day tier-list reads, so
+  // even the tightest state degrades accuracy rather than emptying a feature.
+  high: { snapshots: 4, pairing: 30, rollup: 60 },
+  critical: { snapshots: 2, pairing: 22, rollup: 30 },
 };
 
 /**

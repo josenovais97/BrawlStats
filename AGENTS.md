@@ -23,7 +23,7 @@ learned expensively.
 | Host | **Oracle Cloud Always Free**, VM.Standard.A1.Flex (2 OCPU / 12 GB, aarch64), `eu-frankfurt-1` |
 | Serving | Docker Compose — Caddy (TLS) -> Next standalone -> Postgres, all on the box |
 | Database | **Postgres 17, on the box**, container-only with no published port except loopback |
-| Sampler | **systemd timer on the box**, `brawlzone-sampler`, every 3h at :17 |
+| Sampler | **systemd timer on the box**, `brawlzone-sampler`, every 2h at :17 |
 | Deploys | **systemd timer**, `brawlzone-deploy`, every 5 min: resets to `origin/main` and rebuilds if HEAD moved |
 | Backups | **systemd timer**, `brawlzone-backup`, nightly 03:30 UTC, 7 daily + 4 weekly |
 | DNS | Cloudflare, A records **DNS-only (grey cloud)** for apex and `www` |
@@ -186,7 +186,16 @@ fixed panel forever.
 
 **Sampling frequency is set by the battle log, not by cost.** It holds a
 player's last ~25 battles with no history endpoint, so anything played between
-visits is lost permanently. Three hours is that constraint, not a preference.
+visits is lost permanently.
+
+Three hours was that constraint's first answer; two hours is its second.
+Measured on the box 2026-08-27 across three days: battles captured per player
+per 3h window averaged 12.2, but p95 was 30 and **13.2% of active
+player-windows sat at or past 25** -- i.e. one in eight was at the log's
+ceiling and losing battles. Halving the interval roughly halves the per-fetch
+count. `READ_CACHE_SECONDS` and every `revalidate` that was matched to the
+sampler moved with it, because a cache longer than the data's own rhythm serves
+stale numbers for no reason.
 
 ## What was deliberately not done
 

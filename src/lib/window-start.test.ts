@@ -61,8 +61,10 @@ test('the site’s real windows stay inside what the prune keeps', () => {
    * thinner answer, which is how the tier list's since-removed "30d" option
    * came to be quietly reading 24 days.
    */
-  const OLDEST_ROLLUP_DAY = 30;
-  for (const days of [7, 21, 30]) {
+  // 120 since 2026-08-27 (was 30). The guard is the same: a read that reaches
+  // past retention does not error, it quietly returns fewer days.
+  const OLDEST_ROLLUP_DAY = 120;
+  for (const days of [7, 21, 30, 90]) {
     const reachBack = (todayUtcMidnight() - windowStartUtc(days).getTime()) / DAY;
     assert.ok(
       reachBack <= OLDEST_ROLLUP_DAY,

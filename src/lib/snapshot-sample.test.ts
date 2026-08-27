@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { shouldSnapshot } from '@/lib/aggregation';
+import { DATA_BUDGET_BYTES, SNAPSHOT_RETENTION_DAYS, shouldSnapshot } from '@/lib/aggregation';
 
 /**
  * The snapshot sample is the difference between fitting the plan and not.
@@ -44,14 +44,17 @@ test('the sample rate keeps the database inside the plan', () => {
   );
 });
 
-test('a census does not fit, which is why the rate exists', () => {
-  // The state this replaced. Kept as a test so the saving is not mistaken for
-  // caution: at rate 1 the table alone overruns the plan.
+test('a census costs four times the sample, which is why the rate exists', () => {
+  // The state this replaced. On an 8 GB budget a census would now *fit*, so
+  // the old assertion (that it overruns the plan) stopped being true and
+  // stopped being the point. What still matters is the multiple: this table
+  // was 47% of the whole database at rate 1, and every consumer of it is an
+  // aggregate that a representative sample answers just as well.
   const total = projectedBytes(1) + OTHER_TABLES_BYTES;
 
   assert.ok(
-    total > PLAN_BYTES,
-    'rate 1 was supposed to overrun the plan; if it no longer does, these constants are stale',
+    total > projectedBytes(4) + OTHER_TABLES_BYTES,
+    'a census was supposed to cost far more than the sample; if it no longer does, these constants are stale',
   );
 });
 

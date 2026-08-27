@@ -38,7 +38,7 @@ interface PageProps {
  * route's revalidate is the shortest-lived cache inside it. This value was
  * briefly 43200, which the build reported as 1h.
  */
-export const revalidate = 10800;
+export const revalidate = 7200;
 
 /*
  * Runtime ISR. See `/brawlers/[slug]` for why the empty array is required.

@@ -10,7 +10,7 @@ import { resolveTierRoute, tierListMetadata } from '@/lib/tier-list-route';
  * route's revalidate is the shortest-lived cache inside it. This value was
  * briefly 43200, which the build reported as 1h.
  */
-export const revalidate = 10800;
+export const revalidate = 7200;
 
 /* Runtime ISR. Without an empty `generateStaticParams` a dynamic segment is
    re-rendered per request however short its `revalidate` is. */

@@ -127,7 +127,7 @@ async function resolveBrawler(handle: string): Promise<Resolved> {
  * fiction until 2026-08-25 — `getBrawlerRankings` used the 120s default, which
  * pinned every page here to a two-minute cycle and the ranking calls with it.
  */
-export const revalidate = 10800;
+export const revalidate = 7200;
 
 /*
  * Empty on purpose, and load-bearing.
