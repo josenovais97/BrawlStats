@@ -41,7 +41,11 @@ export function ShareButton({ title, text }: { title: string; text: string }) {
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+      /* Deliberately the same shape as FavoriteButton: the two sit side by
+         side in the profile header, and a different radius, padding and weight
+         on each made them read as two unrelated controls that happened to be
+         adjacent. */
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-sm font-semibold text-muted transition-colors hover:border-brand/40 hover:text-foreground"
     >
       {copied ? <Check className="size-4 text-victory" /> : <Share2 className="size-4" />}
       {copied ? 'Link copied' : 'Share'}

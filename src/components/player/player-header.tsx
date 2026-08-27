@@ -99,24 +99,29 @@ export function PlayerHeader({
               Peak {formatNumber(player.highestTrophies)}
             </span>
           </div>
-          <FavoriteButton
-            kind="player"
-            tag={normalizeTag(player.tag)}
-            name={player.name}
-          />
           {/*
-            Share lives here, beside Favourite, because it belongs to the
-            profile rather than to any one section of it. It used to sit on the
-            trophy-progress heading, which returns null for anyone with fewer
-            than two days of sampled history -- so three of the four profiles
-            checked on 2026-08-27 had no share button at all, including the
-            top-ranked player. A share action that is missing from most of the
-            pages it applies to is not a feature.
+            The two profile actions share one row rather than taking a stacked
+            slot each. Stacked, they made this card a third taller than the
+            identity beside it needs, which left a band of empty space across
+            the middle -- the header is a place to read a name and a trophy
+            count, not a column of controls.
+
+            Share belongs to the profile rather than to any one section of it.
+            It used to sit on the trophy-progress heading, which returns null
+            for anyone with fewer than two days of sampled history, so three of
+            the four profiles checked on 2026-08-27 had no share button at all.
           */}
-          <ShareButton
-            title={`${player.name} on BrawlZone`}
-            text={`${player.name} (${player.tag}) has ${formatNumber(player.trophies)} trophies on BrawlZone`}
-          />
+          <div className="grid flex-1 grid-cols-2 items-stretch gap-2.5 sm:flex-none">
+            <FavoriteButton
+              kind="player"
+              tag={normalizeTag(player.tag)}
+              name={player.name}
+            />
+            <ShareButton
+              title={`${player.name} on BrawlZone`}
+              text={`${player.name} (${player.tag}) has ${formatNumber(player.trophies)} trophies on BrawlZone`}
+            />
+          </div>
         </div>
 
         <div className="flex w-full flex-wrap items-center gap-2 text-sm">
