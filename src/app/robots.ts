@@ -58,7 +58,14 @@ export default function robots(): MetadataRoute.Robots {
       })),
       {
         userAgent: '*',
-        allow: '/',
+        /*
+         * The `/player/<tag>` entries are the baked allowlist. They have to be
+         * spelled out one per line -- robots.txt has no way to say "these
+         * hundred of that prefix" -- and crawlers resolve a conflict between
+         * Allow and Disallow by longest match, so a listed tag wins over the
+         * `/player/` disallow below while every other tag stays refused.
+         */
+        allow: ['/', ...[...INDEXABLE_PLAYER_TAGS].map((tag) => `/player/${tag}`)],
         /*
          * Both lists live in `@/lib/crawl-policy`, which explains what is on
          * them and why. They are shared because `src/proxy.ts` enforces the
