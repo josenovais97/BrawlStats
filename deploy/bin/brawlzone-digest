@@ -87,7 +87,7 @@ html_rows_close
 
 html_section "Sampler"
 html_rows_open
-html_row "Runs (24h)" "$runs24 of 8 expected" "$([ "${runs24:-0}" -ge 7 ] && echo "$OK" || echo "$WARN")"
+html_row "Runs (24h)" "$runs24 of 12 expected" "$([ "${runs24:-0}" -ge 10 ] && echo "$OK" || echo "$WARN")"
 html_row "Players sampled" "$players24"
 html_row "Battles recorded" "$battles24"
 html_row "Last run" "$last_run ($last_status)"

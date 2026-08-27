@@ -1,8 +1,8 @@
 [Unit]
-Description=Sample every three hours at :17
+Description=Sample every two hours at :17
 
 [Timer]
-OnCalendar=*-*-* 00/3:17:00
+OnCalendar=*-*-* 00/2:17:00
 Persistent=true
 Unit=brawlzone-sampler.service
 
