@@ -20,26 +20,37 @@
 name: Refresh stats
 
 on:
-  schedule:
-    # Every three hours, at :17 rather than :00.
-    #
-    # The interval is set by the battle log, not by taste. It holds a player's
-    # last ~25 matches, so anything they play beyond that between visits is
-    # lost; three hours keeps all but the most relentless accounts under the
-    # ceiling. Measured at a six-hour interval, 68% of players came back capped.
-    #
-    # The offset matters more than it looks. GitHub queues scheduled workflows
-    # and the top of the hour is by far the most contended slot, so ':00' jobs
-    # routinely start 10-20 minutes late or get dropped under load. An odd
-    # minute is far likelier to fire on time.
-    #
-    # Costs, all inside free tiers at this cadence:
-    #   Actions   ~5 min/run x 8/day  = ~1,200 min/month (2,000 free, private)
-    #   Brawl API ~2,018 calls/run    = ~16k/day, ~11/s only during a run
-    #   Vercel    nothing at all, which is the point of this file
-    # Halving the frequency to '17 */6 * * *' halves all three if any gets tight.
-    - cron: '17 */3 * * *'
-  # Manual trigger, for testing a change without waiting for the schedule.
+  # Disabled 2026-08-27. The sampler now runs on the Oracle box as the
+  # systemd timer brawlzone-sampler.timer, on the same */3h at :17 schedule.
+  #
+  # It had to move: Postgres now runs container-only on that box with no
+  # published port, so a GitHub runner cannot reach it, and opening the
+  # database to GitHub's rotating runner ranges is a worse trade than moving
+  # 136 seconds of batch work onto a machine that is already paid for.
+  #
+  # Kept as workflow_dispatch so it can still be run by hand against a
+  # reachable database. The schedule block below is preserved, commented, so
+  # the cadence and its reasoning are not lost.
+  # schedule:
+  #   # Every three hours, at :17 rather than :00.
+  #   #
+  #   # The interval is set by the battle log, not by taste. It holds a player's
+  #   # last ~25 matches, so anything they play beyond that between visits is
+  #   # lost; three hours keeps all but the most relentless accounts under the
+  #   # ceiling. Measured at a six-hour interval, 68% of players came back capped.
+  #   #
+  #   # The offset matters more than it looks. GitHub queues scheduled workflows
+  #   # and the top of the hour is by far the most contended slot, so ':00' jobs
+  #   # routinely start 10-20 minutes late or get dropped under load. An odd
+  #   # minute is far likelier to fire on time.
+  #   #
+  #   # Costs, all inside free tiers at this cadence:
+  #   #   Actions   ~5 min/run x 8/day  = ~1,200 min/month (2,000 free, private)
+  #   #   Brawl API ~2,018 calls/run    = ~16k/day, ~11/s only during a run
+  #   #   Vercel    nothing at all, which is the point of this file
+  #   # Halving the frequency to '17 */6 * * *' halves all three if any gets tight.
+  #   - cron: '17 */3 * * *'
+  # # Manual trigger, for testing a change without waiting for the schedule.
   workflow_dispatch:
 
 # Two runs overlapping would double the upstream call rate for no extra data,
