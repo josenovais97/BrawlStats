@@ -60,6 +60,26 @@ services:
     depends_on:
       - app
 
+  # Batch sampler. Built from the `builder` stage because it needs tsx, the dev
+  # dependencies and scripts/ -- none of which survive into the standalone
+  # runtime image. Behind a profile so it never starts with the stack; a
+  # systemd timer runs it every three hours via `docker compose run --rm`.
+  #
+  # Three hours is set by the battle log, not by cost: it holds a player's last
+  # ~25 matches and there is no history endpoint, so anything played beyond
+  # that between samples is lost permanently.
+  sampler:
+    build:
+      context: .
+      target: builder
+    profiles: ["tools"]
+    restart: "no"
+    env_file: .env.production
+    command: ["npm", "run", "stats:refresh"]
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
   next-cache:
