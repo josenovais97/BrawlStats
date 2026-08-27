@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 import { getOfficialBrawlers, getPlayer } from '@/lib/bs-api';
 import { playerIconUrl } from '@/lib/brawlapi';
-import { nameColorToCss } from '@/lib/format';
+import { nameColorToCss, titleCaseLabel } from '@/lib/format';
 import { SITE_NAME } from '@/lib/site';
 import { computeSkillScore } from '@/lib/skill-score';
 import { displayTag } from '@/lib/tags';
@@ -89,7 +89,11 @@ export default async function Image({ params }: { params: Promise<{ tag: string 
    * resets everyone to the floor and a card shared in week one would otherwise
    * flatter nobody.
    */
-  const peakRank = player.highestAllTimeRankedRankName ?? player.highestSeasonRankedRankName;
+  // titleCaseLabel, not the raw value: the API returns "MYTHIC I" and the card
+  // was the only place on the site shouting it. lib/skill-score already
+  // title-cases the same field for the page.
+  const peakRankName = player.highestAllTimeRankedRankName ?? player.highestSeasonRankedRankName;
+  const peakRank = peakRankName ? titleCaseLabel(peakRankName) : undefined;
 
   const stats: [string, string][] = [
     ...(peakRank ? ([['Peak Ranked', peakRank]] as [string, string][]) : []),
