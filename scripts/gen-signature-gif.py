@@ -1,68 +1,43 @@
 """
-Renders public/brand/signature.gif -- the animated mark for the email signature.
+Renders public/brand/signature.gif -- the animated rule for the email signature.
 
 A GIF because Gmail strips <style> blocks and CSS animation, so a raster loop is
 the only thing that moves in an inbox.
 
-The animation is the product, not an effect: three gold bars fill, hold, and
-drain, which is the same readout the Skill Score panel uses on a player page. A
-shimmer sweep would have looked identical on any brand; bars filling say "this
-is a stats site" before the reader has finished the wordmark.
+It is a *rule*, not a banner. The app icon above it already carries the mark, so
+an earlier version that repeated the wordmark underneath was branding the same
+thing twice -- the commonest way a signature stops looking professional. What is
+left is the readout itself: three gold bars that fill, hold and drain, the same
+shape the Skill Score panel draws on a player page.
 
-Symmetric loop -- fill, hold, drain, pause -- so it never snaps back to the
-start. Slow and low-contrast on purpose: a signature sits beside a message, and
-anything fast there reads as an advert.
+Ground is sampled from apple-icon.png (11,16,32), so the rule and the mark share
+a background and read as one object rather than two pasted images. That also
+means it holds up in a dark-mode inbox, where a white strip would glare.
 
-Hosted on brawlzone.net rather than an image host, so the signature has no
-third-party dependency to outlive.
-
-Regenerate with:  python3 scripts/gen-signature-gif.py
+Square ends, not rounded: this is a data readout, and at 17px tall a radius is
+noise. Regenerate with:  python3 scripts/gen-signature-gif.py
 """
-import math
 import os
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
-W, H = 780, 124                 # 2x; displayed at 390x62
-BG = (11, 15, 29)               # --ink
-GOLD = (255, 197, 61)           # --brand
-GOLD_DEEP = (255, 171, 0)       # --brand-strong
-TRACK = (30, 37, 64)
-MUTED = (122, 133, 166)
+W, H = 780, 68                  # 2x; displayed at 390x34
+BG = (11, 16, 32)               # sampled from apple-icon.png
+GOLD = (255, 197, 61)
+GOLD_DEEP = (255, 171, 0)
+TRACK = (28, 35, 60)
 
-FONT_DIR = "/usr/share/fonts/truetype/dejavu"
-F_MARK = ImageFont.truetype(f"{FONT_DIR}/DejaVuSans-Bold.ttf", 42)
-F_SUB = ImageFont.truetype(f"{FONT_DIR}/DejaVuSans.ttf", 19)
+PAD_X, BAR_H, BAR_GAP = 16, 12, 10
+# Uneven, because a real readout is. Even bars look like a loading spinner.
+BAR_FILL = [0.94, 0.61, 0.79]
 
-MARK, SPACING = "BRAWLZONE", 6
-SUB = "Brawl Stars stats, tier lists & draft tools"
-
-# Bar geometry. Three, because that is what the Skill Score panel shows:
-# Ranked, Trophy push, Mastery -- and their relative lengths echo a real
-# readout rather than three identical stripes.
-BAR_X, BAR_W, BAR_H, BAR_GAP = 470, 268, 12, 20
-BAR_FILL = [0.92, 0.58, 0.76]
-
-# Fewer, slower frames: the loop reads the same and the file is a third
-# smaller, which matters for something attached to every message sent.
 FILL, HOLD, DRAIN, PAUSE = 9, 6, 9, 4
 FRAMES = FILL + HOLD + DRAIN + PAUSE
 
 
 def ease(t: float) -> float:
-    """Ease-in-out. A linear bar looks mechanical; this looks deliberate."""
+    """Ease-in-out. Linear looks mechanical; this looks deliberate."""
     return 3 * t * t - 2 * t * t * t
-
-
-def tracked(draw, x, y, text, font, fill):
-    for ch in text:
-        draw.text((x, y), ch, font=font, fill=fill)
-        x += draw.textlength(ch, font=font) + SPACING
-    return x
-
-
-def mark_width(draw):
-    return sum(draw.textlength(c, font=F_MARK) + SPACING for c in MARK) - SPACING
 
 
 def progress(i: int) -> float:
@@ -75,52 +50,31 @@ def progress(i: int) -> float:
     return 0.0
 
 
-def rounded_bar(draw, x, y, w, h, colour):
-    if w <= 0:
-        return
-    r = h / 2
-    if w <= h:
-        draw.ellipse([x, y, x + w, y + h], fill=colour)
-        return
-    draw.rounded_rectangle([x, y, x + w, y + h], radius=r, fill=colour)
-
-
 def build():
-    probe = ImageDraw.Draw(Image.new("RGB", (8, 8)))
-    mw = mark_width(probe)
+    bar_w = W - PAD_X * 2
+    top = (H - (BAR_H * 3 + BAR_GAP * 2)) // 2
     frames = []
 
     for i in range(FRAMES):
         img = Image.new("RGB", (W, H), BG)
         d = ImageDraw.Draw(img)
-
-        # A gold hairline along the top edge, the only chrome on the strip.
-        d.rectangle([0, 0, W, 3], fill=GOLD_DEEP)
-
-        tracked(d, 28, 26, MARK, F_MARK, GOLD)
-        d.text((30, 82), SUB, font=F_SUB, fill=MUTED)
+        d.rectangle([0, 0, W, 2], fill=GOLD_DEEP)   # the only chrome
 
         p = progress(i)
         for n, target in enumerate(BAR_FILL):
-            y = 28 + n * (BAR_H + BAR_GAP)
-            # Staggered, so they read as a cascade rather than one control.
+            y = top + n * (BAR_H + BAR_GAP)
             local = max(0.0, min(1.0, p * 1.25 - n * 0.12))
-            rounded_bar(d, BAR_X, y, BAR_W, BAR_H, TRACK)
-            rounded_bar(d, BAR_X, y, BAR_W * target * local, BAR_H, GOLD)
+            d.rectangle([PAD_X, y, PAD_X + bar_w, y + BAR_H], fill=TRACK)
+            w = bar_w * target * local
+            if w >= 1:
+                d.rectangle([PAD_X, y, PAD_X + w, y + BAR_H], fill=GOLD)
 
-        frames.append(img.convert("P", palette=Image.ADAPTIVE, colors=16))
+        frames.append(img.convert("P", palette=Image.ADAPTIVE, colors=8))
 
     out = "public/brand/signature.gif"
-    frames[0].save(
-        out,
-        save_all=True,
-        append_images=frames[1:],
-        duration=85,
-        loop=0,
-        optimize=True,
-        disposal=2,
-    )
-    print(f"wrote {out} - {os.path.getsize(out)/1024:.0f} KB, {FRAMES} frames, {W}x{H}")
+    frames[0].save(out, save_all=True, append_images=frames[1:],
+                   duration=85, loop=0, optimize=True, disposal=2)
+    print(f"wrote {out} - {os.path.getsize(out)/1024:.1f} KB, {W}x{H}")
 
 
 build()
