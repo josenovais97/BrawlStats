@@ -6,6 +6,20 @@
 {$SITE_ADDRESS::80} {
 	encode zstd gzip
 
+	# There was no access log at all until 2026-08-27, which meant no way to
+	# answer "which crawler is hitting what" -- the exact question behind the
+	# outage that moved this project off Vercel.
+	#
+	# roll_disabled hands retention to logrotate (daily, 30 days) so every log
+	# on the box has one policy in one place. logrotate uses copytruncate,
+	# which Caddy tolerates because it appends rather than seeking.
+	log {
+		output file /var/log/brawlzone/access.log {
+			roll_disabled
+		}
+		format json
+	}
+
 	# Next sets its own cache headers per route (see AGENTS.md trap 2) and
 	# Caddy must not override them.
 	reverse_proxy app:3000

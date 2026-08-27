@@ -33,6 +33,13 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        # Docker's default is json-file with NO limit, so a container log grows
+        # until the disk does. 20 MB x 5 caps each service at 100 MB.
+        max-size: "20m"
+        max-file: "5"
 
   app:
     build:
@@ -53,6 +60,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        # Docker's default is json-file with NO limit, so a container log grows
+        # until the disk does. 20 MB x 5 caps each service at 100 MB.
+        max-size: "20m"
+        max-file: "5"
 
   caddy:
     image: caddy:2-alpine
@@ -65,8 +79,18 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+      # Access log lands beside the scheduled-job logs so one logrotate rule
+      # covers everything and one directory answers "what happened".
+      - /var/log/brawlzone:/var/log/brawlzone
     depends_on:
       - app
+    logging:
+      driver: json-file
+      options:
+        # Docker's default is json-file with NO limit, so a container log grows
+        # until the disk does. 20 MB x 5 caps each service at 100 MB.
+        max-size: "20m"
+        max-file: "5"
 
   # Batch sampler. Built from the `builder` stage because it needs tsx, the dev
   # dependencies and scripts/ -- none of which survive into the standalone
