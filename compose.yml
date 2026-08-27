@@ -1,4 +1,34 @@
 services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: .env.production
+    # Deliberately no `ports:`. Postgres is reachable only over the compose
+    # network, so nothing needs firewalling and there is no public surface.
+    # Anything that needs a shell into it goes through `docker compose exec`.
+    command:
+      - postgres
+      # Tuned for 11 GB / 2 cores against a ~120 MB database: enough shared
+      # buffers to hold the whole thing, the rest left to the page cache.
+      - -c
+      - shared_buffers=1GB
+      - -c
+      - effective_cache_size=3GB
+      - -c
+      - maintenance_work_mem=256MB
+      - -c
+      - work_mem=16MB
+      - -c
+      - max_connections=50
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
   app:
     build:
       context: .
@@ -12,6 +42,9 @@ services:
       # The ISR cache. Without this the container re-renders all ~1,000 URLs
       # from cold on every restart and deploy.
       - next-cache:/app/.next/cache
+    depends_on:
+      db:
+        condition: service_healthy
 
   caddy:
     image: caddy:2-alpine
@@ -28,6 +61,7 @@ services:
       - app
 
 volumes:
+  pgdata:
   next-cache:
   caddy-data:
   caddy-config:
