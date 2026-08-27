@@ -20,7 +20,10 @@ USER_NAME="${SUDO_USER:-$USER}"
 say() { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 
 [ "$(uname -m)" = "aarch64" ] || { echo "expected aarch64; this is $(uname -m)" >&2; exit 1; }
-sudo -v
+# No `sudo -v` here: it insists on a TTY even where the user has NOPASSWD, so
+# it broke non-interactive runs over ssh. The individual sudo calls below work
+# either way.
+sudo true
 
 say "Firewall: open 80/443 above the REJECT rule"
 # OCI's Ubuntu image ships a REJECT at the end of INPUT, so 80/443 stay dead
