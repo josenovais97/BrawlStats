@@ -125,3 +125,56 @@ test('curl is let through, because a documented operation runs on it', () => {
   assert.equal(shouldBlockCrawl('/api/cron/refresh-stats', 'curl/8.5.0'), false);
   assert.equal(shouldBlockCrawl('/api/cron/refresh-stats', null), false);
 });
+
+/*
+ * The player allowlist.
+ *
+ * `/player/[tag]` is refused to crawlers wholesale because the tag space is
+ * unbounded — that refusal is what stopped the outage repeating. The allowlist
+ * carves a bounded hole in it for the ranked leaderboard's top 100, so the
+ * tests that matter are the ones proving the hole stays exactly that size.
+ */
+const ALLOWED = new Set(['9PVU00U2P', '8PLLQ2C0']);
+
+test('an allowlisted player is served to a crawler', () => {
+  assert.equal(shouldBlockCrawl('/player/9PVU00U2P', 'Googlebot', ALLOWED), false);
+  assert.equal(isCrawlerDisallowed('/player/9PVU00U2P', ALLOWED), false);
+});
+
+test('every other player tag stays refused', () => {
+  assert.equal(shouldBlockCrawl('/player/NOTONTHELIST', 'Googlebot', ALLOWED), true);
+  assert.equal(isCrawlerDisallowed('/player/NOTONTHELIST', ALLOWED), true);
+});
+
+test('an empty allowlist refuses everything, which is the safe build failure', () => {
+  // scripts/gen-indexable-players.ts writes an empty set when it cannot reach
+  // the database. That must never mean "allow all".
+  assert.equal(shouldBlockCrawl('/player/9PVU00U2P', 'Googlebot', new Set()), true);
+  assert.equal(shouldBlockCrawl('/player/9PVU00U2P', 'Googlebot', undefined), true);
+});
+
+test('the allowlist does not leak past the player route', () => {
+  // A tag-shaped segment under another blocked prefix must not be matched.
+  assert.equal(shouldBlockCrawl('/club/9PVU00U2P', 'Googlebot', ALLOWED), true);
+  assert.equal(shouldBlockCrawl('/api/player/9PVU00U2P', 'Googlebot', ALLOWED), true);
+  assert.equal(shouldBlockCrawl('/player/9PVU00U2P/extra', 'Googlebot', ALLOWED), true);
+});
+
+test('tag spellings normalise to one allowlist entry', () => {
+  // The route canonicalises with normalizeTag, so the guard must agree or a
+  // legitimate URL variant would 404 for a crawler that found it.
+  for (const spelling of ['9pvu00u2p', '%239PVU00U2P', '9PVUOOU2P']) {
+    assert.equal(
+      shouldBlockCrawl(`/player/${spelling}`, 'Googlebot', ALLOWED),
+      false,
+      `${spelling} should resolve to the allowlisted tag`,
+    );
+  }
+});
+
+test('social unfurlers are unaffected by the allowlist', () => {
+  // SOCIAL_DISALLOW is /api/ only, so Discord could always fetch a profile.
+  // The carve-out must not change that in either direction.
+  assert.equal(shouldBlockCrawl('/player/NOTONTHELIST', 'Discordbot', ALLOWED), false);
+  assert.equal(shouldBlockCrawl('/api/player/X', 'Discordbot', ALLOWED), true);
+});

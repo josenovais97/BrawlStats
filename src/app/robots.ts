@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 
+import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { CRAWLER_DISALLOW, SOCIAL_AGENTS, SOCIAL_DISALLOW } from '@/lib/crawl-policy';
 import { SITE_URL } from '@/lib/site';
 

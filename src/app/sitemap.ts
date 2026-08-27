@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
@@ -84,6 +85,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Maps and their mode indexes: the largest indexable surface on the site,
   // and every one of them answers a real query ("<map> best brawlers").
+  // The bounded set of player pages a crawler is allowed to fetch. Listing
+  // them is the point: they are the second most-visited content on the site
+  // and were invisible to search until 2026-08-27. See
+  // scripts/gen-indexable-players.ts for why the set is baked rather than
+  // queried, and why an empty one is the safe failure.
+  for (const tag of INDEXABLE_PLAYER_TAGS) {
+    add(`/player/${tag}`, 'daily', 0.5);
+  }
+
   const maps = await getActiveMaps().catch(() => []);
   for (const group of groupByMode(maps)) {
     add(`/maps/${group.mode}`, 'weekly', 0.7);

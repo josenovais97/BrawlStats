@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && npm run gen:players && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "node --import tsx --conditions=react-server --test \"src/**/*.test.ts\"",
@@ -15,7 +15,8 @@
     "db:seed": "tsx scripts/seed-stats.ts",
     "db:storage": "tsx scripts/db-storage.ts",
     "stats:refresh": "node --import tsx --conditions=react-server scripts/refresh-stats.ts",
-    "crawl:budget": "node scripts/crawl-budget.mjs"
+    "crawl:budget": "node scripts/crawl-budget.mjs",
+    "gen:players": "node --import tsx --conditions=react-server scripts/gen-indexable-players.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

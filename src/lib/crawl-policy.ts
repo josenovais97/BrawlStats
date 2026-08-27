@@ -42,6 +42,8 @@
  * Prefixes, so `/draft` and `/compare` themselves — the bare tools, which are
  * what the sitemap lists and what is worth indexing — stay crawlable.
  */
+import { normalizeTag } from '@/lib/tags';
+
 export const CRAWLER_DISALLOW = [
   '/api/',
   '/player/',
@@ -122,7 +124,42 @@ export function disallowFor(
 }
 
 /** True when `robots.txt` tells search crawlers to stay out of this path. */
-export function isCrawlerDisallowed(pathname: string): boolean {
+/**
+ * The tag in `/player/<tag>`, normalised, or null for any other shape.
+ *
+ * Normalised with the same function the route canonicalises with, so `#abc`,
+ * `%23ABC` and `abc` all resolve to the one allowlist entry rather than three
+ * near-misses that quietly fall back to being blocked.
+ */
+export function playerTagFromPath(pathname: string): string | null {
+  const match = /^\/player\/([^/]+)\/?$/.exec(pathname);
+  if (!match) return null;
+  try {
+    return normalizeTag(decodeURIComponent(match[1]));
+  } catch {
+    // A malformed percent-escape is not a tag anyone can have.
+    return null;
+  }
+}
+
+/**
+ * Whether a crawler is refused this path.
+ *
+ * `allowIndexablePlayers` is the baked allowlist (see
+ * scripts/gen-indexable-players.ts). It carves a bounded hole in the
+ * `/player/` disallow: the ranked leaderboard's top 100, which the site
+ * already links to. Omit it and the behaviour is exactly what it was before
+ * the allowlist existed — which is what every caller that has no business
+ * knowing about players should do.
+ */
+export function isCrawlerDisallowed(
+  pathname: string,
+  allowIndexablePlayers?: ReadonlySet<string>,
+): boolean {
+  if (allowIndexablePlayers?.size) {
+    const tag = playerTagFromPath(pathname);
+    if (tag && allowIndexablePlayers.has(tag)) return false;
+  }
   return CRAWLER_DISALLOW.some((prefix) => pathname.startsWith(prefix));
 }
 
@@ -133,7 +170,16 @@ export function isCrawlerDisallowed(pathname: string): boolean {
 export function shouldBlockCrawl(
   pathname: string,
   userAgent: string | null | undefined,
+  allowIndexablePlayers?: ReadonlySet<string>,
 ): boolean {
   const disallow = disallowFor(userAgent);
-  return disallow !== null && disallow.some((prefix) => pathname.startsWith(prefix));
+  if (disallow === null) return false;
+  // Only search crawlers get the player carve-out. Social unfurlers were never
+  // blocked from /player/ in the first place -- SOCIAL_DISALLOW is /api/ only
+  // -- so this must not widen anything for them.
+  if (disallow === CRAWLER_DISALLOW && allowIndexablePlayers?.size) {
+    const tag = playerTagFromPath(pathname);
+    if (tag && allowIndexablePlayers.has(tag)) return false;
+  }
+  return disallow.some((prefix) => pathname.startsWith(prefix));
 }

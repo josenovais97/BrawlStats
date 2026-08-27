@@ -8,6 +8,7 @@ import {
   leaderboardHref,
 } from '@/lib/leaderboard-route';
 import { MAX_ENEMIES, draftHref } from '@/lib/draft-route';
+import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { shouldBlockCrawl } from '@/lib/crawl-policy';
 import { slugify } from '@/lib/slugs';
 
@@ -131,7 +132,12 @@ const CRAWLER_REFUSED = 'Not found.\n';
 export function proxy(request: NextRequest): NextResponse | undefined {
   const { pathname, searchParams } = request.nextUrl;
 
-  if (shouldBlockCrawl(pathname, request.headers.get('user-agent'))) {
+  // The allowlist is baked at build time (scripts/gen-indexable-players.ts)
+  // because `config.matcher` below has to be statically analysable and this
+  // runs on every profile view -- a lookup here would cost more than the crawl
+  // it prevents. An empty set means nothing is indexable, which is the
+  // behaviour this had before the allowlist existed.
+  if (shouldBlockCrawl(pathname, request.headers.get('user-agent'), INDEXABLE_PLAYER_TAGS)) {
     return new NextResponse(CRAWLER_REFUSED, {
       status: 404,
       headers: {
