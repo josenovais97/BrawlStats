@@ -20,7 +20,14 @@ import type { CosmeticUsage } from '@/lib/stats';
  * There is no page per cosmetic on purpose. Around 1,200 skins and 500 icons
  * would nearly triple the crawlable surface of the site for pages carrying one
  * number each, and this box has two cores.
+ *
+ * Only the first chunk of rows is rendered. The full list rendered at once was
+ * 1.1 MB of markup for the skins page -- the data itself is a fraction of that,
+ * so it all travels in the payload and search still spans every row; what is
+ * capped is the DOM, not the dataset. Nothing is orphaned by this, because no
+ * row links anywhere a crawler needs to follow.
  */
+const FIRST_PAGE = 250;
 export function CosmeticList({
   items,
   kind,
@@ -32,6 +39,7 @@ export function CosmeticList({
   art?: Record<string, string>;
 }) {
   const [query, setQuery] = useState('');
+  const [showAll, setShowAll] = useState(false);
 
   // Rank is assigned once, from the unfiltered order, so a search narrows the
   // list without renumbering it -- and so the row does not call indexOf, which
@@ -50,6 +58,10 @@ export function CosmeticList({
         (item.brawlerName ?? '').toLowerCase().includes(q),
     );
   }, [ranked, query]);
+
+  // A search is already a narrowing, so it shows everything it found.
+  const searching = query.trim().length > 0;
+  const visible = searching || showAll ? matches : matches.slice(0, FIRST_PAGE);
 
   const isIcon = kind === 'icon';
 
@@ -74,7 +86,7 @@ export function CosmeticList({
         <p className="card p-6 text-sm text-muted">Nothing matches &ldquo;{query}&rdquo;.</p>
       ) : (
         <ol className="card divide-y divide-border overflow-hidden">
-          {matches.map(({ item, rank }, index) => (
+          {visible.map(({ item, rank }, index) => (
             <li key={`${item.id}-${item.brawlerId ?? 0}`} className="flex items-center gap-3 px-3 py-2.5">
               <span className="w-8 shrink-0 text-right text-xs tabular-nums text-muted">
                 {rank}
@@ -115,6 +127,16 @@ export function CosmeticList({
           ))}
         </ol>
       )}
+
+      {!searching && !showAll && matches.length > FIRST_PAGE ? (
+        <button
+          type="button"
+          onClick={() => setShowAll(true)}
+          className="btn-game w-full bg-surface-2 py-3 text-sm uppercase hover:bg-surface-3"
+        >
+          Show all {formatNumber(matches.length)}
+        </button>
+      ) : null}
     </div>
   );
 }
