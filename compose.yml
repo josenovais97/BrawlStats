@@ -84,13 +84,14 @@ services:
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
     restart: unless-stopped
-    environment:
-      DATABASE_TYPE: postgresql
-      DATABASE_URL: ${UMAMI_DATABASE_URL}
-      APP_SECRET: ${UMAMI_APP_SECRET}
-      BASE_PATH: /analytics
-      DISABLE_TELEMETRY: "1"
-    env_file: .env.production
+    # Its own env file, and deliberately NOT .env.production: that sets
+    # DATABASE_URL to the brawlzone database, which would point Umami at the
+    # site data instead of its own.
+    #
+    # An env_file rather than `environment: ${VAR}` because Compose resolves
+    # ${...} from a file named exactly `.env`, not from env_file -- so the
+    # interpolated version silently passed empty strings and Umami crash-looped.
+    env_file: .env.umami
     expose:
       - "3000"
     depends_on:
