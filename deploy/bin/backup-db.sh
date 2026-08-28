@@ -30,8 +30,27 @@ fi
 mv "$out.tmp" "$out"
 echo "wrote $out ($(du -h "$out" | cut -f1), $tables tables)"
 
+# The analytics database too. Smaller and less precious than the site data --
+# losing it costs history, not the site -- but restoring only one of the two
+# would leave the tracking script in layout.tsx pointing at a website record
+# that no longer exists, and every page view would be dropped silently.
+uout="$DIR/umami-$stamp.sql.gz"
+if docker compose exec -T db pg_dump -U brawlzone -d umami --no-owner --no-privileges 2>/dev/null | gzip -9 > "$uout.tmp"; then
+  if gunzip -t "$uout.tmp" 2>/dev/null; then
+    mv "$uout.tmp" "$uout"
+    echo "wrote $uout ($(du -h "$uout" | cut -f1))"
+  else
+    rm -f "$uout.tmp"
+    echo "analytics dump was corrupt, discarded" >&2
+  fi
+else
+  rm -f "$uout.tmp"
+  echo "analytics dump failed (is the umami database present?)" >&2
+fi
+
 # Keep 7 most recent; plus any Sunday dump from the last 28 days.
 cd "$DIR"
+ls -1t umami-*.sql.gz 2>/dev/null | tail -n +8 | xargs -r rm -f
 ls -1t brawlzone-*.sql.gz 2>/dev/null | tail -n +8 | while read -r f; do
   d=$(echo "$f" | grep -oP '\d{8}')
   if [ "$(date -d "$d" +%u 2>/dev/null)" = "7" ] && \

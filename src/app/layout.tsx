@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
+import Script from 'next/script';
 
 import { InstallPrompt } from '@/components/install-prompt';
 import { SiteFooter } from '@/components/site-footer';
@@ -78,6 +79,32 @@ export default function RootLayout({
           <SiteFooter />
         </div>
         <InstallPrompt />
+
+        {/*
+          Umami, self-hosted on this project's own box. Replaces
+          @vercel/analytics, which posted to an endpoint that stopped existing
+          when the site left Vercel.
+
+          Cookieless and storing no personal data, so it needs no consent
+          banner. `defer` and afterInteractive keep it off the critical path --
+          analytics should never be the reason a page renders late.
+
+          Only in production: a dev server would otherwise file page views
+          against the real site and quietly skew every number.
+
+          The id is not a secret; it is visible in the served HTML by design.
+          It lives in the `umami` database, which backup-db.sh dumps alongside
+          the site data -- restoring only one of the two would leave this
+          pointing at a website record that no longer exists.
+        */}
+        {process.env.NODE_ENV === 'production' ? (
+          <Script
+            src="https://analytics.brawlzone.net/script.js"
+            data-website-id="09f04c04-b76c-41a0-927e-a6c88041a4e3"
+            strategy="afterInteractive"
+            defer
+          />
+        ) : null}
       </body>
     </html>
   );
