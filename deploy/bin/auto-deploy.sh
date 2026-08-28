@@ -27,9 +27,12 @@ if git diff --name-only "$local" "$remote" | grep -qx Caddyfile; then
   docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
 fi
 docker image prune -f >/dev/null
-# Build cache, not just dangling images. Measured 2026-08-27: 11.77 GB of it,
-# a quarter of the disk, because every deploy rebuilds and image pruning does
-# not touch build cache at all. Keep a week so ordinary redeploys still hit
-# warm layers and a rebuild stays ~2 minutes.
-docker builder prune -f --filter until=168h >/dev/null
+# Build cache, not just dangling images. `docker image prune` does not touch
+# it at all, and it reached 16.75 GB -- a third of the disk -- inside a day.
+#
+# Capped by SIZE, not age. An age filter is the wrong tool here: the variable
+# is how often this repo is pushed, not how old a layer is, and 19 deploys in
+# one day left every layer younger than any sensible cut-off. 4 GB keeps
+# same-session rebuilds warm and cannot grow past that however busy the day.
+docker builder prune -f --max-used-space=4GB >/dev/null
 echo "done: $(git log --oneline -1)"
