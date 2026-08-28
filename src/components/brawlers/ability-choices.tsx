@@ -178,14 +178,20 @@ function Row({
           <span className="flex shrink-0 items-baseline gap-2 tabular-nums">
             {/* The win rate is the point, so it leads; the share explains how
                 many people that rate is based on. */}
+            {/* Two different measurements, so each says which it is. They
+                used to read "too few battles · 68% picked", which put a
+                battle-derived number and an ownership-derived one side by side
+                with nothing to separate them -- and when the first was missing
+                the pair looked like one broken statistic. */}
             {row.winRate !== null ? (
               <span className="text-sm font-bold text-victory">
-                {formatPercent(row.winRate)}
+                {formatPercent(row.winRate)} win rate
               </span>
-            ) : (
-              <span className="text-xs text-muted">too few battles</span>
-            )}
-            <span className="text-xs text-muted">{formatPercent(row.share)} picked</span>
+            ) : null}
+            <span className="text-xs text-muted">
+              {formatPercent(row.share)} of first buyers &middot; {formatNumber(row.choosers)}{' '}
+              {row.choosers === 1 ? 'player' : 'players'}
+            </span>
           </span>
         </div>
 

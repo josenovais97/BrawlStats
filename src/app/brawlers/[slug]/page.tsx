@@ -11,6 +11,7 @@ import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
 import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
+import { RecommendedBuild } from '@/components/brawlers/recommended-build';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -615,6 +616,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           </div>
         </div>
       </header>
+
+      {/* The answer the page title promises, before the biography and the stat
+          grid. A summary of the Build & upgrades section below, which keeps
+          every sample size and caveat. */}
+      <RecommendedBuild build={build} meta={official ?? undefined} gearNames={gearNames} />
 
       {wiki && wiki.stats.health ? (
         <section>
