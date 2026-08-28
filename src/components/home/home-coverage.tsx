@@ -46,7 +46,7 @@ export async function HomeCoverage() {
                   fallback={relativeTime(lastRun.startedAt)}
                   className="font-semibold text-foreground"
                 />
-                <span className="block text-muted">Re-read every three hours</span>
+                <span className="block text-muted">Re-read every two hours</span>
               </>
             ) : (
               <span className="font-semibold text-foreground">Live sample</span>
