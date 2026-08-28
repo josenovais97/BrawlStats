@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { compactNumber } from '@/lib/format';
+import { compactNumber } from "@/lib/format";
 
 /**
  * A number that counts up to itself when it first comes into view.
@@ -30,7 +30,8 @@ import { compactNumber } from '@/lib/format';
  */
 
 /** React warns about `useLayoutEffect` during the server pass; it has none. */
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export function CountUp({
   value,
@@ -51,7 +52,7 @@ export function CountUp({
     if (!el || value <= 0) return;
 
     // Motion for its own sake, which is the one kind this query switches off.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     setShown(0);
 
@@ -69,7 +70,7 @@ export function CountUp({
       frame = requestAnimationFrame(tick);
     };
 
-    if (typeof IntersectionObserver === 'undefined') {
+    if (typeof IntersectionObserver === "undefined") {
       run();
       return () => cancelAnimationFrame(frame);
     }

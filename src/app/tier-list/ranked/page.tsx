@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-import { TierListView } from '@/components/tier-list/tier-list-view';
-import { resolveTierRoute, tierListMetadata } from '@/lib/tier-list-route';
+import { TierListView } from "@/components/tier-list/tier-list-view";
+import { resolveTierRoute, tierListMetadata } from "@/lib/tier-list-route";
 
 /*
  * Three hours, matching both the sampler and `READ_CACHE_SECONDS`.
@@ -13,10 +13,16 @@ import { resolveTierRoute, tierListMetadata } from '@/lib/tier-list-route';
 export const revalidate = 7200;
 
 export function generateMetadata(): Promise<Metadata> {
-  return tierListMetadata('ranked', resolveTierRoute('ranked', []));
+  return tierListMetadata("ranked", resolveTierRoute("ranked", []));
 }
 
 export default function RankedTierListPage() {
-  const route = resolveTierRoute('ranked', []);
-  return <TierListView format="ranked" windowKey={route.windowKey} modeSlug={route.modeSlug} />;
+  const route = resolveTierRoute("ranked", []);
+  return (
+    <TierListView
+      format="ranked"
+      windowKey={route.windowKey}
+      modeSlug={route.modeSlug}
+    />
+  );
 }

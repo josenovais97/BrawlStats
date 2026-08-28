@@ -1,8 +1,8 @@
-import { ArrowRight, Search } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Search } from "lucide-react";
+import Link from "next/link";
 
-import { TrophyIcon } from '@/components/game-icons';
-import { TagLocationHint } from '@/components/tag-location-hint';
+import { TrophyIcon } from "@/components/game-icons";
+import { TagLocationHint } from "@/components/tag-location-hint";
 
 /**
  * Closing call to action.
@@ -26,7 +26,7 @@ export function HomeCta() {
         className="pointer-events-none absolute inset-0 opacity-[0.16]"
         style={{
           background:
-            'radial-gradient(28rem 12rem at 15% 0%, #ffc53d, transparent 70%), radial-gradient(24rem 12rem at 85% 110%, #8b6bff, transparent 70%)',
+            "radial-gradient(28rem 12rem at 15% 0%, #ffc53d, transparent 70%), radial-gradient(24rem 12rem at 85% 110%, #8b6bff, transparent 70%)",
         }}
       />
 
@@ -36,11 +36,14 @@ export function HomeCta() {
             <TrophyIcon className="size-7" />
           </span>
           <div className="min-w-0">
-            <h2 id="closing-cta" className="display text-xl uppercase sm:text-2xl">
+            <h2
+              id="closing-cta"
+              className="display text-xl uppercase sm:text-2xl"
+            >
               See where you stand
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-muted">
-              Your tag is on your in-game profile, just below your profile icon.{' '}
+              Your tag is on your in-game profile, just below your profile icon.{" "}
               <TagLocationHint />
             </p>
           </div>

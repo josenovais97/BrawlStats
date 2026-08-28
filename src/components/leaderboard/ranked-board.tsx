@@ -1,12 +1,12 @@
-import { RankedIcon } from '@/components/game-icons';
-import Image from 'next/image';
-import Link from 'next/link';
+import { RankedIcon } from "@/components/game-icons";
+import Image from "next/image";
+import Link from "next/link";
 
-import { TrophyIcon } from '@/components/game-icons';
-import { playerIconUrl, rankedLeagueIconUrl } from '@/lib/brawlapi';
-import { formatNumber, titleCaseLabel } from '@/lib/format';
-import { getRankedLeaderboard } from '@/lib/stats';
-import { displayTag } from '@/lib/tags';
+import { TrophyIcon } from "@/components/game-icons";
+import { playerIconUrl, rankedLeagueIconUrl } from "@/lib/brawlapi";
+import { formatNumber, titleCaseLabel } from "@/lib/format";
+import { getRankedLeaderboard } from "@/lib/stats";
+import { displayTag } from "@/lib/tags";
 
 /**
  * Top players by Ranked elo.
@@ -45,8 +45,8 @@ export async function RankedBoard() {
       <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
         Current season standing. The game API publishes no Ranked leaderboard,
         so this one is built from the {formatNumber(pool)} sampled players who
-        have played Ranked this season. The top {players.length} of those, not
-        a global board. Looking up a profile adds it to the pool.
+        have played Ranked this season. The top {players.length} of those, not a
+        global board. Looking up a profile adds it to the pool.
       </p>
 
       <ol className="space-y-1.5">
@@ -111,7 +111,7 @@ export async function RankedBoard() {
                   {/* Peak only when it is actually higher, so a player at their
                       all-time best does not show the same number twice. */}
                   {player.peakElo > player.elo ? (
-                    <span className="block text-[0.6875rem] tabular-nums text-muted">
+                    <span className="block text-xs tabular-nums text-muted">
                       peak {formatNumber(player.peakElo)}
                     </span>
                   ) : null}

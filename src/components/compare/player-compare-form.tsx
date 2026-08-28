@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { ArrowLeftRight, Check, Clock, Share2, X } from 'lucide-react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useId, useState, useSyncExternalStore } from 'react';
+import { ArrowLeftRight, Check, Clock, Share2, X } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useId, useState, useSyncExternalStore } from "react";
 
-import { PlayersIcon } from '@/components/game-icons';
-import { playerIconUrl } from '@/lib/brawlapi';
+import { PlayersIcon } from "@/components/game-icons";
+import { playerIconUrl } from "@/lib/brawlapi";
 import {
   clearRecentSearches,
   readRecentSearches,
   serverRecentSearches,
   subscribeRecentSearches,
   type RecentSearch,
-} from '@/lib/recent-searches';
+} from "@/lib/recent-searches";
 
 /**
  * Two tag inputs, fed by the profiles this device has already looked at.
@@ -33,8 +33,8 @@ import {
 const RECENT_SHOWN = 6;
 
 export function PlayerCompareForm({
-  initialA = '',
-  initialB = '',
+  initialA = "",
+  initialB = "",
 }: {
   initialA?: string;
   initialB?: string;
@@ -52,10 +52,12 @@ export function PlayerCompareForm({
     serverRecentSearches,
   );
   // Clubs live in the same store and are not comparable here.
-  const recent = stored.filter((entry) => entry.kind === 'player').slice(0, RECENT_SHOWN);
+  const recent = stored
+    .filter((entry) => entry.kind === "player")
+    .slice(0, RECENT_SHOWN);
 
   // Uppercase, strip the hash, so "#2v0ul0gqv8" and "2V0UL0GQV8" both work.
-  const clean = (value: string) => value.trim().replace(/^#/, '').toUpperCase();
+  const clean = (value: string) => value.trim().replace(/^#/, "").toUpperCase();
   const one = clean(a);
   const two = clean(b);
 
@@ -80,12 +82,12 @@ export function PlayerCompareForm({
   };
 
   /** Assigning a profile already on the other side would compare it to itself. */
-  const pick = (side: 'a' | 'b', entry: RecentSearch) => {
-    if (side === 'a') {
-      if (clean(b) === entry.tag) setB('');
+  const pick = (side: "a" | "b", entry: RecentSearch) => {
+    if (side === "a") {
+      if (clean(b) === entry.tag) setB("");
       setA(entry.tag);
     } else {
-      if (clean(a) === entry.tag) setA('');
+      if (clean(a) === entry.tag) setA("");
       setB(entry.tag);
     }
   };
@@ -94,7 +96,7 @@ export function PlayerCompareForm({
     const url = window.location.href;
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Brawl Stars player comparison', url });
+        await navigator.share({ title: "Brawl Stars player comparison", url });
         return;
       } catch {
         // Cancelling the sheet rejects; fall through so the click still does
@@ -126,7 +128,7 @@ export function PlayerCompareForm({
           recent={recent}
           selected={one}
           otherSelected={two}
-          onPick={(entry) => pick('a', entry)}
+          onPick={(entry) => pick("a", entry)}
         />
 
         {/* Labelled where there is room for a label. In the stacked phone
@@ -152,16 +154,16 @@ export function PlayerCompareForm({
           recent={recent}
           selected={two}
           otherSelected={one}
-          onPick={(entry) => pick('b', entry)}
+          onPick={(entry) => pick("b", entry)}
         />
       </div>
 
       {recent.length === 0 ? (
         /* Says how the list fills up rather than showing an empty box. */
         <p className="rounded-lg bg-surface-2/60 px-3 py-2.5 text-xs leading-relaxed text-muted">
-          Look a player up from the search box and they are remembered on this device,
-          ready to pick here without typing the tag again. Nothing is sent to the
-          server.
+          Look a player up from the search box and they are remembered on this
+          device, ready to pick here without typing the tag again. Nothing is
+          sent to the server.
         </p>
       ) : (
         <div className="flex items-center justify-between gap-3">
@@ -206,14 +208,14 @@ export function PlayerCompareForm({
               ) : (
                 <Share2 className="size-4" />
               )}
-              {copied ? 'Copied' : 'Share'}
+              {copied ? "Copied" : "Share"}
             </button>
             <button
               type="button"
               onClick={() => {
-                setA('');
-                setB('');
-                router.push('/compare');
+                setA("");
+                setB("");
+                router.push("/compare");
               }}
               aria-label="Clear the comparison"
               className="grid min-h-11 w-11 place-items-center rounded-xl border border-border text-muted transition-colors hover:border-defeat/50 hover:text-foreground"
@@ -273,7 +275,7 @@ function Side({
         {value ? (
           <button
             type="button"
-            onClick={() => onChange('')}
+            onClick={() => onChange("")}
             aria-label={`Clear ${label.toLowerCase()}`}
             className="absolute right-1.5 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
           >
@@ -285,7 +287,10 @@ function Side({
       {/* Names the tag once it matches something known, so the field is not
           eight characters of hex with no confirmation attached. */}
       {chosen?.name ? (
-        <p id={`${id}-name`} className="mt-1 truncate text-xs font-semibold text-brand">
+        <p
+          id={`${id}-name`}
+          className="mt-1 truncate text-xs font-semibold text-brand"
+        >
           {chosen.name}
         </p>
       ) : null}
@@ -303,8 +308,8 @@ function Side({
                   aria-pressed={isSelected}
                   className={`flex min-h-11 w-full items-center gap-2.5 rounded-lg border px-2 py-1.5 text-left transition-colors ${
                     isSelected
-                      ? 'border-brand/60 bg-brand/10'
-                      : 'border-transparent hover:border-border hover:bg-surface-2'
+                      ? "border-brand/60 bg-brand/10"
+                      : "border-transparent hover:border-border hover:bg-surface-2"
                   }`}
                 >
                   {entry.icon ? (

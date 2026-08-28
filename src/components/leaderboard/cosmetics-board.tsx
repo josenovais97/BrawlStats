@@ -1,11 +1,11 @@
-import { CosmeticsIcon, PlayersIcon } from '@/components/game-icons';
-import Image from 'next/image';
-import Link from 'next/link';
+import { CosmeticsIcon, PlayersIcon } from "@/components/game-icons";
+import Image from "next/image";
+import Link from "next/link";
 
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl, playerIconUrl } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, titleCaseLabel } from '@/lib/format';
-import { getIconUsage, getSkinUsage, type CosmeticUsage } from '@/lib/stats';
+import { brawlerPath } from "@/lib/slugs";
+import { brawlerIconUrl, playerIconUrl } from "@/lib/brawlapi";
+import { formatNumber, formatPercent, titleCaseLabel } from "@/lib/format";
+import { getIconUsage, getSkinUsage, type CosmeticUsage } from "@/lib/stats";
 
 /**
  * What the sampled population is actually wearing.
@@ -21,7 +21,10 @@ import { getIconUsage, getSkinUsage, type CosmeticUsage } from '@/lib/stats';
  * ones. See `getSkinUsage`.
  */
 export async function CosmeticsBoard() {
-  const [skins, icons] = await Promise.all([getSkinUsage(24), getIconUsage(12)]);
+  const [skins, icons] = await Promise.all([
+    getSkinUsage(24),
+    getIconUsage(12),
+  ]);
 
   if (skins.length === 0 && icons.length === 0) {
     return (
@@ -45,10 +48,10 @@ export async function CosmeticsBoard() {
           Most worn skins
         </h2>
         <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          Share of sampled brawlers wearing each skin. Default skins are left out
-          of the list but still counted in the total, so a 2% share means two in
-          every hundred brawlers we saw. Not two in every hundred that had a
-          skin on at all.
+          Share of sampled brawlers wearing each skin. Default skins are left
+          out of the list but still counted in the total, so a 2% share means
+          two in every hundred brawlers we saw. Not two in every hundred that
+          had a skin on at all.
         </p>
 
         <ol className="grid gap-2 sm:grid-cols-2">
@@ -90,16 +93,13 @@ export async function CosmeticsBoard() {
             Most worn profile icons
           </h2>
           <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-            Share of sampled accounts using each icon. Everyone has one, so these
-            shares are out of the whole pool.
+            Share of sampled accounts using each icon. Everyone has one, so
+            these shares are out of the whole pool.
           </p>
 
           <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {icons.map((icon, index) => (
-              <li
-                key={icon.id}
-                className="card flex items-center gap-3 p-2.5"
-              >
+              <li key={icon.id} className="card flex items-center gap-3 p-2.5">
                 <span className="w-5 shrink-0 text-center text-sm font-bold tabular-nums text-muted">
                   {index + 1}
                 </span>
@@ -134,7 +134,7 @@ function Share({ usage }: { usage: CosmeticUsage }) {
       <span className="block text-sm font-bold tabular-nums text-brand">
         {formatPercent(usage.share)}
       </span>
-      <span className="block text-[0.6875rem] tabular-nums text-muted">
+      <span className="block text-xs tabular-nums text-muted">
         {formatNumber(usage.users)}
       </span>
     </span>

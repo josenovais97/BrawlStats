@@ -26,6 +26,8 @@ const nextConfig: NextConfig = {
       // Drop artwork and reward marks on the Starr Drops page, from the wiki
       // the odds themselves come from.
       { protocol: 'https', hostname: 'static.wikia.nocookie.net', pathname: '/**' },
+      // Video thumbnails for the channel card. See lib/youtube.
+      { protocol: 'https', hostname: 'i.ytimg.com', pathname: '/**' },
     ],
   },
 };

@@ -204,7 +204,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               placeholder="Search brawlers"
               type="search"
               autoComplete="off"
-              className="min-h-12 w-full rounded-xl border border-border-strong/70 bg-surface-2 py-2 pl-11 pr-10 text-base outline-none transition-colors placeholder:text-muted/60 focus:border-brand/70"
+              className="min-h-12 w-full rounded-xl border border-border-strong/70 bg-surface-2 py-2 pl-11 pr-10 text-base outline-none transition-colors placeholder:text-muted/85 focus:border-brand/70"
             />
             {query ? (
               <button
@@ -425,7 +425,7 @@ function BrawlerCard({
         /* Corner chip, matching the profile grid and the tier list, so the
            same letter always means the same thing across the site. */
         <span
-          className="absolute right-1.5 top-1.5 z-10 grid size-5 place-items-center rounded-md text-[0.625rem] font-black"
+          className="absolute right-1.5 top-1.5 z-10 grid size-5 place-items-center rounded-md text-xs font-black"
           style={{
             background: `color-mix(in srgb, ${TIER_COLOR[brawler.tier]} 18%, transparent)`,
             color: TIER_COLOR[brawler.tier],

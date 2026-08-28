@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 /**
  * The old single tier list, now split in two.
@@ -12,5 +12,5 @@ import { redirect } from 'next/navigation';
  * later without fighting a redirect browsers have cached forever.
  */
 export default function TierListIndexPage() {
-  redirect('/tier-list/ranked');
+  redirect("/tier-list/ranked");
 }

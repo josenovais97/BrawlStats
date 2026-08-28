@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Check, ChevronDown, Search } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Check, ChevronDown, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 /**
  * Searchable brawler combobox.
@@ -33,7 +33,7 @@ export function BrawlerPicker({
   exclude?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,14 +44,14 @@ export function BrawlerPicker({
       if (!containerRef.current?.contains(event.target as Node)) close();
     }
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') close();
+      if (event.key === "Escape") close();
     }
 
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
 
@@ -61,7 +61,7 @@ export function BrawlerPicker({
 
   function close() {
     setOpen(false);
-    setQuery('');
+    setQuery("");
   }
 
   const results = useMemo(() => {
@@ -80,15 +80,15 @@ export function BrawlerPicker({
         onClick={() => (open ? close() : setOpen(true))}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={`${label}: ${selected?.name.toLowerCase() ?? 'none chosen'}`}
+        aria-label={`${label}: ${selected?.name.toLowerCase() ?? "none chosen"}`}
         className="flex min-h-12 w-full items-center gap-2 rounded-xl border border-border bg-surface-2 px-3 text-sm font-semibold capitalize transition-colors hover:border-brand/50"
       >
         <span className="flex-1 truncate text-left">
-          {selected ? selected.name.toLowerCase() : 'Choose a brawler'}
+          {selected ? selected.name.toLowerCase() : "Choose a brawler"}
         </span>
         <ChevronDown
           aria-hidden
-          className={`size-4 shrink-0 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`size-4 shrink-0 text-muted transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -106,7 +106,7 @@ export function BrawlerPicker({
               onKeyDown={(event) => {
                 // Enter takes the top match, so a full name never has to be
                 // typed and then clicked.
-                if (event.key !== 'Enter') return;
+                if (event.key !== "Enter") return;
                 event.preventDefault();
                 const first = results[0];
                 if (first) {
@@ -116,11 +116,15 @@ export function BrawlerPicker({
               }}
               placeholder="Search brawlers"
               aria-label="Search brawlers"
-              className="w-full bg-transparent py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-muted/70"
+              className="w-full bg-transparent py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-muted/85"
             />
           </div>
 
-          <ul role="listbox" aria-label={label} className="max-h-72 overflow-y-auto py-1">
+          <ul
+            role="listbox"
+            aria-label={label}
+            className="max-h-72 overflow-y-auto py-1"
+          >
             {results.length === 0 ? (
               <li className="px-3 py-4 text-center text-sm text-muted">
                 No brawler matches “{query}”.
@@ -137,11 +141,15 @@ export function BrawlerPicker({
                       close();
                     }}
                     className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm capitalize transition-colors hover:bg-surface-2 ${
-                      brawler.slug === value ? 'text-brand' : ''
+                      brawler.slug === value ? "text-brand" : ""
                     }`}
                   >
-                    <span className="flex-1 truncate">{brawler.name.toLowerCase()}</span>
-                    {brawler.slug === value ? <Check aria-hidden className="size-4" /> : null}
+                    <span className="flex-1 truncate">
+                      {brawler.name.toLowerCase()}
+                    </span>
+                    {brawler.slug === value ? (
+                      <Check aria-hidden className="size-4" />
+                    ) : null}
                   </button>
                 </li>
               ))

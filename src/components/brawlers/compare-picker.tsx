@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { BrawlerPicker } from '@/components/brawlers/brawler-picker';
+import { BrawlerPicker } from "@/components/brawlers/brawler-picker";
 
 /**
  * Two brawler pickers and a button, which is the whole interaction.
@@ -26,8 +26,8 @@ export function ComparePicker({
   initialB?: string;
 }) {
   const router = useRouter();
-  const [a, setA] = useState(initialA ?? brawlers[0]?.slug ?? '');
-  const [b, setB] = useState(initialB ?? brawlers[1]?.slug ?? '');
+  const [a, setA] = useState(initialA ?? brawlers[0]?.slug ?? "");
+  const [b, setB] = useState(initialB ?? brawlers[1]?.slug ?? "");
 
   return (
     <form
@@ -46,7 +46,9 @@ export function ComparePicker({
         exclude={b}
       />
 
-      <span className="px-1 text-xs font-black uppercase tracking-wide text-muted">vs</span>
+      <span className="px-1 text-xs font-black uppercase tracking-wide text-muted">
+        vs
+      </span>
 
       <BrawlerPicker
         id="compare-b"

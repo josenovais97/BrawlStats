@@ -1,21 +1,24 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Suspense } from 'react';
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 
-import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
-import { TierMaker, type MakerBrawler } from '@/components/tier-list/tier-maker';
-import { ErrorState } from '@/components/ui/error-state';
-import { TierMakerSkeleton } from '@/components/ui/skeletons';
-import { PageHeading } from '@/components/ui/section-heading';
-import { brawlerIconUrl } from '@/lib/brawlapi';
-import { getBrawlerCatalog } from '@/lib/brawler-catalog';
-import { getMetaIndex } from '@/lib/stats';
+import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
+import {
+  TierMaker,
+  type MakerBrawler,
+} from "@/components/tier-list/tier-maker";
+import { ErrorState } from "@/components/ui/error-state";
+import { TierMakerSkeleton } from "@/components/ui/skeletons";
+import { PageHeading } from "@/components/ui/section-heading";
+import { brawlerIconUrl } from "@/lib/brawlapi";
+import { getBrawlerCatalog } from "@/lib/brawler-catalog";
+import { getMetaIndex } from "@/lib/stats";
 
 export const metadata: Metadata = {
-  title: 'Brawl Stars tier list maker. Build and share your own',
+  title: "Brawl Stars tier list maker. Build and share your own",
   description:
-    'Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.',
-  alternates: { canonical: '/tier-list/maker' },
+    "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.",
+  alternates: { canonical: "/tier-list/maker" },
 };
 
 /** The roster and the meta both move; hourly matches the tier list itself. */
@@ -49,7 +52,7 @@ export default async function TierMakerPage() {
 
   // Falls back to an empty index: a maker with no meta is still a maker, it
   // just cannot offer to prefill from it.
-  const meta = await getMetaIndex('ranked', 7).catch(() => new Map());
+  const meta = await getMetaIndex("ranked", 7).catch(() => new Map());
 
   const brawlers: MakerBrawler[] = catalog.current.map((brawler) => ({
     id: brawler.id,
@@ -62,8 +65,8 @@ export default async function TierMakerPage() {
     <div className="space-y-6">
       <JsonLd
         data={breadcrumbSchema([
-          { name: 'Tier list', path: '/tier-list' },
-          { name: 'Maker', path: '/tier-list/maker' },
+          { name: "Tier list", path: "/tier-list" },
+          { name: "Maker", path: "/tier-list/maker" },
         ])}
       />
 
@@ -81,14 +84,20 @@ export default async function TierMakerPage() {
       </Suspense>
 
       <p className="text-xs leading-relaxed text-muted">
-        Nothing here is saved on a server — the link <em>is</em> the tier list, so
-        it keeps working for as long as anyone has it. For the measured version,
-        built from sampled battles rather than opinion, see the{' '}
-        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
+        Nothing here is saved on a server — the link <em>is</em> the tier list,
+        so it keeps working for as long as anyone has it. For the measured
+        version, built from sampled battles rather than opinion, see the{" "}
+        <Link
+          href="/tier-list/ranked"
+          className="font-medium text-brand hover:underline"
+        >
           Ranked tier list
-        </Link>{' '}
-        or the{' '}
-        <Link href="/tier-list/trophy" className="font-medium text-brand hover:underline">
+        </Link>{" "}
+        or the{" "}
+        <Link
+          href="/tier-list/trophy"
+          className="font-medium text-brand hover:underline"
+        >
           trophy list
         </Link>
         .

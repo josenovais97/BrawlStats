@@ -1,10 +1,10 @@
-import Image from 'next/image';
+import Image from "next/image";
 
-import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
-import { Disclosure } from '@/components/ui/disclosure';
-import { formatNumber, formatPercent } from '@/lib/format';
-import type { AbilityChoice, BrawlerAbilityChoices } from '@/lib/stats';
-import type { BAAccessory } from '@/types/brawlapi';
+import { GadgetIcon, StarPowerIcon } from "@/components/game-icons";
+import { Disclosure } from "@/components/ui/disclosure";
+import { formatNumber, formatPercent } from "@/lib/format";
+import type { AbilityChoice, BrawlerAbilityChoices } from "@/lib/stats";
+import type { BAAccessory } from "@/types/brawlapi";
 
 /**
  * Which star power and gadget players actually buy first, and how it goes.
@@ -29,7 +29,9 @@ import type { BAAccessory } from '@/types/brawlapi';
  * nearly every owner has both options, which leaves no first-buyers to
  * measure, and a half-empty two-column row is the visible result.
  */
-export function hasAbilityChoices(choices: BrawlerAbilityChoices | null): boolean {
+export function hasAbilityChoices(
+  choices: BrawlerAbilityChoices | null,
+): boolean {
   return (
     choices !== null &&
     (choices.starPowers.length > 1 || choices.gadgets.length > 1)
@@ -47,13 +49,13 @@ export function AbilityChoices({
 }) {
   const groups = [
     {
-      title: 'Star power',
+      title: "Star power",
       node: <StarPowerIcon className="size-5" />,
       rows: choices.starPowers,
       items: starPowers,
     },
     {
-      title: 'Gadget',
+      title: "Gadget",
       node: <GadgetIcon className="size-5" />,
       rows: choices.gadgets,
       items: gadgets,
@@ -66,9 +68,9 @@ export function AbilityChoices({
   if (!hasAbilityChoices(choices)) return null;
 
   const label = {
-    high: 'Well sampled',
-    medium: 'Building',
-    low: 'Thin sample',
+    high: "Well sampled",
+    medium: "Building",
+    low: "Thin sample",
   }[choices.confidence];
 
   return (
@@ -88,9 +90,9 @@ export function AbilityChoices({
                   should not be the loudest thing on the card. */}
               <span
                 className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
-                  choices.confidence === 'low'
-                    ? 'bg-surface-2 text-muted'
-                    : 'bg-brand/15 text-brand'
+                  choices.confidence === "low"
+                    ? "bg-surface-2 text-muted"
+                    : "bg-brand/15 text-brand"
                 }`}
               >
                 {label}
@@ -113,8 +115,8 @@ export function AbilityChoices({
               </ul>
             ) : (
               <p className="text-sm text-muted">
-                Almost every owner has both, so there are too few first-buyers left to
-                name a preference.
+                Almost every owner has both, so there are too few first-buyers
+                left to name a preference.
               </p>
             )}
           </div>
@@ -127,14 +129,14 @@ export function AbilityChoices({
         tone="bare"
         summary={`Read from ${formatNumber(choices.sampleSize)} first-buyers`}
       >
-        Counted from tracked players who own exactly one of the pair: they chose it,
-        and every battle they played on this brawler was played with it. Both sides
-        are equally invested in the brawler, so the gap between the two win rates is
-        the ability rather than the player &mdash; read them against each other
-        rather than as absolutes.
-        {choices.confidence === 'low'
-          ? ' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.'
-          : ''}
+        Counted from tracked players who own exactly one of the pair: they chose
+        it, and every battle they played on this brawler was played with it.
+        Both sides are equally invested in the brawler, so the gap between the
+        two win rates is the ability rather than the player &mdash; read them
+        against each other rather than as absolutes.
+        {choices.confidence === "low"
+          ? " On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative."
+          : ""}
       </Disclosure>
     </div>
   );
@@ -189,8 +191,9 @@ function Row({
               </span>
             ) : null}
             <span className="text-xs text-muted">
-              {formatPercent(row.share)} of first buyers &middot; {formatNumber(row.choosers)}{' '}
-              {row.choosers === 1 ? 'player' : 'players'}
+              {formatPercent(row.share)} of first buyers &middot;{" "}
+              {formatNumber(row.choosers)}{" "}
+              {row.choosers === 1 ? "player" : "players"}
             </span>
           </span>
         </div>

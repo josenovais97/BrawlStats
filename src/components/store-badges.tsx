@@ -18,7 +18,7 @@ interface BadgeProps {
   className?: string;
 }
 
-export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
+export function AppStoreBadge({ className = "h-11 w-auto" }: BadgeProps) {
   return (
     <svg
       viewBox="0 0 135 40"
@@ -71,7 +71,7 @@ export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
   );
 }
 
-export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
+export function GooglePlayBadge({ className = "h-11 w-auto" }: BadgeProps) {
   return (
     <svg
       viewBox="0 0 135 40"
@@ -90,10 +90,22 @@ export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
       />
       {/* Play mark: four facets of the classic triangle */}
       <g transform="translate(14 10)">
-        <path d="M0.6 0.5a1.6 1.6 0 0 0-.4 1.1v16.8a1.6 1.6 0 0 0 .4 1.1l.1.05L10 10.2v-.22z" fill="#00d0ff" />
-        <path d="M13.2 13.4 10.1 10.2v-.22l3.1-3.1.07.04 3.7 2.1c1.06.6 1.06 1.58 0 2.19l-3.7 2.1z" fill="#ffd400" />
-        <path d="m13.27 13.36-3.17-3.17L0.6 19.6a1.28 1.28 0 0 0 1.63.05z" fill="#ff3a44" />
-        <path d="M13.27 7.02 2.23 0.35A1.28 1.28 0 0 0 .6 0.4l9.5 9.5z" fill="#00e676" />
+        <path
+          d="M0.6 0.5a1.6 1.6 0 0 0-.4 1.1v16.8a1.6 1.6 0 0 0 .4 1.1l.1.05L10 10.2v-.22z"
+          fill="#00d0ff"
+        />
+        <path
+          d="M13.2 13.4 10.1 10.2v-.22l3.1-3.1.07.04 3.7 2.1c1.06.6 1.06 1.58 0 2.19l-3.7 2.1z"
+          fill="#ffd400"
+        />
+        <path
+          d="m13.27 13.36-3.17-3.17L0.6 19.6a1.28 1.28 0 0 0 1.63.05z"
+          fill="#ff3a44"
+        />
+        <path
+          d="M13.27 7.02 2.23 0.35A1.28 1.28 0 0 0 .6 0.4l9.5 9.5z"
+          fill="#00e676"
+        />
       </g>
       <text
         x="45"

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { History } from 'lucide-react';
-import { useEffect, useSyncExternalStore } from 'react';
+import { History } from "lucide-react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import {
   diffSnapshot,
   readSnapshot,
   subscribeSnapshot,
   writeSnapshot,
-} from '@/lib/player-history';
+} from "@/lib/player-history";
 
 /**
  * "Since your last visit", from a snapshot kept in this browser.
@@ -71,11 +71,11 @@ export function SinceLastVisit({
   if (delta.unchanged) return null;
 
   const rows: { label: string; value: number; decimals?: number }[] = [
-    { label: 'Trophies', value: delta.trophies },
-    { label: 'Brawlers', value: delta.brawlers },
-    { label: 'Power 11', value: delta.power11 },
-    { label: 'Hypercharges', value: delta.hyperCharges },
-    { label: 'Skill score', value: delta.skill, decimals: 1 },
+    { label: "Trophies", value: delta.trophies },
+    { label: "Brawlers", value: delta.brawlers },
+    { label: "Power 11", value: delta.power11 },
+    { label: "Hypercharges", value: delta.hyperCharges },
+    { label: "Skill score", value: delta.skill, decimals: 1 },
   ].filter((row) => row.value !== 0);
 
   if (rows.length === 0) return null;
@@ -94,8 +94,8 @@ export function SinceLastVisit({
           Since your last visit
         </p>
         <p className="text-xs text-muted">
-          {delta.days === 1 ? '1 day ago' : `${delta.days} days ago`} · kept in this
-          browser only
+          {delta.days === 1 ? "1 day ago" : `${delta.days} days ago`} · kept in
+          this browser only
         </p>
       </div>
 
@@ -109,11 +109,11 @@ export function SinceLastVisit({
             </dt>
             <dd
               className={`text-lg font-black tabular-nums ${
-                row.value > 0 ? 'text-victory' : 'text-defeat'
+                row.value > 0 ? "text-victory" : "text-defeat"
               }`}
             >
-              {row.value > 0 ? '+' : '−'}
-              {Math.abs(row.value).toLocaleString('en-US', {
+              {row.value > 0 ? "+" : "−"}
+              {Math.abs(row.value).toLocaleString("en-US", {
                 minimumFractionDigits: row.decimals ?? 0,
                 maximumFractionDigits: row.decimals ?? 0,
               })}

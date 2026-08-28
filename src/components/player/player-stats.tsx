@@ -9,11 +9,11 @@ import {
   SoloShowdownIcon,
   TrophyIcon,
   WinStreakIcon,
-} from '@/components/game-icons';
-import { StatCard } from '@/components/ui/stat-card';
-import { SectionHeading } from '@/components/ui/section-heading';
-import { formatDuration, formatNumber, titleCaseLabel } from '@/lib/format';
-import type { BSPlayer } from '@/types/brawlstars';
+} from "@/components/game-icons";
+import { StatCard } from "@/components/ui/stat-card";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { formatDuration, formatNumber, titleCaseLabel } from "@/lib/format";
+import type { BSPlayer } from "@/types/brawlstars";
 
 export function PlayerStats({ player }: { player: BSPlayer }) {
   // Ranked deliberately absent: the Ranking section directly below shows the
@@ -26,7 +26,7 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
       <StatCard
         node={<Battle3v3Icon className="size-8" />}
         label="3v3 wins"
-        value={formatNumber(player['3vs3Victories'])}
+        value={formatNumber(player["3vs3Victories"])}
       />
       <StatCard
         node={<SoloShowdownIcon className="size-8" />}
@@ -75,11 +75,15 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
   // per-brawler `highestTrophies` have always been in the response and were
   // never shown anywhere — on a long-lived account they are usually the two
   // most impressive numbers on the page.
-  const bestStreak = player.brawlers.reduce<BSPlayer['brawlers'][number] | null>(
+  const bestStreak = player.brawlers.reduce<
+    BSPlayer["brawlers"][number] | null
+  >(
     (best, b) => ((b.maxWinStreak ?? 0) > (best?.maxWinStreak ?? 0) ? b : best),
     null,
   );
-  const bestBrawler = player.brawlers.reduce<BSPlayer['brawlers'][number] | null>(
+  const bestBrawler = player.brawlers.reduce<
+    BSPlayer["brawlers"][number] | null
+  >(
     (best, b) => (b.highestTrophies > (best?.highestTrophies ?? 0) ? b : best),
     null,
   );
@@ -106,7 +110,9 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     player.totalPrestigeLevel ? (
       <StatCard
         key="prestige"
-        node={<PrestigeIcon total={player.totalPrestigeLevel} className="size-8" />}
+        node={
+          <PrestigeIcon total={player.totalPrestigeLevel} className="size-8" />
+        }
         label="Total prestige"
         value={formatNumber(player.totalPrestigeLevel)}
         hint="Across every brawler"
@@ -137,7 +143,9 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
   return (
     <section>
       <SectionHeading title="Personal bests" aside="All-time" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{cards}</div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {cards}
+      </div>
     </section>
   );
 }

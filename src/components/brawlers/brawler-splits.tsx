@@ -1,8 +1,8 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
-import { slugify } from '@/lib/slugs';
-import type { BrawlerSplit } from '@/lib/stats';
+import { formatNumber, formatPercent, humanizeMode } from "@/lib/format";
+import { slugify } from "@/lib/slugs";
+import type { BrawlerSplit } from "@/lib/stats";
 
 /**
  * Where a brawler is actually good: its best modes, and its best maps.
@@ -44,7 +44,7 @@ export function BrawlerSplits({
         empty="Not enough battles on any one map yet."
         rows={maps.slice(0, 6).map((split) => ({
           key: `${split.mode}-${split.mapName}`,
-          label: split.mapName ?? '–',
+          label: split.mapName ?? "–",
           sublabel: humanizeMode(split.mode),
           href: mapSlugFor(split),
           split,
@@ -82,16 +82,18 @@ function SplitList({
             const body = (
               <>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{label}</span>
+                  <span className="block truncate text-sm font-semibold">
+                    {label}
+                  </span>
                   <span className="block text-xs tabular-nums text-muted">
-                    {sublabel ? `${sublabel} · ` : ''}
-                    {formatNumber(split.decidedSampleSize)} battles ·{' '}
+                    {sublabel ? `${sublabel} · ` : ""}
+                    {formatNumber(split.decidedSampleSize)} battles ·{" "}
                     {formatPercent(split.winRate)} raw
                   </span>
                 </span>
                 <span
                   className={`shrink-0 text-sm font-bold tabular-nums ${
-                    split.score >= 0.5 ? 'text-victory' : 'text-muted'
+                    split.score >= 0.5 ? "text-victory" : "text-muted"
                   }`}
                 >
                   {formatPercent(split.score)}
@@ -109,7 +111,9 @@ function SplitList({
                     {body}
                   </Link>
                 ) : (
-                  <div className="flex items-center gap-3 px-4 py-2.5">{body}</div>
+                  <div className="flex items-center gap-3 px-4 py-2.5">
+                    {body}
+                  </div>
                 )}
               </li>
             );

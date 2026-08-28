@@ -1,15 +1,15 @@
-import { ArrowUpRight, Lock, TrendingDown } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { ArrowUpRight, Lock, TrendingDown } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { SectionHeading } from '@/components/ui/section-heading';
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl } from '@/lib/brawlapi';
-import { formatNumber } from '@/lib/format';
-import { MAX_POWER_LEVEL } from '@/lib/progression';
-import { TIER_COLOR, type ScoredBrawler } from '@/lib/stats';
-import type { BABrawler } from '@/types/brawlapi';
-import type { BSPlayerBrawler } from '@/types/brawlstars';
+import { SectionHeading } from "@/components/ui/section-heading";
+import { brawlerPath } from "@/lib/slugs";
+import { brawlerIconUrl } from "@/lib/brawlapi";
+import { formatNumber } from "@/lib/format";
+import { MAX_POWER_LEVEL } from "@/lib/progression";
+import { TIER_COLOR, type ScoredBrawler } from "@/lib/stats";
+import type { BABrawler } from "@/types/brawlapi";
+import type { BSPlayerBrawler } from "@/types/brawlstars";
 
 /**
  * The player's roster read against the current tier list.
@@ -46,7 +46,7 @@ export function PlayerMetaFit({
   const owned = new Map(brawlers.map((b) => [b.id, b]));
   const rated = [...meta.values()].filter((e) => e.tier !== null);
   const top = rated
-    .filter((e) => e.tier === 'S' || e.tier === 'A')
+    .filter((e) => e.tier === "S" || e.tier === "A")
     .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
   if (top.length === 0) return null;
 
@@ -67,12 +67,13 @@ export function PlayerMetaFit({
     .map((b) => ({ brawler: b, entry: meta.get(b.id) }))
     .filter(
       (row): row is { brawler: BSPlayerBrawler; entry: ScoredBrawler } =>
-        row.entry?.tier === 'C' || row.entry?.tier === 'D',
+        row.entry?.tier === "C" || row.entry?.tier === "D",
     )
     .sort((a, b) => (a.entry.metaScore ?? 0) - (b.entry.metaScore ?? 0))
     .slice(0, LIMIT);
 
-  const iconFor = (id: number) => brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id);
+  const iconFor = (id: number) =>
+    brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id);
 
   return (
     <section>
@@ -82,13 +83,19 @@ export function PlayerMetaFit({
       />
 
       <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
-        This roster scored against the current{' '}
-        <Link href="/tier-list/trophy" className="font-medium text-brand hover:underline">
+        This roster scored against the current{" "}
+        <Link
+          href="/tier-list/trophy"
+          className="font-medium text-brand hover:underline"
+        >
           trophy tier list
         </Link>
         , which rates every brawler from sampled ladder battles. For competitive
-        play see the{' '}
-        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
+        play see the{" "}
+        <Link
+          href="/tier-list/ranked"
+          className="font-medium text-brand hover:underline"
+        >
           Ranked list
         </Link>
         , which covers the 3v3 modes only.
@@ -189,7 +196,9 @@ function Card({
       <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{hint}</p>
 
       {items.length === 0 ? (
-        <p className="flex flex-1 items-center py-2 text-sm text-muted">{empty}</p>
+        <p className="flex flex-1 items-center py-2 text-sm text-muted">
+          {empty}
+        </p>
       ) : (
         <ul className="space-y-1">{items}</ul>
       )}
@@ -209,7 +218,7 @@ function Row({
   id: number;
   name: string;
   icon: string;
-  tier: ScoredBrawler['tier'];
+  tier: ScoredBrawler["tier"];
   score: number | null;
   detail: string;
   muted?: boolean;
@@ -225,7 +234,7 @@ function Row({
           alt=""
           width={32}
           height={32}
-          className={`size-8 shrink-0 ${muted ? 'opacity-50 grayscale' : ''}`}
+          className={`size-8 shrink-0 ${muted ? "opacity-50 grayscale" : ""}`}
           unoptimized
         />
         <span className="min-w-0 flex-1">
@@ -239,7 +248,7 @@ function Row({
             className="text-sm font-black tabular-nums"
             style={{ color: tier ? TIER_COLOR[tier] : undefined }}
           >
-            {score?.toFixed(1) ?? '–'}
+            {score?.toFixed(1) ?? "–"}
           </span>
           {tier ? (
             <span

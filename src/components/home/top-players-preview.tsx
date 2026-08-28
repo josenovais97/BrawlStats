@@ -1,14 +1,14 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import { TrophyIcon } from '@/components/game-icons';
-import { getPlayerRankings } from '@/lib/bs-api';
-import { playerIconUrl } from '@/lib/brawlapi';
-import { formatNumber, nameColorToCss } from '@/lib/format';
-import { normalizeTag } from '@/lib/tags';
+import { TrophyIcon } from "@/components/game-icons";
+import { getPlayerRankings } from "@/lib/bs-api";
+import { playerIconUrl } from "@/lib/brawlapi";
+import { formatNumber, nameColorToCss } from "@/lib/format";
+import { normalizeTag } from "@/lib/tags";
 
 /** Podium colours for the first three rows. Everything below is neutral. */
-const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
+const PODIUM = ["#ffc53d", "#c9d3ee", "#e08a4a"];
 
 /**
  * Homepage teaser. A failure here must not take down the landing page, so any
@@ -30,12 +30,12 @@ export async function TopPlayersPreview({
 }) {
   let players;
   try {
-    players = (await getPlayerRankings('global', limit, revalidate)).items;
+    players = (await getPlayerRankings("global", limit, revalidate)).items;
   } catch {
     return (
       <div className="card p-6 text-sm text-muted">
-        The global leaderboard is unavailable right now. Player and club search still
-        work.
+        The global leaderboard is unavailable right now. Player and club search
+        still work.
       </div>
     );
   }
@@ -50,7 +50,7 @@ export async function TopPlayersPreview({
           <li key={player.tag}>
             <Link
               href={`/player/${tag}`}
-                prefetch={false}
+              prefetch={false}
               className="row-interactive flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
             >
               <span
@@ -62,7 +62,7 @@ export async function TopPlayersPreview({
                         color: podium,
                         boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${podium} 35%, transparent)`,
                       }
-                    : { color: 'var(--muted)' }
+                    : { color: "var(--muted)" }
                 }
               >
                 {player.rank}
@@ -86,7 +86,7 @@ export async function TopPlayersPreview({
                   {player.name}
                 </p>
                 <p className="mt-1 truncate text-xs text-muted">
-                  {player.club?.name ?? 'No club'}
+                  {player.club?.name ?? "No club"}
                 </p>
               </div>
 

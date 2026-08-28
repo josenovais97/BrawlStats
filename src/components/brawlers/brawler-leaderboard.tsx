@@ -1,9 +1,9 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import { TrophyIcon } from '@/components/game-icons';
-import { playerIconUrl } from '@/lib/brawlapi';
-import { getBrawlerRankings } from '@/lib/bs-api';
+import { TrophyIcon } from "@/components/game-icons";
+import { playerIconUrl } from "@/lib/brawlapi";
+import { getBrawlerRankings } from "@/lib/bs-api";
 
 /**
  * Must match `revalidate` on `/brawlers/[slug]`, the only page that renders
@@ -12,14 +12,16 @@ import { getBrawlerRankings } from '@/lib/bs-api';
  * ranking call each of them makes — to a two-minute cycle.
  */
 const RANKING_REVALIDATE = 21600;
-import { formatNumber, nameColorToCss } from '@/lib/format';
-import { normalizeTag } from '@/lib/tags';
+import { formatNumber, nameColorToCss } from "@/lib/format";
+import { normalizeTag } from "@/lib/tags";
 
 /** Global top players ranked by trophies on this specific brawler. */
 export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
   let players;
   try {
-    players = (await getBrawlerRankings(brawlerId, 'global', 10, RANKING_REVALIDATE)).items;
+    players = (
+      await getBrawlerRankings(brawlerId, "global", 10, RANKING_REVALIDATE)
+    ).items;
   } catch {
     return (
       <p className="card p-6 text-sm text-muted">
@@ -42,7 +44,7 @@ export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
         <li key={player.tag}>
           <Link
             href={`/player/${normalizeTag(player.tag)}`}
-                prefetch={false}
+            prefetch={false}
             className="card card-interactive flex items-center gap-4 p-3"
           >
             <span className="w-8 shrink-0 text-center text-lg font-black tabular-nums text-muted">
@@ -64,7 +66,9 @@ export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
                 {player.name}
               </p>
               {player.club?.name ? (
-                <p className="truncate text-xs text-muted">{player.club.name}</p>
+                <p className="truncate text-xs text-muted">
+                  {player.club.name}
+                </p>
               ) : null}
             </div>
             <span className="flex shrink-0 items-center gap-1.5 font-bold tabular-nums text-brand">

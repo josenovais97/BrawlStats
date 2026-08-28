@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { ChevronDown, Minus, TrendingDown, TrendingUp } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { ChevronDown, Minus, TrendingDown, TrendingUp } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
-import { CrownIcon, TrophyIcon } from '@/components/game-icons';
-import { formatNumber } from '@/lib/format';
-import { normalizeTag } from '@/lib/tags';
+import { CrownIcon, TrophyIcon } from "@/components/game-icons";
+import { formatNumber } from "@/lib/format";
+import { normalizeTag } from "@/lib/tags";
 
-export type BattleTone = 'win' | 'loss' | 'draw';
+export type BattleTone = "win" | "loss" | "draw";
 
 export interface BattleParticipant {
   tag: string;
@@ -39,9 +39,9 @@ export interface BattleEntry {
 }
 
 const TONE_COLOR: Record<BattleTone, string> = {
-  win: 'var(--victory)',
-  loss: 'var(--defeat)',
-  draw: 'var(--draw)',
+  win: "var(--victory)",
+  loss: "var(--defeat)",
+  draw: "var(--draw)",
 };
 
 /**
@@ -66,8 +66,8 @@ const TONE_COLOR: Record<BattleTone, string> = {
  * cost a hydration boundary of its own.
  */
 export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
-  const [tone, setTone] = useState<BattleTone | 'all'>('all');
-  const [mode, setMode] = useState('all');
+  const [tone, setTone] = useState<BattleTone | "all">("all");
+  const [mode, setMode] = useState("all");
 
   const modes = useMemo(
     () => [...new Set(entries.map((entry) => entry.mode))].sort(),
@@ -76,7 +76,7 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
 
   const tones = useMemo(
     () =>
-      (['win', 'loss', 'draw'] as const).filter((t) =>
+      (["win", "loss", "draw"] as const).filter((t) =>
         entries.some((entry) => entry.tone === t),
       ),
     [entries],
@@ -86,8 +86,8 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
     () =>
       entries.filter(
         (entry) =>
-          (tone === 'all' || entry.tone === tone) &&
-          (mode === 'all' || entry.mode === mode),
+          (tone === "all" || entry.tone === tone) &&
+          (mode === "all" || entry.mode === mode),
       ),
     [entries, mode, tone],
   );
@@ -115,8 +115,8 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
   }, [filtered]);
 
   const record = useMemo(() => {
-    const wins = entries.filter((e) => e.tone === 'win').length;
-    const losses = entries.filter((e) => e.tone === 'loss').length;
+    const wins = entries.filter((e) => e.tone === "win").length;
+    const losses = entries.filter((e) => e.tone === "loss").length;
     return { wins, losses };
   }, [entries]);
 
@@ -135,10 +135,14 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
           ))}
         </div>
         <p className="shrink-0 text-xs text-muted">
-          <span className="font-bold tabular-nums text-victory">{record.wins}W</span>
-          {' · '}
-          <span className="font-bold tabular-nums text-defeat">{record.losses}L</span>
-          {' over the last '}
+          <span className="font-bold tabular-nums text-victory">
+            {record.wins}W
+          </span>
+          {" · "}
+          <span className="font-bold tabular-nums text-defeat">
+            {record.losses}L
+          </span>
+          {" over the last "}
           <span className="tabular-nums">{entries.length}</span>
         </p>
       </div>
@@ -146,8 +150,12 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
       {(tones.length > 1 || modes.length > 1) && (
         <div className="flex flex-wrap items-center gap-1.5">
           {tones.length > 1 ? (
-            <div role="group" aria-label="Filter by result" className="flex gap-1.5">
-              <Chip active={tone === 'all'} onClick={() => setTone('all')}>
+            <div
+              role="group"
+              aria-label="Filter by result"
+              className="flex gap-1.5"
+            >
+              <Chip active={tone === "all"} onClick={() => setTone("all")}>
                 All results
               </Chip>
               {tones.map((t) => (
@@ -157,7 +165,7 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
                   onClick={() => setTone(t)}
                   dot={TONE_COLOR[t]}
                 >
-                  {t === 'win' ? 'Wins' : t === 'loss' ? 'Losses' : 'Draws'}
+                  {t === "win" ? "Wins" : t === "loss" ? "Losses" : "Draws"}
                 </Chip>
               ))}
             </div>
@@ -169,7 +177,7 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
               aria-label="Filter by mode"
               className="flex flex-wrap gap-1.5"
             >
-              <Chip active={mode === 'all'} onClick={() => setMode('all')}>
+              <Chip active={mode === "all"} onClick={() => setMode("all")}>
                 All modes
               </Chip>
               {modes.map((m) => (
@@ -221,8 +229,8 @@ function Chip({
       onClick={onClick}
       className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors ${
         active
-          ? 'bg-brand text-brand-ink'
-          : 'border border-border bg-surface-2/60 text-muted hover:border-border-strong hover:text-foreground'
+          ? "bg-brand text-brand-ink"
+          : "border border-border bg-surface-2/60 text-muted hover:border-border-strong hover:text-foreground"
       }`}
     >
       {dot && !active ? (
@@ -249,11 +257,18 @@ function RunRow({ run }: { run: BattleEntry[] }) {
       style={{ borderLeft: `3px solid ${TONE_COLOR[head.tone]}` }}
     >
       <summary className="flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/60 [&::-webkit-details-marker]:hidden">
-        <BrawlerTile iconUrl={head.iconUrl} name={head.brawlerName} count={run.length} />
+        <BrawlerTile
+          iconUrl={head.iconUrl}
+          name={head.brawlerName}
+          count={run.length}
+        />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-semibold" style={{ color: TONE_COLOR[head.tone] }}>
+            <span
+              className="font-semibold"
+              style={{ color: TONE_COLOR[head.tone] }}
+            >
               {head.outcomeLabel}
             </span>
             <span className="text-xs font-bold tabular-nums text-muted">
@@ -291,10 +306,16 @@ function RunRow({ run }: { run: BattleEntry[] }) {
   );
 }
 
-function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boolean }) {
+function BattleRow({
+  entry,
+  nested = false,
+}: {
+  entry: BattleEntry;
+  nested?: boolean;
+}) {
   return (
     <details
-      className={`group overflow-hidden ${nested ? 'rounded-xl bg-surface' : 'card'}`}
+      className={`group overflow-hidden ${nested ? "rounded-xl bg-surface" : "card"}`}
       style={{ borderLeft: `3px solid ${TONE_COLOR[entry.tone]}` }}
     >
       <summary className="flex cursor-pointer list-none items-center gap-3 p-3 transition-colors hover:bg-surface-2/60 [&::-webkit-details-marker]:hidden">
@@ -302,7 +323,10 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-semibold" style={{ color: TONE_COLOR[entry.tone] }}>
+            <span
+              className="font-semibold"
+              style={{ color: TONE_COLOR[entry.tone] }}
+            >
               {entry.outcomeLabel}
             </span>
             <span className="text-muted">·</span>
@@ -351,7 +375,7 @@ function BrawlerTile({
       {iconUrl ? (
         <Image
           src={iconUrl}
-          alt={name ?? ''}
+          alt={name ?? ""}
           width={48}
           height={48}
           className="size-12 rounded-lg bg-surface-2"
@@ -361,7 +385,7 @@ function BrawlerTile({
         <span className="block size-12 rounded-lg bg-surface-2" />
       )}
       {count && count > 1 ? (
-        <span className="absolute -bottom-1 -right-1 grid min-w-5 place-items-center rounded-full border border-border bg-surface px-1 text-[0.625rem] font-bold tabular-nums">
+        <span className="absolute -bottom-1 -right-1 grid min-w-5 place-items-center rounded-full border border-border bg-surface px-1 text-xs font-bold tabular-nums">
           {count}
         </span>
       ) : null}
@@ -370,13 +394,13 @@ function BrawlerTile({
 }
 
 function TrophyDelta({ value }: { value: number | null }) {
-  if (typeof value !== 'number' || value === 0) {
+  if (typeof value !== "number" || value === 0) {
     return <Minus aria-hidden className="size-4 shrink-0 text-muted/50" />;
   }
   return (
     <span
       className={`flex shrink-0 items-center gap-1 text-sm font-bold tabular-nums ${
-        value > 0 ? 'text-victory' : 'text-defeat'
+        value > 0 ? "text-victory" : "text-defeat"
       }`}
     >
       {value > 0 ? (
@@ -416,17 +440,17 @@ function Lineup({
                 <li key={participant.tag}>
                   <Link
                     href={`/player/${normalizeTag(participant.tag)}`}
-                prefetch={false}
+                    prefetch={false}
                     className={`flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-3 ${
                       participant.isSelf
-                        ? 'bg-brand/10 ring-1 ring-inset ring-brand/25'
-                        : ''
+                        ? "bg-brand/10 ring-1 ring-inset ring-brand/25"
+                        : ""
                     }`}
                   >
                     {participant.iconUrl ? (
                       <Image
                         src={participant.iconUrl}
-                        alt={participant.brawlerName ?? ''}
+                        alt={participant.brawlerName ?? ""}
                         width={32}
                         height={32}
                         className="size-8 shrink-0 rounded-md bg-surface-2"
@@ -441,7 +465,9 @@ function Lineup({
                       <span className="flex items-center gap-1.5">
                         <span
                           className={`truncate text-sm ${
-                            participant.isSelf ? 'font-bold text-brand' : 'font-medium'
+                            participant.isSelf
+                              ? "font-bold text-brand"
+                              : "font-medium"
                           }`}
                         >
                           {participant.name}
@@ -453,10 +479,10 @@ function Lineup({
                       <span className="block truncate text-xs capitalize text-muted">
                         {participant.brawlerName
                           ? participant.brawlerName.toLowerCase()
-                          : 'Unknown brawler'}
+                          : "Unknown brawler"}
                         {participant.brawlerPower
                           ? ` · power ${participant.brawlerPower}`
-                          : ''}
+                          : ""}
                       </span>
                     </span>
 

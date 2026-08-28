@@ -1,16 +1,16 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-import { CosmeticList } from '@/components/cosmetics/cosmetic-list';
-import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
-import { PageHeading } from '@/components/ui/section-heading';
-import { formatNumber } from '@/lib/format';
-import { getIconCatalogue } from '@/lib/stats';
+import { CosmeticList } from "@/components/cosmetics/cosmetic-list";
+import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
+import { PageHeading } from "@/components/ui/section-heading";
+import { formatNumber } from "@/lib/format";
+import { getIconCatalogue } from "@/lib/stats";
 
 export const metadata: Metadata = {
-  title: 'Every Brawl Stars profile icon, ranked by how many players use it',
+  title: "Every Brawl Stars profile icon, ranked by how many players use it",
   description:
-    'The full profile icon catalogue measured from sampled accounts: which icons players actually wear, and which are almost never seen.',
-  alternates: { canonical: '/cosmetics/icons' },
+    "The full profile icon catalogue measured from sampled accounts: which icons players actually wear, and which are almost never seen.",
+  alternates: { canonical: "/cosmetics/icons" },
 };
 
 /** Matches READ_CACHE_SECONDS; the read below is cached for two hours. */
@@ -28,8 +28,8 @@ export default async function IconCataloguePage() {
     <div className="space-y-8">
       <JsonLd
         data={breadcrumbSchema([
-          { name: 'Cosmetics', path: '/cosmetics' },
-          { name: 'Profile icons', path: '/cosmetics/icons' },
+          { name: "Cosmetics", path: "/cosmetics" },
+          { name: "Profile icons", path: "/cosmetics/icons" },
         ])}
       />
 
@@ -39,7 +39,7 @@ export default async function IconCataloguePage() {
         subtitle={
           icons.length > 0
             ? `${formatNumber(icons.length)} icons seen on sampled accounts, ranked by share of players.`
-            : 'No icon data has been sampled yet.'
+            : "No icon data has been sampled yet."
         }
       />
 

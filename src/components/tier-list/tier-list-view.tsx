@@ -595,19 +595,31 @@ function TierRow({
                 </p>
                 {/*
                 Labelled and spaced rather than "55.1% · 2.0%".
-                
+
                 At 12px the period between two digits all but disappears in this
                 face — "53.9%" reads as 539% — and two bare percentages a middot
-                apart give no clue which is which. A slightly larger figure, a
-                real gap, and a one-letter label each solves both at once.
+                apart give no clue which is which. A one-letter label each
+                solves both at once.
+
+                Stacked rather than side by side, because the two of them do not
+                fit on one line at a readable size: the card is 92px wide, and
+                inline they had to drop to 11px with the labels dimmed to 60%
+                opacity to fit — which is 3.2:1 against this surface, under the
+                4.5:1 AA needs. Two rows buy the size and the contrast back for
+                a line of height, and let the digits align in a column, so the
+                numbers can be compared down a tier rather than only read.
               */}
-                <p className="flex items-center justify-center gap-2.5 text-[0.6875rem] tabular-nums tracking-tight text-muted">
-                  <span title="Adjusted win rate">
-                    <span className="text-muted/60">W</span>{" "}
+                <p className="mx-auto mt-0.5 grid w-fit grid-cols-[auto_auto] items-baseline gap-x-1.5 text-xs tabular-nums">
+                  <span className="text-muted" title="Adjusted win rate">
+                    W
+                  </span>
+                  <span className="text-right font-semibold text-foreground">
                     {formatPercent(entry.normalizedWinRate)}
                   </span>
-                  <span title="Pick rate">
-                    <span className="text-muted/60">P</span>{" "}
+                  <span className="text-muted" title="Pick rate">
+                    P
+                  </span>
+                  <span className="text-right font-semibold text-foreground">
                     {formatPercent(entry.usageRate)}
                   </span>
                 </p>

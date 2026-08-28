@@ -1,6 +1,6 @@
 /** Loading placeholders that mirror the real layouts to avoid layout shift. */
 
-export function Skeleton({ className = '' }: { className?: string }) {
+export function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`skeleton ${className}`} />;
 }
 

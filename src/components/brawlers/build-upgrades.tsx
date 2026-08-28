@@ -1,27 +1,27 @@
-import Image from 'next/image';
-import type { ReactNode } from 'react';
+import Image from "next/image";
+import type { ReactNode } from "react";
 
 import {
   AbilityChoices,
   hasAbilityChoices,
-} from '@/components/brawlers/ability-choices';
-import { PopularBuild } from '@/components/brawlers/popular-build';
+} from "@/components/brawlers/ability-choices";
+import { PopularBuild } from "@/components/brawlers/popular-build";
 import {
   BuffieIcon,
   GadgetIcon,
   GearIcon,
   HyperchargeIcon,
   StarPowerIcon,
-} from '@/components/game-icons';
-import { ClampedText } from '@/components/ui/disclosure';
-import { SectionHeading } from '@/components/ui/section-heading';
-import { gearIconUrl } from '@/lib/brawlapi';
-import type { BrawlerWiki } from '@/lib/brawler-wiki';
-import { slugify } from '@/lib/slugs';
-import type { BrawlerAbilityChoices, BrawlerBuffies } from '@/lib/stats';
-import type { BAAccessory, BABrawler } from '@/types/brawlapi';
-import type { BSAccessory } from '@/types/brawlstars';
-import type { BrawlerBuild } from '@/types/stats';
+} from "@/components/game-icons";
+import { ClampedText } from "@/components/ui/disclosure";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { gearIconUrl } from "@/lib/brawlapi";
+import type { BrawlerWiki } from "@/lib/brawler-wiki";
+import { slugify } from "@/lib/slugs";
+import type { BrawlerAbilityChoices, BrawlerBuffies } from "@/lib/stats";
+import type { BAAccessory, BABrawler } from "@/types/brawlapi";
+import type { BSAccessory } from "@/types/brawlstars";
+import type { BrawlerBuild } from "@/types/stats";
 
 /**
  * Everything a player unlocks, buys or equips, in one place.
@@ -38,11 +38,11 @@ import type { BrawlerBuild } from '@/types/stats';
  * lets the cards sit two to a row without the row reading as one thing.
  */
 const KIND = {
-  starPower: { accent: '#ffc53d', label: 'Star power' },
-  gadget: { accent: '#35d07f', label: 'Gadget' },
-  hypercharge: { accent: '#ff5c72', label: 'Hypercharge' },
-  buffie: { accent: '#8b6bff', label: 'Buffie' },
-  gear: { accent: '#35d0ff', label: 'Gear' },
+  starPower: { accent: "#ffc53d", label: "Star power" },
+  gadget: { accent: "#35d07f", label: "Gadget" },
+  hypercharge: { accent: "#ff5c72", label: "Hypercharge" },
+  buffie: { accent: "#8b6bff", label: "Buffie" },
+  gear: { accent: "#35d0ff", label: "Gear" },
 } as const;
 
 export function BuildAndUpgrades({
@@ -103,7 +103,7 @@ export function BuildAndUpgrades({
       <div className="space-y-4">
         {/* What other owners bought. First, because it is the only part of
             this area that is a recommendation rather than a reference. */}
-        <div className={`grid gap-4 ${showChoices ? 'lg:grid-cols-2' : ''}`}>
+        <div className={`grid gap-4 ${showChoices ? "lg:grid-cols-2" : ""}`}>
           {showChoices && abilityChoices ? (
             <AbilityChoices
               choices={abilityChoices}
@@ -163,7 +163,11 @@ export function BuildAndUpgrades({
                   </span>
                   <div className="min-w-0">
                     <p className="font-bold capitalize">
-                      {(hyperchargeName ?? hyperCharges[0]?.name ?? 'Hypercharge').toLowerCase()}
+                      {(
+                        hyperchargeName ??
+                        hyperCharges[0]?.name ??
+                        "Hypercharge"
+                      ).toLowerCase()}
                     </p>
                     {/* What it changes, in the game's own words. No ownership
                         percentage: how many sampled players have bought it
@@ -178,8 +182,9 @@ export function BuildAndUpgrades({
                     />
                     {!hyperchargeDescription ? (
                       <p className="mt-2 text-xs leading-relaxed text-muted/80">
-                        The exact boost percentages vary per brawler and are published
-                        neither by the game API nor by any artwork source.
+                        The exact boost percentages vary per brawler and are
+                        published neither by the game API nor by any artwork
+                        source.
                       </p>
                     ) : null}
                   </div>
@@ -202,7 +207,10 @@ export function BuildAndUpgrades({
                 {buffieEffects.length > 0 ? (
                   <ul className="divide-y divide-border">
                     {buffieEffects.map((entry) => (
-                      <li key={`${entry.kind}-${entry.ability}`} className="p-4">
+                      <li
+                        key={`${entry.kind}-${entry.ability}`}
+                        className="p-4"
+                      >
                         <p className="flex flex-wrap items-baseline gap-2">
                           <span className="font-semibold capitalize">
                             {entry.ability.toLowerCase()}
@@ -217,15 +225,20 @@ export function BuildAndUpgrades({
                   </ul>
                 ) : (buffies?.none ?? true) ? (
                   <p className="p-4 text-sm text-muted">
-                    <span className="font-semibold text-foreground">Unreleased.</span>{' '}
+                    <span className="font-semibold text-foreground">
+                      Unreleased.
+                    </span>{" "}
                     {name} has no buffies yet.
                   </p>
                 ) : (
                   /* Our own samples say buffies exist here, but the wiki has no
                      text for them. A brand-new release, most likely. */
                   <p className="p-4 text-sm text-muted">
-                    <span className="font-semibold text-foreground">Released.</span>{' '}
-                    {name} has buffies, but their effects have not been documented yet.
+                    <span className="font-semibold text-foreground">
+                      Released.
+                    </span>{" "}
+                    {name} has buffies, but their effects have not been
+                    documented yet.
                   </p>
                 )}
               </UpgradeCard>
@@ -304,7 +317,11 @@ function UpgradeCard({
   const { accent } = KIND[kind];
   return (
     <div className="card flex flex-col overflow-hidden">
-      <span aria-hidden className="block h-0.5 w-full" style={{ background: accent }} />
+      <span
+        aria-hidden
+        className="block h-0.5 w-full"
+        style={{ background: accent }}
+      />
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
         <span
           className="grid size-8 shrink-0 place-items-center rounded-lg"
@@ -315,8 +332,12 @@ function UpgradeCard({
         >
           {icon}
         </span>
-        <h3 className="display flex-1 text-lg uppercase leading-none">{title}</h3>
-        {aside ? <span className="shrink-0 text-xs text-muted">{aside}</span> : null}
+        <h3 className="display flex-1 text-lg uppercase leading-none">
+          {title}
+        </h3>
+        {aside ? (
+          <span className="shrink-0 text-xs text-muted">{aside}</span>
+        ) : null}
       </div>
       <div className="flex-1">{children}</div>
     </div>
@@ -362,7 +383,9 @@ function AbilityCard({
                 unoptimized
               />
               <div className="min-w-0">
-                <p className="font-bold capitalize">{item.name.toLowerCase()}</p>
+                <p className="font-bold capitalize">
+                  {item.name.toLowerCase()}
+                </p>
                 {/* Descriptions run from eight words to sixty. Clamped past a
                     threshold so one wordy gadget cannot make its card three
                     times the height of the one beside it. */}

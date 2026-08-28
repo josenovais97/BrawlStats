@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { X } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useSyncExternalStore } from 'react';
+import { X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useSyncExternalStore } from "react";
 
-import { ClubIcon, PlayersIcon } from '@/components/game-icons';
-import { playerIconUrl } from '@/lib/brawlapi';
+import { ClubIcon, PlayersIcon } from "@/components/game-icons";
+import { playerIconUrl } from "@/lib/brawlapi";
 import {
   clearRecentSearches,
   readRecentSearches,
   serverRecentSearches,
   subscribeRecentSearches,
-} from '@/lib/recent-searches';
+} from "@/lib/recent-searches";
 
 /**
  * Tags looked up on this device, as a one-line shortcut rather than a section.
@@ -51,7 +51,7 @@ export function RecentSearches() {
           instead of stopping short of it. */}
       <ul className="-mx-1 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto px-1 py-0.5">
         {shown.map((entry) => {
-          const isClub = entry.kind === 'club';
+          const isClub = entry.kind === "club";
           return (
             <li key={`${entry.kind}:${entry.tag}`} className="shrink-0">
               <Link

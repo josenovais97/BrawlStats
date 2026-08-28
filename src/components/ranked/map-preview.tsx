@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Expand, X } from 'lucide-react';
-import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Expand, X } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * The map image on a ranked card, expandable to full size.

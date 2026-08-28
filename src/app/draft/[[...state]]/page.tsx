@@ -1,19 +1,19 @@
-import type { Metadata } from 'next';
-import { ArrowRight, Target, X } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import type { Metadata } from "next";
+import { ArrowRight, Target, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { DraftPicks } from '@/components/draft/draft-picks';
-import { MapArt } from '@/components/maps/map-art';
-import { RankedIcon } from '@/components/game-icons';
-import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
-import { PageHeading } from '@/components/ui/section-heading';
-import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
-import { formatNumber, humanizeMode } from '@/lib/format';
-import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
-import { getActiveMaps, type GameMap } from '@/lib/game-maps';
-import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
+import { DraftPicks } from "@/components/draft/draft-picks";
+import { MapArt } from "@/components/maps/map-art";
+import { RankedIcon } from "@/components/game-icons";
+import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
+import { PageHeading } from "@/components/ui/section-heading";
+import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from "@/lib/brawlapi";
+import { formatNumber, humanizeMode } from "@/lib/format";
+import { getBrawlerCatalog, type CatalogBrawler } from "@/lib/brawler-catalog";
+import { getActiveMaps, type GameMap } from "@/lib/game-maps";
+import { MAX_ENEMIES, draftHref, resolveDraftRoute } from "@/lib/draft-route";
 
 /**
  * How many team-mates a draft can name.
@@ -23,16 +23,16 @@ import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
  * theirs are somebody else's.
  */
 const MAX_ALLIES = 2;
-import { slugify } from '@/lib/slugs';
+import { slugify } from "@/lib/slugs";
 import {
   RANKED_MAP_WINDOW_DAYS,
   getBestPicksByMode,
   getAllyScores,
   getCounterScores,
   getRankedMapPicks,
-} from '@/lib/stats';
-import type { BABrawler, BAGameMode } from '@/types/brawlapi';
-import type { ModePick, RankedMapPick, RankedMapPicks } from '@/types/stats';
+} from "@/lib/stats";
+import type { BABrawler, BAGameMode } from "@/types/brawlapi";
+import type { ModePick, RankedMapPick, RankedMapPicks } from "@/types/stats";
 
 interface PageProps {
   params: Promise<{ state?: string[] }>;
@@ -51,15 +51,17 @@ interface PageProps {
  * link outward to pages worth discovering, whereas every link on a picked
  * draft state points at another draft state.
  */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { state } = await params;
   const picked = (state ?? []).length > 0;
 
   return {
-    title: 'Brawl Stars draft helper. Pick against the enemy team',
+    title: "Brawl Stars draft helper. Pick against the enemy team",
     description:
-      'Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.',
-    alternates: { canonical: '/draft' },
+      "Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.",
+    alternates: { canonical: "/draft" },
     ...(picked ? { robots: { index: false, follow: false } } : {}),
   };
 }
@@ -125,7 +127,8 @@ export default async function DraftPage({ params }: PageProps) {
 
   const artFor = (map: RankedMapPicks): GameMap | undefined =>
     catalogue.find(
-      (entry) => entry.mapSlug === slugify(map.mapName) && entry.scHash === map.mode,
+      (entry) =>
+        entry.mapSlug === slugify(map.mapName) && entry.scHash === map.mode,
     );
 
   const selected = route.mapSlug
@@ -158,7 +161,9 @@ export default async function DraftPage({ params }: PageProps) {
   // them" are different claims and someone drafting in ninety seconds needs to
   // see which one is carrying the recommendation.
   const basePicks: (ModePick | RankedMapPick)[] =
-    (selected?.picks.length ?? 0) > 0 ? selected!.picks : (modePicks?.picks ?? []);
+    (selected?.picks.length ?? 0) > 0
+      ? selected!.picks
+      : (modePicks?.picks ?? []);
 
   const ranked = basePicks
     .map((pick) => {
@@ -191,7 +196,9 @@ export default async function DraftPage({ params }: PageProps) {
 
   return (
     <div className="space-y-8">
-      <JsonLd data={breadcrumbSchema([{ name: 'Draft helper', path: '/draft' }])} />
+      <JsonLd
+        data={breadcrumbSchema([{ name: "Draft helper", path: "/draft" }])}
+      />
 
       <PageHeading
         title="Draft helper"
@@ -209,14 +216,19 @@ export default async function DraftPage({ params }: PageProps) {
 
       {pool.length === 0 ? (
         <p className="card p-6 text-sm leading-relaxed text-muted">
-          No Ranked maps have enough sampled battles yet. The sampler works through the
-          leaderboard pool continuously, so this fills in over the next day or two.
+          No Ranked maps have enough sampled battles yet. The sampler works
+          through the leaderboard pool continuously, so this fills in over the
+          next day or two.
         </p>
       ) : !selected ? (
         <MapChooser pool={pool} artFor={artFor} modeMeta={modeMeta} />
       ) : (
         <>
-          <SelectedMap map={selected} art={artFor(selected)} modeMeta={modeMeta} />
+          <SelectedMap
+            map={selected}
+            art={artFor(selected)}
+            modeMeta={modeMeta}
+          />
 
           <section>
             <StepHeading
@@ -237,7 +249,9 @@ export default async function DraftPage({ params }: PageProps) {
                   return id ? (
                     <Link
                       key={slot}
-                      href={hrefFor({ enemy: enemies.filter((other) => other !== id) })}
+                      href={hrefFor({
+                        enemy: enemies.filter((other) => other !== id),
+                      })}
                       rel="nofollow"
                       prefetch={false}
                       title={`Remove ${meta?.name ?? id}`}
@@ -306,7 +320,9 @@ export default async function DraftPage({ params }: PageProps) {
                   return id ? (
                     <Link
                       key={slot}
-                      href={hrefFor({ ally: allies.filter((other) => other !== id) })}
+                      href={hrefFor({
+                        ally: allies.filter((other) => other !== id),
+                      })}
                       rel="nofollow"
                       prefetch={false}
                       title={`Remove ${meta?.name ?? id}`}
@@ -365,12 +381,12 @@ export default async function DraftPage({ params }: PageProps) {
               title="Your pick"
               hint={
                 enemies.length > 0 && allies.length > 0
-                  ? 'Map score, plus how each candidate does against their picks and beside yours.'
+                  ? "Map score, plus how each candidate does against their picks and beside yours."
                   : enemies.length > 0
-                    ? 'Map score plus how each candidate does against the brawlers you named.'
+                    ? "Map score plus how each candidate does against the brawlers you named."
                     : allies.length > 0
-                      ? 'Map score plus how each candidate does beside your team-mates.'
-                      : 'Ranked by record on this map. Name either team above to reweigh it.'
+                      ? "Map score plus how each candidate does beside your team-mates."
+                      : "Ranked by record on this map. Name either team above to reweigh it."
               }
             />
 
@@ -398,10 +414,11 @@ export default async function DraftPage({ params }: PageProps) {
             )}
 
             <p className="mt-3 text-xs leading-relaxed text-muted">
-              Map score is a brawler&rsquo;s adjusted win rate here, weighed against its
-              overall Ranked form. The matchup figure is its win rate when one of the
-              brawlers you named was on the other team, minus its own average. So a
-              brawler that simply wins a lot does not appear to counter everything.
+              Map score is a brawler&rsquo;s adjusted win rate here, weighed
+              against its overall Ranked form. The matchup figure is its win
+              rate when one of the brawlers you named was on the other team,
+              minus its own average. So a brawler that simply wins a lot does
+              not appear to counter everything.
             </p>
           </section>
         </>
@@ -448,7 +465,7 @@ function SelectedMap({
   modeMeta: Map<string, BAGameMode>;
 }) {
   const mode = modeMeta.get(map.mode.toLowerCase());
-  const accent = mode?.color ?? '#8b95b8';
+  const accent = mode?.color ?? "#8b95b8";
 
   return (
     <section>
@@ -480,12 +497,17 @@ function SelectedMap({
           ) : null}
 
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
+            <p
+              className="text-xs font-bold uppercase tracking-wide"
+              style={{ color: accent }}
+            >
               {mode?.name ?? humanizeMode(map.mode)}
             </p>
-            <h3 className="display mt-1 truncate text-2xl uppercase">{map.mapName}</h3>
+            <h3 className="display mt-1 truncate text-2xl uppercase">
+              {map.mapName}
+            </h3>
             <p className="mt-1 text-sm text-muted">
-              {formatNumber(map.sampleSize)} sampled Ranked battles ·{' '}
+              {formatNumber(map.sampleSize)} sampled Ranked battles ·{" "}
               {map.brawlersSeen} brawlers seen
             </p>
           </div>
@@ -533,7 +555,7 @@ function MapChooser({
       <div className="space-y-6">
         {[...byMode].map(([mode, list]) => {
           const meta = modeMeta.get(mode.toLowerCase());
-          const accent = meta?.color ?? '#8b95b8';
+          const accent = meta?.color ?? "#8b95b8";
 
           return (
             <div key={mode}>
@@ -574,7 +596,7 @@ function MapChooser({
                         <span className="block truncate px-3 pt-2 text-sm font-semibold">
                           {map.mapName}
                         </span>
-                        <span className="block px-3 pb-2 text-[0.625rem] tabular-nums text-muted">
+                        <span className="block px-3 pb-2 text-xs tabular-nums text-muted">
                           {formatNumber(map.sampleSize)} battles
                         </span>
                       </Link>
@@ -637,7 +659,7 @@ function BrawlerChooser({
                 loading="lazy"
                 unoptimized
               />
-              <span className="w-full truncate text-center text-[0.625rem] font-medium capitalize text-muted">
+              <span className="w-full truncate text-center text-xs font-medium capitalize text-muted">
                 {brawler.name.toLowerCase()}
               </span>
             </Link>

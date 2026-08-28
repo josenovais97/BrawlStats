@@ -143,7 +143,7 @@ export function ChangeBadge({
   return (
     <span
       title={title}
-      className={`mt-1 inline-flex w-full items-center justify-center gap-0.5 rounded-md px-1 py-0.5 text-[0.625rem] font-bold tabular-nums ${
+      className={`mt-1 inline-flex w-full items-center justify-center gap-0.5 rounded-md px-1 py-0.5 text-xs font-bold tabular-nums ${
         up ? "bg-victory/15 text-victory" : "bg-defeat/15 text-defeat"
       }`}
     >

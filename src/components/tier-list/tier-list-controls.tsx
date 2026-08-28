@@ -1,9 +1,9 @@
-import { RankedIcon, TrophyIcon } from '@/components/game-icons';
-import Link from 'next/link';
+import { RankedIcon, TrophyIcon } from "@/components/game-icons";
+import Link from "next/link";
 
-import { humanizeMode } from '@/lib/format';
-import { tierListHref } from '@/lib/tier-list-route';
-import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from '@/lib/stats';
+import { humanizeMode } from "@/lib/format";
+import { tierListHref } from "@/lib/tier-list-route";
+import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from "@/lib/stats";
 
 /**
  * The three controls above a tier list: format, window, mode.
@@ -24,8 +24,8 @@ const FORMATS: {
   sublabel: string;
   icon: (props: { className?: string }) => React.ReactNode;
 }[] = [
-  { key: 'ranked', label: 'Ranked', sublabel: 'Competitive', icon: RankedIcon },
-  { key: 'trophy', label: 'Trophy', sublabel: 'Ladder', icon: TrophyIcon },
+  { key: "ranked", label: "Ranked", sublabel: "Competitive", icon: RankedIcon },
+  { key: "trophy", label: "Trophy", sublabel: "Ladder", icon: TrophyIcon },
 ];
 
 export function TierListControls({
@@ -49,7 +49,12 @@ export function TierListControls({
         <FormatTabs format={format} windowKey={windowKey} />
         <WindowTabs format={format} windowKey={windowKey} mode={mode} />
       </div>
-      <ModeFilter format={format} windowKey={windowKey} mode={mode} modes={modes} />
+      <ModeFilter
+        format={format}
+        windowKey={windowKey}
+        mode={mode}
+        modes={modes}
+      />
     </div>
   );
 }
@@ -82,11 +87,11 @@ function FormatTabs({
           <Link
             key={key}
             href={tierListHref(key, windowKey)}
-            aria-current={current ? 'page' : undefined}
+            aria-current={current ? "page" : undefined}
             className={`flex items-center gap-2.5 rounded-xl px-4 py-2.5 transition-colors ${
               current
-                ? 'bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]'
-                : 'text-muted hover:bg-surface-3/60 hover:text-foreground'
+                ? "bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]"
+                : "text-muted hover:bg-surface-3/60 hover:text-foreground"
             }`}
           >
             <Icon className="size-4 shrink-0" />
@@ -94,7 +99,7 @@ function FormatTabs({
               <span className="block text-sm font-bold">{label}</span>
               <span
                 className={`block text-xs font-semibold ${
-                  current ? 'text-brand-ink/70' : 'text-muted/70'
+                  current ? "text-brand-ink/70" : "text-muted"
                 }`}
               >
                 {sublabel}
@@ -134,17 +139,17 @@ function WindowTabs({
           <Link
             key={key}
             href={tierListHref(format, key, mode)}
-            aria-current={current ? 'page' : undefined}
+            aria-current={current ? "page" : undefined}
             className={`flex items-baseline gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
               current
-                ? 'bg-surface-3 text-foreground'
-                : 'text-muted hover:text-foreground'
+                ? "bg-surface-3 text-foreground"
+                : "text-muted hover:text-foreground"
             }`}
           >
             {label}
             <span
               className={`text-xs font-bold ${
-                current ? 'text-muted' : 'text-muted/70'
+                current ? "text-foreground" : "text-muted"
               }`}
             >
               {sublabel}
@@ -175,16 +180,16 @@ function ModeFilter({
   if (modes.length === 0) return null;
 
   const chip =
-    'shrink-0 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors';
-  const on = 'border-brand/40 bg-brand/10 text-brand';
-  const off = 'border-border bg-surface text-muted hover:text-foreground';
+    "shrink-0 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors";
+  const on = "border-brand/40 bg-brand/10 text-brand";
+  const off = "border-border bg-surface text-muted hover:text-foreground";
 
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div role="group" aria-label="Game mode" className="flex w-max gap-2">
         <Link
           href={tierListHref(format, windowKey)}
-          aria-current={mode ? undefined : 'page'}
+          aria-current={mode ? undefined : "page"}
           className={`${chip} ${mode ? off : on}`}
         >
           All modes
@@ -196,7 +201,7 @@ function ModeFilter({
             <Link
               key={entry.mode}
               href={tierListHref(format, windowKey, entry.mode)}
-              aria-current={current ? 'page' : undefined}
+              aria-current={current ? "page" : undefined}
               title={`${entry.battles.toLocaleString()} sampled battles`}
               className={`${chip} ${current ? on : off}`}
             >

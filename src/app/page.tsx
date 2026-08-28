@@ -1,32 +1,33 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { FavoritesList } from '@/components/favorites-list';
-import { HomeCoverage } from '@/components/home/home-coverage';
-import { HomeCta } from '@/components/home/home-cta';
-import { HomeHero } from '@/components/home/home-hero';
-import { HomeLiveEvents } from '@/components/home/home-live-events';
-import { HomeAccountPreview } from '@/components/home/home-account-preview';
-import { HomeBand } from '@/components/home/home-band';
-import { HomeSection } from '@/components/home/home-section';
-import { HomeSnapshot } from '@/components/home/home-snapshot';
-import { HomeSplit } from '@/components/home/home-split';
-import { HomeTools } from '@/components/home/home-tools';
-import { Skeleton } from '@/components/ui/skeletons';
-import { SITE_NAME, SITE_URL } from '@/lib/site';
+import { FavoritesList } from "@/components/favorites-list";
+import { HomeCoverage } from "@/components/home/home-coverage";
+import { HomeCta } from "@/components/home/home-cta";
+import { HomeHero } from "@/components/home/home-hero";
+import { HomeLatestVideo } from "@/components/home/home-latest-video";
+import { HomeLiveEvents } from "@/components/home/home-live-events";
+import { HomeAccountPreview } from "@/components/home/home-account-preview";
+import { HomeBand } from "@/components/home/home-band";
+import { HomeSection } from "@/components/home/home-section";
+import { HomeSnapshot } from "@/components/home/home-snapshot";
+import { HomeSplit } from "@/components/home/home-split";
+import { HomeTools } from "@/components/home/home-tools";
+import { Skeleton } from "@/components/ui/skeletons";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: 'BrawlZone: Brawl Stars stats, tier lists and leaderboards',
+  title: "BrawlZone: Brawl Stars stats, tier lists and leaderboards",
   description:
-    'Look up any Brawl Stars player by tag for a skill score out of 10, their roster read against the meta and trophy history over time. Separate Ranked and trophy tier lists, a Ranked elo leaderboard the game API does not publish, and the live event rotation.',
-  alternates: { canonical: '/' },
+    "Look up any Brawl Stars player by tag for a skill score out of 10, their roster read against the meta and trophy history over time. Separate Ranked and trophy tier lists, a Ranked elo leaderboard the game API does not publish, and the live event rotation.",
+  alternates: { canonical: "/" },
   openGraph: {
-    type: 'website',
+    type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: 'BrawlZone: Brawl Stars stats, tier lists and leaderboards',
+    title: "BrawlZone: Brawl Stars stats, tier lists and leaderboards",
     description:
-      'Skill scores, separate Ranked and trophy tier lists, a Ranked elo leaderboard, live events and player stats. All from one tag.',
+      "Skill scores, separate Ranked and trophy tier lists, a Ranked elo leaderboard, live events and player stats. All from one tag.",
   },
 };
 
@@ -60,19 +61,19 @@ const LIVE_REVALIDATE = 600;
  * directly in results. The target has to be an absolute URL template.
  */
 const WEBSITE_SCHEMA = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
+  "@context": "https://schema.org",
+  "@type": "WebSite",
   name: SITE_NAME,
   url: SITE_URL,
   description:
-    'Brawl Stars player and club statistics, brawler win rates, live event rotation and global leaderboards.',
+    "Brawl Stars player and club statistics, brawler win rates, live event rotation and global leaderboards.",
   potentialAction: {
-    '@type': 'SearchAction',
+    "@type": "SearchAction",
     target: {
-      '@type': 'EntryPoint',
+      "@type": "EntryPoint",
       urlTemplate: `${SITE_URL}/player/{search_term_string}`,
     },
-    'query-input': 'required name=search_term_string',
+    "query-input": "required name=search_term_string",
   },
 };
 
@@ -179,6 +180,13 @@ export default function HomePage() {
 
       <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
         <HomeSnapshot revalidate={LIVE_REVALIDATE} />
+      </Suspense>
+
+      {/* Under the snapshot on purpose: someone who has just read the numbers
+          is the one person on the page who might want them talked through.
+          Renders nothing while the channel has no videos. */}
+      <Suspense fallback={null}>
+        <HomeLatestVideo />
       </Suspense>
 
       <HomeCta />

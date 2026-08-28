@@ -1,5 +1,5 @@
-import type { LucideIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface StatCardProps {
   /** A lucide component. Ignored when `node` is given. */
@@ -22,7 +22,7 @@ export function StatCard({
   label,
   value,
   hint,
-  tone = 'text-brand',
+  tone = "text-brand",
 }: StatCardProps) {
   return (
     <div className="card card-glow flex items-center gap-3 p-4">

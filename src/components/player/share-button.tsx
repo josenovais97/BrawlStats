@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Check, Share2 } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Share2 } from "lucide-react";
+import { useState } from "react";
 
 /**
  * Shares the current profile, or copies its link.
@@ -47,8 +47,12 @@ export function ShareButton({ title, text }: { title: string; text: string }) {
          adjacent. */
       className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-sm font-semibold text-muted transition-colors hover:border-brand/40 hover:text-foreground"
     >
-      {copied ? <Check className="size-4 text-victory" /> : <Share2 className="size-4" />}
-      {copied ? 'Link copied' : 'Share'}
+      {copied ? (
+        <Check className="size-4 text-victory" />
+      ) : (
+        <Share2 className="size-4" />
+      )}
+      {copied ? "Link copied" : "Share"}
     </button>
   );
 }

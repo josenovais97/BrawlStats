@@ -1,13 +1,13 @@
-import { CountUp } from '@/components/ui/count-up';
-import { RelativeTime } from '@/components/ui/relative-time';
+import { CountUp } from "@/components/ui/count-up";
+import { RelativeTime } from "@/components/ui/relative-time";
 import {
   BattlesIcon,
   BrawlersIcon,
   PlayersIcon,
   RankedIcon,
-} from '@/components/game-icons';
-import { relativeTime } from '@/lib/format';
-import { getCoverageStats, getLastAggregationRun } from '@/lib/stats';
+} from "@/components/game-icons";
+import { relativeTime } from "@/lib/format";
+import { getCoverageStats, getLastAggregationRun } from "@/lib/stats";
 
 /**
  * The live-data rail at the base of the hero.
@@ -33,10 +33,10 @@ export async function HomeCoverage() {
   if (!stats || stats.battles === 0) return null;
 
   const items = [
-    { icon: BrawlersIcon, label: 'Brawlers tracked', value: stats.brawlers },
-    { icon: PlayersIcon, label: 'Players sampled', value: stats.players },
-    { icon: BattlesIcon, label: 'Battles analysed', value: stats.battles },
-    { icon: RankedIcon, label: 'Ranked placements', value: stats.placements },
+    { icon: BrawlersIcon, label: "Brawlers tracked", value: stats.brawlers },
+    { icon: PlayersIcon, label: "Players sampled", value: stats.players },
+    { icon: BattlesIcon, label: "Battles analysed", value: stats.battles },
+    { icon: RankedIcon, label: "Ranked placements", value: stats.placements },
   ];
 
   return (
@@ -48,13 +48,15 @@ export async function HomeCoverage() {
           <span className="min-w-0">
             {lastRun ? (
               <>
-                Sampled{' '}
+                Sampled{" "}
                 <RelativeTime
                   iso={lastRun.startedAt}
                   fallback={relativeTime(lastRun.startedAt)}
                   className="font-semibold text-foreground"
                 />
-                <span className="block text-muted/75">Re-read every three hours</span>
+                <span className="block text-muted">
+                  Re-read every three hours
+                </span>
               </>
             ) : (
               <span className="font-semibold text-foreground">Live sample</span>
@@ -73,10 +75,12 @@ export async function HomeCoverage() {
             <li
               key={label}
               className={`flex items-center gap-3 py-4 lg:py-5 lg:pl-6 ${
-                index % 2 === 1 ? 'border-l border-border/60 pl-4 sm:pl-6 lg:pl-6' : ''
-              } ${index > 1 ? 'border-t border-border/60 lg:border-t-0' : ''} ${
-                index === 2 ? 'lg:border-l lg:border-border/60' : ''
-              } ${index === 3 ? 'lg:border-l lg:border-border/60' : ''}`}
+                index % 2 === 1
+                  ? "border-l border-border/60 pl-4 sm:pl-6 lg:pl-6"
+                  : ""
+              } ${index > 1 ? "border-t border-border/60 lg:border-t-0" : ""} ${
+                index === 2 ? "lg:border-l lg:border-border/60" : ""
+              } ${index === 3 ? "lg:border-l lg:border-border/60" : ""}`}
             >
               <Icon className="size-7 shrink-0 opacity-90 sm:size-8" />
               <div className="min-w-0">

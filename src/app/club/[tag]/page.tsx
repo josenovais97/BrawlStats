@@ -1,33 +1,36 @@
-import type { Metadata } from 'next';
-import { Lock, Shield, UserPlus } from 'lucide-react';
+import type { Metadata } from "next";
+import { Lock, Shield, UserPlus } from "lucide-react";
 
-import { FavoriteButton } from '@/components/favorite-button';
-import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
-import Image from 'next/image';
+import { FavoriteButton } from "@/components/favorite-button";
+import { PlayersIcon, TrophyIcon } from "@/components/game-icons";
+import Image from "next/image";
 
-import { ClubInsights } from '@/components/club/club-insights';
-import { ClubMembers } from '@/components/club/club-members';
-import { ErrorState } from '@/components/ui/error-state';
-import { RecentSearchRecorder } from '@/components/recent-search-recorder';
-import { SectionHeading } from '@/components/ui/section-heading';
-import { StatCard } from '@/components/ui/stat-card';
-import { clubBadgeUrl } from '@/lib/brawlapi';
-import { getClub } from '@/lib/bs-api';
-import { toApiError } from '@/lib/errors';
-import { formatNumber, humanizeRole } from '@/lib/format';
-import { displayTag, normalizeTag } from '@/lib/tags';
+import { ClubInsights } from "@/components/club/club-insights";
+import { ClubMembers } from "@/components/club/club-members";
+import { ErrorState } from "@/components/ui/error-state";
+import { RecentSearchRecorder } from "@/components/recent-search-recorder";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { StatCard } from "@/components/ui/stat-card";
+import { clubBadgeUrl } from "@/lib/brawlapi";
+import { getClub } from "@/lib/bs-api";
+import { toApiError } from "@/lib/errors";
+import { formatNumber, humanizeRole } from "@/lib/format";
+import { displayTag, normalizeTag } from "@/lib/tags";
 
 interface PageProps {
   params: Promise<{ tag: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { tag } = await params;
   try {
     const club = await getClub(tag);
     return {
       title: `${club.name} (${displayTag(club.tag)})`,
-      description: club.description || `${club.name} club stats and member list.`,
+      description:
+        club.description || `${club.name} club stats and member list.`,
       alternates: { canonical: `/club/${normalizeTag(club.tag)}` },
       // Indexable pages must be a deliberate set. This one is not: the
       // combinations are effectively unbounded, and a crawler walking them costs
@@ -51,9 +54,9 @@ export default async function ClubPage({ params }: PageProps) {
     return (
       <ErrorState
         code={apiError.code}
-        title={apiError.code === 'notFound' ? 'Club not found' : undefined}
+        title={apiError.code === "notFound" ? "Club not found" : undefined}
         detail={
-          apiError.code === 'notFound'
+          apiError.code === "notFound"
             ? `No club exists with the tag ${displayTag(tag)}. Club tags are shown on the club's info screen in-game.`
             : undefined
         }
@@ -79,7 +82,7 @@ export default async function ClubPage({ params }: PageProps) {
           className="pointer-events-none absolute inset-x-0 top-0 h-40 opacity-[0.14]"
           style={{
             background:
-              'radial-gradient(40rem 12rem at 18% 0%, var(--accent), transparent 70%)',
+              "radial-gradient(40rem 12rem at 18% 0%, var(--accent), transparent 70%)",
           }}
         />
         <div className="relative flex flex-wrap items-center gap-5 p-6 sm:p-7">
@@ -119,7 +122,11 @@ export default async function ClubPage({ params }: PageProps) {
               </span>
               <span className="text-xs text-muted">Club trophies</span>
             </div>
-            <FavoriteButton kind="club" tag={normalizeTag(club.tag)} name={club.name} />
+            <FavoriteButton
+              kind="club"
+              tag={normalizeTag(club.tag)}
+              name={club.name}
+            />
           </div>
         </div>
       </header>
@@ -144,10 +151,10 @@ export default async function ClubPage({ params }: PageProps) {
           tone="text-victory"
         />
         <StatCard
-          icon={club.type === 'open' ? Shield : Lock}
+          icon={club.type === "open" ? Shield : Lock}
           label="Type"
           value={humanizeRole(club.type)}
-          hint={club.isFamilyFriendly ? 'Family friendly' : undefined}
+          hint={club.isFamilyFriendly ? "Family friendly" : undefined}
         />
       </section>
 

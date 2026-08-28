@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { addRecentSearch, type RecentKind } from '@/lib/recent-searches';
+import { addRecentSearch, type RecentKind } from "@/lib/recent-searches";
 
 /**
  * Renders nothing. Dropped into a player or club page so that visiting it

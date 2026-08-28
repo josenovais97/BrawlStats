@@ -1,7 +1,7 @@
-import { AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react';
-import Link from 'next/link';
+import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react";
+import Link from "next/link";
 
-import { ERROR_COPY, type ApiErrorCode } from '@/lib/errors';
+import { ERROR_COPY, type ApiErrorCode } from "@/lib/errors";
 
 interface ErrorStateProps {
   code: ApiErrorCode;
@@ -21,11 +21,12 @@ export function ErrorState({
   code,
   title,
   detail,
-  backHref = '/',
-  backLabel = 'Back to search',
+  backHref = "/",
+  backLabel = "Back to search",
 }: ErrorStateProps) {
   const copy = ERROR_COPY[code];
-  const isRetryable = code === 'rateLimited' || code === 'upstreamDown' || code === 'timeout';
+  const isRetryable =
+    code === "rateLimited" || code === "upstreamDown" || code === "timeout";
 
   return (
     <div className="card card-glow mx-auto max-w-lg p-8 text-center">
@@ -33,7 +34,9 @@ export function ErrorState({
         <AlertTriangle className="size-7" />
       </span>
       <h2 className="mt-4 text-xl font-bold">{title ?? copy.title}</h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{detail ?? copy.detail}</p>
+      <p className="mt-2 text-sm leading-relaxed text-muted">
+        {detail ?? copy.detail}
+      </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link

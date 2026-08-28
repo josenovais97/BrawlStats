@@ -1,11 +1,11 @@
-import { ClockIcon } from '@/components/game-icons';
-import Image from 'next/image';
-import Link from 'next/link';
+import { ClockIcon } from "@/components/game-icons";
+import Image from "next/image";
+import Link from "next/link";
 
-import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
-import { getEventRotation } from '@/lib/bs-api';
-import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
-import type { BAGameMode, BAMap } from '@/types/brawlapi';
+import { getGameModeMap, getMapMap } from "@/lib/brawlapi";
+import { getEventRotation } from "@/lib/bs-api";
+import { humanizeMode, partitionRotation, timeUntil } from "@/lib/format";
+import type { BAGameMode, BAMap } from "@/types/brawlapi";
 
 /**
  * Three live maps as a homepage teaser. Silent if the rotation is unavailable.
@@ -47,12 +47,15 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
     <ul className="reveal-row -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-3">
       {slots.map((slot) => {
         const map = mapMeta.get(slot.event.id);
-        const mode = modeMeta.get((slot.event.mode ?? '').toLowerCase());
-        const accent = mode?.color ?? '#8b95b8';
+        const mode = modeMeta.get((slot.event.mode ?? "").toLowerCase());
+        const accent = mode?.color ?? "#8b95b8";
         const modeName = mode?.name ?? humanizeMode(slot.event.mode);
 
         return (
-          <li className="w-[85%] shrink-0 snap-start sm:w-auto sm:shrink" key={`${slot.slotId}-${slot.event.id}`}>
+          <li
+            className="w-[85%] shrink-0 snap-start sm:w-auto sm:shrink"
+            key={`${slot.slotId}-${slot.event.id}`}
+          >
             {/*
               Two shapes from one set of elements: a wide row on a phone, where
               a poster card would burn most of the screen on empty margin round
@@ -139,7 +142,7 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                       {modeName}
                     </p>
                     <p className="display mt-1 truncate text-base leading-none">
-                      {slot.event.map ?? 'Unknown map'}
+                      {slot.event.map ?? "Unknown map"}
                     </p>
                   </div>
                 </div>

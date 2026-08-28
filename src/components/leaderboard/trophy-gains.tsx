@@ -1,12 +1,12 @@
-import { TrophyGainIcon } from '@/components/game-icons';
-import Link from 'next/link';
+import { TrophyGainIcon } from "@/components/game-icons";
+import Link from "next/link";
 
-import { TrophyIcon } from '@/components/game-icons';
-import { formatNumber } from '@/lib/format';
-import { getTrophyGains } from '@/lib/stats';
+import { TrophyIcon } from "@/components/game-icons";
+import { formatNumber } from "@/lib/format";
+import { getTrophyGains } from "@/lib/stats";
 
 /** Podium colours for the first three. Everything below is neutral. */
-const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
+const PODIUM = ["#ffc53d", "#c9d3ee", "#e08a4a"];
 
 /**
  * Fewer rows than this and the section is hidden rather than shown half empty.
@@ -26,7 +26,9 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
   // Bars are scaled on the daily rate, which is also what the list is ranked
   // by, so the longest bar is always the top row.
   const topRate = gains[0].gain / gains[0].days;
-  const uniformSpan = gains.every((g) => g.days === gains[0].days) ? gains[0].days : null;
+  const uniformSpan = gains.every((g) => g.days === gains[0].days)
+    ? gains[0].days
+    : null;
 
   return (
     <section aria-labelledby="trophy-gains" className="reveal">
@@ -36,8 +38,11 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
             <TrophyGainIcon className="size-4" />
             Climbing fastest
           </p>
-          <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
-            Biggest trophy gains{uniformSpan === 1 ? ' today' : ''}
+          <h2
+            id="trophy-gains"
+            className="display mt-2.5 text-2xl uppercase sm:text-3xl"
+          >
+            Biggest trophy gains{uniformSpan === 1 ? " today" : ""}
           </h2>
           {/*
             The population is stated up front because this list sits directly
@@ -47,13 +52,16 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
             missing below is the expected case rather than a bug.
           */}
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            From our own daily snapshots of the{' '}
-            <Link href="/about" className="font-medium text-brand hover:underline">
+            From our own daily snapshots of the{" "}
+            <Link
+              href="/about"
+              className="font-medium text-brand hover:underline"
+            >
               sampled player pool
             </Link>
-            , ranked by trophies per day since each player was last read. A different
-            population from the official top 100 below, so these names mostly do not
-            appear there.
+            , ranked by trophies per day since each player was last read. A
+            different population from the official top 100 below, so these names
+            mostly do not appear there.
           </p>
         </div>
       </div>
@@ -64,7 +72,9 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
           // Bar length is relative to the biggest gain, so the leader always
           // fills the row and the rest are legible as a proportion of it.
           const width =
-            topRate > 0 ? Math.max(4, (player.gain / player.days / topRate) * 100) : 0;
+            topRate > 0
+              ? Math.max(4, (player.gain / player.days / topRate) * 100)
+              : 0;
 
           return (
             <li key={player.tag} className="relative">
@@ -86,7 +96,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                 style={{
                   width: `${width}%`,
                   background:
-                    'linear-gradient(90deg, color-mix(in srgb, var(--defeat) 13%, transparent), color-mix(in srgb, var(--defeat) 4%, transparent))',
+                    "linear-gradient(90deg, color-mix(in srgb, var(--defeat) 13%, transparent), color-mix(in srgb, var(--defeat) 4%, transparent))",
                 }}
               />
               <span
@@ -108,7 +118,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                           color: podium,
                           boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${podium} 35%, transparent)`,
                         }
-                      : { color: 'var(--muted)' }
+                      : { color: "var(--muted)" }
                   }
                 >
                   {index + 1}
@@ -120,7 +130,9 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                   </p>
                   <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-muted">
                     <TrophyIcon className="size-3" />
-                    <span className="tabular-nums">{formatNumber(player.trophies)}</span>
+                    <span className="tabular-nums">
+                      {formatNumber(player.trophies)}
+                    </span>
                     <span aria-hidden>total</span>
                   </p>
                 </div>
@@ -134,8 +146,10 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                     row states its own. Hidden when every row shares one.
                   */}
                   {uniformSpan === null ? (
-                    <p className="mt-1 text-[0.625rem] uppercase tracking-wide text-muted">
-                      {player.days === 1 ? 'in 1 day' : `in ${player.days} days`}
+                    <p className="mt-1 text-[0.6875rem] uppercase tracking-wide text-muted">
+                      {player.days === 1
+                        ? "in 1 day"
+                        : `in ${player.days} days`}
                     </p>
                   ) : null}
                 </div>

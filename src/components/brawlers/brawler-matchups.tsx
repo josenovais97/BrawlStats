@@ -1,12 +1,12 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import { comparePath } from '@/lib/compare';
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl } from '@/lib/brawlapi';
-import { formatNumber, formatPercent } from '@/lib/format';
-import type { BrawlerPairing, BrawlerPairings } from '@/lib/stats';
-import type { BABrawler } from '@/types/brawlapi';
+import { comparePath } from "@/lib/compare";
+import { brawlerPath } from "@/lib/slugs";
+import { brawlerIconUrl } from "@/lib/brawlapi";
+import { formatNumber, formatPercent } from "@/lib/format";
+import type { BrawlerPairing, BrawlerPairings } from "@/lib/stats";
+import type { BABrawler } from "@/types/brawlapi";
 
 /**
  * Who this brawler beats, who beats it, and who it wants beside it.
@@ -44,17 +44,17 @@ export function BrawlerMatchups({
   const name = brawlerName.toLowerCase();
   const columns: { title: string; hint: string; rows: BrawlerPairing[] }[] = [
     {
-      title: 'Strong against',
+      title: "Strong against",
       hint: `Opponents ${name} beats more often than its own average`,
       rows: pairings.strongAgainst,
     },
     {
-      title: 'Weak against',
+      title: "Weak against",
       hint: `Opponents that pull ${name} below its own average`,
       rows: pairings.weakAgainst,
     },
     {
-      title: 'Best team-mates',
+      title: "Best team-mates",
       hint: `Allies ${name} wins more alongside`,
       rows: pairings.bestWith,
     },
@@ -83,14 +83,17 @@ export function BrawlerMatchups({
                 // Falls back to the brawler page when either side lacks the
                 // artwork metadata comparePath needs to build a slug.
                 const href =
-                  self && meta ? comparePath(self, meta) : brawlerPath(row.brawlerId, meta?.name);
-                const followable = self && meta ? indexablePairs.has(key) : true;
+                  self && meta
+                    ? comparePath(self, meta)
+                    : brawlerPath(row.brawlerId, meta?.name);
+                const followable =
+                  self && meta ? indexablePairs.has(key) : true;
 
                 return (
                   <li key={row.brawlerId}>
                     <Link
                       href={href}
-                      rel={followable ? undefined : 'nofollow'}
+                      rel={followable ? undefined : "nofollow"}
                       className="row-interactive flex items-center gap-3 px-3 py-2"
                       title={`${formatPercent(row.winRate)} win rate over ${formatNumber(row.decidedSampleSize)} sampled battles, against a ${formatPercent(pairings.baseline)} average for this brawler`}
                     >
@@ -113,10 +116,10 @@ export function BrawlerMatchups({
                       </span>
                       <span
                         className={`shrink-0 text-sm font-bold tabular-nums ${
-                          positive ? 'text-victory' : 'text-defeat'
+                          positive ? "text-victory" : "text-defeat"
                         }`}
                       >
-                        {positive ? '+' : '−'}
+                        {positive ? "+" : "−"}
                         {Math.abs(row.edge * 100).toFixed(1)}
                       </span>
                     </Link>
@@ -129,11 +132,12 @@ export function BrawlerMatchups({
       </div>
 
       <p className="text-xs leading-relaxed text-muted">
-        Percentage points above or below this brawler&rsquo;s own{' '}
-        {formatPercent(pairings.baseline)} win rate across{' '}
-        {formatNumber(pairings.sampleSize)} sampled team battles. Counted once per
-        battle from one player&rsquo;s side, and kept out of the win-rate and pick-rate
-        numbers above. Those would be skewed by counting every participant.
+        Percentage points above or below this brawler&rsquo;s own{" "}
+        {formatPercent(pairings.baseline)} win rate across{" "}
+        {formatNumber(pairings.sampleSize)} sampled team battles. Counted once
+        per battle from one player&rsquo;s side, and kept out of the win-rate
+        and pick-rate numbers above. Those would be skewed by counting every
+        participant.
       </p>
     </div>
   );

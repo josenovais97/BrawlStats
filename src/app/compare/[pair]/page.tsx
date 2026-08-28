@@ -1,15 +1,19 @@
-import type { Metadata } from 'next';
-import { ArrowLeft } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import type { Metadata } from "next";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 
-import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
-import { VersusList } from '@/components/compare/versus-list';
-import { SectionHeading } from '@/components/ui/section-heading';
-import { brawlerPath } from '@/lib/slugs';
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
-import { resolvePair } from '@/lib/compare';
+import {
+  JsonLd,
+  breadcrumbSchema,
+  faqSchema,
+} from "@/components/seo/structured-data";
+import { VersusList } from "@/components/compare/versus-list";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { brawlerPath } from "@/lib/slugs";
+import { formatNumber, formatPercent, humanizeMode } from "@/lib/format";
+import { resolvePair } from "@/lib/compare";
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
@@ -20,9 +24,9 @@ import {
   getIndexablePairs,
   normalizeWinRate,
   type BrawlerSplit,
-} from '@/lib/stats';
-import type { BABrawler } from '@/types/brawlapi';
-import type { BrawlerStatRow, Tier } from '@/types/stats';
+} from "@/lib/stats";
+import type { BABrawler } from "@/types/brawlapi";
+import type { BrawlerStatRow, Tier } from "@/types/stats";
 
 interface PageProps {
   params: Promise<{ pair: string }>;
@@ -48,11 +52,12 @@ export async function generateStaticParams() {
   return [];
 }
 
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { pair } = await params;
   const resolved = await resolvePair(pair).catch(() => null);
-  if (!resolved) return { title: 'Compare brawlers' };
+  if (!resolved) return { title: "Compare brawlers" };
 
   const a = titleCase(resolved.a.name);
   const b = titleCase(resolved.b.name);
@@ -145,7 +150,7 @@ export default async function ComparePage({ params }: PageProps) {
     <div className="space-y-8">
       <JsonLd
         data={breadcrumbSchema([
-          { name: 'Compare', path: '/compare' },
+          { name: "Compare", path: "/compare" },
           { name: `${nameA} vs ${nameB}`, path: `/compare/${resolved.slug}` },
         ])}
       />
@@ -162,7 +167,9 @@ export default async function ComparePage({ params }: PageProps) {
       <header className="card card-glow overflow-hidden">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 p-6">
           <Portrait side={left} align="end" />
-          <span className="display text-xl uppercase text-muted sm:text-2xl">vs</span>
+          <span className="display text-xl uppercase text-muted sm:text-2xl">
+            vs
+          </span>
           <Portrait side={right} align="start" />
         </div>
       </header>
@@ -180,20 +187,20 @@ export default async function ComparePage({ params }: PageProps) {
         <VersusList
           labelA={nameA}
           labelB={nameB}
-          accentA={left.brawler.rarity?.color ?? 'var(--brand)'}
-          accentB={right.brawler.rarity?.color ?? 'var(--accent-2)'}
+          accentA={left.brawler.rarity?.color ?? "var(--brand)"}
+          accentB={right.brawler.rarity?.color ?? "var(--accent-2)"}
           sections={[
             {
-              title: 'Performance',
+              title: "Performance",
               metrics: [
                 {
-                  label: 'Adjusted win rate',
+                  label: "Adjusted win rate",
                   a: formatPercent(left.adjusted),
                   b: formatPercent(right.adjusted),
                   leader: compareLeader(left.adjusted, right.adjusted),
                 },
                 {
-                  label: 'Pick rate',
+                  label: "Pick rate",
                   a: formatPercent(left.stat?.usageRate ?? null),
                   b: formatPercent(right.stat?.usageRate ?? null),
                   leader: compareLeader(
@@ -202,39 +209,39 @@ export default async function ComparePage({ params }: PageProps) {
                   ),
                 },
                 {
-                  label: 'Tier',
-                  a: left.tier ?? '–',
-                  b: right.tier ?? '–',
+                  label: "Tier",
+                  a: left.tier ?? "–",
+                  b: right.tier ?? "–",
                   leader: null,
                 },
                 {
-                  label: 'Sampled battles',
+                  label: "Sampled battles",
                   a: formatNumber(left.stat?.decidedSampleSize ?? null),
                   b: formatNumber(right.stat?.decidedSampleSize ?? null),
                   leader: null,
-                  hint: 'More battles means a more reliable rate, not a better brawler.',
+                  hint: "More battles means a more reliable rate, not a better brawler.",
                 },
               ],
             },
             {
-              title: 'Profile',
+              title: "Profile",
               metrics: [
                 {
-                  label: 'Rarity',
-                  a: left.brawler.rarity?.name ?? '–',
-                  b: right.brawler.rarity?.name ?? '–',
+                  label: "Rarity",
+                  a: left.brawler.rarity?.name ?? "–",
+                  b: right.brawler.rarity?.name ?? "–",
                   leader: null,
                 },
                 {
-                  label: 'Class',
-                  a: left.brawler.class?.name ?? '–',
-                  b: right.brawler.class?.name ?? '–',
+                  label: "Class",
+                  a: left.brawler.class?.name ?? "–",
+                  b: right.brawler.class?.name ?? "–",
                   leader: null,
                 },
                 {
-                  label: 'Best mode',
-                  a: left.splits[0] ? humanizeMode(left.splits[0].mode) : '–',
-                  b: right.splits[0] ? humanizeMode(right.splits[0].mode) : '–',
+                  label: "Best mode",
+                  a: left.splits[0] ? humanizeMode(left.splits[0].mode) : "–",
+                  b: right.splits[0] ? humanizeMode(right.splits[0].mode) : "–",
                   leader: null,
                 },
               ],
@@ -254,20 +261,20 @@ export default async function ComparePage({ params }: PageProps) {
               subject={nameA}
               opponent={nameB}
               record={leftVsRight}
-              accent={left.brawler.rarity?.color ?? '#8b95b8'}
+              accent={left.brawler.rarity?.color ?? "#8b95b8"}
             />
             <HeadToHeadCard
               subject={nameB}
               opponent={nameA}
               record={rightVsLeft}
-              accent={right.brawler.rarity?.color ?? '#8b95b8'}
+              accent={right.brawler.rarity?.color ?? "#8b95b8"}
             />
           </div>
         ) : (
           <p className="card p-6 text-sm leading-relaxed text-muted">
-            These two have not met often enough in sampled battles to report a record.
-            Matchup data is collected from team modes only and needs a while to build
-            up for any specific pairing.
+            These two have not met often enough in sampled battles to report a
+            record. Matchup data is collected from team modes only and needs a
+            while to build up for any specific pairing.
           </p>
         )}
       </section>
@@ -312,7 +319,9 @@ export default async function ComparePage({ params }: PageProps) {
           {faq.map((item) => (
             <div key={item.question} className="p-4">
               <dt className="font-semibold">{item.question}</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">
+                {item.answer}
+              </dd>
             </div>
           ))}
         </dl>
@@ -325,7 +334,11 @@ async function loadSide(brawler: BABrawler): Promise<Side> {
   const stat = await getBrawlerStat(brawler.id);
   const splits = await getBrawlerSplits(brawler.id).then((s) => s.modes);
   const adjusted = stat
-    ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
+    ? normalizeWinRate(
+        stat.winRate,
+        stat.baselineWinRate,
+        stat.decidedSampleSize,
+      )
     : null;
 
   return {
@@ -333,7 +346,9 @@ async function loadSide(brawler: BABrawler): Promise<Side> {
     stat,
     adjusted,
     tier:
-      stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER ? assignTier(adjusted) : null,
+      stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER
+        ? assignTier(adjusted)
+        : null,
     splits,
   };
 }
@@ -364,8 +379,10 @@ function buildVerdict(left: Side, right: Side): string {
     (side) => (side.stat?.decidedSampleSize ?? 0) < MIN_SAMPLE_FOR_TIER,
   );
   if (thin.length > 0) {
-    const names = thin.map((side) => titleCase(side.brawler.name)).join(' and ');
-    return `Too little data to call this one: ${names} ${thin.length === 1 ? 'has' : 'have'} fewer than ${MIN_SAMPLE_FOR_TIER} sampled decided battles, which is below the floor either tier list uses. The table below shows what has been collected so far.`;
+    const names = thin
+      .map((side) => titleCase(side.brawler.name))
+      .join(" and ");
+    return `Too little data to call this one: ${names} ${thin.length === 1 ? "has" : "have"} fewer than ${MIN_SAMPLE_FOR_TIER} sampled decided battles, which is below the floor either tier list uses. The table below shows what has been collected so far.`;
   }
 
   if (gap < 0.005) {
@@ -373,15 +390,17 @@ function buildVerdict(left: Side, right: Side): string {
   }
 
   const aheadSide = left.adjusted >= right.adjusted ? left : right;
-  const mode = aheadSide.splits[0] ? humanizeMode(aheadSide.splits[0].mode) : null;
+  const mode = aheadSide.splits[0]
+    ? humanizeMode(aheadSide.splits[0].mode)
+    : null;
 
-  return `${ahead} is ahead of ${behind} on current data, by ${(gap * 100).toFixed(1)} percentage points of adjusted win rate${mode ? `, and is strongest in ${mode}` : ''}. Both numbers are re-centred on the sample average, so this compares the brawlers rather than who happened to be playing them.`;
+  return `${ahead} is ahead of ${behind} on current data, by ${(gap * 100).toFixed(1)} percentage points of adjusted win rate${mode ? `, and is strongest in ${mode}` : ""}. Both numbers are re-centred on the sample average, so this compares the brawlers rather than who happened to be playing them.`;
 }
 
 /** Which side leads, or null when they are level or a value is missing. */
-function compareLeader(a: number | null, b: number | null): 'a' | 'b' | null {
+function compareLeader(a: number | null, b: number | null): "a" | "b" | null {
   if (a === null || b === null || Math.abs(a - b) < 0.002) return null;
-  return a > b ? 'a' : 'b';
+  return a > b ? "a" : "b";
 }
 
 function HeadToHeadCard({
@@ -402,7 +421,10 @@ function HeadToHeadCard({
       </p>
       {record ? (
         <>
-          <p className="mt-1 text-3xl font-black tabular-nums" style={{ color: accent }}>
+          <p
+            className="mt-1 text-3xl font-black tabular-nums"
+            style={{ color: accent }}
+          >
             {formatPercent(record.winRate)}
           </p>
           <p className="mt-1 text-xs text-muted">
@@ -410,19 +432,21 @@ function HeadToHeadCard({
           </p>
         </>
       ) : (
-        <p className="mt-2 text-sm text-muted">Not enough sampled battles yet.</p>
+        <p className="mt-2 text-sm text-muted">
+          Not enough sampled battles yet.
+        </p>
       )}
     </div>
   );
 }
 
-function Portrait({ side, align }: { side: Side; align: 'start' | 'end' }) {
-  const accent = side.brawler.rarity?.color ?? '#8b95b8';
+function Portrait({ side, align }: { side: Side; align: "start" | "end" }) {
+  const accent = side.brawler.rarity?.color ?? "#8b95b8";
 
   return (
     <div
       className={`flex min-w-0 flex-col gap-2 ${
-        align === 'end' ? 'items-end text-right' : 'items-start text-left'
+        align === "end" ? "items-end text-right" : "items-start text-left"
       }`}
     >
       <Image

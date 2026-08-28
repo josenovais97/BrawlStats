@@ -3,7 +3,7 @@ import {
   BrawlerGridSkeleton,
   ProfileHeaderSkeleton,
   StatGridSkeleton,
-} from '@/components/ui/skeletons';
+} from "@/components/ui/skeletons";
 
 export default function PlayerLoading() {
   return (

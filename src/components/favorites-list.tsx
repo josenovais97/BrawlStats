@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { Star, X } from 'lucide-react';
-import Link from 'next/link';
-import { useSyncExternalStore } from 'react';
+import { Star, X } from "lucide-react";
+import Link from "next/link";
+import { useSyncExternalStore } from "react";
 
-import { ClubIcon, PlayersIcon } from '@/components/game-icons';
+import { ClubIcon, PlayersIcon } from "@/components/game-icons";
 import {
   clearFavorites,
   readFavorites,
   removeFavorite,
   serverFavorites,
   subscribeFavorites,
-} from '@/lib/favorites';
+} from "@/lib/favorites";
 
 /**
  * Saved players and clubs. Renders nothing until mounted and nothing when
@@ -49,7 +49,7 @@ export function FavoritesList() {
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {entries.map((entry) => {
-          const isClub = entry.kind === 'club';
+          const isClub = entry.kind === "club";
           return (
             <li key={`${entry.kind}:${entry.tag}`} className="group relative">
               <Link
@@ -58,10 +58,14 @@ export function FavoritesList() {
               >
                 <span
                   className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${
-                    entry.kind === 'player' ? 'text-brand' : 'text-accent'
+                    entry.kind === "player" ? "text-brand" : "text-accent"
                   }`}
                 >
-                  {isClub ? <ClubIcon className="size-5" /> : <PlayersIcon className="size-5" />}
+                  {isClub ? (
+                    <ClubIcon className="size-5" />
+                  ) : (
+                    <PlayersIcon className="size-5" />
+                  )}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">

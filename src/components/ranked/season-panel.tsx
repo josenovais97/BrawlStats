@@ -1,10 +1,10 @@
-import { CalendarClock, Sparkles } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { CalendarClock, Sparkles } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { Disclosure } from '@/components/ui/disclosure';
-import { brawlerPath } from '@/lib/slugs';
-import { TRIAL_BRAWLER_RULES, type SeasonState } from '@/lib/ranked-seasons';
+import { Disclosure } from "@/components/ui/disclosure";
+import { brawlerPath } from "@/lib/slugs";
+import { TRIAL_BRAWLER_RULES, type SeasonState } from "@/lib/ranked-seasons";
 
 /**
  * Where the Ranked season is, who you can borrow while it runs, and which maps
@@ -47,22 +47,25 @@ export function SeasonPanel({
   const awaiting = !current && !next;
 
   const countdownLabel = isPreview
-    ? 'Starts'
+    ? "Starts"
     : next
       ? `Season ${next.number} starts`
       : awaiting
-        ? 'Next turnover'
-        : 'Ends';
+        ? "Next turnover"
+        : "Ends";
   const countdown =
     daysUntilNext === null
       ? null
       : daysUntilNext === 0
-        ? 'today'
+        ? "today"
         : daysUntilNext === 1
-          ? 'tomorrow'
+          ? "tomorrow"
           : `in ${daysUntilNext} days`;
 
-  const poolCount = state.mapPool.reduce((sum, entry) => sum + entry.maps.length, 0);
+  const poolCount = state.mapPool.reduce(
+    (sum, entry) => sum + entry.maps.length,
+    0,
+  );
 
   return (
     <section className="card overflow-hidden" aria-labelledby="ranked-season">
@@ -72,10 +75,19 @@ export function SeasonPanel({
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-accent">
             <Sparkles className="size-3.5" />
-            {isPreview ? 'Next season' : awaiting ? 'Season in progress' : 'Current season'}
+            {isPreview
+              ? "Next season"
+              : awaiting
+                ? "Season in progress"
+                : "Current season"}
           </p>
-          <h2 id="ranked-season" className="display mt-1.5 text-xl uppercase sm:text-2xl">
-            {awaiting ? `After season ${season.number}` : `Ranked season ${season.number}`}
+          <h2
+            id="ranked-season"
+            className="display mt-1.5 text-xl uppercase sm:text-2xl"
+          >
+            {awaiting
+              ? `After season ${season.number}`
+              : `Ranked season ${season.number}`}
           </h2>
         </div>
 
@@ -92,7 +104,7 @@ export function SeasonPanel({
           {season.brawlers.length > 0 && !awaiting ? (
             <Chip>
               {season.brawlers.length} trial brawler
-              {season.brawlers.length === 1 ? '' : 's'}
+              {season.brawlers.length === 1 ? "" : "s"}
             </Chip>
           ) : null}
           {poolCount > 0 ? <Chip>{poolCount} maps in the pool</Chip> : null}
@@ -101,9 +113,9 @@ export function SeasonPanel({
 
       {awaiting ? (
         <p className="border-t border-border px-4 py-3 text-sm leading-relaxed text-muted sm:px-5">
-          Season {season.number} ended on {formatDay(season.endsOn)}. A new season
-          started that day, but its number and trial brawlers have not been published
-          yet.
+          Season {season.number} ended on {formatDay(season.endsOn)}. A new
+          season started that day, but its number and trial brawlers have not
+          been published yet.
         </p>
       ) : null}
 
@@ -117,11 +129,11 @@ export function SeasonPanel({
             tone="bare"
             summary={`Trial brawlers: ${season.brawlers
               .map((b) => titleCase(b.name))
-              .join(', ')}`}
+              .join(", ")}`}
           >
             <ul className="grid grid-cols-3 gap-3 sm:max-w-md">
               {season.brawlers.map((brawler) => {
-                const accent = brawler.rarity?.color ?? '#8b95b8';
+                const accent = brawler.rarity?.color ?? "#8b95b8";
                 return (
                   <li key={brawler.id}>
                     <Link
@@ -170,9 +182,10 @@ export function SeasonPanel({
           <Disclosure
             tone="bare"
             summary={`Full map pool${
-              state.mapPoolSeason !== null && state.mapPoolSeason !== season.number
+              state.mapPoolSeason !== null &&
+              state.mapPoolSeason !== season.number
                 ? ` (season ${state.mapPoolSeason})`
-                : ''
+                : ""
             }`}
           >
             <div className="space-y-3">
@@ -218,12 +231,12 @@ export function SeasonPanel({
                 pool is fixed for the season, and nothing is modifying the
                 games. */}
             <p className="mt-4 text-xs leading-relaxed">
-              The pool is fixed for the season. Modifiers were removed from Ranked in
-              the February 2025 rework, so every battle counted here is the plain mode
-              on the plain map.{' '}
-              {state.source === 'wiki' ? (
+              The pool is fixed for the season. Modifiers were removed from
+              Ranked in the February 2025 rework, so every battle counted here
+              is the plain mode on the plain map.{" "}
+              {state.source === "wiki" ? (
                 <>
-                  Season and pool data from the{' '}
+                  Season and pool data from the{" "}
                   <a
                     href="https://brawlstars.fandom.com/wiki/Ranked"
                     rel="noreferrer noopener"
@@ -255,18 +268,18 @@ export function SeasonPanel({
 function Chip({
   children,
   icon,
-  tone = 'plain',
+  tone = "plain",
 }: {
   children: React.ReactNode;
   icon?: React.ReactNode;
-  tone?: 'plain' | 'brand';
+  tone?: "plain" | "brand";
 }) {
   return (
     <li
       className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold ${
-        tone === 'brand'
-          ? 'bg-brand/15 text-brand'
-          : 'border border-border bg-surface-2/60 text-muted'
+        tone === "brand"
+          ? "bg-brand/15 text-brand"
+          : "border border-border bg-surface-2/60 text-muted"
       }`}
     >
       {icon}
@@ -277,12 +290,12 @@ function Chip({
 
 /** "17 September 2026". */
 function formatDay(iso: string | null): string {
-  if (!iso) return 'an unknown date';
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
+  if (!iso) return "an unknown date";
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
   });
 }
 

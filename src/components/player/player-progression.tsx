@@ -11,15 +11,15 @@ import {
   PowerPointIcon,
   SkinsIcon,
   StarPowerIcon,
-} from '@/components/game-icons';
+} from "@/components/game-icons";
 
-import { SectionHeading } from '@/components/ui/section-heading';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { SectionHeading } from "@/components/ui/section-heading";
+import { formatNumber, formatPercent } from "@/lib/format";
 import type {
   OwnershipStat,
   PlaytimeEstimate,
   ProgressionSummary,
-} from '@/lib/progression';
+} from "@/lib/progression";
 
 interface Props {
   progression: ProgressionSummary;
@@ -35,45 +35,45 @@ export function PlayerProgression({ progression, playtime }: Props) {
   }[] = [
     {
       node: <BrawlersIcon className="size-4" />,
-      label: 'Brawlers',
+      label: "Brawlers",
       stat: progression.brawlers,
-      tone: 'text-brand',
+      tone: "text-brand",
     },
     {
       node: <Power11Icon className="size-4" />,
-      label: 'At power 11',
+      label: "At power 11",
       stat: progression.maxedBrawlers,
-      tone: 'text-victory',
+      tone: "text-victory",
     },
     {
       node: <StarPowerIcon className="size-4" />,
-      label: 'Star powers',
+      label: "Star powers",
       stat: progression.starPowers,
-      tone: 'text-brand',
+      tone: "text-brand",
     },
     {
       node: <GadgetIcon className="size-4" />,
-      label: 'Gadgets',
+      label: "Gadgets",
       stat: progression.gadgets,
-      tone: 'text-accent',
+      tone: "text-accent",
     },
     {
       node: <GearIcon className="size-4" />,
-      label: 'Gears equipped',
+      label: "Gears equipped",
       stat: progression.gears,
-      tone: 'text-muted',
+      tone: "text-muted",
     },
     {
       node: <HyperchargeIcon className="size-4" />,
-      label: 'Hypercharges',
+      label: "Hypercharges",
       stat: progression.hyperCharges,
-      tone: 'text-defeat',
+      tone: "text-defeat",
     },
     {
       node: <BuffieIcon className="size-4" />,
-      label: 'Buffies',
+      label: "Buffies",
       stat: progression.buffies,
-      tone: 'text-accent',
+      tone: "text-accent",
     },
   ];
 
@@ -83,7 +83,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
         title="Progression"
         aside={
           progression.totalsUnavailable
-            ? 'Totals unavailable right now'
+            ? "Totals unavailable right now"
             : `${formatPercent(progression.completion)} of everything unlocked`
         }
       />
@@ -92,7 +92,9 @@ export function PlayerProgression({ progression, playtime }: Props) {
         {/* Headline completion bar. */}
         <div className="mb-6">
           <div className="mb-2 flex items-baseline justify-between gap-3">
-            <span className="text-sm font-medium text-muted">Account completion</span>
+            <span className="text-sm font-medium text-muted">
+              Account completion
+            </span>
             <span className="text-2xl font-black tabular-nums text-brand">
               {formatPercent(progression.completion)}
             </span>
@@ -104,24 +106,29 @@ export function PlayerProgression({ progression, playtime }: Props) {
           {rows.map(({ node, label, stat, tone }) => (
             <div key={label}>
               <div className="mb-1.5 flex items-center gap-2 text-sm">
-                <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>
+                <span
+                  className={`grid size-4 shrink-0 place-items-center ${tone}`}
+                >
                   {node}
                 </span>
                 <span className="flex-1 font-medium">{label}</span>
                 <span className="tabular-nums text-muted">
                   {formatNumber(stat.owned)}
                   {stat.total > 0 ? (
-                    <span className="text-muted/60"> / {formatNumber(stat.total)}</span>
+                    <span className="text-muted">
+                      {" "}
+                      / {formatNumber(stat.total)}
+                    </span>
                   ) : null}
                   {/* Gears only: completion counts the two a brawler can
                       equip, but plenty of players own more and the page should
                       say so rather than silently dropping the extras. */}
                   {stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned ? (
                     <span
-                      className="text-muted/60"
+                      className="text-muted"
                       title={`${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`}
                     >
-                      {' '}
+                      {" "}
                       · {formatNumber(stat.ownedRaw)} owned
                     </span>
                   ) : null}
@@ -169,11 +176,10 @@ export function PlayerProgression({ progression, playtime }: Props) {
           <p className="mt-4 rounded-lg bg-surface-2 px-4 py-3 text-sm text-muted">
             <span className="font-semibold text-foreground">
               {formatNumber(progression.coinsToMaxOwned)} coins
-            </span>{' '}
+            </span>{" "}
             still needed to take every brawler already unlocked to power 11.
           </p>
         ) : null}
-
       </div>
     </section>
   );
@@ -183,7 +189,7 @@ function Bar({ value, thin = false }: { value: number; thin?: boolean }) {
   const pct = Math.round(Math.min(Math.max(value, 0), 1) * 100);
   return (
     <div
-      className={`w-full overflow-hidden rounded-full bg-surface-2 ${thin ? 'h-1.5' : 'h-2.5'}`}
+      className={`w-full overflow-hidden rounded-full bg-surface-2 ${thin ? "h-1.5" : "h-2.5"}`}
       role="progressbar"
       aria-valuenow={pct}
       aria-valuemin={0}
@@ -218,7 +224,7 @@ function Investment({
           {label}
         </p>
         <p className="truncate text-lg font-bold tabular-nums">{value}</p>
-        <p className="truncate text-xs text-muted/70">{hint}</p>
+        <p className="truncate text-xs text-muted">{hint}</p>
       </div>
     </div>
   );

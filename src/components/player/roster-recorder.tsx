@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { saveRoster } from '@/lib/roster';
+import { saveRoster } from "@/lib/roster";
 
 /**
  * Renders nothing. Dropped into a profile so that visiting it remembers which
@@ -30,16 +30,16 @@ export function RosterRecorder({
    * effect — the ids are the whole payload, so the string is not a proxy for
    * the array, it *is* the array.
    */
-  const ownedKey = owned.join(',');
-  const power11Key = power11.join(',');
+  const ownedKey = owned.join(",");
+  const power11Key = power11.join(",");
 
   useEffect(() => {
     if (!ownedKey) return;
     saveRoster({
       tag,
       name,
-      owned: ownedKey.split(',').map(Number),
-      power11: power11Key ? power11Key.split(',').map(Number) : [],
+      owned: ownedKey.split(",").map(Number),
+      power11: power11Key ? power11Key.split(",").map(Number) : [],
     });
   }, [tag, name, ownedKey, power11Key]);
 

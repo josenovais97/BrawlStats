@@ -1,6 +1,6 @@
-import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 import {
   BrawlersIcon,
@@ -10,27 +10,53 @@ import {
   MapsIcon,
   RankedIcon,
   TierListIcon,
-} from '@/components/game-icons';
-import { getTopMetaBrawlers } from '@/lib/home-meta';
-import { TIER_COLOR } from '@/lib/tiers';
+} from "@/components/game-icons";
+import { getTopMetaBrawlers } from "@/lib/home-meta";
+import { TIER_COLOR } from "@/lib/tiers";
 
 /**
  * The tools, weighted.
  *
- * This was six identical cells, which is a navigation table rather than a
+ * This was identical cells, which is a navigation table rather than a
  * recommendation — it told a first-time visitor that every tool matters
  * equally, which is not true. Two are worth opening immediately and get room
- * plus a real preview; the other four are a compact row underneath.
+ * plus a real preview; the rest are a compact grid underneath.
  *
  * The tier-list preview uses the same cached ranking as the meta snapshot, so
  * showing it here costs nothing upstream.
  */
 const SECONDARY = [
-  { href: '/ranked', icon: RankedIcon, title: 'Ranked Maps', body: 'Best picks per map' },
-  { href: '/compare', icon: CompareIcon, title: 'Compare', body: 'Two players, side by side' },
-  { href: '/leaderboard', icon: LeaderboardIcon, title: 'Leaderboards', body: 'Trophies and Ranked elo' },
-  { href: '/maps', icon: MapsIcon, title: 'Maps', body: 'Every map, ranked' },
-  { href: '/brawlers', icon: BrawlersIcon, title: 'Brawlers', body: 'Stats, builds, matchups' },
+  {
+    href: "/ranked",
+    icon: RankedIcon,
+    title: "Ranked Maps",
+    body: "Best picks per map",
+  },
+  {
+    href: "/compare",
+    icon: CompareIcon,
+    title: "Compare",
+    body: "Two players, side by side",
+  },
+  {
+    href: "/leaderboard",
+    icon: LeaderboardIcon,
+    title: "Leaderboards",
+    body: "Trophies and Ranked elo",
+  },
+  { href: "/maps", icon: MapsIcon, title: "Maps", body: "Every map, ranked" },
+  {
+    href: "/brawlers",
+    icon: BrawlersIcon,
+    title: "Brawlers",
+    body: "Stats, builds, matchups",
+  },
+  {
+    href: "/tier-list/maker",
+    icon: TierListIcon,
+    title: "Tier list maker",
+    body: "Build and share your own",
+  },
 ];
 
 export async function HomeTools() {
@@ -44,11 +70,16 @@ export async function HomeTools() {
             <span aria-hidden className="rule h-4" />
             <span className="eyebrow">Everything else</span>
           </p>
-          <h2 id="tools" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
+          <h2
+            id="tools"
+            className="display mt-2.5 text-2xl uppercase sm:text-4xl"
+          >
             Tools
           </h2>
         </div>
-        <p className="text-sm text-muted">All of it from our own sampled battles.</p>
+        <p className="text-sm text-muted">
+          All of it from our own sampled battles.
+        </p>
       </div>
 
       {/* Two featured, then four compact. The proportions are the hierarchy. */}
@@ -102,23 +133,24 @@ export async function HomeTools() {
               filling. No match data, because none of it would be real. */}
           <div className="flex items-center gap-2">
             <Slots label="Your team" tone="var(--accent-2)" filled={2} />
-            <span className="display shrink-0 text-xs uppercase text-muted">vs</span>
+            <span className="display shrink-0 text-xs uppercase text-muted">
+              vs
+            </span>
             <Slots label="Enemy" tone="var(--defeat)" filled={3} />
           </div>
         </Featured>
       </div>
 
       {/*
-        Five items in a two-column grid leaves a hole in the last row, and the
-        container's hairline background renders that hole as a visible empty
-        panel. The last item spans the gap instead.
+        Six, in one, two or three columns — all of which divide evenly, so the
+        hole that the last item used to stretch across never opens. It was five
+        until the tier-list maker joined them; the maker had been reachable
+        only from the header menu, which is the one place nobody looks for a
+        tool they do not already know exists.
       */}
-      <ul className="reveal-row mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
+      <ul className="reveal-row mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         {SECONDARY.map(({ href, icon: Icon, title, body }) => (
-          <li
-            key={href}
-            className="bg-surface last:col-span-full sm:last:col-span-2 lg:last:col-span-1"
-          >
+          <li key={href} className="bg-surface">
             {/*
               A row on a phone, a card from `lg`. The strip used to be a row at
               every width, which at full width is five lines of small text
@@ -216,8 +248,8 @@ function Slots({
                     borderColor: `color-mix(in srgb, ${tone} 45%, transparent)`,
                   }
                 : {
-                    borderColor: 'var(--border)',
-                    borderStyle: 'dashed',
+                    borderColor: "var(--border)",
+                    borderStyle: "dashed",
                   }
             }
           />

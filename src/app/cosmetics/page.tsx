@@ -1,16 +1,16 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import Link from "next/link";
 
-import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
-import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { formatNumber, formatPercent } from '@/lib/format';
-import { getIconCatalogue, getSkinCatalogue } from '@/lib/stats';
+import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
+import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
+import { formatNumber, formatPercent } from "@/lib/format";
+import { getIconCatalogue, getSkinCatalogue } from "@/lib/stats";
 
 export const metadata: Metadata = {
-  title: 'Brawl Stars cosmetics: which skins and icons players actually use',
+  title: "Brawl Stars cosmetics: which skins and icons players actually use",
   description:
-    'Every skin and profile icon seen in the sampled player pool, ranked by how many people equip it. Not a list of what exists, a measurement of what gets worn.',
-  alternates: { canonical: '/cosmetics' },
+    "Every skin and profile icon seen in the sampled player pool, ranked by how many people equip it. Not a list of what exists, a measurement of what gets worn.",
+  alternates: { canonical: "/cosmetics" },
 };
 
 /*
@@ -35,13 +35,18 @@ export const revalidate = 7200;
  * anyone who could already read the wiki.
  */
 export default async function CosmeticsPage() {
-  const [skins, icons] = await Promise.all([getSkinCatalogue(), getIconCatalogue()]);
+  const [skins, icons] = await Promise.all([
+    getSkinCatalogue(),
+    getIconCatalogue(),
+  ]);
 
   const topSkins = skins.slice(0, 8);
 
   return (
     <div className="space-y-10">
-      <JsonLd data={breadcrumbSchema([{ name: 'Cosmetics', path: '/cosmetics' }])} />
+      <JsonLd
+        data={breadcrumbSchema([{ name: "Cosmetics", path: "/cosmetics" }])}
+      />
 
       <PageHeading
         title="Cosmetics"
@@ -55,10 +60,12 @@ export default async function CosmeticsPage() {
         >
           <p className="display text-lg uppercase">Skins</p>
           <p className="mt-1 text-sm text-muted">
-            {formatNumber(skins.length)} seen across the roster, ranked by how many of the sampled
-            slots wear each one.
+            {formatNumber(skins.length)} seen across the roster, ranked by how
+            many of the sampled slots wear each one.
           </p>
-          <p className="mt-3 text-sm font-semibold text-brand">Browse every skin &rarr;</p>
+          <p className="mt-3 text-sm font-semibold text-brand">
+            Browse every skin &rarr;
+          </p>
         </Link>
 
         <Link
@@ -67,10 +74,13 @@ export default async function CosmeticsPage() {
         >
           <p className="display text-lg uppercase">Profile icons</p>
           <p className="mt-1 text-sm text-muted">
-            {formatNumber(icons.length)} seen on sampled accounts. The icon sits on the account, so
-            these are shares of players rather than of brawlers.
+            {formatNumber(icons.length)} seen on sampled accounts. The icon sits
+            on the account, so these are shares of players rather than of
+            brawlers.
           </p>
-          <p className="mt-3 text-sm font-semibold text-brand">Browse every icon &rarr;</p>
+          <p className="mt-3 text-sm font-semibold text-brand">
+            Browse every icon &rarr;
+          </p>
         </Link>
       </section>
 
@@ -91,7 +101,7 @@ export default async function CosmeticsPage() {
                     {skin.name.toLowerCase()}
                   </span>
                   <span className="block text-xs capitalize text-muted">
-                    {(skin.brawlerName ?? '').toLowerCase()}
+                    {(skin.brawlerName ?? "").toLowerCase()}
                   </span>
                 </span>
                 <span className="shrink-0 text-sm font-bold tabular-nums">
@@ -107,15 +117,17 @@ export default async function CosmeticsPage() {
         <SectionHeading title="How this is counted" />
         <div className="card space-y-3 p-5 text-sm leading-relaxed text-muted">
           <p>
-            Numbers come from the rotating snapshot sample, which records a quarter of the sampled
-            player pool each day, so this is a survey rather than a census. That is enough for
-            shares, which is all it reports, and it is why a number here is never a count of how
-            many people own something in the game.
+            Numbers come from the rotating snapshot sample, which records a
+            quarter of the sampled player pool each day, so this is a survey
+            rather than a census. That is enough for shares, which is all it
+            reports, and it is why a number here is never a count of how many
+            people own something in the game.
           </p>
           <p>
-            A skin&rsquo;s share is of sampled player-brawler slots; an icon&rsquo;s is of sampled
-            players. Default skins are left out — the one carrying the brawler&rsquo;s own name is
-            not something anyone chose. Per-brawler adoption, including the default, is on each
+            A skin&rsquo;s share is of sampled player-brawler slots; an
+            icon&rsquo;s is of sampled players. Default skins are left out — the
+            one carrying the brawler&rsquo;s own name is not something anyone
+            chose. Per-brawler adoption, including the default, is on each
             brawler&rsquo;s own page.
           </p>
         </div>

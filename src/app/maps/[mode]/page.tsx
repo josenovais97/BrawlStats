@@ -1,18 +1,22 @@
-import type { Metadata } from 'next';
-import { ArrowLeft } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import type { Metadata } from "next";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { MapPickList } from '@/components/maps/map-pick-list';
-import { JsonLd, breadcrumbSchema, itemListSchema } from '@/components/seo/structured-data';
-import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getBrawlerMap } from '@/lib/brawlapi';
-import { formatNumber } from '@/lib/format';
-import { getActiveMaps } from '@/lib/game-maps';
-import { slugify } from '@/lib/slugs';
-import { getBestPicksByMode } from '@/lib/stats';
-import type { BABrawler } from '@/types/brawlapi';
+import { MapPickList } from "@/components/maps/map-pick-list";
+import {
+  JsonLd,
+  breadcrumbSchema,
+  itemListSchema,
+} from "@/components/seo/structured-data";
+import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
+import { getBrawlerMap } from "@/lib/brawlapi";
+import { formatNumber } from "@/lib/format";
+import { getActiveMaps } from "@/lib/game-maps";
+import { slugify } from "@/lib/slugs";
+import { getBestPicksByMode } from "@/lib/stats";
+import type { BABrawler } from "@/types/brawlapi";
 
 interface PageProps {
   params: Promise<{ mode: string }>;
@@ -25,7 +29,6 @@ export async function generateStaticParams() {
   return [];
 }
 
-
 /** Resolves the mode slug against the modes that actually have active maps. */
 async function resolveMode(slug: string) {
   const maps = await getActiveMaps().catch(() => []);
@@ -37,18 +40,21 @@ async function resolveMode(slug: string) {
   return {
     slug: wanted,
     label: first.mode?.name ?? first.map.gameMode.name,
-    color: first.mode?.color ?? '#8b95b8',
+    color: first.mode?.color ?? "#8b95b8",
     imageUrl: first.mode?.imageUrl,
-    description: first.mode?.shortDescription ?? first.mode?.description ?? null,
+    description:
+      first.mode?.shortDescription ?? first.mode?.description ?? null,
     scHash: first.scHash,
     maps: inMode,
   };
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { mode } = await params;
   const resolved = await resolveMode(mode);
-  if (!resolved) return { title: 'Mode' };
+  if (!resolved) return { title: "Mode" };
 
   return {
     title: `${resolved.label} maps and best brawlers`,
@@ -62,7 +68,9 @@ export default async function ModeMapsPage({ params }: PageProps) {
   const resolved = await resolveMode(mode);
   if (!resolved) notFound();
 
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+  const brawlerMeta = await getBrawlerMap().catch(
+    () => new Map<number, BABrawler>(),
+  );
   const picks = resolved.scHash
     ? await getBestPicksByMode(8)
         .then((byMode) => byMode.get(resolved.scHash!) ?? null)
@@ -73,7 +81,7 @@ export default async function ModeMapsPage({ params }: PageProps) {
     <div className="space-y-8">
       <JsonLd
         data={breadcrumbSchema([
-          { name: 'Maps', path: '/maps' },
+          { name: "Maps", path: "/maps" },
           { name: resolved.label, path: `/maps/${resolved.slug}` },
         ])}
       />

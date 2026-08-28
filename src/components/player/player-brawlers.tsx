@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { ArrowUpDown, Search, Star } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { ArrowUpDown, Search, Star } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
-import { TrophyIcon, WinStreakIcon } from '@/components/game-icons';
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl } from '@/lib/brawlapi';
-import { formatNumber } from '@/lib/format';
-import { TIER_COLOR } from '@/lib/tiers';
-import type { BSPlayerBrawler } from '@/types/brawlstars';
-import type { Tier } from '@/types/stats';
+import { TrophyIcon, WinStreakIcon } from "@/components/game-icons";
+import { brawlerPath } from "@/lib/slugs";
+import { brawlerIconUrl } from "@/lib/brawlapi";
+import { formatNumber } from "@/lib/format";
+import { TIER_COLOR } from "@/lib/tiers";
+import type { BSPlayerBrawler } from "@/types/brawlstars";
+import type { Tier } from "@/types/stats";
 
 /** How far below its own record a brawler currently sits. Never negative. */
 function peakGap(brawler: BSPlayerBrawler): number {
@@ -37,24 +37,32 @@ interface PlayerBrawlersProps {
   meta: Record<string, BrawlerMetaLite>;
 }
 
-type SortKey = 'trophies' | 'meta' | 'streak' | 'prestige' | 'peak' | 'rank' | 'power' | 'name';
+type SortKey =
+  | "trophies"
+  | "meta"
+  | "streak"
+  | "prestige"
+  | "peak"
+  | "rank"
+  | "power"
+  | "name";
 
 const SORTS: { key: SortKey; label: string }[] = [
-  { key: 'trophies', label: 'Trophies' },
+  { key: "trophies", label: "Trophies" },
   // The reason the tier list exists, applied to the roster: "which of mine are
   // actually good right now".
-  { key: 'meta', label: 'Meta' },
+  { key: "meta", label: "Meta" },
   // Sorts by how far below their own peak each brawler sits, which is where a
   // losing streak or a fresh reset shows up.
-  { key: 'peak', label: 'Off peak' },
+  { key: "peak", label: "Off peak" },
   // Both were in the payload and in our types from the start and had never
   // been rendered anywhere. A 233-game streak is the most impressive number on
   // some accounts.
-  { key: 'streak', label: 'Win streak' },
-  { key: 'prestige', label: 'Prestige' },
-  { key: 'rank', label: 'Rank' },
-  { key: 'power', label: 'Power' },
-  { key: 'name', label: 'Name' },
+  { key: "streak", label: "Win streak" },
+  { key: "prestige", label: "Prestige" },
+  { key: "rank", label: "Rank" },
+  { key: "power", label: "Power" },
+  { key: "name", label: "Name" },
 ];
 
 /**
@@ -69,8 +77,8 @@ const SORTS: { key: SortKey; label: string }[] = [
 const FIRST_LOOK = 24;
 
 export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
-  const [sort, setSort] = useState<SortKey>('trophies');
-  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<SortKey>("trophies");
+  const [query, setQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
 
   // A search is already a request for a subset, so it is never capped again.
@@ -84,25 +92,31 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
 
     return [...filtered].sort((a, b) => {
       switch (sort) {
-        case 'name':
+        case "name":
           return a.name.localeCompare(b.name);
-        case 'power':
+        case "power":
           return b.power - a.power || b.trophies - a.trophies;
-        case 'rank':
+        case "rank":
           return b.rank - a.rank || b.trophies - a.trophies;
-        case 'meta': {
+        case "meta": {
           // Unrated brawlers sort last rather than as zero, so "no data" never
           // reads as "worst in the game".
           const sa = meta[a.id]?.metaScore ?? -1;
           const sb = meta[b.id]?.metaScore ?? -1;
           return sb - sa || b.trophies - a.trophies;
         }
-        case 'peak':
+        case "peak":
           return peakGap(b) - peakGap(a) || b.trophies - a.trophies;
-        case 'streak':
-          return (b.maxWinStreak ?? 0) - (a.maxWinStreak ?? 0) || b.trophies - a.trophies;
-        case 'prestige':
-          return (b.prestigeLevel ?? 0) - (a.prestigeLevel ?? 0) || b.trophies - a.trophies;
+        case "streak":
+          return (
+            (b.maxWinStreak ?? 0) - (a.maxWinStreak ?? 0) ||
+            b.trophies - a.trophies
+          );
+        case "prestige":
+          return (
+            (b.prestigeLevel ?? 0) - (a.prestigeLevel ?? 0) ||
+            b.trophies - a.trophies
+          );
         default:
           return b.trophies - a.trophies;
       }
@@ -136,8 +150,8 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
               onClick={() => setSort(key)}
               className={`shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 sort === key
-                  ? 'bg-brand text-[#1a1200]'
-                  : 'border border-border text-muted hover:text-foreground'
+                  ? "bg-brand text-[#1a1200]"
+                  : "border border-border text-muted hover:text-foreground"
               }`}
             >
               {label}
@@ -147,12 +161,18 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
       </div>
 
       {visible.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">No brawlers match “{query}”.</p>
+        <p className="card p-6 text-sm text-muted">
+          No brawlers match “{query}”.
+        </p>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {shown.map((brawler) => (
-              <BrawlerTile key={brawler.id} brawler={brawler} meta={meta[brawler.id]} />
+              <BrawlerTile
+                key={brawler.id}
+                brawler={brawler}
+                meta={meta[brawler.id]}
+              />
             ))}
           </div>
 
@@ -162,7 +182,7 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
               onClick={() => setShowAll(true)}
               className="min-h-11 w-full rounded-xl border border-border bg-surface-2/60 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
             >
-              Show {hidden} more {hidden === 1 ? 'brawler' : 'brawlers'}
+              Show {hidden} more {hidden === 1 ? "brawler" : "brawlers"}
             </button>
           ) : null}
         </>
@@ -178,7 +198,7 @@ function BrawlerTile({
   brawler: BSPlayerBrawler;
   meta?: BrawlerMetaLite;
 }) {
-  const accent = meta?.rarityColor ?? '#8b95b8';
+  const accent = meta?.rarityColor ?? "#8b95b8";
   const gearCount = brawler.gears?.length ?? 0;
   const gap = peakGap(brawler);
   const tier = meta?.tier;
@@ -193,7 +213,7 @@ function BrawlerTile({
       style={{ borderColor: `color-mix(in srgb, ${accent} 35%, transparent)` }}
       title={
         tier
-          ? `${brawler.name}: ${tier} tier on the trophy list, meta score ${meta?.metaScore?.toFixed(1) ?? '?'}`
+          ? `${brawler.name}: ${tier} tier on the trophy list, meta score ${meta?.metaScore?.toFixed(1) ?? "?"}`
           : `${brawler.name}: not enough sampled battles to rate`
       }
     >
@@ -227,7 +247,7 @@ function BrawlerTile({
         />
         <span
           className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md px-2 py-0.5 text-xs font-black text-[#1a1200] shadow"
-          style={{ background: 'var(--brand)' }}
+          style={{ background: "var(--brand)" }}
         >
           {brawler.power}
         </span>
@@ -274,7 +294,7 @@ function BrawlerTile({
       {streak > 0 ? (
         <p
           className="mt-0.5 flex items-center justify-center gap-1 text-xs tabular-nums text-muted"
-          title={`Best win streak ${streak}${onStreak > 0 ? `, currently on ${onStreak}` : ''}`}
+          title={`Best win streak ${streak}${onStreak > 0 ? `, currently on ${onStreak}` : ""}`}
         >
           <WinStreakIcon className="size-3.5" />
           {/* The live streak leads when there is one — it is the only number on

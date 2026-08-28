@@ -1,11 +1,11 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl } from '@/lib/brawlapi';
-import { formatPercent } from '@/lib/format';
-import type { BABrawler } from '@/types/brawlapi';
-import type { ModeBestPicks } from '@/types/stats';
+import { brawlerPath } from "@/lib/slugs";
+import { brawlerIconUrl } from "@/lib/brawlapi";
+import { formatPercent } from "@/lib/format";
+import type { BABrawler } from "@/types/brawlapi";
+import type { ModeBestPicks } from "@/types/stats";
 
 /**
  * The strongest brawlers for an event card — for the map when the map has been
@@ -36,7 +36,7 @@ export function ModeBestPicks({
   mapName?: string | null;
   modeLabel?: string;
   /** Which population the picks were actually computed over. */
-  scope: 'map' | 'mode';
+  scope: "map" | "mode";
 }) {
   if (!data || data.picks.length === 0) {
     return (
@@ -50,11 +50,11 @@ export function ModeBestPicks({
     <div className="border-t border-border px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="eyebrow truncate" style={{ color: accent }}>
-          {scope === 'map' && mapName
+          {scope === "map" && mapName
             ? `Best picks for ${mapName}`
-            : `Best ${modeLabel ?? 'mode'} picks`}
+            : `Best ${modeLabel ?? "mode"} picks`}
         </p>
-        <p className="shrink-0 text-[0.625rem] tabular-nums text-muted">
+        <p className="shrink-0 text-xs tabular-nums text-muted">
           {formatPercent(data.baselineWinRate)} avg
         </p>
       </div>
@@ -62,8 +62,8 @@ export function ModeBestPicks({
       {/* Stated on the card itself rather than a page away: someone reading an
           event card is about to queue, and whether this is about their map or
           their mode changes what the list is worth. */}
-      {scope === 'mode' ? (
-        <p className="mt-1 text-[0.625rem] leading-snug text-muted">
+      {scope === "mode" ? (
+        <p className="mt-1 text-xs leading-snug text-muted">
           Map sample too small. Using mode-wide data.
         </p>
       ) : null}
@@ -78,7 +78,7 @@ export function ModeBestPicks({
                 title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} win rate over ${pick.decidedSampleSize} sampled ranked battles in this mode`}
                 className="group flex items-center gap-2.5 rounded-lg px-1 py-1 transition-colors hover:bg-surface-2"
               >
-                <span className="w-3 shrink-0 text-center text-[0.625rem] font-black tabular-nums text-muted">
+                <span className="w-3 shrink-0 text-center text-xs font-black tabular-nums text-muted">
                   {index + 1}
                 </span>
                 <Image

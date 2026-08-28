@@ -1,10 +1,10 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import { brawlerPath } from '@/lib/slugs';
-import { TIER_COLOR } from '@/lib/stats';
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
-import type { TierListEntry } from '@/types/stats';
+import { brawlerPath } from "@/lib/slugs";
+import { TIER_COLOR } from "@/lib/stats";
+import { formatNumber, formatPercent, humanizeMode } from "@/lib/format";
+import type { TierListEntry } from "@/types/stats";
 
 /**
  * The brawlers that get picked most, which is a different question from the
@@ -66,10 +66,11 @@ export function MostPicked({
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
         The brawlers appearing in the most sampled {battlesLabel}
-        {mode ? ` in ${humanizeMode(mode)}` : ''} over the {windowLabel} window. This is
-        popularity, not strength &mdash; the tiers above rank how well a brawler
-        performs, and the two disagree often. A pick rate is a share of all battles
-        sampled, so it sums across the roster rather than to 100% per battle.
+        {mode ? ` in ${humanizeMode(mode)}` : ""} over the {windowLabel} window.
+        This is popularity, not strength &mdash; the tiers above rank how well a
+        brawler performs, and the two disagree often. A pick rate is a share of
+        all battles sampled, so it sums across the roster rather than to 100%
+        per battle.
       </p>
 
       <ol className="grid gap-2 sm:grid-cols-2">
@@ -122,7 +123,9 @@ export function MostPicked({
                   >
                     <span
                       className="block h-full rounded-full bg-brand"
-                      style={{ width: `${peak > 0 ? (usage / peak) * 100 : 0}%` }}
+                      style={{
+                        width: `${peak > 0 ? (usage / peak) * 100 : 0}%`,
+                      }}
                     />
                   </span>
 

@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 /**
  * A map thumbnail that fills its frame.
@@ -20,9 +20,9 @@ import Image from 'next/image';
 export function MapArt({
   src,
   alt,
-  height = 'h-24',
+  height = "h-24",
   sizes,
-  className = '',
+  className = "",
 }: {
   src?: string | null;
   /** Empty when the surrounding link already names the map. */
@@ -35,7 +35,7 @@ export function MapArt({
   if (!src) {
     return (
       <div
-        className={`grid w-full place-items-center bg-surface-2 text-[0.625rem] text-muted ${height} ${className}`}
+        className={`grid w-full place-items-center bg-surface-2 text-xs text-muted ${height} ${className}`}
       >
         No preview
       </div>
@@ -43,7 +43,9 @@ export function MapArt({
   }
 
   return (
-    <div className={`relative w-full overflow-hidden bg-surface-2 ${height} ${className}`}>
+    <div
+      className={`relative w-full overflow-hidden bg-surface-2 ${height} ${className}`}
+    >
       <Image
         src={src}
         alt=""

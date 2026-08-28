@@ -1,5 +1,5 @@
-import { formatPercent } from '@/lib/format';
-import type { BrawlerTrendPoint } from '@/lib/stats';
+import { formatPercent } from "@/lib/format";
+import type { BrawlerTrendPoint } from "@/lib/stats";
 
 /**
  * A brawler's adjusted win rate over the stored snapshots.
@@ -45,8 +45,11 @@ export function BrawlerTrend({
   const y = (value: number) => height - ((value - low) / (high - low)) * height;
 
   const line = usable
-    .map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(2)} ${y(p.normalizedWinRate).toFixed(2)}`)
-    .join(' ');
+    .map(
+      (p, i) =>
+        `${i === 0 ? "M" : "L"}${x(i).toFixed(2)} ${y(p.normalizedWinRate).toFixed(2)}`,
+    )
+    .join(" ");
   const area = `${line} L${width} ${height} L0 ${height} Z`;
 
   const first = values[0];
@@ -67,10 +70,14 @@ export function BrawlerTrend({
         </div>
         <p
           className={`text-sm font-bold tabular-nums ${
-            delta >= 0.002 ? 'text-victory' : delta <= -0.002 ? 'text-defeat' : 'text-muted'
+            delta >= 0.002
+              ? "text-victory"
+              : delta <= -0.002
+                ? "text-defeat"
+                : "text-muted"
           }`}
         >
-          {delta >= 0.002 ? '+' : delta <= -0.002 ? '−' : '±'}
+          {delta >= 0.002 ? "+" : delta <= -0.002 ? "−" : "±"}
           {Math.abs(delta * 100).toFixed(1)} pts
         </p>
       </div>
@@ -95,8 +102,8 @@ export function BrawlerTrend({
       </svg>
 
       <p className="mt-2 text-xs text-muted">
-        {days} daily snapshots. Adjusted against the sample average, so a shift here
-        is the brawler moving rather than the cohort.
+        {days} daily snapshots. Adjusted against the sample average, so a shift
+        here is the brawler moving rather than the cohort.
       </p>
     </div>
   );

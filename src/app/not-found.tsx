@@ -1,7 +1,7 @@
-import { ArrowLeft, Compass } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, Compass } from "lucide-react";
+import Link from "next/link";
 
-import { FullPageMessage } from '@/components/ui/full-page-message';
+import { FullPageMessage } from "@/components/ui/full-page-message";
 
 /*
  * The root 404, which Next also serves for any URL that matches no route at

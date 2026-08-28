@@ -1,27 +1,37 @@
-import type { Metadata } from 'next';
-import Image from 'next/image';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
-import { MapPreview } from '@/components/ranked/map-preview';
-import { SeasonPanel } from '@/components/ranked/season-panel';
-import { RankedIcon } from '@/components/game-icons';
-import { Disclosure } from '@/components/ui/disclosure';
-import { RelativeTime } from '@/components/ui/relative-time';
-import { currentMonth } from '@/lib/site';
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
-import { getActiveMaps } from '@/lib/game-maps';
-import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
-import { slugify } from '@/lib/slugs';
-import { getLastAggregationRun, getRankedMapPicks } from '@/lib/stats';
-import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
-import type { MapConfidence, RankedMapPicks } from '@/types/stats';
+import { MapPreview } from "@/components/ranked/map-preview";
+import { SeasonPanel } from "@/components/ranked/season-panel";
+import { RankedIcon } from "@/components/game-icons";
+import { Disclosure } from "@/components/ui/disclosure";
+import { RelativeTime } from "@/components/ui/relative-time";
+import { currentMonth } from "@/lib/site";
+import { brawlerPath } from "@/lib/slugs";
+import {
+  brawlerIconUrl,
+  getBrawlerMap,
+  getGameModeMap,
+  getMapMap,
+} from "@/lib/brawlapi";
+import {
+  formatNumber,
+  formatPercent,
+  humanizeMode,
+  relativeTime,
+} from "@/lib/format";
+import { getActiveMaps } from "@/lib/game-maps";
+import { getSeasonState, type SeasonState } from "@/lib/ranked-seasons";
+import { slugify } from "@/lib/slugs";
+import { getLastAggregationRun, getRankedMapPicks } from "@/lib/stats";
+import type { BABrawler, BAGameMode, BAMap } from "@/types/brawlapi";
+import type { MapConfidence, RankedMapPicks } from "@/types/stats";
 
 /* A function, so the month is the month the page was last regenerated. */
 export function generateMetadata(): Metadata {
   return {
-    alternates: { canonical: '/ranked' },
+    alternates: { canonical: "/ranked" },
     title: `Brawl Stars Ranked maps and best brawlers (${currentMonth()})`,
     description: `The best brawlers for every map in the current Ranked rotation, ${currentMonth()}. From sampled competitive battles, updated every few hours.`,
   };
@@ -31,19 +41,19 @@ export function generateMetadata(): Metadata {
 export const revalidate = 3600;
 
 const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
-  low: 'Thin sample',
-  medium: 'Building',
-  high: 'Well sampled',
+  low: "Thin sample",
+  medium: "Building",
+  high: "Well sampled",
 };
 
 export default async function RankedPage() {
-  const [maps, mapMeta, modeMeta, brawlerMeta, season, lastRun] = await Promise.all([
-    getRankedMapPicks(3),
-    getMapMap().catch(() => new Map<number, BAMap>()),
-    getGameModeMap().catch(() => new Map<string, BAGameMode>()),
-    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
-    getSeasonState().catch(
-      (): SeasonState => ({
+  const [maps, mapMeta, modeMeta, brawlerMeta, season, lastRun] =
+    await Promise.all([
+      getRankedMapPicks(3),
+      getMapMap().catch(() => new Map<number, BAMap>()),
+      getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+      getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+      getSeasonState().catch((): SeasonState => ({
         current: null,
         next: null,
         latest: null,
@@ -51,11 +61,10 @@ export default async function RankedPage() {
         daysUntilNext: null,
         mapPool: [],
         mapPoolSeason: null,
-        source: 'fallback',
-      }),
-    ),
-    getLastAggregationRun(),
-  ]);
+        source: "fallback",
+      })),
+      getLastAggregationRun(),
+    ]);
 
   // Sampled maps are matched to the catalogue by name and mode, so a map that
   // has since left rotation simply loses its link rather than 404ing.
@@ -87,7 +96,8 @@ export default async function RankedPage() {
    * failure than a slightly stale one.
    */
   const poolMatches = season.mapPool.reduce(
-    (n, entry) => n + entry.maps.filter((m) => sampled.has(key(entry.mode, m))).length,
+    (n, entry) =>
+      n + entry.maps.filter((m) => sampled.has(key(entry.mode, m))).length,
     0,
   );
   const usePool = poolMatches > 0;
@@ -120,7 +130,7 @@ export default async function RankedPage() {
       modeSlug,
       label: meta?.name ?? humanizeMode(modeId),
       icon: meta?.imageUrl,
-      accent: meta?.color ?? '#8b95b8',
+      accent: meta?.color ?? "#8b95b8",
       maps: names.map((name) => {
         const catalogue = activeMaps.find(
           (a) => a.modeSlug === modeSlug && a.mapSlug === slugify(name),
@@ -132,14 +142,19 @@ export default async function RankedPage() {
           // Prefer the id recorded on our own battles; fall back to the
           // catalogue, which is the only source for a map with no battles yet.
           art: picks?.eventId ? mapMeta.get(picks.eventId) : catalogue?.map,
-          href: catalogue ? `/maps/${catalogue.modeSlug}/${catalogue.mapSlug}` : null,
+          href: catalogue
+            ? `/maps/${catalogue.modeSlug}/${catalogue.mapSlug}`
+            : null,
         };
       }),
     };
   });
 
   const onBoard = board.flatMap((row) => row.maps);
-  const totalSamples = onBoard.reduce((sum, m) => sum + (m.picks?.sampleSize ?? 0), 0);
+  const totalSamples = onBoard.reduce(
+    (sum, m) => sum + (m.picks?.sampleSize ?? 0),
+    0,
+  );
   const baseline = maps[0]?.baselineWinRate ?? 0;
   const rated = onBoard.filter((m) => (m.picks?.picks.length ?? 0) > 0).length;
   // In-page navigation, so a visitor after one mode does not scroll past five.
@@ -168,10 +183,12 @@ export default async function RankedPage() {
           <RankedIcon className="size-4" />
           Competitive only
         </p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Ranked maps</h1>
+        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">
+          Ranked maps
+        </h1>
         <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">
-          The strongest brawlers on each map in the current Ranked rotation, from
-          sampled competitive battles only.
+          The strongest brawlers on each map in the current Ranked rotation,
+          from sampled competitive battles only.
         </p>
 
         {/* Everything needed to judge the numbers below, on one line. */}
@@ -179,7 +196,7 @@ export default async function RankedPage() {
           <Fact tone="brand">{formatNumber(totalSamples)} Ranked battles</Fact>
           {lastRun ? (
             <Fact>
-              Sampled{' '}
+              Sampled{" "}
               <RelativeTime
                 iso={lastRun.startedAt}
                 fallback={relativeTime(lastRun.startedAt)}
@@ -208,7 +225,8 @@ export default async function RankedPage() {
           // than a 404.
           const match = activeMaps.find(
             (entry) =>
-              entry.mapSlug === slugify(map) && entry.modeSlug === slugify(mode),
+              entry.mapSlug === slugify(map) &&
+              entry.modeSlug === slugify(mode),
           );
           return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
         }}
@@ -234,7 +252,9 @@ export default async function RankedPage() {
                     />
                   ) : null}
                   <span style={{ color }}>{label}</span>
-                  <span className="text-xs tabular-nums text-muted">{count}</span>
+                  <span className="text-xs tabular-nums text-muted">
+                    {count}
+                  </span>
                 </a>
               </li>
             ))}
@@ -246,9 +266,9 @@ export default async function RankedPage() {
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
           <h2 className="display text-xl uppercase">Collecting map data</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            Map names are recorded on newly sampled battles only, and the battle log
-            reaches back about 25 matches, so this fills in over the next day or two as
-            the sampler works through the pool.
+            Map names are recorded on newly sampled battles only, and the battle
+            log reaches back about 25 matches, so this fills in over the next
+            day or two as the sampler works through the pool.
           </p>
           <Link
             href="/tier-list/ranked"
@@ -317,27 +337,28 @@ export default async function RankedPage() {
       <Disclosure summary="How these picks are chosen">
         <p>
           Trophy-ladder games are excluded entirely. Ranked matchmaking pairs
-          comparable opponents, so what is left reflects the brawler rather than who
-          was holding it, and Ranked has carried no modifiers since the February 2025
-          rework &mdash; every battle counted here is the plain mode on the plain map.
+          comparable opponents, so what is left reflects the brawler rather than
+          who was holding it, and Ranked has carried no modifiers since the
+          February 2025 rework &mdash; every battle counted here is the plain
+          mode on the plain map.
         </p>
         {onBoard.length > 0 ? (
           <p className="mt-2">
-            Every map is scored against the same {formatPercent(baseline)} sample-wide
-            Ranked average, and each brawler&rsquo;s handful of battles on one map is
-            weighed against its overall Ranked form. A map needs real evidence to move
-            a brawler off that.
+            Every map is scored against the same {formatPercent(baseline)}{" "}
+            sample-wide Ranked average, and each brawler&rsquo;s handful of
+            battles on one map is weighed against its overall Ranked form. A map
+            needs real evidence to move a brawler off that.
             {rated < onBoard.length
               ? ` ${onBoard.length - rated} of ${onBoard.length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.`
-              : ''}
+              : ""}
           </p>
         ) : null}
         <p className="mt-2">
-          Which maps appear is taken from the season&rsquo;s published pool rather than
-          from our own samples, so the board matches the rotation the day it changes.
-          Map names are recorded on newly sampled battles only and a battle log reaches
-          back about 25 matches, so a map that has just entered the pool carries no
-          picks for a day or two after it does.
+          Which maps appear is taken from the season&rsquo;s published pool
+          rather than from our own samples, so the board matches the rotation
+          the day it changes. Map names are recorded on newly sampled battles
+          only and a battle log reaches back about 25 matches, so a map that has
+          just entered the pool carries no picks for a day or two after it does.
         </p>
       </Disclosure>
     </div>
@@ -347,17 +368,17 @@ export default async function RankedPage() {
 /** One fact from the data row under the title. */
 function Fact({
   children,
-  tone = 'plain',
+  tone = "plain",
 }: {
   children: React.ReactNode;
-  tone?: 'plain' | 'brand';
+  tone?: "plain" | "brand";
 }) {
   return (
     <li
       className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold ${
-        tone === 'brand'
-          ? 'bg-brand/15 text-brand'
-          : 'border border-border bg-surface-2/60 text-muted'
+        tone === "brand"
+          ? "bg-brand/15 text-brand"
+          : "border border-border bg-surface-2/60 text-muted"
       }`}
     >
       {children}
@@ -417,7 +438,8 @@ function PendingMapCard({
 
       <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
         In the season pool, but nobody we sample has played it yet. A battle log
-        reaches back about 25 matches, so this fills in over the next day or two.
+        reaches back about 25 matches, so this fills in over the next day or
+        two.
       </p>
     </article>
   );
@@ -471,17 +493,20 @@ function MapCard({
           <span
             className="shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide"
             style={
-              map.confidence === 'low'
-                ? { color: 'var(--muted)', background: 'var(--surface-2)' }
-                : { color: accent, background: `color-mix(in srgb, ${accent} 16%, transparent)` }
+              map.confidence === "low"
+                ? { color: "var(--muted)", background: "var(--surface-2)" }
+                : {
+                    color: accent,
+                    background: `color-mix(in srgb, ${accent} 16%, transparent)`,
+                  }
             }
           >
             {CONFIDENCE_LABEL[map.confidence]}
           </span>
         </div>
         <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">
-          {formatNumber(map.sampleSize)} ranked battles · {map.brawlersSeen} brawlers
-          seen
+          {formatNumber(map.sampleSize)} ranked battles · {map.brawlersSeen}{" "}
+          brawlers seen
         </p>
       </div>
 
@@ -489,8 +514,8 @@ function MapCard({
         /* Naming a "best pick" the sample cannot support is worse than naming
            none, so a thin map says so instead of ranking noise. */
         <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
-          No brawler is clearly above average here yet. The map has been sampled{' '}
-          {formatNumber(map.sampleSize)} times, spread across {map.brawlersSeen}{' '}
+          No brawler is clearly above average here yet. The map has been sampled{" "}
+          {formatNumber(map.sampleSize)} times, spread across {map.brawlersSeen}{" "}
           brawlers. Not enough for any one of them to separate from the pack.
         </p>
       ) : (
@@ -545,10 +570,10 @@ function MapCard({
                         what made the column unreadable. */}
                     <span
                       className={`block text-xs tabular-nums ${
-                        edge >= 0.005 ? 'text-victory/80' : 'text-muted'
+                        edge >= 0.005 ? "text-victory/80" : "text-muted"
                       }`}
                     >
-                      {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
+                      {edge >= 0.005 ? "+" : edge <= -0.005 ? "−" : "±"}
                       {Math.abs(edge * 100).toFixed(1)} vs usual
                     </span>
                   </span>

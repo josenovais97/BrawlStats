@@ -1,17 +1,17 @@
-import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 import {
   BattlesIcon,
   HyperchargeIcon,
   Power11Icon,
   TrophyIcon,
-} from '@/components/game-icons';
-import { getTopMetaBrawlers } from '@/lib/home-meta';
-import { SAMPLE_PLAYER_TAG } from '@/lib/site';
-import { brawlerPath } from '@/lib/slugs';
-import { TIER_COLOR } from '@/lib/tiers';
+} from "@/components/game-icons";
+import { getTopMetaBrawlers } from "@/lib/home-meta";
+import { SAMPLE_PLAYER_TAG } from "@/lib/site";
+import { brawlerPath } from "@/lib/slugs";
+import { TIER_COLOR } from "@/lib/tiers";
 
 /**
  * The flagship section: what BrawlZone actually does with a tag.
@@ -35,12 +35,16 @@ export async function HomeAccountPreview() {
     <section className="reveal" aria-labelledby="account-preview">
       <div className="mb-6 max-w-2xl">
         <p className="eyebrow text-accent">After you search</p>
-        <h2 id="account-preview" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
+        <h2
+          id="account-preview"
+          className="display mt-2.5 text-2xl uppercase sm:text-4xl"
+        >
           Your account, explained
         </h2>
         <p className="mt-3 leading-relaxed text-muted">
-          A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads
-          yours against every player we sample and tells you what it means.
+          A Brawl Stars profile is a pile of numbers with no context. BrawlZone
+          reads yours against every player we sample and tells you what it
+          means.
         </p>
       </div>
 
@@ -83,8 +87,8 @@ export async function HomeAccountPreview() {
                 Roster vs the meta
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Every brawler you own, tiered against the list below. Your strong picks,
-                and the ones you are missing.
+                Every brawler you own, tiered against the list below. Your
+                strong picks, and the ones you are missing.
               </p>
 
               {top.length > 0 ? (
@@ -139,9 +143,18 @@ export async function HomeAccountPreview() {
         <div className="lg:pl-2 lg:pt-2">
           <ol className="space-y-5">
             {[
-              ['Understand your level', 'One score, comparable to everyone we sample.'],
-              ['Find roster weaknesses', 'Which of your brawlers the meta has left behind.'],
-              ['Decide what to upgrade', 'Where the next coins actually change a match.'],
+              [
+                "Understand your level",
+                "One score, comparable to everyone we sample.",
+              ],
+              [
+                "Find roster weaknesses",
+                "Which of your brawlers the meta has left behind.",
+              ],
+              [
+                "Decide what to upgrade",
+                "Where the next coins actually change a match.",
+              ],
             ].map(([title, body], index) => (
               <li key={title} className="flex gap-3">
                 <span className="display shrink-0 text-lg leading-none text-brand/70">

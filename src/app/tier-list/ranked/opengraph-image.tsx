@@ -1,16 +1,19 @@
-import { tierListOgImage, type TierListOgEntry } from '@/components/seo/tier-list-og';
-import { currentMonth } from '@/lib/site';
-import { getMetaIndex } from '@/lib/stats';
+import {
+  tierListOgImage,
+  type TierListOgEntry,
+} from "@/components/seo/tier-list-og";
+import { currentMonth } from "@/lib/site";
+import { getMetaIndex } from "@/lib/stats";
 
-export const alt = 'Brawl Stars Ranked tier list';
+export const alt = "Brawl Stars Ranked tier list";
 export const size = { width: 1200, height: 630 };
-export const contentType = 'image/png';
+export const contentType = "image/png";
 
 /** Matches the page it represents, so a shared card is never wildly stale. */
 export const revalidate = 3600;
 
 export default async function Image() {
-  const index = await getMetaIndex('ranked', 7).catch(() => new Map());
+  const index = await getMetaIndex("ranked", 7).catch(() => new Map());
 
   const top: TierListOgEntry[] = [...index.values()]
     .filter((entry) => entry.tier !== null && entry.metaScore !== null)
@@ -24,9 +27,9 @@ export default async function Image() {
     }));
 
   return tierListOgImage({
-    heading: 'Ranked tier list',
+    heading: "Ranked tier list",
     scope: `Competitive Ranked, ${currentMonth()} · updated every few hours`,
-    accent: '#ff5c72',
+    accent: "#ff5c72",
     top,
     size,
   });

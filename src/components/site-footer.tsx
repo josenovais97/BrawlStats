@@ -1,21 +1,21 @@
-import { Coffee, ExternalLink, Mail, PlayCircle } from 'lucide-react';
-import Link from 'next/link';
+import { Coffee, ExternalLink, Mail, PlayCircle } from "lucide-react";
+import Link from "next/link";
 
-import { BrandMark } from '@/components/brand-mark';
-import { AppStoreBadge, GooglePlayBadge } from '@/components/store-badges';
-import { CONTACT_EMAIL, SITE_NAME } from '@/lib/site';
+import { BrandMark } from "@/components/brand-mark";
+import { AppStoreBadge, GooglePlayBadge } from "@/components/store-badges";
+import { CONTACT_EMAIL, SITE_NAME } from "@/lib/site";
 
-const APP_STORE_URL = 'https://apps.apple.com/app/brawl-stars/id1229016807';
+const APP_STORE_URL = "https://apps.apple.com/app/brawl-stars/id1229016807";
 const GOOGLE_PLAY_URL =
-  'https://play.google.com/store/apps/details?id=com.supercell.brawlstars';
-const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/josenovais';
+  "https://play.google.com/store/apps/details?id=com.supercell.brawlstars";
+const BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/josenovais";
 
 /**
  * `?sub_confirmation=1` opens YouTube's subscribe dialog straight away rather
  * than dropping the visitor on the channel to find the button themselves.
  */
-const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
-const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
+const YOUTUBE_URL = "https://www.youtube.com/@brawlzonenet?sub_confirmation=1";
+const FAN_CONTENT_POLICY_URL = "https://supercell.com/en/fan-content-policy/";
 
 /**
  * Where every route on the site is reachable from, and where the attribution
@@ -30,29 +30,29 @@ const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
  * worse than no footer link, and it is the kind of thing that rots quietly.
  */
 const EXPLORE = [
-  { href: '/brawlers', label: 'Brawlers' },
-  { href: '/tier-list/ranked', label: 'Tier List' },
-  { href: '/ranked', label: 'Ranked Maps' },
-  { href: '/maps', label: 'Maps' },
-  { href: '/draft', label: 'Draft' },
-  { href: '/compare', label: 'Compare' },
-  { href: '/leaderboard', label: 'Leaderboard' },
-  { href: '/events', label: 'Events' },
+  { href: "/brawlers", label: "Brawlers" },
+  { href: "/tier-list/ranked", label: "Tier List" },
+  { href: "/ranked", label: "Ranked Maps" },
+  { href: "/maps", label: "Maps" },
+  { href: "/draft", label: "Draft" },
+  { href: "/compare", label: "Compare" },
+  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/events", label: "Events" },
   // Added 2026-08-27. These three were live, in the sitemap, and reachable
   // from nowhere on the site -- `npm run crawl:budget` never found them
   // because no page linked to them. A route with no inbound link is a page
   // nobody can arrive at except by typing it.
-  { href: '/cosmetics', label: 'Cosmetics' },
-  { href: '/news', label: 'News' },
-  { href: '/starr-drops', label: 'Starr Drops' },
-  { href: '/release-notes', label: 'Release Notes' },
+  { href: "/cosmetics", label: "Cosmetics" },
+  { href: "/news", label: "News" },
+  { href: "/starr-drops", label: "Starr Drops" },
+  { href: "/release-notes", label: "Release Notes" },
 ];
 
 /** Where the numbers and the artwork come from. Required attribution. */
 const SOURCES = [
-  { href: 'https://developer.brawlstars.com', label: 'Brawl Stars API' },
-  { href: 'https://docs.royaleapi.com/proxy.html', label: 'RoyaleAPI proxy' },
-  { href: 'https://brawlify.com', label: 'Brawlify artwork' },
+  { href: "https://developer.brawlstars.com", label: "Brawl Stars API" },
+  { href: "https://docs.royaleapi.com/proxy.html", label: "RoyaleAPI proxy" },
+  { href: "https://brawlify.com", label: "Brawlify artwork" },
 ];
 
 export function SiteFooter() {
@@ -68,7 +68,7 @@ export function SiteFooter() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{
           background:
-            'linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 45%, transparent), color-mix(in srgb, var(--accent) 35%, transparent), transparent)',
+            "linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 45%, transparent), color-mix(in srgb, var(--accent) 35%, transparent), transparent)",
         }}
       />
 
@@ -84,8 +84,9 @@ export function SiteFooter() {
               <span className="display text-xl uppercase">{SITE_NAME}</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
-              Brawl Stars stats that show where you stand. Player and club lookups,
-              tier lists and map picks, from battles we sample ourselves.
+              Brawl Stars stats that show where you stand. Player and club
+              lookups, tier lists and map picks, from battles we sample
+              ourselves.
             </p>
 
             <p className="eyebrow mt-6">Get the game</p>
@@ -188,7 +189,9 @@ export function SiteFooter() {
               <Coffee aria-hidden className="size-4" />
               Buy me a coffee
             </a>
-            <p className="mt-2 text-xs text-muted/80">Free, ad-free, no paywall.</p>
+            <p className="mt-2 text-xs text-muted/80">
+              Free, ad-free, no paywall.
+            </p>
 
             {/* Below the coffee link and styled quieter than it, for the same
                 reason that one is quieter than the search: the page is for
@@ -211,8 +214,8 @@ export function SiteFooter() {
         {/* Required disclaimer, on its own quiet line. */}
         <div className="mt-9 flex flex-col gap-2 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-2xl">
-            This material is unofficial and is not endorsed by Supercell. For more
-            information see{' '}
+            This material is unofficial and is not endorsed by Supercell. For
+            more information see{" "}
             <a
               href={FAN_CONTENT_POLICY_URL}
               target="_blank"

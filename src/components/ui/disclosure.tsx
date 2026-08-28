@@ -1,5 +1,5 @@
-import { ChevronDown } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { ChevronDown } from "lucide-react";
+import type { ReactNode } from "react";
 
 /**
  * Methodology, caveats and long tables, folded away.
@@ -17,15 +17,15 @@ import type { ReactNode } from 'react';
 export function Disclosure({
   summary,
   children,
-  className = '',
-  tone = 'card',
+  className = "",
+  tone = "card",
   defaultOpen = false,
 }: {
   summary: ReactNode;
   children: ReactNode;
   className?: string;
   /** `card` sits on a surface of its own; `bare` inherits the parent's. */
-  tone?: 'card' | 'bare';
+  tone?: "card" | "bare";
   /**
    * Starts open, for content that is worth showing but still worth being able
    * to fold away. Uncontrolled after the first render — the browser owns the
@@ -36,11 +36,11 @@ export function Disclosure({
   return (
     <details
       open={defaultOpen}
-      className={`group ${tone === 'card' ? 'card overflow-hidden' : ''} ${className}`}
+      className={`group ${tone === "card" ? "card overflow-hidden" : ""} ${className}`}
     >
       <summary
         className={`flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-muted transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden ${
-          tone === 'card' ? 'px-4 py-3.5' : 'py-2'
+          tone === "card" ? "px-4 py-3.5" : "py-2"
         }`}
       >
         <ChevronDown
@@ -51,9 +51,9 @@ export function Disclosure({
       </summary>
       <div
         className={
-          tone === 'card'
-            ? 'border-t border-border px-4 py-4 text-sm leading-relaxed text-muted'
-            : 'pb-2 text-sm leading-relaxed text-muted'
+          tone === "card"
+            ? "border-t border-border px-4 py-4 text-sm leading-relaxed text-muted"
+            : "pb-2 text-sm leading-relaxed text-muted"
         }
       >
         {children}
@@ -79,7 +79,7 @@ export function ClampedText({
   text,
   lines = 3,
   threshold = 180,
-  className = '',
+  className = "",
 }: {
   text: string;
   /** Lines shown while collapsed. */
@@ -89,10 +89,16 @@ export function ClampedText({
   className?: string;
 }) {
   if (text.length <= threshold) {
-    return <p className={`text-sm leading-relaxed text-muted ${className}`}>{text}</p>;
+    return (
+      <p className={`text-sm leading-relaxed text-muted ${className}`}>
+        {text}
+      </p>
+    );
   }
 
-  const clamp = { 2: 'line-clamp-2', 3: 'line-clamp-3', 4: 'line-clamp-4' }[lines];
+  const clamp = { 2: "line-clamp-2", 3: "line-clamp-3", 4: "line-clamp-4" }[
+    lines
+  ];
 
   return (
     <details className={`group ${className}`}>

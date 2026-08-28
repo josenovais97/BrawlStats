@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-import { TierListView } from '@/components/tier-list/tier-list-view';
-import { resolveTierRoute, tierListMetadata } from '@/lib/tier-list-route';
+import { TierListView } from "@/components/tier-list/tier-list-view";
+import { resolveTierRoute, tierListMetadata } from "@/lib/tier-list-route";
 
 /*
  * Three hours, matching both the sampler and `READ_CACHE_SECONDS`.
@@ -22,9 +22,11 @@ interface PageProps {
   params: Promise<{ scope: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { scope } = await params;
-  return tierListMetadata('trophy', resolveTierRoute('trophy', [scope]));
+  return tierListMetadata("trophy", resolveTierRoute("trophy", [scope]));
 }
 
 /**
@@ -37,6 +39,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  */
 export default async function TrophyScopedTierListPage({ params }: PageProps) {
   const { scope } = await params;
-  const route = resolveTierRoute('trophy', [scope]);
-  return <TierListView format="trophy" windowKey={route.windowKey} modeSlug={route.modeSlug} />;
+  const route = resolveTierRoute("trophy", [scope]);
+  return (
+    <TierListView
+      format="trophy"
+      windowKey={route.windowKey}
+      modeSlug={route.modeSlug}
+    />
+  );
 }

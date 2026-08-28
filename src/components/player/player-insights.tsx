@@ -1,20 +1,28 @@
-import { Activity, TrendingDown, TrendingUp } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { Activity, TrendingDown, TrendingUp } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 import {
   BattlesIcon,
   BrawlersIcon,
   CrownIcon,
   PlayersIcon,
-} from '@/components/game-icons';
-import { SectionHeading } from '@/components/ui/section-heading';
-import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl } from '@/lib/brawlapi';
-import { getBattleLog } from '@/lib/bs-api';
-import { computeBattleInsights, type PlayerAssociation } from '@/lib/battle-insights';
-import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
-import type { BABrawler } from '@/types/brawlapi';
+} from "@/components/game-icons";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { brawlerPath } from "@/lib/slugs";
+import { brawlerIconUrl } from "@/lib/brawlapi";
+import { getBattleLog } from "@/lib/bs-api";
+import {
+  computeBattleInsights,
+  type PlayerAssociation,
+} from "@/lib/battle-insights";
+import {
+  formatNumber,
+  formatPercent,
+  humanizeMode,
+  relativeTime,
+} from "@/lib/format";
+import type { BABrawler } from "@/types/brawlapi";
 
 interface Props {
   tag: string;
@@ -46,7 +54,9 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
       <SectionHeading
         title="Recent form"
         aside={`Last ${insights.battles} battles${
-          insights.lastBattleAt ? ` · ${relativeTime(insights.lastBattleAt)}` : ''
+          insights.lastBattleAt
+            ? ` · ${relativeTime(insights.lastBattleAt)}`
+            : ""
         }`}
       />
 
@@ -63,11 +73,15 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
           <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-surface-2">
             <div
               className="bg-victory"
-              style={{ width: `${(insights.wins / Math.max(insights.battles, 1)) * 100}%` }}
+              style={{
+                width: `${(insights.wins / Math.max(insights.battles, 1)) * 100}%`,
+              }}
             />
             <div
               className="bg-defeat"
-              style={{ width: `${(insights.losses / Math.max(insights.battles, 1)) * 100}%` }}
+              style={{
+                width: `${(insights.losses / Math.max(insights.battles, 1)) * 100}%`,
+              }}
             />
           </div>
 
@@ -86,10 +100,12 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
 
           <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">Trophies</p>
+              <p className="text-xs uppercase tracking-wide text-muted">
+                Trophies
+              </p>
               <p
                 className={`flex items-center gap-1 text-lg font-bold tabular-nums ${
-                  insights.trophyChange >= 0 ? 'text-victory' : 'text-defeat'
+                  insights.trophyChange >= 0 ? "text-victory" : "text-defeat"
                 }`}
               >
                 {insights.trophyChange >= 0 ? (
@@ -97,12 +113,14 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                 ) : (
                   <TrendingDown className="size-4" />
                 )}
-                {insights.trophyChange > 0 ? '+' : ''}
+                {insights.trophyChange > 0 ? "+" : ""}
                 {formatNumber(insights.trophyChange)}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">Star player</p>
+              <p className="text-xs uppercase tracking-wide text-muted">
+                Star player
+              </p>
               <p className="flex items-center gap-1 text-lg font-bold tabular-nums">
                 <CrownIcon className="size-4" />
                 {insights.starPlayerCount}
@@ -140,18 +158,21 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                         {brawler.brawlerName.toLowerCase()}
                       </p>
                       <p className="truncate text-xs text-muted">
-                        {brawler.battles} {brawler.battles === 1 ? 'battle' : 'battles'}
+                        {brawler.battles}{" "}
+                        {brawler.battles === 1 ? "battle" : "battles"}
                         {brawler.winRate !== null
                           ? ` · ${formatPercent(brawler.winRate)} win`
-                          : ''}
+                          : ""}
                       </p>
                     </div>
                     <span
                       className={`shrink-0 text-sm font-bold tabular-nums ${
-                        brawler.trophyChange >= 0 ? 'text-victory' : 'text-defeat'
+                        brawler.trophyChange >= 0
+                          ? "text-victory"
+                          : "text-defeat"
                       }`}
                     >
-                      {brawler.trophyChange > 0 ? '+' : ''}
+                      {brawler.trophyChange > 0 ? "+" : ""}
                       {brawler.trophyChange}
                     </span>
                   </Link>
@@ -182,14 +203,24 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
             Activity
           </h3>
           <dl className="space-y-3 text-sm">
-            <Row label="Last 24 hours" value={`${insights.battlesLast24h} battles`} />
+            <Row
+              label="Last 24 hours"
+              value={`${insights.battlesLast24h} battles`}
+            />
             <Row label="Battles per day" value={perDay.toFixed(1)} />
             <Row
               label="Last seen"
-              value={insights.lastBattleAt ? relativeTime(insights.lastBattleAt) : ', '}
+              value={
+                insights.lastBattleAt
+                  ? relativeTime(insights.lastBattleAt)
+                  : ", "
+              }
             />
             {insights.modes[0] ? (
-              <Row label="Top mode" value={humanizeMode(insights.modes[0].mode)} />
+              <Row
+                label="Top mode"
+                value={humanizeMode(insights.modes[0].mode)}
+              />
             ) : null}
           </dl>
         </div>
@@ -241,7 +272,9 @@ function AssociationList({
                 </span>
                 <span className="shrink-0 text-xs text-muted">
                   {person.battles}×
-                  {person.winRate !== null ? ` · ${formatPercent(person.winRate)}` : ''}
+                  {person.winRate !== null
+                    ? ` · ${formatPercent(person.winRate)}`
+                    : ""}
                 </span>
               </Link>
             </li>

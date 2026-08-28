@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { ArrowLeft, RefreshCw } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import Link from "next/link";
 
-import { FullPageMessage } from '@/components/ui/full-page-message';
+import { FullPageMessage } from "@/components/ui/full-page-message";
 
 /**
  * The root error boundary. Error boundaries must be Client Components.
