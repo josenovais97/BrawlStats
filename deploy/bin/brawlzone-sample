@@ -69,6 +69,12 @@ failed = re.search(r"(\d+) of (\d+) player samples failed", notes)
 if failed:
     print(f"{failed.group(1)} of {failed.group(2)} player lookups failed "
           f"(deleted or renamed accounts -- normal)")
+# Says why the pool shrank. Without this the count just drops by twelve one
+# run and nothing on the page accounts for it.
+dropped = re.search(r"(\d+) deleted account\(s\) removed from the pool", notes)
+if dropped:
+    print(f"Dropped {dropped.group(1)} of them from the pool for good; "
+          f"fresh players take those slots next run")
 
 status = result.get("status", "?")
 print(f"Status {status}, completed in {elapsed}s")
