@@ -48,7 +48,20 @@ export const USER_AGENT = `${SITE_NAME}/1.0 (+${SITE_URL})`;
  * tag already used as the search placeholder, so it is one account rather than
  * a second one to keep an eye on.
  */
-export const SAMPLE_PLAYER_TAG = '2V0UL0GQV8';
+/*
+ * The profile the landing page offers as an example, so it has to show the
+ * site working rather than merely load.
+ *
+ * The previous pick had ranked elo 0 and had not been seen in game for a
+ * fortnight, so the example demonstrated an empty Ranked section, a capped
+ * skill score and no recent battles -- every feature worth showing, missing.
+ *
+ * Chosen 2026-08-28 for activity, not size: 7,850 ranked elo and ~150 battles
+ * in the last week, which is what makes the Ranked, battle-log and progression
+ * sections all have something to say. Worth re-checking if it ever goes quiet;
+ * an inactive example is the same bug again.
+ */
+export const SAMPLE_PLAYER_TAG = '2RLCPVGUG';
 
 /**
  * The month a page is being served in, for titles.

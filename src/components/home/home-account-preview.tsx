@@ -161,7 +161,7 @@ export async function HomeAccountPreview() {
             href={`/player/${SAMPLE_PLAYER_TAG}`}
             className="group mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border-strong/70 bg-surface px-4 text-sm font-bold transition-colors hover:border-brand/60 hover:text-brand"
           >
-            Open a sample profile
+            See a complete example
             <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
           </Link>
         </div>
