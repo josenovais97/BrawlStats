@@ -16,13 +16,13 @@ problems=()
 code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SITE/" || echo 000)
 [ "$code" = "200" ] || problems+=("site returned HTTP $code")
 
-# 2. Is the data fresh? The sampler runs every 3h; 5h means runs are failing
+# 2. Is the data fresh? The sampler runs every 2h; 5h means runs are failing
 #    or the timer stopped, which the OnFailure hook cannot catch because a
 #    timer that never fires never fails.
 last=$(cd /home/ubuntu/brawlstats && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
   "select extract(epoch from (now() - max(started_at)))::int from aggregation_runs;" 2>/dev/null || echo "")
 if [ -n "$last" ] && [ "$last" -gt 18000 ]; then
-  problems+=("last sampler run was $((last/3600))h ago (expected under 3h)")
+  problems+=("last sampler run was $((last/3600))h ago (expected under 2h)")
 fi
 
 # 3. Disk. Postgres, Docker and the dumps all share one volume; a full disk
@@ -33,6 +33,37 @@ use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
 # 4. Are all containers up?
 down=$(cd /home/ubuntu/brawlstats && docker compose ps --status exited --status dead -q 2>/dev/null | wc -l)
 [ "$down" -eq 0 ] || problems+=("$down container(s) not running")
+
+# 5. Is the Discord invite in the footer still going to work?
+#    Discord's default invite lasts 30 days and cannot be extended, so the
+#    link on every page of the site expires quietly and nothing else would
+#    notice. Two attempts at creating a no-expiry invite both came back as
+#    30-day ones, which is exactly why this is checked rather than assumed.
+#
+#    The code is read out of the footer source rather than repeated here: one
+#    source of truth, so replacing the invite in the site cannot leave this
+#    check watching the old one.
+invite=$(grep -oE 'discord\.gg/[A-Za-z0-9]+' /home/ubuntu/brawlstats/src/components/site-footer.tsx 2>/dev/null | head -1 | cut -d/ -f2)
+if [ -n "$invite" ]; then
+  inv_json=$(curl -s --max-time 15 "https://discord.com/api/v10/invites/${invite}?with_expiration=true" || echo '')
+  inv_msg=$(printf '%s' "$inv_json" | python3 -c '
+import sys, json, datetime
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)                      # unreadable: a network blip, not a fault
+if "guild" not in d:
+    print("Discord invite is dead (%s)" % (d.get("message") or "invalid"))
+    sys.exit(0)
+exp = d.get("expires_at")
+if not exp:
+    sys.exit(0)                      # permanent, which is the goal
+left = (datetime.datetime.fromisoformat(exp) - datetime.datetime.now(datetime.timezone.utc)).days
+if left <= 7:
+    print("Discord invite expires in %d day(s)" % left)
+' 2>/dev/null || echo '')
+  [ -n "$inv_msg" ] && problems+=("$inv_msg")
+fi
 
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 

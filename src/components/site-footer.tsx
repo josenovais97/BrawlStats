@@ -1,4 +1,4 @@
-import { Coffee, ExternalLink, Mail, PlayCircle } from 'lucide-react';
+import { Coffee, ExternalLink, Mail, MessagesSquare, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -15,6 +15,22 @@ const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/josenovais';
  * than dropping the visitor on the channel to find the button themselves.
  */
 const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
+
+/**
+ * The community server.
+ *
+ * This invite expires 2026-09-27, and that is the interesting part. Discord
+ * cannot extend an existing invite — "permanent" means generating a new code —
+ * and two attempts at setting no-expiry both came back as 30-day invites, so
+ * the assumption that someone will remember to replace it in a month is not
+ * one worth making. `brawlzone-healthcheck` queries the invite every ten
+ * minutes and alerts once it is inside a week of expiry or already dead, which
+ * turns a silent broken link on every page into a mail with time to act on it.
+ *
+ * If you are reading this because that alert fired: make a new invite, put the
+ * code below, and the alert stops on its own.
+ */
+const DISCORD_URL = 'https://discord.gg/DydJUWYZR';
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
 
 /**
@@ -204,6 +220,19 @@ export function SiteFooter() {
                   licensed for use unmodified. */}
               <PlayCircle aria-hidden className="size-4" />
               Subscribe on YouTube
+            </a>
+
+            <a
+              href={DISCORD_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 inline-flex min-h-10 items-center gap-2 rounded-xl border border-border px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground sm:mt-3 sm:ml-2"
+            >
+              {/* Generic speech marks rather than Discord's own wordmark, for
+                  the same reason the button above does not carry YouTube's:
+                  both are trademarks, licensed only for unmodified use. */}
+              <MessagesSquare aria-hidden className="size-4" />
+              Join the Discord
             </a>
           </div>
         </div>
