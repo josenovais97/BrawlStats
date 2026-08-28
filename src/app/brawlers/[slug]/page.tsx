@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
+import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
@@ -55,6 +56,7 @@ import {
   getBrawlerSplits,
   getBrawlerStat,
   getBrawlerTrend,
+  getBrawlerSkins,
   getIndexablePairs,
   getMetaIndex,
   normalizeWinRate,
@@ -342,9 +344,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Fetched together: the matchup rows need to know which of their pairs the
   // sitemap actually claims, so a non-indexable one can be nofollowed rather
   // than quietly widening the crawlable set. See BrawlerMatchups.
-  const [pairings, indexable] = await Promise.all([
+  const [pairings, indexable, skins] = await Promise.all([
     getBrawlerPairings(brawlerId),
     getIndexablePairs(),
+    getBrawlerSkins(brawlerId),
   ]);
   const indexablePairs = new Set(
     indexable.map(([a, b]) => (a < b ? `${a}:${b}` : `${b}:${a}`)),
@@ -798,6 +801,16 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           <BrawlerLeaderboard brawlerId={brawlerId} />
         </Suspense>
       </section>
+
+      {skins.length > 0 ? (
+        <section>
+          <SectionHeading
+            title="Skins"
+            subtitle={`Which ${name} skins players actually equip, from the sampled snapshot pool.`}
+          />
+          <BrawlerSkins skins={skins} brawlerName={brawler.name} />
+        </section>
+      ) : null}
 
       {wiki && wiki.history.length > 0 ? (
         <section>

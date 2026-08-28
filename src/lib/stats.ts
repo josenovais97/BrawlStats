@@ -1485,6 +1485,79 @@ const COSMETIC_WINDOW_DAYS = 7;
  * Counted from each player's most recent snapshot per brawler, so a player who
  * has been sampled thirty times still contributes one vote per brawler.
  */
+/** One skin on a brawler, and how much of that brawler's playerbase equips it. */
+export interface BrawlerSkinUsage {
+  id: number;
+  name: string;
+  users: number;
+  /** Share of players who own this brawler, not of the whole population. */
+  share: number;
+  /** The skin the brawler ships with, which carries the brawler's own name. */
+  isDefault: boolean;
+}
+
+/**
+ * Which skins the owners of one brawler actually equip.
+ *
+ * The denominator is the point. `getSkinUsage` ranks skins across the whole
+ * game and divides by every player-brawler pair, which is the right question
+ * for a leaderboard and the wrong one here: "2% of all accounts" says nothing
+ * about whether a Shelly skin is popular. This divides by the people who own
+ * *this* brawler, so the number reads as "of players who have Shelly".
+ *
+ * The default skin is kept rather than filtered out. Globally it would swamp
+ * the ranking, which is why the leaderboard drops it; per brawler it is the
+ * baseline every other skin is competing with, and usually the honest answer
+ * to "what do people actually use".
+ *
+ * Snapshots are a rotating sample (SNAPSHOT_SAMPLE_RATE), so this is a survey
+ * of a quarter of the pool rather than a census -- fine for shares, which is
+ * all it reports.
+ */
+async function compute_getBrawlerSkins(brawlerId: number): Promise<BrawlerSkinUsage[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(COSMETIC_WINDOW_DAYS);
+
+    const rows = await prisma.$queryRaw<
+      { skin_id: number; skin_name: string; brawler_name: string; users: bigint }[]
+    >`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag)
+               player_tag, skin_id, skin_name, brawler_name
+        FROM player_brawler_snapshots
+        WHERE snapshot_date >= ${since}
+          AND brawler_id = ${brawlerId}
+          AND skin_id IS NOT NULL
+        ORDER BY player_tag, snapshot_date DESC
+      )
+      SELECT skin_id, skin_name, max(brawler_name) AS brawler_name, COUNT(*) AS users
+      FROM latest
+      GROUP BY skin_id, skin_name
+      ORDER BY users DESC
+    `;
+
+    const owners = rows.reduce((sum, row) => sum + Number(row.users), 0);
+    if (owners === 0) return [];
+
+    return rows.map((row) => {
+      const name = row.skin_name.replace(/\s+/g, ' ').trim();
+      return {
+        id: row.skin_id,
+        name,
+        users: Number(row.users),
+        share: Number(row.users) / owners,
+        isDefault: name.toUpperCase() === row.brawler_name.trim().toUpperCase(),
+      };
+    });
+  } catch (error) {
+    swallow('compute_getBrawlerSkins', error);
+    return [];
+  }
+}
+
 async function compute_getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
@@ -2905,6 +2978,7 @@ export const getMetaMovers = cachedRead('meta-movers', compute_getMetaMovers);
 export const getCoverageStats = cachedRead('coverage-stats', compute_getCoverageStats);
 export const getTrophyGains = cachedRead('trophy-gains', compute_getTrophyGains);
 export const getSkinUsage = cachedRead('skin-usage', compute_getSkinUsage);
+export const getBrawlerSkins = cachedRead('brawler-skins', compute_getBrawlerSkins);
 export const getIconUsage = cachedRead('icon-usage', compute_getIconUsage);
 export const getReleasedBuffieCount = cachedRead('released-buffie-count', compute_getReleasedBuffieCount);
 export const getRankedLeaderboard = cachedRead('ranked-leaderboard', compute_getRankedLeaderboard);
