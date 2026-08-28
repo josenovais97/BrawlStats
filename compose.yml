@@ -84,7 +84,13 @@ services:
       - "443:443"
     env_file: .env.production
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # The DIRECTORY, not the file. Docker bind-mounts a single file by inode,
+      # and `git reset --hard` in auto-deploy.sh replaces the file rather than
+      # editing it -- so the mount kept pointing at the original and the
+      # container read a stale Caddyfile for a day. Every `caddy reload`
+      # dutifully re-read the same old bytes, which is why the zero-downtime
+      # upstream fix appeared to deploy and never took effect.
+      - ./caddy:/etc/caddy:ro
       - caddy-data:/data
       - caddy-config:/config
       # Access log lands beside the scheduled-job logs so one logrotate rule
