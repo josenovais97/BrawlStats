@@ -13,6 +13,7 @@ import {
 import { ClubIcon, PlayersIcon } from '@/components/game-icons';
 import { RecentSearches } from '@/components/recent-searches';
 import { isValidTag, normalizeTag } from '@/lib/tags';
+import { TagLocationHint } from '@/components/tag-location-hint';
 
 type Mode = 'player' | 'club';
 
@@ -177,8 +178,9 @@ export function SearchBar({
       ) : (
         <p id={hintId} className="mt-3 text-sm text-muted">
           {mode === 'player'
-            ? 'Your tag is on your in-game profile, just below your name.'
-            : 'A club tag is shown on the club screen, under the club name.'}
+            ? 'Your tag is on your in-game profile, just below your profile icon. '
+            : 'A club tag is shown on the club screen, under the club name. '}
+          <TagLocationHint kind={mode === 'player' ? 'player' : 'club'} />
         </p>
       )}
 

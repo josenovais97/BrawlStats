@@ -2,6 +2,7 @@ import { ArrowRight, Search } from 'lucide-react';
 import Link from 'next/link';
 
 import { TrophyIcon } from '@/components/game-icons';
+import { TagLocationHint } from '@/components/tag-location-hint';
 
 /**
  * Closing call to action.
@@ -39,7 +40,8 @@ export function HomeCta() {
               See where you stand
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-muted">
-              Your tag is on your in-game profile, just below your name.
+              Your tag is on your in-game profile, just below your profile icon.{' '}
+              <TagLocationHint />
             </p>
           </div>
         </div>
