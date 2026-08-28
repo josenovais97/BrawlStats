@@ -62,6 +62,23 @@ export const CRAWLER_DISALLOW = [
  * distinction is exactly right: an unfurler fetches one URL somebody chose to
  * share, a search crawler walks every URL it can find.
  */
+/**
+ * Agents refused outright, at the edge, for every path.
+ *
+ * `meta-externalagent` is Meta's AI-training crawler -- NOT
+ * `facebookexternalhit`, which unfurls shared links and stays welcome.
+ * Measured over 24h on 2026-08-28 it was **58% of all traffic**: 17,419
+ * requests, ~600/hour round the clock, of which 15,193 were 404s on /player/.
+ * It ignores this file, so listing it here documents the intent while
+ * `Caddyfile` does the actual refusing -- one regex in Caddy instead of
+ * booting Next 17,000 times a day to say no.
+ *
+ * Deliberately short. Every name here is a crawler measured to be a real cost
+ * with no traffic to show for it; guessing at others trades away reach for
+ * nothing.
+ */
+export const BLOCKED_AGENTS = ['meta-externalagent'] as const;
+
 export const SOCIAL_AGENTS = [
   'Twitterbot',
   'facebookexternalhit',

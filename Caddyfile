@@ -6,6 +6,26 @@
 {$SITE_ADDRESS::80} {
 	encode zstd gzip
 
+	# Refused here rather than in src/proxy.ts, which is where every other
+	# crawler rule lives. The difference is what it costs: the proxy runs
+	# inside Next, so a refusal there still boots the app. Measured over 24h
+	# on 2026-08-28, meta-externalagent was 58% of all traffic -- 17,419
+	# requests, ~600/hour, 15,193 of them 404s on /player/. That is the app
+	# starting seventeen thousand times a day to say no to one bot.
+	#
+	# This is Meta's AI-TRAINING crawler. `facebookexternalhit`, which unfurls
+	# links shared on Facebook and Messenger, is a different agent and is not
+	# matched here -- link previews are unaffected. So is Googlebot: search
+	# indexing continues exactly as before.
+	#
+	# Kept in step with BLOCKED_AGENTS in src/lib/crawl-policy.ts, which is
+	# what robots.txt reads. Neither enforces the other: robots.txt is a
+	# request, this is the answer for an agent that ignores it.
+	@blocked_agents header_regex User-Agent (?i)meta-externalagent
+	respond @blocked_agents "Refused. See /robots.txt\n" 403 {
+		close
+	}
+
 	# There was no access log at all until 2026-08-27, which meant no way to
 	# answer "which crawler is hitting what" -- the exact question behind the
 	# outage that moved this project off Vercel.

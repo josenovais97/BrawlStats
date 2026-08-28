@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
-import { CRAWLER_DISALLOW, SOCIAL_AGENTS, SOCIAL_DISALLOW } from '@/lib/crawl-policy';
+import { BLOCKED_AGENTS, CRAWLER_DISALLOW, SOCIAL_AGENTS, SOCIAL_DISALLOW } from '@/lib/crawl-policy';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -50,6 +50,10 @@ import { SITE_URL } from '@/lib/site';
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
+      // Refused at the edge by Caddy regardless; stated here so the intent is
+      // readable, and so a well-behaved future version of the agent obeys it
+      // without needing a firewall rule.
+      ...BLOCKED_AGENTS.map((userAgent) => ({ userAgent, disallow: '/' })),
       ...SOCIAL_AGENTS.map((userAgent) => ({
         userAgent,
         allow: '/',
