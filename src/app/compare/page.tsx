@@ -1,13 +1,17 @@
 import type { Metadata } from 'next';
 
 import { CompareTool } from '@/components/compare/compare-tool';
+import { currentMonth } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'Compare Brawl Stars players and brawlers side by side',
-  description:
-    'Put two Brawl Stars players or two brawlers side by side: trophies, Ranked, skill score, account completion, win rates and head-to-head records.',
-  alternates: { canonical: '/compare' },
-};
+/* A function, not an object, so the month is not frozen at module load —
+   see `currentMonth`. */
+export function generateMetadata(): Metadata {
+  return {
+    title: `Compare Brawl Stars players and brawlers (${currentMonth()})`,
+    description: `Put two Brawl Stars players or two brawlers side by side, ${currentMonth()}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.`,
+    alternates: { canonical: '/compare' },
+  };
+}
 
 export const revalidate = 3600;
 

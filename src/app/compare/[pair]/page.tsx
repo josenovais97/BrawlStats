@@ -10,6 +10,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { brawlerPath } from '@/lib/slugs';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { resolvePair } from '@/lib/compare';
+import { currentMonth } from '@/lib/site';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
@@ -75,8 +76,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .catch(() => false);
 
   return {
-    title: `${a} vs ${b}. Which is better in Brawl Stars?`,
-    description: `${a} and ${b} compared: win rates, pick rates, tiers, best modes and their head-to-head record from sampled Brawl Stars battles.`,
+    /*
+     * Dated like every other high-intent page — see `currentMonth`. A "which
+     * is better" answer is exactly the kind a reader wants to know is current,
+     * and this one is: both sides come from the same rolling 21-day window the
+     * pairing threshold uses.
+     */
+    title: `${a} vs ${b}: which is better in Brawl Stars? (${currentMonth()})`,
+    description: `${a} vs ${b} in Brawl Stars, ${currentMonth()}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.`,
     alternates: { canonical: `/compare/${resolved.slug}` },
     /*
      * Indexable pages must be a deliberate set, and this is how that set is
