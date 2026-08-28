@@ -182,14 +182,9 @@ export const config = {
     '/leaderboard',
     '/draft',
     '/api/:path*',
-    // Both, because the disallowed prefix has no trailing slash: the Umami
-    // dashboard sits at exactly /analytics, which a :path* matcher misses.
-    //
     // No apostrophes in this block. crawl-policy.test.ts extracts the entries
     // with a single-quote regex over this file as text, so one in a comment
     // shifts the pairing and silently hides the entries after it.
-    '/analytics',
-    '/analytics/:path*',
     '/player/:path*',
     '/club/:path*',
     '/draft/:path*',

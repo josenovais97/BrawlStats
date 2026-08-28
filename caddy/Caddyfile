@@ -55,11 +55,6 @@
 		respond "Refused. See /robots.txt" 403
 	}
 
-	# Umami, first-party. Its own BASE_PATH keeps every asset under here.
-	handle /analytics* {
-		reverse_proxy umami:3000
-	}
-
 	handle {
 		reverse_proxy {
 			# Resolved per-refresh rather than once at startup. Docker gives a
@@ -86,4 +81,19 @@
 # verification, when there is no www hostname to answer for.
 {$WWW_ADDRESS::8443} {
 	redir https://{$SITE_ADDRESS}{uri} permanent
+}
+
+# Analytics, on its own host.
+#
+# Not a path on the main domain, which is where this started: Umami is a
+# Next.js app and Next bakes `basePath` at BUILD time, so the BASE_PATH env var
+# the image accepts does nothing -- it served /login while Caddy asked it for
+# /analytics/login. Stripping the prefix instead would have collided its
+# /_next/ assets with the site's own.
+#
+# The cost is that the tracking script lives on a recognisable analytics
+# hostname, which some ad blockers filter. Correctness first.
+{$ANALYTICS_ADDRESS::8444} {
+	encode zstd gzip
+	reverse_proxy umami:3000
 }

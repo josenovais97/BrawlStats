@@ -46,10 +46,6 @@ import { normalizeTag } from '@/lib/tags';
 
 export const CRAWLER_DISALLOW = [
   '/api/',
-  // Umami's dashboard and collection endpoint. A login screen and a POST API,
-  // not a document set -- and crawling it would file analytics hits for the
-  // crawler itself.
-  '/analytics',
   '/player/',
   '/club/',
   '/draft/',

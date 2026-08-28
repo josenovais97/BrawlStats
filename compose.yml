@@ -77,10 +77,12 @@ services:
         max-file: "5"
 
   # Self-hosted analytics, replacing Vercel's. Its own database inside the same
-  # Postgres, so it costs a container rather than a service. Cookieless and
-  # first-party -- served under /analytics on the main domain rather than a
-  # subdomain, which means ad blockers that filter known analytics hostnames do
-  # not filter it, and no extra DNS record or certificate is involved.
+  # Postgres, so it costs a container rather than a service. Cookieless, so no
+  # consent banner.
+  #
+  # Served on analytics.brawlzone.net, not a path on the main domain: Umami is
+  # a Next.js app and Next bakes `basePath` at build time, so the BASE_PATH env
+  # var this image accepts has no effect on the published build.
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
     restart: unless-stopped
