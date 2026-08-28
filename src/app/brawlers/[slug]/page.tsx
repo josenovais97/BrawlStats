@@ -620,28 +620,31 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         <section>
           <SectionHeading
             title="Combat stats"
-            subtitle="Base values at Power 11, before gears and star powers."
+            subtitle="Power 1 values from the wiki, before gears and star powers. Health and damage double at Power 11; reload, range and speed do not change."
           />
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {(
               [
-                ['Health', wiki.stats.health, 'health'],
+                ['Health', wiki.stats.health, 'health', true],
                 /* The infobox labels these two independently and often gives
                    them the same words, so the grid used to print "Damage per
                    bullet" twice with different numbers under it. See
                    `combatStatLabels`. The gold Super mark carries the same
                    distinction a second way, in colour. */
-                [statLabels.attack, wiki.stats.attack, 'damage'],
-                [statLabels.super, wiki.stats.super, 'super-damage'],
-                ['Reload', wiki.stats.reload, 'cooldown'],
-                ['Range', wiki.stats.attackRange, 'ranged'],
-                ['Speed', wiki.stats.movementSpeed, 'speed'],
+                [statLabels.attack, wiki.stats.attack, 'damage', true],
+                [statLabels.super, wiki.stats.super, 'super-damage', true],
+                // These three do not scale with Power Level, so they carry no
+                // Power 11 figure. Printing one would be the same mistake the
+                // heading used to make, one row further down.
+                ['Reload', wiki.stats.reload, 'cooldown', false],
+                ['Range', wiki.stats.attackRange, 'ranged', false],
+                ['Speed', wiki.stats.movementSpeed, 'speed', false],
               ] as const
             )
               // Not every brawler has every stat: a super that deals no direct
               // damage has no super damage, and the infobox simply omits it.
               .filter(([, value]) => Boolean(value))
-              .map(([label, value, stat]) => {
+              .map(([label, value, stat, scales]) => {
                 const { main, hint } = splitStat(value!);
                 return (
                   <div key={label} className="card p-3">
@@ -662,6 +665,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                     {hint ? (
                       <dd className="mt-0.5 text-xs leading-tight text-muted">{hint}</dd>
                     ) : null}
+                    {scales ? <PowerElevenHint main={main} /> : null}
                   </div>
                 );
               })}
@@ -924,4 +928,31 @@ function listOf(items: string[]): string {
   if (items.length === 0) return 'none yet';
   if (items.length === 1) return items[0];
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+}
+
+
+/**
+ * The Power 11 figure for a stat that scales with Power Level.
+ *
+ * Health and damage rise 10% of base per level — raised from 5% in the
+ * 23/10/24 balance change, which Piper's own history records — so Power 11 is
+ * ten levels above Power 1 and therefore exactly double.
+ *
+ * Renders nothing unless the wiki gave a clean number. Infobox values carry
+ * qualifiers and alternates ("720 (Normal)<br>864 (with Hypercharge)"), and a
+ * doubled *guess* at one of those would repeat the mistake this replaced: a
+ * confident figure that happens to be wrong. Silence is the honest fallback.
+ */
+function PowerElevenHint({ main }: { main: string }) {
+  const cleaned = main.replace(/,/g, '').trim();
+  if (!/^\d+(\.\d+)?$/.test(cleaned)) return null;
+
+  const doubled = Number(cleaned) * 2;
+  if (!Number.isFinite(doubled) || doubled === 0) return null;
+
+  return (
+    <dd className="mt-0.5 text-xs font-semibold leading-tight text-brand tabular-nums">
+      {doubled.toLocaleString('en-US')} at Power 11
+    </dd>
+  );
 }

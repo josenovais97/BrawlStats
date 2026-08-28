@@ -16,6 +16,7 @@ import { BrandMark } from '@/components/brand-mark';
 import {
   BrawlersIcon,
   ClubIcon,
+  CosmeticsIcon,
   CompareIcon,
   DraftIcon,
   EventsIcon,
@@ -82,6 +83,7 @@ const MORE: NavItem[] = [
   { href: '/compare', label: 'Compare', icon: CompareIcon },
   { href: '/tier-list/maker', label: 'Tier List Maker', icon: TierListIcon },
   { href: '/starr-drops', label: 'Starr Drops', icon: StarrDropIcon },
+  { href: '/cosmetics', label: 'Cosmetics', icon: CosmeticsIcon },
   { href: '/news', label: 'News', icon: Newspaper },
   { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
 ];
