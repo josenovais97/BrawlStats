@@ -7,5 +7,5 @@ Requires=docker.service
 Type=oneshot
 User=ubuntu
 WorkingDirectory=/home/ubuntu/brawlstats
-ExecStart=/usr/local/bin/brawlzone-run sampler /usr/bin/docker compose run --rm --build sampler
+ExecStart=/usr/local/bin/brawlzone-run sampler /usr/local/bin/brawlzone-sample
 TimeoutStartSec=1800

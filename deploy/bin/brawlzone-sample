@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Run the stats sampler and report what it did, not how it did it.
+#
+# `docker compose run --build` prints a few hundred lines of build progress,
+# npm notices and layer hashes. On a successful run none of it is information
+# -- the question a log should answer is "did it work and what did it collect",
+# and that was buried under image digests.
+#
+# So: quiet on success, everything on failure. The full output is kept and
+# printed only when the exit code is non-zero, which is exactly when someone
+# needs it -- and when the OnFailure alert mails this log.
+set -uo pipefail
+
+cd "$HOME/brawlstats" || exit 1
+out=$(mktemp)
+trap 'rm -f "$out"' EXIT
+
+echo "Starting sampler"
+start=$(date +%s)
+docker compose run --rm --build sampler >"$out" 2>&1
+rc=$?
+elapsed=$(( $(date +%s) - start ))
+
+if [ "$rc" -ne 0 ]; then
+  echo "Sampler FAILED after ${elapsed}s (exit $rc). Full output follows:"
+  cat "$out"
+  exit "$rc"
+fi
+
+python3 - "$out" "$elapsed" <<'PY'
+import json, re, sys
+
+raw = open(sys.argv[1], encoding="utf-8", errors="replace").read()
+elapsed = sys.argv[2]
+
+# The script prints one JSON object as its result. Find the last balanced one.
+result, depth, start = None, 0, None
+for i, ch in enumerate(raw):
+    if ch == "{":
+        if depth == 0:
+            start = i
+        depth += 1
+    elif ch == "}" and depth:
+        depth -= 1
+        if depth == 0:
+            try:
+                candidate = json.loads(raw[start:i + 1])
+            except ValueError:
+                continue
+            if isinstance(candidate, dict) and "playersSampled" in candidate:
+                result = candidate
+
+if result is None:
+    print(f"Finished in {elapsed}s, but no result was reported -- output kept below.")
+    print(raw[-1500:])
+    sys.exit(0)
+
+n = lambda k: f"{result.get(k, 0):,}"
+print(f"Sampled {n('playersSampled')} players and {n('battlesRecorded')} battles "
+      f"across {n('brawlersUpdated')} brawlers")
+print(f"Rolled up {n('rolledUp')} rows, pruned {n('pruned')}, "
+      f"pool seeded {n('seeded')} and evicted {n('evicted')}")
+
+notes = result.get("notes") or ""
+size = re.search(r"db (\d+)MB \((\d+)% of data budget", notes)
+if size:
+    print(f"Database {size.group(1)} MB, {size.group(2)}% of its budget")
+failed = re.search(r"(\d+) of (\d+) player samples failed", notes)
+if failed:
+    print(f"{failed.group(1)} of {failed.group(2)} player lookups failed "
+          f"(deleted or renamed accounts -- normal)")
+
+status = result.get("status", "?")
+print(f"Status {status}, completed in {elapsed}s")
+PY
