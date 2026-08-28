@@ -182,6 +182,10 @@ export const config = {
     '/leaderboard',
     '/draft',
     '/api/:path*',
+    // Both, because the disallowed prefix has no trailing slash: Umami's
+    // dashboard is at exactly /analytics, and ':path*' alone would miss it.
+    '/analytics',
+    '/analytics/:path*',
     '/player/:path*',
     '/club/:path*',
     '/draft/:path*',

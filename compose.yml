@@ -76,6 +76,32 @@ services:
         max-size: "20m"
         max-file: "5"
 
+  # Self-hosted analytics, replacing Vercel's. Its own database inside the same
+  # Postgres, so it costs a container rather than a service. Cookieless and
+  # first-party -- served under /analytics on the main domain rather than a
+  # subdomain, which means ad blockers that filter known analytics hostnames do
+  # not filter it, and no extra DNS record or certificate is involved.
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    restart: unless-stopped
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_URL: ${UMAMI_DATABASE_URL}
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      BASE_PATH: /analytics
+      DISABLE_TELEMETRY: "1"
+    env_file: .env.production
+    expose:
+      - "3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -98,6 +124,7 @@ services:
       - /var/log/brawlzone:/var/log/brawlzone
     depends_on:
       - app
+      - umami
     logging:
       driver: json-file
       options:

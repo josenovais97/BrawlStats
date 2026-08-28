@@ -25,9 +25,6 @@
 	# and Caddy rejects the whole file, which `caddy reload` then declines,
 	# leaving the previous config running. Silently, unless someone checks the
 	# reload's exit code, which auto-deploy.sh now does.
-	@blocked_agents header_regexp User-Agent (?i)meta-externalagent
-	respond @blocked_agents "Refused. See /robots.txt" 403
-
 	# There was no access log at all until 2026-08-27, which meant no way to
 	# answer "which crawler is hitting what" -- the exact question behind the
 	# outage that moved this project off Vercel.
@@ -44,28 +41,40 @@
 
 	# Next sets its own cache headers per route (see AGENTS.md trap 2) and
 	# Caddy must not override them.
-	reverse_proxy {
-		# Resolved per-refresh rather than once at startup. Docker gives a
-		# recreated container a NEW IP, and a statically-resolved upstream
-		# keeps dialling the dead one -- which fails instantly instead of
-		# being retried, so lb_try_duration never got a chance and deploys
-		# still emitted a 502. Measured 2026-08-27.
-		dynamic a {
-			name app
-			port 3000
-			refresh 1s
-		}
+	# handle blocks, not bare directives: they are mutually exclusive and match
+	# in written order, so "refuse this agent", "this path goes to analytics"
+	# and "everything else goes to the app" cannot be reordered by Caddy's own
+	# directive sorting into something that never fires.
+	#
+	# header_regexp, not header_regex -- the latter is not a registered module
+	# and Caddy rejects the whole file, which `caddy reload` then declines,
+	# leaving the previous config running. Silently, unless someone checks the
+	# reload's exit code, which auto-deploy.sh now does.
+	@blocked_agents header_regexp User-Agent (?i)meta-externalagent
+	handle @blocked_agents {
+		respond "Refused. See /robots.txt" 403
+	}
 
-		# Every deploy recreates the app container, and Caddy returned 502 for
-		# the few seconds it was gone -- the access log caught real requests
-		# hitting that window. Retrying a refused connection for 30s turns a
-		# deploy from a visible error into a short wait.
-		#
-		# Safe here because Caddy only retries when the connection itself
-		# failed, so no request is ever delivered twice, and this site is
-		# read-only GET traffic regardless.
-		lb_try_duration 30s
-		lb_try_interval 250ms
+	# Umami, first-party. Its own BASE_PATH keeps every asset under here.
+	handle /analytics* {
+		reverse_proxy umami:3000
+	}
+
+	handle {
+		reverse_proxy {
+			# Resolved per-refresh rather than once at startup. Docker gives a
+			# recreated container a NEW IP, and a statically-resolved upstream
+			# keeps dialling the dead one -- which fails instantly instead of
+			# being retried, so lb_try_duration never got a chance and deploys
+			# still emitted a 502. Measured 2026-08-27.
+			dynamic a {
+				name app
+				port 3000
+				refresh 1s
+			}
+			lb_try_duration 30s
+			lb_try_interval 250ms
+		}
 	}
 }
 
