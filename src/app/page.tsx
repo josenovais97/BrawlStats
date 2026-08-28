@@ -112,8 +112,27 @@ export default function HomePage() {
       <FavoritesList />
 
       {/*
-        The flagship, immediately after the search that feeds it.
-        
+        The claim that separates this site from every other one, moved up here
+        on 2026-08-28.
+
+        It used to sit last, on the argument that it was the footnote the
+        snapshot earns. That reasoning holds for a reader who arrives at it —
+        the problem is that most never did. It was the eighth section, four
+        screens down, so the one thing a competitor cannot copy was the one
+        thing a bouncing visitor never saw, and everything above it (search, a
+        profile, live events, a tier list) is something the other sites also
+        have. Stating the difference before the evidence costs a little rigour
+        and is the only way it gets read at all.
+
+        It carries its own deep band — see `HomeSplit`.
+      */}
+      <Suspense fallback={null}>
+        <HomeSplit />
+      </Suspense>
+
+      {/*
+        Then the flagship: the search box above feeds it directly.
+
         Live events used to hold this slot, which meant the first thing the
         page demonstrated was a rotation anyone can see in the game. What a
         visitor cannot see anywhere else is what BrawlZone does with their tag,
@@ -161,20 +180,6 @@ export default function HomePage() {
       <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
         <HomeSnapshot revalidate={LIVE_REVALIDATE} />
       </Suspense>
-
-      {/*
-        Straight after the snapshot, because it is the footnote the snapshot
-        earns: those are the Ranked numbers, and the ladder disagrees. Placed
-        anywhere earlier it would be an argument before any evidence.
-        
-        On the deep band because it is the only section that argues rather than
-        reports, and the page should look different where it changes register.
-      */}
-      <HomeBand tone="deep">
-        <Suspense fallback={null}>
-          <HomeSplit />
-        </Suspense>
-      </HomeBand>
 
       <HomeCta />
     </div>

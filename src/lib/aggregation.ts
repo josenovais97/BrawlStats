@@ -1243,6 +1243,47 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   return result.count;
 }
 
+/**
+ * Removes accounts the game says do not exist.
+ *
+ * Eviction otherwise only fires when the pool is *over* `POOL_TARGET`, and it
+ * sits exactly at it — so a deleted account held its slot forever. Measured
+ * 2026-08-28: the same 12 tags failed every run, wasting 1.2% of the sample and
+ * putting an identical, permanent failure line in every log.
+ *
+ * Capped per run rather than trusting the codes blindly. A 404 for one tag is
+ * certain, but a bad deploy or an upstream fault answering 404 to everything
+ * would otherwise empty the pool in a single run, and re-seeding a thousand
+ * players is far more expensive than carrying a dead tag for another two hours.
+ * Above the cap it evicts nothing and says so, because a wave of 404s is a
+ * story about the API rather than about these accounts.
+ */
+const MAX_MISSING_EVICTIONS = 0.05;
+
+async function evictDeletedAccounts(tags: string[], sampled: number): Promise<number> {
+  if (tags.length === 0) return 0;
+
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const cap = Math.max(1, Math.floor(sampled * MAX_MISSING_EVICTIONS));
+  if (tags.length > cap) {
+    console.warn(
+      `[aggregation] ${tags.length} tags reported missing, above the ${cap} cap — ` +
+        'evicting none, since that looks like an upstream fault rather than deletions',
+    );
+    return 0;
+  }
+
+  try {
+    const result = await prisma.sampledPlayer.deleteMany({ where: { tag: { in: tags } } });
+    return result.count;
+  } catch {
+    // A failed eviction costs a wasted slot until the next run, nothing more.
+    return 0;
+  }
+}
+
 /* -------------------------------- sampling -------------------------------- */
 
 /** Finds the sampled player's own entry in a battle, across all mode shapes. */
@@ -1841,12 +1882,22 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
 
     // Group failure reasons so a bad run says *why*, not just how many.
     const reasons = new Map<string, number>();
-    for (const result of results) {
+    const gone: string[] = [];
+    for (const [index, result] of results.entries()) {
       if (result.status === 'rejected') {
         const code = toApiError(result.reason).code;
         reasons.set(code, (reasons.get(code) ?? 0) + 1);
+        // `withRetry` already treats these as permanent: a 404 for a deleted
+        // account never becomes a 200. Collected here so they can leave the
+        // pool -- see `evictDeletedAccounts`.
+        if (code === 'notFound' || code === 'invalidTag') {
+          const tag = targets[index]?.tag;
+          if (tag) gone.push(tag);
+        }
       }
     }
+
+    const evictedMissing = await evictDeletedAccounts(gone, targets.length);
 
     // Checkpoint the sampling work before recomputing. If aggregation fails,
     // the run record still shows what was collected rather than reporting zero.
@@ -1909,7 +1960,8 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       failures > 0
         ? `${failures} of ${results.length} player samples failed (${[...reasons]
             .map(([code, count]) => `${code}: ${count}`)
-            .join(', ')})`
+            .join(', ')})` +
+          (evictedMissing > 0 ? ` · ${evictedMissing} deleted account(s) removed from the pool` : '')
         : null;
 
     const notes =
