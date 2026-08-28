@@ -1,12 +1,12 @@
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { brawlerPath } from "@/lib/slugs";
-import { TIER_COLOR } from "@/lib/stats";
-import { formatNumber, formatPercent } from "@/lib/format";
-import type { BABrawler } from "@/types/brawlapi";
-import type { MetaMover } from "@/types/stats";
+import { brawlerPath } from '@/lib/slugs';
+import { TIER_COLOR } from '@/lib/stats';
+import { formatNumber, formatPercent } from '@/lib/format';
+import type { BABrawler } from '@/types/brawlapi';
+import type { MetaMover } from '@/types/stats';
 
 /**
  * Which brawlers gained or lost ground since the last comparable snapshot.
@@ -66,23 +66,22 @@ export function MetaMovers({
         Meta movers
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-        Change in{" "}
-        <strong className="font-semibold text-foreground">meta score</strong> .
-        The same 0&ndash;10 scale the tiers above use, measured on the stored
+        Change in <strong className="font-semibold text-foreground">meta score</strong>{' '}
+. The same 0&ndash;10 scale the tiers above use, measured on the stored
         daily snapshots, so a mover is a brawler visibly climbing or sliding the
-        Ranked meta.{" "}
+        Ranked meta.{' '}
         {span
-          ? `Measured over the last ${days} ${days === 1 ? "day" : "days"}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
-          : "Measured between the two most recent snapshots."}{" "}
+          ? `Measured over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
+          : 'Measured between the two most recent snapshots.'}{' '}
         Both sides clear the same sample floor as the tier list, and snapshots
         computed under different methodologies are never compared.
         {modeFiltered ? (
           <>
-            {" "}
+            {' '}
             <strong className="font-semibold text-foreground">
               Across all modes
-            </strong>{" "}
-            . The daily snapshots this compares are not split by mode, so the
+            </strong>{' '}
+. The daily snapshots this compares are not split by mode, so the
             filter above does not apply here.
           </>
         ) : null}
@@ -127,7 +126,7 @@ function MoverList({
           a percentage reads as percentage points unless something says
           otherwise, and this column is meta score. */}
       <h3 className={`mb-3 flex items-center gap-2 font-bold ${tone}`}>
-        {tone.includes("victory") ? (
+        {tone.includes('victory') ? (
           <ArrowUpRight className="size-4" />
         ) : (
           <ArrowDownRight className="size-4" />
@@ -186,9 +185,9 @@ function MoverList({
                     {/* The two inputs to the score, so the move is explained
                         rather than asserted. */}
                     <span className="block truncate text-xs text-muted">
-                      {formatPercent(mover.winRateBefore)} →{" "}
-                      {formatPercent(mover.winRateNow)} win ·{" "}
-                      {formatPercent(mover.usageBefore)} →{" "}
+                      {formatPercent(mover.winRateBefore)} →{' '}
+                      {formatPercent(mover.winRateNow)} win ·{' '}
+                      {formatPercent(mover.usageBefore)} →{' '}
                       {formatPercent(mover.usageNow)} pick
                     </span>
                     <span className="block truncate text-xs tabular-nums text-muted">
@@ -198,16 +197,16 @@ function MoverList({
                   <span className="shrink-0 text-right">
                     <span
                       className={`block text-sm font-bold tabular-nums ${
-                        up ? "text-victory" : "text-defeat"
+                        up ? 'text-victory' : 'text-defeat'
                       }`}
                     >
-                      {up ? "+" : "−"}
+                      {up ? '+' : '−'}
                       {Math.abs(mover.metaScoreDelta).toFixed(1)}
                     </span>
                     {/* Not smaller than this: at 10px the decimal point in
                         "8.4 → 7.3" disappears and it reads as "84 → 73". */}
                     <span className="block text-xs tabular-nums text-muted">
-                      {mover.metaScoreBefore.toFixed(1)} →{" "}
+                      {mover.metaScoreBefore.toFixed(1)} →{' '}
                       {mover.metaScoreNow.toFixed(1)}
                     </span>
                   </span>

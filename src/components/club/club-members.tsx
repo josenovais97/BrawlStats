@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { Search, Shield, Star } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Search, Shield, Star } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
-import { CrownIcon, PlayersIcon } from "@/components/game-icons";
+import { CrownIcon, PlayersIcon } from '@/components/game-icons';
 
-import { TrophyIcon } from "@/components/game-icons";
-import { playerIconUrl } from "@/lib/brawlapi";
-import { formatNumber, humanizeRole, nameColorToCss } from "@/lib/format";
-import { normalizeTag } from "@/lib/tags";
-import type { BSClubMember, BSClubRole } from "@/types/brawlstars";
+import { TrophyIcon } from '@/components/game-icons';
+import { playerIconUrl } from '@/lib/brawlapi';
+import { formatNumber, humanizeRole, nameColorToCss } from '@/lib/format';
+import { normalizeTag } from '@/lib/tags';
+import type { BSClubMember, BSClubRole } from '@/types/brawlstars';
 
 /** Higher is more senior — drives the default ordering and badge styling. */
 const ROLE_WEIGHT: Record<string, number> = {
@@ -23,39 +23,34 @@ const ROLE_WEIGHT: Record<string, number> = {
 
 const ROLE_STYLE: Record<
   string,
-  {
-    icon: (props: { className?: string }) => React.ReactNode;
-    className: string;
-  }
+  { icon: (props: { className?: string }) => React.ReactNode; className: string }
 > = {
-  president: { icon: CrownIcon, className: "bg-brand/15 text-brand" },
-  vicePresident: { icon: Shield, className: "bg-accent/20 text-accent" },
-  senior: { icon: Star, className: "bg-victory/15 text-victory" },
-  member: { icon: PlayersIcon, className: "bg-surface-2 text-muted" },
+  president: { icon: CrownIcon, className: 'bg-brand/15 text-brand' },
+  vicePresident: { icon: Shield, className: 'bg-accent/20 text-accent' },
+  senior: { icon: Star, className: 'bg-victory/15 text-victory' },
+  member: { icon: PlayersIcon, className: 'bg-surface-2 text-muted' },
 };
 
 export function ClubMembers({ members }: { members: BSClubMember[] }) {
-  const [query, setQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<BSClubRole | "all">("all");
+  const [query, setQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<BSClubRole | 'all'>('all');
 
   const roles = useMemo(() => {
     const present = new Set(members.map((m) => m.role));
-    return (
-      ["president", "vicePresident", "senior", "member"] as BSClubRole[]
-    ).filter((r) => present.has(r));
+    return (['president', 'vicePresident', 'senior', 'member'] as BSClubRole[]).filter(
+      (r) => present.has(r),
+    );
   }, [members]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return members
-      .filter((m) => (roleFilter === "all" ? true : m.role === roleFilter))
+      .filter((m) => (roleFilter === 'all' ? true : m.role === roleFilter))
       .filter(
         (m) =>
           !q ||
           m.name.toLowerCase().includes(q) ||
-          normalizeTag(m.tag)
-            .toLowerCase()
-            .includes(normalizeTag(q).toLowerCase()),
+          normalizeTag(m.tag).toLowerCase().includes(normalizeTag(q).toLowerCase()),
       )
       .sort(
         (a, b) =>
@@ -65,11 +60,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
   }, [members, query, roleFilter]);
 
   if (members.length === 0) {
-    return (
-      <p className="card p-6 text-sm text-muted">
-        This club has no members listed.
-      </p>
-    );
+    return <p className="card p-6 text-sm text-muted">This club has no members listed.</p>;
   }
 
   return (
@@ -87,27 +78,25 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
         </div>
 
         <div className="flex items-center gap-1 overflow-x-auto">
-          {(["all", ...roles] as const).map((role) => (
+          {(['all', ...roles] as const).map((role) => (
             <button
               key={role}
               type="button"
-              onClick={() => setRoleFilter(role as BSClubRole | "all")}
+              onClick={() => setRoleFilter(role as BSClubRole | 'all')}
               className={`shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 roleFilter === role
-                  ? "bg-brand text-[#1a1200]"
-                  : "border border-border text-muted hover:text-foreground"
+                  ? 'bg-brand text-[#1a1200]'
+                  : 'border border-border text-muted hover:text-foreground'
               }`}
             >
-              {role === "all" ? "All" : humanizeRole(role)}
+              {role === 'all' ? 'All' : humanizeRole(role)}
             </button>
           ))}
         </div>
       </div>
 
       {visible.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">
-          No members match that search.
-        </p>
+        <p className="card p-6 text-sm text-muted">No members match that search.</p>
       ) : (
         <ol className="space-y-2">
           {visible.map((member, index) => {
@@ -118,7 +107,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
-                  prefetch={false}
+                prefetch={false}
                   className="card card-interactive flex items-center gap-3 p-3"
                 >
                   <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums text-muted">
@@ -139,9 +128,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
                     >
                       {member.name}
                     </p>
-                    <p className="truncate font-mono text-xs text-muted">
-                      {member.tag}
-                    </p>
+                    <p className="truncate font-mono text-xs text-muted">{member.tag}</p>
                   </div>
                   <span
                     className={`hidden shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold sm:inline-flex ${style.className}`}

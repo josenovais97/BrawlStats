@@ -1,11 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { brawlerPath } from "@/lib/slugs";
-import { brawlerIconUrl } from "@/lib/brawlapi";
-import { formatPercent } from "@/lib/format";
-import type { BABrawler } from "@/types/brawlapi";
-import type { ModeBestPicks } from "@/types/stats";
+import { brawlerPath } from '@/lib/slugs';
+import { brawlerIconUrl } from '@/lib/brawlapi';
+import { formatPercent } from '@/lib/format';
+import type { BABrawler } from '@/types/brawlapi';
+import type { ModeBestPicks } from '@/types/stats';
 
 /**
  * The strongest brawlers for an event card — for the map when the map has been
@@ -36,7 +36,7 @@ export function ModeBestPicks({
   mapName?: string | null;
   modeLabel?: string;
   /** Which population the picks were actually computed over. */
-  scope: "map" | "mode";
+  scope: 'map' | 'mode';
 }) {
   if (!data || data.picks.length === 0) {
     return (
@@ -50,9 +50,9 @@ export function ModeBestPicks({
     <div className="border-t border-border px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="eyebrow truncate" style={{ color: accent }}>
-          {scope === "map" && mapName
+          {scope === 'map' && mapName
             ? `Best picks for ${mapName}`
-            : `Best ${modeLabel ?? "mode"} picks`}
+            : `Best ${modeLabel ?? 'mode'} picks`}
         </p>
         <p className="shrink-0 text-xs tabular-nums text-muted">
           {formatPercent(data.baselineWinRate)} avg
@@ -62,7 +62,7 @@ export function ModeBestPicks({
       {/* Stated on the card itself rather than a page away: someone reading an
           event card is about to queue, and whether this is about their map or
           their mode changes what the list is worth. */}
-      {scope === "mode" ? (
+      {scope === 'mode' ? (
         <p className="mt-1 text-xs leading-snug text-muted">
           Map sample too small. Using mode-wide data.
         </p>

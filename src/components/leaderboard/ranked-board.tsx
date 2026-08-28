@@ -1,12 +1,12 @@
-import { RankedIcon } from "@/components/game-icons";
-import Image from "next/image";
-import Link from "next/link";
+import { RankedIcon } from '@/components/game-icons';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { TrophyIcon } from "@/components/game-icons";
-import { playerIconUrl, rankedLeagueIconUrl } from "@/lib/brawlapi";
-import { formatNumber, titleCaseLabel } from "@/lib/format";
-import { getRankedLeaderboard } from "@/lib/stats";
-import { displayTag } from "@/lib/tags";
+import { TrophyIcon } from '@/components/game-icons';
+import { playerIconUrl, rankedLeagueIconUrl } from '@/lib/brawlapi';
+import { formatNumber, titleCaseLabel } from '@/lib/format';
+import { getRankedLeaderboard } from '@/lib/stats';
+import { displayTag } from '@/lib/tags';
 
 /**
  * Top players by Ranked elo.
@@ -33,8 +33,8 @@ export async function RankedBoard() {
         </span>
         <h2 className="mt-4 text-xl font-bold">Collecting Ranked standings</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Elo is recorded as the sampler works through the player pool, and as
-          people look profiles up. This board fills in over the next day or two.
+          Elo is recorded as the sampler works through the player pool, and as people look profiles
+          up. This board fills in over the next day or two.
         </p>
       </div>
     );
@@ -43,10 +43,9 @@ export async function RankedBoard() {
   return (
     <section>
       <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
-        Current season standing. The game API publishes no Ranked leaderboard,
-        so this one is built from the {formatNumber(pool)} sampled players who
-        have played Ranked this season. The top {players.length} of those, not a
-        global board. Looking up a profile adds it to the pool.
+        Current season standing. The game API publishes no Ranked leaderboard, so this one is built
+        from the {formatNumber(pool)} sampled players who have played Ranked this season. The top{' '}
+        {players.length} of those, not a global board. Looking up a profile adds it to the pool.
       </p>
 
       <ol className="space-y-1.5">

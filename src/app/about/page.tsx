@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import {
   ArrowRight,
   Coffee,
@@ -8,38 +8,38 @@ import {
   RefreshCw,
   Search,
   Shield,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
-import { CONTACT_EMAIL } from "@/lib/site";
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { CONTACT_EMAIL } from '@/lib/site';
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/about" },
-  title: "About",
+  alternates: { canonical: '/about' },
+  title: 'About',
   description:
-    "What BrawlZone is, where its data comes from, and what it can and cannot tell you.",
+    'What BrawlZone is, where its data comes from, and what it can and cannot tell you.',
 };
 
 const SOURCES = [
   {
     icon: Shield,
-    title: "Official Brawl Stars API",
-    href: "https://developer.brawlstars.com",
-    body: "Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.",
+    title: 'Official Brawl Stars API',
+    href: 'https://developer.brawlstars.com',
+    body: 'Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.',
   },
   {
     icon: Database,
-    title: "Brawlify CDN",
-    href: "https://brawlify.com",
-    body: "Brawler portraits, star power and gadget art, gears, ranked badges, maps and game mode icons.",
+    title: 'Brawlify CDN',
+    href: 'https://brawlify.com',
+    body: 'Brawler portraits, star power and gadget art, gears, ranked badges, maps and game mode icons.',
   },
   {
     icon: RefreshCw,
-    title: "Supercell news & release notes",
-    href: "https://supercell.com/en/games/brawlstars/blog/",
-    body: "Official announcements and the full text of each update, resolved automatically as new posts go live.",
+    title: 'Supercell news & release notes',
+    href: 'https://supercell.com/en/games/brawlstars/blog/',
+    body: 'Official announcements and the full text of each update, resolved automatically as new posts go live.',
   },
 ];
 
@@ -99,24 +99,24 @@ export default function AboutPage() {
         <ul className="card divide-y divide-border p-0">
           {[
             [
-              "Battle history only goes back ~25 matches",
-              "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.",
+              'Battle history only goes back ~25 matches',
+              'That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.',
             ],
             [
-              "Leaderboards stop at 200",
-              "The API refuses to return more, so top-200 is the deepest placement that exists. There is no top-500.",
+              'Leaderboards stop at 200',
+              'The API refuses to return more, so top-200 is the deepest placement that exists. There is no top-500.',
             ],
             [
-              "Loadouts are not published",
-              "The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler\u2019s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.",
+              'Loadouts are not published',
+              'The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler\u2019s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.',
             ],
             [
-              "Tier list percentages are adjusted",
-              "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.",
+              'Tier list percentages are adjusted',
+              'Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.',
             ],
             [
-              "Coins, power points and playtime are estimates",
-              "Derived from published upgrade costs and victory counts. Bling is not exposed by the API at all, so we do not show it.",
+              'Coins, power points and playtime are estimates',
+              'Derived from published upgrade costs and victory counts. Bling is not exposed by the API at all, so we do not show it.',
             ],
           ].map(([title, body]) => (
             <li key={title} className="p-5">
@@ -135,24 +135,24 @@ export default function AboutPage() {
         <ul className="card divide-y divide-border">
           {[
             [
-              "Live now",
-              "The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.",
+              'Live now',
+              'The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.',
             ],
             [
-              "Ranked pool",
-              "The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.",
+              'Ranked pool',
+              'The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.',
             ],
             [
-              "Full catalogue",
-              "Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.",
+              'Full catalogue',
+              'Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.',
             ],
             [
-              "Map picks vs mode picks",
-              "A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.",
+              'Map picks vs mode picks',
+              'A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.',
             ],
             [
-              "Confidence labels",
-              "Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.",
+              'Confidence labels',
+              'Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.',
             ],
           ].map(([title, body]) => (
             <li key={title} className="p-5">
@@ -171,23 +171,22 @@ export default function AboutPage() {
           </span>
           <div className="space-y-2 text-sm leading-relaxed text-muted">
             <p>
-              There is no account system, so there is nothing to sign up for and
-              no password to store. Your recent searches and saved profiles live
-              in your own browser&apos;s local storage and are never sent to us.
-              Clearing your browser data removes them for good.
+              There is no account system, so there is nothing to sign up for and no
+              password to store. Your recent searches and saved profiles live in your
+              own browser&apos;s local storage and are never sent to us. Clearing your
+              browser data removes them for good.
             </p>
             <p>
               {/* Previously this said "no tracking", which was not true while
                   Vercel Analytics is enabled. Stating it plainly is the point
                   of this page. */}
-              The site does use Vercel&apos;s privacy-friendly analytics to
-              count page views. It records no cookies and does not build a
-              profile of you or follow you across other sites. It is a visit
-              counter, not ad tracking.
+              The site does use Vercel&apos;s privacy-friendly analytics to count page
+              views. It records no cookies and does not build a profile of you or follow
+              you across other sites. It is a visit counter, not ad tracking.
             </p>
             <p>
-              Looking up a tag is a public action: the same data is available to
-              anyone through the official API.
+              Looking up a tag is a public action: the same data is available to anyone
+              through the official API.
             </p>
           </div>
         </div>
@@ -224,10 +223,9 @@ export default function AboutPage() {
             {CONTACT_EMAIL}
           </a>
           <p className="mt-3 max-w-2xl leading-relaxed text-muted">
-            Is there a feature you would like to see on BrawlZone? Something
-            that looks wrong, or a page you wish existed? Send it over &mdash;
-            ideas for what this site should do next are the most useful thing
-            you can put in my inbox.
+            Is there a feature you would like to see on BrawlZone? Something that looks
+            wrong, or a page you wish existed? Send it over &mdash; ideas for what this
+            site should do next are the most useful thing you can put in my inbox.
           </p>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
             One person reads every message, so a reply can take a few days.
@@ -236,9 +234,8 @@ export default function AboutPage() {
             {/* Kept, and kept last: without it this address collects &ldquo;unban
                 me&rdquo; mail, which is neither answerable here nor a good use of
                 anyone&apos;s time. */}
-            Account help, bans and purchases are Supercell&apos;s &mdash; this
-            site only reads the public API and cannot change anything about your
-            account.
+            Account help, bans and purchases are Supercell&apos;s &mdash; this site only
+            reads the public API and cannot change anything about your account.
           </p>
         </div>
       </section>
@@ -248,8 +245,7 @@ export default function AboutPage() {
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.12]"
           style={{
-            background:
-              "radial-gradient(30rem 14rem at 50% 0%, #ffc53d, transparent 70%)",
+            background: 'radial-gradient(30rem 14rem at 50% 0%, #ffc53d, transparent 70%)',
           }}
         />
         <div className="relative">
@@ -258,8 +254,8 @@ export default function AboutPage() {
             Built by one person
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-muted">
-            BrawlZone is free, ad-free and has no paywall. If it saved you some
-            time, a coffee goes a long way.
+            BrawlZone is free, ad-free and has no paywall. If it saved you some time,
+            a coffee goes a long way.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -283,8 +279,8 @@ export default function AboutPage() {
       </section>
 
       <p className="text-center text-xs text-muted/80">
-        This material is unofficial and is not endorsed by Supercell. For more
-        information see Supercell&apos;s Fan Content Policy.
+        This material is unofficial and is not endorsed by Supercell. For more information
+        see Supercell&apos;s Fan Content Policy.
       </p>
     </div>
   );

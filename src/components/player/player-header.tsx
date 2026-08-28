@@ -1,18 +1,18 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { FavoriteButton } from "@/components/favorite-button";
+import { FavoriteButton } from '@/components/favorite-button';
 import {
   ClubIcon,
   ExperienceIcon,
   PrestigeIcon,
   TrophyIcon,
-} from "@/components/game-icons";
-import { playerIconUrl } from "@/lib/brawlapi";
-import { formatNumber, nameColorToCss } from "@/lib/format";
-import { ShareButton } from "@/components/player/share-button";
-import { normalizeTag } from "@/lib/tags";
-import type { BSPlayer } from "@/types/brawlstars";
+} from '@/components/game-icons';
+import { playerIconUrl } from '@/lib/brawlapi';
+import { formatNumber, nameColorToCss } from '@/lib/format';
+import { ShareButton } from '@/components/player/share-button';
+import { normalizeTag } from '@/lib/tags';
+import type { BSPlayer } from '@/types/brawlstars';
 
 export function PlayerHeader({
   player,
@@ -83,9 +83,7 @@ export function PlayerHeader({
             >
               {player.name}
             </h1>
-            <p className="mt-1 truncate font-mono text-sm text-muted">
-              {player.tag}
-            </p>
+            <p className="mt-1 truncate font-mono text-sm text-muted">{player.tag}</p>
           </div>
         </div>
 
@@ -136,10 +134,7 @@ export function PlayerHeader({
               number beside it is the exact total. */}
           {player.totalPrestigeLevel ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium">
-              <PrestigeIcon
-                total={player.totalPrestigeLevel}
-                className="size-4"
-              />
+              <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />
               Prestige {formatNumber(player.totalPrestigeLevel)}
             </span>
           ) : null}

@@ -1,41 +1,33 @@
-import { Suspense } from "react";
-import type { Metadata } from "next";
-import { headers } from "next/headers";
-import { after } from "next/server";
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { after } from 'next/server';
 
-import { BattleLog } from "@/components/player/battle-log";
-import { LastOnline } from "@/components/player/last-online";
-import { PlayerBrawlers } from "@/components/player/player-brawlers";
-import { PlayerHeader } from "@/components/player/player-header";
-import { PlayerNav } from "@/components/player/player-nav";
-import { PlayerProgress } from "@/components/player/player-progress";
-import { SinceLastVisit } from "@/components/player/since-last-visit";
-import { PlayerMetaFit } from "@/components/player/player-meta-fit";
-import { PlayerRecords, PlayerStats } from "@/components/player/player-stats";
-import { PlayerSkillScore } from "@/components/player/player-skill-score";
-import { PlayerUpgradeGap } from "@/components/player/player-upgrade-gap";
-import { ErrorState } from "@/components/ui/error-state";
-import { BattleLogSkeleton, InsightsSkeleton } from "@/components/ui/skeletons";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { PlayerProgression } from "@/components/player/player-progression";
-import { RecentSearchRecorder } from "@/components/recent-search-recorder";
-import { RosterRecorder } from "@/components/player/roster-recorder";
-import { PlayerInsights } from "@/components/player/player-insights";
-import { PlayerPlacements } from "@/components/player/player-placements";
-import { PlayerRanked } from "@/components/player/player-ranked";
-import {
-  getOfficialBrawlers,
-  getPlayer,
-  getPlayerRankings,
-} from "@/lib/bs-api";
-import { getBrawlerMap } from "@/lib/brawlapi";
-import {
-  coinsToMaxFrom,
-  computeProgression,
-  estimatePlaytime,
-} from "@/lib/progression";
-import { computeSkillScore } from "@/lib/skill-score";
-import { toApiError } from "@/lib/errors";
+import { BattleLog } from '@/components/player/battle-log';
+import { LastOnline } from '@/components/player/last-online';
+import { PlayerBrawlers } from '@/components/player/player-brawlers';
+import { PlayerHeader } from '@/components/player/player-header';
+import { PlayerNav } from '@/components/player/player-nav';
+import { PlayerProgress } from '@/components/player/player-progress';
+import { SinceLastVisit } from '@/components/player/since-last-visit';
+import { PlayerMetaFit } from '@/components/player/player-meta-fit';
+import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
+import { PlayerSkillScore } from '@/components/player/player-skill-score';
+import { PlayerUpgradeGap } from '@/components/player/player-upgrade-gap';
+import { ErrorState } from '@/components/ui/error-state';
+import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { PlayerProgression } from '@/components/player/player-progression';
+import { RecentSearchRecorder } from '@/components/recent-search-recorder';
+import { RosterRecorder } from '@/components/player/roster-recorder';
+import { PlayerInsights } from '@/components/player/player-insights';
+import { PlayerPlacements } from '@/components/player/player-placements';
+import { PlayerRanked } from '@/components/player/player-ranked';
+import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
+import { getBrawlerMap } from '@/lib/brawlapi';
+import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
+import { computeSkillScore } from '@/lib/skill-score';
+import { toApiError } from '@/lib/errors';
 import {
   getMetaIndex,
   getPlayerBrawlerPlacements,
@@ -43,23 +35,21 @@ import {
   getTrophyHistory,
   getTrophyPercentile,
   recordLookup,
-} from "@/lib/stats";
-import { displayTag, normalizeTag } from "@/lib/tags";
-import type { BSPlayer } from "@/types/brawlstars";
+} from '@/lib/stats';
+import { displayTag, normalizeTag } from '@/lib/tags';
+import type { BSPlayer } from '@/types/brawlstars';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { tag } = await params;
   try {
     const player = await getPlayer(tag);
     return {
       title: `${player.name} (${displayTag(player.tag)})`,
-      description: `${player.name} has ${player.trophies.toLocaleString("en-US")} trophies and ${player.brawlers.length} brawlers.`,
+      description: `${player.name} has ${player.trophies.toLocaleString('en-US')} trophies and ${player.brawlers.length} brawlers.`,
       // Normalised, so #ABC, %23ABC and abc all resolve to one indexable URL
       // rather than three competing ones.
       alternates: { canonical: `/player/${normalizeTag(player.tag)}` },
@@ -85,9 +75,9 @@ export default async function PlayerPage({ params }: PageProps) {
     return (
       <ErrorState
         code={apiError.code}
-        title={apiError.code === "notFound" ? "Player not found" : undefined}
+        title={apiError.code === 'notFound' ? 'Player not found' : undefined}
         detail={
-          apiError.code === "notFound"
+          apiError.code === 'notFound'
             ? `No player exists with the tag ${displayTag(tag)}. Check it in-game under your profile.`
             : undefined
         }
@@ -112,7 +102,7 @@ export default async function PlayerPage({ params }: PageProps) {
    *
    * `after` runs it once the response is sent, so it never delays the page.
    */
-  const isPrefetch = (await headers()).get("next-router-prefetch") === "1";
+  const isPrefetch = (await headers()).get('next-router-prefetch') === '1';
 
   if (!isPrefetch) {
     after(() =>
@@ -152,7 +142,7 @@ export default async function PlayerPage({ params }: PageProps) {
   const trophyHistory = await getTrophyHistory(normalizedTag);
   // The trophy tier list, joined against this roster below and onto every tile
   // in the grid. Empty without a database, which every consumer handles.
-  const metaIndex = await getMetaIndex("trophy", 7);
+  const metaIndex = await getMetaIndex('trophy', 7);
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
@@ -217,11 +207,7 @@ export default async function PlayerPage({ params }: PageProps) {
        */}
       <PlayerSkillScore skill={skill} />
       <Suspense fallback={<PlayerRanked player={player} standing={standing} />}>
-        <RankedWithBoard
-          player={player}
-          standing={standing}
-          tag={normalizedTag}
-        />
+        <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
       </Suspense>
 
       <div id="stats" className="scroll-anchor-nav space-y-8">
@@ -260,21 +246,13 @@ export default async function PlayerPage({ params }: PageProps) {
       />
 
       <Suspense fallback={<InsightsSkeleton />}>
-        <PlayerInsights
-          tag={tag}
-          playerTag={player.tag}
-          brawlerMeta={brawlerMeta}
-        />
+        <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
       </Suspense>
 
       <section id="battles" className="scroll-anchor-nav">
         <SectionHeading title="Recent battles" />
         <Suspense fallback={<BattleLogSkeleton />}>
-          <BattleLog
-            tag={tag}
-            playerTag={player.tag}
-            brawlerMeta={brawlerMeta}
-          />
+          <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
         </Suspense>
       </section>
 
@@ -322,11 +300,9 @@ async function RankedWithBoard({
   standing: Awaited<ReturnType<typeof getTrophyPercentile>>;
   tag: string;
 }) {
-  const globalRank = await getPlayerRankings("global", 200)
+  const globalRank = await getPlayerRankings('global', 200)
     .then((r) => r.items.find((p) => normalizeTag(p.tag) === tag)?.rank ?? null)
     .catch(() => null);
 
-  return (
-    <PlayerRanked player={player} globalRank={globalRank} standing={standing} />
-  );
+  return <PlayerRanked player={player} globalRank={globalRank} standing={standing} />;
 }

@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import { CompareTool } from "@/components/compare/compare-tool";
+import { CompareTool } from '@/components/compare/compare-tool';
 
 export const metadata: Metadata = {
-  title: "Compare Brawl Stars players and brawlers side by side",
+  title: 'Compare Brawl Stars players and brawlers side by side',
   description:
-    "Put two Brawl Stars players or two brawlers side by side: trophies, Ranked, skill score, account completion, win rates and head-to-head records.",
-  alternates: { canonical: "/compare" },
+    'Put two Brawl Stars players or two brawlers side by side: trophies, Ranked, skill score, account completion, win rates and head-to-head records.',
+  alternates: { canonical: '/compare' },
 };
 
 export const revalidate = 3600;

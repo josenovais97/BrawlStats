@@ -1,23 +1,18 @@
-import type { Metadata } from "next";
-import { ChevronDown } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
-import { ErrorState } from "@/components/ui/error-state";
-import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
-import {
-  getStarrDrops,
-  type DropReward,
-  type DropTable,
-  type DropType,
-} from "@/lib/starr-drops";
+import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { getStarrDrops, type DropReward, type DropTable, type DropType } from '@/lib/starr-drops';
 
 export const metadata: Metadata = {
-  title: "Brawl Stars Starr Drop odds. Every drop rate and what is inside",
+  title: 'Brawl Stars Starr Drop odds. Every drop rate and what is inside',
   description:
-    "Exact Starr Drop chances: how often each rarity rolls, and every reward inside Rare, Super Rare, Epic, Mythic and Legendary drops. Plus Chaos Drops and every event drop.",
-  alternates: { canonical: "/starr-drops" },
+    'Exact Starr Drop chances: how often each rarity rolls, and every reward inside Rare, Super Rare, Epic, Mythic and Legendary drops. Plus Chaos Drops and every event drop.',
+  alternates: { canonical: '/starr-drops' },
 };
 
 /** The wiki updates on balance changes; twice a day is plenty. */
@@ -50,14 +45,12 @@ export default async function StarrDropsPage() {
     );
   }
 
-  const core = data.types.filter((type) => type.group === "core");
-  const event = data.types.filter((type) => type.group === "event");
+  const core = data.types.filter((type) => type.group === 'core');
+  const event = data.types.filter((type) => type.group === 'event');
 
   return (
     <div className="space-y-10">
-      <JsonLd
-        data={breadcrumbSchema([{ name: "Starr Drops", path: "/starr-drops" }])}
-      />
+      <JsonLd data={breadcrumbSchema([{ name: 'Starr Drops', path: '/starr-drops' }])} />
 
       <PageHeading
         eyebrow="Every drop rate"
@@ -99,7 +92,7 @@ export default async function StarrDropsPage() {
       ) : null}
 
       <p className="text-xs leading-relaxed text-muted">
-        Drop rates and contents from the{" "}
+        Drop rates and contents from the{' '}
         <a
           href={data.sourceUrl}
           rel="noreferrer noopener"
@@ -108,14 +101,10 @@ export default async function StarrDropsPage() {
         >
           Brawl Stars Wiki
         </a>
-        , CC-BY-SA. Supercell publishes no drop-rate API, so these are
-        community-maintained from datamines and in-game observation rather than
-        official figures. For what the meta looks like once you have the
-        brawlers, see the{" "}
-        <Link
-          href="/tier-list/ranked"
-          className="font-medium text-brand hover:underline"
-        >
+        , CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from
+        datamines and in-game observation rather than official figures. For what the meta looks like
+        once you have the brawlers, see the{' '}
+        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
           Ranked tier list
         </Link>
         .
@@ -133,17 +122,8 @@ export default async function StarrDropsPage() {
  * about anything. Leading each section with the real image is what makes it
  * scannable.
  */
-function DropSection({
-  type,
-  defaultOpen = false,
-}: {
-  type: DropType;
-  defaultOpen?: boolean;
-}) {
-  const rewardCount = type.tables.reduce(
-    (sum, table) => sum + table.rewards.length,
-    0,
-  );
+function DropSection({ type, defaultOpen = false }: { type: DropType; defaultOpen?: boolean }) {
+  const rewardCount = type.tables.reduce((sum, table) => sum + table.rewards.length, 0);
 
   return (
     <details open={defaultOpen} className="group card overflow-hidden">
@@ -160,9 +140,7 @@ function DropSection({
         ) : null}
 
         <div className="min-w-0 flex-1">
-          <h3 className="display text-base uppercase sm:text-lg">
-            {type.name}
-          </h3>
+          <h3 className="display text-base uppercase sm:text-lg">{type.name}</h3>
           {/*
             One line closed, the whole thing open. The description is the only
             place that says where a drop comes from, so it is worth a glance in
@@ -177,16 +155,13 @@ function DropSection({
         <span className="hidden shrink-0 text-right text-xs text-muted sm:block">
           {rewardCount > 0 ? (
             <>
-              <span className="font-bold tabular-nums text-foreground">
-                {rewardCount}
-              </span>{" "}
-              rewards
+              <span className="font-bold tabular-nums text-foreground">{rewardCount}</span> rewards
               {type.rarityOdds.length > 0 ? (
                 <span className="block">{type.rarityOdds.length} rarities</span>
               ) : null}
             </>
           ) : (
-            "No table"
+            'No table'
           )}
         </span>
 
@@ -216,9 +191,7 @@ function DropSection({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted">
-            The wiki publishes no reward table for this drop.
-          </p>
+          <p className="text-sm text-muted">The wiki publishes no reward table for this drop.</p>
         )}
       </div>
     </details>
@@ -233,19 +206,19 @@ function DropSection({
  * S-to-D colours here would imply these are rankings rather than rarities.
  */
 const RARITY_COLOR: Record<string, string> = {
-  Rare: "#5fd45f",
-  "Super Rare": "#3ea8ff",
-  Epic: "#c05bff",
-  Mythic: "#ff4d6d",
-  Legendary: "#ffc53d",
-  Ultra: "#ff8a3d",
-  "Ultra Legendary": "#ff8a3d",
-  Angelic: "#ffe9a8",
-  Demonic: "#ff5c72",
+  Rare: '#5fd45f',
+  'Super Rare': '#3ea8ff',
+  Epic: '#c05bff',
+  Mythic: '#ff4d6d',
+  Legendary: '#ffc53d',
+  Ultra: '#ff8a3d',
+  'Ultra Legendary': '#ff8a3d',
+  Angelic: '#ffe9a8',
+  Demonic: '#ff5c72',
 };
 
 function rarityColor(rarity: string | null): string {
-  return (rarity && RARITY_COLOR[rarity]) || "var(--accent)";
+  return (rarity && RARITY_COLOR[rarity]) || 'var(--accent)';
 }
 
 function RarityBar({ type }: { type: DropType }) {
@@ -258,7 +231,7 @@ function RarityBar({ type }: { type: DropType }) {
         role="img"
         aria-label={type.rarityOdds
           .map((odd) => `${odd.rarity} ${(odd.chance * 100).toFixed(0)}%`)
-          .join(", ")}
+          .join(', ')}
       >
         {type.rarityOdds.map((odd) => (
           <span
@@ -295,10 +268,7 @@ function RewardTable({ table }: { table: DropTable }) {
   const color = rarityColor(table.rarity);
   // A point of slack for the wiki's rounded percentages.
   const short = table.listed < 0.99;
-  const most = Math.max(
-    ...table.rewards.map((reward) => reward.chance ?? 0),
-    0,
-  );
+  const most = Math.max(...table.rewards.map((reward) => reward.chance ?? 0), 0);
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface-2/20">
@@ -316,12 +286,7 @@ function RewardTable({ table }: { table: DropTable }) {
 
       <ul className="divide-y divide-border/60">
         {table.rewards.map((reward) => (
-          <RewardRow
-            key={reward.reward}
-            reward={reward}
-            color={color}
-            most={most}
-          />
+          <RewardRow key={reward.reward} reward={reward} color={color} most={most} />
         ))}
       </ul>
 
@@ -380,12 +345,8 @@ function RewardRow({
           width and the number moves down beside its own bar.
         */}
         <p className="text-sm leading-tight">
-          {reward.amount ? (
-            <span className="font-bold tabular-nums">{reward.amount} </span>
-          ) : null}
-          <span className={reward.amount ? "text-muted" : ""}>
-            {reward.label}
-          </span>
+          {reward.amount ? <span className="font-bold tabular-nums">{reward.amount} </span> : null}
+          <span className={reward.amount ? 'text-muted' : ''}>{reward.label}</span>
         </p>
 
         <div className="mt-1.5 flex items-center gap-2">
@@ -401,10 +362,7 @@ function RewardRow({
             reward is too short to see, and the comparison worth making here is
             between the rows of one table.
           */}
-          <span
-            aria-hidden
-            className="h-[3px] flex-1 overflow-hidden rounded-full bg-surface-3/70"
-          >
+          <span aria-hidden className="h-[3px] flex-1 overflow-hidden rounded-full bg-surface-3/70">
             {reward.chance !== null && most > 0 ? (
               <span
                 className="block h-full rounded-full"
@@ -417,9 +375,7 @@ function RewardRow({
           </span>
 
           <span className="shrink-0 text-xs font-bold tabular-nums">
-            {reward.chance === null
-              ? "–"
-              : `${(reward.chance * 100).toFixed(2)}%`}
+            {reward.chance === null ? '–' : `${(reward.chance * 100).toFixed(2)}%`}
           </span>
         </div>
       </div>

@@ -1,7 +1,7 @@
-import { Play } from "lucide-react";
-import Image from "next/image";
+import { Play } from 'lucide-react';
+import Image from 'next/image';
 
-import { CHANNEL_URL, getLatestVideo } from "@/lib/youtube";
+import { CHANNEL_URL, getLatestVideo } from '@/lib/youtube';
 
 /**
  * The channel's latest video, as one row rather than as a section.
@@ -26,10 +26,10 @@ export async function HomeLatestVideo() {
   const published = video.publishedAt ? new Date(video.publishedAt) : null;
   const dateLabel =
     published && !Number.isNaN(published.getTime())
-      ? published.toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
+      ? published.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
         })
       : null;
 
@@ -66,7 +66,7 @@ export async function HomeLatestVideo() {
           {video.title}
         </span>
         <span className="mt-1 block text-xs text-muted">
-          {dateLabel ? `${dateLabel} · ` : ""}youtube.com/@brawlzonenet
+          {dateLabel ? `${dateLabel} · ` : ''}youtube.com/@brawlzonenet
         </span>
       </span>
     </a>

@@ -1,7 +1,7 @@
-import { Radio } from "lucide-react";
+import { Radio } from 'lucide-react';
 
-import { getBattleLog } from "@/lib/bs-api";
-import { minutesSince, relativeTime } from "@/lib/format";
+import { getBattleLog } from '@/lib/bs-api';
+import { minutesSince, relativeTime } from '@/lib/format';
 
 /** Under this many minutes since the last battle, treat the player as online. */
 const ONLINE_WINDOW_MINUTES = 15;
@@ -36,8 +36,8 @@ export async function LastOnline({ tag }: { tag: string }) {
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium ${
         online
-          ? "border-victory/40 bg-victory/10 text-victory"
-          : "border-border bg-surface-2 text-muted"
+          ? 'border-victory/40 bg-victory/10 text-victory'
+          : 'border-border bg-surface-2 text-muted'
       }`}
     >
       {online ? (
@@ -45,7 +45,7 @@ export async function LastOnline({ tag }: { tag: string }) {
       ) : (
         <Radio className="size-3.5" aria-hidden />
       )}
-      {online ? "In a match recently" : `Last seen ${relativeTime(newest)}`}
+      {online ? 'In a match recently' : `Last seen ${relativeTime(newest)}`}
     </span>
   );
 }

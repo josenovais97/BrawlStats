@@ -1,19 +1,15 @@
-import { ArrowUpRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Suspense } from "react";
-import type { ReactNode } from "react";
+import { ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense } from 'react';
+import type { ReactNode } from 'react';
 
-import { SearchBar } from "@/components/search-bar";
-import {
-  brawlerModelUrl,
-  brawlerPortraitUrl,
-  hasBrawlerModel,
-} from "@/lib/brawlapi";
-import { getTopMetaBrawlers } from "@/lib/home-meta";
-import { SAMPLE_PLAYER_TAG } from "@/lib/site";
-import { brawlerPath } from "@/lib/slugs";
-import { TIER_COLOR } from "@/lib/tiers";
+import { SearchBar } from '@/components/search-bar';
+import { brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { getTopMetaBrawlers } from '@/lib/home-meta';
+import { SAMPLE_PLAYER_TAG } from '@/lib/site';
+import { brawlerPath } from '@/lib/slugs';
+import { TIER_COLOR } from '@/lib/tiers';
 
 /**
  * The hero, as a command centre.
@@ -45,9 +41,9 @@ import { TIER_COLOR } from "@/lib/tiers";
  * Spike while pointing at 16000024 and 16000019, which are neither.
  */
 const FALLBACK_CAST = [
-  { id: 16000011, name: "Mortis" },
-  { id: 16000023, name: "Leon" },
-  { id: 16000043, name: "Edgar" },
+  { id: 16000011, name: 'Mortis' },
+  { id: 16000023, name: 'Leon' },
+  { id: 16000043, name: 'Edgar' },
 ];
 
 export function HomeHero({ stats }: { stats?: ReactNode }) {
@@ -89,8 +85,8 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
               </h1>
 
               <p className="mt-3.5 max-w-md leading-relaxed text-muted">
-                Search any player or club. See skill score, roster gaps,
-                progression and live meta context in seconds.
+                Search any player or club. See skill score, roster gaps, progression and live meta
+                context in seconds.
               </p>
 
               <Console />
@@ -125,9 +121,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
       */}
       {stats ? (
         <div className="relative border-y border-border/60 bg-background/55 backdrop-blur-sm">
-          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-            {stats}
-          </div>
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">{stats}</div>
           {/* The handover: the rail's edge dissolves into the page instead of
               stopping on a hard line. */}
           <span
@@ -169,7 +163,7 @@ function Console() {
         className="pointer-events-none absolute -inset-x-8 -bottom-8 -top-5 -z-10 rounded-[2.5rem] opacity-70 blur-3xl"
         style={{
           background:
-            "radial-gradient(58% 58% at 26% 0%, color-mix(in srgb, #ffc53d 24%, transparent), transparent 72%)",
+            'radial-gradient(58% 58% at 26% 0%, color-mix(in srgb, #ffc53d 24%, transparent), transparent 72%)',
         }}
       />
 
@@ -197,7 +191,7 @@ function Console() {
                 what a lookup returns without inventing numbers.
               */
               <p className="mt-2.5 text-sm text-muted">
-                No tag handy?{" "}
+                No tag handy?{' '}
                 <Link
                   href={`/player/${SAMPLE_PLAYER_TAG}`}
                   className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
@@ -265,10 +259,8 @@ async function Stage() {
    * link. One framed portrait standing between two full bodies reads as a
    * failure; three framed portraits read as a deliberate treatment.
    */
-  const available = await Promise.all(
-    slots.map((s) => hasBrawlerModel(s.brawlerId)),
-  );
-  const treatment: Treatment = available.every(Boolean) ? "model" : "portrait";
+  const available = await Promise.all(slots.map((s) => hasBrawlerModel(s.brawlerId)));
+  const treatment: Treatment = available.every(Boolean) ? 'model' : 'portrait';
 
   const [left, centre, right] = slots;
 
@@ -280,7 +272,7 @@ async function Stage() {
         className="pointer-events-none absolute inset-x-[8%] -top-6 bottom-[16%] opacity-70"
         style={{
           background:
-            "radial-gradient(60% 80% at 50% 0%, color-mix(in srgb, #ffffff 9%, transparent), transparent 70%)",
+            'radial-gradient(60% 80% at 50% 0%, color-mix(in srgb, #ffffff 9%, transparent), transparent 70%)',
         }}
       />
 
@@ -290,27 +282,15 @@ async function Stage() {
         className="pointer-events-none absolute inset-x-[6%] bottom-[3%] h-16 rounded-[50%] opacity-60 blur-2xl"
         style={{
           background:
-            "radial-gradient(closest-side, color-mix(in srgb, #8b6bff 80%, transparent), transparent)",
+            'radial-gradient(closest-side, color-mix(in srgb, #8b6bff 80%, transparent), transparent)',
         }}
       />
 
       {/* Three steps that meet exactly — 31 / 38 / 31 — so no edge is drawn
           over its neighbour and the podium reads as one object. */}
-      <Plinth
-        className="bottom-[8%] left-0 h-20 w-[31%]"
-        slot={left}
-        place="left"
-      />
-      <Plinth
-        className="bottom-[8%] left-[31%] h-32 w-[38%]"
-        slot={centre}
-        place="centre"
-      />
-      <Plinth
-        className="bottom-[8%] right-0 h-20 w-[31%]"
-        slot={right}
-        place="right"
-      />
+      <Plinth className="bottom-[8%] left-0 h-20 w-[31%]" slot={left} place="left" />
+      <Plinth className="bottom-[8%] left-[31%] h-32 w-[38%]" slot={centre} place="centre" />
+      <Plinth className="bottom-[8%] right-0 h-20 w-[31%]" slot={right} place="right" />
 
       {/* Contact shadows, one per step, so each figure is planted on the
           surface it is standing on rather than on the stage floor. */}
@@ -327,21 +307,9 @@ async function Stage() {
         className="pointer-events-none absolute bottom-[37%] left-[33%] z-10 h-3.5 w-[34%] rounded-[50%] bg-black/60 blur-[6px]"
       />
 
-      <Figure
-        slot={left}
-        treatment={treatment}
-        className={`z-20 ${FIGURE[treatment].left}`}
-      />
-      <Figure
-        slot={right}
-        treatment={treatment}
-        className={`z-20 ${FIGURE[treatment].right}`}
-      />
-      <Figure
-        slot={centre}
-        treatment={treatment}
-        className={`z-30 ${FIGURE[treatment].centre}`}
-      />
+      <Figure slot={left} treatment={treatment} className={`z-20 ${FIGURE[treatment].left}`} />
+      <Figure slot={right} treatment={treatment} className={`z-20 ${FIGURE[treatment].right}`} />
+      <Figure slot={centre} treatment={treatment} className={`z-30 ${FIGURE[treatment].centre}`} />
 
       {/* The six words that explain the whole conceit. Anchored under the
           podium rather than floated beside it. */}
@@ -372,10 +340,10 @@ interface Slot {
  * matters more than the pose — swapping in a fourth-place brawler with nicer
  * art would quietly make the caption a lie.
  */
-type Treatment = "model" | "portrait";
+type Treatment = 'model' | 'portrait';
 
 /** Which step of the podium, which decides its scale and its outside edge. */
-type Place = "left" | "centre" | "right";
+type Place = 'left' | 'centre' | 'right';
 
 /**
  * Each treatment needs its own geometry, not a shared box.
@@ -386,14 +354,11 @@ type Place = "left" | "centre" | "right";
  * step's face stays clear underneath to carry the placing. Same podium, two
  * sets of numbers.
  */
-const FIGURE: Record<
-  Treatment,
-  { left: string; centre: string; right: string }
-> = {
+const FIGURE: Record<Treatment, { left: string; centre: string; right: string }> = {
   model: {
-    left: "bottom-[26%] left-0 h-52 w-[36%]",
-    centre: "bottom-[37%] left-[24%] h-64 w-[52%]",
-    right: "bottom-[26%] right-0 h-52 w-[36%]",
+    left: 'bottom-[26%] left-0 h-52 w-[36%]',
+    centre: 'bottom-[37%] left-[24%] h-64 w-[52%]',
+    right: 'bottom-[26%] right-0 h-52 w-[36%]',
   },
   /*
    * Every offset here clears the step below it. Sitting a disc down on the step
@@ -401,9 +366,9 @@ const FIGURE: Record<
    * go with it.
    */
   portrait: {
-    left: "bottom-[29%] left-[0.5%] size-[7.5rem]",
-    centre: "bottom-[40%] left-1/2 size-[10rem] -translate-x-1/2",
-    right: "bottom-[29%] right-[0.5%] size-[7.5rem]",
+    left: 'bottom-[29%] left-[0.5%] size-[7.5rem]',
+    centre: 'bottom-[40%] left-1/2 size-[10rem] -translate-x-1/2',
+    right: 'bottom-[29%] right-[0.5%] size-[7.5rem]',
   },
 };
 
@@ -429,10 +394,10 @@ function Figure({
   treatment: Treatment;
   className: string;
 }) {
-  const rim = slot.tier ? TIER_COLOR[slot.tier] : "#8b6bff";
+  const rim = slot.tier ? TIER_COLOR[slot.tier] : '#8b6bff';
 
   const art =
-    treatment === "model" ? (
+    treatment === 'model' ? (
       <>
         <span
           aria-hidden
@@ -495,7 +460,7 @@ function Figure({
   return slot.rank ? (
     <Link
       href={brawlerPath(slot.brawlerId, slot.name)}
-      title={`${slot.name}: number ${slot.rank} in Ranked${slot.tier ? `, tier ${slot.tier}` : ""}`}
+      title={`${slot.name}: number ${slot.rank} in Ranked${slot.tier ? `, tier ${slot.tier}` : ''}`}
       className={`absolute block transition-transform duration-300 hover:-translate-y-1.5 ${className}`}
     >
       {art}
@@ -526,33 +491,16 @@ function Figure({
  * Hidden from assistive tech as a whole: every fact on it is already the
  * accessible name of the figure standing above it.
  */
-function Plinth({
-  className,
-  place,
-  slot,
-}: {
-  className: string;
-  place: Place;
-  slot: Slot;
-}) {
-  const centre = place === "centre";
-  const accent = slot.tier
-    ? TIER_COLOR[slot.tier]
-    : centre
-      ? "var(--brand)"
-      : "var(--accent)";
+function Plinth({ className, place, slot }: { className: string; place: Place; slot: Slot }) {
+  const centre = place === 'centre';
+  const accent = slot.tier ? TIER_COLOR[slot.tier] : centre ? 'var(--brand)' : 'var(--accent)';
 
   /*
    * Only the outside of the podium is rounded. Rounding every step put a notch
    * at each junction where two corners curved away from each other, which read
    * as three blocks pushed together rather than one stand.
    */
-  const round =
-    place === "left"
-      ? "rounded-bl-xl"
-      : place === "right"
-        ? "rounded-br-xl"
-        : "";
+  const round = place === 'left' ? 'rounded-bl-xl' : place === 'right' ? 'rounded-br-xl' : '';
 
   return (
     <span aria-hidden className={`pointer-events-none absolute ${className}`}>
@@ -572,10 +520,10 @@ function Plinth({
           drawn only where a wall is actually exposed. Two steps that meet do
           not each need an edge; the centre keeps both because it stands proud
           of the steps beside it. */}
-      {place !== "right" ? (
+      {place !== 'right' ? (
         <span className="absolute inset-y-2 left-0 w-px bg-white/[0.06]" />
       ) : null}
-      {place !== "left" ? (
+      {place !== 'left' ? (
         <span className="absolute inset-y-2 right-0 w-px bg-white/[0.06]" />
       ) : null}
 
@@ -600,7 +548,7 @@ function Plinth({
       {slot.rank ? (
         <span className="absolute inset-x-0 bottom-1.5 top-5 flex flex-col items-center justify-center gap-1">
           <span
-            className={`display leading-none ${centre ? "text-3xl" : "text-2xl"}`}
+            className={`display leading-none ${centre ? 'text-3xl' : 'text-2xl'}`}
             style={{
               color: accent,
               textShadow: `0 2px 16px color-mix(in srgb, ${accent} 45%, transparent)`,
@@ -636,10 +584,10 @@ function Backdrop() {
              * spot behind the stage, and a linear stop so the scene ends
              * without a seam where it meets the rail.
              */
-            "radial-gradient(50rem 26rem at 18% 22%, color-mix(in srgb, #8b6bff 36%, transparent), transparent 66%)," +
-            "radial-gradient(26rem 13rem at 15% 48%, color-mix(in srgb, #ffc53d 13%, transparent), transparent 70%)," +
-            "radial-gradient(34rem 30rem at 78% 34%, color-mix(in srgb, #35d0ff 14%, transparent), transparent 68%)," +
-            "linear-gradient(180deg, transparent 62%, var(--background) 99%)",
+            'radial-gradient(50rem 26rem at 18% 22%, color-mix(in srgb, #8b6bff 36%, transparent), transparent 66%),' +
+            'radial-gradient(26rem 13rem at 15% 48%, color-mix(in srgb, #ffc53d 13%, transparent), transparent 70%),' +
+            'radial-gradient(34rem 30rem at 78% 34%, color-mix(in srgb, #35d0ff 14%, transparent), transparent 68%),' +
+            'linear-gradient(180deg, transparent 62%, var(--background) 99%)',
         }}
       />
 
@@ -653,24 +601,20 @@ function Backdrop() {
         className="absolute inset-0 hidden opacity-[0.22] sm:block"
         style={{
           backgroundImage:
-            "linear-gradient(to right, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px)",
-          backgroundSize: "76px 76px",
-          maskImage:
-            "radial-gradient(42rem 24rem at 44% 34%, #000 10%, transparent 74%)",
-          WebkitMaskImage:
-            "radial-gradient(42rem 24rem at 44% 34%, #000 10%, transparent 74%)",
+            'linear-gradient(to right, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, #ffffff 5%, transparent) 1px, transparent 1px)',
+          backgroundSize: '76px 76px',
+          maskImage: 'radial-gradient(42rem 24rem at 44% 34%, #000 10%, transparent 74%)',
+          WebkitMaskImage: 'radial-gradient(42rem 24rem at 44% 34%, #000 10%, transparent 74%)',
         }}
       />
       <div
         className="absolute inset-0 hidden opacity-[0.5] lg:block"
         style={{
           background:
-            "linear-gradient(104deg, transparent 46%, color-mix(in srgb, var(--brand) 10%, transparent) 46.15%, transparent 46.3%)," +
-            "linear-gradient(104deg, transparent 58%, color-mix(in srgb, var(--accent) 12%, transparent) 58.15%, transparent 58.3%)",
-          maskImage:
-            "linear-gradient(90deg, transparent, #000 40%, transparent 92%)",
-          WebkitMaskImage:
-            "linear-gradient(90deg, transparent, #000 40%, transparent 92%)",
+            'linear-gradient(104deg, transparent 46%, color-mix(in srgb, var(--brand) 10%, transparent) 46.15%, transparent 46.3%),' +
+            'linear-gradient(104deg, transparent 58%, color-mix(in srgb, var(--accent) 12%, transparent) 58.15%, transparent 58.3%)',
+          maskImage: 'linear-gradient(90deg, transparent, #000 40%, transparent 92%)',
+          WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 40%, transparent 92%)',
         }}
       />
 
@@ -679,7 +623,7 @@ function Backdrop() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%)",
+            'radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%)',
         }}
       />
     </div>

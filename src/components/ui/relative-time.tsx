@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from 'react';
 
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from '@/lib/format';
 
 /**
  * "2 hours ago", corrected in the reader's browser.

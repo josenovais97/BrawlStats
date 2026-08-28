@@ -1,11 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { brawlerPath } from "@/lib/slugs";
-import { brawlerIconUrl } from "@/lib/brawlapi";
-import { formatNumber, formatPercent } from "@/lib/format";
-import type { BABrawler } from "@/types/brawlapi";
-import type { ModePick, RankedMapPick } from "@/types/stats";
+import { brawlerPath } from '@/lib/slugs';
+import { brawlerIconUrl } from '@/lib/brawlapi';
+import { formatNumber, formatPercent } from '@/lib/format';
+import type { BABrawler } from '@/types/brawlapi';
+import type { ModePick, RankedMapPick } from '@/types/stats';
 
 /**
  * The ranked list of brawlers on a map or in a mode.
@@ -25,11 +25,7 @@ export function MapPickList({
   emptyLabel: string;
 }) {
   if (picks.length === 0) {
-    return (
-      <p className="card p-6 text-sm leading-relaxed text-muted">
-        {emptyLabel}
-      </p>
-    );
+    return <p className="card p-6 text-sm leading-relaxed text-muted">{emptyLabel}</p>;
   }
 
   return (
@@ -39,8 +35,7 @@ export function MapPickList({
         // Only present on a map pick: how much better the brawler does here
         // than it does in Ranked generally, which is the map-specific half of
         // the claim.
-        const edge =
-          "overallScore" in pick ? pick.score - pick.overallScore : null;
+        const edge = 'overallScore' in pick ? pick.score - pick.overallScore : null;
 
         return (
           <li key={pick.brawlerId}>
@@ -67,7 +62,7 @@ export function MapPickList({
                   {pick.brawlerName.toLowerCase()}
                 </span>
                 <span className="block text-xs tabular-nums text-muted">
-                  {formatNumber(pick.decidedSampleSize)} decided battles ·{" "}
+                  {formatNumber(pick.decidedSampleSize)} decided battles ·{' '}
                   {formatPercent(pick.winRate)} raw
                 </span>
               </span>
@@ -78,10 +73,10 @@ export function MapPickList({
                 {edge !== null ? (
                   <span
                     className={`block text-xs tabular-nums ${
-                      edge >= 0.005 ? "text-victory/80" : "text-muted"
+                      edge >= 0.005 ? 'text-victory/80' : 'text-muted'
                     }`}
                   >
-                    {edge >= 0.005 ? "+" : edge <= -0.005 ? "−" : "±"}
+                    {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
                     {Math.abs(edge * 100).toFixed(1)} vs usual
                   </span>
                 ) : (

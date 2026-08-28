@@ -1,15 +1,15 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { HyperchargeIcon } from "@/components/game-icons";
-import { Disclosure } from "@/components/ui/disclosure";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { brawlerPath } from "@/lib/slugs";
-import { brawlerIconUrl } from "@/lib/brawlapi";
-import { formatNumber } from "@/lib/format";
-import { MAX_POWER_LEVEL } from "@/lib/progression";
-import type { BABrawler } from "@/types/brawlapi";
-import type { BSPlayerBrawler } from "@/types/brawlstars";
+import { HyperchargeIcon } from '@/components/game-icons';
+import { Disclosure } from '@/components/ui/disclosure';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
+import { brawlerIconUrl } from '@/lib/brawlapi';
+import { formatNumber } from '@/lib/format';
+import { MAX_POWER_LEVEL } from '@/lib/progression';
+import type { BABrawler } from '@/types/brawlapi';
+import type { BSPlayerBrawler } from '@/types/brawlstars';
 
 /**
  * Brawlers carrying the game's rarest upgrades while still short of power 11.
@@ -56,9 +56,7 @@ export function PlayerUpgradeGap({
 
   if (stranded.length === 0) return null;
 
-  const coins = coinsPerLevel
-    ? stranded.reduce((sum, b) => sum + coinsPerLevel(b.power), 0)
-    : 0;
+  const coins = coinsPerLevel ? stranded.reduce((sum, b) => sum + coinsPerLevel(b.power), 0) : 0;
 
   const head = stranded.slice(0, SHOWN);
   const rest = stranded.slice(SHOWN);
@@ -67,22 +65,18 @@ export function PlayerUpgradeGap({
     <section>
       <SectionHeading
         title="Upgraded but not maxed"
-        aside={`${stranded.length} ${stranded.length === 1 ? "brawler" : "brawlers"}`}
+        aside={`${stranded.length} ${stranded.length === 1 ? 'brawler' : 'brawlers'}`}
       />
 
       <div className="card p-4">
         <p className="text-sm leading-relaxed text-muted">
-          {stranded.length === 1
-            ? "One brawler carries"
-            : `${stranded.length} carry`}{" "}
-          a hypercharge or buffie below power {MAX_POWER_LEVEL}.
+          {stranded.length === 1 ? 'One brawler carries' : `${stranded.length} carry`} a hypercharge
+          or buffie below power {MAX_POWER_LEVEL}.
           {coins > 0 ? (
             <>
-              {" "}
-              Finishing {stranded.length === 1 ? "it" : "them all"} costs about{" "}
-              <strong className="font-semibold text-foreground">
-                {formatNumber(coins)} coins
-              </strong>
+              {' '}
+              Finishing {stranded.length === 1 ? 'it' : 'them all'} costs about{' '}
+              <strong className="font-semibold text-foreground">{formatNumber(coins)} coins</strong>
               .
             </>
           ) : null}
@@ -91,29 +85,17 @@ export function PlayerUpgradeGap({
         <ul className="mt-3 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
           {head.map((brawler) => (
             <li key={brawler.id}>
-              <Row
-                brawler={brawler}
-                brawlerMeta={brawlerMeta}
-                coinsPerLevel={coinsPerLevel}
-              />
+              <Row brawler={brawler} brawlerMeta={brawlerMeta} coinsPerLevel={coinsPerLevel} />
             </li>
           ))}
         </ul>
 
         {rest.length > 0 ? (
-          <Disclosure
-            tone="bare"
-            className="mt-1"
-            summary={`Show all ${stranded.length}`}
-          >
+          <Disclosure tone="bare" className="mt-1" summary={`Show all ${stranded.length}`}>
             <ul className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
               {rest.map((brawler) => (
                 <li key={brawler.id}>
-                  <Row
-                    brawler={brawler}
-                    brawlerMeta={brawlerMeta}
-                    coinsPerLevel={coinsPerLevel}
-                  />
+                  <Row brawler={brawler} brawlerMeta={brawlerMeta} coinsPerLevel={coinsPerLevel} />
                 </li>
               ))}
             </ul>
@@ -121,10 +103,9 @@ export function PlayerUpgradeGap({
         ) : null}
 
         <Disclosure tone="bare" className="mt-1" summary="Why this matters">
-          A hypercharge does not require a maxed brawler, so it is easy to end
-          up holding the best upgrade available on something that loses the
-          fight before it charges. Ordered by how close each one is to power{" "}
-          {MAX_POWER_LEVEL}, so the cheapest to finish are first.
+          A hypercharge does not require a maxed brawler, so it is easy to end up holding the best
+          upgrade available on something that loses the fight before it charges. Ordered by how
+          close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.
         </Disclosure>
       </div>
     </section>
@@ -141,9 +122,7 @@ function Row({
   coinsPerLevel?: (from: number) => number;
 }) {
   const hyper = (brawler.hyperCharges?.length ?? 0) > 0;
-  const buffies = Object.entries(brawler.buffies ?? {}).filter(
-    ([, owned]) => owned,
-  );
+  const buffies = Object.entries(brawler.buffies ?? {}).filter(([, owned]) => owned);
   const cost = coinsPerLevel?.(brawler.power);
 
   return (
@@ -157,9 +136,7 @@ function Row({
       className="row-interactive flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5"
     >
       <Image
-        src={
-          brawlerMeta.get(brawler.id)?.imageUrl ?? brawlerIconUrl(brawler.id)
-        }
+        src={brawlerMeta.get(brawler.id)?.imageUrl ?? brawlerIconUrl(brawler.id)}
         alt=""
         width={32}
         height={32}
@@ -180,7 +157,7 @@ function Row({
           ) : null}
           {buffies.length > 0 ? (
             <span className="text-accent">
-              {buffies.length} buffie{buffies.length === 1 ? "" : "s"}
+              {buffies.length} buffie{buffies.length === 1 ? '' : 's'}
             </span>
           ) : null}
         </span>

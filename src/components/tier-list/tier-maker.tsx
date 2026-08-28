@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
-import { Check, Link2, RotateCcw, Sparkles } from "lucide-react";
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
+import { Check, Link2, RotateCcw, Sparkles } from 'lucide-react';
 
-import { decodeBoard, decodeOrder, encodeBoard } from "@/lib/tier-board";
-import { TIER_COLOR, TIER_ORDER } from "@/lib/tiers";
-import type { Tier } from "@/types/stats";
+import { decodeBoard, decodeOrder, encodeBoard } from '@/lib/tier-board';
+import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
+import type { Tier } from '@/types/stats';
 
 export interface MakerBrawler {
   id: number;
@@ -46,14 +46,14 @@ export interface MakerBrawler {
  */
 
 /** The pool is a tier too, internally: "not placed yet". */
-type Slot = Tier | "pool";
+type Slot = Tier | 'pool';
 
 const ROW_LABEL: Record<Tier, string> = {
-  S: "S",
-  A: "A",
-  B: "B",
-  C: "C",
-  D: "D",
+  S: 'S',
+  A: 'A',
+  B: 'B',
+  C: 'C',
+  D: 'D',
 };
 
 export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
@@ -89,18 +89,10 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
    * object key order for integer-like keys is numeric, so the order is carried
    * separately.
    */
-  const [order, setOrder] = useState<number[]>(() =>
-    decodeOrder(searchParams, known),
-  );
+  const [order, setOrder] = useState<number[]>(() => decodeOrder(searchParams, known));
 
   const rows = useMemo(() => {
-    const out: Record<Tier, MakerBrawler[]> = {
-      S: [],
-      A: [],
-      B: [],
-      C: [],
-      D: [],
-    };
+    const out: Record<Tier, MakerBrawler[]> = { S: [], A: [], B: [], C: [], D: [] };
     for (const id of order) {
       const tier = placed[id];
       const brawler = byId.get(id);
@@ -117,14 +109,11 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
   const place = useCallback((id: number, tier: Slot) => {
     setPlaced((current) => {
       const next = { ...current };
-      if (tier === "pool") delete next[id];
+      if (tier === 'pool') delete next[id];
       else next[id] = tier;
       return next;
     });
-    setOrder((current) => [
-      ...current.filter((existing) => existing !== id),
-      id,
-    ]);
+    setOrder((current) => [...current.filter((existing) => existing !== id), id]);
     setSelected(null);
     setCopied(false);
   }, []);
@@ -135,7 +124,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
     setSelected(null);
     setCopied(false);
     // The URL is the document; clearing the board has to clear that too.
-    window.history.replaceState(null, "", window.location.pathname);
+    window.history.replaceState(null, '', window.location.pathname);
   }, []);
 
   const fromMeta = useCallback(() => {
@@ -160,7 +149,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
       ? `${window.location.origin}${window.location.pathname}?${query}`
       : `${window.location.origin}${window.location.pathname}`;
 
-    window.history.replaceState(null, "", url);
+    window.history.replaceState(null, '', url);
 
     try {
       await navigator.clipboard.writeText(url);
@@ -184,12 +173,8 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
           onClick={share}
           className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-strong"
         >
-          {copied ? (
-            <Check aria-hidden className="size-4" />
-          ) : (
-            <Link2 aria-hidden className="size-4" />
-          )}
-          {copied ? "Link copied" : "Copy share link"}
+          {copied ? <Check aria-hidden className="size-4" /> : <Link2 aria-hidden className="size-4" />}
+          {copied ? 'Link copied' : 'Copy share link'}
         </button>
 
         <button
@@ -212,10 +197,8 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
         </button>
 
         <p className="ml-auto text-xs text-muted">
-          <span className="font-bold tabular-nums text-foreground">
-            {placedCount}
-          </span>
-          {" of "}
+          <span className="font-bold tabular-nums text-foreground">{placedCount}</span>
+          {' of '}
           <span className="tabular-nums">{brawlers.length}</span> placed
         </p>
       </div>
@@ -224,7 +207,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
         <p className="rounded-xl border border-brand/30 bg-brand/10 px-3.5 py-2.5 text-sm text-foreground">
           <span className="font-bold capitalize">
             {byId.get(selected)?.name.toLowerCase()}
-          </span>{" "}
+          </span>{' '}
           selected — now tap a tier to place it.
         </p>
       ) : null}
@@ -244,7 +227,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
 
       <div>
         <p className="eyebrow mb-2.5">
-          Unranked{pool.length > 0 ? ` · ${pool.length}` : ""}
+          Unranked{pool.length > 0 ? ` · ${pool.length}` : ''}
         </p>
         <PoolArea
           brawlers={pool}
@@ -299,12 +282,12 @@ function TierRow({
         onDrop={(event) => {
           event.preventDefault();
           setOver(false);
-          const id = Number(event.dataTransfer.getData("text/plain"));
+          const id = Number(event.dataTransfer.getData('text/plain'));
           if (Number.isFinite(id) && id > 0) onPlace(id, tier);
         }}
         onClick={() => selected !== null && onPlace(selected, tier)}
         className={`flex min-h-[4.5rem] flex-1 flex-wrap content-start gap-1.5 p-2 transition-colors ${
-          over ? "bg-surface-2" : "bg-surface/40"
+          over ? 'bg-surface-2' : 'bg-surface/40'
         }`}
       >
         {brawlers.map((brawler) => (
@@ -315,7 +298,7 @@ function TierRow({
             onSelect={onSelect}
             // A brawler already in a tier goes back to the pool when tapped
             // twice, which is the only way out of a row.
-            onReturn={() => onPlace(brawler.id, "pool")}
+            onReturn={() => onPlace(brawler.id, 'pool')}
           />
         ))}
       </div>
@@ -346,11 +329,11 @@ function PoolArea({
       onDrop={(event) => {
         event.preventDefault();
         setOver(false);
-        const id = Number(event.dataTransfer.getData("text/plain"));
-        if (Number.isFinite(id) && id > 0) onPlace(id, "pool");
+        const id = Number(event.dataTransfer.getData('text/plain'));
+        if (Number.isFinite(id) && id > 0) onPlace(id, 'pool');
       }}
       className={`flex min-h-[5rem] flex-wrap content-start gap-1.5 rounded-2xl border border-border p-2 transition-colors ${
-        over ? "bg-surface-2" : "bg-surface/40"
+        over ? 'bg-surface-2' : 'bg-surface/40'
       }`}
     >
       {brawlers.length === 0 ? (
@@ -388,8 +371,8 @@ function Tile({
       type="button"
       draggable
       onDragStart={(event) => {
-        event.dataTransfer.setData("text/plain", String(brawler.id));
-        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData('text/plain', String(brawler.id));
+        event.dataTransfer.effectAllowed = 'move';
       }}
       onClick={(event) => {
         // The row underneath is itself a drop target; a tap on a tile is about
@@ -409,7 +392,7 @@ function Tile({
       }
       aria-pressed={selected}
       className={`relative size-12 shrink-0 overflow-hidden rounded-lg bg-surface-2 transition-transform sm:size-14 ${
-        selected ? "ring-2 ring-brand" : "hover:-translate-y-0.5"
+        selected ? 'ring-2 ring-brand' : 'hover:-translate-y-0.5'
       }`}
     >
       <Image

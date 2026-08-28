@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import { CalendarDays, ExternalLink, FileText } from "lucide-react";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import { CalendarDays, ExternalLink, FileText } from 'lucide-react';
+import Link from 'next/link';
 
-import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import {
   getLatestReleaseNotes,
   type RichHeading,
   type RichNode,
   type RichText,
   type ReleaseSection,
-} from "@/lib/release-notes";
+} from '@/lib/release-notes';
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/release-notes" },
-  title: "Brawl Stars update notes",
+  alternates: { canonical: '/release-notes' },
+  title: 'Brawl Stars update notes',
   description:
-    "The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.",
+    'The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.',
 };
 
 export const revalidate = 3600;
@@ -28,8 +28,7 @@ export default async function ReleaseNotesPage() {
       <div className="space-y-6">
         <PageHeading title="Release notes" />
         <p className="card p-6 text-sm text-muted">
-          Release notes are unavailable right now. Try again shortly, or read
-          them on{" "}
+          Release notes are unavailable right now. Try again shortly, or read them on{' '}
           <a
             href="https://supercell.com/en/games/brawlstars/blog/"
             target="_blank"
@@ -67,11 +66,11 @@ export default async function ReleaseNotesPage() {
       {published ? (
         <p className="flex items-center gap-2 text-sm text-muted">
           <CalendarDays className="size-4" />
-          Published{" "}
-          {published.toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
+          Published{' '}
+          {published.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
           })}
         </p>
       ) : null}
@@ -82,25 +81,22 @@ export default async function ReleaseNotesPage() {
         <div className="min-w-0 space-y-6">
           {notes.sections.map((section, index) => (
             <section
-              key={`${section.title ?? "section"}-${index}`}
+              key={`${section.title ?? 'section'}-${index}`}
               id={sectionId(section, index)}
               className="card scroll-mt-24 p-6"
             >
               {section.title ? <SectionHeading title={section.title} /> : null}
-              <RichContent
-                nodes={section.nodes}
-                startLevel={section.title ? 3 : 2}
-              />
+              <RichContent nodes={section.nodes} startLevel={section.title ? 3 : 2} />
             </section>
           ))}
         </div>
       </div>
 
       <p className="text-xs text-muted">
-        Published by Supercell, reproduced here for convenience.{" "}
+        Published by Supercell, reproduced here for convenience.{' '}
         <Link href="/news" className="text-brand hover:underline">
           see detected in-game changes
-        </Link>{" "}
+        </Link>{' '}
         for what we track ourselves.
       </p>
     </div>
@@ -111,8 +107,8 @@ function sectionId(section: ReleaseSection, index: number): string {
   const base = section.title
     ? section.title
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
     : `section-${index}`;
   return base || `section-${index}`;
 }
@@ -168,22 +164,19 @@ function RichContent({
   startLevel?: 2 | 3;
 }) {
   const present = [
-    ...new Set(
-      nodes.flatMap((node) => (node.type === "heading" ? [node.level] : [])),
-    ),
+    ...new Set(nodes.flatMap((node) => (node.type === 'heading' ? [node.level] : []))),
   ].sort((a, b) => a - b);
 
-  const deepest = (level: RichHeading["level"]) => present.indexOf(level) > 0;
+  const deepest = (level: RichHeading['level']) => present.indexOf(level) > 0;
 
-  const tagFor = (level: RichHeading["level"]) =>
-    (deepest(level) ? `h${startLevel + 1}` : `h${startLevel}`) as
-      "h2" | "h3" | "h4";
+  const tagFor = (level: RichHeading['level']) =>
+    (deepest(level) ? `h${startLevel + 1}` : `h${startLevel}`) as 'h2' | 'h3' | 'h4';
 
   return (
     <div className="space-y-3">
       {nodes.map((node, index) => {
         switch (node.type) {
-          case "heading": {
+          case 'heading': {
             const Tag = tagFor(node.level);
             const deep = deepest(node.level);
             return (
@@ -191,8 +184,8 @@ function RichContent({
                 key={index}
                 className={
                   deep
-                    ? "mt-5 font-bold capitalize text-brand first:mt-0"
-                    : "mt-6 text-lg font-bold tracking-tight first:mt-0"
+                    ? 'mt-5 font-bold capitalize text-brand first:mt-0'
+                    : 'mt-6 text-lg font-bold tracking-tight first:mt-0'
                 }
               >
                 <Spans spans={node.spans} />
@@ -200,14 +193,11 @@ function RichContent({
             );
           }
 
-          case "list":
+          case 'list':
             return (
               <ul key={index} className="space-y-1.5">
                 {node.items.map((item, itemIndex) => (
-                  <li
-                    key={itemIndex}
-                    className="flex gap-2.5 text-sm leading-relaxed"
-                  >
+                  <li key={itemIndex} className="flex gap-2.5 text-sm leading-relaxed">
                     <span
                       aria-hidden
                       className="mt-[0.55rem] size-1.5 shrink-0 rounded-full bg-brand/70"
@@ -243,7 +233,7 @@ function Spans({ spans }: { spans: RichText[] }) {
     <>
       {spans.map((span, index) => {
         // Preserve the newlines the source uses for spacing inside a run.
-        const parts = span.value.split("\n");
+        const parts = span.value.split('\n');
         const content = parts.map((part, partIndex) => (
           <span key={partIndex}>
             {partIndex > 0 ? <br /> : null}
@@ -252,14 +242,12 @@ function Spans({ spans }: { spans: RichText[] }) {
         ));
 
         const className = [
-          span.marks.includes("bold") ? "font-semibold text-foreground" : "",
-          span.marks.includes("italic") ? "italic" : "",
-          span.marks.includes("underline")
-            ? "underline underline-offset-2"
-            : "",
+          span.marks.includes('bold') ? 'font-semibold text-foreground' : '',
+          span.marks.includes('italic') ? 'italic' : '',
+          span.marks.includes('underline') ? 'underline underline-offset-2' : '',
         ]
           .filter(Boolean)
-          .join(" ");
+          .join(' ');
 
         return className ? (
           <span key={index} className={className}>

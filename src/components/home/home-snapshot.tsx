@@ -1,15 +1,15 @@
-import { ArrowRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Suspense } from "react";
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
-import { LeaderboardIcon, TrophyIcon } from "@/components/game-icons";
-import { TopPlayersPreview } from "@/components/home/top-players-preview";
-import { Skeleton } from "@/components/ui/skeletons";
-import { formatPercent } from "@/lib/format";
-import { getTopMetaBrawlers } from "@/lib/home-meta";
-import { brawlerPath } from "@/lib/slugs";
-import { TIER_COLOR } from "@/lib/tiers";
+import { LeaderboardIcon, TrophyIcon } from '@/components/game-icons';
+import { TopPlayersPreview } from '@/components/home/top-players-preview';
+import { Skeleton } from '@/components/ui/skeletons';
+import { formatPercent } from '@/lib/format';
+import { getTopMetaBrawlers } from '@/lib/home-meta';
+import { brawlerPath } from '@/lib/slugs';
+import { TIER_COLOR } from '@/lib/tiers';
 
 /**
  * One look at what is happening right now.
@@ -35,10 +35,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
             <span className="live-dot" />
             Live snapshot
           </p>
-          <h2
-            id="snapshot"
-            className="display mt-2.5 text-2xl uppercase sm:text-4xl"
-          >
+          <h2 id="snapshot" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
             Where things stand
           </h2>
         </div>
@@ -92,7 +89,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                       <span className="tabular-nums text-muted">
                         <strong className="font-bold text-victory">
                           {formatPercent(leader.winRate)}
-                        </strong>{" "}
+                        </strong>{' '}
                         win
                       </span>
                     ) : null}
@@ -100,7 +97,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                       <span className="tabular-nums text-muted">
                         <strong className="font-bold text-foreground">
                           {formatPercent(leader.pickRate)}
-                        </strong>{" "}
+                        </strong>{' '}
                         pick
                       </span>
                     ) : null}
@@ -186,8 +183,8 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
             <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
           </Link>
           <p className="mt-2 text-xs leading-relaxed text-muted/80">
-            Three of the top 200 worldwide. Our Ranked elo board, which the game
-            API does not publish, is on the full leaderboard.
+            Three of the top 200 worldwide. Our Ranked elo board, which the game API
+            does not publish, is on the full leaderboard.
           </p>
         </div>
       </div>

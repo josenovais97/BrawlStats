@@ -1,6 +1,6 @@
-import { ArrowRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   BrawlersIcon,
@@ -10,9 +10,9 @@ import {
   MapsIcon,
   RankedIcon,
   TierListIcon,
-} from "@/components/game-icons";
-import { getTopMetaBrawlers } from "@/lib/home-meta";
-import { TIER_COLOR } from "@/lib/tiers";
+} from '@/components/game-icons';
+import { getTopMetaBrawlers } from '@/lib/home-meta';
+import { TIER_COLOR } from '@/lib/tiers';
 
 /**
  * The tools, weighted.
@@ -27,35 +27,35 @@ import { TIER_COLOR } from "@/lib/tiers";
  */
 const SECONDARY = [
   {
-    href: "/ranked",
+    href: '/ranked',
     icon: RankedIcon,
-    title: "Ranked Maps",
-    body: "Best picks per map",
+    title: 'Ranked Maps',
+    body: 'Best picks per map',
   },
   {
-    href: "/compare",
+    href: '/compare',
     icon: CompareIcon,
-    title: "Compare",
-    body: "Two players, side by side",
+    title: 'Compare',
+    body: 'Two players, side by side',
   },
   {
-    href: "/leaderboard",
+    href: '/leaderboard',
     icon: LeaderboardIcon,
-    title: "Leaderboards",
-    body: "Trophies and Ranked elo",
+    title: 'Leaderboards',
+    body: 'Trophies and Ranked elo',
   },
-  { href: "/maps", icon: MapsIcon, title: "Maps", body: "Every map, ranked" },
+  { href: '/maps', icon: MapsIcon, title: 'Maps', body: 'Every map, ranked' },
   {
-    href: "/brawlers",
+    href: '/brawlers',
     icon: BrawlersIcon,
-    title: "Brawlers",
-    body: "Stats, builds, matchups",
+    title: 'Brawlers',
+    body: 'Stats, builds, matchups',
   },
   {
-    href: "/tier-list/maker",
+    href: '/tier-list/maker',
     icon: TierListIcon,
-    title: "Tier list maker",
-    body: "Build and share your own",
+    title: 'Tier list maker',
+    body: 'Build and share your own',
   },
 ];
 
@@ -70,16 +70,11 @@ export async function HomeTools() {
             <span aria-hidden className="rule h-4" />
             <span className="eyebrow">Everything else</span>
           </p>
-          <h2
-            id="tools"
-            className="display mt-2.5 text-2xl uppercase sm:text-4xl"
-          >
+          <h2 id="tools" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
             Tools
           </h2>
         </div>
-        <p className="text-sm text-muted">
-          All of it from our own sampled battles.
-        </p>
+        <p className="text-sm text-muted">All of it from our own sampled battles.</p>
       </div>
 
       {/* Two featured, then four compact. The proportions are the hierarchy. */}
@@ -133,9 +128,7 @@ export async function HomeTools() {
               filling. No match data, because none of it would be real. */}
           <div className="flex items-center gap-2">
             <Slots label="Your team" tone="var(--accent-2)" filled={2} />
-            <span className="display shrink-0 text-xs uppercase text-muted">
-              vs
-            </span>
+            <span className="display shrink-0 text-xs uppercase text-muted">vs</span>
             <Slots label="Enemy" tone="var(--defeat)" filled={3} />
           </div>
         </Featured>
@@ -222,15 +215,7 @@ function Featured({
 }
 
 /** Three draft slots, some taken. Shape only — no brawlers are named. */
-function Slots({
-  label,
-  tone,
-  filled,
-}: {
-  label: string;
-  tone: string;
-  filled: number;
-}) {
+function Slots({ label, tone, filled }: { label: string; tone: string; filled: number }) {
   return (
     <span className="min-w-0 flex-1">
       <span className="block text-xs font-semibold uppercase tracking-wide text-muted">
@@ -248,8 +233,8 @@ function Slots({
                     borderColor: `color-mix(in srgb, ${tone} 45%, transparent)`,
                   }
                 : {
-                    borderColor: "var(--border)",
-                    borderStyle: "dashed",
+                    borderColor: 'var(--border)',
+                    borderStyle: 'dashed',
                   }
             }
           />

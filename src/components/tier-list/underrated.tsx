@@ -1,10 +1,10 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { brawlerPath } from "@/lib/slugs";
-import { TIER_COLOR } from "@/lib/stats";
-import { formatNumber, formatPercent, humanizeMode } from "@/lib/format";
-import type { TierListEntry } from "@/types/stats";
+import { brawlerPath } from '@/lib/slugs';
+import { TIER_COLOR } from '@/lib/stats';
+import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import type { TierListEntry } from '@/types/stats';
 
 /**
  * Brawlers that win often and are picked rarely.
@@ -57,9 +57,7 @@ export function Underrated({
    * would either select everything or nothing depending on which page it ran
    * on. The median splits the roster the same way whatever the scale.
    */
-  const usages = withRates
-    .map((entry) => entry.usageRate ?? 0)
-    .sort((a, b) => a - b);
+  const usages = withRates.map((entry) => entry.usageRate ?? 0).sort((a, b) => a - b);
   const medianUsage = usages[Math.floor(usages.length / 2)];
 
   const top = withRates
@@ -79,11 +77,11 @@ export function Underrated({
         Strong but rarely picked
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-        Brawlers with the best adjusted win rates among the less-played half of
-        the roster, from sampled {battlesLabel}
-        {mode ? ` in ${humanizeMode(mode)}` : ""} over the {windowLabel} window.
-        They win when they are used and are not used much &mdash; which usually
-        means they are underrated rather than bad.
+        Brawlers with the best adjusted win rates among the less-played half of the
+        roster, from sampled {battlesLabel}
+        {mode ? ` in ${humanizeMode(mode)}` : ''} over the {windowLabel} window. They
+        win when they are used and are not used much &mdash; which usually means
+        they are underrated rather than bad.
       </p>
 
       <ol className="grid gap-2 sm:grid-cols-2">

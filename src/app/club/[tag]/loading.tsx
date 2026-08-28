@@ -2,7 +2,7 @@ import {
   ProfileHeaderSkeleton,
   StatGridSkeleton,
   TableSkeleton,
-} from "@/components/ui/skeletons";
+} from '@/components/ui/skeletons';
 
 export default function ClubLoading() {
   return (

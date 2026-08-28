@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 /**
  * A head-to-head metric list that does not become a table on a phone.
@@ -28,7 +28,7 @@ export interface VersusMetric {
    * Null for anything that is a property rather than a score — rarity, class,
    * a favourite mode — because marking one of those as winning is nonsense.
    */
-  leader: "a" | "b" | null;
+  leader: 'a' | 'b' | null;
   /** Optional clarification shown under the row. */
   hint?: string;
 }
@@ -42,8 +42,8 @@ export function VersusList({
   sections,
   labelA,
   labelB,
-  accentA = "var(--brand)",
-  accentB = "var(--accent-2)",
+  accentA = 'var(--brand)',
+  accentB = 'var(--accent-2)',
 }: {
   sections: VersusSection[];
   labelA: ReactNode;
@@ -76,24 +76,18 @@ export function VersusList({
 
             {section.metrics.map((metric) => (
               <div key={metric.label} className="px-3 py-2.5">
-                <dt className="text-xs font-medium text-muted">
-                  {metric.label}
-                </dt>
+                <dt className="text-xs font-medium text-muted">{metric.label}</dt>
                 <dd className="mt-0.5 grid grid-cols-2 items-baseline gap-2">
                   <span
                     className={`min-w-0 truncate text-sm tabular-nums ${
-                      metric.leader === "a"
-                        ? "font-bold text-victory"
-                        : "font-medium"
+                      metric.leader === 'a' ? 'font-bold text-victory' : 'font-medium'
                     }`}
                   >
                     {metric.a}
                   </span>
                   <span
                     className={`min-w-0 truncate text-right text-sm tabular-nums ${
-                      metric.leader === "b"
-                        ? "font-bold text-victory"
-                        : "font-medium"
+                      metric.leader === 'b' ? 'font-bold text-victory' : 'font-medium'
                     }`}
                   >
                     {metric.b}

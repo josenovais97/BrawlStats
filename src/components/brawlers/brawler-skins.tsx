@@ -1,8 +1,8 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-import { brawlerPortraitUrl } from "@/lib/brawlapi";
-import { formatNumber, formatPercent } from "@/lib/format";
-import type { BrawlerSkinUsage } from "@/lib/stats";
+import { brawlerPortraitUrl } from '@/lib/brawlapi';
+import { formatNumber, formatPercent } from '@/lib/format';
+import type { BrawlerSkinUsage } from '@/lib/stats';
 
 /**
  * What this brawler's owners actually equip.
@@ -45,26 +45,19 @@ export function BrawlerSkins({
       <p className="text-sm leading-relaxed text-muted">
         {dressed > 0 ? (
           <>
-            <span className="font-semibold text-foreground">
-              {formatPercent(dressed)}
-            </span>{" "}
-            of sampled {name} owners have a skin equipped.
+            <span className="font-semibold text-foreground">{formatPercent(dressed)}</span> of
+            sampled {name} owners have a skin equipped.
           </>
         ) : (
           <>Almost every sampled {name} owner is on the default skin.</>
-        )}{" "}
+        )}{' '}
         Shares are of players who own {name}, from the rotating snapshot sample.
       </p>
 
       <ul className="card divide-y divide-border overflow-hidden">
         {top.map((skin) => (
           <li key={skin.id} className="flex items-center gap-3 px-3 py-2.5">
-            <SkinArt
-              src={
-                skin.isDefault ? brawlerPortraitUrl(brawlerId) : artFor(skin)
-              }
-              alt=""
-            />
+            <SkinArt src={skin.isDefault ? brawlerPortraitUrl(brawlerId) : artFor(skin)} alt="" />
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-2">
                 <span className="truncate text-sm font-semibold capitalize">
@@ -82,7 +75,7 @@ export function BrawlerSkins({
                 className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-surface-2"
               >
                 <span
-                  className={`block h-full rounded-full ${skin.isDefault ? "bg-muted/50" : "bg-brand"}`}
+                  className={`block h-full rounded-full ${skin.isDefault ? 'bg-muted/50' : 'bg-brand'}`}
                   style={{ width: `${Math.max(skin.share * 100, 1.5)}%` }}
                 />
               </span>
@@ -101,8 +94,8 @@ export function BrawlerSkins({
 
       {skins.length > top.length ? (
         <p className="text-xs text-muted">
-          {skins.length - top.length} rarer{" "}
-          {skins.length - top.length === 1 ? "skin" : "skins"} not shown.
+          {skins.length - top.length} rarer {skins.length - top.length === 1 ? 'skin' : 'skins'} not
+          shown.
         </p>
       ) : null}
     </div>

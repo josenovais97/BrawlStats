@@ -1,17 +1,17 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ComparePicker } from "@/components/brawlers/compare-picker";
-import { PlayerCompareForm } from "@/components/compare/player-compare-form";
-import { PlayerVersus } from "@/components/compare/player-versus";
-import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
-import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
-import { getBrawlerMap } from "@/lib/brawlapi";
-import { getBrawlerCatalog } from "@/lib/brawler-catalog";
-import type { loadComparison } from "@/lib/player-compare";
-import { comparePath } from "@/lib/compare";
-import { slugify } from "@/lib/slugs";
-import { getMetaIndex } from "@/lib/stats";
-import type { BABrawler } from "@/types/brawlapi";
+import { ComparePicker } from '@/components/brawlers/compare-picker';
+import { PlayerCompareForm } from '@/components/compare/player-compare-form';
+import { PlayerVersus } from '@/components/compare/player-versus';
+import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { getBrawlerMap } from '@/lib/brawlapi';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import type { loadComparison } from '@/lib/player-compare';
+import { comparePath } from '@/lib/compare';
+import { slugify } from '@/lib/slugs';
+import { getMetaIndex } from '@/lib/stats';
+import type { BABrawler } from '@/types/brawlapi';
 
 /**
  * The compare tool, shared by the bare page and by a specific player pairing.
@@ -29,8 +29,8 @@ const SUGGESTION_SEED = 8;
 
 export async function CompareTool({
   comparison,
-  tagA = "",
-  tagB = "",
+  tagA = '',
+  tagB = '',
 }: {
   /** Loaded by the pairing route. Null on the bare tool page. */
   comparison?: Awaited<ReturnType<typeof loadComparison>> | null;
@@ -40,7 +40,7 @@ export async function CompareTool({
   // Withdrawn brawlers are not comparable options.
   const brawlers = (await getBrawlerCatalog()).current;
   const meta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
-  const metaIndex = await getMetaIndex("ranked", 7);
+  const metaIndex = await getMetaIndex('ranked', 7);
 
   // Suggestions are drawn from the current top of the meta rather than picked
   // by hand: those are the brawlers people are choosing between this week, and
@@ -63,9 +63,7 @@ export async function CompareTool({
 
   return (
     <div className="space-y-8">
-      <JsonLd
-        data={breadcrumbSchema([{ name: "Compare", path: "/compare" }])}
-      />
+      <JsonLd data={breadcrumbSchema([{ name: 'Compare', path: '/compare' }])} />
 
       <PageHeading
         title="Compare"
@@ -104,9 +102,7 @@ export async function CompareTool({
                   className="card card-interactive flex items-center justify-center gap-3 px-4 py-3 text-sm font-semibold capitalize"
                 >
                   {a.name.toLowerCase()}
-                  <span className="text-xs font-black uppercase text-muted">
-                    vs
-                  </span>
+                  <span className="text-xs font-black uppercase text-muted">vs</span>
                   {b.name.toLowerCase()}
                 </Link>
               </li>

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { X } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Shows people where their tag actually is.
@@ -16,11 +16,7 @@ import { useEffect, useRef } from "react";
  * scales without blurring, costs no image request, and shows a tag that
  * obviously belongs to nobody.
  */
-export function TagLocationHint({
-  kind = "player",
-}: {
-  kind?: "player" | "club";
-}) {
+export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' }) {
   const ref = useRef<HTMLDialogElement>(null);
 
   // Native <dialog> gives focus trapping, inertness and Escape for free, but
@@ -33,11 +29,11 @@ export function TagLocationHint({
       // with a different target, so this closes on backdrop only.
       if (event.target === el) el.close();
     };
-    el.addEventListener("click", onClick);
-    return () => el.removeEventListener("click", onClick);
+    el.addEventListener('click', onClick);
+    return () => el.removeEventListener('click', onClick);
   }, []);
 
-  const isClub = kind === "club";
+  const isClub = kind === 'club';
 
   return (
     <>
@@ -57,12 +53,12 @@ export function TagLocationHint({
         <div className="flex items-start justify-between gap-4 border-b border-border p-5">
           <div>
             <h2 id="tag-hint-title" className="display text-lg uppercase">
-              {isClub ? "Finding a club tag" : "Finding your tag"}
+              {isClub ? 'Finding a club tag' : 'Finding your tag'}
             </h2>
             <p className="mt-1 text-sm text-muted">
               {isClub
-                ? "Open the club screen. The tag sits under the club name."
-                : "Tap your profile icon in the top-left of the game. The tag is directly underneath it."}
+                ? 'Open the club screen. The tag sits under the club name.'
+                : 'Tap your profile icon in the top-left of the game. The tag is directly underneath it.'}
             </p>
           </div>
           <button
@@ -79,10 +75,9 @@ export function TagLocationHint({
           <ProfileDiagram isClub={isClub} />
 
           <p className="mt-4 text-sm leading-relaxed text-muted">
-            It always begins with{" "}
-            <span className="font-mono font-semibold text-foreground">#</span>.
-            You can type it with or without the{" "}
-            <span className="font-mono">#</span>, and case does not matter.
+            It always begins with <span className="font-mono font-semibold text-foreground">#</span>.
+            You can type it with or without the <span className="font-mono">#</span>, and case does
+            not matter.
           </p>
         </div>
       </dialog>
@@ -105,69 +100,26 @@ function ProfileDiagram({ isClub }: { isClub: boolean }) {
       role="img"
       aria-label={
         isClub
-          ? "Diagram of the club screen with the club tag highlighted beneath the club name"
-          : "Diagram of the game profile screen with the player tag highlighted beneath the profile icon"
+          ? 'Diagram of the club screen with the club tag highlighted beneath the club name'
+          : 'Diagram of the game profile screen with the player tag highlighted beneath the profile icon'
       }
       className="w-full rounded-xl border border-border bg-surface-2"
     >
       {/* Background panel */}
-      <rect
-        x="0"
-        y="0"
-        width="340"
-        height="168"
-        rx="12"
-        className="fill-surface-2"
-      />
+      <rect x="0" y="0" width="340" height="168" rx="12" className="fill-surface-2" />
 
       {/* Profile icon block */}
-      <rect
-        x="20"
-        y="18"
-        width="64"
-        height="64"
-        rx="12"
-        className="fill-brand/20 stroke-brand/40"
-        strokeWidth="2"
-      />
+      <rect x="20" y="18" width="64" height="64" rx="12" className="fill-brand/20 stroke-brand/40" strokeWidth="2" />
       <circle cx="52" cy="44" r="13" className="fill-brand/50" />
       <path d="M32 72c4-11 36-11 40 0z" className="fill-brand/50" />
 
       {/* Name field */}
-      <rect
-        x="98"
-        y="20"
-        width="164"
-        height="28"
-        rx="8"
-        className="fill-border/60"
-      />
-      <rect
-        x="110"
-        y="30"
-        width="86"
-        height="8"
-        rx="4"
-        className="fill-muted/50"
-      />
+      <rect x="98" y="20" width="164" height="28" rx="8" className="fill-border/60" />
+      <rect x="110" y="30" width="86" height="8" rx="4" className="fill-muted/50" />
 
       {/* Secondary field, the one people mistake for the tag */}
-      <rect
-        x="98"
-        y="56"
-        width="164"
-        height="26"
-        rx="8"
-        className="fill-border/40"
-      />
-      <rect
-        x="110"
-        y="65"
-        width="70"
-        height="8"
-        rx="4"
-        className="fill-muted/30"
-      />
+      <rect x="98" y="56" width="164" height="26" rx="8" className="fill-border/40" />
+      <rect x="110" y="65" width="70" height="8" rx="4" className="fill-muted/30" />
 
       {/* The tag itself, highlighted */}
       <rect
@@ -184,9 +136,9 @@ function ProfileDiagram({ isClub }: { isClub: boolean }) {
         y="112"
         textAnchor="middle"
         className="fill-foreground font-mono"
-        style={{ fontSize: 15, fontWeight: 700, letterSpacing: "0.02em" }}
+        style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.02em' }}
       >
-        {isClub ? "#CLUB99Z" : "#2ABC0XYZ"}
+        {isClub ? '#CLUB99Z' : '#2ABC0XYZ'}
       </text>
 
       {/* Callout line and label */}
@@ -202,28 +154,14 @@ function ProfileDiagram({ isClub }: { isClub: boolean }) {
         x="206"
         y="112"
         className="fill-brand"
-        style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em" }}
+        style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em' }}
       >
-        {isClub ? "CLUB TAG" : "YOUR TAG"}
+        {isClub ? 'CLUB TAG' : 'YOUR TAG'}
       </text>
 
       {/* Stat blocks below, so the crop reads as a real screen */}
-      <rect
-        x="20"
-        y="136"
-        width="140"
-        height="18"
-        rx="6"
-        className="fill-border/40"
-      />
-      <rect
-        x="180"
-        y="136"
-        width="140"
-        height="18"
-        rx="6"
-        className="fill-border/40"
-      />
+      <rect x="20" y="136" width="140" height="18" rx="6" className="fill-border/40" />
+      <rect x="180" y="136" width="140" height="18" rx="6" className="fill-border/40" />
     </svg>
   );
 }

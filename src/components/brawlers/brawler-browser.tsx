@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useId, useMemo, useState } from "react";
+import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useId, useMemo, useState } from 'react';
 
-import { TIER_COLOR, TIER_ORDER } from "@/lib/tiers";
-import type { Tier } from "@/types/stats";
+import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
+import type { Tier } from '@/types/stats';
 
-import { ClassIcon } from "@/components/game-icons";
-import { brawlerPath } from "@/lib/slugs";
+import { ClassIcon } from '@/components/game-icons';
+import { brawlerPath } from '@/lib/slugs';
 
 /** Only what the grid renders — keeps the client payload small. */
 export interface BrawlerCardData {
@@ -21,7 +21,7 @@ export interface BrawlerCardData {
   rarityName: string | null;
   rarityColor: string;
   /** "legacy" brawlers are kept for their history but are not playable. */
-  status: "current" | "legacy";
+  status: 'current' | 'legacy';
   /**
    * Ranked tier and meta score, or null below the sample floor.
    *
@@ -37,13 +37,13 @@ export interface BrawlerCardData {
 
 /** Ordered by in-game progression so the filter row reads naturally. */
 const RARITY_ORDER = [
-  "Common",
-  "Rare",
-  "Super Rare",
-  "Epic",
-  "Mythic",
-  "Legendary",
-  "Ultra Legendary",
+  'Common',
+  'Rare',
+  'Super Rare',
+  'Epic',
+  'Mythic',
+  'Legendary',
+  'Ultra Legendary',
 ];
 
 /**
@@ -56,25 +56,24 @@ const RARITY_ORDER = [
  */
 const SORTS = {
   meta: {
-    label: "Strongest",
+    label: 'Strongest',
     compare: (a: BrawlerCardData, b: BrawlerCardData) =>
       (b.metaScore ?? -1) - (a.metaScore ?? -1) || a.id - b.id,
   },
   release: {
-    label: "Release order",
+    label: 'Release order',
     compare: (a: BrawlerCardData, b: BrawlerCardData) => a.id - b.id,
   },
   newest: {
-    label: "Newest first",
+    label: 'Newest first',
     compare: (a: BrawlerCardData, b: BrawlerCardData) => b.id - a.id,
   },
   name: {
-    label: "Name A–Z",
-    compare: (a: BrawlerCardData, b: BrawlerCardData) =>
-      a.name.localeCompare(b.name),
+    label: 'Name A–Z',
+    compare: (a: BrawlerCardData, b: BrawlerCardData) => a.name.localeCompare(b.name),
   },
   rarity: {
-    label: "Rarest first",
+    label: 'Rarest first',
     compare: (a: BrawlerCardData, b: BrawlerCardData) =>
       rarityRank(b.rarityName) - rarityRank(a.rarityName) || a.id - b.id,
   },
@@ -99,10 +98,10 @@ function rarityRank(rarity: string | null): number {
  * undoes them.
  */
 export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
-  const [query, setQuery] = useState("");
-  const [rarity, setRarity] = useState("all");
-  const [brawlerClass, setBrawlerClass] = useState("all");
-  const [tier, setTier] = useState("all");
+  const [query, setQuery] = useState('');
+  const [rarity, setRarity] = useState('all');
+  const [brawlerClass, setBrawlerClass] = useState('all');
+  const [tier, setTier] = useState('all');
   /*
    * Strongest by default, changed 2026-08-28.
    *
@@ -111,7 +110,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
    * the first row and buried every brawler worth picking four screens down.
    * The default should answer the question the page is for.
    */
-  const [sort, setSort] = useState<SortKey>("meta");
+  const [sort, setSort] = useState<SortKey>('meta');
   /* Mobile only. Four pill rows is most of a phone screen before a single
      brawler is visible, and the grid is what people came for. */
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -129,13 +128,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
 
   const classes = useMemo(
     () =>
-      [
-        ...new Set(
-          brawlers
-            .map((b) => b.className)
-            .filter((c): c is string => Boolean(c)),
-        ),
-      ].sort(),
+      [...new Set(brawlers.map((b) => b.className).filter((c): c is string => Boolean(c)))].sort(),
     [brawlers],
   );
 
@@ -150,37 +143,32 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
       .filter(
         (b) =>
           (!q || b.name.toLowerCase().includes(q)) &&
-          (rarity === "all" || b.rarityName === rarity) &&
-          (brawlerClass === "all" || b.className === brawlerClass) &&
-          (tier === "all" || b.tier === tier),
+          (rarity === 'all' || b.rarityName === rarity) &&
+          (brawlerClass === 'all' || b.className === brawlerClass) &&
+          (tier === 'all' || b.tier === tier),
       )
       .sort(SORTS[sort].compare);
   }, [brawlers, query, rarity, brawlerClass, tier, sort]);
 
   const filtered =
-    query.trim() !== "" ||
-    rarity !== "all" ||
-    brawlerClass !== "all" ||
-    tier !== "all";
+    query.trim() !== '' || rarity !== 'all' || brawlerClass !== 'all' || tier !== 'all';
 
   /* The heading counts current brawlers and the footer counted every row, so
      the page showed 106 and 107 a few centimetres apart with nothing saying
      why. Reconciled here rather than by hiding one of them: both numbers are
      true and the difference is the withdrawn brawlers. */
-  const playable = brawlers.filter((b) => b.status !== "legacy").length;
+  const playable = brawlers.filter((b) => b.status !== 'legacy').length;
   const legacy = brawlers.length - playable;
 
   /* Only the pill rows count — the search box stays visible, so it would read
      as an uncounted filter. */
-  const activeFilters = [rarity, brawlerClass, tier].filter(
-    (v) => v !== "all",
-  ).length;
+  const activeFilters = [rarity, brawlerClass, tier].filter((v) => v !== 'all').length;
 
   const reset = () => {
-    setQuery("");
-    setRarity("all");
-    setBrawlerClass("all");
-    setTier("all");
+    setQuery('');
+    setRarity('all');
+    setBrawlerClass('all');
+    setTier('all');
   };
 
   return (
@@ -209,7 +197,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             {query ? (
               <button
                 type="button"
-                onClick={() => setQuery("")}
+                onClick={() => setQuery('')}
                 aria-label="Clear search"
                 className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
               >
@@ -249,15 +237,12 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             <ChevronDown
               aria-hidden
               className={`size-4 text-muted duration-200 motion-safe:transition-transform ${
-                filtersOpen ? "rotate-180" : ""
+                filtersOpen ? 'rotate-180' : ''
               }`}
             />
           </button>
 
-          <div
-            id={filtersId}
-            className={`space-y-2 ${filtersOpen ? "block" : "hidden"} sm:block`}
-          >
+          <div id={filtersId} className={`space-y-2 ${filtersOpen ? 'block' : 'hidden'} sm:block`}>
             {tiers.length > 0 ? (
               <FilterRow
                 label="Tier"
@@ -273,12 +258,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
                 )}
               />
             ) : null}
-            <FilterRow
-              label="Rarity"
-              options={rarities}
-              value={rarity}
-              onChange={setRarity}
-            />
+            <FilterRow label="Rarity" options={rarities} value={rarity} onChange={setRarity} />
             <FilterRow
               label="Class"
               options={classes}
@@ -286,9 +266,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               onChange={setBrawlerClass}
               /* The class marks are distinctive enough to be recognised before
                  the word is read, which is most of the point of a filter row. */
-              renderIcon={(option) => (
-                <ClassIcon name={option} className="size-4" />
-              )}
+              renderIcon={(option) => <ClassIcon name={option} className="size-4" />}
             />
           </div>
         </div>
@@ -296,14 +274,12 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
         {/* Feedback from the filters, next to the control that undoes them. */}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border bg-surface-2/40 px-3 py-2.5 sm:px-4">
           <p className="text-sm text-muted">
-            <strong className="font-bold tabular-nums text-foreground">
-              {visible.length}
-            </strong>{" "}
-            {visible.length === 1 ? "brawler" : "brawlers"}
+            <strong className="font-bold tabular-nums text-foreground">{visible.length}</strong>{' '}
+            {visible.length === 1 ? 'brawler' : 'brawlers'}
             {filtered ? ` of ${brawlers.length}` : null}
             {!filtered && legacy > 0 ? (
               <>
-                {" "}
+                {' '}
                 &middot; {playable} currently playable, {legacy} withdrawn
               </>
             ) : null}
@@ -358,13 +334,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
  * that pushed the portrait down and made a two-column phone layout tall enough
  * to fit four cards on a screen.
  */
-function BrawlerCard({
-  brawler,
-  eager,
-}: {
-  brawler: BrawlerCardData;
-  eager: boolean;
-}) {
+function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: boolean }) {
   // Not prefetched: the full roster is 106 links on one grid. See the map
   // catalogue for the same reasoning at more length.
   return (
@@ -386,7 +356,7 @@ function BrawlerCard({
         }}
       />
 
-      {brawler.status === "legacy" ? (
+      {brawler.status === 'legacy' ? (
         <span
           className="absolute left-2 top-2 z-10 rounded-md bg-surface-3/90 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted"
           title="No longer available in the game. Kept for its history."
@@ -404,8 +374,8 @@ function BrawlerCard({
         className="relative mx-auto aspect-square w-full max-w-[7rem] object-contain duration-200 group-hover:scale-105 motion-safe:transition-transform"
         /* The cards above the fold used to come in blank for a second or two:
            `next/image` lazy-loads by default, and the portrait IS the card. */
-        loading={eager ? "eager" : "lazy"}
-        fetchPriority={eager ? "high" : "auto"}
+        loading={eager ? 'eager' : 'lazy'}
+        fetchPriority={eager ? 'high' : 'auto'}
         unoptimized
       />
 
@@ -431,9 +401,7 @@ function BrawlerCard({
             color: TIER_COLOR[brawler.tier],
           }}
           title={`${brawler.tier} tier in Ranked${
-            brawler.metaScore !== null
-              ? `, meta score ${brawler.metaScore.toFixed(1)}`
-              : ""
+            brawler.metaScore !== null ? `, meta score ${brawler.metaScore.toFixed(1)}` : ''
           }`}
         >
           {brawler.tier}
@@ -505,7 +473,7 @@ function FilterRow({
         aria-labelledby={`filter-${label}`}
         className="-mx-3 mt-1.5 flex items-center gap-1.5 overflow-x-auto px-3 pb-1 sm:mx-0 sm:mt-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0"
       >
-        {(includeAll ? ["all", ...options] : options).map((option) => {
+        {(includeAll ? ['all', ...options] : options).map((option) => {
           const active = value === option;
           return (
             <button
@@ -515,12 +483,12 @@ function FilterRow({
               onClick={() => onChange(option)}
               className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors ${
                 active
-                  ? "bg-brand text-brand-ink"
-                  : "border border-border bg-surface-2/60 text-muted hover:border-border-strong hover:text-foreground"
+                  ? 'bg-brand text-brand-ink'
+                  : 'border border-border bg-surface-2/60 text-muted hover:border-border-strong hover:text-foreground'
               }`}
             >
-              {option === "all" ? null : renderIcon?.(option)}
-              {option === "all" ? "All" : (labelFor?.(option) ?? option)}
+              {option === 'all' ? null : renderIcon?.(option)}
+              {option === 'all' ? 'All' : (labelFor?.(option) ?? option)}
             </button>
           );
         })}

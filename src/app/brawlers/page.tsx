@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import { BrawlerBrowser } from "@/components/brawlers/brawler-browser";
-import { ErrorState } from "@/components/ui/error-state";
-import { PageHeading } from "@/components/ui/section-heading";
-import { brawlerIconUrl } from "@/lib/brawlapi";
-import { getBrawlerCatalog } from "@/lib/brawler-catalog";
-import { getMetaIndex } from "@/lib/stats";
+import { BrawlerBrowser } from '@/components/brawlers/brawler-browser';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageHeading } from '@/components/ui/section-heading';
+import { brawlerIconUrl } from '@/lib/brawlapi';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getMetaIndex } from '@/lib/stats';
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/brawlers" },
-  title: "Brawl Stars brawlers",
+  alternates: { canonical: '/brawlers' },
+  title: 'Brawl Stars brawlers',
   description:
-    "Every Brawl Stars brawler with class, rarity, star powers and gadgets.",
+    'Every Brawl Stars brawler with class, rarity, star powers and gadgets.',
 };
 
 /*
@@ -26,7 +26,7 @@ export default async function BrawlersPage() {
   let catalog;
   try {
     catalog = await getBrawlerCatalog();
-    if (catalog.all.length === 0) throw new Error("empty catalogue");
+    if (catalog.all.length === 0) throw new Error('empty catalogue');
   } catch {
     return (
       <ErrorState
@@ -43,7 +43,7 @@ export default async function BrawlersPage() {
    * is still a brawler index, and the artwork source and the database fail
    * independently of each other.
    */
-  const meta = await getMetaIndex("ranked", 7).catch(() => new Map());
+  const meta = await getMetaIndex('ranked', 7).catch(() => new Map());
 
   return (
     <div className="space-y-6">
@@ -55,7 +55,7 @@ export default async function BrawlersPage() {
         subtitle={`All ${catalog.current.length} current brawlers with their Ranked tier, sortable by how strong they are right now${
           catalog.legacy.length > 0
             ? `. Plus ${catalog.legacy.length} no longer playable.`
-            : "."
+            : '.'
         }`}
       />
 
@@ -69,7 +69,7 @@ export default async function BrawlersPage() {
           // reading "Unknown" on a fifth of the roster is worse than no chip.
           className: b.className,
           rarityName: b.rarityName,
-          rarityColor: b.rarityColor ?? "#8b95b8",
+          rarityColor: b.rarityColor ?? '#8b95b8',
           status: b.status,
           tier: meta.get(b.id)?.tier ?? null,
           metaScore: meta.get(b.id)?.metaScore ?? null,

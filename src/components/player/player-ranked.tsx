@@ -1,17 +1,12 @@
-import { TrendingUp } from "lucide-react";
-import Image from "next/image";
+import { TrendingUp } from 'lucide-react';
+import Image from 'next/image';
 
-import {
-  CrownIcon,
-  PlayersIcon,
-  RankedIcon,
-  TrophyIcon,
-} from "@/components/game-icons";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { rankedLeagueIconUrl, rankedTierIconUrl } from "@/lib/brawlapi";
-import { formatNumber, titleCaseLabel } from "@/lib/format";
-import type { BSPlayer } from "@/types/brawlstars";
-import type { TrophyStanding } from "@/types/stats";
+import { CrownIcon, PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
+import { formatNumber, titleCaseLabel } from '@/lib/format';
+import type { BSPlayer } from '@/types/brawlstars';
+import type { TrophyStanding } from '@/types/stats';
 
 interface Props {
   player: BSPlayer;
@@ -33,9 +28,7 @@ interface Props {
  * of dashes.
  */
 export function PlayerRanked({ player, globalRank = null, standing }: Props) {
-  const hasRanked = Boolean(
-    player.rankedRankName || player.highestAllTimeRankedRankName,
-  );
+  const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
   if (!hasRanked && globalRank === null && !standing) return null;
 
   return (
@@ -48,12 +41,8 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
             <Cell
               gameIcon={<RankedIcon className="size-6" />}
               label="Current ranked"
-              value={player.rankedRankName ?? "Unranked"}
-              hint={
-                player.rankedElo
-                  ? `${formatNumber(player.rankedElo)} elo`
-                  : undefined
-              }
+              value={player.rankedRankName ?? 'Unranked'}
+              hint={player.rankedElo ? `${formatNumber(player.rankedElo)} elo` : undefined}
               tone="text-accent"
               badgeUrl={
                 rankedTierIconUrl(player.rankedRank) ??
@@ -63,7 +52,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
             <Cell
               icon={TrendingUp}
               label="Season best"
-              value={player.highestSeasonRankedRankName ?? "–"}
+              value={player.highestSeasonRankedRankName ?? '–'}
               hint={
                 player.highestSeasonRankedElo
                   ? `${formatNumber(player.highestSeasonRankedElo)} elo`
@@ -78,7 +67,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
             <Cell
               gameIcon={<CrownIcon className="size-6" />}
               label="All-time best"
-              value={player.highestAllTimeRankedRankName ?? "–"}
+              value={player.highestAllTimeRankedRankName ?? '–'}
               hint={
                 player.highestAllTimeRankedElo
                   ? `${formatNumber(player.highestAllTimeRankedElo)} elo`
@@ -123,7 +112,7 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
  */
 function formatPercentileLabel(percentile: number): string {
   const topFraction = (1 - percentile) * 100;
-  if (topFraction < 0.1) return "0.1%";
+  if (topFraction < 0.1) return '0.1%';
   if (topFraction < 1) return `${topFraction.toFixed(1)}%`;
   return `${Math.round(topFraction)}%`;
 }
@@ -149,9 +138,7 @@ function Cell({
 }) {
   return (
     <div className="card card-glow flex items-center gap-3 p-4">
-      <span
-        className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${tone}`}
-      >
+      <span className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${tone}`}>
         {badgeUrl ? (
           <Image
             src={badgeUrl}

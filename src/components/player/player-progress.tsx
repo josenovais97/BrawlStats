@@ -1,11 +1,11 @@
-import { CalendarDays, TrendingUp } from "lucide-react";
+import { CalendarDays, TrendingUp } from 'lucide-react';
 
-import { TrophyGainIcon } from "@/components/game-icons";
+import { TrophyGainIcon } from '@/components/game-icons';
 
-import { SectionHeading } from "@/components/ui/section-heading";
-import { StatCard } from "@/components/ui/stat-card";
-import { formatNumber } from "@/lib/format";
-import type { TrophyPoint } from "@/lib/stats";
+import { SectionHeading } from '@/components/ui/section-heading';
+import { StatCard } from '@/components/ui/stat-card';
+import { formatNumber } from '@/lib/format';
+import type { TrophyPoint } from '@/lib/stats';
 
 /**
  * What a player has actually done lately, read off the trophy history.
@@ -23,7 +23,11 @@ import type { TrophyPoint } from "@/lib/stats";
  * exist: history only fills in on days someone looked the profile up, so a
  * "30 days" figure is labelled with the span it actually covers.
  */
-export function PlayerProgress({ points }: { points: TrophyPoint[] }) {
+export function PlayerProgress({
+  points,
+}: {
+  points: TrophyPoint[];
+}) {
   if (points.length < 2) return null;
 
   const first = points[0];
@@ -59,7 +63,7 @@ export function PlayerProgress({ points }: { points: TrophyPoint[] }) {
             label={`Last ${week.days} days`}
             value={signed(week.change)}
             hint={`${formatNumber(week.from)} → ${formatNumber(week.to)}`}
-            tone={week.change >= 0 ? "text-victory" : "text-defeat"}
+            tone={week.change >= 0 ? 'text-victory' : 'text-defeat'}
           />
         ) : null}
         {month ? (
@@ -68,7 +72,7 @@ export function PlayerProgress({ points }: { points: TrophyPoint[] }) {
             label={`Last ${month.days} days`}
             value={signed(month.change)}
             hint={`${formatNumber(month.from)} → ${formatNumber(month.to)}`}
-            tone={month.change >= 0 ? "text-victory" : "text-defeat"}
+            tone={month.change >= 0 ? 'text-victory' : 'text-defeat'}
           />
         ) : null}
         {best ? (
@@ -90,23 +94,19 @@ export function PlayerProgress({ points }: { points: TrophyPoint[] }) {
       */}
       <p className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm text-muted">
         <span>
-          Tracked {tracked} {tracked === 1 ? "day" : "days"} &middot;{" "}
+          Tracked {tracked} {tracked === 1 ? 'day' : 'days'} &middot;{' '}
           <strong
             className={`font-semibold tabular-nums ${
-              overall > 0
-                ? "text-victory"
-                : overall < 0
-                  ? "text-defeat"
-                  : "text-foreground"
+              overall > 0 ? 'text-victory' : overall < 0 ? 'text-defeat' : 'text-foreground'
             }`}
           >
             {signed(overall)}
-          </strong>{" "}
+          </strong>{' '}
           overall, now on {formatNumber(last.trophies)}
         </span>
         <span className="text-xs">
-          One point per day, recorded when this profile is viewed, so it covers
-          the days someone checked rather than every day played.
+          One point per day, recorded when this profile is viewed, so it covers the
+          days someone checked rather than every day played.
         </span>
       </p>
     </section>
@@ -114,7 +114,7 @@ export function PlayerProgress({ points }: { points: TrophyPoint[] }) {
 }
 
 function signed(value: number): string {
-  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  const sign = value > 0 ? '+' : value < 0 ? '−' : '';
   return `${sign}${formatNumber(Math.abs(value))}`;
 }
 
@@ -141,9 +141,7 @@ function changeOver(
   }
   if (!anchor) return null;
 
-  const span = Math.round(
-    (Date.parse(last.date) - Date.parse(anchor.date)) / 86_400_000,
-  );
+  const span = Math.round((Date.parse(last.date) - Date.parse(anchor.date)) / 86_400_000);
   if (span < 1) return null;
 
   return {
@@ -155,15 +153,12 @@ function changeOver(
 }
 
 /** The largest single-day climb in the tracked history. */
-function bestDay(
-  points: TrophyPoint[],
-): { change: number; date: string } | null {
+function bestDay(points: TrophyPoint[]): { change: number; date: string } | null {
   let best: { change: number; date: string } | null = null;
 
   for (let i = 1; i < points.length; i += 1) {
     const gap = Math.round(
-      (Date.parse(points[i].date) - Date.parse(points[i - 1].date)) /
-        86_400_000,
+      (Date.parse(points[i].date) - Date.parse(points[i - 1].date)) / 86_400_000,
     );
     // Only consecutive days: a gap of a fortnight between two views is not a
     // day's climb, however large the difference is.

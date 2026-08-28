@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
-import { playerIconUrl } from "@/lib/brawlapi";
-import { formatNumber, formatPercent } from "@/lib/format";
-import { brawlerPath } from "@/lib/slugs";
-import type { CosmeticUsage } from "@/lib/stats";
+import { playerIconUrl } from '@/lib/brawlapi';
+import { formatNumber, formatPercent } from '@/lib/format';
+import { brawlerPath } from '@/lib/slugs';
+import type { CosmeticUsage } from '@/lib/stats';
 
 /**
  * The full catalogue of one cosmetic kind, ranked by how many people wear it.
@@ -34,28 +34,24 @@ export function CosmeticList({
   art,
 }: {
   items: CosmeticUsage[];
-  kind: "skin" | "icon";
+  kind: 'skin' | 'icon';
   /** Skin artwork by `${brawler}|${skin}` key; icons resolve from their id. */
   art?: Record<string, string>;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
 
   // Rank is assigned once, from the unfiltered order, so a search narrows the
   // list without renumbering it -- and so the row does not call indexOf, which
   // would be quadratic across twelve hundred rows on every keystroke.
-  const ranked = useMemo(
-    () => items.map((item, index) => ({ item, rank: index + 1 })),
-    [items],
-  );
+  const ranked = useMemo(() => items.map((item, index) => ({ item, rank: index + 1 })), [items]);
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return ranked;
     return ranked.filter(
       ({ item }) =>
-        item.name.toLowerCase().includes(q) ||
-        (item.brawlerName ?? "").toLowerCase().includes(q),
+        item.name.toLowerCase().includes(q) || (item.brawlerName ?? '').toLowerCase().includes(q),
     );
   }, [ranked, query]);
 
@@ -63,7 +59,7 @@ export function CosmeticList({
   const searching = query.trim().length > 0;
   const visible = searching || showAll ? matches : matches.slice(0, FIRST_PAGE);
 
-  const isIcon = kind === "icon";
+  const isIcon = kind === 'icon';
 
   return (
     <div className="space-y-4">
@@ -72,24 +68,18 @@ export function CosmeticList({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={
-            isIcon ? "Search icons by number" : "Search by skin or brawler"
-          }
-          aria-label={isIcon ? "Search profile icons" : "Search skins"}
+          placeholder={isIcon ? 'Search icons by number' : 'Search by skin or brawler'}
+          aria-label={isIcon ? 'Search profile icons' : 'Search skins'}
           className="min-h-11 flex-1 rounded-xl border border-border bg-surface-2 px-4 text-sm outline-none transition-colors placeholder:text-muted/85 focus:border-brand"
         />
         <p className="text-sm text-muted">
-          <span className="font-semibold text-foreground">
-            {formatNumber(matches.length)}
-          </span>{" "}
-          of {formatNumber(items.length)}
+          <span className="font-semibold text-foreground">{formatNumber(matches.length)}</span> of{' '}
+          {formatNumber(items.length)}
         </p>
       </div>
 
       {matches.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">
-          Nothing matches &ldquo;{query}&rdquo;.
-        </p>
+        <p className="card p-6 text-sm text-muted">Nothing matches &ldquo;{query}&rdquo;.</p>
       ) : (
         <ol className="card divide-y divide-border overflow-hidden">
           {visible.map(({ item, rank }, index) => (
@@ -105,7 +95,7 @@ export function CosmeticList({
                 src={
                   isIcon
                     ? playerIconUrl(item.id)
-                    : (art?.[`${item.brawlerName ?? ""}|${item.name}`] ?? null)
+                    : (art?.[`${item.brawlerName ?? ''}|${item.name}`] ?? null)
                 }
                 eager={index < 24}
               />
@@ -167,7 +157,7 @@ function CosmeticArt({ src, eager }: { src: string | null; eager: boolean }) {
       width={36}
       height={36}
       className="size-9 shrink-0 rounded-lg bg-surface-2 object-cover"
-      loading={eager ? "eager" : "lazy"}
+      loading={eager ? 'eager' : 'lazy'}
       unoptimized
     />
   );

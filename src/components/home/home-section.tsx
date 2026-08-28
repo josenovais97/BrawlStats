@@ -1,6 +1,6 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import type { ReactNode } from "react";
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 /**
  * One heading treatment for every homepage block: eyebrow, title, one line of

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 /**
  * The shared shape of the two whole-page dead ends: a 404, and a render that

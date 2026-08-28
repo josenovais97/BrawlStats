@@ -1,11 +1,11 @@
-import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { brawlerPath } from "@/lib/slugs";
-import { TIER_COLOR } from "@/lib/tiers";
-import type { BABrawler } from "@/types/brawlapi";
-import type { MetaMover, Tier } from "@/types/stats";
+import { brawlerPath } from '@/lib/slugs';
+import { TIER_COLOR } from '@/lib/tiers';
+import type { BABrawler } from '@/types/brawlapi';
+import type { MetaMover, Tier } from '@/types/stats';
 
 /**
  * What moved since the last comparable snapshot.
@@ -47,9 +47,7 @@ const MIN_SCORE_MOVE = 0.15;
  * out of 107 and the copy never claims it is — "3 places" is a distance, and
  * the distance is honest.
  */
-export function buildChangeIndex(
-  movers: MetaMover[],
-): Map<number, BrawlerChange> {
+export function buildChangeIndex(movers: MetaMover[]): Map<number, BrawlerChange> {
   const index = new Map<number, BrawlerChange>();
   if (movers.length === 0) return index;
 
@@ -66,9 +64,7 @@ export function buildChangeIndex(
   for (const mover of movers) {
     index.set(mover.brawlerId, {
       scoreDelta: mover.metaScoreDelta,
-      rankDelta:
-        (rankBefore.get(mover.brawlerId) ?? 0) -
-        (rankNow.get(mover.brawlerId) ?? 0),
+      rankDelta: (rankBefore.get(mover.brawlerId) ?? 0) - (rankNow.get(mover.brawlerId) ?? 0),
       tierBefore: mover.tierBefore,
       tierNow: mover.tierNow,
       crossedTier: mover.tierBefore !== mover.tierNow,
@@ -95,12 +91,11 @@ export function isNotable(change: BrawlerChange): boolean {
  */
 export function spanLabel(from: string, to: string): string {
   const days = Math.round(
-    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) /
-      86_400_000,
+    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000,
   );
-  if (!Number.isFinite(days) || days <= 0) return "since the last snapshot";
-  if (days === 1) return "since yesterday";
-  if (days === 7) return "in the last week";
+  if (!Number.isFinite(days) || days <= 0) return 'since the last snapshot';
+  if (days === 1) return 'since yesterday';
+  if (days === 7) return 'in the last week';
   return `in the last ${days} days`;
 }
 
@@ -112,26 +107,18 @@ export function spanLabel(from: string, to: string): string {
  * delta is the detail that goes in the tooltip. Showing all three on a 92px
  * card would make every chip unreadable to say something about a handful.
  */
-export function ChangeBadge({
-  change,
-  span,
-}: {
-  change: BrawlerChange;
-  span: string;
-}) {
+export function ChangeBadge({ change, span }: { change: BrawlerChange; span: string }) {
   const up = change.crossedTier
     ? TIER_ORDER_VALUE(change.tierNow) < TIER_ORDER_VALUE(change.tierBefore)
     : change.scoreDelta > 0;
 
-  const sign = change.scoreDelta > 0 ? "+" : "";
-  const title = `${
-    change.crossedTier ? `${change.tierBefore} to ${change.tierNow} tier, ` : ""
-  }${
+  const sign = change.scoreDelta > 0 ? '+' : '';
+  const title = `${change.crossedTier ? `${change.tierBefore} to ${change.tierNow} tier, ` : ''}${
     change.rankDelta !== 0
       ? `${Math.abs(change.rankDelta)} ${
-          Math.abs(change.rankDelta) === 1 ? "place" : "places"
-        } ${change.rankDelta > 0 ? "up" : "down"}, `
-      : ""
+          Math.abs(change.rankDelta) === 1 ? 'place' : 'places'
+        } ${change.rankDelta > 0 ? 'up' : 'down'}, `
+      : ''
   }meta score ${sign}${change.scoreDelta.toFixed(1)} ${span}`;
 
   const label = change.crossedTier
@@ -144,7 +131,7 @@ export function ChangeBadge({
     <span
       title={title}
       className={`mt-1 inline-flex w-full items-center justify-center gap-0.5 rounded-md px-1 py-0.5 text-xs font-bold tabular-nums ${
-        up ? "bg-victory/15 text-victory" : "bg-defeat/15 text-defeat"
+        up ? 'bg-victory/15 text-victory' : 'bg-defeat/15 text-defeat'
       }`}
     >
       {up ? (
@@ -159,7 +146,7 @@ export function ChangeBadge({
 
 /** S is the top, so a *lower* index is a better tier. */
 function TIER_ORDER_VALUE(tier: Tier): number {
-  return ["S", "A", "B", "C", "D"].indexOf(tier);
+  return ['S', 'A', 'B', 'C', 'D'].indexOf(tier);
 }
 
 /**
@@ -186,15 +173,11 @@ export function WhatChanged({
   if (notable.length === 0) return null;
 
   const span = spanLabel(movers[0].fromDate, movers[0].toDate);
-  const riser = notable.reduce((best, m) =>
-    m.metaScoreDelta > best.metaScoreDelta ? m : best,
-  );
+  const riser = notable.reduce((best, m) => (m.metaScoreDelta > best.metaScoreDelta ? m : best));
   const faller = notable.reduce((worst, m) =>
     m.metaScoreDelta < worst.metaScoreDelta ? m : worst,
   );
-  const crossings = notable.filter(
-    (m) => changes.get(m.brawlerId)!.crossedTier,
-  );
+  const crossings = notable.filter((m) => changes.get(m.brawlerId)!.crossedTier);
   const promoted = crossings.filter(
     (m) =>
       TIER_ORDER_VALUE(changes.get(m.brawlerId)!.tierNow) <
@@ -207,9 +190,7 @@ export function WhatChanged({
         <h2 id="what-changed" className="display text-lg uppercase">
           What changed
         </h2>
-        <p className="text-xs text-muted">
-          Against the last comparable snapshot, {span}
-        </p>
+        <p className="text-xs text-muted">Against the last comparable snapshot, {span}</p>
       </div>
 
       <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
@@ -233,18 +214,14 @@ export function WhatChanged({
         ) : null}
 
         <div className="rounded-xl bg-surface-2 p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">
-            Tier changes
-          </p>
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">Tier changes</p>
           {crossings.length === 0 ? (
             <p className="mt-1.5 text-sm text-muted">
               Every brawler held its tier. {notable.length} moved within one.
             </p>
           ) : (
             <>
-              <p className="mt-1.5 text-2xl font-black tabular-nums">
-                {crossings.length}
-              </p>
+              <p className="mt-1.5 text-2xl font-black tabular-nums">{crossings.length}</p>
               <p className="text-xs text-muted">
                 {promoted.length} up, {crossings.length - promoted.length} down
               </p>
@@ -252,10 +229,9 @@ export function WhatChanged({
                 {crossings
                   .slice(0, 4)
                   .map(
-                    (m) =>
-                      `${m.brawlerName.toLowerCase()} → ${changes.get(m.brawlerId)!.tierNow}`,
+                    (m) => `${m.brawlerName.toLowerCase()} → ${changes.get(m.brawlerId)!.tierNow}`,
                   )
-                  .join(", ")}
+                  .join(', ')}
               </p>
             </>
           )}
@@ -276,10 +252,10 @@ function Mover({
   mover: MetaMover;
   change: BrawlerChange;
   meta: BABrawler | undefined;
-  tone: "up" | "down";
+  tone: 'up' | 'down';
 }) {
-  const up = tone === "up";
-  const sign = mover.metaScoreDelta > 0 ? "+" : "";
+  const up = tone === 'up';
+  const sign = mover.metaScoreDelta > 0 ? '+' : '';
 
   return (
     <Link
@@ -297,15 +273,13 @@ function Mover({
         />
       ) : null}
       <span className="min-w-0 flex-1">
-        <span className="block text-xs font-bold uppercase tracking-wide text-muted">
-          {label}
-        </span>
+        <span className="block text-xs font-bold uppercase tracking-wide text-muted">{label}</span>
         <span className="block truncate text-sm font-bold capitalize">
           {mover.brawlerName.toLowerCase()}
         </span>
         <span
           className={`mt-0.5 flex items-center gap-1 text-xs font-semibold tabular-nums ${
-            up ? "text-victory" : "text-defeat"
+            up ? 'text-victory' : 'text-defeat'
           }`}
         >
           {up ? (
@@ -318,14 +292,11 @@ function Mover({
           {change.rankDelta !== 0 ? (
             <>
               <Minus aria-hidden className="size-2.5 rotate-90 text-muted/40" />
-              {Math.abs(change.rankDelta)}{" "}
-              {Math.abs(change.rankDelta) === 1 ? "place" : "places"}
+              {Math.abs(change.rankDelta)} {Math.abs(change.rankDelta) === 1 ? 'place' : 'places'}
             </>
           ) : null}
           {change.crossedTier ? (
-            <span style={{ color: TIER_COLOR[change.tierNow] }}>
-              new in {change.tierNow}
-            </span>
+            <span style={{ color: TIER_COLOR[change.tierNow] }}>new in {change.tierNow}</span>
           ) : null}
         </span>
       </span>

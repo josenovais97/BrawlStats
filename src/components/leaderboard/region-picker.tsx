@@ -1,13 +1,9 @@
-"use client";
+'use client';
 
-import { Check, ChevronDown, Globe, Search } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Globe, Search } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  POPULAR_REGION_CODES,
-  REGION_OPTIONS,
-  regionName,
-} from "@/lib/regions";
+import { POPULAR_REGION_CODES, REGION_OPTIONS, regionName } from '@/lib/regions';
 
 interface RegionPickerProps {
   value: string;
@@ -22,7 +18,7 @@ interface RegionPickerProps {
  */
 export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -34,14 +30,14 @@ export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
       if (!containerRef.current?.contains(event.target as Node)) close();
     }
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") close();
+      if (event.key === 'Escape') close();
     }
 
-    document.addEventListener("mousedown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
     return () => {
-      document.removeEventListener("mousedown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
     };
   }, [open]);
 
@@ -53,15 +49,13 @@ export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
 
   function close() {
     setOpen(false);
-    setQuery("");
+    setQuery('');
   }
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return REGION_OPTIONS;
-    return REGION_OPTIONS.filter(
-      (r) => r.name.toLowerCase().includes(q) || r.code === q,
-    );
+    return REGION_OPTIONS.filter((r) => r.name.toLowerCase().includes(q) || r.code === q);
   }, [query]);
 
   const popularCount = POPULAR_REGION_CODES.length + 1;
@@ -79,7 +73,7 @@ export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
         <Globe className="size-4 shrink-0 text-muted" />
         <span className="flex-1 truncate text-left">{regionName(value)}</span>
         <ChevronDown
-          className={`size-4 shrink-0 text-muted transition-transform ${open ? "rotate-180" : ""}`}
+          className={`size-4 shrink-0 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -119,16 +113,12 @@ export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
                       close();
                     }}
                     className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-surface-2 ${
-                      region.code === value ? "text-brand" : ""
+                      region.code === value ? 'text-brand' : ''
                     }`}
                   >
                     <span className="flex-1 truncate">{region.name}</span>
-                    <span className="font-mono text-xs uppercase text-muted">
-                      {region.code}
-                    </span>
-                    {region.code === value ? (
-                      <Check className="size-4" />
-                    ) : null}
+                    <span className="font-mono text-xs uppercase text-muted">{region.code}</span>
+                    {region.code === value ? <Check className="size-4" /> : null}
                   </button>
                 </li>
               ))

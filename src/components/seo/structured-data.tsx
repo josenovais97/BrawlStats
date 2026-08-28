@@ -1,4 +1,4 @@
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 /**
  * Schema.org payloads, emitted as JSON-LD.
@@ -13,7 +13,7 @@ export function JsonLd({ data }: { data: object }) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify(data).replace(/</g, "\\u003c"),
+        __html: JSON.stringify(data).replace(/</g, '\\u003c'),
       }}
     />
   );
@@ -28,10 +28,10 @@ export function JsonLd({ data }: { data: object }) {
  */
 export function breadcrumbSchema(trail: { name: string; path: string }[]) {
   return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
     itemListElement: trail.map((item, index) => ({
-      "@type": "ListItem",
+      '@type': 'ListItem',
       position: index + 1,
       name: item.name,
       item: `${SITE_URL}${item.path}`,
@@ -49,13 +49,13 @@ export function itemListSchema(
   items: { name: string; path: string }[],
 ) {
   return {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
     name,
     description,
     numberOfItems: items.length,
     itemListElement: items.map((item, index) => ({
-      "@type": "ListItem",
+      '@type': 'ListItem',
       position: index + 1,
       name: item.name,
       url: `${SITE_URL}${item.path}`,
@@ -72,12 +72,12 @@ export function itemListSchema(
  */
 export function faqSchema(entries: { question: string; answer: string }[]) {
   return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
     mainEntity: entries.map((entry) => ({
-      "@type": "Question",
+      '@type': 'Question',
       name: entry.question,
-      acceptedAnswer: { "@type": "Answer", text: entry.answer },
+      acceptedAnswer: { '@type': 'Answer', text: entry.answer },
     })),
   };
 }
@@ -85,12 +85,12 @@ export function faqSchema(entries: { question: string; answer: string }[]) {
 /** Wraps a dataset-backed page so the numbers are attributed to the site. */
 export function datasetSchema(name: string, description: string, path: string) {
   return {
-    "@context": "https://schema.org",
-    "@type": "Dataset",
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
     name,
     description,
     url: `${SITE_URL}${path}`,
-    creator: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    creator: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     isAccessibleForFree: true,
   };
 }

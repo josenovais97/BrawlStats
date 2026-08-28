@@ -1,59 +1,52 @@
-import type { Metadata } from "next";
-import { ArrowLeft, BarChart3, Sparkles } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Suspense } from "react";
+import type { Metadata } from 'next';
+import { ArrowLeft, BarChart3, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
-import { BrawlerLeaderboard } from "@/components/brawlers/brawler-leaderboard";
-import { BrawlerSkins } from "@/components/brawlers/brawler-skins";
-import { getSkinArt, skinArtUrl } from "@/lib/skin-art";
-import { BrawlerMatchups } from "@/components/brawlers/brawler-matchups";
-import { BrawlerSplits } from "@/components/brawlers/brawler-splits";
-import { BrawlerTrend } from "@/components/brawlers/brawler-trend";
-import { BuildAndUpgrades } from "@/components/brawlers/build-upgrades";
-import { RecommendedBuild } from "@/components/brawlers/recommended-build";
-import {
-  JsonLd,
-  breadcrumbSchema,
-  faqSchema,
-} from "@/components/seo/structured-data";
-import { cache } from "react";
-import { notFound, permanentRedirect } from "next/navigation";
+import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
+import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
+import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
+import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
+import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
+import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
+import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
+import { RecommendedBuild } from '@/components/brawlers/recommended-build';
+import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
+import { cache } from 'react';
+import { notFound, permanentRedirect } from 'next/navigation';
 
-import { ErrorState } from "@/components/ui/error-state";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { StatCard } from "@/components/ui/stat-card";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { ErrorState } from '@/components/ui/error-state';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { StatCard } from '@/components/ui/stat-card';
+import { TableSkeleton } from '@/components/ui/skeletons';
 import {
   ClassIcon,
   CombatStatIcon,
   PlayersIcon,
   TrophyIcon,
-} from "@/components/game-icons";
+} from '@/components/game-icons';
 import {
   brawlerModelUrl,
   getBrawler,
   getBrawlerMap,
   hasBrawlerModel,
   rarityColor,
-} from "@/lib/brawlapi";
-import {
-  formatNumber,
-  formatPercent,
-  humanizeMode,
+} from '@/lib/brawlapi';
+import { formatNumber, formatPercent, humanizeMode,
   titleCase,
-} from "@/lib/format";
+} from '@/lib/format';
 import {
   combatStatLabels,
   getBrawlerWiki,
   getGearDescriptions,
   wikiPageUrl,
-} from "@/lib/brawler-wiki";
-import { getBrawlerCatalog } from "@/lib/brawler-catalog";
-import { currentMonth } from "@/lib/site";
-import { getActiveMaps } from "@/lib/game-maps";
-import { getOfficialBrawlers } from "@/lib/bs-api";
-import { slugify } from "@/lib/slugs";
+} from '@/lib/brawler-wiki';
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { currentMonth } from '@/lib/site';
+import { getActiveMaps } from '@/lib/game-maps';
+import { getOfficialBrawlers } from '@/lib/bs-api';
+import { slugify } from '@/lib/slugs';
 import {
   MIN_SAMPLE_FOR_TIER,
   TIER_COLOR,
@@ -69,9 +62,9 @@ import {
   getIndexablePairs,
   getMetaIndex,
   normalizeWinRate,
-} from "@/lib/stats";
-import type { BAAccessory, BABrawler } from "@/types/brawlapi";
-import type { BSAccessory } from "@/types/brawlstars";
+} from '@/lib/stats';
+import type { BAAccessory, BABrawler } from '@/types/brawlapi';
+import type { BSAccessory } from '@/types/brawlstars';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -86,41 +79,36 @@ interface PageProps {
  * permanently redirects it rather than 404ing a live URL.
  */
 type Resolved =
-  | { kind: "ok"; id: number; slug: string; numeric: boolean }
+  | { kind: 'ok'; id: number; slug: string; numeric: boolean }
   /** The catalogue is readable and has no such brawler. A real 404. */
-  | { kind: "unknown" }
+  | { kind: 'unknown' }
   /** The catalogue could not be read, so absence proves nothing. */
-  | { kind: "unavailable" };
+  | { kind: 'unavailable' };
 
 async function resolveBrawler(handle: string): Promise<Resolved> {
   const asId = Number(handle);
   const catalog = await getBrawlerCatalog().catch(() => null);
 
-  if (Number.isFinite(asId) && handle.trim() !== "") {
+  if (Number.isFinite(asId) && handle.trim() !== '') {
     if (!catalog) {
       /*
        * No catalogue means no slug to redirect to. Serving the page at its
        * numeric URL is right here — redirecting an id to itself is an
        * infinite loop, which is what this branch used to do.
        */
-      return { kind: "ok", id: asId, slug: String(asId), numeric: false };
+      return { kind: 'ok', id: asId, slug: String(asId), numeric: false };
     }
 
     const entry = catalog.byId.get(asId);
-    if (!entry) return { kind: "unknown" };
-    return { kind: "ok", id: asId, slug: slugify(entry.name), numeric: true };
+    if (!entry) return { kind: 'unknown' };
+    return { kind: 'ok', id: asId, slug: slugify(entry.name), numeric: true };
   }
 
   const entry = catalog?.bySlug.get(slugify(handle));
   if (entry) {
-    return {
-      kind: "ok",
-      id: entry.id,
-      slug: slugify(entry.name),
-      numeric: false,
-    };
+    return { kind: 'ok', id: entry.id, slug: slugify(entry.name), numeric: false };
   }
-  return catalog ? { kind: "unknown" } : { kind: "unavailable" };
+  return catalog ? { kind: 'unknown' } : { kind: 'unavailable' };
 }
 
 /**
@@ -165,6 +153,7 @@ export async function generateStaticParams() {
   return [];
 }
 
+
 /*
  * `generateMetadata` and the page body want the same rows — the snippet quotes
  * the build the page renders. Both run inside one request, so caching here
@@ -199,7 +188,7 @@ function buildSentence(
   ].filter(Boolean);
 
   if (parts.length === 0) return null;
-  return `Most ${name} owners buy ${parts.join(" and ")} first.`;
+  return `Most ${name} owners buy ${parts.join(' and ')} first.`;
 }
 
 /**
@@ -210,16 +199,14 @@ function buildSentence(
  */
 const BALANCE_CHANGES_SHOWN = 8;
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const resolved = await resolveBrawler(slug);
-  if (resolved.kind !== "ok") return { title: "Brawler" };
+  if (resolved.kind !== 'ok') return { title: 'Brawler' };
 
   const brawlerId = resolved.id;
   const brawler = await getBrawler(brawlerId).catch(() => undefined);
-  if (!brawler) return { title: "Brawler" };
+  if (!brawler) return { title: 'Brawler' };
 
   const name = titleCase(brawler.name);
   const [stat, choices] = await Promise.all([
@@ -227,11 +214,7 @@ export async function generateMetadata({
     abilityChoicesFor(brawlerId),
   ]);
   const adjusted = stat
-    ? normalizeWinRate(
-        stat.winRate,
-        stat.baselineWinRate,
-        stat.decidedSampleSize,
-      )
+    ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
 
   const accessories = new Map(
@@ -253,13 +236,14 @@ export async function generateMetadata({
       ? `${formatPercent(adjusted)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled battles.`
       : null;
 
-  const description = [
-    recommendation,
-    performance,
-    "Gears, star powers, gadgets, best modes and maps, updated daily from real battles.",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const description =
+    [
+      recommendation,
+      performance,
+      'Gears, star powers, gadgets, best modes and maps, updated daily from real battles.',
+    ]
+      .filter(Boolean)
+      .join(' ');
 
   return {
     /*
@@ -289,9 +273,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * `unknown`: when the catalogue itself is unreachable, absence proves
    * nothing and telling a crawler the brawler is gone would be a lie.
    */
-  if (resolved.kind === "unknown") notFound();
+  if (resolved.kind === 'unknown') notFound();
 
-  if (resolved.kind === "unavailable") {
+  if (resolved.kind === 'unavailable') {
     return (
       <ErrorState
         code="upstreamDown"
@@ -344,13 +328,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const hyperCharges = official?.hyperCharges ?? [];
   // Combat stats and resolved ability text. Nothing else publishes these —
   // see lib/brawler-wiki. Null costs the sections that use it, not the page.
-  const metaIndex = await getMetaIndex("ranked", 7);
+  const metaIndex = await getMetaIndex('ranked', 7);
   const catalogEntry = (await getBrawlerCatalog()).byId.get(brawlerId);
   const wiki = await getBrawlerWiki(brawler.name).catch(() => null);
   // One page for the whole game, so this is shared across every brawler.
-  const gearText = await getGearDescriptions().catch(
-    () => new Map<string, string>(),
-  );
+  const gearText = await getGearDescriptions().catch(() => new Map<string, string>());
   const buffies = await getBrawlerBuffies(brawlerId);
   // Which star power and gadget people actually buy first, from players who
   // own exactly one of the pair.
@@ -379,16 +361,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Maps come and go from rotation; a split naming a retired one still has a
   // real record behind it, so the row stays and only the link is dropped.
   const activeMaps = await getActiveMaps().catch(() => []);
-  const brawlerMeta = await getBrawlerMap().catch(
-    () => new Map<number, BABrawler>(),
-  );
+  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
 
   const normalizedWinRate = stat
-    ? normalizeWinRate(
-        stat.winRate,
-        stat.baselineWinRate,
-        stat.decidedSampleSize,
-      )
+    ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
   // Tier and meta score come from the same scoring pass the tier lists use, so
   // the chip here cannot disagree with the chip there. Falls back to scoring
@@ -414,29 +390,22 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // The artwork source says "Unknown" for every recent brawler; the wiki
   // infobox has the real class, and that page is already fetched above.
   const className =
-    (brawler.class?.name && brawler.class.name !== "Unknown"
+    (brawler.class?.name && brawler.class.name !== 'Unknown'
       ? brawler.class.name
-      : null) ??
-    wiki?.stats.className ??
-    null;
+      : null) ?? wiki?.stats.className ?? null;
   const rarityName =
-    (brawler.rarity?.name && brawler.rarity.name !== "Unknown"
+    (brawler.rarity?.name && brawler.rarity.name !== 'Unknown'
       ? brawler.rarity.name
-      : null) ??
-    wiki?.stats.rarityName ??
-    null;
-  const isLegacy = catalogEntry?.status === "legacy";
-  const statLabels = combatStatLabels(
-    wiki?.stats.attackLabel,
-    wiki?.stats.superLabel,
-  );
+      : null) ?? wiki?.stats.rarityName ?? null;
+  const isLegacy = catalogEntry?.status === 'legacy';
+  const statLabels = combatStatLabels(wiki?.stats.attackLabel, wiki?.stats.superLabel);
 
   // A buffie is named for the ability type it upgrades, so each one is listed
   // against the gadget or star power it actually changes.
   const buffieEffects: { kind: string; ability: string; effect: string }[] = [];
   for (const [kind, items] of [
-    ["Gadget", gadgets],
-    ["Star power", starPowers],
+    ['Gadget', gadgets],
+    ['Star power', starPowers],
   ] as const) {
     for (const item of items) {
       const effect = wiki?.abilities.get(slugify(item.name))?.buffie;
@@ -445,7 +414,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   }
   if (wiki?.hypercharge?.buffie) {
     buffieEffects.push({
-      kind: "Hypercharge",
+      kind: 'Hypercharge',
       ability: wiki.hypercharge.name,
       effect: wiki.hypercharge.buffie,
     });
@@ -459,7 +428,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       question: `Is ${name} good in Brawl Stars?`,
       answer:
         stat && normalizedWinRate !== null
-          ? `${name} has a ${formatPercent(normalizedWinRate)} adjusted win rate and a ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled decided battles${tier ? `, which puts it in ${tier} tier` : ""}.`
+          ? `${name} has a ${formatPercent(normalizedWinRate)} adjusted win rate and a ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled decided battles${tier ? `, which puts it in ${tier} tier` : ''}.`
           : `${name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.`,
     },
     ...(splits.modes.length > 0
@@ -484,14 +453,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             question: `What counters ${name}?`,
             answer: `${pairings.weakAgainst
               .slice(0, 3)
-              .map((p) =>
-                titleCase(
-                  brawlerMeta.get(p.brawlerId)?.name ?? `#${p.brawlerId}`,
-                ),
-              )
-              .join(
-                ", ",
-              )} pull ${name} furthest below its own ${formatPercent(pairings.baseline)} average in sampled team battles.`,
+              .map((p) => titleCase(brawlerMeta.get(p.brawlerId)?.name ?? `#${p.brawlerId}`))
+              .join(', ')} pull ${name} furthest below its own ${formatPercent(pairings.baseline)} average in sampled team battles.`,
           },
         ]
       : []),
@@ -505,7 +468,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     <div className="space-y-8">
       <JsonLd
         data={breadcrumbSchema([
-          { name: "Brawlers", path: "/brawlers" },
+          { name: 'Brawlers', path: '/brawlers' },
           { name, path: `/brawlers/${resolved.slug}` },
         ])}
       />
@@ -594,7 +557,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   color: accent,
                 }}
               >
-                {rarityName ?? "Brawler"}
+                {rarityName ?? 'Brawler'}
               </span>
               {isLegacy ? (
                 <span
@@ -657,11 +620,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       {/* The answer the page title promises, before the biography and the stat
           grid. A summary of the Build & upgrades section below, which keeps
           every sample size and caveat. */}
-      <RecommendedBuild
-        build={build}
-        meta={official ?? undefined}
-        gearNames={gearNames}
-      />
+      <RecommendedBuild build={build} meta={official ?? undefined} gearNames={gearNames} />
 
       {wiki && wiki.stats.health ? (
         <section>
@@ -672,20 +631,20 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {(
               [
-                ["Health", wiki.stats.health, "health", true],
+                ['Health', wiki.stats.health, 'health', true],
                 /* The infobox labels these two independently and often gives
                    them the same words, so the grid used to print "Damage per
                    bullet" twice with different numbers under it. See
                    `combatStatLabels`. The gold Super mark carries the same
                    distinction a second way, in colour. */
-                [statLabels.attack, wiki.stats.attack, "damage", true],
-                [statLabels.super, wiki.stats.super, "super-damage", true],
+                [statLabels.attack, wiki.stats.attack, 'damage', true],
+                [statLabels.super, wiki.stats.super, 'super-damage', true],
                 // These three do not scale with Power Level, so they carry no
                 // Power 11 figure. Printing one would be the same mistake the
                 // heading used to make, one row further down.
-                ["Reload", wiki.stats.reload, "cooldown", false],
-                ["Range", wiki.stats.attackRange, "ranged", false],
-                ["Speed", wiki.stats.movementSpeed, "speed", false],
+                ['Reload', wiki.stats.reload, 'cooldown', false],
+                ['Range', wiki.stats.attackRange, 'ranged', false],
+                ['Speed', wiki.stats.movementSpeed, 'speed', false],
               ] as const
             )
               // Not every brawler has every stat: a super that deals no direct
@@ -710,9 +669,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                       </span>
                     </dd>
                     {hint ? (
-                      <dd className="mt-0.5 text-xs leading-tight text-muted">
-                        {hint}
-                      </dd>
+                      <dd className="mt-0.5 text-xs leading-tight text-muted">{hint}</dd>
                     ) : null}
                     {scales ? <PowerElevenHint main={main} /> : null}
                   </div>
@@ -771,16 +728,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               node={<TrophyIcon className="size-6" />}
               label="Avg trophies"
               value={
-                stat.avgTrophies === null
-                  ? ", "
-                  : formatNumber(Math.round(stat.avgTrophies))
+                stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))
               }
               hint="Across tracked players"
             />
             <StatCard
               icon={Sparkles}
               label="Avg rank"
-              value={stat.avgRank === null ? ", " : stat.avgRank.toFixed(1)}
+              value={stat.avgRank === null ? ', ' : stat.avgRank.toFixed(1)}
               hint="Across tracked players"
             />
           </div>
@@ -789,9 +744,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
              is missing and offers the two pages that do have an answer. */
           <div className="card p-6">
             <p className="text-sm leading-relaxed text-muted">
-              Not enough sampled battles for {name} yet. The sampler works
-              through the global leaderboard pool continuously, so newly
-              released brawlers fill in over the following days.
+              Not enough sampled battles for {name} yet. The sampler works through the
+              global leaderboard pool continuously, so newly released brawlers fill in
+              over the following days.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
@@ -829,7 +784,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             mapSlugFor={(split) => {
               const match = activeMaps.find(
                 (m) =>
-                  m.mapSlug === slugify(split.mapName ?? "") &&
+                  m.mapSlug === slugify(split.mapName ?? '') &&
                   m.scHash === split.mode,
               );
               return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
@@ -855,9 +810,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       ) : null}
 
       <section>
-        <SectionHeading
-          title={`Top players with ${brawler.name.toLowerCase()}`}
-        />
+        <SectionHeading title={`Top players with ${brawler.name.toLowerCase()}`} />
         <Suspense fallback={<TableSkeleton rows={5} />}>
           <BrawlerLeaderboard brawlerId={brawlerId} />
         </Suspense>
@@ -886,32 +839,30 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             aside={`${wiki.history.length} recorded`}
           />
           <ol className="card divide-y divide-border overflow-hidden">
-            {wiki.history
-              .slice(0, BALANCE_CHANGES_SHOWN)
-              .map((change, index) => (
-                <li
-                  key={`${change.date}-${index}`}
-                  className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3"
+            {wiki.history.slice(0, BALANCE_CHANGES_SHOWN).map((change, index) => (
+              <li
+                key={`${change.date}-${index}`}
+                className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3"
+              >
+                <span className="w-20 shrink-0 text-xs tabular-nums text-muted">
+                  {change.date}
+                </span>
+                <span
+                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
+                    change.kind === 'Buff'
+                      ? 'bg-victory/15 text-victory'
+                      : change.kind === 'Nerf'
+                        ? 'bg-defeat/15 text-defeat'
+                        : 'bg-surface-2 text-muted'
+                  }`}
                 >
-                  <span className="w-20 shrink-0 text-xs tabular-nums text-muted">
-                    {change.date}
-                  </span>
-                  <span
-                    className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
-                      change.kind === "Buff"
-                        ? "bg-victory/15 text-victory"
-                        : change.kind === "Nerf"
-                          ? "bg-defeat/15 text-defeat"
-                          : "bg-surface-2 text-muted"
-                    }`}
-                  >
-                    {change.kind}
-                  </span>
-                  <span className="min-w-0 flex-1 text-sm leading-relaxed">
-                    {change.text}
-                  </span>
-                </li>
-              ))}
+                  {change.kind}
+                </span>
+                <span className="min-w-0 flex-1 text-sm leading-relaxed">
+                  {change.text}
+                </span>
+              </li>
+            ))}
           </ol>
         </section>
       ) : null}
@@ -921,8 +872,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
            wiki: the combat stats, the resolved ability text, the hypercharge
            effect and the buffie effects. Their text is CC-BY-SA. */
         <p className="text-xs leading-relaxed text-muted">
-          Combat stats, ability and gear descriptions, hypercharge and buffie
-          effects, and balance history from the{" "}
+          Combat stats, ability and gear descriptions, hypercharge and buffie effects,{' '}
+          and balance history from the{' '}
           <a
             href={wikiPageUrl(wiki.title)}
             rel="noreferrer noopener"
@@ -941,9 +892,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           {faq.map((item) => (
             <div key={item.question} className="p-4">
               <dt className="font-semibold">{item.question}</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-muted">
-                {item.answer}
-              </dd>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
             </div>
           ))}
         </dl>
@@ -959,10 +908,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
  * to the artwork source when the official entry is missing, which is the case
  * for limited-time brawlers it never lists.
  */
-function ownedBy(
-  items: BAAccessory[],
-  official: BSAccessory[] | undefined,
-): BAAccessory[] {
+function ownedBy(items: BAAccessory[], official: BSAccessory[] | undefined): BAAccessory[] {
   if (!official?.length) return items;
   const allowed = new Set(official.map((a) => a.id));
   return items.filter((item) => allowed.has(item.id));
@@ -979,16 +925,17 @@ function ownedBy(
  */
 function splitStat(value: string): { main: string; hint: string | null } {
   const match = /^(.*?)\s*\((.+)\)\s*$/.exec(value);
-  const main = (match ? match[1] : value).replace(/\s*seconds?$/i, "s");
+  const main = (match ? match[1] : value).replace(/\s*seconds?$/i, 's');
   return { main: main.trim() || value, hint: match ? match[2].trim() : null };
 }
 
 /** ["A", "B", "C"] -> "A, B and C". Returns "none yet" for an empty list. */
 function listOf(items: string[]): string {
-  if (items.length === 0) return "none yet";
+  if (items.length === 0) return 'none yet';
   if (items.length === 1) return items[0];
-  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
+
 
 /**
  * The Power 11 figure for a stat that scales with Power Level.
@@ -1003,7 +950,7 @@ function listOf(items: string[]): string {
  * confident figure that happens to be wrong. Silence is the honest fallback.
  */
 function PowerElevenHint({ main }: { main: string }) {
-  const cleaned = main.replace(/,/g, "").trim();
+  const cleaned = main.replace(/,/g, '').trim();
   if (!/^\d+(\.\d+)?$/.test(cleaned)) return null;
 
   const doubled = Number(cleaned) * 2;
@@ -1011,7 +958,7 @@ function PowerElevenHint({ main }: { main: string }) {
 
   return (
     <dd className="mt-0.5 text-xs font-semibold leading-tight text-brand tabular-nums">
-      {doubled.toLocaleString("en-US")} at Power 11
+      {doubled.toLocaleString('en-US')} at Power 11
     </dd>
   );
 }

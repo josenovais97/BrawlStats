@@ -1,19 +1,16 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Lilita_One } from "next/font/google";
-import Script from "next/script";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
+import Script from 'next/script';
 
-import { InstallPrompt } from "@/components/install-prompt";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { InstallPrompt } from '@/components/install-prompt';
+import { SiteFooter } from '@/components/site-footer';
+import { SiteHeader } from '@/components/site-header';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
 
-import "./globals.css";
+import './globals.css';
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 /**
  * Display face for headings and the wordmark.
@@ -23,23 +20,23 @@ const geistMono = Geist_Mono({
  * Geist, which is far more readable at small sizes.
  */
 const lilita = Lilita_One({
-  variable: "--font-display",
-  weight: "400",
-  subsets: ["latin"],
+  variable: '--font-display',
+  weight: '400',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "BrawlZone: Brawl Stars player, club and brawler stats",
-    template: "%s · BrawlZone",
+    default: 'BrawlZone: Brawl Stars player, club and brawler stats',
+    template: '%s · BrawlZone',
   },
   description:
-    "Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.",
+    'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',
 
   /** Google Search Console ownership. Rendered as the verification meta tag. */
   verification: {
-    google: "MiIdig1YXgfLeQWD89d1Kagjh5w1wiXivuByKgHHHsw",
+    google: 'MiIdig1YXgfLeQWD89d1Kagjh5w1wiXivuByKgHHHsw',
   },
 
   /*
@@ -49,12 +46,12 @@ export const metadata: Metadata = {
    * currently override the image.
    */
   openGraph: {
-    type: "website",
+    type: 'website',
     siteName: SITE_NAME,
-    locale: "en_US",
+    locale: 'en_US',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
   },
 };
 
@@ -100,7 +97,7 @@ export default function RootLayout({
           the site data -- restoring only one of the two would leave this
           pointing at a website record that no longer exists.
         */}
-        {process.env.NODE_ENV === "production" ? (
+        {process.env.NODE_ENV === 'production' ? (
           <Script
             src="https://analytics.brawlzone.net/script.js"
             data-website-id="09f04c04-b76c-41a0-927e-a6c88041a4e3"

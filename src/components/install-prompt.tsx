@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Download, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Download, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { BrandMark } from "@/components/brand-mark";
+import { BrandMark } from '@/components/brand-mark';
 
 /**
  * The event Chromium fires when a site meets the installability criteria.
@@ -11,10 +11,10 @@ import { BrandMark } from "@/components/brand-mark";
  */
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const DISMISSED_KEY = "brawlzone:install-dismissed";
+const DISMISSED_KEY = 'brawlzone:install-dismissed';
 
 /**
  * Offers to install BrawlZone as an app on mobile.
@@ -24,16 +24,14 @@ const DISMISSED_KEY = "brawlzone:install-dismissed";
  * support it. A dismissal is remembered so it is never nagging.
  */
 export function InstallPrompt() {
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
-    null,
-  );
+  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (window.localStorage.getItem(DISMISSED_KEY) === "1") return;
+    if (window.localStorage.getItem(DISMISSED_KEY) === '1') return;
 
     // Already running as an installed app.
-    if (window.matchMedia("(display-mode: standalone)").matches) return;
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
 
     function onBeforeInstallPrompt(event: Event) {
       // Keep the event so the prompt can be shown from our own button.
@@ -42,15 +40,14 @@ export function InstallPrompt() {
       setVisible(true);
     }
 
-    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-    return () =>
-      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
   }, []);
 
   function dismiss() {
     setVisible(false);
     try {
-      window.localStorage.setItem(DISMISSED_KEY, "1");
+      window.localStorage.setItem(DISMISSED_KEY, '1');
     } catch {
       // Storage disabled — the banner just reappears next visit.
     }
@@ -72,9 +69,7 @@ export function InstallPrompt() {
         <BrandMark className="size-10 shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold">Install BrawlZone</p>
-          <p className="truncate text-xs text-muted">
-            Add it to your home screen
-          </p>
+          <p className="truncate text-xs text-muted">Add it to your home screen</p>
         </div>
         <button
           type="button"

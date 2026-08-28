@@ -1,15 +1,15 @@
-import { Globe } from "lucide-react";
+import { Globe } from 'lucide-react';
 
-import { LeaderboardIcon } from "@/components/game-icons";
-import Image from "next/image";
-import Link from "next/link";
+import { LeaderboardIcon } from '@/components/game-icons';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { Disclosure } from "@/components/ui/disclosure";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { brawlerPath } from "@/lib/slugs";
-import { brawlerIconUrl } from "@/lib/brawlapi";
-import { formatNumber } from "@/lib/format";
-import type { BrawlerPlacement } from "@/types/stats";
+import { Disclosure } from '@/components/ui/disclosure';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { brawlerPath } from '@/lib/slugs';
+import { brawlerIconUrl } from '@/lib/brawlapi';
+import { formatNumber } from '@/lib/format';
+import type { BrawlerPlacement } from '@/types/stats';
 
 interface Props {
   placements: BrawlerPlacement[];
@@ -27,11 +27,11 @@ const SHOWN = 8;
 
 /** Colour bands so a top-10 placement reads differently from a top-200 one. */
 function band(rank: number): { label: string; color: string } {
-  if (rank <= 10) return { label: "Top 10", color: "#ffc53d" };
-  if (rank <= 25) return { label: "Top 25", color: "#c9d3e8" };
-  if (rank <= 50) return { label: "Top 50", color: "#d08c4a" };
-  if (rank <= 100) return { label: "Top 100", color: "#7c5cff" };
-  return { label: "Top 200", color: "#35d07f" };
+  if (rank <= 10) return { label: 'Top 10', color: '#ffc53d' };
+  if (rank <= 25) return { label: 'Top 25', color: '#c9d3e8' };
+  if (rank <= 50) return { label: 'Top 50', color: '#d08c4a' };
+  if (rank <= 100) return { label: 'Top 100', color: '#7c5cff' };
+  return { label: 'Top 200', color: '#35d07f' };
 }
 
 /**
@@ -53,16 +53,14 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
         title="World ranked"
         aside={
           placements.length === 1
-            ? "On 1 global brawler leaderboard"
+            ? 'On 1 global brawler leaderboard'
             : `On ${placements.length} global brawler leaderboards`
         }
       />
 
       <div
         className="card card-glow mb-3 flex items-center gap-4 p-5"
-        style={{
-          borderColor: `color-mix(in srgb, ${band(best.rank).color} 45%, transparent)`,
-        }}
+        style={{ borderColor: `color-mix(in srgb, ${band(best.rank).color} 45%, transparent)` }}
       >
         <Image
           src={iconFor(best.brawlerId) ?? brawlerIconUrl(best.brawlerId)}
@@ -75,8 +73,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-muted">Best world ranking</p>
           <p className="truncate text-xl font-black capitalize">
-            #{best.rank}{" "}
-            <span className="text-brand">{best.brawlerName.toLowerCase()}</span>
+            #{best.rank} <span className="text-brand">{best.brawlerName.toLowerCase()}</span>
           </p>
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
             <Globe className="size-3" />
@@ -144,9 +141,7 @@ function Chip({
       title={`#${placement.rank} in the world on ${placement.brawlerName}`}
     >
       <Image
-        src={
-          iconFor(placement.brawlerId) ?? brawlerIconUrl(placement.brawlerId)
-        }
+        src={iconFor(placement.brawlerId) ?? brawlerIconUrl(placement.brawlerId)}
         alt=""
         width={28}
         height={28}

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { ArrowLeft, Search, X } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import Link from 'next/link';
+import { ArrowLeft, Search, X } from 'lucide-react';
+import { useId, useMemo, useState } from 'react';
 
-import { MapArt } from "@/components/maps/map-art";
+import { MapArt } from '@/components/maps/map-art';
 
 /** The minimum a card needs. The full BAMap payload never reaches the client. */
 export interface CatalogueMap {
@@ -49,14 +49,11 @@ export interface CatalogueGroup {
  * else fails when it stops being true.
  */
 export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [mode, setMode] = useState<string | null>(null);
   const searchId = useId();
 
-  const total = useMemo(
-    () => groups.reduce((sum, group) => sum + group.maps.length, 0),
-    [groups],
-  );
+  const total = useMemo(() => groups.reduce((sum, group) => sum + group.maps.length, 0), [groups]);
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -91,7 +88,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
         {query ? (
           <button
             type="button"
-            onClick={() => setQuery("")}
+            onClick={() => setQuery('')}
             aria-label="Clear search"
             className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
           >
@@ -102,24 +99,16 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
 
       {matches ? (
         matches.length === 0 ? (
-          <p className="card p-6 text-sm text-muted">
-            No map matches “{query}”.
-          </p>
+          <p className="card p-6 text-sm text-muted">No map matches “{query}”.</p>
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted">
-              <span className="font-semibold text-foreground">
-                {matches.length}
-              </span>{" "}
-              {matches.length === 1 ? "map" : "maps"} matching “{query}”
+              <span className="font-semibold text-foreground">{matches.length}</span>{' '}
+              {matches.length === 1 ? 'map' : 'maps'} matching “{query}”
             </p>
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {matches.map((map) => (
-                <MapCard
-                  key={`${map.modeSlug}-${map.id}`}
-                  map={map}
-                  sublabel={map.modeLabel}
-                />
+                <MapCard key={`${map.modeSlug}-${map.id}`} map={map} sublabel={map.modeLabel} />
               ))}
             </ul>
           </div>
@@ -146,7 +135,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
           <div className="flex items-start gap-3">
             <span className="rule mt-1" aria-hidden />
             <h3 className="display text-2xl uppercase">
-              {open.label}{" "}
+              {open.label}{' '}
               <span className="text-base normal-case tracking-normal text-muted">
                 {open.maps.length} maps
               </span>
@@ -180,13 +169,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                 href={`/maps/${group.mode}`}
                 prefetch={false}
                 onClick={(event) => {
-                  if (
-                    event.metaKey ||
-                    event.ctrlKey ||
-                    event.shiftKey ||
-                    event.altKey
-                  )
-                    return;
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
                   event.preventDefault();
                   setMode(group.mode);
                 }}
@@ -202,7 +185,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                   {group.label}
                 </span>
                 <span className="block px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
-                  {group.maps.length} {group.maps.length === 1 ? "map" : "maps"}
+                  {group.maps.length} {group.maps.length === 1 ? 'map' : 'maps'}
                 </span>
               </Link>
             </li>
@@ -230,9 +213,7 @@ function MapCard({ map, sublabel }: { map: CatalogueMap; sublabel?: string }) {
           height="h-28"
           sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
         />
-        <span className="block truncate px-3 pt-2 text-sm font-semibold">
-          {map.name}
-        </span>
+        <span className="block truncate px-3 pt-2 text-sm font-semibold">{map.name}</span>
         {sublabel ? (
           <span className="block truncate px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
             {sublabel}

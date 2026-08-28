@@ -1,21 +1,18 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
 
 import {
   ClubIcon,
   CosmeticsIcon,
   PlayersIcon,
   RankedIcon,
-} from "@/components/game-icons";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+} from '@/components/game-icons';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 
-import { RegionPicker } from "@/components/leaderboard/region-picker";
-import {
-  leaderboardHref,
-  type LeaderboardBoard,
-} from "@/lib/leaderboard-route";
+import { RegionPicker } from '@/components/leaderboard/region-picker';
+import { leaderboardHref, type LeaderboardBoard } from '@/lib/leaderboard-route';
 
 /* Defined with the URL scheme it is a segment of; re-exported so the callers
    that already import it from here keep working. */
@@ -32,20 +29,17 @@ const BOARDS: {
   key: LeaderboardBoard;
   icon: (props: { className?: string }) => React.ReactNode;
 }[] = [
-  { key: "players", icon: PlayersIcon },
-  { key: "clubs", icon: ClubIcon },
-  { key: "ranked", icon: RankedIcon },
-  { key: "cosmetics", icon: CosmeticsIcon },
+  { key: 'players', icon: PlayersIcon },
+  { key: 'clubs', icon: ClubIcon },
+  { key: 'ranked', icon: RankedIcon },
+  { key: 'cosmetics', icon: CosmeticsIcon },
 ];
 
 /**
  * Drives the leaderboard purely through the URL, so the server component above
  * re-renders with fresh data and every view is linkable.
  */
-export function LeaderboardControls({
-  region,
-  board,
-}: LeaderboardControlsProps) {
+export function LeaderboardControls({ region, board }: LeaderboardControlsProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -63,7 +57,7 @@ export function LeaderboardControls({
   return (
     <div
       className={`card relative z-30 flex flex-col gap-4 p-4 transition-opacity sm:flex-row sm:items-center ${
-        pending ? "opacity-60" : ""
+        pending ? 'opacity-60' : ''
       }`}
     >
       <div className="flex gap-2">
@@ -82,20 +76,14 @@ export function LeaderboardControls({
             key={key}
             href={leaderboardHref(key, region)}
             onClick={(event) => {
-              if (
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey
-              )
-                return;
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
               event.preventDefault();
               navigate({ type: key });
             }}
             className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-colors ${
               board === key
-                ? "bg-brand text-[#1a1200]"
-                : "border border-border text-muted hover:text-foreground"
+                ? 'bg-brand text-[#1a1200]'
+                : 'border border-border text-muted hover:text-foreground'
             }`}
           >
             <Icon className="size-4" />
@@ -107,7 +95,7 @@ export function LeaderboardControls({
       {/* Hidden on the two boards built from our own sampled pool: neither has
           a region dimension, so the picker would be a control that changes
           nothing. */}
-      {board === "cosmetics" || board === "ranked" ? null : (
+      {board === 'cosmetics' || board === 'ranked' ? null : (
         <div className="flex flex-1 sm:justify-end">
           <RegionPicker
             value={region}

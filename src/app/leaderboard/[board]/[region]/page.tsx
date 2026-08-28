@@ -1,10 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import { LeaderboardView } from "@/components/leaderboard/leaderboard-view";
-import {
-  leaderboardMetadata,
-  resolveLeaderboardRoute,
-} from "@/lib/leaderboard-route";
+import { LeaderboardView } from '@/components/leaderboard/leaderboard-view';
+import { leaderboardMetadata, resolveLeaderboardRoute } from '@/lib/leaderboard-route';
 
 /**
  * Fifteen minutes, not two.
@@ -30,9 +27,7 @@ interface PageProps {
   params: Promise<{ board: string; region: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { board, region } = await params;
   return leaderboardMetadata(resolveLeaderboardRoute([board, region]));
 }

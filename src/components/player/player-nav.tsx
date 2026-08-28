@@ -16,10 +16,10 @@
  * jumped-to heading lands below this one rather than behind it.
  */
 const SECTIONS: { id: string; label: string }[] = [
-  { id: "stats", label: "Stats" },
-  { id: "progress", label: "Progress" },
-  { id: "brawlers", label: "Brawlers" },
-  { id: "battles", label: "Battles" },
+  { id: 'stats', label: 'Stats' },
+  { id: 'progress', label: 'Progress' },
+  { id: 'brawlers', label: 'Brawlers' },
+  { id: 'battles', label: 'Battles' },
 ];
 
 export function PlayerNav() {

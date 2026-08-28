@@ -1,4 +1,4 @@
-import "server-only";
+import 'server-only';
 
 /**
  * The channel's latest video, from the public RSS feed.
@@ -20,7 +20,7 @@ import "server-only";
  */
 
 /** youtube.com/@brawlzonenet. Stable across handle renames. */
-const CHANNEL_ID = "UCFHUOC2ySM5BLMVhY9Hxdjw";
+const CHANNEL_ID = 'UCFHUOC2ySM5BLMVhY9Hxdjw';
 
 const FEED = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 
@@ -43,11 +43,11 @@ function tag(xml: string, name: string): string | null {
   const match = new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`).exec(xml);
   if (!match) return null;
   const value = match[1]
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
+    .replace(/&amp;/g, '&')
     .trim();
   return value || null;
 }
@@ -62,7 +62,7 @@ function tag(xml: string, name: string): string | null {
 export async function getLatestVideo(): Promise<LatestVideo | null> {
   try {
     const res = await fetch(FEED, {
-      headers: { "user-agent": "BrawlZone (+https://brawlzone.net)" },
+      headers: { 'user-agent': 'BrawlZone (+https://brawlzone.net)' },
       next: { revalidate: REVALIDATE_VIDEO },
       signal: AbortSignal.timeout(10_000),
     });
@@ -77,15 +77,15 @@ export async function getLatestVideo(): Promise<LatestVideo | null> {
     const entry = /<entry>([\s\S]*?)<\/entry>/.exec(xml)?.[1];
     if (!entry) return null;
 
-    const id = tag(entry, "yt:videoId");
-    const title = tag(entry, "title");
+    const id = tag(entry, 'yt:videoId');
+    const title = tag(entry, 'title');
     if (!id || !title) return null;
 
     return {
       id,
       title,
       url: `https://www.youtube.com/watch?v=${id}`,
-      publishedAt: tag(entry, "published"),
+      publishedAt: tag(entry, 'published'),
       thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
     };
   } catch {

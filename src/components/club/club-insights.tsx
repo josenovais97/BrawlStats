@@ -1,15 +1,15 @@
-import { Shield, Star, TrendingUp } from "lucide-react";
+import { Shield, Star, TrendingUp } from 'lucide-react';
 
-import { CrownIcon, PlayersIcon } from "@/components/game-icons";
-import Image from "next/image";
-import Link from "next/link";
+import { CrownIcon, PlayersIcon } from '@/components/game-icons';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { TrophyIcon } from "@/components/game-icons";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { playerIconUrl } from "@/lib/brawlapi";
-import { formatNumber, humanizeRole } from "@/lib/format";
-import { normalizeTag } from "@/lib/tags";
-import type { BSClub, BSClubMember } from "@/types/brawlstars";
+import { TrophyIcon } from '@/components/game-icons';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { playerIconUrl } from '@/lib/brawlapi';
+import { formatNumber, humanizeRole } from '@/lib/format';
+import { normalizeTag } from '@/lib/tags';
+import type { BSClub, BSClubMember } from '@/types/brawlstars';
 
 /** Roster composition, trophy spread and eligibility, derived from the member list. */
 export function ClubInsights({ club }: { club: BSClub }) {
@@ -77,10 +77,10 @@ export function ClubInsights({ club }: { club: BSClub }) {
           <ul className="space-y-3">
             {(
               [
-                ["president", CrownIcon, "text-brand"],
-                ["vicePresident", Shield, "text-accent"],
-                ["senior", Star, "text-victory"],
-                ["member", PlayersIcon, "text-muted"],
+                ['president', CrownIcon, 'text-brand'],
+                ['vicePresident', Shield, 'text-accent'],
+                ['senior', Star, 'text-victory'],
+                ['member', PlayersIcon, 'text-muted'],
               ] as const
             ).map(([role, Icon, tone]) => {
               const count = roleCounts[role] ?? 0;
@@ -107,12 +107,12 @@ export function ClubInsights({ club }: { club: BSClub }) {
           <dl className="mt-4 space-y-2.5 border-t border-border pt-4 text-sm">
             <Row
               label="Open slots"
-              value={openSlots === 0 ? "Full" : String(openSlots)}
+              value={openSlots === 0 ? 'Full' : String(openSlots)}
             />
             {club.requiredTrophies > 0 ? (
               <Row
                 label="Below entry bar"
-                value={`${belowRequirement} ${belowRequirement === 1 ? "member" : "members"}`}
+                value={`${belowRequirement} ${belowRequirement === 1 ? 'member' : 'members'}`}
               />
             ) : null}
           </dl>
@@ -130,7 +130,7 @@ export function ClubInsights({ club }: { club: BSClub }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
-                  prefetch={false}
+                prefetch={false}
                   className="flex items-center gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
                 >
                   <span className="w-4 shrink-0 text-center text-xs font-black tabular-nums text-muted">

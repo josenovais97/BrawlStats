@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   ChevronDown,
@@ -7,12 +7,12 @@ import {
   ScrollText,
   Search,
   X,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
-import { BrandMark } from "@/components/brand-mark";
+import { BrandMark } from '@/components/brand-mark';
 import {
   BrawlersIcon,
   ClubIcon,
@@ -25,7 +25,7 @@ import {
   RankedIcon,
   StarrDropIcon,
   TierListIcon,
-} from "@/components/game-icons";
+} from '@/components/game-icons';
 
 interface NavItem {
   href: string;
@@ -48,19 +48,14 @@ interface NavItem {
  * worth a permanent slot — the ones people arrive looking for.
  */
 const NAV: NavItem[] = [
-  { href: "/brawlers", label: "Brawlers", icon: BrawlersIcon },
+  { href: '/brawlers', label: 'Brawlers', icon: BrawlersIcon },
   // Points straight at the Ranked list so the nav does not bounce through the
   // /tier-list redirect, but stays highlighted on the trophy list too.
-  {
-    href: "/tier-list/ranked",
-    match: "/tier-list",
-    label: "Tier List",
-    icon: TierListIcon,
-  },
-  { href: "/ranked", label: "Ranked", icon: RankedIcon },
-  { href: "/maps", label: "Maps", icon: MapsIcon },
-  { href: "/draft", label: "Draft", icon: DraftIcon },
-  { href: "/leaderboard", label: "Leaderboard", icon: LeaderboardIcon },
+  { href: '/tier-list/ranked', match: '/tier-list', label: 'Tier List', icon: TierListIcon },
+  { href: '/ranked', label: 'Ranked', icon: RankedIcon },
+  { href: '/maps', label: 'Maps', icon: MapsIcon },
+  { href: '/draft', label: 'Draft', icon: DraftIcon },
+  { href: '/leaderboard', label: 'Leaderboard', icon: LeaderboardIcon },
 ];
 
 /**
@@ -74,7 +69,7 @@ const MORE: NavItem[] = [
   // Events is the one demotion that costs something: it is a page people do
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.
-  { href: "/events", label: "Events", icon: EventsIcon },
+  { href: '/events', label: 'Events', icon: EventsIcon },
   /*
    * Clubs had full pages and no way in from anywhere but a profile's club
    * chip. The board is the honest destination: there is no club index to point
@@ -84,18 +79,13 @@ const MORE: NavItem[] = [
    * an oversight — the game's ranking payload carries `club.name` with no tag,
    * so there is no URL to link to. Only a profile knows its club's tag.
    */
-  {
-    href: "/leaderboard/clubs",
-    match: "/club",
-    label: "Clubs",
-    icon: ClubIcon,
-  },
-  { href: "/compare", label: "Compare", icon: CompareIcon },
-  { href: "/tier-list/maker", label: "Tier List Maker", icon: TierListIcon },
-  { href: "/starr-drops", label: "Starr Drops", icon: StarrDropIcon },
-  { href: "/cosmetics", label: "Cosmetics", icon: CosmeticsIcon },
-  { href: "/news", label: "News", icon: Newspaper },
-  { href: "/release-notes", label: "Release Notes", icon: ScrollText },
+  { href: '/leaderboard/clubs', match: '/club', label: 'Clubs', icon: ClubIcon },
+  { href: '/compare', label: 'Compare', icon: CompareIcon },
+  { href: '/tier-list/maker', label: 'Tier List Maker', icon: TierListIcon },
+  { href: '/starr-drops', label: 'Starr Drops', icon: StarrDropIcon },
+  { href: '/cosmetics', label: 'Cosmetics', icon: CosmeticsIcon },
+  { href: '/news', label: 'News', icon: Newspaper },
+  { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
 ];
 
 /** The mobile panel has room for the lot, so it never hides anything. */
@@ -122,9 +112,7 @@ export function SiteHeader() {
     setMoreOpen(false);
   }
 
-  const moreActive = MORE.some((item) =>
-    isActive(pathname, item.href, item.match),
-  );
+  const moreActive = MORE.some((item) => isActive(pathname, item.href, item.match));
 
   return (
     <header className="sticky top-0 z-40">
@@ -165,9 +153,9 @@ export function SiteHeader() {
               <Link
                 key={href}
                 href={href}
-                aria-current={active ? "page" : undefined}
+                aria-current={active ? 'page' : undefined}
                 className={`relative whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  active ? "text-brand" : "text-muted hover:text-foreground"
+                  active ? 'text-brand' : 'text-muted hover:text-foreground'
                 }`}
               >
                 {label}
@@ -175,7 +163,7 @@ export function SiteHeader() {
                 <span
                   aria-hidden
                   className={`absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand transition-opacity ${
-                    active ? "opacity-100" : "opacity-0"
+                    active ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
               </Link>
@@ -189,19 +177,17 @@ export function SiteHeader() {
               aria-expanded={moreOpen}
               aria-haspopup="true"
               className={`relative flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                moreActive || moreOpen
-                  ? "text-brand"
-                  : "text-muted hover:text-foreground"
+                moreActive || moreOpen ? 'text-brand' : 'text-muted hover:text-foreground'
               }`}
             >
               More
               <ChevronDown
-                className={`size-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`}
+                className={`size-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`}
               />
               <span
                 aria-hidden
                 className={`absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand transition-opacity ${
-                  moreActive ? "opacity-100" : "opacity-0"
+                  moreActive ? 'opacity-100' : 'opacity-0'
                 }`}
               />
             </button>
@@ -225,12 +211,12 @@ export function SiteHeader() {
                       <li key={href}>
                         <Link
                           href={href}
-                          aria-current={active ? "page" : undefined}
+                          aria-current={active ? 'page' : undefined}
                           onClick={() => setMoreOpen(false)}
                           className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold transition-colors ${
                             active
-                              ? "bg-brand/10 text-brand"
-                              : "text-muted hover:bg-surface-2 hover:text-foreground"
+                              ? 'bg-brand/10 text-brand'
+                              : 'text-muted hover:bg-surface-2 hover:text-foreground'
                           }`}
                         >
                           <Icon className="size-4 shrink-0" />
@@ -264,7 +250,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
             aria-controls="mobile-nav"
             className="grid size-10 place-items-center rounded-lg border border-border text-muted transition-colors hover:text-foreground"
@@ -291,12 +277,12 @@ export function SiteHeader() {
                 <li key={href}>
                   <Link
                     href={href}
-                    aria-current={active ? "page" : undefined}
+                    aria-current={active ? 'page' : undefined}
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-2.5 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${
                       active
-                        ? "border-brand/40 bg-brand/10 text-brand"
-                        : "border-border bg-surface-2/60 text-muted hover:text-foreground"
+                        ? 'border-brand/40 bg-brand/10 text-brand'
+                        : 'border-border bg-surface-2/60 text-muted hover:text-foreground'
                     }`}
                   >
                     <Icon className="size-4 shrink-0" />

@@ -4,7 +4,7 @@
  * Inlined as a component rather than loaded as an image so it renders at any
  * size without a network request and can inherit sizing from Tailwind classes.
  */
-export function BrandMark({ className = "size-8" }: { className?: string }) {
+export function BrandMark({ className = 'size-8' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 64 64"
@@ -32,14 +32,7 @@ export function BrandMark({ className = "size-8" }: { className?: string }) {
       <rect x="31" y="32" width="29" height="28" rx="7" fill="#14365F" />
       <rect x="36" y="48.6" width="6.2" height="7.4" rx="1.5" fill="#FFFFFF" />
       <rect x="43.9" y="44" width="6.2" height="12" rx="1.5" fill="#FFFFFF" />
-      <rect
-        x="51.8"
-        y="39.4"
-        width="6.2"
-        height="16.6"
-        rx="1.5"
-        fill="#FFFFFF"
-      />
+      <rect x="51.8" y="39.4" width="6.2" height="16.6" rx="1.5" fill="#FFFFFF" />
 
       <path
         d="M36.0,45.6 L43.2,38.8 L47.4,42.6 L55.0,35.4 M55.0,35.4 L49.8,35.7 M55.0,35.4 L54.8,40.6"

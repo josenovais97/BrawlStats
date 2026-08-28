@@ -1,22 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { MapArt } from "@/components/maps/map-art";
-import { MapCatalogue } from "@/components/maps/map-catalogue";
-import { JsonLd, breadcrumbSchema } from "@/components/seo/structured-data";
-import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
-import { getEventRotation } from "@/lib/bs-api";
-import { MapsIcon } from "@/components/game-icons";
-import { getActiveMaps, groupByMode, type GameMap } from "@/lib/game-maps";
-import { getSeasonState } from "@/lib/ranked-seasons";
-import { slugify } from "@/lib/slugs";
+import { MapArt } from '@/components/maps/map-art';
+import { MapCatalogue } from '@/components/maps/map-catalogue';
+import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { getEventRotation } from '@/lib/bs-api';
+import { MapsIcon } from '@/components/game-icons';
+import { getActiveMaps, groupByMode, type GameMap } from '@/lib/game-maps';
+import { getSeasonState } from '@/lib/ranked-seasons';
+import { slugify } from '@/lib/slugs';
 
 export const metadata: Metadata = {
-  title: "Brawl Stars maps. Best brawlers for every map",
+  title: 'Brawl Stars maps. Best brawlers for every map',
   description:
-    "Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles.",
-  alternates: { canonical: "/maps" },
+    'Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles.',
+  alternates: { canonical: '/maps' },
 };
 
 /*
@@ -58,11 +58,8 @@ export default async function MapsIndexPage() {
     getSeasonState().catch(() => null),
   ]);
 
-  const byRoute = new Map(
-    maps.map((entry) => [`${entry.modeSlug}/${entry.mapSlug}`, entry]),
-  );
-  const pick = (mode: string, map: string) =>
-    byRoute.get(`${slugify(mode)}/${slugify(map)}`);
+  const byRoute = new Map(maps.map((entry) => [`${entry.modeSlug}/${entry.mapSlug}`, entry]));
+  const pick = (mode: string, map: string) => byRoute.get(`${slugify(mode)}/${slugify(map)}`);
 
   const live: GameMap[] = [];
   const liveSeen = new Set<string>();
@@ -86,7 +83,7 @@ export default async function MapsIndexPage() {
 
   return (
     <div className="space-y-10">
-      <JsonLd data={breadcrumbSchema([{ name: "Maps", path: "/maps" }])} />
+      <JsonLd data={breadcrumbSchema([{ name: 'Maps', path: '/maps' }])} />
 
       <PageHeading
         title="Maps"
@@ -111,16 +108,14 @@ export default async function MapsIndexPage() {
       {rankedPool.length > 0 ? (
         <MapStrip
           id="ranked-pool"
-          title={`Ranked pool${season?.current ? ` · season ${season.current.number}` : ""}`}
+          title={`Ranked pool${season?.current ? ` · season ${season.current.number}` : ''}`}
           subtitle="The competitive map pool for the current Ranked season. Fixed until the season turns over."
           maps={rankedPool}
         />
       ) : null}
 
       {groups.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">
-          The map catalogue is unavailable right now.
-        </p>
+        <p className="card p-6 text-sm text-muted">The map catalogue is unavailable right now.</p>
       ) : (
         <div>
           <SectionHeading
@@ -166,30 +161,18 @@ function MapStrip({
   return (
     <section aria-labelledby={id}>
       <div id={id}>
-        <SectionHeading
-          title={title}
-          subtitle={subtitle}
-          aside={`${maps.length} maps`}
-        />
+        <SectionHeading title={title} subtitle={subtitle} aside={`${maps.length} maps`} />
       </div>
       {/* Scrolls rather than wraps: these are short, ordered lists and a grid
           of eight would push the catalogue below the fold on a phone. */}
       <ul className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
         {maps.map((entry) => (
-          <li
-            key={`${entry.modeSlug}-${entry.mapSlug}`}
-            className="w-36 shrink-0 snap-start"
-          >
+          <li key={`${entry.modeSlug}-${entry.mapSlug}`} className="w-36 shrink-0 snap-start">
             <Link
               href={`/maps/${entry.modeSlug}/${entry.mapSlug}`}
               className="card card-interactive group block h-full overflow-hidden"
             >
-              <MapArt
-                src={entry.map.imageUrl}
-                alt=""
-                height="h-28"
-                sizes="144px"
-              />
+              <MapArt src={entry.map.imageUrl} alt="" height="h-28" sizes="144px" />
               <span className="block truncate px-3 pt-2 text-sm font-semibold">
                 {entry.map.name}
               </span>

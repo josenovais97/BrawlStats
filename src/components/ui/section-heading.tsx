@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 /**
  * One heading treatment for every section, so pages share a rhythm instead of
@@ -46,14 +46,10 @@ export function SectionHeading({
               </span>
             ) : null}
           </h2>
-          {subtitle ? (
-            <p className="mt-1 text-sm text-muted">{subtitle}</p>
-          ) : null}
+          {subtitle ? <p className="mt-1 text-sm text-muted">{subtitle}</p> : null}
         </div>
       </div>
-      {aside ? (
-        <div className="shrink-0 text-sm text-muted">{aside}</div>
-      ) : null}
+      {aside ? <div className="shrink-0 text-sm text-muted">{aside}</div> : null}
     </div>
   );
 }
@@ -81,9 +77,7 @@ export function PageHeading({
           </p>
         ) : null}
         <h1 className="display text-3xl uppercase sm:text-4xl">{title}</h1>
-        {subtitle ? (
-          <p className="mt-2 max-w-3xl text-muted">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="mt-2 max-w-3xl text-muted">{subtitle}</p> : null}
       </div>
       {aside}
     </header>

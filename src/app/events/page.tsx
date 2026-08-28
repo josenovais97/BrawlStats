@@ -1,28 +1,27 @@
-import type { Metadata } from "next";
-import { CalendarClock, Radio } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import type { Metadata } from 'next';
+import { CalendarClock, Radio } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { ModeBestPicks } from "@/components/events/mode-best-picks";
-import { ClockIcon } from "@/components/game-icons";
-import { ErrorState } from "@/components/ui/error-state";
-import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
-import { getBrawlerMap, getGameModeMap, getMapMap } from "@/lib/brawlapi";
-import { getEventRotation } from "@/lib/bs-api";
-import { toApiError } from "@/lib/errors";
-import { humanizeMode, partitionRotation, timeUntil } from "@/lib/format";
-import { getActiveMaps } from "@/lib/game-maps";
-import { slugify } from "@/lib/slugs";
-import { getBestPicksByMode } from "@/lib/stats";
-import type { BABrawler, BAGameMode, BAMap } from "@/types/brawlapi";
-import type { ModeBestPicks as ModeBestPicksData } from "@/types/stats";
-import type { BSRotationSlot } from "@/types/brawlstars";
+import { ModeBestPicks } from '@/components/events/mode-best-picks';
+import { ClockIcon } from '@/components/game-icons';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { getEventRotation } from '@/lib/bs-api';
+import { toApiError } from '@/lib/errors';
+import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
+import { getActiveMaps } from '@/lib/game-maps';
+import { slugify } from '@/lib/slugs';
+import { getBestPicksByMode } from '@/lib/stats';
+import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
+import type { ModeBestPicks as ModeBestPicksData } from '@/types/stats';
+import type { BSRotationSlot } from '@/types/brawlstars';
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/events" },
-  title: "Brawl Stars events",
-  description:
-    "Current and upcoming Brawl Stars event rotation across every mode slot.",
+  alternates: { canonical: '/events' },
+  title: 'Brawl Stars events',
+  description: 'Current and upcoming Brawl Stars event rotation across every mode slot.',
 };
 
 /*
@@ -44,12 +43,7 @@ export default async function EventsPage() {
   try {
     rotation = await getEventRotation(ROTATION_REVALIDATE);
   } catch (err) {
-    return (
-      <ErrorState
-        code={toApiError(err).code}
-        title="Event rotation unavailable"
-      />
-    );
+    return <ErrorState code={toApiError(err).code} title="Event rotation unavailable" />;
   }
 
   // Cosmetic metadata is optional — the page still works without artwork.
@@ -71,8 +65,7 @@ export default async function EventsPage() {
     if (!slot.event.map) return null;
     const match = activeMaps.find(
       (entry) =>
-        entry.mapSlug === slugify(slot.event.map!) &&
-        entry.scHash === slot.event.mode,
+        entry.mapSlug === slugify(slot.event.map!) && entry.scHash === slot.event.mode,
     );
     return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
   };
@@ -154,9 +147,9 @@ function EventSection({
               key={`${slot.slotId}-${slot.startTime}-${slot.event.id}`}
               slot={slot}
               map={mapMeta.get(slot.event.id)}
-              mode={modeMeta.get((slot.event.mode ?? "").toLowerCase())}
+              mode={modeMeta.get((slot.event.mode ?? '').toLowerCase())}
               brawlerMeta={brawlerMeta}
-              picks={bestPicks.get(slot.event.mode ?? "")}
+              picks={bestPicks.get(slot.event.mode ?? '')}
               showEndsIn={showEndsIn}
               mapHref={mapHrefFor(slot)}
             />
@@ -184,7 +177,7 @@ function EventCard({
   showEndsIn: boolean;
   mapHref: string | null;
 }) {
-  const accent = mode?.color ?? "#8b95b8";
+  const accent = mode?.color ?? '#8b95b8';
   const modeLabel = mode?.name ?? humanizeMode(slot.event.mode);
 
   return (
@@ -214,7 +207,7 @@ function EventCard({
       {map?.imageUrl ? (
         <Image
           src={map.imageUrl}
-          alt={slot.event.map ?? ""}
+          alt={slot.event.map ?? ''}
           width={300}
           height={180}
           className="h-40 w-full bg-surface-2 object-contain p-2"
@@ -230,16 +223,11 @@ function EventCard({
         {/* The map's own page is where the picks strip below comes from at
             full depth, so the name is the way through to it. */}
         {mapHref ? (
-          <Link
-            href={mapHref}
-            className="block truncate font-semibold hover:text-brand"
-          >
+          <Link href={mapHref} className="block truncate font-semibold hover:text-brand">
             {slot.event.map}
           </Link>
         ) : (
-          <p className="truncate font-semibold">
-            {slot.event.map ?? "Unknown map"}
-          </p>
+          <p className="truncate font-semibold">{slot.event.map ?? 'Unknown map'}</p>
         )}
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
           <ClockIcon className="size-4" />

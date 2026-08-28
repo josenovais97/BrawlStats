@@ -1,9 +1,9 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-import { GadgetIcon, StarPowerIcon } from "@/components/game-icons";
-import { gearIconUrl } from "@/lib/brawlapi";
-import { formatPercent } from "@/lib/format";
-import type { BrawlerBuild, BuildOption } from "@/types/stats";
+import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
+import { gearIconUrl } from '@/lib/brawlapi';
+import { formatPercent } from '@/lib/format';
+import type { BrawlerBuild, BuildOption } from '@/types/stats';
 
 /** Only what naming a pick needs, so either brawler type satisfies it. */
 interface NamedAccessory {
@@ -48,15 +48,11 @@ export function RecommendedBuild({
     list?.find((entry) => entry.id === id)?.name ?? null;
 
   const gadgetName = gadget ? nameOf(meta?.gadgets, gadget.itemId) : null;
-  const starPowerName = starPower
-    ? nameOf(meta?.starPowers, starPower.itemId)
-    : null;
+  const starPowerName = starPower ? nameOf(meta?.starPowers, starPower.itemId) : null;
 
   return (
     <div className="card flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">
-        Most equipped
-      </p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted">Most equipped</p>
 
       {starPower && starPowerName ? (
         <Pick
@@ -118,12 +114,8 @@ function Pick({
   return (
     <span className="flex items-center gap-2">
       {icon}
-      <span className="text-sm font-semibold capitalize">
-        {name.toLowerCase()}
-      </span>
-      <span className="text-xs tabular-nums text-muted">
-        {formatPercent(share)}
-      </span>
+      <span className="text-sm font-semibold capitalize">{name.toLowerCase()}</span>
+      <span className="text-xs tabular-nums text-muted">{formatPercent(share)}</span>
     </span>
   );
 }

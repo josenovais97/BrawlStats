@@ -1,12 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { GadgetIcon, GearIcon, StarPowerIcon } from "@/components/game-icons";
+import { GadgetIcon, GearIcon, StarPowerIcon } from '@/components/game-icons';
 
-import { gearIconUrl } from "@/lib/brawlapi";
-import { formatNumber, formatPercent } from "@/lib/format";
-import type { BAAccessory, BABrawler } from "@/types/brawlapi";
-import type { BrawlerBuild, BuildOption } from "@/types/stats";
+import { gearIconUrl } from '@/lib/brawlapi';
+import { formatNumber, formatPercent } from '@/lib/format';
+import type { BAAccessory, BABrawler } from '@/types/brawlapi';
+import type { BrawlerBuild, BuildOption } from '@/types/stats';
 
 interface Props {
   build: BrawlerBuild | null;
@@ -42,9 +42,8 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
          missing and offers a page that does have an answer. */
       <div className="card p-6">
         <p className="text-sm leading-relaxed text-muted">
-          No sampled player owns this brawler yet, so there is nothing to
-          measure. This fills in over the next few days as the sampler works
-          through profiles.
+          No sampled player owns this brawler yet, so there is nothing to measure.
+          This fills in over the next few days as the sampler works through profiles.
         </p>
         <Link
           href="/tier-list/trophy"
@@ -83,25 +82,25 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
     note?: string;
   }[] = [
     {
-      title: "Gears owners buy",
+      title: 'Gears owners buy',
       node: <GearIcon className="size-5" />,
       options: build.gears,
-      note: "Gears cost coins and you can only run two, so what owners have bought is a real preference.",
+      note: 'Gears cost coins and you can only run two, so what owners have bought is a real preference.',
     },
     ...(starPowersSplit
       ? [
           {
-            title: "Star powers",
+            title: 'Star powers',
             node: <StarPowerIcon className="size-5" />,
             options: build.starPowers,
-            note: "One of these is noticeably more common than the other, which usually means it came first or is the one people buy.",
+            note: 'One of these is noticeably more common than the other, which usually means it came first or is the one people buy.',
           },
         ]
       : []),
     ...(gadgetsSplit
       ? [
           {
-            title: "Gadgets",
+            title: 'Gadgets',
             node: <GadgetIcon className="size-5" />,
             options: build.gadgets,
             note: undefined,
@@ -122,9 +121,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
               {title}
             </h3>
             {note ? (
-              <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
-                {note}
-              </p>
+              <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{note}</p>
             ) : (
               <div className="mb-3" />
             )}
@@ -136,14 +133,10 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                 const leadMargin =
                   options.length > 1 ? options[0].share - options[1].share : 0;
                 const accessory = accessoryById.get(option.itemId);
-                const isGear = title.startsWith("Gears");
+                const isGear = title.startsWith('Gears');
                 const name =
-                  accessory?.name ??
-                  gearNames.get(option.itemId) ??
-                  `#${option.itemId}`;
-                const imageUrl =
-                  accessory?.imageUrl ??
-                  (isGear ? gearIconUrl(option.itemId) : null);
+                  accessory?.name ?? gearNames.get(option.itemId) ?? `#${option.itemId}`;
+                const imageUrl = accessory?.imageUrl ?? (isGear ? gearIconUrl(option.itemId) : null);
 
                 return (
                   <li key={option.itemId} className="flex items-center gap-3">
@@ -164,9 +157,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="truncate text-sm font-medium capitalize">
                           {name.toLowerCase()}
-                          {index === 0 &&
-                          options.length > 1 &&
-                          leadMargin > 0.1 ? (
+                          {index === 0 && options.length > 1 && leadMargin > 0.1 ? (
                             <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">
                               Most picked
                             </span>
@@ -184,9 +175,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                       <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-brand-strong to-brand"
-                          style={{
-                            width: `${Math.round(option.share * 100)}%`,
-                          }}
+                          style={{ width: `${Math.round(option.share * 100)}%` }}
                         />
                       </div>
                     </div>
@@ -203,8 +192,8 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       <p className="text-xs leading-relaxed text-muted">
         {`Measured across ${formatNumber(build.sampleSize)} tracked players who own this brawler.${
           !starPowersSplit && !gadgetsSplit
-            ? " Almost all of them own both star powers and both gadgets."
-            : ""
+            ? ' Almost all of them own both star powers and both gadgets.'
+            : ''
         }`}
       </p>
     </div>

@@ -37,7 +37,7 @@ const NOTES: Record<string, string> = {
 /** The slug a note is keyed on, or null for a URL that has no path. */
 export function newsSlug(url: string): string | null {
   try {
-    const segments = new URL(url).pathname.split("/").filter(Boolean);
+    const segments = new URL(url).pathname.split('/').filter(Boolean);
     return segments.length > 0 ? segments[segments.length - 1] : null;
   } catch {
     // A malformed URL simply has no note.
