@@ -1,15 +1,57 @@
 #!/usr/bin/env bash
-# Filter the BrawlZone logs. The files already carry colour, so this exists for
-# selecting levels, not for adding colour -- `tail`/`less -R` work directly.
+# Read the BrawlZone logs.
 #
-#   brawlzone-log                 # list what is available
-#   brawlzone-log sampler ERROR   # only errors
-#   brawlzone-log sampler -f      # follow
+#   brawlzone-log                  list what is available
+#   brawlzone-log access           the web log, as readable lines
+#   brawlzone-log access -f        follow it live
+#   brawlzone-log sampler          a job log
+#   brawlzone-log sampler ERROR    just the errors
+#   brawlzone-log deploy 50        last 50 lines
 #
-# Strips colour when piped, so `brawlzone-log sampler | grep x` stays clean.
+# The job logs already carry colour in the file, so `tail` and `less -R` work
+# on them directly. access.log is the exception: it is JSON, because the daily
+# digest queries it with jq and a human-readable format would have to be
+# re-parsed with a regex. So it stays machine-shaped on disk and gets rendered
+# here -- the same split as everywhere else, store what is precise, show what
+# is legible.
 set -uo pipefail
 DIR=/var/log/brawlzone
+E=$'\033'
+
 plain() { if [ -t 1 ]; then cat; else sed -E 's/\x1b\[[0-9;]*m//g'; fi; }
+
+# Turn one JSON request into: time  status  method  path  duration  client
+render_access() {
+  jq -r '
+    def shorten:
+      if   test("meta-externalagent") then "meta-AI"
+      elif test("Googlebot")          then "Googlebot"
+      elif test("bingbot")            then "bingbot"
+      elif test("ClaudeBot")          then "ClaudeBot"
+      elif test("Discordbot")         then "Discord"
+      elif test("facebookexternalhit")then "Facebook"
+      elif test("MJ12bot")            then "MJ12bot"
+      elif test("[Bb]ot|[Cc]rawler|spider") then "other-bot"
+      elif test("curl")               then "curl"
+      elif test("Chrome")             then "browser"
+      elif test("Firefox")            then "browser"
+      elif test("Safari")             then "browser"
+      else "-" end;
+    (.ts | strftime("%H:%M:%S")) as $t
+    | (.status // 0) as $s
+    | ((.duration // 0) * 1000 | round) as $ms
+    | ((.request.headers["User-Agent"][0] // "-") | shorten) as $ua
+    | [$t, ($s|tostring), (.request.method // "-"), (.request.uri // "-"), ($ms|tostring), $ua]
+    | @tsv
+  ' 2>/dev/null |
+  awk -F'\t' -v E="$E" '
+    BEGIN { printf "%-9s %-5s %-5s %-44s %7s  %s\n", "TIME","CODE","VERB","PATH","MS","CLIENT" }
+    {
+      c = ($2 >= 500) ? "1;31" : ($2 >= 400) ? "1;33" : ($2 >= 300) ? "0;36" : "0;32"
+      p = length($4) > 43 ? substr($4,1,42) "…" : $4
+      printf "%s%-9s%s %s%-5s%s %-5s %-44s %7s  %s\n", E "[2m", $1, E "[0m", E "[" c "m", $2, E "[0m", $3, p, $5, $6
+    }'
+}
 
 if [ $# -eq 0 ]; then
   echo "logs in $DIR:"
@@ -19,13 +61,23 @@ if [ $# -eq 0 ]; then
       "$(du -h "$f" | cut -f1)" "$(date -u -r "$f" +%Y-%m-%dT%H:%M:%SZ)"
   done
   echo
-  echo "these are coloured in the file: plain 'tail -f' and 'less -R' work"
+  echo "usage: brawlzone-log <name> [-f | ERROR | WARN | INFO | <lines>]"
   exit 0
 fi
 
 name=$1; shift
 f="$DIR/${name}.log"
 [ -r "$f" ] || { echo "no readable log at $f" >&2; exit 1; }
+
+if [ "$name" = "access" ]; then
+  case "${1:-}" in
+    -f|--follow) tail -f "$f" | render_access | plain ;;
+    "")          tail -400 "$f" | render_access | plain ;;
+    *)           tail -n "$1" "$f" | render_access | plain ;;
+  esac
+  exit 0
+fi
+
 case "${1:-}" in
   -f|--follow)     tail -f "$f" | plain ;;
   ERROR|WARN|INFO) grep -F "[$1" "$f" | tail -200 | plain ;;

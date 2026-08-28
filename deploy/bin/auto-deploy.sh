@@ -24,6 +24,26 @@ docker compose up -d --build
 # pull. `caddy reload` is graceful: no dropped connections, no restart.
 if git diff --name-only "$local" "$remote" | grep -qx Caddyfile; then
   echo "Caddyfile changed, validating and reloading caddy"
+  # Gate on the EXIT CODE, not on the output. `caddy validate` prints its
+  # progress as JSON on stderr and never says the word "valid", so grepping
+  # for one would have failed every time.
+  #
+  # This matters because `caddy reload` DECLINES an invalid config and keeps
+  # the previous one running: the site stays up, the change silently does not
+  # happen, and without this the deploy still reports success.
+  if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/tmp/caddy-validate.log 2>&1; then
+    echo "Caddyfile is INVALID -- refusing to reload, previous config still serving" >&2
+    tail -5 /tmp/caddy-validate.log >&2
+    exit 1
+  fi
+  if ! docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile >/tmp/caddy-reload.log 2>&1; then
+    echo "caddy reload FAILED -- previous config still serving" >&2
+    tail -5 /tmp/caddy-reload.log >&2
+    exit 1
+  fi
+  echo "caddy reloaded"
+file; then
+  echo "Caddyfile changed, validating and reloading caddy"
   # Validate first, and FAIL if either step fails. A bad Caddyfile makes
   # `caddy reload` decline and keep the previous config -- the site stays up,
   # the change silently does not happen, and without this check the deploy
