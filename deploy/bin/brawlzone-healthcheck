@@ -37,6 +37,10 @@ down=$(cd /home/ubuntu/brawlstats && docker compose ps --status exited --status 
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 
 if [ ${#problems[@]} -eq 0 ]; then
+  # Say what was checked. A log that only records that something ran cannot
+  # tell you afterwards whether it was actually looking at anything.
+  age=$([ -n "$last" ] && echo "$((last / 60))m" || echo "unknown")
+  echo "All checks passed: site HTTP $code, data $age old, disk ${use}%, $(cd /home/ubuntu/brawlstats && docker compose ps --services --status running | wc -l) containers up"
   if [ "$prev" != "ok" ]; then
     printf 'Recovered at %s.\n\nAll checks passing:\n  site HTTP 200\n  data fresh\n  disk %s%%\n  containers up\n' \
       "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$use" | /usr/local/bin/brawlzone-alert "RECOVERED"

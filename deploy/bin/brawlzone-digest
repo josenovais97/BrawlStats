@@ -43,14 +43,14 @@ bk_size=$(du -sh /home/ubuntu/backups 2>/dev/null | cut -f1)
 
 reqs=$(wc -l < "$ACCESS" 2>/dev/null || echo 0)
 if [ "$reqs" -gt 0 ] && command -v jq >/dev/null; then
-  codes=$(jq -r '.status' "$ACCESS" 2>/dev/null | sort | uniq -c | sort -rn | head -5 \
+  codes=$(jq -r '.status' "$ACCESS" 2>/dev/null | sort 2>/dev/null | uniq -c | sort -rn 2>/dev/null | head -5 \
           | awk '{printf "%s x%s   ", $2, $1}')
   agents=$(jq -r '.request.headers["User-Agent"][0] // "none"' "$ACCESS" 2>/dev/null \
           | sed -E 's/.*(Googlebot|bingbot|Bytespider|GPTBot|ClaudeBot|meta-externalagent|Amazonbot|SemrushBot|AhrefsBot|YandexBot|Discordbot|Twitterbot|facebookexternalhit).*/\1 (bot)/; s/.*(Chrome|Safari|Firefox|Edg).*/\1/; s/^curl.*/curl/' \
-          | sort | uniq -c | sort -rn | head -6 | awk '{printf "%-26s %s\n", $2" "$3, $1}')
+          | sort 2>/dev/null | uniq -c | sort -rn 2>/dev/null | head -6 | awk '{printf "%-26s %s\n", $2" "$3, $1}')
   paths=$(jq -r '.request.uri' "$ACCESS" 2>/dev/null \
           | sed -E 's#/player/.*#/player/*#; s#/brawlers/[^/]+.*#/brawlers/*#; s#/maps/.+#/maps/*#; s#/_next/.*#/_next/*#; s#\?.*##' \
-          | sort | uniq -c | sort -rn | head -6 | awk '{printf "%-26s %s\n", $2, $1}')
+          | sort 2>/dev/null | uniq -c | sort -rn 2>/dev/null | head -6 | awk '{printf "%-26s %s\n", $2, $1}')
 else
   codes="no requests logged"; agents=""; paths=""
 fi
@@ -124,3 +124,11 @@ fi
 
 html_close "brawlzone-web &middot; Oracle A1, eu-frankfurt-1 &middot; generated $(date -u +%Y-%m-%dT%H:%M:%SZ)<br>Sent by brawlzone-digest.timer. Failures are mailed separately as they happen."
 } | /usr/local/bin/brawlzone-alert --html "$subj"
+
+# Say what was sent, so this log matches the others: a line stating the outcome
+# rather than only that something ran.
+if [ "$problems" -eq 0 ]; then
+  echo "Sent daily status to $(grep -oP '"'"'(?<=^ALERT_TO=).*'"'"' /etc/brawlzone/alert.conf 2>/dev/null || echo 'the configured address'): all healthy"
+else
+  echo "Sent daily status: $problems check(s) need attention"
+fi
