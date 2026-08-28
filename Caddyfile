@@ -21,10 +21,12 @@
 	# Kept in step with BLOCKED_AGENTS in src/lib/crawl-policy.ts, which is
 	# what robots.txt reads. Neither enforces the other: robots.txt is a
 	# request, this is the answer for an agent that ignores it.
-	@blocked_agents header_regex User-Agent (?i)meta-externalagent
-	respond @blocked_agents "Refused. See /robots.txt\n" 403 {
-		close
-	}
+	# header_regexp, not header_regex -- the latter is not a registered module
+	# and Caddy rejects the whole file, which `caddy reload` then declines,
+	# leaving the previous config running. Silently, unless someone checks the
+	# reload's exit code, which auto-deploy.sh now does.
+	@blocked_agents header_regexp User-Agent (?i)meta-externalagent
+	respond @blocked_agents "Refused. See /robots.txt" 403
 
 	# There was no access log at all until 2026-08-27, which meant no way to
 	# answer "which crawler is hitting what" -- the exact question behind the

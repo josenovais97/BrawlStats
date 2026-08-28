@@ -23,8 +23,20 @@ docker compose up -d --build
 # Caddy keeps serving the old config -- silently. Reload if it moved in this
 # pull. `caddy reload` is graceful: no dropped connections, no restart.
 if git diff --name-only "$local" "$remote" | grep -qx Caddyfile; then
-  echo "Caddyfile changed, reloading caddy"
-  docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+  echo "Caddyfile changed, validating and reloading caddy"
+  # Validate first, and FAIL if either step fails. A bad Caddyfile makes
+  # `caddy reload` decline and keep the previous config -- the site stays up,
+  # the change silently does not happen, and without this check the deploy
+  # reports success. That is how a crawler block sat in the repo for an hour
+  # doing nothing on 2026-08-28.
+  if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile; then
+    echo "Caddyfile is invalid -- refusing to reload, previous config still serving" >&2
+    exit 1
+  fi
+  docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile || {
+    echo "caddy reload failed" >&2
+    exit 1
+  }
 fi
 docker image prune -f >/dev/null
 # Build cache, not just dangling images. `docker image prune` does not touch
