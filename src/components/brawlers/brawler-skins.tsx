@@ -1,3 +1,6 @@
+import Image from 'next/image';
+
+import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BrawlerSkinUsage } from '@/lib/stats';
 
@@ -9,17 +12,25 @@ import type { BrawlerSkinUsage } from '@/lib/stats';
  * anything at this scale, and the sitewide cosmetics board answers the other
  * question already.
  *
- * No artwork: neither the metadata API nor the CDN exposes skin images (there
- * is no /v1/skins endpoint and every skin path 404s), so the bars carry the
- * visual weight rather than a grid of broken thumbnails. The numbers are the
- * part nobody else has anyway.
+ * Artwork comes from the wiki, which is the only reachable source: there is no
+ * /v1/skins endpoint on the metadata API and every cdn.brawlify.com skin path
+ * 404s. See lib/skin-art. Around a fifth of skins have no file — usually the
+ * newest — so a row without art still renders, with its bar and its numbers.
+ *
+ * The default skin falls back to the brawler's portrait rather than a blank,
+ * because the portrait IS what the default looks like.
  */
 export function BrawlerSkins({
   skins,
+  brawlerId,
   brawlerName,
+  artFor,
 }: {
   skins: BrawlerSkinUsage[];
+  brawlerId: number;
   brawlerName: string;
+  /** Resolves a skin to its wiki artwork, or null when the wiki has no file. */
+  artFor: (skin: BrawlerSkinUsage) => string | null;
 }) {
   if (skins.length === 0) return null;
 
@@ -46,6 +57,10 @@ export function BrawlerSkins({
       <ul className="card divide-y divide-border overflow-hidden">
         {top.map((skin) => (
           <li key={skin.id} className="flex items-center gap-3 px-3 py-2.5">
+            <SkinArt
+              src={skin.isDefault ? brawlerPortraitUrl(brawlerId) : artFor(skin)}
+              alt=""
+            />
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-2">
                 <span className="truncate text-sm font-semibold capitalize">
@@ -87,5 +102,33 @@ export function BrawlerSkins({
         </p>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * The skin's picture, or a quiet placeholder when the wiki has no file for it.
+ *
+ * A placeholder rather than a hidden row: the skin is real and its numbers are
+ * the point, and dropping it would misrepresent the ranking.
+ */
+function SkinArt({ src, alt }: { src: string | null; alt: string }) {
+  if (!src) {
+    return (
+      <span
+        aria-hidden
+        className="size-11 shrink-0 rounded-lg border border-dashed border-border bg-surface-2"
+      />
+    );
+  }
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={44}
+      height={44}
+      className="size-11 shrink-0 rounded-lg bg-surface-2 object-cover"
+      loading="lazy"
+      unoptimized
+    />
   );
 }

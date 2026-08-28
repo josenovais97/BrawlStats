@@ -42,6 +42,7 @@ const EXPLORE = [
   // from nowhere on the site -- `npm run crawl:budget` never found them
   // because no page linked to them. A route with no inbound link is a page
   // nobody can arrive at except by typing it.
+  { href: '/cosmetics', label: 'Cosmetics' },
   { href: '/news', label: 'News' },
   { href: '/starr-drops', label: 'Starr Drops' },
   { href: '/release-notes', label: 'Release Notes' },

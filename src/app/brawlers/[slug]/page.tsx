@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
 import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
+import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
@@ -344,10 +345,13 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Fetched together: the matchup rows need to know which of their pairs the
   // sitemap actually claims, so a non-indexable one can be nofollowed rather
   // than quietly widening the crawlable set. See BrawlerMatchups.
-  const [pairings, indexable, skins] = await Promise.all([
+  const [pairings, indexable, skins, skinArt] = await Promise.all([
     getBrawlerPairings(brawlerId),
     getIndexablePairs(),
     getBrawlerSkins(brawlerId),
+    // One cached sweep of the wiki's file list serves every brawler page; see
+    // lib/skin-art for why the artwork cannot come from the metadata API.
+    getSkinArt(),
   ]);
   const indexablePairs = new Set(
     indexable.map(([a, b]) => (a < b ? `${a}:${b}` : `${b}:${a}`)),
@@ -808,7 +812,12 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             title="Skins"
             subtitle={`Which ${name} skins players actually equip, from the sampled snapshot pool.`}
           />
-          <BrawlerSkins skins={skins} brawlerName={brawler.name} />
+          <BrawlerSkins
+            skins={skins}
+            brawlerId={brawlerId}
+            brawlerName={brawler.name}
+            artFor={(skin) => skinArtUrl(skinArt, brawler.name, skin.name)}
+          />
         </section>
       ) : null}
 

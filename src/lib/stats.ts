@@ -1558,6 +1558,104 @@ async function compute_getBrawlerSkins(brawlerId: number): Promise<BrawlerSkinUs
   }
 }
 
+/**
+ * Every skin the sample has seen, not just the top of the board.
+ *
+ * `getSkinUsage` answers "what is popular right now" in twenty rows; this
+ * answers "what exists, and does anyone use it", which is a different page and
+ * a much longer list -- around 1,200 skins across the roster.
+ *
+ * Defaults are excluded, matching the leaderboard: the skin carrying the
+ * brawler's own name is not something anyone acquired, and per-brawler
+ * adoption is already answered by `getBrawlerSkins`.
+ *
+ * Shares are of all sampled player-brawler slots, so they are directly
+ * comparable between skins of different brawlers -- which is the comparison a
+ * catalogue is for.
+ */
+async function compute_getSkinCatalogue(): Promise<CosmeticUsage[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(COSMETIC_WINDOW_DAYS);
+
+    const rows = await prisma.$queryRaw<
+      { skin_id: number; skin_name: string; brawler_id: number; brawler_name: string; users: bigint }[]
+    >`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag, brawler_id)
+               player_tag, brawler_id, brawler_name, skin_id, skin_name
+        FROM player_brawler_snapshots
+        WHERE snapshot_date >= ${since} AND skin_id IS NOT NULL
+        ORDER BY player_tag, brawler_id, snapshot_date DESC
+      )
+      SELECT skin_id, skin_name, brawler_id, max(brawler_name) AS brawler_name, COUNT(*) AS users
+      FROM latest
+      WHERE upper(regexp_replace(skin_name, '\s+', ' ', 'g')) <> upper(brawler_name)
+      GROUP BY skin_id, skin_name, brawler_id
+      ORDER BY users DESC
+    `;
+
+    const [{ total }] = await prisma.$queryRaw<{ total: bigint }[]>`
+      WITH latest AS (
+        SELECT DISTINCT ON (player_tag, brawler_id) player_tag, brawler_id
+        FROM player_brawler_snapshots
+        WHERE snapshot_date >= ${since} AND skin_id IS NOT NULL
+        ORDER BY player_tag, brawler_id, snapshot_date DESC
+      )
+      SELECT COUNT(*) AS total FROM latest
+    `;
+    const denominator = Number(total) || 1;
+
+    return rows.map((row) => ({
+      id: row.skin_id,
+      name: row.skin_name.replace(/\s+/g, ' ').trim(),
+      brawlerId: row.brawler_id,
+      brawlerName: row.brawler_name.replace(/\s+/g, ' ').trim(),
+      users: Number(row.users),
+      share: Number(row.users) / denominator,
+    }));
+  } catch (error) {
+    swallow('compute_getSkinCatalogue', error);
+    return [];
+  }
+}
+
+/**
+ * Every profile icon the sample has seen.
+ *
+ * Unlike skins these have artwork -- `playerIconUrl` resolves any id -- so the
+ * catalogue can actually show them. The icon lives on the account rather than
+ * per brawler, so the denominator is sampled players.
+ */
+async function compute_getIconCatalogue(): Promise<CosmeticUsage[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const groups = await prisma.sampledPlayer.groupBy({
+      by: ['iconId'],
+      where: { iconId: { not: null } },
+      _count: { _all: true },
+      orderBy: { _count: { iconId: 'desc' } },
+    });
+
+    const total = groups.reduce((sum, group) => sum + group._count._all, 0);
+    if (total === 0) return [];
+
+    return groups.map((group) => ({
+      id: group.iconId!,
+      name: `Icon #${group.iconId}`,
+      users: group._count._all,
+      share: group._count._all / total,
+    }));
+  } catch (error) {
+    swallow('compute_getIconCatalogue', error);
+    return [];
+  }
+}
+
 async function compute_getSkinUsage(limit = 20): Promise<CosmeticUsage[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
@@ -2978,6 +3076,8 @@ export const getMetaMovers = cachedRead('meta-movers', compute_getMetaMovers);
 export const getCoverageStats = cachedRead('coverage-stats', compute_getCoverageStats);
 export const getTrophyGains = cachedRead('trophy-gains', compute_getTrophyGains);
 export const getSkinUsage = cachedRead('skin-usage', compute_getSkinUsage);
+export const getSkinCatalogue = cachedRead('skin-catalogue', compute_getSkinCatalogue);
+export const getIconCatalogue = cachedRead('icon-catalogue', compute_getIconCatalogue);
 export const getBrawlerSkins = cachedRead('brawler-skins', compute_getBrawlerSkins);
 export const getIconUsage = cachedRead('icon-usage', compute_getIconUsage);
 export const getReleasedBuffieCount = cachedRead('released-buffie-count', compute_getReleasedBuffieCount);
