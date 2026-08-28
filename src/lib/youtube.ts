@@ -13,10 +13,10 @@ import 'server-only';
  * every cache miss to recover a string that changes never — the handle can be
  * renamed, the id cannot.
  *
- * Checked 2026-08-28: the feed returns 200 with the channel title and zero
- * entries, because the channel has no public videos yet. That is the reason
- * every caller here is built to render nothing rather than to show a frame —
- * the empty state is the *current* state, not a hypothetical one.
+ * The empty-channel path is not hypothetical: this shipped against a channel
+ * with zero entries and rendered nothing for a day, which is why every caller
+ * is built to return null rather than to show an empty frame. The first video
+ * went up 2026-08-28.
  */
 
 /** youtube.com/@brawlzonenet. Stable across handle renames. */
@@ -26,8 +26,15 @@ const FEED = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`
 
 export const CHANNEL_URL = `https://www.youtube.com/channel/${CHANNEL_ID}`;
 
-/** An upload changes rarely; six hours is plenty and stays polite. */
-const REVALIDATE_VIDEO = 21_600;
+/**
+ * An hour, matching `REVALIDATE_NEWS` for the official news feed — the same
+ * kind of source, polled the same way, so there was no reason for the two to
+ * differ. Six hours was the original guess and it was wrong in the one case
+ * that matters: the first upload landed while the cached response still said
+ * the channel was empty, and a card called "latest video" that takes most of a
+ * day to notice a video is not doing its job.
+ */
+const REVALIDATE_VIDEO = 3600;
 
 export interface LatestVideo {
   id: string;
