@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Redeploy when origin/main moves. Run from a systemd timer.
+# Redeploy when origin/main moves. Run from a systemd timer every 5 minutes.
 #
 # Resets rather than pulls: this box is a mirror of origin and must never carry
 # local edits, or a stray change silently blocks every future deploy. The only
@@ -16,55 +16,43 @@ remote=$(git rev-parse origin/main)
 [ "$local" = "$remote" ] && exit 0
 
 echo "deploying ${local:0:7} -> ${remote:0:7}"
+caddy_changed=$(git diff --name-only "$local" "$remote" | grep -cx "caddy/Caddyfile" || true)
+
 git reset --hard --quiet origin/main
 docker compose up -d --build
 
-# Caddyfile is a bind mount, so a change to it lands on disk but the running
-# Caddy keeps serving the old config -- silently. Reload if it moved in this
-# pull. `caddy reload` is graceful: no dropped connections, no restart.
-if git diff --name-only "$local" "$remote" | grep -qx Caddyfile; then
-  echo "Caddyfile changed, validating and reloading caddy"
+if [ "$caddy_changed" -gt 0 ]; then
+  echo "Caddy config changed, validating and reloading"
   # Gate on the EXIT CODE, not on the output. `caddy validate` prints its
   # progress as JSON on stderr and never says the word "valid", so grepping
-  # for one would have failed every time.
+  # its text for one would fail every time.
   #
   # This matters because `caddy reload` DECLINES an invalid config and keeps
   # the previous one running: the site stays up, the change silently does not
-  # happen, and without this the deploy still reports success.
-  if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/tmp/caddy-validate.log 2>&1; then
-    echo "Caddyfile is INVALID -- refusing to reload, previous config still serving" >&2
-    tail -5 /tmp/caddy-validate.log >&2
+  # happen, and without this the deploy still reports success. That is exactly
+  # how a stale config served for a day on 2026-08-28.
+  if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/tmp/caddy-check.log 2>&1; then
+    echo "Caddy config is INVALID -- not reloading, previous config still serving" >&2
+    tail -5 /tmp/caddy-check.log >&2
     exit 1
   fi
-  if ! docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile >/tmp/caddy-reload.log 2>&1; then
-    echo "caddy reload FAILED -- previous config still serving" >&2
-    tail -5 /tmp/caddy-reload.log >&2
+  if ! docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile >/tmp/caddy-check.log 2>&1; then
+    echo "Caddy reload FAILED -- previous config still serving" >&2
+    tail -5 /tmp/caddy-check.log >&2
     exit 1
   fi
-  echo "caddy reloaded"
-file; then
-  echo "Caddyfile changed, validating and reloading caddy"
-  # Validate first, and FAIL if either step fails. A bad Caddyfile makes
-  # `caddy reload` decline and keep the previous config -- the site stays up,
-  # the change silently does not happen, and without this check the deploy
-  # reports success. That is how a crawler block sat in the repo for an hour
-  # doing nothing on 2026-08-28.
-  if ! docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile; then
-    echo "Caddyfile is invalid -- refusing to reload, previous config still serving" >&2
-    exit 1
-  fi
-  docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile || {
-    echo "caddy reload failed" >&2
-    exit 1
-  }
+  echo "Caddy reloaded"
 fi
+
 docker image prune -f >/dev/null
-# Build cache, not just dangling images. `docker image prune` does not touch
-# it at all, and it reached 16.75 GB -- a third of the disk -- inside a day.
+
+# Build cache, not just dangling images. `docker image prune` does not touch it
+# at all, and it reached 16.75 GB -- a third of the disk -- inside a day.
 #
-# Capped by SIZE, not age. An age filter is the wrong tool here: the variable
-# is how often this repo is pushed, not how old a layer is, and 19 deploys in
-# one day left every layer younger than any sensible cut-off. 4 GB keeps
-# same-session rebuilds warm and cannot grow past that however busy the day.
+# Capped by SIZE, not age. An age filter is the wrong tool: the variable is how
+# often this repo is pushed, not how old a layer is, and 19 deploys in one day
+# left every layer younger than any sensible cut-off. 4 GB keeps same-session
+# rebuilds warm and cannot grow past that however busy the day.
 docker builder prune -f --max-used-space=4GB >/dev/null
+
 echo "done: $(git log --oneline -1)"
