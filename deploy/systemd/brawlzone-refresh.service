@@ -1,0 +1,11 @@
+[Unit]
+Description=Rebuild BrawlZone so dated page titles roll over
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/brawlstats
+ExecStart=/usr/local/bin/brawlzone-run deploy /home/ubuntu/auto-deploy.sh --force
+TimeoutStartSec=900

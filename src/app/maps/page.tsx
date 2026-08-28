@@ -10,14 +10,17 @@ import { getEventRotation } from '@/lib/bs-api';
 import { MapsIcon } from '@/components/game-icons';
 import { getActiveMaps, groupByMode, type GameMap } from '@/lib/game-maps';
 import { getSeasonState } from '@/lib/ranked-seasons';
+import { currentMonth } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
 
-export const metadata: Metadata = {
-  title: 'Brawl Stars maps. Best brawlers for every map',
-  description:
-    'Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles.',
-  alternates: { canonical: '/maps' },
-};
+/* Generated rather than static, for the month — see the brawler index. */
+export function generateMetadata(): Metadata {
+  return {
+    title: `Brawl Stars maps and best brawlers (${currentMonth()})`,
+    description: `Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, ${currentMonth()}.`,
+    alternates: { canonical: '/maps' },
+  };
+}
 
 /*
  * One hour, and it says one hour because that is what it is.

@@ -67,9 +67,21 @@ export const SAMPLE_PLAYER_TAG = '2RLCPVGUG';
  * The month a page is being served in, for titles.
  *
  * A freshness signal, and one this site can actually make good on: the sampler
- * runs every three hours and these pages revalidate hourly to daily, so a
- * month in the title is a claim the data backs rather than decoration. Every
+ * runs every two hours and these pages revalidate hourly to daily, so a month
+ * in the title is a claim the data backs rather than decoration. Every
  * competitor that outranks us on "<brawler> build" carries one.
+ *
+ * Keeping it *true* takes more than calling this function. Titles are baked
+ * into prerendered HTML at build time, and the deploy timer only builds when
+ * origin/main moves — so a quiet month would have served August's date through
+ * September on every indexed page, which is a staleness signal on exactly the
+ * pages the date exists to make look fresh. `brawlzone-refresh.timer` forces a
+ * rebuild on the 1st, and `BUILD_MONTH` in the Dockerfile makes that rebuild
+ * actually re-run `next build` instead of reusing a cached layer.
+ *
+ * Call it from `generateMetadata`, never from a `metadata` object: the object
+ * is evaluated once when the module loads, so the month would sit at whatever
+ * it was when the process started.
  *
  * Deliberately not the day. A date that specific reads as stale the moment it
  * is a day old, and the underlying numbers move on a slower cadence than that.

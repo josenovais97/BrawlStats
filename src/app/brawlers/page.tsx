@@ -5,14 +5,24 @@ import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { currentMonth } from '@/lib/site';
 import { getMetaIndex } from '@/lib/stats';
 
-export const metadata: Metadata = {
-  alternates: { canonical: '/brawlers' },
-  title: 'Brawl Stars brawlers',
-  description:
-    'Every Brawl Stars brawler with class, rarity, star powers and gadgets.',
-};
+/*
+ * A function, not a `metadata` object, because of the month in the title.
+ *
+ * A static `metadata` export is evaluated once when the module loads, so the
+ * month would freeze at server start and only move on a restart. Generated per
+ * render, it refreshes whenever ISR revalidates the page — and the monthly
+ * rebuild is then a backstop rather than the only thing keeping it honest.
+ */
+export function generateMetadata(): Metadata {
+  return {
+    alternates: { canonical: '/brawlers' },
+    title: `All Brawl Stars brawlers ranked (${currentMonth()})`,
+    description: `Every Brawl Stars brawler with its Ranked tier, class, rarity, star powers and gadgets, ${currentMonth()}. Sorted strongest first from sampled battles.`,
+  };
+}
 
 /*
  * Hourly rather than daily, since the tier on each card comes from a sampler

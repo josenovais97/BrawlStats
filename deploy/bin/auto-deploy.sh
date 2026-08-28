@@ -9,7 +9,17 @@
 # Quiet on success, everything on failure. `docker compose up --build` prints a
 # few hundred lines of layer hashes and npm notices; none of it is information
 # when the build worked, and all of it is when it did not.
+#
+# `--force` rebuilds even when HEAD has not moved. That exists for one reason:
+# page titles carry the current month ("Best Brock build in Brawl Stars (August
+# 2026)"), and those titles are baked into prerendered HTML at build time. With
+# no forced path, a month with no pushes would serve last month's date on every
+# indexed page — a staleness signal on the exact pages the date was added to
+# make look fresh. `brawlzone-refresh.timer` calls this on the 1st.
 set -uo pipefail
+
+force=0
+[ "${1:-}" = "--force" ] && force=1
 
 cd "$HOME/brawlstats" || exit 1
 
@@ -17,16 +27,25 @@ git fetch --quiet origin main || exit 0
 
 local=$(git rev-parse HEAD)
 remote=$(git rev-parse origin/main)
-[ "$local" = "$remote" ] && exit 0
+[ "$local" = "$remote" ] && [ "$force" -eq 0 ] && exit 0
 
-changed=$(git diff --name-only "$local" "$remote" | wc -l)
-echo "Deploying ${local:0:7} -> ${remote:0:7} ($changed file(s) changed)"
-caddy_changed=$(git diff --name-only "$local" "$remote" | grep -cx "caddy/Caddyfile" || true)
+if [ "$local" = "$remote" ]; then
+  echo "Forced rebuild at ${local:0:7} (no new commits; refreshing dated titles)"
+  changed=0
+  caddy_changed=0
+else
+  changed=$(git diff --name-only "$local" "$remote" | wc -l)
+  echo "Deploying ${local:0:7} -> ${remote:0:7} ($changed file(s) changed)"
+  caddy_changed=$(git diff --name-only "$local" "$remote" | grep -cx "caddy/Caddyfile" || true)
+fi
 
 git reset --hard --quiet origin/main
 
 build=$(mktemp); trap 'rm -f "$build"' EXIT
 start=$(date +%s)
+# Invalidates the build layer only when the month actually turns over, so an
+# ordinary same-month deploy still reuses the cache and stays fast.
+export BUILD_MONTH="$(date -u +%Y-%m)"
 if ! docker compose up -d --build >"$build" 2>&1; then
   echo "Build or restart FAILED. Full output follows:"
   cat "$build"

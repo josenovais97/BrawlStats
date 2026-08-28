@@ -49,6 +49,9 @@ services:
         - build_env
       args:
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://brawlzone.net}
+        # Changes once a month so the monthly refresh actually re-runs
+        # `next build` instead of reusing a cached layer. See the Dockerfile.
+        BUILD_MONTH: ${BUILD_MONTH:-unset}
     restart: unless-stopped
     env_file: .env.production
     expose:

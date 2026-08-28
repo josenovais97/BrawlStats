@@ -48,7 +48,17 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 # image layer. BUILD_DATABASE_URL overrides DATABASE_URL because the runtime
 # value (db:5432) resolves only on the compose network, which a build does not
 # join; it points at the loopback-published port instead.
+#
+# BUILD_MONTH exists only to invalidate this layer. Page titles carry the
+# current month and are baked into prerendered HTML here, so a rebuild that
+# reuses a cached build layer would re-ship last month's titles — which is the
+# whole failure the monthly refresh is meant to prevent. Placed immediately
+# before the build so it invalidates nothing above it: `npm ci` and the Prisma
+# client are untouched, and a forced monthly rebuild costs only `next build`.
+# Not a secret, so an ARG is the right home for it.
+ARG BUILD_MONTH=unset
 RUN --mount=type=secret,id=build_env,uid=0 \
+    echo "build month: $BUILD_MONTH" >/dev/null && \
     set -a && . /run/secrets/build_env && set +a && \
     export DATABASE_URL="${BUILD_DATABASE_URL:-$DATABASE_URL}" && \
     npm run build

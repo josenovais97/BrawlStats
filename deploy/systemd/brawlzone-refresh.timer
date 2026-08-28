@@ -1,0 +1,16 @@
+[Unit]
+Description=Monthly rebuild so page titles carry the current month
+
+[Timer]
+# Page titles read "(August 2026)" and are baked into prerendered HTML at build
+# time, so without this a month with no pushes would serve last month's date on
+# every indexed page. 00:20 on the 1st, after midnight UTC has actually turned
+# the month over.
+OnCalendar=*-*-01 00:20:00
+# Fires on the next boot if the box was down on the 1st, which matters here:
+# a missed run means a whole month of stale dates.
+Persistent=true
+Unit=brawlzone-refresh.service
+
+[Install]
+WantedBy=timers.target

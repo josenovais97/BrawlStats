@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+
+import { currentMonth } from '@/lib/site';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { isSupportedRegion, regionName } from '@/lib/regions';
@@ -136,7 +138,9 @@ export function leaderboardMetadata({ board, region }: LeaderboardRoute): Metada
 
   if (atDefaultRegion) {
     return {
-      title: copy.title,
+      // Only this branch is indexable; the regional boards below are
+      // noindex, so dating them would be decoration nobody sees.
+      title: `${copy.title} (${currentMonth()})`,
       description: copy.description,
       alternates: { canonical: leaderboardHref(board) },
     };
