@@ -101,6 +101,21 @@ export function PlayerRankedPicks({
     .sort((a, b) => (a.best!.rank - b.best!.rank) || b.best!.score - a.best!.score)
     .slice(0, 4);
 
+  /*
+   * Covered, but not with the map's best answer.
+   *
+   * Without this the second card collapsed to one sentence and a lot of empty
+   * space on any account with full coverage — which is every strong account,
+   * i.e. exactly the people most likely to read this. "You own something on
+   * every map" is not the end of the advice: owning the third-best pick on
+   * fourteen maps is still fourteen maps with a better option available.
+   */
+  const settling = covered
+    .filter((v) => v.best!.rank > 1)
+    .sort((a, b) => b.best!.rank - a.best!.rank)
+    .slice(0, 4);
+  const firstPicks = covered.length - covered.filter((v) => v.best!.rank > 1).length;
+
   return (
     <section className="space-y-4" aria-labelledby="ranked-picks">
       <div>
@@ -157,7 +172,7 @@ export function PlayerRankedPicks({
               ? 'Upgrades that would fix a map'
               : gaps.length > 0
                 ? 'Maps you have no answer for'
-                : 'Full coverage'}
+                : 'Where you are settling'}
           </p>
           {upgrades.length > 0 ? (
             <>
@@ -192,9 +207,31 @@ export function PlayerRankedPicks({
                 />
               ))}
             </ul>
+          ) : settling.length > 0 ? (
+            <>
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                You have {firstPicks} of {verdicts.length} maps' best pick. On these
+                you are on a lower option — the brawler shown is the one the map
+                actually wants.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {settling.map(({ map, best }) => (
+                  <PickRow
+                    key={`${map.mode}-${map.mapName}`}
+                    map={map}
+                    brawlerId={map.picks[0].brawlerId}
+                    brawlerName={map.picks[0].brawlerName}
+                    meta={brawlerMeta.get(map.picks[0].brawlerId)}
+                    note={`You play #${best!.rank} here`}
+                    tone="warn"
+                  />
+                ))}
+              </ul>
+            </>
           ) : (
             <p className="mt-2 text-sm text-muted">
-              You own a strong pick on every rated map in the rotation.
+              You own the best pick on every rated map in the rotation. There is
+              nothing to improve here.
             </p>
           )}
         </div>
