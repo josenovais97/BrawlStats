@@ -8,13 +8,14 @@ import {
   type BrawlerChange,
   buildChangeIndex,
   isNotable,
+  isNotableInTier,
   spanLabel,
   tierRank,
 } from '@/lib/meta-changes';
 import type { BABrawler } from '@/types/brawlapi';
 import type { MetaMover, Tier } from '@/types/stats';
 
-export { buildChangeIndex, isNotable, spanLabel, type BrawlerChange };
+export { buildChangeIndex, isNotable, isNotableInTier, spanLabel, type BrawlerChange };
 
 /**
  * What moved since the last comparable snapshot.
@@ -40,13 +41,30 @@ export { buildChangeIndex, isNotable, spanLabel, type BrawlerChange };
  * delta is the detail that goes in the tooltip. Showing all three on a 92px
  * card would make every chip unreadable to say something about a handful.
  */
-export function ChangeBadge({ change, span }: { change: BrawlerChange; span: string }) {
-  const up = change.crossedTier
-    ? tierRank(change.tierNow) < tierRank(change.tierBefore)
+export function ChangeBadge({
+  change,
+  span,
+  currentTier,
+}: {
+  change: BrawlerChange;
+  span: string;
+  /**
+   * The tier this chip is actually rendered in.
+   *
+   * Not `change.tierNow`: that is the snapshot pair's answer, computed over a
+   * different window from the page's own scoring, and the two disagree often
+   * enough to put a red "A tier" badge on a brawler sitting in the S row.
+   * The badge describes the move that ends where the reader can see it ending.
+   */
+  currentTier: Tier;
+}) {
+  const crossed = change.tierBefore !== currentTier;
+  const up = crossed
+    ? tierRank(currentTier) < tierRank(change.tierBefore)
     : change.scoreDelta > 0;
 
   const sign = change.scoreDelta > 0 ? '+' : '';
-  const title = `${change.crossedTier ? `${change.tierBefore} to ${change.tierNow} tier, ` : ''}${
+  const title = `${crossed ? `${change.tierBefore} to ${currentTier} tier, ` : ''}${
     change.rankDelta !== 0
       ? `${Math.abs(change.rankDelta)} ${
           Math.abs(change.rankDelta) === 1 ? 'place' : 'places'
@@ -54,8 +72,8 @@ export function ChangeBadge({ change, span }: { change: BrawlerChange; span: str
       : ''
   }meta score ${sign}${change.scoreDelta.toFixed(1)} ${span}`;
 
-  const label = change.crossedTier
-    ? `${change.tierNow} tier`
+  const label = crossed
+    ? `${currentTier} tier`
     : change.rankDelta !== 0
       ? `${Math.abs(change.rankDelta)}`
       : `${sign}${change.scoreDelta.toFixed(1)}`;

@@ -15,7 +15,7 @@ import {
   ChangeBadge,
   WhatChanged,
   buildChangeIndex,
-  isNotable,
+  isNotableInTier,
   spanLabel,
 } from '@/components/tier-list/meta-changes';
 import { MetaMovers } from '@/components/tier-list/meta-movers';
@@ -575,7 +575,9 @@ function TierRow({
                 </p>
                 {/* Only when it actually moved. A badge on every chip saying
                   "+0.0" would be noise wearing the costume of information. */}
-                {change && isNotable(change) ? <ChangeBadge change={change} span={span} /> : null}
+                {change && isNotableInTier(change, tier) ? (
+                  <ChangeBadge change={change} span={span} currentTier={tier} />
+                ) : null}
               </Link>
             );
           })}

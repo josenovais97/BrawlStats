@@ -65,9 +65,27 @@ export function buildChangeIndex(movers: MetaMover[]): Map<number, BrawlerChange
   return index;
 }
 
-/** Whether a change is worth the ink. */
+/** Whether a change is worth the ink, judged on its own snapshot pair. */
 export function isNotable(change: BrawlerChange): boolean {
   return change.crossedTier || Math.abs(change.scoreDelta) >= MIN_SCORE_MOVE;
+}
+
+/**
+ * The same question, asked against the tier a page has actually placed the
+ * brawler in.
+ *
+ * `change.tierNow` comes from `getMetaMovers`, which assigns a tier from the
+ * latest stored snapshot. A tier list assigns its own from `scoreBrawlers`
+ * over whichever window the reader picked. Those are two computations over two
+ * different windows, and they disagree often: Brock sat in the S row carrying
+ * a red "A tier" badge, because the snapshot pair said A while the page's own
+ * 7-day scoring said S.
+ *
+ * So anything rendered beside a tier chip has to judge the crossing against
+ * that chip, not against the snapshot's opinion of where the brawler is.
+ */
+export function isNotableInTier(change: BrawlerChange, currentTier: Tier): boolean {
+  return change.tierBefore !== currentTier || Math.abs(change.scoreDelta) >= MIN_SCORE_MOVE;
 }
 
 /**
