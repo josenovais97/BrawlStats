@@ -20,8 +20,13 @@ export interface BrawlerCardData {
   className: string | null;
   rarityName: string | null;
   rarityColor: string;
-  /** "legacy" brawlers are kept for their history but are not playable. */
-  status: 'current' | 'legacy';
+  /**
+   * "legacy" brawlers are kept for their history but are not playable.
+   * "upcoming" ones have been revealed and are not in the game yet — they are
+   * listed so that searching the name here finds something, which is the whole
+   * reason their pages exist.
+   */
+  status: 'current' | 'legacy' | 'upcoming';
   /**
    * Ranked tier and meta score, or null below the sample floor.
    *
@@ -157,8 +162,9 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
      the page showed 106 and 107 a few centimetres apart with nothing saying
      why. Reconciled here rather than by hiding one of them: both numbers are
      true and the difference is the withdrawn brawlers. */
-  const playable = brawlers.filter((b) => b.status !== 'legacy').length;
-  const legacy = brawlers.length - playable;
+  const playable = brawlers.filter((b) => b.status === 'current').length;
+  const legacy = brawlers.filter((b) => b.status === 'legacy').length;
+  const upcoming = brawlers.filter((b) => b.status === 'upcoming').length;
 
   /* Only the pill rows count — the search box stays visible, so it would read
      as an uncounted filter. */
@@ -277,10 +283,12 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             <strong className="font-bold tabular-nums text-foreground">{visible.length}</strong>{' '}
             {visible.length === 1 ? 'brawler' : 'brawlers'}
             {filtered ? ` of ${brawlers.length}` : null}
-            {!filtered && legacy > 0 ? (
+            {!filtered && (legacy > 0 || upcoming > 0) ? (
               <>
                 {' '}
-                &middot; {playable} currently playable, {legacy} withdrawn
+                &middot; {playable} currently playable
+                {legacy > 0 ? `, ${legacy} withdrawn` : ''}
+                {upcoming > 0 ? `, ${upcoming} not released yet` : ''}
               </>
             ) : null}
           </p>
@@ -355,6 +363,15 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
           background: `radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, ${brawler.rarityColor} 22%, transparent), transparent 70%)`,
         }}
       />
+
+      {brawler.status === 'upcoming' ? (
+        <span
+          className="absolute left-2 top-2 z-10 rounded-md bg-accent/20 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-accent"
+          title="Revealed but not in the game yet."
+        >
+          Soon
+        </span>
+      ) : null}
 
       {brawler.status === 'legacy' ? (
         <span

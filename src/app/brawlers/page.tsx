@@ -6,6 +6,7 @@ import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { currentMonth } from '@/lib/site';
+import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { getMetaIndex } from '@/lib/stats';
 
 /*
@@ -55,11 +56,22 @@ export default async function BrawlersPage() {
    */
   const meta = await getMetaIndex('ranked', 7).catch(() => new Map());
 
+  /*
+   * Revealed but not shipped. Fetched here so the index can list them: this is
+   * the page people use to look a brawler up, and finding nothing for a name
+   * that is all over the game's own announcements is the gap their pages were
+   * built to close.
+   */
+  const upcoming = await getUpcomingBrawlers(
+    catalog.all.map((b) => b.name),
+  ).catch(() => [] as UpcomingBrawler[]);
+
   return (
     <div className="space-y-6">
       {/* The count is the playable roster, not the row count: the artwork
-          source still lists withdrawn brawlers, and they are shown here with
-          a Legacy badge rather than counted as current. */}
+          source still lists withdrawn brawlers, and revealed-but-unreleased
+          ones are listed too. Both carry a badge rather than being counted as
+          current. */}
       <PageHeading
         title="Brawlers"
         subtitle={`All ${catalog.current.length} current brawlers with their Ranked tier, sortable by how strong they are right now${
@@ -70,20 +82,42 @@ export default async function BrawlersPage() {
       />
 
       <BrawlerBrowser
-        brawlers={catalog.all.map((b) => ({
-          id: b.id,
-          name: b.name,
-          imageUrl: b.meta?.imageUrl ?? brawlerIconUrl(b.id),
-          // Null rather than "Unknown": the artwork source reports that
-          // literal string for every brawler released since Meeple, and a chip
-          // reading "Unknown" on a fifth of the roster is worse than no chip.
-          className: b.className,
-          rarityName: b.rarityName,
-          rarityColor: b.rarityColor ?? '#8b95b8',
-          status: b.status,
-          tier: meta.get(b.id)?.tier ?? null,
-          metaScore: meta.get(b.id)?.metaScore ?? null,
-        }))}
+        brawlers={[
+          ...catalog.all.map((b) => ({
+            id: b.id,
+            name: b.name,
+            imageUrl: b.meta?.imageUrl ?? brawlerIconUrl(b.id),
+            // Null rather than "Unknown": the artwork source reports that
+            // literal string for every brawler released since Meeple, and a chip
+            // reading "Unknown" on a fifth of the roster is worse than no chip.
+            className: b.className,
+            rarityName: b.rarityName,
+            rarityColor: b.rarityColor ?? '#8b95b8',
+            status: b.status,
+            tier: meta.get(b.id)?.tier ?? null,
+            metaScore: meta.get(b.id)?.metaScore ?? null,
+          })),
+          /*
+           * Revealed but not shipped. Listed because searching the name here
+           * and finding nothing is the failure their pages exist to prevent —
+           * this index is where people look for a brawler.
+           *
+           * Negative ids: these are not in the catalogue and have no real id,
+           * and a negative one cannot collide with a brawler that later ships
+           * under the same name. Links are built from the name regardless.
+           */
+          ...upcoming.map((b, i) => ({
+            id: -(i + 1),
+            name: b.name,
+            imageUrl: b.portraitUrl ?? '',
+            className: b.className,
+            rarityName: b.rarityName,
+            rarityColor: '#8b7cf6',
+            status: 'upcoming' as const,
+            tier: null,
+            metaScore: null,
+          })),
+        ]}
       />
     </div>
   );
