@@ -670,7 +670,8 @@ export interface CoverageStats {
   brawlers: number;
   players: number;
   battles: number;
-  placements: number;
+  /** Competitive Ranked battles only — see `compute_getCoverageStats`. */
+  rankedBattles: number;
 }
 
 /**
@@ -691,7 +692,22 @@ async function compute_getCoverageStats(): Promise<CoverageStats | null> {
     // few days and read as a collapse in coverage.
     const battleAgg = await prisma.battleDailyStat.aggregate({ _sum: { battles: true } });
     const battles = battleAgg._sum.battles ?? 0;
-    const placements = await prisma.brawlerRankingEntry.count();
+    /*
+     * Competitive battles from the roll-up, not `brawlerRankingEntry.count()`.
+     *
+     * That count was the brawler *leaderboard* table, which the game API caps
+     * at 200 entries per brawler. With 106 brawlers it is pinned at 21,200 and
+     * is replaced wholesale on every run, so it sat unchanged at "21.2K" for
+     * days next to three counters that were climbing — which reads as the
+     * sampler having stopped. It was never a measure of sampling at all.
+     *
+     * This counts what the label claims: Ranked battles actually observed.
+     */
+    const rankedAgg = await prisma.battleDailyStat.aggregate({
+      _sum: { battles: true },
+      where: { battleType: { in: [...COMPETITIVE_BATTLE_TYPES] } },
+    });
+    const rankedBattles = rankedAgg._sum.battles ?? 0;
     const brawlers = await prisma.brawlerCatalogEntry.findMany({
       distinct: ['brawlerId'],
       select: { brawlerId: true },
@@ -701,7 +717,7 @@ async function compute_getCoverageStats(): Promise<CoverageStats | null> {
       brawlers: brawlers.length,
       players,
       battles,
-      placements,
+      rankedBattles,
     };
   } catch (error) {
     swallow('compute_getCoverageStats', error);

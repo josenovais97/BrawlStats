@@ -28,7 +28,7 @@ export async function HomeCoverage() {
     { icon: BrawlersIcon, label: 'Brawlers tracked', value: stats.brawlers },
     { icon: PlayersIcon, label: 'Players sampled', value: stats.players },
     { icon: BattlesIcon, label: 'Battles analysed', value: stats.battles },
-    { icon: RankedIcon, label: 'Ranked placements', value: stats.placements },
+    { icon: RankedIcon, label: 'Ranked battles', value: stats.rankedBattles },
   ];
 
   return (
