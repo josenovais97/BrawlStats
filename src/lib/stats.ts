@@ -2979,7 +2979,34 @@ function cachedRead<A extends unknown[], R>(
     [key],
     { revalidate: READ_CACHE_SECONDS },
   );
-  return (...args: A) => wrapped(...(args as unknown[]));
+  return async (...args: A) => {
+    try {
+      return await wrapped(...(args as unknown[]));
+    } catch (error) {
+      /*
+       * Outside a Next server context there is no incremental cache, and
+       * `unstable_cache` throws an invariant rather than degrading — so every
+       * read in this file explodes the moment a plain script imports it. Same
+       * family as needing `--conditions=react-server` for `server-only`, and
+       * just as invisible: `tsc`, eslint and `next build` all pass, because
+       * none of them run the script.
+       *
+       * It cost a Discord bot that reported "nothing moved" every day while
+       * actually failing on every call, because the caller wrapped this in a
+       * `.catch` that returned an empty list. Running uncached is exactly
+       * right for a script: it runs once and exits, so there is nothing for a
+       * cache to amortise.
+       *
+       * Matched on the specific invariant, never broadly — a real database
+       * error must still reach the caller rather than being retried silently
+       * and then swallowed a second time.
+       */
+      if (error instanceof Error && error.message.includes('incrementalCache missing')) {
+        return fn(...args);
+      }
+      throw error;
+    }
+  };
 }
 
 

@@ -11,7 +11,11 @@ cd /home/ubuntu/brawlstats || exit 1
 
 out=$(mktemp); trap 'rm -f "$out"' EXIT
 
-if ! docker compose run --rm sampler npm run discord:meta >"$out" 2>&1; then
+# `--build`, like brawlzone-sample: without it `docker compose run` reuses
+# whatever image exists, which on the first run was one built before this
+# script's npm entry existed -- "Missing script: discord:meta" against a
+# package.json that plainly has it.
+if ! docker compose run --rm --build sampler npm run discord:meta >"$out" 2>&1; then
   echo "Discord meta post FAILED. Output:"
   # Build noise is a few hundred lines; the useful part is always the tail.
   tail -25 "$out"

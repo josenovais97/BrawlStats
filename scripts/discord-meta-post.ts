@@ -46,7 +46,14 @@ async function main(): Promise<void> {
     return;
   }
 
-  const movers = await getMetaMovers(7).catch(() => [] as MetaMover[]);
+  /*
+   * Deliberately NOT wrapped in a `.catch` that returns an empty list. That is
+   * what hid the first version's real failure: every call was throwing, the
+   * empty result read as "nothing moved", and the bot reported a quiet meta
+   * every day while being completely broken. A throw here fails the systemd
+   * unit, which is what `OnFailure=brawlzone-alert@` exists for.
+   */
+  const movers: MetaMover[] = await getMetaMovers(7);
   const changes = buildChangeIndex(movers);
   const notable = movers.filter((m) => {
     const c = changes.get(m.brawlerId);
