@@ -11,6 +11,7 @@ import { PlayerNav } from '@/components/player/player-nav';
 import { PlayerProgress } from '@/components/player/player-progress';
 import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
+import { PlayerRankedPicks } from '@/components/player/player-ranked-picks';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
 import { PlayerSkillScore } from '@/components/player/player-skill-score';
 import { PlayerUpgradeGap } from '@/components/player/player-upgrade-gap';
@@ -30,6 +31,7 @@ import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
 import {
   getMetaIndex,
+  getRankedMapPicks,
   getPlayerBrawlerPlacements,
   getReleasedBuffieCount,
   getTrophyHistory,
@@ -143,6 +145,12 @@ export default async function PlayerPage({ params }: PageProps) {
   // The trophy tier list, joined against this roster below and onto every tile
   // in the grid. Empty without a database, which every consumer handles.
   const metaIndex = await getMetaIndex('trophy', 7);
+  /*
+   * The live Ranked rotation, for `PlayerRankedPicks`. A cached read shared by
+   * every profile view, so this costs one query per revalidation window rather
+   * than one per visitor.
+   */
+  const rankedMaps = await getRankedMapPicks(3).catch(() => []);
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
@@ -242,6 +250,14 @@ export default async function PlayerPage({ params }: PageProps) {
       <PlayerMetaFit
         brawlers={player.brawlers}
         meta={metaIndex}
+        brawlerMeta={brawlerMeta}
+      />
+
+      {/* After the roster-vs-meta read, because this narrows the same question
+          to the maps that are actually queueable right now. */}
+      <PlayerRankedPicks
+        brawlers={player.brawlers}
+        maps={rankedMaps}
         brawlerMeta={brawlerMeta}
       />
 
