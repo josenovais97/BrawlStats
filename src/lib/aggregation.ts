@@ -13,7 +13,7 @@ import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
 import { COMPETITIVE_BATTLE_TYPES, windowStartUtc } from '@/lib/stats';
-import { POPULAR_REGION_CODES } from '@/lib/regions';
+import { ALL_REGIONS, POPULAR_REGION_CODES } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
 import { parseApiDate } from '@/lib/format';
 import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
@@ -451,8 +451,25 @@ const CLUBS_TO_SEED = 10;
  * deliberate: a region's top 200 barely moves hour to hour, so re-reading the
  * same one repeatedly would add cost without adding accounts.
  */
-const REGIONS_PER_RUN = 6;
-const REGION_ROTATION_MS = 4 * 3600_000;
+const REGIONS_PER_RUN = 18;
+
+/**
+ * The order regions are walked in: the deep boards first, then everything else.
+ *
+ * Popular first so a cold pool fills from the leaderboards that actually have
+ * 200 entries, rather than spending its first days on regions that return a
+ * dozen. Past that the long tail is the point — a mid-table player in a small
+ * country is exactly the account the global board never contains, and the
+ * sample has been badly skewed toward the top: median 128,580 trophies, with
+ * 875 of the first 1,000 members above 50,000.
+ */
+const REGION_ROTATION_CODES: readonly string[] = [
+  ...POPULAR_REGION_CODES,
+  ...ALL_REGIONS.map((r) => r.code).filter(
+    (code) => !POPULAR_REGION_CODES.includes(code as (typeof POPULAR_REGION_CODES)[number]),
+  ),
+];
+const REGION_ROTATION_MS = 2 * 3600_000;
 
 export interface AggregationResult {
   playersSampled: number;
@@ -575,13 +592,26 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
    * Every supported country publishes its own top 200, and those lists barely
    * overlap with the global one or with each other, so each is a few hundred
    * genuinely different accounts for one API call. Fetching all of them every
-   * run would be 250 calls, so a window rotates: the offset advances with the
-   * clock, and the whole list is covered over a day or so.
+   * run would be ~250 calls, so a window rotates and the whole list is covered
+   * over a day or so.
+   *
+   * That last sentence was aspirational until 2026-08-31. The rotation ran
+   * over POPULAR_REGION_CODES — 21 countries — so "the whole list" was the
+   * same 4,200 leaderboard slots forever, and once the pool held them seeding
+   * found nothing new: measured at 1 new player in a run, against 1,288 the
+   * run before. It now rotates over every supported region.
+   *
+   * Two smaller faults went with it. The offset advanced by one per rotation
+   * while the window was six wide, so consecutive windows overlapped by five;
+   * it now advances by a full window. And the rotation period was four hours
+   * against a two-hour sampler, so every second run re-read boards it had just
+   * read; the two now match.
    */
-  const offset = Math.floor(Date.now() / REGION_ROTATION_MS) % POPULAR_REGION_CODES.length;
+  const rotation = Math.floor(Date.now() / REGION_ROTATION_MS);
+  const start = (rotation * REGIONS_PER_RUN) % REGION_ROTATION_CODES.length;
   const regions = Array.from(
     { length: REGIONS_PER_RUN },
-    (_, i) => POPULAR_REGION_CODES[(offset + i) % POPULAR_REGION_CODES.length],
+    (_, i) => REGION_ROTATION_CODES[(start + i) % REGION_ROTATION_CODES.length],
   );
 
   for (const region of regions) {
