@@ -22,7 +22,19 @@ import { buildChangeIndex, isNotable, spanLabel, tierRank } from '@/lib/meta-cha
 import { getMetaMovers } from '@/lib/stats';
 import type { MetaMover } from '@/types/stats';
 
-const WEBHOOK = process.env.DISCORD_META_WEBHOOK ?? '';
+/*
+ * Posted as the bot rather than through a webhook.
+ *
+ * The webhook route was tried first and silently loses embeds in this channel:
+ * Discord accepts the POST, echoes the message back with the embed intact when
+ * asked with `?wait=true`, and then stores it with `embeds: []`. Granting
+ * Embed Links to @everyone on the channel made no difference. The identical
+ * embed posted with the bot token stores correctly, so that is what this uses.
+ * The symptom is worth remembering: a 2xx and a correct echo are not evidence
+ * that anything was kept.
+ */
+const TOKEN = process.env.DISCORD_BOT_TOKEN ?? '';
+const CHANNEL = process.env.DISCORD_META_CHANNEL ?? '';
 const SITE = 'https://brawlzone.net';
 
 /** BrawlZone yellow, so the embed stripe matches the site. */
@@ -40,8 +52,8 @@ function line(m: MetaMover, change: ReturnType<typeof buildChangeIndex> extends 
 }
 
 async function main(): Promise<void> {
-  if (!WEBHOOK) {
-    console.error('DISCORD_META_WEBHOOK is not set; nothing to post to.');
+  if (!TOKEN || !CHANNEL) {
+    console.error('DISCORD_BOT_TOKEN or DISCORD_META_CHANNEL is not set; nothing to post to.');
     process.exitCode = 1;
     return;
   }
@@ -108,7 +120,6 @@ async function main(): Promise<void> {
     .catch(() => undefined);
 
   const body = {
-    username: 'BrawlZone',
     embeds: [
       {
         title: 'What changed in Ranked',
@@ -135,18 +146,16 @@ async function main(): Promise<void> {
   }
 
   /*
-   * `?wait=true` makes Discord return the message it stored instead of a bare
-   * 204, and `cache: 'no-store'` opts out of Next's patched fetch.
-   *
-   * Both are here because the first working run posted an *empty* message: a
-   * 2xx, the script reporting success, and a message in the channel with no
-   * content and no embeds. A 204 tells you a request was accepted, not that
-   * anything arrived — so the check below reads back what Discord actually
-   * kept, and fails if the embed is not in it.
+   * `cache: 'no-store'` opts out of Next's patched fetch, which this inherits
+   * from running inside the builder image.
    */
-  const res = await fetch(`${WEBHOOK}?wait=true`, {
+  const res = await fetch(`https://discord.com/api/v10/channels/${CHANNEL}/messages`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bot ${TOKEN}`,
+      'user-agent': 'BrawlZone (https://brawlzone.net, 1.0)',
+    },
     body: JSON.stringify(body),
     cache: 'no-store',
   });
@@ -157,10 +166,11 @@ async function main(): Promise<void> {
     return;
   }
 
+  // Read back what was stored, not what was echoed: the webhook route returned
+  // a correct-looking message and kept an empty one.
   const stored = (await res.json().catch(() => null)) as { embeds?: unknown[] } | null;
   if (!stored?.embeds?.length) {
-    console.error('Discord accepted the post but stored no embed. Payload was:');
-    console.error(JSON.stringify(body));
+    console.error('Discord accepted the post but stored no embed.');
     process.exitCode = 1;
     return;
   }
