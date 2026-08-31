@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
-import { getUpcomingBrawlers } from '@/lib/announced';
+import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { CATEGORY_LABEL, getGameUpdates } from '@/lib/game-updates';
 import { brawlerPath } from '@/lib/slugs';
 import {
@@ -72,7 +72,7 @@ export default async function ReleaseNotesPage() {
    */
   const upcoming = await getUpcomingBrawlers(
     [...brawlerMeta.values()].map((b) => b.name),
-  ).catch(() => [] as string[]);
+  ).catch(() => [] as UpcomingBrawler[]);
 
   return (
     <div className="space-y-8">
@@ -96,21 +96,68 @@ export default async function ReleaseNotesPage() {
         <section aria-labelledby="upcoming">
           <SectionHeading
             title="Announced, not yet released"
-            subtitle="Revealed but not yet in the game. Found by comparing the community brawler list against the live game catalogue, so it appears on announcement day and clears itself on release day."
+            subtitle="Revealed in a Brawl Talk and coming to the game. Everything known so far."
           />
-          <ul className="flex flex-wrap gap-2">
-            {upcoming.map((name) => (
-              <li
-                key={name}
-                className="card px-4 py-2.5 text-base font-bold capitalize"
-              >
-                {name.toLowerCase()}
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {upcoming.map((b) => (
+              <li key={b.name} className="card flex gap-4 p-4">
+                {b.portraitUrl ? (
+                  <Image
+                    src={b.portraitUrl}
+                    alt=""
+                    width={72}
+                    height={72}
+                    className="size-18 shrink-0 self-start rounded-xl bg-surface-2 object-contain"
+                    loading="lazy"
+                    unoptimized
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    className="grid size-18 shrink-0 self-start place-items-center rounded-xl border border-dashed border-border bg-surface-2 text-xs text-muted"
+                  >
+                    ?
+                  </span>
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-bold capitalize">{b.name.toLowerCase()}</p>
+                  <p className="mt-0.5 text-xs uppercase tracking-wide text-muted">
+                    {[b.rarityName, b.className].filter(Boolean).join(' · ') ||
+                      'Details not published yet'}
+                  </p>
+
+                  {b.stats.length > 0 ? (
+                    <dl className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                      {b.stats.map((stat) => (
+                        <div key={stat.label} className="flex justify-between gap-2">
+                          <dt className="truncate text-muted">{stat.label}</dt>
+                          <dd className="shrink-0 font-semibold tabular-nums">{stat.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+
+                  {b.abilities.length > 0 ? (
+                    <ul className="mt-2.5 flex flex-wrap gap-1.5">
+                      {b.abilities.map((a) => (
+                        <li
+                          key={a}
+                          className="rounded-md bg-surface-2 px-2 py-0.5 text-xs text-muted"
+                        >
+                          {a}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
           <p className="mt-3 text-xs leading-relaxed text-muted">
-            Names only. What an unreleased brawler does is video commentary
-            until it ships, and every other number on this site is measured.
+            Stats and abilities come from the community wiki and fill in over the
+            days after a reveal, so a brawler announced yesterday may show little
+            beyond its name.
           </p>
         </section>
       ) : null}

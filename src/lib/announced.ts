@@ -1,6 +1,8 @@
 import 'server-only';
 
+import { getBrawlerWiki } from '@/lib/brawler-wiki';
 import { cached } from '@/lib/cached';
+import { titleCase } from '@/lib/format';
 import { WIKI_API } from '@/lib/wiki';
 
 /**
@@ -20,10 +22,16 @@ import { WIKI_API } from '@/lib/wiki';
  * announcement day, and nothing to clean up on release day, because a brawler
  * that ships enters the catalogue and leaves this set on its own.
  *
- * Deliberately only names them. What a brawler does before release is video
- * commentary and rumour, and this site does not publish either — the value
- * here is being the page that already exists when people start searching the
- * name, which needs nothing more than the name.
+ * Each one is then filled in from its wiki page: rarity, class, the combat
+ * stats and the names of its gadgets and star powers. That is the same parser
+ * the brawler pages already use, so it costs nothing new.
+ *
+ * How complete that is depends entirely on how long ago the reveal was, and
+ * the card is built to degrade rather than to look broken. Measured the day
+ * after this month's Brawl Talk: one of the two had full stats, four named
+ * abilities and a portrait, while the other had only its rarity and four
+ * placeholder abilities the wiki writes as "pending". Placeholders are
+ * dropped; a brawler with nothing but a name still gets a card.
  *
  * The reverse difference is checked too. If the catalogue ever holds a brawler
  * the wiki category does not, the two are disagreeing about *naming* rather
@@ -75,5 +83,82 @@ async function fetchUpcoming(liveNames: string[]): Promise<string[]> {
   }
 }
 
-/** Names of brawlers revealed but not yet playable. Empty when there are none. */
-export const getUpcomingBrawlers = cached('upcoming-brawlers', fetchUpcoming, REVALIDATE);
+/** What the wiki knows about a brawler that has not shipped. */
+export interface UpcomingBrawler {
+  name: string;
+  rarityName: string | null;
+  className: string | null;
+  /** Combat stats, only where the infobox has been filled in. */
+  stats: { label: string; value: string }[];
+  /** Gadget and star power names. Empty while the wiki still says "pending". */
+  abilities: string[];
+  portraitUrl: string | null;
+}
+
+/** The wiki files a brawler's portrait under a predictable name. */
+async function portraitFor(name: string): Promise<string | null> {
+  try {
+    const url = new URL(WIKI_API);
+    url.searchParams.set('action', 'query');
+    url.searchParams.set('list', 'allimages');
+    url.searchParams.set('aiprefix', `${name}_Portrait`);
+    url.searchParams.set('ailimit', '2');
+    url.searchParams.set('aiprop', 'url');
+    url.searchParams.set('format', 'json');
+    const res = await fetch(url, {
+      headers: { 'user-agent': 'BrawlZone (+https://brawlzone.net)' },
+      next: { revalidate: REVALIDATE },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { query?: { allimages?: { url: string }[] } };
+    return body.query?.allimages?.[0]?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchDetails(names: string[]): Promise<UpcomingBrawler[]> {
+  return Promise.all(
+    names.map(async (name) => {
+      const [wiki, portraitUrl] = await Promise.all([
+        getBrawlerWiki(name).catch(() => null),
+        portraitFor(name),
+      ]);
+      const s = wiki?.stats;
+
+      const stats: { label: string; value: string }[] = [];
+      const push = (label: string, value: string | null | undefined) => {
+        if (value) stats.push({ label, value });
+      };
+      push('Health', s?.health);
+      push(s?.attackLabel ?? 'Attack', s?.attack);
+      push(s?.superLabel ?? 'Super', s?.super);
+      push('Reload', s?.reload);
+      push('Speed', s?.movementSpeed);
+      push('Range', s?.attackRange);
+
+      // The wiki names an unwritten ability "Gadget 1 (Pending)". Rendering
+      // that reads as a bug rather than as an unfinished page.
+      const abilities = [...(wiki?.abilities.keys() ?? [])]
+        .filter((slug) => !/pending/i.test(slug))
+        .map((slug) => titleCase(slug.replace(/-/g, ' ')));
+
+      return {
+        name: titleCase(name),
+        rarityName: s?.rarityName ?? null,
+        className: s?.className ?? null,
+        stats,
+        abilities,
+        portraitUrl,
+      };
+    }),
+  );
+}
+
+/** Brawlers revealed but not yet playable, with whatever the wiki knows. */
+export const getUpcomingBrawlers = cached(
+  'upcoming-brawlers',
+  async (liveNames: string[]) => fetchDetails(await fetchUpcoming(liveNames)),
+  REVALIDATE,
+);
