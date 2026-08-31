@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
+import { KIND_LABEL, pendingAnnouncements } from '@/lib/announced';
 import { CATEGORY_LABEL, getGameUpdates } from '@/lib/game-updates';
 import { brawlerPath } from '@/lib/slugs';
 import {
@@ -64,6 +65,13 @@ export default async function ReleaseNotesPage() {
   );
   const latest = updates[0] ?? null;
 
+  /*
+   * Announced but not shipped. Curated by hand — see lib/announced for why
+   * there is no source to automate against — and self-retiring: a brawler that
+   * has reached the catalogue is no longer upcoming.
+   */
+  const upcoming = pendingAnnouncements([...brawlerMeta.values()].map((b) => b.name));
+
   return (
     <div className="space-y-8">
       <PageHeading
@@ -81,6 +89,47 @@ export default async function ReleaseNotesPage() {
           </a>
         }
       />
+
+      {upcoming.length > 0 ? (
+        <section aria-labelledby="upcoming">
+          <SectionHeading
+            title="Announced, not yet released"
+            subtitle="Revealed in the latest Brawl Talk. Everything else on this page is measured; this is what is coming."
+          />
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {upcoming.map((item) => (
+              <li key={`${item.kind}-${item.name}`} className="card p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-accent">
+                  {KIND_LABEL[item.kind]}
+                </p>
+                <p className="mt-1 text-base font-bold capitalize">{item.name.toLowerCase()}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{item.note}</p>
+                <p className="mt-2 text-xs text-muted">
+                  Announced{' '}
+                  {new Date(item.announcedOn).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                  {item.source ? (
+                    <>
+                      {' · '}
+                      <a
+                        href={item.source}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand hover:underline"
+                      >
+                        source
+                      </a>
+                    </>
+                  ) : null}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {latest && latest.changes.length > 0 ? (
         <section aria-labelledby="who-changed">
