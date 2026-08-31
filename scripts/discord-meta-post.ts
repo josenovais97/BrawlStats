@@ -134,10 +134,21 @@ async function main(): Promise<void> {
     return;
   }
 
-  const res = await fetch(WEBHOOK, {
+  /*
+   * `?wait=true` makes Discord return the message it stored instead of a bare
+   * 204, and `cache: 'no-store'` opts out of Next's patched fetch.
+   *
+   * Both are here because the first working run posted an *empty* message: a
+   * 2xx, the script reporting success, and a message in the channel with no
+   * content and no embeds. A 204 tells you a request was accepted, not that
+   * anything arrived — so the check below reads back what Discord actually
+   * kept, and fails if the embed is not in it.
+   */
+  const res = await fetch(`${WEBHOOK}?wait=true`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -145,6 +156,15 @@ async function main(): Promise<void> {
     process.exitCode = 1;
     return;
   }
+
+  const stored = (await res.json().catch(() => null)) as { embeds?: unknown[] } | null;
+  if (!stored?.embeds?.length) {
+    console.error('Discord accepted the post but stored no embed. Payload was:');
+    console.error(JSON.stringify(body));
+    process.exitCode = 1;
+    return;
+  }
+
   console.log(`Posted: ${notable.length} notable movers, ${crossings.length} tier change(s).`);
 }
 
