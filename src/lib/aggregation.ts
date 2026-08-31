@@ -32,34 +32,6 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  * to grow the sample honestly.
  */
 
-/**
- * Players sampled per run. 2 API calls each.
- *
- * This is an upper bound, not a target: sampling stops at `samplingDeadline`
- * regardless, so a slow upstream night simply samples fewer players rather
- * than overrunning the function.
- *
- * Raised from 100 because 100 was leaving most of the budget unused while
- * actively losing data. A battle log holds only a player's last ~25 matches,
- * and at 100 per run each tag was revisited about every two days — measured
- * against live data, **48% of sampled players came back sitting on the 25-match
- * cap**, meaning everything they played in the gap was gone for good.
- *
- * Sized to cover the whole pool in one run, which is the point.
- *
- * Measured on live data, the previous cadence was losing battles outright:
- * across 1,545 visits the average player came back with 24.9 new battles, and
- * 68% of them were sitting on the log's 25-match ceiling. A player at the
- * ceiling has played more than we can read, and everything past 25 is gone for
- * good. Sampling half the pool per run meant a six-hour revisit interval, and
- * an active account plays through 25 matches well inside that.
- *
- * So the batch now matches POOL_TARGET rather than a fraction of it: every
- * member is read every run, and the revisit interval becomes the gap between
- * runs instead of a multiple of it. Overrunning is safe either way, since
- * sampling stops at the deadline rather than at the batch size.
- */
-const DEFAULT_BATCH_SIZE = 1000;
 
 /**
  * Concurrent players in flight. Each issues two API calls at once, so the real
@@ -129,6 +101,41 @@ const WINDOW_DAYS = 7;
  * as the global one.
  */
 export const POOL_TARGET = 3000;
+
+/**
+ * Players sampled per run. 2 API calls each.
+ *
+ * This is an upper bound, not a target: sampling stops at `samplingDeadline`
+ * regardless, so a slow upstream night simply samples fewer players rather
+ * than overrunning the function.
+ *
+ * Raised from 100 because 100 was leaving most of the budget unused while
+ * actively losing data. A battle log holds only a player's last ~25 matches,
+ * and at 100 per run each tag was revisited about every two days — measured
+ * against live data, **48% of sampled players came back sitting on the 25-match
+ * cap**, meaning everything they played in the gap was gone for good.
+ *
+ * Sized to cover the whole pool in one run, which is the point.
+ *
+ * Measured on live data, the previous cadence was losing battles outright:
+ * across 1,545 visits the average player came back with 24.9 new battles, and
+ * 68% of them were sitting on the log's 25-match ceiling. A player at the
+ * ceiling has played more than we can read, and everything past 25 is gone for
+ * good. Sampling half the pool per run meant a six-hour revisit interval, and
+ * an active account plays through 25 matches well inside that.
+ *
+ * So the batch now matches POOL_TARGET rather than a fraction of it: every
+ * member is read every run, and the revisit interval becomes the gap between
+ * runs instead of a multiple of it. Overrunning is safe either way, since
+ * sampling stops at the deadline rather than at the batch size.
+ *
+ * Derived from POOL_TARGET rather than repeated, and declared after it for
+ * that reason. Raising the pool on 2026-08-31 while this still said 1000 left
+ * a 2,336-member pool being read a thousand at a time — the revisit interval
+ * silently tripled, which is exactly the battle loss described above, arrived
+ * at by a change meant to improve coverage.
+ */
+const DEFAULT_BATCH_SIZE = POOL_TARGET;
 
 /**
  * How many trailing days of roll-up are rebuilt from raw rows each run.
@@ -1829,11 +1836,15 @@ const RANKING_MIN_BUDGET_MS = 15_000;
  * into the rows the tier list actually reads.
  *
  * Raised from 40s when the roll-up joined this phase. Measured against a full
- * day of samples it folds three days in about 6s, so 55s keeps roughly the
- * same headroom over the phase as before rather than quietly spending the
- * recomputes' margin on it.
+ * day of samples it folds three days in about 6s, so 55s per thousand players
+ * keeps roughly the same headroom over the phase as before rather than quietly
+ * spending the recomputes' margin on it.
+ *
+ * Scaled off the batch rather than fixed, because the sentence above is a rule
+ * and a constant is not: it said the reserve has to grow with the batch, and
+ * then did not when the batch grew.
  */
-const RECOMPUTE_RESERVE_MS = 55_000;
+const RECOMPUTE_RESERVE_MS = 55_000 * (DEFAULT_BATCH_SIZE / 1000);
 
 export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<AggregationResult> {
   const deadline = Date.now() + RUN_BUDGET_MS;
