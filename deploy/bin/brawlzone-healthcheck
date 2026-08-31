@@ -65,6 +65,24 @@ if left <= 7:
   [ -n "$inv_msg" ] && problems+=("$inv_msg")
 fi
 
+# 6. Is the box actually running what was pushed?
+#    A deploy that silently stops is the worst kind of failure here: every
+#    change looks shipped and none of it is. Twenty minutes allows four
+#    five-minute timer cycles plus a three-minute build, so a normal deploy
+#    never trips this and a stalled one always does.
+cd /home/ubuntu/brawlstats 2>/dev/null && {
+  git fetch --quiet origin main 2>/dev/null
+  head_sha=$(git rev-parse HEAD 2>/dev/null)
+  remote_sha=$(git rev-parse origin/main 2>/dev/null)
+  if [ -n "$head_sha" ] && [ -n "$remote_sha" ] && [ "$head_sha" != "$remote_sha" ]; then
+    pushed_at=$(git log -1 --format=%ct "$remote_sha" 2>/dev/null || echo 0)
+    age=$(( $(date +%s) - pushed_at ))
+    if [ "$age" -gt 1200 ]; then
+      problems+=("box is $((age/60))m behind origin/main (${remote_sha:0:7} not deployed)")
+    fi
+  fi
+}
+
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 
 if [ ${#problems[@]} -eq 0 ]; then
