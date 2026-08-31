@@ -19,18 +19,20 @@ const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
 /**
  * The community server.
  *
- * This invite expires 2026-09-27, and that is the interesting part. Discord
- * cannot extend an existing invite — "permanent" means generating a new code —
- * and two attempts at setting no-expiry both came back as 30-day invites, so
- * the assumption that someone will remember to replace it in a month is not
- * one worth making. `brawlzone-healthcheck` queries the invite every ten
- * minutes and alerts once it is inside a week of expiry or already dead, which
- * turns a silent broken link on every page into a mail with time to act on it.
+ * This one is permanent — verified against Discord's API rather than assumed,
+ * because the two invites before it were both created as "never expiring" and
+ * both came back with a 30-day expiry.
  *
- * If you are reading this because that alert fired: make a new invite, put the
- * code below, and the alert stops on its own.
+ * `brawlzone-healthcheck` still queries it every ten minutes. A permanent
+ * invite cannot lapse, but it can be revoked, and the channel it points at can
+ * be deleted — either of which leaves a dead link on every page of the site
+ * with nothing else to notice. The check reads the code out of this file, so
+ * changing the constant is all it takes to move it.
+ *
+ * If you are reading this because that alert fired: make a new invite with no
+ * expiry and no use limit, put the code below, and the alert stops on its own.
  */
-const DISCORD_URL = 'https://discord.gg/DydJUWYZR';
+const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
 
 /**
