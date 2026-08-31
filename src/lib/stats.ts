@@ -3114,17 +3114,25 @@ const cachedRankedMapPicks = unstable_cache(
  * stopped appearing between the 25th and the 26th. All four still showed "no
  * sampled battles yet", which promises data that is not coming.
  *
+ * Carries the event id too, which is the only way to show artwork for a map
+ * that has left every rotation. The page normally takes art from the active
+ * map catalogue, and that catalogue only lists what is currently live — so
+ * Safe(r) Zone, out of Ranked *and* off the ladder, rendered with no picture
+ * and no link while the other three retired maps kept theirs. Brawlify's map
+ * data is keyed by event id and does include retired maps, so our own battle
+ * history is enough to find it again.
+ *
  * Keyed on mode and map exactly as the roll-up stores them; callers slugify.
  */
 export async function getRankedMapLastSeen(
   windowDays = RANKED_MAP_WINDOW_DAYS,
-): Promise<{ mode: string; mapName: string; lastSeen: string }[]> {
+): Promise<{ mode: string; mapName: string; lastSeen: string; eventId: number | null }[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
   try {
     const rows = await prisma.battleDailyStat.groupBy({
-      by: ['mode', 'mapName'],
+      by: ['mode', 'mapName', 'eventId'],
       where: {
         battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
         day: { gte: windowStartUtc(windowDays) },
@@ -3133,11 +3141,20 @@ export async function getRankedMapLastSeen(
       _max: { lastBattleTime: true },
     });
 
-    return rows.flatMap((row) => {
+    // Grouping by event id splits a map across however many ids it has been
+    // filed under, so fold back to one row each and keep the most recent.
+    const byMap = new Map<string, { mode: string; mapName: string; lastSeen: string; eventId: number | null }>();
+    for (const row of rows) {
       const seen = row._max.lastBattleTime;
-      if (!row.mapName || !seen) return [];
-      return [{ mode: row.mode, mapName: row.mapName, lastSeen: seen.toISOString() }];
-    });
+      if (!row.mapName || !seen) continue;
+      const key = `${row.mode}|${row.mapName}`;
+      const iso = seen.toISOString();
+      const held = byMap.get(key);
+      if (!held || iso > held.lastSeen) {
+        byMap.set(key, { mode: row.mode, mapName: row.mapName, lastSeen: iso, eventId: row.eventId });
+      }
+    }
+    return [...byMap.values()];
   } catch (error) {
     swallow('getRankedMapLastSeen', error);
     return [];

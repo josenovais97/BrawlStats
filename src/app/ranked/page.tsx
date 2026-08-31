@@ -87,9 +87,7 @@ export default async function RankedPage() {
    * already dropped. This is what separates "not sampled yet" from "the game
    * rotated this out days ago" — see `getRankedMapLastSeen`.
    */
-  const lastSeen = new Map(
-    lastSeenRows.map((r) => [key(r.mode, r.mapName), r.lastSeen] as const),
-  );
+  const lastSeen = new Map(lastSeenRows.map((r) => [key(r.mode, r.mapName), r] as const));
 
   /*
    * Only trusted when it overlaps what we have sampled. A wiki table that has
@@ -140,11 +138,26 @@ export default async function RankedPage() {
         return {
           name: picks?.mapName ?? name,
           picks,
-          // Prefer the id recorded on our own battles; fall back to the
-          // catalogue, which is the only source for a map with no battles yet.
-          art: picks?.eventId ? mapMeta.get(picks.eventId) : catalogue?.map,
+          /*
+           * Our own battles first, then the live catalogue, then the event id
+           * from the last time we saw this map.
+           *
+           * That third step is what gives a fully retired map its picture. The
+           * catalogue only lists maps that are live in some rotation, so a map
+           * out of Ranked *and* off the ladder had no entry and rendered blank
+           * — while retired maps still running on the ladder kept theirs, which
+           * made it look arbitrary. Brawlify's map data is keyed by event id
+           * and does include retired maps.
+           */
+          art:
+            (picks?.eventId ? mapMeta.get(picks.eventId) : undefined) ??
+            catalogue?.map ??
+            (() => {
+              const id = lastSeen.get(key(modeSlug, name))?.eventId;
+              return id ? mapMeta.get(id) : undefined;
+            })(),
           href: catalogue ? `/maps/${catalogue.modeSlug}/${catalogue.mapSlug}` : null,
-          lastSeen: lastSeen.get(key(modeSlug, name)) ?? null,
+          lastSeen: lastSeen.get(key(modeSlug, name))?.lastSeen ?? null,
         };
       }),
     };
