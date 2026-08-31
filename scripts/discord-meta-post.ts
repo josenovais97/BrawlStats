@@ -123,6 +123,17 @@ async function main(): Promise<void> {
     ],
   };
 
+  /*
+   * A dry run prints the payload instead of sending it. Added while working
+   * out why a post Discord accepted came out empty — and kept, because the
+   * only alternative was posting to a live channel to find out what it would
+   * say.
+   */
+  if (process.env.DISCORD_DRY_RUN) {
+    console.log(JSON.stringify(body, null, 2));
+    return;
+  }
+
   const res = await fetch(WEBHOOK, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
