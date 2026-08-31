@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
 import { CalendarDays, ExternalLink, FileText } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
+import { getBrawlerMap } from '@/lib/brawlapi';
+import { CATEGORY_LABEL, getGameUpdates } from '@/lib/game-updates';
+import { brawlerPath } from '@/lib/slugs';
 import {
   getLatestReleaseNotes,
   type RichHeading,
@@ -45,6 +49,21 @@ export default async function ReleaseNotesPage() {
 
   const published = notes.publishedAt ? new Date(notes.publishedAt) : null;
 
+  /*
+   * Who the update actually touched.
+   *
+   * Supercell's post is prose, so it cannot answer "did my brawler change?" —
+   * which is the question in the hours after an update, exactly when the
+   * searches happen and almost nobody has published yet. The wiki's version
+   * history is structured, so this turns it into a list that links straight to
+   * the brawler pages people are searching for.
+   */
+  const brawlerMeta = await getBrawlerMap().catch(() => new Map());
+  const updates = await getGameUpdates([...brawlerMeta.values()].map((b) => b.name)).catch(
+    () => [],
+  );
+  const latest = updates[0] ?? null;
+
   return (
     <div className="space-y-8">
       <PageHeading
@@ -62,6 +81,52 @@ export default async function ReleaseNotesPage() {
           </a>
         }
       />
+
+      {latest && latest.changes.length > 0 ? (
+        <section aria-labelledby="who-changed">
+          <SectionHeading
+            title="Who changed"
+            subtitle={`Brawlers touched by ${latest.title}, from the community version history.`}
+          />
+          <div className="space-y-4">
+            {latest.changes.map((change) => (
+              <div key={change.category} className="card p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted">
+                  {CATEGORY_LABEL[change.category]}
+                </p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {change.brawlers.map((name) => {
+                    const meta = [...brawlerMeta.values()].find(
+                      (b) => b.name.toLowerCase() === name.toLowerCase(),
+                    );
+                    return (
+                      <li key={name}>
+                        <Link
+                          href={meta ? brawlerPath(meta.id, meta.name) : '/brawlers'}
+                          className="flex items-center gap-2 rounded-xl border border-border bg-surface-2 py-1.5 pl-1.5 pr-3 text-sm font-semibold capitalize transition-colors hover:border-brand/50 hover:text-brand"
+                        >
+                          {meta?.imageUrl ? (
+                            <Image
+                              src={meta.imageUrl}
+                              alt=""
+                              width={28}
+                              height={28}
+                              className="size-7 shrink-0 object-contain"
+                              loading="lazy"
+                              unoptimized
+                            />
+                          ) : null}
+                          {name.toLowerCase()}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {published ? (
         <p className="flex items-center gap-2 text-sm text-muted">
