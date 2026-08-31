@@ -7,7 +7,7 @@ import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { CATEGORY_LABEL, getGameUpdates } from '@/lib/game-updates';
-import { brawlerPath } from '@/lib/slugs';
+import { brawlerPath, slugify } from '@/lib/slugs';
 import {
   getLatestReleaseNotes,
   type RichHeading,
@@ -100,7 +100,11 @@ export default async function ReleaseNotesPage() {
           />
           <ul className="grid gap-4 sm:grid-cols-2">
             {upcoming.map((b) => (
-              <li key={b.name} className="card flex gap-4 p-4">
+              <li key={b.name}>
+                <Link
+                  href={`/brawlers/${slugify(b.name)}`}
+                  className="card card-interactive flex gap-4 p-4 transition-colors hover:border-brand/50"
+                >
                 {b.portraitUrl ? (
                   <Image
                     src={b.portraitUrl}
@@ -140,17 +144,30 @@ export default async function ReleaseNotesPage() {
 
                   {b.abilities.length > 0 ? (
                     <ul className="mt-2.5 flex flex-wrap gap-1.5">
-                      {b.abilities.map((a) => (
+                      {b.abilities.map((a, i) => (
                         <li
-                          key={a}
-                          className="rounded-md bg-surface-2 px-2 py-0.5 text-xs text-muted"
+                          key={`${a.kind}-${a.name ?? i}`}
+                          className="inline-flex items-center gap-1.5 rounded-md bg-surface-2 py-0.5 pl-0.5 pr-2 text-xs text-muted"
+                          title={a.kind === 'gadget' ? 'Gadget' : 'Star power'}
                         >
-                          {a}
+                          {a.imageUrl ? (
+                            <Image
+                              src={a.imageUrl}
+                              alt=""
+                              width={20}
+                              height={20}
+                              className="size-5 shrink-0"
+                              loading="lazy"
+                              unoptimized
+                            />
+                          ) : null}
+                          {a.name ?? (a.kind === 'gadget' ? 'Gadget' : 'Star power')}
                         </li>
                       ))}
                     </ul>
                   ) : null}
                 </div>
+                </Link>
               </li>
             ))}
           </ul>

@@ -90,19 +90,34 @@ export interface UpcomingBrawler {
   className: string | null;
   /** Combat stats, only where the infobox has been filled in. */
   stats: { label: string; value: string }[];
-  /** Gadget and star power names. Empty while the wiki still says "pending". */
-  abilities: string[];
+  /** Gadgets then star powers, with artwork where the wiki has it. */
+  abilities: UpcomingAbility[];
   portraitUrl: string | null;
 }
 
-/** The wiki files a brawler's portrait under a predictable name. */
-async function portraitFor(name: string): Promise<string | null> {
+export interface UpcomingAbility {
+  kind: 'gadget' | 'starPower';
+  /** Null while the wiki still calls it "Gadget 1 (Pending)". */
+  name: string | null;
+  imageUrl: string | null;
+}
+
+/**
+ * Files whose name starts with a prefix, newest-sorted by the wiki.
+ *
+ * The wiki names a brawler's art predictably: "Cosmo Portrait.png" for the
+ * portrait, "GD-Cosmo1.png" and "GD-Cosmo2.png" for gadgets, "SP-Cosmo1.png"
+ * and "SP-Cosmo2.png" for star powers. Querying by prefix is three small calls
+ * per brawler; asking the page for its images returns 300 of them, because the
+ * navigation template embeds every other brawler's avatar.
+ */
+async function imagesWithPrefix(prefix: string): Promise<string[]> {
   try {
     const url = new URL(WIKI_API);
     url.searchParams.set('action', 'query');
     url.searchParams.set('list', 'allimages');
-    url.searchParams.set('aiprefix', `${name}_Portrait`);
-    url.searchParams.set('ailimit', '2');
+    url.searchParams.set('aiprefix', prefix);
+    url.searchParams.set('ailimit', '6');
     url.searchParams.set('aiprop', 'url');
     url.searchParams.set('format', 'json');
     const res = await fetch(url, {
@@ -110,20 +125,26 @@ async function portraitFor(name: string): Promise<string | null> {
       next: { revalidate: REVALIDATE },
       signal: AbortSignal.timeout(10_000),
     });
-    if (!res.ok) return null;
-    const body = (await res.json()) as { query?: { allimages?: { url: string }[] } };
-    return body.query?.allimages?.[0]?.url ?? null;
+    if (!res.ok) return [];
+    const body = (await res.json()) as {
+      query?: { allimages?: { name: string; url: string }[] };
+    };
+    return (body.query?.allimages ?? [])
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((i) => i.url);
   } catch {
-    return null;
+    return [];
   }
 }
 
 async function fetchDetails(names: string[]): Promise<UpcomingBrawler[]> {
   return Promise.all(
     names.map(async (name) => {
-      const [wiki, portraitUrl] = await Promise.all([
+      const [wiki, portraits, gadgetArt, starPowerArt] = await Promise.all([
         getBrawlerWiki(name).catch(() => null),
-        portraitFor(name),
+        imagesWithPrefix(`${name} Portrait`),
+        imagesWithPrefix(`GD-${name}`),
+        imagesWithPrefix(`SP-${name}`),
       ]);
       const s = wiki?.stats;
 
@@ -140,9 +161,28 @@ async function fetchDetails(names: string[]): Promise<UpcomingBrawler[]> {
 
       // The wiki names an unwritten ability "Gadget 1 (Pending)". Rendering
       // that reads as a bug rather than as an unfinished page.
-      const abilities = [...(wiki?.abilities.keys() ?? [])]
-        .filter((slug) => !/pending/i.test(slug))
-        .map((slug) => titleCase(slug.replace(/-/g, ' ')));
+      /*
+       * Gadgets first, then star powers — the order the infobox lists them,
+       * confirmed by a freshly revealed brawler whose four entries are still
+       * literally "Gadget 1", "Gadget 2", "Star Power 1", "Star Power 2".
+       * That ordering is what lets a name be paired with GD-/SP- artwork by
+       * index, since neither carries the other's label.
+       */
+      const names = [...(wiki?.abilities.keys() ?? [])].map((slug) =>
+        /pending/i.test(slug) ? null : titleCase(slug.replace(/-/g, ' ')),
+      );
+      const abilities: UpcomingAbility[] = [];
+      const take = (kind: UpcomingAbility['kind'], offset: number, art: string[]) => {
+        for (let i = 0; i < 2; i += 1) {
+          const abilityName = names[offset + i];
+          const imageUrl = art[i] ?? null;
+          // A slot with neither a name nor an icon has not been written yet.
+          if (!abilityName && !imageUrl) continue;
+          abilities.push({ kind, name: abilityName, imageUrl });
+        }
+      };
+      take('gadget', 0, gadgetArt);
+      take('starPower', 2, starPowerArt);
 
       return {
         name: titleCase(name),
@@ -150,7 +190,7 @@ async function fetchDetails(names: string[]): Promise<UpcomingBrawler[]> {
         className: s?.className ?? null,
         stats,
         abilities,
-        portraitUrl,
+        portraitUrl: portraits[0] ?? null,
       };
     }),
   );

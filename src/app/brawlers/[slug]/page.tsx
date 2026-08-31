@@ -43,6 +43,8 @@ import {
   wikiPageUrl,
 } from '@/lib/brawler-wiki';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
+import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
 import { currentMonth } from '@/lib/site';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getOfficialBrawlers } from '@/lib/bs-api';
@@ -83,7 +85,15 @@ type Resolved =
   /** The catalogue is readable and has no such brawler. A real 404. */
   | { kind: 'unknown' }
   /** The catalogue could not be read, so absence proves nothing. */
-  | { kind: 'unavailable' };
+  | { kind: 'unavailable' }
+  /**
+   * Revealed but not shipped, so the catalogue is right not to have it.
+   *
+   * The page exists on purpose: in the hours after a reveal people search the
+   * name and almost nothing has been published, and this becomes the real
+   * brawler page the moment it ships.
+   */
+  | { kind: 'upcoming'; brawler: UpcomingBrawler };
 
 async function resolveBrawler(handle: string): Promise<Resolved> {
   const asId = Number(handle);
@@ -108,7 +118,16 @@ async function resolveBrawler(handle: string): Promise<Resolved> {
   if (entry) {
     return { kind: 'ok', id: entry.id, slug: slugify(entry.name), numeric: false };
   }
-  return catalog ? { kind: 'unknown' } : { kind: 'unavailable' };
+  if (!catalog) return { kind: 'unavailable' };
+
+  // Not in the catalogue may mean not released yet rather than not a brawler.
+  const upcoming = await getUpcomingBrawlers(
+    [...catalog.byId.values()].map((b) => b.name),
+  ).catch(() => [] as UpcomingBrawler[]);
+  const pending = upcoming.find((b) => slugify(b.name) === slugify(handle));
+  if (pending) return { kind: 'upcoming', brawler: pending };
+
+  return { kind: 'unknown' };
 }
 
 /**
@@ -202,6 +221,17 @@ const BALANCE_CHANGES_SHOWN = 8;
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const resolved = await resolveBrawler(slug);
+
+  if (resolved.kind === 'upcoming') {
+    const b = resolved.brawler;
+    const kind = [b.rarityName, b.className].filter(Boolean).join(' ');
+    return {
+      title: `${b.name}: the new Brawl Stars brawler (${currentMonth()})`,
+      description: `${b.name} is a new${kind ? ` ${kind}` : ''} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.`,
+      alternates: { canonical: `/brawlers/${slugify(b.name)}` },
+    };
+  }
+
   if (resolved.kind !== 'ok') return { title: 'Brawler' };
 
   const brawlerId = resolved.id;
@@ -273,6 +303,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * `unknown`: when the catalogue itself is unreachable, absence proves
    * nothing and telling a crawler the brawler is gone would be a lie.
    */
+  if (resolved.kind === 'upcoming') {
+    return <UpcomingBrawlerPage brawler={resolved.brawler} />;
+  }
+
   if (resolved.kind === 'unknown') notFound();
 
   if (resolved.kind === 'unavailable') {
