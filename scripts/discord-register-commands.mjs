@@ -4,6 +4,12 @@
  * Run once after changing a command's name, description or options — Discord
  * stores these, so editing the handler alone changes nothing a user sees.
  *
+ * Registers against the guild, not globally. Global commands can take up to an
+ * hour to propagate, and during that hour typing `/profile` does not open the
+ * picker at all — it just sends the literal text as a message, which looks
+ * exactly like a broken bot. Guild commands appear immediately. Global scope
+ * only matters if the bot is ever added to a second server.
+ *
  * Needs DISCORD_BOT_TOKEN and DISCORD_APP_ID in the environment:
  *   set -a && . .env.production && set +a && node scripts/discord-register-commands.mjs
  *
@@ -14,10 +20,11 @@
  */
 const TOKEN = process.env.DISCORD_BOT_TOKEN;
 const APP = process.env.DISCORD_APP_ID;
+const GUILD = process.env.DISCORD_GUILD_ID;
 const ENDPOINT = 'https://brawlzone.net/api/discord/interactions';
 
-if (!TOKEN || !APP) {
-  console.error('DISCORD_BOT_TOKEN and DISCORD_APP_ID must be set.');
+if (!TOKEN || !APP || !GUILD) {
+  console.error('DISCORD_BOT_TOKEN, DISCORD_APP_ID and DISCORD_GUILD_ID must be set.');
   process.exit(1);
 }
 
@@ -65,5 +72,5 @@ async function call(method, path, body) {
 await call('PATCH', '/applications/@me', { interactions_endpoint_url: ENDPOINT });
 console.log(`endpoint set and verified: ${ENDPOINT}`);
 
-const registered = await call('PUT', `/applications/${APP}/commands`, COMMANDS);
+const registered = await call('PUT', `/applications/${APP}/guilds/${GUILD}/commands`, COMMANDS);
 for (const c of registered) console.log(`  /${c.name} — ${c.description}`);
