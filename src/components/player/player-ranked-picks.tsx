@@ -149,8 +149,15 @@ export function PlayerRankedPicks({
         </div>
 
         <div className="card p-4">
+          {/* Three states, and the heading has to match the one being shown:
+              full coverage under "maps you have no answer for" reads as a bug
+              even though both halves are correct. */}
           <p className="text-xs font-bold uppercase tracking-wide text-muted">
-            {upgrades.length > 0 ? 'Upgrades that would fix a map' : 'Maps you have no answer for'}
+            {upgrades.length > 0
+              ? 'Upgrades that would fix a map'
+              : gaps.length > 0
+                ? 'Maps you have no answer for'
+                : 'Full coverage'}
           </p>
           {upgrades.length > 0 ? (
             <>
