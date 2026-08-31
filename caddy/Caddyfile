@@ -33,7 +33,7 @@
 	# on the box has one policy in one place. logrotate uses copytruncate,
 	# which Caddy tolerates because it appends rather than seeking.
 	log {
-		output file /var/log/brawlzone/access.log {
+		output file /var/log/brawlzone/access/access.log {
 			roll_disabled
 		}
 		format json

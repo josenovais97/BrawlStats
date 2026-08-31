@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Run a scheduled job, appending levelled, timestamped, COLOURED output to
-# /var/log/brawlzone/<name>.log
+# /var/log/brawlzone/<name>/<name>.log
+#
+# A directory per job, because the flat layout put every job's current log and
+# thirty days of rotated archives in one listing -- eight jobs was already ~40
+# entries and `ls` told you nothing about which job was which.
 #
 #   2026-08-27T11:47:29Z  [INFO ] wrote /home/ubuntu/backups/....sql.gz
 #
@@ -21,7 +25,10 @@
 set -uo pipefail
 
 name=$1; shift
-log="/var/log/brawlzone/${name}.log"
+log="/var/log/brawlzone/${name}/${name}.log"
+# The first run of a new job creates its own directory, so adding a job never
+# means remembering to create one by hand.
+mkdir -p "$(dirname "$log")"
 E=$'\033'
 DIM="${E}[2m"; OFF="${E}[0m"
 RED="${E}[1;31m"; YEL="${E}[1;33m"; CYN="${E}[0;36m"; GRN="${E}[1;32m"

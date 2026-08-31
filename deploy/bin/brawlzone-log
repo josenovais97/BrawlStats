@@ -55,7 +55,7 @@ render_access() {
 
 if [ $# -eq 0 ]; then
   echo "logs in $DIR:"
-  for f in "$DIR"/*.log; do
+  for f in "$DIR"/*/*.log; do
     [ -e "$f" ] || continue
     printf "  %-10s %8s   last write %s\n" "$(basename "$f" .log)" \
       "$(du -h "$f" | cut -f1)" "$(date -u -r "$f" +%Y-%m-%dT%H:%M:%SZ)"
@@ -66,7 +66,7 @@ if [ $# -eq 0 ]; then
 fi
 
 name=$1; shift
-f="$DIR/${name}.log"
+f="$DIR/${name}/${name}.log"
 [ -r "$f" ] || { echo "no readable log at $f" >&2; exit 1; }
 
 if [ "$name" = "access" ]; then

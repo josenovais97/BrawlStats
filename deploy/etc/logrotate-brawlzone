@@ -3,7 +3,8 @@
 # copytruncate because a job may be mid-run when logrotate fires: the wrapper
 # holds the file open, so renaming it would leave systemd writing to an
 # unlinked inode and the rest of that run would vanish.
-/var/log/brawlzone/*.log {
+# One directory per job; the archives rotate beside the log they belong to.
+/var/log/brawlzone/*/*.log {
     daily
     rotate 30
     missingok
