@@ -1,70 +1,79 @@
+import 'server-only';
+
+import { cached } from '@/lib/cached';
+import { WIKI_API } from '@/lib/wiki';
+
 /**
- * Announced in a Brawl Talk, not yet in the game.
+ * Brawlers announced but not yet in the game, found by difference.
  *
- * Hand-written, and it has to be: checked 2026-08-31, the wiki has no
- * structured source for unreleased content — Category:Upcoming,
- * Category:Unreleased, Category:Upcoming Brawlers and Category:Unreleased
- * Brawlers all return zero members, and there is no Brawl Talk page. The
- * version history covers what shipped, which is what `lib/game-updates` reads.
+ * The wiki creates a brawler's page when it is revealed, while the game API
+ * only lists it once it ships. So anything in the wiki's brawler category that
+ * the catalogue does not know about is, by definition, announced and pending.
+ * Measured 2026-08-31: 109 on the wiki against 107 live, and the two extras
+ * were exactly the pair revealed in that month's Brawl Talk.
  *
- * Worth the manual step because of when it pays. The hours after an
- * announcement are when the searches happen and when nobody has published
- * anything, and a page that already names the brawler is the one that gets
- * found. Everything else on this site is measured; this is the one place that
- * is deliberately ahead of the data.
+ * This began as a hand-curated list, on the assumption that reveals could not
+ * be automated — Category:Upcoming, Category:Unreleased and their variants are
+ * all empty, and there is no Brawl Talk page, so there is no source that
+ * *states* what is coming. The difference states it implicitly, which is
+ * better than curation in every way that matters: nothing to remember on
+ * announcement day, and nothing to clean up on release day, because a brawler
+ * that ships enters the catalogue and leaves this set on its own.
  *
- * Curated in, automatic out: an entry naming a brawler disappears on its own
- * once that brawler appears in the live catalogue, so a stale "coming soon"
- * cannot sit here after release. `announcedOn` is shown, so a reader can see
- * how old the claim is.
+ * Deliberately only names them. What a brawler does before release is video
+ * commentary and rumour, and this site does not publish either — the value
+ * here is being the page that already exists when people start searching the
+ * name, which needs nothing more than the name.
+ *
+ * The reverse difference is checked too. If the catalogue ever holds a brawler
+ * the wiki category does not, the two are disagreeing about *naming* rather
+ * than about releases, and the whole answer is suppressed rather than
+ * publishing a live brawler as "upcoming".
  */
 
-export type AnnouncedKind = 'brawler' | 'hypercharge' | 'buffie' | 'rework' | 'feature';
+/** Announcements matter in hours, so this is polled far more often than the wiki changes. */
+const REVALIDATE = 1800;
 
-export interface Announced {
-  /** The brawler this concerns, or the feature's own name. */
-  name: string;
-  kind: AnnouncedKind;
-  /** One line, in your own words. Never a transcript of the video. */
-  note: string;
-  /** ISO date the announcement was made. */
-  announcedOn: string;
-  /** Where it was announced, for anyone who wants to check. */
-  source?: string;
+async function fetchUpcoming(liveNames: string[]): Promise<string[]> {
+  try {
+    const url = new URL(WIKI_API);
+    url.searchParams.set('action', 'query');
+    url.searchParams.set('list', 'categorymembers');
+    url.searchParams.set('cmtitle', 'Category:Brawlers');
+    url.searchParams.set('cmlimit', '500');
+    url.searchParams.set('cmnamespace', '0');
+    url.searchParams.set('format', 'json');
+
+    const res = await fetch(url, {
+      headers: { 'user-agent': 'BrawlZone (+https://brawlzone.net)' },
+      next: { revalidate: REVALIDATE },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return [];
+
+    const body = (await res.json()) as {
+      query?: { categorymembers?: { title: string }[] };
+    };
+    const wiki = (body.query?.categorymembers ?? []).map((m) => m.title).filter(Boolean);
+    // A short list means the category moved or the fetch half-failed; a
+    // difference computed against it would call most of the roster upcoming.
+    if (wiki.length < liveNames.length) return [];
+
+    const live = new Set(liveNames.map((n) => n.toLowerCase()));
+    const wikiLower = new Set(wiki.map((n) => n.toLowerCase()));
+
+    // Disagreement in the other direction means the two sides name brawlers
+    // differently, not that something is unreleased. Say nothing rather than
+    // announce a brawler that has been out for months.
+    const missingFromWiki = liveNames.filter((n) => !wikiLower.has(n.toLowerCase()));
+    if (missingFromWiki.length > 0) return [];
+
+    return wiki.filter((n) => !live.has(n.toLowerCase()));
+  } catch {
+    // An unreachable wiki costs this section, never the page.
+    return [];
+  }
 }
 
-/**
- * Fill this from the Brawl Talk. Example of the shape:
- *
- *   {
- *     name: 'Nori',
- *     kind: 'brawler',
- *     note: 'New legendary assassin, arriving with the September update.',
- *     announcedOn: '2026-08-30',
- *     source: 'https://www.youtube.com/watch?v=...',
- *   },
- *
- * Keep notes short and factual. A sentence that says what it is and roughly
- * when beats a paragraph, and it is the part search engines show.
- */
-export const ANNOUNCED: Announced[] = [];
-
-export const KIND_LABEL: Record<AnnouncedKind, string> = {
-  brawler: 'New brawler',
-  hypercharge: 'New hypercharge',
-  buffie: 'New buffie',
-  rework: 'Rework',
-  feature: 'New feature',
-};
-
-/**
- * Entries still genuinely unreleased.
- *
- * A brawler already in the catalogue has shipped, so its announcement is
- * history rather than news and drops out without anyone editing this file.
- * Other kinds cannot be checked that way and stay until removed by hand.
- */
-export function pendingAnnouncements(liveBrawlerNames: Iterable<string>): Announced[] {
-  const live = new Set([...liveBrawlerNames].map((n) => n.toLowerCase()));
-  return ANNOUNCED.filter((a) => a.kind !== 'brawler' || !live.has(a.name.toLowerCase()));
-}
+/** Names of brawlers revealed but not yet playable. Empty when there are none. */
+export const getUpcomingBrawlers = cached('upcoming-brawlers', fetchUpcoming, REVALIDATE);
