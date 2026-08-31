@@ -382,19 +382,34 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
         </span>
       ) : null}
 
-      <Image
-        src={brawler.imageUrl}
-        alt={brawler.name}
-        width={140}
-        height={140}
-        sizes="(max-width: 640px) 45vw, 180px"
-        className="relative mx-auto aspect-square w-full max-w-[7rem] object-contain duration-200 group-hover:scale-105 motion-safe:transition-transform"
-        /* The cards above the fold used to come in blank for a second or two:
-           `next/image` lazy-loads by default, and the portrait IS the card. */
-        loading={eager ? 'eager' : 'lazy'}
-        fetchPriority={eager ? 'high' : 'auto'}
-        unoptimized
-      />
+      {/*
+        An unreleased brawler may have no portrait drawn yet, and an empty src
+        renders as the browser's broken-image glyph — which reads as a bug
+        rather than as artwork that does not exist. Same dashed placeholder the
+        skin list and the upcoming brawler page already use.
+      */}
+      {brawler.imageUrl ? (
+        <Image
+          src={brawler.imageUrl}
+          alt={brawler.name}
+          width={140}
+          height={140}
+          sizes="(max-width: 640px) 45vw, 180px"
+          className="relative mx-auto aspect-square w-full max-w-[7rem] object-contain duration-200 group-hover:scale-105 motion-safe:transition-transform"
+          /* The cards above the fold used to come in blank for a second or two:
+             `next/image` lazy-loads by default, and the portrait IS the card. */
+          loading={eager ? 'eager' : 'lazy'}
+          fetchPriority={eager ? 'high' : 'auto'}
+          unoptimized
+        />
+      ) : (
+        <span
+          aria-hidden
+          className="relative mx-auto grid aspect-square w-full max-w-[7rem] place-items-center rounded-xl border border-dashed border-border bg-surface-2 text-2xl text-muted"
+        >
+          ?
+        </span>
+      )}
 
       <p className="relative mt-1.5 truncate text-center font-bold capitalize">
         {brawler.name.toLowerCase()}
