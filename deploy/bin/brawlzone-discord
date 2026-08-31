@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Post the day's meta movement to Discord. Quiet unless something is wrong.
+#
+# Reuses the `sampler` compose service with the command overridden: it already
+# has the database on the compose network, .env.production loaded, and the
+# build secret wired up. A second service definition differing only in its
+# command would be one more thing to keep in step with the first.
+set -uo pipefail
+
+cd /home/ubuntu/brawlstats || exit 1
+
+out=$(mktemp); trap 'rm -f "$out"' EXIT
+
+if ! docker compose run --rm sampler npm run discord:meta >"$out" 2>&1; then
+  echo "Discord meta post FAILED. Output:"
+  # Build noise is a few hundred lines; the useful part is always the tail.
+  tail -25 "$out"
+  exit 1
+fi
+
+# The script prints one line saying what it did, or that nothing moved.
+grep -E '^(Posted|Nothing moved)' "$out" || echo "Ran, but said nothing — check the full log."

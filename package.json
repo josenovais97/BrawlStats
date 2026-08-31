@@ -16,7 +16,8 @@
     "db:storage": "tsx scripts/db-storage.ts",
     "stats:refresh": "node --import tsx --conditions=react-server scripts/refresh-stats.ts",
     "crawl:budget": "node scripts/crawl-budget.mjs",
-    "gen:players": "node --import tsx --conditions=react-server scripts/gen-indexable-players.ts"
+    "gen:players": "node --import tsx --conditions=react-server scripts/gen-indexable-players.ts",
+    "discord:meta": "node --import tsx --conditions=react-server scripts/discord-meta-post.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

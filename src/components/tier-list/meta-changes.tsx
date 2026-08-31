@@ -4,8 +4,17 @@ import Link from 'next/link';
 
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
+import {
+  type BrawlerChange,
+  buildChangeIndex,
+  isNotable,
+  spanLabel,
+  tierRank,
+} from '@/lib/meta-changes';
 import type { BABrawler } from '@/types/brawlapi';
 import type { MetaMover, Tier } from '@/types/stats';
+
+export { buildChangeIndex, isNotable, spanLabel, type BrawlerChange };
 
 /**
  * What moved since the last comparable snapshot.
@@ -23,82 +32,6 @@ import type { MetaMover, Tier } from '@/types/stats';
  * scores it already holds.
  */
 
-/** One brawler's movement, in the three forms the page shows it. */
-export interface BrawlerChange {
-  scoreDelta: number;
-  /** Positive is upward: places gained since the earlier snapshot. */
-  rankDelta: number;
-  tierBefore: Tier;
-  tierNow: Tier;
-  crossedTier: boolean;
-}
-
-/**
- * Below this, a "move" is the third decimal place of a noisy score.
- *
- * A crossed tier boundary is always shown regardless, because that is a
- * visible change to the page even when the score barely moved.
- */
-const MIN_SCORE_MOVE = 0.15;
-
-/**
- * Ranks are positions among the brawlers that clear the sample floor on *both*
- * dates, which is the same population the tier list rates. It is not a rank
- * out of 107 and the copy never claims it is — "3 places" is a distance, and
- * the distance is honest.
- */
-export function buildChangeIndex(movers: MetaMover[]): Map<number, BrawlerChange> {
-  const index = new Map<number, BrawlerChange>();
-  if (movers.length === 0) return index;
-
-  const rankNow = new Map<number, number>();
-  const rankBefore = new Map<number, number>();
-
-  [...movers]
-    .sort((a, b) => b.metaScoreNow - a.metaScoreNow)
-    .forEach((m, i) => rankNow.set(m.brawlerId, i + 1));
-  [...movers]
-    .sort((a, b) => b.metaScoreBefore - a.metaScoreBefore)
-    .forEach((m, i) => rankBefore.set(m.brawlerId, i + 1));
-
-  for (const mover of movers) {
-    index.set(mover.brawlerId, {
-      scoreDelta: mover.metaScoreDelta,
-      rankDelta: (rankBefore.get(mover.brawlerId) ?? 0) - (rankNow.get(mover.brawlerId) ?? 0),
-      tierBefore: mover.tierBefore,
-      tierNow: mover.tierNow,
-      crossedTier: mover.tierBefore !== mover.tierNow,
-    });
-  }
-
-  return index;
-}
-
-/** Whether a change is worth the ink. */
-export function isNotable(change: BrawlerChange): boolean {
-  return change.crossedTier || Math.abs(change.scoreDelta) >= MIN_SCORE_MOVE;
-}
-
-/**
- * How long the comparison actually spans.
- *
- * Written from the snapshot dates rather than hard-coded, because the lookback
- * is a *request* — `compute_getMetaMovers` falls back to the oldest comparable
- * snapshot when the dataset is too young, so a page asking for seven days can
- * legitimately be showing two. Printing "since yesterday" over a week-old
- * comparison would be the kind of small lie that makes every other number on
- * the page worth doubting.
- */
-export function spanLabel(from: string, to: string): string {
-  const days = Math.round(
-    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000,
-  );
-  if (!Number.isFinite(days) || days <= 0) return 'since the last snapshot';
-  if (days === 1) return 'since yesterday';
-  if (days === 7) return 'in the last week';
-  return `in the last ${days} days`;
-}
-
 /**
  * The badge on a tier-list chip.
  *
@@ -109,7 +42,7 @@ export function spanLabel(from: string, to: string): string {
  */
 export function ChangeBadge({ change, span }: { change: BrawlerChange; span: string }) {
   const up = change.crossedTier
-    ? TIER_ORDER_VALUE(change.tierNow) < TIER_ORDER_VALUE(change.tierBefore)
+    ? tierRank(change.tierNow) < tierRank(change.tierBefore)
     : change.scoreDelta > 0;
 
   const sign = change.scoreDelta > 0 ? '+' : '';
@@ -144,11 +77,6 @@ export function ChangeBadge({ change, span }: { change: BrawlerChange; span: str
   );
 }
 
-/** S is the top, so a *lower* index is a better tier. */
-function TIER_ORDER_VALUE(tier: Tier): number {
-  return ['S', 'A', 'B', 'C', 'D'].indexOf(tier);
-}
-
 /**
  * The answer to "what changed?", above the list rather than below it.
  *
@@ -180,8 +108,8 @@ export function WhatChanged({
   const crossings = notable.filter((m) => changes.get(m.brawlerId)!.crossedTier);
   const promoted = crossings.filter(
     (m) =>
-      TIER_ORDER_VALUE(changes.get(m.brawlerId)!.tierNow) <
-      TIER_ORDER_VALUE(changes.get(m.brawlerId)!.tierBefore),
+      tierRank(changes.get(m.brawlerId)!.tierNow) <
+      tierRank(changes.get(m.brawlerId)!.tierBefore),
   );
 
   return (

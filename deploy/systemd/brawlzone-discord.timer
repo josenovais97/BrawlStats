@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily Discord meta post
+
+[Timer]
+# 17:00 UTC is early evening in Europe and afternoon in the Americas, which is
+# when a stats post is most likely to be read rather than scrolled past. Well
+# clear of the sampler's :17 runs, so it reads a settled snapshot.
+OnCalendar=*-*-* 17:00:00
+Persistent=true
+Unit=brawlzone-discord.service
+
+[Install]
+WantedBy=timers.target

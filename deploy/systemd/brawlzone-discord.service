@@ -1,0 +1,12 @@
+[Unit]
+Description=Post the day's Ranked meta movement to Discord
+After=network-online.target docker.service
+Wants=network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/brawlstats
+ExecStart=/usr/local/bin/brawlzone-run discord /usr/local/bin/brawlzone-discord
+TimeoutStartSec=900
