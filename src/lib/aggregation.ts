@@ -104,13 +104,31 @@ const WINDOW_DAYS = 7;
  *
  * Held at what one run can actually read, since the batch above is now the
  * whole pool by design. Growing this past a run's wall clock would quietly
- * reintroduce the partial coverage that was losing battles.
+ * reintroduce the partial coverage that was losing battles — so this number
+ * and `RUN_BUDGET_MS` only ever move together.
  *
- * Breadth now comes from *which* accounts are in the pool rather than from how
- * many: see `seedSamplePool`, which draws on regional leaderboards as well as
- * the global one.
+ * Raised 1,000 -> 3,000 on 2026-08-31, with the plateau re-derived rather than
+ * assumed. Disk was never the binding constraint: 248 MB of the 289 MB in the
+ * database is in tables whose retention (8-45 days) has already elapsed, so it
+ * was already at steady state; only ~22 MB was still filling toward the
+ * 120-day roll-up window. Tripling the pool projects to ~2.25 GB against an
+ * 8 GB budget — 28%, where `pressureFor` does not begin defending until 80%.
+ *
+ * The real limit was time. Sampling gets RUN_BUDGET_MS minus the ranking and
+ * recompute reserves, which was 530s, and 1,000 players took 127s on a good
+ * run and 340s on a slow one. Three thousand at the slow rate is ~1,020s, so
+ * the budget went to 25 minutes — still inside the unit's 30-minute
+ * TimeoutStartSec, with the margin left deliberately.
+ *
+ * Time rather than concurrency, deliberately: raising CONCURRENCY would hold
+ * the wall clock flat but triple the request *rate* against an API key that is
+ * IP-locked to one proxy. Spending more wall clock is the cheaper risk.
+ *
+ * Breadth still comes from *which* accounts are in the pool as much as from
+ * how many: see `seedSamplePool`, which draws on regional leaderboards as well
+ * as the global one.
  */
-const POOL_TARGET = 1000;
+export const POOL_TARGET = 3000;
 
 /**
  * How many trailing days of roll-up are rebuilt from raw rows each run.
@@ -1796,7 +1814,7 @@ export async function recomputeBuildStats(): Promise<number> {
  * unmetered. On a private repo this would be ~2,400 minutes a month against a
  * 2,000 allowance, and the frequency would have to come down to pay for it.
  */
-const RUN_BUDGET_MS = 600_000;
+const RUN_BUDGET_MS = 1_500_000;
 
 /** Always give rankings at least this long, even on a slow run. */
 const RANKING_MIN_BUDGET_MS = 15_000;

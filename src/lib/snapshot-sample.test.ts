@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { DATA_BUDGET_BYTES, SNAPSHOT_RETENTION_DAYS, shouldSnapshot } from '@/lib/aggregation';
+import { DATA_BUDGET_BYTES, POOL_TARGET, SNAPSHOT_RETENTION_DAYS, shouldSnapshot } from '@/lib/aggregation';
 
 /**
  * The snapshot sample is the difference between fitting the plan and not.
@@ -18,8 +18,20 @@ import { DATA_BUDGET_BYTES, SNAPSHOT_RETENTION_DAYS, shouldSnapshot } from '@/li
 
 /** What the table cost per row, measured on real data. */
 const BYTES_PER_ROW = 482;
-/** Distinct players sampled per day, and brawlers each, at the current cadence. */
-const PLAYERS_PER_DAY = 7_000;
+/*
+ * Distinct players sampled per day, derived rather than transcribed.
+ *
+ * The pool churns almost completely on every run — a run seeds and evicts
+ * roughly its own size — so eight runs a day touch far more distinct accounts
+ * than the pool holds at any instant. Measured at a 1,000 pool: ~7,000 a day.
+ *
+ * Derived from POOL_TARGET for the reason the block below already gives about
+ * retention and the plan: a hardcoded 7,000 would have gone on asserting
+ * against a 1,000-player world after the pool tripled, and passed while
+ * meaning nothing.
+ */
+const RUNS_PER_DAY_DISTINCT_FACTOR = 7;
+const PLAYERS_PER_DAY = POOL_TARGET * RUNS_PER_DAY_DISTINCT_FACTOR;
 const BRAWLERS_PER_PLAYER = 57;
 /*
  * Imported, not transcribed -- the same lesson storage-pressure.test.ts learned.
@@ -31,8 +43,15 @@ const BRAWLERS_PER_PLAYER = 57;
  */
 const RETENTION_DAYS = SNAPSHOT_RETENTION_DAYS;
 const PLAN_BYTES = DATA_BUDGET_BYTES;
-/** Everything in the database that is not this table. Measured 2026-08-27. */
-const OTHER_TABLES_BYTES = 400 * 1024 * 1024;
+/**
+ * Everything in the database that is not this table.
+ *
+ * Measured at 400 MB on 2026-08-27 against a 1,000-player pool. Scaled with
+ * the pool because every large table in it — raw battles, team rows, the
+ * pairing roll-up — is a function of how many accounts are walked, not a
+ * fixed cost. The brawler leaderboard is the one exception and is small.
+ */
+const OTHER_TABLES_BYTES = 400 * 1024 * 1024 * (POOL_TARGET / 1_000);
 
 function projectedBytes(rate: number): number {
   const rowsPerDay = (PLAYERS_PER_DAY / rate) * BRAWLERS_PER_PLAYER;
