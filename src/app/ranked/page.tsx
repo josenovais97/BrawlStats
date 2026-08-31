@@ -13,6 +13,7 @@ import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
+import { getRankedMapLastSeen } from '@/lib/stats';
 import { slugify } from '@/lib/slugs';
 import { getLastAggregationRun, getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
@@ -37,8 +38,9 @@ const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
 };
 
 export default async function RankedPage() {
-  const [maps, mapMeta, modeMeta, brawlerMeta, season, lastRun] = await Promise.all([
+  const [maps, lastSeenRows, mapMeta, modeMeta, brawlerMeta, season, lastRun] = await Promise.all([
     getRankedMapPicks(3),
+    getRankedMapLastSeen().catch(() => []),
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     getBrawlerMap().catch(() => new Map<number, BABrawler>()),
@@ -79,6 +81,15 @@ export default async function RankedPage() {
    */
   const key = (mode: string, map: string) => `${slugify(mode)}/${slugify(map)}`;
   const sampled = new Map(maps.map((m) => [key(m.mode, m.mapName), m]));
+
+  /*
+   * When each map was last played, including maps the rotation cut-off has
+   * already dropped. This is what separates "not sampled yet" from "the game
+   * rotated this out days ago" — see `getRankedMapLastSeen`.
+   */
+  const lastSeen = new Map(
+    lastSeenRows.map((r) => [key(r.mode, r.mapName), r.lastSeen] as const),
+  );
 
   /*
    * Only trusted when it overlaps what we have sampled. A wiki table that has
@@ -133,6 +144,7 @@ export default async function RankedPage() {
           // catalogue, which is the only source for a map with no battles yet.
           art: picks?.eventId ? mapMeta.get(picks.eventId) : catalogue?.map,
           href: catalogue ? `/maps/${catalogue.modeSlug}/${catalogue.mapSlug}` : null,
+          lastSeen: lastSeen.get(key(modeSlug, name)) ?? null,
         };
       }),
     };
@@ -305,6 +317,7 @@ export default async function RankedPage() {
                       modeLabel={row.label}
                       accent={row.accent}
                       mapHref={entry.href}
+                      lastSeen={entry.lastSeen}
                     />
                   )}
                 </li>
@@ -379,13 +392,29 @@ function PendingMapCard({
   modeLabel,
   accent,
   mapHref,
+  lastSeen,
 }: {
   mapName: string;
   art?: BAMap;
   modeLabel: string;
   accent: string;
   mapHref: string | null;
+  /** ISO timestamp of the last sampled battle here, or null if never seen. */
+  lastSeen: string | null;
 }) {
+  /*
+   * Two different situations, and only one of them is going to change.
+   *
+   * A map with no sighting at all is genuinely waiting for data. A map that
+   * was played and then stopped has been rotated out by the game — the season
+   * pool this board is built from lists every map of the season, and Brawl
+   * Stars plays a subset of it at a time. Saying "yet" about the second kind
+   * promises data that is not coming.
+   */
+  const rotatedOut = lastSeen !== null;
+  const since = lastSeen
+    ? new Date(lastSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+    : null;
   return (
     <article className="card flex h-full flex-col overflow-hidden opacity-80">
       <MapPreview
@@ -411,7 +440,7 @@ function PendingMapCard({
           </span>
         </div>
         <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">
-          No sampled battles yet
+          {rotatedOut ? `Out of rotation · last played ${since}` : 'No sampled battles yet'}
         </p>
       </div>
 

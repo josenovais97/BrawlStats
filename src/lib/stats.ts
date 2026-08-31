@@ -3099,6 +3099,51 @@ const cachedRankedMapPicks = unstable_cache(
   { revalidate: READ_CACHE_SECONDS },
 );
 
+/**
+ * When each Ranked map was last played, ignoring the rotation cut-off.
+ *
+ * `getRankedMapPicks` drops a map once it has gone `MAP_ROTATION_GRACE_DAYS`
+ * without a sighting, which is right for a board that claims to show the
+ * current rotation. The cost is that the page then cannot tell two very
+ * different situations apart: a map that has never been sampled, and one the
+ * game rotated out days ago.
+ *
+ * They read identically on screen and only one of them is going to change.
+ * Measured 2026-08-31: the season pool listed 30 maps, 26 of which were played
+ * every day, while Crystal Arcade, Pit Stop, Safe(r) Zone and Rustic Arcade
+ * stopped appearing between the 25th and the 26th. All four still showed "no
+ * sampled battles yet", which promises data that is not coming.
+ *
+ * Keyed on mode and map exactly as the roll-up stores them; callers slugify.
+ */
+export async function getRankedMapLastSeen(
+  windowDays = RANKED_MAP_WINDOW_DAYS,
+): Promise<{ mode: string; mapName: string; lastSeen: string }[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.battleDailyStat.groupBy({
+      by: ['mode', 'mapName'],
+      where: {
+        battleType: { in: [...COMPETITIVE_BATTLE_TYPES] },
+        day: { gte: windowStartUtc(windowDays) },
+        mapName: { not: null },
+      },
+      _max: { lastBattleTime: true },
+    });
+
+    return rows.flatMap((row) => {
+      const seen = row._max.lastBattleTime;
+      if (!row.mapName || !seen) return [];
+      return [{ mode: row.mode, mapName: row.mapName, lastSeen: seen.toISOString() }];
+    });
+  } catch (error) {
+    swallow('getRankedMapLastSeen', error);
+    return [];
+  }
+}
+
 export async function getRankedMapPicks(
   perMap = 3,
   windowDays = RANKED_MAP_WINDOW_DAYS,
