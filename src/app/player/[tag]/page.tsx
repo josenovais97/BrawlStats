@@ -25,12 +25,14 @@ import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
-import { getBrawlerMap } from '@/lib/brawlapi';
+import { getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
+import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
 import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
 import {
   getMetaIndex,
+  getBestPicksByMode,
   getRankedMapPicks,
   getPlayerBrawlerPlacements,
   getReleasedBuffieCount,
@@ -151,6 +153,16 @@ export default async function PlayerPage({ params }: PageProps) {
    * than one per visitor.
    */
   const rankedMaps = await getRankedMapPicks(3).catch(() => []);
+  /*
+   * Picks are read per mode rather than per map: people choose a brawler for
+   * Gem Grab, not for Hard Rock Mine specifically. The rotation still decides
+   * *which* modes are shown, so this stays scoped to what is queueable now.
+   */
+  const rotationModes = [...new Set(rankedMaps.map((m) => m.mode))];
+  const [picksByMode, modeMeta] = await Promise.all([
+    getBestPicksByMode(5).catch(() => new Map()),
+    getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+  ]);
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
@@ -257,8 +269,10 @@ export default async function PlayerPage({ params }: PageProps) {
           to the maps that are actually queueable right now. */}
       <PlayerRankedPicks
         brawlers={player.brawlers}
-        maps={rankedMaps}
+        picksByMode={picksByMode}
+        modes={rotationModes}
         brawlerMeta={brawlerMeta}
+        modeMeta={modeMeta}
       />
 
       <Suspense fallback={<InsightsSkeleton />}>
