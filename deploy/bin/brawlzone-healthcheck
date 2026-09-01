@@ -88,6 +88,23 @@ cd /home/ubuntu/brawlstats 2>/dev/null && {
   fi
 }
 
+# 7. Is the update summary still parsing?
+#    /release-notes groups an update by what it touched, matching Supercell's
+#    own section titles ("NEW Buffies", "Balance Changes"). Those have been
+#    stable for over a year, but a rename would not break anything loudly --
+#    the category would simply vanish and the page would still look fine.
+#
+#    Checked through the rendered page rather than by running the parser: it
+#    costs one request, needs no container, and tests what a reader actually
+#    gets. Only when the page itself is healthy, so a site-wide outage is not
+#    reported twice.
+notes=$(curl -s --max-time 20 "$SITE/release-notes" || echo "")
+if printf '%s' "$notes" | grep -q "Who changed"; then
+  if ! printf '%s' "$notes" | grep -qE "New brawlers|New hypercharges|New buffies|Balance changes"; then
+    problems+=("release notes parsed but matched no change categories (section titles may have changed)")
+  fi
+fi
+
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 
 if [ ${#problems[@]} -eq 0 ]; then
