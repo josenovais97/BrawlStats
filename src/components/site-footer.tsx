@@ -53,6 +53,11 @@ const EXPLORE = [
   { href: '/ranked', label: 'Ranked Maps' },
   { href: '/maps', label: 'Maps' },
   { href: '/draft', label: 'Draft' },
+  // Same lesson as the three below, caught the same way: /comps shipped linked
+  // only from the header's "More" menu, which renders its items on open and so
+  // puts none of them in the served HTML. `crawl:budget` found 846 URLs and no
+  // comps section at all.
+  { href: '/comps', label: 'Team Comps' },
   { href: '/compare', label: 'Compare' },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/events', label: 'Events' },
