@@ -51,6 +51,16 @@ const CONCURRENCY = 5;
 const MAX_RETRIES = 3;
 
 /**
+ * Consecutive upstream failures that mean the game API is down, not unlucky.
+ *
+ * Fifty is far past what jitter produces at a concurrency of five — a healthy
+ * run's failures are isolated deleted accounts, which reset the count — while
+ * an outage reaches it within seconds. Set it much lower and a brief wobble
+ * abandons a good run; much higher and the saving disappears.
+ */
+const UPSTREAM_FAILURE_STREAK = 50;
+
+/**
  * Ranking refreshes issue one call each rather than two, so they can run wider
  * than player sampling without doubling the real request rate.
  */
@@ -1925,11 +1935,51 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     // Leave room for aggregation and the ranking pass: sampling stops early
     // rather than starving the steps that turn samples into readable data.
     const samplingDeadline = deadline - RANKING_MIN_BUDGET_MS - RECOMPUTE_RESERVE_MS;
-    const results = await mapLimit(targets, CONCURRENCY, (t) => {
+    /*
+     * Stop early when the game API is down rather than working the whole pool.
+     *
+     * Supercell takes the API down for every update, and on 2026-09-01 a run
+     * spent 1,329 seconds failing all 3,000 players — 1,280 upstream-down and
+     * 1,720 timeouts — before giving up. Tripling the pool tripled that waste,
+     * and on two shared cores a day-long maintenance costs hours of CPU spent
+     * on calls that cannot succeed.
+     *
+     * Counted consecutively, and reset by any success. That distinguishes an
+     * outage from ordinary bad luck: scattered timeouts never accumulate,
+     * while a dead API produces an unbroken run of them immediately. Counting
+     * consecutively also catches an API that dies mid-run, which a check on
+     * the first N players only would miss.
+     *
+     * The circuit throws per player rather than aborting the whole map, which
+     * is the same shape the deadline check above uses: every remaining player
+     * fails instantly with no network call, so the run still reports a
+     * complete set of results and the notes still say what went wrong.
+     */
+    let consecutiveUpstreamFailures = 0;
+    let circuitOpen = false;
+
+    const results = await mapLimit(targets, CONCURRENCY, async (t) => {
       if (Date.now() > samplingDeadline) {
         throw new BrawlApiError('timeout', 'Run budget exhausted before sampling this player');
       }
-      return samplePlayer(t.tag);
+      if (circuitOpen) {
+        throw new BrawlApiError('upstreamDown', 'Upstream is down; run abandoned early');
+      }
+      try {
+        const sampled = await samplePlayer(t.tag);
+        consecutiveUpstreamFailures = 0;
+        return sampled;
+      } catch (error) {
+        const code = toApiError(error).code;
+        if (code === 'upstreamDown' || code === 'timeout') {
+          consecutiveUpstreamFailures += 1;
+          if (consecutiveUpstreamFailures >= UPSTREAM_FAILURE_STREAK) circuitOpen = true;
+        } else {
+          // A deleted account is not evidence about the API's health.
+          consecutiveUpstreamFailures = 0;
+        }
+        throw error;
+      }
     });
 
     const fulfilled = results.filter((r) => r.status === 'fulfilled');
@@ -2015,12 +2065,20 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
      */
     const rollUpNote = rollUp.error ? `roll-up FAILED (${rollUp.error})` : null;
 
+    // Say that the run was cut short, not just that calls failed: the two look
+    // identical in a count of error codes, and only one of them means the box
+    // stopped spending CPU on an API that could not answer.
+    const abandonedNote = circuitOpen
+      ? `upstream down — run abandoned after ${UPSTREAM_FAILURE_STREAK} consecutive failures`
+      : null;
+
     const failureNote =
       failures > 0
         ? `${failures} of ${results.length} player samples failed (${[...reasons]
             .map(([code, count]) => `${code}: ${count}`)
             .join(', ')})` +
-          (evictedMissing > 0 ? ` · ${evictedMissing} deleted account(s) removed from the pool` : '')
+          (evictedMissing > 0 ? ` · ${evictedMissing} deleted account(s) removed from the pool` : '') +
+          (abandonedNote ? ` · ${abandonedNote}` : '')
         : null;
 
     const notes =
