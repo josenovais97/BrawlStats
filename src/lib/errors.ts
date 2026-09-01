@@ -58,14 +58,25 @@ export const ERROR_COPY: Record<ApiErrorCode, { title: string; detail: string }>
     detail:
       'The server API key is missing, expired, or not whitelisted for the RoyaleAPI proxy IP. See the README.',
   },
+  /*
+   * Written for a player, not for whoever runs the server.
+   *
+   * The old wording named the proxy, which means nothing to someone whose
+   * profile will not load. Supercell takes the game down for every update, so
+   * this is the message shown most often and by a wide margin — during the
+   * 2026-09-01 maintenance it was on every profile and leaderboard view for
+   * hours. Naming the cause is what stops a reader concluding the site is
+   * broken or their tag is wrong.
+   */
   upstreamDown: {
-    title: 'Brawl Stars API unavailable',
+    title: 'Brawl Stars is down',
     detail:
-      'The game API or the proxy is not responding. This usually clears up on its own. Try again shortly.',
+      'Supercell is not answering right now, usually because the game is being updated or is in maintenance. Nothing is wrong with your tag. Try again in a few minutes.',
   },
   timeout: {
-    title: 'Request timed out',
-    detail: 'The Brawl Stars API took too long to answer. Try again in a moment.',
+    title: 'Brawl Stars is slow to answer',
+    detail:
+      'The game took too long to respond, which usually means it is busy or being updated. Try again in a moment.',
   },
   notConfigured: {
     title: 'Server not configured',
