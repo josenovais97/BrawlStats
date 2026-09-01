@@ -252,3 +252,87 @@ export async function getLatestReleaseNotes(now = new Date()): Promise<ReleaseNo
 export function spansToText(spans: RichText[]): string {
   return spans.map((s) => s.value).join('');
 }
+
+/* ------------------------- who an update touched -------------------------- */
+
+/**
+ * Which brawlers an update changed, taken from the official notes themselves.
+ *
+ * This used to be parsed from the community wiki's version history, which is
+ * written by hand and lags: on 2026-09-01 the site showed a June summary
+ * directly above September's actual notes, which is worse than showing
+ * nothing. The official post is already fetched for this page, always
+ * describes the update being displayed, and needs no editor — so the summary
+ * is current by construction rather than by luck.
+ *
+ * Only names are taken. The prose is Supercell's and stays where it is; what
+ * this adds is a scannable index that links each brawler to our own page for
+ * it, which is the thing a reader actually wants in the hour after an update.
+ *
+ * Sections are matched by title against a fixed list rather than scanned
+ * wholesale, because a brawler is mentioned all over a release post — in skin
+ * announcements, bug fixes and event blurbs — and none of those mean the
+ * brawler was changed.
+ */
+export type ChangeCategory = 'brawlers' | 'hypercharges' | 'buffies' | 'balance';
+
+const CATEGORY_MATCHERS: { key: ChangeCategory; test: RegExp }[] = [
+  { key: 'brawlers', test: /new\s+brawler/i },
+  { key: 'hypercharges', test: /hypercharge/i },
+  { key: 'buffies', test: /buffie/i },
+  { key: 'balance', test: /balance/i },
+];
+
+export const CHANGE_LABEL: Record<ChangeCategory, string> = {
+  brawlers: 'New brawlers',
+  hypercharges: 'New hypercharges',
+  buffies: 'New buffies',
+  balance: 'Balance changes',
+};
+
+/** Flattens a node to plain text, so a name can be found wherever it sits. */
+function nodeText(node: RichNode): string {
+  if (node.type === 'list') {
+    return node.items.flat().map(nodeText).join(' ');
+  }
+  return node.spans.map((span) => span.value).join(' ');
+}
+
+/**
+ * Brawlers named in each category section of an update.
+ *
+ * `known` should include unreleased brawlers as well as the live catalogue —
+ * a "new brawlers" section names exactly the ones the game API does not have
+ * yet, so matching on the catalogue alone finds nothing there.
+ */
+export function changesFromNotes(
+  notes: ReleaseNotes,
+  known: string[],
+): { category: ChangeCategory; brawlers: string[] }[] {
+  const out: { category: ChangeCategory; brawlers: string[] }[] = [];
+
+  for (const section of notes.sections) {
+    if (!section.title) continue;
+    const matched = CATEGORY_MATCHERS.find((c) => c.test.test(section.title!));
+    if (!matched) continue;
+
+    const body = section.nodes.map(nodeText).join(' ');
+    const found: string[] = [];
+    for (const name of known) {
+      // Word-bounded so "Max" does not match "maximum" and "Bo" does not
+      // match "Bonnie".
+      const pattern = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (pattern.test(body) && !found.includes(name)) found.push(name);
+    }
+    if (found.length === 0) continue;
+
+    const existing = out.find((o) => o.category === matched.key);
+    if (existing) {
+      for (const n of found) if (!existing.brawlers.includes(n)) existing.brawlers.push(n);
+    } else {
+      out.push({ category: matched.key, brawlers: found });
+    }
+  }
+
+  return out;
+}

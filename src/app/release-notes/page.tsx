@@ -6,15 +6,14 @@ import Link from 'next/link';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getBrawlerMap } from '@/lib/brawlapi';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
-import { CATEGORY_LABEL, getGameUpdates } from '@/lib/game-updates';
+
 import { brawlerPath, slugify } from '@/lib/slugs';
-import {
+import { CHANGE_LABEL, changesFromNotes,
   getLatestReleaseNotes,
   type RichHeading,
   type RichNode,
   type RichText,
-  type ReleaseSection,
-} from '@/lib/release-notes';
+  type ReleaseSection } from '@/lib/release-notes';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/release-notes' },
@@ -60,19 +59,22 @@ export default async function ReleaseNotesPage() {
    * the brawler pages people are searching for.
    */
   const brawlerMeta = await getBrawlerMap().catch(() => new Map());
-  const updates = await getGameUpdates([...brawlerMeta.values()].map((b) => b.name)).catch(
-    () => [],
-  );
-  const latest = updates[0] ?? null;
+  const liveNames = [...brawlerMeta.values()].map((b) => b.name);
 
   /*
    * Announced but not shipped. Curated by hand — see lib/announced for why
    * there is no source to automate against — and self-retiring: a brawler that
    * has reached the catalogue is no longer upcoming.
    */
-  const upcoming = await getUpcomingBrawlers(
-    [...brawlerMeta.values()].map((b) => b.name),
-  ).catch(() => [] as UpcomingBrawler[]);
+  const upcoming = await getUpcomingBrawlers(liveNames).catch(() => [] as UpcomingBrawler[]);
+
+  /*
+   * Who this update touched, read from the notes being displayed rather than
+   * from the wiki. Unreleased brawlers are included in the names to match
+   * against, because a "new brawlers" section names exactly the ones the game
+   * API does not have yet.
+   */
+  const changes = changesFromNotes(notes, [...liveNames, ...upcoming.map((b) => b.name)]);
 
   return (
     <div className="space-y-8">
@@ -179,17 +181,17 @@ export default async function ReleaseNotesPage() {
         </section>
       ) : null}
 
-      {latest && latest.changes.length > 0 ? (
+      {changes.length > 0 ? (
         <section aria-labelledby="who-changed">
           <SectionHeading
             title="Who changed"
-            subtitle={`Brawlers touched by ${latest.title}, from the community version history.`}
+            subtitle={`Every brawler named in ${notes.title}, linked to its page here.`}
           />
           <div className="space-y-4">
-            {latest.changes.map((change) => (
+            {changes.map((change) => (
               <div key={change.category} className="card p-4">
                 <p className="text-xs font-bold uppercase tracking-wide text-muted">
-                  {CATEGORY_LABEL[change.category]}
+                  {CHANGE_LABEL[change.category]}
                 </p>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {change.brawlers.map((name) => {
