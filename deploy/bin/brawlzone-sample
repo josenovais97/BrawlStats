@@ -79,3 +79,10 @@ if dropped:
 status = result.get("status", "?")
 print(f"Status {status}, completed in {elapsed}s")
 PY
+
+# Both this and auto-deploy.sh build images, but only auto-deploy pruned. This
+# runs every two hours and the deploy only when a commit lands, so on a quiet
+# day the build cache grew unchecked -- 6.7GB against a 4GB cap by 2026-09-01,
+# which was most of a 8-percentage-point jump in disk use. Same cap, applied
+# from both sides.
+docker builder prune -f --max-used-space=4GB >/dev/null 2>&1 || true

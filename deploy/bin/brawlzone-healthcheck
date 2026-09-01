@@ -19,8 +19,13 @@ code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SITE/" || echo 000
 # 2. Is the data fresh? The sampler runs every 2h; 5h means runs are failing
 #    or the timer stopped, which the OnFailure hook cannot catch because a
 #    timer that never fires never fails.
+#
+#    Successful runs only. A failed run still writes its row, so counting every
+#    run made a sampler that fails on every attempt look perfectly healthy --
+#    which is exactly what happened during the game API outage on 2026-09-01,
+#    while the box collected nothing for hours and reported itself fine.
 last=$(cd /home/ubuntu/brawlstats && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
-  "select extract(epoch from (now() - max(started_at)))::int from aggregation_runs;" 2>/dev/null || echo "")
+  "select extract(epoch from (now() - max(started_at)))::int from aggregation_runs where status <> 'failed';" 2>/dev/null || echo "")
 if [ -n "$last" ] && [ "$last" -gt 18000 ]; then
   problems+=("last sampler run was $((last/3600))h ago (expected under 2h)")
 fi
