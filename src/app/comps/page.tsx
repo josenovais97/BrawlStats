@@ -47,7 +47,7 @@ export default async function CompsPage() {
 
       <PageHeading
         title="Best team comps"
-        subtitle="The three-brawler combinations that actually win, by mode. Every comp here was used by at least ten different players, so what you are reading is the comp rather than the squad that likes it."
+        subtitle="The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it."
       />
 
       {withComps.length === 0 ? (
@@ -87,9 +87,8 @@ export default async function CompsPage() {
               }
             />
             <p className="text-xs text-muted">
-              {formatNumber(mode.sampleSize)} sampled battles · the mode averages{' '}
-              {formatPercent(mode.baseline)}, and the figure on the right is how far above or below
-              that a comp sits.
+              {formatNumber(mode.sampleSize)} sampled battles · mode average{' '}
+              {formatPercent(mode.baseline)}
             </p>
             <CompList
               comps={mode.comps.slice(0, PREVIEW)}

@@ -11,9 +11,9 @@ import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { CHANGE_LABEL, changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { brawlerPath, slugify } from '@/lib/slugs';
-import { getMetaMovers, getTeamComps } from '@/lib/stats';
+import { TIER_COLOR, getMetaMovers, getTeamComps } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
-import type { MetaMover } from '@/types/stats';
+import type { MetaMover, Tier } from '@/types/stats';
 
 /* Daily: the movers are recomputed from each day's snapshot, so a weekly page
    that only changed on Mondays would sit stale for six days out of seven. */
@@ -72,6 +72,14 @@ export default async function MetaReportPage() {
 
   const window = movers[0];
 
+  /** UTC-anchored so server and browser agree; "25 August" beats "2026-08-25". */
+  const day = (iso: string) =>
+    new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'UTC',
+    });
+
   return (
     <div className="space-y-8">
       <JsonLd
@@ -85,7 +93,7 @@ export default async function MetaReportPage() {
         title="This week in the meta"
         subtitle={
           window
-            ? `What moved between ${window.fromDate} and ${window.toDate}, measured from sampled battles.`
+            ? `What moved between ${day(window.fromDate)} and ${day(window.toDate)}, measured from sampled battles.`
             : 'What moved this week, measured from sampled battles.'
         }
       />
@@ -117,19 +125,21 @@ export default async function MetaReportPage() {
                     loading="lazy"
                     unoptimized
                   />
-                  <span className="min-w-0 flex-1 truncate font-semibold capitalize">
-                    {mover.brawlerName.toLowerCase()}
-                  </span>
-                  <span className="shrink-0 text-sm font-bold tabular-nums">
-                    <span className="text-muted">{mover.tierBefore}</span>
-                    <span className="mx-1.5 text-muted">→</span>
-                    <span
-                      className={
-                        mover.metaScoreDelta > 0 ? 'text-victory' : 'text-defeat'
-                      }
-                    >
-                      {mover.tierNow}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold capitalize">
+                      {mover.brawlerName.toLowerCase()}
                     </span>
+                    <span className="block text-xs tabular-nums text-muted">
+                      {formatNumber(mover.sampleSize)} battles ·{' '}
+                      {formatPercent(mover.winRateNow)} win rate
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1.5 text-sm font-black">
+                    <TierPill tier={mover.tierBefore} muted />
+                    <span aria-hidden className="text-muted">
+                      →
+                    </span>
+                    <TierPill tier={mover.tierNow} />
                   </span>
                 </Link>
               </li>
@@ -258,5 +268,21 @@ function MoverColumn({
         </ul>
       )}
     </section>
+  );
+}
+
+/** The tier chip used across the tier list, so a move reads in one glance. */
+function TierPill({ tier, muted = false }: { tier: Tier; muted?: boolean }) {
+  return (
+    <span
+      className="rounded px-1.5 py-0.5 text-xs font-black"
+      style={{
+        background: `color-mix(in srgb, ${TIER_COLOR[tier]} ${muted ? 10 : 20}%, transparent)`,
+        color: TIER_COLOR[tier],
+        opacity: muted ? 0.65 : 1,
+      }}
+    >
+      {tier}
+    </span>
   );
 }

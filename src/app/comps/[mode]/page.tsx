@@ -125,8 +125,8 @@ export default async function ModeCompsPage({ params }: PageProps) {
       />
 
       <p className="text-xs leading-relaxed text-muted">
-        A comp appears here once at least ten different players have used it in at least twenty
-        decided battles. The player floor matters more than the battle count: a squad that queues
+        A comp appears here once at least fifteen different players have used it across at least
+        forty decided battles. The player floor matters more than the battle count: a squad that queues
         together brings the same trio every game, so without it the list ranks strong teams rather
         than strong comps. Ranked and ladder battles both count.
       </p>
