@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { BrawlerBrowser } from '@/components/brawlers/brawler-browser';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading } from '@/components/ui/section-heading';
-import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { currentMonth } from '@/lib/site';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
