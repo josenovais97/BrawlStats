@@ -209,7 +209,30 @@ re-deriving the plateau.** `storage-pressure.test.ts` and
 `snapshot-sample.test.ts` pin that arithmetic; they exist to make a careless
 change fail loudly.
 
-## Two non-obvious design decisions
+## Three non-obvious design decisions
+
+**A trio of brawlers is a proxy for a trio of players.** This is the one to
+read before touching `/comps` or anything else aggregated over teams. Three
+friends who queue together bring the same comp every game, so a strong premade
+squad writes its own win rate into whatever it happens to play. Measured over
+14 days of Brawl Ball, win rate was almost a pure function of how many distinct
+players a comp had — 87.0% at one player, 80.9% at two, 69.7% at ten, 64.0% at
+twelve, against a mode baseline of ~66%. Ranked on battles alone, every comp on
+the page sat at a flat 100%, which is what gave it away.
+
+Two floors fix it, and both are needed. `MIN_DISTINCT_PLAYERS_FOR_COMP` (15)
+stops one squad being a comp. `MIN_SAMPLE_FOR_COMP` (40) stops the *top* of the
+list being noise, which is a separate problem: selecting a maximum out of
+thousands of ~25-battle samples produces extremes by construction, and no
+choice of estimator fixes it. A within-player estimator — each player's rate
+with the comp minus their own overall rate, which controls for skill exactly —
+was tried and ranked the same implausible comps at +20 to +30 points. Sample
+size was the fix.
+
+The floors cost most of the roster: 47 Brawl Ball comps survive, 6 Knockout, 4
+Hot Zone, and nothing at all in five modes, which say so. They loosen on their
+own as the 14-day window fills with post-2026-08-30 data (the pool tripled that
+day), so re-measure before changing them.
 
 **`player_brawler_snapshots` is a sample, not a census.** It records a rotating
 quarter of sampled players (`SNAPSHOT_SAMPLE_RATE`), because every consumer is
