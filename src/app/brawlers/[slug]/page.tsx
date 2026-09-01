@@ -20,12 +20,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
-import {
-  ClassIcon,
-  CombatStatIcon,
-  PlayersIcon,
-  TrophyIcon,
-} from '@/components/game-icons';
+import { ClassIcon, CombatStatIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import {
   brawlerModelUrl,
   getBrawler,
@@ -33,9 +28,7 @@ import {
   hasBrawlerModel,
   rarityColor,
 } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode,
-  titleCase,
-} from '@/lib/format';
+import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
 import {
   combatStatLabels,
   getBrawlerWiki,
@@ -43,7 +36,7 @@ import {
   wikiPageUrl,
 } from '@/lib/brawler-wiki';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
-import { getWikiAbilityArt } from '@/lib/wiki-art';
+import { getWikiAbilityArt, getWikiModel } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
 import { currentMonth } from '@/lib/site';
@@ -122,9 +115,9 @@ async function resolveBrawler(handle: string): Promise<Resolved> {
   if (!catalog) return { kind: 'unavailable' };
 
   // Not in the catalogue may mean not released yet rather than not a brawler.
-  const upcoming = await getUpcomingBrawlers(
-    [...catalog.byId.values()].map((b) => b.name),
-  ).catch(() => [] as UpcomingBrawler[]);
+  const upcoming = await getUpcomingBrawlers([...catalog.byId.values()].map((b) => b.name)).catch(
+    () => [] as UpcomingBrawler[],
+  );
   const pending = upcoming.find((b) => slugify(b.name) === slugify(handle));
   if (pending) return { kind: 'upcoming', brawler: pending };
 
@@ -172,7 +165,6 @@ export const revalidate = 7200;
 export async function generateStaticParams() {
   return [];
 }
-
 
 /*
  * `generateMetadata` and the page body want the same rows — the snippet quotes
@@ -240,10 +232,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!brawler) return { title: 'Brawler' };
 
   const name = titleCase(brawler.name);
-  const [stat, choices] = await Promise.all([
-    brawlerStat(brawlerId),
-    abilityChoicesFor(brawlerId),
-  ]);
+  const [stat, choices] = await Promise.all([brawlerStat(brawlerId), abilityChoicesFor(brawlerId)]);
   const adjusted = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
@@ -267,14 +256,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ? `${formatPercent(adjusted)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled battles.`
       : null;
 
-  const description =
-    [
-      recommendation,
-      performance,
-      'Gears, star powers, gadgets, best modes and maps, updated daily from real battles.',
-    ]
-      .filter(Boolean)
-      .join(' ');
+  const description = [
+    recommendation,
+    performance,
+    'Gears, star powers, gadgets, best modes and maps, updated daily from real battles.',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return {
     /*
@@ -351,32 +339,50 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * class and rarity, wiki-backed) and the official API (star powers and
    * gadgets), and renders degraded rather than not at all.
    */
+  let wikiModel: string | null = null;
+
   if (!brawler) {
-    const [catalogue, official, abilityArt] = await Promise.all([
+    const [catalogue, official] = await Promise.all([
       getBrawlerCatalog().catch(() => null),
       getOfficialBrawlers()
         .then((r) => r.items)
         .catch(() => []),
-      getWikiAbilityArt(resolved.slug).catch(() => ({ gadgets: [], starPowers: [] })),
     ]);
     const entry = catalogue?.byId.get(brawlerId);
     const live = official.find((b: { id: number }) => b.id === brawlerId);
 
     if (entry) {
       /*
+       * Keyed on the brawler's real name, not the URL slug, and so fetched
+       * only once the catalogue has supplied it. `titleCase` capitalises after
+       * a hyphen, so a slug round-trips correctly for `8-bit` and wrongly for
+       * every two-word name there is — `el-primo` becomes `El-Primo`, which
+       * matches no file on the wiki. Today's un-mirrored brawlers are both one
+       * word, so the bug was invisible and would have surfaced on whichever
+       * future release happened to have a space in its name.
+       */
+      const [abilityArt, model] = await Promise.all([
+        getWikiAbilityArt(entry.name).catch(() => ({ gadgets: [], starPowers: [] })),
+        getWikiModel(entry.name).catch(() => null),
+      ]);
+      wikiModel = model;
+
+      /*
        * Icons come from the wiki, paired by index. The game API lists gadgets
        * and star powers in the order the wiki numbers its files, and an empty
        * src renders as an empty box — which is what this page showed on
        * launch day, four blank squares beside four real ability names.
        */
-      const accessory = (art: string[]) => (a: { id: number; name: string }, i: number): BAAccessory => ({
-        id: a.id,
-        name: a.name,
-        description: '',
-        descriptionHtml: '',
-        imageUrl: art[i] ?? '',
-        released: true,
-      });
+      const accessory =
+        (art: string[]) =>
+        (a: { id: number; name: string }, i: number): BAAccessory => ({
+          id: a.id,
+          name: a.name,
+          description: '',
+          descriptionHtml: '',
+          imageUrl: art[i] ?? '',
+          released: true,
+        });
 
       brawler = {
         id: entry.id,
@@ -456,9 +462,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     // lib/skin-art for why the artwork cannot come from the metadata API.
     getSkinArt(),
   ]);
-  const indexablePairs = new Set(
-    indexable.map(([a, b]) => (a < b ? `${a}:${b}` : `${b}:${a}`)),
-  );
+  const indexablePairs = new Set(indexable.map(([a, b]) => (a < b ? `${a}:${b}` : `${b}:${a}`)));
 
   // Maps come and go from rotation; a split naming a retired one still has a
   // real record behind it, so the row stays and only the link is dropped.
@@ -474,16 +478,20 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   const scored = metaIndex.get(brawlerId);
   const tier =
     scored?.tier ??
-    (stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER
-      ? assignTier(normalizedWinRate)
-      : null);
+    (stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER ? assignTier(normalizedWinRate) : null);
   const metaScore = scored?.metaScore ?? null;
 
   // Cleaned at the source now — see `rarityColor` — so this only picks the
   // value up. It is interpolated into `color-mix()` below, which a malformed
   // colour would take down along with the whole header wash.
   const accent = rarityColor(brawler.rarity?.color);
-  const hasModel = await hasBrawlerModel(brawler.id);
+  /*
+   * The mirror's render where it has one, the wiki's where it does not. Both
+   * are full-body cut-outs on transparent ground and render identically; the
+   * square portrait tile below is now only for a brawler neither source has
+   * drawn yet.
+   */
+  const modelSrc = (await hasBrawlerModel(brawler.id)) ? brawlerModelUrl(brawler.id) : wikiModel;
   const name = titleCase(brawler.name);
 
   // "Unknown" is a real value upstream, not a missing one: unclassified
@@ -492,13 +500,13 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // The artwork source says "Unknown" for every recent brawler; the wiki
   // infobox has the real class, and that page is already fetched above.
   const className =
-    (brawler.class?.name && brawler.class.name !== 'Unknown'
-      ? brawler.class.name
-      : null) ?? wiki?.stats.className ?? null;
+    (brawler.class?.name && brawler.class.name !== 'Unknown' ? brawler.class.name : null) ??
+    wiki?.stats.className ??
+    null;
   const rarityName =
-    (brawler.rarity?.name && brawler.rarity.name !== 'Unknown'
-      ? brawler.rarity.name
-      : null) ?? wiki?.stats.rarityName ?? null;
+    (brawler.rarity?.name && brawler.rarity.name !== 'Unknown' ? brawler.rarity.name : null) ??
+    wiki?.stats.rarityName ??
+    null;
   const isLegacy = catalogEntry?.status === 'legacy';
   const statLabels = combatStatLabels(wiki?.stats.attackLabel, wiki?.stats.superLabel);
 
@@ -556,7 +564,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             answer: `${pairings.weakAgainst
               .slice(0, 3)
               .map((p) => titleCase(brawlerMeta.get(p.brawlerId)?.name ?? `#${p.brawlerId}`))
-              .join(', ')} pull ${name} furthest below its own ${formatPercent(pairings.baseline)} average in sampled team battles.`,
+              .join(
+                ', ',
+              )} pull ${name} furthest below its own ${formatPercent(pairings.baseline)} average in sampled team battles.`,
           },
         ]
       : []),
@@ -599,17 +609,16 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         />
         <div className="relative flex flex-wrap items-center gap-5 p-5 sm:gap-6 sm:p-6">
           {/*
-            The full-body render where the CDN has one, the portrait tile where
-            it does not. This card is the full content width and used to spend
-            it on a 144px square: the page about a brawler never showed the
-            brawler.
+            The full-body render, from whichever source has one. This card is
+            the full content width and used to spend it on a 144px square: the
+            page about a brawler never showed the brawler.
 
-            `hasBrawlerModel` is the same probe the home page's podium uses —
-            the render is published weeks behind a release, so the two newest
-            brawlers 404 and have to fall back. Lit from the accent behind it so
-            the cut-out has a ground rather than floating on the card.
+            Resolved above: the mirror is probed with `hasBrawlerModel`, the
+            same check the home page's podium uses, and the wiki answers for
+            what it has not published yet. Lit from the accent behind it so the
+            cut-out has a ground rather than floating on the card.
           */}
-          {hasModel ? (
+          {modelSrc ? (
             <div className="relative shrink-0">
               <span
                 aria-hidden
@@ -617,7 +626,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 style={{ background: accent }}
               />
               <Image
-                src={brawlerModelUrl(brawler.id)}
+                src={modelSrc}
                 alt={brawler.name}
                 width={320}
                 height={380}
@@ -712,9 +721,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">
               {brawler.name.toLowerCase()}
             </h1>
-            <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">
-              {brawler.description}
-            </p>
+            <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">{brawler.description}</p>
           </div>
         </div>
       </header>
@@ -829,9 +836,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             <StatCard
               node={<TrophyIcon className="size-6" />}
               label="Avg trophies"
-              value={
-                stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))
-              }
+              value={stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))}
               hint="Across tracked players"
             />
             <StatCard
@@ -846,9 +851,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
              is missing and offers the two pages that do have an answer. */
           <div className="card p-6">
             <p className="text-sm leading-relaxed text-muted">
-              Not enough sampled battles for {name} yet. The sampler works through the
-              global leaderboard pool continuously, so newly released brawlers fill in
-              over the following days.
+              Not enough sampled battles for {name} yet. The sampler works through the global
+              leaderboard pool continuously, so newly released brawlers fill in over the following
+              days.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
@@ -885,9 +890,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             maps={splits.maps}
             mapSlugFor={(split) => {
               const match = activeMaps.find(
-                (m) =>
-                  m.mapSlug === slugify(split.mapName ?? '') &&
-                  m.scHash === split.mode,
+                (m) => m.mapSlug === slugify(split.mapName ?? '') && m.scHash === split.mode,
               );
               return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
             }}
@@ -946,9 +949,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 key={`${change.date}-${index}`}
                 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3"
               >
-                <span className="w-20 shrink-0 text-xs tabular-nums text-muted">
-                  {change.date}
-                </span>
+                <span className="w-20 shrink-0 text-xs tabular-nums text-muted">{change.date}</span>
                 <span
                   className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
                     change.kind === 'Buff'
@@ -960,9 +961,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 >
                   {change.kind}
                 </span>
-                <span className="min-w-0 flex-1 text-sm leading-relaxed">
-                  {change.text}
-                </span>
+                <span className="min-w-0 flex-1 text-sm leading-relaxed">{change.text}</span>
               </li>
             ))}
           </ol>
@@ -974,8 +973,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
            wiki: the combat stats, the resolved ability text, the hypercharge
            effect and the buffie effects. Their text is CC-BY-SA. */
         <p className="text-xs leading-relaxed text-muted">
-          Combat stats, ability and gear descriptions, hypercharge and buffie effects,{' '}
-          and balance history from the{' '}
+          Combat stats, ability and gear descriptions, hypercharge and buffie effects, and balance
+          history from the{' '}
           <a
             href={wikiPageUrl(wiki.title)}
             rel="noreferrer noopener"
@@ -1037,7 +1036,6 @@ function listOf(items: string[]): string {
   if (items.length === 1) return items[0];
   return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
 }
-
 
 /**
  * The Power 11 figure for a stat that scales with Power Level.

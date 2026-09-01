@@ -42,7 +42,7 @@ const REVALIDATE = 86_400;
  * the space in his name while his ability icons drop it. Every spelling is
  * tried rather than any one assumed.
  */
-function candidates(name: string): string[] {
+function spellings(name: string): string[] {
   const cased = new Set([titleCase(name), name]);
   const forms = new Set<string>();
   for (const base of cased) {
@@ -50,7 +50,11 @@ function candidates(name: string): string[] {
     forms.add(base.replace(/\.\s+/g, '.'));
     forms.add(base.replace(/\s+/g, ''));
   }
-  return [...forms].map((f) => `${f} Portrait`);
+  return [...forms];
+}
+
+function candidates(name: string): string[] {
+  return spellings(name).map((f) => `${f} Portrait`);
 }
 
 async function lookup(prefix: string): Promise<string | null> {
@@ -141,3 +145,62 @@ async function fetchAbilityArt(name: string): Promise<{ gadgets: string[]; starP
 
 /** Ability icons for one brawler, for when the mirror has none. */
 export const getWikiAbilityArt = cached('wiki-ability-art', fetchAbilityArt, REVALIDATE);
+
+/**
+ * The full-body character render, for the detail page's header.
+ *
+ * The header spends the full content width on the brawler, and the square
+ * portrait tile is the fallback for when there is no render — which is how a
+ * brand-new brawler looked beside every released one: a 144px crop where the
+ * rest of the roster gets a character. Brawlify publishes `/model/` weeks
+ * behind a release, so the gap this closes is the same one the portrait
+ * fallback exists for, and it is wider than the portrait's.
+ *
+ * The wiki files it as "<Name> Skin-Default.png" — the default skin's render,
+ * a convention that holds across every awkward name checked (`Mr. P`,
+ * `8-Bit`, `Larry & Lawrie`, `El Primo`). Requested through MediaWiki's
+ * scaler rather than raw: the originals run 2-4 MB, which is fine as a wiki
+ * download and absurd behind a 208px-wide `<img>`. The scaler never upscales,
+ * so a small original comes back untouched.
+ *
+ * Every spelling goes in one request as pipe-separated titles; a title that
+ * does not exist comes back flagged missing with no `imageinfo`, so the first
+ * page that carries one is the answer.
+ */
+const MODEL_WIDTH = 640;
+
+async function fetchModel(name: string): Promise<string | null> {
+  try {
+    const url = new URL(WIKI_API);
+    url.searchParams.set('action', 'query');
+    url.searchParams.set('prop', 'imageinfo');
+    url.searchParams.set(
+      'titles',
+      spellings(name)
+        .map((f) => `File:${f} Skin-Default.png`)
+        .join('|'),
+    );
+    url.searchParams.set('iiprop', 'url');
+    url.searchParams.set('iiurlwidth', String(MODEL_WIDTH));
+    url.searchParams.set('format', 'json');
+    const res = await fetch(url, {
+      headers: { 'user-agent': 'BrawlZone (+https://brawlzone.net)' },
+      next: { revalidate: REVALIDATE },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as {
+      query?: { pages?: Record<string, { imageinfo?: { url?: string; thumburl?: string }[] }> };
+    };
+    for (const page of Object.values(body.query?.pages ?? {})) {
+      const info = page.imageinfo?.[0];
+      if (info) return info.thumburl ?? info.url ?? null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** Full-body render for one brawler, for when the mirror has none. */
+export const getWikiModel = cached('wiki-model', fetchModel, REVALIDATE);
