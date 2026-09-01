@@ -1,4 +1,5 @@
 import { getBrawlers } from '@/lib/brawlapi';
+import { getWikiBrawlerClasses } from '@/lib/brawler-classes';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
@@ -115,6 +116,26 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
       };
     })
     .sort((a, b) => a.id - b.id);
+
+  /*
+   * Fill the classes the mirror does not know from the wiki.
+   *
+   * In place, after the list is built, so the lookup runs once for the whole
+   * roster rather than per brawler — and only for the names actually missing
+   * one, which is twenty rather than a hundred and seven. A failure here
+   * leaves the field null, which is exactly the state this is improving on.
+   */
+  const unclassified = all.filter((b) => b.className === null).map((b) => b.name);
+  if (unclassified.length > 0) {
+    const wikiClasses = new Map(
+      await getWikiBrawlerClasses(unclassified).catch(() => [] as [string, string][]),
+    );
+    for (const brawler of all) {
+      if (brawler.className === null) {
+        brawler.className = wikiClasses.get(brawler.name.toLowerCase()) ?? null;
+      }
+    }
+  }
 
   return {
     all,
