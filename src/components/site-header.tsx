@@ -4,6 +4,7 @@ import {
   ChevronDown,
   Menu,
   Newspaper,
+  Sparkles,
   Swords,
   ScrollText,
   Search,
@@ -71,6 +72,7 @@ const MORE: NavItem[] = [
   // one, so it would earn a permanent slot if there were a seventh. There is
   // not — see above — and the draft helper is the main bar's entry point into
   // the same question.
+  { href: '/daily', label: 'Daily', icon: Sparkles },
   { href: '/comps', label: 'Team Comps', icon: Swords },
   { href: '/meta', label: 'Meta Report', icon: Newspaper },
   // Events is the one demotion that costs something: it is a page people do

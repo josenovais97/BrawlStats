@@ -57,6 +57,7 @@ const EXPLORE = [
   // only from the header's "More" menu, which renders its items on open and so
   // puts none of them in the served HTML. `crawl:budget` found 846 URLs and no
   // comps section at all.
+  { href: '/daily', label: 'Daily' },
   { href: '/comps', label: 'Team Comps' },
   { href: '/meta', label: 'Meta Report' },
   { href: '/compare', label: 'Compare' },

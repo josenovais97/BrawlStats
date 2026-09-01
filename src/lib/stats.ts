@@ -9,6 +9,7 @@ import { cache } from 'react';
 import type { BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
 import { stripGameMarkup } from '@/lib/format';
 import { getPrisma } from '@/lib/prisma';
+import { brawlerPath, slugify } from '@/lib/slugs';
 import type {
   AggregationRunSummary,
   BrawlerBuild,
@@ -2742,6 +2743,191 @@ async function compute_getMapMatchups(limit = 8): Promise<Map<string, MapMatchup
   }
 }
 
+export type DiscoveryKind =
+  | 'secret-pick'
+  | 'meta-trap'
+  | 'giant-killer'
+  | 'secret-duo'
+  | 'map-surprise'
+  | 'overnight-rise';
+
+export interface Discovery {
+  kind: DiscoveryKind;
+  /** One or two brawlers, in reading order: the subject first. */
+  brawlerIds: number[];
+  brawlerNames: string[];
+  /** The number the discovery is about — a win rate, or a delta in points. */
+  value: number;
+  /** What that number is measured against. */
+  comparison: number;
+  sampleSize: number;
+  /** A map or mode name, where the finding is specific to one. */
+  context?: string;
+  href: string;
+}
+
+/** A pairing needs far more evidence than a comp: it is picked, not drafted. */
+const MIN_SAMPLE_FOR_DISCOVERY = 300;
+
+/** Enough that a "nobody plays this" claim is about the roster, not the tail. */
+const SECRET_PICK_MAX_USAGE = 0.01;
+
+/**
+ * Six findings a reader would not get from a ranked table.
+ *
+ * The site is full of sorted lists, and a sorted list answers "who is best"
+ * while hiding everything interesting: the brawler winning quietly at 0.4%
+ * usage, the popular pick that loses, the matchup that is not close. Each of
+ * these is a *contrast* — a number against the number it should have been —
+ * and a table cannot show a contrast without the reader doing the subtraction.
+ *
+ * Deterministic, not generated. Every one is the argmax of a stated quantity
+ * over a stated population, so the same data always produces the same six, and
+ * the page can be regenerated from scratch without drifting.
+ *
+ * Each returns null rather than a weak entry when nothing clears its floor,
+ * and the page renders what it gets. A day with four discoveries shows four.
+ */
+async function compute_getDailyDiscoveries(): Promise<Discovery[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const [index, movers, mapPicks] = await Promise.all([
+      getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
+      getMetaMovers(1).catch(() => [] as MetaMover[]),
+      getRankedMapPicks(6).catch(() => [] as RankedMapPicks[]),
+    ]);
+
+    const scored = [...index.values()].filter(
+      (b) => b.normalizedWinRate !== null && b.decidedSampleSize >= MIN_SAMPLE_FOR_DISCOVERY,
+    );
+    const nameOf = (id: number) => index.get(id)?.brawlerName ?? `#${id}`;
+    const out: Discovery[] = [];
+
+    // 1. Winning quietly: the best record among brawlers almost nobody picks.
+    const secret = scored
+      .filter((b) => (b.usageRate ?? 1) <= SECRET_PICK_MAX_USAGE)
+      .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))[0];
+    if (secret && (secret.normalizedWinRate ?? 0) > 0.52) {
+      out.push({
+        kind: 'secret-pick',
+        brawlerIds: [secret.brawlerId],
+        brawlerNames: [secret.brawlerName],
+        value: secret.normalizedWinRate ?? 0,
+        comparison: secret.usageRate ?? 0,
+        sampleSize: secret.decidedSampleSize,
+        href: brawlerPath(secret.brawlerId, secret.brawlerName),
+      });
+    }
+
+    // 2. The inverse: heavily picked and losing. Ranked by usage, not by how
+    //    badly it loses — a popular trap is more interesting than a bad one.
+    const trap = scored
+      .filter((b) => (b.normalizedWinRate ?? 1) < 0.485)
+      .sort((a, b) => (b.usageRate ?? 0) - (a.usageRate ?? 0))[0];
+    if (trap && (trap.usageRate ?? 0) > 0.02) {
+      out.push({
+        kind: 'meta-trap',
+        brawlerIds: [trap.brawlerId],
+        brawlerNames: [trap.brawlerName],
+        value: trap.normalizedWinRate ?? 0,
+        comparison: trap.usageRate ?? 0,
+        sampleSize: trap.decidedSampleSize,
+        href: brawlerPath(trap.brawlerId, trap.brawlerName),
+      });
+    }
+
+    // 3 and 4. The most one-sided matchup, and the best partnership, from the
+    //    same roll-up — each measured against the subject's own overall record
+    //    so a strong brawler does not simply own both lists.
+    const pairs = await prisma.$queryRaw<
+      { side: string; a: number; b: number; wins: bigint; decided: bigint }[]
+    >`
+      SELECT side, brawler_id AS a, other_brawler_id AS b,
+        COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+        SUM(battles) AS decided
+      FROM brawler_pair_daily
+      WHERE day >= ${windowStartUtc(14)}
+      GROUP BY side, brawler_id, other_brawler_id
+      HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_DISCOVERY}
+    `;
+
+    const edgeOf = (row: { a: number; wins: bigint; decided: bigint }) => {
+      const own = index.get(row.a)?.winRate;
+      if (own === null || own === undefined) return null;
+      return Number(row.wins) / Number(row.decided) - own;
+    };
+
+    const best = (side: string, kind: DiscoveryKind) => {
+      let top: { row: (typeof pairs)[number]; edge: number } | null = null;
+      for (const row of pairs) {
+        if (row.side !== side) continue;
+        const edge = edgeOf(row);
+        if (edge === null) continue;
+        if (!top || edge > top.edge) top = { row, edge };
+      }
+      if (!top || top.edge < 0.05) return;
+      out.push({
+        kind,
+        brawlerIds: [top.row.a, top.row.b],
+        brawlerNames: [nameOf(top.row.a), nameOf(top.row.b)],
+        value: Number(top.row.wins) / Number(top.row.decided),
+        comparison: index.get(top.row.a)?.winRate ?? 0.5,
+        sampleSize: Number(top.row.decided),
+        href: brawlerPath(top.row.a, nameOf(top.row.a)),
+      });
+    };
+    best('enemy', 'giant-killer');
+    best('ally', 'secret-duo');
+
+    // 5. A brawler that behaves differently on one map than it does anywhere
+    //    else — the largest gap between its map score and its overall form.
+    let surprise: { pick: RankedMapPick; map: RankedMapPicks; edge: number } | null = null;
+    for (const map of mapPicks) {
+      for (const pick of map.picks) {
+        const edge = pick.score - pick.overallScore;
+        if (pick.decidedSampleSize < 60) continue;
+        if (!surprise || edge > surprise.edge) surprise = { pick, map, edge };
+      }
+    }
+    if (surprise && surprise.edge > 0.03) {
+      out.push({
+        kind: 'map-surprise',
+        brawlerIds: [surprise.pick.brawlerId],
+        brawlerNames: [surprise.pick.brawlerName],
+        value: surprise.pick.score,
+        comparison: surprise.pick.overallScore,
+        sampleSize: surprise.pick.decidedSampleSize,
+        context: surprise.map.mapName,
+        href: `/maps/${slugify(surprise.map.mode)}/${slugify(surprise.map.mapName)}`,
+      });
+    }
+
+    // 6. Yesterday against today, on the same score the tier list ranks.
+    const risen = movers
+      .filter((m) => m.sampleSize >= MIN_SAMPLE_FOR_DISCOVERY)
+      .sort((a, b) => b.metaScoreDelta - a.metaScoreDelta)[0];
+    if (risen && risen.metaScoreDelta > 0.2) {
+      out.push({
+        kind: 'overnight-rise',
+        brawlerIds: [risen.brawlerId],
+        brawlerNames: [risen.brawlerName],
+        value: risen.metaScoreNow,
+        comparison: risen.metaScoreBefore,
+        sampleSize: risen.sampleSize,
+        href: brawlerPath(risen.brawlerId, risen.brawlerName),
+      });
+    }
+
+    return out;
+  } catch (error) {
+    swallow('compute_getDailyDiscoveries', error);
+    return [];
+  }
+}
+
+
 /** How a brawler does against a specific set of opponents. */
 export interface CounterScore {
   brawlerId: number;
@@ -3603,6 +3789,7 @@ export const getBrawlerSplits = cachedRead('brawler-splits', compute_getBrawlerS
 export const getBrawlerPairings = cachedRead('brawler-pairings', compute_getBrawlerPairings);
 export const getTeamComps = cachedRead('team-comps', compute_getTeamComps);
 export const getMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
+export const getDailyDiscoveries = cachedRead('daily-discoveries', compute_getDailyDiscoveries);
 export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
 export const getBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
 export const getBrawlerAbilityChoices = cachedRead('brawler-ability-choices', compute_getBrawlerAbilityChoices);
