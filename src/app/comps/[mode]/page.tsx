@@ -42,7 +42,7 @@ async function resolveMode(
 
   const wanted = slugify(slug);
   for (const mode of modes) {
-    const label = modeMeta.get(mode.mode)?.name ?? mode.mode;
+    const label = modeMeta.get(mode.mode.toLowerCase())?.name ?? mode.mode;
     if (slugify(label) === wanted) return { comps: mode, label, slug: wanted };
   }
   return null;

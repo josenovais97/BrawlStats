@@ -116,7 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const modeNames = await getGameModeMap().catch(() => new Map());
   for (const mode of comps) {
     if (mode.comps.length === 0) continue;
-    add(`/comps/${slugify(modeNames.get(mode.mode)?.name ?? mode.mode)}`, 'daily', 0.7);
+    add(`/comps/${slugify(modeNames.get(mode.mode.toLowerCase())?.name ?? mode.mode)}`, 'daily', 0.7);
   }
 
   // Per-mode tier lists, listed only for the modes that actually have enough

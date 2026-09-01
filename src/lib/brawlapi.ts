@@ -123,8 +123,14 @@ export async function getGameModes(): Promise<BAGameMode[]> {
 }
 
 /**
- * Keyed by `scHash`, which is the same string the official API returns in
- * `battle.mode` and `event.mode` (e.g. "gemGrab", "soloShowdown").
+ * Keyed by `scHash` **lowercased**, plus the space-stripped lowercased name.
+ *
+ * The lowercasing is the part worth stating, because `battle.mode` arrives
+ * camelCased ("gemGrab", "brawlBall") and looking it up unchanged silently
+ * misses — silently, and only for the camelCase half of the roster, so
+ * "knockout" and "heist" resolve while "brawlBall" and "hotZone" fall through
+ * to whatever fallback the caller wrote. That shipped to /comps and /meta as
+ * mode headings reading "brawlBall". Lowercase the key at every call site.
  */
 export async function getGameModeMap(): Promise<Map<string, BAGameMode>> {
   const modes = await getGameModes();

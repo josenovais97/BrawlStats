@@ -179,7 +179,7 @@ export default async function MetaReportPage() {
             }
           />
           {topComps.map(({ mode, comp }) => {
-            const label = modeMeta.get(mode.mode)?.name ?? mode.mode;
+            const label = modeMeta.get(mode.mode.toLowerCase())?.name ?? mode.mode;
             return (
               <div key={mode.mode} className="space-y-1.5">
                 <p className="text-xs font-semibold text-muted">

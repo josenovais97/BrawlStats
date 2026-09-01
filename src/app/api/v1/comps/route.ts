@@ -34,7 +34,7 @@ export async function GET() {
         windowDays: 14,
         modes: modes.map((mode) => ({
           mode: mode.mode,
-          name: modeMeta.get(mode.mode)?.name ?? mode.mode,
+          name: modeMeta.get(mode.mode.toLowerCase())?.name ?? mode.mode,
           baselineWinRate: mode.baseline,
           sampleSize: mode.sampleSize,
           comps: mode.comps.map((comp) => ({

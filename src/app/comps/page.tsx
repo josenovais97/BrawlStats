@@ -56,7 +56,7 @@ export default async function CompsPage() {
       ) : null}
 
       {withComps.map((mode) => {
-        const meta = modeMeta.get(mode.mode);
+        const meta = modeMeta.get(mode.mode.toLowerCase());
         const label = meta?.name ?? mode.mode;
         const slug = slugify(label);
 
