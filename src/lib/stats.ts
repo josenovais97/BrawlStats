@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+
 import { unstable_cache } from 'next/cache';
 
 import { cache } from 'react';
@@ -3160,6 +3162,118 @@ export async function getRankedMapLastSeen(
     return [];
   }
 }
+
+/* --------------------------- role compositions ---------------------------- */
+
+/**
+ * How the shapes of a team perform, by role rather than by brawler.
+ *
+ * The sample stores both teams of every competitive battle, and until now only
+ * pairs were ever read from it. Identity-level trios are not supportable and
+ * will not be soon: there are ~187,000 possible three-brawler teams against
+ * 166,720 sampled battles, so the average trio has been seen ten times and
+ * exactly one has passed fifty. Measured 2026-08-31.
+ *
+ * Roles collapse that. There are seven classes, so ~120 distinct shapes, and
+ * 76 of them clear 200 battles — enough for a number that means something.
+ * This is the level the data actually supports, and it happens to be the level
+ * a drafter thinks at: nobody asks whether Brock-Piper-Poco wins, they ask
+ * whether two marksmen and a support wins.
+ *
+ * Baseline-adjusted, and that matters more here than anywhere else on the
+ * site. Every comp's raw win rate sits above 50% because each battle is
+ * counted from a sampled player's point of view and sampled players are
+ * stronger than average — so read raw, a 56% comp looks good while actually
+ * being below the sample's own average. `normalizeWinRate` re-centres on the
+ * baseline, so 50% here means "exactly average for this sample" and the
+ * numbers are comparable with the tier list rather than merely adjacent to it.
+ */
+
+/** Below this a comp's rate is noise dressed as a finding. */
+const MIN_BATTLES_FOR_COMP = 200;
+
+export interface RoleComposition {
+  /** The three roles, alphabetical, so one shape has one key. */
+  roles: string[];
+  /** Baseline-adjusted: 0.5 is exactly average for the sample. */
+  score: number;
+  /** Raw share of decided battles won, before adjustment. */
+  winRate: number;
+  decided: number;
+}
+
+async function compute_getRoleCompositions(
+  windowDays = RANKED_MAP_WINDOW_DAYS,
+): Promise<{ comps: RoleComposition[]; baseline: number } | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const [catalog, rows] = await Promise.all([
+      getBrawlerCatalog().catch(() => null),
+      prisma.$queryRaw<{ comp: number[]; result: string; n: bigint }[]>`
+        SELECT (SELECT array_agg(x ORDER BY x)
+                FROM unnest(brawler_id || ally_brawler_ids) x) AS comp,
+               result,
+               count(*) AS n
+        FROM battle_team_samples
+        WHERE battle_type = ANY(${[...COMPETITIVE_BATTLE_TYPES]}::text[])
+          AND array_length(ally_brawler_ids, 1) = 2
+          AND result IN ('victory', 'defeat')
+          AND battle_time >= ${windowStartUtc(windowDays)}
+        GROUP BY 1, 2
+      `,
+    ]);
+    if (!catalog || rows.length === 0) return null;
+
+    const roleOf = new Map(catalog.all.map((b) => [b.id, b.className]));
+
+    const byShape = new Map<string, { roles: string[]; wins: number; decided: number }>();
+    let wins = 0;
+    let decided = 0;
+
+    for (const row of rows) {
+      // A brawler with no class would make the shape a lie rather than a
+      // guess, so the whole battle is skipped.
+      const roles = row.comp.map((id) => roleOf.get(id) ?? null);
+      if (roles.some((r) => r === null)) continue;
+
+      const key = (roles as string[]).slice().sort().join(' + ');
+      const n = Number(row.n);
+      const entry = byShape.get(key) ?? { roles: key.split(' + '), wins: 0, decided: 0 };
+      entry.decided += n;
+      decided += n;
+      if (row.result === 'victory') {
+        entry.wins += n;
+        wins += n;
+      }
+      byShape.set(key, entry);
+    }
+
+    if (decided === 0) return null;
+    const baseline = wins / decided;
+
+    const comps = [...byShape.values()]
+      .filter((c) => c.decided >= MIN_BATTLES_FOR_COMP)
+      .map((c) => {
+        const raw = c.wins / c.decided;
+        return {
+          roles: c.roles,
+          score: normalizeWinRate(raw, baseline, c.decided) ?? 0.5,
+          winRate: raw,
+          decided: c.decided,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    return { comps, baseline };
+  } catch (error) {
+    swallow('compute_getRoleCompositions', error);
+    return null;
+  }
+}
+
+export const getRoleCompositions = cachedRead('role-compositions', compute_getRoleCompositions);
 
 export async function getRankedMapPicks(
   perMap = 3,
