@@ -2,6 +2,7 @@ import 'server-only';
 
 import { getBrawlerWiki } from '@/lib/brawler-wiki';
 import { cached } from '@/lib/cached';
+import { titleCase } from '@/lib/format';
 
 /**
  * Classes for the brawlers the artwork mirror does not classify.
@@ -30,7 +31,15 @@ async function fetchClasses(names: string[]): Promise<[string, string][]> {
 
   const found = await Promise.all(
     names.map(async (name): Promise<[string, string] | null> => {
-      const wiki = await getBrawlerWiki(name).catch(() => null);
+      /*
+       * Title-cased before asking. The official API shouts its names — "COSMO"
+       * — and a brawler with no artwork-mirror entry takes its name from
+       * there, which is precisely the brawler this lookup exists for. The raw
+       * name is kept as a second attempt for anything the casing rule mangles.
+       */
+      const wiki =
+        (await getBrawlerWiki(titleCase(name)).catch(() => null)) ??
+        (await getBrawlerWiki(name).catch(() => null));
       const className = wiki?.stats.className?.trim();
       // The wiki carries its own "Unknown" for a brawler nobody has written up
       // yet, and echoing it would undo the point of asking.

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { cached } from '@/lib/cached';
+import { titleCase } from '@/lib/format';
 import { WIKI_API } from '@/lib/wiki';
 
 /**
@@ -28,12 +29,27 @@ import { WIKI_API } from '@/lib/wiki';
 const REVALIDATE = 86_400;
 
 /**
- * The wiki files a portrait as "<Name> Portrait.png", but is inconsistent
- * about punctuation: Mr. P's portrait keeps the space while his ability icons
- * drop it. Both spellings are tried rather than assuming either.
+ * The wiki files a portrait as "<Name> Portrait.png", and the casing has to
+ * match: MediaWiki's prefix search is case-sensitive past the first letter.
+ *
+ * That is not a hypothetical. The official game API returns names shouted —
+ * "COSMO", "VINCE" — and a brawler with no artwork-mirror entry takes its name
+ * from there, which is exactly the case this fallback exists for. Searching
+ * "COSMO Portrait" against a file called "Cosmo Portrait.png" found nothing,
+ * so the fallback silently did nothing on the one day it was written for.
+ *
+ * Punctuation is inconsistent on the wiki's side too: Mr. P's portrait keeps
+ * the space in his name while his ability icons drop it. Every spelling is
+ * tried rather than any one assumed.
  */
 function candidates(name: string): string[] {
-  const forms = new Set([name, name.replace(/\.\s+/g, '.'), name.replace(/\s+/g, '')]);
+  const cased = new Set([titleCase(name), name]);
+  const forms = new Set<string>();
+  for (const base of cased) {
+    forms.add(base);
+    forms.add(base.replace(/\.\s+/g, '.'));
+    forms.add(base.replace(/\s+/g, ''));
+  }
   return [...forms].map((f) => `${f} Portrait`);
 }
 
