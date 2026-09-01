@@ -68,9 +68,34 @@ looked. `auto-deploy.sh` now runs `docker builder prune --filter until=168h`.
 
 **Oracle reclaims idle Always Free instances.** If CPU 95th percentile, network
 *and* memory all sit under 20% across a continuous 7-day window, the instance
-can be stopped. This box idles near zero load and ~13% memory, so it is inside
-that window. Nothing on the box is reproducible from the repo alone —
+can be stopped. Nothing on the box is reproducible from the repo alone —
 `.env.production` and every dump live only there.
+
+Measured from six days of `sar` history on 2026-09-01, all three legs were
+inside the window, and the reason is worth knowing before touching any of it:
+
+| | quiet day (Aug 30) | day with deploys (Sep 1) |
+| --- | --- | --- |
+| CPU p95 | **6.0%** (daily max 6.5%) | 46.7% |
+| Memory | 20-21%, dipping to 19.9% | 21% |
+
+The sampler runs 8x a day for ~11 minutes and **barely moves CPU at all**,
+because it spends that time waiting on the game API rather than computing — an
+I/O-bound workload is invisible to a CPU metric. The days that look busy are
+days someone was pushing commits, since every deploy rebuilds the image. That
+is not a property of the service, so do not read an aggregate p95 as safety:
+across all six days it came to 31%, which is an artefact of development
+activity and would vanish in a quiet week.
+
+`brawlzone-reserve-memory` holds 2.5 GiB resident to keep the memory leg near
+45% rather than balanced on the threshold. It is a workaround, not a fix — the
+fix is converting the tenancy to Pay As You Go, which exempts the instance
+entirely while leaving Always Free resources free, and which was declined
+deliberately. The unit caps itself with `MemoryMax` and takes
+`OOMScoreAdjust=1000`, so the kernel kills the guard before Postgres or the
+app; a full 163s image build was run with it held, with no OOM kills. Health
+check 9 alerts if it stops, because losing it breaks nothing visible right up
+until the instance is stopped.
 
 ## Six traps that cost real outages
 
