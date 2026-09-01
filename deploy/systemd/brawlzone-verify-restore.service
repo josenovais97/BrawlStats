@@ -1,0 +1,7 @@
+[Unit]
+Description=BrawlZone backup restore verification
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-run verify-restore /usr/local/bin/brawlzone-verify-restore

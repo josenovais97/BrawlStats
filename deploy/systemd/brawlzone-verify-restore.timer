@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly proof that the newest dump restores
+
+[Timer]
+# Mondays, after the nightly backup has written and well clear of it.
+OnCalendar=Mon *-*-* 04:30:00
+Persistent=true
+Unit=brawlzone-verify-restore.service
+
+[Install]
+WantedBy=timers.target

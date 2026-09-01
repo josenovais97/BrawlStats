@@ -4,9 +4,11 @@
 # Dumps from inside the container, so it needs no exposed port and no client
 # on the host. Keeps 7 daily + 4 weekly (Sundays) copies.
 #
-# WARNING: these live on the same disk as the database. That defends against
-# operator error -- a bad migration, a wrong DELETE -- but NOT against losing
-# the box. An off-box copy is still owed.
+# These live on the same disk as the database, so on their own they defend
+# against operator error -- a bad migration, a wrong DELETE -- but not against
+# losing the box. A `brawlzone-pull-backup` timer on the workstation copies
+# them off nightly, and `brawlzone-verify-restore` proves weekly that what is
+# written here actually replays.
 set -euo pipefail
 
 DIR="$HOME/backups"

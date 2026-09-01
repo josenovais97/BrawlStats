@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# Weekly proof that the newest dump actually restores.
+#
+# `backup-db.sh` already refuses to promote a dump that gunzips badly or is
+# missing tables, but both of those are checks on the FILE. They cannot tell
+# you the SQL inside it replays, that a constraint still applies, or that the
+# data is anything but empty tables -- and a backup nobody has restored is a
+# hypothesis, not a backup. The failure mode is silent by construction: you
+# find out on the one day you cannot afford to.
+#
+# So this restores for real, into a scratch database beside the live one, and
+# asserts the result is something you would actually accept as the site. The
+# live database is never touched: everything happens in $SCRATCH, which is
+# dropped on the way in and on the way out, and is refused if it collides with
+# the real database name.
+set -euo pipefail
+
+DIR="$HOME/backups"
+REPO="$HOME/brawlstats"
+SCRATCH="brawlzone_restore_check"
+LIVE="brawlzone"
+STAMP="$DIR/.last-verified"
+MIN_TABLES=17
+
+# A typo here would restore an old dump over the live database, so this is
+# checked rather than trusted, and the script refuses to run at all if the two
+# names have drifted into each other.
+if [ "$SCRATCH" = "$LIVE" ]; then
+  echo "REFUSING: scratch and live database names are identical" >&2
+  exit 1
+fi
+
+newest=$(ls -1t "$DIR"/brawlzone-*.sql.gz 2>/dev/null | head -1 || true)
+if [ -z "$newest" ]; then
+  echo "no dumps found in $DIR" >&2
+  exit 1
+fi
+
+age_h=$(( ( $(date +%s) - $(stat -c %Y "$newest") ) / 3600 ))
+echo "verifying $(basename "$newest") ($(du -h "$newest" | cut -f1), ${age_h}h old)"
+
+# The restore needs room for a second copy of the database. Checked first,
+# because running the disk to full would take Postgres, Docker and the site
+# down together -- a verification job that can cause an outage is not one.
+free_mb=$(df --output=avail -m / | tail -1 | tr -dc '0-9')
+if [ "$free_mb" -lt 4096 ]; then
+  echo "REFUSING: only ${free_mb}MB free, need 4GB headroom to restore" >&2
+  exit 1
+fi
+
+cd "$REPO"
+psql_as() { docker compose exec -T db psql -U brawlzone "$@"; }
+
+drop_scratch() { psql_as -d postgres -q -c "DROP DATABASE IF EXISTS $SCRATCH;" >/dev/null 2>&1 || true; }
+trap drop_scratch EXIT
+
+drop_scratch
+psql_as -d postgres -q -c "CREATE DATABASE $SCRATCH;"
+
+started=$(date +%s)
+# ON_ERROR_STOP is the whole point: without it psql prints errors, carries on,
+# and exits 0, so a dump that half-replays looks like a pass.
+if ! gunzip -c "$newest" | psql_as -d "$SCRATCH" -q -v ON_ERROR_STOP=1 >/dev/null; then
+  echo "RESTORE FAILED: $newest did not replay cleanly" >&2
+  exit 1
+fi
+elapsed=$(( $(date +%s) - started ))
+
+tables=$(psql_as -d "$SCRATCH" -Atc \
+  "select count(*) from information_schema.tables where table_schema='public';")
+live_tables=$(psql_as -d "$LIVE" -Atc \
+  "select count(*) from information_schema.tables where table_schema='public';")
+
+if [ "$tables" -lt "$MIN_TABLES" ]; then
+  echo "RESTORE INCOMPLETE: $tables tables, expected >= $MIN_TABLES" >&2
+  exit 1
+fi
+if [ "$tables" -ne "$live_tables" ]; then
+  echo "RESTORE INCOMPLETE: $tables tables restored, live has $live_tables" >&2
+  exit 1
+fi
+
+# Table count alone would pass on a schema-only dump with no rows in it, which
+# is the exact shape a misconfigured pg_dump produces. These are the tables the
+# site cannot render without, so an empty one means the dump is not a backup of
+# anything, whatever its file size says.
+empty=""
+for t in battle_daily_stats player_brawler_snapshots brawler_stats aggregation_runs; do
+  n=$(psql_as -d "$SCRATCH" -Atc "select count(*) from $t;" 2>/dev/null || echo 0)
+  echo "  $t: $n rows"
+  [ "$n" -gt 0 ] || empty="$empty $t"
+done
+if [ -n "$empty" ]; then
+  echo "RESTORE EMPTY: no rows in$empty" >&2
+  exit 1
+fi
+
+# Freshness, not just presence. A dump that restores perfectly but stopped
+# collecting a month ago restores a month-old site, and every check above
+# would still pass.
+latest_day=$(psql_as -d "$SCRATCH" -Atc "select max(day) from battle_daily_stats;")
+lag_days=$(( ( $(date -u +%s) - $(date -u -d "$latest_day" +%s) ) / 86400 ))
+if [ "$lag_days" -gt 3 ]; then
+  echo "RESTORE STALE: newest battle day is $latest_day (${lag_days}d old)" >&2
+  exit 1
+fi
+
+size=$(psql_as -d "$SCRATCH" -Atc "select pg_size_pretty(pg_database_size('$SCRATCH'));")
+echo "restore verified: $tables tables, $size, newest day $latest_day, ${elapsed}s"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$STAMP"

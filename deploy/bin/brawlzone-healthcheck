@@ -105,6 +105,20 @@ if printf '%s' "$notes" | grep -q "Who changed"; then
   fi
 fi
 
+# 8. Has anyone proved the backups still restore?
+#    The nightly dump checks its own file; only the weekly restore proves the
+#    SQL inside it replays into a database the site would accept. That job is
+#    on a timer, and a timer that stops firing never fails -- the same blind
+#    spot that let a failing sampler report itself healthy. Ten days allows a
+#    missed Monday without crying wolf.
+verified=$(cat /home/ubuntu/backups/.last-verified 2>/dev/null || echo "")
+if [ -z "$verified" ]; then
+  problems+=("backups have never been restore-verified")
+else
+  vage=$(( ( $(date -u +%s) - $(date -u -d "$verified" +%s) ) / 86400 ))
+  [ "$vage" -le 10 ] || problems+=("backups last restore-verified ${vage}d ago (weekly job may have stopped)")
+fi
+
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 
 if [ ${#problems[@]} -eq 0 ]; then

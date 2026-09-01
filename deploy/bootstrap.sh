@@ -77,7 +77,7 @@ install -m 755 "$REPO_DIR/deploy/bin/backup-db.sh"  "$HOME/backup-db.sh"
 
 say "systemd units"
 sudo install -m 644 "$REPO_DIR"/deploy/systemd/* /etc/systemd/system/
-for u in sampler backup deploy; do
+for u in sampler backup deploy verify-restore; do
   sudo install -d "/etc/systemd/system/brawlzone-${u}.service.d"
   printf '[Unit]\nOnFailure=brawlzone-alert@%%N.service\n' \
     | sudo tee "/etc/systemd/system/brawlzone-${u}.service.d/onfailure.conf" >/dev/null
@@ -131,7 +131,9 @@ sudo chgrp adm /var/log/brawlzone/alert.log && sudo chmod 660 /var/log/brawlzone
 say "Timers"
 sudo systemctl enable --now brawlzone-deploy.timer brawlzone-sampler.timer \
                             brawlzone-backup.timer brawlzone-health.timer \
-                            brawlzone-digest.timer >/dev/null
+                            brawlzone-digest.timer brawlzone-discord.timer \
+                            brawlzone-refresh.timer \
+                            brawlzone-verify-restore.timer >/dev/null
 
 cat <<EOF
 
