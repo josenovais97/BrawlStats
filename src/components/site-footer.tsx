@@ -58,6 +58,7 @@ const EXPLORE = [
   // puts none of them in the served HTML. `crawl:budget` found 846 URLs and no
   // comps section at all.
   { href: '/comps', label: 'Team Comps' },
+  { href: '/meta', label: 'Meta Report' },
   { href: '/compare', label: 'Compare' },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/events', label: 'Events' },

@@ -72,6 +72,7 @@ const MORE: NavItem[] = [
   // not — see above — and the draft helper is the main bar's entry point into
   // the same question.
   { href: '/comps', label: 'Team Comps', icon: Swords },
+  { href: '/meta', label: 'Meta Report', icon: Newspaper },
   // Events is the one demotion that costs something: it is a page people do
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.

@@ -41,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/brawlers', 'weekly', 0.8],
     ['/draft', 'weekly', 0.8],
     ['/comps', 'daily', 0.8],
+    ['/meta', 'daily', 0.8],
     ['/compare', 'weekly', 0.7],
     ['/events', 'hourly', 0.7],
     ['/leaderboard', 'daily', 0.7],
