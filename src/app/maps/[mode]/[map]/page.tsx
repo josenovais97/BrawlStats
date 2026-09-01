@@ -10,7 +10,7 @@ import { MapPreview } from '@/components/ranked/map-preview';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { currentMonth } from '@/lib/site';
-import { getBrawlerMap } from '@/lib/brawlapi';
+
 import { formatNumber, formatPercent, minutesSince,
   titleCase,
 } from '@/lib/format';
@@ -26,6 +26,7 @@ import {
 } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import type { ModeBestPicks } from '@/types/stats';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 interface PageProps {
   params: Promise<{ mode: string; map: string }>;
@@ -50,7 +51,6 @@ export const revalidate = 7200;
 export async function generateStaticParams() {
   return [];
 }
-
 
 /** How many brawlers a map page ranks. Deeper than the three-up card on /ranked. */
 const PICK_COUNT = 10;
@@ -92,7 +92,7 @@ export default async function MapPage({ params }: PageProps) {
   const modeLabel = entry.mode?.name ?? entry.map.gameMode.name;
   const accent = entry.mode?.color ?? '#8b95b8';
 
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+  const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
   // Layout and environment. The mode is passed so a map name shared across
   // modes cannot pick up the wrong page's description.
   const mapWiki = await getMapWiki(entry.map.name, modeLabel).catch(() => null);

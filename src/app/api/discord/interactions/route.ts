@@ -1,12 +1,13 @@
 import { after } from 'next/server';
 
-import { brawlerPortraitUrl, getBrawlerMap } from '@/lib/brawlapi';
+import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { getPlayer } from '@/lib/bs-api';
 import { verifyDiscordRequest } from '@/lib/discord-verify';
 import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import { computeSkillScore } from '@/lib/skill-score';
 import { assignTierFromScore, getBrawlerStat, metaScore, normalizeWinRate } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 /**
  * Slash commands, over HTTP rather than a gateway connection.
@@ -92,7 +93,7 @@ async function profileCommand(token: string, rawTag: string) {
 }
 
 async function tierCommand(token: string, query: string) {
-  const map = await getBrawlerMap().catch(() => new Map());
+  const map = await getBrawlerArtMap().catch(() => new Map());
   const needle = query.trim().toLowerCase();
   const match = [...map.values()].find(
     (b) => b.name.toLowerCase() === needle || b.name.toLowerCase().startsWith(needle),

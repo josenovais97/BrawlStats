@@ -9,7 +9,7 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { currentMonth } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
-import { brawlerIconUrl, getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
@@ -18,6 +18,7 @@ import { slugify } from '@/lib/slugs';
 import { getLastAggregationRun, getRankedMapPicks } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 /* A function, so the month is the month the page was last regenerated. */
 export function generateMetadata(): Metadata {
@@ -43,7 +44,7 @@ export default async function RankedPage() {
     getRankedMapLastSeen().catch(() => []),
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
-    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getSeasonState().catch(
       (): SeasonState => ({
         current: null,

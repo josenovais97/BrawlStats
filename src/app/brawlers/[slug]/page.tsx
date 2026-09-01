@@ -21,13 +21,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
 import { ClassIcon, CombatStatIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
-import {
-  brawlerModelUrl,
-  getBrawler,
-  getBrawlerMap,
-  hasBrawlerModel,
-  rarityColor,
-} from '@/lib/brawlapi';
+import { brawlerModelUrl, getBrawler, hasBrawlerModel, rarityColor } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
 import {
   combatStatLabels,
@@ -35,7 +29,7 @@ import {
   getGearDescriptions,
   wikiPageUrl,
 } from '@/lib/brawler-wiki';
-import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getWikiAbilityArt, getWikiModel } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
@@ -467,7 +461,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Maps come and go from rotation; a split naming a retired one still has a
   // real record behind it, so the row stays and only the link is dropped.
   const activeMaps = await getActiveMaps().catch(() => []);
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+  const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
 
   const normalizedWinRate = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)

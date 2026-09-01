@@ -26,7 +26,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { brawlerPath } from '@/lib/slugs';
-import { getBrawlerMap } from '@/lib/brawlapi';
+
 import {
   formatNumber,
   formatPercent,
@@ -51,6 +51,7 @@ import {
 } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import type { Tier, TierListEntry } from '@/types/stats';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 /** How many meta movers to show on each side. */
 const MOVER_LIMIT = 8;
@@ -162,7 +163,7 @@ export async function TierListView({
   // one after the other so the page never needs more than one connection.
   const [rows, brawlerMeta, lastRun, movers] = await Promise.all([
     getBrawlerStatsForWindow(days, mode, format),
-    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getLastAggregationRun(),
     // Snapshot-to-snapshot movement. The stored snapshots are competitive-only,
     // so this belongs to the Ranked list and is not rendered on the trophy one

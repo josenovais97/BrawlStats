@@ -1,4 +1,4 @@
-import { getBrawlers } from '@/lib/brawlapi';
+import { getBrawlerMap, getBrawlers } from '@/lib/brawlapi';
 import { getWikiBrawlerFacts } from '@/lib/brawler-classes';
 import { getWikiPortraits } from '@/lib/wiki-art';
 import { getOfficialBrawlers } from '@/lib/bs-api';
@@ -216,4 +216,51 @@ export async function getBrawlerCounts(): Promise<{
     legacy: catalog.legacy.length,
     total: catalog.all.length,
   };
+}
+
+/**
+ * The artwork map, with the mirror's gaps filled from the catalogue.
+ *
+ * Every list on the site draws its icons as `meta?.imageUrl ?? brawlerIconUrl(id)`,
+ * and that fallback is the one thing it cannot be: Brawlify builds its URLs
+ * from an id, so a brawler it has not added yet 404s instead of degrading.
+ * The result is a broken square wherever a brand-new brawler appears — a
+ * player's profile, their battle log — for the days between the game listing
+ * the brawler and the mirror catching up.
+ *
+ * That is the same gap `getWikiPortraits` already closes for the catalogue, so
+ * this hands the rest of the site the catalogue's answer rather than making
+ * each caller repeat it. Callers still see a `Map<number, BABrawler>` and the
+ * `?? brawlerIconUrl(id)` fallbacks stay where they are; they simply stop
+ * being reached.
+ *
+ * A synthesised entry carries artwork and identity only. Anything reading
+ * richer fields off the mirror still finds them missing, which is correct —
+ * the mirror genuinely has nothing to say about this brawler yet.
+ */
+export async function getBrawlerArtMap(): Promise<Map<number, BABrawler>> {
+  const [map, catalogue] = await Promise.all([
+    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getBrawlerCatalog().catch(() => null),
+  ]);
+
+  for (const entry of catalogue?.all ?? []) {
+    if (map.has(entry.id) || !entry.imageUrl) continue;
+    map.set(entry.id, {
+      id: entry.id,
+      name: entry.name,
+      imageUrl: entry.imageUrl,
+      imageUrl2: entry.imageUrl,
+      imageUrl3: entry.imageUrl,
+      class: { id: 0, name: entry.className ?? '' },
+      rarity: { id: 0, name: entry.rarityName ?? '', color: entry.rarityColor ?? '#8b95b8' },
+      description: '',
+      descriptionHtml: '',
+      starPowers: [],
+      gadgets: [],
+      released: true,
+    } as unknown as BABrawler);
+  }
+
+  return map;
 }

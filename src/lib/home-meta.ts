@@ -2,10 +2,11 @@ import 'server-only';
 
 import { cache } from 'react';
 
-import { brawlerIconUrl, getBrawlerMap } from '@/lib/brawlapi';
+import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getMetaIndex, type ScoredBrawler } from '@/lib/stats';
 import { TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 /**
  * The current top of the meta: the head of the Ranked tier list, unchanged.
@@ -47,7 +48,7 @@ export const getTopMetaBrawlers = cache(
   async (limit = 5): Promise<TopMetaBrawler[]> => {
     const [index, brawlerMeta] = await Promise.all([
       getMetaIndex('ranked', 7),
-      getBrawlerMap().catch(() => new Map()),
+      getBrawlerArtMap().catch(() => new Map()),
     ]);
 
     return [...index.values()]
@@ -117,7 +118,7 @@ export const getMetaSplit = cache(async (limit = 3): Promise<MetaSplit[]> => {
   const [ranked, trophy, brawlerMeta] = await Promise.all([
     getMetaIndex('ranked', 7),
     getMetaIndex('trophy', 7),
-    getBrawlerMap().catch(() => new Map()),
+    getBrawlerArtMap().catch(() => new Map()),
   ]);
 
   const rank = (tier: Tier) => TIER_ORDER.indexOf(tier);

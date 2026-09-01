@@ -9,9 +9,9 @@ import { MapArt } from '@/components/maps/map-art';
 import { RankedIcon } from '@/components/game-icons';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
-import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, humanizeMode } from '@/lib/format';
-import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
+import { getBrawlerArtMap, getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
 import { CompShape } from '@/components/draft/comp-shape';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
@@ -109,7 +109,7 @@ export default async function DraftPage({ params }: PageProps) {
   const [pool, catalogue, brawlerMeta, modeMeta] = await Promise.all([
     getRankedMapPicks(POOL, RANKED_MAP_WINDOW_DAYS).catch(() => []),
     getActiveMaps().catch(() => []),
-    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
   ]);
 

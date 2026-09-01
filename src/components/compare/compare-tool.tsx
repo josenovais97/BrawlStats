@@ -5,8 +5,8 @@ import { PlayerCompareForm } from '@/components/compare/player-compare-form';
 import { PlayerVersus } from '@/components/compare/player-versus';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getBrawlerMap } from '@/lib/brawlapi';
-import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+
+import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import type { loadComparison } from '@/lib/player-compare';
 import { comparePath } from '@/lib/compare';
 import { slugify } from '@/lib/slugs';
@@ -39,7 +39,7 @@ export async function CompareTool({
 }) {
   // Withdrawn brawlers are not comparable options.
   const brawlers = (await getBrawlerCatalog()).current;
-  const meta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+  const meta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
   const metaIndex = await getMetaIndex('ranked', 7);
 
   // Suggestions are drawn from the current top of the meta rather than picked

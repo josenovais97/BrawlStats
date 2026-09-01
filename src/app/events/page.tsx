@@ -7,7 +7,7 @@ import { ModeBestPicks } from '@/components/events/mode-best-picks';
 import { ClockIcon } from '@/components/game-icons';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getBrawlerMap, getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { getEventRotation } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
@@ -17,6 +17,7 @@ import { getBestPicksByMode } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { ModeBestPicks as ModeBestPicksData } from '@/types/stats';
 import type { BSRotationSlot } from '@/types/brawlstars';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/events' },
@@ -50,7 +51,7 @@ export default async function EventsPage() {
   const [mapMeta, modeMeta, brawlerMeta, bestPicks] = await Promise.all([
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
-    getBrawlerMap().catch(() => new Map<number, BABrawler>()),
+    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     // Our own aggregate; an empty map just hides the picks strip.
     getBestPicksByMode(3).catch(() => new Map<string, ModeBestPicksData>()),
   ]);

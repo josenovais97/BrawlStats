@@ -4,10 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getBrawlerMap } from '@/lib/brawlapi';
+
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 
 import { brawlerPath, slugify } from '@/lib/slugs';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { CHANGE_LABEL, changesFromNotes,
   getLatestReleaseNotes,
   type RichHeading,
@@ -58,7 +59,7 @@ export default async function ReleaseNotesPage() {
    * history is structured, so this turns it into a list that links straight to
    * the brawler pages people are searching for.
    */
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map());
+  const brawlerMeta = await getBrawlerArtMap().catch(() => new Map());
   const liveNames = [...brawlerMeta.values()].map((b) => b.name);
 
   /*

@@ -7,12 +7,13 @@ import { notFound } from 'next/navigation';
 import { MapPickList } from '@/components/maps/map-pick-list';
 import { JsonLd, breadcrumbSchema, itemListSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getBrawlerMap } from '@/lib/brawlapi';
+
 import { formatNumber } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { slugify } from '@/lib/slugs';
 import { getBestPicksByMode } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 interface PageProps {
   params: Promise<{ mode: string }>;
@@ -24,7 +25,6 @@ export const revalidate = 3600;
 export async function generateStaticParams() {
   return [];
 }
-
 
 /** Resolves the mode slug against the modes that actually have active maps. */
 async function resolveMode(slug: string) {
@@ -62,7 +62,7 @@ export default async function ModeMapsPage({ params }: PageProps) {
   const resolved = await resolveMode(mode);
   if (!resolved) notFound();
 
-  const brawlerMeta = await getBrawlerMap().catch(() => new Map<number, BABrawler>());
+  const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
   const picks = resolved.scHash
     ? await getBestPicksByMode(8)
         .then((byMode) => byMode.get(resolved.scHash!) ?? null)

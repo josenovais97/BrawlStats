@@ -5,11 +5,12 @@ import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { brawlerPath } from '@/lib/slugs';
-import { getBrawlerMap } from '@/lib/brawlapi';
+
 import { getOfficialNews } from '@/lib/news';
 import { noteFor } from '@/lib/news-notes';
 import { getCatalogChanges } from '@/lib/stats';
 import type { CatalogChangeEntry } from '@/types/stats';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/news' },
@@ -35,7 +36,7 @@ export default async function UpdatesPage() {
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after another so the page never needs more than one connection.
   const [brawlerMeta, news] = await Promise.all([
-    getBrawlerMap().catch(() => new Map()),
+    getBrawlerArtMap().catch(() => new Map()),
     getOfficialNews(6),
   ]);
   const changes = await getCatalogChanges(40);

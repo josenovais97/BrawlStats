@@ -25,7 +25,7 @@ import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
-import { getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
+import { getGameModeMap } from '@/lib/brawlapi';
 import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
 import { computeSkillScore } from '@/lib/skill-score';
@@ -42,6 +42,7 @@ import {
 } from '@/lib/stats';
 import { displayTag, normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
+import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -132,7 +133,7 @@ export default async function PlayerPage({ params }: PageProps) {
   const normalizedTag = normalizeTag(player.tag);
 
   const [brawlerMeta, catalogue] = await Promise.all([
-    getBrawlerMap().catch(() => new Map()),
+    getBrawlerArtMap().catch(() => new Map()),
     getOfficialBrawlers()
       .then((r) => r.items)
       .catch(() => []),
