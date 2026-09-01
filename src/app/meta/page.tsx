@@ -6,7 +6,7 @@ import { CompList } from '@/components/comps/comp-list';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 
-import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { CHANGE_LABEL, changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
@@ -179,7 +179,7 @@ export default async function MetaReportPage() {
             }
           />
           {topComps.map(({ mode, comp }) => {
-            const label = modeMeta.get(mode.mode.toLowerCase())?.name ?? mode.mode;
+            const label = modeLabel(modeMeta, mode.mode);
             return (
               <div key={mode.mode} className="space-y-1.5">
                 <p className="text-xs font-semibold text-muted">

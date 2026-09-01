@@ -7,7 +7,7 @@ import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
 import { PAIR_SEPARATOR } from '@/lib/compare';
 import { getFilterableModes, getIndexablePairs, getTeamComps } from '@/lib/stats';
-import { getGameModeMap } from '@/lib/brawlapi';
+import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 
 /**
  * The site's fixed routes, plus a page per brawler, map, mode and top-ranked
@@ -116,7 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const modeNames = await getGameModeMap().catch(() => new Map());
   for (const mode of comps) {
     if (mode.comps.length === 0) continue;
-    add(`/comps/${slugify(modeNames.get(mode.mode.toLowerCase())?.name ?? mode.mode)}`, 'daily', 0.7);
+    add(`/comps/${slugify(modeLabel(modeNames, mode.mode))}`, 'daily', 0.7);
   }
 
   // Per-mode tier lists, listed only for the modes that actually have enough

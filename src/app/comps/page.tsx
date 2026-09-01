@@ -5,7 +5,7 @@ import { CompList } from '@/components/comps/comp-list';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 
-import { getGameModeMap } from '@/lib/brawlapi';
+import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
@@ -56,8 +56,7 @@ export default async function CompsPage() {
       ) : null}
 
       {withComps.map((mode) => {
-        const meta = modeMeta.get(mode.mode.toLowerCase());
-        const label = meta?.name ?? mode.mode;
+        const label = modeLabel(modeMeta, mode.mode);
         const slug = slugify(label);
 
         return (

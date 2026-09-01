@@ -1,4 +1,4 @@
-import { getGameModeMap } from '@/lib/brawlapi';
+import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { errorResponse, okResponse } from '@/lib/route-helpers';
 import { getTeamComps } from '@/lib/stats';
 
@@ -34,7 +34,7 @@ export async function GET() {
         windowDays: 14,
         modes: modes.map((mode) => ({
           mode: mode.mode,
-          name: modeMeta.get(mode.mode.toLowerCase())?.name ?? mode.mode,
+          name: modeLabel(modeMeta, mode.mode),
           baselineWinRate: mode.baseline,
           sampleSize: mode.sampleSize,
           comps: mode.comps.map((comp) => ({

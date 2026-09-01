@@ -142,6 +142,24 @@ export async function getGameModeMap(): Promise<Map<string, BAGameMode>> {
   return map;
 }
 
+/**
+ * A mode's display name, however the caller happens to hold its key.
+ *
+ * Wraps the two things every caller was getting wrong on its own: the map is
+ * keyed lowercase while `battle.mode` is camelCase, and a mode the artwork
+ * source has dropped has no entry at all. Retired modes still appear in
+ * sampled battles — Siege is gone from Brawlify's list and still in the data —
+ * so the fallback has to be presentable rather than a raw key.
+ */
+export function modeLabel(modes: Map<string, BAGameMode>, key: string): string {
+  const known = modes.get(key.toLowerCase())?.name;
+  if (known) return known;
+  // "brawlBall" -> "Brawl Ball": split the camel hump, then capitalise.
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+}
+
 /** id -> mode. Maps reference their mode by numeric id, not by name. */
 export async function getGameModeIdMap(): Promise<Map<number, BAGameMode>> {
   const modes = await getGameModes();

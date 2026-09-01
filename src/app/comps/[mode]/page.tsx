@@ -7,7 +7,7 @@ import { CompList } from '@/components/comps/comp-list';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 
-import { getGameModeMap } from '@/lib/brawlapi';
+import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
@@ -42,7 +42,7 @@ async function resolveMode(
 
   const wanted = slugify(slug);
   for (const mode of modes) {
-    const label = modeMeta.get(mode.mode.toLowerCase())?.name ?? mode.mode;
+    const label = modeLabel(modeMeta, mode.mode);
     if (slugify(label) === wanted) return { comps: mode, label, slug: wanted };
   }
   return null;
