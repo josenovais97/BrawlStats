@@ -4,8 +4,6 @@ import {
   ChevronDown,
   Menu,
   Newspaper,
-  Sparkles,
-  Swords,
   ScrollText,
   Search,
   X,
@@ -16,7 +14,9 @@ import { useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
 import {
+  Battle3v3Icon,
   BrawlersIcon,
+  ClockIcon,
   ClubIcon,
   CosmeticsIcon,
   CompareIcon,
@@ -27,6 +27,7 @@ import {
   RankedIcon,
   StarrDropIcon,
   TierListIcon,
+  TrophyGainIcon,
 } from '@/components/game-icons';
 
 interface NavItem {
@@ -72,9 +73,9 @@ const MORE: NavItem[] = [
   // one, so it would earn a permanent slot if there were a seventh. There is
   // not — see above — and the draft helper is the main bar's entry point into
   // the same question.
-  { href: '/daily', label: 'Daily', icon: Sparkles },
-  { href: '/comps', label: 'Team Comps', icon: Swords },
-  { href: '/meta', label: 'Meta Report', icon: Newspaper },
+  { href: '/daily', label: 'Daily', icon: ClockIcon },
+  { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
+  { href: '/meta', label: 'Meta Report', icon: TrophyGainIcon },
   // Events is the one demotion that costs something: it is a page people do
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.
