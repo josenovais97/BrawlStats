@@ -2856,21 +2856,45 @@ async function compute_getDailyDiscoveries(): Promise<Discovery[]> {
     // 3 and 4. The most one-sided matchup, and the best partnership, from the
     //    same roll-up — each measured against the subject's own overall record
     //    so a strong brawler does not simply own both lists.
-    const pairs = await prisma.$queryRaw<
-      { side: string; a: number; b: number; wins: bigint; decided: bigint }[]
-    >`
-      SELECT side, brawler_id AS a, other_brawler_id AS b,
-        COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
-        SUM(battles) AS decided
-      FROM brawler_pair_daily
-      WHERE day >= ${windowStartUtc(14)}
-      GROUP BY side, brawler_id, other_brawler_id
-      HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_DISCOVERY}
-    `;
+    const pairSince = windowStartUtc(14);
+    const [pairs, pairBaselines] = await Promise.all([
+      prisma.$queryRaw<{ side: string; a: number; b: number; wins: bigint; decided: bigint }[]>`
+        SELECT side, brawler_id AS a, other_brawler_id AS b,
+          COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+          SUM(battles) AS decided
+        FROM brawler_pair_daily
+        WHERE day >= ${pairSince}
+        GROUP BY side, brawler_id, other_brawler_id
+        HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_DISCOVERY}
+      `,
+      /*
+       * The baseline has to come from the same place over the same window.
+       *
+       * The first version measured these pairings against the brawler's Ranked
+       * form from `getMetaIndex` — a different format over a different number
+       * of days, since `brawler_pair_daily` is rolled up from every battle type
+       * and read here over fourteen. Every edge came out inflated, and
+       * plausibly so: +30 points looks like a discovery rather than a units
+       * mismatch. `brawler_team_daily` is the same roll-up of the same battles,
+       * which is why getBrawlerPairings uses it too.
+       */
+      prisma.$queryRaw<{ id: number; wins: bigint; decided: bigint }[]>`
+        SELECT brawler_id AS id, SUM(wins) AS wins, SUM(decided) AS decided
+        FROM brawler_team_daily
+        WHERE day >= ${pairSince}
+        GROUP BY brawler_id
+      `,
+    ]);
+
+    const baselineFor = new Map(
+      pairBaselines
+        .filter((row) => Number(row.decided) > 0)
+        .map((row) => [row.id, Number(row.wins) / Number(row.decided)]),
+    );
 
     const edgeOf = (row: { a: number; wins: bigint; decided: bigint }) => {
-      const own = index.get(row.a)?.winRate;
-      if (own === null || own === undefined) return null;
+      const own = baselineFor.get(row.a);
+      if (own === undefined) return null;
       return Number(row.wins) / Number(row.decided) - own;
     };
 
@@ -2888,7 +2912,7 @@ async function compute_getDailyDiscoveries(): Promise<Discovery[]> {
         brawlerIds: [top.row.a, top.row.b],
         brawlerNames: [nameOf(top.row.a), nameOf(top.row.b)],
         value: Number(top.row.wins) / Number(top.row.decided),
-        comparison: index.get(top.row.a)?.winRate ?? 0.5,
+        comparison: baselineFor.get(top.row.a) ?? 0.5,
         sampleSize: Number(top.row.decided),
         href: brawlerPath(top.row.a, nameOf(top.row.a)),
       });
