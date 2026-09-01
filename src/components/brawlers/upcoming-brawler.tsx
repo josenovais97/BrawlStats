@@ -17,6 +17,15 @@ import type { UpcomingBrawler } from '@/lib/announced';
  * measured from battles, so it says so plainly rather than letting a reader
  * assume these carry the same weight as the rest.
  */
+/** The measured half of a brawler page, in the order the released pages use. */
+const MEASURED_SECTIONS = [
+  { id: 'performance', title: 'Performance', blurb: 'Ranked and ladder win rates, pick rate and tier.' },
+  { id: 'where', title: 'Where it performs', blurb: 'The maps and modes it is strongest on.' },
+  { id: 'matchups', title: 'Matchups', blurb: 'Which brawlers it beats, and which beat it.' },
+  { id: 'build', title: 'Build & upgrades', blurb: 'The star power, gadget and gears owners actually run.' },
+  { id: 'top-players', title: 'Top players', blurb: 'The highest-trophy accounts playing it.' },
+] as const;
+
 export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
   const { name, rarityName, className, stats, abilities, portraitUrl } = brawler;
   const gadgets = abilities.filter((a) => a.kind === 'gadget');
@@ -47,12 +56,24 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
           )}
 
           <div className="min-w-0">
-            <span className="eyebrow text-accent">Announced, not yet released</span>
-            <h1 className="display mt-1.5 text-3xl uppercase sm:text-4xl">{name}</h1>
-            <p className="mt-1.5 text-sm text-muted">
-              {[rarityName, className].filter(Boolean).join(' · ') ||
-                'Rarity and class not published yet'}
-            </p>
+            {/* Pills in the same shape the released pages use, so a reader
+                moving between the two is not learning a second layout. */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
+                Not released yet
+              </span>
+              {rarityName ? (
+                <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                  {rarityName}
+                </span>
+              ) : null}
+              {className ? (
+                <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                  {className}
+                </span>
+              ) : null}
+            </div>
+            <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">{name.toLowerCase()}</h1>
             <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">
               {name} has been revealed but is not playable yet, so there are no
               sampled battles behind this page. Everything below comes from the
@@ -109,40 +130,30 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       ) : null}
 
       {/*
-        Says why the page is shorter than a released brawler's, rather than
-        leaving it looking half-built.
+        The same sections a released brawler has, each saying plainly that it
+        has nothing yet.
         
-        None of these can be faked or borrowed: every one is computed from
-        battles this site sampled itself, and nobody has played {name} yet. The
-        page is deliberately the same shape it will grow into, so the sections
-        appear where a reader already expects them.
+        Every one is computed from battles this site sampled itself, so none of
+        them can be borrowed or estimated before anyone has played. Rendering
+        them empty rather than omitting them keeps the page the shape it will
+        grow into: a reader finds matchups where matchups live, and learns why
+        it is blank instead of wondering whether the site simply lacks it.
       */}
-      <section aria-labelledby="on-release">
-        <h2 id="on-release" className="display text-2xl uppercase">
-          What appears on release
-        </h2>
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-          Everything below is measured from sampled battles, so none of it can
-          exist before {name} is playable. This page becomes the full brawler
-          page automatically once the game lists {name} and the sampler has seen
-          enough matches — usually a day or two after launch.
-        </p>
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-          {[
-            ['Performance', 'Ranked and ladder win rates, pick rate and tier.'],
-            ['Where it performs', 'The maps and modes it is strongest on.'],
-            ['Matchups', 'Which brawlers it beats and loses to.'],
-            ['Build & upgrades', 'The star power, gadget and gears owners actually run.'],
-            ['Top players', 'The highest-trophy accounts playing it.'],
-            ['Balance history', 'Every change Supercell makes to it from here.'],
-          ].map(([title, detail]) => (
-            <li key={title} className="card p-3.5">
-              <p className="text-sm font-bold">{title}</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-muted">{detail}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {MEASURED_SECTIONS.map((section) => (
+        <section key={section.id} aria-labelledby={section.id}>
+          <h2 id={section.id} className="display text-2xl uppercase">
+            {section.title}
+          </h2>
+          <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-muted">
+            {section.blurb}
+          </p>
+          <p className="card mt-3 p-4 text-sm text-muted">
+            <span className="font-semibold text-foreground">No data yet.</span>{' '}
+            {name} is not playable, so no battles have been sampled. This fills
+            in within a day or two of release.
+          </p>
+        </section>
+      ))}
 
       <p className="text-sm text-muted">
         <Link href="/brawlers" className="text-brand hover:underline">
