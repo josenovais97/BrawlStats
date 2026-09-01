@@ -2719,11 +2719,20 @@ async function compute_getMapMatchups(limit = 8): Promise<Map<string, MapMatchup
       out.set(row.map_name, list);
     }
 
+    /*
+     * Balanced by sign rather than ranked by magnitude.
+     *
+     * Sorting on |edge| alone filled every map with losing matchups — the bad
+     * ones are simply more extreme — so the list told a drafter what not to do
+     * and never what to do. Taking each end separately guarantees both, and
+     * the merge leaves the whole list running best to worst.
+     */
+    const half = Math.max(1, Math.floor(limit / 2));
     for (const [map, list] of out) {
-      out.set(
-        map,
-        list.sort((x, y) => Math.abs(y.edge) - Math.abs(x.edge)).slice(0, limit),
-      );
+      const sorted = [...list].sort((x, y) => y.edge - x.edge);
+      const best = sorted.slice(0, half);
+      const worst = sorted.slice(-half).filter((m) => !best.includes(m));
+      out.set(map, [...best, ...worst].sort((x, y) => y.edge - x.edge));
     }
 
     return out;
