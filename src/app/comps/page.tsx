@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { CompList } from '@/components/comps/comp-list';
@@ -58,11 +59,24 @@ export default async function CompsPage() {
       {withComps.map((mode) => {
         const label = modeLabel(modeMeta, mode.mode);
         const slug = slugify(label);
+        const meta = modeMeta.get(mode.mode.toLowerCase());
 
         return (
           <section key={mode.mode} className="space-y-3">
             <SectionHeading
               title={label}
+              icon={
+                meta?.imageUrl ? (
+                  <Image
+                    src={meta.imageUrl}
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="size-6 shrink-0 object-contain"
+                    unoptimized
+                  />
+                ) : null
+              }
               aside={
                 <Link
                   href={`/comps/${slug}`}

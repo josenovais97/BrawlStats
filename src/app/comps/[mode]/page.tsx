@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -34,7 +35,7 @@ export async function generateStaticParams() {
  */
 async function resolveMode(
   slug: string,
-): Promise<{ comps: ModeComps; label: string; slug: string } | null> {
+): Promise<{ comps: ModeComps; label: string; slug: string; icon?: string } | null> {
   const [modes, modeMeta] = await Promise.all([
     getTeamComps().catch(() => []),
     getGameModeMap().catch(() => new Map()),
@@ -43,7 +44,14 @@ async function resolveMode(
   const wanted = slugify(slug);
   for (const mode of modes) {
     const label = modeLabel(modeMeta, mode.mode);
-    if (slugify(label) === wanted) return { comps: mode, label, slug: wanted };
+    if (slugify(label) === wanted) {
+      return {
+        comps: mode,
+        label,
+        slug: wanted,
+        icon: modeMeta.get(mode.mode.toLowerCase())?.imageUrl,
+      };
+    }
   }
   return null;
 }
@@ -87,6 +95,23 @@ export default async function ModeCompsPage({ params }: PageProps) {
       </Link>
 
       <PageHeading
+        eyebrow={
+          resolved.icon ? (
+            <span className="inline-flex items-center gap-2">
+              <Image
+                src={resolved.icon}
+                alt=""
+                width={18}
+                height={18}
+                className="size-[18px] shrink-0 object-contain"
+                unoptimized
+              />
+              {resolved.label}
+            </span>
+          ) : (
+            resolved.label
+          )
+        }
         title={`Best ${resolved.label} comps`}
         subtitle={`Ranked by how far each trio sits above the mode's own average of ${formatPercent(
           comps.baseline,
