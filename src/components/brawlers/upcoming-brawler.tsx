@@ -65,7 +65,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       {stats.length > 0 ? (
         <section aria-labelledby="stats">
           <h2 id="stats" className="display text-2xl uppercase">
-            Stats
+            Combat stats
           </h2>
           <p className="mt-1 text-sm text-muted">
             Base values, before gears and star powers. Provisional until release.
@@ -104,11 +104,45 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       {bare ? (
         <p className="card p-5 text-sm leading-relaxed text-muted">
           Nothing beyond the name has been published for {name} yet. This page
-          updates automatically as the wiki fills in, and becomes the full page —
-          tier, win rate, best maps and builds — once {name} is in the game and
-          has been sampled.
+          fills in as the wiki does.
         </p>
       ) : null}
+
+      {/*
+        Says why the page is shorter than a released brawler's, rather than
+        leaving it looking half-built.
+        
+        None of these can be faked or borrowed: every one is computed from
+        battles this site sampled itself, and nobody has played {name} yet. The
+        page is deliberately the same shape it will grow into, so the sections
+        appear where a reader already expects them.
+      */}
+      <section aria-labelledby="on-release">
+        <h2 id="on-release" className="display text-2xl uppercase">
+          What appears on release
+        </h2>
+        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
+          Everything below is measured from sampled battles, so none of it can
+          exist before {name} is playable. This page becomes the full brawler
+          page automatically once the game lists {name} and the sampler has seen
+          enough matches — usually a day or two after launch.
+        </p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          {[
+            ['Performance', 'Ranked and ladder win rates, pick rate and tier.'],
+            ['Where it performs', 'The maps and modes it is strongest on.'],
+            ['Matchups', 'Which brawlers it beats and loses to.'],
+            ['Build & upgrades', 'The star power, gadget and gears owners actually run.'],
+            ['Top players', 'The highest-trophy accounts playing it.'],
+            ['Balance history', 'Every change Supercell makes to it from here.'],
+          ].map(([title, detail]) => (
+            <li key={title} className="card p-3.5">
+              <p className="text-sm font-bold">{title}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-muted">{detail}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <p className="text-sm text-muted">
         <Link href="/brawlers" className="text-brand hover:underline">
