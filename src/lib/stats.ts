@@ -2428,15 +2428,26 @@ async function compute_getBrawlerPairings(
 }
 
 /**
- * A trio needs more evidence than a pair before it says anything.
+ * Battles a trio needs before it says anything.
  *
- * Twenty decided battles, measured: 1,566 trios clear it and 210 clear fifty.
- * The same question asked in October returned 107 and 1, which is why comps
- * were declined then — the pool was a third the size. The floor is what stops
- * the list being a leaderboard of three-battle flukes, and shrinkage below
- * handles what is left.
+ * Forty, and the number was argued down to it rather than picked. At twenty,
+ * 1,566 trios qualified and the top of every mode sat at 85-90% against a 66%
+ * baseline — not a finding, but selection on noise: with thousands of
+ * candidates at ~25 battles each, the maximum is extreme by construction.
+ * Raising the floor is what makes the top of the list mean something; at forty
+ * battles and fifteen distinct players the leaders are comps like one with 550
+ * battles across 39 players at 84.5%, which is a real effect.
+ *
+ * The cost is coverage, and it is steep: 47 Brawl Ball comps survive, 6
+ * Knockout, 4 Hot Zone, and nothing at all in five modes. Those modes say so
+ * rather than showing a list built from noise.
+ *
+ * This loosens on its own. The 14-day window still mostly predates the pool
+ * going from 1,000 players to 3,000 on 2026-08-30, so roughly a third of the
+ * data it could hold is in it. Once the window is entirely post-change the
+ * counts should roughly triple without anything here being touched.
  */
-const MIN_SAMPLE_FOR_COMP = 20;
+const MIN_SAMPLE_FOR_COMP = 40;
 
 /**
  * How many DIFFERENT players must have used a comp before it counts.
@@ -2457,11 +2468,19 @@ const MIN_SAMPLE_FOR_COMP = 20;
  * silently ranked which small groups of strong players exist — every entry at
  * a flat 100%, which is what gave it away.
  *
- * Ten costs most of the roster: 240 Brawl Ball comps survive where 536 cleared
- * the battle floor alone. That is the right trade. The thinner modes drop to
- * single digits and say so rather than showing a list built from one clan.
+ * Fifteen rather than ten. Ten flattened the average to the mode baseline,
+ * which is what the table above was measuring, but it did not fix the *top* of
+ * the list: a comp with fourteen players can still be one player's twenty
+ * battles plus thirteen people's one. Paired with the battle floor above,
+ * fifteen is where the leaders stop being flukes.
+ *
+ * A within-player estimator was tried first — each player's rate with the comp
+ * minus their own overall rate, which controls for skill exactly. It ranked the
+ * same implausible comps at +20 to +30 points, because it does not address the
+ * actual problem: selecting a maximum out of thousands of small samples. Sample
+ * size was the fix, not a cleverer statistic.
  */
-const MIN_DISTINCT_PLAYERS_FOR_COMP = 10;
+const MIN_DISTINCT_PLAYERS_FOR_COMP = 15;
 
 /**
  * How far back comps read.
