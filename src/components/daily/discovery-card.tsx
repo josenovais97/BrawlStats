@@ -27,6 +27,12 @@ interface Copy {
   cta: string;
   /** Drives the card's accent. Two hues only: a find, or a warning. */
   tone: 'good' | 'bad';
+  /**
+   * How the two portraits relate, for findings about a pair. Without it the
+   * giant killer and the secret duo render identically — two faces side by
+   * side — when one is an opposition and the other a partnership.
+   */
+  pair?: 'vs' | '+';
 }
 
 const pts = (n: number) => `${n >= 0 ? '+' : '−'}${Math.abs(n * 100).toFixed(1)} pts`;
@@ -53,6 +59,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'giant-killer': {
     eyebrow: 'The giant killer',
     tone: 'good',
+    pair: 'vs',
     headline: (d) => `${titleCase(d.brawlerNames[0])} owns ${titleCase(d.brawlerNames[1])}.`,
     detail: (d) =>
       `${formatPercent(d.value)} against ${titleCase(d.brawlerNames[1])} specifically, ${pts(
@@ -64,6 +71,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'secret-duo': {
     eyebrow: 'The secret duo',
     tone: 'good',
+    pair: '+',
     headline: (d) => `${titleCase(d.brawlerNames[0])} and ${titleCase(d.brawlerNames[1])} belong together.`,
     detail: (d) =>
       `Teamed up, ${titleCase(d.brawlerNames[0])} wins ${formatPercent(d.value)} — ${pts(
@@ -125,18 +133,34 @@ export function DiscoveryCard({
       <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
         <div className="flex shrink-0 items-center gap-2">
           {discovery.brawlerIds.slice(0, 2).map((id, i) => (
-            <Image
-              key={id}
-              src={brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id)}
-              alt=""
-              width={72}
-              height={72}
-              className={`rounded-xl bg-surface-2 ${
-                i === 0 ? 'size-16 sm:size-[72px]' : 'size-12 opacity-70 sm:size-14'
-              }`}
-              loading={index < 2 ? 'eager' : 'lazy'}
-              unoptimized
-            />
+            <div key={id} className="flex items-center gap-2">
+              {i > 0 && copy.pair ? (
+                <span
+                  aria-hidden
+                  className="text-xs font-black uppercase tracking-wide text-muted"
+                >
+                  {copy.pair}
+                </span>
+              ) : null}
+              <span className="flex flex-col items-center gap-1">
+                <Image
+                  src={brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id)}
+                  alt=""
+                  width={72}
+                  height={72}
+                  className={`rounded-xl bg-surface-2 ${
+                    i === 0 ? 'size-16 sm:size-[72px]' : 'size-14 sm:size-16'
+                  }`}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  unoptimized
+                />
+                {discovery.brawlerNames[i] ? (
+                  <span className="max-w-[5rem] truncate text-[11px] font-semibold leading-tight">
+                    {titleCase(discovery.brawlerNames[i])}
+                  </span>
+                ) : null}
+              </span>
+            </div>
           ))}
         </div>
 

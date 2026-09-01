@@ -55,7 +55,10 @@ export function CompList({
 
             {/* The trio reads as one unit rather than three list items: the
                 brawlers are joined by "+" and share a single tinted plate. */}
-            <div className="flex min-w-0 flex-1 flex-wrap items-start gap-x-1 gap-y-2 rounded-xl bg-surface-2/40 p-2">
+            {/* `mr-auto` rather than `flex-1`: the plate should hug the three
+                brawlers and let the gap fall between it and the numbers, not
+                stretch a tinted panel across empty space. */}
+            <div className="mr-auto flex min-w-0 flex-wrap items-start gap-x-1 gap-y-2 rounded-xl bg-surface-2/40 p-2">
               {comp.brawlerIds.map((id, i) => {
                 const meta = brawlerMeta.get(id);
                 const name = meta?.name ? titleCase(meta.name) : `#${id}`;
