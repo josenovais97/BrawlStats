@@ -86,7 +86,7 @@ export default async function BrawlersPage() {
           ...catalog.all.map((b) => ({
             id: b.id,
             name: b.name,
-            imageUrl: b.meta?.imageUrl ?? brawlerIconUrl(b.id),
+            imageUrl: b.imageUrl,
             // Null rather than "Unknown": the artwork source reports that
             // literal string for every brawler released since Meeple, and a chip
             // reading "Unknown" on a fifth of the roster is worse than no chip.

@@ -1,5 +1,6 @@
 import { getBrawlers } from '@/lib/brawlapi';
 import { getWikiBrawlerClasses } from '@/lib/brawler-classes';
+import { getWikiPortraits } from '@/lib/wiki-art';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
@@ -33,6 +34,17 @@ export interface CatalogBrawler {
   status: BrawlerStatus;
   /** Artwork and rarity. Absent only if the mirror is unreachable. */
   meta: BABrawler | undefined;
+  /**
+   * A portrait that actually resolves.
+   *
+   * Brawlify's URLs are built from an id, so a brawler it has not added yet
+   * 404s rather than falling back. That happens for one day per release — the
+   * day the game API lists a new brawler and the site switches from the
+   * preview page to the full one — and it is the day that page gets the most
+   * traffic it ever will. The wiki has the art from the reveal, so it covers
+   * exactly the gap between "the game has it" and "the mirror has it".
+   */
+  imageUrl: string;
   /**
    * Class name, or null when no source knows it.
    *
@@ -110,6 +122,8 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
           ? 'current'
           : 'legacy') as BrawlerStatus,
         meta,
+        // Overwritten below when the mirror has nothing and the wiki does.
+        imageUrl: meta?.imageUrl ?? `https://cdn.brawlify.com/brawlers/borders/${id}.png`,
         className: realValue(meta?.class?.name),
         rarityName: realValue(meta?.rarity?.name),
         rarityColor: realColor(meta?.rarity?.color),
@@ -125,6 +139,23 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
    * one, which is twenty rather than a hundred and seven. A failure here
    * leaves the field null, which is exactly the state this is improving on.
    */
+  /*
+   * Portraits for anything the mirror has not caught up with. Normally this
+   * list is empty and costs nothing; it is non-empty only in the window after
+   * a release, which is the only time it matters.
+   */
+  const unmirrored = all.filter((b) => !b.meta?.imageUrl).map((b) => b.name);
+  if (unmirrored.length > 0) {
+    const portraits = new Map(
+      await getWikiPortraits(unmirrored).catch(() => [] as [string, string][]),
+    );
+    for (const brawler of all) {
+      if (!brawler.meta?.imageUrl) {
+        brawler.imageUrl = portraits.get(brawler.name.toLowerCase()) ?? brawler.imageUrl;
+      }
+    }
+  }
+
   const unclassified = all.filter((b) => b.className === null).map((b) => b.name);
   if (unclassified.length > 0) {
     const wikiClasses = new Map(
