@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Hold a block of RAM so the instance is not reclaimed as idle.
+
+This is a workaround, and worth naming as one. Oracle reclaims an Always Free
+instance when, across a continuous 7-day window, CPU 95th percentile, network
+AND memory utilisation are ALL under 20%. It is an AND, so lifting any single
+one of the three is enough.
+
+Measured on this box over six days of `sar` history, all three sat inside the
+window. The interesting part is why, because it is not that the box does
+nothing:
+
+  - CPU p95 on a quiet day was 6.0%, and the daily MAX was 6.5%. The sampler
+    runs 8x a day for ~11 minutes and barely registers, because it spends that
+    time waiting on the game API rather than computing. An I/O-bound workload
+    is invisible to a CPU metric.
+  - Memory ran 20-21% with dips to 19.9% -- the threshold itself.
+  - Network never approaches 20% of a 2 Gbps shape.
+
+The days that looked busy were days someone was pushing commits, because each
+deploy rebuilds the image. Development activity is not a property of the
+service, so it cannot be what keeps the instance alive.
+
+Memory is the right lever of the three. It is a level rather than a rate, so it
+holds regardless of what the site is doing; there is no swap on this box, so
+the pages stay resident once touched; and unlike burning CPU it costs nothing
+to keep -- no heat, no contention with Postgres or the app.
+
+The genuine fix is converting the tenancy to Pay As You Go, which exempts the
+instance from reclamation entirely while leaving Always Free resources free.
+That was declined deliberately (it needs a card on file). This is the fallback,
+and it defends a real production site whose workload the policy's proxy metrics
+simply do not capture.
+
+Sized to land near 40%, well clear of the line rather than balanced on it.
+Safety comes from the unit file rather than from here: MemoryMax caps it, and
+OOMScoreAdjust=1000 means that if the kernel ever runs short this process is
+killed first -- never Postgres, never the app.
+"""
+
+import sys
+import time
+
+PAGE = 4096
+
+
+def main() -> int:
+    mib = int(sys.argv[1]) if len(sys.argv) > 1 else 2560
+
+    # A large bytearray is mmap'd anonymously and filled lazily, so allocating
+    # it is not enough to make the pages resident -- and a reservation the
+    # kernel has not actually handed out does not move the metric. Touching one
+    # byte per page is what forces them in.
+    buf = bytearray(mib * 1024 * 1024)
+    for i in range(0, len(buf), PAGE):
+        buf[i] = 1
+
+    print(f"holding {mib} MiB resident", flush=True)
+
+    # Nothing to do from here. The allocation is the whole job, and with no
+    # swap configured the kernel cannot page it back out.
+    while True:
+        time.sleep(3600)
+        # Keep a reference the interpreter cannot optimise away.
+        if buf[0] != 1:
+            return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

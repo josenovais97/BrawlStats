@@ -1,0 +1,27 @@
+[Unit]
+Description=BrawlZone idle-reclaim guard (holds RAM so the instance is not reclaimed)
+After=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-reserve-memory 2560
+Restart=always
+RestartSec=30
+
+# Everything below is the safety envelope. The reservation must never be the
+# reason something real dies, so it is capped by the cgroup and volunteered as
+# the kernel's first OOM victim -- Postgres, the app and Caddy all keep their
+# default score and are therefore killed only after this is gone.
+MemoryMax=2800M
+OOMScoreAdjust=1000
+Nice=19
+CPUWeight=1
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

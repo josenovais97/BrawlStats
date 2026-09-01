@@ -119,6 +119,21 @@ else
   [ "$vage" -le 10 ] || problems+=("backups last restore-verified ${vage}d ago (weekly job may have stopped)")
 fi
 
+# 9. Is the idle-reclaim guard still holding?
+#    Oracle reclaims an Always Free instance whose CPU p95, network AND memory
+#    all sit under 20% for 7 continuous days, and this box measured 6% CPU on a
+#    quiet day with memory balanced on 20.x%. The guard holds RAM to keep the
+#    memory leg clear of the line. If it dies, nothing user-facing breaks and
+#    the site looks perfectly healthy -- right up until the instance is
+#    stopped, which is why it is checked here rather than left to notice
+#    itself. See brawlzone-reserve-memory for why memory is the leg chosen.
+if ! systemctl is-active --quiet brawlzone-reserve-memory.service; then
+  problems+=("idle-reclaim guard is not running (instance may be reclaimed)")
+else
+  memu=$(awk '/^MemTotal/{t=$2} /^MemAvailable/{a=$2} END{printf "%d", 100*(t-a)/t}' /proc/meminfo)
+  [ "$memu" -ge 30 ] || problems+=("memory utilisation ${memu}%, too close to Oracle's 20% idle threshold")
+fi
+
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 
 if [ ${#problems[@]} -eq 0 ]; then

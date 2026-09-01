@@ -135,6 +135,10 @@ sudo systemctl enable --now brawlzone-deploy.timer brawlzone-sampler.timer \
                             brawlzone-refresh.timer \
                             brawlzone-verify-restore.timer >/dev/null
 
+# Not a timer: it holds RAM continuously so the instance is not reclaimed as
+# idle. See brawlzone-reserve-memory for the measurements behind it.
+sudo systemctl enable --now brawlzone-reserve-memory.service >/dev/null
+
 cat <<EOF
 
 $(printf '\033[1;32mBox provisioned.\033[0m') Three things this script cannot do for you:
