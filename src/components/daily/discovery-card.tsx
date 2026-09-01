@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { brawlerIconUrl } from '@/lib/brawlapi';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import type { Discovery, DiscoveryKind } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 
@@ -35,7 +35,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'secret-pick': {
     eyebrow: 'The secret pick',
     tone: 'good',
-    headline: (d) => `Almost nobody picks ${cap(d.brawlerNames[0])}. It is winning anyway.`,
+    headline: (d) => `Almost nobody picks ${titleCase(d.brawlerNames[0])}. It is winning anyway.`,
     detail: (d) =>
       `${formatPercent(d.value)} adjusted win rate on just ${formatPercent(d.comparison)} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.`,
     stat: (d) => ({ value: formatPercent(d.value), label: 'adjusted win rate' }),
@@ -44,7 +44,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'meta-trap': {
     eyebrow: 'The meta trap',
     tone: 'bad',
-    headline: (d) => `${cap(d.brawlerNames[0])} is everywhere, and losing.`,
+    headline: (d) => `${titleCase(d.brawlerNames[0])} is everywhere, and losing.`,
     detail: (d) =>
       `Picked in ${formatPercent(d.comparison)} of sampled battles and returning ${formatPercent(d.value)} adjusted — below the average of the very players picking it.`,
     stat: (d) => ({ value: formatPercent(d.comparison), label: 'of all picks' }),
@@ -53,20 +53,20 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'giant-killer': {
     eyebrow: 'The giant killer',
     tone: 'good',
-    headline: (d) => `${cap(d.brawlerNames[0])} owns ${cap(d.brawlerNames[1])}.`,
+    headline: (d) => `${titleCase(d.brawlerNames[0])} owns ${titleCase(d.brawlerNames[1])}.`,
     detail: (d) =>
-      `${formatPercent(d.value)} against ${cap(d.brawlerNames[1])} specifically, ${pts(
+      `${formatPercent(d.value)} against ${titleCase(d.brawlerNames[1])} specifically, ${pts(
         d.value - d.comparison,
-      )} above ${cap(d.brawlerNames[0])}'s own record. The most lopsided matchup in the sample.`,
+      )} above ${titleCase(d.brawlerNames[0])}'s own record. The most lopsided matchup in the sample.`,
     stat: (d) => ({ value: pts(d.value - d.comparison), label: 'vs its usual form' }),
     cta: 'See every matchup',
   },
   'secret-duo': {
     eyebrow: 'The secret duo',
     tone: 'good',
-    headline: (d) => `${cap(d.brawlerNames[0])} and ${cap(d.brawlerNames[1])} belong together.`,
+    headline: (d) => `${titleCase(d.brawlerNames[0])} and ${titleCase(d.brawlerNames[1])} belong together.`,
     detail: (d) =>
-      `Teamed up, ${cap(d.brawlerNames[0])} wins ${formatPercent(d.value)} — ${pts(
+      `Teamed up, ${titleCase(d.brawlerNames[0])} wins ${formatPercent(d.value)} — ${pts(
         d.value - d.comparison,
       )} better than it does otherwise. Neither is picked for the other.`,
     stat: (d) => ({ value: pts(d.value - d.comparison), label: 'when paired' }),
@@ -75,7 +75,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'map-surprise': {
     eyebrow: 'The map surprise',
     tone: 'good',
-    headline: (d) => `${cap(d.brawlerNames[0])} is a different brawler on ${d.context}.`,
+    headline: (d) => `${titleCase(d.brawlerNames[0])} is a different brawler on ${d.context}.`,
     detail: (d) =>
       `${formatPercent(d.value)} here against ${formatPercent(
         d.comparison,
@@ -86,7 +86,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   'overnight-rise': {
     eyebrow: 'The overnight rise',
     tone: 'good',
-    headline: (d) => `${cap(d.brawlerNames[0])} moved more than anything else since yesterday.`,
+    headline: (d) => `${titleCase(d.brawlerNames[0])} moved more than anything else since yesterday.`,
     detail: (d) =>
       `Meta score ${d.comparison.toFixed(1)} to ${d.value.toFixed(
         1,
@@ -96,9 +96,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
   },
 };
 
-function cap(name: string): string {
-  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-}
+
 
 export function DiscoveryCard({
   discovery,

@@ -2805,9 +2805,24 @@ async function compute_getDailyDiscoveries(): Promise<Discovery[]> {
     const nameOf = (id: number) => index.get(id)?.brawlerName ?? `#${id}`;
     const out: Discovery[] = [];
 
-    // 1. Winning quietly: the best record among brawlers almost nobody picks.
+    /*
+     * 1. Winning quietly: the best record among brawlers almost nobody picks —
+     *    excluding whatever the tier list is already shouting about.
+     *
+     * The meta score deliberately rewards a strong record at low usage, so its
+     * top entries are often exactly the brawlers this would pick. The first
+     * version named Amber, which is true (0.78% usage) and useless: Amber was
+     * also rank 1 on the tier list. A secret the front page already tells you
+     * is not a secret, so the top of the ranking is off the table.
+     */
+    const headline = new Set(
+      [...scored]
+        .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
+        .slice(0, 10)
+        .map((b) => b.brawlerId),
+    );
     const secret = scored
-      .filter((b) => (b.usageRate ?? 1) <= SECRET_PICK_MAX_USAGE)
+      .filter((b) => (b.usageRate ?? 1) <= SECRET_PICK_MAX_USAGE && !headline.has(b.brawlerId))
       .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))[0];
     if (secret && (secret.normalizedWinRate ?? 0) > 0.52) {
       out.push({
