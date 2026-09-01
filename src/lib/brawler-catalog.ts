@@ -1,4 +1,4 @@
-import { getBrawlerMap, getBrawlers } from '@/lib/brawlapi';
+import { getBrawlerMap, getBrawlers, realBrawlerClass } from '@/lib/brawlapi';
 import { getWikiBrawlerFacts } from '@/lib/brawler-classes';
 import { getWikiPortraits } from '@/lib/wiki-art';
 import { getOfficialBrawlers } from '@/lib/bs-api';
@@ -124,7 +124,7 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
         meta,
         // Overwritten below when the mirror has nothing and the wiki does.
         imageUrl: meta?.imageUrl ?? `https://cdn.brawlify.com/brawlers/borders/${id}.png`,
-        className: realValue(meta?.class?.name),
+        className: realBrawlerClass(meta?.class?.name),
         rarityName: realValue(meta?.rarity?.name),
         rarityColor: realColor(meta?.rarity?.color),
       };

@@ -21,7 +21,13 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
 import { ClassIcon, CombatStatIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
-import { brawlerModelUrl, getBrawler, hasBrawlerModel, rarityColor } from '@/lib/brawlapi';
+import {
+  brawlerModelUrl,
+  getBrawler,
+  hasBrawlerModel,
+  rarityColor,
+  realBrawlerClass,
+} from '@/lib/brawlapi';
 import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
 import {
   combatStatLabels,
@@ -502,7 +508,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // The artwork source says "Unknown" for every recent brawler; the wiki
   // infobox has the real class, and that page is already fetched above.
   const className =
-    (brawler.class?.name && brawler.class.name !== 'Unknown' ? brawler.class.name : null) ??
+    realBrawlerClass(brawler.class?.name) ??
     wiki?.stats.className ??
     null;
   const rarityName =

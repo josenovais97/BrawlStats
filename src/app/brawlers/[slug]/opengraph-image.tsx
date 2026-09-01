@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-import { brawlerPortraitUrl, getBrawler } from '@/lib/brawlapi';
+import { brawlerPortraitUrl, getBrawler, realBrawlerClass } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { slugify } from '@/lib/slugs';
 import { formatPercent } from '@/lib/format';
@@ -116,7 +116,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             {/* One interpolation, not two: Satori requires an explicit display
                 on any element with more than one child node. */}
             <div style={{ fontSize: 32, color: '#8b95b8', marginTop: 10 }}>
-              {`${brawler.rarity?.name ?? 'Brawler'}  ·  ${brawler.class?.name ?? 'Brawl Stars'}`}
+              {`${brawler.rarity?.name ?? 'Brawler'}  ·  ${realBrawlerClass(brawler.class?.name) ?? 'Brawl Stars'}`}
             </div>
           </div>
         </div>

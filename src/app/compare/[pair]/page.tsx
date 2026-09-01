@@ -22,6 +22,7 @@ import {
   normalizeWinRate,
   type BrawlerSplit,
 } from '@/lib/stats';
+import { realBrawlerClass } from '@/lib/brawlapi';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BrawlerStatRow, Tier } from '@/types/stats';
 
@@ -234,8 +235,8 @@ export default async function ComparePage({ params }: PageProps) {
                 },
                 {
                   label: 'Class',
-                  a: left.brawler.class?.name ?? '–',
-                  b: right.brawler.class?.name ?? '–',
+                  a: realBrawlerClass(left.brawler.class?.name) ?? '–',
+                  b: realBrawlerClass(right.brawler.class?.name) ?? '–',
                   leader: null,
                 },
                 {

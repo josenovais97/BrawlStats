@@ -115,6 +115,39 @@ export async function getBrawlerMap(): Promise<Map<number, BABrawler>> {
   return new Map(list.map((b) => [b.id, b]));
 }
 
+/**
+ * The seven classes the game actually has.
+ *
+ * Checked rather than trusted, because on 2026-09-01 the mirror started
+ * returning the brawler's *tagline* in `class.name` — Vince came back as
+ * `{ id: 107, name: "Collect Caterpillars To Become More Powerful" }`, and the
+ * id is the brawler's index rather than a class id. Nothing errored: the
+ * brawler index rendered a filter row with one chip per brawler ("Bombard
+ * Safely From Behind Walls."), and every brawler page showed a sentence where
+ * its class chip belongs.
+ *
+ * A closed set is the right shape for this. There have been seven classes for
+ * years and a new one would be a headline change, so anything outside the set
+ * is upstream noise rather than a class this code has not heard of. Returning
+ * null routes the brawler to the wiki fallback, which already existed for the
+ * brawlers the mirror reported as "Unknown" and is correct for all of them.
+ */
+const BRAWLER_CLASSES = new Set([
+  'Artillery',
+  'Assassin',
+  'Controller',
+  'Damage Dealer',
+  'Marksman',
+  'Support',
+  'Tank',
+]);
+
+/** The mirror's class name when it is one, and null when it is anything else. */
+export function realBrawlerClass(name: string | null | undefined): string | null {
+  const trimmed = name?.trim();
+  return trimmed && BRAWLER_CLASSES.has(trimmed) ? trimmed : null;
+}
+
 /* ------------------------------- game modes ------------------------------- */
 
 export async function getGameModes(): Promise<BAGameMode[]> {
