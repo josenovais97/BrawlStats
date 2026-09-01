@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { BrawlersIcon } from '@/components/game-icons';
+import { MapMatchups } from '@/components/maps/map-matchups';
 import { MapPickList } from '@/components/maps/map-pick-list';
 import { MapPreview } from '@/components/ranked/map-preview';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
@@ -22,6 +23,7 @@ import {
   MAP_ROTATION_GRACE_DAYS,
   RANKED_MAP_WINDOW_DAYS,
   getBestPicksByMode,
+  getMapMatchups,
   getRankedMapPicks,
 } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
@@ -93,6 +95,10 @@ export default async function MapPage({ params }: PageProps) {
   const accent = entry.mode?.color ?? '#8b95b8';
 
   const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
+  // One cached pass covers every map; this picks its own out of it.
+  const matchups = await getMapMatchups()
+    .then((byMap) => byMap.get(entry.map.name) ?? [])
+    .catch(() => []);
   // Layout and environment. The mode is passed so a map name shared across
   // modes cannot pick up the wrong page's description.
   const mapWiki = await getMapWiki(entry.map.name, modeLabel).catch(() => null);
@@ -293,6 +299,21 @@ export default async function MapPage({ params }: PageProps) {
           </p>
         ) : null}
       </section>
+
+      {matchups.length > 0 ? (
+        <section>
+          <SectionHeading
+            title="Matchups on this map"
+            subtitle={`Where a brawler does measurably better or worse against a specific opponent here than it does on ${entry.map.name} generally.`}
+          />
+          <MapMatchups matchups={matchups} brawlerMeta={brawlerMeta} />
+          <p className="mt-3 text-xs leading-relaxed text-muted">
+            Each row is measured against that brawler&rsquo;s own record on this map, so a map
+            that simply favours a brawler does not make all of its matchups look winning. Only
+            matchups with at least 40 sampled battles appear.
+          </p>
+        </section>
+      ) : null}
 
       {mapWiki?.layout ? (
         <section>

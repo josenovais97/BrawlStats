@@ -2629,6 +2629,110 @@ async function compute_getTeamComps(limit = 12): Promise<ModeComps[]> {
   }
 }
 
+export interface MapMatchup {
+  brawlerId: number;
+  againstBrawlerId: number;
+  battles: number;
+  winRate: number;
+  /** Against the same brawler's record on this map, not its record overall. */
+  edge: number;
+}
+
+/**
+ * Which brawlers beat which, on a specific map.
+ *
+ * The site already answers "who is good on this map" and "who beats this
+ * brawler". The gap between them is the question a draft actually asks: they
+ * have picked Shelly and we are on Hard Rock Mine, so does Nita beat her *here*
+ * — which is not the same as whether Nita beats her on average, because maps
+ * decide engagement range and cover far more than the roster does.
+ *
+ * Measured against the brawler's own record on the same map, so a map that
+ * simply favours a brawler does not make every one of its matchups look
+ * winning. That is the whole reason the baseline is per-map rather than global.
+ *
+ * 1,725 map-matchup cells clear 40 battles across 131 maps — around thirteen a
+ * map, which is a short honest list rather than a full grid. The grid would be
+ * 11,000 cells per map and almost all of them empty.
+ *
+ * Every map is computed in one pass and cached together, for the same reason
+ * comps are: the alternative is one full scan of the raw rows per map page.
+ */
+async function compute_getMapMatchups(limit = 8): Promise<Map<string, MapMatchup[]>> {
+  const prisma = getPrisma();
+  const out = new Map<string, MapMatchup[]>();
+  if (!prisma) return out;
+
+  try {
+    const since = windowStartUtc(COMP_WINDOW_DAYS);
+
+    const rows = await prisma.$queryRaw<
+      {
+        map_name: string;
+        a: number;
+        b: number;
+        wins: bigint;
+        decided: bigint;
+        base_wins: bigint;
+        base_decided: bigint;
+      }[]
+    >`
+      WITH faced AS (
+        SELECT map_name, brawler_id AS a, unnest(enemy_brawler_ids) AS b,
+          (result = 'victory')::int AS win
+        FROM battle_team_samples
+        WHERE battle_time >= ${since}
+          AND map_name IS NOT NULL
+          AND result IN ('victory', 'defeat')
+      ),
+      base AS (
+        SELECT map_name, a, SUM(win) AS wins, COUNT(*) AS decided
+        FROM faced GROUP BY map_name, a
+      )
+      SELECT f.map_name, f.a, f.b,
+        SUM(f.win) AS wins, COUNT(*) AS decided,
+        MAX(base.wins) AS base_wins, MAX(base.decided) AS base_decided
+      FROM faced f
+      JOIN base ON base.map_name = f.map_name AND base.a = f.a
+      GROUP BY f.map_name, f.a, f.b
+      HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
+    `;
+
+    for (const row of rows) {
+      const decided = Number(row.decided);
+      const baseDecided = Number(row.base_decided);
+      if (decided === 0 || baseDecided === 0) continue;
+
+      const winRate = Number(row.wins) / decided;
+      const edge = winRate - Number(row.base_wins) / baseDecided;
+      // A matchup that lands on the brawler's own map average is not a matchup.
+      if (Math.abs(edge) < 0.05) continue;
+
+      const list = out.get(row.map_name) ?? [];
+      list.push({
+        brawlerId: row.a,
+        againstBrawlerId: row.b,
+        battles: decided,
+        winRate,
+        edge,
+      });
+      out.set(row.map_name, list);
+    }
+
+    for (const [map, list] of out) {
+      out.set(
+        map,
+        list.sort((x, y) => Math.abs(y.edge) - Math.abs(x.edge)).slice(0, limit),
+      );
+    }
+
+    return out;
+  } catch (error) {
+    swallow('compute_getMapMatchups', error);
+    return out;
+  }
+}
+
 /** How a brawler does against a specific set of opponents. */
 export interface CounterScore {
   brawlerId: number;
@@ -3489,6 +3593,7 @@ export async function getRankedMapPicks(
 export const getBrawlerSplits = cachedRead('brawler-splits', compute_getBrawlerSplits);
 export const getBrawlerPairings = cachedRead('brawler-pairings', compute_getBrawlerPairings);
 export const getTeamComps = cachedRead('team-comps', compute_getTeamComps);
+export const getMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
 export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
 export const getBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
 export const getBrawlerAbilityChoices = cachedRead('brawler-ability-choices', compute_getBrawlerAbilityChoices);
