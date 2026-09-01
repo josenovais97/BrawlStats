@@ -6,7 +6,8 @@ import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
 import { PAIR_SEPARATOR } from '@/lib/compare';
-import { getFilterableModes, getIndexablePairs } from '@/lib/stats';
+import { getFilterableModes, getIndexablePairs, getTeamComps } from '@/lib/stats';
+import { getGameModeMap } from '@/lib/brawlapi';
 
 /**
  * The site's fixed routes, plus a page per brawler, map, mode and top-ranked
@@ -39,6 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/ranked', 'daily', 0.8],
     ['/brawlers', 'weekly', 0.8],
     ['/draft', 'weekly', 0.8],
+    ['/comps', 'daily', 0.8],
     ['/compare', 'weekly', 0.7],
     ['/events', 'hourly', 0.7],
     ['/leaderboard', 'daily', 0.7],
@@ -101,8 +103,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const group of groupByMode(maps)) {
     add(`/maps/${group.mode}`, 'weekly', 0.7);
   }
+
   for (const entry of maps) {
     add(`/maps/${entry.modeSlug}/${entry.mapSlug}`, 'daily', 0.7);
+  }
+
+  // One per mode that actually has comps clearing the sample floor. Listed off
+  // the same source the route resolves against, so the sitemap cannot advertise
+  // a mode whose page would 404.
+  const comps = await getTeamComps().catch(() => []);
+  const modeNames = await getGameModeMap().catch(() => new Map());
+  for (const mode of comps) {
+    if (mode.comps.length === 0) continue;
+    add(`/comps/${slugify(modeNames.get(mode.mode)?.name ?? mode.mode)}`, 'daily', 0.7);
   }
 
   // Per-mode tier lists, listed only for the modes that actually have enough

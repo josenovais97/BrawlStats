@@ -4,6 +4,7 @@ import {
   ChevronDown,
   Menu,
   Newspaper,
+  Swords,
   ScrollText,
   Search,
   X,
@@ -66,6 +67,11 @@ const NAV: NavItem[] = [
  * comparison) or is a page people come back to rather than look for.
  */
 const MORE: NavItem[] = [
+  // Team comps answers a question people ask before a match rather than after
+  // one, so it would earn a permanent slot if there were a seventh. There is
+  // not — see above — and the draft helper is the main bar's entry point into
+  // the same question.
+  { href: '/comps', label: 'Team Comps', icon: Swords },
   // Events is the one demotion that costs something: it is a page people do
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.

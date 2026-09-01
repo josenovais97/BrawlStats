@@ -2427,6 +2427,189 @@ async function compute_getBrawlerPairings(
   }
 }
 
+/**
+ * A trio needs more evidence than a pair before it says anything.
+ *
+ * Twenty decided battles, measured: 1,566 trios clear it and 210 clear fifty.
+ * The same question asked in October returned 107 and 1, which is why comps
+ * were declined then — the pool was a third the size. The floor is what stops
+ * the list being a leaderboard of three-battle flukes, and shrinkage below
+ * handles what is left.
+ */
+const MIN_SAMPLE_FOR_COMP = 20;
+
+/**
+ * How many DIFFERENT players must have used a comp before it counts.
+ *
+ * This is the one that matters, and it is not obvious. A trio of brawlers is a
+ * proxy for a trio of *players*: three friends who queue together always bring
+ * the same comp, so a strong premade team writes its own win rate into whatever
+ * it happens to play. Measured over 14 days of Brawl Ball, win rate was almost
+ * a pure function of how many distinct players a comp had:
+ *
+ *     1 player  -> 87.0%      5 players -> 81.6%
+ *     2 players -> 80.9%     10 players -> 69.7%
+ *     3 players -> 82.8%     12 players -> 64.0%
+ *
+ * The mode's own baseline over the same window is ~66%, so at ten distinct
+ * players the effect has washed out and above it the numbers are about the
+ * comp. Ranking on battles alone would have published a "best comps" page that
+ * silently ranked which small groups of strong players exist — every entry at
+ * a flat 100%, which is what gave it away.
+ *
+ * Ten costs most of the roster: 240 Brawl Ball comps survive where 536 cleared
+ * the battle floor alone. That is the right trade. The thinner modes drop to
+ * single digits and say so rather than showing a list built from one clan.
+ */
+const MIN_DISTINCT_PLAYERS_FOR_COMP = 10;
+
+/**
+ * How far back comps read.
+ *
+ * Straight off the raw team rows rather than a roll-up, because a trio is not
+ * a shape any roll-up keeps: `brawler_pair_daily` folds a battle into pairs and
+ * `brawler_team_daily` folds it into single brawlers, and neither can be
+ * reassembled into "these three, together". A fourth roll-up would mean a
+ * migration and a new storage plateau to re-derive, for a query measured at
+ * 935ms over 250k rows — which, cached for three hours, runs eight times a day.
+ *
+ * Bounded by RAW_BATTLE_RETENTION_DAYS in lib/aggregation, which is 14 and
+ * deliberate. Under storage pressure the prune shortens that window, and this
+ * thins out with it rather than breaking: fewer trios clear the floor, and the
+ * page says so instead of inventing them.
+ */
+const COMP_WINDOW_DAYS = 14;
+
+export interface TeamComp {
+  /** Ascending, so the same three brawlers are always the same comp. */
+  brawlerIds: number[];
+  battles: number;
+  /** Distinct players who used it — the sample size that actually matters. */
+  players: number;
+  winRate: number;
+  /** 0.5 is the mode's own average, so a comp is judged against its mode. */
+  normalizedWinRate: number | null;
+  edge: number;
+}
+
+export interface ModeComps {
+  mode: string;
+  baseline: number;
+  sampleSize: number;
+  comps: TeamComp[];
+}
+
+/**
+ * The trios that actually win, per mode.
+ *
+ * Measured against the mode rather than the roster, because modes do not share
+ * a baseline — a comp that wins 54% of Heist matches has done something; the
+ * same number in a mode the sample wins 54% of anyway has done nothing. The
+ * mode's own rate is subtracted first, and `normalizeWinRate` then shrinks
+ * toward it, so a 20-battle comp has to be genuinely better to outrank a
+ * 200-battle one.
+ *
+ * Every mode is computed in one pass and cached together. Splitting it per
+ * mode would repeat the same scan nine times for one page.
+ *
+ * Both Ranked and ladder count. Ladder is the larger half and its teams are
+ * matched at random, which — for measuring whether three brawlers work
+ * together — is a cleaner experiment than Ranked, where a good drafter picks
+ * good comps and the two effects cannot be separated.
+ */
+async function compute_getTeamComps(limit = 12): Promise<ModeComps[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(COMP_WINDOW_DAYS);
+
+    const [totals, trios] = await Promise.all([
+      prisma.$queryRaw<{ mode: string; wins: bigint; decided: bigint }[]>`
+        SELECT mode,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples
+        WHERE battle_time >= ${since}
+          AND array_length(ally_brawler_ids, 1) = 2
+          AND result IN ('victory', 'defeat')
+        GROUP BY mode
+      `,
+      /*
+       * `battle_key` is unique per row, so a battle contributes to a trio once
+       * even when several of its players are in the sampled pool — checked,
+       * because counting the same win three times would inflate exactly the
+       * comps that are most popular among sampled players.
+       */
+      prisma.$queryRaw<
+        { mode: string; trio: number[]; wins: bigint; decided: bigint; players: bigint }[]
+      >`
+        WITH teams AS (
+          SELECT mode, player_tag,
+            (SELECT array_agg(x ORDER BY x) FROM unnest(ally_brawler_ids || brawler_id) AS x) AS trio,
+            result
+          FROM battle_team_samples
+          WHERE battle_time >= ${since}
+            AND array_length(ally_brawler_ids, 1) = 2
+            AND result IN ('victory', 'defeat')
+        )
+        SELECT mode, trio,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided,
+          COUNT(DISTINCT player_tag) AS players
+        FROM teams
+        GROUP BY mode, trio
+        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
+           AND COUNT(DISTINCT player_tag) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP}
+      `,
+    ]);
+
+    const baselines = new Map(
+      totals.map((row) => [
+        row.mode,
+        {
+          baseline: Number(row.decided) > 0 ? Number(row.wins) / Number(row.decided) : 0.5,
+          sampleSize: Number(row.decided),
+        },
+      ]),
+    );
+
+    const byMode = new Map<string, TeamComp[]>();
+    for (const row of trios) {
+      const base = baselines.get(row.mode);
+      if (!base) continue;
+
+      const battles = Number(row.decided);
+      const winRate = Number(row.wins) / battles;
+      const list = byMode.get(row.mode) ?? [];
+      list.push({
+        brawlerIds: row.trio,
+        battles,
+        players: Number(row.players),
+        winRate,
+        normalizedWinRate: normalizeWinRate(winRate, base.baseline, battles),
+        edge: winRate - base.baseline,
+      });
+      byMode.set(row.mode, list);
+    }
+
+    return [...byMode.entries()]
+      .map(([mode, comps]) => ({
+        mode,
+        baseline: baselines.get(mode)?.baseline ?? 0.5,
+        sampleSize: baselines.get(mode)?.sampleSize ?? 0,
+        comps: comps
+          .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))
+          .slice(0, limit),
+      }))
+      // Most-played mode first: it is the one most readers came for.
+      .sort((a, b) => b.sampleSize - a.sampleSize);
+  } catch (error) {
+    swallow('compute_getTeamComps', error);
+    return [];
+  }
+}
+
 /** How a brawler does against a specific set of opponents. */
 export interface CounterScore {
   brawlerId: number;
@@ -3286,6 +3469,7 @@ export async function getRankedMapPicks(
 /* The reads above, cached. See `cachedRead`. */
 export const getBrawlerSplits = cachedRead('brawler-splits', compute_getBrawlerSplits);
 export const getBrawlerPairings = cachedRead('brawler-pairings', compute_getBrawlerPairings);
+export const getTeamComps = cachedRead('team-comps', compute_getTeamComps);
 export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
 export const getBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
 export const getBrawlerAbilityChoices = cachedRead('brawler-ability-choices', compute_getBrawlerAbilityChoices);
