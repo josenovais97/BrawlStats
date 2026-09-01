@@ -236,6 +236,23 @@ export function CompareIcon({ className }: IconProps) {
   return <GameIcon src="/icons/compare.png" alt="Compare" className={className} />;
 }
 
+/**
+ * Official Brawl Stars news posts, and the update notes behind them.
+ *
+ * Sourced from the wiki rather than the CDN, which publishes only game
+ * entities — brawlers, maps, gadgets — and nothing for the parts of the site
+ * that are about the game rather than in it. These two were the last nav
+ * entries still drawing a generic line icon, which reads as a hole in a menu
+ * where everything else is game art.
+ */
+export function NewsIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/news.png" alt="News" className={className} />;
+}
+
+export function ReleaseNotesIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/release-notes.png" alt="Release notes" className={className} />;
+}
+
 /** The live event rotation. */
 export function EventsIcon({ className }: IconProps) {
   return <GameIcon src="/icons/events.png" alt="Events" className={className} />;

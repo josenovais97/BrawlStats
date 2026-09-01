@@ -3,8 +3,6 @@
 import {
   ChevronDown,
   Menu,
-  Newspaper,
-  ScrollText,
   Search,
   X,
 } from 'lucide-react';
@@ -24,7 +22,9 @@ import {
   EventsIcon,
   LeaderboardIcon,
   MapsIcon,
+  NewsIcon,
   RankedIcon,
+  ReleaseNotesIcon,
   StarrDropIcon,
   TierListIcon,
   TrophyGainIcon,
@@ -94,8 +94,8 @@ const MORE: NavItem[] = [
   { href: '/tier-list/maker', label: 'Tier List Maker', icon: TierListIcon },
   { href: '/starr-drops', label: 'Starr Drops', icon: StarrDropIcon },
   { href: '/cosmetics', label: 'Cosmetics', icon: CosmeticsIcon },
-  { href: '/news', label: 'News', icon: Newspaper },
-  { href: '/release-notes', label: 'Release Notes', icon: ScrollText },
+  { href: '/news', label: 'News', icon: NewsIcon },
+  { href: '/release-notes', label: 'Release Notes', icon: ReleaseNotesIcon },
 ];
 
 /** The mobile panel has room for the lot, so it never hides anything. */
