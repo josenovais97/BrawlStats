@@ -336,3 +336,57 @@ export function changesFromNotes(
 
   return out;
 }
+
+export interface BalanceEvent {
+  /** ISO date the update was published. */
+  date: string;
+  categories: ChangeCategory[];
+  title: string;
+  url: string;
+}
+
+/**
+ * When a brawler was last touched by an update, for annotating its trend.
+ *
+ * A win-rate line on its own invites the reader to invent a cause for every
+ * bend in it. Most bends are the map rotation or noise; the ones that are not
+ * have a date attached, and Supercell publishes it. Marking the update on the
+ * chart is the difference between "Brock is trending down" and "Brock was
+ * nerfed on 1 September and here is what happened after".
+ *
+ * Notes are monthly, so a 30-day chart carries at most one or two marks —
+ * which is the honest resolution. The API gives no per-change timestamp finer
+ * than the post itself, and pretending otherwise would put a mark on a day
+ * nothing happened.
+ *
+ * Only categories that can move a win rate count. A brawler named solely under
+ * "new skins" has not been changed, and a mark there would be a false cause.
+ */
+const BALANCE_CATEGORIES: ChangeCategory[] = ['balance', 'buffies', 'hypercharges'];
+
+export async function getBalanceEvents(
+  brawlerName: string,
+  months = 2,
+  now = new Date(),
+): Promise<BalanceEvent[]> {
+  const events: BalanceEvent[] = [];
+
+  for (const slug of monthSlugsBackFrom(now, months)) {
+    const notes = await fetchNotes(slug);
+    if (!notes?.publishedAt) continue;
+
+    const categories = changesFromNotes(notes, [brawlerName])
+      .filter((change) => BALANCE_CATEGORIES.includes(change.category))
+      .map((change) => change.category);
+
+    if (categories.length === 0) continue;
+    events.push({
+      date: notes.publishedAt,
+      categories,
+      title: notes.title,
+      url: notes.url,
+    });
+  }
+
+  return events;
+}

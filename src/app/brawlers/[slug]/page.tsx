@@ -30,6 +30,7 @@ import {
   wikiPageUrl,
 } from '@/lib/brawler-wiki';
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getBalanceEvents } from '@/lib/release-notes';
 import { getWikiAbilityArt, getWikiModel } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
@@ -445,6 +446,13 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // than the page.
   const splits = await getBrawlerSplits(brawlerId);
   const trend = await getBrawlerTrend(brawlerId);
+  /*
+   * Only worth fetching when there is a chart to annotate: this walks the last
+   * two months of Supercell's blog, and a brawler with no trend has nothing to
+   * mark. Degrades to no marks rather than no chart.
+   */
+  const balanceEvents =
+    trend.length >= 3 ? await getBalanceEvents(brawler.name).catch(() => []) : [];
   // Fetched together: the matchup rows need to know which of their pairs the
   // sitemap actually claims, so a non-indexable one can be nofollowed rather
   // than quietly widening the crawlable set. See BrawlerMatchups.
@@ -868,7 +876,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
         {trend.length > 0 ? (
           <div className="mt-3">
-            <BrawlerTrend points={trend} accent={accent} />
+            <BrawlerTrend points={trend} accent={accent} events={balanceEvents} />
           </div>
         ) : null}
       </section>

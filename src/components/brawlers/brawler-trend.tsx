@@ -1,5 +1,15 @@
 import { formatPercent } from '@/lib/format';
+import { CHANGE_LABEL, type BalanceEvent } from '@/lib/release-notes';
 import type { BrawlerTrendPoint } from '@/lib/stats';
+
+/** UTC-anchored so the server and the browser format the same string. */
+function shortDate(iso: string): string {
+  return new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  });
+}
 
 /**
  * A brawler's adjusted win rate over the stored snapshots.
@@ -17,9 +27,11 @@ import type { BrawlerTrendPoint } from '@/lib/stats';
 export function BrawlerTrend({
   points,
   accent,
+  events = [],
 }: {
   points: BrawlerTrendPoint[];
   accent: string;
+  events?: BalanceEvent[];
 }) {
   const usable = points.filter(
     (p): p is BrawlerTrendPoint & { normalizedWinRate: number } =>
@@ -54,6 +66,21 @@ export function BrawlerTrend({
   const delta = last - first;
   const days = usable.length;
 
+  /*
+   * Each update is placed on the first snapshot at or after it was published,
+   * because that is the first day the chart could possibly show its effect.
+   * An update older than the window has no position on this chart and is
+   * dropped rather than pinned to the left edge, where it would read as having
+   * happened at the start of the period.
+   */
+  const marks = events
+    .map((event) => {
+      const day = event.date.slice(0, 10);
+      const index = usable.findIndex((p) => p.date.slice(0, 10) >= day);
+      return index === -1 ? null : { event, index };
+    })
+    .filter((m): m is { event: BalanceEvent; index: number } => m !== null);
+
   return (
     <div className="card p-4">
       <div className="flex items-baseline justify-between gap-3">
@@ -75,28 +102,73 @@ export function BrawlerTrend({
         </p>
       </div>
 
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        preserveAspectRatio="none"
-        className="mt-3 h-16 w-full"
-        role="img"
-        aria-label={`Adjusted win rate over the last ${days} daily snapshots, from ${formatPercent(first)} to ${formatPercent(last)}`}
-      >
-        <path d={area} fill={accent} opacity={0.16} />
-        <path
-          d={line}
-          fill="none"
-          stroke={accent}
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
+      {/* The markers are HTML over the chart rather than SVG inside it: the
+          viewBox is stretched by `preserveAspectRatio="none"`, which would
+          shear any text drawn in it. */}
+      <div className="relative mt-3">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="none"
+          className="h-16 w-full"
+          role="img"
+          aria-label={`Adjusted win rate over the last ${days} daily snapshots, from ${formatPercent(first)} to ${formatPercent(last)}${
+            marks.length > 0
+              ? `. Balance updates on ${marks.map((m) => shortDate(m.event.date)).join(' and ')}.`
+              : ''
+          }`}
+        >
+          <path d={area} fill={accent} opacity={0.16} />
+          <path
+            d={line}
+            fill="none"
+            stroke={accent}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        {marks.map(({ event, index }) => (
+          <span
+            key={event.date}
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 w-px border-l border-dashed border-foreground/45"
+            style={{ left: `${(index / (usable.length - 1)) * 100}%` }}
+          >
+            <span className="absolute -top-1 -left-[3px] size-1.5 rounded-full bg-foreground/70" />
+          </span>
+        ))}
+      </div>
+
+      {marks.length > 0 ? (
+        <ul className="mt-2 space-y-1">
+          {marks.map(({ event }) => (
+            <li key={event.date} className="flex flex-wrap items-baseline gap-x-2 text-xs">
+              <span className="inline-flex items-center gap-1.5 font-semibold">
+                <span aria-hidden className="size-1.5 rounded-full bg-foreground/70" />
+                {shortDate(event.date)}
+              </span>
+              <span className="text-muted">
+                {event.categories.map((c) => CHANGE_LABEL[c]).join(' · ')}
+              </span>
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand transition-colors hover:underline"
+              >
+                Patch notes
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       <p className="mt-2 text-xs text-muted">
         {days} daily snapshots. Adjusted against the sample average, so a shift here
         is the brawler moving rather than the cohort.
+        {marks.length > 0 ? ' Dashed lines mark updates that changed this brawler.' : ''}
       </p>
     </div>
   );
