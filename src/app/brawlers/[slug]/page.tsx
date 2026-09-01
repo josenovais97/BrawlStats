@@ -331,7 +331,69 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   if (resolved.numeric) permanentRedirect(`/brawlers/${resolved.slug}`);
 
   const brawlerId = resolved.id;
-  const brawler = await getBrawler(brawlerId).catch(() => undefined);
+  let brawler = await getBrawler(brawlerId).catch(() => undefined);
+
+  /*
+   * The artwork mirror is not allowed to decide whether a brawler exists.
+   *
+   * This page used to bail the moment `getBrawler` came back empty, which made
+   * the mirror a hard dependency for a page whose facts come from three other
+   * places. On 2026-09-01 that took both brand-new brawlers offline: the game
+   * API listed them, the wiki had their stats, artwork and every ability name,
+   * the catalogue held them with a real id — and the page still said "no
+   * brawler exists with that id", on the two highest-traffic pages of the
+   * month.
+   *
+   * The mirror stays the preferred source, because it is complete for
+   * everything already released and its shapes are richer. But when it has
+   * nothing, the page is now assembled from the catalogue (name, artwork,
+   * class and rarity, wiki-backed) and the official API (star powers and
+   * gadgets), and renders degraded rather than not at all.
+   */
+  if (!brawler) {
+    const [catalogue, official] = await Promise.all([
+      getBrawlerCatalog().catch(() => null),
+      getOfficialBrawlers()
+        .then((r) => r.items)
+        .catch(() => []),
+    ]);
+    const entry = catalogue?.byId.get(brawlerId);
+    const live = official.find((b) => b.id === brawlerId);
+
+    if (entry) {
+      const accessory = (a: { id: number; name: string }): BAAccessory => ({
+        id: a.id,
+        name: a.name,
+        description: '',
+        descriptionHtml: '',
+        // The mirror hosts accessory icons; without it there is no image to
+        // point at, and a broken one is worse than none.
+        imageUrl: '',
+        released: true,
+      });
+
+      brawler = {
+        id: entry.id,
+        name: entry.name,
+        imageUrl: entry.imageUrl,
+        description: '',
+        class: { id: 0, name: entry.className ?? '' },
+        rarity: { id: 0, name: entry.rarityName ?? '', color: entry.rarityColor ?? '#8b95b8' },
+        starPowers: (live?.starPowers ?? []).map(accessory),
+        gadgets: (live?.gadgets ?? []).map(accessory),
+        // Unused by this page; present to satisfy the mirror's shape.
+        avatarId: 0,
+        hash: '',
+        path: '',
+        fankit: '',
+        released: true,
+        version: 0,
+        link: '',
+        imageUrl2: entry.imageUrl,
+        imageUrl3: entry.imageUrl,
+      } as BABrawler;
+    }
+  }
 
   if (!brawler) {
     return (
