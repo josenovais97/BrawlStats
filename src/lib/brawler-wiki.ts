@@ -1,3 +1,4 @@
+import { titleCase } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import {
   WIKI_API,
@@ -214,7 +215,21 @@ async function fetchPage(name: string): Promise<WikiPage | null> {
  * resolves the spelling differences between sources ("Jae-Yong" to "Jae-yong").
  */
 export async function getBrawlerWiki(name: string): Promise<BrawlerWiki | null> {
-  const page = await fetchPage(name);
+  /*
+   * Casing is normalised here, not by callers.
+   *
+   * The official game API returns names shouted — "COSMO" — and any brawler
+   * the artwork mirror has not added yet takes its name from there. MediaWiki
+   * matches page titles case-sensitively past the first letter, so "COSMO"
+   * finds nothing where "Cosmo" finds everything.
+   *
+   * Fixed at the source after patching it in two callers and still missing a
+   * third: the brawler page asked for "COSMO" on launch day and silently got
+   * null, which gated off its whole combat-stats section while the wiki had
+   * every number. Any future caller passing an API name would have hit the
+   * same wall.
+   */
+  const page = (await fetchPage(titleCase(name))) ?? (await fetchPage(name));
   if (!page) return null;
 
   const { wikitext } = page;

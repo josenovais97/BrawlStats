@@ -43,6 +43,7 @@ import {
   wikiPageUrl,
 } from '@/lib/brawler-wiki';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getWikiAbilityArt } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
 import { currentMonth } from '@/lib/site';
@@ -351,24 +352,29 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * gadgets), and renders degraded rather than not at all.
    */
   if (!brawler) {
-    const [catalogue, official] = await Promise.all([
+    const [catalogue, official, abilityArt] = await Promise.all([
       getBrawlerCatalog().catch(() => null),
       getOfficialBrawlers()
         .then((r) => r.items)
         .catch(() => []),
+      getWikiAbilityArt(resolved.slug).catch(() => ({ gadgets: [], starPowers: [] })),
     ]);
     const entry = catalogue?.byId.get(brawlerId);
-    const live = official.find((b) => b.id === brawlerId);
+    const live = official.find((b: { id: number }) => b.id === brawlerId);
 
     if (entry) {
-      const accessory = (a: { id: number; name: string }): BAAccessory => ({
+      /*
+       * Icons come from the wiki, paired by index. The game API lists gadgets
+       * and star powers in the order the wiki numbers its files, and an empty
+       * src renders as an empty box — which is what this page showed on
+       * launch day, four blank squares beside four real ability names.
+       */
+      const accessory = (art: string[]) => (a: { id: number; name: string }, i: number): BAAccessory => ({
         id: a.id,
         name: a.name,
         description: '',
         descriptionHtml: '',
-        // The mirror hosts accessory icons; without it there is no image to
-        // point at, and a broken one is worse than none.
-        imageUrl: '',
+        imageUrl: art[i] ?? '',
         released: true,
       });
 
@@ -379,8 +385,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         description: '',
         class: { id: 0, name: entry.className ?? '' },
         rarity: { id: 0, name: entry.rarityName ?? '', color: entry.rarityColor ?? '#8b95b8' },
-        starPowers: (live?.starPowers ?? []).map(accessory),
-        gadgets: (live?.gadgets ?? []).map(accessory),
+        starPowers: (live?.starPowers ?? []).map(accessory(abilityArt.starPowers)),
+        gadgets: (live?.gadgets ?? []).map(accessory(abilityArt.gadgets)),
         // Unused by this page; present to satisfy the mirror's shape.
         avatarId: 0,
         hash: '',

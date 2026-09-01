@@ -91,3 +91,53 @@ async function fetchPortraits(names: string[]): Promise<[string, string][]> {
 
 /** Keyed by lowercased name. Empty when the wiki is unreachable. */
 export const getWikiPortraits = cached('wiki-portraits', fetchPortraits, REVALIDATE);
+
+/**
+ * Gadget and star power icons, in the order the wiki numbers them.
+ *
+ * Filed as "GD-<Name>1.png" and "SP-<Name>1.png", which is a different
+ * spelling of the name from the portrait's: Mr. P keeps the space in
+ * "Mr. P Portrait.png" and loses it in "GD-Mr.P1.png". Both are tried.
+ *
+ * Ordered, because that is what lets an icon be paired with an ability the
+ * game API named: the API lists gadgets and star powers in the same order the
+ * wiki numbers them, and neither carries the other's label.
+ */
+async function abilityIcons(prefix: string): Promise<string[]> {
+  try {
+    const url = new URL(WIKI_API);
+    url.searchParams.set('action', 'query');
+    url.searchParams.set('list', 'allimages');
+    url.searchParams.set('aiprefix', prefix);
+    url.searchParams.set('ailimit', '8');
+    url.searchParams.set('aiprop', 'url');
+    url.searchParams.set('format', 'json');
+    const res = await fetch(url, {
+      headers: { 'user-agent': 'BrawlZone (+https://brawlzone.net)' },
+      next: { revalidate: REVALIDATE },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) return [];
+    const body = (await res.json()) as { query?: { allimages?: { name: string; url: string }[] } };
+    return (body.query?.allimages ?? [])
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((i) => i.url);
+  } catch {
+    return [];
+  }
+}
+
+async function fetchAbilityArt(name: string): Promise<{ gadgets: string[]; starPowers: string[] }> {
+  const forms = [...new Set([titleCase(name), name])].flatMap((n) => [n, n.replace(/\.\s+/g, '.')]);
+  for (const form of forms) {
+    const [gadgets, starPowers] = await Promise.all([
+      abilityIcons(`GD-${form}`),
+      abilityIcons(`SP-${form}`),
+    ]);
+    if (gadgets.length > 0 || starPowers.length > 0) return { gadgets, starPowers };
+  }
+  return { gadgets: [], starPowers: [] };
+}
+
+/** Ability icons for one brawler, for when the mirror has none. */
+export const getWikiAbilityArt = cached('wiki-ability-art', fetchAbilityArt, REVALIDATE);
