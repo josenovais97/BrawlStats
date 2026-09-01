@@ -26,6 +26,7 @@ learned expensively.
 | Sampler | **systemd timer on the box**, `brawlzone-sampler`, every 2h at :17 |
 | Deploys | **systemd timer**, `brawlzone-deploy`, every 5 min: resets to `origin/main` and rebuilds if HEAD moved |
 | Backups | **systemd timer**, `brawlzone-backup`, nightly 03:30 UTC, 7 daily + 4 weekly |
+| Backup proof | **systemd timer**, `brawlzone-verify-restore`, Mondays 04:30 UTC, restores into a scratch database |
 | DNS | Cloudflare, A records **DNS-only (grey cloud)** for apex and `www` |
 
 The box is a mirror of `origin/main` — the deploy timer resets to it, so **never
@@ -42,9 +43,19 @@ fallbacks; DNS no longer points at either.
 
 **Backups are yours now.** Supabase did them invisibly. `~/backup-db.sh` dumps
 from inside the container and refuses to promote a dump with fewer than 17
-tables. Restore has been tested into a scratch database, not assumed. The dumps
-still sit on the same disk as the database, so they defend against operator
-error but **not** against losing the box — an off-box copy is still owed.
+tables — but that is a check on the *file*, not on whether the SQL inside it
+replays. `brawlzone-verify-restore` closes that gap weekly: it restores the
+newest dump into a scratch database beside the live one and asserts the result
+is something the site would accept — table count matching live, rows in the
+tables the site cannot render without, and a newest battle day under three days
+old. It refuses to run without 4 GB free, and drops the scratch database on
+every exit path. A first real run took 13s for 17 tables and 369 MB.
+
+The dumps still sit on the same disk as the database, so on their own they
+defend against operator error but not against losing the box. A
+`brawlzone-pull-backup` user timer on the workstation copies them off nightly
+at 09:00, so that debt is paid — but it lives on the workstation, not here, and
+nothing on the box would notice if it stopped.
 
 **Storage stopped being someone else's plan limit.** `STORAGE_LIMIT_BYTES` is
 now 8 GB, a slice of the 45 GB volume rather than a free tier, and is ~50x the
