@@ -251,39 +251,34 @@ export function brawlerModelUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/model/${brawlerId}.png`;
 }
 
-/** A render that exists will not stop existing; a missing one might land. */
-const MODEL_TTL_FOUND = 86_400_000;
-const MODEL_TTL_MISSING = 3_600_000;
+/** Artwork that exists will not stop existing; a missing file might land. */
+const ART_TTL_FOUND = 86_400_000;
+const ART_TTL_MISSING = 3_600_000;
 
-interface ModelProbe {
+interface ArtProbe {
   expires: number;
   result: Promise<boolean>;
 }
 
-const modelProbes = new Map<number, ModelProbe>();
+const artProbes = new Map<string, ArtProbe>();
 
 /**
- * Whether a full-body render actually exists for a brawler.
+ * Whether a CDN artwork file actually exists, by asking for its headers.
  *
- * The CDN publishes `/model/` weeks behind a release — Nori and Wendy both 404
- * today — and nothing in the metadata says so: the payload hands out an
- * `imageUrl` for the portrait and never mentions the render at all. So the only
- * honest answer comes from asking, which is one HEAD request.
- *
- * Worth asking because the hero puts the live top three on a podium: whoever is
- * winning this week is exactly the brawler whose art has not landed yet, and a
- * broken image is the one thing a landing page cannot show.
+ * The mirror builds every artwork URL from a brawler id, so a file it has not
+ * published yet does not fall back — it 404s, and nothing in the metadata says
+ * so. Only asking gives an honest answer, and it costs one HEAD request.
  *
  * Memoised in-process rather than through the data cache, which only stores
- * GET. Left on default fetch semantics deliberately — `no-store` would opt the
- * whole landing page out of static rendering to ask a question whose answer
- * changes once per brawler, ever.
+ * GET. Left on default fetch semantics deliberately — `no-store` would opt a
+ * whole page out of static rendering to ask a question whose answer changes
+ * once per brawler, ever.
  */
-export function hasBrawlerModel(brawlerId: number): Promise<boolean> {
-  const cached = modelProbes.get(brawlerId);
+function hasArtwork(url: string): Promise<boolean> {
+  const cached = artProbes.get(url);
   if (cached && cached.expires > Date.now()) return cached.result;
 
-  const result: Promise<boolean> = fetch(brawlerModelUrl(brawlerId), {
+  const result: Promise<boolean> = fetch(url, {
     method: 'HEAD',
     signal: AbortSignal.timeout(5_000),
   })
@@ -295,8 +290,8 @@ export function hasBrawlerModel(brawlerId: number): Promise<boolean> {
      */
     .catch(() => true)
     .then((found) => {
-      modelProbes.set(brawlerId, {
-        expires: Date.now() + (found ? MODEL_TTL_FOUND : MODEL_TTL_MISSING),
+      artProbes.set(url, {
+        expires: Date.now() + (found ? ART_TTL_FOUND : ART_TTL_MISSING),
         result,
       });
       return found;
@@ -304,8 +299,34 @@ export function hasBrawlerModel(brawlerId: number): Promise<boolean> {
 
   // Held on the short life while in flight, so a hung request cannot pin an
   // answer nobody has given yet.
-  modelProbes.set(brawlerId, { expires: Date.now() + MODEL_TTL_MISSING, result });
+  artProbes.set(url, { expires: Date.now() + ART_TTL_MISSING, result });
   return result;
+}
+
+/**
+ * Whether a full-body render exists.
+ *
+ * The CDN publishes `/model/` weeks behind a release, and the hero puts the
+ * live top three on a podium — whoever is winning this week is exactly the
+ * brawler whose art has not landed yet.
+ */
+export function hasBrawlerModel(brawlerId: number): Promise<boolean> {
+  return hasArtwork(brawlerModelUrl(brawlerId));
+}
+
+/**
+ * Whether the square portrait tile exists — the one every list on the site uses.
+ *
+ * Worth probing because the mirror publishes a brawler's *metadata* before its
+ * *artwork*. On 2026-09-01 Cosmo and Vince appeared in the payload with
+ * constructed `imageUrl`s that 404, which is a worse failure than being absent
+ * entirely: the catalogue's wiki-portrait fallback keyed on "the mirror has no
+ * entry", so the moment the entry arrived the fallback switched off and the
+ * roster rendered two broken images. Existence, not presence of a URL, is the
+ * question that matters.
+ */
+export function hasBrawlerPortrait(brawlerId: number): Promise<boolean> {
+  return hasArtwork(brawlerIconUrl(brawlerId));
 }
 
 /**

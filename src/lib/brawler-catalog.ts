@@ -1,4 +1,9 @@
-import { getBrawlerMap, getBrawlers, realBrawlerClass } from '@/lib/brawlapi';
+import {
+  getBrawlerMap,
+  getBrawlers,
+  hasBrawlerPortrait,
+  realBrawlerClass,
+} from '@/lib/brawlapi';
 import { getWikiBrawlerFacts } from '@/lib/brawler-classes';
 import { getWikiPortraits } from '@/lib/wiki-art';
 import { getOfficialBrawlers } from '@/lib/bs-api';
@@ -140,19 +145,41 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
    * leaves the field null, which is exactly the state this is improving on.
    */
   /*
-   * Portraits for anything the mirror has not caught up with. Normally this
-   * list is empty and costs nothing; it is non-empty only in the window after
-   * a release, which is the only time it matters.
+   * Portraits for anything the mirror has not caught up with.
+   *
+   * Keyed on whether the image *resolves*, not on whether the payload carries a
+   * URL. Those are not the same question: the mirror publishes a brawler's
+   * metadata before its artwork, so on 2026-09-01 Cosmo and Vince arrived with
+   * constructed `imageUrl`s that 404. The earlier test — "the mirror has no
+   * entry" — passed the moment the entry landed, which switched the fallback
+   * off and left two broken images on the roster page. A URL is not evidence of
+   * a file.
+   *
+   * One HEAD per brawler, memoised in-process for a day and answered from cache
+   * on every later call, so a warm catalogue build asks nothing. Bounded
+   * concurrency because it is the whole roster: unbounded, it is 109 sockets
+   * opened at once for a question that is almost always "yes".
    */
-  const unmirrored = all.filter((b) => !b.meta?.imageUrl).map((b) => b.name);
-  if (unmirrored.length > 0) {
-    const portraits = new Map(
-      await getWikiPortraits(unmirrored).catch(() => [] as [string, string][]),
+  const missingArt: string[] = [];
+  const CONCURRENCY = 12;
+  for (let i = 0; i < all.length; i += CONCURRENCY) {
+    const batch = all.slice(i, i + CONCURRENCY);
+    const present = await Promise.all(
+      batch.map((b) => (b.meta?.imageUrl ? hasBrawlerPortrait(b.id) : Promise.resolve(false))),
     );
+    batch.forEach((b, j) => {
+      if (!present[j]) missingArt.push(b.name);
+    });
+  }
+
+  if (missingArt.length > 0) {
+    const portraits = new Map(
+      await getWikiPortraits(missingArt).catch(() => [] as [string, string][]),
+    );
+    const wanted = new Set(missingArt);
     for (const brawler of all) {
-      if (!brawler.meta?.imageUrl) {
-        brawler.imageUrl = portraits.get(brawler.name.toLowerCase()) ?? brawler.imageUrl;
-      }
+      if (!wanted.has(brawler.name)) continue;
+      brawler.imageUrl = portraits.get(brawler.name.toLowerCase()) ?? brawler.imageUrl;
     }
   }
 
