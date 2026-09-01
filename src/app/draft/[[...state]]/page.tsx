@@ -12,6 +12,7 @@ import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl, getBrawlerMap, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, humanizeMode } from '@/lib/format';
 import { getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
+import { CompShape } from '@/components/draft/comp-shape';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
 
@@ -24,13 +25,7 @@ import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
  */
 const MAX_ALLIES = 2;
 import { slugify } from '@/lib/slugs';
-import {
-  RANKED_MAP_WINDOW_DAYS,
-  getBestPicksByMode,
-  getAllyScores,
-  getCounterScores,
-  getRankedMapPicks,
-} from '@/lib/stats';
+import { RANKED_MAP_WINDOW_DAYS, getAllyScores, getBestPicksByMode, getCounterScores, getRankedMapPicks, getRoleCompositions } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { ModePick, RankedMapPick, RankedMapPicks } from '@/types/stats';
 
@@ -150,6 +145,12 @@ export default async function DraftPage({ params }: PageProps) {
   // Sequential, like every other read here, so the page holds one connection.
   const counters = await getCounterScores(enemies);
   const synergies = await getAllyScores(allies);
+  /*
+   * Team shape, at role level. Sequential like the reads above so the page
+   * holds one connection, and cached so it costs one query per window rather
+   * than one per draft.
+   */
+  const roleComps = await getRoleCompositions().catch(() => null);
 
   // The map's own ranking is the starting order; the enemy line-up reorders it.
   // Both halves stay visible on the row, because "good here" and "good against
@@ -360,6 +361,18 @@ export default async function DraftPage({ params }: PageProps) {
               ) : null}
             </div>
           </section>
+
+          {/* After the team is named and before the recommendations: three
+              individually good picks can still be three assassins with no way
+              to hold a zone, and that is the one thing the rows below cannot
+              say. */}
+          {roleComps ? (
+            <CompShape
+              allies={allies}
+              roleOf={new Map(catalog.all.map((b) => [b.id, b.className]))}
+              comps={roleComps.comps}
+            />
+          ) : null}
 
           <section>
             <StepHeading
