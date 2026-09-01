@@ -64,6 +64,18 @@ const WEBSITE_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: SITE_NAME,
+  /*
+   * The spellings people actually type.
+   *
+   * Google treats `alternateName` as one of its signals for learning a site's
+   * name, and "brawl zone" as two words is ambiguous to it: the query already
+   * resolves to Brawl Stars' Hot Zone mode, an older Android game, a Bakugan
+   * product and several social accounts, all with years of history behind
+   * them. Declaring both spellings will not win that query on its own — that
+   * takes external mentions and time — but it is what tells Google the two
+   * refer to one site.
+   */
+  alternateName: ['Brawl Zone', 'BrawlZone.net'],
   url: SITE_URL,
   description:
     'Brawl Stars player and club statistics, brawler win rates, live event rotation and global leaderboards.',

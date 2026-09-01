@@ -51,6 +51,27 @@ export default function AboutPage() {
         subtitle="A fast, honest stats site for Brawl Stars. Built for players who want to know exactly where they stand."
       />
 
+      {/*
+        States the name in prose, which is the other half of the site-name
+        signal `alternateName` carries in the homepage schema.
+
+        Worth one sentence because "brawl zone" as two words is genuinely
+        ambiguous: it already resolves to Brawl Stars' Hot Zone mode, an older
+        Android game of the same name and a Bakugan product, all with years of
+        history. Written as a sentence a person would read rather than a list
+        of spellings, since a page that reads like it is talking to a crawler
+        is the wrong trade for a paragraph nobody needed.
+      */}
+      <p className="max-w-prose leading-relaxed text-muted">
+        BrawlZone — often written <strong className="text-foreground">Brawl Zone</strong> — is an
+        independent Brawl Stars statistics site covering player and club lookups, Ranked analysis
+        and brawler tier lists. It lives at{' '}
+        <a href="https://brawlzone.net" className="text-brand hover:underline">
+          brawlzone.net
+        </a>{' '}
+        and is not affiliated with Supercell.
+      </p>
+
       <section>
         <SectionHeading title="What it does" />
         <div className="grid gap-4 sm:grid-cols-2">
