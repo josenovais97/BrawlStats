@@ -1,5 +1,5 @@
 import { getBrawlers } from '@/lib/brawlapi';
-import { getWikiBrawlerClasses } from '@/lib/brawler-classes';
+import { getWikiBrawlerFacts } from '@/lib/brawler-classes';
 import { getWikiPortraits } from '@/lib/wiki-art';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
@@ -156,14 +156,33 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
     }
   }
 
-  const unclassified = all.filter((b) => b.className === null).map((b) => b.name);
+  const unclassified = all
+    .filter((b) => b.className === null || b.rarityName === null)
+    .map((b) => b.name);
   if (unclassified.length > 0) {
-    const wikiClasses = new Map(
-      await getWikiBrawlerClasses(unclassified).catch(() => [] as [string, string][]),
-    );
+    const facts = new Map(await getWikiBrawlerFacts(unclassified).catch(() => []));
+
+    /*
+     * Rarity colours are borrowed from a brawler that already has one, rather
+     * than hardcoded here. The mirror owns that palette, so copying a peer of
+     * the same rarity keeps a wiki-sourced brawler tinted exactly like every
+     * other Mythic instead of falling back to the neutral grey — which is what
+     * left the two newest brawlers with a grey pill and a grey card border.
+     */
+    const colourByRarity = new Map<string, string>();
+    for (const b of all) {
+      if (b.rarityName && b.rarityColor && !colourByRarity.has(b.rarityName)) {
+        colourByRarity.set(b.rarityName, b.rarityColor);
+      }
+    }
+
     for (const brawler of all) {
-      if (brawler.className === null) {
-        brawler.className = wikiClasses.get(brawler.name.toLowerCase()) ?? null;
+      const found = facts.get(brawler.name.toLowerCase());
+      if (!found) continue;
+      brawler.className ??= found.className;
+      if (brawler.rarityName === null && found.rarityName) {
+        brawler.rarityName = found.rarityName;
+        brawler.rarityColor = colourByRarity.get(found.rarityName) ?? brawler.rarityColor;
       }
     }
   }

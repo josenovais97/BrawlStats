@@ -26,11 +26,16 @@ import { titleCase } from '@/lib/format';
 /** A class is settled data; a day is generous and keeps this off the hot path. */
 const REVALIDATE = 86_400;
 
-async function fetchClasses(names: string[]): Promise<[string, string][]> {
+export interface WikiBrawlerFacts {
+  className: string | null;
+  rarityName: string | null;
+}
+
+async function fetchClasses(names: string[]): Promise<[string, WikiBrawlerFacts][]> {
   if (names.length === 0) return [];
 
   const found = await Promise.all(
-    names.map(async (name): Promise<[string, string] | null> => {
+    names.map(async (name): Promise<[string, WikiBrawlerFacts] | null> => {
       /*
        * Title-cased before asking. The official API shouts its names — "COSMO"
        * — and a brawler with no artwork-mirror entry takes its name from
@@ -40,15 +45,20 @@ async function fetchClasses(names: string[]): Promise<[string, string][]> {
       const wiki =
         (await getBrawlerWiki(titleCase(name)).catch(() => null)) ??
         (await getBrawlerWiki(name).catch(() => null));
-      const className = wiki?.stats.className?.trim();
-      // The wiki carries its own "Unknown" for a brawler nobody has written up
-      // yet, and echoing it would undo the point of asking.
-      if (!className || /unknown/i.test(className)) return null;
-      return [name.toLowerCase(), className];
+      const real = (value: string | null | undefined) => {
+        const trimmed = value?.trim();
+        // The wiki carries its own "Unknown" for a brawler nobody has written
+        // up yet, and echoing it would undo the point of asking.
+        return trimmed && !/unknown/i.test(trimmed) ? trimmed : null;
+      };
+      const className = real(wiki?.stats.className);
+      const rarityName = real(wiki?.stats.rarityName);
+      if (!className && !rarityName) return null;
+      return [name.toLowerCase(), { className, rarityName }];
     }),
   );
 
-  return found.filter((entry): entry is [string, string] => entry !== null);
+  return found.filter((entry): entry is [string, WikiBrawlerFacts] => entry !== null);
 }
 
 /**
@@ -57,4 +67,4 @@ async function fetchClasses(names: string[]): Promise<[string, string][]> {
  * An unreachable wiki yields an empty map and every caller falls back to the
  * behaviour it had before: no chip, rather than a wrong one.
  */
-export const getWikiBrawlerClasses = cached('wiki-brawler-classes', fetchClasses, REVALIDATE);
+export const getWikiBrawlerFacts = cached('wiki-brawler-facts', fetchClasses, REVALIDATE);
