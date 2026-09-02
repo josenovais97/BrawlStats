@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { CompareTool } from '@/components/compare/compare-tool';
+import { RivalRace } from '@/components/compare/rival-race';
 import { loadComparison } from '@/lib/player-compare';
 import { displayTag, normalizeTag } from '@/lib/tags';
 
@@ -43,5 +44,16 @@ export default async function ComparePlayersPage({ params }: PageProps) {
 
   const comparison = await loadComparison(tagA, tagB);
 
-  return <CompareTool comparison={comparison} tagA={tagA} tagB={tagB} />;
+  return (
+    <div className="space-y-8">
+      {/* Above the table: the race is the reading, the table is the evidence.
+          Only when both sides resolved — a race against a profile that failed
+          to load is two bars, one of them empty. */}
+      {comparison.a.ok && comparison.b.ok ? (
+        <RivalRace a={comparison.a.side} b={comparison.b.side} />
+      ) : null}
+
+      <CompareTool comparison={comparison} tagA={tagA} tagB={tagB} />
+    </div>
+  );
 }
