@@ -19,8 +19,17 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  * is a horoscope.
  */
 
-/** A brawler this far below its map's average was the wrong tool for the job. */
-const POOR_PICK = -0.03;
+/**
+ * How far below a map's average makes a pick the wrong tool for the job.
+ *
+ * Calibrated to the scale it is measured on, not picked as a round number. Map
+ * form is shrunk with a 150-battle prior (see MAP_FORM_PRIOR), which compresses
+ * everything toward the map average: the strongest pick on the whole rotation
+ * sits near +8 points, so a -3 threshold was asking for a deficit larger than
+ * most maps produce in either direction, and this finding never fired on any
+ * account tested.
+ */
+const POOR_PICK = -0.015;
 
 /** Fewer than this and a "recurring problem" is a coincidence. */
 const MIN_OCCURRENCES = 2;
