@@ -2659,10 +2659,22 @@ export interface MapMatchup {
  * Every map is computed in one pass and cached together, for the same reason
  * comps are: the alternative is one full scan of the raw rows per map page.
  */
-async function compute_getMapMatchups(limit = 8): Promise<Map<string, MapMatchup[]>> {
+/*
+ * Returns entries, not a Map.
+ *
+ * `unstable_cache` serialises what it stores, and a Map does not survive the
+ * round trip — it comes back as a plain object, so the first (uncached) call
+ * works and every later one throws `c.get is not a function`. That is a
+ * genuinely nasty shape of bug: it passes every local test, passes the first
+ * request after a deploy, and only breaks once the cache is warm.
+ *
+ * `getBestPicksByMode` already had the answer: cache the entries and rebuild
+ * the Map outside the cache boundary.
+ */
+async function compute_getMapMatchups(limit = 8): Promise<[string, MapMatchup[]][]> {
   const prisma = getPrisma();
   const out = new Map<string, MapMatchup[]>();
-  if (!prisma) return out;
+  if (!prisma) return [];
 
   try {
     const since = windowStartUtc(COMP_WINDOW_DAYS);
@@ -2736,10 +2748,10 @@ async function compute_getMapMatchups(limit = 8): Promise<Map<string, MapMatchup
       out.set(map, [...best, ...worst].sort((x, y) => y.edge - x.edge));
     }
 
-    return out;
+    return [...out];
   } catch (error) {
     swallow('compute_getMapMatchups', error);
-    return out;
+    return [...out];
   }
 }
 
@@ -3857,10 +3869,12 @@ const MIN_SAMPLE_FOR_MAP_FORM = 30;
  * fifteen of them — one per live rotation slot — and fifteen separate scans of
  * the roll-up would cost far more than one.
  */
-async function compute_getLadderMapForm(windowDays = 14): Promise<Map<string, MapForm[]>> {
+async function compute_getLadderMapForm(
+  windowDays = 14,
+): Promise<[string, MapForm[]][]> {
   const prisma = getPrisma();
   const out = new Map<string, MapForm[]>();
-  if (!prisma) return out;
+  if (!prisma) return [];
 
   try {
     const rows = await prisma.$queryRaw<
@@ -3905,15 +3919,25 @@ async function compute_getLadderMapForm(windowDays = 14): Promise<Map<string, Ma
     for (const [map, list] of out) {
       out.set(map, list.sort((a, b) => b.adjusted - a.adjusted));
     }
-    return out;
+    return [...out];
   } catch (error) {
     swallow('compute_getLadderMapForm', error);
-    return out;
+    return [...out];
   }
 }
 
-export const getMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
-export const getLadderMapForm = cachedRead('ladder-map-form', compute_getLadderMapForm);
+const cachedMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
+
+/** Keyed by map name. See compute_getMapMatchups for why the cache holds entries. */
+export async function getMapMatchups(): Promise<Map<string, MapMatchup[]>> {
+  return new Map(await cachedMapMatchups());
+}
+const cachedLadderMapForm = cachedRead('ladder-map-form', compute_getLadderMapForm);
+
+/** Keyed by map name. Entries through the cache, Map to callers. */
+export async function getLadderMapForm(): Promise<Map<string, MapForm[]>> {
+  return new Map(await cachedLadderMapForm());
+}
 export const getDailyDiscoveries = cachedRead('daily-discoveries', compute_getDailyDiscoveries);
 export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
 export const getBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
