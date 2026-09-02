@@ -23,36 +23,49 @@ force=0
 
 cd "$HOME/brawlstats" || exit 1
 
-# Retried, then fatal.
+# Retried within the run, then tolerated across a couple of runs, then fatal.
 #
 # GitHub intermittently refuses anonymous fetches from this address — measured
 # 2026-09-02, two of four back-to-back `ls-remote` calls failed with "could not
 # read Username", which is how git reports a 401 when it has no credentials to
 # offer. The repository is public and the API rate limit was untouched, so this
-# is throttling of the git endpoint rather than anything about the repo.
+# is throttling of the git endpoint, and it outlasts a thirty-second retry.
 #
-# A single attempt therefore proves nothing. Three spread over half a minute
-# tells a blip — which the next five-minute tick would have swallowed anyway —
-# apart from the remote actually being unreachable.
+# So a single failed run is not evidence of anything: this timer fires every
+# five minutes, and the next tick usually succeeds. What matters is a *streak*.
+# Three consecutive failures is a quarter of an hour of not tracking
+# origin/main, which is worth an alert; anything less is noise that would train
+# the reader to ignore the mail.
 #
-# It must still fail loudly at the end. This used to `exit 0` on any fetch
-# error, so it could not tell "nothing new to deploy" from "cannot reach the
-# remote" and reported both as success: `OnFailure` never fired, and the only
-# thing that noticed was the health check's "box is behind origin/main" rule
-# twenty minutes later.
+# The counter is what makes that distinction possible. Before it, this exited 0
+# on any fetch error, so it could not tell "nothing new to deploy" from "cannot
+# reach the remote" and reported both as success — `OnFailure` never fired, and
+# the only thing that noticed was the health check's "box is behind
+# origin/main" rule twenty minutes later.
+FAIL_STATE="$HOME/.brawlzone-fetch-failures"
+FAIL_LIMIT=3
+
 fetched=0
-for attempt in 1 2 3; do
+for attempt in 1 2; do
   if git fetch --quiet origin main; then
     fetched=1
     break
   fi
-  [ "$attempt" -lt 3 ] && sleep 15
+  [ "$attempt" -lt 2 ] && sleep 10
 done
 
 if [ "$fetched" -eq 0 ]; then
-  echo "could not fetch origin/main after 3 attempts; the box is no longer tracking it" >&2
-  exit 1
+  streak=$(( $(cat "$FAIL_STATE" 2>/dev/null || echo 0) + 1 ))
+  echo "$streak" > "$FAIL_STATE"
+  if [ "$streak" -ge "$FAIL_LIMIT" ]; then
+    echo "could not fetch origin/main on $streak consecutive runs; the box is no longer tracking it" >&2
+    exit 1
+  fi
+  echo "fetch failed (run $streak of $FAIL_LIMIT before this is treated as an outage); will retry next tick"
+  exit 0
 fi
+
+rm -f "$FAIL_STATE"
 
 local=$(git rev-parse HEAD)
 remote=$(git rev-parse origin/main)
