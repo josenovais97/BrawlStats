@@ -143,7 +143,18 @@ export function patchImpact({
   rows.sort((a, b) => {
     const ownedDiff = Number(b.power !== null) - Number(a.power !== null);
     if (ownedDiff !== 0) return ownedDiff;
-    return Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0);
+
+    const moveDiff = Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0);
+    if (moveDiff !== 0) return moveDiff;
+
+    /*
+     * Trophies break the tie, and for the first few days after a patch they are
+     * the whole order — nothing has a measured move yet, so without this the
+     * list is arbitrary. Ranking by trophies puts the brawlers this account
+     * actually plays at the top, which is the right answer to "does this patch
+     * affect me" before any measurement exists.
+     */
+    return b.trophies - a.trophies;
   });
 
   const mineWithMove = rows.filter((r) => r.power !== null && r.delta !== null);

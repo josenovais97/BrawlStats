@@ -43,6 +43,12 @@ export function PlayerPatchImpact({
 }) {
   const { rows, buffed, nerfed, changedTotal, ownedTotal } = impact;
   const measured = buffed + nerfed > 0;
+  /*
+   * With no measurements yet, the column would be eight identical "too early"
+   * labels — a caveat repeated per row rather than stated once. It is dropped
+   * until at least one row has something to say, and the footnote carries it.
+   */
+  const anyMeasured = rows.some((row) => row.delta !== null);
 
   return (
     <section className="space-y-3">
@@ -97,8 +103,8 @@ export function PlayerPatchImpact({
                 </span>
               </span>
 
-              {row.delta === null ? (
-                <span className="shrink-0 text-xs text-muted">too early to measure</span>
+              {!anyMeasured ? null : row.delta === null ? (
+                <span className="shrink-0 text-xs text-muted">too early</span>
               ) : (
                 <span className="shrink-0 text-right">
                   <span
@@ -125,9 +131,9 @@ export function PlayerPatchImpact({
         {changedTotal > rows.length
           ? `Showing the ${rows.length} most relevant of ${changedTotal} brawlers the update touched, yours first. `
           : ''}
-        Win rates are adjusted against the sample average, so a shift here is the brawler moving
-        rather than the cohort — and a move only appears once there are a few days of snapshots
-        behind it, because a two-day sample swings further than any balance change does.
+        {anyMeasured
+          ? 'Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.'
+          : 'How each one actually moved appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does. Ordered by your trophies until then.'}
       </p>
     </section>
   );
