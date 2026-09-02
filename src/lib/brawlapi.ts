@@ -172,6 +172,34 @@ export async function getGameModeMap(): Promise<Map<string, BAGameMode>> {
     if (m.scHash) map.set(m.scHash.toLowerCase(), m);
     map.set(m.name.toLowerCase().replace(/\s+/g, ''), m);
   }
+
+  /*
+   * Modes the game renamed but still reports under their old internal hash.
+   *
+   * The battle log and the rotation both send `airHockey`, while the mode has
+   * been called Brawl Hockey for some time and the artwork source files it
+   * under `brawlHockey`. Nothing joins the two: the hashes differ, the names
+   * differ, and the numeric ids belong to different systems.
+   *
+   * The cost of the mismatch was not just a missing icon. `modeLabel` falls
+   * back to splitting the camel hump, so the site confidently printed "Air
+   * Hockey" — a name the game no longer uses — while /maps, which resolves
+   * through the map catalogue, correctly said Brawl Hockey. Two names for one
+   * mode, on the same site.
+   *
+   * A short explicit table rather than anything clever. There is no rule to
+   * infer here; a rename is a fact about one mode, and the alias disappears on
+   * its own if the game ever starts sending the new hash.
+   */
+  const RENAMED: Record<string, string> = {
+    airhockey: 'brawlhockey',
+    cooking: 'combatcooking',
+  };
+  for (const [oldHash, current] of Object.entries(RENAMED)) {
+    const mode = map.get(current);
+    if (mode && !map.has(oldHash)) map.set(oldHash, mode);
+  }
+
   return map;
 }
 
