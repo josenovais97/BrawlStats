@@ -35,7 +35,7 @@ import {
 import { getGameModeMap } from '@/lib/brawlapi';
 import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
-import { PATCH_RELEVANT_DAYS, patchImpact, type PatchImpact } from '@/lib/patch-impact';
+import { patchImpact, patchIsRecent, type PatchImpact } from '@/lib/patch-impact';
 import { pushOptions } from '@/lib/push-now';
 import { changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { computeSkillScore } from '@/lib/skill-score';
@@ -198,12 +198,9 @@ export default async function PlayerPage({ params }: PageProps) {
    * removes itself rather than accumulating.
    */
   const notes = await getLatestReleaseNotes().catch(() => null);
-  const patchAge = notes?.publishedAt
-    ? (Date.now() - new Date(notes.publishedAt).getTime()) / 86_400_000
-    : Infinity;
 
   let impact: PatchImpact | null = null;
-  if (notes?.publishedAt && patchAge <= PATCH_RELEVANT_DAYS && catalogue.length > 0) {
+  if (notes?.publishedAt && patchIsRecent(notes.publishedAt) && catalogue.length > 0) {
     const changes = changesFromNotes(
       notes,
       catalogue.map((b: { name: string }) => b.name),

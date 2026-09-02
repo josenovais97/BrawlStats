@@ -23,20 +23,34 @@ force=0
 
 cd "$HOME/brawlstats" || exit 1
 
-# A failed fetch is a failure, not a quiet no-op.
+# Retried, then fatal.
 #
-# This used to `exit 0`, on the reasoning that a network blip should not page
-# anyone. The cost is that it cannot tell "nothing new to deploy" apart from
-# "cannot reach the remote", and it reports both as success — so `OnFailure`
-# never fires and the box silently stops tracking `origin/main`. Seen on
-# 2026-09-02: two consecutive runs died on `could not read Username for
-# 'https://github.com'` and both logged rc=0.
+# GitHub intermittently refuses anonymous fetches from this address — measured
+# 2026-09-02, two of four back-to-back `ls-remote` calls failed with "could not
+# read Username", which is how git reports a 401 when it has no credentials to
+# offer. The repository is public and the API rate limit was untouched, so this
+# is throttling of the git endpoint rather than anything about the repo.
 #
-# The only thing that noticed was the health check's "box is behind
-# origin/main" rule, twenty minutes later. Exiting non-zero puts the alert back
-# on the job that actually failed.
-if ! git fetch --quiet origin main; then
-  echo "could not fetch origin/main; the box is no longer tracking it" >&2
+# A single attempt therefore proves nothing. Three spread over half a minute
+# tells a blip — which the next five-minute tick would have swallowed anyway —
+# apart from the remote actually being unreachable.
+#
+# It must still fail loudly at the end. This used to `exit 0` on any fetch
+# error, so it could not tell "nothing new to deploy" from "cannot reach the
+# remote" and reported both as success: `OnFailure` never fired, and the only
+# thing that noticed was the health check's "box is behind origin/main" rule
+# twenty minutes later.
+fetched=0
+for attempt in 1 2 3; do
+  if git fetch --quiet origin main; then
+    fetched=1
+    break
+  fi
+  [ "$attempt" -lt 3 ] && sleep 15
+done
+
+if [ "$fetched" -eq 0 ]; then
+  echo "could not fetch origin/main after 3 attempts; the box is no longer tracking it" >&2
   exit 1
 fi
 

@@ -71,12 +71,20 @@ export function PlayerPushNow({
           </Link>
 
           <div className="min-w-0 flex-1 basis-56">
+            {/* The mode leads, the map follows underneath.
+                People think in modes — "I'm going to play some Knockout" — and
+                a map name alone asks the reader to remember which mode it
+                belongs to before the sentence means anything. The map is still
+                named, and still the link, because the recommendation is
+                specific to it. */}
             <p className="text-xl font-black leading-tight sm:text-2xl">
-              Play {titleCase(top.brawlerName)} on{' '}
+              Play {titleCase(top.brawlerName)} in {topMode}
+            </p>
+            <p className="mt-0.5 text-sm">
               <Link
                 href={`/maps/${slugify(topMode)}/${slugify(top.mapName)}`}
                 prefetch={false}
-                className="text-brand hover:underline"
+                className="font-semibold text-brand hover:underline"
               >
                 {top.mapName}
               </Link>
@@ -132,13 +140,15 @@ export function PlayerPushNow({
                   loading="lazy"
                   unoptimized
                 />
-                <span className="min-w-0 flex-1 truncate text-sm">
-                  <span className="font-semibold">{titleCase(option.brawlerName)}</span>
-                  <span className="text-muted"> on </span>
+                <span className="min-w-0 flex-1 text-sm">
+                  <span className="block truncate">
+                    <span className="font-semibold">{titleCase(option.brawlerName)}</span>
+                    <span className="text-muted"> in {mode}</span>
+                  </span>
                   <Link
                     href={`/maps/${slugify(mode)}/${slugify(option.mapName)}`}
                     prefetch={false}
-                    className="transition-colors hover:text-brand"
+                    className="block truncate text-xs text-muted transition-colors hover:text-brand"
                   >
                     {option.mapName}
                   </Link>

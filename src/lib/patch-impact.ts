@@ -30,6 +30,12 @@ const MEANINGFUL_MOVE = 0.01;
  */
 export const PATCH_RELEVANT_DAYS = 21;
 
+/** Whether an update is recent enough to still be worth a section. */
+export function patchIsRecent(publishedAt: string | null | undefined, now = Date.now()): boolean {
+  if (!publishedAt) return false;
+  return (now - new Date(publishedAt).getTime()) / 86_400_000 <= PATCH_RELEVANT_DAYS;
+}
+
 export interface PatchRow {
   brawlerId: number;
   name: string;
