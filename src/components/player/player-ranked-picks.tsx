@@ -291,10 +291,10 @@ function Empty({ children, small = false }: { children: React.ReactNode; small?:
     <span
       className={`flex items-center gap-2.5 ${small ? 'min-h-8' : 'mt-1.5 min-h-10'}`}
     >
-      <span
-        aria-hidden
-        className={`${small ? 'size-8' : 'size-10'} shrink-0 rounded-lg border border-dashed border-border`}
-      />
+      {/* An invisible spacer, not a dashed outline. The slot needs to hold the
+          row's height and keep the text aligned with the names above it;
+          drawing a box around nothing just adds another edge to read. */}
+      <span aria-hidden className={`${small ? 'size-8' : 'size-10'} shrink-0`} />
       <span className={`text-muted ${small ? 'text-xs' : 'text-sm'}`}>{children}</span>
     </span>
   );
