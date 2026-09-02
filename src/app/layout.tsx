@@ -27,6 +27,17 @@ const lilita = Lilita_One({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /*
+   * Feed discovery, so a reader's client finds the daily report without being
+   * told where it is. Declared once here rather than on /daily: a feed is a
+   * property of the site, and browsers and readers look for it in the head of
+   * whatever page they were handed.
+   */
+  alternates: {
+    types: {
+      'application/rss+xml': [{ url: '/daily/feed.xml', title: 'BrawlZone daily findings' }],
+    },
+  },
   title: {
     default: 'BrawlZone: Brawl Stars player, club and brawler stats',
     template: '%s · BrawlZone',

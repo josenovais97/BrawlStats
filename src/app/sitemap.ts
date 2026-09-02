@@ -6,7 +6,12 @@ import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
 import { PAIR_SEPARATOR } from '@/lib/compare';
-import { getFilterableModes, getIndexablePairs, getTeamComps } from '@/lib/stats';
+import {
+  getFilterableModes,
+  getIndexablePairs,
+  getTeamComps,
+  listDailyReports,
+} from '@/lib/stats';
 import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 
 /**
@@ -41,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/brawlers', 'weekly', 0.8],
     ['/draft', 'weekly', 0.8],
     ['/daily', 'daily', 0.9],
+    ['/daily/archive', 'daily', 0.6],
     ['/comps', 'daily', 0.8],
     ['/meta', 'daily', 0.8],
     ['/compare', 'weekly', 0.7],
@@ -108,6 +114,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const entry of maps) {
     add(`/maps/${entry.modeSlug}/${entry.mapSlug}`, 'daily', 0.7);
+  }
+
+  /*
+   * Archived daily reports, but only the ones worth a crawl.
+   *
+   * The floor matches the `noindex` the dated route applies to a thin day, so
+   * the sitemap and the page directive cannot disagree — listing a URL while
+   * asking not to have it indexed is the contradiction that put ~98 profiles
+   * through Google's crawler for nothing.
+   */
+  const daily = await listDailyReports(400, 4).catch(() => []);
+  for (const report of daily) {
+    add(`/daily/${report.day}`, 'yearly', 0.5);
   }
 
   // One per mode that actually has comps clearing the sample floor. Listed off

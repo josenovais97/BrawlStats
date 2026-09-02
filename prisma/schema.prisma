@@ -531,3 +531,25 @@ model RollupWatermark {
   @@id([day, source])
   @@map("rollup_watermarks")
 }
+
+/// One day's Daily discoveries, kept because they cannot be recomputed.
+///
+/// The Daily page reads a live rotation, a moving 7-day meta window and 14-day
+/// battle windows, so asking for yesterday tomorrow returns a different answer
+/// or none at all. An archive is therefore only possible if each day is written
+/// down as it happens.
+///
+/// One row a day at roughly 2 KB is under a megabyte a year, which is why this
+/// carries no retention window: it is the one table on the site whose whole
+/// purpose is to outlive its inputs, and pruning it would delete the archive it
+/// exists to keep.
+model DailyReport {
+  day       DateTime @id @db.Date
+  /// The discoveries exactly as rendered that day.
+  payload   Json
+  /// Carried as a column so the archive can filter without parsing every row.
+  findings  Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("daily_reports")
+}

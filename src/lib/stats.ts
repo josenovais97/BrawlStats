@@ -4050,6 +4050,100 @@ async function compute_getPatchSplit(patchDate: string): Promise<[number, PatchS
   }
 }
 
+/**
+ * Yesterday's discoveries, written down because they cannot be recovered.
+ *
+ * `getDailyDiscoveries` reads a live rotation, a moving seven-day meta window
+ * and fourteen days of battles. Ask it for 2 September on the 3rd and it
+ * answers for the 3rd — there is no parameter that would make it answer for a
+ * day whose inputs have rolled past. An archive is therefore only possible if
+ * each day is stored as it happens, and it starts empty rather than being
+ * backfilled.
+ */
+export interface StoredDailyReport {
+  day: string;
+  discoveries: Discovery[];
+  findings: number;
+}
+
+/** Reads one archived day, or null when that day was never written. */
+export async function getDailyReport(day: string): Promise<StoredDailyReport | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const row = await prisma.dailyReport.findUnique({ where: { day: new Date(`${day}T00:00:00Z`) } });
+    if (!row) return null;
+    return {
+      day: toIsoDate(row.day),
+      discoveries: row.payload as unknown as Discovery[],
+      findings: row.findings,
+    };
+  } catch (error) {
+    swallow('getDailyReport', error);
+    return null;
+  }
+}
+
+/**
+ * Writes today's discoveries, once.
+ *
+ * Idempotent and lazy: the first render of the day stores what it produced and
+ * every later render finds it already there. That is deliberately not a
+ * scheduled job — a timer would need its own failure handling to guarantee the
+ * page and the archive agree, whereas writing exactly what was rendered makes
+ * disagreement impossible.
+ */
+export async function saveDailyReport(day: string, discoveries: Discovery[]): Promise<void> {
+  const prisma = getPrisma();
+  if (!prisma || discoveries.length === 0) return;
+
+  try {
+    await prisma.dailyReport.upsert({
+      where: { day: new Date(`${day}T00:00:00Z`) },
+      create: {
+        day: new Date(`${day}T00:00:00Z`),
+        payload: discoveries as unknown as object,
+        findings: discoveries.length,
+      },
+      // The day's own numbers keep moving until it ends, so a later render
+      // supersedes an earlier one rather than being discarded.
+      update: { payload: discoveries as unknown as object, findings: discoveries.length },
+    });
+  } catch (error) {
+    swallow('saveDailyReport', error);
+  }
+}
+
+/**
+ * The archive index, newest first.
+ *
+ * `minFindings` is what keeps thin days out of the crawlable set: a report with
+ * one discovery is a page that exists rather than one worth indexing, and the
+ * whole point of dated URLs is fresh entry points, not a thousand near-empty
+ * ones.
+ */
+export async function listDailyReports(
+  limit = 60,
+  minFindings = 1,
+): Promise<{ day: string; findings: number }[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.dailyReport.findMany({
+      where: { findings: { gte: minFindings } },
+      orderBy: { day: 'desc' },
+      take: limit,
+      select: { day: true, findings: true },
+    });
+    return rows.map((row) => ({ day: toIsoDate(row.day), findings: row.findings }));
+  } catch (error) {
+    swallow('listDailyReports', error);
+    return [];
+  }
+}
+
 const cachedPatchSplit = cachedRead('patch-split', compute_getPatchSplit);
 
 /** Keyed by brawler id. Entries through the cache, Map to callers. */
