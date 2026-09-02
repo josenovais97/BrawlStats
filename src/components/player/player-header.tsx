@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -138,6 +139,17 @@ export function PlayerHeader({
               Prestige {formatNumber(player.totalPrestigeLevel)}
             </span>
           ) : null}
+
+          {/* The card belongs in the chip row rather than as a section of its
+              own: it is a link to a different view of this profile, not another
+              thing to read here. */}
+          <Link
+            href={`/wrapped/${normalizeTag(player.tag)}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium transition-colors hover:border-brand/60 hover:text-foreground"
+          >
+            <Sparkles className="size-4" />
+            Recent run
+          </Link>
 
           {player.club?.tag ? (
             <Link

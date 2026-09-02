@@ -50,6 +50,9 @@ export const CRAWLER_DISALLOW = [
   '/club/',
   '/draft/',
   '/compare/players/',
+  // One URL per tag, unbounded and unenumerable, each costing an upstream call
+  // to render — the same reasoning as /player/.
+  '/wrapped/',
 ] as const;
 
 /**

@@ -189,5 +189,6 @@ export const config = {
     '/club/:path*',
     '/draft/:path*',
     '/compare/players/:path*',
+    '/wrapped/:path*',
   ],
 };
