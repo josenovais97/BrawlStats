@@ -52,21 +52,30 @@ const MEANINGFUL_RANK = 10;
  */
 const UPGRADE_TARGET = MAX_POWER_LEVEL;
 
+/** One thing this account could bring to a mode, and what standing in the way. */
+interface Option {
+  id: number;
+  name: string;
+  /** Position in the mode's pick order. */
+  rank: number;
+  kind: 'ready' | 'upgrade' | 'unlock';
+  /** Present for an upgrade: where it is now, and the coins to finish it. */
+  power?: number;
+  coins?: number;
+}
+
 interface ModeAnswer {
   mode: string;
   label: string;
   meta: BAGameMode | undefined;
   /** The best pick this account can queue with right now. */
-  play: { id: number; name: string; rank: number; power: number } | null;
-  /**
-   * The two ways to improve this mode, shown together rather than ranked
-   * against each other. They are different actions on different timescales —
-   * one is a coin cost you can pay tonight, the other waits on drops — so
-   * picking one to show would hide the half the reader happens to want.
-   */
-  upgrade: { id: number; name: string; rank: number; coins: number; power: number } | null;
-  unlock: { id: number; name: string; rank: number } | null;
+  play: Option | null;
+  /** The next-best options, whatever their kind. */
+  others: Option[];
 }
+
+/** Alternatives shown under the pick. Two keeps every card the same height. */
+const ALTERNATIVES = 2;
 
 export function PlayerRankedPicks({
   brawlers,
@@ -89,72 +98,45 @@ export function PlayerRankedPicks({
     const entry = picksByMode.get(mode);
     if (!entry || entry.picks.length === 0) continue;
 
-    let play: ModeAnswer['play'] = null;
-    let upgrade: ModeAnswer['upgrade'] = null;
-    let unlock: ModeAnswer['unlock'] = null;
-
     /*
-     * Upgrades are preferred over unlocks, and that ordering is the whole point
-     * of this block rather than an aesthetic choice. A brawler you own at power
-     * 4 is a coin cost away; one you do not own is gated behind drops and
-     * credits and cannot simply be bought when you want it. Suggesting "unlock
-     * the #1 pick" while the #3 pick sits owned at power 5 recommends the one
-     * thing the player cannot act on tonight.
+     * Every pick classified, rather than a search for the first of each kind.
+     *
+     * The card used to hold one answer and two reasons a slot was empty
+     * ("you own every better pick"), which is true and tells nobody anything.
+     * A mode where the account already holds the best pick has *more* to say,
+     * not less: the second and third options are exactly what a player wants
+     * when their first choice is banned or taken.
      */
-    const better: { id: number; name: string; rank: number; power: number | undefined }[] = [];
+    const options: Option[] = entry.picks
+      .slice(0, MEANINGFUL_RANK)
+      .map((pick, index): Option => {
+        const rank = index + 1;
+        const power = owned.get(pick.brawlerId);
+        if (power === undefined) {
+          return { id: pick.brawlerId, name: pick.brawlerName, rank, kind: 'unlock' };
+        }
+        if (power >= READY_POWER) {
+          return { id: pick.brawlerId, name: pick.brawlerName, rank, kind: 'ready' };
+        }
+        return {
+          id: pick.brawlerId,
+          name: pick.brawlerName,
+          rank,
+          kind: 'upgrade',
+          power,
+          coins: coinsBetweenLevels(power, UPGRADE_TARGET),
+        };
+      });
 
-    entry.picks.forEach((pick, index) => {
-      const rank = index + 1;
-      const power = owned.get(pick.brawlerId);
-
-      if (power !== undefined && power >= READY_POWER) {
-        if (!play) play = { id: pick.brawlerId, name: pick.brawlerName, rank, power };
-        return;
-      }
-      if (rank <= MEANINGFUL_RANK) {
-        better.push({ id: pick.brawlerId, name: pick.brawlerName, rank, power });
-      }
-    });
-
-    const beats = (rank: number) => !play || rank < (play as { rank: number }).rank;
-    const upgradable = better.find((c) => c.power !== undefined && beats(c.rank));
-    const unlockable = better.find((c) => c.power === undefined && beats(c.rank));
-
-    if (upgradable) {
-      upgrade = {
-        id: upgradable.id,
-        name: upgradable.name,
-        rank: upgradable.rank,
-        coins: coinsBetweenLevels(upgradable.power!, UPGRADE_TARGET),
-        power: upgradable.power!,
-      };
-    } else if (play && (play as { power: number }).power < UPGRADE_TARGET) {
-      /*
-       * Nothing better is owned, but the brawler they are already playing is
-       * not finished. Maxing it is then the only upgrade that improves this
-       * mode, and it is the one the card would otherwise never mention.
-       */
-      const current = play as { id: number; name: string; rank: number; power: number };
-      upgrade = {
-        id: current.id,
-        name: current.name,
-        rank: current.rank,
-        coins: coinsBetweenLevels(current.power, UPGRADE_TARGET),
-        power: current.power,
-      };
-    }
-
-    if (unlockable) {
-      unlock = { id: unlockable.id, name: unlockable.name, rank: unlockable.rank };
-    }
+    const play = options.find((option) => option.kind === 'ready') ?? null;
+    const others = options.filter((option) => option !== play).slice(0, ALTERNATIVES);
 
     answers.push({
       mode,
       label: modeMeta.get(mode.toLowerCase())?.name ?? humanizeMode(mode),
       meta: modeMeta.get(mode.toLowerCase()),
       play,
-      upgrade,
-      unlock,
+      others,
     });
   }
 
@@ -209,6 +191,15 @@ export function PlayerRankedPicks({
  * is empty. "You own every better pick" is worth a line: it is the answer to
  * the question the slot exists to ask, and it is good news.
  */
+/**
+ * Three slots, always: what to play, then the next two options.
+ *
+ * The card looked messy for a structural reason rather than a styling one — a
+ * mode with one row sat beside a mode with three, so the grid came out ragged
+ * and the eye could not compare like with like. Fixing the shape fixes that,
+ * and filling the extra slots with real alternatives rather than "nothing to
+ * upgrade" makes the uniform height carry its weight.
+ */
 function ModeCard({
   answer,
   brawlerMeta,
@@ -216,7 +207,7 @@ function ModeCard({
   answer: ModeAnswer;
   brawlerMeta: Map<number, BABrawler>;
 }) {
-  const { play, upgrade, unlock, label, meta } = answer;
+  const { play, others, label, meta } = answer;
   const accent = meta?.color ?? '#8b95b8';
 
   return (
@@ -253,44 +244,38 @@ function ModeCard({
       )}
 
       <div className="mt-2 space-y-2 border-t border-border pt-2">
-        {upgrade ? (
+        {others.map((option) => (
           <Row
-            art={brawlerMeta.get(upgrade.id)?.imageUrl}
-            name={upgrade.name}
-            note={
-              play && upgrade.id === play.id
-                ? `Finish it · power ${upgrade.power} → ${UPGRADE_TARGET} · ${formatNumber(upgrade.coins)} coins`
-                : `#${upgrade.rank} pick · power ${upgrade.power} → ${UPGRADE_TARGET} · ${formatNumber(upgrade.coins)} coins`
-            }
-            tone="invest"
+            key={option.id}
+            art={brawlerMeta.get(option.id)?.imageUrl}
+            name={option.name}
+            note={noteFor(option)}
+            tone={option.kind === 'ready' ? 'good' : option.kind === 'upgrade' ? 'invest' : 'lock'}
             small
           />
-        ) : (
-          <Empty small>Nothing here left to upgrade</Empty>
-        )}
-
-        {unlock ? (
-          <Row
-            art={brawlerMeta.get(unlock.id)?.imageUrl}
-            name={unlock.name}
-            note={`Unlock for the #${unlock.rank} pick`}
-            tone="lock"
-            small
-          />
-        ) : (
-          <Empty small>You own every better pick</Empty>
-        )}
+        ))}
+        {Array.from({ length: Math.max(0, ALTERNATIVES - others.length) }).map((_, i) => (
+          <Empty key={`pad-${i}`} small>
+            No other picks with data yet
+          </Empty>
+        ))}
       </div>
     </li>
   );
 }
 
+function noteFor(option: Option): string {
+  if (option.kind === 'ready') return `Also ready · #${option.rank}`;
+  if (option.kind === 'unlock') return `Unlock for the #${option.rank} pick`;
+  return `#${option.rank} pick · power ${option.power} → ${UPGRADE_TARGET} · ${formatNumber(
+    option.coins ?? 0,
+  )} coins`;
+}
+
 /** Holds a slot's height so the grid stays a matrix rather than a staircase. */
 function Empty({ children, small = false }: { children: React.ReactNode; small?: boolean }) {
   return (
-    <span
-      className={`flex items-center gap-2.5 ${small ? 'min-h-8' : 'mt-1.5 min-h-10'}`}
-    >
+    <span className={`flex items-center gap-2.5 ${small ? 'min-h-8' : 'mt-1.5 min-h-10'}`}>
       {/* An invisible spacer, not a dashed outline. The slot needs to hold the
           row's height and keep the text aligned with the names above it;
           drawing a box around nothing just adds another edge to read. */}
