@@ -36,48 +36,64 @@ const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
 
 /**
- * Where every route on the site is reachable from, and where the attribution
- * lives.
+ * Where every route on the site is reachable from, grouped by what it is for.
  *
- * Three groups rather than two loose blocks: the old footer paired a "get the
- * game" panel with a full-brand yellow "buy me a coffee" button and nothing
- * else, so the loudest thing under a page about looking up players was a
- * donation link, and the site's own pages were not linked at all.
+ * One list of fifteen links was the problem rather than the styling. Rendered
+ * two-up it came out ragged — seven items beside six, with "Release Notes"
+ * dangling under an empty cell — and it asked the reader to scan an
+ * alphabet-soup of page names for the one they wanted. Three named groups of
+ * five are the same links doing an extra job: the headings say what the site
+ * actually offers before a single link is read.
  *
- * Only routes that exist are listed. A footer link to a page that 404s is
- * worse than no footer link, and it is the kind of thing that rots quietly.
+ * Only routes that exist are listed. A footer link to a page that 404s is worse
+ * than no footer link, and it is the kind of thing that rots quietly.
  */
-const EXPLORE = [
-  { href: '/brawlers', label: 'Brawlers' },
-  { href: '/tier-list/ranked', label: 'Tier List' },
-  { href: '/ranked', label: 'Ranked Maps' },
-  { href: '/maps', label: 'Maps' },
-  { href: '/draft', label: 'Draft' },
-  // Same lesson as the three below, caught the same way: /comps shipped linked
-  // only from the header's "More" menu, which renders its items on open and so
-  // puts none of them in the served HTML. `crawl:budget` found 846 URLs and no
-  // comps section at all.
-  { href: '/daily', label: 'Daily' },
-  { href: '/comps', label: 'Team Comps' },
-  { href: '/meta', label: 'Meta Report' },
-  { href: '/compare', label: 'Compare' },
-  { href: '/leaderboard', label: 'Leaderboard' },
-  { href: '/events', label: 'Events' },
-  // Added 2026-08-27. These three were live, in the sitemap, and reachable
-  // from nowhere on the site -- `npm run crawl:budget` never found them
-  // because no page linked to them. A route with no inbound link is a page
-  // nobody can arrive at except by typing it.
-  { href: '/cosmetics', label: 'Cosmetics' },
-  { href: '/news', label: 'News' },
-  { href: '/starr-drops', label: 'Starr Drops' },
-  { href: '/release-notes', label: 'Release Notes' },
+const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }[] = [
+  {
+    heading: 'Stats',
+    links: [
+      { href: '/brawlers', label: 'Brawlers' },
+      { href: '/tier-list/ranked', label: 'Tier List' },
+      { href: '/ranked', label: 'Ranked Maps' },
+      { href: '/maps', label: 'Maps' },
+      { href: '/leaderboard', label: 'Leaderboard' },
+    ],
+  },
+  {
+    heading: 'Tools',
+    links: [
+      { href: '/draft', label: 'Draft' },
+      { href: '/comps', label: 'Team Comps' },
+      { href: '/compare', label: 'Compare' },
+      { href: '/daily', label: 'Daily' },
+      { href: '/meta', label: 'Meta Report' },
+    ],
+  },
+  {
+    heading: 'Game',
+    links: [
+      { href: '/events', label: 'Events' },
+      { href: '/cosmetics', label: 'Cosmetics' },
+      { href: '/starr-drops', label: 'Starr Drops' },
+      { href: '/news', label: 'News' },
+      { href: '/release-notes', label: 'Release Notes' },
+    ],
+  },
 ];
 
-/** Where the numbers and the artwork come from. Required attribution. */
+/**
+ * Where the numbers and the artwork come from. Required attribution.
+ *
+ * The wiki was missing from this list while supplying class, rarity, every
+ * combat stat, ability text, prestige titles and the artwork for brawlers the
+ * mirror has not published — which is most of what a brawler page shows.
+ * Crediting three of four sources is not crediting the sources.
+ */
 const SOURCES = [
   { href: 'https://developer.brawlstars.com', label: 'Brawl Stars API' },
   { href: 'https://docs.royaleapi.com/proxy.html', label: 'RoyaleAPI proxy' },
   { href: 'https://brawlify.com', label: 'Brawlify artwork' },
+  { href: 'https://brawlstars.fandom.com', label: 'Brawl Stars Wiki' },
 ];
 
 export function SiteFooter() {
@@ -97,9 +113,15 @@ export function SiteFooter() {
         }}
       />
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10">
-          {/* Brand */}
+      <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+        {/*
+          Four columns rather than three, and the link groups carry their own
+          headings. The old layout put the brand in one column and everything
+          else in two, which left three hundred pixels of dead space under the
+          store badges while the right-hand column ran on past it — the reason
+          the whole block read as unbalanced.
+        */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
           <div className="min-w-0">
             <Link
               href="/"
@@ -113,7 +135,55 @@ export function SiteFooter() {
               tier lists and map picks, from battles we sample ourselves.
             </p>
 
-            <p className="eyebrow mt-6">Get the game</p>
+            {/*
+              One row of equal-weight links, not three stacked buttons.
+
+              They used to be a filled brand pill above two outlined ones, which
+              read as three unrelated calls to action of descending importance —
+              and put a donation button at the visual top of the stack. They are
+              three ways to follow the same project, so they now look like it.
+              The coffee link keeps a warm tint because it is an offer rather
+              than a destination, but never the solid brand fill: that belongs
+              to the search button, and a donation should not be the loudest
+              control on a page about looking up players.
+            */}
+            <p className="eyebrow mt-7">Follow and support</p>
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <a
+                href={DISCORD_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+              >
+                {/* Generic speech marks rather than Discord's own wordmark:
+                    it is a trademark, licensed only for unmodified use. */}
+                <MessagesSquare aria-hidden className="size-4" />
+                Discord
+              </a>
+              <a
+                href={YOUTUBE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+              >
+                {/* lucide dropped its brand icons, so this is the generic play
+                    mark rather than YouTube's own, for the same reason. */}
+                <PlayCircle aria-hidden className="size-4" />
+                YouTube
+              </a>
+              <a
+                href={BUY_ME_A_COFFEE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/35 bg-brand/10 px-3.5 text-sm font-bold text-brand transition-colors hover:border-brand/60 hover:bg-brand/15"
+              >
+                <Coffee aria-hidden className="size-4" />
+                Buy me a coffee
+              </a>
+            </div>
+            <p className="mt-2.5 text-xs text-muted/80">Free, ad-free, no paywall.</p>
+
+            <p className="eyebrow mt-7">Get the game</p>
             {/* Both badges are locked to one height so they read as a pair
                 rather than as two pieces of borrowed artwork. */}
             <div className="mt-2.5 flex flex-wrap items-center gap-2.5">
@@ -138,134 +208,96 @@ export function SiteFooter() {
             </div>
           </div>
 
-          {/* Explore */}
-          <nav aria-labelledby="footer-explore" className="min-w-0">
-            <p id="footer-explore" className="eyebrow">
-              Explore
-            </p>
-            <ul className="mt-3 grid grid-cols-2 gap-x-4">
-              {EXPLORE.map(({ href, label }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="inline-flex min-h-9 items-center text-sm text-muted transition-colors hover:text-foreground"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* About and data */}
-          <div className="min-w-0">
-            <p className="eyebrow">About and data</p>
-            <ul className="mt-3 space-y-0.5">
-              <li>
-                <Link
-                  href="/about"
-                  className="inline-flex min-h-9 items-center text-sm text-muted transition-colors hover:text-foreground"
-                >
-                  About {SITE_NAME}
-                </Link>
-              </li>
-              {/* Directly above the data sources on purpose: someone who has
-                  just read where a number came from is exactly the person who
-                  wants to tell us it looks wrong. */}
-              <li>
-                <a
-                  href={`mailto:${CONTACT_EMAIL}`}
-                  className="inline-flex min-h-9 items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
-                >
-                  <Mail aria-hidden className="size-3.5 shrink-0" />
-                  Contact
-                </a>
-              </li>
-              {SOURCES.map(({ href, label }) => (
-                <li key={href}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-9 items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-                  >
-                    {label}
-                    <ExternalLink aria-hidden className="size-3 shrink-0" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            {/* Support, deliberately quiet: it is a thank-you, not the thing
-                the site is for. The page's own call to action is the search. */}
-            {/*
-              Given a warm tint so it reads as an offer rather than as one more
-              grey link, but never the solid brand fill — that belongs to the
-              search button, and a donation should not be the loudest control
-              on a page about looking up players.
-            */}
-            <a
-              href={BUY_ME_A_COFFEE_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/35 bg-brand/10 px-3.5 text-sm font-bold text-brand transition-colors hover:border-brand/60 hover:bg-brand/15"
-            >
-              <Coffee aria-hidden className="size-4" />
-              Buy me a coffee
-            </a>
-            <p className="mt-2 text-xs text-muted/80">Free, ad-free, no paywall.</p>
-
-            {/* Below the coffee link and styled quieter than it, for the same
-                reason that one is quieter than the search: the page is for
-                looking up players, and neither of these should outrank it. */}
-            <a
-              href={YOUTUBE_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-border px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-            >
-              {/* lucide dropped its brand icons, so this is the generic play mark
-                  rather than YouTube's own — which is trademarked, and only
-                  licensed for use unmodified. */}
-              <PlayCircle aria-hidden className="size-4" />
-              Subscribe on YouTube
-            </a>
-
-            <a
-              href={DISCORD_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 inline-flex min-h-10 items-center gap-2 rounded-xl border border-border px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground sm:mt-3 sm:ml-2"
-            >
-              {/* Generic speech marks rather than Discord's own wordmark, for
-                  the same reason the button above does not carry YouTube's:
-                  both are trademarks, licensed only for unmodified use. */}
-              <MessagesSquare aria-hidden className="size-4" />
-              Join the Discord
-            </a>
-          </div>
+          {LINK_GROUPS.map((group) => (
+            <nav key={group.heading} aria-label={group.heading} className="min-w-0">
+              <p className="eyebrow">{group.heading}</p>
+              <ul className="mt-3 space-y-0.5">
+                {group.links.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="inline-flex min-h-9 items-center text-sm text-muted transition-colors hover:text-foreground"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
 
-        {/* Required disclaimer, on its own quiet line. */}
-        <div className="mt-9 flex flex-col gap-2 border-t border-border/70 pt-5 text-xs leading-relaxed text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-2xl">
-            This material is unofficial and is not endorsed by Supercell. For more
-            information see{' '}
-            <a
-              href={FAN_CONTENT_POLICY_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand"
+        {/*
+          About, contact and attribution together on one quiet line.
+
+          Sources used to sit in a column of navigation styled exactly like it,
+          which made "RoyaleAPI proxy" look like a page on this site. They are
+          credit, not destinations, so they belong with the disclaimer that is
+          also credit.
+        */}
+        <div className="mt-10 space-y-3 border-t border-border/70 pt-6 text-xs leading-relaxed text-muted">
+          <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+            <Link
+              href="/about"
+              className="transition-colors hover:text-foreground"
             >
-              Supercell&rsquo;s Fan Content Policy
+              About {SITE_NAME}
+            </Link>
+            <Dot />
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            >
+              <Mail aria-hidden className="size-3.5 shrink-0" />
+              Contact
             </a>
-            .
-          </p>
-          <p className="shrink-0 text-muted/80">
-            {SITE_NAME} &middot; not affiliated with Supercell
-          </p>
+            <Dot />
+            <span className="text-muted/80">Data and artwork from</span>
+            {SOURCES.map((source, index) => (
+              <span key={source.href} className="inline-flex items-center gap-1">
+                <a
+                  href={source.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+                >
+                  {source.label}
+                  <ExternalLink aria-hidden className="size-3 shrink-0" />
+                </a>
+                {index < SOURCES.length - 1 ? <Dot /> : null}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-2xl">
+              This material is unofficial and is not endorsed by Supercell. For more
+              information see{' '}
+              <a
+                href={FAN_CONTENT_POLICY_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand"
+              >
+                Supercell&rsquo;s Fan Content Policy
+              </a>
+              .
+            </p>
+            <p className="shrink-0 text-muted/80">
+              {SITE_NAME} &middot; not affiliated with Supercell
+            </p>
+          </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+/** The separator between attribution links, so they read as one sentence. */
+function Dot() {
+  return (
+    <span aria-hidden className="px-0.5 text-muted/40">
+      &middot;
+    </span>
   );
 }
