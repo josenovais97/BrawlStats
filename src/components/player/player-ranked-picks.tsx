@@ -152,7 +152,10 @@ export function PlayerRankedPicks({
         </p>
       </div>
 
-      <ul className="grid gap-2.5 sm:grid-cols-2">
+      {/* `items-start` so a mode with nothing to upgrade stays short instead of
+          being stretched to match its neighbour, which left a card-sized hole
+          under the one answer that needed no follow-up. */}
+      <ul className="grid items-start gap-2.5 sm:grid-cols-2">
         {answers.map((answer) => (
           <ModeCard key={answer.mode} answer={answer} brawlerMeta={brawlerMeta} />
         ))}
