@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { BrawlerChooser } from '@/components/draft/brawler-chooser';
 import { DraftPicks } from '@/components/draft/draft-picks';
 import { MapArt } from '@/components/maps/map-art';
 import { RankedIcon } from '@/components/game-icons';
@@ -11,7 +12,7 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
 import { formatNumber, humanizeMode } from '@/lib/format';
-import { getBrawlerArtMap, getBrawlerCatalog, type CatalogBrawler } from '@/lib/brawler-catalog';
+import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { CompShape } from '@/components/draft/comp-shape';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
 import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
@@ -159,6 +160,23 @@ export default async function DraftPage({ params }: PageProps) {
   const basePicks: (ModePick | RankedMapPick)[] =
     (selected?.picks.length ?? 0) > 0 ? selected!.picks : (modePicks?.picks ?? []);
 
+  /*
+   * The roster as the picker needs it, with the map's own pick order attached.
+   *
+   * That rank is what makes the "best here" shortcut possible: it is already
+   * computed for the results below, so surfacing the same order at the top of
+   * the picker costs nothing and saves the common case — most drafts choose
+   * from the handful of brawlers that are actually good on the map in front of
+   * you, not from all 109.
+   */
+  const pickRank = new Map(basePicks.map((pick, index) => [pick.brawlerId, index + 1]));
+  const chooserOptions = catalog.current.map((brawler) => ({
+    id: brawler.id,
+    name: brawler.name,
+    imageUrl: brawler.meta?.imageUrl ?? brawler.imageUrl,
+    rank: pickRank.get(brawler.id),
+  }));
+
   const ranked = basePicks
     .map((pick) => {
       const counter = counters.get(pick.brawlerId);
@@ -225,7 +243,10 @@ export default async function DraftPage({ params }: PageProps) {
             />
 
             <div className="card p-4">
-              <div className="flex flex-wrap items-center gap-2">
+              {/* Sticky, because the slots are the thing you are filling in and the
+                  picker below is long enough to push them off a phone screen. `top-16`
+                  clears the site header, which is sticky too. */}
+              <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 bg-surface px-4 py-2">
                 {Array.from({ length: MAX_ENEMIES }).map((_, slot) => {
                   const id = enemies[slot];
                   const meta = id ? brawlerMeta.get(id) : undefined;
@@ -282,10 +303,11 @@ export default async function DraftPage({ params }: PageProps) {
 
               {enemies.length < MAX_ENEMIES ? (
                 <BrawlerChooser
-                  options={catalog.current}
+                  options={chooserOptions}
                   taken={[...enemies, ...allies]}
                   label="Add an enemy brawler"
-                  onPick={(id) => hrefFor({ enemy: [...enemies, id] })}
+                  suggestedLabel="Most likely picks here"
+                  hrefFor={(id) => hrefFor({ enemy: [...enemies, id] })}
                 />
               ) : null}
             </div>
@@ -299,7 +321,10 @@ export default async function DraftPage({ params }: PageProps) {
             />
 
             <div className="card p-4">
-              <div className="flex flex-wrap items-center gap-2">
+              {/* Sticky, because the slots are the thing you are filling in and the
+                  picker below is long enough to push them off a phone screen. `top-16`
+                  clears the site header, which is sticky too. */}
+              <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 bg-surface px-4 py-2">
                 {Array.from({ length: MAX_ALLIES }).map((_, slot) => {
                   const id = allies[slot];
                   const meta = id ? brawlerMeta.get(id) : undefined;
@@ -353,10 +378,11 @@ export default async function DraftPage({ params }: PageProps) {
 
               {allies.length < MAX_ALLIES ? (
                 <BrawlerChooser
-                  options={catalog.current}
+                  options={chooserOptions}
                   taken={[...enemies, ...allies]}
                   label="Add a team-mate"
-                  onPick={(id) => hrefFor({ ally: [...allies, id] })}
+                  suggestedLabel="Best here"
+                  hrefFor={(id) => hrefFor({ ally: [...allies, id] })}
                 />
               ) : null}
             </div>
@@ -598,61 +624,5 @@ function MapChooser({
         })}
       </div>
     </section>
-  );
-}
-
-/**
- * Brawler picker: the roster as a labelled grid, for either side of the draft.
- *
- * Named tiles rather than a bare wall of portraits — a hundred unlabelled
- * icons is a memory test, and the whole point of this step is finding one
- * specific brawler quickly. Capped in height so it never buries the result
- * list underneath it.
- */
-function BrawlerChooser({
-  options: pool,
-  taken,
-  label,
-  onPick,
-}: {
-  options: CatalogBrawler[];
-  /** Everyone already named, on either side — nobody is drafted twice. */
-  taken: number[];
-  label: string;
-  onPick: (brawlerId: number) => string;
-}) {
-  const options = pool
-    .filter((brawler) => !taken.includes(brawler.id))
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  return (
-    <div className="mt-4 border-t border-border pt-4">
-      <p className="mb-2.5 text-xs font-bold uppercase tracking-wide text-muted">{label}</p>
-      <ul className="grid max-h-80 grid-cols-3 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-5 lg:grid-cols-8">
-        {options.map((brawler) => (
-          <li key={brawler.id}>
-            <Link
-              href={onPick(brawler.id)}
-              rel="nofollow"
-              prefetch={false}
-              className="flex flex-col items-center gap-1 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
-            >
-              <Image
-                src={brawler.meta?.imageUrl ?? brawlerIconUrl(brawler.id)}
-                alt=""
-                width={40}
-                height={40}
-                className="size-10 shrink-0"
-                loading="lazy"
-                unoptimized
-              />
-              <span className="w-full truncate text-center text-xs font-medium capitalize text-muted">
-                {brawler.name.toLowerCase()}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
