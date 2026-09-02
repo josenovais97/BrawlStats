@@ -3863,8 +3863,21 @@ function shrinkToward(
   return Math.min(1, Math.max(0, shrunk - baseline + 0.5));
 }
 
-/** Below this a map-and-brawler cell is noise; the prior handles the rest. */
-const MIN_SAMPLE_FOR_MAP_FORM = 50;
+/**
+ * Below this a map-and-brawler cell is not kept at all.
+ *
+ * Thirty rather than fifty, because the prior below is what protects quality
+ * now and the floor was costing coverage that consumers need. Measured: a
+ * player losing 25 straight games on Frank had exactly one of his six maps
+ * represented at fifty, so "was this the wrong pick here" could not be answered
+ * for five of them — not because the answer was no, but because the cell had
+ * been discarded.
+ *
+ * Safe because MAP_FORM_PRIOR pulls a thirty-battle cell most of the way back
+ * to its map's average: it can no longer reach the extremes that made a
+ * fifty-battle floor necessary when the prior was 50.
+ */
+const MIN_SAMPLE_FOR_MAP_FORM = 30;
 
 /**
  * Shrinkage for a map cell, in pseudo-battles. Deliberately three times the
