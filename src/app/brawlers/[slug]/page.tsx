@@ -23,6 +23,7 @@ import { TableSkeleton } from '@/components/ui/skeletons';
 import {
   ClassIcon,
   CombatStatIcon,
+  HyperchargeIcon,
   PlayersIcon,
   PrestigeIcon,
   TrophyIcon,
@@ -838,6 +839,69 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 );
               })}
           </dl>
+
+          {/*
+            Charging the Super, which the game never tells you and no other site
+            publishes. The wiki gives a percentage per hit; the useful form is
+            the count, so that is what leads.
+
+            `shotsToSuper` is null wherever the rate is conditional — Piper
+            charges "8.225-41.225%" depending on range — and the row is dropped
+            rather than reduced to an average that would be wrong at both ends.
+          */}
+          {wiki.stats.shotsToSuper ||
+          wiki.stats.attackSuperCharge ||
+          wiki.stats.hyperchargeMultiplier ? (
+            <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {wiki.stats.shotsToSuper ? (
+                <div className="card p-3">
+                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
+                    Hits to Super
+                  </dt>
+                  <dd className="mt-1.5 text-lg font-bold leading-tight tabular-nums">
+                    {wiki.stats.shotsToSuper}
+                  </dd>
+                  <dd className="mt-0.5 text-xs leading-tight text-muted">
+                    from empty, all hits landing
+                  </dd>
+                </div>
+              ) : null}
+
+              {wiki.stats.attackSuperCharge ? (
+                <div className="card p-3">
+                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
+                    Super charge
+                  </dt>
+                  <dd className="mt-1.5 text-lg font-bold leading-tight tabular-nums">
+                    {wiki.stats.attackSuperCharge}
+                  </dd>
+                  <dd className="mt-0.5 text-xs leading-tight text-muted">
+                    per hit
+                    {wiki.stats.attackBullets
+                      ? ` · ${wiki.stats.attackBullets} per attack`
+                      : ''}
+                  </dd>
+                </div>
+              ) : null}
+
+              {wiki.stats.hyperchargeMultiplier ? (
+                <div className="card p-3">
+                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
+                    Hypercharge boost
+                  </dt>
+                  <dd className="mt-1.5 flex items-center gap-2">
+                    <HyperchargeIcon className="size-5 shrink-0" />
+                    <span className="text-lg font-bold leading-tight tabular-nums">
+                      {wiki.stats.hyperchargeMultiplier}
+                    </span>
+                  </dd>
+                  <dd className="mt-0.5 text-xs leading-tight text-muted">
+                    speed, damage and shield
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : null}
         </section>
       ) : null}
 

@@ -72,6 +72,30 @@ export interface BrawlerStats {
   reload: string | null;
   movementSpeed: string | null;
   attackRange: string | null;
+
+  /**
+   * How fast the Super charges, and what it takes to get there.
+   *
+   * The infobox gives a percentage per hit — Shelly charges 10.05% per shell —
+   * and `shotsToSuper` is that turned into the number a player actually thinks
+   * in. Neither the game API nor the artwork mirror publishes any of it, and
+   * the game itself never shows it, so this is the sort of thing a stats site
+   * exists to work out.
+   */
+  attackSuperCharge: string | null;
+  superSuperCharge: string | null;
+  /** Projectiles per attack, which is what makes the per-hit rate readable. */
+  attackBullets: string | null;
+  /** Derived: hits needed to fill the Super bar from empty. */
+  shotsToSuper: number | null;
+  /** How much Hypercharge boosts the brawler, e.g. "30%". */
+  hyperchargeMultiplier: string | null;
+}
+
+/** A gadget with the cooldown the wiki records for it. */
+export interface WikiGadget {
+  name: string;
+  cooldown: string | null;
 }
 
 export interface WikiAbility {
@@ -96,6 +120,8 @@ export interface BrawlerWiki {
   /** Keyed by slugged ability name, covering gadgets and star powers. */
   abilities: Map<string, WikiAbility>;
   hypercharge: (WikiAbility & { name: string }) | null;
+  /** Gadget cooldowns, in the order the infobox numbers them. */
+  gadgets: WikiGadget[];
   /** Balance changes, newest first. */
   history: BalanceChange[];
 }
@@ -108,6 +134,23 @@ export interface BrawlerWiki {
  * base value is the one worth showing. The rest depend on a loadout the reader
  * has not told us about.
  */
+/**
+ * Hits to fill the Super bar, from the wiki's per-hit percentage.
+ *
+ * Rounded up, because a partial hit does not charge anything — the last one has
+ * to land. Returns null on anything unparseable rather than guessing: several
+ * brawlers charge conditionally (Shelly's is different with Clay Pigeons) and
+ * the infobox writes those as prose this cannot safely reduce to a number.
+ */
+function shotsToSuper(percentPerHit: string | null): number | null {
+  if (!percentPerHit) return null;
+  const match = /^([\d.]+)\s*%/.exec(percentPerHit.trim());
+  if (!match) return null;
+  const per = Number(match[1]);
+  if (!Number.isFinite(per) || per <= 0) return null;
+  return Math.ceil(100 / per);
+}
+
 function firstValue(value: string | undefined): string | null {
   if (!value) return null;
   const text = toPlainText(value.split(/<br\s*\/?>/i)[0]);
@@ -269,7 +312,23 @@ export async function getBrawlerWiki(name: string): Promise<BrawlerWiki | null> 
     reload: firstValue(box.Reload),
     movementSpeed: firstValue(box.MovementSpeed),
     attackRange: firstValue(box.AttackRange),
+    attackSuperCharge: firstValue(box.AttackSuperCharge),
+    superSuperCharge: firstValue(box.SuperSuperCharge),
+    attackBullets: firstValue(box.AttackBullets),
+    shotsToSuper: shotsToSuper(firstValue(box.AttackSuperCharge)),
+    hyperchargeMultiplier: firstValue(box.HyperchargeMultiplier),
   };
+
+  /*
+   * Numbered rather than named in the infobox, so they are read until one is
+   * missing. Two is the norm; a brawler with one gadget stops at one.
+   */
+  const gadgets: WikiGadget[] = [];
+  for (let i = 1; i <= 4; i += 1) {
+    const name = firstValue(box[`Gadget${i}Name`]);
+    if (!name) break;
+    gadgets.push({ name, cooldown: firstValue(box[`Gadget${i}Cooldown`]) });
+  }
 
   const hypercharge = parseHypercharge(wikitext);
   const history = parseHistory(wikitext);
@@ -280,7 +339,7 @@ export async function getBrawlerWiki(name: string): Promise<BrawlerWiki | null> 
     return null;
   }
 
-  return { title: page.title, stats, abilities, hypercharge, history };
+  return { title: page.title, stats, abilities, hypercharge, gadgets, history };
 }
 
 /**

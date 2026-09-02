@@ -93,6 +93,18 @@ export function BuildAndUpgrades({
   const describe = (item: BAAccessory) =>
     wiki?.abilities.get(slugify(item.name))?.description ?? item.description;
 
+  /*
+   * Matched on the slugged name rather than by position. The infobox numbers
+   * its gadgets and the game API lists them in its own order, and the two have
+   * no contract with each other — pairing by index would eventually put one
+   * gadget's cooldown under another's name, silently and only for the brawlers
+   * where the orders happen to differ.
+   */
+  const cooldowns = new Map(
+    (wiki?.gadgets ?? []).map((g) => [slugify(g.name), g.cooldown] as const),
+  );
+  const cooldownOf = (item: BAAccessory) => cooldowns.get(slugify(item.name)) ?? null;
+
   return (
     <section id="build" className="scroll-anchor">
       <SectionHeading
@@ -134,6 +146,7 @@ export function BuildAndUpgrades({
             items={gadgets}
             emptyLabel="No gadgets released."
             descriptionFor={describe}
+            cooldownFor={cooldownOf}
           />
         </div>
 
@@ -331,6 +344,7 @@ function AbilityCard({
   items,
   emptyLabel,
   descriptionFor,
+  cooldownFor,
 }: {
   title: string;
   kind: keyof typeof KIND;
@@ -338,6 +352,8 @@ function AbilityCard({
   items: BAAccessory[];
   emptyLabel: string;
   descriptionFor: (item: BAAccessory) => string;
+  /** Gadgets only: the wiki records a cooldown, nothing else does. */
+  cooldownFor?: (item: BAAccessory) => string | null;
 }) {
   return (
     <UpgradeCard
@@ -362,7 +378,16 @@ function AbilityCard({
                 unoptimized
               />
               <div className="min-w-0">
-                <p className="font-bold capitalize">{item.name.toLowerCase()}</p>
+                <p className="flex flex-wrap items-baseline gap-x-2 font-bold capitalize">
+                  {item.name.toLowerCase()}
+                  {/* The cooldown decides whether a gadget is a habit or an
+                      emergency button, and the game shows it nowhere. */}
+                  {cooldownFor?.(item) ? (
+                    <span className="text-xs font-semibold normal-case text-muted">
+                      {cooldownFor(item)} cooldown
+                    </span>
+                  ) : null}
+                </p>
                 {/* Descriptions run from eight words to sixty. Clamped past a
                     threshold so one wordy gadget cannot make its card three
                     times the height of the one beside it. */}
