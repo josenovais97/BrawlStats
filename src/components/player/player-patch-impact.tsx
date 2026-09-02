@@ -15,11 +15,23 @@ import type { BABrawler } from '@/types/brawlapi';
  * brawlers you own were changed" is the thing a reader cannot get from the
  * official notes, and it is the reason to look here rather than at them.
  *
- * Rows keep their measured move even when it is small, and say how many days of
- * data are behind it. A patch is usually days old when this matters most, and
- * two days of snapshots is a real measurement of a short period rather than a
- * verdict — printing the number without its age would overstate it.
+ * The list is capped and the roster is sorted to the top, because an update can
+ * touch forty brawlers and a wall of them is the patch notes again. A row says
+ * "too early to measure" until there are a few days of snapshots behind it,
+ * which is most of the window where this section is on the page at all — that
+ * is the honest state, and better than a two-day number that looks like a
+ * finding.
  */
+
+/** "1 September", UTC-anchored so the server and browser agree. */
+function patchDay(iso: string): string {
+  return new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+  });
+}
+
 export function PlayerPatchImpact({
   impact,
   patch,
@@ -29,19 +41,19 @@ export function PlayerPatchImpact({
   patch: { title: string; url: string; date: string };
   brawlerMeta: Map<number, BABrawler>;
 }) {
-  const { rows, buffed, nerfed, daysAfter } = impact;
-  const mine = rows.filter((row) => row.power !== null);
+  const { rows, buffed, nerfed, changedTotal, ownedTotal } = impact;
+  const measured = buffed + nerfed > 0;
 
   return (
     <section className="space-y-3">
       <SectionHeading
         title="What the update did to you"
         subtitle={
-          mine.length > 0
-            ? `${mine.length} ${mine.length === 1 ? 'brawler' : 'brawlers'} you own changed in ${patch.title}${
-                buffed + nerfed > 0 ? ` — ${buffed} up, ${nerfed} down since` : ''
-              }.`
-            : `Nothing you own changed in ${patch.title}.`
+          ownedTotal > 0
+            ? `The ${patchDay(patch.date)} update changed ${ownedTotal} ${
+                ownedTotal === 1 ? 'brawler' : 'brawlers'
+              } you own${measured ? ` — ${buffed} up, ${nerfed} down since` : ''}.`
+            : `Nothing you own changed in the ${patchDay(patch.date)} update.`
         }
         aside={
           <a
@@ -86,7 +98,7 @@ export function PlayerPatchImpact({
               </span>
 
               {row.delta === null ? (
-                <span className="shrink-0 text-xs text-muted">not measured yet</span>
+                <span className="shrink-0 text-xs text-muted">too early to measure</span>
               ) : (
                 <span className="shrink-0 text-right">
                   <span
@@ -110,11 +122,12 @@ export function PlayerPatchImpact({
       </ul>
 
       <p className="text-xs leading-relaxed text-muted">
+        {changedTotal > rows.length
+          ? `Showing the ${rows.length} most relevant of ${changedTotal} brawlers the update touched, yours first. `
+          : ''}
         Win rates are adjusted against the sample average, so a shift here is the brawler moving
-        rather than the cohort.{' '}
-        {Number.isFinite(daysAfter) && daysAfter > 0
-          ? `Measured from ${daysAfter} ${daysAfter === 1 ? 'day' : 'days'} of snapshots since the update — a short window, and it widens daily.`
-          : 'Moves appear once a day of snapshots has been collected since the update.'}
+        rather than the cohort — and a move only appears once there are a few days of snapshots
+        behind it, because a two-day sample swings further than any balance change does.
       </p>
     </section>
   );

@@ -17,8 +17,25 @@ import type { BSPlayerBrawler } from '@/types/brawlstars';
  * our daily snapshots. The roster decides which rows are worth showing.
  */
 
-/** Below this a move is inside the noise of a two-day sample. */
+/** Below this a move is inside the noise of a short sample. */
 const MEANINGFUL_MOVE = 0.01;
+
+/**
+ * Snapshots needed after the patch before a move is worth printing.
+ *
+ * Two days produced swings of twelve points in both directions, which is not
+ * what a balance change does — it is what a two-day sample does. Publishing
+ * those would be the map-form mistake again: a number that looks like a
+ * finding, is the first thing a reader would quote, and is mostly noise.
+ *
+ * So the section ships the day a patch lands, showing which of the player's
+ * brawlers were touched, and fills in the measurements a few days later when
+ * they mean something.
+ */
+const MIN_DAYS_AFTER = 3;
+
+/** Rows shown before the list becomes a wall. An update can touch forty. */
+export const PATCH_ROWS_SHOWN = 8;
 
 /**
  * How long an update stays interesting.
@@ -50,7 +67,12 @@ export interface PatchRow {
 }
 
 export interface PatchImpact {
+  /** Capped for display; `changedTotal` keeps the real figure. */
   rows: PatchRow[];
+  /** Every brawler the update touched, owned or not. */
+  changedTotal: number;
+  /** How many of those this account owns. */
+  ownedTotal: number;
   /** Owned and measurably improved / worsened, for the headline. */
   buffed: number;
   nerfed: number;
@@ -90,7 +112,10 @@ export function patchImpact({
       const mine = owned.get(id);
       const measured = split.get(id);
       const delta =
-        measured && measured.before !== null && measured.after !== null
+        measured &&
+        measured.before !== null &&
+        measured.after !== null &&
+        measured.daysAfter >= MIN_DAYS_AFTER
           ? measured.after - measured.before
           : null;
 
@@ -123,7 +148,9 @@ export function patchImpact({
 
   const mineWithMove = rows.filter((r) => r.power !== null && r.delta !== null);
   return {
-    rows,
+    rows: rows.slice(0, PATCH_ROWS_SHOWN),
+    changedTotal: rows.length,
+    ownedTotal: rows.filter((r) => r.power !== null).length,
     buffed: mineWithMove.filter((r) => (r.delta ?? 0) >= MEANINGFUL_MOVE).length,
     nerfed: mineWithMove.filter((r) => (r.delta ?? 0) <= -MEANINGFUL_MOVE).length,
     daysAfter: Math.min(...rows.map((r) => r.daysAfter).filter((d) => d > 0), Infinity),
