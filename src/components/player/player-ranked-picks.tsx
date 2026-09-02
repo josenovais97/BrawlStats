@@ -188,10 +188,7 @@ export function PlayerRankedPicks({
         </p>
       </div>
 
-      {/* `items-start` so a mode with nothing to upgrade stays short instead of
-          being stretched to match its neighbour, which left a card-sized hole
-          under the one answer that needed no follow-up. */}
-      <ul className="grid items-start gap-2.5 sm:grid-cols-2">
+      <ul className="grid gap-2.5 sm:grid-cols-2">
         {answers.map((answer) => (
           <ModeCard key={answer.mode} answer={answer} brawlerMeta={brawlerMeta} />
         ))}
@@ -200,6 +197,18 @@ export function PlayerRankedPicks({
   );
 }
 
+/**
+ * Three slots, always, whether or not each is filled.
+ *
+ * The card looked messy for a structural reason rather than a styling one: a
+ * mode with one row sat beside a mode with three, so the grid came out ragged
+ * and the eye could not compare like with like. The version that read cleanly
+ * was the one where every card happened to have all three.
+ *
+ * So the shape is fixed — play, upgrade, unlock — and an empty slot says why it
+ * is empty. "You own every better pick" is worth a line: it is the answer to
+ * the question the slot exists to ask, and it is good news.
+ */
 function ModeCard({
   answer,
   brawlerMeta,
@@ -211,7 +220,7 @@ function ModeCard({
   const accent = meta?.color ?? '#8b95b8';
 
   return (
-    <li className="card overflow-hidden p-3">
+    <li className="card flex flex-col overflow-hidden p-3">
       <span className="flex items-center gap-1.5">
         {meta?.imageUrl ? (
           <Image
@@ -240,46 +249,54 @@ function ModeCard({
           tone="good"
         />
       ) : (
-        <p className="mt-2 text-sm text-muted">
-          Nothing in this mode&rsquo;s picks at power {READY_POWER} yet.
-        </p>
+        <Empty>Nothing here at power {READY_POWER} yet</Empty>
       )}
 
-      {upgrade || unlock ? (
-        <div className="mt-2 space-y-2 border-t border-border pt-2">
-          {upgrade ? (
-            play && upgrade.id === play.id ? (
-              /* When the only worthwhile upgrade is the brawler already named
-                 above, a second portrait of the same face reads as a bug. It
-                 becomes a line about that brawler instead. */
-              <p className="text-xs text-accent">
-                Finish {titleCase(upgrade.name)} · power {upgrade.power} → {UPGRADE_TARGET} ·{' '}
-                {formatNumber(upgrade.coins)} coins
-              </p>
-            ) : (
-              <Row
-                art={brawlerMeta.get(upgrade.id)?.imageUrl}
-                name={upgrade.name}
-                note={`#${upgrade.rank} pick · power ${upgrade.power} → ${UPGRADE_TARGET} · ${formatNumber(upgrade.coins)} coins`}
-                tone="invest"
-                small
-              />
-            )
-          ) : null}
+      <div className="mt-2 space-y-2 border-t border-border pt-2">
+        {upgrade ? (
+          <Row
+            art={brawlerMeta.get(upgrade.id)?.imageUrl}
+            name={upgrade.name}
+            note={
+              play && upgrade.id === play.id
+                ? `Finish it · power ${upgrade.power} → ${UPGRADE_TARGET} · ${formatNumber(upgrade.coins)} coins`
+                : `#${upgrade.rank} pick · power ${upgrade.power} → ${UPGRADE_TARGET} · ${formatNumber(upgrade.coins)} coins`
+            }
+            tone="invest"
+            small
+          />
+        ) : (
+          <Empty small>Nothing here left to upgrade</Empty>
+        )}
 
-          {unlock ? (
-            <Row
-              art={brawlerMeta.get(unlock.id)?.imageUrl}
-              name={unlock.name}
-              note={`Unlock for the #${unlock.rank} pick`}
-              tone="lock"
-              small
-            />
-          ) : null}
-        </div>
-      ) : null}
-
+        {unlock ? (
+          <Row
+            art={brawlerMeta.get(unlock.id)?.imageUrl}
+            name={unlock.name}
+            note={`Unlock for the #${unlock.rank} pick`}
+            tone="lock"
+            small
+          />
+        ) : (
+          <Empty small>You own every better pick</Empty>
+        )}
+      </div>
     </li>
+  );
+}
+
+/** Holds a slot's height so the grid stays a matrix rather than a staircase. */
+function Empty({ children, small = false }: { children: React.ReactNode; small?: boolean }) {
+  return (
+    <span
+      className={`flex items-center gap-2.5 ${small ? 'min-h-8' : 'mt-1.5 min-h-10'}`}
+    >
+      <span
+        aria-hidden
+        className={`${small ? 'size-8' : 'size-10'} shrink-0 rounded-lg border border-dashed border-border`}
+      />
+      <span className={`text-muted ${small ? 'text-xs' : 'text-sm'}`}>{children}</span>
+    </span>
   );
 }
 
