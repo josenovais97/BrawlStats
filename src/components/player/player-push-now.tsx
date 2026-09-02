@@ -35,6 +35,13 @@ export function PlayerPushNow({
   const [top, ...rest] = options;
   const topMode = modeLabel(modeMeta, top.mode);
   const topArt = brawlerMeta.get(top.brawlerId);
+  /*
+   * Absent for the newest modes. The artwork source publishes a mode's icon
+   * some weeks after the game ships it — Air Hockey, Cooking and Tag Team all
+   * have none today, and the wiki has not drawn them either — so the icon is
+   * rendered when it exists rather than reserved with a placeholder box.
+   */
+  const topModeArt = modeMeta.get(top.mode.toLowerCase())?.imageUrl;
 
   return (
     <section className="space-y-3">
@@ -77,8 +84,21 @@ export function PlayerPushNow({
                 belongs to before the sentence means anything. The map is still
                 named, and still the link, because the recommendation is
                 specific to it. */}
-            <p className="text-xl font-black leading-tight sm:text-2xl">
-              Play {titleCase(top.brawlerName)} in {topMode}
+            <p className="flex flex-wrap items-center gap-x-2 text-xl font-black leading-tight sm:text-2xl">
+              <span>Play {titleCase(top.brawlerName)} in</span>
+              <span className="inline-flex items-center gap-1.5">
+                {topModeArt ? (
+                  <Image
+                    src={topModeArt}
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="size-6 shrink-0 object-contain"
+                    unoptimized
+                  />
+                ) : null}
+                {topMode}
+              </span>
             </p>
             <p className="mt-0.5 text-sm">
               <Link
@@ -141,9 +161,21 @@ export function PlayerPushNow({
                   unoptimized
                 />
                 <span className="min-w-0 flex-1 text-sm">
-                  <span className="block truncate">
+                  <span className="flex items-center gap-1.5 truncate">
                     <span className="font-semibold">{titleCase(option.brawlerName)}</span>
-                    <span className="text-muted"> in {mode}</span>
+                    <span className="text-muted">in</span>
+                    {modeMeta.get(option.mode.toLowerCase())?.imageUrl ? (
+                      <Image
+                        src={modeMeta.get(option.mode.toLowerCase())!.imageUrl}
+                        alt=""
+                        width={16}
+                        height={16}
+                        className="size-4 shrink-0 object-contain"
+                        loading="lazy"
+                        unoptimized
+                      />
+                    ) : null}
+                    <span className="text-muted">{mode}</span>
                   </span>
                   <Link
                     href={`/maps/${slugify(mode)}/${slugify(option.mapName)}`}
