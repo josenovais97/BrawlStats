@@ -23,7 +23,22 @@ force=0
 
 cd "$HOME/brawlstats" || exit 1
 
-git fetch --quiet origin main || exit 0
+# A failed fetch is a failure, not a quiet no-op.
+#
+# This used to `exit 0`, on the reasoning that a network blip should not page
+# anyone. The cost is that it cannot tell "nothing new to deploy" apart from
+# "cannot reach the remote", and it reports both as success — so `OnFailure`
+# never fires and the box silently stops tracking `origin/main`. Seen on
+# 2026-09-02: two consecutive runs died on `could not read Username for
+# 'https://github.com'` and both logged rc=0.
+#
+# The only thing that noticed was the health check's "box is behind
+# origin/main" rule, twenty minutes later. Exiting non-zero puts the alert back
+# on the job that actually failed.
+if ! git fetch --quiet origin main; then
+  echo "could not fetch origin/main; the box is no longer tracking it" >&2
+  exit 1
+fi
 
 local=$(git rev-parse HEAD)
 remote=$(git rev-parse origin/main)
