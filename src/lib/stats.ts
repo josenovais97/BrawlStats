@@ -3964,6 +3964,86 @@ const cachedMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
 export async function getMapMatchups(): Promise<Map<string, MapMatchup[]>> {
   return new Map(await cachedMapMatchups());
 }
+/** A brawler's adjusted win rate on each side of a date. */
+export interface PatchSplit {
+  brawlerId: number;
+  before: number | null;
+  after: number | null;
+  /** Snapshots behind each side, so a thin "after" can say so. */
+  daysBefore: number;
+  daysAfter: number;
+}
+
+/**
+ * Every brawler's form before and after a date, from the daily snapshots.
+ *
+ * Split on the update's own publication date, which is the only boundary that
+ * means anything: a balance change lands with the patch, so a window that
+ * straddles it averages the two metas together and reports that nothing moved.
+ *
+ * Adjusted rather than raw on both sides. Each snapshot carries the baseline it
+ * was computed under, and the sampled cohort's average drifts week to week — a
+ * fortnight where the pool skews stronger lifts every brawler at once, which
+ * would read as "the patch buffed everything".
+ *
+ * Returns entries; see compute_getMapMatchups for why nothing cached is a Map.
+ */
+async function compute_getPatchSplit(patchDate: string): Promise<[number, PatchSplit][]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.$queryRaw<
+      {
+        brawler_id: number;
+        side: string;
+        adjusted: number | null;
+        days: bigint;
+      }[]
+    >`
+      SELECT brawler_id,
+        CASE WHEN snapshot_date < ${patchDate}::date THEN 'before' ELSE 'after' END AS side,
+        AVG(win_rate - baseline_win_rate + 0.5) AS adjusted,
+        COUNT(DISTINCT snapshot_date) AS days
+      FROM brawler_stats
+      WHERE win_rate IS NOT NULL
+        AND baseline_win_rate IS NOT NULL
+        AND decided_sample_size >= ${MIN_SAMPLE_FOR_TIER}
+      GROUP BY brawler_id, side
+    `;
+
+    const byId = new Map<number, PatchSplit>();
+    for (const row of rows) {
+      const entry = byId.get(row.brawler_id) ?? {
+        brawlerId: row.brawler_id,
+        before: null,
+        after: null,
+        daysBefore: 0,
+        daysAfter: 0,
+      };
+      if (row.side === 'before') {
+        entry.before = row.adjusted;
+        entry.daysBefore = Number(row.days);
+      } else {
+        entry.after = row.adjusted;
+        entry.daysAfter = Number(row.days);
+      }
+      byId.set(row.brawler_id, entry);
+    }
+    return [...byId];
+  } catch (error) {
+    swallow('compute_getPatchSplit', error);
+    return [];
+  }
+}
+
+const cachedPatchSplit = cachedRead('patch-split', compute_getPatchSplit);
+
+/** Keyed by brawler id. Entries through the cache, Map to callers. */
+export async function getPatchSplit(patchDate: string): Promise<Map<number, PatchSplit>> {
+  return new Map(await cachedPatchSplit(patchDate));
+}
+
 const cachedLadderMapForm = cachedRead('ladder-map-form', compute_getLadderMapForm);
 
 /** Keyed by map name. Entries through the cache, Map to callers. */

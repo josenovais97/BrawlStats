@@ -9,6 +9,7 @@ import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerNav } from '@/components/player/player-nav';
 import { PlayerProgress } from '@/components/player/player-progress';
+import { PlayerPatchImpact } from '@/components/player/player-patch-impact';
 import { PlayerPushNow } from '@/components/player/player-push-now';
 import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
@@ -34,11 +35,14 @@ import {
 import { getGameModeMap } from '@/lib/brawlapi';
 import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
+import { PATCH_RELEVANT_DAYS, patchImpact, type PatchImpact } from '@/lib/patch-impact';
 import { pushOptions } from '@/lib/push-now';
+import { changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
 import {
   getLadderMapForm,
+  getPatchSplit,
   getMetaIndex,
   getBestPicksByMode,
   getRankedMapPicks,
@@ -187,6 +191,36 @@ export default async function PlayerPage({ params }: PageProps) {
 
   const push = pushOptions({ rotation, brawlers: player.brawlers, form: mapForm });
 
+  /*
+   * Only while the update is recent. This is the one section on the profile
+   * with a natural expiry: "what did the patch do to me" is urgent for a couple
+   * of weeks and then becomes another permanent block on a long page, so it
+   * removes itself rather than accumulating.
+   */
+  const notes = await getLatestReleaseNotes().catch(() => null);
+  const patchAge = notes?.publishedAt
+    ? (Date.now() - new Date(notes.publishedAt).getTime()) / 86_400_000
+    : Infinity;
+
+  let impact: PatchImpact | null = null;
+  if (notes?.publishedAt && patchAge <= PATCH_RELEVANT_DAYS && catalogue.length > 0) {
+    const changes = changesFromNotes(
+      notes,
+      catalogue.map((b: { name: string }) => b.name),
+    );
+    const split = await getPatchSplit(notes.publishedAt.slice(0, 10)).catch(
+      () => new Map(),
+    );
+    impact = patchImpact({
+      changes,
+      brawlers: player.brawlers,
+      split,
+      byName: new Map(
+        catalogue.map((b: { id: number; name: string }) => [b.name.toLowerCase(), b.id]),
+      ),
+    });
+  }
+
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
   // Pure function over the payload we already have — no database, no extra
@@ -287,6 +321,14 @@ export default async function PlayerPage({ params }: PageProps) {
           about the next couple of hours, and burying it under them would be
           filing the answer behind the background. */}
       <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
+
+      {impact && notes?.publishedAt ? (
+        <PlayerPatchImpact
+          impact={impact}
+          patch={{ title: notes.title, url: notes.url, date: notes.publishedAt }}
+          brawlerMeta={brawlerMeta}
+        />
+      ) : null}
 
       <PlayerMetaFit
         brawlers={player.brawlers}

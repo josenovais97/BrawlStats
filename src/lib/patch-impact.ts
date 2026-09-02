@@ -1,0 +1,125 @@
+import 'server-only';
+
+import { CHANGE_LABEL, type ChangeCategory } from '@/lib/release-notes';
+import type { PatchSplit } from '@/lib/stats';
+import type { BSPlayerBrawler } from '@/types/brawlstars';
+
+/**
+ * What the last update did to *this* account.
+ *
+ * Every site publishes the patch notes and every site publishes the new tier
+ * list. Neither answers the question the player actually has on update day,
+ * which is whether any of it applies to them — a nerf to a brawler you have
+ * never touched is news about someone else's account.
+ *
+ * Two things are joined here that nobody else has together: Supercell's own
+ * change list, parsed by category, and a per-brawler before/after measured from
+ * our daily snapshots. The roster decides which rows are worth showing.
+ */
+
+/** Below this a move is inside the noise of a two-day sample. */
+const MEANINGFUL_MOVE = 0.01;
+
+/**
+ * How long an update stays interesting.
+ *
+ * The section removes itself afterwards rather than becoming another permanent
+ * block on an already long page. Three weeks covers the window where "what did
+ * the patch do to me" is a live question, and by then the next one is usually
+ * close.
+ */
+export const PATCH_RELEVANT_DAYS = 21;
+
+export interface PatchRow {
+  brawlerId: number;
+  name: string;
+  category: ChangeCategory;
+  categoryLabel: string;
+  /** Power the account holds it at, or null when it is not owned. */
+  power: number | null;
+  trophies: number;
+  /** Adjusted win-rate move across the patch date, or null when unmeasured. */
+  delta: number | null;
+  daysAfter: number;
+}
+
+export interface PatchImpact {
+  rows: PatchRow[];
+  /** Owned and measurably improved / worsened, for the headline. */
+  buffed: number;
+  nerfed: number;
+  /** The thinnest "after" sample behind any row, for the caveat line. */
+  daysAfter: number;
+}
+
+/**
+ * Joins the update's change list to the roster and the measurements.
+ *
+ * Brawlers the account does not own are kept rather than filtered: "the thing
+ * that got buffed is one you never unlocked" is a useful answer, and it is the
+ * one that turns a patch note into an unlock decision. They are ordered last.
+ */
+export function patchImpact({
+  changes,
+  brawlers,
+  split,
+  byName,
+}: {
+  changes: { category: ChangeCategory; brawlers: string[] }[];
+  brawlers: BSPlayerBrawler[];
+  split: Map<number, PatchSplit>;
+  /** Lowercased brawler name to id, from the catalogue. */
+  byName: Map<string, number>;
+}): PatchImpact | null {
+  const owned = new Map(brawlers.map((b) => [b.id, b]));
+  const rows: PatchRow[] = [];
+  const seen = new Set<number>();
+
+  for (const change of changes) {
+    for (const name of change.brawlers) {
+      const id = byName.get(name.toLowerCase());
+      if (id === undefined || seen.has(id)) continue;
+      seen.add(id);
+
+      const mine = owned.get(id);
+      const measured = split.get(id);
+      const delta =
+        measured && measured.before !== null && measured.after !== null
+          ? measured.after - measured.before
+          : null;
+
+      rows.push({
+        brawlerId: id,
+        name,
+        category: change.category,
+        categoryLabel: CHANGE_LABEL[change.category],
+        power: mine?.power ?? null,
+        trophies: mine?.trophies ?? 0,
+        delta,
+        daysAfter: measured?.daysAfter ?? 0,
+      });
+    }
+  }
+
+  if (rows.length === 0) return null;
+
+  /*
+   * Owned first, then by how far the brawler moved. A player scanning this
+   * wants their own roster before the rest of the patch, and within that the
+   * biggest change first — in either direction, because a nerf to something
+   * they main matters as much as a buff.
+   */
+  rows.sort((a, b) => {
+    const ownedDiff = Number(b.power !== null) - Number(a.power !== null);
+    if (ownedDiff !== 0) return ownedDiff;
+    return Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0);
+  });
+
+  const mineWithMove = rows.filter((r) => r.power !== null && r.delta !== null);
+  return {
+    rows,
+    buffed: mineWithMove.filter((r) => (r.delta ?? 0) >= MEANINGFUL_MOVE).length,
+    nerfed: mineWithMove.filter((r) => (r.delta ?? 0) <= -MEANINGFUL_MOVE).length,
+    daysAfter: Math.min(...rows.map((r) => r.daysAfter).filter((d) => d > 0), Infinity),
+  };
+}
