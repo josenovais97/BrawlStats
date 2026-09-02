@@ -3849,8 +3849,40 @@ export interface MapForm {
   adjusted: number;
 }
 
-/** Below this a map-and-brawler cell is noise; shrinkage handles the rest. */
-const MIN_SAMPLE_FOR_MAP_FORM = 30;
+/**
+ * `normalizeWinRate` with the prior spelled out, for consumers whose sample
+ * size is nothing like a brawler's season-long record.
+ */
+function shrinkToward(
+  winRate: number,
+  baseline: number,
+  sampleSize: number,
+  prior: number,
+): number {
+  const shrunk = (winRate * sampleSize + baseline * prior) / (sampleSize + prior);
+  return Math.min(1, Math.max(0, shrunk - baseline + 0.5));
+}
+
+/** Below this a map-and-brawler cell is noise; the prior handles the rest. */
+const MIN_SAMPLE_FOR_MAP_FORM = 50;
+
+/**
+ * Shrinkage for a map cell, in pseudo-battles. Deliberately three times the
+ * roster-wide `PRIOR_BATTLES`.
+ *
+ * A map cell is a much smaller sample than a brawler's overall record, and the
+ * consumer picks the *maximum* of a few dozen of them — which is the same
+ * selection-on-noise problem the comps hit. Measured over 14 days: cells with
+ * 30-60 battles reach a 100.0% win rate, and at k=50 one of those surfaced as
+ * the headline recommendation at "97.9% win rate here", which is not a finding.
+ *
+ * At k=150 a 47-battle cell at 97.9% lands near +7.6 points while a 201-battle
+ * cell at 80.6% lands near +8.4, so weight of evidence decides the order rather
+ * than luck. The floor above then only has to exclude the very smallest cells
+ * instead of carrying the whole burden — at a floor of 100 the live rotation
+ * produced two usable options, which is not a section.
+ */
+const MAP_FORM_PRIOR = 150;
 
 /**
  * Every brawler's form on every ladder map, keyed by map name.
@@ -3911,7 +3943,7 @@ async function compute_getLadderMapForm(
         brawlerId: row.brawler_id,
         battles,
         winRate,
-        adjusted: normalizeWinRate(winRate, total.wins / total.decided, battles) ?? 0.5,
+        adjusted: shrinkToward(winRate, total.wins / total.decided, battles, MAP_FORM_PRIOR),
       });
       out.set(row.map_name, list);
     }

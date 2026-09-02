@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { SectionHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, titleCase } from '@/lib/format';
+import { formatNumber, titleCase } from '@/lib/format';
 import type { PushOption } from '@/lib/push-now';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
@@ -81,9 +81,13 @@ export function PlayerPushNow({
                 {top.mapName}
               </Link>
             </p>
+            {/* The raw per-map win rate is deliberately not printed. On a
+                fifty-battle cell it reads as "97.9% win rate here", which is
+                true of the sample and false about the brawler — and it is the
+                first thing a reader would quote. The adjusted figure on the
+                right is the claim, and it already carries its own shrinkage. */}
             <p className="mt-1 text-sm text-muted">
-              Power {top.power} · {formatNumber(top.trophies)} trophies ·{' '}
-              {formatPercent(top.winRate)} win rate here
+              Power {top.power} · {formatNumber(top.trophies)} trophies
             </p>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
               <span>{timeLeft(top.endsAt)}</span>
