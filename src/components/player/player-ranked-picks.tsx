@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { formatNumber, humanizeMode, titleCase } from '@/lib/format';
-import { coinsBetweenLevels } from '@/lib/progression';
+import { MAX_POWER_LEVEL, coinsBetweenLevels } from '@/lib/progression';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
 import type { ModeBestPicks } from '@/types/stats';
@@ -42,15 +42,25 @@ const READY_POWER = 9;
 /** Ranks past this are not "a pick", they are the rest of the roster. */
 const MEANINGFUL_RANK = 10;
 
+/**
+ * Upgrades are quoted to power 11, not to the playable floor.
+ *
+ * Power 9 is where a brawler stops being dead weight, which is the right bar
+ * for "can I queue with this". It is the wrong bar for "what should I spend
+ * on": nobody stops at 9, so quoting that price answers a question no one
+ * asked and understates what finishing the job actually costs.
+ */
+const UPGRADE_TARGET = MAX_POWER_LEVEL;
+
 interface ModeAnswer {
   mode: string;
   label: string;
   meta: BAGameMode | undefined;
   /** The best pick this account can queue with right now. */
-  play: { id: number; name: string; rank: number } | null;
+  play: { id: number; name: string; rank: number; power: number } | null;
   /** The upgrade or unlock that would beat it, and what it costs. */
   invest:
-    | { id: number; name: string; rank: number; kind: 'upgrade'; coins: number }
+    | { id: number; name: string; rank: number; kind: 'upgrade'; coins: number; power: number }
     | { id: number; name: string; rank: number; kind: 'unlock' }
     | null;
 }
@@ -79,38 +89,59 @@ export function PlayerRankedPicks({
     let play: ModeAnswer['play'] = null;
     let invest: ModeAnswer['invest'] = null;
 
+    /*
+     * Upgrades are preferred over unlocks, and that ordering is the whole point
+     * of this block rather than an aesthetic choice. A brawler you own at power
+     * 4 is a coin cost away; one you do not own is gated behind drops and
+     * credits and cannot simply be bought when you want it. Suggesting "unlock
+     * the #1 pick" while the #3 pick sits owned at power 5 recommends the one
+     * thing the player cannot act on tonight.
+     */
+    const better: { id: number; name: string; rank: number; power: number | undefined }[] = [];
+
     entry.picks.forEach((pick, index) => {
       const rank = index + 1;
       const power = owned.get(pick.brawlerId);
 
       if (power !== undefined && power >= READY_POWER) {
-        if (!play) play = { id: pick.brawlerId, name: pick.brawlerName, rank };
+        if (!play) play = { id: pick.brawlerId, name: pick.brawlerName, rank, power };
         return;
       }
-
-      /*
-       * The first pick this account cannot field. Only the top of the list is
-       * worth investing in — being told to unlock the tenth-best pick is not
-       * advice — and only when it would actually beat what is already
-       * playable, which is checked below once both are known.
-       */
-      if (invest || rank > MEANINGFUL_RANK) return;
-      invest =
-        power === undefined
-          ? { id: pick.brawlerId, name: pick.brawlerName, rank, kind: 'unlock' }
-          : {
-              id: pick.brawlerId,
-              name: pick.brawlerName,
-              rank,
-              kind: 'upgrade',
-              coins: coinsBetweenLevels(power, READY_POWER),
-            };
+      if (rank <= MEANINGFUL_RANK) {
+        better.push({ id: pick.brawlerId, name: pick.brawlerName, rank, power });
+      }
     });
 
-    // An upgrade that lands below what the account can already field is not an
-    // upgrade. Dropping it is what keeps the card from nagging a good roster.
-    if (invest && play && (invest as { rank: number }).rank >= (play as { rank: number }).rank) {
-      invest = null;
+    const beats = (rank: number) => !play || rank < (play as { rank: number }).rank;
+    const upgradable = better.find((c) => c.power !== undefined && beats(c.rank));
+    const unlockable = better.find((c) => c.power === undefined && beats(c.rank));
+
+    if (upgradable) {
+      invest = {
+        id: upgradable.id,
+        name: upgradable.name,
+        rank: upgradable.rank,
+        kind: 'upgrade',
+        coins: coinsBetweenLevels(upgradable.power!, UPGRADE_TARGET),
+        power: upgradable.power!,
+      };
+    } else if (unlockable) {
+      invest = { id: unlockable.id, name: unlockable.name, rank: unlockable.rank, kind: 'unlock' };
+    } else if (play && (play as { power: number }).power < UPGRADE_TARGET) {
+      /*
+       * Nothing better is reachable, but the brawler they are already playing
+       * is not finished. Maxing it is then the only spend that improves this
+       * mode, and it is the one the card would otherwise never mention.
+       */
+      const current = play as { id: number; name: string; rank: number; power: number };
+      invest = {
+        id: current.id,
+        name: current.name,
+        rank: current.rank,
+        kind: 'upgrade',
+        coins: coinsBetweenLevels(current.power, UPGRADE_TARGET),
+        power: current.power,
+      };
     }
 
     answers.push({
@@ -211,17 +242,27 @@ function ModeCard({
 
       {invest ? (
         <div className="mt-2 border-t border-border pt-2">
-          <Row
-            art={brawlerMeta.get(invest.id)?.imageUrl}
-            name={invest.name}
-            note={
-              invest.kind === 'unlock'
-                ? `Unlock for the #${invest.rank} pick`
-                : `To power ${READY_POWER} · ${formatNumber(invest.coins)} coins`
-            }
-            tone="invest"
-            small
-          />
+          {/* When the only worthwhile spend is on the brawler already named
+              above, a second portrait of the same face reads as a bug. It
+              becomes a line about that brawler instead. */}
+          {play && invest.id === play.id ? (
+            <p className="text-xs text-accent">
+              Finish it · power {invest.kind === 'upgrade' ? invest.power : ''} →{' '}
+              {UPGRADE_TARGET} · {invest.kind === 'upgrade' ? formatNumber(invest.coins) : ''} coins
+            </p>
+          ) : (
+            <Row
+              art={brawlerMeta.get(invest.id)?.imageUrl}
+              name={invest.name}
+              note={
+                invest.kind === 'unlock'
+                  ? `Unlock for the #${invest.rank} pick`
+                  : `#${invest.rank} pick · power ${invest.power} → ${UPGRADE_TARGET} · ${formatNumber(invest.coins)} coins`
+              }
+              tone="invest"
+              small
+            />
+          )}
         </div>
       ) : null}
     </li>
