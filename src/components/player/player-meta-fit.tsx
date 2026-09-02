@@ -1,4 +1,4 @@
-import { ArrowUpRight, Lock, TrendingDown } from 'lucide-react';
+import { ArrowUpRight, TrendingDown } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -51,7 +51,6 @@ export function PlayerMetaFit({
   if (top.length === 0) return null;
 
   const ownedTop = top.filter((e) => owned.has(e.brawlerId));
-  const missingTop = top.filter((e) => !owned.has(e.brawlerId));
 
   // Strong *and* not finished: the actionable half of "you own it".
   const underlevelled = ownedTop
@@ -119,27 +118,6 @@ export function PlayerMetaFit({
         </Card>
 
         <Card
-          title="Not unlocked"
-          icon={Lock}
-          tone="text-brand"
-          empty="You own every top-tier brawler."
-          hint="Top-tier brawlers missing from this account."
-        >
-          {missingTop.slice(0, LIMIT).map((entry) => (
-            <Row
-              key={entry.brawlerId}
-              id={entry.brawlerId}
-              name={entry.brawlerName}
-              icon={iconFor(entry.brawlerId)}
-              tier={entry.tier}
-              score={entry.metaScore}
-              detail="Not unlocked"
-              muted
-            />
-          ))}
-        </Card>
-
-        <Card
           title="Mains out of favour"
           icon={TrendingDown}
           tone="text-defeat"
@@ -172,7 +150,7 @@ function Card({
   children,
 }: {
   title: string;
-  icon: typeof Lock;
+  icon: typeof ArrowUpRight;
   tone: string;
   hint: string;
   empty: string;

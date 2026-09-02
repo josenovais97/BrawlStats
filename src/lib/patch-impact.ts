@@ -83,9 +83,22 @@ export interface PatchImpact {
 /**
  * Joins the update's change list to the roster and the measurements.
  *
- * Brawlers the account does not own are kept rather than filtered: "the thing
- * that got buffed is one you never unlocked" is a useful answer, and it is the
- * one that turns a patch note into an unlock decision. They are ordered last.
+ * Returns null unless something here is both *owned* and *measured*, and that
+ * pair of conditions is the whole design.
+ *
+ * The first version showed every brawler the notes named — "the 1 September
+ * update changed 41 brawlers you own" over eight rows of "too early to
+ * measure". Each part was true and the whole thing was useless: a large patch
+ * touches most of the roster, so the count says nothing, and a section that
+ * cannot yet say what changed is a placeholder taking up a screen.
+ *
+ * Unowned brawlers are dropped for the same reason. "Something you have never
+ * unlocked was buffed" is not a thing the reader can act on, and it was padding
+ * the list to the point where the rows that mattered were below the fold.
+ *
+ * So this stays absent for the first days after a patch and appears once the
+ * snapshots can say which of the reader's own brawlers actually moved — which
+ * is the only version of this section worth a place on the page.
  */
 export function patchImpact({
   changes,
@@ -132,7 +145,12 @@ export function patchImpact({
     }
   }
 
-  if (rows.length === 0) return null;
+  /*
+   * Owned and measured only. Everything else is a patch note, and Supercell
+   * already published those.
+   */
+  const useful = rows.filter((row) => row.power !== null && row.delta !== null);
+  if (useful.length === 0) return null;
 
   /*
    * Owned first, then by how far the brawler moved. A player scanning this
@@ -140,30 +158,20 @@ export function patchImpact({
    * biggest change first — in either direction, because a nerf to something
    * they main matters as much as a buff.
    */
-  rows.sort((a, b) => {
-    const ownedDiff = Number(b.power !== null) - Number(a.power !== null);
-    if (ownedDiff !== 0) return ownedDiff;
-
+  // Biggest move first, in either direction: a nerf to something they main
+  // matters as much as a buff. Trophies break a tie, so the brawlers this
+  // account actually plays win it.
+  useful.sort((a, b) => {
     const moveDiff = Math.abs(b.delta ?? 0) - Math.abs(a.delta ?? 0);
-    if (moveDiff !== 0) return moveDiff;
-
-    /*
-     * Trophies break the tie, and for the first few days after a patch they are
-     * the whole order — nothing has a measured move yet, so without this the
-     * list is arbitrary. Ranking by trophies puts the brawlers this account
-     * actually plays at the top, which is the right answer to "does this patch
-     * affect me" before any measurement exists.
-     */
-    return b.trophies - a.trophies;
+    return moveDiff !== 0 ? moveDiff : b.trophies - a.trophies;
   });
 
-  const mineWithMove = rows.filter((r) => r.power !== null && r.delta !== null);
   return {
-    rows: rows.slice(0, PATCH_ROWS_SHOWN),
-    changedTotal: rows.length,
-    ownedTotal: rows.filter((r) => r.power !== null).length,
-    buffed: mineWithMove.filter((r) => (r.delta ?? 0) >= MEANINGFUL_MOVE).length,
-    nerfed: mineWithMove.filter((r) => (r.delta ?? 0) <= -MEANINGFUL_MOVE).length,
-    daysAfter: Math.min(...rows.map((r) => r.daysAfter).filter((d) => d > 0), Infinity),
+    rows: useful.slice(0, PATCH_ROWS_SHOWN),
+    changedTotal: useful.length,
+    ownedTotal: useful.length,
+    buffed: useful.filter((r) => (r.delta ?? 0) >= MEANINGFUL_MOVE).length,
+    nerfed: useful.filter((r) => (r.delta ?? 0) <= -MEANINGFUL_MOVE).length,
+    daysAfter: Math.min(...useful.map((r) => r.daysAfter).filter((d) => d > 0), Infinity),
   };
 }

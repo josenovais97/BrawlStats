@@ -15,12 +15,10 @@ import type { BABrawler } from '@/types/brawlapi';
  * brawlers you own were changed" is the thing a reader cannot get from the
  * official notes, and it is the reason to look here rather than at them.
  *
- * The list is capped and the roster is sorted to the top, because an update can
- * touch forty brawlers and a wall of them is the patch notes again. A row says
- * "too early to measure" until there are a few days of snapshots behind it,
- * which is most of the window where this section is on the page at all — that
- * is the honest state, and better than a two-day number that looks like a
- * finding.
+ * Every row here is a brawler the reader owns whose measured form actually
+ * moved. That filtering happens upstream, and it is what makes the section
+ * worth a place: the first version listed all forty-one brawlers the update
+ * named, said "too early to measure" beside each, and answered nothing.
  */
 
 /** "1 September", UTC-anchored so the server and browser agree. */
@@ -41,26 +39,15 @@ export function PlayerPatchImpact({
   patch: { title: string; url: string; date: string };
   brawlerMeta: Map<number, BABrawler>;
 }) {
-  const { rows, buffed, nerfed, changedTotal, ownedTotal } = impact;
-  const measured = buffed + nerfed > 0;
-  /*
-   * With no measurements yet, the column would be eight identical "too early"
-   * labels — a caveat repeated per row rather than stated once. It is dropped
-   * until at least one row has something to say, and the footnote carries it.
-   */
-  const anyMeasured = rows.some((row) => row.delta !== null);
+  const { rows, buffed, nerfed, changedTotal } = impact;
 
   return (
     <section className="space-y-3">
       <SectionHeading
         title="What the update did to you"
-        subtitle={
-          ownedTotal > 0
-            ? `The ${patchDay(patch.date)} update changed ${ownedTotal} ${
-                ownedTotal === 1 ? 'brawler' : 'brawlers'
-              } you own${measured ? ` — ${buffed} up, ${nerfed} down since` : ''}.`
-            : `Nothing you own changed in the ${patchDay(patch.date)} update.`
-        }
+        subtitle={`Brawlers you own that the ${patchDay(patch.date)} update changed, and how they have actually moved since${
+          buffed + nerfed > 0 ? ` — ${buffed} up, ${nerfed} down` : ''
+        }.`}
         aside={
           <a
             href={patch.url}
@@ -86,9 +73,7 @@ export function PlayerPatchImpact({
                 alt=""
                 width={36}
                 height={36}
-                className={`size-9 shrink-0 rounded-lg bg-surface-2 ${
-                  row.power === null ? 'opacity-50' : ''
-                }`}
+                className="size-9 shrink-0 rounded-lg bg-surface-2"
                 loading="lazy"
                 unoptimized
               />
@@ -98,14 +83,11 @@ export function PlayerPatchImpact({
                   {titleCase(row.name)}
                 </span>
                 <span className="block truncate text-xs text-muted">
-                  {row.categoryLabel}
-                  {row.power !== null ? ` · your power ${row.power}` : ' · not unlocked'}
+                  {row.categoryLabel} · your power {row.power}
                 </span>
               </span>
 
-              {!anyMeasured ? null : row.delta === null ? (
-                <span className="shrink-0 text-xs text-muted">too early</span>
-              ) : (
+              {row.delta === null ? null : (
                 <span className="shrink-0 text-right">
                   <span
                     className={`block text-sm font-bold tabular-nums ${
@@ -129,11 +111,11 @@ export function PlayerPatchImpact({
 
       <p className="text-xs leading-relaxed text-muted">
         {changedTotal > rows.length
-          ? `Showing the ${rows.length} most relevant of ${changedTotal} brawlers the update touched, yours first. `
+          ? `The ${rows.length} biggest moves of ${changedTotal} changed brawlers you own. `
           : ''}
-        {anyMeasured
-          ? 'Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.'
-          : 'How each one actually moved appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does. Ordered by your trophies until then.'}
+        Win rates are adjusted against the sample average, so a shift here is the brawler moving
+        rather than the cohort. A brawler appears once there are a few days of snapshots behind
+        it — a two-day sample swings further than any balance change does.
       </p>
     </section>
   );

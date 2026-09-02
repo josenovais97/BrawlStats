@@ -9,6 +9,7 @@ import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerNav } from '@/components/player/player-nav';
 import { PlayerProgress } from '@/components/player/player-progress';
+import { BattleAutopsySection } from '@/components/player/battle-autopsy-section';
 import { PlayerPatchImpact } from '@/components/player/player-patch-impact';
 import { PlayerPushNow } from '@/components/player/player-push-now';
 import { SinceLastVisit } from '@/components/player/since-last-visit';
@@ -345,6 +346,18 @@ export default async function PlayerPage({ params }: PageProps) {
 
       <Suspense fallback={<InsightsSkeleton />}>
         <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+      </Suspense>
+
+      {/* Above the log rather than below it: this is the same subject read one
+          level up, and the reader should meet the conclusion before scrolling
+          twenty-five rows of evidence. */}
+      <Suspense fallback={null}>
+        <BattleAutopsySection
+          tag={tag}
+          playerTag={player.tag}
+          brawlerMeta={brawlerMeta}
+          modeMeta={modeMeta}
+        />
       </Suspense>
 
       <section id="battles" className="scroll-anchor-nav">
