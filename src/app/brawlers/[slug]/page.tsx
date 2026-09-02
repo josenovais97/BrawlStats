@@ -505,7 +505,20 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * square portrait tile below is now only for a brawler neither source has
    * drawn yet.
    */
-  const modelSrc = (await hasBrawlerModel(brawler.id)) ? brawlerModelUrl(brawler.id) : wikiModel;
+  /*
+   * The wiki render is fetched whenever the mirror has no model, not only when
+   * the mirror has no *brawler*.
+   *
+   * That distinction broke Cosmo and Vince the day the mirror added them: the
+   * lookup lived inside the un-mirrored fallback below, so the moment they
+   * appeared in the payload the fallback stopped running and the render went
+   * with it — while `/model/` still 404s. Metadata and artwork arrive
+   * separately, and this has to key on the artwork.
+   */
+  const hasModel = await hasBrawlerModel(brawler.id);
+  const modelSrc = hasModel
+    ? brawlerModelUrl(brawler.id)
+    : (wikiModel ?? (await getWikiModel(brawler.name).catch(() => null)));
   const name = titleCase(brawler.name);
 
   // "Unknown" is a real value upstream, not a missing one: unclassified
@@ -652,7 +665,12 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             </div>
           ) : (
             <Image
-              src={brawler.imageUrl}
+              /* The catalogue's portrait, not the mirror's: `getBrawlerArtMap`
+                 has already probed whether the mirror's file exists and
+                 substituted the wiki's where it does not. Reading
+                 `brawler.imageUrl` straight from the payload is what put a
+                 404ing URL on this page. */
+              src={brawlerMeta.get(brawler.id)?.imageUrl ?? brawler.imageUrl}
               alt={brawler.name}
               width={144}
               height={144}
