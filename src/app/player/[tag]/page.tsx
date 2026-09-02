@@ -9,6 +9,7 @@ import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerNav } from '@/components/player/player-nav';
 import { PlayerProgress } from '@/components/player/player-progress';
+import { PlayerPushNow } from '@/components/player/player-push-now';
 import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRankedPicks } from '@/components/player/player-ranked-picks';
@@ -24,13 +25,20 @@ import { RosterRecorder } from '@/components/player/roster-recorder';
 import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
-import { getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
+import {
+  getEventRotation,
+  getOfficialBrawlers,
+  getPlayer,
+  getPlayerRankings,
+} from '@/lib/bs-api';
 import { getGameModeMap } from '@/lib/brawlapi';
 import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
+import { pushOptions } from '@/lib/push-now';
 import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
 import {
+  getLadderMapForm,
   getMetaIndex,
   getBestPicksByMode,
   getRankedMapPicks,
@@ -160,10 +168,19 @@ export default async function PlayerPage({ params }: PageProps) {
    * *which* modes are shown, so this stays scoped to what is queueable now.
    */
   const rotationModes = [...new Set(rankedMaps.map((m) => m.mode))];
-  const [picksByMode, modeMeta] = await Promise.all([
+  const [picksByMode, modeMeta, rotation, mapForm] = await Promise.all([
     getBestPicksByMode(5).catch(() => new Map()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+    /*
+     * The live rotation and per-map ladder form, for `PlayerPushNow`. Both are
+     * cached reads shared by every profile, so the section costs the same
+     * whether one person opens a profile or a thousand do.
+     */
+    getEventRotation().catch(() => []),
+    getLadderMapForm().catch(() => new Map()),
   ]);
+
+  const push = pushOptions({ rotation, brawlers: player.brawlers, form: mapForm });
 
   const progression = computeProgression(player, catalogue, releasedBuffies);
   const playtime = estimatePlaytime(player);
@@ -259,6 +276,12 @@ export default async function PlayerPage({ params }: PageProps) {
           coinsPerLevel={coinsToMaxFrom}
         />
       </div>
+
+      {/* Above the roster reads below it because it is the only section that
+          expires. Those describe the account and are true all week; this one is
+          about the next couple of hours, and burying it under them would be
+          filing the answer behind the background. */}
+      <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
 
       <PlayerMetaFit
         brawlers={player.brawlers}
