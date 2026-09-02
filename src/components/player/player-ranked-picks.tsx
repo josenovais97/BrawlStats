@@ -58,11 +58,14 @@ interface ModeAnswer {
   meta: BAGameMode | undefined;
   /** The best pick this account can queue with right now. */
   play: { id: number; name: string; rank: number; power: number } | null;
-  /** The upgrade or unlock that would beat it, and what it costs. */
-  invest:
-    | { id: number; name: string; rank: number; kind: 'upgrade'; coins: number; power: number }
-    | { id: number; name: string; rank: number; kind: 'unlock' }
-    | null;
+  /**
+   * The two ways to improve this mode, shown together rather than ranked
+   * against each other. They are different actions on different timescales —
+   * one is a coin cost you can pay tonight, the other waits on drops — so
+   * picking one to show would hide the half the reader happens to want.
+   */
+  upgrade: { id: number; name: string; rank: number; coins: number; power: number } | null;
+  unlock: { id: number; name: string; rank: number } | null;
 }
 
 export function PlayerRankedPicks({
@@ -87,7 +90,8 @@ export function PlayerRankedPicks({
     if (!entry || entry.picks.length === 0) continue;
 
     let play: ModeAnswer['play'] = null;
-    let invest: ModeAnswer['invest'] = null;
+    let upgrade: ModeAnswer['upgrade'] = null;
+    let unlock: ModeAnswer['unlock'] = null;
 
     /*
      * Upgrades are preferred over unlocks, and that ordering is the whole point
@@ -117,31 +121,31 @@ export function PlayerRankedPicks({
     const unlockable = better.find((c) => c.power === undefined && beats(c.rank));
 
     if (upgradable) {
-      invest = {
+      upgrade = {
         id: upgradable.id,
         name: upgradable.name,
         rank: upgradable.rank,
-        kind: 'upgrade',
         coins: coinsBetweenLevels(upgradable.power!, UPGRADE_TARGET),
         power: upgradable.power!,
       };
-    } else if (unlockable) {
-      invest = { id: unlockable.id, name: unlockable.name, rank: unlockable.rank, kind: 'unlock' };
     } else if (play && (play as { power: number }).power < UPGRADE_TARGET) {
       /*
-       * Nothing better is reachable, but the brawler they are already playing
-       * is not finished. Maxing it is then the only spend that improves this
+       * Nothing better is owned, but the brawler they are already playing is
+       * not finished. Maxing it is then the only upgrade that improves this
        * mode, and it is the one the card would otherwise never mention.
        */
       const current = play as { id: number; name: string; rank: number; power: number };
-      invest = {
+      upgrade = {
         id: current.id,
         name: current.name,
         rank: current.rank,
-        kind: 'upgrade',
         coins: coinsBetweenLevels(current.power, UPGRADE_TARGET),
         power: current.power,
       };
+    }
+
+    if (unlockable) {
+      unlock = { id: unlockable.id, name: unlockable.name, rank: unlockable.rank };
     }
 
     answers.push({
@@ -149,7 +153,8 @@ export function PlayerRankedPicks({
       label: modeMeta.get(mode.toLowerCase())?.name ?? humanizeMode(mode),
       meta: modeMeta.get(mode.toLowerCase()),
       play,
-      invest,
+      upgrade,
+      unlock,
     });
   }
 
@@ -202,7 +207,7 @@ function ModeCard({
   answer: ModeAnswer;
   brawlerMeta: Map<number, BABrawler>;
 }) {
-  const { play, invest, label, meta } = answer;
+  const { play, upgrade, unlock, label, meta } = answer;
   const accent = meta?.color ?? '#8b95b8';
 
   return (
@@ -240,31 +245,40 @@ function ModeCard({
         </p>
       )}
 
-      {invest ? (
-        <div className="mt-2 border-t border-border pt-2">
-          {/* When the only worthwhile spend is on the brawler already named
-              above, a second portrait of the same face reads as a bug. It
-              becomes a line about that brawler instead. */}
-          {play && invest.id === play.id ? (
-            <p className="text-xs text-accent">
-              Finish it · power {invest.kind === 'upgrade' ? invest.power : ''} →{' '}
-              {UPGRADE_TARGET} · {invest.kind === 'upgrade' ? formatNumber(invest.coins) : ''} coins
-            </p>
-          ) : (
+      {upgrade || unlock ? (
+        <div className="mt-2 space-y-2 border-t border-border pt-2">
+          {upgrade ? (
+            play && upgrade.id === play.id ? (
+              /* When the only worthwhile upgrade is the brawler already named
+                 above, a second portrait of the same face reads as a bug. It
+                 becomes a line about that brawler instead. */
+              <p className="text-xs text-accent">
+                Finish {titleCase(upgrade.name)} · power {upgrade.power} → {UPGRADE_TARGET} ·{' '}
+                {formatNumber(upgrade.coins)} coins
+              </p>
+            ) : (
+              <Row
+                art={brawlerMeta.get(upgrade.id)?.imageUrl}
+                name={upgrade.name}
+                note={`#${upgrade.rank} pick · power ${upgrade.power} → ${UPGRADE_TARGET} · ${formatNumber(upgrade.coins)} coins`}
+                tone="invest"
+                small
+              />
+            )
+          ) : null}
+
+          {unlock ? (
             <Row
-              art={brawlerMeta.get(invest.id)?.imageUrl}
-              name={invest.name}
-              note={
-                invest.kind === 'unlock'
-                  ? `Unlock for the #${invest.rank} pick`
-                  : `#${invest.rank} pick · power ${invest.power} → ${UPGRADE_TARGET} · ${formatNumber(invest.coins)} coins`
-              }
-              tone="invest"
+              art={brawlerMeta.get(unlock.id)?.imageUrl}
+              name={unlock.name}
+              note={`Unlock for the #${unlock.rank} pick`}
+              tone="lock"
               small
             />
-          )}
+          ) : null}
         </div>
       ) : null}
+
     </li>
   );
 }
@@ -279,7 +293,7 @@ function Row({
   art: string | undefined;
   name: string;
   note: string;
-  tone: 'good' | 'invest';
+  tone: 'good' | 'invest' | 'lock';
   small?: boolean;
 }) {
   return (
@@ -308,7 +322,7 @@ function Row({
         </span>
         <span
           className={`block truncate text-xs ${
-            tone === 'good' ? 'text-victory' : 'text-accent'
+            tone === 'good' ? 'text-victory' : tone === 'invest' ? 'text-accent' : 'text-muted'
           }`}
         >
           {note}
