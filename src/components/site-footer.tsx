@@ -183,29 +183,6 @@ export function SiteFooter() {
             </div>
             <p className="mt-2.5 text-xs text-muted/80">Free, ad-free, no paywall.</p>
 
-            <p className="eyebrow mt-7">Get the game</p>
-            {/* Both badges are locked to one height so they read as a pair
-                rather than as two pieces of borrowed artwork. */}
-            <div className="mt-2.5 flex flex-wrap items-center gap-2.5">
-              <a
-                href={APP_STORE_URL}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Download Brawl Stars on the App Store (opens in a new tab)"
-                className="rounded transition-opacity hover:opacity-80"
-              >
-                <AppStoreBadge className="h-10 w-auto" />
-              </a>
-              <a
-                href={GOOGLE_PLAY_URL}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Download Brawl Stars on Google Play (opens in a new tab)"
-                className="rounded transition-opacity hover:opacity-80"
-              >
-                <GooglePlayBadge className="h-10 w-auto" />
-              </a>
-            </div>
           </div>
 
           {LINK_GROUPS.map((group) => (
@@ -235,8 +212,41 @@ export function SiteFooter() {
           credit, not destinations, so they belong with the disclaimer that is
           also credit.
         */}
-        <div className="mt-10 space-y-3 border-t border-border/70 pt-6 text-xs leading-relaxed text-muted">
-          <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+        <div className="mt-10 space-y-4 border-t border-border/70 pt-6 text-xs leading-relaxed text-muted">
+          {/*
+            The store badges close the footer rather than sitting in the brand
+            column. Up there they made that column half again as tall as the
+            three beside it, so the block ended in a wide empty rectangle; down
+            here they balance the attribution line and read as what they are —
+            a link out, next to the other links out.
+          */}
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Both badges are locked to one height so they read as a pair
+                  rather than as two pieces of borrowed artwork. */}
+              <a
+                href={APP_STORE_URL}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Download Brawl Stars on the App Store (opens in a new tab)"
+                className="rounded transition-opacity hover:opacity-80"
+              >
+                <AppStoreBadge className="h-9 w-auto" />
+              </a>
+              <a
+                href={GOOGLE_PLAY_URL}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Download Brawl Stars on Google Play (opens in a new tab)"
+                className="rounded transition-opacity hover:opacity-80"
+              >
+                <GooglePlayBadge className="h-9 w-auto" />
+              </a>
+            </div>
+            <p className="text-muted/80">Get Brawl Stars &mdash; free on iOS and Android</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-t border-border/50 pt-4">
             <Link
               href="/about"
               className="transition-colors hover:text-foreground"
