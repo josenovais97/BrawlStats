@@ -1,4 +1,6 @@
-import { AlertTriangle, Boxes, Sparkles, TrendingUp } from 'lucide-react';
+import { AlertTriangle, TrendingUp } from 'lucide-react';
+
+import { Power11Icon } from '@/components/game-icons';
 import Link from 'next/link';
 
 import { SectionHeading } from '@/components/ui/section-heading';
@@ -14,10 +16,20 @@ import type { AccountFlag, SkillScore } from '@/lib/skill-score';
  * rather than with the number.
  */
 
-const FLAG_STYLE: Record<AccountFlag['kind'], { icon: typeof Sparkles; tone: string }> = {
+/*
+ * A mixed set on purpose. "Likely smurf" and "ahead of the curve" are readings
+ * this site makes, and a warning triangle and a trend arrow are the right marks
+ * for a judgement — there is no Brawl Stars asset that means "we think this is
+ * a second account". "Collector" is different: it describes a fully progressed
+ * roster, and the game already has a mark for that.
+ */
+const FLAG_STYLE: Record<
+  AccountFlag['kind'],
+  { icon: (props: { className?: string }) => React.ReactNode; tone: string }
+> = {
   smurf: { icon: AlertTriangle, tone: 'text-brand' },
   ahead: { icon: TrendingUp, tone: 'text-victory' },
-  collector: { icon: Boxes, tone: 'text-accent' },
+  collector: { icon: Power11Icon, tone: 'text-accent' },
 };
 
 /** Score colour, matched to the tier bands in lib/skill-score. */

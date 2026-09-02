@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import { Shield } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -12,7 +11,7 @@ import {
 import { TrophyGains } from '@/components/leaderboard/trophy-gains';
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
+import { LeaderboardIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import { clubBadgeUrl, playerIconUrl } from '@/lib/brawlapi';
 import { getClubRankings, getPlayerRankings } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
@@ -236,7 +235,7 @@ function EmptyRegion({ region }: { region: string }) {
   return (
     <div className="card p-8 text-center">
       <span className="mx-auto grid size-12 place-items-center rounded-xl bg-surface-2 text-muted">
-        <Shield className="size-6" />
+        <LeaderboardIcon className="size-6" />
       </span>
       <p className="mt-3 font-semibold">No ranking data for {regionName(region)}</p>
       <p className="mt-1 text-sm text-muted">
