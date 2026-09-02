@@ -37,14 +37,23 @@ export function BrawlerChooser({
   options,
   taken,
   label,
-  hrefFor,
+  hrefs,
   suggestedLabel = 'Best here',
 }: {
   options: ChooserBrawler[];
   /** Everyone already named, on either side — nobody is drafted twice. */
   taken: number[];
   label: string;
-  hrefFor: (brawlerId: number) => string;
+  /**
+   * Destination per brawler id, precomputed on the server.
+   *
+   * A `(id) => string` callback would be the natural shape and cannot cross
+   * this boundary: React refuses to serialise a function into a client
+   * component, and the page 500s at request time rather than failing to build.
+   * The URLs are a pure function of state the server already holds, so it
+   * hands over the answers instead of the means to compute them.
+   */
+  hrefs: Record<number, string>;
   suggestedLabel?: string;
 }) {
   const [query, setQuery] = useState('');
@@ -128,7 +137,7 @@ export function BrawlerChooser({
             {suggested.map((brawler) => (
               <li key={brawler.id}>
                 <Link
-                  href={hrefFor(brawler.id)}
+                  href={hrefs[brawler.id]}
                   rel="nofollow"
                   prefetch={false}
                   className="flex items-center gap-1.5 rounded-full border border-border bg-surface-2/60 py-1 pl-1 pr-2.5 text-xs font-semibold capitalize transition-colors hover:border-brand/50"
@@ -159,7 +168,7 @@ export function BrawlerChooser({
         {filtered.map((brawler) => (
           <li key={brawler.id}>
             <Link
-              href={hrefFor(brawler.id)}
+              href={hrefs[brawler.id]}
               rel="nofollow"
               prefetch={false}
               className="flex flex-col items-center gap-1 rounded-lg p-1 transition-colors hover:bg-surface-2 sm:p-1.5"

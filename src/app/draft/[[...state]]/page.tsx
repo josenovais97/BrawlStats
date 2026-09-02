@@ -307,7 +307,9 @@ export default async function DraftPage({ params }: PageProps) {
                   taken={[...enemies, ...allies]}
                   label="Add an enemy brawler"
                   suggestedLabel="Most likely picks here"
-                  hrefFor={(id) => hrefFor({ enemy: [...enemies, id] })}
+                  hrefs={Object.fromEntries(
+                    catalog.current.map((b) => [b.id, hrefFor({ enemy: [...enemies, b.id] })]),
+                  )}
                 />
               ) : null}
             </div>
@@ -382,7 +384,9 @@ export default async function DraftPage({ params }: PageProps) {
                   taken={[...enemies, ...allies]}
                   label="Add a team-mate"
                   suggestedLabel="Best here"
-                  hrefFor={(id) => hrefFor({ ally: [...allies, id] })}
+                  hrefs={Object.fromEntries(
+                    catalog.current.map((b) => [b.id, hrefFor({ ally: [...allies, b.id] })]),
+                  )}
                 />
               ) : null}
             </div>
