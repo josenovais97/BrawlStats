@@ -25,6 +25,17 @@ const POOR_PICK = -0.03;
 /** Fewer than this and a "recurring problem" is a coincidence. */
 const MIN_OCCURRENCES = 2;
 
+/**
+ * How much more often a brawler must appear in losses than in wins to count.
+ *
+ * Without this the list fills with whoever is popular. The first version
+ * reported "Otis was on the other side in 3 of your losses" — true, and
+ * meaningless, because Otis is played constantly and turned up in the wins too.
+ * Appearing in defeats is only evidence if it is *disproportionate*, so the
+ * comparison is against the same brawler's appearances in this player's wins.
+ */
+const NEMESIS_SKEW = 2;
+
 export interface AutopsyFinding {
   kind: 'map-pick' | 'nemesis';
   /** The player's brawler, for `map-pick`; the opponent's, for `nemesis`. */
@@ -73,10 +84,28 @@ export function battleAutopsy({
 
   const badPicks = new Map<string, AutopsyFinding>();
   const nemeses = new Map<number, AutopsyFinding>();
+  /** Appearances in this player's wins, the control for the loss counts. */
+  const inWins = new Map<number, number>();
   let losses = 0;
 
   for (const entry of log) {
-    if (entry.battle.result !== 'defeat') continue;
+    const lost = entry.battle.result === 'defeat';
+
+    if (!lost) {
+      if (entry.battle.result !== 'victory') continue;
+      const team = entry.battle.teams?.find((t) => t.some((p) => normalizeTag(p.tag) === me));
+      if (!team) continue;
+      const counted = new Set<number>();
+      for (const player of participants(entry)) {
+        if (team.some((mate) => mate.tag === player.tag)) continue;
+        const id = player.brawler?.id;
+        if (id === undefined || counted.has(id)) continue;
+        counted.add(id);
+        inWins.set(id, (inWins.get(id) ?? 0) + 1);
+      }
+      continue;
+    }
+
     losses += 1;
 
     const everyone = participants(entry);
@@ -109,9 +138,9 @@ export function battleAutopsy({
     }
 
     /*
-     * Is one opponent brawler doing the damage? Counted per losing battle
-     * rather than per appearance, so a brawler that happens to be popular does
-     * not become a nemesis by turning up everywhere.
+     * Is one opponent brawler doing the damage? Counted once per losing battle
+     * rather than per appearance; whether that count means anything is decided
+     * later, against the same brawler's appearances in this player's wins.
      */
     const myTeam = entry.battle.teams?.find((team) =>
       team.some((p) => normalizeTag(p.tag) === me),
@@ -138,6 +167,11 @@ export function battleAutopsy({
 
   const findings = [...badPicks.values(), ...nemeses.values()]
     .filter((finding) => finding.losses >= MIN_OCCURRENCES)
+    .filter(
+      (finding) =>
+        finding.kind !== 'nemesis' ||
+        finding.losses >= (inWins.get(finding.brawlerId) ?? 0) * NEMESIS_SKEW,
+    )
     .sort((a, b) => {
       // A wrong pick is actionable; a recurring opponent is context. Both are
       // ranked by how much of the log they explain, picks first on a tie.
