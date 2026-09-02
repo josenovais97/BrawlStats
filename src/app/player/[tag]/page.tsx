@@ -169,7 +169,12 @@ export default async function PlayerPage({ params }: PageProps) {
    */
   const rotationModes = [...new Set(rankedMaps.map((m) => m.mode))];
   const [picksByMode, modeMeta, rotation, mapForm] = await Promise.all([
-    getBestPicksByMode(5).catch(() => new Map()),
+    /*
+     * Deep enough that a mode almost always has an answer this account can
+     * actually play. At five, a roster missing the top handful produced four
+     * cards in a row reading "one upgrade away" and nothing to press.
+     */
+    getBestPicksByMode(15).catch(() => new Map()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     /*
      * The live rotation and per-map ladder form, for `PlayerPushNow`. Both are

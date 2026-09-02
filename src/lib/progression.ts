@@ -32,6 +32,18 @@ export function coinsToMaxFrom(level: number): number {
   return coinsToReachLevel(MAX_POWER_LEVEL) - coinsToReachLevel(level);
 }
 
+/**
+ * Coins to take one brawler from `from` to `to`.
+ *
+ * Separate from `coinsToMaxFrom` because "what would make this brawler
+ * playable" is a different question from "what would finish it". Power 9 is
+ * where a brawler becomes usable in Ranked, and quoting the price of power 11
+ * when 9 is the goal overstates the ask by more than half.
+ */
+export function coinsBetweenLevels(from: number, to: number): number {
+  return Math.max(0, coinsToReachLevel(to) - coinsToReachLevel(from));
+}
+
 /** Coin prices for unlockable abilities. */
 const STAR_POWER_COINS = 2000;
 const GADGET_COINS = 1000;
