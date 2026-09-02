@@ -53,6 +53,7 @@ import {
   getTrophyPercentile,
   recordLookup,
 } from '@/lib/stats';
+import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { displayTag, normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
@@ -71,11 +72,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       // Normalised, so #ABC, %23ABC and abc all resolve to one indexable URL
       // rather than three competing ones.
       alternates: { canonical: `/player/${normalizeTag(player.tag)}` },
-      // Indexable pages must be a deliberate set. This one is not: the
-      // combinations are effectively unbounded, and a crawler walking them costs
-      // real API and function budget for pages nobody searched for. `follow` is
-      // kept so the links out of them still pass value to the pages that matter.
-      robots: { index: false, follow: true },
+      /*
+       * Indexable pages must be a deliberate set, and this one now has one.
+       *
+       * The reasoning behind the blanket `noindex` still holds for the general
+       * case: player URLs are effectively unbounded and a crawler walking them
+       * costs real API budget for pages nobody searched for. What changed is
+       * that a bounded allowlist exists — the current global top boards, baked
+       * at build time — and it is already threaded through `robots.ts`, the
+       * sitemap and the crawler guard in `proxy.ts`.
+       *
+       * All three of those were being cancelled here. Search Console on
+       * 2026-09-02 reported 789 pages "excluded by noindex" while robots.txt
+       * invited crawlers to exactly these URLs and the sitemap listed them:
+       * Google fetched each one, at the cost of an upstream call, and threw it
+       * away. Listing a page in a sitemap while asking not to have it indexed
+       * is the contradiction the sitemap's own comment warns about.
+       *
+       * `follow` stays either way, so links out of a non-indexed profile still
+       * pass value to the pages that matter.
+       */
+      robots: {
+        index: INDEXABLE_PLAYER_TAGS.has(normalizeTag(player.tag)),
+        follow: true,
+      },
     };
   } catch {
     return { title: `Player ${displayTag(tag)}` };
