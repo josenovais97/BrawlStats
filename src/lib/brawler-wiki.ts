@@ -53,6 +53,16 @@ export interface BrawlerStats {
    */
   className: string | null;
   rarityName: string | null;
+  /**
+   * The brawler's in-game tagline, and the title unlocked at prestige.
+   *
+   * Neither exists in the artwork mirror or the game API — the wiki is the only
+   * published source. The prestige title is the more interesting of the two: it
+   * is a reward players work toward and cannot look up in the game before
+   * earning it.
+   */
+  title: string | null;
+  prestigeTitle: string | null;
   health: string | null;
   /** The infobox labels this per brawler — "Damage per shell", "Healing". */
   attackLabel: string | null;
@@ -249,6 +259,8 @@ export async function getBrawlerWiki(name: string): Promise<BrawlerWiki | null> 
   const stats: BrawlerStats = {
     className: firstValue(box.Class),
     rarityName: firstValue(box.Rarity),
+    title: firstValue(box.Title),
+    prestigeTitle: firstValue(box.PrestigeTitle),
     health: firstValue(box.Health),
     attackLabel: firstValue(box.AttackLabel),
     attack: firstValue(box.Attack),

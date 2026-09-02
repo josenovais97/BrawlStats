@@ -20,7 +20,13 @@ import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { TableSkeleton } from '@/components/ui/skeletons';
-import { ClassIcon, CombatStatIcon, PlayersIcon, TrophyIcon } from '@/components/game-icons';
+import {
+  ClassIcon,
+  CombatStatIcon,
+  PlayersIcon,
+  PrestigeIcon,
+  TrophyIcon,
+} from '@/components/game-icons';
 import {
   brawlerModelUrl,
   getBrawler,
@@ -729,7 +735,28 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">
               {brawler.name.toLowerCase()}
             </h1>
+
+            {/* The in-game tagline, which the artwork mirror does not carry.
+                Shown above the biography because it is the brawler's own line
+                rather than a description of it, and it reads as one. */}
+            {wiki?.stats.title ? (
+              <p className="mt-1 text-sm font-semibold italic text-muted">
+                &ldquo;{wiki.stats.title}&rdquo;
+              </p>
+            ) : null}
+
             <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">{brawler.description}</p>
+
+            {/* The title unlocked at prestige. Published nowhere else — not in
+                the game API, not in the artwork mirror — and it is the one fact
+                on this page a player cannot look up in game before earning it. */}
+            {wiki?.stats.prestigeTitle ? (
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                <PrestigeIcon total={1} className="size-4" />
+                Prestige title
+                <span className="font-bold text-foreground">{wiki.stats.prestigeTitle}</span>
+              </p>
+            ) : null}
           </div>
         </div>
       </header>
