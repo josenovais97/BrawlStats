@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
 import Script from 'next/script';
 
 import { InstallPrompt } from '@/components/install-prompt';
+import { PwaTelemetry } from '@/components/pwa-telemetry';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -90,6 +91,7 @@ export default function RootLayout({
           <SiteFooter />
         </div>
         <InstallPrompt />
+        <PwaTelemetry />
 
         {/*
           Umami, self-hosted on this project's own box. Replaces

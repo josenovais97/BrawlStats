@@ -12,6 +12,7 @@ import { PlayerProgress } from '@/components/player/player-progress';
 import { BattleAutopsySection } from '@/components/player/battle-autopsy-section';
 import { PlayerPatchImpact } from '@/components/player/player-patch-impact';
 import { PlayerPushNow } from '@/components/player/player-push-now';
+import { PlayerRosterPlan } from '@/components/player/player-roster-plan';
 import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRankedPicks } from '@/components/player/player-ranked-picks';
@@ -33,11 +34,12 @@ import {
   getPlayer,
   getPlayerRankings,
 } from '@/lib/bs-api';
-import { getGameModeMap } from '@/lib/brawlapi';
+import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
 import { patchImpact, patchIsRecent, type PatchImpact } from '@/lib/patch-impact';
 import { pushOptions } from '@/lib/push-now';
+import { rosterPlan } from '@/lib/roster-optimizer';
 import { changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { computeSkillScore } from '@/lib/skill-score';
 import { toApiError } from '@/lib/errors';
@@ -213,6 +215,17 @@ export default async function PlayerPage({ params }: PageProps) {
   const push = pushOptions({ rotation, brawlers: player.brawlers, form: mapForm });
 
   /*
+   * Uses exactly the inputs `PlayerRankedPicks` already has, so the plan and
+   * the mode cards below it can never disagree about what "covered" means.
+   */
+  const plan = rosterPlan({
+    brawlers: player.brawlers,
+    picksByMode,
+    modes: rotationModes,
+    modeLabels: new Map(rotationModes.map((mode) => [mode, modeLabel(modeMeta, mode)])),
+  });
+
+  /*
    * Only while the update is recent. This is the one section on the profile
    * with a natural expiry: "what did the patch do to me" is urgent for a couple
    * of weeks and then becomes another permanent block on a long page, so it
@@ -347,6 +360,10 @@ export default async function PlayerPage({ params }: PageProps) {
           brawlerMeta={brawlerMeta}
         />
       ) : null}
+
+      {/* Directly above the roster reads: those describe the account, this
+          says what to do about it, and the spend is the more useful half. */}
+      {plan ? <PlayerRosterPlan plan={plan} brawlerMeta={brawlerMeta} /> : null}
 
       <PlayerMetaFit
         brawlers={player.brawlers}
