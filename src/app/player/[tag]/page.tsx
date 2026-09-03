@@ -391,7 +391,7 @@ export default async function PlayerPage({ params }: PageProps) {
       <Suspense fallback={null}>
         <BattleAutopsySection
           tag={tag}
-          playerTag={player.tag}
+          player={player}
           brawlerMeta={brawlerMeta}
           modeMeta={modeMeta}
         />
