@@ -67,6 +67,7 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
       { href: '/compare', label: 'Compare' },
       { href: '/daily', label: 'Daily' },
       { href: '/meta', label: 'Meta Report' },
+      { href: '/bubble', label: 'Android App' },
     ],
   },
   {

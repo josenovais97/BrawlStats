@@ -66,6 +66,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/leaderboard/cosmetics', 'weekly', 0.6],
     ['/news', 'daily', 0.6],
     ['/release-notes', 'weekly', 0.5],
+    // The app's download page. Its panel at /bubble/panel is deliberately
+    // absent and carries `noindex`: one URL of data that already has an
+    // indexable home on /tier-list/ranked.
+    ['/bubble', 'monthly', 0.5],
     ['/about', 'monthly', 0.3],
   ];
 

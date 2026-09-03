@@ -5,6 +5,36 @@ const nextConfig: NextConfig = {
   // actually imports, which is what the Dockerfile ships.
   output: 'standalone',
 
+  /*
+   * The APK's own headers.
+   *
+   * Next serves everything in `public/` as `application/octet-stream` when it
+   * does not recognise the extension, which downloads but leaves Android
+   * guessing at what it received. Naming the type is what makes the browser
+   * hand the file to the package installer rather than the file manager, and
+   * `Content-Disposition` keeps the filename intact through any redirect.
+   *
+   * The path is versionless by design — a new build overwrites it — so the
+   * cache is a day rather than immutable: long enough not to re-fetch 2.5 MB
+   * for every visit to the page, short enough that a new release reaches
+   * people without anyone having to bust a URL.
+   */
+  async headers() {
+    return [
+      {
+        source: '/downloads/brawlzone-bubble.apk',
+        headers: [
+          { key: 'Content-Type', value: 'application/vnd.android.package-archive' },
+          {
+            key: 'Content-Disposition',
+            value: 'attachment; filename="brawlzone-bubble.apk"',
+          },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+    ];
+  },
+
   images: {
     // Self-hosting change. On Vercel, image optimization ran on the platform;
     // here it would run in-process on 2 shared cores, resizing CDN artwork on
