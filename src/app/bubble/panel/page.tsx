@@ -57,6 +57,19 @@ export default async function BubblePanelPage() {
     byTier.set(entry.tier, bucket);
   }
 
+  /*
+   * Strongest first within each tier, sorted here rather than inherited.
+   *
+   * `scoreBrawlers` does not promise an order, and it came back ascending —
+   * so the S row opened on its weakest name. The panel truncates each tier to
+   * what fits, which makes the order load-bearing in a way the full page's
+   * wrapping rows are not: whatever is cut has to be the least useful, not the
+   * most.
+   */
+  for (const bucket of byTier.values()) {
+    bucket.sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
+  }
+
   const { active } = partitionRotation(rotation);
   active.sort((a, b) => a.slotId - b.slotId);
 
