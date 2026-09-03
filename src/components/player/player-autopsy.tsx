@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { SectionHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { titleCase } from '@/lib/format';
 import type { Autopsy } from '@/lib/battle-autopsy';
@@ -33,12 +32,13 @@ export function PlayerAutopsy({
 }) {
   return (
     <section className="space-y-3">
-      <SectionHeading
-        title="What went wrong"
-        subtitle={`Patterns across the ${autopsy.losses} ${
-          autopsy.losses === 1 ? 'loss' : 'losses'
-        } in this battle log, rather than one-off results.`}
-      />
+      {/* The section title belongs to the parent now, which pairs this with the
+          deep read of the last loss. This half only needs to say which of the
+          two questions it answers. */}
+      <p className="text-sm text-muted">
+        Across the {autopsy.losses} {autopsy.losses === 1 ? 'loss' : 'losses'} in this log, rather
+        than one-off results:
+      </p>
 
       <ul className="card divide-y divide-border overflow-hidden">
         {autopsy.findings.map((finding) => {
