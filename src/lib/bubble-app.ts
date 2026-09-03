@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.2',
+  version: '1.3',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 12,
+  versionCode: 13,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2642201,
-  sha256: 'cebe5e0cb260d81577ef9fe08bf7a8e419aa358202c100e7eadc024c539cb303',
+  size: 2642981,
+  sha256: '09dab73e660cbb74a3146e8ddbfbd3d84e23007d81bf660b79c60ed5244c9625',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-03',
