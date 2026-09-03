@@ -231,6 +231,18 @@ export function DraftIcon({ className }: IconProps) {
   return <GameIcon src="/icons/draft.png" alt="Draft" className={className} />;
 }
 
+/**
+ * The Android app.
+ *
+ * The site's own mark rather than a game entity, because there is no Brawl
+ * Stars icon for "an app that floats over Brawl Stars". It is the same speech
+ * bubble the launcher icon and the overlay itself use, so the nav entry, the
+ * install and the thing on your screen are all visibly one product.
+ */
+export function BubbleAppIcon({ className }: IconProps) {
+  return <GameIcon src="/icons/bubble-app.png" alt="Android app" className={className} />;
+}
+
 /** Head-to-head comparison. */
 export function CompareIcon({ className }: IconProps) {
   return <GameIcon src="/icons/compare.png" alt="Compare" className={className} />;

@@ -98,8 +98,30 @@ export default function BubblePage() {
         subtitle="The Ranked tier list, floating on top of the game. Check the meta without leaving your draft."
       />
 
-      {/* Download and one screenshot, side by side: what you get and what it
-          looks like, before any explanation is asked for. */}
+      {/*
+        The real thing, first and full width.
+
+        This replaced a mock-up of the bubble over an Android home screen,
+        which demonstrated only that an overlay can draw over an app. A live
+        Knockout draft with the tier list open beside it is the entire pitch in
+        one image, and it is landscape because that is how the game is held —
+        the shape of the screenshot is itself part of the claim.
+      */}
+      <figure className="overflow-hidden rounded-2xl border border-border">
+        <Image
+          src="/bubble/in-game.jpg"
+          alt="The BrawlZone bubble open during a Knockout draft on Belle's Rock, showing the S, A and B tiers with meta scores beside the brawler picker"
+          width={1560}
+          height={720}
+          className="w-full"
+          priority
+        />
+        <figcaption className="border-t border-border bg-surface px-4 py-2.5 text-xs text-muted">
+          The panel open over a live Ranked draft. Nothing is mocked up — this is the app running
+          on a phone.
+        </figcaption>
+      </figure>
+
       <section className="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-5">
           <p className="text-lg leading-relaxed text-muted">
@@ -149,14 +171,14 @@ export default function BubblePage() {
           </details>
         </div>
 
-        <div className="mx-auto w-full max-w-[280px]">
+        <div className="mx-auto w-full max-w-[260px]">
           <Image
-            src="/bubble/app-bubble.png"
-            alt="The BrawlZone bubble floating over an Android home screen, with the tier list panel open beneath it"
+            src="/bubble/app-home.png"
+            alt="The BrawlZone app's main screen, showing the permission status and the Start bubble button"
             width={540}
             height={1200}
             className="w-full rounded-2xl border border-border"
-            priority
+            loading="lazy"
           />
         </div>
       </section>
@@ -279,10 +301,13 @@ export default function BubblePage() {
         />
 
         <div className="grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="mx-auto w-full max-w-[280px] lg:order-2">
+          {/* The close gesture, which is the one that has to be shown rather
+              than described: a drop target that only exists mid-drag cannot be
+              discovered from a still page. */}
+          <div className="mx-auto w-full max-w-[260px] lg:order-2">
             <Image
-              src="/bubble/app-home.png"
-              alt="The BrawlZone app's main screen, showing the permission status and Start bubble button"
+              src="/bubble/app-close.jpg"
+              alt="The bubble part-way through a drag, with the circular close target visible at the bottom of the screen"
               width={540}
               height={1200}
               className="w-full rounded-2xl border border-border"

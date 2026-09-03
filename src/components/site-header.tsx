@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { BrandMark } from '@/components/brand-mark';
 import {
   Battle3v3Icon,
+  BubbleAppIcon,
   BrawlersIcon,
   ClockIcon,
   ClubIcon,
@@ -73,6 +74,7 @@ const MORE: NavItem[] = [
   // one, so it would earn a permanent slot if there were a seventh. There is
   // not — see above — and the draft helper is the main bar's entry point into
   // the same question.
+  { href: '/bubble', label: 'Android App', icon: BubbleAppIcon },
   { href: '/daily', label: 'Daily', icon: ClockIcon },
   { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
   { href: '/meta', label: 'Meta Report', icon: TrophyGainIcon },
