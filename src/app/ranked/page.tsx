@@ -550,17 +550,34 @@ function MapCard({
                 <Link
                   href={brawlerPath(pick.brawlerId, pick.brawlerName)}
                   title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} raw win rate over ${pick.decidedSampleSize} sampled Ranked battles on this map, against ${formatPercent(pick.overallScore)} adjusted form over ${formatNumber(pick.overallSampleSize)} Ranked battles overall`}
-                  className="row-interactive flex items-center gap-2.5 px-3.5 py-2"
+                  className="row-interactive flex items-center gap-2.5 px-3.5 py-2.5"
                 >
-                  <span className="w-3 shrink-0 text-center text-xs font-black tabular-nums text-muted">
+                  {/* A podium, not a list index. Three rows ranked against
+                      each other is exactly the shape a medal reads on, and the
+                      colour does the ordering at a glance so the eye does not
+                      have to parse digits to find the top pick. */}
+                  <span
+                    aria-hidden
+                    className={`grid size-5 shrink-0 place-items-center rounded-full text-[10px] font-black tabular-nums ${
+                      index === 0
+                        ? 'bg-brand text-brand-ink'
+                        : index === 1
+                          ? 'bg-surface-3 text-foreground'
+                          : index === 2
+                            ? 'bg-[#8a5a2b] text-[#ffe6c7]'
+                            : 'text-muted'
+                    }`}
+                  >
                     {index + 1}
                   </span>
                   <Image
                     src={meta?.imageUrl ?? brawlerIconUrl(pick.brawlerId)}
                     alt=""
-                    width={30}
-                    height={30}
-                    className="size-[30px] shrink-0 rounded-md bg-surface-2"
+                    width={34}
+                    height={34}
+                    className={`size-[34px] shrink-0 rounded-lg bg-surface-2 ${
+                      index === 0 ? 'ring-1 ring-brand/50' : ''
+                    }`}
                     loading="lazy"
                     unoptimized
                   />

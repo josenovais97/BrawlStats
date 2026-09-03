@@ -45,7 +45,7 @@ export function MapPreview({
 
   if (!imageUrl) {
     return (
-      <div className="grid h-44 w-full place-items-center bg-surface-2 text-xs text-muted">
+      <div className="grid h-52 w-full place-items-center bg-surface-2 text-xs text-muted">
         No map preview
       </div>
     );
@@ -57,30 +57,51 @@ export function MapPreview({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`Expand the ${mapName} map layout`}
-        className="group relative block h-44 w-full cursor-zoom-in overflow-hidden bg-surface-2 focus-visible:outline-offset-[-2px]"
+        className="group relative block h-52 w-full cursor-zoom-in overflow-hidden bg-surface-2 focus-visible:outline-offset-[-2px]"
       >
         {/* Maps are portrait and the card is landscape, so drawing one whole
             leaves two dead columns either side. The same image, blown up and
-            blurred behind it, fills them with the map's own colours. The card
-            picks up the environment's palette instead of a grey void. */}
+            blurred behind it, fills them with the map's own colours, so the
+            card picks up the environment's palette instead of a grey void.
+
+            The backdrop is carried at real strength rather than a faint wash.
+            At 30% it read as grey haze — the colour was there but too weak to
+            be a colour, which is the difference between a card that looks
+            considered and one that looks unfinished. It is pushed further out
+            of focus to compensate, so it stays a field of colour and never
+            competes with the layout drawn on top of it. */}
         <Image
           src={imageUrl}
           alt=""
           aria-hidden
           fill
           sizes="24rem"
-          className="scale-125 object-cover opacity-30 blur-xl saturate-150"
+          className="scale-150 object-cover opacity-70 blur-2xl saturate-[1.6]"
           loading="lazy"
           unoptimized
         />
+
+        {/* A vignette, so the bright middle of the backdrop does not run into
+            the card's own edges, and the map below reads as lit from behind. */}
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(8,11,22,0.55)_100%)]"
+        />
+
         <Image
           src={imageUrl}
           alt={`${mapName} map layout`}
           fill
           sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 92vw"
-          className="object-contain p-2 transition-transform duration-200 group-hover:scale-[1.04]"
+          className="object-contain p-3 drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)] transition-transform duration-200 group-hover:scale-[1.04]"
           loading="lazy"
           unoptimized
+        />
+
+        {/* Grounds the image block against the card body below it. */}
+        <span
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-surface to-transparent"
         />
         <span
           aria-hidden

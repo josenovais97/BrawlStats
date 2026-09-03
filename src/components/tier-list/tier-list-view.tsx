@@ -503,14 +503,34 @@ function TierRow({
   return (
     <section className="card overflow-hidden">
       <div className="flex flex-col sm:flex-row">
+        {/*
+          The tier band carries the weight of the row.
+
+          A flat 22% wash of the tier colour gave S and D the same presence, so
+          a list whose whole job is to rank things read as six equal shelves. A
+          gradient plus a glow behind the letter makes the band an object with
+          a light source, and the count underneath tells you how crowded the
+          tier is — which is information the eye otherwise has to gather by
+          scanning the row.
+        */}
         <div
-          className="flex shrink-0 items-center justify-center px-6 py-3 sm:w-24 sm:py-6"
+          className="relative flex shrink-0 items-center justify-center gap-3 px-6 py-3 sm:w-24 sm:flex-col sm:gap-1 sm:py-6"
           style={{
-            background: `color-mix(in srgb, ${color} 22%, transparent)`,
+            background: `linear-gradient(155deg, color-mix(in srgb, ${color} 52%, transparent) 0%, color-mix(in srgb, ${color} 14%, transparent) 65%, transparent 100%)`,
+            boxShadow: `inset 0 1px 0 color-mix(in srgb, #ffffff 12%, transparent), inset -1px 0 0 color-mix(in srgb, ${color} 45%, transparent)`,
           }}
         >
-          <span className="text-3xl font-black" style={{ color }}>
+          <span
+            className="text-4xl font-black leading-none"
+            style={{
+              color,
+              textShadow: `0 0 26px color-mix(in srgb, ${color} 60%, transparent)`,
+            }}
+          >
             {tier}
+          </span>
+          <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
+            {entries.length}
           </span>
         </div>
 
@@ -521,7 +541,8 @@ function TierRow({
               <Link
                 key={entry.brawlerId}
                 href={brawlerPath(entry.brawlerId, entry.brawlerName)}
-                className="group w-[92px] rounded-xl bg-surface-2 p-2 transition-transform hover:-translate-y-0.5"
+                style={{ '--tier': color } as React.CSSProperties}
+                className="group w-[92px] rounded-xl border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,transparent_45%),var(--surface-2)] p-2 transition-[transform,border-color,box-shadow] duration-150 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--tier)_55%,transparent)] hover:shadow-[0_8px_20px_-10px_color-mix(in_srgb,var(--tier)_70%,transparent)]"
                 title={`${entry.brawlerName}: meta score ${entry.metaScore ?? '?'} from ${formatPercent(entry.normalizedWinRate)} adjusted win rate (${formatPercent(entry.winRate)} raw, against a ${formatPercent(entry.baselineWinRate)} average for the modes it is played in) and ${formatPercent(entry.usageRate)} pick rate, over ${formatNumber(entry.decidedSampleSize)} decided battles`}
               >
                 {entry.imageUrl ? (
