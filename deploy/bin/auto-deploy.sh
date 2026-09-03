@@ -57,11 +57,25 @@ done
 if [ "$fetched" -eq 0 ]; then
   streak=$(( $(cat "$FAIL_STATE" 2>/dev/null || echo 0) + 1 ))
   echo "$streak" > "$FAIL_STATE"
-  if [ "$streak" -ge "$FAIL_LIMIT" ]; then
+
+  # Once per outage, not once per run.
+  #
+  # `-ge` sent a mail every five minutes for as long as the remote was
+  # unreachable: GitHub throttled anonymous fetches from this address for five
+  # hours on 2026-09-03 and produced ten identical alerts, which is how a useful
+  # alert becomes a filter rule. `-eq` fires on the run that crosses the
+  # threshold and then stays quiet — the outage is already known, and the health
+  # check's "box is behind origin/main" rule is what keeps watching it.
+  if [ "$streak" -eq "$FAIL_LIMIT" ]; then
     echo "could not fetch origin/main on $streak consecutive runs; the box is no longer tracking it" >&2
     exit 1
   fi
-  echo "fetch failed (run $streak of $FAIL_LIMIT before this is treated as an outage); will retry next tick"
+
+  if [ "$streak" -gt "$FAIL_LIMIT" ]; then
+    echo "still cannot fetch origin/main ($streak consecutive runs); already alerted"
+  else
+    echo "fetch failed (run $streak of $FAIL_LIMIT before this is treated as an outage); will retry next tick"
+  fi
   exit 0
 fi
 
