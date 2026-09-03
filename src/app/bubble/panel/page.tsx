@@ -31,6 +31,16 @@ export const revalidate = 600;
 /** Matches the site's Ranked list: seven days, competitive battles only. */
 const WINDOW_DAYS = 7;
 
+/**
+ * Brawlers drawn per tier.
+ *
+ * Eight fits one row at the panel's landscape width and two in portrait, which
+ * keeps every tier visible in a window that is only ~370dp tall when the phone
+ * is held the way the game is played. D holds forty-odd; drawing them all would
+ * push S off the top of the screen to show the brawlers nobody is choosing.
+ */
+const SHOWN_PER_TIER = 8;
+
 export const metadata: Metadata = {
   title: 'Live picks',
   // One bounded URL showing data that already has an indexable home on
@@ -89,7 +99,7 @@ export default async function BubblePanelPage() {
         body > div > main { padding: 0 !important; max-width: none !important; }
       `}</style>
 
-      <div className="min-h-dvh bg-background px-3 py-3">
+      <div className="min-h-dvh bg-background px-2 py-2">
         <h1 className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-muted">
           Ranked meta · last {WINDOW_DAYS} days
         </h1>
@@ -165,7 +175,7 @@ function TierStrip({
       <div className="flex items-stretch">
         {/* The same lit band the site's tier rows use, at panel scale. */}
         <div
-          className="flex w-10 shrink-0 flex-col items-center justify-center gap-0.5 py-2"
+          className="flex w-9 shrink-0 flex-col items-center justify-center gap-0.5 py-1.5"
           style={{
             background: `linear-gradient(155deg, color-mix(in srgb, ${color} 52%, transparent) 0%, color-mix(in srgb, ${color} 14%, transparent) 65%, transparent 100%)`,
             boxShadow: `inset -1px 0 0 color-mix(in srgb, ${color} 45%, transparent)`,
@@ -181,30 +191,43 @@ function TierStrip({
         </div>
 
         {/*
-          Scrolls sideways rather than wrapping. A tier can hold twenty
-          brawlers, and wrapping them would push the lower tiers off a 520dp
-          window entirely — the reader would never learn the list continues.
+          Wraps rather than scrolling sideways, and that is a bug fix.
+
+          These were horizontal scrollers inside a vertically scrolling page.
+          A drag starting on a tier could be claimed by the wrong axis, so
+          scrolling the panel sometimes did nothing at all — worst in landscape,
+          which is the orientation the game is actually played in and where the
+          window is shortest. One scroll axis cannot be stolen from.
+
+          Truncated to what a glance needs. The full list is a tap away on the
+          site, and the count in the band already says how many there are.
         */}
-        <div className="flex flex-1 gap-1.5 overflow-x-auto p-2">
-          {entries.slice(0, 14).map((entry) => (
-            <div key={entry.brawlerId} className="w-11 shrink-0 text-center">
+        <div className="flex flex-1 flex-wrap content-start gap-x-1.5 gap-y-1 p-1.5">
+          {entries.slice(0, SHOWN_PER_TIER).map((entry) => (
+            <div key={entry.brawlerId} className="w-10 text-center">
               <Image
                 src={brawlerMeta.get(entry.brawlerId)?.imageUrl ?? brawlerIconUrl(entry.brawlerId)}
                 alt={titleCase(entry.brawlerName)}
-                width={44}
-                height={44}
-                className="size-11 rounded-lg bg-surface-2"
+                width={40}
+                height={40}
+                className="size-10 rounded-lg bg-surface-2"
                 loading="lazy"
                 unoptimized
               />
-              <p className="mt-0.5 truncate text-[10px] font-semibold capitalize leading-tight">
+              <p className="truncate text-[9px] font-semibold capitalize leading-tight">
                 {entry.brawlerName.toLowerCase()}
               </p>
-              <p className="text-[10px] font-black tabular-nums leading-tight" style={{ color }}>
+              <p className="text-[10px] font-black tabular-nums leading-none" style={{ color }}>
                 {entry.metaScore?.toFixed(1) ?? '–'}
               </p>
             </div>
           ))}
+
+          {entries.length > SHOWN_PER_TIER ? (
+            <span className="self-center px-1 text-[10px] font-semibold text-muted">
+              +{entries.length - SHOWN_PER_TIER}
+            </span>
+          ) : null}
         </div>
       </div>
     </li>
