@@ -25,6 +25,21 @@ const MIN_MAP_SAMPLE = 30;
 /** A matchup edge smaller than this is inside the noise of a pairing sample. */
 const MIN_COUNTER_EDGE = 0.04;
 
+/**
+ * Battles a pairing needs before it can be named as the reason for a loss.
+ *
+ * `MIN_SAMPLE_FOR_PAIRING` is 20, which is the right floor for a brawler page
+ * listing several matchups where the reader can see them together and weigh
+ * them. It is the wrong floor here, where one pairing is singled out as *the*
+ * explanation for a specific defeat — measured on a live profile, a 23-battle
+ * pairing produced "countered by Mico, 23.5 points below its usual record",
+ * which is a coin-flip sample wearing the clothes of a verdict.
+ *
+ * The same small-sample trap the comps and the map form both hit. A claim gets
+ * stronger scrutiny the more weight the page puts on it.
+ */
+const MIN_COUNTER_BATTLES = 100;
+
 /** Points of expected advantage below which a draft was not the problem. */
 const DRAFT_DECIDED_IT = 4;
 
@@ -153,6 +168,7 @@ export function draftAutopsy({
     for (const weak of pairing.weakAgainst) {
       if (!theirIds.includes(weak.brawlerId)) continue;
       if (-weak.edge < MIN_COUNTER_EDGE) continue;
+      if (weak.decidedSampleSize < MIN_COUNTER_BATTLES) continue;
       if (!worstMatchup || weak.edge < worstMatchup.edge / 100) {
         worstMatchup = {
           brawlerId: id,
