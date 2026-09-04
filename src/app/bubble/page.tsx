@@ -15,7 +15,7 @@ import Link from "next/link";
 
 import { DemoVideo } from "@/components/bubble/demo-video";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { BUBBLE_APP, bubbleAppSize } from "@/lib/bubble-app";
+import { BUBBLE_APP, BUBBLE_CHANGELOG, bubbleAppSize } from "@/lib/bubble-app";
 
 /**
  * The Android app's download page.
@@ -366,6 +366,43 @@ export default function BubblePage() {
             />
           </div>
         </div>
+      </section>
+
+      {/* The changelog, on the page people reach from the panel's update
+          notice. Newest first, and the current build is marked so a reader can
+          tell at a glance whether they are already on it. */}
+      <section id="changelog" className="space-y-5 scroll-mt-24">
+        <SectionHeading
+          title="What&apos;s new"
+          subtitle="Every release so far. The app updates by downloading again — installs over the top and keeps your permission."
+        />
+
+        <ol className="space-y-4">
+          {BUBBLE_CHANGELOG.map((release) => (
+            <li key={release.versionCode} className="card p-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h3 className="display text-lg uppercase">Version {release.version}</h3>
+                {release.versionCode === BUBBLE_APP.versionCode ? (
+                  <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">
+                    Current
+                  </span>
+                ) : null}
+                <time className="text-xs text-muted" dateTime={release.date}>
+                  {release.date}
+                </time>
+              </div>
+
+              <ul className="mt-3 space-y-2">
+                {release.changes.map((change) => (
+                  <li key={change} className="flex gap-2.5 text-sm leading-relaxed text-muted">
+                    <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-brand/60" />
+                    <span>{change}</span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="card card-glow p-6 text-center sm:p-10">

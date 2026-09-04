@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
 import { PanelTiers, type PanelEntry, type PanelMode } from '@/components/bubble/panel-tiers';
+import { PanelUpdate } from '@/components/bubble/panel-update';
+import { BUBBLE_APP, BUBBLE_CHANGELOG } from '@/lib/bubble-app';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getBrawlerStatsForWindow, getFilterableModes, scoreBrawlers } from '@/lib/stats';
@@ -107,6 +109,14 @@ export default async function BubblePanelPage() {
       `}</style>
 
       <div className="min-h-dvh bg-background px-2 py-2">
+        {/* Above the list, because an out-of-date app is the one thing here
+            that the numbers below cannot tell you about themselves. */}
+        <PanelUpdate
+          latestVersion={BUBBLE_APP.version}
+          latestVersionCode={BUBBLE_APP.versionCode}
+          changes={BUBBLE_CHANGELOG}
+        />
+
         <h1 className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
           Ranked meta · last {WINDOW_DAYS} days
         </h1>
