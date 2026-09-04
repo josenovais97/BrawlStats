@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 
+import { PanelTiers, type PanelEntry, type PanelMode } from '@/components/bubble/panel-tiers';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { getEventRotation } from '@/lib/bs-api';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { partitionRotation, titleCase } from '@/lib/format';
-import { getBrawlerStatsForWindow, scoreBrawlers, TIER_ORDER } from '@/lib/stats';
-import { TIER_COLOR } from '@/lib/tiers';
+import { partitionRotation } from '@/lib/format';
+import { getBrawlerStatsForWindow, getFilterableModes, scoreBrawlers } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSRotationSlot } from '@/types/brawlstars';
 
@@ -31,16 +30,6 @@ export const revalidate = 600;
 /** Matches the site's Ranked list: seven days, competitive battles only. */
 const WINDOW_DAYS = 7;
 
-/**
- * Brawlers drawn per tier.
- *
- * Eight fits one row at the panel's landscape width and two in portrait, which
- * keeps every tier visible in a window that is only ~370dp tall when the phone
- * is held the way the game is played. D holds forty-odd; drawing them all would
- * push S off the top of the screen to show the brawlers nobody is choosing.
- */
-const SHOWN_PER_TIER = 8;
-
 export const metadata: Metadata = {
   title: 'Live picks',
   // One bounded URL showing data that already has an indexable home on
@@ -51,34 +40,58 @@ export const metadata: Metadata = {
 };
 
 export default async function BubblePanelPage() {
-  const [rows, brawlerMeta, modeMeta, rotation] = await Promise.all([
+  /*
+   * Which modes are worth offering, asked before the stats are fetched.
+   *
+   * The same source the site's tier list uses, so the two cannot disagree
+   * about which modes have enough competitive data to split by. A mode nobody
+   * plays in Ranked would otherwise get a chip that opens on an empty list.
+   */
+  const filterable = await getFilterableModes(30, 150, 'ranked').catch(() => []);
+  const modeKeys = filterable.map((entry) => entry.mode);
+
+  const [allRows, perMode, brawlerMeta, modeMeta, rotation] = await Promise.all([
     getBrawlerStatsForWindow(WINDOW_DAYS, undefined, 'ranked').catch(() => []),
+    // Each of these is cached independently, and the site's own per-mode pages
+    // read the same entries — so the panel usually warms nothing of its own.
+    Promise.all(
+      modeKeys.map((mode) =>
+        getBrawlerStatsForWindow(WINDOW_DAYS, mode, 'ranked').catch(() => []),
+      ),
+    ),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     getEventRotation(revalidate).catch(() => [] as BSRotationSlot[]),
   ]);
 
-  const scored = scoreBrawlers(rows, 'ranked');
-  const byTier = new Map<string, typeof scored>();
-  for (const entry of scored) {
-    if (!entry.tier) continue; // below the sample floor: unrated, not D
-    const bucket = byTier.get(entry.tier) ?? [];
-    bucket.push(entry);
-    byTier.set(entry.tier, bucket);
-  }
-
-  /*
-   * Strongest first within each tier, sorted here rather than inherited.
+  /**
+   * Trimmed to what the panel draws.
    *
-   * `scoreBrawlers` does not promise an order, and it came back ascending —
-   * so the S row opened on its weakest name. The panel truncates each tier to
-   * what fits, which makes the order load-bearing in a way the full page's
-   * wrapping rows are not: whatever is cut has to be the least useful, not the
-   * most.
+   * Every mode's list is serialised into the page so the filter can switch
+   * without a request. The full stat rows carry far more than four fields, and
+   * carrying all of them across seven modes would put hundreds of kilobytes
+   * into an overlay opened on mobile data.
    */
-  for (const bucket of byTier.values()) {
-    bucket.sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
-  }
+  const shape = (rows: Awaited<ReturnType<typeof getBrawlerStatsForWindow>>): PanelEntry[] =>
+    scoreBrawlers(rows, 'ranked')
+      .filter((entry) => entry.tier !== null)
+      .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
+      .map((entry) => ({
+        brawlerId: entry.brawlerId,
+        brawlerName: entry.brawlerName,
+        metaScore: entry.metaScore,
+        tier: entry.tier!,
+        imageUrl: brawlerMeta.get(entry.brawlerId)?.imageUrl ?? brawlerIconUrl(entry.brawlerId),
+      }));
+
+  const modes: PanelMode[] = [
+    { key: null, label: 'All', entries: shape(allRows) },
+    ...modeKeys.map((mode, index) => ({
+      key: mode,
+      label: modeLabel(modeMeta, mode),
+      entries: shape(perMode[index]),
+    })),
+  ].filter((mode) => mode.key === null || mode.entries.length > 0);
 
   const { active } = partitionRotation(rotation);
   active.sort((a, b) => a.slotId - b.slotId);
@@ -100,30 +113,16 @@ export default async function BubblePanelPage() {
       `}</style>
 
       <div className="min-h-dvh bg-background px-2 py-2">
-        <h1 className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-muted">
+        <h1 className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
           Ranked meta · last {WINDOW_DAYS} days
         </h1>
 
-        {scored.length === 0 ? (
+        {modes[0].entries.length === 0 ? (
           <p className="px-2 py-8 text-center text-sm text-muted">
             Not enough sampled Ranked battles yet. This fills in as the sampler runs.
           </p>
         ) : (
-          <ul className="space-y-2">
-            {TIER_ORDER.map((tier) => {
-              const entries = byTier.get(tier) ?? [];
-              if (entries.length === 0) return null;
-              return (
-                <TierStrip
-                  key={tier}
-                  tier={tier}
-                  color={TIER_COLOR[tier]}
-                  entries={entries}
-                  brawlerMeta={brawlerMeta}
-                />
-              );
-            })}
-          </ul>
+          <PanelTiers modes={modes} />
         )}
 
         {active.length > 0 ? (
@@ -156,80 +155,5 @@ export default async function BubblePanelPage() {
         </p>
       </div>
     </>
-  );
-}
-
-function TierStrip({
-  tier,
-  color,
-  entries,
-  brawlerMeta,
-}: {
-  tier: string;
-  color: string;
-  entries: { brawlerId: number; brawlerName: string; metaScore: number | null }[];
-  brawlerMeta: Map<number, BABrawler>;
-}) {
-  return (
-    <li className="card overflow-hidden">
-      <div className="flex items-stretch">
-        {/* The same lit band the site's tier rows use, at panel scale. */}
-        <div
-          className="flex w-9 shrink-0 flex-col items-center justify-center gap-0.5 py-1.5"
-          style={{
-            background: `linear-gradient(155deg, color-mix(in srgb, ${color} 52%, transparent) 0%, color-mix(in srgb, ${color} 14%, transparent) 65%, transparent 100%)`,
-            boxShadow: `inset -1px 0 0 color-mix(in srgb, ${color} 45%, transparent)`,
-          }}
-        >
-          <span
-            className="text-xl font-black leading-none"
-            style={{ color, textShadow: `0 0 18px color-mix(in srgb, ${color} 60%, transparent)` }}
-          >
-            {tier}
-          </span>
-          <span className="text-[10px] font-bold tabular-nums text-muted">{entries.length}</span>
-        </div>
-
-        {/*
-          Wraps rather than scrolling sideways, and that is a bug fix.
-
-          These were horizontal scrollers inside a vertically scrolling page.
-          A drag starting on a tier could be claimed by the wrong axis, so
-          scrolling the panel sometimes did nothing at all — worst in landscape,
-          which is the orientation the game is actually played in and where the
-          window is shortest. One scroll axis cannot be stolen from.
-
-          Truncated to what a glance needs. The full list is a tap away on the
-          site, and the count in the band already says how many there are.
-        */}
-        <div className="flex flex-1 flex-wrap content-start gap-x-1.5 gap-y-1 p-1.5">
-          {entries.slice(0, SHOWN_PER_TIER).map((entry) => (
-            <div key={entry.brawlerId} className="w-10 text-center">
-              <Image
-                src={brawlerMeta.get(entry.brawlerId)?.imageUrl ?? brawlerIconUrl(entry.brawlerId)}
-                alt={titleCase(entry.brawlerName)}
-                width={40}
-                height={40}
-                className="size-10 rounded-lg bg-surface-2"
-                loading="lazy"
-                unoptimized
-              />
-              <p className="truncate text-[9px] font-semibold capitalize leading-tight">
-                {entry.brawlerName.toLowerCase()}
-              </p>
-              <p className="text-[10px] font-black tabular-nums leading-none" style={{ color }}>
-                {entry.metaScore?.toFixed(1) ?? '–'}
-              </p>
-            </div>
-          ))}
-
-          {entries.length > SHOWN_PER_TIER ? (
-            <span className="self-center px-1 text-[10px] font-semibold text-muted">
-              +{entries.length - SHOWN_PER_TIER}
-            </span>
-          ) : null}
-        </div>
-      </div>
-    </li>
   );
 }
