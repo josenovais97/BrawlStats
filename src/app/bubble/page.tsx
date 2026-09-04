@@ -122,74 +122,87 @@ export default function BubblePage() {
     <div className="space-y-16 sm:space-y-24">
       {/* Hero. The claim, the proof and the button, before anything is explained. */}
       <section className="space-y-7">
-        <div className="max-w-3xl space-y-5">
-          <p className="flex items-center gap-2.5">
-            <span aria-hidden className="rule h-4" />
-            <span className="eyebrow">Free Android app</span>
-          </p>
+        {/* Two columns on a wide screen: the pitch, and the way to get it
+            onto the device that can actually run it. The QR used to sit
+            under the trust row, which left the whole right of the hero
+            empty on desktop and buried the code below the fold on the very
+            screens it exists for. */}
+        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="space-y-6">
+            <div className="max-w-3xl space-y-5">
+              <p className="flex items-center gap-2.5">
+                <span aria-hidden className="rule h-4" />
+                <span className="eyebrow">Free Android app</span>
+              </p>
 
-          <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">
-            The tier list,
-            <br />
-            <span className="text-brand">on top of the game</span>
-          </h1>
+              <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">
+                The tier list,
+                <br />
+                <span className="text-brand">on top of the game</span>
+              </h1>
 
-          <p className="max-w-2xl text-lg leading-relaxed text-muted">
-            Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs
-            more of them than you have — so the list comes to you instead, one tap away, and gets
-            out of the way when you are done.
-          </p>
-        </div>
+              <p className="max-w-2xl text-lg leading-relaxed text-muted">
+                Brawl Stars gives you seconds to pick. Leaving the game to check
+                a tier list costs more of them than you have — so the list comes
+                to you instead, one tap away, and gets out of the way when you
+                are done.
+              </p>
+            </div>
 
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-          <a
-            href={BUBBLE_APP.path}
-            download
-            className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
-          >
-            <Download className="size-5" />
-            Download for Android
-          </a>
-          <p className="text-sm text-muted">
-            Version {BUBBLE_APP.version} · {bubbleAppSize()} · Android {BUBBLE_APP.minAndroid} or
-            newer
-          </p>
-        </div>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+              <a
+                href={BUBBLE_APP.path}
+                download
+                className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
+              >
+                <Download className="size-5" />
+                Download for Android
+              </a>
+              <p className="text-sm text-muted">
+                Version {BUBBLE_APP.version} · {bubbleAppSize()} · Android{" "}
+                {BUBBLE_APP.minAndroid} or newer
+              </p>
+            </div>
 
-        <ul className="flex flex-wrap gap-x-6 gap-y-2">
-          {TRUST.map((item) => (
-            <li key={item} className="flex items-center gap-2 text-sm font-semibold">
-              <Check className="size-4 text-victory" />
-              {item}
-            </li>
-          ))}
-        </ul>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              {TRUST.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-2 text-sm font-semibold"
+                >
+                  <Check className="size-4 text-victory" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        {/*
-          For the reader on a desktop, where the download button hands them an
-          APK their computer cannot install.
+          {/*
+            For the reader on a desktop, where the download button hands them an
+            APK their computer cannot install.
 
-          Points at this page rather than the file: someone arriving on a phone
-          needs the install steps — the restricted-settings one in particular —
-          and a QR that starts a download gives them the file with none of that.
-          Hidden below `lg`, because scanning a code with the phone displaying
-          it is not a thing anyone can do.
-        */}
-        <div className="hidden w-fit items-center gap-4 rounded-2xl border border-border bg-surface p-4 lg:flex">
-          <Image
-            src="/bubble/qr.svg"
-            alt="QR code linking to brawlzone.net/bubble"
-            width={330}
-            height={330}
-            className="size-28 rounded-lg"
-            unoptimized
-          />
-          <div className="max-w-[15rem]">
-            <p className="font-bold">On a computer?</p>
-            <p className="mt-1 text-sm leading-relaxed text-muted">
-              Scan to open this page on your Android phone, where the app can actually be
-              installed.
-            </p>
+            Points at this page rather than the file: someone arriving on a phone
+            needs the install steps — the restricted-settings one in particular —
+            and a QR that starts a download gives them the file with none of that.
+            Hidden below `lg`, because scanning a code with the phone displaying
+            it is not a thing anyone can do.
+          */}
+          <div className="hidden shrink-0 rounded-2xl border border-border bg-surface p-5 text-center lg:block">
+            <Image
+              src="/bubble/qr.svg"
+              alt="QR code linking to brawlzone.net/bubble"
+              width={330}
+              height={330}
+              className="mx-auto size-36 rounded-lg"
+              unoptimized
+            />
+            <div className="mt-3 max-w-[13rem]">
+              <p className="font-bold">On a computer?</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
+                Scan to open this page on your Android phone, where the app can
+                actually be installed.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -197,9 +210,10 @@ export default function BubblePage() {
         <figure className="card-glow overflow-hidden rounded-2xl border border-border">
           <DemoVideo />
           <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-            One unedited take on a phone: queueing into Hot Zone, opening the bubble mid-draft,
-            filtering to the mode being played, checking Bo&apos;s build, then picking Bo and
-            switching to the star power the panel pointed at. Taps are marked.
+            One unedited take on a phone: queueing into Hot Zone, opening the
+            bubble mid-draft, filtering to the mode being played, checking
+            Bo&apos;s build, then picking Bo and switching to the star power the
+            panel pointed at. Taps are marked.
           </figcaption>
         </figure>
       </section>
@@ -214,16 +228,19 @@ export default function BubblePage() {
       */}
       <section className="card card-glow p-6 sm:p-10">
         <div className="max-w-3xl space-y-4">
-          <h2 className="display text-2xl uppercase sm:text-3xl">A website cannot do this</h2>
+          <h2 className="display text-2xl uppercase sm:text-3xl">
+            A website cannot do this
+          </h2>
           <p className="leading-relaxed text-muted">
-            Not this one, not any of them. A browser tab cannot draw on top of another app — the
-            sandbox forbids it, on every phone. Checking a tier list in a browser means leaving
-            the draft, and leaving the draft is what costs you the pick.
+            Not this one, not any of them. A browser tab cannot draw on top of
+            another app — the sandbox forbids it, on every phone. Checking a
+            tier list in a browser means leaving the draft, and leaving the
+            draft is what costs you the pick.
           </p>
           <p className="leading-relaxed text-muted">
-            An installed app can. That is the whole reason this exists as an APK rather than
-            another page on the site, and it is all the app does: draw the numbers over the game,
-            then get out of the way.
+            An installed app can. That is the whole reason this exists as an APK
+            rather than another page on the site, and it is all the app does:
+            draw the numbers over the game, then get out of the way.
           </p>
         </div>
       </section>
@@ -272,7 +289,9 @@ export default function BubblePage() {
             <article key={f.title} className="card p-5">
               <f.icon className="size-6 text-brand" />
               <h3 className="mt-3 font-bold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{f.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                {f.body}
+              </p>
             </article>
           ))}
         </div>
@@ -295,14 +314,16 @@ export default function BubblePage() {
             <ShieldCheck className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
               <p>
-                The bubble cannot see your screen, your match, or which map you are on. Android
-                does not let one app read another&apos;s display, and anything claiming otherwise
-                is not playing by the rules.
+                The bubble cannot see your screen, your match, or which map you
+                are on. Android does not let one app read another&apos;s
+                display, and anything claiming otherwise is not playing by the
+                rules.
               </p>
               <p>
-                It shows the meta; you match that to the draft in front of you. It does not touch
-                the game, read your account, or send anything anywhere — there is no account, no
-                analytics in the app, and nothing to log in to.
+                It shows the meta; you match that to the draft in front of you.
+                It does not touch the game, read your account, or send anything
+                anywhere — there is no account, no analytics in the app, and
+                nothing to log in to.
               </p>
             </div>
           </div>
@@ -321,14 +342,18 @@ export default function BubblePage() {
             <li key={step.n} className="flex gap-4 p-5">
               <span
                 className={`grid size-8 shrink-0 place-items-center rounded-full text-sm font-black tabular-nums ${
-                  step.warn ? "bg-brand text-brand-ink" : "bg-surface-2 text-muted"
+                  step.warn
+                    ? "bg-brand text-brand-ink"
+                    : "bg-surface-2 text-muted"
                 }`}
               >
                 {step.n}
               </span>
               <div className="min-w-0">
                 <h3 className="font-bold">{step.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-muted">{step.body}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted">
+                  {step.body}
+                </p>
               </div>
             </li>
           ))}
@@ -338,15 +363,18 @@ export default function BubblePage() {
           <div className="card p-5">
             <h3 className="text-sm font-bold">About Play Protect</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Google Play Protect warns about any app installed outside the Play Store. That
-              warning is about where a file came from, not about what is in it.
+              Google Play Protect warns about any app installed outside the Play
+              Store. That warning is about where a file came from, not about
+              what is in it.
             </p>
           </div>
 
           {/* A checksum is only worth printing if it is right, so it is generated
               from the committed file and asserted against it in the test run. */}
           <details className="card p-5">
-            <summary className="cursor-pointer text-sm font-bold">Verify the download</summary>
+            <summary className="cursor-pointer text-sm font-bold">
+              Verify the download
+            </summary>
             <p className="mt-3 text-sm leading-relaxed text-muted">
               Confirm the file you got is the file published here. On a desktop:{" "}
               <code className="rounded bg-surface-2 px-1.5 py-0.5 text-xs">
@@ -377,7 +405,9 @@ export default function BubblePage() {
                 <g.icon className="size-6 shrink-0 text-brand" />
                 <div className="min-w-0">
                   <h3 className="font-bold">{g.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">{g.body}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">
+                    {g.body}
+                  </p>
                 </div>
               </li>
             ))}
@@ -401,7 +431,7 @@ export default function BubblePage() {
           tell at a glance whether they are already on it. */}
       <section id="changelog" className="space-y-5 scroll-mt-24">
         <SectionHeading
-          title="What&apos;s new"
+          title="What's new"
           subtitle="Every release so far. The app updates by downloading again — installs over the top and keeps your permission."
         />
 
@@ -409,7 +439,9 @@ export default function BubblePage() {
           {BUBBLE_CHANGELOG.map((release) => (
             <li key={release.versionCode} className="card p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <h3 className="display text-lg uppercase">Version {release.version}</h3>
+                <h3 className="display text-lg uppercase">
+                  Version {release.version}
+                </h3>
                 {release.versionCode === BUBBLE_APP.versionCode ? (
                   <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">
                     Current
@@ -422,8 +454,14 @@ export default function BubblePage() {
 
               <ul className="mt-3 space-y-2">
                 {release.changes.map((change) => (
-                  <li key={change} className="flex gap-2.5 text-sm leading-relaxed text-muted">
-                    <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-brand/60" />
+                  <li
+                    key={change}
+                    className="flex gap-2.5 text-sm leading-relaxed text-muted"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-2 size-1.5 shrink-0 rounded-full bg-brand/60"
+                    />
                     <span>{change}</span>
                   </li>
                 ))}
@@ -434,10 +472,13 @@ export default function BubblePage() {
       </section>
 
       <section className="card card-glow p-6 text-center sm:p-10">
-        <h2 className="display text-2xl uppercase sm:text-3xl">Get it on your phone</h2>
+        <h2 className="display text-2xl uppercase sm:text-3xl">
+          Get it on your phone
+        </h2>
         <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">
-          Free, {bubbleAppSize()}, no account. Everything it shows is on the site too — the app
-          only saves you the app switch, which is the part that costs you the draft.
+          Free, {bubbleAppSize()}, no account. Everything it shows is on the
+          site too — the app only saves you the app switch, which is the part
+          that costs you the draft.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <a
