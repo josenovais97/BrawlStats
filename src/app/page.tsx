@@ -9,6 +9,7 @@ import { HomeLatestVideo } from '@/components/home/home-latest-video';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
+import { HomeBubble } from '@/components/home/home-bubble';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeSnapshot } from '@/components/home/home-snapshot';
 import { HomeSplit } from '@/components/home/home-split';
@@ -154,6 +155,16 @@ export default function HomePage() {
       <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
         <HomeAccountPreview />
       </Suspense>
+
+      {/*
+        The app, directly under the flagship.
+
+        High for the same reason HomeSplit is high: it is the one thing on this
+        page a competitor's website cannot copy, and not because they have not
+        got round to it — a browser tab cannot draw over another app on any
+        phone. Burying it would repeat the mistake that section documents.
+      */}
+      <HomeBubble />
 
       <HomeSection
         id="live-now"
