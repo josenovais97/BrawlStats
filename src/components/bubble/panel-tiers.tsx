@@ -32,11 +32,32 @@ export interface PanelEntry {
   imageUrl: string;
 }
 
+/** One brawler's record on one Ranked map. */
+export interface PanelMapPick {
+  brawlerId: number;
+  brawlerName: string;
+  imageUrl: string;
+  /** Baseline-adjusted, shrunk. What the ordering uses. */
+  score: number;
+  /** The same brawler's form across all Ranked maps, for the delta. */
+  overallScore: number;
+  /** Decided battles sampled on this map. */
+  battles: number;
+}
+
+export interface PanelMap {
+  mapName: string;
+  mode: string;
+  picks: PanelMapPick[];
+}
+
 export interface PanelMode {
   /** The API's mode key, or `null` for the combined list. */
   key: string | null;
   label: string;
   entries: PanelEntry[];
+  /** Ranked maps in this mode. Empty on the combined list. */
+  maps: PanelMap[];
 }
 
 /**
@@ -51,6 +72,7 @@ const SHOWN_PER_TIER = 8;
 
 /** Where the last-used mode is kept between openings. */
 const STORED_MODE = 'brawlzone.bubble.mode';
+const STORED_MAP = 'brawlzone.bubble.map';
 
 interface BuildItem {
   itemId: number;
@@ -67,8 +89,20 @@ interface BuildResponse {
   gadget: BuildItem | null;
 }
 
+/** Writes a preference, or clears it, and never lets storage break the panel. */
+function remember(key: string, value: string | null) {
+  try {
+    if (value === null) window.localStorage.removeItem(key);
+    else window.localStorage.setItem(key, value);
+  } catch {
+    // Private windows and blocked site data both throw. Keeping a choice
+    // between openings is a convenience, never a requirement.
+  }
+}
+
 export function PanelTiers({ modes }: { modes: PanelMode[] }) {
   const [active, setActive] = useState<string | null>(null);
+  const [map, setMap] = useState<string | null>(null);
 
   /*
    * The choice outlives the panel.
@@ -81,6 +115,7 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
    */
   useEffect(() => {
     try {
+      const savedMap = window.localStorage.getItem(STORED_MAP);
       const saved = window.localStorage.getItem(STORED_MODE);
       if (!saved || !modes.some((m) => m.key === saved)) return;
 
@@ -93,6 +128,9 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
        */
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActive(saved);
+
+      const mode = modes.find((m) => m.key === saved);
+      if (savedMap && mode?.maps.some((m) => m.mapName === savedMap)) setMap(savedMap);
     } catch {
       // Private windows and blocked site data both throw on access. A filter
       // that starts on All is a fine outcome; a panel that fails to render is
@@ -102,15 +140,20 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
 
   const choose = (key: string | null) => {
     setActive(key);
-    try {
-      if (key === null) window.localStorage.removeItem(STORED_MODE);
-      else window.localStorage.setItem(STORED_MODE, key);
-    } catch {
-      // Storing the preference is a convenience, never a requirement.
-    }
+    // A map belongs to a mode; carrying it across would show Brawl Ball picks
+    // under a Knockout heading.
+    setMap(null);
+    remember(STORED_MODE, key);
+    remember(STORED_MAP, null);
+  };
+
+  const chooseMap = (name: string | null) => {
+    setMap(name);
+    remember(STORED_MAP, name);
   };
 
   const current = modes.find((m) => m.key === active) ?? modes[0];
+  const currentMap = current.maps.find((m) => m.mapName === map) ?? null;
 
   /*
    * The tapped brawler's build, fetched rather than pre-rendered.
@@ -192,7 +235,55 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
         })}
       </div>
 
-      {current.entries.length === 0 ? (
+      {/*
+        The map row, and the reason this panel is worth opening mid-draft.
+
+        A mode is too coarse to draft on: Ranked gives you one map out of that
+        mode's pool and the answer changes with it, so filtering to Knockout
+        still left the reader holding the average of five different maps. The
+        maps only appear once a mode is chosen — the full pool is around thirty,
+        which is more chips than a 375dp-tall window can show without becoming
+        the whole panel.
+      */}
+      {current.maps.length > 0 ? (
+        <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
+          <button
+            type="button"
+            onClick={() => chooseMap(null)}
+            aria-pressed={currentMap === null}
+            className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+              currentMap === null
+                ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
+                : 'border-border bg-surface text-muted'
+            }`}
+          >
+            All maps
+          </button>
+
+          {current.maps.map((m) => {
+            const on = currentMap?.mapName === m.mapName;
+            return (
+              <button
+                key={m.mapName}
+                type="button"
+                onClick={() => chooseMap(m.mapName)}
+                aria-pressed={on}
+                className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                  on
+                    ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
+                    : 'border-border bg-surface text-muted'
+                }`}
+              >
+                {m.mapName}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {currentMap ? (
+        <MapPicks map={currentMap} onPick={show} openId={openId} />
+      ) : current.entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
           Not enough sampled Ranked battles in {current.label.toLowerCase()} yet.
         </p>
@@ -403,5 +494,115 @@ function BuildRow({ item, kind }: { item: BuildItem; kind: string }) {
         {Math.round(item.share * 100)}%
       </span>
     </div>
+  );
+}
+
+/**
+ * The best picks on one map, ranked.
+ *
+ * A list rather than tier bands. Tiers are a way of grouping ninety brawlers
+ * into something readable; on a single map there are ten names and an order,
+ * and the order is the answer — a reader mid-draft wants "who is best here",
+ * not "who is roughly in the same bracket here".
+ *
+ * The delta against the brawler's own Ranked form is the only genuinely
+ * map-specific claim on the row, so it is the thing given colour. A brawler
+ * that is strong everywhere is not a map pick; one that is better *here* than
+ * it usually is, is.
+ */
+function MapPicks({
+  map,
+  onPick,
+  openId,
+}: {
+  map: PanelMap;
+  onPick: (entry: PanelEntry) => void;
+  openId: number | null;
+}) {
+  if (map.picks.length === 0) {
+    return (
+      <p className="px-2 py-6 text-center text-xs leading-relaxed text-muted">
+        No brawler is clearly above average on {map.mapName} yet. It fills in as the sampler
+        works through more battles here.
+      </p>
+    );
+  }
+
+  return (
+    <ol className="card divide-y divide-border overflow-hidden">
+      {map.picks.map((pick, index) => {
+        const edge = pick.score - pick.overallScore;
+        return (
+          <li key={pick.brawlerId}>
+            <button
+              type="button"
+              onClick={() =>
+                onPick({
+                  brawlerId: pick.brawlerId,
+                  brawlerName: pick.brawlerName,
+                  metaScore: null,
+                  tier: 'S',
+                  imageUrl: pick.imageUrl,
+                })
+              }
+              aria-pressed={openId === pick.brawlerId}
+              className="flex w-full items-center gap-2 px-2 py-1.5 text-left"
+            >
+              <span
+                aria-hidden
+                className={`grid size-5 shrink-0 place-items-center rounded-full text-[10px] font-black tabular-nums ${
+                  index === 0
+                    ? 'bg-brand text-brand-ink'
+                    : index === 1
+                      ? 'bg-surface-3 text-foreground'
+                      : index === 2
+                        ? 'bg-[#8a5a2b] text-[#ffe6c7]'
+                        : 'text-muted'
+                }`}
+              >
+                {index + 1}
+              </span>
+
+              <Image
+                src={pick.imageUrl}
+                alt=""
+                width={30}
+                height={30}
+                className={`size-[30px] shrink-0 rounded-md bg-surface-2 ${
+                  openId === pick.brawlerId ? 'ring-2 ring-brand' : ''
+                }`}
+                loading="lazy"
+                unoptimized
+              />
+
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-xs font-bold capitalize leading-tight">
+                  {pick.brawlerName.toLowerCase()}
+                </span>
+                {/* Sample size is never hidden: on a per-map split it is the
+                    difference between a signal and a coin flip. */}
+                <span className="block text-[10px] tabular-nums leading-tight text-muted">
+                  {pick.battles} battles here
+                </span>
+              </span>
+
+              <span className="shrink-0 text-right">
+                <span className="block text-[11px] font-black tabular-nums leading-tight text-victory">
+                  {(pick.score * 100).toFixed(1)}%
+                </span>
+                <span
+                  className={`block text-[10px] tabular-nums leading-tight ${
+                    edge >= 0.005 ? 'text-victory/80' : 'text-muted'
+                  }`}
+                >
+                  {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
+                  {Math.abs(edge * 100).toFixed(1)} vs usual
+                </span>
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

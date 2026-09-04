@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
 
-import { PanelTiers, type PanelEntry, type PanelMode } from '@/components/bubble/panel-tiers';
+import {
+  PanelTiers,
+  type PanelEntry,
+  type PanelMap,
+  type PanelMode,
+} from '@/components/bubble/panel-tiers';
 import { PanelUpdate } from '@/components/bubble/panel-update';
 import { BUBBLE_APP, BUBBLE_CHANGELOG } from '@/lib/bubble-app';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { getBrawlerStatsForWindow, getFilterableModes, scoreBrawlers } from '@/lib/stats';
+import {
+  getBrawlerStatsForWindow,
+  getFilterableModes,
+  getRankedMapPicks,
+  scoreBrawlers,
+} from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 
 /**
@@ -50,7 +60,7 @@ export default async function BubblePanelPage() {
   const filterable = await getFilterableModes(30, 150, 'ranked').catch(() => []);
   const modeKeys = filterable.map((entry) => entry.mode);
 
-  const [allRows, perMode, brawlerMeta, modeMeta] = await Promise.all([
+  const [allRows, perMode, brawlerMeta, modeMeta, mapPicks] = await Promise.all([
     getBrawlerStatsForWindow(WINDOW_DAYS, undefined, 'ranked').catch(() => []),
     // Each of these is cached independently, and the site's own per-mode pages
     // read the same entries — so the panel usually warms nothing of its own.
@@ -61,6 +71,15 @@ export default async function BubblePanelPage() {
     ),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+    /*
+     * Per-map picks, which are the point of the panel mid-draft.
+     *
+     * A mode is too coarse to draft on: Ranked hands you one map out of that
+     * mode's pool and the answer moves with it. Ten deep, because a draft has
+     * bans and two team-mates picking before you and the top three are often
+     * gone.
+     */
+    getRankedMapPicks(10).catch(() => []),
   ]);
 
   /**
@@ -83,14 +102,42 @@ export default async function BubblePanelPage() {
         imageUrl: brawlerMeta.get(entry.brawlerId)?.imageUrl ?? brawlerIconUrl(entry.brawlerId),
       }));
 
+  /** Ranked maps grouped by the mode they belong to. */
+  const mapsByMode = new Map<string, PanelMap[]>();
+  for (const map of mapPicks) {
+    const bucket = mapsByMode.get(map.mode) ?? [];
+    bucket.push({
+      mapName: map.mapName,
+      mode: map.mode,
+      picks: map.picks.map((pick) => ({
+        brawlerId: pick.brawlerId,
+        brawlerName: pick.brawlerName,
+        imageUrl:
+          brawlerMeta.get(pick.brawlerId)?.imageUrl ?? brawlerIconUrl(pick.brawlerId),
+        score: pick.score,
+        overallScore: pick.overallScore,
+        battles: pick.decidedSampleSize,
+      })),
+    });
+    mapsByMode.set(map.mode, bucket);
+  }
+  // Alphabetical, so a map keeps its position between openings. Ranking the
+  // chips by sample size would move them under the reader's thumb.
+  for (const bucket of mapsByMode.values()) {
+    bucket.sort((a, b) => a.mapName.localeCompare(b.mapName));
+  }
+
   const modes: PanelMode[] = [
-    { key: null, label: 'All', entries: shape(allRows) },
+    // No maps on the combined list: the full pool is around thirty, which is
+    // more chips than this window can show without becoming the whole panel.
+    { key: null, label: 'All', entries: shape(allRows), maps: [] },
     ...modeKeys.map((mode, index) => ({
       key: mode,
       label: modeLabel(modeMeta, mode),
       entries: shape(perMode[index]),
+      maps: mapsByMode.get(mode) ?? [],
     })),
-  ].filter((mode) => mode.key === null || mode.entries.length > 0);
+  ].filter((mode) => mode.key === null || mode.entries.length > 0 || mode.maps.length > 0);
 
   return (
     <>
