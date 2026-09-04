@@ -207,27 +207,46 @@ export default function BubblePage() {
           subtitle="The same data as the site, cut down to what a draft needs."
         />
 
-        <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="mx-auto w-full max-w-[300px]">
+        {/* Both screens, because they answer different questions: what the
+            meta looks like, and what to actually run once you have picked. */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:mx-auto lg:max-w-2xl">
+          <figure className="space-y-2">
             <Image
               src="/bubble/app-panel.png"
-              alt="The panel showing the Ranked tier list from S to D with meta scores, the mode filter across the top, and the live rotation below"
+              alt="The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score"
               width={720}
-              height={1280}
+              height={1360}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />
-          </div>
+            <figcaption className="text-center text-xs text-muted">
+              Every tier, filtered by mode
+            </figcaption>
+          </figure>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            {FEATURES.map((f) => (
-              <article key={f.title} className="card p-5">
-                <f.icon className="size-6 text-brand" />
-                <h3 className="mt-3 font-bold">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{f.body}</p>
-              </article>
-            ))}
-          </div>
+          <figure className="space-y-2">
+            <Image
+              src="/bubble/app-build.png"
+              alt="The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each"
+              width={720}
+              height={1302}
+              className="w-full rounded-2xl border border-border"
+              loading="lazy"
+            />
+            <figcaption className="text-center text-xs text-muted">
+              Tap a brawler for its build
+            </figcaption>
+          </figure>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {FEATURES.map((f) => (
+            <article key={f.title} className="card p-5">
+              <f.icon className="size-6 text-brand" />
+              <h3 className="mt-3 font-bold">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{f.body}</p>
+            </article>
+          ))}
         </div>
       </section>
 
