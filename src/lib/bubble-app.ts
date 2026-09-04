@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.5',
+  version: '1.6',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 15,
+  versionCode: 16,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2643753,
-  sha256: 'bda5a5ea5908f5631c51b07a0e8b974fd0a6c441e1d6bc65bc5cda5b388d4995',
+  size: 2644577,
+  sha256: 'ec9349835ba58a397a4246ab9c7edaf54c17c9b6f64029b0a0369d41c16e24e6',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-04',
@@ -52,6 +52,14 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.6',
+    versionCode: 16,
+    date: '2026-09-04',
+    changes: [
+      'The panel says when it cannot reach the site, with a tap to retry, instead of spinning forever on a dropped connection.',
+    ],
+  },
   {
     version: '1.5',
     versionCode: 15,

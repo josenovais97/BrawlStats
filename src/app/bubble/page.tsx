@@ -165,6 +165,34 @@ export default function BubblePage() {
           ))}
         </ul>
 
+        {/*
+          For the reader on a desktop, where the download button hands them an
+          APK their computer cannot install.
+
+          Points at this page rather than the file: someone arriving on a phone
+          needs the install steps — the restricted-settings one in particular —
+          and a QR that starts a download gives them the file with none of that.
+          Hidden below `lg`, because scanning a code with the phone displaying
+          it is not a thing anyone can do.
+        */}
+        <div className="hidden w-fit items-center gap-4 rounded-2xl border border-border bg-surface p-4 lg:flex">
+          <Image
+            src="/bubble/qr.svg"
+            alt="QR code linking to brawlzone.net/bubble"
+            width={330}
+            height={330}
+            className="size-28 rounded-lg"
+            unoptimized
+          />
+          <div className="max-w-[15rem]">
+            <p className="font-bold">On a computer?</p>
+            <p className="mt-1 text-sm leading-relaxed text-muted">
+              Scan to open this page on your Android phone, where the app can actually be
+              installed.
+            </p>
+          </div>
+        </div>
+
         {/* The recording carries the page. Everything below it is detail. */}
         <figure className="card-glow overflow-hidden rounded-2xl border border-border">
           <DemoVideo />
