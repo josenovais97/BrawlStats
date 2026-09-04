@@ -325,10 +325,20 @@ function BuildCard({
           {build.starPower ? <BuildRow item={build.starPower} kind="Star power" /> : null}
           {build.gadget ? <BuildRow item={build.gadget} kind="Gadget" /> : null}
 
-          {build.gears.length === 0 && !build.starPower && !build.gadget ? (
-            <p className="text-xs leading-relaxed text-muted">
-              Owners are split evenly across every option, so there is no popular build to
-              report.
+          {/*
+            Said out loud rather than left as an absence.
+
+            Measured across every brawler in the sampled pool, neither the star
+            power nor the gadget split ever clears an even one — owners hold
+            both. A card that simply omitted them would read as missing data
+            instead of as the finding it is, and the reader would keep tapping
+            to look for it.
+          */}
+          {!build.starPower && !build.gadget ? (
+            <p className="pt-0.5 text-[10px] leading-relaxed text-muted">
+              {build.gears.length > 0
+                ? 'Owners hold both star powers and both gadgets, so neither is a preference worth reporting.'
+                : 'Owners are split evenly across every option, so there is no popular build to report.'}
             </p>
           ) : null}
 
@@ -358,7 +368,11 @@ function BuildRow({ item, kind }: { item: BuildItem; kind: string }) {
         <span className="size-6 shrink-0 rounded bg-surface-2" />
       )}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-xs font-semibold">{item.name}</span>
+        {/* The official catalogue publishes gear names in caps ("DAMAGE"),
+            which reads as shouting next to sentence-case ability names. */}
+        <span className="block truncate text-xs font-semibold capitalize">
+          {item.name.toLowerCase()}
+        </span>
         <span className="block text-[10px] text-muted">{kind}</span>
       </span>
       <span className="shrink-0 text-xs font-bold tabular-nums text-brand">
