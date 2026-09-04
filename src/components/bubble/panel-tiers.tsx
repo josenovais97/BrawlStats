@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
@@ -121,6 +121,28 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
    */
   const [open, setOpen] = useState<PanelEntry | null>(null);
   const [builds, setBuilds] = useState<Record<number, BuildResponse | 'error'>>({});
+  const cardRef = useRef<HTMLElement | null>(null);
+
+  /*
+   * Bring the card into view when it opens.
+   *
+   * It renders under all five tier strips, which in a 375dp-tall landscape
+   * window puts it well below the fold: tapping a brawler in S tier lit up the
+   * ring and, as far as the reader could tell, did nothing at all. The panel is
+   * the one place this matters most — it is glanced at mid-draft, and a result
+   * that needs to be scrolled for is a result that is missed.
+   *
+   * Keyed on the loaded build as well as the id, so it scrolls again once the
+   * fetch turns a one-line placeholder into the full card and the target has
+   * moved.
+   */
+  const openId = open?.brawlerId ?? null;
+  const loaded = openId !== null && builds[openId] !== undefined;
+
+  useEffect(() => {
+    if (openId === null) return;
+    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [openId, loaded]);
 
   const show = (entry: PanelEntry) => {
     setOpen((prev) => (prev?.brawlerId === entry.brawlerId ? null : entry));
@@ -185,14 +207,16 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
                 tier={tier}
                 entries={entries}
                 onPick={show}
-                openId={open?.brawlerId ?? null}
+                openId={openId}
               />
             );
           })}
         </ul>
       )}
 
-      {open ? <BuildCard entry={open} build={builds[open.brawlerId]} /> : null}
+      {open ? (
+        <BuildCard ref={cardRef} entry={open} build={builds[open.brawlerId]} />
+      ) : null}
     </>
   );
 }
@@ -285,14 +309,16 @@ function TierStrip({
  * so what owners bought is a revealed preference worth ranking.
  */
 function BuildCard({
+  ref,
   entry,
   build,
 }: {
+  ref: React.Ref<HTMLElement>;
   entry: PanelEntry;
   build: BuildResponse | 'error' | undefined;
 }) {
   return (
-    <section className="card mt-2 overflow-hidden">
+    <section ref={ref} className="card mt-2 overflow-hidden scroll-mt-2">
       <header className="flex items-center gap-2 border-b border-border px-2.5 py-2">
         <Image
           src={entry.imageUrl}
