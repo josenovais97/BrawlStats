@@ -111,9 +111,9 @@ export default function BubblePage() {
       <figure className="overflow-hidden rounded-2xl border border-border">
         <DemoVideo />
         <figcaption className="border-t border-border bg-surface px-4 py-2.5 text-xs text-muted">
-          Recorded on a phone during a live Hot Zone draft. The panel folds out of the bubble,
-          the filter switches to the mode being played, and tapping a brawler shows what owners
-          have unlocked.
+          One unedited take on a phone: queueing into Hot Zone, opening the bubble mid-draft,
+          filtering to the mode being played, checking Bo&apos;s build, then picking Bo and
+          switching to the star power the panel pointed at. Taps are marked.
         </figcaption>
       </figure>
 

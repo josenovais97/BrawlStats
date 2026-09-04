@@ -6,11 +6,16 @@ import { useSyncExternalStore } from 'react';
 /**
  * The app running, as a looping clip.
  *
- * Deliberately a video and not a GIF. The same nine seconds as a GIF is around
- * 10 MB; as H.264 it is under 900 KB, and this sits on the hero of the page the
- * app is downloaded from. On a box with fixed bandwidth and two shared cores,
- * that difference is the whole argument — a muted, looping, inline video
- * behaves exactly like a GIF to a reader and costs a fifteenth as much.
+ * Deliberately a video and not a GIF. These nineteen seconds as a GIF would be
+ * north of 20 MB; as H.264 it is 1.3 MB, and this sits on the hero of the page
+ * the app is downloaded from. On a box with fixed bandwidth and two shared
+ * cores that difference is the whole argument — a muted, looping, inline video
+ * behaves exactly like a GIF to a reader and costs a twentieth as much.
+ *
+ * Encoded at crf 32 rather than the 27 it started at. The content is flat UI on
+ * a dark ground, which is the easiest thing there is to compress: the brawler
+ * names and scores are pixel-identical between the two, and the file is a third
+ * smaller.
  *
  * `playsInline` is the one that bites: without it iOS Safari yanks the video
  * fullscreen the moment it autoplays, which on a page about an Android app is
@@ -53,7 +58,7 @@ export function DemoVideo() {
       loop
       playsInline
       poster="/bubble/demo-poster.jpg"
-      aria-label="The bubble opened during a Hot Zone draft: the panel folds out with the Ranked tier list, the filter switches to Hot Zone, and tapping Bo shows what owners have unlocked."
+      aria-label="A Hot Zone draft from the queue onward: the bubble opens the Ranked tier list, the filter switches to Hot Zone, tapping Bo shows what owners have unlocked, and Bo is then picked and given that star power."
     >
       <source src="/bubble/demo.mp4" type="video/mp4" />
     </video>
