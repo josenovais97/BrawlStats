@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useSyncExternalStore } from 'react';
+import Image from "next/image";
+import { useSyncExternalStore } from "react";
 
 /**
  * The app running, as a looping clip.
  *
- * Deliberately a video and not a GIF. These nineteen seconds as a GIF would be
- * north of 20 MB; as H.264 it is 1.3 MB, and this sits on the hero of the page
+ * Deliberately a video and not a GIF. These fifteen seconds as a GIF would be
+ * north of 15 MB; as H.264 it is 848 KB, and this sits on the hero of the page
  * the app is downloaded from. On a box with fixed bandwidth and two shared
  * cores that difference is the whole argument — a muted, looping, inline video
  * behaves exactly like a GIF to a reader and costs a twentieth as much.
@@ -40,10 +40,10 @@ export function DemoVideo() {
   if (reduced) {
     return (
       <Image
-        src="/bubble/in-game.jpg"
-        alt="The BrawlZone panel open during a Knockout draft, showing the S, A and B tiers with meta scores"
-        width={1560}
-        height={720}
+        src="/bubble/demo-poster.jpg"
+        alt="The BrawlZone panel open during a Hot Zone draft on Dueling Beetles, listing the brawlers measured best on that map"
+        width={1280}
+        height={590}
         className="w-full"
         priority
       />
@@ -58,19 +58,19 @@ export function DemoVideo() {
       loop
       playsInline
       poster="/bubble/demo-poster.jpg"
-      aria-label="A Hot Zone draft from the queue onward: the bubble opens the Ranked tier list, the filter switches to Hot Zone, tapping Bo shows what owners have unlocked, and Bo is then picked and given that star power."
+      aria-label="A Hot Zone draft on Dueling Beetles: the bubble opens the Ranked tier list, the filter narrows to that mode and then to that map, and the panel lists the ten brawlers measured best on it."
     >
       <source src="/bubble/demo.mp4" type="video/mp4" />
     </video>
   );
 }
 
-const QUERY = '(prefers-reduced-motion: reduce)';
+const QUERY = "(prefers-reduced-motion: reduce)";
 
 function subscribe(onChange: () => void) {
   const mq = window.matchMedia(QUERY);
-  mq.addEventListener('change', onChange);
-  return () => mq.removeEventListener('change', onChange);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
 }
 
 function snapshot() {

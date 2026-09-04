@@ -210,10 +210,9 @@ export default function BubblePage() {
         <figure className="card-glow overflow-hidden rounded-2xl border border-border">
           <DemoVideo />
           <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-            One unedited take on a phone: queueing into Hot Zone, opening the
-            bubble mid-draft, filtering to the mode being played, checking
-            Bo&apos;s build, then picking Bo and switching to the star power the
-            panel pointed at. Taps are marked.
+            One unedited take on a phone: queueing into Hot Zone on Dueling
+            Beetles, opening the bubble mid-draft, narrowing to that exact map,
+            and reading the ten brawlers measured best on it. Taps are marked.
           </figcaption>
         </figure>
       </section>
