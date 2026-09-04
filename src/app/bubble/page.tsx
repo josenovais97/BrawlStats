@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
+import { DemoVideo } from "@/components/bubble/demo-video";
 import { PageHeading, SectionHeading } from "@/components/ui/section-heading";
 import { BUBBLE_APP, bubbleAppSize } from "@/lib/bubble-app";
 
@@ -108,17 +109,11 @@ export default function BubblePage() {
         the shape of the screenshot is itself part of the claim.
       */}
       <figure className="overflow-hidden rounded-2xl border border-border">
-        <Image
-          src="/bubble/in-game.jpg"
-          alt="The BrawlZone bubble open during a Knockout draft on Belle's Rock, showing the S, A and B tiers with meta scores beside the brawler picker"
-          width={1560}
-          height={720}
-          className="w-full"
-          priority
-        />
+        <DemoVideo />
         <figcaption className="border-t border-border bg-surface px-4 py-2.5 text-xs text-muted">
-          The panel open over a live Ranked draft. Nothing is mocked up — this is the app running
-          on a phone.
+          Recorded on a phone during a live Hot Zone draft. The panel folds out of the bubble,
+          the filter switches to the mode being played, and tapping a brawler shows what owners
+          have unlocked.
         </figcaption>
       </figure>
 
