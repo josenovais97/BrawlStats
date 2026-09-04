@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
@@ -49,8 +49,52 @@ export interface PanelMode {
  */
 const SHOWN_PER_TIER = 8;
 
+/** Where the last-used mode is kept between openings. */
+const STORED_MODE = 'brawlzone.bubble.mode';
+
 export function PanelTiers({ modes }: { modes: PanelMode[] }) {
   const [active, setActive] = useState<string | null>(null);
+
+  /*
+   * The choice outlives the panel.
+   *
+   * Every tap on the bubble builds a fresh WebView, so without this the filter
+   * reset to All each time it opened — and someone queueing Knockout all
+   * evening would re-pick Knockout on every single draft. Read in an effect
+   * rather than in the initial state so the server and client render the same
+   * markup on the first pass.
+   */
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(STORED_MODE);
+      if (!saved || !modes.some((m) => m.key === saved)) return;
+
+      /*
+       * Reading a browser store is the "synchronise with an external system"
+       * case effects exist for: the value cannot be known during render, and
+       * seeding it into initial state instead would make the server and the
+       * client disagree about which chip is pressed. It runs once, so the
+       * cascading render the rule guards against is a single extra pass.
+       */
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActive(saved);
+    } catch {
+      // Private windows and blocked site data both throw on access. A filter
+      // that starts on All is a fine outcome; a panel that fails to render is
+      // not.
+    }
+  }, [modes]);
+
+  const choose = (key: string | null) => {
+    setActive(key);
+    try {
+      if (key === null) window.localStorage.removeItem(STORED_MODE);
+      else window.localStorage.setItem(STORED_MODE, key);
+    } catch {
+      // Storing the preference is a convenience, never a requirement.
+    }
+  };
+
   const current = modes.find((m) => m.key === active) ?? modes[0];
 
   const byTier = new Map<Tier, PanelEntry[]>();
@@ -68,16 +112,16 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
         here a sideways scroller sits inside a vertically scrolling panel, and
         a drag claimed by the wrong axis is what made the panel feel stuck.
       */}
-      <div role="group" aria-label="Game mode" className="flex flex-wrap gap-1 px-1 pb-2">
+      <div role="group" aria-label="Game mode" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
         {modes.map((mode) => {
           const on = mode.key === current.key;
           return (
             <button
               key={mode.key ?? 'all'}
               type="button"
-              onClick={() => setActive(mode.key)}
+              onClick={() => choose(mode.key)}
               aria-pressed={on}
-              className={`rounded-lg border px-2 py-1 text-[11px] font-bold transition-colors ${
+              className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
                 on
                   ? 'border-brand/40 bg-brand/10 text-brand'
                   : 'border-border bg-surface text-muted'
