@@ -1,9 +1,10 @@
-import { Check, Download } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { Check, Download } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { HomeSection } from '@/components/home/home-section';
-import { BUBBLE_APP, bubbleAppSize } from '@/lib/bubble-app';
+import { DownloadButton } from "@/components/bubble/download-button";
+import { HomeSection } from "@/components/home/home-section";
+import { BUBBLE_APP, bubbleAppSize } from "@/lib/bubble-app";
 
 /**
  * The Android app, on the landing page.
@@ -48,29 +49,34 @@ export function HomeBubble() {
 
         <div className="space-y-4">
           <p className="leading-relaxed text-muted">
-            Brawl Stars gives you seconds to pick, and switching apps costs more of them than you
-            have. The bubble sits on the edge of the screen, opens the full Ranked tier list on a
-            tap, filters to the mode you are drafting, and folds away again.
+            Brawl Stars gives you seconds to pick, and switching apps costs more
+            of them than you have. The bubble sits on the edge of the screen,
+            opens the full Ranked tier list on a tap, filters to the mode you
+            are drafting, and folds away again.
           </p>
 
           <ul className="grid gap-2 sm:grid-cols-2">
-            {['Free forever', 'No ads', 'No account', 'No tracking'].map((item) => (
-              <li key={item} className="flex items-center gap-2 text-sm font-semibold">
-                <Check className="size-4 shrink-0 text-victory" />
-                {item}
-              </li>
-            ))}
+            {["Free forever", "No ads", "No account", "No tracking"].map(
+              (item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-2 text-sm font-semibold"
+                >
+                  <Check className="size-4 shrink-0 text-victory" />
+                  {item}
+                </li>
+              ),
+            )}
           </ul>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-            <a
-              href={BUBBLE_APP.path}
-              download
+            <DownloadButton
+              from="home"
               className="inline-flex items-center gap-2.5 rounded-xl bg-brand px-5 py-3 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
             >
               <Download className="size-4" />
               Download for Android
-            </a>
+            </DownloadButton>
             <p className="text-xs text-muted">
               {bubbleAppSize()} · Android {BUBBLE_APP.minAndroid}+
             </p>

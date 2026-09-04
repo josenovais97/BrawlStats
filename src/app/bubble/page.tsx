@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { DemoVideo } from "@/components/bubble/demo-video";
+import { DownloadButton } from "@/components/bubble/download-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { BUBBLE_APP, BUBBLE_CHANGELOG, bubbleAppSize } from "@/lib/bubble-app";
 
@@ -150,14 +151,13 @@ export default function BubblePage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-              <a
-                href={BUBBLE_APP.path}
-                download
+              <DownloadButton
+                from="hero"
                 className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
               >
                 <Download className="size-5" />
                 Download for Android
-              </a>
+              </DownloadButton>
               <p className="text-sm text-muted">
                 Version {BUBBLE_APP.version} · {bubbleAppSize()} · Android{" "}
                 {BUBBLE_APP.minAndroid} or newer
@@ -540,14 +540,13 @@ export default function BubblePage() {
           that costs you the draft.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <a
-            href={BUBBLE_APP.path}
-            download
+          <DownloadButton
+            from="cta"
             className="inline-flex items-center gap-3 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
           >
             <Download className="size-5" />
             Download for Android
-          </a>
+          </DownloadButton>
           <Link
             href="/tier-list/ranked"
             className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"
