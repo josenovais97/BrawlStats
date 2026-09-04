@@ -20,20 +20,6 @@ import { getBrawlerBuild } from '@/lib/stats';
  */
 export const revalidate = 3600;
 
-/**
- * How far the top option of a *kind* must be clear of an even split before it
- * is worth calling a preference.
- *
- * Star powers and gadgets are near-universally owned in pairs: measured across
- * the sampled pool, between 74% and 99% of a brawler's owners have unlocked
- * both, so the split between two options is usually close enough to 50/50 to
- * be noise. Reporting the larger half of a coin flip as "the popular pick"
- * would be inventing a recommendation. Gears are different and always shown —
- * a player picks two from nineteen and pays for them, so what they bought is a
- * real revealed preference.
- */
-const DIVERGENCE = 0.58;
-
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -65,9 +51,19 @@ export async function GET(
     }
     const gearNames = new Map((official?.gears ?? []).map((g) => [g.id, g.name]));
 
+    /*
+     * The most-owned option of a kind, always returned when there is one.
+     *
+     * These were gated behind a divergence threshold, on the reasoning that
+     * owners hold both star powers and both gadgets so the larger half is a
+     * coin flip. That is still true, and measured across the sampled pool no
+     * brawler's split ever cleared it — which meant the card showed gears and
+     * nothing else. The share travels with the item precisely so a 51/49 reads
+     * as the tie it is, rather than being hidden on the reader's behalf.
+     */
     const ability = (options: typeof build.starPowers) => {
       const top = options[0];
-      if (!top || top.share < DIVERGENCE) return null;
+      if (!top) return null;
       const named = accessories.get(top.itemId);
       return {
         itemId: top.itemId,

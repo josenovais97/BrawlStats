@@ -278,12 +278,11 @@ function TierStrip({
  * no usage field anywhere in the player or battle payloads — so a card headed
  * "most used build" would be describing a measurement nobody has.
  *
- * Gears carry the weight, because they are the part of a loadout that is
- * actually a choice: two from nineteen, paid for in coins, so what owners
- * bought is a revealed preference. Star powers and gadgets appear only when
- * the split is clear of an even one; most brawlers' owners have unlocked both,
- * and reporting the larger half of a coin flip as a recommendation would be
- * inventing advice.
+ * Star power, gadget and two gears — the shape of an actual loadout. The two
+ * abilities are usually near 50%, because owners hold both, and the share is
+ * printed rather than the row hidden so that reads as the tie it is. Gears are
+ * the part that is genuinely a choice: two from nineteen, paid for in coins,
+ * so what owners bought is a revealed preference worth ranking.
  */
 function BuildCard({
   entry,
@@ -319,32 +318,31 @@ function BuildCard({
         </p>
       ) : (
         <div className="space-y-1.5 p-2.5">
+          {build.starPower ? <BuildRow item={build.starPower} kind="Star power" /> : null}
+          {build.gadget ? <BuildRow item={build.gadget} kind="Gadget" /> : null}
           {build.gears.map((gear) => (
             <BuildRow key={gear.itemId} item={gear} kind="Gear" />
           ))}
-          {build.starPower ? <BuildRow item={build.starPower} kind="Star power" /> : null}
-          {build.gadget ? <BuildRow item={build.gadget} kind="Gadget" /> : null}
 
-          {/*
-            Said out loud rather than left as an absence.
-
-            Measured across every brawler in the sampled pool, neither the star
-            power nor the gadget split ever clears an even one — owners hold
-            both. A card that simply omitted them would read as missing data
-            instead of as the finding it is, and the reader would keep tapping
-            to look for it.
-          */}
-          {!build.starPower && !build.gadget ? (
-            <p className="pt-0.5 text-[10px] leading-relaxed text-muted">
-              {build.gears.length > 0
-                ? 'Owners hold both star powers and both gadgets, so neither is a preference worth reporting.'
-                : 'Owners are split evenly across every option, so there is no popular build to report.'}
+          {build.gears.length === 0 && !build.starPower && !build.gadget ? (
+            <p className="text-xs leading-relaxed text-muted">
+              Nothing unlocked on this brawler across the sampled pool yet.
             </p>
           ) : null}
 
+          {/*
+            The caveat has to travel with the numbers.
+
+            Owners tend to hold both star powers and both gadgets, so those two
+            rows usually sit near 50% — which is the honest reading of a pair
+            everybody owns, not a recommendation. The share is printed rather
+            than the row being hidden, so a tie looks like a tie. Gears are the
+            genuine choice: two from nineteen, paid for in coins.
+          */}
           <p className="pt-1 text-[10px] leading-relaxed text-muted">
             Across {build.owners.toLocaleString('en-US')} sampled owners. Ownership, not
-            usage — the game publishes no record of what was taken into a match.
+            usage — the game publishes no record of what was taken into a match, so a
+            near-50% share means owners hold both.
           </p>
         </div>
       )}

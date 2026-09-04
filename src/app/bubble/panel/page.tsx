@@ -2,15 +2,12 @@ import type { Metadata } from 'next';
 
 import { PanelTiers, type PanelEntry, type PanelMode } from '@/components/bubble/panel-tiers';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
-import { getEventRotation } from '@/lib/bs-api';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { partitionRotation } from '@/lib/format';
 import { getBrawlerStatsForWindow, getFilterableModes, scoreBrawlers } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
-import type { BSRotationSlot } from '@/types/brawlstars';
 
 /**
- * The bubble's panel: the Ranked tier list, then what is live right now.
+ * The bubble's panel: the Ranked tier list, filterable by mode.
  *
  * A separate route rather than `/tier-list/ranked` in a WebView, for two
  * reasons. Reading `searchParams` to strip chrome would opt the route out of
@@ -19,9 +16,10 @@ import type { BSRotationSlot } from '@/types/brawlstars';
  * site's header, hero, controls and footer are most of that window, so the
  * panel would open on chrome and make the reader scroll to reach the answer.
  *
- * The tier list leads because that is the question being asked mid-draft: who
- * is strong right now. The rotation follows, because which map you are on
- * changes which of those names matters.
+ * The tier list is the whole page. A live-rotation strip sat under it for a
+ * while and was cut: the rotation is already on screen behind the overlay, in
+ * the game itself, so the panel was spending a third of a short window telling
+ * the reader something they were looking at.
  */
 
 /** The tier list's own data moves with the sampler, not faster. */
@@ -50,7 +48,7 @@ export default async function BubblePanelPage() {
   const filterable = await getFilterableModes(30, 150, 'ranked').catch(() => []);
   const modeKeys = filterable.map((entry) => entry.mode);
 
-  const [allRows, perMode, brawlerMeta, modeMeta, rotation] = await Promise.all([
+  const [allRows, perMode, brawlerMeta, modeMeta] = await Promise.all([
     getBrawlerStatsForWindow(WINDOW_DAYS, undefined, 'ranked').catch(() => []),
     // Each of these is cached independently, and the site's own per-mode pages
     // read the same entries — so the panel usually warms nothing of its own.
@@ -61,7 +59,6 @@ export default async function BubblePanelPage() {
     ),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
-    getEventRotation(revalidate).catch(() => [] as BSRotationSlot[]),
   ]);
 
   /**
@@ -93,9 +90,6 @@ export default async function BubblePanelPage() {
     })),
   ].filter((mode) => mode.key === null || mode.entries.length > 0);
 
-  const { active } = partitionRotation(rotation);
-  active.sort((a, b) => a.slotId - b.slotId);
-
   return (
     <>
       {/*
@@ -125,29 +119,6 @@ export default async function BubblePanelPage() {
           <PanelTiers modes={modes} />
         )}
 
-        {active.length > 0 ? (
-          <>
-            <h2 className="px-1 pb-2 pt-4 text-[11px] font-bold uppercase tracking-wider text-muted">
-              Live now
-            </h2>
-            <ul className="space-y-1.5">
-              {active.map((slot) => (
-                <li
-                  key={slot.slotId}
-                  className="card flex items-baseline justify-between gap-2 px-3 py-2"
-                >
-                  <span
-                    className="shrink-0 text-xs font-bold uppercase tracking-wide"
-                    style={{ color: modeMeta.get(slot.event.mode)?.color ?? 'var(--brand)' }}
-                  >
-                    {modeLabel(modeMeta, slot.event.mode)}
-                  </span>
-                  <span className="truncate text-sm font-semibold">{slot.event.map ?? '—'}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
 
         <p className="px-2 pb-2 pt-4 text-center text-[11px] leading-relaxed text-muted">
           Meta score combines adjusted win rate and pick rate across sampled Ranked battles.
