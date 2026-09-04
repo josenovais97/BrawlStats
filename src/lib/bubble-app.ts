@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.4',
+  version: '1.5',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 14,
+  versionCode: 15,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2643233,
-  sha256: 'a0ba6141aa6abc6c16c185426a4d3e62e35e0720cb7b3acdb3a7cccfffaeebf9',
+  size: 2643753,
+  sha256: 'bda5a5ea5908f5631c51b07a0e8b974fd0a6c441e1d6bc65bc5cda5b388d4995',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-04',
@@ -52,6 +52,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.5',
+    versionCode: 15,
+    date: '2026-09-04',
+    changes: [
+      'The update notice downloads the new version directly, instead of sending you to the site to find the button.',
+      'Links in the panel now open in your browser rather than inside the overlay.',
+    ],
+  },
   {
     version: '1.4',
     versionCode: 14,

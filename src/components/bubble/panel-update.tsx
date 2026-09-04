@@ -2,7 +2,18 @@
 
 import { useSyncExternalStore } from 'react';
 
-import type { BubbleRelease } from '@/lib/bubble-app';
+import { BUBBLE_APP, type BubbleRelease } from '@/lib/bubble-app';
+
+/**
+ * The first build whose WebView can actually start a download.
+ *
+ * A WebView discards download requests unless the app sets a
+ * `DownloadListener`, and 1.5 is where that was added. Below it the APK link is
+ * a dead button through no fault of the page, so the notice says where to go
+ * instead rather than offering a control that does nothing.
+ */
+const DOWNLOADS_WORK_FROM = 15;
+
 
 /**
  * Tells an out-of-date install that a newer app exists, and what is in it.
@@ -55,15 +66,25 @@ export function PanelUpdate({
     <section className="mb-2 overflow-hidden rounded-xl border border-brand/40 bg-brand/10">
       <div className="flex items-baseline justify-between gap-2 px-3 py-2">
         <p className="text-xs font-bold text-brand">Version {latestVersion} is out</p>
+        {/* Straight to the file. Sending someone to the download page from
+            inside a 360dp overlay means hunting for a button in a window that
+            is not built for reading. */}
         <a
-          href="/bubble"
-          target="_blank"
-          rel="noopener"
+          href={BUBBLE_APP.path}
+          download
           className="shrink-0 rounded-lg bg-brand px-2.5 py-1 text-[11px] font-bold text-brand-ink"
         >
-          Update
+          Download
         </a>
       </div>
+
+      {running === null || running < DOWNLOADS_WORK_FROM ? (
+        <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
+          On this version the button may do nothing — open{' '}
+          <span className="font-semibold text-foreground">brawlzone.net/bubble</span> in your
+          phone&apos;s browser instead. Updating fixes it.
+        </p>
+      ) : null}
 
       {lines.length > 0 ? (
         <ul className="space-y-1 px-3 pb-2.5">
