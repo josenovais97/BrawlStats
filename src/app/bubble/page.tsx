@@ -60,8 +60,8 @@ const FEATURES = [
   },
   {
     icon: Timer,
-    title: "Filtered to the mode you are in",
-    body: "Knockout and Brawl Ball are different metas. One tap narrows the list to the mode you are drafting, and it remembers your choice for next time.",
+    title: "Down to the map you are on",
+    body: "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.",
   },
   {
     icon: MousePointerClick,
@@ -254,7 +254,7 @@ export default function BubblePage() {
 
         {/* Both screens, because they answer different questions: what the
             meta looks like, and what to actually run once you have picked. */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:mx-auto lg:max-w-2xl">
+        <div className="grid gap-4 sm:grid-cols-3">
           <figure className="space-y-2">
             <Image
               src="/bubble/app-panel.png"
@@ -265,7 +265,21 @@ export default function BubblePage() {
               loading="lazy"
             />
             <figcaption className="text-center text-xs text-muted">
-              Every tier, filtered by mode
+              Pick your mode
+            </figcaption>
+          </figure>
+
+          <figure className="space-y-2">
+            <Image
+              src="/bubble/app-map.png"
+              alt="The panel with Knockout and Belle's Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there"
+              width={720}
+              height={1360}
+              className="w-full rounded-2xl border border-border"
+              loading="lazy"
+            />
+            <figcaption className="text-center text-xs text-muted">
+              Then the map you are on
             </figcaption>
           </figure>
 
@@ -432,43 +446,89 @@ export default function BubblePage() {
       <section id="changelog" className="space-y-5 scroll-mt-24">
         <SectionHeading
           title="What's new"
-          subtitle="Every release so far. The app updates by downloading again — installs over the top and keeps your permission."
+          subtitle="The app updates by downloading again — it installs over the top and keeps your permission."
         />
 
-        <ol className="space-y-4">
-          {BUBBLE_CHANGELOG.map((release) => (
-            <li key={release.versionCode} className="card p-5">
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <h3 className="display text-lg uppercase">
-                  Version {release.version}
-                </h3>
-                {release.versionCode === BUBBLE_APP.versionCode ? (
-                  <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">
-                    Current
-                  </span>
-                ) : null}
-                <time className="text-xs text-muted" dateTime={release.date}>
-                  {release.date}
-                </time>
-              </div>
+        {/*
+          The newest release, then everything else folded away.
 
-              <ul className="mt-3 space-y-2">
-                {release.changes.map((change) => (
-                  <li
-                    key={change}
-                    className="flex gap-2.5 text-sm leading-relaxed text-muted"
-                  >
-                    <span
-                      aria-hidden
-                      className="mt-2 size-1.5 shrink-0 rounded-full bg-brand/60"
-                    />
-                    <span>{change}</span>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
+          A changelog that prints every version in full turns into the longest
+          section on the page within a few releases, and buries the download
+          under a history almost nobody wants. What a reader here actually asks
+          is "what changed since I installed it" — and the panel's own update
+          notice answers that precisely, because it knows their version. This is
+          the public copy, so the current release leads and the archive stays one
+          click away rather than gone.
+        */}
+        <article className="card p-5">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h3 className="display text-lg uppercase">
+              Version {BUBBLE_CHANGELOG[0].version}
+            </h3>
+            <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">
+              Latest
+            </span>
+            <time
+              className="text-xs text-muted"
+              dateTime={BUBBLE_CHANGELOG[0].date}
+            >
+              {BUBBLE_CHANGELOG[0].date}
+            </time>
+          </div>
+
+          <ul className="mt-3 space-y-2">
+            {BUBBLE_CHANGELOG[0].changes.map((change) => (
+              <li
+                key={change}
+                className="flex gap-2.5 text-sm leading-relaxed text-muted"
+              >
+                <span
+                  aria-hidden
+                  className="mt-2 size-1.5 shrink-0 rounded-full bg-brand/60"
+                />
+                <span>{change}</span>
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        {BUBBLE_CHANGELOG.length > 1 ? (
+          <details className="card p-5">
+            <summary className="cursor-pointer text-sm font-bold">
+              Earlier versions ({BUBBLE_CHANGELOG.length - 1})
+            </summary>
+
+            <ol className="mt-4 space-y-5">
+              {BUBBLE_CHANGELOG.slice(1).map((release) => (
+                <li key={release.versionCode}>
+                  <div className="flex flex-wrap items-baseline gap-x-3">
+                    <h3 className="font-bold">Version {release.version}</h3>
+                    <time
+                      className="text-xs text-muted"
+                      dateTime={release.date}
+                    >
+                      {release.date}
+                    </time>
+                  </div>
+                  <ul className="mt-2 space-y-1.5">
+                    {release.changes.map((change) => (
+                      <li
+                        key={change}
+                        className="flex gap-2.5 text-sm leading-relaxed text-muted"
+                      >
+                        <span
+                          aria-hidden
+                          className="mt-2 size-1.5 shrink-0 rounded-full bg-muted/40"
+                        />
+                        <span>{change}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ol>
+          </details>
+        ) : null}
       </section>
 
       <section className="card card-glow p-6 text-center sm:p-10">
