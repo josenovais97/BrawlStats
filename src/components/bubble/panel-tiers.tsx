@@ -52,6 +52,21 @@ const SHOWN_PER_TIER = 8;
 /** Where the last-used mode is kept between openings. */
 const STORED_MODE = 'brawlzone.bubble.mode';
 
+interface BuildItem {
+  itemId: number;
+  name: string;
+  imageUrl: string | null;
+  share: number;
+}
+
+interface BuildResponse {
+  brawlerId: number;
+  owners: number;
+  gears: BuildItem[];
+  starPower: BuildItem | null;
+  gadget: BuildItem | null;
+}
+
 export function PanelTiers({ modes }: { modes: PanelMode[] }) {
   const [active, setActive] = useState<string | null>(null);
 
@@ -96,6 +111,28 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
   };
 
   const current = modes.find((m) => m.key === active) ?? modes[0];
+
+  /*
+   * The tapped brawler's build, fetched rather than pre-rendered.
+   *
+   * Cached per brawler for the life of the panel, because the same few names
+   * get tapped repeatedly across a draft and a second request would show a
+   * spinner for something already on screen a moment ago.
+   */
+  const [open, setOpen] = useState<PanelEntry | null>(null);
+  const [builds, setBuilds] = useState<Record<number, BuildResponse | 'error'>>({});
+
+  const show = (entry: PanelEntry) => {
+    setOpen((prev) => (prev?.brawlerId === entry.brawlerId ? null : entry));
+    if (builds[entry.brawlerId]) return;
+
+    fetch(`/api/v1/brawler-build/${entry.brawlerId}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: BuildResponse) =>
+        setBuilds((prev) => ({ ...prev, [entry.brawlerId]: data })),
+      )
+      .catch(() => setBuilds((prev) => ({ ...prev, [entry.brawlerId]: 'error' })));
+  };
 
   const byTier = new Map<Tier, PanelEntry[]>();
   for (const entry of current.entries) {
@@ -142,15 +179,35 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
           {TIER_ORDER.map((tier) => {
             const entries = byTier.get(tier) ?? [];
             if (entries.length === 0) return null;
-            return <TierStrip key={tier} tier={tier} entries={entries} />;
+            return (
+              <TierStrip
+                key={tier}
+                tier={tier}
+                entries={entries}
+                onPick={show}
+                openId={open?.brawlerId ?? null}
+              />
+            );
           })}
         </ul>
       )}
+
+      {open ? <BuildCard entry={open} build={builds[open.brawlerId]} /> : null}
     </>
   );
 }
 
-function TierStrip({ tier, entries }: { tier: Tier; entries: PanelEntry[] }) {
+function TierStrip({
+  tier,
+  entries,
+  onPick,
+  openId,
+}: {
+  tier: Tier;
+  entries: PanelEntry[];
+  onPick: (entry: PanelEntry) => void;
+  openId: number | null;
+}) {
   const color = TIER_COLOR[tier];
 
   return (
@@ -175,13 +232,21 @@ function TierStrip({ tier, entries }: { tier: Tier; entries: PanelEntry[] }) {
 
         <div className="flex flex-1 flex-wrap content-start gap-x-1.5 gap-y-1 p-1.5">
           {entries.slice(0, SHOWN_PER_TIER).map((entry) => (
-            <div key={entry.brawlerId} className="w-10 text-center">
+            <button
+              key={entry.brawlerId}
+              type="button"
+              onClick={() => onPick(entry)}
+              aria-pressed={openId === entry.brawlerId}
+              className="w-10 text-center"
+            >
               <Image
                 src={entry.imageUrl}
                 alt={entry.brawlerName}
                 width={40}
                 height={40}
-                className="size-10 rounded-lg bg-surface-2"
+                className={`size-10 rounded-lg bg-surface-2 transition-shadow ${
+                  openId === entry.brawlerId ? 'ring-2 ring-brand' : ''
+                }`}
                 loading="lazy"
                 unoptimized
               />
@@ -191,7 +256,7 @@ function TierStrip({ tier, entries }: { tier: Tier; entries: PanelEntry[] }) {
               <p className="text-[10px] font-black tabular-nums leading-none" style={{ color }}>
                 {entry.metaScore?.toFixed(1) ?? '–'}
               </p>
-            </div>
+            </button>
           ))}
 
           {entries.length > SHOWN_PER_TIER ? (
@@ -202,5 +267,103 @@ function TierStrip({ tier, entries }: { tier: Tier; entries: PanelEntry[] }) {
         </div>
       </div>
     </li>
+  );
+}
+
+/**
+ * What owners of this brawler have unlocked.
+ *
+ * Deliberately not called "most used". The game's API publishes what a player
+ * *owns* on a brawler and nothing about what they took into a match — there is
+ * no usage field anywhere in the player or battle payloads — so a card headed
+ * "most used build" would be describing a measurement nobody has.
+ *
+ * Gears carry the weight, because they are the part of a loadout that is
+ * actually a choice: two from nineteen, paid for in coins, so what owners
+ * bought is a revealed preference. Star powers and gadgets appear only when
+ * the split is clear of an even one; most brawlers' owners have unlocked both,
+ * and reporting the larger half of a coin flip as a recommendation would be
+ * inventing advice.
+ */
+function BuildCard({
+  entry,
+  build,
+}: {
+  entry: PanelEntry;
+  build: BuildResponse | 'error' | undefined;
+}) {
+  return (
+    <section className="card mt-2 overflow-hidden">
+      <header className="flex items-center gap-2 border-b border-border px-2.5 py-2">
+        <Image
+          src={entry.imageUrl}
+          alt=""
+          width={28}
+          height={28}
+          className="size-7 shrink-0 rounded-md bg-surface-2"
+          unoptimized
+        />
+        <span className="min-w-0 flex-1 truncate text-sm font-bold capitalize">
+          {entry.brawlerName.toLowerCase()}
+        </span>
+        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-muted">
+          Most owned
+        </span>
+      </header>
+
+      {build === undefined ? (
+        <p className="px-2.5 py-3 text-xs text-muted">Reading builds…</p>
+      ) : build === 'error' || build.owners === 0 ? (
+        <p className="px-2.5 py-3 text-xs leading-relaxed text-muted">
+          No sampled player owns this brawler yet, so there is nothing to measure.
+        </p>
+      ) : (
+        <div className="space-y-1.5 p-2.5">
+          {build.gears.map((gear) => (
+            <BuildRow key={gear.itemId} item={gear} kind="Gear" />
+          ))}
+          {build.starPower ? <BuildRow item={build.starPower} kind="Star power" /> : null}
+          {build.gadget ? <BuildRow item={build.gadget} kind="Gadget" /> : null}
+
+          {build.gears.length === 0 && !build.starPower && !build.gadget ? (
+            <p className="text-xs leading-relaxed text-muted">
+              Owners are split evenly across every option, so there is no popular build to
+              report.
+            </p>
+          ) : null}
+
+          <p className="pt-1 text-[10px] leading-relaxed text-muted">
+            Across {build.owners.toLocaleString('en-US')} sampled owners. Ownership, not
+            usage — the game publishes no record of what was taken into a match.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function BuildRow({ item, kind }: { item: BuildItem; kind: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      {item.imageUrl ? (
+        <Image
+          src={item.imageUrl}
+          alt=""
+          width={24}
+          height={24}
+          className="size-6 shrink-0"
+          unoptimized
+        />
+      ) : (
+        <span className="size-6 shrink-0 rounded bg-surface-2" />
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-xs font-semibold">{item.name}</span>
+        <span className="block text-[10px] text-muted">{kind}</span>
+      </span>
+      <span className="shrink-0 text-xs font-bold tabular-nums text-brand">
+        {Math.round(item.share * 100)}%
+      </span>
+    </div>
   );
 }
