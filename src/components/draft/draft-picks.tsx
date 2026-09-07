@@ -16,7 +16,18 @@ export interface DraftPick {
   decidedSampleSize: number;
   /** Win-rate edge against the named enemies, or null when unmeasured. */
   edge: number | null;
+  /**
+   * Win-rate edge alongside the named team-mates, or null when unmeasured.
+   *
+   * The page has always computed this and folded it into the ordering; it just
+   * never showed it. A row that moved up the list for a reason the reader
+   * cannot see is the same problem as a row with no reason at all.
+   */
+  allyEdge: number | null;
 }
+
+/** Below this a per-map figure is mostly the prior rather than the map. */
+const THIN_SAMPLE = 30;
 
 /**
  * The recommendation list, filterable down to brawlers you actually own.
@@ -99,8 +110,16 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
                   <span className="block truncate font-semibold capitalize">
                     {pick.brawlerName.toLowerCase()}
                   </span>
-                  <span className="block text-xs tabular-nums text-muted">
+                  {/* Thin samples are called out rather than left to be read
+                      off a number nobody compares: 61% off twelve battles and
+                      61% off two hundred are not the same claim. */}
+                  <span
+                    className={`block text-xs tabular-nums ${
+                      pick.decidedSampleSize < THIN_SAMPLE ? 'text-defeat/80' : 'text-muted'
+                    }`}
+                  >
                     {formatNumber(pick.decidedSampleSize)} battles here
+                    {pick.decidedSampleSize < THIN_SAMPLE ? ' · thin' : ''}
                   </span>
                 </span>
                 <span className="shrink-0 text-right">
@@ -118,6 +137,17 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
                     </span>
                   ) : hasEnemies ? (
                     <span className="block text-xs text-muted">no matchup data</span>
+                  ) : null}
+
+                  {pick.allyEdge !== null ? (
+                    <span
+                      className={`block text-xs tabular-nums ${
+                        pick.allyEdge > 0 ? 'text-victory/80' : 'text-defeat/80'
+                      }`}
+                    >
+                      {pick.allyEdge > 0 ? '+' : '−'}
+                      {Math.abs(pick.allyEdge * 100).toFixed(1)} beside yours
+                    </span>
                   ) : null}
                 </span>
               </Link>

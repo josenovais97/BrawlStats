@@ -518,7 +518,7 @@ export default async function DraftPage({ params }: PageProps) {
                  cross the boundary. */
               <DraftPicks
                 hasEnemies={enemies.length > 0}
-                picks={ranked.map(({ pick, counter }) => ({
+                picks={ranked.map(({ pick, counter, synergy }) => ({
                   brawlerId: pick.brawlerId,
                   brawlerName: pick.brawlerName,
                   iconUrl:
@@ -526,6 +526,7 @@ export default async function DraftPage({ params }: PageProps) {
                   score: pick.score,
                   decidedSampleSize: pick.decidedSampleSize,
                   edge: counter ? counter.edge : null,
+                  allyEdge: synergy ? synergy.edge : null,
                 }))}
               />
             )}
