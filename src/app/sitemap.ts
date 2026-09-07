@@ -71,6 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // indexable home on /tier-list/ranked.
     ['/bubble', 'monthly', 0.5],
     ['/about', 'monthly', 0.3],
+    ['/privacy', 'yearly', 0.2],
   ];
 
   const entries: MetadataRoute.Sitemap = staticRoutes.map(

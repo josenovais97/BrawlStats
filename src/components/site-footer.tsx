@@ -255,6 +255,10 @@ export function SiteFooter() {
               About {SITE_NAME}
             </Link>
             <Dot />
+            <Link href="/privacy" className="transition-colors hover:text-foreground">
+              Privacy
+            </Link>
+            <Dot />
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
