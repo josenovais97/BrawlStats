@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { draftHref, resolveDraftRoute } from '@/lib/draft-route';
+import { MAX_ALLIES, MAX_BANS, MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
 
 /**
  * The draft URL is the tool's entire state, and two of its rules are the kind
@@ -63,7 +63,7 @@ test('both sides decode independently', () => {
 
 test('an empty path is the empty board', () => {
   const route = resolveDraftRoute(undefined);
-  assert.deepEqual(route, { enemies: [], allies: [] });
+  assert.deepEqual(route, { enemies: [], allies: [], bans: [] });
 });
 
 test('a side that parses to nothing is a typo, not an empty side', () => {
@@ -80,5 +80,70 @@ test('a lone empty enemy side is not a state', () => {
 
 test('shapes the tool does not have are rejected', () => {
   assert.equal(resolveDraftRoute(['gem-grab']), null);
-  assert.equal(resolveDraftRoute(['a', 'b', '1', '2', '3']), null);
+  // Five segments is now a real shape (map, enemies, allies, bans); six is not.
+  assert.equal(resolveDraftRoute(['a', 'b', '1', '2', '3', '4']), null);
+});
+
+/* --- bans ------------------------------------------------------------- */
+
+test('bans force both earlier sides to be spelled', () => {
+  assert.equal(
+    draftHref({ mode: 'Gem Grab', map: 'Hard Rock Mine', bans: [16000007, 16000009] }),
+    '/draft/gem-grab/hard-rock-mine/x/x/7-9',
+  );
+});
+
+test('a full board round-trips', () => {
+  const href = draftHref({
+    mode: 'Gem Grab',
+    map: 'Hard Rock Mine',
+    enemies: [16000003, 16000012],
+    allies: [16000045],
+    bans: [16000007, 16000009, 16000011],
+  });
+  assert.equal(href, '/draft/gem-grab/hard-rock-mine/3-12/45/7-9-11');
+
+  const back = resolveDraftRoute(href.replace('/draft/', '').split('/'));
+  assert.deepEqual(back?.enemies, [16000003, 16000012]);
+  assert.deepEqual(back?.allies, [16000045]);
+  assert.deepEqual(back?.bans, [16000007, 16000009, 16000011]);
+});
+
+test('links made before bans existed still resolve', () => {
+  // The whole point of appending rather than reordering: every URL already
+  // shared keeps working, and keeps meaning what it meant.
+  assert.deepEqual(resolveDraftRoute(['gem-grab', 'hard-rock-mine', '3-12']), {
+    modeSlug: 'gem-grab',
+    mapSlug: 'hard-rock-mine',
+    enemies: [16000003, 16000012],
+    allies: [],
+    bans: [],
+  });
+});
+
+test('each side keeps its own limit', () => {
+  // Allies were sliced at the enemy cap of three; a 3v3 draft has two.
+  const route = resolveDraftRoute([
+    'gem-grab',
+    'hard-rock-mine',
+    '1-2-3-4-5',
+    '6-7-8-9',
+    '10-11-12-13-14-15-16-17',
+  ]);
+  assert.equal(route?.enemies.length, MAX_ENEMIES);
+  assert.equal(route?.allies.length, MAX_ALLIES);
+  assert.equal(route?.bans.length, MAX_BANS);
+});
+
+test('a ban segment that parses to nothing is a typo', () => {
+  assert.equal(resolveDraftRoute(['gem-grab', 'hard-rock-mine', 'x', 'x', 'nope']), null);
+});
+
+test('an empty board spelled the long way is not a state', () => {
+  assert.equal(resolveDraftRoute(['gem-grab', 'hard-rock-mine', 'x', 'x']), null);
+});
+
+test('Shelly survives on the ban side too', () => {
+  const href = draftHref({ mode: 'Gem Grab', map: 'Hard Rock Mine', bans: [16000000] });
+  assert.deepEqual(resolveDraftRoute(href.replace('/draft/', '').split('/'))?.bans, [16000000]);
 });

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowRight, Target, X } from 'lucide-react';
+import { ArrowRight, Ban, Target, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -15,7 +15,7 @@ import { formatNumber, humanizeMode } from '@/lib/format';
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { CompShape } from '@/components/draft/comp-shape';
 import { getActiveMaps, type GameMap } from '@/lib/game-maps';
-import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
+import { MAX_ALLIES, MAX_BANS, MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
 
 /**
  * How many team-mates a draft can name.
@@ -24,7 +24,6 @@ import { MAX_ENEMIES, draftHref, resolveDraftRoute } from '@/lib/draft-route';
  * pick this page exists to make. `MAX_ENEMIES` is three because all three of
  * theirs are somebody else's.
  */
-const MAX_ALLIES = 2;
 import { slugify } from '@/lib/slugs';
 import { RANKED_MAP_WINDOW_DAYS, getAllyScores, getBestPicksByMode, getCounterScores, getRankedMapPicks, getRoleCompositions } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
@@ -136,6 +135,7 @@ export default async function DraftPage({ params }: PageProps) {
 
   const enemies = route.enemies;
   const allies = route.allies;
+  const bans = route.bans;
 
   // Sequential database reads keep the page to a single connection.
   const modePicks = selected
@@ -177,7 +177,17 @@ export default async function DraftPage({ params }: PageProps) {
     rank: pickRank.get(brawler.id),
   }));
 
+  /*
+   * Banned brawlers are gone, not demoted.
+   *
+   * A ban is not a weak pick, it is an unavailable one, and a list that still
+   * offers it is worse than useless under a draft timer — the reader loses the
+   * seconds it takes to notice.
+   */
+  const unavailable = new Set([...bans, ...enemies, ...allies]);
+
   const ranked = basePicks
+    .filter((pick) => !unavailable.has(pick.brawlerId))
     .map((pick) => {
       const counter = counters.get(pick.brawlerId);
       const synergy = synergies.get(pick.brawlerId);
@@ -198,12 +208,13 @@ export default async function DraftPage({ params }: PageProps) {
     .sort((a, b) => b.total - a.total)
     .slice(0, CANDIDATES);
 
-  const hrefFor = (next: { enemy?: number[]; ally?: number[] }) =>
+  const hrefFor = (next: { enemy?: number[]; ally?: number[]; ban?: number[] }) =>
     draftHref({
       mode: selected?.mode,
       map: selected?.mapName,
       enemies: next.enemy ?? enemies,
       allies: next.ally ?? allies,
+      bans: next.ban ?? bans,
     });
 
   return (
@@ -235,9 +246,87 @@ export default async function DraftPage({ params }: PageProps) {
         <>
           <SelectedMap map={selected} art={artFor(selected)} modeMeta={modeMeta} />
 
+          {/*
+            Bans first, because that is the order the game asks in.
+
+            They also do the most work per tap: a ban removes a brawler from
+            every list below it, so entering them before the picks means the
+            enemy and ally pickers never offer something that cannot be taken.
+          */}
           <section>
             <StepHeading
               step={2}
+              title="Bans"
+              hint={`Up to ${MAX_BANS}. Banned brawlers disappear from every suggestion below.`}
+            />
+
+            <div className="card p-4">
+              <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 bg-surface px-4 py-2">
+                {bans.map((id) => {
+                  const meta = brawlerMeta.get(id);
+                  return (
+                    <Link
+                      key={id}
+                      href={hrefFor({ ban: bans.filter((other) => other !== id) })}
+                      rel="nofollow"
+                      prefetch={false}
+                      title={`Un-ban ${meta?.name ?? id}`}
+                      className="group flex items-center gap-2 rounded-xl border border-border bg-surface-2 px-2.5 py-2 text-sm font-semibold capitalize text-muted"
+                    >
+                      <Image
+                        src={meta?.imageUrl ?? brawlerIconUrl(id)}
+                        alt=""
+                        width={32}
+                        height={32}
+                        /* Greyed, because a ban is unavailable rather than
+                           hostile — the enemy slots already own red. */
+                        className="size-8 rounded-lg opacity-40 grayscale"
+                        unoptimized
+                      />
+                      {(meta?.name ?? `#${id}`).toLowerCase()}
+                      <X className="size-4 transition-colors group-hover:text-foreground" />
+                    </Link>
+                  );
+                })}
+
+                {bans.length === 0 ? (
+                  <span className="flex items-center gap-2 rounded-xl border border-dashed border-border px-2.5 py-2 text-sm text-muted">
+                    <span className="grid size-8 place-items-center rounded-lg bg-surface-2">
+                      <Ban className="size-4" />
+                    </span>
+                    Nothing banned yet
+                  </span>
+                ) : null}
+
+                {bans.length > 0 ? (
+                  <Link
+                    href={hrefFor({ ban: [] })}
+                    rel="nofollow"
+                    prefetch={false}
+                    className="ml-auto text-sm font-medium text-muted hover:text-foreground"
+                  >
+                    Clear
+                  </Link>
+                ) : null}
+              </div>
+
+              {bans.length < MAX_BANS ? (
+                <BrawlerChooser
+                  options={chooserOptions}
+                  taken={[...bans, ...enemies, ...allies]}
+                  label="Ban a brawler"
+                  suggestedLabel="Most likely bans here"
+                  hrefs={Object.fromEntries(
+                    catalog.current.map((b) => [b.id, hrefFor({ ban: [...bans, b.id] })]),
+                  )}
+                />
+              ) : null}
+            </div>
+          </section>
+
+          <section>
+            <StepHeading
+              step={3}
               title="Enemy team"
               hint={`Up to ${MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.`}
             />
@@ -304,7 +393,7 @@ export default async function DraftPage({ params }: PageProps) {
               {enemies.length < MAX_ENEMIES ? (
                 <BrawlerChooser
                   options={chooserOptions}
-                  taken={[...enemies, ...allies]}
+                  taken={[...bans, ...enemies, ...allies]}
                   label="Add an enemy brawler"
                   suggestedLabel="Most likely picks here"
                   hrefs={Object.fromEntries(
@@ -317,7 +406,7 @@ export default async function DraftPage({ params }: PageProps) {
 
           <section>
             <StepHeading
-              step={3}
+              step={4}
               title="Your team"
               hint={`Up to ${MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.`}
             />
@@ -381,7 +470,7 @@ export default async function DraftPage({ params }: PageProps) {
               {allies.length < MAX_ALLIES ? (
                 <BrawlerChooser
                   options={chooserOptions}
-                  taken={[...enemies, ...allies]}
+                  taken={[...bans, ...enemies, ...allies]}
                   label="Add a team-mate"
                   suggestedLabel="Best here"
                   hrefs={Object.fromEntries(
@@ -406,7 +495,7 @@ export default async function DraftPage({ params }: PageProps) {
 
           <section>
             <StepHeading
-              step={4}
+              step={5}
               title="Your pick"
               hint={
                 enemies.length > 0 && allies.length > 0

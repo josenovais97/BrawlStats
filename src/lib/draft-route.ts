@@ -8,6 +8,7 @@ import { slugify } from '@/lib/slugs';
  *   /draft/gem-grab/hard-rock-mine/3-12         map picked, enemies named
  *   /draft/gem-grab/hard-rock-mine/3-12/45      enemies and allies
  *   /draft/gem-grab/hard-rock-mine/x/45         allies only, no enemy known yet
+ *   /draft/gem-grab/hard-rock-mine/x/x/7-9      bans only, nothing drafted yet
  *
  * A Ranked draft alternates picks, so "I know one of theirs and one of ours"
  * and "I know one of ours and none of theirs" are both real states and both
@@ -32,11 +33,18 @@ const ID_BASE = 16_000_000;
 /** How many enemy picks a Ranked draft can have. */
 export const MAX_ENEMIES = 3;
 
+/** Team-mates, excluding the reader: a 3v3 draft leaves two to know about. */
+export const MAX_ALLIES = 2;
+
+/** Bans in a Ranked draft: three a side. */
+export const MAX_BANS = 6;
+
 export interface DraftRoute {
   modeSlug?: string;
   mapSlug?: string;
   enemies: number[];
   allies: number[];
+  bans: number[];
 }
 
 /** Spelled in a path segment when a side has nobody named yet. */
@@ -46,7 +54,7 @@ function encodeSide(ids: number[]): string {
   return ids.length > 0 ? ids.map((id) => id - ID_BASE).join('-') : EMPTY_SIDE;
 }
 
-function decodeSide(raw: string | undefined): number[] {
+function decodeSide(raw: string | undefined, limit: number): number[] {
   if (!raw || raw === EMPTY_SIDE) return [];
   return raw
     .split('-')
@@ -59,7 +67,12 @@ function decodeSide(raw: string | undefined): number[] {
      * in the game to be missing.
      */
     .filter((id) => Number.isFinite(id) && id >= ID_BASE)
-    .slice(0, MAX_ENEMIES);
+    /*
+     * Per side, not one shared cap. Allies were being sliced at three, which
+     * is the enemy limit — a 3v3 draft has two team-mates besides the reader,
+     * and bans run to six.
+     */
+    .slice(0, limit);
 }
 
 export function draftHref({
@@ -67,19 +80,30 @@ export function draftHref({
   map,
   enemies = [],
   allies = [],
+  bans = [],
 }: {
   mode?: string;
   map?: string;
   enemies?: number[];
   allies?: number[];
+  bans?: number[];
 }): string {
   if (!mode || !map) return '/draft';
 
   const segments = ['draft', slugify(mode), slugify(map)];
-  // Trailing empties are omitted, so the common states keep the short URLs
-  // they had before allies existed and old links stay canonical.
-  if (allies.length > 0) segments.push(encodeSide(enemies), encodeSide(allies));
-  else if (enemies.length > 0) segments.push(encodeSide(enemies));
+  /*
+   * Trailing empties are omitted, so the common states keep the short URLs
+   * they had before allies and bans existed and old links stay canonical. A
+   * later side forces the earlier ones to be spelled, because position is what
+   * distinguishes them.
+   */
+  if (bans.length > 0) {
+    segments.push(encodeSide(enemies), encodeSide(allies), encodeSide(bans));
+  } else if (allies.length > 0) {
+    segments.push(encodeSide(enemies), encodeSide(allies));
+  } else if (enemies.length > 0) {
+    segments.push(encodeSide(enemies));
+  }
 
   return `/${segments.join('/')}`;
 }
@@ -100,13 +124,14 @@ export function draftHref({
 export function resolveDraftRoute(state: string[] | undefined): DraftRoute | null {
   const segments = state ?? [];
 
-  if (segments.length === 0) return { enemies: [], allies: [] };
-  if (segments.length === 1 || segments.length > 4) return null;
+  if (segments.length === 0) return { enemies: [], allies: [], bans: [] };
+  if (segments.length === 1 || segments.length > 5) return null;
 
-  const [modeSlug, mapSlug, rawEnemies, rawAllies] = segments;
+  const [modeSlug, mapSlug, rawEnemies, rawAllies, rawBans] = segments;
 
-  const enemies = decodeSide(rawEnemies);
-  const allies = decodeSide(rawAllies);
+  const enemies = decodeSide(rawEnemies, MAX_ENEMIES);
+  const allies = decodeSide(rawAllies, MAX_ALLIES);
+  const bans = decodeSide(rawBans, MAX_BANS);
 
   /*
    * A side segment that parsed to nothing is a typo, not an empty side —
@@ -114,8 +139,11 @@ export function resolveDraftRoute(state: string[] | undefined): DraftRoute | nul
    */
   if (rawEnemies !== undefined && rawEnemies !== EMPTY_SIDE && enemies.length === 0) return null;
   if (rawAllies !== undefined && rawAllies !== EMPTY_SIDE && allies.length === 0) return null;
+  if (rawBans !== undefined && rawBans !== EMPTY_SIDE && bans.length === 0) return null;
   // `/x` alone says "no enemies" on a URL that already means that.
   if (rawEnemies === EMPTY_SIDE && rawAllies === undefined) return null;
+  // As does `/x/x` with nothing after it.
+  if (rawEnemies === EMPTY_SIDE && rawAllies === EMPTY_SIDE && rawBans === undefined) return null;
 
-  return { modeSlug: slugify(modeSlug), mapSlug: slugify(mapSlug), enemies, allies };
+  return { modeSlug: slugify(modeSlug), mapSlug: slugify(mapSlug), enemies, allies, bans };
 }
