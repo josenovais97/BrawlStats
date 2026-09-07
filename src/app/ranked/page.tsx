@@ -168,8 +168,32 @@ export default async function RankedPage() {
   const totalSamples = onBoard.reduce((sum, m) => sum + (m.picks?.sampleSize ?? 0), 0);
   const baseline = maps[0]?.baselineWinRate ?? 0;
   const rated = onBoard.filter((m) => (m.picks?.picks.length ?? 0) > 0).length;
+
+  /*
+   * Only maps this board can actually answer for.
+   *
+   * Two kinds were drawn with nothing in them: maps in the season pool that
+   * have never been sampled, and maps sampled too thinly for any brawler to
+   * separate from the pack. Both were deliberate once — a board claiming to be
+   * "the current rotation" arguably owes a card for every map in it — but in
+   * use they read as broken cards, and a grid where a third of the tiles say
+   * nothing teaches people to skim past the ones that do.
+   *
+   * The count in the header is what keeps this honest: "26 of 30 maps with a
+   * pick" says plainly that four are missing, so an absent map still reads as
+   * "no data yet" rather than "not in Ranked".
+   */
+  const shown = board
+    .map((row) => ({
+      ...row,
+      maps: row.maps.filter((m) => (m.picks?.picks.length ?? 0) > 0),
+    }))
+    .filter((row) => row.maps.length > 0);
+
   // In-page navigation, so a visitor after one mode does not scroll past five.
-  const modeNav = board.map((row) => ({
+  // Counts follow what is drawn rather than what is in the pool: a chip
+  // promising six maps that scrolls to four is worse than no chip.
+  const modeNav = shown.map((row) => ({
     mode: row.modeSlug,
     label: row.label,
     icon: row.icon,
@@ -268,7 +292,7 @@ export default async function RankedPage() {
         </nav>
       ) : null}
 
-      {onBoard.length === 0 ? (
+      {shown.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
           <h2 className="display text-xl uppercase">Collecting map data</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -284,7 +308,7 @@ export default async function RankedPage() {
           </Link>
         </div>
       ) : (
-        board.map((row) => (
+        shown.map((row) => (
           <section
             key={row.modeSlug}
             aria-labelledby={`mode-${row.modeSlug}`}
@@ -311,29 +335,16 @@ export default async function RankedPage() {
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {row.maps.map((entry) => (
                 <li key={`${row.modeSlug}-${entry.name}`}>
-                  {entry.picks ? (
-                    <MapCard
-                      map={entry.picks}
-                      art={entry.art}
-                      modeLabel={row.label}
-                      accent={row.accent}
-                      brawlerMeta={brawlerMeta}
-                      mapHref={entry.href}
-                    />
-                  ) : (
-                    /* In the pool, not yet in our data. Shown rather than
-                       omitted: the board claims to be the current rotation,
-                       and a map missing from it reads as "not in Ranked"
-                       rather than as "no battles sampled here yet". */
-                    <PendingMapCard
-                      mapName={entry.name}
-                      art={entry.art}
-                      modeLabel={row.label}
-                      accent={row.accent}
-                      mapHref={entry.href}
-                      lastSeen={entry.lastSeen}
-                    />
-                  )}
+                  {/* `shown` has already dropped every map without picks, so
+                      each card here has something to say. */}
+                  <MapCard
+                    map={entry.picks!}
+                    art={entry.art}
+                    modeLabel={row.label}
+                    accent={row.accent}
+                    brawlerMeta={brawlerMeta}
+                    mapHref={entry.href}
+                  />
                 </li>
               ))}
             </ul>
@@ -389,80 +400,6 @@ function Fact({
     >
       {children}
     </li>
-  );
-}
-
-/**
- * A map that is in the season's pool but has no sampled battles yet.
- *
- * Deliberately quiet — no confidence chip, no placeholder numbers, no bars
- * drawn at zero. The card exists to say the map is live and that we have
- * nothing to say about it yet, which is a different statement from the
- * thin-sample cards and should not look like one.
- */
-function PendingMapCard({
-  mapName,
-  art,
-  modeLabel,
-  accent,
-  mapHref,
-  lastSeen,
-}: {
-  mapName: string;
-  art?: BAMap;
-  modeLabel: string;
-  accent: string;
-  mapHref: string | null;
-  /** ISO timestamp of the last sampled battle here, or null if never seen. */
-  lastSeen: string | null;
-}) {
-  /*
-   * Two different situations, and only one of them is going to change.
-   *
-   * A map with no sighting at all is genuinely waiting for data. A map that
-   * was played and then stopped has been rotated out by the game — the season
-   * pool this board is built from lists every map of the season, and Brawl
-   * Stars plays a subset of it at a time. Saying "yet" about the second kind
-   * promises data that is not coming.
-   */
-  const rotatedOut = lastSeen !== null;
-  const since = lastSeen
-    ? new Date(lastSeen).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-    : null;
-  return (
-    <article className="card flex h-full flex-col overflow-hidden opacity-80">
-      <MapPreview
-        imageUrl={art?.imageUrl}
-        mapName={mapName}
-        modeLabel={modeLabel}
-        accent={accent}
-      />
-
-      <div className="border-y border-border px-3.5 py-3">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="display min-w-0 flex-1 truncate text-base leading-tight">
-            {mapHref ? (
-              <Link href={mapHref} className="hover:text-brand">
-                {mapName}
-              </Link>
-            ) : (
-              mapName
-            )}
-          </h3>
-          <span className="shrink-0 rounded-md bg-surface-2 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted">
-            New this season
-          </span>
-        </div>
-        <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">
-          {rotatedOut ? `Out of rotation · last played ${since}` : 'No sampled battles yet'}
-        </p>
-      </div>
-
-      <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
-        In the season pool, but nobody we sample has played it yet. A battle log
-        reaches back about 25 matches, so this fills in over the next day or two.
-      </p>
-    </article>
   );
 }
 
