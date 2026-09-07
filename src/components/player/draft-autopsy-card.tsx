@@ -37,13 +37,23 @@ export function DraftAutopsyCard({
   const blamed = draftWasTheProblem(autopsy);
   const unclear = autopsy.advantage === null || autopsy.confidence === 'low';
 
-  const headline = unclear
-    ? 'Not enough sampled battles to judge this draft'
-    : blamed
-      ? 'The draft was the problem'
-      : autopsy.advantage !== null && autopsy.advantage >= 4
-        ? 'The draft was in your favour'
-        : 'The drafts were even';
+  const chance = autopsy.winChance;
+  const pct = chance === null ? null : Math.round(chance * 100);
+
+  /*
+   * The headline is the percentage, because that is the sentence people
+   * already know how to read. "The draft was the problem" is a verdict a
+   * reader has to take on trust; "your draft was 38% to win this" is the same
+   * verdict with the evidence in it.
+   */
+  const headline =
+    unclear || pct === null
+      ? 'Not enough sampled battles to judge this draft'
+      : pct >= 60
+        ? `Your draft was ${pct}% to win this`
+        : pct <= 40
+          ? `Your draft was ${pct}% to win this`
+          : 'The drafts were close to even';
 
   const accent = blamed ? 'var(--defeat)' : unclear ? 'var(--muted)' : 'var(--accent-2)';
 
@@ -74,20 +84,22 @@ export function DraftAutopsyCard({
         {/* The two drafts, side by side, because the comparison is the claim. */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
           <Side ids={autopsy.mine.brawlerIds} label="Yours" art={art} />
-          {autopsy.advantage !== null ? (
+          {pct !== null ? (
+            /* Both halves, because a lone "62%" invites the reader to wonder
+               what the other side was. Two numbers that sum to 100 answer it
+               without a legend. */
             <p className="shrink-0 text-center">
               <span
                 className={`block text-2xl font-black tabular-nums ${
-                  autopsy.advantage >= 0 ? 'text-victory' : 'text-defeat'
+                  pct >= 50 ? 'text-victory' : 'text-defeat'
                 }`}
               >
-                {autopsy.advantage >= 0 ? '+' : '−'}
-                {Math.abs(autopsy.advantage).toFixed(1)}
+                {pct}%
               </span>
               <span className="block text-[11px] leading-tight text-muted">
-                points of
+                to win
                 <br />
-                map advantage
+                <span className="tabular-nums">vs {100 - pct}%</span>
               </span>
             </p>
           ) : null}
@@ -164,10 +176,21 @@ export function DraftAutopsyCard({
             : blamed
               ? 'This explains the draft only. '
               : 'The draft does not explain this loss. '}
-          Aim, positioning and gadget timing are not in the battle log and are not guessed at
-          here. Confidence: <span className="font-semibold">{autopsy.confidence}</span>, from{' '}
-          {autopsy.supportingBattles.toLocaleString('en-US')} sampled battles behind the brawlers
-          involved.
+          {/*
+            What the percentage is, said plainly.
+
+            It combines each side's measured record on this map with how those
+            brawlers fare against each other, then compares the two — so it is
+            the chance the *draft* had, not the chance you had. Aim,
+            positioning and gadget timing are not in the battle log and are not
+            guessed at here.
+          */}
+          The percentage is the drafts compared: each side&apos;s measured record on this map,
+          adjusted for how those brawlers fare against each other. It is the draft&apos;s chance,
+          not yours — aim, positioning and gadget timing are not in the battle log and are not
+          guessed at. Confidence: <span className="font-semibold">{autopsy.confidence}</span>,
+          from {autopsy.supportingBattles.toLocaleString('en-US')} sampled battles behind the
+          brawlers involved.
         </p>
       </div>
     </article>

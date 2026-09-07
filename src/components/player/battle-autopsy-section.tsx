@@ -7,8 +7,10 @@ import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { draftAutopsy, type DraftAutopsy } from '@/lib/draft-autopsy';
 import {
   getBrawlerPairings,
+  getCounterScores,
   getLadderMapForm,
   getRoleCompositions,
+  type CounterScore,
   type MapForm,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
@@ -71,12 +73,26 @@ export async function BattleAutopsySection({
       .map((p) => p.brawler?.id)
       .filter((id): id is number => id !== undefined);
 
-    const [pairs, shapes, catalogue] = await Promise.all([
+    const theirIds = (lastLoss.battle.teams ?? [])
+      .flat()
+      .filter((p) => !myTeam.some((mate) => mate.tag === p.tag))
+      .map((p) => p.brawler?.id)
+      .filter((id): id is number => id !== undefined);
+
+    const [pairs, shapes, catalogue, counters, countered] = await Promise.all([
       Promise.all(
         myIds.map(async (id) => [id, await getBrawlerPairings(id).catch(() => null)] as const),
       ),
       getRoleCompositions().catch(() => null),
       getBrawlerCatalog().catch(() => null),
+      /*
+       * Both directions, because a head-to-head chance needs both. How my
+       * brawlers fare against theirs is only half the question; theirs may be
+       * just as badly matched into mine, and a number built from one side
+       * would read every draft as lopsided.
+       */
+      getCounterScores(theirIds).catch(() => new Map<number, CounterScore>()),
+      getCounterScores(myIds).catch(() => new Map<number, CounterScore>()),
     ]);
 
     deep = draftAutopsy({
@@ -86,6 +102,8 @@ export async function BattleAutopsySection({
       pairings: new Map(
         pairs.filter((entry): entry is [number, NonNullable<(typeof entry)[1]>] => entry[1] !== null),
       ),
+      counters,
+      countered,
       roles: new Map((catalogue?.all ?? []).map((b) => [b.id, b.className])),
       shapes,
       roster: player.brawlers,

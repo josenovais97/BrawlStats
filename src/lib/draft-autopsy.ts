@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { BrawlerPairings, MapForm, RoleComposition } from '@/lib/stats';
+import type { BrawlerPairings, CounterScore, MapForm, RoleComposition } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
 import type { BSBattleLogEntry, BSBattlePlayer, BSPlayerBrawler } from '@/types/brawlstars';
 
@@ -73,6 +73,13 @@ export interface DraftAutopsy {
   /** Positive means this account's draft was the stronger one. */
   advantage: number | null;
 
+  /**
+   * The draft's estimated chance of winning, 0-1, or null when the map has too
+   * little data to say. See `winProbability` for how it is derived and what it
+   * deliberately excludes.
+   */
+  winChance: number | null;
+
   /** The worst matchup on the board for this account. */
   worstMatchup: CounterMismatch | null;
   /** The enemy pick that contributed most to their side's edge. */
@@ -100,6 +107,60 @@ function participants(entry: BSBattleLogEntry): BSBattlePlayer[] {
   return [];
 }
 
+/**
+ * Two measured win rates turned into one head-to-head chance.
+ *
+ * Each side's number is already a win rate: `MapForm.adjusted` is centred on
+ * 0.5, so 0.56 means "this brawler wins 56% here against an average opponent".
+ * Two such rates do not simply subtract into a probability — a 55% side facing
+ * a 45% side is not 55% to win, it is better than that, because the opponent
+ * is *also* below average.
+ *
+ * The standard way to combine them is the log-odds difference, which is what
+ * Elo and Bradley-Terry both reduce to: convert each rate to log-odds, take
+ * the gap, convert back. Two even sides give exactly 50%, which is the
+ * property that makes the output readable as a probability at all.
+ *
+ * What it is not: a fitted model of *this match*. It knows the drafts and the
+ * map. It knows nothing about aim, positioning, gadget timing or who is better
+ * at the game, and those decide most matches. It is the draft's chance, not
+ * yours, and the card says so.
+ */
+function winProbability(mine: number, theirs: number): number {
+  // Clamped so a lopsided sample cannot produce an infinite log-odds.
+  const clamp = (p: number) => Math.min(0.95, Math.max(0.05, p));
+  const logit = (p: number) => Math.log(p / (1 - p));
+  const delta = logit(clamp(mine)) - logit(clamp(theirs));
+  return 1 / (1 + Math.exp(-delta));
+}
+
+/** Mean rate of a side on this map, including how it fares against the other. */
+function sideRate(
+  ids: number[],
+  form: Map<number, MapForm>,
+  counters: Map<number, CounterScore>,
+): number | null {
+  const rated = ids.map((id) => form.get(id)).filter((f): f is MapForm => f !== undefined);
+  if (rated.length === 0) return null;
+
+  const map = rated.reduce((sum, f) => sum + f.adjusted, 0) / rated.length;
+
+  /*
+   * The matchup, folded in on the same scale.
+   *
+   * `CounterScore.edge` is already a delta in win rate — the brawler's rate
+   * against those specific opponents minus its own overall rate — so it adds
+   * directly to a rate. Brawlers with no pairing data contribute nothing
+   * rather than dragging the average toward zero.
+   */
+  const edges = ids
+    .map((id) => counters.get(id)?.edge)
+    .filter((e): e is number => e !== undefined);
+  const matchup = edges.length > 0 ? edges.reduce((a, b) => a + b, 0) / edges.length : 0;
+
+  return map + matchup;
+}
+
 /** Mean edge of a side, over the brawlers this map actually has data for. */
 function sideEdge(ids: number[], form: Map<number, MapForm>): DraftSide {
   const measured = ids.map((id) => form.get(id)).filter((f): f is MapForm => f !== undefined);
@@ -121,6 +182,8 @@ export function draftAutopsy({
   tag,
   mapForm,
   pairings,
+  counters,
+  countered,
   roles,
   shapes,
   roster,
@@ -131,6 +194,10 @@ export function draftAutopsy({
   mapForm: Map<number, MapForm>;
   /** Pairings for each of the player's brawlers in this battle. */
   pairings: Map<number, BrawlerPairings>;
+  /** How each of this account's brawlers fares against the enemy line-up. */
+  counters?: Map<number, CounterScore>;
+  /** The same from the other side, for the enemy's brawlers against ours. */
+  countered?: Map<number, CounterScore>;
   /** Brawler id to class name, for the team shape. */
   roles: Map<number, string | null>;
   shapes: { comps: RoleComposition[]; baseline: number } | null;
@@ -155,6 +222,11 @@ export function draftAutopsy({
   const theirs = sideEdge(theirIds, mapForm);
   const advantage =
     mine.edge !== null && theirs.edge !== null ? mine.edge - theirs.edge : null;
+
+  const myRate = sideRate(myIds, mapForm, counters ?? new Map());
+  const theirRate = sideRate(theirIds, mapForm, countered ?? new Map());
+  const winChance =
+    myRate !== null && theirRate !== null ? winProbability(myRate, theirRate) : null;
 
   /*
    * The worst matchup on the board: for each of our brawlers, is any enemy one
@@ -254,6 +326,7 @@ export function draftAutopsy({
     mine,
     theirs,
     advantage,
+    winChance,
     worstMatchup,
     keyEnemy,
     shape,
