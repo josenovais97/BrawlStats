@@ -87,6 +87,20 @@ export interface DraftAutopsy {
   /** The team's role shape, when every brawler on it has a class. */
   shape: RoleComposition | null;
 
+  /**
+   * The strongest shape measured, and where this one sits against it.
+   *
+   * A shape's adjusted score means nothing on its own: 49.1% reads as "about
+   * even" to anyone who does not already know that shapes range from roughly
+   * 44 to 56. Naming the best one, and this one's rank among them, is what
+   * turns the number into a judgement the reader can act on next draft.
+   */
+  bestShape: RoleComposition | null;
+  /** 1-based position of `shape` among all measured shapes, best first. */
+  shapeRank: number | null;
+  /** How many shapes were measured, for "Nth of M". */
+  shapeCount: number;
+
   /** A swap from this account's own maxed roster that would have helped most. */
   betterPick: {
     outId: number;
@@ -301,11 +315,23 @@ export function draftAutopsy({
 
   /* The team's role shape, only when every brawler on it has a class. */
   let shape: RoleComposition | null = null;
+  let shapeRank: number | null = null;
+
+  /* Ranked once, so the lookup and the "best" answer come from one ordering. */
+  const ranked = shapes
+    ? [...shapes.comps].sort((a, b) => b.score - a.score)
+    : [];
+  const bestShape = ranked[0] ?? null;
+
   if (shapes && myIds.length === 3) {
     const named = myIds.map((id) => roles.get(id) ?? null);
     if (named.every((role): role is string => role !== null)) {
       const key = [...named].sort().join(' + ');
-      shape = shapes.comps.find((comp) => comp.roles.slice().sort().join(' + ') === key) ?? null;
+      const at = ranked.findIndex((comp) => comp.roles.slice().sort().join(' + ') === key);
+      if (at !== -1) {
+        shape = ranked[at];
+        shapeRank = at + 1;
+      }
     }
   }
 
@@ -377,6 +403,9 @@ export function draftAutopsy({
     worstMatchup,
     keyEnemy,
     shape,
+    bestShape,
+    shapeRank,
+    shapeCount: ranked.length,
     betterPick,
     confidence,
     supportingBattles,

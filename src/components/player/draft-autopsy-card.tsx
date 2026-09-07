@@ -151,8 +151,28 @@ export function DraftAutopsyCard({
               <span className="font-semibold capitalize">
                 {autopsy.shape.roles.join(' + ').toLowerCase()}
               </span>{' '}
-              — wins {(autopsy.shape.score * 100).toFixed(1)}% adjusted across{' '}
-              {autopsy.shape.decided.toLocaleString('en-US')} sampled battles.
+              — wins {(autopsy.shape.score * 100).toFixed(1)}% adjusted
+              {autopsy.shapeRank !== null && autopsy.shapeCount > 1 ? (
+                <>
+                  , {ordinal(autopsy.shapeRank)} of {autopsy.shapeCount} shapes
+                </>
+              ) : null}
+              . {/*
+                The best shape, because the reader cannot judge 49.1% without
+                knowing the range. Suppressed when theirs *is* the best — "the
+                strongest is yours" is a sentence that says nothing.
+              */}
+              {autopsy.bestShape && autopsy.shapeRank !== 1 ? (
+                <>
+                  The strongest is{' '}
+                  <span className="font-semibold capitalize">
+                    {autopsy.bestShape.roles.join(' + ').toLowerCase()}
+                  </span>{' '}
+                  at {(autopsy.bestShape.score * 100).toFixed(1)}%.
+                </>
+              ) : (
+                <>Nothing measured beats it.</>
+              )}
             </Line>
           ) : null}
 
@@ -243,6 +263,22 @@ function Side({
       </div>
     </div>
   );
+}
+
+/** "1st", "2nd", "14th" — the form a rank is read in. */
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
 }
 
 function Line({ children }: { children: React.ReactNode }) {
