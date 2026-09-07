@@ -169,9 +169,22 @@ export function PanelDraft({
         enemies: prev.enemies.filter((x) => x !== id),
       };
       if (cleaned[slot].length >= LIMITS[slot]) return cleaned;
-      return { ...cleaned, [slot]: [...cleaned[slot], id] };
+
+      const next = { ...cleaned, [slot]: [...cleaned[slot], id] };
+
+      /*
+       * Closes when the slot is full, and not before.
+       *
+       * It used to close on every pick, which is fine for a single enemy and
+       * miserable for six bans: six selections meant six reopenings, and the
+       * grid lost its scroll position each time. A slot that holds several
+       * things should stay open until it holds them.
+       */
+      if (next[slot].length >= LIMITS[slot]) setPicking(null);
+      return next;
     });
-    setPicking(null);
+    // Cleared so the next name can be typed straight away; the field keeps
+    // focus, so a reader filling bans types, taps, types, taps.
     setQuery('');
   };
 
@@ -179,6 +192,24 @@ export function PanelDraft({
     setPicked((prev) => ({ ...prev, [slot]: prev[slot].filter((x) => x !== id) }));
 
   const taken = new Set([...picked.bans, ...picked.allies, ...picked.enemies]);
+
+  /*
+   * The map's own best brawlers, offered first.
+   *
+   * These are the picks and bans a draft on this map actually revolves around,
+   * so scanning eight portraits you already expect beats typing a name — and
+   * the reader is under a timer. The full roster stays underneath for the ones
+   * that surprise you.
+   */
+  const likely = useMemo(() => {
+    if (!map) return [];
+    return map.picks
+      .filter((p) => !taken.has(p.brawlerId))
+      .slice(0, 8)
+      .map((p) => byId.get(p.brawlerId))
+      .filter((b): b is DraftBrawler => b !== undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, picked, byId]);
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -276,6 +307,14 @@ export function PanelDraft({
               <div key={slot} className="flex items-center gap-1">
                 <span className="text-[9px] font-bold uppercase tracking-wide text-muted">
                   {LABELS[slot]}
+                  {/* The count only appears once something is in the slot: a
+                      board showing 0/6 before anyone has done anything reads
+                      as a form to fill in rather than a draft to follow. */}
+                  {picked[slot].length > 0 ? (
+                    <span className="ml-0.5 tabular-nums text-muted/70">
+                      {picked[slot].length}/{LIMITS[slot]}
+                    </span>
+                  ) : null}
                 </span>
 
                 {picked[slot].map((id) => {
@@ -323,10 +362,13 @@ export function PanelDraft({
           {picking ? (
             <BrawlerPicker
               matches={matches}
+              likely={likely}
               query={query}
               onQuery={setQuery}
               onPick={(id) => add(picking, id)}
+              onClose={() => setPicking(null)}
               label={LONG[picking]}
+              remaining={LIMITS[picking] - picked[picking].length}
             />
           ) : null}
 
@@ -340,63 +382,117 @@ export function PanelDraft({
 /**
  * Ninety brawlers in a window this size, made findable.
  *
- * A search box and a dense grid, rather than the site's larger tiles. Typing
- * two letters is faster than scrolling a roster when the clock is running, and
- * the grid stays visible so a reader who would rather scan than type still can.
+ * Two ways in, because a draft has two kinds of moment. Most of the time the
+ * brawler being banned or countered is one of the handful this map revolves
+ * around, and scanning eight portraits you already expect is faster than
+ * typing. The rest of the time it is a surprise, and then a search box beats
+ * scrolling ninety.
+ *
+ * The field keeps focus and clears after each pick, so filling six bans is
+ * type-tap-type-tap rather than six trips through a menu.
  */
 function BrawlerPicker({
   matches,
+  likely,
   query,
   onQuery,
   onPick,
+  onClose,
   label,
+  remaining,
 }: {
   matches: DraftBrawler[];
+  likely: DraftBrawler[];
   query: string;
   onQuery: (q: string) => void;
   onPick: (id: number) => void;
+  onClose: () => void;
   label: string;
+  remaining: number;
 }) {
-  return (
-    <div className="card space-y-2 p-2">
-      <input
-        type="search"
-        value={query}
-        autoFocus
-        onChange={(e) => onQuery(e.target.value)}
-        placeholder={`Add to ${label}…`}
-        className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-brand/50"
-      />
+  const searching = query.trim().length > 0;
 
-      <div className="flex max-h-[9.5rem] flex-wrap gap-1 overflow-y-auto">
+  return (
+    <div className="card space-y-1.5 p-2">
+      <div className="flex items-center gap-1.5">
+        <input
+          type="search"
+          value={query}
+          autoFocus
+          onChange={(e) => onQuery(e.target.value)}
+          placeholder={`Add to ${label}…`}
+          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-brand/50"
+        />
+        <span className="shrink-0 text-[10px] tabular-nums text-muted">{remaining} left</span>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close the picker"
+          className="shrink-0 rounded border border-border px-1.5 py-1 text-[10px] font-bold text-muted"
+        >
+          Done
+        </button>
+      </div>
+
+      {/* The shortlist, hidden the moment a search narrows things itself. */}
+      {!searching && likely.length > 0 ? (
+        <>
+          <p className="px-0.5 text-[9px] font-bold uppercase tracking-wide text-muted">
+            Likely here
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {likely.map((b) => (
+              <PickerTile key={b.brawlerId} brawler={b} onPick={onPick} />
+            ))}
+          </div>
+          <p className="px-0.5 pt-0.5 text-[9px] font-bold uppercase tracking-wide text-muted">
+            Everyone
+          </p>
+        </>
+      ) : null}
+
+      <div className="flex max-h-[8rem] flex-wrap gap-1 overflow-y-auto">
         {matches.map((b) => (
-          <button
-            key={b.brawlerId}
-            type="button"
-            onClick={() => onPick(b.brawlerId)}
-            title={b.brawlerName}
-            className="w-9 text-center"
-          >
-            <Image
-              src={b.imageUrl}
-              alt={b.brawlerName}
-              width={34}
-              height={34}
-              className="size-[34px] rounded bg-surface-2"
-              loading="lazy"
-              unoptimized
-            />
-            <span className="block truncate text-[8px] leading-tight text-muted">
-              {b.brawlerName.toLowerCase()}
-            </span>
-          </button>
+          <PickerTile key={b.brawlerId} brawler={b} onPick={onPick} />
         ))}
 
         {matches.length === 0 ? (
-          <p className="w-full px-1 py-3 text-center text-xs text-muted">No brawler by that name.</p>
+          <p className="w-full px-1 py-3 text-center text-xs text-muted">
+            No brawler by that name.
+          </p>
         ) : null}
       </div>
     </div>
+  );
+}
+
+function PickerTile({
+  brawler,
+  onPick,
+}: {
+  brawler: DraftBrawler;
+  onPick: (id: number) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onPick(brawler.brawlerId)}
+      title={brawler.brawlerName}
+      className="w-9 text-center"
+    >
+      <Image
+        src={brawler.imageUrl}
+        alt={brawler.brawlerName}
+        width={34}
+        height={34}
+        className="size-[34px] rounded bg-surface-2"
+        loading="lazy"
+        unoptimized
+      />
+      <span className="block truncate text-[8px] leading-tight text-muted">
+        {brawler.brawlerName.toLowerCase()}
+      </span>
+    </button>
   );
 }
 
