@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
 
-import {
-  PanelTiers,
-  type PanelEntry,
-  type PanelMap,
-  type PanelMode,
-} from '@/components/bubble/panel-tiers';
+import type { DraftBrawler } from '@/components/bubble/panel-draft';
+import { PanelShell } from '@/components/bubble/panel-shell';
+import type { PanelEntry, PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 import { PanelUpdate } from '@/components/bubble/panel-update';
 import { BUBBLE_APP, BUBBLE_CHANGELOG } from '@/lib/bubble-app';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { titleCase } from '@/lib/format';
 import {
   getBrawlerStatsForWindow,
   getFilterableModes,
@@ -127,6 +125,22 @@ export default async function BubblePanelPage() {
     bucket.sort((a, b) => a.mapName.localeCompare(b.mapName));
   }
 
+  /*
+   * Every brawler, for the draft board's picker.
+   *
+   * Not the tier list's entries: those exclude anything below the sample floor,
+   * and a brawler nobody has enough data on is still a brawler the enemy can
+   * pick. A board that cannot represent the draft in front of you is worse than
+   * no board.
+   */
+  const roster: DraftBrawler[] = [...brawlerMeta.values()]
+    .map((b) => ({
+      brawlerId: b.id,
+      brawlerName: titleCase(b.name),
+      imageUrl: b.imageUrl ?? brawlerIconUrl(b.id),
+    }))
+    .sort((a, b) => a.brawlerName.localeCompare(b.brawlerName));
+
   const modes: PanelMode[] = [
     // No maps on the combined list: the full pool is around thirty, which is
     // more chips than this window can show without becoming the whole panel.
@@ -173,7 +187,7 @@ export default async function BubblePanelPage() {
             Not enough sampled Ranked battles yet. This fills in as the sampler runs.
           </p>
         ) : (
-          <PanelTiers modes={modes} />
+          <PanelShell modes={modes} roster={roster} />
         )}
 
 
