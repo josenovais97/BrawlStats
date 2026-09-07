@@ -54,7 +54,29 @@ const LABELS: Record<Slot, string> = { bans: 'Ban', allies: 'You', enemies: 'Vs'
 /** For the picker's placeholder, where there is room for the real word. */
 const LONG: Record<Slot, string> = { bans: 'bans', allies: 'your team', enemies: 'the enemy' };
 
-const STORED_TAB_MAP = 'brawlzone.bubble.draftmap';
+/**
+ * Below this, a map figure is mostly the prior rather than the map.
+ *
+ * Matches MIN_SAMPLE_FOR_MAP_FORM on the site, so the two do not disagree
+ * about what counts as thin.
+ */
+const THIN_SAMPLE = 30;
+
+const STORED_DRAFT = 'brawlzone.bubble.draft';
+
+/**
+ * How long a half-finished draft is worth restoring.
+ *
+ * Every tap on the bubble builds a fresh WebView, so without this the board
+ * emptied every time the panel closed — check a pick, glance at the game, come
+ * back, and the six bans you just entered are gone. That is the single worst
+ * thing an overlay can do, because closing it is the normal way to use it.
+ *
+ * Half an hour rather than forever: a draft from yesterday restored under
+ * today's match is worse than an empty board, and matches do not last thirty
+ * minutes.
+ */
+const DRAFT_TTL_MS = 30 * 60 * 1000;
 
 export function PanelDraft({
   modes,
@@ -86,29 +108,57 @@ export function PanelDraft({
 
   const currentMode = withMaps.find((m) => m.key === mode) ?? null;
 
-  /* The map the last draft used, so reopening mid-session skips two taps. */
+  /* The draft in progress, so closing the bubble does not empty the board. */
   useEffect(() => {
     try {
-      const saved = window.localStorage.getItem(STORED_TAB_MAP);
-      if (!saved) return;
+      const raw = window.localStorage.getItem(STORED_DRAFT);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as {
+        map?: string;
+        at?: number;
+        bans?: number[];
+        allies?: number[];
+        enemies?: number[];
+      };
+      if (!saved.map || Date.now() - (saved.at ?? 0) > DRAFT_TTL_MS) return;
+
       for (const m of withMaps) {
-        const found = m.maps.find((x) => x.mapName === saved);
+        const found = m.maps.find((x) => x.mapName === saved.map);
         if (!found) continue;
         /*
          * Reading a browser store is the "synchronise with an external system"
          * case effects exist for: the value cannot be known during render, and
          * seeding it into initial state would make the server and the client
-         * disagree about which map is selected. It runs once.
+         * disagree about what is selected. It runs once.
          */
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMode(m.key);
         setMap(found);
+        setPicked({
+          bans: saved.bans ?? [],
+          allies: saved.allies ?? [],
+          enemies: saved.enemies ?? [],
+        });
         return;
       }
     } catch {
-      // Storage is a convenience here, never a requirement.
+      // Malformed or blocked storage. An empty board is a fine outcome; a
+      // panel that fails to render is not.
     }
   }, [withMaps]);
+
+  /* Written on every change, so whatever is on screen survives a close. */
+  useEffect(() => {
+    if (!map) return;
+    try {
+      window.localStorage.setItem(
+        STORED_DRAFT,
+        JSON.stringify({ map: map.mapName, at: Date.now(), ...picked }),
+      );
+    } catch {
+      // ignored
+    }
+  }, [map, picked]);
 
   /*
    * Scoring, debounced.
@@ -152,11 +202,13 @@ export function PanelDraft({
     // answer, and that is a consequence of the tap, not of the fetch.
     setPicks(null);
     setPicked({ bans: [], allies: [], enemies: [] });
-    try {
-      window.localStorage.setItem(STORED_TAB_MAP, m.mapName);
-    } catch {
-      // ignored
-    }
+  };
+
+  /* One tap back to an empty board, because the next match is a new draft. */
+  const clear = () => {
+    setPicked({ bans: [], allies: [], enemies: [] });
+    setPicking(null);
+    setPicks(null);
   };
 
   const add = (slot: Slot, id: number) => {
@@ -357,6 +409,18 @@ export function PanelDraft({
                 ) : null}
               </div>
             ))}
+
+            {/* Only once there is something to clear. A reset button on an
+                empty board is a control that does nothing. */}
+            {picked.bans.length + picked.allies.length + picked.enemies.length > 0 ? (
+              <button
+                type="button"
+                onClick={clear}
+                className="ml-auto shrink-0 rounded border border-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted"
+              >
+                Clear
+              </button>
+            ) : null}
           </div>
 
           {picking ? (
@@ -562,7 +626,18 @@ function Suggestions({
                 {pick.brawlerName.toLowerCase()}
               </span>
               <span className="flex gap-1.5 text-[9px] leading-tight text-muted">
+                {/*
+                  The battle count appears only when it is thin.
+                  Printing it on every row would spend the width on a number
+                  that is usually reassuring and never acted on; printing it
+                  when it is small is the only time it changes a decision — a
+                  61% off twelve battles and a 61% off two hundred are not the
+                  same claim, and the list cannot show that any other way.
+                */}
                 <span>map {(pick.mapScore * 100).toFixed(0)}%</span>
+                {pick.battles < THIN_SAMPLE ? (
+                  <span className="text-defeat/70">{pick.battles} battles</span>
+                ) : null}
                 {pick.counterEdge !== null ? (
                   <span className={pick.counterEdge >= 0 ? 'text-victory/80' : 'text-defeat/80'}>
                     vs {pick.counterEdge >= 0 ? '+' : '−'}
