@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The site paints two soft radial washes behind the page; a linear fade is
+     the closest an Android background drawable gets without a bitmap. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><color android:color="@color/background" /></item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#1A1430"
+                android:centerColor="#0C1020"
+                android:endColor="@color/background" />
+        </shape>
+    </item>
+</layer-list>

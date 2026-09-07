@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The launcher screen, as a layout rather than views built in code.
+
+  The previous version assembled this in Kotlin and passed raw pixels to
+  setPadding — so "56" was 56 physical pixels, which is 13dp on a 420dpi phone
+  and 56dp on an old 160dpi one. The margins were wrong on every modern device,
+  which is most of why the screen read as cheap. Every dimension here is dp.
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="32dp">
+
+        <!-- Brand row: the same mark as the launcher icon and the bubble, so
+             the three are recognisably one thing. -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/bubble_badge"
+                android:src="@drawable/bubble_glyph"
+                android:padding="5dp"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="BRAWLZONE"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.14"
+                android:textColor="@color/foreground" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Bubble"
+            android:textSize="38sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/foreground" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Live map picks, floating on top of the game."
+            android:textSize="16sp"
+            android:lineSpacingMultiplier="1.25"
+            android:textColor="@color/muted" />
+
+        <!-- Status. Its own card because it is the one line on this screen
+             that changes, and the eye should know where to look for it. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/card_surface"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <View
+                android:id="@+id/status_dot"
+                android:layout_width="9dp"
+                android:layout_height="9dp"
+                android:background="@drawable/dot" />
+
+            <TextView
+                android:id="@+id/status_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/muted"
+                android:text="Checking permission…" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/start"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/btn_gold"
+            android:stateListAnimator="@null"
+            android:text="Start bubble"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.01"
+            android:textColor="@color/brand_ink" />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_outline"
+            android:stateListAnimator="@null"
+            android:text="Stop bubble"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/foreground" />
+
+        <!-- Shown only after a grant attempt has actually failed. -->
+        <TextView
+            android:id="@+id/restricted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/card_warn"
+            android:padding="16dp"
+            android:textSize="13sp"
+            android:lineSpacingMultiplier="1.35"
+            android:textColor="@color/brand"
+            android:visibility="gone"
+            android:text="The toggle is greyed out?" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="HOW IT WORKS"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:textColor="@color/muted" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_surface"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/brand" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:textSize="14sp"
+                    android:lineSpacingMultiplier="1.25"
+                    android:textColor="@color/foreground"
+                    android:text="Tap the bubble to open the panel; tap it again to fold it away." />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="52dp"
+                android:background="@color/border" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/brand" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:textSize="14sp"
+                    android:lineSpacingMultiplier="1.25"
+                    android:textColor="@color/foreground"
+                    android:text="Drag the bubble anywhere — it rests against the nearest edge." />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="52dp"
+                android:background="@color/border" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="wrap_content"
+                    android:text="3"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/brand" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:textSize="14sp"
+                    android:lineSpacingMultiplier="1.25"
+                    android:textColor="@color/foreground"
+                    android:text="Drag it onto the ✕ at the bottom to close it, or use Stop in the notification." />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="12sp"
+            android:lineSpacingMultiplier="1.35"
+            android:textColor="@color/muted"
+            android:alpha="0.75"
+            android:text="The bubble cannot see which map you are on — Android does not let one app read another's screen. Pick your mode in the panel and it shows what is live right now." />
+    </LinearLayout>
+</ScrollView>

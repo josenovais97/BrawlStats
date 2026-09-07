@@ -1,0 +1,5 @@
+# The signing key and its passwords. Never commit these.
+keystore/
+build/
+.gradle/
+local.properties

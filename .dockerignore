@@ -8,3 +8,6 @@ npm-debug.log
 src/generated
 MIGRATION.md
 *.md
+
+# The Android app: built by Gradle, not by the web image.
+android
