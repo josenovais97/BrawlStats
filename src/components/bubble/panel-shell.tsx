@@ -30,9 +30,11 @@ type Tab = 'meta' | 'draft';
 export function PanelShell({
   modes,
   roster,
+  windowDays,
 }: {
   modes: PanelMode[];
   roster: DraftBrawler[];
+  windowDays: number;
 }) {
   const [tab, setTab] = useState<Tab>('meta');
 
@@ -90,7 +92,7 @@ export function PanelShell({
       </div>
 
       {tab === 'meta' ? (
-        <PanelTiers modes={modes} />
+        <PanelTiers modes={modes} windowDays={windowDays} />
       ) : (
         <PanelDraft modes={modes} roster={roster} />
       )}

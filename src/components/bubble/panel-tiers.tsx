@@ -100,7 +100,13 @@ function remember(key: string, value: string | null) {
   }
 }
 
-export function PanelTiers({ modes }: { modes: PanelMode[] }) {
+export function PanelTiers({
+  modes,
+  windowDays,
+}: {
+  modes: PanelMode[];
+  windowDays: number;
+}) {
   const [active, setActive] = useState<string | null>(null);
   const [map, setMap] = useState<string | null>(null);
 
@@ -208,6 +214,12 @@ export function PanelTiers({ modes }: { modes: PanelMode[] }) {
 
   return (
     <>
+      {/* Belongs to this view, not to the panel: the draft board is not a
+          seven-day average of anything, and the heading said so anyway. */}
+      <p className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
+        Ranked meta · last {windowDays} days
+      </p>
+
       {/*
         Wraps rather than scrolling sideways. The site can afford a horizontal
         chip rail because the page scrolls under a finger that started on it;

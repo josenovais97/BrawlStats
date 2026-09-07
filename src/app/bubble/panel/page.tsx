@@ -178,16 +178,12 @@ export default async function BubblePanelPage() {
           changes={BUBBLE_CHANGELOG}
         />
 
-        <h1 className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
-          Ranked meta · last {WINDOW_DAYS} days
-        </h1>
-
         {modes[0].entries.length === 0 ? (
           <p className="px-2 py-8 text-center text-sm text-muted">
             Not enough sampled Ranked battles yet. This fills in as the sampler runs.
           </p>
         ) : (
-          <PanelShell modes={modes} roster={roster} />
+          <PanelShell modes={modes} roster={roster} windowDays={WINDOW_DAYS} />
         )}
 
 

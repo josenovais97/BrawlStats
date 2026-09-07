@@ -48,11 +48,11 @@ type Slot = 'bans' | 'allies' | 'enemies';
 /** What a Ranked draft actually allows, so the strips cannot overfill. */
 const LIMITS: Record<Slot, number> = { bans: 6, allies: 2, enemies: 3 };
 
-const LABELS: Record<Slot, string> = {
-  bans: 'Bans',
-  allies: 'Your team',
-  enemies: 'Enemy',
-};
+/** Long enough to read, short enough that three fit on one line. */
+const LABELS: Record<Slot, string> = { bans: 'Ban', allies: 'You', enemies: 'Vs' };
+
+/** For the picker's placeholder, where there is room for the real word. */
+const LONG: Record<Slot, string> = { bans: 'bans', allies: 'your team', enemies: 'the enemy' };
 
 const STORED_TAB_MAP = 'brawlzone.bubble.draftmap';
 
@@ -74,6 +74,7 @@ export function PanelDraft({
   });
 
   const [picking, setPicking] = useState<Slot | null>(null);
+  const [changing, setChanging] = useState(false);
   const [query, setQuery] = useState('');
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -146,6 +147,7 @@ export function PanelDraft({
 
   const chooseMap = (m: PanelMap) => {
     setMap(m);
+    setChanging(false);
     // Cleared here rather than in the effect: a new map invalidates the old
     // answer, and that is a consequence of the tap, not of the fetch.
     setPicks(null);
@@ -189,47 +191,70 @@ export function PanelDraft({
 
   return (
     <div className="space-y-2">
-      {/* Map first: nothing below means anything without it. */}
-      <div role="group" aria-label="Mode" className="flex flex-wrap gap-1 px-1 text-[11px]">
-        {withMaps.map((m) => (
-          <button
-            key={m.key ?? 'all'}
-            type="button"
-            onClick={() => {
-              setMode(m.key);
-              setMap(null);
-            }}
-            aria-pressed={m.key === mode}
-            className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
-              m.key === mode
-                ? 'border-brand/40 bg-brand/10 text-brand'
-                : 'border-border bg-surface text-muted'
-            }`}
-          >
-            {m.label}
-          </button>
-        ))}
-      </div>
+      {/*
+        The selector folds away once it has done its job.
 
-      {currentMode ? (
-        <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 text-[11px]">
-          {currentMode.maps.map((m) => (
-            <button
-              key={m.mapName}
-              type="button"
-              onClick={() => chooseMap(m)}
-              aria-pressed={map?.mapName === m.mapName}
-              className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
-                map?.mapName === m.mapName
-                  ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
-                  : 'border-border bg-surface text-muted'
-              }`}
-            >
-              {m.mapName}
-            </button>
-          ))}
-        </div>
-      ) : null}
+        Mode and map chips are two full rows, and in a 375dp-tall window that is
+        a fifth of the screen spent restating a choice already made. Collapsed
+        to one line, the space goes to the answer — which is the only thing on
+        this tab anyone is reading under a draft timer.
+      */}
+      {map && !changing ? (
+        <button
+          type="button"
+          onClick={() => setChanging(true)}
+          className="flex w-full items-center gap-1.5 px-1 pb-1 text-left text-[11px]"
+        >
+          <span className="font-bold text-accent-2">{map.mapName}</span>
+          <span className="text-muted">· {currentMode?.label}</span>
+          <span className="ml-auto rounded border border-border px-1.5 py-0.5 font-bold text-muted">
+            Change
+          </span>
+        </button>
+      ) : (
+        <>
+          <div role="group" aria-label="Mode" className="flex flex-wrap gap-1 px-1 text-[11px]">
+            {withMaps.map((m) => (
+              <button
+                key={m.key ?? 'all'}
+                type="button"
+                onClick={() => {
+                  setMode(m.key);
+                  setMap(null);
+                }}
+                aria-pressed={m.key === mode}
+                className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                  m.key === mode
+                    ? 'border-brand/40 bg-brand/10 text-brand'
+                    : 'border-border bg-surface text-muted'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
+          {currentMode ? (
+            <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 text-[11px]">
+              {currentMode.maps.map((m) => (
+                <button
+                  key={m.mapName}
+                  type="button"
+                  onClick={() => chooseMap(m)}
+                  aria-pressed={map?.mapName === m.mapName}
+                  className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                    map?.mapName === m.mapName
+                      ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
+                      : 'border-border bg-surface text-muted'
+                  }`}
+                >
+                  {m.mapName}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </>
+      )}
 
       {!map ? (
         <p className="px-2 py-6 text-center text-xs leading-relaxed text-muted">
@@ -237,14 +262,22 @@ export function PanelDraft({
         </p>
       ) : (
         <>
-          {/* The board. Three strips, because that is the whole state. */}
-          {(['bans', 'allies', 'enemies'] as Slot[]).map((slot) => (
-            <div key={slot} className="card flex items-center gap-2 px-2 py-1.5">
-              <span className="w-14 shrink-0 text-[10px] font-bold uppercase tracking-wide text-muted">
-                {LABELS[slot]}
-              </span>
+          {/*
+            One row, not three cards.
 
-              <div className="flex flex-1 flex-wrap items-center gap-1">
+            Three full-width cards cost 150px of a 375px window to hold at most
+            eleven small portraits, and "Your team" wrapped onto a second line
+            for no reason at all. Grouped on one line the board reads as what it
+            is — the state of the draft — and the suggestions start above the
+            fold instead of below it.
+          */}
+          <div className="card flex flex-wrap items-center gap-x-2.5 gap-y-1 px-2 py-1.5">
+            {(['bans', 'allies', 'enemies'] as Slot[]).map((slot) => (
+              <div key={slot} className="flex items-center gap-1">
+                <span className="text-[9px] font-bold uppercase tracking-wide text-muted">
+                  {LABELS[slot]}
+                </span>
+
                 {picked[slot].map((id) => {
                   const b = byId.get(id);
                   return (
@@ -253,15 +286,14 @@ export function PanelDraft({
                       type="button"
                       onClick={() => remove(slot, id)}
                       title={`Remove ${b?.brawlerName ?? id}`}
-                      className="relative"
                     >
                       <Image
                         src={b?.imageUrl ?? ''}
                         alt={b?.brawlerName ?? ''}
-                        width={28}
-                        height={28}
-                        className={`size-7 rounded bg-surface-2 ${
-                          slot === 'bans' ? 'opacity-45 grayscale' : ''
+                        width={24}
+                        height={24}
+                        className={`size-6 rounded bg-surface-2 ${
+                          slot === 'bans' ? 'opacity-40 grayscale' : ''
                         }`}
                         unoptimized
                       />
@@ -274,7 +306,8 @@ export function PanelDraft({
                     type="button"
                     onClick={() => setPicking(picking === slot ? null : slot)}
                     aria-pressed={picking === slot}
-                    className={`grid size-7 place-items-center rounded border text-sm font-bold leading-none ${
+                    aria-label={`Add to ${LONG[slot]}`}
+                    className={`grid size-6 place-items-center rounded border text-xs font-bold leading-none ${
                       picking === slot
                         ? 'border-brand bg-brand/15 text-brand'
                         : 'border-dashed border-border-strong text-muted'
@@ -284,8 +317,8 @@ export function PanelDraft({
                   </button>
                 ) : null}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {picking ? (
             <BrawlerPicker
@@ -293,7 +326,7 @@ export function PanelDraft({
               query={query}
               onQuery={setQuery}
               onPick={(id) => add(picking, id)}
-              label={LABELS[picking]}
+              label={LONG[picking]}
             />
           ) : null}
 
@@ -331,7 +364,7 @@ function BrawlerPicker({
         value={query}
         autoFocus
         onChange={(e) => onQuery(e.target.value)}
-        placeholder={`Add to ${label.toLowerCase()}…`}
+        placeholder={`Add to ${label}…`}
         className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-brand/50"
       />
 
