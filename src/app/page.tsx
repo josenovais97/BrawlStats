@@ -6,6 +6,7 @@ import { HomeCoverage } from '@/components/home/home-coverage';
 import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLatestVideo } from '@/components/home/home-latest-video';
+import { HomeRadarSection } from '@/components/home/home-radar-section';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
@@ -124,6 +125,22 @@ export default function HomePage() {
       {/* Renders nothing until the visitor has saved someone, so a first-time
           view goes straight from the search box to the product. */}
       <FavoritesList />
+
+      {/*
+        The findings, directly under the search.
+
+        They were four screens down on /daily, which is the same mistake the
+        section below documents: a tier list is a table anyone can build from
+        the same API, while "almost nobody picks Nita, it is winning anyway" is
+        a claim only this project's own sampling can make. It is also the kind
+        of thing people repeat to each other, which a table never is.
+
+        Renders nothing on a day with no findings rather than announcing that
+        there are none.
+      */}
+      <Suspense fallback={<Skeleton className="h-72 rounded-2xl" />}>
+        <HomeRadarSection />
+      </Suspense>
 
       {/*
         The claim that separates this site from every other one, moved up here
