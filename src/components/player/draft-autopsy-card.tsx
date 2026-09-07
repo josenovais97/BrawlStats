@@ -35,7 +35,17 @@ export function DraftAutopsyCard({
   const mode = modeLabel(modeMeta, autopsy.mode);
 
   const blamed = draftWasTheProblem(autopsy);
-  const unclear = autopsy.advantage === null || autopsy.confidence === 'low';
+
+  /*
+   * Silent only when there is genuinely nothing to say.
+   *
+   * This used to also fire on `confidence === 'low'`, which put "not enough
+   * sampled battles" on nearly every card: low confidence means the estimate
+   * leans on overall Ranked form rather than this map's, which is a weaker
+   * claim, not an absent one. The strength of the claim belongs in the
+   * wording, not in whether the card speaks.
+   */
+  const unclear = autopsy.winChance === null;
 
   const chance = autopsy.winChance;
   const pct = chance === null ? null : Math.round(chance * 100);
@@ -185,12 +195,18 @@ export function DraftAutopsyCard({
             positioning and gadget timing are not in the battle log and are not
             guessed at here.
           */}
-          The percentage is the drafts compared: each side&apos;s measured record on this map,
-          adjusted for how those brawlers fare against each other. It is the draft&apos;s chance,
-          not yours — aim, positioning and gadget timing are not in the battle log and are not
-          guessed at. Confidence: <span className="font-semibold">{autopsy.confidence}</span>,
-          from {autopsy.supportingBattles.toLocaleString('en-US')} sampled battles behind the
-          brawlers involved.
+          The percentage is the drafts compared:{' '}
+          {autopsy.confidence === 'low'
+            ? 'mostly each side\u2019s overall Ranked form, because this map has too little data on these brawlers yet'
+            : 'each side\u2019s measured record on this map'}
+          , adjusted for how those brawlers fare against each other. It is the draft&apos;s
+          chance, not yours — aim, positioning and gadget timing are not in the battle log and
+          are not guessed at. Confidence:{' '}
+          <span className="font-semibold">{autopsy.confidence}</span>
+          {autopsy.supportingBattles > 0
+            ? `, from ${autopsy.supportingBattles.toLocaleString('en-US')} sampled battles on this map`
+            : ''}
+          .
         </p>
       </div>
     </article>

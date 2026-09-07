@@ -9,9 +9,11 @@ import {
   getBrawlerPairings,
   getCounterScores,
   getLadderMapForm,
+  getMetaIndex,
   getRoleCompositions,
   type CounterScore,
   type MapForm,
+  type ScoredBrawler,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSBattleLogEntry, BSPlayer } from '@/types/brawlstars';
@@ -79,7 +81,7 @@ export async function BattleAutopsySection({
       .map((p) => p.brawler?.id)
       .filter((id): id is number => id !== undefined);
 
-    const [pairs, shapes, catalogue, counters, countered] = await Promise.all([
+    const [pairs, shapes, catalogue, counters, countered, meta] = await Promise.all([
       Promise.all(
         myIds.map(async (id) => [id, await getBrawlerPairings(id).catch(() => null)] as const),
       ),
@@ -93,6 +95,13 @@ export async function BattleAutopsySection({
        */
       getCounterScores(theirIds).catch(() => new Map<number, CounterScore>()),
       getCounterScores(myIds).catch(() => new Map<number, CounterScore>()),
+      /*
+       * Overall Ranked form, for brawlers this map has too little data on.
+       * Without it the card refused to judge nearly every draft: map form
+       * needs thirty battles on one map in fourteen days, and across thirty
+       * Ranked maps most of a six-player line-up misses that bar.
+       */
+      getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
     ]);
 
     deep = draftAutopsy({
@@ -104,6 +113,11 @@ export async function BattleAutopsySection({
       ),
       counters,
       countered,
+      overall: new Map(
+        [...meta.values()]
+          .filter((e) => e.normalizedWinRate !== null)
+          .map((e) => [e.brawlerId, e.normalizedWinRate!] as const),
+      ),
       roles: new Map((catalogue?.all ?? []).map((b) => [b.id, b.className])),
       shapes,
       roster: player.brawlers,

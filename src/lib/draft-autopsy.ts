@@ -134,16 +134,48 @@ function winProbability(mine: number, theirs: number): number {
   return 1 / (1 + Math.exp(-delta));
 }
 
-/** Mean rate of a side on this map, including how it fares against the other. */
+/**
+ * A side's expected win rate, and how much of it is really about this map.
+ *
+ * Map form is preferred and overall Ranked form is the fallback, because the
+ * alternative was refusing to answer. `getLadderMapForm` only publishes a
+ * brawler once it has thirty battles on that exact map in fourteen days, which
+ * across roughly thirty Ranked maps is a bar most of any given six-player
+ * line-up misses — so the card said "not enough sampled battles" on nearly
+ * every battle it was shown for, which is not a caveat, it is a broken
+ * feature.
+ *
+ * Falling back is not a fudge: map form *is* overall form adjusted for a map,
+ * so when the map has nothing to say, overall form is exactly the right prior
+ * — it is what the map estimate would be shrunk toward anyway. What changes is
+ * the strength of the claim, and `mapped` reports that honestly so the card can
+ * say whether it is talking about this map or about Ranked in general.
+ */
 function sideRate(
   ids: number[],
   form: Map<number, MapForm>,
+  overall: Map<number, number>,
   counters: Map<number, CounterScore>,
-): number | null {
-  const rated = ids.map((id) => form.get(id)).filter((f): f is MapForm => f !== undefined);
-  if (rated.length === 0) return null;
+): { rate: number; mapped: number; battles: number } | null {
+  const rates: number[] = [];
+  let mapped = 0;
+  let battles = 0;
 
-  const map = rated.reduce((sum, f) => sum + f.adjusted, 0) / rated.length;
+  for (const id of ids) {
+    const onMap = form.get(id);
+    if (onMap) {
+      rates.push(onMap.adjusted);
+      battles += onMap.battles;
+      mapped += 1;
+      continue;
+    }
+    const general = overall.get(id);
+    if (general !== undefined) rates.push(general);
+  }
+
+  if (rates.length === 0) return null;
+
+  const base = rates.reduce((a, b) => a + b, 0) / rates.length;
 
   /*
    * The matchup, folded in on the same scale.
@@ -158,7 +190,7 @@ function sideRate(
     .filter((e): e is number => e !== undefined);
   const matchup = edges.length > 0 ? edges.reduce((a, b) => a + b, 0) / edges.length : 0;
 
-  return map + matchup;
+  return { rate: base + matchup, mapped, battles };
 }
 
 /** Mean edge of a side, over the brawlers this map actually has data for. */
@@ -184,6 +216,7 @@ export function draftAutopsy({
   pairings,
   counters,
   countered,
+  overall,
   roles,
   shapes,
   roster,
@@ -198,6 +231,8 @@ export function draftAutopsy({
   counters?: Map<number, CounterScore>;
   /** The same from the other side, for the enemy's brawlers against ours. */
   countered?: Map<number, CounterScore>;
+  /** Overall Ranked form per brawler, used where this map has nothing. */
+  overall?: Map<number, number>;
   /** Brawler id to class name, for the team shape. */
   roles: Map<number, string | null>;
   shapes: { comps: RoleComposition[]; baseline: number } | null;
@@ -223,10 +258,13 @@ export function draftAutopsy({
   const advantage =
     mine.edge !== null && theirs.edge !== null ? mine.edge - theirs.edge : null;
 
-  const myRate = sideRate(myIds, mapForm, counters ?? new Map());
-  const theirRate = sideRate(theirIds, mapForm, countered ?? new Map());
+  const general = overall ?? new Map<number, number>();
+  const myRate = sideRate(myIds, mapForm, general, counters ?? new Map());
+  const theirRate = sideRate(theirIds, mapForm, general, countered ?? new Map());
   const winChance =
-    myRate !== null && theirRate !== null ? winProbability(myRate, theirRate) : null;
+    myRate !== null && theirRate !== null
+      ? winProbability(myRate.rate, theirRate.rate)
+      : null;
 
   /*
    * The worst matchup on the board: for each of our brawlers, is any enemy one
@@ -301,14 +339,23 @@ export function draftAutopsy({
    * A side where only one brawler was sampled produces a number, and that
    * number should not be presented like one built from six.
    */
-  const supportingBattles = [...myIds, ...theirIds]
-    .map((id) => mapForm.get(id)?.battles ?? 0)
-    .reduce((sum, n) => sum + n, 0);
-  const measured = mine.measured + theirs.measured;
+  const supportingBattles = (myRate?.battles ?? 0) + (theirRate?.battles ?? 0);
+  const measured = (myRate?.mapped ?? 0) + (theirRate?.mapped ?? 0);
+
+  /*
+   * Confidence now grades the claim rather than gating it.
+   *
+   * It used to decide whether the card said anything at all, which meant a
+   * draft the data could describe perfectly well in general terms was reported
+   * as unknowable. It describes how much of the estimate is this map talking:
+   * high when most of the line-up has real map data behind it, low when the
+   * number is mostly overall Ranked form. The card words itself accordingly
+   * instead of refusing.
+   */
   const confidence: DraftAutopsy['confidence'] =
-    measured >= 5 && supportingBattles >= 600
+    measured >= 4 && supportingBattles >= 400
       ? 'high'
-      : measured >= 3 && supportingBattles >= 200
+      : measured >= 2 && supportingBattles >= 100
         ? 'medium'
         : 'low';
 
