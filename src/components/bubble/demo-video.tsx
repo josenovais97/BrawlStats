@@ -6,9 +6,9 @@ import { useSyncExternalStore } from "react";
 /**
  * The app running, as a looping clip.
  *
- * Deliberately a video and not a GIF. These fifteen seconds as a GIF would be
- * north of 15 MB; as H.264 it is 848 KB, and this sits on the hero of the page
- * the app is downloaded from. On a box with fixed bandwidth and two shared
+ * Deliberately a video and not a GIF. These twenty-two seconds as a GIF would
+ * be north of 25 MB; as H.264 it is 1.5 MB, and this sits on the hero of the
+ * page the app is downloaded from. On a box with fixed bandwidth and two shared
  * cores that difference is the whole argument — a muted, looping, inline video
  * behaves exactly like a GIF to a reader and costs a twentieth as much.
  *
@@ -41,7 +41,7 @@ export function DemoVideo() {
     return (
       <Image
         src="/bubble/demo-poster.jpg"
-        alt="The BrawlZone panel open during a Hot Zone draft on Dueling Beetles, listing the brawlers measured best on that map"
+        alt="The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map"
         width={1280}
         height={590}
         className="w-full"
@@ -58,7 +58,7 @@ export function DemoVideo() {
       loop
       playsInline
       poster="/bubble/demo-poster.jpg"
-      aria-label="A Hot Zone draft on Dueling Beetles: the bubble opens the Ranked tier list, the filter narrows to that mode and then to that map, and the panel lists the ten brawlers measured best on it."
+      aria-label="A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power."
     >
       <source src="/bubble/demo.mp4" type="video/mp4" />
     </video>

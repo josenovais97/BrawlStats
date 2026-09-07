@@ -210,9 +210,10 @@ export default function BubblePage() {
         <figure className="card-glow overflow-hidden rounded-2xl border border-border">
           <DemoVideo />
           <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-            One unedited take on a phone: queueing into Hot Zone on Dueling
-            Beetles, opening the bubble mid-draft, narrowing to that exact map,
-            and reading the ten brawlers measured best on it. Taps are marked.
+            One unedited take on a phone: queueing into Bounty on Hideout,
+            opening the bubble mid-draft, narrowing to that map, reading Brock’s
+            build — then picking Brock and giving him the star power the panel
+            pointed at.
           </figcaption>
         </figure>
       </section>
@@ -307,6 +308,49 @@ export default function BubblePage() {
               </p>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* The second tab, which is the tool rather than the glance. */}
+      <section className="space-y-5">
+        <SectionHeading
+          title="Or draft with it"
+          subtitle="A second tab, for when you want more than the meta: the bans, your team, and theirs."
+        />
+
+        <div className="grid items-center gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="mx-auto w-full max-w-[300px]">
+            <Image
+              src="/bubble/app-draft.png"
+              alt="The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft"
+              width={720}
+              height={1360}
+              className="w-full rounded-2xl border border-border"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="space-y-4 text-muted">
+            <p className="leading-relaxed">
+              Enter the bans, what your team has taken and what theirs has, and
+              the list reorders around all three. A brawler that is merely
+              strong on the map is a different call from one that is strong on
+              the map <em>and</em> answers what they just picked.
+            </p>
+            <p className="leading-relaxed">
+              Every row shows its working: form on this map, edge against the
+              enemies you named, edge alongside your team-mates. A suggestion
+              you cannot check is a guess dressed up in a percentage — and
+              mid-draft the reason is usually what decides it.
+            </p>
+            <p className="leading-relaxed">
+              {/* Said plainly because the alternative is a reader trusting a
+                  number that a dozen battles produced. */}
+              Thin evidence is flagged rather than hidden. A brawler backed by
+              eleven battles on this map says so in red, because 52% off eleven
+              battles and 52% off two hundred are not the same claim.
+            </p>
+          </div>
         </div>
       </section>
 
