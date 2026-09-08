@@ -12,18 +12,18 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.6',
+  version: '1.7',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 16,
+  versionCode: 17,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2644577,
-  sha256: 'ec9349835ba58a397a4246ab9c7edaf54c17c9b6f64029b0a0369d41c16e24e6',
+  size: 2645165,
+  sha256: '14fb4fd75b88d4146337c268b173c76ad95ba5f2c86cb2ba1fad88be8a8ea602',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-09-04',
+  released: '2026-09-08',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -52,6 +52,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.7',
+    versionCode: 17,
+    date: '2026-09-08',
+    changes: [
+      'The keyboard no longer buries the draft picker: the panel moves above it, and searching is opt-in so the shortlist of likely picks is visible first.',
+      'In landscape the keyboard no longer takes over the whole screen.',
+    ],
+  },
   {
     version: '1.6',
     versionCode: 16,
