@@ -1,8 +1,8 @@
 'use client';
 
-import { Share2, Check } from 'lucide-react';
+import { Share2, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { DiscoveryCard } from '@/components/daily/discovery-card';
 import type { Discovery } from '@/lib/stats';
@@ -27,10 +27,28 @@ import type { BABrawler } from '@/types/brawlapi';
  * hovers it, or tabs into it, because a panel that moves under a reader who is
  * mid-sentence is worse than one that never moves at all. Under
  * `prefers-reduced-motion` it never advances by itself.
+ *
+ * And it is *driveable*: arrows, swipe and arrow keys, not only dots. A card
+ * that changes by itself and offers no way to go back is a trap — see a
+ * finding out of the corner of your eye, look up, and it is gone with no
+ * affordance for retrieving it. The dots were technically enough (six targets,
+ * any of them reachable) but they read as an indicator rather than a control,
+ * so nobody uses them to go back one.
  */
 
 /** Long enough to read a two-line claim without hurrying. */
 const DWELL_MS = 8000;
+
+/**
+ * How far a touch has to travel sideways to count as a swipe.
+ *
+ * Paired with a ratio test against the vertical distance, because this sits in
+ * a scrolling page: a finger dragged down through the card moves a few pixels
+ * horizontally on the way, and without the ratio every scroll past the Radar
+ * would change the card under the reader.
+ */
+const SWIPE_PX = 48;
+const SWIPE_RATIO = 1.5;
 
 export function HomeRadar({
   discoveries,
@@ -42,18 +60,77 @@ export function HomeRadar({
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const [copied, setCopied] = useState(false);
+  /**
+   * Set once, never cleared. Hovering is ambiguous — a cursor can rest on a
+   * section by accident — so it only pauses. Choosing a card is not ambiguous,
+   * and resuming the carousel under someone who has just steered it is the
+   * rudest thing this component could do.
+   */
+  const [steered, setSteered] = useState(false);
+  /** Which way the last move went, so the card enters from the right side. */
+  const [dir, setDir] = useState<1 | -1>(1);
 
   const count = discoveries.length;
 
+  const go = useCallback(
+    (delta: 1 | -1) => {
+      setSteered(true);
+      setDir(delta);
+      setIndex((i) => (i + delta + count) % count);
+    },
+    [count],
+  );
+
+  // Direction of travel, so the slide matches the dot that was clicked rather
+  // than always sliding forward.
+  const jump = useCallback(
+    (to: number) => {
+      setSteered(true);
+      setDir(to >= index ? 1 : -1);
+      setIndex(to);
+    },
+    [index],
+  );
+
   useEffect(() => {
-    if (held || count < 2) return;
+    if (held || steered || count < 2) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const timer = setInterval(() => setIndex((i) => (i + 1) % count), DWELL_MS);
+    const timer = setInterval(() => {
+      setDir(1);
+      setIndex((i) => (i + 1) % count);
+    }, DWELL_MS);
     return () => clearInterval(timer);
-  }, [held, count]);
+  }, [held, steered, count]);
 
   const current = discoveries[Math.min(index, count - 1)];
+
+  const touch = useRef<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    setHeld(true);
+    const t = e.touches[0];
+    touch.current = t ? { x: t.clientX, y: t.clientY } : null;
+  }, []);
+
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const start = touch.current;
+      touch.current = null;
+      if (!start || count < 2) return;
+
+      const t = e.changedTouches[0];
+      if (!t) return;
+
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO) return;
+
+      // Content follows the finger: dragging left brings the next card in.
+      go(dx < 0 ? 1 : -1);
+    },
+    [count, go],
+  );
 
   /*
    * Share the discovery, not the page.
@@ -87,12 +164,32 @@ export function HomeRadar({
   return (
     <section
       aria-labelledby="radar"
+      aria-roledescription="carousel"
       className="reveal"
       onMouseEnter={() => setHeld(true)}
       onMouseLeave={() => setHeld(false)}
       onFocusCapture={() => setHeld(true)}
       onBlurCapture={() => setHeld(false)}
-      onTouchStart={() => setHeld(true)}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={() => {
+        touch.current = null;
+      }}
+      /*
+       * Arrow keys work wherever focus already is inside the section, which for
+       * a keyboard reader is the arrow buttons or the card's own link. Nothing
+       * in here takes typed input, so there is nothing to steal them from.
+       */
+      onKeyDown={(e) => {
+        if (count < 2) return;
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          go(1);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          go(-1);
+        }
+      }}
     >
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
@@ -129,29 +226,54 @@ export function HomeRadar({
         </div>
       </div>
 
-      {/* Keyed so the card remounts and its entrance animation replays; without
-          it the numbers swap in place and the change is easy to miss. */}
-      <DiscoveryCard
-        key={current.kind + current.brawlerIds.join('-')}
-        discovery={current}
-        brawlerMeta={brawlerMeta}
-        index={0}
-      />
+      {/* Keyed so the wrapper remounts and the slide replays; without it the
+          numbers swap in place and the change is easy to miss. The key carries
+          the direction, so going back slides back — a card that always enters
+          from the right after a "previous" makes the control feel broken.
+          `touch-pan-y` leaves vertical scrolling to the browser and claims only
+          the horizontal axis for the swipe handler. */}
+      <div
+        key={`${dir}:${current.kind}${current.brawlerIds.join('-')}`}
+        data-dir={dir}
+        className="radar-slide touch-pan-y"
+      >
+        <DiscoveryCard discovery={current} brawlerMeta={brawlerMeta} index={0} />
+      </div>
 
       {count > 1 ? (
-        <div className="mt-4 flex items-center justify-center gap-2">
-          {discoveries.map((d, i) => (
-            <button
-              key={d.kind + d.brawlerIds.join('-')}
-              type="button"
-              onClick={() => setIndex(i)}
-              aria-label={`Finding ${i + 1} of ${count}`}
-              aria-current={i === index}
-              className={`h-1.5 rounded-full transition-all ${
-                i === index ? 'w-6 bg-brand' : 'w-1.5 bg-border-strong hover:bg-muted'
-              }`}
-            />
-          ))}
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="Previous finding"
+            className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-brand/50 hover:text-fg"
+          >
+            <ChevronLeft className="size-4" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {discoveries.map((d, i) => (
+              <button
+                key={d.kind + d.brawlerIds.join('-')}
+                type="button"
+                onClick={() => jump(i)}
+                aria-label={`Finding ${i + 1} of ${count}`}
+                aria-current={i === index}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? 'w-6 bg-brand' : 'w-1.5 bg-border-strong hover:bg-muted'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="Next finding"
+            className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-brand/50 hover:text-fg"
+          >
+            <ChevronRight className="size-4" />
+          </button>
         </div>
       ) : null}
     </section>

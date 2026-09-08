@@ -209,6 +209,48 @@ body {
   }
 }
 
+/*
+ * The Radar's card change, as a slide in the direction of travel.
+ *
+ * Direction matters more than the motion does: a card that always enters from
+ * the right after the reader pressed "previous" reads as a control that did
+ * not work, and the fix is a data attribute rather than two classes so the
+ * component sets one value instead of branching.
+ *
+ * Short — 380ms — because this fires on a timer as well as on a press, and
+ * anything statelier turns an auto-advancing panel into something that is
+ * always mid-animation.
+ */
+@keyframes radar-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes radar-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility radar-slide {
+  animation: radar-slide-next 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &[data-dir='-1'] {
+    animation-name: radar-slide-prev;
+  }
+}
+
 /* Same motion, but on load rather than on scroll, for above-the-fold copy. */
 @utility reveal-now {
   animation: reveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -395,7 +437,8 @@ body {
    */
   .reveal,
   .reveal-now,
-  .reveal-row > * {
+  .reveal-row > *,
+  .radar-slide {
     animation: none;
     opacity: 1;
     transform: none;
