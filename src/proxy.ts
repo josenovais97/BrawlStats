@@ -10,6 +10,7 @@ import {
 import { MAX_ENEMIES, draftHref } from '@/lib/draft-route';
 import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { shouldBlockCrawl } from '@/lib/crawl-policy';
+import { createBucket, isLimitedPath, retryAfter, take } from '@/lib/hot-path-limit';
 import { slugify } from '@/lib/slugs';
 
 /**
@@ -34,6 +35,12 @@ import { slugify } from '@/lib/slugs';
  */
 
 const TIER_LIST = /^\/tier-list\/(ranked|trophy)(?:\/|$)/;
+
+/**
+ * One bucket for the whole process. See `lib/hot-path-limit` for why it is not
+ * per-IP, and for the numbers.
+ */
+const hotPath = createBucket(Date.now());
 
 /** Mirrors `TIER_WINDOWS`, minus the default, which is spelled as a bare path. */
 const WINDOW_SEGMENTS = new Set(['24h']);
@@ -137,6 +144,31 @@ export function proxy(request: NextRequest): NextResponse | undefined {
   // runs on every profile view -- a lookup here would cost more than the crawl
   // it prevents. An empty set means nothing is indexable, which is the
   // behaviour this had before the allowlist existed.
+  /*
+   * The cost ceiling, ahead of the crawler check.
+   *
+   * Ahead of it because the client this exists for does not admit to being a
+   * crawler: on 2026-09-08 several hundred addresses sent Chrome's user agent,
+   * two requests each, walking the draft state space and the profile tags, and
+   * took the box to 99% CPU for half an hour. `shouldBlockCrawl` cannot see
+   * that, by construction — it reads a header the client chooses.
+   *
+   * A refusal here is cheap in the way that matters: it happens before any
+   * render, before the database and before the game API, so a flood costs a
+   * regex and a subtraction instead of two shared cores.
+   */
+  if (isLimitedPath(pathname) && !take(hotPath, Date.now())) {
+    return new NextResponse('Too many requests. Try again in a moment.', {
+      status: 429,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'retry-after': String(retryAfter(hotPath)),
+        // Never cached. The next request a second later should be served.
+        'cache-control': 'no-store',
+      },
+    });
+  }
+
   if (shouldBlockCrawl(pathname, request.headers.get('user-agent'), INDEXABLE_PLAYER_TAGS)) {
     return new NextResponse(CRAWLER_REFUSED, {
       status: 404,
