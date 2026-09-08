@@ -1,6 +1,6 @@
 import { dayLabel } from '@/components/daily/daily-report';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
-import { listDailyReports, getDailyReport } from '@/lib/stats';
+import { ensureTodayReport, listDailyReports, getDailyReport } from '@/lib/stats';
 
 /**
  * RSS for the daily findings.
@@ -39,6 +39,11 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 export async function GET(): Promise<Response> {
+  // See the archive page: this is prerendered alongside `/daily` with no
+  // ordering between them, so the feed has to make sure today exists rather
+  // than assume the page that writes it ran first.
+  await ensureTodayReport().catch(() => {});
+
   const reports = await listDailyReports(ITEMS).catch(() => []);
 
   const items = await Promise.all(

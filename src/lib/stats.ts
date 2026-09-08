@@ -4124,6 +4124,27 @@ export async function saveDailyReport(day: string, discoveries: Discovery[]): Pr
 }
 
 /**
+ * Makes sure today's report exists before anything reads the archive.
+ *
+ * The write lived only in `/daily`'s own render, which reads correctly — store
+ * exactly what was published — but quietly assumes `/daily` renders before
+ * `/daily/archive` and the feed do. It does not. `next build` prerenders routes
+ * in parallel workers with no ordering between them, so the first build of a
+ * day produced an archive rendered against a table `/daily` had not written to
+ * yet: today's findings visible on one page and "nothing archived yet" on the
+ * next, which is exactly how this looked on 2026-09-08.
+ *
+ * So every route that reads the archive calls this first rather than trusting
+ * the order. It costs a data-cache hit, not six aggregates — `getDailyDiscoveries`
+ * is cached and the upsert is idempotent — and it keeps the guarantee that
+ * matters, which is that the archived copy is the copy that was published.
+ */
+export async function ensureTodayReport(): Promise<void> {
+  const discoveries = await getDailyDiscoveries().catch(() => []);
+  await saveDailyReport(toIsoDate(new Date()), discoveries);
+}
+
+/**
  * The archive index, newest first.
  *
  * `minFindings` is what keeps thin days out of the crawlable set: a report with

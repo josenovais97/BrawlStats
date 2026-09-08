@@ -5,7 +5,7 @@ import { dayLabel } from '@/components/daily/daily-report';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 
-import { listDailyReports } from '@/lib/stats';
+import { ensureTodayReport, listDailyReports } from '@/lib/stats';
 
 export const revalidate = 3600;
 
@@ -24,6 +24,13 @@ export const metadata: Metadata = {
  * they want is a date, so the page gives them dates and gets out of the way.
  */
 export default async function DailyArchivePage() {
+  // Before reading, not after. `next build` prerenders this page and `/daily`
+  // in parallel workers, so without this the first build of a day can render
+  // the archive against a table `/daily` has not written to yet — which is what
+  // left this page saying "nothing archived yet" while the findings it was
+  // supposed to list were live one click away.
+  await ensureTodayReport().catch(() => {});
+
   const reports = await listDailyReports(400).catch(() => []);
 
   return (
