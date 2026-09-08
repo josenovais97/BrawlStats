@@ -113,8 +113,30 @@ export function BuildAndUpgrades({
       />
 
       <div className="space-y-4">
-        {/* What other owners bought. First, because it is the only part of
-            this area that is a recommendation rather than a reference. */}
+        {/*
+          What kind of claim each number below is, said once, before any of them.
+
+          Three different things share this section and read alike if nobody
+          separates them: what owners have bought, how it has gone for the
+          people who bought each option, and a recommendation. The third does
+          not exist here, and saying so is the point — a reader deciding where
+          to spend coins should know they are being shown what is popular and
+          what correlates with it, not what this site thinks they should buy.
+        */}
+        <p className="mb-4 text-sm leading-relaxed text-muted">
+          Two different things below.{' '}
+          <strong className="font-semibold text-foreground">What owners bought</strong> is
+          popularity — the game&apos;s API reports what a player has unlocked, never what
+          they took into a match.{' '}
+          <strong className="font-semibold text-foreground">How it has gone</strong> is the
+          win rate among the players who made each choice, which covers the ability and the
+          kind of player who picks it together. Neither is a recommendation from us:
+          BrawlZone does not rank {name}&apos;s kit, and nothing here is an opinion about
+          what you should buy.
+        </p>
+
+        {/* What other owners bought. First, because it is the part people
+            came for; the kit reference follows. */}
         <div className={`grid gap-4 ${showChoices ? 'lg:grid-cols-2' : ''}`}>
           {showChoices && abilityChoices ? (
             <AbilityChoices

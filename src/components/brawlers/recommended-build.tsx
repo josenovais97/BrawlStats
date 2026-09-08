@@ -19,10 +19,14 @@ interface NamedAccessory {
  * detail below, not a replacement for it, and every number it shows is
  * repeated there with its sample size and its caveats.
  *
- * Most-equipped, not most-effective: these are shares of sampled owners, so
- * this reports the build players converge on rather than one this site has
- * judged. Saying "most equipped" rather than "best" is the difference between
- * describing the data and overclaiming it.
+ * Most *owned*, not most equipped and not most effective — and the difference
+ * between the first two is not pedantry. The game API reports what a player
+ * has unlocked on a brawler and never what they took into a match; the About
+ * page says so directly, and this heading said "Most equipped" anyway, which
+ * contradicted it on the one page a reader goes to before spending coins.
+ *
+ * So it reports the build players have converged on buying, not one this site
+ * has judged, and not one anybody has been observed using.
  */
 export function RecommendedBuild({
   build,
@@ -52,7 +56,7 @@ export function RecommendedBuild({
 
   return (
     <div className="card flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">Most equipped</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted">Most owned</p>
 
       {starPower && starPowerName ? (
         <Pick

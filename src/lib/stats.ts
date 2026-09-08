@@ -1813,9 +1813,17 @@ async function computeFilterableModes(
  * played with it. Both halves of that are already recorded, so the join costs
  * nothing new.
  *
- * The comparison is fair in a way an ownership split is not. Everyone counted
- * here owns exactly one, so the two groups are equally invested in the brawler
- * and the difference between them is the ability rather than the player.
+ * The comparison is better than an ownership split, and it is still not a
+ * controlled one. Everyone counted here owns exactly one, so both groups are
+ * equally invested in the brawler — but *which* one they bought is their own
+ * choice, and people who choose an aggressive gadget may play aggressively,
+ * may be newer, may follow a particular guide. Owning one option does not make
+ * two groups otherwise comparable.
+ *
+ * So the win rate here is the rate *among the players who chose that option*.
+ * It measures the choice and the chooser together, and nothing in this data
+ * separates them. Read as "how it has gone for people who bought this", not as
+ * "what this ability does to your win rate".
  *
  * It has data precisely when the question is live. On a brawler released years
  * ago almost everyone owns both, so there is nothing to measure, but nobody is

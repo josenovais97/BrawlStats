@@ -11,8 +11,13 @@ import type { BAAccessory } from '@/types/brawlapi';
  *
  * Read from players who own exactly one of the pair: they chose it, and every
  * battle they played on the brawler was played with it. That makes this a
- * measurement of a decision rather than of ownership, and the win rates beside
- * it a fair comparison, since both groups are equally invested in the brawler.
+ * measurement of a decision rather than of ownership.
+ *
+ * It is not a controlled comparison, and the section says so rather than
+ * letting the two win rates imply one. Which option a player bought is their
+ * own choice, so the rate beside it measures the ability and the kind of
+ * player who picks it together — owning one option does not make two groups
+ * otherwise alike.
  *
  * Shown for every brawler that has enough first-buyers to name a preference,
  * which at a floor of ten is all 106 for star powers and 101 for gadgets. How
@@ -97,7 +102,8 @@ export function AbilityChoices({
               </span>
             </div>
             <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
-              Among owners who have only one so far.
+              Among owners who have only one so far. Win rates cover the choice and the
+              chooser together.
             </p>
 
             {rows.length > 1 ? (
@@ -128,10 +134,17 @@ export function AbilityChoices({
         summary={`Read from ${formatNumber(choices.sampleSize)} first-buyers`}
       >
         Counted from tracked players who own exactly one of the pair: they chose it,
-        and every battle they played on this brawler was played with it. Both sides
-        are equally invested in the brawler, so the gap between the two win rates is
-        the ability rather than the player &mdash; read them against each other
-        rather than as absolutes.
+        and every battle they played on this brawler was played with it, so this
+        measures a decision rather than ownership.
+        {' '}
+        <strong className="font-semibold text-foreground">
+          It is not a controlled comparison.
+        </strong>{' '}
+        Which option a player bought is their own choice, so each win rate covers the
+        ability and the kind of player who picks it together. Owning one option does
+        not make two groups otherwise alike, and nothing here separates the two. Read
+        it as how it has gone for the people who bought each one &mdash; not as what
+        the ability will do to your win rate.
         {choices.confidence === 'low'
           ? ' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.'
           : ''}

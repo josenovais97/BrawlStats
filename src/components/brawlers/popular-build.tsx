@@ -163,12 +163,28 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                             </span>
                           ) : null}
                         </span>
+                        {/*
+                          Both denominators, each labelled, because the two
+                          numbers do not divide into each other and a reader who
+                          tries gets a third figure that appears nowhere.
+
+                          Shield read "2,136 unlocks · 33.5%" under a footnote
+                          saying 3,322 owners: 2,136/3,322 is 64%, not 33.5%,
+                          because the percentage was a share of *gear unlocks*
+                          rather than of owners. Both are worth knowing — one
+                          compares the options against each other, the other
+                          says how common the choice is — so both are named.
+                        */}
                         <span className="flex shrink-0 items-baseline gap-2">
                           <span className="text-xs text-muted">
-                            {formatNumber(option.owners)} unlocks
+                            {formatPercent(option.unlockRate)} of owners
                           </span>
-                          <span className="text-sm font-bold tabular-nums">
+                          <span
+                            className="text-sm font-bold tabular-nums"
+                            title={`${formatNumber(option.owners)} unlocks, out of every gear unlock recorded on this brawler`}
+                          >
                             {formatPercent(option.share)}
+                            <span className="ml-1 text-xs font-normal text-muted">of picks</span>
                           </span>
                         </span>
                       </div>
@@ -190,11 +206,17 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       {/* What the numbers are, in one line. The methodology behind them lives
           on the About page rather than under every chart. */}
       <p className="text-xs leading-relaxed text-muted">
-        {`Measured across ${formatNumber(build.sampleSize)} tracked players who own this brawler.${
-          !starPowersSplit && !gadgetsSplit
-            ? ' Almost all of them own both star powers and both gadgets.'
-            : ''
-        }`}
+        Measured across {formatNumber(build.sampleSize)} tracked players who own this
+        brawler.{' '}
+        <span className="text-muted/90">
+          &ldquo;Of owners&rdquo; is how many of them have that item; &ldquo;of
+          picks&rdquo; is its share of every unlock of that kind, which is what makes
+          the options comparable with each other. A player can own several gears, so
+          the first column does not add up to 100% and the second does.
+        </span>
+        {!starPowersSplit && !gadgetsSplit
+          ? ' Almost all of them own both star powers and both gadgets.'
+          : ''}
       </p>
     </div>
   );
