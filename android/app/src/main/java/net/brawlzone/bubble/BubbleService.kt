@@ -8,7 +8,9 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.Icon
@@ -24,9 +26,13 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -36,6 +42,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import org.json.JSONArray
+import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -89,6 +97,34 @@ class BubbleService : Service() {
      * the tap collapse the panel and leave it collapsed.
      */
     private var outsideClosedAt = 0L
+
+    // ------------------------------------------------------------------ scan
+
+    /**
+     * Reading the draft off the screen, when the user has allowed it.
+     *
+     * All of this is null until someone asks. The overlay is the feature; this
+     * is an addition to it, and an app that holds a screen-capture session open
+     * because it might be useful later is not one anybody should install.
+     */
+    private var scan: ScreenScan? = null
+    private var vision: DraftVision? = null
+
+    /**
+     * The frame the last scan read, kept so a correction can be learned from
+     * the pixels that produced it rather than from the next frame, which by
+     * then shows a draft one pick further on.
+     */
+    private var lastFrame: Bitmap? = null
+
+    private var scanning = false
+
+    /** The panel's WebView, so a scan result has somewhere to go. */
+    private var panelWeb: WebView? = null
+
+    /** A result that arrived while the panel was shut. See `postToPanel`. */
+    private var pendingScanJs: String? = null
+
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -150,11 +186,19 @@ class BubbleService : Service() {
      * killed it. An overlay should appear only when a person asks for it.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_STOP) stopSelf()
+        when (intent?.action) {
+            ACTION_STOP -> stopSelf()
+            ScanContract.ACTION_GRANTED -> onScanGranted(intent)
+            ScanContract.ACTION_DENIED -> postScanState("denied")
+        }
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        scan?.release()
+        scan = null
+        lastFrame?.recycle()
+        lastFrame = null
         removePanel()
         hideCloseTarget()
         bubble?.let { runCatching { windows.removeView(it) } }
@@ -469,6 +513,7 @@ class BubbleService : Service() {
     private fun removePanel() {
         panel?.let { runCatching { windows.removeView(it) } }
         panel = null
+        panelWeb = null
         panelParams = null
     }
 
@@ -488,6 +533,7 @@ class BubbleService : Service() {
         val view = panel ?: return
         val params = panelParams
         panel = null
+        panelWeb = null
         panelParams = null
         Log.d(TAG, "collapsePanel: animating out")
 
@@ -627,7 +673,7 @@ class BubbleService : Service() {
             setPadding(dp(24), dp(24), dp(24), dp(24))
             visibility = View.GONE
         }
-        val web = WebView(this).apply {
+        val web = PanelWebView(this).apply {
             alpha = 0f
             setBackgroundColor(Color.parseColor("#0B0F1D"))
             settings.javaScriptEnabled = true
@@ -637,6 +683,7 @@ class BubbleService : Service() {
                     spinner.visibility = View.GONE
                     if (failed) return
                     view?.animate()?.alpha(1f)?.setDuration(160)?.start()
+                    flushPendingScan()
                 }
 
                 /*
@@ -695,6 +742,18 @@ class BubbleService : Service() {
              */
             setDownloadListener { url, _, _, _, _ -> openExternally(Uri.parse(url)) }
 
+            /*
+             * Only the panel's own page ever sees this.
+             *
+             * `addJavascriptInterface` exposes Kotlin to any page the WebView
+             * loads, which is why `shouldOverrideUrlLoading` above sends every
+             * URL outside /bubble/panel to the browser instead of navigating
+             * here. The bridge cannot read the screen on its own — it can ask
+             * the service to, and the service still needs a consent the user
+             * granted to a system dialog.
+             */
+            addJavascriptInterface(ScanBridge(), "BrawlZoneScan")
+
             loadUrl(PANEL_URL)
         }
         body.addView(web, FrameLayout.LayoutParams(
@@ -742,7 +801,16 @@ class BubbleService : Service() {
                 WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH or
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT,
-        ).apply { gravity = Gravity.TOP or Gravity.START }
+        ).apply {
+            gravity = Gravity.TOP or Gravity.START
+            /*
+             * Ask the system to make room rather than draw over us. On its own
+             * this does nothing to a fixed-size overlay, but it is what makes
+             * the window a participant in IME insets at all, which is how
+             * `fitPanelAroundIme` ever hears that the keyboard opened.
+             */
+            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        }
 
         /*
          * A position the user dragged the panel to survives; otherwise it is
@@ -811,6 +879,23 @@ class BubbleService : Service() {
             }
         }
 
+        /*
+         * Ask the window for the keyboard's height, and react when it changes.
+         *
+         * `ime()` insets are the only reliable answer: the older tricks measure
+         * a *resizing* window against the screen, and this window never resizes
+         * because its size is written into its LayoutParams. Below API 30 there
+         * is no ime() type, and no repositioning happens — the keyboard covers
+         * the panel there exactly as it did before, which is the same behaviour
+         * those devices already had rather than a regression.
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            root.setOnApplyWindowInsetsListener { _, insets ->
+                fitPanelAroundIme(insets.getInsets(WindowInsets.Type.ime()).bottom)
+                insets
+            }
+        }
+
         root.alpha = 0f
         root.scaleX = 0.12f
         root.scaleY = 0.12f
@@ -818,6 +903,7 @@ class BubbleService : Service() {
         root.pivotY = (params.y + params.height / 2 - panelParams.y).toFloat()
 
         panel = root
+        panelWeb = web
         this.panelParams = panelParams
         runCatching { windows.addView(root, panelParams) }
             .onSuccess {
@@ -829,8 +915,69 @@ class BubbleService : Service() {
             }
             .onFailure {
                 panel = null
+                panelWeb = null
                 this.panelParams = null
             }
+    }
+
+    /**
+     * A WebView that will not let the keyboard take the screen.
+     *
+     * In landscape Android's IME defaults to "extract" mode: it covers the whole
+     * display with its own full-width text field and its own editor, on the
+     * reasonable assumption that a short screen has no room to show the app
+     * behind it. For an app that is a 375dp-tall overlay over a game, that
+     * assumption produces exactly the reported symptom — searching covers
+     * everything.
+     *
+     * The two flags are the documented way to decline it, and they have to be
+     * set on the editor rather than the window, which for a WebView means
+     * overriding the input connection it hands the IME.
+     */
+    private inner class PanelWebView(context: Context) : WebView(context) {
+        override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
+            val connection = super.onCreateInputConnection(outAttrs)
+            outAttrs.imeOptions =
+                outAttrs.imeOptions or
+                    EditorInfo.IME_FLAG_NO_EXTRACT_UI or
+                    EditorInfo.IME_FLAG_NO_FULLSCREEN
+            return connection
+        }
+    }
+
+    /**
+     * Moves the panel clear of the keyboard, and puts it back afterwards.
+     *
+     * An overlay window has a fixed size in its LayoutParams, so `adjust=resize`
+     * has nothing to resize and `adjust=pan` has nothing to pan — the keyboard
+     * simply draws over whatever the panel was showing. Nothing repositions it
+     * but us.
+     *
+     * So when the IME appears the panel goes to the top of the screen and
+     * shrinks to the gap above the keyboard, and when it goes it returns to
+     * where the reader had put it. The remembered position is untouched
+     * throughout: a keyboard is a temporary visitor, not a decision.
+     */
+    private fun fitPanelAroundIme(imeHeight: Int) {
+        val view = panel ?: return
+        val params = panelParams ?: return
+        val (width, height) = panelSize()
+
+        if (imeHeight <= 0) {
+            params.width = width
+            params.height = height
+            placePanel(params, width, height)
+        } else {
+            val available = screenH - imeHeight - dp(8)
+            // Never smaller than a couple of rows; below that the panel is not
+            // showing anything and would be better closed than squeezed.
+            params.height = height.coerceAtMost(available.coerceAtLeast(dp(140)))
+            params.width = width
+            params.x = params.x.coerceIn(0, (screenW - width).coerceAtLeast(0))
+            params.y = 0
+        }
+
+        runCatching { windows.updateViewLayout(view, params) }
     }
 
     /**
@@ -887,6 +1034,268 @@ class BubbleService : Service() {
     }
 
     // ---------------------------------------------------------- notification
+
+    // ------------------------------------------------------------------ scan
+
+    /**
+     * The bridge the panel talks to.
+     *
+     * Every method here is called on a WebView worker thread, so nothing in it
+     * touches a view directly — the handler is not a formality. The surface is
+     * deliberately tiny: the page asks whether scanning exists, asks for it to
+     * be turned on, asks for a scan, and reports corrections. Everything about
+     * what a draft *means* stays on the web side, where the map list and the
+     * numbers already live.
+     */
+    private inner class ScanBridge {
+
+        /** "unsupported" on a build without capture, else idle/ready/busy. */
+        @JavascriptInterface
+        fun status(): String = when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> "unsupported"
+            scanning -> "busy"
+            scan?.live == true -> "ready"
+            else -> "idle"
+        }
+
+        /** The roster, so the matcher knows which art to fetch. */
+        @JavascriptInterface
+        fun roster(json: String) {
+            Thread {
+                try {
+                    val array = JSONArray(json)
+                    val ids = ArrayList<Int>(array.length())
+                    for (i in 0 until array.length()) ids.add(array.getInt(i))
+                    val v = vision ?: DraftVision(this@BubbleService).also { vision = it }
+                    v.prepare(ids)
+                } catch (e: Throwable) {
+                    Log.w(TAG, "roster rejected", e)
+                }
+            }.start()
+        }
+
+        @JavascriptInterface
+        fun enable() = handler.post { requestScanConsent() }
+
+        @JavascriptInterface
+        fun scan() = handler.post { runScan() }
+
+        /** Give the capture session back. Also what the recording chip does. */
+        @JavascriptInterface
+        fun stop() = handler.post {
+            scan?.release()
+            scan = null
+            postScanState("idle")
+        }
+
+        /**
+         * A correction. The frame that produced the misread is still in hand,
+         * so the descriptor learned is the one that was actually on screen.
+         */
+        /**
+         * Files the plate on screen under the map the reader just confirmed.
+         *
+         * The names come from the page, so what the app stores is keyed on the
+         * site's own map list rather than on anything it tried to read — which
+         * is why a learned plate can never disagree with the map it selects.
+         */
+        @JavascriptInterface
+        fun learnPlate(modeKey: String?, mapName: String?) {
+            val frame = lastFrame ?: return
+            val v = vision ?: return
+            Thread { runCatching { v.learnPlate(frame, modeKey, mapName) } }.start()
+        }
+
+        @JavascriptInterface
+        fun learn(kind: String, index: Int, brawlerId: Int) {
+            val frame = lastFrame ?: return
+            val v = vision ?: return
+            Thread { runCatching { v.learn(frame, kind, index, brawlerId) } }.start()
+        }
+    }
+
+    /**
+     * Asks for screen capture, having first got out of the way.
+     *
+     * Android disables the consent dialog's button while anything is drawn over
+     * it — the same anti-tapjacking rule that makes the overlay permission
+     * screen unusable with the bubble up — so the panel has to be gone before
+     * the dialog appears, not after.
+     */
+    private fun requestScanConsent() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            postScanState("unsupported")
+            return
+        }
+        /*
+         * The panel is left open on purpose.
+         *
+         * Android applies FLAG_HIDE_NON_SYSTEM_OVERLAY_WINDOWS to its own
+         * capture dialog, so every overlay is hidden for as long as it is up
+         * without this service doing anything — and collapsing the panel by
+         * hand would throw away the WebView the answer has to be delivered to.
+         */
+        runCatching {
+            startActivity(
+                Intent(this, ScanConsentActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }
+    }
+
+    /**
+     * Turns the granted token into a live session.
+     *
+     * `startForeground` is called again first, and that is not redundant.
+     * Android 14 refuses `getMediaProjection` unless the calling service is
+     * already in the foreground carrying the mediaProjection type, and it
+     * refuses with a SecurityException rather than a null — so without this
+     * line the app crashes at the moment the user says yes.
+     */
+    private fun onScanGranted(intent: Intent) {
+        val code = intent.getIntExtra(ScanContract.EXTRA_RESULT_CODE, 0)
+        val data: Intent? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(ScanContract.EXTRA_RESULT_DATA, Intent::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(ScanContract.EXTRA_RESULT_DATA)
+        }
+        if (data == null) {
+            postScanState("denied")
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            runCatching {
+                startForeground(
+                    NOTIFICATION_ID,
+                    buildNotification(),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE or
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
+                )
+            }
+        }
+
+        val session = ScreenScan(this, handler)
+        session.onLost = {
+            scan = null
+            postScanState("idle")
+        }
+        val ok = session.start(code, data, screenW, screenH, resources.displayMetrics.densityDpi)
+        if (!ok) {
+            postScanState("failed")
+            return
+        }
+        scan = session
+        postScanState("ready")
+        // Straight into a scan: the user asked for one, and the dialog was the
+        // only thing between them and it.
+        handler.postDelayed({ runScan() }, 250L)
+    }
+
+    /**
+     * One scan: hide, capture, read, show, report.
+     *
+     * The overlay has to go first. MediaProjection captures the composited
+     * display, so the bubble and the panel are *in* the frame — the panel sits
+     * over the very strip the draft is read from, and the bubble parks on an
+     * edge that can cover a ban. Hiding both for a couple of frames is the only
+     * way to photograph the game rather than ourselves.
+     */
+    private fun runScan() {
+        val session = scan
+        if (session == null || !session.live) {
+            requestScanConsent()
+            return
+        }
+        if (scanning) return
+        val v = vision
+        if (v == null || !v.ready) {
+            postScanState("preparing")
+            return
+        }
+
+        scanning = true
+        postScanState("busy")
+
+        val hidden = panel
+        hidden?.visibility = View.GONE
+        bubble?.visibility = View.GONE
+
+        handler.postDelayed({
+            session.capture { frame ->
+                hidden?.visibility = View.VISIBLE
+                bubble?.visibility = View.VISIBLE
+
+                if (frame == null) {
+                    scanning = false
+                    postScanState("failed")
+                    return@capture
+                }
+                lastFrame?.recycle()
+                lastFrame = frame
+
+                Thread {
+                    val reading = runCatching { v.read(frame) }.getOrNull()
+                    handler.post { deliver(reading) }
+                }.start()
+            }
+        }, HIDE_FOR_SCAN_MS)
+    }
+
+    private fun deliver(reading: DraftVision.Reading?) {
+        scanning = false
+        val payload = JSONObject()
+        payload.put("ok", reading != null)
+        if (reading != null) {
+            payload.put("mode", reading.mode ?: JSONObject.NULL)
+            payload.put("map", reading.map ?: JSONObject.NULL)
+            payload.put("bans", slots(reading.bans))
+            payload.put("allies", slots(reading.allies))
+            payload.put("enemies", slots(reading.enemies))
+        }
+        postToPanel("window.brawlzone && window.brawlzone.scanResult($payload)")
+        postScanState(if (scan?.live == true) "ready" else "idle")
+    }
+
+    /** `null` for an empty or uncertain slot, so the page can say which. */
+    private fun slots(list: List<DraftVision.Slot>): JSONArray {
+        val out = JSONArray()
+        for (slot in list) {
+            if (slot.brawlerId == null) out.put(JSONObject.NULL) else out.put(slot.brawlerId)
+        }
+        return out
+    }
+
+    private fun postScanState(state: String) {
+        postToPanel("window.brawlzone && window.brawlzone.scanState(${JSONObject.quote(state)})")
+    }
+
+    /**
+     * Delivers to the panel, or holds it until there is one.
+     *
+     * A scan takes a few hundred milliseconds and the reader may well have
+     * tapped the bubble shut in the meantime — they asked a question and looked
+     * back at their game, which is the correct way to use this. Holding the
+     * last message means reopening the panel shows the answer instead of an
+     * empty board and no explanation of what happened.
+     */
+    private fun postToPanel(js: String) {
+        handler.post {
+            val web = panelWeb
+            if (web == null) {
+                pendingScanJs = js
+                return@post
+            }
+            runCatching { web.evaluateJavascript(js, null) }
+        }
+    }
+
+    private fun flushPendingScan() {
+        val js = pendingScanJs ?: return
+        pendingScanJs = null
+        runCatching { panelWeb?.evaluateJavascript(js, null) }
+    }
 
     private fun buildNotification(): Notification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -950,6 +1359,17 @@ class BubbleService : Service() {
         const val SAME_GESTURE_MS = 700L
 
         const val COLLAPSE_MS = 170L
+
+        /**
+         * How long the overlay stays hidden before the frame is grabbed.
+         *
+         * Two things have to finish: the window manager has to compose a frame
+         * without our windows in it, and the virtual display has to hand that
+         * frame to the reader. One vsync would be enough for the first and is
+         * not reliably enough for the second, so this is four of them — still
+         * a blink, and the capture retries anyway if the frame is not there.
+         */
+        const val HIDE_FOR_SCAN_MS = 70L
         const val TAG = "BrawlZoneBubble"
 
         /**

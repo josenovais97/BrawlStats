@@ -1,9 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
+import type { ScanPayload } from '@/lib/bubble-scan';
+import { correctionIndex, mergeSlots, resolvePlate } from '@/lib/bubble-scan';
 
 /**
  * The draft board, at overlay scale.
@@ -65,6 +67,35 @@ const THIN_SAMPLE = 30;
 const STORED_DRAFT = 'brawlzone.bubble.draft';
 
 /**
+ * What the Android build exposes when it can read the screen.
+ *
+ * Absent in a browser, and absent in app builds before 1.8, so every use is
+ * guarded rather than assumed — the panel is one page served to both.
+ */
+interface ScanBridge {
+  status(): string;
+  roster(json: string): void;
+  enable(): void;
+  scan(): void;
+  stop(): void;
+  learn(kind: string, index: number, brawlerId: number): void;
+  learnPlate(modeKey: string | null, mapName: string | null): void;
+}
+
+type ScanState = 'unsupported' | 'idle' | 'ready' | 'busy' | 'preparing' | 'denied' | 'failed';
+
+/** What the scan button says, per state. */
+const SCAN_LABEL: Record<ScanState, string> = {
+  unsupported: '',
+  idle: 'Scan draft',
+  ready: 'Scan draft',
+  busy: 'Reading screen…',
+  preparing: 'Loading portraits…',
+  denied: 'Scan draft',
+  failed: 'Scan draft',
+};
+
+/**
  * How long a half-finished draft is worth restoring.
  *
  * Every tap on the bubble builds a fresh WebView, so without this the board
@@ -100,6 +131,17 @@ export function PanelDraft({
   const [query, setQuery] = useState('');
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [scanState, setScanState] = useState<ScanState>('unsupported');
+  const [scanNote, setScanNote] = useState<string | null>(null);
+  /*
+   * The last reading, kept positionally.
+   *
+   * The board holds a compact list per slot, but the app learns from *screen
+   * positions* — so a correction can only be attributed if we still know which
+   * position it went unread at. See `correctionIndex`.
+   */
+  const lastScan = useRef<ScanPayload | null>(null);
 
   const byId = useMemo(
     () => new Map(roster.map((b) => [b.brawlerId, b])),
@@ -195,9 +237,153 @@ export function PanelDraft({
     };
   }, [map, picked]);
 
+  const applyRef = useRef<(payload: ScanPayload) => void>(() => {});
+  const applyScan = useCallback((payload: ScanPayload) => applyRef.current(payload), []);
+
+  /*
+   * The scan bridge, if this is the app rather than a browser.
+   *
+   * Two things are handed over on the way in. The callbacks go on `window`
+   * because Kotlin can only call into the page by evaluating a string, and the
+   * roster goes over because the matcher needs to know which brawlers exist —
+   * shipping that list inside the APK would mean a release every time a brawler
+   * comes out, and the panel already has it.
+   */
+  useEffect(() => {
+    const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+    if (!bridge) return;
+
+    const api = (window as unknown as { brawlzone?: Record<string, unknown> }).brawlzone ?? {};
+    api.scanState = (state: string) => setScanState(state as ScanState);
+    api.scanResult = (payload: ScanPayload) => applyScan(payload);
+    (window as unknown as { brawlzone: Record<string, unknown> }).brawlzone = api;
+
+    try {
+      /*
+       * Reading a capability off the host is the "synchronise with an external
+       * system" case effects exist for: whether this page is inside the app,
+       * and whether capture is already granted, cannot be known during render
+       * and must not differ between the server and the first client paint.
+       */
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setScanState(bridge.status() as ScanState);
+      bridge.roster(JSON.stringify(roster.map((b) => b.brawlerId)));
+    } catch {
+      setScanState('unsupported');
+    }
+    // `applyScan` closes over the current board, and re-registering the
+    // callbacks on every board change would be a lot of churn for no gain —
+    // the ref below is what keeps the handler current instead.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roster]);
+
+  const handleScan = (payload: ScanPayload) => {
+    lastScan.current = payload;
+
+    if (!payload.ok) {
+      setScanNote('Could not read the screen. Is the draft on screen?');
+      return;
+    }
+
+    const plate = resolvePlate(payload, withMaps);
+    /*
+     * A different map means a different match, so the board resets. Anything
+     * else merges: a scan is one frame of a draft still in progress, and the
+     * reader may have typed in a ban the app could not identify.
+     */
+    const changedMap = plate.map !== null && plate.map.mapName !== map?.mapName;
+    if (plate.mode !== null) {
+      setMode(plate.mode);
+      if (plate.map === null) setChanging(true);
+    }
+    if (plate.map !== null) {
+      setMap(plate.map);
+      setChanging(false);
+    }
+
+    const base = changedMap ? { bans: [], allies: [], enemies: [] } : picked;
+    setPicked(mergeSlots(base, payload, LIMITS));
+    if (changedMap) setPicks(null);
+
+    const found =
+      (payload.bans ?? []).filter((x) => x !== null).length +
+      (payload.allies ?? []).filter((x) => x !== null).length +
+      (payload.enemies ?? []).filter((x) => x !== null).length;
+
+    /*
+     * Says what it did *not* get, not what it did.
+     *
+     * The board already shows what was recognised — the portraits are right
+     * there. What the reader cannot see is whether the app looked and gave up
+     * or never looked at all, and that is the difference between tapping the
+     * gaps in and scanning again.
+     *
+     * The first time on any map it will not know the map, and saying so plainly
+     * is what makes the next line — pick it once and it is remembered — read as
+     * an instruction rather than an apology.
+     */
+    if (plate.map === null && plate.mode === null && found === 0) {
+      setScanNote('Nothing recognised yet. Pick the map below — it is remembered.');
+    } else if (plate.map === null) {
+      setScanNote('Pick the map below. It is remembered for next time.');
+    } else if (found === 0) {
+      setScanNote(`${plate.map.mapName}. No brawlers read — tap them in.`);
+    } else {
+      setScanNote(null);
+    }
+  };
+
+  /*
+   * The handler the bridge reaches, kept current.
+   *
+   * `window.brawlzone.scanResult` is installed once, but it has to see the
+   * board as it is when the scan lands rather than as it was when the panel
+   * opened. Assigning the ref after every render is the smallest way to have
+   * both a stable callback and fresh state.
+   */
+  useEffect(() => {
+    applyRef.current = handleScan;
+  });
+
+  /**
+   * One button for three states: ask, scan, wait.
+   *
+   * Granting capture runs straight into a scan on the other side, so the reader
+   * taps once whether or not they have granted it before. Being asked for a
+   * permission and then having to find the button again is the kind of thing
+   * that makes a feature feel broken when it is working.
+   */
+  const runScan = () => {
+    const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+    if (!bridge) return;
+    setScanNote(null);
+    try {
+      if (scanState === 'ready') bridge.scan();
+      else bridge.enable();
+    } catch {
+      setScanNote('Screen reading is not available on this build.');
+    }
+  };
+
   const chooseMap = (m: PanelMap) => {
     setMap(m);
     setChanging(false);
+    /*
+     * Confirming a map is how the app learns to read the plate.
+     *
+     * It still has the frame it scanned, so this files that plate under the
+     * name chosen here — and every later scan on this map fills it in with no
+     * taps at all. Only after a scan: with no frame in hand there is nothing to
+     * file, and a map chosen from a cold panel says nothing about any picture.
+     */
+    if (lastScan.current) {
+      const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+      try {
+        bridge?.learnPlate(m.mode ?? mode, m.mapName);
+      } catch {
+        // A build without the bridge, or one that has since lost the frame.
+      }
+    }
     // Cleared here rather than in the effect: a new map invalidates the old
     // answer, and that is a consequence of the tap, not of the fetch.
     setPicks(null);
@@ -235,9 +421,41 @@ export function PanelDraft({
       if (next[slot].length >= LIMITS[slot]) setPicking(null);
       return next;
     });
+    teach(slot, id);
     // Cleared so the next name can be typed straight away; the field keeps
     // focus, so a reader filling bans types, taps, types, taps.
     setQuery('');
+  };
+
+  /**
+   * Tells the app what it should have read, when that can be said unambiguously.
+   *
+   * The app keeps the frame it scanned, so a correction stores the pixels it
+   * misread against the brawler chosen here — a reference taken from this
+   * phone's own screen, which beats a CDN render every time. That only works if
+   * the correction can be pinned to a screen position, so `correctionIndex`
+   * refuses when more than one slot went unread. A reference learned against
+   * the wrong position would be worse than none, because it would score highly
+   * against exactly the thing it is wrong about.
+   */
+  const teach = (slot: Slot, id: number) => {
+    const payload = lastScan.current;
+    if (!payload) return;
+    const index = correctionIndex(payload[slot]);
+    if (index === null) return;
+
+    const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+    if (!bridge) return;
+    try {
+      bridge.learn(slot, index, id);
+      // Recorded, so the same gap is not attributed twice if the reader
+      // changes their mind about it.
+      const updated = [...(payload[slot] ?? [])];
+      updated[index] = id;
+      lastScan.current = { ...payload, [slot]: updated };
+    } catch {
+      // A build without the bridge, or one that has since lost the frame.
+    }
   };
 
   const remove = (slot: Slot, id: number) =>
@@ -272,8 +490,56 @@ export function PanelDraft({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, roster, picked]);
 
+  const canScan = scanState !== 'unsupported';
+
   return (
     <div className="space-y-2">
+      {/*
+        The scan button, on top of everything else.
+
+        It sits above the map selector rather than beside it because it is the
+        answer to the same question: on a good scan the map is filled in and the
+        two rows below become a confirmation rather than a task. Under a draft
+        timer, one tap that fills the whole board is the entire feature.
+      */}
+      {canScan ? (
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={runScan}
+            disabled={scanState === 'busy' || scanState === 'preparing'}
+            className={`flex w-full items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px] font-bold transition-colors ${
+              scanState === 'busy' || scanState === 'preparing'
+                ? 'border-border bg-surface text-muted'
+                : 'border-accent-2/50 bg-accent-2/10 text-accent-2'
+            }`}
+          >
+            <span
+              aria-hidden
+              className={scanState === 'busy' ? 'animate-pulse' : undefined}
+            >
+              ◎
+            </span>
+            {SCAN_LABEL[scanState]}
+          </button>
+
+          {/*
+            Only ever says something when there is something to say. A status
+            line that reads "ready" under a button labelled "Scan draft" is a
+            row of a small screen spent on nothing.
+          */}
+          {scanNote ? (
+            <p className="px-1 text-[10px] leading-snug text-muted">{scanNote}</p>
+          ) : null}
+          {scanState === 'denied' ? (
+            <p className="px-1 text-[10px] leading-snug text-muted">
+              Android needs permission each time the app starts. Nothing is stored or sent —
+              the frame is read and dropped.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       {/*
         The selector folds away once it has done its job.
 

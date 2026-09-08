@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 16
-    versionName = "1.6"
+    versionCode = 18
+    versionName = "1.8"
   }
 
   signingConfigs {
@@ -72,4 +72,16 @@ android {
 dependencies {
   implementation("androidx.core:core-ktx:1.13.1")
   implementation("androidx.appcompat:appcompat:1.7.0")
+
+  /*
+   * No OCR engine, deliberately.
+   *
+   * The mode and map ARE printed on the draft screen, and reading them with
+   * ML Kit worked — at 11 MB of native pipeline per ABI, which took a 2.6 MB
+   * app to 46 MB. That is an absurd price for two words, on an app people
+   * download over mobile data from a page that calls it small.
+   *
+   * The plate is matched as a picture instead, against crops learned the first
+   * time the reader confirms a map. See DraftVision.
+   */
 }

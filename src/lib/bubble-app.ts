@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.7',
+  version: '1.8',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 17,
+  versionCode: 18,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2645165,
-  sha256: '14fb4fd75b88d4146337c268b173c76ad95ba5f2c86cb2ba1fad88be8a8ea602',
+  size: 2661945,
+  sha256: '2b192529cda8b548a768f788be0976e694a10b0e5ad0aa3fe8f7da052b087507',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.8',
+    versionCode: 18,
+    date: '2026-09-08',
+    changes: [
+      'Scan the draft instead of typing it: one tap reads the bans and picks off your screen and fills the board.',
+      'The map is remembered. Confirm it once and every later scan on that map fills it in for you.',
+      'Anything it is not sure about is left blank rather than guessed at — and correcting it teaches it that brawler for next time.',
+    ],
+  },
   {
     version: '1.7',
     versionCode: 17,

@@ -6,6 +6,7 @@ import {
   Hand,
   Layers,
   MousePointerClick,
+  ScanLine,
   ShieldCheck,
   Timer,
   X,
@@ -63,6 +64,11 @@ const FEATURES = [
     icon: Timer,
     title: "Down to the map you are on",
     body: "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.",
+  },
+  {
+    icon: ScanLine,
+    title: "Scan the draft",
+    body: "One tap reads the bans and picks off your screen and fills the board, instead of typing six bans into a phone with twenty seconds on the clock. Anything it is unsure of it leaves blank rather than guessing, and correcting it teaches it that brawler for next time.",
   },
   {
     icon: MousePointerClick,
@@ -355,15 +361,17 @@ export default function BubblePage() {
       </section>
 
       {/*
-        The limit, given the same weight as the features.
+        The capability, given the same weight as the features.
 
-        Every overlay tool gets asked whether it reads the game, and the honest
-        answer is a selling point rather than a caveat: it cannot, by design, and
-        neither can anything else that is playing by the rules.
+        Every overlay tool gets asked whether it reads the game, and since 1.8
+        the answer is "yes, when you ask it to" — which makes this section more
+        important than it was when the answer was no. What earns trust is not a
+        claim that it cannot, it is a specific account of what happens to the
+        picture, and that account has to be checkable against the app.
       */}
       <section className="space-y-5">
         <SectionHeading
-          title="What it cannot do"
+          title="What reading your screen means"
           subtitle="Worth knowing before you install it, not after."
         />
         <div className="card border-border-strong p-6">
@@ -371,16 +379,31 @@ export default function BubblePage() {
             <ShieldCheck className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
               <p>
-                The bubble cannot see your screen, your match, or which map you
-                are on. Android does not let one app read another&apos;s
-                display, and anything claiming otherwise is not playing by the
-                rules.
+                Scanning reads one frame, when you tap Scan, and only after you
+                have said yes to Android&apos;s own screen-capture dialog. That
+                dialog comes back every time the app starts — Android will not
+                let an app keep the permission — and while a session is open
+                your phone shows a recording indicator you can stop at any time.
               </p>
               <p>
-                It shows the meta; you match that to the draft in front of you.
-                It does not touch the game, read your account, or send anything
-                anywhere — there is no account, no analytics in the app, and
-                nothing to log in to.
+                The frame is measured on your phone and dropped. It is never
+                written to storage and never leaves the device: there is no
+                upload, no account, and nothing in the app that could send one.
+                What comes out of it is a short list of brawler names, matched
+                against portraits the app downloaded once.
+              </p>
+              <p>
+                It reads pixels the game has already drawn, and nothing else. It
+                does not touch the game, tap anything for you, read your Brawl
+                Stars account, or show you anything the draft screen is not
+                already showing — below Diamond that means no bans and no enemy
+                picks, because the game does not display them.
+              </p>
+              <p>
+                It is also allowed to be wrong. A brawler it cannot place is
+                left blank rather than filled in with a guess, because a board
+                quietly holding the wrong brawler is worse than one holding
+                nothing.
               </p>
             </div>
           </div>

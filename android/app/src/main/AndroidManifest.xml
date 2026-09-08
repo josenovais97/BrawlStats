@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!--
+      Draft scanning. The permission alone grants nothing: every capture session
+      still needs the user to accept the system dialog, and Android shows a
+      recording indicator for as long as one is open.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -37,10 +43,22 @@
         <service
             android:name=".BubbleService"
             android:exported="false"
-            android:foregroundServiceType="specialUse">
+            android:foregroundServiceType="specialUse|mediaProjection">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Draws a movable overlay showing live Brawl Stars map picks while the game is in the foreground." />
         </service>
+
+        <!--
+          Shows the screen-capture dialog and hands the result to the service.
+          Excluded from recents because it is a dialog, not a screen, and a
+          blank entry in the task switcher is just confusing.
+        -->
+        <activity
+            android:name=".ScanConsentActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.BrawlZone.Invisible" />
     </application>
 </manifest>

@@ -15,4 +15,16 @@
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowBackground">@color/background</item>
     </style>
+    <!--
+      The consent activity has no UI of its own; it exists to show the system's
+      screen-capture dialog. A normal opaque window would flash the app over the
+      game on the way there and again on the way back, in the middle of a draft.
+    -->
+    <style name="Theme.BrawlZone.Invisible" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>

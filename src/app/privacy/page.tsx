@@ -178,8 +178,16 @@ export default function PrivacyPage() {
               <p>
                 The bubble needs <span className="font-semibold text-foreground">Display over
                 other apps</span> so it can draw on top of the game. That permission lets it put
-                pixels on your screen. It does not let it read your screen, and Android does not
-                let one app read another&apos;s display at all.
+                pixels on your screen; it does not let it read them.
+              </p>
+              <p>
+                Reading the screen is a separate thing, and it is off unless you turn it on.
+                Version 1.8 can scan the draft, and to do that Android makes you accept its own
+                screen-capture dialog — every time the app starts, because the system will not let
+                an app keep that permission — and shows a recording indicator for as long as a
+                session is open. One frame is read when you tap Scan, measured on your phone, and
+                dropped. It is never written to storage and never sent anywhere; what comes out of
+                it is a handful of brawler names.
               </p>
               <p>
                 The app has no account, collects nothing, and sends nothing anywhere. Its panel is
