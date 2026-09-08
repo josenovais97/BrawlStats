@@ -162,7 +162,7 @@ class BubbleService : Service() {
     override fun onCreate() {
         super.onCreate()
         windows = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        startForeground(NOTIFICATION_ID, buildNotification())
+        enterForeground(withProjection = false)
 
         /*
          * The permission is re-checked here, not just in the activity.
@@ -1165,15 +1165,9 @@ class BubbleService : Service() {
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            runCatching {
-                startForeground(
-                    NOTIFICATION_ID,
-                    buildNotification(),
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE or
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
-                )
-            }
+        if (!enterForeground(withProjection = true)) {
+            postScanState("failed")
+            return
         }
 
         val session = ScreenScan(this, handler)
@@ -1295,6 +1289,52 @@ class BubbleService : Service() {
         val js = pendingScanJs ?: return
         pendingScanJs = null
         runCatching { panelWeb?.evaluateJavascript(js, null) }
+    }
+
+    /**
+     * Enters the foreground with exactly the service type that is legal *now*.
+     *
+     * The two-argument `startForeground` infers the type from the manifest, and
+     * the manifest declares both — so the moment `mediaProjection` was added
+     * there, every ordinary start of the bubble began asking Android for a
+     * media-projection foreground service without holding a projection. API 34
+     * refuses that with a SecurityException, which killed the service inside
+     * the five seconds `startForegroundService` allows, which Android reports
+     * as the app crashing. It shipped in 1.8 and made the app unusable: the
+     * bubble could not start at all, whether or not anyone wanted to scan.
+     *
+     * So the type is always passed explicitly, and `mediaProjection` is only
+     * ever claimed on the path where the user has just granted a capture token.
+     * A declared type is permission to ask for it, not a description of what
+     * the service is doing.
+     */
+    private fun enterForeground(withProjection: Boolean): Boolean {
+        val notification = buildNotification()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return runCatching { startForeground(NOTIFICATION_ID, notification) }.isSuccess
+        }
+
+        var types = ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        if (withProjection) types = types or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+
+        val ok = runCatching { startForeground(NOTIFICATION_ID, notification, types) }
+            .onFailure { Log.e(TAG, "startForeground(types=$types) refused", it) }
+            .isSuccess
+        if (ok || !withProjection) return ok
+
+        /*
+         * Promotion refused. Falling back to the plain type keeps the bubble
+         * alive with scanning unavailable, which is the whole app minus one
+         * feature — the alternative is the service dying and taking the overlay
+         * with it.
+         */
+        return runCatching {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+            )
+        }.isSuccess
     }
 
     private fun buildNotification(): Notification {

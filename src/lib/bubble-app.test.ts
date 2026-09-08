@@ -49,5 +49,8 @@ test('the version name and code move together', () => {
   // Android compares versionCode, not versionName: shipping a new name with a
   // stale code produces an APK the phone refuses to install as an update.
   assert.ok(BUBBLE_APP.versionCode >= 1);
-  assert.match(BUBBLE_APP.version, /^\d+\.\d+$/);
+  // A patch segment is allowed: 1.8.1 was a same-day fix for a 1.8 that
+  // crashed on launch, and a scheme that cannot express that pushes a
+  // bug fix into looking like a feature release.
+  assert.match(BUBBLE_APP.version, /^\d+\.\d+(\.\d+)?$/);
 });

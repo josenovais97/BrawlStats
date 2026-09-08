@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 18
-    versionName = "1.8"
+    versionCode = 19
+    versionName = "1.8.1"
   }
 
   signingConfigs {
