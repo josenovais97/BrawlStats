@@ -479,10 +479,18 @@ function BrawlerPicker({
   return (
     <div className="card space-y-1.5 p-2">
       <div className="flex items-center gap-1.5">
+        {/*
+          No autoFocus, and that single word was most of the problem.
+          
+          Focusing on open raised the keyboard the instant the picker appeared,
+          which covered the shortlist that exists precisely so most picks need
+          no typing — the fast path was hidden by the slow one before the reader
+          could see it. The field is still there for the pick that surprises
+          you; it just waits to be asked for.
+        */}
         <input
           type="search"
           value={query}
-          autoFocus
           onChange={(e) => onQuery(e.target.value)}
           placeholder={`Add to ${label}…`}
           className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-brand/50"
@@ -501,8 +509,8 @@ function BrawlerPicker({
       {/* The shortlist, hidden the moment a search narrows things itself. */}
       {!searching && likely.length > 0 ? (
         <>
-          <p className="px-0.5 text-[9px] font-bold uppercase tracking-wide text-muted">
-            Likely here
+          <p className="px-0.5 text-[9px] font-bold uppercase tracking-wide text-brand">
+            Likely here — tap one
           </p>
           <div className="flex flex-wrap gap-1">
             {likely.map((b) => (
