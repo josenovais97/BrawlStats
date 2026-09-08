@@ -97,6 +97,33 @@ fi
 
 git reset --hard --quiet origin/main
 
+# Schema before build, because the build reads the schema.
+#
+# From 2026-08-25 to 2026-09-08 this script had NO migrate step at all, and
+# nothing else on the box ran one. `daily_reports` was added to the repo on
+# 2 September and never existed in production: /daily writes each day's findings
+# to it on render and swallows its own errors -- correctly, since a broken
+# archive must not take down the page -- so the site looked completely healthy
+# while the archive stayed empty for a week. Nothing in a deploy, a health check
+# or a log said a word about it.
+#
+# It runs BEFORE `docker compose up --build` because pages with `revalidate` and
+# no dynamic segment are PRERENDERED during the build (trap 6). A migration
+# applied afterwards would ship HTML rendered against the previous schema and
+# keep serving it until s-maxage expired.
+#
+# A failure is fatal rather than a warning: building against a schema that was
+# supposed to change is how you get a deploy that reports success and half
+# works. `migrate deploy` is a no-op when there is nothing pending, so this
+# costs a cached image build and a container start on an ordinary deploy.
+mig=$(mktemp)
+if ! docker compose build migrate >"$mig" 2>&1 || ! docker compose run --rm migrate >>"$mig" 2>&1; then
+  echo "Migrations FAILED -- not building, previous image still serving. Full output follows:"
+  cat "$mig"; rm -f "$mig"; exit 1
+fi
+grep -E "Applying migration|No pending migrations|migrations? found" "$mig" | head -20
+rm -f "$mig"
+
 build=$(mktemp); trap 'rm -f "$build"' EXIT
 start=$(date +%s)
 # Invalidates the build layer only when the month actually turns over, so an

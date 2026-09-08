@@ -97,7 +97,7 @@ app; a full 163s image build was run with it held, with no OOM kills. Health
 check 9 alerts if it stops, because losing it breaks nothing visible right up
 until the instance is stopped.
 
-## Six traps that cost real outages
+## Seven traps that cost real outages
 
 **1. `revalidate` does nothing without `generateStaticParams`.** A dynamic route
 that exports `revalidate` but no `generateStaticParams` is *not* ISR — Next
@@ -172,6 +172,25 @@ knowing before debugging anything similar:
 - **`.next/cache` is a named volume and survives rebuilds.** A fixed build
   keeps serving the old broken page until the volume is cleared or `s-maxage`
   expires.
+
+**7. Nothing applied migrations, and every caller hides that.** Moving off a
+PaaS quietly dropped the migrate step: Vercel ran `prisma migrate deploy` as
+part of its build, `auto-deploy.sh` never did, and no other timer on the box
+does either. `daily_reports` was added on 2026-09-02 and did not exist in
+production on 2026-09-08 — `/daily` writes each day's findings to it on render
+and every `lib/stats` read is wrapped in `swallow()`, so Prisma's "relation does
+not exist" went to a log nobody reads while the page rendered perfectly and the
+archive stayed empty for six days.
+
+That is the shape to watch for, not the one table. Errors are swallowed
+deliberately, so that one broken aggregate cannot take down a page that has
+nine working ones — which means **a missing table looks exactly like a quiet
+day**. The deploy now runs `docker compose run --rm migrate` (the `deps` stage,
+so the Prisma CLI is present) *before* the build, because the build prerenders
+pages against the schema; a failure there aborts the deploy rather than warning.
+Health check 10 compares `prisma/migrations` against the finished rows in
+`_prisma_migrations` independently, because a step that stops running never
+fails.
 
 ## Limits, and which defend themselves
 

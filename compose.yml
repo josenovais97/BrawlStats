@@ -139,6 +139,32 @@ services:
         max-size: "20m"
         max-file: "5"
 
+  # Schema migrations, run by auto-deploy.sh before every build.
+  #
+  # Built from the `deps` stage rather than `builder`: that stage already has
+  # node_modules (so the Prisma CLI, a dev dependency), prisma/migrations and
+  # prisma.config.ts, and it stops short of `next build` -- which is the point,
+  # because migrations have to land BEFORE the build prerenders pages against
+  # the schema. It is also a prefix of the app's own build, so on a normal
+  # deploy this service is entirely cache hits.
+  #
+  # No `secrets:` because the deps stage mounts none; DATABASE_URL arrives at
+  # run time from .env.production, over the compose network like every other
+  # service.
+  migrate:
+    build:
+      context: .
+      target: deps
+      # Matches the app's build so both share one set of cached layers.
+      network: host
+    profiles: ["tools"]
+    restart: "no"
+    env_file: .env.production
+    command: ["npx", "prisma", "migrate", "deploy"]
+    depends_on:
+      db:
+        condition: service_healthy
+
   # Batch sampler. Built from the `builder` stage because it needs tsx, the dev
   # dependencies and scripts/ -- none of which survive into the standalone
   # runtime image. Behind a profile so it never starts with the stack; a

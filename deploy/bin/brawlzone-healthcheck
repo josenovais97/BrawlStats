@@ -134,6 +134,22 @@ else
   [ "$memu" -ge 30 ] || problems+=("memory utilisation ${memu}%, too close to Oracle's 20% idle threshold")
 fi
 
+# 10. Is the database schema actually the one in the repo?
+#     auto-deploy.sh applies migrations now, but a schema that fell behind is
+#     invisible from outside: Prisma raises on the missing relation, the caller
+#     swallows it so one broken feature cannot take a page down, and the site
+#     serves 200s with a feature quietly doing nothing. That is exactly how
+#     `daily_reports` was missing for a week -- added to the repo on 2 September,
+#     never created, /daily archiving nothing and saying nothing.
+#
+#     Compares directory names against the rows Prisma marks finished, which is
+#     the same comparison `migrate deploy` makes, without needing its container.
+pending=$(cd /home/ubuntu/brawlstats && comm -23 \
+  <(ls prisma/migrations 2>/dev/null | grep -v migration_lock | sort) \
+  <(docker compose exec -T db sh -c 'psql -U $POSTGRES_USER -d $POSTGRES_DB -At -c "select migration_name from _prisma_migrations where finished_at is not null"' 2>/dev/null | sort) \
+  | wc -l)
+[ "$pending" -eq 0 ] || problems+=("$pending migration(s) in the repo have never been applied to the database")
+
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
 
 if [ ${#problems[@]} -eq 0 ]; then
