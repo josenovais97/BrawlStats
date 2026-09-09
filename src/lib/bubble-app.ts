@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.8.4',
+  version: '1.8.5',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 22,
+  versionCode: 23,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2663809,
-  sha256: '02082bfb9465b338bee6442d342d2cdedc3f068ff8d3ae4455392d67c9d8ca08',
+  size: 3371034,
+  sha256: '445cace1275bf54526c8b61b9fad45868ef99d97a3226319bb758112a9c1ffd6',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.8.5',
+    versionCode: 23,
+    date: '2026-09-09',
+    changes: [
+      'The map is read from the screen on the first scan, instead of only after you had confirmed it once.',
+      'A map it still cannot place falls back to the old behaviour — pick it once and it is remembered.',
+    ],
+  },
   {
     version: '1.8.4',
     versionCode: 22,

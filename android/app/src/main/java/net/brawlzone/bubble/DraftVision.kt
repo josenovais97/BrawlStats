@@ -85,6 +85,21 @@ class DraftVision(private val context: Context) {
         val PLATE_MODE = Region(0.1006f, 0.0306f, 0.1654f, 0.0500f)
         val PLATE_MAP = Region(0.1006f, 0.0833f, 0.1654f, 0.0389f)
 
+        /**
+         * Both lines together, for the text recogniser.
+         *
+         * One box rather than two: the recogniser groups by layout and does
+         * better with a whole plate than with a band cropped tight to one line,
+         * and the caller has to tell mode from map anyway — it matches each
+         * returned line against every known name rather than trusting the
+         * order, because a wrapped mode badge produces three lines, not two.
+         *
+         * Slightly wider and taller than the two bands it covers, because a
+         * glyph clipped at the edge is worth more to avoid than the background
+         * that padding lets in.
+         */
+        val PLATE_TEXT = Region(0.0950f, 0.0250f, 0.1850f, 0.1000f)
+
         /** Ban portraits: three down each flank of the team strip. */
         val BAN_X = floatArrayOf(0.1500f, 0.8641f)
         const val BAN_Y = 0.7222f
@@ -361,6 +376,9 @@ class DraftVision(private val context: Context) {
     }
 
     // ---- reading a frame ----------------------------------------------------
+
+    /** The plate crop the caller hands to the recogniser. */
+    fun plateRect(frame: Bitmap) = rect(frame, PLATE_TEXT)
 
     private fun rect(frame: Bitmap, r: Region) = android.graphics.Rect(
         (r.x * frame.width).roundToInt(),

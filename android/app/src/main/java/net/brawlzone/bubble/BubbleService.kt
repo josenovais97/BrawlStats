@@ -42,6 +42,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.abs
@@ -1099,6 +1102,16 @@ class BubbleService : Service() {
             preparing = true
             handler.post { postScanState("preparing") }
             Thread {
+                /*
+                 * Ask for the recogniser before it is needed.
+                 *
+                 * The text model is not in the APK — Play Services fetches it
+                 * on first use — so without this the very first scan is the one
+                 * that waits for a download, and the map it most needs to read
+                 * is the one it fails to. Touching the client here starts that
+                 * fetch while the portraits are downloading anyway.
+                 */
+                runCatching { TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) }
                 runCatching { v.prepare(ids) }
                     .onFailure { Log.w(TAG, "reference table failed", it) }
                 handler.post {
@@ -1279,13 +1292,78 @@ class BubbleService : Service() {
 
                 Thread {
                     val reading = runCatching { v.read(frame) }.getOrNull()
-                    handler.post { deliver(reading) }
+                    handler.post { readPlate(frame, v, reading) }
                 }.start()
             }
         }, HIDE_FOR_SCAN_MS)
     }
 
-    private fun deliver(reading: DraftVision.Reading?) {
+    /**
+     * Reads the mode and map off the plate, then delivers everything.
+     *
+     * The recogniser is the *first* answer for a map, not the only one. A plate
+     * the reader has already confirmed is matched as a picture — faster, exact,
+     * and needing no model — and this covers the case that path cannot: a map
+     * this install has never been shown, which before today meant every first
+     * scan on every map.
+     *
+     * Nothing is resolved here. The page holds the mode list and the Ranked
+     * rotation, so it decides what "SPIRALINQ OUTI" means; a second copy of that
+     * list in Kotlin would be a second thing to update whenever the pool turns
+     * over. This just reports the strings.
+     *
+     * Failure is ordinary. The model lives in Play Services and may not be
+     * there — on a sideloaded app it may never arrive — so a miss delivers no
+     * text and the learned-plate path carries on underneath.
+     */
+    private fun readPlate(frame: Bitmap, v: DraftVision, reading: DraftVision.Reading?) {
+        val rect = v.plateRect(frame)
+        val plate = runCatching {
+            Bitmap.createBitmap(
+                frame,
+                rect.left.coerceIn(0, frame.width - 1),
+                rect.top.coerceIn(0, frame.height - 1),
+                rect.width().coerceAtMost(frame.width - rect.left).coerceAtLeast(1),
+                rect.height().coerceAtMost(frame.height - rect.top).coerceAtLeast(1),
+            )
+        }.getOrNull()
+
+        if (plate == null) {
+            deliver(reading, emptyList())
+            return
+        }
+
+        val recognizer = runCatching {
+            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        }.getOrNull()
+        if (recognizer == null) {
+            plate.recycle()
+            deliver(reading, emptyList())
+            return
+        }
+
+        runCatching { recognizer.process(InputImage.fromBitmap(plate, 0)) }
+            .onSuccess { task ->
+                task.addOnSuccessListener { text ->
+                    val lines = text.textBlocks
+                        .flatMap { it.lines }
+                        .map { it.text.trim() }
+                        .filter { it.isNotEmpty() }
+                    plate.recycle()
+                    deliver(reading, lines)
+                }.addOnFailureListener {
+                    Log.w(TAG, "plate not recognised", it)
+                    plate.recycle()
+                    deliver(reading, emptyList())
+                }
+            }
+            .onFailure {
+                plate.recycle()
+                deliver(reading, emptyList())
+            }
+    }
+
+    private fun deliver(reading: DraftVision.Reading?, lines: List<String>) {
         scanning = false
         val payload = JSONObject()
         payload.put("ok", reading != null)
@@ -1296,6 +1374,7 @@ class BubbleService : Service() {
             payload.put("allies", slots(reading.allies))
             payload.put("enemies", slots(reading.enemies))
         }
+        payload.put("text", JSONArray(lines))
         postToPanel("window.brawlzone && window.brawlzone.scanResult($payload)")
         postScanState(if (scan?.live == true) "ready" else "idle")
     }

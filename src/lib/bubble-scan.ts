@@ -20,6 +20,8 @@ export interface ScanPayload {
   mode?: string | null;
   /** A map name the app has been shown before, or null. */
   map?: string | null;
+  /** Whatever the text recogniser read off the mode plate. */
+  text?: string[];
   bans?: (number | null)[];
   allies?: (number | null)[];
   enemies?: (number | null)[];
@@ -33,6 +35,67 @@ export interface ResolvedPlate<M extends NamedMap> {
   mode: string | null;
   map: M | null;
 }
+
+/**
+ * Comparable form of a name.
+ *
+ * The recogniser gets the letters right and the punctuation wrong: an
+ * apostrophe becomes a comma, a hyphen disappears, and spacing follows the
+ * kerning rather than the words. Stripping everything that is not a letter or a
+ * digit removes the whole class at once, and no two maps in the pool differ
+ * only by punctuation.
+ */
+export function normalise(value: string): string {
+  return value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+/** Levenshtein, single-row, because these strings are short. */
+function distance(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i += 1) {
+    const row = [i];
+    for (let j = 1; j <= b.length; j += 1) {
+      row[j] = Math.min(
+        prev[j] + 1,
+        row[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+    }
+    prev = row;
+  }
+  return prev[b.length];
+}
+
+/**
+ * How alike two names are, 0 to 1.
+ *
+ * A containment counts as a near-match on purpose: the plate crop is padded so
+ * no glyph is clipped, which lets a stray mark from the badge beside the text
+ * into the line. "SPIRALINGOUTI" is still Spiraling Out, and an edit-distance
+ * ratio alone punishes one extra character far more than it deserves on a short
+ * name.
+ */
+export function similarity(a: string, b: string): number {
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  if (a.includes(b) || b.includes(a)) return 0.95;
+  return 1 - distance(a, b) / Math.max(a.length, b.length);
+}
+
+/**
+ * Below this, a "match" is two unrelated words sharing some letters.
+ *
+ * Set against the shortest names in the pool: at 0.62 a four-letter map name
+ * still has to get three of its four characters right, which nothing else in
+ * the rotation does. Getting this wrong in the generous direction is the
+ * expensive one — a map chosen by mistake changes every number under it,
+ * whereas a refusal costs one tap.
+ */
+export const MIN_SIMILARITY = 0.62;
 
 /**
  * Turns what the app recognised into the panel's own mode and map.
@@ -69,6 +132,38 @@ export function resolvePlate<M extends NamedMap>(
     const found = modes.find((m) => m.key === payload.mode);
     if (found) mode = found.key;
   }
+
+  /*
+   * Then the recogniser, for a map this install has never been shown.
+   *
+   * Second, not first: a learned plate is an exact match on a picture the
+   * reader themselves confirmed, so it cannot be wrong about which map it is,
+   * whereas this is a best guess at some letters. When both have an opinion the
+   * confirmed one wins.
+   *
+   * Every line is tried against every map rather than assuming the plate's two
+   * lines arrive in order — the recogniser groups by layout, and a wrapped mode
+   * badge produces three lines. The map is what is matched on: map names are
+   * long and nearly unique, mode names are short and several share words.
+   */
+  if (map === null) {
+    const lines = (payload.text ?? []).map(normalise).filter((l) => l.length >= 3);
+    let bestScore = 0;
+    for (const m of modes) {
+      for (const candidate of m.maps) {
+        const target = normalise(candidate.mapName);
+        for (const line of lines) {
+          const score = similarity(line, target);
+          if (score >= MIN_SIMILARITY && score > bestScore) {
+            bestScore = score;
+            map = candidate;
+            mode = m.key;
+          }
+        }
+      }
+    }
+  }
+
   return { mode, map };
 }
 

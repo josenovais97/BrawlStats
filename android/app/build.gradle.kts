@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 22
-    versionName = "1.8.4"
+    versionCode = 23
+    versionName = "1.8.5"
   }
 
   signingConfigs {
@@ -74,6 +74,24 @@ dependencies {
   implementation("androidx.appcompat:appcompat:1.7.0")
 
   /*
+   * Text recognition, UNBUNDLED.
+   *
+   * The bundled recogniser reads the mode and map correctly and costs 11 MB of
+   * native pipeline per ABI -- it took this app from 2.6 MB to 46 MB, which is
+   * an absurd price for two words. This one is a thin client: the model lives
+   * in Play Services and is fetched once, on device, so the APK grows by about
+   * a megabyte instead of forty.
+   *
+   * The reason it was rejected first time was that a sideloaded app cannot
+   * assume Play Services. That is still true, and it is now handled rather than
+   * avoided: if the model never becomes available the plate simply is not read,
+   * and the learned-plate path underneath -- which needs no model at all -- is
+   * exactly the behaviour that shipped before this. Degrading to "what we had
+   * yesterday" is a fine failure mode; a 46 MB download is not.
+   */
+  implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+
+  /*
    * No OCR engine, deliberately.
    *
    * The mode and map ARE printed on the draft screen, and reading them with
@@ -81,7 +99,8 @@ dependencies {
    * app to 46 MB. That is an absurd price for two words, on an app people
    * download over mobile data from a page that calls it small.
    *
-   * The plate is matched as a picture instead, against crops learned the first
-   * time the reader confirms a map. See DraftVision.
+   * The plate is also matched as a picture, against crops learned the first
+   * time the reader confirms a map -- that path is faster, needs no model, and
+   * keeps working when the recogniser is unavailable. See DraftVision.
    */
 }
