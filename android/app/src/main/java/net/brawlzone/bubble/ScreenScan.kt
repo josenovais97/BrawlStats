@@ -100,14 +100,51 @@ class ScreenScan(
     }
 
     /**
-     * Grabs the most recent frame.
+     * Throws away every frame the display has already produced.
      *
-     * Retried on a delay rather than returned immediately, because a virtual
-     * display that was created moments ago has not necessarily produced a frame
-     * yet and `acquireLatestImage` answers null rather than waiting. The first
-     * scan after granting consent is exactly that case.
+     * The caller hides its own windows before scanning, and this is what makes
+     * that mean anything. `acquireLatestImage` returns the newest frame the
+     * reader is *holding*, not the newest the screen has shown — so a capture
+     * taken shortly after hiding an overlay happily returns a frame from before
+     * it was hidden, with the overlay still in it.
+     *
+     * That is not a subtle degradation. The panel covers the right-hand half of
+     * a landscape screen, which is exactly where the enemy picks and one team's
+     * bans are, so a stale frame reads the left half of the draft and reports
+     * the rest as empty — indistinguishable from "the matcher did not recognise
+     * them", which is what made this look like a recognition problem.
      */
-    fun capture(attempt: Int = 0, onFrame: (Bitmap?) -> Unit) {
+    private fun discardPending(r: ImageReader) {
+        while (true) {
+            val image = try {
+                r.acquireLatestImage()
+            } catch (e: Throwable) {
+                null
+            } ?: return
+            image.close()
+        }
+    }
+
+    /**
+     * Grabs a frame produced *after* this call.
+     *
+     * Drains first, then waits for the display to hand over something new, so
+     * what comes back is always the screen as it is now rather than as it was
+     * when the panel was still up. Retried on a delay because a virtual display
+     * answers null rather than blocking, and because the first scan after
+     * consent has no frames at all yet.
+     */
+    fun capture(onFrame: (Bitmap?) -> Unit) {
+        val r = reader
+        if (r == null || projection == null) {
+            onFrame(null)
+            return
+        }
+        discardPending(r)
+        awaitFresh(0, onFrame)
+    }
+
+    private fun awaitFresh(attempt: Int, onFrame: (Bitmap?) -> Unit) {
         val r = reader
         if (r == null || projection == null) {
             onFrame(null)
@@ -122,7 +159,7 @@ class ScreenScan(
             onFrame(null)
             return
         }
-        handler.postDelayed({ capture(attempt + 1, onFrame) }, RETRY_MS)
+        handler.postDelayed({ awaitFresh(attempt + 1, onFrame) }, RETRY_MS)
     }
 
     private fun grab(r: ImageReader): Bitmap? {
@@ -180,7 +217,8 @@ class ScreenScan(
 
     private companion object {
         const val TAG = "BrawlZoneScan"
-        const val MAX_ATTEMPTS = 8
+        /** ~1.2s of waiting for a fresh frame, which is far more than it takes. */
+        const val MAX_ATTEMPTS = 20
         const val RETRY_MS = 60L
     }
 }

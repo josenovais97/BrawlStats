@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.8.2',
+  version: '1.8.3',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 20,
+  versionCode: 21,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2663177,
-  sha256: '4598890888b038da75c1ac78f8e16797c36172292d5c69669ed60ed8226cb4f9',
+  size: 2662981,
+  sha256: '484b8186256e372b6cc74cee962fe25c3fc6812b61dd11db583cfdb19e1ca856',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.8.3',
+    versionCode: 21,
+    date: '2026-09-09',
+    changes: [
+      'Scanning read only half the draft. The frame was often captured before the panel had got out of the way, so the panel itself covered the enemy picks — it now waits for a frame taken after the overlay is hidden.',
+      'What the scan found now shows immediately, instead of staying hidden until you had picked the map by hand.',
+      'The panel says how many brawlers it read, so a scan that worked no longer looks like one that did nothing.',
+    ],
+  },
   {
     version: '1.8.2',
     versionCode: 20,

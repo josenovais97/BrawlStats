@@ -1458,15 +1458,17 @@ class BubbleService : Service() {
         const val COLLAPSE_MS = 170L
 
         /**
-         * How long the overlay stays hidden before the frame is grabbed.
+         * How long the overlay stays hidden before the frame is asked for.
          *
-         * Two things have to finish: the window manager has to compose a frame
-         * without our windows in it, and the virtual display has to hand that
-         * frame to the reader. One vsync would be enough for the first and is
-         * not reliably enough for the second, so this is four of them — still
-         * a blink, and the capture retries anyway if the frame is not there.
+         * The window manager has to compose at least one frame without our
+         * windows in it. This used to be 70ms and to *not* drain the reader
+         * first, so the frame that came back was routinely the one from before
+         * the panel was hidden — with the panel covering the enemy picks. The
+         * drain in `ScreenScan.capture` is what actually guarantees freshness
+         * now; this is just enough time that the first new frame is already the
+         * clean one, so the drain does not have to spin.
          */
-        const val HIDE_FOR_SCAN_MS = 70L
+        const val HIDE_FOR_SCAN_MS = 160L
         const val TAG = "BrawlZoneBubble"
 
         /**

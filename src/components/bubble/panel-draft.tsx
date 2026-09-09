@@ -344,14 +344,24 @@ export function PanelDraft({
      * is what makes the next line — pick it once and it is remembered — read as
      * an instruction rather than an apology.
      */
-    if (plate.map === null && plate.mode === null && found === 0) {
-      setScanNote('Nothing recognised yet. Pick the map below — it is remembered.');
+    /*
+     * Leads with what it read, not with what it wants.
+     *
+     * "Pick the map below" on its own reads as a refusal — the reader tapped
+     * Scan and got a instruction back, with no sign anything happened. Saying
+     * the count first makes the same sentence a report with a next step, and it
+     * is the only signal that the recognition side is working at all on a map
+     * the app has not been taught yet.
+     */
+    const read = found === 1 ? '1 brawler' : `${found} brawlers`;
+    if (plate.map === null && found === 0) {
+      setScanNote('Nothing recognised. Scan with the draft screen showing.');
     } else if (plate.map === null) {
-      setScanNote('Pick the map below. It is remembered for next time.');
+      setScanNote(`Read ${read}. Pick the map — it is remembered for next time.`);
     } else if (found === 0) {
       setScanNote(`${plate.map.mapName}. No brawlers read — tap them in.`);
     } else {
-      setScanNote(null);
+      setScanNote(`Read ${read} on ${plate.map.mapName}.`);
     }
   };
 
@@ -513,6 +523,8 @@ export function PanelDraft({
   }, [query, roster, picked]);
 
   const canScan = scanState !== 'unsupported';
+  const anythingPicked =
+    picked.bans.length + picked.allies.length + picked.enemies.length > 0;
 
   return (
     <div className="space-y-2">
@@ -629,7 +641,16 @@ export function PanelDraft({
         </>
       )}
 
-      {!map ? (
+      {/*
+        The board appears as soon as there is anything on it, map or no map.
+        
+        It used to be gated on the map alone, which made a successful scan look
+        like a failure: the app read the draft, the brawlers went into state,
+        and the panel showed "Pick the mode, then the map" over an empty space.
+        The one thing that proves the scan worked was the one thing hidden until
+        after the reader had done the work it was meant to save them.
+      */}
+      {!map && !anythingPicked ? (
         <p className="px-2 py-6 text-center text-xs leading-relaxed text-muted">
           Pick the mode, then the map you are drafting on.
         </p>
@@ -726,7 +747,14 @@ export function PanelDraft({
             />
           ) : null}
 
-          <Suggestions picks={picks} loading={loading} byId={byId} />
+          {map ? (
+            <Suggestions picks={picks} loading={loading} byId={byId} />
+          ) : (
+            <p className="px-2 py-3 text-center text-[11px] leading-relaxed text-muted">
+              Pick the mode and map above to score these picks — the app
+              remembers that map and fills it in on the next scan.
+            </p>
+          )}
         </>
       )}
     </div>
