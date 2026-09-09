@@ -2,7 +2,9 @@ package net.brawlzone.bubble
 
 import android.app.Activity
 import android.content.Intent
+import android.media.projection.MediaProjectionConfig
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
 
 /**
@@ -33,8 +35,23 @@ class ScanConsentActivity : Activity() {
             deny()
             return
         }
+        /*
+         * Ask for the whole display, explicitly.
+         *
+         * Android 14's dialog defaults to "Share one app", and a reader who
+         * accepts that default is asked to pick an app — at which point the
+         * capture shows that app rather than the screen. Choosing BrawlZone
+         * there would have the scanner photograph its own panel. Naming the
+         * default display removes the choice, so the dialog cannot be answered
+         * in a way that quietly breaks the feature.
+         */
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            manager.createScreenCaptureIntent(MediaProjectionConfig.createConfigForDefaultDisplay())
+        } else {
+            manager.createScreenCaptureIntent()
+        }
         @Suppress("DEPRECATION")
-        startActivityForResult(manager.createScreenCaptureIntent(), REQUEST)
+        startActivityForResult(intent, REQUEST)
     }
 
     @Deprecated("Single-shot consent; see the class comment.")
@@ -44,6 +61,8 @@ class ScanConsentActivity : Activity() {
         if (requestCode != REQUEST) return
 
         if (resultCode == RESULT_OK && data != null) {
+            // From now on the dialog can be got out of the way at bubble start.
+            ScanContract.rememberWanted(this)
             /*
              * `startForegroundService`, not `startService`. Granting capture is
              * the one moment the service is guaranteed to be running already —
@@ -61,6 +80,15 @@ class ScanConsentActivity : Activity() {
             deny()
             return
         }
+        /*
+         * Hand the screen back to whatever was in front.
+         *
+         * This dialog is often opened from the overlay while a match is on, and
+         * finishing alone would leave BrawlZone's task in the foreground with
+         * the game behind it. Backgrounding the task returns the reader to the
+         * draft they were in the middle of.
+         */
+        runCatching { moveTaskToBack(true) }
         finish()
         overridePendingTransition(0, 0)
     }

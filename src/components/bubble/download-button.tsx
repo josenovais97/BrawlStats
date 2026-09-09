@@ -32,12 +32,32 @@ export function DownloadButton({
   className?: string;
   children: ReactNode;
 }) {
+  /*
+   * No `download` attribute inside the app, and that is the whole difference
+   * between a working button and a dead one.
+   *
+   * Android's WebView does not implement the HTML5 `download` attribute. A link
+   * carrying it is not treated as a navigation, so `shouldOverrideUrlLoading`
+   * never fires, the service never gets to hand the URL to a browser, and the
+   * button silently does nothing — which is exactly what an out-of-date install
+   * saw when it tried to update itself from the panel's own banner.
+   *
+   * Without it the click is an ordinary navigation to the APK, which every app
+   * build since 1.5 already routes out to the browser. That matters more than
+   * it looks: this is a *page* change, so it fixes the button on installs that
+   * are already out there, which is precisely who is reading an update banner.
+   *
+   * The attribute stays everywhere else, where it names the saved file properly
+   * in a real browser.
+   */
+  const inApp = from === 'panel';
+
   return (
     <a
       href={BUBBLE_APP.path}
-      download
+      download={inApp ? undefined : ''}
       className={className}
-      onClick={() => {
+      onClick={(event) => {
         try {
           window.umami?.track('apk_download', {
             from,
@@ -45,6 +65,24 @@ export function DownloadButton({
           });
         } catch {
           // Analytics blocked or unavailable. Never a reason to stop a download.
+        }
+
+        /*
+         * In the app, ask the app. Belt to the braces above: newer builds
+         * expose a bridge that opens the URL with an Intent directly, which
+         * cannot be defeated by whatever a given WebView build decides a link
+         * means. Older builds have no bridge and fall through to the plain
+         * navigation, which is why both exist.
+         */
+        if (!inApp) return;
+        const bridge = (window as unknown as { BrawlZoneScan?: { openExternal?: (u: string) => void } })
+          .BrawlZoneScan;
+        if (typeof bridge?.openExternal !== 'function') return;
+        try {
+          bridge.openExternal(new URL(BUBBLE_APP.path, window.location.origin).toString());
+          event.preventDefault();
+        } catch {
+          // Leave the navigation to happen normally.
         }
       }}
     >

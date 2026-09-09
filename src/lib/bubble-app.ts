@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.8.5',
+  version: '1.9',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 23,
+  versionCode: 24,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3371034,
-  sha256: '445cace1275bf54526c8b61b9fad45868ef99d97a3226319bb758112a9c1ffd6',
+  size: 3371650,
+  sha256: 'b9873cd527bd1c27d53364f7fa6b4a8d73bb0062cf7485a1611739404d835e5a',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.9',
+    versionCode: 24,
+    date: '2026-09-09',
+    changes: [
+      'The screen-capture prompt no longer interrupts a match. Once you have allowed it, it is asked as the bubble starts instead of on your first scan.',
+      'The prompt can no longer be answered with "Share one app", which captured the wrong thing.',
+      'The Download button in the update notice works. It was a dead button inside the app.',
+    ],
+  },
   {
     version: '1.8.5',
     versionCode: 23,

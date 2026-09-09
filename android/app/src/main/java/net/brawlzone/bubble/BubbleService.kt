@@ -1128,6 +1128,22 @@ class BubbleService : Service() {
             }.start()
         }
 
+        /**
+         * Opens a URL outside the panel, by Intent.
+         *
+         * Exists because the panel cannot rely on what a WebView build decides
+         * a link means. The update banner's own Download button was dead for
+         * exactly that reason, and a button that cannot deliver an update is
+         * the worst one to leave broken — the people who see it are by
+         * definition running the version you are trying to replace.
+         */
+        @JavascriptInterface
+        fun openExternal(url: String) {
+            val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return
+            if (uri.scheme != "https") return
+            handler.post { openExternally(uri) }
+        }
+
         @JavascriptInterface
         fun enable() = handler.post { requestScanConsent() }
 
