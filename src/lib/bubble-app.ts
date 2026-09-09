@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.8.3',
+  version: '1.8.4',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 21,
+  versionCode: 22,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2662981,
-  sha256: '484b8186256e372b6cc74cee962fe25c3fc6812b61dd11db583cfdb19e1ca856',
+  size: 2663809,
+  sha256: '02082bfb9465b338bee6442d342d2cdedc3f068ff8d3ae4455392d67c9d8ca08',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.8.4',
+    versionCode: 22,
+    date: '2026-09-09',
+    changes: [
+      'Scanning recognised about one brawler in six. It now matches each brawler on the framing that suits it, and reads the picks on both teams.',
+      'Bans are still left blank rather than guessed at — the game draws them with artwork nothing public matches. Tap one in and it is remembered.',
+      'The update notice now says which version you have, so you can tell a real update from a stuck banner.',
+    ],
+  },
   {
     version: '1.8.3',
     versionCode: 21,

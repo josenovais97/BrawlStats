@@ -61,13 +61,39 @@ export function PanelUpdate({
    */
   const newer =
     running === null ? changes : changes.filter((r) => r.versionCode > running);
+
+  /*
+   * The name of what is installed, when the changelog still carries it.
+   * Older builds fall off the end of the list, and a bare code number means
+   * nothing to a reader, so this stays silent rather than showing "build 17".
+   */
+  const runningName =
+    running === null
+      ? null
+      : (changes.find((r) => r.versionCode === running)?.version ?? null);
   const lines = newer.flatMap((r) => r.changes).slice(0, 4);
 
   return (
     <section className="mb-2 overflow-hidden rounded-xl border border-brand/40 bg-brand/10">
       <div className="flex items-baseline justify-between gap-2 px-3 py-2">
+        {/*
+          Names both versions, not just the new one.
+          
+          "Version 1.8.3 is out" is unfalsifiable from the reader's side: they
+          have no way to see what they are running, so a banner that is telling
+          the truth and a banner that is stuck look identical. Someone who
+          updated to 1.8.2 an hour before 1.8.3 shipped reasonably reads a
+          correct banner as a bug, and there is nothing on screen to settle it.
+          Showing the installed version makes the whole thing checkable at a
+          glance — and if it ever really is stuck, that is visible too.
+        */}
         <p className="text-xs font-bold text-brand">
           Version {latestVersion} is out
+          {runningName ? (
+            <span className="ml-1.5 font-semibold text-muted">
+              — you have {runningName}
+            </span>
+          ) : null}
         </p>
         {/* Straight to the file. Sending someone to the download page from
             inside a 360dp overlay means hunting for a button in a window that

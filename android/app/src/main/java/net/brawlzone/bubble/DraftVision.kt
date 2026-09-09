@@ -99,37 +99,77 @@ class DraftVision(private val context: Context) {
         const val CARD_W = 0.0801f
         const val CARD_H = 0.1486f
 
-        /** Descriptor side. 32 is where accuracy stopped improving. */
-        const val N = 32
-
-        /*
-         * Query crops.
+        /**
+         * Descriptor side.
          *
-         * A card is not matched whole: the level badge sits over its top-left
-         * corner and a tick or a skull over the others, so the crop is pulled
-         * down and right of centre, away from all three. These numbers are the
-         * ones that scored 0.88 on a known card against a 0.23 runner-up; a
-         * wider search was tried and made things *worse*, because searching a
-         * large space over ninety candidates finds coincidences.
+         * 16 rather than 32, which is not a compromise: measured on real
+         * captures the two rank identically, and halving the side quarters both
+         * the memory and the work — which is what buys the reference variants
+         * below, and those are worth far more than the resolution was.
          */
-        val CARD_ZOOMS = floatArrayOf(0.60f, 0.65f, 0.70f, 0.75f)
-        const val CARD_FX = 0.55f
-        const val CARD_FY = 0.65f
+        const val N = 16
+
+        /**
+         * How a region is sampled: (zoom, centre x, centre y), all fractions.
+         *
+         * A card is not matched whole. The level badge sits over its top-left
+         * corner and a tick or a skull over the others, so the crops are pulled
+         * down and right, away from all three.
+         */
+        val CARD_QUERIES = arrayOf(
+            floatArrayOf(0.60f, 0.65f, 0.65f),
+            floatArrayOf(0.60f, 0.50f, 0.55f),
+            floatArrayOf(0.75f, 0.55f, 0.60f),
+            floatArrayOf(0.90f, 0.50f, 0.50f),
+        )
 
         /** A ban icon is already a tight head crop, so it is matched nearly whole. */
-        val BAN_ZOOMS = floatArrayOf(1.0f, 0.85f)
-        const val BAN_FX = 0.5f
-        const val BAN_FY = 0.5f
+        val BAN_QUERIES = arrayOf(
+            floatArrayOf(1.00f, 0.50f, 0.50f),
+            floatArrayOf(0.88f, 0.50f, 0.45f),
+            floatArrayOf(0.75f, 0.50f, 0.45f),
+        )
 
-        /** Reference zooms, because the downloaded art is not framed uniformly. */
-        val REF_ZOOMS = floatArrayOf(1.0f, 0.85f, 0.72f)
+        /**
+         * How each reference image is sampled — and this is the whole fix.
+         *
+         * The downloaded art is not framed consistently between brawlers: the
+         * best match for Rico's card sits at 70% zoom around a centre at
+         * x=0.65, not in the middle. One fixed reference crop therefore fits
+         * one brawler and mis-frames the rest, which is exactly what happened —
+         * the crop was tuned on Rico, Rico matched at 0.88, and almost nothing
+         * else cleared the gate. On a real draft that read one brawler out of
+         * six.
+         *
+         * Sampling every candidate at a spread of zooms and offsets lets each
+         * brawler be matched on the framing that actually suits it. Measured on
+         * two real captures the same cards go to 0.93 and 0.83 against
+         * runners-up of 0.57 and 0.45, while an empty card and a card the panel
+         * was covering stay under a 0.10 margin and are still refused.
+         *
+         * Twenty-four variants is about eight megabytes of descriptors for the
+         * whole roster at N=16, and a scan compares 48 crops against them in a
+         * few hundred milliseconds on a background thread.
+         */
+        val REF_ZOOMS = floatArrayOf(0.55f, 0.70f, 0.85f, 1.0f)
+        val REF_FX = floatArrayOf(0.40f, 0.50f, 0.65f)
+        val REF_FY = floatArrayOf(0.40f, 0.50f)
+        val REF_VARIANTS = REF_ZOOMS.size * REF_FX.size * REF_FY.size
 
-        /** Accept a match only this far clear of the field. */
-        const val MIN_SCORE = 0.40f
-        const val MIN_MARGIN = 0.10f
+        /**
+         * Accept a match only this far clear of the field.
+         *
+         * Raised with the variants, not despite them. A richer reference set
+         * lifts every score, including the wrong ones, so the bar has to move
+         * with it — the separation that matters is measured, not assumed: real
+         * picks clear 0.83 with margins past 0.35, and everything that should
+         * be refused sits under 0.10.
+         */
+        const val MIN_SCORE = 0.60f
+        const val MIN_MARGIN = 0.15f
 
         /** A learned crop is the same UI at the same size, so it should score high. */
-        const val MIN_SCORE_LEARNED = 0.55f
+        const val MIN_SCORE_LEARNED = 0.70f
 
         /**
          * Below this much variation a region is the empty "?" placeholder.
@@ -183,8 +223,12 @@ class DraftVision(private val context: Context) {
             if (refs.containsKey(id)) continue
             val file = File(dir, "$id.png")
             val bitmap = readArt(file, id) ?: continue
-            val variants = ArrayList<FloatArray>(REF_ZOOMS.size)
-            for (z in REF_ZOOMS) variants.add(describe(bitmap, centred(bitmap, z)))
+            val variants = ArrayList<FloatArray>(REF_VARIANTS)
+            for (z in REF_ZOOMS) {
+                for (fx in REF_FX) {
+                    for (fy in REF_FY) variants.add(describe(bitmap, sub(bitmap, z, fx, fy)))
+                }
+            }
             refs[id] = variants
             bitmap.recycle()
         }
@@ -219,11 +263,17 @@ class DraftVision(private val context: Context) {
         }
     }
 
-    private fun centred(bitmap: Bitmap, zoom: Float): android.graphics.Rect {
-        val side = (min(bitmap.width, bitmap.height) * zoom).roundToInt()
-        val cx = bitmap.width / 2
-        val cy = bitmap.height / 2
-        return android.graphics.Rect(cx - side / 2, cy - side / 2, cx + side / 2, cy + side / 2)
+    /** A sub-rectangle of a whole image, by zoom and centre, all fractions. */
+    private fun sub(bitmap: Bitmap, zoom: Float, fx: Float, fy: Float): android.graphics.Rect {
+        val side = (min(bitmap.width, bitmap.height) * zoom).roundToInt().coerceAtLeast(8)
+        val cx = (bitmap.width * fx).roundToInt()
+        val cy = (bitmap.height * fy).roundToInt()
+        return android.graphics.Rect(
+            max(0, cx - side / 2),
+            max(0, cy - side / 2),
+            min(bitmap.width, cx + side / 2),
+            min(bitmap.height, cy + side / 2),
+        )
     }
 
     // ---- descriptors --------------------------------------------------------
@@ -328,14 +378,14 @@ class DraftVision(private val context: Context) {
         for (side in BAN_X) {
             for (i in 0 until 3) {
                 val r = Region(side, BAN_Y + i * BAN_PITCH, BAN_SIZE_X, BAN_SIZE_Y)
-                bans.add(identify(frame, rect(frame, r), BAN_ZOOMS, BAN_FX, BAN_FY))
+                bans.add(identify(frame, rect(frame, r), BAN_QUERIES))
             }
         }
         val allies = ALLY_X.map { x ->
-            identify(frame, rect(frame, Region(x, CARD_Y, CARD_W, CARD_H)), CARD_ZOOMS, CARD_FX, CARD_FY)
+            identify(frame, rect(frame, Region(x, CARD_Y, CARD_W, CARD_H)), CARD_QUERIES)
         }
         val enemies = ENEMY_X.map { x ->
-            identify(frame, rect(frame, Region(x, CARD_Y, CARD_W, CARD_H)), CARD_ZOOMS, CARD_FX, CARD_FY)
+            identify(frame, rect(frame, Region(x, CARD_Y, CARD_W, CARD_H)), CARD_QUERIES)
         }
         return Reading(
             recall(frame, PLATE_MODE, PLATE_MODE_KEY),
@@ -357,15 +407,13 @@ class DraftVision(private val context: Context) {
     private fun identify(
         frame: Bitmap,
         region: android.graphics.Rect,
-        zooms: FloatArray,
-        fx: Float,
-        fy: Float,
+        queries: Array<FloatArray>,
     ): Slot {
         if (region.width() < 8 || region.height() < 8) return Slot(null, 0f)
         if (detail(frame, region) < MIN_DETAIL) return Slot(null, 0f)
 
-        val queries = ArrayList<FloatArray>(zooms.size)
-        for (z in zooms) queries.add(describe(frame, crop(region, z, fx, fy)))
+        val qs = ArrayList<FloatArray>(queries.size)
+        for (q in queries) qs.add(describe(frame, crop(region, q[0], q[1], q[2])))
 
         var bestId = -1
         var best = -2f
@@ -375,10 +423,14 @@ class DraftVision(private val context: Context) {
             var s = -2f
             var learned = false
             for ((index, v) in variants.withIndex()) {
-                val value = queries.maxOf { score(it, v) }
+                var value = -2f
+                for (q in qs) {
+                    val x = score(q, v)
+                    if (x > value) value = x
+                }
                 if (value > s) {
                     s = value
-                    learned = index >= REF_ZOOMS.size
+                    learned = index >= REF_VARIANTS
                 }
             }
             if (s > best) {
@@ -532,16 +584,15 @@ class DraftVision(private val context: Context) {
             "enemies" -> Region(ENEMY_X.getOrElse(index) { return }, CARD_Y, CARD_W, CARD_H)
             else -> return
         }
-        val zooms = if (kind == "bans") BAN_ZOOMS else CARD_ZOOMS
-        val fx = if (kind == "bans") BAN_FX else CARD_FX
-        val fy = if (kind == "bans") BAN_FY else CARD_FY
+        val queries = if (kind == "bans") BAN_QUERIES else CARD_QUERIES
         val r = rect(frame, region)
         if (detail(frame, r) < MIN_DETAIL) return
 
-        val d = describe(frame, crop(r, zooms[0], fx, fy))
+        val q = queries[0]
+        val d = describe(frame, crop(r, q[0], q[1], q[2]))
         val list = refs.getOrPut(brawlerId) { ArrayList() }
         list.add(d)
-        while (list.size > REF_ZOOMS.size + MAX_LEARNED) list.removeAt(REF_ZOOMS.size)
+        while (list.size > REF_VARIANTS + MAX_LEARNED) list.removeAt(REF_VARIANTS)
         saveLearned(brawlerId, d)
     }
 
