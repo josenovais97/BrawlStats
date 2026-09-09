@@ -155,26 +155,18 @@ class MainActivity : AppCompatActivity() {
         startForegroundService(Intent(this, BubbleService::class.java))
 
         /*
-         * Get the screen-capture dialog over with here, while the reader is
-         * looking at this screen and no match is running.
+         * No screen-capture prompt here.
          *
-         * Android will not let an app keep that permission and has no
-         * user-grantable alternative — `CAPTURE_VIDEO_OUTPUT` is signature-level
-         * and a sideloaded app can never hold it — so the dialog is unavoidable
-         * once per app start. What is avoidable is *when*. Asked on the first
-         * scan it arrives mid-draft, takes Brawl Stars out of the foreground
-         * and costs the match, which had readers starting a screen recording
-         * before queueing as a workaround.
+         * 1.9 moved that prompt to this point so it would stop interrupting a
+         * match, which was right about the timing and wrong about the cost:
+         * once granted, it then fired on *every* start of the bubble, so the
+         * common case — opening a tier list — became a permission dialog. With
+         * scanning switched off it asks for a capability nothing will use.
          *
-         * Only for readers who have granted it before, so nobody is asked for
-         * screen capture on their first run just for opening a tier list. The
-         * consent activity backgrounds this task when it is done, so the flow
-         * still ends where `moveTaskToBack` used to leave it.
+         * If scanning comes back, this asks on demand again and the mid-match
+         * problem returns with it. The fix then is a choice on this screen, not
+         * a prompt nobody asked for.
          */
-        if (ScanContract.wanted(this)) {
-            startActivity(Intent(this, ScanConsentActivity::class.java))
-            return
-        }
         moveTaskToBack(true)
     }
 }

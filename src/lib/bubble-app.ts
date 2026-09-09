@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.9.2',
+  version: '1.9.3',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 26,
+  versionCode: 27,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.9.2.apk',
+  path: '/downloads/brawlzone-bubble-1.9.3.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -39,8 +39,8 @@ export const BUBBLE_APP = {
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3372846,
-  sha256: '02bc898ac7f8766acaff79c2798b3ae046ec56f6f798dea67257de706832a54b',
+  size: 3373482,
+  sha256: '1e91c5c88ea504db3f65bc262a822de42105169440c66e4ae1d26f710863a1af',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -72,6 +72,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.9.3',
+    versionCode: 27,
+    date: '2026-09-09',
+    changes: [
+      'Starting the bubble no longer asks to share your screen. That prompt fired on every start once it had been allowed.',
+      'The update download now opens the installer itself when it finishes, instead of relying on a notification that may be switched off.',
+    ],
+  },
   {
     version: '1.9.2',
     versionCode: 26,

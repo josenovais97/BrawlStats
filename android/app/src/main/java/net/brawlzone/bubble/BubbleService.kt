@@ -8,7 +8,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
+import android.content.BroadcastReceiver
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.Bitmap
@@ -239,6 +241,8 @@ class BubbleService : Service() {
     }
 
     override fun onDestroy() {
+        runCatching { installWatcher?.let { unregisterReceiver(it) } }
+        installWatcher = null
         scan?.release()
         scan = null
         lastFrame?.recycle()
@@ -1069,6 +1073,59 @@ class BubbleService : Service() {
         }
     }
 
+    /**
+     * Offers the finished download to the package installer.
+     *
+     * DownloadManager's own notification is the usual way in, and it is exactly
+     * the part that disappears when POST_NOTIFICATIONS is not granted — which
+     * is how this button "did nothing" while succeeding: the file arrived and
+     * nothing on screen ever mentioned it. So the app watches for its own
+     * download and opens the installer itself rather than relying on a
+     * notification the reader may never see.
+     *
+     * Unregistered as soon as it fires. A receiver kept alive for a download
+     * that already happened is a leak with a long memory.
+     */
+    private var installWatcher: BroadcastReceiver? = null
+
+    private fun watchForInstall(id: Long) {
+        runCatching { installWatcher?.let { unregisterReceiver(it) } }
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L) != id) return
+                runCatching { unregisterReceiver(this) }
+                installWatcher = null
+
+                val manager = getSystemService(DownloadManager::class.java) ?: return
+                val file = runCatching { manager.getUriForDownloadedFile(id) }.getOrNull()
+                if (file == null) {
+                    toast("Update downloaded — open it from your Downloads folder")
+                    return
+                }
+                val opened = runCatching {
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(file, "application/vnd.android.package-archive")
+                            .addFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                            ),
+                    )
+                    true
+                }.getOrElse { false }
+                if (!opened) toast("Update downloaded — open it from your Downloads folder")
+            }
+        }
+        installWatcher = receiver
+        runCatching {
+            registerReceiver(
+                receiver,
+                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+                Context.RECEIVER_EXPORTED,
+            )
+        }
+    }
+
     private fun downloadApk(uri: Uri): Boolean = runCatching {
         val manager = getSystemService(DownloadManager::class.java) ?: return false
         val name = uri.lastPathSegment ?: "brawlzone-bubble.apk"
@@ -1080,7 +1137,7 @@ class BubbleService : Service() {
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED,
             )
             .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
-        manager.enqueue(request)
+        watchForInstall(manager.enqueue(request))
         /*
          * Says where it went, not just that it started.
          *

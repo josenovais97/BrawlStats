@@ -18,6 +18,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--
+      Needed to hand a downloaded APK to the package installer ourselves.
+      Without it the app can fetch its own update and then not offer it, which
+      leaves the file sitting in Downloads with nothing pointing at it — the
+      shape the update button failed in more than once.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

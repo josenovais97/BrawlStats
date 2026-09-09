@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
+import { DownloadButton } from "@/components/bubble/download-button";
 import { type BubbleRelease } from "@/lib/bubble-app";
 
 /**
@@ -105,30 +106,31 @@ export function PanelUpdate({
             </span>
           ) : null}
         </p>
-        {/*
-          An instruction, not a button.
-          
-          There was a Download button here for four versions and it never once
-          worked on the reader's phone. Every attempt to fix it addressed a real
-          obstacle — the WebView ignoring the `download` attribute, Android
-          blocking an activity start from a service, a missing notification
-          permission hiding the completed download — and behind each was another
-          one. Meanwhile the file it fetched was a day-stale copy from cache, so
-          even the attempts that worked delivered the wrong build.
-          
-          A sentence naming the address cannot fail. It is worse than a working
-          button and far better than a broken one, and after this many rounds
-          the honest thing is to stop offering the control and say where to go.
-        */}
-        <span className="shrink-0 text-[11px] font-semibold text-muted">
-          brawlzone.net/bubble
-        </span>
+        {/* Straight to the file; the address below is the fallback. */}
+        <DownloadButton
+          from="panel"
+          className="shrink-0 rounded-lg bg-brand px-2.5 py-1 text-[11px] font-bold text-brand-ink"
+        >
+          Download
+        </DownloadButton>
       </div>
 
+      {/*
+        The address stays, under the button rather than instead of it.
+        
+        The button has failed on a real phone more than once and each failure
+        was silent, so the reader needs a route that cannot fail even when the
+        one above does. The filename carries the version, which is how you can
+        tell a fresh download from a cached one before installing it — the thing
+        that would have caught a day of stale updates.
+      */}
       <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
-        Open that page in your browser to update. The file is named for its
-        version, so you can see which build you are getting before you install
-        it.
+        If nothing happens, open{" "}
+        <span className="font-semibold text-foreground">
+          brawlzone.net/bubble
+        </span>{" "}
+        in your browser. Either way the file is named for its version, so you
+        can check what you are installing.
       </p>
 
       {lines.length > 0 ? (
