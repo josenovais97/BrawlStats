@@ -1,3 +1,4 @@
+import { BUBBLE_APP } from './src/lib/bubble-app';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -14,23 +15,53 @@ const nextConfig: NextConfig = {
    * hand the file to the package installer rather than the file manager, and
    * `Content-Disposition` keeps the filename intact through any redirect.
    *
-   * The path is versionless by design — a new build overwrites it — so the
-   * cache is a day rather than immutable: long enough not to re-fetch 2.5 MB
-   * for every visit to the page, short enough that a new release reaches
-   * people without anyone having to bust a URL.
+   * The URL carries the version, and the cache rule follows from that.
+   *
+   * It used to be one versionless path that every  release overwrote, served with
+   * `max-age=86400`. The reasoning written here was that a day is "short enough
+   * that a new release reaches people without anyone having to bust a URL",
+   * and it was wrong in the only way that mattered: a day is enormous when six
+   * releases ship in one, and a client that had the old bytes kept serving them
+   * to itself. Updates installed the previous build. Four releases of fixes
+   * were reported as not working, because the binary carrying them never
+   * arrived — while the page around it redeployed in minutes and announced the
+   * new version as installed.
+   *
+   * A versioned URL cannot answer with the wrong bytes, so it can be cached
+   * hard. The old address is a redirect that is never cached, so anything
+   * holding a stale bookmark lands on the current release instead of a stale
+   * copy of it.
    */
   async headers() {
     return [
       {
-        source: '/downloads/brawlzone-bubble.apk',
+        source: '/downloads/:file(brawlzone-bubble-.*\\.apk)',
         headers: [
           { key: 'Content-Type', value: 'application/vnd.android.package-archive' },
-          {
-            key: 'Content-Disposition',
-            value: 'attachment; filename="brawlzone-bubble.apk"',
-          },
-          { key: 'Cache-Control', value: 'public, max-age=86400' },
+          { key: 'Content-Disposition', value: 'attachment' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
+      },
+      {
+        source: '/downloads/brawlzone-bubble.apk',
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      },
+    ];
+  },
+
+  /**
+   * The versionless address, kept working for links already in the world.
+   *
+   * Temporary rather than permanent on purpose: it points at whatever the
+   * current release is, so it must never be the kind of redirect a browser is
+   * entitled to remember.
+   */
+  async redirects() {
+    return [
+      {
+        source: '/downloads/brawlzone-bubble.apk',
+        destination: BUBBLE_APP.path,
+        permanent: false,
       },
     ];
   },

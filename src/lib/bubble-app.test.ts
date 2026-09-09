@@ -45,6 +45,18 @@ test('the published SHA-256 matches the file', () => {
   );
 });
 
+test('the download URL carries the version', () => {
+  // A versionless URL cached for a day is how four releases of fixes reached
+  // nobody: phones kept serving themselves the previous build. A new release
+  // has to be a new address, or a cache is entitled to answer with old bytes.
+  assert.ok(
+    BUBBLE_APP.path.includes(BUBBLE_APP.version),
+    `BUBBLE_APP.path (${BUBBLE_APP.path}) must contain ${BUBBLE_APP.version}, ` +
+      'or an updated APK is served from a URL that already has a cached answer.',
+  );
+  assert.notEqual(BUBBLE_APP.path, BUBBLE_APP.legacyPath);
+});
+
 test('the version name and code move together', () => {
   // Android compares versionCode, not versionName: shipping a new name with a
   // stale code produces an APK the phone refuses to install as an update.

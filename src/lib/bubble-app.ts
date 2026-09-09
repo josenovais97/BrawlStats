@@ -15,9 +15,29 @@ export const BUBBLE_APP = {
   version: '1.9.2',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
   versionCode: 26,
-  /** Served from this origin rather than a third party, so the download and
-   *  the site people already trust come from the same place. */
-  path: '/downloads/brawlzone-bubble.apk',
+  /**
+   * Served from this origin rather than a third party, so the download and the
+   * site people already trust come from the same place.
+   *
+   * **The version is in the filename, and that is not cosmetic.** This used to
+   * be one versionless path that each release overwrote, cached for a day. A
+   * day is a long time when six releases ship in one: a phone that had fetched
+   * the APK kept serving itself the copy it already had, so every update
+   * installed the previous build. Fixes were reported as not working because
+   * the binary carrying them never arrived — through four releases, while the
+   * page around it updated instantly and said the new version was installed.
+   *
+   * A new release is now a new URL, which no cache can answer with the wrong
+   * bytes. Bump this with `version` and `versionCode`; the test below fails if
+   * the file at this path is not the one whose checksum is published.
+   */
+  path: '/downloads/brawlzone-bubble-1.9.2.apk',
+
+  /**
+   * The old versionless address, kept for links and QR codes already in the
+   * world. Redirected to `path` and never cached — see `next.config.ts`.
+   */
+  legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
   size: 3372846,
   sha256: '02bc898ac7f8766acaff79c2798b3ae046ec56f6f798dea67257de706832a54b',
