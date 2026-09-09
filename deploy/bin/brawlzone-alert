@@ -37,6 +37,47 @@ log=/var/log/brawlzone/alert.log
 
 command -v msmtp >/dev/null || { echo "msmtp missing; dropped: $subject" >&2; exit 0; }
 
+# A log this process cannot write must never stop the mail.
+#
+# `2>>"$log"` on the pipeline below is opened by the SHELL, before msmtp runs.
+# If that open fails the whole command fails to start: msmtp never executes, the
+# printfs upstream die on EPIPE, and the alert is dropped without a word.
+#
+# That is not hypothetical. alert.log is root-owned 0644 and the health timer
+# runs as `ubuntu`, so every alert the health check has ever raised was thrown
+# away at this line -- including "disk at 97%" on 2026-09-09, four hours before
+# a full disk killed Postgres. The one job whose entire purpose is to tell you
+# something is broken could not tell you anything, and it failed silently, which
+# is the only way a monitor can fail that nobody notices.
+#
+# So the log is now best-effort and the mail is not. Losing a log line costs a
+# record of an alert that was still delivered; losing the alert costs the site.
+if ! { : >>"$log"; } 2>/dev/null; then
+  echo "alert log $log is not writable; sending anyway" >&2
+  log=/dev/null
+fi
+
+# Which msmtp config this process can actually read.
+#
+# The system one is 0600 root:root and has to stay that way: msmtp refuses any
+# config carrying a password that is readable by group or other, so loosening it
+# does not make it usable, it makes it rejected. The timers run as `ubuntu`, so
+# that user keeps its own copy — same box, same admin, and `ubuntu` can sudo-read
+# the original regardless, so this duplicates a secret rather than exposing one.
+#
+# Checked rather than assumed, because getting it wrong is silent: msmtp exits
+# non-zero, the alert is logged as FAILED, and nothing else notices that the
+# thing which reports failures is the thing failing.
+MSMTPRC=/etc/brawlzone/msmtprc
+if [ ! -r "$MSMTPRC" ]; then
+  MSMTPRC="${HOME:-/home/ubuntu}/.msmtprc"
+fi
+if [ ! -r "$MSMTPRC" ]; then
+  echo "no readable msmtp config; dropped: $subject" >&2
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  NO CONFIG, dropped: $subject" >> "$log"
+  exit 0
+fi
+
 {
   printf 'From: BrawlZone <%s>\n' "$SMTP_USER"
   printf 'To: %s\n' "$TO"
@@ -49,7 +90,7 @@ command -v msmtp >/dev/null || { echo "msmtp missing; dropped: $subject" >&2; ex
     printf 'Content-Type: text/plain; charset=utf-8\n\n'
     printf '%s\n\n-- \n%s at %s\n' "$body" "$host" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   fi
-} | msmtp --file=/etc/brawlzone/msmtprc "$TO" 2>>"$log" \
+} | msmtp --file="$MSMTPRC" "$TO" 2>>"$log" \
   && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  sent: $subject" >> "$log" \
   || echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)  FAILED to send: $subject" >> "$log"
 exit 0
