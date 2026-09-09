@@ -60,7 +60,28 @@ export function PanelUpdate({
   if (hash === null) return null;
 
   const running = parseVersion(hash);
-  if (running !== null && running >= latestVersionCode) return null;
+
+  /*
+   * Up to date still says so, quietly.
+   *
+   * Rendering nothing was the tidier choice and it cost days. Version drift is
+   * invisible from inside the app — the panel is a web page that updates itself
+   * on every deploy, so its bug fixes appear instantly while the APK's do not,
+   * and a reader testing a fix they have not installed sees new wording around
+   * old behaviour. "Nothing changed" then means "I am on the old build", and
+   * there is no way to tell from the screen.
+   *
+   * One line of 10px text ends that. It is the answer to "am I testing what I
+   * think I am testing", which is the first question worth asking whenever a
+   * fix appears not to have worked.
+   */
+  if (running !== null && running >= latestVersionCode) {
+    return (
+      <p className="mb-1.5 px-1 text-right text-[10px] text-muted/70">
+        App {latestVersion} · up to date
+      </p>
+    );
+  }
 
   /*
    * Only what this reader has not got. Someone on 1.3 does not need to be told
