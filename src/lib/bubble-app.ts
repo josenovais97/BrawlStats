@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.9',
+  version: '1.9.1',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 24,
+  versionCode: 25,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3371650,
-  sha256: 'b9873cd527bd1c27d53364f7fa6b4a8d73bb0062cf7485a1611739404d835e5a',
+  size: 3372482,
+  sha256: '114b6a4c53a68958cc7d01bae54eb565106088871b3e5518fc0efb0c469b2522',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.9.1',
+    versionCode: 25,
+    date: '2026-09-09',
+    changes: [
+      'Allowing screen sharing could ask again, and again, forever. Android was destroying the permission screen before it could receive your answer.',
+      'A second scan sometimes did nothing at all. One scan that never finished left the button jammed for the rest of the session.',
+      'The Download button in this notice finally downloads. Every version until now was blocked by Android from opening it, silently.',
+    ],
+  },
   {
     version: '1.9',
     versionCode: 24,

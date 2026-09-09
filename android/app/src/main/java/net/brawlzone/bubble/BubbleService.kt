@@ -3,6 +3,7 @@ package net.brawlzone.bubble
 import android.animation.ValueAnimator
 import android.app.Notification
 import android.app.NotificationChannel
+import android.app.DownloadManager
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -17,6 +18,7 @@ import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
+import android.os.Environment
 import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
@@ -42,6 +44,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -121,6 +124,29 @@ class BubbleService : Service() {
     private var lastFrame: Bitmap? = null
 
     private var scanning = false
+
+    /**
+     * Forces a stuck scan to end.
+     *
+     * `scanning` gates every later scan, and it was cleared in exactly two
+     * places: a null frame, and delivery. Delivery is behind the text
+     * recogniser's callback, and that callback is not guaranteed — Play
+     * Services may still be fetching the model, or never produce it at all — so
+     * one scan that never came back left the flag set and every scan after it
+     * returned silently at the top of `runScan`. Scan once, it works; scan
+     * again mid-draft, nothing happens and nothing says why.
+     *
+     * A flag whose only clear path runs inside someone else's callback needs a
+     * way out that does not.
+     */
+    private val scanWatchdog = Runnable {
+        if (!scanning) return@Runnable
+        Log.w(TAG, "scan did not finish in time; releasing")
+        deliver(pendingReading, emptyList())
+    }
+
+    /** What the vision pass read, held while the recogniser is still running. */
+    private var pendingReading: DraftVision.Reading? = null
 
     /**
      * Set while the reference table is being built, and whether a scan is
@@ -1005,13 +1031,65 @@ class BubbleService : Service() {
      * and an overlay left floating over it is exactly the behaviour that makes
      * people uninstall this class of app.
      */
+    /**
+     * Sends a link somewhere it can actually be dealt with.
+     *
+     * The APK goes to DownloadManager, and that is the fix for a button that
+     * had been dead through three releases. `startActivity` from a *service* is
+     * a background activity launch, and Android blocks those — silently. No
+     * exception, nothing to catch, nothing in this app's log: the panel closed
+     * and absolutely nothing else happened, which is exactly what the reader
+     * described. Removing the `download` attribute from the link got the click
+     * this far and no further, because the wall was never in the WebView.
+     *
+     * DownloadManager needs no activity and no permission for the public
+     * Downloads folder. It fetches in the background, puts a real progress
+     * notification in the shade, and — with the APK mime type set — tapping
+     * that notification opens the installer. That is the same path a download
+     * from the site takes, which is the workaround this replaces.
+     *
+     * Everything else still tries an activity, because a web link genuinely
+     * wants a browser, and a Toast says so either way: a control that has
+     * visibly done nothing is worse than one that failed out loud.
+     */
     private fun openExternally(uri: Uri) {
         collapsePanel()
-        runCatching {
-            startActivity(
-                Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+
+        val isApk = uri.lastPathSegment?.endsWith(".apk", ignoreCase = true) == true
+        if (isApk && downloadApk(uri)) return
+
+        val opened = runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            true
+        }.getOrElse { false }
+
+        if (!opened) {
+            Log.d(TAG, "no handler for $uri")
+            toast("Could not open that link")
+        }
+    }
+
+    private fun downloadApk(uri: Uri): Boolean = runCatching {
+        val manager = getSystemService(DownloadManager::class.java) ?: return false
+        val name = uri.lastPathSegment ?: "brawlzone-bubble.apk"
+        val request = DownloadManager.Request(uri)
+            .setTitle("BrawlZone update")
+            .setDescription("Tap when finished to install")
+            .setMimeType("application/vnd.android.package-archive")
+            .setNotificationVisibility(
+                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED,
             )
-        }.onFailure { Log.d(TAG, "no handler for " + uri) }
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
+        manager.enqueue(request)
+        toast("Downloading the update — tap the notification to install")
+        true
+    }.getOrElse {
+        Log.w(TAG, "download manager refused $uri", it)
+        false
+    }
+
+    private fun toast(message: String) {
+        handler.post { runCatching { Toast.makeText(this, message, Toast.LENGTH_LONG).show() } }
     }
 
     /**
@@ -1287,7 +1365,10 @@ class BubbleService : Service() {
         }
 
         scanning = true
+        pendingReading = null
         postScanState("busy")
+        handler.removeCallbacks(scanWatchdog)
+        handler.postDelayed(scanWatchdog, SCAN_TIMEOUT_MS)
 
         val hidden = panel
         hidden?.visibility = View.GONE
@@ -1300,6 +1381,7 @@ class BubbleService : Service() {
 
                 if (frame == null) {
                     scanning = false
+                    handler.removeCallbacks(scanWatchdog)
                     postScanState("failed")
                     return@capture
                 }
@@ -1308,7 +1390,12 @@ class BubbleService : Service() {
 
                 Thread {
                     val reading = runCatching { v.read(frame) }.getOrNull()
-                    handler.post { readPlate(frame, v, reading) }
+                    handler.post {
+                        // Held so the watchdog can still deliver the brawlers if
+                        // the recogniser never answers about the map.
+                        pendingReading = reading
+                        readPlate(frame, v, reading)
+                    }
                 }.start()
             }
         }, HIDE_FOR_SCAN_MS)
@@ -1380,7 +1467,12 @@ class BubbleService : Service() {
     }
 
     private fun deliver(reading: DraftVision.Reading?, lines: List<String>) {
+        // Whoever gets here first wins: the recogniser's callback, its failure
+        // handler, or the watchdog. The other two become no-ops.
+        if (!scanning) return
         scanning = false
+        pendingReading = null
+        handler.removeCallbacks(scanWatchdog)
         val payload = JSONObject()
         payload.put("ok", reading != null)
         if (reading != null) {
@@ -1564,6 +1656,16 @@ class BubbleService : Service() {
          * clean one, so the drain does not have to spin.
          */
         const val HIDE_FOR_SCAN_MS = 160L
+
+        /**
+         * How long a scan may take before it is cut loose.
+         *
+         * Generous, because the first scan on a fresh install can be waiting on
+         * Play Services to fetch the text model, and cutting that off early
+         * loses the map. Not unbounded, because the alternative is a flag that
+         * never clears and a Scan button that silently stops working.
+         */
+        const val SCAN_TIMEOUT_MS = 6000L
         const val TAG = "BrawlZoneBubble"
 
         /**

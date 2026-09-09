@@ -53,12 +53,19 @@
           Shows the screen-capture dialog and hands the result to the service.
           Excluded from recents because it is a dialog, not a screen, and a
           blank entry in the task switcher is just confusing.
+
+          Deliberately NOT android:noHistory. That flag finishes an activity as
+          soon as it stops being visible, and the system capture dialog covers
+          this one — so the activity was destroyed before its result arrived,
+          `onActivityResult` never ran, and granting permission did nothing.
+          The reader allowed it, was asked again, allowed it again, forever.
+          It finishes itself explicitly instead, which is what noHistory was
+          there to save and is worth doing by hand to keep the result.
         -->
         <activity
             android:name=".ScanConsentActivity"
             android:exported="false"
             android:excludeFromRecents="true"
-            android:noHistory="true"
             android:theme="@style/Theme.BrawlZone.Invisible" />
     </application>
 </manifest>

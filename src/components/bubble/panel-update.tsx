@@ -9,11 +9,19 @@ import { type BubbleRelease } from "@/lib/bubble-app";
  * The first build whose WebView can actually start a download.
  *
  * A WebView discards download requests unless the app sets a
- * `DownloadListener`, and 1.5 is where that was added. Below it the APK link is
- * a dead button through no fault of the page, so the notice says where to go
- * instead rather than offering a control that does nothing.
+ * `DownloadListener`, and 1.5 is where that was added. That turned out not to
+ * be enough: the listener handed the URL to the service, and `startActivity`
+ * from a service is a background activity launch, which Android blocks
+ * silently. The panel closed and nothing else happened, through every version
+ * up to 1.9. 1.9.1 stops needing an activity at all and downloads through
+ * DownloadManager.
+ *
+ * So this is the first build where the button genuinely works, and below it the
+ * notice says where to go instead rather than offering a control that does
+ * nothing. Bump it only for a version that has been seen to download on a real
+ * device — an optimistic number here is how a dead button stays hidden.
  */
-const DOWNLOADS_WORK_FROM = 15;
+const DOWNLOADS_WORK_FROM = 25;
 
 /**
  * Tells an out-of-date install that a newer app exists, and what is in it.
@@ -108,11 +116,13 @@ export function PanelUpdate({
 
       {running === null || running < DOWNLOADS_WORK_FROM ? (
         <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
-          On this version the button may do nothing — open{" "}
+          The button above does nothing on this version — Android blocks the
+          app from opening it. Open{" "}
           <span className="font-semibold text-foreground">
             brawlzone.net/bubble
           </span>{" "}
-          in your phone&apos;s browser instead. Updating fixes it.
+          in your browser and download from there. This is the last update that
+          needs it.
         </p>
       ) : null}
 
