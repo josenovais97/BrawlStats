@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.9.1',
+  version: '1.9.2',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 25,
+  versionCode: 26,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3372482,
-  sha256: '114b6a4c53a68958cc7d01bae54eb565106088871b3e5518fc0efb0c469b2522',
+  size: 3372846,
+  sha256: '02bc898ac7f8766acaff79c2798b3ae046ec56f6f798dea67257de706832a54b',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.9.2',
+    versionCode: 26,
+    date: '2026-09-09',
+    changes: [
+      'The app finally asks for notification permission. Without it the update download finished invisibly and the bubble\u2019s Stop control was hidden — both looked like features that did nothing.',
+      'The download now says which folder the file landed in, so it is findable even with notifications turned off.',
+    ],
+  },
   {
     version: '1.9.1',
     versionCode: 25,

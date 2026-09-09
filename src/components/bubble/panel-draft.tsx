@@ -164,6 +164,9 @@ export function PanelDraft({
    * position it went unread at. See `correctionIndex`.
    */
   const lastScan = useRef<ScanPayload | null>(null);
+  /* The same payload, as state, because diagnostics renders it and a ref read
+     during render is exactly the stale-value trap refs are warned about. */
+  const [lastPayload, setLastPayload] = useState<ScanPayload | null>(null);
 
   const byId = useMemo(
     () => new Map(roster.map((b) => [b.brawlerId, b])),
@@ -301,6 +304,7 @@ export function PanelDraft({
 
   const handleScan = (payload: ScanPayload) => {
     lastScan.current = payload;
+    setLastPayload(payload);
 
     if (!payload.ok) {
       setScanNote('Could not read the screen. Is the draft on screen?');
@@ -523,6 +527,44 @@ export function PanelDraft({
   }, [query, roster, picked]);
 
   const canScan = scanState !== 'unsupported';
+
+  /*
+   * What the app on the other side of this page actually is.
+   *
+   * Written after four releases of fixing bugs remotely and being told nothing
+   * changed each time. The panel is a web page and redeploys in minutes; the
+   * APK does not, so the two halves of a fix arrive at different times through
+   * the same window, and there was no way — from the screen — to tell a fix
+   * that did not work from a fix that was not installed.
+   *
+   * The page can answer that itself without an app update, which is the point:
+   * the bridge's method list is a fingerprint of the build behind it.
+   * `openExternal` only exists from 1.9, `learnPlate` from 1.8.4. So even an
+   * install too old to report anything useful about itself can be identified by
+   * what it can and cannot do.
+   */
+  const diagnostics = () => {
+    const w = window as unknown as { BrawlZoneScan?: Record<string, unknown> };
+    const bridge = w.BrawlZoneScan;
+    const methods = bridge
+      ? ['status', 'roster', 'enable', 'scan', 'stop', 'learn', 'learnPlate', 'openExternal']
+          .filter((m) => typeof bridge[m] === 'function')
+      : [];
+    const last = lastPayload;
+    return [
+      `app  ${window.location.hash || '(no version)'}`,
+      `scan ${scanState}`,
+      `api  ${bridge ? methods.join(',') : 'absent — not running in the app'}`,
+      last
+        ? `read map=${last.map ?? '-'} mode=${last.mode ?? '-'} text=${JSON.stringify(last.text ?? [])}`
+        : 'read (no scan yet)',
+      last
+        ? `slots bans=${JSON.stringify(last.bans ?? [])} you=${JSON.stringify(last.allies ?? [])} vs=${JSON.stringify(last.enemies ?? [])}`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+  };
   const anythingPicked =
     picked.bans.length + picked.allies.length + picked.enemies.length > 0;
 
@@ -567,6 +609,20 @@ export function PanelDraft({
               {scanNote ?? SCAN_NOTE[scanState]}
             </p>
           ) : null}
+          {/*
+            Collapsed, because it is for the two occasions it is needed: a fix
+            that appears not to have worked, and a scan that read the wrong
+            thing. Open, it is one screenshot that settles both.
+          */}
+          <details className="px-1">
+            <summary className="cursor-pointer text-[10px] text-muted/70">
+              Diagnostics
+            </summary>
+            <pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all rounded border border-border bg-surface p-1.5 text-[9px] leading-relaxed text-muted">
+              {diagnostics()}
+            </pre>
+          </details>
+
           {scanState === 'denied' ? (
             <p className="px-1 text-[10px] leading-snug text-muted">
               Android needs permission each time the app starts. Nothing is stored or sent —

@@ -1081,7 +1081,17 @@ class BubbleService : Service() {
             )
             .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
         manager.enqueue(request)
-        toast("Downloading the update — tap the notification to install")
+        /*
+         * Says where it went, not just that it started.
+         *
+         * The completion notification is the normal way to install what this
+         * just fetched, and it is invisible without POST_NOTIFICATIONS — which
+         * for anyone who declined that prompt is a download that finishes into
+         * silence. A Toast is not subject to it, so this names the folder: with
+         * notifications on it is redundant, and without them it is the only
+         * thing standing between the reader and the file.
+         */
+        toast("Downloading the update — it lands in your Downloads folder")
         true
     }.getOrElse {
         Log.w(TAG, "download manager refused $uri", it)

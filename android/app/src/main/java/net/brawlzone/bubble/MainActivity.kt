@@ -1,6 +1,8 @@
 package net.brawlzone.bubble
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -26,6 +28,11 @@ import androidx.appcompat.app.AppCompatActivity
  * margins were a third of their intended size on any modern display.
  */
 class MainActivity : AppCompatActivity() {
+
+    private companion object {
+        const val NOTIFICATIONS = 4210
+    }
+
 
     private lateinit var statusText: TextView
     private lateinit var statusDot: View
@@ -55,9 +62,43 @@ class MainActivity : AppCompatActivity() {
             append("choose \"Allow restricted settings\", then try again.")
         }
 
+        askForNotifications()
+
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
             stopService(Intent(this, BubbleService::class.java))
+        }
+    }
+
+    /**
+     * Asks for notifications, which this app needs more than it looks.
+     *
+     * Declared in the manifest since the beginning and never actually
+     * requested — and on Android 13 and up that means never granted, because it
+     * became a runtime permission. Two things break silently as a result, and
+     * both were reported as something else:
+     *
+     * The update download completes and shows nothing. DownloadManager delivers
+     * its progress and its "tap to install" through a notification, so with the
+     * permission missing the APK lands in Downloads and the reader sees no
+     * trace of it — which is indistinguishable from a button that did nothing,
+     * and was reported as exactly that.
+     *
+     * And the bubble's own ongoing notification is hidden, which is where the
+     * Stop control lives.
+     *
+     * Asked here rather than at first download: this screen is the one place
+     * the app is in the foreground with the reader's attention, and a
+     * permission prompt appearing over a game is the thing this app has spent
+     * several releases learning not to do.
+     */
+    private fun askForNotifications() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        if (granted) return
+        runCatching {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATIONS)
         }
     }
 
