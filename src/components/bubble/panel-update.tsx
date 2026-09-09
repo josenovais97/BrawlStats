@@ -2,26 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-import { DownloadButton } from "@/components/bubble/download-button";
 import { type BubbleRelease } from "@/lib/bubble-app";
-
-/**
- * The first build whose WebView can actually start a download.
- *
- * A WebView discards download requests unless the app sets a
- * `DownloadListener`, and 1.5 is where that was added. That turned out not to
- * be enough: the listener handed the URL to the service, and `startActivity`
- * from a service is a background activity launch, which Android blocks
- * silently. The panel closed and nothing else happened, through every version
- * up to 1.9. 1.9.1 stops needing an activity at all and downloads through
- * DownloadManager.
- *
- * So this is the first build where the button genuinely works, and below it the
- * notice says where to go instead rather than offering a control that does
- * nothing. Bump it only for a version that has been seen to download on a real
- * device — an optimistic number here is how a dead button stays hidden.
- */
-const DOWNLOADS_WORK_FROM = 25;
 
 /**
  * Tells an out-of-date install that a newer app exists, and what is in it.
@@ -124,28 +105,31 @@ export function PanelUpdate({
             </span>
           ) : null}
         </p>
-        {/* Straight to the file. Sending someone to the download page from
-            inside a 360dp overlay means hunting for a button in a window that
-            is not built for reading. */}
-        <DownloadButton
-          from="panel"
-          className="shrink-0 rounded-lg bg-brand px-2.5 py-1 text-[11px] font-bold text-brand-ink"
-        >
-          Download
-        </DownloadButton>
+        {/*
+          An instruction, not a button.
+          
+          There was a Download button here for four versions and it never once
+          worked on the reader's phone. Every attempt to fix it addressed a real
+          obstacle — the WebView ignoring the `download` attribute, Android
+          blocking an activity start from a service, a missing notification
+          permission hiding the completed download — and behind each was another
+          one. Meanwhile the file it fetched was a day-stale copy from cache, so
+          even the attempts that worked delivered the wrong build.
+          
+          A sentence naming the address cannot fail. It is worse than a working
+          button and far better than a broken one, and after this many rounds
+          the honest thing is to stop offering the control and say where to go.
+        */}
+        <span className="shrink-0 text-[11px] font-semibold text-muted">
+          brawlzone.net/bubble
+        </span>
       </div>
 
-      {running === null || running < DOWNLOADS_WORK_FROM ? (
-        <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
-          The button above does nothing on this version — Android blocks the
-          app from opening it. Open{" "}
-          <span className="font-semibold text-foreground">
-            brawlzone.net/bubble
-          </span>{" "}
-          in your browser and download from there. This is the last update that
-          needs it.
-        </p>
-      ) : null}
+      <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
+        Open that page in your browser to update. The file is named for its
+        version, so you can see which build you are getting before you install
+        it.
+      </p>
 
       {lines.length > 0 ? (
         <ul className="space-y-1 px-3 pb-2.5">

@@ -67,6 +67,24 @@ const THIN_SAMPLE = 30;
 const STORED_DRAFT = 'brawlzone.bubble.draft';
 
 /**
+ * Whether the panel offers to read the draft off the screen.
+ *
+ * Off, at the reader's request, after it cost more of their evenings than it
+ * saved. The recognition itself got there — brawlers on both teams, the map
+ * from the mode plate — but it was never reliable end to end, and most of the
+ * testing that proved it was tested against builds that had never reached the
+ * phone, because the APK was served from a URL cached for a day. Asking someone
+ * to keep retrying a feature while the thing under test is not the thing they
+ * installed is not a reasonable thing to ask.
+ *
+ * A switch rather than a deletion. Nothing about the draft board depends on it,
+ * the app side is inert with no caller, and the whole feature comes back by
+ * turning this to `true` — so this is a decision that can be revisited, not
+ * work that has to be done again.
+ */
+const SCAN_ENABLED = false;
+
+/**
  * What the Android build exposes when it can read the screen.
  *
  * Absent in a browser, and absent in app builds before 1.8, so every use is
@@ -275,6 +293,7 @@ export function PanelDraft({
    * comes out, and the panel already has it.
    */
   useEffect(() => {
+    if (!SCAN_ENABLED) return;
     const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
     if (!bridge) return;
 
@@ -526,7 +545,7 @@ export function PanelDraft({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, roster, picked]);
 
-  const canScan = scanState !== 'unsupported';
+  const canScan = SCAN_ENABLED && scanState !== 'unsupported';
 
   /*
    * What the app on the other side of this page actually is.
