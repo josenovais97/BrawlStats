@@ -260,6 +260,6 @@
             android:lineSpacingMultiplier="1.35"
             android:textColor="@color/muted"
             android:alpha="0.75"
-            android:text="The bubble cannot see which map you are on — Android does not let one app read another's screen. Pick your mode in the panel and it shows what is live right now." />
+            android:text="Tap Scan in the panel to read the draft off your screen — Android asks your permission each time the app starts, and the frame is read on your phone and dropped. You can always pick the mode and map by hand instead." />
     </LinearLayout>
 </ScrollView>

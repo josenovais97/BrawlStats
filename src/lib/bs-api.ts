@@ -52,13 +52,34 @@ interface FetchOptions {
   revalidate?: number;
   /** Cache tags, so a route can be revalidated on demand. */
   tags?: string[];
+  /**
+   * Whether the response may be written to Next's data cache.
+   *
+   * False for anything keyed on a player or club tag. Next files one cache
+   * entry per distinct URL and never bounds the directory, so a per-tag lookup
+   * is an unbounded write: on 2026-09-09 that directory held 211,787 player
+   * responses and 8.3 GB, the disk hit 100%, and Postgres died mid-checkpoint
+   * with "No space left on device" — the site served "not enough data" for
+   * five hours because a cache nobody was reading had eaten the database's
+   * disk.
+   *
+   * The tags are supplied by whoever is asking, so the set is exactly as large
+   * as the internet wants it to be. A crawler walking profile tags fills this
+   * as fast as it can fetch. There is nothing to cap it with, so it is off.
+   *
+   * Nothing is lost by that. Every route reading one of these is already fully
+   * dynamic — no `revalidate`, no `generateStaticParams` — because a profile is
+   * live data; the entries were being written for a second reader that never
+   * arrived.
+   */
+  persist?: boolean;
 }
 
 async function bsFetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
   const key = process.env.BRAWL_STARS_API_KEY;
   if (!key) throw new BrawlApiError('notConfigured');
 
-  const { revalidate = REVALIDATE_LIVE, tags } = options;
+  const { revalidate = REVALIDATE_LIVE, tags, persist = true } = options;
 
   let res: Response;
   try {
@@ -68,7 +89,11 @@ async function bsFetch<T>(path: string, options: FetchOptions = {}): Promise<T> 
         Accept: 'application/json',
       },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      next: { revalidate, ...(tags ? { tags } : {}) },
+      // `no-store` rather than `revalidate: 0`: the second still files an entry
+      // and then treats it as stale, which writes the file this is avoiding.
+      ...(persist
+        ? { next: { revalidate, ...(tags ? { tags } : {}) } }
+        : { cache: 'no-store' as const }),
     });
   } catch (err) {
     // Covers DNS failure, connection reset and the abort above.
@@ -133,28 +158,20 @@ function assertTag(tag: string): string {
 
 export function getPlayer(tag: string): Promise<BSPlayer> {
   const t = assertTag(tag);
-  return bsFetch<BSPlayer>(`/players/${t}`, {
-    revalidate: REVALIDATE_LIVE,
-    tags: [`player:${t}`],
-  });
+  // Unbounded key space; see FetchOptions.persist.
+  return bsFetch<BSPlayer>(`/players/${t}`, { persist: false });
 }
 
 export function getBattleLog(tag: string): Promise<BSBattleLog> {
   const t = assertTag(tag);
-  return bsFetch<BSBattleLog>(`/players/${t}/battlelog`, {
-    revalidate: REVALIDATE_LIVE,
-    tags: [`battlelog:${t}`],
-  });
+  return bsFetch<BSBattleLog>(`/players/${t}/battlelog`, { persist: false });
 }
 
 /* ---------------------------------- clubs --------------------------------- */
 
 export function getClub(tag: string): Promise<BSClub> {
   const t = assertTag(tag);
-  return bsFetch<BSClub>(`/clubs/${t}`, {
-    revalidate: REVALIDATE_LIVE,
-    tags: [`club:${t}`],
-  });
+  return bsFetch<BSClub>(`/clubs/${t}`, { persist: false });
 }
 
 /* -------------------------------- rankings -------------------------------- */

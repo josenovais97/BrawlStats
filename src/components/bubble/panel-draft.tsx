@@ -82,7 +82,15 @@ interface ScanBridge {
   learnPlate(modeKey: string | null, mapName: string | null): void;
 }
 
-type ScanState = 'unsupported' | 'idle' | 'ready' | 'busy' | 'preparing' | 'denied' | 'failed';
+type ScanState =
+  | 'unsupported'
+  | 'idle'
+  | 'ready'
+  | 'busy'
+  | 'preparing'
+  | 'denied'
+  | 'failed'
+  | 'noroster';
 
 /** What the scan button says, per state. */
 const SCAN_LABEL: Record<ScanState, string> = {
@@ -93,6 +101,20 @@ const SCAN_LABEL: Record<ScanState, string> = {
   preparing: 'Loading portraits…',
   denied: 'Scan draft',
   failed: 'Scan draft',
+  noroster: 'Scan draft',
+};
+
+/**
+ * Anything the reader has to do something about.
+ *
+ * Kept beside the labels so a state cannot be added without deciding what it
+ * says — the first version had no line for the case where the app has no
+ * portraits to match against, so the button read "Loading portraits…" forever
+ * and the panel never explained why.
+ */
+const SCAN_NOTE: Partial<Record<ScanState, string>> = {
+  failed: 'Could not read the screen. Try again with the draft on screen.',
+  noroster: 'Waiting for brawler data — reopen the panel in a moment.',
 };
 
 /**
@@ -528,8 +550,10 @@ export function PanelDraft({
             line that reads "ready" under a button labelled "Scan draft" is a
             row of a small screen spent on nothing.
           */}
-          {scanNote ? (
-            <p className="px-1 text-[10px] leading-snug text-muted">{scanNote}</p>
+          {scanNote ?? SCAN_NOTE[scanState] ? (
+            <p className="px-1 text-[10px] leading-snug text-muted">
+              {scanNote ?? SCAN_NOTE[scanState]}
+            </p>
           ) : null}
           {scanState === 'denied' ? (
             <p className="px-1 text-[10px] leading-snug text-muted">

@@ -119,6 +119,21 @@ class BubbleService : Service() {
 
     private var scanning = false
 
+    /**
+     * Set while the reference table is being built, and whether a scan is
+     * waiting on it.
+     *
+     * Without the second flag, tapping Scan before the portraits finished
+     * downloading set the button to "Loading portraits…" and left it there: the
+     * state was posted once, nothing re-posted it when the table became ready,
+     * and nothing retried the scan. The button was disabled for the rest of the
+     * session. That is what "scan does not work" looked like whenever the panel
+     * came up before the download did — including every time the site was
+     * serving an empty roster, which builds a table of nothing at all.
+     */
+    private var preparing = false
+    private var scanWhenReady = false
+
     /** The panel's WebView, so a scan result has somewhere to go. */
     private var panelWeb: WebView? = null
 
@@ -1051,25 +1066,51 @@ class BubbleService : Service() {
 
         /** "unsupported" on a build without capture, else idle/ready/busy. */
         @JavascriptInterface
-        fun status(): String = when {
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> "unsupported"
-            scanning -> "busy"
-            scan?.live == true -> "ready"
-            else -> "idle"
-        }
+        fun status(): String = statusNow()
 
         /** The roster, so the matcher knows which art to fetch. */
         @JavascriptInterface
         fun roster(json: String) {
+            val ids = try {
+                val array = JSONArray(json)
+                ArrayList<Int>(array.length()).apply {
+                    for (i in 0 until array.length()) add(array.getInt(i))
+                }
+            } catch (e: Throwable) {
+                Log.w(TAG, "roster rejected", e)
+                return
+            }
+
+            /*
+             * An empty roster is the panel telling us it has no data — the site
+             * was down, or the sampler has not run. Building a table from it
+             * would leave the matcher permanently not-ready with nothing to say
+             * about why, so it is refused loudly instead.
+             */
+            if (ids.isEmpty()) {
+                Log.w(TAG, "roster is empty; matcher not built")
+                handler.post { postScanState("noroster") }
+                return
+            }
+
+            val v = vision ?: DraftVision(this@BubbleService).also { vision = it }
+            if (v.ready || preparing) return
+
+            preparing = true
+            handler.post { postScanState("preparing") }
             Thread {
-                try {
-                    val array = JSONArray(json)
-                    val ids = ArrayList<Int>(array.length())
-                    for (i in 0 until array.length()) ids.add(array.getInt(i))
-                    val v = vision ?: DraftVision(this@BubbleService).also { vision = it }
-                    v.prepare(ids)
-                } catch (e: Throwable) {
-                    Log.w(TAG, "roster rejected", e)
+                runCatching { v.prepare(ids) }
+                    .onFailure { Log.w(TAG, "reference table failed", it) }
+                handler.post {
+                    preparing = false
+                    // Whoever tapped Scan while this was running gets their scan.
+                    if (scanWhenReady && v.ready) {
+                        scanWhenReady = false
+                        runScan()
+                    } else {
+                        scanWhenReady = false
+                        postScanState(if (v.ready) statusNow() else "failed")
+                    }
                 }
             }.start()
         }
@@ -1205,7 +1246,14 @@ class BubbleService : Service() {
         if (scanning) return
         val v = vision
         if (v == null || !v.ready) {
-            postScanState("preparing")
+            /*
+             * Not a dead end. The table is either being built right now or has
+             * not been asked for, and either way the answer is to remember that
+             * a scan is wanted rather than to disable the button until the
+             * panel is closed and reopened.
+             */
+            scanWhenReady = true
+            postScanState(if (preparing) "preparing" else "noroster")
             return
         }
 
@@ -1259,6 +1307,15 @@ class BubbleService : Service() {
             if (slot.brawlerId == null) out.put(JSONObject.NULL) else out.put(slot.brawlerId)
         }
         return out
+    }
+
+    /** The one place that decides what the button should say. */
+    private fun statusNow(): String = when {
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> "unsupported"
+        scanning -> "busy"
+        preparing -> "preparing"
+        scan?.live == true -> "ready"
+        else -> "idle"
     }
 
     private fun postScanState(state: String) {

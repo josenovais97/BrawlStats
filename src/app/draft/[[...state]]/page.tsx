@@ -59,17 +59,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export const revalidate = 3600;
-
 /*
- * Only the bare board is built ahead of time; every picked state renders on
- * first visit and is cached from then on. Returning a param rather than an
- * empty array is what prerenders `/draft` itself, which is the URL that is
- * linked, indexed and crawled.
+ * Rendered per request, and never written to disk.
+ *
+ * "Every picked state renders on first visit and is cached from then on" was
+ * the design, and it is wrong for the same reason trap 5 was wrong: the number
+ * of picked states is about 10^11, so "cached from then on" is an unbounded
+ * write. On 2026-09-09 that directory held **306,483 files and 18 GB** — a
+ * crawler ignoring `robots.txt` walking state to state, each visit leaving a
+ * page behind. It filled a 45 GB disk, Postgres died mid-checkpoint with "No
+ * space left on device", and the site served "not enough data" for five hours.
+ *
+ * The rate limiter in `proxy.ts` caps how fast that can happen; it does not
+ * stop it. At the four requests a second it allows, a cached-on-write draft
+ * route still lays down about 20 GB a day. A ceiling on rate does not bound a
+ * quantity that only grows.
+ *
+ * So the state pages cost CPU instead of disk, which is the resource that
+ * recovers on its own when the traffic stops. The reads behind them are all
+ * `cachedRead`-wrapped and keyed on bounded things — the map, the window — so
+ * a re-render is cache hits and a bit of assembly, not a fresh set of queries.
+ *
+ * The cost is that `/draft` itself is no longer prerendered either, since a
+ * route has one setting. That is one URL rendering on demand against warm
+ * caches, which is a trade worth making to stop the other 10^11.
  */
-export async function generateStaticParams() {
-  return [{ state: [] as string[] }];
-}
+export const dynamic = 'force-dynamic';
 
 /** How many candidates to show. */
 const CANDIDATES = 12;

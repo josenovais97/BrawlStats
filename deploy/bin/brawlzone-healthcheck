@@ -150,7 +150,29 @@ pending=$(cd /home/ubuntu/brawlstats && comm -23 \
   | wc -l)
 [ "$pending" -eq 0 ] || problems+=("$pending migration(s) in the repo have never been applied to the database")
 
+# The state is the SET of problems, not a yes/no.
+#
+# It used to be the single word `ok` or `failed`, and alerting only on the
+# transition out of `ok`. That is quiet while a known problem persists, which
+# was the point -- and it is also silent about every *new* problem that arrives
+# while an old one is open, which is not.
+#
+# On 2026-09-08 a deploy failed and left the state at `failed`. Overnight the
+# disk filled to 100%; check 3 saw it, added "disk at 97%" to the list, found
+# prev != ok and said nothing. Postgres died at 04:21 and the site served
+# "not enough data" until someone happened to look. The rule that exists to
+# stop repeat mail had swallowed the worst alert this box can raise.
+#
+# Comparing the sorted set keeps the anti-spam property exactly -- the same
+# problems on the next run are still silent -- while making an arriving problem
+# a change, which is what it is. Percentages are stripped from the key so a disk
+# creeping 91% -> 92% is the same problem rather than a new one every ten
+# minutes.
+# `${problems[@]:-}` because an empty array under `set -u` is an error on some
+# bash builds, and this runs before the empty case is handled.
+signature=$(printf '%s\n' "${problems[@]:-}" | sed 's/[0-9][0-9]*/N/g' | sort | tr '\n' ';')
 prev=$(cat "$STATE" 2>/dev/null || echo ok)
+
 
 if [ ${#problems[@]} -eq 0 ]; then
   # Say what was checked. A log that only records that something ran cannot
@@ -165,13 +187,13 @@ if [ ${#problems[@]} -eq 0 ]; then
   exit 0
 fi
 
-if [ "$prev" = "ok" ]; then
+if [ "$prev" != "$signature" ]; then
   { printf 'Health check failed at %s.\n\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     for p in "${problems[@]}"; do printf '  - %s\n' "$p"; done
     printf '\nContainers:\n'; (cd /home/ubuntu/brawlstats && docker compose ps 2>&1 | head -8)
   } | /usr/local/bin/brawlzone-alert "UNHEALTHY: ${problems[0]}"
 fi
-echo failed > "$STATE"
+echo "$signature" > "$STATE"
 # Exit 0: the alert is the output. A non-zero exit would also trip OnFailure
 # and send a second, less useful mail about the checker itself.
 exit 0

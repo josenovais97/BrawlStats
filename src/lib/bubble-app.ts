@@ -12,15 +12,15 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.8.1',
+  version: '1.8.2',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 19,
+  versionCode: 20,
   /** Served from this origin rather than a third party, so the download and
    *  the site people already trust come from the same place. */
   path: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2662073,
-  sha256: 'b23618f2c5e48c2123623dcf231a9b8a28f0e566f198c1d6d781e5b941a5314a',
+  size: 2663177,
+  sha256: '4598890888b038da75c1ac78f8e16797c36172292d5c69669ed60ed8226cb4f9',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -52,6 +52,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.8.2',
+    versionCode: 20,
+    date: '2026-09-09',
+    changes: [
+      'Scan works again. It could get stuck on “Loading portraits…” with the button disabled for the rest of the session, and never recover.',
+      'Tapping Scan before the portraits have finished downloading now waits and then scans, instead of doing nothing.',
+    ],
+  },
   {
     version: '1.8.1',
     versionCode: 19,
