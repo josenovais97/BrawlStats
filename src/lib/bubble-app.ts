@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.11.1',
+  version: '1.11.2',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 30,
+  versionCode: 31,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.11.1.apk',
+  path: '/downloads/brawlzone-bubble-1.11.2.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -39,8 +39,8 @@ export const BUBBLE_APP = {
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3381918,
-  sha256: '03a7f8a92f0826546eb3306c4260a78b1b161fa68f9115b7d980c20acfd183a3',
+  size: 3382458,
+  sha256: '18dc2f479d96b3a8e49bd1fa0f2908fa9b2c48a02d9d4a91cf27a2eb2d3fefa0',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -72,6 +72,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.11.2',
+    versionCode: 31,
+    date: '2026-09-10',
+    changes: [
+      'Ban artwork that a phone refuses to decode the preferred way now falls back instead of failing — which left the ban list empty with nothing to say why.',
+      'Tapping Scan while the app is still loading shows the progress instead of asking to share your screen for a scan that could not run yet.',
+    ],
+  },
   {
     version: '1.11.1',
     versionCode: 30,

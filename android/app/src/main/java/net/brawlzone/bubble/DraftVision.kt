@@ -228,28 +228,36 @@ class DraftVision(private val context: Context) {
         return decode(file)
     }
 
-    private fun decode(file: File): DraftCore.Image? = try {
-        /*
-         * Straight alpha, not premultiplied.
-         *
-         * The ban icons are the only art here with transparency, and they are
-         * composited onto a team colour before matching. Decoded premultiplied,
-         * every partly transparent pixel arrives already darkened toward black
-         * and the compositing darkens it again — a quiet corruption of exactly
-         * the images bans depend on, and of nothing else, which is the shape of
-         * "the picks work and the bans do not".
-         */
-        val options = BitmapFactory.Options().apply {
+    /**
+     * Decodes cached art, preferring straight alpha but never depending on it.
+     *
+     * The ban icons are composited onto a team colour, so premultiplied alpha
+     * darkens their edges twice — hence the request for straight alpha. But
+     * `inPremultiplied = false` is a *hint*: some decoders refuse it and return
+     * null, and a null here means the icon table never builds and every ban
+     * silently comes back empty. Asking for the better decode and falling back
+     * to the ordinary one costs a second attempt on the rare device that
+     * refuses, and removes a way for this to fail completely.
+     */
+    private fun decode(file: File): DraftCore.Image? {
+        val straight = BitmapFactory.Options().apply {
             inPreferredConfig = Bitmap.Config.ARGB_8888
             inPremultiplied = false
         }
-        BitmapFactory.decodeFile(file.absolutePath, options)?.let { bitmap ->
-            val image = toImage(bitmap)
-            bitmap.recycle()
-            image
-        }
-    } catch (e: Throwable) {
-        null
+        val bitmap = runCatching { BitmapFactory.decodeFile(file.absolutePath, straight) }
+            .getOrNull()
+            ?: runCatching {
+                Log.w(TAG, "straight-alpha decode refused for ${file.name}; using default")
+                BitmapFactory.decodeFile(
+                    file.absolutePath,
+                    BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 },
+                )
+            }.getOrNull()
+            ?: return null
+
+        val image = toImage(bitmap)
+        bitmap.recycle()
+        return image
     }
 
     /** The one place a platform Bitmap becomes something testable. */

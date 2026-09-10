@@ -1497,15 +1497,18 @@ class BubbleService : Service() {
      * way to photograph the game rather than ourselves.
      */
     private fun runScan() {
-        val session = scan
-        if (session == null || !session.live) {
-            // Never a prompt from here. See `grantedAt` — asking for consent as
-            // a side effect of scanning is what turned a dying session into an
-            // endless dialog. The panel offers it as its own labelled action.
-            postScanState(statusNow())
-            return
-        }
         if (scanning) return
+
+        /*
+         * Readiness before permission, and the order matters.
+         *
+         * Checked the other way round, a tap during the first load asked to
+         * share the screen for a scan that could not have run anyway — the
+         * tables were still building. The reader gets a permission dialog, a
+         * scan that does nothing, and no hint that the app was simply not
+         * ready. Progress first; the dialog only once there is something to
+         * scan with.
+         */
         val v = vision
         if (v == null || !v.ready) {
             /*
@@ -1515,7 +1518,16 @@ class BubbleService : Service() {
              * panel is closed and reopened.
              */
             scanWhenReady = true
-            postScanState(if (preparing) "preparing" else "noroster")
+            postScanState(if (preparing) "preparing:${v?.progress ?: 0}" else "noroster")
+            return
+        }
+
+        val session = scan
+        if (session == null || !session.live) {
+            // Never a prompt from here. Asking for consent as a side effect of
+            // scanning is what turned a dying session into an endless dialog;
+            // the panel offers it as its own labelled action instead.
+            postScanState(statusNow())
             return
         }
 
