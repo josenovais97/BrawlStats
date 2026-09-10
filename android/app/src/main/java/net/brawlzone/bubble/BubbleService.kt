@@ -1274,6 +1274,12 @@ class BubbleService : Service() {
             // every region is reading the wrong place.
             .put("frame", scan?.size ?: "-")
             .put("screen", "${screenW}x$screenH")
+            // Whether the draft screen's own layout was found in the last
+            // frame. False means the regions fell back to fixed fractions,
+            // which are only right at one aspect ratio.
+            .put("layout", lastImage?.let { img ->
+                vision?.located(img)?.let { if (it.detected) "found u=${it.unit}" else "fallback" }
+            } ?: "-")
             .toString()
 
         /** The roster, so the matcher knows which art to fetch. */

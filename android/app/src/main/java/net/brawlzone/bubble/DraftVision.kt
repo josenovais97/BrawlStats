@@ -269,29 +269,42 @@ class DraftVision(private val context: Context) {
 
     // ---- reading a frame ----------------------------------------------------
 
-    fun plateRect(frame: DraftCore.Image) = DraftCore.rectOf(frame, DraftLayout.PLATE_TEXT)
+    fun plateRect(frame: DraftCore.Image) = DraftLayout.locate(frame).plateText
+
+    /** Whether the draft screen's own layout could be found in this frame. */
+    fun located(frame: DraftCore.Image) = DraftLayout.locate(frame)
 
     fun read(frame: DraftCore.Image): Reading {
-        val bans = (0 until 6).map { i ->
+        /*
+         * The layout is found in the frame, not assumed from its size.
+         *
+         * Regions written as fractions of the whole frame are only right at the
+         * aspect ratio they were measured on, and a capture at another shape
+         * read the match timer where the map name is. Everything is now
+         * measured against the team strip, whose height is the game's own unit
+         * of scale — so it holds at any resolution and any aspect.
+         */
+        val at = DraftLayout.locate(frame)
+
+        val bans = at.bans.map { rect ->
             match(
-                frame, DraftCore.rectOf(frame, DraftLayout.banRegion(i)),
-                DraftLayout.BAN_QUERIES, icons,
+                frame, rect, DraftLayout.BAN_QUERIES, icons,
                 DraftLayout.BAN_MIN_SCORE, DraftLayout.BAN_MIN_MARGIN, DraftLayout.ICON_N,
             )
         }
-        val allies = (0 until 3).map { card(frame, DraftLayout.allyRegion(it)) }
-        val enemies = (0 until 3).map { card(frame, DraftLayout.enemyRegion(it)) }
+        val allies = at.allies.map { card(frame, it) }
+        val enemies = at.enemies.map { card(frame, it) }
         return Reading(
-            recall(frame, DraftLayout.PLATE_MODE, PLATE_MODE_KEY),
-            recall(frame, DraftLayout.PLATE_MAP, PLATE_MAP_KEY),
+            recall(frame, at.plateMode, PLATE_MODE_KEY),
+            recall(frame, at.plateMap, PLATE_MAP_KEY),
             bans,
             allies,
             enemies,
         )
     }
 
-    private fun card(frame: DraftCore.Image, region: DraftCore.Region): Slot = match(
-        frame, DraftCore.rectOf(frame, region), DraftLayout.CARD_QUERIES, portraits,
+    private fun card(frame: DraftCore.Image, rect: DraftCore.Rect): Slot = match(
+        frame, rect, DraftLayout.CARD_QUERIES, portraits,
         DraftLayout.CARD_MIN_SCORE, DraftLayout.CARD_MIN_MARGIN,
     )
 
@@ -311,10 +324,9 @@ class DraftVision(private val context: Context) {
 
     // ---- the mode plate -----------------------------------------------------
 
-    private fun recall(frame: DraftCore.Image, region: DraftCore.Region, kind: String): String? {
+    private fun recall(frame: DraftCore.Image, r: DraftCore.Rect, kind: String): String? {
         val table = plates[kind] ?: return null
         if (table.isEmpty()) return null
-        val r = DraftCore.rectOf(frame, region)
         if (r.width < 8 || r.height < 6) return null
         if (DraftCore.detail(frame, r) < DraftCore.MIN_DETAIL) return null
 
@@ -331,12 +343,12 @@ class DraftVision(private val context: Context) {
     }
 
     fun learnPlate(frame: DraftCore.Image, modeKey: String?, mapName: String?) {
-        if (modeKey != null) storePlate(frame, DraftLayout.PLATE_MODE, PLATE_MODE_KEY, modeKey)
-        if (mapName != null) storePlate(frame, DraftLayout.PLATE_MAP, PLATE_MAP_KEY, mapName)
+        val at = DraftLayout.locate(frame)
+        if (modeKey != null) storePlate(frame, at.plateMode, PLATE_MODE_KEY, modeKey)
+        if (mapName != null) storePlate(frame, at.plateMap, PLATE_MAP_KEY, mapName)
     }
 
-    private fun storePlate(frame: DraftCore.Image, region: DraftCore.Region, kind: String, name: String) {
-        val r = DraftCore.rectOf(frame, region)
+    private fun storePlate(frame: DraftCore.Image, r: DraftCore.Rect, kind: String, name: String) {
         if (r.width < 8 || r.height < 6) return
         if (DraftCore.detail(frame, r) < DraftCore.MIN_DETAIL) return
         val d = DraftCore.describe(frame, r)
@@ -366,13 +378,13 @@ class DraftVision(private val context: Context) {
      */
     fun learn(frame: DraftCore.Image, kind: String, index: Int, brawlerId: Int) {
         val bans = kind == "bans"
-        val region = when (kind) {
-            "bans" -> if (index in 0 until 6) DraftLayout.banRegion(index) else return
-            "allies" -> if (index in DraftLayout.ALLY_X.indices) DraftLayout.allyRegion(index) else return
-            "enemies" -> if (index in DraftLayout.ENEMY_X.indices) DraftLayout.enemyRegion(index) else return
+        val at = DraftLayout.locate(frame)
+        val r = when (kind) {
+            "bans" -> at.bans.getOrNull(index) ?: return
+            "allies" -> at.allies.getOrNull(index) ?: return
+            "enemies" -> at.enemies.getOrNull(index) ?: return
             else -> return
         }
-        val r = DraftCore.rectOf(frame, region)
         if (DraftCore.detail(frame, r) < DraftCore.MIN_DETAIL) return
 
         val queries = if (bans) DraftLayout.BAN_QUERIES else DraftLayout.CARD_QUERIES

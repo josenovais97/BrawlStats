@@ -188,28 +188,69 @@ class DraftCoreTest {
         }
     }
 
-    private fun ban(frame: DraftCore.Image, index: Int): DraftCore.Match {
-        val side = if (index < 3) DraftLayout.BAN_X[0] else DraftLayout.BAN_X[1]
-        val r = DraftCore.Region(
-            side,
-            DraftLayout.BAN_Y + (index % 3) * DraftLayout.BAN_PITCH,
-            DraftLayout.BAN_SIZE_X,
-            DraftLayout.BAN_SIZE_Y,
-        )
-        return DraftCore.identify(
-            frame, DraftCore.rectOf(frame, r), DraftLayout.BAN_QUERIES, icons,
-            DraftLayout.BAN_MIN_SCORE, DraftLayout.BAN_MIN_MARGIN, DraftLayout.ICON_N,
-        )
+    private fun ban(frame: DraftCore.Image, index: Int): DraftCore.Match = DraftCore.identify(
+        frame, DraftLayout.locate(frame).bans[index], DraftLayout.BAN_QUERIES, icons,
+        DraftLayout.BAN_MIN_SCORE, DraftLayout.BAN_MIN_MARGIN, DraftLayout.ICON_N,
+    )
+
+    private fun ally(frame: DraftCore.Image, index: Int): DraftCore.Match = DraftCore.identify(
+        frame, DraftLayout.locate(frame).allies[index], DraftLayout.CARD_QUERIES, portraits,
+        DraftLayout.CARD_MIN_SCORE, DraftLayout.CARD_MIN_MARGIN,
+    )
+
+    /** The same frame at another size, as a phone with a different screen sees it. */
+    private fun scaled(frame: DraftCore.Image, w: Int, h: Int): DraftCore.Image {
+        val out = IntArray(w * h)
+        for (y in 0 until h) {
+            val sy = (y.toLong() * frame.height / h).toInt().coerceAtMost(frame.height - 1)
+            for (x in 0 until w) {
+                val sx = (x.toLong() * frame.width / w).toInt().coerceAtMost(frame.width - 1)
+                out[y * w + x] = frame.pixels[sy * frame.width + sx]
+            }
+        }
+        return DraftCore.Image(out, w, h)
     }
 
-    private fun ally(frame: DraftCore.Image, index: Int): DraftCore.Match {
-        val r = DraftCore.Region(
-            DraftLayout.ALLY_X[index], DraftLayout.CARD_Y, DraftLayout.CARD_W, DraftLayout.CARD_H,
-        )
-        return DraftCore.identify(
-            frame, DraftCore.rectOf(frame, r), DraftLayout.CARD_QUERIES, portraits,
-            DraftLayout.CARD_MIN_SCORE, DraftLayout.CARD_MIN_MARGIN,
-        )
+    /**
+     * The same frame on a taller screen: the game keeps its strip at the bottom
+     * and there is simply more room above it.
+     */
+    private fun taller(frame: DraftCore.Image, extra: Int): DraftCore.Image {
+        val h = frame.height + extra
+        val out = IntArray(frame.width * h)
+        System.arraycopy(frame.pixels, 0, out, extra * frame.width, frame.pixels.size)
+        return DraftCore.Image(out, frame.width, h)
+    }
+
+    @Test
+    fun `the layout is found from the frame, not assumed`() {
+        val f = frame("draft-picked.jpg")
+        val located = DraftLayout.locate(f)
+        assertTrue("the team strip should be detected", located.detected)
+        // 1560x720: the strip is 228 tall. Anything wildly off means the
+        // detector latched onto something that is not the strip.
+        assertTrue("strip unit ${located.unit}", located.unit in 200..260)
+    }
+
+    @Test
+    fun `the same draft reads the same at another resolution`() {
+        // The fault this guards: regions written as fractions of the whole
+        // frame are only correct at the aspect ratio they were measured on. A
+        // capture at a different shape read the match timer where the map name
+        // is and put the first pick in the third slot.
+        val big = scaled(frame("draft-picked.jpg"), 2340, 1080)
+        assertEquals("first pick at 2340x1080", RICO, ally(big, 0).id)
+        assertEquals("second pick at 2340x1080", GRIFF, ally(big, 1).id)
+        assertEquals("ban 1 at 2340x1080", BULL, ban(big, 0).id)
+    }
+
+    @Test
+    fun `the same draft reads the same on a taller screen`() {
+        // A different aspect ratio, which is what actually broke it: more room
+        // above a strip that stays where it is.
+        val tall = taller(frame("draft-picked.jpg"), 200)
+        assertEquals("first pick on a taller screen", RICO, ally(tall, 0).id)
+        assertEquals("ban 3 on a taller screen", NORI, ban(tall, 2).id)
     }
 
     @Test

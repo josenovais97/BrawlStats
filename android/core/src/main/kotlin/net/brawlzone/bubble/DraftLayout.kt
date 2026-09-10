@@ -152,4 +152,139 @@ object DraftLayout {
         }
         return DraftCore.Image(out, image.width, image.height)
     }
+
+    // ---- finding the layout instead of assuming it -------------------------
+
+    /**
+     * Everything the reader needs from one frame, in pixels.
+     *
+     * Derived from the frame rather than fixed, because a fraction of the whole
+     * frame is only correct at the aspect ratio it was measured on. Calibrated
+     * on a 1560x720 capture, those fractions read the match timer where the map
+     * name is on a 2400x1080 one — which is exactly what a scan came back with.
+     */
+    class Located(
+        val bans: List<DraftCore.Rect>,
+        val allies: List<DraftCore.Rect>,
+        val enemies: List<DraftCore.Rect>,
+        val plateText: DraftCore.Rect,
+        val plateMode: DraftCore.Rect,
+        val plateMap: DraftCore.Rect,
+        /** The team strip's height, which is the game's own unit of scale. */
+        val unit: Int,
+        val detected: Boolean,
+    )
+
+    /** Team panel colours, matched with a tolerance for compression. */
+    private const val TOLERANCE = 96
+
+    private fun near(pixel: Int, r: Int, g: Int, b: Int): Boolean {
+        val dr = ((pixel shr 16) and 0xFF) - r
+        val dg = ((pixel shr 8) and 0xFF) - g
+        val db = (pixel and 0xFF) - b
+        return Math.abs(dr) + Math.abs(dg) + Math.abs(db) < TOLERANCE
+    }
+
+    /**
+     * Finds the top of the team strip, which is the one thing on this screen
+     * with a shape worth trusting.
+     *
+     * The strip is two large areas of flat, saturated colour across the bottom —
+     * the easiest thing in the frame to find, and the thing every ban and every
+     * pick is positioned against. Its height is the game's unit of scale: the
+     * UI grows and shrinks with it, so measuring everything in those units
+     * makes the layout independent of both resolution and aspect ratio.
+     *
+     * Returns -1 when the strip is not there, which happens whenever the draft
+     * screen is not up. That is a useful answer in itself: it means "this is not
+     * a draft" rather than "read it anyway and hope".
+     */
+    fun stripTop(frame: DraftCore.Image): Int {
+        val w = frame.width
+        val h = frame.height
+        if (w < 64 || h < 64) return -1
+        val step = (w / 160).coerceAtLeast(1)
+
+        var found = -1
+        var y = h - 1
+        // Upwards from the bottom, stopping at the first row that is not the
+        // strip: the strip is contiguous, so its top is the last row that is.
+        while (y > h / 2) {
+            var blue = 0
+            var red = 0
+            var seen = 0
+            var x = 0
+            while (x < w) {
+                val p = frame.pixels[y * w + x]
+                if (x < w / 2) {
+                    if (near(p, 59, 113, 247)) blue++
+                } else if (near(p, 175, 45, 71)) red++
+                seen++
+                x += step
+            }
+            val half = (seen / 2).coerceAtLeast(1)
+            if (blue * 100 / half < 30 && red * 100 / half < 30) break
+            found = y
+            y--
+        }
+        if (found < 0) return -1
+        // A strip shorter than a fifth of the screen is a stray band of colour.
+        return if (h - found >= h / 6) found else -1
+    }
+
+    /**
+     * The layout for one frame: measured from the strip when it can be found,
+     * and from the old whole-frame fractions when it cannot.
+     *
+     * The fallback is not a good answer — it is only right at 1560x720 — but it
+     * is better than refusing to read a frame whose strip detection was thrown
+     * by an unusual skin or a screenshot mid-animation.
+     */
+    fun locate(frame: DraftCore.Image): Located {
+        val top = stripTop(frame)
+        if (top < 0) return fallback(frame)
+
+        val s = (frame.height - top).toFloat()
+        fun r(xLeft: Float, yTop: Float, w: Float, h: Float) = DraftCore.Rect(
+            Math.round(xLeft), Math.round(yTop), Math.round(xLeft + w), Math.round(yTop + h),
+        )
+
+        val banSize = 0.211f * s
+        val bans = ArrayList<DraftCore.Rect>(6)
+        for (side in 0 until 2) {
+            val x = if (side == 0) 1.026f * s else frame.width - 0.719f * s - banSize
+            for (i in 0 until 3) {
+                bans.add(r(x, top + (0.123f + i * 0.263f) * s, banSize, banSize))
+            }
+        }
+
+        val cardW = 0.548f * s
+        val cardH = 0.469f * s
+        val cardY = top + 0.171f * s
+        val allies = floatArrayOf(1.509f, 2.193f, 2.877f).map { r(it * s, cardY, cardW, cardH) }
+        val enemies = floatArrayOf(2.364f, 1.772f, 1.162f)
+            .map { r(frame.width - it * s - cardW, cardY, cardW, cardH) }
+
+        return Located(
+            bans = bans,
+            allies = allies,
+            enemies = enemies,
+            plateText = r(0.649f * s, 0.079f * s, 1.268f * s, 0.316f * s),
+            plateMode = r(0.689f * s, 0.118f * s, 1.132f * s, 0.123f * s),
+            plateMap = r(0.689f * s, 0.285f * s, 1.132f * s, 0.088f * s),
+            unit = s.toInt(),
+            detected = true,
+        )
+    }
+
+    private fun fallback(frame: DraftCore.Image) = Located(
+        bans = (0 until 6).map { DraftCore.rectOf(frame, banRegion(it)) },
+        allies = (0 until 3).map { DraftCore.rectOf(frame, allyRegion(it)) },
+        enemies = (0 until 3).map { DraftCore.rectOf(frame, enemyRegion(it)) },
+        plateText = DraftCore.rectOf(frame, PLATE_TEXT),
+        plateMode = DraftCore.rectOf(frame, PLATE_MODE),
+        plateMap = DraftCore.rectOf(frame, PLATE_MAP),
+        unit = 0,
+        detected = false,
+    )
 }
