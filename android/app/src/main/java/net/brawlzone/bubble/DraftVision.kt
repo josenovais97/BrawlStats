@@ -104,7 +104,14 @@ class DraftVision(private val context: Context) {
      * something to scan against.
      */
     val ready: Boolean
-        get() = expected > 0 && portraits.size >= expected - MISSING_ALLOWANCE
+        get() = expected > 0 &&
+            portraits.size >= expected - MISSING_ALLOWANCE &&
+            icons.size >= expected - MISSING_ALLOWANCE
+
+    /** Table sizes, for the panel's diagnostics. Bans read the second one. */
+    val portraitCount: Int get() = portraits.size
+    val iconCount: Int get() = icons.size
+    val expectedCount: Int get() = expected
 
     /** How far through building the tables, 0..100, for the panel to show. */
     @Volatile
@@ -193,7 +200,12 @@ class DraftVision(private val context: Context) {
         loadLearned()
         loadPlates()
         progress = 100
-        Log.i(TAG, "tables ready: ${portraits.size} portraits, ${icons.size} icons of ${ids.size}")
+        Log.i(TAG, "tables: ${portraits.size} portraits, ${icons.size} icons of ${ids.size}")
+        if (icons.size < ids.size - MISSING_ALLOWANCE) {
+            // Bans read this table and nothing else. Short is worth saying out
+            // loud: it presents as the matcher failing on bans alone.
+            Log.w(TAG, "icon table short — bans will not match")
+        }
     }
 
     /** Replaces transparency with a flat colour. See DraftLayout.TEAM_BLUE. */
@@ -217,7 +229,20 @@ class DraftVision(private val context: Context) {
     }
 
     private fun decode(file: File): DraftCore.Image? = try {
-        val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
+        /*
+         * Straight alpha, not premultiplied.
+         *
+         * The ban icons are the only art here with transparency, and they are
+         * composited onto a team colour before matching. Decoded premultiplied,
+         * every partly transparent pixel arrives already darkened toward black
+         * and the compositing darkens it again — a quiet corruption of exactly
+         * the images bans depend on, and of nothing else, which is the shape of
+         * "the picks work and the bans do not".
+         */
+        val options = BitmapFactory.Options().apply {
+            inPreferredConfig = Bitmap.Config.ARGB_8888
+            inPremultiplied = false
+        }
         BitmapFactory.decodeFile(file.absolutePath, options)?.let { bitmap ->
             val image = toImage(bitmap)
             bitmap.recycle()

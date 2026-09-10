@@ -1263,8 +1263,13 @@ class BubbleService : Service() {
             .put("live", scan?.live == true)
             .put("quickLosses", quickLosses)
             .put("lastLossMs", lastLossMs)
-            .put("tables", vision?.progress ?: -1)
+            .put("pct", vision?.progress ?: -1)
             .put("ready", vision?.ready == true)
+            // Bans read `icons` and picks read `portraits`. Reporting both is
+            // what turns "bans do not work" into a number.
+            .put("portraits", vision?.portraitCount ?: -1)
+            .put("icons", vision?.iconCount ?: -1)
+            .put("expected", vision?.expectedCount ?: -1)
             .toString()
 
         /** The roster, so the matcher knows which art to fetch. */

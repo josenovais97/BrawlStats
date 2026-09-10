@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.11',
+  version: '1.11.1',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 29,
+  versionCode: 30,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.11.apk',
+  path: '/downloads/brawlzone-bubble-1.11.1.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -39,8 +39,8 @@ export const BUBBLE_APP = {
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3381586,
-  sha256: '3480791d54628755043fd7519696ecd0755d4a67545cd841e43df6c790450b04',
+  size: 3381918,
+  sha256: '03a7f8a92f0826546eb3306c4260a78b1b161fa68f9115b7d980c20acfd183a3',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -72,6 +72,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.11.1',
+    versionCode: 30,
+    date: '2026-09-10',
+    changes: [
+      'Bans are matched against their own artwork, which is decoded correctly now — transparent edges were being darkened twice, which affected the ban icons and nothing else.',
+      'The app no longer reports itself ready to scan until the ban artwork has loaded too, instead of only the portraits.',
+    ],
+  },
   {
     version: '1.11',
     versionCode: 29,
