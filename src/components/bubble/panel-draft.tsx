@@ -69,40 +69,33 @@ const STORED_DRAFT = 'brawlzone.bubble.draft';
 /**
  * Whether the panel offers to read the draft off the screen.
  *
- * Off, at the reader's request, for the second and last time.
+ * On, with the two faults that had it switched off both addressed.
  *
- * The recognition works. Measured against real captures of their own draft, in
- * `core`'s DraftCoreTest: Rico 0.97, Griff 0.80, Bull 0.85, Nori 0.79, Surge
- * 0.67, every margin past 0.19, and the slot the panel was covering refused at
- * 0.05. That part is not in doubt and the test keeps it honest.
+ * The recognition was never the problem and is pinned by `core`'s
+ * DraftCoreTest, which runs the real matcher against real captures of a real
+ * draft on every build: Rico 0.97, Griff 0.80, Bull 0.85, Nori 0.79, Surge
+ * 0.67, every margin past 0.19, and the card the panel was covering refused at
+ * 0.05.
  *
- * Two faults were still open, and both are worth writing down because they are
- * the map for whoever picks this up.
+ * What *was* wrong: `ready` went true as soon as the first of two hundred and
+ * fourteen downloads landed, so a scan could run against a table holding almost
+ * nothing and return almost nothing. That reads as a matcher that does not
+ * work, and it is the likeliest explanation for recognition being unreliable in
+ * use. It now means complete, the downloads run eight at a time instead of one,
+ * and the button counts up so a slow first run is visible rather than silent.
  *
- * The first is known and needs no device. `prepare` downloads 214 images one at
- * a time, so "Loading portraits…" can run for minutes on mobile data — and
- * `ready` returns true as soon as the *first* one lands, which means a scan can
- * run against a half-built table and produce exactly the unreliable results
- * that were reported. Parallel fetches, and a `ready` that means *complete*,
- * would fix both and are verifiable on a laptop.
+ * And the prompt loop: scanning used to ask for screen capture by itself
+ * whenever the session was missing, so a session that kept dying produced a
+ * dialog that kept coming back. Consent is now only ever requested by a tap on
+ * a button that says so, and a grant that dies twice inside a few seconds stops
+ * the offer and explains instead. Whatever kills the projection on that device
+ * — still unknown, still not reproducible here — the worst it can now cost is
+ * two dialogs and a sentence.
  *
- * The second is not understood: the screen-capture session. On the reader's phone,
- * tapping Scan asks to share the screen again even while a share is running,
- * and granting it starts the same loop over — a projection dying and being
- * re-requested, forever. It does not happen on an emulator: consent is taken
- * once there, the service comes up with types=40000020, and repeated scans run
- * without another prompt. So the cause is something about that device or its
- * Android build, and the only way to find it is more rounds of shipping a guess
- * and asking someone to try it in a live match. That has been the whole
- * problem, and it is not a reasonable thing to keep asking for.
- *
- * A switch, not a deletion, and the reason is now stronger than last time: the
- * hard part is finished and covered by a test that runs in under a minute. If
- * the capture session is ever understood — a device to reproduce it on, or a
- * released fix in the platform — this is one line and the recognition behind it
- * still works.
+ * Still a switch, because the reason to be able to turn a feature off in one
+ * line has not gone away.
  */
-const SCAN_ENABLED = false;
+const SCAN_ENABLED = true;
 
 /**
  * What the Android build exposes when it can read the screen.
@@ -128,7 +121,9 @@ type ScanState =
   | 'preparing'
   | 'denied'
   | 'failed'
-  | 'noroster';
+  | 'noroster'
+  | 'needs-permission'
+  | 'blocked';
 
 /** What the scan button says, per state. */
 const SCAN_LABEL: Record<ScanState, string> = {
@@ -137,9 +132,19 @@ const SCAN_LABEL: Record<ScanState, string> = {
   ready: 'Scan draft',
   busy: 'Reading screen…',
   preparing: 'Loading portraits…',
-  denied: 'Scan draft',
+  denied: 'Allow screen reading',
   failed: 'Scan draft',
   noroster: 'Scan draft',
+  /*
+   * A labelled request, not a surprise.
+   *
+   * Scanning used to ask for screen capture by itself whenever the session was
+   * missing, so a session that kept dying produced a dialog that kept coming
+   * back. Consent is now something the reader asks for, on a button that says
+   * what it will do.
+   */
+  'needs-permission': 'Allow screen reading',
+  blocked: 'Screen reading unavailable',
 };
 
 /**
@@ -153,6 +158,11 @@ const SCAN_LABEL: Record<ScanState, string> = {
 const SCAN_NOTE: Partial<Record<ScanState, string>> = {
   failed: 'Could not read the screen. Try again with the draft on screen.',
   noroster: 'Waiting for brawler data — reopen the panel in a moment.',
+  'needs-permission':
+    'Android asks once per app start. Nothing is stored or sent — the frame is read and dropped.',
+  denied: 'Screen reading is off. Tap above to allow it.',
+  blocked:
+    'Android keeps stopping the screen share on this device — often another app is already recording. Stop that and restart the bubble, or fill the board in by hand.',
 };
 
 /**
@@ -193,6 +203,8 @@ export function PanelDraft({
   const [loading, setLoading] = useState(false);
 
   const [scanState, setScanState] = useState<ScanState>('unsupported');
+  /** How far the reference tables are through building, when that is running. */
+  const [scanProgress, setScanProgress] = useState<number | null>(null);
   const [scanNote, setScanNote] = useState<string | null>(null);
   /*
    * The last reading, kept positionally.
@@ -318,7 +330,16 @@ export function PanelDraft({
     if (!bridge) return;
 
     const api = (window as unknown as { brawlzone?: Record<string, unknown> }).brawlzone ?? {};
-    api.scanState = (state: string) => setScanState(state as ScanState);
+    /*
+     * The app reports progress as "preparing:42", so the label can count up
+     * instead of sitting on "Loading portraits…" for a minute with no sign of
+     * whether anything is happening. That silence was itself a bug report.
+     */
+    api.scanState = (state: string) => {
+      const [name, pct] = state.split(':');
+      setScanState(name as ScanState);
+      setScanProgress(pct ? Number(pct) : null);
+    };
     api.scanResult = (payload: ScanPayload) => applyScan(payload);
     (window as unknown as { brawlzone: Record<string, unknown> }).brawlzone = api;
 
@@ -330,7 +351,7 @@ export function PanelDraft({
        * and must not differ between the server and the first client paint.
        */
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setScanState(bridge.status() as ScanState);
+      setScanState(bridge.status().split(':')[0] as ScanState);
       bridge.roster(JSON.stringify(roster.map((b) => b.brawlerId)));
     } catch {
       setScanState('unsupported');
@@ -433,6 +454,7 @@ export function PanelDraft({
     if (!bridge) return;
     setScanNote(null);
     try {
+      if (scanState === 'blocked') return;
       if (scanState === 'ready') bridge.scan();
       else bridge.enable();
     } catch {
@@ -594,6 +616,17 @@ export function PanelDraft({
       `app  ${window.location.hash || '(no version)'}`,
       `scan ${scanState}`,
       `api  ${bridge ? methods.join(',') : 'absent — not running in the app'}`,
+      (() => {
+        // The app's own account of the capture session: why it is in the state
+        // it is, so a failure on a device nobody here can reproduce arrives as
+        // a fact instead of a guess.
+        const detail = bridge as unknown as { scanDetail?: () => string };
+        try {
+          return typeof detail?.scanDetail === 'function' ? `cap  ${detail.scanDetail()}` : '';
+        } catch {
+          return '';
+        }
+      })(),
       last
         ? `read map=${last.map ?? '-'} mode=${last.mode ?? '-'} text=${JSON.stringify(last.text ?? [])}`
         : 'read (no scan yet)',
@@ -622,7 +655,9 @@ export function PanelDraft({
           <button
             type="button"
             onClick={runScan}
-            disabled={scanState === 'busy' || scanState === 'preparing'}
+            disabled={
+              scanState === 'busy' || scanState === 'preparing' || scanState === 'blocked'
+            }
             className={`flex w-full items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px] font-bold transition-colors ${
               scanState === 'busy' || scanState === 'preparing'
                 ? 'border-border bg-surface text-muted'
@@ -636,6 +671,9 @@ export function PanelDraft({
               ◎
             </span>
             {SCAN_LABEL[scanState]}
+            {scanState === 'preparing' && scanProgress !== null ? (
+              <span className="tabular-nums opacity-80">{scanProgress}%</span>
+            ) : null}
           </button>
 
           {/*

@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.10',
+  version: '1.11',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 28,
+  versionCode: 29,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.10.apk',
+  path: '/downloads/brawlzone-bubble-1.11.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -39,8 +39,8 @@ export const BUBBLE_APP = {
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3378930,
-  sha256: '1215d20eb0d589f107c9bb3c6e67ecec0a6e3bf3c660e0f3c71c6d141c07687e',
+  size: 3381586,
+  sha256: '3480791d54628755043fd7519696ecd0755d4a67545cd841e43df6c790450b04',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -72,6 +72,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.11',
+    versionCode: 29,
+    date: '2026-09-10',
+    changes: [
+      'Scanning no longer asks to share your screen over and over. Permission is a button you press, never something a scan asks for on its own, and it stops asking if Android keeps refusing.',
+      'Loading the portraits is about eight times faster, and shows how far along it is.',
+      'A scan can no longer run against a half-loaded set of portraits, which made recognition look unreliable when it was simply not ready.',
+    ],
+  },
   {
     version: '1.10',
     versionCode: 28,

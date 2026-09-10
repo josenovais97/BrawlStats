@@ -8,6 +8,9 @@ import android.util.Log
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 /**
@@ -66,6 +69,13 @@ class DraftVision(private val context: Context) {
         private const val PORTRAIT_URL = "https://cdn.brawlify.com/brawlers/borderless/%d.png"
         private const val ICON_URL = "https://cdn.brawlify.com/brawlers/emoji/%d.png"
         private const val MAX_LEARNED = 3
+
+        /** Enough to saturate a phone's link without hammering the CDN. */
+        private const val FETCH_THREADS = 8
+        private const val PREPARE_TIMEOUT_MINUTES = 3L
+
+        /** The CDN is missing art for a brawler or two at any given time. */
+        private const val MISSING_ALLOWANCE = 4
     }
 
     /** brawler id -> portrait descriptors, for the player cards. */
@@ -77,7 +87,31 @@ class DraftVision(private val context: Context) {
     /** Plates the reader has confirmed, by kind then by name. */
     private val plates = HashMap<String, HashMap<String, FloatArray>>()
 
-    val ready: Boolean get() = portraits.isNotEmpty()
+    /**
+     * Whether the tables are complete enough to scan against.
+     *
+     * "Complete", not "started". This used to be `portraits.isNotEmpty()`,
+     * which goes true the moment the *first* of two hundred and fourteen
+     * downloads lands — so a scan a second later ran against a table holding
+     * one brawler and confidently found nothing, or found the wrong thing
+     * because the right one had not arrived yet. That is indistinguishable from
+     * a matcher that does not work, and it is what a reader saw as recognition
+     * being unreliable.
+     *
+     * A small shortfall is tolerated because the CDN is missing art for a
+     * couple of brawlers at any time and waiting for them would mean never
+     * being ready. Missing *most* of the roster is a different thing and is not
+     * something to scan against.
+     */
+    val ready: Boolean
+        get() = expected > 0 && portraits.size >= expected - MISSING_ALLOWANCE
+
+    /** How far through building the tables, 0..100, for the panel to show. */
+    @Volatile
+    var progress: Int = 0
+        private set
+
+    private var expected = 0
 
     // ---- reference tables ---------------------------------------------------
 
@@ -86,35 +120,80 @@ class DraftVision(private val context: Context) {
      *
      * The ids come from the page rather than being compiled in, so a brawler
      * released next month is matchable the day the site knows about it. The art
-     * is cached on disk after the first run.
+     * is cached on disk after the first run, so this is slow exactly once.
+     *
+     * Downloaded in parallel, which is not a micro-optimisation: two hundred and
+     * fourteen files fetched one after another over mobile data is minutes of
+     * "Loading portraits…" during which the feature does not work and nothing
+     * says why. Eight at a time turns that into seconds, and the work is all
+     * waiting on a network rather than on this phone.
      */
-    fun prepare(ids: List<Int>) {
+    fun prepare(ids: List<Int>, onProgress: (Int) -> Unit = {}) {
         val dir = File(context.filesDir, "art").apply { mkdirs() }
-        for (id in ids) {
-            if (!portraits.containsKey(id)) {
-                fetch(File(dir, "p$id.png"), PORTRAIT_URL, id)?.let { image ->
-                    portraits[id] = DraftCore
-                        .variants(image, DraftLayout.PORTRAIT_ZOOMS, DraftLayout.PORTRAIT_FX, DraftLayout.PORTRAIT_FY)
-                        .toMutableList()
-                }
-            }
-            if (!icons.containsKey(id)) {
-                fetch(File(dir, "i$id.png"), ICON_URL, id)?.let { image ->
-                    val v = ArrayList<FloatArray>()
-                    for (bg in intArrayOf(DraftLayout.TEAM_BLUE, DraftLayout.TEAM_RED)) {
-                        v += DraftCore.variants(
-                            DraftLayout.over(image, bg),
-                            DraftLayout.ICON_ZOOMS, DraftLayout.ICON_FX, DraftLayout.ICON_FY,
-                            DraftLayout.ICON_N,
-                        )
+        expected = ids.size
+        val done = java.util.concurrent.atomic.AtomicInteger(0)
+
+        val portraitOut = ConcurrentHashMap<Int, MutableList<FloatArray>>()
+        val iconOut = ConcurrentHashMap<Int, MutableList<FloatArray>>()
+
+        val pool = Executors.newFixedThreadPool(FETCH_THREADS)
+        try {
+            for (id in ids) {
+                pool.execute {
+                    runCatching {
+                        if (!portraits.containsKey(id)) {
+                            fetch(File(dir, "p$id.png"), PORTRAIT_URL, id)?.let { image ->
+                                portraitOut[id] = DraftCore.variants(
+                                    image,
+                                    DraftLayout.PORTRAIT_ZOOMS,
+                                    DraftLayout.PORTRAIT_FX,
+                                    DraftLayout.PORTRAIT_FY,
+                                ).toMutableList()
+                            }
+                        }
+                        if (!icons.containsKey(id)) {
+                            fetch(File(dir, "i$id.png"), ICON_URL, id)?.let { image ->
+                                val v = ArrayList<FloatArray>()
+                                for (bg in intArrayOf(DraftLayout.TEAM_BLUE, DraftLayout.TEAM_RED)) {
+                                    v += DraftCore.variants(
+                                        DraftLayout.over(image, bg),
+                                        DraftLayout.ICON_ZOOMS,
+                                        DraftLayout.ICON_FX,
+                                        DraftLayout.ICON_FY,
+                                        DraftLayout.ICON_N,
+                                    )
+                                }
+                                iconOut[id] = v
+                            }
+                        }
                     }
-                    icons[id] = v
+                    val n = done.incrementAndGet()
+                    progress = n * 100 / ids.size.coerceAtLeast(1)
+                    onProgress(progress)
                 }
             }
+            pool.shutdown()
+            pool.awaitTermination(PREPARE_TIMEOUT_MINUTES, TimeUnit.MINUTES)
+        } finally {
+            pool.shutdownNow()
         }
+
+        /*
+         * Published in one go, at the end.
+         *
+         * The tables are read by the scan thread, and a half-filled one is
+         * exactly the bug this method used to have. Building into separate maps
+         * and swapping them in once means `ready` and the contents change
+         * together, so there is no window where the matcher can see part of a
+         * roster and believe it is looking at all of it.
+         */
+        portraits.putAll(portraitOut)
+        icons.putAll(iconOut)
+
         loadLearned()
         loadPlates()
-        Log.i(TAG, "tables ready: ${portraits.size} portraits, ${icons.size} icons")
+        progress = 100
+        Log.i(TAG, "tables ready: ${portraits.size} portraits, ${icons.size} icons of ${ids.size}")
     }
 
     /** Replaces transparency with a flat colour. See DraftLayout.TEAM_BLUE. */

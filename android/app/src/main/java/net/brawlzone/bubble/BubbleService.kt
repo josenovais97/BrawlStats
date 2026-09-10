@@ -174,6 +174,28 @@ class BubbleService : Service() {
     private var preparing = false
     private var scanWhenReady = false
 
+    /**
+     * When the current capture session was granted, and how many times a grant
+     * has died almost immediately.
+     *
+     * A reader reported tapping Scan, being asked to share the screen while a
+     * share was already running, granting it, and being asked again — forever.
+     * The cause is on that device and does not reproduce here, but the *loop*
+     * was this service's doing: `runScan` asked for consent whenever there was
+     * no live session, so a session that kept dying produced a prompt that kept
+     * coming back.
+     *
+     * Two things break that. Consent is now only ever requested by a deliberate
+     * tap on a button that says so, never as a side effect of scanning; and a
+     * grant that dies twice inside a few seconds stops the offer entirely and
+     * says what is happening instead. Whatever kills the projection, the worst
+     * it can now cost is two dialogs and an explanation.
+     */
+    private var grantedAt = 0L
+    private var quickLosses = 0
+    private var lastLossMs = -1L
+    private var consentPending = false
+
     /** The panel's WebView, so a scan result has somewhere to go. */
     private var panelWeb: WebView? = null
 
@@ -244,7 +266,10 @@ class BubbleService : Service() {
         when (intent?.action) {
             ACTION_STOP -> stopSelf()
             ScanContract.ACTION_GRANTED -> onScanGranted(intent)
-            ScanContract.ACTION_DENIED -> postScanState("denied")
+            ScanContract.ACTION_DENIED -> {
+                consentPending = false
+                postScanState("denied")
+            }
         }
         return START_NOT_STICKY
     }
@@ -1226,6 +1251,22 @@ class BubbleService : Service() {
         @JavascriptInterface
         fun status(): String = statusNow()
 
+        /**
+         * Why the capture session is in the state it is.
+         *
+         * Reported to the panel's Diagnostics block so a failure on a device
+         * nobody here can reproduce arrives as a fact rather than a guess.
+         */
+        @JavascriptInterface
+        fun scanDetail(): String = JSONObject()
+            .put("state", statusNow())
+            .put("live", scan?.live == true)
+            .put("quickLosses", quickLosses)
+            .put("lastLossMs", lastLossMs)
+            .put("tables", vision?.progress ?: -1)
+            .put("ready", vision?.ready == true)
+            .toString()
+
         /** The roster, so the matcher knows which art to fetch. */
         @JavascriptInterface
         fun roster(json: String) {
@@ -1267,8 +1308,17 @@ class BubbleService : Service() {
                  * fetch while the portraits are downloading anyway.
                  */
                 runCatching { TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) }
-                runCatching { v.prepare(ids) }
-                    .onFailure { Log.w(TAG, "reference table failed", it) }
+                runCatching {
+                    var lastPosted = -1
+                    v.prepare(ids) { pct ->
+                        // Every ten percent: enough for the label to move,
+                        // rare enough not to cross into the WebView constantly.
+                        if (pct / 10 != lastPosted) {
+                            lastPosted = pct / 10
+                            handler.post { postScanState("preparing:$pct") }
+                        }
+                    }
+                }.onFailure { Log.w(TAG, "reference table failed", it) }
                 handler.post {
                     preparing = false
                     // Whoever tapped Scan while this was running gets their scan.
@@ -1352,6 +1402,13 @@ class BubbleService : Service() {
             postScanState("unsupported")
             return
         }
+        if (consentPending) return
+        if (quickLosses >= QUICK_LOSS_LIMIT) {
+            postScanState("blocked")
+            return
+        }
+        consentPending = true
+
         /*
          * The panel is left open on purpose.
          *
@@ -1397,15 +1454,28 @@ class BubbleService : Service() {
 
         val session = ScreenScan(this, handler)
         session.onLost = {
+            val alive = SystemClock.elapsedRealtime() - grantedAt
+            lastLossMs = alive
             scan = null
-            postScanState("idle")
+            /*
+             * A session that survives a few seconds and then stops is the
+             * reader closing it, which is ordinary. One that dies immediately,
+             * twice, is something on this device refusing to let us capture —
+             * and asking a third time will not change that.
+             */
+            if (alive in 0 until QUICK_LOSS_MS) quickLosses++ else quickLosses = 0
+            Log.w(TAG, "capture stopped after ${alive}ms (quick losses: $quickLosses)")
+            postScanState(statusNow())
         }
         val ok = session.start(code, data, screenW, screenH, resources.displayMetrics.densityDpi)
+        consentPending = false
         if (!ok) {
-            postScanState("failed")
+            quickLosses++
+            postScanState(statusNow())
             return
         }
         scan = session
+        grantedAt = SystemClock.elapsedRealtime()
         postScanState("ready")
         // Straight into a scan: the user asked for one, and the dialog was the
         // only thing between them and it.
@@ -1424,7 +1494,10 @@ class BubbleService : Service() {
     private fun runScan() {
         val session = scan
         if (session == null || !session.live) {
-            requestScanConsent()
+            // Never a prompt from here. See `grantedAt` — asking for consent as
+            // a side effect of scanning is what turned a dying session into an
+            // endless dialog. The panel offers it as its own labelled action.
+            postScanState(statusNow())
             return
         }
         if (scanning) return
@@ -1578,10 +1651,11 @@ class BubbleService : Service() {
     /** The one place that decides what the button should say. */
     private fun statusNow(): String = when {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> "unsupported"
+        quickLosses >= QUICK_LOSS_LIMIT -> "blocked"
         scanning -> "busy"
         preparing -> "preparing"
         scan?.live == true -> "ready"
-        else -> "idle"
+        else -> "needs-permission"
     }
 
     private fun postScanState(state: String) {
@@ -1745,6 +1819,16 @@ class BubbleService : Service() {
          * never clears and a Scan button that silently stops working.
          */
         const val SCAN_TIMEOUT_MS = 6000L
+
+        /**
+         * A grant that dies inside this is not a reader closing it.
+         *
+         * Generous, because a projection legitimately ends when the reader taps
+         * stop on the recording chip, and that should reset the count rather
+         * than count against it.
+         */
+        const val QUICK_LOSS_MS = 8000L
+        const val QUICK_LOSS_LIMIT = 2
         const val TAG = "BrawlZoneBubble"
 
         /**
