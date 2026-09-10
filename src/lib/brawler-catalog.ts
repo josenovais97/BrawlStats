@@ -272,35 +272,22 @@ export async function getBrawlerArtMap(): Promise<Map<number, BABrawler>> {
   ]);
 
   /*
-   * A mirror entry with no artwork behind it is worse than no entry.
+   * Deliberately NOT substituting art here.
    *
-   * The mirror publishes a brawler's metadata before its images, so a new
-   * brawler arrives with a constructed `imageUrl` that 404s — and because the
-   * catalogue's wiki-portrait fallback below keys on "the mirror has no entry",
-   * the entry arriving is exactly what switches the fallback off. Cosmo and
-   * Vince rendered as broken images across the tier lists for that reason, and
-   * every future brawler would do the same on release week.
+   * A brawler whose mirror artwork 404s — Cosmo, Vince, and every new brawler
+   * in its release week — renders as a broken image in every list, and the
+   * obvious repair is to swap in the catalogue's wiki portrait instead. That
+   * was tried on 2026-09-10 and taken straight back out: the catalogue matches
+   * its wiki portraits *by name*, so a substitution here can quietly put the
+   * wrong brawler's face under the right brawler's label. A broken image is
+   * visibly broken. A confident, wrong one is not, and a tier list whose
+   * pictures cannot be trusted is worth less than one with a gap in it.
    *
-   * `hasBrawlerPortrait` asks whether the file exists rather than whether a URL
-   * was constructed. It is cached per URL with a long TTL for hits, so this
-   * costs one HEAD per brawler per day and nothing on a warm render, and a
-   * failed probe counts as a hit — a flaky request must not hide art that is
-   * really there.
+   * If this is worth fixing properly, the fix is a placeholder tile keyed on
+   * the brawler's own rarity colour and initial — something that cannot be
+   * mistaken for a different brawler — not a lookup that might disagree with
+   * the label beside it.
    */
-  const substitutes = catalogue?.all?.filter((e) => e.imageUrl && map.has(e.id)) ?? [];
-  const present = await Promise.all(substitutes.map((e) => hasBrawlerPortrait(e.id)));
-  substitutes.forEach((entry, i) => {
-    if (present[i]) return;
-    const mirrored = map.get(entry.id);
-    if (!mirrored || !entry.imageUrl) return;
-    map.set(entry.id, {
-      ...mirrored,
-      imageUrl: entry.imageUrl,
-      imageUrl2: entry.imageUrl,
-      imageUrl3: entry.imageUrl,
-    });
-  });
-
   for (const entry of catalogue?.all ?? []) {
     if (map.has(entry.id) || !entry.imageUrl) continue;
     map.set(entry.id, {
