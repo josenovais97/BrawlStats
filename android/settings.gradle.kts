@@ -6,3 +6,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "BrawlZone"
 include(":app")
+include(":core")

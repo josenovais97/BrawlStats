@@ -8,42 +8,36 @@ import android.util.Log
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
- * Reading a Brawl Stars draft screen.
+ * Reading a Brawl Stars draft screen, on Android.
  *
- * Two different jobs, and they are not equally hard. The mode and the map are
- * *printed* on the screen as text, so those are OCR and they are close to free.
- * The brawlers are only ever pictures, so those are template matching against
- * the game's own art — which works, but not uniformly, and the difference
- * matters enough that the two are reported separately.
+ * All the arithmetic lives in [DraftCore], which has no Android in it and is
+ * tested against real captures of an actual draft. This file is the part that
+ * cannot be: downloading the reference art, caching it, turning a screen frame
+ * into pixels, and remembering what the reader corrected.
  *
- * Everything here is measured rather than assumed. The regions below came off
- * four real captures at 1560x720 and are stored as fractions of the frame,
- * because the game lays its draft screen out proportionally: the ban strip is
- * always the same fraction down the screen whatever the device is. That is a
- * reasonable belief, not a verified one — it has been checked on one phone —
- * so every region is also allowed to come back empty rather than wrong.
+ * Three things are read, and they are not equally easy.
  *
- * The confidence gate is the whole design. A draft helper that fills a slot
- * with the wrong brawler is worse than one that leaves it blank: blank is one
- * tap to fix and obviously unfinished, whereas wrong is silently plausible and
- * changes the advice underneath it. So a match is only reported when it beats
- * the runner-up by a clear margin, and everything else is left for the reader.
- * On the sample captures that gate accepted six brawlers and got none wrong.
+ * **The picks** are matched against the game's own portrait art. Measured on
+ * real captures: 0.93 and 0.83 against runners-up of 0.57 and 0.45.
  *
- * And it learns. When the reader corrects a slot, the descriptor that was
- * actually on screen is stored against the brawler they chose — the exact crop,
- * from the real UI, at the real size. Those beat the downloaded art every time,
- * so the cold start is the worst this ever performs.
+ * **The bans** are drawn in a different, pixel-art style, and matching them
+ * against the portraits failed for weeks — best 0.47 at a 0.01 margin, which is
+ * noise. They are the *emoji* asset, and against that they match at 0.70 to
+ * 0.90 with margins from 0.20 to 0.33. Two reference sets, because the game
+ * uses two.
+ *
+ * **The mode and map** are printed as text, so they are read by the recogniser
+ * in [BubbleService], with plates the reader has confirmed as a faster path
+ * that needs no model at all.
+ *
+ * Nothing is guessed. A slot that does not beat the field by a clear margin
+ * comes back empty, because a draft board quietly holding the wrong brawler is
+ * worse than one holding nothing.
  */
 class DraftVision(private val context: Context) {
-
-    /** A rectangle as fractions of the captured frame. */
-    data class Region(val x: Float, val y: Float, val w: Float, val h: Float)
 
     data class Slot(val brawlerId: Int?, val score: Float)
 
@@ -57,508 +51,261 @@ class DraftVision(private val context: Context) {
         val enemies: List<Slot>,
     )
 
-    /**
-     * Where things are, as fractions of a landscape frame.
-     *
-     * Measured on 1560x720 captures of the ban screen and three stages of the
-     * pick screen. The bottom strip is what gets read, never the roster grid
-     * above it: the grid scrolls horizontally and shows about fourteen of
-     * ninety brawlers, so a pick on anything scrolled off-screen simply has no
-     * marker to find. The strip always shows all six bans and all six picks.
-     */
     companion object {
-        /**
-         * The two lines of the mode plate, top left.
-         *
-         * Split rather than read as one box, because they are worth different
-         * amounts. There are eight Ranked modes and twenty-odd maps, so the
-         * mode line is learned eight times and then always known — which means
-         * even a map the reader has never scanned before arrives with its mode
-         * already selected and two or three maps to choose between instead of
-         * twenty.
-         *
-         * Both crops run to the plate's right edge. Map names differ in length
-         * and the text is left-aligned, so a crop sized to the name would be a
-         * different crop per map; a fixed one is the same pixels every time,
-         * which is the entire requirement for matching a picture to itself.
+        /*
+         * The layout, the crops and the thresholds all live in DraftLayout,
+         * in the `core` module, because they are the recognition rather than
+         * the plumbing — and because that is where they can be tested against
+         * real captures. What is left here is only what needs a device.
          */
-        val PLATE_MODE = Region(0.1006f, 0.0306f, 0.1654f, 0.0500f)
-        val PLATE_MAP = Region(0.1006f, 0.0833f, 0.1654f, 0.0389f)
-
-        /**
-         * Both lines together, for the text recogniser.
-         *
-         * One box rather than two: the recogniser groups by layout and does
-         * better with a whole plate than with a band cropped tight to one line,
-         * and the caller has to tell mode from map anyway — it matches each
-         * returned line against every known name rather than trusting the
-         * order, because a wrapped mode badge produces three lines, not two.
-         *
-         * Slightly wider and taller than the two bands it covers, because a
-         * glyph clipped at the edge is worth more to avoid than the background
-         * that padding lets in.
-         */
-        val PLATE_TEXT = Region(0.0950f, 0.0250f, 0.1850f, 0.1000f)
-
-        /** Ban portraits: three down each flank of the team strip. */
-        val BAN_X = floatArrayOf(0.1500f, 0.8641f)
-        const val BAN_Y = 0.7222f
-        const val BAN_PITCH = 0.0833f
-        const val BAN_SIZE_X = 0.0308f
-        const val BAN_SIZE_Y = 0.0667f
-
-        /** Player cards: three a side, art above the name. */
-        val ALLY_X = floatArrayOf(0.2205f, 0.3205f, 0.4205f)
-        val ENEMY_X = floatArrayOf(0.5744f, 0.6609f, 0.7500f)
-        const val CARD_Y = 0.7375f
-        const val CARD_W = 0.0801f
-        const val CARD_H = 0.1486f
-
-        /**
-         * Descriptor side.
-         *
-         * 16 rather than 32, which is not a compromise: measured on real
-         * captures the two rank identically, and halving the side quarters both
-         * the memory and the work — which is what buys the reference variants
-         * below, and those are worth far more than the resolution was.
-         */
-        const val N = 16
-
-        /**
-         * How a region is sampled: (zoom, centre x, centre y), all fractions.
-         *
-         * A card is not matched whole. The level badge sits over its top-left
-         * corner and a tick or a skull over the others, so the crops are pulled
-         * down and right, away from all three.
-         */
-        val CARD_QUERIES = arrayOf(
-            floatArrayOf(0.60f, 0.65f, 0.65f),
-            floatArrayOf(0.60f, 0.50f, 0.55f),
-            floatArrayOf(0.75f, 0.55f, 0.60f),
-            floatArrayOf(0.90f, 0.50f, 0.50f),
-        )
-
-        /** A ban icon is already a tight head crop, so it is matched nearly whole. */
-        val BAN_QUERIES = arrayOf(
-            floatArrayOf(1.00f, 0.50f, 0.50f),
-            floatArrayOf(0.88f, 0.50f, 0.45f),
-            floatArrayOf(0.75f, 0.50f, 0.45f),
-        )
-
-        /**
-         * How each reference image is sampled — and this is the whole fix.
-         *
-         * The downloaded art is not framed consistently between brawlers: the
-         * best match for Rico's card sits at 70% zoom around a centre at
-         * x=0.65, not in the middle. One fixed reference crop therefore fits
-         * one brawler and mis-frames the rest, which is exactly what happened —
-         * the crop was tuned on Rico, Rico matched at 0.88, and almost nothing
-         * else cleared the gate. On a real draft that read one brawler out of
-         * six.
-         *
-         * Sampling every candidate at a spread of zooms and offsets lets each
-         * brawler be matched on the framing that actually suits it. Measured on
-         * two real captures the same cards go to 0.93 and 0.83 against
-         * runners-up of 0.57 and 0.45, while an empty card and a card the panel
-         * was covering stay under a 0.10 margin and are still refused.
-         *
-         * Twenty-four variants is about eight megabytes of descriptors for the
-         * whole roster at N=16, and a scan compares 48 crops against them in a
-         * few hundred milliseconds on a background thread.
-         */
-        val REF_ZOOMS = floatArrayOf(0.55f, 0.70f, 0.85f, 1.0f)
-        val REF_FX = floatArrayOf(0.40f, 0.50f, 0.65f)
-        val REF_FY = floatArrayOf(0.40f, 0.50f)
-        val REF_VARIANTS = REF_ZOOMS.size * REF_FX.size * REF_FY.size
-
-        /**
-         * Accept a match only this far clear of the field.
-         *
-         * Raised with the variants, not despite them. A richer reference set
-         * lifts every score, including the wrong ones, so the bar has to move
-         * with it — the separation that matters is measured, not assumed: real
-         * picks clear 0.83 with margins past 0.35, and everything that should
-         * be refused sits under 0.10.
-         */
-        const val MIN_SCORE = 0.60f
-        const val MIN_MARGIN = 0.15f
-
-        /** A learned crop is the same UI at the same size, so it should score high. */
-        const val MIN_SCORE_LEARNED = 0.70f
-
-        /**
-         * Below this much variation a region is the empty "?" placeholder.
-         *
-         * An unpicked card is a flat dark rectangle with a grey silhouette. It
-         * correlates weakly with everything, so the gate would reject it anyway
-         * — but naming it means an empty slot reads as "nobody has picked yet"
-         * rather than "we could not tell", which is a different message.
-         */
-        const val MIN_DETAIL = 14.0
-
-        /** Prefix under which a learned mode / map plate is filed. */
         const val PLATE_MODE_KEY = "mode"
         const val PLATE_MAP_KEY = "map"
 
-        /**
-         * A plate is text rendered by the game at a fixed size, so a true match
-         * is the same pixels twice and scores near one. The bar is high on
-         * purpose: two map names of similar length on the same lilac ground
-         * correlate well just by being text, and a *wrong* map silently changes
-         * every number underneath it.
-         */
-        const val MIN_PLATE_SCORE = 0.86f
-        const val MIN_PLATE_MARGIN = 0.05f
-
         private const val TAG = "BrawlZoneScan"
         private const val PREFS = "brawlzone.vision"
-        private const val ART = "https://cdn.brawlify.com/brawlers/borderless/%d.png"
+        private const val PORTRAIT_URL = "https://cdn.brawlify.com/brawlers/borderless/%d.png"
+        private const val ICON_URL = "https://cdn.brawlify.com/brawlers/emoji/%d.png"
+        private const val MAX_LEARNED = 3
     }
 
-    /** brawler id -> descriptors: downloaded art first, learned crops appended. */
-    private val refs = HashMap<Int, MutableList<FloatArray>>()
-    private var rosterIds: List<Int> = emptyList()
+    /** brawler id -> portrait descriptors, for the player cards. */
+    private val portraits = HashMap<Int, MutableList<FloatArray>>()
 
-    val ready: Boolean get() = refs.isNotEmpty()
+    /** brawler id -> emoji descriptors, for the ban icons. */
+    private val icons = HashMap<Int, MutableList<FloatArray>>()
 
-    // ---- reference table ----------------------------------------------------
+    /** Plates the reader has confirmed, by kind then by name. */
+    private val plates = HashMap<String, HashMap<String, FloatArray>>()
+
+    val ready: Boolean get() = portraits.isNotEmpty()
+
+    // ---- reference tables ---------------------------------------------------
 
     /**
-     * Builds the table from the roster the panel already knows about.
+     * Builds both tables from the roster the panel already knows about.
      *
      * The ids come from the page rather than being compiled in, so a brawler
-     * released next month is matchable the day the site knows about it without
-     * shipping an APK. The art is cached on disk after the first run; the
-     * download is about a megabyte and a half, once.
+     * released next month is matchable the day the site knows about it. The art
+     * is cached on disk after the first run.
      */
     fun prepare(ids: List<Int>) {
-        rosterIds = ids
         val dir = File(context.filesDir, "art").apply { mkdirs() }
         for (id in ids) {
-            if (refs.containsKey(id)) continue
-            val file = File(dir, "$id.png")
-            val bitmap = readArt(file, id) ?: continue
-            val variants = ArrayList<FloatArray>(REF_VARIANTS)
-            for (z in REF_ZOOMS) {
-                for (fx in REF_FX) {
-                    for (fy in REF_FY) variants.add(describe(bitmap, sub(bitmap, z, fx, fy)))
+            if (!portraits.containsKey(id)) {
+                fetch(File(dir, "p$id.png"), PORTRAIT_URL, id)?.let { image ->
+                    portraits[id] = DraftCore
+                        .variants(image, DraftLayout.PORTRAIT_ZOOMS, DraftLayout.PORTRAIT_FX, DraftLayout.PORTRAIT_FY)
+                        .toMutableList()
                 }
             }
-            refs[id] = variants
-            bitmap.recycle()
+            if (!icons.containsKey(id)) {
+                fetch(File(dir, "i$id.png"), ICON_URL, id)?.let { image ->
+                    val v = ArrayList<FloatArray>()
+                    for (bg in intArrayOf(DraftLayout.TEAM_BLUE, DraftLayout.TEAM_RED)) {
+                        v += DraftCore.variants(
+                            DraftLayout.over(image, bg),
+                            DraftLayout.ICON_ZOOMS, DraftLayout.ICON_FX, DraftLayout.ICON_FY,
+                            DraftLayout.ICON_N,
+                        )
+                    }
+                    icons[id] = v
+                }
+            }
         }
         loadLearned()
         loadPlates()
-        Log.i(TAG, "reference table ready: ${refs.size} brawlers, ${plates.values.sumOf { it.size }} plates")
+        Log.i(TAG, "tables ready: ${portraits.size} portraits, ${icons.size} icons")
     }
 
-    private fun readArt(file: File, id: Int): Bitmap? {
-        if (!file.exists() || file.length() < 500) {
+    /** Replaces transparency with a flat colour. See DraftLayout.TEAM_BLUE. */
+    private fun fetch(file: File, template: String, id: Int): DraftCore.Image? {
+        if (!file.exists() || file.length() < 300) {
             try {
-                val url = URL(String.format(ART, id))
-                val conn = (url.openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 8000
-                    readTimeout = 8000
-                    // The CDN refuses requests with no user agent.
-                    setRequestProperty("User-Agent", "BrawlZone/${BuildConfig.VERSION_CODE}")
-                }
-                conn.inputStream.use { input ->
-                    file.outputStream().use { output -> input.copyTo(output) }
-                }
+                val conn = (URL(String.format(template, id)).openConnection() as HttpURLConnection)
+                    .apply {
+                        connectTimeout = 8000
+                        readTimeout = 8000
+                        // The CDN refuses requests with no user agent.
+                        setRequestProperty("User-Agent", "BrawlZone/${BuildConfig.VERSION_CODE}")
+                    }
+                conn.inputStream.use { input -> file.outputStream().use { input.copyTo(it) } }
             } catch (e: Throwable) {
-                Log.w(TAG, "art $id unavailable", e)
                 file.delete()
                 return null
             }
         }
-        return try {
-            BitmapFactory.decodeFile(file.absolutePath)
-        } catch (e: Throwable) {
-            null
-        }
+        return decode(file)
     }
 
-    /** A sub-rectangle of a whole image, by zoom and centre, all fractions. */
-    private fun sub(bitmap: Bitmap, zoom: Float, fx: Float, fy: Float): android.graphics.Rect {
-        val side = (min(bitmap.width, bitmap.height) * zoom).roundToInt().coerceAtLeast(8)
-        val cx = (bitmap.width * fx).roundToInt()
-        val cy = (bitmap.height * fy).roundToInt()
-        return android.graphics.Rect(
-            max(0, cx - side / 2),
-            max(0, cy - side / 2),
-            min(bitmap.width, cx + side / 2),
-            min(bitmap.height, cy + side / 2),
-        )
+    private fun decode(file: File): DraftCore.Image? = try {
+        val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
+        BitmapFactory.decodeFile(file.absolutePath, options)?.let { bitmap ->
+            val image = toImage(bitmap)
+            bitmap.recycle()
+            image
+        }
+    } catch (e: Throwable) {
+        null
     }
 
-    // ---- descriptors --------------------------------------------------------
-
-    /**
-     * A 32x32 colour descriptor, mean-removed and scaled to unit variation.
-     *
-     * Normalising is what makes the score a correlation rather than a
-     * brightness comparison: the same brawler over a blue team panel and over a
-     * red one differs by a constant the subtraction removes, and the game's own
-     * gradients differ by a factor the division removes. Without it every match
-     * is decided by the team colour, which is the one thing in the frame that
-     * says nothing about which brawler it is.
-     */
-    private fun describe(source: Bitmap, rect: android.graphics.Rect): FloatArray {
-        val w = max(1, rect.width())
-        val h = max(1, rect.height())
-        val x0 = rect.left.coerceIn(0, source.width - 1)
-        val y0 = rect.top.coerceIn(0, source.height - 1)
-        val cw = min(w, source.width - x0)
-        val ch = min(h, source.height - y0)
-
-        val crop = Bitmap.createBitmap(source, x0, y0, max(1, cw), max(1, ch))
-        val small = Bitmap.createScaledBitmap(crop, N, N, true)
-        if (crop !== source) crop.recycle()
-
-        val pixels = IntArray(N * N)
-        small.getPixels(pixels, 0, N, 0, 0, N, N)
-        small.recycle()
-
-        val out = FloatArray(N * N * 3)
-        var i = 0
-        var sumR = 0.0
-        var sumG = 0.0
-        var sumB = 0.0
-        for (p in pixels) {
-            val r = ((p shr 16) and 0xFF).toFloat()
-            val g = ((p shr 8) and 0xFF).toFloat()
-            val b = (p and 0xFF).toFloat()
-            out[i++] = r; out[i++] = g; out[i++] = b
-            sumR += r; sumG += g; sumB += b
-        }
-        val n = pixels.size
-        val mr = (sumR / n).toFloat()
-        val mg = (sumG / n).toFloat()
-        val mb = (sumB / n).toFloat()
-        var sq = 0.0
-        i = 0
-        while (i < out.size) {
-            out[i] -= mr; out[i + 1] -= mg; out[i + 2] -= mb
-            sq += out[i] * out[i] + out[i + 1] * out[i + 1] + out[i + 2] * out[i + 2]
-            i += 3
-        }
-        val sd = Math.sqrt(sq / out.size).toFloat()
-        if (sd > 1e-4f) for (k in out.indices) out[k] /= sd
-        return out
-    }
-
-    /** How much variation a descriptor has before normalising, i.e. is it blank. */
-    private fun detail(source: Bitmap, rect: android.graphics.Rect): Double {
-        val x0 = rect.left.coerceIn(0, source.width - 1)
-        val y0 = rect.top.coerceIn(0, source.height - 1)
-        val cw = min(rect.width(), source.width - x0).coerceAtLeast(1)
-        val ch = min(rect.height(), source.height - y0).coerceAtLeast(1)
-        val crop = Bitmap.createBitmap(source, x0, y0, cw, ch)
-        val small = Bitmap.createScaledBitmap(crop, 16, 16, true)
-        crop.recycle()
-        val px = IntArray(256)
-        small.getPixels(px, 0, 16, 0, 0, 16, 16)
-        small.recycle()
-        var sum = 0.0
-        var sq = 0.0
-        for (p in px) {
-            val v = (((p shr 16) and 0xFF) + ((p shr 8) and 0xFF) + (p and 0xFF)) / 3.0
-            sum += v; sq += v * v
-        }
-        val mean = sum / px.size
-        return Math.sqrt(max(0.0, sq / px.size - mean * mean))
-    }
-
-    private fun score(a: FloatArray, b: FloatArray): Float {
-        var s = 0.0
-        for (i in a.indices) s += a[i] * b[i]
-        return (s / a.size).toFloat()
+    /** The one place a platform Bitmap becomes something testable. */
+    fun toImage(bitmap: Bitmap): DraftCore.Image {
+        val pixels = IntArray(bitmap.width * bitmap.height)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        return DraftCore.Image(pixels, bitmap.width, bitmap.height)
     }
 
     // ---- reading a frame ----------------------------------------------------
 
-    /** The plate crop the caller hands to the recogniser. */
-    fun plateRect(frame: Bitmap) = rect(frame, PLATE_TEXT)
+    fun plateRect(frame: DraftCore.Image) = DraftCore.rectOf(frame, DraftLayout.PLATE_TEXT)
 
-    private fun rect(frame: Bitmap, r: Region) = android.graphics.Rect(
-        (r.x * frame.width).roundToInt(),
-        (r.y * frame.height).roundToInt(),
-        ((r.x + r.w) * frame.width).roundToInt(),
-        ((r.y + r.h) * frame.height).roundToInt(),
-    )
-
-    /**
-     * Reads the six bans and the six picks. Text is handled by the caller,
-     * because OCR is asynchronous and this is not.
-     */
-    fun read(frame: Bitmap): Reading {
-        val bans = ArrayList<Slot>(6)
-        for (side in BAN_X) {
-            for (i in 0 until 3) {
-                val r = Region(side, BAN_Y + i * BAN_PITCH, BAN_SIZE_X, BAN_SIZE_Y)
-                bans.add(identify(frame, rect(frame, r), BAN_QUERIES))
-            }
+    fun read(frame: DraftCore.Image): Reading {
+        val bans = (0 until 6).map { i ->
+            match(
+                frame, DraftCore.rectOf(frame, DraftLayout.banRegion(i)),
+                DraftLayout.BAN_QUERIES, icons,
+                DraftLayout.BAN_MIN_SCORE, DraftLayout.BAN_MIN_MARGIN, DraftLayout.ICON_N,
+            )
         }
-        val allies = ALLY_X.map { x ->
-            identify(frame, rect(frame, Region(x, CARD_Y, CARD_W, CARD_H)), CARD_QUERIES)
-        }
-        val enemies = ENEMY_X.map { x ->
-            identify(frame, rect(frame, Region(x, CARD_Y, CARD_W, CARD_H)), CARD_QUERIES)
-        }
+        val allies = (0 until 3).map { card(frame, DraftLayout.allyRegion(it)) }
+        val enemies = (0 until 3).map { card(frame, DraftLayout.enemyRegion(it)) }
         return Reading(
-            recall(frame, PLATE_MODE, PLATE_MODE_KEY),
-            recall(frame, PLATE_MAP, PLATE_MAP_KEY),
+            recall(frame, DraftLayout.PLATE_MODE, PLATE_MODE_KEY),
+            recall(frame, DraftLayout.PLATE_MAP, PLATE_MAP_KEY),
             bans,
             allies,
             enemies,
         )
     }
 
-    /**
-     * One region against the whole roster.
-     *
-     * The runner-up is what decides this, not the winner. A best score of 0.45
-     * means nothing on its own — some brawler always comes top of ninety — but
-     * 0.45 against a second place of 0.30 is a different claim from 0.45
-     * against 0.44, and only the first is worth putting on the board.
-     */
-    private fun identify(
-        frame: Bitmap,
-        region: android.graphics.Rect,
-        queries: Array<FloatArray>,
+    private fun card(frame: DraftCore.Image, region: DraftCore.Region): Slot = match(
+        frame, DraftCore.rectOf(frame, region), DraftLayout.CARD_QUERIES, portraits,
+        DraftLayout.CARD_MIN_SCORE, DraftLayout.CARD_MIN_MARGIN,
+    )
+
+    private fun match(
+        frame: DraftCore.Image,
+        rect: DraftCore.Rect,
+        queries: Array<DraftCore.Crop>,
+        table: Map<Int, List<FloatArray>>,
+        minScore: Float,
+        minMargin: Float,
+        n: Int = DraftCore.N,
     ): Slot {
-        if (region.width() < 8 || region.height() < 8) return Slot(null, 0f)
-        if (detail(frame, region) < MIN_DETAIL) return Slot(null, 0f)
-
-        val qs = ArrayList<FloatArray>(queries.size)
-        for (q in queries) qs.add(describe(frame, crop(region, q[0], q[1], q[2])))
-
-        var bestId = -1
-        var best = -2f
-        var second = -2f
-        var bestLearned = false
-        for ((id, variants) in refs) {
-            var s = -2f
-            var learned = false
-            for ((index, v) in variants.withIndex()) {
-                var value = -2f
-                for (q in qs) {
-                    val x = score(q, v)
-                    if (x > value) value = x
-                }
-                if (value > s) {
-                    s = value
-                    learned = index >= REF_VARIANTS
-                }
-            }
-            if (s > best) {
-                second = best; best = s; bestId = id; bestLearned = learned
-            } else if (s > second) {
-                second = s
-            }
-        }
-        val floor = if (bestLearned) MIN_SCORE_LEARNED else MIN_SCORE
-        val ok = bestId > 0 && best >= floor && (best - second) >= MIN_MARGIN
-        return Slot(if (ok) bestId else null, best)
-    }
-
-    private fun crop(region: android.graphics.Rect, zoom: Float, fx: Float, fy: Float): android.graphics.Rect {
-        val side = (min(region.width(), region.height()) * zoom).roundToInt().coerceAtLeast(8)
-        val cx = region.left + (region.width() * fx).roundToInt()
-        val cy = region.top + (region.height() * fy).roundToInt()
-        return android.graphics.Rect(
-            max(region.left, cx - side / 2),
-            max(region.top, cy - side / 2),
-            min(region.right, cx + side / 2),
-            min(region.bottom, cy + side / 2),
-        )
+        if (table.isEmpty()) return Slot(null, 0f)
+        val m = DraftCore.identify(frame, rect, queries, table, minScore, minMargin, n)
+        return Slot(m.id, m.best)
     }
 
     // ---- the mode plate -----------------------------------------------------
 
-    /**
-     * Plates the reader has confirmed, by kind then by name.
-     *
-     * Nothing is shipped here and nothing can be: the plate is text drawn by
-     * the game, and there is no asset anywhere that renders "Spiraling Out" in
-     * the game's own font at the game's own size on this phone's own screen.
-     * What there is, once, is the reader telling us which map they are on while
-     * that text is on the screen — so the first confirmation of a map is what
-     * makes every later scan of it free.
-     *
-     * The mode line pays for itself fastest. Eight modes cover every Ranked map
-     * there will ever be, so after a week of use a map never seen before still
-     * arrives with its mode filled in and three maps to choose from.
-     */
-    private val plates = HashMap<String, HashMap<String, FloatArray>>()
-
-    private fun recall(frame: Bitmap, region: Region, kind: String): String? {
+    private fun recall(frame: DraftCore.Image, region: DraftCore.Region, kind: String): String? {
         val table = plates[kind] ?: return null
         if (table.isEmpty()) return null
-        val r = rect(frame, region)
-        if (r.width() < 8 || r.height() < 6) return null
-        if (detail(frame, r) < MIN_DETAIL) return null
+        val r = DraftCore.rectOf(frame, region)
+        if (r.width < 8 || r.height < 6) return null
+        if (DraftCore.detail(frame, r) < DraftCore.MIN_DETAIL) return null
 
-        val q = describe(frame, r)
+        val q = DraftCore.describe(frame, r)
         var bestName: String? = null
         var best = -2f
         var second = -2f
         for ((name, d) in table) {
-            val v = score(q, d)
-            if (v > best) {
-                second = best; best = v; bestName = name
-            } else if (v > second) {
-                second = v
-            }
+            val v = DraftCore.score(q, d)
+            if (v > best) { second = best; best = v; bestName = name } else if (v > second) second = v
         }
-        val clear = table.size == 1 || (best - second) >= MIN_PLATE_MARGIN
-        return if (best >= MIN_PLATE_SCORE && clear) bestName else null
+        val clear = table.size == 1 || (best - second) >= DraftLayout.PLATE_MIN_MARGIN
+        return if (best >= DraftLayout.PLATE_MIN_SCORE && clear) bestName else null
     }
 
-    /**
-     * Files the plate currently on screen under the names the reader chose.
-     *
-     * Called after a scan, from the panel, when the reader picks or confirms a
-     * map — so the pixels stored are the ones that were on screen for that map,
-     * not a re-render of them.
-     */
-    fun learnPlate(frame: Bitmap, modeKey: String?, mapName: String?) {
-        if (modeKey != null) store(frame, PLATE_MODE, PLATE_MODE_KEY, modeKey)
-        if (mapName != null) store(frame, PLATE_MAP, PLATE_MAP_KEY, mapName)
+    fun learnPlate(frame: DraftCore.Image, modeKey: String?, mapName: String?) {
+        if (modeKey != null) storePlate(frame, DraftLayout.PLATE_MODE, PLATE_MODE_KEY, modeKey)
+        if (mapName != null) storePlate(frame, DraftLayout.PLATE_MAP, PLATE_MAP_KEY, mapName)
     }
 
-    private fun store(frame: Bitmap, region: Region, kind: String, name: String) {
-        val r = rect(frame, region)
-        if (r.width() < 8 || r.height() < 6) return
-        if (detail(frame, r) < MIN_DETAIL) return
-        val d = describe(frame, r)
+    private fun storePlate(frame: DraftCore.Image, region: DraftCore.Region, kind: String, name: String) {
+        val r = DraftCore.rectOf(frame, region)
+        if (r.width < 8 || r.height < 6) return
+        if (DraftCore.detail(frame, r) < DraftCore.MIN_DETAIL) return
+        val d = DraftCore.describe(frame, r)
         plates.getOrPut(kind) { HashMap() }[name] = d
-
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        prefs.edit().putString("plate.$kind.$name", encode(d)).apply()
+        prefs().edit().putString("plate.$kind.$name", encode(d)).apply()
     }
 
     private fun loadPlates() {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        for ((key, value) in prefs.all) {
+        for ((key, value) in prefs().all) {
             if (!key.startsWith("plate.")) continue
             val rest = key.removePrefix("plate.")
             val split = rest.indexOf('.')
             if (split <= 0) continue
-            val kind = rest.substring(0, split)
-            val name = rest.substring(split + 1)
-            val d = decode(value as? String ?: continue) ?: continue
-            plates.getOrPut(kind) { HashMap() }[name] = d
+            val d = decodeDescriptor(value as? String ?: continue) ?: continue
+            plates.getOrPut(rest.substring(0, split)) { HashMap() }[rest.substring(split + 1)] = d
         }
     }
 
+    // ---- learning from corrections -----------------------------------------
+
     /**
-     * Descriptors are quantised to bytes before storage.
+     * Remembers what was on screen when the reader fixed a slot.
      *
-     * A float array of 3,072 entries is a quarter of a megabyte of text in
-     * shared preferences; the same thing at one byte a value is three kilobytes
-     * and agrees to three decimal places, which is well inside the margin any
-     * of this is decided by.
+     * A learned descriptor is this phone's own pixels at the real size, so it
+     * beats a CDN render every time — which means the cold start is the worst
+     * this ever performs.
+     */
+    fun learn(frame: DraftCore.Image, kind: String, index: Int, brawlerId: Int) {
+        val bans = kind == "bans"
+        val region = when (kind) {
+            "bans" -> if (index in 0 until 6) DraftLayout.banRegion(index) else return
+            "allies" -> if (index in DraftLayout.ALLY_X.indices) DraftLayout.allyRegion(index) else return
+            "enemies" -> if (index in DraftLayout.ENEMY_X.indices) DraftLayout.enemyRegion(index) else return
+            else -> return
+        }
+        val r = DraftCore.rectOf(frame, region)
+        if (DraftCore.detail(frame, r) < DraftCore.MIN_DETAIL) return
+
+        val queries = if (bans) DraftLayout.BAN_QUERIES else DraftLayout.CARD_QUERIES
+        val n = if (bans) DraftLayout.ICON_N else DraftCore.N
+        val d = DraftCore.describe(frame, DraftCore.crop(r, queries[0]), n)
+        val table = if (bans) icons else portraits
+        val list = table.getOrPut(brawlerId) { ArrayList() }
+        list.add(d)
+        val base = if (bans) DraftLayout.ICON_ZOOMS.size * DraftLayout.ICON_FX.size * DraftLayout.ICON_FY.size * 2
+        else DraftLayout.PORTRAIT_ZOOMS.size * DraftLayout.PORTRAIT_FX.size * DraftLayout.PORTRAIT_FY.size
+        while (list.size > base + MAX_LEARNED) list.removeAt(base)
+        saveLearned(if (bans) "i" else "p", brawlerId, d)
+    }
+
+    private fun saveLearned(kind: String, brawlerId: Int, d: FloatArray) {
+        val key = "learned.$kind.$brawlerId"
+        val existing = prefs().getStringSet(key, null)?.toMutableSet() ?: LinkedHashSet()
+        existing.add(encode(d))
+        while (existing.size > MAX_LEARNED) existing.remove(existing.first())
+        prefs().edit().putStringSet(key, existing).apply()
+    }
+
+    private fun loadLearned() {
+        for ((key, value) in prefs().all) {
+            if (!key.startsWith("learned.")) continue
+            val rest = key.removePrefix("learned.")
+            val kind = rest.substringBefore('.')
+            val id = rest.substringAfter('.').toIntOrNull() ?: continue
+            @Suppress("UNCHECKED_CAST")
+            val blobs = value as? Set<String> ?: continue
+            val table = if (kind == "i") icons else portraits
+            val list = table.getOrPut(id) { ArrayList() }
+            for (blob in blobs) list.add(decodeDescriptor(blob) ?: continue)
+        }
+    }
+
+    // ---- storage ------------------------------------------------------------
+
+    private fun prefs() = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    /**
+     * Descriptors are quantised to bytes before storage. A float array of 768
+     * entries is a quarter of a megabyte of text in shared preferences; the
+     * same thing at a byte a value is under a kilobyte and agrees to three
+     * decimal places, which is inside the margin any of this is decided by.
      */
     private fun encode(d: FloatArray): String {
         val bytes = ByteArray(d.size)
@@ -566,74 +313,13 @@ class DraftVision(private val context: Context) {
         return Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
 
-    private fun decode(blob: String): FloatArray? {
+    private fun decodeDescriptor(blob: String): FloatArray? {
         val bytes = try {
             Base64.decode(blob, Base64.NO_WRAP)
         } catch (e: Throwable) {
             return null
         }
-        if (bytes.size != N * N * 3) return null
-        val out = FloatArray(bytes.size)
-        for (i in bytes.indices) out[i] = bytes[i] / 32f
-        return out
+        if (bytes.size != DraftCore.N * DraftCore.N * 3) return null
+        return FloatArray(bytes.size) { bytes[it] / 32f }
     }
-
-    // ---- learning from corrections -----------------------------------------
-
-    /**
-     * Remembers what was actually on screen when the reader fixed a slot.
-     *
-     * This is the part that makes the feature get better instead of staying at
-     * whatever the downloaded art happens to support. A learned descriptor is
-     * the same UI element, at the same size, cropped the same way, so it scores
-     * far higher than the CDN render it replaces — and it is per-device, which
-     * quietly absorbs whatever this phone's aspect ratio does to the layout.
-     *
-     * Capped, and oldest-first, because a table that only grows would eventually
-     * make every scan slower than the draft timer it is meant to beat.
-     */
-    fun learn(frame: Bitmap, kind: String, index: Int, brawlerId: Int) {
-        val region = when (kind) {
-            "bans" -> {
-                val side = if (index < 3) BAN_X[0] else BAN_X[1]
-                Region(side, BAN_Y + (index % 3) * BAN_PITCH, BAN_SIZE_X, BAN_SIZE_Y)
-            }
-            "allies" -> Region(ALLY_X.getOrElse(index) { return }, CARD_Y, CARD_W, CARD_H)
-            "enemies" -> Region(ENEMY_X.getOrElse(index) { return }, CARD_Y, CARD_W, CARD_H)
-            else -> return
-        }
-        val queries = if (kind == "bans") BAN_QUERIES else CARD_QUERIES
-        val r = rect(frame, region)
-        if (detail(frame, r) < MIN_DETAIL) return
-
-        val q = queries[0]
-        val d = describe(frame, crop(r, q[0], q[1], q[2]))
-        val list = refs.getOrPut(brawlerId) { ArrayList() }
-        list.add(d)
-        while (list.size > REF_VARIANTS + MAX_LEARNED) list.removeAt(REF_VARIANTS)
-        saveLearned(brawlerId, d)
-    }
-
-    private fun saveLearned(brawlerId: Int, d: FloatArray) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val key = "learned.$brawlerId"
-        val existing = prefs.getStringSet(key, null)?.toMutableSet() ?: LinkedHashSet()
-        existing.add(encode(d))
-        while (existing.size > MAX_LEARNED) existing.remove(existing.first())
-        prefs.edit().putStringSet(key, existing).apply()
-    }
-
-    private fun loadLearned() {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        for ((key, value) in prefs.all) {
-            if (!key.startsWith("learned.")) continue
-            val id = key.removePrefix("learned.").toIntOrNull() ?: continue
-            @Suppress("UNCHECKED_CAST")
-            val blobs = value as? Set<String> ?: continue
-            val list = refs.getOrPut(id) { ArrayList() }
-            for (blob in blobs) list.add(decode(blob) ?: continue)
-        }
-    }
-
-    private val MAX_LEARNED = 3
 }

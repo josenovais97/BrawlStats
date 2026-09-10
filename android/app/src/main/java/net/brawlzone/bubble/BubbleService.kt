@@ -125,6 +125,15 @@ class BubbleService : Service() {
      */
     private var lastFrame: Bitmap? = null
 
+    /**
+     * The same frame as plain pixels, which is what the matcher works on.
+     *
+     * Kept beside the Bitmap rather than instead of it: the text recogniser
+     * wants a Bitmap to crop, and everything else wants something that can also
+     * exist off a device — see DraftCore.
+     */
+    private var lastImage: DraftCore.Image? = null
+
     private var scanning = false
 
     /**
@@ -247,6 +256,7 @@ class BubbleService : Service() {
         scan = null
         lastFrame?.recycle()
         lastFrame = null
+        lastImage = null
         removePanel()
         hideCloseTarget()
         bubble?.let { runCatching { windows.removeView(it) } }
@@ -1316,14 +1326,14 @@ class BubbleService : Service() {
          */
         @JavascriptInterface
         fun learnPlate(modeKey: String?, mapName: String?) {
-            val frame = lastFrame ?: return
+            val frame = lastImage ?: return
             val v = vision ?: return
             Thread { runCatching { v.learnPlate(frame, modeKey, mapName) } }.start()
         }
 
         @JavascriptInterface
         fun learn(kind: String, index: Int, brawlerId: Int) {
-            val frame = lastFrame ?: return
+            val frame = lastImage ?: return
             val v = vision ?: return
             Thread { runCatching { v.learn(frame, kind, index, brawlerId) } }.start()
         }
@@ -1454,9 +1464,11 @@ class BubbleService : Service() {
                 }
                 lastFrame?.recycle()
                 lastFrame = frame
+                val image = v.toImage(frame)
+                lastImage = image
 
                 Thread {
-                    val reading = runCatching { v.read(frame) }.getOrNull()
+                    val reading = runCatching { v.read(image) }.getOrNull()
                     handler.post {
                         // Held so the watchdog can still deliver the brawlers if
                         // the recogniser never answers about the map.
@@ -1487,14 +1499,14 @@ class BubbleService : Service() {
      * text and the learned-plate path carries on underneath.
      */
     private fun readPlate(frame: Bitmap, v: DraftVision, reading: DraftVision.Reading?) {
-        val rect = v.plateRect(frame)
+        val rect = v.plateRect(v.toImage(frame))
         val plate = runCatching {
             Bitmap.createBitmap(
                 frame,
                 rect.left.coerceIn(0, frame.width - 1),
                 rect.top.coerceIn(0, frame.height - 1),
-                rect.width().coerceAtMost(frame.width - rect.left).coerceAtLeast(1),
-                rect.height().coerceAtMost(frame.height - rect.top).coerceAtLeast(1),
+                rect.width.coerceAtMost(frame.width - rect.left).coerceAtLeast(1),
+                rect.height.coerceAtMost(frame.height - rect.top).coerceAtLeast(1),
             )
         }.getOrNull()
 

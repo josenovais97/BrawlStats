@@ -69,20 +69,22 @@ const STORED_DRAFT = 'brawlzone.bubble.draft';
 /**
  * Whether the panel offers to read the draft off the screen.
  *
- * Off, at the reader's request, after it cost more of their evenings than it
- * saved. The recognition itself got there — brawlers on both teams, the map
- * from the mode plate — but it was never reliable end to end, and most of the
- * testing that proved it was tested against builds that had never reached the
- * phone, because the APK was served from a URL cached for a day. Asking someone
- * to keep retrying a feature while the thing under test is not the thing they
- * installed is not a reasonable thing to ask.
+ * Back on, and this time the recognition is *tested* rather than argued for.
+ * It was switched off after several rounds of fixes that could not be checked
+ * without a phone, a live match and the reader's patience — and most of what
+ * was being tested had never reached the phone anyway, because the APK was
+ * served from a URL cached for a day.
  *
- * A switch rather than a deletion. Nothing about the draft board depends on it,
- * the app side is inert with no caller, and the whole feature comes back by
- * turning this to `true` — so this is a decision that can be revisited, not
- * work that has to be done again.
+ * Both of those are closed now: releases carry the version in their URL, and
+ * the matcher runs on a laptop against real captures of a real draft
+ * (`core`'s DraftCoreTest). The bans, which never worked, turned out to be
+ * drawn from the game's *emoji* artwork rather than its portraits — matched
+ * against the right set they land at 0.85 where the portraits managed 0.47.
+ *
+ * Still a switch rather than a hard-coded true, because the reason to be able
+ * to turn a feature off in one line has not gone away.
  */
-const SCAN_ENABLED = false;
+const SCAN_ENABLED = true;
 
 /**
  * What the Android build exposes when it can read the screen.

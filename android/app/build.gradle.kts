@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 27
-    versionName = "1.9.3"
+    versionCode = 28
+    versionName = "1.10"
   }
 
   signingConfigs {
@@ -67,9 +67,31 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
   kotlinOptions { jvmTarget = "17" }
+
+  /*
+   * Unit tests run on the JVM, not on a device.
+   *
+   * `isReturnDefaultValues` keeps the stubbed android.jar from throwing on the
+   * handful of platform calls a test touches indirectly. The recognition maths
+   * itself is in DraftCore and deliberately has no Android in it, which is the
+   * whole reason these tests can exist — see DraftCoreTest.
+   */
+  testOptions { unitTests.isReturnDefaultValues = true }
 }
 
 dependencies {
+  /*
+   * The recognition maths, as a plain JVM module.
+   *
+   * Separate so it can be tested: inside this module a unit test compiles
+   * against Android's stubbed android.jar, which has no javax.imageio, so a
+   * test cannot even open the screenshot it is meant to check. In `core` it
+   * is an ordinary library and `./gradlew :core:test` runs the real matcher
+   * against real captures of a real draft.
+   */
+  implementation(project(":core"))
+
+  testImplementation("junit:junit:4.13.2")
   implementation("androidx.core:core-ktx:1.13.1")
   implementation("androidx.appcompat:appcompat:1.7.0")
 

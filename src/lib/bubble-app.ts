@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.9.3',
+  version: '1.10',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 27,
+  versionCode: 28,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.9.3.apk',
+  path: '/downloads/brawlzone-bubble-1.10.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -39,8 +39,8 @@ export const BUBBLE_APP = {
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3373482,
-  sha256: '1e91c5c88ea504db3f65bc262a822de42105169440c66e4ae1d26f710863a1af',
+  size: 3378930,
+  sha256: '1215d20eb0d589f107c9bb3c6e67ecec0a6e3bf3c660e0f3c71c6d141c07687e',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-08',
@@ -72,6 +72,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.10',
+    versionCode: 28,
+    date: '2026-09-10',
+    changes: [
+      'Scanning is back, and the bans work for the first time — the game draws them from a different artwork set, which is why they never matched before.',
+      'One tap reads the mode, the map, both teams\u2019 picks and all six bans, then scores the picks for that map.',
+      'The recognition is now tested against real captures of a real draft on every build, instead of only on your phone.',
+    ],
+  },
   {
     version: '1.9.3',
     versionCode: 27,
