@@ -69,22 +69,40 @@ const STORED_DRAFT = 'brawlzone.bubble.draft';
 /**
  * Whether the panel offers to read the draft off the screen.
  *
- * Back on, and this time the recognition is *tested* rather than argued for.
- * It was switched off after several rounds of fixes that could not be checked
- * without a phone, a live match and the reader's patience — and most of what
- * was being tested had never reached the phone anyway, because the APK was
- * served from a URL cached for a day.
+ * Off, at the reader's request, for the second and last time.
  *
- * Both of those are closed now: releases carry the version in their URL, and
- * the matcher runs on a laptop against real captures of a real draft
- * (`core`'s DraftCoreTest). The bans, which never worked, turned out to be
- * drawn from the game's *emoji* artwork rather than its portraits — matched
- * against the right set they land at 0.85 where the portraits managed 0.47.
+ * The recognition works. Measured against real captures of their own draft, in
+ * `core`'s DraftCoreTest: Rico 0.97, Griff 0.80, Bull 0.85, Nori 0.79, Surge
+ * 0.67, every margin past 0.19, and the slot the panel was covering refused at
+ * 0.05. That part is not in doubt and the test keeps it honest.
  *
- * Still a switch rather than a hard-coded true, because the reason to be able
- * to turn a feature off in one line has not gone away.
+ * Two faults were still open, and both are worth writing down because they are
+ * the map for whoever picks this up.
+ *
+ * The first is known and needs no device. `prepare` downloads 214 images one at
+ * a time, so "Loading portraits…" can run for minutes on mobile data — and
+ * `ready` returns true as soon as the *first* one lands, which means a scan can
+ * run against a half-built table and produce exactly the unreliable results
+ * that were reported. Parallel fetches, and a `ready` that means *complete*,
+ * would fix both and are verifiable on a laptop.
+ *
+ * The second is not understood: the screen-capture session. On the reader's phone,
+ * tapping Scan asks to share the screen again even while a share is running,
+ * and granting it starts the same loop over — a projection dying and being
+ * re-requested, forever. It does not happen on an emulator: consent is taken
+ * once there, the service comes up with types=40000020, and repeated scans run
+ * without another prompt. So the cause is something about that device or its
+ * Android build, and the only way to find it is more rounds of shipping a guess
+ * and asking someone to try it in a live match. That has been the whole
+ * problem, and it is not a reasonable thing to keep asking for.
+ *
+ * A switch, not a deletion, and the reason is now stronger than last time: the
+ * hard part is finished and covered by a test that runs in under a minute. If
+ * the capture session is ever understood — a device to reproduce it on, or a
+ * released fix in the platform — this is one line and the recognition behind it
+ * still works.
  */
-const SCAN_ENABLED = true;
+const SCAN_ENABLED = false;
 
 /**
  * What the Android build exposes when it can read the screen.
