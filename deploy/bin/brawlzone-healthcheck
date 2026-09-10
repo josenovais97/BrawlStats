@@ -33,6 +33,35 @@ fi
 # 3. Disk. Postgres, Docker and the dumps all share one volume; a full disk
 #    takes all three down at once.
 use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+
+# Reclaim before complaining.
+#
+# An alert is the right answer when somebody is there to read it. On
+# 2026-09-09 the disk went from fine to 100% inside a night, Postgres died
+# mid-checkpoint, and the site served "not enough data" for five hours -- and
+# the alert that should have gone out four hours earlier could not be sent at
+# all. Even repaired, an alert is a message to a person, and a person is not
+# always there.
+#
+# So above 80% the box tidies up on its own first, and only reports a problem
+# if that was not enough. Everything here regenerates: build cache is rebuilt
+# by the next deploy, dangling images are already unreferenced, and an
+# uncompressed rotated log is the same log. Nothing that a restore or a
+# rollback depends on is touched -- no dumps, no tagged images, no volumes.
+#
+# It is deliberately not a fix for anything. Whatever filled the disk still
+# filled it, and the alert below still fires if this cannot keep up. This buys
+# hours, which on the day in question would have been the whole difference.
+if [ "$use" -ge 80 ]; then
+  before=$use
+  docker builder prune -af >/dev/null 2>&1
+  docker image prune -f >/dev/null 2>&1
+  find /var/log/brawlzone -name '*.log-*' ! -name '*.gz' -size +10M \
+    -exec gzip -9 {} \; >/dev/null 2>&1
+  use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+  echo "disk was ${before}%, reclaimed down to ${use}%"
+fi
+
 [ "$use" -lt 85 ] || problems+=("disk at ${use}%")
 
 # 4. Are all containers up?

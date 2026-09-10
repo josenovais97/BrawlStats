@@ -1,19 +1,35 @@
-# Scheduled-job logs written by /usr/local/bin/brawlzone-run.
+# Scheduled-job logs written by /usr/local/bin/brawlzone-run, and Caddy's
+# access log, which shares the directory.
 #
 # copytruncate because a job may be mid-run when logrotate fires: the wrapper
 # holds the file open, so renaming it would leave systemd writing to an
 # unlinked inode and the rest of that run would vanish.
 # One directory per job; the archives rotate beside the log they belong to.
+#
+# `maxsize` and immediate compression are here for the access log, which is not
+# like the others. The job logs come to a few hundred kilobytes a day between
+# them; the access log is a line per request, so its size is set by whatever is
+# pointed at the site rather than by anything this box does. A normal day is
+# 6-8 MB compressed. 2026-09-09 — a crawler walking the draft state space, plus
+# a line for every 429 the rate limiter returned to it — produced 489 MB in
+# twenty-four hours, and sat uncompressed for a further day because
+# `delaycompress` was set. A full disk is how Postgres died that morning, so
+# "daily" is not a tight enough bound on a file whose growth rate is somebody
+# else's decision.
+#
+# `delaycompress` exists for readers that hold a rotated file open. Caddy
+# reopens on rotation and the job wrapper is copytruncate'd, so nothing here
+# needed it.
 /var/log/brawlzone/*/*.log {
     daily
+    maxsize 100M
     rotate 30
     missingok
     notifempty
     compress
-    delaycompress
     copytruncate
     dateext
-    dateformat -%Y-%m-%d
+    dateformat -%Y-%m-%d-%s
     su root adm
     create 0664 root adm
 }

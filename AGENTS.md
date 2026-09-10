@@ -199,6 +199,22 @@ retention windows at 80% and 93% of `DATA_BUDGET_BYTES`. Every table has a
 retention bound — `player_trophy_points` was the last exception and now prunes
 at 120 days (charts read 90).
 
+Disk **now self-corrects too**, and did not before. Storage pressure only ever
+governed the *database*; everything else on the volume — Docker build cache,
+ISR output, logs — grew until someone looked. On 2026-09-09 it reached 100% and
+killed Postgres mid-checkpoint. Health check 3 now reclaims above 80% before it
+reports: build cache, dangling images, and any rotated log left uncompressed.
+All of it regenerates, and none of it is a dump, a tagged image or a volume.
+It buys hours rather than fixing anything, which on the day in question was the
+whole difference.
+
+The access log is the growth to watch. Job logs are a few hundred kilobytes a
+day; the access log is a line per request, so its rate is set by whoever is
+pointed at the site — 6-8 MB on a normal day, **489 MB** on the day a crawler
+walked the draft state space. It rotates on size as well as daily and compresses
+immediately, because "daily" is not a bound on a file whose growth rate is
+somebody else's decision.
+
 Egress **has no guard**, and since 2026-08-27 it is no longer metered by
 anyone — the box has fixed monthly bandwidth rather than a per-GB bill, so the
 failure mode changed rather than disappeared. What the crawlable-URL bound
