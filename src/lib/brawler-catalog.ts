@@ -271,6 +271,36 @@ export async function getBrawlerArtMap(): Promise<Map<number, BABrawler>> {
     getBrawlerCatalog().catch(() => null),
   ]);
 
+  /*
+   * A mirror entry with no artwork behind it is worse than no entry.
+   *
+   * The mirror publishes a brawler's metadata before its images, so a new
+   * brawler arrives with a constructed `imageUrl` that 404s — and because the
+   * catalogue's wiki-portrait fallback below keys on "the mirror has no entry",
+   * the entry arriving is exactly what switches the fallback off. Cosmo and
+   * Vince rendered as broken images across the tier lists for that reason, and
+   * every future brawler would do the same on release week.
+   *
+   * `hasBrawlerPortrait` asks whether the file exists rather than whether a URL
+   * was constructed. It is cached per URL with a long TTL for hits, so this
+   * costs one HEAD per brawler per day and nothing on a warm render, and a
+   * failed probe counts as a hit — a flaky request must not hide art that is
+   * really there.
+   */
+  const substitutes = catalogue?.all?.filter((e) => e.imageUrl && map.has(e.id)) ?? [];
+  const present = await Promise.all(substitutes.map((e) => hasBrawlerPortrait(e.id)));
+  substitutes.forEach((entry, i) => {
+    if (present[i]) return;
+    const mirrored = map.get(entry.id);
+    if (!mirrored || !entry.imageUrl) return;
+    map.set(entry.id, {
+      ...mirrored,
+      imageUrl: entry.imageUrl,
+      imageUrl2: entry.imageUrl,
+      imageUrl3: entry.imageUrl,
+    });
+  });
+
   for (const entry of catalogue?.all ?? []) {
     if (map.has(entry.id) || !entry.imageUrl) continue;
     map.set(entry.id, {

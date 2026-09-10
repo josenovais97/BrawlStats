@@ -3,9 +3,13 @@ import { test } from 'node:test';
 
 import {
   BURST,
+  ClientBuckets,
+  MAX_CLIENTS,
+  PER_CLIENT_BURST,
   REFILL_PER_SECOND,
   createBucket,
   isLimitedPath,
+  limitedPrefix,
   retryAfter,
   take,
 } from '@/lib/hot-path-limit';
@@ -76,4 +80,39 @@ test('retry-after is a whole number of seconds and never zero', () => {
   for (let i = 0; i < BURST; i += 1) take(bucket, 0);
   const wait = retryAfter(bucket);
   assert.ok(Number.isInteger(wait) && wait >= 1, `got ${wait}`);
+});
+
+test('a flood on one prefix does not refuse another', () => {
+  // The failure this exists for: a crawler walking /draft at fifty requests a
+  // second took 2,747 of every 3,000 responses, and readers opening a profile
+  // were refused for traffic that was nothing to do with them.
+  const draft = createBucket(0);
+  const player = createBucket(0);
+  for (let i = 0; i < BURST * 3; i += 1) take(draft, 0);
+
+  assert.equal(take(draft, 0), false, '/draft is exhausted, as intended');
+  assert.ok(take(player, 0), '/player must be unaffected');
+});
+
+test('prefixes are told apart', () => {
+  assert.equal(limitedPrefix('/player/2VLR2JJLJL'), '/player/');
+  assert.equal(limitedPrefix('/draft/gem-grab/undermine/13'), '/draft/');
+  assert.equal(limitedPrefix('/tier-list/ranked'), null);
+});
+
+test('one client cannot drink a prefix dry', () => {
+  const clients = new ClientBuckets();
+  let noisy = 0;
+  while (clients.take('1.2.3.4', 0)) noisy += 1;
+  assert.equal(noisy, PER_CLIENT_BURST, 'the loud client is capped at its burst');
+  assert.ok(clients.take('5.6.7.8', 0), 'a quiet client is still served');
+});
+
+test('the client table cannot grow without bound', () => {
+  const clients = new ClientBuckets();
+  for (let i = 0; i < MAX_CLIENTS + 500; i += 1) clients.take(`ip-${i}`, 0);
+  assert.ok(
+    clients.size <= MAX_CLIENTS,
+    `client table grew to ${clients.size}; a map the internet can add keys to must be bounded`,
+  );
 });

@@ -10,7 +10,13 @@ import {
 import { MAX_ENEMIES, draftHref } from '@/lib/draft-route';
 import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { shouldBlockCrawl } from '@/lib/crawl-policy';
-import { createBucket, isLimitedPath, retryAfter, take } from '@/lib/hot-path-limit';
+import {
+  ClientBuckets,
+  createBucket,
+  limitedPrefix,
+  retryAfter,
+  take,
+} from '@/lib/hot-path-limit';
 import { slugify } from '@/lib/slugs';
 
 /**
@@ -37,10 +43,16 @@ import { slugify } from '@/lib/slugs';
 const TIER_LIST = /^\/tier-list\/(ranked|trophy)(?:\/|$)/;
 
 /**
- * One bucket for the whole process. See `lib/hot-path-limit` for why it is not
- * per-IP, and for the numbers.
+ * One bucket per expensive prefix, plus a small one per client.
+ *
+ * A single shared bucket meant whoever was loudest decided what everyone else
+ * got: a crawler walking `/draft` at fifty requests a second refused people
+ * opening a *profile*, for traffic that had nothing to do with them. Splitting
+ * by prefix contains a flood to the thing being flooded; the per-client bucket
+ * stops one caller draining a prefix on its own. See `lib/hot-path-limit`.
  */
-const hotPath = createBucket(Date.now());
+const prefixBuckets = new Map<string, ReturnType<typeof createBucket>>();
+const clients = new ClientBuckets();
 
 /** Mirrors `TIER_WINDOWS`, minus the default, which is spelled as a bare path. */
 const WINDOW_SEGMENTS = new Set(['24h']);
@@ -157,16 +169,35 @@ export function proxy(request: NextRequest): NextResponse | undefined {
    * render, before the database and before the game API, so a flood costs a
    * regex and a subtraction instead of two shared cores.
    */
-  if (isLimitedPath(pathname) && !take(hotPath, Date.now())) {
-    return new NextResponse('Too many requests. Try again in a moment.', {
-      status: 429,
-      headers: {
-        'content-type': 'text/plain; charset=utf-8',
-        'retry-after': String(retryAfter(hotPath)),
-        // Never cached. The next request a second later should be served.
-        'cache-control': 'no-store',
-      },
-    });
+  const prefix = limitedPrefix(pathname);
+  if (prefix !== null) {
+    const now = Date.now();
+    let bucket = prefixBuckets.get(prefix);
+    if (!bucket) {
+      bucket = createBucket(now);
+      prefixBuckets.set(prefix, bucket);
+    }
+
+    /*
+     * The client's own allowance first, so a caller that has been quiet is not
+     * turned away for a prefix someone else has been hammering.
+     */
+    const client =
+      request.headers.get('cf-connecting-ip') ??
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+      'unknown';
+
+    if (!clients.take(client, now) || !take(bucket, now)) {
+      return new NextResponse('Too many requests. Try again in a moment.', {
+        status: 429,
+        headers: {
+          'content-type': 'text/plain; charset=utf-8',
+          'retry-after': String(retryAfter(bucket)),
+          // Never cached. The next request a second later should be served.
+          'cache-control': 'no-store',
+        },
+      });
+    }
   }
 
   if (shouldBlockCrawl(pathname, request.headers.get('user-agent'), INDEXABLE_PLAYER_TAGS)) {

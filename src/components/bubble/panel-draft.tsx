@@ -69,33 +69,27 @@ const STORED_DRAFT = 'brawlzone.bubble.draft';
 /**
  * Whether the panel offers to read the draft off the screen.
  *
- * On, with the two faults that had it switched off both addressed.
+ * Off, at the reader's request. This is the third time, and the honest summary
+ * is that the half nobody can test kept losing to the half that can.
  *
- * The recognition was never the problem and is pinned by `core`'s
- * DraftCoreTest, which runs the real matcher against real captures of a real
- * draft on every build: Rico 0.97, Griff 0.80, Bull 0.85, Nori 0.79, Surge
- * 0.67, every margin past 0.19, and the card the panel was covering refused at
- * 0.05.
+ * What is finished, and stays finished: the matcher. `core`'s DraftCoreTest
+ * runs it against real captures of a real draft on every build — Rico 0.97,
+ * Griff 0.80, Bull 0.85, Nori 0.79, Surge 0.67, every margin past 0.19, the
+ * card the panel was covering refused at 0.05 — and now also at another
+ * resolution and on a taller screen, because the regions are found from the
+ * team strip rather than assumed from the frame's shape.
  *
- * What *was* wrong: `ready` went true as soon as the first of two hundred and
- * fourteen downloads landed, so a scan could run against a table holding almost
- * nothing and return almost nothing. That reads as a matcher that does not
- * work, and it is the likeliest explanation for recognition being unreliable in
- * use. It now means complete, the downloads run eight at a time instead of one,
- * and the button counts up so a slow first run is visible rather than silent.
+ * What never came right is everything between that matcher and a phone: a
+ * capture sized from the wrong moment, a projection that dies between scans for
+ * reasons that do not reproduce on an emulator, artwork a decoder refuses. Each
+ * was real, each was fixed, and each time the next one was waiting. None of
+ * them are findable without the device, and the method — ship a guess, ask
+ * someone to try it mid-match — costs more than the feature is worth.
  *
- * And the prompt loop: scanning used to ask for screen capture by itself
- * whenever the session was missing, so a session that kept dying produced a
- * dialog that kept coming back. Consent is now only ever requested by a tap on
- * a button that says so, and a grant that dies twice inside a few seconds stops
- * the offer and explains instead. Whatever kills the projection on that device
- * — still unknown, still not reproducible here — the worst it can now cost is
- * two dialogs and a sentence.
- *
- * Still a switch, because the reason to be able to turn a feature off in one
- * line has not gone away.
+ * A switch, not a deletion, and everything behind it is tested and green. If
+ * there is ever a device to debug on, this is one line.
  */
-const SCAN_ENABLED = true;
+const SCAN_ENABLED = false;
 
 /**
  * What the Android build exposes when it can read the screen.
