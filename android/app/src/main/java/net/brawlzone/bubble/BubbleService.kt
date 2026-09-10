@@ -1270,6 +1270,10 @@ class BubbleService : Service() {
             .put("portraits", vision?.portraitCount ?: -1)
             .put("icons", vision?.iconCount ?: -1)
             .put("expected", vision?.expectedCount ?: -1)
+            // The frame's own dimensions, and the screen's. If these disagree
+            // every region is reading the wrong place.
+            .put("frame", scan?.size ?: "-")
+            .put("screen", "${screenW}x$screenH")
             .toString()
 
         /** The roster, so the matcher knows which art to fetch. */
@@ -1530,6 +1534,13 @@ class BubbleService : Service() {
             postScanState(statusNow())
             return
         }
+
+        /*
+         * The capture must match the screen it is capturing. See
+         * ScreenScan.ensureSize — a session granted while the phone was
+         * portrait keeps producing portrait frames of a landscape game.
+         */
+        session.ensureSize(screenW, screenH, resources.displayMetrics.densityDpi)
 
         scanning = true
         pendingReading = null

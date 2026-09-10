@@ -100,6 +100,40 @@ class ScreenScan(
     }
 
     /**
+     * Makes the capture match the screen as it is *now*.
+     *
+     * The virtual display is created once, sized from whatever the screen was
+     * when consent was granted — and consent arrives through an Activity, which
+     * can bring its own orientation with it. Grant it from a portrait screen and
+     * the display stays portrait: a landscape game is then mirrored, scaled and
+     * letterboxed into a portrait buffer, so every region reads somewhere other
+     * than where it should. That is not a subtle drift. It reads the match timer
+     * where the map name is, and puts the first player's pick in the third
+     * slot — which is exactly what a scan came back with.
+     *
+     * Checked before every capture rather than on rotation callbacks, because
+     * the only moment the answer has to be right is the moment a frame is taken.
+     */
+    fun ensureSize(w: Int, h: Int, dpi: Int) {
+        if (w <= 0 || h <= 0) return
+        if (w == width && h == height) return
+        val d = display ?: return
+        runCatching {
+            val fresh = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 2)
+            d.resize(w, h, dpi)
+            d.surface = fresh.surface
+            reader?.close()
+            reader = fresh
+            width = w
+            height = h
+            Log.i(TAG, "capture resized to ${w}x$h")
+        }.onFailure { Log.w(TAG, "could not resize capture", it) }
+    }
+
+    /** The size frames are currently produced at, for diagnostics. */
+    val size: String get() = "${width}x$height"
+
+    /**
      * Throws away every frame the display has already produced.
      *
      * The caller hides its own windows before scanning, and this is what makes
