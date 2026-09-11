@@ -12,6 +12,7 @@ import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { shouldBlockCrawl } from '@/lib/crawl-policy';
 import {
   ClientBuckets,
+  allowanceFor,
   createBucket,
   limitedPrefix,
   retryAfter,
@@ -49,7 +50,12 @@ const TIER_LIST = /^\/tier-list\/(ranked|trophy)(?:\/|$)/;
  * got: a crawler walking `/draft` at fifty requests a second refused people
  * opening a *profile*, for traffic that had nothing to do with them. Splitting
  * by prefix contains a flood to the thing being flooded; the per-client bucket
- * stops one caller draining a prefix on its own. See `lib/hot-path-limit`.
+ * stops one caller draining a prefix on its own.
+ *
+ * Each prefix carries its own rate, because they do not cost the same and are
+ * not asked for by the same people — `/draft` renders per request and is almost
+ * all crawler, `/player` is what readers actually open. `lib/hot-path-limit`
+ * holds the numbers and the reasoning.
  */
 const prefixBuckets = new Map<string, ReturnType<typeof createBucket>>();
 const clients = new ClientBuckets();
@@ -172,9 +178,10 @@ export function proxy(request: NextRequest): NextResponse | undefined {
   const prefix = limitedPrefix(pathname);
   if (prefix !== null) {
     const now = Date.now();
+    const { perSecond, burst } = allowanceFor(prefix);
     let bucket = prefixBuckets.get(prefix);
     if (!bucket) {
-      bucket = createBucket(now);
+      bucket = createBucket(now, burst);
       prefixBuckets.set(prefix, bucket);
     }
 
@@ -187,12 +194,12 @@ export function proxy(request: NextRequest): NextResponse | undefined {
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       'unknown';
 
-    if (!clients.take(client, now) || !take(bucket, now)) {
+    if (!clients.take(client, now) || !take(bucket, now, perSecond, burst)) {
       return new NextResponse('Too many requests. Try again in a moment.', {
         status: 429,
         headers: {
           'content-type': 'text/plain; charset=utf-8',
-          'retry-after': String(retryAfter(bucket)),
+          'retry-after': String(retryAfter(bucket, perSecond)),
           // Never cached. The next request a second later should be served.
           'cache-control': 'no-store',
         },

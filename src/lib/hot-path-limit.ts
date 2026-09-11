@@ -32,39 +32,76 @@
  *
  * So there is now a bucket per prefix, and a small one per client inside that.
  * A flood on `/draft` can exhaust `/draft` and nothing else, and no single
- * caller can drink a prefix dry. The disk cost that made the original flood
- * dangerous is gone — those routes no longer write anything — so the shared
- * ceiling can also be twice what it was.
+ * caller can drink a prefix dry.
+ *
+ * **Splitting the budget is not a reason to raise it.** The same change that
+ * added per-prefix buckets also doubled the rate to eight, which across five
+ * prefixes is forty a second where there had been four — and on 2026-09-11 that
+ * took the box down harder than the flood it was written for. Isolation decides
+ * *who* gets refused; the sum decides whether the box survives. They are
+ * separate questions and only one of them was asked.
  */
 
 /**
- * Sustained requests a second across every uncached route.
+ * What each expensive prefix is allowed, per second, and its burst.
  *
- * Four is roughly twenty times a plausible human rate on these pages: a person
- * reading a profile or stepping through a draft generates something like one
- * request every few seconds, and there are not forty of them at once. It is
- * also about a quarter of what saturated the box, which is the number that
- * actually matters.
+ * Per prefix and not shared, because a shared budget means whoever is loudest
+ * decides what everyone else gets — a crawler on `/draft` was refusing people
+ * opening a profile. But per-prefix budgets **add up**, and that is how this
+ * broke the site on 2026-09-11: five prefixes at eight a second is forty
+ * uncached renders a second, ten times the ceiling it replaced. The box has two
+ * shared cores and `/draft` renders per request, so it saturated, stopped
+ * answering, and the middleware that was supposed to protect it never got to
+ * run — 2,994 of 3,000 requests returned nothing at all.
+ *
+ * So they are budgeted individually against what they cost and who actually
+ * asks for them, and `TOTAL_CEILING` below is asserted in the tests so the sum
+ * cannot quietly creep back up.
  */
-export const REFILL_PER_SECOND = 8;
+export interface Allowance {
+  perSecond: number;
+  burst: number;
+}
+
+export const ALLOWANCES: Record<string, Allowance> = {
+  /*
+   * Almost entirely crawler traffic, and the most expensive thing here: the
+   * route renders per request, so every hit is a full render against the
+   * database. `robots.txt` forbids it and the proxy refuses anything that
+   * admits to being a crawler, so what is left is the ones that lie. A real
+   * reader reaches a draft state by clicking, a few seconds apart.
+   */
+  '/draft/': { perSecond: 1, burst: 10 },
+
+  /*
+   * Real readers, and the one people notice when it fails. Costs an upstream
+   * call rather than a database render, and profiles are the thing this site is
+   * most often opened for.
+   */
+  '/player/': { perSecond: 4, burst: 30 },
+
+  '/club/': { perSecond: 2, burst: 15 },
+  '/compare/players/': { perSecond: 2, burst: 15 },
+  '/wrapped/': { perSecond: 1, burst: 10 },
+};
 
 /**
- * How much of a burst is allowed before the rate starts to bite.
+ * The most this box will render per second across every uncached route.
  *
- * Ten seconds' worth. Loading a profile fires the page and its own follow-up
- * requests together, and a limit with no burst turns one visitor's normal
- * behaviour into a 429 on their second click.
+ * Two shared Ampere cores, and these routes do not benefit from ISR. Measured
+ * the hard way: at forty a second the app stopped answering entirely. Ten is
+ * comfortably inside what it served for weeks.
  */
-export const BURST = 80;
+export const TOTAL_CEILING = 12;
 
-/**
- * The prefixes this covers: every route that renders per request.
- *
- * Kept as a list rather than derived from `CRAWLER_DISALLOW` even though they
- * are nearly the same set, because they answer different questions. That list
- * is about what should be *indexed*; this one is about what is expensive, and
- * the day those two stop agreeing this should follow the cost.
- */
+/** Fallback for a limited prefix with no explicit allowance. */
+export const REFILL_PER_SECOND = 2;
+export const BURST = 15;
+
+export function allowanceFor(prefix: string): Allowance {
+  return ALLOWANCES[prefix] ?? { perSecond: REFILL_PER_SECOND, burst: BURST };
+}
+
 export const LIMITED_PREFIXES = [
   '/player/',
   '/club/',

@@ -2,11 +2,15 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  ALLOWANCES,
   BURST,
   ClientBuckets,
+  LIMITED_PREFIXES,
   MAX_CLIENTS,
   PER_CLIENT_BURST,
   REFILL_PER_SECOND,
+  TOTAL_CEILING,
+  allowanceFor,
   createBucket,
   isLimitedPath,
   limitedPrefix,
@@ -115,4 +119,77 @@ test('the client table cannot grow without bound', () => {
     clients.size <= MAX_CLIENTS,
     `client table grew to ${clients.size}; a map the internet can add keys to must be bounded`,
   );
+});
+
+/**
+ * The sum, which is the number that actually decides whether the box survives.
+ *
+ * Per-prefix buckets add up, and nothing about adding a prefix or nudging one
+ * rate makes the total visible at the point of change. On 2026-09-11 five
+ * prefixes at eight a second admitted forty uncached renders a second into two
+ * shared cores; the app stopped completing requests, so the middleware holding
+ * this limit never ran and 2,994 of 3,000 requests returned nothing at all.
+ *
+ * Isolation and the total are separate questions. The tests above cover the
+ * first. These cover the second.
+ */
+
+test('the prefixes together stay inside what the box can render', () => {
+  const total = LIMITED_PREFIXES.reduce((sum, prefix) => sum + allowanceFor(prefix).perSecond, 0);
+  assert.ok(
+    total <= TOTAL_CEILING,
+    `the limited prefixes admit ${total} uncached renders a second, over the ${TOTAL_CEILING} ` +
+      `this box can serve. Per-prefix budgets add up: at 40/s on 2026-09-11 the site stopped ` +
+      `answering entirely. Lower a rate rather than raising the ceiling.`,
+  );
+});
+
+test('a burst cannot outrun the ceiling for long either', () => {
+  // Bursts are additive too, and every bucket starts full. Sustained refill is
+  // what the ceiling governs, so the combined burst is allowed to exceed it —
+  // but not so far that the opening seconds of a flood are themselves an
+  // outage. Ten seconds' worth is the same shape as the per-bucket burst.
+  const burst = LIMITED_PREFIXES.reduce((sum, prefix) => sum + allowanceFor(prefix).burst, 0);
+  assert.ok(
+    burst <= TOTAL_CEILING * 10,
+    `the prefixes can open with ${burst} requests at once, which two cores cannot absorb`,
+  );
+});
+
+test('every limited prefix is budgeted deliberately', () => {
+  // The fallback exists so an unlisted prefix is limited rather than unlimited,
+  // but a prefix reaching it means someone added a route and never said what it
+  // costs — and the cheap default is the one that would go unnoticed.
+  for (const prefix of LIMITED_PREFIXES) {
+    assert.ok(
+      prefix in ALLOWANCES,
+      `${prefix} is rate-limited but has no entry in ALLOWANCES; say what it costs`,
+    );
+  }
+});
+
+test('the expensive route is held tighter than the one readers open', () => {
+  // /draft renders per request against the database and is almost entirely
+  // crawlers; /player is what people actually came for. If these ever invert,
+  // the limiter is protecting the wrong thing.
+  assert.ok(
+    allowanceFor('/draft/').perSecond < allowanceFor('/player/').perSecond,
+    '/draft must not be given more room than /player',
+  );
+});
+
+test('a reader clicking through profiles is never refused', () => {
+  // The allowance has to be usable by a person, or it is just an outage with
+  // better manners. A profile page and its follow-up requests arrive together.
+  const { perSecond, burst } = allowanceFor('/player/');
+  const bucket = createBucket(0, burst);
+  let served = 0;
+  // Ten clicks, two seconds apart, each firing four requests at once.
+  for (let click = 0; click < 10; click += 1) {
+    const now = click * 2000;
+    for (let i = 0; i < 4; i += 1) {
+      if (take(bucket, now, perSecond, burst)) served += 1;
+    }
+  }
+  assert.equal(served, 40, 'a person browsing profiles must never see a 429');
 });
