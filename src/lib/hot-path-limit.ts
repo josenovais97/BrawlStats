@@ -65,32 +65,56 @@ export interface Allowance {
 
 export const ALLOWANCES: Record<string, Allowance> = {
   /*
-   * Almost entirely crawler traffic, and the most expensive thing here: the
-   * route renders per request, so every hit is a full render against the
-   * database. `robots.txt` forbids it and the proxy refuses anything that
-   * admits to being a crawler, so what is left is the ones that lie. A real
-   * reader reaches a draft state by clicking, a few seconds apart.
+   * Cheap since the pairing matrix was cached — measured warm on 2026-09-11,
+   * median 65ms against the 11.1s that took the box down the same morning. It
+   * gets four a second because it is now *worth* four a second: a route that
+   * was made ~200x cheaper should earn back the room it was costing, and this
+   * is the one prefix people click through rather than read one page of.
+   *
+   * Still not the largest allowance, because it is the most exposed: the state
+   * space is ~3x10^11 URLs (AGENTS.md trap 5) and the traffic walking it is
+   * distributed across thousands of addresses, so a shared budget of any
+   * affordable size can be drained by it. Real visitors will still occasionally
+   * meet a 429 here during a flood. That is a real cost and the alternative was
+   * measured: a site that answers nothing at all.
    */
-  '/draft/': { perSecond: 1, burst: 10 },
+  '/draft/': { perSecond: 4, burst: 30 },
 
   /*
-   * Real readers, and the one people notice when it fails. Costs an upstream
-   * call rather than a database render, and profiles are the thing this site is
-   * most often opened for.
+   * The one people notice when it fails, and the cheapest in the way that
+   * matters. It looks slow — median 1.07s — but that is almost entirely waiting
+   * on the game API, not computing: an I/O-bound request occupies a socket
+   * rather than a core, which is the same distinction AGENTS.md draws about the
+   * sampler being invisible to a CPU metric. Real demand measured at 0.3/s.
    */
   '/player/': { perSecond: 4, burst: 30 },
 
+  /* 0.82s, and roughly one request every five minutes. */
   '/club/': { perSecond: 2, burst: 15 },
-  '/compare/players/': { perSecond: 2, burst: 15 },
+
+  /* No measured demand; moderate cost. */
+  '/compare/players/': { perSecond: 1, burst: 10 },
+
+  /*
+   * The most expensive single render left — 3.4s — and no measured demand at
+   * all, which is the combination that deserves the tightest allowance.
+   */
   '/wrapped/': { perSecond: 1, burst: 10 },
 };
 
 /**
- * The most this box will render per second across every uncached route.
+ * The most this box will admit per second across every uncached route.
  *
- * Two shared Ampere cores, and these routes do not benefit from ISR. Measured
- * the hard way: at forty a second the app stopped answering entirely. Ten is
- * comfortably inside what it served for weeks.
+ * A request count is a crude proxy for the thing that actually breaks, which is
+ * CPU — trap 8 in AGENTS.md is the long version. It is kept anyway because it
+ * is the one number a reviewer can check against a diff, and because the
+ * failure it guards is arithmetic nobody does by eye: five prefixes at eight a
+ * second is forty, and the change that made it forty read as a sensible
+ * two-line edit.
+ *
+ * Unchanged at 12 while `/draft` went from 1/s to 4/s — the room came from
+ * `/compare/players/` and `/wrapped/`, which have no measured demand, and not
+ * from raising the bar to fit. Lower a rate rather than raising this.
  */
 export const TOTAL_CEILING = 12;
 

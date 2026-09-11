@@ -169,14 +169,23 @@ test('every limited prefix is budgeted deliberately', () => {
   }
 });
 
-test('the expensive route is held tighter than the one readers open', () => {
-  // /draft renders per request against the database and is almost entirely
-  // crawlers; /player is what people actually came for. If these ever invert,
-  // the limiter is protecting the wrong thing.
-  assert.ok(
-    allowanceFor('/draft/').perSecond < allowanceFor('/player/').perSecond,
-    '/draft must not be given more room than /player',
-  );
+test('no single prefix can crowd out the rest', () => {
+  // Replaced an assertion that /draft must be tighter than /player, which was
+  // true only while /draft was the expensive one. It is now ~200x cheaper, and
+  // a test that pins a transient fact starts failing for the wrong reason —
+  // here, because the route it was protecting against got fixed.
+  //
+  // What is durable is that these prefixes share a fixed budget: if any one of
+  // them holds most of it, the split that stopped a crawler refusing readers
+  // has been undone by arithmetic rather than by an edit anyone would notice.
+  const share = TOTAL_CEILING / 3;
+  for (const prefix of LIMITED_PREFIXES) {
+    const { perSecond } = allowanceFor(prefix);
+    assert.ok(
+      perSecond <= share,
+      `${prefix} holds ${perSecond}/s of a ${TOTAL_CEILING}/s budget; no prefix may exceed ${share}`,
+    );
+  }
 });
 
 test('a reader clicking through profiles is never refused', () => {
@@ -254,4 +263,18 @@ test('a page that renders per request is covered by a limit', () => {
       `let the route be cached. An uncached route with no ceiling is what took the ` +
       `site down on 2026-09-08 and again on 2026-09-11.`,
   );
+});
+
+test('a person stepping through a draft is never refused', () => {
+  // The counterpart to the profile test, and the reason /draft did not stay at
+  // the 1/s it was cut to during the outage: a limit that a single human user
+  // trips is an outage with better manners. Picking a mode, a map and then five
+  // brawlers is seven requests, and people do it faster than they read.
+  const { perSecond, burst } = allowanceFor('/draft/');
+  const bucket = createBucket(0, burst);
+  let served = 0;
+  for (let step = 0; step < 7; step += 1) {
+    if (take(bucket, step * 1500, perSecond, burst)) served += 1;
+  }
+  assert.equal(served, 7, 'a full draft must complete without a 429');
 });
