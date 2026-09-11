@@ -126,6 +126,53 @@ export function allowanceFor(prefix: string): Allowance {
   return ALLOWANCES[prefix] ?? { perSecond: REFILL_PER_SECOND, burst: BURST };
 }
 
+/**
+ * Whether a `Referer` could have come from a browser.
+ *
+ * Not a guess about intent and not a user-agent list — trap 5 explains why
+ * those fail. It is a shape check on a header, and the shape is decided by the
+ * URL spec rather than by convention: a Referer carries a *document URL*, and a
+ * document URL on a special scheme always serialises with at least "/" as its
+ * path. `https://brawlzone.net/` is what a browser sends from the home page.
+ * `https://brawlzone.net`, with nothing after the host, is not something a
+ * browser can produce — it is an origin that was written by hand.
+ *
+ * Measured 2026-09-11 across 58,485 requests to `/draft`: 58,479 carried the
+ * pathless form, 3 the browser form, 3 no Referer at all. The pathless ones
+ * were also, without exception, five and six segments deep — states that take
+ * several clicks to reach and that nothing links to from the home page.
+ *
+ * A missing Referer is browser-shaped: a pasted link, a bookmark and a shared
+ * draft all arrive with none, and refusing those would break the main reason
+ * these URLs carry their state in the path at all.
+ *
+ * This is a heuristic and it is worth being clear about what happens when it
+ * stops working. If the flood starts appending a slash, its traffic rejoins the
+ * ordinary buckets and the site behaves exactly as it did before this existed —
+ * the limits still hold, real visitors just share them again. It can only lose
+ * the advantage, never the protection.
+ */
+export function browserShapedReferer(referer: string | null): boolean {
+  if (referer === null || referer === '') return true;
+
+  const authority = referer.indexOf('://');
+  if (authority === -1) return false;
+
+  // The raw string, deliberately: `new URL(...)` normalises the empty path to
+  // "/" and would report both forms identically, which is the whole signal.
+  return referer.indexOf('/', authority + 3) !== -1;
+}
+
+/**
+ * What everything failing that check shares between it.
+ *
+ * One bucket for all prefixes rather than one each, because this is a single
+ * flood rather than five audiences: splitting it would only multiply what it is
+ * allowed. Non-zero rather than a block, because the cost of being wrong about
+ * a real visitor should be a slow page and not a wall.
+ */
+export const SUSPECT_ALLOWANCE: Allowance = { perSecond: 1, burst: 10 };
+
 export const LIMITED_PREFIXES = [
   '/player/',
   '/club/',

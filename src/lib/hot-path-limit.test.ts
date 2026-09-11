@@ -8,10 +8,12 @@ import {
   ClientBuckets,
   LIMITED_PREFIXES,
   MAX_CLIENTS,
+  SUSPECT_ALLOWANCE,
   PER_CLIENT_BURST,
   REFILL_PER_SECOND,
   TOTAL_CEILING,
   allowanceFor,
+  browserShapedReferer,
   createBucket,
   isLimitedPath,
   limitedPrefix,
@@ -277,4 +279,55 @@ test('a person stepping through a draft is never refused', () => {
     if (take(bucket, step * 1500, perSecond, burst)) served += 1;
   }
   assert.equal(served, 7, 'a full draft must complete without a 429');
+});
+
+/**
+ * The Referer shape check, which is the only thing that tells a distributed
+ * flood apart from a reader.
+ *
+ * Worth testing carefully in both directions. A false negative costs only the
+ * advantage — that traffic rejoins the ordinary buckets. A false *positive*
+ * puts a real visitor in a 1/s bucket with a crawler, so the cases that must
+ * pass matter more than the ones that must fail.
+ */
+
+test('a browser Referer always carries a path', () => {
+  // What real navigation looks like: the home page, a section, and a draft
+  // state clicked through from the one before it.
+  for (const referer of [
+    'https://brawlzone.net/',
+    'https://brawlzone.net/draft',
+    'https://brawlzone.net/draft/gem-grab/hard-rock-mine/16000000',
+    'https://www.brawlzone.net/',
+    'https://www.google.com/',
+    'https://brawlzone.net/?utm_source=x',
+  ]) {
+    assert.ok(browserShapedReferer(referer), `${referer} is a real browser Referer`);
+  }
+});
+
+test('no Referer at all is a reader, not a crawler', () => {
+  // A pasted link, a bookmark, a shared draft, a typed URL. Refusing these
+  // would break the reason draft state lives in the path in the first place.
+  assert.ok(browserShapedReferer(null));
+  assert.ok(browserShapedReferer(''));
+});
+
+test('a pathless origin is not something a browser sends', () => {
+  // 58,479 of 58,485 requests to /draft on 2026-09-11, all five and six
+  // segments deep. `new URL()` would normalise this to "/" and report it as
+  // identical to the line above, which is why the raw string is inspected.
+  assert.ok(!browserShapedReferer('https://brawlzone.net'));
+  assert.ok(!browserShapedReferer('http://brawlzone.net'));
+  assert.ok(!browserShapedReferer('not a url'));
+});
+
+test('the flood cannot take the budget by looking like five audiences', () => {
+  // One bucket for everything suspect, not one per prefix: five would be five
+  // times the allowance for a single flood, which is the same arithmetic that
+  // caused the outage.
+  assert.ok(
+    SUSPECT_ALLOWANCE.perSecond <= allowanceFor('/draft/').perSecond,
+    'suspect traffic must never be given more room than the readers it mimics',
+  );
 });

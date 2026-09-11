@@ -12,7 +12,9 @@ import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { shouldBlockCrawl } from '@/lib/crawl-policy';
 import {
   ClientBuckets,
+  SUSPECT_ALLOWANCE,
   allowanceFor,
+  browserShapedReferer,
   createBucket,
   limitedPrefix,
   retryAfter,
@@ -178,11 +180,29 @@ export function proxy(request: NextRequest): NextResponse | undefined {
   const prefix = limitedPrefix(pathname);
   if (prefix !== null) {
     const now = Date.now();
-    const { perSecond, burst } = allowanceFor(prefix);
-    let bucket = prefixBuckets.get(prefix);
+
+    /*
+     * Traffic that cannot have come from a browser is counted apart from
+     * traffic that can, and given far less.
+     *
+     * Without this the two share a budget, and a flood spread across thousands
+     * of addresses drains it no matter how large it is — which is not a limit
+     * that can be tuned out of the problem. Every one of those addresses sends
+     * two requests, so a per-client bucket never sees anything worth refusing,
+     * while the prefix they are all pointed at is emptied continuously. The
+     * visitor who then opens the draft helper gets the 429 that was meant for
+     * the flood.
+     *
+     * See `browserShapedReferer` for what the test is and what it is not.
+     */
+    const suspect = !browserShapedReferer(request.headers.get('referer'));
+    const key = suspect ? 'suspect' : prefix;
+    const { perSecond, burst } = suspect ? SUSPECT_ALLOWANCE : allowanceFor(prefix);
+
+    let bucket = prefixBuckets.get(key);
     if (!bucket) {
       bucket = createBucket(now, burst);
-      prefixBuckets.set(prefix, bucket);
+      prefixBuckets.set(key, bucket);
     }
 
     /*
