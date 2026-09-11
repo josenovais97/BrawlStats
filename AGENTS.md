@@ -97,7 +97,7 @@ app; a full 163s image build was run with it held, with no OOM kills. Health
 check 9 alerts if it stops, because losing it breaks nothing visible right up
 until the instance is stopped.
 
-## Seven traps that cost real outages
+## Eight traps that cost real outages
 
 **1. `revalidate` does nothing without `generateStaticParams`.** A dynamic route
 that exports `revalidate` but no `generateStaticParams` is *not* ISR — Next
@@ -191,6 +191,48 @@ pages against the schema; a failure there aborts the deploy rather than warning.
 Health check 10 compares `prisma/migrations` against the finished rows in
 `_prisma_migrations` independently, because a step that stops running never
 fails.
+
+**8. A rate limit does not bound work, and splitting one is not a reason to
+raise it.** Both halves of this were learned in the same outage, 2026-09-11.
+
+`hot-path-limit` started as one global bucket at 4/s. That was starving real
+readers — a crawler on `/draft` was spending the whole allowance, so people
+opening a *profile* got the 429 — so it was split into a bucket per prefix,
+which was right. What was not right was doubling the rate in the same change:
+five prefixes at 8/s is **forty** uncached renders a second where there had
+been four. Isolation decides *who* gets refused; the sum decides whether the
+box survives. They are separate questions and only one of them was asked. The
+total is now asserted against `TOTAL_CEILING` in the tests, because per-prefix
+budgets add up and nothing at the point of change makes the total visible.
+
+The deeper half: **a rate limit bounds arrivals, not work in progress.** If a
+render takes T seconds and R are admitted a second, R x T are in flight — and T
+is not a constant, it grows with load. Measured during the outage, a `/draft`
+render had a median of **11.1s** and a p95 of 74s, against a fraction of a
+second when idle. That is a positive feedback loop: more admitted work makes
+each unit slower, which makes more of it concurrent. Rate limiting cannot
+escape it; the render has to be made cheap. Read `duration` out of the Caddy
+access log per path before choosing a number — the answer is in
+`/var/log/brawlzone/access/access.log`, not in a guess.
+
+And the reason it became a total outage rather than a slow site: **the limiter
+runs inside the process it protects.** When Node saturated, the middleware
+holding the ceiling stopped running too, so 2,994 of 3,000 requests returned
+nothing at all — including the ones that were supposed to be cheap 429s. Caddy
+is a separate process and would be the place for an outer guard, but its
+standard image has no `rate_limit` module, so there is currently no second line
+of defence. Do not assume one exists.
+
+Two things that are *not* the fix, both tried elsewhere in this file's history:
+blocking by user agent (the flood was 58 req/s from thousands of addresses at
+two requests each, all sending Chrome's UA — see trap 5) and `noindex` (a
+crawler has to fetch the URL to read it). `robots.txt` remains a request, not
+an answer.
+
+The guard that generalises is `hot-path-limit.test.ts`: it walks `src/app` and
+fails if any page exporting `dynamic = 'force-dynamic'` is not covered by
+`LIMITED_PREFIXES`. Adding an uncached route with no ceiling is the shape of
+both this outage and the one three days before it.
 
 ## Limits, and which defend themselves
 

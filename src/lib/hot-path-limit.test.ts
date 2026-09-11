@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 
 import {
@@ -192,4 +193,65 @@ test('a reader clicking through profiles is never refused', () => {
     }
   }
   assert.equal(served, 40, 'a person browsing profiles must never see a 429');
+});
+
+/**
+ * Every page that opts out of caching has to be covered by a limit.
+ *
+ * This is the hole the numbers above cannot close. A rate only protects the
+ * prefixes it names, and nothing about adding a route makes its absence from
+ * that list visible — `next build` prints one line for `/draft/[[...state]]`
+ * whether it addresses one page or 3x10^11 (AGENTS.md trap 5), and an uncached
+ * route that nobody limited looks exactly like a cached one until a crawler
+ * finds it.
+ *
+ * Checked against the source rather than at runtime, for the same reason
+ * `cached-shape.test.ts` is: the runtime path needs a server and a database,
+ * and the mistake is a missing line in a file, which is where to catch it.
+ */
+const APP_DIR = new URL('../app/', import.meta.url);
+
+/** Every `page.tsx` under `src/app`, as a path relative to that directory. */
+function pageFiles(dir: URL, prefix = ''): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    if (entry.isDirectory()) {
+      return pageFiles(new URL(`${entry.name}/`, dir), `${prefix}${entry.name}/`);
+    }
+    return entry.name === 'page.tsx' ? [`${prefix}${entry.name}`] : [];
+  });
+}
+
+/**
+ * The URL a page file answers on, with its dynamic segments removed.
+ *
+ * `draft/[[...state]]/page.tsx` is `/draft/`. Route groups — `(marketing)` —
+ * are organisational and contribute no segment, which is exactly why they are
+ * easy to forget when reasoning about a path by eye.
+ */
+function routePrefix(file: string): string {
+  const segments = file
+    .split('/')
+    .slice(0, -1)
+    .filter((segment) => !segment.startsWith('[') && !segment.startsWith('('));
+  return `/${segments.join('/')}${segments.length > 0 ? '/' : ''}`;
+}
+
+test('a page that renders per request is covered by a limit', () => {
+  const uncovered = pageFiles(APP_DIR)
+    .filter((file) =>
+      /export const dynamic\s*=\s*'force-dynamic'/.test(
+        readFileSync(new URL(file, APP_DIR), 'utf8'),
+      ),
+    )
+    .map(routePrefix)
+    .filter((prefix) => limitedPrefix(`${prefix}anything`) === null);
+
+  assert.deepEqual(
+    uncovered,
+    [],
+    `these render per request but no bucket covers them: ${uncovered.join(', ')}. ` +
+      `Add the prefix to LIMITED_PREFIXES and give it an entry in ALLOWANCES, or ` +
+      `let the route be cached. An uncached route with no ceiling is what took the ` +
+      `site down on 2026-09-08 and again on 2026-09-11.`,
+  );
 });
