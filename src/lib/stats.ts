@@ -3044,61 +3044,147 @@ export function getAllyScores(
   return pairingScores(allyIds, 'ally', windowDays);
 }
 
+/**
+ * One brawler's record against one named opponent, summed over the window.
+ *
+ * A flat tuple rather than an object because there are ~11,300 of these per
+ * side and this is what gets serialised into the cache. Field names would
+ * roughly triple it for no benefit — nothing reads these except the loop below.
+ */
+type PairingRow = [brawlerId: number, otherId: number, wins: number, decided: number];
+
+/**
+ * Every pairing on one side of the ball, for the whole roster at once.
+ *
+ * The lineup-shaped query this replaces was the most expensive thing on the
+ * site, and the reason is worth stating because it is not obvious from reading
+ * it: `getCounterScores(enemies)` looks like it needs the database because its
+ * *answer* depends on which enemies were named. But the **data** it reads does
+ * not. `brawler_pair_daily` is a fixed ~90x90x2 matrix, and naming a lineup
+ * only picks which cells to add up — which is arithmetic, not a query.
+ *
+ * So the matrix is fetched once every `READ_CACHE_SECONDS` and every draft
+ * state is summed out of it in memory. That matters far more than the usual
+ * cache saving, because `/draft` renders per request over a state space of
+ * ~3x10^11 URLs (AGENTS.md trap 5): there is no cache key that a crawler
+ * walking it will ever hit twice, so caching *per lineup* would buy nothing and
+ * would write an unbounded number of entries to a disk that has already filled
+ * once. Caching the matrix instead has a key space of two.
+ *
+ * Measured on 2026-09-11, during the outage this was written for: `/draft`
+ * renders had a median of 11.1s and a p95 of 74s, with Postgres backends
+ * pegged, because every one of 58 requests a second ran two 21-day aggregations
+ * over the largest roll-up in the database.
+ */
+async function compute_pairingMatrix(
+  side: 'enemy' | 'ally',
+  windowDays: number,
+): Promise<PairingRow[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  const since = windowStartUtc(windowDays);
+  // Grouped by the pair rather than by the subject, which is the whole trick:
+  // the old query collapsed `other_brawler_id` inside the database because it
+  // had already filtered to one lineup. Keeping that column is what makes one
+  // result serve every lineup.
+  const rows = await prisma.$queryRaw<
+    { brawler_id: number; other_brawler_id: number; wins: bigint; decided: bigint }[]
+  >`
+    SELECT brawler_id, other_brawler_id,
+      COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
+      SUM(battles) AS decided
+    FROM brawler_pair_daily
+    WHERE day >= ${since}
+      AND side = ${side}
+    GROUP BY brawler_id, other_brawler_id
+  `;
+
+  // Numbers, not bigints: `unstable_cache` serialises through JSON and
+  // JSON.stringify throws outright on a BigInt. That failure is invisible
+  // locally, because the first uncached call never serialises anything.
+  return rows.map((r) => [
+    r.brawler_id,
+    r.other_brawler_id,
+    Number(r.wins),
+    Number(r.decided),
+  ]);
+}
+
+/**
+ * Each brawler's own win rate over the window, which every edge is measured
+ * against.
+ *
+ * Split out and cached separately because it never depended on the lineup at
+ * all — the same roster-wide aggregate was being recomputed on every draft
+ * render, and *twice* per render, since counters and synergies each asked for
+ * it. Entries rather than a Map: see `compute_getMapMatchups`.
+ */
+async function compute_overallWinRates(windowDays: number): Promise<[number, number][]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  const since = windowStartUtc(windowDays);
+  const rows = await prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
+    SELECT brawler_id,
+      COALESCE(SUM(wins), 0) AS wins,
+      COALESCE(SUM(decided), 0) AS decided
+    FROM brawler_team_daily
+    WHERE day >= ${since}
+    GROUP BY brawler_id
+  `;
+
+  // Brawlers with nothing decided are dropped rather than stored as null: the
+  // consumer skips them either way, and an absent key says so more cheaply.
+  return rows.flatMap((r) =>
+    Number(r.decided) > 0
+      ? [[r.brawler_id, Number(r.wins) / Number(r.decided)] as [number, number]]
+      : [],
+  );
+}
+
 async function pairingScores(
   otherIds: number[],
   side: 'enemy' | 'ally',
   windowDays: number,
 ): Promise<Map<number, CounterScore>> {
   const out = new Map<number, CounterScore>();
-  const prisma = getPrisma();
-  if (!prisma || otherIds.length === 0) return out;
+  if (otherIds.length === 0) return out;
 
   try {
-    const since = windowStartUtc(windowDays);
-
-    const [overall, versus] = await Promise.all([
-      prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
-        SELECT brawler_id,
-          COALESCE(SUM(wins), 0) AS wins,
-          COALESCE(SUM(decided), 0) AS decided
-        FROM brawler_team_daily
-        WHERE day >= ${since}
-        GROUP BY brawler_id
-      `,
-      // One row per (brawler, opponent) pairing, summed over the named
-      // opponents. See CounterScore.winRate: a battle against two of them
-      // lands in two pairings and so is counted twice, deliberately.
-      prisma.$queryRaw<{ brawler_id: number; wins: bigint; decided: bigint }[]>`
-        SELECT brawler_id,
-          COALESCE(SUM(battles) FILTER (WHERE result = 'victory'), 0) AS wins,
-          SUM(battles) AS decided
-        FROM brawler_pair_daily
-        WHERE day >= ${since}
-          AND side = ${side}
-          AND other_brawler_id = ANY(${otherIds}::int[])
-        GROUP BY brawler_id
-        HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
-      `,
+    const [matrix, overall] = await Promise.all([
+      cachedPairingMatrix(side, windowDays),
+      cachedOverallWinRates(windowDays),
     ]);
 
-    const base = new Map(
-      overall.map((row) => [
-        row.brawler_id,
-        Number(row.decided) > 0 ? Number(row.wins) / Number(row.decided) : null,
-      ]),
-    );
+    // Exactly what the database was doing: sum the named opponents' columns.
+    const named = new Set(otherIds);
+    const totals = new Map<number, { wins: number; decided: number }>();
+    for (const [brawlerId, otherId, wins, decided] of matrix) {
+      if (!named.has(otherId)) continue;
+      const running = totals.get(brawlerId);
+      if (running) {
+        running.wins += wins;
+        running.decided += decided;
+      } else {
+        totals.set(brawlerId, { wins, decided });
+      }
+    }
 
-    for (const row of versus) {
-      const decided = Number(row.decided);
-      const winRate = Number(row.wins) / decided;
-      const own = base.get(row.brawler_id);
-      if (own === null || own === undefined) continue;
+    const base = new Map(overall);
+    for (const [brawlerId, total] of totals) {
+      // The old query's HAVING, which applied to the total across the named
+      // opponents rather than to any single pairing. Same here.
+      if (total.decided < MIN_SAMPLE_FOR_PAIRING) continue;
+      const own = base.get(brawlerId);
+      if (own === undefined) continue;
 
-      out.set(row.brawler_id, {
-        brawlerId: row.brawler_id,
+      const winRate = total.wins / total.decided;
+      out.set(brawlerId, {
+        brawlerId,
         winRate,
         edge: winRate - own,
-        decidedSampleSize: decided,
+        decidedSampleSize: total.decided,
       });
     }
 
@@ -3980,6 +4066,15 @@ async function compute_getLadderMapForm(
 }
 
 const cachedMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
+
+/*
+ * The draft helper's two reads, which between them were the most expensive
+ * thing the site did. Keyed on side and window only — never on the lineup, which
+ * is what keeps the key space at two entries instead of unbounded. See
+ * `compute_pairingMatrix`.
+ */
+const cachedPairingMatrix = cachedRead('pairing-matrix', compute_pairingMatrix);
+const cachedOverallWinRates = cachedRead('overall-win-rates', compute_overallWinRates);
 
 /** Keyed by map name. See compute_getMapMatchups for why the cache holds entries. */
 export async function getMapMatchups(): Promise<Map<string, MapMatchup[]>> {
