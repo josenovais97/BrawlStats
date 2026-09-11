@@ -273,8 +273,101 @@ object DraftCore {
         return (s / a.size).toFloat()
     }
 
+    /**
+     * Why a slot has the answer it has.
+     *
+     * Four answers, not two, because "nothing" was hiding three different
+     * facts. An empty placeholder means nobody has picked yet; an unknown means
+     * something is there and the matcher could not name it; occluded means our
+     * own panel was in the frame and there is nothing to read. The page treats
+     * them differently — an empty slot that used to hold a pick is evidence of
+     * a new draft, an unknown one is not — so they have to arrive as different
+     * words rather than the same null.
+     */
+    enum class Status { RECOGNIZED, EMPTY, UNKNOWN, OCCLUDED }
+
+    /** One runner-up, kept so a misread can be diagnosed from the payload. */
+    data class Candidate(val id: Int, val score: Float)
+
     /** What one slot came to: a brawler, or nothing, and how sure. */
-    data class Match(val id: Int?, val best: Float, val margin: Float, val empty: Boolean)
+    data class Match(
+        val id: Int?,
+        val best: Float,
+        val margin: Float,
+        val status: Status,
+        val candidates: List<Candidate> = emptyList(),
+        /** Why it is not a recognition, for the diagnostics export. */
+        val reason: String? = null,
+    ) {
+        val empty: Boolean get() = status == Status.EMPTY
+    }
+
+    /**
+     * How much of a rectangle is near-black.
+     *
+     * The overlay this app draws is #0B0F1D, and a stale capture that still
+     * has it in the frame reads as a slot full of that. Measured on captures
+     * with the panel up: 89-97% of a covered slot is under 40 brightness,
+     * against 8-21% of any real card and 16% of the empty placeholder.
+     */
+    fun darkFraction(image: Image, rect: Rect, limit: Int = 40): Float {
+        var dark = 0
+        var n = 0
+        sample(image, rect) { p ->
+            val r = (p shr 16) and 0xFF
+            val g = (p shr 8) and 0xFF
+            val b = p and 0xFF
+            if (max(r, max(g, b)) < limit) dark++
+            n++
+        }
+        return if (n == 0) 0f else dark.toFloat() / n
+    }
+
+    /**
+     * How much of a rectangle is coloured rather than grey.
+     *
+     * The unpicked card is a grey "?" placeholder: 9% of its pixels have a
+     * channel spread over 60, against 45-68% of every real card and ban on
+     * the same captures. This is what says "empty" rather than a weak match.
+     */
+    fun saturatedFraction(image: Image, rect: Rect, spread: Int = 60): Float {
+        var sat = 0
+        var n = 0
+        sample(image, rect) { p ->
+            val r = (p shr 16) and 0xFF
+            val g = (p shr 8) and 0xFF
+            val b = p and 0xFF
+            if (max(r, max(g, b)) - min(r, min(g, b)) > spread) sat++
+            n++
+        }
+        return if (n == 0) 0f else sat.toFloat() / n
+    }
+
+    /** Visits a grid of at most ~32x32 samples of a rectangle. */
+    private inline fun sample(image: Image, rect: Rect, visit: (Int) -> Unit) {
+        val x0 = rect.left.coerceIn(0, max(0, image.width - 1))
+        val y0 = rect.top.coerceIn(0, max(0, image.height - 1))
+        val x1 = rect.right.coerceIn(x0 + 1, image.width)
+        val y1 = rect.bottom.coerceIn(y0 + 1, image.height)
+        val stepY = max(1, (y1 - y0) / 32)
+        val stepX = max(1, (x1 - x0) / 32)
+        var y = y0
+        while (y < y1) {
+            val row = y * image.width
+            var x = x0
+            while (x < x1) {
+                visit(image.pixels[row + x])
+                x += stepX
+            }
+            y += stepY
+        }
+    }
+
+    /** Below this share of coloured pixels a card is the grey placeholder. */
+    const val EMPTY_MAX_SATURATED = 0.20f
+
+    /** Above this share of near-black a slot is under our own overlay. */
+    const val OCCLUDED_MIN_DARK = 0.55f
 
     /**
      * One region against a whole reference table.
@@ -293,14 +386,27 @@ object DraftCore {
         minMargin: Float,
         n: Int = N,
     ): Match {
-        if (region.width < 6 || region.height < 6) return Match(null, 0f, 0f, true)
-        if (detail(frame, region) < MIN_DETAIL) return Match(null, 0f, 0f, true)
+        if (region.width < 6 || region.height < 6) {
+            return Match(null, 0f, 0f, Status.UNKNOWN, reason = "region too small")
+        }
+        /*
+         * Occlusion is decided before anything is matched, because a slot
+         * under the panel matches nothing and the *reason* it matches nothing
+         * is the fact worth reporting: it says the capture was stale, not that
+         * the matcher failed.
+         */
+        val dark = darkFraction(frame, region)
+        if (dark >= OCCLUDED_MIN_DARK) {
+            return Match(null, 0f, 0f, Status.OCCLUDED, reason = "dark %.2f".format(dark))
+        }
+        if (detail(frame, region) < MIN_DETAIL) {
+            return Match(null, 0f, 0f, Status.EMPTY, reason = "flat")
+        }
+        if (table.isEmpty()) return Match(null, 0f, 0f, Status.UNKNOWN, reason = "no references")
 
         val qs = queries.map { describe(frame, crop(region, it), n) }
 
-        var bestId = -1
-        var best = -2f
-        var second = -2f
+        val scored = ArrayList<Candidate>(table.size)
         for ((id, variants) in table) {
             var s = -2f
             for (v in variants) {
@@ -309,16 +415,30 @@ object DraftCore {
                     if (x > s) s = x
                 }
             }
-            if (s > best) {
-                second = best; best = s; bestId = id
-            } else if (s > second) {
-                second = s
-            }
+            scored.add(Candidate(id, s))
         }
+        scored.sortByDescending { it.score }
+        val top = scored.take(TOP_CANDIDATES)
+        val best = top.firstOrNull()?.score ?: -2f
+        val second = top.getOrNull(1)?.score ?: -2f
+        val bestId = top.firstOrNull()?.id ?: -1
         val margin = best - second
         val ok = bestId > 0 && best >= minScore && margin >= minMargin
-        return Match(if (ok) bestId else null, best, margin, false)
+        if (ok) return Match(bestId, best, margin, Status.RECOGNIZED, top)
+
+        /*
+         * Not a brawler the table knows. Whether that is "nobody yet" or
+         * "somebody we cannot name" is decided by colour: the placeholder is
+         * grey, and every brawler is not.
+         */
+        val saturated = saturatedFraction(frame, region)
+        val status = if (saturated < EMPTY_MAX_SATURATED) Status.EMPTY else Status.UNKNOWN
+        val reason = if (best < minScore) "score %.2f".format(best) else "margin %.2f".format(margin)
+        return Match(null, best, margin, status, top, reason)
     }
+
+    /** Runner-ups kept per slot. Three is enough to see what it confused. */
+    const val TOP_CANDIDATES = 3
 
     /**
      * Every crop of a reference image the matcher will compare against.

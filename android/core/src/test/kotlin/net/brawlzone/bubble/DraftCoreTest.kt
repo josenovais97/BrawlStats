@@ -198,6 +198,11 @@ class DraftCoreTest {
         DraftLayout.CARD_MIN_SCORE, DraftLayout.CARD_MIN_MARGIN,
     )
 
+    private fun enemy(frame: DraftCore.Image, index: Int): DraftCore.Match = DraftCore.identify(
+        frame, DraftLayout.locate(frame).enemies[index], DraftLayout.CARD_QUERIES, portraits,
+        DraftLayout.CARD_MIN_SCORE, DraftLayout.CARD_MIN_MARGIN,
+    )
+
     /** The same frame at another size, as a phone with a different screen sees it. */
     private fun scaled(frame: DraftCore.Image, w: Int, h: Int): DraftCore.Image {
         val out = IntArray(w * h)
@@ -212,24 +217,47 @@ class DraftCoreTest {
     }
 
     /**
-     * The same frame on a taller screen: the game keeps its strip at the bottom
-     * and there is simply more room above it.
+     * The same frame with black bars around it: `top` rows above, `bottom`
+     * below, `side` columns left and right. This is what a virtual display
+     * produces when the screen it mirrors is a different shape, and what a
+     * navigation bar or a cutout inset does to one edge.
      */
-    private fun taller(frame: DraftCore.Image, extra: Int): DraftCore.Image {
-        val h = frame.height + extra
-        val out = IntArray(frame.width * h)
-        System.arraycopy(frame.pixels, 0, out, extra * frame.width, frame.pixels.size)
-        return DraftCore.Image(out, frame.width, h)
+    private fun padded(frame: DraftCore.Image, top: Int, bottom: Int = 0, side: Int = 0): DraftCore.Image {
+        val w = frame.width + side * 2
+        val h = frame.height + top + bottom
+        val out = IntArray(w * h) { 0xFF000000.toInt() }
+        for (y in 0 until frame.height) {
+            System.arraycopy(frame.pixels, y * frame.width, out, (y + top) * w + side, frame.width)
+        }
+        return DraftCore.Image(out, w, h)
     }
+
+    /** The old test's name for the same thing. */
+    private fun taller(frame: DraftCore.Image, extra: Int) = padded(frame, extra)
 
     @Test
     fun `the layout is found from the frame, not assumed`() {
         val f = frame("draft-picked.jpg")
         val located = DraftLayout.locate(f)
-        assertTrue("the team strip should be detected", located.detected)
+        assertTrue("the team strip should be detected: ${located.reasons}", located.detected)
         // 1560x720: the strip is 228 tall. Anything wildly off means the
         // detector latched onto something that is not the strip.
         assertTrue("strip unit ${located.unit}", located.unit in 200..260)
+        assertTrue("seam ${located.seam}", located.seam in 830..850)
+        assertTrue("the plate should be found on its own colour", located.plateFound)
+        assertEquals(1f, located.confidence, 0f)
+    }
+
+    @Test
+    fun `the plate is found where it is, not where the frame's corner says`() {
+        val f = frame("draft-picked.jpg")
+        val at = DraftLayout.locate(f)
+        // Measured: the lavender box spans rows 20-97 and columns 72-406.
+        assertTrue("plate top ${at.plateText.top}", at.plateText.top in 16..26)
+        assertTrue("plate bottom ${at.plateText.bottom}", at.plateText.bottom in 92..102)
+        assertTrue("plate right ${at.plateText.right}", at.plateText.right in 400..412)
+        assertTrue("mode line above map line", at.plateMode.bottom <= at.plateMap.top + 1)
+        assertTrue("map line inside the box", at.plateMap.bottom <= at.plateText.bottom)
     }
 
     @Test
@@ -242,6 +270,9 @@ class DraftCoreTest {
         assertEquals("first pick at 2340x1080", RICO, ally(big, 0).id)
         assertEquals("second pick at 2340x1080", GRIFF, ally(big, 1).id)
         assertEquals("ban 1 at 2340x1080", BULL, ban(big, 0).id)
+        val at = DraftLayout.locate(big)
+        assertTrue("plate found at 2340x1080", at.plateFound)
+        assertTrue("plate top ${at.plateText.top}", at.plateText.top in 24..40)
     }
 
     @Test
@@ -254,14 +285,106 @@ class DraftCoreTest {
     }
 
     @Test
+    fun `two hundred rows above the game move the plate crop with it`() {
+        // The review's case: the old detector moved the strip and the picks
+        // correctly and left the map crop at rows 18-90 of the frame — two
+        // hundred pixels above the text, with zero overlap.
+        val base = DraftLayout.locate(frame("draft-picked.jpg"))
+        val at = DraftLayout.locate(taller(frame("draft-picked.jpg"), 200))
+        assertTrue("detected: ${at.reasons}", at.detected)
+        assertTrue("plate found", at.plateFound)
+        assertEquals("plate top moved by 200", base.plateText.top + 200, at.plateText.top)
+        assertEquals("map line moved by 200", base.plateMap.top + 200, at.plateMap.top)
+        assertEquals("plate left unchanged", base.plateText.left, at.plateText.left)
+    }
+
+    @Test
+    fun `one black row under the game does not lose the layout`() {
+        // The old detector started at the frame's last row and stopped the
+        // moment it was neither blue nor red — so a single appended row of
+        // black, which is what a rounded corner or a gesture bar produces,
+        // dropped it into the whole-frame fallback.
+        val base = DraftLayout.locate(frame("draft-picked.jpg"))
+        val at = DraftLayout.locate(padded(frame("draft-picked.jpg"), top = 0, bottom = 1))
+        assertTrue("detected: ${at.reasons}", at.detected)
+        assertEquals(base.unit, at.unit)
+        assertEquals("first ally crop unmoved", base.allies[0], at.allies[0])
+    }
+
+    @Test
+    fun `a bottom margin does not move the cards`() {
+        // With 48 black rows below the game, the old fallback moved the first
+        // ally crop from rows 531-638 to 566-681 although the card had not
+        // moved at all. The cards are where they were; only the frame grew.
+        val base = DraftLayout.locate(frame("draft-picked.jpg"))
+        val f = padded(frame("draft-picked.jpg"), top = 0, bottom = 48)
+        val at = DraftLayout.locate(f)
+        assertTrue("detected: ${at.reasons}", at.detected)
+        assertEquals("first ally crop unmoved", base.allies[0], at.allies[0])
+        assertEquals("ban 1 unmoved", base.bans[0], at.bans[0])
+        assertEquals("first pick", RICO, ally(f, 0).id)
+    }
+
+    @Test
+    fun `side bars move every crop by the same amount`() {
+        // A portrait-sized virtual display mirroring a landscape game puts the
+        // game in the middle with black either side. Nothing may be read from
+        // the frame's edge.
+        val base = DraftLayout.locate(frame("draft-picked.jpg"))
+        val f = padded(frame("draft-picked.jpg"), top = 120, bottom = 120, side = 100)
+        val at = DraftLayout.locate(f)
+        assertTrue("detected: ${at.reasons}", at.detected)
+        assertEquals(base.unit, at.unit)
+        assertEquals("ally shifted right by 100", base.allies[0].left + 100, at.allies[0].left)
+        assertEquals("right-side ban shifted right by 100", base.bans[3].left + 100, at.bans[3].left)
+        assertEquals("plate shifted right by 100", base.plateText.left + 100, at.plateText.left)
+        assertEquals("plate shifted down by 120", base.plateText.top + 120, at.plateText.top)
+        assertEquals("first pick", RICO, ally(f, 0).id)
+        assertEquals("ban 2", SURGE, ban(f, 1).id)
+    }
+
+    @Test
+    fun `two flat panels are not a draft`() {
+        // The review's synthetic frame: the two team colours and nothing else
+        // passed strip detection. A strip is where a draft *would* be; the
+        // cards are what says one is there.
+        val w = 1560
+        val h = 720
+        val px = IntArray(w * h) { i ->
+            val y = i / w
+            val x = i % w
+            if (y < 492) 0xFF202020.toInt()
+            else if (x < 840) DraftLayout.TEAM_BLUE else DraftLayout.TEAM_RED
+        }
+        val at = DraftLayout.locate(DraftCore.Image(px, w, h))
+        assertTrue("must not be detected", !at.detected)
+        assertTrue("says why: ${at.reasons}", at.reasons.any { it.contains("flat") })
+    }
+
+    @Test
+    fun `a screen without the strip is refused with a reason`() {
+        val f = frame("draft-picked.jpg")
+        // Paint the strip over: the rest of the frame is unchanged.
+        val px = f.pixels.copyOf()
+        for (y in 480 until f.height) for (x in 0 until f.width) px[y * f.width + x] = 0xFF303030.toInt()
+        val at = DraftLayout.locate(DraftCore.Image(px, f.width, f.height))
+        assertTrue(!at.detected)
+        assertEquals(0f, at.confidence, 0f)
+        assertTrue(at.reasons.toString(), at.reasons.isNotEmpty())
+    }
+
+    @Test
     fun `reads the picks off a real draft`() {
         val f = frame("draft-picked.jpg")
         val first = ally(f, 0)
         val second = ally(f, 1)
         assertEquals("first pick", RICO, first.id)
         assertEquals("second pick", GRIFF, second.id)
+        assertEquals(DraftCore.Status.RECOGNIZED, first.status)
         assertTrue("Rico margin ${first.margin}", first.margin > 0.25f)
         assertTrue("Griff margin ${second.margin}", second.margin > 0.25f)
+        assertEquals("top candidate is the answer", RICO, first.candidates.first().id)
+        assertEquals(DraftCore.TOP_CANDIDATES, first.candidates.size)
     }
 
     @Test
@@ -276,18 +399,40 @@ class DraftCoreTest {
     fun `an unpicked card is reported empty, not guessed`() {
         // In this frame the second player has not picked: the card is the grey
         // "?" placeholder. A guess here is worse than a gap, because the board
-        // would hold a brawler nobody chose.
+        // would hold a brawler nobody chose — and "empty" is a different fact
+        // from "unknown": it is what a new draft looks like.
         val f = frame("draft-partial.jpg")
         assertEquals(RICO, ally(f, 0).id)
-        assertNull("second card should be empty", ally(f, 1).id)
+        val second = ally(f, 1)
+        assertNull("second card should be empty", second.id)
+        assertEquals(DraftCore.Status.EMPTY, second.status)
     }
 
     @Test
-    fun `a slot the panel is covering is refused`() {
-        // The overlay sits over the right-hand half of the screen in this
-        // capture. Whatever is under it must not become a confident answer.
-        val f = frame("draft-partial.jpg")
-        assertNull("covered card should be refused", ally(f, 2).id)
+    fun `a slot the panel is covering is reported occluded, not empty`() {
+        // The overlay sits over the right-hand half of the screen in these
+        // captures. Whatever is under it must not become a confident answer,
+        // and it must not read as "nobody has picked" either — that would
+        // tell the page a draft had restarted.
+        for (name in listOf("draft-partial.jpg", "draft-picked.jpg")) {
+            val f = frame(name)
+            assertEquals("$name ally 3", DraftCore.Status.OCCLUDED, ally(f, 2).status)
+            for (i in 0 until 3) {
+                assertEquals("$name enemy $i", DraftCore.Status.OCCLUDED, enemy(f, i).status)
+            }
+            assertEquals("$name right ban 1", DraftCore.Status.OCCLUDED, ban(f, 3).status)
+        }
+    }
+
+    @Test
+    fun `the reader's own card is told from the team-mates'`() {
+        // The reader is KZ BOXING, in the middle slot, in both captures: still
+        // choosing in one, locked in the other. The name under the card is
+        // cream either way, and the team-mate's is green.
+        for (name in listOf("draft-partial.jpg", "draft-picked.jpg")) {
+            val f = frame(name)
+            assertEquals(name, 1, DraftLayout.selfIndex(f, DraftLayout.locate(f)))
+        }
     }
 
     @Test
@@ -297,14 +442,7 @@ class DraftCoreTest {
         // bans at the portrait table again, this catches it.
         val f = frame("draft-picked.jpg")
         val wrong = DraftCore.identify(
-            f,
-            DraftCore.rectOf(
-                f,
-                DraftCore.Region(
-                    DraftLayout.BAN_X[0], DraftLayout.BAN_Y,
-                    DraftLayout.BAN_SIZE_X, DraftLayout.BAN_SIZE_Y,
-                ),
-            ),
+            f, DraftLayout.locate(f).bans[0],
             DraftLayout.BAN_QUERIES, portraits,
             DraftLayout.BAN_MIN_SCORE, DraftLayout.BAN_MIN_MARGIN,
         )

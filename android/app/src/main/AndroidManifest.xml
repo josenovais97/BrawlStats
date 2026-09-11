@@ -70,6 +70,22 @@
           It finishes itself explicitly instead, which is what noHistory was
           there to save and is worth doing by hand to keep the result.
         -->
+        <!--
+          Hands an exported scan — the exact frame recognition ran on, and its
+          record — to whatever the reader picks in the share sheet. The files
+          live in the app's own external directory, which nothing else can
+          read on Android 11+ without this.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity
             android:name=".ScanConsentActivity"
             android:exported="false"

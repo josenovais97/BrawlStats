@@ -61,3 +61,27 @@ checkout configures cleanly.
    file, which is the reminder that would otherwise not exist: a stale checksum
    fails verification on a good download and teaches the one careful reader to
    skip the step.
+
+## Testing the scan without a phone
+
+The recognition maths runs on the JVM: `./gradlew :core:test` reads two real
+draft captures and asserts both teams' slots, the layout, the plate and the
+control flow (`ScanFlowTest`). The Android half can be driven on an emulator
+with no Brawl Stars on it:
+
+1. `cd android/harness && python3 -m http.server 8765 --bind 0.0.0.0` — a
+   stand-in for `/bubble/panel` that speaks the bridge protocol exactly as
+   the panel does and prints every payload.
+2. `./gradlew assembleDebug -PpanelOrigin=http://10.0.2.2:8765` — debug builds
+   accept a panel origin; releases always use the site.
+3. Copy a capture into the app's private files (`adb push` to
+   `/data/local/tmp`, then `run-as net.brawlzone.bubble cat > files/x.jpg`)
+   and show it full-screen: `adb shell am start -f 0x18000000 -n
+   net.brawlzone.bubble/.FixtureActivity --es path
+   /data/data/net.brawlzone.bubble/files/x.jpg`.
+4. Start the bubble, open the panel, Allow capture, Scan. Diagnostics and
+   the exact frame recognition ran on are exported from the panel's
+   Diagnostics block.
+
+Run the emulator with a window and hardware GPU; a headless swiftshader run
+at 2 GB is enough to take a WSL instance down.

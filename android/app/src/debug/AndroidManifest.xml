@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Debug builds only. Cleartext so the panel can be loaded from a laptop's
+      dev server over 10.0.2.2, and a full-screen picture viewer so an emulator
+      with no Brawl Stars on it can still put a real draft capture in front of
+      the scanner. Neither exists in a release.
+    -->
+    <application
+        android:usesCleartextTraffic="true"
+        tools:ignore="UnusedAttribute">
+        <activity
+            android:name=".FixtureActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+    </application>
+</manifest>

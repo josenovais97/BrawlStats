@@ -1,0 +1,60 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridge harness</title>
+<style>
+  body { font: 12px system-ui, sans-serif; background: #0b0f1d; color: #dfe4f5; margin: 0; padding: 8px; }
+  button { font: inherit; padding: 6px 10px; margin: 2px; border-radius: 6px; border: 1px solid #33415f; background: #141a2e; color: #dfe4f5; }
+  pre { white-space: pre-wrap; word-break: break-all; font-size: 10px; background: #111729; padding: 6px; border-radius: 6px; max-height: 40vh; overflow: auto; }
+  .row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .slot { display: inline-block; min-width: 54px; padding: 3px 5px; margin: 1px; border-radius: 4px; background: #1a2340; }
+  .recognized { background: #1f4d2c; } .empty { background: #333; } .unknown { background: #4d3a1f; } .occluded { background: #4d1f2c; }
+</style>
+<!--
+  A stand-in for /bubble/panel that speaks the bridge protocol exactly as the
+  panel does, and nothing else: register handlers, hand over the roster, say
+  ready, acknowledge results. It exists so the Android half can be driven on an
+  emulator without the site's database behind it. Serve it with
+
+      cd android/harness && python3 -m http.server 8765
+
+  and build with -PpanelOrigin=http://10.0.2.2:8765.
+-->
+<div class="row">
+  <span id="state">state: ?</span>
+  <button onclick="BrawlZoneScan.enable()">Allow capture</button>
+  <button onclick="BrawlZoneScan.scan()">Scan</button>
+  <button onclick="BrawlZoneScan.stop()">Stop</button>
+  <button onclick="log('detail', JSON.parse(BrawlZoneScan.scanDetail()))">Detail</button>
+  <button onclick="log('export', BrawlZoneScan.exportDiagnostics())">Export</button>
+</div>
+<div id="slots"></div>
+<pre id="log"></pre>
+<script>
+const NAMES = {"16000110": "Vince", "16000109": "Cosmo", "16000108": "Wendy", "16000107": "Nori", "16000106": "Bolt", "16000105": "Starr Nova", "16000104": "Damian", "16000103": "Najia", "16000102": "Sirius", "16000101": "Glowy", "16000100": "Gigi", "16000099": "Pierce", "16000098": "Ziggy", "16000097": "Mina", "16000096": "Trunk", "16000095": "Alli", "16000094": "Kaze", "16000093": "Jae-Yong", "16000092": "Finx", "16000091": "Lumi", "16000090": "Ollie", "16000089": "Meeple", "16000088": "Buzz Lightyear", "16000087": "Juju", "16000086": "Shade", "16000085": "Kenji", "16000084": "Moe", "16000083": "Clancy", "16000082": "Berry", "16000081": "Lily", "16000080": "Draco", "16000079": "Angelo", "16000078": "Melodie", "16000077": "Larry & Lawrie", "16000076": "Kit", "16000075": "Mico", "16000074": "Charlie", "16000073": "Chuck", "16000072": "Pearl", "16000071": "Doug", "16000070": "Cordelius", "16000069": "Hank", "16000068": "Maisie", "16000067": "Willow", "16000066": "R-T", "16000065": "Mandy", "16000064": "Gray", "16000063": "Chester", "16000062": "Buster", "16000061": "Gus", "16000060": "Sam", "16000059": "Otis", "16000058": "Bonnie", "16000057": "Janet", "16000056": "Eve", "16000054": "Fang", "16000053": "Lola", "16000052": "Meg", "16000051": "Ash", "16000050": "Griff", "16000049": "Buzz", "16000048": "Grom", "16000047": "Squeak", "16000046": "Belle", "16000045": "Stu", "16000044": "Ruffs", "16000043": "Edgar", "16000042": "Byron", "16000041": "Lou", "16000040": "Amber", "16000039": "Colette", "16000038": "Surge", "16000037": "Sprout", "16000036": "Nani", "16000035": "Gale", "16000034": "Jacky", "16000032": "Max", "16000031": "Mr. P", "16000030": "Emz", "16000029": "Bea", "16000028": "Sandy", "16000027": "8-Bit", "16000026": "Bibi", "16000025": "Carl", "16000024": "Rosa", "16000023": "Leon", "16000022": "Tick", "16000021": "Gene", "16000020": "Frank", "16000019": "Penny", "16000018": "Darryl", "16000017": "Tara", "16000016": "Pam", "16000015": "Piper", "16000014": "Bo", "16000013": "Poco", "16000012": "Crow", "16000011": "Mortis", "16000010": "El Primo", "16000009": "Dynamike", "16000008": "Nita", "16000007": "Jessie", "16000006": "Barley", "16000005": "Spike", "16000004": "Rico", "16000003": "Brock", "16000002": "Bull", "16000001": "Colt", "16000000": "Shelly"};
+const ROSTER = [16000000, 16000001, 16000002, 16000003, 16000004, 16000005, 16000006, 16000007, 16000008, 16000009, 16000010, 16000011, 16000012, 16000013, 16000014, 16000015, 16000016, 16000017, 16000018, 16000019, 16000020, 16000021, 16000022, 16000023, 16000024, 16000025, 16000026, 16000027, 16000028, 16000029, 16000030, 16000031, 16000032, 16000034, 16000035, 16000036, 16000037, 16000038, 16000039, 16000040, 16000041, 16000042, 16000043, 16000044, 16000045, 16000046, 16000047, 16000048, 16000049, 16000050, 16000051, 16000052, 16000053, 16000054, 16000056, 16000057, 16000058, 16000059, 16000060, 16000061, 16000062, 16000063, 16000064, 16000065, 16000066, 16000067, 16000068, 16000069, 16000070, 16000071, 16000072, 16000073, 16000074, 16000075, 16000076, 16000077, 16000078, 16000079, 16000080, 16000081, 16000082, 16000083, 16000084, 16000085, 16000086, 16000087, 16000088, 16000089, 16000090, 16000091, 16000092, 16000093, 16000094, 16000095, 16000096, 16000097, 16000098, 16000099, 16000100, 16000101, 16000102, 16000103, 16000104, 16000105, 16000106, 16000107, 16000108, 16000109, 16000110];
+const out = document.getElementById('log');
+const lines = [];
+function log(tag, value) {
+  lines.unshift(new Date().toISOString().slice(11, 23) + ' ' + tag + ' ' + (typeof value === 'string' ? value : JSON.stringify(value)));
+  out.textContent = lines.slice(0, 40).join('\n');
+  console.log('HARNESS ' + tag + ' ' + (typeof value === 'string' ? value : JSON.stringify(value)));
+}
+function show(p) {
+  const el = document.getElementById('slots');
+  if (!p.ok) { el.innerHTML = '<b>' + p.screen + '</b> ' + (p.reason || ''); return; }
+  el.innerHTML = ['bans', 'allies', 'enemies'].map((k) =>
+    '<div><b>' + k + '</b> ' + (p[k] || []).map((s, i) =>
+      '<span class="slot ' + s.status + '">' + i + (i === p.self && k === 'allies' ? '*' : '') + ' ' + (s.id ? (NAMES[s.id] || s.id) : s.status) + ' ' + (s.score ?? '') + '</span>').join('') + '</div>').join('') +
+    '<div>map=' + p.map + ' mode=' + p.mode + ' ocr=' + p.ocr + ' modeText=' + JSON.stringify(p.modeText) + ' mapText=' + JSON.stringify(p.mapText) + ' layout=' + JSON.stringify(p.layout) + '</div>';
+}
+window.brawlzone = {
+  scanState(s) { document.getElementById('state').textContent = 'state: ' + s; log('state', s); },
+  scanResult(p) { log('result', p); show(p); if (p.id !== undefined) BrawlZoneScan.ack(p.id); },
+};
+try {
+  log('status', BrawlZoneScan.status());
+  BrawlZoneScan.roster(JSON.stringify(ROSTER));
+  BrawlZoneScan.ready();
+} catch (e) { log('error', String(e)); }
+</script>

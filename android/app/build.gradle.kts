@@ -31,8 +31,25 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 33
-    versionName = "1.12"
+    versionCode = 34
+    versionName = "1.13"
+
+    /*
+     * Where the panel is served from. The site, always, in a release; a
+     * debug build accepts `-PpanelOrigin=http://10.0.2.2:3000` so the panel
+     * running on a laptop's `next dev` can be driven from an emulator before
+     * anything is deployed. The bridge is the only contract between the two
+     * halves, and this is the only way to test both halves of a change to it
+     * without shipping one of them first.
+     */
+    buildConfigField("String", "PANEL_ORIGIN", "\"https://brawlzone.net\"")
+  }
+
+  buildTypes {
+    debug {
+      val origin = (project.findProperty("panelOrigin") as String?) ?: "https://brawlzone.net"
+      buildConfigField("String", "PANEL_ORIGIN", "\"$origin\"")
+    }
   }
 
   signingConfigs {
@@ -112,6 +129,13 @@ dependencies {
    * yesterday" is a fine failure mode; a 46 MB download is not.
    */
   implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+
+  /*
+   * The module installer, so the text model's presence is a question with an
+   * answer. Creating the recogniser client does not fetch the model; asking
+   * `ModuleInstallClient` does, and reports whether it is there.
+   */
+  implementation("com.google.android.gms:play-services-base:18.5.0")
 
   /*
    * No OCR engine, deliberately.

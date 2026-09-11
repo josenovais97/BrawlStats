@@ -8,6 +8,7 @@ import android.hardware.display.DisplayManager
 import android.media.ImageReader
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Handler
 import android.util.Log
 
@@ -22,38 +23,85 @@ import android.util.Log
  *
  * Nothing here writes a frame anywhere. The bitmap is read, measured and
  * dropped inside one call; there is no file, no upload and no copy that
- * outlives the scan. That is a promise the app makes next to a permanent
- * recording indicator, so it is worth keeping in one small class where it can
- * be checked by reading it.
+ * outlives the scan unless the reader explicitly exports a diagnostic. That is
+ * a promise the app makes next to a permanent recording indicator, so it is
+ * worth keeping in one small class where it can be checked by reading it.
+ *
+ * Every session has an id and every frame says which surface produced it.
+ * Those are not decoration: the service uses the session id to ignore a
+ * callback from a session it has already replaced, and the surface generation
+ * to tell a frame from before a resize from one after it.
  */
 class ScreenScan(
     private val context: Context,
     private val handler: Handler,
+    val id: Long,
 ) {
+
+    /** One captured frame, with enough about its origin to be argued about. */
+    class Frame(
+        val bitmap: Bitmap,
+        /** Which surface produced it; changes on every resize. */
+        val generation: Int,
+        /** How many frames this session had handed over before this one. */
+        val sequence: Int,
+        /** The producer's own timestamp, ns. Only comparable to its siblings. */
+        val timestamp: Long,
+    )
 
     private var projection: MediaProjection? = null
     private var display: android.hardware.display.VirtualDisplay? = null
     private var reader: ImageReader? = null
     private var width = 0
     private var height = 0
+    private var retired = false
+
+    /** Bumped every time frames start coming from a new surface. */
+    var generation = 0
+        private set
+
+    private var sequence = 0
+
+    /** What the system says it is actually capturing, on API 34+. */
+    @Volatile
+    var contentSize: String? = null
+        private set
 
     /** Whether a frame can be grabbed right now without asking the user again. */
-    val live: Boolean get() = projection != null
+    val live: Boolean get() = projection != null && !retired
 
     /**
      * Called when the system tears the projection down — the user pressed stop
      * on the recording chip, or another app took the display. The service uses
      * it to put the button back to "allow screen reading" rather than leaving
      * a Scan button that silently does nothing.
+     *
+     * Never called for a session the service retired itself: that is not a
+     * loss, and treating it as one is how a replacement session got cleared
+     * by its predecessor's stop callback.
      */
-    var onLost: (() -> Unit)? = null
+    var onLost: ((ScreenScan) -> Unit)? = null
 
     private val callback = object : MediaProjection.Callback() {
         override fun onStop() {
             handler.post {
+                if (retired) return@post
                 release()
-                onLost?.invoke()
+                onLost?.invoke(this@ScreenScan)
             }
+        }
+
+        /*
+         * Android 14 reports when the captured content changes size — a
+         * rotation, a fold — and documents that frames may be letterboxed
+         * until the surface is resized to match. Recorded rather than acted
+         * on: the service resizes before every capture from the window
+         * metrics it trusts, and this is the second opinion the diagnostics
+         * carry so a mismatch is a fact rather than a theory.
+         */
+        override fun onCapturedContentResize(w: Int, h: Int) {
+            contentSize = "${w}x$h"
+            Log.i(TAG, "captured content is now ${w}x$h (surface ${width}x$height)")
         }
     }
 
@@ -64,6 +112,11 @@ class ScreenScan(
      * mediaProjection service type; on Android 14 `getMediaProjection` throws
      * a SecurityException otherwise, and it does so for the *whole* app rather
      * than returning null.
+     *
+     * Fields are assigned as each resource is created, not after the last
+     * one, so a failure in `createVirtualDisplay` still leaves `release` with
+     * a projection and a reader to close. The previous version assigned them
+     * at the end and leaked both on that path.
      */
     fun start(resultCode: Int, data: Intent, w: Int, h: Int, dpi: Int): Boolean {
         release()
@@ -71,6 +124,7 @@ class ScreenScan(
             val manager = context.getSystemService(MediaProjectionManager::class.java)
                 ?: return false
             val p = manager.getMediaProjection(resultCode, data) ?: return false
+            projection = p
 
             // Registered BEFORE createVirtualDisplay: API 34 rejects the display
             // outright if the projection has no callback attached.
@@ -79,6 +133,8 @@ class ScreenScan(
             width = w
             height = h
             val r = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 2)
+            reader = r
+            generation++
             display = p.createVirtualDisplay(
                 "brawlzone-scan",
                 w,
@@ -89,8 +145,6 @@ class ScreenScan(
                 null,
                 handler,
             )
-            projection = p
-            reader = r
             true
         } catch (e: Throwable) {
             Log.w(TAG, "could not start screen capture", e)
@@ -111,14 +165,20 @@ class ScreenScan(
      * where the map name is, and puts the first player's pick in the third
      * slot — which is exactly what a scan came back with.
      *
+     * One virtual display for the life of the session, resized in place. The
+     * consent token is single-use on Android 14, so a second display would
+     * mean a second dialog.
+     *
      * Checked before every capture rather than on rotation callbacks, because
      * the only moment the answer has to be right is the moment a frame is taken.
+     * Returns whether the surface changed, so the caller knows to wait for a
+     * frame from the new one.
      */
-    fun ensureSize(w: Int, h: Int, dpi: Int) {
-        if (w <= 0 || h <= 0) return
-        if (w == width && h == height) return
-        val d = display ?: return
-        runCatching {
+    fun ensureSize(w: Int, h: Int, dpi: Int): Boolean {
+        if (w <= 0 || h <= 0) return false
+        if (w == width && h == height) return false
+        val d = display ?: return false
+        return runCatching {
             val fresh = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 2)
             d.resize(w, h, dpi)
             d.surface = fresh.surface
@@ -126,8 +186,13 @@ class ScreenScan(
             reader = fresh
             width = w
             height = h
-            Log.i(TAG, "capture resized to ${w}x$h")
-        }.onFailure { Log.w(TAG, "could not resize capture", it) }
+            generation++
+            Log.i(TAG, "capture resized to ${w}x$h (surface generation $generation)")
+            true
+        }.getOrElse {
+            Log.w(TAG, "could not resize capture", it)
+            false
+        }
     }
 
     /** The size frames are currently produced at, for diagnostics. */
@@ -142,14 +207,10 @@ class ScreenScan(
      * taken shortly after hiding an overlay happily returns a frame from before
      * it was hidden, with the overlay still in it.
      *
-     * That is not a subtle degradation. The panel covers the right-hand half of
-     * a landscape screen, which is exactly where the enemy picks and one team's
-     * bans are, so a stale frame reads the left half of the draft and reports
-     * the rest as empty — indistinguishable from "the matcher did not recognise
-     * them", which is what made this look like a recognition problem.
+     * Bounded by the reader's own queue depth (two), so this cannot spin.
      */
     private fun discardPending(r: ImageReader) {
-        while (true) {
+        repeat(4) {
             val image = try {
                 r.acquireLatestImage()
             } catch (e: Throwable) {
@@ -160,43 +221,48 @@ class ScreenScan(
     }
 
     /**
-     * Grabs a frame produced *after* this call.
+     * Grabs a frame produced *after* this call, from the current surface.
      *
      * Drains first, then waits for the display to hand over something new, so
      * what comes back is always the screen as it is now rather than as it was
      * when the panel was still up. Retried on a delay because a virtual display
      * answers null rather than blocking, and because the first scan after
      * consent has no frames at all yet.
+     *
+     * The frame is checked against the surface size the session believes it
+     * has: a frame of another size is one from a surface that has since been
+     * replaced, and is dropped rather than read.
      */
-    fun capture(onFrame: (Bitmap?) -> Unit) {
+    fun capture(onFrame: (Frame?) -> Unit) {
         val r = reader
-        if (r == null || projection == null) {
+        if (r == null || !live) {
             onFrame(null)
             return
         }
         discardPending(r)
-        awaitFresh(0, onFrame)
+        awaitFresh(generation, 0, onFrame)
     }
 
-    private fun awaitFresh(attempt: Int, onFrame: (Bitmap?) -> Unit) {
+    private fun awaitFresh(wanted: Int, attempt: Int, onFrame: (Frame?) -> Unit) {
         val r = reader
-        if (r == null || projection == null) {
+        if (r == null || !live || generation != wanted) {
             onFrame(null)
             return
         }
-        val bitmap = grab(r)
-        if (bitmap != null) {
-            onFrame(bitmap)
+        val frame = grab(r)
+        if (frame != null) {
+            onFrame(frame)
             return
         }
         if (attempt >= MAX_ATTEMPTS) {
+            Log.w(TAG, "no frame from surface generation $wanted after ${MAX_ATTEMPTS * RETRY_MS}ms")
             onFrame(null)
             return
         }
-        handler.postDelayed({ awaitFresh(attempt + 1, onFrame) }, RETRY_MS)
+        handler.postDelayed({ awaitFresh(wanted, attempt + 1, onFrame) }, RETRY_MS)
     }
 
-    private fun grab(r: ImageReader): Bitmap? {
+    private fun grab(r: ImageReader): Frame? {
         val image = try {
             r.acquireLatestImage()
         } catch (e: Throwable) {
@@ -205,6 +271,10 @@ class ScreenScan(
         } ?: return null
 
         return try {
+            if (image.width != width || image.height != height) {
+                Log.w(TAG, "dropped a ${image.width}x${image.height} frame; surface is ${width}x$height")
+                return null
+            }
             val plane = image.planes[0]
             val pixelStride = plane.pixelStride
             val rowStride = plane.rowStride
@@ -221,13 +291,23 @@ class ScreenScan(
             full.copyPixelsFromBuffer(plane.buffer)
             val out = if (padded == width) full else Bitmap.createBitmap(full, 0, 0, width, height)
             if (out !== full) full.recycle()
-            out
+            sequence++
+            Frame(out, generation, sequence, image.timestamp)
         } catch (e: Throwable) {
             Log.w(TAG, "could not read frame", e)
             null
         } finally {
             image.close()
         }
+    }
+
+    /**
+     * Ends the session on the service's own initiative — a replacement, a
+     * stop, destruction. After this `onLost` will never fire for it.
+     */
+    fun retire() {
+        retired = true
+        release()
     }
 
     fun release() {

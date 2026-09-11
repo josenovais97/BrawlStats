@@ -4,8 +4,15 @@ import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
-import type { ScanPayload } from '@/lib/bubble-scan';
-import { correctionIndex, mergeSlots, resolvePlate } from '@/lib/bubble-scan';
+import type { Board, BoardEntry, ScanPayload } from '@/lib/bubble-scan';
+import {
+  applyScan as applyScanPure,
+  correctionIndex,
+  emptyBoard,
+  idsOf,
+  resolvePlate,
+  slotsOf,
+} from '@/lib/bubble-scan';
 
 /**
  * The draft board, at overlay scale.
@@ -69,27 +76,22 @@ const STORED_DRAFT = 'brawlzone.bubble.draft';
 /**
  * Whether the panel offers to read the draft off the screen.
  *
- * Off, at the reader's request. This is the third time, and the honest summary
- * is that the half nobody can test kept losing to the half that can.
+ * Decided by the app on the other side of the bridge, not by a constant here.
+ * The bridge's `ready` method only exists from build 34 — the first with
+ * scan identity, result retention, the content-rect geometry and slot
+ * statuses — and every earlier build has the faults the September review
+ * documented. So an older app sees no scan button at all, and the feature is
+ * enabled by shipping the APK that can carry it rather than by flipping a
+ * line on a page that redeploys in minutes.
  *
- * What is finished, and stays finished: the matcher. `core`'s DraftCoreTest
- * runs it against real captures of a real draft on every build — Rico 0.97,
- * Griff 0.80, Bull 0.85, Nori 0.79, Surge 0.67, every margin past 0.19, the
- * card the panel was covering refused at 0.05 — and now also at another
- * resolution and on a taller screen, because the regions are found from the
- * team strip rather than assumed from the frame's shape.
- *
- * What never came right is everything between that matcher and a phone: a
- * capture sized from the wrong moment, a projection that dies between scans for
- * reasons that do not reproduce on an emulator, artwork a decoder refuses. Each
- * was real, each was fixed, and each time the next one was waiting. None of
- * them are findable without the device, and the method — ship a guess, ask
- * someone to try it mid-match — costs more than the feature is worth.
- *
- * A switch, not a deletion, and everything behind it is tested and green. If
- * there is ever a device to debug on, this is one line.
+ * The page can be made to show the controls without the app for layout work
+ * by setting `brawlzone.bubble.scan-preview` in local storage; every bridge
+ * call is guarded, so they simply do nothing there.
  */
-const SCAN_ENABLED = false;
+const SCAN_PREVIEW = 'brawlzone.bubble.scan-preview';
+
+/** The first app build whose bridge speaks this page's protocol. */
+const MIN_SCAN_BUILD = 34;
 
 /**
  * What the Android build exposes when it can read the screen.
@@ -103,8 +105,17 @@ interface ScanBridge {
   enable(): void;
   scan(): void;
   stop(): void;
-  learn(kind: string, index: number, brawlerId: number): void;
-  learnPlate(modeKey: string | null, mapName: string | null): void;
+  ready?(): void;
+  ack?(id: number): void;
+  ocrStatus?(): string;
+  learn(scanId: number, kind: string, index: number, brawlerId: number): void;
+  learnPlate(scanId: number, modeKey: string | null, mapName: string | null): void;
+  exportDiagnostics?(): string;
+  resetLearned?(): number;
+}
+
+function bridgeOf(): ScanBridge | undefined {
+  return (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
 }
 
 type ScanState =
@@ -112,6 +123,7 @@ type ScanState =
   | 'idle'
   | 'ready'
   | 'busy'
+  | 'consent'
   | 'preparing'
   | 'denied'
   | 'failed'
@@ -125,6 +137,7 @@ const SCAN_LABEL: Record<ScanState, string> = {
   idle: 'Scan draft',
   ready: 'Scan draft',
   busy: 'Reading screen…',
+  consent: 'Waiting for permission…',
   preparing: 'Loading portraits…',
   denied: 'Allow screen reading',
   failed: 'Scan draft',
@@ -151,6 +164,7 @@ const SCAN_LABEL: Record<ScanState, string> = {
  */
 const SCAN_NOTE: Partial<Record<ScanState, string>> = {
   failed: 'Could not read the screen. Try again with the draft on screen.',
+  consent: 'Answer the Android dialog to share the screen.',
   noroster: 'Waiting for brawler data — reopen the panel in a moment.',
   'needs-permission':
     'Android asks once per app start. Nothing is stored or sent — the frame is read and dropped.',
@@ -184,11 +198,13 @@ export function PanelDraft({
   const [mode, setMode] = useState<string | null>(null);
   const [map, setMap] = useState<PanelMap | null>(null);
 
-  const [picked, setPicked] = useState<Record<Slot, number[]>>({
-    bans: [],
-    allies: [],
-    enemies: [],
-  });
+  /*
+   * The board, as entries rather than ids: each one knows whether the reader
+   * or the scanner put it there, and a scanned one knows which screen
+   * position it came from. That is what lets a later scan correct a misread
+   * in place without touching anything the reader typed.
+   */
+  const [picked, setPicked] = useState<Board>(emptyBoard);
 
   const [picking, setPicking] = useState<Slot | null>(null);
   const [changing, setChanging] = useState(false);
@@ -197,20 +213,29 @@ export function PanelDraft({
   const [loading, setLoading] = useState(false);
 
   const [scanState, setScanState] = useState<ScanState>('unsupported');
+  /** Whether this page is talking to an app build that can scan. */
+  const [scanOffered, setScanOffered] = useState(false);
   /** How far the reference tables are through building, when that is running. */
   const [scanProgress, setScanProgress] = useState<number | null>(null);
   const [scanNote, setScanNote] = useState<string | null>(null);
   /*
    * The last reading, kept positionally.
    *
-   * The board holds a compact list per slot, but the app learns from *screen
-   * positions* — so a correction can only be attributed if we still know which
-   * position it went unread at. See `correctionIndex`.
+   * The app learns from *screen positions*, and a correction names the scan
+   * it belongs to — so a correction can only be attributed if we still know
+   * which scan is on screen and which position went unread in it.
    */
   const lastScan = useRef<ScanPayload | null>(null);
   /* The same payload, as state, because diagnostics renders it and a ref read
      during render is exactly the stale-value trap refs are warned about. */
   const [lastPayload, setLastPayload] = useState<ScanPayload | null>(null);
+  /*
+   * A scanned entry the reader just removed. The next brawler they add to
+   * that strip is the correction for it, and the app is told which position
+   * it was read from — that is the only way a correction can name the pixels
+   * it is correcting.
+   */
+  const pendingFix = useRef<{ slot: Slot; position: number; scanId: number } | null>(null);
 
   const byId = useMemo(
     () => new Map(roster.map((b) => [b.brawlerId, b])),
@@ -227,11 +252,15 @@ export function PanelDraft({
       const saved = JSON.parse(raw) as {
         map?: string;
         at?: number;
-        bans?: number[];
-        allies?: number[];
-        enemies?: number[];
+        bans?: (number | BoardEntry)[];
+        allies?: (number | BoardEntry)[];
+        enemies?: (number | BoardEntry)[];
       };
       if (!saved.map || Date.now() - (saved.at ?? 0) > DRAFT_TTL_MS) return;
+      // An older page stored bare ids; they were the reader's, so they are
+      // hand entries now.
+      const entries = (list: (number | BoardEntry)[] | undefined): BoardEntry[] =>
+        (list ?? []).map((e) => (typeof e === 'number' ? { id: e, source: 'hand' as const } : e));
 
       for (const m of withMaps) {
         const found = m.maps.find((x) => x.mapName === saved.map);
@@ -246,9 +275,9 @@ export function PanelDraft({
         setMode(m.key);
         setMap(found);
         setPicked({
-          bans: saved.bans ?? [],
-          allies: saved.allies ?? [],
-          enemies: saved.enemies ?? [],
+          bans: entries(saved.bans),
+          allies: entries(saved.allies),
+          enemies: entries(saved.enemies),
         });
         return;
       }
@@ -281,9 +310,9 @@ export function PanelDraft({
   useEffect(() => {
     if (!map) return;
     const params = new URLSearchParams({ map: map.mapName });
-    if (picked.enemies.length) params.set('enemies', picked.enemies.join(','));
-    if (picked.allies.length) params.set('allies', picked.allies.join(','));
-    if (picked.bans.length) params.set('bans', picked.bans.join(','));
+    if (picked.enemies.length) params.set('enemies', idsOf(picked.enemies).join(','));
+    if (picked.allies.length) params.set('allies', idsOf(picked.allies).join(','));
+    if (picked.bans.length) params.set('bans', idsOf(picked.bans).join(','));
 
     const controller = new AbortController();
     const timer = setTimeout(() => {
@@ -308,20 +337,32 @@ export function PanelDraft({
 
   const applyRef = useRef<(payload: ScanPayload) => void>(() => {});
   const applyScan = useCallback((payload: ScanPayload) => applyRef.current(payload), []);
+  const applyScanToBoard = applyScanPure;
 
   /*
    * The scan bridge, if this is the app rather than a browser.
    *
-   * Two things are handed over on the way in. The callbacks go on `window`
-   * because Kotlin can only call into the page by evaluating a string, and the
-   * roster goes over because the matcher needs to know which brawlers exist —
-   * shipping that list inside the APK would mean a release every time a brawler
-   * comes out, and the panel already has it.
+   * Three things happen on the way in, in this order. The callbacks go on
+   * `window`, because Kotlin can only call into the page by evaluating a
+   * string. The roster goes over, because the matcher needs to know which
+   * brawlers exist and the panel already has the list. And then — only then —
+   * the page tells the app it is ready, which is what releases any result the
+   * app was holding from a scan that finished while the panel was shut.
+   *
+   * `onPageFinished` is not that signal. The document being loaded says
+   * nothing about whether these handlers exist yet, and a result delivered
+   * into `window.brawlzone && ...` before they do is silently nothing.
    */
   useEffect(() => {
-    if (!SCAN_ENABLED) return;
-    const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
-    if (!bridge) return;
+    const bridge = bridgeOf();
+    let preview = false;
+    try {
+      preview = window.localStorage.getItem(SCAN_PREVIEW) === '1';
+    } catch {
+      // ignored
+    }
+    const capable = !!bridge && typeof bridge.ready === 'function';
+    if (!capable && !preview) return;
 
     const api = (window as unknown as { brawlzone?: Record<string, unknown> }).brawlzone ?? {};
     /*
@@ -334,9 +375,23 @@ export function PanelDraft({
       setScanState(name as ScanState);
       setScanProgress(pct ? Number(pct) : null);
     };
-    api.scanResult = (payload: ScanPayload) => applyScan(payload);
+    api.scanResult = (payload: ScanPayload) => {
+      applyScan(payload);
+      // Acknowledged after it is applied, never before: the app keeps a result
+      // until this, so a page that dies between the two gets it again.
+      if (payload.id !== undefined) {
+        try {
+          bridge?.ack?.(payload.id);
+        } catch {
+          // A build without ack retains nothing, so there is nothing to lose.
+        }
+      }
+    };
     (window as unknown as { brawlzone: Record<string, unknown> }).brawlzone = api;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setScanOffered(true);
+    if (!bridge) return;
     try {
       /*
        * Reading a capability off the host is the "synchronise with an external
@@ -344,9 +399,9 @@ export function PanelDraft({
        * and whether capture is already granted, cannot be known during render
        * and must not differ between the server and the first client paint.
        */
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setScanState(bridge.status().split(':')[0] as ScanState);
       bridge.roster(JSON.stringify(roster.map((b) => b.brawlerId)));
+      bridge.ready?.();
     } catch {
       setScanState('unsupported');
     }
@@ -357,11 +412,20 @@ export function PanelDraft({
   }, [roster]);
 
   const handleScan = (payload: ScanPayload) => {
+    if ((payload.v ?? 1) < 2) {
+      setScanNote('This app build is too old to scan with. Update it from the Meta tab.');
+      return;
+    }
     lastScan.current = payload;
     setLastPayload(payload);
 
-    if (!payload.ok) {
-      setScanNote('Could not read the screen. Is the draft on screen?');
+    if (!payload.ok || payload.screen !== 'draft') {
+      const why: Record<string, string> = {
+        'not-draft': 'That is not the draft screen. Scan with the draft showing.',
+        'no-frame': 'The screen could not be captured. Try again.',
+        timeout: 'The scan took too long. Try again.',
+      };
+      setScanNote(why[payload.screen ?? ''] ?? 'Could not read the screen. Is the draft on screen?');
       return;
     }
 
@@ -369,9 +433,11 @@ export function PanelDraft({
     /*
      * A different map means a different match, so the board resets. Anything
      * else merges: a scan is one frame of a draft still in progress, and the
-     * reader may have typed in a ban the app could not identify.
+     * reader may have typed in a ban the app could not identify. The slots
+     * themselves can also say "new draft" — a ban that changed, picks that
+     * are empty again — and `applyScan` decides that independently of the map.
      */
-    const changedMap = plate.map !== null && plate.map.mapName !== map?.mapName;
+    const changedMap = plate.map !== null && map !== null && plate.map.mapName !== map.mapName;
     if (plate.mode !== null) {
       setMode(plate.mode);
       if (plate.map === null) setChanging(true);
@@ -381,45 +447,46 @@ export function PanelDraft({
       setChanging(false);
     }
 
-    const base = changedMap ? { bans: [], allies: [], enemies: [] } : picked;
-    setPicked(mergeSlots(base, payload, LIMITS));
-    if (changedMap) setPicks(null);
+    const applied = applyScanToBoard(picked, payload, LIMITS, { newDraft: changedMap });
+    setPicked(applied.board);
+    if (applied.newDraft) {
+      setPicks(null);
+      pendingFix.current = null;
+    }
 
-    const found =
-      (payload.bans ?? []).filter((x) => x !== null).length +
-      (payload.allies ?? []).filter((x) => x !== null).length +
-      (payload.enemies ?? []).filter((x) => x !== null).length;
+    const found = applied.recognized;
+    const read = found === 1 ? '1 brawler' : `${found} brawlers`;
+    const covered = applied.occluded > 0 ? ' Some slots were under the panel — scan again.' : '';
+    const fresh = applied.newDraft ? 'New draft. ' : '';
+    const swapped = applied.replaced > 0 ? ` Corrected ${applied.replaced}.` : '';
+    const ocr =
+      payload.ocr === 'pending'
+        ? ' Reading the map…'
+        : payload.ocr === 'unavailable'
+          ? ' Map reading is not available on this phone yet.'
+          : payload.ocr === 'timeout' || payload.ocr === 'failed'
+            ? ' The map text could not be read.'
+            : '';
 
-    /*
-     * Says what it did *not* get, not what it did.
-     *
-     * The board already shows what was recognised — the portraits are right
-     * there. What the reader cannot see is whether the app looked and gave up
-     * or never looked at all, and that is the difference between tapping the
-     * gaps in and scanning again.
-     *
-     * The first time on any map it will not know the map, and saying so plainly
-     * is what makes the next line — pick it once and it is remembered — read as
-     * an instruction rather than an apology.
-     */
     /*
      * Leads with what it read, not with what it wants.
      *
      * "Pick the map below" on its own reads as a refusal — the reader tapped
-     * Scan and got a instruction back, with no sign anything happened. Saying
+     * Scan and got an instruction back, with no sign anything happened. Saying
      * the count first makes the same sentence a report with a next step, and it
      * is the only signal that the recognition side is working at all on a map
      * the app has not been taught yet.
      */
-    const read = found === 1 ? '1 brawler' : `${found} brawlers`;
     if (plate.map === null && found === 0) {
-      setScanNote('Nothing recognised. Scan with the draft screen showing.');
+      setScanNote(`${fresh}Nothing recognised.${covered || ' Scan with the draft screen showing.'}${ocr}`);
+    } else if (plate.ambiguous) {
+      setScanNote(`${fresh}Read ${read}. Two maps fit the name — pick the right one.${swapped}${covered}`);
     } else if (plate.map === null) {
-      setScanNote(`Read ${read}. Pick the map — it is remembered for next time.`);
+      setScanNote(`${fresh}Read ${read}. Pick the map — it is remembered for next time.${swapped}${covered}${ocr}`);
     } else if (found === 0) {
-      setScanNote(`${plate.map.mapName}. No brawlers read — tap them in.`);
+      setScanNote(`${fresh}${plate.map.mapName}. No brawlers read — tap them in.${covered}`);
     } else {
-      setScanNote(`Read ${read} on ${plate.map.mapName}.`);
+      setScanNote(`${fresh}Read ${read} on ${plate.map.mapName}.${swapped}${covered}`);
     }
   };
 
@@ -444,11 +511,11 @@ export function PanelDraft({
    * that makes a feature feel broken when it is working.
    */
   const runScan = () => {
-    const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+    const bridge = bridgeOf();
     if (!bridge) return;
     setScanNote(null);
     try {
-      if (scanState === 'blocked') return;
+      if (scanState === 'blocked' || scanState === 'consent') return;
       if (scanState === 'ready') bridge.scan();
       else bridge.enable();
     } catch {
@@ -467,39 +534,47 @@ export function PanelDraft({
      * taps at all. Only after a scan: with no frame in hand there is nothing to
      * file, and a map chosen from a cold panel says nothing about any picture.
      */
-    if (lastScan.current) {
-      const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+    const last = lastScan.current;
+    if (last && last.id !== undefined && last.ok && last.layout?.plate) {
       try {
-        bridge?.learnPlate(m.mode ?? mode, m.mapName);
+        bridgeOf()?.learnPlate(last.id, m.mode ?? mode, m.mapName);
       } catch {
         // A build without the bridge, or one that has since lost the frame.
       }
     }
-    // Cleared here rather than in the effect: a new map invalidates the old
-    // answer, and that is a consequence of the tap, not of the fetch.
+    /*
+     * The board stays. Confirming or correcting the map after a scan is the
+     * ordinary way the first scan on any map ends — "read 4 brawlers, pick
+     * the map" — and clearing what was just read at that moment threw the
+     * scan's whole result away. A map change is a new draft only when the
+     * *scan* says so; the reader saying "this is the map" is not.
+     *
+     * Cleared here rather than in the effect: a new map invalidates the old
+     * answer, and that is a consequence of the tap, not of the fetch.
+     */
     setPicks(null);
-    setPicked({ bans: [], allies: [], enemies: [] });
   };
 
   /* One tap back to an empty board, because the next match is a new draft. */
   const clear = () => {
-    setPicked({ bans: [], allies: [], enemies: [] });
+    setPicked(emptyBoard());
     setPicking(null);
     setPicks(null);
+    pendingFix.current = null;
   };
 
   const add = (slot: Slot, id: number) => {
     setPicked((prev) => {
       // One brawler, one place. A pick cannot also be a ban, and the game
       // would not offer it twice.
-      const cleaned: Record<Slot, number[]> = {
-        bans: prev.bans.filter((x) => x !== id),
-        allies: prev.allies.filter((x) => x !== id),
-        enemies: prev.enemies.filter((x) => x !== id),
+      const cleaned: Board = {
+        bans: prev.bans.filter((x) => x.id !== id),
+        allies: prev.allies.filter((x) => x.id !== id),
+        enemies: prev.enemies.filter((x) => x.id !== id),
       };
       if (cleaned[slot].length >= LIMITS[slot]) return cleaned;
 
-      const next = { ...cleaned, [slot]: [...cleaned[slot], id] };
+      const next: Board = { ...cleaned, [slot]: [...cleaned[slot], { id, source: 'hand' as const }] };
 
       /*
        * Closes when the slot is full, and not before.
@@ -524,25 +599,35 @@ export function PanelDraft({
    * The app keeps the frame it scanned, so a correction stores the pixels it
    * misread against the brawler chosen here — a reference taken from this
    * phone's own screen, which beats a CDN render every time. That only works if
-   * the correction can be pinned to a screen position, so `correctionIndex`
-   * refuses when more than one slot went unread. A reference learned against
-   * the wrong position would be worse than none, because it would score highly
-   * against exactly the thing it is wrong about.
+   * the correction can be pinned to a screen position in a named scan. Two ways
+   * can: the reader removed a scanned entry and is now adding its replacement
+   * (the position is the removed entry's), or exactly one position in the
+   * strip went unread. Anything else is ambiguous, and a reference learned
+   * against the wrong position would be worse than none, because it would
+   * score highly against exactly the thing it is wrong about.
    */
   const teach = (slot: Slot, id: number) => {
     const payload = lastScan.current;
-    if (!payload) return;
-    const index = correctionIndex(payload[slot]);
+    if (!payload || payload.id === undefined) return;
+
+    let index: number | null = null;
+    const fix = pendingFix.current;
+    if (fix && fix.slot === slot && fix.scanId === payload.id) {
+      index = fix.position;
+      pendingFix.current = null;
+    } else {
+      index = correctionIndex(payload[slot]);
+    }
     if (index === null) return;
 
-    const bridge = (window as unknown as { BrawlZoneScan?: ScanBridge }).BrawlZoneScan;
+    const bridge = bridgeOf();
     if (!bridge) return;
     try {
-      bridge.learn(slot, index, id);
+      bridge.learn(payload.id, slot, index, id);
       // Recorded, so the same gap is not attributed twice if the reader
       // changes their mind about it.
-      const updated = [...(payload[slot] ?? [])];
-      updated[index] = id;
+      const updated = [...slotsOf(payload, slot)];
+      updated[index] = { id, status: 'recognized' };
       lastScan.current = { ...payload, [slot]: updated };
     } catch {
       // A build without the bridge, or one that has since lost the frame.
@@ -550,9 +635,15 @@ export function PanelDraft({
   };
 
   const remove = (slot: Slot, id: number) =>
-    setPicked((prev) => ({ ...prev, [slot]: prev[slot].filter((x) => x !== id) }));
+    setPicked((prev) => {
+      const gone = prev[slot].find((x) => x.id === id);
+      if (gone?.source === 'scan' && gone.position !== undefined && gone.scanId !== undefined) {
+        pendingFix.current = { slot, position: gone.position, scanId: gone.scanId };
+      }
+      return { ...prev, [slot]: prev[slot].filter((x) => x.id !== id) };
+    });
 
-  const taken = new Set([...picked.bans, ...picked.allies, ...picked.enemies]);
+  const taken = new Set(idsOf([...picked.bans, ...picked.allies, ...picked.enemies]));
 
   /*
    * The map's own best brawlers, offered first.
@@ -581,7 +672,7 @@ export function PanelDraft({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, roster, picked]);
 
-  const canScan = SCAN_ENABLED && scanState !== 'unsupported';
+  const canScan = scanOffered && scanState !== 'unsupported';
 
   /*
    * What the app on the other side of this page actually is.
@@ -602,12 +693,13 @@ export function PanelDraft({
     const w = window as unknown as { BrawlZoneScan?: Record<string, unknown> };
     const bridge = w.BrawlZoneScan;
     const methods = bridge
-      ? ['status', 'roster', 'enable', 'scan', 'stop', 'learn', 'learnPlate', 'openExternal']
+      ? ['status', 'roster', 'enable', 'scan', 'stop', 'ready', 'ack', 'learn', 'learnPlate', 'openExternal', 'exportDiagnostics']
           .filter((m) => typeof bridge[m] === 'function')
       : [];
     const last = lastPayload;
+    const build = Number((window.location.hash.match(/v=(\d+)/) ?? [])[1] ?? 0);
     return [
-      `app  ${window.location.hash || '(no version)'}`,
+      `app  ${window.location.hash || '(no version)'}${build && build < MIN_SCAN_BUILD ? ' (too old to scan)' : ''}`,
       `scan ${scanState}`,
       `api  ${bridge ? methods.join(',') : 'absent — not running in the app'}`,
       (() => {
@@ -622,11 +714,20 @@ export function PanelDraft({
         }
       })(),
       last
-        ? `read map=${last.map ?? '-'} mode=${last.mode ?? '-'} text=${JSON.stringify(last.text ?? [])}`
+        ? `read #${last.id ?? '?'} ${last.screen ?? '-'} map=${last.map ?? '-'} mode=${last.mode ?? '-'} ocr=${last.ocr ?? '-'} mode-text=${JSON.stringify(last.modeText ?? [])} map-text=${JSON.stringify(last.mapText ?? [])}`
         : 'read (no scan yet)',
-      last
-        ? `slots bans=${JSON.stringify(last.bans ?? [])} you=${JSON.stringify(last.allies ?? [])} vs=${JSON.stringify(last.enemies ?? [])}`
+      last?.layout
+        ? `layout ${last.layout.detected ? 'ok' : 'NOT FOUND'} unit=${last.layout.unit} plate=${last.layout.plate} ${last.layout.reasons?.join('; ') ?? ''}`
         : '',
+      last?.self !== undefined && last.self !== null ? `self ally ${last.self + 1}` : '',
+      ...(last
+        ? (['bans', 'allies', 'enemies'] as const).map(
+            (k) =>
+              `${k.padEnd(7)} ${slotsOf(last, k)
+                .map((s) => (s.status === 'recognized' ? String(s.id) : s.status[0]) + (s.score !== undefined ? `@${s.score}` : ''))
+                .join(' ')}`,
+          )
+        : []),
     ]
       .filter(Boolean)
       .join('\n');
@@ -692,6 +793,42 @@ export function PanelDraft({
             <pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all rounded border border-border bg-surface p-1.5 text-[9px] leading-relaxed text-muted">
               {diagnostics()}
             </pre>
+            {/*
+              The export is the one thing that turns "it read the wrong
+              brawler" into something that can be fixed without the phone:
+              the exact frame recognition ran on, and its record. Manual, and
+              nothing leaves the phone unless the reader picks somewhere.
+            */}
+            <div className="mt-1 flex gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const out = bridgeOf()?.exportDiagnostics?.();
+                    setScanNote(out ? `Export: ${out}` : 'Export needs the app.');
+                  } catch {
+                    setScanNote('Export failed.');
+                  }
+                }}
+                className="rounded border border-border px-1.5 py-0.5 text-[9px] font-bold text-muted"
+              >
+                Export last scan
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    const n = bridgeOf()?.resetLearned?.();
+                    setScanNote(n === undefined ? 'Reset needs the app.' : `Forgot ${n} corrections.`);
+                  } catch {
+                    setScanNote('Reset failed.');
+                  }
+                }}
+                className="rounded border border-border px-1.5 py-0.5 text-[9px] font-bold text-muted"
+              >
+                Reset corrections
+              </button>
+            </div>
           </details>
 
           {scanState === 'denied' ? (
@@ -807,14 +944,14 @@ export function PanelDraft({
                   ) : null}
                 </span>
 
-                {picked[slot].map((id) => {
+                {picked[slot].map(({ id, source }) => {
                   const b = byId.get(id);
                   return (
                     <button
                       key={id}
                       type="button"
                       onClick={() => remove(slot, id)}
-                      title={`Remove ${b?.brawlerName ?? id}`}
+                      title={`Remove ${b?.brawlerName ?? id}${source === 'scan' ? ' (scanned)' : ''}`}
                     >
                       <Image
                         src={b?.imageUrl ?? ''}
@@ -823,7 +960,7 @@ export function PanelDraft({
                         height={24}
                         className={`size-6 rounded bg-surface-2 ${
                           slot === 'bans' ? 'opacity-40 grayscale' : ''
-                        }`}
+                        } ${source === 'scan' ? 'ring-1 ring-accent-2/60' : ''}`}
                         unoptimized
                       />
                     </button>
