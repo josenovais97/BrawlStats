@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.12',
+  version: '1.13',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 33,
+  versionCode: 34,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.12.apk',
+  path: '/downloads/brawlzone-bubble-1.13.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -39,11 +39,11 @@ export const BUBBLE_APP = {
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3385146,
-  sha256: 'ef2524d9ea2048da2b8b4521b93be99e1bd7830af5282d4c2f7251f35d22d970',
+  size: 3409598,
+  sha256: '57da042f16bc6a174f7b321a4f71c8b153a79e3d332907584cd5117d3fe3ed0a',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-09-08',
+  released: '2026-09-11',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -72,6 +72,17 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.13',
+    versionCode: 34,
+    date: '2026-09-11',
+    changes: [
+      'The draft scan is back, rebuilt: each scan owns its result, so a slow scan can no longer overwrite the next one, and a result that arrives while the panel is closed is shown when it reopens.',
+      'Every slot now says why it is what it is — read, empty, unknown, or covered by the panel — and a later scan corrects a misread in place without touching anything you typed in.',
+      'The screen is found from the picture itself, including the map name plate, so black bars, insets and other screen shapes no longer read the wrong pixels.',
+      'Diagnostics can export the exact frame a scan used, so a misread on your phone can be fixed without guessing.',
+    ],
+  },
   {
     version: '1.12',
     versionCode: 33,
