@@ -4065,6 +4065,43 @@ async function compute_getLadderMapForm(
   }
 }
 
+/**
+ * The newest sampled day per (mode, map), for the sitemap's `lastmod`.
+ *
+ * Every URL used to carry the build timestamp, which told Google that all
+ * 1,177 pages changed on every deploy. Google documents that it ignores
+ * `lastmod` once it proves unreliable — and it was the one signal that could
+ * have told it which of the ~800 URLs it had discovered but never fetched were
+ * worth the visit. A map that left rotation months ago has not changed since
+ * its last battle; a map in this week's Ranked pool changed today. This is
+ * that distinction, from the roll-up the map pages themselves read.
+ *
+ * Entries rather than a Map, keyed `mode\u0000mapName`: see `compute_getMapMatchups`.
+ */
+async function compute_getNewestDayByMap(): Promise<[string, string][]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+  try {
+    const rows = await prisma.$queryRaw<{ mode: string; map_name: string | null; day: Date }[]>`
+      SELECT mode, map_name, MAX(day) AS day
+      FROM battle_daily_stats
+      WHERE map_name IS NOT NULL
+      GROUP BY mode, map_name
+    `;
+    return rows.map((r) => [`${r.mode}\u0000${r.map_name}`, r.day.toISOString().slice(0, 10)]);
+  } catch (error) {
+    swallow('compute_getNewestDayByMap', error);
+    return [];
+  }
+}
+
+const cachedNewestDayByMap = cachedRead('newest-day-by-map', compute_getNewestDayByMap);
+
+/** `mode\u0000mapName` -> ISO day of the newest sampled battle on that map. */
+export async function getNewestDayByMap(): Promise<Map<string, string>> {
+  return new Map(await cachedNewestDayByMap());
+}
+
 const cachedMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
 
 /*

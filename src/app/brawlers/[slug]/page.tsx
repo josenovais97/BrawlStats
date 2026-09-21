@@ -288,6 +288,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/** 107 -> "107th". */
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  const suffix = { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th';
+  return `${n}${suffix}`;
+}
+
 export default async function BrawlerDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const resolved = await resolveBrawler(slug);
@@ -445,7 +453,18 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Combat stats and resolved ability text. Nothing else publishes these —
   // see lib/brawler-wiki. Null costs the sections that use it, not the page.
   const metaIndex = await getMetaIndex('ranked', 7);
-  const catalogEntry = (await getBrawlerCatalog()).byId.get(brawlerId);
+  const catalog = await getBrawlerCatalog();
+  const catalogEntry = catalog.byId.get(brawlerId);
+  /*
+   * "Who is the 107th brawler?" is a real query and it means the newest one.
+   * Released brawlers count up in id order, so the size of the released set
+   * is the newest brawler's ordinal. Claimed only for the newest: an older
+   * brawler's position would have to survive withdrawals (Buzz Lightyear) and
+   * out-of-order ids, and a wrong number in an FAQ is worse than none.
+   */
+  const released = catalog.current;
+  const newestId = Math.max(...released.map((b) => b.id));
+  const newestOrdinal = brawlerId === newestId ? ordinal(released.length) : null;
   const wiki = await getBrawlerWiki(brawler.name).catch(() => null);
   // One page for the whole game, so this is shared across every brawler.
   const gearText = await getGearDescriptions().catch(() => new Map<string, string>());
@@ -595,6 +614,20 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               .join(
                 ', ',
               )} pull ${name} furthest below its own ${formatPercent(pairings.baseline)} average in sampled team battles.`,
+          },
+        ]
+      : []),
+    // Two questions Search Console showed the site ranking for on 2026-09-21
+    // without a click to show for it — "who is the 107 brawler" and "which
+    // brawler is an ice cone salesman". The biography is already on the page;
+    // this is the same fact in the form the question takes.
+    ...(brawler.description
+      ? [
+          {
+            question: `Who is ${name} in Brawl Stars?`,
+            answer: newestOrdinal
+              ? `${name} is the newest brawler in Brawl Stars and the ${newestOrdinal} to be released. ${brawler.description}`
+              : brawler.description,
           },
         ]
       : []),
@@ -751,8 +784,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               ) : null}
             </div>
 
-            <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">
-              {brawler.name.toLowerCase()}
+            {/* Cased in the markup, not by CSS. The lowercase name under a
+                `capitalize` class looked right and read to a crawler as
+                "griff" — while the title promised "Best Griff build". Search
+                Console on 2026-09-21: 74 of 267 queries were "best <name>
+                build", landing on these pages at position 17-60. The visible
+                heading now says what the title says. */}
+            <h1 className="display mt-3 text-3xl sm:text-4xl">
+              {name} <span className="text-muted">build, stats and matchups</span>
             </h1>
 
             {/* The in-game tagline, which the artwork mirror does not carry.
