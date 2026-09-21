@@ -31,6 +31,7 @@ import { isFramedTile } from '@/lib/brawlapi';
 import { brawlerPath } from '@/lib/slugs';
 
 import {
+  formatDate,
   formatNumber,
   formatPercent,
   humanizeMode,
@@ -317,6 +318,32 @@ export async function TierListView({
           {copy.eyebrow}
         </p>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{heading}</h1>
+
+        {/*
+          The answer, in one sentence, before anything else.
+
+          The tiers below are the answer for a person looking at them; they are
+          not an answer for anything that reads the page as text. Measured in
+          Umami on 2026-09-21, ChatGPT was the site's largest outside referrer
+          — four times Google — and what an answer engine can quote is a plain
+          sentence with names, a number and a date. This is the same fact the
+          meta description and the FAQ already state, put where a reader and a
+          quoter both meet it first. The date is absolute for the same reason
+          (see `formatDate`).
+        */}
+        {best.length >= 3 ? (
+          <p className="mt-3 max-w-3xl text-base leading-relaxed">
+            <strong>
+              {titleCaseLabel(best[0].brawlerName)}, {titleCaseLabel(best[1].brawlerName)} and{' '}
+              {titleCaseLabel(best[2].brawlerName)} are the best{mode ? ` ${humanizeMode(mode)}` : ''}{' '}
+              brawlers in {format === 'ranked' ? 'Ranked' : 'trophy ladder'} right now
+            </strong>
+            {lastRun ? ` (as of ${formatDate(lastRun.startedAt)})` : ''}.{' '}
+            {titleCaseLabel(best[0].brawlerName)} leads with a{' '}
+            {formatPercent(best[0].normalizedWinRate)} adjusted win rate over{' '}
+            {formatNumber(best[0].decidedSampleSize)} decided battles.
+          </p>
+        ) : null}
 
         {/*
           Two sentences, then the controls.

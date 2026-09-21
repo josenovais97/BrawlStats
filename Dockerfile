@@ -56,8 +56,20 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 # before the build so it invalidates nothing above it: `npm ci` and the Prisma
 # client are untouched, and a forced monthly rebuild costs only `next build`.
 # Not a secret, so an ARG is the right home for it.
+#
+# `.next/cache` is a BuildKit cache mount, so it survives from one build to the
+# next on this host. Without it every build starts cold and prerendering ~600
+# wiki-backed pages is ~600 requests to the wiki in a couple of minutes. Two
+# deploys in one morning (2026-09-21) tripped Fandom's rate limit, and until
+# `fetchWikiJson` stopped retrying with `no-store` that took every uncached
+# brawler and map page to a 500. Next's fetch cache honours each entry's own
+# `revalidate` across builds, so a day-long wiki entry is fetched once a day
+# however many times the site is built; the compiler cache in the same
+# directory makes the build faster as a side effect. Not copied into the image:
+# the runtime has its own named volume for this directory.
 ARG BUILD_MONTH=unset
 RUN --mount=type=secret,id=build_env,uid=0 \
+    --mount=type=cache,id=brawlzone-next-cache,target=/app/.next/cache \
     echo "build month: $BUILD_MONTH" >/dev/null && \
     set -a && . /run/secrets/build_env && set +a && \
     export DATABASE_URL="${BUILD_DATABASE_URL:-$DATABASE_URL}" && \

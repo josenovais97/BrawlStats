@@ -10,12 +10,12 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { currentMonth } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, getGameModeMap, getMapMap } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
+import { formatDate, formatNumber, formatPercent, humanizeMode, relativeTime, titleCaseLabel } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
 import { getRankedMapLastSeen } from '@/lib/stats';
 import { slugify } from '@/lib/slugs';
-import { getLastAggregationRun, getRankedMapPicks } from '@/lib/stats';
+import { getLastAggregationRun, getMetaIndex, getRankedMapPicks, type ScoredBrawler } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
@@ -39,7 +39,7 @@ const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
 };
 
 export default async function RankedPage() {
-  const [maps, lastSeenRows, mapMeta, modeMeta, brawlerMeta, season, lastRun] = await Promise.all([
+  const [maps, lastSeenRows, mapMeta, modeMeta, brawlerMeta, season, lastRun, metaIndex] = await Promise.all([
     getRankedMapPicks(3),
     getRankedMapLastSeen().catch(() => []),
     getMapMap().catch(() => new Map<number, BAMap>()),
@@ -58,7 +58,15 @@ export default async function RankedPage() {
       }),
     ),
     getLastAggregationRun(),
+    // The same scoring the Ranked tier list uses, for the one-sentence answer
+    // in the header: this is the page answer engines send people to most.
+    getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
   ]);
+
+  const top = [...metaIndex.values()]
+    .filter((b) => b.tier !== null)
+    .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
+    .slice(0, 3);
 
   // Sampled maps are matched to the catalogue by name and mode, so a map that
   // has since left rotation simply loses its link rather than 404ing.
@@ -219,6 +227,28 @@ export default async function RankedPage() {
           Competitive only
         </p>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Ranked maps</h1>
+
+        {/*
+          The answer first, as a sentence. Measured in Umami on 2026-09-21 this
+          was the page ChatGPT sent the most visitors to — 27 of its 79 — and
+          what it lands on is a heading and a map grid. A plain sentence with
+          names, a number and an absolute date is what an answer engine can
+          quote; the grid below stays the answer for a person. Same scoring as
+          the Ranked tier list, so the two pages cannot disagree.
+        */}
+        {top.length === 3 ? (
+          <p className="mt-3 max-w-2xl text-base leading-relaxed">
+            <strong>
+              {titleCaseLabel(top[0].brawlerName)}, {titleCaseLabel(top[1].brawlerName)} and{' '}
+              {titleCaseLabel(top[2].brawlerName)} are the best brawlers in Ranked right now
+            </strong>
+            {lastRun ? ` (as of ${formatDate(lastRun.startedAt)})` : ''}, across every map in the
+            pool. {titleCaseLabel(top[0].brawlerName)} leads with a{' '}
+            {formatPercent(top[0].normalizedWinRate)} adjusted win rate over{' '}
+            {formatNumber(top[0].decidedSampleSize)} decided battles. Each map below has its own
+            answer.
+          </p>
+        ) : null}
         <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">
           The strongest brawlers on each map in the current Ranked rotation, from
           sampled competitive battles only.

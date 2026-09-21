@@ -35,7 +35,7 @@ import {
   rarityColor,
   realBrawlerClass,
 } from '@/lib/brawlapi';
-import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
+import { formatDate, formatNumber, formatPercent, humanizeMode, ordinal, titleCase } from '@/lib/format';
 import {
   combatStatLabels,
   getBrawlerWiki,
@@ -60,6 +60,7 @@ import {
   getBrawlerBuild,
   getBrawlerPairings,
   getBrawlerSplits,
+  getLastAggregationRun,
   getBrawlerStat,
   getBrawlerTrend,
   getBrawlerSkins,
@@ -288,14 +289,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-/** 107 -> "107th". */
-function ordinal(n: number): string {
-  const rem100 = n % 100;
-  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
-  const suffix = { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th';
-  return `${n}${suffix}`;
-}
-
 export default async function BrawlerDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const resolved = await resolveBrawler(slug);
@@ -437,6 +430,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
   // Sequential database reads keep the page to a single connection.
   const stat = await brawlerStat(brawlerId);
+  const lastRun = await getLastAggregationRun().catch(() => null);
   const build = await brawlerBuild(brawlerId);
 
   // The official catalogue is the authority on which kit belongs to whom, and
@@ -515,6 +509,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     (stat && stat.decidedSampleSize >= MIN_SAMPLE_FOR_TIER ? assignTier(normalizedWinRate) : null);
   const metaScore = scored?.metaScore ?? null;
 
+
   // Cleaned at the source now — see `rarityColor` — so this only picks the
   // value up. It is interpolated into `color-mix()` below, which a malformed
   // colour would take down along with the whole header wash.
@@ -540,6 +535,29 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     ? brawlerModelUrl(brawler.id)
     : (wikiModel ?? (await getWikiModel(brawler.name).catch(() => null)));
   const name = titleCase(brawler.name);
+
+  /*
+   * The answer, in one sentence, under the heading.
+   *
+   * The same sentence the meta description carries, made visible: build
+   * first, then the measured number, then the date. It was already the
+   * snippet Google shows; it is now also the first thing a reader meets and
+   * the thing an answer engine can quote. Umami on 2026-09-21 had ChatGPT as
+   * the largest outside referrer, and a page that states its answer in prose
+   * with a date is the kind it cites.
+   */
+  const lead = [
+    buildSentence(
+      name,
+      abilityChoices,
+      new Map([...brawler.starPowers, ...brawler.gadgets].map((a) => [a.id, a.name])),
+    ),
+    stat && normalizedWinRate !== null
+      ? `${name} has a ${formatPercent(normalizedWinRate)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled battles${tier ? `, ${tier} tier in Ranked` : ''}${lastRun ? `, as of ${formatDate(lastRun.startedAt)}` : ''}.`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // "Unknown" is a real value upstream, not a missing one: unclassified
   // brawlers come back as `{ id: 0, name: "Unknown" }`, and a chip reading
@@ -793,6 +811,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             <h1 className="display mt-3 text-3xl sm:text-4xl">
               {name} <span className="text-muted">build, stats and matchups</span>
             </h1>
+
+            {lead ? <p className="mt-3 max-w-2xl leading-relaxed">{lead}</p> : null}
 
             {/* The in-game tagline, which the artwork mirror does not carry.
                 Shown above the biography because it is the brawler's own line

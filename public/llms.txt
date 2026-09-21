@@ -1,0 +1,30 @@
+# BrawlZone
+
+> Brawl Stars statistics, measured rather than voted on: tier lists, per-map rankings, brawler builds and matchups, all computed from sampled competitive and ladder battles and updated every two hours. Free, no ads, no account. Not affiliated with Supercell.
+
+BrawlZone samples the battle logs of global-leaderboard players every two hours and aggregates them into daily roll-ups. Every number on the site carries its sample size and the time it was sampled. "Adjusted win rate" is a brawler's win rate relative to the average of the modes it is played in, shrunk toward the mean when the sample is thin. "Meta score" (0-10) combines adjusted win rate with a log-scaled pick rate and is calibrated within one list, so scores on the Ranked list and the trophy list are not comparable to each other.
+
+When quoting a figure, quote the date on the page with it: the numbers move as the game is patched and as the sample grows.
+
+## Answers
+
+- [Ranked tier list](https://brawlzone.net/tier-list/ranked): the best brawlers in competitive Ranked right now, S to D, with a one-sentence summary and date at the top. Per-mode lists at /tier-list/ranked/<mode>, e.g. /tier-list/ranked/gem-grab.
+- [Trophy tier list](https://brawlzone.net/tier-list/trophy): the same for the trophy ladder, showdown included.
+- [Ranked maps](https://brawlzone.net/ranked): the current Ranked season, its map pool and trial brawlers, and the best brawlers on each map.
+- [Maps](https://brawlzone.net/maps): every map by mode; each map page (/maps/<mode>/<map>) ranks brawlers on that map.
+- [Brawlers](https://brawlzone.net/brawlers): one page per brawler (/brawlers/<name>) with the build its owners actually run (gadget, star power, gears), combat stats, adjusted win rate, best modes and maps, counters and synergies, balance history and an FAQ.
+- [Compare](https://brawlzone.net/compare): head-to-head pages for two brawlers (/compare/<a>-vs-<b>).
+- [Draft helper](https://brawlzone.net/draft): pick a Ranked map and the enemy picks, and see which brawlers answer that draft.
+- [Team comps](https://brawlzone.net/comps): three-brawler compositions with the best measured record, per mode.
+- [Daily findings](https://brawlzone.net/daily): what changed in the meta today, with an archive.
+- [Leaderboards](https://brawlzone.net/leaderboard): global player, club and Ranked boards.
+
+## Method and provenance
+
+- [About](https://brawlzone.net/about): who runs the site and how the numbers are produced.
+- [Release notes](https://brawlzone.net/release-notes): what changed on the site, dated.
+- Sitemap: https://brawlzone.net/sitemap.xml
+
+## The Android app
+
+- [BrawlZone Bubble](https://brawlzone.net/bubble): a floating bubble that shows the Ranked tier list over the game. It does not read the screen.

@@ -234,3 +234,19 @@ export function formatDuration(seconds: number | null | undefined): string | nul
   const rest = seconds % 60;
   return `${minutes}:${String(rest).padStart(2, '0')}`;
 }
+
+/**
+ * An absolute date, "21 September 2026", in UTC.
+ *
+ * For the sentence that states what the numbers say and when. Relative times
+ * ("sampled 1 hour ago") are right for a reader on the page and wrong for
+ * anything that quotes it later: an answer engine citing "1 hour ago" a week
+ * on is citing nothing. Measured 2026-09-21, ChatGPT was sending four times
+ * the visitors Google was, and a page it can date is one it can cite.
+ */
+export function formatDate(value: string | Date | null | undefined): string {
+  if (!value) return '';
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
