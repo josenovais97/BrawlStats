@@ -16,13 +16,20 @@ export const WIKI_API = 'https://brawlstars.fandom.com/api.php';
 /**
  * Fetches JSON, and never lets a failure stick.
  *
- * Next's data cache stores what a `fetch` with `revalidate` returned — status
- * included — so a wiki 5xx during a regeneration would be replayed for the
- * whole TTL, hiding a section for hours after the wiki itself recovered. A
- * non-OK response is therefore retried once with `cache: 'no-store'`, which
- * bypasses that entry entirely: the render gets live data the moment the wiki
- * is healthy again, at the cost of one extra request per render while it is
- * not.
+ * On a non-OK response this returns null and does nothing else. It used to
+ * retry with `cache: 'no-store'`, on the theory that Next's data cache stores
+ * whatever a `revalidate` fetch returned, status included, so a wiki 5xx would
+ * be replayed for the whole TTL. That theory is wrong for this version of
+ * Next: `patch-fetch` only writes a response to the cache when its status is
+ * 200, so a failed fetch is simply fetched again on the next render.
+ *
+ * And the retry was not merely redundant. A `no-store` fetch inside a route
+ * that is statically rendered is a runtime error — "Page changed from static
+ * to dynamic" — and it takes the whole page down, not the section. On
+ * 2026-09-21 the wiki started answering the box with a Cloudflare 429, which
+ * this turned into a 500 on every brawler and map page whose wiki data was
+ * not already cached. A missing wiki section is the designed failure; a 500
+ * on /brawlers/sam is not.
  */
 export async function fetchWikiJson<T>(
   url: string,
@@ -38,8 +45,7 @@ export async function fetchWikiJson<T>(
   } as const;
 
   try {
-    let res = await fetch(url, { ...init, next: { revalidate } });
-    if (!res.ok) res = await fetch(url, { ...init, cache: 'no-store' });
+    const res = await fetch(url, { ...init, next: { revalidate } });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {

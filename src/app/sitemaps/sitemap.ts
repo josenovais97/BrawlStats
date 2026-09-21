@@ -57,14 +57,14 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
   const byMap = await getNewestDayByMap().catch(() => new Map<string, string>());
   /** The newest sampled day anywhere, which is when every data page changed. */
   const newest = [...byMap.values()].sort().at(-1);
-  const dataDay = newest ? new Date(`${newest}T00:00:00Z`) : undefined;
+  const dataDay = newest ? new Date(`${newest}T00:00:00Z`) : null;
 
   const entries: MetadataRoute.Sitemap = [];
   const add = (
     path: string,
     changeFrequency: Frequency,
     priority: number,
-    lastModified: Date | undefined = dataDay,
+    lastModified: Date | null = dataDay ?? null,
   ) => {
     entries.push({
       url: `${SITE_URL}${path}`,
@@ -92,12 +92,17 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
   return entries;
 }
 
-type Add = (path: string, f: Frequency, p: number, lastModified?: Date | undefined) => void;
+type Add = (path: string, f: Frequency, p: number, lastModified?: Date | null) => void;
 
-/** No date at all: these change when someone edits them, which nothing here tracks. */
-const EVERGREEN = undefined;
+/**
+ * No date at all: these change when someone edits them, which nothing here
+ * tracks. `null`, not `undefined` — an `undefined` argument selects the
+ * default parameter, which is today's date, and that is exactly what the
+ * first deploy of this shipped: 363 maps "changed today" where 258 had data.
+ */
+const EVERGREEN = null;
 
-async function core(add: Add, dataDay: Date | undefined) {
+async function core(add: Add, dataDay: Date | null) {
   // Ordered by what the search data says earns the visit, not by site
   // structure. Order is not something Google promises to honour, but a crawler
   // that reads the file top-down and stops early — which is what a small
