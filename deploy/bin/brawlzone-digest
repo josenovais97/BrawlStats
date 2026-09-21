@@ -9,7 +9,9 @@ set -uo pipefail
 . /usr/local/lib/brawlzone-html.sh
 
 REPO=/home/ubuntu/brawlstats
-ACCESS=/var/log/brawlzone/access.log
+# Caddy writes into its own subdirectory (see caddy/Caddyfile). This pointed at
+# the parent for three weeks, so every digest reported zero requests.
+ACCESS=/var/log/brawlzone/access/access.log
 psql() { (cd "$REPO" && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc "$1" 2>/dev/null); }
 
 # ---- gather -----------------------------------------------------------------

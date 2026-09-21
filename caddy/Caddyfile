@@ -55,6 +55,36 @@
 		respond "Refused. See /robots.txt" 403
 	}
 
+	# The draft-state flood, refused here so that Node never sees it.
+	#
+	# `src/proxy.ts` already refuses this traffic, and correctly: its Referer
+	# is `https://brawlzone.net` with nothing after the host, which a browser
+	# cannot produce (a document URL always serialises with at least "/").
+	# But the proxy runs INSIDE the app, and AGENTS.md trap 8 is what that
+	# cost on 2026-09-11: when the app saturated, the limiter went down with
+	# it. Measured 2026-09-21 after a week unattended, the same flood was at
+	# 81 requests a second, 99% of all traffic, every one of them a Node
+	# middleware invocation returning a 429. The site held; the sampler,
+	# landing on top of that every two hours, did not always.
+	#
+	# `header` without a wildcard is an exact match, so the trailing-slash
+	# form a real browser sends from the home page does not match. If the
+	# flood ever appends the slash it falls through to the app's own limiter
+	# and the site behaves as it did before this block existed -- the
+	# advantage is lost, the protection is not.
+	#
+	# Only /draft, not every limited prefix: this is one measured flood with
+	# one measured shape, and a broader rule would be a guess.
+	@draft_flood {
+		path /draft/*
+		header Referer https://brawlzone.net
+	}
+	handle @draft_flood {
+		header Retry-After 5
+		header Cache-Control no-store
+		respond "Too many requests. Try again in a moment." 429
+	}
+
 	handle {
 		reverse_proxy {
 			# Resolved per-refresh rather than once at startup. Docker gives a

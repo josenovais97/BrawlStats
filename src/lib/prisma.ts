@@ -31,6 +31,20 @@ export function getPrisma(): PrismaClient | null {
     globalForPrisma.prisma = new PrismaClient({
       adapter: new PrismaPg({ connectionString }),
       log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
+      /*
+       * Prisma's default is 5 seconds for the whole transaction, and it applies
+       * to the batch form `$transaction([...])` as well as the interactive one.
+       * The only transactions here are the roll-up's delete-then-insert pairs
+       * in `lib/aggregation`, each of which aggregates a day of raw battles —
+       * real work whose duration is set by how much was sampled and by whatever
+       * else the box is doing at :17. On 2026-09-16 and 2026-09-21 one took
+       * 9.6s, the roll-up failed, the prune parked, and the sampler paged.
+       *
+       * The site itself opens no transactions, so this costs the pages nothing.
+       * A minute is not a target; it is far enough above the measured worst
+       * case that hitting it means something is actually wrong.
+       */
+      transactionOptions: { maxWait: 10_000, timeout: 60_000 },
     });
   }
   return globalForPrisma.prisma;

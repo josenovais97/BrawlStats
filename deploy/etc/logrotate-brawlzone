@@ -20,7 +20,30 @@
 # `delaycompress` exists for readers that hold a rotated file open. Caddy
 # reopens on rotation and the job wrapper is copytruncate'd, so nothing here
 # needed it.
-/var/log/brawlzone/*/*.log {
+# Thirty days for the job logs and seven for the access log. Measured
+# 2026-09-21 after a week unattended: a crawler refused at 81 requests a second
+# is still a line per request, 250-330 MB compressed *per day*, and thirty of
+# those is a fifth of the disk for a file nobody reads past a week. The disk
+# guard in the health check does not touch it, because these are already
+# compressed and "reclaim" would mean deleting evidence.
+/var/log/brawlzone/access/*.log {
+    daily
+    maxsize 100M
+    rotate 7
+    missingok
+    notifempty
+    compress
+    copytruncate
+    dateext
+    dateformat -%Y-%m-%d-%s
+    su root adm
+    create 0664 root adm
+}
+
+# `[!a]*` rather than `*`, because logrotate refuses a file that two stanzas
+# both match, and the access stanza above already owns `access/`. The one other
+# directory starting with "a" is named back in explicitly.
+/var/log/brawlzone/[!a]*/*.log /var/log/brawlzone/alert/*.log {
     daily
     maxsize 100M
     rotate 30
