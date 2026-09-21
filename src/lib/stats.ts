@@ -3248,16 +3248,28 @@ export async function getHeadToHead(
  * roster at large; the estimate itself is what handles thin evidence, by
  * shrinking toward the brawler's overall ranked form (see below).
  *
- * Raised from 4 to 8 because 4 was letting a four-battle record take the top
- * row of a map — a coin flip wearing a percentage sign, and the first thing a
- * reader sees. Shrinkage kept the *number* honest but not the *ordering*.
+ * It was 8, set when the sample was a third of today's and 12 would have
+ * emptied half the maps. At the current rate that let Hank take third on
+ * Belle's Rock off 17 battles and Clancy fourth off 9 — shrinkage kept the
+ * *number* honest but not the *ordering*, and a reader sees the ordering.
  *
- * 8 costs nothing today: measured over the current 21-day window, all 27
- * sampled maps still field at least three eligible brawlers at 8 (the
- * thinnest, Undermine, has four), while 12 would empty half of them. Worth
- * re-measuring with the same query if the sampling rate changes.
+ * 50, re-measured 2026-09-21 over the 21-day window: every map in the current
+ * Ranked pool fields between 48 and 73 eligible brawlers at 50 (Safe Zone and
+ * Hot Potato the thinnest), and the two maps that just entered the pool still
+ * field 34. A map out of rotation for weeks will list fewer, which is the
+ * honest reading of it. Re-measure with the same query if the sampling rate
+ * changes:
+ *
+ *   SELECT mode, map_name, count(*) FILTER (WHERE decided >= 50)
+ *   FROM (SELECT mode, map_name, brawler_id,
+ *           SUM(battles) FILTER (WHERE result IN ('victory','defeat')) AS decided
+ *         FROM battle_daily_stats
+ *         WHERE day >= CURRENT_DATE - 21 AND map_name IS NOT NULL
+ *           AND battle_type IN ('soloRanked','teamRanked')
+ *         GROUP BY 1,2,3) per
+ *   GROUP BY 1,2;
  */
-const MIN_SAMPLE_FOR_MAP_PICK = 8;
+const MIN_SAMPLE_FOR_MAP_PICK = 50;
 
 /** Maps needing at least this many decided battles to appear at all. */
 const MIN_SAMPLE_FOR_MAP = 20;

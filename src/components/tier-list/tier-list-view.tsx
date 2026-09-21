@@ -25,6 +25,8 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
+import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
+import { brawlerIconUrl } from '@/lib/brawlapi';
 import { isFramedTile } from '@/lib/brawlapi';
 import { brawlerPath } from '@/lib/slugs';
 
@@ -46,6 +48,7 @@ import {
   getFilterableModes,
   getLastAggregationRun,
   getMetaMovers,
+  getRankedMapPicks,
   scoreBrawlers,
   type TierFormat,
   type TierWindowKey,
@@ -162,7 +165,7 @@ export async function TierListView({
 
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after the other so the page never needs more than one connection.
-  const [rows, brawlerMeta, lastRun, movers] = await Promise.all([
+  const [rows, brawlerMeta, lastRun, movers, mapPicks] = await Promise.all([
     getBrawlerStatsForWindow(days, mode, format),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getLastAggregationRun(),
@@ -170,7 +173,29 @@ export async function TierListView({
     // so this belongs to the Ranked list and is not rendered on the trophy one
     // — see MetaMovers.
     format === 'ranked' ? getMetaMovers(7) : Promise.resolve([]),
+    // The mode's Ranked maps, for the chips under the mode filter. Only on a
+    // mode page: the combined list has no map pool, and the trophy ladder has
+    // no map-level ranking. Same cached read the Bubble's panel uses.
+    format === 'ranked' && mode ? getRankedMapPicks(60).catch(() => []) : Promise.resolve([]),
   ]);
+
+  const maps: MapRows[] = mapPicks
+    .filter((map) => map.mode === mode)
+    .sort((a, b) => a.mapName.localeCompare(b.mapName))
+    .map((map) => ({
+      mapName: map.mapName,
+      // `/maps/<mode>/<map>` uses the same slugs the catalogue does.
+      slug: `${slugify(map.mode)}/${slugify(map.mapName)}`,
+      picks: map.picks.map((pick) => ({
+        brawlerId: pick.brawlerId,
+        brawlerName: pick.brawlerName,
+        imageUrl:
+          brawlerMeta.get(pick.brawlerId)?.imageUrl ?? brawlerIconUrl(pick.brawlerId),
+        score: pick.score,
+        overallScore: pick.overallScore,
+        battles: pick.decidedSampleSize,
+      })),
+    }));
 
   /*
    * Movement, indexed by brawler so a chip can carry its own.
@@ -376,27 +401,31 @@ export async function TierListView({
         <WhatChanged movers={movers} changes={changes} brawlerMeta={brawlerMeta} />
       ) : null}
 
-      {rated.length === 0 ? (
-        <EmptyState windowLabel={scopeLabel} />
-      ) : (
-        <div className="space-y-4">
-          {TIER_ORDER.map((tier) => {
-            const inTier = rated
-              .filter((e) => e.tier === tier)
-              .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
-            if (inTier.length === 0) return null;
-            return (
-              <TierRow
-                key={tier}
-                tier={tier}
-                entries={inTier}
-                changes={changes}
-                span={changeSpan}
-              />
-            );
-          })}
-        </div>
-      )}
+      {/* On a Ranked mode page the tiers sit inside the map switch, so a map
+          chip can swap them for that map's ranking without a request. */}
+      <RankedMapSwitch maps={maps}>
+        {rated.length === 0 ? (
+          <EmptyState windowLabel={scopeLabel} />
+        ) : (
+          <div className="space-y-4">
+            {TIER_ORDER.map((tier) => {
+              const inTier = rated
+                .filter((e) => e.tier === tier)
+                .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
+              if (inTier.length === 0) return null;
+              return (
+                <TierRow
+                  key={tier}
+                  tier={tier}
+                  entries={inTier}
+                  changes={changes}
+                  span={changeSpan}
+                />
+              );
+            })}
+          </div>
+        )}
+      </RankedMapSwitch>
 
       {/*
         Placed under the tiers rather than above them: the ranking is what the
