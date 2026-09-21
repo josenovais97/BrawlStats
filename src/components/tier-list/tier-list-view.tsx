@@ -25,6 +25,7 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
+import { isFramedTile } from '@/lib/brawlapi';
 import { brawlerPath } from '@/lib/slugs';
 
 import {
@@ -457,7 +458,7 @@ export async function TierListView({
                       alt=""
                       width={28}
                       height={28}
-                      className="size-7"
+                      className={isFramedTile(entry.imageUrl) ? 'size-7' : 'size-7 rounded-sm bg-[#151515] object-cover'}
                       unoptimized
                     />
                   ) : null}
@@ -551,7 +552,12 @@ function TierRow({
                     alt={entry.brawlerName}
                     width={72}
                     height={72}
-                    className="mx-auto aspect-square w-full object-contain"
+                    className={
+                      isFramedTile(entry.imageUrl)
+                        ? 'mx-auto aspect-square w-full object-contain'
+                        : // The mirror's frame, drawn by hand for art from anywhere else.
+                          'mx-auto aspect-square w-full rounded-md border-[3px] border-[#151515] bg-[#151515] object-cover'
+                    }
                     unoptimized
                   />
                 ) : (

@@ -264,6 +264,21 @@ export function brawlerIconUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/borders/${brawlerId}.png`;
 }
 
+/**
+ * Whether a portrait URL is one of the mirror's framed tiles.
+ *
+ * The mirror bakes the black rounded frame into the image itself, so a
+ * portrait from anywhere else — the wiki fallback for a brawler the mirror has
+ * not caught up with — arrives as bare art and sits in a row of framed tiles
+ * looking like it belongs to a different site. The frame has to be drawn in
+ * CSS for those, and this is how a caller knows to. On 2026-09-10 Cosmo got
+ * his wiki portrait back and was reported as "not matching other brawlers":
+ * the face was right, the frame was missing.
+ */
+export function isFramedTile(url: string): boolean {
+  return url.startsWith('https://cdn.brawlify.com/brawlers/borders/');
+}
+
 /** Borderless brawler portrait, by id. Still a square tile, just unframed. */
 export function brawlerPortraitUrl(brawlerId: number): string {
   return `https://cdn.brawlify.com/brawlers/borderless/${brawlerId}.png`;
