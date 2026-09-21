@@ -252,14 +252,5 @@
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="12sp"
-            android:lineSpacingMultiplier="1.35"
-            android:textColor="@color/muted"
-            android:alpha="0.75"
-            android:text="Tap Scan in the panel to read the draft off your screen. Android asks permission once per app start — after the first time it is asked here, as the bubble starts, so it never interrupts a match. The frame is read on your phone and dropped." />
     </LinearLayout>
 </ScrollView>

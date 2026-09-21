@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.13',
+  version: '1.14',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 34,
+  versionCode: 35,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,16 +31,30 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.13.apk',
+  path: '/downloads/brawlzone-bubble-1.14.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
    * world. Redirected to `path` and never cached — see `next.config.ts`.
    */
   legacyPath: '/downloads/brawlzone-bubble.apk',
+  /**
+   * Where the same build is listed on a store, or null while it is not.
+   *
+   * A store page is a second door to the same APK, not a different build: the
+   * listing is updated by uploading the file at `path`, signed with the same
+   * key, so an install from either side updates from either side. It exists
+   * for the people a sideload page loses — the ones who will not enable
+   * "unknown sources" for a site they found ten minutes ago — and because a
+   * listing on a domain search engines already trust is a link to this one.
+   *
+   * Null renders nothing. The page must never point at a listing that is not
+   * up yet; a dead store link on a download page reads as a dead app.
+   */
+  storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 3409598,
-  sha256: '57da042f16bc6a174f7b321a4f71c8b153a79e3d332907584cd5117d3fe3ed0a',
+  size: 2648809,
+  sha256: '6b66fe59b8b88295a095e1d592bef67cc9c0c2ef2b02c39a8d98a857f534df4b',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -72,6 +86,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.14',
+    versionCode: 35,
+    date: '2026-09-21',
+    changes: [
+      'The draft scan is gone. It never worked reliably enough across phones to keep, and an app that asks to record your screen for a feature that does not work is worse than one that does not ask. The app no longer requests screen capture at all.',
+      'The draft board stays: pick the map and enter the bans and picks by hand, and it ranks the remaining brawlers as before.',
+      'Smaller and simpler for it — the text-recognition library is gone too.',
+    ],
+  },
   {
     version: '1.13',
     versionCode: 34,

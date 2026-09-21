@@ -13,7 +13,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.Icon
@@ -47,16 +46,6 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.FileProvider
-import com.google.android.gms.common.moduleinstall.ModuleInstall
-import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.TextRecognizer
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import java.io.File
-import org.json.JSONArray
-import org.json.JSONObject
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -111,123 +100,8 @@ class BubbleService : Service() {
      */
     private var outsideClosedAt = 0L
 
-    // ------------------------------------------------------------------ scan
-
-    /**
-     * Reading the draft off the screen, when the user has allowed it.
-     *
-     * All of this is null until someone asks. The overlay is the feature; this
-     * is an addition to it, and an app that holds a screen-capture session open
-     * because it might be useful later is not one anybody should install.
-     */
-    private var scan: ScreenScan? = null
-    private var sessionCounter = 0L
-    private var vision: DraftVision? = null
-
-    /**
-     * Which scan may still speak, and what the page has been told.
-     *
-     * Both are plain classes in `core` with their own tests, because the two
-     * worst faults in this feature's history were not in recognition at all:
-     * a late callback from an abandoned scan overwriting a live one, and a
-     * status message overwriting a result while the panel was shut. See
-     * ScanFlow for both, and ScanFlowTest for the sequences.
-     */
-    private val flow = ScanFlow()
-    private val outbox = ScanOutbox { SystemClock.elapsedRealtime() }
-
-    /**
-     * One scan in flight: its request, its frame, and everything recorded
-     * about it. The frame is owned here and recycled here — nothing else holds
-     * the Bitmap — so a late callback cannot touch pixels that are gone.
-     */
-    private inner class Scan(val request: ScanFlow.Request) {
-        val startedAt = SystemClock.elapsedRealtime()
-        var bitmap: Bitmap? = null
-        var image: DraftCore.Image? = null
-        var reading: DraftVision.Reading? = null
-        var payload: JSONObject? = null
-        val diag = JSONObject().put("scan", request.id).put("session", request.sessionId)
-        val stages = JSONObject()
-        val watchdog = Runnable { onTimeout(this) }
-
-        fun stage(name: String) {
-            stages.put(name, SystemClock.elapsedRealtime() - startedAt)
-        }
-
-        fun recycleFrame() {
-            bitmap?.let { if (!it.isRecycled) it.recycle() }
-            bitmap = null
-        }
-    }
-
-    private var current: Scan? = null
-
-    /**
-     * The last scan whose reading reached the page, kept for corrections and
-     * for the diagnostic export. A correction names the scan it belongs to,
-     * and one for any other scan is refused: the pixels it would learn from
-     * are not the pixels the reader was looking at.
-     */
-    private var lastDelivered: Scan? = null
-
-    /** The last few scans' records, newest last, for the export. */
-    private val history = ArrayDeque<JSONObject>()
-
-    /**
-     * Set while the reference table is being built, and whether a scan is
-     * waiting on it.
-     *
-     * Without the second flag, tapping Scan before the portraits finished
-     * downloading set the button to "Loading portraits…" and left it there: the
-     * state was posted once, nothing re-posted it when the table became ready,
-     * and nothing retried the scan. The button was disabled for the rest of the
-     * session. That is what "scan does not work" looked like whenever the panel
-     * came up before the download did — including every time the site was
-     * serving an empty roster, which builds a table of nothing at all.
-     */
-    private var preparing = false
-    private var scanWhenReady = false
-
-    /**
-     * When the current capture session was granted, and how many times a grant
-     * has died almost immediately.
-     *
-     * A reader reported tapping Scan, being asked to share the screen while a
-     * share was already running, granting it, and being asked again — forever.
-     * The cause is on that device and does not reproduce here, but the *loop*
-     * was this service's doing: `runScan` asked for consent whenever there was
-     * no live session, so a session that kept dying produced a prompt that kept
-     * coming back.
-     *
-     * Two things break that. Consent is now only ever requested by a deliberate
-     * tap on a button that says so, never as a side effect of scanning; and a
-     * grant that dies twice inside a few seconds stops the offer entirely and
-     * says what is happening instead. Whatever kills the projection, the worst
-     * it can now cost is two dialogs and an explanation.
-     */
-    private var grantedAt = 0L
-    private var quickLosses = 0
-    private var lastLossMs = -1L
-    private var consentPending = false
-
-    /** The panel's WebView, so a scan result has somewhere to go. */
+    /** The panel's WebView, kept so the panel can be torn down cleanly. */
     private var panelWeb: WebView? = null
-
-    /**
-     * The text recogniser, one for the service's life.
-     *
-     * Created once and closed in `onDestroy`. A client per scan, never closed,
-     * is what the previous version did; and "creating a client" was also what
-     * it called warming the model up, which does not request the model at
-     * all. `ensureOcr` asks Play Services whether the module is present and
-     * installs it if not, and `ocrStatus` is the honest answer to "will the
-     * map be read?" rather than a hope.
-     */
-    private var recognizer: TextRecognizer? = null
-
-    @Volatile
-    private var ocrStatus = "unknown"
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -265,7 +139,7 @@ class BubbleService : Service() {
     override fun onCreate() {
         super.onCreate()
         windows = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        enterForeground(withProjection = false)
+        enterForeground()
 
         /*
          * The permission is re-checked here, not just in the activity.
@@ -291,11 +165,6 @@ class BubbleService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> stopSelf()
-            ScanContract.ACTION_GRANTED -> onScanGranted(intent)
-            ScanContract.ACTION_DENIED -> {
-                consentPending = false
-                postScanState("denied")
-            }
         }
         return START_NOT_STICKY
     }
@@ -303,13 +172,6 @@ class BubbleService : Service() {
     override fun onDestroy() {
         runCatching { installWatcher?.let { unregisterReceiver(it) } }
         installWatcher = null
-        flow.invalidateCurrent("service destroyed")
-        current?.let { handler.removeCallbacks(it.watchdog); it.recycleFrame() }
-        current = null
-        scan?.retire()
-        scan = null
-        runCatching { recognizer?.close() }
-        recognizer = null
         removePanel()
         hideCloseTarget()
         bubble?.let { runCatching { windows.removeView(it) } }
@@ -626,7 +488,6 @@ class BubbleService : Service() {
         panel = null
         panelWeb = null
         panelParams = null
-        outbox.pageGone()
     }
 
     /**
@@ -647,7 +508,6 @@ class BubbleService : Service() {
         panel = null
         panelWeb = null
         panelParams = null
-        outbox.pageGone()
         Log.d(TAG, "collapsePanel: animating out")
 
         val bp = bubbleParams
@@ -796,12 +656,6 @@ class BubbleService : Service() {
                     spinner.visibility = View.GONE
                     if (failed) return
                     view?.animate()?.alpha(1f)?.setDuration(160)?.start()
-                    /*
-                     * Nothing is delivered from here. The document has loaded,
-                     * which is not the same as the page having installed its
-                     * scan handlers; the page calls `ready()` on the bridge
-                     * when it has, and the outbox replays into that.
-                     */
                 }
 
                 /*
@@ -866,11 +720,10 @@ class BubbleService : Service() {
              * `addJavascriptInterface` exposes Kotlin to any page the WebView
              * loads, which is why `shouldOverrideUrlLoading` above sends every
              * URL outside /bubble/panel to the browser instead of navigating
-             * here. The bridge cannot read the screen on its own — it can ask
-             * the service to, and the service still needs a consent the user
-             * granted to a system dialog.
+             * here. One method, and it is the update button's: nothing here
+             * can read the screen or anything else.
              */
-            addJavascriptInterface(ScanBridge(), "BrawlZoneScan")
+            addJavascriptInterface(AppBridge(), "BrawlZoneApp")
 
             loadUrl(PANEL_URL)
         }
@@ -1266,912 +1119,50 @@ class BubbleService : Service() {
         }
     }
 
-    // ---------------------------------------------------------- notification
-
-    // ------------------------------------------------------------------ scan
+    // ---------------------------------------------------------------- bridge
 
     /**
-     * The bridge the panel talks to.
+     * What the panel's page may ask the app to do. Kept to one method.
      *
-     * Every method here is called on a WebView worker thread, so nothing in it
-     * touches a view directly — the handler is not a formality. The surface is
-     * deliberately small: the page asks whether scanning exists, asks for it to
-     * be turned on, asks for a scan, says when it is ready to receive and when
-     * it has received, and reports corrections. Everything about what a draft
-     * *means* stays on the web side, where the map list and the numbers
-     * already live.
-     *
-     * Two of these are a handshake and they are the fix for a deterministic
-     * loss. `ready()` is the page saying its handlers are installed, and it is
-     * the only thing that lets a result through; `ack(id)` is the page saying
-     * it applied one, and until then the result is kept for the next `ready`.
+     * This is what remains of the scan bridge after the scan was removed in
+     * 1.14. It stays because the update banner's own Download button was dead
+     * for exactly the reason it exists: the panel cannot rely on what a WebView
+     * build decides a link means, and a button that cannot deliver an update is
+     * the worst one to leave broken — the people who see it are by definition
+     * running the version you are trying to replace. The page checks for this
+     * name first and the old `BrawlZoneScan` second, so an older install still
+     * gets its update through the same door.
      */
-    private inner class ScanBridge {
-
-        /** "unsupported" on a build without capture, else idle/ready/busy. */
-        @JavascriptInterface
-        fun status(): String = statusNow()
-
-        /**
-         * Why the capture session is in the state it is.
-         *
-         * Reported to the panel's Diagnostics block so a failure on a device
-         * nobody here can reproduce arrives as a fact rather than a guess.
-         */
-        @JavascriptInterface
-        fun scanDetail(): String = JSONObject()
-            .put("state", statusNow())
-            .put("live", scan?.live == true)
-            .put("session", scan?.id ?: -1)
-            .put("quickLosses", quickLosses)
-            .put("lastLossMs", lastLossMs)
-            .put("pct", vision?.progress ?: -1)
-            .put("ready", vision?.ready == true)
-            .put("coverage", vision?.coverage?.toJson() ?: JSONObject.NULL)
-            .put("learned", vision?.learnedCount() ?: 0)
-            .put("ocr", ocrStatus)
-            // The frame's own dimensions, and the screen's. If these disagree
-            // every region is reading the wrong place.
-            .put("frame", scan?.size ?: "-")
-            .put("content", scan?.contentSize ?: "-")
-            .put("screen", "${screenW}x$screenH")
-            .put("pending", outbox.pending ?: JSONObject.NULL)
-            .put("lastScan", lastDelivered?.request?.id ?: JSONObject.NULL)
-            .toString()
-
-        @JavascriptInterface
-        fun ocrStatus(): String = ocrStatus
-
-        /** The roster, so the matcher knows which art to fetch. */
-        @JavascriptInterface
-        fun roster(json: String) {
-            val ids = try {
-                val array = JSONArray(json)
-                ArrayList<Int>(array.length()).apply {
-                    for (i in 0 until array.length()) add(array.getInt(i))
-                }
-            } catch (e: Throwable) {
-                Log.w(TAG, "roster rejected", e)
-                return
-            }
-
-            /*
-             * An empty roster is the panel telling us it has no data — the site
-             * was down, or the sampler has not run. Building a table from it
-             * would leave the matcher permanently not-ready with nothing to say
-             * about why, so it is refused loudly instead.
-             */
-            if (ids.isEmpty()) {
-                Log.w(TAG, "roster is empty; matcher not built")
-                handler.post { postScanState("noroster") }
-                return
-            }
-
-            handler.post { prepareTables(ids) }
-        }
-
-        /**
-         * Opens a URL outside the panel, by Intent.
-         *
-         * Exists because the panel cannot rely on what a WebView build decides
-         * a link means. The update banner's own Download button was dead for
-         * exactly that reason, and a button that cannot deliver an update is
-         * the worst one to leave broken — the people who see it are by
-         * definition running the version you are trying to replace.
-         */
+    private inner class AppBridge {
         @JavascriptInterface
         fun openExternal(url: String) {
             val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return
             if (uri.scheme != "https") return
             handler.post { openExternally(uri) }
         }
-
-        @JavascriptInterface
-        fun enable() = handler.post { requestScanConsent() }
-
-        @JavascriptInterface
-        fun scan() = handler.post { runScan() }
-
-        /** Give the capture session back. Also what the recording chip does. */
-        @JavascriptInterface
-        fun stop() = handler.post {
-            flow.invalidateCurrent("stopped")
-            current?.let { handler.removeCallbacks(it.watchdog); it.recycleFrame() }
-            current = null
-            restoreOverlay()
-            scan?.retire()
-            scan = null
-            postScanState("idle")
-        }
-
-        /** The page's handlers are installed; anything held is replayed. */
-        @JavascriptInterface
-        fun ready() = handler.post { send(outbox.pageReady()) }
-
-        /** The page applied result `id`. */
-        @JavascriptInterface
-        fun ack(id: Int) = handler.post { outbox.ack(id.toLong()) }
-
-        /**
-         * Files the plate on screen under the map the reader just confirmed.
-         *
-         * The names come from the page, so what the app stores is keyed on the
-         * site's own map list rather than on anything it tried to read — which
-         * is why a learned plate can never disagree with the map it selects.
-         * Bound to a scan: a plate confirmed against a different frame than the
-         * one on the reader's screen would be filed under the wrong pixels.
-         */
-        @JavascriptInterface
-        fun learnPlate(scanId: Int, modeKey: String?, mapName: String?) {
-            handler.post {
-                val last = lastDelivered ?: return@post
-                if (last.request.id != scanId.toLong()) {
-                    Log.w(TAG, "learnPlate for scan $scanId; last delivered is ${last.request.id}")
-                    return@post
-                }
-                val frame = last.image ?: return@post
-                val v = vision ?: return@post
-                Thread { runCatching { v.learnPlate(frame, modeKey, mapName) } }.start()
-            }
-        }
-
-        /**
-         * A correction. The frame that produced the misread is still in hand,
-         * so the descriptor learned is the one that was actually on screen —
-         * provided the correction is for that scan, and that slot was actually
-         * readable in it.
-         */
-        @JavascriptInterface
-        fun learn(scanId: Int, kind: String, index: Int, brawlerId: Int) {
-            handler.post {
-                val last = lastDelivered ?: return@post
-                if (last.request.id != scanId.toLong()) {
-                    Log.w(TAG, "learn for scan $scanId; last delivered is ${last.request.id}")
-                    return@post
-                }
-                val frame = last.image ?: return@post
-                val v = vision ?: return@post
-                Thread {
-                    runCatching { v.learn(frame, kind, index, brawlerId, scanId.toLong()) }
-                        .onFailure { Log.w(TAG, "learn failed", it) }
-                }.start()
-            }
-        }
-
-        /** Forgets every correction. Returns how many entries went. */
-        @JavascriptInterface
-        fun resetLearned(): Int = vision?.resetLearned() ?: 0
-
-        /**
-         * Writes the last scan's frame and record to the app's own external
-         * files and offers them to share. Manual, and only ever this — no
-         * frame is written anywhere unless the reader taps the button that
-         * says it will be.
-         */
-        @JavascriptInterface
-        fun exportDiagnostics(): String = exportLastScan()
     }
+
+    // ---------------------------------------------------------- notification
 
     /**
-     * Builds the reference tables for `ids`, unless they are already built for
-     * exactly that roster. A changed roster in the same service session used
-     * to be ignored, because the check was "is the matcher ready" rather than
-     * "is it ready for these".
-     */
-    private fun prepareTables(ids: List<Int>) {
-        val v = vision ?: DraftVision(this).also { vision = it }
-        if (preparing) return
-        if (!v.needsPrepare(ids)) {
-            postScanState(statusNow())
-            return
-        }
-        preparing = true
-        postScanState("preparing")
-        ensureOcr()
-        Thread {
-            runCatching {
-                var lastPosted = -1
-                v.prepare(ids) { pct ->
-                    // Every ten percent: enough for the label to move,
-                    // rare enough not to cross into the WebView constantly.
-                    if (pct / 10 != lastPosted) {
-                        lastPosted = pct / 10
-                        handler.post { postScanState("preparing:$pct") }
-                    }
-                }
-            }.onFailure { Log.w(TAG, "reference table failed", it) }
-            handler.post {
-                preparing = false
-                // Whoever tapped Scan while this was running gets their scan.
-                if (scanWhenReady && v.ready) {
-                    scanWhenReady = false
-                    runScan()
-                } else {
-                    scanWhenReady = false
-                    postScanState(if (v.ready) statusNow() else "failed")
-                }
-            }
-        }.start()
-    }
-
-    /**
-     * Makes sure the text model is on the device, and says whether it is.
+     * Enters the foreground with the service type passed explicitly.
      *
-     * The unbundled recogniser's model lives in Play Services and is fetched
-     * on first use — which means the first scan on a fresh install is the one
-     * that waits for a download, and Google documents that requests before
-     * the download finishes simply return nothing. Asking the module
-     * installer explicitly starts that download now and reports the answer,
-     * so the panel can say "map reading is still installing" rather than
-     * silently reading nothing.
+     * Explicit, not inferred: the two-argument `startForeground` takes the type
+     * from the manifest, and in 1.8 — when the manifest briefly declared
+     * `mediaProjection` as well — that made every ordinary start ask Android
+     * for a capture type without holding a capture, which API 34 refuses and
+     * reports as the app crashing. The manifest now declares only
+     * `specialUse`, but passing the type stays: it is the one line that
+     * prevents that class of crash regardless of what the manifest says.
      */
-    private fun ensureOcr() {
-        if (ocrStatus == "available" || ocrStatus == "checking" || ocrStatus == "installing") return
-        val r = recognizer ?: runCatching {
-            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        }.getOrNull()?.also { recognizer = it }
-        if (r == null) {
-            ocrStatus = "unavailable"
-            return
-        }
-        ocrStatus = "checking"
-        val client = runCatching { ModuleInstall.getClient(this) }.getOrNull()
-        if (client == null) {
-            ocrStatus = "unavailable"
-            return
-        }
-        client.areModulesAvailable(r)
-            .addOnSuccessListener { response ->
-                if (response.areModulesAvailable()) {
-                    ocrStatus = "available"
-                    return@addOnSuccessListener
-                }
-                ocrStatus = "installing"
-                val request = ModuleInstallRequest.newBuilder().addApi(r).build()
-                client.installModules(request)
-                    .addOnSuccessListener { ocrStatus = if (it.areModulesAlreadyInstalled()) "available" else "installing" }
-                    .addOnFailureListener {
-                        Log.w(TAG, "text model install refused", it)
-                        ocrStatus = "unavailable"
-                    }
-            }
-            .addOnFailureListener {
-                Log.w(TAG, "text model availability unknown", it)
-                ocrStatus = "unavailable"
-            }
-    }
-
-    /**
-     * Asks for screen capture, having first got out of the way.
-     *
-     * Android disables the consent dialog's button while anything is drawn over
-     * it — the same anti-tapjacking rule that makes the overlay permission
-     * screen unusable with the bubble up — so the panel has to be gone before
-     * the dialog appears, not after.
-     */
-    private fun requestScanConsent() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            postScanState("unsupported")
-            return
-        }
-        if (consentPending) return
-        if (quickLosses >= QUICK_LOSS_LIMIT) {
-            postScanState("blocked")
-            return
-        }
-        consentPending = true
-        postScanState("consent")
-
-        /*
-         * The panel is left open on purpose.
-         *
-         * Android applies FLAG_HIDE_NON_SYSTEM_OVERLAY_WINDOWS to its own
-         * capture dialog, so every overlay is hidden for as long as it is up
-         * without this service doing anything — and collapsing the panel by
-         * hand would throw away the WebView the answer has to be delivered to.
-         *
-         * A launch that fails is a terminal path like any other: the flag is
-         * cleared, or the next tap on the button does nothing forever.
-         */
-        val launched = runCatching {
-            startActivity(
-                Intent(this, ScanConsentActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-            )
-        }.onFailure { Log.w(TAG, "consent activity could not start", it) }.isSuccess
-        if (!launched) {
-            consentPending = false
-            postScanState("failed")
-            return
-        }
-        // And a dialog that never answers — the activity killed under memory
-        // pressure, say — must not leave the flag set either.
-        handler.postDelayed({
-            if (consentPending) {
-                consentPending = false
-                postScanState(statusNow())
-            }
-        }, CONSENT_TIMEOUT_MS)
-    }
-
-    /**
-     * Turns the granted token into a live session.
-     *
-     * `startForeground` is called again first, and that is not redundant.
-     * Android 14 refuses `getMediaProjection` unless the calling service is
-     * already in the foreground carrying the mediaProjection type, and it
-     * refuses with a SecurityException rather than a null — so without this
-     * line the app crashes at the moment the user says yes.
-     *
-     * Every early return clears `consentPending`; the previous version
-     * cleared it once, after the session was up, so a refused grant left the
-     * button dead for the rest of the service's life.
-     */
-    private fun onScanGranted(intent: Intent) {
-        consentPending = false
-        val code = intent.getIntExtra(ScanContract.EXTRA_RESULT_CODE, 0)
-        val data: Intent? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(ScanContract.EXTRA_RESULT_DATA, Intent::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(ScanContract.EXTRA_RESULT_DATA)
-        }
-        if (data == null) {
-            postScanState("denied")
-            return
-        }
-
-        if (!enterForeground(withProjection = true)) {
-            postScanState("failed")
-            return
-        }
-
-        /*
-         * The old session is retired *before* the new one exists. Retiring
-         * silences its stop callback, so it cannot arrive later and clear the
-         * field that by then holds its replacement — which is what an
-         * unguarded `scan = null` in `onLost` allowed.
-         */
-        scan?.let { old ->
-            flow.sessionEnded(old.id)
-            old.retire()
-        }
-        scan = null
-
-        val session = ScreenScan(this, handler, ++sessionCounter)
-        session.onLost = { lost ->
-            // Only the current session may report a loss. Anything else is a
-            // ghost of a session already replaced, and says nothing.
-            if (scan === lost) {
-                val alive = SystemClock.elapsedRealtime() - grantedAt
-                lastLossMs = alive
-                scan = null
-                flow.sessionEnded(lost.id)
-                current?.let { c ->
-                    if (c.request.sessionId == lost.id) {
-                        handler.removeCallbacks(c.watchdog)
-                        c.recycleFrame()
-                        restoreOverlay()
-                        current = null
-                    }
-                }
-                /*
-                 * A session that survives a few seconds and then stops is the
-                 * reader closing it, which is ordinary. One that dies
-                 * immediately, twice, is something on this device refusing to
-                 * let us capture — and asking a third time will not change that.
-                 */
-                if (alive in 0 until QUICK_LOSS_MS) quickLosses++ else quickLosses = 0
-                Log.w(TAG, "capture stopped after ${alive}ms (quick losses: $quickLosses)")
-                postScanState(statusNow())
-            }
-        }
-        val ok = session.start(code, data, screenW, screenH, resources.displayMetrics.densityDpi)
-        if (!ok) {
-            quickLosses++
-            postScanState(statusNow())
-            return
-        }
-        scan = session
-        grantedAt = SystemClock.elapsedRealtime()
-        ensureOcr()
-        postScanState("ready")
-        // Straight into a scan: the user asked for one, and the dialog was the
-        // only thing between them and it.
-        handler.postDelayed({ runScan() }, 250L)
-    }
-
-    /**
-     * One scan: hide, capture, read, show, report.
-     *
-     * The overlay has to go first. MediaProjection captures the composited
-     * display, so the bubble and the panel are *in* the frame — the panel sits
-     * over the very strip the draft is read from, and the bubble parks on an
-     * edge that can cover a ban. Hiding both for a couple of frames is the only
-     * way to photograph the game rather than ourselves.
-     */
-    private fun runScan() {
-        if (flow.busy) return
-
-        /*
-         * Readiness before permission, and the order matters.
-         *
-         * Checked the other way round, a tap during the first load asked to
-         * share the screen for a scan that could not have run anyway — the
-         * tables were still building. The reader gets a permission dialog, a
-         * scan that does nothing, and no hint that the app was simply not
-         * ready. Progress first; the dialog only once there is something to
-         * scan with.
-         */
-        val v = vision
-        if (v == null || !v.ready) {
-            /*
-             * Not a dead end. The table is either being built right now or has
-             * not been asked for, and either way the answer is to remember that
-             * a scan is wanted rather than to disable the button until the
-             * panel is closed and reopened.
-             */
-            scanWhenReady = true
-            postScanState(if (preparing) "preparing:${v?.progress ?: 0}" else "noroster")
-            return
-        }
-
-        val session = scan
-        if (session == null || !session.live) {
-            // Never a prompt from here. Asking for consent as a side effect of
-            // scanning is what turned a dying session into an endless dialog;
-            // the panel offers it as its own labelled action instead.
-            postScanState(statusNow())
-            return
-        }
-
-        /*
-         * The capture must match the screen it is capturing. See
-         * ScreenScan.ensureSize — a session granted while the phone was
-         * portrait keeps producing portrait frames of a landscape game.
-         */
-        val resized = session.ensureSize(screenW, screenH, resources.displayMetrics.densityDpi)
-
-        current?.let { handler.removeCallbacks(it.watchdog); it.recycleFrame() }
-        val job = Scan(flow.begin(session.id))
-        current = job
-        job.diag.put("screen", "${screenW}x$screenH").put("resized", resized)
-        postScanState("busy")
-        handler.postDelayed(job.watchdog, SCAN_TIMEOUT_MS)
-
-        panel?.visibility = View.GONE
-        bubble?.visibility = View.GONE
-        job.stage("hidden")
-
-        // Longer after a resize: the new surface has to produce its first frame.
-        handler.postDelayed({
-            if (!job.request.alive) {
-                restoreOverlay()
-                return@postDelayed
-            }
-            session.capture { frame ->
-                restoreOverlay()
-                job.stage("captured")
-                if (!job.request.alive) {
-                    frame?.bitmap?.recycle()
-                    return@capture
-                }
-                if (frame == null) {
-                    finish(job, fail(job, "no-frame", "the display produced no frame"))
-                    return@capture
-                }
-                job.bitmap = frame.bitmap
-                job.diag.put(
-                    "frame",
-                    JSONObject()
-                        .put("w", frame.bitmap.width)
-                        .put("h", frame.bitmap.height)
-                        .put("generation", frame.generation)
-                        .put("sequence", frame.sequence)
-                        .put("timestamp", frame.timestamp),
-                )
-                val image = v.toImage(frame.bitmap)
-                job.image = image
-
-                Thread {
-                    val reading = runCatching { v.read(image) }
-                        .onFailure { Log.w(TAG, "vision pass failed", it) }
-                    handler.post { onVision(job, reading.getOrNull(), reading.exceptionOrNull()) }
-                }.start()
-            }
-        }, if (resized) HIDE_FOR_SCAN_MS * 3 else HIDE_FOR_SCAN_MS)
-    }
-
-    private fun restoreOverlay() {
-        panel?.visibility = View.VISIBLE
-        bubble?.visibility = View.VISIBLE
-    }
-
-    /**
-     * The vision pass finished. Delivers the brawlers now and starts the plate
-     * read, which arrives later as an update to the same result.
-     */
-    private fun onVision(job: Scan, reading: DraftVision.Reading?, error: Throwable?) {
-        job.stage("read")
-        if (!flow.visionDone(job.request)) {
-            job.recycleFrame()
-            return
-        }
-        val v = vision
-        if (reading == null || v == null) {
-            val image = job.image
-            val at = if (image != null) v?.located(image) else null
-            val payload = if (error != null) {
-                fail(job, "error", error.toString())
-            } else {
-                fail(job, "not-draft", at?.reasons?.joinToString("; ") ?: "no layout")
-            }
-            if (at != null) payload.put("layout", layoutJson(at))
-            finish(job, payload)
-            return
-        }
-        job.reading = reading
-
-        /*
-         * The plate is cropped now, on this thread, while the frame is still
-         * ours — and then the frame goes. The recogniser gets its own small
-         * bitmap and nothing else ever touches the big one again, so there is
-         * no path on which a late callback finds it recycled.
-         */
-        val plate = if (reading.layout.plateFound) cropPlate(job, reading.layout.plateText) else null
-        job.recycleFrame()
-
-        val r = recognizer
-        val ocr = when {
-            plate == null -> "skipped"
-            r == null || ocrStatus == "unavailable" -> "unavailable"
-            else -> "pending"
-        }
-        val payload = payloadFor(job, reading, ocr)
-        job.payload = payload
-        lastDelivered = job
-        send(outbox.result(job.request.id, payload.toString()))
-        postScanState(statusNow())
-
-        if (plate == null || r == null || ocr != "pending") {
-            plate?.recycle()
-            flow.plateDone(job.request)
-            record(job)
-            return
-        }
-        readPlate(job, r, plate, reading.layout)
-    }
-
-    private fun cropPlate(job: Scan, rect: DraftCore.Rect): Bitmap? {
-        val frame = job.bitmap ?: return null
-        if (frame.isRecycled) return null
-        return runCatching {
-            Bitmap.createBitmap(
-                frame,
-                rect.left.coerceIn(0, frame.width - 1),
-                rect.top.coerceIn(0, frame.height - 1),
-                rect.width.coerceAtMost(frame.width - rect.left).coerceAtLeast(1),
-                rect.height.coerceAtMost(frame.height - rect.top).coerceAtLeast(1),
-            )
-        }.getOrNull()
-    }
-
-    /**
-     * Reads the mode and map off the plate, then attaches them to the result
-     * already delivered.
-     *
-     * The recogniser is the *first* answer for a map, not the only one. A plate
-     * the reader has already confirmed is matched as a picture — faster, exact,
-     * and needing no model — and this covers the case that path cannot: a map
-     * this install has never been shown.
-     *
-     * Nothing is resolved here. The page holds the mode list and the Ranked
-     * rotation, so it decides what "SPIRALINQ OUTI" means; a second copy of that
-     * list in Kotlin would be a second thing to update whenever the pool turns
-     * over. This reports the strings — split into the plate's two lines by
-     * where each line sits, so the page can match the mode and the map
-     * against different lists.
-     */
-    private fun readPlate(job: Scan, recognizer: TextRecognizer, plate: Bitmap, at: DraftLayout.Located) {
-        val split = at.plateMode.height // lines above this are the mode line
-        runCatching { recognizer.process(InputImage.fromBitmap(plate, 0)) }
-            .onSuccess { task ->
-                task.addOnSuccessListener { text ->
-                    val all = ArrayList<String>()
-                    val mode = ArrayList<String>()
-                    val map = ArrayList<String>()
-                    for (block in text.textBlocks) for (line in block.lines) {
-                        val t = line.text.trim()
-                        if (t.isEmpty()) continue
-                        all += t
-                        val box = line.boundingBox
-                        if (box == null) continue
-                        if (box.centerY() < split) mode += t else map += t
-                    }
-                    plate.recycle()
-                    onPlate(job, "done", all, mode, map)
-                }.addOnFailureListener {
-                    Log.w(TAG, "plate not recognised", it)
-                    plate.recycle()
-                    onPlate(job, "failed", emptyList(), emptyList(), emptyList())
-                }
-            }
-            .onFailure {
-                plate.recycle()
-                onPlate(job, "failed", emptyList(), emptyList(), emptyList())
-            }
-    }
-
-    private fun onPlate(job: Scan, ocr: String, all: List<String>, mode: List<String>, map: List<String>) {
-        handler.post {
-            job.stage("plate")
-            if (!flow.plateDone(job.request)) {
-                Log.i(TAG, "plate for scan ${job.request.id} dropped: ${job.request.phase} ${job.request.invalidReason ?: ""}")
-                return@post
-            }
-            val payload = job.payload ?: return@post
-            payload.put("ocr", ocr)
-            payload.put("text", JSONArray(all))
-            payload.put("modeText", JSONArray(mode))
-            payload.put("mapText", JSONArray(map))
-            send(outbox.update(job.request.id, payload.toString()))
-            postScanState(statusNow())
-            record(job)
-        }
-    }
-
-    /**
-     * The watchdog. A scan whose reading never came is failed out loud; one
-     * whose brawlers went out and whose plate never came is closed with the
-     * plate marked as timed out, so the page stops saying "reading map".
-     */
-    private fun onTimeout(job: Scan) {
-        job.stage("timeout")
-        restoreOverlay()
-        if (flow.timedOut(job.request)) {
-            finish(job, fail(job, "timeout", "no reading within ${SCAN_TIMEOUT_MS}ms"))
-            return
-        }
-        if (job.request.phase == ScanFlow.Phase.DONE && job.payload?.optString("ocr") == "pending") {
-            val payload = job.payload ?: return
-            payload.put("ocr", "timeout")
-            send(outbox.update(job.request.id, payload.toString()))
-            postScanState(statusNow())
-            record(job)
-        }
-    }
-
-    /** A result that says the scan did not produce a reading, and why. */
-    private fun fail(job: Scan, screen: String, reason: String): JSONObject {
-        Log.w(TAG, "scan ${job.request.id}: $screen — $reason")
-        return JSONObject()
-            .put("v", PAYLOAD_VERSION)
-            .put("id", job.request.id)
-            .put("session", job.request.sessionId)
-            .put("ok", false)
-            .put("screen", screen)
-            .put("reason", reason)
-    }
-
-    /** Delivers a terminal payload and closes the request. */
-    private fun finish(job: Scan, payload: JSONObject) {
-        handler.removeCallbacks(job.watchdog)
-        job.recycleFrame()
-        job.payload = payload
-        if (job.request.alive) {
-            flow.visionDone(job.request)
-            flow.plateDone(job.request)
-        }
-        send(outbox.result(job.request.id, payload.toString()))
-        postScanState(statusNow())
-        record(job)
-    }
-
-    private fun payloadFor(job: Scan, reading: DraftVision.Reading, ocr: String): JSONObject {
-        val v = vision
-        return JSONObject()
-            .put("v", PAYLOAD_VERSION)
-            .put("id", job.request.id)
-            .put("session", job.request.sessionId)
-            .put("ok", true)
-            .put("screen", "draft")
-            .put("layout", layoutJson(reading.layout))
-            .put("coverage", v?.coverage?.toJson() ?: JSONObject.NULL)
-            .put("self", reading.self ?: JSONObject.NULL)
-            .put("mode", reading.mode ?: JSONObject.NULL)
-            .put("map", reading.map ?: JSONObject.NULL)
-            .put("ocr", ocr)
-            .put("text", JSONArray())
-            .put("modeText", JSONArray())
-            .put("mapText", JSONArray())
-            .put("bans", slots(reading.bans))
-            .put("allies", slots(reading.allies))
-            .put("enemies", slots(reading.enemies))
-    }
-
-    private fun layoutJson(at: DraftLayout.Located): JSONObject = JSONObject()
-        .put("detected", at.detected)
-        .put("confidence", at.confidence)
-        .put("unit", at.unit)
-        .put("seam", at.seam)
-        .put("plate", at.plateFound)
-        .put("content", JSONArray(listOf(at.content.left, at.content.top, at.content.right, at.content.bottom)))
-        .put("reasons", JSONArray(at.reasons))
-
-    /** One slot: what it is, how it was decided, and what it nearly was. */
-    private fun slots(list: List<DraftCore.Match>): JSONArray {
-        val out = JSONArray()
-        for (m in list) {
-            val top = JSONArray()
-            for (c in m.candidates) top.put(JSONObject().put("id", c.id).put("score", round2(c.score)))
-            out.put(
-                JSONObject()
-                    .put("id", m.id ?: JSONObject.NULL)
-                    .put("status", m.status.name.lowercase())
-                    .put("score", round2(m.best))
-                    .put("margin", round2(m.margin))
-                    .put("reason", m.reason ?: JSONObject.NULL)
-                    .put("top", top),
-            )
-        }
-        return out
-    }
-
-    private fun round2(x: Float): Double = Math.round(x * 100.0) / 100.0
-
-    /** Keeps the record of a finished scan for the export. */
-    private fun record(job: Scan) {
-        job.diag.put("stages", job.stages)
-        job.diag.put("phase", job.request.phase.name)
-        job.request.invalidReason?.let { job.diag.put("invalid", it) }
-        job.diag.put("payload", job.payload ?: JSONObject.NULL)
-        job.diag.put("ocrStatus", ocrStatus)
-        history.addLast(job.diag)
-        while (history.size > HISTORY) history.removeFirst()
-    }
-
-    /** The one place that decides what the button should say. */
-    private fun statusNow(): String = when {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q -> "unsupported"
-        quickLosses >= QUICK_LOSS_LIMIT -> "blocked"
-        consentPending -> "consent"
-        flow.busy -> "busy"
-        preparing -> "preparing"
-        scan?.live == true -> "ready"
-        else -> "needs-permission"
-    }
-
-    private fun postScanState(state: String) {
-        handler.post { send(outbox.state(state)) }
-    }
-
-    /**
-     * Evaluates what the outbox decided to send, and checks it landed.
-     *
-     * `window.brawlzone && window.brawlzone.scanResult(...)` used to be the
-     * whole delivery, and it evaluates to `undefined` without complaint when
-     * the handler is not there. The page now returns a word for each message;
-     * anything other than "ok" is logged, and a result that did not land is
-     * still in the outbox for the page's next `ready()`.
-     */
-    private fun send(sends: List<ScanOutbox.Send>) {
-        if (sends.isEmpty()) return
-        val web = panelWeb
-        if (web == null) {
-            outbox.pageGone()
-            return
-        }
-        for (s in sends) {
-            val js = when (s) {
-                is ScanOutbox.Send.Result ->
-                    "(function(){var b=window.brawlzone;if(!b||typeof b.scanResult!=='function')return 'no-handler';" +
-                        "try{b.scanResult(${s.json});return 'ok'}catch(e){return 'threw:'+e}})()"
-                is ScanOutbox.Send.State ->
-                    "(function(){var b=window.brawlzone;if(!b||typeof b.scanState!=='function')return 'no-handler';" +
-                        "try{b.scanState(${JSONObject.quote(s.state)});return 'ok'}catch(e){return 'threw:'+e}})()"
-            }
-            runCatching {
-                web.evaluateJavascript(js) { result ->
-                    if (result != "\"ok\"") Log.w(TAG, "panel did not take $s: $result")
-                }
-            }.onFailure { Log.w(TAG, "evaluateJavascript failed", it) }
-        }
-    }
-
-    /**
-     * Writes the last delivered scan's frame and record to the app's external
-     * files directory and offers them to share.
-     *
-     * The frame is the exact pixels recognition ran on — not a screenshot taken
-     * afterwards with the bubble back on screen, which is a different image
-     * and has misled this project before. Local by default: nothing leaves the
-     * phone unless the reader picks somewhere in the share sheet.
-     */
-    private fun exportLastScan(): String {
-        val job = lastDelivered ?: return JSONObject().put("ok", false).put("reason", "no scan yet").toString()
-        val image = job.image ?: return JSONObject().put("ok", false).put("reason", "frame not kept").toString()
-        return runCatching {
-            val dir = File(getExternalFilesDir(null), "scans").apply { mkdirs() }
-            val png = File(dir, "scan-${job.request.id}.png")
-            val json = File(dir, "scan-${job.request.id}.json")
-            val bitmap = Bitmap.createBitmap(image.pixels, image.width, image.height, Bitmap.Config.ARGB_8888)
-            png.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-            bitmap.recycle()
-
-            val record = JSONObject()
-                .put("app", BuildConfig.VERSION_CODE)
-                .put("exportedAt", System.currentTimeMillis())
-                .put("acknowledged", outbox.pending != job.request.id)
-                .put("detail", JSONObject(ScanBridge().scanDetail()))
-                .put("scan", job.diag)
-                .put("history", JSONArray(history.toList()))
-            json.writeText(record.toString(2))
-
-            val uris = ArrayList<Uri>()
-            for (f in listOf(png, json)) {
-                uris += FileProvider.getUriForFile(this, "$packageName.files", f)
-            }
-            val share = Intent(Intent.ACTION_SEND_MULTIPLE)
-                .setType("*/*")
-                .putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            handler.post {
-                collapsePanel()
-                runCatching {
-                    startActivity(Intent.createChooser(share, "Share scan diagnostics").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                }.onFailure { toast("Saved to ${dir.absolutePath}") }
-            }
-            JSONObject().put("ok", true).put("png", png.absolutePath).put("json", json.absolutePath).toString()
-        }.getOrElse {
-            Log.w(TAG, "export failed", it)
-            JSONObject().put("ok", false).put("reason", it.toString()).toString()
-        }
-    }
-
-    /**
-     * Enters the foreground with exactly the service type that is legal *now*.
-     *
-     * The two-argument `startForeground` infers the type from the manifest, and
-     * the manifest declares both — so the moment `mediaProjection` was added
-     * there, every ordinary start of the bubble began asking Android for a
-     * media-projection foreground service without holding a projection. API 34
-     * refuses that with a SecurityException, which killed the service inside
-     * the five seconds `startForegroundService` allows, which Android reports
-     * as the app crashing. It shipped in 1.8 and made the app unusable: the
-     * bubble could not start at all, whether or not anyone wanted to scan.
-     *
-     * So the type is always passed explicitly, and `mediaProjection` is only
-     * ever claimed on the path where the user has just granted a capture token.
-     * A declared type is permission to ask for it, not a description of what
-     * the service is doing.
-     */
-    private fun enterForeground(withProjection: Boolean): Boolean {
+    private fun enterForeground(): Boolean {
         val notification = buildNotification()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             return runCatching { startForeground(NOTIFICATION_ID, notification) }.isSuccess
         }
-
-        var types = ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        if (withProjection) types = types or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
-
-        val ok = runCatching { startForeground(NOTIFICATION_ID, notification, types) }
-            .onFailure { Log.e(TAG, "startForeground(types=$types) refused", it) }
-            .isSuccess
-        if (ok || !withProjection) return ok
-
-        /*
-         * Promotion refused. Falling back to the plain type keeps the bubble
-         * alive with scanning unavailable, which is the whole app minus one
-         * feature — the alternative is the service dying and taking the overlay
-         * with it.
-         */
         return runCatching {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
-            )
-        }.isSuccess
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        }.onFailure { Log.e(TAG, "startForeground refused", it) }.isSuccess
     }
 
     private fun buildNotification(): Notification {
@@ -2237,47 +1228,6 @@ class BubbleService : Service() {
 
         const val COLLAPSE_MS = 170L
 
-        /**
-         * How long the overlay stays hidden before the frame is asked for.
-         *
-         * The window manager has to compose at least one frame without our
-         * windows in it. This used to be 70ms and to *not* drain the reader
-         * first, so the frame that came back was routinely the one from before
-         * the panel was hidden — with the panel covering the enemy picks. The
-         * drain in `ScreenScan.capture` is what actually guarantees freshness
-         * now; this is just enough time that the first new frame is already the
-         * clean one, so the drain does not have to spin.
-         */
-        const val HIDE_FOR_SCAN_MS = 160L
-
-        /**
-         * How long a scan may take before it is cut loose.
-         *
-         * Generous, because the first scan on a fresh install can be waiting on
-         * Play Services to fetch the text model, and cutting that off early
-         * loses the map. Not unbounded, because the alternative is a flag that
-         * never clears and a Scan button that silently stops working.
-         */
-        const val SCAN_TIMEOUT_MS = 6000L
-
-        /** A consent dialog that has not answered by then is not going to. */
-        const val CONSENT_TIMEOUT_MS = 90_000L
-
-        /** The bridge payload's shape. The page refuses anything else. */
-        const val PAYLOAD_VERSION = 2
-
-        /** Scan records kept for the export. */
-        const val HISTORY = 6
-
-        /**
-         * A grant that dies inside this is not a reader closing it.
-         *
-         * Generous, because a projection legitimately ends when the reader taps
-         * stop on the recording chip, and that should reset the count rather
-         * than count against it.
-         */
-        const val QUICK_LOSS_MS = 8000L
-        const val QUICK_LOSS_LIMIT = 2
         const val TAG = "BrawlZoneBubble"
 
         /**

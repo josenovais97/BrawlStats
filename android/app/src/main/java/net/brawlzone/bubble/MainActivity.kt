@@ -154,19 +154,6 @@ class MainActivity : AppCompatActivity() {
         }
         startForegroundService(Intent(this, BubbleService::class.java))
 
-        /*
-         * No screen-capture prompt here.
-         *
-         * 1.9 moved that prompt to this point so it would stop interrupting a
-         * match, which was right about the timing and wrong about the cost:
-         * once granted, it then fired on *every* start of the bubble, so the
-         * common case — opening a tier list — became a permission dialog. With
-         * scanning switched off it asks for a capability nothing will use.
-         *
-         * If scanning comes back, this asks on demand again and the mid-match
-         * problem returns with it. The fix then is a choice on this screen, not
-         * a prompt nobody asked for.
-         */
         moveTaskToBack(true)
     }
 }

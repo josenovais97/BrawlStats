@@ -6,7 +6,6 @@ import {
   Hand,
   Layers,
   MousePointerClick,
-  ScanLine,
   ShieldCheck,
   Timer,
   X,
@@ -64,11 +63,6 @@ const FEATURES = [
     icon: Timer,
     title: "Down to the map you are on",
     body: "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.",
-  },
-  {
-    icon: ScanLine,
-    title: "Scan the draft",
-    body: "One tap reads the bans and picks off your screen and fills the board, instead of typing six bans into a phone with twenty seconds on the clock. Anything it is unsure of it leaves blank rather than guessing, and correcting it teaches it that brawler for next time.",
   },
   {
     icon: MousePointerClick,
@@ -169,6 +163,22 @@ export default function BubblePage() {
                 {BUBBLE_APP.minAndroid} or newer
               </p>
             </div>
+
+            {/* The store listing, for readers who will not sideload. Same
+                build, same key; see `storeUrl`. */}
+            {BUBBLE_APP.storeUrl ? (
+              <p className="text-sm text-muted">
+                Prefer a store?{" "}
+                <a
+                  href={BUBBLE_APP.storeUrl}
+                  rel="noopener"
+                  className="font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"
+                >
+                  Get it on Uptodown
+                </a>{" "}
+                — the same file, updated in step with this page.
+              </p>
+            ) : null}
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {TRUST.map((item) => (
@@ -361,17 +371,17 @@ export default function BubblePage() {
       </section>
 
       {/*
-        The capability, given the same weight as the features.
+        The limit, given the same weight as the features.
 
-        Every overlay tool gets asked whether it reads the game, and since 1.8
-        the answer is "yes, when you ask it to" — which makes this section more
-        important than it was when the answer was no. What earns trust is not a
-        claim that it cannot, it is a specific account of what happens to the
-        picture, and that account has to be checkable against the app.
+        Every overlay tool gets asked whether it reads the game. Between 1.8 and
+        1.13 this one could, when asked to, and this section was an account of
+        what happened to the picture. The scan was removed in 1.14 — it never
+        worked reliably enough across phones to keep — and the answer is back to
+        the one that needs no account at all: it cannot, by design.
       */}
       <section className="space-y-5">
         <SectionHeading
-          title="What reading your screen means"
+          title="What it cannot do"
           subtitle="Worth knowing before you install it, not after."
         />
         <div className="card border-border-strong p-6">
@@ -379,31 +389,17 @@ export default function BubblePage() {
             <ShieldCheck className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
               <p>
-                Scanning reads one frame, when you tap Scan, and only after you
-                have said yes to Android&apos;s own screen-capture dialog. That
-                dialog comes back every time the app starts — Android will not
-                let an app keep the permission — and while a session is open
-                your phone shows a recording indicator you can stop at any time.
+                The bubble does not read your screen, your match, or which map
+                you are on. It asks to draw over other apps, and to show a
+                notification — the one that says it is running, and the
+                download progress when you update it. No screen capture, no
+                storage access, nothing else.
               </p>
               <p>
-                The frame is measured on your phone and dropped. It is never
-                written to storage and never leaves the device: there is no
-                upload, no account, and nothing in the app that could send one.
-                What comes out of it is a short list of brawler names, matched
-                against portraits the app downloaded once.
-              </p>
-              <p>
-                It reads pixels the game has already drawn, and nothing else. It
-                does not touch the game, tap anything for you, read your Brawl
-                Stars account, or show you anything the draft screen is not
-                already showing — below Diamond that means no bans and no enemy
-                picks, because the game does not display them.
-              </p>
-              <p>
-                It is also allowed to be wrong. A brawler it cannot place is
-                left blank rather than filled in with a guess, because a board
-                quietly holding the wrong brawler is worse than one holding
-                nothing.
+                It shows the meta; you match that to the draft in front of you.
+                It does not touch the game, read your account, or send anything
+                anywhere — there is no account, no analytics in the app, and
+                nothing to log in to.
               </p>
             </div>
           </div>

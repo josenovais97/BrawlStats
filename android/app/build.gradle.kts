@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 34
-    versionName = "1.13"
+    versionCode = 35
+    versionName = "1.14"
 
     /*
      * Where the panel is served from. The site, always, in a release; a
@@ -85,68 +85,13 @@ android {
   }
   kotlinOptions { jvmTarget = "17" }
 
-  /*
-   * Unit tests run on the JVM, not on a device.
-   *
-   * `isReturnDefaultValues` keeps the stubbed android.jar from throwing on the
-   * handful of platform calls a test touches indirectly. The recognition maths
-   * itself is in DraftCore and deliberately has no Android in it, which is the
-   * whole reason these tests can exist — see DraftCoreTest.
-   */
+  // Unit tests run on the JVM; this keeps the stubbed android.jar from
+  // throwing on the handful of platform calls a test touches indirectly.
   testOptions { unitTests.isReturnDefaultValues = true }
 }
 
 dependencies {
-  /*
-   * The recognition maths, as a plain JVM module.
-   *
-   * Separate so it can be tested: inside this module a unit test compiles
-   * against Android's stubbed android.jar, which has no javax.imageio, so a
-   * test cannot even open the screenshot it is meant to check. In `core` it
-   * is an ordinary library and `./gradlew :core:test` runs the real matcher
-   * against real captures of a real draft.
-   */
-  implementation(project(":core"))
-
   testImplementation("junit:junit:4.13.2")
   implementation("androidx.core:core-ktx:1.13.1")
   implementation("androidx.appcompat:appcompat:1.7.0")
-
-  /*
-   * Text recognition, UNBUNDLED.
-   *
-   * The bundled recogniser reads the mode and map correctly and costs 11 MB of
-   * native pipeline per ABI -- it took this app from 2.6 MB to 46 MB, which is
-   * an absurd price for two words. This one is a thin client: the model lives
-   * in Play Services and is fetched once, on device, so the APK grows by about
-   * a megabyte instead of forty.
-   *
-   * The reason it was rejected first time was that a sideloaded app cannot
-   * assume Play Services. That is still true, and it is now handled rather than
-   * avoided: if the model never becomes available the plate simply is not read,
-   * and the learned-plate path underneath -- which needs no model at all -- is
-   * exactly the behaviour that shipped before this. Degrading to "what we had
-   * yesterday" is a fine failure mode; a 46 MB download is not.
-   */
-  implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
-
-  /*
-   * The module installer, so the text model's presence is a question with an
-   * answer. Creating the recogniser client does not fetch the model; asking
-   * `ModuleInstallClient` does, and reports whether it is there.
-   */
-  implementation("com.google.android.gms:play-services-base:18.5.0")
-
-  /*
-   * No OCR engine, deliberately.
-   *
-   * The mode and map ARE printed on the draft screen, and reading them with
-   * ML Kit worked — at 11 MB of native pipeline per ABI, which took a 2.6 MB
-   * app to 46 MB. That is an absurd price for two words, on an app people
-   * download over mobile data from a page that calls it small.
-   *
-   * The plate is also matched as a picture, against crops learned the first
-   * time the reader confirms a map -- that path is faster, needs no model, and
-   * keeps working when the recogniser is unavailable. See DraftVision.
-   */
 }

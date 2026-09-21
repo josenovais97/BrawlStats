@@ -75,8 +75,11 @@ export function DownloadButton({
          * navigation, which is why both exist.
          */
         if (!inApp) return;
-        const bridge = (window as unknown as { BrawlZoneScan?: { openExternal?: (u: string) => void } })
-          .BrawlZoneScan;
+        type Bridge = { openExternal?: (u: string) => void };
+        // `BrawlZoneApp` from 1.14, when the scan bridge went and this one
+        // method stayed; `BrawlZoneScan` on every install before it.
+        const w = window as unknown as { BrawlZoneApp?: Bridge; BrawlZoneScan?: Bridge };
+        const bridge = w.BrawlZoneApp ?? w.BrawlZoneScan;
         if (typeof bridge?.openExternal !== 'function') return;
         try {
           bridge.openExternal(new URL(BUBBLE_APP.path, window.location.origin).toString());
