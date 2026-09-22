@@ -1,6 +1,9 @@
 package net.brawlzone.bubble
 
 import android.Manifest
+import android.app.StatusBarManager
+import android.content.ComponentName
+import android.graphics.drawable.Icon
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -67,6 +70,37 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
             stopService(Intent(this, BubbleService::class.java))
+        }
+        offerTile()
+    }
+
+    /**
+     * Offers the Quick Settings tile, where Android lets an app do that.
+     *
+     * The tile is the better Start button — one swipe from inside the game —
+     * and nobody finds a tile by scrolling the shade's edit sheet. From API 33
+     * `StatusBarManager.requestAddTileService` shows a system dialog asking to
+     * add it, which is the one honest way to make the tile discoverable. Below
+     * that the button stays hidden and the "how it works" step names it.
+     */
+    private fun offerTile() {
+        val button = findViewById<Button>(R.id.add_tile)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val bar = getSystemService(StatusBarManager::class.java) ?: return
+        button.visibility = View.VISIBLE
+        button.setOnClickListener {
+            bar.requestAddTileService(
+                ComponentName(this, BubbleTileService::class.java),
+                "BrawlZone",
+                Icon.createWithResource(this, R.drawable.bubble_glyph),
+                mainExecutor,
+            ) { result ->
+                if (result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED ||
+                    result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED
+                ) {
+                    button.visibility = View.GONE
+                }
+            }
         }
     }
 

@@ -124,6 +124,25 @@
             android:textStyle="bold"
             android:textColor="@color/foreground" />
 
+        <!--
+          Android 13+ can add the tile from here in one tap; older versions
+          reach it by editing Quick Settings by hand, so the button is hidden
+          and the "how it works" step says where it is instead.
+        -->
+        <Button
+            android:id="@+id/add_tile"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/btn_outline"
+            android:stateListAnimator="@null"
+            android:text="Add to Quick Settings"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:textColor="@color/foreground" />
+
         <!-- Shown only after a grant attempt has actually failed. -->
         <TextView
             android:id="@+id/restricted"
@@ -247,7 +266,7 @@
                     android:textSize="14sp"
                     android:lineSpacingMultiplier="1.25"
                     android:textColor="@color/foreground"
-                    android:text="Drag it onto the ✕ at the bottom to close it, or use Stop in the notification." />
+                    android:text="Drag it onto the ✕ at the bottom to close it, use Stop in the notification, or the BrawlZone tile in Quick Settings — that tile also starts it, from inside the game." />
             </LinearLayout>
 
         </LinearLayout>

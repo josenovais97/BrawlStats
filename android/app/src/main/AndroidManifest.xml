@@ -51,5 +51,26 @@
                 android:value="Draws a movable overlay showing live Brawl Stars map picks while the game is in the foreground." />
         </service>
 
+
+        <!--
+          A Quick Settings tile that toggles the bubble from the notification
+          shade — one swipe from inside the game, which is where the bubble is
+          wanted and where opening an app screen is exactly wrong. The
+          BIND_QUICK_SETTINGS_TILE permission is what lets the system, and only
+          the system, bind to it.
+        -->
+        <service
+            android:name=".BubbleTileService"
+            android:exported="true"
+            android:icon="@drawable/bubble_glyph"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
     </application>
 </manifest>

@@ -155,6 +155,8 @@ class BubbleService : Service() {
         }
 
         showBubble()
+        running = true
+        BubbleTileService.refresh(this)
     }
 
     /**
@@ -165,11 +167,16 @@ class BubbleService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> stopSelf()
+            // From the notification's Panel action: the same thing as tapping
+            // the bubble, for a reader whose hand is already in the shade.
+            ACTION_TOGGLE_PANEL -> if (bubble != null) togglePanel()
         }
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        running = false
+        BubbleTileService.refresh(this)
         runCatching { installWatcher?.let { unregisterReceiver(it) } }
         installWatcher = null
         removePanel()
@@ -1195,11 +1202,22 @@ class BubbleService : Service() {
             PendingIntent.FLAG_IMMUTABLE,
         )
 
+        // Opens or closes the panel without finding the bubble first. The
+        // bubble can be under a finger, under the game's own UI, or on the far
+        // edge in landscape; the shade is always one swipe away.
+        val panel = PendingIntent.getService(
+            this,
+            2,
+            Intent(this, BubbleService::class.java).setAction(ACTION_TOGGLE_PANEL),
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+
         return Notification.Builder(this, CHANNEL_ID)
             .setContentTitle("BrawlZone bubble")
             .setContentText("Tap the bubble for live picks · drag it down to close")
             .setSmallIcon(R.drawable.bubble_glyph)
             .setContentIntent(open)
+            .addAction(Notification.Action.Builder(null as Icon?, "Panel", panel).build())
             .addAction(Notification.Action.Builder(null as Icon?, "Stop", stop).build())
             .setOngoing(true)
             .build()
@@ -1213,10 +1231,25 @@ class BubbleService : Service() {
             WindowManager.LayoutParams.TYPE_PHONE
         }
 
-    private companion object {
-        const val CHANNEL_ID = "brawlzone-bubble"
-        const val NOTIFICATION_ID = 1
+    companion object {
+        private const val CHANNEL_ID = "brawlzone-bubble"
+        private const val NOTIFICATION_ID = 1
         const val ACTION_STOP = "net.brawlzone.bubble.STOP"
+        const val ACTION_TOGGLE_PANEL = "net.brawlzone.bubble.TOGGLE_PANEL"
+
+        /**
+         * Whether the bubble is up, for anything outside the service that has
+         * to say so — the Quick Settings tile, and the app's own screen.
+         *
+         * A flag rather than a bind, because the tile's whole point is to work
+         * without the app open and a bound connection is exactly the kind of
+         * lifecycle that a foreground service is trying not to have. Set on
+         * `onCreate` after the overlay is actually showing and cleared on
+         * `onDestroy`, so it is never true for a service that failed to start.
+         */
+        @Volatile
+        var running = false
+            private set
 
         /**
          * Backstop only. The coordinate test above is the real rule; this
@@ -1224,11 +1257,11 @@ class BubbleService : Service() {
          * Generous on purpose: a stalled main thread stretched the gap between
          * the two events to 350ms on a device under load.
          */
-        const val SAME_GESTURE_MS = 700L
+        private const val SAME_GESTURE_MS = 700L
 
-        const val COLLAPSE_MS = 170L
+        private const val COLLAPSE_MS = 170L
 
-        const val TAG = "BrawlZoneBubble"
+        private const val TAG = "BrawlZoneBubble"
 
         /**
          * A view built for this window rather than a page borrowed from the
@@ -1246,7 +1279,7 @@ class BubbleService : Service() {
          * and says so when a newer build exists — which is the only way an app
          * can be told about an update it does not contain.
          */
-        val PANEL_URL =
+        private val PANEL_URL =
             BuildConfig.PANEL_ORIGIN + "/bubble/panel?app=bubble#v=" + BuildConfig.VERSION_CODE
     }
 }

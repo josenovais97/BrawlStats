@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.14',
+  version: '1.15',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 35,
+  versionCode: 36,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.14.apk',
+  path: '/downloads/brawlzone-bubble-1.15.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2648809,
-  sha256: '6b66fe59b8b88295a095e1d592bef67cc9c0c2ef2b02c39a8d98a857f534df4b',
+  size: 2649925,
+  sha256: '8fa7c2041f6655c54cf5a0e9dc0711f84132f64b1fb5544c26534f58068c34f4',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -86,6 +86,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.15',
+    versionCode: 36,
+    date: '2026-09-22',
+    changes: [
+      'A BrawlZone tile for Quick Settings: swipe down from inside the game and tap it to put the bubble up or take it down, without opening the app. Android 13 and up can add it with one tap from the app screen; older versions find it by editing Quick Settings.',
+      'The notification has a Panel button, so the panel can be opened or closed from the shade when the bubble is under your thumb or behind the game’s own UI.',
+    ],
+  },
   {
     version: '1.14',
     versionCode: 35,
