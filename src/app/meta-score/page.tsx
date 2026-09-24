@@ -275,15 +275,27 @@ export default function MetaScorePage() {
           subtitle="The honest limits, because a number without them is worth less."
         />
         <ul className="card divide-y divide-border overflow-hidden">
-          <Limit title="It mixes strength with popularity">
-            Pick rate is {PICK_WEIGHT * 100}% of the score by weight, and it
-            correlates almost not at all with win rate &mdash; measured at 0.08
-            on 2026-09-24. So it is not breaking ties between similar brawlers,
-            it is blending in a second, unrelated ranking. A popular brawler
-            with a poor record outscores an unpopular one with a good record,
-            which is intended for &ldquo;what is shaping the meta&rdquo; and
-            wrong for &ldquo;what is strongest&rdquo;. Both numbers are printed
-            on every row so you can weigh them yourself.
+          <Limit title="It mixes strength with popularity, on purpose">
+            Pick rate is {PICK_WEIGHT * 100}% of the score. That weight is
+            measured, not chosen: against an estimator that controls for player
+            skill exactly, the adjusted win rate scores r&nbsp;=&nbsp;+0.77 and
+            pick rate r&nbsp;=&nbsp;+0.22, so popularity is a weak but real
+            strength signal rather than noise &mdash; and its share of the
+            combined signal is about a fifth, which is the weight it now
+            carries. It was 35%, where it produced 45% of the actual spread and
+            moved brawlers forty places on popularity alone. Even so, a popular
+            brawler with a mediocre record will still outscore an unpopular one
+            with a better record. Both numbers are printed on every row so you
+            can weigh them yourself.
+          </Limit>
+          <Limit title="Win rate is not the same as strength">
+            A brawler played mostly by weaker players carries their results.
+            Measured against a within-player estimator, some brawlers move a
+            long way &mdash; Bibi ranked 96th on adjusted win rate and 16th once
+            each player was compared against their own average. Correcting this
+            properly for Ranked needs a change to how battles are stored, and
+            it is the next thing on the list rather than something already
+            done.
           </Limit>
           <Limit title="It does not control for who is playing">
             A win rate says the brawler was on the winning side, not that it

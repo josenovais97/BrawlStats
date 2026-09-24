@@ -232,9 +232,34 @@ export const SCORE_ANCHORS = {
   winCeiling: number;
 }>;
 
-/** Performance carries most of the weight; popularity breaks the ties. */
-export const WIN_WEIGHT = 0.65;
-export const PICK_WEIGHT = 0.35;
+/**
+ * How the two halves are weighted, derived rather than chosen.
+ *
+ * The split used to be 0.65/0.35 by judgement. Measured on 2026-09-24 against
+ * a within-player estimator — each player's win rate with a brawler minus
+ * their own rate without it, which controls for player skill exactly and is
+ * therefore the closest thing available to a bias-free strength signal:
+ *
+ *   adjusted win rate  vs that estimator   r = +0.77
+ *   pick rate          vs that estimator   r = +0.22
+ *   pick rate          vs adjusted win     r = +0.11
+ *
+ * So pick rate is a weak but real strength signal, not noise and not a
+ * duplicate of the win rate — which is the case for keeping it. Its share of
+ * the combined signal is 0.22/(0.77+0.22), about a fifth.
+ *
+ * At 0.35 it was carrying far more than that: because the log pick scale gets
+ * used more fully than the win scale, a nominal 35% produced 45% of the actual
+ * spread in scores, and brawlers moved forty places on popularity alone.
+ * Pierce ranked 99th on win rate and 59th on score.
+ *
+ * 0.25 is the weight at which *effective* influence — pick rate's share of the
+ * standard deviation of scores — comes out at 23%, which is where the
+ * measurement says it belongs. Nominal weights and real influence are not the
+ * same thing here, and it is the second that had to be matched.
+ */
+export const WIN_WEIGHT = 0.75;
+export const PICK_WEIGHT = 0.25;
 
 const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
 
