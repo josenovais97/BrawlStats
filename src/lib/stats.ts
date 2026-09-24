@@ -4356,6 +4356,127 @@ const cachedMapMatchups = cachedRead('map-matchups', compute_getMapMatchups);
  * `compute_pairingMatrix`.
  */
 const cachedPairingMatrix = cachedRead('pairing-matrix', compute_pairingMatrix);
+/**
+ * Minimum battles a player needs with a brawler, and without it, to be counted.
+ *
+ * Both sides are needed because the estimator is a difference: a player with
+ * two battles on the brawler contributes noise, and one with four battles in
+ * total has no personal baseline to compare against.
+ */
+const EDGE_MIN_WITH = 5;
+const EDGE_MIN_WITHOUT = 30;
+
+/** Below this many contributing players the average is describing a handful. */
+const EDGE_MIN_PLAYERS = 40;
+
+/**
+ * How strongly the edge is pulled toward zero, in pseudo-players.
+ *
+ * Same idea as `PRIOR_BATTLES` and for the same reason: a brawler carried by
+ * forty players should not outrank one carried by four thousand on the
+ * strength of a good week.
+ */
+const EDGE_PRIOR_PLAYERS = 150;
+
+/** A brawler's skill-controlled strength, in win-rate points. */
+export interface SkillEdge {
+  brawlerId: number;
+  /** Mean of (this player's rate with it − their own rate without it), x100. */
+  edge: number;
+  /** Players behind it. */
+  players: number;
+}
+
+/**
+ * Win rate with a brawler, minus the same player's win rate without it.
+ *
+ * The plain win rate answers "did the side holding this brawler win", which is
+ * not the same question as "is this brawler good". Strong players gravitate
+ * toward particular brawlers and carry their results with them; the mode
+ * baseline corrects for *where* a brawler is played, and nothing corrected for
+ * *who* was holding it.
+ *
+ * Comparing each player against themselves removes player skill exactly, which
+ * makes this the closest thing available to an unbiased strength signal.
+ * Measured 2026-09-24 it tracked the published adjusted win rate at r = +0.77
+ * — close enough to confirm both are measuring strength, far enough apart to
+ * matter: Bibi ranked 96th on adjusted win rate and 16th here, because she is
+ * played mostly by weaker accounts and their results were being read as hers.
+ *
+ * It has its own bias, in the opposite direction, and that is why it corrects
+ * the published rate rather than replacing it. A player's "without" rate spans
+ * every mode they play, so a showdown specialist is compared against their own
+ * Brawl Ball games. The two estimators are wrong about different things, which
+ * is the whole reason for averaging them — see `metaScore`.
+ */
+async function compute_getSkillEdge(format: TierFormat): Promise<[number, SkillEdge][]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(7);
+    // Competitive columns for Ranked, all-battle columns for the ladder list.
+    // Written by the roll-up since 2026-09-24; older days carry zeros, which
+    // the floors below exclude on their own.
+    const rows =
+      format === 'ranked'
+        ? await prisma.$queryRaw<{ brawler_id: number; edge: number; players: bigint }[]>`
+            WITH p AS (
+              SELECT player_tag, brawler_id,
+                     SUM(competitive_wins) AS w, SUM(competitive_decided) AS d
+              FROM player_battle_daily WHERE day >= ${since}
+              GROUP BY 1, 2
+            ), tot AS (
+              SELECT player_tag, SUM(w) AS pw, SUM(d) AS pd FROM p GROUP BY 1
+            )
+            SELECT p.brawler_id,
+                   SUM(p.d * (p.w::numeric / p.d
+                       - (tot.pw - p.w)::numeric / (tot.pd - p.d))) / SUM(p.d) * 100 AS edge,
+                   COUNT(*) AS players
+            FROM p JOIN tot USING (player_tag)
+            WHERE p.d >= ${EDGE_MIN_WITH} AND tot.pd - p.d >= ${EDGE_MIN_WITHOUT}
+            GROUP BY p.brawler_id
+            HAVING COUNT(*) >= ${EDGE_MIN_PLAYERS}
+          `
+        : await prisma.$queryRaw<{ brawler_id: number; edge: number; players: bigint }[]>`
+            WITH p AS (
+              SELECT player_tag, brawler_id, SUM(wins) AS w, SUM(decided) AS d
+              FROM player_battle_daily WHERE day >= ${since}
+              GROUP BY 1, 2
+            ), tot AS (
+              SELECT player_tag, SUM(w) AS pw, SUM(d) AS pd FROM p GROUP BY 1
+            )
+            SELECT p.brawler_id,
+                   SUM(p.d * (p.w::numeric / p.d
+                       - (tot.pw - p.w)::numeric / (tot.pd - p.d))) / SUM(p.d) * 100 AS edge,
+                   COUNT(*) AS players
+            FROM p JOIN tot USING (player_tag)
+            WHERE p.d >= ${EDGE_MIN_WITH} AND tot.pd - p.d >= ${EDGE_MIN_WITHOUT}
+            GROUP BY p.brawler_id
+            HAVING COUNT(*) >= ${EDGE_MIN_PLAYERS}
+          `;
+
+    return rows.map((r) => {
+      const players = Number(r.players);
+      // Shrunk toward zero by player count, not battle count: the unit of
+      // evidence here is a player who tried the brawler, and one obsessive
+      // account with a thousand battles is one opinion.
+      const shrunk = (Number(r.edge) * players) / (players + EDGE_PRIOR_PLAYERS);
+      return [r.brawler_id, { brawlerId: r.brawler_id, edge: shrunk, players }];
+    });
+  } catch (error) {
+    swallow('compute_getSkillEdge', error);
+    return [];
+  }
+}
+
+const cachedSkillEdge = cachedRead('skill-edge', compute_getSkillEdge);
+
+/** Keyed by brawler id. Empty when the split columns have no data yet. */
+export async function getSkillEdge(format: TierFormat = 'ranked'): Promise<Map<number, SkillEdge>> {
+  return new Map(await cachedSkillEdge(format));
+}
+
 const cachedOverallWinRates = cachedRead('overall-win-rates', compute_overallWinRates);
 
 /** Keyed by map name. See compute_getMapMatchups for why the cache holds entries. */

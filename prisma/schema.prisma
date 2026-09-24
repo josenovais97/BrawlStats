@@ -436,6 +436,11 @@ model PlayerBattleDaily {
   wins               Int
   /// Battles that reported a win or a loss, i.e. the win-rate denominator.
   decided            Int
+  /// Wins among the competitive battles only. Zero on rows folded before
+  /// 2026-09-24, which the raw samples can no longer reach.
+  competitiveWins    Int      @default(0) @map("competitive_wins")
+  /// The competitive win-rate denominator.
+  competitiveDecided Int      @default(0) @map("competitive_decided")
 
   /*
    * The natural key *is* the key. A surrogate id would add four bytes a row

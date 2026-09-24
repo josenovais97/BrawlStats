@@ -961,12 +961,24 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
         prisma.$executeRaw`DELETE FROM player_battle_daily WHERE day = ${day}`,
         prisma.$executeRaw`
         INSERT INTO player_battle_daily
-          (day, player_tag, brawler_id, battles, competitive_battles, wins, decided)
+          (day, player_tag, brawler_id, battles, competitive_battles, wins, decided,
+           competitive_wins, competitive_decided)
         SELECT battle_time::date, player_tag, brawler_id,
                COUNT(*),
                COUNT(*) FILTER (WHERE battle_type = ANY(${competitive}::text[])),
                COUNT(*) FILTER (WHERE result = 'victory'),
-               COUNT(*) FILTER (WHERE result IN ('victory', 'defeat'))
+               COUNT(*) FILTER (WHERE result IN ('victory', 'defeat')),
+               -- Competitive wins and losses on their own, so a Ranked-only
+               -- within-player estimator is possible. Without the split you can
+               -- see how many Ranked battles a player had with a brawler but
+               -- not how many they won.
+               COUNT(*) FILTER (
+                 WHERE result = 'victory' AND battle_type = ANY(${competitive}::text[])
+               ),
+               COUNT(*) FILTER (
+                 WHERE result IN ('victory', 'defeat')
+                   AND battle_type = ANY(${competitive}::text[])
+               )
         FROM battle_samples
         WHERE battle_time::date = ${day}
         GROUP BY 1, 2, 3
