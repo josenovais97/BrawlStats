@@ -662,10 +662,19 @@ export interface RankedRung {
  * because the sampler records each player's rank as it goes.
  *
  * Ordered by Elo rather than by name, because the names are the game's and
- * their order is not alphabetical. Players with no rank name are excluded
- * rather than bucketed: an account at zero Elo with no rank has not played
- * Ranked this season, and counting it as the bottom rung would understate
- * every rung above it.
+ * their order is not alphabetical.
+ *
+ * Two exclusions, and the second one is the whole difference between a chart
+ * and a wrong chart. Players with no rank name have not played Ranked at all.
+ * Players sitting on exactly `RANKED_RESET_ELO` have been reset by the season
+ * rollover and not played since — the Ranked board already excludes them for
+ * the same reason, and measured on 2026-09-24 they were 1,897 of the 2,180
+ * accounts showing Silver I. Counting them put a quarter of the whole ladder
+ * on one rung and understated every rung above it.
+ *
+ * The cost is that someone who reset, played, and happens to sit on exactly
+ * 750 again is dropped. That is the trade the board already makes, and one
+ * missing account is better than two thousand phantom ones.
  */
 async function compute_getRankedLadder(): Promise<RankedRung[]> {
   const prisma = getPrisma();
@@ -681,6 +690,7 @@ async function compute_getRankedLadder(): Promise<RankedRung[]> {
         MAX(ranked_elo) AS max_elo
       FROM sampled_players
       WHERE ranked_elo IS NOT NULL
+        AND ranked_elo <> ${RANKED_RESET_ELO}
         AND ranked_rank_name IS NOT NULL
         AND ranked_rank_name <> ''
       GROUP BY ranked_rank_name
@@ -739,13 +749,16 @@ export async function getRankedPercentile(elo: number): Promise<RankedEloStandin
   if (!prisma) return null;
 
   try {
+    // The same population the ladder draws, or a player would be placed
+    // against a denominator the chart beside it does not show.
+    const played = { not: RANKED_RESET_ELO } as const;
     const total = await prisma.sampledPlayer.count({
-      where: { rankedElo: { not: null }, rankedRankName: { not: null } },
+      where: { rankedElo: { ...played }, rankedRankName: { not: null } },
     });
     if (total < MIN_RANKED_POPULATION) return null;
 
     const below = await prisma.sampledPlayer.count({
-      where: { rankedElo: { not: null, lt: elo }, rankedRankName: { not: null } },
+      where: { rankedElo: { ...played, lt: elo }, rankedRankName: { not: null } },
     });
 
     return { percentile: below / total, population: total };

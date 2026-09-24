@@ -53,14 +53,14 @@ export function RankedLadder({ ladder }: { ladder: RankedRung[] }) {
             </span>
 
             <span className="w-12 shrink-0 text-right text-xs font-black tabular-nums sm:w-16">
-              {(rung.share * 100).toFixed(1)}%
+              {share(rung.share)}
             </span>
 
             {/* The cumulative figure is the one people quote — "only 4% get
                 past Mythic" — so it is printed rather than left to be worked
                 out from the bars. */}
             <span className="hidden w-28 shrink-0 text-right text-xs tabular-nums text-muted sm:block">
-              {(rung.atOrAbove * 100).toFixed(1)}% here or above
+              {share(rung.atOrAbove)} here or above
             </span>
           </li>
         ))}
@@ -94,4 +94,18 @@ function RungBadge({ rank }: { rank: string }) {
       ) : null}
     </span>
   );
+}
+
+/**
+ * A share, without claiming precision the sample does not have.
+ *
+ * Masters II held two of 8,327 players on the day this shipped, which
+ * `toFixed(1)` rendered as "0.0%" — the top of the ladder, the rung readers
+ * are most curious about, reading as nobody. A second decimal would say
+ * "0.02%", which two players cannot support either.
+ */
+function share(value: number): string {
+  const pct = value * 100;
+  if (pct > 0 && pct < 0.1) return '<0.1%';
+  return `${pct.toFixed(1)}%`;
 }
