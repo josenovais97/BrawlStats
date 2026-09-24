@@ -4011,11 +4011,21 @@ export async function getBestPicksByMode(
   return new Map(await cachedBestPicksByMode(perMode, windowDays));
 }
 
-const cachedBrawlerStatsForWindow = unstable_cache(
+/*
+ * `cachedRead`, not `unstable_cache` directly.
+ *
+ * The two differ in exactly one way that matters here: outside a Next server
+ * there is no incremental cache and `unstable_cache` raises an invariant
+ * rather than simply not caching. `scripts/check-anchors.ts` reads this on
+ * every sampler run and did nothing but throw for its first hours alive —
+ * caught, downgraded to a warning, and measuring nothing. A guard that cannot
+ * run is worse than no guard, because the warning it emits looks like a
+ * finding.
+ */
+const cachedBrawlerStatsForWindow = cachedRead(
+  'brawler-stats-for-window',
   async (windowDays: number, mode: string | undefined, format: TierFormat) =>
     computeBrawlerStatsForWindow(windowDays, mode, format),
-  ['brawler-stats-for-window'],
-  { revalidate: READ_CACHE_SECONDS },
 );
 
 export async function getBrawlerStatsForWindow(
