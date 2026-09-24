@@ -1,270 +1,75 @@
 import type { Metadata } from 'next';
-import { CalendarClock, Radio } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
 
 import { CommunityEvents } from '@/components/events/community-events';
-import { ModeBestPicks } from '@/components/events/mode-best-picks';
-import { ClockIcon } from '@/components/game-icons';
-import { ErrorState } from '@/components/ui/error-state';
-import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
+import { PageHeading } from '@/components/ui/section-heading';
 import { getCommunityEvents } from '@/lib/community-events';
-import { getEventRotation } from '@/lib/bs-api';
-import { toApiError } from '@/lib/errors';
-import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
-import { getActiveMaps } from '@/lib/game-maps';
-import { slugify } from '@/lib/slugs';
-import { getBestPicksByMode } from '@/lib/stats';
-import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
-import type { ModeBestPicks as ModeBestPicksData } from '@/types/stats';
-import type { BSRotationSlot } from '@/types/brawlstars';
-import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+
+/**
+ * Community events: the game-wide challenges the whole player base grinds.
+ *
+ * This page used to be the live map rotation, and the rotation is gone from it
+ * rather than moved. It was the same content twice over — `/maps` is the map
+ * catalogue, `/ranked` is the Ranked pool, and the home page already carries
+ * three live slots as a teaser — so the page was a fourth presentation of
+ * something the site says better elsewhere, and the thing it was uniquely
+ * placed to answer was buried underneath.
+ *
+ * What is left is the part nothing else publishes. No API carries community
+ * events; the game announces them in-client and on social media, and once one
+ * ends the only durable record is the wiki's write-up. See
+ * `lib/community-events` for how that is read and why it expects a mess.
+ */
+
+/*
+ * Six hours, matching the wiki read inside it.
+ *
+ * The 600s here was the rotation's, and it went with the rotation. A route's
+ * revalidate is the shortest-lived fetch inside it (AGENTS.md trap 2), so
+ * leaving it would have re-rendered this page twelve times an hour to show
+ * identical wiki text.
+ */
+export const revalidate = 21_600;
 
 export const metadata: Metadata = {
   alternates: { canonical: '/events' },
-  title: 'Brawl Stars events',
-  description: 'Current and upcoming Brawl Stars event rotation across every mode slot.',
+  title: 'Brawl Stars community events and rewards',
+  description:
+    'Every Brawl Stars community event: the milestones the whole player base had to hit, what each one paid out, and when it ran.',
+  openGraph: {
+    title: 'Brawl Stars community events and rewards',
+    description:
+      'Milestones, tasks and rewards for every game-wide community event.',
+  },
 };
 
-/*
- * Ten minutes. The rotation changes on the game's schedule, not continuously,
- * so a two-minute window spent ISR writes redrawing an identical grid — see
- * the leaderboard for the same reasoning at more length.
- *
- * `ROTATION_REVALIDATE` below has to match: Next takes a route's revalidate
- * from the shortest-lived fetch inside it, so the rotation call's own TTL is
- * what actually decides this.
- */
-export const revalidate = 600;
-
-/** Must match `revalidate` above. See the note there. */
-const ROTATION_REVALIDATE = 600;
-
 export default async function EventsPage() {
-  let rotation: BSRotationSlot[];
-  try {
-    rotation = await getEventRotation(ROTATION_REVALIDATE);
-  } catch (err) {
-    return <ErrorState code={toApiError(err).code} title="Event rotation unavailable" />;
-  }
-
-  // Cosmetic metadata is optional — the page still works without artwork.
-  const [mapMeta, modeMeta, brawlerMeta, bestPicks, community] = await Promise.all([
-    getMapMap().catch(() => new Map<number, BAMap>()),
-    getGameModeMap().catch(() => new Map<string, BAGameMode>()),
-    getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
-    // Our own aggregate; an empty map just hides the picks strip.
-    getBestPicksByMode(3).catch(() => new Map<string, ModeBestPicksData>()),
-    // Read from the wiki, so an empty list is a wiki that is down rather than
-    // a page that is broken. The section removes itself.
-    getCommunityEvents().catch(() => []),
-  ]);
-
-  const { active, upcoming } = partitionRotation(rotation);
-  active.sort((a, b) => a.slotId - b.slotId);
-
-  // Rotation slots carry the map name and mode id; the catalogue turns that
-  // pair into a route. A map missing from the catalogue simply loses its link.
-  const activeMaps = await getActiveMaps().catch(() => []);
-  const mapHrefFor = (slot: BSRotationSlot): string | null => {
-    if (!slot.event.map) return null;
-    const match = activeMaps.find(
-      (entry) =>
-        entry.mapSlug === slugify(slot.event.map!) && entry.scHash === slot.event.mode,
-    );
-    return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
-  };
+  // An unreachable wiki empties the list rather than failing the page.
+  const community = await getCommunityEvents().catch(() => []);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Community events', path: '/events' },
+        ])}
+      />
+
       <PageHeading
-        eyebrow="In rotation now"
-        title="Events"
-        subtitle="What is live in the game right now, and the community events the whole player base is grinding."
+        eyebrow="Everyone, one target"
+        title="Community events"
+        subtitle="Game-wide challenges: the whole player base grinds one milestone, and everybody collects the reward."
       />
 
-      <EventSection
-        title="Live now"
-        icon={Radio}
-        slots={active}
-        mapMeta={mapMeta}
-        modeMeta={modeMeta}
-        brawlerMeta={brawlerMeta}
-        bestPicks={bestPicks}
-        emptyLabel="No active events reported right now."
-        showEndsIn
-        mapHrefFor={mapHrefFor}
-      />
-
-      <EventSection
-        title="Upcoming"
-        icon={CalendarClock}
-        slots={upcoming}
-        mapMeta={mapMeta}
-        modeMeta={modeMeta}
-        brawlerMeta={brawlerMeta}
-        bestPicks={bestPicks}
-        emptyLabel="No upcoming events announced yet."
-        mapHrefFor={mapHrefFor}
-      />
-
-      {/* After the rotation, because the rotation is what people open this
-          page for, and before nothing else — the community events are the
-          reason to scroll. */}
-      <CommunityEvents events={community} />
-    </div>
-  );
-}
-
-function EventSection({
-  title,
-  icon: Icon,
-  slots,
-  mapMeta,
-  modeMeta,
-  brawlerMeta,
-  bestPicks,
-  emptyLabel,
-  showEndsIn = false,
-  mapHrefFor,
-}: {
-  title: string;
-  icon: typeof Radio;
-  slots: BSRotationSlot[];
-  mapMeta: Map<number, BAMap>;
-  modeMeta: Map<string, BAGameMode>;
-  brawlerMeta: Map<number, BABrawler>;
-  bestPicks: Map<string, ModeBestPicksData>;
-  emptyLabel: string;
-  showEndsIn?: boolean;
-  /** Resolves a rotation slot to its map page, or null when out of catalogue. */
-  mapHrefFor: (slot: BSRotationSlot) => string | null;
-}) {
-  return (
-    <section>
-      <SectionHeading
-        icon={<Icon className="size-5 text-brand" />}
-        title={title}
-        count={slots.length}
-      />
-
-      {slots.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">{emptyLabel}</p>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {slots.map((slot) => (
-            <EventCard
-              key={`${slot.slotId}-${slot.startTime}-${slot.event.id}`}
-              slot={slot}
-              map={mapMeta.get(slot.event.id)}
-              mode={modeMeta.get((slot.event.mode ?? '').toLowerCase())}
-              brawlerMeta={brawlerMeta}
-              picks={bestPicks.get(slot.event.mode ?? '')}
-              showEndsIn={showEndsIn}
-              mapHref={mapHrefFor(slot)}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
-function EventCard({
-  slot,
-  map,
-  mode,
-  brawlerMeta,
-  picks,
-  showEndsIn,
-  mapHref,
-}: {
-  slot: BSRotationSlot;
-  map?: BAMap;
-  mode?: BAGameMode;
-  brawlerMeta: Map<number, BABrawler>;
-  picks?: ModeBestPicksData;
-  showEndsIn: boolean;
-  mapHref: string | null;
-}) {
-  const accent = mode?.color ?? '#8b95b8';
-  const modeLabel = mode?.name ?? humanizeMode(slot.event.mode);
-
-  return (
-    <article className="card flex flex-col overflow-hidden">
-      <div
-        className="flex items-center gap-3 px-4 py-3"
-        style={{ background: `color-mix(in srgb, ${accent} 18%, transparent)` }}
-      >
-        {mode?.imageUrl ? (
-          <Image
-            src={mode.imageUrl}
-            alt=""
-            width={32}
-            height={32}
-            className="size-8 shrink-0 object-contain"
-            unoptimized
-          />
-        ) : null}
-        <div className="min-w-0">
-          <p className="truncate font-bold" style={{ color: accent }}>
-            {modeLabel}
-          </p>
-          {/* The slot number used to sit here. It is the game's internal
-              index for a rotation position, means nothing to a reader, and the
-              card already carries the two facts that do — which map, and how
-              long it lasts. */}
-        </div>
-      </div>
-
-      {map?.imageUrl ? (
-        <Image
-          src={map.imageUrl}
-          alt={slot.event.map ?? ''}
-          width={300}
-          height={180}
-          className="h-40 w-full bg-surface-2 object-contain p-2"
-          unoptimized
-        />
-      ) : (
-        <div className="grid h-40 w-full place-items-center bg-surface-2 text-sm text-muted">
-          No map preview
-        </div>
-      )}
-
-      <div className="flex-1 p-4">
-        {/* The map's own page is where the picks strip below comes from at
-            full depth, so the name is the way through to it. */}
-        {mapHref ? (
-          <Link href={mapHref} className="block truncate font-semibold hover:text-brand">
-            {slot.event.map}
-          </Link>
-        ) : (
-          <p className="truncate font-semibold">{slot.event.map ?? 'Unknown map'}</p>
-        )}
-        <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
-          <ClockIcon className="size-4" />
-          {showEndsIn
-            ? `Ends in ${timeUntil(slot.endTime)}`
-            : `Starts in ${timeUntil(slot.startTime)}`}
+      {community.length === 0 ? (
+        <p className="card p-6 text-sm leading-relaxed text-muted">
+          The community-event write-ups could not be read just now. They come
+          from the Brawl Stars wiki and this fills back in on its own.
         </p>
-      </div>
-
-      {/*
-        Always mode-scoped today, and now says so. Per-map picks exist for the
-        six competitive modes, but they are computed from Ranked battles and
-        this is the ladder rotation. Showing one against the other would swap
-        a stated overclaim for a hidden one.
-      */}
-      <ModeBestPicks
-        data={picks}
-        brawlerMeta={brawlerMeta}
-        accent={accent}
-        scope="mode"
-        mapName={slot.event.map}
-        modeLabel={modeLabel}
-      />
-    </article>
+      ) : (
+        <CommunityEvents events={community} />
+      )}
+    </div>
   );
 }

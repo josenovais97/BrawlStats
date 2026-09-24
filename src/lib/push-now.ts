@@ -14,7 +14,7 @@ import type { BSPlayerBrawler, BSRotationSlot } from '@/types/brawlstars';
  * That is a different question from the roster read a few sections below it.
  * "You own a top-3 pick in 6 of 6 modes" describes the account; this names one
  * brawler, one map and a countdown. Everything here is already on the site —
- * the rotation on /events, the map form on each map page — and the only new
+ * the rotation on /maps, the map form on each map page — and the only new
  * thing is the intersection with what this player owns.
  */
 

@@ -75,7 +75,7 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
   {
     heading: 'Game',
     links: [
-      { href: '/events', label: 'Events' },
+      { href: '/events', label: 'Community Events' },
       { href: '/cosmetics', label: 'Cosmetics' },
       { href: '/starr-drops', label: 'Starr Drops' },
       { href: '/news', label: 'News' },

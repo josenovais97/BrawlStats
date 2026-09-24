@@ -1,6 +1,5 @@
 import Image from 'next/image';
 
-import { SectionHeading } from '@/components/ui/section-heading';
 import { formatDate } from '@/lib/format';
 import { COMMUNITY_EVENTS_URL, type CommunityEvent } from '@/lib/community-events';
 
@@ -9,9 +8,8 @@ import { COMMUNITY_EVENTS_URL, type CommunityEvent } from '@/lib/community-event
  *
  * Presented as a list of expandable cards rather than seven tables stacked
  * down the page. The live one is worth reading now; the finished ones are a
- * record, and a record should be available without being in the way — six
- * closed events at full height pushed the rotation, which is the thing people
- * actually open this page for, a long way down.
+ * record, and a record should be available without being scrolled past — at
+ * full height, six closed write-ups are several screens of table.
  *
  * `<details>` rather than state: this is a server component on a page with no
  * other interactivity, and the browser already knows how to open a disclosure.
@@ -23,20 +21,6 @@ export function CommunityEvents({ events }: { events: CommunityEvent[] }) {
 
   return (
     <section className="space-y-4">
-      <SectionHeading
-        title="Community events"
-        subtitle="Game-wide challenges: the whole player base grinds one target, everybody gets the reward."
-        aside={
-          <a
-            href={COMMUNITY_EVENTS_URL}
-            rel="noopener nofollow"
-            className="text-sm hover:underline"
-          >
-            Source
-          </a>
-        }
-      />
-
       {/* The newest is open by default — if one is running, this is it. */}
       <EventCard event={latest} open />
 
@@ -49,9 +33,16 @@ export function CommunityEvents({ events }: { events: CommunityEvent[] }) {
       ) : null}
 
       <p className="px-1 text-xs leading-relaxed text-muted">
-        Milestones and rewards are written up by the Brawl Stars wiki community
-        and read from it automatically, so a new event appears here without the
-        site being changed. Text is CC BY-SA.
+        Milestones and rewards are written up by the{' '}
+        <a
+          href={COMMUNITY_EVENTS_URL}
+          rel="noopener nofollow"
+          className="font-medium text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"
+        >
+          Brawl Stars wiki
+        </a>{' '}
+        community and read from it automatically, so a new event appears here
+        without the site being changed. Text is CC BY-SA.
       </p>
     </section>
   );

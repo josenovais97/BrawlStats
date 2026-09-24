@@ -58,8 +58,12 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
               a poster card would burn most of the screen on empty margin round
               a small map thumbnail, and a poster card from `sm` up.
             */}
+            {/* `/maps`, not `/events`. The rotation left that page on
+                2026-09-24 — it was the fourth place on the site showing the
+                same slots — and a teaser must not point somewhere the thing it
+                is teasing no longer is. */}
             <Link
-              href="/events"
+              href="/maps"
               className="card card-interactive group flex h-full overflow-hidden sm:flex-col"
             >
               {/*

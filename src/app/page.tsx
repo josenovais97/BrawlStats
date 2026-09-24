@@ -45,8 +45,12 @@ export const metadata: Metadata = {
  *
  * Ten minutes rather than longer because the two genuinely live things here —
  * the event rotation and the global top three — are the only reason this page
- * is not simply static. It matches what `/events` shows. Everything else on
- * the page reads the 1-hour data cache and never wanted two minutes.
+ * is not simply static. Everything else on the page reads the 1-hour data
+ * cache and never wanted two minutes.
+ *
+ * `/events` used to be the other page on this TTL and is no longer: the
+ * rotation left it on 2026-09-24, so this component and `/maps` are now the
+ * only places the live slots appear.
  */
 export const revalidate = 600;
 
@@ -193,8 +197,8 @@ export default function HomePage() {
         }
         title="Live Brawl Stars events"
         subtitle="The maps everyone is playing this slot, straight from the game API."
-        ctaHref="/events"
-        ctaLabel="View all events"
+        ctaHref="/maps"
+        ctaLabel="Every map"
       >
         <Suspense
           fallback={

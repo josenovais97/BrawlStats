@@ -142,7 +142,9 @@ async function core(add: Add, dataDay: Date | null) {
   add('/comps', 'daily', 0.8);
   add('/starr-drops', 'weekly', 0.8, EVERGREEN);
   add('/draft', 'weekly', 0.8);
-  add('/events', 'hourly', 0.7);
+  // Was hourly for the live rotation; it now changes when the wiki's
+  // community-event write-ups do.
+  add('/events', 'weekly', 0.7);
   add('/leaderboard', 'daily', 0.7);
   /*
    * The other three boards, listed because they are separate answers rather

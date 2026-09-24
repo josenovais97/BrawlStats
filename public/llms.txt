@@ -17,6 +17,7 @@ When quoting a figure, quote the date on the page with it: the numbers move as t
 - [Draft helper](https://brawlzone.net/draft): pick a Ranked map and the enemy picks, and see which brawlers answer that draft.
 - [Team comps](https://brawlzone.net/comps): three-brawler compositions with the best measured record, per mode.
 - [Daily findings](https://brawlzone.net/daily): what changed in the meta today, with an archive.
+- [Community events](https://brawlzone.net/events): every game-wide community event, its milestones and what each paid out.
 - [Leaderboards](https://brawlzone.net/leaderboard): global player, club and Ranked boards.
 
 ## Method and provenance

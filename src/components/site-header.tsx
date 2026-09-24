@@ -83,10 +83,11 @@ const MORE: NavItem[] = [
   // that one says what moved this week, this one says whether the update did
   // it. /meta links straight here from its own update section.
   { href: '/patches', label: 'Patch Impact', icon: Activity },
-  // Events is the one demotion that costs something: it is a page people do
-  // come back to. It goes here rather than Ranked because the rotation is also
-  // surfaced on the home page, while the Ranked board has no other entry point.
-  { href: '/events', label: 'Events', icon: EventsIcon },
+  // "Community events", not "Events": the live rotation left this page on
+  // 2026-09-24 and a label promising it would be a broken promise. What is
+  // here now is the game-wide challenges, which nothing else on the site or
+  // anywhere else publishes as a set.
+  { href: '/events', label: 'Community Events', icon: EventsIcon },
   /*
    * Clubs had full pages and no way in from anywhere but a profile's club
    * chip. The board is the honest destination: there is no club index to point
