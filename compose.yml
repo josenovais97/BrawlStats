@@ -192,7 +192,12 @@ services:
     profiles: ["tools"]
     restart: "no"
     env_file: .env.production
-    command: ["npm", "run", "stats:refresh"]
+    # The anchor check runs straight after the refresh, in the same container,
+    # because it wants exactly the data the refresh just wrote and a second
+    # service would be a second image build every two hours. `;` not `&&`: a
+    # calibration warning must never mask the refresh's own exit code, which is
+    # what the sampler alert is keyed on.
+    command: ["sh", "-c", "npm run stats:refresh; rc=$$?; npm run anchors:check || true; exit $$rc"]
     depends_on:
       db:
         condition: service_healthy

@@ -15,6 +15,7 @@
     "db:seed": "tsx scripts/seed-stats.ts",
     "db:storage": "tsx scripts/db-storage.ts",
     "stats:refresh": "node --import tsx --conditions=react-server scripts/refresh-stats.ts",
+    "anchors:check": "node --import tsx --conditions=react-server scripts/check-anchors.ts",
     "crawl:budget": "node scripts/crawl-budget.mjs",
     "gen:players": "node --import tsx --conditions=react-server scripts/gen-indexable-players.ts",
     "discord:meta": "node --import tsx --conditions=react-server scripts/discord-meta-post.ts"

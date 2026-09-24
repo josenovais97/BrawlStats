@@ -412,7 +412,11 @@ export async function TierListView({
               {format === 'ranked' ? 'trophy list' : 'Ranked list'}
             </Link>
             . A brawler needs {MIN_SAMPLE_FOR_TIER} decided battles in the window before it is rated
-            at all. Tap or hover a brawler for the full breakdown.
+            at all. Tap or hover a brawler for the full breakdown, or read{' '}
+            <Link href="/meta-score" className="font-medium text-brand hover:underline">
+              the full method
+            </Link>{' '}
+            — sampling, the mode adjustment, the anchors, and what it cannot tell you.
           </p>
         </Disclosure>
 

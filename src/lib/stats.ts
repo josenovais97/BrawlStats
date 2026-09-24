@@ -125,7 +125,7 @@ const MIN_SAMPLE_FOR_MODE_PICK = 12;
  * At k=50 a brawler needs roughly 50 decided battles before its own record
  * outweighs the prior, which is about where the noise stops dominating.
  */
-const PRIOR_BATTLES = 50;
+export const PRIOR_BATTLES = 50;
 
 /** Keeps a re-centred rate inside 0-1 after the baseline has been shifted out. */
 function clampRate(rate: number): number {
@@ -190,19 +190,41 @@ export function normalizeWinRate(
  * measured against different denominators — the two pages never put their
  * numbers side by side, so one scale per page is the honest arrangement.
  *
- * Both sets are anchored just outside the format's own 5th-95th percentile,
- * measured over the sampled data:
+ * Each pair sits just outside its format's own 5th-95th percentile, so roughly
+ * a tenth of the roster clamps at the extremes by construction and the rest is
+ * spread across the scale.
  *
- *   ranked  pick 0.42%-4.27%   adjusted win 42.1%-56.1%
- *   trophy  pick 0.31%-1.45%   adjusted win 39.2%-55.0%
+ * **Absolute is not the same as permanent, and that distinction cost both
+ * lists their calibration.** The previous values were measured before
+ * 2026-08-30, when Ranked sampling went from ~1,538 battles a day to ~27,217
+ * and the roster kept growing. Nothing re-derived them, and by 2026-09-24 the
+ * two lists were wrong in opposite directions:
  *
- * Trophy sits lower and tighter on both axes, and reusing the Ranked anchors
- * put 62% of the ladder roster in D. The floors are the same judgement call in
- * each case, just made against the right distribution.
+ *   ranked  42% of the roster in D, 7% in S+A, nothing scoring above 8.2,
+ *           and 17 brawlers clamped to zero on pick — indistinguishable.
+ *   trophy  41% in S+A and 3 in D, with 15 brawlers clamped at the top of a
+ *           pick ceiling of 1.5% that the roster had grown past (max 5.3%).
+ *           Wendy, Cosmo and Amber were tied at a perfect 10.0.
+ *
+ * Re-measured the same day across both windows of each format, 168 and 214
+ * observations:
+ *
+ *   ranked  pick 0.10%-3.70% (max 5.50)   adjusted win 43.3%-56.1%
+ *   trophy  pick 0.30%-2.40% (max 5.30)   adjusted win 41.4%-57.0%
+ *
+ * The values below were chosen by scoring the live roster under each candidate
+ * and reading the resulting distribution, not by taste. They give ranked
+ * S 10% / A 10% / B 19% / C 29% / D 30% with three brawlers clamped in total,
+ * and trophy S 11% / A 9% / B 20% / C 35% / D 23% with fourteen.
+ *
+ * `scripts/check-anchors.ts` re-measures this on every sampler run and says so
+ * when the distribution drifts back outside them, because the failure mode
+ * here is silence: a stale anchor produces a tier list that looks completely
+ * normal and is quietly wrong.
  */
-const SCORE_ANCHORS = {
-  ranked: { pickFloor: 0.001, pickCeiling: 0.05, winFloor: 0.42, winCeiling: 0.6 },
-  trophy: { pickFloor: 0.0015, pickCeiling: 0.015, winFloor: 0.39, winCeiling: 0.57 },
+export const SCORE_ANCHORS = {
+  ranked: { pickFloor: 0.0004, pickCeiling: 0.05, winFloor: 0.43, winCeiling: 0.58 },
+  trophy: { pickFloor: 0.002, pickCeiling: 0.028, winFloor: 0.4, winCeiling: 0.585 },
 } as const satisfies Record<TierFormat, {
   pickFloor: number;
   pickCeiling: number;
@@ -211,8 +233,8 @@ const SCORE_ANCHORS = {
 }>;
 
 /** Performance carries most of the weight; popularity breaks the ties. */
-const WIN_WEIGHT = 0.65;
-const PICK_WEIGHT = 0.35;
+export const WIN_WEIGHT = 0.65;
+export const PICK_WEIGHT = 0.35;
 
 const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
 
@@ -241,7 +263,7 @@ export function metaScore(
 /**
  * Cut-offs on the meta score, replacing the old win-rate-only thresholds.
  */
-const SCORE_THRESHOLDS: { tier: Tier; minScore: number }[] = [
+export const SCORE_THRESHOLDS: { tier: Tier; minScore: number }[] = [
   { tier: 'S', minScore: 7.5 },
   { tier: 'A', minScore: 6.5 },
   { tier: 'B', minScore: 5.5 },

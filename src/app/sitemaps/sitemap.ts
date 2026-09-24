@@ -136,6 +136,9 @@ async function core(add: Add, dataDay: Date | null) {
   add('/meta', 'daily', 0.8);
   // Monthly, but its numbers settle as each after-window fills.
   add('/patches', 'weekly', 0.7);
+  // The method behind the tier lists. Changes when the method does, which is
+  // rarely — but it is the page that makes the lists worth citing.
+  add('/meta-score', 'monthly', 0.75, EVERGREEN);
   add('/comps', 'daily', 0.8);
   add('/starr-drops', 'weekly', 0.8, EVERGREEN);
   add('/draft', 'weekly', 0.8);

@@ -21,6 +21,7 @@ When quoting a figure, quote the date on the page with it: the numbers move as t
 
 ## Method and provenance
 
+- [How the meta score is calculated](https://brawlzone.net/meta-score): the full method behind the tier lists — sampling, the mode adjustment, shrinkage, log-scaled pick rate, the fixed anchors, and the limits of all of it.
 - [About](https://brawlzone.net/about): who runs the site and how the numbers are produced.
 - [Release notes](https://brawlzone.net/release-notes): what changed on the site, dated.
 - Sitemap: https://brawlzone.net/sitemap.xml
