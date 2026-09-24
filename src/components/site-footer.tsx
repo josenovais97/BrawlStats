@@ -261,6 +261,10 @@ export function SiteFooter() {
               Privacy
             </Link>
             <Dot />
+            <Link href="/terms" className="transition-colors hover:text-foreground">
+              Terms
+            </Link>
+            <Dot />
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"

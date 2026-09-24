@@ -198,6 +198,7 @@ async function core(add: Add, dataDay: Date | null) {
   add('/bubble', 'monthly', 0.5, EVERGREEN);
   add('/about', 'monthly', 0.3, EVERGREEN);
   add('/privacy', 'yearly', 0.2, EVERGREEN);
+  add('/terms', 'yearly', 0.2, EVERGREEN);
 }
 
 async function maps(add: Add, byMap: Map<string, string>) {
