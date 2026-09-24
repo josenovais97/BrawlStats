@@ -197,7 +197,7 @@ services:
     # service would be a second image build every two hours. `;` not `&&`: a
     # calibration warning must never mask the refresh's own exit code, which is
     # what the sampler alert is keyed on.
-    command: ["sh", "-c", "npm run stats:refresh; rc=$$?; npm run anchors:check || true; exit $$rc"]
+    command: ["sh", "-c", "npm run stats:refresh; rc=$$?; npm run anchors:check || true; npm run wiki:check || true; exit $$rc"]
     depends_on:
       db:
         condition: service_healthy
