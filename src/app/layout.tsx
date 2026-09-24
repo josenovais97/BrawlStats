@@ -46,9 +46,24 @@ export const metadata: Metadata = {
   description:
     'Look up Brawl Stars players and clubs, browse the brawler database, track the event rotation and global leaderboards.',
 
-  /** Google Search Console ownership. Rendered as the verification meta tag. */
+  /**
+   * Ownership proofs, rendered as verification meta tags.
+   *
+   * TikTok's is here as well as available over DNS, because their portal hands
+   * you one `name=value` string and does not say which of its three methods it
+   * belongs to. A meta tag costs one line in the head and satisfies the option
+   * that needs it; if the property was set up for DNS instead, this is inert
+   * rather than wrong.
+   *
+   * Needed for the Content Posting API, not for search: TikTok refuses to pull
+   * an image from an unverified domain, and the daily card is pulled from this
+   * one.
+   */
   verification: {
     google: 'MiIdig1YXgfLeQWD89d1Kagjh5w1wiXivuByKgHHHsw',
+    other: {
+      'tiktok-developers-site-verification': '2Q9Db1uMxpbb3dle79qa327RdWOsuLf7',
+    },
   },
 
   /*
