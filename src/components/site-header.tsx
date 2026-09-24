@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Activity,
   ChevronDown,
   Menu,
   Search,
@@ -78,6 +79,10 @@ const MORE: NavItem[] = [
   { href: '/daily', label: 'Daily', icon: ClockIcon },
   { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
   { href: '/meta', label: 'Meta Report', icon: TrophyGainIcon },
+  // Next to the meta report because it is the other half of the same question:
+  // that one says what moved this week, this one says whether the update did
+  // it. /meta links straight here from its own update section.
+  { href: '/patches', label: 'Patch Impact', icon: Activity },
   // Events is the one demotion that costs something: it is a page people do
   // come back to. It goes here rather than Ranked because the rotation is also
   // surfaced on the home page, while the Ranked board has no other entry point.
