@@ -12,10 +12,17 @@ import { type Discovery, getDailyReport } from '@/lib/stats';
  * and no numbers. This one is the post itself — it goes to TikTok, Instagram
  * or anywhere else vertical, where nobody is clicking a link and the image has
  * to carry the whole claim on its own. So each finding gets its number, and
- * the domain sits at the bottom because that is the only route back here.
+ * the domain sits under the findings because that is the only route back here.
  *
  * Served from a stable path rather than generated on the box, because the
  * posting APIs fetch the image themselves from a public URL.
+ *
+ * Laid out for where it lands rather than for the canvas. TikTok draws its own
+ * UI over the bottom of a post — caption, username, music — and a column of
+ * buttons up the right-hand side, so the first version put "brawlzone.net"
+ * exactly where the caption covers it, and left a third of the frame empty in
+ * the middle. Everything now sits in a centred block clear of both, which also
+ * lets the findings be the size they should have been.
  *
  * Satori: flexbox and a subset of CSS only. No grid, no custom properties, no
  * Tailwind, and every `div` with more than one child needs an explicit
@@ -106,8 +113,10 @@ export async function GET(
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
-          padding: 96,
+          justifyContent: 'center',
+          // Generous on the right: that is where the like/comment/share column
+          // sits. Deep at the bottom: caption and username.
+          padding: '260px 260px 420px 96px',
           background: BG,
           color: FG,
           fontFamily: 'sans-serif',
@@ -129,16 +138,16 @@ export async function GET(
           <div style={{ display: 'flex', fontSize: 34, letterSpacing: 3, color: ACCENT }}>
             {dayLabel(date).toUpperCase()}
           </div>
-          <div style={{ display: 'flex', fontSize: 92, fontWeight: 800, marginTop: 16 }}>
+          <div style={{ display: 'flex', fontSize: 100, fontWeight: 800, marginTop: 16 }}>
             What we
           </div>
-          <div style={{ display: 'flex', fontSize: 92, fontWeight: 800 }}>found today</div>
-          <div style={{ display: 'flex', fontSize: 32, color: DIM, marginTop: 20 }}>
+          <div style={{ display: 'flex', fontSize: 100, fontWeight: 800 }}>found today</div>
+          <div style={{ display: 'flex', fontSize: 34, color: DIM, marginTop: 20 }}>
             Measured from sampled battles, not opinion
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 44 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 52, marginTop: 72 }}>
           {findings.length > 0 ? (
             findings.map((d, i) => {
               const names = d.brawlerNames.map(cap);
@@ -151,20 +160,20 @@ export async function GET(
                     <div
                       style={{
                         display: 'flex',
-                        width: 8,
-                        height: 58,
+                        width: 10,
+                        height: 66,
                         borderRadius: 4,
                         background: ACCENT,
                       }}
                     />
-                    <div style={{ display: 'flex', fontSize: 56, fontWeight: 700 }}>
+                    <div style={{ display: 'flex', fontSize: 62, fontWeight: 700 }}>
                       {HEADLINE[d.kind]?.(names, d.context) ?? names.join(' and ')}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', fontSize: 40, color: MUTED, marginLeft: 28 }}>
+                  <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginLeft: 30 }}>
                     {KICKER[d.kind] ?? ''}
                   </div>
-                  <div style={{ display: 'flex', fontSize: 32, color: DIM, marginLeft: 28 }}>
+                  <div style={{ display: 'flex', fontSize: 34, color: DIM, marginLeft: 30 }}>
                     {detail(d)}
                   </div>
                 </div>
@@ -177,11 +186,13 @@ export async function GET(
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', fontSize: 46, fontWeight: 800, color: BRAND }}>
+        {/* Immediately under the findings, not pinned to the bottom edge, so
+            the one line that brings anybody back is never under a caption. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 88 }}>
+          <div style={{ display: 'flex', fontSize: 52, fontWeight: 800, color: BRAND }}>
             brawlzone.net
           </div>
-          <div style={{ display: 'flex', fontSize: 28, color: DIM }}>
+          <div style={{ display: 'flex', fontSize: 30, color: DIM }}>
             {SITE_NAME} · free tier lists, maps and draft help
           </div>
         </div>
