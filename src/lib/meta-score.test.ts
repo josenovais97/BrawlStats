@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  EDGE_SHARE,
   PICK_WEIGHT,
   SCORE_ANCHORS,
   SCORE_THRESHOLDS,
   WIN_WEIGHT,
+  blendStrength,
   metaScore,
 } from '@/lib/stats';
 
@@ -72,4 +74,48 @@ test('tier thresholds descend and reach the bottom', () => {
     'thresholds are read in order, so an out-of-order entry makes a tier unreachable',
   );
   assert.equal(scores.at(-1), 0, 'the lowest tier must catch every remaining score');
+});
+
+/**
+ * The skill-controlled correction.
+ *
+ * Every case here is one where a wrong answer still renders a complete,
+ * plausible tier list — which is why they are pinned rather than eyeballed.
+ */
+
+test('a brawler with no measured edge scores exactly as before', () => {
+  // The estimator needs enough players carrying a brawler, and the competitive
+  // split only exists for days folded since 2026-09-24. Anything it cannot
+  // reach must fall back rather than fall out.
+  for (const rate of [0.45, 0.5, 0.55]) {
+    assert.equal(blendStrength(rate, null), rate);
+  }
+  assert.equal(
+    metaScore(0.52, 0.02, 'ranked', null),
+    metaScore(0.52, 0.02, 'ranked'),
+  );
+});
+
+test('the correction moves halfway, in the right direction', () => {
+  // +4 points of edge means "players do 4 points better than their own
+  // average with this brawler", i.e. a 54% estimate. Half of the way from a
+  // published 0.50 is 0.52.
+  assert.equal(blendStrength(0.5, 4), 0.52);
+  assert.equal(blendStrength(0.5, -4), 0.48);
+  // It is a move toward the estimate, never past it.
+  const blended = blendStrength(0.4, 10);
+  assert.ok(blended > 0.4 && blended < 0.6, `${blended} overshot the estimate`);
+});
+
+test('an absurd edge cannot push a rate outside a plausible one', () => {
+  // An average of two numbers must stay inside the range either could occupy,
+  // or the anchors stop meaning what they say.
+  for (const edge of [500, -500]) {
+    const blended = blendStrength(0.5, edge);
+    assert.ok(blended >= 0 && blended <= 1, `blend left the rate range: ${blended}`);
+  }
+});
+
+test('the correction is a correction, not the whole answer', () => {
+  assert.ok(EDGE_SHARE > 0 && EDGE_SHARE < 1, 'the published rate must still count');
 });

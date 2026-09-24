@@ -10,6 +10,7 @@ import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { titleCase } from '@/lib/format';
 import {
   getBrawlerStatsForWindow,
+  getSkillEdge,
   getFilterableModes,
   getRankedMapPicks,
   scoreBrawlers,
@@ -88,8 +89,12 @@ export default async function BubblePanelPage() {
    * carrying all of them across seven modes would put hundreds of kilobytes
    * into an overlay opened on mobile data.
    */
+  // Fetched once for the whole panel: the same correction the site's tier list
+  // applies, so the overlay and the page can never disagree about a score.
+  const edges = await getSkillEdge('ranked').catch(() => undefined);
+
   const shape = (rows: Awaited<ReturnType<typeof getBrawlerStatsForWindow>>): PanelEntry[] =>
-    scoreBrawlers(rows, 'ranked')
+    scoreBrawlers(rows, 'ranked', edges)
       .filter((entry) => entry.tier !== null)
       .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
       .map((entry) => ({

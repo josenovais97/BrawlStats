@@ -263,16 +263,57 @@ export const PICK_WEIGHT = 0.25;
 
 const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
 
+/**
+ * How far the published win rate is moved toward the skill-controlled estimate.
+ *
+ * Half, because the two estimators are wrong about different things and
+ * neither is the referee. The adjusted win rate corrects for the modes a
+ * brawler is played in and carries the skill of whoever played it; the
+ * within-player edge removes player skill exactly and compares a showdown
+ * specialist's showdown games against their own Brawl Ball games. Averaging
+ * two estimates whose biases point in opposite directions is worth more than
+ * picking the one whose bias is easier to describe.
+ *
+ * They agree closely enough for the average to be stable — r = +0.77 measured
+ * 2026-09-24 — and disagree where it matters: Bibi ranked 96th on the
+ * published rate and 16th on the estimator, because she is played mostly by
+ * weaker accounts and their results were being read as hers.
+ *
+ * A brawler with no edge — too few players carrying it, or days folded before
+ * the competitive split existed — scores exactly as it did before, so the list
+ * degrades to the old behaviour rather than to a hole.
+ */
+export const EDGE_SHARE = 0.5;
+
+/**
+ * Blends the two strength estimates, on the scale of the published rate.
+ *
+ * The edge arrives in win-rate points around zero and is re-centred on 50% to
+ * sit on the same axis as the adjusted rate. Both are then bounded to a
+ * plausible rate, because an average of two numbers cannot be allowed to leave
+ * the range either of them could occupy.
+ */
+export function blendStrength(
+  normalizedWinRate: number,
+  skillEdge: number | null,
+): number {
+  if (skillEdge === null) return normalizedWinRate;
+  const fromEdge = clampRate(0.5 + skillEdge / 100);
+  return normalizedWinRate + EDGE_SHARE * (fromEdge - normalizedWinRate);
+}
+
 export function metaScore(
   normalizedWinRate: number | null,
   usageRate: number | null,
   format: TierFormat = 'ranked',
+  skillEdge: number | null = null,
 ): number | null {
   if (normalizedWinRate === null) return null;
 
   const { pickFloor, pickCeiling, winFloor, winCeiling } = SCORE_ANCHORS[format];
 
-  const win = clamp01((normalizedWinRate - winFloor) / (winCeiling - winFloor));
+  const strength = blendStrength(normalizedWinRate, skillEdge);
+  const win = clamp01((strength - winFloor) / (winCeiling - winFloor));
 
   const pick =
     usageRate && usageRate > 0
@@ -1537,6 +1578,12 @@ export interface ScoredBrawler {
 export function scoreBrawlers(
   rows: BrawlerStatRow[],
   format: TierFormat,
+  /**
+   * Skill-controlled edges by brawler id. Optional so a caller without them
+   * scores exactly as it did before rather than differently — see
+   * `getScoredRoster`, which is what every page should use.
+   */
+  edges?: Map<number, SkillEdge>,
 ): ScoredBrawler[] {
   return rows.map((row) => {
     const normalizedWinRate = normalizeWinRate(
@@ -1544,7 +1591,8 @@ export function scoreBrawlers(
       row.baselineWinRate,
       row.decidedSampleSize,
     );
-    const score = metaScore(normalizedWinRate, row.usageRate, format);
+    const edge = edges?.get(row.brawlerId)?.edge ?? null;
+    const score = metaScore(normalizedWinRate, row.usageRate, format, edge);
     const rated =
       normalizedWinRate !== null && row.decidedSampleSize >= MIN_SAMPLE_FOR_TIER;
 
@@ -1558,8 +1606,29 @@ export function scoreBrawlers(
       winRate: row.winRate,
       baselineWinRate: row.baselineWinRate,
       decidedSampleSize: row.decidedSampleSize,
+      skillEdge: edge,
     };
   });
+}
+
+/**
+ * The scored roster, with the skill-controlled correction applied.
+ *
+ * Every page that renders a tier list should call this rather than fetching
+ * rows and scoring them itself. Two pages scoring the same window differently
+ * is the failure this exists to prevent, and it is invisible: both render a
+ * complete, plausible list.
+ */
+export async function getScoredRoster(
+  windowDays: number,
+  mode: string | undefined,
+  format: TierFormat,
+): Promise<ScoredBrawler[]> {
+  const [rows, edges] = await Promise.all([
+    getBrawlerStatsForWindow(windowDays, mode, format),
+    getSkillEdge(format).catch(() => new Map<number, SkillEdge>()),
+  ]);
+  return scoreBrawlers(rows, format, edges);
 }
 
 /**
@@ -1572,8 +1641,8 @@ export const getMetaIndex = cache(
     format: TierFormat = 'ranked',
     windowDays = 7,
   ): Promise<Map<number, ScoredBrawler>> => {
-    const rows = await getBrawlerStatsForWindow(windowDays, undefined, format);
-    return new Map(scoreBrawlers(rows, format).map((entry) => [entry.brawlerId, entry]));
+    const scored = await getScoredRoster(windowDays, undefined, format);
+    return new Map(scored.map((entry) => [entry.brawlerId, entry]));
   },
 );
 
@@ -4360,14 +4429,28 @@ const cachedPairingMatrix = cachedRead('pairing-matrix', compute_pairingMatrix);
  * Minimum battles a player needs with a brawler, and without it, to be counted.
  *
  * Both sides are needed because the estimator is a difference: a player with
- * two battles on the brawler contributes noise, and one with four battles in
+ * one battle on the brawler contributes noise, and one with four battles in
  * total has no personal baseline to compare against.
+ *
+ * Set low on purpose, and safe to set low because `EDGE_PRIOR_PLAYERS` below
+ * does the real work. Strict floors looked prudent and were the opposite:
+ * measured 2026-09-24, a floor of five battles and forty players covered 23
+ * brawlers out of a hundred-odd — and, because clearing a player floor is
+ * mostly a matter of being popular, it corrected exactly the brawlers that
+ * pick rate already rewards while leaving the rest alone. A systematic
+ * difference in method between popular and unpopular brawlers is worse than
+ * a noisier estimate on both.
+ *
+ * Shrinkage turns coverage into a gradient instead of a cliff. A brawler
+ * carried by twenty players keeps an eighth of its edge; one carried by two
+ * thousand keeps almost all of it. Nothing has to be excluded to stop a thin
+ * estimate shouting.
  */
-const EDGE_MIN_WITH = 5;
-const EDGE_MIN_WITHOUT = 30;
+const EDGE_MIN_WITH = 3;
+const EDGE_MIN_WITHOUT = 20;
 
 /** Below this many contributing players the average is describing a handful. */
-const EDGE_MIN_PLAYERS = 40;
+const EDGE_MIN_PLAYERS = 20;
 
 /**
  * How strongly the edge is pulled toward zero, in pseudo-players.

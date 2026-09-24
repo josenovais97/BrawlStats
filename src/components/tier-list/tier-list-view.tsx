@@ -50,7 +50,7 @@ import {
   getLastAggregationRun,
   getMetaMovers,
   getRankedMapPicks,
-  scoreBrawlers,
+  getScoredRoster,
   type TierFormat,
   type TierWindowKey,
 } from '@/lib/stats';
@@ -166,8 +166,9 @@ export async function TierListView({
 
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after the other so the page never needs more than one connection.
-  const [rows, brawlerMeta, lastRun, movers, mapPicks] = await Promise.all([
+  const [rows, scored, brawlerMeta, lastRun, movers, mapPicks] = await Promise.all([
     getBrawlerStatsForWindow(days, mode, format),
+    getScoredRoster(days, mode, format),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getLastAggregationRun(),
     // Snapshot-to-snapshot movement. The stored snapshots are competitive-only,
@@ -211,7 +212,6 @@ export async function TierListView({
 
   // `scoreBrawlers` leaves `tier` null below the sample floor, which is what
   // splits the page: rated brawlers get a row, the rest get the progress list.
-  const scored = scoreBrawlers(rows, format);
   const byId = new Map(rows.map((row) => [row.brawlerId, row]));
 
   const entries: TierListEntry[] = scored.map((entry) => {

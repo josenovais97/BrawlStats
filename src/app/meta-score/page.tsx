@@ -63,6 +63,11 @@ const FAQ = [
     answer: `Every win rate is pulled toward the average by ${PRIOR_BATTLES} pseudo-battles, so a brawler needs roughly that many decided battles before its own record outweighs the prior. Without it the top of the list was whichever rarely-played brawler had a lucky week. Anything under ${MIN_SAMPLE_FOR_TIER} decided battles is not rated at all.`,
   },
   {
+    question: 'Does the tier list account for player skill?',
+    answer:
+      "Partly, and deliberately. Alongside the plain win rate each brawler is measured a second way: every player's win rate with it minus that same player's win rate without it, which removes player skill exactly because it compares people against themselves. The published strength is the average of the two, because each is biased in a different direction. It changes real placements — one brawler ranked 96th on win rate alone and 16th once every player was compared against their own average.",
+  },
+  {
     question: 'Are the Ranked and trophy scores comparable?',
     answer:
       'No. They are different populations measured against different denominators, so each list is calibrated against its own distribution. A 7.0 on the Ranked list and a 7.0 on the trophy list are not the same claim, which is why the two are never shown side by side.',
@@ -172,6 +177,39 @@ export default function MetaScorePage() {
 
       <Step
         n={4}
+        title="Correcting for who is holding it"
+        body={
+          <>
+            <p>
+              A win rate says the side holding a brawler won. It does not say
+              the brawler is why. Strong players gravitate toward particular
+              brawlers and carry their results with them, and step 2 corrects
+              for <em>where</em> a brawler is played, not <em>who</em> is
+              playing it.
+            </p>
+            <p>
+              So each brawler is also measured a second way:{' '}
+              <strong>every player&apos;s win rate with it, minus that same
+              player&apos;s win rate without it</strong>. Comparing a player
+              against themselves removes skill exactly. The published figure is
+              the average of the two estimates, because they are wrong about
+              different things &mdash; the first carries the skill of whoever
+              played it, the second compares a showdown specialist&apos;s
+              showdown games against their own Brawl Ball games.
+            </p>
+            <p>
+              The two agree closely (r&nbsp;=&nbsp;+0.77) and disagree where it
+              matters. Bibi ranked 96th on win rate alone and 16th once every
+              player was compared against their own average, because she is
+              played mostly by weaker accounts and their results were being
+              read as hers.
+            </p>
+          </>
+        }
+      />
+
+      <Step
+        n={5}
         title="Adding pick rate, on a log scale"
         body={
           <>
@@ -191,7 +229,7 @@ export default function MetaScorePage() {
       />
 
       <Step
-        n={5}
+        n={6}
         title="Fixing the scale, and checking it stays fixed"
         body={
           <>
@@ -243,7 +281,7 @@ export default function MetaScorePage() {
       />
 
       <Step
-        n={6}
+        n={7}
         title="Turning the score into a tier"
         body={
           <>
@@ -288,14 +326,15 @@ export default function MetaScorePage() {
             with a better record. Both numbers are printed on every row so you
             can weigh them yourself.
           </Limit>
-          <Limit title="Win rate is not the same as strength">
-            A brawler played mostly by weaker players carries their results.
-            Measured against a within-player estimator, some brawlers move a
-            long way &mdash; Bibi ranked 96th on adjusted win rate and 16th once
-            each player was compared against their own average. Correcting this
-            properly for Ranked needs a change to how battles are stored, and
-            it is the next thing on the list rather than something already
-            done.
+          <Limit title="The skill correction is partial, not complete">
+            Step 4 removes the effect of who is holding a brawler, but the
+            estimator behind it compares a player&apos;s games with a brawler
+            against all their other games, across every mode. A specialist is
+            therefore compared against their own play elsewhere, which is its
+            own bias &mdash; smaller than the one it removes, and pointing the
+            other way, which is why the two estimates are averaged rather than
+            one being picked. A brawler carried by too few players is not
+            corrected at all and falls back to the mode-adjusted rate.
           </Limit>
           <Limit title="It does not control for who is playing">
             A win rate says the brawler was on the winning side, not that it
