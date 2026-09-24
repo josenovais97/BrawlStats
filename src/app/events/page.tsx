@@ -3,11 +3,13 @@ import { CalendarClock, Radio } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { CommunityEvents } from '@/components/events/community-events';
 import { ModeBestPicks } from '@/components/events/mode-best-picks';
 import { ClockIcon } from '@/components/game-icons';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
+import { getCommunityEvents } from '@/lib/community-events';
 import { getEventRotation } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
@@ -48,12 +50,15 @@ export default async function EventsPage() {
   }
 
   // Cosmetic metadata is optional — the page still works without artwork.
-  const [mapMeta, modeMeta, brawlerMeta, bestPicks] = await Promise.all([
+  const [mapMeta, modeMeta, brawlerMeta, bestPicks, community] = await Promise.all([
     getMapMap().catch(() => new Map<number, BAMap>()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     // Our own aggregate; an empty map just hides the picks strip.
     getBestPicksByMode(3).catch(() => new Map<string, ModeBestPicksData>()),
+    // Read from the wiki, so an empty list is a wiki that is down rather than
+    // a page that is broken. The section removes itself.
+    getCommunityEvents().catch(() => []),
   ]);
 
   const { active, upcoming } = partitionRotation(rotation);
@@ -76,7 +81,7 @@ export default async function EventsPage() {
       <PageHeading
         eyebrow="In rotation now"
         title="Events"
-        subtitle="The live rotation straight from the game API, with map art from BrawlAPI."
+        subtitle="What is live in the game right now, and the community events the whole player base is grinding."
       />
 
       <EventSection
@@ -103,6 +108,11 @@ export default async function EventsPage() {
         emptyLabel="No upcoming events announced yet."
         mapHrefFor={mapHrefFor}
       />
+
+      {/* After the rotation, because the rotation is what people open this
+          page for, and before nothing else — the community events are the
+          reason to scroll. */}
+      <CommunityEvents events={community} />
     </div>
   );
 }
@@ -201,7 +211,10 @@ function EventCard({
           <p className="truncate font-bold" style={{ color: accent }}>
             {modeLabel}
           </p>
-          <p className="truncate text-xs text-muted">Slot {slot.slotId}</p>
+          {/* The slot number used to sit here. It is the game's internal
+              index for a rotation position, means nothing to a reader, and the
+              card already carries the two facts that do — which map, and how
+              long it lasts. */}
         </div>
       </div>
 
