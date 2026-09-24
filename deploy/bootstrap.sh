@@ -133,6 +133,7 @@ sudo systemctl enable --now brawlzone-deploy.timer brawlzone-sampler.timer \
                             brawlzone-backup.timer brawlzone-health.timer \
                             brawlzone-digest.timer brawlzone-discord.timer \
                             brawlzone-refresh.timer \
+                            brawlzone-indexnow.timer \
                             brawlzone-verify-restore.timer >/dev/null
 
 # Not a timer: it holds RAM continuously so the instance is not reclaimed as

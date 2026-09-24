@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# Tell Bing (and Yandex, Seznam, Naver) which pages changed today.
+#
+# Written 2026-09-24. Measured over a full day of the access log: Googlebot 55
+# requests, Applebot 43, GPTBot 30, ClaudeBot 27 -- and bingbot 6. Bing was
+# barely looking at the site, and Bing's index is what DuckDuckGo, Yahoo,
+# Ecosia and a large part of ChatGPT search read. ChatGPT was already the
+# single biggest referrer here (26 sessions that week against Google's 14), so
+# the channel that works best was being fed by the index that saw least.
+#
+# IndexNow is the fix and costs nothing: a key hosted at the domain root, and
+# an HTTP POST naming the URLs that changed. No account, no quota, and one
+# submission reaches every participating engine.
+#
+# WHICH URLs, and why it is not all of them. The protocol is for content that
+# was added, updated or deleted; submitting the whole site daily is how a host
+# gets ignored. So this submits the pages whose `lastmod` in `core.xml` is
+# today -- roughly 170 of them. That works because Monday's sitemap change made
+# `lastmod` honest: it is the newest sampled day behind each page's data, not
+# the build timestamp, so "lastmod is today" genuinely means "these numbers
+# moved today". `core.xml` rather than every section for the same reason it
+# exists: it holds the tier lists, the brawler pages and the hubs, which is
+# where the search demand measured in Search Console actually is. Maps and
+# compare pages are in the sitemap and Bing can crawl them from there.
+#
+# Failure is not fatal. A search engine that does not hear about today's change
+# hears about it from the sitemap tomorrow, so nothing here is worth failing a
+# timer over -- but a non-2xx is logged, because silent success is how the
+# alerting in this project has been wrong before.
+set -uo pipefail
+
+HOST="brawlzone.net"
+KEY="7c5d42c3d2b23f04c659bb537275876b"
+SITEMAP="https://${HOST}/sitemaps/sitemap/core.xml"
+ENDPOINT="https://api.indexnow.org/IndexNow"
+
+# The key has to be fetchable at the root before anything is accepted: it is
+# what proves control of the host. Checked rather than assumed, because the
+# file lives in `public/` and a bad deploy would otherwise turn every
+# submission into a silent 403.
+key_url="https://${HOST}/${KEY}.txt"
+served=$(curl -s --max-time 20 "$key_url" | tr -d '[:space:]')
+if [ "$served" != "$KEY" ]; then
+  echo "key file at ${key_url} does not serve the key (got: '${served:0:40}') -- not submitting"
+  exit 0
+fi
+
+# The URLs carrying the newest `lastmod` in the file -- not the URLs dated
+# today.
+#
+# The sitemap route revalidates daily, so it routinely serves yesterday's dates
+# and a match on the wall clock finds nothing at all. Measured before this was
+# wired to a timer: every entry read 2026-09-23 on the morning of the 24th.
+# Taking the maximum date present asks the question that actually matters --
+# which pages changed most recently, according to the site itself -- and stays
+# right however stale the cache is.
+urls=$(curl -s --max-time 30 "$SITEMAP" | python3 -c '
+import re, sys
+
+xml = sys.stdin.read()
+entries = re.findall(r"<loc>([^<]+)</loc>\s*<lastmod>([^<]{10})", xml)
+if not entries:
+    sys.exit(0)
+
+newest = max(day for _, day in entries)
+for loc, day in entries:
+    if day == newest:
+        print(loc)
+print(newest, file=sys.stderr)
+' 2>/tmp/indexnow.day)
+day=$(cat /tmp/indexnow.day 2>/dev/null || echo unknown)
+rm -f /tmp/indexnow.day
+
+count=$(printf '%s\n' "$urls" | grep -c . || true)
+if [ "$count" -eq 0 ]; then
+  echo "no URLs parsed from ${SITEMAP} -- nothing to submit"
+  exit 0
+fi
+
+body=$(printf '%s\n' "$urls" | python3 -c '
+import json, sys
+urls = [line.strip() for line in sys.stdin if line.strip()]
+print(json.dumps({
+    "host": sys.argv[1],
+    "key": sys.argv[2],
+    "keyLocation": f"https://{sys.argv[1]}/{sys.argv[2]}.txt",
+    # The protocol caps a submission at 10,000. core.xml is ~170 and bounded by
+    # the roster, so this is a guard against a future section rather than a
+    # limit anything reaches today.
+    "urlList": urls[:10000],
+}))' "$HOST" "$KEY")
+
+code=$(curl -s -o /tmp/indexnow.out -w '%{http_code}' --max-time 30 \
+  -X POST "$ENDPOINT" \
+  -H 'Content-Type: application/json; charset=utf-8' \
+  --data-binary "$body")
+
+case "$code" in
+  200|202)
+    echo "submitted ${count} URLs changed on ${day} (HTTP ${code})"
+    ;;
+  *)
+    # 403 means the key was rejected, 422 that a URL did not match the host --
+    # both are configuration faults that would otherwise never surface.
+    echo "IndexNow refused ${count} URLs: HTTP ${code} $(head -c 200 /tmp/indexnow.out)"
+    ;;
+esac
+rm -f /tmp/indexnow.out

@@ -1,0 +1,16 @@
+[Unit]
+Description=Tell Bing what changed, daily at 07:40 UTC
+
+[Timer]
+# After the 06:17 sampler run has landed and the tier lists have regenerated,
+# and before the 08:00 digest, so a failure shows up in that morning's email.
+#
+# Daily, not per sampler run. The numbers move every two hours, but IndexNow is
+# for content that was added, updated or deleted -- submitting the same 155
+# URLs twelve times a day is how a host stops being listened to.
+OnCalendar=*-*-* 07:40:00
+Persistent=true
+Unit=brawlzone-indexnow.service
+
+[Install]
+WantedBy=timers.target

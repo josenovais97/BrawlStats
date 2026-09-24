@@ -1,0 +1,7 @@
+[Unit]
+Description=BrawlZone IndexNow submission
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/brawlzone-run indexnow /usr/local/bin/brawlzone-indexnow
