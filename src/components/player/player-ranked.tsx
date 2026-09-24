@@ -6,6 +6,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
+import type { RankedEloStanding } from '@/lib/stats';
 import type { TrophyStanding } from '@/types/stats';
 
 interface Props {
@@ -18,6 +19,14 @@ interface Props {
    */
   globalRank?: number | null;
   standing: TrophyStanding | null;
+  /**
+   * Where this account's Elo sits on the Ranked ladder.
+   *
+   * The game publishes no Ranked leaderboard and no rank distribution, so this
+   * is a number the player cannot get anywhere else — including from the game
+   * itself. See `getRankedLadder` for the whole ladder.
+   */
+  rankedStanding?: RankedEloStanding | null;
 }
 
 /**
@@ -27,7 +36,12 @@ interface Props {
  * touched ranked and is not on any leaderboard gets nothing rather than a row
  * of dashes.
  */
-export function PlayerRanked({ player, globalRank = null, standing }: Props) {
+export function PlayerRanked({
+  player,
+  globalRank = null,
+  standing,
+  rankedStanding = null,
+}: Props) {
   const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
   if (!hasRanked && globalRank === null && !standing) return null;
 
@@ -89,6 +103,16 @@ export function PlayerRanked({ player, globalRank = null, standing }: Props) {
             value={`#${globalRank}`}
             hint="Global trophies"
             tone="text-brand"
+          />
+        ) : null}
+
+        {rankedStanding ? (
+          <Cell
+            gameIcon={<RankedIcon className="size-6" />}
+            label="Ranked standing"
+            value={`Top ${formatPercentileLabel(rankedStanding.percentile)}`}
+            hint={`Of ${formatNumber(rankedStanding.population)} ranked players`}
+            tone="text-victory"
           />
         ) : null}
 

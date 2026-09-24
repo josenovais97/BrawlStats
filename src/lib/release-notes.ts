@@ -240,6 +240,18 @@ export function monthSlugsBackFrom(from: Date, count = MAX_MONTHS_BACK): string[
  * Requests are sequential and stop at the first hit, so the common case (this
  * month or last month) costs one or two requests.
  */
+/**
+ * One month's update by slug, e.g. "september-2026".
+ *
+ * `fetchNotes` was private because every caller wanted "the latest" or "the
+ * ones naming this brawler". `/patches` wants a named month — the update is
+ * the subject of the page rather than a lookup on the way to something else —
+ * so the fetch it already does is exported rather than copied.
+ */
+export async function getReleaseNotes(slug: string): Promise<ReleaseNotes | null> {
+  return fetchNotes(slug);
+}
+
 export async function getLatestReleaseNotes(now = new Date()): Promise<ReleaseNotes | null> {
   for (const slug of monthSlugsBackFrom(now)) {
     const notes = await fetchNotes(slug);

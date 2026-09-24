@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
 import { SeasonPanel } from '@/components/ranked/season-panel';
+import { RankedLadder } from '@/components/ranked/ranked-ladder';
 import { RankedIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
 import { RelativeTime } from '@/components/ui/relative-time';
@@ -15,7 +16,13 @@ import { getActiveMaps } from '@/lib/game-maps';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
 import { getRankedMapLastSeen } from '@/lib/stats';
 import { slugify } from '@/lib/slugs';
-import { getLastAggregationRun, getMetaIndex, getRankedMapPicks, type ScoredBrawler } from '@/lib/stats';
+import {
+  getLastAggregationRun,
+  getMetaIndex,
+  getRankedLadder,
+  getRankedMapPicks,
+  type ScoredBrawler,
+} from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
@@ -39,7 +46,7 @@ const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
 };
 
 export default async function RankedPage() {
-  const [maps, lastSeenRows, mapMeta, modeMeta, brawlerMeta, season, lastRun, metaIndex] = await Promise.all([
+  const [maps, lastSeenRows, mapMeta, modeMeta, brawlerMeta, season, lastRun, metaIndex, ladder] = await Promise.all([
     getRankedMapPicks(3),
     getRankedMapLastSeen().catch(() => []),
     getMapMap().catch(() => new Map<number, BAMap>()),
@@ -61,6 +68,7 @@ export default async function RankedPage() {
     // The same scoring the Ranked tier list uses, for the one-sentence answer
     // in the header: this is the page answer engines send people to most.
     getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
+    getRankedLadder().catch(() => []),
   ]);
 
   const top = [...metaIndex.values()]
@@ -381,6 +389,11 @@ export default async function RankedPage() {
           </section>
         ))
       )}
+
+      {/* After the map picks, because a reader arriving from "best brawlers
+          for <map>" wants the answer first — but before the methodology,
+          because this is a finding rather than a footnote. */}
+      <RankedLadder ladder={ladder} />
 
       <Disclosure summary="How these picks are chosen">
         <p>

@@ -640,6 +640,121 @@ export async function getTrophyPercentile(trophies: number): Promise<TrophyStand
   }
 }
 
+/** One rung of the Ranked ladder, and how many sampled players sit on it. */
+export interface RankedRung {
+  /** The game's own name, e.g. "MYTHIC I". */
+  rank: string;
+  players: number;
+  /** Share of ranked players on this rung, 0-1. */
+  share: number;
+  /** Share of ranked players on this rung or above, 0-1. */
+  atOrAbove: number;
+  minElo: number;
+  maxElo: number;
+}
+
+/**
+ * The whole Ranked ladder and how crowded each rung is.
+ *
+ * The game publishes no Ranked leaderboard and no rank distribution — there is
+ * no endpoint for either — so "what fraction of players actually reach Mythic"
+ * is a question with no published answer anywhere. It has one here only
+ * because the sampler records each player's rank as it goes.
+ *
+ * Ordered by Elo rather than by name, because the names are the game's and
+ * their order is not alphabetical. Players with no rank name are excluded
+ * rather than bucketed: an account at zero Elo with no rank has not played
+ * Ranked this season, and counting it as the bottom rung would understate
+ * every rung above it.
+ */
+async function compute_getRankedLadder(): Promise<RankedRung[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const rows = await prisma.$queryRaw<
+      { rank: string; players: bigint; min_elo: number; max_elo: number }[]
+    >`
+      SELECT ranked_rank_name AS rank,
+        COUNT(*) AS players,
+        MIN(ranked_elo) AS min_elo,
+        MAX(ranked_elo) AS max_elo
+      FROM sampled_players
+      WHERE ranked_elo IS NOT NULL
+        AND ranked_rank_name IS NOT NULL
+        AND ranked_rank_name <> ''
+      GROUP BY ranked_rank_name
+      ORDER BY MIN(ranked_elo)
+    `;
+
+    const total = rows.reduce((sum, r) => sum + Number(r.players), 0);
+    if (total < MIN_RANKED_POPULATION) return [];
+
+    // Walked from the top so each rung carries "this rung or better", which is
+    // the number a reader is actually looking for.
+    let running = 0;
+    const out: RankedRung[] = [];
+    for (let i = rows.length - 1; i >= 0; i -= 1) {
+      const row = rows[i];
+      const players = Number(row.players);
+      running += players;
+      out.unshift({
+        rank: row.rank,
+        players,
+        share: players / total,
+        atOrAbove: running / total,
+        minElo: row.min_elo,
+        maxElo: row.max_elo,
+      });
+    }
+    return out;
+  } catch (error) {
+    swallow('compute_getRankedLadder', error);
+    return [];
+  }
+}
+
+/** Below this a distribution is describing the sample, not the game. */
+const MIN_RANKED_POPULATION = 500;
+
+export const getRankedLadder = cachedRead('ranked-ladder', compute_getRankedLadder);
+
+/** Where one Elo sits against every ranked player we have sampled. */
+export interface RankedEloStanding {
+  /** Share of ranked players strictly below this Elo, 0-1. */
+  percentile: number;
+  population: number;
+}
+
+/**
+ * The Ranked counterpart to `getTrophyPercentile`.
+ *
+ * Deliberately not cached per Elo: the argument is a player's own number, so a
+ * cache keyed on it would hold an entry per distinct Elo — thousands of them,
+ * each answering one account. Two counts against an indexed column is cheaper
+ * than that, and `/player` is already the route that does per-account work.
+ */
+export async function getRankedPercentile(elo: number): Promise<RankedEloStanding | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+
+  try {
+    const total = await prisma.sampledPlayer.count({
+      where: { rankedElo: { not: null }, rankedRankName: { not: null } },
+    });
+    if (total < MIN_RANKED_POPULATION) return null;
+
+    const below = await prisma.sampledPlayer.count({
+      where: { rankedElo: { not: null, lt: elo }, rankedRankName: { not: null } },
+    });
+
+    return { percentile: below / total, population: total };
+  } catch (error) {
+    swallow('getRankedPercentile', error);
+    return null;
+  }
+}
+
 /**
  * How many distinct buffies have actually been observed across the sampled
  * population, per kind.
@@ -1183,13 +1298,34 @@ async function computeBrawlerStatsForWindow(
   mode?: string,
   format: TierFormat = 'ranked',
 ): Promise<BrawlerStatRow[]> {
+  return computeBrawlerStatsIn({ gte: windowStartUtc(windowDays) }, windowDays, mode, format);
+}
+
+/**
+ * The same computation over an explicit range of days.
+ *
+ * Split out for `/patches`, which asks what a brawler's rate was in the two
+ * weeks *before* an update as well as the two weeks after — a question a
+ * trailing window cannot express. Everything else about the scoring is
+ * identical and deliberately shared: a patch page that computed win rates its
+ * own way would disagree with the tier list about the same fortnight, and the
+ * disagreement would be invisible.
+ *
+ * `lt` is exclusive, so two adjacent ranges never double-count the boundary
+ * day.
+ */
+async function computeBrawlerStatsIn(
+  days: { gte: Date; lt?: Date },
+  windowDays: number,
+  mode?: string,
+  format: TierFormat = 'ranked',
+): Promise<BrawlerStatRow[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
   try {
-    const since = windowStartUtc(windowDays);
     const scope = {
-      day: { gte: since },
+      day: days,
       battleType: battleTypeFilter(format),
       ...(mode ? { mode } : {}),
     };
@@ -1311,7 +1447,7 @@ async function computeBrawlerStatsForWindow(
       };
     });
   } catch (error) {
-    swallow('computeBrawlerStatsForWindow', error);
+    swallow('computeBrawlerStatsIn', error);
     return [];
   }
 }
@@ -3732,6 +3868,43 @@ export async function getBrawlerStatsForWindow(
   format: TierFormat = 'ranked',
 ): Promise<BrawlerStatRow[]> {
   return cachedBrawlerStatsForWindow(windowDays, mode, format);
+}
+
+/**
+ * Brawler rates over a fixed historical range, for the patch scoreboard.
+ *
+ * Keyed on the two ISO dates, which is what makes it safe to cache: a patch's
+ * window is a pair of days in the past and never moves, so an entry written
+ * once stays correct forever. That is the opposite of the trailing windows
+ * above, whose answer changes every time the sampler runs, and it is why this
+ * has its own wrapper rather than sharing theirs.
+ *
+ * Bounded by the number of updates the roll-up can still see -- four months of
+ * `battle_daily_stats` is at most a handful of monthly patches, two ranges
+ * each.
+ */
+const cachedBrawlerStatsForRange = cachedRead(
+  'brawler-stats-for-range',
+  async (startIso: string, endIso: string, format: TierFormat) =>
+    computeBrawlerStatsIn(
+      { gte: new Date(`${startIso}T00:00:00Z`), lt: new Date(`${endIso}T00:00:00Z`) },
+      Math.max(
+        1,
+        Math.round(
+          (Date.parse(`${endIso}T00:00:00Z`) - Date.parse(`${startIso}T00:00:00Z`)) / 86_400_000,
+        ),
+      ),
+      undefined,
+      format,
+    ),
+);
+
+export async function getBrawlerStatsForRange(
+  startIso: string,
+  endIso: string,
+  format: TierFormat = 'ranked',
+): Promise<BrawlerStatRow[]> {
+  return cachedBrawlerStatsForRange(startIso, endIso, format);
 }
 
 const cachedFilterableModes = unstable_cache(

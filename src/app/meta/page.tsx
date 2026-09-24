@@ -155,7 +155,19 @@ export default async function MetaReportPage() {
 
       {changes.length > 0 && notes ? (
         <section className="space-y-3">
-          <SectionHeading title="What the update changed" aside={notes.title} />
+          <SectionHeading
+            title="What the update changed"
+            aside={notes.title}
+            subtitle={
+              <>
+                The names Supercell published.{' '}
+                <Link href="/patches" className="font-medium text-brand hover:underline">
+                  Whether any of it moved
+                </Link>{' '}
+                is measured separately.
+              </>
+            }
+          />
           <ul className="card divide-y divide-border overflow-hidden">
             {changes.map((change) => (
               <li key={change.category} className="px-4 py-3">

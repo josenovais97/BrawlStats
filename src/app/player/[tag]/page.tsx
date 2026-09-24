@@ -52,6 +52,7 @@ import {
   getPlayerBrawlerPlacements,
   getReleasedBuffieCount,
   getTrophyHistory,
+  getRankedPercentile,
   getTrophyPercentile,
   recordLookup,
 } from '@/lib/stats';
@@ -178,6 +179,12 @@ export default async function PlayerPage({ params }: PageProps) {
   // connection, and each degrades to null/empty on its own.
   const placements = await getPlayerBrawlerPlacements(normalizedTag);
   const standing = await getTrophyPercentile(player.trophies);
+  // Only for an account that has actually played Ranked this season: a
+  // percentile for an unranked player would rank them against a ladder they
+  // are not on.
+  const rankedStanding = player.rankedElo
+    ? await getRankedPercentile(player.rankedElo).catch(() => null)
+    : null;
   const releasedBuffies = await getReleasedBuffieCount();
   const trophyHistory = await getTrophyHistory(normalizedTag);
   // The trophy tier list, joined against this roster below and onto every tile
@@ -314,8 +321,17 @@ export default async function PlayerPage({ params }: PageProps) {
        * profile to find them.
        */}
       <PlayerSkillScore skill={skill} />
-      <Suspense fallback={<PlayerRanked player={player} standing={standing} />}>
-        <RankedWithBoard player={player} standing={standing} tag={normalizedTag} />
+      <Suspense
+        fallback={
+          <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
+        }
+      >
+        <RankedWithBoard
+          player={player}
+          standing={standing}
+          rankedStanding={rankedStanding}
+          tag={normalizedTag}
+        />
       </Suspense>
 
       <div id="stats" className="scroll-anchor-nav space-y-8">
@@ -442,15 +458,24 @@ export default async function PlayerPage({ params }: PageProps) {
 async function RankedWithBoard({
   player,
   standing,
+  rankedStanding,
   tag,
 }: {
   player: BSPlayer;
   standing: Awaited<ReturnType<typeof getTrophyPercentile>>;
+  rankedStanding: Awaited<ReturnType<typeof getRankedPercentile>>;
   tag: string;
 }) {
   const globalRank = await getPlayerRankings('global', 200)
     .then((r) => r.items.find((p) => normalizeTag(p.tag) === tag)?.rank ?? null)
     .catch(() => null);
 
-  return <PlayerRanked player={player} globalRank={globalRank} standing={standing} />;
+  return (
+    <PlayerRanked
+      player={player}
+      globalRank={globalRank}
+      standing={standing}
+      rankedStanding={rankedStanding}
+    />
+  );
 }
