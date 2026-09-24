@@ -17,7 +17,12 @@
  * drifted back outside the scale. It never changes anything: rescaling on its
  * own would break the property the anchors exist for.
  */
-import { SCORE_ANCHORS, TIER_WINDOWS, getBrawlerStatsForWindow, scoreBrawlers } from '../src/lib/stats';
+import {
+  SCORE_ANCHORS,
+  TIER_WINDOWS,
+  blendStrength,
+  getScoredRoster,
+} from '../src/lib/stats';
 import type { TierFormat } from '../src/lib/stats';
 
 /** Share of the roster allowed to clamp at either extreme before it is a problem. */
@@ -25,6 +30,22 @@ const MAX_CLAMPED = 0.12;
 
 /** Below this many rated brawlers the percentiles are describing noise. */
 const MIN_ROSTER = 40;
+
+/**
+ * The narrowest the data may sit inside its own scale before that is a fault.
+ *
+ * The first version of this check only asked whether the distribution had
+ * grown *past* the anchors, which is half the question and turned out to be
+ * the half that did not happen. On 2026-09-24 the opposite occurred: adding
+ * the skill correction narrowed the strength spread by about two points while
+ * the anchors stayed where they were, so the scale was 15 points wide for 9
+ * points of data and the trophy list bunched into 46% C and 8% D. Nothing was
+ * outside anything. Nothing flagged.
+ *
+ * An anchor is calibrated against the number it scales, so changing what feeds
+ * it invalidates it even when the population has not moved.
+ */
+const MIN_SPREAD_SHARE = 0.6;
 
 function quantile(sorted: number[], p: number): number {
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
@@ -35,12 +56,19 @@ async function checkFormat(format: TierFormat): Promise<string[]> {
   const anchors = SCORE_ANCHORS[format];
 
   for (const key of Object.keys(TIER_WINDOWS) as (keyof typeof TIER_WINDOWS)[]) {
-    const rows = await getBrawlerStatsForWindow(TIER_WINDOWS[key].days, undefined, format);
-    const scored = scoreBrawlers(rows, format).filter((b) => b.tier !== null);
+    const scored = (await getScoredRoster(TIER_WINDOWS[key].days, undefined, format)).filter(
+      (b) => b.tier !== null,
+    );
     if (scored.length < MIN_ROSTER) continue;
 
+    // The blended strength, not the published win rate: the anchors scale what
+    // the score actually consumes, and since 2026-09-24 those are two numbers.
     const wins = scored
-      .map((b) => b.normalizedWinRate)
+      .map((b) =>
+        b.normalizedWinRate === null
+          ? null
+          : blendStrength(b.normalizedWinRate, b.skillEdge ?? null),
+      )
       .filter((w): w is number => w !== null)
       .sort((a, b) => a - b);
     const picks = scored
@@ -75,14 +103,29 @@ async function checkFormat(format: TierFormat): Promise<string[]> {
       );
     }
 
+    // Too wide is as wrong as too narrow, and looks like nothing at all.
+    const spread = quantile(wins, 0.95) - quantile(wins, 0.05);
+    const scale = anchors.winCeiling - anchors.winFloor;
+    if (spread / scale < MIN_SPREAD_SHARE) {
+      problems.push(
+        `${where}: strength spans ${pct(spread)} inside a ${pct(scale)} scale ` +
+          `(${Math.round((spread / scale) * 100)}%), so scores bunch toward the middle`,
+      );
+    }
+
     // And the symptom that is visible on the page: ties at the extremes.
-    const clamped = scored.filter(
-      (b) =>
+    const clamped = scored.filter((b) => {
+      const strength =
+        b.normalizedWinRate === null
+          ? null
+          : blendStrength(b.normalizedWinRate, b.skillEdge ?? null);
+      return (
         (b.usageRate !== null && b.usageRate >= anchors.pickCeiling) ||
         (b.usageRate !== null && b.usageRate > 0 && b.usageRate <= anchors.pickFloor) ||
-        (b.normalizedWinRate !== null && b.normalizedWinRate >= anchors.winCeiling) ||
-        (b.normalizedWinRate !== null && b.normalizedWinRate <= anchors.winFloor),
-    ).length;
+        (strength !== null && strength >= anchors.winCeiling) ||
+        (strength !== null && strength <= anchors.winFloor)
+      );
+    }).length;
     if (clamped / scored.length > MAX_CLAMPED) {
       problems.push(
         `${where}: ${clamped} of ${scored.length} brawlers (${Math.round((clamped / scored.length) * 100)}%) sit on an anchor and cannot be told apart`,

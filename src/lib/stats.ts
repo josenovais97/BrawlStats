@@ -213,9 +213,24 @@ export function normalizeWinRate(
  *   trophy  pick 0.30%-2.40% (max 5.30)   adjusted win 41.4%-57.0%
  *
  * The values below were chosen by scoring the live roster under each candidate
- * and reading the resulting distribution, not by taste. They give ranked
- * S 10% / A 10% / B 19% / C 29% / D 30% with three brawlers clamped in total,
- * and trophy S 11% / A 9% / B 20% / C 35% / D 23% with fourteen.
+ * and reading the resulting distribution, not by taste.
+ *
+ * **Re-derived a second time the same day, against the corrected strength.**
+ * The first pass was measured on the adjusted win rate; hours later that
+ * stopped being what the score uses, because `blendStrength` began averaging
+ * it with the skill-controlled estimate. Averaging with a shrunk estimate
+ * narrows the spread — ranked went from 10.9 points between the 5th and 95th
+ * percentiles to 9.0, trophy from 10.3 to 8.0 — while the anchors stayed 15.0
+ * and 18.5 wide. The scale was then far wider than the data and scores bunched
+ * toward the middle: the trophy list came out 46% C and 8% D.
+ *
+ * The lesson is narrower than "re-measure": an anchor is calibrated against
+ * *the number it scales*, so changing what feeds it invalidates it even when
+ * the population has not moved at all. Measured on the blended strength across
+ * both windows of both formats: ranked p5 45.8 / p95 54.5, trophy 45.0 / 55.1.
+ *
+ * These give ranked S 10% / A 9% / B 16% / C 29% / D 34% and trophy
+ * S 9% / A 8% / B 21% / C 28% / D 32%, each with about 5% clamped.
  *
  * `scripts/check-anchors.ts` re-measures this on every sampler run and says so
  * when the distribution drifts back outside them, because the failure mode
@@ -223,8 +238,8 @@ export function normalizeWinRate(
  * normal and is quietly wrong.
  */
 export const SCORE_ANCHORS = {
-  ranked: { pickFloor: 0.0004, pickCeiling: 0.05, winFloor: 0.43, winCeiling: 0.58 },
-  trophy: { pickFloor: 0.002, pickCeiling: 0.028, winFloor: 0.4, winCeiling: 0.585 },
+  ranked: { pickFloor: 0.0004, pickCeiling: 0.05, winFloor: 0.45, winCeiling: 0.56 },
+  trophy: { pickFloor: 0.002, pickCeiling: 0.028, winFloor: 0.44, winCeiling: 0.56 },
 } as const satisfies Record<TierFormat, {
   pickFloor: number;
   pickCeiling: number;
@@ -1565,6 +1580,13 @@ async function computeBrawlerStatsIn(
 export interface ScoredBrawler {
   brawlerId: number;
   brawlerName: string;
+  /**
+   * The mode-adjusted win rate, as published on the page.
+   *
+   * Not the number the score is built from since 2026-09-24 — that is this
+   * blended with `skillEdge`, which `blendStrength` does. The published figure
+   * stays the plain adjusted rate because it is the one with a plain meaning.
+   */
   normalizedWinRate: number | null;
   metaScore: number | null;
   tier: Tier | null;
@@ -1572,6 +1594,11 @@ export interface ScoredBrawler {
   winRate: number | null;
   baselineWinRate: number | null;
   decidedSampleSize: number;
+  /**
+   * The skill-controlled correction folded into the score, in win-rate points.
+   * Null when too few players carry the brawler to measure one.
+   */
+  skillEdge: number | null;
 }
 
 /** Applies the scoring pipeline to raw rows. Pure; no artwork, no database. */
