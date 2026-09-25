@@ -77,7 +77,11 @@ case "$ERR" in
     die "::error::TikTok refused the list: $(printf '%s' "$response" | head -c 400)" ;;
 esac
 
-read -r POST_ID URL TITLE COVER CREATED < <(
+# IFS=tab, or `read` splits on spaces: the title is a sentence, so without
+# this it takes the first WORD and every field after it shifts by one. The
+# posting job had the same fault and this reproduced it -- the tab is the
+# separator the generator emits and it has to be the separator here.
+IFS=$'\t' read -r POST_ID URL TITLE COVER CREATED < <(
   printf '%s' "$response" | python3 -c '
 import json, sys
 videos = json.load(sys.stdin).get("data", {}).get("videos", [])
