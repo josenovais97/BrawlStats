@@ -2,6 +2,8 @@
 Description=Rebuild BrawlZone so dated page titles roll over
 After=network-online.target docker.service
 Wants=network-online.target
+# Stale aggregates look exactly like a quiet day.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot

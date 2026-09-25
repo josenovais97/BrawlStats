@@ -40,6 +40,28 @@ POST_MODE="MEDIA_UPLOAD"
 
 die() { echo "$*" >&2; exit 1; }
 
+# Write a timestamp into the state file, merging rather than replacing.
+#
+# Health check 11 reads these. A timer that stops firing never fails, so
+# OnFailure cannot see it, and the daily mail is now the prompt to go and
+# publish -- which makes silence ambiguous: it means either "nothing to post"
+# or "the job is dead", and an inbox cannot tell you which. Writing down when
+# the job last ran, and separately when it last actually posted, is what lets
+# the box answer that instead of you guessing.
+record_state () { # dotted key, value
+  python3 - "$STATE" "$1" "$2" <<'PY'
+import json, sys
+path, key, value = sys.argv[1], sys.argv[2], sys.argv[3]
+state = json.load(open(path))
+section, name = key.split('.', 1)
+state.setdefault(section, {})[name] = value
+with open(path, 'w') as f:
+    json.dump(state, f, indent=2)
+PY
+}
+
+now_iso () { date -u +%Y-%m-%dT%H:%M:%S+00:00; }
+
 [ -f "$ENV_FILE" ] || die "::error::no $ENV_FILE"
 CLIENT_KEY=$(grep -oP '^TIKTOK_CLIENT_KEY=\K.*' "$ENV_FILE" | tr -d '"')
 CLIENT_SECRET=$(grep -oP '^TIKTOK_CLIENT_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
@@ -105,6 +127,11 @@ case "$MODE" in
   build) MANIFEST="${SITE}/daily/${DAY}/build/slides.json" ;;
   *)     die "::error::unknown mode '${MODE}' (expected daily or build)" ;;
 esac
+
+# Before anything that can exit, so "the job ran and decided there was nothing
+# to post" stays distinguishable from "the job never ran at all". Those two
+# look identical from the inbox and need different fixes.
+record_state "last_run.${MODE}" "$(now_iso)" || true
 
 # A carousel, not one image, and the site publishes the list rather than this
 # job guessing: the slide count varies with the day's content, and re-deriving
@@ -222,6 +249,7 @@ if [ -z "$PUBLISH_ID" ] || { [ -n "$ERR" ] && [ "$ERR" != "ok" ]; }; then
   esac
 fi
 
+record_state "last_post.${MODE}" "$(now_iso)" || true
 echo "uploaded ${DAY} as ${PUBLISH_ID}"
 
 # Status is informational: the upload is already accepted, and TikTok processes

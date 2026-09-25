@@ -1,5 +1,7 @@
 [Unit]
 Description=BrawlZone database backup
+# A backup that stopped working is only discovered when you need it.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot

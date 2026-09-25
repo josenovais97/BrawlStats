@@ -2,6 +2,9 @@
 Description=BrawlZone stats sampler
 After=docker.service
 Requires=docker.service
+# Health check 2 catches data going stale, but only after five hours.
+# This says so on the first failed run.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot

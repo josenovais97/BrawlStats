@@ -1,5 +1,9 @@
 [Unit]
 Description=BrawlZone backup restore verification
+# This is the check that a dump actually replays. Silent failure here
+# means the backups are unproven rather than broken, which is worse:
+# it looks exactly like having working backups.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot

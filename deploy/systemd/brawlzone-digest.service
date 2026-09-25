@@ -1,6 +1,9 @@
 [Unit]
 Description=BrawlZone daily status email
 After=docker.service
+# The digest is itself a daily report. Losing it loses the thing that
+# would otherwise tell you something is wrong.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot

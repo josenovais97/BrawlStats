@@ -1,5 +1,9 @@
 [Unit]
 Description=BrawlZone health check
+# The checker exits 0 deliberately so an alert does not also fire this
+# hook. So this only catches the checker CRASHING -- which is the one
+# failure nothing else on the box can see.
+OnFailure=brawlzone-alert@%n.service
 [Service]
 Type=oneshot
 User=ubuntu

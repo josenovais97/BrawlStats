@@ -1,6 +1,9 @@
 [Unit]
 Description=BrawlZone IndexNow submission
 After=docker.service
+# Search engines stop being told about new pages, and nothing on the
+# site changes to show it.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot

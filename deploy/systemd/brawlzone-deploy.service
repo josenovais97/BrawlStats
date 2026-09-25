@@ -2,6 +2,9 @@
 Description=Redeploy BrawlZone when origin/main moves
 After=network-online.target docker.service
 Wants=network-online.target
+# A failed deploy leaves the box on the previous image, serving happily,
+# with nothing to say the last few commits never shipped.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot
