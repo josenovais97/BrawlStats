@@ -225,4 +225,72 @@ status=$(curl -s --max-time 30 -X POST "$STATUS_URL" \
   -H "Authorization: Bearer ${ACCESS}" \
   -H 'Content-Type: application/json; charset=UTF-8' \
   --data-raw "{\"publish_id\":\"${PUBLISH_ID}\"}")
-echo "status: $(printf '%s' "$status" | python3 -c 'import json,sys;d=json.load(sys.stdin).get("data",{});print(d.get("status","?"), d.get("fail_reason",""))' 2>/dev/null)"
+read -r STATUS FAIL_REASON < <(
+  printf '%s' "$status" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin).get("data", {})
+except Exception:
+    d = {}
+print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
+' 2>/dev/null
+)
+echo "status: ${STATUS:-?} ${FAIL_REASON:--}"
+
+# ------------------------------------------------------------------- the mail
+#
+# MEDIA_UPLOAD only puts the carousel in the inbox; somebody still has to open
+# TikTok and publish it. Without a nudge that means remembering, every day, to
+# go and look -- and a day nobody looks is a day the post silently does not
+# happen, which is indistinguishable from the job being broken.
+#
+# Uses the same alerter as everything else on the box rather than a second mail
+# path: one msmtp config, one ALERT_TO, one place to fix. brawlzone-alert exits
+# 0 even when mail fails, deliberately, so this cannot turn a successful post
+# into a failed unit.
+#
+# No <img> of the card: mail clients block remote images by default, so an
+# email whose whole content is a blocked image says nothing. The findings go in
+# as text, which is also what makes the mail skimmable on a phone.
+HTML_LIB=/usr/local/lib/brawlzone-html.sh
+if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
+  # shellcheck disable=SC1090
+  . "$HTML_LIB"
+
+  if [ "$POST_MODE" = "DIRECT_POST" ]; then
+    subject="[brawlzone] Posted to TikTok -- ${DAY}"
+    heading="Posted to TikTok"
+    todo="Nothing to do. DIRECT_POST published it; this is a record, not a prompt."
+    accent="$OK"
+  else
+    subject="[brawlzone] TikTok carousel waiting -- ${DAY}"
+    heading="Waiting in your TikTok inbox"
+    todo="Open TikTok, tap the notification, add music if you want it, and publish."
+    accent="$ACCENT"
+  fi
+
+  {
+    html_open "$heading" "${DAY} &middot; ${slide_count} slides" "$accent"
+
+    html_section "The post"
+    html_rows_open
+    html_row "Title" "$(printf '%s' "$TITLE" | esc)"
+    html_row "Slides" "$slide_count"
+    html_row "Mode" "$POST_MODE"
+    html_row "Status" "${STATUS:-?}" "$([ "${FAIL_REASON:--}" = "-" ] && printf '%s' "$OK" || printf '%s' "$BAD")"
+    [ "${FAIL_REASON:--}" = "-" ] || html_row "Fail reason" "$(printf '%s' "$FAIL_REASON" | esc)" "$BAD"
+    html_row "Findings page" "<a href=\"${SITE}/daily/${DAY}\" style=\"color:${ACCENT};\">/daily/${DAY}</a>"
+    html_rows_close
+
+    html_section "Caption"
+    printf '%s\n' "$DESCRIPTION" | html_pre
+
+    html_section "What to do"
+    printf '%s\n' "$todo" | html_pre
+
+    html_close "brawlzone-web &middot; sent by brawlzone-tiktok after a successful upload.<br>Publish id ${PUBLISH_ID}"
+  } | /usr/local/bin/brawlzone-alert --html "$subject"
+  echo "notified"
+else
+  echo "::warning::no brawlzone-alert on this host; skipping the email"
+fi
