@@ -1,6 +1,11 @@
 [Unit]
 Description=BrawlZone daily TikTok draft
 After=docker.service
+# Without this a failed run is silent. On 2026-09-25 the 09:10 run died on a
+# 404 and nothing said so -- which, for a job whose whole output is "there is
+# something waiting for you to publish", is the worst way to fail: no post and
+# no notice that there was no post.
+OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot
