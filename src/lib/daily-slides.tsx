@@ -1,3 +1,6 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import type { ReactElement } from 'react';
 import sharp from 'sharp';
 
@@ -181,6 +184,45 @@ async function loadArt(brawlerId: number, box: number): Promise<string | null> {
     }
   }
   return null;
+}
+
+/**
+ * What the site offers, for the closing slide.
+ *
+ * Every line is a page that exists. A carousel that advertises a feature the
+ * site does not have is worse than one that advertises nothing, and this is
+ * exactly the list that rots quietly — `site-footer` carries the same rule and
+ * the same reason.
+ */
+const OFFERS = [
+  'Tier lists for every mode',
+  'Best builds, gadgets and gears',
+  'Map-by-map ranked picks',
+  'A draft helper, pick by pick',
+  'Team comps with real sample floors',
+  'Player, club and leaderboard stats',
+];
+
+/**
+ * The app icon as a data URI, read off disk rather than fetched.
+ *
+ * `public/` is copied next to `server.js` in the standalone output, so
+ * `process.cwd()` resolves in both `next dev` and the container. Fetching it
+ * from SITE_URL would work too and would be a pointless round trip through
+ * Caddy to reach a file already on the same disk. Failure is not fatal: the
+ * wordmark carries the brand on its own.
+ */
+async function loadLogo(box: number): Promise<string | null> {
+  try {
+    const raw = await readFile(join(process.cwd(), 'public', 'brand', 'app-icon-1024.png'));
+    const png = await sharp(raw)
+      .resize({ width: box, height: box, fit: 'inside', withoutEnlargement: true })
+      .png()
+      .toBuffer();
+    return `data:image/png;base64,${png.toString('base64')}`;
+  } catch {
+    return null;
+  }
 }
 
 /** The full-bleed wash every slide sits on. Linear: Satori has no radial. */
@@ -380,8 +422,84 @@ function method(): ReactElement {
         ))}
       </div>
 
-      <div style={{ display: 'flex', marginTop: 72 }}>
-        <Wordmark />
+      {/* No wordmark here: the slide immediately after this one is nothing but
+          the wordmark, and repeating it two frames apart reads as a loop. */}
+      <div style={{ display: 'flex', fontSize: 34, color: DIM, marginTop: 64 }}>
+        That is where every number you just read comes from.
+      </div>
+    </Frame>
+  );
+}
+
+/**
+ * The closing slide: what else is on the site.
+ *
+ * The method slide before it answers "should I believe this"; this one answers
+ * "where do I get more of it". Nothing here is tappable — `post_info` has no
+ * link field and a slide is a picture — so the domain is set large enough to
+ * be read and remembered off a phone screen, which is the only mechanism
+ * available.
+ */
+function outro(logo: string | null): ReactElement {
+  return (
+    <Frame>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        {logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logo} width={104} height={104} alt="" style={{ borderRadius: 24 }} />
+        ) : (
+          <div style={{ display: 'flex' }} />
+        )}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
+            THERE IS A LOT MORE
+          </div>
+          <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginTop: 6 }}>
+            Find this and more on
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', fontSize: 116, fontWeight: 800, color: BRAND, marginTop: 10 }}>
+        BrawlZone
+      </div>
+
+      {/* A panel rather than loose lines: it groups the offer as one block and
+          keeps it from reading as a continuation of the headline. */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 22,
+          marginTop: 40,
+          padding: '38px 34px',
+          borderRadius: 28,
+          background: 'rgba(255,255,255,0.05)',
+        }}
+      >
+        {OFFERS.map((line, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div
+              style={{
+                display: 'flex',
+                width: 14,
+                height: 14,
+                borderRadius: 7,
+                background: ACCENT,
+              }}
+            />
+            <div style={{ display: 'flex', fontSize: 36, color: FG }}>{line}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 44 }}>
+        <div style={{ display: 'flex', fontSize: 68, fontWeight: 800, color: BRAND }}>
+          brawlzone.net
+        </div>
+        <div style={{ display: 'flex', fontSize: 30, color: DIM }}>
+          Free. No login. Updated every 2 hours.
+        </div>
       </div>
     </Frame>
   );
@@ -422,24 +540,36 @@ export async function dailySlides(
   const findings = (report?.discoveries ?? []).slice(0, MAX_FINDINGS);
   const needed = artNeededBy(only, findings.length);
 
-  const art = await Promise.all(
-    findings.map((d, i) =>
-      needed.has(i)
-        ? Promise.all(d.brawlerIds.slice(0, 2).map((id) => loadArt(id, 700)))
-        : Promise.resolve<(string | null)[]>([]),
+  // The logo is only drawn on the last slide, so it is only read when that
+  // slide is the one being rendered.
+  const wantsLogo = only === undefined || only === findings.length + 2;
+
+  const [art, logo] = await Promise.all([
+    Promise.all(
+      findings.map((d, i) =>
+        needed.has(i)
+          ? Promise.all(d.brawlerIds.slice(0, 2).map((id) => loadArt(id, 700)))
+          : Promise.resolve<(string | null)[]>([]),
+      ),
     ),
-  );
+    wantsLogo ? loadLogo(208) : Promise.resolve(null),
+  ]);
 
   return [
     cover(date, findings, art[0]?.[0] ?? null),
     ...findings.map((d, i) => finding(d, i, findings.length, art[i] ?? [])),
     method(),
+    outro(logo),
   ];
 }
 
-/** How many slides a day has, without loading any artwork to find out. */
+/**
+ * How many slides a day has, without loading any artwork to find out.
+ *
+ * Findings, plus the cover, the method slide and the closing slide.
+ */
 export function slideCount(report: StoredDailyReport | null): number {
-  return Math.min(report?.discoveries.length ?? 0, MAX_FINDINGS) + 2;
+  return Math.min(report?.discoveries.length ?? 0, MAX_FINDINGS) + 3;
 }
 
 /** PNG from Satori to JPEG, which is the only thing TikTok accepts. */

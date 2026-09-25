@@ -9,6 +9,7 @@ made an idle-reclaimed instance an unrecoverable one.
 | `bin/` | scripts installed to `/usr/local/bin` and `~` |
 | `systemd/` | the four timers and the alert template unit |
 | `etc/` | logrotate, fail2ban, sshd drop-in |
+| `TIKTOK-DIRECT-POST.md` | what to change if the TikTok audit passes. Not yet done. |
 
 ## Changing any of this
 
