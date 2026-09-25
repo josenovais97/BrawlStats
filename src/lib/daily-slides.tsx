@@ -43,8 +43,21 @@ const BRAND = '#ffc53d';
  */
 const PAD = '150px 230px 400px 92px';
 
-/** At most three. A fourth finding is a fourth slide nobody swipes to. */
-export const MAX_FINDINGS = 3;
+/**
+ * Every finding the day produced, not the first three.
+ *
+ * The single card took three because a fourth cost every other one its type
+ * size. A carousel has no such trade -- each finding has its own frame -- and
+ * keeping the cap was actively harmful, because `buildDiscoveries` pushes in a
+ * fixed KIND order rather than by strength: secret-pick, meta-trap,
+ * giant-killer, secret-duo, map-surprise, overnight-rise. Slicing to three did
+ * not take the three best findings, it discarded the last three kinds every
+ * single day, whatever they said.
+ *
+ * Six is the number of kinds that exist, so this is a ceiling rather than a
+ * cut. TikTok allows 35 images.
+ */
+export const MAX_FINDINGS = 6;
 
 /** The claim, in the fewest words that still say what was found. */
 const HEADLINE: Record<string, (names: string[], context?: string) => string> = {
