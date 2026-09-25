@@ -1,0 +1,17 @@
+[Unit]
+Description=Send the day's findings card to TikTok, daily at 09:10 UTC
+
+[Timer]
+# After the 08:00 digest, so the card for today has been rendered and the
+# night's sampling is in it. Late enough that a failure is in the log before
+# anybody looks, early enough to be a morning post in Europe.
+#
+# Deliberately not retried on failure. TikTok allows five pending uploads in
+# any 24 hours and a retry loop would spend that allowance on a bad day, then
+# have none left on a good one.
+OnCalendar=*-*-* 09:10:00
+Persistent=false
+Unit=brawlzone-tiktok.service
+
+[Install]
+WantedBy=timers.target

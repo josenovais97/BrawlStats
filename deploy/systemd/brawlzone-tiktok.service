@@ -1,0 +1,8 @@
+[Unit]
+Description=BrawlZone daily TikTok draft
+After=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-run tiktok /usr/local/bin/brawlzone-tiktok

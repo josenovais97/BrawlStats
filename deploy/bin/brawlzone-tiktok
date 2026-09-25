@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# Send the day's findings card to TikTok as a draft.
+#
+# The site renders the card at /daily/<date>/card.png and this pushes it to the
+# account's inbox with post_mode=MEDIA_UPLOAD. TikTok then notifies the phone;
+# the account holder opens it, adds music and a caption in TikTok's own editor,
+# and decides whether to publish. Nothing here posts publicly.
+#
+# DIRECT_POST is the eventual goal and is one constant away — but an unaudited
+# client has its posts forced to private whatever it asks for, so automating it
+# before the audit passes would automate invisible posts. See POST_MODE below.
+#
+# WHY THIS RUNS ON THE BOX and not in the app: TikTok rotates the refresh token
+# on every use, so whatever holds it has to write the new one back. The app
+# container is rebuilt on every deploy and its filesystem goes with it. The
+# state file here is outside the repo for the same reason.
+set -uo pipefail
+
+STATE="${HOME}/.brawlzone-tiktok.json"
+ENV_FILE="/home/ubuntu/brawlstats/.env.production"
+SITE="https://brawlzone.net"
+TOKEN_URL="https://open.tiktokapis.com/v2/oauth/token/"
+INIT_URL="https://open.tiktokapis.com/v2/post/publish/content/init/"
+STATUS_URL="https://open.tiktokapis.com/v2/post/publish/status/fetch/"
+
+# MEDIA_UPLOAD until the audit passes; DIRECT_POST after. Nothing else in this
+# script changes when it flips — the request body already carries a title and a
+# description, which both modes accept.
+POST_MODE="MEDIA_UPLOAD"
+
+die() { echo "$*" >&2; exit 1; }
+
+[ -f "$ENV_FILE" ] || die "::error::no $ENV_FILE"
+CLIENT_KEY=$(grep -oP '^TIKTOK_CLIENT_KEY=\K.*' "$ENV_FILE" | tr -d '"')
+CLIENT_SECRET=$(grep -oP '^TIKTOK_CLIENT_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
+[ -n "${CLIENT_KEY:-}" ] || die "::error::TIKTOK_CLIENT_KEY missing from $ENV_FILE"
+[ -n "${CLIENT_SECRET:-}" ] || die "::error::TIKTOK_CLIENT_SECRET missing from $ENV_FILE"
+
+[ -f "$STATE" ] || die "::error::no $STATE — authorise once at ${SITE}/api/tiktok/auth?key=\$CRON_SECRET"
+REFRESH=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("refresh_token",""))' "$STATE")
+[ -n "$REFRESH" ] || die "::error::$STATE has no refresh_token"
+
+# ----------------------------------------------------------------- the token
+#
+# Access tokens last 24 hours, so one is fetched per run rather than stored.
+# The refresh token that comes back REPLACES the one used, and is written
+# before anything else happens: a post that fails is a day missed, but a
+# rotated token that was never saved locks the integration out until somebody
+# authorises by hand.
+token_json=$(curl -s --max-time 30 -X POST "$TOKEN_URL" \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode "client_key=${CLIENT_KEY}" \
+  --data-urlencode "client_secret=${CLIENT_SECRET}" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=${REFRESH}")
+
+ACCESS=$(printf '%s' "$token_json" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("access_token",""))' 2>/dev/null)
+if [ -z "$ACCESS" ]; then
+  die "::error::token refresh failed: $(printf '%s' "$token_json" | head -c 300)"
+fi
+
+printf '%s' "$token_json" | python3 - "$STATE" <<'PY'
+import json, sys, datetime
+state_path = sys.argv[1]
+fresh = json.load(sys.stdin)
+state = json.load(open(state_path))
+# Only overwrite when a new one actually came back. TikTok returns the same
+# token when it is not due for rotation, and an empty field must never clear
+# the one that works.
+if fresh.get('refresh_token'):
+    state['refresh_token'] = fresh['refresh_token']
+if fresh.get('open_id'):
+    state['open_id'] = fresh['open_id']
+state['refreshed_at'] = datetime.datetime.now(datetime.UTC).isoformat()
+with open(state_path, 'w') as f:
+    json.dump(state, f, indent=2)
+PY
+echo "token refreshed"
+
+# ---------------------------------------------------------------- the post
+DAY="${1:-$(date -u +%Y-%m-%d)}"
+CARD="${SITE}/daily/${DAY}/card.png"
+
+# The card must be fetchable before TikTok is asked to fetch it: a 404 here
+# returns a generic error from their side that says nothing about why.
+code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 60 "$CARD")
+[ "$code" = "200" ] || die "::error::card not available at $CARD (HTTP $code)"
+
+# Caption from the day's own findings, read from the public feed rather than
+# the database: the feed is a stable contract, and this script has no reason
+# to know how the site stores anything.
+#
+# The numbers go in the caption as well as on the image because TikTok indexes
+# caption text and does not read pictures — "Nita 54.8% win rate" is findable,
+# a screenshot of it is not.
+read -r TITLE DESCRIPTION < <(
+  curl -s --max-time 30 "${SITE}/daily/feed.xml" | python3 - "$DAY" "$SITE" <<'PY'
+import re, sys, html
+day, site = sys.argv[1], sys.argv[2]
+feed = sys.stdin.read()
+item = ''
+for block in feed.split('<item>')[1:]:
+    if f'/daily/{day}' in block:
+        item = block
+        break
+findings = []
+if item:
+    body = re.search(r'<!\[CDATA\[(.*?)\]\]>', item, re.S)
+    if body:
+        findings = [html.unescape(re.sub(r'<[^>]+>', '', li)).strip()
+                    for li in re.findall(r'<li>(.*?)</li>', body.group(1), re.S)]
+
+title = findings[0] if findings else 'What the Brawl Stars data says today'
+tags = '#brawlstars #brawlstarsmeta #brawlstarstierlist #brawlstarstips'
+lines = [f'{f}' for f in findings[:3]]
+desc = ' | '.join(lines) if lines else 'Measured from sampled Brawl Stars battles.'
+desc = f'{desc} — full findings at {site}/daily {tags}'
+# One line, tab-separated, because the caller reads it with `read -r a b`.
+print(title[:90].replace('\t', ' ') + '\t' + desc[:3900].replace('\t', ' '))
+PY
+)
+
+payload=$(python3 - "$TITLE" "$DESCRIPTION" "$CARD" "$POST_MODE" <<'PY'
+import json, sys
+title, description, card, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+body = {
+    'post_info': {'title': title, 'description': description},
+    'source_info': {
+        'source': 'PULL_FROM_URL',
+        'photo_cover_index': 0,
+        'photo_images': [card],
+    },
+    'post_mode': mode,
+    'media_type': 'PHOTO',
+}
+print(json.dumps(body))
+PY
+)
+
+response=$(curl -s --max-time 60 -X POST "$INIT_URL" \
+  -H "Authorization: Bearer ${ACCESS}" \
+  -H 'Content-Type: application/json; charset=UTF-8' \
+  --data-raw "$payload")
+
+PUBLISH_ID=$(printf '%s' "$response" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("data",{}).get("publish_id",""))' 2>/dev/null)
+ERR=$(printf '%s' "$response" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("error",{}).get("code",""))' 2>/dev/null)
+
+if [ -z "$PUBLISH_ID" ] || { [ -n "$ERR" ] && [ "$ERR" != "ok" ]; }; then
+  # Named rather than generic, because these three are the ones that will
+  # actually happen and each has a different fix.
+  case "$ERR" in
+    url_ownership_unverified)
+      die "::error::TikTok refuses the card URL: brawlzone.net is not verified for this app any more." ;;
+    spam_risk_too_many_pending_share)
+      echo "::warning::TikTok has 5 uploads already waiting in the inbox; skipping today rather than stacking another."
+      exit 0 ;;
+    unaudited_client_can_only_post_to_private_accounts)
+      die "::error::POST_MODE is DIRECT_POST but the app is not audited. Set it back to MEDIA_UPLOAD." ;;
+    *)
+      die "::error::TikTok refused the upload: $(printf '%s' "$response" | head -c 400)" ;;
+  esac
+fi
+
+echo "uploaded ${DAY} as ${PUBLISH_ID}"
+
+# Status is informational: the upload is already accepted, and TikTok processes
+# it asynchronously. Worth printing so a failure that happens after acceptance
+# is visible in the log rather than silent.
+sleep 5
+status=$(curl -s --max-time 30 -X POST "$STATUS_URL" \
+  -H "Authorization: Bearer ${ACCESS}" \
+  -H 'Content-Type: application/json; charset=UTF-8' \
+  --data-raw "{\"publish_id\":\"${PUBLISH_ID}\"}")
+echo "status: $(printf '%s' "$status" | python3 -c 'import json,sys;d=json.load(sys.stdin).get("data",{});print(d.get("status","?"), d.get("fail_reason",""))' 2>/dev/null)"
