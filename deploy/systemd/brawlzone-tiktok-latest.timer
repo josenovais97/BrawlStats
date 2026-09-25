@@ -1,16 +1,24 @@
 [Unit]
-Description=Refresh the newest TikTok post, four times a day
+Description=Refresh the newest TikTok post for the homepage card
 
 [Timer]
-# Clear of both posting timers (09:10 and 17:10) by at least half an hour.
-# All three refresh the same TikTok token and TikTok rotates it on use, so two
-# of them overlapping would have one save a token the other had already
-# invalidated -- a lockout that needs a human with a browser to undo.
+# Every two hours, at :35.
 #
-# Four times a day rather than hourly: the account gets two posts a day, and
-# the homepage card carries a 10-minute ISR window on top of this, so a
-# tighter schedule would spend requests to show the same row.
-OnCalendar=*-*-* 02,10,14,22:05:00
+# It was four times a day, on the assumption that only the box posts and so
+# the row could only change twice. That was wrong: posts made by hand are the
+# common case, and the gap between the 14:05 and 22:05 runs left the homepage
+# showing a stale "latest" post for eight hours on 2026-09-25.
+#
+# :35 rather than :05 keeps it clear of the two posting timers at :10. All
+# three refresh the same TikTok token and TikTok rotates it on use, so two
+# overlapping runs would have one save a token the other had already
+# invalidated -- a lockout only a human with a browser can undo. A cold card
+# render can push a posting run to several minutes, so the separation is 25
+# minutes rather than 5.
+#
+# The homepage carries a 10-minute ISR window on top of this, so the worst
+# case a reader sees is a post about two hours old.
+OnCalendar=*-*-* 01/2:35:00
 Persistent=false
 Unit=brawlzone-tiktok-latest.service
 
