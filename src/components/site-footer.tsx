@@ -1,9 +1,10 @@
-import { Coffee, ExternalLink, Mail, MessagesSquare, PlayCircle } from 'lucide-react';
+import { Coffee, ExternalLink, Mail, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
 import { AppStoreBadge, GooglePlayBadge } from '@/components/store-badges';
 import { CONTACT_EMAIL, SITE_NAME } from '@/lib/site';
+import { TIKTOK_PROFILE_URL } from '@/lib/tiktok-latest';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/brawl-stars/id1229016807';
 const GOOGLE_PLAY_URL =
@@ -33,6 +34,8 @@ const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
  * expiry and no use limit, put the code below, and the alert stops on its own.
  */
 const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
+
+
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
 
 /**
@@ -173,6 +176,18 @@ export function SiteFooter() {
                     mark rather than YouTube's own, for the same reason. */}
                 <PlayCircle aria-hidden className="size-4" />
                 YouTube
+              </a>
+              <a
+                href={TIKTOK_PROFILE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+              >
+                {/* A generic music note rather than TikTok's own mark, for the
+                    same reason as Discord and YouTube above: the logo is a
+                    trademark, licensed only for unmodified use. */}
+                <Music2 aria-hidden className="size-4" />
+                TikTok
               </a>
               <a
                 href={BUY_ME_A_COFFEE_URL}

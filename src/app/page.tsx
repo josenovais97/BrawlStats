@@ -5,7 +5,7 @@ import { FavoritesList } from '@/components/favorites-list';
 import { HomeCoverage } from '@/components/home/home-coverage';
 import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
-import { HomeLatestVideo } from '@/components/home/home-latest-video';
+import { HomeLatestPost } from '@/components/home/home-latest-post';
 import { HomeRadarSection } from '@/components/home/home-radar-section';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeAccountPreview } from '@/components/home/home-account-preview';
@@ -227,10 +227,10 @@ export default function HomePage() {
       </Suspense>
 
       {/* Under the snapshot on purpose: someone who has just read the numbers
-          is the one person on the page who might want them talked through.
-          Renders nothing while the channel has no videos. */}
+          is the one person on the page who might want to follow them daily.
+          Renders nothing until the box has written a post. */}
       <Suspense fallback={null}>
-        <HomeLatestVideo />
+        <HomeLatestPost />
       </Suspense>
 
       <HomeCta />

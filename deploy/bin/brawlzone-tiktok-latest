@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# Write the newest TikTok post into the database, for the homepage card.
+#
+# WHY THIS RUNS ON THE BOX: reading the account's own posts needs an access
+# token, which is minted from a refresh token that TikTok rotates on every use.
+# Whatever holds it has to write the new one back, and the app container is
+# rebuilt on every deploy. So the box fetches and the site reads.
+#
+# WHY IT SHARES A STATE FILE WITH THE POSTING JOB AND NOT A SCHEDULE: this and
+# `brawlzone-tiktok` both refresh the same token. Two of them overlapping would
+# have one save a token the other already invalidated, which locks the
+# integration out until somebody authorises by hand. All three timers are
+# scheduled clear of each other for that reason.
+set -uo pipefail
+
+STATE="${HOME}/.brawlzone-tiktok.json"
+ENV_FILE="/home/ubuntu/brawlstats/.env.production"
+COMPOSE_DIR="/home/ubuntu/brawlstats"
+TOKEN_URL="https://open.tiktokapis.com/v2/oauth/token/"
+LIST_URL="https://open.tiktokapis.com/v2/video/list/"
+
+die() { echo "$*" >&2; exit 1; }
+
+[ -f "$ENV_FILE" ] || die "::error::no $ENV_FILE"
+CLIENT_KEY=$(grep -oP '^TIKTOK_CLIENT_KEY=\K.*' "$ENV_FILE" | tr -d '"')
+CLIENT_SECRET=$(grep -oP '^TIKTOK_CLIENT_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
+[ -n "${CLIENT_KEY:-}" ] || die "::error::TIKTOK_CLIENT_KEY missing from $ENV_FILE"
+
+[ -f "$STATE" ] || die "::error::no $STATE — authorise once first"
+REFRESH=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("refresh_token",""))' "$STATE")
+[ -n "$REFRESH" ] || die "::error::$STATE has no refresh_token"
+
+# ----------------------------------------------------------------- the token
+token_json=$(curl -s --max-time 30 -X POST "$TOKEN_URL" \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode "client_key=${CLIENT_KEY}" \
+  --data-urlencode "client_secret=${CLIENT_SECRET}" \
+  --data-urlencode "grant_type=refresh_token" \
+  --data-urlencode "refresh_token=${REFRESH}")
+
+ACCESS=$(printf '%s' "$token_json" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("access_token",""))' 2>/dev/null)
+[ -n "$ACCESS" ] || die "::error::token refresh failed: $(printf '%s' "$token_json" | head -c 300)"
+
+# Saved before anything else, and a failure to save aborts: a rotated token
+# that was never written down is a lockout. Same shape as the posting job,
+# including the argv-not-stdin detail -- `python3 -` reads its program from
+# stdin, so a heredoc and a pipe cannot both feed it.
+python3 - "$STATE" "$token_json" <<'PY'
+import json, sys, datetime
+state_path = sys.argv[1]
+fresh = json.loads(sys.argv[2])
+state = json.load(open(state_path))
+if fresh.get('refresh_token'):
+    state['refresh_token'] = fresh['refresh_token']
+state['refreshed_at'] = datetime.datetime.now(datetime.UTC).isoformat()
+with open(state_path, 'w') as f:
+    json.dump(state, f, indent=2)
+PY
+saved=$?
+[ "$saved" -eq 0 ] || die "::error::could not save the rotated refresh token to $STATE"
+
+# ------------------------------------------------------------------ the post
+#
+# `max_count=1` because only the newest is wanted. The field list is explicit
+# and required: TikTok returns nothing useful without it.
+response=$(curl -s --max-time 60 -X POST "$LIST_URL?fields=id,title,video_description,share_url,cover_image_url,create_time" \
+  -H "Authorization: Bearer ${ACCESS}" \
+  -H 'Content-Type: application/json; charset=UTF-8' \
+  --data-raw '{"max_count":1}')
+
+ERR=$(printf '%s' "$response" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("error",{}).get("code",""))' 2>/dev/null)
+case "$ERR" in
+  ok|'') : ;;
+  scope_not_authorized)
+    die "::error::video.list is not granted. Add the scope in the TikTok portal, then re-authorise once." ;;
+  *)
+    die "::error::TikTok refused the list: $(printf '%s' "$response" | head -c 400)" ;;
+esac
+
+read -r POST_ID URL TITLE COVER CREATED < <(
+  printf '%s' "$response" | python3 -c '
+import json, sys
+videos = json.load(sys.stdin).get("data", {}).get("videos", [])
+if not videos:
+    sys.exit(2)
+v = videos[0]
+# A photo post carries its text in video_description; title is often empty.
+title = (v.get("title") or v.get("video_description") or "").replace("\t", " ").strip()
+print("\t".join([
+    str(v.get("id", "")),
+    v.get("share_url", "") or "",
+    title[:300] or "-",
+    v.get("cover_image_url", "") or "-",
+    str(v.get("create_time", "") or ""),
+]))
+' 2>/dev/null
+) || true
+
+if [ -z "${POST_ID:-}" ]; then
+  # An account with no posts yet is not an error. The card renders nothing.
+  echo "no posts returned; leaving the row as it is"
+  exit 0
+fi
+
+# ------------------------------------------------------------------ the row
+#
+# Written with psql inside the db container rather than through Prisma: this is
+# one upsert of one row from a bash job, and pulling the app's toolchain onto
+# the box to do it would be the larger moving part.
+cd "$COMPOSE_DIR" || die "::error::no $COMPOSE_DIR"
+POST_ID="$POST_ID" URL="$URL" TITLE="$TITLE" COVER="$COVER" CREATED="$CREATED" \
+python3 - > /tmp/brawlzone-tiktok-latest.sql <<'PY'
+import os
+def q(v):
+    return "NULL" if v in (None, "", "-") else "'" + v.replace("'", "''") + "'"
+created = os.environ.get("CREATED", "")
+posted = f"to_timestamp({int(created)})" if created.isdigit() and created != "0" else "NULL"
+print(f"""INSERT INTO tiktok_latest_post (id, post_id, url, title, cover_url, posted_at, refreshed_at)
+VALUES (1, {q(os.environ['POST_ID'])}, {q(os.environ['URL'])}, {q(os.environ['TITLE'])},
+        {q(os.environ['COVER'])}, {posted}, now())
+ON CONFLICT (id) DO UPDATE SET
+  post_id = EXCLUDED.post_id, url = EXCLUDED.url, title = EXCLUDED.title,
+  cover_url = EXCLUDED.cover_url, posted_at = EXCLUDED.posted_at,
+  refreshed_at = now();""")
+PY
+
+docker compose exec -T db psql -U brawlzone -d brawlzone -v ON_ERROR_STOP=1 \
+  -f - < /tmp/brawlzone-tiktok-latest.sql >/dev/null \
+  || die "::error::could not write the row"
+rm -f /tmp/brawlzone-tiktok-latest.sql
+
+echo "latest post ${POST_ID} -> ${URL}"

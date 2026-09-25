@@ -558,3 +558,28 @@ model DailyReport {
 
   @@map("daily_reports")
 }
+
+/// The newest post on the site's own TikTok, refreshed by the box.
+///
+/// One row, always id 1. It lives in the database rather than in a file
+/// because the thing that fetches it and the thing that renders it are
+/// different machines-in-effect: the refresh token rotates on every use so the
+/// fetcher has to be the box, and the app container is rebuilt on every deploy
+/// so it cannot hold state of its own. The database is the one place both can
+/// reach that survives a rebuild.
+///
+/// Nothing here is recomputable and nothing else depends on it, so a missing
+/// row is a card that does not render rather than an error.
+model TikTokLatestPost {
+  id          Int      @id @default(1)
+  postId      String   @map("post_id")
+  /// Public URL of the post, from TikTok's `share_url`.
+  url         String
+  title       String?
+  coverUrl    String?  @map("cover_url")
+  /// When TikTok says it was created, not when we noticed.
+  postedAt    DateTime? @map("posted_at")
+  refreshedAt DateTime @updatedAt @map("refreshed_at")
+
+  @@map("tiktok_latest_post")
+}

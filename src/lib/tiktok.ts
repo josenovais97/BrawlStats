@@ -26,7 +26,14 @@ export const TIKTOK_REDIRECT_URI = 'https://brawlzone.net/api/tiktok/callback';
  * purpose — it is only useful after TikTok's audit, and an unused scope in a
  * review submission delays the review.
  */
-export const TIKTOK_SCOPES = 'user.info.basic,video.upload';
+/**
+ * `video.list` is what lets the site show its own newest post. It is a read of
+ * our own account and nothing else, but it is a separate scope and has to be
+ * enabled in the TikTok portal before a re-authorisation will grant it --
+ * asking for a scope the app is not configured for fails the whole consent
+ * screen rather than dropping that one scope.
+ */
+export const TIKTOK_SCOPES = 'user.info.basic,video.upload,video.list';
 
 /**
  * Guards the two OAuth routes.

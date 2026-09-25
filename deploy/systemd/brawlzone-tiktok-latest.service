@@ -1,0 +1,9 @@
+[Unit]
+Description=BrawlZone: refresh the newest TikTok post for the homepage card
+After=docker.service
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-run tiktok-latest /usr/local/bin/brawlzone-tiktok-latest
