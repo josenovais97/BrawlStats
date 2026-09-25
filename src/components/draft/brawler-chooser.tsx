@@ -33,6 +33,15 @@ export interface ChooserBrawler {
  * the handful of brawlers that are actually good on the map in front of you,
  * and those are already computed for the results below.
  */
+/*
+ * Every Link here carries `scroll={false}`.
+ *
+ * The draft keeps its state in the path rather than the query string, so
+ * picking a brawler is a navigation -- and Next scrolls to the top on every
+ * navigation. Without this, each pick threw the reader from the brawler grid
+ * back to the top of the page, which is the one place they were not looking.
+ * Links that genuinely leave the draft keep the default.
+ */
 export function BrawlerChooser({
   options,
   taken,
@@ -140,6 +149,7 @@ export function BrawlerChooser({
                   href={hrefs[brawler.id]}
                   rel="nofollow"
                   prefetch={false}
+                  scroll={false}
                   className="flex items-center gap-1.5 rounded-full border border-border bg-surface-2/60 py-1 pl-1 pr-2.5 text-xs font-semibold capitalize transition-colors hover:border-brand/50"
                 >
                   <Image
@@ -171,6 +181,7 @@ export function BrawlerChooser({
               href={hrefs[brawler.id]}
               rel="nofollow"
               prefetch={false}
+              scroll={false}
               className="flex flex-col items-center gap-1 rounded-lg p-1 transition-colors hover:bg-surface-2 sm:p-1.5"
             >
               <Image

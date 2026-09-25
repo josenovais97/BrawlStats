@@ -282,9 +282,13 @@ export default async function DraftPage({ params }: PageProps) {
                   return (
                     <Link
                       key={id}
+                      /* scroll={false} throughout this step: removing a pick
+                         is a navigation, and without it the reader is thrown
+                         to the top of the page every time they undo one. */
                       href={hrefFor({ ban: bans.filter((other) => other !== id) })}
                       rel="nofollow"
                       prefetch={false}
+                      scroll={false}
                       title={`Un-ban ${meta?.name ?? id}`}
                       className="group flex items-center gap-2 rounded-xl border border-border bg-surface-2 px-2.5 py-2 text-sm font-semibold capitalize text-muted"
                     >
@@ -318,6 +322,7 @@ export default async function DraftPage({ params }: PageProps) {
                     href={hrefFor({ ban: [] })}
                     rel="nofollow"
                     prefetch={false}
+                    scroll={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
                   >
                     Clear
@@ -366,6 +371,7 @@ export default async function DraftPage({ params }: PageProps) {
                       })}
                       rel="nofollow"
                       prefetch={false}
+                      scroll={false}
                       title={`Remove ${meta?.name ?? id}`}
                       className="group flex items-center gap-2 rounded-xl border border-defeat/40 bg-defeat/10 px-2.5 py-2 text-sm font-semibold capitalize"
                     >
@@ -398,6 +404,7 @@ export default async function DraftPage({ params }: PageProps) {
                     href={hrefFor({ enemy: [] })}
                     rel="nofollow"
                     prefetch={false}
+                    scroll={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
                   >
                     Clear
@@ -443,6 +450,7 @@ export default async function DraftPage({ params }: PageProps) {
                       })}
                       rel="nofollow"
                       prefetch={false}
+                      scroll={false}
                       title={`Remove ${meta?.name ?? id}`}
                       className="group flex items-center gap-2 rounded-xl border border-victory/40 bg-victory/10 px-2.5 py-2 text-sm font-semibold capitalize"
                     >
@@ -475,6 +483,7 @@ export default async function DraftPage({ params }: PageProps) {
                     href={hrefFor({ ally: [] })}
                     rel="nofollow"
                     prefetch={false}
+                    scroll={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
                   >
                     Clear
