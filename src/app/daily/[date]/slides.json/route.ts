@@ -1,5 +1,5 @@
 import { SITE_URL } from '@/lib/site';
-import { slideCount } from '@/lib/daily-slides';
+import { dailyCaption, slideCount } from '@/lib/daily-slides';
 import { getDailyReport } from '@/lib/stats';
 
 /**
@@ -30,6 +30,7 @@ export async function GET(
   const { date } = await params;
   const report = await getDailyReport(date).catch(() => null);
   const count = slideCount(report);
+  const caption = dailyCaption(report, SITE_URL);
 
   const slides = Array.from(
     { length: count },
@@ -37,7 +38,14 @@ export async function GET(
   );
 
   return Response.json(
-    { date, findings: report?.discoveries.length ?? 0, count, slides },
+    {
+      date,
+      findings: report?.discoveries.length ?? 0,
+      title: caption.title,
+      description: caption.description,
+      count,
+      slides,
+    },
     {
       headers: {
         'cache-control': 'public, max-age=0, s-maxage=86400, stale-while-revalidate=86400',

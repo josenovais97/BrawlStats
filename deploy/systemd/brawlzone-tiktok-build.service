@@ -1,0 +1,12 @@
+[Unit]
+Description=BrawlZone daily brawler-build carousel to TikTok
+After=docker.service
+# Same reasoning as the findings unit: a failed run that says nothing is worse
+# than no run, because "no post today" and "the job is broken" look identical
+# from the inbox.
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/local/bin/brawlzone-run tiktok-build /usr/local/bin/brawlzone-tiktok build

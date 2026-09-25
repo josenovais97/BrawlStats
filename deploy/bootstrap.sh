@@ -135,6 +135,7 @@ sudo systemctl enable --now brawlzone-deploy.timer brawlzone-sampler.timer \
                             brawlzone-refresh.timer \
                             brawlzone-indexnow.timer \
                             brawlzone-tiktok.timer \
+                            brawlzone-tiktok-build.timer \
                             brawlzone-verify-restore.timer >/dev/null
 
 # Not a timer: it holds RAM continuously so the instance is not reclaimed as

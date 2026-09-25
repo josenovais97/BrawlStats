@@ -20,7 +20,8 @@
     "crawl:budget": "node scripts/crawl-budget.mjs",
     "gen:players": "node --import tsx --conditions=react-server scripts/gen-indexable-players.ts",
     "discord:meta": "node --import tsx --conditions=react-server scripts/discord-meta-post.ts",
-    "slides:preview": "tsx --conditions=react-server scripts/preview-slides.ts"
+    "slides:preview": "tsx --conditions=react-server scripts/preview-slides.ts",
+    "slides:preview:build": "tsx --conditions=react-server scripts/preview-build-slides.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

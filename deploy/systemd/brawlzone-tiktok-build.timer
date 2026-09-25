@@ -1,0 +1,24 @@
+[Unit]
+Description=Send a brawler's build to TikTok, daily at 17:10 UTC
+
+[Timer]
+# Eight hours after the findings post, and that gap is load-bearing rather
+# than editorial. Both jobs refresh the same TikTok token, and TikTok rotates
+# it on use: two runs overlapping would have one of them save a token the
+# other had already invalidated, which locks the integration out until
+# somebody authorises by hand. systemd will not run two instances of the same
+# unit, but these are different units, so the separation has to be the
+# schedule.
+#
+# It is also a second posting slot in the day rather than two posts an hour
+# apart, and 17:10 UTC is early evening in Europe.
+#
+# Not retried on failure, same as the findings timer: TikTok allows five
+# pending uploads per 24 hours and a retry loop spends that allowance on a bad
+# day, leaving none for a good one.
+OnCalendar=*-*-* 17:10:00
+Persistent=false
+Unit=brawlzone-tiktok-build.service
+
+[Install]
+WantedBy=timers.target

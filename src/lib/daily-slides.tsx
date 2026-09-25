@@ -1,13 +1,20 @@
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-
 import type { ReactElement } from 'react';
-import sharp from 'sharp';
 
 import { dayLabel } from '@/lib/format';
-import { brawlerModelUrl, brawlerPortraitUrl } from '@/lib/brawlapi';
-import { SITE_NAME } from '@/lib/site';
+import {
+  ACCENT,
+  DIM,
+  FG,
+  Frame,
+  MUTED,
+  Wordmark,
+  loadArt,
+  loadLogo,
+  outro,
+} from '@/lib/slide-chrome';
 import type { Discovery, StoredDailyReport } from '@/lib/stats';
+
+export { SLIDE_SIZE, toJpeg } from '@/lib/slide-chrome';
 
 /**
  * The day's findings as a TikTok photo carousel.
@@ -30,21 +37,6 @@ import type { Discovery, StoredDailyReport } from '@/lib/stats';
  * `display: flex`.
  */
 
-export const SLIDE_SIZE = { width: 1080, height: 1920 };
-
-const BG = '#0b0f1d';
-const FG = '#f2f5ff';
-const MUTED = '#c9d2ea';
-const DIM = '#8b95b8';
-const ACCENT = '#35d0ff';
-const BRAND = '#ffc53d';
-
-/**
- * TikTok draws its own UI over a post: caption and username across the bottom,
- * a column of like/comment/share buttons up the right. Content sits inside
- * these margins rather than being centred on the canvas.
- */
-const PAD = '150px 230px 400px 92px';
 
 /**
  * Every finding the day produced, not the first three.
@@ -150,130 +142,8 @@ function statsFor(d: Discovery): [Stat, Stat] {
   }
 }
 
-/**
- * Brawler art as a data URI, or null when there is none to be had.
- *
- * Inlined rather than handed to Satori as a URL, because Satori fetches images
- * itself and a 404 takes down the whole render — and the CDN publishes a
- * brawler's metadata weeks before its artwork, so a 404 is the *expected* case
- * for anyone newly released. `hasBrawlerPortrait` is no help here: it counts a
- * failed probe as a hit deliberately, which is right for an `<img>` the
- * browser can fail quietly and wrong for a render that would throw.
- *
- * The fetch is deliberately left on Next's default (uncached): a `force-cache`
- * here would put a fetch-level revalidate under the route and pin it to
- * whichever is shorter (AGENTS.md trap 2). One CDN request per slide per day
- * is not worth that risk.
- *
- * Downscaled before it reaches Satori because the model renders are far larger
- * than the box they are drawn into, and rasterising them at full size is the
- * slowest part of the whole image.
- */
-async function loadArt(brawlerId: number, box: number): Promise<string | null> {
-  for (const url of [brawlerModelUrl(brawlerId), brawlerPortraitUrl(brawlerId)]) {
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
-      if (!res.ok) continue;
-      const png = await sharp(Buffer.from(await res.arrayBuffer()))
-        .resize({ width: box, height: box, fit: 'inside', withoutEnlargement: true })
-        .png()
-        .toBuffer();
-      return `data:image/png;base64,${png.toString('base64')}`;
-    } catch {
-      // Next candidate, then none. A slide without art is still a slide.
-    }
-  }
-  return null;
-}
 
-/**
- * What the site offers, for the closing slide.
- *
- * Every line is a page that exists. A carousel that advertises a feature the
- * site does not have is worse than one that advertises nothing, and this is
- * exactly the list that rots quietly — `site-footer` carries the same rule and
- * the same reason.
- */
-const OFFERS = [
-  'Tier lists for every mode',
-  'Best builds, gadgets and gears',
-  'Map-by-map ranked picks',
-  'A draft helper, pick by pick',
-  'Team comps with real sample floors',
-  'Player, club and leaderboard stats',
-];
 
-/**
- * The app icon as a data URI, read off disk rather than fetched.
- *
- * `public/` is copied next to `server.js` in the standalone output, so
- * `process.cwd()` resolves in both `next dev` and the container. Fetching it
- * from SITE_URL would work too and would be a pointless round trip through
- * Caddy to reach a file already on the same disk. Failure is not fatal: the
- * wordmark carries the brand on its own.
- */
-async function loadLogo(box: number): Promise<string | null> {
-  try {
-    const raw = await readFile(join(process.cwd(), 'public', 'brand', 'app-icon-1024.png'));
-    const png = await sharp(raw)
-      .resize({ width: box, height: box, fit: 'inside', withoutEnlargement: true })
-      .png()
-      .toBuffer();
-    return `data:image/png;base64,${png.toString('base64')}`;
-  } catch {
-    return null;
-  }
-}
-
-/** The full-bleed wash every slide sits on. Linear: Satori has no radial. */
-function Backdrop(): ReactElement {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: SLIDE_SIZE.width,
-        height: SLIDE_SIZE.height,
-        background: 'linear-gradient(160deg, rgba(53,208,255,0.18), rgba(11,15,29,0) 55%)',
-      }}
-    />
-  );
-}
-
-function Frame({ children }: { children: ReactElement[] }): ReactElement {
-  return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: PAD,
-        background: BG,
-        color: FG,
-        fontFamily: 'sans-serif',
-      }}
-    >
-      <Backdrop />
-      {children}
-    </div>
-  );
-}
-
-function Wordmark(): ReactElement {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ display: 'flex', fontSize: 46, fontWeight: 800, color: BRAND }}>
-        brawlzone.net
-      </div>
-      <div style={{ display: 'flex', fontSize: 28, color: DIM }}>
-        {SITE_NAME} · free tier lists, maps and draft help
-      </div>
-    </div>
-  );
-}
 
 function cover(date: string, findings: Discovery[], art: string | null): ReactElement {
   return (
@@ -300,7 +170,7 @@ function cover(date: string, findings: Discovery[], art: string | null): ReactEl
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: 520,
+          height: art ? 520 : 0,
           marginTop: 44,
         }}
       >
@@ -431,79 +301,6 @@ function method(): ReactElement {
   );
 }
 
-/**
- * The closing slide: what else is on the site.
- *
- * The method slide before it answers "should I believe this"; this one answers
- * "where do I get more of it". Nothing here is tappable — `post_info` has no
- * link field and a slide is a picture — so the domain is set large enough to
- * be read and remembered off a phone screen, which is the only mechanism
- * available.
- */
-function outro(logo: string | null): ReactElement {
-  return (
-    <Frame>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-        {logo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={logo} width={104} height={104} alt="" style={{ borderRadius: 24 }} />
-        ) : (
-          <div style={{ display: 'flex' }} />
-        )}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
-            THERE IS A LOT MORE
-          </div>
-          <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginTop: 6 }}>
-            Find this and more on
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', fontSize: 116, fontWeight: 800, color: BRAND, marginTop: 10 }}>
-        BrawlZone
-      </div>
-
-      {/* A panel rather than loose lines: it groups the offer as one block and
-          keeps it from reading as a continuation of the headline. */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 22,
-          marginTop: 40,
-          padding: '38px 34px',
-          borderRadius: 28,
-          background: 'rgba(255,255,255,0.05)',
-        }}
-      >
-        {OFFERS.map((line, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <div
-              style={{
-                display: 'flex',
-                width: 14,
-                height: 14,
-                borderRadius: 7,
-                background: ACCENT,
-              }}
-            />
-            <div style={{ display: 'flex', fontSize: 36, color: FG }}>{line}</div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 44 }}>
-        <div style={{ display: 'flex', fontSize: 68, fontWeight: 800, color: BRAND }}>
-          brawlzone.net
-        </div>
-        <div style={{ display: 'flex', fontSize: 30, color: DIM }}>
-          Free. No login. Updated every 2 hours.
-        </div>
-      </div>
-    </Frame>
-  );
-}
 
 /**
  * Which findings' artwork a given slide actually draws.
@@ -572,10 +369,56 @@ export function slideCount(report: StoredDailyReport | null): number {
   return Math.min(report?.discoveries.length ?? 0, MAX_FINDINGS) + 3;
 }
 
-/** PNG from Satori to JPEG, which is the only thing TikTok accepts. */
-export async function toJpeg(png: ArrayBuffer): Promise<Buffer> {
-  return sharp(Buffer.from(png))
-    .flatten({ background: BG })
-    .jpeg({ quality: 92, chromaSubsampling: '4:4:4' })
-    .toBuffer();
+/**
+ * Hashtags chosen from what the day actually found.
+ *
+ * The job posted four fixed tags every day forever, which is both a wasted
+ * signal and the most obviously automated thing about the account. Two broad
+ * tags carry the reach; the narrow ones are where a small account can
+ * realistically rank, and they are the ones worth matching to the content.
+ */
+const KIND_TAGS: Record<string, string> = {
+  'secret-pick': '#brawlstarstips',
+  'meta-trap': '#brawlstarsmeta',
+  'giant-killer': '#brawlstarsdraft',
+  'secret-duo': '#brawlstarsdraft',
+  'map-surprise': '#brawlstarsmaps',
+  'overnight-rise': '#brawlstarsranked',
+};
+
+const BASE_TAGS = ['#brawlstars', '#brawlstarstierlist'];
+
+/**
+ * The caption, built from the same findings the slides draw.
+ *
+ * Published by the manifest rather than assembled on the box: it is made of
+ * the day's numbers, and deriving it a second time in bash would be two
+ * implementations of one claim that disagree the moment either changes. The
+ * numbers go in the text as well as on the images because TikTok indexes
+ * caption text and does not read pictures.
+ */
+export function dailyCaption(
+  report: StoredDailyReport | null,
+  site: string,
+): { title: string; description: string } {
+  const findings = (report?.discoveries ?? []).slice(0, MAX_FINDINGS);
+  const names = (d: Discovery) => d.brawlerNames.map(cap);
+  const line = (d: Discovery) => HEADLINE[d.kind]?.(names(d), d.context) ?? names(d).join(' and ');
+
+  const tags = [
+    ...BASE_TAGS,
+    ...[...new Set(findings.map((d) => KIND_TAGS[d.kind]).filter(Boolean))].slice(0, 3),
+  ];
+
+  const title = findings[0] ? line(findings[0]) : 'What the Brawl Stars data says today';
+
+  // findings[1..] rather than [0..]: TikTok renders title and description
+  // together, so repeating the first line prints it twice.
+  const rest = findings.slice(1).map(line);
+  const body = rest.length > 0 ? rest.join(' | ') : 'Measured from sampled Brawl Stars battles.';
+
+  return {
+    title: title.slice(0, 90),
+    description: `${body} — full findings at ${site}/daily ${tags.join(' ')}`.slice(0, 3900),
+  };
 }
