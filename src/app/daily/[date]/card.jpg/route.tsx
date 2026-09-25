@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import sharp from 'sharp';
 
 import { dayLabel } from '@/components/daily/daily-report';
 import { SITE_NAME } from '@/lib/site';
@@ -16,6 +17,14 @@ import { type Discovery, getDailyReport } from '@/lib/stats';
  *
  * Served from a stable path rather than generated on the box, because the
  * posting APIs fetch the image themselves from a public URL.
+ *
+ * JPEG, not PNG, and that is not cosmetic: TikTok's Content Posting API
+ * accepts JPEG and WebP only, and a PNG is taken, queued, and *then* failed
+ * asynchronously as `file_format_check_failed` — the init call returns a
+ * publish id and looks like success. `ImageResponse` only emits PNG, so the
+ * bytes go through sharp on the way out. JPEG has no alpha, hence the flatten
+ * onto the same background the card is drawn on; without it the transparent
+ * areas come out black.
  *
  * Laid out for where it lands rather than for the canvas. TikTok draws its own
  * UI over the bottom of a post — caption, username, music — and a column of
@@ -105,7 +114,7 @@ export async function GET(
    */
   const findings = (report?.discoveries ?? []).slice(0, 3);
 
-  return new ImageResponse(
+  const png = new ImageResponse(
     (
       <div
         style={{
@@ -200,4 +209,18 @@ export async function GET(
     ),
     SIZE,
   );
+
+  const jpeg = await sharp(Buffer.from(await png.arrayBuffer()))
+    .flatten({ background: BG })
+    .jpeg({ quality: 92, chromaSubsampling: '4:4:4' })
+    .toBuffer();
+
+  /* 4:4:4 rather than the default 4:2:0 because the card is thin coloured
+     text on a dark field, which is exactly what chroma subsampling smears. */
+  return new Response(new Uint8Array(jpeg), {
+    headers: {
+      'content-type': 'image/jpeg',
+      'cache-control': 'public, max-age=0, s-maxage=86400, stale-while-revalidate=86400',
+    },
+  });
 }

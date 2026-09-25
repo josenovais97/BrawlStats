@@ -88,7 +88,7 @@ echo "token refreshed"
 
 # ---------------------------------------------------------------- the post
 DAY="${1:-$(date -u +%Y-%m-%d)}"
-CARD="${SITE}/daily/${DAY}/card.png"
+CARD="${SITE}/daily/${DAY}/card.jpg"
 
 # The card must be fetchable before TikTok is asked to fetch it: a 404 here
 # returns a generic error from their side that says nothing about why.
