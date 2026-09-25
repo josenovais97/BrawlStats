@@ -59,10 +59,13 @@ if [ -z "$ACCESS" ]; then
   die "::error::token refresh failed: $(printf '%s' "$token_json" | head -c 300)"
 fi
 
-printf '%s' "$token_json" | python3 - "$STATE" <<'PY'
+# The JSON travels in argv, not on stdin: `python3 -` reads its PROGRAM from
+# stdin, so a heredoc and a pipe cannot both feed it. Piping here silently fed
+# python an empty document and dropped the rotated token.
+python3 - "$STATE" "$token_json" <<'PY'
 import json, sys, datetime
 state_path = sys.argv[1]
-fresh = json.load(sys.stdin)
+fresh = json.loads(sys.argv[2])
 state = json.load(open(state_path))
 # Only overwrite when a new one actually came back. TikTok returns the same
 # token when it is not due for rotation, and an empty field must never clear
@@ -75,6 +78,12 @@ state['refreshed_at'] = datetime.datetime.now(datetime.UTC).isoformat()
 with open(state_path, 'w') as f:
     json.dump(state, f, indent=2)
 PY
+saved=$?
+# The echo below used to run unconditionally, which is precisely how the
+# dropped-token bug stayed invisible: the save threw and the log still said
+# "token refreshed". A token that was not persisted is a lockout, so abort
+# rather than post and carry on.
+[ "$saved" -eq 0 ] || die "::error::could not save the rotated refresh token to $STATE"
 echo "token refreshed"
 
 # ---------------------------------------------------------------- the post
@@ -93,11 +102,15 @@ code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 60 "$CARD")
 # The numbers go in the caption as well as on the image because TikTok indexes
 # caption text and does not read pictures — "Nita 54.8% win rate" is findable,
 # a screenshot of it is not.
+FEED=$(mktemp)
+trap 'rm -f "$FEED"' EXIT
+curl -s --max-time 30 "${SITE}/daily/feed.xml" -o "$FEED"
+
 read -r TITLE DESCRIPTION < <(
-  curl -s --max-time 30 "${SITE}/daily/feed.xml" | python3 - "$DAY" "$SITE" <<'PY'
+  python3 - "$DAY" "$SITE" "$FEED" <<'PY'
 import re, sys, html
-day, site = sys.argv[1], sys.argv[2]
-feed = sys.stdin.read()
+day, site, feed_path = sys.argv[1], sys.argv[2], sys.argv[3]
+feed = open(feed_path, encoding='utf-8').read()
 item = ''
 for block in feed.split('<item>')[1:]:
     if f'/daily/{day}' in block:
