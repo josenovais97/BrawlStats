@@ -91,9 +91,33 @@ export async function GET(request: Request) {
     );
   }
 
+  /*
+   * The confirmation comes first and the credential a long way below it.
+   *
+   * This page is filmed: TikTok's review wants a recording of the
+   * authorisation flow, and the natural thing to do is record the browser
+   * until it says something reassuring. What it said first, in the version
+   * before this one, was a refresh token — which would have been uploaded to
+   * TikTok inside the demo video. The top of the page is now the only part
+   * worth filming, and says so.
+   */
   return text(
     [
-      'Authorised. Copy the line below onto the box, then close this tab.',
+      '  BrawlZone is now authorised to upload to this TikTok account.',
+      '',
+      '  Scope granted: ' + (body.scope ?? 'unknown'),
+      '  Refresh token valid for ' +
+        Math.round((body.refresh_expires_in ?? 0) / 86400) +
+        ' days.',
+      '',
+      '  --- STOP RECORDING HERE ---------------------------------------',
+      '',
+      '  Everything below this line is a working credential.',
+      '  Do not film it, screenshot it, or paste it anywhere public.',
+      '',
+      '',
+      '',
+      'Run this to store it on the box, then close this tab:',
       '',
       `ssh brawlzone 'umask 077; cat > ~/.brawlzone-tiktok.json' <<'JSON'`,
       JSON.stringify(
@@ -108,10 +132,9 @@ export async function GET(request: Request) {
       ),
       'JSON',
       '',
-      `Scope granted: ${body.scope ?? 'unknown'}`,
-      `Refresh token valid for ${Math.round((body.refresh_expires_in ?? 0) / 86400)} days.`,
-      '',
       'This page is not cached and the token is not stored anywhere on the site.',
+      'Once it is on the box, delete TIKTOK_SETUP_KEY from .env.production to',
+      'close these two routes.',
     ].join('\n'),
   );
 }
