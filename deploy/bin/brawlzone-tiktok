@@ -92,8 +92,20 @@ CARD="${SITE}/daily/${DAY}/card.jpg"
 
 # The card must be fetchable before TikTok is asked to fetch it: a 404 here
 # returns a generic error from their side that says nothing about why.
-code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 60 "$CARD")
-[ "$code" = "200" ] || die "::error::card not available at $CARD (HTTP $code)"
+#
+# This request is not a health check, it is the render. Nothing touches the
+# day's card before this job does, so the first fetch queries the day's
+# findings and rasterises a 1080x1920 image on two shared cores -- it is the
+# most expensive request the box serves all day, and 60s was not enough for it
+# on 2026-09-25. Hence a real budget and one retry: a cold render that overran
+# once will hit a warm ISR entry on the second attempt.
+code=''
+for attempt in 1 2; do
+  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 240 "$CARD")
+  [ "$code" = "200" ] && break
+  [ "$attempt" = "1" ] && echo "::warning::card fetch returned ${code:-000}, retrying once"
+done
+[ "$code" = "200" ] || die "::error::card not available at $CARD (HTTP ${code:-000})"
 
 # Caption from the day's own findings, read from the public feed rather than
 # the database: the feed is a stable contract, and this script has no reason
