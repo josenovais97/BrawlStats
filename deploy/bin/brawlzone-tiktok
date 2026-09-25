@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Send the day's findings card to TikTok as a draft.
 #
-# The site renders the card at /daily/<date>/card.png and this pushes it to the
+# The site renders the card at /daily/<date>/card.jpg and this pushes it to the
 # account's inbox with post_mode=MEDIA_UPLOAD. TikTok then notifies the phone;
 # the account holder opens it, adds music and a caption in TikTok's own editor,
 # and decides whether to publish. Nothing here posts publicly.
@@ -36,7 +36,7 @@ CLIENT_SECRET=$(grep -oP '^TIKTOK_CLIENT_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
 [ -n "${CLIENT_KEY:-}" ] || die "::error::TIKTOK_CLIENT_KEY missing from $ENV_FILE"
 [ -n "${CLIENT_SECRET:-}" ] || die "::error::TIKTOK_CLIENT_SECRET missing from $ENV_FILE"
 
-[ -f "$STATE" ] || die "::error::no $STATE — authorise once at ${SITE}/api/tiktok/auth?key=\$CRON_SECRET"
+[ -f "$STATE" ] || die "::error::no $STATE — authorise once at ${SITE}/api/tiktok/auth?key=\$TIKTOK_SETUP_KEY"
 REFRESH=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("refresh_token",""))' "$STATE")
 [ -n "$REFRESH" ] || die "::error::$STATE has no refresh_token"
 
@@ -118,7 +118,9 @@ FEED=$(mktemp)
 trap 'rm -f "$FEED"' EXIT
 curl -s --max-time 30 "${SITE}/daily/feed.xml" -o "$FEED"
 
-read -r TITLE DESCRIPTION < <(
+# IFS=tab, or `read` splits on spaces and TITLE gets the first WORD: the post
+# published on 2026-09-25 was captioned "The" followed by everything else.
+IFS=$'\t' read -r TITLE DESCRIPTION < <(
   python3 - "$DAY" "$SITE" "$FEED" <<'PY'
 import re, sys, html
 day, site, feed_path = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -137,7 +139,9 @@ if item:
 
 title = findings[0] if findings else 'What the Brawl Stars data says today'
 tags = '#brawlstars #brawlstarsmeta #brawlstarstierlist #brawlstarstips'
-lines = [f'{f}' for f in findings[:3]]
+# The rest, not all of it: TikTok renders title and description together, so
+# repeating findings[0] here printed the first finding twice in the caption.
+lines = findings[1:3]
 desc = ' | '.join(lines) if lines else 'Measured from sampled Brawl Stars battles.'
 desc = f'{desc} — full findings at {site}/daily {tags}'
 # One line, tab-separated, because the caller reads it with `read -r a b`.
