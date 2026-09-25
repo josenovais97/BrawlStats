@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Send the day's findings card to TikTok as a draft.
 #
-# The site renders the card at /daily/<date>/card.jpg and this pushes it to the
-# account's inbox with post_mode=MEDIA_UPLOAD. TikTok then notifies the phone;
+# The site renders the day as a carousel under /daily/<date>/slides/ and this
+# pushes the whole set to the account's inbox with post_mode=MEDIA_UPLOAD. TikTok then notifies the phone;
 # the account holder opens it, adds music and a caption in TikTok's own editor,
 # and decides whether to publish. Nothing here posts publicly.
 #
@@ -88,24 +88,46 @@ echo "token refreshed"
 
 # ---------------------------------------------------------------- the post
 DAY="${1:-$(date -u +%Y-%m-%d)}"
-CARD="${SITE}/daily/${DAY}/card.jpg"
 
-# The card must be fetchable before TikTok is asked to fetch it: a 404 here
+# A carousel, not one image. How many slides a day has depends on how many
+# findings it produced, so the site publishes the list rather than this job
+# guessing -- otherwise `slideCount` would be re-implemented here and the two
+# would drift the first time the carousel changes shape.
+MANIFEST="${SITE}/daily/${DAY}/slides.json"
+manifest_json=$(curl -s --max-time 120 "$MANIFEST")
+SLIDES=$(printf '%s' "$manifest_json" | python3 -c '
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(1)
+for url in data.get("slides", []):
+    print(url)
+' 2>/dev/null)
+[ -n "$SLIDES" ] || die "::error::no slides listed at $MANIFEST: $(printf "%s" "$manifest_json" | head -c 200)"
+
+# Each slide must be fetchable before TikTok is asked to fetch it: a 404 there
 # returns a generic error from their side that says nothing about why.
 #
-# This request is not a health check, it is the render. Nothing touches the
-# day's card before this job does, so the first fetch queries the day's
-# findings and rasterises a 1080x1920 image on two shared cores -- it is the
-# most expensive request the box serves all day, and 60s was not enough for it
-# on 2026-09-25. Hence a real budget and one retry: a cold render that overran
-# once will hit a warm ISR entry on the second attempt.
-code=''
-for attempt in 1 2; do
-  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 240 "$CARD")
-  [ "$code" = "200" ] && break
-  [ "$attempt" = "1" ] && echo "::warning::card fetch returned ${code:-000}, retrying once"
-done
-[ "$code" = "200" ] || die "::error::card not available at $CARD (HTTP ${code:-000})"
+# These requests are not health checks, they are the renders. Nothing touches a
+# day's slides before this job does, so the first fetch of each queries the
+# findings, pulls brawler art and rasterises a 1080x1920 image on two shared
+# cores -- the most expensive requests the box serves all day, and 60s was not
+# enough for one of them on 2026-09-25. Hence a real budget and one retry: a
+# cold render that overran once leaves a warm ISR entry for the second try.
+slide_count=0
+while IFS= read -r slide; do
+  [ -n "$slide" ] || continue
+  slide_count=$((slide_count + 1))
+  code=''
+  for attempt in 1 2; do
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 240 "$slide")
+    [ "$code" = "200" ] && break
+    [ "$attempt" = "1" ] && echo "::warning::${slide} returned ${code:-000}, retrying once"
+  done
+  [ "$code" = "200" ] || die "::error::slide not available at $slide (HTTP ${code:-000})"
+done <<< "$SLIDES"
+echo "${slide_count} slides ready"
 
 # Caption from the day's own findings, read from the public feed rather than
 # the database: the feed is a stable contract, and this script has no reason
@@ -149,15 +171,18 @@ print(title[:90].replace('\t', ' ') + '\t' + desc[:3900].replace('\t', ' '))
 PY
 )
 
-payload=$(python3 - "$TITLE" "$DESCRIPTION" "$CARD" "$POST_MODE" <<'PY'
+payload=$(python3 - "$TITLE" "$DESCRIPTION" "$SLIDES" "$POST_MODE" <<'PY'
 import json, sys
-title, description, card, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+title, description, slides, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+images = [line for line in slides.splitlines() if line.strip()]
 body = {
     'post_info': {'title': title, 'description': description},
     'source_info': {
         'source': 'PULL_FROM_URL',
+        # Slide 0 is the cover by construction -- the one laid out to be read
+        # at thumbnail size, which is all most people ever see of a post.
         'photo_cover_index': 0,
-        'photo_images': [card],
+        'photo_images': images,
     },
     'post_mode': mode,
     'media_type': 'PHOTO',
@@ -179,7 +204,7 @@ if [ -z "$PUBLISH_ID" ] || { [ -n "$ERR" ] && [ "$ERR" != "ok" ]; }; then
   # actually happen and each has a different fix.
   case "$ERR" in
     url_ownership_unverified)
-      die "::error::TikTok refuses the card URL: brawlzone.net is not verified for this app any more." ;;
+      die "::error::TikTok refuses the slide URLs: brawlzone.net is not verified for this app any more." ;;
     spam_risk_too_many_pending_share)
       echo "::warning::TikTok has 5 uploads already waiting in the inbox; skipping today rather than stacking another."
       exit 0 ;;

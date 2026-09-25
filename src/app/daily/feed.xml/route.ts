@@ -1,4 +1,4 @@
-import { dayLabel } from '@/components/daily/daily-report';
+import { dayLabel } from '@/lib/format';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
 import { ensureTodayReport, listDailyReports, getDailyReport } from '@/lib/stats';
 

@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-import { dayLabel } from '@/components/daily/daily-report';
+import { dayLabel } from '@/lib/format';
 import { SITE_NAME } from '@/lib/site';
 import { getDailyReport } from '@/lib/stats';
 

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
-import { DailyReport, dayLabel, todayIso } from '@/components/daily/daily-report';
+import { DailyReport, todayIso } from '@/components/daily/daily-report';
+import { dayLabel } from '@/lib/format';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';

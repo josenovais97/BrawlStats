@@ -250,3 +250,21 @@ export function formatDate(value: string | Date | null | undefined): string {
   if (Number.isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
+
+/**
+ * "2 September 2026", UTC-anchored so the server and browser agree.
+ *
+ * Lives here rather than beside the component that used to own it because
+ * non-component code needs it too, and importing it from a component module
+ * drags `next/link` in behind it -- which throws outright under
+ * `--conditions=react-server`, the condition every script in this repo runs
+ * with (AGENTS.md trap 3).
+ */
+export function dayLabel(iso: string): string {
+  return new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}

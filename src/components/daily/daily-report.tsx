@@ -86,16 +86,6 @@ export function DailyReport({
   );
 }
 
-/** "2 September 2026", UTC-anchored so the server and browser agree. */
-export function dayLabel(iso: string): string {
-  return new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
-}
-
 /** Today in UTC, which is the day the archive keys on. */
 export function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
