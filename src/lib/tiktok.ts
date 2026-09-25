@@ -33,12 +33,21 @@ export const TIKTOK_SCOPES = 'user.info.basic,video.upload';
  *
  * Without it, a stranger who found the path could start an authorisation
  * against their own account and be shown their own tokens. Harmless to this
- * site, but a page that hands out credentials to anyone who asks is not a page
- * worth having. Shares `CRON_SECRET` rather than adding a second one: it is
- * the same class of thing — a key for an operation only the operator performs.
+ * site, but a page that hands out credentials to anyone who asks is not one
+ * worth having.
+ *
+ * Its own variable rather than `CRON_SECRET`, which was the first attempt and
+ * could never have worked: that secret is base64 and contains `+`, which a
+ * query string decodes as a space, so the comparison failed every time and the
+ * route answered 404 to the one person entitled to use it. A key that travels
+ * in a URL has to be URL-safe, and reusing one that was only ever sent in a
+ * header does not make it so.
+ *
+ * Short-lived by intention. It exists to authorise an account once; delete the
+ * line from `.env.production` afterwards and the routes close themselves.
  */
 export function setupKeyValid(url: URL): boolean {
-  const secret = process.env.CRON_SECRET;
+  const secret = process.env.TIKTOK_SETUP_KEY;
   if (!secret) return false;
   return url.searchParams.get('key') === secret;
 }

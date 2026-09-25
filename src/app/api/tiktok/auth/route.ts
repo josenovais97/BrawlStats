@@ -10,7 +10,7 @@ import {
 /**
  * Starts the one-time authorisation.
  *
- * Visited by hand, once, with `?key=$CRON_SECRET`. It redirects to TikTok's
+ * Visited by hand, once, with `?key=$TIKTOK_SETUP_KEY`. It redirects to TikTok's
  * consent screen; the answer comes back to `/api/tiktok/callback`.
  *
  * `state` is required by the protocol as CSRF protection and is checked on the
