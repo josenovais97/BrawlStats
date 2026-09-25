@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import type { BrawlerOfDay } from '@/lib/brawler-of-day';
 import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
+import { titleCase } from '@/lib/format';
 import {
   ACCENT,
   BRAND,
@@ -41,6 +42,15 @@ const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 function cap(name: string): string {
   return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 }
+
+/**
+ * Item names arrive from the game API in capitals -- NEW INSECT OVERLORDS --
+ * and the site renders them title-cased. Matching that matters more here than
+ * on the page: a slide is a picture of the site, and all-caps names would read
+ * as a different product sitting next to the screenshots people already know.
+ */
+const itemName = (names: Map<number, string>, id: number) =>
+  titleCase(names.get(id) ?? `#${id}`);
 
 /** A win rate, or a dash. Below the sample floor `winRate` is null by design. */
 const rate = (n: number | null) => (n === null ? '--' : pct(n));
@@ -136,7 +146,7 @@ function pair(
               )}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', fontSize: 46, fontWeight: 700, color: FG }}>
-                  {names.get(row.itemId) ?? `#${row.itemId}`}
+                  {itemName(names, row.itemId)}
                 </div>
                 <div style={{ display: 'flex', fontSize: 30, color: DIM }}>
                   {i === 0 ? 'Most picked' : 'The other one'}
@@ -200,7 +210,7 @@ function gears(day: BrawlerOfDay, icons: (string | null)[]): ReactElement {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: 560 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', fontSize: 40, fontWeight: 700, color: FG }}>
-                  {day.gearNames.get(row.itemId) ?? `#${row.itemId}`}
+                  {itemName(day.gearNames, row.itemId)}
                 </div>
                 <div style={{ display: 'flex', fontSize: 40, fontWeight: 800, color: ACCENT }}>
                   {pct(row.share)}
@@ -310,11 +320,11 @@ export function buildCaption(day: BrawlerOfDay, site: string): { title: string; 
 
   const parts: string[] = [];
   if (best) {
-    parts.push(`${day.starPowerNames.get(best.itemId) ?? 'Star power'} — ${pct(best.share)} of first buyers`);
+    parts.push(`${itemName(day.starPowerNames, best.itemId)} — ${pct(best.share)} of first buyers`);
   }
   if (bestGadget) {
     parts.push(
-      `${day.gadgetNames.get(bestGadget.itemId) ?? 'Gadget'} — ${pct(bestGadget.share)} of first buyers`,
+      `${itemName(day.gadgetNames, bestGadget.itemId)} — ${pct(bestGadget.share)} of first buyers`,
     );
   }
 
