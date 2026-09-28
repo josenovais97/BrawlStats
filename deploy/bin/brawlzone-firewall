@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Accept web traffic only from Cloudflare, so the proxy cannot be bypassed.
+#
+# The origin IP is public and known. Without this, anyone who has it simply
+# connects to 141.147.53.176 directly and Cloudflare -- the WAF, Bot Fight
+# Mode, the whole point of proxying -- is skipped entirely. On 2026-09-28 the
+# records went orange; this is what makes that mean something.
+#
+# WHY DOCKER-USER AND NOT INPUT. bootstrap.sh has always added ACCEPT rules for
+# 80/443 to the INPUT chain, and they have never done anything: Docker
+# publishes ports by DNAT and the packets traverse FORWARD, not INPUT.
+# Measured on the day this was written, those INPUT rules had passed 47 packets
+# on 443 and *zero* on 80, while FORWARD -> DOCKER-USER had passed 2,079
+# million. Filtering INPUT would have looked like protection and been none.
+# DOCKER-USER is the chain Docker guarantees is consulted first, and is the
+# documented place for exactly this.
+#
+# WHY `-i` MATTERS. DOCKER-USER sees every forwarded packet, which includes
+# containers talking OUT to the internet. A rule matching only `--dport 443`
+# would also match the app fetching brawler art from the CDN, the wiki, and
+# TikTok's API -- and drop all of it. Binding to the external interface means
+# only traffic arriving from outside is considered.
+#
+# Idempotent: re-running rebuilds the chain from the current range list.
+set -euo pipefail
+
+CHAIN=BZ_CF_ONLY
+EXT_IF=${EXT_IF:-$(ip route get 1.1.1.1 2>/dev/null | sed -n 's/.* dev \([^ ]*\).*/\1/p')}
+[ -n "$EXT_IF" ] || { echo "::error::could not determine the external interface" >&2; exit 1; }
+
+# Fetched live rather than pinned. Cloudflare's ranges change rarely, but a
+# stale list here does not fail loudly -- it silently refuses real visitors
+# arriving through a newly added range.
+V4=$(curl -fsS --max-time 20 https://www.cloudflare.com/ips-v4 || true)
+[ -n "$V4" ] || { echo "::error::could not fetch Cloudflare ranges; refusing to build a partial allowlist" >&2; exit 1; }
+
+# A sanity floor. If the fetch ever returns something short or malformed,
+# building the chain from it would lock the site away from most of Cloudflare.
+count=$(printf '%s\n' "$V4" | grep -c '/' || true)
+[ "$count" -ge 10 ] || { echo "::error::only $count ranges fetched, expected 15ish; refusing" >&2; exit 1; }
+
+sudo iptables -N "$CHAIN" 2>/dev/null || sudo iptables -F "$CHAIN"
+
+while read -r range; do
+  [ -n "$range" ] || continue
+  sudo iptables -A "$CHAIN" -s "$range" -j RETURN
+done <<< "$V4"
+
+# Anything that reached this point is not Cloudflare. DROP rather than REJECT:
+# a dropped packet tells a scanner nothing, a rejection confirms the host.
+sudo iptables -A "$CHAIN" -j DROP
+
+# Hook it in once. `-C` tests for the rule first so re-running does not stack
+# duplicates, which would be harmless but makes the chain unreadable.
+#
+# ctstate NEW so applying this never severs a connection already in flight --
+# including, on the day it is first applied, somebody reading the site.
+if ! sudo iptables -C DOCKER-USER -i "$EXT_IF" -p tcp -m conntrack --ctstate NEW \
+     -m multiport --dports 80,443 -j "$CHAIN" 2>/dev/null; then
+  sudo iptables -I DOCKER-USER 1 -i "$EXT_IF" -p tcp -m conntrack --ctstate NEW \
+    -m multiport --dports 80,443 -j "$CHAIN"
+fi
+
+sudo netfilter-persistent save >/dev/null 2>&1 || sudo sh -c 'iptables-save > /etc/iptables/rules.v4'
+
+echo "web traffic on ${EXT_IF}:80,443 restricted to $(printf '%s\n' "$V4" | grep -c '/') Cloudflare ranges"
