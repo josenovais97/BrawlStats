@@ -220,7 +220,7 @@ export async function TierListView({
       ...byId.get(entry.brawlerId)!,
       normalizedWinRate: entry.normalizedWinRate,
       metaScore: entry.metaScore,
-      tier: entry.tier ?? 'D',
+      tier: entry.tier ?? 'F',
       imageUrl: meta?.imageUrl,
       rarityName: meta?.rarity?.name,
       rarityColor: meta?.rarity?.color,

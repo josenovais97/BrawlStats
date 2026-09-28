@@ -343,19 +343,41 @@ export function metaScore(
 
 /**
  * Cut-offs on the meta score, replacing the old win-rate-only thresholds.
+ *
+ * E and F were added on 2026-09-25 because D had become a dumping ground. It
+ * spanned 0 to 4.0 -- the widest band on the scale -- and held 38 of the 106
+ * rated brawlers, which is not a rating, it is a shrug. Splitting the bottom
+ * three ways gives D 17, E 14 and F 7.
+ *
+ * F is safe to read as "do not pick", and that is checked arithmetic rather
+ * than a label. Win rate carries WIN_WEIGHT (0.75) of the score, so even with
+ * a pick-rate component of zero a brawler needs a normalized win rate under
+ * ~48% to score below 2.0, and under ~49% to score below 3.0. Nothing lands
+ * in E or F for being unpopular alone -- which matters, because the Daily's
+ * "secret pick" finding exists to surface exactly those brawlers, and a tier
+ * list that buried them would contradict the site's own front page. Nita, the
+ * example on 2026-09-25 at 0.4% pick rate, sits in A.
+ *
+ * C is left alone at 36. It is the mode of the distribution -- the median
+ * score is 4.7, in the middle of C's band -- and a large middle tier is an
+ * honest description of a 106-brawler roster. Forcing every tier to the same
+ * size would turn these into percentile ranks, which is the opposite of what
+ * the anchored score is for: in a balanced meta, nobody should be S.
  */
 export const SCORE_THRESHOLDS: { tier: Tier; minScore: number }[] = [
   { tier: 'S', minScore: 7.5 },
   { tier: 'A', minScore: 6.5 },
   { tier: 'B', minScore: 5.5 },
   { tier: 'C', minScore: 4.0 },
-  { tier: 'D', minScore: 0 },
+  { tier: 'D', minScore: 3.0 },
+  { tier: 'E', minScore: 2.0 },
+  { tier: 'F', minScore: 0 },
 ];
 
 /** Expects a meta score from `metaScore`. */
 export function assignTierFromScore(score: number | null): Tier | null {
   if (score === null) return null;
-  return SCORE_THRESHOLDS.find((t) => score >= t.minScore)?.tier ?? 'D';
+  return SCORE_THRESHOLDS.find((t) => score >= t.minScore)?.tier ?? 'F';
 }
 
 /**
@@ -368,13 +390,15 @@ const TIER_THRESHOLDS: { tier: Tier; minWinRate: number }[] = [
   { tier: 'A', minWinRate: 0.52 },
   { tier: 'B', minWinRate: 0.485 },
   { tier: 'C', minWinRate: 0.45 },
-  { tier: 'D', minWinRate: 0 },
+  { tier: 'D', minWinRate: 0.43 },
+  { tier: 'E', minWinRate: 0.41 },
+  { tier: 'F', minWinRate: 0 },
 ];
 
 /** Expects an already-normalized win rate — see `normalizeWinRate`. */
 export function assignTier(normalizedWinRate: number | null): Tier | null {
   if (normalizedWinRate === null) return null;
-  return TIER_THRESHOLDS.find((t) => normalizedWinRate >= t.minWinRate)?.tier ?? 'D';
+  return TIER_THRESHOLDS.find((t) => normalizedWinRate >= t.minWinRate)?.tier ?? 'F';
 }
 
 // Re-exported so the many server callers keep importing tiers from one place,
@@ -577,8 +601,8 @@ async function compute_getMetaMovers(lookbackDays = 7): Promise<MetaMover[]> {
         metaScoreNow: nowScore,
         metaScoreBefore: prevScore,
         metaScoreDelta: nowScore - prevScore,
-        tierNow: assignTierFromScore(nowScore) ?? 'D',
-        tierBefore: assignTierFromScore(prevScore) ?? 'D',
+        tierNow: assignTierFromScore(nowScore) ?? 'F',
+        tierBefore: assignTierFromScore(prevScore) ?? 'F',
         winRateNow: nowRate,
         winRateBefore: prevRate,
         winRateDelta: nowRate - prevRate,

@@ -1,6 +1,6 @@
 /** Aggregated tier-list data, mirrored from the `brawler_stats` table. */
 
-export type Tier = 'S' | 'A' | 'B' | 'C' | 'D';
+export type Tier = 'S' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
 export interface BrawlerStatRow {
   brawlerId: number;

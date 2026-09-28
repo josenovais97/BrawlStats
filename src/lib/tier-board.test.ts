@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { decodeBoard, decodeOrder, encodeBoard } from '@/lib/tier-board';
+import { TIER_ORDER } from '@/lib/tiers';
+import type { Tier } from '@/types/stats';
 
 /**
  * The share link is the only place a tier list is ever stored.
@@ -31,26 +33,35 @@ test('decodes the format that shipped', () => {
   });
 });
 
+/**
+ * A full board from only the tiers a case cares about.
+ *
+ * The fixtures used to spell out every tier, which meant adding E and F broke
+ * three tests that were not about E or F. Filling the rest from TIER_ORDER
+ * keeps each case about the thing it is testing.
+ */
+function board(rows: Partial<Record<Tier, { id: number }[]>>): Record<Tier, { id: number }[]> {
+  return Object.fromEntries(TIER_ORDER.map((t) => [t, rows[t] ?? []])) as Record<
+    Tier,
+    { id: number }[]
+  >;
+}
+
 test('encodes back to the same spelling', () => {
-  const query = encodeBoard({
+  const query = encodeBoard(board({
     S: [{ id: 16_000_004 }, { id: 16_000_011 }],
     A: [{ id: 16_000_001 }, { id: 16_000_005 }],
-    B: [],
-    C: [],
-    D: [],
-  });
+  }));
 
   assert.equal(query, 's=4.11&a=1.5');
 });
 
 test('a board survives a round trip', () => {
-  const rows = {
+  const rows = board({
     S: [{ id: 16_000_011 }],
-    A: [],
     B: [{ id: 16_000_004 }, { id: 16_000_001 }],
-    C: [],
     D: [{ id: 16_000_005 }],
-  };
+  });
 
   const decoded = decodeBoard(new URLSearchParams(encodeBoard(rows)), KNOWN);
 
@@ -98,5 +109,5 @@ test('order spans tiers in tier order', () => {
 test('an empty link is an empty board rather than a throw', () => {
   assert.deepEqual(decodeBoard(new URLSearchParams(''), KNOWN), {});
   assert.deepEqual(decodeOrder(new URLSearchParams(''), KNOWN), []);
-  assert.equal(encodeBoard({ S: [], A: [], B: [], C: [], D: [] }), '');
+  assert.equal(encodeBoard(board({})), '');
 });

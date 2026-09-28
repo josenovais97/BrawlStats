@@ -54,6 +54,8 @@ const ROW_LABEL: Record<Tier, string> = {
   B: 'B',
   C: 'C',
   D: 'D',
+  E: 'E',
+  F: 'F',
 };
 
 export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
@@ -92,7 +94,10 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
   const [order, setOrder] = useState<number[]>(() => decodeOrder(searchParams, known));
 
   const rows = useMemo(() => {
-    const out: Record<Tier, MakerBrawler[]> = { S: [], A: [], B: [], C: [], D: [] };
+    const out = Object.fromEntries(TIER_ORDER.map((t) => [t, [] as MakerBrawler[]])) as Record<
+      Tier,
+      MakerBrawler[]
+    >;
     for (const id of order) {
       const tier = placed[id];
       const brawler = byId.get(id);

@@ -57,8 +57,8 @@ export function PlayerMetaFit({
     .filter((e) => (owned.get(e.brawlerId)?.power ?? 0) < MAX_POWER_LEVEL)
     .slice(0, LIMIT);
 
-  // The brawlers this player actually invests in, scored. A main sitting in C
-  // or D is the single most useful thing this join can surface.
+  // The brawlers this player actually invests in, scored. A main sitting in
+  // the bottom half is the single most useful thing this join can surface.
   const mains = [...brawlers]
     .sort((a, b) => b.trophies - a.trophies)
     .slice(0, MAIN_COUNT);
@@ -66,7 +66,10 @@ export function PlayerMetaFit({
     .map((b) => ({ brawler: b, entry: meta.get(b.id) }))
     .filter(
       (row): row is { brawler: BSPlayerBrawler; entry: ScoredBrawler } =>
-        row.entry?.tier === 'C' || row.entry?.tier === 'D',
+        row.entry?.tier === 'C' ||
+        row.entry?.tier === 'D' ||
+        row.entry?.tier === 'E' ||
+        row.entry?.tier === 'F',
     )
     .sort((a, b) => (a.entry.metaScore ?? 0) - (b.entry.metaScore ?? 0))
     .slice(0, LIMIT);

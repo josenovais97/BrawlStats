@@ -1,3 +1,4 @@
+import { TIER_ORDER } from '@/lib/tiers';
 import type { MetaMover, Tier } from '@/types/stats';
 
 /**
@@ -27,9 +28,15 @@ export interface BrawlerChange {
  */
 const MIN_SCORE_MOVE = 0.15;
 
-/** S is the top, so a *lower* index is a better tier. */
+/**
+ * S is the top, so a *lower* index is a better tier.
+ *
+ * Reads TIER_ORDER rather than listing the letters again. The second copy was
+ * already wrong the moment E and F were added, and a tier missing from this
+ * list silently ranks -1, which is better than every real tier.
+ */
 export function tierRank(tier: Tier): number {
-  return ['S', 'A', 'B', 'C', 'D'].indexOf(tier);
+  return TIER_ORDER.indexOf(tier);
 }
 
 /**

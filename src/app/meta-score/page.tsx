@@ -287,14 +287,20 @@ export default function MetaScorePage() {
           <>
             <p>The cut-offs are plain thresholds on the score:</p>
             <ul className="flex flex-wrap gap-2 not-prose">
-              {SCORE_THRESHOLDS.map((t) => (
+              {SCORE_THRESHOLDS.map((t, i) => (
                 <li
                   key={t.tier}
                   className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-semibold tabular-nums"
                 >
                   <span className="font-black">{t.tier}</span>
                   <span className="ml-2 text-muted">
-                    {t.minScore > 0 ? `${t.minScore}+` : 'below 4.0'}
+                    {/* The bottom band has no floor of its own, so it is named
+                        by the one above it. This used to read "below 4.0"
+                        hardcoded, which silently became a lie the moment E and
+                        F were added under it. */}
+                    {t.minScore > 0
+                      ? `${t.minScore}+`
+                      : `below ${SCORE_THRESHOLDS[i - 1]?.minScore ?? 0}`}
                   </span>
                 </li>
               ))}
