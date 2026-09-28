@@ -815,25 +815,37 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             {lead ? <p className="mt-3 max-w-2xl leading-relaxed">{lead}</p> : null}
 
             {/* The in-game tagline, which the artwork mirror does not carry.
-                Shown above the biography because it is the brawler's own line
-                rather than a description of it, and it reads as one. */}
-            {wiki?.stats.title ? (
-              <p className="mt-1 text-sm font-semibold italic text-muted">
-                &ldquo;{wiki.stats.title}&rdquo;
-              </p>
-            ) : null}
-
+                Both titles live below the biography now. */}
             <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">{brawler.description}</p>
 
-            {/* The title unlocked at prestige. Published nowhere else — not in
-                the game API, not in the artwork mirror — and it is the one fact
-                on this page a player cannot look up in game before earning it. */}
-            {wiki?.stats.prestigeTitle ? (
-              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
-                <PrestigeIcon total={1} className="size-4" />
-                Prestige title
-                <span className="font-bold text-foreground">{wiki.stats.prestigeTitle}</span>
-              </p>
+            {/* Both titles a brawler carries, presented as titles.
+                Published nowhere else — not in the game API, not in the
+                artwork mirror — so the wiki is the only source for either.
+
+                The trophy title used to render above the biography as an
+                italic quote, on the reading that it was the brawler's own
+                line. It is not: it is the title unlocked at 1,000 trophies,
+                and styling it as flavour text hid the one of the two a player
+                is most likely to have actually earned. The prestige title is
+                still the rarer of the pair, which is why it keeps its own
+                icon rather than sharing the trophy. */}
+            {wiki?.stats.title || wiki?.stats.prestigeTitle ? (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {wiki?.stats.title ? (
+                  <p className="inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                    <TrophyIcon className="size-4" />
+                    Title
+                    <span className="font-bold text-foreground">{wiki.stats.title}</span>
+                  </p>
+                ) : null}
+                {wiki?.stats.prestigeTitle ? (
+                  <p className="inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                    <PrestigeIcon total={1} className="size-4" />
+                    Prestige title
+                    <span className="font-bold text-foreground">{wiki.stats.prestigeTitle}</span>
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
         </div>

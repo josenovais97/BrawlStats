@@ -70,6 +70,15 @@ export interface PanelMode {
  */
 const SHOWN_PER_TIER = 8;
 
+/**
+ * Map picks shown before "show more".
+ *
+ * Ten is the useful answer almost always; the rest matter when a draft has
+ * eaten the top of the list, which is rare enough that it should not cost
+ * everyone else a longer scroll in a panel floating over the game.
+ */
+const SHOWN_MAP_PICKS = 10;
+
 /** Where the last-used mode is kept between openings. */
 const STORED_MODE = 'brawlzone.bubble.mode';
 const STORED_MAP = 'brawlzone.bubble.map';
@@ -294,7 +303,7 @@ export function PanelTiers({
       ) : null}
 
       {currentMap ? (
-        <MapPicks map={currentMap} onPick={show} openId={openId} />
+        <MapPicks key={currentMap.mapName} map={currentMap} onPick={show} openId={openId} />
       ) : current.entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
           Not enough sampled Ranked battles in {current.label.toLowerCase()} yet.
@@ -531,6 +540,8 @@ function MapPicks({
   onPick: (entry: PanelEntry) => void;
   openId: number | null;
 }) {
+  const [expanded, setExpanded] = useState(false);
+
   if (map.picks.length === 0) {
     return (
       <p className="px-2 py-6 text-center text-xs leading-relaxed text-muted">
@@ -540,9 +551,13 @@ function MapPicks({
     );
   }
 
+  const shown = expanded ? map.picks : map.picks.slice(0, SHOWN_MAP_PICKS);
+  const hidden = map.picks.length - shown.length;
+
   return (
+    <>
     <ol className="card divide-y divide-border overflow-hidden">
-      {map.picks.map((pick, index) => {
+      {shown.map((pick, index) => {
         const edge = pick.score - pick.overallScore;
         return (
           <li key={pick.brawlerId}>
@@ -616,5 +631,16 @@ function MapPicks({
         );
       })}
     </ol>
+
+    {hidden > 0 ? (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className="mt-1.5 w-full rounded-lg border border-border bg-surface-2/60 px-2 py-1.5 text-[11px] font-bold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+      >
+        Show {hidden} more
+      </button>
+    ) : null}
+    </>
   );
 }

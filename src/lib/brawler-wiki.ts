@@ -54,12 +54,16 @@ export interface BrawlerStats {
   className: string | null;
   rarityName: string | null;
   /**
-   * The brawler's in-game tagline, and the title unlocked at prestige.
+   * The two titles a brawler carries: the one unlocked at 1,000 trophies and
+   * the one unlocked at prestige.
    *
-   * Neither exists in the artwork mirror or the game API — the wiki is the only
-   * published source. The prestige title is the more interesting of the two: it
-   * is a reward players work toward and cannot look up in the game before
-   * earning it.
+   * Neither exists in the artwork mirror or the game API — the wiki is the
+   * only published source for either.
+   *
+   * `title` was described here as an "in-game tagline", which is how it came
+   * to be rendered as an italic quote above the biography rather than as a
+   * title. Some of them do read like one ("Boom!", "#haters") but they are
+   * titles, and the brawler page shows both as such.
    */
   title: string | null;
   prestigeTitle: string | null;
