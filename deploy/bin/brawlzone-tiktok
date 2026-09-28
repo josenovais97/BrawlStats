@@ -249,19 +249,35 @@ if [ -z "$PUBLISH_ID" ] || { [ -n "$ERR" ] && [ "$ERR" != "ok" ]; }; then
   esac
 fi
 
-record_state "last_post.${MODE}" "$(now_iso)" || true
 echo "uploaded ${DAY} as ${PUBLISH_ID}"
 
-# Status is informational: the upload is already accepted, and TikTok processes
-# it asynchronously. Worth printing so a failure that happens after acceptance
-# is visible in the log rather than silent.
-sleep 5
-status=$(curl -s --max-time 30 -X POST "$STATUS_URL" \
-  -H "Authorization: Bearer ${ACCESS}" \
-  -H 'Content-Type: application/json; charset=UTF-8' \
-  --data-raw "{\"publish_id\":\"${PUBLISH_ID}\"}")
-read -r STATUS FAIL_REASON < <(
-  printf '%s' "$status" | python3 -c '
+# Poll until TikTok reaches a terminal state, not just once.
+#
+# Acceptance is not publication. `content/init/` returning a publish id means
+# TikTok took the request; it then fetches every image and can still fail, and
+# the only way to learn that is to ask.
+#
+# This used to sleep five seconds, poll once, and report whatever came back --
+# then send the "ready to publish" mail regardless. On 2026-09-28 the poll
+# caught PROCESSING_DOWNLOAD, which is not a terminal state, the mail went out
+# saying the carousel was waiting, and the upload then failed with
+# photo_pull_failed. The post never existed and nothing said so. A
+# notification that fires before the outcome is known is worse than none: it
+# is a false all-clear.
+#
+# Two minutes of polling. Every successful run before that day reached
+# SEND_TO_USER_INBOX within five seconds, so this is slack rather than an
+# expected wait.
+STATUS=''
+FAIL_REASON='-'
+for attempt in $(seq 1 24); do
+  sleep 5
+  status=$(curl -s --max-time 30 -X POST "$STATUS_URL" \
+    -H "Authorization: Bearer ${ACCESS}" \
+    -H 'Content-Type: application/json; charset=UTF-8' \
+    --data-raw "{\"publish_id\":\"${PUBLISH_ID}\"}")
+  read -r STATUS FAIL_REASON < <(
+    printf '%s' "$status" | python3 -c '
 import json, sys
 try:
     d = json.load(sys.stdin).get("data", {})
@@ -269,8 +285,30 @@ except Exception:
     d = {}
 print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
 ' 2>/dev/null
-)
-echo "status: ${STATUS:-?} ${FAIL_REASON:--}"
+  )
+  case "$STATUS" in
+    SEND_TO_USER_INBOX|PUBLISH_COMPLETE|FAILED) break ;;
+  esac
+done
+echo "status: ${STATUS:-?} ${FAIL_REASON:--} (after $((attempt * 5))s)"
+
+# A failure here is the whole point of polling: say so loudly rather than
+# mailing "ready to publish" about a post that does not exist.
+if [ "$STATUS" = "FAILED" ]; then
+  case "$FAIL_REASON" in
+    photo_pull_failed)
+      die "::error::TikTok could not fetch the slides from ${SITE}. They are reachable from this box, so the block is between TikTok and the origin -- check Cloudflare (Bot Fight Mode challenges automated fetchers and cannot be scoped per-path on the free plan)." ;;
+    *)
+      die "::error::TikTok rejected the upload after accepting it: ${FAIL_REASON}" ;;
+  esac
+fi
+
+# Anything still in flight after two minutes is not a success, and must not be
+# announced as one.
+case "$STATUS" in
+  SEND_TO_USER_INBOX|PUBLISH_COMPLETE) : ;;
+  *) die "::error::upload did not reach a terminal state in two minutes (last seen: ${STATUS:-unknown})" ;;
+esac
 
 # ------------------------------------------------------------------- the mail
 #
@@ -287,6 +325,11 @@ echo "status: ${STATUS:-?} ${FAIL_REASON:--}"
 # No <img> of the card: mail clients block remote images by default, so an
 # email whose whole content is a blocked image says nothing. The findings go in
 # as text, which is also what makes the mail skimmable on a phone.
+# Recorded here rather than at upload time: health check 11 reads this to
+# answer "is the posting still working", and a timestamp written before the
+# outcome was known would have reported 2026-09-28 as a successful post.
+record_state "last_post.${MODE}" "$(now_iso)" || true
+
 HTML_LIB=/usr/local/lib/brawlzone-html.sh
 if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
   # shellcheck disable=SC1090
