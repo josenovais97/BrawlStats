@@ -80,7 +80,7 @@ export const CRAWLER_DISALLOW = [
  * with no traffic to show for it; guessing at others trades away reach for
  * nothing.
  */
-export const BLOCKED_AGENTS = ['meta-externalagent'] as const;
+export const BLOCKED_AGENTS = ['meta-externalagent', 'Lightpanda'] as const;
 
 export const SOCIAL_AGENTS = [
   'Twitterbot',

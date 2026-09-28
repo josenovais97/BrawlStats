@@ -18,6 +18,21 @@
 	# matched here -- link previews are unaffected. So is Googlebot: search
 	# indexing continues exactly as before.
 	#
+	# `lightpanda` was added 2026-09-28, after a weekend of it. Lightpanda is a
+	# headless browser built for scraping, and over that weekend it was 19,975 of
+	# every 20,000 requests -- 99.9% of all traffic -- walking every top-level
+	# page in a loop from thousands of distinct addresses, none of them making
+	# more than ~36 requests. The app process sat pegged at 100% CPU for three
+	# days and the container went unhealthy.
+	#
+	# AGENTS.md trap 8 says blocking by user agent is NOT the fix, and that is
+	# still true of the flood it describes: that one sent Chrome's UA from
+	# thousands of addresses, so there was nothing to match on. This one names
+	# itself in every request. The lesson is not "never match the agent", it is
+	# "match on what is actually distinctive" -- and here that is the agent.
+	# If it ever starts spoofing Chrome, this line stops working and the answer
+	# becomes rate limiting at the edge, which this image cannot do.
+	#
 	# Kept in step with BLOCKED_AGENTS in src/lib/crawl-policy.ts, which is
 	# what robots.txt reads. Neither enforces the other: robots.txt is a
 	# request, this is the answer for an agent that ignores it.
@@ -50,7 +65,7 @@
 	# and Caddy rejects the whole file, which `caddy reload` then declines,
 	# leaving the previous config running. Silently, unless someone checks the
 	# reload's exit code, which auto-deploy.sh now does.
-	@blocked_agents header_regexp User-Agent (?i)meta-externalagent
+	@blocked_agents header_regexp User-Agent (?i)meta-externalagent|lightpanda
 	handle @blocked_agents {
 		respond "Refused. See /robots.txt" 403
 	}
