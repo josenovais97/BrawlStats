@@ -323,29 +323,73 @@ fi
 # `${problems[@]:-}` because an empty array under `set -u` is an error on some
 # bash builds, and this runs before the empty case is handled.
 signature=$(printf '%s\n' "${problems[@]:-}" | sed 's/[0-9][0-9]*/N/g' | sort | tr '\n' ';')
-prev=$(cat "$STATE" 2>/dev/null || echo ok)
+[ ${#problems[@]} -eq 0 ] && signature=ok
 
+# Alert on a pattern, not on a transition.
+#
+# Comparing the problem SET already stopped repeat mail while one problem
+# persisted. It did not stop *flapping*: a condition that comes and goes is a
+# fresh transition every time, and every transition was an email. On the night
+# of 2026-09-28 the site was intermittently timing out under a scraper flood
+# and this sent five UNHEALTHY/RECOVERED pairs between 01:06 and 05:00 -- ten
+# emails saying nothing but "still bad", which buried the one message that
+# morning that actually needed reading. That is the exact failure this file
+# warns about in its own header: alerting too often trains you to ignore it.
+#
+# The obvious fix -- "require N consecutive identical runs" -- is wrong, and
+# was written and thrown away before this one. Under it, an alternating
+# bad/ok/bad/ok sequence never repeats itself, so a genuinely degraded site
+# sends NOTHING. Ten mails is bad; silence is worse.
+#
+# So the window is "how many of the last N runs failed", which does not care
+# whether the failures were adjacent. Two of the last three, at a ten-minute
+# cadence, means: a single slow probe is ignored, a sustained outage is
+# reported within twenty minutes, and a site flapping every other run is
+# reported once. Recovery needs three clean runs in a row, so a flapping site
+# is never declared better between blips.
+HISTORY_LEN=3
+FAIL_THRESHOLD=2
+
+prev_hist=$(sed -n 2p "$STATE" 2>/dev/null || true)
+prev_announced=$(sed -n 3p "$STATE" 2>/dev/null || true)
+# Anything that is not a run of 0s and 1s is a state file from the older
+# single-line format, or a corrupted one. Starting the window empty costs one
+# extra run before the first alert and cannot produce a false one.
+case "$prev_hist" in *[!01]*) prev_hist='' ;; esac
+[ -n "$prev_announced" ] || prev_announced=ok
+
+if [ "$signature" = ok ]; then now=0; else now=1; fi
+hist="${prev_hist}${now}"
+# Guarded: `${hist: -N}` returns the EMPTY string when the string is shorter
+# than N, not the whole string, so trimming unconditionally would keep the
+# window permanently empty and no alert would ever fire.
+[ ${#hist} -gt "$HISTORY_LEN" ] && hist="${hist: -$HISTORY_LEN}"
+fails=${hist//0/}; fails=${#fails}
+
+announced=$prev_announced
+if [ "$signature" != ok ] && [ "$fails" -ge "$FAIL_THRESHOLD" ] && [ "$signature" != "$prev_announced" ]; then
+  { printf 'Health check failed %s of the last %s runs, most recently at %s.\n\n' \
+      "$fails" "${#hist}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    for p in "${problems[@]}"; do printf '  - %s\n' "$p"; done
+    printf '\nContainers:\n'; (cd /home/ubuntu/brawlstats && docker compose ps 2>&1 | head -8)
+  } | /usr/local/bin/brawlzone-alert "UNHEALTHY: ${problems[0]}"
+  announced=$signature
+elif [ "$signature" = ok ] && [ "$fails" -eq 0 ] && [ ${#hist} -ge "$HISTORY_LEN" ] \
+     && [ "$prev_announced" != ok ]; then
+  printf 'Recovered at %s, after %s clean runs.\n\nAll checks passing:\n  site HTTP 200\n  data fresh\n  disk %s%%\n  containers up\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$HISTORY_LEN" "$use" | /usr/local/bin/brawlzone-alert "RECOVERED"
+  announced=ok
+fi
+
+printf '%s\n%s\n%s\n' "$signature" "$hist" "$announced" > "$STATE"
 
 if [ ${#problems[@]} -eq 0 ]; then
   # Say what was checked. A log that only records that something ran cannot
   # tell you afterwards whether it was actually looking at anything.
   age=$([ -n "$last" ] && echo "$((last / 60))m" || echo "unknown")
   echo "All checks passed: site HTTP $code in ${took}s, data $age old, disk ${use}%, $(cd /home/ubuntu/brawlstats && docker compose ps --services --status running | wc -l) containers up"
-  if [ "$prev" != "ok" ]; then
-    printf 'Recovered at %s.\n\nAll checks passing:\n  site HTTP 200\n  data fresh\n  disk %s%%\n  containers up\n' \
-      "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$use" | /usr/local/bin/brawlzone-alert "RECOVERED"
-  fi
-  echo ok > "$STATE"
   exit 0
 fi
-
-if [ "$prev" != "$signature" ]; then
-  { printf 'Health check failed at %s.\n\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    for p in "${problems[@]}"; do printf '  - %s\n' "$p"; done
-    printf '\nContainers:\n'; (cd /home/ubuntu/brawlstats && docker compose ps 2>&1 | head -8)
-  } | /usr/local/bin/brawlzone-alert "UNHEALTHY: ${problems[0]}"
-fi
-echo "$signature" > "$STATE"
 # Exit 0: the alert is the output. A non-zero exit would also trip OnFailure
 # and send a second, less useful mail about the checker itself.
 exit 0
