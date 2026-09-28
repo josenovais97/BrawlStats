@@ -262,6 +262,33 @@ else
   problems+=("TikTok state file is missing -- the integration is not authorised")
 fi
 
+# 12. Is the TLS certificate being renewed?
+#
+#     Added before the Cloudflare proxy cutover, because that cutover puts a
+#     third party in the renewal path. Caddy renews via HTTP-01 on port 80,
+#     and behind the proxy that challenge has to travel Cloudflare -> origin.
+#     It normally does. If it ever silently stops, nothing breaks for sixty
+#     days and then the certificate expires and the whole site goes down at
+#     once, with no warning and no gradual symptom to notice.
+#
+#     That is the same shape as every other failure this file exists for: the
+#     thing that stopped working stopped quietly. A renewal that is not
+#     happening is invisible right up until it is total.
+#
+#     21 days. Caddy renews at 30 days remaining, so anything under 21 means
+#     at least one renewal attempt has already failed -- early enough to fix
+#     by hand, late enough not to fire on a normal renewal cycle.
+CERT_MIN_DAYS=21
+cert_end=$(echo | openssl s_client -servername "${SITE#https://}" -connect "${SITE#https://}:443" 2>/dev/null \
+  | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+if [ -n "$cert_end" ]; then
+  cert_days=$(( ( $(date -d "$cert_end" +%s) - $(date +%s) ) / 86400 ))
+  [ "$cert_days" -ge "$CERT_MIN_DAYS" ] ||
+    problems+=("TLS certificate expires in ${cert_days} days (renewal may be failing)")
+else
+  problems+=("could not read the TLS certificate from $SITE")
+fi
+
 # The state is the SET of problems, not a yes/no.
 #
 # It used to be the single word `ok` or `failed`, and alerting only on the
