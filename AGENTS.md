@@ -304,12 +304,46 @@ with the number of *distinct URLs* a crawler can reach, and nothing about
 adding a route makes that number visible. So it is now measured rather than
 argued. `npm run crawl:budget` walks the site the way a crawler does — same
 origin, `<a href>` only, obeying `robots.txt` and `rel="nofollow"` — and prints
-the reachable set per section, currently **421 URLs** link-reachable and ~1,000
-counting the sitemap. It exits non-zero if the walk does not terminate.
+the reachable set per section. It exits non-zero if the walk does not
+terminate.
+
+Measured 2026-09-28: **932 URLs** link-reachable. The figure in this paragraph
+said 421 for a month, which is the shape of rot this file exists to prevent, so
+the sections and what bounds each are written down rather than the total alone:
+
+| section | URLs | what bounds it |
+| --- | --- | --- |
+| `/maps` | 468 | the game's **active** rotation — `getActiveMaps` feeds every listing, and retired maps resolve but are not linked |
+| `/compare` | 122 | matchup links off the 107 brawler pages, plus the index's suggestions |
+| `/brawlers` | 110 | the roster |
+| `/player` | 100 | an explicit allowlist, `scripts/gen-indexable-players.ts` |
+| `/tier-list` | 76 | formats x modes x windows |
+| `/daily` | 24 | `listDailyReports(limit = 60)`, so it stops at ~61 |
+| everything else | ~30 | static pages, one each |
+
+**The total is not the signal; a section without a bound is.** Both dynamic
+routes above existed before the 421 was measured, so none of that growth came
+from adding a route — it came from the sampler covering more of the game, which
+makes more pages have enough data to render and link. The number will therefore
+keep drifting on its own, and "it went up" is not evidence of a problem.
+
+The one to re-check on any change is `/compare`. It is combinatorial in
+principle — 107 brawlers is 5,671 unordered pairs — and it is bounded today for
+one reason: **`/compare/[pair]` is a leaf.** It links back to `/compare` and to
+the two brawler pages, and to no other pair. That is exactly the property
+`/draft` lost in trap 5, where every state linked to every next state. If a
+"related comparisons" block is ever added to that page, the walk stops
+terminating and the section goes from 122 to the full 5,671 or worse.
 
 **Run it against a local `next start` after adding any route with a dynamic
 segment**, and check the new route's count is a number you can explain. The
 answer to "is this bounded?" is the output of that command, not an argument.
+
+Against production it needs `CRAWL_CONCURRENCY=2`, because the Cloudflare rate
+limit added 2026-09-28 blocks an IP at 100 requests per 10 seconds and the
+default eight-way walk trips it. A throttled walk reports a *smaller* surface,
+which reads exactly like a healthy bound — so the script now counts 403s and
+429s and fails loudly rather than under-reporting.
 
 **Do not raise sampling frequency, pool size, or any retention window without
 re-deriving the plateau.** `storage-pressure.test.ts` and

@@ -28,7 +28,24 @@ const BASE = (process.argv[2] ?? 'http://localhost:3111').replace(/\/$/, '');
 
 /** Well past the ~1,000 URLs the sitemap lists, and far short of a real trap. */
 const CAP = 5_000;
-const CONCURRENCY = 8;
+
+/**
+ * Overridable, because production now rate-limits this tool.
+ *
+ * A Cloudflare rule added 2026-09-28 blocks an IP at 100 requests per 10
+ * seconds. Eight in flight against a site answering in a few hundred
+ * milliseconds is roughly 200 per 10s, so the default walk trips it, gets
+ * blocked, and reports a *smaller* reachable set -- the one failure mode this
+ * script must never have, since its whole output is the answer to "is this
+ * bounded?". A short walk that stops early looks exactly like a healthy bound.
+ *
+ * Local runs should leave it alone. Against production use CRAWL_CONCURRENCY=2,
+ * which keeps the walk near 5 req/s.
+ */
+const CONCURRENCY = Number(process.env.CRAWL_CONCURRENCY) || 8;
+
+/** CRAWL_DUMP=1 prints every reachable path, grouped, for eyeballing shape. */
+const DUMP = process.env.CRAWL_DUMP === '1';
 
 /**
  * Only the `*` group matters: this is asking what an ordinary crawler sees.
@@ -119,6 +136,7 @@ async function main() {
   const bytes = new Map();
   let queue = ['/'];
   let capped = false;
+  let throttled = 0;
 
   while (queue.length > 0 && !capped) {
     const batch = queue.splice(0, CONCURRENCY);
@@ -129,6 +147,12 @@ async function main() {
         });
         // A blocked path answers 404 with no body, which is the enforcement
         // working; counting its bytes as a page would misreport the saving.
+        // 429 and 403 are the rate limiter, not the site: treat them as fatal
+        // rather than as "no links here". Swallowing them would shrink the
+        // reported surface and turn a throttled run into a false all-clear.
+        if (response.status === 429 || response.status === 403) {
+          throttled += 1;
+        }
         if (!response.ok) return new Set();
         const html = await response.text();
         bytes.set(section(pathname), (bytes.get(section(pathname)) ?? 0) + html.length);
@@ -159,6 +183,20 @@ async function main() {
     console.log(`${name.padEnd(18)} ${String(count).padStart(5)}    ${mb.toFixed(1).padStart(8)} MB`);
   }
   console.log(`${'TOTAL'.padEnd(18)} ${String(seen.size).padStart(5)}`);
+
+  if (DUMP) {
+    console.log('\n--- reachable paths ---');
+    for (const pathname of [...seen].sort()) console.log(pathname);
+  }
+
+  if (throttled > 0) {
+    console.error(
+      `\nTHROTTLED: ${throttled} request(s) were refused with 403/429.\n` +
+        'The number above is therefore a FLOOR, not the bound. Re-run with\n' +
+        'CRAWL_CONCURRENCY=2, or against a local `next start`.',
+    );
+    process.exitCode = 1;
+  }
 
   if (capped) {
     console.error(
