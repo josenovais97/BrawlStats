@@ -12,9 +12,38 @@ mkdir -p "$(dirname "$STATE")"
 
 problems=()
 
-# 1. Is the site actually serving?
-code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SITE/" || echo 000)
-[ "$code" = "200" ] || problems+=("site returned HTTP $code")
+# 1. Is the site actually serving, and serving in a reasonable time?
+#
+# "Returns 200" was the whole of this check until 2026-09-28, and that is how a
+# scraper flood ran for three days without a word. The app sat pegged at 100%
+# CPU the entire weekend and every page still answered 200 -- just slowly --
+# so this check passed every ten minutes while the site was effectively
+# unusable. It only ever fired once requests degraded all the way to a
+# timeout, at which point it flapped UNHEALTHY/RECOVERED five times in a night.
+#
+# Up and unusable is the failure mode a status check is worst at seeing, so
+# latency is now measured rather than inferred from a status code.
+#
+# Two samples, both of which must be slow. One slow request is a hiccup -- a
+# cold ISR render, a sampler run landing at the same moment -- and alerting on
+# it would train you to ignore the alert, which is the one thing a monitor
+# cannot afford.
+#
+# 3 seconds against a normal 0.2-0.5s total for a cached page. Generous on
+# purpose: this is looking for "something is wrong", not for a regression.
+SLOW_SECONDS=3
+probe() { curl -s -o /dev/null -w '%{http_code} %{time_total}' --max-time 20 "$SITE/" 2>/dev/null || echo '000 20'; }
+
+read -r code took <<<"$(probe)"
+[ "$code" = "200" ] || problems+=("site returned HTTP ${code:-000}")
+
+# Only re-probe when the first one looked slow; a healthy box does one request.
+if [ "$code" = "200" ] && [ "${took%%.*}" -ge "$SLOW_SECONDS" ] 2>/dev/null; then
+  read -r code2 took2 <<<"$(probe)"
+  if [ "${took2%%.*}" -ge "$SLOW_SECONDS" ] 2>/dev/null; then
+    problems+=("site is slow: homepage took ${took}s then ${took2}s (normally under 1s)")
+  fi
+fi
 
 # 2. Is the data fresh? The sampler runs every 2h; 5h means runs are failing
 #    or the timer stopped, which the OnFailure hook cannot catch because a
@@ -261,7 +290,7 @@ if [ ${#problems[@]} -eq 0 ]; then
   # Say what was checked. A log that only records that something ran cannot
   # tell you afterwards whether it was actually looking at anything.
   age=$([ -n "$last" ] && echo "$((last / 60))m" || echo "unknown")
-  echo "All checks passed: site HTTP $code, data $age old, disk ${use}%, $(cd /home/ubuntu/brawlstats && docker compose ps --services --status running | wc -l) containers up"
+  echo "All checks passed: site HTTP $code in ${took}s, data $age old, disk ${use}%, $(cd /home/ubuntu/brawlstats && docker compose ps --services --status running | wc -l) containers up"
   if [ "$prev" != "ok" ]; then
     printf 'Recovered at %s.\n\nAll checks passing:\n  site HTTP 200\n  data fresh\n  disk %s%%\n  containers up\n' \
       "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$use" | /usr/local/bin/brawlzone-alert "RECOVERED"

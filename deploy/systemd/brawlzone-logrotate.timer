@@ -1,0 +1,24 @@
+[Unit]
+Description=Rotate BrawlZone logs hourly
+
+[Timer]
+# Hourly, and that is the whole point of this unit existing.
+#
+# The rule in /etc/logrotate.d/brawlzone carries `maxsize 100M` precisely so a
+# flood cannot run the disk out between daily rotations. But logrotate only
+# evaluates maxsize when logrotate RUNS, and the system timer runs it once a
+# day at 00:00 -- so the bound was never actually checked more than once a day.
+#
+# On 2026-09-28 the access log reached 4.6 GB in seven hours (a scraper flood,
+# one line per request, plus one line per 403 once it was refused). `maxsize
+# 100M` was in the config the entire time and did nothing, because nothing
+# looked.
+#
+# Its own state file, so this and the system-wide daily run do not fight over
+# /var/lib/logrotate/status and skip each other's rotations.
+OnCalendar=hourly
+Persistent=false
+Unit=brawlzone-logrotate.service
+
+[Install]
+WantedBy=timers.target

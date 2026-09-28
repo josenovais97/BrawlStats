@@ -1,0 +1,9 @@
+[Unit]
+Description=BrawlZone log rotation, run often enough for maxsize to mean something
+# A failure here means the access log is unbounded, which is how a full disk
+# killed Postgres on 2026-09-09.
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/logrotate /etc/logrotate.d/brawlzone --state /var/lib/brawlzone/logrotate.state
