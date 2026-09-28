@@ -6,4 +6,4 @@ OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/logrotate /etc/logrotate.d/brawlzone --state /var/lib/brawlzone/logrotate.state
+ExecStart=/usr/sbin/logrotate /etc/logrotate.d/brawlzone-access --state /var/lib/brawlzone/logrotate.state

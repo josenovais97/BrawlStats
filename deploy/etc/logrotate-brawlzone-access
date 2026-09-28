@@ -1,0 +1,39 @@
+# Caddy's access log, on its own so it can be rotated on its own schedule.
+#
+# Split out of the job-log config on 2026-09-28. Both lived in one file, and
+# the hourly timer added that morning was therefore rotating the job logs
+# hourly too -- which fragmented them and left `brawlzone-log tiktok` showing
+# an empty current file while the run it was meant to show sat in an archive.
+#
+# This file is what `brawlzone-logrotate.timer` runs hourly. The job logs stay
+# with the daily system run, where they belong: they come to a few hundred
+# kilobytes a day between them.
+#
+# `maxsize` is the whole reason for the hourly cadence. The access log is a
+# line per request, so its growth rate is set by whoever is pointed at the site
+# rather than by anything this box does. 2026-09-28: a scraper flood produced
+# 4.6 GB in seven hours while `maxsize 100M` sat in this config doing nothing,
+# because logrotate only evaluates maxsize when logrotate runs, and it ran once
+# a day. A full disk is how Postgres died on 2026-09-09.
+#
+# copytruncate because Caddy holds the file open; it appends rather than
+# seeking, so truncation is safe. No `delaycompress`: Caddy reopens on
+# rotation, and a rotated file sitting uncompressed for a day is what turned
+# 489 MB into a disk emergency once already.
+#
+# Seven days. A crawler refused at 81 requests a second is still a line per
+# request -- 250-330 MB compressed per day -- and thirty of those is a fifth of
+# the disk for a file nobody reads past a week.
+/var/log/brawlzone/access/*.log {
+    daily
+    maxsize 100M
+    rotate 7
+    missingok
+    notifempty
+    compress
+    copytruncate
+    dateext
+    dateformat -%Y-%m-%d-%s
+    su root adm
+    create 0664 root adm
+}

@@ -86,6 +86,7 @@ sudo systemctl daemon-reload
 
 say "logrotate, fail2ban, sshd"
 sudo install -m 644 "$REPO_DIR/deploy/etc/logrotate-brawlzone" /etc/logrotate.d/brawlzone
+sudo install -m 644 "$REPO_DIR/deploy/etc/logrotate-brawlzone-access" /etc/logrotate.d/brawlzone-access
 sudo install -m 644 "$REPO_DIR/deploy/etc/fail2ban-jail.local" /etc/fail2ban/jail.local
 # apt starts fail2ban on install, so `enable --now` is a no-op and the config
 # is never read. It must be restarted.
