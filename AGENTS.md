@@ -27,7 +27,8 @@ learned expensively.
 | Deploys | **systemd timer**, `brawlzone-deploy`, every 5 min: resets to `origin/main` and rebuilds if HEAD moved |
 | Backups | **systemd timer**, `brawlzone-backup`, nightly 03:30 UTC, 7 daily + 4 weekly |
 | Backup proof | **systemd timer**, `brawlzone-verify-restore`, Mondays 04:30 UTC, restores into a scratch database |
-| DNS | Cloudflare, A records **DNS-only (grey cloud)** for apex and `www` |
+| DNS | Cloudflare, A records **proxied (orange cloud)** for apex, `www` and `analytics` since 2026-09-28 |
+| Edge | Cloudflare in front of Caddy; origin accepts 80/443 **only from Cloudflare ranges** |
 
 The box is a mirror of `origin/main` — the deploy timer resets to it, so **never
 edit files on the box**; they are silently wiped on the next cycle. The one
@@ -220,8 +221,37 @@ runs inside the process it protects.** When Node saturated, the middleware
 holding the ceiling stopped running too, so 2,994 of 3,000 requests returned
 nothing at all — including the ones that were supposed to be cheap 429s. Caddy
 is a separate process and would be the place for an outer guard, but its
-standard image has no `rate_limit` module, so there is currently no second line
-of defence. Do not assume one exists.
+standard image has no `rate_limit` module, so there was no second line of
+defence inside this stack.
+
+**That changed on 2026-09-28**, and the reason is worth reading before touching
+any of it. A headless scraper called Lightpanda spent a weekend walking every
+page in a loop -- 19,975 of every 20,000 requests, from thousands of addresses
+none of which sent more than ~36. The app sat pegged at 100% CPU for three days
+and the access log reached 4.6 GB in seven hours.
+
+Two things that were supposed to catch it did not. Health check 1 asked only
+whether the site returned 200; it did, every page, the whole weekend, just
+slowly. And the logrotate rule carried `maxsize 100M` the entire time while
+logrotate ran once a day, so the bound was never evaluated. Both are fixed --
+latency is measured now, and an hourly timer runs logrotate -- but the shape is
+the lesson: *up and unusable* is the failure a status check is worst at seeing.
+
+The immediate fix was refusing the agent in Caddy, which works here **because
+this flood named itself**. That does not contradict the paragraph above: the
+2026-09-11 flood sent Chrome's UA and there was nothing to match on. The rule
+is "match on what is actually distinctive", not "user agents never work". If
+Lightpanda ever spoofs a browser, that line stops working.
+
+The durable answer is the edge. Cloudflare now proxies all three hostnames and
+`deploy/bin/brawlzone-firewall` restricts 80/443 to Cloudflare's ranges, so the
+origin cannot be reached directly and the proxy cannot be bypassed. Two details
+in that script are load-bearing and non-obvious: it filters in **DOCKER-USER**,
+because Docker publishes ports through FORWARD and the INPUT rules bootstrap
+has always added were passing 47 packets on 443 and zero on 80 while
+DOCKER-USER carried 2,079 million; and it binds to the external interface,
+because DOCKER-USER also carries containers talking *out*, so an unscoped
+`--dport 443` rule drops the app's own calls to the CDN, the wiki and TikTok.
 
 Two things that are *not* the fix, both tried elsewhere in this file's history:
 blocking by user agent (the flood was 58 req/s from thousands of addresses at
