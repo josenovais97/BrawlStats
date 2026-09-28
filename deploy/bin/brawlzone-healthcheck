@@ -278,15 +278,28 @@ fi
 #     21 days. Caddy renews at 30 days remaining, so anything under 21 means
 #     at least one renewal attempt has already failed -- early enough to fix
 #     by hand, late enough not to fire on a normal renewal cycle.
+#     READ OFF DISK, NOT OFF THE SOCKET. This check originally connected to
+#     the site and read whatever certificate came back, which was right for
+#     about six hours. Once Cloudflare proxied the domain, that socket
+#     terminates at Cloudflare, so the check was reading Cloudflare's edge
+#     certificate -- which Cloudflare renews itself and which essentially
+#     cannot fail -- while ignoring the Let's Encrypt certificate that can.
+#     A monitor pointed at the one thing that never breaks is worse than none,
+#     because it reports green for the failure it was built to catch.
+#
+#     Caddy's own copy is the authority: it is what the origin actually
+#     serves, and its mtime moves when a renewal succeeds.
 CERT_MIN_DAYS=21
-cert_end=$(echo | openssl s_client -servername "${SITE#https://}" -connect "${SITE#https://}:443" 2>/dev/null \
+cert_host="${SITE#https://}"
+cert_end=$(cd /home/ubuntu/brawlstats 2>/dev/null && docker compose exec -T caddy \
+  sh -c "cat /data/caddy/certificates/*/${cert_host}/${cert_host}.crt" 2>/dev/null \
   | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
 if [ -n "$cert_end" ]; then
   cert_days=$(( ( $(date -d "$cert_end" +%s) - $(date +%s) ) / 86400 ))
   [ "$cert_days" -ge "$CERT_MIN_DAYS" ] ||
-    problems+=("TLS certificate expires in ${cert_days} days (renewal may be failing)")
+    problems+=("origin TLS certificate expires in ${cert_days} days (renewal may be failing)")
 else
-  problems+=("could not read the TLS certificate from $SITE")
+  problems+=("could not read the origin TLS certificate from Caddy")
 fi
 
 # The state is the SET of problems, not a yes/no.
