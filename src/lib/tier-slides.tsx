@@ -303,10 +303,10 @@ function mover(m: TierMove, art: string | null, rising: boolean): ReactElement {
 function method(post: TierPost): ReactElement {
   const lines = [
     `Ranked battles only, last ${post.windowLabel}`,
-    `${post.battles.toLocaleString('en-GB')} decided battles sampled`,
-    'Win rate adjusted against the mode baseline',
-    'A brawler needs 20 decided battles to be ranked',
-    'Score blends win rate with pick rate',
+    `${post.battles.toLocaleString('en-GB')} decided battles`,
+    'Win rate adjusted for mode baseline',
+    '20 decided battles minimum to rank',
+    'Score blends win rate and pick rate',
   ];
 
   return (
@@ -333,9 +333,16 @@ function method(post: TierPost): ReactElement {
         }}
       >
         {lines.map((line, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
             <div
-              style={{ display: 'flex', width: 14, height: 14, borderRadius: 7, background: ACCENT }}
+              style={{
+                display: 'flex',
+                width: 14,
+                height: 14,
+                borderRadius: 7,
+                background: ACCENT,
+                marginTop: 18,
+              }}
             />
             <div style={{ display: 'flex', fontSize: 36, color: FG }}>{line}</div>
           </div>

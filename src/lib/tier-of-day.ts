@@ -180,7 +180,14 @@ export async function tierOfDay(date: string): Promise<TierPost | null> {
   // F first, E only when F is empty. Both are "do not pick this", and on a
   // week when nothing is bad enough for F the slide should still have
   // something to say rather than being dropped.
-  const avoid = f.length > 0 ? f : e;
+  //
+  // Reversed, unlike every other tier. `inTier` sorts best-first, which on a
+  // "think twice before picking these" slide puts the *least* bad brawler at
+  // the top and gives it the highlight row -- emphasis on the one entry that
+  // least deserves it. Worst first is what the slide is actually claiming,
+  // and it is also what makes the trailing "N more" the mildest cases rather
+  // than the severest.
+  const avoid = (f.length > 0 ? f : e).slice().reverse();
   const avoidTier: Tier | null = f.length > 0 ? 'F' : e.length > 0 ? 'E' : null;
 
   // Restated against the published ranking, and dropped when the brawler is
