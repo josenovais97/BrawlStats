@@ -97,6 +97,30 @@ fi
 
 git reset --hard --quiet origin/main
 
+# The timers run copies, and until 2026-09-28 nothing updated them.
+#
+# Everything above this line deploys the *site*: the repo is reset and the
+# image is rebuilt. But every timer on this box -- sampler, backup, health,
+# TikTok, and this script itself -- executes a file under /usr/local/bin that
+# was put there by hand when it was written. A fix to any of them could be
+# committed, pushed and deployed, with the deploy reporting complete success,
+# while the box carried on running the old copy indefinitely.
+#
+# That happened. The TikTok job was found announcing posts that had failed;
+# the fix shipped and changed nothing, because no deploy had ever had a reason
+# to touch /usr/local/bin. Nothing was broken enough to notice -- the deploy
+# had genuinely done everything it knew about.
+#
+# Run from the repo path rather than the installed copy, so the installer is
+# the one file that cannot itself be stale. Fatal for the same reason the
+# migrate step below is: continuing to build on top of operational scripts
+# that are not the ones in this commit is how you get a deploy that reports
+# success and half works.
+if ! bash deploy/bin/brawlzone-install; then
+  echo "Installing deploy/ FAILED -- not building, previous image still serving"
+  exit 1
+fi
+
 # Schema before build, because the build reads the schema.
 #
 # From 2026-08-25 to 2026-09-08 this script had NO migrate step at all, and

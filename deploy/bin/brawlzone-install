@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# Copy deploy/ into the places on the box that actually read it.
+#
+# Until 2026-09-28 nothing did this. `auto-deploy.sh` reset the repo to
+# origin/main and rebuilt the Docker image, which is the whole of what the site
+# serves -- but every timer on this box runs a script from /usr/local/bin, and
+# those were put there by hand, once, whenever each was written. The repo copy
+# and the running copy were two files that happened to agree.
+#
+# They stopped agreeing the morning the TikTok job was found announcing a post
+# that had failed. The fix was committed, pushed, deployed -- and did nothing at
+# all, because the deploy had never had any reason to touch /usr/local/bin. The
+# job kept running the old code and would have gone on doing so indefinitely.
+# Nothing was broken enough to notice: the deploy reported success, because it
+# had genuinely done everything it knew about.
+#
+# That is trap 7 in AGENTS.md wearing different clothes -- a step that only ever
+# runs by hand is a step that has already stopped running, you just do not know
+# it yet. So the deploy runs this, and health check 13 re-derives the same
+# comparison independently, because this script could itself stop being called.
+#
+# Run from the repo, never from /usr/local/bin. Two reasons, and the second is
+# the important one: auto-deploy already has the repo checked out and freshly
+# reset, and an installer that installs itself cannot be stale if it is always
+# read from the source of truth rather than from a copy it made earlier.
+#
+#   brawlzone-install            install anything that differs
+#   brawlzone-install --check    report what differs, change nothing, exit 1
+#
+# It never deletes. There are files on this box that no longer have a repo
+# counterpart -- the brawlzone-*.service.d/onfailure.conf drop-ins predate the
+# OnFailure= lines now inlined in the units -- and an installer that cleaned up
+# after itself would silently remove whatever a future hand-fix had added.
+# Removing something is a decision for a person.
+set -uo pipefail
+
+REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd) || exit 1
+DEPLOY="$REPO/deploy"
+
+check_only=0
+[ "${1:-}" = "--check" ] && check_only=1
+
+# Where each file goes, derived rather than listed.
+#
+# A hand-maintained list of all 49 files would be one more thing that goes
+# quietly out of date -- which is the exact bug this script exists to fix. A
+# new script dropped into deploy/bin is installed by the next deploy without
+# anyone remembering to add a line here.
+#
+# deploy/etc is the exception, because those filenames deliberately do not
+# match their destinations (/etc/logrotate.d/brawlzone cannot be called
+# logrotate-brawlzone in the repo without being ambiguous). An unmapped file
+# there is a hard error rather than a skip: skipping would reintroduce exactly
+# the silence this is meant to end.
+dest_for () { # relative path under deploy/ -> "<dest> <mode>"
+  local rel=$1 name
+  name=$(basename "$rel")
+  case "$rel" in
+    # Sourced as a library by the mail-formatting jobs, not executed.
+    bin/brawlzone-html.sh)          echo "/usr/local/lib/$name 644" ;;
+    # The two entry points systemd invokes by absolute path from $HOME.
+    bin/*.sh)                       echo "/home/ubuntu/$name 755" ;;
+    bin/*)                          echo "/usr/local/bin/$name 755" ;;
+    systemd/*)                      echo "/etc/systemd/system/$name 644" ;;
+    etc/logrotate-brawlzone)        echo "/etc/logrotate.d/brawlzone 644" ;;
+    etc/logrotate-brawlzone-access) echo "/etc/logrotate.d/brawlzone-access 644" ;;
+    etc/fail2ban-jail.local)        echo "/etc/fail2ban/jail.local 644" ;;
+    etc/sshd-99-brawlzone.conf)     echo "/etc/ssh/sshd_config.d/99-brawlzone.conf 644" ;;
+    *) return 1 ;;
+  esac
+}
+
+# Write to a temporary name in the destination directory, then rename over.
+#
+# Not cosmetic. This script is called BY auto-deploy.sh and installs
+# auto-deploy.sh, and bash reads a script incrementally from an open file
+# descriptor as it executes it. Truncating and rewriting that file in place --
+# which is what `install` and a plain `cp` both do -- moves the bytes under the
+# interpreter mid-run and makes it execute whatever now sits at its current
+# offset. A rename leaves the running process on the old inode until it exits,
+# and the next run picks up the new one.
+place () { # src dest mode
+  local src=$1 dest=$2 mode=$3 dir sudo='' tmp
+  dir=$(dirname "$dest")
+  [ -d "$dir" ] || { [ -w "$(dirname "$dir")" ] || sudo=sudo; $sudo mkdir -p "$dir" || return 1; }
+  [ -w "$dir" ] || sudo=sudo
+  tmp="${dest}.brawlzone-install.$$"
+  $sudo cp -- "$src" "$tmp" || return 1
+  $sudo chmod "$mode" "$tmp" || { $sudo rm -f -- "$tmp"; return 1; }
+  $sudo mv -f -- "$tmp" "$dest" || { $sudo rm -f -- "$tmp"; return 1; }
+}
+
+drift=()
+installed=()
+changed_timers=()
+units_changed=0
+sshd_changed=0
+fail2ban_changed=0
+failed=0
+
+shopt -s nullglob
+for src in "$DEPLOY"/bin/* "$DEPLOY"/systemd/* "$DEPLOY"/etc/*; do
+  [ -f "$src" ] || continue
+  rel=${src#"$DEPLOY"/}
+
+  if ! mapping=$(dest_for "$rel"); then
+    echo "::error::deploy/$rel has no install destination -- add one to dest_for()" >&2
+    exit 1
+  fi
+  read -r dest mode <<<"$mapping"
+
+  cmp -s "$src" "$dest" 2>/dev/null && continue
+
+  drift+=("deploy/$rel -> $dest")
+  [ "$check_only" -eq 1 ] && continue
+
+  if ! place "$src" "$dest" "$mode"; then
+    echo "::error::could not install deploy/$rel to $dest" >&2
+    failed=1
+    continue
+  fi
+  installed+=("$dest")
+
+  case "$rel" in
+    systemd/*.timer)   units_changed=1; changed_timers+=("$(basename "$rel")") ;;
+    systemd/*)         units_changed=1 ;;
+    etc/sshd-*)        sshd_changed=1 ;;
+    etc/fail2ban-*)    fail2ban_changed=1 ;;
+  esac
+done
+
+if [ "$check_only" -eq 1 ]; then
+  if [ ${#drift[@]} -eq 0 ]; then
+    echo "in sync: every file under deploy/ matches its installed copy"
+    exit 0
+  fi
+  printf 'not installed (repo differs from the running copy):\n'
+  printf '  %s\n' "${drift[@]}"
+  exit 1
+fi
+
+if [ ${#installed[@]} -eq 0 ]; then
+  # Quiet on a no-op, like the rest of the deploy. This runs on every deploy
+  # and most deploys change no operational file at all.
+  exit "$failed"
+fi
+
+printf 'Installed %s file(s) from deploy/:\n' "${#installed[@]}"
+printf '  %s\n' "${installed[@]}"
+
+# A unit file on disk is not a unit systemd knows about, and a .timer that has
+# been rewritten keeps its old schedule until something restarts it. Copying
+# the file and stopping there would leave the change installed and inert --
+# which looks exactly like success and is the failure mode this whole script
+# exists to remove.
+if [ "$units_changed" -eq 1 ]; then
+  sudo systemctl daemon-reload || { echo "::error::daemon-reload failed" >&2; failed=1; }
+  for t in "${changed_timers[@]}"; do
+    # Only restart a timer that is already enabled. Installing a brand new
+    # timer should not silently start it -- that is a decision for whoever
+    # adds it, made deliberately once, not a side effect of a deploy.
+    if systemctl is-enabled --quiet "$t" 2>/dev/null; then
+      sudo systemctl restart "$t" || { echo "::error::could not restart $t" >&2; failed=1; }
+      echo "  restarted $t"
+    else
+      echo "  $t is installed but not enabled -- enable it by hand if it should run"
+    fi
+  done
+fi
+
+# sshd is validated after the fact and rolled back on failure, because a
+# drop-in cannot be checked in isolation: `sshd -t` reads the whole assembled
+# config or nothing. Reloading an invalid config would be the one change on
+# this box capable of locking everybody out of it, so a bad file goes back the
+# way it came and the deploy fails loudly rather than reloading.
+if [ "$sshd_changed" -eq 1 ]; then
+  if sudo sshd -t 2>/dev/null; then
+    sudo systemctl reload ssh && echo "  reloaded ssh"
+  else
+    echo "::error::sshd config is invalid after installing the drop-in; reverting and NOT reloading" >&2
+    sudo rm -f /etc/ssh/sshd_config.d/99-brawlzone.conf
+    sudo sshd -t || echo "::error::sshd config is still invalid after reverting -- fix by hand" >&2
+    failed=1
+  fi
+fi
+
+if [ "$fail2ban_changed" -eq 1 ] && systemctl is-active --quiet fail2ban; then
+  sudo systemctl reload fail2ban && echo "  reloaded fail2ban"
+fi
+
+exit "$failed"

@@ -302,6 +302,38 @@ else
   problems+=("could not read the origin TLS certificate from Caddy")
 fi
 
+# 13. Is the box running the scripts that are in the repo?
+#     The deploy installs deploy/ now, but that is a step, and the whole
+#     lesson of check 10 is that a step which stops running never fails. This
+#     asks the question from the other side -- not "did the install run" but
+#     "does the running copy match the commit" -- so it stays true even if the
+#     install is removed, reordered, or silently skipped by an early exit.
+#
+#     Until 2026-09-28 the answer was no and nothing could say so. Every timer
+#     on this box executes a copy under /usr/local/bin placed there by hand;
+#     the TikTok fix was committed, pushed and deployed while the job went on
+#     running the previous version, and the deploy reported success because it
+#     had done everything it knew about.
+#
+#     Read from the repo, not from the installed copy, or a stale installer
+#     would be grading its own homework.
+if [ -x /home/ubuntu/brawlstats/deploy/bin/brawlzone-install ]; then
+  inst_out=$(bash /home/ubuntu/brawlstats/deploy/bin/brawlzone-install --check 2>&1)
+  inst_rc=$?
+  stale=$(printf '%s\n' "$inst_out" | grep -c ' -> ')
+  if [ "$stale" -gt 0 ]; then
+    problems+=("$stale operational file(s) in the repo are not the ones installed on the box")
+  elif [ "$inst_rc" -ne 0 ]; then
+    # Non-zero with nothing to list is the installer refusing to run at all --
+    # an unmapped file in deploy/etc, most likely. Counting drift lines alone
+    # would read that as "no drift" and stay quiet, which is the same
+    # swallow-and-look-healthy failure this check exists to catch.
+    problems+=("deploy/bin/brawlzone-install --check failed (rc=$inst_rc): $(printf '%s' "$inst_out" | head -1)")
+  fi
+else
+  problems+=("deploy/bin/brawlzone-install is missing from the checkout")
+fi
+
 # The state is the SET of problems, not a yes/no.
 #
 # It used to be the single word `ok` or `failed`, and alerting only on the
