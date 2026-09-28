@@ -3,6 +3,7 @@ import {
   DEFAULT_TIER_WINDOW,
   TIER_WINDOWS,
   type TierFormat,
+  assignTierFromScore,
   getMetaMovers,
   getScoredRoster,
 } from '@/lib/stats';
@@ -74,6 +75,45 @@ const MOVER_LOOKBACK_DAYS = 7;
 const MIN_SAMPLE_FOR_MOVER = 300;
 const MIN_MOVE = 0.2;
 
+/**
+ * A mover, restated on the tier list's own terms.
+ *
+ * `MetaMover` cannot be shown beside a tier list, and that is not obvious.
+ * `compute_getMetaMovers` scores with `metaScore(rate, usage)` -- no skill
+ * edge -- while `getScoredRoster` blends the skill-controlled correction in,
+ * so the two produce different scores for the same brawler and therefore
+ * different tiers. On 2026-09-28 the mover said Willow had reached S; the
+ * published ranking had it 15th, in A, with ten brawlers above it. A carousel
+ * whose riser slide contradicts its own S-tier slide two swipes earlier is
+ * worse than one with no riser slide, because the contradiction is what the
+ * reader remembers.
+ *
+ * So the level comes from the roster -- the same numbers every other slide
+ * draws -- and only the *movement* comes from the mover. `tierBefore` is
+ * derived by subtracting that movement from the published score, which treats
+ * the brawler's skill edge as constant across the window. It is measured over
+ * a longer span than seven days, so that is close to true, and it is the
+ * assumption that makes the difference and the level consistent at once.
+ */
+export interface TierMove {
+  brawlerId: number;
+  name: string;
+  imageUrl: string | null;
+  /** The published score, as the tier slides show it. */
+  scoreNow: number;
+  /** How far it moved, from the mover. Signed. */
+  scoreDelta: number;
+  tierNow: Tier;
+  tierBefore: Tier;
+  winRateNow: number;
+  winRateDelta: number;
+  usageNow: number | null;
+  usageDelta: number | null;
+  sampleSize: number;
+  fromDate: string;
+  toDate: string;
+}
+
 export interface TierPostEntry {
   brawlerId: number;
   name: string;
@@ -100,8 +140,8 @@ export interface TierPost {
   rated: number;
   /** Totals behind the whole ranking, for the method line. */
   battles: number;
-  riser: MetaMover | null;
-  faller: MetaMover | null;
+  riser: TierMove | null;
+  faller: TierMove | null;
 }
 
 export async function tierOfDay(date: string): Promise<TierPost | null> {
@@ -143,13 +183,49 @@ export async function tierOfDay(date: string): Promise<TierPost | null> {
   const avoid = f.length > 0 ? f : e;
   const avoidTier: Tier | null = f.length > 0 ? 'F' : e.length > 0 ? 'E' : null;
 
+  // Restated against the published ranking, and dropped when the brawler is
+  // not in it: a mover the tier list does not rank has no level to show, and
+  // inventing one from the unedged score is the bug this replaced.
+  const ranked = new Map(rated.map((b) => [b.brawlerId, b]));
+  const restate = (m: MetaMover): TierMove | null => {
+    const now = ranked.get(m.brawlerId);
+    if (!now || now.metaScore === null || now.tier === null) return null;
+    const before = assignTierFromScore(now.metaScore - m.metaScoreDelta);
+    if (!before) return null;
+    return {
+      brawlerId: m.brawlerId,
+      name: m.brawlerName,
+      imageUrl: catalog?.byId.get(m.brawlerId)?.imageUrl ?? null,
+      scoreNow: now.metaScore,
+      scoreDelta: m.metaScoreDelta,
+      tierNow: now.tier,
+      tierBefore: before,
+      winRateNow: m.winRateNow,
+      winRateDelta: m.winRateDelta,
+      usageNow: m.usageNow,
+      usageDelta: m.usageDelta,
+      sampleSize: m.sampleSize,
+      fromDate: m.fromDate,
+      toDate: m.toDate,
+    };
+  };
+
   const eligible = movers.filter(
     (m) => m.sampleSize >= MIN_SAMPLE_FOR_MOVER && Math.abs(m.metaScoreDelta) >= MIN_MOVE,
   );
   const byDelta = [...eligible].sort((a, b) => b.metaScoreDelta - a.metaScoreDelta);
-  const riser = byDelta[0] && byDelta[0].metaScoreDelta > 0 ? byDelta[0] : null;
-  const last = byDelta[byDelta.length - 1];
-  const faller = last && last.metaScoreDelta < 0 ? last : null;
+
+  // First from each end that survives restatement, rather than the single
+  // extreme: a brawler dropped for being unranked should hand the slide to
+  // the next biggest move, not leave it empty.
+  const riser =
+    byDelta.filter((m) => m.metaScoreDelta > 0).map(restate).find((m) => m !== null) ?? null;
+  const faller =
+    byDelta
+      .filter((m) => m.metaScoreDelta < 0)
+      .reverse()
+      .map(restate)
+      .find((m) => m !== null) ?? null;
 
   return {
     date,

@@ -13,8 +13,8 @@ import {
   loadLogo,
   outro,
 } from '@/lib/slide-chrome';
-import { PER_TIER, type TierPost, type TierPostEntry } from '@/lib/tier-of-day';
-import type { MetaMover, Tier } from '@/types/stats';
+import { PER_TIER, type TierMove, type TierPost, type TierPostEntry } from '@/lib/tier-of-day';
+import type { Tier } from '@/types/stats';
 
 export { SLIDE_SIZE, toJpeg } from '@/lib/slide-chrome';
 
@@ -206,7 +206,7 @@ function tierSlide(
  * whether a brawler went from unplayable to fine or from strong to dominant,
  * and the tier badges either side are what make the move mean something.
  */
-function mover(m: MetaMover, art: string | null, rising: boolean): ReactElement {
+function mover(m: TierMove, art: string | null, rising: boolean): ReactElement {
   const colour = rising ? '#63d471' : '#ff5c8a';
   const crossed = m.tierNow !== m.tierBefore;
 
@@ -217,7 +217,7 @@ function mover(m: MetaMover, art: string | null, rising: boolean): ReactElement 
           {rising ? 'BIGGEST RISER' : 'BIGGEST FALLER'}
         </div>
         <div style={{ display: 'flex', fontSize: 110, fontWeight: 800, marginTop: 8 }}>
-          {cap(m.brawlerName)}
+          {cap(m.name)}
         </div>
       </div>
 
@@ -262,7 +262,7 @@ function mover(m: MetaMover, art: string | null, rising: boolean): ReactElement 
         <Badge tier={m.tierNow} size={84} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 18 }}>
           <div style={{ display: 'flex', fontSize: 72, fontWeight: 800, color: colour }}>
-            {signed(m.metaScoreDelta)}
+            {signed(m.scoreDelta)}
           </div>
           <div style={{ display: 'flex', fontSize: 26, color: DIM }}>score</div>
         </div>
@@ -392,10 +392,10 @@ export async function tierSlides(post: TierPost, only?: number): Promise<ReactEl
     wanted('strong') ? portraits(post.strong) : Promise.resolve<(string | null)[]>([]),
     wanted('avoid') ? portraits(post.avoid) : Promise.resolve<(string | null)[]>([]),
     wanted('riser') && post.riser
-      ? loadArt(post.riser.brawlerId, 560)
+      ? loadArt(post.riser.brawlerId, 560, post.riser.imageUrl)
       : Promise.resolve(null),
     wanted('faller') && post.faller
-      ? loadArt(post.faller.brawlerId, 560)
+      ? loadArt(post.faller.brawlerId, 560, post.faller.imageUrl)
       : Promise.resolve(null),
     wanted('cover') || wanted('outro') ? loadLogo(208) : Promise.resolve(null),
   ]);
@@ -409,9 +409,9 @@ export async function tierSlides(post: TierPost, only?: number): Promise<ReactEl
       case 'strong':
         return tierSlide('A', post.strong, strongArt, post.windowLabel, 'A tier', 'Strong, and easier to get');
       case 'riser':
-        return mover(post.riser as MetaMover, riserArt, true);
+        return mover(post.riser as TierMove, riserArt, true);
       case 'faller':
-        return mover(post.faller as MetaMover, fallerArt, false);
+        return mover(post.faller as TierMove, fallerArt, false);
       case 'avoid':
         return tierSlide(
           post.avoidTier as Tier,
@@ -435,12 +435,8 @@ export function tierCaption(post: TierPost, site: string): { title: string; desc
   const parts: string[] = [];
 
   if (best) parts.push(`${cap(best.name)} leads at ${best.metaScore.toFixed(1)}`);
-  if (post.riser) {
-    parts.push(`${cap(post.riser.brawlerName)} up ${signed(post.riser.metaScoreDelta)}`);
-  }
-  if (post.faller) {
-    parts.push(`${cap(post.faller.brawlerName)} down ${signed(post.faller.metaScoreDelta)}`);
-  }
+  if (post.riser) parts.push(`${cap(post.riser.name)} up ${signed(post.riser.scoreDelta)}`);
+  if (post.faller) parts.push(`${cap(post.faller.name)} down ${signed(post.faller.scoreDelta)}`);
 
   return {
     title: best ? `${cap(best.name)} tops the ranked tier list` : 'Ranked tier list update',
