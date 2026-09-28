@@ -1,0 +1,26 @@
+[Unit]
+Description=Send the ranked tier list to TikTok, daily at 12:00 UTC
+
+[Timer]
+# Midday, between the 09:10 findings post and the 17:10 build post.
+#
+# The spacing is load-bearing, not editorial. All three jobs refresh the same
+# TikTok token and TikTok rotates it on use, so two runs overlapping would have
+# one save a token the other had already invalidated -- which locks the
+# integration out until somebody authorises by hand. systemd will not run two
+# instances of one unit, but these are three different units, so the schedule
+# is the only thing keeping them apart. Just under three hours either side is
+# far more than any run has ever taken.
+#
+# Three posts a day also sits inside TikTok's five-pending-uploads-per-24h
+# limit with two spare, which is what leaves room to re-run a failed one by
+# hand without waiting for the window to roll.
+#
+# Not retried on failure, same as the other two: a retry loop spends that
+# allowance on a bad day and leaves none for a good one.
+OnCalendar=*-*-* 12:00:00
+Persistent=false
+Unit=brawlzone-tiktok-tiers.service
+
+[Install]
+WantedBy=timers.target
