@@ -55,18 +55,44 @@ export const PAD = '150px 230px 400px 92px';
  * than the box they are drawn into, and rasterising them at full size is the
  * slowest part of the whole image.
  */
+/**
+ * Retried once, and given longer than feels necessary, because the failure
+ * here is silent and lasts a day.
+ *
+ * The timeout was 8s with no retry. Measured from the box on 2026-09-28,
+ * three back-to-back fetches of the same CDN file returned in 0.05s, timed
+ * out entirely at 20s, and returned in 9.07s -- so the link is not slow so
+ * much as intermittently stalled, and 8s sat right in the middle of the
+ * distribution. A miss is not visible anywhere: `loadArt` falls through its
+ * candidates, the slide renders without art, and the result is written into a
+ * 24-hour ISR entry. Gale's faller slide shipped with an empty frame that way,
+ * and nothing in the logs mentioned it.
+ *
+ * Two attempts rather than more, and a short pause between them: the point is
+ * to survive one stall, not to wait out a dead CDN. `loadArt` still walks its
+ * candidate list on top of this, so a genuinely missing file costs the same as
+ * it did before.
+ */
+const ICON_TIMEOUT_MS = 12_000;
+
 export async function loadIcon(url: string, box: number): Promise<string | null> {
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
-    if (!res.ok) return null;
-    const png = await sharp(Buffer.from(await res.arrayBuffer()))
-      .resize({ width: box, height: box, fit: 'inside', withoutEnlargement: true })
-      .png()
-      .toBuffer();
-    return `data:image/png;base64,${png.toString('base64')}`;
-  } catch {
-    return null;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(ICON_TIMEOUT_MS) });
+      // A 404 is an answer, not a stall: the mirror has not published this
+      // brawler yet, and retrying cannot change that. Only a throw -- a
+      // timeout or a dropped connection -- is worth a second go.
+      if (!res.ok) return null;
+      const png = await sharp(Buffer.from(await res.arrayBuffer()))
+        .resize({ width: box, height: box, fit: 'inside', withoutEnlargement: true })
+        .png()
+        .toBuffer();
+      return `data:image/png;base64,${png.toString('base64')}`;
+    } catch {
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 400));
+    }
   }
+  return null;
 }
 
 export async function loadArt(
