@@ -3,8 +3,11 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { ClassIcon, GadgetIcon, StarPowerIcon } from '@/components/game-icons';
 import type { Clue, GuessResult } from '@/lib/brawldle';
 import type { PickerEntry } from '@/lib/brawldle-data';
+import { TIER_COLOR } from '@/lib/tiers';
+import type { Tier } from '@/types/stats';
 
 /**
  * The board.
@@ -52,6 +55,113 @@ function save(state: Saved) {
   }
 }
 
+/**
+ * One clue.
+ *
+ * A word alone makes the player do the work: "Fast" means nothing until you
+ * remember there are five speeds and that Fast is the fourth. The meter shows
+ * that, so the tile answers "how close" at a glance and the word only confirms
+ * it. Ordered clues get a meter; rarity and tier also get the game's own
+ * colour, so an Epic tile looks Epic.
+ */
+function ClueTile({ clue, animate, delayMs }: { clue: Clue; animate: boolean; delayMs: number }) {
+  const tint =
+    clue.key === 'tier' && clue.value in TIER_COLOR
+      ? TIER_COLOR[clue.value as Tier]
+      : clue.color;
+
+  return (
+    <div
+      style={animate ? { animationDelay: `${delayMs}ms` } : undefined}
+      className={`flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-xl border-2 px-1 py-2 text-center ${
+        VERDICT_CLASS[clue.verdict]
+      } ${animate ? 'animate-clue-flip' : ''}`}
+    >
+      {/* A real per-class image, not a generic glyph. Returns null for a class
+          it has no art for, so the tile falls back to the word alone. */}
+      {clue.key === 'class' ? <ClassIcon name={clue.value} className="size-5" /> : null}
+
+      <span
+        className="text-[12px] font-bold leading-tight"
+        /* The game's own colour, but only as the text: tinting the whole tile
+           would fight the green/amber/red, which is the thing the player is
+           actually reading. */
+        style={tint ? { color: tint } : undefined}
+      >
+        {clue.value}
+      </span>
+
+      {clue.scale ? (
+        <span className="flex items-center gap-[3px]" aria-hidden>
+          {Array.from({ length: clue.scale.of }, (_unused, n) => (
+            <span
+              key={n}
+              className={`h-1 w-1.5 rounded-full ${
+                n <= (clue.scale?.index ?? -1) ? 'bg-current opacity-90' : 'bg-current opacity-25'
+              }`}
+            />
+          ))}
+        </span>
+      ) : null}
+
+      {clue.direction ? (
+        <span
+          aria-label={clue.direction === 'up' ? 'higher' : 'lower'}
+          className="text-sm leading-none opacity-80"
+        >
+          {ARROW[clue.direction]}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+interface Hints {
+  thresholds: { starPower: number; gadget: number };
+  starPower: string | null;
+  gadget: string | null;
+}
+
+/**
+ * Hints, as pictures.
+ *
+ * The star power at four guesses and the gadget at eight, drawn from the game
+ * itself. Names are never fetched: "Come To Papa" is searchable and would end
+ * the puzzle, where the icon is a memory test — which is what a hint is for.
+ */
+function HintPanel({ hints, guesses }: { hints: Hints | null; guesses: number }) {
+  if (!hints) return null;
+  const rows = [
+    { key: 'sp', at: hints.thresholds.starPower, url: hints.starPower, label: 'Star power', Icon: StarPowerIcon },
+    { key: 'gd', at: hints.thresholds.gadget, url: hints.gadget, label: 'Gadget', Icon: GadgetIcon },
+  ];
+
+  return (
+    <div className="card flex flex-wrap items-center gap-4 p-4">
+      {rows.map(({ key, at, url, label, Icon }) => {
+        const left = at - guesses;
+        return (
+          <div key={key} className="flex items-center gap-3">
+            <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-surface-2">
+              {url ? (
+                <Image src={url} alt={label} width={40} height={40} className="size-10" unoptimized />
+              ) : (
+                <Icon className="size-5 opacity-30" />
+              )}
+            </div>
+            <div className="text-xs leading-tight">
+              <p className="font-semibold">{label}</p>
+              <p className="text-muted">
+                {url ? 'Revealed' : `in ${left} ${left === 1 ? 'guess' : 'guesses'}`}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ChallengeBoard({ date, picker }: { date: string; picker: PickerEntry[] }) {
   /*
    * One state object, hydrated once. `board === null` means localStorage has
@@ -63,6 +173,7 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [hints, setHints] = useState<Hints | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   /*
@@ -86,6 +197,28 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
   const results = useMemo(() => board?.results ?? [], [board]);
   const solved = board?.solved ?? false;
   const ready = board !== null;
+
+  /*
+   * Hints are asked for by guess count, so this refires as the count changes
+   * and a hint appears the moment it is earned. The endpoint returns the
+   * thresholds even when nothing is unlocked, which is what lets the panel say
+   * "in 3 guesses" rather than hiding until it has something.
+   */
+  useEffect(() => {
+    if (!ready || solved) return;
+    let cancelled = false;
+    fetch(`/api/brawldle/hint?after=${results.length}`, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: Hints | null) => {
+        if (!cancelled && data) setHints(data);
+      })
+      .catch(() => {
+        /* A missing hint panel is not worth an error message. */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, solved, results.length]);
 
   const guessed = useMemo(() => new Set(results.map((r) => r.brawler.slug)), [results]);
 
@@ -198,6 +331,10 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
 
       {error ? <p className="text-sm text-rose-400">{error}</p> : null}
 
+      {!solved && results.length > 0 ? (
+        <HintPanel hints={hints} guesses={results.length} />
+      ) : null}
+
       {results.length > 0 ? (
         /* Seven columns do not fit a phone at a readable size, and shrinking
            the type until "Very Fast" fits is how a board becomes unreadable.
@@ -233,26 +370,7 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
                 ) : null}
               </div>
               {r.clues.map((c, col) => (
-                <div
-                  key={c.key}
-                  /* Staggered so the row reveals left to right rather than all
-                     at once. Only the newest row animates: replaying the whole
-                     board on every guess is noise, not feedback. */
-                  style={i === 0 ? { animationDelay: `${col * 90}ms` } : undefined}
-                  className={`flex min-h-[4.5rem] flex-col items-center justify-center gap-1 rounded-xl border-2 px-1 py-2 text-center ${
-                    VERDICT_CLASS[c.verdict]
-                  } ${i === 0 ? 'animate-clue-flip' : ''}`}
-                >
-                  <span className="text-[12px] font-bold leading-tight">{c.value}</span>
-                  {c.direction ? (
-                    <span
-                      aria-label={c.direction === 'up' ? 'higher' : 'lower'}
-                      className="text-base leading-none opacity-80"
-                    >
-                      {ARROW[c.direction]}
-                    </span>
-                  ) : null}
-                </div>
+                <ClueTile key={c.key} clue={c} animate={i === 0} delayMs={col * 90} />
               ))}
             </div>
           ))}

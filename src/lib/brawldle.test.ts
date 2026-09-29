@@ -22,6 +22,7 @@ const make = (over: Partial<BrawldleBrawler> & { id: number }): BrawldleBrawler 
   slug: `b${over.id}`,
   imageUrl: null,
   rarity: 'Epic',
+  rarityColor: '#b65cff',
   className: 'Assassin',
   tier: 'B',
   movement: 'Normal',

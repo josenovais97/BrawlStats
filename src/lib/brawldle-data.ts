@@ -45,6 +45,7 @@ export async function brawldleRoster(): Promise<BrawldleBrawler[]> {
         slug: slugify(b.name),
         imageUrl: b.imageUrl ?? null,
         rarity: b.rarityName,
+        rarityColor: b.rarityColor,
         className: b.className,
         tier: m?.tier ?? null,
         movement: tiers.get(b.name.toLowerCase())?.movement ?? null,

@@ -36,6 +36,8 @@ export interface BrawldleBrawler {
   slug: string;
   imageUrl: string | null;
   rarity: string | null;
+  /** The game's own rarity colour, so a tile can be tinted with it. */
+  rarityColor: string | null;
   className: string | null;
   /** Tier from the live ranked list, or null when it has too few battles. */
   tier: string | null;
@@ -62,6 +64,17 @@ export interface Clue {
    * meaningless — there is no direction from Marksman to Tank.
    */
   direction: Direction;
+  /**
+   * Where the guess sits on its scale, for the ordered clues.
+   *
+   * Sent from here rather than re-derived in the browser so the board and the
+   * judgement cannot disagree about what "Fast" means. It is what lets a tile
+   * draw a five-step meter instead of printing a word: a player sees at a
+   * glance that Fast is fourth of five, which is the actual information.
+   */
+  scale: { index: number; of: number } | null;
+  /** The game's own colour for this value, where it has one. */
+  color: string | null;
 }
 
 export interface GuessResult {
@@ -132,19 +145,25 @@ function ordered(
   value: string,
   guess: number | null,
   answer: number | null,
+  of: number,
+  color: string | null = null,
 ): Clue {
   if (guess === null || answer === null) {
-    // Unranked brawlers have no tier and no pick rate. Saying so is better
-    // than guessing at one, and it cannot be a hit or a near.
-    return { key, label, value: value || '—', verdict: 'miss', direction: null };
+    // A brawler with too few battles has no tier, and a wiki page that could
+    // not be read has no combat tiers. Saying so beats guessing at one, and
+    // it can be neither a hit nor a near.
+    return { key, label, value: value || '—', verdict: 'miss', direction: null, scale: null, color: null };
   }
-  if (guess === answer) return { key, label, value, verdict: 'hit', direction: null };
+  const scale = { index: guess, of };
+  if (guess === answer) return { key, label, value, verdict: 'hit', direction: null, scale, color };
   return {
     key,
     label,
     value,
     verdict: Math.abs(guess - answer) === 1 ? 'near' : 'miss',
     direction: answer > guess ? 'up' : 'down',
+    scale,
+    color,
   };
 }
 
@@ -165,6 +184,8 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     guess.rarity ?? '—',
     ordinal(RARITY_ORDER, guess.rarity),
     ordinal(RARITY_ORDER, answer.rarity),
+    RARITY_ORDER.length,
+    guess.rarityColor,
   );
 
   const className: Clue = {
@@ -175,6 +196,8 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     // would invite a player to read an ordering that does not exist.
     verdict: guess.className && guess.className === answer.className ? 'hit' : 'miss',
     direction: null,
+    scale: null,
+    color: null,
   };
 
   const guessRank = guess.id;
@@ -190,6 +213,8 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
           ? 'near'
           : 'miss',
     direction: guessRank === answerRank ? null : answerRank > guessRank ? 'up' : 'down',
+    scale: null,
+    color: null,
   };
 
   const tier = ordered(
@@ -198,6 +223,7 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     guess.tier ?? 'Unranked',
     ordinal(TIER_ORDER, guess.tier),
     ordinal(TIER_ORDER, answer.tier),
+    TIER_ORDER.length,
   );
 
   const movement = ordered(
@@ -206,6 +232,7 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     guess.movement ?? '—',
     ordinal(MOVEMENT_SCALE, guess.movement),
     ordinal(MOVEMENT_SCALE, answer.movement),
+    MOVEMENT_SCALE.length,
   );
   const range = ordered(
     'range',
@@ -213,6 +240,7 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     guess.range ?? '—',
     ordinal(RANGE_SCALE, guess.range),
     ordinal(RANGE_SCALE, answer.range),
+    RANGE_SCALE.length,
   );
   const reload = ordered(
     'reload',
@@ -220,6 +248,7 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     guess.reload ?? '—',
     ordinal(RELOAD_SCALE, guess.reload),
     ordinal(RELOAD_SCALE, answer.reload),
+    RELOAD_SCALE.length,
   );
 
   /*

@@ -88,6 +88,12 @@ export default async function DailyChallengePage() {
             too few ranked battles to be tiered shows a dash rather than a guess.
           </p>
           <p>
+            <strong className="text-foreground">Stuck?</strong> After four guesses the board shows
+            the answer&rsquo;s star power, and after eight its gadget — the real icons from the
+            game, with the names withheld, because a name is searchable and a picture is a memory
+            test.
+          </p>
+          <p>
             Your progress is kept in this browser only. No account, nothing stored on our side.
           </p>
         </div>
