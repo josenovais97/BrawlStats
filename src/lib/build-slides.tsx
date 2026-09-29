@@ -9,6 +9,8 @@ import {
   BRAND,
   DIM,
   FG,
+  Bar,
+  Card,
   Frame,
   Hero,
   MUTED,
@@ -115,17 +117,7 @@ function pair(
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 30, marginTop: 52 }}>
         {top.map((row, i) => (
-          <div
-            key={row.itemId}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 16,
-              padding: '32px 30px',
-              borderRadius: 26,
-              background: i === 0 ? 'rgba(53,208,255,0.10)' : 'rgba(255,255,255,0.05)',
-            }}
-          >
+          <Card key={row.itemId} lead={i === 0} column gap={16} pad="30px 30px">
             <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
               {icons[i] ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -144,20 +136,22 @@ function pair(
             </div>
 
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 44, marginTop: 6 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={{ display: 'flex', fontSize: 76, fontFamily: DISPLAY, fontWeight: 400, color: ACCENT }}>
                   {rate(row.winRate)}
                 </div>
+                <Bar value={row.winRate} width={250} />
                 <div style={{ display: 'flex', fontSize: 28, color: DIM }}>win rate</div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div style={{ display: 'flex', fontSize: 76, fontFamily: DISPLAY, fontWeight: 400, color: FG }}>
                   {pct(row.share)}
                 </div>
+                <Bar value={row.share} min={0} max={1} width={250} color={BRAND} />
                 <div style={{ display: 'flex', fontSize: 28, color: DIM }}>of first buyers</div>
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 

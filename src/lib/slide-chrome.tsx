@@ -450,18 +450,25 @@ export function Card({
   accent,
   lead = false,
   pad = '24px 28px',
+  column = false,
+  gap,
 }: {
   children: ReactElement | ReactElement[];
   accent?: string | null;
   lead?: boolean;
   pad?: string;
+  /** Stacked rather than side by side, for a card that is a block not a row. */
+  column?: boolean;
+  gap?: number;
 }): ReactElement {
   const tint = accent ?? ACCENT;
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: column ? 'column' : 'row',
+        alignItems: column ? 'stretch' : 'center',
+        ...(gap === undefined ? {} : { gap }),
         padding: pad,
         borderRadius: 26,
         border: `2px solid ${lead ? `${tint}55` : 'rgba(255,255,255,0.07)'}`,

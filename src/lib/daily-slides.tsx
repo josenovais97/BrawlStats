@@ -7,6 +7,7 @@ import {
   BRAND,
   DIM,
   FG,
+  Card,
   Frame,
   Hero,
   MUTED,
@@ -243,21 +244,26 @@ function finding(
         {KICKER[d.kind] ?? ''}
       </div>
 
-      <div style={{ display: 'flex', gap: 64, marginTop: 56 }}>
-        {[a, b].map((s, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {/* Two figures, the first one forward.
+          They were the same size in the same weight side by side, so the slide
+          asked the viewer to work out which number was the point. The headline
+          above is about the first one; the second is context. */}
+      <div style={{ display: 'flex', gap: 28, marginTop: 44 }}>
+        {[a, b].map((stat, i) => (
+          <Card key={i} lead={i === 0} column gap={8} pad="24px 28px">
             <div
               style={{
                 display: 'flex',
-                fontSize: 96,
-                fontFamily: DISPLAY, fontWeight: 400,
+                fontSize: i === 0 ? 96 : 76,
+                fontFamily: DISPLAY,
+                fontWeight: 400,
                 color: i === 0 ? ACCENT : FG,
               }}
             >
-              {s.figure}
+              {stat.figure}
             </div>
-            <div style={{ display: 'flex', fontSize: 30, color: DIM }}>{s.label}</div>
-          </div>
+            <div style={{ display: 'flex', fontSize: 28, color: DIM }}>{stat.label}</div>
+          </Card>
         ))}
       </div>
 
