@@ -98,7 +98,7 @@ app; a full 163s image build was run with it held, with no OOM kills. Health
 check 9 alerts if it stops, because losing it breaks nothing visible right up
 until the instance is stopped.
 
-## Eight traps that cost real outages
+## Nine traps that cost real outages
 
 **1. `revalidate` does nothing without `generateStaticParams`.** A dynamic route
 that exports `revalidate` but no `generateStaticParams` is *not* ISR — Next
@@ -263,6 +263,45 @@ The guard that generalises is `hot-path-limit.test.ts`: it walks `src/app` and
 fails if any page exporting `dynamic = 'force-dynamic'` is not covered by
 `LIMITED_PREFIXES`. Adding an uncached route with no ceiling is the shape of
 both this outage and the one three days before it.
+
+**9. A step that only ever runs by hand has already stopped running.** You
+just do not know it yet.
+
+`auto-deploy.sh` reset the repo to `origin/main` and rebuilt the image, which
+is the whole of what the site serves. But every timer on this box executes a
+file under `/usr/local/bin`, and those were put there by hand, once each,
+whenever they were written. The repo copy and the running copy were two files
+that happened to agree.
+
+They stopped agreeing on 2026-09-29. The TikTok job was found announcing posts
+that had failed; the fix was committed, pushed and deployed, and did nothing at
+all, because no deploy had ever had a reason to touch `/usr/local/bin`. The job
+kept running the previous version. Nothing was broken enough to notice -- the
+deploy reported success, because it had genuinely done everything it knew
+about.
+
+That is trap 7 wearing different clothes, and the fix has the same shape:
+`deploy/bin/brawlzone-install` runs from the deploy, and **health check 13
+re-derives the comparison independently** -- not "did the install run" but
+"does the running copy match the commit" -- so it stays true if the install is
+ever removed, reordered or skipped by an early exit. It reads the installer
+from the repo rather than the installed copy, because a stale installer
+grading its own homework is the same bug again.
+
+Two details in that script are load-bearing and non-obvious:
+
+- **It renames into place rather than writing in place.** It installs
+  `auto-deploy.sh` *while `auto-deploy.sh` is running it*, and bash reads a
+  script incrementally from an open descriptor; truncating and rewriting moves
+  the bytes under the interpreter mid-run. A rename leaves the running process
+  on the old inode.
+- **A changed `.timer` is reloaded and restarted.** Copying a unit file and
+  stopping there leaves the change installed and inert, which looks exactly
+  like success. A brand new timer is installed but deliberately left disabled:
+  starting it is a decision, not a side effect of a deploy.
+
+It never deletes. There are `.service.d/onfailure.conf` drop-ins on the box
+with no repo counterpart, and removing something is a decision for a person.
 
 ## Limits, and which defend themselves
 
