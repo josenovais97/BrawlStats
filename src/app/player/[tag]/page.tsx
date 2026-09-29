@@ -158,6 +158,10 @@ export default async function PlayerPage({ params }: PageProps) {
         rankedRankName: player.rankedRankName,
         highestRankedElo: player.highestAllTimeRankedElo,
         highestRankedRankName: player.highestAllTimeRankedRankName,
+        // Ids and power levels only. The evolution point needs roster depth
+        // and meta coverage, and both are derived in one place inside
+        // recordLookup so two callers cannot compute them differently.
+        roster: player.brawlers.map((b) => ({ id: b.id, power: b.power })),
       }),
     );
   }

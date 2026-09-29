@@ -1026,6 +1026,17 @@ export async function getLastAggregationRun(): Promise<AggregationRunSummary | n
  * Records a looked-up tag in the sampling pool. Fire-and-forget: a failure
  * here should never affect the page the visitor asked for.
  */
+/**
+ * How strong a brawler has to be before it counts toward meta coverage.
+ *
+ * Owning an S-tier brawler at power 1 does not mean you can play it, so
+ * coverage asks what a player could actually field rather than what they have
+ * unlocked. Nine rather than eleven because eleven is the ceiling and is
+ * already counted separately as `powerElevenCount` -- two different questions,
+ * and collapsing them into one number would answer neither.
+ */
+export const USABLE_POWER = 9;
+
 export async function recordLookup(reading: {
   tag: string;
   name?: string;
@@ -1037,6 +1048,8 @@ export async function recordLookup(reading: {
   rankedRankName?: string;
   highestRankedElo?: number;
   highestRankedRankName?: string;
+  /** Every brawler the player owns, with its power level. */
+  roster?: { id: number; power: number }[];
 }) {
   const prisma = getPrisma();
   if (!prisma) return;
@@ -1052,6 +1065,7 @@ export async function recordLookup(reading: {
     rankedRankName,
     highestRankedElo,
     highestRankedRankName,
+    roster,
   } = reading;
 
   const standing = {
@@ -1072,16 +1086,55 @@ export async function recordLookup(reading: {
     // The row above is overwritten on every visit, so it can only say "how
     // many now". This one keeps the history: one point per day, last reading
     // of the day wins, so a refreshed page cannot write unbounded rows.
+    /*
+     * The three evolution readings, computed here rather than at the call site
+     * so every caller records the same thing. A second page that recorded
+     * coverage its own way would produce a timeline that steps at the moment
+     * somebody opened a different tab, which is the kind of bug that is
+     * invisible until a chart looks wrong months later.
+     *
+     * Coverage is the share of the CURRENT top of the tier list a player can
+     * field, so it moves when the meta moves and not only when the player does
+     * -- which is the honest reading. Someone who unlocks nothing and watches
+     * their coverage fall because the meta shifted has genuinely got worse at
+     * fielding it.
+     *
+     * Failure here must not cost the trophy point: `swallow` already wraps the
+     * whole function, but an exception before the upsert would lose a reading
+     * that is otherwise fine, so the meta read has its own catch.
+     */
+    let powerElevenCount: number | undefined;
+    let metaCoverage: number | undefined;
+    if (roster && roster.length > 0) {
+      powerElevenCount = roster.filter((b) => b.power >= 11).length;
+      try {
+        const meta = await getMetaIndex('ranked', 7);
+        const top = [...meta.values()].filter((b) => b.tier === 'S' || b.tier === 'A');
+        if (top.length > 0) {
+          const usable = new Set(
+            roster.filter((b) => b.power >= USABLE_POWER).map((b) => b.id),
+          );
+          metaCoverage =
+            top.filter((b) => usable.has(b.brawlerId)).length / top.length;
+        }
+      } catch (error) {
+        swallow('recordLookup.metaCoverage', error);
+      }
+    }
+
+    const point = {
+      trophies,
+      highestTrophies,
+      brawlerCount,
+      rankedElo: rankedElo ?? null,
+      powerElevenCount: powerElevenCount ?? null,
+      metaCoverage: metaCoverage ?? null,
+    };
+
     await prisma.playerTrophyPoint.upsert({
       where: { playerTag_recordedOn: { playerTag: tag, recordedOn: todayUtcDate() } },
-      create: {
-        playerTag: tag,
-        recordedOn: todayUtcDate(),
-        trophies,
-        highestTrophies,
-        brawlerCount,
-      },
-      update: { trophies, highestTrophies, brawlerCount },
+      create: { playerTag: tag, recordedOn: todayUtcDate(), ...point },
+      update: point,
     });
   } catch (error) {
     swallow('recordLookup', error);
