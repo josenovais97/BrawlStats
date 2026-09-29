@@ -32,7 +32,7 @@ export function PlayerRosterPlan({
   const gained = coveredAfter - coveredBefore;
 
   return (
-    <section className="space-y-3">
+    <section id="upgrade-next" className="scroll-anchor-nav space-y-3">
       <SectionHeading
         title="What to upgrade next"
         subtitle="The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns."

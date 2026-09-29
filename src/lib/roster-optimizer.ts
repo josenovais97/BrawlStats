@@ -51,6 +51,24 @@ export interface UpgradeStep {
   secures: string[];
 }
 
+/** One mode, and how ready this account is for it before any upgrades. */
+export interface ModeReadiness {
+  mode: string;
+  label: string;
+  /** Top-three picks the player can already field, 0 to COVERAGE_DEPTH. */
+  ready: number;
+  /**
+   * `strong` is ban-safe: two or more ready, so the plan survives the first
+   * ban. `thin` is exactly one, which is a plan only until somebody bans it.
+   * `none` is nothing ready at all.
+   *
+   * The three are not new thresholds -- they are the covered and ban-safe
+   * distinction this file already draws, made visible. Inventing a second
+   * scale here would give the profile two ways to say the same thing.
+   */
+  status: 'strong' | 'thin' | 'none';
+}
+
 export interface RosterPlan {
   steps: UpgradeStep[];
   totalCoins: number;
@@ -59,6 +77,8 @@ export interface RosterPlan {
   coveredAfter: number;
   banSafeBefore: number;
   banSafeAfter: number;
+  /** Per-mode readiness as things stand, worst first. */
+  readiness: ModeReadiness[];
 }
 
 /** How many upgrades a plan is allowed to ask for before it stops being a plan. */
@@ -191,5 +211,27 @@ export function rosterPlan({
     coveredAfter: current.covered,
     banSafeBefore: start.banSafe,
     banSafeAfter: current.banSafe,
+    /*
+     * Before the plan, not after: the verdict describes the account as it is
+     * today. `coveredAfter` is what the upgrades below would buy, and showing
+     * that at the top would tell a player they are fine when they have not
+     * spent anything yet.
+     *
+     * Worst first, because the point of the block is the gap.
+     */
+    readiness: modes
+      .map((mode) => {
+        const ready = start.perMode.get(mode) ?? 0;
+        return {
+          mode,
+          label: modeLabels.get(mode) ?? mode,
+          ready,
+          status:
+            ready >= BAN_SAFE_PICKS ? ('strong' as const)
+            : ready >= 1 ? ('thin' as const)
+            : ('none' as const),
+        };
+      })
+      .sort((a, b) => a.ready - b.ready || a.label.localeCompare(b.label)),
   };
 }

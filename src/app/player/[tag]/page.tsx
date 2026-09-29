@@ -13,6 +13,7 @@ import { BattleAutopsySection } from '@/components/player/battle-autopsy-section
 import { PlayerPatchImpact } from '@/components/player/player-patch-impact';
 import { PlayerPushNow } from '@/components/player/player-push-now';
 import { PlayerRosterPlan } from '@/components/player/player-roster-plan';
+import { PlayerVerdict } from '@/components/player/player-verdict';
 import { SinceLastVisit } from '@/components/player/since-last-visit';
 import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRankedPicks } from '@/components/player/player-ranked-picks';
@@ -325,6 +326,19 @@ export default async function PlayerPage({ params }: PageProps) {
        * profile to find them.
        */}
       <PlayerSkillScore skill={skill} />
+
+      {/* The same plan the "What to upgrade next" section renders, read for
+          its per-mode readiness instead of its price. One computation, two
+          presentations -- a second pass over the rotation would eventually
+          disagree with the first and both would look right. */}
+      {plan ? (
+        <PlayerVerdict
+          plan={plan}
+          usable={player.brawlers.filter((b) => b.power >= 9).length}
+          total={player.brawlers.length}
+        />
+      ) : null}
+
       <Suspense
         fallback={
           <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
