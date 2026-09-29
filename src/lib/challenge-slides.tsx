@@ -59,8 +59,23 @@ const SHORT: Record<string, string> = {
 };
 const short = (v: string) => SHORT[v] ?? v;
 
-/** One guess, drawn the way the board draws it. */
-function Row({ result, art }: { result: GuessResult; art: string | null }): ReactElement {
+/**
+ * One guess, drawn the way the board draws it.
+ *
+ * `revealed` is how many of this row's tiles have turned. A tile that has not
+ * turned yet keeps its exact size and draws as an empty outline, so the board
+ * never reflows as the animation runs — a layout that shifts mid-reveal reads
+ * as a glitch rather than a game.
+ */
+function Row({
+  result,
+  art,
+  revealed = Infinity,
+}: {
+  result: GuessResult;
+  art: string | null;
+  revealed?: number;
+}): ReactElement {
   return (
     <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
       <div
@@ -78,7 +93,8 @@ function Row({ result, art }: { result: GuessResult; art: string | null }): Reac
           <div style={{ display: 'flex', width: 84, height: 84 }} />
         )}
       </div>
-      {result.clues.map((c) => {
+      {result.clues.map((c, i) => {
+        const shown = i < revealed;
         const t = TILE[c.verdict];
         return (
           <div
@@ -92,8 +108,8 @@ function Row({ result, art }: { result: GuessResult; art: string | null }): Reac
               gap: 6,
               padding: '16px 4px',
               borderRadius: 18,
-              border: `2px solid ${t.border}`,
-              background: t.bg,
+              border: `2px solid ${shown ? t.border : 'rgba(255,255,255,0.10)'}`,
+              background: shown ? t.bg : 'rgba(255,255,255,0.03)',
             }}
           >
             <div
@@ -105,9 +121,9 @@ function Row({ result, art }: { result: GuessResult; art: string | null }): Reac
                 textAlign: 'center',
               }}
             >
-              {short(c.value)}
+              {shown ? short(c.value) : ''}
             </div>
-            {c.direction ? (
+            {shown && c.direction ? (
               <div style={{ display: 'flex', fontSize: 20, color: t.text }}>
                 {ARROW[c.direction]}
               </div>
@@ -239,6 +255,59 @@ function extras(): ReactElement {
       </div>
       <div style={{ display: 'flex', fontSize: 30, color: MUTED, marginTop: 38 }}>
         Free, no account, nothing to install.
+      </div>
+    </Frame>
+  );
+}
+
+/**
+ * One frame of the reveal, for the promo video.
+ *
+ * `turned` counts tiles across the whole board, so a single increasing number
+ * drives the entire animation and ffmpeg only has to hold each frame for a
+ * fixed time. Rows that have not started yet are not drawn at all — a row of
+ * seven empty outlines appearing before its guess would give away how many
+ * guesses are coming.
+ */
+export async function challengeFrame(
+  post: ChallengePost,
+  turned: number,
+): Promise<ReactElement> {
+  const perRow = post.results[0]?.clues.length ?? 7;
+  const rowsStarted = Math.min(post.results.length, Math.ceil(turned / perRow) || 1);
+  const shown = post.results.slice(0, rowsStarted);
+
+  const art = await Promise.all(
+    shown.map((r) => loadArt(r.brawler.id, 128, r.brawler.imageUrl)),
+  );
+
+  return (
+    <Frame>
+      <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
+        GUESS THE BRAWLER
+      </div>
+      <div style={{ display: 'flex', fontSize: 84, fontFamily: DISPLAY, marginTop: 10 }}>
+        Seven clues
+      </div>
+      <div style={{ display: 'flex', fontSize: 32, color: DIM, marginTop: 10 }}>
+        Green is exact · amber is close · the arrow points at the answer
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 52 }}>
+        {shown.map((r, i) => (
+          <Row
+            key={r.brawler.slug}
+            result={r}
+            art={art[i] ?? null}
+            revealed={Math.max(0, turned - i * perRow)}
+          />
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', fontSize: 34, color: BRAND, marginTop: 44 }}>
+        {turned >= post.results.length * perRow
+          ? `${cap(post.answerName)}, in ${post.results.length}`
+          : ''}
       </div>
     </Frame>
   );
