@@ -1,0 +1,27 @@
+[Unit]
+Description=Send the hidden meta to TikTok, daily at 20:30 UTC
+
+[Timer]
+# Evening in Europe, afternoon in the Americas, and three hours clear of the
+# 17:10 build post.
+#
+# The spacing is load-bearing rather than editorial. All four jobs refresh the
+# same TikTok token and TikTok rotates it on use, so two overlapping runs would
+# have one save a token the other had already invalidated, which locks the
+# integration out until somebody authorises by hand. systemd will not run two
+# instances of one unit, but these are four different units, so the schedule is
+# the only thing keeping them apart.
+#
+# Four posts a day is also the point at which the five-pending-uploads-per-24h
+# limit starts to matter: it leaves ONE spare rather than two, so a failed run
+# can be re-run by hand once and no more. If that headroom is ever needed
+# twice in a day, drop one of the four rather than raising the rate.
+#
+# Not retried on failure, same as the others: a retry loop spends the
+# allowance on a bad day and leaves none for a good one.
+OnCalendar=*-*-* 20:30:00
+Persistent=false
+Unit=brawlzone-tiktok-hidden.service
+
+[Install]
+WantedBy=timers.target

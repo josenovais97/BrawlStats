@@ -126,7 +126,8 @@ case "$MODE" in
   daily) MANIFEST="${SITE}/daily/${DAY}/slides.json" ;;
   build) MANIFEST="${SITE}/daily/${DAY}/build/slides.json" ;;
   tiers) MANIFEST="${SITE}/daily/${DAY}/tiers/slides.json" ;;
-  *)     die "::error::unknown mode '${MODE}' (expected daily, build or tiers)" ;;
+  hidden) MANIFEST="${SITE}/daily/${DAY}/hidden/slides.json" ;;
+  *)     die "::error::unknown mode '${MODE}' (expected daily, build, tiers or hidden)" ;;
 esac
 
 # Before anything that can exit, so "the job ran and decided there was nothing
