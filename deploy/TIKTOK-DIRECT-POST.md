@@ -84,8 +84,11 @@ it returns for that account. Hardcoding `PUBLIC_TO_EVERYONE` is the documented
 way to have posts rejected, or to publish against a setting the account holder
 changed in the app and we never read.
 
-`deploy/bin/brawlzone-tiktok` does not do this today, because `MEDIA_UPLOAD`
-does not need it. It has to be added:
+**Done, 2026-09-29.** `deploy/bin/brawlzone-tiktok` queries it whenever
+`POST_MODE=DIRECT_POST`, prefers `PUBLIC_TO_EVERYONE`, and dies naming the
+response if it is not offered. Skipped entirely under `MEDIA_UPLOAD`. The
+payload builder also sends the step-4 fields on the direct path only. What is
+left below is the credential swap and the flip itself:
 
 ```
 POST https://open.tiktokapis.com/v2/post/publish/creator_info/query/
@@ -149,17 +152,18 @@ If `unaudited_client_can_only_post_to_private_accounts` comes back, the audit
 has not actually applied to this client yet. The script dies with that named
 error rather than continuing. Set `POST_MODE` back to `MEDIA_UPLOAD` and wait.
 
-## 7. Add the staleness check
+## 7. Add the staleness check — **done, 2026-09-25**
 
-Deferred while a human was publishing daily, because a missing post was
-obvious — you would notice there was nothing to tap. Once it is unattended,
-nothing on the box notices if the job stops: `die` writes to the journal and
-no health check reads it.
+Health check 11 does this and now covers all four modes (`daily`, `build`,
+`tiers`, `hidden`). It reads two clocks out of `~/.brawlzone-tiktok.json` —
+`last_run` says the timer fired, `last_post` says TikTok accepted something —
+because a job running daily and posting nothing is a different fault from a job
+that stopped running, and one number cannot tell you which. 40 hours, so one
+genuinely missed run fires it and a late one does not.
 
-Add a check that fails when the newest successful upload is more than ~2 days
-old, alongside the other health checks in `deploy/`. Health check 9 (the memory
-guard) is the model: it exists precisely because losing it breaks nothing
-visible until it suddenly does.
+`last_post` is written **after** the status poll reaches a terminal state, not
+at upload time. It used to be written at upload, which recorded 2026-09-28 — a
+run that failed with `photo_pull_failed` — as a success.
 
 ## Rollback
 

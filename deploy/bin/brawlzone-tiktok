@@ -32,6 +32,7 @@ SITE="https://brawlzone.net"
 TOKEN_URL="https://open.tiktokapis.com/v2/oauth/token/"
 INIT_URL="https://open.tiktokapis.com/v2/post/publish/content/init/"
 STATUS_URL="https://open.tiktokapis.com/v2/post/publish/status/fetch/"
+CREATOR_URL="https://open.tiktokapis.com/v2/post/publish/creator_info/query/"
 
 # MEDIA_UPLOAD until the audit passes; DIRECT_POST after. Nothing else in this
 # script changes when it flips — the request body already carries a title and a
@@ -207,12 +208,67 @@ print(title.replace("\t", " ") + "\t" + desc.replace("\t", " "))
 )
 [ -n "$TITLE" ] || die "::error::manifest carried no caption"
 
-payload=$(python3 - "$TITLE" "$DESCRIPTION" "$SLIDES" "$POST_MODE" <<'PY'
+# ------------------------------------------------- privacy, for DIRECT_POST
+#
+# TikTok requires creator_info to be queried before a direct post, and
+# `privacy_level` must be one of the options it returns FOR THIS ACCOUNT.
+# Hardcoding PUBLIC_TO_EVERYONE is the documented way to have posts rejected --
+# or worse, to keep posting against a setting the account holder changed in the
+# app and we never read.
+#
+# Aborts rather than falling back. Every other option is more private than
+# intended, and quietly publishing to SELF_ONLY every day is precisely the
+# failure that looks like success: the job reports PUBLISH_COMPLETE, the log is
+# clean, and nobody sees the post.
+#
+# Skipped entirely under MEDIA_UPLOAD, which does not need it and where a human
+# picks the privacy in TikTok's own editor.
+PRIVACY=""
+if [ "$POST_MODE" = "DIRECT_POST" ]; then
+  creator=$(curl -s --max-time 30 -X POST "$CREATOR_URL" \
+    -H "Authorization: Bearer ${ACCESS}" \
+    -H 'Content-Type: application/json; charset=UTF-8')
+
+  PRIVACY=$(printf '%s' "$creator" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin).get("data", {}) or {}
+except Exception:
+    d = {}
+opts = d.get("privacy_level_options") or []
+print("PUBLIC_TO_EVERYONE" if "PUBLIC_TO_EVERYONE" in opts else "")
+' 2>/dev/null)
+
+  if [ -z "$PRIVACY" ]; then
+    die "::error::creator_info did not offer PUBLIC_TO_EVERYONE. Not posting: every other option is more private than intended. Response: $(printf '%s' "$creator" | head -c 300)"
+  fi
+fi
+
+payload=$(python3 - "$TITLE" "$DESCRIPTION" "$SLIDES" "$POST_MODE" "$PRIVACY" <<'PY'
 import json, sys
 title, description, slides, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+privacy = sys.argv[5] if len(sys.argv) > 5 else ''
 images = [line for line in slides.splitlines() if line.strip()]
+
+post_info = {'title': title, 'description': description}
+if mode == 'DIRECT_POST':
+    # Only on the direct path. MEDIA_UPLOAD rejects some of these, and the
+    # human publishing from the inbox chooses them anyway.
+    post_info.update({
+        'privacy_level': privacy,
+        # TikTok picks recommended music. A silent photo post gets pushed less,
+        # and the field only does anything under DIRECT_POST.
+        'auto_add_music': True,
+        'disable_comment': False,
+        # Not a paid partnership, but it IS promoting a site we own. The photo
+        # reference marks both required and the direct-post reference marks
+        # them optional; sending both explicitly makes the disagreement moot.
+        'brand_content_toggle': False,
+        'brand_organic_toggle': True,
+    })
+
 body = {
-    'post_info': {'title': title, 'description': description},
+    'post_info': post_info,
     'source_info': {
         'source': 'PULL_FROM_URL',
         # Slide 0 is the cover by construction -- the one laid out to be read
