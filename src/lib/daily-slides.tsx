@@ -174,7 +174,6 @@ function cover(date: string, findings: Discovery[], art: string | null): ReactEl
         <div style={{ display: 'flex', fontSize: 40, fontWeight: 700, color: ACCENT }}>
           {findings.length > 0 ? `Swipe for all ${findings.length}` : 'Fresh numbers every day'}
         </div>
-        <div style={{ display: 'flex', fontSize: 34, color: ACCENT }}>Swipe through them all</div>
       </div>
     </Frame>
   );
