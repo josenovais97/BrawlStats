@@ -140,7 +140,7 @@ function pair(
                 <div style={{ display: 'flex', fontSize: 76, fontFamily: DISPLAY, fontWeight: 400, color: ACCENT }}>
                   {rate(row.winRate)}
                 </div>
-                <Bar value={row.winRate} width={250} />
+                <Bar value={row.winRate} min={0.4} max={1} width={250} />
                 <div style={{ display: 'flex', fontSize: 28, color: DIM }}>win rate</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

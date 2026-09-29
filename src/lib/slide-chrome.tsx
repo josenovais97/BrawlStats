@@ -492,6 +492,13 @@ export function Card({
  * Scaled against a floor and ceiling rather than 0-100%: every ranked win rate
  * sits between roughly 40% and 60%, so a bar drawn from zero would show six
  * identical half-full bars and say nothing.
+ *
+ * The default band is for RANKED win rates specifically, and a caller whose
+ * numbers live somewhere else must say so. Ability win rates -- measured among
+ * players who own one option of a pair -- routinely run past 70%, and reusing
+ * this band for them rendered 68.3% and 79.8% as two identical full bars. A
+ * bar that draws different numbers at the same length is worse than no bar,
+ * because it is read as a comparison and it is lying.
  */
 export function Bar({
   value,
