@@ -265,6 +265,23 @@ export function ReleaseNotesIcon({ className }: IconProps) {
   return <GameIcon src="/icons/release-notes.png" alt="Release notes" className={className} />;
 }
 
+/**
+ * The daily challenge.
+ *
+ * The game's own Daily Quest mark, from the wiki rather than the CDN — the
+ * same reasoning as News and Release Notes above. The CDN publishes game
+ * *entities*, so there is nothing in it for "a puzzle that resets at
+ * midnight", and every other candidate in this file was already spoken for:
+ * the Starr Drop belongs to /starr-drops and the tier-list mark to two
+ * tier-list pages. A menu where three entries share one icon is a menu you
+ * cannot scan.
+ */
+export function DailyChallengeIcon({ className }: IconProps) {
+  return (
+    <GameIcon src="/icons/daily-challenge.png" alt="Daily challenge" className={className} />
+  );
+}
+
 /** The live event rotation. */
 export function EventsIcon({ className }: IconProps) {
   return <GameIcon src="/icons/events.png" alt="Events" className={className} />;

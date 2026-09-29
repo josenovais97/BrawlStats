@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Activity,
-  ChevronDown,
-  Menu,
-  Search,
-  X,
-} from 'lucide-react';
+import { ChevronDown, Menu, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -16,6 +10,7 @@ import {
   Battle3v3Icon,
   BubbleAppIcon,
   BrawlersIcon,
+  BuffieIcon,
   ClockIcon,
   ClubIcon,
   CosmeticsIcon,
@@ -26,7 +21,9 @@ import {
   MapsIcon,
   NewsIcon,
   RankedIcon,
+  DailyChallengeIcon,
   ReleaseNotesIcon,
+  StarPowerIcon,
   StarrDropIcon,
   TierListIcon,
   TrophyGainIcon,
@@ -79,12 +76,17 @@ const MORE: NavItem[] = [
   { href: '/daily', label: 'Daily', icon: ClockIcon },
   { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
   { href: '/meta', label: 'Meta Report', icon: TrophyGainIcon },
-  { href: '/hidden-meta', label: 'Hidden Meta', icon: TrophyGainIcon },
-  { href: '/daily-challenge', label: 'Daily Challenge', icon: TrophyGainIcon },
+  // A star power is the strength a brawler has that its base kit does not
+  // show, which is the whole subject of the page.
+  { href: '/hidden-meta', label: 'Hidden Meta', icon: StarPowerIcon },
+  { href: '/daily-challenge', label: 'Daily Challenge', icon: DailyChallengeIcon },
   // Next to the meta report because it is the other half of the same question:
   // that one says what moved this week, this one says whether the update did
   // it. /meta links straight here from its own update section.
-  { href: '/patches', label: 'Patch Impact', icon: Activity },
+  // Buffie is the game's own mark for a balance change, which is exactly what
+  // this page measures. It was the last nav entry drawing a generic line icon,
+  // and the only non-game icon left in the menu.
+  { href: '/patches', label: 'Patch Impact', icon: BuffieIcon },
   // "Community events", not "Events": the live rotation left this page on
   // 2026-09-24 and a label promising it would be a broken promise. What is
   // here now is the game-wide challenges, which nothing else on the site or
