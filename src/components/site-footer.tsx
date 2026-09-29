@@ -71,6 +71,7 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
       { href: '/daily', label: 'Daily' },
       { href: '/meta', label: 'Meta Report' },
       { href: '/hidden-meta', label: 'Hidden Meta' },
+      { href: '/daily-challenge', label: 'Daily Challenge' },
       { href: '/patches', label: 'Patch Impact' },
       { href: '/meta-score', label: 'How Scores Work' },
       { href: '/bubble', label: 'Android App' },

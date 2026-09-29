@@ -80,6 +80,7 @@ const MORE: NavItem[] = [
   { href: '/comps', label: 'Team Comps', icon: Battle3v3Icon },
   { href: '/meta', label: 'Meta Report', icon: TrophyGainIcon },
   { href: '/hidden-meta', label: 'Hidden Meta', icon: TrophyGainIcon },
+  { href: '/daily-challenge', label: 'Daily Challenge', icon: TrophyGainIcon },
   // Next to the meta report because it is the other half of the same question:
   // that one says what moved this week, this one says whether the update did
   // it. /meta links straight here from its own update section.

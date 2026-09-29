@@ -135,6 +135,7 @@ async function core(add: Add, dataDay: Date | null) {
   add('/daily', 'daily', 0.9);
   add('/meta', 'daily', 0.8);
   add('/hidden-meta', 'daily', 0.8);
+  add('/daily-challenge', 'daily', 0.8);
   // Monthly, but its numbers settle as each after-window fills.
   add('/patches', 'weekly', 0.7);
   // The method behind the tier lists. Changes when the method does, which is
