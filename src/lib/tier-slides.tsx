@@ -173,12 +173,12 @@ function tierSlide(
             ) : (
               <div style={{ display: 'flex', width: 96, height: 96 }} />
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: 380 }}>
-              <div style={{ display: 'flex', fontSize: 46, fontWeight: 700, color: FG }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: 430 }}>
+              <div style={{ display: 'flex', fontSize: 46, fontFamily: DISPLAY, color: FG }}>
                 {cap(row.name)}
               </div>
               <div style={{ display: 'flex', fontSize: 28, color: DIM }}>
-                {`Wins ${pct(row.winRate)} · picked ${pct(row.usageRate)} of the time`}
+                {`Wins ${pct(row.winRate)} · picked ${pct(row.usageRate)}`}
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
