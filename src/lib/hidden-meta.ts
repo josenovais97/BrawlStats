@@ -47,6 +47,20 @@ const MIN_SAMPLE = 300;
 /** Map-brawler pairs are thinner than roster-wide rows, so they get their own. */
 const MIN_MAP_SAMPLE = 60;
 
+/**
+ * How big a map gap has to be before it is worth a word.
+ *
+ * `score` here is a shrunk win rate, so an edge is in win-rate points: 0.03 is
+ * three points better or worse on that map than the brawler manages anywhere
+ * else. Below that it is a wobble, and calling it a trap would be inventing a
+ * finding -- especially on the negative side, where shrinkage toward the prior
+ * keeps edges small and the largest one on a quiet week is barely two points.
+ *
+ * The same 0.03 that `compute_getDailyDiscoveries` already requires before it
+ * will announce a map surprise, so the two cannot disagree.
+ */
+const MIN_EDGE = 0.03;
+
 /** How many entries each section shows. */
 const SHOWN = 6;
 
@@ -190,8 +204,12 @@ export async function getHiddenMeta(windowDays = 7): Promise<HiddenMeta | null> 
     return out;
   };
 
-  const gems = firstPerBrawler([...edges].sort((a, b) => b.edge - a.edge).filter((e) => e.edge > 0));
-  const traps = firstPerBrawler([...edges].sort((a, b) => a.edge - b.edge).filter((e) => e.edge < 0));
+  const gems = firstPerBrawler(
+    [...edges].sort((a, b) => b.edge - a.edge).filter((e) => e.edge >= MIN_EDGE),
+  );
+  const traps = firstPerBrawler(
+    [...edges].sort((a, b) => a.edge - b.edge).filter((e) => e.edge <= -MIN_EDGE),
+  );
 
   return { sleepers, overrated, gems, traps, cuts, rated: rated.length, windowDays };
 }

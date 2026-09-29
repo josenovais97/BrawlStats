@@ -180,7 +180,7 @@ export default async function HiddenMetaPage() {
 
       <Section
         title="Hidden gems"
-        subtitle="Far better on one map than their overall form suggests. The gap is the map-specific part, with general strength taken out."
+        subtitle="Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out."
         empty={gems.length === 0}
       >
         {gems.map((e) => (
@@ -190,7 +190,7 @@ export default async function HiddenMetaPage() {
             sub={`${titleCaseLabel(e.mapName)} · ${formatNumber(e.sampleSize)} battles on this map`}
             right={
               <span className="text-lg font-black tabular-nums text-emerald-400">
-                +{e.edge.toFixed(2)}
+                +{(e.edge * 100).toFixed(1)} pts
               </span>
             }
           />
@@ -199,7 +199,7 @@ export default async function HiddenMetaPage() {
 
       <Section
         title="Trap picks"
-        subtitle="Fine overall, poor on a map that is in rotation right now."
+        subtitle="Fine overall, but losing win-rate points on a map that is in rotation right now."
         empty={traps.length === 0}
       >
         {traps.map((e) => (
@@ -209,7 +209,7 @@ export default async function HiddenMetaPage() {
             sub={`${titleCaseLabel(e.mapName)} · ${formatNumber(e.sampleSize)} battles on this map`}
             right={
               <span className="text-lg font-black tabular-nums text-rose-400">
-                {e.edge.toFixed(2)}
+                {(e.edge * 100).toFixed(1)} pts
               </span>
             }
           />
