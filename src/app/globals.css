@@ -583,3 +583,29 @@ body {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
+
+/* The daily challenge's clue reveal.
+   Flipped on the Y axis rather than faded: a fade reads as "loading", a flip
+   reads as "here is the answer", which is what it is. Respects
+   prefers-reduced-motion, because a board that flips seven tiles per guess is
+   exactly the kind of motion that rule exists for. */
+@keyframes clue-flip {
+  from {
+    transform: rotateY(90deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-clue-flip {
+  animation: clue-flip 260ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-clue-flip {
+    animation: none;
+  }
+}

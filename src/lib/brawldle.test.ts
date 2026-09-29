@@ -6,7 +6,6 @@ import {
   answerFor,
   compareGuess,
   dayIndex,
-  pickBand,
   shareGrid,
 } from '@/lib/brawldle';
 
@@ -25,7 +24,9 @@ const make = (over: Partial<BrawldleBrawler> & { id: number }): BrawldleBrawler 
   rarity: 'Epic',
   className: 'Assassin',
   tier: 'B',
-  usageRate: 0.015,
+  movement: 'Normal',
+  range: 'Normal',
+  reload: 'Normal',
   ...over,
 });
 
@@ -114,29 +115,51 @@ test('a release within five is near', () => {
 });
 
 test('an unranked brawler is a miss with no direction, not a crash', () => {
-  const guess = make({ id: 1, tier: null, usageRate: null });
-  const answer = make({ id: 2, tier: 'S', usageRate: 0.04 });
+  const guess = make({ id: 1, tier: null });
+  const answer = make({ id: 2, tier: 'S' });
   const result = compareGuess(guess, answer);
   const tier = result.clues.find((c) => c.key === 'tier');
-  const picked = result.clues.find((c) => c.key === 'picked');
+
   assert.equal(tier?.verdict, 'miss');
   assert.equal(tier?.direction, null);
-  assert.equal(picked?.verdict, 'miss');
-  assert.equal(picked?.direction, null);
 });
 
-test('pick rate is banded, so near numbers can actually match', () => {
-  assert.equal(pickBand(0.019), pickBand(0.012));
-  assert.notEqual(pickBand(0.004), pickBand(0.02));
-  assert.equal(pickBand(null), null);
-});
-
-test('every guess produces exactly five clues, in a stable order', () => {
+test('every guess produces the same seven clues, in a stable order', () => {
+  /*
+   * The order is part of the contract: the share grid is a row of squares in
+   * this order, so two people comparing pasted grids are comparing the same
+   * columns. Changing it silently makes every grid already in a chat wrong.
+   */
   const clues = compareGuess(make({ id: 1 }), make({ id: 2 })).clues;
   assert.deepEqual(
     clues.map((c) => c.key),
-    ['rarity', 'class', 'released', 'tier', 'picked'],
+    ['rarity', 'class', 'movement', 'range', 'reload', 'released', 'tier'],
   );
+});
+
+test('a combat tier one step apart is near and points the right way', () => {
+  const result = compareGuess(
+    make({ id: 1, movement: 'Fast', range: 'Short', reload: 'Slow' }),
+    make({ id: 2, movement: 'Very Fast', range: 'Very Short', reload: 'Very Slow' }),
+  );
+  const by = (k: string) => result.clues.find((c) => c.key === k);
+  assert.equal(by('movement')?.verdict, 'near');
+  assert.equal(by('movement')?.direction, 'up');
+  assert.equal(by('range')?.direction, 'down');
+  assert.equal(by('reload')?.direction, 'down');
+});
+
+test('a brawler whose wiki page could not be read shows dashes, not guesses', () => {
+  const result = compareGuess(
+    make({ id: 1, movement: null, range: null, reload: null }),
+    make({ id: 2 }),
+  );
+  for (const key of ['movement', 'range', 'reload']) {
+    const clue = result.clues.find((c) => c.key === key);
+    assert.equal(clue?.verdict, 'miss');
+    assert.equal(clue?.direction, null);
+    assert.equal(clue?.value, '—');
+  }
 });
 
 test('the share grid marks a solve and a failure differently', () => {

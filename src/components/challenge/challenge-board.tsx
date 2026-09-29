@@ -199,23 +199,28 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
       {error ? <p className="text-sm text-rose-400">{error}</p> : null}
 
       {results.length > 0 ? (
-        <div className="space-y-2">
+        /* Seven columns do not fit a phone at a readable size, and shrinking
+           the type until "Very Fast" fits is how a board becomes unreadable.
+           It scrolls sideways instead. */
+        <div className="-mx-4 space-y-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
           {/* Column headings once, so five labels are not repeated on every row */}
-          <div className="grid grid-cols-[auto_repeat(5,1fr)] gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
-            <span className="w-10" />
+          <div className="grid min-w-[620px] grid-cols-[3rem_repeat(7,1fr)] gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
+            <span />
             <span className="text-center">Rarity</span>
             <span className="text-center">Class</span>
+            <span className="text-center">Movement</span>
+            <span className="text-center">Range</span>
+            <span className="text-center">Reload</span>
             <span className="text-center">Released</span>
             <span className="text-center">Tier</span>
-            <span className="text-center">Picked</span>
           </div>
 
           {[...results].reverse().map((r, i) => (
             <div
               key={`${r.brawler.slug}-${i}`}
-              className="grid grid-cols-[auto_repeat(5,1fr)] items-stretch gap-1.5"
+              className="grid min-w-[620px] grid-cols-[3rem_repeat(7,1fr)] items-stretch gap-1.5"
             >
-              <div className="flex w-10 items-center justify-center">
+              <div className="flex items-center justify-center">
                 {r.brawler.imageUrl ? (
                   <Image
                     src={r.brawler.imageUrl}
@@ -227,14 +232,23 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
                   />
                 ) : null}
               </div>
-              {r.clues.map((c) => (
+              {r.clues.map((c, col) => (
                 <div
                   key={c.key}
-                  className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-1.5 text-center ${VERDICT_CLASS[c.verdict]}`}
+                  /* Staggered so the row reveals left to right rather than all
+                     at once. Only the newest row animates: replaying the whole
+                     board on every guess is noise, not feedback. */
+                  style={i === 0 ? { animationDelay: `${col * 90}ms` } : undefined}
+                  className={`flex min-h-[4.5rem] flex-col items-center justify-center gap-1 rounded-xl border-2 px-1 py-2 text-center ${
+                    VERDICT_CLASS[c.verdict]
+                  } ${i === 0 ? 'animate-clue-flip' : ''}`}
                 >
-                  <span className="text-[11px] font-bold leading-tight">{c.value}</span>
+                  <span className="text-[12px] font-bold leading-tight">{c.value}</span>
                   {c.direction ? (
-                    <span aria-label={c.direction === 'up' ? 'higher' : 'lower'} className="text-xs">
+                    <span
+                      aria-label={c.direction === 'up' ? 'higher' : 'lower'}
+                      className="text-base leading-none opacity-80"
+                    >
                       {ARROW[c.direction]}
                     </span>
                   ) : null}

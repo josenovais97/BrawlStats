@@ -25,6 +25,10 @@ export const RARITY_ORDER = [
 
 export const TIER_ORDER = ['F', 'E', 'D', 'C', 'B', 'A', 'S'] as const;
 
+export const MOVEMENT_SCALE = ['Very Slow', 'Slow', 'Normal', 'Fast', 'Very Fast'] as const;
+export const RANGE_SCALE = ['Very Short', 'Short', 'Normal', 'Long', 'Very Long'] as const;
+export const RELOAD_SCALE = ['Very Slow', 'Slow', 'Normal', 'Fast', 'Very Fast'] as const;
+
 /** Everything a guess is judged on. */
 export interface BrawldleBrawler {
   id: number;
@@ -35,15 +39,17 @@ export interface BrawldleBrawler {
   className: string | null;
   /** Tier from the live ranked list, or null when it has too few battles. */
   tier: string | null;
-  /** Share of sampled ranked battles, or null when unranked. */
-  usageRate: number | null;
+  /** Named tiers off the wiki infobox. Null when the page could not be read. */
+  movement: string | null;
+  range: string | null;
+  reload: string | null;
 }
 
 export type Verdict = 'hit' | 'near' | 'miss';
 export type Direction = 'up' | 'down' | null;
 
 export interface Clue {
-  key: 'rarity' | 'class' | 'released' | 'tier' | 'picked';
+  key: 'rarity' | 'class' | 'movement' | 'range' | 'reload' | 'released' | 'tier';
   label: string;
   /** What the guess had, as shown to the player. */
   value: string;
@@ -142,19 +148,6 @@ function ordered(
   };
 }
 
-/** Pick rate, bucketed, because two raw percentages are never equal. */
-export function pickBand(rate: number | null): number | null {
-  if (rate === null) return null;
-  const pct = rate * 100;
-  if (pct < 0.5) return 0;
-  if (pct < 1) return 1;
-  if (pct < 2) return 2;
-  if (pct < 3.5) return 3;
-  return 4;
-}
-
-const PICK_BAND_LABEL = ['Under 0.5%', '0.5–1%', '1–2%', '2–3.5%', 'Over 3.5%'];
-
 /**
  * How close a release is before it counts as near.
  *
@@ -207,20 +200,37 @@ export function compareGuess(guess: BrawldleBrawler, answer: BrawldleBrawler): G
     ordinal(TIER_ORDER, answer.tier),
   );
 
-  const gBand = pickBand(guess.usageRate);
-  const aBand = pickBand(answer.usageRate);
-  const picked = ordered(
-    'picked',
-    'Pick rate',
-    gBand === null ? '—' : PICK_BAND_LABEL[gBand],
-    gBand,
-    aBand,
+  const movement = ordered(
+    'movement',
+    'Movement',
+    guess.movement ?? '—',
+    ordinal(MOVEMENT_SCALE, guess.movement),
+    ordinal(MOVEMENT_SCALE, answer.movement),
+  );
+  const range = ordered(
+    'range',
+    'Range',
+    guess.range ?? '—',
+    ordinal(RANGE_SCALE, guess.range),
+    ordinal(RANGE_SCALE, answer.range),
+  );
+  const reload = ordered(
+    'reload',
+    'Reload',
+    guess.reload ?? '—',
+    ordinal(RELOAD_SCALE, guess.reload),
+    ordinal(RELOAD_SCALE, answer.reload),
   );
 
+  /*
+   * Order matters and is fixed: the board reads left to right and the share
+   * grid is a row of squares in this same order, so a viewer comparing two
+   * pasted grids is comparing the same columns.
+   */
   return {
     brawler: guess,
     correct: guess.id === answer.id,
-    clues: [rarity, className, released, tier, picked],
+    clues: [rarity, className, movement, range, reload, released, tier],
   };
 }
 

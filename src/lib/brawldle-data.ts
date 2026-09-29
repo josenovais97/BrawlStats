@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getCombatTiers } from '@/lib/brawler-combat-tiers';
 import type { BrawldleBrawler } from '@/lib/brawldle';
 import { slugify } from '@/lib/slugs';
 import { getScoredRoster } from '@/lib/stats';
@@ -31,6 +32,8 @@ export async function brawldleRoster(): Promise<BrawldleBrawler[]> {
   if (!catalog || catalog.current.length === 0) return [];
 
   const meta = new Map(scored.map((b) => [b.brawlerId, b]));
+  // Three batched wiki requests for the whole roster, cached for a day.
+  const tiers = await getCombatTiers(catalog.current.map((b) => b.name));
 
   return [...catalog.current]
     .sort((a, b) => a.id - b.id)
@@ -44,12 +47,14 @@ export async function brawldleRoster(): Promise<BrawldleBrawler[]> {
         rarity: b.rarityName,
         className: b.className,
         tier: m?.tier ?? null,
-        usageRate: m?.usageRate ?? null,
+        movement: tiers.get(b.name.toLowerCase())?.movement ?? null,
+        range: tiers.get(b.name.toLowerCase())?.range ?? null,
+        reload: tiers.get(b.name.toLowerCase())?.reload ?? null,
       };
     });
 }
 
-/** Just enough for the picker: no tier, no pick rate, no answer. */
+/** Just enough for the picker: no clue values, no answer. */
 export interface PickerEntry {
   id: number;
   name: string;
