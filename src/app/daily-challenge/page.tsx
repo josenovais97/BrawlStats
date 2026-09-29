@@ -14,10 +14,12 @@ import { brawldleRoster, pickerEntries } from '@/lib/brawldle-data';
  * the HTML -- which is the difference between a puzzle and a page with the
  * answer written at the bottom.
  *
- * Hourly rather than daily revalidate. The clues include tier and pick rate,
- * which move when the sampler runs, and a day-long cache would serve a clue
- * that disagrees with /tier-list/ranked. The answer itself is a pure function
- * of the date, so it does not move within a day regardless.
+ * Hourly rather than daily revalidate. The tier clue moves when the sampler
+ * runs, and a day-long cache would serve a clue that disagrees with
+ * /tier-list/ranked. The answer itself is a pure function of the date, so it
+ * does not move within a day regardless. The three combat clues are cached for
+ * a day inside `getCombatTiers`, which is right for values that only change on
+ * a balance patch.
  */
 
 export const revalidate = 3600;
@@ -25,7 +27,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Brawl Stars daily challenge — guess the brawler',
   description:
-    'A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, release order, tier and pick rate. Free, no account, one puzzle a day.',
+    'A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.',
   alternates: { canonical: '/daily-challenge' },
 };
 
@@ -66,13 +68,20 @@ export default async function DailyChallengePage() {
             An arrow points toward the answer: ▲ means higher, ▼ means lower.
           </p>
           <p>
+            <strong className="text-foreground">Movement</strong>,{' '}
+            <strong className="text-foreground">range</strong> and{' '}
+            <strong className="text-foreground">reload</strong> are the named tiers the game uses —
+            Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because
+            nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.
+          </p>
+          <p>
             <strong className="text-foreground">Released</strong> is the brawler&rsquo;s place in
-            release order, not a date. <strong className="text-foreground">Tier</strong> and{' '}
-            <strong className="text-foreground">pick rate</strong> come from the live{' '}
+            release order, not a date. <strong className="text-foreground">Tier</strong> comes from
+            the live{' '}
             <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
               ranked tier list
             </Link>
-            , so they move with the meta and always match what the rest of the site says.
+            , so it moves with the meta and always matches what the rest of the site says.
           </p>
           <p>
             Class has no arrow, because there is no direction from Marksman to Tank. A brawler with
