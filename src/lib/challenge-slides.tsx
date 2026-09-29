@@ -45,21 +45,35 @@ const TILE: Record<Clue['verdict'], { bg: string; border: string; text: string }
 
 const ARROW: Record<'up' | 'down', string> = { up: '▲', down: '▼' };
 
+/**
+ * Values that do not fit a tile, shortened rather than clipped.
+ *
+ * "Damage Dealer" rendered as "Damage Dea…", which looks like a rendering bug
+ * rather than an abbreviation. Dropping the noun keeps the word a player
+ * recognises; the ellipsis at the end keeps nothing.
+ */
+const SHORT: Record<string, string> = {
+  'Damage Dealer': 'Damage',
+  'Ultra Legendary': 'Ultra Leg.',
+  'Very Short': 'V. Short',
+};
+const short = (v: string) => SHORT[v] ?? v;
+
 /** One guess, drawn the way the board draws it. */
 function Row({ result, art }: { result: GuessResult; art: string | null }): ReactElement {
   return (
-    <div style={{ display: 'flex', alignItems: 'stretch', gap: 10 }}>
+    <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
       <div
         style={{
           display: 'flex',
-          width: 92,
+          width: 104,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
         {art ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={art} width={84} height={84} alt="" />
+          <img src={art} width={96} height={96} alt="" />
         ) : (
           <div style={{ display: 'flex', width: 84, height: 84 }} />
         )}
@@ -74,10 +88,10 @@ function Row({ result, art }: { result: GuessResult; art: string | null }): Reac
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 96,
-              gap: 4,
-              padding: '10px 4px',
-              borderRadius: 16,
+              width: 110,
+              gap: 6,
+              padding: '16px 4px',
+              borderRadius: 18,
               border: `2px solid ${t.border}`,
               background: t.bg,
             }}
@@ -85,13 +99,13 @@ function Row({ result, art }: { result: GuessResult; art: string | null }): Reac
             <div
               style={{
                 display: 'flex',
-                fontSize: 19,
+                fontSize: 21,
                 fontFamily: DISPLAY,
                 color: t.text,
                 textAlign: 'center',
               }}
             >
-              {c.value.length > 11 ? `${c.value.slice(0, 10)}…` : c.value}
+              {short(c.value)}
             </div>
             {c.direction ? (
               <div style={{ display: 'flex', fontSize: 20, color: t.text }}>
@@ -186,7 +200,7 @@ function board(
       <div style={{ display: 'flex', fontSize: 30, color: DIM, marginTop: 10 }}>
         Each row is one guess, narrowing it down
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 40 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 48 }}>
         {results.map((r, i) => (
           <Row key={r.brawler.slug} result={r} art={art[i] ?? null} />
         ))}
