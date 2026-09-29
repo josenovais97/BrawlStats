@@ -4,6 +4,7 @@ import { dayLabel } from '@/lib/format';
 import {
   DISPLAY,
   ACCENT,
+  BRAND,
   DIM,
   FG,
   Frame,
@@ -196,21 +197,43 @@ function finding(
         {`FINDING ${index + 1} OF ${total}`}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, height: 380, marginTop: 24 }}>
-        {shown.map((src, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            {i > 0 && glyph ? (
-              <div style={{ display: 'flex', fontSize: 52, fontWeight: 700, color: DIM }}>
-                {glyph}
-              </div>
-            ) : (
-              <div style={{ display: 'flex' }} />
-            )}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} width={340} height={340} alt="" style={{ objectFit: 'contain' }} />
-          </div>
-        ))}
-      </div>
+      {/* One brawler gets the hero treatment; a pair cannot, because two discs
+          side by side read as two separate slides pushed together. The pair
+          keeps a plain row and the glyph between them carries the relationship.
+
+          Centred either way. Left-aligned art in a 1080px frame left the right
+          third empty and the whole slide looking like it had lost a column. */}
+      {shown.length === 1 ? (
+        <div style={{ display: 'flex', marginTop: 16 }}>
+          <Hero src={shown[0]} size={460} />
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 24,
+            height: 400,
+            marginTop: 16,
+            width: '100%',
+          }}
+        >
+          {shown.map((src, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+              {i > 0 && glyph ? (
+                <div style={{ display: 'flex', fontSize: 56, fontFamily: DISPLAY, color: BRAND }}>
+                  {glyph}
+                </div>
+              ) : (
+                <div style={{ display: 'flex' }} />
+              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} width={360} height={360} alt="" style={{ objectFit: 'contain' }} />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', fontSize: 78, fontFamily: DISPLAY, fontWeight: 400, marginTop: 28 }}>
         {HEADLINE[d.kind]?.(names, d.context) ?? names.join(' and ')}
