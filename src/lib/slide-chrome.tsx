@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { ReactElement } from 'react';
+import { cloneElement, type ReactElement } from 'react';
 import sharp from 'sharp';
 
 import { brawlerModelUrl, brawlerPortraitUrl } from '@/lib/brawlapi';
@@ -434,6 +434,136 @@ export function outro(logo: string | null): ReactElement {
       </div>
     </Frame>
   );
+}
+
+/**
+ * A raised surface, instead of flat translucent white.
+ *
+ * Every panel on every slide was `rgba(255,255,255,0.05)` -- the same wash at
+ * the same opacity, with no edge. Six of them stacked read as six identical
+ * grey bars, which is most of why a tier slide looked like a spreadsheet. A
+ * gradient and a hairline give a card a top and a bottom, and `accent` lets
+ * the one that matters sit forward of the rest.
+ */
+export function Card({
+  children,
+  accent,
+  lead = false,
+  pad = '24px 28px',
+}: {
+  children: ReactElement | ReactElement[];
+  accent?: string | null;
+  lead?: boolean;
+  pad?: string;
+}): ReactElement {
+  const tint = accent ?? ACCENT;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: pad,
+        borderRadius: 26,
+        border: `2px solid ${lead ? `${tint}55` : 'rgba(255,255,255,0.07)'}`,
+        background: lead
+          ? `linear-gradient(135deg, ${tint}22, rgba(255,255,255,0.03))`
+          : 'linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.02))',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * A rate as a length.
+ *
+ * A viewer gives a slide about half a second, and in half a second a bar is
+ * read and "56.7%" is not. The number stays -- this is a post about being
+ * checkable -- but the bar is what carries the ranking at a glance.
+ *
+ * Scaled against a floor and ceiling rather than 0-100%: every ranked win rate
+ * sits between roughly 40% and 60%, so a bar drawn from zero would show six
+ * identical half-full bars and say nothing.
+ */
+export function Bar({
+  value,
+  min = 0.4,
+  max = 0.62,
+  width = 300,
+  color,
+}: {
+  value: number | null;
+  min?: number;
+  max?: number;
+  width?: number;
+  color?: string | null;
+}): ReactElement {
+  const pct = value === null ? 0 : Math.max(0, Math.min(1, (value - min) / (max - min)));
+  return (
+    <div
+      style={{
+        display: 'flex',
+        width,
+        height: 12,
+        borderRadius: 6,
+        background: 'rgba(255,255,255,0.08)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          width: Math.max(10, Math.round(width * pct)),
+          height: 12,
+          borderRadius: 6,
+          background: color ?? ACCENT,
+        }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Where you are in the carousel.
+ *
+ * TikTok shows its own dots, but small and low-contrast over whatever the
+ * slide happens to be. Nine slides is a lot to ask for on trust, and a viewer
+ * who can see there are nine has a reason to keep swiping.
+ */
+export function Pips({ index, total }: { index: number; total: number }): ReactElement {
+  return (
+    <div style={{ position: 'absolute', top: 64, left: 84, display: 'flex', gap: 8 }}>
+      {Array.from({ length: Math.min(total, 12) }, (_unused, i) => (
+        <div
+          key={i}
+          style={{
+            display: 'flex',
+            width: i === index ? 30 : 10,
+            height: 10,
+            borderRadius: 5,
+            background: i === index ? BRAND : 'rgba(255,255,255,0.22)',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Stamps the progress pips onto a finished slide.
+ *
+ * Applied to the assembled list rather than passed into every `Frame`, because
+ * only the list knows a slide's position -- the function that builds a tier
+ * slide has no idea whether it is third of eight or third of six, and
+ * threading an index through every builder to tell it would be a lot of
+ * plumbing for a row of dots.
+ */
+export function withPips(slides: ReactElement[]): ReactElement[] {
+  return slides.map((el, i) => {
+    const kids = (el.props as { children?: ReactElement | ReactElement[] }).children;
+    const list = Array.isArray(kids) ? kids : kids ? [kids] : [];
+    return cloneElement(el, {}, ...list, <Pips key="pips" index={i} total={slides.length} />);
+  });
 }
 
 /** PNG from Satori to JPEG, which is the only thing TikTok accepts. */

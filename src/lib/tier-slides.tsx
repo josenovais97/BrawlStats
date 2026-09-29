@@ -7,12 +7,15 @@ import {
   BRAND,
   DIM,
   FG,
+  Bar,
+  Card,
   Frame,
   Hero,
   MUTED,
   loadArt,
   loadLogo,
   outro,
+  withPips,
 } from '@/lib/slide-chrome';
 import { PER_TIER, type TierMove, type TierPost, type TierPostEntry } from '@/lib/tier-of-day';
 import type { Tier } from '@/types/stats';
@@ -154,40 +157,49 @@ function tierSlide(
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 52 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginTop: 44 }}>
         {shown.map((row, i) => (
-          <div
-            key={row.brawlerId}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 24,
-              padding: '22px 26px',
-              borderRadius: 24,
-              background: i === 0 ? 'rgba(53,208,255,0.10)' : 'rgba(255,255,255,0.05)',
-            }}
-          >
+          <Card key={row.brawlerId} accent={row.rarityColor ?? TIER_COLOR[tier]} lead={i === 0} pad="20px 26px">
+            {/* The rank, which six visually identical cards were not carrying.
+                A list is an ordering, and the ordering was only implied by
+                position -- fine on a page you read top to bottom, useless in a
+                screenshot someone sees for half a second. */}
+            <div
+              style={{
+                display: 'flex',
+                width: 62,
+                fontSize: 54,
+                fontFamily: DISPLAY,
+                color: i === 0 ? BRAND : 'rgba(255,255,255,0.28)',
+              }}
+            >
+              {i + 1}
+            </div>
+
             {art[i] ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={art[i] as string} width={96} height={96} alt="" />
+              <img src={art[i] as string} width={104} height={104} alt="" />
             ) : (
-              <div style={{ display: 'flex', width: 96, height: 96 }} />
+              <div style={{ display: 'flex', width: 104, height: 104 }} />
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: 430 }}>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: 372, marginLeft: 18 }}>
               <div style={{ display: 'flex', fontSize: 46, fontFamily: DISPLAY, color: FG }}>
                 {cap(row.name)}
               </div>
-              <div style={{ display: 'flex', fontSize: 28, color: DIM }}>
+              <Bar value={row.winRate} width={330} color={row.rarityColor ?? ACCENT} />
+              <div style={{ display: 'flex', fontSize: 26, color: DIM }}>
                 {`Wins ${pct(row.winRate)} · picked ${pct(row.usageRate)}`}
               </div>
             </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
               <div style={{ display: 'flex', fontSize: 52, fontFamily: DISPLAY, fontWeight: 400, color: ACCENT }}>
                 {row.metaScore.toFixed(1)}
               </div>
               <div style={{ display: 'flex', fontSize: 24, color: DIM }}>rating</div>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -395,7 +407,7 @@ export async function tierSlides(post: TierPost, only?: number): Promise<ReactEl
     wanted('cover') || wanted('outro') ? loadLogo(208) : Promise.resolve(null),
   ]);
 
-  return steps.map((step) => {
+  return withPips(steps.map((step) => {
     switch (step) {
       case 'cover':
         return cover(post, logo);
@@ -421,7 +433,7 @@ export async function tierSlides(post: TierPost, only?: number): Promise<ReactEl
       default:
         return outro(logo);
     }
-  });
+  }));
 }
 
 /** The caption, built from the same numbers the slides draw. */

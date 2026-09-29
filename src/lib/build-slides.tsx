@@ -16,6 +16,7 @@ import {
   loadIcon,
   loadLogo,
   outro,
+  withPips,
 } from '@/lib/slide-chrome';
 import type { AbilityChoice } from '@/lib/stats';
 
@@ -284,7 +285,7 @@ export async function buildSlides(
     wanted('outro') ? loadLogo(208) : Promise.resolve(null),
   ]);
 
-  return steps.map((step) => {
+  return withPips(steps.map((step) => {
     switch (step) {
       case 'cover':
         return cover(day, art);
@@ -297,7 +298,7 @@ export async function buildSlides(
       default:
         return outro(logo);
     }
-  });
+  }));
 }
 
 /** The caption the post carries, built from the same data the slides show. */

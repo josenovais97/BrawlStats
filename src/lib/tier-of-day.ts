@@ -119,6 +119,14 @@ export interface TierPostEntry {
   name: string;
   /** The catalogue's portrait, which is documented to actually resolve. */
   imageUrl: string | null;
+  /**
+   * The brawler's rarity colour, so a slide can be tinted to its subject.
+   *
+   * Six cards in one accent are six identical cards. The game already assigns
+   * every brawler a colour and players already read it, so borrowing it costs
+   * nothing and makes a Mythic row and a Rare row tell themselves apart.
+   */
+  rarityColor: string | null;
   metaScore: number;
   winRate: number | null;
   usageRate: number | null;
@@ -164,6 +172,7 @@ export async function tierOfDay(date: string): Promise<TierPost | null> {
     brawlerId: b.brawlerId,
     name: b.brawlerName,
     imageUrl: catalog?.byId.get(b.brawlerId)?.imageUrl ?? null,
+    rarityColor: catalog?.byId.get(b.brawlerId)?.rarityColor ?? null,
     metaScore: b.metaScore ?? 0,
     winRate: b.normalizedWinRate,
     usageRate: b.usageRate,

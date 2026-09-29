@@ -13,6 +13,7 @@ import {
   loadArt,
   loadLogo,
   outro,
+  withPips,
 } from '@/lib/slide-chrome';
 import type { Discovery, StoredDailyReport } from '@/lib/stats';
 
@@ -362,12 +363,12 @@ export async function dailySlides(
     wantsLogo ? loadLogo(208) : Promise.resolve(null),
   ]);
 
-  return [
+  return withPips([
     cover(date, findings, art[0]?.[0] ?? null),
     ...findings.map((d, i) => finding(d, i, findings.length, art[i] ?? [])),
     method(),
     outro(logo),
-  ];
+  ]);;
 }
 
 /**
