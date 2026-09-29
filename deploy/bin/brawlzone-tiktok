@@ -128,7 +128,11 @@ case "$MODE" in
   build) MANIFEST="${SITE}/daily/${DAY}/build/slides.json" ;;
   tiers) MANIFEST="${SITE}/daily/${DAY}/tiers/slides.json" ;;
   hidden) MANIFEST="${SITE}/daily/${DAY}/hidden/slides.json" ;;
-  *)     die "::error::unknown mode '${MODE}' (expected daily, build, tiers or hidden)" ;;
+  # Promotional, run by hand. There is deliberately no timer: four scheduled
+  # posts already sit against TikTok's five pending uploads per 24h, and a
+  # fifth would leave no headroom to re-run a failed one.
+  challenge) MANIFEST="${SITE}/daily/${DAY}/challenge/slides.json" ;;
+  *)     die "::error::unknown mode '${MODE}' (expected daily, build, tiers, hidden or challenge)" ;;
 esac
 
 # Before anything that can exit, so "the job ran and decided there was nothing

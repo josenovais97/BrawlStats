@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   BrawlersIcon,
   CompareIcon,
+  DailyChallengeIcon,
   DraftIcon,
   LeaderboardIcon,
   MapsIcon,
@@ -26,6 +27,18 @@ import { TIER_COLOR } from '@/lib/tiers';
  * showing it here costs nothing upstream.
  */
 const SECONDARY = [
+  /*
+   * First in the list on purpose. Everything else here is a reference tool
+   * somebody opens when they have a question; this is the only one that is a
+   * reason to come back tomorrow, and it was reachable only from the "More"
+   * menu — which is where a daily game goes to be played once.
+   */
+  {
+    href: '/daily-challenge',
+    icon: DailyChallengeIcon,
+    title: 'Daily challenge',
+    body: 'Guess today’s brawler',
+  },
   {
     href: '/ranked',
     icon: RankedIcon,
