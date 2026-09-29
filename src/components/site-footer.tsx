@@ -70,6 +70,7 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
       { href: '/compare', label: 'Compare' },
       { href: '/daily', label: 'Daily' },
       { href: '/meta', label: 'Meta Report' },
+      { href: '/hidden-meta', label: 'Hidden Meta' },
       { href: '/patches', label: 'Patch Impact' },
       { href: '/meta-score', label: 'How Scores Work' },
       { href: '/bubble', label: 'Android App' },
