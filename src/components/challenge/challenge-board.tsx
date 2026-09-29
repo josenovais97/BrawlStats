@@ -6,6 +6,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ClassIcon, GadgetIcon, StarPowerIcon } from '@/components/game-icons';
 import type { Clue, GuessResult } from '@/lib/brawldle';
 import type { PickerEntry } from '@/lib/brawldle-data';
+import {
+  type DailyStats,
+  EMPTY_STATS,
+  averageGuesses,
+  currentStreak,
+  formatCountdown,
+  msUntilReset,
+  oneShots,
+  recordResult,
+} from '@/lib/brawldle-stats';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 
@@ -52,6 +62,33 @@ function save(state: Saved) {
     localStorage.setItem('brawlzone-daily', JSON.stringify(state));
   } catch {
     /* Private window, or storage disabled. The game still plays. */
+  }
+}
+
+/*
+ * Stats live under their own key, not inside the board.
+ *
+ * The board is wiped every midnight when the date no longer matches; a streak
+ * has to survive that, and burying it in a record that is designed to be
+ * discarded is how it would not.
+ */
+const STATS_KEY = 'brawlzone-daily-stats';
+
+function loadStats(): DailyStats {
+  try {
+    const raw = localStorage.getItem(STATS_KEY);
+    if (!raw) return EMPTY_STATS;
+    return { ...EMPTY_STATS, ...(JSON.parse(raw) as Partial<DailyStats>) };
+  } catch {
+    return EMPTY_STATS;
+  }
+}
+
+function saveStats(stats: DailyStats) {
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  } catch {
+    /* As above: a lost streak is better than a broken game. */
   }
 }
 
@@ -162,6 +199,91 @@ function HintPanel({ hints, guesses }: { hints: Hints | null; guesses: number })
   );
 }
 
+/** A number with its label, the way the game shows a stat. */
+function Stat({ value, label }: { value: string | number; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <span className="text-2xl font-black tabular-nums leading-none">{value}</span>
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">{label}</span>
+    </div>
+  );
+}
+
+/**
+ * The reason to come back.
+ *
+ * A daily without a streak is a puzzle you do once. The distribution is the
+ * part people screenshot, so it is drawn as bars rather than listed as
+ * numbers, and today's row is highlighted so a good result is legible at a
+ * glance rather than found.
+ */
+function StatsPanel({
+  stats,
+  today,
+  todayGuesses,
+}: {
+  stats: DailyStats;
+  today: string;
+  todayGuesses: number | null;
+}) {
+  const streak = currentStreak(stats, today);
+  const avg = averageGuesses(stats);
+  const counts = Object.entries(stats.distribution)
+    .map(([k, v]) => [Number(k), v] as const)
+    .sort((a, b) => a[0] - b[0]);
+  const peak = counts.reduce((m, [, v]) => Math.max(m, v), 0);
+
+  if (stats.played === 0) return null;
+
+  return (
+    <div className="card space-y-4 p-5">
+      <div className="grid grid-cols-4 gap-2">
+        <Stat value={stats.played} label="Played" />
+        <Stat
+          value={stats.played > 0 ? `${Math.round((stats.won / stats.played) * 100)}%` : '—'}
+          label="Won"
+        />
+        <Stat value={streak} label="Streak" />
+        <Stat value={stats.best} label="Best" />
+      </div>
+
+      {counts.length > 0 ? (
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+            Guesses to solve
+          </p>
+          {counts.map(([guesses, times]) => (
+            <div key={guesses} className="flex items-center gap-2 text-xs">
+              <span className="w-4 shrink-0 text-right font-bold tabular-nums">{guesses}</span>
+              <span className="flex-1">
+                <span
+                  className={`flex h-5 min-w-6 items-center justify-end rounded px-1.5 font-bold tabular-nums ${
+                    todayGuesses === guesses
+                      ? 'bg-emerald-500 text-[#0b0f1d]'
+                      : 'bg-surface-2 text-foreground'
+                  }`}
+                  style={{ width: `${Math.max(12, Math.round((times / peak) * 100))}%` }}
+                >
+                  {times}
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted">
+        {avg !== null ? <span>Average {avg.toFixed(1)} guesses</span> : null}
+        {oneShots(stats) > 0 ? (
+          <span>
+            {oneShots(stats)} first-guess {oneShots(stats) === 1 ? 'solve' : 'solves'}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function ChallengeBoard({ date, picker }: { date: string; picker: PickerEntry[] }) {
   /*
    * One state object, hydrated once. `board === null` means localStorage has
@@ -174,6 +296,9 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [hints, setHints] = useState<Hints | null>(null);
+  const [stats, setStats] = useState<DailyStats | null>(null);
+  const [yesterday, setYesterday] = useState<{ name: string; imageUrl: string | null } | null>(null);
+  const [countdown, setCountdown] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   /*
@@ -191,12 +316,41 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setBoard(load(date) ?? { date, results: [], solved: false });
+    setStats(loadStats());
   }, [date]);
 
   // Memoised so the `??` does not hand useMemo a fresh array every render.
   const results = useMemo(() => board?.results ?? [], [board]);
   const solved = board?.solved ?? false;
   const ready = board !== null;
+
+  /*
+   * The countdown only runs once the puzzle is done, which is the only time it
+   * is an invitation rather than a distraction. One interval, cleared on
+   * unmount: a second one per render is how a page starts eating battery.
+   */
+  useEffect(() => {
+    if (!solved) return;
+    const tick = () => setCountdown(formatCountdown(msUntilReset(new Date())));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [solved]);
+
+  /* Yesterday's answer, fetched once the day is finished either way. */
+  useEffect(() => {
+    if (!solved) return;
+    let cancelled = false;
+    fetch('/api/brawldle/yesterday')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d?.brawler) setYesterday(d.brawler);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [solved]);
 
   /*
    * Hints are asked for by guess count, so this refires as the count changes
@@ -250,6 +404,20 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
       };
       setBoard(next);
       save(next);
+
+      /*
+       * Counted the moment it is won, not on the next load. `recordResult` is
+       * idempotent per date, so a refresh or a re-render cannot double it —
+       * which is why the board is free to save on every guess.
+       */
+      if (data.correct) {
+        setStats((prev) => {
+          const updated = recordResult(prev ?? EMPTY_STATS, date, true, next.results.length);
+          saveStats(updated);
+          return updated;
+        });
+      }
+
       setQuery('');
       inputRef.current?.focus();
     } catch {
@@ -389,7 +557,19 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
             <p className="text-lg font-black">
               Got it in {results.length} {results.length === 1 ? 'guess' : 'guesses'}.
             </p>
-            <p className="text-sm text-muted">A new brawler at midnight UTC.</p>
+            {/* A countdown rather than "midnight UTC": one is a fact you have
+                to convert, the other is an invitation with a number on it. */}
+            <p className="text-sm text-muted">
+              {countdown ? (
+                <>
+                  Next brawler in{' '}
+                  <span className="font-bold tabular-nums text-foreground">{countdown}</span>
+                </>
+              ) : (
+                'A new brawler at midnight UTC.'
+              )}
+            </p>
+
             <button
               type="button"
               onClick={share}
@@ -397,8 +577,35 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
             >
               {copied ? 'Copied' : 'Copy result'}
             </button>
+
+            {yesterday ? (
+              <p className="flex items-center gap-2 pt-1 text-xs text-muted">
+                Yesterday was
+                {yesterday.imageUrl ? (
+                  <Image
+                    src={yesterday.imageUrl}
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="size-6 rounded bg-surface-2"
+                    unoptimized
+                  />
+                ) : null}
+                <span className="font-semibold capitalize text-foreground">
+                  {yesterday.name.toLowerCase()}
+                </span>
+              </p>
+            ) : null}
           </div>
         </div>
+      ) : null}
+
+      {stats ? (
+        <StatsPanel
+          stats={stats}
+          today={date}
+          todayGuesses={solved ? results.length : null}
+        />
       ) : null}
     </div>
   );
