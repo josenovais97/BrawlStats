@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 import { brawlerOfDay } from '@/lib/brawler-of-day';
-import { SLIDE_SIZE, buildSlideCount, buildSlides, toJpeg } from '@/lib/build-slides';
+import { SLIDE_SIZE, slideFonts, buildSlideCount, buildSlides, toJpeg } from '@/lib/build-slides';
 
 /**
  * One slide of the day's brawler-build carousel, as a JPEG.
@@ -43,7 +43,7 @@ export async function GET(
   const slide = slides[n];
   if (!slide) return new Response('Not found', { status: 404 });
 
-  const png = new ImageResponse(slide, SLIDE_SIZE);
+  const png = new ImageResponse(slide, { ...SLIDE_SIZE, fonts: await slideFonts() });
   const jpeg = await toJpeg(await png.arrayBuffer());
 
   return new Response(new Uint8Array(jpeg), {

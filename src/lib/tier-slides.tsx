@@ -2,13 +2,14 @@ import type { ReactElement } from 'react';
 
 import { titleCase } from '@/lib/format';
 import {
+  DISPLAY,
   ACCENT,
   BRAND,
   DIM,
   FG,
   Frame,
+  Hero,
   MUTED,
-  Wordmark,
   loadArt,
   loadLogo,
   outro,
@@ -16,7 +17,7 @@ import {
 import { PER_TIER, type TierMove, type TierPost, type TierPostEntry } from '@/lib/tier-of-day';
 import type { Tier } from '@/types/stats';
 
-export { SLIDE_SIZE, toJpeg } from '@/lib/slide-chrome';
+export { SLIDE_SIZE, slideFonts, toJpeg } from '@/lib/slide-chrome';
 
 /**
  * The tier list as a carousel, with the day's biggest riser and faller.
@@ -66,7 +67,7 @@ function Badge({ tier, size = 64 }: { tier: Tier; size?: number }): ReactElement
         background: TIER_COLOR[tier],
         color: '#0b0f1d',
         fontSize: size * 0.55,
-        fontWeight: 800,
+        fontFamily: DISPLAY, fontWeight: 400,
       }}
     >
       {tier}
@@ -81,10 +82,10 @@ function cover(post: TierPost, logo: string | null): ReactElement {
         <div style={{ display: 'flex', fontSize: 32, letterSpacing: 3, color: ACCENT }}>
           RANKED TIER LIST
         </div>
-        <div style={{ display: 'flex', fontSize: 118, fontWeight: 800, marginTop: 10 }}>
+        <div style={{ display: 'flex', fontSize: 118, fontFamily: DISPLAY, fontWeight: 400, marginTop: 10 }}>
           Who is strong
         </div>
-        <div style={{ display: 'flex', fontSize: 118, fontWeight: 800, color: BRAND }}>
+        <div style={{ display: 'flex', fontSize: 118, fontFamily: DISPLAY, fontWeight: 400, color: BRAND }}>
           right now
         </div>
         <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginTop: 20 }}>
@@ -111,13 +112,13 @@ function cover(post: TierPost, logo: string | null): ReactElement {
             {`${post.rated} brawlers ranked`}
           </div>
           <div style={{ display: 'flex', fontSize: 32, color: DIM }}>
-            {`${post.battles.toLocaleString('en-GB')} decided battles · last ${post.windowLabel}`}
+            {`From ${post.battles.toLocaleString('en-GB')} ranked battles in the last ${post.windowLabel}`}
           </div>
         </div>
       </div>
 
       <div style={{ display: 'flex', marginTop: 56 }}>
-        <Wordmark />
+        <div style={{ display: 'flex', fontSize: 34, color: ACCENT }}>Swipe for the full list</div>
       </div>
     </Frame>
   );
@@ -146,7 +147,7 @@ function tierSlide(
       <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
         <Badge tier={tier} size={96} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ display: 'flex', fontSize: 66, fontWeight: 800, color: FG }}>
+          <div style={{ display: 'flex', fontSize: 66, fontFamily: DISPLAY, fontWeight: 400, color: FG }}>
             {headline}
           </div>
           <div style={{ display: 'flex', fontSize: 32, color: DIM }}>{subline}</div>
@@ -177,14 +178,14 @@ function tierSlide(
                 {cap(row.name)}
               </div>
               <div style={{ display: 'flex', fontSize: 28, color: DIM }}>
-                {`${pct(row.winRate)} win · ${pct(row.usageRate)} picked`}
+                {`Wins ${pct(row.winRate)} · picked ${pct(row.usageRate)} of the time`}
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-              <div style={{ display: 'flex', fontSize: 52, fontWeight: 800, color: ACCENT }}>
+              <div style={{ display: 'flex', fontSize: 52, fontFamily: DISPLAY, fontWeight: 400, color: ACCENT }}>
                 {row.metaScore.toFixed(1)}
               </div>
-              <div style={{ display: 'flex', fontSize: 24, color: DIM }}>score</div>
+              <div style={{ display: 'flex', fontSize: 24, color: DIM }}>rating</div>
             </div>
           </div>
         ))}
@@ -216,26 +217,13 @@ function mover(m: TierMove, art: string | null, rising: boolean): ReactElement {
         <div style={{ display: 'flex', fontSize: 32, letterSpacing: 3, color: ACCENT }}>
           {rising ? 'BIGGEST RISER' : 'BIGGEST FALLER'}
         </div>
-        <div style={{ display: 'flex', fontSize: 110, fontWeight: 800, marginTop: 8 }}>
+        <div style={{ display: 'flex', fontSize: 110, fontFamily: DISPLAY, fontWeight: 400, marginTop: 8 }}>
           {cap(m.name)}
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: art ? 420 : 0,
-          marginTop: 24,
-        }}
-      >
-        {art ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={art} width={400} height={400} alt="" style={{ objectFit: 'contain' }} />
-        ) : (
-          <div style={{ display: 'flex' }} />
-        )}
+      <div style={{ display: 'flex', marginTop: 24 }}>
+        <Hero src={art} size={470} />
       </div>
 
       {/* The move itself: tier before, tier now, and the score change. */}
@@ -258,13 +246,13 @@ function mover(m: TierMove, art: string | null, rising: boolean): ReactElement {
             the middle dot is proven in a rendered string here (the wordmark
             has used one since the first carousel), so an arrow is not worth
             the risk when a chevron says the same thing. */}
-        <div style={{ display: 'flex', fontSize: 56, fontWeight: 800, color: DIM }}>&gt;</div>
+        <div style={{ display: 'flex', fontSize: 56, fontFamily: DISPLAY, fontWeight: 400, color: DIM }}>&gt;</div>
         <Badge tier={m.tierNow} size={84} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginLeft: 18 }}>
-          <div style={{ display: 'flex', fontSize: 72, fontWeight: 800, color: colour }}>
+          <div style={{ display: 'flex', fontSize: 72, fontFamily: DISPLAY, fontWeight: 400, color: colour }}>
             {signed(m.scoreDelta)}
           </div>
-          <div style={{ display: 'flex', fontSize: 26, color: DIM }}>score</div>
+          <div style={{ display: 'flex', fontSize: 26, color: DIM }}>rating change</div>
         </div>
       </div>
 
@@ -287,7 +275,7 @@ function mover(m: TierMove, art: string | null, rising: boolean): ReactElement {
       </div>
 
       <div style={{ display: 'flex', fontSize: 28, color: DIM, marginTop: 32 }}>
-        {`${m.sampleSize.toLocaleString('en-GB')} decided battles · ${m.fromDate} to ${m.toDate}`}
+        {`Measured across ${m.sampleSize.toLocaleString('en-GB')} battles, ${m.fromDate} to ${m.toDate}`}
       </div>
     </Frame>
   );
@@ -305,7 +293,7 @@ function method(post: TierPost): ReactElement {
     `Ranked battles only, last ${post.windowLabel}`,
     `${post.battles.toLocaleString('en-GB')} decided battles`,
     'Win rate adjusted for mode baseline',
-    '20 decided battles minimum to rank',
+    'A brawler needs 20 battles to be ranked',
     'Score blends win rate and pick rate',
   ];
 
@@ -314,8 +302,8 @@ function method(post: TierPost): ReactElement {
       <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
         HOW THIS IS RANKED
       </div>
-      <div style={{ display: 'flex', fontSize: 74, fontWeight: 800, marginTop: 14 }}>
-        No opinions
+      <div style={{ display: 'flex', fontSize: 74, fontFamily: DISPLAY, fontWeight: 400, marginTop: 14 }}>
+        No opinions here
       </div>
       <div style={{ display: 'flex', fontSize: 34, color: DIM, marginTop: 14 }}>
         Measured from real battles, updated every 2 hours

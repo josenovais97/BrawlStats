@@ -2,19 +2,20 @@ import type { ReactElement } from 'react';
 
 import { dayLabel } from '@/lib/format';
 import {
+  DISPLAY,
   ACCENT,
   DIM,
   FG,
   Frame,
+  Hero,
   MUTED,
-  Wordmark,
   loadArt,
   loadLogo,
   outro,
 } from '@/lib/slide-chrome';
 import type { Discovery, StoredDailyReport } from '@/lib/stats';
 
-export { SLIDE_SIZE, toJpeg } from '@/lib/slide-chrome';
+export { SLIDE_SIZE, slideFonts, toJpeg } from '@/lib/slide-chrome';
 
 /**
  * The day's findings as a TikTok photo carousel.
@@ -152,41 +153,28 @@ function cover(date: string, findings: Discovery[], art: string | null): ReactEl
         <div style={{ display: 'flex', fontSize: 32, letterSpacing: 3, color: ACCENT }}>
           {dayLabel(date).toUpperCase()}
         </div>
-        <div style={{ display: 'flex', fontSize: 108, fontWeight: 800, marginTop: 14 }}>
+        <div style={{ display: 'flex', fontSize: 108, fontFamily: DISPLAY, fontWeight: 400, marginTop: 14 }}>
           What we
         </div>
-        <div style={{ display: 'flex', fontSize: 108, fontWeight: 800 }}>found today</div>
+        <div style={{ display: 'flex', fontSize: 108, fontFamily: DISPLAY, fontWeight: 400 }}>found today</div>
         <div style={{ display: 'flex', fontSize: 36, color: MUTED, marginTop: 24 }}>
           {findings.length > 0
-            ? `${findings.length} finding${findings.length === 1 ? '' : 's'} from sampled battles`
-            : 'Measured from sampled battles, not opinion'}
+            ? `${findings.length} thing${findings.length === 1 ? '' : 's'} we spotted in today's battles`
+            : 'Real battles, not opinions'}
         </div>
       </div>
 
       {/* Centred rather than pinned right: the right margin is TikTok's button
           column, and art pushed into it gets a heart drawn over its face. */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: art ? 520 : 0,
-          marginTop: 44,
-        }}
-      >
-        {art ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={art} width={500} height={500} alt="" style={{ objectFit: 'contain' }} />
-        ) : (
-          <div style={{ display: 'flex' }} />
-        )}
+      <div style={{ display: 'flex', marginTop: 44 }}>
+        <Hero src={art} size={560} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 26, marginTop: 20 }}>
         <div style={{ display: 'flex', fontSize: 40, fontWeight: 700, color: ACCENT }}>
           {findings.length > 0 ? `Swipe for all ${findings.length}` : 'Fresh numbers every day'}
         </div>
-        <Wordmark />
+        <div style={{ display: 'flex', fontSize: 34, color: ACCENT }}>Swipe through them all</div>
       </div>
     </Frame>
   );
@@ -225,7 +213,7 @@ function finding(
         ))}
       </div>
 
-      <div style={{ display: 'flex', fontSize: 78, fontWeight: 800, marginTop: 28 }}>
+      <div style={{ display: 'flex', fontSize: 78, fontFamily: DISPLAY, fontWeight: 400, marginTop: 28 }}>
         {HEADLINE[d.kind]?.(names, d.context) ?? names.join(' and ')}
       </div>
       <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginTop: 14 }}>
@@ -239,7 +227,7 @@ function finding(
               style={{
                 display: 'flex',
                 fontSize: 96,
-                fontWeight: 800,
+                fontFamily: DISPLAY, fontWeight: 400,
                 color: i === 0 ? ACCENT : FG,
               }}
             >
@@ -252,7 +240,7 @@ function finding(
 
       {/* The evidence line. A number with no sample behind it is a claim. */}
       <div style={{ display: 'flex', fontSize: 32, color: DIM, marginTop: 44 }}>
-        {`from ${d.sampleSize.toLocaleString('en-GB')} decided battles`}
+        {`Seen across ${d.sampleSize.toLocaleString('en-GB')} battles`}
       </div>
     </Frame>
   );
@@ -269,10 +257,10 @@ function method(): ReactElement {
       <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
         HOW WE MEASURE
       </div>
-      <div style={{ display: 'flex', fontSize: 88, fontWeight: 800, marginTop: 18 }}>
+      <div style={{ display: 'flex', fontSize: 88, fontFamily: DISPLAY, fontWeight: 400, marginTop: 18 }}>
         No opinions.
       </div>
-      <div style={{ display: 'flex', fontSize: 88, fontWeight: 800 }}>Just battles.</div>
+      <div style={{ display: 'flex', fontSize: 88, fontFamily: DISPLAY, fontWeight: 400 }}>Just battles.</div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 34, marginTop: 56 }}>
         {lines.map((line, i) => (

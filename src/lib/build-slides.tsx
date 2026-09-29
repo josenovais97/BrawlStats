@@ -4,13 +4,14 @@ import type { BrawlerOfDay } from '@/lib/brawler-of-day';
 import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
 import { titleCase } from '@/lib/format';
 import {
+  DISPLAY,
   ACCENT,
   BRAND,
   DIM,
   FG,
   Frame,
+  Hero,
   MUTED,
-  Wordmark,
   loadArt,
   loadIcon,
   loadLogo,
@@ -18,7 +19,7 @@ import {
 } from '@/lib/slide-chrome';
 import type { AbilityChoice } from '@/lib/stats';
 
-export { SLIDE_SIZE, toJpeg } from '@/lib/slide-chrome';
+export { SLIDE_SIZE, slideFonts, toJpeg } from '@/lib/slide-chrome';
 
 /**
  * One brawler's build, as a carousel: what owners actually bought, and how it
@@ -62,7 +63,7 @@ function cover(day: BrawlerOfDay, art: string | null): ReactElement {
         <div style={{ display: 'flex', fontSize: 32, letterSpacing: 3, color: ACCENT }}>
           BUILD OF THE DAY
         </div>
-        <div style={{ display: 'flex', fontSize: 124, fontWeight: 800, marginTop: 10 }}>
+        <div style={{ display: 'flex', fontSize: 124, fontFamily: DISPLAY, fontWeight: 400, marginTop: 10 }}>
           {cap(day.name)}
         </div>
         <div style={{ display: 'flex', fontSize: 44, color: MUTED, marginTop: 14 }}>
@@ -70,28 +71,15 @@ function cover(day: BrawlerOfDay, art: string | null): ReactElement {
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: art ? 520 : 0,
-          marginTop: 36,
-        }}
-      >
-        {art ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={art} width={500} height={500} alt="" style={{ objectFit: 'contain' }} />
-        ) : (
-          <div style={{ display: 'flex' }} />
-        )}
+      <div style={{ display: 'flex', marginTop: 36 }}>
+        <Hero src={art} size={560} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 26, marginTop: 18 }}>
         <div style={{ display: 'flex', fontSize: 34, color: DIM }}>
           {`Read from ${day.choices.sampleSize.toLocaleString('en-GB')} first-buyers`}
         </div>
-        <Wordmark />
+        <div style={{ display: 'flex', fontSize: 34, color: ACCENT }}>Swipe for the full build</div>
       </div>
     </Frame>
   );
@@ -117,7 +105,7 @@ function pair(
       <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
         {`${kind.toUpperCase()} BOUGHT FIRST`}
       </div>
-      <div style={{ display: 'flex', fontSize: 70, fontWeight: 800, marginTop: 14 }}>
+      <div style={{ display: 'flex', fontSize: 70, fontFamily: DISPLAY, fontWeight: 400, marginTop: 14 }}>
         What owners pick
       </div>
       <div style={{ display: 'flex', fontSize: 34, color: DIM, marginTop: 12 }}>
@@ -156,13 +144,13 @@ function pair(
 
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 44, marginTop: 6 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', fontSize: 76, fontWeight: 800, color: ACCENT }}>
+                <div style={{ display: 'flex', fontSize: 76, fontFamily: DISPLAY, fontWeight: 400, color: ACCENT }}>
                   {rate(row.winRate)}
                 </div>
                 <div style={{ display: 'flex', fontSize: 28, color: DIM }}>win rate</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', fontSize: 76, fontWeight: 800, color: FG }}>
+                <div style={{ display: 'flex', fontSize: 76, fontFamily: DISPLAY, fontWeight: 400, color: FG }}>
                   {pct(row.share)}
                 </div>
                 <div style={{ display: 'flex', fontSize: 28, color: DIM }}>of first buyers</div>
@@ -191,7 +179,7 @@ function gears(day: BrawlerOfDay, icons: (string | null)[]): ReactElement {
       <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
         GEARS OWNERS BUY
       </div>
-      <div style={{ display: 'flex', fontSize: 70, fontWeight: 800, marginTop: 14 }}>
+      <div style={{ display: 'flex', fontSize: 70, fontFamily: DISPLAY, fontWeight: 400, marginTop: 14 }}>
         {`${cap(day.name)} gears`}
       </div>
       <div style={{ display: 'flex', fontSize: 34, color: DIM, marginTop: 12 }}>
@@ -212,7 +200,7 @@ function gears(day: BrawlerOfDay, icons: (string | null)[]): ReactElement {
                 <div style={{ display: 'flex', fontSize: 40, fontWeight: 700, color: FG }}>
                   {itemName(day.gearNames, row.itemId)}
                 </div>
-                <div style={{ display: 'flex', fontSize: 40, fontWeight: 800, color: ACCENT }}>
+                <div style={{ display: 'flex', fontSize: 40, fontFamily: DISPLAY, fontWeight: 400, color: ACCENT }}>
                   {pct(row.share)}
                 </div>
               </div>

@@ -22,6 +22,46 @@ import { SITE_NAME } from '@/lib/site';
 
 export const SLIDE_SIZE = { width: 1080, height: 1920 };
 
+/**
+ * The two faces every slide is set in, read off disk.
+ *
+ * Until 2026-09-29 the carousels shipped in whatever font `ImageResponse`
+ * bundles by default, which is Geist Regular and nothing else. Every headline,
+ * every number and every label therefore rendered in one weight of one neutral
+ * UI face -- and a post about a *game*, set in the same type as a settings
+ * dialog, reads as something a machine emitted. It was the single biggest
+ * reason the posts felt automated, and it had nothing to do with the words.
+ *
+ * Lilita One is already the site's display face, so the post and the page now
+ * look like the same product. It is a heavy face by design, which is why
+ * headlines and big numbers need no synthetic bold: asking Satori to embolden
+ * a font it has one weight of produces a smeared outline, not a bolder letter.
+ *
+ * Read from `public/` with the same reasoning as `loadLogo` -- the files are
+ * on the same disk as the renderer, and fetching them over the network would
+ * add a dependency that can stall, which is exactly what dropped Gale's
+ * artwork on 2026-09-28.
+ */
+export const DISPLAY = 'Lilita One';
+export const BODY = 'Geist';
+
+let fontCache: { name: string; data: ArrayBuffer; weight: 400; style: 'normal' }[] | null = null;
+
+export async function slideFonts() {
+  if (fontCache) return fontCache;
+  const dir = join(process.cwd(), 'public', 'fonts');
+  const [display, body] = await Promise.all([
+    readFile(join(dir, 'LilitaOne-Regular.ttf')),
+    readFile(join(dir, 'Geist-Regular.ttf')),
+  ]);
+  const toAb = (b: Buffer) => b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
+  fontCache = [
+    { name: DISPLAY, data: toAb(display), weight: 400 as const, style: 'normal' as const },
+    { name: BODY, data: toAb(body), weight: 400 as const, style: 'normal' as const },
+  ];
+  return fontCache;
+}
+
 export const BG = '#0b0f1d';
 export const FG = '#f2f5ff';
 export const MUTED = '#c9d2ea';
@@ -34,7 +74,21 @@ export const BRAND = '#ffc53d';
  * a column of like/comment/share buttons up the right. Content sits inside
  * these margins rather than being centred on the canvas.
  */
-export const PAD = '150px 230px 400px 92px';
+export const PAD = '120px 200px 330px 84px';
+
+/**
+ * Where the pinned footer sits, and why the bottom padding shrank.
+ *
+ * 400px of bottom padding was reserved for TikTok's caption and username, and
+ * with `justifyContent: center` above it the result was content floating in
+ * the upper two thirds over a third of empty canvas. It read as an unfinished
+ * template rather than a deliberate margin.
+ *
+ * TikTok's own chrome occupies roughly the bottom 280px, so 330px keeps a
+ * margin without donating the whole lower third, and the footer below draws
+ * the eye to a deliberate end instead of a void.
+ */
+const FOOTER_BOTTOM = 232;
 
 /**
  * Brawler art as a data URI, or null when there is none to be had.
@@ -157,19 +211,82 @@ export async function loadLogo(box: number): Promise<string | null> {
   }
 }
 
-/** The full-bleed wash every slide sits on. Linear: Satori has no radial. */
+/**
+ * The full-bleed wash every slide sits on. Linear only: Satori has no radial.
+ *
+ * Three layers rather than one. The single top-left wash left the lower half
+ * of every slide as flat, undifferentiated navy, which is what made the posts
+ * look like a template with the content missing. The accent bar and the bottom
+ * scrim give the frame a top and a bottom, so a slide with little content
+ * still looks composed rather than empty.
+ */
 export function Backdrop(): ReactElement {
+  return (
+    <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0 }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: SLIDE_SIZE.width,
+          height: SLIDE_SIZE.height,
+          background: 'linear-gradient(160deg, rgba(53,208,255,0.20), rgba(11,15,29,0) 52%)',
+        }}
+      />
+      {/* Weights the bottom, so the safe area reads as margin, not as a gap. */}
+      <div
+        style={{
+          position: 'absolute',
+          top: SLIDE_SIZE.height - 760,
+          left: 0,
+          width: SLIDE_SIZE.width,
+          height: 760,
+          background: 'linear-gradient(180deg, rgba(11,15,29,0), rgba(4,6,14,0.85))',
+        }}
+      />
+      {/* A brand edge. Two pixels of yellow is the cheapest signal that a
+          human chose something about this picture. */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: SLIDE_SIZE.width,
+          height: 10,
+          background: BRAND,
+        }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Pinned to the bottom of every slide, over the scrim.
+ *
+ * Carousels are swiped fast and most viewers never reach the closing slide, so
+ * the domain has to be on all of them. Small and quiet: it is a signature, not
+ * a banner.
+ */
+function Footer(): ReactElement {
   return (
     <div
       style={{
         position: 'absolute',
-        top: 0,
-        left: 0,
-        width: SLIDE_SIZE.width,
-        height: SLIDE_SIZE.height,
-        background: 'linear-gradient(160deg, rgba(53,208,255,0.18), rgba(11,15,29,0) 55%)',
+        left: 84,
+        bottom: FOOTER_BOTTOM,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
       }}
-    />
+    >
+      <div style={{ display: 'flex', width: 8, height: 34, borderRadius: 4, background: BRAND }} />
+      <div style={{ display: 'flex', fontSize: 34, fontFamily: DISPLAY, color: BRAND }}>
+        brawlzone.net
+      </div>
+      <div style={{ display: 'flex', fontSize: 26, fontFamily: BODY, color: DIM }}>
+        updated every 2h
+      </div>
+    </div>
   );
 }
 
@@ -185,11 +302,49 @@ export function Frame({ children }: { children: ReactElement[] }): ReactElement 
         padding: PAD,
         background: BG,
         color: FG,
-        fontFamily: 'sans-serif',
+        fontFamily: BODY,
       }}
     >
       <Backdrop />
       {children}
+      <Footer />
+    </div>
+  );
+}
+
+/**
+ * Brawler art on a pedestal.
+ *
+ * The art is the best asset these posts have and it was being rendered at a
+ * third of the size it deserved, floating with nothing under it. A disc behind
+ * it grounds the figure and separates it from the background without needing a
+ * radial gradient, which Satori cannot draw.
+ */
+export function Hero({ src, size = 520 }: { src: string | null; size?: number }): ReactElement {
+  if (!src) return <div style={{ display: 'flex' }} />;
+  const disc = Math.round(size * 0.86);
+  return (
+    <div
+      style={{
+        display: 'flex',
+        position: 'relative',
+        width: '100%',
+        height: size,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          width: disc,
+          height: disc,
+          borderRadius: disc / 2,
+          background: 'rgba(53,208,255,0.10)',
+        }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} width={size} height={size} alt="" style={{ objectFit: 'contain' }} />
     </div>
   );
 }
