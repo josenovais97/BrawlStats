@@ -7,7 +7,9 @@ key; a store install and a site install update each other.
 ## Uptodown (no review gate, no tester requirement)
 
 1. https://www.uptodown.com/developers → sign in with any account → **Upload app**.
-2. Upload `public/downloads/brawlzone-bubble-1.15.apk`. Package `net.brawlzone.bubble`, version 1.15 (36).
+2. Upload the APK at `BUBBLE_APP.path` in `src/lib/bubble-app.ts` — that is the only copy kept in
+   `public/downloads/`, and its `version`/`versionCode` there are the numbers the form asks for.
+   Package `net.brawlzone.bubble`.
 3. Fill the fields from the sections below. Icon: `android/store/icon-512.png`. Screenshots: `public/bubble/app-home.png`, `app-panel.png`, `app-draft.png`, `app-map.png`, `app-build.png`.
 4. Category: **Tools** (or Games › Utilities if offered). Price: Free. Contains ads: No. In-app purchases: No.
 5. Website: https://brawlzone.net/bubble · Privacy policy: https://brawlzone.net/privacy · Support: the site's contact on /about.

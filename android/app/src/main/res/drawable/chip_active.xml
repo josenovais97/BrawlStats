@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The stat tile that is currently governing the panel.
+     Brand edge and the raised surface, so which number is in play is answerable
+     at a glance rather than by reading the switches and reasoning about them.
+     The fill stays in the navy palette; the stroke carries the selection. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/surface_3" />
+    <corners android:radius="9dp" />
+    <stroke android:width="2dp" android:color="@color/brand" />
+</shape>

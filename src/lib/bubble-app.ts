@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.19',
+  version: '1.20',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 40,
+  versionCode: 41,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.19.apk',
+  path: '/downloads/brawlzone-bubble-1.20.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2720802,
-  sha256: 'ad285ecf60864e7f1dd0020116da7d6b29b3e00c5b443156ebd8b5740bcf658f',
+  size: 2721758,
+  sha256: '5816dd1ab4fd882b2f95f3ae03f245dd8b32bf68a5f667c04317927ba3834c9d',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -86,6 +86,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.20',
+    versionCode: 41,
+    date: '2026-09-30',
+    changes: [
+      'The three counts are the filter now. Tap owned, power 11 or hypercharge and the tile lights up \u2014 so the number the panel is using is the one you can see, instead of something to work out from two switches.',
+      'Those two switches are gone with it. They encoded three settings in four combinations, and the spare one was impossible: a hypercharge cannot be unlocked below power 11, so \u201chypercharge without power 11\u201d had to be quietly rewritten every time it was set.',
+      'The tag box has a label, and the filter says in words what it is doing underneath the tiles.',
+    ],
+  },
   {
     version: '1.19',
     versionCode: 40,

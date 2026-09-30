@@ -19,11 +19,13 @@ export const ACCOUNT_KEYS = {
 } as const;
 
 /**
- * What the app's two switches mean.
+ * How much of a roster the panel treats as fieldable.
  *
- * `hypercharge` implies `power11`: a hypercharge cannot be unlocked below
- * power 11, so "level 11 with hypercharge" is strictly narrower. The panel
- * therefore only has to check the one active mode rather than combine them.
+ * One value, not a set of flags, and the app picks it from three mutually
+ * exclusive tiles. `hypercharge` implies `power11` — a hypercharge cannot be
+ * unlocked below power 11, so "level 11 with hypercharge" is strictly narrower,
+ * and the two as separate booleans had a fourth combination that means nothing.
+ * The panel therefore only has to check the one active mode.
  */
 export type OwnedFilter = 'all' | 'power11' | 'hypercharge';
 

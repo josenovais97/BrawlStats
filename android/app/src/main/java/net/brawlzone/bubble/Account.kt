@@ -3,7 +3,7 @@ package net.brawlzone.bubble
 import android.content.Context
 
 /**
- * The account the panel filters for, and the two switches beside it.
+ * The account the panel filters for, and how much of it it will show.
  *
  * Stored here and injected into the panel's WebView storage on load, rather
  * than appended to the panel URL. That is not a style preference: a query

@@ -214,17 +214,24 @@ class MainActivity : AppCompatActivity() {
      * can check by reading it, and one wrong character is a valid tag
      * belonging to a stranger whose only symptom is that the panel's filters
      * look broken. A name and a face settle that at a glance, and the three
-     * counts show exactly what each switch will do to this roster.
+     * counts show exactly what each choice will do to this roster.
+     *
+     * The three tiles *are* the filter rather than a readout beside one. Two
+     * switches encoded three states, so one of the four combinations had to be
+     * silently rewritten — "hypercharge" with "power 11" off is not a narrower
+     * filter, it is an empty one, because a hypercharge cannot be unlocked
+     * below power 11. Three mutually exclusive tiles cannot express the
+     * impossible state at all, and each one shows the count it will produce.
      */
     private fun wireAccount() {
         val tag = findViewById<EditText>(R.id.tag)
         val status = findViewById<TextView>(R.id.tag_status)
-        val eleven = findViewById<Switch>(R.id.only_eleven)
-        val hyper = findViewById<Switch>(R.id.only_hypercharge)
         val hide = findViewById<Switch>(R.id.hide_unusable)
 
         val identity = findViewById<LinearLayout>(R.id.account_identity)
         val chips = findViewById<LinearLayout>(R.id.account_chips)
+        val chipsCaption = findViewById<TextView>(R.id.chips_caption)
+        val filterLabel = findViewById<TextView>(R.id.filter_label)
         val icon = findViewById<ImageView>(R.id.account_icon)
         val name = findViewById<TextView>(R.id.account_name)
         val meta = findViewById<TextView>(R.id.account_meta)
@@ -233,23 +240,34 @@ class MainActivity : AppCompatActivity() {
         val chipEleven = findViewById<TextView>(R.id.chip_eleven)
         val chipHyper = findViewById<TextView>(R.id.chip_hyper)
 
+        /** Each filter, its tile, and how it reads once chosen. */
+        val tiles = listOf(
+            Triple(Account.FILTER_ALL, R.id.tile_owned, "Every brawler you own"),
+            Triple(Account.FILTER_POWER_11, R.id.tile_eleven, "Power 11 only"),
+            Triple(Account.FILTER_HYPERCHARGE, R.id.tile_hyper, "Power 11 with hypercharge"),
+        )
+
+        var filter = Account.filter(this)
+
         tag.setText(Account.tag(this))
         hide.isChecked = Account.hide(this)
-        when (Account.filter(this)) {
-            Account.FILTER_HYPERCHARGE -> { eleven.isChecked = true; hyper.isChecked = true }
-            Account.FILTER_POWER_11 -> eleven.isChecked = true
-        }
 
-        fun currentFilter(): String = when {
-            hyper.isChecked -> Account.FILTER_HYPERCHARGE
-            eleven.isChecked -> Account.FILTER_POWER_11
-            else -> Account.FILTER_ALL
+        fun paintFilter() {
+            for ((value, id, label) in tiles) {
+                val active = value == filter
+                findViewById<LinearLayout>(id).setBackgroundResource(
+                    if (active) R.drawable.chip_active else R.drawable.chip,
+                )
+                if (active) filterLabel.text = label
+            }
         }
 
         fun showAccount(result: AccountLookup.Result?) {
             if (result == null) {
                 identity.visibility = View.GONE
                 chips.visibility = View.GONE
+                chipsCaption.visibility = View.GONE
+                filterLabel.visibility = View.GONE
                 return
             }
             name.text = result.name
@@ -262,6 +280,8 @@ class MainActivity : AppCompatActivity() {
             chipHyper.text = result.hypercharged.toString()
             identity.visibility = View.VISIBLE
             chips.visibility = View.VISIBLE
+            chipsCaption.visibility = View.VISIBLE
+            filterLabel.visibility = View.VISIBLE
             icon.setImageDrawable(null)
             if (result.iconUrl.isNotEmpty()) {
                 AccountLookup.icon(result.iconUrl) { bitmap ->
@@ -272,7 +292,7 @@ class MainActivity : AppCompatActivity() {
 
         fun persist() {
             val raw = tag.text.toString()
-            Account.save(this, raw, currentFilter(), hide.isChecked)
+            Account.save(this, raw, filter, hide.isChecked)
 
             when {
                 raw.isBlank() -> {
@@ -305,16 +325,18 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
         })
 
-        eleven.setOnCheckedChangeListener { _, on ->
-            // Clearing power 11 cannot leave the narrower filter set.
-            if (!on && hyper.isChecked) hyper.isChecked = false
-            persist()
-        }
-        hyper.setOnCheckedChangeListener { _, on ->
-            if (on && !eleven.isChecked) eleven.isChecked = true
-            persist()
+        for ((value, id, _) in tiles) {
+            findViewById<LinearLayout>(id).setOnClickListener {
+                filter = value
+                paintFilter()
+                // Only the stored filter changed, so the tag does not need
+                // resolving again — persist without re-running the lookup.
+                Account.save(this, tag.text.toString(), filter, hide.isChecked)
+            }
         }
         hide.setOnCheckedChangeListener { _, _ -> persist() }
+
+        paintFilter()
 
         // Resolve whatever was already saved, so the card is populated on open
         // rather than only after the field is touched.

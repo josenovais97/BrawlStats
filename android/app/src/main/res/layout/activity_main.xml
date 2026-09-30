@@ -219,8 +219,8 @@
             The tag, who it resolved to, and what the filters do to that roster
             all answer one question — "is the panel set up for me" — so they
             share a surface and read top to bottom. The identity block sits
-            above the switches because it is the thing that has to be right
-            before any switch means anything.
+            above the filter because it is the thing that has to be right
+            before any count below it means anything.
         -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -300,17 +300,35 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- The counts the two filters actually produce, so a switch is
-                 not a guess about what it will do. -->
+            <!--
+                These three are the filter, not a readout beside one. Each tile
+                is a count taken from the resolved roster, so the choice is made
+                against the number it produces rather than a switch label that
+                has to be believed; the lit tile is the one in force.
+            -->
+            <TextView
+                android:id="@+id/chips_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:letterSpacing="0.1"
+                android:text="WHAT THE PANEL SHOWS"
+                android:textColor="@color/muted"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:id="@+id/account_chips"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
                 android:orientation="horizontal"
                 android:visibility="gone">
 
                 <LinearLayout
+                    android:id="@+id/tile_owned"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -344,6 +362,9 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/tile_eleven"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -378,6 +399,9 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/tile_hyper"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -411,6 +435,29 @@
                         android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- The lit tile in words, because a highlight says which one and
+                 not what it means. -->
+            <TextView
+                android:id="@+id/filter_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:layout_marginBottom="18dp"
+                android:textColor="@color/brand"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:letterSpacing="0.1"
+                android:text="PLAYER TAG"
+                android:textColor="@color/muted"
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/tag"
@@ -449,89 +496,18 @@
                 android:background="@color/border" />
 
             <!--
-                Each switch carries the sentence explaining it. A bare label is
-                a guess about behaviour, and these three change what the panel
-                shows mid-draft, which is the worst moment to discover you
-                guessed wrong.
+                One switch left. The three tiles above are the filter now:
+                one tap, one setting, and the tile that governs is lit.
+                Two booleans made three states, and "hypercharged only"
+                silently switched "power 11 only" on beside it, because a
+                hypercharge you cannot reach is not a pick.
             -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Power 11 only"
-                        android:textColor="@color/foreground"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="Ignore brawlers you have not maxed"
-                        android:textColor="@color/muted"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <Switch
-                    android:id="@+id/only_eleven"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Hypercharged only"
-                        android:textColor="@color/foreground"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="Power 11 and the hypercharge unlocked"
-                        android:textColor="@color/muted"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <Switch
-                    android:id="@+id/only_hypercharge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingTop="14dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
