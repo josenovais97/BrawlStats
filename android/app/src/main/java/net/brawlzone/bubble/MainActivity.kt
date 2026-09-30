@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 
         statusText.text =
-            if (granted) "Ready — tap Start bubble" else "Permission needed to draw over apps"
+            if (granted) "Ready — it will float over the game" else "Permission needed to draw over apps"
         statusText.setTextColor(
             if (granted) getColor(R.color.victory) else getColor(R.color.muted),
         )
@@ -227,6 +227,8 @@ class MainActivity : AppCompatActivity() {
         val tag = findViewById<EditText>(R.id.tag)
         val status = findViewById<TextView>(R.id.tag_status)
         val hide = findViewById<Switch>(R.id.hide_unusable)
+        val editor = findViewById<LinearLayout>(R.id.tag_editor)
+        val change = findViewById<TextView>(R.id.change_tag)
 
         val identity = findViewById<LinearLayout>(R.id.account_identity)
         val chips = findViewById<LinearLayout>(R.id.account_chips)
@@ -251,6 +253,19 @@ class MainActivity : AppCompatActivity() {
 
         tag.setText(Account.tag(this))
         hide.isChecked = Account.hide(this)
+
+        /**
+         * Show the field, or the Change chip that brings it back.
+         *
+         * Collapsed is the state this card is in nearly all of its life — the
+         * tag is set once and then read forever, and it is already on screen in
+         * the line under the name. An open box below a settled account makes a
+         * finished card look like an unfinished form.
+         */
+        fun setEditing(on: Boolean) {
+            editor.visibility = if (on) View.VISIBLE else View.GONE
+            change.visibility = if (on) View.GONE else View.VISIBLE
+        }
 
         fun paintFilter() {
             for ((value, id, label) in tiles) {
@@ -310,6 +325,13 @@ class MainActivity : AppCompatActivity() {
                     AccountLookup.lookup(Account.normalise(raw)) { result ->
                         showAccount(result)
                         status.text = if (result == null) {
+                            /*
+                             * A saved tag that does not resolve reopens the
+                             * field. Otherwise the card folds to a Change chip
+                             * over nothing, and the one line explaining why is
+                             * inside the part that just folded away.
+                             */
+                            setEditing(true)
                             "No account with that tag. Check it in game under your profile."
                         } else {
                             "The panel will mark what you can field."
@@ -317,6 +339,30 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        change.setOnClickListener {
+            setEditing(true)
+            tag.requestFocus()
+            tag.setSelection(tag.text.length)
+            (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                .showSoftInput(tag, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        }
+
+        /*
+         * Done folds the field away, and only if the tag resolved. Collapsing
+         * the moment a lookup succeeds would take the box away mid-word from
+         * someone whose own tag is a prefix of a stranger's.
+         */
+        tag.setOnEditorActionListener { _, _, _ ->
+            if (identity.visibility == View.VISIBLE) {
+                setEditing(false)
+                (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                    .hideSoftInputFromWindow(tag.windowToken, 0)
+            }
+            // False: this is a fold, not a submit, and the field keeps whatever
+            // the platform would do with the key otherwise.
+            false
         }
 
         tag.addTextChangedListener(object : android.text.TextWatcher {
@@ -339,7 +385,10 @@ class MainActivity : AppCompatActivity() {
         paintFilter()
 
         // Resolve whatever was already saved, so the card is populated on open
-        // rather than only after the field is touched.
-        if (Account.isValid(tag.text.toString())) persist()
+        // rather than only after the field is touched — and open folded, since
+        // a tag that is already there is not what the reader came to change.
+        val saved = Account.isValid(tag.text.toString())
+        setEditing(!saved)
+        if (saved) persist()
     }
 }
