@@ -1,3 +1,4 @@
+import { playerIconUrl } from '@/lib/brawlapi';
 import { getPlayer } from '@/lib/bs-api';
 import { normalizeTag } from '@/lib/tags';
 import { recordLookup } from '@/lib/stats';
@@ -67,6 +68,14 @@ export async function GET(request: Request) {
     {
       tag: normalizeTag(player.tag),
       name: player.name,
+      /*
+       * For the app's account card. It confirms the tag belongs to the person
+       * typing it — a name and a face are checkable at a glance where a string
+       * of characters is not, and a tag with one wrong character is otherwise
+       * a silent mistake that just makes every filter look broken.
+       */
+      iconUrl: playerIconUrl(player.icon?.id),
+      trophies: player.trophies,
       brawlers: player.brawlers.map((b) => ({
         id: b.id,
         power: b.power,

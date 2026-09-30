@@ -15,6 +15,8 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -68,6 +70,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         askForNotifications()
+
+        findViewById<TextView>(R.id.version_chip).text = "v${BuildConfig.VERSION_NAME}"
+        findViewById<TextView>(R.id.footer_link).setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://brawlzone.net/bubble")))
+        }
 
         wireAccount()
 
@@ -196,16 +203,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * The account section.
+     * The account card.
      *
-     * Saved as it is typed rather than behind a Save button. There is nothing
+     * Saved as it is typed rather than behind a Save button: there is nothing
      * to submit — the panel reads these on its next open — and a button that
      * has to be remembered is a button people forget, leaving them with a
      * setting they believe they made.
      *
-     * The two switches are mutually exclusive in effect but not in appearance:
-     * a hypercharge cannot exist below power 11, so turning that one on turns
-     * the other on too rather than silently overriding it.
+     * The lookup is what makes the card worth having. A tag is a string nobody
+     * can check by reading it, and one wrong character is a valid tag
+     * belonging to a stranger whose only symptom is that the panel's filters
+     * look broken. A name and a face settle that at a glance, and the three
+     * counts show exactly what each switch will do to this roster.
      */
     private fun wireAccount() {
         val tag = findViewById<EditText>(R.id.tag)
@@ -213,6 +222,15 @@ class MainActivity : AppCompatActivity() {
         val eleven = findViewById<Switch>(R.id.only_eleven)
         val hyper = findViewById<Switch>(R.id.only_hypercharge)
         val hide = findViewById<Switch>(R.id.hide_unusable)
+
+        val identity = findViewById<LinearLayout>(R.id.account_identity)
+        val chips = findViewById<LinearLayout>(R.id.account_chips)
+        val icon = findViewById<ImageView>(R.id.account_icon)
+        val name = findViewById<TextView>(R.id.account_name)
+        val meta = findViewById<TextView>(R.id.account_meta)
+        val chipOwned = findViewById<TextView>(R.id.chip_owned)
+        val chipEleven = findViewById<TextView>(R.id.chip_eleven)
+        val chipHyper = findViewById<TextView>(R.id.chip_hyper)
 
         tag.setText(Account.tag(this))
         hide.isChecked = Account.hide(this)
@@ -227,15 +245,53 @@ class MainActivity : AppCompatActivity() {
             else -> Account.FILTER_ALL
         }
 
+        fun showAccount(result: AccountLookup.Result?) {
+            if (result == null) {
+                identity.visibility = View.GONE
+                chips.visibility = View.GONE
+                return
+            }
+            name.text = result.name
+            meta.text = "#${result.tag} · ${"%,d".format(result.trophies)} trophies"
+            chipOwned.text = "${result.owned}\nowned"
+            chipEleven.text = "${result.powerEleven}\npower 11"
+            chipHyper.text = "${result.hypercharged}\nhyper"
+            identity.visibility = View.VISIBLE
+            chips.visibility = View.VISIBLE
+            icon.setImageDrawable(null)
+            if (result.iconUrl.isNotEmpty()) {
+                AccountLookup.icon(result.iconUrl) { bitmap ->
+                    if (bitmap != null) icon.setImageBitmap(bitmap)
+                }
+            }
+        }
+
         fun persist() {
             val raw = tag.text.toString()
             Account.save(this, raw, currentFilter(), hide.isChecked)
 
-            status.visibility = View.VISIBLE
-            status.text = when {
-                raw.isBlank() -> "No tag set — the panel shows the full tier list."
-                !Account.isValid(raw) -> "That does not look like a tag yet."
-                else -> "Saved. The panel will mark what you can field."
+            when {
+                raw.isBlank() -> {
+                    AccountLookup.cancel()
+                    showAccount(null)
+                    status.text = "Optional. Add your tag and the panel marks the picks you can actually take."
+                }
+                !Account.isValid(raw) -> {
+                    AccountLookup.cancel()
+                    showAccount(null)
+                    status.text = "That does not look like a tag yet."
+                }
+                else -> {
+                    status.text = "Checking…"
+                    AccountLookup.lookup(Account.normalise(raw)) { result ->
+                        showAccount(result)
+                        status.text = if (result == null) {
+                            "No account with that tag. Check it in game under your profile."
+                        } else {
+                            "The panel will mark what you can field."
+                        }
+                    }
+                }
             }
         }
 
@@ -255,5 +311,9 @@ class MainActivity : AppCompatActivity() {
             persist()
         }
         hide.setOnCheckedChangeListener { _, _ -> persist() }
+
+        // Resolve whatever was already saved, so the card is populated on open
+        // rather than only after the field is touched.
+        if (Account.isValid(tag.text.toString())) persist()
     }
 }

@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.17',
+  version: '1.18',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 38,
+  versionCode: 39,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.17.apk',
+  path: '/downloads/brawlzone-bubble-1.18.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2653589,
-  sha256: 'c2052f0539e6aa01c6ffbe47b30a1e2df4d76ec1f1c57d38b9dfdc7c46e41f6b',
+  size: 2659053,
+  sha256: '10d7a52c1b4e99a0b29edc7a697a7e4b74e1dcc699bbfdf0c613ccc99831287e',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -86,6 +86,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.18',
+    versionCode: 39,
+    date: '2026-09-30',
+    changes: [
+      'The app screen is rebuilt. State and action share one card instead of four stacked full-width blocks, Stop and Quick Settings sit side by side, and the screen ends on a footer rather than stopping mid-list.',
+      'Your tag now resolves to a name and your player icon, with the counts each filter produces — owned, power 11, hypercharged. A tag is a string nobody can check by reading it, and one wrong character is a valid tag belonging to a stranger whose only symptom is that every filter looks broken.',
+    ],
+  },
   {
     version: '1.17',
     versionCode: 38,

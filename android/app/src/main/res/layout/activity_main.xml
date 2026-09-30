@@ -21,127 +21,173 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:paddingTop="28dp"
-        android:paddingBottom="32dp">
+        android:paddingBottom="36dp">
 
-        <!-- Brand row: the same mark as the launcher icon and the bubble, so
-             the three are recognisably one thing. -->
+        <!--
+          Hero.
+
+          The mark, the name and the version on one line, with the sentence
+          under it. It was a brand row, then a gap, then a headline, then a
+          gap — three stacked blocks saying one thing, which is how a screen
+          ends up looking like a form.
+        -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
                 android:background="@drawable/bubble_badge"
-                android:src="@drawable/bubble_glyph"
-                android:padding="5dp"
-                android:contentDescription="@null" />
+                android:contentDescription="@null"
+                android:padding="9dp"
+                android:src="@drawable/bubble_glyph" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Bubble"
+                    android:textColor="@color/foreground"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.14"
+                    android:text="BRAWLZONE"
+                    android:textColor="@color/muted"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
+                android:id="@+id/version_chip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="BRAWLZONE"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.14"
-                android:textColor="@color/foreground" />
+                android:background="@drawable/chip"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="@color/muted"
+                android:textSize="11sp"
+                android:textStyle="bold" />
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="Bubble"
-            android:textSize="38sp"
-            android:fontFamily="sans-serif-black"
-            android:textColor="@color/foreground" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Live map picks, floating on top of the game."
-            android:textSize="16sp"
-            android:lineSpacingMultiplier="1.25"
-            android:textColor="@color/muted" />
+            android:layout_marginTop="14dp"
+            android:lineSpacingMultiplier="1.3"
+            android:text="The Ranked tier list, floating on top of the game. Tap it mid-draft, tap it again and it folds away."
+            android:textColor="@color/muted"
+            android:textSize="15sp" />
 
-        <!-- Status. Its own card because it is the one line on this screen
-             that changes, and the eye should know where to look for it. -->
+        <!--
+          State and action in one card.
+
+          They were a status card, then a gold button, then two more buttons —
+          four stacked full-width blocks for what is really one decision. The
+          card now says where the bubble is and offers the one thing worth
+          doing about it; the secondary actions share a row beneath.
+        -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@drawable/card_surface"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="16dp">
+            android:orientation="vertical"
+            android:padding="18dp">
 
-            <View
-                android:id="@+id/status_dot"
-                android:layout_width="9dp"
-                android:layout_height="9dp"
-                android:background="@drawable/dot" />
-
-            <TextView
-                android:id="@+id/status_text"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/muted"
-                android:text="Checking permission…" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/status_dot"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:background="@drawable/dot" />
+
+                <TextView
+                    android:id="@+id/status_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:text="Checking permission…"
+                    android:textColor="@color/muted"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/start"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_gold"
+                android:letterSpacing="0.01"
+                android:stateListAnimator="@null"
+                android:text="Start bubble"
+                android:textAllCaps="false"
+                android:textColor="@color/brand_ink"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!--
+              Side by side, and a hidden Quick Settings button collapses rather
+              than leaving a gap: a LinearLayout gives no space to a GONE
+              child, so Stop takes the full width on Android 12 and below where
+              the tile cannot be added from an app.
+            -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/stop"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="Stop"
+                    android:textAllCaps="false"
+                    android:textColor="@color/foreground"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/add_tile"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_outline"
+                    android:stateListAnimator="@null"
+                    android:text="Quick Settings"
+                    android:textAllCaps="false"
+                    android:textColor="@color/foreground"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
         </LinearLayout>
-
-        <Button
-            android:id="@+id/start"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/btn_gold"
-            android:stateListAnimator="@null"
-            android:text="Start bubble"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.01"
-            android:textColor="@color/brand_ink" />
-
-        <Button
-            android:id="@+id/stop"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/btn_outline"
-            android:stateListAnimator="@null"
-            android:text="Stop bubble"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/foreground" />
-
-        <!--
-          Android 13+ can add the tile from here in one tap; older versions
-          reach it by editing Quick Settings by hand, so the button is hidden
-          and the "how it works" step says where it is instead.
-        -->
-        <Button
-            android:id="@+id/add_tile"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/btn_outline"
-            android:stateListAnimator="@null"
-            android:text="Add to Quick Settings"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:textColor="@color/foreground" />
 
         <!-- Shown only after a grant attempt has actually failed. -->
         <TextView
@@ -150,105 +196,287 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:background="@drawable/card_warn"
-            android:padding="16dp"
-            android:textSize="13sp"
             android:lineSpacingMultiplier="1.35"
+            android:padding="16dp"
+            android:text="The toggle is greyed out?"
             android:textColor="@color/brand"
-            android:visibility="gone"
-            android:text="The toggle is greyed out?" />
+            android:textSize="13sp"
+            android:visibility="gone" />
 
-        <!--
-            Your account.
-
-            The panel shows the global meta: the best pick on a map whether or
-            not you own it. With a tag set it also says what YOU can field, and
-            dims what you cannot. Set here rather than in the overlay because
-            typing a tag into a floating window over a live match is the wrong
-            place for it, and it is a once-ever action.
-        -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="32dp"
             android:text="YOUR ACCOUNT"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.12"
             android:textColor="@color/muted" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Optional. Add your tag and the panel marks the picks you can actually take."
-            android:textSize="13sp"
-            android:lineSpacingMultiplier="1.35"
-            android:textColor="@color/muted" />
+        <!--
+            One card, not a stack of loose controls.
 
-        <EditText
-            android:id="@+id/tag"
+            The tag, who it resolved to, and what the filters do to that roster
+            all answer one question — "is the panel set up for me" — so they
+            share a surface and read top to bottom. The identity block sits
+            above the switches because it is the thing that has to be right
+            before any switch means anything.
+        -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:background="@drawable/card_surface"
-            android:padding="16dp"
-            android:hint="#2RLCPVGUG"
-            android:importantForAutofill="no"
-            android:inputType="textCapCharacters|textNoSuggestions"
-            android:maxLength="16"
-            android:singleLine="true"
-            android:textSize="16sp"
-            android:textColor="@color/foreground"
-            android:textColorHint="@color/muted"
-            android:autofillHints="" />
+            android:orientation="vertical"
+            android:padding="18dp">
 
-        <TextView
-            android:id="@+id/tag_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="13sp"
-            android:textColor="@color/muted"
-            android:visibility="gone" />
+            <!-- Identity. Hidden until a tag resolves: an empty avatar frame
+                 with no name beside it is a placeholder, and a screen of
+                 placeholders looks unfinished rather than ready. -->
+            <LinearLayout
+                android:id="@+id/account_identity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-        <!--
-            Two switches rather than three states, because a hypercharge cannot
-            exist below power 11: "with hypercharge" is strictly narrower than
-            "power 11", so turning it on implies the other.
-        -->
-        <Switch
-            android:id="@+id/only_eleven"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Only power 11 brawlers"
-            android:textSize="15sp"
-            android:textColor="@color/foreground" />
+                <ImageView
+                    android:id="@+id/account_icon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/avatar_frame"
+                    android:contentDescription="Player icon"
+                    android:padding="4dp"
+                    android:scaleType="fitCenter" />
 
-        <Switch
-            android:id="@+id/only_hypercharge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Only power 11 with hypercharge"
-            android:textSize="15sp"
-            android:textColor="@color/foreground" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-        <!--
-            Off by default. Dimming keeps the tier counts honest and keeps a
-            brawler you are one upgrade away from in view; hiding makes the
-            panel disagree with every other tier list, which reads as a bug to
-            anyone who knows the meta. Opt-in for people who would rather see
-            only what they can take.
-        -->
-        <Switch
-            android:id="@+id/hide_unusable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Hide them instead of greying them out"
-            android:textSize="15sp"
-            android:textColor="@color/foreground" />
+                    <TextView
+                        android:id="@+id/account_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textColor="@color/foreground"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/account_meta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/muted"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- The counts the two filters actually produce, so a switch is
+                 not a guess about what it will do. -->
+            <LinearLayout
+                android:id="@+id/account_chips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/chip_owned"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/chip"
+                    android:gravity="center"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
+                    android:textColor="@color/foreground"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/chip_eleven"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/chip"
+                    android:gravity="center"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
+                    android:textColor="@color/foreground"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/chip_hyper"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/chip"
+                    android:gravity="center"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
+                    android:textColor="@color/foreground"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/tag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:background="@drawable/field"
+                android:hint="#2RLCPVGUG"
+                android:importantForAutofill="no"
+                android:inputType="textCapCharacters|textNoSuggestions"
+                android:maxLength="16"
+                android:paddingStart="16dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="15dp"
+                android:singleLine="true"
+                android:textColor="@color/foreground"
+                android:textColorHint="@color/muted"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tag_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="@color/muted"
+                android:textSize="13sp"
+                android:text="Optional. Add your tag and the panel marks the picks you can actually take." />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/border" />
+
+            <!--
+                Each switch carries the sentence explaining it. A bare label is
+                a guess about behaviour, and these three change what the panel
+                shows mid-draft, which is the worst moment to discover you
+                guessed wrong.
+            -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Power 11 only"
+                        android:textColor="@color/foreground"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="Ignore brawlers you have not maxed"
+                        android:textColor="@color/muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/only_eleven"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hypercharged only"
+                        android:textColor="@color/foreground"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="Power 11 and the hypercharge unlocked"
+                        android:textColor="@color/muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/only_hypercharge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hide, do not grey"
+                        android:textColor="@color/foreground"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="Remove what you cannot field from the panel"
+                        android:textColor="@color/muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/hide_unusable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -363,6 +591,34 @@
             </LinearLayout>
 
         </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="28dp"
+            android:background="@color/border" />
+
+        <!-- The screen ended on the last numbered step, which reads as the
+             page having been cut off rather than finished. -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:lineSpacingMultiplier="1.3"
+            android:text="Numbers measured from sampled Ranked battles, the same ones brawlzone.net shows. Free, no account, no ads."
+            android:textColor="@color/muted"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/footer_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="brawlzone.net"
+            android:textColor="@color/brand"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </ScrollView>
