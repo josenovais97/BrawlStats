@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.18',
+  version: '1.19',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 39,
+  versionCode: 40,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.18.apk',
+  path: '/downloads/brawlzone-bubble-1.19.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2659053,
-  sha256: '10d7a52c1b4e99a0b29edc7a697a7e4b74e1dcc699bbfdf0c613ccc99831287e',
+  size: 2720802,
+  sha256: 'ad285ecf60864e7f1dd0020116da7d6b29b3e00c5b443156ebd8b5740bcf658f',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -86,6 +86,14 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.19',
+    versionCode: 40,
+    date: '2026-09-30',
+    changes: [
+      'The account tiles use the game\u2019s own art: the brawler mark on what you own, the power 11 badge, the hypercharge symbol, and a trophy beside your count. A number under an icon you already recognise reads faster than a number under a word.',
+    ],
+  },
   {
     version: '1.18',
     versionCode: 39,

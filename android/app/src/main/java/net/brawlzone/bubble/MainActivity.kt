@@ -228,6 +228,7 @@ class MainActivity : AppCompatActivity() {
         val icon = findViewById<ImageView>(R.id.account_icon)
         val name = findViewById<TextView>(R.id.account_name)
         val meta = findViewById<TextView>(R.id.account_meta)
+        val tagLine = findViewById<TextView>(R.id.account_tag)
         val chipOwned = findViewById<TextView>(R.id.chip_owned)
         val chipEleven = findViewById<TextView>(R.id.chip_eleven)
         val chipHyper = findViewById<TextView>(R.id.chip_hyper)
@@ -252,10 +253,13 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             name.text = result.name
-            meta.text = "#${result.tag} · ${"%,d".format(result.trophies)} trophies"
-            chipOwned.text = "${result.owned}\nowned"
-            chipEleven.text = "${result.powerEleven}\npower 11"
-            chipHyper.text = "${result.hypercharged}\nhyper"
+            // The label under each tile is in the layout now, beside its icon,
+            // so these carry only the number.
+            tagLine.text = "#${result.tag}"
+            meta.text = "%,d".format(result.trophies)
+            chipOwned.text = result.owned.toString()
+            chipEleven.text = result.powerEleven.toString()
+            chipHyper.text = result.hypercharged.toString()
             identity.visibility = View.VISIBLE
             chips.visibility = View.VISIBLE
             icon.setImageDrawable(null)
