@@ -107,6 +107,30 @@ function countCoverage(
 }
 
 /**
+ * Where this account stands before spending anything.
+ *
+ * Exported because a caller that gets `null` back from `rosterPlan` still has
+ * to say something, and "you already cover every live mode" and "there is no
+ * data" are opposite messages reached through the same return value. Deriving
+ * the count here rather than in the caller is the same discipline the profile
+ * follows: one definition of *covered*, so the plan and whatever sits beside it
+ * can never disagree about it.
+ */
+export function rosterCoverage({
+  brawlers,
+  picksByMode,
+  modes,
+}: {
+  brawlers: BSPlayerBrawler[];
+  picksByMode: Map<string, ModeBestPicks>;
+  modes: string[];
+}): { covered: number; banSafe: number; modes: number } {
+  const ready = new Set(brawlers.filter((b) => b.power >= READY_POWER).map((b) => b.id));
+  const { covered, banSafe } = countCoverage(picksByMode, modes, ready);
+  return { covered, banSafe, modes: modes.length };
+}
+
+/**
  * Builds the plan.
  *
  * Candidates are owned brawlers below `READY_POWER` that appear in some live
