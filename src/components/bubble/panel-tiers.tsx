@@ -45,6 +45,8 @@ export interface PanelMapPick {
   overallScore: number;
   /** Decided battles sampled on this map. */
   battles: number;
+  /** Share of this map's sampled battles. How likely it is to be taken. */
+  pickRate: number;
 }
 
 export interface PanelMap {
@@ -130,6 +132,9 @@ export function PanelTiers({
   const account = useBubbleAccount();
   const fieldable = (id: number) =>
     account.owned === null || canField(account.owned, id, account.filter);
+  /* Only ever true with an account configured, so the unconfigured panel is
+     untouched by the setting. */
+  const hiding = account.owned !== null && account.hide;
 
   /*
    * The choice outlives the panel.
@@ -322,6 +327,7 @@ export function PanelTiers({
           openId={openId}
           fieldable={fieldable}
           filtering={account.owned !== null}
+          hiding={hiding}
         />
       ) : current.entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
@@ -340,6 +346,7 @@ export function PanelTiers({
                 onPick={show}
                 openId={openId}
                 fieldable={fieldable}
+                hiding={hiding}
               />
             );
           })}
@@ -359,6 +366,7 @@ function TierStrip({
   onPick,
   openId,
   fieldable,
+  hiding,
 }: {
   tier: Tier;
   entries: PanelEntry[];
@@ -366,8 +374,18 @@ function TierStrip({
   openId: number | null;
   /** True when this account can field the brawler under the current filter. */
   fieldable: (brawlerId: number) => boolean;
+  /** Remove what cannot be fielded rather than dimming it. */
+  hiding: boolean;
 }) {
   const color = TIER_COLOR[tier];
+
+  /*
+   * Hiding filters the row, and the count beside the tier letter counts what
+   * is drawn. A count that still said forty over a row of six would be the
+   * panel contradicting itself on the same line.
+   */
+  const visible = hiding ? entries.filter((e) => fieldable(e.brawlerId)) : entries;
+  if (visible.length === 0) return null;
 
   return (
     <li className="card overflow-hidden">
@@ -386,11 +404,11 @@ function TierStrip({
           >
             {tier}
           </span>
-          <span className="text-[10px] font-bold tabular-nums text-muted">{entries.length}</span>
+          <span className="text-[10px] font-bold tabular-nums text-muted">{visible.length}</span>
         </div>
 
         <div className="flex flex-1 flex-wrap content-start gap-x-1.5 gap-y-1 p-1.5">
-          {entries.slice(0, SHOWN_PER_TIER).map((entry) => (
+          {visible.slice(0, SHOWN_PER_TIER).map((entry) => (
             <button
               key={entry.brawlerId}
               type="button"
@@ -423,9 +441,9 @@ function TierStrip({
             </button>
           ))}
 
-          {entries.length > SHOWN_PER_TIER ? (
+          {visible.length > SHOWN_PER_TIER ? (
             <span className="self-center px-1 text-[10px] font-semibold text-muted">
-              +{entries.length - SHOWN_PER_TIER}
+              +{visible.length - SHOWN_PER_TIER}
             </span>
           ) : null}
         </div>
@@ -565,6 +583,7 @@ function MapPicks({
   openId,
   fieldable,
   filtering,
+  hiding,
 }: {
   map: PanelMap;
   onPick: (entry: PanelEntry) => void;
@@ -572,8 +591,18 @@ function MapPicks({
   fieldable: (brawlerId: number) => boolean;
   /** Whether an account is configured at all, so the banner can stay quiet. */
   filtering: boolean;
+  /** Remove what cannot be fielded rather than dimming it. */
+  hiding: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  /*
+   * Picks is filtered to what you can take; Bans is not.
+   *
+   * You ban what the enemy might pick, which has nothing to do with your own
+   * roster — a ban list narrowed to brawlers you own would be answering a
+   * different question from the one it is named after.
+   */
+  const [tab, setTab] = useState<'picks' | 'bans'>('picks');
 
   if (map.picks.length === 0) {
     return (
@@ -584,8 +613,14 @@ function MapPicks({
     );
   }
 
-  const shown = expanded ? map.picks : map.picks.slice(0, SHOWN_MAP_PICKS);
-  const hidden = map.picks.length - shown.length;
+  /*
+   * Bans are never filtered by what you own, and never hidden. The enemy's
+   * options are the enemy's options.
+   */
+  const source =
+    tab === 'bans' || !hiding ? map.picks : map.picks.filter((p) => fieldable(p.brawlerId));
+  const shown = expanded ? source : source.slice(0, SHOWN_MAP_PICKS);
+  const hidden = source.length - shown.length;
 
   /*
    * The best pick this account can actually take, which is the answer someone
@@ -593,11 +628,43 @@ function MapPicks({
    * shown: the point of the line is that it saves you scrolling, and it cannot
    * do that if it only looks at what is already on screen.
    */
-  const best = filtering ? map.picks.find((p) => fieldable(p.brawlerId)) : undefined;
+  const best =
+    filtering && tab === 'picks' ? map.picks.find((p) => fieldable(p.brawlerId)) : undefined;
 
   return (
     <>
-    {filtering ? (
+    {/* Two questions, not two views of one. Picks answers "what do I take",
+        which depends on your roster; Bans answers "what do I take away",
+        which depends on theirs. */}
+    <div className="mb-1.5 flex gap-1">
+      {(['picks', 'bans'] as const).map((key) => (
+        <button
+          key={key}
+          type="button"
+          onClick={() => {
+            setTab(key);
+            setExpanded(false);
+          }}
+          aria-pressed={tab === key}
+          className={`flex-1 rounded-lg px-2 py-1 text-[11px] font-bold capitalize transition-colors ${
+            tab === key
+              ? 'bg-brand text-[#0b0f1d]'
+              : 'bg-surface-2 text-muted hover:text-foreground'
+          }`}
+        >
+          {key === 'bans' ? 'Ban' : 'Pick'}
+        </button>
+      ))}
+    </div>
+
+    {tab === 'bans' ? (
+      <p className="mb-1.5 px-1 text-[10px] font-semibold leading-tight text-muted">
+        Strongest here, whoever owns them. The pick rate is how often it is
+        actually taken — banning something nobody picks spends the ban for nothing.
+      </p>
+    ) : null}
+
+    {filtering && tab === 'picks' ? (
       <p className="mb-1.5 px-1 text-[10px] font-semibold leading-tight text-muted">
         {best ? (
           <>
@@ -614,7 +681,7 @@ function MapPicks({
     <ol className="card divide-y divide-border overflow-hidden">
       {shown.map((pick, index) => {
         const edge = pick.score - pick.overallScore;
-        const own = fieldable(pick.brawlerId);
+        const own = tab === 'bans' || fieldable(pick.brawlerId);
         return (
           <li key={pick.brawlerId} className={own ? '' : 'opacity-40'}>
             <button
@@ -664,8 +731,14 @@ function MapPicks({
                 </span>
                 {/* Sample size is never hidden: on a per-map split it is the
                     difference between a signal and a coin flip. */}
+                {/* Sample size on Pick, pick rate on Ban.
+                    They answer the two different questions the tabs ask: "can
+                    I trust this number" when choosing, and "will it even be
+                    there" when banning. */}
                 <span className="block text-[10px] tabular-nums leading-tight text-muted">
-                  {pick.battles} battles here
+                  {tab === 'bans'
+                    ? `${(pick.pickRate * 100).toFixed(1)}% picked here`
+                    : `${pick.battles} battles here`}
                 </span>
               </span>
 

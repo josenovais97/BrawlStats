@@ -14,6 +14,7 @@
 export const ACCOUNT_KEYS = {
   tag: 'brawlzone-bubble-tag',
   filter: 'brawlzone-bubble-filter',
+  hide: 'brawlzone-bubble-hide',
   roster: 'brawlzone-bubble-roster',
 } as const;
 
@@ -62,6 +63,19 @@ function read(key: string): string | null {
 export function readTag(): string | null {
   const tag = read(ACCOUNT_KEYS.tag);
   return tag && tag.trim() ? tag.trim().toUpperCase() : null;
+}
+
+/**
+ * Whether to remove what you cannot field, rather than dim it.
+ *
+ * Off by default, and that default is deliberate. Dimming keeps the tier
+ * counts honest and keeps a brawler you are one upgrade away from in view —
+ * hiding makes the panel disagree with every other tier list, which reads as a
+ * bug to anyone who knows the meta. It is opt-in for the people who would
+ * rather see only what they can take.
+ */
+export function readHide(): boolean {
+  return read(ACCOUNT_KEYS.hide) === '1';
 }
 
 export function readFilter(): OwnedFilter {

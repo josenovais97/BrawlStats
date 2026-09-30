@@ -18,6 +18,7 @@ object Account {
     private const val PREFS = "brawlzone-account"
     private const val KEY_TAG = "tag"
     private const val KEY_FILTER = "filter"
+    private const val KEY_HIDE = "hide"
 
     /** Matches `OwnedFilter` in src/lib/bubble-account.ts. */
     const val FILTER_ALL = "all"
@@ -32,10 +33,13 @@ object Account {
     fun filter(context: Context): String =
         prefs(context).getString(KEY_FILTER, FILTER_ALL) ?: FILTER_ALL
 
-    fun save(context: Context, tag: String, filter: String) {
+    fun hide(context: Context): Boolean = prefs(context).getBoolean(KEY_HIDE, false)
+
+    fun save(context: Context, tag: String, filter: String, hide: Boolean) {
         prefs(context).edit()
             .putString(KEY_TAG, normalise(tag))
             .putString(KEY_FILTER, filter)
+            .putBoolean(KEY_HIDE, hide)
             .apply()
     }
 
@@ -76,11 +80,13 @@ object Account {
     fun bootstrapScript(context: Context): String {
         val tag = org.json.JSONObject.quote(tag(context))
         val filter = org.json.JSONObject.quote(filter(context))
+        val hide = if (hide(context)) "'1'" else "'0'"
         return """
             (function () {
               try {
                 localStorage.setItem('brawlzone-bubble-tag', $tag);
                 localStorage.setItem('brawlzone-bubble-filter', $filter);
+                localStorage.setItem('brawlzone-bubble-hide', $hide);
               } catch (e) {}
             })();
         """.trimIndent()

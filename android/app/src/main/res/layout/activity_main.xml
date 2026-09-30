@@ -234,6 +234,22 @@
             android:textSize="15sp"
             android:textColor="@color/foreground" />
 
+        <!--
+            Off by default. Dimming keeps the tier counts honest and keeps a
+            brawler you are one upgrade away from in view; hiding makes the
+            panel disagree with every other tier list, which reads as a bug to
+            anyone who knows the meta. Opt-in for people who would rather see
+            only what they can take.
+        -->
+        <Switch
+            android:id="@+id/hide_unusable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Hide them instead of greying them out"
+            android:textSize="15sp"
+            android:textColor="@color/foreground" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

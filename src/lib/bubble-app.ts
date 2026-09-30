@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.16',
+  version: '1.17',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 37,
+  versionCode: 38,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.16.apk',
+  path: '/downloads/brawlzone-bubble-1.17.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2653145,
-  sha256: '92c5e853d116879b86f6e5090dbe2a768376442324f221295151982cfd6d6ffc',
+  size: 2653589,
+  sha256: 'c2052f0539e6aa01c6ffbe47b30a1e2df4d76ec1f1c57d38b9dfdc7c46e41f6b',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -86,6 +86,15 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.17',
+    versionCode: 38,
+    date: '2026-09-30',
+    changes: [
+      'Pick and Ban tabs on every map. Pick is the list you already had, narrowed to what you can field. Ban is every brawler, whoever owns them, with how often it is actually taken here — because banning something nobody picks spends the ban for nothing.',
+      'A third switch on the app screen: hide the brawlers you cannot use instead of greying them out. Off by default — greying keeps the tier counts honest and keeps a brawler you are one upgrade away from in view.',
+    ],
+  },
   {
     version: '1.16',
     versionCode: 37,

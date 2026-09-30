@@ -9,6 +9,7 @@ import {
   isStale,
   readFilter,
   readRoster,
+  readHide,
   readTag,
   writeRoster,
 } from '@/lib/bubble-account';
@@ -31,11 +32,13 @@ export interface BubbleAccount {
   tag: string | null;
   name: string | null;
   filter: OwnedFilter;
+  /** Remove what cannot be fielded instead of dimming it. */
+  hide: boolean;
   /** Null until a roster is known — and permanently null with no tag set. */
   owned: Map<number, OwnedBrawler> | null;
 }
 
-const NONE: BubbleAccount = { tag: null, name: null, filter: 'all', owned: null };
+const NONE: BubbleAccount = { tag: null, name: null, filter: 'all', hide: false, owned: null };
 
 function toMap(roster: CachedRoster): Map<number, OwnedBrawler> {
   return new Map(roster.brawlers.map((b) => [b.id, b]));
@@ -49,6 +52,7 @@ export function useBubbleAccount(): BubbleAccount {
     if (!tag) return;
 
     const filter = readFilter();
+    const hide = readHide();
     const cached = readRoster(tag);
 
     /*
@@ -63,8 +67,8 @@ export function useBubbleAccount(): BubbleAccount {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAccount(
       cached
-        ? { tag, name: cached.name, filter, owned: toMap(cached) }
-        : { tag, name: null, filter, owned: null },
+        ? { tag, name: cached.name, filter, hide, owned: toMap(cached) }
+        : { tag, name: null, filter, hide, owned: null },
     );
     if (cached && !isStale(cached)) return;
 
@@ -75,7 +79,7 @@ export function useBubbleAccount(): BubbleAccount {
         if (cancelled || !data?.brawlers) return;
         const roster: CachedRoster = { ...data, fetchedAt: Date.now() };
         writeRoster(roster);
-        setAccount({ tag, name: data.name, filter, owned: toMap(roster) });
+        setAccount({ tag, name: data.name, filter, hide, owned: toMap(roster) });
       })
       .catch(() => {
         /* Keep whatever was cached. A failed refresh is not a reason to stop

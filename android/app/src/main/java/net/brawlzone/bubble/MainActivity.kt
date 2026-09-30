@@ -212,8 +212,10 @@ class MainActivity : AppCompatActivity() {
         val status = findViewById<TextView>(R.id.tag_status)
         val eleven = findViewById<Switch>(R.id.only_eleven)
         val hyper = findViewById<Switch>(R.id.only_hypercharge)
+        val hide = findViewById<Switch>(R.id.hide_unusable)
 
         tag.setText(Account.tag(this))
+        hide.isChecked = Account.hide(this)
         when (Account.filter(this)) {
             Account.FILTER_HYPERCHARGE -> { eleven.isChecked = true; hyper.isChecked = true }
             Account.FILTER_POWER_11 -> eleven.isChecked = true
@@ -227,7 +229,7 @@ class MainActivity : AppCompatActivity() {
 
         fun persist() {
             val raw = tag.text.toString()
-            Account.save(this, raw, currentFilter())
+            Account.save(this, raw, currentFilter(), hide.isChecked)
 
             status.visibility = View.VISIBLE
             status.text = when {
@@ -252,5 +254,6 @@ class MainActivity : AppCompatActivity() {
             if (on && !eleven.isChecked) eleven.isChecked = true
             persist()
         }
+        hide.setOnCheckedChangeListener { _, _ -> persist() }
     }
 }

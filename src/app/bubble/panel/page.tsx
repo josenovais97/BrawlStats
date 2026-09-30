@@ -129,6 +129,9 @@ export default async function BubblePanelPage() {
         score: pick.score,
         overallScore: pick.overallScore,
         battles: pick.decidedSampleSize,
+        // For the ban list: banning a brawler nobody takes wastes the ban, so
+        // the reader needs how strong it is AND how likely it is to be there.
+        pickRate: pick.pickRate,
       })),
     });
     mapsByMode.set(map.mode, bucket);
