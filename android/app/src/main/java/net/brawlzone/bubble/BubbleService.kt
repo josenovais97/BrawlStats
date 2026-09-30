@@ -13,6 +13,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.Icon
@@ -659,6 +660,25 @@ class BubbleService : Service() {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             webViewClient = object : WebViewClient() {
+                /**
+                 * Hand the panel the account before its own scripts run.
+                 *
+                 * Seeded into the page's storage rather than passed on the
+                 * URL. A query parameter would opt the panel page out of
+                 * server caching, and this is the page that gets opened over
+                 * and over in a hurry -- see the caching note on
+                 * /bubble/panel, and AGENTS.md on what search params cost.
+                 *
+                 * `onPageStarted` rather than `onPageFinished`: the panel
+                 * reads these when it mounts, and writing them afterwards
+                 * would show the unfiltered list for a frame and then correct
+                 * it, which reads as a bug.
+                 */
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    view?.evaluateJavascript(Account.bootstrapScript(this@BubbleService), null)
+                }
+
                 override fun onPageFinished(view: WebView?, url: String?) {
                     spinner.visibility = View.GONE
                     if (failed) return

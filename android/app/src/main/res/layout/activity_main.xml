@@ -157,6 +157,83 @@
             android:visibility="gone"
             android:text="The toggle is greyed out?" />
 
+        <!--
+            Your account.
+
+            The panel shows the global meta: the best pick on a map whether or
+            not you own it. With a tag set it also says what YOU can field, and
+            dims what you cannot. Set here rather than in the overlay because
+            typing a tag into a floating window over a live match is the wrong
+            place for it, and it is a once-ever action.
+        -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="YOUR ACCOUNT"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:textColor="@color/muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Optional. Add your tag and the panel marks the picks you can actually take."
+            android:textSize="13sp"
+            android:lineSpacingMultiplier="1.35"
+            android:textColor="@color/muted" />
+
+        <EditText
+            android:id="@+id/tag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/card_surface"
+            android:padding="16dp"
+            android:hint="#2RLCPVGUG"
+            android:importantForAutofill="no"
+            android:inputType="textCapCharacters|textNoSuggestions"
+            android:maxLength="16"
+            android:singleLine="true"
+            android:textSize="16sp"
+            android:textColor="@color/foreground"
+            android:textColorHint="@color/muted"
+            android:autofillHints="" />
+
+        <TextView
+            android:id="@+id/tag_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="13sp"
+            android:textColor="@color/muted"
+            android:visibility="gone" />
+
+        <!--
+            Two switches rather than three states, because a hypercharge cannot
+            exist below power 11: "with hypercharge" is strictly narrower than
+            "power 11", so turning it on implies the other.
+        -->
+        <Switch
+            android:id="@+id/only_eleven"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Only power 11 brawlers"
+            android:textSize="15sp"
+            android:textColor="@color/foreground" />
+
+        <Switch
+            android:id="@+id/only_hypercharge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Only power 11 with hypercharge"
+            android:textSize="15sp"
+            android:textColor="@color/foreground" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

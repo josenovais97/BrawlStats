@@ -14,6 +14,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -66,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         askForNotifications()
+
+        wireAccount()
 
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
@@ -189,5 +193,64 @@ class MainActivity : AppCompatActivity() {
         startForegroundService(Intent(this, BubbleService::class.java))
 
         moveTaskToBack(true)
+    }
+
+    /**
+     * The account section.
+     *
+     * Saved as it is typed rather than behind a Save button. There is nothing
+     * to submit — the panel reads these on its next open — and a button that
+     * has to be remembered is a button people forget, leaving them with a
+     * setting they believe they made.
+     *
+     * The two switches are mutually exclusive in effect but not in appearance:
+     * a hypercharge cannot exist below power 11, so turning that one on turns
+     * the other on too rather than silently overriding it.
+     */
+    private fun wireAccount() {
+        val tag = findViewById<EditText>(R.id.tag)
+        val status = findViewById<TextView>(R.id.tag_status)
+        val eleven = findViewById<Switch>(R.id.only_eleven)
+        val hyper = findViewById<Switch>(R.id.only_hypercharge)
+
+        tag.setText(Account.tag(this))
+        when (Account.filter(this)) {
+            Account.FILTER_HYPERCHARGE -> { eleven.isChecked = true; hyper.isChecked = true }
+            Account.FILTER_POWER_11 -> eleven.isChecked = true
+        }
+
+        fun currentFilter(): String = when {
+            hyper.isChecked -> Account.FILTER_HYPERCHARGE
+            eleven.isChecked -> Account.FILTER_POWER_11
+            else -> Account.FILTER_ALL
+        }
+
+        fun persist() {
+            val raw = tag.text.toString()
+            Account.save(this, raw, currentFilter())
+
+            status.visibility = View.VISIBLE
+            status.text = when {
+                raw.isBlank() -> "No tag set — the panel shows the full tier list."
+                !Account.isValid(raw) -> "That does not look like a tag yet."
+                else -> "Saved. The panel will mark what you can field."
+            }
+        }
+
+        tag.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) = persist()
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+        })
+
+        eleven.setOnCheckedChangeListener { _, on ->
+            // Clearing power 11 cannot leave the narrower filter set.
+            if (!on && hyper.isChecked) hyper.isChecked = false
+            persist()
+        }
+        hyper.setOnCheckedChangeListener { _, on ->
+            if (on && !eleven.isChecked) eleven.isChecked = true
+            persist()
+        }
     }
 }

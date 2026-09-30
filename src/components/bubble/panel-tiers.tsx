@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
+import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
+import { canField } from '@/lib/bubble-account';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 
@@ -118,6 +120,16 @@ export function PanelTiers({
 }) {
   const [active, setActive] = useState<string | null>(null);
   const [map, setMap] = useState<string | null>(null);
+
+  /*
+   * Whose roster to filter for, configured in the Android app.
+   *
+   * Null when nobody has set a tag, which is the state the overlay shipped in:
+   * every list then renders exactly as it always did.
+   */
+  const account = useBubbleAccount();
+  const fieldable = (id: number) =>
+    account.owned === null || canField(account.owned, id, account.filter);
 
   /*
    * The choice outlives the panel.
@@ -303,7 +315,14 @@ export function PanelTiers({
       ) : null}
 
       {currentMap ? (
-        <MapPicks key={currentMap.mapName} map={currentMap} onPick={show} openId={openId} />
+        <MapPicks
+          key={currentMap.mapName}
+          map={currentMap}
+          onPick={show}
+          openId={openId}
+          fieldable={fieldable}
+          filtering={account.owned !== null}
+        />
       ) : current.entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
           Not enough sampled Ranked battles in {current.label.toLowerCase()} yet.
@@ -320,6 +339,7 @@ export function PanelTiers({
                 entries={entries}
                 onPick={show}
                 openId={openId}
+                fieldable={fieldable}
               />
             );
           })}
@@ -338,11 +358,14 @@ function TierStrip({
   entries,
   onPick,
   openId,
+  fieldable,
 }: {
   tier: Tier;
   entries: PanelEntry[];
   onPick: (entry: PanelEntry) => void;
   openId: number | null;
+  /** True when this account can field the brawler under the current filter. */
+  fieldable: (brawlerId: number) => boolean;
 }) {
   const color = TIER_COLOR[tier];
 
@@ -375,6 +398,11 @@ function TierStrip({
               aria-pressed={openId === entry.brawlerId}
               className="w-10 text-center"
             >
+              {/* Dimmed, not removed, and the order never changes.
+                  Hiding would make the tier counts lie, and a reader who knows
+                  the meta would think the panel was broken. Someone also
+                  levels brawlers between drafts, so what they cannot field
+                  today is a thing they might want to see. */}
               <Image
                 src={entry.imageUrl}
                 alt={entry.brawlerName}
@@ -382,7 +410,7 @@ function TierStrip({
                 height={40}
                 className={`size-10 rounded-lg bg-surface-2 transition-shadow ${
                   openId === entry.brawlerId ? 'ring-2 ring-brand' : ''
-                }`}
+                } ${fieldable(entry.brawlerId) ? '' : 'opacity-25 grayscale'}`}
                 loading="lazy"
                 unoptimized
               />
@@ -535,10 +563,15 @@ function MapPicks({
   map,
   onPick,
   openId,
+  fieldable,
+  filtering,
 }: {
   map: PanelMap;
   onPick: (entry: PanelEntry) => void;
   openId: number | null;
+  fieldable: (brawlerId: number) => boolean;
+  /** Whether an account is configured at all, so the banner can stay quiet. */
+  filtering: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -554,13 +587,36 @@ function MapPicks({
   const shown = expanded ? map.picks : map.picks.slice(0, SHOWN_MAP_PICKS);
   const hidden = map.picks.length - shown.length;
 
+  /*
+   * The best pick this account can actually take, which is the answer someone
+   * with eight seconds wants. Found across the WHOLE list rather than the ten
+   * shown: the point of the line is that it saves you scrolling, and it cannot
+   * do that if it only looks at what is already on screen.
+   */
+  const best = filtering ? map.picks.find((p) => fieldable(p.brawlerId)) : undefined;
+
   return (
     <>
+    {filtering ? (
+      <p className="mb-1.5 px-1 text-[10px] font-semibold leading-tight text-muted">
+        {best ? (
+          <>
+            Your best here:{' '}
+            <span className="font-black capitalize text-brand">
+              {best.brawlerName.toLowerCase()}
+            </span>
+          </>
+        ) : (
+          'Nothing on this map matches your filter.'
+        )}
+      </p>
+    ) : null}
     <ol className="card divide-y divide-border overflow-hidden">
       {shown.map((pick, index) => {
         const edge = pick.score - pick.overallScore;
+        const own = fieldable(pick.brawlerId);
         return (
-          <li key={pick.brawlerId}>
+          <li key={pick.brawlerId} className={own ? '' : 'opacity-40'}>
             <button
               type="button"
               onClick={() =>
