@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { bubblePlan } from '@/lib/bubble-plan';
+import { rosterCoverage, rosterPlan } from '@/lib/roster-optimizer';
 import type { RosterPlan } from '@/lib/roster-optimizer';
+import type { BSPlayerBrawler } from '@/types/brawlstars';
+import type { ModeBestPicks, ModePick } from '@/types/stats';
 
 /**
  * The app renders these strings verbatim and cannot be corrected once shipped,
@@ -79,4 +82,82 @@ test('singular and plural are both reachable, because both ship', () => {
     coverage: { covered: 1, banSafe: 0, modes: 6 },
   })!;
   assert.match(many.headline, /3 more modes$/);
+});
+
+/**
+ * The optimiser and the wording, joined.
+ *
+ * The cases above hand `bubblePlan` a plan built by hand, which leaves the one
+ * thing production does untested: running the real greedy loop and rendering
+ * whatever it chooses. Both live accounts available to check against are
+ * maxed — they only ever exercise the empty branch — so the branch a player
+ * with gaps actually sees is pinned here instead of hoped for.
+ */
+
+function pick(brawlerId: number, brawlerName: string): ModePick {
+  return {
+    brawlerId,
+    brawlerName,
+    score: 0,
+    winRate: 0.55,
+    pickRate: 0.1,
+    decidedSampleSize: 500,
+  };
+}
+
+function mode(key: string, picks: ModePick[]): [string, ModeBestPicks] {
+  return [key, { mode: key, picks, sampleSize: 5000, baselineWinRate: 0.5 }];
+}
+
+function brawler(id: number, name: string, power: number): BSPlayerBrawler {
+  return {
+    id,
+    name,
+    power,
+    rank: 20,
+    trophies: 600,
+    highestTrophies: 700,
+    gadgets: [],
+    starPowers: [],
+    gears: [],
+  };
+}
+
+test('an account with a hole gets a step that names what the coins buy', () => {
+  const picksByMode = new Map([
+    mode('gemGrab', [pick(1, 'PIPER'), pick(2, 'GENE'), pick(3, 'POCO')]),
+    mode('hotZone', [pick(1, 'PIPER'), pick(4, 'BULL'), pick(5, 'NITA')]),
+  ]);
+  const modes = ['gemGrab', 'hotZone'];
+  const brawlers = [
+    // Covers Gem Grab already, and nothing else.
+    brawler(2, 'GENE', 11),
+    // One upgrade away, and the only owned pick in Hot Zone.
+    brawler(4, 'BULL', 7),
+    // Owned, in no mode's top three: never worth recommending.
+    brawler(9, 'EDGAR', 5),
+  ];
+
+  const plan = rosterPlan({
+    brawlers,
+    picksByMode,
+    modes,
+    modeLabels: new Map([
+      ['gemGrab', 'Gem Grab'],
+      ['hotZone', 'Hot Zone'],
+    ]),
+  });
+
+  const out = bubblePlan({
+    plan,
+    coverage: rosterCoverage({ brawlers, picksByMode, modes }),
+  })!;
+
+  assert.equal(out.note, 'Right now you can field a top-three pick in 1 of 2.');
+  assert.match(out.headline, /^[\d,]+ coins covers 1 more mode$/);
+  assert.equal(out.steps.length, 1, 'only the upgrade that changes a mode');
+  assert.equal(out.steps[0].name, 'BULL');
+  assert.equal(out.steps[0].gain, 'Covers Hot Zone');
+  assert.match(out.steps[0].detail, /^Power 7 → 11 · [\d,]+ coins$/);
+  assert.match(out.steps[0].icon, /^https:\/\/\S+\/4\.png$/);
 });

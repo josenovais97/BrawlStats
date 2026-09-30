@@ -781,6 +781,71 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!--
+            What to upgrade next.
+
+            The same optimiser the profile page runs, and the one thing the app
+            can say that the overlay cannot: the bubble answers "what do I pick
+            in this draft", this answers "what do I spend coins on before the
+            next one". That question is asked between sessions, which is when
+            this screen is in front of somebody and the panel is not.
+
+            Every string in here arrives from the server. An installed APK is
+            the one version that cannot be told it is wrong, so the wording is
+            not compiled into it.
+        -->
+        <TextView
+            android:id="@+id/plan_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="WHAT TO UPGRADE NEXT"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:textColor="@color/muted"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/plan_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card_surface"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="6dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/plan_headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingMultiplier="1.2"
+                android:textColor="@color/brand"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/plan_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="4dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="@color/muted"
+                android:textSize="13sp" />
+
+            <!-- Rows land here, one per step. -->
+            <LinearLayout
+                android:id="@+id/plan_steps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

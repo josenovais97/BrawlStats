@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.21',
+  version: '1.22',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 42,
+  versionCode: 43,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.21.apk',
+  path: '/downloads/brawlzone-bubble-1.22.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2796614,
-  sha256: 'fbfc9ddc351b35dca0abdb69163dcebc4f074858e8e05cdd2d9ee3e1841d5e83',
+  size: 2803578,
+  sha256: 'abb96d8b7a4fa927a06cd62de3c2adf5890627617f40d854a139d36f1c17c52f',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -87,7 +87,7 @@ export interface BubbleRelease {
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
   {
-    version: '1.21',
+    version: '1.22',
     versionCode: 41,
     date: '2026-09-30',
     changes: [

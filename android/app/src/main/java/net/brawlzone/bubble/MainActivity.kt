@@ -230,6 +230,12 @@ class MainActivity : AppCompatActivity() {
         val editor = findViewById<LinearLayout>(R.id.tag_editor)
         val change = findViewById<TextView>(R.id.change_tag)
 
+        val planCaption = findViewById<TextView>(R.id.plan_caption)
+        val planCard = findViewById<LinearLayout>(R.id.plan_card)
+        val planHeadline = findViewById<TextView>(R.id.plan_headline)
+        val planNote = findViewById<TextView>(R.id.plan_note)
+        val planSteps = findViewById<LinearLayout>(R.id.plan_steps)
+
         val identity = findViewById<LinearLayout>(R.id.account_identity)
         val chips = findViewById<LinearLayout>(R.id.account_chips)
         val chipsCaption = findViewById<TextView>(R.id.chips_caption)
@@ -250,6 +256,9 @@ class MainActivity : AppCompatActivity() {
         )
 
         var filter = Account.filter(this)
+        /* The tag the plan on screen belongs to, so it is fetched once. */
+        var plannedFor: String? = null
+        var editing = true
 
         tag.setText(Account.tag(this))
         hide.isChecked = Account.hide(this)
@@ -263,8 +272,66 @@ class MainActivity : AppCompatActivity() {
          * finished card look like an unfinished form.
          */
         fun setEditing(on: Boolean) {
+            editing = on
             editor.visibility = if (on) View.VISIBLE else View.GONE
             change.visibility = if (on) View.GONE else View.VISIBLE
+        }
+
+        fun showPlan(plan: PlanLookup.Plan?) {
+            planSteps.removeAllViews()
+            if (plan == null) {
+                planCaption.visibility = View.GONE
+                planCard.visibility = View.GONE
+                return
+            }
+            planHeadline.text = plan.headline
+            planNote.text = plan.note
+
+            val inflater = layoutInflater
+            for ((index, step) in plan.steps.withIndex()) {
+                val row = inflater.inflate(R.layout.row_plan_step, planSteps, false)
+                // Between the rows, not above the first — a rule under the note
+                // would read as the end of the card rather than the start of a
+                // list.
+                row.findViewById<View>(R.id.step_divider).visibility =
+                    if (index == 0) View.GONE else View.VISIBLE
+                row.findViewById<TextView>(R.id.step_name).text = step.name
+                row.findViewById<TextView>(R.id.step_detail).text = step.detail
+                val gain = row.findViewById<TextView>(R.id.step_gain)
+                gain.text = step.gain
+                gain.visibility = if (step.gain.isEmpty()) View.GONE else View.VISIBLE
+
+                val art = row.findViewById<ImageView>(R.id.step_icon)
+                if (step.icon.isNotEmpty()) {
+                    PlanLookup.icon(step.icon) { bitmap ->
+                        if (bitmap != null) art.setImageBitmap(bitmap)
+                    }
+                }
+                planSteps.addView(row)
+            }
+
+            planCaption.visibility = View.VISIBLE
+            planCard.visibility = View.VISIBLE
+        }
+
+        /**
+         * Fetched once the account has settled, never while it is being typed.
+         *
+         * A tag is entered a character at a time and a short prefix can be a
+         * real account, so resolving on every keystroke would send a live
+         * upstream player fetch per letter to build a plan nobody asked for.
+         * Waiting for the field to fold costs nothing: the plan is about what
+         * to buy before the next session, not about this second.
+         */
+        fun loadPlan(tag: String) {
+            if (editing || tag == plannedFor) return
+            plannedFor = tag
+            PlanLookup.load(tag) { plan ->
+                // A failed fetch hides the card rather than leaving the previous
+                // account's plan under a new name.
+                if (plan == null) plannedFor = null
+                showPlan(plan)
+            }
         }
 
         fun paintFilter() {
@@ -283,6 +350,9 @@ class MainActivity : AppCompatActivity() {
                 chips.visibility = View.GONE
                 chipsCaption.visibility = View.GONE
                 filterLabel.visibility = View.GONE
+                PlanLookup.cancel()
+                plannedFor = null
+                showPlan(null)
                 return
             }
             name.text = result.name
@@ -303,6 +373,7 @@ class MainActivity : AppCompatActivity() {
                     if (bitmap != null) icon.setImageBitmap(bitmap)
                 }
             }
+            loadPlan(result.tag)
         }
 
         fun persist() {
@@ -359,6 +430,7 @@ class MainActivity : AppCompatActivity() {
                 setEditing(false)
                 (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
                     .hideSoftInputFromWindow(tag.windowToken, 0)
+                loadPlan(Account.normalise(tag.text.toString()))
             }
             // False: this is a fold, not a submit, and the field keeps whatever
             // the platform would do with the key otherwise.

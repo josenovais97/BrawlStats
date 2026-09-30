@@ -5,8 +5,6 @@ import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.Looper
 import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.concurrent.Executors
 
 /**
@@ -61,14 +59,14 @@ object AccountLookup {
         val mine = token
         pool.execute {
             val bitmap = runCatching {
-                open(url).use { BitmapFactory.decodeStream(it) }
+                Http.open(url).use { BitmapFactory.decodeStream(it) }
             }.getOrNull()
             main.post { if (mine == token) onResult(bitmap) }
         }
     }
 
     private fun fetch(tag: String): Result? {
-        val body = open("$SITE/api/bubble/roster?tag=$tag").use { it.readBytes().decodeToString() }
+        val body = Http.text("${Http.SITE}/api/bubble/roster?tag=$tag")
         val json = JSONObject(body)
         if (json.has("error")) return null
 
@@ -93,13 +91,4 @@ object AccountLookup {
             hypercharged = hyper,
         )
     }
-
-    private fun open(url: String) =
-        (URL(url).openConnection() as HttpURLConnection).apply {
-            connectTimeout = 10_000
-            readTimeout = 10_000
-            setRequestProperty("User-Agent", "BrawlZoneBubble")
-        }.inputStream
-
-    private const val SITE = "https://brawlzone.net"
 }
