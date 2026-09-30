@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.15',
+  version: '1.16',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 36,
+  versionCode: 37,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.15.apk',
+  path: '/downloads/brawlzone-bubble-1.16.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,8 +53,8 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2649925,
-  sha256: '8fa7c2041f6655c54cf5a0e9dc0711f84132f64b1fb5544c26534f58068c34f4',
+  size: 2653145,
+  sha256: '92c5e853d116879b86f6e5090dbe2a768376442324f221295151982cfd6d6ffc',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-09-11',
@@ -86,6 +86,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.16',
+    versionCode: 37,
+    date: '2026-09-30',
+    changes: [
+      'Add your player tag on the app screen and the panel marks what you can actually field. The tier list stops being a list of brawlers you might not own: anything you cannot take is dimmed, and each map names your best available pick.',
+      'Two filters beside it — power 11 only, and power 11 with a hypercharge — for when a pick is only worth making at full strength.',
+      'Your roster is read once a day and kept on the phone, so none of this costs anything mid-draft. Leave the tag blank and the panel behaves exactly as it did before.',
+    ],
+  },
   {
     version: '1.15',
     versionCode: 36,

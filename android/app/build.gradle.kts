@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 36
-    versionName = "1.15"
+    versionCode = 37
+    versionName = "1.16"
 
     /*
      * Where the panel is served from. The site, always, in a release; a
