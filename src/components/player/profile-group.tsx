@@ -18,39 +18,32 @@ import type { ReactNode } from 'react';
  * area now, and it comes first, because a reader who came to be told what to
  * do should not have to read a trophy history to find it.
  *
- * The number is not decoration. It tells a reader scrolling past how far
- * through they are, which on a page this long is the thing a flat column never
- * says.
+ * The groups are tabs rather than stops on a long scroll. Grouping alone was
+ * necessary and not sufficient: the page was still six screens, so it read
+ * exactly as it always had -- a reorganisation that was real and invisible.
  */
 export function ProfileGroup({
-  id,
-  index,
   title,
   subtitle,
   children,
 }: {
-  id: string;
-  /** Position in the page, shown beside the title. */
-  index: number;
   title: string;
   subtitle?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-anchor-nav">
-      <header className="mb-7 flex items-start gap-4 border-t border-border pt-7">
-        <span
-          aria-hidden
-          className="display shrink-0 text-3xl leading-none tabular-nums text-brand/35 sm:text-4xl"
-        >
-          {String(index).padStart(2, '0')}
-        </span>
-        <div className="min-w-0">
-          <h2 className="display text-2xl uppercase leading-tight sm:text-3xl">{title}</h2>
-          {subtitle ? (
-            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
-          ) : null}
-        </div>
+    <section>
+      {/*
+        No number and no rule any more. Both existed to tell a reader scrolling
+        a six-screen column how far through they were and where one area ended
+        and the next began -- questions a tab answers by construction, since
+        only one area is on screen at a time.
+      */}
+      <header className="mb-7">
+        <h2 className="display text-2xl uppercase leading-tight sm:text-3xl">{title}</h2>
+        {subtitle ? (
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
+        ) : null}
       </header>
 
       {/*

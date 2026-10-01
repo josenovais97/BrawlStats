@@ -7,7 +7,6 @@ import { BattleLog } from '@/components/player/battle-log';
 import { LastOnline } from '@/components/player/last-online';
 import { PlayerBrawlers } from '@/components/player/player-brawlers';
 import { PlayerHeader } from '@/components/player/player-header';
-import { PlayerNav } from '@/components/player/player-nav';
 import { PlayerProgress } from '@/components/player/player-progress';
 import { BattleAutopsySection } from '@/components/player/battle-autopsy-section';
 import { PlayerPatchImpact } from '@/components/player/player-patch-impact';
@@ -27,6 +26,7 @@ import { PlayerProgression } from '@/components/player/player-progression';
 import { MetaRadar } from '@/components/meta/meta-radar';
 import { Panel } from '@/components/ui/panel';
 import { ProfileGroup } from '@/components/player/profile-group';
+import { ProfileTabs } from '@/components/player/profile-tabs';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
 import { RosterRecorder } from '@/components/player/roster-recorder';
 import { PlayerInsights } from '@/components/player/player-insights';
@@ -322,14 +322,13 @@ export default async function PlayerPage({ params }: PageProps) {
         )}
         skill={skill.score}
       />
-      <PlayerNav />
-
-      <ProfileGroup
-        id="overview"
-        index={1}
-        title="Overview"
-        subtitle="How strong this account is and where it stands, before any of the detail."
-      >
+      <ProfileTabs
+        tabs={[
+        {
+          id: 'overview',
+          label: 'Overview',
+          content: (
+            <ProfileGroup title="Overview" subtitle="How strong this account is and where it stands, before any of the detail.">
         {/*
          * Ordered by the questions a visitor actually arrives with, and set
          * side by side because these two answer the same one from opposite
@@ -370,15 +369,14 @@ export default async function PlayerPage({ params }: PageProps) {
             usable={player.brawlers.filter((b) => b.power >= 9).length}
             total={player.brawlers.length}
           />
-        ) : null}
-      </ProfileGroup>
-
-      <ProfileGroup
-        id="account"
-        index={2}
-        title="The account"
-        subtitle="Lifetime totals, records and how the trophies got here. Reference rather than news."
-      >
+        ) : null}            </ProfileGroup>
+          ),
+        },
+        {
+          id: 'account',
+          label: 'Account',
+          content: (
+            <ProfileGroup title="The account" subtitle="Lifetime totals, records and how the trophies got here. Reference rather than news.">
         <PlayerStats player={player} />
         <PlayerRecords player={player} />
         {/* Only ever populated for the couple of hundred players holding a
@@ -400,28 +398,14 @@ export default async function PlayerPage({ params }: PageProps) {
           Skill score and Ranking do; these do not.
         */}
         <PlayerProgress points={trophyHistory} />
-        <PlayerProgression progression={progression} playtime={playtime} />
-      </ProfileGroup>
-
-      {/*
-        Everything that tells the reader to go and do something, in one place
-        and before the reference material.
-
-        These five were spread across the page between the facts they are drawn
-        from, each argued into position relative to its neighbour. Individually
-        every one of those arguments held; together they meant the advice was
-        never in one place.
-
-        Within the group the order is by how soon it expires: the rotation is
-        about the next couple of hours, a patch is about the next fortnight, and
-        an upgrade plan is true until the coins are spent.
-      */}
-      <ProfileGroup
-        id="next"
-        index={3}
-        title="What to do next"
-        subtitle="The things on this page that are worth acting on, soonest first."
-      >
+        <PlayerProgression progression={progression} playtime={playtime} />            </ProfileGroup>
+          ),
+        },
+        {
+          id: 'next',
+          label: 'Do next',
+          content: (
+            <ProfileGroup title="What to do next" subtitle="The things on this page that are worth acting on, soonest first.">
         <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
 
         {/* After the rotation, because it narrows the same question to the maps
@@ -454,15 +438,14 @@ export default async function PlayerPage({ params }: PageProps) {
           brawlers={player.brawlers}
           brawlerMeta={brawlerMeta}
           coinsPerLevel={coinsToMaxFrom}
-        />
-      </ProfileGroup>
-
-      <ProfileGroup
-        id="battles"
-        index={4}
-        title="Battles"
-        subtitle="What the last few days of games actually say, and the games themselves."
-      >
+        />            </ProfileGroup>
+          ),
+        },
+        {
+          id: 'battles',
+          label: 'Battles',
+          content: (
+            <ProfileGroup title="Battles" subtitle="What the last few days of games actually say, and the games themselves.">
         <Suspense fallback={<InsightsSkeleton />}>
           <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
         </Suspense>
@@ -484,14 +467,14 @@ export default async function PlayerPage({ params }: PageProps) {
           <Suspense fallback={<BattleLogSkeleton />}>
             <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
           </Suspense>
-        </section>
-      </ProfileGroup>
-      <ProfileGroup
-        id="brawlers"
-        index={5}
-        title="Brawlers"
-        subtitle={`${player.brawlers.length} unlocked, read against the current tier list.`}
-      >
+        </section>            </ProfileGroup>
+          ),
+        },
+        {
+          id: 'brawlers',
+          label: 'Brawlers',
+          content: (
+            <ProfileGroup title="Brawlers" subtitle={`${player.brawlers.length} unlocked, read against the current tier list.`}>
         {/*
           The whole ranked meta, with this roster lit up on it.
 
@@ -544,8 +527,11 @@ export default async function PlayerPage({ params }: PageProps) {
               },
             ]),
           )}
-        />
-      </ProfileGroup>
+        />            </ProfileGroup>
+          ),
+        },
+        ]}
+      />
 
     </div>
   );
