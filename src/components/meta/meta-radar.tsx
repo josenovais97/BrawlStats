@@ -36,6 +36,9 @@ const W = 760;
 const H = 520;
 const PAD = { top: 18, right: 18, bottom: 58, left: 108 };
 
+/** Height kept clear inside each corner for its title. */
+const LABEL_STRIP = 30;
+
 const CELL_FILL: Record<RadarCell, string> = {
   sleeper: 'var(--victory)',
   overrated: 'var(--defeat)',
@@ -84,17 +87,27 @@ export function MetaRadar({
     const top = PAD.top;
     const bottom = H - PAD.bottom;
 
-    /** The rectangle each named cell occupies, so a nudge cannot leave it. */
+    /*
+     * The rectangle each named cell occupies, so a nudge cannot leave it --
+     * minus the strip its title sits in.
+     *
+     * Reserving that strip is the fix for a collision that showed up the
+     * moment real data arrived: fifteen out-of-favour brawlers crowded the
+     * bottom-left and buried the words OUT OF FAVOUR under four of them. The
+     * label is part of the layout now rather than something drawn on top and
+     * hoped for, and the two bottom corners carry theirs along the bottom edge
+     * where their own data is thinnest.
+     */
     const boundsFor = (cell: ReturnType<typeof cellOf>) => {
       switch (cell) {
         case 'sleeper':
-          return { x0: left, y0: top, x1: xLow, y1: yStrong };
+          return { x0: left, y0: top + LABEL_STRIP, x1: xLow, y1: yStrong };
         case 'meta':
-          return { x0: xHigh, y0: top, x1: right, y1: yStrong };
+          return { x0: xHigh, y0: top + LABEL_STRIP, x1: right, y1: yStrong };
         case 'dead':
-          return { x0: left, y0: yWeak, x1: xLow, y1: bottom };
+          return { x0: left, y0: yWeak, x1: xLow, y1: bottom - LABEL_STRIP };
         case 'overrated':
-          return { x0: xHigh, y0: yWeak, x1: right, y1: bottom };
+          return { x0: xHigh, y0: yWeak, x1: right, y1: bottom - LABEL_STRIP };
         default:
           return null;
       }
@@ -181,6 +194,7 @@ export function MetaRadar({
             fill="var(--victory)"
             label="Sleepers"
             anchor="start"
+            edge="top"
           />
           <Corner
             x={layout.xHigh}
@@ -190,6 +204,7 @@ export function MetaRadar({
             fill="var(--brand)"
             label="Meta"
             anchor="end"
+            edge="top"
           />
           <Corner
             x={PAD.left}
@@ -199,6 +214,7 @@ export function MetaRadar({
             fill="var(--muted)"
             label="Out of favour"
             anchor="start"
+            edge="bottom"
           />
           <Corner
             x={layout.xHigh}
@@ -208,6 +224,7 @@ export function MetaRadar({
             fill="var(--defeat)"
             label="Overrated"
             anchor="end"
+            edge="bottom"
           />
 
           {/*
@@ -362,6 +379,7 @@ function Corner({
   fill,
   label,
   anchor,
+  edge,
 }: {
   x: number;
   y: number;
@@ -370,6 +388,8 @@ function Corner({
   fill: string;
   label: string;
   anchor: 'start' | 'end';
+  /** Which horizontal edge the title hugs; matches the strip left clear above. */
+  edge: 'top' | 'bottom';
 }) {
   // A corner can be zero-width when every brawler sits on one side of a cut.
   if (w <= 2 || h <= 2) return null;
@@ -378,7 +398,7 @@ function Corner({
       <rect x={x} y={y} width={w} height={h} fill={fill} fillOpacity={0.07} />
       <text
         x={anchor === 'start' ? x + 10 : x + w - 10}
-        y={y + 20}
+        y={edge === 'top' ? y + 20 : y + h - 10}
         textAnchor={anchor}
         className="text-[12px] font-bold uppercase tracking-wide"
         fill={fill}
