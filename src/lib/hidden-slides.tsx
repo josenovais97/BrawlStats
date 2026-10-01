@@ -1,6 +1,15 @@
 import type { ReactElement } from 'react';
 
 import { titleCase } from '@/lib/format';
+import {
+  type RadarCell,
+  cellOf,
+  deoverlap,
+  isNamed,
+  middleRadius,
+  portraitRadius,
+  radarScales,
+} from '@/lib/meta-radar';
 import type { HiddenMeta, HiddenPick, MapEdgePick } from '@/lib/hidden-meta';
 import {
   ACCENT,
@@ -255,15 +264,256 @@ function method(data: HiddenMeta): ReactElement {
   );
 }
 
-type Step = 'cover' | 'sleepers' | 'overrated' | 'gems' | 'traps' | 'method' | 'outro';
+type Step = 'cover' | 'radar' | 'sleepers' | 'overrated' | 'gems' | 'traps' | 'method' | 'outro';
 
 /**
  * Which sections today has. An empty one is left out rather than rendered
  * saying nothing -- a week where nobody is being slept on is a real answer,
  * and the page says the same thing in words.
  */
+/* ----------------------------------------------------------------- radar -- */
+
+/** The plot, inside `Frame`'s padding. */
+const RADAR_W = 796;
+const RADAR_H = 820;
+
+const CELL_INK: Record<RadarCell, string> = {
+  sleeper: '#35d07f',
+  overrated: '#ff5c72',
+  meta: BRAND,
+  dead: DIM,
+  middle: DIM,
+};
+
+/**
+ * The hidden meta as one picture, before the lists that follow.
+ *
+ * The four sections after this are the four corners of this plot, and a
+ * carousel is the one place that relationship can actually be shown: slide two
+ * is the shape, slides three to six are the names in it. A viewer who swipes
+ * away after this one has still learned the finding.
+ *
+ * Shares `meta-radar` with the page, which is the point rather than a
+ * convenience. The cut lines are `getHiddenMeta`'s own percentiles, so a
+ * brawler is in the sleepers corner here exactly when it is in the sleepers
+ * corner on the site and in the list on the next slide. Three places agreeing
+ * by construction rather than by maintenance.
+ *
+ * Built from absolutely positioned divs, not SVG. Satori lays out flexbox and
+ * nothing else -- `<svg>`, `clipPath` and `<circle>` all render as nothing,
+ * silently, which on a scatter plot means a slide that posts as an empty
+ * frame.
+ */
+function radar(
+  data: HiddenMeta,
+  art: Map<number, string | null>,
+): ReactElement {
+  const scales = radarScales(data.points, data.cuts);
+  if (!scales) {
+    // No points to place. Returns an empty frame rather than throwing, so one
+    // thin day cannot take the whole carousel down.
+    return (
+      <Frame>
+        <div style={{ display: 'flex' }} />
+        <div style={{ display: 'flex' }} />
+      </Frame>
+    );
+  }
+
+  const maxSample = Math.max(...data.points.map((p) => p.sampleSize), 1);
+  const x = (usage: number) => scales.x.at(usage) * RADAR_W;
+  const y = (score: number) => (1 - scales.y.at(score)) * RADAR_H;
+
+  const xLow = x(data.cuts.lowUsage);
+  const xHigh = x(data.cuts.highUsage);
+  const yStrong = y(data.cuts.strong);
+  const yWeak = y(data.cuts.weak);
+
+  const boundsFor = (cell: RadarCell) => {
+    switch (cell) {
+      case 'sleeper':
+        return { x0: 0, y0: 34, x1: xLow, y1: yStrong };
+      case 'meta':
+        return { x0: xHigh, y0: 34, x1: RADAR_W, y1: yStrong };
+      case 'dead':
+        return { x0: 0, y0: yWeak, x1: xLow, y1: RADAR_H - 34 };
+      case 'overrated':
+        return { x0: xHigh, y0: yWeak, x1: RADAR_W, y1: RADAR_H - 34 };
+      default:
+        return null;
+    }
+  };
+
+  const prepared = data.points.map((p) => {
+    const cell = cellOf(p, data.cuts);
+    const named = isNamed(cell);
+    return {
+      p,
+      cell,
+      named,
+      /*
+       * Faces only in the named corners, which is where this parts company
+       * with the site. The page is explored; a slide is read in about three
+       * seconds at arm's length, and eighty-five portraits at this size is a
+       * texture rather than an answer. The middle stays as dots so the
+       * thirty-four that carry the finding are the thirty-four you see.
+       */
+      face: named ? art.get(p.brawlerId) ?? null : null,
+      r: named ? portraitRadius(p.sampleSize, maxSample) * 2.1 : middleRadius(p.sampleSize, maxSample) * 1.2,
+    };
+  });
+
+  const nudged = new Map(
+    deoverlap(
+      prepared
+        .filter((q) => q.face)
+        .map((q) => ({
+          id: q.p.brawlerId,
+          x: x(q.p.usageRate ?? 0),
+          y: y(q.p.metaScore),
+          r: q.r,
+          bounds: boundsFor(q.cell),
+        })),
+    ).map((q) => [q.id, q]),
+  );
+
+  const placed = prepared
+    .map((q) => {
+      const moved = nudged.get(q.p.brawlerId);
+      return { ...q, cx: moved?.x ?? x(q.p.usageRate ?? 0), cy: moved?.y ?? y(q.p.metaScore) };
+    })
+    // Named last, so a collision is survived by the brawler being argued about.
+    .sort((a, b) => Number(a.named) - Number(b.named));
+
+  const band = (
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    colour: string,
+  ): ReactElement => (
+    <div
+      key={`${left}-${top}-${colour}`}
+      style={{
+        display: 'flex',
+        position: 'absolute',
+        left,
+        top,
+        width: Math.max(0, width),
+        height: Math.max(0, height),
+        background: colour,
+        opacity: 0.1,
+      }}
+    />
+  );
+
+  const corner = (
+    left: number,
+    top: number,
+    label: string,
+    colour: string,
+    align: 'flex-start' | 'flex-end',
+  ): ReactElement => (
+    <div
+      key={label}
+      style={{
+        display: 'flex',
+        position: 'absolute',
+        left,
+        top,
+        width: 300,
+        justifyContent: align,
+        fontSize: 26,
+        letterSpacing: 2,
+        fontWeight: 700,
+        color: colour,
+      }}
+    >
+      {label.toUpperCase()}
+    </div>
+  );
+
+  return (
+    <Frame>
+      <div style={{ display: 'flex', fontSize: 30, letterSpacing: 3, color: ACCENT }}>
+        THE WHOLE ROSTER
+      </div>
+      <div style={{ display: 'flex', fontSize: 74, fontFamily: DISPLAY, marginTop: 12 }}>
+        Who wins, who gets picked
+      </div>
+      <div style={{ display: 'flex', fontSize: 30, color: DIM, marginTop: 10, marginBottom: 22 }}>
+        {`${data.rated} brawlers · last ${data.windowDays} days of ranked battles`}
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          position: 'relative',
+          width: RADAR_W,
+          height: RADAR_H,
+          borderRadius: 24,
+          background: 'rgba(255,255,255,0.04)',
+        }}
+      >
+        {band(0, 0, xLow, yStrong, '#35d07f')}
+        {band(xHigh, 0, RADAR_W - xHigh, yStrong, BRAND)}
+        {band(0, yWeak, xLow, RADAR_H - yWeak, DIM)}
+        {band(xHigh, yWeak, RADAR_W - xHigh, RADAR_H - yWeak, '#ff5c72')}
+
+        {/* The cuts. Solid hairlines: Satori does not draw a dashed border. */}
+        {[xLow, xHigh].map((v) => band(v, 0, 2, RADAR_H, '#ffffff'))}
+        {[yStrong, yWeak].map((v) => band(0, v, RADAR_W, 2, '#ffffff'))}
+
+        {corner(14, 10, 'Sleepers', '#35d07f', 'flex-start')}
+        {corner(RADAR_W - 314, 10, 'Meta', BRAND, 'flex-end')}
+        {corner(14, RADAR_H - 40, 'Out of favour', DIM, 'flex-start')}
+        {corner(RADAR_W - 314, RADAR_H - 40, 'Overrated', '#ff5c72', 'flex-end')}
+
+        {placed.map(({ p, cell, face, r, cx, cy }) => (
+          <div
+            key={p.brawlerId}
+            style={{
+              display: 'flex',
+              position: 'absolute',
+              left: cx - r,
+              top: cy - r,
+              width: r * 2,
+              height: r * 2,
+              borderRadius: r,
+              overflow: 'hidden',
+              background: face ? 'rgba(10,14,28,0.9)' : CELL_INK[cell],
+              opacity: face ? 1 : 0.35,
+              border: face ? `3px solid ${CELL_INK[cell]}` : '0px solid transparent',
+            }}
+          >
+            {face ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={face} width={r * 2} height={r * 2} alt="" style={{ objectFit: 'cover' }} />
+            ) : (
+              <div style={{ display: 'flex' }} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', fontSize: 28, color: DIM, marginTop: 18 }}>
+        {`Left is rarely picked · right is everywhere · higher wins more`}
+      </div>
+    </Frame>
+  );
+}
+
 function plan(data: HiddenMeta): Step[] {
   const out: Step[] = ['cover'];
+  /*
+   * Second, before the lists it summarises. The four sections that follow are
+   * the four corners of this plot, so the shape lands first and the names fill
+   * it in -- and a viewer who swipes away after slide two has still been told
+   * the finding.
+   *
+   * Needs enough points to be a picture rather than a scatter of three.
+   */
+  if (data.points.length >= 20) out.push('radar');
   if (data.sleepers.length > 0) out.push('sleepers');
   if (data.overrated.length > 0) out.push('overrated');
   if (data.gems.length > 0) out.push('gems');
@@ -286,7 +536,17 @@ export async function hiddenSlides(data: HiddenMeta, only?: number): Promise<Rea
   const portraits = (rows: { brawlerId: number; imageUrl: string | null }[]) =>
     Promise.all(rows.slice(0, PER_SECTION).map((r) => loadArt(r.brawlerId, 128, r.imageUrl)));
 
-  const [coverArt, sleeperArt, overratedArt, gemArt, trapArt, logo] = await Promise.all([
+  /*
+   * Only the named corners, which is where the slide parts company with the
+   * page. It is also what keeps this affordable: thirty-four portraits inlined
+   * as data URIs rather than eighty-five, on a render that already carries five
+   * other slides' art.
+   */
+  const radarNamed = wanted('radar')
+    ? data.points.filter((p) => isNamed(cellOf(p, data.cuts)))
+    : [];
+
+  const [coverArt, sleeperArt, overratedArt, gemArt, trapArt, radarArt, logo] = await Promise.all([
     wanted('cover') && data.sleepers[0]
       ? loadArt(data.sleepers[0].brawlerId, 560, data.sleepers[0].imageUrl)
       : Promise.resolve(null),
@@ -294,14 +554,19 @@ export async function hiddenSlides(data: HiddenMeta, only?: number): Promise<Rea
     wanted('overrated') ? portraits(data.overrated) : Promise.resolve<(string | null)[]>([]),
     wanted('gems') ? portraits(data.gems) : Promise.resolve<(string | null)[]>([]),
     wanted('traps') ? portraits(data.traps) : Promise.resolve<(string | null)[]>([]),
+    Promise.all(radarNamed.map((p) => loadArt(p.brawlerId, 128, p.imageUrl))),
     wanted('cover') || wanted('outro') ? loadLogo(208) : Promise.resolve(null),
   ]);
+
+  const radarFaces = new Map(radarNamed.map((p, i) => [p.brawlerId, radarArt[i]]));
 
   return withPips(
     steps.map((step) => {
       switch (step) {
         case 'cover':
           return cover(data, coverArt, logo);
+        case 'radar':
+          return radar(data, radarFaces);
         case 'sleepers':
           return list(
             'SLEEPER PICKS',
