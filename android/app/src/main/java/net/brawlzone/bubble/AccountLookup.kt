@@ -29,6 +29,15 @@ object AccountLookup {
         val owned: Int,
         val powerEleven: Int,
         val hypercharged: Int,
+        /**
+         * The whole roster as `id.power.hyper` rows, for `Account.saveRoster`.
+         *
+         * Carried here rather than fetched again later because this is the one
+         * moment the list is already in hand. The rotation check runs on a
+         * timer with no user present, and making it fetch a player would put an
+         * uncached upstream call on a background job on every install.
+         */
+        val roster: String,
     )
 
     /**
@@ -73,12 +82,18 @@ object AccountLookup {
         val brawlers = json.getJSONArray("brawlers")
         var eleven = 0
         var hyper = 0
+        val rows = StringBuilder()
         for (i in 0 until brawlers.length()) {
             val b = brawlers.getJSONObject(i)
-            if (b.getInt("power") >= 11) {
+            val power = b.getInt("power")
+            val hypercharge = b.getBoolean("hypercharge")
+            if (power >= 11) {
                 eleven += 1
-                if (b.getBoolean("hypercharge")) hyper += 1
+                if (hypercharge) hyper += 1
             }
+            if (rows.isNotEmpty()) rows.append(',')
+            rows.append(b.getInt("id")).append('.').append(power)
+                .append('.').append(if (hypercharge) '1' else '0')
         }
 
         return Result(
@@ -89,6 +104,7 @@ object AccountLookup {
             owned = brawlers.length(),
             powerEleven = eleven,
             hypercharged = hyper,
+            roster = rows.toString(),
         )
     }
 }

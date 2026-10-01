@@ -20,6 +20,14 @@
     -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!--
+      So the rotation check survives a reboot. A persisted JobScheduler job is
+      dropped at boot without this, and the symptom is the quietest possible
+      one: notifications simply stop, on the devices that restart most often,
+      with nothing anywhere saying so.
+    -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -51,6 +59,16 @@
                 android:value="Draws a movable overlay showing live Brawl Stars map picks while the game is in the foreground." />
         </service>
 
+
+        <!--
+          The rotation check. `BIND_JOB_SERVICE` is what lets the system, and
+          only the system, start it — without it JobScheduler refuses the job
+          at schedule time rather than at run time, which at least fails loudly.
+        -->
+        <service
+            android:name=".RotationJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!--
           A Quick Settings tile that toggles the bubble from the notification
