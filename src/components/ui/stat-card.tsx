@@ -16,6 +16,12 @@ interface StatCardProps {
   tone?: string;
 }
 
+/*
+ * No `card-glow`. A stat tile is the smallest unit on a page and these appear
+ * in rows of five; a 48px hero shadow on each made a row of reference figures
+ * the heaviest thing on screen, on three pages at once. See globals.css --
+ * one headline panel per page, and it is never the one there are five of.
+ */
 export function StatCard({
   icon: Icon,
   node,
@@ -25,7 +31,7 @@ export function StatCard({
   tone = 'text-brand',
 }: StatCardProps) {
   return (
-    <div className="card card-glow flex items-center gap-3 p-4">
+    <div className="card flex items-center gap-3 p-4">
       <span
         className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${tone}`}
       >

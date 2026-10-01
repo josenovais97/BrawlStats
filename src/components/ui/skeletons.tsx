@@ -6,7 +6,7 @@ export function Skeleton({ className = '' }: { className?: string }) {
 
 export function ProfileHeaderSkeleton() {
   return (
-    <div className="card card-glow p-6">
+    <div className="card p-6">
       <div className="flex flex-wrap items-center gap-5">
         <Skeleton className="size-20 rounded-2xl" />
         <div className="flex-1 space-y-3">
