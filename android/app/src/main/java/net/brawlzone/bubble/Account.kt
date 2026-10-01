@@ -22,6 +22,7 @@ object Account {
     private const val KEY_ROSTER = "roster"
     private const val KEY_ALERTS = "alerts"
     private const val KEY_SEEN = "seen_revision"
+    private const val KEY_SEEN_MAPS = "seen_maps"
 
     /** Matches `OwnedFilter` in src/lib/bubble-account.ts. */
     const val FILTER_ALL = "all"
@@ -57,8 +58,31 @@ object Account {
     fun seenRevision(context: Context): String =
         prefs(context).getString(KEY_SEEN, "").orEmpty()
 
-    fun setSeenRevision(context: Context, revision: String) {
-        prefs(context).edit().putString(KEY_SEEN, revision).apply()
+    /**
+     * The maps that were live last time, so the next check can say which ones
+     * are *new*.
+     *
+     * The revision alone is not enough. Around twenty-six Ranked maps are live
+     * at once and they do not all turn over together, so a revision that moved
+     * means "something changed", not "all of this is new" — and a notification
+     * headed "new maps" listing four that have been there a fortnight is a
+     * notification people switch off.
+     *
+     * Empty is its own case and is handled at the call site: on a first run
+     * everything looks new, and announcing all twenty-six is the worst possible
+     * introduction to a feature somebody just enabled.
+     */
+    fun seenMaps(context: Context): Set<String> =
+        prefs(context).getString(KEY_SEEN_MAPS, "").orEmpty()
+            .split('\n')
+            .filter { it.isNotEmpty() }
+            .toSet()
+
+    fun setSeen(context: Context, revision: String, maps: Set<String>) {
+        prefs(context).edit()
+            .putString(KEY_SEEN, revision)
+            .putString(KEY_SEEN_MAPS, maps.joinToString("\n"))
+            .apply()
     }
 
     /**

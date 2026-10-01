@@ -88,11 +88,29 @@ class RotationJob : android.app.job.JobService() {
         }
 
         /**
+         * Read the rotation once, now, without announcing it.
+         *
+         * `check` deliberately says nothing when it has no previous map set to
+         * diff against, so without this the first periodic run would only
+         * record the baseline and the *second* real change — days away — would
+         * be the first one anybody heard about. Seeding on the way in makes
+         * the next change the first one.
+         */
+        fun seed(context: Context) {
+            Executors.newSingleThreadExecutor().execute {
+                runCatching { check(context) }
+            }
+        }
+
+        /**
          * One poll, one comparison, and usually nothing at all.
          *
-         * The revision covers the set of live maps and not their picks, so this
-         * stays quiet through the several times a day the numbers underneath it
-         * move. "The rotation changed" is the event; the request is not.
+         * `revision` is the early-out: it covers the set of live maps and not
+         * their picks, so this stays quiet through the several times a day the
+         * numbers underneath move. The diff below is what makes the
+         * notification true — around twenty-six Ranked maps are live at once
+         * and they do not rotate together, so "the revision moved" means
+         * something changed, not that all of it is new.
          */
         fun check(context: Context) {
             if (!Account.alerts(context)) return
@@ -102,11 +120,29 @@ class RotationJob : android.app.job.JobService() {
             if (revision.isEmpty() || revision == Account.seenRevision(context)) return
 
             val maps = json.getJSONArray("maps")
-            val lines = ArrayList<String>()
+            val seen = Account.seenMaps(context)
+            val live = LinkedHashMap<String, JSONObject>()
             for (i in 0 until maps.length()) {
-                if (lines.size >= MAX_LINES) break
                 val map = maps.getJSONObject(i)
-                val picks = map.getJSONArray("picks")
+                live["${map.getString("mode")}/${map.getString("map")}"] = map
+            }
+
+            /*
+             * Recorded before anything is drawn, and whether or not there was
+             * anything to say. A rotation this account has nothing to play must
+             * not stay "new" forever and be re-examined on every single run.
+             */
+            Account.setSeen(context, revision, live.keys)
+
+            // Nothing to compare against yet. Everything looks new on a first
+            // run, and announcing twenty-six maps is the worst possible
+            // introduction to a feature somebody has just switched on.
+            if (seen.isEmpty()) return
+
+            val lines = ArrayList<String>()
+            for ((key, map) in live) {
+                if (key in seen) continue
+                if (lines.size >= MAX_LINES) break
 
                 /*
                  * The best pick this account can actually take, which is the
@@ -115,6 +151,7 @@ class RotationJob : android.app.job.JobService() {
                  * list it exists to personalise, so a map with no answer for
                  * this roster is left out instead.
                  */
+                val picks = map.getJSONArray("picks")
                 var mine: String? = null
                 for (p in 0 until picks.length()) {
                     val pick = picks.getJSONObject(p)
@@ -128,14 +165,7 @@ class RotationJob : android.app.job.JobService() {
                 }
             }
 
-            /*
-             * The revision is recorded whether or not anything was worth
-             * saying. Otherwise a rotation this account has nothing to play
-             * stays "new" forever, and every single run would re-examine it.
-             */
-            Account.setSeenRevision(context, revision)
             if (lines.isEmpty()) return
-
             notify(context, lines)
         }
 

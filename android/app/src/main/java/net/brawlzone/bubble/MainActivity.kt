@@ -371,6 +371,9 @@ class MainActivity : AppCompatActivity() {
              * is the kind of thing people uninstall an app over.
              */
             RotationJob.sync(this)
+            // Take the baseline straight away, so the next rotation is the
+            // first one announced rather than the one after it.
+            if (on) RotationJob.seed(this)
             paintAlerts()
         }
         paintAlerts()
