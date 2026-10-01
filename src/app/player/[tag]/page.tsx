@@ -361,6 +361,18 @@ export default async function PlayerPage({ params }: PageProps) {
           </Suspense>
         </div>
 
+        {/*
+          How the account is actually doing lately, which belongs on the tab
+          somebody lands on rather than two tabs away under the battle log.
+          It is also what keeps Overview from being thin: the readiness
+          verdict below renders nothing on an account with nothing left to
+          upgrade, and on those profiles this tab was two panels and a lot of
+          floor.
+        */}
+        <Suspense fallback={<InsightsSkeleton />}>
+          <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+        </Suspense>
+
         {/* Full width underneath, because it is a per-mode readout that wants
             the room and is the conclusion the two above lead to. */}
         {plan ? (
@@ -446,10 +458,6 @@ export default async function PlayerPage({ params }: PageProps) {
           label: 'Battles',
           content: (
             <ProfileGroup title="Battles" subtitle="What the last few days of games actually say, and the games themselves.">
-        <Suspense fallback={<InsightsSkeleton />}>
-          <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
-        </Suspense>
-
         {/* Above the log rather than below it: this is the same subject read one
             level up, and the reader should meet the conclusion before scrolling
             twenty-five rows of evidence. */}
