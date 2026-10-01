@@ -164,17 +164,6 @@ class MainActivity : AppCompatActivity() {
         tintDot(if (granted) getColor(R.color.victory) else getColor(R.color.muted))
 
         restricted.visibility = if (!granted && asked) View.VISIBLE else View.GONE
-
-        /*
-         * Repairs the rotation schedule on every open.
-         *
-         * `setPersisted` covers a reboot but not a force-stop, which cancels
-         * every job the app has and tells nobody. Rescheduling an identical job
-         * is free -- JobScheduler replaces the one with the same id -- so doing
-         * it here costs nothing and closes the one gap that would otherwise
-         * look exactly like the feature quietly not working.
-         */
-        RotationJob.sync(this)
     }
 
     /** The dot is a shared drawable, so it is mutated rather than restyled. */
@@ -345,39 +334,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val alerts = findViewById<Switch>(R.id.alerts)
-        val alertsNote = findViewById<TextView>(R.id.alerts_note)
-        alerts.isChecked = Account.alerts(this)
-
-        fun paintAlerts() {
-            /*
-             * Says what it will actually do, which depends on something two
-             * cards above it. Without a tag there is no roster, so there is no
-             * "your best pick" to name -- and a switch promising one would be
-             * lying about the only thing that makes this worth turning on.
-             */
-            alertsNote.text = if (Account.tag(this).isEmpty()) {
-                "Add your player tag above first — without it there is no roster to pick from"
-            } else {
-                "One notification when the Ranked rotation turns over, naming your best pick on each new map"
-            }
-        }
-
-        alerts.setOnCheckedChangeListener { _, on ->
-            Account.setAlerts(this, on)
-            /*
-             * The schedule follows the switch immediately rather than at the
-             * next app open. A job that keeps running after it was turned off
-             * is the kind of thing people uninstall an app over.
-             */
-            RotationJob.sync(this)
-            // Take the baseline straight away, so the next rotation is the
-            // first one announced rather than the one after it.
-            if (on) RotationJob.seed(this)
-            paintAlerts()
-        }
-        paintAlerts()
-
         fun paintFilter() {
             for ((value, id, label) in tiles) {
                 val active = value == filter
@@ -417,20 +373,12 @@ class MainActivity : AppCompatActivity() {
                     if (bitmap != null) icon.setImageBitmap(bitmap)
                 }
             }
-            /*
-             * The snapshot the rotation check reads. Taken here because this is
-             * the one moment the roster is already in hand -- a background job
-             * fetching a player on a timer, on every install, is exactly the
-             * cost this feature is designed not to have.
-             */
-            Account.saveRoster(this, result.roster)
             loadPlan(result.tag)
         }
 
         fun persist() {
             val raw = tag.text.toString()
             Account.save(this, raw, filter, hide.isChecked)
-            paintAlerts()
 
             when {
                 raw.isBlank() -> {
