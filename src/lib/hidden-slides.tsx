@@ -273,9 +273,25 @@ type Step = 'cover' | 'radar' | 'sleepers' | 'overrated' | 'gems' | 'traps' | 'm
  */
 /* ----------------------------------------------------------------- radar -- */
 
-/** The plot, inside `Frame`'s padding. */
+/**
+ * The plot, inside `Frame`'s padding.
+ *
+ * Taller than it is wide because the canvas is 9:16 and the first render left
+ * roughly three hundred pixels of nothing between the plot and the footer.
+ * Height is the dimension this format has spare, and spending it on the chart
+ * is what makes a face readable at arm's length.
+ */
 const RADAR_W = 796;
-const RADAR_H = 820;
+const RADAR_H = 980;
+
+/**
+ * Space kept clear inside each corner for its title.
+ *
+ * Larger than the site's 30px because everything here is scaled up: at 34 the
+ * out-of-favour cluster still printed over its own label, since the strip has
+ * to clear the *radius* of the portrait nearest it, not just its centre.
+ */
+const RADAR_LABEL_STRIP = 62;
 
 const CELL_INK: Record<RadarCell, string> = {
   sleeper: '#35d07f',
@@ -332,13 +348,13 @@ function radar(
   const boundsFor = (cell: RadarCell) => {
     switch (cell) {
       case 'sleeper':
-        return { x0: 0, y0: 34, x1: xLow, y1: yStrong };
+        return { x0: 0, y0: RADAR_LABEL_STRIP, x1: xLow, y1: yStrong };
       case 'meta':
-        return { x0: xHigh, y0: 34, x1: RADAR_W, y1: yStrong };
+        return { x0: xHigh, y0: RADAR_LABEL_STRIP, x1: RADAR_W, y1: yStrong };
       case 'dead':
-        return { x0: 0, y0: yWeak, x1: xLow, y1: RADAR_H - 34 };
+        return { x0: 0, y0: yWeak, x1: xLow, y1: RADAR_H - RADAR_LABEL_STRIP };
       case 'overrated':
-        return { x0: xHigh, y0: yWeak, x1: RADAR_W, y1: RADAR_H - 34 };
+        return { x0: xHigh, y0: yWeak, x1: RADAR_W, y1: RADAR_H - RADAR_LABEL_STRIP };
       default:
         return null;
     }
@@ -407,6 +423,21 @@ function radar(
     />
   );
 
+  const rule = (left: number, top: number, width: number, height: number): ReactElement => (
+    <div
+      key={`rule-${left}-${top}`}
+      style={{
+        display: 'flex',
+        position: 'absolute',
+        left,
+        top,
+        width,
+        height,
+        background: 'rgba(255,255,255,0.28)',
+      }}
+    />
+  );
+
   const corner = (
     left: number,
     top: number,
@@ -460,14 +491,18 @@ function radar(
         {band(0, yWeak, xLow, RADAR_H - yWeak, DIM)}
         {band(xHigh, yWeak, RADAR_W - xHigh, RADAR_H - yWeak, '#ff5c72')}
 
-        {/* The cuts. Solid hairlines: Satori does not draw a dashed border. */}
-        {[xLow, xHigh].map((v) => band(v, 0, 2, RADAR_H, '#ffffff'))}
-        {[yStrong, yWeak].map((v) => band(0, v, RADAR_W, 2, '#ffffff'))}
+        {/*
+          The cuts. Solid hairlines, because Satori will not draw a dashed
+          border — and drawn through `rule` rather than `band` because the
+          bands carry 10% opacity, which on a 2px line is invisible on a phone.
+        */}
+        {[xLow, xHigh].map((v) => rule(v, 0, 2, RADAR_H))}
+        {[yStrong, yWeak].map((v) => rule(0, v, RADAR_W, 2))}
 
         {corner(14, 10, 'Sleepers', '#35d07f', 'flex-start')}
         {corner(RADAR_W - 314, 10, 'Meta', BRAND, 'flex-end')}
-        {corner(14, RADAR_H - 40, 'Out of favour', DIM, 'flex-start')}
-        {corner(RADAR_W - 314, RADAR_H - 40, 'Overrated', '#ff5c72', 'flex-end')}
+        {corner(14, RADAR_H - 44, 'Out of favour', DIM, 'flex-start')}
+        {corner(RADAR_W - 314, RADAR_H - 44, 'Overrated', '#ff5c72', 'flex-end')}
 
         {placed.map(({ p, cell, face, r, cx, cy }) => (
           <div
