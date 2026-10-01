@@ -6,6 +6,7 @@ import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 
 import { ClubInsights } from '@/components/club/club-insights';
+import { ClubPower } from '@/components/club/club-power';
 import { ClubMembers } from '@/components/club/club-members';
 import { ErrorState } from '@/components/ui/error-state';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
@@ -152,6 +153,8 @@ export default async function ClubPage({ params }: PageProps) {
       </section>
 
       <ClubInsights club={club} />
+
+      <ClubPower tag={normalizeTag(club.tag)} name={club.name} />
 
       <section>
         <SectionHeading title="Members" aside={`${members.length} of 30`} />

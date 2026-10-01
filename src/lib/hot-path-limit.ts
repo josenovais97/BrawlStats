@@ -90,7 +90,24 @@ export const ALLOWANCES: Record<string, Allowance> = {
   '/player/': { perSecond: 4, burst: 30 },
 
   /* 0.82s, and roughly one request every five minutes. */
-  '/club/': { perSecond: 2, burst: 15 },
+  '/club/': { perSecond: 1, burst: 10 },
+
+  /*
+   * The club scan, and the only route here whose cost is not this box's.
+   *
+   * One request fetches up to thirty player profiles upstream, so a request
+   * count understates it by thirty — at this allowance a single client can
+   * still ask the game API for thirty accounts a second, against the ~4.5/s
+   * the sampler itself sustains. It is as low as a prefix can go and the real
+   * defence is the twelve-hour cache behind it: a club asked for twice is one
+   * scan, and only distinct clubs cost anything.
+   *
+   * The 1/s came off `/club/` rather than out of the ceiling. That prefix is
+   * measured at roughly one request every five minutes, so it had the room,
+   * and the ceiling exists precisely so that a new expensive route has to take
+   * budget from somewhere instead of adding to the total.
+   */
+  '/club/scan/': { perSecond: 1, burst: 3 },
 
   /* No measured demand; moderate cost. */
   '/compare/players/': { perSecond: 1, burst: 10 },
@@ -175,6 +192,12 @@ export const SUSPECT_ALLOWANCE: Allowance = { perSecond: 1, burst: 10 };
 
 export const LIMITED_PREFIXES = [
   '/player/',
+  /*
+   * Before `/club/`, because `limitedPrefix` takes the first match and the
+   * scan is the dearer of the two by a factor of thirty. A more specific
+   * prefix listed after a broader one is budgeted as the broader one, silently.
+   */
+  '/club/scan/',
   '/club/',
   '/draft/',
   '/compare/players/',
