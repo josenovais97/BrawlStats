@@ -12,6 +12,7 @@ import {
   cellOf,
   deoverlap,
   isNamed,
+  middleRadius,
   portraitRadius,
   radarScales,
   radiusFor,
@@ -115,12 +116,23 @@ export function MetaRadar({
 
     const prepared = points.map((p) => {
       const cell = cellOf(p, cuts);
-      const named = isNamed(cell) && p.imageUrl !== null;
+      const named = isNamed(cell);
+      /*
+       * Everybody gets a face. `named` now sets emphasis rather than
+       * eligibility: a corner portrait is larger, ringed in its cell's colour,
+       * given room by the de-overlap pass, and painted last.
+       */
+      const face = p.imageUrl !== null;
       return {
         point: p,
         cell,
         named,
-        r: named ? portraitRadius(p.sampleSize, maxSample) : radiusFor(p.sampleSize, maxSample),
+        face,
+        r: !face
+          ? radiusFor(p.sampleSize, maxSample)
+          : named
+            ? portraitRadius(p.sampleSize, maxSample)
+            : middleRadius(p.sampleSize, maxSample),
       };
     });
 
@@ -133,7 +145,7 @@ export function MetaRadar({
     const nudged = new Map(
       deoverlap(
         prepared
-          .filter((p) => p.named)
+          .filter((p) => p.named && p.face)
           .map((p) => ({
             id: p.point.brawlerId,
             x: x(p.point.usageRate ?? 0),
@@ -168,7 +180,13 @@ export function MetaRadar({
          * small ones. Drawn the other way round, a 5,000-battle bubble sits on
          * top of every floor-sample point near it and they become untappable.
          */
-        .sort((a, b) => b.r - a.r),
+        /*
+         * The middle first and the corners last, then biggest to smallest
+         * within each. Showing all eighty-five means they overlap, so paint
+         * order is the only thing deciding which brawler survives a collision
+         * -- and it should be the ones the chart is making a claim about.
+         */
+        .sort((a, b) => Number(a.named) - Number(b.named) || b.r - a.r),
     };
   }, [points, cuts]);
 
@@ -315,7 +333,7 @@ export function MetaRadar({
           {/* One clip per named brawler, so each portrait is round. */}
           <defs>
             {layout.placed
-              .filter((p) => p.named)
+              .filter((p) => p.face)
               .map(({ point, cx, cy, r }) => (
                 <clipPath key={point.brawlerId} id={`radar-${point.brawlerId}`}>
                   <circle cx={cx} cy={cy} r={r} />
@@ -323,7 +341,7 @@ export function MetaRadar({
               ))}
           </defs>
 
-          {layout.placed.map(({ point, cell, named, r, cx, cy }) => {
+          {layout.placed.map(({ point, cell, named, face, r, cx, cy }) => {
             const selected = point.brawlerId === openId;
             const rr = selected ? r + 3 : r;
 
@@ -338,7 +356,7 @@ export function MetaRadar({
                   cy={cy}
                   r={rr}
                   fill={CELL_FILL[cell]}
-                  fillOpacity={named ? 1 : 0.5}
+                  fillOpacity={face ? 1 : 0.5}
                   stroke={selected ? 'var(--foreground)' : CELL_FILL[cell]}
                   strokeWidth={selected ? 2.5 : named ? 2 : 1}
                 />
@@ -348,7 +366,7 @@ export function MetaRadar({
                   cropped short of its own ring and leave a crescent gap.
                   Selection grows the ring outward and leaves the art put.
                 */}
-                {named && point.imageUrl ? (
+                {face && point.imageUrl ? (
                   <image
                     href={point.imageUrl}
                     x={cx - r}
@@ -357,6 +375,9 @@ export function MetaRadar({
                     height={r * 2}
                     preserveAspectRatio="xMidYMid slice"
                     clipPath={`url(#radar-${point.brawlerId})`}
+                    // Dimmed in the middle, so eighty-five faces still have a
+                    // foreground and a background.
+                    opacity={named ? 1 : 0.72}
                   />
                 ) : null}
                 <title>{`${titleCaseLabel(point.brawlerName)} — ${formatPercent(point.winRate ?? 0)} win rate, ${formatPercent(point.usageRate ?? 0)} picked`}</title>

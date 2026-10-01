@@ -144,21 +144,35 @@ export function radiusFor(sampleSize: number, max: number, min = 4, span = 9): n
 }
 
 /**
- * Whether this point sits in a labelled corner, and so gets a face.
+ * Whether this point sits in a labelled corner.
  *
- * Every named cell, and only the named cells. The first cut left `dead` out on
- * the grounds that "out of favour" is the least interesting of the four
- * answers -- which was a judgement about the content applied to the *rendering*,
- * and it showed: a quadrant with a title and not one face in it reads as
- * broken rather than as uninteresting.
+ * Every point carries a face now, so this no longer decides *whether* a
+ * brawler is drawn as itself -- it decides emphasis: the corners get the
+ * larger portrait, the coloured ring, the space reserved by the de-overlap
+ * pass, and the top of the paint order.
  *
- * The rule is now the obvious one. If the chart has put a label on a region, a
- * reader is entitled to see who is in it. The unnamed middle, where no claim is
- * being made, stays as dots -- measured live that is 51 of 85, which is the
- * majority and exactly the set whose identities do not matter.
+ * It went through two wrong answers first, both worth keeping written down.
+ * The first left `dead` out because "out of favour" is the least interesting
+ * of the four lists, which was a judgement about content applied to rendering
+ * -- a labelled quadrant with no faces in it reads as broken, not as dull. The
+ * second kept the unnamed middle as plain dots on the grounds that nobody
+ * needs to identify them. Also wrong: a reader scanning for one brawler does
+ * not know in advance which cell it is in, and a chart that can answer "where
+ * am I" for 34 of 85 cannot answer it at all.
  */
 export function isNamed(cell: RadarCell): boolean {
   return cell !== 'middle';
+}
+
+/**
+ * Radius for a point in the unnamed middle.
+ *
+ * Smaller than a corner portrait and drawn under it, so the hierarchy survives
+ * showing everybody: these are recognisable when looked for without competing
+ * with the brawlers the chart is actually making a claim about.
+ */
+export function middleRadius(sampleSize: number, max: number): number {
+  return radiusFor(sampleSize, max, 9, 5);
 }
 
 /**
