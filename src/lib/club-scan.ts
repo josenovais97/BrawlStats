@@ -57,6 +57,17 @@ export interface MemberStanding {
 }
 
 export interface ClubScan {
+  /**
+   * The median member, which is the figure that leads.
+   *
+   * The union below reads better and says less: measured on a full
+   * twenty-nine-member club, *both* union figures came back at 100% because
+   * somebody in a group that size holds everything. A headline that is 100% for
+   * every club with a full roster is a constant, not a measurement. The median
+   * member moved from 86% to 0% across the same club.
+   */
+  medianCoverage: number;
+  medianHyperCoverage: number;
   /** Top-tier brawlers at least one member can field, 0-1. */
   coverage: number;
   /** The same, counting only brawlers somebody holds hypercharged at power 11. */
@@ -178,7 +189,22 @@ export function clubScan({
   const gaps = topIds.filter((id) => holders.get(id)!.length === 0);
   const hyperGaps = topIds.filter((id) => hyperHolders.get(id)!.length === 0);
 
+  /*
+   * Median rather than mean. One maxed account in an otherwise ordinary club
+   * drags an average up by several points and describes nobody; the middle
+   * member is a real person somebody can picture.
+   */
+  const median = (pick: (m: MemberStanding) => number) => {
+    const values = standings.map(pick).sort((a, b) => a - b);
+    const mid = Math.floor(values.length / 2);
+    return values.length % 2 === 0
+      ? (values[mid - 1] + values[mid]) / 2
+      : values[mid];
+  };
+
   return {
+    medianCoverage: median((m) => m.coverage),
+    medianHyperCoverage: median((m) => m.hyperCoverage),
     coverage: (topIds.length - gaps.length) / topIds.length,
     hyperCoverage: (topIds.length - hyperGaps.length) / topIds.length,
     topTierSize: topIds.length,

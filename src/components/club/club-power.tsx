@@ -95,30 +95,37 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
     <div className="space-y-4">
       <div className="card card-glow p-5">
         {/*
-          Two numbers, because one of them saturates. Any serious account owns
-          the handful of brawlers in S and A at power nine, so a strong club
-          reads 100% and the figure stops being a measurement. Hypercharges
+          The median member leads, and the union is a footnote underneath it.
+          Measured on a full twenty-nine-member club, both union figures came
+          back at 100% — in a group that size somebody holds everything — so a
+          headline built on them would read 100% for every club with a full
+          roster. The median member of that same club ran from 86% to 0%.
+
+          Hypercharged is the brighter of the two for the same reason: any
+          serious account owns the S and A tier at power nine, but hypercharges
           come out of drops rather than coins, so no amount of play guarantees
-          them — that is the one that still separates two good clubs.
+          them.
         */}
         <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
           <div>
-            <p className="text-3xl font-black tabular-nums text-brand sm:text-4xl">
-              {pct(scan.coverage)}
-            </p>
-            <p className="text-xs text-muted">can field</p>
-          </div>
-          <div>
             <p className="text-3xl font-black tabular-nums text-accent sm:text-4xl">
-              {pct(scan.hyperCoverage)}
+              {pct(scan.medianHyperCoverage)}
             </p>
             <p className="text-xs text-muted">hypercharged</p>
+          </div>
+          <div>
+            <p className="text-3xl font-black tabular-nums text-brand sm:text-4xl">
+              {pct(scan.medianCoverage)}
+            </p>
+            <p className="text-xs text-muted">can field</p>
           </div>
         </div>
 
         <p className="mt-3 text-sm text-muted">
-          of the {scan.topTierSize} brawlers in the current Ranked S and A tier,{' '}
-          {name} can put on the field between them.
+          of the {scan.topTierSize} brawlers in the current Ranked S and A tier, for the
+          typical member of {name}. Between all {scan.members.length} of them:{' '}
+          <span className="text-foreground">{pct(scan.coverage)}</span> fieldable,{' '}
+          <span className="text-foreground">{pct(scan.hyperCoverage)}</span> hypercharged.
           {scan.missed > 0 ? (
             <>
               {' '}

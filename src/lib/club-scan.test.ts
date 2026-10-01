@@ -119,3 +119,41 @@ test('no top tier is our gap, not a verdict of 0% on the club', () => {
     null,
   );
 });
+
+test('the headline is the median member, because the union is a constant', () => {
+  // Measured on a real twenty-nine-member club: both union figures came back
+  // at 100%, because somebody in a group that size holds everything. The
+  // median member of the same club ran from 86% down to 0%.
+  const out = scan([
+    member('A', 'Ana', 10, [[1, 11, true], [2, 11, true], [3, 11, true], [4, 11, true]]),
+    member('B', 'Ben', 10, [[1, 11, true], [2, 11, true]]),
+    member('C', 'Cal', 10, [[3, 9]]),
+  ])!;
+  assert.equal(out.coverage, 1, 'between them they hold everything');
+  assert.equal(out.hyperCoverage, 1);
+  assert.equal(out.medianHyperCoverage, 0.5, 'the middle member, not the best one');
+  assert.equal(out.medianCoverage, 0.5);
+});
+
+test('an even number of members averages the middle two', () => {
+  const out = scan([
+    member('A', 'Ana', 10, [[1, 11, true], [2, 11, true], [3, 11, true], [4, 11, true]]),
+    member('B', 'Ben', 10, [[1, 11, true], [2, 11, true]]),
+    member('C', 'Cal', 10, [[1, 11, true]]),
+    member('D', 'Dee', 10, [[9, 11]]),
+  ])!;
+  // Sorted: 0, 0.25, 0.5, 1 -> the middle two are 0.25 and 0.5.
+  assert.equal(out.medianHyperCoverage, 0.375);
+});
+
+test('one maxed account does not describe the club it is carrying', () => {
+  const out = scan([
+    member('GOD', 'God', 10, [[1, 11, true], [2, 11, true], [3, 11, true], [4, 11, true]]),
+    member('B', 'Ben', 10, []),
+    member('C', 'Cal', 10, []),
+    member('D', 'Dee', 10, []),
+    member('E', 'Eve', 10, []),
+  ])!;
+  assert.equal(out.medianHyperCoverage, 0, 'the median is unmoved by the outlier');
+  assert.equal(out.hyperCoverage, 1, 'while the union is entirely that one account');
+});
