@@ -63,6 +63,45 @@ PY
 
 now_iso () { date -u +%Y-%m-%dT%H:%M:%S+00:00; }
 
+# A read that is worth attempting more than once, into $REPLY_BODY.
+#
+# One network blink used to be one missed post. On 2026-09-30 the token refresh
+# came back as an EMPTY BODY IN UNDER A SECOND -- not a timeout, a connection
+# that never opened -- and the build carousel died there and missed the day.
+# The posts three hours either side refreshed the same token without trouble,
+# so nothing was wrong with the credentials or the state file; there was simply
+# no second attempt.
+#
+# Retries transport failures and 5xx only. A 4xx is the far end answering the
+# question, and asking again does not change the answer -- it only delays the
+# error that says what to fix.
+#
+# **Only for calls that are safe to repeat.** Every caller here is a read. The
+# publish init deliberately does not use this: a request that creates a draft
+# and whose reply is lost cannot be retried without risking two, against a
+# quota of five pending uploads a day.
+try_read () { # label, then curl arguments
+  local label="$1"; shift
+  local attempt rc reply http
+  for attempt in 1 2 3; do
+    reply=$(curl -s -w '\n%{http_code}' "$@")
+    rc=$?
+    # curl writes the status as the last line, and nothing at all when it could
+    # not complete the request -- which leaves both of these empty.
+    http=$(printf '%s' "$reply" | tail -n1)
+    REPLY_BODY=$(printf '%s' "$reply" | sed '$d')
+
+    if [ "$rc" -eq 0 ] && [ -n "$REPLY_BODY" ] && [ "${http:-500}" -lt 500 ]; then
+      return 0
+    fi
+
+    echo "${label}: attempt ${attempt} did not complete (curl rc=${rc} http=${http:-none})" >&2
+    REPLY_BODY=""
+    [ "$attempt" -lt 3 ] && sleep $((attempt * 5))
+  done
+  return 1
+}
+
 [ -f "$ENV_FILE" ] || die "::error::no $ENV_FILE"
 CLIENT_KEY=$(grep -oP '^TIKTOK_CLIENT_KEY=\K.*' "$ENV_FILE" | tr -d '"')
 CLIENT_SECRET=$(grep -oP '^TIKTOK_CLIENT_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
@@ -80,16 +119,24 @@ REFRESH=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("re
 # before anything else happens: a post that fails is a day missed, but a
 # rotated token that was never saved locks the integration out until somebody
 # authorises by hand.
-token_json=$(curl -s --max-time 30 -X POST "$TOKEN_URL" \
+#
+# Safe to repeat, which is the part worth being sure about since this token
+# rotates on use: rotation happens on *success*, so a request that never landed
+# leaves the stored token valid and the retry is simply the first real attempt.
+# A request that did land and whose reply was lost has already spent the token,
+# and no number of retries recovers that -- there the retry neither helps nor
+# harms.
+try_read "token refresh" --max-time 30 -X POST "$TOKEN_URL" \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   --data-urlencode "client_key=${CLIENT_KEY}" \
   --data-urlencode "client_secret=${CLIENT_SECRET}" \
   --data-urlencode "grant_type=refresh_token" \
-  --data-urlencode "refresh_token=${REFRESH}")
+  --data-urlencode "refresh_token=${REFRESH}"
+token_json="$REPLY_BODY"
 
 ACCESS=$(printf '%s' "$token_json" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("access_token",""))' 2>/dev/null)
 if [ -z "$ACCESS" ]; then
-  die "::error::token refresh failed: $(printf '%s' "$token_json" | head -c 300)"
+  die "::error::token refresh failed: $(printf '%s' "${token_json:-no reply from ${TOKEN_URL} after 3 attempts}" | head -c 300)"
 fi
 
 # The JSON travels in argv, not on stdin: `python3 -` reads its PROGRAM from
@@ -145,7 +192,8 @@ record_state "last_run.${MODE}" "$(now_iso)" || true
 # it here would be a second implementation that drifts the first time either
 # carousel changes shape. The caption comes down the same way, for the same
 # reason -- it is made of the same numbers the slides draw.
-manifest_json=$(curl -s --max-time 120 "$MANIFEST")
+try_read "manifest" --max-time 120 "$MANIFEST"
+manifest_json="$REPLY_BODY"
 
 # An empty slide list is a valid answer, not a failure: the build rotation
 # skips brawlers whose split is too thin to post, and a day can legitimately
