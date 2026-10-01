@@ -1,10 +1,18 @@
 /**
  * Anchor navigation for a profile.
  *
- * A full profile runs to a dozen sections and about four screens on a phone,
+ * A full profile runs to eighteen sections and about six screens on a phone,
  * and the thing a returning visitor wants is usually the battle log at the
  * bottom. Plain anchor links, sticky under the header: no client JavaScript,
- * no scroll listener, and every entry is a real link that works before hydration.
+ * no scroll listener, and every entry is a real link that works before
+ * hydration.
+ *
+ * **Every group is listed, and that is the fix rather than a detail.** This bar
+ * used to offer four anchors — Stats, Progress, Brawlers, Battles — while ten
+ * of the page's sections sat outside all four, including the verdict, the
+ * upgrade plan and the ranked standing. The most useful parts of the page were
+ * unreachable from the only means it had of moving around, and the bar implied
+ * they did not exist.
  *
  * `top-16` rather than `top-0`, and that is the whole point of the bar. The
  * site header is also `sticky top-0` and sits on `z-40`; at `top-0` this one
@@ -16,8 +24,9 @@
  * jumped-to heading lands below this one rather than behind it.
  */
 const SECTIONS: { id: string; label: string }[] = [
-  { id: 'stats', label: 'Stats' },
-  { id: 'progress', label: 'Progress' },
+  { id: 'overview', label: 'Overview' },
+  { id: 'next', label: 'Do next' },
+  { id: 'account', label: 'Account' },
   { id: 'brawlers', label: 'Brawlers' },
   { id: 'battles', label: 'Battles' },
 ];

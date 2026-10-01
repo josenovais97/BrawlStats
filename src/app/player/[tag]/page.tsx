@@ -24,6 +24,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { PlayerProgression } from '@/components/player/player-progression';
+import { ProfileGroup } from '@/components/player/profile-group';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
 import { RosterRecorder } from '@/components/player/roster-recorder';
 import { PlayerInsights } from '@/components/player/player-insights';
@@ -312,47 +313,114 @@ export default async function PlayerPage({ params }: PageProps) {
       />
       <PlayerNav />
 
-      {/*
-       * Ordered by the questions a visitor actually arrives with.
-       *
-       * The header answers "who is this". These two answer "how strong is the
-       * account" and "where do they stand", which is what someone opening a
-       * profile wants before anything else, and both used to sit below a grid
-       * of lifetime counters. On a phone that meant scrolling past most of a
-       * screen of readouts to reach the only two numbers that are judgements.
-       *
-       * The counters are not demoted for being uninteresting, they are
-       * demoted for being reference: you look them up, you do not open a
-       * profile to find them.
-       */}
-      <PlayerSkillScore skill={skill} />
-
-      {/* The same plan the "What to upgrade next" section renders, read for
-          its per-mode readiness instead of its price. One computation, two
-          presentations -- a second pass over the rotation would eventually
-          disagree with the first and both would look right. */}
-      {plan ? (
-        <PlayerVerdict
-          plan={plan}
-          usable={player.brawlers.filter((b) => b.power >= 9).length}
-          total={player.brawlers.length}
-        />
-      ) : null}
-
-      <Suspense
-        fallback={
-          <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
-        }
+      <ProfileGroup
+        id="overview"
+        index={1}
+        title="Overview"
+        subtitle="How strong this account is and where it stands, before any of the detail."
       >
-        <RankedWithBoard
-          player={player}
-          standing={standing}
-          rankedStanding={rankedStanding}
-          tag={normalizedTag}
-        />
-      </Suspense>
+        {/*
+         * Ordered by the questions a visitor actually arrives with.
+         *
+         * The header answers "who is this". These answer "how strong is the
+         * account" and "where do they stand", which is what someone opening a
+         * profile wants before anything else, and both used to sit below a
+         * grid of lifetime counters. On a phone that meant scrolling past most
+         * of a screen of readouts to reach the only two numbers that are
+         * judgements.
+         *
+         * The counters are not demoted for being uninteresting, they are
+         * demoted for being reference: you look them up, you do not open a
+         * profile to find them.
+         */}
+        <PlayerSkillScore skill={skill} />
 
-      <div id="stats" className="scroll-anchor-nav space-y-8">
+        {/* The same plan the "What to upgrade next" section renders, read for
+            its per-mode readiness instead of its price. One computation, two
+            presentations -- a second pass over the rotation would eventually
+            disagree with the first and both would look right. */}
+        {plan ? (
+          <PlayerVerdict
+            plan={plan}
+            usable={player.brawlers.filter((b) => b.power >= 9).length}
+            total={player.brawlers.length}
+          />
+        ) : null}
+
+        <Suspense
+          fallback={
+            <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
+          }
+        >
+          <RankedWithBoard
+            player={player}
+            standing={standing}
+            rankedStanding={rankedStanding}
+            tag={normalizedTag}
+          />
+        </Suspense>
+      </ProfileGroup>
+
+      {/*
+        Everything that tells the reader to go and do something, in one place
+        and before the reference material.
+
+        These five were spread across the page between the facts they are drawn
+        from, each argued into position relative to its neighbour. Individually
+        every one of those arguments held; together they meant a reader who came
+        to be told what to do had to read a trophy history to find out.
+
+        Within the group the order is by how soon it expires: the rotation is
+        about the next couple of hours, a patch is about the next fortnight, and
+        an upgrade plan is true until the coins are spent.
+      */}
+      <ProfileGroup
+        id="next"
+        index={2}
+        title="What to do next"
+        subtitle="The things on this page that are worth acting on, soonest first."
+      >
+        <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
+
+        {/* After the rotation, because it narrows the same question to the maps
+            that are actually queueable right now. */}
+        <PlayerRankedPicks
+          brawlers={player.brawlers}
+          picksByMode={picksByMode}
+          modes={rotationModes}
+          brawlerMeta={brawlerMeta}
+          modeMeta={modeMeta}
+        />
+
+        {impact && notes?.publishedAt ? (
+          <PlayerPatchImpact
+            impact={impact}
+            patch={{ title: notes.title, url: notes.url, date: notes.publishedAt }}
+            brawlerMeta={brawlerMeta}
+          />
+        ) : null}
+
+        {plan ? <PlayerRosterPlan plan={plan} brawlerMeta={brawlerMeta} /> : null}
+
+        {/* Beside the upgrade plan rather than after Progression, which is
+            where it used to sit. Both of these say "spend your coins here" and
+            they are the only two sections that do; the coins figure that used
+            to justify the old placement is one group away, while the plan it
+            belongs beside was three. Renders nothing on a maxed account rather
+            than carrying an empty prompt. */}
+        <PlayerUpgradeGap
+          brawlers={player.brawlers}
+          brawlerMeta={brawlerMeta}
+          coinsPerLevel={coinsToMaxFrom}
+        />
+      </ProfileGroup>
+
+      <ProfileGroup
+        id="account"
+        index={3}
+        title="The account"
+        subtitle="Lifetime totals, records and how the trophies got here. Reference rather than news."
+      >
         <PlayerStats player={player} />
         <PlayerRecords player={player} />
         {/* Only ever populated for the couple of hundred players holding a
@@ -362,87 +430,25 @@ export default async function PlayerPage({ params }: PageProps) {
           placements={placements}
           iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
         />
-      </div>
-      <div id="progress" className="scroll-anchor-nav space-y-8">
         <PlayerProgress points={trophyHistory} />
         <PlayerProgression progression={progression} playtime={playtime} />
+      </ProfileGroup>
 
-        {/* Immediately after Progression, because it is the same subject read
-            the other way round: Progression says how much of the account is
-            finished and what finishing the rest costs, this names the specific
-            brawlers worth finishing first. It used to sit near the top of the
-            page, half a screen of its own, where nothing around it explained
-            what the coins were for. Renders nothing on a maxed account rather
-            than carrying an empty prompt. */}
-        <PlayerUpgradeGap
+      <ProfileGroup
+        id="brawlers"
+        index={4}
+        title="Brawlers"
+        subtitle={`${player.brawlers.length} unlocked, read against the current tier list.`}
+      >
+        {/* Before the grid rather than three groups away from it. This is the
+            roster judged against the meta and the grid is the roster itself,
+            so the reading and the thing being read now sit together. */}
+        <PlayerMetaFit
           brawlers={player.brawlers}
-          brawlerMeta={brawlerMeta}
-          coinsPerLevel={coinsToMaxFrom}
-        />
-      </div>
-
-      {/* Above the roster reads below it because it is the only section that
-          expires. Those describe the account and are true all week; this one is
-          about the next couple of hours, and burying it under them would be
-          filing the answer behind the background. */}
-      <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
-
-      {impact && notes?.publishedAt ? (
-        <PlayerPatchImpact
-          impact={impact}
-          patch={{ title: notes.title, url: notes.url, date: notes.publishedAt }}
+          meta={metaIndex}
           brawlerMeta={brawlerMeta}
         />
-      ) : null}
 
-      {/* Directly above the roster reads: those describe the account, this
-          says what to do about it, and the spend is the more useful half. */}
-      {plan ? <PlayerRosterPlan plan={plan} brawlerMeta={brawlerMeta} /> : null}
-
-      <PlayerMetaFit
-        brawlers={player.brawlers}
-        meta={metaIndex}
-        brawlerMeta={brawlerMeta}
-      />
-
-      {/* After the roster-vs-meta read, because this narrows the same question
-          to the maps that are actually queueable right now. */}
-      <PlayerRankedPicks
-        brawlers={player.brawlers}
-        picksByMode={picksByMode}
-        modes={rotationModes}
-        brawlerMeta={brawlerMeta}
-        modeMeta={modeMeta}
-      />
-
-      <Suspense fallback={<InsightsSkeleton />}>
-        <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
-      </Suspense>
-
-      {/* Above the log rather than below it: this is the same subject read one
-          level up, and the reader should meet the conclusion before scrolling
-          twenty-five rows of evidence. */}
-      <Suspense fallback={null}>
-        <BattleAutopsySection
-          tag={tag}
-          player={player}
-          brawlerMeta={brawlerMeta}
-          modeMeta={modeMeta}
-        />
-      </Suspense>
-
-      <section id="battles" className="scroll-anchor-nav">
-        <SectionHeading title="Recent battles" />
-        <Suspense fallback={<BattleLogSkeleton />}>
-          <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
-        </Suspense>
-      </section>
-
-      <section id="brawlers" className="scroll-anchor-nav">
-        <SectionHeading
-          title="Brawlers"
-          aside={`${player.brawlers.length} unlocked`}
-        />
         <PlayerBrawlers
           brawlers={player.brawlers}
           meta={Object.fromEntries(
@@ -460,7 +466,37 @@ export default async function PlayerPage({ params }: PageProps) {
             ]),
           )}
         />
-      </section>
+      </ProfileGroup>
+
+      <ProfileGroup
+        id="battles"
+        index={5}
+        title="Battles"
+        subtitle="What the last few days of games actually say, and the games themselves."
+      >
+        <Suspense fallback={<InsightsSkeleton />}>
+          <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+        </Suspense>
+
+        {/* Above the log rather than below it: this is the same subject read one
+            level up, and the reader should meet the conclusion before scrolling
+            twenty-five rows of evidence. */}
+        <Suspense fallback={null}>
+          <BattleAutopsySection
+            tag={tag}
+            player={player}
+            brawlerMeta={brawlerMeta}
+            modeMeta={modeMeta}
+          />
+        </Suspense>
+
+        <section>
+          <SectionHeading title="Recent battles" />
+          <Suspense fallback={<BattleLogSkeleton />}>
+            <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+          </Suspense>
+        </section>
+      </ProfileGroup>
     </div>
   );
 }
