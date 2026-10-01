@@ -2,7 +2,7 @@ import { CalendarDays, TrendingUp } from 'lucide-react';
 
 import { TrophyGainIcon } from '@/components/game-icons';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { StatCard } from '@/components/ui/stat-card';
 import { formatNumber } from '@/lib/format';
 import type { TrophyPoint } from '@/lib/stats';
@@ -50,12 +50,10 @@ export function PlayerProgress({
   if (week === null && month === null && overall === 0) return null;
 
   return (
-    <section>
-      <SectionHeading
-        title="Recent progress"
-        subtitle="From the trophy points recorded on each profile view."
-      />
-
+    <Panel
+      title="Recent progress"
+      subtitle="From the trophy points recorded on each profile view."
+    >
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {week ? (
           <StatCard
@@ -109,7 +107,7 @@ export function PlayerProgress({
           days someone checked rather than every day played.
         </span>
       </p>
-    </section>
+    </Panel>
   );
 }
 

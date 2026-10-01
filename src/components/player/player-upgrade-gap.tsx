@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { HyperchargeIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
@@ -62,13 +62,11 @@ export function PlayerUpgradeGap({
   const rest = stranded.slice(SHOWN);
 
   return (
-    <section>
-      <SectionHeading
-        title="Upgraded but not maxed"
-        aside={`${stranded.length} ${stranded.length === 1 ? 'brawler' : 'brawlers'}`}
-      />
-
-      <div className="card p-4">
+    <Panel
+      title="Upgraded but not maxed"
+      aside={`${stranded.length} ${stranded.length === 1 ? 'brawler' : 'brawlers'}`}
+    >
+      <div>
         <p className="text-sm leading-relaxed text-muted">
           {stranded.length === 1 ? 'One brawler carries' : `${stranded.length} carry`} a hypercharge
           or buffie below power {MAX_POWER_LEVEL}.
@@ -108,7 +106,7 @@ export function PlayerUpgradeGap({
           close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.
         </Disclosure>
       </div>
-    </section>
+    </Panel>
   );
 }
 

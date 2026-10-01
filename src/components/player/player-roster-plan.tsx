@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { CoinIcon } from '@/components/game-icons';
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCase } from '@/lib/format';
 import type { RosterPlan } from '@/lib/roster-optimizer';
@@ -32,13 +32,13 @@ export function PlayerRosterPlan({
   const gained = coveredAfter - coveredBefore;
 
   return (
-    <section id="upgrade-next" className="scroll-anchor-nav space-y-3">
-      <SectionHeading
-        title="What to upgrade next"
-        subtitle="The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns."
-      />
-
-      <div className="card relative overflow-hidden">
+    <Panel
+      id="upgrade-next"
+      title="What to upgrade next"
+      subtitle="The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns."
+      bodyClassName=""
+    >
+      <div className="relative scroll-anchor-nav">
         <span className="block h-1 w-full bg-brand" />
 
         <div className="space-y-4 p-5">
@@ -129,6 +129,6 @@ export function PlayerRosterPlan({
           </p>
         </div>
       </div>
-    </section>
+    </Panel>
   );
 }

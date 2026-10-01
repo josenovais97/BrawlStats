@@ -3,7 +3,7 @@ import { AlertTriangle, TrendingUp } from 'lucide-react';
 import { Power11Icon } from '@/components/game-icons';
 import Link from 'next/link';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import type { AccountFlag, SkillScore } from '@/lib/skill-score';
 
 /**
@@ -47,10 +47,8 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
   const FlagIcon = flag ? FLAG_STYLE[flag.kind].icon : null;
 
   return (
-    <section>
-      <SectionHeading title="Skill score" aside="How the account plays" />
-
-      <div className="card p-5 sm:p-6">
+    <Panel title="Skill score" aside="How the account plays">
+      <div className="flex h-full flex-col">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-center sm:gap-1">
             <span
@@ -110,7 +108,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
           </p>
         ) : null}
 
-        <p className="mt-4 text-xs leading-relaxed text-muted">
+        <p className="mt-auto pt-4 text-xs leading-relaxed text-muted">
           Weighted toward{' '}
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
             Ranked
@@ -127,6 +125,6 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
             : ''}
         </p>
       </div>
-    </section>
+    </Panel>
   );
 }

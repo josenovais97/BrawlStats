@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { titleCase } from '@/lib/format';
 import type { PatchImpact } from '@/lib/patch-impact';
@@ -42,25 +42,24 @@ export function PlayerPatchImpact({
   const { rows, buffed, nerfed, changedTotal } = impact;
 
   return (
-    <section className="space-y-3">
-      <SectionHeading
-        title="What the update did to you"
-        subtitle={`Brawlers you own that the ${patchDay(patch.date)} update changed, and how they have actually moved since${
-          buffed + nerfed > 0 ? ` — ${buffed} up, ${nerfed} down` : ''
-        }.`}
-        aside={
-          <a
-            href={patch.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-semibold text-brand transition-colors hover:underline"
-          >
-            Patch notes
-          </a>
-        }
-      />
-
-      <ul className="card divide-y divide-border overflow-hidden">
+    <Panel
+      title="What the update did to you"
+      subtitle={`Brawlers you own that the ${patchDay(patch.date)} update changed, and how they have actually moved since${
+        buffed + nerfed > 0 ? ` — ${buffed} up, ${nerfed} down` : ''
+      }.`}
+      aside={
+        <a
+          href={patch.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-semibold text-brand transition-colors hover:underline"
+        >
+          Patch notes
+        </a>
+      }
+      bodyClassName=""
+    >
+      <ul className="divide-y divide-border/70">
         {rows.map((row) => (
           <li key={row.brawlerId}>
             <Link
@@ -117,6 +116,6 @@ export function PlayerPatchImpact({
         rather than the cohort. A brawler appears once there are a few days of snapshots behind
         it — a two-day sample swings further than any balance change does.
       </p>
-    </section>
+    </Panel>
   );
 }

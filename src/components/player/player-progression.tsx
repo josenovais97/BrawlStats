@@ -13,7 +13,7 @@ import {
   StarPowerIcon,
 } from '@/components/game-icons';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { OwnershipStat, PlaytimeEstimate, ProgressionSummary } from '@/lib/progression';
 
@@ -74,17 +74,15 @@ export function PlayerProgression({ progression, playtime }: Props) {
   ];
 
   return (
-    <section>
-      <SectionHeading
-        title="Progression"
-        aside={
-          progression.totalsUnavailable
-            ? 'Totals unavailable right now'
-            : `${formatPercent(progression.completion)} of everything unlocked`
-        }
-      />
-
-      <div className="card p-5">
+    <Panel
+      title="Progression"
+      aside={
+        progression.totalsUnavailable
+          ? 'Totals unavailable right now'
+          : `${formatPercent(progression.completion)} of everything unlocked`
+      }
+    >
+      <div>
         {/* Headline completion bar. */}
         <div className="mb-6">
           <div className="mb-2 flex items-baseline justify-between gap-3">
@@ -168,7 +166,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
           </p>
         ) : null}
       </div>
-    </section>
+    </Panel>
   );
 }
 

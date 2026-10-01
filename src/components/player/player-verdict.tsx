@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import type { ModeReadiness, RosterPlan } from '@/lib/roster-optimizer';
 
 /**
@@ -57,13 +57,12 @@ export function PlayerVerdict({
         : 'Every ranked mode is covered, with a pick spare';
 
   return (
-    <section className="space-y-3">
-      <SectionHeading
-        title="Your account, in short"
-        subtitle="Read from the live Ranked rotation and the brawlers you have at power 9 or above."
-      />
-
-      <div className="card relative overflow-hidden">
+    <Panel
+      title="Your account, in short"
+      subtitle="Read from the live Ranked rotation and the brawlers you have at power 9 or above."
+      bodyClassName=""
+    >
+      <div className="relative">
         <span
           className={`block h-1 w-full ${
             worst.length > 0 ? 'bg-rose-500' : gaps.length > 0 ? 'bg-amber-400' : 'bg-emerald-400'
@@ -127,6 +126,6 @@ export function PlayerVerdict({
           ) : null}
         </div>
       </div>
-    </section>
+    </Panel>
   );
 }

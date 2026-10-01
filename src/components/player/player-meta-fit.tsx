@@ -2,7 +2,7 @@ import { ArrowUpRight, TrendingDown } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
@@ -77,12 +77,10 @@ export function PlayerMetaFit({
   const iconFor = (id: number) => brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id);
 
   return (
-    <section>
-      <SectionHeading
-        title="Roster vs the meta"
-        aside={`${ownedTop.length}/${top.length} top-tier unlocked`}
-      />
-
+    <Panel
+      title="Roster vs the meta"
+      aside={`${ownedTop.length}/${top.length} top-tier unlocked`}
+    >
       <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
         This roster scored against the current{' '}
         <Link href="/tier-list/trophy" className="font-medium text-brand hover:underline">
@@ -140,7 +138,7 @@ export function PlayerMetaFit({
           ))}
         </Card>
       </div>
-    </section>
+    </Panel>
   );
 }
 

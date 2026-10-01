@@ -2,7 +2,7 @@ import { TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 
 import { CrownIcon, PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
@@ -46,9 +46,7 @@ export function PlayerRanked({
   if (!hasRanked && globalRank === null && !standing) return null;
 
   return (
-    <section>
-      <SectionHeading title="Ranking" />
-
+    <Panel title="Ranking" aside="Where the game puts them" bodyClassName="">
       {/*
         One panel of rows, not a grid of five small cards.
         
@@ -59,7 +57,7 @@ export function PlayerRanked({
         cleanly at one column, carry the tier artwork larger, and put the elo
         on the same line as the tier it belongs to.
       */}
-      <div className="card divide-y divide-border overflow-hidden">
+      <div className="divide-y divide-border/70">
         {hasRanked ? (
           <>
             <Cell
@@ -136,7 +134,7 @@ export function PlayerRanked({
           />
         ) : null}
       </div>
-    </section>
+    </Panel>
   );
 }
 

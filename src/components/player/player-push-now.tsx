@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { formatNumber, titleCase } from '@/lib/format';
 import type { PushOption } from '@/lib/push-now';
@@ -44,13 +44,12 @@ export function PlayerPushNow({
   const topModeArt = modeMeta.get(top.mode.toLowerCase())?.imageUrl;
 
   return (
-    <section className="space-y-3">
-      <SectionHeading
-        title="Push now"
-        subtitle="The best map in the live rotation for the brawlers this account already owns."
-      />
-
-      <div className="card relative overflow-hidden">
+    <Panel
+      title="Push now"
+      subtitle="The best map in the live rotation for the brawlers this account already owns."
+      bodyClassName=""
+    >
+      <div className="relative">
         <span className="block h-1 w-full bg-victory" />
         <span
           aria-hidden
@@ -196,7 +195,7 @@ export function PlayerPushNow({
           })}
         </ul>
       ) : null}
-    </section>
+    </Panel>
   );
 }
 

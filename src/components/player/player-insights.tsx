@@ -8,7 +8,7 @@ import {
   CrownIcon,
   PlayersIcon,
 } from '@/components/game-icons';
-import { SectionHeading } from '@/components/ui/section-heading';
+import { Panel } from '@/components/ui/panel';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
@@ -42,17 +42,15 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
   const perDay = insights.battles / insights.daysCovered;
 
   return (
-    <section>
-      <SectionHeading
-        title="Recent form"
-        aside={`Last ${insights.battles} battles${
-          insights.lastBattleAt ? ` · ${relativeTime(insights.lastBattleAt)}` : ''
-        }`}
-      />
-
+    <Panel
+      title="Recent form"
+      aside={`Last ${insights.battles} battles${
+        insights.lastBattleAt ? ` · ${relativeTime(insights.lastBattleAt)}` : ''
+      }`}
+    >
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Headline numbers */}
-        <div className="card p-5">
+        <div className="rounded-xl bg-surface-2/40 p-5">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-medium text-muted">Win rate</span>
             <span className="text-3xl font-black tabular-nums text-brand">
@@ -112,7 +110,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         </div>
 
         {/* Most played brawlers */}
-        <div className="card p-5 lg:col-span-2">
+        <div className="rounded-xl bg-surface-2/40 p-5 lg:col-span-2">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
             <BrawlersIcon className="size-4" />
             Most played
@@ -176,7 +174,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
           emptyLabel="No repeat opponents in this window."
         />
 
-        <div className="card p-5">
+        <div className="rounded-xl bg-surface-2/40 p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
             <Activity className="size-4 text-accent" />
             Activity
@@ -194,7 +192,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
           </dl>
         </div>
       </div>
-    </section>
+    </Panel>
   );
 }
 
@@ -219,7 +217,7 @@ function AssociationList({
   emptyLabel: string;
 }) {
   return (
-    <div className="card p-5">
+    <div className="rounded-xl bg-surface-2/40 p-5">
       <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
         <Icon className="size-4 text-accent" />
         {title}
