@@ -94,7 +94,7 @@ export function PlayerMetaFit({
         , which covers the 3v3 modes only.
       </p>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @3xl:grid-cols-3">
         <Card
           title="Strong, not finished"
           icon={ArrowUpRight}

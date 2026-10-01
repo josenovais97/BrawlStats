@@ -94,7 +94,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
           <Bar value={progression.completion} />
         </div>
 
-        <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+        <div className="grid gap-x-6 gap-y-4 @2xl:grid-cols-2">
           {rows.map(({ node, label, stat, tone }) => (
             <div key={label}>
               <div className="mb-1.5 flex items-center gap-2 text-sm">
@@ -124,7 +124,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
           ))}
         </div>
 
-        <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-6 grid gap-3 border-t border-border pt-5 @sm:grid-cols-2 @3xl:grid-cols-5">
           <Investment
             node={<CoinIcon className="size-5" />}
             label="Coins invested"

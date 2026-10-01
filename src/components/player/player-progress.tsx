@@ -54,7 +54,7 @@ export function PlayerProgress({
       title="Recent progress"
       subtitle="From the trophy points recorded on each profile view."
     >
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-3">
         {week ? (
           <StatCard
             icon={TrendingUp}

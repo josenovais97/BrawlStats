@@ -388,14 +388,19 @@ export default async function PlayerPage({ params }: PageProps) {
           placements={placements}
           iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
         />
-        {/* The curve and what it adds up to, together. One is where the
-            trophies came from and the other is how finished the account is;
-            side by side they are a single answer about progress rather than
-            two more full-width blocks in a column of them. */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <PlayerProgress points={trophyHistory} />
-          <PlayerProgression progression={progression} playtime={playtime} />
-        </div>
+        {/*
+          Not paired, and the attempt is worth recording. These two were set
+          side by side on the theory that both are about progress -- but one is
+          three figures and a caveat and the other is eight bars, five
+          investment tiles and a note. `h-full` duly stretched the short one to
+          match the tall one and left half a panel of nothing, which looked far
+          worse than the stacking it was meant to fix.
+          
+          Two panels only belong in a row when they carry comparable weight.
+          Skill score and Ranking do; these do not.
+        */}
+        <PlayerProgress points={trophyHistory} />
+        <PlayerProgression progression={progression} playtime={playtime} />
       </ProfileGroup>
 
       {/*

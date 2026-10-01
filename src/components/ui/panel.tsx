@@ -64,7 +64,17 @@ export function Panel({
         ) : null}
       </header>
 
-      <div className={`flex-1 ${bodyClassName}`}>{children}</div>
+      {/*
+        A container, so a panel's contents lay themselves out against the
+        column they landed in rather than the window. Two panels side by side
+        are each about half the width of the page while the viewport is still
+        reporting `lg`, and every grid inside them that used `lg:grid-cols-5`
+        duly drew five columns into half the room: the progression panel ended
+        up with five tiles reading "COI... 1,... Esti...". Container queries
+        (`@md:`, `@3xl:`) are the only breakpoints that mean anything once a
+        component can be placed in either a full-width slot or half of one.
+      */}
+      <div className={`@container flex-1 ${bodyClassName}`}>{children}</div>
     </section>
   );
 }

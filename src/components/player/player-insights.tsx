@@ -48,7 +48,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         insights.lastBattleAt ? ` · ${relativeTime(insights.lastBattleAt)}` : ''
       }`}
     >
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @3xl:grid-cols-3">
         {/* Headline numbers */}
         <div className="rounded-xl bg-surface-2/40 p-5">
           <div className="flex items-baseline justify-between">
@@ -116,7 +116,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
             Most played
           </h3>
 
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid gap-3 @xl:grid-cols-2">
             {topBrawlers.map((brawler) => {
               const meta = brawlerMeta.get(brawler.brawlerId);
               return (
@@ -160,7 +160,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid gap-4 @3xl:grid-cols-3">
         <AssociationList
           title="Played with"
           icon={PlayersIcon}
