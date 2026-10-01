@@ -9,6 +9,7 @@ import { formatNumber, formatPercent } from '@/lib/format';
 import { type HiddenPick, type MapEdgePick, getHiddenMeta } from '@/lib/hidden-meta';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import { titleCaseLabel } from '@/lib/format';
+import { MetaRadar } from '@/components/meta/meta-radar';
 
 /**
  * The four questions the tier list does not answer.
@@ -124,7 +125,7 @@ export default async function HiddenMetaPage() {
     );
   }
 
-  const { sleepers, overrated, gems, traps, cuts, rated, windowDays } = data;
+  const { sleepers, overrated, gems, traps, points, cuts, rated, windowDays } = data;
 
   return (
     <div className="space-y-8">
@@ -139,6 +140,18 @@ export default async function HiddenMetaPage() {
         title="The hidden meta"
         subtitle={`Who is everyone sleeping on. Read from ${rated} brawlers with enough ranked battles to judge, over the last ${windowDays} days.`}
       />
+
+      {/*
+        The chart before the lists, because it is the same four answers and it
+        shows what they were selected out of. A row cannot say whether a
+        sleeper cleared the cut by a hair or by a mile; a point can, and the
+        bubble size says how much evidence is behind it.
+
+        Its quadrant lines are `cuts`, the very percentiles the sections below
+        quote in their own subtitles, so the picture and the lists cannot drift
+        apart.
+      */}
+      <MetaRadar points={points} cuts={cuts} windowDays={windowDays} />
 
       <Section
         title="Sleeper picks"

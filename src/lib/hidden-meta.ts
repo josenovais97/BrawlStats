@@ -100,6 +100,15 @@ export interface HiddenMeta {
   gems: MapEdgePick[];
   /** Fine overall, poor on a map that is in rotation right now. */
   traps: MapEdgePick[];
+  /**
+   * Every rated brawler, for the radar.
+   *
+   * The four lists above are six rows each, selected out of this. Shipping the
+   * whole set is what lets the chart show the distribution they were chosen
+   * from -- a sleeper three battles from the cut and one in a class of its own
+   * are the same row in a list, and visibly different points on a plot.
+   */
+  points: HiddenPick[];
   /** What the percentiles resolved to today, so the page can show its working. */
   cuts: { lowUsage: number; highUsage: number; strong: number; weak: number };
   rated: number;
@@ -211,5 +220,14 @@ export async function getHiddenMeta(windowDays = 7): Promise<HiddenMeta | null> 
     [...edges].sort((a, b) => a.edge - b.edge).filter((e) => e.edge <= -MIN_EDGE),
   );
 
-  return { sleepers, overrated, gems, traps, cuts, rated: rated.length, windowDays };
+  return {
+    sleepers,
+    overrated,
+    gems,
+    traps,
+    points: rated.map(dress),
+    cuts,
+    rated: rated.length,
+    windowDays,
+  };
 }
