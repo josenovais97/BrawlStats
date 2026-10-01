@@ -49,7 +49,17 @@ export function PlayerRanked({
     <section>
       <SectionHeading title="Ranking" />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/*
+        One panel of rows, not a grid of five small cards.
+        
+        Each of these was its own bordered box with an icon tile, which at four
+        across read as five unrelated facts rather than one standing — and in
+        the two-column layout this now sits in, a four-column grid of cards
+        inside a half-width column is unreadable at any size. Rows divide
+        cleanly at one column, carry the tier artwork larger, and put the elo
+        on the same line as the tier it belongs to.
+      */}
+      <div className="card divide-y divide-border overflow-hidden">
         {hasRanked ? (
           <>
             <Cell
@@ -161,28 +171,34 @@ function Cell({
   gameIcon?: React.ReactNode;
 }) {
   return (
-    <div className="card flex items-center gap-3 p-4">
-      <span className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${tone}`}>
+    <div className="flex items-center gap-3.5 px-4 py-3.5 sm:px-5">
+      <span
+        className={`grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 ${tone}`}
+      >
         {badgeUrl ? (
           <Image
             src={badgeUrl}
             alt=""
-            width={32}
-            height={32}
-            className="size-8 object-contain"
+            width={36}
+            height={36}
+            className="size-9 object-contain"
             unoptimized
           />
         ) : (
           (gameIcon ?? (Icon ? <Icon className="size-5" /> : null))
         )}
       </span>
-      <div className="min-w-0">
-        <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[11px] font-medium uppercase tracking-wide text-muted">
           {label}
         </p>
-        <p className="truncate text-lg font-bold">{titleCaseLabel(value)}</p>
-        {hint ? <p className="truncate text-xs text-muted">{hint}</p> : null}
+        <p className="truncate text-base font-bold leading-tight">{titleCaseLabel(value)}</p>
       </div>
+      {/* The elo sits on the row it belongs to rather than under the tier, so
+          the column of numbers can be read down on its own. */}
+      {hint ? (
+        <p className="shrink-0 text-right text-xs tabular-nums text-muted">{hint}</p>
+      ) : null}
     </div>
   );
 }

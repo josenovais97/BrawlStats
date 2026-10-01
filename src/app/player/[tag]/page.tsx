@@ -320,25 +320,39 @@ export default async function PlayerPage({ params }: PageProps) {
         subtitle="How strong this account is and where it stands, before any of the detail."
       >
         {/*
-         * Ordered by the questions a visitor actually arrives with.
+         * Ordered by the questions a visitor actually arrives with, and set
+         * side by side because these two answer the same one from opposite
+         * ends: the skill score is what this site makes of the account, the
+         * ranking is what the game does. Reading them together is the point.
          *
-         * The header answers "who is this". These answer "how strong is the
-         * account" and "where do they stand", which is what someone opening a
-         * profile wants before anything else, and both used to sit below a
-         * grid of lifetime counters. On a phone that meant scrolling past most
-         * of a screen of readouts to reach the only two numbers that are
-         * judgements.
-         *
-         * The counters are not demoted for being uninteresting, they are
-         * demoted for being reference: you look them up, you do not open a
-         * profile to find them.
+         * They used to be stacked full-width, which on a laptop put them two
+         * screens apart with a column of empty margin either side of each --
+         * and both sat below a grid of lifetime counters, so a phone had to
+         * scroll past most of a screen of readouts to reach the only two
+         * numbers on the page that are judgements. Those counters are not
+         * demoted for being uninteresting; they are demoted for being
+         * reference, the sort of thing you look up rather than open a profile
+         * to find.
          */}
-        <PlayerSkillScore skill={skill} />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PlayerSkillScore skill={skill} />
 
-        {/* The same plan the "What to upgrade next" section renders, read for
-            its per-mode readiness instead of its price. One computation, two
-            presentations -- a second pass over the rotation would eventually
-            disagree with the first and both would look right. */}
+          <Suspense
+            fallback={
+              <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
+            }
+          >
+            <RankedWithBoard
+              player={player}
+              standing={standing}
+              rankedStanding={rankedStanding}
+              tag={normalizedTag}
+            />
+          </Suspense>
+        </div>
+
+        {/* Full width underneath, because it is a per-mode readout that wants
+            the room and is the conclusion the two above lead to. */}
         {plan ? (
           <PlayerVerdict
             plan={plan}
@@ -346,19 +360,6 @@ export default async function PlayerPage({ params }: PageProps) {
             total={player.brawlers.length}
           />
         ) : null}
-
-        <Suspense
-          fallback={
-            <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
-          }
-        >
-          <RankedWithBoard
-            player={player}
-            standing={standing}
-            rankedStanding={rankedStanding}
-            tag={normalizedTag}
-          />
-        </Suspense>
       </ProfileGroup>
 
       <ProfileGroup
@@ -376,8 +377,14 @@ export default async function PlayerPage({ params }: PageProps) {
           placements={placements}
           iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
         />
-        <PlayerProgress points={trophyHistory} />
-        <PlayerProgression progression={progression} playtime={playtime} />
+        {/* The curve and what it adds up to, together. One is where the
+            trophies came from and the other is how finished the account is;
+            side by side they are a single answer about progress rather than
+            two more full-width blocks in a column of them. */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PlayerProgress points={trophyHistory} />
+          <PlayerProgression progression={progression} playtime={playtime} />
+        </div>
       </ProfileGroup>
 
       {/*
