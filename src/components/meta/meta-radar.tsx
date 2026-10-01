@@ -10,6 +10,8 @@ import {
   type RadarCuts,
   type RadarPoint,
   cellOf,
+  isNamed,
+  portraitRadius,
   radarScales,
   radiusFor,
 } from '@/lib/meta-radar';
@@ -76,11 +78,24 @@ export function MetaRadar({
       // Inverted: SVG y grows downward and a win rate does not.
       y: (score: number) => PAD.top + (1 - scales.y.at(score)) * plotH,
       placed: points
-        .map((p) => ({
-          point: p,
-          cell: cellOf(p, cuts),
-          r: radiusFor(p.sampleSize, maxSample),
-        }))
+        .map((p) => {
+          const cell = cellOf(p, cuts);
+          /*
+           * A face only where the page makes a claim. The middle of the pack
+           * and the out-of-favour corner stay as dots: 66 of the 85 are in
+           * those two, and portraits on all of them would bury the nineteen
+           * that are the whole point of the chart.
+           */
+          const named = isNamed(cell) && p.imageUrl !== null;
+          return {
+            point: p,
+            cell,
+            named,
+            r: named
+              ? portraitRadius(p.sampleSize, maxSample)
+              : radiusFor(p.sampleSize, maxSample),
+          };
+        })
         /*
          * Biggest first, so the heavily-sampled giants are painted under the
          * small ones. Drawn the other way round, a 5,000-battle bubble sits on
@@ -192,23 +207,61 @@ export function MetaRadar({
             How well it does →
           </text>
 
-          {layout.placed.map(({ point, cell, r }) => {
+          {/* One clip per named brawler, so each portrait is round. */}
+          <defs>
+            {layout.placed
+              .filter((p) => p.named)
+              .map(({ point, r }) => (
+                <clipPath key={point.brawlerId} id={`radar-${point.brawlerId}`}>
+                  <circle
+                    cx={layout.x(point.usageRate ?? 0)}
+                    cy={layout.y(point.metaScore)}
+                    r={r}
+                  />
+                </clipPath>
+              ))}
+          </defs>
+
+          {layout.placed.map(({ point, cell, named, r }) => {
             const selected = point.brawlerId === openId;
+            const cx = layout.x(point.usageRate ?? 0);
+            const cy = layout.y(point.metaScore);
+            const rr = selected ? r + 3 : r;
+
             return (
-              <circle
+              <g
                 key={point.brawlerId}
-                cx={layout.x(point.usageRate ?? 0)}
-                cy={layout.y(point.metaScore)}
-                r={selected ? r + 3 : r}
-                fill={CELL_FILL[cell]}
-                fillOpacity={cell === 'middle' ? 0.35 : 0.65}
-                stroke={selected ? 'var(--foreground)' : CELL_FILL[cell]}
-                strokeWidth={selected ? 2.5 : 1}
-                className="cursor-pointer transition-[r]"
+                className="cursor-pointer"
                 onClick={() => setOpenId(selected ? null : point.brawlerId)}
               >
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={rr}
+                  fill={CELL_FILL[cell]}
+                  fillOpacity={named ? 1 : cell === 'middle' ? 0.35 : 0.65}
+                  stroke={selected ? 'var(--foreground)' : CELL_FILL[cell]}
+                  strokeWidth={selected ? 2.5 : named ? 2 : 1}
+                />
+                {/*
+                  The portrait is drawn at `r`, never `rr`. The clip circle is
+                  sized at `r`, so a selected portrait drawn larger would be
+                  cropped short of its own ring and leave a crescent gap.
+                  Selection grows the ring outward and leaves the art put.
+                */}
+                {named && point.imageUrl ? (
+                  <image
+                    href={point.imageUrl}
+                    x={cx - r}
+                    y={cy - r}
+                    width={r * 2}
+                    height={r * 2}
+                    preserveAspectRatio="xMidYMid slice"
+                    clipPath={`url(#radar-${point.brawlerId})`}
+                  />
+                ) : null}
                 <title>{`${titleCaseLabel(point.brawlerName)} — ${formatPercent(point.winRate ?? 0)} win rate, ${formatPercent(point.usageRate ?? 0)} picked`}</title>
-              </circle>
+              </g>
             );
           })}
         </svg>

@@ -142,3 +142,29 @@ export function radiusFor(sampleSize: number, max: number, min = 4, span = 9): n
   if (max <= 0) return min;
   return min + span * Math.sqrt(Math.min(1, sampleSize / max));
 }
+
+/**
+ * Whether this point is one of the ones the page names, and so worth a face.
+ *
+ * Measured on the live roster: 51 of 85 brawlers sit in the middle, 15 are out
+ * of favour, and only 19 are in a corner the page makes a claim about. Drawing
+ * a portrait on all 85 would be unreadable -- the smallest bubbles are eight
+ * pixels across and a face at that size is a smudge -- and drawing one on the
+ * out-of-favour fifteen spends the chart's attention on its least interesting
+ * answer. Nineteen faces is the number that fits.
+ */
+export function isNamed(cell: RadarCell): boolean {
+  return cell === 'sleeper' || cell === 'overrated' || cell === 'meta';
+}
+
+/**
+ * Radius for a point that carries a portrait.
+ *
+ * Still scaled by sample, so a named brawler with five thousand battles is
+ * visibly a bigger claim than one at the floor -- but floored at a size a face
+ * survives. Without the floor the chart would be honest and illegible, which
+ * on a picture whose whole job is to be read at a glance is the wrong trade.
+ */
+export function portraitRadius(sampleSize: number, max: number): number {
+  return radiusFor(sampleSize, max, 13, 7);
+}
