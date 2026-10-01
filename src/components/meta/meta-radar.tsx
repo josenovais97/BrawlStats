@@ -10,6 +10,7 @@ import {
   type RadarCuts,
   type RadarPoint,
   cellOf,
+  deoverlap,
   isNamed,
   portraitRadius,
   radarScales,
@@ -33,7 +34,7 @@ import { brawlerPath } from '@/lib/slugs';
 /** The plot's own coordinate space; CSS scales it to the container. */
 const W = 760;
 const H = 520;
-const PAD = { top: 18, right: 18, bottom: 44, left: 56 };
+const PAD = { top: 18, right: 18, bottom: 58, left: 108 };
 
 const CELL_FILL: Record<RadarCell, string> = {
   sleeper: 'var(--victory)',
@@ -70,30 +71,83 @@ export function MetaRadar({
     const plotH = H - PAD.top - PAD.bottom;
     const maxSample = Math.max(...points.map((p) => p.sampleSize), 1);
 
+    const x = (usage: number) => PAD.left + scales.x.at(usage) * plotW;
+    // Inverted: SVG y grows downward and a win rate does not.
+    const y = (score: number) => PAD.top + (1 - scales.y.at(score)) * plotH;
+
+    const xLow = x(cuts.lowUsage);
+    const xHigh = x(cuts.highUsage);
+    const yStrong = y(cuts.strong);
+    const yWeak = y(cuts.weak);
+    const left = PAD.left;
+    const right = W - PAD.right;
+    const top = PAD.top;
+    const bottom = H - PAD.bottom;
+
+    /** The rectangle each named cell occupies, so a nudge cannot leave it. */
+    const boundsFor = (cell: ReturnType<typeof cellOf>) => {
+      switch (cell) {
+        case 'sleeper':
+          return { x0: left, y0: top, x1: xLow, y1: yStrong };
+        case 'meta':
+          return { x0: xHigh, y0: top, x1: right, y1: yStrong };
+        case 'dead':
+          return { x0: left, y0: yWeak, x1: xLow, y1: bottom };
+        case 'overrated':
+          return { x0: xHigh, y0: yWeak, x1: right, y1: bottom };
+        default:
+          return null;
+      }
+    };
+
+    const prepared = points.map((p) => {
+      const cell = cellOf(p, cuts);
+      const named = isNamed(cell) && p.imageUrl !== null;
+      return {
+        point: p,
+        cell,
+        named,
+        r: named ? portraitRadius(p.sampleSize, maxSample) : radiusFor(p.sampleSize, maxSample),
+      };
+    });
+
+    /*
+     * Only the faces are separated. The dots are background texture -- the
+     * middle of the pack, where no claim is being made and no identity is
+     * being read -- so moving them would spend the budget that keeps the
+     * named points honest on points nobody is looking at.
+     */
+    const nudged = new Map(
+      deoverlap(
+        prepared
+          .filter((p) => p.named)
+          .map((p) => ({
+            id: p.point.brawlerId,
+            x: x(p.point.usageRate ?? 0),
+            y: y(p.point.metaScore),
+            r: p.r,
+            bounds: boundsFor(p.cell),
+          })),
+      ).map((p) => [p.id, p]),
+    );
+
     return {
       scales,
       plotW,
       plotH,
-      x: (usage: number) => PAD.left + scales.x.at(usage) * plotW,
-      // Inverted: SVG y grows downward and a win rate does not.
-      y: (score: number) => PAD.top + (1 - scales.y.at(score)) * plotH,
-      placed: points
+      x,
+      y,
+      xLow,
+      xHigh,
+      yStrong,
+      yWeak,
+      placed: prepared
         .map((p) => {
-          const cell = cellOf(p, cuts);
-          /*
-           * A face only where the page makes a claim. The middle of the pack
-           * and the out-of-favour corner stay as dots: 66 of the 85 are in
-           * those two, and portraits on all of them would bury the nineteen
-           * that are the whole point of the chart.
-           */
-          const named = isNamed(cell) && p.imageUrl !== null;
+          const moved = nudged.get(p.point.brawlerId);
           return {
-            point: p,
-            cell,
-            named,
-            r: named
-              ? portraitRadius(p.sampleSize, maxSample)
-              : radiusFor(p.sampleSize, maxSample),
+            ...p,
+            cx: moved?.x ?? x(p.point.usageRate ?? 0),
+            cy: moved?.y ?? y(p.point.metaScore),
           };
         })
         /*
@@ -122,62 +176,96 @@ export function MetaRadar({
           <Corner
             x={PAD.left}
             y={PAD.top}
-            w={layout.x(cuts.lowUsage) - PAD.left}
-            h={layout.y(cuts.strong) - PAD.top}
+            w={layout.xLow - PAD.left}
+            h={layout.yStrong - PAD.top}
             fill="var(--victory)"
             label="Sleepers"
             anchor="start"
           />
           <Corner
-            x={layout.x(cuts.highUsage)}
+            x={layout.xHigh}
             y={PAD.top}
-            w={W - PAD.right - layout.x(cuts.highUsage)}
-            h={layout.y(cuts.strong) - PAD.top}
+            w={W - PAD.right - layout.xHigh}
+            h={layout.yStrong - PAD.top}
             fill="var(--brand)"
             label="Meta"
             anchor="end"
           />
           <Corner
             x={PAD.left}
-            y={layout.y(cuts.weak)}
-            w={layout.x(cuts.lowUsage) - PAD.left}
-            h={H - PAD.bottom - layout.y(cuts.weak)}
+            y={layout.yWeak}
+            w={layout.xLow - PAD.left}
+            h={H - PAD.bottom - layout.yWeak}
             fill="var(--muted)"
             label="Out of favour"
             anchor="start"
           />
           <Corner
-            x={layout.x(cuts.highUsage)}
-            y={layout.y(cuts.weak)}
-            w={W - PAD.right - layout.x(cuts.highUsage)}
-            h={H - PAD.bottom - layout.y(cuts.weak)}
+            x={layout.xHigh}
+            y={layout.yWeak}
+            w={W - PAD.right - layout.xHigh}
+            h={H - PAD.bottom - layout.yWeak}
             fill="var(--defeat)"
             label="Overrated"
             anchor="end"
           />
 
-          {/* The cuts themselves. */}
+          {/*
+            The cuts, each labelled with the pick rate it sits at.
+
+            Without a number on them these are four dashed lines a reader has
+            to take on faith. With one, the claim is checkable: "under 0.4%
+            picked" is the same sentence the sleepers list prints in its own
+            subtitle, and seeing it on the axis is what connects the two.
+
+            The vertical axis is deliberately *not* numbered. It plots the
+            shrunk, baseline-adjusted score the tier list ranks on, and
+            printing those values would invite them to be read as win rates,
+            which they are not. The win rate is on the card when a point is
+            tapped, where there is room to say which number it is.
+          */}
           {[cuts.lowUsage, cuts.highUsage].map((v) => (
-            <line
-              key={`x${v}`}
-              x1={layout.x(v)}
-              x2={layout.x(v)}
-              y1={PAD.top}
-              y2={H - PAD.bottom}
-              stroke="var(--border-strong)"
-              strokeDasharray="4 4"
-            />
+            <g key={`x${v}`}>
+              <line
+                x1={layout.x(v)}
+                x2={layout.x(v)}
+                y1={PAD.top}
+                y2={H - PAD.bottom}
+                stroke="var(--border-strong)"
+                strokeDasharray="4 4"
+              />
+              <text
+                x={layout.x(v)}
+                y={H - PAD.bottom + 18}
+                textAnchor="middle"
+                className="fill-[var(--muted)] text-[12px] tabular-nums"
+              >
+                {formatPercent(v)}
+              </text>
+            </g>
           ))}
-          {[cuts.weak, cuts.strong].map((v) => (
-            <line
-              key={`y${v}`}
-              x1={PAD.left}
-              x2={W - PAD.right}
-              y1={layout.y(v)}
-              y2={layout.y(v)}
-              stroke="var(--border-strong)"
-              strokeDasharray="4 4"
-            />
+          {[
+            { v: cuts.strong, label: 'strongest 30%' },
+            { v: cuts.weak, label: 'weakest 40%' },
+          ].map(({ v, label }) => (
+            <g key={`y${v}`}>
+              <line
+                x1={PAD.left}
+                x2={W - PAD.right}
+                y1={layout.y(v)}
+                y2={layout.y(v)}
+                stroke="var(--border-strong)"
+                strokeDasharray="4 4"
+              />
+              <text
+                x={PAD.left - 8}
+                y={layout.y(v) + 4}
+                textAnchor="end"
+                className="fill-[var(--muted)] text-[11px]"
+              >
+                {label}
+              </text>
+            </g>
           ))}
 
           {/* Frame and axis labels. */}
@@ -191,7 +279,7 @@ export function MetaRadar({
           />
           <text
             x={PAD.left + layout.plotW / 2}
-            y={H - 10}
+            y={H - 12}
             textAnchor="middle"
             className="fill-[var(--muted)] text-[13px]"
           >
@@ -199,7 +287,7 @@ export function MetaRadar({
           </text>
           <text
             x={-(PAD.top + layout.plotH / 2)}
-            y={14}
+            y={16}
             transform="rotate(-90)"
             textAnchor="middle"
             className="fill-[var(--muted)] text-[13px]"
@@ -211,21 +299,15 @@ export function MetaRadar({
           <defs>
             {layout.placed
               .filter((p) => p.named)
-              .map(({ point, r }) => (
+              .map(({ point, cx, cy, r }) => (
                 <clipPath key={point.brawlerId} id={`radar-${point.brawlerId}`}>
-                  <circle
-                    cx={layout.x(point.usageRate ?? 0)}
-                    cy={layout.y(point.metaScore)}
-                    r={r}
-                  />
+                  <circle cx={cx} cy={cy} r={r} />
                 </clipPath>
               ))}
           </defs>
 
-          {layout.placed.map(({ point, cell, named, r }) => {
+          {layout.placed.map(({ point, cell, named, r, cx, cy }) => {
             const selected = point.brawlerId === openId;
-            const cx = layout.x(point.usageRate ?? 0);
-            const cy = layout.y(point.metaScore);
             const rr = selected ? r + 3 : r;
 
             return (
@@ -239,7 +321,7 @@ export function MetaRadar({
                   cy={cy}
                   r={rr}
                   fill={CELL_FILL[cell]}
-                  fillOpacity={named ? 1 : cell === 'middle' ? 0.35 : 0.65}
+                  fillOpacity={named ? 1 : 0.5}
                   stroke={selected ? 'var(--foreground)' : CELL_FILL[cell]}
                   strokeWidth={selected ? 2.5 : named ? 2 : 1}
                 />

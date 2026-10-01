@@ -5,6 +5,7 @@ import {
   type RadarCuts,
   type RadarPoint,
   cellOf,
+  deoverlap,
   radarScales,
   radiusFor,
 } from '@/lib/meta-radar';
@@ -119,4 +120,75 @@ test('sample size reads as area, so a floor-sample point looks less certain', ()
   assert.ok(small >= 4, 'still large enough to tap');
   // Area, not radius: a 16x sample is 4x the radius above the floor.
   assert.ok(Math.abs(radiusFor(1250, 5000) - radiusFor(0, 5000) - 9 * 0.5) < 1e-9);
+});
+
+const CELL = { x0: 0, y0: 0, x1: 300, y1: 300 };
+
+test('overlapping portraits are pushed apart', () => {
+  const out = deoverlap([
+    { id: 1, x: 100, y: 100, r: 14, bounds: CELL },
+    { id: 2, x: 104, y: 101, r: 14, bounds: CELL },
+  ]);
+  const d = Math.hypot(out[0].x - out[1].x, out[0].y - out[1].y);
+  assert.ok(d >= 28, `still overlapping at ${d.toFixed(1)}px apart`);
+});
+
+test('a nudge never moves a point out of its own cell', () => {
+  // The constraint the whole thing rests on: position means membership, so a
+  // sleeper shoved across the cut line would make the chart contradict the
+  // list printed under it.
+  const tight = { x0: 0, y0: 0, x1: 60, y1: 60 };
+  const out = deoverlap(
+    Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      x: 30 + i * 0.5,
+      y: 30,
+      r: 13,
+      bounds: tight,
+    })),
+  );
+  for (const p of out) {
+    assert.ok(p.x >= tight.x0 && p.x <= tight.x1, `${p.id} escaped horizontally to ${p.x}`);
+    assert.ok(p.y >= tight.y0 && p.y <= tight.y1, `${p.id} escaped vertically to ${p.y}`);
+  }
+});
+
+test('exactly coincident points still separate', () => {
+  // Zero distance has no direction to push along; without a fallback the two
+  // stay welded together through every iteration.
+  const out = deoverlap([
+    { id: 1, x: 100, y: 100, r: 12, bounds: CELL },
+    { id: 2, x: 100, y: 100, r: 12, bounds: CELL },
+  ]);
+  assert.ok(Math.hypot(out[0].x - out[1].x, out[0].y - out[1].y) > 1);
+});
+
+test('an unsolvable corner terminates instead of hanging', () => {
+  // Five portraits that cannot fit in the space available. The real sleepers
+  // corner can be exactly this crowded, because low pick rate is what puts
+  // them there in the first place.
+  const pinhole = { x0: 0, y0: 0, x1: 28, y1: 28 };
+  const out = deoverlap(
+    Array.from({ length: 5 }, (_, i) => ({ id: i, x: 14, y: 14, r: 13, bounds: pinhole })),
+  );
+  assert.equal(out.length, 5);
+  for (const p of out) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y));
+});
+
+test('a point that overlaps nothing is left exactly where it was', () => {
+  const out = deoverlap([
+    { id: 1, x: 40, y: 40, r: 10, bounds: CELL },
+    { id: 2, x: 200, y: 200, r: 10, bounds: CELL },
+  ]);
+  assert.equal(out[0].x, 40);
+  assert.equal(out[0].y, 40);
+});
+
+test('the input is not mutated', () => {
+  const input = [
+    { id: 1, x: 100, y: 100, r: 14, bounds: CELL },
+    { id: 2, x: 102, y: 100, r: 14, bounds: CELL },
+  ];
+  deoverlap(input);
+  assert.equal(input[0].x, 100, 'callers re-render from this array');
 });

@@ -144,17 +144,21 @@ export function radiusFor(sampleSize: number, max: number, min = 4, span = 9): n
 }
 
 /**
- * Whether this point is one of the ones the page names, and so worth a face.
+ * Whether this point sits in a labelled corner, and so gets a face.
  *
- * Measured on the live roster: 51 of 85 brawlers sit in the middle, 15 are out
- * of favour, and only 19 are in a corner the page makes a claim about. Drawing
- * a portrait on all 85 would be unreadable -- the smallest bubbles are eight
- * pixels across and a face at that size is a smudge -- and drawing one on the
- * out-of-favour fifteen spends the chart's attention on its least interesting
- * answer. Nineteen faces is the number that fits.
+ * Every named cell, and only the named cells. The first cut left `dead` out on
+ * the grounds that "out of favour" is the least interesting of the four
+ * answers -- which was a judgement about the content applied to the *rendering*,
+ * and it showed: a quadrant with a title and not one face in it reads as
+ * broken rather than as uninteresting.
+ *
+ * The rule is now the obvious one. If the chart has put a label on a region, a
+ * reader is entitled to see who is in it. The unnamed middle, where no claim is
+ * being made, stays as dots -- measured live that is 51 of 85, which is the
+ * majority and exactly the set whose identities do not matter.
  */
 export function isNamed(cell: RadarCell): boolean {
-  return cell === 'sleeper' || cell === 'overrated' || cell === 'meta';
+  return cell !== 'middle';
 }
 
 /**
@@ -167,4 +171,82 @@ export function isNamed(cell: RadarCell): boolean {
  */
 export function portraitRadius(sampleSize: number, max: number): number {
   return radiusFor(sampleSize, max, 13, 7);
+}
+
+export interface Placeable {
+  id: number;
+  x: number;
+  y: number;
+  r: number;
+  /**
+   * The cell this point belongs to, in pixels. A nudge may not leave it.
+   *
+   * This is the constraint that makes moving points at all defensible. The
+   * whole claim of the chart is that position means membership, so a sleeper
+   * pushed a few pixels across the cut line is no longer in the corner the
+   * list under it says it is in — the picture would contradict the page to
+   * make itself prettier. Null means unconstrained.
+   */
+  bounds: { x0: number; y0: number; x1: number; y1: number } | null;
+}
+
+/**
+ * Nudge overlapping portraits apart, without letting any leave its cell.
+ *
+ * Measured on the live chart: the five sleepers landed within a few pixels of
+ * each other and drew as one unreadable pile — which is the single group this
+ * whole picture exists to show. Low pick rate is what makes a brawler a
+ * sleeper, so they are crowded against the left edge *by definition*; this is
+ * not bad luck on one day's data, it is the permanent shape of the corner.
+ *
+ * Plain pairwise repulsion, run to a fixed iteration count rather than to
+ * convergence. A crowded corner may be genuinely unsolvable — five circles
+ * will not fit in a space big enough for three — and a loop that ran until
+ * nothing overlapped would hang on exactly the day the chart is most
+ * interesting. Fixed work, best effort, always terminates.
+ */
+export function deoverlap(items: Placeable[], iterations = 80): Placeable[] {
+  const out = items.map((i) => ({ ...i }));
+
+  const clamp = (p: Placeable) => {
+    if (!p.bounds) return;
+    // Inset by the radius, so a point is never drawn half outside its cell.
+    p.x = Math.min(Math.max(p.x, p.bounds.x0 + p.r), Math.max(p.bounds.x0 + p.r, p.bounds.x1 - p.r));
+    p.y = Math.min(Math.max(p.y, p.bounds.y0 + p.r), Math.max(p.bounds.y0 + p.r, p.bounds.y1 - p.r));
+  };
+
+  for (let step = 0; step < iterations; step += 1) {
+    let moved = false;
+
+    for (let a = 0; a < out.length; a += 1) {
+      for (let b = a + 1; b < out.length; b += 1) {
+        const p = out[a];
+        const q = out[b];
+        const dx = q.x - p.x;
+        const dy = q.y - p.y;
+        /* A hair of padding, so touching circles still read as two. */
+        const want = p.r + q.r + 2;
+        const dist = Math.hypot(dx, dy);
+        if (dist >= want) continue;
+
+        moved = true;
+        // Exactly coincident points have no direction to separate along, so
+        // pick one. Without this they stay welded together forever.
+        const ux = dist === 0 ? 1 : dx / dist;
+        const uy = dist === 0 ? 0 : dy / dist;
+        const push = (want - dist) / 2;
+
+        p.x -= ux * push;
+        p.y -= uy * push;
+        q.x += ux * push;
+        q.y += uy * push;
+        clamp(p);
+        clamp(q);
+      }
+    }
+
+    if (!moved) break;
+  }
+
+  return out;
 }
