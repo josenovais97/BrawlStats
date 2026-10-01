@@ -24,6 +24,8 @@ import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { PlayerProgression } from '@/components/player/player-progression';
+import { MetaRadar } from '@/components/meta/meta-radar';
+import { Panel } from '@/components/ui/panel';
 import { ProfileGroup } from '@/components/player/profile-group';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
 import { RosterRecorder } from '@/components/player/roster-recorder';
@@ -41,6 +43,7 @@ import type { BAGameMode } from '@/types/brawlapi';
 import { coinsToMaxFrom, computeProgression, estimatePlaytime } from '@/lib/progression';
 import { patchImpact, patchIsRecent, type PatchImpact } from '@/lib/patch-impact';
 import { pushOptions } from '@/lib/push-now';
+import { getHiddenMeta } from '@/lib/hidden-meta';
 import { rosterPlan } from '@/lib/roster-optimizer';
 import { changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { computeSkillScore } from '@/lib/skill-score';
@@ -208,7 +211,7 @@ export default async function PlayerPage({ params }: PageProps) {
    * *which* modes are shown, so this stays scoped to what is queueable now.
    */
   const rotationModes = [...new Set(rankedMaps.map((m) => m.mode))];
-  const [picksByMode, modeMeta, rotation, mapForm] = await Promise.all([
+  const [picksByMode, modeMeta, rotation, mapForm, hidden] = await Promise.all([
     /*
      * Deep enough that a mode almost always has an answer this account can
      * actually play. At five, a roster missing the top handful produced four
@@ -223,6 +226,14 @@ export default async function PlayerPage({ params }: PageProps) {
      */
     getEventRotation().catch(() => []),
     getLadderMapForm().catch(() => new Map()),
+    /*
+     * The ranked meta as a whole, for the radar. A cached read shared with
+     * /hidden-meta and every other profile, so plotting eighty-five brawlers
+     * here costs one query per revalidation window rather than one per
+     * visitor — and the chart cannot disagree with that page, because it is
+     * the same numbers and the same percentile cuts.
+     */
+    getHiddenMeta().catch(() => null),
   ]);
 
   const push = pushOptions({ rotation, brawlers: player.brawlers, form: mapForm });
@@ -476,6 +487,33 @@ export default async function PlayerPage({ params }: PageProps) {
         title="Brawlers"
         subtitle={`${player.brawlers.length} unlocked, read against the current tier list.`}
       >
+        {/*
+          The whole ranked meta, with this roster lit up on it.
+
+          The list underneath says which top-tier brawlers are owned; this
+          says what that looks like. Every brawler is drawn whether owned or
+          not, because the holes are the finding — a dark patch in the
+          top-right corner is precisely the thing worth seeing, and leaving out
+          what the account does not have would delete it.
+
+          Same component, same percentile cuts and same data as /hidden-meta,
+          so the two cannot disagree about who is in which corner.
+        */}
+        {hidden ? (
+          <Panel
+            title="Your roster on the meta"
+            aside={`${hidden.rated} brawlers rated`}
+          >
+            <MetaRadar
+              bare
+              points={hidden.points}
+              cuts={hidden.cuts}
+              windowDays={hidden.windowDays}
+              owned={new Set(player.brawlers.filter((b) => b.power >= 9).map((b) => b.id))}
+            />
+          </Panel>
+        ) : null}
+
         {/* Before the grid rather than three groups away from it. This is the
             roster judged against the meta and the grid is the roster itself,
             so the reading and the thing being read now sit together. */}

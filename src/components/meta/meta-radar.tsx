@@ -57,13 +57,27 @@ const CELL_LABEL: Record<RadarCell, string> = {
 };
 
 export function MetaRadar({
+  bare = false,
   points,
   cuts,
   windowDays,
+  owned,
 }: {
   points: RadarPoint[];
   cuts: RadarCuts;
   windowDays: number;
+  /**
+   * On a profile, the brawlers this account can field.
+   *
+   * The same chart answers a different and better question once it knows: not
+   * "what is the meta" but "how much of the meta can you actually play". Every
+   * brawler is still drawn, because the gaps are the finding -- a dark patch
+   * in the top-right corner is the thing worth seeing, and dropping the ones
+   * you do not own would delete exactly that.
+   */
+  owned?: Set<number>;
+  /** True inside a Panel, which already provides the surface. */
+  bare?: boolean;
 }) {
   const [openId, setOpenId] = useState<number | null>(null);
 
@@ -121,8 +135,12 @@ export function MetaRadar({
        * Everybody gets a face. `named` now sets emphasis rather than
        * eligibility: a corner portrait is larger, ringed in its cell's colour,
        * given room by the de-overlap pass, and painted last.
+       *
+       * With a roster in hand the emphasis moves to ownership instead, since
+       * that is what the reader is scanning for.
        */
-      const face = p.imageUrl !== null;
+      const has = owned ? owned.has(p.brawlerId) : true;
+      const face = p.imageUrl !== null && has;
       return {
         point: p,
         cell,
@@ -188,7 +206,7 @@ export function MetaRadar({
          */
         .sort((a, b) => Number(a.named) - Number(b.named) || b.r - a.r),
     };
-  }, [points, cuts]);
+  }, [points, cuts, owned]);
 
   if (!layout) return null;
 
@@ -196,7 +214,7 @@ export function MetaRadar({
 
   return (
     <div className="space-y-3">
-      <div className="card overflow-hidden p-3 sm:p-4">
+      <div className={bare ? '' : 'card overflow-hidden p-3 sm:p-4'}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="h-auto w-full touch-manipulation"
@@ -356,7 +374,8 @@ export function MetaRadar({
                   cy={cy}
                   r={rr}
                   fill={CELL_FILL[cell]}
-                  fillOpacity={face ? 1 : 0.5}
+                  /* A brawler the account cannot field is a hole, not a dot. */
+                  fillOpacity={face ? 1 : owned ? 0.16 : 0.5}
                   stroke={selected ? 'var(--foreground)' : CELL_FILL[cell]}
                   strokeWidth={selected ? 2.5 : named ? 2 : 1}
                 />
@@ -377,7 +396,7 @@ export function MetaRadar({
                     clipPath={`url(#radar-${point.brawlerId})`}
                     // Dimmed in the middle, so eighty-five faces still have a
                     // foreground and a background.
-                    opacity={named ? 1 : 0.72}
+                    opacity={owned ? 1 : named ? 1 : 0.72}
                   />
                 ) : null}
                 <title>{`${titleCaseLabel(point.brawlerName)} — ${formatPercent(point.winRate ?? 0)} win rate, ${formatPercent(point.usageRate ?? 0)} picked`}</title>
@@ -387,7 +406,11 @@ export function MetaRadar({
         </svg>
       </div>
 
-      {open ? <Detail {...open} /> : <Hint count={points.length} windowDays={windowDays} />}
+      {open ? (
+        <Detail {...open} />
+      ) : (
+        <Hint count={points.length} windowDays={windowDays} owned={owned} points={points} cuts={cuts} />
+      )}
     </div>
   );
 }
@@ -431,12 +454,58 @@ function Corner({
   );
 }
 
-function Hint({ count, windowDays }: { count: number; windowDays: number }) {
+function Hint({
+  count,
+  windowDays,
+  owned,
+  points,
+  cuts,
+}: {
+  count: number;
+  windowDays: number;
+  owned?: Set<number>;
+  points: RadarPoint[];
+  cuts: RadarCuts;
+}) {
+  if (!owned) {
+    return (
+      <p className="text-sm text-muted">
+        {count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble
+        size is the sample behind each one, so the least certain points are the
+        smallest. Tap one for its numbers.
+      </p>
+    );
+  }
+
+  /*
+   * The top-right corner is the one worth counting. "You own 61 of 85" says
+   * almost nothing -- most rosters are most of the roster -- while "7 of the
+   * 11 brawlers that are both strong and popular" is the sentence the chart
+   * was drawn to support.
+   */
+  const metaPicks = points.filter((p) => cellOf(p, cuts) === 'meta');
+  const sleepers = points.filter((p) => cellOf(p, cuts) === 'sleeper');
+  const haveMeta = metaPicks.filter((p) => owned.has(p.brawlerId)).length;
+  const haveSleepers = sleepers.filter((p) => owned.has(p.brawlerId)).length;
+
   return (
-    <p className="text-sm text-muted">
-      {count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble
-      size is the sample behind each one, so the least certain points are the
-      smallest. Tap one for its numbers.
+    <p className="text-sm leading-relaxed text-muted">
+      Lit brawlers are the ones this account can field. It has{' '}
+      <span className="font-semibold text-brand">
+        {haveMeta} of the {metaPicks.length}
+      </span>{' '}
+      in the meta corner
+      {sleepers.length > 0 ? (
+        <>
+          {' '}
+          and{' '}
+          <span className="font-semibold text-victory">
+            {haveSleepers} of the {sleepers.length}
+          </span>{' '}
+          sleepers
+        </>
+      ) : null}
+      . Bubble size is the sample behind each point. Tap one for its numbers.
     </p>
   );
 }
