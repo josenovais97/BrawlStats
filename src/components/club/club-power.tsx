@@ -27,6 +27,8 @@ import type { ClubScan } from '@/lib/club-scan';
 export function ClubPower({ tag, name }: { tag: string; name: string }) {
   const [scan, setScan] = useState<ClubScan | null>(null);
   const [busy, setBusy] = useState(false);
+  /** Too much of the club was unreadable to keep, so it was not cached. */
+  const [partial, setPartial] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function run() {
@@ -42,8 +44,9 @@ export function ClubPower({ tag, name }: { tag: string; name: string }) {
         );
         return;
       }
-      const data = (await response.json()) as { scan: ClubScan };
+      const data = (await response.json()) as { scan: ClubScan; partial?: boolean };
       setScan(data.scan);
+      setPartial(data.partial === true);
     } catch {
       setError('Could not read this club right now.');
     } finally {
@@ -81,18 +84,54 @@ export function ClubPower({ tag, name }: { tag: string; name: string }) {
           {error ? <p className="text-sm text-defeat">{error}</p> : null}
         </div>
       ) : (
-        <Result scan={scan} name={name} />
+        <Result scan={scan} name={name} partial={partial} onRetry={run} busy={busy} />
       )}
     </section>
   );
 }
 
-function Result({ scan, name }: { scan: ClubScan; name: string }) {
+function Result({
+  scan,
+  name,
+  partial,
+  onRetry,
+  busy,
+}: {
+  scan: ClubScan;
+  name: string;
+  partial: boolean;
+  onRetry: () => void;
+  busy: boolean;
+}) {
   const pct = (n: number) => `${Math.round(n * 100)}%`;
   const carried = scan.members[0];
 
   return (
     <div className="space-y-4">
+      {partial ? (
+        /*
+          Shown rather than hidden, and offered again rather than cached. More
+          than a quarter of the club came back unreadable, which is not that
+          many private accounts — it is the game's API shedding load, and the
+          figures below are computed over whoever answered.
+        */
+        <div className="card flex flex-wrap items-center gap-3 border-brand/40 p-4">
+          <p className="min-w-0 flex-1 text-sm text-muted">
+            The game&rsquo;s API only answered for {scan.members.length} of{' '}
+            {scan.members.length + scan.missed} members, so this is incomplete and
+            has not been saved.
+          </p>
+          <button
+            type="button"
+            onClick={onRetry}
+            disabled={busy}
+            className="btn-game inline-flex items-center gap-2 bg-surface-2 px-4 py-2 text-xs uppercase hover:bg-surface-3 disabled:opacity-60"
+          >
+            {busy ? <Loader2 className="size-3.5 animate-spin" /> : null}
+            Try again
+          </button>
+        </div>
+      ) : null}
       <div className="card card-glow p-5">
         {/*
           The median member leads, and the union is a footnote underneath it.

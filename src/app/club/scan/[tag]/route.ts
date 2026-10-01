@@ -63,7 +63,16 @@ async function scan(tag: string) {
     const batch = await Promise.all(
       members.slice(i, i + CONCURRENCY).map(async (member) => {
         try {
-          const player = await getPlayer(normalizeTag(member.tag));
+          /*
+           * One retry. Measured while load-testing this route: thirteen of
+           * twenty-nine members came back unreadable at once, which is not
+           * thirteen private accounts -- it is the upstream API shedding load.
+           * A read is safe to repeat and the second attempt costs one call
+           * against a scan that would otherwise be wrong for twelve hours.
+           */
+          const player = await getPlayer(normalizeTag(member.tag)).catch(() =>
+            getPlayer(normalizeTag(member.tag)),
+          );
           return {
             tag: normalizeTag(member.tag),
             name: member.name,
@@ -95,8 +104,35 @@ async function scan(tag: string) {
 
   return {
     name: club.name,
+    size: members.length,
     scan: clubScan({ members: read, topTier, usablePower: USABLE_POWER, missed }),
   };
+}
+
+/**
+ * Above this, the scan describes a different club from the one on screen.
+ *
+ * A handful of private or renamed accounts is ordinary and is reported rather
+ * than hidden. A quarter of the club missing is not that -- it is the upstream
+ * API refusing, and the coverage figures are then computed over whoever
+ * happened to answer.
+ */
+const MAX_MISSED_SHARE = 0.25;
+
+/** Carries the partial result past `unstable_cache`, which does not cache a throw. */
+interface PartialScan {
+  partialScan: true;
+  result: Awaited<ReturnType<typeof scan>>;
+}
+
+/*
+ * Matched on a field rather than with `instanceof`. The throw crosses the cache
+ * wrapper, and a guard that depends on the prototype surviving that is a guard
+ * that fails by falling through to "lookup failed" -- which looks exactly like
+ * a club that does not exist.
+ */
+function isPartialScan(error: unknown): error is PartialScan {
+  return typeof error === 'object' && error !== null && 'partialScan' in error;
 }
 
 /**
@@ -108,7 +144,26 @@ async function scan(tag: string) {
  * own schedule, so a scan that is half a day old is still describing the same
  * club against very nearly the same meta.
  */
-const cachedScan = unstable_cache(scan, ['club-scan'], { revalidate: 43_200 });
+const cachedScan = unstable_cache(
+  async (tag: string) => {
+    const result = await scan(tag);
+    /*
+     * A degraded scan is still shown, but never remembered.
+     *
+     * Twelve hours is a long time to be wrong, and the first person to press
+     * the button during an upstream hiccup would otherwise decide what every
+     * later visitor sees until tomorrow. `unstable_cache` does not cache a
+     * rejected promise, so throwing is how a result gets past it -- the
+     * handler catches this and answers with the data anyway.
+     */
+    if (result.size > 0 && (result.scan?.missed ?? 0) / result.size > MAX_MISSED_SHARE) {
+      throw { partialScan: true, result } satisfies PartialScan;
+    }
+    return result;
+  },
+  ['club-scan'],
+  { revalidate: 43_200 },
+);
 
 export async function GET(
   _request: Request,
@@ -124,7 +179,16 @@ export async function GET(
       return Response.json({ error: 'no meta' }, { status: 503 });
     }
     return Response.json(result);
-  } catch {
+  } catch (error) {
+    // Too much of the club was unreadable to keep, but what came back is still
+    // worth showing — with `partial` so the page can offer to try again rather
+    // than presenting a quarter-empty club as the answer.
+    if (isPartialScan(error) && error.result.scan) {
+      return Response.json(
+        { ...error.result, partial: true },
+        { headers: { 'cache-control': 'no-store' } },
+      );
+    }
     return Response.json({ error: 'lookup failed' }, { status: 404 });
   }
 }
