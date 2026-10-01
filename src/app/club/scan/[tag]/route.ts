@@ -55,7 +55,7 @@ async function scan(tag: string) {
     tag: string;
     name: string;
     trophies: number;
-    roster: Array<{ id: number; power: number }>;
+    roster: Array<{ id: number; power: number; hypercharge: boolean }>;
   }> = [];
   let missed = 0;
 
@@ -68,7 +68,13 @@ async function scan(tag: string) {
             tag: normalizeTag(member.tag),
             name: member.name,
             trophies: member.trophies,
-            roster: player.brawlers.map((b) => ({ id: b.id, power: b.power })),
+            roster: player.brawlers.map((b) => ({
+              id: b.id,
+              power: b.power,
+              // Absent for a brawler with none, empty for one that has the
+              // ability but has not unlocked it. Both mean "cannot field it".
+              hypercharge: (b.hyperCharges?.length ?? 0) > 0,
+            })),
           };
         } catch {
           /*

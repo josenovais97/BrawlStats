@@ -16,13 +16,23 @@ const TOP: TopTierBrawler[] = [
   { brawlerId: 4, brawlerName: 'JUJU' },
 ];
 
+/** `[id, power]`, or `[id, power, true]` for a hypercharge. */
 function member(
   tag: string,
   name: string,
   trophies: number,
-  roster: Array<[number, number]>,
+  roster: Array<[number, number] | [number, number, boolean]>,
 ): ScannedMember {
-  return { tag, name, trophies, roster: roster.map(([id, power]) => ({ id, power })) };
+  return {
+    tag,
+    name,
+    trophies,
+    roster: roster.map(([id, power, hypercharge]) => ({
+      id,
+      power,
+      hypercharge: hypercharge === true,
+    })),
+  };
 }
 
 const scan = (members: ScannedMember[], missed = 0) =>
@@ -47,14 +57,36 @@ test('a brawler below the usable floor is not fielded', () => {
 
 test('exclusives name who the club cannot replace', () => {
   const out = scan([
-    member('A', 'Ana', 10, [[1, 11], [2, 11]]),
-    member('B', 'Ben', 10, [[1, 11]]),
-    member('C', 'Cal', 10, [[1, 11]]),
+    member('A', 'Ana', 10, [[1, 11, true], [2, 11, true]]),
+    member('B', 'Ben', 10, [[1, 11, true]]),
+    member('C', 'Cal', 10, [[1, 11, true]]),
   ])!;
   const ana = out.members.find((m) => m.tag === 'A')!;
   const ben = out.members.find((m) => m.tag === 'B')!;
-  assert.deepEqual(ana.exclusives, ['WENDY'], 'only Ana holds Wendy');
-  assert.deepEqual(ben.exclusives, [], 'Shade is held by three, so nobody is exclusive on it');
+  assert.deepEqual(ana.exclusives, ['WENDY'], 'only Ana has Wendy hypercharged');
+  assert.deepEqual(ben.exclusives, [], 'Shade is hypercharged by three, so nobody is exclusive');
+});
+
+test('hypercharge is what separates two maxed members', () => {
+  // The shape measured against the top global club: everybody owns everything
+  // at power 11, so plain coverage says 100% thirty times and the board falls
+  // through to the trophy order it exists not to be.
+  const out = scan([
+    member('RICH', 'Rich', 90_000, [[1, 11], [2, 11], [3, 11], [4, 11]]),
+    member('POOR', 'Poor', 400, [[1, 11, true], [2, 11, true], [3, 11], [4, 11]]),
+  ])!;
+  assert.equal(out.coverage, 1, 'between them, and each alone, they field all four');
+  assert.equal(out.members[0].tag, 'POOR', 'the hypercharges rank, not the trophies');
+  assert.equal(out.members[0].hyperCoverage, 0.5);
+  assert.equal(out.members[1].hyperCoverage, 0);
+  assert.equal(out.hyperCoverage, 0.5);
+  assert.deepEqual(out.hyperGaps, ['AMBER', 'JUJU']);
+});
+
+test('a hypercharge below power 11 cannot be used, so it does not count', () => {
+  const out = scan([member('A', 'Ana', 10, [[1, 10, true], [2, 11, true]])])!;
+  assert.equal(out.hyperCoverage, 0.25, 'only the power 11 one');
+  assert.equal(out.coverage, 0.5, 'both are still fieldable brawlers');
 });
 
 test('the board is not the trophy list again', () => {

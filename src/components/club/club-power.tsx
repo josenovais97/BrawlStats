@@ -94,12 +94,31 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
   return (
     <div className="space-y-4">
       <div className="card card-glow p-5">
-        <p className="text-3xl font-black tabular-nums text-brand sm:text-4xl">
-          {pct(scan.coverage)}
-        </p>
-        <p className="mt-1 text-sm text-muted">
+        {/*
+          Two numbers, because one of them saturates. Any serious account owns
+          the handful of brawlers in S and A at power nine, so a strong club
+          reads 100% and the figure stops being a measurement. Hypercharges
+          come out of drops rather than coins, so no amount of play guarantees
+          them — that is the one that still separates two good clubs.
+        */}
+        <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
+          <div>
+            <p className="text-3xl font-black tabular-nums text-brand sm:text-4xl">
+              {pct(scan.coverage)}
+            </p>
+            <p className="text-xs text-muted">can field</p>
+          </div>
+          <div>
+            <p className="text-3xl font-black tabular-nums text-accent sm:text-4xl">
+              {pct(scan.hyperCoverage)}
+            </p>
+            <p className="text-xs text-muted">hypercharged</p>
+          </div>
+        </div>
+
+        <p className="mt-3 text-sm text-muted">
           of the {scan.topTierSize} brawlers in the current Ranked S and A tier,{' '}
-          {name} can field between them.
+          {name} can put on the field between them.
           {scan.missed > 0 ? (
             <>
               {' '}
@@ -119,6 +138,15 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
             </span>
           </p>
         ) : null}
+
+        {scan.hyperGaps.length > 0 ? (
+          <p className="mt-3 border-t border-border pt-3 text-sm">
+            <span className="font-semibold text-foreground">No hypercharge in the club:</span>{' '}
+            <span className="text-muted">
+              {scan.hyperGaps.map((g) => titleCaseLabel(g)).join(', ')}
+            </span>
+          </p>
+        ) : null}
       </div>
 
       <ol className="space-y-2">
@@ -133,7 +161,8 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{member.name}</p>
               <p className="truncate text-xs text-muted">
-                {member.powerEleven} at power 11 · {formatNumber(member.trophies)} trophies
+                {pct(member.coverage)} fieldable · {member.powerEleven} at power 11 ·{' '}
+                {formatNumber(member.trophies)}
                 {member.exclusives.length > 0 ? (
                   <>
                     {' · '}
@@ -143,7 +172,7 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
                       club than one at 60% who duplicates everybody.
                     */}
                     <span className="text-brand">
-                      only one with{' '}
+                      only hypercharged{' '}
                       {member.exclusives.slice(0, 2).map((e) => titleCaseLabel(e)).join(', ')}
                       {member.exclusives.length > 2
                         ? ` +${member.exclusives.length - 2}`
@@ -153,8 +182,9 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
                 ) : null}
               </p>
             </div>
-            <span className="shrink-0 text-sm font-black tabular-nums text-foreground">
-              {pct(member.coverage)}
+            <span className="shrink-0 text-right text-sm font-black tabular-nums text-accent">
+              {pct(member.hyperCoverage)}
+              <span className="block text-[10px] font-normal text-muted">hyper</span>
             </span>
           </li>
         ))}
@@ -162,8 +192,9 @@ function Result({ scan, name }: { scan: ClubScan; name: string }) {
 
       {carried ? (
         <p className="text-xs text-muted">
-          Ranked by what each member can field, not by trophies — the game already
-          sorts the member list that way.
+          Ranked by hypercharged coverage of the top tier, then by what they can
+          field at all. Trophies only break a tie — the game already sorts the
+          member list that way.
         </p>
       ) : null}
     </div>
