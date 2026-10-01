@@ -103,7 +103,14 @@ body {
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
-/* Deeper treatment for hero and headline panels. */
+/*
+ * Deeper treatment for hero and headline panels.
+ *
+ * **One per page.** This drifted onto eight sections of a profile at once --
+ * a 48px drop shadow on everything, which emphasises nothing and reads as
+ * weight rather than as hierarchy. If a second panel on a page wants it, the
+ * question is which of the two is actually the headline.
+ */
 @utility card-glow {
   box-shadow:
     inset 0 1px 0 0 color-mix(in srgb, #ffffff 9%, transparent),

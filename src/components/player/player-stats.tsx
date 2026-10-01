@@ -10,51 +10,52 @@ import {
   TrophyIcon,
   WinStreakIcon,
 } from '@/components/game-icons';
-import { StatCard } from '@/components/ui/stat-card';
-import { SectionHeading } from '@/components/ui/section-heading';
+import { type StatItem, StatStrip } from '@/components/ui/stat-strip';
 import { formatDuration, formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 
 export function PlayerStats({ player }: { player: BSPlayer }) {
-  // Ranked deliberately absent: the Ranking section directly below shows the
-  // current, season-best and all-time-best tiers with their elo, so a card
-  // repeating just the current tier was the weakest thing in this row.
+  // Ranked deliberately absent: the Ranking section shows the current,
+  // season-best and all-time-best tiers with their elo, so a figure repeating
+  // just the current tier was the weakest thing in this row.
   return (
-    <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-      {/* The game's own marks, so the row reads as Brawl Stars rather than as a
-          generic dashboard of line icons. */}
-      <StatCard
-        node={<Battle3v3Icon className="size-8" />}
-        label="3v3 wins"
-        value={formatNumber(player['3vs3Victories'])}
-      />
-      <StatCard
-        node={<SoloShowdownIcon className="size-8" />}
-        label="Solo SD wins"
-        value={formatNumber(player.soloVictories)}
-      />
-      <StatCard
-        node={<DuoShowdownIcon className="size-8" />}
-        label="Duo SD wins"
-        value={formatNumber(player.duoVictories)}
-      />
-      <StatCard
-        node={<BrawlersIcon className="size-8" />}
-        label="Brawlers"
-        value={formatNumber(player.brawlers.length)}
-        hint={`${player.brawlers.filter((b) => b.power === 11).length} at power 11`}
-      />
-      {/*
-        No hint here. `totalPrestigeLevel` is prestige, not fame, and the header
-        chip already shows it, so repeating it under exp points was both
-        duplicated and mislabelled.
-      */}
-      <StatCard
-        node={<ExperienceIcon className="size-8" />}
-        label="Exp points"
-        value={formatNumber(player.expPoints)}
-      />
-    </section>
+    <StatStrip
+      items={[
+        {
+          // The game's own marks, so the row reads as Brawl Stars rather than
+          // as a generic dashboard of line icons.
+          node: <Battle3v3Icon className="size-4" />,
+          label: '3v3 wins',
+          value: formatNumber(player['3vs3Victories']),
+        },
+        {
+          node: <SoloShowdownIcon className="size-4" />,
+          label: 'Solo SD wins',
+          value: formatNumber(player.soloVictories),
+        },
+        {
+          node: <DuoShowdownIcon className="size-4" />,
+          label: 'Duo SD wins',
+          value: formatNumber(player.duoVictories),
+        },
+        {
+          node: <BrawlersIcon className="size-4" />,
+          label: 'Brawlers',
+          value: formatNumber(player.brawlers.length),
+          hint: `${player.brawlers.filter((b) => b.power === 11).length} at power 11`,
+        },
+        {
+          /*
+           * No hint here. `totalPrestigeLevel` is prestige, not fame, and the
+           * header chip already shows it, so repeating it under exp points was
+           * both duplicated and mislabelled.
+           */
+          node: <ExperienceIcon className="size-4" />,
+          label: 'Exp points',
+          value: formatNumber(player.expPoints),
+        },
+      ]}
+    />
   );
 }
 
@@ -84,60 +85,56 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     null,
   );
 
-  const cards = [
-    bestBrawler && bestBrawler.highestTrophies > 0 ? (
-      <StatCard
-        key="best-brawler"
-        node={<TrophyIcon className="size-8" />}
-        label="Best brawler"
-        value={formatNumber(bestBrawler.highestTrophies)}
-        hint={titleCaseLabel(bestBrawler.name)}
-      />
-    ) : null,
-    bestStreak && (bestStreak.maxWinStreak ?? 0) > 0 ? (
-      <StatCard
-        key="streak"
-        node={<WinStreakIcon className="size-8" />}
-        label="Best win streak"
-        value={formatNumber(bestStreak.maxWinStreak ?? 0)}
-        hint={titleCaseLabel(bestStreak.name)}
-      />
-    ) : null,
-    player.totalPrestigeLevel ? (
-      <StatCard
-        key="prestige"
-        node={<PrestigeIcon total={player.totalPrestigeLevel} className="size-8" />}
-        label="Total prestige"
-        value={formatNumber(player.totalPrestigeLevel)}
-        hint="Across every brawler"
-      />
-    ) : null,
-    robo ? (
-      <StatCard
-        key="robo"
-        node={<RoboRumbleIcon className="size-8" />}
-        label="Robo Rumble"
-        value={robo}
-        hint="Longest survival"
-      />
-    ) : null,
-    bigBrawler ? (
-      <StatCard
-        key="big"
-        node={<BigBrawlerIcon className="size-8" />}
-        label="Big Brawler"
-        value={bigBrawler}
-        hint="Longest time as the Big Brawler"
-      />
-    ) : null,
-  ].filter(Boolean);
+  const items: StatItem[] = [];
 
-  if (cards.length === 0) return null;
+  if (bestBrawler && bestBrawler.highestTrophies > 0) {
+    items.push({
+      node: <TrophyIcon className="size-4" />,
+      label: 'Best brawler',
+      value: formatNumber(bestBrawler.highestTrophies),
+      hint: titleCaseLabel(bestBrawler.name),
+    });
+  }
+  if (bestStreak && (bestStreak.maxWinStreak ?? 0) > 0) {
+    items.push({
+      node: <WinStreakIcon className="size-4" />,
+      label: 'Best win streak',
+      value: formatNumber(bestStreak.maxWinStreak ?? 0),
+      hint: titleCaseLabel(bestStreak.name),
+    });
+  }
+  if (player.totalPrestigeLevel) {
+    items.push({
+      node: <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />,
+      label: 'Total prestige',
+      value: formatNumber(player.totalPrestigeLevel),
+      hint: 'Across every brawler',
+    });
+  }
+  if (robo) {
+    items.push({
+      node: <RoboRumbleIcon className="size-4" />,
+      label: 'Robo Rumble',
+      value: robo,
+      hint: 'Longest survival',
+    });
+  }
+  if (bigBrawler) {
+    items.push({
+      node: <BigBrawlerIcon className="size-4" />,
+      label: 'Big Brawler',
+      value: bigBrawler,
+      hint: 'Longest time as the Big Brawler',
+    });
+  }
 
-  return (
-    <section>
-      <SectionHeading title="Personal bests" aside="All-time" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{cards}</div>
-    </section>
-  );
+  if (items.length === 0) return null;
+
+  /*
+   * No heading of its own any more. "Personal bests" was a section title over
+   * five cards that sat directly under five near-identical cards; the group
+   * header above now says what the whole area is, and one more title inside it
+   * was a line of type separating two things that look the same anyway.
+   */
+  return <StatStrip items={items} />;
 }

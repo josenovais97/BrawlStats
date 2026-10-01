@@ -161,7 +161,7 @@ function Cell({
   gameIcon?: React.ReactNode;
 }) {
   return (
-    <div className="card card-glow flex items-center gap-3 p-4">
+    <div className="card flex items-center gap-3 p-4">
       <span className={`grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 ${tone}`}>
         {badgeUrl ? (
           <Image

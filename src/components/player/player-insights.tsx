@@ -52,7 +52,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Headline numbers */}
-        <div className="card card-glow p-5">
+        <div className="card p-5">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-medium text-muted">Win rate</span>
             <span className="text-3xl font-black tabular-nums text-brand">

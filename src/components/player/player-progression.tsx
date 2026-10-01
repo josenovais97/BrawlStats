@@ -84,7 +84,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
         }
       />
 
-      <div className="card card-glow p-5">
+      <div className="card p-5">
         {/* Headline completion bar. */}
         <div className="mb-6">
           <div className="mb-2 flex items-baseline justify-between gap-3">

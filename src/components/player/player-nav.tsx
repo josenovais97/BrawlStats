@@ -25,10 +25,10 @@
  */
 const SECTIONS: { id: string; label: string }[] = [
   { id: 'overview', label: 'Overview' },
-  { id: 'next', label: 'Do next' },
   { id: 'account', label: 'Account' },
-  { id: 'brawlers', label: 'Brawlers' },
+  { id: 'next', label: 'Do next' },
   { id: 'battles', label: 'Battles' },
+  { id: 'brawlers', label: 'Brawlers' },
 ];
 
 export function PlayerNav() {

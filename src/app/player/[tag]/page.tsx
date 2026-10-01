@@ -361,14 +361,33 @@ export default async function PlayerPage({ params }: PageProps) {
         </Suspense>
       </ProfileGroup>
 
+      <ProfileGroup
+        id="account"
+        index={2}
+        title="The account"
+        subtitle="Lifetime totals, records and how the trophies got here. Reference rather than news."
+      >
+        <PlayerStats player={player} />
+        <PlayerRecords player={player} />
+        {/* Only ever populated for the couple of hundred players holding a
+            global brawler placement, so it sits with the other reference
+            readouts rather than above them. */}
+        <PlayerPlacements
+          placements={placements}
+          iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
+        />
+        <PlayerProgress points={trophyHistory} />
+        <PlayerProgression progression={progression} playtime={playtime} />
+      </ProfileGroup>
+
       {/*
         Everything that tells the reader to go and do something, in one place
         and before the reference material.
 
         These five were spread across the page between the facts they are drawn
         from, each argued into position relative to its neighbour. Individually
-        every one of those arguments held; together they meant a reader who came
-        to be told what to do had to read a trophy history to find out.
+        every one of those arguments held; together they meant the advice was
+        never in one place.
 
         Within the group the order is by how soon it expires: the rotation is
         about the next couple of hours, a patch is about the next fortnight, and
@@ -376,7 +395,7 @@ export default async function PlayerPage({ params }: PageProps) {
       */}
       <ProfileGroup
         id="next"
-        index={2}
+        index={3}
         title="What to do next"
         subtitle="The things on this page that are worth acting on, soonest first."
       >
@@ -416,27 +435,37 @@ export default async function PlayerPage({ params }: PageProps) {
       </ProfileGroup>
 
       <ProfileGroup
-        id="account"
-        index={3}
-        title="The account"
-        subtitle="Lifetime totals, records and how the trophies got here. Reference rather than news."
+        id="battles"
+        index={4}
+        title="Battles"
+        subtitle="What the last few days of games actually say, and the games themselves."
       >
-        <PlayerStats player={player} />
-        <PlayerRecords player={player} />
-        {/* Only ever populated for the couple of hundred players holding a
-            global brawler placement, so it sits with the other reference
-            readouts rather than above them. */}
-        <PlayerPlacements
-          placements={placements}
-          iconFor={(id) => brawlerMeta.get(id)?.imageUrl}
-        />
-        <PlayerProgress points={trophyHistory} />
-        <PlayerProgression progression={progression} playtime={playtime} />
-      </ProfileGroup>
+        <Suspense fallback={<InsightsSkeleton />}>
+          <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+        </Suspense>
 
+        {/* Above the log rather than below it: this is the same subject read one
+            level up, and the reader should meet the conclusion before scrolling
+            twenty-five rows of evidence. */}
+        <Suspense fallback={null}>
+          <BattleAutopsySection
+            tag={tag}
+            player={player}
+            brawlerMeta={brawlerMeta}
+            modeMeta={modeMeta}
+          />
+        </Suspense>
+
+        <section>
+          <SectionHeading title="Recent battles" />
+          <Suspense fallback={<BattleLogSkeleton />}>
+            <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+          </Suspense>
+        </section>
+      </ProfileGroup>
       <ProfileGroup
         id="brawlers"
-        index={4}
+        index={5}
         title="Brawlers"
         subtitle={`${player.brawlers.length} unlocked, read against the current tier list.`}
       >
@@ -468,35 +497,6 @@ export default async function PlayerPage({ params }: PageProps) {
         />
       </ProfileGroup>
 
-      <ProfileGroup
-        id="battles"
-        index={5}
-        title="Battles"
-        subtitle="What the last few days of games actually say, and the games themselves."
-      >
-        <Suspense fallback={<InsightsSkeleton />}>
-          <PlayerInsights tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
-        </Suspense>
-
-        {/* Above the log rather than below it: this is the same subject read one
-            level up, and the reader should meet the conclusion before scrolling
-            twenty-five rows of evidence. */}
-        <Suspense fallback={null}>
-          <BattleAutopsySection
-            tag={tag}
-            player={player}
-            brawlerMeta={brawlerMeta}
-            modeMeta={modeMeta}
-          />
-        </Suspense>
-
-        <section>
-          <SectionHeading title="Recent battles" />
-          <Suspense fallback={<BattleLogSkeleton />}>
-            <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
-          </Suspense>
-        </section>
-      </ProfileGroup>
     </div>
   );
 }

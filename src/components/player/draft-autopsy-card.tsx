@@ -68,7 +68,7 @@ export function DraftAutopsyCard({
   const accent = blamed ? 'var(--defeat)' : unclear ? 'var(--muted)' : 'var(--accent-2)';
 
   return (
-    <article className="card card-glow relative overflow-hidden">
+    <article className="card relative overflow-hidden">
       <span className="block h-1 w-full" style={{ background: accent }} />
 
       <div className="space-y-4 p-5">

@@ -38,7 +38,7 @@ export function PlayerRosterPlan({
         subtitle="The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns."
       />
 
-      <div className="card card-glow relative overflow-hidden">
+      <div className="card relative overflow-hidden">
         <span className="block h-1 w-full bg-brand" />
 
         <div className="space-y-4 p-5">

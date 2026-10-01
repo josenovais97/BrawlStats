@@ -50,7 +50,7 @@ export function PlayerPushNow({
         subtitle="The best map in the live rotation for the brawlers this account already owns."
       />
 
-      <div className="card card-glow relative overflow-hidden">
+      <div className="card relative overflow-hidden">
         <span className="block h-1 w-full bg-victory" />
         <span
           aria-hidden

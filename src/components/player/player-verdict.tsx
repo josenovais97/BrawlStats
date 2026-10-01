@@ -63,7 +63,7 @@ export function PlayerVerdict({
         subtitle="Read from the live Ranked rotation and the brawlers you have at power 9 or above."
       />
 
-      <div className="card card-glow relative overflow-hidden">
+      <div className="card relative overflow-hidden">
         <span
           className={`block h-1 w-full ${
             worst.length > 0 ? 'bg-rose-500' : gaps.length > 0 ? 'bg-amber-400' : 'bg-emerald-400'

@@ -59,7 +59,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
       />
 
       <div
-        className="card card-glow mb-3 flex items-center gap-4 p-5"
+        className="card mb-3 flex items-center gap-4 p-5"
         style={{ borderColor: `color-mix(in srgb, ${band(best.rank).color} 45%, transparent)` }}
       >
         <Image

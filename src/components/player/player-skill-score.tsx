@@ -50,7 +50,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
     <section>
       <SectionHeading title="Skill score" aside="How the account plays" />
 
-      <div className="card card-glow p-5 sm:p-6">
+      <div className="card p-5 sm:p-6">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-center sm:gap-1">
             <span
