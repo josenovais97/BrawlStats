@@ -35,13 +35,22 @@ const FLAG_STYLE: Record<
 const RING_R = 52;
 const RING_C = 2 * Math.PI * RING_R;
 
-/** Score colour, matched to the tier bands in lib/skill-score. */
+/*
+ * Score colour, matched to the tier bands in lib/skill-score.
+ *
+ * Not the tier-list palette, which it used to borrow. There S is red, and on
+ * a tier list that reads as "hot". Here it is the exact `--defeat` red, drawn a
+ * few hundred pixels above the loss dots and the red half of the win-rate bar,
+ * so an Elite 9.0 read as a warning. The top of this scale is the brand gold
+ * instead -- the colour the site already uses for the best of anything -- and
+ * nothing on it is red.
+ */
 function toneFor(score: number): string {
-  if (score >= 8.5) return '#ff5c72';
+  if (score >= 8.5) return '#ffc53d';
   if (score >= 7) return '#ff9f45';
-  if (score >= 5.5) return '#ffc53d';
-  if (score >= 4) return '#7ad97a';
-  return '#7fb3ff';
+  if (score >= 5.5) return '#8b6bff';
+  if (score >= 4) return '#7fb3ff';
+  return '#98a3c4';
 }
 
 export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
