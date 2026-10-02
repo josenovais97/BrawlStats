@@ -159,19 +159,38 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 @3xl:grid-cols-3">
-        <AssociationList
-          title="Played with"
-          icon={PlayersIcon}
-          people={insights.teammates.slice(0, 5)}
-          emptyLabel="No repeat teammates in this window."
-        />
-        <AssociationList
-          title="Faced most"
-          icon={BattlesIcon}
-          people={insights.opponents.slice(0, 5)}
-          emptyLabel="No repeat opponents in this window."
-        />
+      {/*
+        Columns to match what there is.
+
+        An empty list used to keep its card -- a full third of the row saying
+        "No repeat opponents in this window", which on most accounts is the
+        normal state, since matchmaking rarely pairs the same opponent twice in
+        twenty-five games. A card whose only content is its own absence is
+        floor, so it goes and the others share the row.
+      */}
+      <div
+        className={`mt-4 grid gap-4 ${
+          insights.teammates.length > 0 && insights.opponents.length > 0
+            ? '@3xl:grid-cols-3'
+            : insights.teammates.length > 0 || insights.opponents.length > 0
+              ? '@3xl:grid-cols-2'
+              : ''
+        }`}
+      >
+        {insights.teammates.length > 0 ? (
+          <AssociationList
+            title="Played with"
+            icon={PlayersIcon}
+            people={insights.teammates.slice(0, 5)}
+          />
+        ) : null}
+        {insights.opponents.length > 0 ? (
+          <AssociationList
+            title="Faced most"
+            icon={BattlesIcon}
+            people={insights.opponents.slice(0, 5)}
+          />
+        ) : null}
 
         <div className="rounded-xl bg-surface-2/40 p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
@@ -180,7 +199,12 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
           </h3>
           <dl className="space-y-3 text-sm">
             <Row label="Last 24 hours" value={`${insights.battlesLast24h} battles`} />
-            <Row label="Battles per day" value={perDay.toFixed(1)} />
+            {/* Only once the log spans more than one day. Inside a single day
+                it is the battle count again with ".0" on the end, directly
+                under "Last 24 hours" saying the same thing. */}
+            {insights.daysCovered > 1 ? (
+              <Row label="Battles per day" value={perDay.toFixed(1)} />
+            ) : null}
             <Row
               label="Last seen"
               value={insights.lastBattleAt ? relativeTime(insights.lastBattleAt) : ', '}
@@ -208,12 +232,10 @@ function AssociationList({
   title,
   icon: Icon,
   people,
-  emptyLabel,
 }: {
   title: string;
   icon: (props: { className?: string }) => React.ReactNode;
   people: PlayerAssociation[];
-  emptyLabel: string;
 }) {
   return (
     <div className="rounded-xl bg-surface-2/40 p-5">
@@ -222,29 +244,25 @@ function AssociationList({
         {title}
       </h3>
 
-      {people.length === 0 ? (
-        <p className="py-2 text-sm text-muted">{emptyLabel}</p>
-      ) : (
-        <ul className="space-y-2">
-          {people.map((person) => (
-            <li key={person.tag}>
-              <Link
-                href={`/player/${person.tag}`}
-                prefetch={false}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-2"
-              >
-                <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                  {person.name}
-                </span>
-                <span className="shrink-0 text-xs text-muted">
-                  {person.battles}×
-                  {person.winRate !== null ? ` · ${formatPercent(person.winRate)}` : ''}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="space-y-2">
+        {people.map((person) => (
+          <li key={person.tag}>
+            <Link
+              href={`/player/${person.tag}`}
+              prefetch={false}
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-2"
+            >
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                {person.name}
+              </span>
+              <span className="shrink-0 text-xs text-muted">
+                {person.battles}×
+                {person.winRate !== null ? ` · ${formatPercent(person.winRate)}` : ''}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
