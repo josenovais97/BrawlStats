@@ -3,7 +3,6 @@ import { CalendarDays, TrendingUp } from 'lucide-react';
 import { TrophyGainIcon } from '@/components/game-icons';
 
 import { Panel } from '@/components/ui/panel';
-import { StatCard } from '@/components/ui/stat-card';
 import { formatNumber } from '@/lib/format';
 import type { TrophyPoint } from '@/lib/stats';
 import { trophyCurve } from '@/lib/trophy-curve';
@@ -104,10 +103,17 @@ export function PlayerProgress({
         </figure>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-3">
+      {/*
+        The same treatment as the strips above it, not the old icon-tile card.
+        Three figures under a chart, inside a panel, do not each need a border
+        and a rounded icon well -- and two different ways of drawing a number
+        on one tab is exactly what made this page read as assembled rather
+        than designed.
+      */}
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-5 @sm:grid-cols-3">
         {week ? (
-          <StatCard
-            icon={TrendingUp}
+          <Figure
+            node={<TrendingUp className="size-4" />}
             label={`Last ${week.days} days`}
             value={signed(week.change)}
             hint={`${formatNumber(week.from)} → ${formatNumber(week.to)}`}
@@ -115,8 +121,8 @@ export function PlayerProgress({
           />
         ) : null}
         {month ? (
-          <StatCard
-            icon={CalendarDays}
+          <Figure
+            node={<CalendarDays className="size-4" />}
             label={`Last ${month.days} days`}
             value={signed(month.change)}
             hint={`${formatNumber(month.from)} → ${formatNumber(month.to)}`}
@@ -124,15 +130,15 @@ export function PlayerProgress({
           />
         ) : null}
         {best ? (
-          <StatCard
-            node={<TrophyGainIcon className="size-5" />}
+          <Figure
+            node={<TrophyGainIcon className="size-4" />}
             label="Best tracked day"
             value={signed(best.change)}
             hint={best.date}
             tone="text-brand"
           />
         ) : null}
-      </div>
+      </dl>
 
       {/*
         The span the numbers above are drawn from, and where they come from.
@@ -219,4 +225,34 @@ function bestDay(points: TrophyPoint[]): { change: number; date: string } | null
   }
 
   return best;
+}
+
+/** One figure, matching `StatStrip`'s treatment so the tab has one of them. */
+function Figure({
+  node,
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  node: React.ReactNode;
+  label: string;
+  value: string;
+  hint: string;
+  tone: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
+        <span aria-hidden className={`flex shrink-0 items-center ${tone}`}>
+          {node}
+        </span>
+        <span className="truncate">{label}</span>
+      </dt>
+      <dd className={`mt-1.5 truncate text-xl font-bold tabular-nums leading-none ${tone}`}>
+        {value}
+      </dd>
+      <dd className="mt-1 truncate text-xs text-muted">{hint}</dd>
+    </div>
+  );
 }

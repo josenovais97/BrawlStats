@@ -4,6 +4,7 @@ import { formatNumber, humanizeMode, titleCase } from '@/lib/format';
 import { MAX_POWER_LEVEL, coinsBetweenLevels } from '@/lib/progression';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
+import { Panel } from '@/components/ui/panel';
 import type { ModeBestPicks } from '@/types/stats';
 
 /**
@@ -145,37 +146,23 @@ export function PlayerRankedPicks({
   const ready = answers.filter((a) => a.play?.rank === 1).length;
 
   return (
-    <section className="space-y-4" aria-labelledby="ranked-picks">
-      <div>
-        <p className="flex items-center gap-2.5">
-          <span aria-hidden className="rule h-4" />
-          <span className="eyebrow text-accent">Live Ranked rotation</span>
-        </p>
-        <h2 id="ranked-picks" className="display mt-2 text-2xl uppercase">
-          Your picks by mode
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          What to play in each mode you can queue right now, and what would improve that
-          answer.{' '}
-          {ready > 0 ? (
-            <>
-              You already hold the best pick in{' '}
-              <strong className="font-bold text-foreground">
-                {ready} of {answers.length}
-              </strong>{' '}
-              modes.{' '}
-            </>
-          ) : null}
-          Scored from sampled Ranked battles, not from the ladder.
-        </p>
-      </div>
-
-      <ul className="grid gap-2.5 sm:grid-cols-2">
+    /*
+     * A Panel like everything around it. This was the one section on the tab
+     * still wearing its own headline treatment -- an eyebrow, a rule and a
+     * 2xl title -- so it broke the rhythm between two panels that have a
+     * title bar, and read as a different page pasted in.
+     */
+    <Panel
+      title="Your picks by mode"
+      aside={ready > 0 ? `Best pick in ${ready} of ${answers.length}` : undefined}
+      subtitle="What to play in each mode you can queue right now, and what would improve that answer. Scored from sampled Ranked battles, not from the ladder."
+    >
+      <ul className="grid gap-2.5 @2xl:grid-cols-2">
         {answers.map((answer) => (
           <ModeCard key={answer.mode} answer={answer} brawlerMeta={brawlerMeta} />
         ))}
       </ul>
-    </section>
+    </Panel>
   );
 }
 
