@@ -108,7 +108,13 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
           </p>
         ) : null}
 
-        <p className="mt-auto pt-4 text-xs leading-relaxed text-muted">
+        {/*
+          `mt-4`, not `mt-auto`. Pinning this to the bottom made it line up
+          with the foot of the Ranking panel beside it, which sounded right and
+          put a ninety-pixel hole in the middle of this one. Slack at the
+          bottom of a card is ordinary; a gap in the middle reads as broken.
+        */}
+        <p className="mt-4 text-xs leading-relaxed text-muted">
           Weighted toward{' '}
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
             Ranked
