@@ -9,7 +9,7 @@ import {
   PrestigeIcon,
   TrophyIcon,
 } from '@/components/game-icons';
-import { playerIconUrl } from '@/lib/brawlapi';
+import { playerIconUrl, rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { ShareButton } from '@/components/player/share-button';
 import { normalizeTag } from '@/lib/tags';
@@ -24,6 +24,23 @@ export function PlayerHeader({
   lastOnline?: React.ReactNode;
 }) {
   const nameColor = nameColorToCss(player.nameColor);
+
+  /*
+   * The hero said who the account was and how many trophies it had, and
+   * nothing at all about Ranked -- which on a competitive profile is half the
+   * identity. A reader had to scroll past the tabs to find out that this
+   * Silver I account peaked at Mythic I.
+   *
+   * Real tier art, with the league badge as the fallback the ranked section
+   * already uses: `rankedRank` is the numbered tier and is absent on accounts
+   * that only ever reached a league.
+   */
+  const rankedArt =
+    rankedTierIconUrl(player.rankedRank) ?? rankedLeagueIconUrl(player.rankedRankName);
+  const peakArt =
+    rankedTierIconUrl(player.highestAllTimeRankedRank) ??
+    rankedLeagueIconUrl(player.highestAllTimeRankedRankName);
+  const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
 
   return (
     <header className="card card-glow relative overflow-hidden">
@@ -91,14 +108,47 @@ export function PlayerHeader({
         {/* Side by side on a phone, stacked beside the identity block once
             there is room for a column. */}
         <div className="flex w-full shrink-0 items-stretch gap-2.5 sm:w-auto sm:flex-col">
-          <div className="flex flex-1 flex-col items-end justify-center gap-1 rounded-2xl border border-border bg-surface-2/60 px-4 py-3 sm:flex-none sm:px-5 sm:py-4">
-            <span className="flex items-center gap-2 text-2xl font-black tabular-nums text-brand sm:text-4xl">
-              <TrophyIcon className="size-6 sm:size-7" />
-              {formatNumber(player.trophies)}
-            </span>
-            <span className="text-xs text-muted">
-              Peak {formatNumber(player.highestTrophies)}
-            </span>
+          {/*
+            The two numbers that say how good this account is, side by side:
+            what the ladder thinks and what Ranked thinks. Trophies alone was
+            half the answer, and on a smurf -- Silver I today, Mythic I at
+            peak -- it was the less interesting half.
+          */}
+          <div className="flex flex-1 items-stretch gap-2.5 sm:flex-none">
+            <div className="flex flex-1 flex-col items-end justify-center gap-0.5 rounded-2xl border border-border bg-surface-2/60 px-4 py-3 sm:px-5 sm:py-4">
+              <span className="flex items-center gap-2 text-2xl font-black tabular-nums text-brand sm:text-4xl">
+                <TrophyIcon className="size-6 sm:size-7" />
+                {formatNumber(player.trophies)}
+              </span>
+              <span className="text-xs text-muted">
+                Peak {formatNumber(player.highestTrophies)}
+              </span>
+            </div>
+
+            {hasRanked ? (
+              <div className="flex flex-1 items-center justify-end gap-2.5 rounded-2xl border border-border bg-surface-2/60 px-4 py-3 sm:px-5 sm:py-4">
+                {rankedArt ?? peakArt ? (
+                  <Image
+                    src={(rankedArt ?? peakArt) as string}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="size-9 shrink-0 object-contain sm:size-11"
+                    unoptimized
+                  />
+                ) : null}
+                <div className="min-w-0 text-right">
+                  <p className="truncate text-base font-black uppercase leading-tight text-accent sm:text-lg">
+                    {player.rankedRankName ?? 'Unranked'}
+                  </p>
+                  <p className="truncate text-xs text-muted">
+                    {player.highestAllTimeRankedRankName
+                      ? `Peak ${player.highestAllTimeRankedRankName}`
+                      : 'No peak on record'}
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
           {/*
             The two profile actions share one row rather than taking a stacked

@@ -48,62 +48,52 @@ export function PlayerRanked({
   return (
     <Panel title="Ranking" aside="Where the game puts them" bodyClassName="">
       {/*
-        One panel of rows, not a grid of five small cards.
-        
-        Each of these was its own bordered box with an icon tile, which at four
-        across read as five unrelated facts rather than one standing — and in
-        the two-column layout this now sits in, a four-column grid of cards
-        inside a half-width column is unreadable at any size. Rows divide
-        cleanly at one column, carry the tier artwork larger, and put the elo
-        on the same line as the tier it belongs to.
-      */}
-      <div className="divide-y divide-border/70">
-        {hasRanked ? (
-          <>
-            <Cell
-              gameIcon={<RankedIcon className="size-6" />}
-              label="Current ranked"
-              value={player.rankedRankName ?? 'Unranked'}
-              hint={player.rankedElo ? `${formatNumber(player.rankedElo)} elo` : undefined}
-              tone="text-accent"
-              badgeUrl={
-                rankedTierIconUrl(player.rankedRank) ??
-                rankedLeagueIconUrl(player.rankedRankName)
-              }
-            />
-            <Cell
-              icon={TrendingUp}
-              label="Season best"
-              value={player.highestSeasonRankedRankName ?? '–'}
-              hint={
-                player.highestSeasonRankedElo
-                  ? `${formatNumber(player.highestSeasonRankedElo)} elo`
-                  : undefined
-              }
-              tone="text-victory"
-              badgeUrl={
-                rankedTierIconUrl(player.highestSeasonRankedRank) ??
-                rankedLeagueIconUrl(player.highestSeasonRankedRankName)
-              }
-            />
-            <Cell
-              gameIcon={<CrownIcon className="size-6" />}
-              label="All-time best"
-              value={player.highestAllTimeRankedRankName ?? '–'}
-              hint={
-                player.highestAllTimeRankedElo
-                  ? `${formatNumber(player.highestAllTimeRankedElo)} elo`
-                  : undefined
-              }
-              tone="text-brand"
-              badgeUrl={
-                rankedTierIconUrl(player.highestAllTimeRankedRank) ??
-                rankedLeagueIconUrl(player.highestAllTimeRankedRankName)
-              }
-            />
-          </>
-        ) : null}
+        Three tiers and two standings are not five equal facts, and drawing
+        them as five identical rows said they were. A smurf sitting at Silver I
+        with a Mythic I peak is a *story*, and it read as two lines of the same
+        size.
 
+        So the tiers get the top of the panel as a three-across band with the
+        real badge art at size -- the peak is the headline on an account like
+        that -- and the standings, which are our measurement rather than the
+        game's, sit underneath as rows.
+      */}
+      {hasRanked ? (
+        <div className="grid grid-cols-3 divide-x divide-border/70 border-b border-border/70">
+          <Tier
+            label="Current"
+            name={player.rankedRankName}
+            elo={player.rankedElo}
+            art={
+              rankedTierIconUrl(player.rankedRank) ??
+              rankedLeagueIconUrl(player.rankedRankName)
+            }
+            tone="text-accent"
+          />
+          <Tier
+            label="Season best"
+            name={player.highestSeasonRankedRankName}
+            elo={player.highestSeasonRankedElo}
+            art={
+              rankedTierIconUrl(player.highestSeasonRankedRank) ??
+              rankedLeagueIconUrl(player.highestSeasonRankedRankName)
+            }
+            tone="text-victory"
+          />
+          <Tier
+            label="All-time best"
+            name={player.highestAllTimeRankedRankName}
+            elo={player.highestAllTimeRankedElo}
+            art={
+              rankedTierIconUrl(player.highestAllTimeRankedRank) ??
+              rankedLeagueIconUrl(player.highestAllTimeRankedRankName)
+            }
+            tone="text-brand"
+          />
+        </div>
+      ) : null}
+
+      <div className="divide-y divide-border/70">
         {globalRank !== null ? (
           <Cell
             label="World rank"
@@ -135,6 +125,56 @@ export function PlayerRanked({
         ) : null}
       </div>
     </Panel>
+  );
+}
+
+/**
+ * One of the three Ranked tiers, with its badge at a size worth looking at.
+ *
+ * A tier nobody has reached renders its label and a dash rather than being
+ * dropped, so the three columns stay in the same place on every profile --
+ * "no season best yet" is itself a reading, and a two-column band on some
+ * profiles and three on others is harder to scan than a dash.
+ */
+function Tier({
+  label,
+  name,
+  elo,
+  art,
+  tone,
+}: {
+  label: string;
+  name?: string | null;
+  elo?: number | null;
+  art: string | null;
+  tone: string;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-1.5 px-2 py-4 text-center">
+      <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
+        {label}
+      </span>
+      {art && name ? (
+        <Image
+          src={art}
+          alt=""
+          width={48}
+          height={48}
+          className="size-10 object-contain @xl:size-12"
+          unoptimized
+        />
+      ) : (
+        <span className="grid size-10 place-items-center @xl:size-12">
+          <RankedIcon className="size-6 opacity-25" />
+        </span>
+      )}
+      <span className={`text-sm font-black uppercase leading-tight ${tone}`}>
+        {name ? titleCaseLabel(name) : '–'}
+      </span>
+      {elo ? (
+        <span className="text-xs tabular-nums text-muted">{formatNumber(elo)} elo</span>
+      ) : null}
+    </div>
   );
 }
 

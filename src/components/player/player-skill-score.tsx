@@ -32,6 +32,10 @@ const FLAG_STYLE: Record<
   collector: { icon: Power11Icon, tone: 'text-accent' },
 };
 
+/** The ring's geometry, in the 120x120 viewBox it is drawn in. */
+const RING_R = 52;
+const RING_C = 2 * Math.PI * RING_R;
+
 /** Score colour, matched to the tier bands in lib/skill-score. */
 function toneFor(score: number): string {
   if (score >= 8.5) return '#ff5c72';
@@ -49,18 +53,55 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
   return (
     <Panel title="Skill score" aside="How the account plays">
       <div className="flex h-full flex-col">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-          <div className="flex shrink-0 items-baseline gap-3 sm:flex-col sm:items-center sm:gap-1">
-            <span
-              className="text-6xl font-black tabular-nums leading-none"
-              style={{ color: tone }}
-            >
-              {skill.score.toFixed(1)}
-            </span>
-            <span className="text-sm font-bold uppercase tracking-wide" style={{ color: tone }}>
-              {skill.tier}
-            </span>
-            <span className="text-xs text-muted sm:mt-1">out of 10</span>
+        <div className="flex flex-col gap-6 @xl:flex-row @xl:items-center">
+          {/*
+            A ring, not a number in a column.
+            
+            This is the one judgement on the page that is entirely ours, and it
+            was rendered at the same weight as a lifetime win counter. The arc
+            is the score out of ten, so the figure can be read without reading
+            the figure -- and the colour is already the tier band, so the ring
+            costs nothing to interpret that the number did not.
+            
+            SVG rather than a conic gradient: a gradient cannot round its ends
+            and cannot be given a track behind it without a second element.
+          */}
+          <div className="relative flex shrink-0 items-center justify-center self-center">
+            <svg viewBox="0 0 120 120" className="size-32 -rotate-90 sm:size-36">
+              <circle
+                cx="60"
+                cy="60"
+                r={RING_R}
+                fill="none"
+                stroke="var(--surface-3)"
+                strokeWidth="9"
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r={RING_R}
+                fill="none"
+                stroke={tone}
+                strokeWidth="9"
+                strokeLinecap="round"
+                strokeDasharray={RING_C}
+                strokeDashoffset={RING_C * (1 - Math.min(1, skill.score / 10))}
+              />
+            </svg>
+            <div className="absolute flex flex-col items-center">
+              <span
+                className="text-4xl font-black tabular-nums leading-none sm:text-5xl"
+                style={{ color: tone }}
+              >
+                {skill.score.toFixed(1)}
+              </span>
+              <span
+                className="mt-1 text-[11px] font-bold uppercase tracking-widest"
+                style={{ color: tone }}
+              >
+                {skill.tier}
+              </span>
+            </div>
           </div>
 
           <div className="min-w-0 flex-1 space-y-3">
