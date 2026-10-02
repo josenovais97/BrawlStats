@@ -34,10 +34,17 @@ INIT_URL="https://open.tiktokapis.com/v2/post/publish/content/init/"
 STATUS_URL="https://open.tiktokapis.com/v2/post/publish/status/fetch/"
 CREATOR_URL="https://open.tiktokapis.com/v2/post/publish/creator_info/query/"
 
-# MEDIA_UPLOAD until the audit passes; DIRECT_POST after. Nothing else in this
-# script changes when it flips — the request body already carries a title and a
-# description, which both modes accept.
-POST_MODE="MEDIA_UPLOAD"
+# DIRECT_POST since 2026-10-02, when the audit passed and the box moved from
+# the sandbox client to the production one. Nothing else in this script changes
+# when it flips — the request body already carries a title and a description,
+# which both modes accept, and the direct path adds `privacy_level` from
+# `creator_info/query` plus the brand toggles.
+#
+# **What this costs.** A bad post used to be a draft nobody published. It is now
+# a public post that went out at 09:10 with nobody looking at it. Rolling back
+# is one line here and a push — the deploy timer picks it up inside five
+# minutes, and posts go back to the inbox.
+POST_MODE="DIRECT_POST"
 
 die() { echo "$*" >&2; exit 1; }
 
