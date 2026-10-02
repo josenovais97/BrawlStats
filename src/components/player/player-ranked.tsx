@@ -93,7 +93,15 @@ export function PlayerRanked({
         </div>
       ) : null}
 
-      <div className="divide-y divide-border/70">
+      {/*
+        Side by side, not stacked.
+        
+        Full width now, these were three rows of a single column with the rest
+        of the panel empty beneath them. They are also peers -- two readings of
+        the same account against two different populations -- so a column was
+        saying something about them that is not true.
+      */}
+      <div className="grid divide-y divide-border/70 @2xl:grid-cols-3 @2xl:divide-x @2xl:divide-y-0">
         {globalRank !== null ? (
           <Cell
             label="World rank"

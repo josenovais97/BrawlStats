@@ -330,36 +330,31 @@ export default async function PlayerPage({ params }: PageProps) {
           content: (
             <ProfileGroup title="Overview" subtitle="How strong this account is and where it stands, before any of the detail.">
         {/*
-         * Ordered by the questions a visitor actually arrives with, and set
-         * side by side because these two answer the same one from opposite
-         * ends: the skill score is what this site makes of the account, the
-         * ranking is what the game does. Reading them together is the point.
+         * The signature element first and on its own, then the game's own
+         * verdict underneath it.
          *
-         * They used to be stacked full-width, which on a laptop put them two
-         * screens apart with a column of empty margin either side of each --
-         * and both sat below a grid of lifetime counters, so a phone had to
-         * scroll past most of a screen of readouts to reach the only two
-         * numbers on the page that are judgements. Those counters are not
-         * demoted for being uninteresting; they are demoted for being
-         * reference, the sort of thing you look up rather than open a profile
-         * to find.
+         * These were a two-column row, which looked balanced and was not: the
+         * skill score is taller than three tiers and two standings, so `h-full`
+         * stretched Ranking to match and left four hundred pixels of floor
+         * under it. Worse, side by side and identically bordered they read as
+         * two equal readouts -- and they are not. One is what this site makes
+         * of the account and is the reason to be on this page rather than in
+         * the game; the other is what the game already told you.
          */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <PlayerSkillScore skill={skill} />
+        <PlayerSkillScore skill={skill} />
 
-          <Suspense
-            fallback={
-              <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
-            }
-          >
-            <RankedWithBoard
-              player={player}
-              standing={standing}
-              rankedStanding={rankedStanding}
-              tag={normalizedTag}
-            />
-          </Suspense>
-        </div>
+        <Suspense
+          fallback={
+            <PlayerRanked player={player} standing={standing} rankedStanding={rankedStanding} />
+          }
+        >
+          <RankedWithBoard
+            player={player}
+            standing={standing}
+            rankedStanding={rankedStanding}
+            tag={normalizedTag}
+          />
+        </Suspense>
 
         {/*
           How the account is actually doing lately, which belongs on the tab

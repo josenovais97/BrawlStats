@@ -3,7 +3,6 @@ import { AlertTriangle, TrendingUp } from 'lucide-react';
 import { Power11Icon } from '@/components/game-icons';
 import Link from 'next/link';
 
-import { Panel } from '@/components/ui/panel';
 import type { AccountFlag, SkillScore } from '@/lib/skill-score';
 
 /**
@@ -51,23 +50,30 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
   const FlagIcon = flag ? FLAG_STYLE[flag.kind].icon : null;
 
   return (
-    <Panel title="Skill score" aside="How the account plays">
-      <div className="flex h-full flex-col">
-        <div className="flex flex-col gap-6 @xl:flex-row @xl:items-center">
+    /*
+     * Not a Panel.
+     *
+     * This is the one judgement on the page that is entirely ours, and inside
+     * a bordered box with a title bar it was the fourth identical rectangle on
+     * the first screen -- the same treatment as a lifetime win counter. A
+     * signature element has to be drawn differently from the reference
+     * material around it, and the cheapest way to do that on a page made of
+     * cards is to take the card away.
+     *
+     * It also fixes a second problem it was causing: as a grid cell beside
+     * Ranking it was the taller of the two, so `h-full` stretched Ranking to
+     * match and left four hundred pixels of nothing under the standings.
+     */
+    <section className="@container">
+      <div className="flex flex-col gap-8 @3xl:flex-row @3xl:items-center">
           {/*
-            A ring, not a number in a column.
-            
-            This is the one judgement on the page that is entirely ours, and it
-            was rendered at the same weight as a lifetime win counter. The arc
-            is the score out of ten, so the figure can be read without reading
-            the figure -- and the colour is already the tier band, so the ring
-            costs nothing to interpret that the number did not.
-            
-            SVG rather than a conic gradient: a gradient cannot round its ends
-            and cannot be given a track behind it without a second element.
+            The arc is the score out of ten, so the figure can be read without
+            reading the figure. SVG rather than a conic gradient: a gradient
+            cannot round its ends or carry a track behind it without a second
+            element.
           */}
           <div className="relative flex shrink-0 items-center justify-center self-center">
-            <svg viewBox="0 0 120 120" className="size-32 -rotate-90 sm:size-36">
+            <svg viewBox="0 0 120 120" className="size-40 -rotate-90 @3xl:size-44">
               <circle
                 cx="60"
                 cy="60"
@@ -90,16 +96,19 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
             </svg>
             <div className="absolute flex flex-col items-center">
               <span
-                className="text-4xl font-black tabular-nums leading-none sm:text-5xl"
+                className="text-5xl font-black tabular-nums leading-none @3xl:text-6xl"
                 style={{ color: tone }}
               >
                 {skill.score.toFixed(1)}
               </span>
               <span
-                className="mt-1 text-[11px] font-bold uppercase tracking-widest"
+                className="mt-1.5 text-xs font-bold uppercase tracking-[0.2em]"
                 style={{ color: tone }}
               >
                 {skill.tier}
+              </span>
+              <span className="mt-0.5 text-[10px] uppercase tracking-wider text-muted">
+                Skill score
               </span>
             </div>
           </div>
@@ -139,23 +148,17 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
           </div>
         </div>
 
-        {flag && FlagIcon ? (
-          <p className="mt-5 flex items-start gap-2.5 rounded-lg bg-surface-2 px-4 py-3 text-sm leading-relaxed">
-            <FlagIcon className={`mt-0.5 size-4 shrink-0 ${FLAG_STYLE[flag.kind].tone}`} />
-            <span>
-              <strong className="font-semibold">{flag.label}.</strong>{' '}
-              <span className="text-muted">{flag.detail}</span>
-            </span>
-          </p>
-        ) : null}
+      {flag && FlagIcon ? (
+        <p className="mt-6 flex max-w-3xl items-start gap-2.5 rounded-xl border border-border/70 bg-surface-2/50 px-4 py-3 text-sm leading-relaxed">
+          <FlagIcon className={`mt-0.5 size-4 shrink-0 ${FLAG_STYLE[flag.kind].tone}`} />
+          <span>
+            <strong className="font-semibold">{flag.label}.</strong>{' '}
+            <span className="text-muted">{flag.detail}</span>
+          </span>
+        </p>
+      ) : null}
 
-        {/*
-          `mt-4`, not `mt-auto`. Pinning this to the bottom made it line up
-          with the foot of the Ranking panel beside it, which sounded right and
-          put a ninety-pixel hole in the middle of this one. Slack at the
-          bottom of a card is ordinary; a gap in the middle reads as broken.
-        */}
-        <p className="mt-4 text-xs leading-relaxed text-muted">
+      <p className="mt-6 max-w-3xl text-xs leading-relaxed text-muted">
           Weighted toward{' '}
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
             Ranked
@@ -170,8 +173,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
                   : ''
               }.`
             : ''}
-        </p>
-      </div>
-    </Panel>
+      </p>
+    </section>
   );
 }
