@@ -268,14 +268,26 @@ function noteFor(option: Option): string {
   )} coins`;
 }
 
-/** Holds a slot's height so the grid stays a matrix rather than a staircase. */
+/**
+ * Holds a slot's height so the grid stays a matrix rather than a staircase.
+ *
+ * The lead row grew from a 40px portrait to a 56px one in a padded box, and
+ * this did not grow with it -- so a mode with no fieldable pick sat shorter
+ * than its neighbours and the staircase this exists to prevent came back. The
+ * height here has to track `Row`'s lead variant: 56px of art plus 8px of
+ * padding either side.
+ */
 function Empty({ children, small = false }: { children: React.ReactNode; small?: boolean }) {
   return (
-    <span className={`flex items-center gap-2.5 ${small ? 'min-h-8' : 'mt-1.5 min-h-10'}`}>
+    <span
+      className={`flex items-center gap-2.5 ${
+        small ? 'min-h-8' : 'mt-1.5 min-h-[72px] rounded-xl px-2'
+      }`}
+    >
       {/* An invisible spacer, not a dashed outline. The slot needs to hold the
           row's height and keep the text aligned with the names above it;
           drawing a box around nothing just adds another edge to read. */}
-      <span aria-hidden className={`${small ? 'size-8' : 'size-10'} shrink-0`} />
+      <span aria-hidden className={`${small ? 'size-8' : 'size-14'} shrink-0`} />
       <span className={`text-muted ${small ? 'text-xs' : 'text-sm'}`}>{children}</span>
     </span>
   );
