@@ -113,7 +113,13 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
             </div>
           </div>
 
-          <div className="min-w-0 flex-1 space-y-3">
+          {/*
+            Capped. Full width at 1440 made each bar about 830px, with its
+            label at one end and its value at the other -- far enough apart
+            that pairing them is work. A measure is a line of text like any
+            other and wants the same limit.
+          */}
+          <div className="min-w-0 flex-1 space-y-3.5 @3xl:max-w-2xl">
             {skill.components.map((component) => (
               <div key={component.key}>
                 <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">

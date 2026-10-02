@@ -43,6 +43,9 @@ export function PlayerRanked({
   rankedStanding = null,
 }: Props) {
   const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
+  const standings = [globalRank !== null, Boolean(rankedStanding), Boolean(standing)].filter(
+    Boolean,
+  ).length;
   if (!hasRanked && globalRank === null && !standing) return null;
 
   return (
@@ -101,7 +104,15 @@ export function PlayerRanked({
         the same account against two different populations -- so a column was
         saying something about them that is not true.
       */}
-      <div className="grid divide-y divide-border/70 @2xl:grid-cols-3 @2xl:divide-x @2xl:divide-y-0">
+      {/*
+        Columns to match what there is. A fixed three left an empty third on
+        every account outside the global top 200, which is almost all of them.
+      */}
+      <div
+        className={`grid divide-y divide-border/70 @2xl:divide-x @2xl:divide-y-0 ${
+          standings === 3 ? '@2xl:grid-cols-3' : standings === 2 ? '@2xl:grid-cols-2' : ''
+        }`}
+      >
         {globalRank !== null ? (
           <Cell
             label="World rank"

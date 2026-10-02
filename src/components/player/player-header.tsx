@@ -83,10 +83,10 @@ export function PlayerHeader({
             <Image
               src={playerIconUrl(player.icon?.id)}
               alt=""
-              width={88}
-              height={88}
-              sizes="(max-width: 640px) 64px, 88px"
-              className="relative size-16 rounded-2xl bg-surface-2 ring-1 ring-border-strong sm:size-[88px]"
+              width={104}
+              height={104}
+              sizes="(max-width: 640px) 80px, 104px"
+              className="relative size-20 rounded-2xl bg-surface-2 ring-1 ring-border-strong sm:size-[104px]"
               priority
               unoptimized
             />
@@ -169,7 +169,13 @@ export function PlayerHeader({
             for anyone with fewer than two days of sampled history, so three of
             the four profiles checked on 2026-08-27 had no share button at all.
           */}
-          <div className="grid flex-1 grid-cols-2 items-stretch gap-2.5 sm:flex-none">
+          {/*
+            Quieter than the numbers above them. Save and Share were the same
+            height and nearly the same weight as the trophy and Ranked blocks,
+            so the first thing the eye landed on in the hero was a pair of
+            controls rather than the account.
+          */}
+          <div className="grid flex-1 grid-cols-2 items-stretch gap-2.5 text-sm sm:flex-none">
             <FavoriteButton
               kind="player"
               tag={normalizeTag(player.tag)}
