@@ -11,7 +11,16 @@ import { useState } from 'react';
  * Share API where it exists (which is where sharing is actually done, on a
  * phone) and falls back to the clipboard everywhere else.
  */
-export function ShareButton({ title, text }: { title: string; text: string }) {
+export function ShareButton({
+  title,
+  text,
+  compact = false,
+}: {
+  title: string;
+  text: string;
+  /** Icon only, for the profile header on a phone. */
+  compact?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function share() {
@@ -45,10 +54,13 @@ export function ShareButton({ title, text }: { title: string; text: string }) {
          side in the profile header, and a different radius, padding and weight
          on each made them read as two unrelated controls that happened to be
          adjacent. */
-      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-sm font-semibold text-muted transition-colors hover:border-brand/40 hover:text-foreground"
+      aria-label={compact ? (copied ? 'Link copied' : 'Share this profile') : undefined}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 text-sm font-semibold text-muted transition-colors hover:border-brand/40 hover:text-foreground ${
+        compact ? 'size-9 shrink-0' : 'w-full px-3.5 py-2'
+      }`}
     >
       {copied ? <Check className="size-4 text-victory" /> : <Share2 className="size-4" />}
-      {copied ? 'Link copied' : 'Share'}
+      {compact ? null : copied ? 'Link copied' : 'Share'}
     </button>
   );
 }

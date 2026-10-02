@@ -15,6 +15,8 @@ interface Props {
   kind: FavoriteKind;
   tag: string;
   name: string;
+  /** Icon only, for the profile header on a phone where a labelled pair costs a row. */
+  compact?: boolean;
 }
 
 /**
@@ -24,7 +26,7 @@ interface Props {
  * store, and this keeps the server snapshot (empty) separate from the client
  * one so hydration matches without any state-setting effect.
  */
-export function FavoriteButton({ kind, tag, name }: Props) {
+export function FavoriteButton({ kind, tag, name, compact = false }: Props) {
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -39,14 +41,16 @@ export function FavoriteButton({ kind, tag, name }: Props) {
       aria-pressed={saved}
       aria-label={saved ? `Remove ${name} from favourites` : `Save ${name} to favourites`}
       title={saved ? 'Saved. Click to remove' : 'Save to favourites'}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-semibold transition-colors ${
+      className={`inline-flex items-center justify-center gap-2 rounded-xl border text-sm font-semibold transition-colors ${
+        compact ? 'size-9 shrink-0' : 'px-3.5 py-2'
+      } ${
         saved
           ? 'border-brand/50 bg-brand/15 text-brand'
           : 'border-border bg-surface-2 text-muted hover:border-brand/40 hover:text-foreground'
       }`}
     >
       <Star className={`size-4 ${saved ? 'fill-current' : ''}`} />
-      {saved ? 'Saved' : 'Save'}
+      {compact ? null : saved ? 'Saved' : 'Save'}
     </button>
   );
 }

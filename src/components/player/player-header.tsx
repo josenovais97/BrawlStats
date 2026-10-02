@@ -10,7 +10,7 @@ import {
   TrophyIcon,
 } from '@/components/game-icons';
 import { playerIconUrl, rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
-import { formatNumber, nameColorToCss } from '@/lib/format';
+import { formatNumber, nameColorToCss, titleCaseLabel } from '@/lib/format';
 import { ShareButton } from '@/components/player/share-button';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
@@ -41,6 +41,17 @@ export function PlayerHeader({
     rankedTierIconUrl(player.highestAllTimeRankedRank) ??
     rankedLeagueIconUrl(player.highestAllTimeRankedRankName);
   const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
+  /*
+   * "Peak 174,081" under 174,081 reads like a second, different number until
+   * the eye checks the digits. When they are the same, say what that means.
+   */
+  const atTrophyPeak = player.trophies >= player.highestTrophies;
+  const atRankedPeak =
+    Boolean(player.rankedRankName) &&
+    player.rankedRankName?.trim().toUpperCase() ===
+      player.highestAllTimeRankedRankName?.trim().toUpperCase();
+  const shareTitle = `${player.name} on BrawlZone`;
+  const shareText = `${player.name} (${player.tag}) has ${formatNumber(player.trophies)} trophies on BrawlZone`;
 
   return (
     <header className="card card-glow relative overflow-hidden">
@@ -85,23 +96,47 @@ export function PlayerHeader({
               alt=""
               width={104}
               height={104}
-              sizes="(max-width: 640px) 80px, 104px"
-              className="relative size-20 rounded-2xl bg-surface-2 ring-1 ring-border-strong sm:size-[104px]"
+              sizes="(max-width: 640px) 56px, 104px"
+              className="relative size-14 rounded-2xl bg-surface-2 ring-1 ring-border-strong sm:size-[104px]"
               priority
               unoptimized
             />
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             {/* Steps down on a phone: at 4xl a name of average length filled
-                the width on its own and left nothing for the avatar. */}
+                the width on its own and left nothing for the avatar. Two lines
+                rather than an ellipsis there, because the end of a name is
+                where players put the emoji and the clan suffix. */}
             <h1
-              className="display truncate text-2xl uppercase sm:text-4xl lg:text-5xl"
+              className="display line-clamp-2 break-words text-2xl uppercase sm:line-clamp-1 sm:text-4xl lg:text-5xl"
               style={{ color: nameColor }}
             >
               {player.name}
             </h1>
-            <p className="mt-1 truncate font-mono text-sm text-muted">{player.tag}</p>
+            {/*
+              On a phone Save and Share ride on the tag line as icons.
+
+              Labelled, they were a full-width row of their own, and the hero
+              -- avatar, name, two stat blocks, two buttons and three rows of
+              chips -- filled the whole first screen of a 390px phone, so the
+              skill score it leads into started below the fold. From `sm` up
+              there is room and the labelled pair comes back beside the stats.
+            */}
+            <div className="mt-1 flex items-center gap-2">
+              <p className="min-w-0 flex-1 truncate font-mono text-sm text-muted">
+                {player.tag}
+              </p>
+              <div className="flex shrink-0 gap-1.5 sm:hidden">
+                <FavoriteButton
+                  kind="player"
+                  tag={normalizeTag(player.tag)}
+                  name={player.name}
+                  compact
+                />
+                <ShareButton title={shareTitle} text={shareText} compact />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -122,36 +157,40 @@ export function PlayerHeader({
             peak -- it was the less interesting half.
           */}
           <div className="flex flex-1 items-stretch gap-2.5 sm:flex-none">
-            <div className="flex flex-1 flex-col items-end justify-center gap-0.5 rounded-2xl border border-border bg-surface-2/60 px-4 py-3 sm:px-5 sm:py-4">
-              <span className="flex items-center gap-2 text-2xl font-black tabular-nums text-brand sm:text-4xl">
-                <TrophyIcon className="size-6 sm:size-7" />
+            {/* Tighter on a phone, where six digits at 2xl with the icon
+                touched the card's own edge. */}
+            <div className="flex min-w-0 flex-1 flex-col items-end justify-center gap-0.5 rounded-2xl border border-border bg-surface-2/60 px-3 py-3 sm:px-5 sm:py-4">
+              <span className="flex items-center gap-1.5 text-[1.375rem] font-black tabular-nums text-brand sm:gap-2 sm:text-4xl">
+                <TrophyIcon className="size-5 sm:size-7" />
                 {formatNumber(player.trophies)}
               </span>
               <span className="text-xs text-muted">
-                Peak {formatNumber(player.highestTrophies)}
+                {atTrophyPeak ? 'At peak' : `Peak ${formatNumber(player.highestTrophies)}`}
               </span>
             </div>
 
             {hasRanked ? (
-              <div className="flex flex-1 items-center justify-end gap-2.5 rounded-2xl border border-border bg-surface-2/60 px-4 py-3 sm:px-5 sm:py-4">
+              <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-2.5 rounded-2xl border border-border bg-surface-2/60 px-3 py-3 sm:px-5 sm:py-4">
                 {rankedArt ?? peakArt ? (
                   <Image
                     src={(rankedArt ?? peakArt) as string}
                     alt=""
                     width={44}
                     height={44}
-                    className="size-9 shrink-0 object-contain sm:size-11"
+                    className="size-8 shrink-0 object-contain sm:size-11"
                     unoptimized
                   />
                 ) : null}
                 <div className="min-w-0 text-right">
-                  <p className="truncate text-base font-black uppercase leading-tight text-accent sm:text-lg">
+                  <p className="truncate text-sm font-black uppercase leading-tight text-accent sm:text-lg">
                     {player.rankedRankName ?? 'Unranked'}
                   </p>
                   <p className="truncate text-xs text-muted">
-                    {player.highestAllTimeRankedRankName
-                      ? `Peak ${player.highestAllTimeRankedRankName}`
-                      : 'No peak on record'}
+                    {atRankedPeak
+                      ? 'At peak'
+                      : player.highestAllTimeRankedRankName
+                        ? `Peak ${titleCaseLabel(player.highestAllTimeRankedRankName)}`
+                        : 'No peak on record'}
                   </p>
                 </div>
               </div>
@@ -175,21 +214,18 @@ export function PlayerHeader({
             so the first thing the eye landed on in the hero was a pair of
             controls rather than the account.
           */}
-          <div className="grid flex-1 grid-cols-2 items-stretch gap-2.5 text-sm sm:flex-none">
+          <div className="hidden grid-cols-2 items-stretch gap-2.5 text-sm sm:grid">
             <FavoriteButton
               kind="player"
               tag={normalizeTag(player.tag)}
               name={player.name}
             />
-            <ShareButton
-              title={`${player.name} on BrawlZone`}
-              text={`${player.name} (${player.tag}) has ${formatNumber(player.trophies)} trophies on BrawlZone`}
-            />
+            <ShareButton title={shareTitle} text={shareText} />
           </div>
         </div>
 
-        <div className="flex w-full flex-wrap items-center gap-2 text-sm">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium">
+        <div className="flex w-full flex-wrap items-center gap-1.5 text-xs sm:gap-2 sm:text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium">
             <ExperienceIcon className="size-4" />
             Level {player.expLevel}
           </span>
@@ -197,7 +233,7 @@ export function PlayerHeader({
           {/* The badge is the milestone reached (1, 25, 50, 100, 200), the
               number beside it is the exact total. */}
           {player.totalPrestigeLevel ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium">
               <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />
               Prestige {formatNumber(player.totalPrestigeLevel)}
             </span>
@@ -208,7 +244,7 @@ export function PlayerHeader({
               thing to read here. */}
           <Link
             href={`/wrapped/${normalizeTag(player.tag)}`}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium transition-colors hover:border-brand/60 hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium transition-colors hover:border-brand/60 hover:text-foreground"
           >
             <BattlesIcon className="size-4" />
             Recent run
@@ -217,7 +253,7 @@ export function PlayerHeader({
           {player.club?.tag ? (
             <Link
               href={`/club/${normalizeTag(player.club.tag)}`}
-              className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 font-medium transition-colors hover:border-accent/60 hover:text-foreground"
+              className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium transition-colors hover:border-accent/60 hover:text-foreground"
             >
               <ClubIcon className="size-4 shrink-0" />
               {/* Club names run long and are player-authored, so this is the
@@ -225,7 +261,7 @@ export function PlayerHeader({
               <span className="truncate">{player.club.name}</span>
             </Link>
           ) : (
-            <span className="rounded-full border border-border bg-surface-2 px-3 py-1 text-muted">
+            <span className="rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 text-muted">
               No club
             </span>
           )}
@@ -233,7 +269,7 @@ export function PlayerHeader({
           {lastOnline}
 
           {player.isQualifiedFromChampionshipChallenge ? (
-            <span className="rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-medium text-brand">
+            <span className="rounded-full border border-brand/40 bg-brand/10 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium text-brand">
               Championship qualified
             </span>
           ) : null}

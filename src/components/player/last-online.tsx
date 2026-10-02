@@ -34,7 +34,7 @@ export async function LastOnline({ tag }: { tag: string }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium ${
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-medium sm:px-3 sm:py-1 ${
         online
           ? 'border-victory/40 bg-victory/10 text-victory'
           : 'border-border bg-surface-2 text-muted'
