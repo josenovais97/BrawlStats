@@ -473,7 +473,12 @@ export default async function PlayerPage({ params }: PageProps) {
         <section>
           <SectionHeading title="Recent battles" />
           <Suspense fallback={<BattleLogSkeleton />}>
-            <BattleLog tag={tag} playerTag={player.tag} brawlerMeta={brawlerMeta} />
+            <BattleLog
+              tag={tag}
+              playerTag={player.tag}
+              brawlerMeta={brawlerMeta}
+              modeMeta={modeMeta}
+            />
           </Suspense>
         </section>            </ProfileGroup>
           ),

@@ -27,6 +27,15 @@ export interface BattleEntry {
   outcomeLabel: string;
   tone: BattleTone;
   mode: string;
+  /**
+   * The game's own mode art, resolved on the server.
+   *
+   * A battle history without mode icons is a list of sentences. The brawler
+   * portrait was already here; the mode was the word "Knockout" and nothing
+   * else, which is the one thing a Brawl Stars player identifies by shape
+   * before they read it.
+   */
+  modeIconUrl: string | null;
   map: string;
   type: string;
   relative: string;
@@ -233,6 +242,7 @@ function RunRow({ run }: { run: BattleEntry[] }) {
             </span>
             <span className="text-xs font-bold tabular-nums text-muted">×{run.length}</span>
             <span className="text-muted">·</span>
+            <ModeMark entry={head} />
             <span className="truncate text-sm font-medium">{head.mode}</span>
             {stars > 0 ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
@@ -279,6 +289,7 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
               {entry.outcomeLabel}
             </span>
             <span className="text-muted">·</span>
+            <ModeMark entry={entry} />
             <span className="truncate text-sm font-medium">{entry.mode}</span>
             {entry.isStarPlayer ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
@@ -435,5 +446,21 @@ function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMod
         ))}
       </div>
     </div>
+  );
+}
+
+/** The mode's own icon, when the catalogue had one for it. */
+function ModeMark({ entry }: { entry: BattleEntry }) {
+  if (!entry.modeIconUrl) return null;
+  return (
+    <Image
+      src={entry.modeIconUrl}
+      alt=""
+      width={16}
+      height={16}
+      className="size-4 shrink-0 object-contain"
+      loading="lazy"
+      unoptimized
+    />
   );
 }

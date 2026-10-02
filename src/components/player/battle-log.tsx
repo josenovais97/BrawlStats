@@ -8,7 +8,7 @@ import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBattleLog } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { humanizeMode, ordinal, relativeTime } from '@/lib/format';
-import type { BABrawler } from '@/types/brawlapi';
+import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
 
 interface BattleLogProps {
@@ -17,6 +17,8 @@ interface BattleLogProps {
   /** Canonical tag from the player payload, used to find them in each battle. */
   playerTag: string;
   brawlerMeta: Map<number, BABrawler>;
+  /** For the mode artwork on each row. */
+  modeMeta: Map<string, BAGameMode>;
 }
 
 /**
@@ -29,7 +31,7 @@ interface BattleLogProps {
  * URLs already resolved: no `Map`, no `BABrawler`, and no date arithmetic that
  * could disagree between the render and the hydration.
  */
-export async function BattleLog({ tag, playerTag, brawlerMeta }: BattleLogProps) {
+export async function BattleLog({ tag, playerTag, brawlerMeta, modeMeta }: BattleLogProps) {
   let entries: BSBattleLogEntry[];
   try {
     entries = (await getBattleLog(tag)).items;
@@ -53,7 +55,7 @@ export async function BattleLog({ tag, playerTag, brawlerMeta }: BattleLogProps)
   }
 
   const view = entries.map((entry, index) =>
-    toViewEntry(entry, index, playerTag, brawlerMeta),
+    toViewEntry(entry, index, playerTag, brawlerMeta, modeMeta),
   );
 
   return <BattleLogView entries={view} />;
@@ -64,6 +66,7 @@ function toViewEntry(
   index: number,
   playerTag: string,
   brawlerMeta: Map<number, BABrawler>,
+  modeMeta: Map<string, BAGameMode>,
 ): BattleEntry {
   const { battle, event } = entry;
   const self = playerTag.toUpperCase();
@@ -98,6 +101,8 @@ function toViewEntry(
     outcomeLabel: outcome.label,
     tone: outcome.tone,
     mode: humanizeMode(battle.mode ?? event.mode),
+    modeIconUrl:
+      modeMeta.get((battle.mode ?? event.mode ?? '').toLowerCase())?.imageUrl ?? null,
     map: event.map ?? 'Unknown map',
     type: battle.type ? humanizeMode(battle.type) : 'Casual',
     relative: relativeTime(entry.battleTime),

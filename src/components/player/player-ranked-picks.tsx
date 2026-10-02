@@ -219,8 +219,17 @@ function ModeCard({
         </span>
       </span>
 
+      {/*
+        The answer, at the size of an answer.
+        
+        The pick and its alternatives were 40px and 32px portraits -- near
+        enough identical that the card read as a list of three brawlers rather
+        than one recommendation with two fallbacks. The point of the section is
+        "play this", so it is the thing you see.
+      */}
       {play ? (
         <Row
+          lead
           art={brawlerMeta.get(play.id)?.imageUrl}
           name={play.name}
           note={play.rank === 1 ? 'Best pick in this mode' : `Your best here · #${play.rank}`}
@@ -278,34 +287,41 @@ function Row({
   note,
   tone,
   small = false,
+  lead = false,
 }: {
   art: string | undefined;
   name: string;
   note: string;
   tone: 'good' | 'invest' | 'lock';
   small?: boolean;
+  /** The mode's recommended pick, drawn to dominate its two alternatives. */
+  lead?: boolean;
 }) {
+  const box = lead ? 'size-14' : small ? 'size-8' : 'size-10';
   return (
-    <span className={`flex items-center gap-2.5 ${small ? 'mt-0' : 'mt-1.5'}`}>
+    <span
+      className={`flex items-center gap-2.5 ${small ? 'mt-0' : 'mt-1.5'} ${
+        lead ? 'rounded-xl bg-surface-2/50 p-2' : ''
+      }`}
+    >
       {art ? (
         <Image
           src={art}
           alt=""
-          width={40}
-          height={40}
-          className={`${small ? 'size-8' : 'size-10'} shrink-0 rounded-lg bg-surface-2`}
+          width={56}
+          height={56}
+          className={`${box} shrink-0 rounded-lg bg-surface-2`}
           loading="lazy"
           unoptimized
         />
       ) : (
-        <span
-          aria-hidden
-          className={`${small ? 'size-8' : 'size-10'} shrink-0 rounded-lg bg-surface-2`}
-        />
+        <span aria-hidden className={`${box} shrink-0 rounded-lg bg-surface-2`} />
       )}
       <span className="min-w-0 flex-1">
         <span
-          className={`block truncate font-bold ${small ? 'text-xs' : 'text-sm'}`}
+          className={`block truncate ${
+            lead ? 'text-base font-black uppercase' : small ? 'text-xs font-bold' : 'text-sm font-bold'
+          }`}
         >
           {titleCase(name)}
         </span>
