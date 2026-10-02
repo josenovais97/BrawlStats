@@ -49,6 +49,13 @@ export function ProfileGroup({
         for. This is the last of that furniture.
       */}
       <h2 className="sr-only">{title}</h2>
+      {/*
+        For a fact about this account, not for what the tab is for. Four of
+        the five tabs used to open with a line like "Reference rather than
+        news" -- the page explaining its own layout to a reader who came to
+        see a number -- so those were removed and only Brawlers, whose line
+        carries a count, keeps one.
+      */}
       {subtitle ? (
         <p className="mb-7 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
       ) : null}

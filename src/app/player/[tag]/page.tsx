@@ -328,7 +328,7 @@ export default async function PlayerPage({ params }: PageProps) {
           id: 'overview',
           label: 'Overview',
           content: (
-            <ProfileGroup title="Overview" subtitle="How strong this account is and where it stands, before any of the detail.">
+            <ProfileGroup title="Overview">
         {/*
          * The signature element first and on its own, then the game's own
          * verdict underneath it.
@@ -383,7 +383,7 @@ export default async function PlayerPage({ params }: PageProps) {
           id: 'account',
           label: 'Account',
           content: (
-            <ProfileGroup title="The account" subtitle="Lifetime totals, records and how the trophies got here. Reference rather than news.">
+            <ProfileGroup title="The account">
         <PlayerStats player={player} />
         <PlayerRecords player={player} />
         {/* Only ever populated for the couple of hundred players holding a
@@ -412,7 +412,7 @@ export default async function PlayerPage({ params }: PageProps) {
           id: 'next',
           label: 'Do next',
           content: (
-            <ProfileGroup title="What to do next" subtitle="The things on this page that are worth acting on, soonest first.">
+            <ProfileGroup title="What to do next">
         <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
 
         {/* After the rotation, because it narrows the same question to the maps
@@ -452,7 +452,7 @@ export default async function PlayerPage({ params }: PageProps) {
           id: 'battles',
           label: 'Battles',
           content: (
-            <ProfileGroup title="Battles" subtitle="What the last few days of games actually say, and the games themselves.">
+            <ProfileGroup title="Battles">
         {/* Above the log rather than below it: this is the same subject read one
             level up, and the reader should meet the conclusion before scrolling
             twenty-five rows of evidence. */}
