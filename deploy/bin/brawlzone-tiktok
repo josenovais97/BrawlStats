@@ -34,8 +34,9 @@ INIT_URL="https://open.tiktokapis.com/v2/post/publish/content/init/"
 STATUS_URL="https://open.tiktokapis.com/v2/post/publish/status/fetch/"
 CREATOR_URL="https://open.tiktokapis.com/v2/post/publish/creator_info/query/"
 
-# DIRECT_POST since 2026-10-02, when the audit passed and the box moved from
-# the sandbox client to the production one. Nothing else in this script changes
+# Back to MEDIA_UPLOAD on 2026-10-02 after a direct post was refused with
+# `unaudited_client_can_only_post_to_private_accounts`. See the note below the
+# constant: scope and audit are two different approvals. Nothing else in this script changes
 # when it flips — the request body already carries a title and a description,
 # which both modes accept, and the direct path adds `privacy_level` from
 # `creator_info/query` plus the brand toggles.
@@ -44,7 +45,7 @@ CREATOR_URL="https://open.tiktokapis.com/v2/post/publish/creator_info/query/"
 # a public post that went out at 09:10 with nobody looking at it. Rolling back
 # is one line here and a push — the deploy timer picks it up inside five
 # minutes, and posts go back to the inbox.
-POST_MODE="DIRECT_POST"
+POST_MODE="MEDIA_UPLOAD"
 
 die() { echo "$*" >&2; exit 1; }
 
