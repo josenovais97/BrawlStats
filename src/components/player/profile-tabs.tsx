@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export interface ProfileTab {
   id: string;
@@ -33,6 +33,7 @@ export interface ProfileTab {
  */
 export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
   const [active, setActive] = useState(tabs[0]?.id);
+  const strip = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fromHash = () => {
@@ -43,6 +44,29 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
     window.addEventListener('hashchange', fromHash);
     return () => window.removeEventListener('hashchange', fromHash);
   }, [tabs]);
+
+  /*
+   * Keep the selected tab on screen.
+   *
+   * Five tabs do not fit across a phone, so opening a link to #brawlers put
+   * the reader on a tab whose button was off the right-hand edge -- the page
+   * had changed and nothing visible said which one was showing.
+   *
+   * `scrollLeft` on the strip rather than `scrollIntoView`, which on a sticky
+   * element also scrolls the page to it and would throw the reader halfway
+   * down on every switch.
+   */
+  useEffect(() => {
+    const bar = strip.current;
+    const button = bar?.querySelector<HTMLElement>('[aria-selected="true"]');
+    if (!bar || !button) return;
+    const left = button.offsetLeft - 16;
+    const right = button.offsetLeft + button.offsetWidth + 16;
+    if (left < bar.scrollLeft) bar.scrollTo({ left, behavior: 'smooth' });
+    else if (right > bar.scrollLeft + bar.clientWidth) {
+      bar.scrollTo({ left: right - bar.clientWidth, behavior: 'smooth' });
+    }
+  }, [active]);
 
   const choose = (id: string) => {
     setActive(id);
@@ -69,6 +93,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
         would show as a grey block against whatever scrolled underneath.
       */}
       <div
+        ref={strip}
         role="tablist"
         aria-label="Profile sections"
         className="profile-tabs sticky top-16 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"

@@ -214,10 +214,19 @@ export function MetaRadar({
 
   return (
     <div className="space-y-3">
-      <div className={bare ? '' : 'card overflow-hidden p-3 sm:p-4'}>
+      {/*
+        Scrolls sideways on a phone rather than shrinking.
+        
+        The plot is 760 wide by nature -- two axes and four labelled corners --
+        and squeezed into 390px the eighty-five portraits are about nine
+        pixels each, which is the mush this chart exists not to be. A minimum
+        width and a scroll keeps them legible; above `sm` there is room and
+        the min-width never binds.
+      */}
+      <div className={`overflow-x-auto ${bare ? '' : 'card p-3 sm:p-4'}`}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
-          className="h-auto w-full touch-manipulation"
+          className="h-auto w-full min-w-[640px] touch-manipulation"
           role="img"
           aria-label={`Every rated brawler plotted by pick rate against meta score, over ${windowDays} days`}
         >
