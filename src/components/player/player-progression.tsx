@@ -22,6 +22,9 @@ interface Props {
   playtime: PlaytimeEstimate;
 }
 
+/** Completion above which the bars are all full and only the gaps are news. */
+const NEARLY_COMPLETE = 0.97;
+
 export function PlayerProgression({ progression, playtime }: Props) {
   /*
    * Two groups, not one list of seven bars.
@@ -36,36 +39,42 @@ export function PlayerProgression({ progression, playtime }: Props) {
     {
       node: <BrawlersIcon className="size-4" />,
       label: 'Brawlers',
+      noun: ['brawler', 'brawlers'],
       stat: progression.brawlers,
       tone: 'text-brand',
     },
     {
       node: <StarPowerIcon className="size-4" />,
       label: 'Star powers',
+      noun: ['star power', 'star powers'],
       stat: progression.starPowers,
       tone: 'text-brand',
     },
     {
       node: <GadgetIcon className="size-4" />,
       label: 'Gadgets',
+      noun: ['gadget', 'gadgets'],
       stat: progression.gadgets,
       tone: 'text-accent',
     },
     {
       node: <GearIcon className="size-4" />,
       label: 'Gears equipped',
+      noun: ['gear', 'gears'],
       stat: progression.gears,
       tone: 'text-muted',
     },
     {
       node: <HyperchargeIcon className="size-4" />,
       label: 'Hypercharges',
+      noun: ['hypercharge', 'hypercharges'],
       stat: progression.hyperCharges,
       tone: 'text-defeat',
     },
     {
       node: <BuffieIcon className="size-4" />,
       label: 'Buffies',
+      noun: ['buffie', 'buffies'],
       stat: progression.buffies,
       tone: 'text-accent',
     },
@@ -75,10 +84,17 @@ export function PlayerProgression({ progression, playtime }: Props) {
     {
       node: <Power11Icon className="size-4" />,
       label: 'Brawlers at power 11',
+      noun: ['brawler to power 11', 'brawlers to power 11'],
       stat: progression.maxedBrawlers,
       tone: 'text-victory',
     },
   ];
+
+  const nearlyComplete =
+    !progression.totalsUnavailable && progression.completion >= NEARLY_COMPLETE;
+  const missing = [...collection, ...maxed].filter(
+    (row) => row.stat.total > 0 && row.stat.owned < row.stat.total,
+  );
 
   return (
     <Panel
@@ -101,53 +117,93 @@ export function PlayerProgression({ progression, playtime }: Props) {
           <Bar value={progression.completion} />
         </div>
 
-        <Group title="Collection" hint="What is unlocked">
-          {collection.map(({ node, label, stat, tone }) => (
-            <div key={label}>
-              <div className="mb-1.5 flex items-center gap-2 text-sm">
-                <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
-                <span className="flex-1 font-medium">{label}</span>
-                <span className="tabular-nums text-muted">
-                  {formatNumber(stat.owned)}
-                  {stat.total > 0 ? (
-                    <span className="text-muted"> / {formatNumber(stat.total)}</span>
-                  ) : null}
-                  {/* Gears only: completion counts the two a brawler can
-                      equip, but plenty of players own more and the page should
-                      say so rather than silently dropping the extras. */}
-                  {stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned ? (
-                    <span
-                      className="text-muted"
-                      title={`${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`}
-                    >
-                      {' '}
-                      · {formatNumber(stat.ownedRaw)} owned
-                    </span>
-                  ) : null}
-                </span>
-              </div>
-              <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
-            </div>
-          ))}
-        </Group>
+        {/*
+          A nearly complete account gets what is missing, not eight bars.
 
-        <Group title="Maxed" hint="What is finished">
-          {maxed.map(({ node, label, stat, tone }) => (
-            <div key={label}>
-              <div className="mb-1.5 flex items-center gap-2 text-sm">
-                <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
-                <span className="flex-1 font-medium">{label}</span>
-                <span className="tabular-nums text-muted">
-                  {formatNumber(stat.owned)}
-                  {stat.total > 0 ? (
-                    <span className="text-muted"> / {formatNumber(stat.total)}</span>
-                  ) : null}
-                </span>
-              </div>
-              <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
-            </div>
-          ))}
-        </Group>
+          At 99% every bar is full to within a pixel, so the section was eight
+          identical gold lines whose only information was in the small print
+          at their right-hand ends -- the reader had to scan every fraction to
+          find the two that were not whole. The list of what is left is that
+          same information, already found. Below the threshold the bars are
+          the right picture and stay.
+        */}
+        {nearlyComplete ? (
+          <div className="rounded-xl bg-surface-2/40 px-4 py-3.5 text-sm">
+            {missing.length === 0 ? (
+              <p className="font-medium text-victory">Everything unlocked and maxed.</p>
+            ) : (
+              <>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted">
+                  Still to get
+                </p>
+                <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5">
+                  {missing.map(({ node, noun, stat, tone }) => {
+                    const left = stat.total - stat.owned;
+                    return (
+                      <li key={noun[1]} className="flex items-center gap-1.5">
+                        <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>
+                          {node}
+                        </span>
+                        <span className="font-semibold tabular-nums">{formatNumber(left)}</span>
+                        <span className="text-muted">{left === 1 ? noun[0] : noun[1]}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+          </div>
+        ) : (
+          <>
+            <Group title="Collection" hint="What is unlocked">
+              {collection.map(({ node, label, stat, tone }) => (
+                <div key={label}>
+                  <div className="mb-1.5 flex items-center gap-2 text-sm">
+                    <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
+                    <span className="flex-1 font-medium">{label}</span>
+                    <span className="tabular-nums text-muted">
+                      {formatNumber(stat.owned)}
+                      {stat.total > 0 ? (
+                        <span className="text-muted"> / {formatNumber(stat.total)}</span>
+                      ) : null}
+                      {/* Gears only: completion counts the two a brawler can
+                          equip, but plenty of players own more and the page should
+                          say so rather than silently dropping the extras. */}
+                      {stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned ? (
+                        <span
+                          className="text-muted"
+                          title={`${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`}
+                        >
+                          {' '}
+                          · {formatNumber(stat.ownedRaw)} owned
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
+                </div>
+              ))}
+            </Group>
+
+            <Group title="Maxed" hint="What is finished">
+              {maxed.map(({ node, label, stat, tone }) => (
+                <div key={label}>
+                  <div className="mb-1.5 flex items-center gap-2 text-sm">
+                    <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
+                    <span className="flex-1 font-medium">{label}</span>
+                    <span className="tabular-nums text-muted">
+                      {formatNumber(stat.owned)}
+                      {stat.total > 0 ? (
+                        <span className="text-muted"> / {formatNumber(stat.total)}</span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
+                </div>
+              ))}
+            </Group>
+          </>
+        )}
 
         <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-wider text-muted">
           Investment <span className="font-medium normal-case tracking-normal">· what it cost</span>
@@ -246,6 +302,8 @@ interface Row {
   label: string;
   stat: OwnershipStat;
   tone: string;
+  /** Singular and plural, for the "still to get" line on a nearly complete account. */
+  noun: [string, string];
 }
 
 /**
