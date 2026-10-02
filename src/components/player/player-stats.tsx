@@ -33,7 +33,14 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
    * summary of the tab rather than its first section.
    */
   return (
-    <section>
+    /*
+     * `@container` because the strip inside sizes itself with container
+     * queries, and taking it out of its Panel took away the container they
+     * were measuring against -- so the five figures fell back to two very wide
+     * columns. A component that uses `@md:` has to be given something to be
+     * `@md` *of*.
+     */
+    <section className="@container">
       <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted">
         Lifetime{' '}
         <span className="font-medium normal-case tracking-normal">
