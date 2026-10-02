@@ -76,6 +76,52 @@ export function PlayerMetaFit({
 
   const iconFor = (id: number) => brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id);
 
+  const cards = [
+    {
+      key: 'underlevelled',
+      title: 'Strong, not finished',
+      icon: ArrowUpRight,
+      tone: 'text-victory',
+      hint: 'Top-tier brawlers you own below power 11. The cheapest upgrades on this account.',
+      empty: 'Every top-tier brawler you own is at power 11.',
+      rows: underlevelled.map((entry) => {
+        const brawler = owned.get(entry.brawlerId)!;
+        return (
+          <Row
+            key={entry.brawlerId}
+            id={entry.brawlerId}
+            name={entry.brawlerName}
+            icon={iconFor(entry.brawlerId)}
+            tier={entry.tier}
+            score={entry.metaScore}
+            detail={`Power ${brawler.power} · ${formatNumber(brawler.trophies)} trophies`}
+          />
+        );
+      }),
+    },
+    {
+      key: 'cold-mains',
+      title: 'Mains out of favour',
+      icon: TrendingDown,
+      tone: 'text-defeat',
+      hint: `Your ${MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.`,
+      empty: 'None of your most-played brawlers are struggling right now.',
+      rows: coldMains.map(({ brawler, entry }) => (
+        <Row
+          key={brawler.id}
+          id={brawler.id}
+          name={brawler.name}
+          icon={iconFor(brawler.id)}
+          tier={entry.tier}
+          score={entry.metaScore}
+          detail={`${formatNumber(brawler.trophies)} trophies · power ${brawler.power}`}
+        />
+      )),
+    },
+  ];
+  const filled = cards.filter((card) => card.rows.length > 0);
+  const emptyCards = cards.filter((card) => card.rows.length === 0);
+
   return (
     <Panel
       title="Roster vs the meta"
@@ -94,50 +140,37 @@ export function PlayerMetaFit({
         , which covers the 3v3 modes only.
       </p>
 
-      <div className="grid gap-4 @3xl:grid-cols-3">
-        <Card
-          title="Strong, not finished"
-          icon={ArrowUpRight}
-          tone="text-victory"
-          empty="Every top-tier brawler you own is at power 11."
-          hint="Top-tier brawlers you own below power 11. The cheapest upgrades on this account."
-        >
-          {underlevelled.map((entry) => {
-            const brawler = owned.get(entry.brawlerId)!;
-            return (
-              <Row
-                key={entry.brawlerId}
-                id={entry.brawlerId}
-                name={entry.brawlerName}
-                icon={iconFor(entry.brawlerId)}
-                tier={entry.tier}
-                score={entry.metaScore}
-                detail={`Power ${brawler.power} · ${formatNumber(brawler.trophies)} trophies`}
-              />
-            );
-          })}
-        </Card>
+      {/*
+        Only the cards with something in them get a column.
 
-        <Card
-          title="Mains out of favour"
-          icon={TrendingDown}
-          tone="text-defeat"
-          empty="None of your most-played brawlers are struggling right now."
-          hint={`Your ${MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.`}
-        >
-          {coldMains.map(({ brawler, entry }) => (
-            <Row
-              key={brawler.id}
-              id={brawler.id}
-              name={brawler.name}
-              icon={iconFor(brawler.id)}
-              tier={entry.tier}
-              score={entry.metaScore}
-              detail={`${formatNumber(brawler.trophies)} trophies · power ${brawler.power}`}
-            />
+        This was a three-column grid holding two cards, so the right third of
+        the panel was always empty -- and on a maxed account "Strong, not
+        finished" was half the panel spent on one sentence at the bottom of
+        its box. An empty card is still a reading ("every top-tier brawler you
+        own is at power 11" is good news), so it is kept, as a line under the
+        cards rather than a box of its own.
+      */}
+      {filled.length > 0 ? (
+        <div className={`grid gap-4 ${filled.length === 2 ? '@3xl:grid-cols-2' : ''}`}>
+          {filled.map(({ key, title, icon, tone, hint, rows }) => (
+            <Card key={key} title={title} icon={icon} tone={tone} hint={hint}>
+              {rows}
+            </Card>
           ))}
-        </Card>
-      </div>
+        </div>
+      ) : null}
+      {emptyCards.length > 0 ? (
+        <ul className={`space-y-1.5 text-sm text-muted ${filled.length > 0 ? 'mt-4' : ''}`}>
+          {emptyCards.map(({ key, icon: Icon, tone, title, empty }) => (
+            <li key={key} className="flex items-start gap-2">
+              <Icon className={`mt-0.5 size-4 shrink-0 ${tone}`} />
+              <span>
+                <span className="font-semibold text-foreground">{title}:</span> {empty}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </Panel>
   );
 }
@@ -147,18 +180,14 @@ function Card({
   icon: Icon,
   tone,
   hint,
-  empty,
   children,
 }: {
   title: string;
   icon: typeof ArrowUpRight;
   tone: string;
   hint: string;
-  empty: string;
-  children: React.ReactNode[];
+  children: React.ReactNode;
 }) {
-  const items = children.filter(Boolean);
-
   return (
     <div className="card flex flex-col p-5">
       <h3 className={`flex items-center gap-2 text-sm font-bold ${tone}`}>
@@ -166,12 +195,7 @@ function Card({
         {title}
       </h3>
       <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{hint}</p>
-
-      {items.length === 0 ? (
-        <p className="flex flex-1 items-center py-2 text-sm text-muted">{empty}</p>
-      ) : (
-        <ul className="space-y-1">{items}</ul>
-      )}
+      <ul className="space-y-1">{children}</ul>
     </div>
   );
 }
