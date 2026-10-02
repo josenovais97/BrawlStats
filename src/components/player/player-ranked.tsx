@@ -47,6 +47,8 @@ export function PlayerRanked({
     Boolean,
   ).length;
   if (!hasRanked && globalRank === null && !standing) return null;
+  const oneTier = hasRanked && atPeakTier(player);
+  const oneTierArt = oneTier ? currentArt(player) : null;
 
   return (
     <Panel title="Ranking" aside="Where the game puts them" bodyClassName="">
@@ -61,7 +63,52 @@ export function PlayerRanked({
         that -- and the standings, which are our measurement rather than the
         game's, sit underneath as rows.
       */}
-      {hasRanked ? (
+      {/*
+        One tier, not three, when all three are the same.
+
+        On an account sitting at its all-time peak the band was the same badge
+        and the same name three times across -- the third and fourth saying of
+        "Masters I" on the first screen, after the hero and the skill score.
+        Three identical cells are not a reading; "at peak" is, and it is the
+        one thing that band was there to show.
+
+        Collapsed only on the tier names. The elo still differs (a peak of
+        8,896 against 8,298 today, within one tier), so it stays on the row.
+      */}
+      {oneTier ? (
+        <div className="flex items-center gap-4 border-b border-border/70 px-4 py-4 sm:px-5">
+          {oneTierArt ? (
+            <Image
+              src={oneTierArt}
+              alt=""
+              width={48}
+              height={48}
+              className="size-11 shrink-0 object-contain @xl:size-12"
+              unoptimized
+            />
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base font-black uppercase leading-tight text-accent @xl:text-lg">
+              {titleCaseLabel(player.rankedRankName)}
+            </p>
+            <p className="text-xs text-muted">Current, season best and all-time best</p>
+          </div>
+          <div className="shrink-0 text-right text-xs tabular-nums text-muted">
+            {player.rankedElo ? (
+              <p>
+                <span className="font-bold text-foreground">
+                  {formatNumber(player.rankedElo)}
+                </span>{' '}
+                elo now
+              </p>
+            ) : null}
+            {player.highestAllTimeRankedElo &&
+            player.highestAllTimeRankedElo !== player.rankedElo ? (
+              <p>best {formatNumber(player.highestAllTimeRankedElo)}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : hasRanked ? (
         <div className="grid grid-cols-3 divide-x divide-border/70 border-b border-border/70">
           <Tier
             label="Current"
@@ -194,6 +241,22 @@ function Tier({
         <span className="text-xs tabular-nums text-muted">{formatNumber(elo)} elo</span>
       ) : null}
     </div>
+  );
+}
+
+/** All three tiers name the same rank, so the band would repeat itself. */
+function atPeakTier(player: BSPlayer): boolean {
+  const current = player.rankedRankName?.trim().toUpperCase();
+  return (
+    Boolean(current) &&
+    player.highestSeasonRankedRankName?.trim().toUpperCase() === current &&
+    player.highestAllTimeRankedRankName?.trim().toUpperCase() === current
+  );
+}
+
+function currentArt(player: BSPlayer): string | null {
+  return (
+    rankedTierIconUrl(player.rankedRank) ?? rankedLeagueIconUrl(player.rankedRankName)
   );
 }
 
