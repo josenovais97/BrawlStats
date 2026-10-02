@@ -10,7 +10,11 @@ import {
   TrophyIcon,
   WinStreakIcon,
 } from '@/components/game-icons';
-import { type StatItem, StatStrip } from '@/components/ui/stat-strip';
+import Image from 'next/image';
+
+import { Panel } from '@/components/ui/panel';
+import { StatStrip } from '@/components/ui/stat-strip';
+import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatDuration, formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 
@@ -19,8 +23,10 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
   // season-best and all-time-best tiers with their elo, so a figure repeating
   // just the current tier was the weakest thing in this row.
   return (
-    <StatStrip
-      items={[
+    <Panel title="Lifetime" aside="Since the account was made">
+      <StatStrip
+        bare
+        items={[
         {
           // The game's own marks, so the row reads as Brawl Stars rather than
           // as a generic dashboard of line icons.
@@ -54,8 +60,9 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
           label: 'Exp points',
           value: formatNumber(player.expPoints),
         },
-      ]}
-    />
+        ]}
+      />
+    </Panel>
   );
 }
 
@@ -85,56 +92,125 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     null,
   );
 
-  const items: StatItem[] = [];
+  /*
+   * Achievements, not database fields.
+   *
+   * "Best brawler: 1,016 (Pierce)" as a figure in a strip is the same shape as
+   * a lifetime win count, and it is not the same kind of thing -- these are the
+   * single best runs on the account, and on a long-lived one they are usually
+   * the most impressive numbers anywhere on the page. The two that belong to a
+   * brawler get that brawler's portrait, because a face is what makes a record
+   * feel like something that happened rather than a row that was stored.
+   */
+  const records: Record[] = [];
 
   if (bestBrawler && bestBrawler.highestTrophies > 0) {
-    items.push({
-      node: <TrophyIcon className="size-4" />,
+    records.push({
+      key: 'best-brawler',
+      brawlerId: bestBrawler.id,
+      icon: <TrophyIcon className="size-4" />,
       label: 'Best brawler',
       value: formatNumber(bestBrawler.highestTrophies),
       hint: titleCaseLabel(bestBrawler.name),
+      tone: 'text-brand',
     });
   }
   if (bestStreak && (bestStreak.maxWinStreak ?? 0) > 0) {
-    items.push({
-      node: <WinStreakIcon className="size-4" />,
+    records.push({
+      key: 'streak',
+      brawlerId: bestStreak.id,
+      icon: <WinStreakIcon className="size-4" />,
       label: 'Best win streak',
-      value: formatNumber(bestStreak.maxWinStreak ?? 0),
+      value: `${formatNumber(bestStreak.maxWinStreak ?? 0)} wins`,
       hint: titleCaseLabel(bestStreak.name),
+      tone: 'text-victory',
     });
   }
   if (player.totalPrestigeLevel) {
-    items.push({
-      node: <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />,
+    records.push({
+      key: 'prestige',
+      icon: <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />,
       label: 'Total prestige',
       value: formatNumber(player.totalPrestigeLevel),
       hint: 'Across every brawler',
+      tone: 'text-accent',
     });
   }
   if (robo) {
-    items.push({
-      node: <RoboRumbleIcon className="size-4" />,
+    records.push({
+      key: 'robo',
+      icon: <RoboRumbleIcon className="size-4" />,
       label: 'Robo Rumble',
       value: robo,
       hint: 'Longest survival',
+      tone: 'text-foreground',
     });
   }
   if (bigBrawler) {
-    items.push({
-      node: <BigBrawlerIcon className="size-4" />,
+    records.push({
+      key: 'big',
+      icon: <BigBrawlerIcon className="size-4" />,
       label: 'Big Brawler',
       value: bigBrawler,
-      hint: 'Longest time as the Big Brawler',
+      hint: 'Longest time held',
+      tone: 'text-foreground',
     });
   }
 
-  if (items.length === 0) return null;
+  if (records.length === 0) return null;
 
-  /*
-   * No heading of its own any more. "Personal bests" was a section title over
-   * five cards that sat directly under five near-identical cards; the group
-   * header above now says what the whole area is, and one more title inside it
-   * was a line of type separating two things that look the same anyway.
-   */
-  return <StatStrip items={items} />;
+  return (
+    <Panel title="Personal bests" aside="All-time">
+      <ul className="grid gap-3 @md:grid-cols-2 @3xl:grid-cols-3">
+        {records.map((record) => (
+          <li
+            key={record.key}
+            className="flex items-center gap-3.5 rounded-xl bg-surface-2/40 p-3.5"
+          >
+            {record.brawlerId !== undefined ? (
+              <Image
+                src={brawlerIconUrl(record.brawlerId)}
+                alt=""
+                width={52}
+                height={52}
+                className="size-13 shrink-0 rounded-lg bg-surface-3"
+                loading="lazy"
+                unoptimized
+              />
+            ) : (
+              /* A record with no brawler behind it still needs something at
+                 the same size, or the row jumps between cards. */
+              <span className="grid size-13 shrink-0 place-items-center rounded-lg bg-surface-3">
+                <span className={record.tone}>{record.icon}</span>
+              </span>
+            )}
+            <div className="min-w-0">
+              <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
+                <span aria-hidden className={`flex shrink-0 items-center ${record.tone}`}>
+                  {record.icon}
+                </span>
+                <span className="truncate">{record.label}</span>
+              </p>
+              <p className={`truncate text-xl font-black tabular-nums leading-tight ${record.tone}`}>
+                {record.value}
+              </p>
+              <p className="truncate text-xs text-muted">{record.hint}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  );
 }
+
+interface Record {
+  key: string;
+  /** Shows that brawler's portrait, for the records that belong to one. */
+  brawlerId?: number;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  hint: string;
+  tone: string;
+}
+

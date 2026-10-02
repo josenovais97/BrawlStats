@@ -23,23 +23,21 @@ interface Props {
 }
 
 export function PlayerProgression({ progression, playtime }: Props) {
-  const rows: {
-    node: React.ReactNode;
-    label: string;
-    stat: OwnershipStat;
-    tone: string;
-  }[] = [
+  /*
+   * Two groups, not one list of seven bars.
+   *
+   * "Brawlers 107/108" and "At power 11 79/108" were sitting in the same
+   * column answering different questions -- what the account *has*, and how
+   * much of it is *finished*. A reader scanning seven identical bars has to
+   * work out which is which from the labels; split in two, the shape of the
+   * account is the first thing visible. The same data, grouped.
+   */
+  const collection: Row[] = [
     {
       node: <BrawlersIcon className="size-4" />,
       label: 'Brawlers',
       stat: progression.brawlers,
       tone: 'text-brand',
-    },
-    {
-      node: <Power11Icon className="size-4" />,
-      label: 'At power 11',
-      stat: progression.maxedBrawlers,
-      tone: 'text-victory',
     },
     {
       node: <StarPowerIcon className="size-4" />,
@@ -73,6 +71,15 @@ export function PlayerProgression({ progression, playtime }: Props) {
     },
   ];
 
+  const maxed: Row[] = [
+    {
+      node: <Power11Icon className="size-4" />,
+      label: 'Brawlers at power 11',
+      stat: progression.maxedBrawlers,
+      tone: 'text-victory',
+    },
+  ];
+
   return (
     <Panel
       title="Progression"
@@ -94,8 +101,8 @@ export function PlayerProgression({ progression, playtime }: Props) {
           <Bar value={progression.completion} />
         </div>
 
-        <div className="grid gap-x-6 gap-y-4 @2xl:grid-cols-2">
-          {rows.map(({ node, label, stat, tone }) => (
+        <Group title="Collection" hint="What is unlocked">
+          {collection.map(({ node, label, stat, tone }) => (
             <div key={label}>
               <div className="mb-1.5 flex items-center gap-2 text-sm">
                 <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
@@ -122,9 +129,30 @@ export function PlayerProgression({ progression, playtime }: Props) {
               <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
             </div>
           ))}
-        </div>
+        </Group>
 
-        <div className="mt-6 grid gap-3 border-t border-border pt-5 @sm:grid-cols-2 @3xl:grid-cols-5">
+        <Group title="Maxed" hint="What is finished">
+          {maxed.map(({ node, label, stat, tone }) => (
+            <div key={label}>
+              <div className="mb-1.5 flex items-center gap-2 text-sm">
+                <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
+                <span className="flex-1 font-medium">{label}</span>
+                <span className="tabular-nums text-muted">
+                  {formatNumber(stat.owned)}
+                  {stat.total > 0 ? (
+                    <span className="text-muted"> / {formatNumber(stat.total)}</span>
+                  ) : null}
+                </span>
+              </div>
+              <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
+            </div>
+          ))}
+        </Group>
+
+        <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-wider text-muted">
+          Investment <span className="font-medium normal-case tracking-normal">· what it cost</span>
+        </p>
+        <div className="grid gap-3 @sm:grid-cols-2 @3xl:grid-cols-5">
           <Investment
             node={<CoinIcon className="size-5" />}
             label="Coins invested"
@@ -210,5 +238,40 @@ function Investment({
         <p className="truncate text-xs text-muted">{hint}</p>
       </div>
     </div>
+  );
+}
+
+interface Row {
+  node: React.ReactNode;
+  label: string;
+  stat: OwnershipStat;
+  tone: string;
+}
+
+/**
+ * One labelled band of bars.
+ *
+ * The heading is small and the rule is the separation, because these are
+ * groups inside a panel rather than sections in their own right -- a second
+ * run of panel-sized titles inside one panel is how a page ends up with four
+ * levels of heading and no hierarchy.
+ */
+function Group({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-6 first:mt-0">
+      <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted">
+        {title}{' '}
+        <span className="font-medium normal-case tracking-normal">· {hint}</span>
+      </p>
+      <div className="grid gap-x-6 gap-y-4 @2xl:grid-cols-2">{children}</div>
+    </section>
   );
 }

@@ -1,7 +1,7 @@
 import { TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 
-import { CrownIcon, PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
+import { PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { Panel } from '@/components/ui/panel';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';

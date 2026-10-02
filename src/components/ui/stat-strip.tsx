@@ -32,12 +32,19 @@ export interface StatItem {
  * the last row is short, and the fix for that is filler cells that have to
  * know the breakpoint. Space has no such problem and is quieter anyway.
  */
-export function StatStrip({ items }: { items: StatItem[] }) {
+export function StatStrip({
+  items,
+  /** True inside a Panel, which already provides the surface and the padding. */
+  bare = false,
+}: {
+  items: StatItem[];
+  bare?: boolean;
+}) {
   if (items.length === 0) return null;
 
   return (
-    <div className="card p-5 sm:p-6">
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
+    <div className={bare ? '' : 'card p-5 sm:p-6'}>
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-6 @md:grid-cols-3 @3xl:grid-cols-5">
         {items.map((item) => (
           <div key={item.label} className="min-w-0">
             <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
