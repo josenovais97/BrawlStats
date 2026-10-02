@@ -22,8 +22,24 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
   // Ranked deliberately absent: the Ranking section shows the current,
   // season-best and all-time-best tiers with their elo, so a figure repeating
   // just the current tier was the weakest thing in this row.
+  /*
+   * A band, not a panel.
+   *
+   * The Account tab was four identical bordered rectangles in a column:
+   * lifetime, bests, progress, progression. These five are the plainest
+   * reference material on the page -- totals that have only ever gone up --
+   * and giving them the same treatment as an upgrade plan said they were
+   * equally worth stopping at. Bare, under the group heading, they read as a
+   * summary of the tab rather than its first section.
+   */
   return (
-    <Panel title="Lifetime" aside="Since the account was made">
+    <section>
+      <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted">
+        Lifetime{' '}
+        <span className="font-medium normal-case tracking-normal">
+          · since the account was made
+        </span>
+      </p>
       <StatStrip
         bare
         items={[
@@ -62,7 +78,7 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
         },
         ]}
       />
-    </Panel>
+    </section>
   );
 }
 
