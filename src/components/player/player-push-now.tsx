@@ -160,9 +160,18 @@ export function PlayerPushNow({
                   unoptimized
                 />
                 <span className="min-w-0 flex-1 text-sm">
-                  <span className="flex items-center gap-1.5 truncate">
-                    <span className="font-semibold">{titleCase(option.brawlerName)}</span>
-                    <span className="text-muted">in</span>
+                  {/*
+                    `truncate` on the flex container did nothing -- it sets
+                    overflow on the box, and flex children overflow it anyway,
+                    so a long mode name was clipped mid-word rather than
+                    ellipsised. The children have to say which of them gives
+                    way, and it is the mode.
+                  */}
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span className="shrink-0 font-semibold">
+                      {titleCase(option.brawlerName)}
+                    </span>
+                    <span className="shrink-0 text-muted">in</span>
                     {modeMeta.get(option.mode.toLowerCase())?.imageUrl ? (
                       <Image
                         src={modeMeta.get(option.mode.toLowerCase())!.imageUrl}
@@ -174,7 +183,7 @@ export function PlayerPushNow({
                         unoptimized
                       />
                     ) : null}
-                    <span className="text-muted">{mode}</span>
+                    <span className="truncate text-muted">{mode}</span>
                   </span>
                   <Link
                     href={`/maps/${slugify(mode)}/${slugify(option.mapName)}`}
