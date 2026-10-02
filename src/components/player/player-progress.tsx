@@ -6,6 +6,7 @@ import { Panel } from '@/components/ui/panel';
 import { StatCard } from '@/components/ui/stat-card';
 import { formatNumber } from '@/lib/format';
 import type { TrophyPoint } from '@/lib/stats';
+import { trophyCurve } from '@/lib/trophy-curve';
 
 /**
  * What a player has actually done lately, read off the trophy history.
@@ -35,6 +36,13 @@ export function PlayerProgress({
   const week = changeOver(points, 7);
   const month = changeOver(points, 30);
   const best = bestDay(points);
+  /*
+   * Null far more often than not, and that is the design. See `trophy-curve`:
+   * a chart only appears once there are enough views spread over enough days
+   * to have a shape, because the alternative is a flat line between two dots
+   * on most profiles -- which is why the previous one was deleted.
+   */
+  const curve = trophyCurve(points);
 
   // The full tracked span, which is the one figure that always exists — the
   // seven- and thirty-day windows need history reaching that far back, and a
@@ -54,6 +62,48 @@ export function PlayerProgress({
       title="Recent progress"
       subtitle="From the trophy points recorded on each profile view."
     >
+      {curve ? (
+        <figure className="mb-5">
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="h-28 w-full sm:h-36"
+            role="img"
+            aria-label={`Trophy history over ${curve.days} days, from ${formatNumber(curve.low)} to ${formatNumber(curve.high)}`}
+          >
+            <defs>
+              <linearGradient id="trophy-curve-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--brand)" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="var(--brand)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={curve.area} fill="url(#trophy-curve-fill)" />
+            {/*
+              `vector-effect` because the viewBox is stretched to the element's
+              width with `preserveAspectRatio="none"`. Without it the stroke is
+              scaled by the same factor and a 1-unit line comes out as a thick
+              smear horizontally and a hairline vertically.
+            */}
+            <path
+              d={curve.line}
+              fill="none"
+              stroke="var(--brand)"
+              strokeWidth={1.5}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          <figcaption className="mt-1.5 flex justify-between text-xs tabular-nums text-muted">
+            <span>{formatNumber(curve.low)}</span>
+            <span>
+              {curve.points} views over {curve.days} days
+            </span>
+            <span>{formatNumber(curve.high)}</span>
+          </figcaption>
+        </figure>
+      ) : null}
+
       <div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-3">
         {week ? (
           <StatCard
