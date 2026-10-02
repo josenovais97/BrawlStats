@@ -377,7 +377,17 @@ export function MetaRadar({
                   /* A brawler the account cannot field is a hole, not a dot. */
                   fillOpacity={face ? 1 : owned ? 0.16 : 0.5}
                   stroke={selected ? 'var(--foreground)' : CELL_FILL[cell]}
-                  strokeWidth={selected ? 2.5 : named ? 2 : 1}
+                  /*
+                   * A hole is drawn faintly, not outlined.
+                   *
+                   * On a profile an unowned brawler in a named corner was
+                   * getting the corner's full 2px ring with nothing inside it,
+                   * which reads as a portrait that failed to load rather than
+                   * as a gap in the roster. The gap is the point, so it is
+                   * drawn as absence.
+                   */
+                  strokeOpacity={owned && !face ? 0.3 : 1}
+                  strokeWidth={selected ? 2.5 : named && face ? 2 : 1}
                 />
                 {/*
                   The portrait is drawn at `r`, never `rr`. The clip circle is
