@@ -22,9 +22,18 @@ export const TIKTOK_REDIRECT_URI = 'https://brawlzone.net/api/tiktok/callback';
 
 /**
  * `user.info.basic` identifies which account a token belongs to;
- * `video.upload` is what sends the daily card. `video.publish` is absent on
- * purpose — it is only useful after TikTok's audit, and an unused scope in a
- * review submission delays the review.
+ * `video.upload` is what sends the daily card to the account's inbox.
+ *
+ * `video.publish` is what DIRECT_POST needs, and it was deliberately absent
+ * until the audit passed — an unused scope in a review submission delays the
+ * review. The audit passed on 2026-10-02, so it is here now.
+ *
+ * **Adding it to this string is not enough on its own, and the order matters.**
+ * A granted authorisation does not widen when the app is approved: the token
+ * on the box was issued against the old three and still carries exactly those,
+ * which is why `creator_info/query` answers `scope_not_authorized` no matter
+ * what the portal says. The sequence is portal, then this constant, then a
+ * fresh consent, and only then `POST_MODE` in `deploy/bin/brawlzone-tiktok`.
  */
 /**
  * `video.list` is what lets the site show its own newest post. It is a read of
@@ -33,7 +42,7 @@ export const TIKTOK_REDIRECT_URI = 'https://brawlzone.net/api/tiktok/callback';
  * asking for a scope the app is not configured for fails the whole consent
  * screen rather than dropping that one scope.
  */
-export const TIKTOK_SCOPES = 'user.info.basic,video.upload,video.list';
+export const TIKTOK_SCOPES = 'user.info.basic,video.upload,video.publish,video.list';
 
 /**
  * Guards the two OAuth routes.
