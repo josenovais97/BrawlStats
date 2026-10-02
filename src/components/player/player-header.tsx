@@ -105,9 +105,16 @@ export function PlayerHeader({
           </div>
         </div>
 
-        {/* Side by side on a phone, stacked beside the identity block once
-            there is room for a column. */}
-        <div className="flex w-full shrink-0 items-stretch gap-2.5 sm:w-auto sm:flex-col">
+        {/*
+          Always a column.
+          
+          This used to put the trophy card and the two buttons side by side on
+          a phone, which fit while there was one stat block. There are two now
+          -- trophies and Ranked -- and three things across 358px pushed Save
+          and Share off the right-hand edge, clipped mid-word. The stat pair
+          takes its own row and the buttons take theirs.
+        */}
+        <div className="flex w-full shrink-0 flex-col items-stretch gap-2.5 sm:w-auto">
           {/*
             The two numbers that say how good this account is, side by side:
             what the ladder thinks and what Ranked thinks. Trophies alone was
