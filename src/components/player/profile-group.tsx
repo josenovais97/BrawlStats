@@ -34,17 +34,24 @@ export function ProfileGroup({
   return (
     <section>
       {/*
-        No number and no rule any more. Both existed to tell a reader scrolling
-        a six-screen column how far through they were and where one area ended
-        and the next began -- questions a tab answers by construction, since
-        only one area is on screen at a time.
+        The title is for screen readers only, because the tab above it already
+        says the same word -- "OVERVIEW" in the tab bar and "OVERVIEW" again as
+        a 3xl heading directly beneath it, on three of the five tabs verbatim.
+        Printing it twice cost about ninety pixels before any content on a
+        phone, which on the first screen is the difference between seeing the
+        skill score and not.
+        
+        It stays in the markup rather than being deleted: the tab panel is
+        labelled, but a heading is still what lets someone navigating by
+        headings land here.
+        
+        The number and the rule went earlier, with the long scroll they were
+        for. This is the last of that furniture.
       */}
-      <header className="mb-7">
-        <h2 className="display text-2xl uppercase leading-tight sm:text-3xl">{title}</h2>
-        {subtitle ? (
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
-        ) : null}
-      </header>
+      <h2 className="sr-only">{title}</h2>
+      {subtitle ? (
+        <p className="mb-7 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
+      ) : null}
 
       {/*
         Generous and uniform. Each section used to set its own distance from
