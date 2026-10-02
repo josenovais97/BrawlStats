@@ -1,6 +1,4 @@
-import { CalendarDays, TrendingUp } from 'lucide-react';
-
-import { TrophyGainIcon } from '@/components/game-icons';
+import { TrophyGainIcon, TrophyIcon } from '@/components/game-icons';
 
 import { Panel } from '@/components/ui/panel';
 import { formatNumber } from '@/lib/format';
@@ -94,7 +92,10 @@ export function PlayerProgress({
             />
           </svg>
           <figcaption className="mt-1.5 flex justify-between text-xs tabular-nums text-muted">
-            <span>{formatNumber(curve.low)}</span>
+            <span className="flex items-center gap-1">
+              <TrophyIcon className="size-3.5" />
+              {formatNumber(curve.low)}
+            </span>
             <span>
               {curve.points} views over {curve.days} days
             </span>
@@ -113,7 +114,7 @@ export function PlayerProgress({
       <dl className="grid grid-cols-1 gap-x-6 gap-y-5 @sm:grid-cols-3">
         {week ? (
           <Figure
-            node={<TrendingUp className="size-4" />}
+            node={<TrophyGainIcon className="size-4" />}
             label={`Last ${week.days} days`}
             value={signed(week.change)}
             hint={`${formatNumber(week.from)} → ${formatNumber(week.to)}`}
@@ -122,7 +123,7 @@ export function PlayerProgress({
         ) : null}
         {month ? (
           <Figure
-            node={<CalendarDays className="size-4" />}
+            node={<TrophyGainIcon className="size-4" />}
             label={`Last ${month.days} days`}
             value={signed(month.change)}
             hint={`${formatNumber(month.from)} → ${formatNumber(month.to)}`}

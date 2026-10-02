@@ -1,7 +1,7 @@
 import { TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 
-import { PlayersIcon, RankedIcon, TrophyIcon } from '@/components/game-icons';
+import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import { Panel } from '@/components/ui/panel';
 import { rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
@@ -135,7 +135,7 @@ export function PlayerRanked({
 
         {standing ? (
           <Cell
-            gameIcon={<PlayersIcon className="size-5" />}
+            gameIcon={<TrophyIcon className="size-5" />}
             label="Trophy standing"
             value={`Top ${formatPercentileLabel(standing.percentile)}`}
             hint={`Of ${formatNumber(standing.population)} tracked players`}

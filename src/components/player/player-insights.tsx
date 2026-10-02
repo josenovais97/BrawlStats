@@ -1,4 +1,4 @@
-import { Activity, TrendingDown, TrendingUp } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -7,6 +7,7 @@ import {
   BrawlersIcon,
   CrownIcon,
   PlayersIcon,
+  TrophyGainIcon,
 } from '@/components/game-icons';
 import { Panel } from '@/components/ui/panel';
 import { brawlerPath } from '@/lib/slugs';
@@ -90,11 +91,9 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                   insights.trophyChange >= 0 ? 'text-victory' : 'text-defeat'
                 }`}
               >
-                {insights.trophyChange >= 0 ? (
-                  <TrendingUp className="size-4" />
-                ) : (
-                  <TrendingDown className="size-4" />
-                )}
+                {/* The game's own trophy-change mark, not a generic arrow:
+                    the sign is already on the number beside it. */}
+                <TrophyGainIcon className="size-4" />
                 {insights.trophyChange > 0 ? '+' : ''}
                 {formatNumber(insights.trophyChange)}
               </p>

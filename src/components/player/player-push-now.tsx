@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { TrophyIcon } from '@/components/game-icons';
 import { Panel } from '@/components/ui/panel';
 import { brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { formatNumber, titleCase } from '@/lib/format';
@@ -114,7 +115,11 @@ export function PlayerPushNow({
                 first thing a reader would quote. The adjusted figure on the
                 right is the claim, and it already carries its own shrinkage. */}
             <p className="mt-1 text-sm text-muted">
-              Power {top.power} · {formatNumber(top.trophies)} trophies
+              Power {top.power} ·{' '}
+              <span className="inline-flex items-baseline gap-1">
+                <TrophyIcon className="size-3.5 translate-y-0.5" />
+                {formatNumber(top.trophies)}
+              </span>
             </p>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
               <span>{timeLeft(top.endsAt)}</span>
