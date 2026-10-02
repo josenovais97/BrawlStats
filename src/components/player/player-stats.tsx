@@ -4,7 +4,6 @@ import {
   BrawlersIcon,
   DuoShowdownIcon,
   ExperienceIcon,
-  PrestigeIcon,
   RoboRumbleIcon,
   SoloShowdownIcon,
   TrophyIcon,
@@ -149,20 +148,16 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
       tone: 'text-victory',
     });
   }
-  if (player.totalPrestigeLevel) {
-    records.push({
-      key: 'prestige',
-      icon: <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />,
-      label: 'Total prestige',
-      value: formatNumber(player.totalPrestigeLevel),
-      hint: 'Across every brawler',
-      tone: 'text-accent',
-    });
-  }
+  /*
+   * No "Total prestige" card. The same number is a chip in the hero two
+   * screens up, and as a fourth record here it pushed the grid to three plus
+   * one alone on a second row.
+   */
   if (robo) {
     records.push({
       key: 'robo',
       icon: <RoboRumbleIcon className="size-4" />,
+      mark: <RoboRumbleIcon className="size-8" />,
       label: 'Robo Rumble',
       value: robo,
       hint: 'Longest survival',
@@ -173,6 +168,7 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
     records.push({
       key: 'big',
       icon: <BigBrawlerIcon className="size-4" />,
+      mark: <BigBrawlerIcon className="size-8" />,
       label: 'Big Brawler',
       value: bigBrawler,
       hint: 'Longest time held',
@@ -202,9 +198,11 @@ export function PlayerRecords({ player }: { player: BSPlayer }) {
               />
             ) : (
               /* A record with no brawler behind it still needs something at
-                 the same size, or the row jumps between cards. */
+                 the same size, or the row jumps between cards -- and at that
+                 size, not a 16px glyph in a 52px box, which read as a missing
+                 image rather than a mark. */
               <span className="grid size-13 shrink-0 place-items-center rounded-lg bg-surface-3">
-                <span className={record.tone}>{record.icon}</span>
+                <span className={record.tone}>{record.mark ?? record.icon}</span>
               </span>
             )}
             <div className="min-w-0">
@@ -231,6 +229,8 @@ interface Record {
   /** Shows that brawler's portrait, for the records that belong to one. */
   brawlerId?: number;
   icon: React.ReactNode;
+  /** The same icon drawn to fill the portrait slot, for records with no brawler. */
+  mark?: React.ReactNode;
   label: string;
   value: string;
   hint: string;
