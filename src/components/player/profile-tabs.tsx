@@ -56,10 +56,22 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
 
   return (
     <>
+      {/*
+        Five tabs do not fit across a 390px phone -- measured, the last one is
+        off-screen and the one before it is clipped. The strip scrolls, which
+        is fine, but a strip that scrolls with no sign that it does is a strip
+        with three tabs as far as the reader is concerned.
+
+        So: smaller type below `sm`, and a fade on the right edge that only
+        appears when there is something past it. `mask-image` rather than an
+        overlaid gradient, because the bar is translucent and blurred over the
+        page behind it -- a solid gradient in the site's background colour
+        would show as a grey block against whatever scrolled underneath.
+      */}
       <div
         role="tablist"
         aria-label="Profile sections"
-        className="sticky top-16 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
+        className="profile-tabs sticky top-16 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
       >
         {tabs.map((tab) => {
           const current = tab.id === active;
@@ -71,7 +83,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
               aria-selected={current}
               aria-controls={`panel-${tab.id}`}
               onClick={() => choose(tab.id)}
-              className={`shrink-0 rounded-lg px-3.5 py-2 text-sm font-bold uppercase tracking-wide transition-colors ${
+              className={`shrink-0 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors sm:px-3.5 sm:text-sm ${
                 current
                   ? 'bg-brand text-brand-ink'
                   : 'text-muted hover:bg-surface-2 hover:text-foreground'

@@ -616,3 +616,31 @@ body {
     animation: none;
   }
 }
+
+/*
+ * The profile's tab strip, which scrolls on a phone.
+ *
+ * Five tabs do not fit across 390px, and a strip that scrolls with nothing to
+ * say so reads as a strip with three tabs. The mask fades the right edge, and
+ * `scroll-timeline`-free: it is unconditional, which costs a few pixels of
+ * fade when everything already fits and is worth not shipping a scroll
+ * listener for.
+ *
+ * A mask rather than an overlaid gradient because the bar is translucent and
+ * blurred over the page behind it; a gradient painted in the background colour
+ * would show as a grey block against whatever happens to scroll underneath.
+ */
+@media (max-width: 639px) {
+  .profile-tabs {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  }
+}
+
+/* No scrollbar under the tabs; the fade is the affordance. */
+.profile-tabs {
+  scrollbar-width: none;
+}
+.profile-tabs::-webkit-scrollbar {
+  display: none;
+}
