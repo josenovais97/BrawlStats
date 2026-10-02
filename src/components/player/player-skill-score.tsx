@@ -114,12 +114,21 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
           </div>
 
           {/*
-            Capped. Full width at 1440 made each bar about 830px, with its
-            label at one end and its value at the other -- far enough apart
-            that pairing them is work. A measure is a line of text like any
-            other and wants the same limit.
+            One column beside the ring, holding everything that is not the
+            ring: the three components, the flag and the methodology.
+            
+            They used to be three siblings of the flex row with three separate
+            width caps, which came out as three different right edges stacked
+            down the page -- 1005, 945 and 915 on a 1440 screen. One column is
+            one measure and one edge, and the ring is centred against the whole
+            of it rather than against a third of it.
+            
+            Capped because full width made each bar about 830px, with its label
+            at one end and its value at the other, far enough apart that
+            pairing them is work. A measure is a line of text like any other.
           */}
-          <div className="min-w-0 flex-1 space-y-3.5 @3xl:max-w-2xl">
+          <div className="min-w-0 flex-1 @3xl:max-w-3xl">
+            <div className="space-y-3.5">
             {skill.components.map((component) => (
               <div key={component.key}>
                 <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
@@ -151,11 +160,10 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
+            </div>
 
       {flag && FlagIcon ? (
-        <p className="mt-6 flex max-w-3xl items-start gap-2.5 rounded-xl border border-border/70 bg-surface-2/50 px-4 py-3 text-sm leading-relaxed">
+        <p className="mt-6 flex items-start gap-2.5 rounded-xl border border-border/70 bg-surface-2/50 px-4 py-3 text-sm leading-relaxed">
           <FlagIcon className={`mt-0.5 size-4 shrink-0 ${FLAG_STYLE[flag.kind].tone}`} />
           <span>
             <strong className="font-semibold">{flag.label}.</strong>{' '}
@@ -164,7 +172,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
         </p>
       ) : null}
 
-      <p className="mt-6 max-w-3xl text-xs leading-relaxed text-muted">
+      <p className="mt-5 text-xs leading-relaxed text-muted">
           Weighted toward{' '}
           <Link href="/leaderboard" className="font-medium text-brand hover:underline">
             Ranked
@@ -180,6 +188,8 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
               }.`
             : ''}
       </p>
+          </div>
+        </div>
     </section>
   );
 }
