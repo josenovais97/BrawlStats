@@ -59,6 +59,15 @@ export interface PanelMode {
   /** The API's mode key, or `null` for the combined list. */
   key: string | null;
   label: string;
+  /**
+   * The mode's own icon, or null for the combined list.
+   *
+   * On the mode chips, not the map chips. A map layout shrunk to chip size is
+   * a smudge nobody can match against the draft screen, while a mode icon is
+   * the one picture every player already reads at a glance -- it is the badge
+   * the game itself shows in the corner of the draft.
+   */
+  icon: string | null;
   entries: PanelEntry[];
   /** Ranked maps in this mode. Empty on the combined list. */
   maps: PanelMap[];
@@ -261,12 +270,22 @@ export function PanelTiers({
               type="button"
               onClick={() => choose(mode.key)}
               aria-pressed={on}
-              className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+              className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
                 on
                   ? 'border-brand/40 bg-brand/10 text-brand'
                   : 'border-border bg-surface text-muted'
               }`}
             >
+              {mode.icon ? (
+                <Image
+                  src={mode.icon}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={`size-4 shrink-0 object-contain ${on ? '' : 'opacity-80'}`}
+                  unoptimized
+                />
+              ) : null}
               {mode.label}
             </button>
           );

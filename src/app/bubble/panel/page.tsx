@@ -161,10 +161,11 @@ export default async function BubblePanelPage() {
   const modes: PanelMode[] = [
     // No maps on the combined list: the full pool is around thirty, which is
     // more chips than this window can show without becoming the whole panel.
-    { key: null, label: 'All', entries: shape(allRows), maps: [] },
+    { key: null, label: 'All', icon: null, entries: shape(allRows), maps: [] },
     ...modeKeys.map((mode, index) => ({
       key: mode,
       label: modeLabel(modeMeta, mode),
+      icon: modeMeta.get(mode.toLowerCase())?.imageUrl ?? null,
       entries: shape(perMode[index]),
       maps: mapsByMode.get(mode) ?? [],
     })),

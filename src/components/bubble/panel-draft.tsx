@@ -288,6 +288,16 @@ export function PanelDraft({
           onClick={() => setChanging(true)}
           className="flex w-full items-center gap-1.5 px-1 pb-1 text-left text-[11px]"
         >
+          {currentMode?.icon ? (
+            <Image
+              src={currentMode.icon}
+              alt=""
+              width={16}
+              height={16}
+              className="size-4 shrink-0 object-contain"
+              unoptimized
+            />
+          ) : null}
           <span className="font-bold text-accent-2">{map.mapName}</span>
           <span className="text-muted">· {currentMode?.label}</span>
           <span className="ml-auto rounded border border-border px-1.5 py-0.5 font-bold text-muted">
@@ -306,12 +316,24 @@ export function PanelDraft({
                   setMap(null);
                 }}
                 aria-pressed={m.key === mode}
-                className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
                   m.key === mode
                     ? 'border-brand/40 bg-brand/10 text-brand'
                     : 'border-border bg-surface text-muted'
                 }`}
               >
+                {/* Same icon as the Meta tab's chips: the badge the game shows
+                    in the corner of the draft, read faster than the word. */}
+                {m.icon ? (
+                  <Image
+                    src={m.icon}
+                    alt=""
+                    width={16}
+                    height={16}
+                    className={`size-4 shrink-0 object-contain ${m.key === mode ? '' : 'opacity-80'}`}
+                    unoptimized
+                  />
+                ) : null}
                 {m.label}
               </button>
             ))}
