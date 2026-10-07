@@ -17,6 +17,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.Icon
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -39,6 +41,7 @@ import android.view.inputmethod.InputConnection
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
@@ -101,8 +104,29 @@ class BubbleService : Service() {
      */
     private var outsideClosedAt = 0L
 
-    /** The panel's WebView, kept so the panel can be torn down cleanly. */
+    /*
+     * The panel's views, built once and kept across opens -- see `buildPanel`.
+     * `panel` above is only set while the panel is on screen; these outlive it.
+     */
+    private var panelRoot: PanelFrame? = null
     private var panelWeb: WebView? = null
+    private var panelSpinner: ProgressBar? = null
+    private var panelRetry: TextView? = null
+    private var panelOffline: TextView? = null
+
+    /** The kept page's state: loaded at all, failed, or served from the cache. */
+    private var panelLoaded = false
+    private var panelFailed = false
+    private var panelFromCache = false
+    /** When it was last loaded, and for which account settings. */
+    private var panelLoadedAt = 0L
+    private var panelAccount: String? = null
+
+    /**
+     * Bumped on every open and every teardown, so removals queued by a
+     * collapse can tell whether the panel has been reopened since.
+     */
+    private var panelGeneration = 0
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -158,6 +182,13 @@ class BubbleService : Service() {
         showBubble()
         running = true
         BubbleTileService.refresh(this)
+
+        /*
+         * Start loading the panel now, so the first tap opens a list rather
+         * than a spinner. Delayed a moment so the bubble itself appears first,
+         * and skipped if the service is already gone.
+         */
+        handler.postDelayed({ if (bubble != null) buildPanel() }, PANEL_PRELOAD_DELAY_MS)
     }
 
     /**
@@ -180,7 +211,8 @@ class BubbleService : Service() {
         BubbleTileService.refresh(this)
         runCatching { installWatcher?.let { unregisterReceiver(it) } }
         installWatcher = null
-        removePanel()
+        handler.removeCallbacksAndMessages(null)
+        destroyPanel()
         hideCloseTarget()
         bubble?.let { runCatching { windows.removeView(it) } }
         bubble = null
@@ -490,12 +522,39 @@ class BubbleService : Service() {
     }
 
     /** Immediate teardown. Used where an animation would be wrong: the service
-     *  shutting down, or a drag that has already started moving the anchor. */
+     *  shutting down, or a drag that has already started moving the anchor.
+     *
+     *  Only the *window* goes. The panel's views and its loaded page are kept
+     *  for the next open; `destroyPanel` is what lets go of them. */
     private fun removePanel() {
-        panel?.let { runCatching { windows.removeView(it) } }
+        panelGeneration += 1
+        // The kept view rather than `panel`: a collapse clears `panel` before
+        // its animation finishes, and bumping the generation above cancels
+        // that collapse's own removal -- so a drag that starts mid-collapse
+        // would otherwise leave the window on screen with nothing to take it
+        // down.
+        (panel ?: panelRoot)?.let { view ->
+            view.animate().cancel()
+            if (view.isAttachedToWindow) runCatching { windows.removeView(view) }
+        }
         panel = null
-        panelWeb = null
         panelParams = null
+    }
+
+    /** Lets go of the kept panel and its WebView. Only when the service ends. */
+    private fun destroyPanel() {
+        removePanel()
+        panelWeb?.let { web ->
+            runCatching {
+                web.stopLoading()
+                web.destroy()
+            }
+        }
+        panelWeb = null
+        panelRoot = null
+        panelSpinner = null
+        panelRetry = null
+        panelOffline = null
     }
 
     /**
@@ -508,14 +567,14 @@ class BubbleService : Service() {
      * one happens to be parked.
      *
      * `panel` is cleared before the animation runs, so a second tap during
-     * those few frames opens a fresh panel instead of finding a stale one.
+     * those few frames reopens straight away -- see the generation check below.
      */
     private fun collapsePanel() {
         val view = panel ?: return
         val params = panelParams
         panel = null
-        panelWeb = null
         panelParams = null
+        val generation = ++panelGeneration
         Log.d(TAG, "collapsePanel: animating out")
 
         val bp = bubbleParams
@@ -535,13 +594,21 @@ class BubbleService : Service() {
          *
          * So the animation is decoration and the delayed removal is the
          * contract. `drop` is idempotent, so whichever arrives first wins.
+         *
+         * And it only acts for *this* collapse. Since 1.25 the same view is
+         * reused, so a tap that reopens the panel inside these few frames puts
+         * this very view back on screen -- and without the generation check
+         * the removals still queued from the collapse would take the reopened
+         * panel straight down again.
          */
         var dropped = false
         val drop = {
             if (!dropped) {
                 dropped = true
-                Log.d(TAG, "collapsePanel: removing window")
-                runCatching { windows.removeView(view) }
+                if (generation == panelGeneration) {
+                    Log.d(TAG, "collapsePanel: removing window")
+                    runCatching { windows.removeView(view) }
+                }
             }
         }
 
@@ -559,17 +626,28 @@ class BubbleService : Service() {
     }
 
     /**
-     * The panel is a WebView pointed at the site's own compact view.
-     *
-     * Deliberately not a reimplementation of the picks in Kotlin. The numbers,
-     * the sampling caveats and the wording all live in one place already, and a
-     * second copy in an app that ships on its own schedule would drift from the
-     * site within a patch or two.
+     * What the loaded page was told about the account, so a change can be
+     * noticed. The page reads the tag and the filters once, when it loads.
      */
-    private fun showPanel() {
-        val params = bubbleParams ?: return
+    private fun accountKey(): String =
+        Account.tag(this) + "|" + Account.filter(this) + "|" + Account.hide(this)
 
-        val (width, height) = panelSize()
+    /**
+     * The panel's views, built once and reused for every open.
+     *
+     * Until 1.24 every tap built a new WebView and fetched the page again, so
+     * the panel opened on a spinner -- a third of a second on Wi-Fi in the
+     * recording, and much longer on mobile data, mid-draft, against a pick
+     * timer, which is the one moment the panel exists for. The tab, mode, map
+     * and draft were already kept in the page's localStorage, so nothing was
+     * lost by reloading -- only time. Keeping the views means reopening is
+     * just putting the window back.
+     *
+     * Detaching a WebView from its window does not unload it: the page, its
+     * scroll position and its state all survive until `destroyPanel`.
+     */
+    private fun buildPanel(): PanelFrame {
+        panelRoot?.let { return it }
 
         val root = PanelFrame(this).apply {
             setBackgroundResource(R.drawable.panel_background)
@@ -636,16 +714,36 @@ class BubbleService : Service() {
             setBackgroundColor(Color.parseColor("#22304A"))
         }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1)))
 
+        /*
+         * Said when the list on screen is the saved copy rather than a fresh
+         * one. A stale list presented as live is worse than no list, so the
+         * fallback below is only acceptable because this says what it is.
+         */
+        val offline = TextView(this).apply {
+            text = "Offline · showing the last saved list"
+            textSize = 11f
+            gravity = Gravity.CENTER
+            setTextColor(Color.parseColor("#FFC53D"))
+            setBackgroundColor(Color.parseColor("#1F1A0B"))
+            setPadding(dp(8), dp(4), dp(8), dp(4))
+            visibility = View.GONE
+        }
+        column.addView(offline, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+        ))
+
         /* A spinner over the WebView, because a blank dark rectangle while the
-           page loads is indistinguishable from a panel that failed to open. */
+           page loads is indistinguishable from a panel that failed to open.
+           Only ever shown before the first load: a refresh happens behind the
+           page already on screen. */
         val body = FrameLayout(this)
         val spinner = ProgressBar(this).apply {
             isIndeterminate = true
         }
 
-        var failed = false
-
-        /* Shown in place of the page when the load fails; tapping reloads. */
+        /* Shown in place of the page when the load fails and there is no saved
+           copy to fall back on; tapping reloads. */
         val retry = TextView(this).apply {
             text = "Could not reach brawlzone.net.\n\nTap to try again."
             textSize = 13f
@@ -660,20 +758,6 @@ class BubbleService : Service() {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             webViewClient = object : WebViewClient() {
-                /**
-                 * Hand the panel the account before its own scripts run.
-                 *
-                 * Seeded into the page's storage rather than passed on the
-                 * URL. A query parameter would opt the panel page out of
-                 * server caching, and this is the page that gets opened over
-                 * and over in a hurry -- see the caching note on
-                 * /bubble/panel, and AGENTS.md on what search params cost.
-                 *
-                 * `onPageStarted` rather than `onPageFinished`: the panel
-                 * reads these when it mounts, and writing them afterwards
-                 * would show the unfiltered list for a frame and then correct
-                 * it, which reads as a bug.
-                 */
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     view?.evaluateJavascript(Account.bootstrapScript(this@BubbleService), null)
@@ -681,40 +765,34 @@ class BubbleService : Service() {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     spinner.visibility = View.GONE
-                    if (failed) return
-                    view?.animate()?.alpha(1f)?.setDuration(160)?.start()
+                    if (panelFailed) return
+                    panelLoaded = true
+                    offline.visibility = if (panelFromCache) View.VISIBLE else View.GONE
+                    // Back to normal caching for the next load: the cache-only
+                    // mode is for this one fallback, never a setting that sticks.
+                    view?.settings?.cacheMode = WebSettings.LOAD_DEFAULT
+                    if (view != null && view.alpha < 1f) {
+                        view.animate().alpha(1f).setDuration(160).start()
+                    }
                 }
 
-                /*
-                 * A panel that cannot load has to say so.
-                 *
-                 * Without this the spinner turned forever: on a dropped
-                 * connection — which is exactly what a phone does mid-match —
-                 * the reader was left watching an animation with no way to tell
-                 * whether it was slow or broken, and no way to retry short of
-                 * closing the bubble and opening it again.
-                 *
-                 * Only the main document counts. A failed image is not a failed
-                 * panel, and treating it as one would replace a working list
-                 * with an error over one missing portrait.
-                 */
                 override fun onReceivedError(
                     view: WebView,
                     request: WebResourceRequest,
                     error: WebResourceError,
                 ) {
                     if (!request.isForMainFrame) return
-                    failed = true
+                    // Offline with nothing saved yet, or online and the site is
+                    // unreachable. Either way there is no list to show.
+                    panelFailed = true
+                    panelLoaded = false
+                    view.settings.cacheMode = WebSettings.LOAD_DEFAULT
                     spinner.visibility = View.GONE
+                    offline.visibility = View.GONE
                     retry.visibility = View.VISIBLE
                     view.visibility = View.GONE
                 }
 
-                /*
-                 * The panel stays in the panel; everything else goes to the
-                 * browser. A 360dp overlay is the wrong place to read the site,
-                 * and it is the wrong place to be sent an APK.
-                 */
                 override fun shouldOverrideUrlLoading(
                     view: WebView,
                     request: WebResourceRequest,
@@ -726,33 +804,9 @@ class BubbleService : Service() {
                 }
             }
 
-            /*
-             * Without this, a download link in a WebView does nothing at all.
-             *
-             * The WebView cannot render an APK, so it hands the URL to a
-             * DownloadListener — and when none is set it discards it silently.
-             * The update button on the panel would have looked like a dead
-             * button, which is worse than not offering one.
-             *
-             * Handed to the browser rather than downloaded in-process on
-             * purpose: installing an APK should go through the same visible
-             * download-and-confirm path as any other, not happen quietly
-             * inside an overlay the user opened to look at a tier list.
-             */
             setDownloadListener { url, _, _, _, _ -> openExternally(Uri.parse(url)) }
 
-            /*
-             * Only the panel's own page ever sees this.
-             *
-             * `addJavascriptInterface` exposes Kotlin to any page the WebView
-             * loads, which is why `shouldOverrideUrlLoading` above sends every
-             * URL outside /bubble/panel to the browser instead of navigating
-             * here. One method, and it is the update button's: nothing here
-             * can read the screen or anything else.
-             */
             addJavascriptInterface(AppBridge(), "BrawlZoneApp")
-
-            loadUrl(PANEL_URL)
         }
         body.addView(web, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
@@ -769,12 +823,11 @@ class BubbleService : Service() {
             Gravity.CENTER,
         ))
         retry.setOnClickListener {
-            failed = false
             retry.visibility = View.GONE
             web.visibility = View.VISIBLE
             web.alpha = 0f
             spinner.visibility = View.VISIBLE
-            web.loadUrl(PANEL_URL)
+            loadPanel()
         }
         column.addView(body, LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f,
@@ -784,6 +837,172 @@ class BubbleService : Service() {
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT,
         ))
+
+        /*
+         * Dragging the panel itself. Same distance-based split as the bubble, so
+         * a press that drifts a couple of pixels still counts as a press on the
+         * close button rather than becoming a drag.
+         *
+         * Reads the live `panelParams` rather than capturing one: the views
+         * outlive any single open, and each open builds its own params.
+         */
+        var downX = 0f
+        var downY = 0f
+        var startX = 0
+        var startY = 0
+        val slop = dp(8)
+        var moving = false
+
+        grab.setOnTouchListener { _, event ->
+            val params = panelParams ?: return@setOnTouchListener false
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    downX = event.rawX
+                    downY = event.rawY
+                    startX = params.x
+                    startY = params.y
+                    moving = false
+                    true
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = event.rawX - downX
+                    val dy = event.rawY - downY
+                    if (!moving && (abs(dx) > slop || abs(dy) > slop)) moving = true
+                    if (moving) {
+                        params.x = (startX + dx).roundToInt()
+                            .coerceIn(0, (screenW - params.width).coerceAtLeast(0))
+                        params.y = (startY + dy).roundToInt()
+                            .coerceIn(0, (screenH - params.height).coerceAtLeast(0))
+                        runCatching { windows.updateViewLayout(root, params) }
+                    }
+                    true
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // Remembered only when it actually moved, so a stray tap on
+                    // the header does not pin the panel to its current spot.
+                    if (moving) {
+                        panelX = params.x
+                        panelY = params.y
+                    }
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        /*
+         * Ask the window for the keyboard's height, and react when it changes.
+         *
+         * `ime()` insets are the only reliable answer: the older tricks measure
+         * a *resizing* window against the screen, and this window never resizes
+         * because its size is written into its LayoutParams. Below API 30 there
+         * is no ime() type, and no repositioning happens — the keyboard covers
+         * the panel there exactly as it did before, which is the same behaviour
+         * those devices already had rather than a regression.
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            root.setOnApplyWindowInsetsListener { _, insets ->
+                fitPanelAroundIme(insets.getInsets(WindowInsets.Type.ime()).bottom)
+                insets
+            }
+        }
+
+        panelRoot = root
+        panelWeb = web
+        panelSpinner = spinner
+        panelRetry = retry
+        panelOffline = offline
+
+        loadPanel()
+        return root
+    }
+
+    /** (Re)loads the page into the kept WebView, behind whatever it shows now. */
+    private fun loadPanel() {
+        val web = panelWeb ?: return
+        panelFailed = false
+        panelLoadedAt = SystemClock.elapsedRealtime()
+        panelAccount = accountKey()
+        /*
+         * Out of signal: the copy the WebView already has, rather than an
+         * error. Mid-draft is when the panel is needed most and reachable
+         * least, and the list from an hour ago is a far better answer than
+         * "could not reach" -- the data only moves every two hours anyway.
+         *
+         * Decided before loading rather than as a retry after a failure. A
+         * failed load finishes on WebView's own error page, in an order relative
+         * to the error callback that is not guaranteed, and retrying from there
+         * could flash that page in the panel.
+         */
+        panelFromCache = !isOnline()
+        web.settings.cacheMode =
+            if (panelFromCache) WebSettings.LOAD_CACHE_ELSE_NETWORK else WebSettings.LOAD_DEFAULT
+        web.loadUrl(PANEL_URL)
+    }
+
+    /**
+     * Whether the page on screen should be fetched again as the panel opens.
+     *
+     * The account is the important one: the page reads the tag and the filters
+     * once, on load, so a page kept alive across a change in the app's own
+     * screen would carry on filtering for the old account.
+     */
+    private fun panelNeedsRefresh(): Boolean {
+        // Offline, a page already on screen is the best there is: reloading it
+        // could only swap a good list for an error. Without one, try the cache.
+        if (!isOnline()) return !panelLoaded
+        return panelFailed ||
+            panelFromCache ||
+            panelAccount != accountKey() ||
+            SystemClock.elapsedRealtime() - panelLoadedAt > PANEL_STALE_MS
+    }
+
+    /** Whether there is a network that claims to reach the internet. */
+    private fun isOnline(): Boolean = runCatching {
+        val connectivity = getSystemService(ConnectivityManager::class.java)
+            ?: return@runCatching true
+        val caps = connectivity.getNetworkCapabilities(connectivity.activeNetwork)
+            ?: return@runCatching false
+        caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }.getOrDefault(true)
+
+    /**
+     * The panel is a WebView pointed at the site's own compact view.
+     *
+     * Deliberately not a reimplementation of the picks in Kotlin. The numbers,
+     * the sampling caveats and the wording all live in one place already, and a
+     * second copy in an app that ships on its own schedule would drift from the
+     * site within a patch or two.
+     */
+    private fun showPanel() {
+        val params = bubbleParams ?: return
+        val root = buildPanel()
+
+        // A collapse still animating out holds the same view. Take it down now
+        // rather than waiting; bumping the generation makes the collapse's own
+        // queued removals leave the reopened panel alone.
+        if (root.isAttachedToWindow) {
+            panelGeneration += 1
+            root.animate().cancel()
+            runCatching { windows.removeView(root) }
+        }
+
+        if (panelNeedsRefresh()) {
+            if (!panelLoaded) {
+                panelRetry?.visibility = View.GONE
+                panelWeb?.visibility = View.VISIBLE
+                panelSpinner?.visibility = View.VISIBLE
+            }
+            loadPanel()
+        } else if (panelLoaded && !isOnline()) {
+            // The page kept from earlier is the saved list now; say so.
+            panelOffline?.visibility = View.VISIBLE
+        }
+
+        val (width, height) = panelSize()
 
         val panelParams = WindowManager.LayoutParams(
             width,
@@ -825,75 +1044,7 @@ class BubbleService : Service() {
             placePanel(panelParams, width, height)
         }
 
-        /*
-         * Dragging the panel itself. Same distance-based split as the bubble, so
-         * a press that drifts a couple of pixels still counts as a press on the
-         * close button rather than becoming a drag.
-         */
-        var downX = 0f
-        var downY = 0f
-        var startX = 0
-        var startY = 0
-        val slop = dp(8)
-        var moving = false
-
-        grab.setOnTouchListener { _, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    downX = event.rawX
-                    downY = event.rawY
-                    startX = panelParams.x
-                    startY = panelParams.y
-                    moving = false
-                    true
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-                    val dx = event.rawX - downX
-                    val dy = event.rawY - downY
-                    if (!moving && (abs(dx) > slop || abs(dy) > slop)) moving = true
-                    if (moving) {
-                        panelParams.x = (startX + dx).roundToInt()
-                            .coerceIn(0, (screenW - panelParams.width).coerceAtLeast(0))
-                        panelParams.y = (startY + dy).roundToInt()
-                            .coerceIn(0, (screenH - panelParams.height).coerceAtLeast(0))
-                        runCatching { windows.updateViewLayout(root, panelParams) }
-                    }
-                    true
-                }
-
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // Remembered only when it actually moved, so a stray tap on
-                    // the header does not pin the panel to its current spot.
-                    if (moving) {
-                        panelX = panelParams.x
-                        panelY = panelParams.y
-                        this@BubbleService.panelParams = panelParams
-                    }
-                    true
-                }
-
-                else -> false
-            }
-        }
-
-        /*
-         * Ask the window for the keyboard's height, and react when it changes.
-         *
-         * `ime()` insets are the only reliable answer: the older tricks measure
-         * a *resizing* window against the screen, and this window never resizes
-         * because its size is written into its LayoutParams. Below API 30 there
-         * is no ime() type, and no repositioning happens — the keyboard covers
-         * the panel there exactly as it did before, which is the same behaviour
-         * those devices already had rather than a regression.
-         */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            root.setOnApplyWindowInsetsListener { _, insets ->
-                fitPanelAroundIme(insets.getInsets(WindowInsets.Type.ime()).bottom)
-                insets
-            }
-        }
-
+        root.animate().cancel()
         root.alpha = 0f
         root.scaleX = 0.12f
         root.scaleY = 0.12f
@@ -901,8 +1052,8 @@ class BubbleService : Service() {
         root.pivotY = (params.y + params.height / 2 - panelParams.y).toFloat()
 
         panel = root
-        panelWeb = web
         this.panelParams = panelParams
+        panelGeneration += 1
         runCatching { windows.addView(root, panelParams) }
             .onSuccess {
                 root.animate()
@@ -913,7 +1064,6 @@ class BubbleService : Service() {
             }
             .onFailure {
                 panel = null
-                panelWeb = null
                 this.panelParams = null
             }
     }
@@ -1280,6 +1430,17 @@ class BubbleService : Service() {
         private const val SAME_GESTURE_MS = 700L
 
         private const val COLLAPSE_MS = 170L
+
+        /**
+         * How old the kept page may get before an open refreshes it. The
+         * panel's data moves every two hours and the page is cached for ten
+         * minutes, so a quarter of an hour never shows anything meaningfully
+         * stale and never refetches what cannot have changed.
+         */
+        private const val PANEL_STALE_MS = 15 * 60 * 1000L
+
+        /** How long after the bubble appears the panel starts loading. */
+        private const val PANEL_PRELOAD_DELAY_MS = 1200L
 
         private const val TAG = "BrawlZoneBubble"
 

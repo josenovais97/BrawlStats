@@ -13,6 +13,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
+      Only to ask "is there a connection", so an open with no signal shows the
+      last saved list instead of an error. A normal permission: granted at
+      install, no prompt, and it reveals nothing about which network.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--
       Needed to hand a downloaded APK to the package installer ourselves.
       Without it the app can fetch its own update and then not offer it, which
       leaves the file sitting in Downloads with nothing pointing at it — the

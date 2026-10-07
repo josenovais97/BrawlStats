@@ -81,7 +81,7 @@ A BrawlZone tile for Quick Settings: swipe down from inside the game and tap it 
 
 ## Review notes (Amazon; Uptodown has no field for this)
 
-The app draws a small overlay over other apps (SYSTEM_ALERT_WINDOW), which is its entire purpose, and adds a Quick Settings tile (TileService) that toggles it from the shade. The panel inside the overlay is a WebView of brawlzone.net/bubble/panel; the overlay, tile, service and updater are native: a tier list you can consult while a game is in the foreground. It runs a foreground service with a persistent notification while the overlay is showing, and stops when the user closes the bubble. It requests no other permissions and collects no data. To test: open the app, tap Start, allow "Display over other apps" when sent to Settings, return; a draggable bubble appears; tap it to open the panel.
+The app draws a small overlay over other apps (SYSTEM_ALERT_WINDOW), which is its entire purpose, and adds a Quick Settings tile (TileService) that toggles it from the shade. The panel inside the overlay is a WebView of brawlzone.net/bubble/panel; the overlay, tile, service and updater are native: a tier list you can consult while a game is in the foreground. It runs a foreground service with a persistent notification while the overlay is showing, and stops when the user closes the bubble. Beyond that it asks only for network state (a normal install-time permission), so that with no connection the panel shows the last saved list instead of an error; it collects no data. To test: open the app, tap Start, allow "Display over other apps" when sent to Settings, return; a draggable bubble appears; tap it to open the panel.
 
 ## Data safety answers
 
