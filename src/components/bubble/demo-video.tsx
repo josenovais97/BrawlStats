@@ -76,3 +76,34 @@ function subscribe(onChange: () => void) {
 function snapshot() {
   return window.matchMedia(QUERY).matches;
 }
+
+/**
+ * The setup-then-draft tutorial, as a vertical clip with controls.
+ *
+ * Secondary to the demo above, and built to cost nothing until it is wanted:
+ * no autoplay and `preload="none"`, so a reader who never presses play never
+ * downloads it. The hero clip already autoplays on this page, and two videos
+ * playing at once is noise rather than a demo -- and on a box with fixed
+ * bandwidth, a second 1.6 MB fetch on every visit is a real cost.
+ *
+ * Encoded at 720x1280, crf 31: measured indistinguishable from crf 28 on the
+ * panel's smallest text, at three quarters of the size. Silent, like the
+ * source -- the captions carry it.
+ */
+export function TutorialVideo() {
+  return (
+    <video
+      className="w-full rounded-2xl"
+      controls
+      muted
+      playsInline
+      preload="none"
+      poster="/bubble/tutorial-poster.jpg"
+      width={720}
+      height={1280}
+      aria-label="A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run."
+    >
+      <source src="/bubble/tutorial.mp4" type="video/mp4" />
+    </video>
+  );
+}

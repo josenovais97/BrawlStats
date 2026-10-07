@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-import { DemoVideo } from "@/components/bubble/demo-video";
+import { DemoVideo, TutorialVideo } from "@/components/bubble/demo-video";
 import { DownloadButton } from "@/components/bubble/download-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { BUBBLE_APP, BUBBLE_CHANGELOG, bubbleAppSize } from "@/lib/bubble-app";
@@ -464,6 +464,54 @@ export default function BubblePage() {
               {BUBBLE_APP.sha256}
             </code>
           </details>
+        </div>
+      </section>
+
+      {/*
+        Setup, then a draft, in under half a minute.
+
+        After the install steps because it is what comes next: the tag and the
+        hide switch are the only setup there is, and seeing them done is
+        quicker than reading about them. Not autoplaying -- the hero clip
+        already does, and this one only loads if someone presses play.
+      */}
+      <section className="space-y-5">
+        <SectionHeading
+          title="Set it up, then draft with it"
+          subtitle="27 seconds: your tag once, then the bubble mid-draft."
+        />
+
+        <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+          <ol className="space-y-4">
+            {[
+              {
+                title: "Add your player tag",
+                body: "The app finds your account. Brawlers you do not own are greyed out in the panel.",
+              },
+              {
+                title: "Hide what you cannot play",
+                body: "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.",
+              },
+              {
+                title: "Tap the bubble in the draft",
+                body: "Pick the mode and the map: the best brawlers for it, and the build to run on them.",
+              },
+            ].map((step, i) => (
+              <li key={step.title} className="card flex gap-4 p-5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-sm font-black tabular-nums text-muted">
+                  {i + 1}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-bold">{step.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mx-auto w-full max-w-[18rem] overflow-hidden rounded-2xl border border-border">
+            <TutorialVideo />
+          </div>
         </div>
       </section>
 
