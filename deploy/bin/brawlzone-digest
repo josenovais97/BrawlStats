@@ -57,6 +57,54 @@ else
   codes="no requests logged"; agents=""; paths=""
 fi
 
+# Bubble, over the last 24 hours, from the access log -- the rotated files
+# included, since a size rotation can land mid-day. Distinct client IPs, so one
+# person reloading is one person; an IP is a household or a carrier NAT rather
+# than exactly one human, which is close enough to see a trend move.
+#
+#   active    phones running the app: its WebView sends X-Requested-With
+#             net.brawlzone.bubble on every request, so this needs no ID
+#   downloads anyone fetching the APK, bots excluded
+#   visitors  anyone opening /bubble, bots and link-preview fetchers excluded
+#
+# It answers "did the TikTok post or the page change move installs", which
+# nothing else on the box can.
+read -r bubble_active bubble_downloads bubble_visitors < <(python3 - <<'PY' 2>/dev/null || echo "? ? ?"
+import glob, gzip, json, os, re, time
+since = time.time() - 86400
+bot = re.compile(r'bot|crawl|spider|slurp|preview|python|curl|wget|headless|lightpanda|facebookexternal|whatsapp|telegram', re.I)
+active, downloads, visitors = set(), set(), set()
+files = [f for f in glob.glob('/var/log/brawlzone/access/access.log*') if os.path.getmtime(f) >= since]
+for f in files:
+    opener = gzip.open if f.endswith('.gz') else open
+    try:
+        handle = opener(f, 'rt', errors='ignore')
+    except OSError:
+        continue
+    with handle:
+        for line in handle:
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get('ts', 0) < since:
+                continue
+            q = r.get('request', {}); h = q.get('headers', {})
+            ip = (h.get('Cf-Connecting-Ip') or [q.get('client_ip', '')])[0]
+            path = q.get('uri', '').split('?')[0]
+            if (h.get('X-Requested-With') or [''])[0] == 'net.brawlzone.bubble':
+                active.add(ip)
+                continue
+            if bot.search((h.get('User-Agent') or [''])[0]):
+                continue
+            if path.startswith('/downloads/') and path.endswith('.apk') and r.get('status') in (200, 206):
+                downloads.add(ip)
+            elif path == '/bubble' and r.get('status') in (200, 304) and (h.get('Next-Router-Prefetch') or [''])[0] != '1':
+                visitors.add(ip)
+print(f'{len(active)} {len(downloads)} {len(visitors)}')
+PY
+)
+
 bans=$(sudo -n fail2ban-client status sshd 2>/dev/null | awk -F'\t' '/Total banned/{print $2}' | tr -d ' ')
 deploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | head -6)
 ndeploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | wc -l)
@@ -85,6 +133,7 @@ html_row "Site" "$site_v" "$site_c"
 html_row "Verdict" "$verdict" "$hdr_c"
 html_row "Uptime" "$up"
 html_row "Load average" "$load"
+html_row "Bubble (24h)" "${bubble_active:-?} active &middot; ${bubble_downloads:-?} downloads &middot; ${bubble_visitors:-?} visitors"
 html_rows_close
 
 html_section "Sampler"
