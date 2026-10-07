@@ -1,18 +1,21 @@
 import { SITE_URL } from '@/lib/site';
-import { tierOfDay } from '@/lib/tier-of-day';
-import { tierCaption, tierSlideCount } from '@/lib/tier-slides';
+import { mapOfDay } from '@/lib/map-of-day';
+import { mapCaption, mapSlideCount } from '@/lib/map-slides';
 
 /**
- * The tier-list carousel for one day: slide URLs, and the caption.
+ * The midday carousel for one day: slide URLs, and the caption.
+ *
+ * Still served under `/tiers/` although it is now the Ranked map of the day
+ * rather than the roster-wide tier list (replaced 2026-10-07). The path is what
+ * the posting job, its timer and health check 11 all key on, and the content is
+ * still a tier list -- for one map. Renaming it would mean changing four files
+ * on the box for a word.
  *
  * The caption is published here rather than assembled on the box, for the same
- * reason the other two manifests are -- it is made of the numbers the slides
- * draw, and deriving it a second time in bash would be two implementations of
- * one claim that disagree the first time either changes.
+ * reason the other manifests are: it is made of the numbers the slides draw.
  *
- * An empty `slides` array is a valid answer, not an error: on a morning when
- * the sampler has not produced enough decided battles to rank anybody, there
- * is nothing to post. The job treats that as "nothing today".
+ * An empty `slides` array is a valid answer, not an error: with no map sampled
+ * well enough to post, the job reads it as "nothing today".
  */
 
 export const revalidate = 86400;
@@ -27,7 +30,7 @@ export async function GET(
   { params }: { params: Promise<{ date: string }> },
 ) {
   const { date } = await params;
-  const post = await tierOfDay(date).catch(() => null);
+  const post = await mapOfDay(date).catch(() => null);
 
   const headers = {
     'cache-control': 'public, max-age=0, s-maxage=86400, stale-while-revalidate=86400',
@@ -37,17 +40,16 @@ export async function GET(
     return Response.json({ date, count: 0, slides: [] }, { headers });
   }
 
-  const count = tierSlideCount(post);
-  const caption = tierCaption(post, SITE_URL);
+  const count = mapSlideCount(post);
+  const caption = mapCaption(post, SITE_URL);
 
   return Response.json(
     {
       date,
-      window: post.windowLabel,
-      rated: post.rated,
-      battles: post.battles,
-      riser: post.riser?.name ?? null,
-      faller: post.faller?.name ?? null,
+      mode: post.mode,
+      map: post.mapName,
+      rotation: `${post.position}/${post.poolSize}`,
+      battles: post.sampleSize,
       title: caption.title,
       description: caption.description,
       count,

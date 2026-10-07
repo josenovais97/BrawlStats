@@ -149,6 +149,40 @@ export async function loadIcon(url: string, box: number): Promise<string | null>
   return null;
 }
 
+/**
+ * An image fitted inside `maxW` x `maxH`, with the size it came out at.
+ *
+ * `loadIcon` fits into a square and returns only the data URI, which is right
+ * for portraits and icons and wrong for a map layout: those are tall and every
+ * map has its own proportions, and Satori needs an `<img>`'s real width and
+ * height or it stretches it. Same fetch, same single retry, same rule that a
+ * 404 is an answer rather than a stall.
+ */
+export async function loadSized(
+  url: string,
+  maxW: number,
+  maxH: number,
+): Promise<{ src: string; width: number; height: number } | null> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(ICON_TIMEOUT_MS) });
+      if (!res.ok) return null;
+      const { data, info } = await sharp(Buffer.from(await res.arrayBuffer()))
+        .resize({ width: maxW, height: maxH, fit: 'inside', withoutEnlargement: false })
+        .png()
+        .toBuffer({ resolveWithObject: true });
+      return {
+        src: `data:image/png;base64,${data.toString('base64')}`,
+        width: info.width,
+        height: info.height,
+      };
+    } catch {
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 400));
+    }
+  }
+  return null;
+}
+
 export async function loadArt(
   brawlerId: number,
   box: number,

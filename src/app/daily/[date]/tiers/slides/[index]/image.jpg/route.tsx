@@ -1,15 +1,16 @@
 import { ImageResponse } from 'next/og';
 
-import { tierOfDay } from '@/lib/tier-of-day';
-import { SLIDE_SIZE, slideFonts, tierSlideCount, tierSlides, toJpeg } from '@/lib/tier-slides';
+import { mapOfDay } from '@/lib/map-of-day';
+import { SLIDE_SIZE, mapSlideCount, mapSlides, slideFonts, toJpeg } from '@/lib/map-slides';
 
 /**
- * One slide of the day's tier-list carousel, as a JPEG.
+ * One slide of the day's Ranked map carousel, as a JPEG.
  *
  * This route and the manifest beside it both derive the slide list from
- * `plan()` in tier-slides, so they agree on how many there are without sharing
- * state. The set is bounded: one day times at most eight slides, and an index
- * outside that range 404s rather than rendering.
+ * `mapSlideCount` and `mapOfDay`, which picks the map from the date alone, so
+ * they agree on the map and the count without sharing state. The set is
+ * bounded: one day times five slides, and an index outside that range 404s
+ * rather than rendering.
  *
  * JPEG because TikTok's Content Posting API accepts JPEG and WebP only, and a
  * PNG is accepted by the init call and then failed asynchronously, which looks
@@ -34,12 +35,12 @@ export async function GET(
     return new Response('Not found', { status: 404 });
   }
 
-  const post = await tierOfDay(date).catch(() => null);
-  if (!post || n >= tierSlideCount(post)) {
+  const post = await mapOfDay(date).catch(() => null);
+  if (!post || n >= mapSlideCount(post)) {
     return new Response('Not found', { status: 404 });
   }
 
-  const slides = await tierSlides(post, n);
+  const slides = await mapSlides(post, n);
   const slide = slides[n];
   if (!slide) return new Response('Not found', { status: 404 });
 
