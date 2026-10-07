@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.24',
+  version: '1.25',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 45,
+  versionCode: 46,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.24.apk',
+  path: '/downloads/brawlzone-bubble-1.25.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -53,11 +53,11 @@ export const BUBBLE_APP = {
    */
   storeUrl: null as string | null,
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2803574,
-  sha256: '7f42b679cabf3ddf8f56cb1d0179d3bff2db50025ecb93093e16f7801564a65a',
+  size: 2806034,
+  sha256: 'df0d8d9b9dc064339e3b0a50d2f3bf37f2491f7e26aad30611a2bfadea920a2e',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-09-11',
+  released: '2026-10-07',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -86,6 +86,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.25',
+    versionCode: 46,
+    date: '2026-10-07',
+    changes: [
+      'The panel opens instantly. It used to load the page again on every tap, so it opened on a spinner mid-draft; it now keeps the page between opens and starts loading as soon as the bubble appears.',
+      'No signal? The panel shows the last saved list, marked \u201cOffline\u201d, instead of an error.',
+      'Each mode chip carries the mode\u2019s own icon, the badge the game shows in the corner of the draft.',
+    ],
+  },
   {
     version: '1.24',
     versionCode: 41,
