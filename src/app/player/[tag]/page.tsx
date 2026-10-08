@@ -502,6 +502,7 @@ export default async function PlayerPage({ params }: PageProps) {
               playerTag={player.tag}
               brawlerMeta={brawlerMeta}
               modeMeta={modeMeta}
+              brawlers={player.brawlers}
             />
           </Suspense>
         </section>            </ProfileGroup>

@@ -41,7 +41,12 @@ export interface BattleEntry {
   relative: string;
   trophyChange: number | null;
   brawlerName: string | null;
+  brawlerId: number | null;
   iconUrl: string | null;
+  /** The brawler in the skin this account has equipped, when it could be resolved. */
+  artUrl: string | null;
+  /** The brawler's rarity colour. */
+  tint: string | null;
   isStarPlayer: boolean;
   teams: BattleParticipant[][];
   isTeamMode: boolean;
@@ -117,34 +122,9 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
     return out;
   }, [filtered]);
 
-  const record = useMemo(() => {
-    const wins = entries.filter((e) => e.tone === 'win').length;
-    const losses = entries.filter((e) => e.tone === 'loss').length;
-    return { wins, losses };
-  }, [entries]);
-
   return (
     <div className="space-y-4">
-      {/* Form: the whole log in one line, newest on the left. */}
-      <div className="card flex flex-wrap items-center gap-x-4 gap-y-3 p-3.5">
-        <div className="flex min-w-0 flex-1 items-center gap-1">
-          {entries.map((entry) => (
-            <span
-              key={entry.key}
-              title={`${entry.outcomeLabel} · ${entry.mode} · ${entry.map}`}
-              className="h-5 min-w-1.5 flex-1 rounded-full"
-              style={{ background: TONE_COLOR[entry.tone] }}
-            />
-          ))}
-        </div>
-        <p className="shrink-0 text-xs text-muted">
-          <span className="font-bold tabular-nums text-victory">{record.wins}W</span>
-          {' · '}
-          <span className="font-bold tabular-nums text-defeat">{record.losses}L</span>
-          {' over the last '}
-          <span className="tabular-nums">{entries.length}</span>
-        </p>
-      </div>
+      <Session entries={entries} />
 
       {(tones.length > 1 || modes.length > 1) && (
         <div className="flex flex-wrap items-center gap-1.5">
@@ -166,11 +146,24 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
               <Chip active={mode === 'all'} onClick={() => setMode('all')}>
                 All modes
               </Chip>
-              {modes.map((m) => (
-                <Chip key={m} active={mode === m} onClick={() => setMode(m)}>
-                  {m}
-                </Chip>
-              ))}
+              {modes.map((m) => {
+                const icon = entries.find((e) => e.mode === m && e.modeIconUrl)?.modeIconUrl;
+                return (
+                  <Chip key={m} active={mode === m} onClick={() => setMode(m)}>
+                    {icon ? (
+                      <Image
+                        src={icon}
+                        alt=""
+                        width={16}
+                        height={16}
+                        className="size-4 shrink-0 object-contain"
+                        unoptimized
+                      />
+                    ) : null}
+                    {m}
+                  </Chip>
+                );
+              })}
             </div>
           ) : null}
         </div>
@@ -187,6 +180,227 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
           ))}
         </ol>
       )}
+    </div>
+  );
+}
+
+/**
+ * The session at a glance, before a single row.
+ *
+ * The log is about twenty-five games, which is one or two sittings, and the
+ * questions a player brings to it are about that sitting: how did it go, what
+ * was I playing, what was working. The headline is the record and what it was
+ * worth; the most-played brawler stands beside it in the skin actually
+ * equipped, as the rest of the profile draws it; the form strip keeps its
+ * place underneath; and two short breakdowns -- by mode and by brawler --
+ * answer "what was working" without the reader tallying rows.
+ */
+function Session({ entries }: { entries: BattleEntry[] }) {
+  const s = useMemo(() => summarise(entries), [entries]);
+  const main = s.brawlers[0];
+  const tint = main?.tint ?? 'var(--brand)';
+
+  return (
+    <section className="card overflow-hidden">
+      <div
+        className="relative flex flex-wrap items-stretch gap-x-5 gap-y-2 px-4 pt-4 sm:px-5"
+        style={{
+          background: `linear-gradient(120deg, color-mix(in srgb, ${tint} 22%, transparent), transparent 60%)`,
+        }}
+      >
+        {main?.art ? (
+          <div className="relative flex w-24 shrink-0 items-end justify-center sm:w-28">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-1/2 size-24 -translate-x-1/2 rounded-full opacity-40 blur-2xl"
+              style={{ background: tint }}
+            />
+            <Image
+              src={main.art}
+              alt=""
+              width={112}
+              height={112}
+              className="relative h-24 w-auto object-contain drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)] sm:h-28"
+              unoptimized
+            />
+          </div>
+        ) : null}
+
+        <div className="flex min-w-0 flex-1 basis-48 flex-col justify-center pb-4">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted">
+            Last {entries.length} games
+            {main ? (
+              <span className="normal-case tracking-normal">
+                {' '}
+                · mostly <span className="font-bold capitalize text-foreground">{main.name.toLowerCase()}</span>
+              </span>
+            ) : null}
+          </p>
+          <p className="display mt-1 text-3xl leading-none tabular-nums sm:text-4xl">
+            <span className="text-victory">{s.wins}W</span>
+            <span className="text-muted"> · </span>
+            <span className="text-defeat">{s.losses}L</span>
+            {s.draws > 0 ? (
+              <>
+                <span className="text-muted"> · </span>
+                <span className="text-draw">{s.draws}D</span>
+              </>
+            ) : null}
+          </p>
+        </div>
+
+        <dl className="flex shrink-0 items-center gap-5 pb-4 max-sm:w-full max-sm:justify-between">
+          <Stat label="Win rate" value={s.decided ? `${Math.round((s.wins / s.decided) * 100)}%` : '—'} />
+          {s.trophies !== null ? (
+            <Stat
+              label="Trophies"
+              value={`${s.trophies > 0 ? '+' : s.trophies < 0 ? '−' : ''}${formatNumber(Math.abs(s.trophies))}`}
+              tone={s.trophies > 0 ? 'text-victory' : s.trophies < 0 ? 'text-defeat' : undefined}
+            />
+          ) : null}
+          <Stat label="Star player" value={`×${s.stars}`} tone={s.stars ? 'text-brand' : undefined} />
+        </dl>
+      </div>
+
+      {/* Form: the whole log in one line, newest on the left. */}
+      <div className="flex items-center gap-1 border-t border-border/70 px-4 py-3 sm:px-5">
+        {entries.map((entry) => (
+          <span
+            key={entry.key}
+            title={`${entry.outcomeLabel} · ${entry.mode} · ${entry.map}`}
+            className="h-4 min-w-1.5 flex-1 rounded-full"
+            style={{ background: TONE_COLOR[entry.tone] }}
+          />
+        ))}
+      </div>
+
+      <div className="grid gap-x-6 gap-y-4 border-t border-border/70 px-4 py-4 sm:px-5 md:grid-cols-2">
+        <Breakdown title="By mode" rows={s.modes} />
+        <Breakdown title="By brawler" rows={s.brawlers} round />
+      </div>
+    </section>
+  );
+}
+
+interface Tally {
+  key: string;
+  name: string;
+  /** Mode icon or brawler portrait, for the row. */
+  icon: string | null;
+  /** The brawler in its equipped skin, for the headline; brawler rows only. */
+  art?: string | null;
+  tint?: string | null;
+  wins: number;
+  losses: number;
+  games: number;
+}
+
+function summarise(entries: BattleEntry[]) {
+  let wins = 0;
+  let losses = 0;
+  let draws = 0;
+  let stars = 0;
+  let trophies: number | null = null;
+  const modes = new Map<string, Tally>();
+  const brawlers = new Map<string, Tally>();
+
+  const bump = (map: Map<string, Tally>, key: string, seed: Omit<Tally, 'wins' | 'losses' | 'games'>, e: BattleEntry) => {
+    const t = map.get(key) ?? { ...seed, wins: 0, losses: 0, games: 0 };
+    t.games += 1;
+    if (e.tone === 'win') t.wins += 1;
+    if (e.tone === 'loss') t.losses += 1;
+    map.set(key, t);
+  };
+
+  for (const e of entries) {
+    if (e.tone === 'win') wins += 1;
+    else if (e.tone === 'loss') losses += 1;
+    else draws += 1;
+    if (e.isStarPlayer) stars += 1;
+    if (e.trophyChange !== null) trophies = (trophies ?? 0) + e.trophyChange;
+    bump(modes, e.mode, { key: e.mode, name: e.mode, icon: e.modeIconUrl }, e);
+    if (e.brawlerName) {
+      bump(
+        brawlers,
+        e.brawlerName,
+        { key: e.brawlerName, name: e.brawlerName, icon: e.iconUrl, art: e.artUrl, tint: e.tint },
+        e,
+      );
+    }
+  }
+
+  // Most played first; the record breaks ties, so the list leads with what
+  // the session was actually about.
+  const order = (a: Tally, b: Tally) => b.games - a.games || b.wins - a.wins;
+  return {
+    wins,
+    losses,
+    draws,
+    decided: wins + losses,
+    stars,
+    trophies,
+    modes: [...modes.values()].sort(order),
+    brawlers: [...brawlers.values()].sort(order),
+  };
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone?: string }) {
+  return (
+    <div className="text-right">
+      <dt className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</dt>
+      <dd className={`text-xl font-black tabular-nums leading-tight ${tone ?? ''}`}>{value}</dd>
+    </div>
+  );
+}
+
+/** At most this many rows per breakdown; the log below has the rest. */
+const BREAKDOWN_ROWS = 4;
+
+function Breakdown({ title, rows, round = false }: { title: string; rows: Tally[]; round?: boolean }) {
+  if (rows.length === 0) return null;
+  return (
+    <div className="min-w-0">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{title}</p>
+      <ul className="space-y-2">
+        {rows.slice(0, BREAKDOWN_ROWS).map((r) => {
+          const decided = r.wins + r.losses;
+          const rate = decided ? r.wins / decided : 0;
+          return (
+            <li key={r.key} className="flex items-center gap-2.5">
+              {r.icon ? (
+                <Image
+                  src={r.icon}
+                  alt=""
+                  width={28}
+                  height={28}
+                  className={`size-7 shrink-0 object-contain ${round ? 'rounded-lg bg-surface-2' : ''}`}
+                  loading="lazy"
+                  unoptimized
+                />
+              ) : (
+                <span className="size-7 shrink-0 rounded-lg bg-surface-2" />
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="truncate font-semibold capitalize">{r.name.toLowerCase()}</span>
+                  <span className="shrink-0 text-xs tabular-nums text-muted">
+                    <span className="font-bold text-victory">{r.wins}</span>
+                    {' – '}
+                    <span className="font-bold text-defeat">{r.losses}</span>
+                  </span>
+                </div>
+                {/* Win share of decided games, so draws neither help nor hurt. */}
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-defeat/30">
+                  <div
+                    className="h-full rounded-full bg-victory"
+                    style={{ width: `${Math.round(rate * 100)}%` }}
+                  />
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

@@ -5,11 +5,12 @@ import {
   type BattleTone,
 } from '@/components/player/battle-log-view';
 import { brawlerIconUrl } from '@/lib/brawlapi';
+import { brawlerArt } from '@/lib/brawler-art';
 import { getBattleLog } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { humanizeMode, ordinal, relativeTime } from '@/lib/format';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
-import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
+import type { BSBattleLogEntry, BSBattlePlayer, BSPlayerBrawler } from '@/types/brawlstars';
 
 interface BattleLogProps {
   /** Tag used for the lookup (no "#"). */
@@ -19,6 +20,8 @@ interface BattleLogProps {
   brawlerMeta: Map<number, BABrawler>;
   /** For the mode artwork on each row. */
   modeMeta: Map<string, BAGameMode>;
+  /** The account's roster, for the skins its session brawlers have equipped. */
+  brawlers?: BSPlayerBrawler[];
 }
 
 /**
@@ -31,7 +34,13 @@ interface BattleLogProps {
  * URLs already resolved: no `Map`, no `BABrawler`, and no date arithmetic that
  * could disagree between the render and the hydration.
  */
-export async function BattleLog({ tag, playerTag, brawlerMeta, modeMeta }: BattleLogProps) {
+export async function BattleLog({
+  tag,
+  playerTag,
+  brawlerMeta,
+  modeMeta,
+  brawlers = [],
+}: BattleLogProps) {
   let entries: BSBattleLogEntry[];
   try {
     entries = (await getBattleLog(tag)).items;
@@ -57,6 +66,21 @@ export async function BattleLog({ tag, playerTag, brawlerMeta, modeMeta }: Battl
   const view = entries.map((entry, index) =>
     toViewEntry(entry, index, playerTag, brawlerMeta, modeMeta),
   );
+
+  // The session card draws the most-played brawler the way the rest of the
+  // profile does -- in the skin this account has equipped. Only the brawlers
+  // actually in the log are looked up, and a failure costs the skin, not the
+  // log.
+  const played = new Set(view.map((v) => v.brawlerId).filter((id): id is number => id !== null));
+  const art = await brawlerArt(
+    brawlers.filter((b) => played.has(b.id)),
+    brawlerMeta,
+  ).catch(() => new Map<number, string>());
+  for (const v of view) {
+    if (v.brawlerId === null) continue;
+    v.artUrl = art.get(v.brawlerId) ?? v.iconUrl;
+    v.tint = brawlerMeta.get(v.brawlerId)?.rarity.color ?? null;
+  }
 
   return <BattleLogView entries={view} />;
 }
@@ -108,6 +132,9 @@ function toViewEntry(
     relative: relativeTime(entry.battleTime),
     trophyChange: battle.trophyChange ?? myBrawler?.trophyChange ?? null,
     brawlerName: myBrawler?.name ?? null,
+    brawlerId: myBrawler?.id ?? null,
+    artUrl: null,
+    tint: null,
     iconUrl: myBrawler
       ? (brawlerMeta.get(myBrawler.id)?.imageUrl ?? brawlerIconUrl(myBrawler.id))
       : null,
