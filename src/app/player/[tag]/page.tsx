@@ -433,7 +433,16 @@ export default async function PlayerPage({ params }: PageProps) {
           label: 'Do next',
           content: (
             <ProfileGroup title="What to do next">
-        <PlayerPushNow options={push} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
+        {/* Streamed for the skin art and map list; the fallback holds the
+            card's height so the picks below do not jump. */}
+        <Suspense fallback={<div className="skeleton h-[16rem] rounded-2xl" />}>
+          <PlayerPushNow
+            options={push}
+            brawlers={player.brawlers}
+            brawlerMeta={brawlerMeta}
+            modeMeta={modeMeta}
+          />
+        </Suspense>
 
         {/* After the rotation, because it narrows the same question to the maps
             that are actually queueable right now. */}

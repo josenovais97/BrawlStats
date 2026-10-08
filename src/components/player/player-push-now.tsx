@@ -3,11 +3,14 @@ import Link from 'next/link';
 
 import { TrophyIcon } from '@/components/game-icons';
 import { Panel } from '@/components/ui/panel';
-import { brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
+import { brawlerIconUrl, getMaps, modeLabel } from '@/lib/brawlapi';
+import { brawlerArt } from '@/lib/brawler-art';
 import { formatNumber, titleCase } from '@/lib/format';
+import { skinLabel } from '@/lib/player-showcase';
 import type { PushOption } from '@/lib/push-now';
 import { brawlerPath, slugify } from '@/lib/slugs';
-import type { BABrawler, BAGameMode } from '@/types/brawlapi';
+import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
+import type { BSPlayerBrawler } from '@/types/brawlstars';
 
 /**
  * One decision, then the alternatives.
@@ -21,17 +24,31 @@ import type { BABrawler, BAGameMode } from '@/types/brawlapi';
  * A live timer would make this the only component on a profile that needs
  * JavaScript to stay truthful, and "ends in about 2h" is exactly as useful as
  * "2:14:31" for deciding what to queue.
+ *
+ * The pick is drawn like the Overview showcase draws the mains: the brawler in
+ * the skin this account has equipped, in its rarity colour, beside the map's
+ * own layout -- "play this, here" as a picture before it is a sentence. Async
+ * for the skin art and the map list, both cached; the page streams it.
  */
-export function PlayerPushNow({
+export async function PlayerPushNow({
   options,
+  brawlers,
   brawlerMeta,
   modeMeta,
 }: {
   options: PushOption[];
+  /** The account's roster, for the skin the top pick has equipped. */
+  brawlers: BSPlayerBrawler[];
   brawlerMeta: Map<number, BABrawler>;
   modeMeta: Map<string, BAGameMode>;
 }) {
   if (options.length === 0) return null;
+
+  const owned = brawlers.find((b) => b.id === options[0].brawlerId);
+  const [art, maps] = await Promise.all([
+    owned ? brawlerArt([owned], brawlerMeta) : Promise.resolve(new Map<number, string>()),
+    getMaps().catch(() => [] as BAMap[]),
+  ]);
 
   const [top, ...rest] = options;
   const topMode = modeLabel(modeMeta, top.mode);
@@ -43,6 +60,11 @@ export function PlayerPushNow({
    * rendered when it exists rather than reserved with a placeholder box.
    */
   const topModeArt = modeMeta.get(top.mode.toLowerCase())?.imageUrl;
+  const topMapArt = maps.find(
+    (m) => m.name.toLowerCase() === top.mapName.toLowerCase() && !m.disabled,
+  )?.imageUrl;
+  const tint = topArt?.rarity.color ?? 'var(--victory)';
+  const topSkin = owned ? skinLabel(owned) : null;
 
   return (
     <Panel
@@ -50,41 +72,46 @@ export function PlayerPushNow({
       subtitle="The best map in the live rotation for the brawlers this account already owns."
       bodyClassName=""
     >
-      <div className="relative">
+      {/* The pick, as a picture: the brawler in its equipped skin standing in
+          its rarity colour, the map it should be played on beside it. */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: `linear-gradient(120deg, color-mix(in srgb, ${tint} 28%, transparent), var(--surface) 55%, color-mix(in srgb, var(--victory) 14%, transparent))`,
+        }}
+      >
         <span className="block h-1 w-full bg-victory" />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(90% 80% at 8% 0%, color-mix(in srgb, var(--victory) 16%, transparent) 0%, transparent 60%)',
-          }}
-        />
 
-        <div className="relative flex flex-wrap items-center gap-4 p-5 sm:gap-5">
+        <div className="relative flex flex-wrap items-stretch gap-x-5 gap-y-3 px-5 pb-5 sm:flex-nowrap">
           <Link
             href={brawlerPath(top.brawlerId, top.brawlerName)}
             prefetch={false}
-            className="shrink-0 transition-transform hover:scale-105"
+            className="group relative flex w-28 shrink-0 items-end justify-center pt-4 sm:w-36"
           >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-1/2 size-32 -translate-x-1/2 rounded-full opacity-45 blur-2xl"
+              style={{ background: tint }}
+            />
             <Image
-              src={topArt?.imageUrl ?? brawlerIconUrl(top.brawlerId)}
+              src={art.get(top.brawlerId) ?? topArt?.imageUrl ?? brawlerIconUrl(top.brawlerId)}
               alt=""
-              width={72}
-              height={72}
-              className="size-16 rounded-xl bg-surface-2 sm:size-[72px]"
+              width={144}
+              height={144}
+              className="relative h-28 w-auto object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-105 sm:h-36"
               unoptimized
             />
           </Link>
 
-          <div className="min-w-0 flex-1 basis-56">
+          <div className="flex min-w-0 flex-1 basis-52 flex-col justify-center pt-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-victory">
+              Your best move right now
+            </p>
             {/* The mode leads, the map follows underneath.
-                People think in modes — "I'm going to play some Knockout" — and
+                People think in modes -- "I'm going to play some Knockout" -- and
                 a map name alone asks the reader to remember which mode it
-                belongs to before the sentence means anything. The map is still
-                named, and still the link, because the recommendation is
-                specific to it. */}
-            <p className="flex flex-wrap items-center gap-x-2 text-xl font-black leading-tight sm:text-2xl">
+                belongs to before the sentence means anything. */}
+            <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xl font-black leading-tight sm:text-2xl">
               <span>Play {titleCase(top.brawlerName)} in</span>
               <span className="inline-flex items-center gap-1.5">
                 {topModeArt ? (
@@ -108,53 +135,81 @@ export function PlayerPushNow({
               >
                 {top.mapName}
               </Link>
+              {topSkin ? <span className="text-muted"> · in {titleCase(topSkin)}</span> : null}
             </p>
             {/* The raw per-map win rate is deliberately not printed. On a
                 fifty-battle cell it reads as "97.9% win rate here", which is
-                true of the sample and false about the brawler — and it is the
-                first thing a reader would quote. The adjusted figure on the
-                right is the claim, and it already carries its own shrinkage. */}
-            <p className="mt-1 text-sm text-muted">
-              Power {top.power} ·{' '}
-              <span className="inline-flex items-baseline gap-1">
-                <TrophyIcon className="size-3.5 translate-y-0.5" />
+                true of the sample and false about the brawler -- and it is the
+                first thing a reader would quote. The adjusted figure is the
+                claim, and it already carries its own shrinkage. */}
+            <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-muted">
+              <span className="rounded-full bg-background/50 px-2 py-0.5 font-semibold text-foreground">
+                Power {top.power}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-background/50 px-2 py-0.5 font-semibold text-brand">
+                <TrophyIcon className="size-3.5" />
                 {formatNumber(top.trophies)}
               </span>
-            </p>
-            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-              <span>{timeLeft(top.endsAt)}</span>
-              <span aria-hidden>·</span>
-              <span>{formatNumber(top.battles)} sampled battles</span>
+              <span className="rounded-full bg-background/50 px-2 py-0.5">{timeLeft(top.endsAt)}</span>
               {top.easyPush ? (
                 <span className="rounded-full bg-brand/15 px-2 py-0.5 font-semibold text-brand">
                   Low trophies for this account
                 </span>
               ) : null}
             </p>
+            <p className="mt-1.5 text-[11px] text-muted">
+              From {formatNumber(top.battles)} sampled battles on this map
+            </p>
           </div>
 
-          <div className="shrink-0 text-right">
-            <p className="text-3xl font-black tabular-nums text-victory">
-              +{((top.adjusted - 0.5) * 100).toFixed(1)}
-            </p>
-            <p className="text-xs leading-snug text-muted">
-              points above
-              <br />
-              this map&rsquo;s average
-            </p>
+          <div className="flex shrink-0 items-center gap-4 pt-4 max-sm:w-full max-sm:justify-between">
+            {/* The map's own layout, when the art source has it: what the
+                reader will actually be standing on. */}
+            {topMapArt ? (
+              <Link
+                href={`/maps/${slugify(topMode)}/${slugify(top.mapName)}`}
+                prefetch={false}
+                className="block shrink-0 overflow-hidden rounded-xl border border-border/70 bg-background/40 transition-transform hover:scale-[1.03]"
+                title={top.mapName}
+              >
+                <Image
+                  src={topMapArt}
+                  alt={`${top.mapName} layout`}
+                  width={96}
+                  height={128}
+                  className="h-28 w-auto object-contain sm:h-32"
+                  unoptimized
+                />
+              </Link>
+            ) : null}
+            <div className="text-right">
+              <p className="display text-4xl leading-none tabular-nums text-victory">
+                +{((top.adjusted - 0.5) * 100).toFixed(1)}
+              </p>
+              <p className="mt-1 text-xs leading-snug text-muted">
+                points above
+                <br />
+                this map&rsquo;s average
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {rest.length > 0 ? (
         <ul className="card divide-y divide-border overflow-hidden">
-          {rest.map((option) => {
+          {rest.map((option, i) => {
             const mode = modeLabel(modeMeta, option.mode);
             return (
               <li
                 key={`${option.mapName}-${option.brawlerId}`}
                 className="flex items-center gap-3 px-4 py-2.5"
               >
+                {/* Numbered from 2: the card above is 1, and the list reads as
+                    the queue it is rather than as a table. */}
+                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-surface-2 text-xs font-black tabular-nums text-muted">
+                  {i + 2}
+                </span>
                 <Image
                   src={brawlerMeta.get(option.brawlerId)?.imageUrl ?? brawlerIconUrl(option.brawlerId)}
                   alt=""

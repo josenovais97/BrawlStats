@@ -80,6 +80,27 @@ export function PlayerUpgradeGap({
           ) : null}
         </p>
 
+        {/* The first thing to do, said as a thing to do: the cheapest of these
+            to finish, by name and price. The list is already in that order,
+            so this is its first row read aloud. */}
+        {coinsPerLevel && coinsPerLevel(stranded[0].power) > 0 ? (
+          <p className="mt-3 flex items-center gap-2 rounded-xl border border-brand/30 bg-brand/10 px-3.5 py-2.5 text-sm">
+            <span className="rounded-md bg-brand px-1.5 py-0.5 text-[11px] font-black uppercase text-brand-ink">
+              Start here
+            </span>
+            <span className="min-w-0">
+              <strong className="font-bold capitalize">{stranded[0].name.toLowerCase()}</strong>
+              <span className="text-muted">
+                {' '}
+                to power {MAX_POWER_LEVEL} for about{' '}
+              </span>
+              <strong className="font-bold tabular-nums text-brand">
+                {formatNumber(coinsPerLevel(stranded[0].power))} coins
+              </strong>
+            </span>
+          </p>
+        ) : null}
+
         <ul className="mt-3 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
           {head.map((brawler) => (
             <li key={brawler.id}>
