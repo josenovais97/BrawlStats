@@ -401,7 +401,11 @@ export default async function PlayerPage({ params }: PageProps) {
           content: (
             <ProfileGroup title="The account">
         <PlayerStats player={player} />
-        <PlayerRecords player={player} />
+        {/* Streamed for the skin art; the fallback holds the hero row's
+            height so the panels below do not jump when it lands. */}
+        <Suspense fallback={<div className="skeleton h-[13rem] rounded-2xl" />}>
+          <PlayerRecords player={player} brawlerMeta={brawlerMeta} />
+        </Suspense>
         {/* Only ever populated for the couple of hundred players holding a
             global brawler placement, so it sits with the other reference
             readouts rather than above them. */}

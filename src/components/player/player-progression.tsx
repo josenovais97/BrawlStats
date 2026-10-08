@@ -118,17 +118,49 @@ export function PlayerProgression({ progression, playtime }: Props) {
         </div>
 
         {/*
-          A nearly complete account gets what is missing, not eight bars.
+          Rings, not bars.
 
-          At 99% every bar is full to within a pixel, so the section was eight
-          identical gold lines whose only information was in the small print
-          at their right-hand ends -- the reader had to scan every fraction to
-          find the two that were not whole. The list of what is left is that
-          same information, already found. Below the threshold the bars are
-          the right picture and stay.
+          Seven thin bars in two columns read as a form, and at 99% they were
+          seven identical gold lines whose only information sat in the small
+          print. A ring per item is the game's own way of showing a collection
+          -- a closed ring is a finished set, an open one shows how far is
+          left at a glance -- and seven of them side by side are the shape of
+          the account before a single number is read. Power 11 sits last and
+          in its own colour because it answers a different question: not what
+          is owned, but what is finished.
         */}
+        <ul className="grid grid-cols-3 gap-x-2 gap-y-5 @md:grid-cols-4 @3xl:grid-cols-7">
+          {[...collection, ...maxed].map(({ node, label, stat, tone }) => {
+            const value = stat.total > 0 ? stat.owned / stat.total : 0;
+            const done = stat.total > 0 && stat.owned >= stat.total;
+            return (
+              <li key={label} className="flex flex-col items-center text-center">
+                <Ring value={value} tone={done ? 'text-victory' : tone}>
+                  <span className={done ? 'text-victory' : tone}>{node}</span>
+                </Ring>
+                <p className="mt-2 text-[11px] font-bold uppercase leading-tight tracking-wide">
+                  {label}
+                </p>
+                <p
+                  className="mt-0.5 text-xs tabular-nums text-muted"
+                  title={
+                    stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned
+                      ? `${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`
+                      : undefined
+                  }
+                >
+                  {formatNumber(stat.owned)}
+                  {stat.total > 0 ? <> / {formatNumber(stat.total)}</> : null}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* What is left, already found, once the rings are all nearly
+            closed and the gaps are the only news. */}
         {nearlyComplete ? (
-          <div className="rounded-xl bg-surface-2/40 px-4 py-3.5 text-sm">
+          <div className="mt-6 rounded-xl bg-surface-2/40 px-4 py-3.5 text-sm">
             {missing.length === 0 ? (
               <p className="font-medium text-victory">Everything unlocked and maxed.</p>
             ) : (
@@ -153,57 +185,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
               </>
             )}
           </div>
-        ) : (
-          <>
-            <Group title="Collection" hint="What is unlocked">
-              {collection.map(({ node, label, stat, tone }) => (
-                <div key={label}>
-                  <div className="mb-1.5 flex items-center gap-2 text-sm">
-                    <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
-                    <span className="flex-1 font-medium">{label}</span>
-                    <span className="tabular-nums text-muted">
-                      {formatNumber(stat.owned)}
-                      {stat.total > 0 ? (
-                        <span className="text-muted"> / {formatNumber(stat.total)}</span>
-                      ) : null}
-                      {/* Gears only: completion counts the two a brawler can
-                          equip, but plenty of players own more and the page should
-                          say so rather than silently dropping the extras. */}
-                      {stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned ? (
-                        <span
-                          className="text-muted"
-                          title={`${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`}
-                        >
-                          {' '}
-                          · {formatNumber(stat.ownedRaw)} owned
-                        </span>
-                      ) : null}
-                    </span>
-                  </div>
-                  <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
-                </div>
-              ))}
-            </Group>
-
-            <Group title="Maxed" hint="What is finished">
-              {maxed.map(({ node, label, stat, tone }) => (
-                <div key={label}>
-                  <div className="mb-1.5 flex items-center gap-2 text-sm">
-                    <span className={`grid size-4 shrink-0 place-items-center ${tone}`}>{node}</span>
-                    <span className="flex-1 font-medium">{label}</span>
-                    <span className="tabular-nums text-muted">
-                      {formatNumber(stat.owned)}
-                      {stat.total > 0 ? (
-                        <span className="text-muted"> / {formatNumber(stat.total)}</span>
-                      ) : null}
-                    </span>
-                  </div>
-                  <Bar value={stat.total > 0 ? stat.owned / stat.total : 0} thin />
-                </div>
-              ))}
-            </Group>
-          </>
-        )}
+        ) : null}
 
         <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-wider text-muted">
           Investment <span className="font-medium normal-case tracking-normal">· what it cost</span>
@@ -307,29 +289,46 @@ interface Row {
 }
 
 /**
- * One labelled band of bars.
+ * A completion ring with a mark in the middle.
  *
- * The heading is small and the rule is the separation, because these are
- * groups inside a panel rather than sections in their own right -- a second
- * run of panel-sized titles inside one panel is how a page ends up with four
- * levels of heading and no hierarchy.
+ * Drawn in `currentColor` from the tone class, so each item keeps the colour
+ * its icon has everywhere else, and a closed ring turns victory green.
  */
-function Group({
-  title,
-  hint,
+function Ring({
+  value,
+  tone,
   children,
 }: {
-  title: string;
-  hint: string;
+  value: number;
+  tone: string;
   children: React.ReactNode;
 }) {
+  const pct = Math.min(Math.max(value, 0), 1);
+  const r = 26;
+  const c = 2 * Math.PI * r;
   return (
-    <section className="mt-6 first:mt-0">
-      <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted">
-        {title}{' '}
-        <span className="font-medium normal-case tracking-normal">· {hint}</span>
-      </p>
-      <div className="grid gap-x-6 gap-y-4 @2xl:grid-cols-2">{children}</div>
-    </section>
+    <div
+      className="relative grid size-16 place-items-center @xl:size-[4.5rem]"
+      role="progressbar"
+      aria-valuenow={Math.round(pct * 100)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <svg viewBox="0 0 64 64" className={`absolute inset-0 size-full -rotate-90 ${tone}`} aria-hidden>
+        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--surface-2)" strokeWidth="6" />
+        <circle
+          cx="32"
+          cy="32"
+          r={r}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeDasharray={`${c * pct} ${c}`}
+          className="transition-[stroke-dasharray] duration-700"
+        />
+      </svg>
+      <span className="relative grid size-6 place-items-center [&_svg]:size-5">{children}</span>
+    </div>
   );
 }

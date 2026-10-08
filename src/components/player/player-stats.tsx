@@ -10,12 +10,17 @@ import {
   WinStreakIcon,
 } from '@/components/game-icons';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Panel } from '@/components/ui/panel';
 import { StatStrip } from '@/components/ui/stat-strip';
 import { brawlerIconUrl } from '@/lib/brawlapi';
-import { formatDuration, formatNumber, titleCaseLabel } from '@/lib/format';
-import type { BSPlayer } from '@/types/brawlstars';
+import { brawlerArt } from '@/lib/brawler-art';
+import { formatDuration, formatNumber, titleCase } from '@/lib/format';
+import { HOT_STREAK, skinLabel } from '@/lib/player-showcase';
+import { brawlerPath } from '@/lib/slugs';
+import type { BABrawler } from '@/types/brawlapi';
+import type { BSPlayer, BSPlayerBrawler } from '@/types/brawlstars';
 
 export function PlayerStats({ player }: { player: BSPlayer }) {
   // Ranked deliberately absent: the Ranking section shows the current,
@@ -89,151 +94,206 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
 }
 
 /**
- * The two survival records the API reports and nothing on the site showed.
+ * The account's single best runs, drawn as achievements.
  *
- * Their own strip rather than two more cards in the row above: that row is
- * lifetime counters, these are single best runs, and appending them made a
- * five-column grid wrap to five-plus-two. Rendered only when at least one is
- * set — the API reports zero for "never played", which as a time would read as
- * an impressively bad run rather than as absence.
+ * The two that belong to a brawler -- the highest trophies any brawler has
+ * reached, and the longest win streak -- are hero cards: that brawler in the
+ * skin actually equipped, washed in its rarity's colour, the same treatment the
+ * Overview showcase gives the mains. A record feels like something that
+ * happened when it has a face, and a 52px default portrait in a list row was
+ * not much of one.
+ *
+ * The two survival times have no brawler behind them and stay as compact
+ * cards with the mode's own mark. Rendered only when at least one is set --
+ * the API reports zero for "never played", which as a time would read as an
+ * impressively bad run rather than as absence.
+ *
+ * Async for the skin art, so the page streams it behind a Suspense boundary.
  */
-export function PlayerRecords({ player }: { player: BSPlayer }) {
+export async function PlayerRecords({
+  player,
+  brawlerMeta,
+}: {
+  player: BSPlayer;
+  brawlerMeta: Map<number, BABrawler>;
+}) {
   const robo = formatDuration(player.bestRoboRumbleTime);
   const bigBrawler = formatDuration(player.bestTimeAsBigBrawler);
 
   // All-time bests hiding in the per-brawler payload. `maxWinStreak` and the
-  // per-brawler `highestTrophies` have always been in the response and were
-  // never shown anywhere — on a long-lived account they are usually the two
-  // most impressive numbers on the page.
-  const bestStreak = player.brawlers.reduce<BSPlayer['brawlers'][number] | null>(
+  // per-brawler `highestTrophies` have always been in the response; on a
+  // long-lived account they are usually the two most impressive numbers on
+  // the page.
+  const bestStreak = player.brawlers.reduce<BSPlayerBrawler | null>(
     (best, b) => ((b.maxWinStreak ?? 0) > (best?.maxWinStreak ?? 0) ? b : best),
     null,
   );
-  const bestBrawler = player.brawlers.reduce<BSPlayer['brawlers'][number] | null>(
+  const bestBrawler = player.brawlers.reduce<BSPlayerBrawler | null>(
     (best, b) => (b.highestTrophies > (best?.highestTrophies ?? 0) ? b : best),
     null,
   );
 
-  /*
-   * Achievements, not database fields.
-   *
-   * "Best brawler: 1,016 (Pierce)" as a figure in a strip is the same shape as
-   * a lifetime win count, and it is not the same kind of thing -- these are the
-   * single best runs on the account, and on a long-lived one they are usually
-   * the most impressive numbers anywhere on the page. The two that belong to a
-   * brawler get that brawler's portrait, because a face is what makes a record
-   * feel like something that happened rather than a row that was stored.
-   */
-  const records: Record[] = [];
-
+  const heroes: Hero[] = [];
   if (bestBrawler && bestBrawler.highestTrophies > 0) {
-    records.push({
+    heroes.push({
       key: 'best-brawler',
-      brawlerId: bestBrawler.id,
+      brawler: bestBrawler,
       icon: <TrophyIcon className="size-4" />,
-      label: 'Best brawler',
+      label: 'Highest trophies',
       value: formatNumber(bestBrawler.highestTrophies),
-      hint: titleCaseLabel(bestBrawler.name),
+      // The gap to now is the story when there is one: a peak of 1,500 on a
+      // brawler sitting at 1,500 is a different record from one now on 900.
+      detail:
+        bestBrawler.trophies < bestBrawler.highestTrophies
+          ? `Now on ${formatNumber(bestBrawler.trophies)}`
+          : 'At its peak right now',
       tone: 'text-brand',
     });
   }
   if (bestStreak && (bestStreak.maxWinStreak ?? 0) > 0) {
-    records.push({
+    const live = bestStreak.currentWinStreak ?? 0;
+    heroes.push({
       key: 'streak',
-      brawlerId: bestStreak.id,
+      brawler: bestStreak,
       icon: <WinStreakIcon className="size-4" />,
-      label: 'Best win streak',
+      label: 'Longest win streak',
       value: `${formatNumber(bestStreak.maxWinStreak ?? 0)} wins`,
-      hint: titleCaseLabel(bestStreak.name),
+      detail: live >= HOT_STREAK ? `On ${live} in a row right now` : 'In a row, all-time',
       tone: 'text-victory',
     });
   }
-  /*
-   * No "Total prestige" card. The same number is a chip in the hero two
-   * screens up, and as a fourth record here it pushed the grid to three plus
-   * one alone on a second row.
-   */
+
+  const times: TimeRecord[] = [];
   if (robo) {
-    records.push({
+    times.push({
       key: 'robo',
-      icon: <RoboRumbleIcon className="size-4" />,
-      mark: <RoboRumbleIcon className="size-8" />,
+      mark: <RoboRumbleIcon className="size-7" />,
       label: 'Robo Rumble',
       value: robo,
       hint: 'Longest survival',
-      tone: 'text-foreground',
     });
   }
   if (bigBrawler) {
-    records.push({
+    times.push({
       key: 'big',
-      icon: <BigBrawlerIcon className="size-4" />,
-      mark: <BigBrawlerIcon className="size-8" />,
+      mark: <BigBrawlerIcon className="size-7" />,
       label: 'Big Brawler',
       value: bigBrawler,
       hint: 'Longest time held',
-      tone: 'text-foreground',
     });
   }
 
-  if (records.length === 0) return null;
+  if (heroes.length === 0 && times.length === 0) return null;
+
+  const art = heroes.length
+    ? await brawlerArt(
+        heroes.map((h) => h.brawler),
+        brawlerMeta,
+      )
+    : new Map<number, string>();
 
   return (
     <Panel title="Personal bests" aside="All-time">
-      <ul className="grid gap-3 @md:grid-cols-2 @3xl:grid-cols-3">
-        {records.map((record) => (
-          <li
-            key={record.key}
-            className="flex items-center gap-3.5 rounded-xl bg-surface-2/40 p-3.5"
-          >
-            {record.brawlerId !== undefined ? (
-              <Image
-                src={brawlerIconUrl(record.brawlerId)}
-                alt=""
-                width={52}
-                height={52}
-                className="size-13 shrink-0 rounded-lg bg-surface-3"
-                loading="lazy"
-                unoptimized
-              />
-            ) : (
-              /* A record with no brawler behind it still needs something at
-                 the same size, or the row jumps between cards -- and at that
-                 size, not a 16px glyph in a 52px box, which read as a missing
-                 image rather than a mark. */
-              <span className="grid size-13 shrink-0 place-items-center rounded-lg bg-surface-3">
-                <span className={record.tone}>{record.mark ?? record.icon}</span>
-              </span>
-            )}
-            <div className="min-w-0">
-              <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
-                <span aria-hidden className={`flex shrink-0 items-center ${record.tone}`}>
-                  {record.icon}
+      <div className="space-y-3">
+        {heroes.length ? (
+          <ul className="grid gap-3 @2xl:grid-cols-2">
+            {heroes.map((h) => {
+              const tint = brawlerMeta.get(h.brawler.id)?.rarity.color ?? 'var(--brand)';
+              const skin = skinLabel(h.brawler);
+              return (
+                <li key={h.key}>
+                  <Link
+                    href={brawlerPath(h.brawler.id, h.brawler.name)}
+                    prefetch={false}
+                    className="group relative flex h-full min-h-36 items-stretch overflow-hidden rounded-2xl border border-border transition-colors hover:border-brand/50"
+                    style={{
+                      background: `linear-gradient(115deg, var(--surface) 35%, color-mix(in srgb, ${tint} 30%, transparent))`,
+                    }}
+                  >
+                    {/* A soft glow behind the art, in the rarity colour, so the
+                        figure stands on something rather than floating. */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute -right-10 top-1/2 size-56 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
+                      style={{ background: tint }}
+                    />
+
+                    <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center gap-1 p-4 @xl:p-5">
+                      <p className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider ${h.tone}`}>
+                        <span aria-hidden className="flex shrink-0 items-center">{h.icon}</span>
+                        {h.label}
+                      </p>
+                      <p className={`display text-3xl leading-none tabular-nums @xl:text-4xl ${h.tone}`}>
+                        {h.value}
+                      </p>
+                      <p className="mt-1 truncate text-sm font-bold uppercase">
+                        {titleCase(h.brawler.name)}
+                        {skin ? (
+                          <span className="font-medium normal-case text-muted"> · {titleCase(skin)}</span>
+                        ) : null}
+                      </p>
+                      <p className="truncate text-xs text-muted">{h.detail}</p>
+                    </div>
+
+                    <div className="relative z-10 flex w-32 shrink-0 items-end justify-center pt-3 @xl:w-40">
+                      <Image
+                        src={art.get(h.brawler.id) ?? brawlerIconUrl(h.brawler.id)}
+                        alt=""
+                        width={160}
+                        height={160}
+                        className="h-32 w-auto object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-105 @xl:h-36"
+                        loading="lazy"
+                        unoptimized
+                      />
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
+
+        {times.length ? (
+          <ul className="grid gap-3 @md:grid-cols-2">
+            {times.map((t) => (
+              <li
+                key={t.key}
+                className="flex items-center gap-3.5 rounded-xl border border-border/70 bg-surface-2/40 p-3.5"
+              >
+                <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-surface-3 text-accent">
+                  {t.mark}
                 </span>
-                <span className="truncate">{record.label}</span>
-              </p>
-              <p className={`truncate text-xl font-black tabular-nums leading-tight ${record.tone}`}>
-                {record.value}
-              </p>
-              <p className="truncate text-xs text-muted">{record.hint}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+                <div className="min-w-0">
+                  <p className="truncate text-[11px] font-bold uppercase tracking-wider text-muted">
+                    {t.label}
+                  </p>
+                  <p className="truncate text-2xl font-black leading-tight tabular-nums">{t.value}</p>
+                  <p className="truncate text-xs text-muted">{t.hint}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </Panel>
   );
 }
 
-interface Record {
+interface Hero {
   key: string;
-  /** Shows that brawler's portrait, for the records that belong to one. */
-  brawlerId?: number;
+  brawler: BSPlayerBrawler;
   icon: React.ReactNode;
-  /** The same icon drawn to fill the portrait slot, for records with no brawler. */
-  mark?: React.ReactNode;
   label: string;
   value: string;
-  hint: string;
+  /** One line of context under the brawler's name. */
+  detail: string;
   tone: string;
 }
 
+interface TimeRecord {
+  key: string;
+  mark: React.ReactNode;
+  label: string;
+  value: string;
+  hint: string;
+}
