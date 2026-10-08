@@ -6,6 +6,7 @@ import { after } from 'next/server';
 import { BattleLog } from '@/components/player/battle-log';
 import { LastOnline } from '@/components/player/last-online';
 import { PlayerBrawlers } from '@/components/player/player-brawlers';
+import { PlayerBrawlersWithArt } from '@/components/player/player-brawlers-art';
 import { PlayerHeader } from '@/components/player/player-header';
 import { PlayerProgress } from '@/components/player/player-progress';
 import { BattleAutopsySection } from '@/components/player/battle-autopsy-section';
@@ -284,6 +285,21 @@ export default async function PlayerPage({ params }: PageProps) {
   // Supercell adds brawlers instead of being pinned to today's count.
   const skill = computeSkillScore(player, catalogue.length || undefined);
 
+  const tileMeta = Object.fromEntries(
+            [...brawlerMeta.entries()].map(([id, b]) => [
+              id,
+              {
+                imageUrl: b.imageUrl,
+                rarityColor: b.rarity.color,
+                rarityName: b.rarity.name,
+                // `tier` is undefined below the sample floor, which the tile
+                // renders as no chip rather than as a bottom-tier one.
+                tier: metaIndex.get(id)?.tier ?? undefined,
+                metaScore: metaIndex.get(id)?.metaScore ?? undefined,
+              },
+            ]),
+          );
+
   return (
     <div className="space-y-8">
       <RecentSearchRecorder
@@ -549,23 +565,11 @@ export default async function PlayerPage({ params }: PageProps) {
           brawlerMeta={brawlerMeta}
         />
 
-        <PlayerBrawlers
-          brawlers={player.brawlers}
-          meta={Object.fromEntries(
-            [...brawlerMeta.entries()].map(([id, b]) => [
-              id,
-              {
-                imageUrl: b.imageUrl,
-                rarityColor: b.rarity.color,
-                rarityName: b.rarity.name,
-                // `tier` is undefined below the sample floor, which the tile
-                // renders as no chip rather than as a bottom-tier one.
-                tier: metaIndex.get(id)?.tier ?? undefined,
-                metaScore: metaIndex.get(id)?.metaScore ?? undefined,
-              },
-            ]),
-          )}
-        />            </ProfileGroup>
+        {/* Portraits first, then the same grid in full-body skin art once the
+            cached wiki sweep answers -- the tab never waits on it. */}
+        <Suspense fallback={<PlayerBrawlers brawlers={player.brawlers} meta={tileMeta} />}>
+          <PlayerBrawlersWithArt brawlers={player.brawlers} meta={tileMeta} />
+        </Suspense>            </ProfileGroup>
           ),
         },
         ]}

@@ -5,7 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
-import { TrophyIcon, WinStreakIcon } from '@/components/game-icons';
+import {
+  BuffieIcon,
+  GadgetIcon,
+  GearIcon,
+  HyperchargeIcon,
+  StarPowerIcon,
+  TrophyIcon,
+  WinStreakIcon,
+} from '@/components/game-icons';
 import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
@@ -30,6 +38,12 @@ export interface BrawlerMetaLite {
    */
   tier?: Tier;
   metaScore?: number;
+  /**
+   * Full-body art: the equipped skin when the wiki has it, else the model.
+   * Resolved on the server and streamed in; absent on the first paint, when
+   * the tile draws the portrait instead.
+   */
+  artUrl?: string;
 }
 
 interface PlayerBrawlersProps {
@@ -171,6 +185,9 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
   );
 }
 
+/** A live streak worth a flame on the tile; matches the Overview's "On fire". */
+const HOT_STREAK = 3;
+
 function BrawlerTile({
   brawler,
   meta,
@@ -179,34 +196,60 @@ function BrawlerTile({
   meta?: BrawlerMetaLite;
 }) {
   const accent = meta?.rarityColor ?? '#8b95b8';
-  const gearCount = brawler.gears?.length ?? 0;
   const gap = peakGap(brawler);
   const tier = meta?.tier;
   const prestige = brawler.prestigeLevel ?? 0;
-  const streak = brawler.maxWinStreak ?? 0;
-  const onStreak = brawler.currentWinStreak ?? 0;
+  const best = brawler.maxWinStreak ?? 0;
+  const live = brawler.currentWinStreak ?? 0;
+  const portrait = meta?.imageUrl ?? brawlerIconUrl(brawler.id);
+  /*
+   * The model URL is built from the id and not every brawler has one yet, so
+   * a 404 falls back to the portrait here rather than costing a HEAD probe
+   * per tile on the server -- a hundred of them on a full roster.
+   */
+  const [src, setSrc] = useState(meta?.artUrl ?? portrait);
+  const full = src !== portrait;
+
+  const kit: { key: string; node: React.ReactNode; n: number; label: string }[] = [
+    { key: 'sp', node: <StarPowerIcon className="size-4" />, n: brawler.starPowers.length, label: 'Star powers' },
+    { key: 'gd', node: <GadgetIcon className="size-4" />, n: brawler.gadgets.length, label: 'Gadgets' },
+    { key: 'gr', node: <GearIcon className="size-4" />, n: brawler.gears?.length ?? 0, label: 'Gears' },
+    { key: 'hc', node: <HyperchargeIcon className="size-4" />, n: brawler.hyperCharges?.length ?? 0, label: 'Hypercharge' },
+    {
+      key: 'bf',
+      node: <BuffieIcon className="size-4" />,
+      n: Object.values(brawler.buffies ?? {}).filter(Boolean).length,
+      label: 'Buffies',
+    },
+  ].filter((k) => k.n > 0);
 
   return (
     <Link
       href={brawlerPath(brawler.id, brawler.name)}
-      className="card card-interactive group relative overflow-hidden p-3"
-      style={{ borderColor: `color-mix(in srgb, ${accent} 35%, transparent)` }}
+      prefetch={false}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border transition-colors hover:border-brand/60"
+      style={{
+        borderColor: `color-mix(in srgb, ${accent} 40%, var(--border))`,
+        background: `linear-gradient(165deg, color-mix(in srgb, ${accent} 24%, transparent), var(--surface) 62%)`,
+      }}
       title={
         tier
           ? `${brawler.name}: ${tier} tier on the trophy list, meta score ${meta?.metaScore?.toFixed(1) ?? '?'}`
           : `${brawler.name}: not enough sampled battles to rate`
       }
     >
-      <span
-        className="absolute inset-x-0 top-0 h-px opacity-70"
-        style={{ background: accent }}
-      />
-
-      {/* Corner rather than inline: the tile is 96px wide and the chip has to
-          not compete with the power badge or the name. */}
+      {/* Corner chips, opposite each other: prestige left, tier right. */}
+      {prestige > 0 ? (
+        <span
+          className="absolute left-2 top-2 z-10 rounded-md bg-background/70 px-1.5 py-0.5 text-[10px] font-black text-accent backdrop-blur"
+          title={`Prestige ${prestige}`}
+        >
+          P{prestige}
+        </span>
+      ) : null}
       {tier ? (
         <span
-          className="absolute right-2 top-2 z-10 grid size-5 place-items-center rounded text-xs font-black"
+          className="absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-md text-xs font-black backdrop-blur"
           style={{
             color: TIER_COLOR[tier],
             background: `color-mix(in srgb, ${TIER_COLOR[tier]} 22%, var(--surface))`,
@@ -216,82 +259,97 @@ function BrawlerTile({
         </span>
       ) : null}
 
-      <div className="relative">
+      {/* The figure, standing on a soft glow in its rarity colour. */}
+      <div className="relative flex h-32 items-end justify-center pt-5 sm:h-36">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute bottom-1 left-1/2 size-24 -translate-x-1/2 rounded-full opacity-35 blur-2xl"
+          style={{ background: accent }}
+        />
         <Image
-          src={meta?.imageUrl ?? brawlerIconUrl(brawler.id)}
+          src={src}
           alt={brawler.name}
-          width={120}
-          height={120}
-          className="mx-auto aspect-square w-full max-w-[96px] object-contain"
+          width={128}
+          height={128}
+          onError={() => setSrc(portrait)}
+          className={`relative w-auto object-contain transition-transform group-hover:scale-105 ${
+            full
+              ? 'h-28 drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)] sm:h-32'
+              : 'mb-2 h-20 rounded-xl sm:h-24'
+          }`}
+          loading="lazy"
           unoptimized
         />
         <span
-          className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md px-2 py-0.5 text-xs font-black text-[#1a1200] shadow"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rounded-md px-2 py-0.5 text-xs font-black text-[#1a1200] shadow"
           style={{ background: 'var(--brand)' }}
+          title={`Power ${brawler.power}`}
         >
           {brawler.power}
         </span>
-
-        {/* Prestige sits opposite the tier chip. Only past level 0, which is
-            most brawlers on most accounts. */}
-        {prestige > 0 ? (
-          <span
-            className="absolute left-0 top-0 rounded-md bg-surface-3 px-1.5 py-0.5 text-xs font-black text-accent"
-            title={`Prestige ${prestige}`}
-          >
-            P{prestige}
-          </span>
-        ) : null}
       </div>
 
-      <p className="mt-3 truncate text-center text-sm font-bold capitalize">
-        {brawler.name.toLowerCase()}
-      </p>
+      <div className="flex flex-1 flex-col items-center gap-1 px-2.5 pb-3 pt-4 text-center">
+        <p className="display w-full truncate text-sm uppercase">{brawler.name.toLowerCase()}</p>
 
-      <div className="mt-2 flex items-center justify-center gap-3 text-xs">
-        <span className="flex items-center gap-1 tabular-nums text-brand">
-          <TrophyIcon className="size-3" />
-          {formatNumber(brawler.trophies)}
-        </span>
-        <span className="flex items-center gap-1 tabular-nums text-muted">
-          <Star className="size-3" />
-          {brawler.rank}
-        </span>
-      </div>
-
-      {/* Only when it is actually off peak. A "−0" under every maxed brawler
-          would be noise on 106 tiles. */}
-      <p className="mt-1 text-center text-xs tabular-nums text-muted">
-        {gap > 0 ? (
-          <span title={`Peak ${formatNumber(brawler.highestTrophies)}`}>
-            −{formatNumber(gap)} off peak
+        <p className="flex items-center gap-2.5 text-xs">
+          <span className="flex items-center gap-1 font-black tabular-nums text-brand">
+            <TrophyIcon className="size-3.5" />
+            {formatNumber(brawler.trophies)}
           </span>
-        ) : (
-          <span className="text-victory/80">At peak</span>
-        )}
-      </p>
-
-      {streak > 0 ? (
-        <p
-          className="mt-0.5 flex items-center justify-center gap-1 text-xs tabular-nums text-muted"
-          title={`Best win streak ${streak}${onStreak > 0 ? `, currently on ${onStreak}` : ''}`}
-        >
-          <WinStreakIcon className="size-3.5" />
-          {/* The live streak leads when there is one — it is the only number on
-              this tile that is true right now rather than ever. */}
-          {onStreak > 0 ? `${onStreak} · best ${streak}` : `best ${streak}`}
+          <span className="flex items-center gap-1 tabular-nums text-muted" title={`Rank ${brawler.rank}`}>
+            <Star className="size-3" />
+            {brawler.rank}
+          </span>
         </p>
-      ) : null}
 
-      <div className="mt-2 flex items-center justify-center gap-1 text-xs text-muted">
-        <span title="Star powers">{brawler.starPowers.length} SP</span>
-        <span aria-hidden>·</span>
-        <span title="Gadgets">{brawler.gadgets.length} GD</span>
-        {gearCount > 0 ? (
-          <>
-            <span aria-hidden>·</span>
-            <span title="Gears">{gearCount} GR</span>
-          </>
+        {/* Only when it is actually off peak; "−0" on every maxed brawler
+            would be noise on a hundred tiles. */}
+        <p className="text-[11px] tabular-nums text-muted">
+          {gap > 0 ? (
+            <span title={`Peak ${formatNumber(brawler.highestTrophies)}`}>
+              −{formatNumber(gap)} off peak
+            </span>
+          ) : (
+            <span className="text-victory/80">At peak</span>
+          )}
+        </p>
+
+        {/* The live streak leads when it is hot -- the only number on the tile
+            that is true right now rather than ever. */}
+        {live >= HOT_STREAK ? (
+          <p
+            className="flex items-center gap-1 rounded-full bg-victory/15 px-2 py-0.5 text-[11px] font-bold tabular-nums text-victory"
+            title={`On ${live} in a row; best ${best}`}
+          >
+            <WinStreakIcon className="size-3.5" />
+            {live} in a row
+          </p>
+        ) : best > 0 ? (
+          <p
+            className="flex items-center gap-1 text-[11px] tabular-nums text-muted"
+            title={`Best win streak ${best}`}
+          >
+            <WinStreakIcon className="size-3.5" />
+            best {best}
+          </p>
+        ) : null}
+
+        {/* The kit as the game's own icons with a count, in place of
+            "2 SP · 2 GD · 2 GR" -- read by shape, like the game reads it. */}
+        {kit.length ? (
+          <ul className="mt-auto flex flex-wrap items-center justify-center gap-1 pt-1.5">
+            {kit.map((k) => (
+              <li
+                key={k.key}
+                className="flex items-center gap-0.5 rounded-md bg-background/50 px-1 py-0.5 text-[10px] font-bold tabular-nums"
+                title={`${k.label}: ${k.n}`}
+              >
+                {k.node}
+                {k.n > 1 ? k.n : null}
+              </li>
+            ))}
+          </ul>
         ) : null}
       </div>
     </Link>
