@@ -167,17 +167,32 @@ export default function BubblePage() {
             {/* The store listing, for readers who will not sideload. Same
                 build, same key; see `storeUrl`. */}
             {BUBBLE_APP.storeUrl ? (
-              <p className="text-sm text-muted">
-                Prefer a store?{" "}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <a
                   href={BUBBLE_APP.storeUrl}
                   rel="noopener"
-                  className="font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"
+                  className="inline-flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-2.5 transition-[transform,border-color] hover:-translate-y-0.5 hover:border-brand/50"
                 >
-                  Get it on {BUBBLE_APP.storeName}
-                </a>{" "}
-                — the same signed file, so either one updates the other.
-              </p>
+                  <Image
+                    src={BUBBLE_APP.storeIcon}
+                    alt=""
+                    width={152}
+                    height={152}
+                    className="size-8"
+                    unoptimized
+                  />
+                  <span className="flex flex-col leading-tight">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                      Get it on
+                    </span>
+                    <span className="font-bold">{BUBBLE_APP.storeName}</span>
+                  </span>
+                </a>
+                <p className="text-sm text-muted">
+                  Prefer a store? The same signed file, so either one updates
+                  the other.
+                </p>
+              </div>
             ) : null}
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2">

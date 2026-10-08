@@ -54,6 +54,11 @@ export const BUBBLE_APP = {
   storeUrl: "https://apkpure.com/p/net.brawlzone.bubble" as string | null,
   /** The store's name, as the link says it. */
   storeName: "APKPure",
+  /**
+   * The store's own icon, saved from its site rather than redrawn, so the
+   * badge reads as that store at a glance. Served from public/.
+   */
+  storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
   size: 2806034,
   sha256: 'df0d8d9b9dc064339e3b0a50d2f3bf37f2491f7e26aad30611a2bfadea920a2e',
