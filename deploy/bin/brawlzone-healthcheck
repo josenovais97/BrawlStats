@@ -72,7 +72,7 @@ use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
 # all. Even repaired, an alert is a message to a person, and a person is not
 # always there.
 #
-# So above 80% the box tidies up on its own first, and only reports a problem
+# So above 70% the box tidies up on its own first, and only reports a problem
 # if that was not enough. Everything here regenerates: build cache is rebuilt
 # by the next deploy, dangling images are already unreferenced, and an
 # uncompressed rotated log is the same log. Nothing that a restore or a
@@ -81,7 +81,11 @@ use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
 # It is deliberately not a fix for anything. Whatever filled the disk still
 # filled it, and the alert below still fires if this cannot keep up. This buys
 # hours, which on the day in question would have been the whole difference.
-if [ "$use" -ge 80 ]; then
+# 70, not 80: on 2026-10-08 a day of deploys took build cache from 4.5 GB
+# back to 15 GB, about 1.5 GB a build, and 80% left only ten points between
+# the first tidy-up and the alert. Build cache is the cheapest thing on the
+# box to throw away, so throwing it away earlier costs one slower build.
+if [ "$use" -ge 70 ]; then
   before=$use
   docker builder prune -af >/dev/null 2>&1
   docker image prune -f >/dev/null 2>&1
