@@ -51,7 +51,9 @@ export const BUBBLE_APP = {
    * Null renders nothing. The page must never point at a listing that is not
    * up yet; a dead store link on a download page reads as a dead app.
    */
-  storeUrl: null as string | null,
+  storeUrl: "https://apkpure.com/p/net.brawlzone.bubble" as string | null,
+  /** The store's name, as the link says it. */
+  storeName: "APKPure",
   /** Bytes, for the page and for `Content-Length` expectations. */
   size: 2806034,
   sha256: 'df0d8d9b9dc064339e3b0a50d2f3bf37f2491f7e26aad30611a2bfadea920a2e',

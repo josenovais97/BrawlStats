@@ -174,9 +174,9 @@ export default function BubblePage() {
                   rel="noopener"
                   className="font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"
                 >
-                  Get it on Uptodown
+                  Get it on {BUBBLE_APP.storeName}
                 </a>{" "}
-                — the same file, updated in step with this page.
+                — the same signed file, so either one updates the other.
               </p>
             ) : null}
 
