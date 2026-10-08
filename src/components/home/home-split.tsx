@@ -88,6 +88,8 @@ export async function HomeSplit() {
               <li key={brawler.brawlerId}>
                 <Link
                   href={brawlerPath(brawler.brawlerId, brawler.name)}
+                  // One of a list: prefetching each would burst past the rate limit -- see site-footer.
+                  prefetch={false}
                   className="row-interactive -mx-2 flex items-center gap-3 rounded-xl px-2 py-3 sm:gap-4"
                 >
                   <Image

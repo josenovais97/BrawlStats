@@ -129,10 +129,26 @@ export function SiteFooter() {
           store badges while the right-hand column ran on past it — the reason
           the whole block read as unbalanced.
         */}
+        {/*
+          Every link in the footer has prefetching off, and that is a fix, not a
+          micro-optimisation.
+
+          Next prefetches each <Link> the moment it scrolls into view. The
+          footer is ~25 links on every page, so reaching the bottom of any page
+          fired ~25 requests at once -- on top of the page's own. Measured on
+          2026-10-07: one visitor opening the home page and scrolling it once
+          sent 112 requests in ten seconds, and Cloudflare's rate limit bans an
+          IP at 100. Real visitors were reaching it -- nine in a week -- and
+          the reward for reading to the bottom of the page was Error 1015.
+
+          Nobody needs the footer's links instant. They still navigate; the
+          next page just loads when it is clicked instead of before.
+        */}
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
           <div className="min-w-0">
             <Link
               href="/"
+              prefetch={false}
               className="inline-flex items-center gap-2.5 rounded-lg font-black tracking-tight"
             >
               <BrandMark className="size-7" />
@@ -213,6 +229,7 @@ export function SiteFooter() {
                   <li key={href}>
                     <Link
                       href={href}
+                      prefetch={false}
                       className="inline-flex min-h-9 items-center text-sm text-muted transition-colors hover:text-foreground"
                     >
                       {label}
@@ -269,16 +286,17 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-t border-border/50 pt-4">
             <Link
               href="/about"
+              prefetch={false}
               className="transition-colors hover:text-foreground"
             >
               About {SITE_NAME}
             </Link>
             <Dot />
-            <Link href="/privacy" className="transition-colors hover:text-foreground">
+            <Link href="/privacy" prefetch={false} className="transition-colors hover:text-foreground">
               Privacy
             </Link>
             <Dot />
-            <Link href="/terms" className="transition-colors hover:text-foreground">
+            <Link href="/terms" prefetch={false} className="transition-colors hover:text-foreground">
               Terms
             </Link>
             <Dot />

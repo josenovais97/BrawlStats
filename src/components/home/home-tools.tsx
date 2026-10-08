@@ -165,6 +165,8 @@ export async function HomeTools() {
             */}
             <Link
               href={href}
+              // One of a list: prefetching each would burst past the rate limit -- see site-footer.
+              prefetch={false}
               className="group flex h-full items-center gap-3 p-3.5 transition-colors hover:bg-surface-2 lg:flex-col lg:items-start lg:gap-2.5 lg:p-4"
             >
               <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 transition-colors group-hover:bg-surface-3">
@@ -205,6 +207,8 @@ function Featured({
   return (
     <Link
       href={href}
+      // One of a list: prefetching each would burst past the rate limit -- see site-footer.
+      prefetch={false}
       className="card card-interactive group flex flex-col gap-4 p-5 hover:bg-surface-2/30"
     >
       <div className="flex items-center gap-3">

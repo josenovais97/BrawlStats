@@ -93,6 +93,8 @@ export async function HomeAccountPreview() {
                     <li key={brawler.brawlerId}>
                       <Link
                         href={brawlerPath(brawler.brawlerId, brawler.name)}
+                        // One of a list: prefetching each would burst past the rate limit -- see site-footer.
+                        prefetch={false}
                         className="flex items-center gap-2 rounded-xl border border-border bg-surface-2/60 py-1 pl-1 pr-2.5 transition-colors hover:border-brand/50"
                         title={`${brawler.name}: meta score ${brawler.score.toFixed(1)}`}
                       >

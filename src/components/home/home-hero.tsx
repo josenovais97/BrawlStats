@@ -460,6 +460,8 @@ function Figure({
   return slot.rank ? (
     <Link
       href={brawlerPath(slot.brawlerId, slot.name)}
+      // One of a list: prefetching each would burst past the rate limit -- see site-footer.
+      prefetch={false}
       title={`${slot.name}: number ${slot.rank} in Ranked${slot.tier ? `, tier ${slot.tier}` : ''}`}
       className={`absolute block transition-transform duration-300 hover:-translate-y-1.5 ${className}`}
     >

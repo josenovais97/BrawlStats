@@ -122,6 +122,8 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                   <li key={brawler.brawlerId}>
                     <Link
                       href={brawlerPath(brawler.brawlerId, brawler.name)}
+                      // One of a list: prefetching each would burst past the rate limit -- see site-footer.
+                      prefetch={false}
                       className="row-interactive flex items-center gap-3 bg-surface px-3 py-2"
                     >
                       <span className="w-4 shrink-0 text-center text-xs font-black tabular-nums text-muted">
