@@ -40,7 +40,9 @@ export function PlayerProgress({
       title="Recent progress"
       subtitle="Trophies and Ranked, from the points recorded on each profile view."
     >
-      <div className="grid gap-x-8 gap-y-8 @3xl:grid-cols-2">
+      {/* Stacked, Trophies over Ranked, with a rule between: two halves of one
+          reading rather than two panels competing side by side. */}
+      <div className="divide-y divide-border/70 [&>section+section]:mt-6 [&>section+section]:pt-6">
         {trophies ? <TrackView track={trophies} kind="trophies" /> : null}
         {ranked ? <TrackView track={ranked} kind="ranked" /> : null}
       </div>
