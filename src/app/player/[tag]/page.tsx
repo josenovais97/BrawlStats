@@ -18,6 +18,7 @@ import { PlayerMetaFit } from '@/components/player/player-meta-fit';
 import { PlayerRankedPicks } from '@/components/player/player-ranked-picks';
 import { PlayerRecords, PlayerStats } from '@/components/player/player-stats';
 import { PlayerSkillScore } from '@/components/player/player-skill-score';
+import { PlayerShowcase } from '@/components/player/player-showcase';
 import { PlayerUpgradeGap } from '@/components/player/player-upgrade-gap';
 import { ErrorState } from '@/components/ui/error-state';
 import { BattleLogSkeleton, InsightsSkeleton } from '@/components/ui/skeletons';
@@ -354,6 +355,21 @@ export default async function PlayerPage({ params }: PageProps) {
             rankedStanding={rankedStanding}
             tag={normalizedTag}
           />
+        </Suspense>
+
+        {/*
+          The account's own brawlers, drawn in the skins actually equipped,
+          with what is on a streak and what is nearly at its next prestige.
+          After the two judgements above and before the battle-log detail:
+          it is the part of Overview that is about *this* player's roster
+          rather than a number about it.
+
+          Streamed: the skin art is one cached wiki sweep, and on the first
+          view of a day that sweep must never hold the profile up. The
+          fallback holds roughly the panel's height so nothing below jumps.
+        */}
+        <Suspense fallback={<div className="skeleton h-[30rem] rounded-2xl" />}>
+          <PlayerShowcase brawlers={player.brawlers} brawlerMeta={brawlerMeta} />
         </Suspense>
 
         {/*
