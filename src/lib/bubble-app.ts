@@ -55,8 +55,10 @@ export const BUBBLE_APP = {
   /** The store's name, as the link says it. */
   storeName: "APKPure",
   /**
-   * The store's own icon, saved from its site rather than redrawn, so the
-   * badge reads as that store at a glance. Served from public/.
+   * The store's own mark, saved from its site rather than redrawn, so the
+   * badge reads as that store at a glance. Served from public/. Cropped from
+   * the transparent wordmark, not the app icon, whose white square shows on
+   * the dark theme.
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */

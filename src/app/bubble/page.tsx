@@ -176,8 +176,8 @@ export default function BubblePage() {
                   <Image
                     src={BUBBLE_APP.storeIcon}
                     alt=""
-                    width={152}
-                    height={152}
+                    width={74}
+                    height={74}
                     className="size-8"
                     unoptimized
                   />
