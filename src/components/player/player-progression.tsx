@@ -129,7 +129,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
           in its own colour because it answers a different question: not what
           is owned, but what is finished.
         */}
-        <ul className="grid grid-cols-3 gap-x-2 gap-y-5 @md:grid-cols-4 @3xl:grid-cols-7">
+        <ul className="grid grid-cols-3 gap-x-2 gap-y-6 @lg:grid-cols-4 @4xl:grid-cols-7">
           {[...collection, ...maxed].map(({ node, label, stat, tone }) => {
             const value = stat.total > 0 ? stat.owned / stat.total : 0;
             const done = stat.total > 0 && stat.owned >= stat.total;
@@ -304,31 +304,35 @@ function Ring({
   children: React.ReactNode;
 }) {
   const pct = Math.min(Math.max(value, 0), 1);
-  const r = 26;
+  const r = 28;
   const c = 2 * Math.PI * r;
   return (
     <div
-      className="relative grid size-16 place-items-center @xl:size-[4.5rem]"
+      className="relative grid size-20 place-items-center @xl:size-24"
       role="progressbar"
       aria-valuenow={Math.round(pct * 100)}
       aria-valuemin={0}
       aria-valuemax={100}
     >
       <svg viewBox="0 0 64 64" className={`absolute inset-0 size-full -rotate-90 ${tone}`} aria-hidden>
-        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--surface-2)" strokeWidth="6" />
+        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--surface-2)" strokeWidth="5" />
         <circle
           cx="32"
           cy="32"
           r={r}
           fill="none"
           stroke="currentColor"
-          strokeWidth="6"
+          strokeWidth="5"
           strokeLinecap="round"
           strokeDasharray={`${c * pct} ${c}`}
           className="transition-[stroke-dasharray] duration-700"
         />
       </svg>
-      <span className="relative grid size-6 place-items-center [&_svg]:size-5">{children}</span>
+      {/* The game icons are images, not SVGs, and arrive sized for a 16px
+          label; the ring is the icon's frame here, so it fills most of it. */}
+      <span className="relative grid place-items-center [&_img]:size-9 [&_svg]:size-9 @xl:[&_img]:size-11 @xl:[&_svg]:size-11">
+        {children}
+      </span>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { TrophyGainIcon, TrophyIcon } from '@/components/game-icons';
+import { RankedIcon, TrophyGainIcon, TrophyIcon } from '@/components/game-icons';
 
 import { Panel } from '@/components/ui/panel';
 import { formatNumber } from '@/lib/format';
@@ -6,85 +6,157 @@ import type { TrophyPoint } from '@/lib/stats';
 import { trophyCurve } from '@/lib/trophy-curve';
 
 /**
- * What a player has actually done lately, read off the trophy history.
+ * What a player has actually done lately, read off the recorded history: one
+ * track for trophies and one for Ranked Elo, the same readings for each.
  *
- * This is the whole of the trophy history now. There used to be a full-width
- * chart under it drawing the curve, and on a real profile it was a flat line:
- * the points are recorded when someone views the page, so a typical account
- * has a handful of them and no shape worth plotting. Worse, the curve was
- * spaced by point index rather than by date, so a gap of two months between
- * two views drew the same width as two consecutive days — the shape was not
- * only thin, it was misleading. A curve is not an answer; "am I up this month"
- * is, and that is what these three cards say.
+ * Mostly figures, not a chart. The points are recorded when someone views the
+ * page, so a typical account has a handful of them and no shape worth
+ * plotting; a curve only appears once there are enough views spread over
+ * enough days (see `trophy-curve`). "Am I up this month" is the answer, and
+ * the figures say it.
  *
  * Windows are matched to the nearest recorded point rather than assumed to
- * exist: history only fills in on days someone looked the profile up, so a
- * "30 days" figure is labelled with the span it actually covers.
+ * exist, so a "30 days" figure is labelled with the span it actually covers.
+ *
+ * Ranked reuses every helper by reading Elo into the `trophies` slot: the
+ * arithmetic is identical, and only the labels and colour differ.
  */
 export function PlayerProgress({
   points,
 }: {
   points: TrophyPoint[];
 }) {
+  const trophies = readTrack(points);
+  const ranked = readTrack(
+    points
+      .filter((p) => typeof p.rankedElo === 'number' && p.rankedElo > 0)
+      .map((p) => ({ ...p, trophies: p.rankedElo as number })),
+  );
+
+  if (!trophies && !ranked) return null;
+
+  return (
+    <Panel
+      title="Recent progress"
+      subtitle="Trophies and Ranked, from the points recorded on each profile view."
+    >
+      <div className="grid gap-x-8 gap-y-8 @3xl:grid-cols-2">
+        {trophies ? <TrackView track={trophies} kind="trophies" /> : null}
+        {ranked ? <TrackView track={ranked} kind="ranked" /> : null}
+      </div>
+
+      {/* The caveat the history always needs: it is only as dense as the
+          times someone opened this profile, which keeps "tracked 2 days"
+          from reading as "played 2 days". */}
+      <p className="mt-5 text-xs text-muted">
+        One point per day, recorded when this profile is viewed, so it covers the days someone
+        checked rather than every day played.
+      </p>
+    </Panel>
+  );
+}
+
+interface Track {
+  last: TrophyPoint;
+  week: ReturnType<typeof changeOver>;
+  month: ReturnType<typeof changeOver>;
+  best: ReturnType<typeof bestDay>;
+  curve: ReturnType<typeof trophyCurve>;
+  overall: number;
+  tracked: number;
+}
+
+/** One history read into its figures, or null when it has nothing to say. */
+function readTrack(points: TrophyPoint[]): Track | null {
   if (points.length < 2) return null;
 
   const first = points[0];
   const last = points[points.length - 1];
   const week = changeOver(points, 7);
   const month = changeOver(points, 30);
-  const best = bestDay(points);
-  /*
-   * Null far more often than not, and that is the design. See `trophy-curve`:
-   * a chart only appears once there are enough views spread over enough days
-   * to have a shape, because the alternative is a flat line between two dots
-   * on most profiles -- which is why the previous one was deleted.
-   */
-  const curve = trophyCurve(points);
-
-  // The full tracked span, which is the one figure that always exists — the
-  // seven- and thirty-day windows need history reaching that far back, and a
-  // profile first looked up on Tuesday has neither.
   const overall = last.trophies - first.trophies;
-  const tracked = Math.max(
-    1,
-    Math.round((Date.parse(last.date) - Date.parse(first.date)) / 86_400_000),
-  );
 
   // Nothing has moved and no window reaches back far enough to say anything.
   // A row of zeroes reads as a broken feature rather than an honest one.
   if (week === null && month === null && overall === 0) return null;
 
+  return {
+    last,
+    week,
+    month,
+    best: bestDay(points),
+    curve: trophyCurve(points),
+    overall,
+    tracked: Math.max(
+      1,
+      Math.round((Date.parse(last.date) - Date.parse(first.date)) / 86_400_000),
+    ),
+  };
+}
+
+const KINDS = {
+  trophies: {
+    title: 'Trophies',
+    icon: (c: string) => <TrophyIcon className={c} />,
+    gain: (c: string) => <TrophyGainIcon className={c} />,
+    colour: 'var(--brand)',
+    tone: 'text-brand',
+    unit: '',
+  },
+  ranked: {
+    title: 'Ranked',
+    icon: (c: string) => <RankedIcon className={c} />,
+    gain: (c: string) => <RankedIcon className={c} />,
+    colour: 'var(--accent)',
+    tone: 'text-accent',
+    unit: ' Elo',
+  },
+} as const;
+
+function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) {
+  const k = KINDS[kind];
+  const { last, week, month, best, curve, overall, tracked } = track;
+  const gradient = `progress-fill-${kind}`;
+
   return (
-    <Panel
-      title="Recent progress"
-      subtitle="From the trophy points recorded on each profile view."
-    >
+    <section className="min-w-0">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className={`flex items-center gap-2 text-sm font-black uppercase tracking-wide ${k.tone}`}>
+          {k.icon('size-6')}
+          {k.title}
+        </h3>
+        <p className="text-sm tabular-nums text-muted">
+          Now{' '}
+          <strong className="text-lg font-black text-foreground">
+            {formatNumber(last.trophies)}
+          </strong>
+          {k.unit}
+        </p>
+      </div>
+
       {curve ? (
         <figure className="mb-5">
           <svg
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
-            className="h-28 w-full sm:h-36"
+            className="h-24 w-full sm:h-32"
             role="img"
-            aria-label={`Trophy history over ${curve.days} days, from ${formatNumber(curve.low)} to ${formatNumber(curve.high)}`}
+            aria-label={`${k.title} history over ${curve.days} days, from ${formatNumber(curve.low)} to ${formatNumber(curve.high)}`}
           >
             <defs>
-              <linearGradient id="trophy-curve-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--brand)" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="var(--brand)" stopOpacity="0" />
+              <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={k.colour} stopOpacity="0.35" />
+                <stop offset="100%" stopColor={k.colour} stopOpacity="0" />
               </linearGradient>
             </defs>
-            <path d={curve.area} fill="url(#trophy-curve-fill)" />
-            {/*
-              `vector-effect` because the viewBox is stretched to the element's
-              width with `preserveAspectRatio="none"`. Without it the stroke is
-              scaled by the same factor and a 1-unit line comes out as a thick
-              smear horizontally and a hairline vertically.
-            */}
+            <path d={curve.area} fill={`url(#${gradient})`} />
+            {/* `vector-effect` because the viewBox is stretched with
+                `preserveAspectRatio="none"`; without it the stroke scales too
+                and comes out a smear one way and a hairline the other. */}
             <path
               d={curve.line}
               fill="none"
-              stroke="var(--brand)"
+              stroke={k.colour}
               strokeWidth={1.5}
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -92,10 +164,7 @@ export function PlayerProgress({
             />
           </svg>
           <figcaption className="mt-1.5 flex justify-between text-xs tabular-nums text-muted">
-            <span className="flex items-center gap-1">
-              <TrophyIcon className="size-3.5" />
-              {formatNumber(curve.low)}
-            </span>
+            <span>{formatNumber(curve.low)}</span>
             <span>
               {curve.points} views over {curve.days} days
             </span>
@@ -104,17 +173,10 @@ export function PlayerProgress({
         </figure>
       ) : null}
 
-      {/*
-        The same treatment as the strips above it, not the old icon-tile card.
-        Three figures under a chart, inside a panel, do not each need a border
-        and a rounded icon well -- and two different ways of drawing a number
-        on one tab is exactly what made this page read as assembled rather
-        than designed.
-      */}
       <dl className="grid grid-cols-1 gap-x-6 gap-y-5 @sm:grid-cols-3">
         {week ? (
           <Figure
-            node={<TrophyGainIcon className="size-4" />}
+            node={k.gain('size-4')}
             label={`Last ${week.days} days`}
             value={signed(week.change)}
             hint={`${formatNumber(week.from)} → ${formatNumber(week.to)}`}
@@ -123,7 +185,7 @@ export function PlayerProgress({
         ) : null}
         {month ? (
           <Figure
-            node={<TrophyGainIcon className="size-4" />}
+            node={k.gain('size-4')}
             label={`Last ${month.days} days`}
             value={signed(month.change)}
             hint={`${formatNumber(month.from)} → ${formatNumber(month.to)}`}
@@ -132,39 +194,27 @@ export function PlayerProgress({
         ) : null}
         {best ? (
           <Figure
-            node={<TrophyGainIcon className="size-4" />}
+            node={k.gain('size-4')}
             label="Best tracked day"
             value={signed(best.change)}
             hint={best.date}
-            tone="text-brand"
+            tone={k.tone}
           />
         ) : null}
       </dl>
 
-      {/*
-        The span the numbers above are drawn from, and where they come from.
-        It carries the caveat the removed chart used to carry: the history is
-        only as dense as the times someone opened this profile, and saying so
-        is what keeps "tracked 2 days" from reading as "played 2 days".
-      */}
-      <p className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm text-muted">
-        <span>
-          Tracked {tracked} {tracked === 1 ? 'day' : 'days'} &middot;{' '}
-          <strong
-            className={`font-semibold tabular-nums ${
-              overall > 0 ? 'text-victory' : overall < 0 ? 'text-defeat' : 'text-foreground'
-            }`}
-          >
-            {signed(overall)}
-          </strong>{' '}
-          overall, now on {formatNumber(last.trophies)}
-        </span>
-        <span className="text-xs">
-          One point per day, recorded when this profile is viewed, so it covers the
-          days someone checked rather than every day played.
-        </span>
+      <p className="mt-3 text-sm text-muted">
+        Tracked {tracked} {tracked === 1 ? 'day' : 'days'} &middot;{' '}
+        <strong
+          className={`font-semibold tabular-nums ${
+            overall > 0 ? 'text-victory' : overall < 0 ? 'text-defeat' : 'text-foreground'
+          }`}
+        >
+          {signed(overall)}
+        </strong>
+        {k.unit} overall
       </p>
-    </Panel>
+    </section>
   );
 }
 

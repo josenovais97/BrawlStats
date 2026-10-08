@@ -1152,6 +1152,8 @@ export interface TrophyPoint {
   trophies: number;
   highestTrophies: number;
   brawlerCount: number;
+  /** Ranked Elo that day; null on days recorded before it was, or unranked. */
+  rankedElo?: number | null;
 }
 
 /**
@@ -1181,6 +1183,7 @@ export async function getTrophyHistory(
       trophies: row.trophies,
       highestTrophies: row.highestTrophies,
       brawlerCount: row.brawlerCount,
+      rankedElo: row.rankedElo,
     }));
   } catch (error) {
     swallow('getTrophyHistory', error);
