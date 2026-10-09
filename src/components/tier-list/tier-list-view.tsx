@@ -27,7 +27,7 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { TierPodium } from '@/components/tier-list/tier-podium';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
-import { brawlerIconUrl } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
 import { isFramedTile } from '@/lib/brawlapi';
 import { brawlerPath } from '@/lib/slugs';
 
@@ -254,6 +254,13 @@ export async function TierListView({
    * Every figure is measured and degrades honestly: no rated brawlers means the
    * question is answered with why, rather than omitted or invented.
    */
+  // The game's mode badges for the mode chips, keyed the way `modes` is.
+  const modeMeta = await getGameModeMap().catch(() => new Map());
+  const modeIcons: Record<string, string> = Object.fromEntries(
+    modes
+      .map((m) => [m.mode, modeMeta.get(m.mode.toLowerCase())?.imageUrl] as const)
+      .filter((pair): pair is readonly [string, string] => Boolean(pair[1])),
+  );
   const best = rated.slice().sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
   const scopeName = mode ? `${humanizeMode(mode)} in ${copy.eyebrow.toLowerCase()}` : copy.battles;
 
@@ -418,7 +425,13 @@ export async function TierListView({
         </Disclosure>
 
         <div className="mt-4">
-          <TierListControls format={format} windowKey={windowKey} mode={mode} modes={modes} />
+          <TierListControls
+            format={format}
+            windowKey={windowKey}
+            mode={mode}
+            modes={modes}
+            modeIcons={modeIcons}
+          />
         </div>
       </header>
 

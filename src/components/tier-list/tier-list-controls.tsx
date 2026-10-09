@@ -1,4 +1,5 @@
 import { RankedIcon, TrophyIcon } from '@/components/game-icons';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { humanizeMode } from '@/lib/format';
@@ -33,11 +34,13 @@ export function TierListControls({
   windowKey,
   mode,
   modes,
+  modeIcons,
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
   mode?: string;
   modes: { mode: string; battles: number }[];
+  modeIcons?: Record<string, string>;
 }) {
   return (
     <div className="space-y-3">
@@ -49,7 +52,7 @@ export function TierListControls({
         <FormatTabs format={format} windowKey={windowKey} />
         <WindowTabs format={format} windowKey={windowKey} mode={mode} />
       </div>
-      <ModeFilter format={format} windowKey={windowKey} mode={mode} modes={modes} />
+      <ModeFilter format={format} windowKey={windowKey} mode={mode} modes={modes} modeIcons={modeIcons} />
     </div>
   );
 }
@@ -154,15 +157,18 @@ function ModeFilter({
   windowKey,
   mode,
   modes,
+  modeIcons,
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
   mode?: string;
   modes: { mode: string; battles: number }[];
+  /** The game's own mode badge per mode key, read faster than the word. */
+  modeIcons?: Record<string, string>;
 }) {
   if (modes.length === 0) return null;
 
-  const chip = 'shrink-0 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors';
+  const chip = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors';
   const on = 'border-brand/40 bg-brand/10 text-brand';
   const off = 'border-border bg-surface text-muted hover:text-foreground';
 
@@ -187,6 +193,16 @@ function ModeFilter({
               title={`${entry.battles.toLocaleString()} sampled battles`}
               className={`${chip} ${current ? on : off}`}
             >
+              {modeIcons?.[entry.mode] ? (
+                <Image
+                  src={modeIcons[entry.mode]}
+                  alt=""
+                  width={18}
+                  height={18}
+                  className="size-[18px] shrink-0 object-contain"
+                  unoptimized
+                />
+              ) : null}
               {humanizeMode(entry.mode)}
             </Link>
           );
