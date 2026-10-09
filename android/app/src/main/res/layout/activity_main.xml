@@ -1193,5 +1193,17 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
+        <!-- The fan disclaimer, as Supercell's Fan Content Policy asks of fan
+             projects. The app borrows the game's look, never its claim to be
+             official, and this is where it says so. -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingMultiplier="1.3"
+            android:text="BrawlZone is a fan-made app. It is not affiliated with, endorsed, sponsored or specifically approved by Supercell, and Supercell is not responsible for it."
+            android:textColor="@color/muted"
+            android:textSize="11sp" />
+
     </LinearLayout>
 </ScrollView>

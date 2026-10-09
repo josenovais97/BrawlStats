@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A filter option. Ripple so a tap visibly lands: these are choices, and a
-     choice that does not react to a finger reads as a label. -->
-<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#22FFC53D">
+<!-- A filter option: a raised chip in a dark outline. Ripple, so a tap visibly lands. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33FFC53D">
     <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@color/surface_2" />
-            <corners android:radius="12dp" />
-            <stroke android:width="1dp" android:color="@color/border" />
-        </shape>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/outline" />
+                    <corners android:radius="14dp" />
+                </shape>
+            </item>
+            <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="4dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/surface_2" />
+                    <corners android:radius="12dp" />
+                    <stroke android:width="1dp" android:color="@color/border" />
+                </shape>
+            </item>
+        </layer-list>
     </item>
 </ripple>

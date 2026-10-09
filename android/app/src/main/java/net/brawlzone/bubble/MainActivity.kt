@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        gameType(findViewById(R.id.scroll))
 
         statusText = findViewById(R.id.status_text)
         statusDot = findViewById(R.id.status_dot)
@@ -310,6 +311,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 planSteps.addView(row)
+                gameType(row)
             }
 
             planCaption.visibility = View.VISIBLE
@@ -502,5 +504,41 @@ class MainActivity : AppCompatActivity() {
         // shown here only when there is nothing to resolve.
         setupPrompt.visibility = if (saved) View.GONE else View.VISIBLE
         if (saved) persist()
+    }
+
+    /**
+     * Game-style type: every bold label on the screen in Lilita One.
+     *
+     * The chunky rounded display face the website already uses, under the
+     * SIL Open Font License, bundled in res/font. Bold in the layout means
+     * "this is a title, a button, a number" -- exactly the text a game draws in
+     * its display face -- so one pass over the view tree applies it, rather
+     * than a fontFamily on two hundred TextViews that the next layout edit
+     * would forget. Body copy stays in the system face, for reading.
+     *
+     * The larger labels also get a hard dark drop shadow, offset straight
+     * down: the way game UI sets type on bright surfaces. Text fields are left
+     * alone; a tag is typed, not read as a title.
+     */
+    private fun gameType(root: View) {
+        val display = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.lilita_one) ?: return
+        val metrics = resources.displayMetrics
+        val large = android.util.TypedValue.applyDimension(
+            android.util.TypedValue.COMPLEX_UNIT_SP, 15f, metrics,
+        )
+        val drop = 2f * metrics.density
+
+        fun walk(view: View) {
+            if (view is android.view.ViewGroup) {
+                for (i in 0 until view.childCount) walk(view.getChildAt(i))
+            }
+            if (view is TextView && view !is EditText && view.typeface?.isBold == true) {
+                view.typeface = display
+                if (view.textSize >= large) {
+                    view.setShadowLayer(1f, 0f, drop, Color.parseColor("#CC050A1F"))
+                }
+            }
+        }
+        walk(root)
     }
 }

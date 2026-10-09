@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The account avatar's plate. Rounded rather than circular: the game's own
-     player icons are square artwork, and circle-cropping them clips the badge
-     corners the art is drawn to include. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/surface_2" />
-    <corners android:radius="14dp" />
-    <stroke android:width="1dp" android:color="@color/border_strong" />
-</shape>
+<!-- The player's icon frame: a gold edge in a dark outline, like a badge. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/outline" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_2" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="@color/brand" />
+        </shape>
+    </item>
+</layer-list>

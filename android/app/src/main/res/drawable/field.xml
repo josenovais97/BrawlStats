@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The tag input. Flatter than a card so it reads as something to type into
-     rather than something to read. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/surface_2" />
-    <corners android:radius="12dp" />
-    <stroke android:width="1dp" android:color="@color/border_strong" />
-</shape>
+<!-- A text field, sunk into the panel: darker than the surface around it, with
+     the same dark outline, so it reads as a slot to type into. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/outline" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:top="3dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#0D1640" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1dp" android:color="@color/border" />
+        </shape>
+    </item>
+</layer-list>

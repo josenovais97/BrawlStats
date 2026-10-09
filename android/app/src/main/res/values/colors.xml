@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- The site's palette, so the app and brawlzone.net are visibly one product. -->
 <resources>
-    <color name="background">#080B16</color>
-    <color name="surface">#121729</color>
-    <color name="surface_2">#1B2136</color>
-    <color name="surface_3">#242B45</color>
-    <color name="border">#262D47</color>
-    <color name="border_strong">#38416A</color>
+    <color name="background">#0A1233</color>
+    <color name="surface">#1A2759</color>
+    <color name="surface_2">#22316C</color>
+    <color name="surface_3">#2C3E86</color>
+    <color name="border">#33468F</color>
+    <color name="border_strong">#4A62B8</color>
     <color name="foreground">#EEF1FA</color>
-    <color name="muted">#98A3C4</color>
+    <color name="muted">#A9B6E0</color>
     <color name="brand">#FFC53D</color>
     <color name="brand_strong">#FFAB00</color>
     <color name="brand_ink">#1A1200</color>
     <color name="victory">#35D07F</color>
     <color name="accent">#8B6BFF</color>
+    <!-- Game-style additions: the dark outline every panel and button wears,
+         the darker "depth" under a 3D button, and the top-edge highlight. -->
+    <color name="outline">#050A1F</color>
+    <color name="gold_depth">#B86A00</color>
+    <color name="gold_face_top">#FFE37A</color>
+    <color name="blue_depth">#142060</color>
+    <color name="blue_face">#3550B8</color>
+    <color name="blue_face_top">#4A6AE0</color>
+    <color name="panel_top">#22337A</color>
+    <color name="highlight">#40FFFFFF</color>
 </resources>

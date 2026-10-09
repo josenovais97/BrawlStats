@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="#1A1F1405" />
-    <corners android:radius="16dp" />
-    <stroke android:width="1dp" android:color="#66FFC53D" />
-</shape>
+<!-- A warning card.
+     A game-style panel: a thick dark outline, a blue gradient face, and a
+     lighter inner edge along the top so the panel reads as raised. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/outline" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="3dp">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#4D5A3A10" android:endColor="@color/surface" />
+            <corners android:radius="16dp" />
+            <stroke android:width="1dp" android:color="#99FFC53D" />
+        </shape>
+    </item>
+</layer-list>
