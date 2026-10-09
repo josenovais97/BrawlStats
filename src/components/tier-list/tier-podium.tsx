@@ -3,7 +3,9 @@ import Link from 'next/link';
 
 import { brawlerIconUrl, brawlerModelUrl, hasBrawlerModel } from '@/lib/brawlapi';
 import { formatPercent, titleCaseLabel } from '@/lib/format';
+import { wikiThumb } from '@/lib/skin-art';
 import { brawlerPath } from '@/lib/slugs';
+import { getWikiModel } from '@/lib/wiki-art';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { TierListEntry } from '@/types/stats';
 import type { BABrawler } from '@/types/brawlapi';
@@ -31,9 +33,22 @@ export async function TierPodium({
   const top = best.slice(0, 3);
   if (top.length < 3) return null;
 
-  const models = await Promise.all(top.map((b) => hasBrawlerModel(b.brawlerId).catch(() => false)));
-  const art = (b: TierListEntry, i: number) =>
-    models[i] ? brawlerModelUrl(b.brawlerId) : (brawlerMeta.get(b.brawlerId)?.imageUrl ?? brawlerIconUrl(b.brawlerId));
+  /*
+   * Full-body art for all three, so the podium never mixes a figure with a
+   * square portrait: the mirror's model where it has one, then the wiki's
+   * full-body render (the brawler page's fallback), and only then the
+   * portrait. Wendy had no model on 2026-10-09 and stood on the podium as a
+   * square tile beside two figures.
+   */
+  const arts = await Promise.all(
+    top.map(async (b) => {
+      if (await hasBrawlerModel(b.brawlerId).catch(() => false)) return brawlerModelUrl(b.brawlerId);
+      const wiki = await getWikiModel(b.brawlerName).catch(() => null);
+      if (wiki) return wikiThumb(wiki, 400);
+      return brawlerMeta.get(b.brawlerId)?.imageUrl ?? brawlerIconUrl(b.brawlerId);
+    }),
+  );
+  const art = (_b: TierListEntry, i: number) => arts[i];
 
   // Second, first, third: the winner in the middle, as podiums stand.
   const order = [1, 0, 2];
