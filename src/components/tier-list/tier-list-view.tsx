@@ -25,6 +25,7 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
+import { TierPodium } from '@/components/tier-list/tier-podium';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { isFramedTile } from '@/lib/brawlapi';
@@ -355,7 +356,9 @@ export async function TierListView({
           are computed is worth a disclosure, and nothing has been dropped from
           it.
         */}
-        <p className="mt-3 max-w-3xl leading-relaxed text-muted">
+        <TierPodium best={best} brawlerMeta={brawlerMeta} />
+
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted">
           Based on {sampled > 0 ? `${formatNumber(sampled)} sampled ` : 'sampled '}
           {copy.battles}
           {mode ? ` in ${humanizeMode(mode)}` : ''} from{' '}
@@ -369,19 +372,7 @@ export async function TierListView({
               Sampled{' '}
               <RelativeTime iso={lastRun.startedAt} fallback={relativeTime(lastRun.startedAt)} />.
             </>
-          ) : null}
-        </p>
-
-        <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted">
-          Meta score combines adjusted win rate and pick rate. Scores are relative to this{' '}
-          {format === 'ranked' ? 'Ranked' : 'trophy'} list, not the{' '}
-          <Link
-            href={format === 'ranked' ? '/tier-list/trophy' : '/tier-list/ranked'}
-            className="font-medium text-brand hover:underline"
-          >
-            {format === 'ranked' ? 'trophy tier list' : 'Ranked tier list'}
-          </Link>
-          .{' '}
+          ) : null}{' '}
           {/* The measured list is the one worth disagreeing with, so the place
               to disagree belongs next to it rather than buried in a menu. */}
           <Link href="/tier-list/maker" className="font-medium text-brand hover:underline">
@@ -390,8 +381,14 @@ export async function TierListView({
           .
         </p>
 
+
+
         <Disclosure className="mt-2" tone="bare" summary="How the meta score works">
           <p>
+            Meta score combines adjusted win rate and pick rate, relative to this{' '}
+            {format === 'ranked' ? 'Ranked' : 'trophy'} list.
+          </p>
+          <p className="mt-2">
             {copy.intro} Brawlers are ranked by{' '}
             <strong className="font-semibold text-foreground">meta score</strong> out of 10, which
             combines an adjusted win rate with a log-scaled pick rate. Win rate alone would rate a
