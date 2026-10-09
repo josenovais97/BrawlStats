@@ -816,7 +816,12 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
             {/* The in-game tagline, which the artwork mirror does not carry.
                 Both titles live below the biography now. */}
-            <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">{brawler.description}</p>
+            {/* Desktop only: on a phone it pushed the build -- the answer the
+                page's title promises -- below the first screen. The same
+                text is the FAQ's "Who is <name>?" answer further down. */}
+            <p className="mt-2.5 hidden max-w-2xl leading-relaxed text-muted sm:block">
+              {brawler.description}
+            </p>
 
             {/* Both titles a brawler carries, presented as titles.
                 Published nowhere else — not in the game API, not in the
