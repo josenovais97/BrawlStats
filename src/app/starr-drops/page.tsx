@@ -9,9 +9,11 @@ import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getStarrDrops, type DropReward, type DropTable, type DropType } from '@/lib/starr-drops';
 
 export const metadata: Metadata = {
-  title: 'Brawl Stars Starr Drop odds. Every drop rate and what is inside',
+  // "Chances", not "odds": the word in the queries Search Console shows
+  // ("legendary starr drop chances", "star drop chances").
+  title: 'Brawl Stars Starr Drop chances: every drop rate and reward',
   description:
-    'Exact Starr Drop chances: how often each rarity rolls, and every reward inside Rare, Super Rare, Epic, Mythic and Legendary drops. Plus Chaos Drops and every event drop.',
+    'Starr Drop chances for every rarity, from Rare to Legendary, and every reward inside each drop. Plus Chaos Drops and every event drop, in one table.',
   alternates: { canonical: '/starr-drops' },
 };
 
@@ -32,6 +34,37 @@ export const revalidate = 43_200;
  * product is only meaningful for a specific reward and stating it per row would
  * imply a precision the source does not have.
  */
+/**
+ * Limited-time ways to earn drops, shown only while their event runs.
+ *
+ * The drop tables below come from the wiki and update themselves. These do not
+ * have a table anywhere -- they are described once, in the patch notes -- so
+ * each is written here by hand with an end date, and the page drops it the day
+ * the event is over rather than leaving a stale offer up. The page revalidates
+ * twice a day, so a card disappears within twelve hours of `endsAt`.
+ */
+const EVENT_EXTRAS: { event: string; name: string; endsAt: string; points: string[] }[] = [
+  {
+    event: 'Brawl-O-Ween',
+    name: "Loony's Loot",
+    // A month-long October event; the card retires at the start of November.
+    endsAt: '2026-11-02T00:00:00Z',
+    points: [
+      'Every daily win adds a reward to Loony, up to 6 wins a day.',
+      'Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.',
+      'Claim by pressing and holding Loony once all 6 daily wins are done.',
+      'Forgot to claim? The rewards are granted automatically the next day.',
+      'Progress resets every day, like Daily Wins.',
+    ],
+  },
+];
+
+/** The extras whose event is still running, as of this render. */
+function liveEventExtras() {
+  const now = Date.now();
+  return EVENT_EXTRAS.filter((e) => now < Date.parse(e.endsAt));
+}
+
 export default async function StarrDropsPage() {
   const data = await getStarrDrops();
 
@@ -57,6 +90,43 @@ export default async function StarrDropsPage() {
         title="Starr Drops"
         subtitle="What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki."
       />
+
+      {/*
+        How you actually get them, before what is inside them.
+
+        Search Console had this page answering "starr drop schedule" at
+        position 9 -- people asking *when* and *how many*, landing on a page
+        that only said *what*. The daily-wins line is from in-game checks
+        (2026-10-09); event extras come from the patch notes and carry an end
+        date, so each one takes itself off the page when its event is over.
+      */}
+      <section aria-labelledby="schedule" className="space-y-3">
+        <SectionHeading title="How to get them: the daily schedule" />
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="card p-5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-brand">Every day</p>
+            <h3 className="display mt-1 text-xl">Your first 5 wins</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Each of your first five wins of the day earns a reward drop: usually a Starr Drop,
+              sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the
+              Daily Wins screen in game shows exactly when.
+            </p>
+          </div>
+          {liveEventExtras().map((e) => (
+            <div key={e.name} className="card border-accent/40 p-5">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                {e.event} · limited time
+              </p>
+              <h3 className="display mt-1 text-xl">{e.name}</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted">
+                {e.points.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/*
         Every drop is folded shut, and the whole page is the list of them.
