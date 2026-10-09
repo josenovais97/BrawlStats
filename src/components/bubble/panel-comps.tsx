@@ -206,7 +206,7 @@ export function PanelComps({
                       <span className="rounded bg-surface-2 px-1 font-bold">thin sample</span>
                     ) : null}
                     {mine ? (
-                      <span className="bz-chip-on shrink-0 px-1.5 py-px text-[9px]">You can run this</span>
+                      <span className="bz-chip-on shrink-0 px-1.5 py-px text-[9px]" title="You own all three">✓ Yours</span>
                     ) : null}
                   </span>
                 </span>
