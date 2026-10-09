@@ -1,6 +1,7 @@
-import { brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { brawlerIconUrl, brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
 import { skinLabel } from '@/lib/player-showcase';
-import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
+import { getSkinArt, skinArtUrl, wikiThumb } from '@/lib/skin-art';
+import { getWikiModel } from '@/lib/wiki-art';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
 
@@ -37,4 +38,20 @@ export async function brawlerArt(
     );
   });
   return art;
+}
+
+/**
+ * A brawler drawn full-body in its default look, for podiums and face-offs:
+ * the mirror's model, then the wiki's full-body render, then the portrait --
+ * so two figures side by side never become a figure and a square tile.
+ */
+export async function fullBodyArt(
+  brawlerId: number,
+  brawlerName: string,
+  portrait?: string | null,
+): Promise<string> {
+  if (await hasBrawlerModel(brawlerId).catch(() => false)) return brawlerModelUrl(brawlerId);
+  const wiki = await getWikiModel(brawlerName).catch(() => null);
+  if (wiki) return wikiThumb(wiki, 400);
+  return portrait ?? brawlerIconUrl(brawlerId);
 }

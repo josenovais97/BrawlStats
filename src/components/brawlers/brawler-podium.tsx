@@ -1,11 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { brawlerIconUrl, brawlerModelUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { fullBodyArt } from '@/lib/brawler-art';
 import { titleCaseLabel } from '@/lib/format';
-import { wikiThumb } from '@/lib/skin-art';
 import { brawlerPath } from '@/lib/slugs';
-import { getWikiModel } from '@/lib/wiki-art';
 import type { BABrawler } from '@/types/brawlapi';
 
 export interface PodiumItem {
@@ -40,12 +38,7 @@ export async function BrawlerPodium({
   if (top.length < 3) return null;
 
   const arts = await Promise.all(
-    top.map(async (b) => {
-      if (await hasBrawlerModel(b.brawlerId).catch(() => false)) return brawlerModelUrl(b.brawlerId);
-      const wiki = await getWikiModel(b.brawlerName).catch(() => null);
-      if (wiki) return wikiThumb(wiki, 400);
-      return brawlerMeta.get(b.brawlerId)?.imageUrl ?? brawlerIconUrl(b.brawlerId);
-    }),
+    top.map((b) => fullBodyArt(b.brawlerId, b.brawlerName, brawlerMeta.get(b.brawlerId)?.imageUrl)),
   );
 
   // Second, first, third: the winner in the middle, as podiums stand.
