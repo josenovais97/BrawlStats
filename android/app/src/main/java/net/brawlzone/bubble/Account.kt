@@ -1,6 +1,9 @@
 package net.brawlzone.bubble
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import java.io.File
 
 /**
  * The account the panel filters for, and how much of it it will show.
@@ -27,6 +30,33 @@ object Account {
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    /*
+     * The resolved player's in-game icon, kept on the phone for the bubble.
+     *
+     * Saved when the app's account card loads it, read by the bubble when it
+     * starts. A file rather than a fetch: the bubble appears the moment it is
+     * started, offline included, and wearing the player's own icon is the
+     * point -- a generic mark that swaps to a face a second later would be
+     * worse than either.
+     */
+    private fun iconFile(context: Context) = File(context.filesDir, "player_icon.png")
+
+    fun saveIcon(context: Context, bitmap: Bitmap) {
+        runCatching {
+            iconFile(context).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        }
+    }
+
+    fun clearIcon(context: Context) {
+        runCatching { iconFile(context).delete() }
+    }
+
+    /** The saved icon, or null with no account or a damaged file. */
+    fun savedIcon(context: Context): Bitmap? = runCatching {
+        val file = iconFile(context)
+        if (file.exists()) BitmapFactory.decodeFile(file.path) else null
+    }.getOrNull()
 
     fun tag(context: Context): String = prefs(context).getString(KEY_TAG, "").orEmpty()
 

@@ -229,11 +229,32 @@ class BubbleService : Service() {
         val badge = dp(52)
         val pad = dp(6) // room inside the window for the drop shadow to render
 
+        /*
+         * The player's own icon when an account is set, inside the gold ring;
+         * the BrawlZone mark otherwise.
+         *
+         * The bubble sits over the game for a whole session, and wearing the
+         * player's icon is what makes it theirs at a glance. Cropped to a
+         * circle so it sits inside the ring rather than over it; the ring is
+         * the badge, which stays the brand's mark around any face.
+         */
+        val playerIcon = Account.savedIcon(this)
         val art = ImageView(this).apply {
             setBackgroundResource(R.drawable.bubble_badge)
-            setImageResource(R.drawable.bubble_glyph)
-            val inset = dp(13)
-            setPadding(inset, inset, inset, inset)
+            if (playerIcon != null) {
+                setImageDrawable(
+                    androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+                        .create(resources, playerIcon)
+                        .apply { isCircular = true },
+                )
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                val ring = dp(4)
+                setPadding(ring, ring, ring, ring)
+            } else {
+                setImageResource(R.drawable.bubble_glyph)
+                val inset = dp(13)
+                setPadding(inset, inset, inset, inset)
+            }
             elevation = dp(6).toFloat()
         }
 
@@ -679,11 +700,24 @@ class BubbleService : Service() {
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(16), dp(8), dp(8), dp(12))
         }
+        // The same face as the bubble that opened it, so the two read as one.
+        val headerIcon = Account.savedIcon(this)
         header.addView(ImageView(this).apply {
             setBackgroundResource(R.drawable.bubble_badge)
-            setImageResource(R.drawable.bubble_glyph)
-            val inset = dp(5)
-            setPadding(inset, inset, inset, inset)
+            if (headerIcon != null) {
+                setImageDrawable(
+                    androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+                        .create(resources, headerIcon)
+                        .apply { isCircular = true },
+                )
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                val ring = dp(2)
+                setPadding(ring, ring, ring, ring)
+            } else {
+                setImageResource(R.drawable.bubble_glyph)
+                val inset = dp(5)
+                setPadding(inset, inset, inset, inset)
+            }
         }, LinearLayout.LayoutParams(dp(26), dp(26)))
 
         header.addView(TextView(this).apply {

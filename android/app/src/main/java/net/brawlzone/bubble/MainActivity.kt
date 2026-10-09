@@ -357,6 +357,9 @@ class MainActivity : AppCompatActivity() {
                 // No resolved account: the panel is running its generic
                 // version, so the prompt saying what a tag unlocks comes back.
                 setupPrompt.visibility = View.VISIBLE
+                // And the bubble goes back to the BrawlZone mark: the icon it
+                // wore belonged to an account that is no longer set.
+                Account.clearIcon(this)
                 PlanLookup.cancel()
                 plannedFor = null
                 showPlan(null)
@@ -380,7 +383,11 @@ class MainActivity : AppCompatActivity() {
             icon.setImageDrawable(null)
             if (result.iconUrl.isNotEmpty()) {
                 AccountLookup.icon(result.iconUrl) { bitmap ->
-                    if (bitmap != null) icon.setImageBitmap(bitmap)
+                    if (bitmap != null) {
+                        icon.setImageBitmap(bitmap)
+                        // The same picture, saved for the bubble to wear.
+                        Account.saveIcon(this, bitmap)
+                    }
                 }
             }
             loadPlan(result.tag)
