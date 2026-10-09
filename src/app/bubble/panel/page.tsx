@@ -213,7 +213,7 @@ export default async function BubblePanelPage() {
         body > div > main { padding: 0 !important; max-width: none !important; }
       `}</style>
 
-      <div className="min-h-dvh bg-background px-2 py-2">
+      <div className="bz-screen min-h-dvh px-2 py-2">
         {/* Above the list, because an out-of-date app is the one thing here
             that the numbers below cannot tell you about themselves. */}
         <PanelUpdate

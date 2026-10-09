@@ -92,24 +92,24 @@ export function PanelShell({
         the panel works the same either way.
       */}
       {account.tag ? (
-        <div className="mb-2 flex items-center gap-2 px-1">
+        <div className="bz-panel mx-1 mb-2.5 flex items-center gap-2 px-2 py-1.5">
           {account.iconUrl ? (
             <Image
               src={account.iconUrl}
               alt=""
               width={28}
               height={28}
-              className="size-7 shrink-0 rounded-md border border-border bg-surface-2"
+              className="size-8 shrink-0 rounded-lg border-2 border-brand bg-surface-2"
               unoptimized
             />
           ) : (
-            <span className="size-7 shrink-0 rounded-md border border-border bg-surface-2" />
+            <span className="size-8 shrink-0 rounded-lg border-2 border-brand bg-surface-2" />
           )}
           <span className="min-w-0 flex-1 leading-tight">
-            <span className="block truncate text-xs font-bold">{account.name ?? `#${account.tag}`}</span>
+            <span className="display block truncate text-sm">{account.name ?? `#${account.tag}`}</span>
             <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
           </span>
-          <span className="shrink-0 rounded border border-brand/40 bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand">
+          <span className="bz-chip-on shrink-0 px-1.5 py-0.5 text-[10px]">
             {filterLabel}
             {account.hide ? ' · hiding rest' : ''}
           </span>
@@ -125,7 +125,7 @@ export function PanelShell({
         tab bar. A full-width segmented control would cost a row of a window
         that is only ~375dp tall in the orientation the game is played in.
       */}
-      <div role="tablist" aria-label="Panel view" className="mb-2 flex gap-1 px-1">
+      <div role="tablist" aria-label="Panel view" className="mb-2.5 flex gap-1.5 px-1">
         {(
           [
             ['meta', 'Meta'],
@@ -139,10 +139,10 @@ export function PanelShell({
             role="tab"
             aria-selected={tab === key}
             onClick={() => choose(key)}
-            className={`rounded-md border px-3 py-1 text-[11px] font-bold leading-tight transition-colors ${
+            className={`flex-1 px-2 py-1.5 text-[13px] leading-tight ${
               tab === key
-                ? 'border-brand/40 bg-brand/10 text-brand'
-                : 'border-border bg-surface text-muted'
+                ? 'bz-chip-on'
+                : 'bz-chip'
             }`}
           >
             {label}

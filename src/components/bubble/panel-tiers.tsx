@@ -198,8 +198,8 @@ export function PanelTiers({
     <>
       {/* Belongs to this view, not to the panel: the draft board is not a
           seven-day average of anything, and the heading said so anyway. */}
-      <p className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
-        Ranked meta · last {windowDays} days
+      <p className="display px-1 pb-2 text-[13px] uppercase tracking-wide text-foreground">
+        Ranked meta <span className="text-[11px] text-muted">· last {windowDays} days</span>
       </p>
 
       {/* Shared with Team comp, so both tabs keep the same mode and map. A
@@ -280,7 +280,7 @@ function TierStrip({
   if (visible.length === 0) return null;
 
   return (
-    <li className="card overflow-hidden">
+    <li className="bz-panel overflow-hidden">
       <div className="flex items-stretch">
         {/* The same lit band the site's tier rows use, at panel scale. */}
         <div
@@ -291,7 +291,7 @@ function TierStrip({
           }}
         >
           <span
-            className="text-xl font-black leading-none"
+            className="display text-2xl leading-none"
             style={{ color, textShadow: `0 0 18px color-mix(in srgb, ${color} 60%, transparent)` }}
           >
             {tier}
@@ -472,7 +472,7 @@ function MapPicks({
         )}
       </p>
     ) : null}
-    <ol className="card divide-y divide-border overflow-hidden">
+    <ol className="bz-panel divide-y divide-border overflow-hidden">
       {shown.map((pick, index) => {
         const edge = pick.score - pick.overallScore;
         const own = tab === 'bans' || fieldable(pick.brawlerId);
@@ -559,7 +559,7 @@ function MapPicks({
       <button
         type="button"
         onClick={() => setExpanded(true)}
-        className="mt-1.5 w-full rounded-lg border border-border bg-surface-2/60 px-2 py-1.5 text-[11px] font-bold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+        className="bz-chip mt-2 w-full px-2 py-1.5 text-[12px]"
       >
         Show {hidden} more
       </button>

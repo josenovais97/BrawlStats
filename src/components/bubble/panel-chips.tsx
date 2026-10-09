@@ -73,7 +73,7 @@ export function ModeMapChips({
       <button
         type="button"
         onClick={() => setChanging(true)}
-        className="flex w-full items-center gap-1.5 px-1 pb-2 text-left text-[11px]"
+        className="bz-panel mx-1 mb-2.5 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-left text-[11px]"
       >
         {mode.icon ? (
           <Image
@@ -85,9 +85,9 @@ export function ModeMapChips({
             unoptimized
           />
         ) : null}
-        <span className="truncate font-bold text-accent-2">{map}</span>
+        <span className="display truncate text-[13px] text-[#a3eaff]">{map}</span>
         <span className="shrink-0 text-muted">· {mode.label}</span>
-        <span className="ml-auto shrink-0 rounded border border-border px-1.5 py-0.5 font-bold text-muted">
+        <span className="bz-chip ml-auto shrink-0 px-2 py-0.5">
           Change
         </span>
       </button>
@@ -105,8 +105,8 @@ export function ModeMapChips({
               type="button"
               onClick={() => onMode(m.key)}
               aria-pressed={on}
-              className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
-                on ? 'border-brand/40 bg-brand/10 text-brand' : 'border-border bg-surface text-muted'
+              className={`inline-flex items-center gap-1 px-2 py-1 leading-tight ${
+                on ? 'bz-chip-on' : 'bz-chip'
               }`}
             >
               {m.icon ? (
@@ -134,10 +134,10 @@ export function ModeMapChips({
               setChanging(false);
             }}
             aria-pressed={map === null}
-            className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+            className={`px-2 py-1 leading-tight ${
               map === null
-                ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
-                : 'border-border bg-surface text-muted'
+                ? 'bz-chip-map-on'
+                : 'bz-chip'
             }`}
           >
             {allMapsLabel}
@@ -156,10 +156,10 @@ export function ModeMapChips({
                 }}
                 aria-pressed={on}
                 title={thin ? 'Not enough Ranked games on this map yet' : undefined}
-                className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                className={`px-2 py-1 leading-tight ${
                   on
-                    ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
-                    : `border-border bg-surface text-muted ${thin ? 'opacity-55' : ''}`
+                    ? 'bz-chip-map-on'
+                    : `bz-chip ${thin ? 'opacity-55' : ''}`
                 }`}
               >
                 {m.mapName}

@@ -344,10 +344,10 @@ export function PanelDraft({
                   setMap(null);
                 }}
                 aria-pressed={m.key === mode}
-                className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                className={`inline-flex items-center gap-1 px-2 py-1 leading-tight ${
                   m.key === mode
-                    ? 'border-brand/40 bg-brand/10 text-brand'
-                    : 'border-border bg-surface text-muted'
+                    ? 'bz-chip-on'
+                    : 'bz-chip'
                 }`}
               >
                 {/* Same icon as the Meta tab's chips: the badge the game shows
@@ -375,10 +375,10 @@ export function PanelDraft({
                   type="button"
                   onClick={() => chooseMap(m)}
                   aria-pressed={map?.mapName === m.mapName}
-                  className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
+                  className={`px-2 py-1 leading-tight ${
                     map?.mapName === m.mapName
-                      ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
-                      : 'border-border bg-surface text-muted'
+                      ? 'bz-chip-map-on'
+                      : 'bz-chip'
                   }`}
                 >
                   {m.mapName}
@@ -404,7 +404,7 @@ export function PanelDraft({
             is — the state of the draft — and the suggestions start above the
             fold instead of below it.
           */}
-          <div className="card flex flex-wrap items-center gap-x-2.5 gap-y-1 px-2 py-1.5">
+          <div className="bz-panel flex flex-wrap items-center gap-x-2.5 gap-y-1 px-2 py-1.5">
             {(['bans', 'allies', 'enemies'] as Slot[]).map((slot) => (
               <div key={slot} className="flex items-center gap-1">
                 <span className="text-[9px] font-bold uppercase tracking-wide text-muted">
@@ -527,7 +527,7 @@ function BrawlerPicker({
   const searching = query.trim().length > 0;
 
   return (
-    <div className="card space-y-1.5 p-2">
+    <div className="bz-panel space-y-1.5 p-2">
       <div className="flex items-center gap-1.5">
         {/*
           No autoFocus, and that single word was most of the problem.
@@ -649,7 +649,7 @@ function Suggestions({
   }
 
   return (
-    <ol className={`card divide-y divide-border overflow-hidden ${loading ? 'opacity-60' : ''}`}>
+    <ol className={`bz-panel divide-y divide-border overflow-hidden ${loading ? 'opacity-60' : ''}`}>
       {picks.map((pick, index) => {
         const b = byId.get(pick.brawlerId);
         return (

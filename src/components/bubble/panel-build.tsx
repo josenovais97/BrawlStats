@@ -85,7 +85,7 @@ export function BuildCard({
   build: BuildResponse | 'error' | undefined;
 }) {
   return (
-    <section ref={ref} className="card mt-2 overflow-hidden scroll-mt-2">
+    <section ref={ref} className="bz-panel mt-2 overflow-hidden scroll-mt-2">
       <header className="flex items-center gap-2 border-b border-border px-2.5 py-2">
         <Image
           src={entry.imageUrl}

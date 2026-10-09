@@ -92,8 +92,8 @@ export function PanelComps({
 
   return (
     <>
-      <p className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-muted">
-        Best Ranked trios · last 14 days
+      <p className="display px-1 pb-2 text-[13px] uppercase tracking-wide text-foreground">
+        Best Ranked trios <span className="text-[11px] text-muted">· last 14 days</span>
       </p>
 
       <ModeMapChips
@@ -116,7 +116,7 @@ export function PanelComps({
       />
 
       {fellBack ? (
-        <p className="mx-1 mb-2 rounded-md border border-border bg-surface px-2 py-1.5 text-[11px] leading-snug text-muted">
+        <p className="bz-panel mx-1 mb-2 px-2 py-1.5 text-[11px] leading-snug text-muted">
           Not enough Ranked games on <span className="font-bold text-foreground">{map}</span> yet.
           Showing the best trios across {current.label}.
         </p>
@@ -150,11 +150,9 @@ export function PanelComps({
             return (
               <li
                 key={comp.brawlers.map((b) => b.brawlerId).join('-')}
-                className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 ${
-                  mine ? 'border-brand/50 bg-brand/5' : 'border-border bg-surface'
-                }`}
+                className={`flex items-center gap-2 px-2 py-1.5 ${mine ? 'bz-panel-gold' : 'bz-panel'}`}
               >
-                <span className="w-4 shrink-0 text-center text-[11px] font-black tabular-nums text-muted">
+                <span className="display w-5 shrink-0 text-center text-base tabular-nums text-brand">
                   {i + 1}
                 </span>
 
@@ -180,7 +178,7 @@ export function PanelComps({
                         alt={b.brawlerName}
                         width={36}
                         height={36}
-                        className={`size-9 rounded-md border-2 border-background bg-surface-2 object-cover ${
+                        className={`size-9 rounded-lg border-2 border-[#050a1f] bg-surface-2 object-cover ${
                           account.owned !== null && !owns(b.brawlerId) ? 'opacity-45 grayscale' : ''
                         }`}
                         loading="lazy"
@@ -212,7 +210,7 @@ export function PanelComps({
                 </span>
 
                 <span className="shrink-0 text-right leading-tight">
-                  <span className="block text-sm font-black tabular-nums">
+                  <span className="display block text-lg leading-none tabular-nums">
                     {Math.round(comp.winRate * 100)}%
                   </span>
                   <span
