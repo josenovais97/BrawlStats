@@ -709,8 +709,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 alt={brawler.name}
                 width={320}
                 height={380}
-                sizes="(max-width: 640px) 9rem, 13rem"
-                className="relative h-36 w-36 select-none object-contain object-bottom drop-shadow-[0_18px_28px_rgba(0,0,0,0.6)] sm:h-52 sm:w-52"
+                sizes="(max-width: 640px) 11rem, 16rem"
+                className="relative h-44 w-44 select-none object-contain object-bottom drop-shadow-[0_18px_28px_rgba(0,0,0,0.6)] sm:h-64 sm:w-64"
                 priority
                 unoptimized
               />
@@ -849,12 +849,29 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             ) : null}
           </div>
         </div>
+              {/*
+          The build, inside the hero. It was a one-line strip under this card,
+          read as a footnote; this is the answer the page's title promises, so
+          it sits in the first screen as four icon cards. The full breakdown,
+          with sample sizes and caveats, is still the "Build & upgrades"
+          section below.
+        */}
+        {build ? (
+          <div className="relative border-t border-border/70 p-4 sm:px-6">
+            <RecommendedBuild
+              build={build}
+              meta={official ?? undefined}
+              gearNames={gearNames}
+              variant="hero"
+            />
+          </div>
+        ) : null}
       </header>
 
       {/* The answer the page title promises, before the biography and the stat
           grid. A summary of the Build & upgrades section below, which keeps
           every sample size and caveat. */}
-      <RecommendedBuild build={build} meta={official ?? undefined} gearNames={gearNames} />
+
 
       {wiki && wiki.stats.health ? (
         <section>

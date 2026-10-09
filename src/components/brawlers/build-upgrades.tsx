@@ -123,17 +123,27 @@ export function BuildAndUpgrades({
           to spend coins should know they are being shown what is popular and
           what correlates with it, not what this site thinks they should buy.
         */}
-        <p className="mb-4 text-sm leading-relaxed text-muted">
-          Two different things below.{' '}
-          <strong className="font-semibold text-foreground">What owners bought</strong> is
-          popularity — the game&apos;s API reports what a player has unlocked, never what
-          they took into a match.{' '}
-          <strong className="font-semibold text-foreground">How it has gone</strong> is the
-          win rate among the players who made each choice, which covers the ability and the
-          kind of player who picks it together. Neither is a recommendation from us:
-          BrawlZone does not rank {name}&apos;s kit, and nothing here is an opinion about
-          what you should buy.
-        </p>
+        {/* One line, then the full caveat on request. The paragraph opened
+            the section people came to the page for, three lines deep, before
+            a single card; the caveat still travels with the numbers. */}
+        <details className="group mb-4 text-sm text-muted">
+          <summary className="flex cursor-pointer list-none items-center gap-2 leading-relaxed [&::-webkit-details-marker]:hidden">
+            <span>
+              <strong className="font-semibold text-foreground">What owners bought</strong> and{' '}
+              <strong className="font-semibold text-foreground">how it has gone</strong> for them.
+            </span>
+            <span className="shrink-0 text-xs font-semibold text-brand group-open:hidden">
+              How to read this
+            </span>
+          </summary>
+          <p className="mt-2 leading-relaxed">
+            What owners bought is popularity — the game&apos;s API reports what a player has
+            unlocked, never what they took into a match. How it has gone is the win rate among
+            the players who made each choice, which covers the ability and the kind of player
+            who picks it together. Neither is a recommendation from us: BrawlZone does not rank{' '}
+            {name}&apos;s kit, and nothing here is an opinion about what you should buy.
+          </p>
+        </details>
 
         {/* What other owners bought. First, because it is the part people
             came for; the kit reference follows. */}

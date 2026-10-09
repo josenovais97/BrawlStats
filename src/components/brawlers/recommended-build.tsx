@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
-import { gearIconUrl } from '@/lib/brawlapi';
+import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
 import { formatPercent } from '@/lib/format';
 import type { BrawlerBuild, BuildOption } from '@/types/stats';
 
@@ -32,10 +32,17 @@ export function RecommendedBuild({
   build,
   meta,
   gearNames,
+  variant = 'strip',
 }: {
   build: BrawlerBuild | null;
   meta?: { gadgets: NamedAccessory[]; starPowers: NamedAccessory[] };
   gearNames: Map<number, string>;
+  /**
+   * `hero` draws the build as four icon cards inside the page's header: the
+   * answer a "best <name> build" search came for, as a picture in the first
+   * screen rather than a line of text under it.
+   */
+  variant?: 'strip' | 'hero';
 }) {
   if (!build || build.sampleSize === 0) return null;
 
@@ -53,6 +60,72 @@ export function RecommendedBuild({
 
   const gadgetName = gadget ? nameOf(meta?.gadgets, gadget.itemId) : null;
   const starPowerName = starPower ? nameOf(meta?.starPowers, starPower.itemId) : null;
+
+  if (variant === 'hero') {
+    const cards: { key: string; kind: string; name: string; share: number; icon: string }[] = [];
+    if (starPower && starPowerName) {
+      cards.push({
+        key: `sp-${starPower.itemId}`,
+        kind: 'Star power',
+        name: starPowerName,
+        share: starPower.share,
+        icon: starPowerIconUrl(starPower.itemId),
+      });
+    }
+    if (gadget && gadgetName) {
+      cards.push({
+        key: `g-${gadget.itemId}`,
+        kind: 'Gadget',
+        name: gadgetName,
+        share: gadget.share,
+        icon: gadgetIconUrl(gadget.itemId),
+      });
+    }
+    for (const gear of gears) {
+      const name = gearNames.get(gear.itemId);
+      if (name) {
+        cards.push({ key: `gr-${gear.itemId}`, kind: 'Gear', name, share: gear.share, icon: gearIconUrl(gear.itemId) });
+      }
+    }
+    return (
+      <div>
+        <div className="mb-2.5 flex items-baseline justify-between gap-3">
+          <p className="display text-sm uppercase tracking-wide">The build owners run</p>
+          <a href="#build" className="text-xs font-semibold text-brand hover:underline">
+            Why, and what else
+          </a>
+        </div>
+        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          {cards.map((c) => (
+            <li
+              key={c.key}
+              className="flex items-center gap-3 rounded-xl border border-border/80 bg-background/40 p-2.5 backdrop-blur"
+            >
+              <Image
+                src={c.icon}
+                alt=""
+                width={44}
+                height={44}
+                className="size-11 shrink-0 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.45)]"
+                unoptimized
+              />
+              <span className="min-w-0">
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
+                  {c.kind}
+                </span>
+                <span className="block truncate text-sm font-bold capitalize leading-tight">
+                  {c.name.toLowerCase()}
+                </span>
+                <span className="block text-xs tabular-nums text-brand">
+                  {formatPercent(c.share)} of owners
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 
   return (
     <div className="card flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
