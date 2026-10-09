@@ -51,9 +51,32 @@ export function HomeBubble() {
           <p className="leading-relaxed text-muted">
             Brawl Stars gives you seconds to pick, and switching apps costs more
             of them than you have. The bubble sits on the edge of the screen,
-            opens the full Ranked tier list on a tap, filters to the mode you
-            are drafting, and folds away again.
+            opens on a tap and folds away again.
           </p>
+          {/* What the panel does, not just that it exists: the paragraph said
+              "tier list" while the panel had grown map picks, trios, a draft
+              board and the reader's own roster. */}
+          <ul className="space-y-2">
+            {[
+              ["Best picks for your map", "The Ranked meta, map by map", false],
+              ["Team comp", "The best trio to take together", true],
+              ["Draft counters", "Enter bans and picks, get the answer", false],
+              ["Your roster", "Your brawlers ticked, your icon on the bubble", false],
+            ].map(([title, hint, isNew]) => (
+              <li key={title as string} className="flex items-start gap-2.5">
+                <Check className="mt-0.5 size-4 shrink-0 text-victory" />
+                <span className="text-sm">
+                  <span className="font-semibold">{title}</span>
+                  {isNew ? (
+                    <span className="ml-1.5 rounded bg-brand px-1.5 py-0.5 align-middle text-[10px] font-black uppercase text-brand-ink">
+                      New
+                    </span>
+                  ) : null}
+                  <span className="text-muted"> · {hint}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
 
           <ul className="grid gap-2 sm:grid-cols-2">
             {["Free forever", "No ads", "No account", "No tracking"].map(

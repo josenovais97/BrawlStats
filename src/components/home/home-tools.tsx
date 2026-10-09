@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import {
+  BattlesIcon,
   BrawlersIcon,
   CompareIcon,
   DailyChallengeIcon,
@@ -10,6 +11,7 @@ import {
   LeaderboardIcon,
   MapsIcon,
   RankedIcon,
+  StarrDropIcon,
   TierListIcon,
 } from '@/components/game-icons';
 import { getTopMetaBrawlers } from '@/lib/home-meta';
@@ -58,6 +60,23 @@ const SECONDARY = [
     body: 'Trophies and Ranked elo',
   },
   { href: '/maps', icon: MapsIcon, title: 'Maps', body: 'Every map, ranked' },
+  /*
+   * Seven tools left the grid's last row one card and an empty block. These
+   * two fill it and were missing anyway: the trios people ask about in a
+   * draft, and the drop chances page that ranks for "starr drop chances".
+   */
+  {
+    href: '/comps',
+    icon: BattlesIcon,
+    title: 'Team comps',
+    body: 'The trios that win',
+  },
+  {
+    href: '/starr-drops',
+    icon: StarrDropIcon,
+    title: 'Starr Drops',
+    body: 'Every drop chance',
+  },
   {
     href: '/brawlers',
     icon: BrawlersIcon,
