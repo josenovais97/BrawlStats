@@ -20,8 +20,10 @@ import {
   getLastAggregationRun,
   getMetaIndex,
   getRankedLadder,
+  getRankedComps,
   getRankedMapPicks,
   type ScoredBrawler,
+  type TeamComp,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
@@ -70,6 +72,13 @@ export default async function RankedPage() {
     getMetaIndex('ranked', 7).catch(() => new Map<number, ScoredBrawler>()),
     getRankedLadder().catch(() => []),
   ]);
+  // Each map's best Ranked trio, from the same cached read as the bubble's
+  // Team comp tab. Keyed by the battle data's mode and map name, which is
+  // what the picks above are keyed by too.
+  const rankedComps = await getRankedComps().catch(() => ({ maps: [], modes: [] }));
+  const trioFor = (mode: string, mapName: string): TeamComp | undefined =>
+    rankedComps.maps.find((m) => m.mode === mode && m.mapName === mapName)?.comps[0];
+
 
   const top = [...metaIndex.values()]
     .filter((b) => b.tier !== null)
@@ -377,6 +386,7 @@ export default async function RankedPage() {
                       each card here has something to say. */}
                   <MapCard
                     map={entry.picks!}
+                    trio={trioFor(entry.picks!.mode, entry.picks!.mapName)}
                     art={entry.art}
                     modeLabel={row.label}
                     accent={row.accent}
@@ -448,6 +458,7 @@ function Fact({
 
 function MapCard({
   map,
+  trio,
   art,
   modeLabel,
   accent,
@@ -455,6 +466,8 @@ function MapCard({
   mapHref,
 }: {
   map: RankedMapPicks;
+  /** The map's best Ranked trio, when it has enough teams to name one. */
+  trio?: TeamComp;
   art?: BAMap;
   modeLabel: string;
   accent: string;
@@ -598,6 +611,36 @@ function MapCard({
           })}
         </ol>
       )}
+
+      {/* The best three to take together here: the bubble's Team comp, one
+          line per map, so the page answers both "who" and "with whom". */}
+      {trio ? (
+        <div className="mt-auto flex items-center gap-2.5 border-t border-border/70 bg-surface-2/40 px-4 py-2.5">
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted">
+            Best trio
+          </span>
+          <span className="flex shrink-0 -space-x-1.5">
+            {trio.brawlerIds.map((id) => (
+              <Image
+                key={id}
+                src={brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id)}
+                alt={brawlerMeta.get(id)?.name ?? ''}
+                width={28}
+                height={28}
+                className="size-7 rounded-md border-2 border-surface bg-surface-2"
+                loading="lazy"
+                unoptimized
+              />
+            ))}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-xs text-muted">
+            {trio.brawlerIds.map((id) => titleCaseLabel(brawlerMeta.get(id)?.name ?? `#${id}`)).join(' · ')}
+          </span>
+          <span className="shrink-0 text-xs font-bold tabular-nums text-victory">
+            {formatPercent(trio.winRate)}
+          </span>
+        </div>
+      ) : null}
     </article>
   );
 }

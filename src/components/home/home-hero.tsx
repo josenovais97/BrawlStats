@@ -7,6 +7,8 @@ import type { ReactNode } from 'react';
 import { SearchBar } from '@/components/search-bar';
 import { brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
 import { getTopMetaBrawlers } from '@/lib/home-meta';
+import { wikiThumb } from '@/lib/skin-art';
+import { getWikiModel } from '@/lib/wiki-art';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
@@ -261,10 +263,23 @@ async function Stage() {
    * link. One framed portrait standing between two full bodies reads as a
    * failure; three framed portraits read as a deliberate treatment.
    */
-  const available = await Promise.all(slots.map((s) => hasBrawlerModel(s.brawlerId)));
-  const treatment: Treatment = available.every(Boolean) ? 'model' : 'portrait';
+  /*
+   * A full body for each slot from either source: the mirror's model, or the
+   * wiki's full-body render when the mirror has not published one. The
+   * all-or-nothing rule stands, but with the wiki as a second source it
+   * rarely triggers -- on 2026-10-09 Wendy alone had no model, and that one
+   * gap was putting the whole podium on round portraits.
+   */
+  const bodies = await Promise.all(
+    slots.map(async (s) => {
+      if (await hasBrawlerModel(s.brawlerId).catch(() => false)) return brawlerModelUrl(s.brawlerId);
+      const wiki = await getWikiModel(s.name).catch(() => null);
+      return wiki ? wikiThumb(wiki, 460) : null;
+    }),
+  );
+  const treatment: Treatment = bodies.every(Boolean) ? 'model' : 'portrait';
 
-  const [left, centre, right] = slots;
+  const [left, centre, right] = slots.map((slot, i) => ({ ...slot, body: bodies[i] ?? undefined }));
 
   return (
     <>
@@ -330,6 +345,8 @@ interface Slot {
   name: string;
   tier: keyof typeof TIER_COLOR | null;
   rank: number | null;
+  /** The full-body art to draw, from the mirror or the wiki; see `Stage`. */
+  body?: string;
 }
 
 /**
@@ -407,7 +424,7 @@ function Figure({
           style={{ background: rim }}
         />
         <Image
-          src={brawlerModelUrl(slot.brawlerId)}
+          src={slot.body ?? brawlerModelUrl(slot.brawlerId)}
           alt=""
           width={460}
           height={670}
