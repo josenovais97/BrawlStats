@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import type { DraftBrawler } from '@/components/bubble/panel-draft';
+import type { PanelComp, PanelModeComps } from '@/components/bubble/panel-comps';
 import { PanelShell } from '@/components/bubble/panel-shell';
 import type { PanelEntry, PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 import { PanelUpdate } from '@/components/bubble/panel-update';
@@ -12,8 +13,10 @@ import {
   getBrawlerStatsForWindow,
   getSkillEdge,
   getFilterableModes,
+  getRankedComps,
   getRankedMapPicks,
   scoreBrawlers,
+  type TeamComp,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 
@@ -59,7 +62,7 @@ export default async function BubblePanelPage() {
   const filterable = await getFilterableModes(30, 150, 'ranked').catch(() => []);
   const modeKeys = filterable.map((entry) => entry.mode);
 
-  const [allRows, perMode, brawlerMeta, modeMeta, mapPicks] = await Promise.all([
+  const [allRows, perMode, brawlerMeta, modeMeta, mapPicks, rankedComps] = await Promise.all([
     getBrawlerStatsForWindow(WINDOW_DAYS, undefined, 'ranked').catch(() => []),
     // Each of these is cached independently, and the site's own per-mode pages
     // read the same entries — so the panel usually warms nothing of its own.
@@ -88,6 +91,10 @@ export default async function BubblePanelPage() {
      * without a request, which is the thing worth protecting on mobile data.
      */
     getRankedMapPicks(20).catch(() => []),
+    // The Team comp tab: Ranked trios per map, with each mode's as fallback.
+    // Eight per list, three ids and three numbers each, so every mode and map
+    // travels with the page for the same reason the picks do.
+    getRankedComps().catch(() => ({ maps: [], modes: [] })),
   ]);
 
   /**
@@ -158,6 +165,25 @@ export default async function BubblePanelPage() {
     }))
     .sort((a, b) => a.brawlerName.localeCompare(b.brawlerName));
 
+  const toComp = (c: TeamComp): PanelComp => ({
+    brawlers: c.brawlerIds.map((id) => ({
+      brawlerId: id,
+      brawlerName: titleCase(brawlerMeta.get(id)?.name ?? `#${id}`),
+      imageUrl: brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id),
+    })),
+    winRate: c.winRate,
+    edge: c.edge,
+    battles: c.battles,
+  });
+  const comps: Record<string, PanelModeComps> = {};
+  for (const m of rankedComps.modes) {
+    comps[m.mode] = { mode: m.comps.map(toComp), maps: {} };
+  }
+  for (const m of rankedComps.maps) {
+    const entry = (comps[m.mode] ??= { mode: [], maps: {} });
+    entry.maps[m.mapName] = m.comps.map(toComp);
+  }
+
   const modes: PanelMode[] = [
     // No maps on the combined list: the full pool is around thirty, which is
     // more chips than this window can show without becoming the whole panel.
@@ -201,7 +227,7 @@ export default async function BubblePanelPage() {
             Not enough sampled Ranked battles yet. This fills in as the sampler runs.
           </p>
         ) : (
-          <PanelShell modes={modes} roster={roster} windowDays={WINDOW_DAYS} />
+          <PanelShell modes={modes} roster={roster} windowDays={WINDOW_DAYS} comps={comps} />
         )}
 
 

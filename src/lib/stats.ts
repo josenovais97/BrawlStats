@@ -4365,6 +4365,166 @@ export const getBrawlerSplits = cachedRead('brawler-splits', compute_getBrawlerS
 export const getBrawlerPairings = cachedRead('brawler-pairings', compute_getBrawlerPairings);
 export const getTeamComps = cachedRead('team-comps', compute_getTeamComps);
 
+/**
+ * Ranked trio floors for the bubble's Team comp tab.
+ *
+ * Looser than the site's per-mode comps on a map, because a map is a much
+ * thinner slice: measured on 2026-10-09, the strict 40-battle / 15-player bar
+ * left three or more Ranked trios on only six maps, while 15 / 8 covered about
+ * eighteen -- every busy Knockout and Brawl Ball map. Thin samples are not
+ * hidden; they carry their battle count and the panel labels them, and the
+ * win rates are shrunk toward the map's baseline either way.
+ */
+const MIN_RANKED_MAP_COMP_BATTLES = 15;
+const MIN_RANKED_MAP_COMP_PLAYERS = 8;
+/** A map needs at least this many trios over the floor to get its own list. */
+const MIN_RANKED_MAP_COMPS = 3;
+
+export interface RankedComps {
+  /** Per Ranked map with enough trios of its own. */
+  maps: { mode: string; mapName: string; baseline: number; comps: TeamComp[] }[];
+  /** Per mode, the fallback for maps without enough data. */
+  modes: ModeComps[];
+}
+
+/**
+ * The trios that win in Ranked, per map and per mode.
+ *
+ * Ranked only -- team and solo queue -- because the bubble is opened in a
+ * Ranked draft and the question is which three to take *there*. Solo-queue
+ * teams are matched at random, which makes them the cleaner half of the
+ * sample for "do these three work together".
+ *
+ * Judged against the map's (or mode's) own win rate and shrunk toward it, as
+ * the site's comps are, so a 15-battle trio has to be genuinely better to
+ * outrank a 100-battle one.
+ */
+async function compute_getRankedComps(limit = 8): Promise<RankedComps> {
+  const prisma = getPrisma();
+  if (!prisma) return { maps: [], modes: [] };
+
+  try {
+    const since = windowStartUtc(COMP_WINDOW_DAYS);
+
+    /*
+     * Both groupings in one pass, filtered in the database. Unfiltered, the
+     * trio rows ran to about 650,000 on 2026-10-09 -- every pairing anyone
+     * played once -- of which about 3,400 clear the floors. `per_mode` is
+     * GROUPING(map_name): 1 on the per-mode rows, where the map is rolled up
+     * rather than unknown, so a battle with no recorded map can never pose as
+     * a mode total.
+     */
+    const [totals, trios] = await Promise.all([
+      prisma.$queryRaw<
+        { mode: string; map_name: string | null; per_mode: number; wins: bigint; decided: bigint }[]
+      >`
+        SELECT mode, map_name, GROUPING(map_name) AS per_mode,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided
+        FROM battle_team_samples
+        WHERE battle_time >= ${since}
+          AND battle_type IN ('ranked', 'soloRanked')
+          AND array_length(ally_brawler_ids, 1) = 2
+          AND result IN ('victory', 'defeat')
+        GROUP BY GROUPING SETS ((mode, map_name), (mode))
+      `,
+      prisma.$queryRaw<
+        {
+          mode: string;
+          map_name: string | null;
+          per_mode: number;
+          trio: number[];
+          wins: bigint;
+          decided: bigint;
+          players: bigint;
+        }[]
+      >`
+        WITH teams AS (
+          SELECT mode, map_name, player_tag,
+            (SELECT array_agg(x ORDER BY x) FROM unnest(ally_brawler_ids || brawler_id) AS x) AS trio,
+            result
+          FROM battle_team_samples
+          WHERE battle_time >= ${since}
+            AND battle_type IN ('ranked', 'soloRanked')
+            AND array_length(ally_brawler_ids, 1) = 2
+            AND result IN ('victory', 'defeat')
+        )
+        SELECT mode, map_name, GROUPING(map_name) AS per_mode, trio,
+          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) AS decided,
+          COUNT(DISTINCT player_tag) AS players
+        FROM teams
+        GROUP BY GROUPING SETS ((mode, map_name, trio), (mode, trio))
+        HAVING (GROUPING(map_name) = 0 AND map_name IS NOT NULL
+                AND COUNT(*) >= ${MIN_RANKED_MAP_COMP_BATTLES}
+                AND COUNT(DISTINCT player_tag) >= ${MIN_RANKED_MAP_COMP_PLAYERS})
+            OR (GROUPING(map_name) = 1
+                AND COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
+                AND COUNT(DISTINCT player_tag) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP})
+      `,
+    ]);
+
+    const keyOf = (r: { mode: string; map_name: string | null; per_mode: number }) =>
+      Number(r.per_mode) === 1 ? `${r.mode}|` : `${r.mode}|${r.map_name ?? ''}`;
+
+    const baselines = new Map<string, { baseline: number; decided: number }>();
+    for (const t of totals) {
+      const decided = Number(t.decided);
+      baselines.set(keyOf(t), {
+        baseline: decided > 0 ? Number(t.wins) / decided : 0.5,
+        decided,
+      });
+    }
+
+    const lists = new Map<string, TeamComp[]>();
+    for (const r of trios) {
+      const key = keyOf(r);
+      const base = baselines.get(key)?.baseline ?? 0.5;
+      const battles = Number(r.decided);
+      const winRate = Number(r.wins) / battles;
+      const list = lists.get(key) ?? [];
+      list.push({
+        brawlerIds: r.trio,
+        battles,
+        players: Number(r.players),
+        winRate,
+        normalizedWinRate: normalizeWinRate(winRate, base, battles),
+        edge: winRate - base,
+      });
+      lists.set(key, list);
+    }
+
+    const best = (comps: TeamComp[]) =>
+      comps
+        .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))
+        .slice(0, limit);
+
+    const maps: RankedComps['maps'] = [];
+    const modes: ModeComps[] = [];
+    for (const [key, comps] of lists) {
+      const [mode, mapName] = key.split('|');
+      const base = baselines.get(key);
+      if (mapName) {
+        if (comps.length < MIN_RANKED_MAP_COMPS) continue;
+        maps.push({ mode, mapName, baseline: base?.baseline ?? 0.5, comps: best(comps) });
+      } else {
+        modes.push({
+          mode,
+          baseline: base?.baseline ?? 0.5,
+          sampleSize: base?.decided ?? 0,
+          comps: best(comps),
+        });
+      }
+    }
+    return { maps, modes };
+  } catch (error) {
+    swallow('compute_getRankedComps', error);
+    return { maps: [], modes: [] };
+  }
+}
+
+export const getRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
+
 /** A brawler's record on one ladder map, against that map's own average. */
 export interface MapForm {
   brawlerId: number;

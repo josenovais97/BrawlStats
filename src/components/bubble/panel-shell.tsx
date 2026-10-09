@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 
@@ -25,25 +26,27 @@ import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 
 const STORED_TAB = 'brawlzone.bubble.tab';
 
-type Tab = 'meta' | 'draft';
+type Tab = 'meta' | 'comps' | 'draft';
 
 export function PanelShell({
   modes,
   roster,
   windowDays,
+  comps,
 }: {
   modes: PanelMode[];
   roster: DraftBrawler[];
   windowDays: number;
+  comps: Record<string, PanelModeComps>;
 }) {
   const [tab, setTab] = useState<Tab>('meta');
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORED_TAB);
-      if (saved === 'draft') {
+      if (saved === 'draft' || saved === 'comps') {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setTab('draft');
+        setTab(saved);
       }
     } catch {
       // Private windows and blocked site data both throw. Meta is a fine
@@ -71,6 +74,7 @@ export function PanelShell({
         {(
           [
             ['meta', 'Meta'],
+            ['comps', 'Team comp'],
             ['draft', 'Draft'],
           ] as const
         ).map(([key, label]) => (
@@ -93,6 +97,8 @@ export function PanelShell({
 
       {tab === 'meta' ? (
         <PanelTiers modes={modes} windowDays={windowDays} />
+      ) : tab === 'comps' ? (
+        <PanelComps modes={modes} comps={comps} />
       ) : (
         <PanelDraft modes={modes} roster={roster} />
       )}
