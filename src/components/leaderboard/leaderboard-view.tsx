@@ -64,18 +64,6 @@ export async function LeaderboardView({
 
       <LeaderboardControls region={region} board={board} />
 
-      {/*
-        Above the board on purpose. It is the one thing here that is ours rather
-        than a mirror of the game API, and below a hundred rows nobody would
-        ever reach it. Streamed separately so our aggregate never delays the
-        live board. Players only: clubs have no per-member trophy history.
-      */}
-      {board === 'players' ? (
-        <Suspense fallback={null}>
-          <TrophyGains />
-        </Suspense>
-      ) : null}
-
       {board === 'players' ? <PlayerBoard region={region} /> : null}
       {board === 'clubs' ? <ClubBoard region={region} /> : null}
       {board === 'ranked' ? (
@@ -86,6 +74,19 @@ export async function LeaderboardView({
       {board === 'cosmetics' ? (
         <Suspense fallback={null}>
           <CosmeticsBoard />
+        </Suspense>
+      ) : null}
+
+      {/*
+        Below the board now. It sat above it as the one thing here that is ours
+        rather than the game API's -- but it is a different population, and on
+        a phone it put the official top 100, the answer the page is named for,
+        a full screen down. The board's podium now opens the page. Streamed
+        separately so our aggregate never delays the live board.
+      */}
+      {board === 'players' ? (
+        <Suspense fallback={null}>
+          <TrophyGains />
         </Suspense>
       ) : null}
     </div>
@@ -117,8 +118,64 @@ async function PlayerBoard({ region }: { region: string }) {
           aside={`${items.length} shown`}
         />
       </div>
+      {/* The top three as a podium, first place in the middle and raised:
+          the world's best players were three rows like any other. */}
+      {items.length >= 3 ? (
+        <ol className="mb-4 grid grid-cols-3 items-end gap-2 sm:gap-4" aria-label="Top three players">
+          {[1, 0, 2].map((i) => {
+            const player = items[i];
+            const first = i === 0;
+            return (
+              <li key={player.tag} className={first ? '' : 'pt-6 sm:pt-8'}>
+                <Link
+                  href={`/player/${normalizeTag(player.tag)}`}
+                  rel={playerLinkRel(normalizeTag(player.tag))}
+                  prefetch={false}
+                  className="card card-interactive relative flex flex-col items-center px-2 pb-3 pt-4 text-center sm:px-3"
+                  style={
+                    first
+                      ? { background: 'linear-gradient(170deg, color-mix(in srgb, var(--brand) 22%, transparent), var(--surface) 70%)' }
+                      : undefined
+                  }
+                >
+                  <span
+                    className={`display absolute left-2 top-2 rounded-md px-2 py-0.5 text-sm ${
+                      first ? 'bg-brand text-brand-ink' : 'bg-background/70 text-foreground'
+                    }`}
+                  >
+                    #{player.rank}
+                  </span>
+                  <Image
+                    src={playerIconUrl(player.icon?.id)}
+                    alt=""
+                    width={96}
+                    height={96}
+                    className={`rounded-2xl border-2 bg-surface-2 ${
+                      first ? 'size-20 border-brand sm:size-24' : 'size-16 border-border sm:size-20'
+                    }`}
+                    unoptimized
+                  />
+                  <p
+                    className="mt-2 w-full truncate text-sm font-bold sm:text-base"
+                    style={{ color: nameColorToCss(player.nameColor) }}
+                  >
+                    {player.name}
+                  </p>
+                  <p className="w-full truncate text-[11px] text-muted sm:text-xs">
+                    {player.club?.name ?? 'No club'}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-sm font-black tabular-nums text-brand sm:text-base">
+                    <TrophyIcon className="size-4" />
+                    {formatNumber(player.trophies)}
+                  </p>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
       <ol className="space-y-2">
-        {items.map((player) => (
+        {(items.length >= 3 ? items.slice(3) : items).map((player) => (
           <li key={player.tag}>
             <Link
               href={`/player/${normalizeTag(player.tag)}`}
