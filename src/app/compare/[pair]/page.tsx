@@ -205,7 +205,13 @@ export default async function ComparePage({ params }: PageProps) {
           labelA={nameA}
           labelB={nameB}
           accentA={left.brawler.rarity?.color ?? 'var(--brand)'}
-          accentB={right.brawler.rarity?.color ?? 'var(--accent-2)'}
+          // Two brawlers of one rarity share a colour, which made both halves
+          // of a bar the same red; the right side takes the brand gold then.
+          accentB={
+            right.brawler.rarity?.color && right.brawler.rarity.color !== left.brawler.rarity?.color
+              ? right.brawler.rarity.color
+              : 'var(--brand)'
+          }
           sections={[
             {
               title: 'Performance',
