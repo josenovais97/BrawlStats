@@ -92,7 +92,7 @@ export function PanelComps({
 
   return (
     <>
-      <p className="display px-1 pb-2 text-[13px] uppercase tracking-wide text-foreground">
+      <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
         Best Ranked trios <span className="text-[11px] text-muted">· last 14 days</span>
       </p>
 
@@ -200,12 +200,14 @@ export function PanelComps({
                   <span className="block truncate text-[11px] font-bold leading-tight">
                     {comp.brawlers.map((b) => b.brawlerName).join(' · ')}
                   </span>
-                  <span className="flex items-center gap-1.5 text-[10px] leading-tight text-muted">
+                  <span className="mt-0.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[10px] leading-tight text-muted">
                     <span className="tabular-nums">{comp.battles} games</span>
                     {comp.battles < THIN ? (
                       <span className="rounded bg-surface-2 px-1 font-bold">thin sample</span>
                     ) : null}
-                    {mine ? <span className="font-bold text-brand">You can run this</span> : null}
+                    {mine ? (
+                      <span className="bz-chip-on shrink-0 px-1.5 py-px text-[9px]">You can run this</span>
+                    ) : null}
                   </span>
                 </span>
 

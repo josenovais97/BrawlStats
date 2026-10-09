@@ -198,7 +198,7 @@ export function PanelTiers({
     <>
       {/* Belongs to this view, not to the panel: the draft board is not a
           seven-day average of anything, and the heading said so anyway. */}
-      <p className="display px-1 pb-2 text-[13px] uppercase tracking-wide text-foreground">
+      <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
         Ranked meta <span className="text-[11px] text-muted">· last {windowDays} days</span>
       </p>
 
