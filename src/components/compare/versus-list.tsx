@@ -31,6 +31,12 @@ export interface VersusMetric {
   leader: 'a' | 'b' | null;
   /** Optional clarification shown under the row. */
   hint?: string;
+  /**
+   * The two raw values, when a picture helps: draws one track under the row,
+   * each side filled in its colour by its share of the pair. Only for scores
+   * where the size of the gap is the point -- win rate, pick rate.
+   */
+  values?: [number | null, number | null];
 }
 
 export interface VersusSection {
@@ -93,6 +99,26 @@ export function VersusList({
                     {metric.b}
                   </span>
                 </dd>
+                {metric.values &&
+                metric.values[0] !== null &&
+                metric.values[1] !== null &&
+                metric.values[0] + metric.values[1] > 0 ? (
+                  <span aria-hidden className="mt-1.5 flex h-2 overflow-hidden rounded-full bg-surface-2">
+                    <span
+                      className="h-full transition-[width]"
+                      style={{
+                        width: `${(metric.values[0] / (metric.values[0] + metric.values[1])) * 100}%`,
+                        background: accentA,
+                        opacity: metric.leader === 'b' ? 0.45 : 1,
+                      }}
+                    />
+                    <span className="h-full w-0.5 shrink-0 bg-background" />
+                    <span
+                      className="h-full flex-1"
+                      style={{ background: accentB, opacity: metric.leader === 'a' ? 0.45 : 1 }}
+                    />
+                  </span>
+                ) : null}
                 {metric.hint ? (
                   <p className="mt-0.5 text-xs leading-snug text-muted">
                     {metric.hint}

@@ -215,6 +215,7 @@ export default async function ComparePage({ params }: PageProps) {
                   a: formatPercent(left.adjusted),
                   b: formatPercent(right.adjusted),
                   leader: compareLeader(left.adjusted, right.adjusted),
+                  values: [left.adjusted, right.adjusted],
                 },
                 {
                   label: 'Pick rate',
@@ -224,6 +225,7 @@ export default async function ComparePage({ params }: PageProps) {
                     left.stat?.usageRate ?? null,
                     right.stat?.usageRate ?? null,
                   ),
+                  values: [left.stat?.usageRate ?? null, right.stat?.usageRate ?? null],
                 },
                 {
                   label: 'Tier',
