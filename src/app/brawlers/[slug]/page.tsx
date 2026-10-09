@@ -1136,7 +1136,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             skins={skins}
             brawlerId={brawlerId}
             brawlerName={brawler.name}
-            artFor={(skin) => skinArtUrl(skinArt, brawler.name, skin.name)}
+            artFor={(skin) => skinArtUrl(skinArt, brawler.name, skin.name, 96)}
           />
         </section>
       ) : null}

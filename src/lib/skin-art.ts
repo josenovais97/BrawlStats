@@ -116,7 +116,29 @@ export function skinArtUrl(
   art: Record<string, string>,
   brawlerName: string,
   skinName: string,
+  /** Pixel width to ask the wiki for; see `wikiThumb`. */
+  width = 400,
 ): string | null {
   const key = `${normalise(brawlerName)}|${variantKey(brawlerName, skinName)}`;
-  return art[key] ?? null;
+  const url = art[key];
+  return url ? wikiThumb(url, width) : null;
+}
+
+/**
+ * A wiki image at the width it is drawn at, not the width it was uploaded at.
+ *
+ * Skin renders are uploaded large -- Cinema Shade is 84 KB -- and were being
+ * shown in 44px rows and 256px cards at full size, which is why the skins
+ * list filled in slowly on a phone. Fandom's image CDN resizes on request
+ * (`/scale-to-width-down/<w>` after `/revision/latest`) and caches the result
+ * for everyone: at 96px the same image is 8.5 KB. The first request for a
+ * size is generated on demand (about 1.5 s, measured 2026-10-09), every one
+ * after that is served from cache.
+ *
+ * Anything that is not a Fandom revision URL is returned unchanged.
+ */
+export function wikiThumb(url: string, width: number): string {
+  const m = /^(https:\/\/static\.wikia\.nocookie\.net\/.+?\/revision\/latest)(?:\/scale-to-width-down\/\d+)?(\?.*)?$/.exec(url);
+  if (!m) return url;
+  return `${m[1]}/scale-to-width-down/${Math.round(width)}${m[2] ?? ''}`;
 }
