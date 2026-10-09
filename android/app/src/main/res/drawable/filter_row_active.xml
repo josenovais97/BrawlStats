@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The filter option in force: raised surface and a brand edge. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#22FFC53D">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_3" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="@color/brand" />
+        </shape>
+    </item>
+</ripple>

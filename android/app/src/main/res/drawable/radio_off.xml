@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- An unselected filter option: an empty ring, the shape every Android user
+     already reads as "one of these, tap to choose". -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <size android:width="22dp" android:height="22dp" />
+    <stroke android:width="2dp" android:color="@color/border_strong" />
+</shape>

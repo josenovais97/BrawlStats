@@ -8,6 +8,7 @@
   which is most of why the screen read as cheap. Every dimension here is dp.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_screen"
@@ -202,6 +203,71 @@
             android:textColor="@color/brand"
             android:textSize="13sp"
             android:visibility="gone" />
+
+        <!--
+            Set-up prompt, shown until a tag resolves.
+
+            The account card was the only place a tag could be entered, and it
+            sat below the fold under a caption that said nothing about why. Most
+            installs never set one, so most players got the panel's weakest
+            version. This says what the tag unlocks, in the first screen, and
+            its button takes the reader straight to the field.
+        -->
+        <LinearLayout
+            android:id="@+id/setup_prompt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/card_cta"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.12"
+                android:text="RECOMMENDED"
+                android:textColor="@color/brand"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Make the panel yours"
+                android:textColor="@color/foreground"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.35"
+                android:text="Add your player tag and the bubble:\n✓  marks the brawlers you actually own\n✓  can show only power 11 or hypercharged picks\n✓  plans what to upgrade next"
+                android:textColor="@color/muted"
+                android:textSize="13sp" />
+            <TextView
+                android:id="@+id/setup_cta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/btn_gold"
+                android:gravity="center"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
+                android:text="Add my player tag"
+                android:textColor="@color/brand_ink"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Find it in game: tap your profile, it starts with #"
+                android:textColor="@color/muted"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <!--
             What the thing actually does, before it is asked to be configured.
@@ -523,130 +589,221 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:letterSpacing="0.1"
-                android:text="WHAT THE PANEL SHOWS"
+                android:text="SHOW IN THE PANEL · TAP TO CHOOSE"
                 android:textColor="@color/muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
+            <!--
+                The filter as a list of choices, not three stat tiles.
+
+                The tiles were the filter, but they looked like a readout:
+                a number, an icon and a word, with nothing saying they could be
+                tapped. A radio ring, a title that says what the panel will
+                show, a line on why, and the count it leaves are how Android
+                says "pick one of these" — and the count is still there, so
+                the choice is still made against the number it produces.
+            -->
             <LinearLayout
                 android:id="@+id/account_chips"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:visibility="gone">
-
                 <LinearLayout
                     android:id="@+id/tile_owned"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    
+                    android:background="@drawable/filter_row"
                     android:clickable="true"
                     android:focusable="true"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/chip"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:paddingTop="11dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="64dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="14dp"
                     android:paddingBottom="10dp">
-
                     <ImageView
+                        android:id="@+id/radio_owned"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:contentDescription="@null"
+                        android:src="@drawable/radio_off" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginStart="12dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_brawlers" />
-
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="All my brawlers"
+                            android:textColor="@color/foreground"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Mark everything you own; grey out the rest"
+                            android:textColor="@color/muted"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                     <TextView
                         android:id="@+id/chip_owned"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/chip"
+                        android:minWidth="40dp"
+                        android:gravity="center"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
                         android:textColor="@color/foreground"
-                        android:textSize="17sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="owned"
-                        android:textColor="@color/muted"
-                        android:textSize="11sp" />
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/tile_eleven"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/filter_row"
                     android:clickable="true"
                     android:focusable="true"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/chip"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:paddingTop="11dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="64dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="14dp"
                     android:paddingBottom="10dp">
-
                     <ImageView
+                        android:id="@+id/radio_eleven"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:contentDescription="@null"
+                        android:src="@drawable/radio_off" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginStart="12dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_power_11" />
-
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Power 11 only"
+                            android:textColor="@color/foreground"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Just what is fully upgraded for Ranked"
+                            android:textColor="@color/muted"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                     <TextView
                         android:id="@+id/chip_eleven"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/chip"
+                        android:minWidth="40dp"
+                        android:gravity="center"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
                         android:textColor="@color/foreground"
-                        android:textSize="17sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="power 11"
-                        android:textColor="@color/muted"
-                        android:textSize="11sp" />
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/tile_hyper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/filter_row"
                     android:clickable="true"
                     android:focusable="true"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/chip"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:paddingTop="11dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="64dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="14dp"
                     android:paddingBottom="10dp">
-
                     <ImageView
+                        android:id="@+id/radio_hyper"
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:contentDescription="@null"
+                        android:src="@drawable/radio_off" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginStart="12dp"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_hypercharge" />
-
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Power 11 + hypercharge"
+                            android:textColor="@color/foreground"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Only brawlers at their absolute strongest"
+                            android:textColor="@color/muted"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                     <TextView
                         android:id="@+id/chip_hyper"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/chip"
+                        android:minWidth="40dp"
+                        android:gravity="center"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
                         android:textColor="@color/foreground"
-                        android:textSize="17sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="hyper"
-                        android:textColor="@color/muted"
-                        android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
-
             <!-- The lit tile in words, because a highlight says which one and
                  not what it means. -->
             <TextView

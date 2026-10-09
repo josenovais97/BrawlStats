@@ -248,12 +248,14 @@ class MainActivity : AppCompatActivity() {
         val chipEleven = findViewById<TextView>(R.id.chip_eleven)
         val chipHyper = findViewById<TextView>(R.id.chip_hyper)
 
-        /** Each filter, its tile, and how it reads once chosen. */
+        /** Each filter, its row, and the radio ring that shows it is chosen. */
         val tiles = listOf(
-            Triple(Account.FILTER_ALL, R.id.tile_owned, "Every brawler you own"),
-            Triple(Account.FILTER_POWER_11, R.id.tile_eleven, "Power 11 only"),
-            Triple(Account.FILTER_HYPERCHARGE, R.id.tile_hyper, "Power 11 with hypercharge"),
+            Triple(Account.FILTER_ALL, R.id.tile_owned, R.id.radio_owned),
+            Triple(Account.FILTER_POWER_11, R.id.tile_eleven, R.id.radio_eleven),
+            Triple(Account.FILTER_HYPERCHARGE, R.id.tile_hyper, R.id.radio_hyper),
         )
+        val setupPrompt = findViewById<LinearLayout>(R.id.setup_prompt)
+        val scroll = findViewById<android.widget.ScrollView>(R.id.scroll)
 
         var filter = Account.filter(this)
         /* The tag the plan on screen belongs to, so it is fetched once. */
@@ -335,12 +337,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun paintFilter() {
-            for ((value, id, label) in tiles) {
+            for ((value, row, radio) in tiles) {
                 val active = value == filter
-                findViewById<LinearLayout>(id).setBackgroundResource(
-                    if (active) R.drawable.chip_active else R.drawable.chip,
+                findViewById<LinearLayout>(row).setBackgroundResource(
+                    if (active) R.drawable.filter_row_active else R.drawable.filter_row,
                 )
-                if (active) filterLabel.text = label
+                findViewById<ImageView>(radio).setImageResource(
+                    if (active) R.drawable.radio_on else R.drawable.radio_off,
+                )
             }
         }
 
@@ -350,6 +354,9 @@ class MainActivity : AppCompatActivity() {
                 chips.visibility = View.GONE
                 chipsCaption.visibility = View.GONE
                 filterLabel.visibility = View.GONE
+                // No resolved account: the panel is running its generic
+                // version, so the prompt saying what a tag unlocks comes back.
+                setupPrompt.visibility = View.VISIBLE
                 PlanLookup.cancel()
                 plannedFor = null
                 showPlan(null)
@@ -366,7 +373,10 @@ class MainActivity : AppCompatActivity() {
             identity.visibility = View.VISIBLE
             chips.visibility = View.VISIBLE
             chipsCaption.visibility = View.VISIBLE
-            filterLabel.visibility = View.VISIBLE
+            // The rows say what each choice does; a line repeating the lit one
+            // under them was a second answer to a question already answered.
+            filterLabel.visibility = View.GONE
+            setupPrompt.visibility = View.GONE
             icon.setImageDrawable(null)
             if (result.iconUrl.isNotEmpty()) {
                 AccountLookup.icon(result.iconUrl) { bitmap ->
@@ -443,6 +453,26 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
         })
 
+        /*
+         * The prompt's button goes to the field rather than opening a dialog
+         * of its own: one place to enter a tag, so the card below is never out
+         * of step with what was typed.
+         */
+        findViewById<TextView>(R.id.setup_cta).setOnClickListener {
+            setEditing(true)
+            tag.requestFocus()
+            scroll.post {
+                val box = android.graphics.Rect()
+                tag.getDrawingRect(box)
+                scroll.offsetDescendantRectToMyCoords(tag, box)
+                // A little above the field, so its label and the line under it
+                // are on screen with it, not just the box.
+                scroll.smoothScrollTo(0, (box.top - (96 * resources.displayMetrics.density).toInt()).coerceAtLeast(0))
+            }
+            (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                .showSoftInput(tag, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        }
+
         for ((value, id, _) in tiles) {
             findViewById<LinearLayout>(id).setOnClickListener {
                 filter = value
@@ -461,6 +491,9 @@ class MainActivity : AppCompatActivity() {
         // a tag that is already there is not what the reader came to change.
         val saved = Account.isValid(tag.text.toString())
         setEditing(!saved)
+        // Hidden in the layout so a saved account never flashes the prompt;
+        // shown here only when there is nothing to resolve.
+        setupPrompt.visibility = if (saved) View.GONE else View.VISIBLE
         if (saved) persist()
     }
 }
