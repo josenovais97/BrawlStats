@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
+import { recall, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 
 /**
@@ -110,9 +111,28 @@ export function PanelDraft({
 
   /* The draft in progress, so closing the bubble does not empty the board. */
   useEffect(() => {
+    /*
+     * No draft in progress: open on the map chosen on any tab. The Meta and
+     * Team comp tabs keep the same mode and map, and the draft is on that map.
+     */
+    const fallBack = () => {
+      const shared = recall();
+      if (!shared.map) return;
+      for (const m of withMaps) {
+        const found = m.maps.find((x) => x.mapName === shared.map);
+        if (!found) continue;
+        setMode(m.key);
+        setMap(found);
+        return;
+      }
+    };
+
     try {
       const raw = window.localStorage.getItem(STORED_DRAFT);
-      if (!raw) return;
+      if (!raw) {
+        fallBack();
+        return;
+      }
       const saved = JSON.parse(raw) as {
         map?: string;
         at?: number;
@@ -120,7 +140,10 @@ export function PanelDraft({
         allies?: number[];
         enemies?: number[];
       };
-      if (!saved.map || Date.now() - (saved.at ?? 0) > DRAFT_TTL_MS) return;
+      if (!saved.map || Date.now() - (saved.at ?? 0) > DRAFT_TTL_MS) {
+        fallBack();
+        return;
+      }
 
       for (const m of withMaps) {
         const found = m.maps.find((x) => x.mapName === saved.map);
@@ -198,6 +221,9 @@ export function PanelDraft({
   const chooseMap = (m: PanelMap) => {
     setMap(m);
     setChanging(false);
+    // Shared with the other tabs, so the map picked here is the one they open on.
+    remember(STORED_MODE, m.mode);
+    remember(STORED_MAP, m.mapName);
     // Cleared here rather than in the effect: a new map invalidates the old
     // answer, and that is a consequence of the tap, not of the fetch.
     setPicks(null);

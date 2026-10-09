@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
+import { ModeMapChips, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { canField } from '@/lib/bubble-account';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
@@ -92,9 +93,6 @@ const SHOWN_PER_TIER = 8;
  */
 const SHOWN_MAP_PICKS = 10;
 
-/** Where the last-used mode is kept between openings. */
-const STORED_MODE = 'brawlzone.bubble.mode';
-const STORED_MAP = 'brawlzone.bubble.map';
 
 interface BuildItem {
   itemId: number;
@@ -109,17 +107,6 @@ interface BuildResponse {
   gears: BuildItem[];
   starPower: BuildItem | null;
   gadget: BuildItem | null;
-}
-
-/** Writes a preference, or clears it, and never lets storage break the panel. */
-function remember(key: string, value: string | null) {
-  try {
-    if (value === null) window.localStorage.removeItem(key);
-    else window.localStorage.setItem(key, value);
-  } catch {
-    // Private windows and blocked site data both throw. Keeping a choice
-    // between openings is a convenience, never a requirement.
-  }
 }
 
 export function PanelTiers({
@@ -255,88 +242,16 @@ export function PanelTiers({
         Ranked meta · last {windowDays} days
       </p>
 
-      {/*
-        Wraps rather than scrolling sideways. The site can afford a horizontal
-        chip rail because the page scrolls under a finger that started on it;
-        here a sideways scroller sits inside a vertically scrolling panel, and
-        a drag claimed by the wrong axis is what made the panel feel stuck.
-      */}
-      <div role="group" aria-label="Game mode" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
-        {modes.map((mode) => {
-          const on = mode.key === current.key;
-          return (
-            <button
-              key={mode.key ?? 'all'}
-              type="button"
-              onClick={() => choose(mode.key)}
-              aria-pressed={on}
-              className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
-                on
-                  ? 'border-brand/40 bg-brand/10 text-brand'
-                  : 'border-border bg-surface text-muted'
-              }`}
-            >
-              {mode.icon ? (
-                <Image
-                  src={mode.icon}
-                  alt=""
-                  width={16}
-                  height={16}
-                  className={`size-4 shrink-0 object-contain ${on ? '' : 'opacity-80'}`}
-                  unoptimized
-                />
-              ) : null}
-              {mode.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/*
-        The map row, and the reason this panel is worth opening mid-draft.
-
-        A mode is too coarse to draft on: Ranked gives you one map out of that
-        mode's pool and the answer changes with it, so filtering to Knockout
-        still left the reader holding the average of five different maps. The
-        maps only appear once a mode is chosen — the full pool is around thirty,
-        which is more chips than a 375dp-tall window can show without becoming
-        the whole panel.
-      */}
-      {current.maps.length > 0 ? (
-        <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
-          <button
-            type="button"
-            onClick={() => chooseMap(null)}
-            aria-pressed={currentMap === null}
-            className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
-              currentMap === null
-                ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
-                : 'border-border bg-surface text-muted'
-            }`}
-          >
-            All maps
-          </button>
-
-          {current.maps.map((m) => {
-            const on = currentMap?.mapName === m.mapName;
-            return (
-              <button
-                key={m.mapName}
-                type="button"
-                onClick={() => chooseMap(m.mapName)}
-                aria-pressed={on}
-                className={`rounded-md border px-1.5 py-1 font-bold leading-tight transition-colors ${
-                  on
-                    ? 'border-accent-2/50 bg-accent-2/10 text-accent-2'
-                    : 'border-border bg-surface text-muted'
-                }`}
-              >
-                {m.mapName}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+      {/* Shared with Team comp, so both tabs keep the same mode and map. A
+          mode is too coarse to draft on -- Ranked hands you one map out of
+          its pool -- which is why the maps appear once a mode is chosen. */}
+      <ModeMapChips
+        modes={modes}
+        mode={current}
+        map={currentMap?.mapName ?? null}
+        onMode={choose}
+        onMap={chooseMap}
+      />
 
       {currentMap ? (
         <MapPicks
