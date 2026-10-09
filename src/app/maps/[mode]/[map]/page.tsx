@@ -10,6 +10,8 @@ import { MapPickList } from '@/components/maps/map-pick-list';
 import { MapPreview } from '@/components/ranked/map-preview';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { SectionHeading } from '@/components/ui/section-heading';
+import { BrawlerPodium } from '@/components/brawlers/brawler-podium';
+import { MapTrios } from '@/components/maps/map-trios';
 import { currentMonth } from '@/lib/site';
 
 import { formatNumber, formatPercent, minutesSince,
@@ -284,11 +286,28 @@ export default async function MapPage({ params }: PageProps) {
             ) : null
           }
         />
+        {/* The top three as a picture before the list; same component as the
+            tier lists. Only for the map's own ranking, where the order is the
+            map's -- the mode fallback is a weaker answer and keeps the list. */}
+        {hasMapPicks ? (
+          <BrawlerPodium
+            label={`Top three on ${entry.map.name}`}
+            brawlerMeta={brawlerMeta}
+            items={mapPicks!.picks.slice(0, 3).map((p) => ({
+              brawlerId: p.brawlerId,
+              brawlerName: p.brawlerName,
+              headline: formatPercent(p.score),
+              detail: `${p.score - p.overallScore >= 0 ? '+' : '−'}${Math.abs((p.score - p.overallScore) * 100).toFixed(1)} vs usual`,
+            }))}
+          />
+        ) : null}
+        <div className={hasMapPicks ? 'mt-4' : ''}>
         <MapPickList
           picks={hasMapPicks ? mapPicks!.picks : (modePicks?.picks ?? [])}
           brawlerMeta={brawlerMeta}
           emptyLabel={`No sampled battles for ${modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.`}
         />
+        </div>
 
         {hasMapPicks ? (
           <p className="mt-3 text-xs leading-relaxed text-muted">
@@ -299,6 +318,15 @@ export default async function MapPage({ params }: PageProps) {
           </p>
         ) : null}
       </section>
+
+      {entry.scHash ? (
+        <MapTrios
+          mode={entry.scHash}
+          mapName={entry.map.name}
+          modeLabel={modeLabel}
+          brawlerMeta={brawlerMeta}
+        />
+      ) : null}
 
       {matchups.length > 0 ? (
         <section>
