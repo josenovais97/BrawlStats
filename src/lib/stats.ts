@@ -4525,6 +4525,41 @@ async function compute_getRankedComps(limit = 8): Promise<RankedComps> {
 
 export const getRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
 
+/** Letters and digits only, lowercased: "Belle's Rock" and "Belles Rock" agree. */
+export function mapNameKey(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+/**
+ * The map's name as the battle data spells it, from the name a page uses.
+ *
+ * The map catalogue and the game's battle log do not always agree on
+ * punctuation -- the catalogue's "Belles Rock" is "Belle's Rock" in every
+ * battle -- and the per-map reads match names exactly. So the busiest Ranked
+ * map on 2026-10-09 (27,814 battles in two weeks) had a page saying it had
+ * "too few sampled battles to rank on its own". This resolves the page's name
+ * to the data's spelling for the mode, ignoring case and punctuation, and
+ * returns the name unchanged when nothing matches.
+ */
+async function compute_resolveDataMapName(mode: string, name: string): Promise<string> {
+  const prisma = getPrisma();
+  if (!prisma) return name;
+  try {
+    const rows = await prisma.$queryRaw<{ map_name: string }[]>`
+      SELECT DISTINCT map_name FROM battle_daily_stats
+      WHERE mode = ${mode} AND map_name IS NOT NULL
+        AND day >= ${windowStartUtc(60)}
+    `;
+    const key = mapNameKey(name);
+    return rows.find((r) => mapNameKey(r.map_name) === key)?.map_name ?? name;
+  } catch (error) {
+    swallow('compute_resolveDataMapName', error);
+    return name;
+  }
+}
+
+export const resolveDataMapName = cachedRead('data-map-name', compute_resolveDataMapName);
+
 /** A brawler's record on one ladder map, against that map's own average. */
 export interface MapForm {
   brawlerId: number;

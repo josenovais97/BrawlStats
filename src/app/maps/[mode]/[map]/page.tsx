@@ -27,6 +27,7 @@ import {
   getBestPicksByMode,
   getMapMatchups,
   getRankedMapPicks,
+  resolveDataMapName,
 } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import type { ModeBestPicks } from '@/types/stats';
@@ -97,9 +98,14 @@ export default async function MapPage({ params }: PageProps) {
   const accent = entry.mode?.color ?? '#8b95b8';
 
   const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
+  // The battle data's spelling of this map, which can differ from the
+  // catalogue's in punctuation ("Belle's Rock" / "Belles Rock").
+  const dataMapName = entry.scHash
+    ? await resolveDataMapName(entry.scHash, entry.map.name).catch(() => entry.map.name)
+    : entry.map.name;
   // One cached pass covers every map; this picks its own out of it.
   const matchups = await getMapMatchups()
-    .then((byMap) => byMap.get(entry.map.name) ?? [])
+    .then((byMap) => byMap.get(dataMapName) ?? byMap.get(entry.map.name) ?? [])
     .catch(() => []);
   // Layout and environment. The mode is passed so a map name shared across
   // modes cannot pick up the wrong page's description.
@@ -109,7 +115,7 @@ export default async function MapPage({ params }: PageProps) {
   // one connection, and each degrades to empty on its own.
   const mapPicks = entry.scHash
     ? await getRankedMapPicks(PICK_COUNT, RANKED_MAP_WINDOW_DAYS, {
-        mapName: entry.map.name,
+        mapName: dataMapName,
         mode: entry.scHash,
       }).then((rows) => rows[0] ?? null)
     : null;
@@ -323,6 +329,7 @@ export default async function MapPage({ params }: PageProps) {
         <MapTrios
           mode={entry.scHash}
           mapName={entry.map.name}
+          dataMapName={dataMapName}
           modeLabel={modeLabel}
           brawlerMeta={brawlerMeta}
         />

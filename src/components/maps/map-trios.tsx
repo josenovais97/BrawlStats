@@ -23,16 +23,19 @@ const SHOWN = 5;
 export async function MapTrios({
   mode,
   mapName,
+  dataMapName,
   modeLabel,
   brawlerMeta,
 }: {
   mode: string;
   mapName: string;
+  /** The battle data's spelling of the map, which the trios are keyed by. */
+  dataMapName: string;
   modeLabel: string;
   brawlerMeta: Map<number, BABrawler>;
 }) {
   const comps = await getRankedComps().catch(() => ({ maps: [], modes: [] }));
-  const own = comps.maps.find((m) => m.mode === mode && m.mapName === mapName);
+  const own = comps.maps.find((m) => m.mode === mode && m.mapName === dataMapName);
   const fallback = own ? null : comps.modes.find((m) => m.mode === mode);
   const trios = (own?.comps ?? fallback?.comps ?? []).slice(0, SHOWN);
   if (trios.length === 0) return null;
