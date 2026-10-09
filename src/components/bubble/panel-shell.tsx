@@ -42,18 +42,26 @@ export function PanelShell({
   windowDays: number;
   comps: Record<string, PanelModeComps>;
 }) {
-  const [tab, setTab] = useState<Tab>('meta');
+  /*
+   * Nothing until the reader chooses.
+
+   * A first opening used to land on Meta with the full tier list already
+   * drawn -- a wall of brawlers before anyone had said what they wanted. With
+   * no saved choice the panel now asks first; after one tap that choice is
+   * remembered, so every later opening goes straight to it.
+   */
+  const [tab, setTab] = useState<Tab | null>(null);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORED_TAB);
-      if (saved === 'draft' || saved === 'comps') {
+      if (saved === 'meta' || saved === 'draft' || saved === 'comps') {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setTab(saved);
       }
     } catch {
-      // Private windows and blocked site data both throw. Meta is a fine
-      // default; a panel that fails to render is not.
+      // Private windows and blocked site data both throw. The chooser is a
+      // fine outcome; a panel that fails to render is not.
     }
   }, []);
 
@@ -71,9 +79,9 @@ export function PanelShell({
 
   // One open per panel, with the tab it opened on and whether a tag is set --
   // a yes/no, never the tag. Read after the saved tab has been restored.
-  const latest = useRef({ tab, hasTag: account.tag !== null });
+  const latest = useRef({ tab: tab ?? 'none', hasTag: account.tag !== null });
   useEffect(() => {
-    latest.current = { tab, hasTag: account.tag !== null };
+    latest.current = { tab: tab ?? 'none', hasTag: account.tag !== null };
   });
   useEffect(() => panelTrackOpen(() => latest.current), []);
   const filterLabel =
@@ -150,7 +158,34 @@ export function PanelShell({
         ))}
       </div>
 
-      {tab === 'meta' ? (
+      {tab === null ? (
+        <div className="bz-panel mx-1 px-3 py-3">
+          <p className="display text-base uppercase">What do you need?</p>
+          <p className="mt-0.5 text-[11px] text-muted">Pick one. The panel remembers it next time.</p>
+          <ul className="mt-2.5 space-y-2">
+            {(
+              [
+                ['meta', 'Meta', 'Who is strong in Ranked right now, by mode and map'],
+                ['comps', 'Team comp', 'The best three to take together on your map'],
+                ['draft', 'Draft', 'Enter bans and picks, get the counter'],
+              ] as const
+            ).map(([key, label, hint]) => (
+              <li key={key}>
+                <button
+                  type="button"
+                  onClick={() => choose(key)}
+                  className="bz-chip flex w-full flex-col items-start px-3 py-2 text-left"
+                >
+                  <span className="text-[14px] leading-tight">{label}</span>
+                  <span className="mt-0.5 font-sans text-[11px] font-normal leading-snug text-muted [text-shadow:none]">
+                    {hint}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : tab === 'meta' ? (
         <PanelTiers modes={modes} windowDays={windowDays} />
       ) : tab === 'comps' ? (
         <PanelComps modes={modes} comps={comps} />
