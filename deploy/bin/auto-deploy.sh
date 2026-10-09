@@ -188,8 +188,32 @@ fi
 # Capped by SIZE, not age. An age filter is the wrong tool: the variable is how
 # often this repo is pushed, not how old a layer is, and 19 deploys in one day
 # left every layer younger than any sensible cut-off.
+#
+# A full prune past a ceiling, because no cap works on this box. Measured on
+# 2026-10-09: `--max-used-space=4GB`, `--reserved-space=4GB` and
+# `--filter until=24h` each reclaimed 0B with 11.9 GB of cache present (this
+# Docker keeps build cache in the containerd store, where the caps do not
+# apply), while a plain `prune -af` freed 8.85 GB. So the line that ran here
+# since 2026-08 never freed anything, and the health check's emergency prune
+# at 70% was doing all the work.
+#
+# Pruning everything after every deploy would cost every build its cache --
+# minutes of npm and Next on two cores. Past 6 GB is the compromise: builds
+# stay cached most of the time, and the cache can never pass ~7.5 GB (the
+# ceiling plus one build) before it is cleared.
+CACHE_CEILING_MB=6144
 freed=$(docker image prune -f 2>/dev/null | grep -oP 'Total reclaimed space: \K.*' || echo "0B")
-freed_cache=$(docker builder prune -f --max-used-space=4GB 2>/dev/null | grep -oP 'Total:\s*\K.*' || echo "0B")
+cache_mb=$(docker system df --format '{{.Type}}\t{{.Size}}' 2>/dev/null | awk -F'\t' '
+  /Build Cache/ {
+    v = $2; n = v + 0
+    if (v ~ /GB$/) n *= 1024; else if (v ~ /kB$/) n /= 1024; else if (v ~ /[0-9]B$/ && v !~ /[kMG]B$/) n /= 1048576
+    printf "%d", n
+  }')
+if [ "${cache_mb:-0}" -gt "$CACHE_CEILING_MB" ]; then
+  freed_cache=$(docker builder prune -af 2>/dev/null | grep -oP 'Total:\s*\K.*' || echo "0B")
+else
+  freed_cache="0B (cache ${cache_mb:-0} MB, under the ${CACHE_CEILING_MB} MB ceiling)"
+fi
 echo "Reclaimed ${freed} of images and ${freed_cache} of build cache"
 
 echo "Now on $(git log --oneline -1)"
