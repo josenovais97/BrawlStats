@@ -60,8 +60,11 @@ export async function PlayerPushNow({
    * rendered when it exists rather than reserved with a placeholder box.
    */
   const topModeArt = modeMeta.get(top.mode.toLowerCase())?.imageUrl;
+  // By slug, not by lowercased name: the catalogue and the battle log
+  // disagree on apostrophes ("Belles Rock" / "Belle's Rock"), and the slug
+  // drops them -- the same join the map pages' URLs rely on.
   const topMapArt = maps.find(
-    (m) => m.name.toLowerCase() === top.mapName.toLowerCase() && !m.disabled,
+    (m) => slugify(m.name) === slugify(top.mapName) && !m.disabled,
   )?.imageUrl;
   const tint = topArt?.rarity.color ?? 'var(--victory)';
   const topSkin = owned ? skinLabel(owned) : null;
