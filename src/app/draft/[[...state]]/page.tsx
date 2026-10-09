@@ -51,9 +51,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const picked = (state ?? []).length > 0;
 
   return {
-    title: 'Brawl Stars draft helper. Pick against the enemy team',
+    // "Counter picks" and "free": what a drafter types, and the reason to click.
+    title: 'Brawl Stars draft helper: best counter picks for Ranked (free)',
     description:
-      'Pick a Ranked map, name the brawlers the enemy has drafted, and see which brawlers have the best record on that map against that line-up.',
+      'Pick the Ranked map, add the brawlers the enemy has drafted, and get the picks with the best record against that exact line-up on that map. Free, no account.',
     alternates: { canonical: '/draft' },
     ...(picked ? { robots: { index: false, follow: false } } : {}),
   };

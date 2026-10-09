@@ -143,10 +143,19 @@ export async function tierListMetadata(
   const label = humanizeMode(resolved);
 
   return {
-    title: `Best Brawl Stars brawlers for ${label}, ${copy.modeNoun} (${currentMonth()})${windowSuffix}`,
-    description: `Which brawlers win most in ${label}, ranked by meta score from sampled ${
+    /*
+     * The search first. Search Console (to 2026-10-05) had the Gem Grab page
+     * at position 4.8 with 43 impressions and no clicks: the title opened on
+     * "Best Brawl Stars brawlers for", so the words people typed ("best gem
+     * grab brawlers") sat mid-sentence, and it ended on a qualifier nobody
+     * searches for. Now: the answer's name, the month, then what kind of list.
+     */
+    title: `Best ${label} brawlers in Brawl Stars (${currentMonth()}): ${
+      format === 'ranked' ? 'Ranked' : 'ladder'
+    } tier list${windowSuffix}`,
+    description: `The brawlers winning most in ${label} right now, ranked from real ${
       format === 'ranked' ? 'competitive Ranked' : 'trophy-ladder'
-    } battles.`,
+    } battles and refreshed every few hours. See the top picks before your next ${label} game.`,
     alternates: { canonical: tierListHref(format, windowKey, resolved) },
     robots,
   };

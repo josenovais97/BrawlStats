@@ -33,11 +33,11 @@ export const revalidate = 21_600;
 
 export const metadata: Metadata = {
   alternates: { canonical: '/events' },
-  title: 'Brawl Stars community events and rewards',
+  title: 'Brawl Stars community events: every reward, milestone and date',
   description:
-    'Every Brawl Stars community event: the milestones the whole player base had to hit, what each one paid out, and when it ran.',
+    'Every Brawl Stars community event in one place: the milestones the whole player base had to hit, what each one paid out, and when it ran.',
   openGraph: {
-    title: 'Brawl Stars community events and rewards',
+    title: 'Brawl Stars community events: every reward, milestone and date',
     description:
       'Milestones, tasks and rewards for every game-wide community event.',
   },

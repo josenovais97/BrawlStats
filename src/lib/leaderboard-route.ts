@@ -111,9 +111,11 @@ export function resolveLeaderboardRoute(
  */
 const BOARD_COPY: Record<LeaderboardBoard, { title: string; description: string }> = {
   players: {
-    title: 'Brawl Stars leaderboard',
+    // Says what is on the page and answers the question people ask of it
+    // ("who has the most trophies"); the month is appended by the caller.
+    title: 'Brawl Stars leaderboard: top 200 players by trophies',
     description:
-      'The top Brawl Stars players by trophies, from the game API\'s own global ranking, with per-region boards.',
+      'Who has the most trophies in Brawl Stars right now: the global top 200 and every regional board, from the game\'s own official ranking, refreshed every 15 minutes.',
   },
   clubs: {
     title: 'Brawl Stars club leaderboard',
