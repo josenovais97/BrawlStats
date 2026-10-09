@@ -31,6 +31,8 @@ import {
 export interface BubbleAccount {
   tag: string | null;
   name: string | null;
+  /** The player's in-game icon URL, once a roster is known. */
+  iconUrl: string | null;
   filter: OwnedFilter;
   /** Remove what cannot be fielded instead of dimming it. */
   hide: boolean;
@@ -38,7 +40,14 @@ export interface BubbleAccount {
   owned: Map<number, OwnedBrawler> | null;
 }
 
-const NONE: BubbleAccount = { tag: null, name: null, filter: 'all', hide: false, owned: null };
+const NONE: BubbleAccount = {
+  tag: null,
+  name: null,
+  iconUrl: null,
+  filter: 'all',
+  hide: false,
+  owned: null,
+};
 
 function toMap(roster: CachedRoster): Map<number, OwnedBrawler> {
   return new Map(roster.brawlers.map((b) => [b.id, b]));
@@ -67,19 +76,26 @@ export function useBubbleAccount(): BubbleAccount {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAccount(
       cached
-        ? { tag, name: cached.name, filter, hide, owned: toMap(cached) }
-        : { tag, name: null, filter, hide, owned: null },
+        ? { tag, name: cached.name, iconUrl: cached.iconUrl ?? null, filter, hide, owned: toMap(cached) }
+        : { tag, name: null, iconUrl: null, filter, hide, owned: null },
     );
     if (cached && !isStale(cached)) return;
 
     let cancelled = false;
     fetch(`/api/bubble/roster?tag=${encodeURIComponent(tag)}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data: { tag: string; name: string; brawlers: OwnedBrawler[] } | null) => {
+      .then((data: { tag: string; name: string; iconUrl?: string; brawlers: OwnedBrawler[] } | null) => {
         if (cancelled || !data?.brawlers) return;
         const roster: CachedRoster = { ...data, fetchedAt: Date.now() };
         writeRoster(roster);
-        setAccount({ tag, name: data.name, filter, hide, owned: toMap(roster) });
+        setAccount({
+          tag,
+          name: data.name,
+          iconUrl: data.iconUrl ?? null,
+          filter,
+          hide,
+          owned: toMap(roster),
+        });
       })
       .catch(() => {
         /* Keep whatever was cached. A failed refresh is not a reason to stop

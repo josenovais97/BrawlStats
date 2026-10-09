@@ -38,6 +38,8 @@ export interface OwnedBrawler {
 export interface CachedRoster {
   tag: string;
   name: string;
+  /** The player's in-game icon, for the panel's header. Absent on old caches. */
+  iconUrl?: string;
   brawlers: OwnedBrawler[];
   /** When this was fetched, so the panel can refresh it without a timer. */
   fetchedAt: number;

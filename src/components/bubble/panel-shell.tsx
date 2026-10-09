@@ -1,10 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
+import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 
 /**
  * Two views of the same draft, and which one is showing.
@@ -63,8 +65,51 @@ export function PanelShell({
     }
   };
 
+  const account = useBubbleAccount();
+  const filterLabel =
+    account.filter === 'power11' ? 'Power 11' : account.filter === 'hypercharge' ? 'Hypercharged' : 'Owned';
+
   return (
     <>
+      {/*
+        Whose panel this is.
+
+        With a tag set, the player's own icon and name, and the filter in
+        force -- the panel marks and hides brawlers on their behalf, and a
+        face at the top is how they know it is their roster being read and
+        not someone else's. Without one, a single quiet line saying what a tag
+        would add, pointing at the app where it is entered. Never a blocker:
+        the panel works the same either way.
+      */}
+      {account.tag ? (
+        <div className="mb-2 flex items-center gap-2 px-1">
+          {account.iconUrl ? (
+            <Image
+              src={account.iconUrl}
+              alt=""
+              width={28}
+              height={28}
+              className="size-7 shrink-0 rounded-md border border-border bg-surface-2"
+              unoptimized
+            />
+          ) : (
+            <span className="size-7 shrink-0 rounded-md border border-border bg-surface-2" />
+          )}
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="block truncate text-xs font-bold">{account.name ?? `#${account.tag}`}</span>
+            <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
+          </span>
+          <span className="shrink-0 rounded border border-brand/40 bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand">
+            {filterLabel}
+            {account.hide ? ' · hiding rest' : ''}
+          </span>
+        </div>
+      ) : (
+        <p className="mx-1 mb-2 rounded-md border border-dashed border-border px-2 py-1.5 text-[11px] leading-snug text-muted">
+          Add your player tag in the BrawlZone app and this panel marks the brawlers you own.
+        </p>
+      )}
+
       {/*
         Two tabs, sized like the chips below them rather than like a phone's
         tab bar. A full-width segmented control would cost a row of a window
