@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { CrownIcon, TrophyIcon } from '@/components/game-icons';
 import { formatNumber } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
+import { playerLinkRel } from '@/lib/link-rel';
 
 export type BattleTone = 'win' | 'loss' | 'draw';
 
@@ -608,6 +609,7 @@ function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMod
                 <li key={participant.tag}>
                   <Link
                     href={`/player/${normalizeTag(participant.tag)}`}
+                    rel={playerLinkRel(normalizeTag(participant.tag))}
                     prefetch={false}
                     className={`flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-3 ${
                       participant.isSelf ? 'bg-brand/10 ring-1 ring-inset ring-brand/25' : ''

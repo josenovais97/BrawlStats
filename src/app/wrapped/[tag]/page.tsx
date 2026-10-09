@@ -11,6 +11,7 @@ import { computeBattleInsights } from '@/lib/battle-insights';
 import { getBattleLog, getPlayer } from '@/lib/bs-api';
 import { displayTag, normalizeTag } from '@/lib/tags';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
+import { playerLinkRel } from '@/lib/link-rel';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -64,6 +65,7 @@ export default async function WrappedPage({ params }: PageProps) {
         eyebrow={
           <Link
             href={`/player/${normalizeTag(player.tag)}`}
+            rel={playerLinkRel(normalizeTag(player.tag))}
             className="transition-colors hover:text-foreground"
           >
             {player.name}

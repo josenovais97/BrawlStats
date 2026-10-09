@@ -12,6 +12,7 @@ import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, humanizeRole, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSClubMember, BSClubRole } from '@/types/brawlstars';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /** Higher is more senior — drives the default ordering and badge styling. */
 const ROLE_WEIGHT: Record<string, number> = {
@@ -107,6 +108,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
+                  rel={playerLinkRel(normalizeTag(member.tag))}
                 prefetch={false}
                   className="card card-interactive flex items-center gap-3 p-3"
                 >

@@ -10,6 +10,7 @@ import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /**
  * The hero, as a command centre.
@@ -194,6 +195,7 @@ function Console() {
                 No tag handy?{' '}
                 <Link
                   href={`/player/${SAMPLE_PLAYER_TAG}`}
+                  rel={playerLinkRel(SAMPLE_PLAYER_TAG)}
                   className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
                 >
                   Try a sample profile

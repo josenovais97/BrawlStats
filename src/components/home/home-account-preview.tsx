@@ -12,6 +12,7 @@ import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /**
  * The flagship section: what BrawlZone actually does with a tag.
@@ -161,6 +162,7 @@ export async function HomeAccountPreview() {
 
           <Link
             href={`/player/${SAMPLE_PLAYER_TAG}`}
+            rel={playerLinkRel(SAMPLE_PLAYER_TAG)}
             className="group mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border-strong/70 bg-surface px-4 text-sm font-bold transition-colors hover:border-brand/60 hover:text-brand"
           >
             See a complete example

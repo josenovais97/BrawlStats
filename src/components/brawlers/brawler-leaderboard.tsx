@@ -14,6 +14,7 @@ import { getBrawlerRankings } from '@/lib/bs-api';
 const RANKING_REVALIDATE = 21600;
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /** Global top players ranked by trophies on this specific brawler. */
 export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
@@ -42,6 +43,7 @@ export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
         <li key={player.tag}>
           <Link
             href={`/player/${normalizeTag(player.tag)}`}
+            rel={playerLinkRel(normalizeTag(player.tag))}
                 prefetch={false}
             className="card card-interactive flex items-center gap-4 p-3"
           >

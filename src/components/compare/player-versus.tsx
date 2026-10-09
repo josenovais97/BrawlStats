@@ -7,6 +7,7 @@ import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, nameColorToCss, titleCaseLabel } from '@/lib/format';
 import type { CompareOutcome, PlayerSide } from '@/lib/player-compare';
 import { displayTag } from '@/lib/tags';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /**
  * Two accounts side by side.
@@ -174,6 +175,7 @@ function Identity({ side, align }: { side: PlayerSide; align: 'start' | 'end' })
   return (
     <Link
       href={`/player/${side.tag}`}
+      rel={playerLinkRel(side.tag)}
       className={`flex min-w-0 items-center gap-2.5 ${
         align === 'end' ? 'flex-row-reverse text-right' : 'text-left'
       }`}

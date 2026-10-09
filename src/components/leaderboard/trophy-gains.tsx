@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { TrophyIcon } from '@/components/game-icons';
 import { formatNumber } from '@/lib/format';
 import { getTrophyGains } from '@/lib/stats';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /** Podium colours for the first three. Everything below is neutral. */
 const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
@@ -94,6 +95,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
               />
               <Link
                 href={`/player/${player.tag}`}
+                rel={playerLinkRel(player.tag)}
                 prefetch={false}
                 className="row-interactive relative flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
               >

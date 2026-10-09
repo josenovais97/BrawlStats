@@ -7,6 +7,7 @@ import { playerIconUrl, rankedLeagueIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import { getRankedLeaderboard } from '@/lib/stats';
 import { displayTag } from '@/lib/tags';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /**
  * Top players by Ranked elo.
@@ -56,6 +57,7 @@ export async function RankedBoard() {
             <li key={player.tag}>
               <Link
                 href={`/player/${player.tag}`}
+                rel={playerLinkRel(player.tag)}
                 prefetch={false}
                 className="row-interactive flex items-center gap-3 rounded-xl p-2.5"
               >

@@ -18,6 +18,7 @@ import { toApiError } from '@/lib/errors';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { regionName } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
+import { CLUB_LINK_REL, playerLinkRel } from '@/lib/link-rel';
 
 /**
  * Must match `revalidate` on the three leaderboard routes.
@@ -121,6 +122,7 @@ async function PlayerBoard({ region }: { region: string }) {
           <li key={player.tag}>
             <Link
               href={`/player/${normalizeTag(player.tag)}`}
+              rel={playerLinkRel(normalizeTag(player.tag))}
                 prefetch={false}
               className="card card-interactive flex items-center gap-3 p-3"
             >
@@ -182,6 +184,7 @@ async function ClubBoard({ region }: { region: string }) {
           <li key={club.tag}>
             <Link
               href={`/club/${normalizeTag(club.tag)}`}
+              rel={CLUB_LINK_REL}
                 prefetch={false}
               className="card card-interactive flex items-center gap-3 p-3"
             >

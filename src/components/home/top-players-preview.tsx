@@ -6,6 +6,7 @@ import { getPlayerRankings } from '@/lib/bs-api';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /** Podium colours for the first three rows. Everything below is neutral. */
 const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
@@ -50,6 +51,7 @@ export async function TopPlayersPreview({
           <li key={player.tag}>
             <Link
               href={`/player/${tag}`}
+              rel={playerLinkRel(tag)}
                 prefetch={false}
               className="row-interactive flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
             >

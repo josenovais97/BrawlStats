@@ -10,6 +10,7 @@ import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, humanizeRole } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSClub, BSClubMember } from '@/types/brawlstars';
+import { playerLinkRel } from '@/lib/link-rel';
 
 /** Roster composition, trophy spread and eligibility, derived from the member list. */
 export function ClubInsights({ club }: { club: BSClub }) {
@@ -130,6 +131,7 @@ export function ClubInsights({ club }: { club: BSClub }) {
               <li key={member.tag}>
                 <Link
                   href={`/player/${normalizeTag(member.tag)}`}
+                  rel={playerLinkRel(normalizeTag(member.tag))}
                 prefetch={false}
                   className="flex items-center gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
                 >

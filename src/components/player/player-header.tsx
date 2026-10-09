@@ -14,6 +14,7 @@ import { formatNumber, nameColorToCss, titleCaseLabel } from '@/lib/format';
 import { ShareButton } from '@/components/player/share-button';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
+import { CLUB_LINK_REL } from '@/lib/link-rel';
 
 export function PlayerHeader({
   player,
@@ -253,6 +254,7 @@ export function PlayerHeader({
           {player.club?.tag ? (
             <Link
               href={`/club/${normalizeTag(player.club.tag)}`}
+              rel={CLUB_LINK_REL}
               className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium transition-colors hover:border-accent/60 hover:text-foreground"
             >
               <ClubIcon className="size-4 shrink-0" />
