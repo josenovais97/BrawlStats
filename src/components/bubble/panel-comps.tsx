@@ -3,10 +3,12 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
 import { ModeMapChips, recall, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
 import type { PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { canField } from '@/lib/bubble-account';
+import { panelTrack } from '@/lib/panel-telemetry';
 
 /** One trio as the panel draws it. */
 export interface PanelComp {
@@ -56,6 +58,8 @@ export function PanelComps({
   const [onlyMine, setOnlyMine] = useState(false);
 
   const account = useBubbleAccount();
+  // Tap any brawler in a trio for its build: the same card the Meta tab opens.
+  const { open, build, cardRef, toggle } = useBuildCard<PanelComp['brawlers'][number]>();
   const owns = (id: number) => account.owned !== null && canField(account.owned, id, account.filter);
 
   // Same saved mode and map as the Meta tab: the draft is on one map, and
@@ -105,6 +109,7 @@ export function PanelComps({
           remember(STORED_MAP, null);
         }}
         onMap={(name) => {
+          if (name) panelTrack('panel_map', { tab: 'comps', mode: current.key ?? 'all', map: name });
           setMap(name);
           remember(STORED_MAP, name);
         }}
@@ -122,7 +127,10 @@ export function PanelComps({
           <input
             type="checkbox"
             checked={onlyMine}
-            onChange={(e) => setOnlyMine(e.target.checked)}
+            onChange={(e) => {
+              setOnlyMine(e.target.checked);
+              panelTrack('panel_comps_mine', { on: e.target.checked });
+            }}
             className="size-3.5 accent-[var(--brand)]"
           />
           Only trios I can run
@@ -152,7 +160,21 @@ export function PanelComps({
 
                 <span className="flex shrink-0 -space-x-1">
                   {comp.brawlers.map((b) => (
-                    <span key={b.brawlerId} className="relative" title={b.brawlerName}>
+                    <button
+                      key={b.brawlerId}
+                      type="button"
+                      onClick={() => {
+                        if (open?.brawlerId !== b.brawlerId) {
+                          panelTrack('panel_build', { tab: 'comps', brawler: b.brawlerName });
+                        }
+                        toggle(b);
+                      }}
+                      aria-pressed={open?.brawlerId === b.brawlerId}
+                      aria-label={`${b.brawlerName}: show build`}
+                      className={`relative rounded-md ${
+                        open?.brawlerId === b.brawlerId ? 'z-10 ring-2 ring-brand' : ''
+                      }`}
+                    >
                       <Image
                         src={b.imageUrl}
                         alt={b.brawlerName}
@@ -172,7 +194,7 @@ export function PanelComps({
                           ✓
                         </span>
                       ) : null}
-                    </span>
+                    </button>
                   ))}
                 </span>
 
@@ -207,6 +229,11 @@ export function PanelComps({
           })}
         </ol>
       )}
+
+      {shown.length > 0 ? (
+        <p className="px-2 pt-2 text-center text-[10px] text-muted">Tap a brawler for its build.</p>
+      ) : null}
+      {open ? <BuildCard ref={cardRef} entry={open} build={build} /> : null}
     </>
   );
 }

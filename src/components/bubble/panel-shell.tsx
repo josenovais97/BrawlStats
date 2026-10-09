@@ -1,12 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
+import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 
 /**
  * Two views of the same draft, and which one is showing.
@@ -57,6 +58,7 @@ export function PanelShell({
   }, []);
 
   const choose = (next: Tab) => {
+    if (next !== tab) panelTrack('panel_tab', { tab: next });
     setTab(next);
     try {
       window.localStorage.setItem(STORED_TAB, next);
@@ -66,6 +68,14 @@ export function PanelShell({
   };
 
   const account = useBubbleAccount();
+
+  // One open per panel, with the tab it opened on and whether a tag is set --
+  // a yes/no, never the tag. Read after the saved tab has been restored.
+  const latest = useRef({ tab, hasTag: account.tag !== null });
+  useEffect(() => {
+    latest.current = { tab, hasTag: account.tag !== null };
+  });
+  useEffect(() => panelTrackOpen(() => latest.current), []);
   const filterLabel =
     account.filter === 'power11' ? 'Power 11' : account.filter === 'hypercharge' ? 'Hypercharged' : 'Owned';
 

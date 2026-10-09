@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 import { recall, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
+import { panelTrack } from '@/lib/panel-telemetry';
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 
 /**
@@ -224,6 +225,7 @@ export function PanelDraft({
     // Shared with the other tabs, so the map picked here is the one they open on.
     remember(STORED_MODE, m.mode);
     remember(STORED_MAP, m.mapName);
+    panelTrack('panel_map', { tab: 'draft', mode: m.mode, map: m.mapName });
     // Cleared here rather than in the effect: a new map invalidates the old
     // answer, and that is a consequence of the tap, not of the fetch.
     setPicks(null);
