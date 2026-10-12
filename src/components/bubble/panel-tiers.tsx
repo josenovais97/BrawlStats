@@ -4,7 +4,8 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
-import { ModeMapChips, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
+import { ModeMapChips, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
+import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import { panelTrack } from '@/lib/panel-telemetry';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { canField } from '@/lib/bubble-account';
@@ -113,6 +114,8 @@ export function PanelTiers({
    * every list then renders exactly as it always did.
    */
   const account = useBubbleAccount();
+  const { t } = usePanelI18n();
+  const modeName = useModeLabel();
   const fieldable = (id: number) =>
     account.owned === null || canField(account.owned, id, account.filter);
   /* Only ever true with an account configured, so the unconfigured panel is
@@ -199,7 +202,8 @@ export function PanelTiers({
       {/* Belongs to this view, not to the panel: the draft board is not a
           seven-day average of anything, and the heading said so anyway. */}
       <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
-        Ranked meta <span className="text-[11px] text-muted">· last {windowDays} days</span>
+        {t('meta.heading')}{' '}
+        <span className="text-[11px] text-muted">· {t('common.lastDays', { n: windowDays })}</span>
       </p>
 
       {/* Shared with Team comp, so both tabs keep the same mode and map. A
@@ -225,7 +229,7 @@ export function PanelTiers({
         />
       ) : current.entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
-          Not enough sampled Ranked battles in {current.label.toLowerCase()} yet.
+          {t('meta.emptyMode', { mode: modeName(current) })}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -270,6 +274,7 @@ function TierStrip({
   hiding: boolean;
 }) {
   const color = TIER_COLOR[tier];
+  const { name } = usePanelI18n();
 
   /*
    * Hiding filters the row, and the count beside the tier letter counts what
@@ -315,7 +320,7 @@ function TierStrip({
                   today is a thing they might want to see. */}
               <Image
                 src={entry.imageUrl}
-                alt={entry.brawlerName}
+                alt={name(entry.brawlerName)}
                 width={40}
                 height={40}
                 className={`size-10 rounded-lg bg-surface-2 transition-shadow ${
@@ -324,8 +329,8 @@ function TierStrip({
                 loading="lazy"
                 unoptimized
               />
-              <p className="truncate text-[9px] font-semibold capitalize leading-tight">
-                {entry.brawlerName.toLowerCase()}
+              <p className="truncate text-[9px] font-semibold leading-tight">
+                {name(entry.brawlerName)}
               </p>
               <p className="text-[10px] font-black tabular-nums leading-none" style={{ color }}>
                 {entry.metaScore?.toFixed(1) ?? '–'}
@@ -397,12 +402,12 @@ function MapPicks({
    * different question from the one it is named after.
    */
   const [tab, setTab] = useState<'picks' | 'bans'>('picks');
+  const { t, name } = usePanelI18n();
 
   if (map.picks.length === 0) {
     return (
       <p className="px-2 py-6 text-center text-xs leading-relaxed text-muted">
-        No brawler is clearly above average on {map.mapName} yet. It fills in as the sampler
-        works through more battles here.
+        {t('meta.emptyMap', { map: name(map.mapName) })}
       </p>
     );
   }
@@ -440,21 +445,20 @@ function MapPicks({
             setExpanded(false);
           }}
           aria-pressed={tab === key}
-          className={`flex-1 rounded-lg px-2 py-1 text-[11px] font-bold capitalize transition-colors ${
+          className={`flex-1 rounded-lg px-2 py-1 text-[11px] font-bold transition-colors ${
             tab === key
               ? 'bg-brand text-[#0b0f1d]'
               : 'bg-surface-2 text-muted hover:text-foreground'
           }`}
         >
-          {key === 'bans' ? 'Ban' : 'Pick'}
+          {key === 'bans' ? t('meta.ban') : t('meta.pick')}
         </button>
       ))}
     </div>
 
     {tab === 'bans' ? (
       <p className="mb-1.5 px-1 text-[10px] font-semibold leading-tight text-muted">
-        Strongest here, whoever owns them. The pick rate is how often it is
-        actually taken — banning something nobody picks spends the ban for nothing.
+        {t('meta.banExplain')}
       </p>
     ) : null}
 
@@ -462,13 +466,11 @@ function MapPicks({
       <p className="mb-1.5 px-1 text-[10px] font-semibold leading-tight text-muted">
         {best ? (
           <>
-            Your best here:{' '}
-            <span className="font-black capitalize text-brand">
-              {best.brawlerName.toLowerCase()}
-            </span>
+            {t('meta.yourBest')}{' '}
+            <span className="font-black text-brand">{name(best.brawlerName)}</span>
           </>
         ) : (
-          'Nothing on this map matches your filter.'
+          t('meta.noneMatch')
         )}
       </p>
     ) : null}
@@ -490,7 +492,7 @@ function MapPicks({
                 })
               }
               aria-pressed={openId === pick.brawlerId}
-              className="flex w-full items-center gap-2 px-2 py-1.5 text-left"
+              className="flex w-full items-center gap-2 px-2 py-1.5 text-start"
             >
               <span
                 aria-hidden
@@ -520,8 +522,8 @@ function MapPicks({
               />
 
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-bold capitalize leading-tight">
-                  {pick.brawlerName.toLowerCase()}
+                <span className="block truncate text-xs font-bold leading-tight">
+                  {name(pick.brawlerName)}
                 </span>
                 {/* Sample size is never hidden: on a per-map split it is the
                     difference between a signal and a coin flip. */}
@@ -531,12 +533,12 @@ function MapPicks({
                     there" when banning. */}
                 <span className="block text-[10px] tabular-nums leading-tight text-muted">
                   {tab === 'bans'
-                    ? `${(pick.pickRate * 100).toFixed(1)}% picked here`
-                    : `${pick.battles} battles here`}
+                    ? t('meta.pickedHere', { n: (pick.pickRate * 100).toFixed(1) })
+                    : t('meta.battlesHere', { n: pick.battles })}
                 </span>
               </span>
 
-              <span className="shrink-0 text-right">
+              <span className="shrink-0 text-end">
                 <span className="block text-[11px] font-black tabular-nums leading-tight text-victory">
                   {(pick.score * 100).toFixed(1)}%
                 </span>
@@ -545,8 +547,9 @@ function MapPicks({
                     edge >= 0.005 ? 'text-victory/80' : 'text-muted'
                   }`}
                 >
-                  {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
-                  {Math.abs(edge * 100).toFixed(1)} vs usual
+                  {t('meta.vsUsual', {
+                    n: `${edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}${Math.abs(edge * 100).toFixed(1)}`,
+                  })}
                 </span>
               </span>
             </button>
@@ -561,7 +564,7 @@ function MapPicks({
         onClick={() => setExpanded(true)}
         className="bz-chip mt-2 w-full px-2 py-1.5 text-[12px]"
       >
-        Show {hidden} more
+        {t('meta.showMore', { n: hidden })}
       </button>
     ) : null}
     </>

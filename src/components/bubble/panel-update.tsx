@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 import { DownloadButton } from "@/components/bubble/download-button";
+import { usePanelI18n } from "@/components/bubble/panel-i18n";
 import { type BubbleRelease } from "@/lib/bubble-app";
 
 /**
@@ -36,6 +37,7 @@ export function PanelUpdate({
   changes: BubbleRelease[];
 }) {
   const hash = useSyncExternalStore(subscribe, snapshot, () => null);
+  const { t, tx } = usePanelI18n();
 
   // Null on the server and on the first paint; nothing is drawn until the
   // client can actually answer the question.
@@ -59,8 +61,8 @@ export function PanelUpdate({
    */
   if (running !== null && running >= latestVersionCode) {
     return (
-      <p className="mb-1.5 px-1 text-right text-[10px] text-muted/70">
-        App {latestVersion} · up to date
+      <p className="mb-1.5 px-1 text-end text-[10px] text-muted/70">
+        {t("update.upToDate", { version: latestVersion })}
       </p>
     );
   }
@@ -99,10 +101,10 @@ export function PanelUpdate({
           glance — and if it ever really is stuck, that is visible too.
         */}
         <p className="text-xs font-bold text-brand">
-          Version {latestVersion} is out
+          {t("update.isOut", { version: latestVersion })}
           {runningName ? (
-            <span className="ml-1.5 font-semibold text-muted">
-              — you have {runningName}
+            <span className="ms-1.5 font-semibold text-muted">
+              {t("update.youHave", { version: runningName })}
             </span>
           ) : null}
         </p>
@@ -111,7 +113,7 @@ export function PanelUpdate({
           from="panel"
           className="shrink-0 rounded-lg bg-brand px-2.5 py-1 text-[11px] font-bold text-brand-ink"
         >
-          Download
+          {t("update.download")}
         </DownloadButton>
       </div>
 
@@ -125,12 +127,13 @@ export function PanelUpdate({
         that would have caught a day of stale updates.
       */}
       <p className="px-3 pb-2 text-[11px] leading-snug text-muted">
-        If nothing happens, open{" "}
-        <span className="font-semibold text-foreground">
-          brawlzone.net/bubble
-        </span>{" "}
-        in your browser. Either way the file is named for its version, so you
-        can check what you are installing.
+        {tx("update.fallback", {
+          url: (
+            <span className="font-semibold text-foreground">
+              brawlzone.net/bubble
+            </span>
+          ),
+        })}
       </p>
 
       {lines.length > 0 ? (

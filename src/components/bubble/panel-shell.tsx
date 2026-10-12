@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
+import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
@@ -76,16 +77,22 @@ export function PanelShell({
   };
 
   const account = useBubbleAccount();
+  const { t, lang } = usePanelI18n();
 
   // One open per panel, with the tab it opened on and whether a tag is set --
   // a yes/no, never the tag. Read after the saved tab has been restored.
-  const latest = useRef({ tab: tab ?? 'none', hasTag: account.tag !== null });
+  // The language too, so the dashboard says which ones are actually used.
+  const latest = useRef({ tab: tab ?? 'none', hasTag: account.tag !== null, lang });
   useEffect(() => {
-    latest.current = { tab: tab ?? 'none', hasTag: account.tag !== null };
+    latest.current = { tab: tab ?? 'none', hasTag: account.tag !== null, lang };
   });
   useEffect(() => panelTrackOpen(() => latest.current), []);
   const filterLabel =
-    account.filter === 'power11' ? 'Power 11' : account.filter === 'hypercharge' ? 'Hypercharged' : 'Owned';
+    account.filter === 'power11'
+      ? t('filter.power11')
+      : account.filter === 'hypercharge'
+        ? t('filter.hypercharge')
+        : t('filter.owned');
 
   return (
     <>
@@ -99,6 +106,8 @@ export function PanelShell({
         would add, pointing at the app where it is entered. Never a blocker:
         the panel works the same either way.
       */}
+      {/* Relative, so the language list opens over the panel under it. */}
+      <div className="relative">
       {account.tag ? (
         <div className="bz-panel mx-1 mb-2.5 flex items-center gap-2 px-2 py-1.5">
           {account.iconUrl ? (
@@ -119,14 +128,19 @@ export function PanelShell({
           </span>
           <span className="bz-chip-on shrink-0 px-1.5 py-0.5 text-[10px]">
             {filterLabel}
-            {account.hide ? ' · hiding rest' : ''}
+            {account.hide ? ` · ${t('filter.hiding')}` : ''}
           </span>
+          <LanguagePicker />
         </div>
       ) : (
-        <p className="mx-1 mb-2 rounded-md border border-dashed border-border px-2 py-1.5 text-[11px] leading-snug text-muted">
-          Add your player tag in the BrawlZone app and this panel marks the brawlers you own.
-        </p>
+        <div className="mx-1 mb-2 flex items-start gap-2">
+          <p className="flex-1 rounded-md border border-dashed border-border px-2 py-1.5 text-[11px] leading-snug text-muted">
+            {t('account.noTag')}
+          </p>
+          <LanguagePicker />
+        </div>
       )}
+      </div>
 
       {/*
         Two tabs, sized like the chips below them rather than like a phone's
@@ -136,9 +150,9 @@ export function PanelShell({
       <div role="tablist" aria-label="Panel view" className="mb-2.5 flex gap-1.5 px-1">
         {(
           [
-            ['meta', 'Meta'],
-            ['comps', 'Team comp'],
-            ['draft', 'Draft'],
+            ['meta', t('tab.meta')],
+            ['comps', t('tab.comps')],
+            ['draft', t('tab.draft')],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -160,21 +174,21 @@ export function PanelShell({
 
       {tab === null ? (
         <div className="bz-panel mx-1 px-3 py-3">
-          <p className="display text-base uppercase">What do you need?</p>
-          <p className="mt-0.5 text-[11px] text-muted">Pick one. The panel remembers it next time.</p>
+          <p className="display text-base uppercase">{t('chooser.title')}</p>
+          <p className="mt-0.5 text-[11px] text-muted">{t('chooser.sub')}</p>
           <ul className="mt-2.5 space-y-2">
             {(
               [
-                ['meta', 'Meta', 'Who is strong in Ranked right now, by mode and map'],
-                ['comps', 'Team comp', 'The best three to take together on your map'],
-                ['draft', 'Draft', 'Enter bans and picks, get the counter'],
+                ['meta', t('tab.meta'), t('chooser.meta')],
+                ['comps', t('tab.comps'), t('chooser.comps')],
+                ['draft', t('tab.draft'), t('chooser.draft')],
               ] as const
             ).map(([key, label, hint]) => (
               <li key={key}>
                 <button
                   type="button"
                   onClick={() => choose(key)}
-                  className="bz-chip flex w-full flex-col items-start px-3 py-2 text-left"
+                  className="bz-chip flex w-full flex-col items-start px-3 py-2 text-start"
                 >
                   <span className="text-[14px] leading-tight">{label}</span>
                   <span className="mt-0.5 font-sans text-[11px] font-normal leading-snug text-muted [text-shadow:none]">

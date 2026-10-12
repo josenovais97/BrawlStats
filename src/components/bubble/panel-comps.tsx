@@ -4,7 +4,8 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
-import { ModeMapChips, recall, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
+import { ModeMapChips, recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
+import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { canField } from '@/lib/bubble-account';
@@ -58,6 +59,8 @@ export function PanelComps({
   const [onlyMine, setOnlyMine] = useState(false);
 
   const account = useBubbleAccount();
+  const { t, tx, name } = usePanelI18n();
+  const modeName = useModeLabel();
   // Tap any brawler in a trio for its build: the same card the Meta tab opens.
   const { open, build, cardRef, toggle } = useBuildCard<PanelComp['brawlers'][number]>();
   const owns = (id: number) => account.owned !== null && canField(account.owned, id, account.filter);
@@ -78,7 +81,7 @@ export function PanelComps({
   if (pickable.length === 0) {
     return (
       <p className="px-2 py-6 text-center text-xs text-muted">
-        Not enough sampled Ranked teams yet. This fills in as the sampler runs.
+        {t('comps.empty')}
       </p>
     );
   }
@@ -93,14 +96,15 @@ export function PanelComps({
   return (
     <>
       <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
-        Best Ranked trios <span className="text-[11px] text-muted">· last 14 days</span>
+        {t('comps.heading')}{' '}
+        <span className="text-[11px] text-muted">· {t('common.lastDays', { n: 14 })}</span>
       </p>
 
       <ModeMapChips
         modes={pickable}
         mode={current}
         map={map}
-        allMapsLabel="Whole mode"
+        allMapsLabel={t('chips.wholeMode')}
         hasData={(name) => Boolean(data.maps[name])}
         onMode={(key) => {
           setActive(key);
@@ -117,8 +121,10 @@ export function PanelComps({
 
       {fellBack ? (
         <p className="bz-panel mx-1 mb-2 px-2 py-1.5 text-[11px] leading-snug text-muted">
-          Not enough Ranked games on <span className="font-bold text-foreground">{map}</span> yet.
-          Showing the best trios across {current.label}.
+          {tx('comps.fellBack', {
+            map: <span className="font-bold text-foreground">{name(map ?? '')}</span>,
+            mode: modeName(current),
+          })}
         </p>
       ) : null}
 
@@ -133,15 +139,15 @@ export function PanelComps({
             }}
             className="size-3.5 accent-[var(--brand)]"
           />
-          Only trios I can run
+          {t('comps.onlyMine')}
         </label>
       ) : null}
 
       {shown.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
           {onlyMine
-            ? 'None of these trios is fully in your roster yet.'
-            : `Not enough sampled Ranked teams in ${current.label} yet.`}
+            ? t('comps.noneMine')
+            : t('comps.emptyMode', { mode: modeName(current) })}
         </p>
       ) : (
         <ol className="space-y-1.5 px-1">
@@ -168,14 +174,14 @@ export function PanelComps({
                         toggle(b);
                       }}
                       aria-pressed={open?.brawlerId === b.brawlerId}
-                      aria-label={`${b.brawlerName}: show build`}
+                      aria-label={t('comps.showBuild', { name: name(b.brawlerName) })}
                       className={`relative rounded-md ${
                         open?.brawlerId === b.brawlerId ? 'z-10 ring-2 ring-brand' : ''
                       }`}
                     >
                       <Image
                         src={b.imageUrl}
-                        alt={b.brawlerName}
+                        alt={name(b.brawlerName)}
                         width={36}
                         height={36}
                         className={`size-9 rounded-lg border-2 border-[#050a1f] bg-surface-2 object-cover ${
@@ -186,8 +192,8 @@ export function PanelComps({
                       />
                       {owns(b.brawlerId) ? (
                         <span
-                          aria-label="You own this brawler"
-                          className="absolute -bottom-0.5 -right-0.5 grid size-3.5 place-items-center rounded-full bg-victory text-[9px] font-black leading-none text-background"
+                          aria-label={t('comps.ownThis')}
+                          className="absolute -bottom-0.5 -end-0.5 grid size-3.5 place-items-center rounded-full bg-victory text-[9px] font-black leading-none text-background"
                         >
                           ✓
                         </span>
@@ -198,20 +204,22 @@ export function PanelComps({
 
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[11px] font-bold leading-tight">
-                    {comp.brawlers.map((b) => b.brawlerName).join(' · ')}
+                    {comp.brawlers.map((b) => name(b.brawlerName)).join(' · ')}
                   </span>
                   <span className="mt-0.5 flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[10px] leading-tight text-muted">
-                    <span className="tabular-nums">{comp.battles} games</span>
+                    <span className="tabular-nums">{t('comps.games', { n: comp.battles })}</span>
                     {comp.battles < THIN ? (
-                      <span className="rounded bg-surface-2 px-1 font-bold">thin sample</span>
+                      <span className="rounded bg-surface-2 px-1 font-bold">{t('comps.thin')}</span>
                     ) : null}
                     {mine ? (
-                      <span className="bz-chip-on shrink-0 px-1.5 py-px text-[9px]" title="You own all three">✓ Yours</span>
+                      <span className="bz-chip-on shrink-0 px-1.5 py-px text-[9px]" title={t('comps.ownAll')}>
+                        {t('comps.yours')}
+                      </span>
                     ) : null}
                   </span>
                 </span>
 
-                <span className="shrink-0 text-right leading-tight">
+                <span className="shrink-0 text-end leading-tight">
                   <span className="display block text-lg leading-none tabular-nums">
                     {Math.round(comp.winRate * 100)}%
                   </span>
@@ -220,8 +228,9 @@ export function PanelComps({
                       comp.edge >= 0 ? 'text-victory' : 'text-defeat'
                     }`}
                   >
-                    {comp.edge >= 0 ? '+' : '−'}
-                    {Math.abs(comp.edge * 100).toFixed(1)} vs avg
+                    {t('comps.vsAvg', {
+                      n: `${comp.edge >= 0 ? '+' : '−'}${Math.abs(comp.edge * 100).toFixed(1)}`,
+                    })}
                   </span>
                 </span>
               </li>
@@ -231,7 +240,7 @@ export function PanelComps({
       )}
 
       {shown.length > 0 ? (
-        <p className="px-2 pt-2 text-center text-[10px] text-muted">Tap a brawler for its build.</p>
+        <p className="px-2 pt-2 text-center text-[10px] text-muted">{t('comps.tapBuild')}</p>
       ) : null}
       {open ? <BuildCard ref={cardRef} entry={open} build={build} /> : null}
     </>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import type { DraftBrawler } from '@/components/bubble/panel-draft';
 import type { PanelComp, PanelModeComps } from '@/components/bubble/panel-comps';
+import { PanelI18nProvider, PanelRoot, PanelText } from '@/components/bubble/panel-i18n';
 import { PanelShell } from '@/components/bubble/panel-shell';
 import type { PanelEntry, PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 import { PanelUpdate } from '@/components/bubble/panel-update';
@@ -213,7 +214,11 @@ export default async function BubblePanelPage() {
         body > div > main { padding: 0 !important; max-width: none !important; }
       `}</style>
 
-      <div className="bz-screen min-h-dvh px-2 py-2">
+      {/* The language is applied in the client: this page is one cached URL
+          for every player, so it renders in English and the provider swaps in
+          the chosen language's strings and the game's own names. */}
+      <PanelI18nProvider>
+      <PanelRoot>
         {/* Above the list, because an out-of-date app is the one thing here
             that the numbers below cannot tell you about themselves. */}
         <PanelUpdate
@@ -224,7 +229,7 @@ export default async function BubblePanelPage() {
 
         {modes[0].entries.length === 0 ? (
           <p className="px-2 py-8 text-center text-sm text-muted">
-            Not enough sampled Ranked battles yet. This fills in as the sampler runs.
+            <PanelText k="page.empty" />
           </p>
         ) : (
           <PanelShell modes={modes} roster={roster} windowDays={WINDOW_DAYS} comps={comps} />
@@ -232,10 +237,10 @@ export default async function BubblePanelPage() {
 
 
         <p className="px-2 pb-2 pt-4 text-center text-[11px] leading-relaxed text-muted">
-          Meta score combines adjusted win rate and pick rate across sampled Ranked battles.
-          Brawlers below the sample floor are left out rather than guessed at.
+          <PanelText k="page.footer" />
         </p>
-      </div>
+      </PanelRoot>
+      </PanelI18nProvider>
     </>
   );
 }

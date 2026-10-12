@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
+import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { PanelMode } from '@/components/bubble/panel-tiers';
 
 /** Where the last-used mode and map are kept between openings, for every tab. */
@@ -18,6 +19,12 @@ export function remember(key: string, value: string | null) {
     // Private windows and blocked site data both throw. Keeping a choice
     // between openings is a convenience, never a requirement.
   }
+}
+
+/** A mode's name in the panel's language: the game's word, or "All". */
+export function useModeLabel(): (mode: Pick<PanelMode, 'key' | 'label'>) => string {
+  const { t, name } = usePanelI18n();
+  return (mode) => (mode.key === null ? t('mode.all') : name(mode.label));
 }
 
 /** The saved mode and map, or nulls; never throws. */
@@ -54,7 +61,7 @@ export function ModeMapChips({
   map,
   onMode,
   onMap,
-  allMapsLabel = 'All maps',
+  allMapsLabel,
   hasData,
 }: {
   modes: PanelMode[];
@@ -67,13 +74,18 @@ export function ModeMapChips({
   hasData?: (mapName: string) => boolean;
 }) {
   const [changing, setChanging] = useState(false);
+  const { t, name, lang } = usePanelI18n();
+  const modeName = useModeLabel();
+  // Alphabetical in the reader's language, so the chips read in order. The
+  // server sorts by the English name, which is no order at all in Japanese.
+  const maps = [...mode.maps].sort((a, b) => name(a.mapName).localeCompare(name(b.mapName), lang));
 
   if (map !== null && !changing) {
     return (
       <button
         type="button"
         onClick={() => setChanging(true)}
-        className="bz-panel mx-1 mb-2.5 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-left text-[11px]"
+        className="bz-panel mx-1 mb-2.5 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-start text-[11px]"
       >
         {mode.icon ? (
           <Image
@@ -85,10 +97,10 @@ export function ModeMapChips({
             unoptimized
           />
         ) : null}
-        <span className="display truncate text-[13px] text-[#a3eaff]">{map}</span>
-        <span className="shrink-0 text-muted">· {mode.label}</span>
-        <span className="bz-chip ml-auto shrink-0 px-2 py-0.5">
-          Change
+        <span className="display truncate text-[13px] text-[#a3eaff]">{name(map)}</span>
+        <span className="shrink-0 text-muted">· {modeName(mode)}</span>
+        <span className="bz-chip ms-auto shrink-0 px-2 py-0.5">
+          {t('chips.change')}
         </span>
       </button>
     );
@@ -119,7 +131,7 @@ export function ModeMapChips({
                   unoptimized
                 />
               ) : null}
-              {m.label}
+              {modeName(m)}
             </button>
           );
         })}
@@ -140,10 +152,10 @@ export function ModeMapChips({
                 : 'bz-chip'
             }`}
           >
-            {allMapsLabel}
+            {allMapsLabel ?? t('chips.allMaps')}
           </button>
 
-          {mode.maps.map((m) => {
+          {maps.map((m) => {
             const on = map === m.mapName;
             const thin = hasData ? !hasData(m.mapName) : false;
             return (
@@ -155,14 +167,14 @@ export function ModeMapChips({
                   setChanging(false);
                 }}
                 aria-pressed={on}
-                title={thin ? 'Not enough Ranked games on this map yet' : undefined}
+                title={thin ? t('chips.thinMap') : undefined}
                 className={`px-2 py-1 leading-tight ${
                   on
                     ? 'bz-chip-map-on'
                     : `bz-chip ${thin ? 'opacity-55' : ''}`
                 }`}
               >
-                {m.mapName}
+                {name(m.mapName)}
               </button>
             );
           })}

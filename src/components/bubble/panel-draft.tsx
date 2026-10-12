@@ -3,7 +3,9 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
-import { recall, remember, STORED_MAP, STORED_MODE } from '@/components/bubble/panel-chips';
+import { recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
+import { usePanelI18n } from '@/components/bubble/panel-i18n';
+import type { UiKey } from '@/lib/bubble-ui-en';
 import { panelTrack } from '@/lib/panel-telemetry';
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 
@@ -35,6 +37,9 @@ export interface DraftBrawler {
   imageUrl: string;
 }
 
+/** A roster entry with its name in the panel's language. */
+type LocalBrawler = DraftBrawler & { localName: string };
+
 interface Suggestion {
   brawlerId: number;
   brawlerName: string;
@@ -51,10 +56,14 @@ type Slot = 'bans' | 'allies' | 'enemies';
 const LIMITS: Record<Slot, number> = { bans: 6, allies: 2, enemies: 3 };
 
 /** Long enough to read, short enough that three fit on one line. */
-const LABELS: Record<Slot, string> = { bans: 'Ban', allies: 'You', enemies: 'Vs' };
+const LABELS: Record<Slot, UiKey> = { bans: 'draft.ban', allies: 'draft.you', enemies: 'draft.vs' };
 
-/** For the picker's placeholder, where there is room for the real word. */
-const LONG: Record<Slot, string> = { bans: 'bans', allies: 'your team', enemies: 'the enemy' };
+/** For the picker's placeholder, where there is room for the real words. */
+const LONG: Record<Slot, UiKey> = {
+  bans: 'draft.addBans',
+  allies: 'draft.addAllies',
+  enemies: 'draft.addEnemies',
+};
 
 /**
  * Below this, a map figure is mostly the prior rather than the map.
@@ -103,9 +112,22 @@ export function PanelDraft({
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const { t, name, lang } = usePanelI18n();
+  const modeName = useModeLabel();
+
+  /* The roster in the reader's language: names as the game shows them, in
+     that language's alphabetical order. */
+  const localRoster = useMemo(
+    () =>
+      roster
+        .map((b) => ({ ...b, localName: name(b.brawlerName) }))
+        .sort((a, b) => a.localName.localeCompare(b.localName, lang)),
+    [roster, name, lang],
+  );
+
   const byId = useMemo(
-    () => new Map(roster.map((b) => [b.brawlerId, b])),
-    [roster],
+    () => new Map(localRoster.map((b) => [b.brawlerId, b])),
+    [localRoster],
   );
 
   const currentMode = withMaps.find((m) => m.key === mode) ?? null;
@@ -287,18 +309,23 @@ export function PanelDraft({
       .filter((p) => !taken.has(p.brawlerId))
       .slice(0, 8)
       .map((p) => byId.get(p.brawlerId))
-      .filter((b): b is DraftBrawler => b !== undefined);
+      .filter((b): b is LocalBrawler => b !== undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, picked, byId]);
 
   const matches = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const pool = roster.filter((b) => !taken.has(b.brawlerId));
+    const q = query.trim().toLocaleLowerCase(lang);
+    const pool = localRoster.filter((b) => !taken.has(b.brawlerId));
     if (!q) return pool;
-    return pool.filter((b) => b.brawlerName.toLowerCase().includes(q));
+    // Either name finds it: the game's in this language, or the English one
+    // a player may know from videos and the site.
+    return pool.filter(
+      (b) =>
+        b.localName.toLocaleLowerCase(lang).includes(q) || b.brawlerName.toLowerCase().includes(q),
+    );
     // `taken` is derived from `picked`; listing it would re-filter every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, roster, picked]);
+  }, [query, localRoster, picked, lang]);
 
   return (
     <div className="space-y-2">
@@ -314,7 +341,7 @@ export function PanelDraft({
         <button
           type="button"
           onClick={() => setChanging(true)}
-          className="flex w-full items-center gap-1.5 px-1 pb-1 text-left text-[11px]"
+          className="flex w-full items-center gap-1.5 px-1 pb-1 text-start text-[11px]"
         >
           {currentMode?.icon ? (
             <Image
@@ -326,10 +353,10 @@ export function PanelDraft({
               unoptimized
             />
           ) : null}
-          <span className="font-bold text-accent-2">{map.mapName}</span>
-          <span className="text-muted">· {currentMode?.label}</span>
-          <span className="ml-auto rounded border border-border px-1.5 py-0.5 font-bold text-muted">
-            Change
+          <span className="font-bold text-accent-2">{name(map.mapName)}</span>
+          <span className="text-muted">· {currentMode ? modeName(currentMode) : ''}</span>
+          <span className="ms-auto rounded border border-border px-1.5 py-0.5 font-bold text-muted">
+            {t('chips.change')}
           </span>
         </button>
       ) : (
@@ -362,14 +389,16 @@ export function PanelDraft({
                     unoptimized
                   />
                 ) : null}
-                {m.label}
+                {modeName(m)}
               </button>
             ))}
           </div>
 
           {currentMode ? (
             <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 text-[11px]">
-              {currentMode.maps.map((m) => (
+              {[...currentMode.maps]
+                .sort((a, b) => name(a.mapName).localeCompare(name(b.mapName), lang))
+                .map((m) => (
                 <button
                   key={m.mapName}
                   type="button"
@@ -381,7 +410,7 @@ export function PanelDraft({
                       : 'bz-chip'
                   }`}
                 >
-                  {m.mapName}
+                  {name(m.mapName)}
                 </button>
               ))}
             </div>
@@ -391,7 +420,7 @@ export function PanelDraft({
 
       {!map ? (
         <p className="px-2 py-6 text-center text-xs leading-relaxed text-muted">
-          Pick the mode, then the map you are drafting on.
+          {t('draft.pickMap')}
         </p>
       ) : (
         <>
@@ -408,12 +437,12 @@ export function PanelDraft({
             {(['bans', 'allies', 'enemies'] as Slot[]).map((slot) => (
               <div key={slot} className="flex items-center gap-1">
                 <span className="text-[9px] font-bold uppercase tracking-wide text-muted">
-                  {LABELS[slot]}
+                  {t(LABELS[slot])}
                   {/* The count only appears once something is in the slot: a
                       board showing 0/6 before anyone has done anything reads
                       as a form to fill in rather than a draft to follow. */}
                   {picked[slot].length > 0 ? (
-                    <span className="ml-0.5 tabular-nums text-muted/70">
+                    <span className="ms-0.5 tabular-nums text-muted/70">
                       {picked[slot].length}/{LIMITS[slot]}
                     </span>
                   ) : null}
@@ -426,11 +455,11 @@ export function PanelDraft({
                       key={id}
                       type="button"
                       onClick={() => remove(slot, id)}
-                      title={`Remove ${b?.brawlerName ?? id}`}
+                      title={t('draft.remove', { name: b?.localName ?? String(id) })}
                     >
                       <Image
                         src={b?.imageUrl ?? ''}
-                        alt={b?.brawlerName ?? ''}
+                        alt={b?.localName ?? ''}
                         width={24}
                         height={24}
                         className={`size-6 rounded bg-surface-2 ${
@@ -447,7 +476,7 @@ export function PanelDraft({
                     type="button"
                     onClick={() => setPicking(picking === slot ? null : slot)}
                     aria-pressed={picking === slot}
-                    aria-label={`Add to ${LONG[slot]}`}
+                    aria-label={t(LONG[slot])}
                     className={`grid size-6 place-items-center rounded border text-xs font-bold leading-none ${
                       picking === slot
                         ? 'border-brand bg-brand/15 text-brand'
@@ -466,9 +495,9 @@ export function PanelDraft({
               <button
                 type="button"
                 onClick={clear}
-                className="ml-auto shrink-0 rounded border border-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted"
+                className="ms-auto shrink-0 rounded border border-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted"
               >
-                Clear
+                {t('draft.clear')}
               </button>
             ) : null}
           </div>
@@ -481,7 +510,7 @@ export function PanelDraft({
               onQuery={setQuery}
               onPick={(id) => add(picking, id)}
               onClose={() => setPicking(null)}
-              label={LONG[picking]}
+              label={t(LONG[picking])}
               remaining={LIMITS[picking] - picked[picking].length}
             />
           ) : null}
@@ -515,8 +544,8 @@ function BrawlerPicker({
   label,
   remaining,
 }: {
-  matches: DraftBrawler[];
-  likely: DraftBrawler[];
+  matches: LocalBrawler[];
+  likely: LocalBrawler[];
   query: string;
   onQuery: (q: string) => void;
   onPick: (id: number) => void;
@@ -525,6 +554,7 @@ function BrawlerPicker({
   remaining: number;
 }) {
   const searching = query.trim().length > 0;
+  const { t } = usePanelI18n();
 
   return (
     <div className="bz-panel space-y-1.5 p-2">
@@ -542,17 +572,17 @@ function BrawlerPicker({
           type="search"
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          placeholder={`Add to ${label}…`}
+          placeholder={label}
           className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-brand/50"
         />
-        <span className="shrink-0 text-[10px] tabular-nums text-muted">{remaining} left</span>
+        <span className="shrink-0 text-[10px] tabular-nums text-muted">{t('draft.left', { n: remaining })}</span>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close the picker"
+          aria-label={t('draft.close')}
           className="shrink-0 rounded border border-border px-1.5 py-1 text-[10px] font-bold text-muted"
         >
-          Done
+          {t('draft.done')}
         </button>
       </div>
 
@@ -560,7 +590,7 @@ function BrawlerPicker({
       {!searching && likely.length > 0 ? (
         <>
           <p className="px-0.5 text-[9px] font-bold uppercase tracking-wide text-brand">
-            Likely here — tap one
+            {t('draft.likely')}
           </p>
           <div className="flex flex-wrap gap-1">
             {likely.map((b) => (
@@ -568,7 +598,7 @@ function BrawlerPicker({
             ))}
           </div>
           <p className="px-0.5 pt-0.5 text-[9px] font-bold uppercase tracking-wide text-muted">
-            Everyone
+            {t('draft.everyone')}
           </p>
         </>
       ) : null}
@@ -580,7 +610,7 @@ function BrawlerPicker({
 
         {matches.length === 0 ? (
           <p className="w-full px-1 py-3 text-center text-xs text-muted">
-            No brawler by that name.
+            {t('draft.noName')}
           </p>
         ) : null}
       </div>
@@ -592,19 +622,19 @@ function PickerTile({
   brawler,
   onPick,
 }: {
-  brawler: DraftBrawler;
+  brawler: LocalBrawler;
   onPick: (id: number) => void;
 }) {
   return (
     <button
       type="button"
       onClick={() => onPick(brawler.brawlerId)}
-      title={brawler.brawlerName}
+      title={brawler.localName}
       className="w-9 text-center"
     >
       <Image
         src={brawler.imageUrl}
-        alt={brawler.brawlerName}
+        alt={brawler.localName}
         width={34}
         height={34}
         className="size-[34px] rounded bg-surface-2"
@@ -612,7 +642,7 @@ function PickerTile({
         unoptimized
       />
       <span className="block truncate text-[8px] leading-tight text-muted">
-        {brawler.brawlerName.toLowerCase()}
+        {brawler.localName}
       </span>
     </button>
   );
@@ -634,16 +664,17 @@ function Suggestions({
 }: {
   picks: Suggestion[] | null;
   loading: boolean;
-  byId: Map<number, DraftBrawler>;
+  byId: Map<number, LocalBrawler>;
 }) {
+  const { t } = usePanelI18n();
   if (picks === null) {
-    return <p className="px-2 py-4 text-center text-xs text-muted">Reading the draft…</p>;
+    return <p className="px-2 py-4 text-center text-xs text-muted">{t('draft.reading')}</p>;
   }
 
   if (picks.length === 0) {
     return (
       <p className="px-2 py-4 text-center text-xs leading-relaxed text-muted">
-        Not enough sampled battles on this map to rank what is left.
+        {t('draft.notEnough')}
       </p>
     );
   }
@@ -680,8 +711,8 @@ function Suggestions({
             />
 
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-xs font-bold capitalize leading-tight">
-                {pick.brawlerName.toLowerCase()}
+              <span className="block truncate text-xs font-bold leading-tight">
+                {b?.localName ?? pick.brawlerName}
               </span>
               <span className="flex gap-1.5 text-[9px] leading-tight text-muted">
                 {/*
@@ -692,20 +723,22 @@ function Suggestions({
                   61% off twelve battles and a 61% off two hundred are not the
                   same claim, and the list cannot show that any other way.
                 */}
-                <span>map {(pick.mapScore * 100).toFixed(0)}%</span>
+                <span>{t('draft.map', { n: (pick.mapScore * 100).toFixed(0) })}</span>
                 {pick.battles < THIN_SAMPLE ? (
-                  <span className="text-defeat/70">{pick.battles} battles</span>
+                  <span className="text-defeat/70">{t('draft.battles', { n: pick.battles })}</span>
                 ) : null}
                 {pick.counterEdge !== null ? (
                   <span className={pick.counterEdge >= 0 ? 'text-victory/80' : 'text-defeat/80'}>
-                    vs {pick.counterEdge >= 0 ? '+' : '−'}
-                    {Math.abs(pick.counterEdge * 100).toFixed(1)}
+                    {t('draft.vsEdge', {
+                      n: `${pick.counterEdge >= 0 ? '+' : '−'}${Math.abs(pick.counterEdge * 100).toFixed(1)}`,
+                    })}
                   </span>
                 ) : null}
                 {pick.allyEdge !== null ? (
                   <span className={pick.allyEdge >= 0 ? 'text-victory/80' : 'text-defeat/80'}>
-                    with {pick.allyEdge >= 0 ? '+' : '−'}
-                    {Math.abs(pick.allyEdge * 100).toFixed(1)}
+                    {t('draft.withEdge', {
+                      n: `${pick.allyEdge >= 0 ? '+' : '−'}${Math.abs(pick.allyEdge * 100).toFixed(1)}`,
+                    })}
                   </span>
                 ) : null}
               </span>
