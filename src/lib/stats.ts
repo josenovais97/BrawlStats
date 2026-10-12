@@ -4068,15 +4068,16 @@ function cachedRead<A extends unknown[], R>(
  * uncached and unexported, so there is exactly one way to reach them.
  */
 
-const cachedBestPicksByMode = unstable_cache(
+// Through `cachedRead`, not a bare `unstable_cache`, so a script (the Discord
+// maps post) gets the query instead of the missing-cache invariant.
+const cachedBestPicksByMode = cachedRead(
+  'best-picks-by-mode',
   // `unstable_cache` serialises through JSON, and a Map does not survive that
   // — it would come back as `{}`. Entries go in and out instead, and the Map
   // is rebuilt on this side so callers see no difference.
   async (perMode: number, windowDays: number) => [
     ...(await computeBestPicksByMode(perMode, windowDays)),
   ],
-  ['best-picks-by-mode'],
-  { revalidate: READ_CACHE_SECONDS },
 );
 
 /**
@@ -4168,14 +4169,13 @@ export async function getFilterableModes(
   return cachedFilterableModes(windowDays, minBattles, format);
 }
 
-const cachedRankedMapPicks = unstable_cache(
+const cachedRankedMapPicks = cachedRead(
+  'ranked-map-picks',
   async (
     perMap: number,
     windowDays: number,
     only: { mapName: string; mode?: string } | undefined,
   ) => computeRankedMapPicks(perMap, windowDays, only),
-  ['ranked-map-picks'],
-  { revalidate: READ_CACHE_SECONDS },
 );
 
 /**

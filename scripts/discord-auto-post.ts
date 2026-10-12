@@ -189,7 +189,14 @@ async function daily(g: Guild): Promise<string> {
   // of its name, else the mode's -- a weaker answer, but a real one.
   const byMode = await getBestPicksByMode(3).catch(() => new Map());
   const fields: Embed[] = [];
-  for (const s of slots.slice(0, 12)) {
+  // The rotation can list one map twice (two slots, same event); an embed
+  // holds 25 fields.
+  const seen = new Set<string>();
+  const unique = slots.filter((s) => {
+    const key = `${s.event.mode}/${s.event.map}`;
+    return seen.has(key) ? false : (seen.add(key), true);
+  });
+  for (const s of unique.slice(0, 24)) {
     const dataName = await resolveDataMapName(s.event.mode, s.event.map!).catch(() => s.event.map!);
     const mapPicks = await getRankedMapPicks(3, RANKED_MAP_WINDOW_DAYS, { mapName: dataName, mode: s.event.mode })
       .then((m) => m[0]?.picks ?? [])
@@ -198,7 +205,7 @@ async function daily(g: Guild): Promise<string> {
     const line = mapPicks.length
       ? mapPicks.map((p) => name(p.brawlerName)).join(' · ')
       : modePicks.length
-        ? `${modePicks.slice(0, 3).map((p) => name(p.brawlerName)).join(' · ')}\n-# best in the mode; new map`
+        ? `${modePicks.slice(0, 3).map((p) => name(p.brawlerName)).join(' · ')}\n-# best in the mode`
         : '-# not enough data yet';
     fields.push({
       name: `${humanizeMode(s.event.mode)} · ${s.event.map}`,
@@ -214,7 +221,7 @@ async function daily(g: Guild): Promise<string> {
           title: '🗺️ Today’s maps and what to pick',
           url: `${SITE}/events`,
           color: BRAND,
-          description: 'Every live map with the three brawlers winning most on it, from sampled battles.',
+          description: 'Every live map with the three brawlers winning most on it (or in its mode), from sampled battles.',
           fields,
           footer: { text: 'brawlzone.net · or tap the Bubble mid-draft' },
         },
