@@ -459,9 +459,9 @@ export async function TierListView({
         {/* Said plainly when a bracket could not be shown as itself. */}
         {bracket && !bracketData ? (
           <p className="mt-3 rounded-xl border border-brand/40 bg-brand/10 px-3 py-2 text-sm leading-relaxed">
-            <strong>Not enough {bracket.label} battles yet to rate brawlers at this rank</strong>, so
-            this is the list for every rank. It fills in as more {bracket.label} lobbies are
-            sampled.
+            <strong>Not enough battles from {bracket.label} lobbies yet</strong> to rate brawlers at
+            this rank, so this is the list for every rank. It fills in over the next few days as
+            more of them are sampled.
           </p>
         ) : bracket && bracketData && bracketData.days > TIER_WINDOWS[windowKey].days ? (
           <p className="mt-3 text-sm text-muted">
