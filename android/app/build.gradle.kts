@@ -31,8 +31,8 @@ android {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
     targetSdk = 34
-    versionCode = 48
-    versionName = "1.27"
+    versionCode = 49
+    versionName = "1.28"
 
     /*
      * Where the panel is served from. The site, always, in a release; a
@@ -76,6 +76,13 @@ android {
       if (hasSigning) signingConfig = signingConfigs.getByName("release")
     }
   }
+  /*
+   * Every language in every APK. The app switches language itself (AppLang),
+   * so a bundle split by the device locale would ship without the one the
+   * player picks. Only matters if this is ever uploaded as an app bundle.
+   */
+  bundle { language { enableSplit = false } }
+
   // BuildConfig.VERSION_CODE is how the panel learns which build is asking.
   buildFeatures { buildConfig = true }
 

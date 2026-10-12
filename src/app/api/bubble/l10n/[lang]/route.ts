@@ -1,13 +1,9 @@
-import { unstable_cache } from 'next/cache';
 import type { NextRequest } from 'next/server';
 
-import { getGameModes, getMaps } from '@/lib/brawlapi';
-import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { getOfficialBrawlers } from '@/lib/bs-api';
+import { bubbleGameNames } from '@/lib/bubble-game-names';
 import { bubbleLang } from '@/lib/bubble-langs';
 import { UI_TRANSLATIONS } from '@/lib/bubble-ui';
 import { BrawlApiError } from '@/lib/errors';
-import { buildGameNames } from '@/lib/game-l10n';
 import { errorResponse, okResponse } from '@/lib/route-helpers';
 
 /**
@@ -32,35 +28,6 @@ const PACK_VERSION = 2;
 
 const DAY = 86_400;
 
-/** The English names the panel can display, from the catalogues it reads. */
-async function displayableNames(): Promise<string[]> {
-  const [maps, modes, brawlers, official] = await Promise.all([
-    getMaps().catch(() => []),
-    getGameModes().catch(() => []),
-    getBrawlerArtMap().catch(() => new Map()),
-    getOfficialBrawlers()
-      .then((r) => r.items)
-      .catch(() => []),
-  ]);
-  // Rank league names too, for the panel's bracket chips.
-  const names: string[] = ['Star Power', 'Gadget', 'Gear', 'Diamond', 'Mythic', 'Legendary', 'Masters', 'Pro'];
-  for (const m of maps) names.push(m.name);
-  for (const m of modes) names.push(m.name);
-  for (const b of brawlers.values()) {
-    names.push(b.name);
-    for (const a of [...(b.starPowers ?? []), ...(b.gadgets ?? [])]) names.push(a.name);
-  }
-  for (const b of official) {
-    for (const g of b.gears ?? []) names.push(g.name);
-  }
-  return names;
-}
-
-const cachedNames = unstable_cache(
-  async (file: string, locale: string) => buildGameNames(file, locale, await displayableNames()),
-  ['bubble-l10n-names-v2'],
-  { revalidate: DAY },
-);
 
 export async function GET(
   _request: NextRequest,
@@ -73,7 +40,7 @@ export async function GET(
     // English is the panel's own text and the catalogue's own names.
     if (lang.code === 'en') return okResponse({ v: PACK_VERSION, lang: 'en', ui: {}, names: {} }, DAY);
 
-    const names = await cachedNames(lang.file, lang.code).catch(() => ({}));
+    const names = await bubbleGameNames(lang).catch(() => ({}));
     return okResponse(
       { v: PACK_VERSION, lang: lang.code, ui: UI_TRANSLATIONS[lang.code] ?? {}, names },
       // A day at the edge: names change when a map or brawler is added, which

@@ -111,12 +111,21 @@ object Account {
         val tag = org.json.JSONObject.quote(tag(context))
         val filter = org.json.JSONObject.quote(filter(context))
         val hide = if (hide(context)) "'1'" else "'0'"
+        /*
+         * The language only when one was chosen. Writing the detected one
+         * would overwrite a choice made in the panel before the app had a
+         * picker, and the panel already detects the phone's the same way.
+         */
+        val lang = AppLang.chosen(context)
+            ?.let { "localStorage.setItem('brawlzone.bubble.lang', ${org.json.JSONObject.quote(it)});" }
+            .orEmpty()
         return """
             (function () {
               try {
                 localStorage.setItem('brawlzone-bubble-tag', $tag);
                 localStorage.setItem('brawlzone-bubble-filter', $filter);
                 localStorage.setItem('brawlzone-bubble-hide', $hide);
+                $lang
               } catch (e) {}
             })();
         """.trimIndent()

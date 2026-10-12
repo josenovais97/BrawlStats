@@ -1,3 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app's own words, in English. Every other values-*/strings.xml is the
+  same keys in one of the languages Brawl Stars ships (AppLang.ALL), and the
+  terms follow the panel's translations in src/lib/bubble-ui/ so the app and
+  the panel never call one thing two names.
+-->
 <resources>
-    <string name="app_name">BrawlZone</string>
+    <string name="app_name" translatable="false">BrawlZone</string>
+    <string name="tagline">The Ranked tier list, floating on top of the game. Tap it mid-draft, tap it again and it folds away.</string>
+    <string name="status_checking">Checking permission…</string>
+    <string name="status_ready">Ready — it will float over the game</string>
+    <string name="status_needed">Permission needed to draw over apps</string>
+    <string name="start">Start bubble</string>
+    <string name="stop">Stop</string>
+    <string name="quick_settings">Quick Settings</string>
+    <string name="restricted_title">The toggle is greyed out?</string>
+    <string name="restricted_body">Android blocks this permission for apps installed outside a store. Open Settings › Apps › BrawlZone, tap the ⋮ menu at the top right, choose \"Allow restricted settings\", then try again.</string>
+    <string name="setup_kicker">RECOMMENDED</string>
+    <string name="setup_title">Make the panel yours</string>
+    <string name="setup_body">Add your player tag and the bubble:\n✓  marks the brawlers you actually own\n✓  can show only power 11 or hypercharged picks\n✓  plans what to upgrade next</string>
+    <string name="setup_cta">Add my player tag</string>
+    <string name="setup_hint">Find it in game: tap your profile, it starts with #</string>
+    <string name="what_caption">WHAT IT DOES</string>
+    <string name="feature_picks_title">Best picks, map by map</string>
+    <string name="feature_picks_body">The live rotation, ranked by what actually wins there — not a season-long average</string>
+    <string name="feature_bans_title">Who to ban</string>
+    <string name="feature_bans_body">Ranked bans, ordered by how often each brawler is taken on this map</string>
+    <string name="feature_trio_title">Best trio for the map</string>
+    <string name="feature_trio_body">The three that win together in Ranked, with the ones you own ticked</string>
+    <string name="feature_counters_title">Counters mid-draft</string>
+    <string name="feature_counters_body">Enter the bans and the enemy picks; it names what beats them</string>
+    <string name="feature_build_title">The build to run</string>
+    <string name="feature_build_body">Gadget, star power and gears on any brawler you tap</string>
+    <string name="account_caption">YOUR ACCOUNT</string>
+    <string name="player_icon">Player icon</string>
+    <string name="filter_caption">SHOW IN THE PANEL · TAP TO CHOOSE</string>
+    <string name="filter_all_title">All my brawlers</string>
+    <string name="filter_all_body">Mark everything you own; grey out the rest</string>
+    <string name="filter_p11_title">Power 11 only</string>
+    <string name="filter_p11_body">Just what is fully upgraded for Ranked</string>
+    <string name="filter_hyper_title">Power 11 + hypercharge</string>
+    <string name="filter_hyper_body">Only brawlers at their absolute strongest</string>
+    <string name="change_tag">Change tag</string>
+    <string name="tag_label">PLAYER TAG</string>
+    <string name="tag_optional">Optional. Add your tag and the panel marks the picks you can actually take.</string>
+    <string name="tag_invalid">That does not look like a tag yet.</string>
+    <string name="tag_checking">Checking…</string>
+    <string name="tag_not_found">No account with that tag. Check it in game under your profile.</string>
+    <string name="tag_ok">The panel will mark what you can field.</string>
+    <string name="hide_title">Hide unavailable brawlers</string>
+    <string name="hide_body">Show only what you can play, instead of greying the rest</string>
+    <string name="look_caption">BUBBLE</string>
+    <string name="look_touched">Touched</string>
+    <string name="look_idle_preview">Idle</string>
+    <string name="look_size">Size</string>
+    <string name="size_small">Small</string>
+    <string name="size_normal">Normal</string>
+    <string name="size_large">Large</string>
+    <string name="look_idle">When idle</string>
+    <string name="idle_solid">Solid</string>
+    <string name="look_idle_hint">Fades 3 seconds after you last touch it. A faded bubble still takes your taps, never the game.</string>
+    <string name="tuck_title">Tuck into the edge</string>
+    <string name="tuck_body">While idle, it slides halfway off the screen. Tap it to bring it back.</string>
+    <string name="lang_title">Language</string>
+    <string name="lang_hint">Pick your game’s language so map and brawler names match. The panel uses it too.</string>
+    <string name="plan_caption">WHAT TO UPGRADE NEXT</string>
+    <string name="how_caption">HOW IT WORKS</string>
+    <string name="how_1">Tap the bubble to open the panel; tap it again to fold it away.</string>
+    <string name="how_2">Drag the bubble anywhere — it rests against the nearest edge.</string>
+    <string name="how_3">Drag it onto the ✕ at the bottom to close it, use Stop in the notification, or the BrawlZone tile in Quick Settings — that tile also starts it, from inside the game.</string>
+    <string name="footer_note">Numbers measured from sampled Ranked battles, the same ones brawlzone.net shows. Free, no account, no ads.</string>
+    <string name="disclaimer">BrawlZone is a fan-made app. It is not affiliated with, endorsed, sponsored or specifically approved by Supercell, and Supercell is not responsible for it.</string>
+    <string name="notification_channel">Bubble</string>
+    <string name="notification_title">BrawlZone bubble</string>
+    <string name="notification_text">Tap the bubble for live picks · drag it onto ✕ to close</string>
+    <string name="notification_panel">Panel</string>
+    <string name="panel_offline">Offline · showing the last saved list</string>
+    <string name="panel_retry">Could not reach brawlzone.net.\n\nTap to try again.</string>
+    <string name="toast_no_link">Could not open that link</string>
+    <string name="toast_downloaded">Update downloaded — open it from your Downloads folder</string>
+    <string name="toast_downloading">Downloading the update — it lands in your Downloads folder</string>
+    <string name="download_title">BrawlZone update</string>
+    <string name="download_description">Tap when finished to install</string>
+    <string name="tile_on">Bubble on</string>
+    <string name="tile_off">Bubble off</string>
 </resources>

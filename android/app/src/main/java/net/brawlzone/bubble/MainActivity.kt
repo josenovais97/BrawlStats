@@ -3,6 +3,7 @@ package net.brawlzone.bubble
 import android.Manifest
 import android.app.StatusBarManager
 import android.content.ComponentName
+import android.content.Context
 import android.graphics.drawable.Icon
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -54,6 +55,17 @@ class MainActivity : AppCompatActivity() {
      */
     private var asked = false
 
+    /** Every string on this screen in the app's language, not the phone's. */
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLang.wrap(newBase))
+    }
+
+    /*
+     * The language this screen was drawn in. A choice made in the panel while
+     * the screen sat in the background is picked up on return.
+     */
+    private var drawnIn: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,12 +75,9 @@ class MainActivity : AppCompatActivity() {
         statusDot = findViewById(R.id.status_dot)
         restricted = findViewById(R.id.restricted)
 
-        restricted.text = buildString {
-            append("The toggle is greyed out?\n\n")
-            append("Android blocks this permission for apps installed outside a store. ")
-            append("Open Settings › Apps › BrawlZone, tap the ⋮ menu at the top right, ")
-            append("choose \"Allow restricted settings\", then try again.")
-        }
+        restricted.text = getString(R.string.restricted_title) + "\n\n" +
+            getString(R.string.restricted_body)
+        drawnIn = AppLang.current(this)
 
         askForNotifications()
 
@@ -78,6 +87,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         wireAccount()
+        wireLook()
+        wireLanguage()
 
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
@@ -154,11 +165,15 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onResume() {
         super.onResume()
+        if (drawnIn != null && drawnIn != AppLang.current(this)) {
+            recreate()
+            return
+        }
         val granted =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 
         statusText.text =
-            if (granted) "Ready — it will float over the game" else "Permission needed to draw over apps"
+            getString(if (granted) R.string.status_ready else R.string.status_needed)
         statusText.setTextColor(
             if (granted) getColor(R.color.victory) else getColor(R.color.muted),
         )
@@ -330,7 +345,7 @@ class MainActivity : AppCompatActivity() {
         fun loadPlan(tag: String) {
             if (editing || tag == plannedFor) return
             plannedFor = tag
-            PlanLookup.load(tag) { plan ->
+            PlanLookup.load(tag, AppLang.current(this)) { plan ->
                 // A failed fetch hides the card rather than leaving the previous
                 // account's plan under a new name.
                 if (plan == null) plannedFor = null
@@ -371,7 +386,9 @@ class MainActivity : AppCompatActivity() {
             // The label under each tile is in the layout now, beside its icon,
             // so these carry only the number.
             tagLine.text = "#${result.tag}"
-            meta.text = "%,d".format(result.trophies)
+            meta.text = java.text.NumberFormat.getIntegerInstance(
+                AppLang.locale(AppLang.current(this)),
+            ).format(result.trophies)
             chipOwned.text = result.owned.toString()
             chipEleven.text = result.powerEleven.toString()
             chipHyper.text = result.hypercharged.toString()
@@ -403,15 +420,15 @@ class MainActivity : AppCompatActivity() {
                 raw.isBlank() -> {
                     AccountLookup.cancel()
                     showAccount(null)
-                    status.text = "Optional. Add your tag and the panel marks the picks you can actually take."
+                    status.setText(R.string.tag_optional)
                 }
                 !Account.isValid(raw) -> {
                     AccountLookup.cancel()
                     showAccount(null)
-                    status.text = "That does not look like a tag yet."
+                    status.setText(R.string.tag_invalid)
                 }
                 else -> {
-                    status.text = "Checking…"
+                    status.setText(R.string.tag_checking)
                     AccountLookup.lookup(Account.normalise(raw)) { result ->
                         showAccount(result)
                         status.text = if (result == null) {
@@ -422,9 +439,9 @@ class MainActivity : AppCompatActivity() {
                              * inside the part that just folded away.
                              */
                             setEditing(true)
-                            "No account with that tag. Check it in game under your profile."
+                            getString(R.string.tag_not_found)
                         } else {
-                            "The panel will mark what you can field."
+                            getString(R.string.tag_ok)
                         }
                     }
                 }
@@ -507,6 +524,238 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * The bubble's look: size, idle opacity and tuck (1.28).
+     *
+     * Saved on tap, like the account card. The service listens to the same
+     * preferences, so a bubble already over the game changes as the option is
+     * chosen -- the quickest way to judge a size is to see it there.
+     */
+    private fun wireLook() {
+        val sizeRow = findViewById<LinearLayout>(R.id.look_size)
+        val idleRow = findViewById<LinearLayout>(R.id.look_idle)
+        val tuck = findViewById<Switch>(R.id.look_tuck)
+        val touched = findViewById<ImageView>(R.id.preview_touched)
+        val idle = findViewById<ImageView>(R.id.preview_idle)
+        val idleFrame = findViewById<android.widget.FrameLayout>(R.id.preview_idle_frame)
+        val density = resources.displayMetrics.density
+        fun px(dp: Int) = (dp * density).toInt()
+
+        // The player's icon when there is one, as the bubble itself wears it.
+        val icon = Account.savedIcon(this)
+        for (view in listOf(touched, idle)) {
+            if (icon != null) {
+                view.setImageDrawable(
+                    androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+                        .create(resources, icon)
+                        .apply { isCircular = true },
+                )
+                view.scaleType = ImageView.ScaleType.CENTER_CROP
+            }
+        }
+
+        fun paintPreview() {
+            val badge = px(BubbleLook.badgeDp(BubbleLook.size(this)))
+            for (view in listOf(touched, idle)) {
+                val inset = if (icon != null) px(4) else badge / 4
+                view.setPadding(inset, inset, inset, inset)
+                view.layoutParams = (view.layoutParams as android.widget.FrameLayout.LayoutParams).apply {
+                    width = badge
+                    height = badge
+                }
+            }
+            idle.alpha = BubbleLook.idle(this) / 100f
+            // Tucked: half the badge past the frame's edge, clipped the way
+            // the screen edge clips it. The frame matches the badge so the
+            // cut lands through its middle.
+            val tucked = BubbleLook.tuck(this)
+            idleFrame.layoutParams = idleFrame.layoutParams.apply {
+                width = if (tucked) badge else px(64)
+            }
+            val end = if (resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) -1 else 1
+            idle.translationX = if (tucked) end * badge / 2f else 0f
+            idleFrame.requestLayout()
+        }
+
+        /** A row of pill options, one lit. */
+        fun <T> options(
+            row: LinearLayout,
+            values: List<T>,
+            label: (T) -> String,
+            current: () -> T,
+            choose: (T) -> Unit,
+        ) {
+            row.removeAllViews()
+            val views = values.map { value ->
+                TextView(this).apply {
+                    text = label(value)
+                    textSize = 14f
+                    gravity = android.view.Gravity.CENTER
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    setPadding(px(6), px(10), px(6), px(12))
+                    isClickable = true
+                    isFocusable = true
+                }
+            }
+            fun paint() {
+                val now = current()
+                for ((i, view) in views.withIndex()) {
+                    val on = values[i] == now
+                    view.setBackgroundResource(if (on) R.drawable.chip_active else R.drawable.chip)
+                    view.setTextColor(getColor(if (on) R.color.brand else R.color.foreground))
+                }
+            }
+            for ((i, view) in views.withIndex()) {
+                view.setOnClickListener {
+                    choose(values[i])
+                    paint()
+                    paintPreview()
+                }
+                row.addView(view, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    if (i > 0) marginStart = px(8)
+                })
+            }
+            paint()
+        }
+
+        options(
+            sizeRow,
+            BubbleLook.SIZES,
+            {
+                getString(
+                    when (it) {
+                        BubbleLook.SIZE_SMALL -> R.string.size_small
+                        BubbleLook.SIZE_LARGE -> R.string.size_large
+                        else -> R.string.size_normal
+                    },
+                )
+            },
+            { BubbleLook.size(this) },
+            { BubbleLook.setSize(this, it) },
+        )
+
+        val percent = java.text.NumberFormat.getPercentInstance(AppLang.locale(AppLang.current(this)))
+        options(
+            idleRow,
+            BubbleLook.IDLE_LEVELS,
+            { if (it >= 100) getString(R.string.idle_solid) else percent.format(it / 100.0) },
+            { BubbleLook.idle(this) },
+            { BubbleLook.setIdle(this, it) },
+        )
+
+        tuck.isChecked = BubbleLook.tuck(this)
+        tuck.setOnCheckedChangeListener { _, on ->
+            BubbleLook.setTuck(this, on)
+            paintPreview()
+        }
+
+        idleFrame.post { paintPreview() }
+        gameType(sizeRow)
+        gameType(idleRow)
+    }
+
+    /**
+     * The language chip and its picker.
+     *
+     * A flag and a short code in the header, because the person who needs to
+     * change the language is the one who cannot read the screen it is in. The
+     * list shows each language in its own name with the flag and the English
+     * name beside it -- the same three ways in that the panel's picker offers.
+     */
+    private fun wireLanguage() {
+        val chip = findViewById<TextView>(R.id.lang_chip)
+        val current = AppLang.byCode(AppLang.current(this)) ?: AppLang.ALL.first()
+        chip.text = current.flag + "  " + current.code.substringBefore('-').uppercase()
+        chip.contentDescription = getString(R.string.lang_title) + ": " + current.label
+        chip.setOnClickListener { showLanguagePicker() }
+    }
+
+    private fun showLanguagePicker() {
+        val density = resources.displayMetrics.density
+        fun px(dp: Int) = (dp * density).toInt()
+        val current = AppLang.current(this)
+
+        val list = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(px(18), px(18), px(18), px(12))
+        }
+        list.addView(TextView(this).apply {
+            setText(R.string.lang_title)
+            textSize = 20f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTextColor(getColor(R.color.foreground))
+        })
+        list.addView(TextView(this).apply {
+            setText(R.string.lang_hint)
+            textSize = 13f
+            setLineSpacing(0f, 1.25f)
+            setTextColor(getColor(R.color.muted))
+            setPadding(0, px(4), 0, px(12))
+        })
+
+        val dialog = android.app.AlertDialog.Builder(this).create()
+
+        for (lang in AppLang.ALL) {
+            val chosen = lang.code == current
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setBackgroundResource(if (chosen) R.drawable.filter_row_active else R.drawable.filter_row)
+                setPadding(px(14), px(10), px(14), px(12))
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    dialog.dismiss()
+                    if (AppLang.set(this@MainActivity, lang.code)) recreate()
+                }
+            }
+            row.addView(TextView(this).apply {
+                text = lang.flag
+                textSize = 24f
+            })
+            val names = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(px(12), 0, px(8), 0)
+            }
+            names.addView(TextView(this).apply {
+                text = lang.label
+                textSize = 16f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setTextColor(getColor(if (chosen) R.color.brand else R.color.foreground))
+            })
+            names.addView(TextView(this).apply {
+                text = lang.english
+                textSize = 12f
+                setTextColor(getColor(R.color.muted))
+            })
+            row.addView(names, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            if (chosen) {
+                row.addView(TextView(this).apply {
+                    text = "✓"
+                    textSize = 18f
+                    setTextColor(getColor(R.color.brand))
+                })
+            }
+            list.addView(row, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply { topMargin = px(6) })
+        }
+
+        val scroll = android.widget.ScrollView(this).apply {
+            setBackgroundResource(R.drawable.card_surface)
+            addView(list)
+        }
+        dialog.setView(scroll)
+        dialog.setOnShowListener {
+            dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+            // The current language in view, not the top of a 22-row list.
+            val index = AppLang.ALL.indexOfFirst { it.code == current }
+            scroll.post { list.getChildAt(index + 2)?.let { scroll.scrollTo(0, (it.top - px(80)).coerceAtLeast(0)) } }
+        }
+        dialog.show()
+    }
+
+    /**
      * Game-style type: every bold label on the screen in Lilita One.
      *
      * The chunky rounded display face the website already uses, under the
@@ -521,6 +770,13 @@ class MainActivity : AppCompatActivity() {
      * alone; a tag is typed, not read as a title.
      */
     private fun gameType(root: View) {
+        /*
+         * Lilita One has Latin letters only. A Russian or Thai title set in it
+         * would come out in whatever the system substitutes glyph by glyph,
+         * so those languages keep the system's own bold, which is drawn for
+         * their script.
+         */
+        if (AppLang.byCode(AppLang.current(this))?.latin == false) return
         val display = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.lilita_one) ?: return
         val metrics = resources.displayMetrics
         val large = android.util.TypedValue.applyDimension(

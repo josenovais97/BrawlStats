@@ -161,3 +161,48 @@ test('an account with a hole gets a step that names what the coins buy', () => {
   assert.match(out.steps[0].detail, /^Power 7 → 11 · [\d,]+ coins$/);
   assert.match(out.steps[0].icon, /^https:\/\/\S+\/4\.png$/);
 });
+
+/*
+ * The other languages (app 1.28). A template that lost a placeholder ships a
+ * sentence with a hole in it and cannot be patched in the app, so every one is
+ * checked against the English it translates.
+ */
+test('every language has every sentence, with the placeholders it needs', async () => {
+  const { PLAN_EN, PLAN_TEXT } = await import('@/lib/bubble-plan-text');
+  const { BUBBLE_LANGS } = await import('@/lib/bubble-langs');
+  const holes = (s: string) => new Set([...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]));
+  // Placeholders a translation may drop: the count where "one" says it in words.
+  const optional = new Set(['n']);
+  for (const { code } of BUBBLE_LANGS) {
+    const t = PLAN_TEXT[code];
+    assert.ok(t, `${code} has no plan text`);
+    for (const key of Object.keys(PLAN_EN) as (keyof typeof PLAN_EN)[]) {
+      const want = holes(PLAN_EN[key]);
+      const got = holes(t[key]);
+      for (const h of got) assert.ok(want.has(h), `${code}.${key} has an unknown {${h}}`);
+      for (const h of want) {
+        if (optional.has(h) && key.endsWith('One')) continue;
+        assert.ok(got.has(h), `${code}.${key} is missing {${h}}`);
+      }
+    }
+  }
+});
+
+test('in another language the numbers, names and lists follow it', () => {
+  const names: Record<string, string> = { piper: 'Piper', hotzone: 'Zone réservée' };
+  const out = bubblePlan({
+    plan: plan({ steps: [{ brawlerId: 16, name: 'PIPER', power: 8, coins: 2975, covers: ['Zone réservée'], secures: [] }] }),
+    coverage: { covered: 4, banSafe: 3, modes: 6 },
+    lang: 'fr',
+    name: (text) => names[text.toLowerCase()] ?? text,
+  })!;
+  assert.equal(out.headline, `${(2975).toLocaleString('fr')} pièces couvrent 1 mode de plus`);
+  assert.equal(out.steps[0].name, 'Piper');
+  assert.equal(out.steps[0].gain, 'Couvre Zone réservée');
+  assert.equal(out.note, 'Pour l’instant, tu peux aligner un choix du top 3 dans 4 modes sur 6.');
+});
+
+test('an unknown language is English, as before the app sent one', () => {
+  const out = bubblePlan({ plan: plan(), coverage: { covered: 4, banSafe: 3, modes: 6 }, lang: 'xx' })!;
+  assert.equal(out.headline, '2,975 coins covers 1 more mode');
+});

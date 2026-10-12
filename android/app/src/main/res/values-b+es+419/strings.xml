@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- es-419 -->
+<resources>
+    <string name="tagline">La tier list de Competitivo, flotando sobre el juego. Tócala en pleno draft, tócala de nuevo y se pliega.</string>
+    <string name="status_needed">Se necesita permiso para mostrarse sobre otras apps</string>
+    <string name="quick_settings">Configuración rápida</string>
+    <string name="restricted_body">Android bloquea este permiso en apps instaladas fuera de una tienda. Abre Configuración › Apps › BrawlZone, toca el menú ⋮ arriba a la derecha, elige «Permitir configuración restringida» y vuelve a intentarlo.</string>
+    <string name="setup_body">Agrega tu ID de jugador y la burbuja:\n✓  marca los brawlers que realmente tienes\n✓  puede mostrar solo elecciones a nivel 11 o con hipercarga\n✓  planifica qué mejorar después</string>
+    <string name="setup_cta">Agregar mi ID de jugador</string>
+    <string name="feature_picks_body">La rotación actual, ordenada por lo que realmente gana ahí — no un promedio de toda la temporada</string>
+    <string name="feature_bans_body">Bloqueos de Competitivo, ordenados por qué tan seguido se elige cada brawler en este mapa</string>
+    <string name="tag_optional">Opcional. Agrega tu ID y el panel marca las elecciones que realmente puedes hacer.</string>
+    <string name="tag_invalid">Eso aún no parece un ID.</string>
+    <string name="how_3">Arrástrala a la ✕ de abajo para cerrarla, usa Detener en la notificación o el mosaico de BrawlZone en Configuración rápida — ese mosaico también la inicia, desde el juego.</string>
+    <string name="notification_text">Toca la burbuja para ver elecciones en vivo · arrástrala a la ✕ para cerrarla</string>
+    <string name="toast_downloaded">Actualización descargada — ábrela desde tu carpeta Descargas</string>
+</resources>

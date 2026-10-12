@@ -93,6 +93,20 @@ function writePack(code: string, pack: Pack) {
   }
 }
 
+/**
+ * Tells the app which language the player chose here (app 1.28 and later),
+ * so its own screens and notification follow. Older builds have no such
+ * method and the call is skipped.
+ */
+function tellApp(code: string) {
+  try {
+    const app = (window as unknown as { BrawlZoneApp?: { setLanguage?: (c: string) => void } }).BrawlZoneApp;
+    if (typeof app?.setLanguage === 'function') app.setLanguage(code);
+  } catch {
+    // The bridge is a convenience; the panel works without it.
+  }
+}
+
 export function PanelI18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState('en');
   const [pack, setPack] = useState<Pack | null>(null);
@@ -102,8 +116,11 @@ export function PanelI18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let chosen = 'en';
     try {
-      const saved = window.localStorage.getItem(STORED_LANG);
-      chosen = bubbleLang(saved)?.code ?? detectBubbleLang(navigator.languages ?? [navigator.language]);
+      const saved = bubbleLang(window.localStorage.getItem(STORED_LANG))?.code;
+      // A choice made here before the app had a picker is still a choice:
+      // hand it over once, so the app's screens match it.
+      if (saved) tellApp(saved);
+      chosen = saved ?? detectBubbleLang(navigator.languages ?? [navigator.language]);
     } catch {
       chosen = detectBubbleLang(typeof navigator === 'undefined' ? [] : (navigator.languages ?? []));
     }
@@ -145,6 +162,7 @@ export function PanelI18nProvider({ children }: { children: ReactNode }) {
       // ignored
     }
     panelTrack('panel_lang', { lang: code });
+    tellApp(code);
     setLangState(code);
   }, []);
 

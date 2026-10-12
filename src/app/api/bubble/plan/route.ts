@@ -1,7 +1,10 @@
 import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getPlayer } from '@/lib/bs-api';
+import { bubbleGameNames } from '@/lib/bubble-game-names';
+import { bubbleLang } from '@/lib/bubble-langs';
 import { bubblePlan } from '@/lib/bubble-plan';
 import { rosterCoverage, rosterPlan } from '@/lib/roster-optimizer';
+import { nameKey } from '@/lib/game-l10n';
 import { getBestPicksByMode, getRankedMapPicks } from '@/lib/stats';
 import { normalizeTag } from '@/lib/tags';
 import type { BAGameMode } from '@/types/brawlapi';
@@ -31,8 +34,11 @@ import type { BAGameMode } from '@/types/brawlapi';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const tag = normalizeTag(new URL(request.url).searchParams.get('tag'));
+  const params = new URL(request.url).searchParams;
+  const tag = normalizeTag(params.get('tag'));
   if (!tag) return Response.json({ error: 'no tag' }, { status: 400 });
+  // The app's language from 1.28. Older builds send none and keep English.
+  const lang = bubbleLang(params.get('lang')) ?? bubbleLang('en')!;
 
   let player;
   try {
@@ -48,19 +54,27 @@ export async function GET(request: Request) {
    */
   const rankedMaps = await getRankedMapPicks(3).catch(() => []);
   const modes = [...new Set(rankedMaps.map((m) => m.mode))];
-  const [picksByMode, modeMeta] = await Promise.all([
+  const [picksByMode, modeMeta, names] = await Promise.all([
     getBestPicksByMode(15).catch(() => new Map()),
     getGameModeMap().catch(() => new Map<string, BAGameMode>()),
+    lang.code === 'en'
+      ? Promise.resolve<Record<string, string>>({})
+      : bubbleGameNames(lang).catch((): Record<string, string> => ({})),
   ]);
+  // Modes and brawlers as the game spells them in this language; the English
+  // name wherever the game's files have no entry.
+  const local = (text: string) => names[nameKey(text)] ?? text;
 
   const payload = bubblePlan({
     plan: rosterPlan({
       brawlers: player.brawlers,
       picksByMode,
       modes,
-      modeLabels: new Map(modes.map((mode) => [mode, modeLabel(modeMeta, mode)])),
+      modeLabels: new Map(modes.map((mode) => [mode, local(modeLabel(modeMeta, mode))])),
     }),
     coverage: rosterCoverage({ brawlers: player.brawlers, picksByMode, modes }),
+    lang: lang.code,
+    name: local,
   });
 
   // Null is "we have nothing worth showing", not an error — the app hides the

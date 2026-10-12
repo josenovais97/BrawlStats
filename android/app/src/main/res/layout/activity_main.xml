@@ -71,6 +71,24 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <!-- The language, as a flag first: the one control on this
+                 screen that has to work for someone who cannot read it. -->
+            <TextView
+                android:id="@+id/lang_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/chip"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="@color/foreground"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/version_chip"
                 android:layout_width="wrap_content"
@@ -90,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:lineSpacingMultiplier="1.3"
-            android:text="The Ranked tier list, floating on top of the game. Tap it mid-draft, tap it again and it folds away."
+            android:text="@string/tagline"
             android:textColor="@color/muted"
             android:textSize="15sp" />
 
@@ -128,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="Checking permission…"
+                    android:text="@string/status_checking"
                     android:textColor="@color/muted"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -142,7 +160,7 @@
                 android:background="@drawable/btn_gold"
                 android:letterSpacing="0.01"
                 android:stateListAnimator="@null"
-                android:text="Start bubble"
+                android:text="@string/start"
                 android:textAllCaps="false"
                 android:textColor="@color/brand_ink"
                 android:textSize="16sp"
@@ -167,7 +185,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="Stop"
+                    android:text="@string/stop"
                     android:textAllCaps="false"
                     android:textColor="@color/foreground"
                     android:textSize="15sp"
@@ -181,7 +199,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/btn_outline"
                     android:stateListAnimator="@null"
-                    android:text="Quick Settings"
+                    android:text="@string/quick_settings"
                     android:textAllCaps="false"
                     android:textColor="@color/foreground"
                     android:textSize="15sp"
@@ -199,7 +217,7 @@
             android:background="@drawable/card_warn"
             android:lineSpacingMultiplier="1.35"
             android:padding="16dp"
-            android:text="The toggle is greyed out?"
+            android:text="@string/restricted_title"
             android:textColor="@color/brand"
             android:textSize="13sp"
             android:visibility="gone" />
@@ -226,7 +244,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.12"
-                android:text="RECOMMENDED"
+                android:text="@string/setup_kicker"
                 android:textColor="@color/brand"
                 android:textSize="10sp"
                 android:textStyle="bold" />
@@ -234,7 +252,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Make the panel yours"
+                android:text="@string/setup_title"
                 android:textColor="@color/foreground"
                 android:textSize="19sp"
                 android:textStyle="bold" />
@@ -243,7 +261,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingMultiplier="1.35"
-                android:text="Add your player tag and the bubble:\n✓  marks the brawlers you actually own\n✓  can show only power 11 or hypercharged picks\n✓  plans what to upgrade next"
+                android:text="@string/setup_body"
                 android:textColor="@color/muted"
                 android:textSize="13sp" />
             <TextView
@@ -255,7 +273,7 @@
                 android:gravity="center"
                 android:paddingTop="13dp"
                 android:paddingBottom="13dp"
-                android:text="Add my player tag"
+                android:text="@string/setup_cta"
                 android:textColor="@color/brand_ink"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -264,7 +282,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="Find it in game: tap your profile, it starts with #"
+                android:text="@string/setup_hint"
                 android:textColor="@color/muted"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -283,7 +301,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="WHAT IT DOES"
+            android:text="@string/what_caption"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.12"
@@ -325,7 +343,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Best picks, map by map"
+                        android:text="@string/feature_picks_title"
                         android:textColor="@color/foreground"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -335,7 +353,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:lineSpacingMultiplier="1.25"
-                        android:text="The live rotation, ranked by what actually wins there — not a season-long average"
+                        android:text="@string/feature_picks_body"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -371,7 +389,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Who to ban"
+                        android:text="@string/feature_bans_title"
                         android:textColor="@color/foreground"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -381,7 +399,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:lineSpacingMultiplier="1.25"
-                        android:text="Ranked bans, ordered by how often each brawler is taken on this map"
+                        android:text="@string/feature_bans_body"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -419,7 +437,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Best trio for the map"
+                        android:text="@string/feature_trio_title"
                         android:textColor="@color/foreground"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -429,7 +447,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:lineSpacingMultiplier="1.25"
-                        android:text="The three that win together in Ranked, with the ones you own ticked"
+                        android:text="@string/feature_trio_body"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -465,7 +483,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Counters mid-draft"
+                        android:text="@string/feature_counters_title"
                         android:textColor="@color/foreground"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -475,7 +493,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:lineSpacingMultiplier="1.25"
-                        android:text="Enter the bans and the enemy picks; it names what beats them"
+                        android:text="@string/feature_counters_body"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -511,7 +529,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="The build to run"
+                        android:text="@string/feature_build_title"
                         android:textColor="@color/foreground"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -521,7 +539,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:lineSpacingMultiplier="1.25"
-                        android:text="Gadget, star power and gears on any brawler you tap"
+                        android:text="@string/feature_build_body"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -532,7 +550,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="YOUR ACCOUNT"
+            android:text="@string/account_caption"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.12"
@@ -572,7 +590,7 @@
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:background="@drawable/avatar_frame"
-                    android:contentDescription="Player icon"
+                    android:contentDescription="@string/player_icon"
                     android:padding="4dp"
                     android:scaleType="fitCenter" />
 
@@ -637,7 +655,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:letterSpacing="0.1"
-                android:text="SHOW IN THE PANEL · TAP TO CHOOSE"
+                android:text="@string/filter_caption"
                 android:textColor="@color/muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -695,7 +713,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="All my brawlers"
+                            android:text="@string/filter_all_title"
                             android:textColor="@color/foreground"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -703,7 +721,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Mark everything you own; grey out the rest"
+                            android:text="@string/filter_all_body"
                             android:textColor="@color/muted"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -759,7 +777,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Power 11 only"
+                            android:text="@string/filter_p11_title"
                             android:textColor="@color/foreground"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -767,7 +785,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Just what is fully upgraded for Ranked"
+                            android:text="@string/filter_p11_body"
                             android:textColor="@color/muted"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -823,7 +841,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Power 11 + hypercharge"
+                            android:text="@string/filter_hyper_title"
                             android:textColor="@color/foreground"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -831,7 +849,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Only brawlers at their absolute strongest"
+                            android:text="@string/filter_hyper_body"
                             android:textColor="@color/muted"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -883,7 +901,7 @@
                 android:paddingTop="8dp"
                 android:paddingEnd="14dp"
                 android:paddingBottom="8dp"
-                android:text="Change tag"
+                android:text="@string/change_tag"
                 android:textColor="@color/muted"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -900,7 +918,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:letterSpacing="0.1"
-                android:text="PLAYER TAG"
+                android:text="@string/tag_label"
                 android:textColor="@color/muted"
                 android:textSize="10sp"
                 android:textStyle="bold" />
@@ -932,7 +950,7 @@
                 android:lineSpacingMultiplier="1.3"
                 android:textColor="@color/muted"
                 android:textSize="13sp"
-                android:text="Optional. Add your tag and the panel marks the picks you can actually take." />
+                android:text="@string/tag_optional" />
             </LinearLayout>
 
             <View
@@ -965,7 +983,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Hide unavailable brawlers"
+                        android:text="@string/hide_title"
                         android:textColor="@color/foreground"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -974,13 +992,188 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
-                        android:text="Show only what you can play, instead of greying the rest"
+                        android:text="@string/hide_body"
                         android:textColor="@color/muted"
                         android:textSize="12sp" />
                 </LinearLayout>
 
                 <Switch
                     android:id="@+id/hide_unusable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <!--
+            How the bubble sits over the game (1.28).
+
+            It rests over a match for its whole length, so this is where it is
+            made smaller, fainter or tucked away. The preview is the bubble
+            itself at the chosen size, once as it looks under a finger and once
+            as it rests, so each choice is made against what it produces.
+        -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/look_caption"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:textColor="@color/muted" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/card_surface"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:background="@drawable/filter_row"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp">
+                        <ImageView
+                            android:id="@+id/preview_touched"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bubble_badge"
+                            android:contentDescription="@null"
+                            android:src="@drawable/bubble_glyph" />
+                    </FrameLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/look_touched"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <!-- Clips the badge when tucked, the way the screen edge does. -->
+                    <FrameLayout
+                        android:id="@+id/preview_idle_frame"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:clipChildren="true">
+                        <ImageView
+                            android:id="@+id/preview_idle"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bubble_badge"
+                            android:contentDescription="@null"
+                            android:src="@drawable/bubble_glyph" />
+                    </FrameLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/look_idle_preview"
+                        android:textColor="@color/muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/look_size"
+                android:textColor="@color/foreground"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Options are added in code, one per size. -->
+            <LinearLayout
+                android:id="@+id/look_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/look_idle"
+                android:textColor="@color/foreground"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/look_idle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingMultiplier="1.25"
+                android:text="@string/look_idle_hint"
+                android:textColor="@color/muted"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/border" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tuck_title"
+                        android:textColor="@color/foreground"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="@string/tuck_body"
+                        android:textColor="@color/muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Switch
+                    android:id="@+id/look_tuck"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
@@ -1004,7 +1197,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="WHAT TO UPGRADE NEXT"
+            android:text="@string/plan_caption"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.12"
@@ -1055,7 +1248,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="HOW IT WORKS"
+            android:text="@string/how_caption"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.12"
@@ -1094,7 +1287,7 @@
                     android:textSize="14sp"
                     android:lineSpacingMultiplier="1.25"
                     android:textColor="@color/foreground"
-                    android:text="Tap the bubble to open the panel; tap it again to fold it away." />
+                    android:text="@string/how_1" />
             </LinearLayout>
 
             <View
@@ -1127,7 +1320,7 @@
                     android:textSize="14sp"
                     android:lineSpacingMultiplier="1.25"
                     android:textColor="@color/foreground"
-                    android:text="Drag the bubble anywhere — it rests against the nearest edge." />
+                    android:text="@string/how_2" />
             </LinearLayout>
 
             <View
@@ -1160,7 +1353,7 @@
                     android:textSize="14sp"
                     android:lineSpacingMultiplier="1.25"
                     android:textColor="@color/foreground"
-                    android:text="Drag it onto the ✕ at the bottom to close it, use Stop in the notification, or the BrawlZone tile in Quick Settings — that tile also starts it, from inside the game." />
+                    android:text="@string/how_3" />
             </LinearLayout>
 
         </LinearLayout>
@@ -1179,7 +1372,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:lineSpacingMultiplier="1.3"
-            android:text="Numbers measured from sampled Ranked battles, the same ones brawlzone.net shows. Free, no account, no ads."
+            android:text="@string/footer_note"
             android:textColor="@color/muted"
             android:textSize="12sp" />
 
@@ -1201,7 +1394,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:lineSpacingMultiplier="1.3"
-            android:text="BrawlZone is a fan-made app. It is not affiliated with, endorsed, sponsored or specifically approved by Supercell, and Supercell is not responsible for it."
+            android:text="@string/disclaimer"
             android:textColor="@color/muted"
             android:textSize="11sp" />
 

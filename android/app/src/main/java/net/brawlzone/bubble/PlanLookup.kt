@@ -47,10 +47,10 @@ object PlanLookup {
         token += 1
     }
 
-    fun load(tag: String, onResult: (Plan?) -> Unit) {
+    fun load(tag: String, lang: String, onResult: (Plan?) -> Unit) {
         val mine = ++token
         pool.execute {
-            val plan = runCatching { fetch(tag) }.getOrNull()
+            val plan = runCatching { fetch(tag, lang) }.getOrNull()
             main.post { if (mine == token) onResult(plan) }
         }
     }
@@ -65,8 +65,9 @@ object PlanLookup {
         }
     }
 
-    private fun fetch(tag: String): Plan? {
-        val json = JSONObject(Http.text("${Http.SITE}/api/bubble/plan?tag=$tag"))
+    private fun fetch(tag: String, lang: String): Plan? {
+        // The sentences are written on the server, in the app's language.
+        val json = JSONObject(Http.text("${Http.SITE}/api/bubble/plan?tag=$tag&lang=$lang"))
         if (json.has("error")) return null
 
         val array = json.getJSONArray("steps")

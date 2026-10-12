@@ -1,4 +1,6 @@
 import { brawlerIconUrl } from '@/lib/brawlapi';
+import { PLAN_EN, PLAN_TEXT, type PlanText } from '@/lib/bubble-plan-text';
+import { fill } from '@/lib/bubble-ui-en';
 import { formatNumber } from '@/lib/format';
 import { MAX_POWER_LEVEL } from '@/lib/progression';
 import type { RosterPlan } from '@/lib/roster-optimizer';
@@ -36,8 +38,21 @@ export interface BubblePlan {
   steps: BubblePlanStep[];
 }
 
-function modesWord(n: number): string {
-  return n === 1 ? 'mode' : 'modes';
+/** How one language writes this card: its sentences, numbers and lists. */
+interface Voice {
+  t: PlanText;
+  num: (n: number) => string;
+  list: (items: string[]) => string;
+}
+
+function voice(lang: string): Voice {
+  const t = PLAN_TEXT[lang];
+  if (!t || lang === 'en') {
+    return { t: PLAN_EN, num: (n) => formatNumber(n), list: (items) => items.join(', ') };
+  }
+  const numbers = new Intl.NumberFormat(lang);
+  const lists = new Intl.ListFormat(lang, { style: 'short', type: 'unit' });
+  return { t, num: (n) => numbers.format(n), list: (items) => lists.format(items) };
 }
 
 /**
@@ -46,16 +61,14 @@ function modesWord(n: number): string {
  * Always about the present, never about the plan — a reader who has not spent
  * anything yet should not be told they cover six modes because they could.
  */
-function baseline(covered: number, modes: number, banSafe: number): string {
+function baseline({ t }: Voice, covered: number, modes: number, banSafe: number): string {
   if (covered === 0) {
     // "any of the 1 live Ranked mode" is what the general form produces, and a
     // sentence the app cannot be patched out of is worth the extra branch.
-    return modes === 1
-      ? 'You cannot field a top-three pick in the one live Ranked mode yet.'
-      : `You cannot field a top-three pick in any of the ${modes} live Ranked modes yet.`;
+    return modes === 1 ? t.noneOne : fill(t.none, { modes });
   }
   if (covered < modes) {
-    return `Right now you can field a top-three pick in ${covered} of ${modes}.`;
+    return fill(t.some, { covered, modes });
   }
   /*
    * Fully covered is not the same as finished. Ban-safe means two ready picks,
@@ -63,8 +76,8 @@ function baseline(covered: number, modes: number, banSafe: number): string {
    * from nothing — and telling them they are done would be wrong.
    */
   return banSafe < modes
-    ? `You cover all ${modes}, but only ${banSafe} ${banSafe === 1 ? 'survives' : 'survive'} the first ban.`
-    : `You cover all ${modes}, and every one survives the first ban.`;
+    ? fill(banSafe === 1 ? t.allBanOne : t.allBan, { modes, n: banSafe })
+    : fill(t.allSafe, { modes });
 }
 
 /**
@@ -77,14 +90,22 @@ function baseline(covered: number, modes: number, banSafe: number): string {
 export function bubblePlan({
   plan,
   coverage,
+  lang = 'en',
+  name = (text) => text,
 }: {
   plan: RosterPlan | null;
   coverage: { covered: number; banSafe: number; modes: number };
+  /** The app's language, from 1.28; older builds send none and get English. */
+  lang?: string;
+  /** A brawler's name in that language, as the game spells it. */
+  name?: (text: string) => string;
 }): BubblePlan | null {
   const { covered, banSafe, modes } = coverage;
   if (modes === 0) return null;
 
-  const note = baseline(covered, modes, banSafe);
+  const v = voice(lang);
+  const { t } = v;
+  const note = baseline(v, covered, modes, banSafe);
 
   if (!plan || plan.steps.length === 0) {
     /*
@@ -94,18 +115,15 @@ export function bubblePlan({
      * refuses to recommend one.
      */
     return {
-      headline: covered >= modes ? 'Nothing left to upgrade' : 'No upgrade would change this',
-      note:
-        covered >= modes
-          ? note
-          : `${note} Closing it needs a brawler you do not own yet, and an unlock is not something you can just buy.`,
+      headline: covered >= modes ? t.doneHead : t.stuckHead,
+      note: covered >= modes ? note : fill(t.stuckNote, { note }),
       steps: [],
     };
   }
 
   const gained = plan.coveredAfter - plan.coveredBefore;
   const secured = plan.banSafeAfter - plan.banSafeBefore;
-  const coins = `${formatNumber(plan.totalCoins)} coins`;
+  const coins = fill(t.coins, { n: v.num(plan.totalCoins) });
 
   /*
    * Coverage leads when there is any, because a mode you cannot play at all is
@@ -114,22 +132,26 @@ export function bubblePlan({
    */
   const headline =
     gained > 0
-      ? `${coins} covers ${gained} more ${modesWord(gained)}`
-      : `${coins} makes ${secured} more ${modesWord(secured)} ban-safe`;
+      ? fill(gained === 1 ? t.coverOne : t.cover, { coins, n: gained })
+      : fill(secured === 1 ? t.secureOne : t.secure, { coins, n: secured });
 
   return {
     headline,
     note,
     steps: plan.steps.map((step) => ({
       brawlerId: step.brawlerId,
-      name: step.name,
+      name: name(step.name),
       icon: brawlerIconUrl(step.brawlerId),
-      detail: `Power ${step.power} → ${MAX_POWER_LEVEL} · ${formatNumber(step.coins)} coins`,
+      detail: fill(t.detail, {
+        from: step.power,
+        to: MAX_POWER_LEVEL,
+        coins: fill(t.coins, { n: v.num(step.coins) }),
+      }),
       gain:
         step.covers.length > 0
-          ? `Covers ${step.covers.join(', ')}`
+          ? fill(t.covers, { list: v.list(step.covers) })
           : step.secures.length > 0
-            ? `Survives a ban in ${step.secures.join(', ')}`
+            ? fill(t.secures, { list: v.list(step.secures) })
             : '',
     })),
   };

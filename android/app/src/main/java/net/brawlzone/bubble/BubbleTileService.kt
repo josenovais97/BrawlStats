@@ -64,7 +64,10 @@ class BubbleTileService : TileService() {
         tile.state = if (BubbleService.running) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
         tile.label = "BrawlZone"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tile.subtitle = if (BubbleService.running) "Bubble on" else "Bubble off"
+            val local = AppLang.wrap(this)
+            tile.subtitle = local.getString(
+                if (BubbleService.running) R.string.tile_on else R.string.tile_off,
+            )
         }
         tile.updateTile()
     }

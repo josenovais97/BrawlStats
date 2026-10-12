@@ -74,6 +74,51 @@ class BubbleService : Service() {
 
     private var bubble: View? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
+    /** The badge inside the bubble's window: what fades and what scales. */
+    private var bubbleArt: ImageView? = null
+
+    /** Whether the bubble is resting: faded and, if asked, tucked. */
+    private var resting = false
+    /** A finger is on the bubble; nothing may rest it underneath one. */
+    private var touching = false
+    private var slide: ValueAnimator? = null
+    private val rest = Runnable { restBubble() }
+
+    /*
+     * Settings changed in the app while the bubble is up. Held in a field:
+     * SharedPreferences keeps its listeners in a weak map, so a lambda passed
+     * inline is collected and silently stops being called.
+     */
+    private val lookListener =
+        android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            handler.post {
+                when (key) {
+                    BubbleLook.KEY_SIZE -> rebuildBubble()
+                    BubbleLook.KEY_IDLE, BubbleLook.KEY_TUCK -> {
+                        wakeBubble(animate = false)
+                        scheduleRest()
+                    }
+                }
+            }
+        }
+    private val langListener =
+        android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            handler.post { onLanguageChanged() }
+        }
+
+    /** Strings in the app's language, which can change while the service runs. */
+    private var textContext: Pair<String, Context>? = null
+
+    private fun str(id: Int): String {
+        val lang = AppLang.current(this)
+        val cached = textContext
+        val ctx = if (cached != null && cached.first == lang) {
+            cached.second
+        } else {
+            AppLang.wrap(this).also { textContext = lang to it }
+        }
+        return ctx.getString(id)
+    }
     private var panel: View? = null
     private var panelParams: WindowManager.LayoutParams? = null
     private var closeTarget: View? = null
@@ -180,6 +225,8 @@ class BubbleService : Service() {
         }
 
         showBubble()
+        BubbleLook.prefs(this).registerOnSharedPreferenceChangeListener(lookListener)
+        AppLang.prefs(this).registerOnSharedPreferenceChangeListener(langListener)
         running = true
         BubbleTileService.refresh(this)
 
@@ -208,6 +255,9 @@ class BubbleService : Service() {
 
     override fun onDestroy() {
         running = false
+        BubbleLook.prefs(this).unregisterOnSharedPreferenceChangeListener(lookListener)
+        AppLang.prefs(this).unregisterOnSharedPreferenceChangeListener(langListener)
+        slide?.cancel()
         BubbleTileService.refresh(this)
         runCatching { installWatcher?.let { unregisterReceiver(it) } }
         installWatcher = null
@@ -216,17 +266,23 @@ class BubbleService : Service() {
         hideCloseTarget()
         bubble?.let { runCatching { windows.removeView(it) } }
         bubble = null
+        bubbleArt = null
         super.onDestroy()
     }
 
     // ---------------------------------------------------------------- bubble
 
-    private fun showBubble() {
+    /**
+     * Puts the bubble up. `at` is where a rebuilt bubble goes: its old y and
+     * the side it rested on, so changing the size in the app does not throw
+     * it back to the default corner.
+     */
+    private fun showBubble(at: Pair<Boolean, Int>? = null) {
         // One bubble, ever. A second `addView` on a restart would leave the
         // first orphaned on screen with nothing holding a reference to remove it.
         if (bubble != null) return
 
-        val badge = dp(52)
+        val badge = dp(BubbleLook.badgeDp(BubbleLook.size(this)))
         val pad = dp(6) // room inside the window for the drop shadow to render
 
         /*
@@ -252,7 +308,8 @@ class BubbleService : Service() {
                 setPadding(ring, ring, ring, ring)
             } else {
                 setImageResource(R.drawable.bubble_glyph)
-                val inset = dp(13)
+                // A quarter of the badge, which is 13dp at the normal size.
+                val inset = badge / 4
                 setPadding(inset, inset, inset, inset)
             }
             elevation = dp(6).toFloat()
@@ -271,13 +328,20 @@ class BubbleService : Service() {
             // LAYOUT_IN_SCREEN so x/y are screen-absolute — without it the y is
             // measured below the status bar while MotionEvent.rawY is not, and
             // the two disagree by the inset height wherever they are compared.
+            //
+            // LAYOUT_NO_LIMITS is for tucking: without it the window manager
+            // clamps an overlay to the screen, and "half off the edge" is
+            // quietly moved back on.
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = screenW - (badge + pad * 2)
-            y = dp(160)
+            val size = badge + pad * 2
+            val onLeft = at?.first ?: false
+            x = if (onLeft) 0 else screenW - size
+            y = (at?.second ?: dp(160)).coerceIn(0, (screenH - size).coerceAtLeast(0))
         }
 
         /*
@@ -290,15 +354,21 @@ class BubbleService : Service() {
         var startX = 0
         var startY = 0
         var dragging = false
+        var startedTucked = false
         val slop = dp(10)
 
         host.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    touching = true
+                    // Back to full strength under the finger, and out from
+                    // the edge if it was tucked.
+                    wakeBubble(animate = true)
                     downX = event.rawX
                     downY = event.rawY
                     startX = params.x
                     startY = params.y
+                    startedTucked = params.x < 0 || params.x > screenW - params.width
                     dragging = false
                     art.animate().scaleX(0.90f).scaleY(0.90f).setDuration(90).start()
                     true
@@ -309,6 +379,15 @@ class BubbleService : Service() {
                     val dy = event.rawY - downY
                     if (!dragging && (abs(dx) > slop || abs(dy) > slop)) {
                         dragging = true
+                        // Pressed while tucked: the slide out may still be
+                        // running. The drag takes over from the edge, from
+                        // where the finger is now, so the bubble never jumps.
+                        if (startedTucked) {
+                            slide?.cancel()
+                            settleOnEdge(params)
+                            startX = params.x
+                            downX = event.rawX
+                        }
                         // Close the panel the moment a drag starts: a panel
                         // anchored to a bubble that is moving looks broken.
                         removePanel()
@@ -326,6 +405,7 @@ class BubbleService : Service() {
                 }
 
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    touching = false
                     art.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
                     val onTarget = dragging && overCloseTarget(params)
                     hideCloseTarget()
@@ -335,6 +415,7 @@ class BubbleService : Service() {
                         dragging -> snapToEdge(host, params)
                         else -> togglePanel()
                     }
+                    scheduleRest()
                     true
                 }
 
@@ -344,12 +425,107 @@ class BubbleService : Service() {
 
         bubble = host
         bubbleParams = params
+        bubbleArt = art
+        resting = false
         runCatching { windows.addView(host, params) }
+            .onSuccess { scheduleRest() }
             .onFailure {
                 bubble = null
                 bubbleParams = null
+                bubbleArt = null
                 stopSelf()
             }
+    }
+
+    /** A new size: the bubble is rebuilt where it was, panel closed first. */
+    private fun rebuildBubble() {
+        val view = bubble ?: return
+        val params = bubbleParams ?: return
+        val onLeft = params.x + params.width / 2 < screenW / 2
+        val y = params.y
+        handler.removeCallbacks(rest)
+        slide?.cancel()
+        removePanel()
+        runCatching { windows.removeView(view) }
+        bubble = null
+        bubbleParams = null
+        bubbleArt = null
+        showBubble(onLeft to y)
+    }
+
+    // ------------------------------------------------------------ resting
+
+    /** The bubble's x against its nearer edge, fully on screen. */
+    private fun edgeX(params: WindowManager.LayoutParams): Int =
+        if (params.x + params.width / 2 < screenW / 2) 0 else screenW - params.width
+
+    /** The same edge, with half the badge past it. */
+    private fun tuckedX(params: WindowManager.LayoutParams): Int {
+        val half = params.width / 2
+        return if (params.x + params.width / 2 < screenW / 2) -half else screenW - params.width + half
+    }
+
+    private fun settleOnEdge(params: WindowManager.LayoutParams) {
+        if (params.x < 0 || params.x > screenW - params.width) {
+            params.x = edgeX(params)
+            bubble?.let { runCatching { windows.updateViewLayout(it, params) } }
+        }
+    }
+
+    /**
+     * Rest the bubble a few seconds after the last touch -- unless it is in
+     * use. With the panel open the bubble is the way to close it, so it stays
+     * where and how it is.
+     */
+    private fun scheduleRest() {
+        handler.removeCallbacks(rest)
+        if (bubble == null) return
+        if (BubbleLook.idle(this) >= 100 && !BubbleLook.tuck(this)) return
+        handler.postDelayed(rest, BubbleLook.IDLE_AFTER_MS)
+    }
+
+    private fun restBubble() {
+        val art = bubbleArt ?: return
+        val params = bubbleParams ?: return
+        if (panel != null || touching || closeTarget != null) return
+        resting = true
+        art.animate().alpha(BubbleLook.idle(this) / 100f).setDuration(400).start()
+        if (BubbleLook.tuck(this)) slideTo(params, tuckedX(params), 260)
+    }
+
+    /** Full strength and fully on screen. */
+    private fun wakeBubble(animate: Boolean) {
+        handler.removeCallbacks(rest)
+        val art = bubbleArt ?: return
+        val params = bubbleParams ?: return
+        resting = false
+        art.animate().cancel()
+        if (animate) art.animate().alpha(1f).setDuration(120).start() else art.alpha = 1f
+        val target = edgeX(params)
+        val outside = params.x < 0 || params.x > screenW - params.width
+        if (!outside) return
+        if (animate) {
+            slideTo(params, target, 120)
+        } else {
+            slide?.cancel()
+            params.x = target
+            bubble?.let { runCatching { windows.updateViewLayout(it, params) } }
+        }
+    }
+
+    private fun slideTo(params: WindowManager.LayoutParams, target: Int, ms: Long) {
+        val view = bubble ?: return
+        slide?.cancel()
+        if (params.x == target) return
+        slide = ValueAnimator.ofInt(params.x, target).apply {
+            duration = ms
+            interpolator = DecelerateInterpolator()
+            addUpdateListener {
+                params.x = it.animatedValue as Int
+                runCatching { windows.updateViewLayout(view, params) }
+            }
+            start()
+        }
     }
 
     /** Rest against whichever side is nearer, the way every bubble on Android does. */
@@ -511,8 +687,13 @@ class BubbleService : Service() {
             params.y = params.y.coerceIn(0, (screenH - params.height).coerceAtLeast(0))
             // Rest against whichever edge is now nearer, so it never lands
             // stranded in the middle of the play area.
+            slide?.cancel()
             params.x = if (params.x + params.width / 2 < screenW / 2) 0 else screenW - params.width
             bubble?.let { runCatching { windows.updateViewLayout(it, params) } }
+            // Untucked by the snap above; it rests again in a moment.
+            bubbleArt?.alpha = 1f
+            resting = false
+            scheduleRest()
         }
 
         // The remembered position belongs to the orientation it was chosen in.
@@ -644,6 +825,7 @@ class BubbleService : Service() {
 
         view.postDelayed(drop, COLLAPSE_MS + 60)
         handler.postDelayed(drop, COLLAPSE_MS + 120)
+        scheduleRest()
     }
 
     /**
@@ -651,7 +833,8 @@ class BubbleService : Service() {
      * noticed. The page reads the tag and the filters once, when it loads.
      */
     private fun accountKey(): String =
-        Account.tag(this) + "|" + Account.filter(this) + "|" + Account.hide(this)
+        Account.tag(this) + "|" + Account.filter(this) + "|" + Account.hide(this) +
+            "|" + AppLang.chosen(this)
 
     /**
      * The panel's views, built once and reused for every open.
@@ -754,7 +937,7 @@ class BubbleService : Service() {
          * fallback below is only acceptable because this says what it is.
          */
         val offline = TextView(this).apply {
-            text = "Offline · showing the last saved list"
+            text = str(R.string.panel_offline)
             textSize = 11f
             gravity = Gravity.CENTER
             setTextColor(Color.parseColor("#FFC53D"))
@@ -779,7 +962,7 @@ class BubbleService : Service() {
         /* Shown in place of the page when the load fails and there is no saved
            copy to fall back on; tapping reloads. */
         val retry = TextView(this).apply {
-            text = "Could not reach brawlzone.net.\n\nTap to try again."
+            text = str(R.string.panel_retry)
             textSize = 13f
             gravity = Gravity.CENTER
             setTextColor(Color.parseColor("#98A3C4"))
@@ -1013,6 +1196,10 @@ class BubbleService : Service() {
      */
     private fun showPanel() {
         val params = bubbleParams ?: return
+        // On the edge and solid before anything is placed against it: the panel
+        // sits beside the bubble, and beside a tucked one is half off-screen.
+        wakeBubble(animate = false)
+        handler.removeCallbacks(rest)
         val root = buildPanel()
 
         // A collapse still animating out holds the same view. Take it down now
@@ -1203,7 +1390,7 @@ class BubbleService : Service() {
 
         if (!opened) {
             Log.d(TAG, "no handler for $uri")
-            toast("Could not open that link")
+            toast(str(R.string.toast_no_link))
         }
     }
 
@@ -1233,7 +1420,7 @@ class BubbleService : Service() {
                 val manager = getSystemService(DownloadManager::class.java) ?: return
                 val file = runCatching { manager.getUriForDownloadedFile(id) }.getOrNull()
                 if (file == null) {
-                    toast("Update downloaded — open it from your Downloads folder")
+                    toast(str(R.string.toast_downloaded))
                     return
                 }
                 val opened = runCatching {
@@ -1247,7 +1434,7 @@ class BubbleService : Service() {
                     )
                     true
                 }.getOrElse { false }
-                if (!opened) toast("Update downloaded — open it from your Downloads folder")
+                if (!opened) toast(str(R.string.toast_downloaded))
             }
         }
         installWatcher = receiver
@@ -1264,8 +1451,8 @@ class BubbleService : Service() {
         val manager = getSystemService(DownloadManager::class.java) ?: return false
         val name = uri.lastPathSegment ?: "brawlzone-bubble.apk"
         val request = DownloadManager.Request(uri)
-            .setTitle("BrawlZone update")
-            .setDescription("Tap when finished to install")
+            .setTitle(str(R.string.download_title))
+            .setDescription(str(R.string.download_description))
             .setMimeType("application/vnd.android.package-archive")
             .setNotificationVisibility(
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED,
@@ -1282,7 +1469,7 @@ class BubbleService : Service() {
          * notifications on it is redundant, and without them it is the only
          * thing standing between the reader and the file.
          */
-        toast("Downloading the update — it lands in your Downloads folder")
+        toast(str(R.string.toast_downloading))
         true
     }.getOrElse {
         Log.w(TAG, "download manager refused $uri", it)
@@ -1351,6 +1538,32 @@ class BubbleService : Service() {
             if (uri.scheme != "https") return
             handler.post { openExternally(uri) }
         }
+
+        /**
+         * The panel's language picker, so the app follows it (1.28).
+         *
+         * The page already shows the new language, so the stored key is
+         * moved along with it: otherwise the next open would see a changed
+         * account key and reload a page that is already right.
+         */
+        @JavascriptInterface
+        fun setLanguage(code: String) {
+            handler.post {
+                if (AppLang.set(this@BubbleService, code) && panelLoaded) {
+                    panelAccount = accountKey()
+                }
+            }
+        }
+    }
+
+    /** The notification and the panel's own few words, in the new language. */
+    private fun onLanguageChanged() {
+        panelOffline?.text = str(R.string.panel_offline)
+        panelRetry?.text = str(R.string.panel_retry)
+        runCatching {
+            getSystemService(NotificationManager::class.java)
+                .notify(NOTIFICATION_ID, buildNotification())
+        }
     }
 
     // ---------------------------------------------------------- notification
@@ -1380,7 +1593,7 @@ class BubbleService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Bubble",
+                str(R.string.notification_channel),
                 NotificationManager.IMPORTANCE_LOW,
             ).apply { setShowBadge(false) }
             (getSystemService(NotificationManager::class.java)).createNotificationChannel(channel)
@@ -1417,12 +1630,12 @@ class BubbleService : Service() {
         )
 
         return Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("BrawlZone bubble")
-            .setContentText("Tap the bubble for live picks · drag it down to close")
+            .setContentTitle(str(R.string.notification_title))
+            .setContentText(str(R.string.notification_text))
             .setSmallIcon(R.drawable.bubble_glyph)
             .setContentIntent(open)
-            .addAction(Notification.Action.Builder(null as Icon?, "Panel", panel).build())
-            .addAction(Notification.Action.Builder(null as Icon?, "Stop", stop).build())
+            .addAction(Notification.Action.Builder(null as Icon?, str(R.string.notification_panel), panel).build())
+            .addAction(Notification.Action.Builder(null as Icon?, str(R.string.stop), stop).build())
             .setOngoing(true)
             .build()
     }
