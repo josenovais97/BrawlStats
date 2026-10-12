@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.27',
+  version: '1.28',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 48,
+  versionCode: 49,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.27.apk',
+  path: '/downloads/brawlzone-bubble-1.28.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -62,11 +62,11 @@ export const BUBBLE_APP = {
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2830114,
-  sha256: '4b7283fcf0ee0ea04706a7f990c36c0aefc3e4c89b125ed894c3355ece1aa81e',
+  size: 2991730,
+  sha256: 'dac07d5864ff39d49764a9796ab19458611103948391a473aa3d9a55097d7ecd',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
-  released: '2026-10-09',
+  released: '2026-10-12',
 } as const;
 
 /** "2.5 MB", for a reader deciding whether to tap on mobile data. */
@@ -95,6 +95,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.28',
+    versionCode: 49,
+    date: '2026-10-12',
+    changes: [
+      'Make the bubble yours: choose its size, how faint it gets when you leave it alone, and whether it tucks half off the edge. A touch always brings it straight back.',
+      'The app now speaks your language: all 22 languages of the game, with a flag picker at the top. The app and this panel share one language setting.',
+      '\u201cWhat to upgrade next\u201d comes in your language too, with brawler and mode names as the game writes them.',
+    ],
+  },
   {
     version: '1.27',
     versionCode: 48,
