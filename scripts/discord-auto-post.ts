@@ -104,6 +104,22 @@ async function publish(channelId: string, messageId: string) {
   await call('POST', `/channels/${channelId}/messages/${messageId}/crosspost`).catch(() => undefined);
 }
 
+/**
+ * True when this bot already posted a message titled `prefix` in the channel
+ * within `hours`. Keeps a re-run, a manual test or systemd's catch-up after a
+ * reboot from posting the same thing twice.
+ */
+async function postedWithin(channelId: string, prefix: string, hours: number): Promise<boolean> {
+  const recent = await call<{ timestamp: string; author: { bot?: boolean }; embeds?: { title?: string }[] }[]>(
+    'GET',
+    `/channels/${channelId}/messages?limit=30`,
+  );
+  const since = Date.now() - hours * 3_600_000;
+  return recent.some(
+    (m) => m.author.bot && Date.parse(m.timestamp) > since && m.embeds?.some((e) => e.title?.startsWith(prefix)),
+  );
+}
+
 function buttons(...links: [string, string][]) {
   return [{ type: 1, components: links.map(([label, url]) => ({ type: 2, style: 5, label, url })) }];
 }
@@ -166,6 +182,8 @@ async function daily(g: Guild): Promise<string> {
     (s) => s.event.map && gameTime(s.startTime) <= now && gameTime(s.endTime) > now,
   );
   if (!slots.length) return 'Rotation empty; nothing posted';
+  const id = channel(g, '📈-meta-updates');
+  if (await postedWithin(id, '🗺️ Today', 20)) return 'Today\u2019s maps already posted';
 
   // The map pages' order: the map's own picks under the battle data's spelling
   // of its name, else the mode's -- a weaker answer, but a real one.
@@ -188,7 +206,6 @@ async function daily(g: Guild): Promise<string> {
       inline: true,
     });
   }
-  const id = channel(g, '📈-meta-updates');
   await post(
     id,
     {
@@ -212,6 +229,8 @@ async function daily(g: Guild): Promise<string> {
 /* ------------------------------------------------------------------- botd */
 
 async function botd(g: Guild): Promise<string> {
+  const tierTalk = channel(g, '⚖️-tier-talk');
+  if (await postedWithin(tierTalk, '🌟 Brawler of the day', 20)) return 'Brawler of the day already posted';
   const [rows, edges, meta] = await Promise.all([
     getBrawlerStatsForWindow(7, undefined, 'ranked'),
     getSkillEdge('ranked').catch(() => undefined),
@@ -245,7 +264,7 @@ async function botd(g: Guild): Promise<string> {
       ].filter(Boolean)
     : [];
   const href = `${SITE}${brawlerPath(pick.brawlerId, pick.brawlerName)}`;
-  await post(channel(g, '⚖️-tier-talk'), {
+  await post(tierTalk, {
     embeds: [
       {
         title: `🌟 Brawler of the day: ${name(pick.brawlerName)}`,
@@ -269,6 +288,8 @@ async function botd(g: Guild): Promise<string> {
 /* ----------------------------------------------------------------- weekly */
 
 async function weekly(g: Guild): Promise<string> {
+  const id = channel(g, '📈-meta-updates');
+  if (await postedWithin(id, '📊 Weekly', 6 * 24)) return 'Weekly report already posted this week';
   const [rows, edges, comps, meta] = await Promise.all([
     getBrawlerStatsForWindow(7, undefined, 'ranked'),
     getSkillEdge('ranked').catch(() => undefined),
@@ -286,7 +307,6 @@ async function weekly(g: Guild): Promise<string> {
     .filter((m) => m.comps.length)
     .map((m) => `${modeIcon(g, m.mode)} **${humanizeMode(m.mode)}** — ${m.comps[0].brawlerIds.map(nameOf).join(' · ')} · ${pct(m.comps[0].winRate)}`);
 
-  const id = channel(g, '📈-meta-updates');
   await post(
     id,
     {
