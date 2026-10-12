@@ -753,3 +753,14 @@ body {
 .profile-tabs::-webkit-scrollbar {
   display: none;
 }
+
+/*
+ * Arabic is a joined script: the panel's letter-spacing pulls each word's
+ * connected letters apart into separate glyphs, which reads as broken text.
+ * Hebrew is not joined but has no use for the tracking either.
+ */
+[dir='rtl'],
+[dir='rtl'] * {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
