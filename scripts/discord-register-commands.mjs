@@ -28,29 +28,91 @@ if (!TOKEN || !APP || !GUILD) {
   process.exit(1);
 }
 
+const STRING = 3;
+const brawlerOpt = (name, description, required = true) => ({
+  name, type: STRING, required, description, autocomplete: true,
+});
+const mapOpt = (name = 'map') => ({
+  name, type: STRING, required: true, description: 'A map in the current Ranked pool', autocomplete: true,
+});
+const MODES = [
+  ['Gem Grab', 'gemGrab'], ['Brawl Ball', 'brawlBall'], ['Knockout', 'knockout'],
+  ['Heist', 'heist'], ['Hot Zone', 'hotZone'], ['Bounty', 'bounty'],
+];
+
 const COMMANDS = [
   {
     name: 'profile',
     type: 1,
-    description: 'Look up a Brawl Stars player: skill score, trophies and roster',
+    description: 'Player card: trophies, Ranked rank, skill score and mains',
     options: [
       {
         name: 'tag',
-        type: 3,
-        required: true,
-        description: 'Player tag, with or without the # (e.g. 2RLCPVGUG)',
+        type: STRING,
+        required: false,
+        description: 'Player tag (e.g. 2RLCPVGUG). Leave empty to show your linked account',
       },
     ],
   },
   {
+    name: 'link',
+    type: 1,
+    description: 'Link your Brawl Stars account: sets your trophy and rank roles',
+    options: [{ name: 'tag', type: STRING, required: true, description: 'Your player tag, under your name in game' }],
+  },
+  { name: 'unlink', type: 1, description: 'Remove your linked account and its roles' },
+  {
+    name: 'brawler',
+    type: 1,
+    description: 'Tier, win rate and the build owners run',
+    options: [brawlerOpt('name', 'Brawler name')],
+  },
+  {
+    // Kept so the old name still works for people who learnt it.
     name: 'tier',
     type: 1,
     description: 'How a brawler is performing in Ranked right now',
+    options: [brawlerOpt('brawler', 'Brawler name')],
+  },
+  {
+    name: 'map',
+    type: 1,
+    description: 'Best picks and trios on a Ranked map',
+    options: [mapOpt('name')],
+  },
+  {
+    name: 'draft',
+    type: 1,
+    description: 'What to pick on a map, against their picks and with yours',
     options: [
-      { name: 'brawler', type: 3, required: true, description: 'Brawler name (e.g. brock)' },
+      mapOpt('map'),
+      brawlerOpt('enemy1', 'An enemy pick', false),
+      brawlerOpt('enemy2', 'An enemy pick', false),
+      brawlerOpt('enemy3', 'An enemy pick', false),
+      brawlerOpt('ally1', 'A team-mate pick', false),
+      brawlerOpt('ally2', 'A team-mate pick', false),
     ],
   },
-  { name: 'draft', type: 1, description: 'Open the draft helper' },
+  {
+    name: 'meta',
+    type: 1,
+    description: 'The Ranked top 10 right now',
+    options: [
+      {
+        name: 'mode', type: STRING, required: false, description: 'Only one mode',
+        choices: MODES.map(([name, value]) => ({ name, value })),
+      },
+    ],
+  },
+  { name: 'rotation', type: 1, description: 'Maps live right now and when they end' },
+  {
+    name: 'compare',
+    type: 1,
+    description: 'Brawler vs brawler',
+    options: [brawlerOpt('a', 'First brawler'), brawlerOpt('b', 'Second brawler')],
+  },
+  { name: 'leaderboard', type: 1, description: 'The global top 10 players' },
+  { name: 'help', type: 1, description: 'Everything the BrawlZone bot can do' },
 ];
 
 const headers = {

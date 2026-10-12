@@ -591,3 +591,15 @@ model TikTokLatestPost {
 
   @@map("tiktok_latest_post")
 }
+
+/// Which Brawl Stars account a Discord member linked with `/link`. One row per
+/// member, replaced on re-link and removed by `/unlink`, so it is bounded by
+/// the server's membership. See the migration for why nothing here is
+/// sensitive.
+model DiscordLink {
+  discordUserId String   @id @map("discord_user_id")
+  playerTag     String   @map("player_tag")
+  linkedAt      DateTime @default(now()) @map("linked_at")
+
+  @@map("discord_links")
+}

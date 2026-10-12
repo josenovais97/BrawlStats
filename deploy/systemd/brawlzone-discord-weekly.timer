@@ -1,0 +1,10 @@
+[Unit]
+Description=Discord: weekly Ranked report
+
+[Timer]
+OnCalendar=Mon *-*-* 10:00:00
+Persistent=true
+Unit=brawlzone-discord-auto@weekly.service
+
+[Install]
+WantedBy=timers.target

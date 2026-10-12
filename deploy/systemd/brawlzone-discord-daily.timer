@@ -1,0 +1,10 @@
+[Unit]
+Description=Discord: today's maps and what to pick
+
+[Timer]
+OnCalendar=*-*-* 08:00:00
+Persistent=true
+Unit=brawlzone-discord-auto@daily.service
+
+[Install]
+WantedBy=timers.target

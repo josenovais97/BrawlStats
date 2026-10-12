@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# One scheduled Discord post: brawlzone-discord-auto <daily|botd|weekly|welcome|bubble>
+#
+# Same shape as brawlzone-discord: the `sampler` compose service with its
+# command overridden, because it already has the database, .env.production and
+# the build secret. Every job also announces an unannounced Bubble release.
+set -uo pipefail
+
+job=${1:?usage: brawlzone-discord-auto <job>}
+cd /home/ubuntu/brawlstats || exit 1
+
+out=$(mktemp); trap 'rm -f "$out"' EXIT
+
+if ! docker compose run --rm --build sampler npm run discord:auto -- "$job" >"$out" 2>&1; then
+  echo "Discord $job post FAILED. Output:"
+  tail -25 "$out"
+  exit 1
+fi
+
+grep -E '^Posted' "$out" || echo "Ran, but said nothing — check the full log."
+
+# Same cap as brawlzone-discord and auto-deploy: this builds an image too.
+docker builder prune -f --max-used-space=4GB >/dev/null 2>&1 || true

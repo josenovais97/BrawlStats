@@ -1,0 +1,10 @@
+[Unit]
+Description=Discord: brawler of the day
+
+[Timer]
+OnCalendar=*-*-* 14:00:00
+Persistent=true
+Unit=brawlzone-discord-auto@botd.service
+
+[Install]
+WantedBy=timers.target
