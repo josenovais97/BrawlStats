@@ -85,6 +85,7 @@ const fr: UiStrings = {
   'bracket.all': 'Tous les rangs',
   'bracket.thin': 'Pas encore assez de combats {rank} dans ce mode — tous les rangs affichés.',
   'bracket.mapsAllRanks': 'Les choix par carte comptent tous les rangs : un seul rang a trop peu de combats par carte.',
+  'bracket.mapsAdjusted': 'Choix pour {rank} : les résultats de cette carte à tous les rangs, ajustés selon la forme de chaque brawler en {rank}.',
 };
 
 export default fr;

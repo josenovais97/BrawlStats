@@ -85,6 +85,7 @@ const nl: UiStrings = {
   'bracket.all': 'Alle rangen',
   'bracket.thin': 'Nog niet genoeg {rank}-potjes in deze modus – alle rangen worden getoond.',
   'bracket.mapsAllRanks': 'Kaartkeuzes tellen alle rangen: één rang alleen heeft te weinig potjes per kaart.',
+  'bracket.mapsAdjusted': 'Keuzes voor {rank}: de resultaten van deze kaart over alle rangen, aangepast aan hoe elke knokker het doet in {rank}.',
 };
 
 export default nl;

@@ -85,6 +85,7 @@ const ja: UiStrings = {
   'bracket.all': '全ランク',
   'bracket.thin': 'このモードの{rank}のバトルがまだ足りないため、全ランクを表示しています。',
   'bracket.mapsAllRanks': 'マップ別のおすすめは全ランクで集計：1つのランクだけではマップごとのバトルが少なすぎます。',
+  'bracket.mapsAdjusted': '{rank}向けのピック：このマップの全ランクの結果を、各キャラの{rank}での成績に合わせて補正しています。',
 };
 
 export default ja;

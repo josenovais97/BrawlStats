@@ -86,6 +86,7 @@ const pt: UiStrings = {
   'bracket.all': 'Todos os ranks',
   'bracket.thin': 'Ainda não há batalhas {rank} suficientes neste modo — mostrando todos os ranks.',
   'bracket.mapsAllRanks': 'As escolhas por mapa contam todos os ranks: um rank sozinho tem poucas batalhas por mapa.',
+  'bracket.mapsAdjusted': 'Escolhas para {rank}: os resultados deste mapa em todos os ranks, ajustados ao desempenho de cada brawler em {rank}.',
 };
 
 export default pt;

@@ -90,6 +90,7 @@ const es: UiStrings = {
   'bracket.all': 'Todos los rangos',
   'bracket.thin': 'Aún no hay suficientes combates de {rank} en este modo: se muestran todos los rangos.',
   'bracket.mapsAllRanks': 'Las elecciones por mapa cuentan todos los rangos: un solo rango tiene muy pocos combates por mapa.',
+  'bracket.mapsAdjusted': 'Elecciones para {rank}: los resultados de este mapa en todos los rangos, ajustados a cómo rinde cada brawler en {rank}.',
 };
 
 export default es;

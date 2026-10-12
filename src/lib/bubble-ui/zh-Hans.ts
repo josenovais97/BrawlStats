@@ -85,6 +85,7 @@ const zhHans: UiStrings = {
   'bracket.all': '全部段位',
   'bracket.thin': '此模式下{rank}段位的对战还不够，正在显示全部段位。',
   'bracket.mapsAllRanks': '地图推荐统计全部段位：单一段位每张地图的对战太少。',
+  'bracket.mapsAdjusted': '{rank} 推荐：此地图所有段位的结果，并按每个英雄在 {rank} 的表现调整。',
 };
 
 export default zhHans;

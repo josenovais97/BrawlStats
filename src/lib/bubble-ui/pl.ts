@@ -85,6 +85,7 @@ const pl: UiStrings = {
   'bracket.all': 'Wszystkie rangi',
   'bracket.thin': 'Za mało walk na randze {rank} w tym trybie — pokazujemy wszystkie rangi.',
   'bracket.mapsAllRanks': 'Wybory na mapie liczą wszystkie rangi: jedna ranga ma za mało walk na mapę.',
+  'bracket.mapsAdjusted': 'Wybory dla {rank}: wyniki tej mapy ze wszystkich rang, dostosowane do formy każdego zadymiarza w {rank}.',
 };
 
 export default pl;

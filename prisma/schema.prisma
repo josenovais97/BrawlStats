@@ -519,6 +519,26 @@ model BrawlerTeamDaily {
   @@map("brawler_team_daily")
 }
 
+/// Every brawler in every sampled Ranked battle -- both teams, six per
+/// battle -- per day, map and rank bracket. Built by the roll-up from
+/// `battle_team_samples`, one row per battle however many pool players were in
+/// it. What the per-rank tier lists and map picks read. See lib/lineups.
+model RankedLineupDaily {
+  day            DateTime @db.Date
+  mode           String
+  /// '' when the battle log named no map.
+  mapName        String   @map("map_name")
+  /// 1-4 (lib/rank-brackets), or 0 when the lobby's rank is unknown.
+  rankBracket    Int      @map("rank_bracket") @db.SmallInt
+  brawlerId      Int      @map("brawler_id")
+  wins           Int
+  losses         Int
+  lastBattleTime DateTime @map("last_battle_time")
+
+  @@id([day, mode, mapName, rankBracket, brawlerId])
+  @@map("ranked_lineup_daily")
+}
+
 /// What each roll-up day was last built from, so unchanged days are not
 /// rebuilt.
 ///
@@ -541,7 +561,7 @@ model BrawlerTeamDaily {
 /// what survived — undercounting it permanently. See RAW_BATTLE_RETENTION_DAYS.
 model RollupWatermark {
   day          DateTime @db.Date
-  /// "battles" | "teams" — the two raw tables, folded on separate day lists.
+  /// "battles" | "teams" | "lineups" — folded on separate day lists.
   source       String
   rawWatermark DateTime @map("raw_watermark")
   foldedAt     DateTime @updatedAt @map("folded_at")

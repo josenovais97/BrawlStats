@@ -101,6 +101,7 @@ export const UI_EN = {
   'bracket.all': 'All ranks',
   'bracket.thin': 'Not enough {rank} battles in this mode yet — showing all ranks.',
   'bracket.mapsAllRanks': 'Map picks count every rank: one rank alone has too few battles per map.',
+  'bracket.mapsAdjusted': 'Picks for {rank}: this map’s results from every rank, adjusted to how each brawler does at {rank}.',
 
   'page.empty': 'Not enough sampled Ranked battles yet. This fills in as more battles are sampled.',
   'page.footer': 'Meta score combines adjusted win rate and pick rate across sampled Ranked battles. Brawlers without enough battles are left out rather than guessed at.',

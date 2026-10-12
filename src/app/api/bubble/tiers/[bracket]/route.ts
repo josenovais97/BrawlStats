@@ -1,18 +1,19 @@
 import type { NextRequest } from 'next/server';
 
-import type { PanelEntry } from '@/components/bubble/panel-tiers';
+import type { PanelEntry, PanelMapPick } from '@/components/bubble/panel-tiers';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { BrawlApiError } from '@/lib/errors';
 import { bracketBySlug } from '@/lib/rank-brackets';
 import { errorResponse, okResponse } from '@/lib/route-helpers';
-import { getBracketRoster, getFilterableModes, type ScoredBrawler } from '@/lib/stats';
+import { getBracketMapPicks, getBracketRoster, getFilterableModes, type ScoredBrawler } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 
 /**
  * GET /api/bubble/tiers/mythic -- the panel's Meta lists for one bracket.
  *
- *   { bracket, lists: { all: { days, entries }, gemGrab: { days, entries }, ... } }
+ *   { bracket, lists: { all: { days, entries }, gemGrab: { days, entries }, ... },
+ *     maps: { 'gemGrab|Hard Rock Mine': [picks], ... } }
  *
  * A mode missing from `lists` is too thin at this rank; the panel shows its
  * all-ranks list and says so. Fetched when a bracket is picked rather than
@@ -55,7 +56,23 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       if (roster) lists[key ?? 'all'] = { days: roster.days, entries: shape(roster.scored, meta) };
     }
 
-    return okResponse({ bracket: bracket.slug, lists }, 600);
+    // Map picks at this rank: each map's all-ranks picks adjusted for the
+    // rank, then pulled toward the rank's own battles there. Twenty deep, as
+    // the page's all-ranks picks are.
+    const maps: Record<string, PanelMapPick[]> = {};
+    for (const map of await getBracketMapPicks(bracket.id, 20).catch(() => [])) {
+      maps[`${map.mode}|${map.mapName}`] = map.picks.map((pick) => ({
+        brawlerId: pick.brawlerId,
+        brawlerName: pick.brawlerName,
+        imageUrl: meta.get(pick.brawlerId)?.imageUrl ?? brawlerIconUrl(pick.brawlerId),
+        score: pick.score,
+        overallScore: pick.overallScore,
+        battles: pick.decidedSampleSize,
+        pickRate: pick.pickRate,
+      }));
+    }
+
+    return okResponse({ bracket: bracket.slug, lists, maps }, 600);
   } catch (error) {
     return errorResponse(error);
   }

@@ -85,6 +85,7 @@ const tr: UiStrings = {
   'bracket.all': 'Tüm rütbeler',
   'bracket.thin': 'Bu modda henüz yeterli {rank} maçı yok — tüm rütbeler gösteriliyor.',
   'bracket.mapsAllRanks': 'Harita seçimleri tüm rütbeleri sayar: tek bir rütbede harita başına çok az maç var.',
+  'bracket.mapsAdjusted': '{rank} için seçimler: bu haritanın tüm rütbelerdeki sonuçları, her savaşçının {rank} seviyesindeki performansına göre ayarlandı.',
 };
 
 export default tr;

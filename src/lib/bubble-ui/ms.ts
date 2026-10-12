@@ -85,6 +85,7 @@ const ms: UiStrings = {
   'bracket.all': 'Semua pangkat',
   'bracket.thin': 'Belum cukup pertempuran {rank} dalam mod ini — menunjukkan semua pangkat.',
   'bracket.mapsAllRanks': 'Pilihan peta mengira semua pangkat: satu pangkat sahaja terlalu sedikit pertempuran setiap peta.',
+  'bracket.mapsAdjusted': 'Pilihan untuk {rank}: keputusan peta ini dari semua pangkat, dilaraskan mengikut prestasi setiap brawler di {rank}.',
 };
 
 export default ms;

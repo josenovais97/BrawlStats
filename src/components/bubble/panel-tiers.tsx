@@ -107,7 +107,11 @@ const SHOWN_MAP_PICKS = 10;
 const STORED_BRACKET = 'brawlzone.bubble.bracket';
 
 /** One bracket's lists, as `/api/bubble/tiers/<bracket>` returns them. */
-type BracketLists = Record<string, { days: number; entries: PanelEntry[] }>;
+type BracketLists = {
+  lists: Record<string, { days: number; entries: PanelEntry[] }>;
+  /** Map picks at this rank, keyed `mode|map`. */
+  maps: Record<string, PanelMapPick[]>;
+};
 
 
 export function PanelTiers({
@@ -164,8 +168,11 @@ export function PanelTiers({
     if (!bracket || bracketLists[bracket]) return;
     fetch(`/api/bubble/tiers/${bracket}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data: { lists: BracketLists }) =>
-        setBracketLists((prev) => ({ ...prev, [bracket]: data.lists ?? {} })),
+      .then((data: Partial<BracketLists>) =>
+        setBracketLists((prev) => ({
+          ...prev,
+          [bracket]: { lists: data.lists ?? {}, maps: data.maps ?? {} },
+        })),
       )
       .catch(() => setBracketLists((prev) => ({ ...prev, [bracket]: 'error' })));
   }, [bracket, bracketLists]);
@@ -249,7 +256,16 @@ export function PanelTiers({
   // says so.
   const loadedLists = bracket ? bracketLists[bracket] : undefined;
   const bracketList =
-    loadedLists && loadedLists !== 'error' ? loadedLists[current.key ?? 'all'] : undefined;
+    loadedLists && loadedLists !== 'error' ? loadedLists.lists[current.key ?? 'all'] : undefined;
+  // The map's picks at this rank, when the rank has them; else all ranks.
+  const bracketMapPicks =
+    currentMap && loadedLists && loadedLists !== 'error'
+      ? loadedLists.maps[`${currentMap.mode}|${currentMap.mapName}`]
+      : undefined;
+  const shownMap =
+    currentMap && bracketMapPicks && bracketMapPicks.length > 0
+      ? { ...currentMap, picks: bracketMapPicks }
+      : currentMap;
   const bracketLoading = bracket !== null && loadedLists === undefined;
   const bracketThin = bracket !== null && loadedLists !== undefined && !bracketList;
   const entries = bracketList?.entries ?? current.entries;
@@ -339,14 +355,18 @@ export function PanelTiers({
         onMap={chooseMap}
       />
 
-      {currentMap && bracket ? (
-        <p className="mx-1 mb-1.5 text-[10px] leading-snug text-muted">{t('bracket.mapsAllRanks')}</p>
+      {currentMap && bracket && activeBracket ? (
+        <p className="mx-1 mb-1.5 text-[10px] leading-snug text-muted">
+          {shownMap !== currentMap
+            ? t('bracket.mapsAdjusted', { rank: bracketLabel(activeBracket) })
+            : t('bracket.mapsAllRanks')}
+        </p>
       ) : null}
 
-      {currentMap ? (
+      {shownMap ? (
         <MapPicks
-          key={currentMap.mapName}
-          map={currentMap}
+          key={`${shownMap.mapName}|${bracket ?? 'all'}`}
+          map={shownMap}
           onPick={show}
           openId={openId}
           fieldable={fieldable}

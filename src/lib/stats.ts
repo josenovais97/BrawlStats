@@ -4154,13 +4154,274 @@ export async function getBracketRoster(
 ): Promise<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | null> {
   const edges = await getSkillEdge('ranked').catch(() => new Map<number, SkillEdge>());
   for (const days of BRACKET_WINDOWS) {
-    const rows = await getBrawlerStatsForWindow(days, mode, 'ranked', bracket);
-    const scored = scoreBrawlers(rows, 'ranked', edges);
-    if (scored.filter((s) => s.tier !== null).length >= MIN_RATED_FOR_BRACKET) {
-      return { days, rows, scored };
+    // Whole lineups first: all six brawlers of each battle, not the sampled
+    // player's one (see `ranked_lineup_daily`). The sampled players' own
+    // battles are the fallback, for a window the lineup roll-up has not
+    // reached yet.
+    for (const read of [getLineupStats, (d: number, m?: string, b?: number) => getBrawlerStatsForWindow(d, m, 'ranked', b)]) {
+      const rows = await read(days, mode, bracket);
+      const scored = scoreBrawlers(rows, 'ranked', edges);
+      if (scored.filter((s) => s.tier !== null).length >= MIN_RATED_FOR_BRACKET) {
+        return { days, rows, scored };
+      }
     }
   }
   return null;
+}
+
+/* ------------------------------ Ranked lineups ----------------------------- */
+
+/**
+ * Brawler rates from whole Ranked lineups: every brawler on both teams of
+ * every sampled Ranked battle (`ranked_lineup_daily`), optionally for one
+ * mode and one rank bracket.
+ *
+ * About six times the evidence of `battle_daily_stats`, which records only
+ * the sampled player's own brawler. And a cleaner one: the six players of a
+ * battle are the whole lobby, so the population wins exactly half its games
+ * and nothing about who is in our pool tilts the average.
+ *
+ * Same row shape as `computeBrawlerStatsIn`, so the scoring and its floors
+ * are shared. Usage is a slot share (appearances over all appearances), the
+ * same scale as one sampled pick per battle.
+ */
+async function computeLineupStats(
+  windowDays: number,
+  mode?: string,
+  bracket?: number,
+): Promise<BrawlerStatRow[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(windowDays);
+    const [groups, names] = await Promise.all([
+      prisma.rankedLineupDaily.groupBy({
+        by: ['brawlerId', 'mode'],
+        where: {
+          day: { gte: since },
+          ...(mode ? { mode } : {}),
+          ...(bracket ? { rankBracket: bracket } : {}),
+        },
+        _sum: { wins: true, losses: true },
+      }),
+      prisma.battleDailyStat.findMany({
+        where: { day: { gte: since } },
+        distinct: ['brawlerId'],
+        select: { brawlerId: true, brawlerName: true },
+      }),
+    ]);
+
+    const nameOf = new Map(names.map((n) => [n.brawlerId, n.brawlerName]));
+    const byMode = new Map<string, { wins: number; decided: number }>();
+    let total = 0;
+    for (const g of groups) {
+      const wins = g._sum.wins ?? 0;
+      const decided = wins + (g._sum.losses ?? 0);
+      const acc = byMode.get(g.mode) ?? { wins: 0, decided: 0 };
+      acc.wins += wins;
+      acc.decided += decided;
+      byMode.set(g.mode, acc);
+      total += decided;
+    }
+    const baselineOf = (m: string) => {
+      const acc = byMode.get(m);
+      return acc && acc.decided > 0 ? acc.wins / acc.decided : 0.5;
+    };
+
+    const per = new Map<number, { wins: number; decided: number; expected: number }>();
+    for (const g of groups) {
+      const wins = g._sum.wins ?? 0;
+      const decided = wins + (g._sum.losses ?? 0);
+      const acc = per.get(g.brawlerId) ?? { wins: 0, decided: 0, expected: 0 };
+      acc.wins += wins;
+      acc.decided += decided;
+      acc.expected += decided * baselineOf(g.mode);
+      per.set(g.brawlerId, acc);
+    }
+
+    const snapshotDate = toIsoDate(new Date());
+    return [...per].map(([brawlerId, acc]) => ({
+      brawlerId,
+      brawlerName: nameOf.get(brawlerId) ?? `Brawler ${brawlerId}`,
+      snapshotDate,
+      winRate: acc.decided > 0 ? acc.wins / acc.decided : null,
+      baselineWinRate: acc.decided > 0 ? acc.expected / acc.decided : 0.5,
+      usageRate: total > 0 ? acc.decided / total : null,
+      avgTrophies: null,
+      avgRank: null,
+      sampleSize: acc.decided,
+      decidedSampleSize: acc.decided,
+      ownerSampleSize: 0,
+      windowDays,
+    }));
+  } catch (error) {
+    swallow('computeLineupStats', error);
+    return [];
+  }
+}
+
+const cachedLineupStats = cachedRead('lineup-stats', computeLineupStats);
+
+export async function getLineupStats(
+  windowDays: number,
+  mode?: string,
+  bracket?: number,
+): Promise<BrawlerStatRow[]> {
+  return cachedLineupStats(windowDays, mode, bracket);
+}
+
+/**
+ * Below this many decided appearances on a map at one rank, a brawler's
+ * rank-and-map record is all prior: the map's all-ranks estimate moved by how
+ * the brawler does at that rank everywhere.
+ */
+const BRACKET_MAP_PRIOR_BATTLES = 60;
+
+/**
+ * Ranked map picks for one rank bracket, from whole lineups.
+ *
+ * A map at one rank is the thinnest slice there is -- a few hundred battles a
+ * week -- so it is not ranked on its own. Each brawler starts from its
+ * all-ranks estimate on the map, moved by the difference between its form at
+ * this rank and at every rank (a brawler strong everywhere but weaker in
+ * Legendary is that much weaker on every map in Legendary). Then this rank's
+ * own battles on the map pull it toward what actually happened, with more
+ * weight the more there are. As the rank's data on a map grows, it takes over.
+ *
+ * Same shape as `getRankedMapPicks`, so the panel and the pages draw it
+ * unchanged.
+ */
+async function computeBracketMapPicks(
+  bracket: number,
+  perMap = 3,
+  windowDays = RANKED_MAP_WINDOW_DAYS,
+): Promise<RankedMapPicks[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+
+  try {
+    const since = windowStartUtc(windowDays);
+    const [rows, names] = await Promise.all([
+      prisma.rankedLineupDaily.groupBy({
+        by: ['mode', 'mapName', 'rankBracket', 'brawlerId'],
+        where: { day: { gte: since } },
+        _sum: { wins: true, losses: true },
+        _max: { lastBattleTime: true },
+      }),
+      prisma.battleDailyStat.findMany({
+        where: { day: { gte: since } },
+        distinct: ['brawlerId'],
+        select: { brawlerId: true, brawlerName: true },
+      }),
+    ]);
+    const nameOf = new Map(names.map((n) => [n.brawlerId, n.brawlerName]));
+
+    type Tally = { wins: number; decided: number };
+    const add = <K,>(m: Map<K, Tally>, k: K, w: number, d: number) => {
+      const acc = m.get(k) ?? { wins: 0, decided: 0 };
+      acc.wins += w;
+      acc.decided += d;
+      m.set(k, acc);
+    };
+
+    const overallAll = new Map<number, Tally>();
+    const overallRank = new Map<number, Tally>();
+    const mapAll = new Map<string, Tally>();
+    const mapRank = new Map<string, Tally>();
+    const maps = new Map<string, { mode: string; mapName: string; lastSeen: number; all: number; rank: number }>();
+
+    for (const r of rows) {
+      const w = r._sum.wins ?? 0;
+      const d = w + (r._sum.losses ?? 0);
+      if (d === 0) continue;
+      const mine = r.rankBracket === bracket;
+      add(overallAll, r.brawlerId, w, d);
+      if (mine) add(overallRank, r.brawlerId, w, d);
+      if (!r.mapName) continue;
+      const mk = `${r.mapName}::${r.mode}`;
+      add(mapAll, `${mk}::${r.brawlerId}`, w, d);
+      if (mine) add(mapRank, `${mk}::${r.brawlerId}`, w, d);
+      const m = maps.get(mk) ?? { mode: r.mode, mapName: r.mapName, lastSeen: 0, all: 0, rank: 0 };
+      m.lastSeen = Math.max(m.lastSeen, r._max.lastBattleTime?.getTime() ?? 0);
+      m.all += d;
+      if (mine) m.rank += d;
+      maps.set(mk, m);
+    }
+
+    let popWins = 0;
+    let popDecided = 0;
+    for (const t of overallAll.values()) {
+      popWins += t.wins;
+      popDecided += t.decided;
+    }
+    if (popDecided === 0) return [];
+    const baseline = popWins / popDecided;
+    const shrink = (t: Tally | undefined, toward: number, k: number) =>
+      t ? (t.wins + toward * k) / (t.decided + k) : toward;
+
+    // A brawler's form at every rank, and at this one shrunk toward it.
+    const formAll = (id: number) => shrink(overallAll.get(id), baseline, PRIOR_BATTLES);
+    const formRank = (id: number) => shrink(overallRank.get(id), formAll(id), PRIOR_BATTLES);
+
+    const rotationCutoff = Date.now() - MAP_ROTATION_GRACE_DAYS * 86_400_000;
+    const out: RankedMapPicks[] = [];
+
+    for (const [mk, m] of maps) {
+      if (m.all < MIN_SAMPLE_FOR_MAP || m.lastSeen < rotationCutoff) continue;
+      const useRankShare = m.rank >= 300;
+      const picks: RankedMapPick[] = [];
+      for (const [key, all] of mapAll) {
+        if (!key.startsWith(`${mk}::`)) continue;
+        if (all.decided < MIN_SAMPLE_FOR_MAP_PICK) continue;
+        const id = Number(key.slice(mk.length + 2));
+        const prior = formAll(id);
+        const onMap = shrink(all, prior, MAP_PRIOR_BATTLES);
+        const target = clampRate(onMap + (formRank(id) - prior));
+        const own = mapRank.get(key);
+        const estimate = shrink(own, target, BRACKET_MAP_PRIOR_BATTLES);
+        picks.push({
+          brawlerId: id,
+          brawlerName: nameOf.get(id) ?? `Brawler ${id}`,
+          winRate: own && own.decided > 0 ? own.wins / own.decided : all.wins / all.decided,
+          pickRate: useRankShare ? (own?.decided ?? 0) / m.rank : all.decided / m.all,
+          decidedSampleSize: own?.decided ?? 0,
+          score: clampRate(estimate - baseline + 0.5),
+          overallScore: clampRate(formRank(id) - baseline + 0.5),
+          overallSampleSize: overallRank.get(id)?.decided ?? 0,
+        });
+      }
+      out.push({
+        mapName: m.mapName,
+        eventId: null,
+        mode: m.mode,
+        picks: picks
+          .filter((p) => p.score > 0.5)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, perMap),
+        sampleSize: m.rank,
+        baselineWinRate: baseline,
+        mapWinRate: 0.5,
+        confidence: mapConfidence(m.rank / 6),
+        brawlersSeen: picks.length,
+        lastSeen: new Date(m.lastSeen).toISOString(),
+      });
+    }
+    return out.sort((a, b) => b.sampleSize - a.sampleSize);
+  } catch (error) {
+    swallow('computeBracketMapPicks', error);
+    return [];
+  }
+}
+
+const cachedBracketMapPicks = cachedRead('bracket-map-picks', computeBracketMapPicks);
+
+export async function getBracketMapPicks(
+  bracket: number,
+  perMap = 3,
+  windowDays = RANKED_MAP_WINDOW_DAYS,
+): Promise<RankedMapPicks[]> {
+  return cachedBracketMapPicks(bracket, perMap, windowDays);
 }
 
 /**

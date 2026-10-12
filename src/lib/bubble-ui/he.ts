@@ -85,6 +85,7 @@ const he: UiStrings = {
   'bracket.all': 'כל הדרגות',
   'bracket.thin': 'אין עדיין מספיק קרבות {rank} במצב הזה — מוצגות כל הדרגות.',
   'bracket.mapsAllRanks': 'בחירות המפה סופרות את כל הדרגות: לדרגה אחת יש מעט מדי קרבות לכל מפה.',
+  'bracket.mapsAdjusted': 'בחירות ל-{rank}: התוצאות של המפה הזו מכל הדרגות, מותאמות לביצועים של כל בראולר ב-{rank}.',
 };
 
 export default he;

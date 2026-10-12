@@ -85,6 +85,7 @@ const it: UiStrings = {
   'bracket.all': 'Tutti i gradi',
   'bracket.thin': 'Non ci sono ancora abbastanza battaglie {rank} in questa modalità: mostriamo tutti i gradi.',
   'bracket.mapsAllRanks': 'Le scelte per mappa contano tutti i gradi: un solo grado ha troppe poche battaglie per mappa.',
+  'bracket.mapsAdjusted': 'Scelte per {rank}: i risultati di questa mappa a tutti i ranghi, adattati a come rende ogni brawler in {rank}.',
 };
 
 export default it;

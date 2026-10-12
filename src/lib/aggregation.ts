@@ -1101,6 +1101,8 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
       rows += pairRows + teamRows;
     }
 
+    rows += await rollUpLineups(competitive);
+
     return { rows, error: null };
   } catch (err) {
     // Stale roll-ups are recoverable on the next run; an unnoticed run of them
@@ -1110,6 +1112,98 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
       error: err instanceof Error ? err.message : 'unknown roll-up failure',
     };
   }
+}
+
+/**
+ * Folds whole Ranked lineups into `ranked_lineup_daily`: all six brawlers of
+ * every sampled Ranked battle, by day, map and rank bracket.
+ *
+ * One battle is often seen by two pool players, once from each side or twice
+ * from one, so battles are de-duplicated on their end time, map and the two
+ * sorted teams before anything is counted. The lobby's rank comes from the
+ * sampled player's own row in `battle_samples` (same battle key).
+ *
+ * Its own day list and watermark, like the team fold: a day is rebuilt while
+ * it is recent, when it has never been folded, or when raw rows were added.
+ */
+async function rollUpLineups(competitive: string[]): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma) return 0;
+
+  const days = await prisma.$queryRaw<{ day: Date; watermark: Date }[]>`
+    WITH candidates AS (
+      SELECT b.battle_time::date AS day, MAX(b.created_at) AS watermark
+      FROM battle_team_samples b
+      WHERE b.battle_type = ANY(${competitive}::text[])
+      GROUP BY 1
+    )
+    SELECT c.day, c.watermark
+    FROM candidates c
+    LEFT JOIN rollup_watermarks w ON w.day = c.day AND w.source = 'lineups'
+    WHERE (c.day > current_date - ${ROLLUP_REBUILD_DAYS}::int OR w.day IS NULL)
+      AND w.raw_watermark IS DISTINCT FROM c.watermark
+    ORDER BY c.day
+  `;
+
+  let rows = 0;
+  for (const { day, watermark } of days) {
+    const [, inserted] = await prisma.$transaction([
+      prisma.$executeRaw`DELETE FROM ranked_lineup_daily WHERE day = ${day}`,
+      prisma.$executeRaw`
+      INSERT INTO ranked_lineup_daily
+        (day, mode, map_name, rank_bracket, brawler_id, wins, losses, last_battle_time)
+      WITH seen AS (
+        SELECT t.battle_time, t.mode, COALESCE(t.map_name, '') AS map_name, t.result,
+               s.lobby_rank,
+               (SELECT array_agg(x ORDER BY x) FROM unnest(t.ally_brawler_ids || t.brawler_id) x) AS own,
+               (SELECT array_agg(x ORDER BY x) FROM unnest(t.enemy_brawler_ids) x) AS foe
+        FROM battle_team_samples t
+        LEFT JOIN battle_samples s ON s.battle_key = t.battle_key
+        WHERE t.battle_time::date = ${day}
+          AND t.battle_type = ANY(${competitive}::text[])
+          AND t.result IN ('victory', 'defeat')
+      ),
+      battles AS (
+        -- One row per battle, whichever side it was seen from. A known lobby
+        -- rank wins over an unknown one.
+        SELECT DISTINCT ON (battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text))
+               battle_time, mode, map_name, result, lobby_rank, own, foe
+        FROM seen
+        ORDER BY battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text),
+                 lobby_rank NULLS LAST
+      ),
+      appearances AS (
+        SELECT b.*, x AS brawler_id, b.result = 'victory' AS won FROM battles b, unnest(b.own) x
+        UNION ALL
+        SELECT b.*, x, b.result = 'defeat' FROM battles b, unnest(b.foe) x
+      )
+      SELECT battle_time::date, mode, map_name,
+             -- Must match RANK_BRACKETS in lib/rank-brackets (a test checks).
+             CASE
+               WHEN lobby_rank IS NULL THEN 0
+               WHEN lobby_rank <= 12 THEN 1
+               WHEN lobby_rank <= 15 THEN 2
+               WHEN lobby_rank <= 18 THEN 3
+               ELSE 4
+             END,
+             brawler_id,
+             COUNT(*) FILTER (WHERE won),
+             COUNT(*) FILTER (WHERE NOT won),
+             MAX(battle_time)
+      FROM appearances
+      GROUP BY 1, 2, 3, 4, 5
+    `,
+    ]);
+
+    await prisma.$executeRaw`
+      INSERT INTO rollup_watermarks (day, source, raw_watermark, folded_at)
+      VALUES (${day}, 'lineups', ${watermark}, now())
+      ON CONFLICT (day, source)
+      DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
+    `;
+    rows += inserted;
+  }
+  return rows;
 }
 
 /**
@@ -1180,6 +1274,14 @@ export async function pruneOldSamples(): Promise<number> {
         AND EXISTS (
           SELECT 1 FROM brawler_team_daily d WHERE d.day = battle_time::date
         )
+        -- Ranked lineups are folded from these rows too.
+        AND (
+          battle_type NOT IN ('soloRanked', 'teamRanked')
+          OR EXISTS (
+            SELECT 1 FROM rollup_watermarks w
+            WHERE w.day = battle_time::date AND w.source = 'lineups'
+          )
+        )
     `;
 
     const snapshots = await prisma.playerBrawlerSnapshot.deleteMany({
@@ -1199,11 +1301,13 @@ export async function pruneOldSamples(): Promise<number> {
     // The roll-ups themselves age out on the window the site reads. Nothing
     // guards these: they are derived, and a lost day costs a thinner average
     // rather than an unrecoverable observation.
-    const [dailyStats, playerDaily, pairDaily, teamDaily] = await Promise.all([
+    const [dailyStats, playerDaily, pairDaily, teamDaily, lineupDaily] = await Promise.all([
       prisma.battleDailyStat.deleteMany({ where: { day: { lt: rollupCutoff } } }),
       prisma.playerBattleDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
       prisma.brawlerPairDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
       prisma.brawlerTeamDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
+      // On the pairing window: 45 days, against the 21 the map picks read.
+      prisma.rankedLineupDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
     ]);
 
     return (
@@ -1214,7 +1318,8 @@ export async function pruneOldSamples(): Promise<number> {
       dailyStats.count +
       playerDaily.count +
       pairDaily.count +
-      teamDaily.count
+      teamDaily.count +
+      lineupDaily.count
     );
   } catch {
     // A failed prune costs disk, not correctness, so it never fails a run.

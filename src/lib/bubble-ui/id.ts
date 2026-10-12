@@ -85,6 +85,7 @@ const id: UiStrings = {
   'bracket.all': 'Semua peringkat',
   'bracket.thin': 'Belum cukup pertarungan {rank} di mode ini — menampilkan semua peringkat.',
   'bracket.mapsAllRanks': 'Pilihan peta menghitung semua peringkat: satu peringkat saja terlalu sedikit pertarungan per peta.',
+  'bracket.mapsAdjusted': 'Pilihan untuk {rank}: hasil peta ini dari semua rank, disesuaikan dengan performa tiap jagoan di {rank}.',
 };
 
 export default id;

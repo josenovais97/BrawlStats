@@ -85,6 +85,7 @@ const zhHant: UiStrings = {
   'bracket.all': '全部段位',
   'bracket.thin': '此模式下{rank}段位的對戰還不夠，正在顯示全部段位。',
   'bracket.mapsAllRanks': '地圖推薦統計全部段位：單一段位每張地圖的對戰太少。',
+  'bracket.mapsAdjusted': '{rank} 推薦：此地圖所有段位的結果，並依每個英雄在 {rank} 的表現調整。',
 };
 
 export default zhHant;

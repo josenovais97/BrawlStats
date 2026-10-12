@@ -85,6 +85,7 @@ const vi: UiStrings = {
   'bracket.all': 'Mọi hạng',
   'bracket.thin': 'Chế độ này chưa đủ trận ở hạng {rank} — đang hiện mọi hạng.',
   'bracket.mapsAllRanks': 'Gợi ý theo bản đồ tính mọi hạng: một hạng riêng có quá ít trận mỗi bản đồ.',
+  'bracket.mapsAdjusted': 'Lựa chọn cho {rank}: kết quả bản đồ này ở mọi hạng, điều chỉnh theo phong độ của từng chiến binh ở {rank}.',
 };
 
 export default vi;

@@ -85,6 +85,7 @@ const fi: UiStrings = {
   'bracket.all': 'Kaikki tasot',
   'bracket.thin': 'Tässä tilassa ei ole vielä tarpeeksi {rank}-otteluita – näytetään kaikki tasot.',
   'bracket.mapsAllRanks': 'Karttavalinnat laskevat kaikki tasot: yhdellä tasolla on liian vähän otteluita karttaa kohden.',
+  'bracket.mapsAdjusted': 'Valinnat tasolle {rank}: tämän kartan tulokset kaikilta tasoilta, sovitettuna kunkin rämäpään menestykseen tasolla {rank}.',
 };
 
 export default fi;

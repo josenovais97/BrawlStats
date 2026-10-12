@@ -85,6 +85,7 @@ const ar: UiStrings = {
   'bracket.all': 'كل الرتب',
   'bracket.thin': 'لا توجد معارك {rank} كافية في هذا النمط بعد — نعرض كل الرتب.',
   'bracket.mapsAllRanks': 'اختيارات الخرائط تحسب كل الرتب: رتبة واحدة فيها معارك قليلة جدًا لكل خريطة.',
+  'bracket.mapsAdjusted': 'اختيارات {rank}: نتائج هذه الخريطة في كل الرتب، معدّلة حسب أداء كل بطل في {rank}.',
 };
 
 export default ar;
