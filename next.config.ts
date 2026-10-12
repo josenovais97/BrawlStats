@@ -63,6 +63,17 @@ const nextConfig: NextConfig = {
         destination: BUBBLE_APP.path,
         permanent: false,
       },
+      /*
+       * The address to put on TikTok, in bios and on screen: short, ours, and
+       * changeable. Temporary for the same reason as the APK path -- if the
+       * invite is ever regenerated, only this line changes and every link
+       * already posted keeps working.
+       */
+      {
+        source: '/discord',
+        destination: 'https://discord.com/invite/964EMQBBUJ',
+        permanent: false,
+      },
     ];
   },
 
