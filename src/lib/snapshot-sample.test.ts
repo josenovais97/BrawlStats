@@ -30,7 +30,17 @@ const BYTES_PER_ROW = 482;
  * against a 1,000-player world after the pool tripled, and passed while
  * meaning nothing.
  */
-const RUNS_PER_DAY_DISTINCT_FACTOR = 7;
+const RUNS_PER_DAY_DISTINCT_FACTOR = 2.2;
+
+/*
+ * 7 -> 2.2 on 2026-10-12, re-measured. The churn described above is gone:
+ * since the batch became the whole pool, every member is read every run and
+ * the pool only turns over through recruits and evictions. With an 8,371
+ * pool the busiest day yet wrote snapshots for 4,590 players at a rate of 4,
+ * which this formula reproduces at 2.2 per member; a normal day is under a
+ * quarter of that. The rest of the database matched OTHER_TABLES_BYTES' 400 MB
+ * per 1,000 players (2.3 GB at ~6,000), so that constant stands.
+ */
 const PLAYERS_PER_DAY = POOL_TARGET * RUNS_PER_DAY_DISTINCT_FACTOR;
 const BRAWLERS_PER_PLAYER = 57;
 /*

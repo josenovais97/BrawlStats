@@ -46,7 +46,16 @@ import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
  * `withRetry` still backs off on throttling, so pushing this too far costs a
  * slower run rather than lost samples.
  */
-const CONCURRENCY = 5;
+const CONCURRENCY = 10;
+
+/*
+ * 5 -> 10 on 2026-10-12, with the same number of requests in flight: a player
+ * used to cost two parallel calls and now costs one on eleven runs out of
+ * twelve (the profile is read once a day, see `samplePlayer`). Ten players at
+ * one call each is the ten requests five players at two each always were, so
+ * the request rate against the IP-locked key stays where it was, and the pool
+ * it covers in a run nearly doubles.
+ */
 
 /** Retries per player when the API throttles or times out. */
 const MAX_RETRIES = 3;
@@ -111,9 +120,13 @@ const WINDOW_DAYS = 7;
  * how many: see `seedSamplePool`, which draws on regional leaderboards as well
  * as the global one.
  */
-export const POOL_TARGET = 6000;
+export const POOL_TARGET = 10000;
 
 /*
+ * 10,000 later the same day, paid for by reading each profile once a day
+ * rather than every run: the same request rate covers ~1.7x the players.
+ * Projected disk at 10,000: ~4 GB of the 8 GB budget, under the 80% valve.
+ *
  * Doubled to 6,000 on 2026-10-12 for the per-rank tier lists. A full run of
  * 3,000 took ~8 minutes of the 25-minute budget, so this is ~16 at the same
  * request rate -- wall clock, not concurrency, as above. What it buys is
@@ -133,10 +146,10 @@ export const POOL_TARGET = 6000;
 const BRACKET_QUOTA = Math.floor(POOL_TARGET / RANK_BRACKETS.length);
 
 /** At most this many recruits per bracket per run, so growth is gradual. */
-const RECRUITS_PER_RUN = 300;
+const RECRUITS_PER_RUN = 600;
 
 /**
- * Players sampled per run. 2 API calls each.
+ * Players sampled per run. One API call each, two on their first run of the day.
  *
  * This is an upper bound, not a target: sampling stops at `samplingDeadline`
  * regardless, so a slow upstream night simply samples fewer players rather
@@ -1601,24 +1614,34 @@ function splitSides(
   };
 }
 
-async function samplePlayer(tag: string) {
+async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
   const prisma = getPrisma();
   if (!prisma) return { battles: 0, recruits: new Map<string, number>() };
 
   const normalized = normalizeTag(tag);
+  const snapshotDate = todayUtc();
+
+  /*
+   * The profile once per UTC day, the battle log every run (since 2026-10-12).
+   *
+   * The battle log is the one that loses data if it is not read: it holds 25
+   * battles. The profile only refreshes the pool's own bookkeeping -- name,
+   * trophies, rank -- and the build snapshot, which is taken at most once a
+   * day anyway. Reading it on all twelve runs was half the API calls for
+   * nothing new, and those calls now go to a bigger pool instead.
+   */
+  const needsProfile = !lastSampledAt || lastSampledAt < snapshotDate;
   const [player, log] = await Promise.all([
-    withRetry(() => getPlayer(normalized)),
+    needsProfile ? withRetry(() => getPlayer(normalized)) : Promise.resolve(null),
     withRetry(() => getBattleLog(normalized)),
   ]);
-
-  const snapshotDate = todayUtc();
 
   // Trophy/rank distribution plus which abilities this player owns, which is
   // what the popular-build percentages are computed from.
   //
   // Only a rotating fraction of players, and only this write — the battle log
   // below is still recorded for everyone. See SNAPSHOT_SAMPLE_RATE.
-  if (player.brawlers.length > 0 && shouldSnapshot(normalized, snapshotDate)) {
+  if (player && player.brawlers.length > 0 && shouldSnapshot(normalized, snapshotDate)) {
     await prisma.playerBrawlerSnapshot.createMany({
       data: player.brawlers.map((b) => ({
         playerTag: normalized,
@@ -1741,16 +1764,18 @@ async function samplePlayer(tag: string) {
 
   await prisma.sampledPlayer.update({
     where: { tag: normalized },
-    data: {
-      lastSampledAt: new Date(),
-      name: player.name,
-      trophies: player.trophies,
-      iconId: player.icon?.id ?? null,
-      rankedElo: player.rankedElo ?? null,
-      rankedRankName: player.rankedRankName ?? null,
-      highestRankedElo: player.highestAllTimeRankedElo ?? null,
-      highestRankedRankName: player.highestAllTimeRankedRankName ?? null,
-    },
+    data: player
+      ? {
+          lastSampledAt: new Date(),
+          name: player.name,
+          trophies: player.trophies,
+          iconId: player.icon?.id ?? null,
+          rankedElo: player.rankedElo ?? null,
+          rankedRankName: player.rankedRankName ?? null,
+          highestRankedElo: player.highestAllTimeRankedElo ?? null,
+          highestRankedRankName: player.highestAllTimeRankedRankName ?? null,
+        }
+      : { lastSampledAt: new Date() },
   });
 
   return { battles: recorded, recruits };
@@ -2161,7 +2186,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     const targets = await prisma.sampledPlayer.findMany({
       orderBy: [{ lastSampledAt: { sort: 'asc', nulls: 'first' } }],
       take: batchSize,
-      select: { tag: true },
+      select: { tag: true, lastSampledAt: true },
     });
 
     // Leave room for aggregation and the ranking pass: sampling stops early
@@ -2198,7 +2223,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
         throw new BrawlApiError('upstreamDown', 'Upstream is down; run abandoned early');
       }
       try {
-        const sampled = await samplePlayer(t.tag);
+        const sampled = await samplePlayer(t.tag, t.lastSampledAt);
         consecutiveUpstreamFailures = 0;
         return sampled;
       } catch (error) {
