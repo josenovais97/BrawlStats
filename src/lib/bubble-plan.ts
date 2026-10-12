@@ -51,7 +51,7 @@ function voice(lang: string): Voice {
     return { t: PLAN_EN, num: (n) => formatNumber(n), list: (items) => items.join(', ') };
   }
   const numbers = new Intl.NumberFormat(lang);
-  const lists = new Intl.ListFormat(lang, { style: 'short', type: 'unit' });
+  const lists = new Intl.ListFormat(lang, { style: 'short', type: 'conjunction' });
   return { t, num: (n) => numbers.format(n), list: (items) => lists.format(items) };
 }
 
