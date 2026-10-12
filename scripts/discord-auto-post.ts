@@ -27,11 +27,13 @@ import { formatPercent, humanizeMode, titleCase } from '@/lib/format';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import {
   RANKED_MAP_WINDOW_DAYS,
+  getBestPicksByMode,
   getBrawlerBuild,
   getBrawlerStatsForWindow,
   getRankedComps,
   getRankedMapPicks,
   getSkillEdge,
+  resolveDataMapName,
   scoreBrawlers,
 } from '@/lib/stats';
 
@@ -165,14 +167,24 @@ async function daily(g: Guild): Promise<string> {
   );
   if (!slots.length) return 'Rotation empty; nothing posted';
 
+  // The map pages' order: the map's own picks under the battle data's spelling
+  // of its name, else the mode's -- a weaker answer, but a real one.
+  const byMode = await getBestPicksByMode(3).catch(() => new Map());
   const fields: Embed[] = [];
   for (const s of slots.slice(0, 12)) {
-    const picks = await getRankedMapPicks(3, RANKED_MAP_WINDOW_DAYS, { mapName: s.event.map!, mode: s.event.mode })
+    const dataName = await resolveDataMapName(s.event.mode, s.event.map!).catch(() => s.event.map!);
+    const mapPicks = await getRankedMapPicks(3, RANKED_MAP_WINDOW_DAYS, { mapName: dataName, mode: s.event.mode })
       .then((m) => m[0]?.picks ?? [])
       .catch(() => []);
+    const modePicks: { brawlerName: string }[] = byMode.get(s.event.mode)?.picks ?? [];
+    const line = mapPicks.length
+      ? mapPicks.map((p) => name(p.brawlerName)).join(' · ')
+      : modePicks.length
+        ? `${modePicks.slice(0, 3).map((p) => name(p.brawlerName)).join(' · ')}\n-# best in the mode; new map`
+        : '-# not enough data yet';
     fields.push({
       name: `${humanizeMode(s.event.mode)} · ${s.event.map}`,
-      value: `${modeIcon(g, s.event.mode)} ${picks.length ? picks.map((p) => name(p.brawlerName)).join(' · ') : '-# not enough data on this map yet'}`,
+      value: `${modeIcon(g, s.event.mode)} ${line}`,
       inline: true,
     });
   }
@@ -205,12 +217,14 @@ async function botd(g: Guild): Promise<string> {
     getSkillEdge('ranked').catch(() => undefined),
     getBrawlerArtMap(),
   ]);
+  // Only brawlers worth playing right now: a C-tier pick with a 0.2% pick rate
+  // is a dull post, and the point is "try this today".
   const rated = scoreBrawlers(rows, 'ranked', edges)
-    .filter((e) => e.tier !== null)
+    .filter((e) => e.tier === 'S' || e.tier === 'A')
     .sort((a, b) => a.brawlerId - b.brawlerId);
-  if (!rated.length) return 'No rated brawlers; nothing posted';
+  if (!rated.length) return 'No S or A tier brawlers; nothing posted';
 
-  // A different brawler each day, cycling the whole rated roster in order.
+  // A different brawler each day, cycling the strong ones in order.
   const day = Math.floor(Date.now() / 86_400_000);
   const pick = rated[day % rated.length];
   const b = meta.get(pick.brawlerId);
