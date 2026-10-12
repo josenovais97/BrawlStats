@@ -86,6 +86,10 @@ const es: UiStrings = {
   'update.fallback': 'Si no pasa nada, abre {url} en tu navegador. El archivo lleva su número de versión, así puedes comprobar qué instalas.',
   'page.empty': 'Aún no hay suficientes combates competitivos analizados. Se irá llenando con más combates.',
   'page.footer': 'La puntuación meta combina el porcentaje de victorias ajustado y el de elección en combates competitivos analizados. Los brawlers sin suficientes combates se omiten en lugar de estimarse.',
+  'bracket.title': 'Tu rango',
+  'bracket.all': 'Todos los rangos',
+  'bracket.thin': 'Aún no hay suficientes combates de {rank} en este modo: se muestran todos los rangos.',
+  'bracket.mapsAllRanks': 'Las elecciones por mapa cuentan todos los rangos: un solo rango tiene muy pocos combates por mapa.',
 };
 
 export default es;

@@ -1493,8 +1493,15 @@ async function computeBrawlerStatsForWindow(
   windowDays: number,
   mode?: string,
   format: TierFormat = 'ranked',
+  bracket?: number,
 ): Promise<BrawlerStatRow[]> {
-  return computeBrawlerStatsIn({ gte: windowStartUtc(windowDays) }, windowDays, mode, format);
+  return computeBrawlerStatsIn(
+    { gte: windowStartUtc(windowDays) },
+    windowDays,
+    mode,
+    format,
+    bracket,
+  );
 }
 
 /**
@@ -1515,6 +1522,8 @@ async function computeBrawlerStatsIn(
   windowDays: number,
   mode?: string,
   format: TierFormat = 'ranked',
+  /** A Ranked bracket id (lib/rank-brackets); omitted for every rank. */
+  bracket?: number,
 ): Promise<BrawlerStatRow[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
@@ -1524,6 +1533,10 @@ async function computeBrawlerStatsIn(
       day: days,
       battleType: battleTypeFilter(format),
       ...(mode ? { mode } : {}),
+      // Only meaningful on Ranked, where the roll-up records it. Each mode's
+      // baseline below is then the bracket's own, which is the point: a
+      // Diamond lobby's average is not a Masters lobby's.
+      ...(bracket && format === 'ranked' ? { rankBracket: bracket } : {}),
     };
 
     // `mode` and `rank` are grouped so showdown placements can be folded into
@@ -1730,9 +1743,10 @@ export async function getScoredRoster(
   windowDays: number,
   mode: string | undefined,
   format: TierFormat,
+  bracket?: number,
 ): Promise<ScoredBrawler[]> {
   const [rows, edges] = await Promise.all([
-    getBrawlerStatsForWindow(windowDays, mode, format),
+    getBrawlerStatsForWindow(windowDays, mode, format, bracket),
     getSkillEdge(format).catch(() => new Map<number, SkillEdge>()),
   ]);
   return scoreBrawlers(rows, format, edges);
@@ -4105,16 +4119,48 @@ export async function getBestPicksByMode(
  */
 const cachedBrawlerStatsForWindow = cachedRead(
   'brawler-stats-for-window',
-  async (windowDays: number, mode: string | undefined, format: TierFormat) =>
-    computeBrawlerStatsForWindow(windowDays, mode, format),
+  async (windowDays: number, mode: string | undefined, format: TierFormat, bracket?: number) =>
+    computeBrawlerStatsForWindow(windowDays, mode, format, bracket),
 );
 
 export async function getBrawlerStatsForWindow(
   windowDays: number,
   mode?: string,
   format: TierFormat = 'ranked',
+  bracket?: number,
 ): Promise<BrawlerStatRow[]> {
-  return cachedBrawlerStatsForWindow(windowDays, mode, format);
+  return cachedBrawlerStatsForWindow(windowDays, mode, format, bracket);
+}
+
+/** Below this many rated brawlers a bracket's list is too thin to show. */
+export const MIN_RATED_FOR_BRACKET = 30;
+
+/** How far a thin bracket may widen before falling back to every rank. */
+export const BRACKET_WINDOWS = [7, 14] as const;
+
+/**
+ * A Ranked bracket's tier list, widened when thin, or null when even the
+ * widest window is too thin to rate enough brawlers.
+ *
+ * The widening is for the start of a season and for the brackets the sample
+ * is still filling: two weeks of a thin bracket is a better answer than one
+ * week of it, and a better answer for that reader than the all-ranks list.
+ * Null is the caller's cue to show every rank and say so -- never an empty or
+ * half-empty list presented as the bracket's.
+ */
+export async function getBracketRoster(
+  bracket: number,
+  mode?: string,
+): Promise<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | null> {
+  const edges = await getSkillEdge('ranked').catch(() => new Map<number, SkillEdge>());
+  for (const days of BRACKET_WINDOWS) {
+    const rows = await getBrawlerStatsForWindow(days, mode, 'ranked', bracket);
+    const scored = scoreBrawlers(rows, 'ranked', edges);
+    if (scored.filter((s) => s.tier !== null).length >= MIN_RATED_FOR_BRACKET) {
+      return { days, rows, scored };
+    }
+  }
+  return null;
 }
 
 /**

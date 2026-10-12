@@ -2,8 +2,10 @@ import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { rankedLeagueIconUrl } from '@/lib/brawlapi';
 import { humanizeMode } from '@/lib/format';
-import { tierListHref } from '@/lib/tier-list-route';
+import { RANK_BRACKETS, type RankBracket } from '@/lib/rank-brackets';
+import { bracketTierListHref, tierListHref } from '@/lib/tier-list-route';
 import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from '@/lib/stats';
 
 /**
@@ -35,12 +37,15 @@ export function TierListControls({
   mode,
   modes,
   modeIcons,
+  bracket,
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
   mode?: string;
   modes: { mode: string; battles: number }[];
   modeIcons?: Record<string, string>;
+  /** The Ranked bracket being shown, if any. Ranked only. */
+  bracket?: RankBracket | null;
 }) {
   return (
     <div className="space-y-3">
@@ -50,9 +55,18 @@ export function TierListControls({
           control that has to scroll is worse than one that wraps. */}
       <div className="flex flex-wrap items-center gap-2">
         <FormatTabs format={format} windowKey={windowKey} />
-        <WindowTabs format={format} windowKey={windowKey} mode={mode} />
+        {/* A bracket page has one window (see bracketTierListHref). */}
+        {bracket ? null : <WindowTabs format={format} windowKey={windowKey} mode={mode} />}
       </div>
-      <ModeFilter format={format} windowKey={windowKey} mode={mode} modes={modes} modeIcons={modeIcons} />
+      {format === 'ranked' ? <BracketTabs bracket={bracket ?? null} mode={mode} /> : null}
+      <ModeFilter
+        format={format}
+        windowKey={windowKey}
+        mode={mode}
+        modes={modes}
+        modeIcons={modeIcons}
+        bracket={bracket ?? null}
+      />
     </div>
   );
 }
@@ -148,6 +162,59 @@ function WindowTabs({
 }
 
 /**
+ * Which rank's lobbies the list is built from.
+ *
+ * Carries the mode across, like the window switch: Gem Grab at Mythic and Gem
+ * Grab at every rank are the same question asked of a different crowd. Each
+ * chip wears the league badge the game shows, which is read before the word.
+ */
+function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: string }) {
+  const chip =
+    'inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-bold transition-colors';
+  const on = 'border-brand bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]';
+  const off = 'border-border bg-surface-2/70 text-muted hover:text-foreground';
+  return (
+    <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div role="group" aria-label="Rank" className="flex w-max items-center gap-2">
+        <span className="eyebrow pe-1 text-muted">Your rank</span>
+        <Link
+          href={bracketTierListHref(null, mode)}
+          aria-current={bracket ? undefined : 'page'}
+          className={`${chip} ${bracket ? off : on}`}
+        >
+          All ranks
+        </Link>
+        {RANK_BRACKETS.map((b) => {
+          const current = b.id === bracket?.id;
+          const icon = rankedLeagueIconUrl(b.icon);
+          return (
+            <Link
+              key={b.slug}
+              href={bracketTierListHref(b, mode)}
+              aria-current={current ? 'page' : undefined}
+              title={`${b.label} Ranked lobbies`}
+              className={`${chip} ${current ? on : off}`}
+            >
+              {icon ? (
+                <Image
+                  src={icon}
+                  alt=""
+                  width={22}
+                  height={22}
+                  className="size-[22px] shrink-0 object-contain"
+                  unoptimized
+                />
+              ) : null}
+              {b.label}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Game-mode filter. The row scrolls horizontally on a phone rather than
  * wrapping into four lines of chips, which is the one place horizontal scroll
  * is the right answer.
@@ -158,6 +225,7 @@ function ModeFilter({
   mode,
   modes,
   modeIcons,
+  bracket,
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
@@ -165,8 +233,12 @@ function ModeFilter({
   modes: { mode: string; battles: number }[];
   /** The game's own mode badge per mode key, read faster than the word. */
   modeIcons?: Record<string, string>;
+  /** Mode chips stay inside the bracket being viewed. */
+  bracket: RankBracket | null;
 }) {
   if (modes.length === 0) return null;
+  const href = (m?: string) =>
+    bracket ? bracketTierListHref(bracket, m) : tierListHref(format, windowKey, m);
 
   const chip = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors';
   const on = 'border-brand/40 bg-brand/10 text-brand';
@@ -176,7 +248,7 @@ function ModeFilter({
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div role="group" aria-label="Game mode" className="flex w-max gap-2">
         <Link
-          href={tierListHref(format, windowKey)}
+          href={href()}
           aria-current={mode ? undefined : 'page'}
           className={`${chip} ${mode ? off : on}`}
         >
@@ -188,7 +260,7 @@ function ModeFilter({
           return (
             <Link
               key={entry.mode}
-              href={tierListHref(format, windowKey, entry.mode)}
+              href={href(entry.mode)}
               aria-current={current ? 'page' : undefined}
               title={`${entry.battles.toLocaleString()} sampled battles`}
               className={`${chip} ${current ? on : off}`}

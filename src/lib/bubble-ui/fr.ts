@@ -81,6 +81,10 @@ const fr: UiStrings = {
   'update.fallback': 'Si rien ne se passe, ouvre {url} dans ton navigateur. Le fichier porte son numéro de version, tu peux donc vérifier ce que tu installes.',
   'page.empty': 'Pas encore assez de combats classés analysés. Cela se remplira avec plus de combats.',
   'page.footer': 'Le score méta combine le taux de victoire ajusté et le taux de sélection des combats classés analysés. Les brawlers sans assez de combats sont exclus plutôt que devinés.',
+  'bracket.title': 'Ton rang',
+  'bracket.all': 'Tous les rangs',
+  'bracket.thin': 'Pas encore assez de combats {rank} dans ce mode — tous les rangs affichés.',
+  'bracket.mapsAllRanks': 'Les choix par carte comptent tous les rangs : un seul rang a trop peu de combats par carte.',
 };
 
 export default fr;

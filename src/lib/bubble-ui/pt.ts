@@ -82,6 +82,10 @@ const pt: UiStrings = {
   'update.fallback': 'Se nada acontecer, abra {url} no navegador. O arquivo leva o número da versão, então você pode conferir o que está instalando.',
   'page.empty': 'Ainda não há batalhas ranqueadas suficientes analisadas. Isso se completa com mais batalhas.',
   'page.footer': 'A pontuação meta combina a taxa de vitória ajustada e a taxa de escolha nas batalhas ranqueadas analisadas. Brawlers com poucas batalhas ficam de fora em vez de serem estimados.',
+  'bracket.title': 'Seu rank',
+  'bracket.all': 'Todos os ranks',
+  'bracket.thin': 'Ainda não há batalhas {rank} suficientes neste modo — mostrando todos os ranks.',
+  'bracket.mapsAllRanks': 'As escolhas por mapa contam todos os ranks: um rank sozinho tem poucas batalhas por mapa.',
 };
 
 export default pt;

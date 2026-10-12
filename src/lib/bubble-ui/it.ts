@@ -81,6 +81,10 @@ const it: UiStrings = {
   'update.fallback': 'Se non succede nulla, apri {url} nel browser. Il file porta il numero di versione, così puoi controllare cosa installi.',
   'page.empty': 'Non ci sono ancora abbastanza battaglie classificate analizzate. Si riempirà con altre battaglie.',
   'page.footer': 'Il punteggio meta combina la percentuale di vittorie corretta e quella di scelta nelle battaglie classificate analizzate. I brawler con troppe poche battaglie vengono esclusi invece che stimati.',
+  'bracket.title': 'Il tuo grado',
+  'bracket.all': 'Tutti i gradi',
+  'bracket.thin': 'Non ci sono ancora abbastanza battaglie {rank} in questa modalità: mostriamo tutti i gradi.',
+  'bracket.mapsAllRanks': 'Le scelte per mappa contano tutti i gradi: un solo grado ha troppe poche battaglie per mappa.',
 };
 
 export default it;

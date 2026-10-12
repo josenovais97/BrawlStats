@@ -97,6 +97,11 @@ export const UI_EN = {
   'update.download': 'Download',
   'update.fallback': 'If nothing happens, open {url} in your browser. The file is named for its version, so you can check what you are installing.',
 
+  'bracket.title': 'Your rank',
+  'bracket.all': 'All ranks',
+  'bracket.thin': 'Not enough {rank} battles in this mode yet — showing all ranks.',
+  'bracket.mapsAllRanks': 'Map picks count every rank: one rank alone has too few battles per map.',
+
   'page.empty': 'Not enough sampled Ranked battles yet. This fills in as more battles are sampled.',
   'page.footer': 'Meta score combines adjusted win rate and pick rate across sampled Ranked battles. Brawlers without enough battles are left out rather than guessed at.',
 } as const;

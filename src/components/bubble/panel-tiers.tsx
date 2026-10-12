@@ -9,6 +9,13 @@ import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import { panelTrack } from '@/lib/panel-telemetry';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { canField } from '@/lib/bubble-account';
+import {
+  bracketBySlug,
+  bracketForRankName,
+  bracketIconUrl,
+  RANK_BRACKETS,
+  type RankBracket,
+} from '@/lib/rank-brackets';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 
@@ -96,6 +103,12 @@ const SHOWN_PER_TIER = 8;
  */
 const SHOWN_MAP_PICKS = 10;
 
+/** The chosen rank bracket's slug, or "all". Absent until someone chooses. */
+const STORED_BRACKET = 'brawlzone.bubble.bracket';
+
+/** One bracket's lists, as `/api/bubble/tiers/<bracket>` returns them. */
+type BracketLists = Record<string, { days: number; entries: PanelEntry[] }>;
+
 
 export function PanelTiers({
   modes,
@@ -114,8 +127,65 @@ export function PanelTiers({
    * every list then renders exactly as it always did.
    */
   const account = useBubbleAccount();
-  const { t } = usePanelI18n();
+  const { t, name } = usePanelI18n();
   const modeName = useModeLabel();
+
+  /*
+   * Which rank's lobbies the list is built from.
+   *
+   * A saved choice wins. Without one, the player's own bracket once their
+   * roster says what rank they are -- the whole point is that a Diamond
+   * player sees the Diamond meta without having to know the option exists.
+   * Null is "all ranks", which is also what a panel with no tag shows.
+   */
+  const [bracket, setBracket] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<boolean | null>(null);
+  const [bracketLists, setBracketLists] = useState<Record<string, BracketLists | 'error'>>({});
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(STORED_BRACKET);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setChosen(saved !== null);
+      if (saved !== null) setBracket(bracketBySlug(saved)?.slug ?? null);
+    } catch {
+      setChosen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (chosen !== false) return;
+    const own = bracketForRankName(account.rankName);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (own) setBracket(own.slug);
+  }, [chosen, account.rankName]);
+
+  useEffect(() => {
+    if (!bracket || bracketLists[bracket]) return;
+    fetch(`/api/bubble/tiers/${bracket}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: { lists: BracketLists }) =>
+        setBracketLists((prev) => ({ ...prev, [bracket]: data.lists ?? {} })),
+      )
+      .catch(() => setBracketLists((prev) => ({ ...prev, [bracket]: 'error' })));
+  }, [bracket, bracketLists]);
+
+  const chooseBracket = (slug: string | null) => {
+    setBracket(slug);
+    setChosen(true);
+    remember(STORED_BRACKET, slug ?? 'all');
+    panelTrack('panel_bracket', { bracket: slug ?? 'all' });
+  };
+
+  /** The game's league names, so the chips read like the game's own badges. */
+  const bracketLabel = (b: RankBracket) =>
+    b.id === 1
+      ? `${name('Diamond')} ↓`
+      : b.id === 2
+        ? name('Mythic')
+        : b.id === 3
+          ? name('Legendary')
+          : `${name('Masters')}+`;
   const fieldable = (id: number) =>
     account.owned === null || canField(account.owned, id, account.filter);
   /* Only ever true with an account configured, so the unconfigured panel is
@@ -174,6 +244,17 @@ export function PanelTiers({
   const current = modes.find((m) => m.key === active) ?? modes[0];
   const currentMap = current.maps.find((m) => m.mapName === map) ?? null;
 
+  // The bracket's list for this mode, when it has one. Loading shows the
+  // all-ranks list dimmed; a mode too thin at this rank shows all ranks and
+  // says so.
+  const loadedLists = bracket ? bracketLists[bracket] : undefined;
+  const bracketList =
+    loadedLists && loadedLists !== 'error' ? loadedLists[current.key ?? 'all'] : undefined;
+  const bracketLoading = bracket !== null && loadedLists === undefined;
+  const bracketThin = bracket !== null && loadedLists !== undefined && !bracketList;
+  const entries = bracketList?.entries ?? current.entries;
+  const activeBracket = bracketBySlug(bracket);
+
   /*
    * The tapped brawler's build, fetched rather than pre-rendered.
    *
@@ -191,7 +272,7 @@ export function PanelTiers({
   const openId = open?.brawlerId ?? null;
 
   const byTier = new Map<Tier, PanelEntry[]>();
-  for (const entry of current.entries) {
+  for (const entry of entries) {
     const bucket = byTier.get(entry.tier) ?? [];
     bucket.push(entry);
     byTier.set(entry.tier, bucket);
@@ -203,8 +284,49 @@ export function PanelTiers({
           seven-day average of anything, and the heading said so anyway. */}
       <p className="display px-1 pb-2 text-[13px] uppercase tracking-normal [word-spacing:0.18em] text-foreground">
         {t('meta.heading')}{' '}
-        <span className="text-[11px] text-muted">· {t('common.lastDays', { n: windowDays })}</span>
+        <span className="text-[11px] text-muted">
+          · {t('common.lastDays', { n: bracketList?.days ?? windowDays })}
+        </span>
       </p>
+
+      {/* The rank row: the game's league badges, the player's own lit. */}
+      <div role="group" aria-label={t('bracket.title')} className="flex flex-wrap items-center gap-1 px-1 pb-2 text-[11px]">
+        <button
+          type="button"
+          onClick={() => chooseBracket(null)}
+          aria-pressed={bracket === null}
+          className={`px-2 py-1 leading-tight ${bracket === null ? 'bz-chip-on' : 'bz-chip'}`}
+        >
+          {t('bracket.all')}
+        </button>
+        {RANK_BRACKETS.map((b) => {
+          const on = bracket === b.slug;
+          return (
+            <button
+              key={b.slug}
+              type="button"
+              onClick={() => chooseBracket(b.slug)}
+              aria-pressed={on}
+              className={`inline-flex items-center gap-1 px-1.5 py-1 leading-tight ${on ? 'bz-chip-on' : 'bz-chip'}`}
+            >
+              <Image
+                src={bracketIconUrl(b)}
+                alt=""
+                width={16}
+                height={16}
+                className={`size-4 shrink-0 object-contain ${on ? '' : 'opacity-85'}`}
+                unoptimized
+              />
+              {bracketLabel(b)}
+            </button>
+          );
+        })}
+      </div>
+      {bracketThin && activeBracket && !currentMap ? (
+        <p className="mx-1 mb-2 text-[10px] leading-snug text-muted">
+          {t('bracket.thin', { rank: bracketLabel(activeBracket) })}
+        </p>
+      ) : null}
 
       {/* Shared with Team comp, so both tabs keep the same mode and map. A
           mode is too coarse to draft on -- Ranked hands you one map out of
@@ -217,6 +339,10 @@ export function PanelTiers({
         onMap={chooseMap}
       />
 
+      {currentMap && bracket ? (
+        <p className="mx-1 mb-1.5 text-[10px] leading-snug text-muted">{t('bracket.mapsAllRanks')}</p>
+      ) : null}
+
       {currentMap ? (
         <MapPicks
           key={currentMap.mapName}
@@ -227,12 +353,12 @@ export function PanelTiers({
           filtering={account.owned !== null}
           hiding={hiding}
         />
-      ) : current.entries.length === 0 ? (
+      ) : entries.length === 0 ? (
         <p className="px-2 py-6 text-center text-xs text-muted">
           {t('meta.emptyMode', { mode: modeName(current) })}
         </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className={`space-y-2 transition-opacity ${bracketLoading ? 'opacity-50' : ''}`}>
           {TIER_ORDER.map((tier) => {
             const entries = byTier.get(tier) ?? [];
             if (entries.length === 0) return null;

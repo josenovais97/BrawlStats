@@ -12,6 +12,10 @@ const es419: UiStrings = {
   'meta.vsUsual': '{n} vs lo habitual',
   'comps.vsAvg': '{n} vs promedio',
   'update.fallback': 'Si no pasa nada, abre {url} en tu navegador. El archivo lleva su número de versión, así puedes revisar qué instalas.',
+  'bracket.title': 'Tu rango',
+  'bracket.all': 'Todos los rangos',
+  'bracket.thin': 'Aún no hay suficientes combates de {rank} en este modo: se muestran todos los rangos.',
+  'bracket.mapsAllRanks': 'Las elecciones por mapa cuentan todos los rangos: un solo rango tiene muy pocos combates por mapa.',
 };
 
 export default es419;

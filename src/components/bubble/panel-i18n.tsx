@@ -25,7 +25,7 @@ import { panelTrack } from '@/lib/panel-telemetry';
 const STORED_LANG = 'brawlzone.bubble.lang';
 const STORED_PACK = 'brawlzone.bubble.l10n.';
 /** Must match PACK_VERSION in the route. */
-const PACK_VERSION = 1;
+const PACK_VERSION = 2;
 const STALE_MS = 24 * 60 * 60 * 1000;
 
 interface Pack {

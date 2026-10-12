@@ -81,6 +81,10 @@ const zhHant: UiStrings = {
   'update.fallback': '如果沒有反應，請在瀏覽器中開啟 {url}。檔名帶有版本號，你可以確認安裝的是哪個版本。',
   'page.empty': '已分析的排位賽場次還不夠。分析更多對戰後會補上。',
   'page.footer': '強勢分數綜合了已分析排位賽中的修正勝率和選用率。對戰次數不足的英雄不予顯示，而不是靠猜測。',
+  'bracket.title': '你的段位',
+  'bracket.all': '全部段位',
+  'bracket.thin': '此模式下{rank}段位的對戰還不夠，正在顯示全部段位。',
+  'bracket.mapsAllRanks': '地圖推薦統計全部段位：單一段位每張地圖的對戰太少。',
 };
 
 export default zhHant;

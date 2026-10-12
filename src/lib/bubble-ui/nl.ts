@@ -81,6 +81,10 @@ const nl: UiStrings = {
   'update.fallback': 'Gebeurt er niets? Open {url} in je browser. Het bestand draagt zijn versienummer, zodat je kunt zien wat je installeert.',
   'page.empty': 'Nog niet genoeg geanalyseerde ladderpotjes. Dit vult zich met meer potjes.',
   'page.footer': 'De metascore combineert het gecorrigeerde winpercentage en keuzepercentage uit geanalyseerde ladderpotjes. Knokkers met te weinig potjes worden weggelaten in plaats van geschat.',
+  'bracket.title': 'Jouw rang',
+  'bracket.all': 'Alle rangen',
+  'bracket.thin': 'Nog niet genoeg {rank}-potjes in deze modus – alle rangen worden getoond.',
+  'bracket.mapsAllRanks': 'Kaartkeuzes tellen alle rangen: één rang alleen heeft te weinig potjes per kaart.',
 };
 
 export default nl;

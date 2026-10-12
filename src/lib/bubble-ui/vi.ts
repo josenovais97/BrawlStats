@@ -81,6 +81,10 @@ const vi: UiStrings = {
   'update.fallback': 'Nếu không có gì xảy ra, hãy mở {url} trong trình duyệt. Tên tệp có số phiên bản, nên bạn kiểm tra được mình đang cài gì.',
   'page.empty': 'Chưa có đủ trận xếp hạng được phân tích. Dữ liệu sẽ có khi phân tích thêm trận.',
   'page.footer': 'Điểm meta kết hợp tỉ lệ thắng đã hiệu chỉnh và tỉ lệ chọn từ các trận xếp hạng được phân tích. Chiến binh có quá ít trận sẽ bị bỏ qua thay vì đoán.',
+  'bracket.title': 'Hạng của bạn',
+  'bracket.all': 'Mọi hạng',
+  'bracket.thin': 'Chế độ này chưa đủ trận ở hạng {rank} — đang hiện mọi hạng.',
+  'bracket.mapsAllRanks': 'Gợi ý theo bản đồ tính mọi hạng: một hạng riêng có quá ít trận mỗi bản đồ.',
 };
 
 export default vi;

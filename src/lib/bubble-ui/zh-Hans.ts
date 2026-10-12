@@ -81,6 +81,10 @@ const zhHans: UiStrings = {
   'update.fallback': '如果没有反应，请在浏览器中打开 {url}。文件名带有版本号，你可以确认安装的是哪个版本。',
   'page.empty': '已分析的排位赛场次还不够。分析更多对战后会补充。',
   'page.footer': '强势分数综合了已分析排位赛中的修正胜率和选用率。对战次数不足的英雄不予显示，而不是靠猜测。',
+  'bracket.title': '你的段位',
+  'bracket.all': '全部段位',
+  'bracket.thin': '此模式下{rank}段位的对战还不够，正在显示全部段位。',
+  'bracket.mapsAllRanks': '地图推荐统计全部段位：单一段位每张地图的对战太少。',
 };
 
 export default zhHans;

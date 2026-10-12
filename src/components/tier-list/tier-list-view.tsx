@@ -25,6 +25,7 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
+import type { RankBracket } from '@/lib/rank-brackets';
 import { TierPodium } from '@/components/tier-list/tier-podium';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
 import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
@@ -46,6 +47,7 @@ import {
   TIER_COLOR,
   TIER_ORDER,
   TIER_WINDOWS,
+  getBracketRoster,
   getBrawlerStatsForWindow,
   getFilterableModes,
   getLastAggregationRun,
@@ -134,6 +136,7 @@ export async function TierListView({
   format,
   windowKey,
   modeSlug,
+  bracket,
 }: {
   format: TierFormat;
   /**
@@ -149,6 +152,8 @@ export async function TierListView({
    * query parameter is one URL to a crawler however many values it takes.
    */
   modeSlug?: string;
+  /** A Ranked bracket, from the `/tier-list/ranked/rank/<bracket>` routes. */
+  bracket?: RankBracket;
 }) {
   const { days } = TIER_WINDOWS[windowKey];
   const copy = COPY[format];
@@ -165,11 +170,18 @@ export async function TierListView({
   // indexable empty page behind every typo.
   if (modeSlug && !mode) notFound();
 
+  /*
+   * A bracket's own list, widened to two weeks when one is thin, or null when
+   * even that is too thin -- in which case the page shows every rank and says
+   * so above the tiers, rather than a half-empty list labelled as the bracket.
+   */
+  const bracketData = bracket ? await getBracketRoster(bracket.id, mode).catch(() => null) : null;
+
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after the other so the page never needs more than one connection.
   const [rows, scored, brawlerMeta, lastRun, movers, mapPicks] = await Promise.all([
-    getBrawlerStatsForWindow(days, mode, format),
-    getScoredRoster(days, mode, format),
+    bracketData ? Promise.resolve(bracketData.rows) : getBrawlerStatsForWindow(days, mode, format),
+    bracketData ? Promise.resolve(bracketData.scored) : getScoredRoster(days, mode, format),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getLastAggregationRun(),
     // Snapshot-to-snapshot movement. The stored snapshots are competitive-only,
@@ -179,7 +191,9 @@ export async function TierListView({
     // The mode's Ranked maps, for the chips under the mode filter. Only on a
     // mode page: the combined list has no map pool, and the trophy ladder has
     // no map-level ranking. Same cached read the Bubble's panel uses.
-    format === 'ranked' && mode ? getRankedMapPicks(60).catch(() => []) : Promise.resolve([]),
+    // Not on a bracket page: map picks are pooled across every rank, and
+    // swapping a Mythic list for an all-ranks map ranking would mislabel it.
+    format === 'ranked' && mode && !bracket ? getRankedMapPicks(60).catch(() => []) : Promise.resolve([]),
   ]);
 
   const maps: MapRows[] = mapPicks
@@ -208,7 +222,10 @@ export async function TierListView({
    * filtered to. `MetaMovers` already caveats this in words at the foot of the
    * page; a badge has no room to caveat anything, so it is simply absent.
    */
-  const changes = mode ? new Map<number, BrawlerChange>() : buildChangeIndex(movers);
+  // Also absent on a bracket page, for the same reason: the snapshots are
+  // every rank's.
+  const changes =
+    mode || bracket ? new Map<number, BrawlerChange>() : buildChangeIndex(movers);
   const changeSpan = movers.length > 0 ? spanLabel(movers[0].fromDate, movers[0].toDate) : '';
 
   // `scoreBrawlers` leaves `tier` null below the sample floor, which is what
@@ -240,7 +257,8 @@ export async function TierListView({
     : `${TIER_WINDOWS[windowKey].sublabel} window`;
   // A mode page is about that mode, so it says so in the heading rather than
   // carrying the generic title with a filter chip lit up below it.
-  const heading = mode ? `${humanizeMode(mode)} ${copy.heading.toLowerCase()}` : copy.heading;
+  const baseHeading = mode ? `${humanizeMode(mode)} ${copy.heading.toLowerCase()}` : copy.heading;
+  const heading = bracket ? `${bracket.label} ${baseHeading.charAt(0).toLowerCase()}${baseHeading.slice(1)}` : baseHeading;
 
   /*
    * Answers to what people actually type, in the words they type them.
@@ -368,11 +386,14 @@ export async function TierListView({
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted">
           Based on {sampled > 0 ? `${formatNumber(sampled)} sampled ` : 'sampled '}
           {copy.battles}
-          {mode ? ` in ${humanizeMode(mode)}` : ''} from{' '}
-          <Link href="/leaderboard" className="font-medium text-brand hover:underline">
-            global-leaderboard
-          </Link>{' '}
-          players.
+          {mode ? ` in ${humanizeMode(mode)}` : ''}
+          {bracketData && bracket ? (
+            <>
+              {' '}played in {bracket.label} lobbies over the last {bracketData.days} days.
+            </>
+          ) : (
+            <> from players across the Ranked ladder.</>
+          )}
           {lastRun ? (
             <>
               {' '}
@@ -431,8 +452,23 @@ export async function TierListView({
             mode={mode}
             modes={modes}
             modeIcons={modeIcons}
+            bracket={bracket ?? null}
           />
         </div>
+
+        {/* Said plainly when a bracket could not be shown as itself. */}
+        {bracket && !bracketData ? (
+          <p className="mt-3 rounded-xl border border-brand/40 bg-brand/10 px-3 py-2 text-sm leading-relaxed">
+            <strong>Not enough {bracket.label} battles yet to rate brawlers at this rank</strong>, so
+            this is the list for every rank. It fills in as more {bracket.label} lobbies are
+            sampled.
+          </p>
+        ) : bracket && bracketData && bracketData.days > TIER_WINDOWS[windowKey].days ? (
+          <p className="mt-3 text-sm text-muted">
+            {bracket.label} lobbies are thinner in the sample, so this list covers the last{' '}
+            {bracketData.days} days rather than {TIER_WINDOWS[windowKey].days}.
+          </p>
+        ) : null}
       </header>
 
       {/* Above the tiers, because "has anything changed?" is the question a

@@ -81,6 +81,10 @@ const de: UiStrings = {
   'update.fallback': 'Passiert nichts, öffne {url} im Browser. Die Datei trägt ihre Versionsnummer, so siehst du, was du installierst.',
   'page.empty': 'Noch nicht genug erfasste Ranglistenkämpfe. Das füllt sich mit weiteren Kämpfen.',
   'page.footer': 'Der Meta-Score kombiniert bereinigte Siegquote und Pickrate aus erfassten Ranglistenkämpfen. Brawler mit zu wenigen Kämpfen werden weggelassen statt geschätzt.',
+  'bracket.title': 'Dein Rang',
+  'bracket.all': 'Alle Ränge',
+  'bracket.thin': 'Noch zu wenige {rank}-Kämpfe in diesem Modus – alle Ränge werden gezeigt.',
+  'bracket.mapsAllRanks': 'Map-Picks zählen alle Ränge: Ein Rang allein hat zu wenige Kämpfe pro Map.',
 };
 
 export default de;

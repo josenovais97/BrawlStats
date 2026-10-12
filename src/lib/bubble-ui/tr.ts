@@ -81,6 +81,10 @@ const tr: UiStrings = {
   'update.fallback': 'Bir şey olmazsa tarayıcında {url} adresini aç. Dosya adında sürüm numarası var, neyi kurduğunu kontrol edebilirsin.',
   'page.empty': 'Henüz yeterli aşamalı maç incelenmedi. Daha çok maçla dolacak.',
   'page.footer': 'Meta puanı, incelenen aşamalı maçlardaki düzeltilmiş kazanma oranını ve seçilme oranını birleştirir. Yeterli maçı olmayan savaşçılar tahmin edilmek yerine dışarıda bırakılır.',
+  'bracket.title': 'Rütben',
+  'bracket.all': 'Tüm rütbeler',
+  'bracket.thin': 'Bu modda henüz yeterli {rank} maçı yok — tüm rütbeler gösteriliyor.',
+  'bracket.mapsAllRanks': 'Harita seçimleri tüm rütbeleri sayar: tek bir rütbede harita başına çok az maç var.',
 };
 
 export default tr;

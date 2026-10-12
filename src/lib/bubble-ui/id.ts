@@ -81,6 +81,10 @@ const id: UiStrings = {
   'update.fallback': 'Jika tidak terjadi apa-apa, buka {url} di browser. Nama file memuat nomor versi, jadi kamu bisa cek apa yang dipasang.',
   'page.empty': 'Belum cukup pertarungan berperingkat yang dianalisis. Ini akan terisi dengan lebih banyak pertarungan.',
   'page.footer': 'Skor meta menggabungkan tingkat kemenangan yang disesuaikan dan tingkat pilihan dari pertarungan berperingkat yang dianalisis. Jagoan dengan pertarungan terlalu sedikit tidak ditampilkan, bukan ditebak.',
+  'bracket.title': 'Peringkatmu',
+  'bracket.all': 'Semua peringkat',
+  'bracket.thin': 'Belum cukup pertarungan {rank} di mode ini — menampilkan semua peringkat.',
+  'bracket.mapsAllRanks': 'Pilihan peta menghitung semua peringkat: satu peringkat saja terlalu sedikit pertarungan per peta.',
 };
 
 export default id;

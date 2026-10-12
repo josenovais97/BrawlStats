@@ -136,6 +136,8 @@ model BattleSample {
   eventId      Int?     @map("event_id")
   battleType   String   @map("battle_type")
   trophyChange Int?     @map("trophy_change")
+  /// Median rank tier (1-22) of the lobby, Ranked battles only. See lib/rank-brackets.
+  lobbyRank    Int?     @map("lobby_rank") @db.SmallInt
   battleTime   DateTime @map("battle_time")
   createdAt    DateTime @default(now()) @map("created_at")
 
@@ -414,6 +416,9 @@ model BattleDailyStat {
   result         String
   /// Showdown placement; null for every mode that reports a result.
   rank           Int?
+  /// Ranked bracket (1-4) of the lobby, from `battle_samples.lobby_rank`.
+  /// Null outside Ranked and before 2026-10-12. See lib/rank-brackets.
+  rankBracket    Int?     @map("rank_bracket") @db.SmallInt
   /// Battles in this combination on this day.
   battles        Int
   /// Newest battle folded into this row, for rotation freshness.

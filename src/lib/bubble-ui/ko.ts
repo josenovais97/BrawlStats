@@ -81,6 +81,10 @@ const ko: UiStrings = {
   'update.fallback': '반응이 없으면 브라우저에서 {url}을 여세요. 파일 이름에 버전이 있어 무엇을 설치하는지 확인할 수 있어요.',
   'page.empty': '분석된 경쟁전 전투가 아직 부족해요. 전투가 더 분석되면 채워져요.',
   'page.footer': '메타 점수는 분석된 경쟁전 전투의 보정 승률과 픽률을 합친 값이에요. 전투 수가 부족한 브롤러는 추측하지 않고 제외해요.',
+  'bracket.title': '내 랭크',
+  'bracket.all': '전체 랭크',
+  'bracket.thin': '이 모드의 {rank} 전투가 아직 부족해 전체 랭크를 보여드려요.',
+  'bracket.mapsAllRanks': '맵별 추천은 전체 랭크 기준이에요. 한 랭크만으로는 맵당 전투가 너무 적어요.',
 };
 
 export default ko;

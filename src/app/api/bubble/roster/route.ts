@@ -76,6 +76,8 @@ export async function GET(request: Request) {
        */
       iconUrl: playerIconUrl(player.icon?.id),
       trophies: player.trophies,
+      // Current Ranked rank, so the panel can open on the player's bracket.
+      rankName: player.rankedRankName ?? null,
       brawlers: player.brawlers.map((b) => ({
         id: b.id,
         power: b.power,

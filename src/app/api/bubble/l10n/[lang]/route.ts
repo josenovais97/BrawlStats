@@ -28,7 +28,7 @@ import { errorResponse, okResponse } from '@/lib/route-helpers';
  */
 
 /** Bumped when the shape changes, so panels drop a stored pack of the old one. */
-const PACK_VERSION = 1;
+const PACK_VERSION = 2;
 
 const DAY = 86_400;
 
@@ -42,7 +42,8 @@ async function displayableNames(): Promise<string[]> {
       .then((r) => r.items)
       .catch(() => []),
   ]);
-  const names: string[] = ['Star Power', 'Gadget', 'Gear'];
+  // Rank league names too, for the panel's bracket chips.
+  const names: string[] = ['Star Power', 'Gadget', 'Gear', 'Diamond', 'Mythic', 'Legendary', 'Masters', 'Pro'];
   for (const m of maps) names.push(m.name);
   for (const m of modes) names.push(m.name);
   for (const b of brawlers.values()) {
@@ -57,7 +58,7 @@ async function displayableNames(): Promise<string[]> {
 
 const cachedNames = unstable_cache(
   async (file: string, locale: string) => buildGameNames(file, locale, await displayableNames()),
-  ['bubble-l10n-names'],
+  ['bubble-l10n-names-v2'],
   { revalidate: DAY },
 );
 

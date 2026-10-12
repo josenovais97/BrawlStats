@@ -1,4 +1,6 @@
 import type { MetadataRoute } from 'next';
+import { RANK_BRACKETS } from '@/lib/rank-brackets';
+import { bracketTierListHref } from '@/lib/tier-list-route';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
@@ -109,6 +111,8 @@ async function core(add: Add, dataDay: Date | null) {
   // budget looks like — gets the important half first.
   add('', 'daily', 1);
   add('/tier-list/ranked', 'daily', 0.9);
+  // The per-rank lists: "brawl stars mythic tier list" is its own search.
+  for (const bracket of RANK_BRACKETS) add(bracketTierListHref(bracket), 'daily', 0.8);
   add('/tier-list/trophy', 'daily', 0.9);
   add('/brawlers', 'weekly', 0.8);
 

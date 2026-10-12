@@ -81,6 +81,10 @@ const ms: UiStrings = {
   'update.fallback': 'Jika tiada apa berlaku, buka {url} dalam pelayar. Nama fail mengandungi nombor versi, jadi anda boleh semak apa yang dipasang.',
   'page.empty': 'Belum cukup pertempuran berperingkat dianalisis. Ia akan terisi dengan lebih banyak pertempuran.',
   'page.footer': 'Skor meta menggabungkan kadar kemenangan terlaras dan kadar pilihan daripada pertempuran berperingkat yang dianalisis. Brawler tanpa cukup pertempuran diketepikan, bukan diteka.',
+  'bracket.title': 'Pangkat anda',
+  'bracket.all': 'Semua pangkat',
+  'bracket.thin': 'Belum cukup pertempuran {rank} dalam mod ini — menunjukkan semua pangkat.',
+  'bracket.mapsAllRanks': 'Pilihan peta mengira semua pangkat: satu pangkat sahaja terlalu sedikit pertempuran setiap peta.',
 };
 
 export default ms;

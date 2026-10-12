@@ -40,6 +40,8 @@ export interface CachedRoster {
   name: string;
   /** The player's in-game icon, for the panel's header. Absent on old caches. */
   iconUrl?: string;
+  /** Current Ranked rank ("MYTHIC II"), for the default bracket. Absent on old caches. */
+  rankName?: string | null;
   brawlers: OwnedBrawler[];
   /** When this was fetched, so the panel can refresh it without a timer. */
   fetchedAt: number;

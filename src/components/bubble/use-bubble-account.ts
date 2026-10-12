@@ -33,6 +33,8 @@ export interface BubbleAccount {
   name: string | null;
   /** The player's in-game icon URL, once a roster is known. */
   iconUrl: string | null;
+  /** Current Ranked rank name, once a roster is known. */
+  rankName: string | null;
   filter: OwnedFilter;
   /** Remove what cannot be fielded instead of dimming it. */
   hide: boolean;
@@ -44,6 +46,7 @@ const NONE: BubbleAccount = {
   tag: null,
   name: null,
   iconUrl: null,
+  rankName: null,
   filter: 'all',
   hide: false,
   owned: null,
@@ -76,15 +79,24 @@ export function useBubbleAccount(): BubbleAccount {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAccount(
       cached
-        ? { tag, name: cached.name, iconUrl: cached.iconUrl ?? null, filter, hide, owned: toMap(cached) }
-        : { tag, name: null, iconUrl: null, filter, hide, owned: null },
+        ? {
+            tag,
+            name: cached.name,
+            iconUrl: cached.iconUrl ?? null,
+            rankName: cached.rankName ?? null,
+            filter,
+            hide,
+            owned: toMap(cached),
+          }
+        : { tag, name: null, iconUrl: null, rankName: null, filter, hide, owned: null },
     );
-    if (cached && !isStale(cached)) return;
+    // A cache from before the rank was stored is refreshed once for it.
+    if (cached && !isStale(cached) && 'rankName' in cached) return;
 
     let cancelled = false;
     fetch(`/api/bubble/roster?tag=${encodeURIComponent(tag)}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data: { tag: string; name: string; iconUrl?: string; brawlers: OwnedBrawler[] } | null) => {
+      .then((data: { tag: string; name: string; iconUrl?: string; rankName?: string | null; brawlers: OwnedBrawler[] } | null) => {
         if (cancelled || !data?.brawlers) return;
         const roster: CachedRoster = { ...data, fetchedAt: Date.now() };
         writeRoster(roster);
@@ -92,6 +104,7 @@ export function useBubbleAccount(): BubbleAccount {
           tag,
           name: data.name,
           iconUrl: data.iconUrl ?? null,
+          rankName: data.rankName ?? null,
           filter,
           hide,
           owned: toMap(roster),

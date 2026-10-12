@@ -81,6 +81,10 @@ const fi: UiStrings = {
   'update.fallback': 'Jos mitään ei tapahdu, avaa {url} selaimessa. Tiedoston nimessä on versionumero, joten voit tarkistaa, mitä asennat.',
   'page.empty': 'Rankattuja otteluita ei ole vielä analysoitu tarpeeksi. Tämä täyttyy lisäotteluilla.',
   'page.footer': 'Metapisteet yhdistävät korjatun voittoprosentin ja valintaprosentin analysoiduista rankatuista otteluista. Rämäpäät, joilla on liian vähän otteluita, jätetään pois arvaamisen sijaan.',
+  'bracket.title': 'Sinun tasosi',
+  'bracket.all': 'Kaikki tasot',
+  'bracket.thin': 'Tässä tilassa ei ole vielä tarpeeksi {rank}-otteluita – näytetään kaikki tasot.',
+  'bracket.mapsAllRanks': 'Karttavalinnat laskevat kaikki tasot: yhdellä tasolla on liian vähän otteluita karttaa kohden.',
 };
 
 export default fi;

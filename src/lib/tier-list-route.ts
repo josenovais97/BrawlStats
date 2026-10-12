@@ -3,6 +3,7 @@ import 'server-only';
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 
+import { bracketBySlug, type RankBracket } from '@/lib/rank-brackets';
 import { currentMonth } from '@/lib/site';
 import { humanizeMode } from '@/lib/format';
 import { findBySlug, slugify } from '@/lib/slugs';
@@ -158,5 +159,54 @@ export async function tierListMetadata(
     } battles and refreshed every few hours. See the top picks before your next ${label} game.`,
     alternates: { canonical: tierListHref(format, windowKey, resolved) },
     robots,
+  };
+}
+
+/*
+ * Ranked brackets get pages of their own, under a fixed `rank` segment:
+ *
+ *   /tier-list/ranked/rank/mythic             every mode, Mythic lobbies
+ *   /tier-list/ranked/rank/mythic/gem-grab    Gem Grab, Mythic lobbies
+ *
+ * Paths for the same reason as everything above (a query string would make the
+ * route dynamic), and a fixed segment so none of it competes with the
+ * mode-or-window ambiguity `resolveTierRoute` settles: a static segment wins
+ * over `[scope]`, and no mode is called "rank". Default window only: a bracket
+ * is already a slice of the sample, and 24 hours of a slice is too little.
+ */
+
+/** The bracket list's URL, or the all-ranks list when no bracket is given. */
+export function bracketTierListHref(bracket: RankBracket | null | undefined, mode?: string): string {
+  if (!bracket) return tierListHref('ranked', DEFAULT_TIER_WINDOW, mode);
+  return `/tier-list/ranked/rank/${bracket.slug}${mode ? `/${slugify(mode)}` : ''}`;
+}
+
+/** The bracket a `rank/<slug>` segment names, or a 404. */
+export function resolveBracket(slug: string): RankBracket {
+  const bracket = bracketBySlug(slug);
+  if (!bracket) notFound();
+  return bracket;
+}
+
+export async function bracketTierListMetadata(
+  bracket: RankBracket,
+  modeSlug?: string,
+): Promise<Metadata> {
+  const month = currentMonth();
+  if (!modeSlug) {
+    return {
+      // What people type: "brawl stars mythic tier list".
+      title: `Brawl Stars ${bracket.label} tier list (${month}): best brawlers at your rank`,
+      description: `The best Brawl Stars brawlers in ${bracket.label} Ranked, ${month}. Built only from battles played in ${bracket.label} lobbies, because the meta at your rank is not the meta at the top.`,
+      alternates: { canonical: bracketTierListHref(bracket) },
+    };
+  }
+  const modes = await getFilterableModes(30, 150, 'ranked').catch(() => []);
+  const resolved = findBySlug(modes, modeSlug, (m) => m.mode)?.mode ?? modeSlug;
+  const label = humanizeMode(resolved);
+  return {
+    title: `Best ${label} brawlers in ${bracket.label} Ranked (${month}): Brawl Stars tier list`,
+    description: `The brawlers winning most in ${label} at ${bracket.label} rank, from real Ranked battles in ${bracket.label} lobbies, refreshed every few hours.`,
+    alternates: { canonical: bracketTierListHref(bracket, resolved) },
   };
 }

@@ -12,6 +12,7 @@ import {
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
+import { bracketForRankName, bracketForTier, lobbyTier, RANK_BRACKETS } from '@/lib/rank-brackets';
 import { COMPETITIVE_BATTLE_TYPES, windowStartUtc } from '@/lib/stats';
 import { ALL_REGIONS, POPULAR_REGION_CODES } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
@@ -110,7 +111,29 @@ const WINDOW_DAYS = 7;
  * how many: see `seedSamplePool`, which draws on regional leaderboards as well
  * as the global one.
  */
-export const POOL_TARGET = 3000;
+export const POOL_TARGET = 6000;
+
+/*
+ * Doubled to 6,000 on 2026-10-12 for the per-rank tier lists. A full run of
+ * 3,000 took ~8 minutes of the 25-minute budget, so this is ~16 at the same
+ * request rate -- wall clock, not concurrency, as above. What it buys is
+ * room: the leaderboard seeding fills the pool with Legendary and Masters
+ * players, and the second 3,000 go to the brackets that seeding never
+ * reaches. See BRACKET_QUOTA and `recruitByBracket`.
+ */
+
+/**
+ * The pool share each Ranked bracket is filled towards: an even split.
+ *
+ * Even rather than proportional to the ladder because each bracket's list
+ * needs the same thing -- enough battles to rate ninety-odd brawlers -- however
+ * many people play at that rank. A bracket above its quota is not trimmed for
+ * it; the quota only decides where recruits go and what eviction protects.
+ */
+const BRACKET_QUOTA = Math.floor(POOL_TARGET / RANK_BRACKETS.length);
+
+/** At most this many recruits per bracket per run, so growth is gradual. */
+const RECRUITS_PER_RUN = 300;
 
 /**
  * Players sampled per run. 2 API calls each.
@@ -948,12 +971,22 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
         prisma.$executeRaw`
         INSERT INTO battle_daily_stats
           (day, battle_type, mode, map_name, event_id, brawler_id, brawler_name,
-           result, rank, battles, last_battle_time)
+           result, rank, rank_bracket, battles, last_battle_time)
         SELECT battle_time::date, battle_type, mode, map_name, event_id, brawler_id,
-               brawler_name, result, rank, COUNT(*), MAX(battle_time)
+               brawler_name, result, rank,
+               -- The lobby's tier folded into its bracket; must match
+               -- RANK_BRACKETS in lib/rank-brackets (a test checks).
+               CASE
+                 WHEN lobby_rank IS NULL THEN NULL
+                 WHEN lobby_rank <= 12 THEN 1
+                 WHEN lobby_rank <= 15 THEN 2
+                 WHEN lobby_rank <= 18 THEN 3
+                 ELSE 4
+               END,
+               COUNT(*), MAX(battle_time)
         FROM battle_samples
         WHERE battle_time::date = ${day}
-        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
       `,
       ]);
 
@@ -1190,6 +1223,49 @@ export async function pruneOldSamples(): Promise<number> {
 }
 
 /**
+ * Adds players met in Ranked battles to the pool, for brackets below quota.
+ *
+ * The leaderboards only ever surface the top of the ladder, which is why the
+ * sample was ~90% Mythic and above. A Ranked battle log, though, lists five
+ * other players and the rank each was at in that match -- so every sampled
+ * Diamond lobby is a list of Diamond players. Recruiting from those fills the
+ * lower brackets from the inside, with no extra API calls to find them.
+ *
+ * Bucketed by the tier seen in the match. That can be a few days stale by the
+ * time the player is sampled, which is fine: their battles are bracketed by
+ * their own lobbies anyway, and the quota is a target, not a census.
+ */
+export async function recruitByBracket(met: Map<string, number>): Promise<number> {
+  const prisma = getPrisma();
+  if (!prisma || met.size === 0) return 0;
+
+  const pool = await prisma.sampledPlayer.findMany({ select: { tag: true, rankedRankName: true } });
+  const inPool = new Set(pool.map((p) => p.tag));
+  const counts = new Map<number, number>();
+  for (const p of pool) {
+    const bracket = bracketForRankName(p.rankedRankName);
+    if (bracket) counts.set(bracket.id, (counts.get(bracket.id) ?? 0) + 1);
+  }
+
+  const chosen: { tag: string; source: string }[] = [];
+  for (const bracket of RANK_BRACKETS) {
+    let room = Math.min(BRACKET_QUOTA - (counts.get(bracket.id) ?? 0), RECRUITS_PER_RUN);
+    if (room <= 0) continue;
+    for (const [tag, tier] of met) {
+      if (room <= 0) break;
+      if (inPool.has(tag) || bracketForTier(tier)?.id !== bracket.id) continue;
+      chosen.push({ tag, source: 'recruit' });
+      inPool.add(tag);
+      room -= 1;
+    }
+  }
+  if (chosen.length === 0) return 0;
+
+  const result = await prisma.sampledPlayer.createMany({ data: chosen, skipDuplicates: true });
+  return result.count;
+}
+
+/**
  * Trims the pool back to POOL_TARGET, dropping the least useful members.
  *
  * Only removes the `sampled_players` row. Battle samples, brawler snapshots
@@ -1278,9 +1354,27 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
    * wants to plan. The pool itself is capped, so this reads about a thousand
    * rows either way.
    */
-  const evictable = (
-    await prisma.sampledPlayer.findMany({ select: { tag: true, trophies: true } })
-  ).filter((row) => !keep.has(row.tag));
+  /*
+   * Two protections for the per-rank lists. A player not yet sampled has
+   * produced nothing by definition, so the "silent first" rule below would
+   * evict every recruit in the run after it was added, before it was ever
+   * read. And a bracket under its quota keeps everyone it has: thinning the
+   * Diamond pool to make room is the opposite of what the pool is for.
+   */
+  const pool = await prisma.sampledPlayer.findMany({
+    select: { tag: true, trophies: true, rankedRankName: true, lastSampledAt: true },
+  });
+  const perBracket = new Map<number, number>();
+  for (const row of pool) {
+    const bracket = bracketForRankName(row.rankedRankName);
+    if (bracket) perBracket.set(bracket.id, (perBracket.get(bracket.id) ?? 0) + 1);
+  }
+  for (const row of pool) {
+    const bracket = bracketForRankName(row.rankedRankName);
+    if (row.lastSampledAt === null) keep.add(row.tag);
+    else if (bracket && (perBracket.get(bracket.id) ?? 0) < BRACKET_QUOTA) keep.add(row.tag);
+  }
+  const evictable = pool.filter((row) => !keep.has(row.tag));
 
   const ordered = evictable
     .map((row) => ({
@@ -1404,7 +1498,7 @@ function splitSides(
 
 async function samplePlayer(tag: string) {
   const prisma = getPrisma();
-  if (!prisma) return { battles: 0 };
+  if (!prisma) return { battles: 0, recruits: new Map<string, number>() };
 
   const normalized = normalizeTag(tag);
   const [player, log] = await Promise.all([
@@ -1450,6 +1544,9 @@ async function samplePlayer(tag: string) {
 
   // One battle sample per match, recording only this player's own brawler.
   const samples = [];
+  // Other players met in Ranked, with the tier they were at in that match:
+  // the raw material for filling thin brackets. See `recruitByBracket`.
+  const recruits = new Map<string, number>();
   // Team composition for the same battles, kept in its own list because it
   // only exists for team modes and is only ever read by matchup stats.
   const teamSamples = [];
@@ -1464,6 +1561,23 @@ async function samplePlayer(tag: string) {
     // Friendlies and map-maker games do not reflect competitive balance.
     const type = entry.battle.type ?? 'unknown';
     if (type === 'friendly') continue;
+
+    // In a Ranked battle each brawler's `trophies` is its player's rank tier
+    // (1-22) at the time of the match, which is what makes per-rank tier
+    // lists possible. Median of the lobby; see lib/rank-brackets.
+    let lobbyRank: number | null = null;
+    if ((COMPETITIVE_BATTLE_TYPES as readonly string[]).includes(type) && entry.battle.teams) {
+      const players = entry.battle.teams.flat();
+      lobbyRank = lobbyTier(
+        players.map((p) => p.brawler?.trophies),
+        players.length,
+      );
+      for (const p of players) {
+        const tier = p.brawler?.trophies;
+        const tag = p.tag ? normalizeTag(p.tag) : '';
+        if (tag && tag !== normalized && bracketForTier(tier)) recruits.set(tag, tier!);
+      }
+    }
 
     samples.push({
       battleKey: `${entry.battleTime}:${normalized}`,
@@ -1481,6 +1595,7 @@ async function samplePlayer(tag: string) {
       eventId: entry.event.id ?? null,
       battleType: type,
       trophyChange: entry.battle.trophyChange ?? null,
+      lobbyRank,
       battleTime,
     });
 
@@ -1533,7 +1648,7 @@ async function samplePlayer(tag: string) {
     },
   });
 
-  return { battles: recorded };
+  return { battles: recorded, recruits };
 }
 
 /* ------------------------------- aggregation ------------------------------ */
@@ -2019,6 +2134,16 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     }
 
     const evictedMissing = await evictDeletedAccounts(gone, targets.length);
+
+    // Players met in this run's Ranked battles, into the brackets short of
+    // their quota. Sampled next run, as the never-sampled go first.
+    const met = new Map<string, number>();
+    for (const r of fulfilled) {
+      const value = (r as PromiseFulfilledResult<{ recruits: Map<string, number> }>).value;
+      for (const [tag, tier] of value.recruits) met.set(tag, tier);
+    }
+    const recruited = await recruitByBracket(met).catch(() => 0);
+    if (recruited > 0) console.log(`Recruited ${recruited} players into thin rank brackets`);
 
     // Checkpoint the sampling work before recomputing. If aggregation fails,
     // the run record still shows what was collected rather than reporting zero.

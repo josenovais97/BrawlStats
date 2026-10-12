@@ -81,6 +81,10 @@ const pl: UiStrings = {
   'update.fallback': 'Jeśli nic się nie dzieje, otwórz {url} w przeglądarce. Plik ma w nazwie numer wersji, więc sprawdzisz, co instalujesz.',
   'page.empty': 'Za mało przeanalizowanych walk rankingowych. To się uzupełni wraz z kolejnymi walkami.',
   'page.footer': 'Wynik meta łączy skorygowany współczynnik zwycięstw i współczynnik wyboru z przeanalizowanych walk rankingowych. Zadymiarze z za małą liczbą walk są pomijani, a nie zgadywani.',
+  'bracket.title': 'Twoja ranga',
+  'bracket.all': 'Wszystkie rangi',
+  'bracket.thin': 'Za mało walk na randze {rank} w tym trybie — pokazujemy wszystkie rangi.',
+  'bracket.mapsAllRanks': 'Wybory na mapie liczą wszystkie rangi: jedna ranga ma za mało walk na mapę.',
 };
 
 export default pl;
