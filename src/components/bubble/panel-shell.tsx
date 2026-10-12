@@ -106,8 +106,7 @@ export function PanelShell({
         would add, pointing at the app where it is entered. Never a blocker:
         the panel works the same either way.
       */}
-      {/* Relative, so the language list opens over the panel under it. */}
-      <div className="relative">
+      <div>
       {account.tag ? (
         <div className="bz-panel mx-1 mb-2.5 flex items-center gap-2 px-2 py-1.5">
           {account.iconUrl ? (
@@ -198,6 +197,11 @@ export function PanelShell({
               </li>
             ))}
           </ul>
+          {/* The first screen anyone sees, so the language setting is spelled
+              out here as well as sitting in the corner as a flag. */}
+          <div className="mt-3 border-t border-border pt-2.5">
+            <LanguagePicker variant="row" />
+          </div>
         </div>
       ) : tab === 'meta' ? (
         <PanelTiers modes={modes} windowDays={windowDays} />

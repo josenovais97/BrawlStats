@@ -181,50 +181,131 @@ export function PanelText({ k }: { k: UiKey }) {
 }
 
 /**
- * The language switch: a small chip showing the current language, opening the
- * game's full list in each language's own name.
+ * The language setting: a chip (or a full row, on the first-open screen)
+ * showing the current language, opening a sheet with all twenty-two.
  *
  * Offered on every open rather than buried in settings, because the game has
- * its own language setting and the phone's is only a guess at it -- the
- * person whose guess is wrong is exactly the one who needs to find this.
+ * its own language setting and the phone's is only a guess at it -- and the
+ * person whose guess was wrong is reading a panel in a language they may not
+ * understand. Hence the flags, and each language's English name under its
+ * own: three ways to find yours, two of which need no reading at all.
+ *
+ * A sheet over the whole panel rather than a dropdown: the overlay is ~375dp
+ * tall in landscape, and twenty-two languages in a dropdown would be a list
+ * inside a list, scrolled with a thumb that is also holding the game.
  */
-export function LanguagePicker() {
+export function LanguagePicker({ variant = 'chip' }: { variant?: 'chip' | 'row' }) {
   const { lang, setLang, t } = usePanelI18n();
   const [open, setOpen] = useState(false);
-  const current = bubbleLang(lang);
+  const current = bubbleLang(lang) ?? BUBBLE_LANGS[0];
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-label={t('lang.title')}
-        className="bz-chip inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 text-[10px]"
-      >
-        <span aria-hidden>🌐</span>
-        {current?.code === 'en' ? 'EN' : (current?.label.split(' ')[0] ?? 'EN')}
-      </button>
+      {variant === 'chip' ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-label={`${t('lang.title')}: ${current.label}`}
+          className="bz-chip inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 text-[11px]"
+        >
+          <span aria-hidden className="text-sm leading-none">{current.flag}</span>
+          <span>{current.code.split('-')[0].toUpperCase()}</span>
+          <span aria-hidden className="text-[8px] opacity-70">▼</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          className="bz-chip flex w-full items-center gap-2 px-3 py-2 text-start"
+        >
+          <span aria-hidden className="text-lg leading-none">🌐</span>
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="block text-[13px]">{t('lang.title')}</span>
+            <span className="block truncate font-sans text-[11px] font-normal text-muted [text-shadow:none]">
+              {current.flag} {current.label}
+            </span>
+          </span>
+          <span aria-hidden className="text-xs opacity-70">{current.flag} ▸</span>
+        </button>
+      )}
+
       {open ? (
-        <div className="bz-panel absolute inset-x-1 top-full z-30 mt-1 p-2">
-          <p className="display text-[13px] uppercase">{t('lang.title')}</p>
-          <p className="mb-1.5 text-[10px] leading-snug text-muted">{t('lang.hint')}</p>
-          <div className="grid grid-cols-2 gap-1">
-            {BUBBLE_LANGS.map((l) => (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('lang.title')}
+          className="fixed inset-0 z-50 flex items-stretch justify-center bg-[#050a1f]/75 p-2 backdrop-blur-[2px]"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="bz-panel flex w-full max-w-xl flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="flex items-center gap-2 border-b border-border px-3 py-2">
+              <span aria-hidden className="text-2xl leading-none">🌐</span>
+              <span className="min-w-0 flex-1 leading-tight">
+                <span className="display block text-base uppercase">{t('lang.title')}</span>
+                {/* "Language" in English as well, for the reader who opened
+                    this because they cannot read the line above it. */}
+                {lang !== 'en' ? (
+                  <span className="block text-[10px] text-muted">Language</span>
+                ) : null}
+              </span>
               <button
-                key={l.code}
                 type="button"
-                dir={l.rtl ? 'rtl' : 'ltr'}
-                onClick={() => {
-                  setLang(l.code);
-                  setOpen(false);
-                }}
-                aria-pressed={l.code === lang}
-                className={`truncate px-2 py-1 text-start text-[11px] ${l.code === lang ? 'bz-chip-on' : 'bz-chip'}`}
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+                className="bz-chip grid size-8 shrink-0 place-items-center text-sm"
               >
-                {l.label}
+                ✕
               </button>
-            ))}
+            </header>
+
+            <p className="px-3 pt-2 text-[11px] leading-snug text-muted">{t('lang.hint')}</p>
+
+            <ul className="grid flex-1 grid-cols-2 content-start gap-1.5 overflow-y-auto p-2.5 sm:grid-cols-3">
+              {BUBBLE_LANGS.map((l) => {
+                const on = l.code === lang;
+                return (
+                  <li key={l.code}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLang(l.code);
+                        setOpen(false);
+                      }}
+                      aria-pressed={on}
+                      lang={l.code}
+                      className={`relative flex w-full items-center gap-2 px-2 py-1.5 text-start ${
+                        on ? 'bz-chip-on' : 'bz-chip'
+                      }`}
+                    >
+                      <span aria-hidden className="text-[22px] leading-none">{l.flag}</span>
+                      <span className="min-w-0 flex-1 leading-tight">
+                        <span dir={l.rtl ? 'rtl' : 'ltr'} className="block truncate text-[12px]">
+                          {l.label}
+                        </span>
+                        <span className="block truncate font-sans text-[9px] font-normal opacity-75 [text-shadow:none]">
+                          {l.english}
+                        </span>
+                      </span>
+                      {on ? (
+                        <span aria-hidden className="shrink-0 text-xs font-black">✓</span>
+                      ) : null}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
       ) : null}

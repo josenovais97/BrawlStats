@@ -18,33 +18,43 @@ export interface BubbleLang {
   code: string;
   /** What the player sees in the picker: the language's own name. */
   label: string;
+  /**
+   * A flag beside the name, for whoever cannot read the list itself -- the
+   * player who opened the panel in a language they do not speak. A language
+   * is not a country, so this is the flag players most associate with it
+   * (Brazil for the game's Brazilian Portuguese, Mexico for its Latin
+   * American Spanish), and the English name sits under it as well.
+   */
+  flag: string;
+  /** The language's name in English, the second way to find it. */
+  english: string;
   file: string;
   rtl?: boolean;
 }
 
 export const BUBBLE_LANGS: BubbleLang[] = [
-  { code: 'en', label: 'English', file: 'texts' },
-  { code: 'fr', label: 'Français', file: 'fr' },
-  { code: 'de', label: 'Deutsch', file: 'de' },
-  { code: 'es', label: 'Español', file: 'es' },
-  { code: 'es-419', label: 'Español (Latinoamérica)', file: 'es-419' },
-  { code: 'it', label: 'Italiano', file: 'it' },
-  { code: 'pt', label: 'Português', file: 'pt' },
-  { code: 'nl', label: 'Nederlands', file: 'nl' },
-  { code: 'pl', label: 'Polski', file: 'pl' },
-  { code: 'tr', label: 'Türkçe', file: 'tr' },
-  { code: 'fi', label: 'Suomi', file: 'fi' },
-  { code: 'ru', label: 'Русский', file: 'ru' },
-  { code: 'zh-Hans', label: '简体中文', file: 'cn' },
-  { code: 'zh-Hant', label: '繁體中文', file: 'cnt' },
-  { code: 'ja', label: '日本語', file: 'jp' },
-  { code: 'ko', label: '한국어', file: 'kr' },
-  { code: 'ms', label: 'Bahasa Melayu', file: 'ms' },
-  { code: 'id', label: 'Bahasa Indonesia', file: 'id' },
-  { code: 'vi', label: 'Tiếng Việt', file: 'vi' },
-  { code: 'th', label: 'ภาษาไทย', file: 'th' },
-  { code: 'ar', label: 'العربية', file: 'ar', rtl: true },
-  { code: 'he', label: 'עברית', file: 'he', rtl: true },
+  { code: 'en', flag: '🇬🇧', english: 'English', label: 'English', file: 'texts' },
+  { code: 'fr', flag: '🇫🇷', english: 'French', label: 'Français', file: 'fr' },
+  { code: 'de', flag: '🇩🇪', english: 'German', label: 'Deutsch', file: 'de' },
+  { code: 'es', flag: '🇪🇸', english: 'Spanish', label: 'Español', file: 'es' },
+  { code: 'es-419', flag: '🇲🇽', english: 'Spanish (Latin America)', label: 'Español (Latinoamérica)', file: 'es-419' },
+  { code: 'it', flag: '🇮🇹', english: 'Italian', label: 'Italiano', file: 'it' },
+  { code: 'pt', flag: '🇧🇷', english: 'Portuguese', label: 'Português', file: 'pt' },
+  { code: 'nl', flag: '🇳🇱', english: 'Dutch', label: 'Nederlands', file: 'nl' },
+  { code: 'pl', flag: '🇵🇱', english: 'Polish', label: 'Polski', file: 'pl' },
+  { code: 'tr', flag: '🇹🇷', english: 'Turkish', label: 'Türkçe', file: 'tr' },
+  { code: 'fi', flag: '🇫🇮', english: 'Finnish', label: 'Suomi', file: 'fi' },
+  { code: 'ru', flag: '🇷🇺', english: 'Russian', label: 'Русский', file: 'ru' },
+  { code: 'zh-Hans', flag: '🇨🇳', english: 'Chinese (Simplified)', label: '简体中文', file: 'cn' },
+  { code: 'zh-Hant', flag: '🇹🇼', english: 'Chinese (Traditional)', label: '繁體中文', file: 'cnt' },
+  { code: 'ja', flag: '🇯🇵', english: 'Japanese', label: '日本語', file: 'jp' },
+  { code: 'ko', flag: '🇰🇷', english: 'Korean', label: '한국어', file: 'kr' },
+  { code: 'ms', flag: '🇲🇾', english: 'Malay', label: 'Bahasa Melayu', file: 'ms' },
+  { code: 'id', flag: '🇮🇩', english: 'Indonesian', label: 'Bahasa Indonesia', file: 'id' },
+  { code: 'vi', flag: '🇻🇳', english: 'Vietnamese', label: 'Tiếng Việt', file: 'vi' },
+  { code: 'th', flag: '🇹🇭', english: 'Thai', label: 'ภาษาไทย', file: 'th' },
+  { code: 'ar', flag: '🇸🇦', english: 'Arabic', label: 'العربية', file: 'ar', rtl: true },
+  { code: 'he', flag: '🇮🇱', english: 'Hebrew', label: 'עברית', file: 'he', rtl: true },
 ];
 
 export const BUBBLE_LANG_CODES = new Set(BUBBLE_LANGS.map((l) => l.code));
