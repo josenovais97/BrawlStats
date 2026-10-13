@@ -1,15 +1,21 @@
 import type { NextRequest } from 'next/server';
 
 import { errorResponse, okResponse } from '@/lib/route-helpers';
+import { bracketBySlug } from '@/lib/rank-brackets';
 import {
   RANKED_MAP_WINDOW_DAYS,
   getAllyScores,
+  getBracketMapPicks,
   getCounterScores,
   getRankedMapPicks,
 } from '@/lib/stats';
 
 /**
- * GET /api/v1/draft-suggest?map=Belle%27s%20Rock&enemies=1,2&allies=3&bans=4,5
+ * GET /api/v1/draft-suggest?map=Belle%27s%20Rock&enemies=1,2&allies=3&bans=4,5&rank=legendary
+ *
+ * `rank` (a bracket slug, optional) answers for that rank's lobbies: the
+ * map's picks at that rank and the matchups measured there. Anything too
+ * thin at the rank falls back to every rank rather than disappearing.
  *
  * What to pick, given a map and who has already been taken.
  *
@@ -51,23 +57,27 @@ export async function GET(request: NextRequest) {
     const enemies = ids(params.get('enemies'));
     const allies = ids(params.get('allies'));
     const taken = new Set([...ids(params.get('bans')), ...enemies, ...allies]);
+    const bracket = bracketBySlug(params.get('rank'))?.id;
 
     /*
      * The map first, because it is the floor everything else adjusts. `only`
      * narrows the roll-up to this one map rather than reading the whole pool
      * and filtering in memory.
      */
-    const [maps, counters, synergies] = await Promise.all([
+    const [maps, rankMaps, counters, synergies] = await Promise.all([
       getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS, { mapName }).catch(() => []),
+      bracket ? getBracketMapPicks(bracket, 60).catch(() => []) : Promise.resolve([]),
       enemies.length > 0
-        ? getCounterScores(enemies).catch(() => new Map())
+        ? getCounterScores(enemies, 21, bracket).catch(() => new Map())
         : Promise.resolve(new Map()),
       allies.length > 0
-        ? getAllyScores(allies).catch(() => new Map())
+        ? getAllyScores(allies, 21, bracket).catch(() => new Map())
         : Promise.resolve(new Map()),
     ]);
 
-    const map = maps.find((m) => m.mapName === mapName) ?? maps[0];
+    // The map at this rank when it has a list there, else every rank's.
+    const rankMap = rankMaps.find((m) => m.mapName === mapName && m.picks.length > 0);
+    const map = rankMap ?? maps.find((m) => m.mapName === mapName) ?? maps[0];
     if (!map) return okResponse({ mapName, picks: [] });
 
     const picks = map.picks

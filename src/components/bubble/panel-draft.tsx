@@ -219,6 +219,13 @@ export function PanelDraft({
     if (picked.enemies.length) params.set('enemies', picked.enemies.join(','));
     if (picked.allies.length) params.set('allies', picked.allies.join(','));
     if (picked.bans.length) params.set('bans', picked.bans.join(','));
+    // The rank chosen on the Meta tab, so the draft answers for that rank.
+    try {
+      const rank = window.localStorage.getItem('brawlzone.bubble.bracket');
+      if (rank && rank !== 'all') params.set('rank', rank);
+    } catch {
+      // No storage: every rank.
+    }
 
     const controller = new AbortController();
     const timer = setTimeout(() => {

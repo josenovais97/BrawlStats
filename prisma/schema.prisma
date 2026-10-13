@@ -479,7 +479,8 @@ model PlayerBattleDaily {
 /// gone, which is where the saving is.
 model BrawlerPairDaily {
   day            DateTime @db.Date
-  /// The sampled player's brawler: the subject of the pairing.
+  /// The subject of the pairing: since 2026-10-13 every brawler in the
+  /// battle, not only the sampled player's.
   brawlerId      Int      @map("brawler_id")
   otherBrawlerId Int      @map("other_brawler_id")
   /// "enemy" | "ally", from the subject's perspective.
@@ -539,6 +540,24 @@ model RankedLineupDaily {
   @@map("ranked_lineup_daily")
 }
 
+/// Ranked matchups per rank bracket (1-4): how a brawler does against
+/// ("enemy") or alongside ("ally") another, in that bracket's lobbies. Built
+/// with `brawler_pair_daily` from the same de-duplicated lineups. What the
+/// draft helper reads when a rank is chosen.
+model RankedPairDaily {
+  day            DateTime @db.Date
+  rankBracket    Int      @map("rank_bracket") @db.SmallInt
+  brawlerId      Int      @map("brawler_id")
+  otherBrawlerId Int      @map("other_brawler_id")
+  /// "enemy" | "ally", from `brawlerId`'s side.
+  side           String
+  wins           Int
+  decided        Int
+
+  @@id([day, rankBracket, brawlerId, otherBrawlerId, side])
+  @@map("ranked_pair_daily")
+}
+
 /// What each roll-up day was last built from, so unchanged days are not
 /// rebuilt.
 ///
@@ -561,7 +580,8 @@ model RankedLineupDaily {
 /// what survived — undercounting it permanently. See RAW_BATTLE_RETENTION_DAYS.
 model RollupWatermark {
   day          DateTime @db.Date
-  /// "battles" | "teams" | "lineups" — folded on separate day lists.
+  /// "battles" | "teams6" | "lineups" — folded on separate day lists.
+  /// ("teams" was the team fold before whole lineups, 2026-10-13.)
   source       String
   rawWatermark DateTime @map("raw_watermark")
   foldedAt     DateTime @updatedAt @map("folded_at")

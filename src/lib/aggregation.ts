@@ -201,6 +201,23 @@ const DEFAULT_BATCH_SIZE = POOL_TARGET;
 const ROLLUP_REBUILD_DAYS = 3;
 
 /**
+ * Older team days rebuilt per run when the team fold changes method.
+ *
+ * Each takes ~60s on the box (measured 2026-10-13, all three tables), and a
+ * run's roll-up has to fit in what the sampling leaves of the 25-minute
+ * budget, after the three recent days. Two a run re-folds the 14 raw days
+ * within a day of runs, newest first.
+ */
+const TEAM_BACKFILL_DAYS_PER_RUN = 2;
+
+/**
+ * How long per-rank matchups are kept: the draft helper reads 21 days. About
+ * 75,000 rows a day, so this rather than the 45-day pairing window keeps the
+ * table near 150 MB.
+ */
+const RANKED_PAIR_RETENTION_DAYS = 22;
+
+/**
  * How long the roll-ups are kept.
  *
  * This is the window the site actually reads, so it is set by the longest
@@ -1044,74 +1061,137 @@ export async function rollUpBattles(): Promise<{ rows: number; error: string | n
     // Team samples are folded on their own day list: they are written only for
     // 3v3 battles, so a day can legitimately exist in one table and not the
     // other, and pairing the two loops would skip or redo days.
-    const teamDays = await prisma.$queryRaw<{ day: Date; watermark: Date }[]>`
+    /*
+     * Team battles are folded from whole lineups since 2026-10-13: every
+     * brawler in the battle, against each of the three opponents and beside
+     * each team-mate -- not only the sampled player's own brawler. Measured on
+     * 2026-10-12: 13.1 million matchup observations against 2.45 million, in
+     * the same ~45,000 rows, because the table already held nearly every pair
+     * and it is the counts inside that grow.
+     *
+     * Battles are de-duplicated first (two pool players often see one battle)
+     * into a temporary table, which the three inserts below then share.
+     *
+     * A new watermark source, so every raw day is rebuilt this way once.
+     * At ~30s a day that is capped per run (TEAM_BACKFILL_DAYS_PER_RUN); the
+     * recent days, which change every run, always go first.
+     */
+    const teamDays = await prisma.$queryRaw<{ day: Date; watermark: Date; recent: boolean }[]>`
       WITH candidates AS (
         SELECT b.battle_time::date AS day, MAX(b.created_at) AS watermark
         FROM battle_team_samples b
-        WHERE b.battle_time::date > current_date - ${ROLLUP_REBUILD_DAYS}::int
-           OR NOT EXISTS (
-             SELECT 1 FROM brawler_team_daily d WHERE d.day = b.battle_time::date
-           )
         GROUP BY 1
       )
-      SELECT c.day, c.watermark
+      SELECT c.day, c.watermark, c.day > current_date - ${ROLLUP_REBUILD_DAYS}::int AS recent
       FROM candidates c
-      LEFT JOIN rollup_watermarks w ON w.day = c.day AND w.source = 'teams'
-      WHERE w.raw_watermark IS DISTINCT FROM c.watermark
-      ORDER BY c.day
+      LEFT JOIN rollup_watermarks w ON w.day = c.day AND w.source = 'teams6'
+      WHERE (c.day > current_date - ${ROLLUP_REBUILD_DAYS}::int OR w.day IS NULL)
+        AND w.raw_watermark IS DISTINCT FROM c.watermark
+      ORDER BY c.day DESC
     `;
+    let backfills = 0;
 
-    for (const { day, watermark } of teamDays) {
-      // One INSERT for both sides: `unnest` is applied twice over the same
-      // scan rather than once per side, which halves the work on the table's
-      // widest columns.
-      const [, pairRows] = await prisma.$transaction([
+    for (const { day, watermark, recent } of teamDays) {
+      if (!recent && backfills++ >= TEAM_BACKFILL_DAYS_PER_RUN) continue;
+
+      const [, , , pairRows, , teamRows, , rankedRows] = await prisma.$transaction([
+        // Created empty and then filled: Postgres takes no bind parameters in
+        // a CREATE TABLE ... AS.
+        prisma.$executeRaw`
+        CREATE TEMP TABLE fold_sides
+          (battle_type TEXT, lobby_rank SMALLINT, team INTEGER[], other INTEGER[], won BOOLEAN)
+          ON COMMIT DROP
+      `,
+        prisma.$executeRaw`
+        INSERT INTO fold_sides
+        WITH seen AS (
+          SELECT t.battle_time, COALESCE(t.map_name, '') AS map_name, t.battle_type, t.result,
+                 s.lobby_rank,
+                 (SELECT array_agg(x ORDER BY x) FROM unnest(t.ally_brawler_ids || t.brawler_id) x) AS own,
+                 (SELECT array_agg(x ORDER BY x) FROM unnest(t.enemy_brawler_ids) x) AS foe
+          FROM battle_team_samples t
+          LEFT JOIN battle_samples s ON s.battle_key = t.battle_key
+          WHERE t.battle_time::date = ${day}
+            AND t.result IN ('victory', 'defeat')
+        ),
+        battles AS (
+          SELECT DISTINCT ON (battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text))
+                 battle_type, result, lobby_rank, own, foe
+          FROM seen
+          ORDER BY battle_time, map_name, LEAST(own::text, foe::text), GREATEST(own::text, foe::text),
+                   lobby_rank NULLS LAST
+        )
+        -- Each battle once from each side, as that side saw it.
+        SELECT battle_type, lobby_rank, own AS team, foe AS other, result = 'victory' AS won FROM battles
+        UNION ALL
+        SELECT battle_type, lobby_rank, foe, own, result = 'defeat' FROM battles
+      `,
         prisma.$executeRaw`DELETE FROM brawler_pair_daily WHERE day = ${day}`,
         prisma.$executeRaw`
         INSERT INTO brawler_pair_daily
           (day, brawler_id, other_brawler_id, side, result, battles)
-        SELECT battle_time::date, brawler_id, other_id, side, result, COUNT(*)
-        FROM battle_team_samples,
-             LATERAL (
-               SELECT unnest(enemy_brawler_ids) AS other_id, 'enemy' AS side
-               UNION ALL
-               SELECT unnest(ally_brawler_ids), 'ally'
-             ) expanded
-        WHERE battle_time::date = ${day}
-          -- Mirrors carry no information: a brawler is 50% against itself by
-          -- construction, and every read excluded them anyway.
-          AND other_id <> brawler_id
-        GROUP BY 1, 2, 3, 4, 5
+        SELECT ${day}::date, brawler_id, other_id, side,
+               CASE WHEN won THEN 'victory' ELSE 'defeat' END, COUNT(*)
+        FROM (
+          SELECT x AS brawler_id, y AS other_id, 'enemy' AS side, won
+          FROM fold_sides, unnest(team) x, unnest(other) y
+          UNION ALL
+          SELECT x, y, 'ally', won FROM fold_sides, unnest(team) x, unnest(team) y
+        ) p
+        -- Mirrors carry no information: a brawler is 50% against itself by
+        -- construction, and every read excluded them anyway. On the ally side
+        -- this is also what stops a brawler counting as its own team-mate.
+        WHERE other_id <> brawler_id
+        GROUP BY 2, 3, 4, 5
       `,
-      ]);
-
-      const [, teamRows] = await prisma.$transaction([
         prisma.$executeRaw`DELETE FROM brawler_team_daily WHERE day = ${day}`,
         prisma.$executeRaw`
         INSERT INTO brawler_team_daily (day, brawler_id, wins, decided)
-        SELECT battle_time::date, brawler_id,
-               COUNT(*) FILTER (WHERE result = 'victory'),
-               -- Every sampled team battle, draws included. Not a slip: the
-               -- pairing rows are summed the same way, and every read reports
-               -- a pairing as an edge against this baseline. Matching
-               -- denominators is what makes that subtraction mean anything;
-               -- excluding draws from one side and not the other would bias
-               -- every matchup on the site by the draw rate.
+        SELECT ${day}::date, x,
+               COUNT(*) FILTER (WHERE won),
+               -- Every team battle the brawler was in. The pairing rows are
+               -- summed the same way, and every read reports a pairing as an
+               -- edge against this baseline, so the denominators must match.
                COUNT(*)
-        FROM battle_team_samples
-        WHERE battle_time::date = ${day}
-        GROUP BY 1, 2
+        FROM fold_sides, unnest(team) x
+        GROUP BY 2
+      `,
+        prisma.$executeRaw`DELETE FROM ranked_pair_daily WHERE day = ${day}`,
+        prisma.$executeRaw`
+        INSERT INTO ranked_pair_daily
+          (day, rank_bracket, brawler_id, other_brawler_id, side, wins, decided)
+        SELECT ${day}::date, bracket, brawler_id, other_id, side,
+               COUNT(*) FILTER (WHERE won), COUNT(*)
+        FROM (
+          -- Must match RANK_BRACKETS in lib/rank-brackets (a test checks).
+          SELECT CASE
+                   WHEN lobby_rank <= 12 THEN 1
+                   WHEN lobby_rank <= 15 THEN 2
+                   WHEN lobby_rank <= 18 THEN 3
+                   ELSE 4
+                 END AS bracket,
+                 team, other, won
+          FROM fold_sides
+          WHERE battle_type = ANY(${competitive}::text[]) AND lobby_rank IS NOT NULL
+        ) r,
+        LATERAL (
+          SELECT x AS brawler_id, y AS other_id, 'enemy' AS side FROM unnest(r.team) x, unnest(r.other) y
+          UNION ALL
+          SELECT x, y, 'ally' FROM unnest(r.team) x, unnest(r.team) y
+        ) p
+        WHERE other_id <> brawler_id
+        GROUP BY 2, 3, 4, 5
       `,
       ]);
 
       await prisma.$executeRaw`
         INSERT INTO rollup_watermarks (day, source, raw_watermark, folded_at)
-        VALUES (${day}, 'teams', ${watermark}, now())
+        VALUES (${day}, 'teams6', ${watermark}, now())
         ON CONFLICT (day, source)
         DO UPDATE SET raw_watermark = EXCLUDED.raw_watermark, folded_at = now()
       `;
 
-      rows += pairRows + teamRows;
+      rows += pairRows + teamRows + rankedRows;
     }
 
     rows += await rollUpLineups(competitive);
@@ -1314,13 +1394,23 @@ export async function pruneOldSamples(): Promise<number> {
     // The roll-ups themselves age out on the window the site reads. Nothing
     // guards these: they are derived, and a lost day costs a thinner average
     // rather than an unrecoverable observation.
-    const [dailyStats, playerDaily, pairDaily, teamDaily, lineupDaily] = await Promise.all([
+    const [dailyStats, playerDaily, pairDaily, teamDaily, lineupDaily, rankedPairDaily] = await Promise.all([
       prisma.battleDailyStat.deleteMany({ where: { day: { lt: rollupCutoff } } }),
       prisma.playerBattleDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
       prisma.brawlerPairDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
       prisma.brawlerTeamDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
       // On the pairing window: 45 days, against the 21 the map picks read.
       prisma.rankedLineupDaily.deleteMany({ where: { day: { lt: pairingCutoff } } }),
+      prisma.rankedPairDaily.deleteMany({
+        where: {
+          day: {
+            lt: new Date(
+              Date.now() -
+                Math.max(Math.min(RANKED_PAIR_RETENTION_DAYS, pairingDays), MIN_ROLLUP_RETENTION_DAYS) * day,
+            ),
+          },
+        },
+      }),
     ]);
 
     return (
@@ -1332,7 +1422,8 @@ export async function pruneOldSamples(): Promise<number> {
       playerDaily.count +
       pairDaily.count +
       teamDaily.count +
-      lineupDaily.count
+      lineupDaily.count +
+      rankedPairDaily.count
     );
   } catch {
     // A failed prune costs disk, not correctness, so it never fails a run.

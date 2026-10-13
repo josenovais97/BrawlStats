@@ -3405,8 +3405,10 @@ export interface CounterScore {
 export function getCounterScores(
   enemyIds: number[],
   windowDays = 21,
+  /** A Ranked bracket (lib/rank-brackets): that rank's lobbies only. */
+  bracket?: number,
 ): Promise<Map<number, CounterScore>> {
-  return pairingScores(enemyIds, 'enemy', windowDays);
+  return pairingScores(enemyIds, 'enemy', windowDays, bracket);
 }
 
 /**
@@ -3426,8 +3428,9 @@ export function getCounterScores(
 export function getAllyScores(
   allyIds: number[],
   windowDays = 21,
+  bracket?: number,
 ): Promise<Map<number, CounterScore>> {
-  return pairingScores(allyIds, 'ally', windowDays);
+  return pairingScores(allyIds, 'ally', windowDays, bracket);
 }
 
 /**
@@ -3529,57 +3532,121 @@ async function compute_overallWinRates(windowDays: number): Promise<[number, num
   );
 }
 
+/** Sums the named brawlers' columns of a matrix into edges against `overall`. */
+function scorePairings(
+  matrix: PairingRow[],
+  overall: [number, number][],
+  otherIds: number[],
+): Map<number, CounterScore> {
+  const out = new Map<number, CounterScore>();
+  const named = new Set(otherIds);
+  const totals = new Map<number, { wins: number; decided: number }>();
+  for (const [brawlerId, otherId, wins, decided] of matrix) {
+    if (!named.has(otherId)) continue;
+    const running = totals.get(brawlerId);
+    if (running) {
+      running.wins += wins;
+      running.decided += decided;
+    } else {
+      totals.set(brawlerId, { wins, decided });
+    }
+  }
+
+  const base = new Map(overall);
+  for (const [brawlerId, total] of totals) {
+    // The old query's HAVING, which applied to the total across the named
+    // opponents rather than to any single pairing. Same here.
+    if (total.decided < MIN_SAMPLE_FOR_PAIRING) continue;
+    const own = base.get(brawlerId);
+    if (own === undefined) continue;
+
+    const winRate = total.wins / total.decided;
+    out.set(brawlerId, {
+      brawlerId,
+      winRate,
+      edge: winRate - own,
+      decidedSampleSize: total.decided,
+    });
+  }
+  return out;
+}
+
 async function pairingScores(
   otherIds: number[],
   side: 'enemy' | 'ally',
   windowDays: number,
+  bracket?: number,
 ): Promise<Map<number, CounterScore>> {
-  const out = new Map<number, CounterScore>();
-  if (otherIds.length === 0) return out;
+  if (otherIds.length === 0) return new Map();
 
   try {
     const [matrix, overall] = await Promise.all([
       cachedPairingMatrix(side, windowDays),
       cachedOverallWinRates(windowDays),
     ]);
+    const all = scorePairings(matrix, overall, otherIds);
+    if (!bracket) return all;
 
-    // Exactly what the database was doing: sum the named opponents' columns.
-    const named = new Set(otherIds);
-    const totals = new Map<number, { wins: number; decided: number }>();
-    for (const [brawlerId, otherId, wins, decided] of matrix) {
-      if (!named.has(otherId)) continue;
-      const running = totals.get(brawlerId);
-      if (running) {
-        running.wins += wins;
-        running.decided += decided;
-      } else {
-        totals.set(brawlerId, { wins, decided });
-      }
-    }
-
-    const base = new Map(overall);
-    for (const [brawlerId, total] of totals) {
-      // The old query's HAVING, which applied to the total across the named
-      // opponents rather than to any single pairing. Same here.
-      if (total.decided < MIN_SAMPLE_FOR_PAIRING) continue;
-      const own = base.get(brawlerId);
-      if (own === undefined) continue;
-
-      const winRate = total.wins / total.decided;
-      out.set(brawlerId, {
-        brawlerId,
-        winRate,
-        edge: winRate - own,
-        decidedSampleSize: total.decided,
-      });
-    }
-
-    return out;
+    /*
+     * At one rank: that rank's Ranked lobbies, measured against the brawler's
+     * own rate at that rank. A brawler with too few battles against the named
+     * line-up at this rank keeps its every-rank answer rather than vanishing
+     * from the draft -- the enemy can still pick it.
+     */
+    const [rankMatrix, rankOverall] = await Promise.all([
+      cachedRankedPairingMatrix(side, windowDays, bracket),
+      cachedRankedOverallWinRates(windowDays, bracket),
+    ]);
+    const atRank = scorePairings(rankMatrix, rankOverall, otherIds);
+    for (const [id, score] of all) if (!atRank.has(id)) atRank.set(id, score);
+    return atRank;
   } catch (error) {
     swallow('pairingScores', error);
-    return out;
+    return new Map();
   }
 }
+
+/** `compute_pairingMatrix` for one Ranked bracket, from `ranked_pair_daily`. */
+async function compute_rankedPairingMatrix(
+  side: 'enemy' | 'ally',
+  windowDays: number,
+  bracket: number,
+): Promise<PairingRow[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+  const rows = await prisma.rankedPairDaily.groupBy({
+    by: ['brawlerId', 'otherBrawlerId'],
+    where: { day: { gte: windowStartUtc(windowDays) }, side, rankBracket: bracket },
+    _sum: { wins: true, decided: true },
+  });
+  return rows.map((r) => [r.brawlerId, r.otherBrawlerId, r._sum.wins ?? 0, r._sum.decided ?? 0]);
+}
+
+/**
+ * Each brawler's own rate at one rank: the baseline its edges there are
+ * measured against. From `ranked_lineup_daily`, which is built from the same
+ * de-duplicated Ranked battles as `ranked_pair_daily`.
+ */
+async function compute_rankedOverallWinRates(
+  windowDays: number,
+  bracket: number,
+): Promise<[number, number][]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+  const rows = await prisma.rankedLineupDaily.groupBy({
+    by: ['brawlerId'],
+    where: { day: { gte: windowStartUtc(windowDays) }, rankBracket: bracket },
+    _sum: { wins: true, losses: true },
+  });
+  return rows.flatMap((r) => {
+    const wins = r._sum.wins ?? 0;
+    const decided = wins + (r._sum.losses ?? 0);
+    return decided > 0 ? [[r.brawlerId, wins / decided] as [number, number]] : [];
+  });
+}
+
+const cachedRankedPairingMatrix = cachedRead('ranked-pairing-matrix', compute_rankedPairingMatrix);
+const cachedRankedOverallWinRates = cachedRead('ranked-overall-win-rates', compute_rankedOverallWinRates);
 
 /** One brawler's record against one specific other brawler. */
 export interface HeadToHead {
