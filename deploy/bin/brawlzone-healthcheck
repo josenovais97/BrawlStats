@@ -250,7 +250,7 @@ except Exception:
 now = datetime.datetime.now(datetime.UTC)
 for section, label in (('last_post', 'post'), ('last_run', 'run')):
     entries = state.get(section) or {}
-    for mode in ('daily', 'build', 'tiers', 'hidden'):
+    for mode in ('counter', 'tiers', 'build', 'trio'):
         stamp = entries.get(mode)
         try:
             when = datetime.datetime.fromisoformat(stamp) if stamp else None

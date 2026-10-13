@@ -1,5 +1,5 @@
 import { brawlerOfDay } from '@/lib/brawler-of-day';
-import { buildCaption, buildSlideCount } from '@/lib/build-slides';
+import { BUILD_V2_SLIDES, buildCaptionV2 } from '@/lib/build-slides-v2';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -39,8 +39,8 @@ export async function GET(
     return Response.json({ date, brawler: null, count: 0, slides: [] }, { headers });
   }
 
-  const count = buildSlideCount(day);
-  const caption = buildCaption(day, SITE_URL);
+  const count = BUILD_V2_SLIDES;
+  const caption = buildCaptionV2(day, SITE_URL);
 
   return Response.json(
     {

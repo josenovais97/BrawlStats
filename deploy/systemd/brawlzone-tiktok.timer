@@ -1,5 +1,5 @@
 [Unit]
-Description=Send the day's findings card to TikTok, daily at 09:10 UTC
+Description=Send the counter of the day to TikTok, daily at 09:10 UTC
 
 [Timer]
 # After the 08:00 digest, so the card for today has been rendered and the

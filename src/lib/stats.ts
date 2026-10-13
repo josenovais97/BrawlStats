@@ -3601,7 +3601,21 @@ async function compute_overallWinRates(windowDays: number): Promise<[number, num
   );
 }
 
-/** Sums the named brawlers' columns of a matrix into edges against `overall`. */
+/**
+ * Sums the named brawlers' columns of a matrix into edges.
+ *
+ * Measured against what the brawler would be expected to do against (or
+ * beside) those particular brawlers, not just against its own usual rate.
+ * Until 2026-10-13 the expectation was the brawler's own rate alone, which
+ * left the opponent's strength in every edge: against Shelly -- the starter
+ * brawler, often in weaker hands -- nearly every brawler showed +27 points
+ * and an 80-88% win rate, as if all of them countered her. So the expected
+ * rate against opponent O is the brawler's own rate plus how far everyone
+ * else ends up from their own rates against O (the mean edge into O,
+ * weighted by games). An edge is then what is specific to this pairing.
+ * The order of candidates for one lineup barely moves; the numbers become
+ * ones a reader can believe.
+ */
 function scorePairings(
   matrix: PairingRow[],
   overall: [number, number][],
@@ -3609,31 +3623,45 @@ function scorePairings(
 ): Map<number, CounterScore> {
   const out = new Map<number, CounterScore>();
   const named = new Set(otherIds);
-  const totals = new Map<number, { wins: number; decided: number }>();
+  const base = new Map(overall);
+
+  // How everyone does against each named brawler, beyond their own rates.
+  const into = new Map<number, { excess: number; decided: number }>();
   for (const [brawlerId, otherId, wins, decided] of matrix) {
     if (!named.has(otherId)) continue;
-    const running = totals.get(brawlerId);
-    if (running) {
-      running.wins += wins;
-      running.decided += decided;
-    } else {
-      totals.set(brawlerId, { wins, decided });
-    }
+    const own = base.get(brawlerId);
+    if (own === undefined || decided === 0) continue;
+    const acc = into.get(otherId) ?? { excess: 0, decided: 0 };
+    acc.excess += wins - own * decided;
+    acc.decided += decided;
+    into.set(otherId, acc);
+  }
+  const shift = (otherId: number) => {
+    const acc = into.get(otherId);
+    return acc && acc.decided > 0 ? acc.excess / acc.decided : 0;
+  };
+
+  const totals = new Map<number, { wins: number; decided: number; expected: number }>();
+  for (const [brawlerId, otherId, wins, decided] of matrix) {
+    if (!named.has(otherId)) continue;
+    const own = base.get(brawlerId);
+    if (own === undefined) continue;
+    const running = totals.get(brawlerId) ?? { wins: 0, decided: 0, expected: 0 };
+    running.wins += wins;
+    running.decided += decided;
+    running.expected += decided * (own + shift(otherId));
+    totals.set(brawlerId, running);
   }
 
-  const base = new Map(overall);
   for (const [brawlerId, total] of totals) {
     // The old query's HAVING, which applied to the total across the named
     // opponents rather than to any single pairing. Same here.
     if (total.decided < MIN_SAMPLE_FOR_PAIRING) continue;
-    const own = base.get(brawlerId);
-    if (own === undefined) continue;
-
     const winRate = total.wins / total.decided;
     out.set(brawlerId, {
       brawlerId,
       winRate,
-      edge: winRate - own,
+      edge: winRate - total.expected / total.decided,
       decidedSampleSize: total.decided,
     });
   }
@@ -3679,13 +3707,14 @@ async function pairingScores(
 async function compute_rankedPairingMatrix(
   side: 'enemy' | 'ally',
   windowDays: number,
-  bracket: number,
+  /** Omitted: every rank, Ranked battles only. */
+  bracket?: number,
 ): Promise<PairingRow[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
   const rows = await prisma.rankedPairDaily.groupBy({
     by: ['brawlerId', 'otherBrawlerId'],
-    where: { day: { gte: windowStartUtc(windowDays) }, side, rankBracket: bracket },
+    where: { day: { gte: windowStartUtc(windowDays) }, side, ...(bracket ? { rankBracket: bracket } : {}) },
     _sum: { wins: true, decided: true },
   });
   return rows.map((r) => [r.brawlerId, r.otherBrawlerId, r._sum.wins ?? 0, r._sum.decided ?? 0]);
@@ -3698,13 +3727,18 @@ async function compute_rankedPairingMatrix(
  */
 async function compute_rankedOverallWinRates(
   windowDays: number,
-  bracket: number,
+  bracket?: number,
 ): Promise<[number, number][]> {
   const prisma = getPrisma();
   if (!prisma) return [];
   const rows = await prisma.rankedLineupDaily.groupBy({
     by: ['brawlerId'],
-    where: { day: { gte: windowStartUtc(windowDays) }, rankBracket: bracket },
+    where: {
+      day: { gte: windowStartUtc(windowDays) },
+      // Every rank's lobbies whose rank is known, the same battles the
+      // per-rank matchups are built from.
+      rankBracket: bracket ? bracket : { gt: 0 },
+    },
     _sum: { wins: true, losses: true },
   });
   return rows.flatMap((r) => {
@@ -3715,6 +3749,29 @@ async function compute_rankedOverallWinRates(
 }
 
 const cachedRankedPairingMatrix = cachedRead('ranked-pairing-matrix', compute_rankedPairingMatrix);
+
+/**
+ * Ranked-only matchups against one or more brawlers, every rank: what the
+ * daily "how to beat" post reads. The ladder's matchups carry who plays a
+ * brawler as much as the brawler -- the starter brawler is half new players --
+ * and a post about Ranked should not.
+ */
+export async function getRankedCounterScores(
+  enemyIds: number[],
+  windowDays = 21,
+): Promise<Map<number, CounterScore>> {
+  if (enemyIds.length === 0) return new Map();
+  try {
+    const [matrix, overall] = await Promise.all([
+      cachedRankedPairingMatrix('enemy', windowDays, undefined),
+      cachedRankedOverallWinRates(windowDays, undefined),
+    ]);
+    return scorePairings(matrix, overall, enemyIds);
+  } catch (error) {
+    swallow('getRankedCounterScores', error);
+    return new Map();
+  }
+}
 const cachedRankedOverallWinRates = cachedRead('ranked-overall-win-rates', compute_rankedOverallWinRates);
 
 /** One brawler's record against one specific other brawler. */

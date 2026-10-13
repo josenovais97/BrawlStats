@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 import { mapOfDay } from '@/lib/map-of-day';
-import { SLIDE_SIZE, mapSlideCount, mapSlides, slideFonts, toJpeg } from '@/lib/map-slides';
+import { MAP_V2_SLIDES, SLIDE_SIZE, mapSlidesV2, slideFonts, toJpeg } from '@/lib/map-slides-v2';
 
 /**
  * One slide of the day's Ranked map carousel, as a JPEG.
@@ -36,11 +36,11 @@ export async function GET(
   }
 
   const post = await mapOfDay(date).catch(() => null);
-  if (!post || n >= mapSlideCount(post)) {
+  if (!post || n >= MAP_V2_SLIDES) {
     return new Response('Not found', { status: 404 });
   }
 
-  const slides = await mapSlides(post, n);
+  const slides = await mapSlidesV2(post, n);
   const slide = slides[n];
   if (!slide) return new Response('Not found', { status: 404 });
 

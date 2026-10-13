@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 import { brawlerOfDay } from '@/lib/brawler-of-day';
-import { SLIDE_SIZE, slideFonts, buildSlideCount, buildSlides, toJpeg } from '@/lib/build-slides';
+import { BUILD_V2_SLIDES, SLIDE_SIZE, buildSlidesV2, slideFonts, toJpeg } from '@/lib/build-slides-v2';
 
 /**
  * One slide of the day's brawler-build carousel, as a JPEG.
@@ -35,11 +35,11 @@ export async function GET(
   }
 
   const day = await brawlerOfDay(date).catch(() => null);
-  if (!day || n >= buildSlideCount(day)) {
+  if (!day || n >= BUILD_V2_SLIDES) {
     return new Response('Not found', { status: 404 });
   }
 
-  const slides = await buildSlides(day, n);
+  const slides = await buildSlidesV2(day, n);
   const slide = slides[n];
   if (!slide) return new Response('Not found', { status: 404 });
 

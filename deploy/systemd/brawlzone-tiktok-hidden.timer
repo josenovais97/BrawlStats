@@ -1,5 +1,5 @@
 [Unit]
-Description=Send the hidden meta to TikTok, daily at 20:30 UTC
+Description=Send the trio of the day to TikTok, daily at 20:30 UTC
 
 [Timer]
 # Evening in Europe, afternoon in the Americas, and three hours clear of the

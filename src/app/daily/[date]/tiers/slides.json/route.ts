@@ -1,6 +1,7 @@
 import { SITE_URL } from '@/lib/site';
 import { mapOfDay } from '@/lib/map-of-day';
-import { mapCaption, mapSlideCount } from '@/lib/map-slides';
+import { mapCaption } from '@/lib/map-slides';
+import { MAP_V2_SLIDES } from '@/lib/map-slides-v2';
 
 /**
  * The midday carousel for one day: slide URLs, and the caption.
@@ -40,7 +41,7 @@ export async function GET(
     return Response.json({ date, count: 0, slides: [] }, { headers });
   }
 
-  const count = mapSlideCount(post);
+  const count = MAP_V2_SLIDES;
   const caption = mapCaption(post, SITE_URL);
 
   return Response.json(
