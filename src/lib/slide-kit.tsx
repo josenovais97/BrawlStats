@@ -21,7 +21,7 @@ import { DISPLAY } from '@/lib/slide-chrome';
  * caches slide images for a day by URL, so a redesign shipped mid-day would
  * otherwise post the old images; bump this with any visual change.
  */
-export const SLIDE_DESIGN = 2;
+export const SLIDE_DESIGN = 3;
 
 export const W = 1080;
 export const H = 1920;
@@ -31,9 +31,15 @@ export const H = 1920;
  * column down the right, and caption and username across the bottom. Content
  * fills what is left, edge to edge, rather than a column on one side of it.
  */
-export const SAFE = { top: 236, right: 150, bottom: 400, left: 64 };
-/** The brand tag, below TikTok's own tab bar (which ends near y=140). */
-const BRAND_TOP = 150;
+export const SAFE = { top: 290, right: 150, bottom: 360, left: 64 };
+/**
+ * The brand tag: on the first content row, at the right, beside each slide's
+ * ribbon. 290 rather than the first version's 150/236 (2026-10-13): TikTok's
+ * tab bar covers the top ~220px in the feed, and the profile grid crops each
+ * cover to 3:4 -- a 1080x1440 window, 240px off the top -- which cut off the
+ * tag and half of every ribbon.
+ */
+const BRAND_TOP = SAFE.top + 4;
 export const INNER_W = W - SAFE.left - SAFE.right;
 
 export const OUTLINE = '#050a1f';
@@ -140,13 +146,11 @@ export function Stage({
  * The domain on every slide, at the top where TikTok's caption cannot cover
  * it: most viewers swipe two slides and leave, and this is how they find us.
  */
-function BrandTag(): ReactElement {
+export function BrandTag({ inline = false }: { inline?: boolean }): ReactElement {
   return (
     <div
       style={{
-        position: 'absolute',
-        top: BRAND_TOP,
-        left: SAFE.left,
+        ...(inline ? { flexShrink: 0 } : { position: 'absolute' as const, top: BRAND_TOP, right: SAFE.right }),
         display: 'flex',
         alignItems: 'center',
         gap: 12,

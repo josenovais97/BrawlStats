@@ -18,6 +18,7 @@ import {
   Portrait,
   RED,
   RankCoin,
+  BrandTag,
   Ribbon,
   SKY,
   Stage,
@@ -188,7 +189,7 @@ function cover(
 
 function topTen(post: MapPost, icon: string | null, faces: (string | null)[]): ReactElement {
   return (
-    <Stage glow={post.modeColor}>
+    <Stage glow={post.modeColor} brand={false}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         {icon ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -196,15 +197,16 @@ function topTen(post: MapPost, icon: string | null, faces: (string | null)[]): R
         ) : (
           <div style={{ display: 'flex' }} />
         )}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Title size={post.mapName.length > 14 ? 64 : 76}>{post.mapName}</Title>
-          <div style={{ display: 'flex', marginTop: 8 }}>
-            <Note size={30}>{`Top 10 picks in Ranked · ${post.sampleSize.toLocaleString('en-GB')} games`}</Note>
+        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, flexShrink: 1 }}>
+          <Title size={post.mapName.length > 12 ? 54 : 66}>{post.mapName}</Title>
+          <div style={{ display: 'flex', marginTop: 6 }}>
+            <Note size={26}>{`Top 10 in Ranked · ${post.sampleSize.toLocaleString('en-GB')} games`}</Note>
           </div>
         </div>
+        <BrandTag inline />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 22 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 16 }}>
         {post.picks.map((p, i) => (
           <Panel key={p.brawlerId} column={false} gap={20} pad="4px 22px 4px 14px" accent={i === 0 ? GOLD : undefined}>
             <RankCoin n={i + 1} size={56} />

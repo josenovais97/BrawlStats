@@ -17,6 +17,7 @@ import {
   Portrait,
   RED,
   RankCoin,
+  BrandTag,
   Ribbon,
   SKY,
   Stage,
@@ -245,9 +246,10 @@ function trioMore(
   faces: Map<number, string | null>,
 ): ReactElement {
   return (
-    <Stage glow={post.modeColor}>
-      <div style={{ display: 'flex', marginTop: 10 }}>
+    <Stage glow={post.modeColor} brand={false}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
         <Title size={76}>{`If they're taken`}</Title>
+        <BrandTag inline />
       </div>
       <div style={{ display: 'flex', marginTop: 8 }}>
         <Note size={30}>{`The next best teams on ${post.mapName}`}</Note>

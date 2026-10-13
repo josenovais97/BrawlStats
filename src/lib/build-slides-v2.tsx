@@ -228,7 +228,10 @@ function pairBlock(
 function abilities(day: BrawlerOfDay, icons: Map<number, string | null>): ReactElement {
   return (
     <Stage glow="#2c8bff">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 46, marginTop: 10 }}>
+      <div style={{ display: 'flex', marginTop: 10 }}>
+        <Ribbon>WHAT TO BUY</Ribbon>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 40, marginTop: 34 }}>
         {day.choices.starPowers.length >= 2 ? (
           pairBlock('Star power', day.choices.starPowers, day.starPowerNames, icons)
         ) : (
