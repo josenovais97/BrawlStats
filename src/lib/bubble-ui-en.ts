@@ -50,6 +50,8 @@ export const UI_EN = {
   'meta.showMore': 'Show {n} more',
 
   'comps.heading': 'Best Ranked trios',
+  'comps.rankOnly': '{rank} lobbies only.',
+  'comps.rankThin': 'Not enough {rank} trios here yet — showing all ranks.',
   'comps.empty': 'Not enough sampled Ranked teams yet. This fills in as more battles are sampled.',
   'comps.emptyMode': 'Not enough sampled Ranked teams in {mode} yet.',
   'comps.fellBack': 'Not enough Ranked games on {map} yet. Showing the best trios across {mode}.',

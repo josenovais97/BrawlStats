@@ -36,6 +36,8 @@ const id: UiStrings = {
   'meta.vsUsual': '{n} vs biasanya',
   'meta.showMore': 'Tampilkan {n} lagi',
   'comps.heading': 'Trio Berperingkat terbaik',
+  'comps.rankOnly': 'Hanya pertandingan {rank}.',
+  'comps.rankThin': 'Belum cukup trio {rank} di sini — menampilkan semua rank.',
   'comps.empty': 'Belum cukup tim berperingkat yang dianalisis. Ini akan terisi dengan lebih banyak pertarungan.',
   'comps.emptyMode': 'Belum cukup tim berperingkat yang dianalisis di {mode}.',
   'comps.fellBack': 'Belum cukup game berperingkat di {map}. Menampilkan trio terbaik di {mode}.',

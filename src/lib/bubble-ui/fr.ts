@@ -36,6 +36,8 @@ const fr: UiStrings = {
   'meta.vsUsual': '{n} vs d’habitude',
   'meta.showMore': 'Afficher {n} de plus',
   'comps.heading': 'Meilleurs trios en Classé',
+  'comps.rankOnly': 'Parties {rank} uniquement.',
+  'comps.rankThin': 'Pas encore assez de trios {rank} ici — tous rangs affichés.',
   'comps.empty': 'Pas encore assez d’équipes classées analysées. Cela se remplira avec plus de combats.',
   'comps.emptyMode': 'Pas encore assez d’équipes classées en {mode}.',
   'comps.fellBack': 'Pas encore assez de parties classées sur {map}. Voici les meilleurs trios en {mode}.',

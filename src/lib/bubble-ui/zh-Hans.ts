@@ -36,6 +36,8 @@ const zhHans: UiStrings = {
   'meta.vsUsual': '比平时 {n}',
   'meta.showMore': '再显示 {n} 个',
   'comps.heading': '排位赛最佳三人组',
+  'comps.rankOnly': '仅 {rank} 对局。',
+  'comps.rankThin': '这里的 {rank} 三人组还不够 — 显示所有段位。',
   'comps.empty': '已分析的排位赛阵容还不够。分析更多对战后会补充。',
   'comps.emptyMode': '{mode}中已分析的排位赛阵容还不够。',
   'comps.fellBack': '{map}的排位赛场次还不够。显示{mode}的最佳三人组。',

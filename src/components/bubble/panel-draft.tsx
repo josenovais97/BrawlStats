@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { storedBracket } from '@/components/bubble/bracket-data';
 import { useEffect, useMemo, useState } from 'react';
 
 import { recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
@@ -220,12 +221,8 @@ export function PanelDraft({
     if (picked.allies.length) params.set('allies', picked.allies.join(','));
     if (picked.bans.length) params.set('bans', picked.bans.join(','));
     // The rank chosen on the Meta tab, so the draft answers for that rank.
-    try {
-      const rank = window.localStorage.getItem('brawlzone.bubble.bracket');
-      if (rank && rank !== 'all') params.set('rank', rank);
-    } catch {
-      // No storage: every rank.
-    }
+    const rank = storedBracket();
+    if (rank) params.set('rank', rank);
 
     const controller = new AbortController();
     const timer = setTimeout(() => {

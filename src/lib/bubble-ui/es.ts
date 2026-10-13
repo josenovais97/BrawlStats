@@ -41,6 +41,8 @@ const es: UiStrings = {
   'meta.vsUsual': '{n} vs lo normal',
   'meta.showMore': 'Mostrar {n} más',
   'comps.heading': 'Mejores tríos en Competitivo',
+  'comps.rankOnly': 'Solo partidas de {rank}.',
+  'comps.rankThin': 'Aún no hay suficientes tríos de {rank} aquí — se muestran todos los rangos.',
   'comps.empty': 'Aún no hay suficientes equipos competitivos analizados. Se irá llenando con más combates.',
   'comps.emptyMode': 'Aún no hay suficientes equipos competitivos analizados en {mode}.',
   'comps.fellBack': 'Aún no hay suficientes partidas competitivas en {map}. Te mostramos los mejores tríos de {mode}.',

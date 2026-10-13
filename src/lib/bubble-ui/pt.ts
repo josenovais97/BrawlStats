@@ -37,6 +37,8 @@ const pt: UiStrings = {
   'meta.vsUsual': '{n} vs o normal',
   'meta.showMore': 'Mostrar mais {n}',
   'comps.heading': 'Melhores trios no Ranqueado',
+  'comps.rankOnly': 'Só partidas {rank}.',
+  'comps.rankThin': 'Ainda não há trios {rank} suficientes aqui — mostrando todos os ranks.',
   'comps.empty': 'Ainda não há equipes ranqueadas suficientes analisadas. Isso se completa com mais batalhas.',
   'comps.emptyMode': 'Ainda não há equipes ranqueadas suficientes analisadas em {mode}.',
   'comps.fellBack': 'Ainda não há partidas ranqueadas suficientes em {map}. Mostrando os melhores trios de {mode}.',

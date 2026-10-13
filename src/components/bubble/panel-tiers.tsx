@@ -3,6 +3,13 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+import {
+  bracketLabel as leagueLabel,
+  loadBracket,
+  STORED_BRACKET,
+  type BracketData,
+} from '@/components/bubble/bracket-data';
+
 import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
 import { ModeMapChips, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
@@ -105,15 +112,7 @@ const SHOWN_PER_TIER = 8;
  */
 const SHOWN_MAP_PICKS = 10;
 
-/** The chosen rank bracket's slug, or "all". Absent until someone chooses. */
-const STORED_BRACKET = 'brawlzone.bubble.bracket';
-
-/** One bracket's lists, as `/api/bubble/tiers/<bracket>` returns them. */
-type BracketLists = {
-  lists: Record<string, { days: number; entries: PanelEntry[] }>;
-  /** Map picks at this rank, keyed `mode|map`. */
-  maps: Record<string, PanelMapPick[]>;
-};
+type BracketLists = BracketData;
 
 
 export function PanelTiers({
@@ -168,14 +167,8 @@ export function PanelTiers({
 
   useEffect(() => {
     if (!bracket || bracketLists[bracket]) return;
-    fetch(`/api/bubble/tiers/${bracket}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data: Partial<BracketLists>) =>
-        setBracketLists((prev) => ({
-          ...prev,
-          [bracket]: { lists: data.lists ?? {}, maps: data.maps ?? {} },
-        })),
-      )
+    loadBracket(bracket)
+      .then((data) => setBracketLists((prev) => ({ ...prev, [bracket]: data })))
       .catch(() => setBracketLists((prev) => ({ ...prev, [bracket]: 'error' })));
   }, [bracket, bracketLists]);
 
@@ -187,14 +180,7 @@ export function PanelTiers({
   };
 
   /** The game's league names, so the chips read like the game's own badges. */
-  const bracketLabel = (b: RankBracket) =>
-    b.id === 1
-      ? `${name('Diamond')} ↓`
-      : b.id === 2
-        ? name('Mythic')
-        : b.id === 3
-          ? name('Legendary')
-          : `${name('Masters')}+`;
+  const bracketLabel = (b: RankBracket) => leagueLabel(b, name);
   const fieldable = (id: number) =>
     account.owned === null || canField(account.owned, id, account.filter);
   /* Only ever true with an account configured, so the unconfigured panel is

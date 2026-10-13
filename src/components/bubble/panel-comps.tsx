@@ -3,6 +3,9 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+import { bracketLabel, loadBracket, storedBracket } from '@/components/bubble/bracket-data';
+import { bracketBySlug } from '@/lib/rank-brackets';
+
 import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
 import { ModeMapChips, recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
@@ -58,6 +61,19 @@ export function PanelComps({
   const [map, setMap] = useState<string | null>(null);
   const [onlyMine, setOnlyMine] = useState(false);
 
+  /*
+   * The rank chosen on the Meta tab: its own trios where it has enough, every
+   * rank's where it does not, and a line saying which (2026-10-13).
+   */
+  const [rank, setRank] = useState<{ slug: string; comps: Record<string, PanelModeComps> } | null>(null);
+  useEffect(() => {
+    const slug = storedBracket();
+    if (!slug) return;
+    loadBracket(slug)
+      .then((data) => setRank({ slug, comps: data.comps }))
+      .catch(() => undefined);
+  }, []);
+
   const account = useBubbleAccount();
   const { t, tx, name } = usePanelI18n();
   const modeName = useModeLabel();
@@ -87,10 +103,16 @@ export function PanelComps({
   }
 
   const current = pickable.find((m) => m.key === active) ?? pickable[0];
-  const data = comps[current.key!];
-  const mapComps = map ? data.maps[map] : undefined;
-  const list = mapComps ?? data.mode;
+  const all = comps[current.key!];
+  const atRank = rank?.comps[current.key!];
+  // The rank's list when it has one for this map (or this mode), else all ranks.
+  const rankList = map ? atRank?.maps[map] : atRank?.mode.length ? atRank.mode : undefined;
+  const data = all;
+  const mapComps = map ? (rankList ?? data.maps[map]) : undefined;
+  const list = mapComps ?? rankList ?? data.mode;
   const fellBack = map !== null && !mapComps;
+  const rankBracket = rank ? bracketBySlug(rank.slug) : null;
+  const rankLabel = rankBracket ? bracketLabel(rankBracket, name) : null;
   const shown = onlyMine ? list.filter((c) => c.brawlers.every((b) => owns(b.brawlerId))) : list;
 
   return (
@@ -118,6 +140,12 @@ export function PanelComps({
           remember(STORED_MAP, name);
         }}
       />
+
+      {rankLabel ? (
+        <p className="mx-1 mb-1.5 text-[10px] leading-snug text-muted">
+          {rankList ? t('comps.rankOnly', { rank: rankLabel }) : t('comps.rankThin', { rank: rankLabel })}
+        </p>
+      ) : null}
 
       {fellBack ? (
         <p className="bz-panel mx-1 mb-2 px-2 py-1.5 text-[11px] leading-snug text-muted">

@@ -36,6 +36,8 @@ const de: UiStrings = {
   'meta.vsUsual': '{n} ggü. sonst',
   'meta.showMore': '{n} weitere zeigen',
   'comps.heading': 'Beste Ranglisten-Trios',
+  'comps.rankOnly': 'Nur {rank}-Lobbys.',
+  'comps.rankThin': 'Noch zu wenige {rank}-Trios hier — alle Ränge werden gezeigt.',
   'comps.empty': 'Noch nicht genug erfasste Ranglisten-Teams. Das füllt sich mit weiteren Kämpfen.',
   'comps.emptyMode': 'Noch nicht genug erfasste Ranglisten-Teams in {mode}.',
   'comps.fellBack': 'Noch nicht genug Ranglistenspiele auf {map}. Hier die besten Trios in {mode}.',

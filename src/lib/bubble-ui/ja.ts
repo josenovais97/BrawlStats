@@ -36,6 +36,8 @@ const ja: UiStrings = {
   'meta.vsUsual': '普段より{n}',
   'meta.showMore': 'さらに{n}件表示',
   'comps.heading': 'ガチバトル最強トリオ',
+  'comps.rankOnly': '{rank}の対戦のみ。',
+  'comps.rankThin': 'ここではまだ{rank}の3体編成が足りません — 全ランクを表示しています。',
   'comps.empty': '分析済みのガチバトル編成がまだ足りません。バトルが増えると表示されます。',
   'comps.emptyMode': '{mode}の分析済みガチバトル編成がまだ足りません。',
   'comps.fellBack': '{map}のガチバトルがまだ足りません。{mode}全体のベストトリオを表示しています。',

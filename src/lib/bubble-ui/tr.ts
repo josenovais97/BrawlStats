@@ -36,6 +36,8 @@ const tr: UiStrings = {
   'meta.vsUsual': 'normale göre {n}',
   'meta.showMore': '{n} tane daha göster',
   'comps.heading': 'En iyi aşamalı üçlüler',
+  'comps.rankOnly': 'Yalnızca {rank} maçları.',
+  'comps.rankThin': 'Burada henüz yeterli {rank} üçlüsü yok — tüm rütbeler gösteriliyor.',
   'comps.empty': 'Henüz yeterli aşamalı takım incelenmedi. Daha çok maçla dolacak.',
   'comps.emptyMode': '{mode} modunda henüz yeterli aşamalı takım incelenmedi.',
   'comps.fellBack': '{map} haritasında henüz yeterli aşamalı maç yok. {mode} modundaki en iyi üçlüler gösteriliyor.',

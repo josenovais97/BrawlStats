@@ -36,6 +36,8 @@ const ko: UiStrings = {
   'meta.vsUsual': '평소 대비 {n}',
   'meta.showMore': '{n}개 더 보기',
   'comps.heading': '경쟁전 최고의 3인 조합',
+  'comps.rankOnly': '{rank} 매치만.',
+  'comps.rankThin': '여기서는 아직 {rank} 3인 조합이 부족해요 — 모든 랭크를 보여 줘요.',
   'comps.empty': '분석된 경쟁전 팀이 아직 부족해요. 전투가 더 분석되면 채워져요.',
   'comps.emptyMode': '{mode}의 분석된 경쟁전 팀이 아직 부족해요.',
   'comps.fellBack': '{map}의 경쟁전 게임이 아직 부족해요. {mode} 전체의 최고 조합을 보여드려요.',

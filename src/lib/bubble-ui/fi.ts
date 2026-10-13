@@ -36,6 +36,8 @@ const fi: UiStrings = {
   'meta.vsUsual': '{n} vs tavallisesti',
   'meta.showMore': 'Näytä {n} lisää',
   'comps.heading': 'Parhaat rankatut kolmikot',
+  'comps.rankOnly': 'Vain {rank}-ottelut.',
+  'comps.rankThin': 'Täällä ei vielä ole tarpeeksi {rank}-kolmikoita — näytetään kaikki tasot.',
   'comps.empty': 'Rankattuja joukkueita ei ole vielä analysoitu tarpeeksi. Tämä täyttyy lisäotteluilla.',
   'comps.emptyMode': 'Tilassa {mode} ei ole vielä analysoitu tarpeeksi rankattuja joukkueita.',
   'comps.fellBack': 'Kartalla {map} ei ole vielä tarpeeksi rankattuja pelejä. Näytetään tilan {mode} parhaat kolmikot.',

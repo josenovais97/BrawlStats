@@ -36,6 +36,8 @@ const ms: UiStrings = {
   'meta.vsUsual': '{n} berbanding biasa',
   'meta.showMore': 'Tunjuk {n} lagi',
   'comps.heading': 'Trio Berperingkat terbaik',
+  'comps.rankOnly': 'Perlawanan {rank} sahaja.',
+  'comps.rankThin': 'Belum cukup trio {rank} di sini — menunjukkan semua pangkat.',
   'comps.empty': 'Belum cukup pasukan berperingkat dianalisis. Ia akan terisi dengan lebih banyak pertempuran.',
   'comps.emptyMode': 'Belum cukup pasukan berperingkat dianalisis dalam {mode}.',
   'comps.fellBack': 'Belum cukup permainan berperingkat di {map}. Menunjukkan trio terbaik dalam {mode}.',

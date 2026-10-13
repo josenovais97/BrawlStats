@@ -36,6 +36,8 @@ const pl: UiStrings = {
   'meta.vsUsual': '{n} wzgl. normy',
   'meta.showMore': 'Pokaż jeszcze {n}',
   'comps.heading': 'Najlepsze trójki rankingowe',
+  'comps.rankOnly': 'Tylko mecze {rank}.',
+  'comps.rankThin': 'Za mało trójek {rank} tutaj — pokazuję wszystkie rangi.',
   'comps.empty': 'Za mało przeanalizowanych drużyn rankingowych. To się uzupełni wraz z kolejnymi walkami.',
   'comps.emptyMode': 'Za mało przeanalizowanych drużyn rankingowych w trybie {mode}.',
   'comps.fellBack': 'Za mało gier rankingowych na mapie {map}. Pokazujemy najlepsze trójki w trybie {mode}.',

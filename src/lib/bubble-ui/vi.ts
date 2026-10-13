@@ -36,6 +36,8 @@ const vi: UiStrings = {
   'meta.vsUsual': '{n} so với thường',
   'meta.showMore': 'Xem thêm {n}',
   'comps.heading': 'Bộ ba Xếp hạng tốt nhất',
+  'comps.rankOnly': 'Chỉ trận {rank}.',
+  'comps.rankThin': 'Chưa đủ bộ ba {rank} ở đây — đang hiện mọi hạng.',
   'comps.empty': 'Chưa có đủ đội xếp hạng được phân tích. Dữ liệu sẽ có khi phân tích thêm trận.',
   'comps.emptyMode': 'Chưa có đủ đội xếp hạng được phân tích ở {mode}.',
   'comps.fellBack': 'Chưa có đủ trận xếp hạng ở {map}. Đang hiện bộ ba tốt nhất của {mode}.',

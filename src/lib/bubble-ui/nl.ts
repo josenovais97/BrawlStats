@@ -36,6 +36,8 @@ const nl: UiStrings = {
   'meta.vsUsual': '{n} t.o.v. normaal',
   'meta.showMore': 'Toon nog {n}',
   'comps.heading': 'Beste laddertrio’s',
+  'comps.rankOnly': 'Alleen {rank}-potjes.',
+  'comps.rankThin': 'Nog te weinig {rank}-trio’s hier — alle rangen worden getoond.',
   'comps.empty': 'Nog niet genoeg geanalyseerde ladderteams. Dit vult zich met meer potjes.',
   'comps.emptyMode': 'Nog niet genoeg geanalyseerde ladderteams in {mode}.',
   'comps.fellBack': 'Nog niet genoeg laddergames op {map}. Dit zijn de beste trio’s in {mode}.',

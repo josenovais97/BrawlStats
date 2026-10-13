@@ -6,7 +6,7 @@ import { unstable_cache } from 'next/cache';
 
 import { cache } from 'react';
 
-import type { BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
+import { Prisma, type BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
 import { stripGameMarkup } from '@/lib/format';
 import { getPrisma } from '@/lib/prisma';
 import { brawlerPath, slugify } from '@/lib/slugs';
@@ -2956,6 +2956,59 @@ export interface ModeComps {
  * together — is a cleaner experiment than Ranked, where a good drafter picks
  * good comps and the two effects cannot be separated.
  */
+/**
+ * Every three-brawler team seen in team battles since `since`, one row per
+ * team per battle, as a `trio_obs` CTE: mode, map ('' when unknown), the
+ * sorted trio, whether it won, and which pool player's log it came from.
+ *
+ * Since 2026-10-13 the opposing team counts too, in Solo Ranked: those teams
+ * are three solo players matched at random, so the other side's trio is as
+ * good an observation as the sampled player's own and doubles the sample.
+ * Everywhere else only the sampled side counts, because the other side may be
+ * a premade that plays together all day and would flood its own trio.
+ *
+ * A battle seen from several pool players is counted once per trio.
+ * `bracket` keeps Ranked lobbies of that rank only (lib/rank-brackets).
+ */
+function trioObservations(since: Date, types: readonly string[], bracket?: number): Prisma.Sql {
+  const rank = bracket
+    ? Prisma.sql`AND (CASE WHEN s.lobby_rank <= 12 THEN 1 WHEN s.lobby_rank <= 15 THEN 2
+                          WHEN s.lobby_rank <= 18 THEN 3 ELSE 4 END) = ${bracket}`
+    : Prisma.empty;
+  const join = bracket
+    ? Prisma.sql`JOIN battle_samples s ON s.battle_key = t.battle_key AND s.lobby_rank IS NOT NULL`
+    : Prisma.empty;
+  return Prisma.sql`
+    trio_obs AS (
+      SELECT DISTINCT ON (o.battle_time, o.map_name, o.trio) o.*
+      FROM (
+        SELECT t.battle_time, t.mode, COALESCE(t.map_name, '') AS map_name, t.player_tag AS observer,
+               (SELECT array_agg(x ORDER BY x) FROM unnest(t.ally_brawler_ids || t.brawler_id) x) AS trio,
+               t.result = 'victory' AS won
+        FROM battle_team_samples t ${join}
+        WHERE t.battle_time >= ${since}
+          AND t.battle_type = ANY(${[...types]}::text[])
+          AND array_length(t.ally_brawler_ids, 1) = 2
+          AND t.result IN ('victory', 'defeat') ${rank}
+        UNION ALL
+        SELECT t.battle_time, t.mode, COALESCE(t.map_name, ''), t.player_tag,
+               (SELECT array_agg(x ORDER BY x) FROM unnest(t.enemy_brawler_ids) x),
+               t.result = 'defeat'
+        FROM battle_team_samples t ${join}
+        WHERE t.battle_time >= ${since}
+          AND t.battle_type = 'soloRanked'
+          AND t.battle_type = ANY(${[...types]}::text[])
+          AND array_length(t.enemy_brawler_ids, 1) = 3
+          AND t.result IN ('victory', 'defeat') ${rank}
+      ) o
+      ORDER BY o.battle_time, o.map_name, o.trio
+    )
+  `;
+}
+
+/** Every battle type that can carry a three-brawler team. */
+const TEAM_BATTLE_TYPES = ['ranked', 'soloRanked', 'teamRanked', 'challenge', 'tournament'] as const;
+
 async function compute_getTeamComps(limit = 12): Promise<ModeComps[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
@@ -2963,15 +3016,14 @@ async function compute_getTeamComps(limit = 12): Promise<ModeComps[]> {
   try {
     const since = windowStartUtc(COMP_WINDOW_DAYS);
 
+    const obs = trioObservations(since, TEAM_BATTLE_TYPES);
     const [totals, trios] = await Promise.all([
       prisma.$queryRaw<{ mode: string; wins: bigint; decided: bigint }[]>`
+        WITH ${obs}
         SELECT mode,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) FILTER (WHERE won) AS wins,
           COUNT(*) AS decided
-        FROM battle_team_samples
-        WHERE battle_time >= ${since}
-          AND array_length(ally_brawler_ids, 1) = 2
-          AND result IN ('victory', 'defeat')
+        FROM trio_obs
         GROUP BY mode
       `,
       /*
@@ -2983,23 +3035,15 @@ async function compute_getTeamComps(limit = 12): Promise<ModeComps[]> {
       prisma.$queryRaw<
         { mode: string; trio: number[]; wins: bigint; decided: bigint; players: bigint }[]
       >`
-        WITH teams AS (
-          SELECT mode, player_tag,
-            (SELECT array_agg(x ORDER BY x) FROM unnest(ally_brawler_ids || brawler_id) AS x) AS trio,
-            result
-          FROM battle_team_samples
-          WHERE battle_time >= ${since}
-            AND array_length(ally_brawler_ids, 1) = 2
-            AND result IN ('victory', 'defeat')
-        )
+        WITH ${obs}
         SELECT mode, trio,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) FILTER (WHERE won) AS wins,
           COUNT(*) AS decided,
-          COUNT(DISTINCT player_tag) AS players
-        FROM teams
+          COUNT(DISTINCT observer) AS players
+        FROM trio_obs
         GROUP BY mode, trio
         HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
-           AND COUNT(DISTINCT player_tag) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP}
+           AND COUNT(DISTINCT observer) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP}
       `,
     ]);
 
@@ -4871,7 +4915,7 @@ export interface RankedComps {
  * the site's comps are, so a 15-battle trio has to be genuinely better to
  * outrank a 100-battle one.
  */
-async function compute_getRankedComps(limit = 8): Promise<RankedComps> {
+async function compute_getRankedComps(limit = 8, bracket?: number): Promise<RankedComps> {
   const prisma = getPrisma();
   if (!prisma) return { maps: [], modes: [] };
 
@@ -4886,19 +4930,23 @@ async function compute_getRankedComps(limit = 8): Promise<RankedComps> {
      * rather than unknown, so a battle with no recorded map can never pose as
      * a mode total.
      */
+    /*
+     * Solo and Team Ranked (COMPETITIVE_BATTLE_TYPES). Until 2026-10-13 this
+     * read 'ranked' and 'soloRanked', but 'ranked' is the trophy ladder's
+     * battle type: half the Ranked trios were ladder games, and Team Ranked
+     * was missing. Both teams count in Solo Ranked; see `trioObservations`.
+     */
+    const obs = trioObservations(since, COMPETITIVE_BATTLE_TYPES, bracket);
     const [totals, trios] = await Promise.all([
       prisma.$queryRaw<
         { mode: string; map_name: string | null; per_mode: number; wins: bigint; decided: bigint }[]
       >`
-        SELECT mode, map_name, GROUPING(map_name) AS per_mode,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+        WITH ${obs}
+        SELECT mode, NULLIF(map_name, '') AS map_name, GROUPING(NULLIF(map_name, '')) AS per_mode,
+          COUNT(*) FILTER (WHERE won) AS wins,
           COUNT(*) AS decided
-        FROM battle_team_samples
-        WHERE battle_time >= ${since}
-          AND battle_type IN ('ranked', 'soloRanked')
-          AND array_length(ally_brawler_ids, 1) = 2
-          AND result IN ('victory', 'defeat')
-        GROUP BY GROUPING SETS ((mode, map_name), (mode))
+        FROM trio_obs
+        GROUP BY GROUPING SETS ((mode, NULLIF(map_name, '')), (mode))
       `,
       prisma.$queryRaw<
         {
@@ -4911,28 +4959,20 @@ async function compute_getRankedComps(limit = 8): Promise<RankedComps> {
           players: bigint;
         }[]
       >`
-        WITH teams AS (
-          SELECT mode, map_name, player_tag,
-            (SELECT array_agg(x ORDER BY x) FROM unnest(ally_brawler_ids || brawler_id) AS x) AS trio,
-            result
-          FROM battle_team_samples
-          WHERE battle_time >= ${since}
-            AND battle_type IN ('ranked', 'soloRanked')
-            AND array_length(ally_brawler_ids, 1) = 2
-            AND result IN ('victory', 'defeat')
-        )
+        WITH ${obs},
+        teams AS (SELECT mode, NULLIF(map_name, '') AS map_name, observer, trio, won FROM trio_obs)
         SELECT mode, map_name, GROUPING(map_name) AS per_mode, trio,
-          COUNT(*) FILTER (WHERE result = 'victory') AS wins,
+          COUNT(*) FILTER (WHERE won) AS wins,
           COUNT(*) AS decided,
-          COUNT(DISTINCT player_tag) AS players
+          COUNT(DISTINCT observer) AS players
         FROM teams
         GROUP BY GROUPING SETS ((mode, map_name, trio), (mode, trio))
         HAVING (GROUPING(map_name) = 0 AND map_name IS NOT NULL
                 AND COUNT(*) >= ${MIN_RANKED_MAP_COMP_BATTLES}
-                AND COUNT(DISTINCT player_tag) >= ${MIN_RANKED_MAP_COMP_PLAYERS})
+                AND COUNT(DISTINCT observer) >= ${MIN_RANKED_MAP_COMP_PLAYERS})
             OR (GROUPING(map_name) = 1
                 AND COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
-                AND COUNT(DISTINCT player_tag) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP})
+                AND COUNT(DISTINCT observer) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP})
       `,
     ]);
 

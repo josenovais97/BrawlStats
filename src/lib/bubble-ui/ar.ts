@@ -36,6 +36,8 @@ const ar: UiStrings = {
   'meta.vsUsual': '{n} مقارنة بالمعتاد',
   'meta.showMore': 'عرض {n} آخرين',
   'comps.heading': 'أفضل الثلاثيات في المصنف',
+  'comps.rankOnly': 'مباريات {rank} فقط.',
+  'comps.rankThin': 'لا توجد ثلاثيات {rank} كافية هنا بعد — نعرض كل الرتب.',
   'comps.empty': 'لا توجد فرق مصنفة محللة كافية بعد. ستكتمل مع تحليل معارك أكثر.',
   'comps.emptyMode': 'لا توجد فرق مصنفة محللة كافية في {mode} بعد.',
   'comps.fellBack': 'لا توجد مباريات مصنفة كافية على {map} بعد. نعرض أفضل الثلاثيات في {mode}.',

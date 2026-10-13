@@ -36,6 +36,8 @@ const it: UiStrings = {
   'meta.vsUsual': '{n} rispetto al solito',
   'meta.showMore': 'Mostra altri {n}',
   'comps.heading': 'Migliori trio in Classificata',
+  'comps.rankOnly': 'Solo partite {rank}.',
+  'comps.rankThin': 'Non ci sono ancora abbastanza trii {rank} qui — mostrati tutti i ranghi.',
   'comps.empty': 'Non ci sono ancora abbastanza squadre classificate analizzate. Si riempirà con altre battaglie.',
   'comps.emptyMode': 'Non ci sono ancora abbastanza squadre classificate analizzate in {mode}.',
   'comps.fellBack': 'Non ci sono ancora abbastanza partite classificate su {map}. Ecco i migliori trio in {mode}.',

@@ -1,12 +1,21 @@
 import type { NextRequest } from 'next/server';
 
+import type { PanelComp, PanelModeComps } from '@/components/bubble/panel-comps';
 import type { PanelEntry, PanelMapPick } from '@/components/bubble/panel-tiers';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { BrawlApiError } from '@/lib/errors';
 import { bracketBySlug } from '@/lib/rank-brackets';
 import { errorResponse, okResponse } from '@/lib/route-helpers';
-import { getBracketMapPicks, getBracketRoster, getFilterableModes, type ScoredBrawler } from '@/lib/stats';
+import { titleCase } from '@/lib/format';
+import {
+  getBracketMapPicks,
+  getBracketRoster,
+  getFilterableModes,
+  getRankedComps,
+  type ScoredBrawler,
+  type TeamComp,
+} from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 
 /**
@@ -73,7 +82,25 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       }));
     }
 
-    return okResponse({ bracket: bracket.slug, lists, maps }, 600);
+    // Trios at this rank, shaped as the panel page ships every rank's.
+    const toComp = (c: TeamComp): PanelComp => ({
+      brawlers: c.brawlerIds.map((id) => ({
+        brawlerId: id,
+        brawlerName: titleCase(meta.get(id)?.name ?? `#${id}`),
+        imageUrl: meta.get(id)?.imageUrl ?? brawlerIconUrl(id),
+      })),
+      winRate: c.winRate,
+      edge: c.edge,
+      battles: c.battles,
+    });
+    const ranked = await getRankedComps(8, bracket.id).catch(() => ({ maps: [], modes: [] }));
+    const comps: Record<string, PanelModeComps> = {};
+    for (const m of ranked.modes) comps[m.mode] = { mode: m.comps.map(toComp), maps: {} };
+    for (const m of ranked.maps) {
+      (comps[m.mode] ??= { mode: [], maps: {} }).maps[m.mapName] = m.comps.map(toComp);
+    }
+
+    return okResponse({ bracket: bracket.slug, lists, maps, comps }, 600);
   } catch (error) {
     return errorResponse(error);
   }
