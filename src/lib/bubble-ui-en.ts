@@ -45,6 +45,7 @@ export const UI_EN = {
   'meta.noneMatch': 'Nothing on this map matches your filter.',
   'meta.pickedHere': '{n}% picked here',
   'meta.battlesHere': '{n} battles here',
+  'meta.battlesAtRank': '{n} at {rank} · {all} all ranks',
   'meta.vsUsual': '{n} vs usual',
   'meta.showMore': 'Show {n} more',
 

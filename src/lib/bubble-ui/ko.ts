@@ -32,6 +32,7 @@ const ko: UiStrings = {
   'meta.noneMatch': '이 맵에는 필터에 맞는 브롤러가 없어요.',
   'meta.pickedHere': '여기서 픽률 {n}%',
   'meta.battlesHere': '여기서 {n}전',
+  'meta.battlesAtRank': '{rank} {n}전 · 전체 {all}전',
   'meta.vsUsual': '평소 대비 {n}',
   'meta.showMore': '{n}개 더 보기',
   'comps.heading': '경쟁전 최고의 3인 조합',

@@ -190,6 +190,11 @@ export interface RankedMapPick extends ModePick {
   overallScore: number;
   /** Decided ranked battles behind `overallScore`, across every map. */
   overallSampleSize: number;
+  /**
+   * On a per-rank list only: decided battles on this map at every rank, the
+   * evidence the rank's own (`decidedSampleSize`) is weighed against.
+   */
+  allRanksSampleSize?: number;
 }
 
 /**

@@ -32,6 +32,7 @@ const de: UiStrings = {
   'meta.noneMatch': 'Nichts auf dieser Map passt zu deinem Filter.',
   'meta.pickedHere': 'hier zu {n} % gewählt',
   'meta.battlesHere': '{n} Kämpfe hier',
+  'meta.battlesAtRank': '{n} in {rank} · {all} alle Ränge',
   'meta.vsUsual': '{n} ggü. sonst',
   'meta.showMore': '{n} weitere zeigen',
   'comps.heading': 'Beste Ranglisten-Trios',

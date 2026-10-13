@@ -32,6 +32,7 @@ const ar: UiStrings = {
   'meta.noneMatch': 'لا شيء على هذه الخريطة يطابق المرشّح.',
   'meta.pickedHere': 'يُختار بنسبة {n}% هنا',
   'meta.battlesHere': '{n} معركة هنا',
+  'meta.battlesAtRank': '{n} في {rank} · {all} كل الرتب',
   'meta.vsUsual': '{n} مقارنة بالمعتاد',
   'meta.showMore': 'عرض {n} آخرين',
   'comps.heading': 'أفضل الثلاثيات في المصنف',

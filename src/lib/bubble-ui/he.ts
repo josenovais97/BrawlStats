@@ -32,6 +32,7 @@ const he: UiStrings = {
   'meta.noneMatch': 'שום דבר במפה הזו לא מתאים לסינון שלכם.',
   'meta.pickedHere': 'נבחר ב-{n}% כאן',
   'meta.battlesHere': '{n} קרבות כאן',
+  'meta.battlesAtRank': '{n} ב-{rank} · {all} כל הדרגות',
   'meta.vsUsual': '{n} לעומת הרגיל',
   'meta.showMore': 'הצג עוד {n}',
   'comps.heading': 'השלישיות המדורגות הטובות ביותר',

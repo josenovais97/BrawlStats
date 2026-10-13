@@ -32,6 +32,7 @@ const th: UiStrings = {
   'meta.noneMatch': 'ไม่มีตัวไหนในแผนที่นี้ตรงกับตัวกรองของคุณ',
   'meta.pickedHere': 'ถูกเลือก {n}% ที่นี่',
   'meta.battlesHere': '{n} การต่อสู้ที่นี่',
+  'meta.battlesAtRank': '{rank} {n} · ทุกแรงก์ {all}',
   'meta.vsUsual': '{n} เทียบปกติ',
   'meta.showMore': 'แสดงเพิ่มอีก {n}',
   'comps.heading': 'ทีมสามคนจัดอันดับที่ดีที่สุด',

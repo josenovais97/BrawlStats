@@ -58,6 +58,8 @@ export interface PanelMapPick {
   battles: number;
   /** Share of this map's sampled battles. How likely it is to be taken. */
   pickRate: number;
+  /** Per-rank lists only: battles on this map at every rank. */
+  allBattles?: number;
 }
 
 export interface PanelMap {
@@ -367,6 +369,7 @@ export function PanelTiers({
         <MapPicks
           key={`${shownMap.mapName}|${bracket ?? 'all'}`}
           map={shownMap}
+          rankLabel={shownMap !== currentMap && activeBracket ? bracketLabel(activeBracket) : null}
           onPick={show}
           openId={openId}
           fieldable={fieldable}
@@ -524,6 +527,7 @@ function TierStrip({
  */
 function MapPicks({
   map,
+  rankLabel,
   onPick,
   openId,
   fieldable,
@@ -531,6 +535,8 @@ function MapPicks({
   hiding,
 }: {
   map: PanelMap;
+  /** The rank a per-rank list is for; its battle counts say both numbers. */
+  rankLabel: string | null;
   onPick: (entry: PanelEntry) => void;
   openId: number | null;
   fieldable: (brawlerId: number) => boolean;
@@ -680,7 +686,9 @@ function MapPicks({
                 <span className="block text-[10px] tabular-nums leading-tight text-muted">
                   {tab === 'bans'
                     ? t('meta.pickedHere', { n: (pick.pickRate * 100).toFixed(1) })
-                    : t('meta.battlesHere', { n: pick.battles })}
+                    : rankLabel && pick.allBattles !== undefined
+                      ? t('meta.battlesAtRank', { n: pick.battles, rank: rankLabel, all: pick.allBattles })
+                      : t('meta.battlesHere', { n: pick.battles })}
                 </span>
               </span>
 

@@ -32,6 +32,7 @@ const ru: UiStrings = {
   'meta.noneMatch': 'На этой карте ничего не подходит под твой фильтр.',
   'meta.pickedHere': 'берут в {n}% здесь',
   'meta.battlesHere': '{n} боёв здесь',
+  'meta.battlesAtRank': '{rank}: {n} · все ранги: {all}',
   'meta.vsUsual': '{n} к обычному',
   'meta.showMore': 'Показать ещё {n}',
   'comps.heading': 'Лучшие тройки в ранговых',

@@ -37,6 +37,7 @@ const es: UiStrings = {
   'meta.noneMatch': 'Nada en este mapa coincide con tu filtro.',
   'meta.pickedHere': 'elegido un {n} % aquí',
   'meta.battlesHere': '{n} combates aquí',
+  'meta.battlesAtRank': '{n} en {rank} · {all} todos los rangos',
   'meta.vsUsual': '{n} vs lo normal',
   'meta.showMore': 'Mostrar {n} más',
   'comps.heading': 'Mejores tríos en Competitivo',

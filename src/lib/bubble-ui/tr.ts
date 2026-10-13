@@ -32,6 +32,7 @@ const tr: UiStrings = {
   'meta.noneMatch': 'Bu haritada filtrene uyan bir şey yok.',
   'meta.pickedHere': 'burada %{n} seçiliyor',
   'meta.battlesHere': 'burada {n} maç',
+  'meta.battlesAtRank': '{rank}: {n} · tüm rütbeler: {all}',
   'meta.vsUsual': 'normale göre {n}',
   'meta.showMore': '{n} tane daha göster',
   'comps.heading': 'En iyi aşamalı üçlüler',

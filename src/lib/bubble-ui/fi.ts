@@ -32,6 +32,7 @@ const fi: UiStrings = {
   'meta.noneMatch': 'Mikään tällä kartalla ei vastaa suodatintasi.',
   'meta.pickedHere': 'valittu täällä {n} %',
   'meta.battlesHere': '{n} ottelua täällä',
+  'meta.battlesAtRank': '{rank}: {n} · kaikki tasot: {all}',
   'meta.vsUsual': '{n} vs tavallisesti',
   'meta.showMore': 'Näytä {n} lisää',
   'comps.heading': 'Parhaat rankatut kolmikot',

@@ -32,6 +32,7 @@ const fr: UiStrings = {
   'meta.noneMatch': 'Rien sur cette carte ne correspond à ton filtre.',
   'meta.pickedHere': 'choisi à {n} % ici',
   'meta.battlesHere': '{n} combats ici',
+  'meta.battlesAtRank': '{n} en {rank} · {all} tous rangs',
   'meta.vsUsual': '{n} vs d’habitude',
   'meta.showMore': 'Afficher {n} de plus',
   'comps.heading': 'Meilleurs trios en Classé',

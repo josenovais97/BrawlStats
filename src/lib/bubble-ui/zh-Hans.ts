@@ -32,6 +32,7 @@ const zhHans: UiStrings = {
   'meta.noneMatch': '这张地图上没有符合你筛选条件的英雄。',
   'meta.pickedHere': '此处选用率 {n}%',
   'meta.battlesHere': '此处 {n} 场',
+  'meta.battlesAtRank': '{rank} {n} 场 · 全段位 {all} 场',
   'meta.vsUsual': '比平时 {n}',
   'meta.showMore': '再显示 {n} 个',
   'comps.heading': '排位赛最佳三人组',

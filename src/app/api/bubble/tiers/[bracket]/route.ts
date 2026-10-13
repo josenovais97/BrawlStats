@@ -69,6 +69,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         overallScore: pick.overallScore,
         battles: pick.decidedSampleSize,
         pickRate: pick.pickRate,
+        allBattles: pick.allRanksSampleSize,
       }));
     }
 

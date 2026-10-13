@@ -32,6 +32,7 @@ const ja: UiStrings = {
   'meta.noneMatch': 'このマップにはフィルターに合うキャラがいません。',
   'meta.pickedHere': 'ここでの使用率{n}%',
   'meta.battlesHere': 'ここで{n}バトル',
+  'meta.battlesAtRank': '{rank} {n}戦 · 全ランク {all}戦',
   'meta.vsUsual': '普段より{n}',
   'meta.showMore': 'さらに{n}件表示',
   'comps.heading': 'ガチバトル最強トリオ',

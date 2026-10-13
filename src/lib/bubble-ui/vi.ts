@@ -32,6 +32,7 @@ const vi: UiStrings = {
   'meta.noneMatch': 'Không có gì trên bản đồ này khớp với bộ lọc của bạn.',
   'meta.pickedHere': 'được chọn {n}% ở đây',
   'meta.battlesHere': '{n} trận ở đây',
+  'meta.battlesAtRank': '{n} ở {rank} · {all} mọi hạng',
   'meta.vsUsual': '{n} so với thường',
   'meta.showMore': 'Xem thêm {n}',
   'comps.heading': 'Bộ ba Xếp hạng tốt nhất',

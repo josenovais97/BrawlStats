@@ -33,6 +33,7 @@ const pt: UiStrings = {
   'meta.noneMatch': 'Nada neste mapa combina com o seu filtro.',
   'meta.pickedHere': 'escolhido em {n}% aqui',
   'meta.battlesHere': '{n} batalhas aqui',
+  'meta.battlesAtRank': '{n} em {rank} · {all} todos os ranks',
   'meta.vsUsual': '{n} vs o normal',
   'meta.showMore': 'Mostrar mais {n}',
   'comps.heading': 'Melhores trios no Ranqueado',

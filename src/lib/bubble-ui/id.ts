@@ -32,6 +32,7 @@ const id: UiStrings = {
   'meta.noneMatch': 'Tidak ada di peta ini yang cocok dengan filtermu.',
   'meta.pickedHere': 'dipilih {n}% di sini',
   'meta.battlesHere': '{n} pertarungan di sini',
+  'meta.battlesAtRank': '{n} di {rank} · {all} semua rank',
   'meta.vsUsual': '{n} vs biasanya',
   'meta.showMore': 'Tampilkan {n} lagi',
   'comps.heading': 'Trio Berperingkat terbaik',

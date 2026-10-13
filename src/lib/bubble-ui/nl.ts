@@ -32,6 +32,7 @@ const nl: UiStrings = {
   'meta.noneMatch': 'Niets op deze kaart past bij je filter.',
   'meta.pickedHere': 'hier {n}% gekozen',
   'meta.battlesHere': '{n} potjes hier',
+  'meta.battlesAtRank': '{n} in {rank} · {all} alle rangen',
   'meta.vsUsual': '{n} t.o.v. normaal',
   'meta.showMore': 'Toon nog {n}',
   'comps.heading': 'Beste laddertrio’s',

@@ -32,6 +32,7 @@ const ms: UiStrings = {
   'meta.noneMatch': 'Tiada apa di peta ini yang sepadan dengan penapis anda.',
   'meta.pickedHere': 'dipilih {n}% di sini',
   'meta.battlesHere': '{n} pertempuran di sini',
+  'meta.battlesAtRank': '{n} di {rank} · {all} semua pangkat',
   'meta.vsUsual': '{n} berbanding biasa',
   'meta.showMore': 'Tunjuk {n} lagi',
   'comps.heading': 'Trio Berperingkat terbaik',

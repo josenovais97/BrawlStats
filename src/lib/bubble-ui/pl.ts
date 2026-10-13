@@ -32,6 +32,7 @@ const pl: UiStrings = {
   'meta.noneMatch': 'Nic na tej mapie nie pasuje do twojego filtra.',
   'meta.pickedHere': 'wybierany w {n}% tutaj',
   'meta.battlesHere': '{n} walk tutaj',
+  'meta.battlesAtRank': '{n} w {rank} · {all} wszystkie rangi',
   'meta.vsUsual': '{n} wzgl. normy',
   'meta.showMore': 'Pokaż jeszcze {n}',
   'comps.heading': 'Najlepsze trójki rankingowe',

@@ -4279,6 +4279,17 @@ export async function getLineupStats(
 const BRACKET_MAP_PRIOR_BATTLES = 60;
 
 /**
+ * Battles a brawler needs at the rank, on the map, to be listed at all.
+ *
+ * The estimate itself leans on every rank, but a brawler that rank barely
+ * takes on a map is not an answer for that rank's draft -- measured
+ * 2026-10-13, Gale sat in Legendary's top ten on Hideout on 2 Legendary
+ * battles, carried by other ranks. Twenty keeps lists full (each map has a
+ * deep pool) and lets more qualify as the rank's battles accumulate.
+ */
+const BRACKET_MAP_MIN_RANK_BATTLES = 20;
+
+/**
  * Ranked map picks for one rank bracket, from whole lineups.
  *
  * A map at one rank is the thinnest slice there is -- a few hundred battles a
@@ -4379,6 +4390,7 @@ async function computeBracketMapPicks(
         const onMap = shrink(all, prior, MAP_PRIOR_BATTLES);
         const target = clampRate(onMap + (formRank(id) - prior));
         const own = mapRank.get(key);
+        if (!own || own.decided < BRACKET_MAP_MIN_RANK_BATTLES) continue;
         const estimate = shrink(own, target, BRACKET_MAP_PRIOR_BATTLES);
         picks.push({
           brawlerId: id,
@@ -4389,6 +4401,7 @@ async function computeBracketMapPicks(
           score: clampRate(estimate - baseline + 0.5),
           overallScore: clampRate(formRank(id) - baseline + 0.5),
           overallSampleSize: overallRank.get(id)?.decided ?? 0,
+          allRanksSampleSize: all.decided,
         });
       }
       out.push({
