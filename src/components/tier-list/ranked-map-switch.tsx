@@ -15,14 +15,18 @@ export interface MapPickRow {
   score: number;
   /** The same brawler's form across all Ranked maps, for the delta. */
   overallScore: number;
-  /** Decided battles sampled on this map. */
+  /** Decided battles sampled on this map (at the rank, on a rank page). */
   battles: number;
+  /** On a rank page: decided battles on this map at every rank. */
+  allBattles?: number;
 }
 
 export interface MapRows {
   mapName: string;
   slug: string;
   picks: MapPickRow[];
+  /** The rank a rank page's list is for, e.g. "Legendary". */
+  rankLabel?: string;
 }
 
 /**
@@ -167,7 +171,9 @@ function MapPicks({ map }: { map: MapRows }) {
                 {/* Sample size is never hidden: on a per-map split it is the
                     difference between a signal and a coin flip. */}
                 <span className="block text-xs tabular-nums leading-tight text-muted">
-                  {pick.battles.toLocaleString()} battles here
+                  {map.rankLabel && pick.allBattles !== undefined
+                    ? `${pick.battles.toLocaleString()} at ${map.rankLabel} · ${pick.allBattles.toLocaleString()} all ranks`
+                    : `${pick.battles.toLocaleString()} battles here`}
                 </span>
               </span>
               <span className="shrink-0 text-right">
@@ -188,9 +194,19 @@ function MapPicks({ map }: { map: MapRows }) {
         );
       })}
       <li className="px-3 py-2 text-xs text-muted">
-        Adjusted win rate on this map over the last three weeks, shrunk toward each brawler&apos;s
-        overall Ranked form where the sample is thin. Brawlers under 50 decided battles here are
-        left out.{' '}
+        {map.rankLabel ? (
+          <>
+            Every rank&apos;s results on this map, adjusted to how each brawler does in{' '}
+            {map.rankLabel} lobbies, then pulled toward the {map.rankLabel} battles played here.
+            Brawlers under 20 {map.rankLabel} battles here are left out.{' '}
+          </>
+        ) : (
+          <>
+            Adjusted win rate on this map over the last three weeks, shrunk toward each
+            brawler&apos;s overall Ranked form where the sample is thin. Brawlers under 150 decided
+            battles here are left out.{' '}
+          </>
+        )}
         <Link
           href={`/maps/${map.slug}`}
           className="font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"

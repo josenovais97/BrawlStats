@@ -48,6 +48,7 @@ import {
   TIER_ORDER,
   TIER_WINDOWS,
   getBracketRoster,
+  getBracketMapPicks,
   getBrawlerStatsForWindow,
   getFilterableModes,
   getLastAggregationRun,
@@ -191,9 +192,11 @@ export async function TierListView({
     // The mode's Ranked maps, for the chips under the mode filter. Only on a
     // mode page: the combined list has no map pool, and the trophy ladder has
     // no map-level ranking. Same cached read the Bubble's panel uses.
-    // Not on a bracket page: map picks are pooled across every rank, and
-    // swapping a Mythic list for an all-ranks map ranking would mislabel it.
-    format === 'ranked' && mode && !bracket ? getRankedMapPicks(60).catch(() => []) : Promise.resolve([]),
+    // On a rank page, that rank's map picks: every rank's adjusted to the
+    // rank, then pulled toward the rank's own battles (getBracketMapPicks).
+    format === 'ranked' && mode
+      ? (bracket ? getBracketMapPicks(bracket.id, 60) : getRankedMapPicks(60)).catch(() => [])
+      : Promise.resolve([]),
   ]);
 
   const maps: MapRows[] = mapPicks
@@ -211,7 +214,9 @@ export async function TierListView({
         score: pick.score,
         overallScore: pick.overallScore,
         battles: pick.decidedSampleSize,
+        allBattles: pick.allRanksSampleSize,
       })),
+      rankLabel: bracket?.label,
     }));
 
   /*
