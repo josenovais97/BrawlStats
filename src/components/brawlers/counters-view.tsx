@@ -119,7 +119,8 @@ const WORDS: Record<Locale, Words> = {
     best: 'Mejores counters',
     avoid: (n) => `No los elijas contra ${n}`,
     atRank: 'Counters en tu rango',
-    games: (g, n) => `${g} partidas de Competitivo contra ${n}`,
+    // "de Competitivo" is in the intro; on a phone it wrapped every row.
+    games: (g, n) => `${g} partidas contra ${n}`,
     expected: 'vs lo esperado',
     none: (n) => `Todavía no hay suficientes partidas de Competitivo contra ${n}.`,
     noneAtRank: 'Todavía no hay suficientes partidas en este rango.',
@@ -155,7 +156,7 @@ const WORDS: Record<Locale, Words> = {
     best: 'Melhores counters',
     avoid: (n) => `Não escolha contra ${n}`,
     atRank: 'Counters no seu rank',
-    games: (g, n) => `${g} partidas ranqueadas contra ${n}`,
+    games: (g, n) => `${g} partidas contra ${n}`,
     expected: 'vs o esperado',
     none: (n) => `Ainda não há partidas ranqueadas suficientes contra ${n}.`,
     noneAtRank: 'Ainda não há partidas suficientes neste rank.',

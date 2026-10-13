@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { type ReactNode, useSyncExternalStore } from 'react';
 
-import { fmtNumber, localePath, type Locale } from '@/lib/i18n';
+import { fmtDecimal, fmtNumber, localePath, type Locale } from '@/lib/i18n';
 import { brawlerPath } from '@/lib/slugs';
 
 /** The switch's words. Map and rank names arrive already translated. */
@@ -171,7 +171,7 @@ export function RankedMapSwitch({
 function MapPicks({ map, locale }: { map: MapRows; locale: Locale }) {
   const w = WORDS[locale];
   const n = (v: number) => (locale === 'en' ? v.toLocaleString() : fmtNumber(v, locale));
-  const dec = (v: number) => (locale === 'en' ? v.toFixed(1) : fmtNumber(Number(v.toFixed(1)), locale));
+  const dec = (v: number) => (locale === 'en' ? v.toFixed(1) : fmtDecimal(v, locale));
   if (map.picks.length === 0) {
     return (
       <p className="card px-4 py-8 text-center text-sm leading-relaxed text-muted">{w.empty(map.mapName)}</p>
