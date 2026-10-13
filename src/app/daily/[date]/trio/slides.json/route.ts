@@ -1,3 +1,4 @@
+import { SLIDE_DESIGN } from '@/lib/slide-kit';
 import { trioOfDay } from '@/lib/daily-posts';
 import { TRIO_SLIDES, trioCaption } from '@/lib/daily-posts-slides';
 import { SITE_URL } from '@/lib/site';
@@ -36,7 +37,7 @@ export async function GET(
       count: TRIO_SLIDES,
       slides: Array.from(
         { length: TRIO_SLIDES },
-        (_unused, i) => `${SITE_URL}/daily/${date}/trio/slides/${i}/image.jpg`,
+        (_unused, i) => `${SITE_URL}/daily/${date}/trio/slides/${i}/image.jpg?v=${SLIDE_DESIGN}`,
       ),
     },
     { headers },

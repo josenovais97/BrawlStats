@@ -1,3 +1,4 @@
+import { SLIDE_DESIGN } from '@/lib/slide-kit';
 import { counterOfDay } from '@/lib/daily-posts';
 import { COUNTER_SLIDES, counterCaption } from '@/lib/daily-posts-slides';
 import { SITE_URL } from '@/lib/site';
@@ -36,7 +37,7 @@ export async function GET(
       count: COUNTER_SLIDES,
       slides: Array.from(
         { length: COUNTER_SLIDES },
-        (_unused, i) => `${SITE_URL}/daily/${date}/counter/slides/${i}/image.jpg`,
+        (_unused, i) => `${SITE_URL}/daily/${date}/counter/slides/${i}/image.jpg?v=${SLIDE_DESIGN}`,
       ),
     },
     { headers },

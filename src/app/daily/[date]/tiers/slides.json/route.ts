@@ -1,3 +1,4 @@
+import { SLIDE_DESIGN } from '@/lib/slide-kit';
 import { SITE_URL } from '@/lib/site';
 import { mapOfDay } from '@/lib/map-of-day';
 import { mapCaption } from '@/lib/map-slides';
@@ -56,7 +57,7 @@ export async function GET(
       count,
       slides: Array.from(
         { length: count },
-        (_unused, i) => `${SITE_URL}/daily/${date}/tiers/slides/${i}/image.jpg`,
+        (_unused, i) => `${SITE_URL}/daily/${date}/tiers/slides/${i}/image.jpg?v=${SLIDE_DESIGN}`,
       ),
     },
     { headers },

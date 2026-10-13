@@ -16,6 +16,13 @@ import { DISPLAY } from '@/lib/slide-chrome';
  * child needs `display: flex`.
  */
 
+/**
+ * The design generation, carried on every slide URL as `?v=`. Cloudflare
+ * caches slide images for a day by URL, so a redesign shipped mid-day would
+ * otherwise post the old images; bump this with any visual change.
+ */
+export const SLIDE_DESIGN = 2;
+
 export const W = 1080;
 export const H = 1920;
 

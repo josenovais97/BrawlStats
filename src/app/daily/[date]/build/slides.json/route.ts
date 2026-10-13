@@ -1,3 +1,4 @@
+import { SLIDE_DESIGN } from '@/lib/slide-kit';
 import { brawlerOfDay } from '@/lib/brawler-of-day';
 import { BUILD_V2_SLIDES, buildCaptionV2 } from '@/lib/build-slides-v2';
 import { SITE_URL } from '@/lib/site';
@@ -54,7 +55,7 @@ export async function GET(
       count,
       slides: Array.from(
         { length: count },
-        (_unused, i) => `${SITE_URL}/daily/${date}/build/slides/${i}/image.jpg`,
+        (_unused, i) => `${SITE_URL}/daily/${date}/build/slides/${i}/image.jpg?v=${SLIDE_DESIGN}`,
       ),
     },
     { headers },
