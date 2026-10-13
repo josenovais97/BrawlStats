@@ -1121,6 +1121,12 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             brawlerMeta={brawlerMeta}
             indexablePairs={indexablePairs}
           />
+          <Link
+            href={`/brawlers/${resolved.slug}/counters`}
+            className="mt-3 inline-flex text-sm font-semibold text-brand hover:underline"
+          >
+            How to counter {name} in Ranked, by rank →
+          </Link>
         </section>
       ) : null}
 

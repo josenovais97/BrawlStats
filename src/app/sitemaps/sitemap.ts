@@ -124,6 +124,7 @@ async function core(add: Add, dataDay: Date | null) {
   const catalog = await getBrawlerCatalog().catch(() => null);
   for (const brawler of catalog?.current ?? []) {
     add(`/brawlers/${slugify(brawler.name)}`, 'daily', 0.8);
+    add(`/brawlers/${slugify(brawler.name)}/counters`, 'daily', 0.7);
   }
 
   // Per-mode tier lists, listed only for the modes that actually have enough

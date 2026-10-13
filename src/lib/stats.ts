@@ -2752,6 +2752,29 @@ export interface BrawlerPairings {
  * not "strong against" the opponent it wins 55% against, and the absolute
  * number would say it was.
  */
+/**
+ * For each brawler, how far everyone else ends up from their own win rate
+ * when facing it (`enemy`) or playing beside it (`ally`), weighted by games.
+ * Subtracted from a pairing's edge, it leaves what is specific to the pair.
+ */
+async function pairingShifts(side: 'enemy' | 'ally', windowDays: number): Promise<Map<number, number>> {
+  const [matrix, overall] = await Promise.all([
+    cachedPairingMatrix(side, windowDays),
+    cachedOverallWinRates(windowDays),
+  ]);
+  const base = new Map(overall);
+  const acc = new Map<number, { excess: number; decided: number }>();
+  for (const [brawlerId, otherId, wins, decided] of matrix) {
+    const own = base.get(brawlerId);
+    if (own === undefined || decided === 0) continue;
+    const a = acc.get(otherId) ?? { excess: 0, decided: 0 };
+    a.excess += wins - own * decided;
+    a.decided += decided;
+    acc.set(otherId, a);
+  }
+  return new Map([...acc].map(([id, a]) => [id, a.decided > 0 ? a.excess / a.decided : 0]));
+}
+
 async function compute_getBrawlerPairings(
   brawlerId: number,
   windowDays = 21,
@@ -2800,7 +2823,22 @@ async function compute_getBrawlerPairings(
     if (sampleSize < MIN_SAMPLE_FOR_PAIRING) return null;
     const baseline = Number(totals[0]?.wins ?? 0) / sampleSize;
 
-    const toPairings = (rows: { other: number; wins: bigint; decided: bigint }[]) =>
+    /*
+     * Each edge is measured against what this brawler would be expected to do
+     * against (or beside) that particular brawler -- its own rate, moved by
+     * how everyone else does against it -- not against its own rate alone.
+     * Same correction as the draft helper's (`scorePairings`): until
+     * 2026-10-13 a weak opponent made every brawler look like its counter.
+     */
+    const [enemyShift, allyShift] = await Promise.all([
+      pairingShifts('enemy', windowDays),
+      pairingShifts('ally', windowDays),
+    ]);
+
+    const toPairings = (
+      rows: { other: number; wins: bigint; decided: bigint }[],
+      shift: Map<number, number>,
+    ) =>
       rows
         .map((row) => {
           const decided = Number(row.decided);
@@ -2808,7 +2846,7 @@ async function compute_getBrawlerPairings(
           return {
             brawlerId: row.other,
             winRate,
-            edge: winRate - baseline,
+            edge: winRate - baseline - (shift.get(row.other) ?? 0),
             decidedSampleSize: decided,
           };
         })
@@ -2816,8 +2854,8 @@ async function compute_getBrawlerPairings(
         // it is the absence of one.
         .filter((p) => Math.abs(p.edge) >= 0.02);
 
-    const versus = toPairings(enemies);
-    const with_ = toPairings(allies);
+    const versus = toPairings(enemies, enemyShift);
+    const with_ = toPairings(allies, allyShift);
 
     /*
      * Split by sign, not by sort order.
@@ -3759,12 +3797,14 @@ const cachedRankedPairingMatrix = cachedRead('ranked-pairing-matrix', compute_ra
 export async function getRankedCounterScores(
   enemyIds: number[],
   windowDays = 21,
+  /** One rank's lobbies only; omitted, every rank. */
+  bracket?: number,
 ): Promise<Map<number, CounterScore>> {
   if (enemyIds.length === 0) return new Map();
   try {
     const [matrix, overall] = await Promise.all([
-      cachedRankedPairingMatrix('enemy', windowDays, undefined),
-      cachedRankedOverallWinRates(windowDays, undefined),
+      cachedRankedPairingMatrix('enemy', windowDays, bracket),
+      cachedRankedOverallWinRates(windowDays, bracket),
     ]);
     return scorePairings(matrix, overall, enemyIds);
   } catch (error) {

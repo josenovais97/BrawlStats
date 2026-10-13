@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import type { CounterEntry, CounterPost, TrioPost } from '@/lib/daily-posts';
 import { titleCase } from '@/lib/format';
+import { slugify } from '@/lib/slugs';
 import { loadArt, loadIcon, loadLogo, loadSized } from '@/lib/slide-chrome';
 import {
   FG,
@@ -174,7 +175,7 @@ export function counterCaption(post: CounterPost, site: string): { title: string
     description:
       `Struggling against ${name}? Pick ${top.join(', ')}. ` +
       `Ranked win rates against ${name} from the last ${post.windowDays} days, every rank. ` +
-      `A different brawler every day. Full draft helper at ${site}/draft ` +
+      `A different brawler every day. All ${name} counters by rank at ${site}/brawlers/${slugify(post.target.name)}/counters ` +
       '#brawlstars #brawlstarsranked #brawlstarstips #brawlstarscounters #brawlstarsdraft',
   };
 }
