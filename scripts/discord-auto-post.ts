@@ -4,6 +4,9 @@
  *   daily    — today's live maps, each with its best picks       (#📈-meta-updates, @Map pings)
  *   botd     — brawler of the day: tier, numbers and build        (#⚖️-tier-talk)
  *   weekly   — Monday report: the top 10 and the best trio a mode (#📈-meta-updates, @Meta pings)
+ *              then `ranks`, the same Monday
+ *   ranks    — meta at your rank: each rank's top five and the week's
+ *              biggest risers and fallers there (#📈-meta-updates, @<rank roles>)
  *   welcome  — the pinned welcome post, created or edited in place (#👋-welcome)
  *
  * Every job also checks for a Bubble app release nobody has announced yet and
@@ -24,12 +27,14 @@ import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { BUBBLE_APP, BUBBLE_CHANGELOG } from '@/lib/bubble-app';
 import { getEventRotation, getOfficialBrawlers } from '@/lib/bs-api';
 import { formatPercent, humanizeMode, titleCase } from '@/lib/format';
+import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import {
   RANKED_MAP_WINDOW_DAYS,
   getBestPicksByMode,
   getBrawlerBuild,
   getBrawlerStatsForWindow,
+  getLineupStats,
   getRankedComps,
   getRankedMapPicks,
   getSkillEdge,
@@ -91,12 +96,23 @@ function channel(g: Guild, name: string): string {
   return id;
 }
 
-async function post(channelId: string, body: { content?: string; embeds?: Embed[]; components?: unknown[] }, pingRole?: string) {
-  return call<{ id: string }>('POST', `/channels/${channelId}/messages`, {
+async function post(
+  channelId: string,
+  body: { content?: string; embeds?: Embed[]; components?: unknown[] },
+  ping?: string | (string | undefined)[],
+) {
+  const roles = (Array.isArray(ping) ? ping : [ping]).filter((r): r is string => Boolean(r));
+  const message = {
     ...body,
-    content: [pingRole ? `<@&${pingRole}>` : null, body.content].filter(Boolean).join(' ') || undefined,
-    allowed_mentions: { parse: [], roles: pingRole ? [pingRole] : [] },
-  });
+    content: [roles.map((r) => `<@&${r}>`).join(' ') || null, body.content].filter(Boolean).join(' ') || undefined,
+    allowed_mentions: { parse: [], roles },
+  };
+  // DISCORD_DRY_RUN=1 prints the message instead of sending it, to preview a post.
+  if (process.env.DISCORD_DRY_RUN) {
+    console.log(JSON.stringify(message, null, 2));
+    return { id: 'dry-run' };
+  }
+  return call<{ id: string }>('POST', `/channels/${channelId}/messages`, message);
 }
 
 /** Announcement channels: publish so servers following it get the post too. */
@@ -336,6 +352,99 @@ async function weekly(g: Guild): Promise<string> {
   return `Posted weekly report (${top.length} brawlers, ${trios.length} modes)`;
 }
 
+/* ------------------------------------------------------------------ ranks */
+
+/** The onboarding rank roles each bracket pings (scripts/discord-setup.mjs). */
+const BRACKET_ROLES: Record<number, string[]> = {
+  1: ['Bronze', 'Silver', 'Gold', 'Diamond'],
+  2: ['Mythic'],
+  3: ['Legendary'],
+  4: ['Masters', 'Pro'],
+};
+const BRACKET_EMOJI: Record<number, string> = {
+  1: 'rank_diamond',
+  2: 'rank_mythic',
+  3: 'rank_legendary',
+  4: 'rank_masters',
+};
+/** Battles a brawler needs in each week before its move is worth reporting. */
+const MOVER_MIN_BATTLES = 300;
+
+/**
+ * Meta at your rank: each rank's top five this week, and the brawlers whose
+ * win rate there moved most against the week before.
+ *
+ * From whole Ranked lineups at each rank (`getLineupStats`). The week before
+ * is the last fourteen days minus the last seven, so both weeks come from the
+ * same roll-up and are measured the same way. Pings the rank roles members
+ * chose in onboarding, once a week.
+ */
+async function ranks(g: Guild): Promise<string> {
+  const id = channel(g, '📈-meta-updates');
+  if (await postedWithin(id, '🏅 Meta at your rank', 6 * 24)) return 'Rank report already posted this week';
+  const edges = await getSkillEdge('ranked').catch(() => undefined);
+
+  const embeds: Embed[] = [];
+  for (const bracket of RANK_BRACKETS) {
+    const [week, fortnight] = await Promise.all([
+      getLineupStats(7, undefined, bracket.id),
+      getLineupStats(14, undefined, bracket.id),
+    ]);
+    const top = scoreBrawlers(week, 'ranked', edges)
+      .filter((e) => e.tier !== null)
+      .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
+      .slice(0, 5);
+    if (top.length === 0) continue;
+
+    const before = new Map(fortnight.map((r) => [r.brawlerId, r]));
+    const moves = week.flatMap((now) => {
+      const both = before.get(now.brawlerId);
+      if (!both || now.winRate === null || both.winRate === null) return [];
+      const prevN = both.decidedSampleSize - now.decidedSampleSize;
+      if (now.decidedSampleSize < MOVER_MIN_BATTLES || prevN < MOVER_MIN_BATTLES) return [];
+      const prevWins = both.winRate * both.decidedSampleSize - now.winRate * now.decidedSampleSize;
+      return [{ name: name(now.brawlerName), delta: now.winRate - prevWins / prevN }];
+    });
+    const sorted = moves.sort((a, b) => b.delta - a.delta);
+    const fmt = (m: { name: string; delta: number }) =>
+      `**${m.name}** ${m.delta >= 0 ? '▲' : '▼'} ${Math.abs(m.delta * 100).toFixed(1)} pts`;
+    const risers = sorted.filter((m) => m.delta >= 0.01).slice(0, 3).map(fmt);
+    const fallers = sorted.reverse().filter((m) => m.delta <= -0.01).slice(0, 3).map(fmt);
+
+    const fields = [];
+    if (risers.length) fields.push({ name: 'Rising', value: risers.join('\n'), inline: true });
+    if (fallers.length) fields.push({ name: 'Falling', value: fallers.join('\n'), inline: true });
+    embeds.push({
+      title: `🏅 Meta at your rank · ${bracket.label}`,
+      // Spelled out: lib/tier-list-route pulls in next/navigation, which a script cannot load.
+      url: `${SITE}/tier-list/ranked/rank/${bracket.slug}`,
+      color: BRAND,
+      description: [
+        g.emojis.get(BRACKET_EMOJI[bracket.id]) ?? '',
+        top.map((b, i) => `**${i + 1}.** \`${b.tier}\` **${name(b.brawlerName)}** · ${pct(b.normalizedWinRate)} win`).join('\n'),
+      ]
+        .filter(Boolean)
+        .join('\n'),
+      fields,
+    });
+  }
+  if (embeds.length === 0) return 'No rank had a rated list; nothing posted';
+  embeds[embeds.length - 1].footer = {
+    text: 'brawlzone.net · last 7 days of sampled Ranked battles at each rank, all six brawlers per battle',
+  };
+
+  const pings = RANK_BRACKETS.flatMap((b) => BRACKET_ROLES[b.id].map((r) => g.roles.get(r)));
+  await post(
+    id,
+    {
+      embeds,
+      components: buttons(['Tier list by rank', `${SITE}/tier-list/ranked`], ['Your rank in the Bubble', `${SITE}/bubble`]),
+    },
+    pings,
+  );
+  return `Posted the rank report (${embeds.length} ranks)`;
+}
+
 /* ---------------------------------------------------------------- welcome */
 
 async function welcome(g: Guild): Promise<string> {
@@ -407,7 +516,7 @@ async function welcome(g: Guild): Promise<string> {
 
 /* -------------------------------------------------------------------- run */
 
-const JOBS: Record<string, (g: Guild) => Promise<string>> = { daily, botd, weekly, welcome, bubble: bubbleRelease };
+const JOBS: Record<string, (g: Guild) => Promise<string>> = { daily, botd, weekly, ranks, welcome, bubble: bubbleRelease };
 
 async function main(): Promise<void> {
   const job = process.argv[2] ?? '';
@@ -423,7 +532,9 @@ async function main(): Promise<void> {
   }
   const g = await guild();
   let failed = false;
-  for (const run of job === 'bubble' ? [bubbleRelease] : [JOBS[job], bubbleRelease]) {
+  // Monday's weekly report brings the rank report with it.
+  const runs = job === 'bubble' ? [bubbleRelease] : job === 'weekly' ? [weekly, ranks, bubbleRelease] : [JOBS[job], bubbleRelease];
+  for (const run of runs) {
     try {
       console.log(`Posted: ${await run(g)}`);
     } catch (error) {
