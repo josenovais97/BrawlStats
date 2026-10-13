@@ -220,6 +220,16 @@ esac
 # look identical from the inbox and need different fixes.
 record_state "last_run.${MODE}" "$(now_iso)" || true
 
+# One post per mode per day. A post sent by hand earlier in the day (as on
+# 2026-10-13, when the build went out at 14:20 to be checked) would otherwise
+# be sent again by its timer, and the duplicate takes one of TikTok's five
+# pending-upload slots that the evening's post needs. FORCE=1 sends anyway.
+last_posted=$(python3 -c 'import json,sys;print((json.load(open(sys.argv[1])).get("last_post") or {}).get(sys.argv[2],"")[:10])' "$STATE" "$MODE" 2>/dev/null)
+if [ "${FORCE:-0}" != "1" ] && [ "$last_posted" = "$DAY" ]; then
+  echo "${MODE} already posted on ${DAY}; skipping (FORCE=1 to send again)"
+  exit 0
+fi
+
 # A carousel, not one image, and the site publishes the list rather than this
 # job guessing: the slide count varies with the day's content, and re-deriving
 # it here would be a second implementation that drifts the first time either
@@ -388,6 +398,11 @@ dur = [2.6] + [4.0] * (n - 2) + [2.4] if n >= 3 else [3.5] * n
 args = ['-hide_banner', '-loglevel', 'error', '-y']
 for i in range(n):
     args += ['-i', f'/w/s{i}.jpg']
+# A silent soundtrack. Without one TikTok takes the whole file (201, every
+# byte counted) and then never finishes processing it: on 2026-10-13 a
+# video-only upload sat in PROCESSING_UPLOAD for good while the same video
+# with this track added reached the inbox in twenty seconds.
+args += ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo']
 parts = []
 for i in range(n):
     frames = round(dur[i] * FPS)
@@ -403,8 +418,9 @@ for i in range(1, n):
     offset += dur[i - 1] - T
     parts.append(f'[{last}][v{i}]xfade=transition=slideleft:duration={T}:offset={offset:.2f}[x{i}]')
     last = f'x{i}'
-args += ['-filter_complex', ';'.join(parts), '-map', f'[{last}]', '-r', str(FPS),
+args += ['-filter_complex', ';'.join(parts), '-map', f'[{last}]', '-map', f'{n}:a', '-shortest', '-r', str(FPS),
          '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+         '-c:a', 'aac', '-b:a', '64k',
          '-movflags', '+faststart', '/w/out.mp4']
 print('\n'.join(args))
 PY
