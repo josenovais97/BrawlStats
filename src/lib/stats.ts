@@ -4982,7 +4982,12 @@ export async function getRankedMapPicks(
 /* The reads above, cached. See `cachedRead`. */
 export const getBrawlerSplits = cachedRead('brawler-splits', compute_getBrawlerSplits);
 export const getBrawlerPairings = cachedRead('brawler-pairings', compute_getBrawlerPairings);
-export const getTeamComps = cachedRead('team-comps', compute_getTeamComps);
+const cachedTeamComps = cachedRead('team-comps', compute_getTeamComps);
+
+/** The site's comps: the precomputed row, else computed live. */
+export async function getTeamComps(limit = 12): Promise<ModeComps[]> {
+  return (await precomputed<ModeComps[]>(`team-comps:${limit}`)) ?? cachedTeamComps(limit);
+}
 
 /**
  * Ranked trio floors for the bubble's Team comp tab.
@@ -5138,7 +5143,45 @@ async function compute_getRankedComps(limit = 8, bracket?: number): Promise<Rank
   }
 }
 
-export const getRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
+const cachedRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
+
+/** Ranked trios, all ranks or one: the precomputed row, else computed live. */
+export async function getRankedComps(limit = 8, bracket?: number): Promise<RankedComps> {
+  return (await precomputed<RankedComps>(rankedCompsKey(limit, bracket))) ?? cachedRankedComps(limit, bracket);
+}
+
+export function rankedCompsKey(limit: number, bracket?: number): string {
+  return `ranked-comps:${limit}:${bracket ?? 0}`;
+}
+
+/* -------------------------------------------------------------- precomputed */
+
+/** How old a precomputed row may be before the live computation is used. */
+const PRECOMPUTED_MAX_AGE_MS = 3 * 3600_000;
+
+/**
+ * A read computed after the last sampler run (scripts/precompute.ts), or null
+ * when there is none, it is too old, or the table cannot be read -- in which
+ * case the caller computes live, exactly as it did before 2026-10-13.
+ */
+async function precomputed<T>(key: string): Promise<T | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+  try {
+    const row = await prisma.precomputedRead.findUnique({ where: { key } });
+    if (!row || Date.now() - row.computedAt.getTime() > PRECOMPUTED_MAX_AGE_MS) return null;
+    return row.value as T;
+  } catch {
+    return null;
+  }
+}
+
+/** The computations the precompute job runs, keyed as `precomputed` reads them. */
+export const PRECOMPUTE_JOBS: { key: string; run: () => Promise<unknown> }[] = [
+  { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
+  ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
+  ...[1, 2, 3, 4].map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
+];
 
 /** Letters and digits only, lowercased: "Belle's Rock" and "Belles Rock" agree. */
 export function mapNameKey(name: string): string {

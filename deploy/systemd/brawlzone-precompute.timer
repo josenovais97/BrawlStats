@@ -1,0 +1,10 @@
+[Unit]
+Description=Compute the expensive reads at :47 every two hours, after the sampler (:17, ~20 min)
+
+[Timer]
+OnCalendar=*-*-* 00/2:47:00
+Persistent=false
+Unit=brawlzone-precompute.service
+
+[Install]
+WantedBy=timers.target

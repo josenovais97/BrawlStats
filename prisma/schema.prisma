@@ -558,6 +558,16 @@ model RankedPairDaily {
   @@map("ranked_pair_daily")
 }
 
+/// Expensive reads computed after each sampler run (scripts/precompute.ts),
+/// keyed by read and arguments. See lib/stats `precomputed`.
+model PrecomputedRead {
+  key        String   @id
+  value      Json
+  computedAt DateTime @default(now()) @map("computed_at")
+
+  @@map("precomputed_reads")
+}
+
 /// What each roll-up day was last built from, so unchanged days are not
 /// rebuilt.
 ///

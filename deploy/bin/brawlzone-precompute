@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Compute the expensive reads (team comps) after a sampler run, into
+# precomputed_reads, so no visitor waits for them. See scripts/precompute.ts.
+set -uo pipefail
+cd /home/ubuntu/brawlstats || exit 1
+out=$(mktemp); trap 'rm -f "$out"' EXIT
+if ! docker compose run --rm -T --build sampler node --import tsx --conditions=react-server scripts/precompute.ts >"$out" 2>&1; then
+  echo "Precompute FAILED. Output:"
+  tail -25 "$out"
+  exit 1
+fi
+grep -E '^(stored|skipped)' "$out"
