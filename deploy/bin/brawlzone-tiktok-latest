@@ -154,7 +154,7 @@ DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
 if [ -n "${DISCORD_TOKEN:-}" ] && [ -n "${DISCORD_GUILD:-}" ]; then
   DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" \
   python3 - "$STATE" "$response" <<'PY' || echo "discord: announcement failed (not fatal)"
-import json, os, sys, time, urllib.request
+import json, os, re, sys, time, urllib.request
 
 state_path, raw = sys.argv[1], sys.argv[2]
 videos = json.loads(raw).get("data", {}).get("videos", [])
@@ -192,9 +192,14 @@ if fresh:
         fresh = []
     # Oldest first, so the channel reads in the order they went up.
     for v in sorted(fresh, key=lambda v: int(v.get("create_time") or 0)):
-        title = (v.get("title") or v.get("video_description") or "").strip()
-        title = title.split(" #")[0].split(" — ")[0][:150]
-        content = (f"**{title}**\n" if title else "") + f"New on our TikTok 👉 {v['share_url']}"
+        # The caption's first sentence, not the whole caption cut off: photo
+        # posts carry their text in the description, and it runs long.
+        text = (v.get("title") or v.get("video_description") or "").split(" #")[0].strip()
+        m = re.match(r"(.+?[.!?])(\s|$)", text)
+        title = (m.group(1) if m else text)[:120]
+        # The share link without TikTok's tracking query; it unfurls the same.
+        url = v["share_url"].split("?")[0]
+        content = (f"**{title}**\n" if title else "") + f"New on our TikTok 👉 {url}"
         call("POST", f"/channels/{clips}/messages", {"content": content, "allowed_mentions": {"parse": []}})
         seen.append(str(v.get("id")))
         print(f"discord: announced {v.get('id')} in #🎬-clips")
