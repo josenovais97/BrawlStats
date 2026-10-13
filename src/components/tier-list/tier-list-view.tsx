@@ -25,6 +25,7 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
+import { PendingArea, TierNav } from '@/components/tier-list/tier-nav';
 import type { RankBracket } from '@/lib/rank-brackets';
 import { TierPodium } from '@/components/tier-list/tier-podium';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
@@ -308,6 +309,7 @@ export async function TierListView({
   ];
 
   return (
+    <TierNav>
     <div className="space-y-8">
       {rated.length > 0 ? (
         <JsonLd
@@ -486,6 +488,7 @@ export async function TierListView({
 
       {/* On a Ranked mode page the tiers sit inside the map switch, so a map
           chip can swap them for that map's ranking without a request. */}
+      <PendingArea>
       <RankedMapSwitch maps={maps}>
         {rated.length === 0 ? (
           <EmptyState windowLabel={scopeLabel} />
@@ -509,6 +512,7 @@ export async function TierListView({
           </div>
         )}
       </RankedMapSwitch>
+      </PendingArea>
 
       {/*
         Placed under the tiers rather than above them: the ranking is what the
@@ -597,6 +601,7 @@ export async function TierListView({
         />
       ) : null}
     </div>
+    </TierNav>
   );
 }
 

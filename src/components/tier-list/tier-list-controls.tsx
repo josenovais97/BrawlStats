@@ -1,6 +1,6 @@
 import { RankedIcon, TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
-import Link from 'next/link';
+import { NavLink } from '@/components/tier-list/tier-nav';
 
 import { rankedLeagueIconUrl } from '@/lib/brawlapi';
 import { humanizeMode } from '@/lib/format';
@@ -90,7 +90,7 @@ function FormatTabs({ format, windowKey }: { format: TierFormat; windowKey: Tier
       {FORMATS.map(({ key, label, sublabel, icon: Icon }) => {
         const current = key === format;
         return (
-          <Link
+          <NavLink
             key={key}
             href={tierListHref(key, windowKey)}
             aria-current={current ? 'page' : undefined}
@@ -111,7 +111,7 @@ function FormatTabs({ format, windowKey }: { format: TierFormat; windowKey: Tier
                 {sublabel}
               </span>
             </span>
-          </Link>
+          </NavLink>
         );
       })}
     </div>
@@ -142,7 +142,7 @@ function WindowTabs({
         const { label, sublabel } = TIER_WINDOWS[key];
         const current = key === windowKey;
         return (
-          <Link
+          <NavLink
             key={key}
             href={tierListHref(format, key, mode)}
             aria-current={current ? 'page' : undefined}
@@ -154,7 +154,7 @@ function WindowTabs({
             <span className={`text-xs font-bold ${current ? 'text-foreground' : 'text-muted'}`}>
               {sublabel}
             </span>
-          </Link>
+          </NavLink>
         );
       })}
     </div>
@@ -177,18 +177,18 @@ function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: st
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div role="group" aria-label="Rank" className="flex w-max items-center gap-2">
         <span className="eyebrow pe-1 text-muted">Your rank</span>
-        <Link
+        <NavLink
           href={bracketTierListHref(null, mode)}
           aria-current={bracket ? undefined : 'page'}
           className={`${chip} ${bracket ? off : on}`}
         >
           All ranks
-        </Link>
+        </NavLink>
         {RANK_BRACKETS.map((b) => {
           const current = b.id === bracket?.id;
           const icon = rankedLeagueIconUrl(b.icon);
           return (
-            <Link
+            <NavLink
               key={b.slug}
               href={bracketTierListHref(b, mode)}
               aria-current={current ? 'page' : undefined}
@@ -206,7 +206,7 @@ function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: st
                 />
               ) : null}
               {b.label}
-            </Link>
+            </NavLink>
           );
         })}
       </div>
@@ -247,18 +247,18 @@ function ModeFilter({
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div role="group" aria-label="Game mode" className="flex w-max gap-2">
-        <Link
+        <NavLink
           href={href()}
           aria-current={mode ? undefined : 'page'}
           className={`${chip} ${mode ? off : on}`}
         >
           All modes
-        </Link>
+        </NavLink>
 
         {modes.map((entry) => {
           const current = entry.mode === mode;
           return (
-            <Link
+            <NavLink
               key={entry.mode}
               href={href(entry.mode)}
               aria-current={current ? 'page' : undefined}
@@ -276,7 +276,7 @@ function ModeFilter({
                 />
               ) : null}
               {humanizeMode(entry.mode)}
-            </Link>
+            </NavLink>
           );
         })}
       </div>

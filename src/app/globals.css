@@ -764,3 +764,9 @@ body {
   letter-spacing: normal !important;
   word-spacing: normal !important;
 }
+
+/* The tier list's loading bar (components/tier-list/tier-nav). */
+@keyframes tier-load {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
