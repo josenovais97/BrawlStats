@@ -183,3 +183,52 @@ export async function trioOfDay(date: string): Promise<TrioPost | null> {
     })),
   };
 }
+
+/* ----------------------------------------------------------------- patch */
+
+/** Days after a balance update that its post goes out: a week of "after". */
+export const PATCH_POST_AFTER_DAYS = 7;
+/** Win-rate points a brawler has to move to count as a winner or a loser. */
+const PATCH_MIN_MOVE = 1.5;
+
+export interface PatchPost {
+  date: string;
+  title: string;
+  updateDate: string;
+  /** Biggest risers and fallers, in win-rate points, with what changed. */
+  winners: { brawlerId: number; name: string; before: number; after: number; delta: number }[];
+  losers: { brawlerId: number; name: string; before: number; after: number; delta: number }[];
+}
+
+/**
+ * "Who really got stronger": a balance update's measured winners and losers,
+ * once, a week after the update -- the scoreboard on /patches, as a post.
+ * Null on every other day, and for an update whose two windows cannot be
+ * compared fairly (see `getPatchImpact`), which the job reads as nothing to
+ * post.
+ */
+export async function patchOfDay(date: string): Promise<PatchPost | null> {
+  const { getPatchImpact, measurableSlugs } = await import('@/lib/patch-scoreboard');
+  const catalog = await getBrawlerCatalog().catch(() => null);
+  const known = (catalog?.all ?? []).map((b) => ({ id: b.id, name: b.name }));
+  const now = `${date}T12:00:00.000Z`;
+  for (const slug of measurableSlugs(new Date(now))) {
+    const impact = await getPatchImpact(slug, known, now).catch(() => null);
+    if (!impact || !impact.comparable) continue;
+    const days = Math.round((Date.parse(now) - Date.parse(`${impact.date}T12:00:00Z`)) / 86_400_000);
+    if (days !== PATCH_POST_AFTER_DAYS) continue;
+    const moved = impact.movements.filter((m) => m.delta !== null && m.before !== null && m.after !== null);
+    const row = (m: (typeof moved)[number]) => ({
+      brawlerId: m.brawlerId,
+      name: catalog?.byId.get(m.brawlerId)?.name ?? m.brawlerName,
+      before: m.before as number,
+      after: m.after as number,
+      delta: m.delta as number,
+    });
+    const winners = moved.filter((m) => (m.delta as number) >= PATCH_MIN_MOVE).sort((a, b) => (b.delta as number) - (a.delta as number)).slice(0, 5).map(row);
+    const losers = moved.filter((m) => (m.delta as number) <= -PATCH_MIN_MOVE).sort((a, b) => (a.delta as number) - (b.delta as number)).slice(0, 5).map(row);
+    if (winners.length + losers.length < 3) return null;
+    return { date, title: impact.title, updateDate: impact.date, winners, losers };
+  }
+  return null;
+}

@@ -190,11 +190,12 @@ case "$MODE" in
   hidden) MANIFEST="${SITE}/daily/${DAY}/hidden/slides.json" ;;
   counter) MANIFEST="${SITE}/daily/${DAY}/counter/slides.json" ;;
   trio) MANIFEST="${SITE}/daily/${DAY}/trio/slides.json" ;;
+  patch) MANIFEST="${SITE}/daily/${DAY}/patch/slides.json" ;;
   # Promotional, run by hand. There is deliberately no timer: four scheduled
   # posts already sit against TikTok's five pending uploads per 24h, and a
   # fifth would leave no headroom to re-run a failed one.
   challenge) MANIFEST="${SITE}/daily/${DAY}/challenge/slides.json" ;;
-  *)     die "::error::unknown mode '${MODE}' (expected counter, tiers, build, trio, daily, hidden or challenge)" ;;
+  *)     die "::error::unknown mode '${MODE}' (expected counter, tiers, build, trio, patch, daily, hidden or challenge)" ;;
 esac
 
 # Before anything that can exit, so "the job ran and decided there was nothing

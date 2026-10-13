@@ -1,5 +1,5 @@
 [Unit]
-Description=BrawlZone daily tier-list carousel to TikTok
+Description=BrawlZone map-of-the-day carousel (and balance-update post) to TikTok
 After=docker.service
 # Same reasoning as the other two carousels: a failed run that says nothing is
 # worse than no run, because "no post today" and "the job is broken" look
@@ -10,3 +10,9 @@ OnFailure=brawlzone-alert@%n.service
 Type=oneshot
 User=ubuntu
 ExecStart=/usr/local/bin/brawlzone-run tiktok-tiers /usr/local/bin/brawlzone-tiktok tiers
+# A week after a balance update, its winners-and-losers post (2026-10-13).
+# Run from this unit, after the map of the day, rather than on a timer of its
+# own: the two jobs refresh the same rotating TikTok token, so they must never
+# overlap, and on every other day the patch manifest is empty and this is a
+# no-op.
+ExecStartPost=/usr/local/bin/brawlzone-run tiktok-patch /usr/local/bin/brawlzone-tiktok patch

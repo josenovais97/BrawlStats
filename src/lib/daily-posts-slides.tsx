@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { brawlerPortraitUrl } from '@/lib/brawlapi';
-import type { CounterEntry, CounterPost, TrioPost } from '@/lib/daily-posts';
+import type { CounterEntry, CounterPost, PatchPost, TrioPost } from '@/lib/daily-posts';
 import { titleCase } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import { loadArt, loadIcon, loadLogo, loadSized } from '@/lib/slide-chrome';
@@ -323,5 +323,122 @@ export function trioCaption(post: TrioPost, site: string): { title: string; desc
       `${pct(post.trios[0].winRate)} adjusted win rate over ${post.trios[0].battles} games, plus two backups. ` +
       `A different map every day. Every map at ${site}/ranked ` +
       '#brawlstars #brawlstarsranked #brawlstarstips #brawlstarsteam #brawlstarsmeta',
+  };
+}
+
+/* ----------------------------------------------------------------- patch */
+
+export const PATCH_SLIDES = 4;
+
+type PatchRow = PatchPost['winners'][number];
+
+function patchCover(post: PatchPost, faces: Map<number, string | null>): ReactElement {
+  const up = post.winners[0];
+  const down = post.losers[0];
+  return (
+    <Stage glow="#ffb000">
+      <div style={{ display: 'flex', marginTop: 10 }}>
+        <Ribbon>BALANCE UPDATE</Ribbon>
+      </div>
+      <div style={{ display: 'flex', marginTop: 30 }}>
+        <Title size={112}>Who really got stronger?</Title>
+      </div>
+      <div style={{ display: 'flex', marginTop: 16 }}>
+        <Note size={36} color={FG}>
+          {`A week after the ${new Date(`${post.updateDate}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} update, measured in Ranked`}
+        </Note>
+      </div>
+      <div style={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+        {[up, down].map((r, i) =>
+          r ? (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 400 }}>
+              <Portrait src={faces.get(r.brawlerId) ?? null} size={300} ring={i === 0 ? GREEN : RED} />
+              <div style={{ display: 'flex', marginTop: 22 }}>
+                <Title size={54} align="center">
+                  {cap(r.name)}
+                </Title>
+              </div>
+              <div style={{ display: 'flex', marginTop: 8 }}>
+                <Title size={72} color={i === 0 ? GREEN : RED} align="center">
+                  {`${r.delta >= 0 ? '+' : '−'}${Math.abs(r.delta).toFixed(1)}`}
+                </Title>
+              </div>
+              <Note size={28} align="center">
+                win-rate points
+              </Note>
+            </div>
+          ) : (
+            <div key={i} style={{ display: 'flex', width: 400 }} />
+          ),
+        )}
+      </div>
+    </Stage>
+  );
+}
+
+function patchRows(rows: PatchRow[], up: boolean, faces: Map<number, string | null>): ReactElement {
+  return (
+    <Stage glow={up ? '#1fbf6b' : '#ff3b5c'}>
+      <div style={{ display: 'flex', marginTop: 10 }}>
+        {up ? (
+          <Ribbon color={GREEN} depth="#167a45">
+            WINNERS
+          </Ribbon>
+        ) : (
+          <Ribbon color={RED} depth="#9c1d36" ink={FG}>
+            LOSERS
+          </Ribbon>
+        )}
+      </div>
+      <div style={{ display: 'flex', marginTop: 28 }}>
+        <Title size={84}>{up ? 'Climbed after the update' : 'Dropped after the update'}</Title>
+      </div>
+      <div style={{ display: 'flex', marginTop: 8 }}>
+        <Note size={30}>Ranked win rate, the two weeks before vs the week after</Note>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 34 }}>
+        {rows.map((r) => (
+          <Panel key={r.brawlerId} column={false} gap={22} pad="12px 24px 12px 16px">
+            <Portrait src={faces.get(r.brawlerId) ?? null} size={118} radius={26} ring={up ? GREEN : RED} />
+            <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <div style={{ display: 'flex', fontSize: 50, color: FG, WebkitTextStroke: `2px ${OUTLINE}` }}>
+                {cap(r.name)}
+              </div>
+              <div style={{ display: 'flex', fontSize: 28, color: MUTED }}>{`${pct(r.before)} → ${pct(r.after)}`}</div>
+            </div>
+            <div style={{ display: 'flex', fontSize: 64, color: up ? GREEN : RED, WebkitTextStroke: `3px ${OUTLINE}` }}>
+              {`${r.delta >= 0 ? '+' : '−'}${Math.abs(r.delta).toFixed(1)}`}
+            </div>
+          </Panel>
+        ))}
+      </div>
+    </Stage>
+  );
+}
+
+export async function patchSlides(post: PatchPost, only?: number): Promise<ReactElement[]> {
+  const want = (i: number) => only === undefined || only === i;
+  const ids = [...new Set([...post.winners, ...post.losers].map((r) => r.brawlerId))];
+  const faces = new Map(await Promise.all(ids.map(async (id) => [id, await face(id, 300)] as const)));
+  const slides: ReactElement[] = [];
+  if (want(0)) slides[0] = patchCover(post, faces);
+  if (want(1)) slides[1] = patchRows(post.winners, true, faces);
+  if (want(2)) slides[2] = patchRows(post.losers, false, faces);
+  if (want(3)) {
+    slides[3] = <Outro logo={await loadLogo(240)} line="Every update, measured, on brawlzone.net/patches." />;
+  }
+  return slides;
+}
+
+export function patchCaption(post: PatchPost, site: string): { title: string; description: string } {
+  const up = post.winners.slice(0, 2).map((r) => cap(r.name));
+  const down = post.losers.slice(0, 2).map((r) => cap(r.name));
+  return {
+    title: 'Balance update: who really got stronger?',
+    description:
+      `A week after the update, measured in Ranked: ${up.join(' and ')} climbed` +
+      (down.length ? `, ${down.join(' and ')} dropped` : '') +
+      `. Win rates before vs after, from real battles. Full scoreboard at ${site}/patches ` +
+      '#brawlstars #brawlstarsupdate #brawlstarsbalance #brawlstarsmeta #brawlstarsranked',
   };
 }
