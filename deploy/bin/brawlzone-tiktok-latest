@@ -210,3 +210,98 @@ with open(state_path, "w") as f:
     json.dump(state, f, indent=2)
 PY
 fi
+
+# ------------------------------------------------- weekly report, #mod-updates
+#
+# Which post formats actually work, every Monday (2026-10-13): views, likes,
+# shares and comments per format for the last seven days, plus the best and the
+# weakest post, in the private #🔒-mod-updates. Formats are told apart by the
+# caption each one writes. Once per ISO week, recorded in the state file.
+# Never fatal.
+if [ -n "${DISCORD_TOKEN:-}" ] && [ -n "${DISCORD_GUILD:-}" ] && [ "$(date -u +%u)" = "1" ]; then
+  stats=$(curl -s --max-time 60 -X POST "$LIST_URL?fields=id,title,video_description,share_url,create_time,view_count,like_count,comment_count,share_count" \
+    -H "Authorization: Bearer ${ACCESS}" \
+    -H 'Content-Type: application/json; charset=UTF-8' \
+    --data-raw '{"max_count":20}')
+  DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" \
+  python3 - "$STATE" "$stats" <<'PY' || echo "discord: weekly report failed (not fatal)"
+import datetime, json, os, sys, time, urllib.request
+
+state_path, raw = sys.argv[1], sys.argv[2]
+state = json.load(open(state_path))
+week = datetime.date.today().isocalendar()
+week_key = f"{week[0]}-W{week[1]:02d}"
+if state.get("weekly_report") == week_key:
+    sys.exit(0)
+
+videos = json.loads(raw).get("data", {}).get("videos", [])
+since = time.time() - 7 * 86400
+recent = [v for v in videos if int(v.get("create_time") or 0) >= since]
+
+def fmt(v):
+    t = (v.get("title") or v.get("video_description") or "").lower()
+    if "how to beat" in t or "struggling against" in t: return "Counter of the day"
+    if "best team" in t or t.startswith("run "): return "Trio of the day"
+    if "build" in t: return "Build of the day"
+    if "best brawlers for" in t or "who to pick on" in t: return "Map of the day"
+    return "Other"
+
+groups = {}
+for v in recent:
+    groups.setdefault(fmt(v), []).append(v)
+
+def avg(vs, k):
+    return sum(int(v.get(k) or 0) for v in vs) / len(vs) if vs else 0
+
+lines = []
+for name, vs in sorted(groups.items(), key=lambda kv: -avg(kv[1], "view_count")):
+    lines.append(
+        f"**{name}** · {len(vs)} post{'s' if len(vs) != 1 else ''} · "
+        f"{avg(vs,'view_count'):,.0f} views · {avg(vs,'like_count'):,.0f} likes · "
+        f"{avg(vs,'share_count'):,.0f} shares · {avg(vs,'comment_count'):,.0f} comments (avg)"
+    )
+
+def title(v):
+    return (v.get("title") or v.get("video_description") or "").split(" #")[0][:80]
+
+fields = []
+if recent:
+    best = max(recent, key=lambda v: int(v.get("view_count") or 0))
+    worst = min(recent, key=lambda v: int(v.get("view_count") or 0))
+    fields.append({"name": "Most viewed", "value": f"{title(best)} · {int(best.get('view_count') or 0):,} views\n{best.get('share_url','').split('?')[0]}"})
+    if worst is not best:
+        fields.append({"name": "Least viewed", "value": f"{title(worst)} · {int(worst.get('view_count') or 0):,} views"})
+
+embed = {
+    "title": "📊 TikTok this week",
+    "description": "\n".join(lines) if lines else "No posts went up in the last 7 days.",
+    "color": 0xFFC93C,
+    "fields": fields,
+    "footer": {"text": f"Last 7 days · {len(recent)} posts · from TikTok's own counts"},
+}
+
+api = "https://discord.com/api/v10"
+headers = {
+    "Authorization": f"Bot {os.environ['DISCORD_TOKEN']}",
+    "Content-Type": "application/json",
+    "User-Agent": "BrawlZone (https://brawlzone.net, 1.0)",
+}
+def call(method, path, body=None):
+    req = urllib.request.Request(api + path, method=method, headers=headers,
+                                 data=None if body is None else json.dumps(body).encode())
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read() or b"{}")
+
+channels = call("GET", f"/guilds/{os.environ['DISCORD_GUILD']}/channels")
+mod = next((c["id"] for c in channels if c.get("name") == "🔒-mod-updates"), None)
+if mod is None:
+    print("discord: no #🔒-mod-updates; weekly report skipped")
+    sys.exit(0)
+call("POST", f"/channels/{mod}/messages", {"embeds": [embed], "allowed_mentions": {"parse": []}})
+state = json.load(open(state_path))
+state["weekly_report"] = week_key
+with open(state_path, "w") as f:
+    json.dump(state, f, indent=2)
+print(f"discord: weekly TikTok report posted for {week_key}")
+PY
+fi
