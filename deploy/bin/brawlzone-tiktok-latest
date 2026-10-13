@@ -61,12 +61,14 @@ saved=$?
 
 # ------------------------------------------------------------------ the post
 #
-# `max_count=1` because only the newest is wanted. The field list is explicit
-# and required: TikTok returns nothing useful without it.
+# The newest five: the first is the homepage card, and all five are checked
+# for Discord below, so two posts published inside one 2-hour gap both get
+# announced. The field list is explicit and required: TikTok returns nothing
+# useful without it.
 response=$(curl -s --max-time 60 -X POST "$LIST_URL?fields=id,title,video_description,share_url,cover_image_url,create_time" \
   -H "Authorization: Bearer ${ACCESS}" \
   -H 'Content-Type: application/json; charset=UTF-8' \
-  --data-raw '{"max_count":1}')
+  --data-raw '{"max_count":5}')
 
 ERR=$(printf '%s' "$response" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("error",{}).get("code",""))' 2>/dev/null)
 case "$ERR" in
@@ -134,3 +136,72 @@ docker compose exec -T db psql -U brawlzone -d brawlzone -v ON_ERROR_STOP=1 \
 rm -f /tmp/brawlzone-tiktok-latest.sql
 
 echo "latest post ${POST_ID} -> ${URL}"
+
+# ------------------------------------------------------------ Discord #clips
+#
+# Every newly published post, linked in the server's #🎬-clips (2026-10-13):
+# Discord unfurls a TikTok link into a playable card, so the post reaches the
+# server without anyone pasting it. Posts reach TikTok as drafts and go public
+# when the account holder publishes them, which is why this hangs off the job
+# that sees *published* posts rather than off the posting job.
+#
+# Announced ids are kept in the state file. The first run seeds that list with
+# everything already up and announces only the newest, and only if it went up
+# in the last day, so turning this on does not replay the back catalogue.
+# Never fatal: the homepage row above is this job's real work.
+DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
+DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
+if [ -n "${DISCORD_TOKEN:-}" ] && [ -n "${DISCORD_GUILD:-}" ]; then
+  DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" \
+  python3 - "$STATE" "$response" <<'PY' || echo "discord: announcement failed (not fatal)"
+import json, os, sys, time, urllib.request
+
+state_path, raw = sys.argv[1], sys.argv[2]
+videos = json.loads(raw).get("data", {}).get("videos", [])
+state = json.load(open(state_path))
+seen = state.get("discord_announced")
+first_run = seen is None
+seen = list(seen or [])
+
+api = "https://discord.com/api/v10"
+headers = {
+    "Authorization": f"Bot {os.environ['DISCORD_TOKEN']}",
+    "Content-Type": "application/json",
+    "User-Agent": "BrawlZone (https://brawlzone.net, 1.0)",
+}
+
+def call(method, path, body=None):
+    req = urllib.request.Request(api + path, method=method, headers=headers,
+                                 data=None if body is None else json.dumps(body).encode())
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read() or b"{}")
+
+fresh = [v for v in videos if str(v.get("id")) not in seen and v.get("share_url")]
+if first_run:
+    # Everything already up counts as announced; only a post from the last day
+    # is worth a message now.
+    newest = videos[0] if videos else None
+    seen = [str(v.get("id")) for v in videos]
+    fresh = [newest] if newest and time.time() - int(newest.get("create_time") or 0) < 86400 else []
+
+if fresh:
+    channels = call("GET", f"/guilds/{os.environ['DISCORD_GUILD']}/channels")
+    clips = next((c["id"] for c in channels if c.get("name") == "🎬-clips"), None)
+    if clips is None:
+        print("discord: no #🎬-clips channel; nothing announced")
+        fresh = []
+    # Oldest first, so the channel reads in the order they went up.
+    for v in sorted(fresh, key=lambda v: int(v.get("create_time") or 0)):
+        title = (v.get("title") or v.get("video_description") or "").strip()
+        title = title.split(" #")[0].split(" — ")[0][:150]
+        content = (f"**{title}**\n" if title else "") + f"New on our TikTok 👉 {v['share_url']}"
+        call("POST", f"/channels/{clips}/messages", {"content": content, "allowed_mentions": {"parse": []}})
+        seen.append(str(v.get("id")))
+        print(f"discord: announced {v.get('id')} in #🎬-clips")
+
+state = json.load(open(state_path))  # re-read: the token was written above
+state["discord_announced"] = seen[-50:]
+with open(state_path, "w") as f:
+    json.dump(state, f, indent=2)
+PY
+fi
