@@ -8,6 +8,7 @@ import {
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getEventRotation, getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
 import { comparePath } from '@/lib/compare';
+import { bracketBySlug } from '@/lib/rank-brackets';
 import { verifyDiscordRequest } from '@/lib/discord-verify';
 import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
 import { mains } from '@/lib/player-showcase';
@@ -23,6 +24,7 @@ import {
   getBrawlerStatsForWindow,
   getCounterScores,
   getRankedComps,
+  getRankedCounterScores,
   getRankedMapPicks,
   getSkillEdge,
   mapNameKey,
@@ -639,6 +641,95 @@ async function leaderboardCommand(token: string) {
   });
 }
 
+/* ----------------------------------------------------------------- /counter */
+
+/** Ranked games against the brawler before a counter is listed. */
+const COUNTER_MIN_GAMES = 150;
+const COUNTER_MIN_GAMES_AT_RANK = 60;
+
+/**
+ * Who beats a brawler in Ranked: the same numbers as /brawlers/<slug>/counters
+ * and the counter-of-the-day post -- Ranked matchups, each measured against
+ * what the two brawlers' own rates predict -- optionally at one rank.
+ */
+async function counterCommand(token: string, query: string, rankSlug: string | undefined) {
+  const all = [...(await getBrawlerArtMap().catch(() => new Map<number, BABrawler>())).values()];
+  const target =
+    all.find((b) => b.name.toLowerCase() === query.toLowerCase()) ??
+    all.find((b) => b.name.toLowerCase().includes(query.toLowerCase()));
+  if (!target) {
+    await respond(token, { content: `No brawler called “${query}”. Start typing and pick from the list.` });
+    return;
+  }
+  const bracket = bracketBySlug(rankSlug ?? null);
+  const scores = await getRankedCounterScores([target.id], 21, bracket?.id).catch(() => new Map());
+  const floor = bracket ? COUNTER_MIN_GAMES_AT_RANK : COUNTER_MIN_GAMES;
+  const nameOf = new Map(all.map((b) => [b.id, titleCase(b.name.toLowerCase())]));
+  const rows = [...scores.values()].filter((s) => s.brawlerId !== target.id && s.decidedSampleSize >= floor);
+  const counters = rows.filter((s) => s.edge >= 0.01 && s.winRate >= 0.5).sort((a, b) => b.edge - a.edge).slice(0, 5);
+  const avoid = rows.filter((s) => s.edge <= -0.01 && s.winRate < 0.5).sort((a, b) => a.edge - b.edge).slice(0, 3);
+  const name = titleCase(target.name.toLowerCase());
+  const href = `${SITE}/brawlers/${slugify(target.name)}/counters`;
+  const line = (s: { brawlerId: number; winRate: number; edge: number; decidedSampleSize: number }, i: number) =>
+    `**${i + 1}.** ${nameOf.get(s.brawlerId) ?? `#${s.brawlerId}`} · **${pct(s.winRate)}** (${signed(s.edge)} vs expected, ${formatNumber(s.decidedSampleSize)} games)`;
+  await respond(token, {
+    embeds: [
+      {
+        title: `How to beat ${name}${bracket ? ` · ${bracket.label}` : ''}`,
+        url: href,
+        color: BRAND,
+        ...(target.imageUrl ? { thumbnail: { url: target.imageUrl } } : {}),
+        description: `Ranked win rates against ${name} over the last 21 days${bracket ? `, ${bracket.label} lobbies only` : ', every rank'}.`,
+        fields: [
+          { name: 'Pick these', value: counters.length ? counters.map(line).join('\n') : 'Not enough Ranked games yet.' },
+          ...(avoid.length ? [{ name: `Don't pick into ${name}`, value: avoid.map(line).join('\n') }] : []),
+        ],
+        footer: { text: 'brawlzone.net · same numbers as the Bubble app' },
+      },
+    ],
+    components: buttons(['All counters by rank', href], ['Draft helper', `${SITE}/draft`]),
+  });
+}
+
+/* -------------------------------------------------------------------- /team */
+
+async function teamCommand(token: string, mapQuery: string, rankSlug: string | undefined) {
+  const maps = await rankedMaps();
+  const key = mapNameKey(mapQuery);
+  const map = maps.find((m) => mapNameKey(m.mapName) === key) ?? maps.find((m) => mapNameKey(m.mapName).includes(key));
+  if (!map) {
+    await respond(token, { content: `“${mapQuery}” is not in the current Ranked pool. Start typing and pick from the list.` });
+    return;
+  }
+  const bracket = bracketBySlug(rankSlug ?? null);
+  const comps = await getRankedComps(8, bracket?.id).catch(() => ({ maps: [], modes: [] }));
+  const own = comps.maps.find((m) => m.mode === map.mode && m.mapName === map.mapName)?.comps;
+  const list = (own ?? comps.modes.find((m) => m.mode === map.mode)?.comps ?? []).slice(0, 3);
+  const meta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
+  const nameOf = (id: number) => titleCase((meta.get(id)?.name ?? `#${id}`).toLowerCase());
+  const href = `${SITE}/maps/${slugify(humanizeMode(map.mode))}/${slugify(map.mapName)}`;
+  await respond(token, {
+    embeds: [
+      {
+        title: `Best teams · ${map.mapName}${bracket ? ` · ${bracket.label}` : ''}`,
+        url: href,
+        color: BRAND,
+        description: own
+          ? `The trios that win most together on ${map.mapName} in Ranked${bracket ? `, ${bracket.label} lobbies` : ''}.`
+          : `Not enough trios on ${map.mapName} yet, so these are the best in ${humanizeMode(map.mode)}.`,
+        fields: list.length
+          ? list.map((t, i) => ({
+              name: `${i + 1}. ${t.brawlerIds.map(nameOf).join(' · ')}`,
+              value: `**${pct(t.normalizedWinRate ?? t.winRate)}** adjusted win rate · ${t.battles} games`,
+            }))
+          : [{ name: 'No trios yet', value: 'Not enough Ranked games at this rank yet.' }],
+        footer: { text: 'brawlzone.net · same numbers as the Bubble app' },
+      },
+    ],
+    components: buttons(['Map page', href], ['Team comps in the Bubble', `${SITE}/bubble`]),
+  });
+}
+
 /* -------------------------------------------------------------------- /help */
 
 async function helpCommand(token: string) {
@@ -653,6 +744,8 @@ async function helpCommand(token: string) {
           '`/brawler name` — tier, win rate and the build owners run',
           '`/map name` — best picks and trios on a Ranked map',
           '`/draft map enemies…` — what to pick against them',
+          '`/counter brawler [rank]` — who beats a brawler, by rank',
+          '`/team map [rank]` — the best trios on a map, by rank',
           '`/meta [mode]` — the Ranked top 10 right now',
           '`/rotation` — maps live right now',
           '`/compare a b` — brawler vs brawler',
@@ -736,6 +829,8 @@ export async function POST(request: Request): Promise<Response> {
         else if (name === 'brawler' || name === 'tier') await brawlerCommand(token, opt(options, 'name') ?? opt(options, 'brawler') ?? '');
         else if (name === 'map') await mapCommand(token, opt(options, 'name') ?? '');
         else if (name === 'draft') await draftCommand(token, options);
+        else if (name === 'counter') await counterCommand(token, opt(options, 'brawler') ?? '', opt(options, 'rank'));
+        else if (name === 'team') await teamCommand(token, opt(options, 'map') ?? '', opt(options, 'rank'));
         else if (name === 'meta') await metaCommand(token, opt(options, 'mode'));
         else if (name === 'rotation') await rotationCommand(token);
         else if (name === 'compare') await compareCommand(token, opt(options, 'a') ?? '', opt(options, 'b') ?? '');

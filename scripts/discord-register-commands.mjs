@@ -35,6 +35,16 @@ const brawlerOpt = (name, description, required = true) => ({
 const mapOpt = (name = 'map') => ({
   name, type: STRING, required: true, description: 'A map in the current Ranked pool', autocomplete: true,
 });
+/** An optional rank bracket, for the commands that answer per rank. */
+const RANK_OPT = {
+  name: 'rank', type: STRING, required: false, description: 'Only lobbies at this rank',
+  choices: [
+    { name: 'Diamond and below', value: 'diamond' },
+    { name: 'Mythic', value: 'mythic' },
+    { name: 'Legendary', value: 'legendary' },
+    { name: 'Masters to Pro', value: 'masters' },
+  ],
+};
 const MODES = [
   ['Gem Grab', 'gemGrab'], ['Brawl Ball', 'brawlBall'], ['Knockout', 'knockout'],
   ['Heist', 'heist'], ['Hot Zone', 'hotZone'], ['Bounty', 'bounty'],
@@ -103,6 +113,18 @@ const COMMANDS = [
         choices: MODES.map(([name, value]) => ({ name, value })),
       },
     ],
+  },
+  {
+    name: 'counter',
+    type: 1,
+    description: 'Who beats a brawler in Ranked, and who not to pick into it',
+    options: [brawlerOpt('brawler', 'The brawler to beat'), RANK_OPT],
+  },
+  {
+    name: 'team',
+    type: 1,
+    description: 'The best Ranked trios on a map',
+    options: [mapOpt('map'), RANK_OPT],
   },
   { name: 'rotation', type: 1, description: 'Maps live right now and when they end' },
   {
