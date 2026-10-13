@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { INTL_LOCALES, languageAlternates } from '@/lib/i18n';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { bracketTierListHref } from '@/lib/tier-list-route';
 
@@ -88,6 +89,9 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
       break;
     case 'players':
       for (const tag of INDEXABLE_PLAYER_TAGS) add(`/player/${tag}`, 'daily', 0.5);
+      break;
+    case 'intl':
+      await intl(entries, dataDay);
       break;
   }
 
@@ -266,3 +270,39 @@ async function compare(add: Add) {
  * boards move. See scripts/gen-indexable-players.ts for why the set is baked
  * rather than queried, and why an empty one is the safe failure.
  */
+
+/**
+ * The Spanish and Portuguese pages (see `lib/i18n`), in a file of their own so
+ * Search Console reports them apart. Each entry carries its alternates, so
+ * the three languages of a page are tied together here as well as in the
+ * pages' own hreflang links. Same pages, and the same priorities, as their
+ * English originals in `core`.
+ */
+async function intl(entries: MetadataRoute.Sitemap, dataDay: Date | null) {
+  const pages: [string, number][] = [
+    ['/tier-list/ranked', 0.85],
+    ...RANK_BRACKETS.map((b) => [bracketTierListHref(b), 0.75] as [string, number]),
+    ['/tier-list/trophy', 0.85],
+  ];
+  for (const format of ['ranked', 'trophy'] as const) {
+    const modes = await getFilterableModes(30, 150, format).catch(() => []);
+    for (const mode of modes) pages.push([`/tier-list/${format}/${slugify(mode.mode)}`, 0.7]);
+  }
+  const catalog = await getBrawlerCatalog().catch(() => null);
+  for (const brawler of catalog?.current ?? []) pages.push([`/brawlers/${slugify(brawler.name)}/counters`, 0.65]);
+
+  for (const [path, priority] of pages) {
+    const languages = Object.fromEntries(
+      Object.entries(languageAlternates(path)).map(([lang, p]) => [lang, `${SITE_URL}${p}`]),
+    );
+    for (const locale of INTL_LOCALES) {
+      entries.push({
+        url: `${SITE_URL}/${locale}${path}`,
+        changeFrequency: 'daily',
+        priority,
+        alternates: { languages },
+        ...(dataDay ? { lastModified: dataDay } : {}),
+      });
+    }
+  }
+}

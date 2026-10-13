@@ -3,6 +3,8 @@ import 'server-only';
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 
+import { languageAlternates, localePath, monthYear, rankLabel, type Locale } from '@/lib/i18n';
+import { gameWords } from '@/lib/i18n-game';
 import { bracketBySlug, type RankBracket } from '@/lib/rank-brackets';
 import { currentMonth } from '@/lib/site';
 import { humanizeMode } from '@/lib/format';
@@ -70,6 +72,7 @@ export interface TierRoute {
 export function resolveTierRoute(
   format: TierFormat,
   segments: (string | undefined)[],
+  locale: Locale = 'en',
 ): TierRoute {
   const [first, second] = segments.filter((s): s is string => Boolean(s));
 
@@ -78,14 +81,14 @@ export function resolveTierRoute(
   // One segment: a window on its own, or a mode at the default window.
   if (!second) {
     if (!isTierWindow(first)) return { windowKey: DEFAULT_TIER_WINDOW, modeSlug: first };
-    if (first === DEFAULT_TIER_WINDOW) permanentRedirect(tierListHref(format, first));
+    if (first === DEFAULT_TIER_WINDOW) permanentRedirect(localePath(locale, tierListHref(format, first)));
     return { windowKey: first };
   }
 
   // Two segments: mode then window, in that order and no other.
   if (isTierWindow(first) || !isTierWindow(second)) notFound();
   if (second === DEFAULT_TIER_WINDOW) {
-    permanentRedirect(tierListHref(format, second, first));
+    permanentRedirect(localePath(locale, tierListHref(format, second, first)));
   }
   return { windowKey: second, modeSlug: first };
 }
@@ -120,20 +123,104 @@ const COPY: Record<
  * would put a dozen near-empty pages in front of the full ones they duplicate.
  * `follow` keeps the links out of them working normally.
  */
+/** Canonical in the page's language, plus the page in the other two. */
+function alternatesFor(path: string, locale: Locale): Metadata['alternates'] {
+  return { canonical: localePath(locale, path), languages: languageAlternates(path) };
+}
+
+/**
+ * The translations' titles. Written for what people type in each language:
+ * "tier list brawl stars", "mejores brawlers para atrapagemas", "melhores
+ * brawlers pique-gema" -- the game's own mode name, the month, the list.
+ */
+const INTL: Record<
+  Exclude<Locale, 'en'>,
+  {
+    where: Record<TierFormat, string>;
+    index: (where: string, month: string) => [string, string];
+    mode: (mode: string, where: string, month: string) => [string, string];
+    rank: (rank: string, month: string) => [string, string];
+    rankMode: (mode: string, rank: string, month: string) => [string, string];
+    last24: string;
+  }
+> = {
+  es: {
+    where: { ranked: 'Competitivo', trophy: 'trofeos' },
+    index: (where, month) => [
+      `Tier list de Brawl Stars en ${where} (${month}): los mejores brawlers`,
+      `Los mejores brawlers de Brawl Stars en ${where}, ${month}. Hecha con las tasas de victoria y de uso de partidas reales, y actualizada cada pocas horas.`,
+    ],
+    mode: (mode, where, month) => [
+      `Mejores brawlers para ${mode} en Brawl Stars (${month}): tier list de ${where}`,
+      `Los brawlers que más ganan en ${mode} ahora mismo, ordenados con partidas reales de ${where} y actualizados cada pocas horas. Mira los mejores antes de tu próxima partida de ${mode}.`,
+    ],
+    rank: (rank, month) => [
+      `Tier list de Brawl Stars en ${rank} (${month}): los mejores brawlers de tu rango`,
+      `Los mejores brawlers de Brawl Stars en ${rank}, ${month}. Hecha solo con partidas de Competitivo jugadas en ${rank}, porque el meta de tu rango no es el de arriba.`,
+    ],
+    rankMode: (mode, rank, month) => [
+      `Mejores brawlers para ${mode} en ${rank} (${month}): tier list de Brawl Stars`,
+      `Los brawlers que más ganan en ${mode} en ${rank}, con partidas reales de Competitivo de ese rango, actualizados cada pocas horas.`,
+    ],
+    last24: ', últimas 24 horas',
+  },
+  pt: {
+    where: { ranked: 'Ranqueado', trophy: 'troféus' },
+    index: (where, month) => [
+      `Tier list do Brawl Stars ${where === 'Ranqueado' ? 'no Ranqueado' : 'nos troféus'} (${month}): os melhores brawlers`,
+      `Os melhores brawlers do Brawl Stars ${where === 'Ranqueado' ? 'no Ranqueado' : 'nos troféus'}, ${month}. Feita com as taxas de vitória e de escolha de partidas reais e atualizada a cada poucas horas.`,
+    ],
+    mode: (mode, where, month) => [
+      `Melhores brawlers para ${mode} no Brawl Stars (${month}): tier list ${where === 'Ranqueado' ? 'do Ranqueado' : 'de troféus'}`,
+      `Os brawlers que mais ganham em ${mode} agora, ordenados por partidas reais ${where === 'Ranqueado' ? 'do Ranqueado' : 'de troféus'} e atualizados a cada poucas horas. Veja os melhores antes da sua próxima partida de ${mode}.`,
+    ],
+    rank: (rank, month) => [
+      `Tier list do Brawl Stars no ${rank} (${month}): os melhores brawlers do seu rank`,
+      `Os melhores brawlers do Brawl Stars no ${rank}, ${month}. Feita só com partidas ranqueadas jogadas no ${rank}, porque o meta do seu rank não é o do topo.`,
+    ],
+    rankMode: (mode, rank, month) => [
+      `Melhores brawlers para ${mode} no ${rank} (${month}): tier list do Brawl Stars`,
+      `Os brawlers que mais ganham em ${mode} no ${rank}, com partidas ranqueadas reais desse rank, atualizados a cada poucas horas.`,
+    ],
+    last24: ', últimas 24 horas',
+  },
+};
+
 export async function tierListMetadata(
   format: TierFormat,
   { windowKey, modeSlug }: TierRoute,
+  locale: Locale = 'en',
 ): Promise<Metadata> {
   const copy = COPY[format];
   const isDefaultWindow = windowKey === DEFAULT_TIER_WINDOW;
   const windowSuffix = isDefaultWindow ? '' : `, last ${TIER_WINDOWS[windowKey].sublabel}`;
   const robots = isDefaultWindow ? undefined : { index: false, follow: true };
 
+  if (locale !== 'en') {
+    const t = INTL[locale];
+    const month = monthYear(locale);
+    const suffix = isDefaultWindow ? '' : t.last24;
+    let resolved: string | undefined;
+    if (modeSlug) {
+      const modes = await getFilterableModes(30, 150, format).catch(() => []);
+      resolved = findBySlug(modes, modeSlug, (m) => m.mode)?.mode ?? modeSlug;
+    }
+    const [title, description] = resolved
+      ? t.mode((await gameWords(locale)).mode(resolved), t.where[format], month)
+      : t.index(t.where[format], month);
+    return {
+      title: `${title}${suffix}`,
+      description,
+      alternates: alternatesFor(tierListHref(format, windowKey, resolved), locale),
+      robots,
+    };
+  }
+
   if (!modeSlug) {
     return {
       title: `Brawl Stars ${copy.noun} (${currentMonth()})${windowSuffix}`,
       description: copy.description.replace('MONTH', currentMonth()),
-      alternates: { canonical: tierListHref(format, windowKey) },
+      alternates: alternatesFor(tierListHref(format, windowKey), locale),
       robots,
     };
   }
@@ -157,7 +244,7 @@ export async function tierListMetadata(
     description: `The brawlers winning most in ${label} right now, ranked from real ${
       format === 'ranked' ? 'competitive Ranked' : 'trophy-ladder'
     } battles and refreshed every few hours. See the top picks before your next ${label} game.`,
-    alternates: { canonical: tierListHref(format, windowKey, resolved) },
+    alternates: alternatesFor(tierListHref(format, windowKey, resolved), locale),
     robots,
   };
 }
@@ -191,14 +278,29 @@ export function resolveBracket(slug: string): RankBracket {
 export async function bracketTierListMetadata(
   bracket: RankBracket,
   modeSlug?: string,
+  locale: Locale = 'en',
 ): Promise<Metadata> {
+  if (locale !== 'en') {
+    const t = INTL[locale];
+    const month = monthYear(locale);
+    const rank = rankLabel(bracket, locale);
+    let resolved: string | undefined;
+    if (modeSlug) {
+      const modes = await getFilterableModes(30, 150, 'ranked').catch(() => []);
+      resolved = findBySlug(modes, modeSlug, (m) => m.mode)?.mode ?? modeSlug;
+    }
+    const [title, description] = resolved
+      ? t.rankMode((await gameWords(locale)).mode(resolved), rank, month)
+      : t.rank(rank, month);
+    return { title, description, alternates: alternatesFor(bracketTierListHref(bracket, resolved), locale) };
+  }
   const month = currentMonth();
   if (!modeSlug) {
     return {
       // What people type: "brawl stars mythic tier list".
       title: `Brawl Stars ${bracket.label} tier list (${month}): best brawlers at your rank`,
       description: `The best Brawl Stars brawlers in ${bracket.label} Ranked, ${month}. Built only from battles played in ${bracket.label} lobbies, because the meta at your rank is not the meta at the top.`,
-      alternates: { canonical: bracketTierListHref(bracket) },
+      alternates: alternatesFor(bracketTierListHref(bracket), locale),
     };
   }
   const modes = await getFilterableModes(30, 150, 'ranked').catch(() => []);
@@ -207,6 +309,6 @@ export async function bracketTierListMetadata(
   return {
     title: `Best ${label} brawlers in ${bracket.label} Ranked (${month}): Brawl Stars tier list`,
     description: `The brawlers winning most in ${label} at ${bracket.label} rank, from real Ranked battles in ${bracket.label} lobbies, refreshed every few hours.`,
-    alternates: { canonical: bracketTierListHref(bracket, resolved) },
+    alternates: alternatesFor(bracketTierListHref(bracket, resolved), locale),
   };
 }

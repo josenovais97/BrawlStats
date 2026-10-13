@@ -4,6 +4,7 @@ import { NavLink } from '@/components/tier-list/tier-nav';
 
 import { rankedLeagueIconUrl } from '@/lib/brawlapi';
 import { humanizeMode } from '@/lib/format';
+import { fmtNumber, localePath, rankLabel, type Locale } from '@/lib/i18n';
 import { RANK_BRACKETS, type RankBracket } from '@/lib/rank-brackets';
 import { bracketTierListHref, tierListHref } from '@/lib/tier-list-route';
 import { TIER_WINDOWS, type TierFormat, type TierWindowKey } from '@/lib/stats';
@@ -23,13 +24,65 @@ export { tierListHref };
 
 const FORMATS: {
   key: TierFormat;
-  label: string;
-  sublabel: string;
   icon: (props: { className?: string }) => React.ReactNode;
 }[] = [
-  { key: 'ranked', label: 'Ranked', sublabel: 'Competitive', icon: RankedIcon },
-  { key: 'trophy', label: 'Trophy', sublabel: 'Ladder', icon: TrophyIcon },
+  { key: 'ranked', icon: RankedIcon },
+  { key: 'trophy', icon: TrophyIcon },
 ];
+
+/** The controls' words. Ranked is the game's own name for it in each language. */
+const WORDS: Record<
+  Locale,
+  {
+    format: Record<TierFormat, { label: string; sublabel: string }>;
+    window: Record<TierWindowKey, string>;
+    formatGroup: string;
+    windowGroup: string;
+    yourRank: string;
+    allRanks: string;
+    lobbies: (rank: string) => string;
+    allModes: string;
+    modeGroup: string;
+    sampled: (n: string) => string;
+  }
+> = {
+  en: {
+    format: { ranked: { label: 'Ranked', sublabel: 'Competitive' }, trophy: { label: 'Trophy', sublabel: 'Ladder' } },
+    window: { '24h': TIER_WINDOWS['24h'].label, '7d': TIER_WINDOWS['7d'].label },
+    formatGroup: 'Tier list format',
+    windowGroup: 'Tier list window',
+    yourRank: 'Your rank',
+    allRanks: 'All ranks',
+    lobbies: (rank) => `${rank} Ranked lobbies`,
+    allModes: 'All modes',
+    modeGroup: 'Game mode',
+    sampled: (n) => `${n} sampled battles`,
+  },
+  es: {
+    format: { ranked: { label: 'Competitivo', sublabel: 'Ranked' }, trophy: { label: 'Trofeos', sublabel: 'Escalera' } },
+    window: { '24h': 'Meta', '7d': 'Reciente' },
+    formatGroup: 'Tipo de tier list',
+    windowGroup: 'Periodo',
+    yourRank: 'Tu rango',
+    allRanks: 'Todos',
+    lobbies: (rank) => `Partidas de Competitivo en ${rank}`,
+    allModes: 'Todos los modos',
+    modeGroup: 'Modo de juego',
+    sampled: (n) => `${n} partidas recogidas`,
+  },
+  pt: {
+    format: { ranked: { label: 'Ranqueado', sublabel: 'Competitivo' }, trophy: { label: 'Troféus', sublabel: 'Escada' } },
+    window: { '24h': 'Meta', '7d': 'Recente' },
+    formatGroup: 'Tipo de tier list',
+    windowGroup: 'Período',
+    yourRank: 'Seu rank',
+    allRanks: 'Todos',
+    lobbies: (rank) => `Partidas ranqueadas no ${rank}`,
+    allModes: 'Todos os modos',
+    modeGroup: 'Modo de jogo',
+    sampled: (n) => `${n} partidas coletadas`,
+  },
+};
 
 export function TierListControls({
   format,
@@ -37,15 +90,20 @@ export function TierListControls({
   mode,
   modes,
   modeIcons,
+  modeNames,
   bracket,
+  locale = 'en',
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
   mode?: string;
   modes: { mode: string; battles: number }[];
   modeIcons?: Record<string, string>;
+  /** Each mode as the reader's game names it. English when absent. */
+  modeNames?: Record<string, string>;
   /** The Ranked bracket being shown, if any. Ranked only. */
   bracket?: RankBracket | null;
+  locale?: Locale;
 }) {
   return (
     <div className="space-y-3">
@@ -54,18 +112,20 @@ export function TierListControls({
           wrap onto separate lines rather than shrinking, because a segmented
           control that has to scroll is worse than one that wraps. */}
       <div className="flex flex-wrap items-center gap-2">
-        <FormatTabs format={format} windowKey={windowKey} />
+        <FormatTabs format={format} windowKey={windowKey} locale={locale} />
         {/* A bracket page has one window (see bracketTierListHref). */}
-        {bracket ? null : <WindowTabs format={format} windowKey={windowKey} mode={mode} />}
+        {bracket ? null : <WindowTabs format={format} windowKey={windowKey} mode={mode} locale={locale} />}
       </div>
-      {format === 'ranked' ? <BracketTabs bracket={bracket ?? null} mode={mode} /> : null}
+      {format === 'ranked' ? <BracketTabs bracket={bracket ?? null} mode={mode} locale={locale} /> : null}
       <ModeFilter
         format={format}
         windowKey={windowKey}
         mode={mode}
         modes={modes}
         modeIcons={modeIcons}
+        modeNames={modeNames}
         bracket={bracket ?? null}
+        locale={locale}
       />
     </div>
   );
@@ -80,19 +140,21 @@ export function TierListControls({
  * mode that has no competitive data at all, and the page would open empty for
  * no reason the reader can see.
  */
-function FormatTabs({ format, windowKey }: { format: TierFormat; windowKey: TierWindowKey }) {
+function FormatTabs({ format, windowKey, locale }: { format: TierFormat; windowKey: TierWindowKey; locale: Locale }) {
+  const w = WORDS[locale];
   return (
     <div
       role="group"
-      aria-label="Tier list format"
+      aria-label={w.formatGroup}
       className="inline-flex gap-1 rounded-2xl border border-border bg-surface-2/70 p-1"
     >
-      {FORMATS.map(({ key, label, sublabel, icon: Icon }) => {
+      {FORMATS.map(({ key, icon: Icon }) => {
         const current = key === format;
+        const { label, sublabel } = w.format[key];
         return (
           <NavLink
             key={key}
-            href={tierListHref(key, windowKey)}
+            href={localePath(locale, tierListHref(key, windowKey))}
             aria-current={current ? 'page' : undefined}
             className={`flex items-center gap-2.5 rounded-xl px-4 py-2.5 transition-colors ${
               current
@@ -127,24 +189,28 @@ function WindowTabs({
   format,
   windowKey,
   mode,
+  locale,
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
   mode?: string;
+  locale: Locale;
 }) {
+  const w = WORDS[locale];
   return (
     <div
       role="group"
-      aria-label="Tier list window"
+      aria-label={w.windowGroup}
       className="inline-flex rounded-xl border border-border bg-surface-2/70 p-1"
     >
       {(Object.keys(TIER_WINDOWS) as TierWindowKey[]).map((key) => {
-        const { label, sublabel } = TIER_WINDOWS[key];
+        const { sublabel } = TIER_WINDOWS[key];
+        const label = w.window[key];
         const current = key === windowKey;
         return (
           <NavLink
             key={key}
-            href={tierListHref(format, key, mode)}
+            href={localePath(locale, tierListHref(format, key, mode))}
             aria-current={current ? 'page' : undefined}
             className={`flex items-baseline gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
               current ? 'bg-surface-3 text-foreground' : 'text-muted hover:text-foreground'
@@ -168,22 +234,23 @@ function WindowTabs({
  * Grab at every rank are the same question asked of a different crowd. Each
  * chip wears the league badge the game shows, which is read before the word.
  */
-function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: string }) {
+function BracketTabs({ bracket, mode, locale }: { bracket: RankBracket | null; mode?: string; locale: Locale }) {
+  const w = WORDS[locale];
   const chip =
     'inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-bold transition-colors';
   const on = 'border-brand bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]';
   const off = 'border-border bg-surface-2/70 text-muted hover:text-foreground';
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-      <div role="group" aria-label="Rank" className="flex w-max items-center gap-2">
-        <span className="eyebrow pe-1 text-muted">Your rank</span>
+      <div role="group" aria-label={w.yourRank} className="flex w-max items-center gap-2">
+        <span className="eyebrow pe-1 text-muted">{w.yourRank}</span>
         <NavLink
           keepMap
-          href={bracketTierListHref(null, mode)}
+          href={localePath(locale, bracketTierListHref(null, mode))}
           aria-current={bracket ? undefined : 'page'}
           className={`${chip} ${bracket ? off : on}`}
         >
-          All ranks
+          {w.allRanks}
         </NavLink>
         {RANK_BRACKETS.map((b) => {
           const current = b.id === bracket?.id;
@@ -192,9 +259,9 @@ function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: st
             <NavLink
               key={b.slug}
               keepMap
-              href={bracketTierListHref(b, mode)}
+              href={localePath(locale, bracketTierListHref(b, mode))}
               aria-current={current ? 'page' : undefined}
-              title={`${b.label} Ranked lobbies`}
+              title={w.lobbies(rankLabel(b, locale))}
               className={`${chip} ${current ? on : off}`}
             >
               {icon ? (
@@ -207,7 +274,7 @@ function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: st
                   unoptimized
                 />
               ) : null}
-              {b.label}
+              {rankLabel(b, locale)}
             </NavLink>
           );
         })}
@@ -227,7 +294,9 @@ function ModeFilter({
   mode,
   modes,
   modeIcons,
+  modeNames,
   bracket,
+  locale,
 }: {
   format: TierFormat;
   windowKey: TierWindowKey;
@@ -235,12 +304,15 @@ function ModeFilter({
   modes: { mode: string; battles: number }[];
   /** The game's own mode badge per mode key, read faster than the word. */
   modeIcons?: Record<string, string>;
+  modeNames?: Record<string, string>;
   /** Mode chips stay inside the bracket being viewed. */
   bracket: RankBracket | null;
+  locale: Locale;
 }) {
   if (modes.length === 0) return null;
+  const w = WORDS[locale];
   const href = (m?: string) =>
-    bracket ? bracketTierListHref(bracket, m) : tierListHref(format, windowKey, m);
+    localePath(locale, bracket ? bracketTierListHref(bracket, m) : tierListHref(format, windowKey, m));
 
   const chip = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors';
   const on = 'border-brand/40 bg-brand/10 text-brand';
@@ -248,13 +320,13 @@ function ModeFilter({
 
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-      <div role="group" aria-label="Game mode" className="flex w-max gap-2">
+      <div role="group" aria-label={w.modeGroup} className="flex w-max gap-2">
         <NavLink
           href={href()}
           aria-current={mode ? undefined : 'page'}
           className={`${chip} ${mode ? off : on}`}
         >
-          All modes
+          {w.allModes}
         </NavLink>
 
         {modes.map((entry) => {
@@ -264,7 +336,7 @@ function ModeFilter({
               key={entry.mode}
               href={href(entry.mode)}
               aria-current={current ? 'page' : undefined}
-              title={`${entry.battles.toLocaleString()} sampled battles`}
+              title={w.sampled(locale === 'en' ? entry.battles.toLocaleString() : fmtNumber(entry.battles, locale))}
               className={`${chip} ${current ? on : off}`}
             >
               {modeIcons?.[entry.mode] ? (
@@ -277,7 +349,7 @@ function ModeFilter({
                   unoptimized
                 />
               ) : null}
-              {humanizeMode(entry.mode)}
+              {modeNames?.[entry.mode] ?? humanizeMode(entry.mode)}
             </NavLink>
           );
         })}

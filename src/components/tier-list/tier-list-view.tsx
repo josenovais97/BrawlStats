@@ -28,15 +28,18 @@ import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { PendingArea, TierNav } from '@/components/tier-list/tier-nav';
 import type { RankBracket } from '@/lib/rank-brackets';
 import { TierPodium } from '@/components/tier-list/tier-podium';
+import { TIER_COPY, type TierCopy } from '@/components/tier-list/tier-list-copy';
+import { LanguageLinks } from '@/components/i18n/language-links';
+import { fmtDate, fmtDecimal, fmtNumber, fmtPercent, localePath, rankLabel, spanText, type Locale } from '@/lib/i18n';
+import { gameWords } from '@/lib/i18n-game';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
 import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
 import { isFramedTile } from '@/lib/brawlapi';
 import { brawlerPath } from '@/lib/slugs';
+import { bracketTierListHref, tierListHref } from '@/lib/tier-list-route';
 
 import {
   formatDate,
-  formatNumber,
-  formatPercent,
   humanizeMode,
   relativeTime,
   titleCaseLabel,
@@ -84,61 +87,26 @@ const MOST_PICKED_LIMIT = 10;
  */
 const UNDERRATED_LIMIT = 6;
 
-/**
- * Everything that differs between the two lists, in one place.
- *
- * They are the same page over different battles, and the only thing that must
- * never be shared is the prose: a reader who cannot tell which population they
- * are looking at will read a ladder ranking as a competitive one.
- */
-const COPY: Record<
-  TierFormat,
-  {
-    eyebrow: string;
-    icon: (props: { className?: string }) => React.ReactNode;
-    heading: string;
-    /** Names the battles counted, mid-sentence. */
-    battles: string;
-    intro: string;
-    /** Why this list is worth reading on its own. */
-    caveat: string;
-    unratedHeading: string;
-    unratedBody: string;
-  }
-> = {
-  ranked: {
-    eyebrow: 'Competitive only',
-    icon: RankedIcon,
-    heading: 'Ranked tier list',
-    battles: 'Ranked battles',
-    intro:
-      'How brawlers perform in competitive Ranked, where matchmaking pairs comparable opponents. So what is left reflects the brawler rather than who was holding it.',
-    caveat:
-      'Ranked is 3v3 modes only and a small slice of what gets sampled, so the list is shorter and moves faster than the ladder one.',
-    unratedHeading: 'Not enough Ranked data',
-    unratedBody:
-      'Competitive Ranked is a small slice of what gets sampled, so plenty of brawlers that see regular ladder play still have too few Ranked battles to rank.',
-  },
-  trophy: {
-    eyebrow: 'Trophy ladder',
-    icon: TrophyIcon,
-    heading: 'Trophy tier list',
-    battles: 'trophy-ladder battles',
-    intro:
-      'How brawlers perform on the trophy ladder. The games most people actually play, showdown included, where you pick what you own rather than what the draft leaves you.',
-    caveat:
-      'Ladder matchmaking is looser than Ranked, so some of a brawler’s record here is the lobby rather than the brawler. Each mode is scored against its own average to keep that from deciding the list.',
-    unratedHeading: 'Not enough ladder data',
-    unratedBody:
-      'Newly released brawlers, and anything barely played on ladder, need more battles before a win rate means anything.',
-  },
+/** The list's badge in the eyebrow. Its words are in `tier-list-copy`. */
+const ICON: Record<TierFormat, (props: { className?: string }) => React.ReactNode> = {
+  ranked: RankedIcon,
+  trophy: TrophyIcon,
 };
+
+/** The window in words: the English tabs' "7d", or "7 días" in a sentence. */
+function windowText(windowKey: TierWindowKey, locale: Locale): string {
+  const { days, sublabel } = TIER_WINDOWS[windowKey];
+  if (locale === 'en') return sublabel;
+  if (days === 1) return '24 horas';
+  return locale === 'es' ? `${days} días` : `${days} dias`;
+}
 
 export async function TierListView({
   format,
   windowKey,
   modeSlug,
   bracket,
+  locale = 'en',
 }: {
   format: TierFormat;
   /**
@@ -156,9 +124,17 @@ export async function TierListView({
   modeSlug?: string;
   /** A Ranked bracket, from the `/tier-list/ranked/rank/<bracket>` routes. */
   bracket?: RankBracket;
+  /** The page's language. The `/es` and `/pt` routes set it; see `lib/i18n`. */
+  locale?: Locale;
 }) {
   const { days } = TIER_WINDOWS[windowKey];
-  const copy = COPY[format];
+  const t = TIER_COPY[locale];
+  const copy = t.format[format];
+  const words = await gameWords(locale);
+  const pct = (v: number | null | undefined) => fmtPercent(v, locale);
+  const num = (v: number | null | undefined) => fmtNumber(v, locale);
+  const href = (path: string) => localePath(locale, path);
+  const win = windowText(windowKey, locale);
 
   const modes = await getFilterableModes(30, 150, format);
   // Only honour a mode we actually have data for, so a stale link cannot
@@ -204,7 +180,7 @@ export async function TierListView({
     .filter((map) => map.mode === mode)
     .sort((a, b) => a.mapName.localeCompare(b.mapName))
     .map((map) => ({
-      mapName: map.mapName,
+      mapName: locale === 'en' ? map.mapName : words.map(map.mapName),
       // `/maps/<mode>/<map>` uses the same slugs the catalogue does.
       slug: `${slugify(map.mode)}/${slugify(map.mapName)}`,
       picks: map.picks.map((pick) => ({
@@ -217,7 +193,7 @@ export async function TierListView({
         battles: pick.decidedSampleSize,
         allBattles: pick.allRanksSampleSize,
       })),
-      rankLabel: bracket?.label,
+      rankLabel: bracket ? rankLabel(bracket, locale) : undefined,
     }));
 
   /*
@@ -232,7 +208,12 @@ export async function TierListView({
   // every rank's.
   const changes =
     mode || bracket ? new Map<number, BrawlerChange>() : buildChangeIndex(movers);
-  const changeSpan = movers.length > 0 ? spanLabel(movers[0].fromDate, movers[0].toDate) : '';
+  const changeSpan =
+    movers.length > 0
+      ? locale === 'en'
+        ? spanLabel(movers[0].fromDate, movers[0].toDate)
+        : spanText(movers[0].fromDate, movers[0].toDate, locale)
+      : '';
 
   // `scoreBrawlers` leaves `tier` null below the sample floor, which is what
   // splits the page: rated brawlers get a row, the rest get the progress list.
@@ -257,14 +238,14 @@ export async function TierListView({
   const unrated = entries.filter((e) => !ratedIds.has(e.brawlerId));
   const sampled = entries.reduce((sum, e) => sum + e.sampleSize, 0);
 
-  const Icon = copy.icon;
-  const scopeLabel = mode
-    ? `${humanizeMode(mode)} over the ${TIER_WINDOWS[windowKey].sublabel} window`
-    : `${TIER_WINDOWS[windowKey].sublabel} window`;
+  const Icon = ICON[format];
+  /** The mode as the reader's game names it. */
+  const modeName = mode ? words.mode(mode) : undefined;
+  const rankName = bracket ? rankLabel(bracket, locale) : undefined;
+  const scopeLabel = t.scopeLabel(win, modeName);
   // A mode page is about that mode, so it says so in the heading rather than
   // carrying the generic title with a filter chip lit up below it.
-  const baseHeading = mode ? `${humanizeMode(mode)} ${copy.heading.toLowerCase()}` : copy.heading;
-  const heading = bracket ? `${bracket.label} ${baseHeading.charAt(0).toLowerCase()}${baseHeading.slice(1)}` : baseHeading;
+  const heading = t.heading(format, modeName, rankName);
 
   /*
    * Answers to what people actually type, in the words they type them.
@@ -285,27 +266,30 @@ export async function TierListView({
       .map((m) => [m.mode, modeMeta.get(m.mode.toLowerCase())?.imageUrl] as const)
       .filter((pair): pair is readonly [string, string] => Boolean(pair[1])),
   );
+  const modeNames: Record<string, string> = Object.fromEntries(modes.map((m) => [m.mode, words.mode(m.mode)]));
   const best = rated.slice().sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
-  const scopeName = mode ? `${humanizeMode(mode)} in ${copy.eyebrow.toLowerCase()}` : copy.battles;
+  const scopeName = t.scopeName(format, modeName);
+  const name = (i: number) => titleCaseLabel(best[i].brawlerName);
 
   const faq = [
     {
-      question: mode
-        ? `What is the best brawler for ${humanizeMode(mode)} in Brawl Stars?`
-        : `What is the best brawler in Brawl Stars ${format === 'ranked' ? 'Ranked' : 'on the trophy ladder'}?`,
+      question: t.faq.bestQ(format, modeName),
       answer:
         best.length > 0
-          ? `${titleCaseLabel(best[0].brawlerName)} ranks highest${mode ? ` in ${humanizeMode(mode)}` : ''}, with an adjusted win rate of ${formatPercent(best[0].normalizedWinRate)} across ${formatNumber(best[0].decidedSampleSize)} decided ${copy.battles} over the last ${TIER_WINDOWS[windowKey].sublabel}.${best.length > 2 ? ` ${titleCaseLabel(best[1].brawlerName)} and ${titleCaseLabel(best[2].brawlerName)} follow.` : ''}`
-          : `Not enough ${copy.battles} have been sampled${mode ? ` in ${humanizeMode(mode)}` : ''} over the last ${TIER_WINDOWS[windowKey].sublabel} to rank brawlers yet. A brawler needs ${MIN_SAMPLE_FOR_TIER} decided battles before it is placed.`,
+          ? t.faq.bestA({
+              first: name(0),
+              second: best.length > 2 ? name(1) : undefined,
+              third: best.length > 2 ? name(2) : undefined,
+              rate: pct(best[0].normalizedWinRate),
+              games: num(best[0].decidedSampleSize),
+              battles: copy.battles,
+              window: win,
+              mode: modeName,
+            })
+          : t.faq.noneA({ battles: copy.battles, mode: modeName, window: win, floor: MIN_SAMPLE_FOR_TIER }),
     },
-    {
-      question: 'How is this tier list made?',
-      answer: `From ${formatNumber(sampled)} ${scopeName} sampled from real matches, not from votes or opinion. Win rate is adjusted against the average of the same sample, because the sampled pool wins more than half its games regardless of brawler — so a tier reflects the brawler rather than who was holding it. A brawler needs ${MIN_SAMPLE_FOR_TIER} decided battles in the window before it is rated at all.`,
-    },
-    {
-      question: 'How often is the tier list updated?',
-      answer: `The sampler collects new battles every few hours and this page is rebuilt from the latest aggregate, so it never trails the data by more than a few hours.`,
-    },
+    { question: t.faq.howQ, answer: t.faq.howA({ sampled: num(sampled), scope: scopeName, floor: MIN_SAMPLE_FOR_TIER }) },
+    { question: t.faq.oftenQ, answer: t.faq.oftenA },
   ];
 
   return (
@@ -315,7 +299,7 @@ export async function TierListView({
         <JsonLd
           data={itemListSchema(
             heading,
-            `Brawl Stars brawlers ranked by meta score${mode ? ` in ${humanizeMode(mode)}` : ''}.`,
+            t.itemList(modeName),
             rated
               .slice()
               .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
@@ -331,13 +315,13 @@ export async function TierListView({
           it in a result rather than a bare URL. */}
       <JsonLd
         data={breadcrumbSchema([
-          { name: 'Tier list', path: '/tier-list' },
-          { name: copy.heading, path: `/tier-list/${format}` },
+          { name: t.breadcrumbRoot, path: locale === 'en' ? '/tier-list' : href(`/tier-list/${format}`) },
+          { name: copy.heading, path: href(`/tier-list/${format}`) },
           ...(mode
             ? [
                 {
-                  name: humanizeMode(mode),
-                  path: `/tier-list/${format}/${slugify(mode)}`,
+                  name: modeName ?? humanizeMode(mode),
+                  path: href(`/tier-list/${format}/${slugify(mode)}`),
                 },
               ]
             : []),
@@ -346,10 +330,13 @@ export async function TierListView({
       <JsonLd data={faqSchema(faq)} />
 
       <header>
-        <p className="eyebrow flex items-center gap-2 text-accent">
-          <Icon className="size-3.5" />
-          {copy.eyebrow}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="eyebrow flex items-center gap-2 text-accent">
+            <Icon className="size-3.5" />
+            {copy.eyebrow}
+          </p>
+          <LanguageLinks locale={locale} path={currentPath(format, windowKey, mode, bracket)} />
+        </div>
         <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{heading}</h1>
 
         {/*
@@ -367,14 +354,10 @@ export async function TierListView({
         {best.length >= 3 ? (
           <p className="mt-3 max-w-3xl text-base leading-relaxed">
             <strong>
-              {titleCaseLabel(best[0].brawlerName)}, {titleCaseLabel(best[1].brawlerName)} and{' '}
-              {titleCaseLabel(best[2].brawlerName)} are the best{mode ? ` ${humanizeMode(mode)}` : ''}{' '}
-              brawlers in {format === 'ranked' ? 'Ranked' : 'trophy ladder'} right now
+              {t.answer({ first: name(0), second: name(1), third: name(2), format, mode: modeName })}
             </strong>
-            {lastRun ? ` (as of ${formatDate(lastRun.startedAt)})` : ''}.{' '}
-            {titleCaseLabel(best[0].brawlerName)} leads with a{' '}
-            {formatPercent(best[0].normalizedWinRate)} adjusted win rate over{' '}
-            {formatNumber(best[0].decidedSampleSize)} decided battles.
+            {lastRun ? ` (${locale === 'en' ? 'as of ' : ''}${locale === 'en' ? formatDate(lastRun.startedAt) : fmtDate(lastRun.startedAt, locale)})` : ''}.{' '}
+            {t.lead({ first: name(0), rate: pct(best[0].normalizedWinRate), games: num(best[0].decidedSampleSize) })}
           </p>
         ) : null}
 
@@ -388,20 +371,20 @@ export async function TierListView({
           are computed is worth a disclosure, and nothing has been dropped from
           it.
         */}
-        <TierPodium best={best} brawlerMeta={brawlerMeta} />
+        <TierPodium best={best} brawlerMeta={brawlerMeta} copy={t} locale={locale} />
 
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted">
-          Based on {sampled > 0 ? `${formatNumber(sampled)} sampled ` : 'sampled '}
-          {copy.battles}
-          {mode ? ` in ${humanizeMode(mode)}` : ''}
-          {bracketData && bracket ? (
-            <>
-              {' '}played in {bracket.label} lobbies over the last {bracketData.days} days.
-            </>
-          ) : (
-            <> from players across the Ranked ladder.</>
-          )}
-          {lastRun ? (
+          {t.based({
+            sampled: sampled > 0 ? num(sampled) : undefined,
+            battles: copy.battles,
+            mode: modeName,
+            rank: bracketData && bracket ? rankName : undefined,
+            days: bracketData && bracket ? bracketData.days : undefined,
+            // The English line says how long ago, live; the translations give
+            // the date, since `RelativeTime` speaks English.
+            asOf: locale !== 'en' && lastRun ? fmtDate(lastRun.startedAt, locale) : undefined,
+          })}
+          {locale === 'en' && lastRun ? (
             <>
               {' '}
               Sampled{' '}
@@ -411,44 +394,36 @@ export async function TierListView({
           {/* The measured list is the one worth disagreeing with, so the place
               to disagree belongs next to it rather than buried in a menu. */}
           <Link href="/tier-list/maker" className="font-medium text-brand hover:underline">
-            Disagree? Build your own
+            {t.disagree}
           </Link>
           .
         </p>
 
 
 
-        <Disclosure className="mt-2" tone="bare" summary="How the meta score works">
-          <p>
-            Meta score combines adjusted win rate and pick rate, relative to this{' '}
-            {format === 'ranked' ? 'Ranked' : 'trophy'} list.
-          </p>
+        <Disclosure className="mt-2" tone="bare" summary={t.howSummary}>
+          <p>{t.how1(format)}</p>
           <p className="mt-2">
-            {copy.intro} Brawlers are ranked by{' '}
-            <strong className="font-semibold text-foreground">meta score</strong> out of 10, which
-            combines an adjusted win rate with a log-scaled pick rate. Win rate alone would rate a
-            brawler nobody plays the same as a staple with identical results, so popularity breaks
-            the ties.
+            {copy.intro} {t.how2a}{' '}
+            <strong className="font-semibold text-foreground">{t.metaScore}</strong> {t.how2b}
           </p>
           <p className="mt-2">{copy.caveat}</p>
           <p className="mt-2">
             {/* The scale is set per format, so the same 7.4 on both pages does
                 not mean the same thing. Said plainly, rather than left for a
                 reader to discover by comparing. */}
-            The scale is calibrated within this list, so scores rank brawlers against each other
-            here and cannot be compared with the{' '}
+            {t.how3a}{' '}
             <Link
-              href={format === 'ranked' ? '/tier-list/trophy' : '/tier-list/ranked'}
+              href={href(format === 'ranked' ? '/tier-list/trophy' : '/tier-list/ranked')}
               className="font-medium text-brand hover:underline"
             >
-              {format === 'ranked' ? 'trophy list' : 'Ranked list'}
+              {t.otherList(format)}
             </Link>
-            . A brawler needs {MIN_SAMPLE_FOR_TIER} decided battles in the window before it is rated
-            at all. Tap or hover a brawler for the full breakdown, or read{' '}
+            {t.how3b(MIN_SAMPLE_FOR_TIER)}{' '}
             <Link href="/meta-score" className="font-medium text-brand hover:underline">
-              the full method
+              {t.fullMethod}
             </Link>{' '}
-            — sampling, the mode adjustment, the anchors, and what it cannot tell you.
+            {t.how3c}
           </p>
         </Disclosure>
 
@@ -459,22 +434,20 @@ export async function TierListView({
             mode={mode}
             modes={modes}
             modeIcons={modeIcons}
+            modeNames={modeNames}
             bracket={bracket ?? null}
+            locale={locale}
           />
         </div>
 
         {/* Said plainly when a bracket could not be shown as itself. */}
         {bracket && !bracketData ? (
           <p className="mt-3 rounded-xl border border-brand/40 bg-brand/10 px-3 py-2 text-sm leading-relaxed">
-            <strong>Not enough battles from {bracket.label} lobbies yet</strong> to rate brawlers at
-            this rank, so this is the list for every rank. It fills in over the next few days as
-            more of them are sampled.
+            <strong>{t.bracketMissingStrong(rankName ?? bracket.label)}</strong> {t.bracketMissingRest}
           </p>
         ) : bracket && bracketData && bracketData.days > TIER_WINDOWS[windowKey].days ? (
           <p className="mt-3 text-sm text-muted">
-            {bracket.label} lobbies are thin in the sample right now (the first days of a Ranked
-            season usually are), so this list covers the last {bracketData.days} days rather than{' '}
-            {TIER_WINDOWS[windowKey].days}.
+            {t.bracketWidened(rankName ?? bracket.label, bracketData.days, TIER_WINDOWS[windowKey].days)}
           </p>
         ) : null}
       </header>
@@ -483,15 +456,15 @@ export async function TierListView({
           returning visitor arrives with, and the tiers themselves look the
           same every day. Renders nothing on a quiet day. */}
       {changes.size > 0 ? (
-        <WhatChanged movers={movers} changes={changes} brawlerMeta={brawlerMeta} />
+        <WhatChanged movers={movers} changes={changes} brawlerMeta={brawlerMeta} locale={locale} />
       ) : null}
 
       {/* On a Ranked mode page the tiers sit inside the map switch, so a map
           chip can swap them for that map's ranking without a request. */}
       <PendingArea>
-      <RankedMapSwitch maps={maps}>
+      <RankedMapSwitch maps={maps} locale={locale}>
         {rated.length === 0 ? (
-          <EmptyState windowLabel={scopeLabel} />
+          <EmptyState windowLabel={scopeLabel} copy={t} />
         ) : (
           <div className="space-y-4">
             {TIER_ORDER.map((tier) => {
@@ -506,6 +479,8 @@ export async function TierListView({
                   entries={inTier}
                   changes={changes}
                   span={changeSpan}
+                  copy={t}
+                  locale={locale}
                 />
               );
             })}
@@ -524,9 +499,10 @@ export async function TierListView({
         <MostPicked
           entries={entries}
           limit={MOST_PICKED_LIMIT}
-          mode={mode}
-          windowLabel={TIER_WINDOWS[windowKey].sublabel}
+          modeLabel={modeName}
+          windowLabel={win}
           battlesLabel={copy.battles}
+          locale={locale}
         />
       ) : null}
 
@@ -537,9 +513,10 @@ export async function TierListView({
         <Underrated
           entries={rated}
           limit={UNDERRATED_LIMIT}
-          mode={mode}
-          windowLabel={TIER_WINDOWS[windowKey].sublabel}
+          modeLabel={modeName}
+          windowLabel={win}
           battlesLabel={copy.battles}
+          locale={locale}
         />
       ) : null}
 
@@ -549,9 +526,7 @@ export async function TierListView({
             title={copy.unratedHeading}
             subtitle={
               <>
-                {copy.unratedBody} Each needs {MIN_SAMPLE_FOR_TIER} decided battles in the{' '}
-                {TIER_WINDOWS[windowKey].sublabel} window; the count below is how far along it is.
-                Closest first.
+                {copy.unratedBody} {t.unratedSub(MIN_SAMPLE_FOR_TIER, win)}
               </>
             }
           />
@@ -565,7 +540,7 @@ export async function TierListView({
                 <Link
                   key={entry.brawlerId}
                   href={brawlerPath(entry.brawlerId, entry.brawlerName)}
-                  title={`${entry.brawlerName}: ${entry.decidedSampleSize} of ${MIN_SAMPLE_FOR_TIER} decided ${copy.battles} needed to be ranked`}
+                  title={t.unratedChip(entry.brawlerName, entry.decidedSampleSize, MIN_SAMPLE_FOR_TIER, copy.battles)}
                   className="card card-interactive flex items-center gap-2 px-3 py-2 text-sm"
                 >
                   {entry.imageUrl ? (
@@ -598,6 +573,7 @@ export async function TierListView({
           brawlerMeta={brawlerMeta}
           limit={MOVER_LIMIT}
           modeFiltered={Boolean(mode)}
+          locale={locale}
         />
       ) : null}
     </div>
@@ -610,11 +586,15 @@ function TierRow({
   entries,
   changes,
   span,
+  copy,
+  locale,
 }: {
   tier: Tier;
   entries: TierListEntry[];
   changes: Map<number, BrawlerChange>;
   span: string;
+  copy: TierCopy;
+  locale: Locale;
 }) {
   const color = TIER_COLOR[tier];
 
@@ -661,7 +641,15 @@ function TierRow({
                 href={brawlerPath(entry.brawlerId, entry.brawlerName)}
                 style={{ '--tier': color } as React.CSSProperties}
                 className="group w-[92px] rounded-xl border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,transparent_45%),var(--surface-2)] p-2 transition-[transform,border-color,box-shadow] duration-150 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--tier)_55%,transparent)] hover:shadow-[0_8px_20px_-10px_color-mix(in_srgb,var(--tier)_70%,transparent)]"
-                title={`${entry.brawlerName}: meta score ${entry.metaScore ?? '?'} from ${formatPercent(entry.normalizedWinRate)} adjusted win rate (${formatPercent(entry.winRate)} raw, against a ${formatPercent(entry.baselineWinRate)} average for the modes it is played in) and ${formatPercent(entry.usageRate)} pick rate, over ${formatNumber(entry.decidedSampleSize)} decided battles`}
+                title={copy.chipTitle({
+                  name: entry.brawlerName,
+                  score: String(entry.metaScore ?? '?'),
+                  adj: fmtPercent(entry.normalizedWinRate, locale),
+                  raw: fmtPercent(entry.winRate, locale),
+                  base: fmtPercent(entry.baselineWinRate, locale),
+                  pick: fmtPercent(entry.usageRate, locale),
+                  games: fmtNumber(entry.decidedSampleSize, locale),
+                })}
               >
                 {entry.imageUrl ? (
                   <Image
@@ -686,7 +674,7 @@ function TierRow({
                 {/* Score leads, because it is what the ordering uses. The two
                   inputs sit underneath so the number is never a black box. */}
                 <p className="text-center text-sm font-black tabular-nums" style={{ color }}>
-                  {entry.metaScore?.toFixed(1) ?? '–'}
+                  {entry.metaScore !== null && entry.metaScore !== undefined ? fmtDecimal(entry.metaScore, locale) : '–'}
                 </p>
                 {/*
                 Labelled and spaced rather than "55.1% · 2.0%".
@@ -705,23 +693,23 @@ function TierRow({
                 numbers can be compared down a tier rather than only read.
               */}
                 <p className="mx-auto mt-0.5 grid w-fit grid-cols-[auto_auto] items-baseline gap-x-1.5 text-xs tabular-nums">
-                  <span className="text-muted" title="Adjusted win rate">
-                    W
+                  <span className="text-muted" title={copy.winTitle}>
+                    {copy.winLetter}
                   </span>
                   <span className="text-right font-semibold text-foreground">
-                    {formatPercent(entry.normalizedWinRate)}
+                    {fmtPercent(entry.normalizedWinRate, locale)}
                   </span>
-                  <span className="text-muted" title="Pick rate">
-                    P
+                  <span className="text-muted" title={copy.pickTitle}>
+                    {copy.pickLetter}
                   </span>
                   <span className="text-right font-semibold text-foreground">
-                    {formatPercent(entry.usageRate)}
+                    {fmtPercent(entry.usageRate, locale)}
                   </span>
                 </p>
                 {/* Only when it actually moved. A badge on every chip saying
                   "+0.0" would be noise wearing the costume of information. */}
                 {change && isNotableInTier(change, tier) ? (
-                  <ChangeBadge change={change} span={span} currentTier={tier} />
+                  <ChangeBadge change={change} span={span} currentTier={tier} locale={locale} />
                 ) : null}
               </Link>
             );
@@ -732,7 +720,7 @@ function TierRow({
   );
 }
 
-function EmptyState({ windowLabel }: { windowLabel: string }) {
+function EmptyState({ windowLabel, copy }: { windowLabel: string; copy: TierCopy }) {
   const configured = hasDatabase();
 
   return (
@@ -741,19 +729,25 @@ function EmptyState({ windowLabel }: { windowLabel: string }) {
         <Database className="size-7" />
       </span>
       <h2 className="mt-4 text-xl font-bold">
-        {configured ? 'No aggregated data yet' : 'Database not configured'}
+        {copy.emptyTitle(configured)}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted">
-        {configured
-          ? `Not enough battles sampled in the ${windowLabel} yet. Try a longer window, or check back shortly.`
-          : 'Rankings are not available right now.'}
-      </p>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{copy.emptyBody(configured, windowLabel)}</p>
       <Link
         href="/brawlers"
         className="mt-6 inline-flex rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
       >
-        Browse the brawler database
+        {copy.browse}
       </Link>
     </div>
   );
+}
+
+/** This page's own path in English, for the language links. */
+function currentPath(
+  format: TierFormat,
+  windowKey: TierWindowKey,
+  mode: string | undefined,
+  bracket: RankBracket | undefined,
+): string {
+  return bracket ? bracketTierListHref(bracket, mode) : tierListHref(format, windowKey, mode);
 }

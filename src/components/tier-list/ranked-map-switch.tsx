@@ -4,7 +4,51 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { type ReactNode, useSyncExternalStore } from 'react';
 
+import { fmtNumber, localePath, type Locale } from '@/lib/i18n';
 import { brawlerPath } from '@/lib/slugs';
+
+/** The switch's words. Map and rank names arrive already translated. */
+const WORDS = {
+  en: {
+    group: 'Ranked map',
+    all: 'All maps',
+    empty: (map: string) =>
+      `No brawler on ${map} has enough sampled battles to rank yet. It fills in as the sampler works through more battles here.`,
+    atRank: (n: string, rank: string, all: string) => `${n} at ${rank} · ${all} all ranks`,
+    here: (n: string) => `${n} battles here`,
+    usual: 'vs usual',
+    noteRank: (rank: string) =>
+      `Every rank's results on this map, adjusted to how each brawler does in ${rank} lobbies, then pulled toward the ${rank} battles played here. Brawlers under 20 ${rank} battles here are left out.`,
+    note: "Adjusted win rate on this map over the last three weeks, shrunk toward each brawler's overall Ranked form where the sample is thin. Brawlers under 150 decided battles here are left out.",
+    full: 'Full map page',
+  },
+  es: {
+    group: 'Mapa de Competitivo',
+    all: 'Todos los mapas',
+    empty: (map: string) =>
+      `Ningún brawler tiene todavía suficientes partidas en ${map} para clasificarlo. Se irá llenando a medida que se recojan más partidas aquí.`,
+    atRank: (n: string, rank: string, all: string) => `${n} en ${rank} · ${all} en total`,
+    here: (n: string) => `${n} partidas aquí`,
+    usual: 'vs lo normal',
+    noteRank: (rank: string) =>
+      `Los resultados de todos los rangos en este mapa, ajustados a cómo rinde cada brawler en ${rank} y acercados a las partidas de ${rank} jugadas aquí. Se omiten los brawlers con menos de 20 partidas de ${rank} aquí.`,
+    note: 'Tasa de victorias ajustada en este mapa en las últimas tres semanas, acercada al nivel general de cada brawler en Competitivo cuando hay pocas partidas. Se omiten los brawlers con menos de 150 partidas decididas aquí.',
+    full: 'Página del mapa (en inglés)',
+  },
+  pt: {
+    group: 'Mapa do Ranqueado',
+    all: 'Todos os mapas',
+    empty: (map: string) =>
+      `Nenhum brawler tem partidas suficientes em ${map} para entrar na lista ainda. Ela vai sendo preenchida conforme mais partidas daqui são coletadas.`,
+    atRank: (n: string, rank: string, all: string) => `${n} no ${rank} · ${all} no total`,
+    here: (n: string) => `${n} partidas aqui`,
+    usual: 'vs o normal',
+    noteRank: (rank: string) =>
+      `Os resultados de todos os ranks neste mapa, ajustados a como cada brawler se sai no ${rank} e aproximados das partidas do ${rank} jogadas aqui. Brawlers com menos de 20 partidas do ${rank} aqui ficam de fora.`,
+    note: 'Taxa de vitória ajustada neste mapa nas últimas três semanas, aproximada do nível geral de cada brawler no Ranqueado quando há poucas partidas. Brawlers com menos de 150 partidas decididas aqui ficam de fora.',
+    full: 'Página do mapa (em inglês)',
+  },
+} satisfies Record<Locale, unknown>;
 
 /** One brawler's record on one Ranked map, as the page serialises it. */
 export interface MapPickRow {
@@ -56,10 +100,13 @@ export interface MapRows {
 export function RankedMapSwitch({
   maps,
   children,
+  locale = 'en',
 }: {
   maps: MapRows[];
   children: ReactNode;
+  locale?: Locale;
 }) {
+  const w = WORDS[locale];
   /*
    * The fragment is the state, read through `useSyncExternalStore` so the
    * server snapshot is "nothing chosen" and the client's first render agrees
@@ -87,14 +134,14 @@ export function RankedMapSwitch({
   return (
     <div className="space-y-4">
       <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div role="group" aria-label="Ranked map" className="flex w-max gap-2">
+        <div role="group" aria-label={w.group} className="flex w-max gap-2">
           <button
             type="button"
             onClick={() => choose(null)}
             aria-pressed={map === undefined}
             className={`${chip} ${map ? off : on}`}
           >
-            All maps
+            {w.all}
           </button>
           {maps.map((entry) => (
             <button
@@ -110,7 +157,7 @@ export function RankedMapSwitch({
         </div>
       </div>
 
-      {map ? <MapPicks map={map} /> : children}
+      {map ? <MapPicks map={map} locale={locale} /> : children}
     </div>
   );
 }
@@ -121,13 +168,13 @@ export function RankedMapSwitch({
  * map-specific number, so it is the one given colour. A brawler that is strong
  * everywhere is not a map pick; one that is better *here* than usual, is.
  */
-function MapPicks({ map }: { map: MapRows }) {
+function MapPicks({ map, locale }: { map: MapRows; locale: Locale }) {
+  const w = WORDS[locale];
+  const n = (v: number) => (locale === 'en' ? v.toLocaleString() : fmtNumber(v, locale));
+  const dec = (v: number) => (locale === 'en' ? v.toFixed(1) : fmtNumber(Number(v.toFixed(1)), locale));
   if (map.picks.length === 0) {
     return (
-      <p className="card px-4 py-8 text-center text-sm leading-relaxed text-muted">
-        No brawler on {map.mapName} has enough sampled battles to rank yet. It fills in as the
-        sampler works through more battles here.
-      </p>
+      <p className="card px-4 py-8 text-center text-sm leading-relaxed text-muted">{w.empty(map.mapName)}</p>
     );
   }
 
@@ -172,13 +219,13 @@ function MapPicks({ map }: { map: MapRows }) {
                     difference between a signal and a coin flip. */}
                 <span className="block text-xs tabular-nums leading-tight text-muted">
                   {map.rankLabel && pick.allBattles !== undefined
-                    ? `${pick.battles.toLocaleString()} at ${map.rankLabel} · ${pick.allBattles.toLocaleString()} all ranks`
-                    : `${pick.battles.toLocaleString()} battles here`}
+                    ? w.atRank(n(pick.battles), map.rankLabel, n(pick.allBattles))
+                    : w.here(n(pick.battles))}
                 </span>
               </span>
               <span className="shrink-0 text-right">
                 <span className="block text-sm font-black tabular-nums leading-tight text-victory">
-                  {(pick.score * 100).toFixed(1)}%
+                  {dec(pick.score * 100)}%
                 </span>
                 <span
                   className={`block text-xs tabular-nums leading-tight ${
@@ -186,7 +233,7 @@ function MapPicks({ map }: { map: MapRows }) {
                   }`}
                 >
                   {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
-                  {Math.abs(edge * 100).toFixed(1)} vs usual
+                  {dec(Math.abs(edge * 100))} {w.usual}
                 </span>
               </span>
             </Link>
@@ -194,24 +241,12 @@ function MapPicks({ map }: { map: MapRows }) {
         );
       })}
       <li className="px-3 py-2 text-xs text-muted">
-        {map.rankLabel ? (
-          <>
-            Every rank&apos;s results on this map, adjusted to how each brawler does in{' '}
-            {map.rankLabel} lobbies, then pulled toward the {map.rankLabel} battles played here.
-            Brawlers under 20 {map.rankLabel} battles here are left out.{' '}
-          </>
-        ) : (
-          <>
-            Adjusted win rate on this map over the last three weeks, shrunk toward each
-            brawler&apos;s overall Ranked form where the sample is thin. Brawlers under 150 decided
-            battles here are left out.{' '}
-          </>
-        )}
+        {map.rankLabel ? w.noteRank(map.rankLabel) : w.note}{' '}
         <Link
-          href={`/maps/${map.slug}`}
+          href={localePath(locale, `/maps/${map.slug}`)}
           className="font-semibold text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"
         >
-          Full map page
+          {w.full}
         </Link>
       </li>
     </ol>

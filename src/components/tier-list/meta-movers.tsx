@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/stats';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { fmtDecimal, fmtNumber, fmtPercent, type Locale } from '@/lib/i18n';
 import type { BABrawler } from '@/types/brawlapi';
 import type { MetaMover } from '@/types/stats';
 
@@ -27,18 +27,92 @@ import type { MetaMover } from '@/types/stats';
  * absolute scores are not the ones the tiers above are drawn on and the
  * caption does not claim they are.
  */
+const WORDS = {
+  en: {
+    title: 'Meta movers',
+    change: 'Change in',
+    score: 'meta score',
+    scale:
+      '. The same 0–10 scale the tiers above use, measured on the stored daily snapshots, so a mover is a brawler visibly climbing or sliding the Ranked meta.',
+    over: (days: number, from: string, to: string) =>
+      `Measured over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${from} and ${to} snapshots.`,
+    between: 'Measured between the two most recent snapshots.',
+    floor:
+      'Both sides clear the same sample floor as the tier list, and snapshots computed under different methodologies are never compared.',
+    allModes: 'Across all modes',
+    allModesRest: '. The daily snapshots this compares are not split by mode, so the filter above does not apply here.',
+    up: 'Trending up',
+    down: 'Trending down',
+    noUp: 'Nothing gained ground over this span.',
+    noDown: 'Nothing lost ground over this span.',
+    unit: 'Meta score /10',
+    win: 'win',
+    pick: 'pick',
+    decided: 'decided battles',
+  },
+  es: {
+    title: 'Los que se mueven en el meta',
+    change: 'Cambio en la',
+    score: 'puntuación meta',
+    scale:
+      ', la misma escala de 0 a 10 que usan los tiers de arriba, medida sobre las mediciones diarias guardadas: quien aparece aquí está subiendo o bajando de verdad en el meta de Competitivo.',
+    over: (days: number, from: string, to: string) =>
+      `Medido en ${days === 1 ? 'el último día' : `los últimos ${days} días`}, comparando las mediciones del ${from} y del ${to}.`,
+    between: 'Medido entre las dos mediciones más recientes.',
+    floor:
+      'Los dos lados superan el mismo mínimo de partidas que la tier list, y nunca se comparan mediciones hechas con métodos distintos.',
+    allModes: 'Todos los modos',
+    allModesRest: ': las mediciones diarias no están separadas por modo, así que el filtro de arriba no se aplica aquí.',
+    up: 'Subiendo',
+    down: 'Bajando',
+    noUp: 'Nadie subió en este periodo.',
+    noDown: 'Nadie bajó en este periodo.',
+    unit: 'Puntuación /10',
+    win: 'victorias',
+    pick: 'uso',
+    decided: 'partidas decididas',
+  },
+  pt: {
+    title: 'Quem está se movendo no meta',
+    change: 'Mudança na',
+    score: 'pontuação meta',
+    scale:
+      ', a mesma escala de 0 a 10 dos tiers acima, medida nas medições diárias guardadas: quem aparece aqui está subindo ou caindo de verdade no meta do Ranqueado.',
+    over: (days: number, from: string, to: string) =>
+      `Medido ${days === 1 ? 'no último dia' : `nos últimos ${days} dias`}, comparando as medições de ${from} e ${to}.`,
+    between: 'Medido entre as duas medições mais recentes.',
+    floor:
+      'Os dois lados passam do mesmo mínimo de partidas da tier list, e medições feitas com métodos diferentes nunca são comparadas.',
+    allModes: 'Todos os modos',
+    allModesRest: ': as medições diárias não são separadas por modo, então o filtro acima não vale aqui.',
+    up: 'Subindo',
+    down: 'Caindo',
+    noUp: 'Ninguém subiu neste período.',
+    noDown: 'Ninguém caiu neste período.',
+    unit: 'Pontuação /10',
+    win: 'vitórias',
+    pick: 'escolha',
+    decided: 'partidas decididas',
+  },
+} satisfies Record<Locale, unknown>;
+
+type Words = (typeof WORDS)[Locale];
+
 export function MetaMovers({
   movers,
   brawlerMeta,
   limit,
   modeFiltered,
+  locale = 'en',
 }: {
   movers: MetaMover[];
   brawlerMeta: Map<number, BABrawler>;
   limit: number;
   /** True when a mode filter is active on the page around this section. */
   modeFiltered: boolean;
+  locale?: Locale;
 }) {
+  const w: Words = WORDS[locale];
   const rising = movers.filter((m) => m.metaScoreDelta > 0).slice(0, limit);
   const falling = movers
     .filter((m) => m.metaScoreDelta < 0)
@@ -63,44 +137,30 @@ export function MetaMovers({
   return (
     <section aria-labelledby="meta-movers">
       <h2 id="meta-movers" className="display text-2xl uppercase">
-        Meta movers
+        {w.title}
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-        Change in <strong className="font-semibold text-foreground">meta score</strong>{' '}
-. The same 0&ndash;10 scale the tiers above use, measured on the stored
-        daily snapshots, so a mover is a brawler visibly climbing or sliding the
-        Ranked meta.{' '}
-        {span
-          ? `Measured over the last ${days} ${days === 1 ? 'day' : 'days'}, comparing the ${span.fromDate} and ${span.toDate} snapshots.`
-          : 'Measured between the two most recent snapshots.'}{' '}
-        Both sides clear the same sample floor as the tier list, and snapshots
-        computed under different methodologies are never compared.
+        {w.change} <strong className="font-semibold text-foreground">{w.score}</strong>
+        {w.scale} {span ? w.over(days, span.fromDate, span.toDate) : w.between} {w.floor}
         {modeFiltered ? (
           <>
             {' '}
-            <strong className="font-semibold text-foreground">
-              Across all modes
-            </strong>{' '}
-. The daily snapshots this compares are not split by mode, so the
-            filter above does not apply here.
+            <strong className="font-semibold text-foreground">{w.allModes}</strong>
+            {w.allModesRest}
           </>
         ) : null}
       </p>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <MoverList title={w.up} tone="text-victory" movers={rising} iconFor={iconFor} emptyLabel={w.noUp} w={w} locale={locale} />
         <MoverList
-          title="Trending up"
-          tone="text-victory"
-          movers={rising}
-          iconFor={iconFor}
-          emptyLabel="Nothing gained ground over this span."
-        />
-        <MoverList
-          title="Trending down"
+          title={w.down}
           tone="text-defeat"
           movers={falling}
           iconFor={iconFor}
-          emptyLabel="Nothing lost ground over this span."
+          emptyLabel={w.noDown}
+          w={w}
+          locale={locale}
         />
       </div>
     </section>
@@ -113,12 +173,16 @@ function MoverList({
   movers,
   iconFor,
   emptyLabel,
+  w,
+  locale,
 }: {
   title: string;
   tone: string;
   movers: MetaMover[];
   iconFor: (id: number) => string | undefined;
   emptyLabel: string;
+  w: Words;
+  locale: Locale;
 }) {
   return (
     <div className="card p-4">
@@ -133,7 +197,7 @@ function MoverList({
         )}
         {title}
         <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-muted">
-          Meta score /10
+          {w.unit}
         </span>
       </h3>
 
@@ -185,13 +249,13 @@ function MoverList({
                     {/* The two inputs to the score, so the move is explained
                         rather than asserted. */}
                     <span className="block truncate text-xs text-muted">
-                      {formatPercent(mover.winRateBefore)} →{' '}
-                      {formatPercent(mover.winRateNow)} win ·{' '}
-                      {formatPercent(mover.usageBefore)} →{' '}
-                      {formatPercent(mover.usageNow)} pick
+                      {fmtPercent(mover.winRateBefore, locale)} →{' '}
+                      {fmtPercent(mover.winRateNow, locale)} {w.win} ·{' '}
+                      {fmtPercent(mover.usageBefore, locale)} →{' '}
+                      {fmtPercent(mover.usageNow, locale)} {w.pick}
                     </span>
                     <span className="block truncate text-xs tabular-nums text-muted">
-                      {formatNumber(mover.sampleSize)} decided battles
+                      {fmtNumber(mover.sampleSize, locale)} {w.decided}
                     </span>
                   </span>
                   <span className="shrink-0 text-right">
@@ -201,13 +265,13 @@ function MoverList({
                       }`}
                     >
                       {up ? '+' : '−'}
-                      {Math.abs(mover.metaScoreDelta).toFixed(1)}
+                      {fmtDecimal(Math.abs(mover.metaScoreDelta), locale)}
                     </span>
                     {/* Not smaller than this: at 10px the decimal point in
                         "8.4 → 7.3" disappears and it reads as "84 → 73". */}
                     <span className="block text-xs tabular-nums text-muted">
-                      {mover.metaScoreBefore.toFixed(1)} →{' '}
-                      {mover.metaScoreNow.toFixed(1)}
+                      {fmtDecimal(mover.metaScoreBefore, locale)} →{' '}
+                      {fmtDecimal(mover.metaScoreNow, locale)}
                     </span>
                   </span>
                 </Link>

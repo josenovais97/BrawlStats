@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/stats';
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import { fmtNumber, fmtPercent, type Locale } from '@/lib/i18n';
 import type { TierListEntry } from '@/types/stats';
 
 /**
@@ -22,17 +22,49 @@ import type { TierListEntry } from '@/types/stats';
  * exactly — it is computed from the same rows the tiers are, so filtering the
  * page filters this too and no caption is needed to explain a mismatch.
  */
+const WORDS = {
+  en: {
+    title: 'Most picked brawlers',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `The brawlers appearing in the most sampled ${battles}${mode ? ` in ${mode}` : ''} over the ${w} window. This is popularity, not strength — the tiers above rank how well a brawler performs, and the two disagree often. A pick rate is a share of all battles sampled, so it sums across the roster rather than to 100% per battle.`,
+    tier: (t: string) => `Tier ${t} on this list`,
+    battles: 'battles',
+    win: 'win',
+    pick: 'pick',
+  },
+  es: {
+    title: 'Los brawlers más elegidos',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Los brawlers que más aparecen en las ${battles}${mode ? ` de ${mode}` : ''} recogidas en los últimos ${w}. Esto es popularidad, no fuerza: los tiers de arriba ordenan lo bien que rinde cada brawler, y las dos cosas no suelen coincidir. La tasa de uso es una parte de todas las partidas recogidas, así que se suma entre todos los brawlers y no da 100% por partida.`,
+    tier: (t: string) => `Tier ${t} en esta lista`,
+    battles: 'partidas',
+    win: 'victorias',
+    pick: 'uso',
+  },
+  pt: {
+    title: 'Brawlers mais escolhidos',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Os brawlers que mais aparecem nas ${battles}${mode ? ` de ${mode}` : ''} coletadas nos últimos ${w}. Isto é popularidade, não força: os tiers acima mostram o quanto cada brawler rende, e as duas coisas costumam não bater. A taxa de escolha é uma parte de todas as partidas coletadas, então soma entre todos os brawlers e não dá 100% por partida.`,
+    tier: (t: string) => `Tier ${t} nesta lista`,
+    battles: 'partidas',
+    win: 'vitórias',
+    pick: 'escolha',
+  },
+} satisfies Record<Locale, unknown>;
+
 export function MostPicked({
   entries,
   limit,
-  mode,
+  modeLabel,
   windowLabel,
   battlesLabel,
+  locale = 'en',
 }: {
   entries: TierListEntry[];
   limit: number;
-  /** Active mode filter, for the caption. */
-  mode?: string;
+  /** Active mode filter, for the caption, already in the page's language. */
+  modeLabel?: string;
+  locale?: Locale;
   /** e.g. "7d", matching the control above. */
   windowLabel: string;
   /** What the sample counts, e.g. "Ranked battles". */
@@ -53,6 +85,7 @@ export function MostPicked({
     .slice(0, limit);
 
   if (top.length === 0) return null;
+  const w = WORDS[locale];
 
   // The leader sets the bar width, so the shape of the drop-off is visible
   // rather than every bar sitting near-empty against a 100% scale that nothing
@@ -62,14 +95,10 @@ export function MostPicked({
   return (
     <section aria-labelledby="most-picked">
       <h2 id="most-picked" className="display text-2xl uppercase">
-        Most picked brawlers
+        {w.title}
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-        The brawlers appearing in the most sampled {battlesLabel}
-        {mode ? ` in ${humanizeMode(mode)}` : ''} over the {windowLabel} window. This is
-        popularity, not strength &mdash; the tiers above rank how well a brawler
-        performs, and the two disagree often. A pick rate is a share of all battles
-        sampled, so it sums across the roster rather than to 100% per battle.
+        {w.body(battlesLabel, modeLabel, windowLabel)}
       </p>
 
       <ol className="grid gap-2 sm:grid-cols-2">
@@ -109,7 +138,7 @@ export function MostPicked({
                       <span
                         className="shrink-0 text-xs font-bold"
                         style={{ color: TIER_COLOR[entry.tier] }}
-                        title={`Tier ${entry.tier} on this list`}
+                        title={w.tier(entry.tier)}
                       >
                         {entry.tier}
                       </span>
@@ -127,19 +156,19 @@ export function MostPicked({
                   </span>
 
                   <span className="mt-1 block truncate text-xs tabular-nums text-muted">
-                    {formatNumber(entry.sampleSize)} battles
+                    {fmtNumber(entry.sampleSize, locale)} {w.battles}
                     {entry.winRate !== null ? (
-                      <> · {formatPercent(entry.winRate)} win</>
+                      <> · {fmtPercent(entry.winRate, locale)} {w.win}</>
                     ) : null}
                   </span>
                 </span>
 
                 <span className="shrink-0 text-right">
                   <span className="block text-sm font-bold tabular-nums">
-                    {formatPercent(usage)}
+                    {fmtPercent(usage, locale)}
                   </span>
                   <span className="block text-xs uppercase tracking-wide text-muted">
-                    pick
+                    {w.pick}
                   </span>
                 </span>
               </Link>

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/stats';
-import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
+import { fmtNumber, fmtPercent, type Locale } from '@/lib/i18n';
 import type { TierListEntry } from '@/types/stats';
 
 /**
@@ -28,18 +28,47 @@ import type { TierListEntry } from '@/types/stats';
  * from the first battle; the claim here is about a *win rate*, which needs the
  * sample floor behind it or it is just noise with a small denominator.
  */
+const WORDS = {
+  en: {
+    title: 'Strong but rarely picked',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Brawlers with the best adjusted win rates among the less-played half of the roster, from sampled ${battles}${mode ? ` in ${mode}` : ''} over the ${w} window. They win when they are used and are not used much — which usually means they are underrated rather than bad.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: ${adj} adjusted win rate over ${games} decided battles, ${pick} pick rate`,
+    pick: 'pick rate',
+  },
+  es: {
+    title: 'Fuertes pero poco elegidos',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Los brawlers con mejor tasa de victorias ajustada entre la mitad menos jugada, según las ${battles}${mode ? ` de ${mode}` : ''} recogidas en los últimos ${w}. Ganan cuando se juegan y se juegan poco, lo que suele significar que están infravalorados, no que sean malos.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: ${adj} de victorias ajustadas en ${games} partidas decididas, ${pick} de uso`,
+    pick: 'de uso',
+  },
+  pt: {
+    title: 'Fortes, mas pouco escolhidos',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Os brawlers com a melhor taxa de vitória ajustada entre a metade menos jogada, pelas ${battles}${mode ? ` de ${mode}` : ''} coletadas nos últimos ${w}. Eles ganham quando são usados e são pouco usados, o que costuma significar que estão subestimados, e não que são ruins.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: ${adj} de vitórias ajustadas em ${games} partidas decididas, ${pick} de escolha`,
+    pick: 'de escolha',
+  },
+} satisfies Record<Locale, unknown>;
+
 export function Underrated({
   entries,
   limit,
-  mode,
+  modeLabel,
   windowLabel,
   battlesLabel,
+  locale = 'en',
 }: {
   /** Rated entries only — see above. */
   entries: TierListEntry[];
   limit: number;
-  /** Active mode filter, for the caption. */
-  mode?: string;
+  /** Active mode filter, for the caption, already in the page's language. */
+  modeLabel?: string;
+  locale?: Locale;
   /** e.g. "7d", matching the control above. */
   windowLabel: string;
   /** What the sample counts, e.g. "Ranked battles". */
@@ -70,18 +99,15 @@ export function Underrated({
 
   // Two rows is not a finding, it is a coincidence with a heading on it.
   if (top.length < 3) return null;
+  const w = WORDS[locale];
 
   return (
     <section aria-labelledby="underrated">
       <h2 id="underrated" className="display text-2xl uppercase">
-        Strong but rarely picked
+        {w.title}
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-        Brawlers with the best adjusted win rates among the less-played half of the
-        roster, from sampled {battlesLabel}
-        {mode ? ` in ${humanizeMode(mode)}` : ''} over the {windowLabel} window. They
-        win when they are used and are not used much &mdash; which usually means
-        they are underrated rather than bad.
+        {w.body(battlesLabel, modeLabel, windowLabel)}
       </p>
 
       <ol className="grid gap-2 sm:grid-cols-2">
@@ -90,7 +116,12 @@ export function Underrated({
             <Link
               href={brawlerPath(entry.brawlerId, entry.brawlerName)}
               prefetch={false}
-              title={`${entry.brawlerName}: ${formatPercent(entry.normalizedWinRate)} adjusted win rate over ${formatNumber(entry.decidedSampleSize)} decided battles, ${formatPercent(entry.usageRate)} pick rate`}
+              title={w.title2(
+                entry.brawlerName,
+                fmtPercent(entry.normalizedWinRate, locale),
+                fmtNumber(entry.decidedSampleSize, locale),
+                fmtPercent(entry.usageRate, locale),
+              )}
               className="row-interactive flex items-center gap-3 rounded-lg p-2"
             >
               <span className="w-5 shrink-0 text-right text-sm font-bold tabular-nums text-muted">
@@ -117,7 +148,7 @@ export function Underrated({
                     rate without the pick rate reads as a tier claim, and the
                     pick rate without the win rate reads as an insult. */}
                 <span className="block text-xs text-muted">
-                  {formatPercent(entry.usageRate)} pick rate
+                  {fmtPercent(entry.usageRate, locale)} {w.pick}
                 </span>
               </span>
 
@@ -131,7 +162,7 @@ export function Underrated({
                 {entry.tier}
               </span>
               <span className="w-14 shrink-0 text-right text-sm font-bold tabular-nums text-victory">
-                {formatPercent(entry.normalizedWinRate)}
+                {fmtPercent(entry.normalizedWinRate, locale)}
               </span>
             </Link>
           </li>
