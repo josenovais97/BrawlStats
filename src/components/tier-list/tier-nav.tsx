@@ -2,7 +2,15 @@
 
 import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createContext, useContext, useEffect, useState, type ComponentProps, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ComponentProps,
+  type ReactNode,
+} from 'react';
 
 /**
  * Filter navigation for the tier list that stays put and says it is working.
@@ -44,13 +52,34 @@ function ChipSpinner() {
   ) : null;
 }
 
-export function NavLink({ children, href, ...rest }: ComponentProps<typeof Link>) {
+/* The map chosen under a mode (`#map=<mode>/<map>`, see RankedMapSwitch). */
+const subscribeHash = (cb: () => void) => {
+  window.addEventListener('hashchange', cb);
+  return () => window.removeEventListener('hashchange', cb);
+};
+const readMapHash = () => (window.location.hash.startsWith('#map=') ? window.location.hash : '');
+
+export function NavLink({
+  children,
+  href,
+  keepMap = false,
+  ...rest
+}: ComponentProps<typeof Link> & {
+  /**
+   * Carry the chosen map across. For the rank chips: the same mode at another
+   * rank has the same maps, so switching rank on Hard Rock Mine should stay
+   * on Hard Rock Mine rather than fall back to every map.
+   */
+  keepMap?: boolean;
+}) {
   const { start } = useContext(Pending);
   const pathname = usePathname();
+  const hash = useSyncExternalStore(subscribeHash, keepMap ? readMapHash : () => '', () => '');
+  const target = typeof href === 'string' && hash ? `${href}${hash}` : href;
   return (
     <Link
       {...rest}
-      href={href}
+      href={target}
       scroll={false}
       onNavigate={() => {
         // The chip already lit is a no-op, not a load that never finishes.

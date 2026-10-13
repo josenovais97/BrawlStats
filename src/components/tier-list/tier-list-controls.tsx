@@ -178,6 +178,7 @@ function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: st
       <div role="group" aria-label="Rank" className="flex w-max items-center gap-2">
         <span className="eyebrow pe-1 text-muted">Your rank</span>
         <NavLink
+          keepMap
           href={bracketTierListHref(null, mode)}
           aria-current={bracket ? undefined : 'page'}
           className={`${chip} ${bracket ? off : on}`}
@@ -190,6 +191,7 @@ function BracketTabs({ bracket, mode }: { bracket: RankBracket | null; mode?: st
           return (
             <NavLink
               key={b.slug}
+              keepMap
               href={bracketTierListHref(b, mode)}
               aria-current={current ? 'page' : undefined}
               title={`${b.label} Ranked lobbies`}
