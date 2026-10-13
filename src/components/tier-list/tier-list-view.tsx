@@ -470,8 +470,9 @@ export async function TierListView({
           </p>
         ) : bracket && bracketData && bracketData.days > TIER_WINDOWS[windowKey].days ? (
           <p className="mt-3 text-sm text-muted">
-            {bracket.label} lobbies are thinner in the sample, so this list covers the last{' '}
-            {bracketData.days} days rather than {TIER_WINDOWS[windowKey].days}.
+            {bracket.label} lobbies are thin in the sample right now (the first days of a Ranked
+            season usually are), so this list covers the last {bracketData.days} days rather than{' '}
+            {TIER_WINDOWS[windowKey].days}.
           </p>
         ) : null}
       </header>

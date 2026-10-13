@@ -4317,7 +4317,13 @@ export async function getBrawlerStatsForWindow(
 export const MIN_RATED_FOR_BRACKET = 30;
 
 /** How far a thin bracket may widen before falling back to every rank. */
-export const BRACKET_WINDOWS = [7, 14] as const;
+export const BRACKET_WINDOWS = [7, 14, 21] as const;
+
+/*
+ * 21 added on 2026-10-13 for the start of a Ranked season, when everyone
+ * drops and the high ranks are thin for more than a week. Three weeks of a
+ * rank is still that rank's answer, and the lineup roll-up keeps 45 days.
+ */
 
 /**
  * A Ranked bracket's tier list, widened when thin, or null when even the
