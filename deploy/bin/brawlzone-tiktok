@@ -38,6 +38,23 @@ TOKEN_URL="https://open.tiktokapis.com/v2/oauth/token/"
 INIT_URL="https://open.tiktokapis.com/v2/post/publish/content/init/"
 STATUS_URL="https://open.tiktokapis.com/v2/post/publish/status/fetch/"
 CREATOR_URL="https://open.tiktokapis.com/v2/post/publish/creator_info/query/"
+VIDEO_INBOX_URL="https://open.tiktokapis.com/v2/post/publish/inbox/video/init/"
+VIDEO_DIRECT_URL="https://open.tiktokapis.com/v2/post/publish/video/init/"
+# Pinned to the build already on the box: a floating tag would be pulled fresh
+# the first time a post needs it, which is the wrong moment to find out it
+# changed.
+FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
+
+# What to send: `video` (the default since 2026-10-14) or `photo`.
+#
+# TikTok gives video far more reach than photo carousels, and both come from
+# the same slides: the video is the carousel with a slow zoom on each slide
+# and a slide-in between them, silent so a trending sound can go on in the
+# app. The two cannot both go out -- four posts a day already sit against
+# TikTok's five pending uploads -- so a video REPLACES the carousel, and the
+# carousel is what goes out instead when the video cannot be made or TikTok
+# refuses it. A bad render must not cost the day's post.
+FORMAT="${TIKTOK_FORMAT:-video}"
 
 # Back to MEDIA_UPLOAD on 2026-10-02 after a direct post was refused with
 # `unaudited_client_can_only_post_to_private_accounts`. See the note below the
@@ -312,6 +329,177 @@ print("PUBLIC_TO_EVERYONE" if "PUBLIC_TO_EVERYONE" in opts else "")
   fi
 fi
 
+# Poll $PUBLISH_ID every five seconds, at most $1 times, into STATUS and
+# FAIL_REASON. Stops at the first terminal state. Why polling matters at all is
+# explained where the carousel calls it.
+wait_for_inbox () { # max polls
+  local attempt status
+  STATUS=''
+  FAIL_REASON='-'
+  for attempt in $(seq 1 "$1"); do
+    sleep 5
+    status=$(curl -s --max-time 30 -X POST "$STATUS_URL" \
+      -H "Authorization: Bearer ${ACCESS}" \
+      -H 'Content-Type: application/json; charset=UTF-8' \
+      --data-raw "{\"publish_id\":\"${PUBLISH_ID}\"}")
+    read -r STATUS FAIL_REASON < <(
+      printf '%s' "$status" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin).get("data", {})
+except Exception:
+    d = {}
+print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
+' 2>/dev/null
+    )
+    case "$STATUS" in
+      SEND_TO_USER_INBOX|PUBLISH_COMPLETE|FAILED) break ;;
+    esac
+  done
+  echo "status: ${STATUS:-?} ${FAIL_REASON:--} (after $((attempt * 5))s)"
+}
+
+# ------------------------------------------------------------------ the video
+#
+# Renders the slides into one MP4 and uploads it, into PUBLISH_ID and STATUS.
+# Returns 1 with VIDEO_ERR set when the carousel should go out instead: only
+# for failures that leave nothing in the inbox, so falling back can never
+# produce two drafts. A video TikTok accepted but is still processing after
+# five minutes is NOT one of those -- it may yet arrive -- and dies instead.
+post_video () { # work dir
+  local work="$1" n=0 slide size reply err upload_url http
+  local -a args
+
+  while IFS= read -r slide; do
+    [ -n "$slide" ] || continue
+    curl -sf --max-time 240 -o "${work}/s${n}.jpg" "$slide" || { VIDEO_ERR="could not download ${slide}"; return 1; }
+    n=$((n + 1))
+  done <<< "$SLIDES"
+
+  # One argument per line. The filter graph has no spaces in it, so nothing
+  # here needs quoting beyond that.
+  mapfile -t args < <(python3 - "$n" <<'PY'
+import sys
+n = int(sys.argv[1])
+FPS, T = 30, 0.4  # frame rate, slide-in length
+# The cover is the hook and is short; the last slide (the site) is shorter
+# still. The rest get four seconds, about what a ten-row list needs.
+dur = [2.6] + [4.0] * (n - 2) + [2.4] if n >= 3 else [3.5] * n
+args = ['-hide_banner', '-loglevel', 'error', '-y']
+for i in range(n):
+    args += ['-i', f'/w/s{i}.jpg']
+parts = []
+for i in range(n):
+    frames = round(dur[i] * FPS)
+    # Upscaled first: zoompan rounds its crop to whole pixels, which makes a
+    # slow zoom at 1080 wide visibly shimmer. Ends 5% in, which stays inside
+    # the slides' safe margins.
+    parts.append(
+        f"[{i}:v]scale=2160:3840,zoompan=z='1+0.05*on/{frames}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+        f":d={frames}:s=1080x1920:fps={FPS},setsar=1,format=yuv420p[v{i}]"
+    )
+last, offset = 'v0', 0.0
+for i in range(1, n):
+    offset += dur[i - 1] - T
+    parts.append(f'[{last}][v{i}]xfade=transition=slideleft:duration={T}:offset={offset:.2f}[x{i}]')
+    last = f'x{i}'
+args += ['-filter_complex', ';'.join(parts), '-map', f'[{last}]', '-r', str(FPS),
+         '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+         '-movflags', '+faststart', '/w/out.mp4']
+print('\n'.join(args))
+PY
+  )
+  [ "${#args[@]}" -gt 10 ] || { VIDEO_ERR="could not build the ffmpeg arguments"; return 1; }
+
+  if ! docker run --rm -v "${work}:/w" "$FFMPEG_IMAGE" "${args[@]}" > "${work}/ffmpeg.log" 2>&1; then
+    VIDEO_ERR="ffmpeg failed: $(tail -c 300 "${work}/ffmpeg.log")"
+    return 1
+  fi
+  size=$(stat -c %s "${work}/out.mp4" 2>/dev/null)
+  # Under 64 MB TikTok takes the file as one chunk; these run 2-6 MB.
+  if [ "${size:-0}" -lt 100000 ] || [ "$size" -gt 60000000 ]; then
+    VIDEO_ERR="the rendered video is ${size:-0} bytes"
+    return 1
+  fi
+  echo "video rendered: ${n} slides, ${size} bytes"
+
+  reply=$(python3 - "$size" "$POST_MODE" "$TITLE" "$DESCRIPTION" "$PRIVACY" <<'PY'
+import json, sys
+size, mode, title, description, privacy = int(sys.argv[1]), *sys.argv[2:6]
+body = {'source_info': {'source': 'FILE_UPLOAD', 'video_size': size, 'chunk_size': size, 'total_chunk_count': 1}}
+if mode == 'DIRECT_POST':
+    # A video has one caption field, `title`, up to 2200 characters. The inbox
+    # upload takes none at all, which is why the mail carries the caption.
+    body['post_info'] = {
+        'title': f'{title}\n\n{description}'[:2200],
+        'privacy_level': privacy,
+        'disable_comment': False,
+        'brand_content_toggle': False,
+        'brand_organic_toggle': True,
+    }
+print(json.dumps(body))
+PY
+  )
+  reply=$(curl -s --max-time 60 -X POST "$([ "$POST_MODE" = "DIRECT_POST" ] && echo "$VIDEO_DIRECT_URL" || echo "$VIDEO_INBOX_URL")" \
+    -H "Authorization: Bearer ${ACCESS}" \
+    -H 'Content-Type: application/json; charset=UTF-8' \
+    --data-raw "$reply")
+  read -r PUBLISH_ID upload_url err < <(printf '%s' "$reply" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    d = {}
+data = d.get("data") or {}
+print(data.get("publish_id") or "-", data.get("upload_url") or "-", (d.get("error") or {}).get("code") or "-")
+' 2>/dev/null)
+  if [ "$err" = "spam_risk_too_many_pending_share" ]; then
+    # The carousel would be refused for the same reason.
+    echo "::warning::TikTok has 5 uploads already waiting in the inbox; skipping today rather than stacking another."
+    exit 0
+  fi
+  if [ "${PUBLISH_ID:--}" = "-" ] || [ "${upload_url:--}" = "-" ] || { [ "$err" != "-" ] && [ "$err" != "ok" ]; }; then
+    PUBLISH_ID=''
+    VIDEO_ERR="TikTok refused the video upload: $(printf '%s' "$reply" | head -c 300)"
+    return 1
+  fi
+
+  http=$(curl -s -o "${work}/put.out" -w '%{http_code}' --max-time 300 -X PUT "$upload_url" \
+    -H 'Content-Type: video/mp4' \
+    -H "Content-Range: bytes 0-$((size - 1))/${size}" \
+    --data-binary @"${work}/out.mp4")
+  case "$http" in
+    2??) : ;;
+    *) VIDEO_ERR="the file upload returned HTTP ${http:-000}: $(head -c 200 "${work}/put.out")"; return 1 ;;
+  esac
+  echo "uploaded ${DAY} video as ${PUBLISH_ID}"
+
+  # Video is processed on TikTok's side before it reaches the inbox, which
+  # takes longer than fetching a few images.
+  wait_for_inbox 60
+  case "$STATUS" in
+    SEND_TO_USER_INBOX|PUBLISH_COMPLETE) return 0 ;;
+    FAILED) VIDEO_ERR="TikTok rejected the video after accepting it: ${FAIL_REASON}"; return 1 ;;
+    *) die "::error::the video did not reach a terminal state in five minutes (last seen: ${STATUS:-unknown}). Not falling back to the carousel: it may still arrive, and two drafts of one post would be worse." ;;
+  esac
+}
+
+if [ "$FORMAT" = "video" ]; then
+  VIDEO_WORK=$(mktemp -d)
+  if post_video "$VIDEO_WORK"; then
+    :
+  else
+    echo "::warning::no video today (${VIDEO_ERR:-unknown}); sending the photo carousel instead"
+    FORMAT="photo"
+  fi
+  rm -rf "$VIDEO_WORK"
+fi
+
+# ------------------------------------------------------- the photo carousel
+# Skipped when the video went out. Not indented under the `if`: the
+# heredocs' terminators must stay in the first column.
+if [ "$FORMAT" = "photo" ]; then
+
 payload=$(python3 - "$TITLE" "$DESCRIPTION" "$SLIDES" "$POST_MODE" "$PRIVACY" <<'PY'
 import json, sys
 title, description, slides, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
@@ -394,29 +582,7 @@ echo "uploaded ${DAY} as ${PUBLISH_ID}"
 # Two minutes of polling. Every successful run before that day reached
 # SEND_TO_USER_INBOX within five seconds, so this is slack rather than an
 # expected wait.
-STATUS=''
-FAIL_REASON='-'
-for attempt in $(seq 1 24); do
-  sleep 5
-  status=$(curl -s --max-time 30 -X POST "$STATUS_URL" \
-    -H "Authorization: Bearer ${ACCESS}" \
-    -H 'Content-Type: application/json; charset=UTF-8' \
-    --data-raw "{\"publish_id\":\"${PUBLISH_ID}\"}")
-  read -r STATUS FAIL_REASON < <(
-    printf '%s' "$status" | python3 -c '
-import json, sys
-try:
-    d = json.load(sys.stdin).get("data", {})
-except Exception:
-    d = {}
-print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
-' 2>/dev/null
-  )
-  case "$STATUS" in
-    SEND_TO_USER_INBOX|PUBLISH_COMPLETE|FAILED) break ;;
-  esac
-done
-echo "status: ${STATUS:-?} ${FAIL_REASON:--} (after $((attempt * 5))s)"
+wait_for_inbox 24
 
 # A failure here is the whole point of polling: say so loudly rather than
 # mailing "ready to publish" about a post that does not exist.
@@ -435,6 +601,8 @@ case "$STATUS" in
   SEND_TO_USER_INBOX|PUBLISH_COMPLETE) : ;;
   *) die "::error::upload did not reach a terminal state in two minutes (last seen: ${STATUS:-unknown})" ;;
 esac
+
+fi # the photo carousel
 
 # ------------------------------------------------------------------- the mail
 #
@@ -455,6 +623,8 @@ esac
 # answer "is the posting still working", and a timestamp written before the
 # outcome was known would have reported 2026-09-28 as a successful post.
 record_state "last_post.${MODE}" "$(now_iso)" || true
+# Which one went out, for the weekly report to compare.
+record_state "last_format.${MODE}" "$FORMAT" || true
 
 HTML_LIB=/usr/local/lib/brawlzone-html.sh
 if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
@@ -467,9 +637,14 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
     todo="Nothing to do. DIRECT_POST published it; this is a record, not a prompt."
     accent="$OK"
   else
-    subject="[brawlzone] TikTok ${MODE} carousel waiting -- ${DAY}"
+    subject="[brawlzone] TikTok ${MODE} ${FORMAT/photo/carousel} waiting -- ${DAY}"
     heading="Waiting in your TikTok inbox"
-    todo="Open TikTok, tap the notification, add music if you want it, and publish."
+    if [ "$FORMAT" = "video" ]; then
+      # TikTok's inbox upload carries no caption for a video.
+      todo="Open TikTok, tap the notification, add a trending sound, paste the caption above, and publish."
+    else
+      todo="Open TikTok, tap the notification, add music if you want it, and publish."
+    fi
     accent="$ACCENT"
   fi
 
@@ -480,6 +655,7 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
     html_rows_open
     html_row "Title" "$(printf '%s' "$TITLE" | esc)"
     html_row "Slides" "$slide_count"
+    html_row "Format" "$FORMAT"
     html_row "Post" "$MODE"
     html_row "Mode" "$POST_MODE"
     html_row "Status" "${STATUS:-?}" "$([ "${FAIL_REASON:--}" = "-" ] && printf '%s' "$OK" || printf '%s' "$BAD")"

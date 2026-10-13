@@ -74,6 +74,17 @@ const nextConfig: NextConfig = {
         destination: 'https://discord.com/invite/964EMQBBUJ',
         permanent: false,
       },
+      /*
+       * The TikTok bio link. TikTok's in-app browser sends no referrer, so a
+       * visit from there looked like anyone typing the address, and on
+       * 2026-10-13 there was no way to tell what the TikTok account brought
+       * in. The tag is what Umami reports as the source.
+       */
+      {
+        source: '/tt',
+        destination: '/bubble?utm_source=tiktok&utm_medium=bio',
+        permanent: false,
+      },
     ];
   },
 
