@@ -36,7 +36,7 @@ android {
      * to edge (see MainActivity.fitSystemBars).
      */
     targetSdk = 36
-    versionCode = 51
+    versionCode = 52
     versionName = "1.30"
 
     /*
