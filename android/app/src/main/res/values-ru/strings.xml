@@ -78,4 +78,6 @@
     <string name="download_description">Нажми после загрузки, чтобы установить</string>
     <string name="tile_on">Пузырь включён</string>
     <string name="tile_off">Пузырь выключен</string>
+    <string name="switch_account">Сменить аккаунт</string>
+    <string name="account_forgotten">%1$s удалён</string>
 </resources>

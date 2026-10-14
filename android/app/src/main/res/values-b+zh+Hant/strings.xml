@@ -78,4 +78,6 @@
     <string name="download_description">下載完成後點按安裝</string>
     <string name="tile_on">懸浮球已開啟</string>
     <string name="tile_off">懸浮球已關閉</string>
+    <string name="switch_account">切換帳號</string>
+    <string name="account_forgotten">已移除 %1$s</string>
 </resources>

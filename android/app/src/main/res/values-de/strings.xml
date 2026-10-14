@@ -78,4 +78,6 @@
     <string name="download_description">Nach dem Download zum Installieren tippen</string>
     <string name="tile_on">Bubble an</string>
     <string name="tile_off">Bubble aus</string>
+    <string name="switch_account">Konto wechseln</string>
+    <string name="account_forgotten">%1$s entfernt</string>
 </resources>

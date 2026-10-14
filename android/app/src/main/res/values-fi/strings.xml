@@ -78,4 +78,6 @@
     <string name="download_description">Asenna napauttamalla, kun lataus on valmis</string>
     <string name="tile_on">Kupla päällä</string>
     <string name="tile_off">Kupla pois</string>
+    <string name="switch_account">Vaihda tiliä</string>
+    <string name="account_forgotten">%1$s poistettu</string>
 </resources>

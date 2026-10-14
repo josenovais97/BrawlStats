@@ -78,4 +78,6 @@
     <string name="download_description">הקישו בסיום כדי להתקין</string>
     <string name="tile_on">הבועה פועלת</string>
     <string name="tile_off">הבועה כבויה</string>
+    <string name="switch_account">החלפת חשבון</string>
+    <string name="account_forgotten">%1$s הוסר</string>
 </resources>

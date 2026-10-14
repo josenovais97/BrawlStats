@@ -84,4 +84,6 @@
     <string name="download_description">Tap when finished to install</string>
     <string name="tile_on">Bubble on</string>
     <string name="tile_off">Bubble off</string>
+    <string name="switch_account">Switch account</string>
+    <string name="account_forgotten">Removed %1$s</string>
 </resources>

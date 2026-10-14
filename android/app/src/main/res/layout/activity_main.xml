@@ -907,6 +907,40 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
+            <!--
+                Other accounts this phone has used (1.29), one tap to switch.
+                Built in code from Account.savedAccounts; long-press forgets one.
+                Outside the editor so it is there whether the field is open or
+                folded; switching should never need the field at all.
+            -->
+            <TextView
+                android:id="@+id/saved_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:letterSpacing="0.1"
+                android:text="@string/switch_account"
+                android:textAllCaps="true"
+                android:textColor="@color/muted"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <HorizontalScrollView
+                android:id="@+id/saved_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/saved_row"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
             <LinearLayout
                 android:id="@+id/tag_editor"
                 android:layout_width="match_parent"

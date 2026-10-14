@@ -84,6 +84,49 @@ object Account {
      * The letter O is not in the game's alphabet; a zero is what is meant
      * every time, so it is corrected rather than refused.
      */
+    // ------------------------------------------------------- saved accounts
+
+    /** An account that resolved once, kept so it can be switched back to. */
+    data class Saved(val tag: String, val name: String)
+
+    private const val KEY_SAVED = "saved_accounts"
+    private const val MAX_SAVED = 5
+
+    /**
+     * Accounts this phone has used, most recent first (1.29).
+     *
+     * For players with more than one account: switching used to mean finding
+     * the other tag, copying it and pasting it into the field every time. Every
+     * tag that resolves to a real account is remembered with its name; the app
+     * screen offers the others as one-tap chips.
+     */
+    fun savedAccounts(context: Context): List<Saved> = runCatching {
+        val raw = prefs(context).getString(KEY_SAVED, "[]") ?: "[]"
+        val array = org.json.JSONArray(raw)
+        (0 until array.length()).map { i ->
+            val o = array.getJSONObject(i)
+            Saved(o.getString("tag"), o.optString("name"))
+        }
+    }.getOrDefault(emptyList())
+
+    private fun writeSaved(context: Context, list: List<Saved>) {
+        val array = org.json.JSONArray()
+        for (s in list.take(MAX_SAVED)) array.put(org.json.JSONObject().put("tag", s.tag).put("name", s.name))
+        prefs(context).edit().putString(KEY_SAVED, array.toString()).apply()
+    }
+
+    /** Remember a resolved account, moving it to the front. */
+    fun rememberAccount(context: Context, tag: String, name: String) {
+        val clean = normalise(tag)
+        writeSaved(context, listOf(Saved(clean, name)) + savedAccounts(context).filter { it.tag != clean })
+    }
+
+    /** Forget a saved account (long-press on its chip). */
+    fun forgetAccount(context: Context, tag: String) {
+        val clean = normalise(tag)
+        writeSaved(context, savedAccounts(context).filter { it.tag != clean })
+    }
+
     fun normalise(raw: String): String =
         raw.trim()
             .removePrefix("#")

@@ -78,4 +78,6 @@
     <string name="download_description">แตะเมื่อเสร็จเพื่อติดตั้ง</string>
     <string name="tile_on">บับเบิลเปิดอยู่</string>
     <string name="tile_off">บับเบิลปิดอยู่</string>
+    <string name="switch_account">สลับบัญชี</string>
+    <string name="account_forgotten">ลบ %1$s แล้ว</string>
 </resources>

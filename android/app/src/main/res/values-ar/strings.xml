@@ -78,4 +78,6 @@
     <string name="download_description">المس عند الانتهاء للتثبيت</string>
     <string name="tile_on">الفقاعة تعمل</string>
     <string name="tile_off">الفقاعة متوقفة</string>
+    <string name="switch_account">تبديل الحساب</string>
+    <string name="account_forgotten">تمت إزالة %1$s</string>
 </resources>

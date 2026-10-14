@@ -78,4 +78,6 @@
     <string name="download_description">Tocca a fine download per installare</string>
     <string name="tile_on">Bolla attiva</string>
     <string name="tile_off">Bolla spenta</string>
+    <string name="switch_account">Cambia account</string>
+    <string name="account_forgotten">%1$s rimosso</string>
 </resources>

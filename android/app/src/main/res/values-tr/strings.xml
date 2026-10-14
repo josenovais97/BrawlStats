@@ -78,4 +78,6 @@
     <string name="download_description">Bitince yüklemek için dokun</string>
     <string name="tile_on">Baloncuk açık</string>
     <string name="tile_off">Baloncuk kapalı</string>
+    <string name="switch_account">Hesap değiştir</string>
+    <string name="account_forgotten">%1$s kaldırıldı</string>
 </resources>

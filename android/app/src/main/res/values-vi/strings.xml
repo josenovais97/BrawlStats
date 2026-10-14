@@ -78,4 +78,6 @@
     <string name="download_description">Chạm khi tải xong để cài đặt</string>
     <string name="tile_on">Bong bóng bật</string>
     <string name="tile_off">Bong bóng tắt</string>
+    <string name="switch_account">Đổi tài khoản</string>
+    <string name="account_forgotten">Đã xóa %1$s</string>
 </resources>

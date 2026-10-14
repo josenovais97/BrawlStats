@@ -78,4 +78,6 @@
     <string name="download_description">Tik na afloop om te installeren</string>
     <string name="tile_on">Bubbel aan</string>
     <string name="tile_off">Bubbel uit</string>
+    <string name="switch_account">Wissel van account</string>
+    <string name="account_forgotten">%1$s verwijderd</string>
 </resources>

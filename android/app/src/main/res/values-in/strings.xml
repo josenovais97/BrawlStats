@@ -78,4 +78,6 @@
     <string name="download_description">Ketuk setelah selesai untuk memasang</string>
     <string name="tile_on">Gelembung aktif</string>
     <string name="tile_off">Gelembung nonaktif</string>
+    <string name="switch_account">Ganti akun</string>
+    <string name="account_forgotten">%1$s dihapus</string>
 </resources>

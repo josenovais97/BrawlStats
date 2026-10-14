@@ -78,4 +78,6 @@
     <string name="download_description">Stuknij po pobraniu, aby zainstalować</string>
     <string name="tile_on">Bańka włączona</string>
     <string name="tile_off">Bańka wyłączona</string>
+    <string name="switch_account">Zmień konto</string>
+    <string name="account_forgotten">Usunięto %1$s</string>
 </resources>

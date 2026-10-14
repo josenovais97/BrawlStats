@@ -270,6 +270,9 @@ class MainActivity : AppCompatActivity() {
             Triple(Account.FILTER_POWER_11, R.id.tile_eleven, R.id.radio_eleven),
             Triple(Account.FILTER_HYPERCHARGE, R.id.tile_hyper, R.id.radio_hyper),
         )
+        val savedCaption = findViewById<TextView>(R.id.saved_caption)
+        val savedScroll = findViewById<View>(R.id.saved_scroll)
+        val savedRow = findViewById<LinearLayout>(R.id.saved_row)
         val setupPrompt = findViewById<LinearLayout>(R.id.setup_prompt)
         val scroll = findViewById<android.widget.ScrollView>(R.id.scroll)
 
@@ -353,6 +356,59 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        /**
+         * The other saved accounts as chips: tap to switch, long-press to forget
+         * (1.29). Switching sets the field, so it runs exactly what typing the
+         * tag does -- lookup, name, icon, counts, plan -- and the panel reloads
+         * for the new account the next time it opens.
+         */
+        fun paintSaved() {
+            // Named apart: inside a view's apply block `tag` is the view's own.
+            val field = tag
+            val current = Account.normalise(field.text.toString())
+            val others = Account.savedAccounts(this).filter { it.tag != current }
+            savedRow.removeAllViews()
+            val visible = if (others.isEmpty()) View.GONE else View.VISIBLE
+            savedCaption.visibility = visible
+            savedScroll.visibility = visible
+            val density = resources.displayMetrics.density
+            for (account in others) {
+                val chip = TextView(this).apply {
+                    text = if (account.name.isNotBlank()) "${account.name}  #${account.tag}" else "#${account.tag}"
+                    setBackgroundResource(R.drawable.chip)
+                    setTextColor(getColor(R.color.muted))
+                    textSize = 13f
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    val h = (14 * density).toInt()
+                    val v = (8 * density).toInt()
+                    setPadding(h, v, h, v)
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener {
+                        field.setText(account.tag)
+                        setEditing(false)
+                        (getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager)
+                            .hideSoftInputFromWindow(field.windowToken, 0)
+                    }
+                    setOnLongClickListener {
+                        Account.forgetAccount(this@MainActivity, account.tag)
+                        android.widget.Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.account_forgotten, account.name.ifBlank { "#${account.tag}" }),
+                            android.widget.Toast.LENGTH_SHORT,
+                        ).show()
+                        paintSaved()
+                        true
+                    }
+                }
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                ).apply { marginEnd = (8 * density).toInt() }
+                savedRow.addView(chip, params)
+            }
+        }
+
         fun paintFilter() {
             for ((value, row, radio) in tiles) {
                 val active = value == filter
@@ -380,9 +436,13 @@ class MainActivity : AppCompatActivity() {
                 PlanLookup.cancel()
                 plannedFor = null
                 showPlan(null)
+                paintSaved()
                 return
             }
             name.text = result.name
+            // Remembered for the switch row, then the row redrawn without it.
+            Account.rememberAccount(this, result.tag, result.name)
+            paintSaved()
             // The label under each tile is in the layout now, beside its icon,
             // so these carry only the number.
             tagLine.text = "#${result.tag}"
@@ -511,6 +571,7 @@ class MainActivity : AppCompatActivity() {
         hide.setOnCheckedChangeListener { _, _ -> persist() }
 
         paintFilter()
+        paintSaved()
 
         // Resolve whatever was already saved, so the card is populated on open
         // rather than only after the field is touched — and open folded, since

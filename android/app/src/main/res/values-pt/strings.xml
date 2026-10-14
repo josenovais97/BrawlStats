@@ -78,4 +78,6 @@
     <string name="download_description">Toque ao terminar para instalar</string>
     <string name="tile_on">Bolha ligada</string>
     <string name="tile_off">Bolha desligada</string>
+    <string name="switch_account">Trocar de conta</string>
+    <string name="account_forgotten">%1$s removida</string>
 </resources>

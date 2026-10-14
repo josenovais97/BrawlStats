@@ -78,4 +78,6 @@
     <string name="download_description">완료되면 탭해서 설치</string>
     <string name="tile_on">버블 켜짐</string>
     <string name="tile_off">버블 꺼짐</string>
+    <string name="switch_account">계정 전환</string>
+    <string name="account_forgotten">%1$s 삭제됨</string>
 </resources>

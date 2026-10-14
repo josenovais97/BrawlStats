@@ -78,4 +78,6 @@
     <string name="download_description">Touche une fois terminé pour installer</string>
     <string name="tile_on">Bulle activée</string>
     <string name="tile_off">Bulle désactivée</string>
+    <string name="switch_account">Changer de compte</string>
+    <string name="account_forgotten">%1$s retiré</string>
 </resources>
