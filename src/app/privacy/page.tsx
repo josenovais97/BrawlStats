@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Database, HardDrive, Server, Shield, Smartphone } from 'lucide-react';
+import { Database, HardDrive, Server, Shield, Smartphone, Trash2, User } from 'lucide-react';
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
   title: 'Privacy',
   description:
-    'What BrawlZone stores, what it does not, and what the Android app sends. No accounts, no cookies, no personal data.',
+    'What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, no cookies, no ads.',
 };
 
 const NOTHING = [
@@ -70,6 +70,24 @@ export default function PrivacyPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="card p-6">
+        <div className="flex gap-4">
+          <User className="size-6 shrink-0 text-brand" />
+          <div className="space-y-2 text-sm leading-relaxed text-muted">
+            <h2 className="font-bold text-foreground">{t('Who we are')}</h2>
+            <p>{t('BrawlZone (brawlzone.net) and the BrawlZone Bubble Android app are made by Novais Labs, an independent developer in Portugal. This policy covers both. Contact:')}{' '}
+              <a
+                href={lp(`mailto:${CONTACT_EMAIL}`)}
+                className="font-semibold text-foreground underline underline-offset-2"
+              >
+                {CONTACT_EMAIL}
+              </a>
+              .
+            </p>
           </div>
         </div>
       </section>
@@ -118,13 +136,13 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <SectionHeading
           title={t('Looking up a player')}
-          subtitle={t('A tag you type is a request, not a record.')}
+          subtitle={t('We keep the public game profile, never who searched for it.')}
         />
         <div className="card p-6">
           <div className="flex gap-4">
             <Database className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
-              <p>{t('Searching a player tag sends it to the official Brawl Stars API to fetch that profile. We do not store a record of who searched for what.')}</p>
+              <p>{t('Searching a player tag, on the site or in the app, sends it to the official Brawl Stars API to fetch that profile. The public game stats that come back (player name, tag, trophies, rank and brawler counts) are saved once a day so the profile can show progress over time, and the account joins the pool sampled for statistics. Nothing about the person searching is stored: no IP address, no device, no link between a search and whoever made it.')}</p>
               <p>{t('Separately, BrawlZone samples public profiles and battle logs from that same official API to build the statistics the site is for — tier lists, map picks, matchups. That data is public in the game, is stored as aggregates rather than as a dossier on any player, and is bounded by retention windows. There is more about where it comes from on the')}{' '}
                 <Link href={lp('/about')} className="font-semibold text-foreground underline underline-offset-2">{t('about page')}</Link>
                 .
@@ -144,24 +162,47 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <SectionHeading
           title={t('The Android app')}
-          subtitle={t('It asks for one permission, and it is not the one people fear.')}
+          subtitle={t('No account, no ads, no trackers, and it cannot see your screen.')}
         />
         <div className="card p-6">
           <div className="flex gap-4">
             <Smartphone className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
-              <p>{t('The bubble needs')}{' '}<span className="font-semibold text-foreground">{t('Display over other apps')}</span>{' '}{t('so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them.')}</p>
-              <p>{t('Reading the screen is a separate thing, and it is off unless you turn it on. Version 1.8 can scan the draft, and to do that Android makes you accept its own screen-capture dialog — every time the app starts, because the system will not let an app keep that permission — and shows a recording indicator for as long as a session is open. One frame is read when you tap Scan, measured on your phone, and dropped. It is never written to storage and never sent anywhere; what comes out of it is a handful of brawler names.')}</p>
-              <p>{t('The app has no account, collects nothing, and sends nothing anywhere. Its panel is a web view of')}{' '}
+              <p>{t('The bubble needs')}{' '}<span className="font-semibold text-foreground">{t('Display over other apps')}</span>{' '}{t('so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them. The app never captures or reads your screen, and does not read your game account, your files, your contacts or your other apps.')}</p>
+              <p>{t('If you enter your player tag, the app sends it to brawlzone.net to show your profile, your brawlers and what to upgrade next, exactly as the site does for a search (see above). The tags you have used, with their player names, and your settings are kept on your phone so you can switch accounts; they are removed when you uninstall the app or clear its data, and a long press removes one.')}</p>
+              <p>{t('Its panel is a web view of')}{' '}
                 <Link
                   href={lp('/bubble/panel')}
                   className="font-semibold text-foreground underline underline-offset-2"
-                >{t('a page on this site')}</Link>{t(', so it counts as a page view here and nothing more. It does not read your game account, your files, or your other apps.')}</p>
-              <p>{t('It is not on the Play Store, so nothing is reported to Google about your use of it. The')}{' '}
+                >{t('a page on this site')}</Link>{t(', so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). The app contains no advertising or analytics SDK and shares nothing with third parties.')}</p>
+              <p>{t('Installed from Google Play, the app is covered by Google\'s own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports. Downloaded from the')}{' '}
                 <Link
                   href={lp('/bubble')}
                   className="font-semibold text-foreground underline underline-offset-2"
-                >{t('download page')}</Link>{' '}{t('publishes a SHA-256 checksum so you can verify the file you got is the file we published.')}</p>
+                >{t('download page')}</Link>{t(', it comes with a SHA-256 checksum so you can verify the file is the one we published.')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeading
+          title={t('Deleting your data')}
+          subtitle={t('Nothing to delete on our side for most people.')}
+        />
+        <div className="card p-6">
+          <div className="flex gap-4">
+            <Trash2 className="size-6 shrink-0 text-brand" />
+            <div className="space-y-3 text-sm leading-relaxed text-muted">
+              <p>{t('What is on your device is yours to remove: clear the site\'s data in your browser, or uninstall the app. To have a player profile\'s saved stats deleted and the tag excluded from future sampling, email')}{' '}
+                <a
+                  href={lp(`mailto:${CONTACT_EMAIL}`)}
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >
+                  {CONTACT_EMAIL}
+                </a>{' '}{t('with the tag. It is done within 30 days, usually much sooner.')}</p>
+              <p>{t('Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.')}</p>
+              <p>{t('BrawlZone is not directed at children and knowingly collects no personal information from anyone, of any age.')}</p>
             </div>
           </div>
         </div>
@@ -174,6 +215,7 @@ export default function PrivacyPage() {
         />
         <div className="card p-6 text-sm leading-relaxed text-muted">
           <p>{t('Artwork is served from Brawlify\'s CDN, and some images come from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading an image means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.')}</p>
+          <p className="mt-3">{t('The site and the app\'s panel are delivered through Cloudflare, which handles each request (including your IP address) in order to serve and protect it, under its own privacy policy. We do not log IP addresses ourselves.')}</p>
           <p className="mt-3">{t('BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.')}</p>
         </div>
       </section>

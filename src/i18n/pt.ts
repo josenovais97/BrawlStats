@@ -3620,4 +3620,42 @@ export const PT: Record<string, string> = {
     "Nenhum brawler com esse nome.",
   "Two accounts? Every tag you use is saved, and the app shows the others under “Switch account”: one tap swaps, a long press forgets one.":
     "Duas contas? Cada tag que você usa fica salva, e o app mostra as outras em “Trocar de conta”: um toque para trocar, segure para esquecer uma.",
+  "The site and the app's panel are delivered through Cloudflare, which handles each request (including your IP address) in order to serve and protect it, under its own privacy policy. We do not log IP addresses ourselves.":
+    "O site e o painel do app são entregues pela Cloudflare, que processa cada requisição (incluindo o seu endereço IP) para servi-la e protegê-la, segundo a política de privacidade dela. Nós não registramos endereços IP.",
+  ", it comes with a SHA-256 checksum so you can verify the file is the one we published.":
+    ", ele vem com um checksum SHA-256 para você conferir que o arquivo é o que publicamos.",
+  ", so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). The app contains no advertising or analytics SDK and shares nothing with third parties.":
+    ", então abri-lo conta como uma visita anônima aqui e nada mais. Todo o tráfego é criptografado (HTTPS). O app não tem nenhum SDK de anúncios ou de análise e não compartilha nada com terceiros.",
+  "BrawlZone (brawlzone.net) and the BrawlZone Bubble Android app are made by Novais Labs, an independent developer in Portugal. This policy covers both. Contact:":
+    "O BrawlZone (brawlzone.net) e o app Android BrawlZone Bubble são feitos pela Novais Labs, um desenvolvedor independente em Portugal. Esta política cobre os dois. Contato:",
+  "BrawlZone is not directed at children and knowingly collects no personal information from anyone, of any age.":
+    "O BrawlZone não é direcionado a crianças e não coleta intencionalmente informações pessoais de ninguém, de nenhuma idade.",
+  "Deleting your data":
+    "Excluir seus dados",
+  "If you enter your player tag, the app sends it to brawlzone.net to show your profile, your brawlers and what to upgrade next, exactly as the site does for a search (see above). The tags you have used, with their player names, and your settings are kept on your phone so you can switch accounts; they are removed when you uninstall the app or clear its data, and a long press removes one.":
+    "Se você digitar sua tag de jogador, o app a envia para brawlzone.net para mostrar seu perfil, seus brawlers e o que melhorar em seguida, igual ao site numa busca (veja acima). As tags que você usou, com os nomes dos jogadores, e suas configurações ficam no seu celular para você trocar de conta; são apagadas ao desinstalar o app ou limpar os dados dele, e segurar uma tag a remove.",
+  "Installed from Google Play, the app is covered by Google's own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports. Downloaded from the":
+    "Instalado pelo Google Play, o app também é coberto pela política de privacidade do Google para a Play Store, e o Google nos dá estatísticas agregadas como número de instalações e relatórios de falhas. Baixado pela",
+  "Its panel is a web view of":
+    "O painel dele é uma visualização web de",
+  "No account, no ads, no trackers, and it cannot see your screen.":
+    "Sem conta, sem anúncios, sem rastreadores, e ele não consegue ver sua tela.",
+  "Nothing to delete on our side for most people.":
+    "Para a maioria das pessoas, não há nada a excluir do nosso lado.",
+  "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":
+    "Os dados de partidas amostrados ficam guardados só enquanto as estatísticas precisam deles e depois são apagados ou reduzidos a agregados que não descrevem nenhum jogador individual.",
+  "Searching a player tag, on the site or in the app, sends it to the official Brawl Stars API to fetch that profile. The public game stats that come back (player name, tag, trophies, rank and brawler counts) are saved once a day so the profile can show progress over time, and the account joins the pool sampled for statistics. Nothing about the person searching is stored: no IP address, no device, no link between a search and whoever made it.":
+    "Buscar uma tag de jogador, no site ou no app, a envia para a API oficial do Brawl Stars para buscar esse perfil. As estatísticas públicas do jogo que voltam (nome, tag, troféus, rank e quantidade de brawlers) são salvas uma vez por dia para o perfil mostrar a evolução, e a conta entra no grupo amostrado para as estatísticas. Nada sobre quem busca é guardado: nem endereço IP, nem aparelho, nem ligação entre uma busca e quem a fez.",
+  "We keep the public game profile, never who searched for it.":
+    "Guardamos o perfil público do jogo, nunca quem o buscou.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, no cookies, no ads.":
+    "O que o BrawlZone e o app BrawlZone Bubble guardam, o que não guardam e o que o app envia. Sem contas, sem cookies, sem anúncios.",
+  "What is on your device is yours to remove: clear the site's data in your browser, or uninstall the app. To have a player profile's saved stats deleted and the tag excluded from future sampling, email":
+    "O que está no seu aparelho é você quem remove: limpe os dados do site no navegador ou desinstale o app. Para excluirmos as estatísticas salvas de um perfil e tirarmos a tag das próximas amostras, envie um email para",
+  "Who we are":
+    "Quem somos",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them. The app never captures or reads your screen, and does not read your game account, your files, your contacts or your other apps.":
+    "para poder desenhar por cima do jogo. Essa permissão deixa o app colocar pixels na sua tela; não deixa ler o que está nela. O app nunca captura nem lê sua tela, e não lê sua conta do jogo, seus arquivos, seus contatos nem seus outros apps.",
+  "with the tag. It is done within 30 days, usually much sooner.":
+    "com a tag. Isso é feito em até 30 dias, normalmente bem antes.",
 };
