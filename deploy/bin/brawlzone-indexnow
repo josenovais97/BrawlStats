@@ -31,7 +31,9 @@ set -uo pipefail
 
 HOST="brawlzone.net"
 KEY="7c5d42c3d2b23f04c659bb537275876b"
-SITEMAP="https://${HOST}/sitemaps/sitemap/core.xml"
+# The core pages and, since 2026-10-14, their Spanish and Portuguese copies
+# (the intl section). Each file's newest-dated entries are taken separately.
+SITEMAPS="https://${HOST}/sitemaps/sitemap/core.xml https://${HOST}/sitemaps/sitemap/intl.xml"
 ENDPOINT="https://api.indexnow.org/IndexNow"
 
 # The key has to be fetchable at the root before anything is accepted: it is
@@ -54,11 +56,18 @@ fi
 # Taking the maximum date present asks the question that actually matters --
 # which pages changed most recently, according to the site itself -- and stays
 # right however stale the cache is.
-urls=$(curl -s --max-time 30 "$SITEMAP" | python3 -c '
+urls=$(for SITEMAP in $SITEMAPS; do curl -s --max-time 60 "$SITEMAP" | python3 -c '
 import re, sys
 
 xml = sys.stdin.read()
-entries = re.findall(r"<loc>([^<]+)</loc>\s*<lastmod>([^<]{10})", xml)
+# Per <url> block rather than <loc> followed by <lastmod>: since 2026-10-14
+# hreflang links sit between the two, and the adjacent match found nothing.
+entries = []
+for block in re.findall(r"<url>(.*?)</url>", xml, re.S):
+    loc = re.search(r"<loc>([^<]+)</loc>", block)
+    mod = re.search(r"<lastmod>([^<]{10})", block)
+    if loc and mod:
+        entries.append((loc.group(1), mod.group(1)))
 if not entries:
     sys.exit(0)
 
@@ -67,13 +76,13 @@ for loc, day in entries:
     if day == newest:
         print(loc)
 print(newest, file=sys.stderr)
-' 2>/tmp/indexnow.day)
+' 2>/tmp/indexnow.day; done)
 day=$(cat /tmp/indexnow.day 2>/dev/null || echo unknown)
 rm -f /tmp/indexnow.day
 
 count=$(printf '%s\n' "$urls" | grep -c . || true)
 if [ "$count" -eq 0 ]; then
-  echo "no URLs parsed from ${SITEMAP} -- nothing to submit"
+  echo "no URLs parsed from ${SITEMAPS} -- nothing to submit"
   exit 0
 fi
 
@@ -84,9 +93,9 @@ print(json.dumps({
     "host": sys.argv[1],
     "key": sys.argv[2],
     "keyLocation": f"https://{sys.argv[1]}/{sys.argv[2]}.txt",
-    # The protocol caps a submission at 10,000. core.xml is ~170 and bounded by
-    # the roster, so this is a guard against a future section rather than a
-    # limit anything reaches today.
+    # The protocol caps a submission at 10,000. core.xml is ~270 and intl.xml
+    # ~1,600, both bounded by the roster and the mode list, so this is a guard
+    # rather than a limit anything reaches today.
     "urlList": urls[:10000],
 }))' "$HOST" "$KEY")
 
