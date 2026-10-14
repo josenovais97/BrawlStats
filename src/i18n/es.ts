@@ -2432,8 +2432,8 @@ export const ES: Record<string, string> = {
     "Empieza a buscar",
   "Supercell news & release notes":
     "Noticias y notas de versión de Supercell",
-  "The site does use Vercel's privacy-friendly analytics to count page views. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.":
-    "El sitio usa una analítica respetuosa con la privacidad para contar visitas. No guarda cookies, no crea un perfil tuyo ni te sigue por otros sitios. Es un contador de visitas, no seguimiento publicitario.",
+  "The site counts page views with Umami, a privacy-friendly analytics tool that runs on our own server. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.":
+    "El sitio cuenta las visitas con Umami, una analítica respetuosa con la privacidad que funciona en nuestro propio servidor. No guarda cookies, no crea un perfil tuyo ni te sigue por otros sitios. Es un contador de visitas, no seguimiento publicitario.",
   "There is no account system, so there is nothing to sign up for and no password to store. Your recent searches and saved profiles live in your own browser's local storage and are never sent to us. Clearing your browser data removes them for good.":
     "No hay sistema de cuentas, así que no hay que registrarse ni hay contraseñas que guardar. Tus búsquedas recientes y perfiles guardados viven en el almacenamiento de tu propio navegador y nunca nos llegan. Si borras los datos del navegador, desaparecen para siempre.",
   "This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy.":

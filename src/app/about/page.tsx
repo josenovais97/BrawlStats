@@ -192,8 +192,8 @@ export default function AboutPage() {
             <p>{t('There is no account system, so there is nothing to sign up for and no password to store. Your recent searches and saved profiles live in your own browser\'s local storage and are never sent to us. Clearing your browser data removes them for good.')}</p>
             <p>
               {/* Previously this said "no tracking", which was not true while
-                  Vercel Analytics is enabled. Stating it plainly is the point
-                  of this page. */}{t('The site does use Vercel\'s privacy-friendly analytics to count page views. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.')}</p>
+                  Analytics (Umami, self-hosted) is enabled. Stating it plainly is the point
+                  of this page. */}{t('The site counts page views with Umami, a privacy-friendly analytics tool that runs on our own server. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.')}</p>
             <p>{t('Looking up a tag is a public action: the same data is available to anyone through the official API.')}</p>
           </div>
         </div>
