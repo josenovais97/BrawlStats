@@ -80,4 +80,5 @@
     <string name="tile_off">Kupla pois</string>
     <string name="switch_account">Vaihda tiliä</string>
     <string name="account_forgotten">%1$s poistettu</string>
+    <string name="privacy_policy">Tietosuojakäytäntö</string>
 </resources>

@@ -80,4 +80,5 @@
     <string name="tile_off">Bolla spenta</string>
     <string name="switch_account">Cambia account</string>
     <string name="account_forgotten">%1$s rimosso</string>
+    <string name="privacy_policy">Informativa sulla privacy</string>
 </resources>

@@ -80,4 +80,5 @@
     <string name="tile_off">Bong bóng tắt</string>
     <string name="switch_account">Đổi tài khoản</string>
     <string name="account_forgotten">Đã xóa %1$s</string>
+    <string name="privacy_policy">Chính sách quyền riêng tư</string>
 </resources>

@@ -80,4 +80,5 @@
     <string name="tile_off">الفقاعة متوقفة</string>
     <string name="switch_account">تبديل الحساب</string>
     <string name="account_forgotten">تمت إزالة %1$s</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
 </resources>

@@ -87,6 +87,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.footer_link).setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://brawlzone.net/bubble")))
         }
+        findViewById<TextView>(R.id.privacy_link).setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://brawlzone.net/privacy")))
+        }
 
         wireAccount()
         wireLook()

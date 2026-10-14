@@ -80,4 +80,5 @@
     <string name="tile_off">Gelembung mati</string>
     <string name="switch_account">Tukar akaun</string>
     <string name="account_forgotten">%1$s dibuang</string>
+    <string name="privacy_policy">Dasar privasi</string>
 </resources>

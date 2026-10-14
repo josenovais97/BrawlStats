@@ -80,4 +80,5 @@
     <string name="tile_off">悬浮球已关闭</string>
     <string name="switch_account">切换账号</string>
     <string name="account_forgotten">已移除 %1$s</string>
+    <string name="privacy_policy">隐私政策</string>
 </resources>

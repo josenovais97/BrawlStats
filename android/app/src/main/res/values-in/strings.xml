@@ -80,4 +80,5 @@
     <string name="tile_off">Gelembung nonaktif</string>
     <string name="switch_account">Ganti akun</string>
     <string name="account_forgotten">%1$s dihapus</string>
+    <string name="privacy_policy">Kebijakan privasi</string>
 </resources>

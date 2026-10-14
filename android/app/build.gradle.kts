@@ -36,8 +36,8 @@ android {
      * to edge (see MainActivity.fitSystemBars).
      */
     targetSdk = 36
-    versionCode = 50
-    versionName = "1.29"
+    versionCode = 51
+    versionName = "1.30"
 
     /*
      * Where the panel is served from. The site, always, in a release; a

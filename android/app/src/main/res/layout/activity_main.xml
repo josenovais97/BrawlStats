@@ -1420,6 +1420,17 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
+        <!-- Google Play asks for the privacy policy inside the app as well as
+             on the listing (1.30). -->
+        <TextView
+            android:id="@+id/privacy_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/privacy_policy"
+            android:textColor="@color/muted"
+            android:textSize="12sp" />
+
         <!-- The fan disclaimer, as Supercell's Fan Content Policy asks of fan
              projects. The app borrows the game's look, never its claim to be
              official, and this is where it says so. -->

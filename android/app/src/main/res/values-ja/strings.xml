@@ -80,4 +80,5 @@
     <string name="tile_off">バブル オフ</string>
     <string name="switch_account">アカウント切り替え</string>
     <string name="account_forgotten">%1$s を削除しました</string>
+    <string name="privacy_policy">プライバシーポリシー</string>
 </resources>

@@ -80,4 +80,5 @@
     <string name="tile_off">Bubble aus</string>
     <string name="switch_account">Konto wechseln</string>
     <string name="account_forgotten">%1$s entfernt</string>
+    <string name="privacy_policy">Datenschutzerklärung</string>
 </resources>
