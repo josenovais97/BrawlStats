@@ -93,6 +93,9 @@ export const UI_EN = {
   'draft.battles': '{n} battles',
   'draft.vsEdge': 'vs {n}',
   'draft.withEdge': 'with {n}',
+  'draft.beats': "Who beats {name}",
+  'draft.noCounters': "Not enough battles against {name} yet.",
+  'draft.removeShort': "Remove",
 
   'update.upToDate': 'App {version} · up to date',
   'update.isOut': 'Version {version} is out',

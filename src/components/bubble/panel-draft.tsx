@@ -108,6 +108,8 @@ export function PanelDraft({
   });
 
   const [picking, setPicking] = useState<Slot | null>(null);
+  // The enemy whose counters are open, if any.
+  const [inspect, setInspect] = useState<number | null>(null);
   const [changing, setChanging] = useState(false);
   const [query, setQuery] = useState('');
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
@@ -458,8 +460,19 @@ export function PanelDraft({
                     <button
                       key={id}
                       type="button"
-                      onClick={() => remove(slot, id)}
-                      title={t('draft.remove', { name: b?.localName ?? String(id) })}
+                      // An enemy opens its counters (Remove is inside the
+                      // card); bans and team-mates still remove on tap.
+                      onClick={() => {
+                        if (slot === 'enemies') setInspect(inspect === id ? null : id);
+                        else remove(slot, id);
+                      }}
+                      aria-pressed={slot === 'enemies' ? inspect === id : undefined}
+                      title={
+                        slot === 'enemies'
+                          ? t('draft.beats', { name: b?.localName ?? String(id) })
+                          : t('draft.remove', { name: b?.localName ?? String(id) })
+                      }
+                      className={slot === 'enemies' && inspect === id ? 'rounded ring-2 ring-brand' : undefined}
                     >
                       <Image
                         src={b?.imageUrl ?? ''}
@@ -516,6 +529,18 @@ export function PanelDraft({
               onClose={() => setPicking(null)}
               label={t(LONG[picking])}
               remaining={LIMITS[picking] - picked[picking].length}
+            />
+          ) : null}
+
+          {inspect !== null && picked.enemies.includes(inspect) ? (
+            <EnemyCounters
+              id={inspect}
+              byId={byId}
+              onRemove={() => {
+                remove('enemies', inspect);
+                setInspect(null);
+              }}
+              onClose={() => setInspect(null)}
             />
           ) : null}
 
@@ -755,5 +780,103 @@ function Suggestions({
         );
       })}
     </ol>
+  );
+}
+
+interface Counter {
+  brawlerId: number;
+  winRate: number;
+  edge: number;
+  games: number;
+}
+
+/**
+ * Who beats the enemy just tapped: its best counters in Ranked, at the rank
+ * chosen on the Meta tab when that rank has enough battles, else every rank's
+ * (see /api/v1/counters). The draft list below already folds counters into
+ * its scores; this answers the narrower question a player asks mid-draft --
+ * "what do I put into that one?" -- and is the same list as the site's
+ * counters page for that brawler.
+ */
+function EnemyCounters({
+  id,
+  byId,
+  onRemove,
+  onClose,
+}: {
+  id: number;
+  byId: Map<number, LocalBrawler>;
+  onRemove: () => void;
+  onClose: () => void;
+}) {
+  const { t } = usePanelI18n();
+  const [counters, setCounters] = useState<Counter[] | null>(null);
+  const name = byId.get(id)?.localName ?? String(id);
+
+  useEffect(() => {
+    const params = new URLSearchParams({ brawler: String(id) });
+    const rank = storedBracket();
+    if (rank) params.set('rank', rank);
+    const controller = new AbortController();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCounters(null);
+    fetch(`/api/v1/counters?${params}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: { counters: Counter[] }) => setCounters(data.counters))
+      .catch((err) => {
+        if ((err as Error).name !== 'AbortError') setCounters([]);
+      });
+    return () => controller.abort();
+  }, [id]);
+
+  return (
+    <div className="bz-panel space-y-1.5 px-2 py-2">
+      <div className="flex items-center gap-2">
+        <span className="min-w-0 flex-1 truncate text-xs font-bold">{t('draft.beats', { name })}</span>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted"
+        >
+          {t('draft.removeShort')}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('draft.close')}
+          className="shrink-0 px-1 text-sm leading-none text-muted"
+        >
+          ×
+        </button>
+      </div>
+
+      {counters === null ? (
+        <p className="text-[10px] text-muted">{t('draft.reading')}</p>
+      ) : counters.length === 0 ? (
+        <p className="text-[10px] text-muted">{t('draft.noCounters', { name })}</p>
+      ) : (
+        <ol className="flex flex-wrap gap-1.5">
+          {counters.map((c) => {
+            const b = byId.get(c.brawlerId);
+            return (
+              <li key={c.brawlerId} className="flex items-center gap-1 rounded bg-surface-2/70 py-0.5 pe-1.5 ps-0.5">
+                <Image
+                  src={b?.imageUrl ?? ''}
+                  alt=""
+                  width={22}
+                  height={22}
+                  className="size-[22px] rounded bg-surface-2"
+                  unoptimized
+                />
+                <span className="text-[10px] font-bold leading-none">{b?.localName ?? c.brawlerId}</span>
+                <span className="text-[10px] font-black tabular-nums leading-none text-victory">
+                  {(c.winRate * 100).toFixed(0)}%
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </div>
   );
 }
