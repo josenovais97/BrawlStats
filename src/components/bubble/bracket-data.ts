@@ -1,7 +1,7 @@
 'use client';
 
 import type { PanelModeComps } from '@/components/bubble/panel-comps';
-import type { RankBracket } from '@/lib/rank-brackets';
+import { bracketForRankName, type RankBracket } from '@/lib/rank-brackets';
 import type { PanelEntry, PanelMapPick } from '@/components/bubble/panel-tiers';
 
 /** The chosen rank bracket's slug, or "all". Absent until someone chooses. */
@@ -59,4 +59,20 @@ export function storedBracket(): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * The rank the panel answers for: the one chosen on the Meta tab, "every
+ * rank" if that is what was chosen, and otherwise the player's own Ranked rank
+ * from their tag -- the default the Meta tab already used, extended to the
+ * draft and team-comp tabs on 2026-10-14 so all three agree.
+ */
+export function panelBracket(ownRankName: string | null): string | null {
+  try {
+    const saved = window.localStorage.getItem(STORED_BRACKET);
+    if (saved !== null) return saved !== 'all' ? saved : null;
+  } catch {
+    // Storage blocked: fall through to the player's own rank.
+  }
+  return bracketForRankName(ownRankName)?.slug ?? null;
 }

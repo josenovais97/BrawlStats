@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-import { bracketLabel, loadBracket, storedBracket } from '@/components/bubble/bracket-data';
+import { bracketLabel, loadBracket, panelBracket } from '@/components/bubble/bracket-data';
 import { bracketBySlug } from '@/lib/rank-brackets';
 
 import { BuildCard, useBuildCard } from '@/components/bubble/panel-build';
@@ -66,15 +66,15 @@ export function PanelComps({
    * rank's where it does not, and a line saying which (2026-10-13).
    */
   const [rank, setRank] = useState<{ slug: string; comps: Record<string, PanelModeComps> } | null>(null);
+  const account = useBubbleAccount();
   useEffect(() => {
-    const slug = storedBracket();
+    const slug = panelBracket(account.rankName);
     if (!slug) return;
     loadBracket(slug)
       .then((data) => setRank({ slug, comps: data.comps }))
       .catch(() => undefined);
-  }, []);
+  }, [account.rankName]);
 
-  const account = useBubbleAccount();
   const { t, tx, name } = usePanelI18n();
   const modeName = useModeLabel();
   // Tap any brawler in a trio for its build: the same card the Meta tab opens.

@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { storedBracket } from '@/components/bubble/bracket-data';
+import { panelBracket } from '@/components/bubble/bracket-data';
+import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useEffect, useMemo, useState } from 'react';
 
 import { recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
@@ -108,6 +109,9 @@ export function PanelDraft({
     enemies: [],
   });
 
+  // The player's own Ranked rank, when their tag is set: the rank the draft
+  // answers for unless one was chosen on the Meta tab (see panelBracket).
+  const ownRank = useBubbleAccount().rankName;
   const [picking, setPicking] = useState<Slot | null>(null);
   // The enemy whose counters are open, if any.
   const [inspect, setInspect] = useState<number | null>(null);
@@ -224,7 +228,7 @@ export function PanelDraft({
     if (picked.allies.length) params.set('allies', picked.allies.join(','));
     if (picked.bans.length) params.set('bans', picked.bans.join(','));
     // The rank chosen on the Meta tab, so the draft answers for that rank.
-    const rank = storedBracket();
+    const rank = panelBracket(ownRank);
     if (rank) params.set('rank', rank);
 
     const controller = new AbortController();
@@ -246,7 +250,7 @@ export function PanelDraft({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [map, picked]);
+  }, [map, picked, ownRank]);
 
   const chooseMap = (m: PanelMap) => {
     setMap(m);
@@ -536,6 +540,7 @@ export function PanelDraft({
           {inspect !== null && picked.enemies.includes(inspect) ? (
             <EnemyCounters
               id={inspect}
+              ownRank={ownRank}
               byId={byId}
               onRemove={() => {
                 remove('enemies', inspect);
@@ -801,11 +806,13 @@ interface Counter {
  */
 function EnemyCounters({
   id,
+  ownRank,
   byId,
   onRemove,
   onClose,
 }: {
   id: number;
+  ownRank: string | null;
   byId: Map<number, LocalBrawler>;
   onRemove: () => void;
   onClose: () => void;
@@ -820,7 +827,7 @@ function EnemyCounters({
 
   useEffect(() => {
     const params = new URLSearchParams({ brawler: String(id) });
-    const rank = storedBracket();
+    const rank = panelBracket(ownRank);
     if (rank) params.set('rank', rank);
     const controller = new AbortController();
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -832,7 +839,7 @@ function EnemyCounters({
         if ((err as Error).name !== 'AbortError') setCounters([]);
       });
     return () => controller.abort();
-  }, [id]);
+  }, [id, ownRank]);
 
   return (
     <div className="bz-panel space-y-1.5 px-2 py-2">
