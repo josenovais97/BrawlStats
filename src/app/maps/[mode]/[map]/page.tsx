@@ -32,6 +32,11 @@ import {
 import type { BABrawler } from '@/types/brawlapi';
 import type { ModeBestPicks } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
+import { andList } from '@/lib/t';
+import { mapNamer, modeNamer } from '@/lib/i18n-game';
 
 interface PageProps {
   params: Promise<{ mode: string; map: string }>;
@@ -61,11 +66,15 @@ export async function generateStaticParams() {
 const PICK_COUNT = 10;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
   const { mode, map } = await params;
   const entry = await resolveMap(mode, map).catch(() => undefined);
-  if (!entry) return { title: 'Map' };
+  if (!entry) return { title: t('Map') };
 
-  const modeLabel = entry.mode?.name ?? entry.map.gameMode.name;
+  // Display name in the page's language; the English one still keys the wiki.
+  const modeLabelEn = entry.mode?.name ?? entry.map.gameMode.name;
+  const modeLabel = (await modeNamer())(modeLabelEn);
 
   return {
     // Written as the query, because that is how this page is found: people
@@ -75,26 +84,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // is nothing fresh to claim about a map that no longer exists — the page
     // stays useful, but as a record rather than as this month's answer.
     title: entry.retired
-      ? `${entry.map.name} (${modeLabel}) — retired Brawl Stars map`
-      : `${entry.map.name} best brawlers, ${modeLabel} (${currentMonth()})`,
+      ? t('{name} ({modeLabel}) — retired Brawl Stars map', { name: nm(entry.map.name), modeLabel: modeLabel })
+      : t('{name} best brawlers, {modeLabel} ({v})', { name: nm(entry.map.name), modeLabel: modeLabel, v: currentMonth() }),
     description: entry.retired
-      ? `${entry.map.name} was a ${modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in ${modeLabel} generally.`
-      : `The strongest brawlers on ${entry.map.name} (${modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.`,
+      ? t('{name} was a {modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in {modeLabel2} generally.', { name: nm(entry.map.name), modeLabel: modeLabel, modeLabel2: modeLabel })
+      : t('The strongest brawlers on {name} ({modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.', { name: nm(entry.map.name), modeLabel: modeLabel }),
     alternates: { canonical: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
     openGraph: {
-      title: `${entry.map.name} best brawlers`,
-      description: `Best Brawl Stars brawlers on ${entry.map.name} (${modeLabel}), from sampled battles.`,
+      title: t('{name} best brawlers', { name: nm(entry.map.name) }),
+      description: t('Best Brawl Stars brawlers on {name} ({modeLabel}), from sampled battles.', { name: nm(entry.map.name), modeLabel: modeLabel }),
       images: entry.map.imageUrl ? [{ url: entry.map.imageUrl }] : undefined,
     },
   };
 }
 
 export default async function MapPage({ params }: PageProps) {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { mode: modeSlug, map: mapSlug } = await params;
   const entry = await resolveMap(modeSlug, mapSlug).catch(() => undefined);
   if (!entry) notFound();
 
-  const modeLabel = entry.mode?.name ?? entry.map.gameMode.name;
+  // Display name in the page's language; the English one still keys the wiki.
+  const modeLabelEn = entry.mode?.name ?? entry.map.gameMode.name;
+  const modeLabel = (await modeNamer())(modeLabelEn);
   const accent = entry.mode?.color ?? '#8b95b8';
 
   const brawlerMeta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
@@ -109,7 +123,7 @@ export default async function MapPage({ params }: PageProps) {
     .catch(() => []);
   // Layout and environment. The mode is passed so a map name shared across
   // modes cannot pick up the wrong page's description.
-  const mapWiki = await getMapWiki(entry.map.name, modeLabel).catch(() => null);
+  const mapWiki = await getMapWiki(entry.map.name, modeLabelEn).catch(() => null);
 
   // Database reads run one after the other so the page never needs more than
   // one connection, and each degrades to empty on its own.
@@ -150,23 +164,37 @@ export default async function MapPage({ params }: PageProps) {
 
   const faq = [
     {
-      question: `What are the best brawlers on ${entry.map.name}?`,
+      question: t('What are the best brawlers on {name}?', { name: nm(entry.map.name) }),
       answer: entry.retired
-        ? `${entry.map.name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in ${modeLabel} overall are the closest answer.`
+        ? t('{name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the closest answer.', { name: nm(entry.map.name), modeLabel: modeLabel })
         : hasMapPicks
-        ? `${listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName)))} ${mapPicks!.picks.length === 1 ? 'has the strongest adjusted win rate' : 'have the strongest adjusted win rates'} on ${entry.map.name}, from ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on the map.`
+        ? t(
+            mapPicks!.picks.length === 1
+              ? '{v} has the strongest adjusted win rate on {name}, from {sampleSize} sampled Ranked battles on the map.'
+              : '{v} have the strongest adjusted win rates on {name}, from {sampleSize} sampled Ranked battles on the map.',
+            { v: listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName))), name: nm(entry.map.name), sampleSize: formatNumber(mapPicks!.sampleSize) },
+          )
         : mapPicks && !inRotation
-          ? `${entry.map.name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in ${modeLabel} overall are the best available answer while it is out.`
-          : `${entry.map.name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in ${modeLabel} overall are the best available answer until it fills in.`,
+          ? t('{name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the best available answer while it is out.', { name: nm(entry.map.name), modeLabel: modeLabel })
+          : t('{name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in {modeLabel} overall are the best available answer until it fills in.', { name: nm(entry.map.name), modeLabel: modeLabel }),
     },
     {
-      question: `What game mode is ${entry.map.name}?`,
-      answer: `${entry.map.name} ${entry.retired ? 'was' : 'is'} a ${modeLabel} map in Brawl Stars${mapWiki?.environment ? `, set in the ${mapWiki.environment} environment` : ''}${entry.retired ? ', and has since been retired' : ''}.`,
+      question: t('What game mode is {name}?', { name: nm(entry.map.name) }),
+      answer: t(
+        entry.retired
+          ? '{name} was a {modeLabel} map in Brawl Stars{environment}, and has since been retired.'
+          : '{name} is a {modeLabel} map in Brawl Stars{environment}.',
+        {
+          name: nm(entry.map.name),
+          modeLabel,
+          environment: mapWiki?.environment ? t(', set in the {environment} environment', { environment: mapWiki.environment }) : '',
+        },
+      ),
     },
     ...(mapWiki?.layout
       ? [
           {
-            question: `How is ${entry.map.name} laid out?`,
+            question: t('How is {name} laid out?', { name: nm(entry.map.name) }),
             answer: mapWiki.layout,
           },
         ]
@@ -179,31 +207,29 @@ export default async function MapPage({ params }: PageProps) {
         data={breadcrumbSchema([
           { name: 'Maps', path: '/maps' },
           { name: modeLabel, path: `/maps/${entry.modeSlug}` },
-          { name: entry.map.name, path: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
+          { name: nm(entry.map.name), path: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
         ])}
       />
       <JsonLd data={faqSchema(faq)} />
 
       <Link
-        href={`/maps/${entry.modeSlug}`}
+        href={lp(`/maps/${entry.modeSlug}`)}
         className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" />
-        All {modeLabel} maps
-      </Link>
+        <ArrowLeft className="size-4" />{t('All {modeLabel} maps', { modeLabel: modeLabel })}</Link>
 
       <header className="card card-glow overflow-hidden">
         <span className="block h-1 w-full" style={{ background: accent }} />
         <MapPreview
           imageUrl={entry.map.imageUrl}
-          mapName={entry.map.name}
+          mapName={nm(entry.map.name)}
           modeLabel={modeLabel}
           accent={accent}
         />
         <div className="p-6">
           <div className="flex flex-wrap items-center gap-2">
             <Link
-              href={`/maps/${entry.modeSlug}`}
+              href={lp(`/maps/${entry.modeSlug}`)}
               className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide transition-opacity hover:opacity-80"
               style={{
                 background: `color-mix(in srgb, ${accent} 20%, transparent)`,
@@ -231,64 +257,47 @@ export default async function MapPage({ params }: PageProps) {
               </span>
             ) : null}
             {entry.map.new ? (
-              <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold uppercase text-brand">
-                New
-              </span>
+              <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold uppercase text-brand">{t('New')}</span>
             ) : null}
             {/* Stated up front rather than left for the reader to infer from
                 stale numbers further down. */}
             {entry.retired ? (
-              <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase text-muted">
-                Retired
-              </span>
+              <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase text-muted">{t('Retired')}</span>
             ) : null}
           </div>
 
           <h1 className="display mt-3 text-3xl uppercase sm:text-4xl">
-            {entry.map.name}
+            {nm(entry.map.name)}
           </h1>
           <p className="mt-3 max-w-3xl leading-relaxed text-muted">
             {entry.retired ? (
-              <>
-                {entry.map.name} was a {modeLabel} map and has been retired from Brawl
-                Stars, so it can no longer be played. Its layout and environment are
-                below, along with the brawlers that perform best in {modeLabel} as a
-                whole &mdash; the closest thing to a ranking now that the map itself
-                sees no battles.
-              </>
+              <>{t('{name} was a {modeLabel} map and has been retired from Brawl Stars, so it can no longer be played. Its layout and environment are below, along with the brawlers that perform best in {modeLabel2} as a whole — the closest thing to a ranking now that the map itself sees no battles.', { name: nm(entry.map.name), modeLabel: modeLabel, modeLabel2: modeLabel })}</>
             ) : (
-              <>
-                The brawlers with the best records on {entry.map.name}, a {modeLabel}{' '}
-                map. Ranked from battles sampled off the global leaderboard pool, scored
-                against the sample-wide average rather than the map&rsquo;s own. So a
-                pick has to beat the field, not just the lobby.
-              </>
+              <>{t('The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.', { name: nm(entry.map.name), mode: modeLabel })}</>
             )}
           </p>
           {entry.map.credit ? (
-            <p className="mt-2 text-xs text-muted">Map by {entry.map.credit}</p>
+            <p className="mt-2 text-xs text-muted">{t('Map by')}{' '}{entry.map.credit}</p>
           ) : null}
         </div>
       </header>
 
       <section>
         <SectionHeading
-          title={hasMapPicks ? 'Best brawlers here' : `Best brawlers in ${modeLabel}`}
+          title={hasMapPicks ? t('Best brawlers here') : t('Best brawlers in {modeLabel}', { modeLabel: modeLabel })}
           subtitle={
             hasMapPicks
-              ? `From ${formatNumber(mapPicks!.sampleSize)} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.`
+              ? t('From {sampleSize} sampled Ranked battles on this map, weighed against each brawler\'s overall Ranked form.', { sampleSize: formatNumber(mapPicks!.sampleSize) })
               : entry.retired
-                ? `${entry.map.name} has been retired from Brawl Stars, so these are ${modeLabel} picks across every map in the mode instead.`
+                ? t('{name} has been retired from Brawl Stars, so these are {modeLabel} picks across every map in the mode instead.', { name: nm(entry.map.name), modeLabel: modeLabel })
                 : mapPicks && !inRotation
-                ? `${entry.map.name} is not in the current Ranked rotation, so these are ${modeLabel} picks across every map in the mode instead.`
-                : `${entry.map.name} has too few sampled battles to rank on its own yet, so these are ${modeLabel} picks across every map in the mode.`
+                ? t('{name} is not in the current Ranked rotation, so these are {modeLabel} picks across every map in the mode instead.', { name: nm(entry.map.name), modeLabel: modeLabel })
+                : t('{name} has too few sampled battles to rank on its own yet, so these are {modeLabel} picks across every map in the mode.', { name: nm(entry.map.name), modeLabel: modeLabel })
           }
           aside={
             hasMapPicks ? (
               <span className="inline-flex items-center gap-1.5">
-                <BrawlersIcon className="size-4" />
-                {mapPicks!.brawlersSeen} brawlers seen
-              </span>
+                <BrawlersIcon className="size-4" />{t('{brawlersSeen} brawlers seen', { brawlersSeen: mapPicks!.brawlersSeen })}</span>
             ) : null
           }
         />
@@ -297,13 +306,13 @@ export default async function MapPage({ params }: PageProps) {
             map's -- the mode fallback is a weaker answer and keeps the list. */}
         {hasMapPicks ? (
           <BrawlerPodium
-            label={`Top three on ${entry.map.name}`}
+            label={t('Top three on {name}', { name: nm(entry.map.name) })}
             brawlerMeta={brawlerMeta}
             items={mapPicks!.picks.slice(0, 3).map((p) => ({
               brawlerId: p.brawlerId,
               brawlerName: p.brawlerName,
               headline: formatPercent(p.score),
-              detail: `${p.score - p.overallScore >= 0 ? '+' : '−'}${Math.abs((p.score - p.overallScore) * 100).toFixed(1)} vs usual`,
+              detail: t('{v}{v2} vs usual', { v: p.score - p.overallScore >= 0 ? '+' : '−', v2: Math.abs((p.score - p.overallScore) * 100).toFixed(1) }),
             }))}
           />
         ) : null}
@@ -311,24 +320,19 @@ export default async function MapPage({ params }: PageProps) {
         <MapPickList
           picks={hasMapPicks ? mapPicks!.picks : (modePicks?.picks ?? [])}
           brawlerMeta={brawlerMeta}
-          emptyLabel={`No sampled battles for ${modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.`}
+          emptyLabel={t('No sampled battles for {modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.', { modeLabel: modeLabel })}
         />
         </div>
 
         {hasMapPicks ? (
-          <p className="mt-3 text-xs leading-relaxed text-muted">
-            Scores are shown against a {formatPercent(mapPicks!.baselineWinRate)}{' '}
-            sample-wide Ranked average. A brawler with a handful of battles here is
-            pulled toward its overall Ranked form, so the map has to produce real
-            evidence before it moves anyone.
-          </p>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{t('Scores are shown against a')}{' '}{formatPercent(mapPicks!.baselineWinRate)}{' '}{t('sample-wide Ranked average. A brawler with a handful of battles here is pulled toward its overall Ranked form, so the map has to produce real evidence before it moves anyone.')}</p>
         ) : null}
       </section>
 
       {entry.scHash ? (
         <MapTrios
           mode={entry.scHash}
-          mapName={entry.map.name}
+          mapName={nm(entry.map.name)}
           dataMapName={dataMapName}
           modeLabel={modeLabel}
           brawlerMeta={brawlerMeta}
@@ -338,41 +342,32 @@ export default async function MapPage({ params }: PageProps) {
       {matchups.length > 0 ? (
         <section>
           <SectionHeading
-            title="Matchups on this map"
-            subtitle={`Where a brawler does measurably better or worse against a specific opponent here than it does on ${entry.map.name} generally.`}
+            title={t('Matchups on this map')}
+            subtitle={t('Where a brawler does measurably better or worse against a specific opponent here than it does on {name} generally.', { name: nm(entry.map.name) })}
           />
           <MapMatchups matchups={matchups} brawlerMeta={brawlerMeta} />
-          <p className="mt-3 text-xs leading-relaxed text-muted">
-            Each row is measured against that brawler&rsquo;s own record on this map, so a map
-            that simply favours a brawler does not make all of its matchups look winning. Only
-            matchups with at least 40 sampled battles appear.
-          </p>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{t('Each row is measured against that brawler’s own record on this map, so a map that simply favours a brawler does not make all of its matchups look winning. Only matchups with at least 40 sampled battles appear.')}</p>
         </section>
       ) : null}
 
       {mapWiki?.layout ? (
         <section>
           <SectionHeading
-            title="Layout"
-            subtitle="How the map is built, and what that rewards."
+            title={t('Layout')}
+            subtitle={t('How the map is built, and what that rewards.')}
           />
           <div className="card space-y-3 p-5">
             {mapWiki.intro ? (
               <p className="text-sm leading-relaxed text-muted">{mapWiki.intro}</p>
             ) : null}
             <p className="leading-relaxed">{mapWiki.layout}</p>
-            <p className="text-xs text-muted">
-              Layout description from the{' '}
+            <p className="text-xs text-muted">{t('Layout description from the')}{' '}
               <a
-                href={wikiPageUrl(mapWiki.title)}
+                href={lp(wikiPageUrl(mapWiki.title))}
                 rel="noreferrer noopener"
                 target="_blank"
                 className="font-medium text-brand hover:underline"
-              >
-                Brawl Stars Wiki
-              </a>
-              , CC-BY-SA. The rankings above are our own.
-            </p>
+              >{t('Brawl Stars Wiki')}</a>{t(', CC-BY-SA. The rankings above are our own.')}</p>
           </div>
         </section>
       ) : null}
@@ -380,12 +375,12 @@ export default async function MapPage({ params }: PageProps) {
       {/* Answers the two questions the page is found by, in the page's own
           copy rather than only in its structured data. */}
       <section>
-        <SectionHeading title={`${entry.map.name} FAQ`} />
+        <SectionHeading title={t('{name} FAQ', { name: nm(entry.map.name) })} />
         <dl className="card divide-y divide-border">
           {faq.map((item) => (
             <div key={item.question} className="p-4">
-              <dt className="font-semibold">{item.question}</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
+              <dt className="font-semibold">{t(item.question)}</dt>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">{t(item.answer)}</dd>
             </div>
           ))}
         </dl>
@@ -394,25 +389,23 @@ export default async function MapPage({ params }: PageProps) {
       {siblings.length > 0 ? (
         <section>
           <SectionHeading
-            title={`Other ${modeLabel} maps`}
+            title={t('Other {modeLabel} maps', { modeLabel: modeLabel })}
             aside={
               <Link
                 href={
-                  entry.scHash
+                  lp(entry.scHash
                     ? `/tier-list/ranked/${slugify(entry.scHash)}`
-                    : '/tier-list/ranked'
+                    : '/tier-list/ranked')
                 }
                 className="hover:text-foreground"
-              >
-                {modeLabel} tier list
-              </Link>
+              >{t('{modeLabel} tier list', { modeLabel: modeLabel })}</Link>
             }
           />
           <ul className="flex flex-wrap gap-2">
             {siblings.slice(0, 24).map((sibling) => (
               <li key={sibling.map.id}>
                 <Link
-                  href={`/maps/${sibling.modeSlug}/${sibling.mapSlug}`}
+                  href={lp(`/maps/${sibling.modeSlug}/${sibling.mapSlug}`)}
                   className="card card-interactive block px-3 py-2 text-sm font-medium"
                 >
                   {sibling.map.name}
@@ -428,7 +421,6 @@ export default async function MapPage({ params }: PageProps) {
 
 /** ["A", "B", "C"] -> "A, B and C". */
 function listOf(items: string[]): string {
-  if (items.length <= 1) return items[0] ?? '';
-  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+  return andList(items);
 }
 

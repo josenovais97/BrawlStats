@@ -8,6 +8,9 @@ import { getMetaSplit } from "@/lib/home-meta";
 import { brawlerPath } from "@/lib/slugs";
 import { TIER_COLOR } from "@/lib/tiers";
 import type { Tier } from "@/types/stats";
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The one thing on this site a competitor cannot copy.
@@ -30,6 +33,8 @@ import type { Tier } from "@/types/stats";
  * leave an empty dark slab near the top on the day the lists agree.
  */
 export async function HomeSplit() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const split = await getMetaSplit(3).catch(() => []);
   if (split.length === 0) return null;
 
@@ -40,44 +45,27 @@ export async function HomeSplit() {
           <div className="min-w-0">
             <p className="flex items-center gap-2.5">
               <span aria-hidden className="rule h-4" />
-              <span className="eyebrow text-accent">
-                Why the numbers differ here
-              </span>
+              <span className="eyebrow text-accent">{t('Why the numbers differ here')}</span>
             </p>
             <h2
               id="split"
               className="display mt-2.5 text-2xl uppercase sm:text-4xl"
-            >
-              Two games.
-              <br />
-              Two answers.
-            </h2>
-            <p className="mt-3.5 leading-relaxed text-muted">
-              Ranked drafts and bans between comparable opponents. The ladder
-              does neither. We score them from separate halves of our own
-              sample, so a brawler can be a first-pick in one and a trap in the
-              other.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-muted/85">
-              Most sites give you one list for both.
-            </p>
+            >{t('Two games.')}<br />{t('Two answers.')}</h2>
+            <p className="mt-3.5 leading-relaxed text-muted">{t('Ranked drafts and bans between comparable opponents. The ladder does neither. We score them from separate halves of our own sample, so a brawler can be a first-pick in one and a trap in the other.')}</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted/85">{t('Most sites give you one list for both.')}</p>
 
             <div className="mt-5 flex flex-wrap gap-2">
               <Link
-                href="/tier-list/ranked"
+                href={lp('/tier-list/ranked')}
                 className="group inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-strong/70 bg-surface px-4 text-sm font-bold transition-colors hover:border-brand/60 hover:text-brand"
               >
-                <RankedIcon className="size-5" />
-                Ranked list
-                <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
+                <RankedIcon className="size-5" />{t('Ranked list')}<ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
               </Link>
               <Link
-                href="/tier-list/trophy"
+                href={lp('/tier-list/trophy')}
                 className="group inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
               >
-                <TrophyIcon className="size-5" />
-                Trophy list
-              </Link>
+                <TrophyIcon className="size-5" />{t('Trophy list')}</Link>
             </div>
           </div>
 
@@ -87,7 +75,7 @@ export async function HomeSplit() {
             {split.map((brawler) => (
               <li key={brawler.brawlerId}>
                 <Link
-                  href={brawlerPath(brawler.brawlerId, brawler.name)}
+                  href={lp(brawlerPath(brawler.brawlerId, brawler.name))}
                   // One of a list: prefetching each would burst past the rate limit -- see site-footer.
                   prefetch={false}
                   className="row-interactive -mx-2 flex items-center gap-3 rounded-xl px-2 py-3 sm:gap-4"
@@ -107,20 +95,20 @@ export async function HomeSplit() {
                     </span>
                     <span className="mt-1.5 block text-xs text-muted">
                       {brawler.gap === 1
-                        ? "One tier apart"
-                        : `${brawler.gap} tiers apart`}
+                        ? t('One tier apart')
+                        : t('{gap} tiers apart', { gap: brawler.gap })}
                     </span>
                   </span>
 
                   {/* Two chips, labelled, so the comparison needs no legend. */}
                   <span className="flex shrink-0 items-center gap-2 sm:gap-3">
                     <Verdict
-                      label="Ranked"
+                      label={t('Ranked')}
                       tier={brawler.ranked.tier}
                       score={brawler.ranked.score}
                     />
                     <Verdict
-                      label="Trophy"
+                      label={t('Trophy')}
                       tier={brawler.trophy.tier}
                       score={brawler.trophy.score}
                     />
@@ -145,10 +133,11 @@ function Verdict({
   tier: Tier;
   score: number;
 }) {
+  const t = getT(requestLocale());
   return (
     <span className="w-14 text-center sm:w-16">
       <span className="block text-xs font-semibold uppercase tracking-wide text-muted">
-        {label}
+        {t(label)}
       </span>
       <span
         className="display mt-1 block rounded-lg py-1 text-xl leading-none"

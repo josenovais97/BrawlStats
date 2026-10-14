@@ -17,12 +17,15 @@ import { getClub } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
 import { formatNumber, humanizeRole } from '@/lib/format';
 import { displayTag, normalizeTag } from '@/lib/tags';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { tag } = await params;
   try {
     const club = await getClub(tag);
@@ -37,11 +40,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       robots: { index: false, follow: true },
     };
   } catch {
-    return { title: `Club ${displayTag(tag)}` };
+    return { title: t('Club {tag}', { tag: displayTag(tag) }) };
   }
 }
 
 export default async function ClubPage({ params }: PageProps) {
+  const t = getT(requestLocale());
   const { tag } = await params;
 
   let club;
@@ -52,10 +56,10 @@ export default async function ClubPage({ params }: PageProps) {
     return (
       <ErrorState
         code={apiError.code}
-        title={apiError.code === 'notFound' ? 'Club not found' : undefined}
+        title={apiError.code === 'notFound' ? t('Club not found') : undefined}
         detail={
           apiError.code === 'notFound'
-            ? `No club exists with the tag ${displayTag(tag)}. Club tags are shown on the club's info screen in-game.`
+            ? t('No club exists with the tag {tag}. Club tags are shown on the club\'s info screen in-game.', { tag: displayTag(tag) })
             : undefined
         }
       />
@@ -107,7 +111,7 @@ export default async function ClubPage({ params }: PageProps) {
             <p className="mt-1 font-mono text-sm text-muted">{club.tag}</p>
             {club.description ? (
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-                {club.description}
+                {t(club.description)}
               </p>
             ) : null}
           </div>
@@ -118,7 +122,7 @@ export default async function ClubPage({ params }: PageProps) {
                 <TrophyIcon className="size-7" />
                 {formatNumber(club.trophies)}
               </span>
-              <span className="text-xs text-muted">Club trophies</span>
+              <span className="text-xs text-muted">{t('Club trophies')}</span>
             </div>
             <FavoriteButton kind="club" tag={normalizeTag(club.tag)} name={club.name} />
           </div>
@@ -128,27 +132,27 @@ export default async function ClubPage({ params }: PageProps) {
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           node={<PlayersIcon className="size-6" />}
-          label="Members"
+          label={t('Members')}
           value={`${members.length}/30`}
           tone="text-accent"
         />
         <StatCard
           node={<TrophyIcon className="size-6" />}
-          label="Avg trophies"
+          label={t('Avg trophies')}
           value={formatNumber(averageTrophies)}
         />
         <StatCard
           icon={UserPlus}
-          label="Required"
+          label={t('Required')}
           value={formatNumber(club.requiredTrophies)}
-          hint="To join"
+          hint={t('To join')}
           tone="text-victory"
         />
         <StatCard
           icon={club.type === 'open' ? Shield : Lock}
-          label="Type"
+          label={t('Type')}
           value={humanizeRole(club.type)}
-          hint={club.isFamilyFriendly ? 'Family friendly' : undefined}
+          hint={club.isFamilyFriendly ? t('Family friendly') : undefined}
         />
       </section>
 
@@ -157,7 +161,7 @@ export default async function ClubPage({ params }: PageProps) {
       <ClubPower tag={normalizeTag(club.tag)} name={club.name} />
 
       <section>
-        <SectionHeading title="Members" aside={`${members.length} of 30`} />
+        <SectionHeading title={t('Members')} aside={`${members.length} of 30`} />
         <ClubMembers members={members} />
       </section>
     </div>

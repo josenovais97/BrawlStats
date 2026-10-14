@@ -10,6 +10,10 @@ import { type HiddenPick, type MapEdgePick, getHiddenMeta } from '@/lib/hidden-m
 import { brawlerPath, slugify } from '@/lib/slugs';
 import { titleCaseLabel } from '@/lib/format';
 import { MetaRadar } from '@/components/meta/meta-radar';
+import { gameWords } from '@/lib/i18n-game';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The four questions the tier list does not answer.
@@ -48,10 +52,11 @@ function Row({
   right: React.ReactNode;
   sub: string;
 }) {
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <li>
       <Link
-        href={brawlerPath(pick.brawlerId, pick.brawlerName)}
+        href={lp(brawlerPath(pick.brawlerId, pick.brawlerName))}
         prefetch={false}
         className="row-interactive flex items-center gap-3 px-4 py-3"
       >
@@ -87,17 +92,15 @@ function Section({
   empty: boolean;
   children: React.ReactNode;
 }) {
+  const t = getT(requestLocale());
   return (
     <section className="space-y-3">
-      <SectionHeading title={title} subtitle={subtitle} />
+      <SectionHeading title={t(title)} subtitle={t(subtitle)} />
       {empty ? (
         /* An empty section is a real answer and says so, rather than being
            hidden. "Nothing qualifies this week" is information: it means the
            meta is being played roughly the way it measures. */
-        <p className="card p-4 text-sm leading-relaxed text-muted">
-          Nothing clears the bar this week, which means the meta is being played roughly the way
-          it measures.
-        </p>
+        <p className="card p-4 text-sm leading-relaxed text-muted">{t('Nothing clears the bar this week, which means the meta is being played roughly the way it measures.')}</p>
       ) : (
         <ul className="card divide-y divide-border overflow-hidden">{children}</ul>
       )}
@@ -108,19 +111,21 @@ function Section({
 const mapHref = (e: MapEdgePick) => `/maps/${slugify(e.mode)}/${slugify(e.mapName)}`;
 
 export default async function HiddenMetaPage() {
+  const t = getT(requestLocale());
+  // Map names as the reader's game writes them; English keeps its own casing.
+  const words = await gameWords(requestLocale());
+  const mapName = (name: string) => (requestLocale() === 'en' ? titleCaseLabel(name) : words.map(name));
+  const lp = (path: string) => localePath(requestLocale(), path);
   const data = await getHiddenMeta().catch(() => null);
 
   if (!data) {
     return (
       <div className="space-y-8">
         <PageHeading
-          title="The hidden meta"
-          subtitle="Who is everyone sleeping on, measured from sampled ranked battles."
+          title={t('The hidden meta')}
+          subtitle={t('Who is everyone sleeping on, measured from sampled ranked battles.')}
         />
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          Not enough sampled battles yet to answer this honestly. It fills in once enough
-          brawlers clear the sample floor.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.')}</p>
       </div>
     );
   }
@@ -137,8 +142,8 @@ export default async function HiddenMetaPage() {
       />
 
       <PageHeading
-        title="The hidden meta"
-        subtitle={`Who is everyone sleeping on. Read from ${rated} brawlers with enough ranked battles to judge, over the last ${windowDays} days.`}
+        title={t('The hidden meta')}
+        subtitle={t('Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.', { rated: rated, windowDays: windowDays })}
       />
 
       {/*
@@ -154,15 +159,15 @@ export default async function HiddenMetaPage() {
       <MetaRadar points={points} cuts={cuts} windowDays={windowDays} />
 
       <Section
-        title="Sleeper picks"
-        subtitle={`Strong, and almost nobody picks them — under ${formatPercent(cuts.lowUsage)} pick rate.`}
+        title={t('Sleeper picks')}
+        subtitle={t('Strong, and almost nobody picks them — under {lowUsage} pick rate.', { lowUsage: formatPercent(cuts.lowUsage) })}
         empty={sleepers.length === 0}
       >
         {sleepers.map((p) => (
           <Row
             key={p.brawlerId}
             pick={p}
-            sub={`${formatPercent(p.winRate)} win rate · ${formatPercent(p.usageRate)} picked · ${formatNumber(p.sampleSize)} battles`}
+            sub={t('{winRate} win rate · {pickRate} picked · {battles} battles', { winRate: formatPercent(p.winRate), pickRate: formatPercent(p.usageRate), battles: formatNumber(p.sampleSize) })}
             right={
               <span className="text-lg font-black tabular-nums text-brand">
                 {p.metaScore.toFixed(1)}
@@ -173,8 +178,8 @@ export default async function HiddenMetaPage() {
       </Section>
 
       <Section
-        title="Overrated"
-        subtitle={`Everybody picks them and the results do not justify it — over ${formatPercent(cuts.highUsage)} pick rate.`}
+        title={t('Overrated')}
+        subtitle={t('Everybody picks them and the results do not justify it — over {highUsage} pick rate.', { highUsage: formatPercent(cuts.highUsage) })}
         empty={overrated.length === 0}
       >
         {overrated.map((p) => (
@@ -192,38 +197,34 @@ export default async function HiddenMetaPage() {
       </Section>
 
       <Section
-        title="Hidden gems"
-        subtitle="Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out."
+        title={t('Hidden gems')}
+        subtitle={t('Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.')}
         empty={gems.length === 0}
       >
         {gems.map((e) => (
           <Row
             key={`${e.brawlerId}-${e.mapName}`}
             pick={e}
-            sub={`${titleCaseLabel(e.mapName)} · ${formatNumber(e.sampleSize)} battles on this map`}
+            sub={t('{map} · {battles} battles on this map', { map: mapName(e.mapName), battles: formatNumber(e.sampleSize) })}
             right={
-              <span className="text-lg font-black tabular-nums text-emerald-400">
-                +{(e.edge * 100).toFixed(1)} pts
-              </span>
+              <span className="text-lg font-black tabular-nums text-emerald-400">{t('+{v} pts', { v: (e.edge * 100).toFixed(1) })}</span>
             }
           />
         ))}
       </Section>
 
       <Section
-        title="Trap picks"
-        subtitle="Fine overall, but losing win-rate points on a map that is in rotation right now."
+        title={t('Trap picks')}
+        subtitle={t('Fine overall, but losing win-rate points on a map that is in rotation right now.')}
         empty={traps.length === 0}
       >
         {traps.map((e) => (
           <Row
             key={`${e.brawlerId}-${e.mapName}`}
             pick={e}
-            sub={`${titleCaseLabel(e.mapName)} · ${formatNumber(e.sampleSize)} battles on this map`}
+            sub={t('{map} · {battles} battles on this map', { map: mapName(e.mapName), battles: formatNumber(e.sampleSize) })}
             right={
-              <span className="text-lg font-black tabular-nums text-rose-400">
-                {(e.edge * 100).toFixed(1)} pts
-              </span>
+              <span className="text-lg font-black tabular-nums text-rose-400">{t('{v} pts', { v: (e.edge * 100).toFixed(1) })}</span>
             }
           />
         ))}
@@ -233,32 +234,15 @@ export default async function HiddenMetaPage() {
           measured rather than asserted. The cuts move with the roster, so a
           fixed number in this paragraph would rot -- they are printed live. */}
       <section className="space-y-3">
-        <SectionHeading title="How this is decided" />
+        <SectionHeading title={t('How this is decided')} />
         <div className="card space-y-2 p-5 text-sm leading-relaxed text-muted">
-          <p>
-            Every brawler here has at least 300 decided ranked battles. These lists are selected
-            extremes, and picking a maximum out of many small samples produces extremes by
-            accident rather than by merit — the floor is what stops that.
-          </p>
-          <p>
-            &ldquo;Low pick rate&rdquo; and &ldquo;strong&rdquo; are percentiles of the live
-            roster, not fixed numbers, so the question stays the same while the answers move.
-            Today they resolve to under {formatPercent(cuts.lowUsage)} picked and a rating of{' '}
-            {cuts.strong.toFixed(1)} or better.
-          </p>
-          <p>
-            Map gems and traps compare a brawler&rsquo;s score on one map against its own overall
-            form, so the list is not a second copy of the{' '}
-            <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-              tier list
-            </Link>
-            . Only maps currently in rotation are included.
-          </p>
+          <p>{t('Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.')}</p>
+          <p>{t('“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of', { lowUsage: formatPercent(cuts.lowUsage) })}{' '}{t('{v} or better.', { v: cuts.strong.toFixed(1) })}</p>
+          <p>{t('Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the')}{' '}
+            <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('tier list')}</Link>{t('. Only maps currently in rotation are included.')}</p>
           <p>
             {gems.length > 0 ? (
-              <Link href={mapHref(gems[0])} className="font-medium text-brand hover:underline">
-                See every pick on {titleCaseLabel(gems[0].mapName)}
-              </Link>
+              <Link href={lp(mapHref(gems[0]))} className="font-medium text-brand hover:underline">{t('See every pick on {mapName}', { mapName: titleCaseLabel(gems[0].mapName) })}</Link>
             ) : null}
           </p>
         </div>

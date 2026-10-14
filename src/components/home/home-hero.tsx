@@ -13,6 +13,9 @@ import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The hero, as a command centre.
@@ -50,6 +53,7 @@ const FALLBACK_CAST = [
 ];
 
 export function HomeHero({ stats }: { stats?: ReactNode }) {
+  const t = getT(requestLocale());
   return (
     /*
       `w-screen` centred on the page escapes `main`'s column. Safe because the
@@ -79,18 +83,11 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
                 brown. Solid colour, same shadow, and the highlight now falls
                 on the four words that carry the promise.
               */}
-              <h1 className="display-hero mt-5 text-[1.875rem] uppercase leading-[0.92] sm:text-[2.5rem] lg:text-[3.25rem]">
-                Brawl Stars
-                <br />
-                stats that show
-                <br />
-                <span className="text-brand">where you stand</span>
+              <h1 className="display-hero mt-5 text-[1.875rem] uppercase leading-[0.92] sm:text-[2.5rem] lg:text-[3.25rem]">{t('Brawl Stars|hero-1')}<br />{t('stats that show|hero-2')}<br />
+                <span className="text-brand">{t('where you stand|hero-3')}</span>
               </h1>
 
-              <p className="mt-3.5 max-w-md leading-relaxed text-muted">
-                Search any player or club. See skill score, roster gaps, progression and live meta
-                context in seconds.
-              </p>
+              <p className="mt-3.5 max-w-md leading-relaxed text-muted">{t('Search any player or club. See skill score, roster gaps, progression and live meta context in seconds.')}</p>
 
               <Console />
             </div>
@@ -139,11 +136,12 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
 
 /** The live-data marker, built into the composition rather than floated on it. */
 function Eyebrow() {
+  const t = getT(requestLocale());
   return (
     <p className="flex items-center gap-2.5">
       <span aria-hidden className="rule h-4" />
       <span className="live-dot" />
-      <span className="eyebrow text-brand">Live Brawl Stars data</span>
+      <span className="eyebrow text-brand">{t('Live Brawl Stars data')}</span>
     </p>
   );
 }
@@ -157,6 +155,8 @@ function Eyebrow() {
  * box, so the diagonal would go unpainted.
  */
 function Console() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div className="relative mt-6 max-w-xl">
       {/* Warm bloom behind the panel, as a sibling so it can spill past the
@@ -193,15 +193,12 @@ function Console() {
                 profile rather than a mock-up, which is the only way to show
                 what a lookup returns without inventing numbers.
               */
-              <p className="mt-2.5 text-sm text-muted">
-                No tag handy?{' '}
+              <p className="mt-2.5 text-sm text-muted">{t('No tag handy?')}{' '}
                 <Link
-                  href={`/player/${SAMPLE_PLAYER_TAG}`}
+                  href={lp(`/player/${SAMPLE_PLAYER_TAG}`)}
                   rel={playerLinkRel(SAMPLE_PLAYER_TAG)}
                   className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
-                >
-                  Try a sample profile
-                  <ArrowUpRight className="size-3.5" />
+                >{t('Try a sample profile')}<ArrowUpRight className="size-3.5" />
                 </Link>
               </p>
             }
@@ -232,6 +229,7 @@ function Console() {
  * page and `cache` collapses them into one.
  */
 async function Stage() {
+  const t = getT(requestLocale());
   const top = await getTopMetaBrawlers(3).catch(() => []);
   const ranked = top.length === 3;
 
@@ -331,9 +329,7 @@ async function Stage() {
       {/* The six words that explain the whole conceit. Anchored under the
           podium rather than floated beside it. */}
       {ranked ? (
-        <p className="absolute inset-x-0 bottom-0 text-center text-xs font-semibold uppercase tracking-[0.16em] text-muted/80">
-          Top 3 in Ranked right now
-        </p>
+        <p className="absolute inset-x-0 bottom-0 text-center text-xs font-semibold uppercase tracking-[0.16em] text-muted/80">{t('Top 3 in Ranked right now')}</p>
       ) : null}
     </>
   );
@@ -413,6 +409,8 @@ function Figure({
   treatment: Treatment;
   className: string;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const rim = slot.tier ? TIER_COLOR[slot.tier] : '#8b6bff';
 
   const art =
@@ -478,10 +476,10 @@ function Figure({
   // Ranked figures are real rows and link like it; stand-ins are decoration.
   return slot.rank ? (
     <Link
-      href={brawlerPath(slot.brawlerId, slot.name)}
+      href={lp(brawlerPath(slot.brawlerId, slot.name))}
       // One of a list: prefetching each would burst past the rate limit -- see site-footer.
       prefetch={false}
-      title={`${slot.name}: number ${slot.rank} in Ranked${slot.tier ? `, tier ${slot.tier}` : ''}`}
+      title={t('{name}: number {rank} in Ranked{v}', { name: slot.name, rank: slot.rank, v: slot.tier ? `, tier ${slot.tier}` : '' })}
       className={`absolute block transition-transform duration-300 hover:-translate-y-1.5 ${className}`}
     >
       {art}

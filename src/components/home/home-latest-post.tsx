@@ -2,6 +2,9 @@ import { Music2 } from 'lucide-react';
 import Image from 'next/image';
 
 import { TIKTOK_PROFILE_URL, getLatestTikTokPost } from '@/lib/tiktok-latest';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The newest post on the site's own TikTok, as one row rather than a section.
@@ -20,6 +23,8 @@ import { TIKTOK_PROFILE_URL, getLatestTikTokPost } from '@/lib/tiktok-latest';
  * showed an empty frame for a day; this one keeps it on purpose.
  */
 export async function HomeLatestPost() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const post = await getLatestTikTokPost();
   if (!post) return null;
 
@@ -35,7 +40,7 @@ export async function HomeLatestPost() {
 
   return (
     <a
-      href={post.url}
+      href={lp(post.url)}
       target="_blank"
       rel="noopener noreferrer"
       className="card card-interactive group flex items-center gap-4 p-3 transition-colors hover:border-brand/50 sm:p-4"
@@ -63,13 +68,12 @@ export async function HomeLatestPost() {
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="eyebrow text-accent">Latest on TikTok</span>
+        <span className="eyebrow text-accent">{t('Latest on TikTok')}</span>
         <span className="mt-1 line-clamp-2 block font-bold leading-snug transition-colors group-hover:text-brand">
-          {post.title || 'Today’s findings, measured from sampled battles'}
+          {post.title || t('Today’s findings, measured from sampled battles')}
         </span>
         <span className="mt-1 block text-xs text-muted">
-          {dateLabel ? `${dateLabel} · ` : ''}tiktok.com/@brawlzone.net
-        </span>
+          {dateLabel ? `${dateLabel} · ` : ''}{t('tiktok.com/@brawlzone.net')}</span>
       </span>
     </a>
   );

@@ -19,6 +19,9 @@ import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
 import { brawlerPath } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The account at a glance, in its own colours: the brawlers it is built
@@ -42,6 +45,8 @@ export async function PlayerShowcase({
   brawlers: BSPlayerBrawler[];
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const tx = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   if (brawlers.length === 0) return null;
 
   const top = mains(brawlers);
@@ -65,7 +70,7 @@ export async function PlayerShowcase({
   };
 
   return (
-    <Panel title="Showcase" aside="The brawlers this account is built around">
+    <Panel title={tx('Showcase')} aside="The brawlers this account is built around">
       {/* The mains. Three cards, each in its rarity's colour, so the row reads
           as three different brawlers rather than three copies of one card.
 
@@ -81,7 +86,7 @@ export async function PlayerShowcase({
           return (
             <li key={b.id}>
               <Link
-                href={brawlerPath(b.id, b.name)}
+                href={lp(brawlerPath(b.id, b.name))}
                 prefetch={false}
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border transition-colors hover:border-brand/50"
                 style={{
@@ -89,12 +94,12 @@ export async function PlayerShowcase({
                 }}
               >
                 <span className="absolute left-2 top-2 z-10 rounded-md bg-background/70 px-1.5 py-0.5 text-[10px] font-black text-brand backdrop-blur @xl:left-3 @xl:top-3 @xl:px-2 @xl:text-xs">
-                  #{i + 1}<span className="hidden @xl:inline"> main</span>
+                  #{i + 1}<span className="hidden @xl:inline">{' '}{tx('main')}</span>
                 </span>
                 {prestigeOf(b) > 0 ? (
                   <span
                     className="absolute right-2 top-2 z-10 rounded-md bg-surface-3 px-1 py-0.5 text-[10px] font-black text-accent @xl:right-3 @xl:top-3 @xl:px-1.5 @xl:text-xs"
-                    title={`Prestige ${prestigeOf(b)}`}
+                    title={tx('Prestige {b}', { b: prestigeOf(b) })}
                   >
                     P{prestigeOf(b)}
                   </span>
@@ -115,7 +120,7 @@ export async function PlayerShowcase({
                   <div className="min-w-0">
                     <p className="display truncate text-sm uppercase @xl:text-xl">{titleCase(b.name)}</p>
                     <p className="truncate text-[10px] text-muted @xl:text-xs">
-                      {label ? titleCase(label) : 'Default skin'}
+                      {label ? titleCase(label) : tx('Default skin')}
                     </p>
                   </div>
 
@@ -128,7 +133,7 @@ export async function PlayerShowcase({
                     {streak >= HOT_STREAK ? (
                       <span className="flex items-center gap-1 text-[10px] font-bold tabular-nums text-victory @xl:text-xs">
                         <WinStreakIcon className="size-3.5 @xl:size-4" />
-                        {streak}<span className="hidden @xl:inline"> in a row</span>
+                        {streak}<span className="hidden @xl:inline">{' '}{tx('in a row')}</span>
                       </span>
                     ) : null}
                   </div>
@@ -143,14 +148,10 @@ export async function PlayerShowcase({
                           style={{ width: `${Math.max(4, Math.round(target.progress * 100))}%` }}
                         />
                       </div>
-                      <p className="mt-1 text-[10px] text-muted @xl:text-[11px]">
-                        {formatNumber(target.toGo)} to P{target.level}
-                      </p>
+                      <p className="mt-1 text-[10px] text-muted @xl:text-[11px]">{tx('{toGo} to P{level}', { toGo: formatNumber(target.toGo), level: target.level })}</p>
                     </div>
                   ) : (
-                    <p className="mt-auto text-[10px] text-muted @xl:text-[11px]">
-                      Past {formatNumber(HIGHEST_KNOWN_MARK)}
-                    </p>
+                    <p className="mt-auto text-[10px] text-muted @xl:text-[11px]">{tx('Past {HIGHEST_KNOWN_MARK}', { HIGHEST_KNOWN_MARK: formatNumber(HIGHEST_KNOWN_MARK) })}</p>
                   )}
                 </div>
               </Link>
@@ -168,14 +169,12 @@ export async function PlayerShowcase({
           {hot.length > 0 ? (
             <div className="rounded-xl bg-surface-2/40 p-4">
               <h3 className="mb-3 flex items-center gap-2 text-sm font-bold">
-                <WinStreakIcon className="size-4" />
-                On fire right now
-              </h3>
+                <WinStreakIcon className="size-4" />{tx('On fire right now')}</h3>
               <ul className="flex flex-wrap gap-2">
                 {hot.map((b) => (
                   <li key={b.id}>
                     <Link
-                      href={brawlerPath(b.id, b.name)}
+                      href={lp(brawlerPath(b.id, b.name))}
                       prefetch={false}
                       className="flex items-center gap-2 rounded-xl border border-border bg-surface px-2 py-1.5 transition-colors hover:border-victory/50"
                     >
@@ -195,19 +194,19 @@ export async function PlayerShowcase({
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-[11px] text-muted">Wins in a row, as of the latest battle.</p>
+              <p className="mt-2 text-[11px] text-muted">{tx('Wins in a row, as of the latest battle.')}</p>
             </div>
           ) : null}
 
           {/* Nearly there: inside the last quarter of a 1,000-trophy band. */}
           {close.length > 0 ? (
             <div className="rounded-xl bg-surface-2/40 p-4">
-              <h3 className="mb-3 text-sm font-bold">Next prestige</h3>
+              <h3 className="mb-3 text-sm font-bold">{tx('Next prestige')}</h3>
               <ul className="space-y-2.5">
                 {close.map((t) => (
                   <li key={t.brawler.id}>
                     <Link
-                      href={brawlerPath(t.brawler.id, t.brawler.name)}
+                      href={lp(brawlerPath(t.brawler.id, t.brawler.name))}
                       prefetch={false}
                       className="flex items-center gap-3 rounded-lg transition-colors hover:text-foreground"
                     >
@@ -223,9 +222,7 @@ export async function PlayerShowcase({
                         <div className="flex items-baseline justify-between gap-2 text-sm">
                           <span className="truncate font-semibold">{titleCase(t.brawler.name)}</span>
                           <span className="shrink-0 text-xs tabular-nums text-muted">
-                            <span className="font-black text-accent">{formatNumber(t.toGo)}</span>{' '}
-                            to P{t.level}
-                          </span>
+                            <span className="font-black text-accent">{formatNumber(t.toGo)}</span>{' '}{tx('to P{level}', { level: t.level })}</span>
                         </div>
                         <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2">
                           <div

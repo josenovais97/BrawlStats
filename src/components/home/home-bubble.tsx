@@ -5,6 +5,9 @@ import Link from "next/link";
 import { DownloadButton } from "@/components/bubble/download-button";
 import { HomeSection } from "@/components/home/home-section";
 import { BUBBLE_APP, bubbleAppSize } from "@/lib/bubble-app";
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The Android app, on the landing page.
@@ -22,24 +25,26 @@ import { BUBBLE_APP, bubbleAppSize } from "@/lib/bubble-app";
  * bytes on a page that already loads plenty.
  */
 export function HomeBubble() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <HomeSection
       id="bubble-app"
-      eyebrow="Free Android app"
-      title="Take the tier list into the game"
-      subtitle="A floating bubble that draws the Ranked meta on top of Brawl Stars, so you can check a pick without leaving the draft."
+      eyebrow={t('Free Android app')}
+      title={t('Take the tier list into the game')}
+      subtitle={t('A floating bubble that draws the Ranked meta on top of Brawl Stars, so you can check a pick without leaving the draft.')}
       ctaHref="/bubble"
-      ctaLabel="About the app"
+      ctaLabel={t('About the app')}
     >
       <div className="grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <Link
-          href="/bubble"
+          href={lp('/bubble')}
           className="card card-interactive block overflow-hidden"
-          aria-label="See the BrawlZone Bubble app"
+          aria-label={t('See the BrawlZone Bubble app')}
         >
           <Image
             src="/bubble/demo-poster.jpg"
-            alt="The BrawlZone panel open over a live Hot Zone draft, showing the Ranked tier list filtered to that mode"
+            alt={t('The BrawlZone panel open over a live Hot Zone draft, showing the Ranked tier list filtered to that mode')}
             width={1280}
             height={590}
             className="w-full"
@@ -48,11 +53,7 @@ export function HomeBubble() {
         </Link>
 
         <div className="space-y-4">
-          <p className="leading-relaxed text-muted">
-            Brawl Stars gives you seconds to pick, and switching apps costs more
-            of them than you have. The bubble sits on the edge of the screen,
-            opens on a tap and folds away again.
-          </p>
+          <p className="leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick, and switching apps costs more of them than you have. The bubble sits on the edge of the screen, opens on a tap and folds away again.')}</p>
           {/* What the panel does, not just that it exists: the paragraph said
               "tier list" while the panel had grown map picks, trios, a draft
               board and the reader's own roster. */}
@@ -66,13 +67,11 @@ export function HomeBubble() {
               <li key={title as string} className="flex items-start gap-2.5">
                 <Check className="mt-0.5 size-4 shrink-0 text-victory" />
                 <span className="text-sm">
-                  <span className="font-semibold">{title}</span>
+                  <span className="font-semibold">{t(title)}</span>
                   {isNew ? (
-                    <span className="ml-1.5 rounded bg-brand px-1.5 py-0.5 align-middle text-[10px] font-black uppercase text-brand-ink">
-                      New
-                    </span>
+                    <span className="ml-1.5 rounded bg-brand px-1.5 py-0.5 align-middle text-[10px] font-black uppercase text-brand-ink">{t('New')}</span>
                   ) : null}
-                  <span className="text-muted"> · {hint}</span>
+                  <span className="text-muted"> · {t(hint)}</span>
                 </span>
               </li>
             ))}
@@ -86,7 +85,7 @@ export function HomeBubble() {
                   className="flex items-center gap-2 text-sm font-semibold"
                 >
                   <Check className="size-4 shrink-0 text-victory" />
-                  {item}
+                  {t(item)}
                 </li>
               ),
             )}
@@ -97,12 +96,8 @@ export function HomeBubble() {
               from="home"
               className="inline-flex items-center gap-2.5 rounded-xl bg-brand px-5 py-3 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
             >
-              <Download className="size-4" />
-              Download for Android
-            </DownloadButton>
-            <p className="text-xs text-muted">
-              {bubbleAppSize()} · Android {BUBBLE_APP.minAndroid}+
-            </p>
+              <Download className="size-4" />{t('Download for Android')}</DownloadButton>
+            <p className="text-xs text-muted">{t('{v} · Android {minAndroid}+', { v: bubbleAppSize(), minAndroid: BUBBLE_APP.minAndroid })}</p>
           </div>
         </div>
       </div>

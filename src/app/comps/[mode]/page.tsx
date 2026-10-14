@@ -14,6 +14,9 @@ import { formatNumber, formatPercent } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import { getTeamComps, type ModeComps } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ mode: string }>;
@@ -57,18 +60,21 @@ async function resolveMode(
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { mode } = await params;
   const resolved = await resolveMode(mode);
-  if (!resolved) return { title: 'Team comps' };
+  if (!resolved) return { title: t('Team comps') };
 
   return {
-    title: `Best ${resolved.label} comps in Brawl Stars`,
-    description: `The three-brawler compositions with the best records in Brawl Stars ${resolved.label}, measured from sampled battles over the last 14 days.`,
+    title: t('Best {label} comps in Brawl Stars', { label: resolved.label }),
+    description: t('The three-brawler compositions with the best records in Brawl Stars {label}, measured from sampled battles over the last 14 days.', { label: resolved.label }),
     alternates: { canonical: `/comps/${resolved.slug}` },
   };
 }
 
 export default async function ModeCompsPage({ params }: PageProps) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { mode } = await params;
   const resolved = await resolveMode(mode);
   if (!resolved) notFound();
@@ -87,12 +93,10 @@ export default async function ModeCompsPage({ params }: PageProps) {
       />
 
       <Link
-        href="/comps"
+        href={lp('/comps')}
         className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" />
-        All modes
-      </Link>
+        <ArrowLeft className="size-4" />{t('All modes')}</Link>
 
       <PageHeading
         eyebrow={
@@ -106,30 +110,25 @@ export default async function ModeCompsPage({ params }: PageProps) {
                 className="size-[18px] shrink-0 object-contain"
                 unoptimized
               />
-              {resolved.label}
+              {t(resolved.label)}
             </span>
           ) : (
             resolved.label
           )
         }
-        title={`Best ${resolved.label} comps`}
-        subtitle={`Ranked by how far each trio sits above the mode's own average of ${formatPercent(
+        title={t('Best {label} comps', { label: resolved.label })}
+        subtitle={t('Ranked by how far each trio sits above the mode\'s own average of {baseline}, from {sampleSize} sampled battles over the last 14 days.', { baseline: formatPercent(
           comps.baseline,
-        )}, from ${formatNumber(comps.sampleSize)} sampled battles over the last 14 days.`}
+        ), sampleSize: formatNumber(comps.sampleSize) })}
       />
 
       <CompList
         comps={comps.comps}
         brawlerMeta={brawlerMeta}
-        emptyLabel="Not enough data for this mode yet."
+        emptyLabel={t('Not enough data for this mode yet.')}
       />
 
-      <p className="text-xs leading-relaxed text-muted">
-        A comp appears here once at least fifteen different players have used it across at least
-        forty decided battles. The player floor matters more than the battle count: a squad that queues
-        together brings the same trio every game, so without it the list ranks strong teams rather
-        than strong comps. Ranked and ladder battles both count.
-      </p>
+      <p className="text-xs leading-relaxed text-muted">{t('A comp appears here once at least fifteen different players have used it across at least forty decided battles. The player floor matters more than the battle count: a squad that queues together brings the same trio every game, so without it the list ranks strong teams rather than strong comps. Ranked and ladder battles both count.')}</p>
     </div>
   );
 }

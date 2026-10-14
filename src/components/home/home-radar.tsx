@@ -7,6 +7,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { DiscoveryCard } from '@/components/daily/discovery-card';
 import type { Discovery } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { useT } from '@/components/i18n/use-t';
+import type { T } from '@/lib/t-core';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * The day's findings, on the landing page.
@@ -57,6 +60,8 @@ export function HomeRadar({
   discoveries: Discovery[];
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const tx = useT();
+  const lp = useLp();
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -143,7 +148,7 @@ export function HomeRadar({
   const share = useCallback(async () => {
     if (!current) return;
     const url = new URL(current.href, window.location.origin).toString();
-    const text = `${headlineFor(current)} — BrawlZone`;
+    const text = `${headlineFor(current, tx)} — BrawlZone`;
 
     try {
       if (navigator.share) {
@@ -157,7 +162,7 @@ export function HomeRadar({
       // The sheet was dismissed, or the clipboard is blocked. Neither is worth
       // interrupting the page for.
     }
-  }, [current]);
+  }, [current, tx]);
 
   if (count === 0) return null;
 
@@ -196,16 +201,10 @@ export function HomeRadar({
           <p className="flex items-center gap-2.5">
             <span aria-hidden className="rule h-4" />
             <span className="eyebrow flex items-center gap-2 text-accent-2">
-              <span className="live-dot" />
-              Discovered today
-            </span>
+              <span className="live-dot" />{tx('Discovered today')}</span>
           </p>
-          <h2 id="radar" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
-            BrawlZone Radar
-          </h2>
-          <p className="mt-2 max-w-xl text-sm text-muted">
-            Things our own sampling turned up that no tier list would tell you.
-          </p>
+          <h2 id="radar" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{tx('BrawlZone Radar')}</h2>
+          <p className="mt-2 max-w-xl text-sm text-muted">{tx('Things our own sampling turned up that no tier list would tell you.')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -215,14 +214,12 @@ export function HomeRadar({
             className="inline-flex items-center gap-2 rounded-xl border border-border px-3.5 py-2 text-sm font-semibold transition-colors hover:border-brand/50"
           >
             {copied ? <Check className="size-4 text-victory" /> : <Share2 className="size-4" />}
-            {copied ? 'Copied' : 'Share'}
+            {copied ? tx('Copied') : tx('Share')}
           </button>
           <Link
-            href="/daily"
+            href={lp('/daily')}
             className="inline-flex items-center gap-2 rounded-xl border border-border px-3.5 py-2 text-sm font-semibold transition-colors hover:border-brand/50"
-          >
-            All findings
-          </Link>
+          >{tx('All findings')}</Link>
         </div>
       </div>
 
@@ -245,7 +242,7 @@ export function HomeRadar({
           <button
             type="button"
             onClick={() => go(-1)}
-            aria-label="Previous finding"
+            aria-label={tx('Previous finding')}
             className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-brand/50 hover:text-fg"
           >
             <ChevronLeft className="size-4" />
@@ -257,7 +254,7 @@ export function HomeRadar({
                 key={d.kind + d.brawlerIds.join('-')}
                 type="button"
                 onClick={() => jump(i)}
-                aria-label={`Finding ${i + 1} of ${count}`}
+                aria-label={tx('Finding {v} of {count}', { v: i + 1, count: count })}
                 aria-current={i === index}
                 className={`h-1.5 rounded-full transition-all ${
                   i === index ? 'w-6 bg-brand' : 'w-1.5 bg-border-strong hover:bg-muted'
@@ -269,7 +266,7 @@ export function HomeRadar({
           <button
             type="button"
             onClick={() => go(1)}
-            aria-label="Next finding"
+            aria-label={tx('Next finding')}
             className="inline-flex size-9 items-center justify-center rounded-full border border-border text-muted transition-colors hover:border-brand/50 hover:text-fg"
           >
             <ChevronRight className="size-4" />
@@ -288,20 +285,20 @@ export function HomeRadar({
  * pasted into a chat has none of that context. This says the finding and the
  * brawler, which is what makes someone tap.
  */
-function headlineFor(d: Discovery): string {
+function headlineFor(d: Discovery, t: T): string {
   const [a, b] = d.brawlerNames.map((n) => n.charAt(0) + n.slice(1).toLowerCase());
   switch (d.kind) {
     case 'secret-pick':
-      return `Almost nobody picks ${a}. It is winning anyway.`;
+      return t('Almost nobody picks {name}. It is winning anyway.', { name: a });
     case 'meta-trap':
-      return `${a} is picked constantly and losing.`;
+      return t('{name} is picked constantly and losing.', { name: a });
     case 'giant-killer':
-      return `${a} owns ${b}.`;
+      return t('{name} owns {other}.', { name: a, other: b });
     case 'secret-duo':
-      return `${a} and ${b} belong together.`;
+      return t('{name} and {other} belong together.', { name: a, other: b });
     case 'map-surprise':
-      return `${a} is a different brawler on ${d.context ?? 'this map'}.`;
+      return t('{name} is a different brawler on {map}.', { name: a, map: d.context ?? t('this map') });
     case 'overnight-rise':
-      return `${a} climbed overnight.`;
+      return t('{name} climbed overnight.', { name: a });
   }
 }

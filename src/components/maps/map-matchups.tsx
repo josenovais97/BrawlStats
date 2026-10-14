@@ -4,6 +4,8 @@ import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import type { MapMatchup } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Matchups that only hold on this map.
@@ -24,6 +26,7 @@ export function MapMatchups({
   matchups: MapMatchup[];
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const t = getT(requestLocale());
   if (matchups.length === 0) return null;
 
   const name = (id: number) => brawlerMeta.get(id)?.name?.toLowerCase() ?? `#${id}`;
@@ -48,11 +51,9 @@ export function MapMatchups({
             />
             <span className="min-w-0 flex-1 text-sm leading-snug">
               <span className="font-semibold capitalize">{name(m.brawlerId)}</span>{' '}
-              <span className="text-muted">{favoured ? 'beats' : 'loses to'}</span>{' '}
+              <span className="text-muted">{favoured ? t('beats') : t('loses to')}</span>{' '}
               <span className="font-semibold capitalize">{name(m.againstBrawlerId)}</span>
-              <span className="block text-xs tabular-nums text-muted">
-                {formatNumber(m.battles)} battles here
-              </span>
+              <span className="block text-xs tabular-nums text-muted">{t('{battles} battles here', { battles: formatNumber(m.battles) })}</span>
             </span>
             <Image
               src={

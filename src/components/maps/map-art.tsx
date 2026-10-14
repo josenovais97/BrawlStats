@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { getUT } from '@/lib/t-universal';
 
 /**
  * A map thumbnail that fills its frame.
@@ -32,13 +33,12 @@ export function MapArt({
   sizes: string;
   className?: string;
 }) {
+  const t = getUT();
   if (!src) {
     return (
       <div
         className={`grid w-full place-items-center bg-surface-2 text-xs text-muted ${height} ${className}`}
-      >
-        No preview
-      </div>
+      >{t('No preview')}</div>
     );
   }
 

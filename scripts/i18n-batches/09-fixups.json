@@ -1,0 +1,18 @@
+{
+ "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.": [
+  "% de la puntuación. Ese peso se mide, no se elige: frente a un estimador que controla exactamente la habilidad del jugador, la tasa de victorias ajustada da r = +0,77 y la tasa de uso r = +0,22, así que la popularidad es una señal de fuerza débil pero real, no ruido, y su parte de la señal combinada es más o menos una quinta parte, que es el peso que tiene ahora. Antes era el 35%, con lo que producía el 45% de la diferencia real y movía brawlers cuarenta puestos solo por popularidad. Aun así, un brawler popular con un récord mediocre seguirá puntuando más que uno impopular con mejor récord. Los dos números aparecen en cada fila para que los valores tú mismo.",
+  "% da pontuação. Esse peso é medido, não escolhido: contra um estimador que controla exatamente a habilidade do jogador, a taxa de vitória ajustada dá r = +0,77 e a taxa de escolha r = +0,22, então a popularidade é um sinal de força fraco, mas real, e não ruído, e a parte dela no sinal combinado é mais ou menos um quinto, que é o peso que ela tem agora. Antes eram 35%, o que gerava 45% da diferença real e movia brawlers quarenta posições só por popularidade. Mesmo assim, um brawler popular com resultado mediano ainda vai pontuar mais que um impopular com resultado melhor. Os dois números aparecem em cada linha para você avaliar."
+ ],
+ "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.": [
+  "Las dos coinciden mucho (r = +0,77) y difieren donde importa. Bibi estaba la 96.ª solo por tasa de victorias y la 16.ª al comparar a cada jugador con su propia media, porque la juegan sobre todo cuentas más flojas y sus resultados se le atribuían a ella.",
+  "As duas concordam bastante (r = +0,77) e discordam onde importa. A Bibi estava em 96º só pela taxa de vitória e em 16º ao comparar cada jogador com a própria média, porque ela é jogada principalmente por contas mais fracas e os resultados delas eram atribuídos a ela."
+ ],
+ "{stats} first-guess solve": [
+  "{stats} acierto al primer intento",
+  "{stats} acerto no primeiro palpite"
+ ],
+ "{stats} first-guess solves": [
+  "{stats} aciertos al primer intento",
+  "{stats} acertos no primeiro palpite"
+ ]
+}

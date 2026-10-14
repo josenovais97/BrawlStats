@@ -6,6 +6,8 @@ import { ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 import { FullPageMessage } from '@/components/ui/full-page-message';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * The root error boundary. Error boundaries must be Client Components.
@@ -25,6 +27,8 @@ export default function Error({
   error: Error & { digest?: string };
   retry: () => void;
 }) {
+  const t = useT();
+  const lp = useLp();
   useEffect(() => {
     // No error reporting service here, so the console is where a digest can
     // still be recovered from a user's own devtools.
@@ -33,24 +37,20 @@ export default function Error({
 
   return (
     <FullPageMessage
-      title="Something went wrong"
-      body="This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works."
+      title={t('Something went wrong')}
+      body={t('This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.')}
     >
       <button
         type="button"
         onClick={() => retry()}
         className="btn-game inline-flex items-center gap-2 bg-brand px-6 py-3 uppercase text-[#1a1200] hover:bg-brand-strong"
       >
-        <RefreshCw className="size-4" />
-        Try again
-      </button>
+        <RefreshCw className="size-4" />{t('Try again')}</button>
       <Link
-        href="/"
+        href={lp('/')}
         className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
       >
-        <ArrowLeft className="size-4" />
-        Back to search
-      </Link>
+        <ArrowLeft className="size-4" />{t('Back to search')}</Link>
     </FullPageMessage>
   );
 }

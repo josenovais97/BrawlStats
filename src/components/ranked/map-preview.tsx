@@ -3,6 +3,7 @@
 import { Expand, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * The map image on a ranked card, expandable to full size.
@@ -28,6 +29,7 @@ export function MapPreview({
   modeLabel: string;
   accent: string;
 }) {
+  const t = useT();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
 
@@ -45,9 +47,7 @@ export function MapPreview({
 
   if (!imageUrl) {
     return (
-      <div className="grid h-52 w-full place-items-center bg-surface-2 text-xs text-muted">
-        No map preview
-      </div>
+      <div className="grid h-52 w-full place-items-center bg-surface-2 text-xs text-muted">{t('No map preview')}</div>
     );
   }
 
@@ -56,7 +56,7 @@ export function MapPreview({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label={`Expand the ${mapName} map layout`}
+        aria-label={t('Expand the {mapName} map layout', { mapName: mapName })}
         className="group relative block h-52 w-full cursor-zoom-in overflow-hidden bg-surface-2 focus-visible:outline-offset-[-2px]"
       >
         {/* Maps are portrait and the card is landscape, so drawing one whole
@@ -90,7 +90,7 @@ export function MapPreview({
 
         <Image
           src={imageUrl}
-          alt={`${mapName} map layout`}
+          alt={t('{mapName} map layout', { mapName: mapName })}
           fill
           sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 92vw"
           className="object-contain p-3 drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)] transition-transform duration-200 group-hover:scale-[1.04]"
@@ -131,7 +131,7 @@ export function MapPreview({
               <button
                 type="button"
                 onClick={close}
-                aria-label="Close map preview"
+                aria-label={t('Close map preview')}
                 className="row-interactive -mr-1 shrink-0 rounded-lg p-1.5 text-muted hover:text-foreground"
               >
                 <X className="size-5" />
@@ -140,7 +140,7 @@ export function MapPreview({
 
             <Image
               src={imageUrl}
-              alt={`${mapName} map layout`}
+              alt={t('{mapName} map layout', { mapName: mapName })}
               width={900}
               height={1400}
               sizes="(min-width: 640px) 46rem, 92vw"

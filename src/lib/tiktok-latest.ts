@@ -18,8 +18,8 @@ import { getPrisma } from '@/lib/prisma';
  * zero entries and rendered an empty frame for a day.
  */
 
-/** The account the box posts to. `@brawlzone` is a different account. */
-export const TIKTOK_PROFILE_URL = 'https://www.tiktok.com/@brawlzone.net';
+/* Lives in `lib/site` so client components can link to it. */
+export { TIKTOK_PROFILE_URL } from '@/lib/site';
 
 export interface TikTokLatestPost {
   postId: string;

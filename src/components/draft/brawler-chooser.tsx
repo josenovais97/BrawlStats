@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useId, useMemo, useState } from 'react';
 
 import { brawlerIconUrl } from '@/lib/brawlapi';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 export interface ChooserBrawler {
   id: number;
@@ -65,6 +67,8 @@ export function BrawlerChooser({
   hrefs: Record<number, string>;
   suggestedLabel?: string;
 }) {
+  const t = useT();
+  const lp = useLp();
   const [query, setQuery] = useState('');
   const inputId = useId();
 
@@ -108,7 +112,7 @@ export function BrawlerChooser({
         htmlFor={inputId}
         className="mb-2.5 block text-xs font-bold uppercase tracking-wide text-muted"
       >
-        {label}
+        {t(label)}
       </label>
 
       <div className="group relative">
@@ -121,7 +125,7 @@ export function BrawlerChooser({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search brawlers"
+          placeholder={t('Search brawlers')}
           autoComplete="off"
           className="min-h-11 w-full rounded-xl border border-border-strong/70 bg-surface-2 py-2 pl-10 pr-10 text-base outline-none transition-colors placeholder:text-muted/85 focus:border-brand/70"
         />
@@ -129,7 +133,7 @@ export function BrawlerChooser({
           <button
             type="button"
             onClick={() => setQuery('')}
-            aria-label="Clear search"
+            aria-label={t('Clear search')}
             className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
           >
             <X className="size-4" />
@@ -146,7 +150,7 @@ export function BrawlerChooser({
             {suggested.map((brawler) => (
               <li key={brawler.id}>
                 <Link
-                  href={hrefs[brawler.id]}
+                  href={lp(hrefs[brawler.id])}
                   rel="nofollow"
                   prefetch={false}
                   scroll={false}
@@ -178,7 +182,7 @@ export function BrawlerChooser({
         {filtered.map((brawler) => (
           <li key={brawler.id}>
             <Link
-              href={hrefs[brawler.id]}
+              href={lp(hrefs[brawler.id])}
               rel="nofollow"
               prefetch={false}
               scroll={false}
@@ -202,9 +206,7 @@ export function BrawlerChooser({
       </ul>
 
       {filtered.length === 0 ? (
-        <p className="mt-3 text-sm text-muted">
-          No brawler matches &ldquo;{query}&rdquo;.
-        </p>
+        <p className="mt-3 text-sm text-muted">{t('No brawler matches “{query}”.', { query: query })}</p>
       ) : null}
     </div>
   );

@@ -1,6 +1,9 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One heading treatment for every homepage block: eyebrow, title, one line of
@@ -32,6 +35,8 @@ export function HomeSection({
   ctaLabel: string;
   children: ReactNode;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     /*
       `min-w-0` matters: when this section is a grid item, its automatic
@@ -45,22 +50,22 @@ export function HomeSection({
           {eyebrow ? (
             <p className="flex items-center gap-2.5">
               <span aria-hidden className="rule h-4" />
-              <span className="eyebrow">{eyebrow}</span>
+              <span className="eyebrow">{t(eyebrow)}</span>
             </p>
           ) : null}
           <h2 id={id} className="display mt-2.5 text-2xl uppercase sm:text-4xl">
-            {title}
+            {t(title)}
           </h2>
           {subtitle ? (
-            <p className="mt-2 max-w-xl text-sm text-muted">{subtitle}</p>
+            <p className="mt-2 max-w-xl text-sm text-muted">{t(subtitle)}</p>
           ) : null}
         </div>
 
         <Link
-          href={ctaHref}
+          href={lp(ctaHref)}
           className="group inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-brand/50 hover:text-brand"
         >
-          {ctaLabel}
+          {t(ctaLabel)}
           <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Link>
       </div>

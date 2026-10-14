@@ -3,6 +3,8 @@ import { rankedLeagueIconUrl } from '@/lib/brawlapi';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { RankedRung } from '@/lib/stats';
 import Image from 'next/image';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * How crowded each rung of the Ranked ladder actually is.
@@ -19,6 +21,7 @@ import Image from 'next/image';
  * would be invisible.
  */
 export function RankedLadder({ ladder }: { ladder: RankedRung[] }) {
+  const t = getT(requestLocale());
   if (ladder.length === 0) return null;
 
   const population = ladder.reduce((sum, rung) => sum + rung.players, 0);
@@ -27,8 +30,8 @@ export function RankedLadder({ ladder }: { ladder: RankedRung[] }) {
   return (
     <section className="space-y-4">
       <SectionHeading
-        title="Where everyone actually is"
-        subtitle={`Every rung of the Ranked ladder across ${formatNumber(population)} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.`}
+        title={t('Where everyone actually is')}
+        subtitle={t('Every rung of the Ranked ladder across {population} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.', { population: formatNumber(population) })}
       />
 
       <ol className="card divide-y divide-border overflow-hidden">
@@ -59,19 +62,12 @@ export function RankedLadder({ ladder }: { ladder: RankedRung[] }) {
             {/* The cumulative figure is the one people quote — "only 4% get
                 past Mythic" — so it is printed rather than left to be worked
                 out from the bars. */}
-            <span className="hidden w-28 shrink-0 text-right text-xs tabular-nums text-muted sm:block">
-              {share(rung.atOrAbove)} here or above
-            </span>
+            <span className="hidden w-28 shrink-0 text-right text-xs tabular-nums text-muted sm:block">{t('{atOrAbove} here or above', { atOrAbove: share(rung.atOrAbove) })}</span>
           </li>
         ))}
       </ol>
 
-      <p className="px-1 text-xs leading-relaxed text-muted">
-        Sampled from players reachable through the global leaderboards and their
-        recent opponents, so it leans slightly toward more active accounts than
-        the game as a whole. Players who have not played Ranked this season are
-        excluded rather than counted at the bottom.
-      </p>
+      <p className="px-1 text-xs leading-relaxed text-muted">{t('Sampled from players reachable through the global leaderboards and their recent opponents, so it leans slightly toward more active accounts than the game as a whole. Players who have not played Ranked this season are excluded rather than counted at the bottom.')}</p>
     </section>
   );
 }

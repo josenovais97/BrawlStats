@@ -8,6 +8,9 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getDailyDiscoveries, listDailyReports, saveDailyReport } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /*
  * Daily, and the framing depends on it. The underlying reads refresh every two
@@ -25,6 +28,8 @@ export const metadata: Metadata = {
 };
 
 export default async function DailyPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const [discoveries, brawlerMeta] = await Promise.all([
     getDailyDiscoveries().catch(() => []),
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
@@ -68,25 +73,10 @@ export default async function DailyPage() {
 
       <section className="card mt-8 p-5 text-sm leading-relaxed text-muted">
         <p>
-          <strong className="text-foreground">How these are chosen.</strong> Each card is the
-          argmax of a stated quantity over a stated population — the highest win rate among
-          brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The
-          same data always produces the same set, so nothing here is written by a model or picked
-          by hand. Win rates are adjusted against the sample average, so a week where the sampled
-          players are stronger does not make every brawler look buffed.
-        </p>
-        <p className="mt-3">
-          Every day is kept at its own address —{' '}
-          <Link href="/daily/archive" className="text-brand hover:underline">
-            browse the archive
-          </Link>{' '}
-          or{' '}
-          <Link href="/daily/feed.xml" className="text-brand hover:underline">
-            subscribe by RSS
-          </Link>
-          . These findings cannot be recomputed later, so the archive starts from the day it was
-          built rather than reaching backwards.
-        </p>
+          <strong className="text-foreground">{t('How these are chosen.')}</strong>{' '}{t('Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.')}</p>
+        <p className="mt-3">{t('Every day is kept at its own address —')}{' '}
+          <Link href={lp('/daily/archive')} className="text-brand hover:underline">{t('browse the archive')}</Link>{' '}{t('or')}{' '}
+          <Link href={lp('/daily/feed.xml')} className="text-brand hover:underline">{t('subscribe by RSS')}</Link>{t('. These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.')}</p>
       </section>
     </>
   );

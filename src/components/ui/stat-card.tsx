@@ -1,5 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface StatCardProps {
   /** A lucide component. Ignored when `node` is given. */
@@ -30,6 +32,7 @@ export function StatCard({
   hint,
   tone = 'text-brand',
 }: StatCardProps) {
+  const t = getT(requestLocale());
   return (
     <div className="card flex items-center gap-3 p-4">
       <span
@@ -39,10 +42,10 @@ export function StatCard({
       </span>
       <div className="min-w-0">
         <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">
-          {label}
+          {t(label)}
         </p>
         <p className="truncate text-lg font-bold tabular-nums">{value}</p>
-        {hint ? <p className="truncate text-xs text-muted">{hint}</p> : null}
+        {hint ? <p className="truncate text-xs text-muted">{t(hint)}</p> : null}
       </div>
     </div>
   );

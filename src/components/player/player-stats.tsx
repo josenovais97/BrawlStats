@@ -21,8 +21,12 @@ import { HOT_STREAK, skinLabel } from '@/lib/player-showcase';
 import { brawlerPath } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BSPlayer, BSPlayerBrawler } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export function PlayerStats({ player }: { player: BSPlayer }) {
+  const tx = getT(requestLocale());
   // Ranked deliberately absent: the Ranking section shows the current,
   // season-best and all-time-best tiers with their elo, so a figure repeating
   // just the current tier was the weakest thing in this row.
@@ -45,11 +49,8 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
      * `@md` *of*.
      */
     <section className="@container">
-      <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted">
-        Lifetime{' '}
-        <span className="font-medium normal-case tracking-normal">
-          · since the account was made
-        </span>
+      <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted">{tx('Lifetime')}{' '}
+        <span className="font-medium normal-case tracking-normal">{tx('· since the account was made')}</span>
       </p>
       <StatStrip
         bare
@@ -58,24 +59,24 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
           // The game's own marks, so the row reads as Brawl Stars rather than
           // as a generic dashboard of line icons.
           node: <Battle3v3Icon className="size-4" />,
-          label: '3v3 wins',
+          label: tx('3v3 wins'),
           value: formatNumber(player['3vs3Victories']),
         },
         {
           node: <SoloShowdownIcon className="size-4" />,
-          label: 'Solo SD wins',
+          label: tx('Solo SD wins'),
           value: formatNumber(player.soloVictories),
         },
         {
           node: <DuoShowdownIcon className="size-4" />,
-          label: 'Duo SD wins',
+          label: tx('Duo SD wins'),
           value: formatNumber(player.duoVictories),
         },
         {
           node: <BrawlersIcon className="size-4" />,
-          label: 'Brawlers',
+          label: tx('Brawlers'),
           value: formatNumber(player.brawlers.length),
-          hint: `${player.brawlers.filter((b) => b.power === 11).length} at power 11`,
+          hint: tx('{length} at power 11', { length: player.brawlers.filter((b) => b.power === 11).length }),
         },
         {
           /*
@@ -84,7 +85,7 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
            * both duplicated and mislabelled.
            */
           node: <ExperienceIcon className="size-4" />,
-          label: 'Exp points',
+          label: tx('Exp points'),
           value: formatNumber(player.expPoints),
         },
         ]}
@@ -117,6 +118,8 @@ export async function PlayerRecords({
   player: BSPlayer;
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const tx = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const robo = formatDuration(player.bestRoboRumbleTime);
   const bigBrawler = formatDuration(player.bestTimeAsBigBrawler);
 
@@ -139,14 +142,14 @@ export async function PlayerRecords({
       key: 'best-brawler',
       brawler: bestBrawler,
       icon: <TrophyIcon className="size-4" />,
-      label: 'Highest trophies',
+      label: tx('Highest trophies'),
       value: formatNumber(bestBrawler.highestTrophies),
       // The gap to now is the story when there is one: a peak of 1,500 on a
       // brawler sitting at 1,500 is a different record from one now on 900.
       detail:
         bestBrawler.trophies < bestBrawler.highestTrophies
-          ? `Now on ${formatNumber(bestBrawler.trophies)}`
-          : 'At its peak right now',
+          ? tx('Now on {trophies}', { trophies: formatNumber(bestBrawler.trophies) })
+          : tx('At its peak right now'),
       tone: 'text-brand',
     });
   }
@@ -156,9 +159,9 @@ export async function PlayerRecords({
       key: 'streak',
       brawler: bestStreak,
       icon: <WinStreakIcon className="size-4" />,
-      label: 'Longest win streak',
+      label: tx('Longest win streak'),
       value: `${formatNumber(bestStreak.maxWinStreak ?? 0)} wins`,
-      detail: live >= HOT_STREAK ? `On ${live} in a row right now` : 'In a row, all-time',
+      detail: live >= HOT_STREAK ? tx('On {live} in a row right now', { live: live }) : tx('In a row, all-time'),
       tone: 'text-victory',
     });
   }
@@ -168,18 +171,18 @@ export async function PlayerRecords({
     times.push({
       key: 'robo',
       mark: <RoboRumbleIcon className="size-7" />,
-      label: 'Robo Rumble',
+      label: tx('Robo Rumble'),
       value: robo,
-      hint: 'Longest survival',
+      hint: tx('Longest survival'),
     });
   }
   if (bigBrawler) {
     times.push({
       key: 'big',
       mark: <BigBrawlerIcon className="size-7" />,
-      label: 'Big Brawler',
+      label: tx('Big Brawler'),
       value: bigBrawler,
-      hint: 'Longest time held',
+      hint: tx('Longest time held'),
     });
   }
 
@@ -193,7 +196,7 @@ export async function PlayerRecords({
     : new Map<number, string>();
 
   return (
-    <Panel title="Personal bests" aside="All-time">
+    <Panel title={tx('Personal bests')} aside="All-time">
       <div className="space-y-3">
         {heroes.length ? (
           <ul className="grid gap-3 @2xl:grid-cols-2">
@@ -203,7 +206,7 @@ export async function PlayerRecords({
               return (
                 <li key={h.key}>
                   <Link
-                    href={brawlerPath(h.brawler.id, h.brawler.name)}
+                    href={lp(brawlerPath(h.brawler.id, h.brawler.name))}
                     prefetch={false}
                     className="group relative flex h-full min-h-36 items-stretch overflow-hidden rounded-2xl border border-border transition-colors hover:border-brand/50"
                     style={{
@@ -221,7 +224,7 @@ export async function PlayerRecords({
                     <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center gap-1 p-4 @xl:p-5">
                       <p className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider ${h.tone}`}>
                         <span aria-hidden className="flex shrink-0 items-center">{h.icon}</span>
-                        {h.label}
+                        {tx(h.label)}
                       </p>
                       <p className={`display text-3xl leading-none tabular-nums @xl:text-4xl ${h.tone}`}>
                         {h.value}
@@ -232,7 +235,7 @@ export async function PlayerRecords({
                           <span className="font-medium normal-case text-muted"> · {titleCase(skin)}</span>
                         ) : null}
                       </p>
-                      <p className="truncate text-xs text-muted">{h.detail}</p>
+                      <p className="truncate text-xs text-muted">{tx(h.detail)}</p>
                     </div>
 
                     <div className="relative z-10 flex w-32 shrink-0 items-end justify-center pt-3 @xl:w-40">
@@ -265,10 +268,10 @@ export async function PlayerRecords({
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-[11px] font-bold uppercase tracking-wider text-muted">
-                    {t.label}
+                    {tx(t.label)}
                   </p>
                   <p className="truncate text-2xl font-black leading-tight tabular-nums">{t.value}</p>
-                  <p className="truncate text-xs text-muted">{t.hint}</p>
+                  <p className="truncate text-xs text-muted">{tx(t.hint)}</p>
                 </div>
               </li>
             ))}

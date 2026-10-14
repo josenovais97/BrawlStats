@@ -3,6 +3,9 @@ import Link from 'next/link';
 
 import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
 import type { UpcomingBrawler } from '@/lib/announced';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * A brawler that has been revealed but is not in the game yet.
@@ -27,6 +30,8 @@ const MEASURED_SECTIONS = [
 ] as const;
 
 export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { name, rarityName, className, stats, abilities, portraitUrl } = brawler;
   const gadgets = abilities.filter((a) => a.kind === 'gadget');
   const starPowers = abilities.filter((a) => a.kind === 'starPower');
@@ -59,12 +64,10 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
             {/* Pills in the same shape the released pages use, so a reader
                 moving between the two is not learning a second layout. */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
-                Not released yet
-              </span>
+              <span className="inline-flex items-center rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">{t('Not released yet')}</span>
               {rarityName ? (
                 <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
-                  {rarityName}
+                  {t(rarityName)}
                 </span>
               ) : null}
               {className ? (
@@ -74,27 +77,19 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
               ) : null}
             </div>
             <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">{name.toLowerCase()}</h1>
-            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">
-              {name} has been revealed but is not playable yet, so there are no
-              sampled battles behind this page. Everything below comes from the
-              community wiki and fills in over the days after a reveal.
-            </p>
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">{t('{name} has been revealed but is not playable yet, so there are no sampled battles behind this page. Everything below comes from the community wiki and fills in over the days after a reveal.', { name: name })}</p>
           </div>
         </div>
       </header>
 
       {stats.length > 0 ? (
         <section aria-labelledby="stats">
-          <h2 id="stats" className="display text-2xl uppercase">
-            Combat stats
-          </h2>
-          <p className="mt-1 text-sm text-muted">
-            Base values, before gears and star powers. Provisional until release.
-          </p>
+          <h2 id="stats" className="display text-2xl uppercase">{t('Combat stats')}</h2>
+          <p className="mt-1 text-sm text-muted">{t('Base values, before gears and star powers. Provisional until release.')}</p>
           <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {stats.map((stat) => (
               <div key={stat.label} className="card flex items-baseline justify-between p-3.5">
-                <dt className="text-sm text-muted">{stat.label}</dt>
+                <dt className="text-sm text-muted">{t(stat.label)}</dt>
                 <dd className="text-lg font-bold tabular-nums">{stat.value}</dd>
               </div>
             ))}
@@ -104,17 +99,15 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
 
       {abilities.length > 0 ? (
         <section aria-labelledby="abilities">
-          <h2 id="abilities" className="display text-2xl uppercase">
-            Gadgets and star powers
-          </h2>
+          <h2 id="abilities" className="display text-2xl uppercase">{t('Gadgets and star powers')}</h2>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <AbilityCard
-              title="Gadgets"
+              title={t('Gadgets')}
               icon={<GadgetIcon className="size-5" />}
               items={gadgets}
             />
             <AbilityCard
-              title="Star powers"
+              title={t('Star powers')}
               icon={<StarPowerIcon className="size-5" />}
               items={starPowers}
             />
@@ -123,10 +116,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       ) : null}
 
       {bare ? (
-        <p className="card p-5 text-sm leading-relaxed text-muted">
-          Nothing beyond the name has been published for {name} yet. This page
-          fills in as the wiki does.
-        </p>
+        <p className="card p-5 text-sm leading-relaxed text-muted">{t('Nothing beyond the name has been published for {name} yet. This page fills in as the wiki does.', { name: name })}</p>
       ) : null}
 
       {/*
@@ -142,26 +132,18 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       {MEASURED_SECTIONS.map((section) => (
         <section key={section.id} aria-labelledby={section.id}>
           <h2 id={section.id} className="display text-2xl uppercase">
-            {section.title}
+            {t(section.title)}
           </h2>
           <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-muted">
-            {section.blurb}
+            {t(section.blurb)}
           </p>
           <p className="card mt-3 p-4 text-sm text-muted">
-            <span className="font-semibold text-foreground">No data yet.</span>{' '}
-            {name} is not playable, so no battles have been sampled. This fills
-            in within a day or two of release.
-          </p>
+            <span className="font-semibold text-foreground">{t('No data yet.')}</span>{' '}{t('{name} is not playable, so no battles have been sampled. This fills in within a day or two of release.', { name: name })}</p>
         </section>
       ))}
 
       <p className="text-sm text-muted">
-        <Link href="/brawlers" className="text-brand hover:underline">
-          All brawlers
-        </Link>{' '}
-        · Stats and abilities from the Brawl Stars Wiki, which is community
-        edited and may change before release.
-      </p>
+        <Link href={lp('/brawlers')} className="text-brand hover:underline">{t('All brawlers')}</Link>{' '}{t('· Stats and abilities from the Brawl Stars Wiki, which is community edited and may change before release.')}</p>
     </div>
   );
 }
@@ -175,12 +157,13 @@ function AbilityCard({
   icon: React.ReactNode;
   items: UpcomingBrawler['abilities'];
 }) {
+  const t = getT(requestLocale());
   if (items.length === 0) return null;
   return (
     <div className="card p-4">
       <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted">
         {icon}
-        {title}
+        {t(title)}
       </p>
       <ul className="mt-3 space-y-2">
         {items.map((a, i) => (
@@ -202,7 +185,7 @@ function AbilityCard({
               <span aria-hidden className="size-9 shrink-0 rounded-lg bg-surface-3" />
             )}
             <span className="min-w-0 text-sm font-semibold">
-              {a.name ?? <span className="text-muted">Not named yet</span>}
+              {a.name ?? <span className="text-muted">{t('Not named yet')}</span>}
             </span>
           </li>
         ))}

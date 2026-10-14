@@ -15,25 +15,26 @@ const RANKING_REVALIDATE = 21600;
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /** Global top players ranked by trophies on this specific brawler. */
 export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   let players;
   try {
     players = (await getBrawlerRankings(brawlerId, 'global', 10, RANKING_REVALIDATE)).items;
   } catch {
     return (
-      <p className="card p-6 text-sm text-muted">
-        The brawler leaderboard is unavailable right now.
-      </p>
+      <p className="card p-6 text-sm text-muted">{t('The brawler leaderboard is unavailable right now.')}</p>
     );
   }
 
   if (players.length === 0) {
     return (
-      <p className="card p-6 text-sm text-muted">
-        No ranking data for this brawler yet.
-      </p>
+      <p className="card p-6 text-sm text-muted">{t('No ranking data for this brawler yet.')}</p>
     );
   }
 
@@ -42,7 +43,7 @@ export async function BrawlerLeaderboard({ brawlerId }: { brawlerId: number }) {
       {players.map((player) => (
         <li key={player.tag}>
           <Link
-            href={`/player/${normalizeTag(player.tag)}`}
+            href={lp(`/player/${normalizeTag(player.tag)}`)}
             rel={playerLinkRel(normalizeTag(player.tag))}
                 prefetch={false}
             className="card card-interactive flex items-center gap-4 p-3"

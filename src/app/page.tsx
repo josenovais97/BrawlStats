@@ -17,6 +17,8 @@ import { HomeSplit } from '@/components/home/home-split';
 import { HomeTools } from '@/components/home/home-tools';
 import { Skeleton } from '@/components/ui/skeletons';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   title: 'BrawlZone: Brawl Stars stats, tier lists and leaderboards',
@@ -110,6 +112,7 @@ const WEBSITE_SCHEMA = {
  * the same content.
  */
 export default function HomePage() {
+  const t = getT(requestLocale());
   return (
     <div className="space-y-14 sm:space-y-20">
       <script
@@ -191,14 +194,12 @@ export default function HomePage() {
         id="live-now"
         eyebrow={
           <span className="inline-flex items-center gap-2 text-victory">
-            <span className="live-dot" />
-            In rotation now
-          </span>
+            <span className="live-dot" />{t('In rotation now')}</span>
         }
-        title="Live Brawl Stars events"
-        subtitle="The maps everyone is playing this slot, straight from the game API."
+        title={t('Live Brawl Stars events')}
+        subtitle={t('The maps everyone is playing this slot, straight from the game API.')}
         ctaHref="/maps"
-        ctaLabel="Every map"
+        ctaLabel={t('Every map')}
       >
         <Suspense
           fallback={

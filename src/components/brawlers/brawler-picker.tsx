@@ -2,6 +2,7 @@
 
 import { Check, ChevronDown, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * Searchable brawler combobox.
@@ -32,6 +33,7 @@ export function BrawlerPicker({
   onChange: (slug: string) => void;
   exclude?: string;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,7 +86,7 @@ export function BrawlerPicker({
         className="flex min-h-12 w-full items-center gap-2 rounded-xl border border-border bg-surface-2 px-3 text-sm font-semibold capitalize transition-colors hover:border-brand/50"
       >
         <span className="flex-1 truncate text-left">
-          {selected ? selected.name.toLowerCase() : 'Choose a brawler'}
+          {selected ? selected.name.toLowerCase() : t('Choose a brawler')}
         </span>
         <ChevronDown
           aria-hidden
@@ -114,17 +116,15 @@ export function BrawlerPicker({
                   close();
                 }
               }}
-              placeholder="Search brawlers"
-              aria-label="Search brawlers"
+              placeholder={t('Search brawlers')}
+              aria-label={t('Search brawlers')}
               className="w-full bg-transparent py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-muted/85"
             />
           </div>
 
-          <ul role="listbox" aria-label={label} className="max-h-72 overflow-y-auto py-1">
+          <ul role="listbox" aria-label={t(label)} className="max-h-72 overflow-y-auto py-1">
             {results.length === 0 ? (
-              <li className="px-3 py-4 text-center text-sm text-muted">
-                No brawler matches “{query}”.
-              </li>
+              <li className="px-3 py-4 text-center text-sm text-muted">{t('No brawler matches “{query}”.', { query: query })}</li>
             ) : (
               results.map((brawler) => (
                 <li key={brawler.slug}>

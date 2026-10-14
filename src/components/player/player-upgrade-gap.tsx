@@ -10,6 +10,9 @@ import { formatNumber } from '@/lib/format';
 import { MAX_POWER_LEVEL } from '@/lib/progression';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Brawlers carrying the game's rarest upgrades while still short of power 11.
@@ -43,6 +46,7 @@ export function PlayerUpgradeGap({
   /** Coins to take one brawler from its current level to 11, by level. */
   coinsPerLevel?: (from: number) => number;
 }) {
+  const t = getT(requestLocale());
   const stranded = brawlers
     .filter((b) => {
       if (b.power >= MAX_POWER_LEVEL) return false;
@@ -63,18 +67,15 @@ export function PlayerUpgradeGap({
 
   return (
     <Panel
-      title="Upgraded but not maxed"
+      title={t('Upgraded but not maxed')}
       aside={`${stranded.length} ${stranded.length === 1 ? 'brawler' : 'brawlers'}`}
     >
       <div>
         <p className="text-sm leading-relaxed text-muted">
-          {stranded.length === 1 ? 'One brawler carries' : `${stranded.length} carry`} a hypercharge
-          or buffie below power {MAX_POWER_LEVEL}.
-          {coins > 0 ? (
+          {stranded.length === 1 ? t('One brawler carries') : t('{length} carry', { length: stranded.length })}{' '}{t('a hypercharge or buffie below power {MAX_POWER_LEVEL}.', { MAX_POWER_LEVEL: MAX_POWER_LEVEL })}{coins > 0 ? (
             <>
-              {' '}
-              Finishing {stranded.length === 1 ? 'it' : 'them all'} costs about{' '}
-              <strong className="font-semibold text-foreground">{formatNumber(coins)} coins</strong>
+              {' '}{t('Finishing')}{' '}{stranded.length === 1 ? t('it') : t('them all')}{' '}{t('costs about')}{' '}
+              <strong className="font-semibold text-foreground">{formatNumber(coins)}{' '}{t('coins')}</strong>
               .
             </>
           ) : null}
@@ -85,18 +86,13 @@ export function PlayerUpgradeGap({
             so this is its first row read aloud. */}
         {coinsPerLevel && coinsPerLevel(stranded[0].power) > 0 ? (
           <p className="mt-3 flex items-center gap-2 rounded-xl border border-brand/30 bg-brand/10 px-3.5 py-2.5 text-sm">
-            <span className="rounded-md bg-brand px-1.5 py-0.5 text-[11px] font-black uppercase text-brand-ink">
-              Start here
-            </span>
+            <span className="rounded-md bg-brand px-1.5 py-0.5 text-[11px] font-black uppercase text-brand-ink">{t('Start here')}</span>
             <span className="min-w-0">
               <strong className="font-bold capitalize">{stranded[0].name.toLowerCase()}</strong>
               <span className="text-muted">
-                {' '}
-                to power {MAX_POWER_LEVEL} for about{' '}
+                {' '}{t('to power {MAX_POWER_LEVEL} for about', { MAX_POWER_LEVEL: MAX_POWER_LEVEL })}{' '}
               </span>
-              <strong className="font-bold tabular-nums text-brand">
-                {formatNumber(coinsPerLevel(stranded[0].power))} coins
-              </strong>
+              <strong className="font-bold tabular-nums text-brand">{t('{power} coins', { power: formatNumber(coinsPerLevel(stranded[0].power)) })}</strong>
             </span>
           </p>
         ) : null}
@@ -110,7 +106,7 @@ export function PlayerUpgradeGap({
         </ul>
 
         {rest.length > 0 ? (
-          <Disclosure tone="bare" className="mt-1" summary={`Show all ${stranded.length}`}>
+          <Disclosure tone="bare" className="mt-1" summary={t('Show all {length}', { length: stranded.length })}>
             <ul className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
               {rest.map((brawler) => (
                 <li key={brawler.id}>
@@ -121,11 +117,7 @@ export function PlayerUpgradeGap({
           </Disclosure>
         ) : null}
 
-        <Disclosure tone="bare" className="mt-1" summary="Why this matters">
-          A hypercharge does not require a maxed brawler, so it is easy to end up holding the best
-          upgrade available on something that loses the fight before it charges. Ordered by how
-          close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.
-        </Disclosure>
+        <Disclosure tone="bare" className="mt-1" summary={t('Why this matters')}>{t('A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.', { MAX_POWER_LEVEL: MAX_POWER_LEVEL })}</Disclosure>
       </div>
     </Panel>
   );
@@ -140,16 +132,18 @@ function Row({
   brawlerMeta: Map<number, BABrawler>;
   coinsPerLevel?: (from: number) => number;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const hyper = (brawler.hyperCharges?.length ?? 0) > 0;
   const buffies = Object.entries(brawler.buffies ?? {}).filter(([, owned]) => owned);
   const cost = coinsPerLevel?.(brawler.power);
 
   return (
     <Link
-      href={brawlerPath(brawler.id, brawler.name)}
+      href={lp(brawlerPath(brawler.id, brawler.name))}
       title={
         cost
-          ? `${brawler.name}: about ${formatNumber(cost)} coins from power ${brawler.power} to ${MAX_POWER_LEVEL}`
+          ? t('{name}: about {cost} coins from power {power} to {MAX_POWER_LEVEL}', { name: brawler.name, cost: formatNumber(cost), power: brawler.power, MAX_POWER_LEVEL: MAX_POWER_LEVEL })
           : undefined
       }
       className="row-interactive flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5"
@@ -170,13 +164,10 @@ function Row({
         <span className="flex items-center gap-2 text-xs">
           {hyper ? (
             <span className="inline-flex items-center gap-1 text-defeat">
-              <HyperchargeIcon className="size-3.5" />
-              Hypercharge
-            </span>
+              <HyperchargeIcon className="size-3.5" />{t('Hypercharge')}</span>
           ) : null}
           {buffies.length > 0 ? (
-            <span className="text-accent">
-              {buffies.length} buffie{buffies.length === 1 ? '' : 's'}
+            <span className="text-accent">{t('{length} buffie', { length: buffies.length })}{buffies.length === 1 ? '' : 's'}
             </span>
           ) : null}
         </span>

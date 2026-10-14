@@ -12,6 +12,9 @@ import { formatNumber, formatPercent } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import { getTeamComps } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /* Matches READ_CACHE_SECONDS: a longer declaration would be capped by the
    data cache inside it anyway. See trap 2 in AGENTS.md. */
@@ -28,6 +31,8 @@ export const metadata: Metadata = {
 const PREVIEW = 3;
 
 export default async function CompsPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const [modes, modeMeta, brawlerMeta] = await Promise.all([
     getTeamComps().catch(() => []),
     getGameModeMap().catch(() => new Map()),
@@ -46,14 +51,12 @@ export default async function CompsPage() {
       />
 
       <PageHeading
-        title="Best team comps"
-        subtitle="The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it."
+        title={t('Best team comps')}
+        subtitle={t('The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it.')}
       />
 
       {withComps.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          No comps have enough data yet. This fills in as battles are sampled.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('No comps have enough data yet. This fills in as battles are sampled.')}</p>
       ) : null}
 
       {withComps.map((mode) => {
@@ -64,7 +67,7 @@ export default async function CompsPage() {
         return (
           <section key={mode.mode} className="space-y-3">
             <SectionHeading
-              title={label}
+              title={t(label)}
               icon={
                 meta?.imageUrl ? (
                   <Image
@@ -79,21 +82,18 @@ export default async function CompsPage() {
               }
               aside={
                 <Link
-                  href={`/comps/${slug}`}
+                  href={lp(`/comps/${slug}`)}
                   className="text-xs font-semibold text-brand transition-colors hover:underline"
-                >
-                  All {mode.comps.length} comps
-                </Link>
+                >{t('All {length} comps', { length: mode.comps.length })}</Link>
               }
             />
-            <p className="text-xs text-muted">
-              {formatNumber(mode.sampleSize)} sampled battles · mode average{' '}
+            <p className="text-xs text-muted">{t('{sampleSize} sampled battles · mode average', { sampleSize: formatNumber(mode.sampleSize) })}{' '}
               {formatPercent(mode.baseline)}
             </p>
             <CompList
               comps={mode.comps.slice(0, PREVIEW)}
               brawlerMeta={brawlerMeta}
-              emptyLabel="No data yet."
+              emptyLabel={t('No data yet.')}
             />
           </section>
         );

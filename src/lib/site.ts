@@ -1,3 +1,5 @@
+import { requestLocale } from '@/lib/request-locale';
+
 /**
  * Canonical origin for the deployed site.
  *
@@ -87,5 +89,10 @@ export const SAMPLE_PLAYER_TAG = '2RLCPVGUG';
  * is a day old, and the underlying numbers move on a slower cadence than that.
  */
 export function currentMonth(): string {
-  return new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  // In the page's language: "octubre de 2026" on a Spanish page.
+  const tag = { en: 'en-GB', es: 'es-419', pt: 'pt-BR' }[requestLocale()];
+  return new Date().toLocaleDateString(tag, { month: 'long', year: 'numeric' });
 }
+
+/** The account the box posts to. `@brawlzone` is a different account. */
+export const TIKTOK_PROFILE_URL = 'https://www.tiktok.com/@brawlzone.net';

@@ -4,6 +4,8 @@ import { CommunityEvents } from '@/components/events/community-events';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 import { getCommunityEvents } from '@/lib/community-events';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Community events: the game-wide challenges the whole player base grinds.
@@ -44,6 +46,7 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
+  const t = getT(requestLocale());
   // An unreachable wiki empties the list rather than failing the page.
   const community = await getCommunityEvents().catch(() => []);
 
@@ -57,16 +60,13 @@ export default async function EventsPage() {
       />
 
       <PageHeading
-        eyebrow="Everyone, one target"
-        title="Community events"
-        subtitle="Game-wide challenges: the whole player base grinds one milestone, and everybody collects the reward."
+        eyebrow={t('Everyone, one target')}
+        title={t('Community events')}
+        subtitle={t('Game-wide challenges: the whole player base grinds one milestone, and everybody collects the reward.')}
       />
 
       {community.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          The community-event write-ups could not be read just now. They come
-          from the Brawl Stars wiki and this fills back in on its own.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('The community-event write-ups could not be read just now. They come from the Brawl Stars wiki and this fills back in on its own.')}</p>
       ) : (
         <CommunityEvents events={community} />
       )}

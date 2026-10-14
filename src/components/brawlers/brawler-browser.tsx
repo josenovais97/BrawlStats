@@ -10,6 +10,8 @@ import type { Tier } from '@/types/stats';
 
 import { ClassIcon } from '@/components/game-icons';
 import { brawlerPath } from '@/lib/slugs';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /** Only what the grid renders — keeps the client payload small. */
 export interface BrawlerCardData {
@@ -103,6 +105,7 @@ function rarityRank(rarity: string | null): number {
  * undoes them.
  */
 export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
+  const tx = useT();
   const [query, setQuery] = useState('');
   const [rarity, setRarity] = useState('all');
   const [brawlerClass, setBrawlerClass] = useState('all');
@@ -184,9 +187,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             because typing a name is what almost everyone does here. */}
         <div className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:p-4">
           <div className="group relative min-w-0 flex-1">
-            <label htmlFor={searchId} className="sr-only">
-              Search brawlers by name
-            </label>
+            <label htmlFor={searchId} className="sr-only">{tx('Search brawlers by name')}</label>
             <Search
               aria-hidden
               className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-muted transition-colors group-focus-within:text-brand"
@@ -195,7 +196,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               id={searchId}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search brawlers"
+              placeholder={tx('Search brawlers')}
               type="search"
               autoComplete="off"
               className="min-h-12 w-full rounded-xl border border-border-strong/70 bg-surface-2 py-2 pl-11 pr-10 text-base outline-none transition-colors placeholder:text-muted/85 focus:border-brand/70"
@@ -204,7 +205,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                aria-label="Clear search"
+                aria-label={tx('Clear search')}
                 className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
               >
                 <X className="size-4" />
@@ -215,7 +216,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
 
         <div className="space-y-2 border-t border-border p-3 sm:p-4">
           <FilterRow
-            label="Sort"
+            label={tx('Sort')}
             options={Object.keys(SORTS)}
             value={sort}
             onChange={(next) => setSort(next as SortKey)}
@@ -232,9 +233,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             className="inline-flex min-h-10 w-full items-center justify-between gap-2 rounded-xl border border-border-strong/70 bg-surface-2 px-3 text-sm font-semibold transition-colors hover:border-brand/60 sm:hidden"
           >
             <span className="inline-flex items-center gap-2">
-              <SlidersHorizontal aria-hidden className="size-4 text-muted" />
-              Filters
-              {activeFilters > 0 ? (
+              <SlidersHorizontal aria-hidden className="size-4 text-muted" />{tx('Filters')}{activeFilters > 0 ? (
                 <span className="rounded-full bg-brand px-1.5 text-xs font-bold tabular-nums text-black">
                   {activeFilters}
                 </span>
@@ -251,7 +250,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
           <div id={filtersId} className={`space-y-2 ${filtersOpen ? 'block' : 'hidden'} sm:block`}>
             {tiers.length > 0 ? (
               <FilterRow
-                label="Tier"
+                label={tx('Tier')}
                 options={tiers}
                 value={tier}
                 onChange={setTier}
@@ -264,9 +263,9 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
                 )}
               />
             ) : null}
-            <FilterRow label="Rarity" options={rarities} value={rarity} onChange={setRarity} />
+            <FilterRow label={tx('Rarity')} options={rarities} value={rarity} onChange={setRarity} />
             <FilterRow
-              label="Class"
+              label={tx('Class')}
               options={classes}
               value={brawlerClass}
               onChange={setBrawlerClass}
@@ -281,14 +280,12 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border bg-surface-2/40 px-3 py-2.5 sm:px-4">
           <p className="text-sm text-muted">
             <strong className="font-bold tabular-nums text-foreground">{visible.length}</strong>{' '}
-            {visible.length === 1 ? 'brawler' : 'brawlers'}
-            {filtered ? ` of ${brawlers.length}` : null}
+            {visible.length === 1 ? tx('brawler') : tx('brawlers')}
+            {filtered ? tx(' of {length}', { length: brawlers.length }) : null}
             {!filtered && (legacy > 0 || upcoming > 0) ? (
               <>
-                {' '}
-                &middot; {playable} currently playable
-                {legacy > 0 ? `, ${legacy} withdrawn` : ''}
-                {upcoming > 0 ? `, ${upcoming} not released yet` : ''}
+                {' '}{tx('· {playable} currently playable', { playable: playable })}{legacy > 0 ? tx(', {legacy} withdrawn', { legacy: legacy }) : ''}
+                {upcoming > 0 ? tx(', {upcoming} not released yet', { upcoming: upcoming }) : ''}
               </>
             ) : null}
           </p>
@@ -298,23 +295,19 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
               onClick={reset}
               className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-semibold text-muted transition-colors hover:text-foreground"
             >
-              <X className="size-3.5" />
-              Clear filters
-            </button>
+              <X className="size-3.5" />{tx('Clear filters')}</button>
           ) : null}
         </div>
       </div>
 
       {visible.length === 0 ? (
         <div className="card mt-4 p-6 text-center">
-          <p className="text-sm text-muted">No brawlers match those filters.</p>
+          <p className="text-sm text-muted">{tx('No brawlers match those filters.')}</p>
           <button
             type="button"
             onClick={reset}
             className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-border px-4 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-          >
-            Clear filters
-          </button>
+          >{tx('Clear filters')}</button>
         </div>
       ) : (
         <ul className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5">
@@ -343,11 +336,13 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
  * to fit four cards on a screen.
  */
 function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: boolean }) {
+  const tx = useT();
+  const lp = useLp();
   // Not prefetched: the full roster is 106 links on one grid. See the map
   // catalogue for the same reasoning at more length.
   return (
     <Link
-      href={brawlerPath(brawler.id, brawler.name)}
+      href={lp(brawlerPath(brawler.id, brawler.name))}
       prefetch={false}
       className="card card-interactive group relative flex h-full flex-col overflow-hidden p-2.5 sm:p-3"
       style={{
@@ -367,19 +362,15 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
       {brawler.status === 'upcoming' ? (
         <span
           className="absolute left-2 top-2 z-10 rounded-md bg-accent/20 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-accent"
-          title="Revealed but not in the game yet."
-        >
-          Soon
-        </span>
+          title={tx('Revealed but not in the game yet.')}
+        >{tx('Soon')}</span>
       ) : null}
 
       {brawler.status === 'legacy' ? (
         <span
           className="absolute left-2 top-2 z-10 rounded-md bg-surface-3/90 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted"
-          title="No longer available in the game. Kept for its history."
-        >
-          Legacy
-        </span>
+          title={tx('No longer available in the game. Kept for its history.')}
+        >{tx('Legacy')}</span>
       ) : null}
 
       {/*
@@ -432,9 +423,7 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
             background: `color-mix(in srgb, ${TIER_COLOR[brawler.tier]} 18%, transparent)`,
             color: TIER_COLOR[brawler.tier],
           }}
-          title={`${brawler.tier} tier in Ranked${
-            brawler.metaScore !== null ? `, meta score ${brawler.metaScore.toFixed(1)}` : ''
-          }`}
+          title={tx('{tier} tier in Ranked{v}', { tier: brawler.tier, v: brawler.metaScore !== null ? `, meta score ${brawler.metaScore.toFixed(1)}` : '' })}
         >
           {brawler.tier}
         </span>
@@ -489,6 +478,7 @@ function FilterRow({
   /** Maps a value to its pill text, for options that are keys. */
   labelFor?: (option: string) => string;
 }) {
+  const tx = useT();
   return (
     /* The label sits above the pills on a phone: a fixed label column plus a
        scrolling pill row left roughly 250px for the pills at 320px wide, which
@@ -498,7 +488,7 @@ function FilterRow({
         id={`filter-${label}`}
         className="block shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:w-12"
       >
-        {label}
+        {tx(label)}
       </span>
       <div
         role="group"
@@ -520,7 +510,7 @@ function FilterRow({
               }`}
             >
               {option === 'all' ? null : renderIcon?.(option)}
-              {option === 'all' ? 'All' : (labelFor?.(option) ?? option)}
+              {option === 'all' ? tx('All') : tx(labelFor?.(option) ?? option)}
             </button>
           );
         })}

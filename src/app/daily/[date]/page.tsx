@@ -8,6 +8,9 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getDailyReport, listDailyReports } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
+import { localePath } from '@/lib/i18n';
 
 interface PageProps {
   params: Promise<{ date: string }>;
@@ -39,17 +42,18 @@ const MIN_FINDINGS_TO_INDEX = 4;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { date } = await params;
-  if (!ISO_DATE.test(date)) return { title: 'Daily' };
+  if (!ISO_DATE.test(date)) return { title: t('Daily') };
 
   const report = await getDailyReport(date).catch(() => null);
   const label = dayLabel(date);
 
   return {
-    title: `What BrawlZone found on ${label}`,
+    title: t('What BrawlZone found on {label}', { label: label }),
     description: report
-      ? `${report.findings} findings from Brawl Stars battles sampled on ${label}, including the strongest pick nobody used and the most one-sided matchup of the day.`
-      : `Brawl Stars findings for ${label}.`,
+      ? t('{findings} findings from Brawl Stars battles sampled on {label}, including the strongest pick nobody used and the most one-sided matchup of the day.', { findings: report.findings, label: label })
+      : t('Brawl Stars findings for {label}.', { label: label }),
     alternates: { canonical: `/daily/${date}` },
     /*
      * A thin day is served but not indexed. The point of dated reports is fresh
@@ -65,11 +69,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DailyArchivePage({ params }: PageProps) {
+  const t = getT(requestLocale());
   const { date } = await params;
   if (!ISO_DATE.test(date)) notFound();
 
   // Today lives at /daily, which is the canonical address for the live report.
-  if (date === todayIso()) redirect('/daily');
+  if (date === todayIso()) redirect(localePath(requestLocale(), '/daily'));
 
   const [report, brawlerMeta, archive] = await Promise.all([
     getDailyReport(date).catch(() => null),
@@ -102,7 +107,7 @@ export default async function DailyArchivePage({ params }: PageProps) {
         next={
           newer
             ? { href: `/daily/${newer.day}`, label: dayLabel(newer.day) }
-            : { href: '/daily', label: 'Today' }
+            : { href: '/daily', label: t('Today') }
         }
       />
     </>

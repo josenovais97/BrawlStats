@@ -8,6 +8,8 @@ import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { BSPlayer } from '@/types/brawlstars';
 import type { RankedEloStanding } from '@/lib/stats';
 import type { TrophyStanding } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface Props {
   player: BSPlayer;
@@ -42,6 +44,7 @@ export function PlayerRanked({
   standing,
   rankedStanding = null,
 }: Props) {
+  const t = getT(requestLocale());
   const hasRanked = Boolean(player.rankedRankName || player.highestAllTimeRankedRankName);
   const standings = [globalRank !== null, Boolean(rankedStanding), Boolean(standing)].filter(
     Boolean,
@@ -51,7 +54,7 @@ export function PlayerRanked({
   const oneTierArt = oneTier ? currentArt(player) : null;
 
   return (
-    <Panel title="Ranking" aside="Where the game puts them" bodyClassName="">
+    <Panel title={t('Ranking')} aside="Where the game puts them" bodyClassName="">
       {/*
         Three tiers and two standings are not five equal facts, and drawing
         them as five identical rows said they were. A smurf sitting at Silver I
@@ -91,27 +94,25 @@ export function PlayerRanked({
             <p className="truncate text-base font-black uppercase leading-tight text-accent @xl:text-lg">
               {titleCaseLabel(player.rankedRankName)}
             </p>
-            <p className="text-xs text-muted">Current, season best and all-time best</p>
+            <p className="text-xs text-muted">{t('Current, season best and all-time best')}</p>
           </div>
           <div className="shrink-0 text-right text-xs tabular-nums text-muted">
             {player.rankedElo ? (
               <p>
                 <span className="font-bold text-foreground">
                   {formatNumber(player.rankedElo)}
-                </span>{' '}
-                elo now
-              </p>
+                </span>{' '}{t('elo now')}</p>
             ) : null}
             {player.highestAllTimeRankedElo &&
             player.highestAllTimeRankedElo !== player.rankedElo ? (
-              <p>best {formatNumber(player.highestAllTimeRankedElo)}</p>
+              <p>{t('best')}{' '}{formatNumber(player.highestAllTimeRankedElo)}</p>
             ) : null}
           </div>
         </div>
       ) : hasRanked ? (
         <div className="grid grid-cols-3 divide-x divide-border/70 border-b border-border/70">
           <Tier
-            label="Current"
+            label={t('Current')}
             name={player.rankedRankName}
             elo={player.rankedElo}
             art={
@@ -121,7 +122,7 @@ export function PlayerRanked({
             tone="text-accent"
           />
           <Tier
-            label="Season best"
+            label={t('Season best')}
             name={player.highestSeasonRankedRankName}
             elo={player.highestSeasonRankedElo}
             art={
@@ -131,7 +132,7 @@ export function PlayerRanked({
             tone="text-victory"
           />
           <Tier
-            label="All-time best"
+            label={t('All-time best')}
             name={player.highestAllTimeRankedRankName}
             elo={player.highestAllTimeRankedElo}
             art={
@@ -162,10 +163,10 @@ export function PlayerRanked({
       >
         {globalRank !== null ? (
           <Cell
-            label="World rank"
+            label={t('World rank')}
             gameIcon={<TrophyIcon className="size-5" />}
             value={`#${globalRank}`}
-            hint="Global trophies"
+            hint={t('Global trophies')}
             tone="text-brand"
           />
         ) : null}
@@ -173,9 +174,9 @@ export function PlayerRanked({
         {rankedStanding ? (
           <Cell
             gameIcon={<RankedIcon className="size-6" />}
-            label="Ranked standing"
+            label={t('Ranked standing')}
             value={`Top ${formatPercentileLabel(rankedStanding.percentile)}`}
-            hint={`Of ${formatNumber(rankedStanding.population)} ranked players`}
+            hint={t('Of {population} ranked players', { population: formatNumber(rankedStanding.population) })}
             tone="text-victory"
           />
         ) : null}
@@ -183,9 +184,9 @@ export function PlayerRanked({
         {standing ? (
           <Cell
             gameIcon={<TrophyIcon className="size-5" />}
-            label="Trophy standing"
+            label={t('Trophy standing')}
             value={`Top ${formatPercentileLabel(standing.percentile)}`}
-            hint={`Of ${formatNumber(standing.population)} tracked players`}
+            hint={t('Of {population} tracked players', { population: formatNumber(standing.population) })}
             tone="text-accent"
           />
         ) : null}
@@ -215,10 +216,11 @@ function Tier({
   art: string | null;
   tone: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="flex flex-col items-center gap-1.5 px-2 py-4 text-center">
       <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-        {label}
+        {t(label)}
       </span>
       {art && name ? (
         <Image
@@ -238,7 +240,7 @@ function Tier({
         {name ? titleCaseLabel(name) : '–'}
       </span>
       {elo ? (
-        <span className="text-xs tabular-nums text-muted">{formatNumber(elo)} elo</span>
+        <span className="text-xs tabular-nums text-muted">{formatNumber(elo)}{' '}{t('elo')}</span>
       ) : null}
     </div>
   );
@@ -290,6 +292,7 @@ function Cell({
   badgeUrl?: string | null;
   gameIcon?: React.ReactNode;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="flex items-center gap-3.5 px-4 py-3.5 sm:px-5">
       <span
@@ -310,14 +313,14 @@ function Cell({
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[11px] font-medium uppercase tracking-wide text-muted">
-          {label}
+          {t(label)}
         </p>
         <p className="truncate text-base font-bold leading-tight">{titleCaseLabel(value)}</p>
       </div>
       {/* The elo sits on the row it belongs to rather than under the tier, so
           the column of numbers can be read down on its own. */}
       {hint ? (
-        <p className="shrink-0 text-right text-xs tabular-nums text-muted">{hint}</p>
+        <p className="shrink-0 text-right text-xs tabular-nums text-muted">{t(hint)}</p>
       ) : null}
     </div>
   );

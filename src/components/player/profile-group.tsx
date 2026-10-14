@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One named area of a profile.
@@ -31,6 +33,7 @@ export function ProfileGroup({
   subtitle?: ReactNode;
   children: ReactNode;
 }) {
+  const t = getT(requestLocale());
   return (
     <section>
       {/*
@@ -48,7 +51,7 @@ export function ProfileGroup({
         The number and the rule went earlier, with the long scroll they were
         for. This is the last of that furniture.
       */}
-      <h2 className="sr-only">{title}</h2>
+      <h2 className="sr-only">{t(title)}</h2>
       {/*
         For a fact about this account, not for what the tab is for. Four of
         the five tabs used to open with a line like "Reference rather than
@@ -57,7 +60,7 @@ export function ProfileGroup({
         carries a count, keeps one.
       */}
       {subtitle ? (
-        <p className="mb-7 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
+        <p className="mb-7 max-w-2xl text-sm leading-relaxed text-muted">{t(subtitle)}</p>
       ) : null}
 
       {/*

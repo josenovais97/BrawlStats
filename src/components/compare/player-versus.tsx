@@ -8,6 +8,9 @@ import { formatNumber, formatPercent, nameColorToCss, titleCaseLabel } from '@/l
 import type { CompareOutcome, PlayerSide } from '@/lib/player-compare';
 import { displayTag } from '@/lib/tags';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Two accounts side by side.
@@ -21,11 +24,12 @@ import { playerLinkRel } from '@/lib/link-rel';
  * verdict on two people rather than a readout of two accounts.
  */
 export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome }) {
+  const t = getT(requestLocale());
   // One bad tag should not take the other side down with it.
   if (!a.ok || !b.ok) {
     return (
       <section>
-        <SectionHeading title="Comparison" />
+        <SectionHeading title={t('Comparison')} />
         <div className="grid gap-3 sm:grid-cols-2">
           <SideStatus outcome={a} position="Player 1" />
           <SideStatus outcome={b} position="Player 2" />
@@ -43,65 +47,65 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
 
   const sections: VersusSection[] = [
     {
-      title: 'Trophies',
+      title: t('Trophies'),
       metrics: [
         {
-          label: 'Current trophies',
+          label: t('Current trophies'),
           a: formatNumber(left.player.trophies),
           b: formatNumber(right.player.trophies),
           leader: higher(left.player.trophies, right.player.trophies),
         },
         {
-          label: 'Peak trophies',
+          label: t('Peak trophies'),
           a: formatNumber(left.player.highestTrophies),
           b: formatNumber(right.player.highestTrophies),
           leader: higher(left.player.highestTrophies, right.player.highestTrophies),
         },
         {
-          label: 'Average per brawler',
+          label: t('Average per brawler'),
           a: Math.round(left.averageTrophies).toLocaleString('en-US'),
           b: Math.round(right.averageTrophies).toLocaleString('en-US'),
           leader: higher(left.averageTrophies, right.averageTrophies),
-          hint: 'Total trophies divided by brawlers unlocked. A rough measure of depth rather than breadth.',
+          hint: t('Total trophies divided by brawlers unlocked. A rough measure of depth rather than breadth.'),
         },
       ],
     },
     {
-      title: 'Account strength',
+      title: t('Account strength'),
       metrics: [
         {
-          label: 'Skill score',
+          label: t('Skill score'),
           a: `${left.skill.toFixed(1)} · ${titleCaseLabel(left.skillTier)}`,
           b: `${right.skill.toFixed(1)} · ${titleCaseLabel(right.skillTier)}`,
           leader: higher(left.skill, right.skill, 0.05),
-          hint: 'A BrawlZone metric out of 10, not an official Brawl Stars statistic.',
+          hint: t('A BrawlZone metric out of 10, not an official Brawl Stars statistic.'),
         },
         {
-          label: 'Roster unlocked',
+          label: t('Roster unlocked'),
           a: formatPercent(left.rosterShare),
           b: formatPercent(right.rosterShare),
           leader: higher(left.rosterShare, right.rosterShare, 0.001),
         },
         {
-          label: 'Brawlers unlocked',
+          label: t('Brawlers unlocked'),
           a: formatNumber(left.player.brawlers.length),
           b: formatNumber(right.player.brawlers.length),
           leader: higher(left.player.brawlers.length, right.player.brawlers.length),
         },
         {
-          label: 'Power 11 brawlers',
+          label: t('Power 11 brawlers'),
           a: formatNumber(left.power11),
           b: formatNumber(right.power11),
           leader: higher(left.power11, right.power11),
         },
         {
-          label: 'Hypercharges',
+          label: t('Hypercharges'),
           a: formatNumber(left.hyperCharges),
           b: formatNumber(right.hyperCharges),
           leader: higher(left.hyperCharges, right.hyperCharges),
         },
         {
-          label: 'Prestige',
+          label: t('Prestige'),
           a: formatNumber(left.prestige),
           b: formatNumber(right.prestige),
           leader: higher(left.prestige, right.prestige),
@@ -109,16 +113,16 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
       ],
     },
     {
-      title: 'Competitive',
+      title: t('Competitive'),
       metrics: [
         {
-          label: 'Ranked elo',
+          label: t('Ranked elo'),
           a: left.player.rankedElo ? formatNumber(left.player.rankedElo) : 'Unranked',
           b: right.player.rankedElo ? formatNumber(right.player.rankedElo) : 'Unranked',
           leader: higher(left.player.rankedElo ?? 0, right.player.rankedElo ?? 0),
         },
         {
-          label: 'Peak Ranked',
+          label: t('Peak Ranked'),
           a: titleCaseLabel(left.player.highestAllTimeRankedRankName ?? '') || '–',
           b: titleCaseLabel(right.player.highestAllTimeRankedRankName ?? '') || '–',
           leader: higher(
@@ -127,17 +131,17 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
           ),
         },
         {
-          label: '3v3 wins',
+          label: t('3v3 wins'),
           a: formatNumber(left.player['3vs3Victories']),
           b: formatNumber(right.player['3vs3Victories']),
           leader: higher(left.player['3vs3Victories'], right.player['3vs3Victories']),
         },
         {
-          label: 'Best win streak',
+          label: t('Best win streak'),
           a: formatNumber(left.bestWinStreak),
           b: formatNumber(right.bestWinStreak),
           leader: higher(left.bestWinStreak, right.bestWinStreak),
-          hint: 'The highest streak on any single brawler. The API publishes no account-wide streak.',
+          hint: t('The highest streak on any single brawler. The API publishes no account-wide streak.'),
         },
       ],
     },
@@ -147,15 +151,15 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
     <section aria-labelledby="player-versus">
       <div id="player-versus">
         <SectionHeading
-          title="Head to head"
-          subtitle="Both accounts read live from the official API. Nothing is stored."
+          title={t('Head to head')}
+          subtitle={t('Both accounts read live from the official API. Nothing is stored.')}
         />
       </div>
 
       <div className="space-y-4">
         <div className="card grid grid-cols-[1fr_auto_1fr] items-center gap-2 p-4">
           <Identity side={left} align="start" />
-          <span className="display text-sm uppercase text-muted sm:text-lg">vs</span>
+          <span className="display text-sm uppercase text-muted sm:text-lg">{t('vs')}</span>
           <Identity side={right} align="end" />
         </div>
 
@@ -172,9 +176,10 @@ export function PlayerVersus({ a, b }: { a: CompareOutcome; b: CompareOutcome })
 }
 
 function Identity({ side, align }: { side: PlayerSide; align: 'start' | 'end' }) {
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <Link
-      href={`/player/${side.tag}`}
+      href={lp(`/player/${side.tag}`)}
       rel={playerLinkRel(side.tag)}
       className={`flex min-w-0 items-center gap-2.5 ${
         align === 'end' ? 'flex-row-reverse text-right' : 'text-left'
@@ -212,26 +217,27 @@ function SideStatus({
   outcome: CompareOutcome;
   position: string;
 }) {
+  const t = getT(requestLocale());
   if (outcome.ok) {
     return (
       <div className="card p-4">
         <p className="text-xs uppercase tracking-wide text-muted">{position}</p>
         <p className="mt-1 font-bold">{outcome.side.player.name}</p>
-        <p className="text-sm text-muted">Ready. Waiting on the other player.</p>
+        <p className="text-sm text-muted">{t('Ready. Waiting on the other player.')}</p>
       </div>
     );
   }
 
   const message = {
     invalid: 'That player tag doesn’t look valid. Tags use the characters 0289PYLQGRJCUV.',
-    notFound: 'We couldn’t find that player. Check the tag in-game under your profile.',
-    unavailable: 'Brawl Stars data is temporarily unavailable. Try again shortly.',
+    notFound: t('We couldn’t find that player. Check the tag in-game under your profile.'),
+    unavailable: t('Brawl Stars data is temporarily unavailable. Try again shortly.'),
   }[outcome.reason];
 
   return (
     <div className="card border-defeat/30 p-4">
       <p className="text-xs uppercase tracking-wide text-muted">{position}</p>
-      <p className="mt-1 text-sm leading-relaxed text-muted">{message}</p>
+      <p className="mt-1 text-sm leading-relaxed text-muted">{t(message)}</p>
     </div>
   );
 }

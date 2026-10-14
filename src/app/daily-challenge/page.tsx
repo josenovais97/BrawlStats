@@ -5,6 +5,9 @@ import { ChallengeBoard } from '@/components/challenge/challenge-board';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { brawldleRoster, pickerEntries } from '@/lib/brawldle-data';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Guess the brawler. One puzzle a day, the same one for everybody.
@@ -32,6 +35,8 @@ export const metadata: Metadata = {
 };
 
 export default async function DailyChallengePage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const roster = await brawldleRoster().catch(() => []);
   const date = new Date().toISOString().slice(0, 10);
 
@@ -45,57 +50,33 @@ export default async function DailyChallengePage() {
       />
 
       <PageHeading
-        title="Daily challenge"
-        subtitle="One brawler a day. Everybody gets the same one, and it changes at midnight UTC."
+        title={t('Daily challenge')}
+        subtitle={t('One brawler a day. Everybody gets the same one, and it changes at midnight UTC.')}
       />
 
       {roster.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          Today&rsquo;s puzzle could not be prepared. It returns once the brawler catalogue is
-          reachable again.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Today’s puzzle could not be prepared. It returns once the brawler catalogue is reachable again.')}</p>
       ) : (
         <ChallengeBoard date={date} picker={pickerEntries(roster)} />
       )}
 
       <section className="space-y-3">
-        <SectionHeading title="How the clues work" />
+        <SectionHeading title={t('How the clues work')} />
         <div className="card space-y-2 p-5 text-sm leading-relaxed text-muted">
           <p>
-            <span className="font-semibold text-emerald-300">Green</span> is exact.{' '}
-            <span className="font-semibold text-amber-300">Amber</span> is one step away — an
-            adjacent rarity, a neighbouring tier, or a brawler released within five of the answer.
-            An arrow points toward the answer: ▲ means higher, ▼ means lower.
-          </p>
+            <span className="font-semibold text-emerald-300">{t('Green')}</span>{' '}{t('is exact.')}{' '}
+            <span className="font-semibold text-amber-300">{t('Amber')}</span>{' '}{t('is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.')}</p>
           <p>
-            <strong className="text-foreground">Movement</strong>,{' '}
-            <strong className="text-foreground">range</strong> and{' '}
-            <strong className="text-foreground">reload</strong> are the named tiers the game uses —
-            Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because
-            nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.
-          </p>
+            <strong className="text-foreground">{t('Movement')}</strong>,{' '}
+            <strong className="text-foreground">{t('range')}</strong>{' '}{t('and')}{' '}
+            <strong className="text-foreground">{t('reload')}</strong>{' '}{t('are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.')}</p>
           <p>
-            <strong className="text-foreground">Released</strong> is the brawler&rsquo;s place in
-            release order, not a date. <strong className="text-foreground">Tier</strong> comes from
-            the live{' '}
-            <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-              ranked tier list
-            </Link>
-            , so it moves with the meta and always matches what the rest of the site says.
-          </p>
+            <strong className="text-foreground">{t('Released')}</strong>{' '}{t('is the brawler’s place in release order, not a date.')}{' '}<strong className="text-foreground">{t('Tier')}</strong>{' '}{t('comes from the live')}{' '}
+            <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('ranked tier list')}</Link>{t(', so it moves with the meta and always matches what the rest of the site says.')}</p>
+          <p>{t('Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.')}</p>
           <p>
-            Class has no arrow, because there is no direction from Marksman to Tank. A brawler with
-            too few ranked battles to be tiered shows a dash rather than a guess.
-          </p>
-          <p>
-            <strong className="text-foreground">Stuck?</strong> After four guesses the board shows
-            the answer&rsquo;s star power, and after eight its gadget — the real icons from the
-            game, with the names withheld, because a name is searchable and a picture is a memory
-            test.
-          </p>
-          <p>
-            Your progress is kept in this browser only. No account, nothing stored on our side.
-          </p>
+            <strong className="text-foreground">{t('Stuck?')}</strong>{' '}{t('After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.')}</p>
+          <p>{t('Your progress is kept in this browser only. No account, nothing stored on our side.')}</p>
         </div>
       </section>
     </div>

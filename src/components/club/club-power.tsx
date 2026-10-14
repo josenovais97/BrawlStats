@@ -6,6 +6,7 @@ import { Loader2, Swords } from 'lucide-react';
 import { SectionHeading } from '@/components/ui/section-heading';
 import { formatNumber, titleCaseLabel } from '@/lib/format';
 import type { ClubScan } from '@/lib/club-scan';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * What the club can field, between them.
@@ -25,6 +26,7 @@ import type { ClubScan } from '@/lib/club-scan';
  * different club from one at 91% evenly — which the board underneath shows.
  */
 export function ClubPower({ tag, name }: { tag: string; name: string }) {
+  const t = useT();
   const [scan, setScan] = useState<ClubScan | null>(null);
   const [busy, setBusy] = useState(false);
   /** Too much of the club was unreadable to keep, so it was not cached. */
@@ -39,8 +41,8 @@ export function ClubPower({ tag, name }: { tag: string; name: string }) {
       if (!response.ok) {
         setError(
           response.status === 429
-            ? 'Too many scans at once. Give it a minute.'
-            : 'Could not read this club right now.',
+            ? t('Too many scans at once. Give it a minute.')
+            : t(t('Could not read this club right now.')),
         );
         return;
       }
@@ -48,7 +50,7 @@ export function ClubPower({ tag, name }: { tag: string; name: string }) {
       setScan(data.scan);
       setPartial(data.partial === true);
     } catch {
-      setError('Could not read this club right now.');
+      setError(t(t('Could not read this club right now.')));
     } finally {
       setBusy(false);
     }
@@ -57,17 +59,14 @@ export function ClubPower({ tag, name }: { tag: string; name: string }) {
   return (
     <section>
       <SectionHeading
-        title="Club power"
-        subtitle="Every member's roster read against the current Ranked S and A tier — what this club can actually put on the field."
+        title={t('Club power')}
+        subtitle={t('Every member\'s roster read against the current Ranked S and A tier — what this club can actually put on the field.')}
       />
 
       {scan === null ? (
         <div className="card flex flex-col items-start gap-3 p-5">
-          <p className="text-sm text-muted">
-            Reads all {' '}
-            <span className="font-semibold text-foreground">30 members&rsquo; rosters</span>{' '}
-            live. It takes a few seconds, so it only runs when you ask.
-          </p>
+          <p className="text-sm text-muted">{t('Reads all')}{' '}{' '}
+            <span className="font-semibold text-foreground">{t('30 members’ rosters')}</span>{' '}{t('live. It takes a few seconds, so it only runs when you ask.')}</p>
           <button
             type="button"
             onClick={run}
@@ -79,7 +78,7 @@ export function ClubPower({ tag, name }: { tag: string; name: string }) {
             ) : (
               <Swords className="size-4" />
             )}
-            {busy ? 'Reading rosters…' : 'Rank this club'}
+            {busy ? t('Reading rosters…') : t('Rank this club')}
           </button>
           {error ? <p className="text-sm text-defeat">{error}</p> : null}
         </div>
@@ -103,6 +102,7 @@ function Result({
   onRetry: () => void;
   busy: boolean;
 }) {
+  const t = useT();
   const pct = (n: number) => `${Math.round(n * 100)}%`;
   const carried = scan.members[0];
 
@@ -116,20 +116,15 @@ function Result({
           figures below are computed over whoever answered.
         */
         <div className="card flex flex-wrap items-center gap-3 border-brand/40 p-4">
-          <p className="min-w-0 flex-1 text-sm text-muted">
-            The game&rsquo;s API only answered for {scan.members.length} of{' '}
-            {scan.members.length + scan.missed} members, so this is incomplete and
-            has not been saved.
-          </p>
+          <p className="min-w-0 flex-1 text-sm text-muted">{t('The game’s API only answered for {length} of', { length: scan.members.length })}{' '}
+            {scan.members.length + scan.missed}{' '}{t('members, so this is incomplete and has not been saved.')}</p>
           <button
             type="button"
             onClick={onRetry}
             disabled={busy}
             className="btn-game inline-flex items-center gap-2 bg-surface-2 px-4 py-2 text-xs uppercase hover:bg-surface-3 disabled:opacity-60"
           >
-            {busy ? <Loader2 className="size-3.5 animate-spin" /> : null}
-            Try again
-          </button>
+            {busy ? <Loader2 className="size-3.5 animate-spin" /> : null}{t('Try again')}</button>
         </div>
       ) : null}
       <div className="card card-glow p-5">
@@ -150,35 +145,29 @@ function Result({
             <p className="text-3xl font-black tabular-nums text-accent sm:text-4xl">
               {pct(scan.medianHyperCoverage)}
             </p>
-            <p className="text-xs text-muted">hypercharged</p>
+            <p className="text-xs text-muted">{t('hypercharged')}</p>
           </div>
           <div>
             <p className="text-3xl font-black tabular-nums text-brand sm:text-4xl">
               {pct(scan.medianCoverage)}
             </p>
-            <p className="text-xs text-muted">can field</p>
+            <p className="text-xs text-muted">{t('can field')}</p>
           </div>
         </div>
 
-        <p className="mt-3 text-sm text-muted">
-          of the {scan.topTierSize} brawlers in the current Ranked S and A tier, for the
-          typical member of {name}. Between all {scan.members.length} of them:{' '}
-          <span className="text-foreground">{pct(scan.coverage)}</span> fieldable,{' '}
-          <span className="text-foreground">{pct(scan.hyperCoverage)}</span> hypercharged.
-          {scan.missed > 0 ? (
+        <p className="mt-3 text-sm text-muted">{t('of the {topTierSize} brawlers in the current Ranked S and A tier, for the typical member of {name}. Between all {length} of them:', { topTierSize: scan.topTierSize, name: name, length: scan.members.length })}{' '}
+          <span className="text-foreground">{pct(scan.coverage)}</span>{' '}{t('fieldable,')}{' '}
+          <span className="text-foreground">{pct(scan.hyperCoverage)}</span>{' '}{t('hypercharged.')}{scan.missed > 0 ? (
             <>
               {' '}
               <span className="text-foreground">
-                {scan.missed} {scan.missed === 1 ? 'member' : 'members'} could not be read
-              </span>
-              , so the real figure is this or better.
-            </>
+                {scan.missed} {scan.missed === 1 ? t('member') : t('members')}{' '}{t('could not be read')}</span>{t(', so the real figure is this or better.')}</>
           ) : null}
         </p>
 
         {scan.gaps.length > 0 ? (
           <p className="mt-4 border-t border-border pt-4 text-sm">
-            <span className="font-semibold text-foreground">Nobody can field:</span>{' '}
+            <span className="font-semibold text-foreground">{t('Nobody can field:')}</span>{' '}
             <span className="text-muted">
               {scan.gaps.map((g) => titleCaseLabel(g)).join(', ')}
             </span>
@@ -187,7 +176,7 @@ function Result({
 
         {scan.hyperGaps.length > 0 ? (
           <p className="mt-3 border-t border-border pt-3 text-sm">
-            <span className="font-semibold text-foreground">No hypercharge in the club:</span>{' '}
+            <span className="font-semibold text-foreground">{t('No hypercharge in the club:')}</span>{' '}
             <span className="text-muted">
               {scan.hyperGaps.map((g) => titleCaseLabel(g)).join(', ')}
             </span>
@@ -206,8 +195,7 @@ function Result({
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-bold">{member.name}</p>
-              <p className="truncate text-xs text-muted">
-                {pct(member.coverage)} fieldable · {member.powerEleven} at power 11 ·{' '}
+              <p className="truncate text-xs text-muted">{t('{coverage} fieldable · {powerEleven} at power 11 ·', { coverage: pct(member.coverage), powerEleven: member.powerEleven })}{' '}
                 {formatNumber(member.trophies)}
                 {member.exclusives.length > 0 ? (
                   <>
@@ -217,8 +205,7 @@ function Result({
                       is the only one holding a key pick matters more to the
                       club than one at 60% who duplicates everybody.
                     */}
-                    <span className="text-brand">
-                      only hypercharged{' '}
+                    <span className="text-brand">{t('only hypercharged')}{' '}
                       {member.exclusives.slice(0, 2).map((e) => titleCaseLabel(e)).join(', ')}
                       {member.exclusives.length > 2
                         ? ` +${member.exclusives.length - 2}`
@@ -230,18 +217,14 @@ function Result({
             </div>
             <span className="shrink-0 text-right text-sm font-black tabular-nums text-accent">
               {pct(member.hyperCoverage)}
-              <span className="block text-[10px] font-normal text-muted">hyper</span>
+              <span className="block text-[10px] font-normal text-muted">{t('hyper')}</span>
             </span>
           </li>
         ))}
       </ol>
 
       {carried ? (
-        <p className="text-xs text-muted">
-          Ranked by hypercharged coverage of the top tier, then by what they can
-          field at all. Trophies only break a tie — the game already sorts the
-          member list that way.
-        </p>
+        <p className="text-xs text-muted">{t('Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.')}</p>
       ) : null}
     </div>
   );

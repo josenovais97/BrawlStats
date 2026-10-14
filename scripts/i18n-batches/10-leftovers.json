@@ -1,0 +1,350 @@
+{
+ "A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.": [
+  "Una página de mapa clasifica a los brawlers con partidas jugadas en ese mapa. Cuando un mapa tiene muy pocas partidas para decir algo, usa las elecciones del modo y lo indica en la página. Nunca se presenta una recomendación como específica del mapa si no lo es.",
+  "Uma página de mapa ranqueia os brawlers com partidas jogadas naquele mapa. Quando um mapa tem poucas partidas para dizer algo, ela usa as escolhas do modo e avisa na página. Uma recomendação nunca é apresentada como específica do mapa quando não é."
+ ],
+ "Almost nobody picks {name}. It is winning anyway.": [
+  "Casi nadie elige a {name}. Y aun así está ganando.",
+  "Quase ninguém escolhe {name}. E mesmo assim está ganhando."
+ ],
+ "Back to brawlers": [
+  "Volver a los brawlers",
+  "Voltar para os brawlers"
+ ],
+ "Battle history only goes back ~25 matches": [
+  "El historial de partidas solo llega a ~25",
+  "O histórico de partidas só vai até ~25"
+ ],
+ "Best here": [
+  "Los mejores aquí",
+  "Os melhores aqui"
+ ],
+ "Best picks for your map": [
+  "Los mejores para tu mapa",
+  "Os melhores para o seu mapa"
+ ],
+ "Brawl Stars data is temporarily unavailable. Try again shortly.": [
+  "Los datos de Brawl Stars no están disponibles por ahora. Vuelve a intentarlo en un rato.",
+  "Os dados do Brawl Stars estão indisponíveis no momento. Tente de novo daqui a pouco."
+ ],
+ "Brawl-O-Ween": [
+  "Brawl-O-Ween",
+  "Brawl-O-Ween"
+ ],
+ "Claim by pressing and holding Loony once all 6 daily wins are done.": [
+  "Se reclama manteniendo pulsado a Loony cuando completes las 6 victorias diarias.",
+  "Resgate segurando o Loony depois de completar as 6 vitórias diárias."
+ ],
+ "Coins, power points and playtime are estimates": [
+  "Las monedas, los puntos de fuerza y el tiempo de juego son estimaciones",
+  "Moedas, pontos de poder e tempo de jogo são estimativas"
+ ],
+ "Could not check that guess.": [
+  "No se pudo comprobar ese intento.",
+  "Não foi possível conferir esse palpite."
+ ],
+ "Could not copy. Select the grid and copy it by hand.": [
+  "No se pudo copiar. Selecciona la cuadrícula y cópiala a mano.",
+  "Não foi possível copiar. Selecione a grade e copie à mão."
+ ],
+ "Could not reach the server. Try again.": [
+  "No se pudo conectar con el servidor. Inténtalo de nuevo.",
+  "Não foi possível falar com o servidor. Tente de novo."
+ ],
+ "Could not read this club right now.": [
+  "No se pudo leer este club ahora mismo.",
+  "Não foi possível ler este clube agora."
+ ],
+ "Decide what to upgrade": [
+  "Decide qué mejorar",
+  "Decida o que melhorar"
+ ],
+ "Derived from published upgrade costs and victory counts. Bling is not exposed by the API at all, so we do not show it.": [
+  "Calculado con los costes de mejora publicados y las victorias. La API no ofrece los blines, así que no los mostramos.",
+  "Calculado com os custos de melhoria publicados e as vitórias. A API não mostra o bling, então não mostramos."
+ ],
+ "Enter bans and picks, get the answer": [
+  "Pon bloqueos y elecciones, y obtén la respuesta",
+  "Coloque banimentos e escolhas e veja a resposta"
+ ],
+ "Every daily win adds a reward to Loony, up to 6 wins a day.": [
+  "Cada victoria diaria añade una recompensa a Loony, hasta 6 victorias al día.",
+  "Cada vitória diária adiciona uma recompensa ao Loony, até 6 vitórias por dia."
+ ],
+ "Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.": [
+  "Todos los mapas que siguen en el juego. Unos cuatrocientos. A propósito no se llama rotación: la fuente de imágenes no publica cuándo se jugó cada uno por última vez, así que nada aquí puede decir cuáles están activos hoy.",
+  "Todos os mapas que ainda estão no jogo. Uns quatrocentos. De propósito não se chama rotação: a fonte de imagens não publica quando cada um foi jogado por último, então nada aqui diz quais estão ativos hoje."
+ ],
+ "Every ranked mode is covered, with a pick spare": [
+  "Tienes cubiertos todos los modos de Competitivo, con una opción de sobra",
+  "Todos os modos do Ranqueado estão cobertos, com uma opção de sobra"
+ ],
+ "Every top-tier brawler you own is at power 11.": [
+  "Todos tus brawlers de los mejores tiers tienen fuerza 11.",
+  "Todos os seus brawlers dos melhores tiers estão no poder 11."
+ ],
+ "Fielded at Power 11 with every Gadget, Star Power, Gear, Buffie and their Hypercharge, exactly as in Friendly Battles.": [
+  "Se juegan con fuerza 11, con todos los gadgets, habilidades estelares, refuerzos, buffies y su hipercarga, igual que en las partidas amistosas.",
+  "São jogados no poder 11, com todos os acessórios, poderes de estrela, engrenagens, buffies e a hipercarga, igual às partidas amistosas."
+ ],
+ "Find roster weaknesses": [
+  "Encuentra los puntos débiles",
+  "Encontre os pontos fracos"
+ ],
+ "Forgot to claim? The rewards are granted automatically the next day.": [
+  "¿Se te olvidó reclamarlas? Las recompensas se entregan solas al día siguiente.",
+  "Esqueceu de resgatar? As recompensas são entregues sozinhas no dia seguinte."
+ ],
+ "Gears, star powers, gadgets, best modes and maps, updated daily from real battles.": [
+  "Refuerzos, habilidades estelares, gadgets, mejores modos y mapas, actualizado cada día con partidas reales.",
+  "Engrenagens, poderes de estrela, acessórios, melhores modos e mapas, atualizado todo dia com partidas reais."
+ ],
+ "How the meta score works": [
+  "Cómo funciona la puntuación meta",
+  "Como a pontuação meta funciona"
+ ],
+ "Leaderboards stop at 200": [
+  "Las clasificaciones terminan en el 200",
+  "Os rankings param no 200"
+ ],
+ "Loadouts are not published": [
+  "Las configuraciones no se publican",
+  "As configurações não são publicadas"
+ ],
+ "Map picks vs mode picks": [
+  "Elecciones por mapa y por modo",
+  "Escolhas por mapa e por modo"
+ ],
+ "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.": [
+  "Puntuación meta de {from} a {to} en un solo día, con suficientes partidas para que el cambio sea real y no ruido.",
+  "Pontuação meta de {from} para {to} em um único dia, com partidas suficientes para a mudança ser real, e não ruído."
+ ],
+ "Most likely bans here": [
+  "Los bloqueos más probables aquí",
+  "Os banimentos mais prováveis aqui"
+ ],
+ "Most likely picks here": [
+  "Las elecciones más probables aquí",
+  "As escolhas mais prováveis aqui"
+ ],
+ "Most {name} owners buy the {gadget} gadget and the {starPower} star power first.": [
+  "La mayoría de los jugadores con {name} compran primero el gadget {gadget} y la habilidad estelar {starPower}.",
+  "A maioria dos jogadores com {name} compra primeiro o acessório {gadget} e o poder de estrela {starPower}."
+ ],
+ "Most {name} owners buy the {gadget} gadget first.": [
+  "La mayoría de los jugadores con {name} compran primero el gadget {gadget}.",
+  "A maioria dos jogadores com {name} compra primeiro o acessório {gadget}."
+ ],
+ "Most {name} owners buy the {starPower} star power first.": [
+  "La mayoría de los jugadores con {name} compran primero la habilidad estelar {starPower}.",
+  "A maioria dos jogadores com {name} compra primeiro o poder de estrela {starPower}."
+ ],
+ "None of your most-played brawlers are struggling right now.": [
+  "Ninguno de tus brawlers más jugados está flojo ahora mismo.",
+  "Nenhum dos seus brawlers mais jogados está mal agora."
+ ],
+ "Not enough sampled battles to judge this draft": [
+  "No hay suficientes partidas para juzgar este draft",
+  "Não há partidas suficientes para julgar este draft"
+ ],
+ "On 1 global brawler leaderboard": [
+  "En 1 clasificación mundial de brawlers",
+  "Em 1 ranking mundial de brawlers"
+ ],
+ "One score, comparable to everyone we sample.": [
+  "Una puntuación, comparable con todos los jugadores que analizamos.",
+  "Uma pontuação, comparável com todos os jogadores que analisamos."
+ ],
+ "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.": [
+  "Nuestra muestra tira hacia jugadores con muchos trofeos, que ganan más con cualquier brawler. Las tasas de victoria se recentran en esa base para que la comparación entre brawlers sea justa.",
+  "A nossa amostra puxa para jogadores com muitos troféus, que ganham mais com qualquer brawler. As taxas de vitória são recentralizadas nessa base para a comparação entre brawlers ser justa."
+ ],
+ "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.": [
+  "Elegido en el {picks} de las partidas y con un {rate} ajustado: por debajo de la media de los propios jugadores que lo eligen.",
+  "Escolhido em {picks} das partidas e com {rate} ajustado: abaixo da média dos próprios jogadores que o escolhem."
+ ],
+ "Playable in Ranked even if you have not unlocked them.": [
+  "Se pueden jugar en Competitivo aunque no los hayas desbloqueado.",
+  "Podem ser jogados no Ranqueado mesmo que você não tenha desbloqueado."
+ ],
+ "Progress resets every day, like Daily Wins.": [
+  "El progreso se reinicia cada día, como las Victorias diarias.",
+  "O progresso reinicia todo dia, como as Vitórias diárias."
+ ],
+ "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.": [
+  "Las recompensas son Premios Starr o Premios del caos, con hasta 2 Premios Starr al día.",
+  "As recompensas são Sorteios Starr ou Sorteios do Caos, com até 2 Sorteios Starr por dia."
+ ],
+ "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.": [
+  "Juntos, {name} gana el {rate}: {edge} más de lo normal. Ninguno de los dos se elige pensando en el otro.",
+  "Juntos, {name} vence {rate}: {edge} a mais do que o normal. Nenhum dos dois é escolhido pensando no outro."
+ ],
+ "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.": [
+  "Es todo lo que guarda la API. Lo que pone «reciente» de verdad lo es. No hay historial de partidas de toda la carrera que mostrar.",
+  "É tudo o que a API guarda. O que diz “recente” realmente é. Não existe histórico de partidas da carreira inteira para mostrar."
+ ],
+ "That is not a current brawler.": [
+  "Ese no es un brawler actual.",
+  "Esse não é um brawler atual."
+ ],
+ "The API refuses to return more, so top-200 is the deepest placement that exists. There is no top-500.": [
+  "La API no devuelve más, así que el top 200 es el puesto más profundo que existe. No hay top 500.",
+  "A API não devolve mais, então o top 200 é a posição mais profunda que existe. Não existe top 500."
+ ],
+ "The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler’s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.": [
+  "La API dice qué habilidades estelares, gadgets y refuerzos tiene un jugador, y nada de lo que llevó a una partida. Ningún endpoint muestra la configuración equipada. Por eso las páginas de brawlers muestran qué mejoras tiene la gente, nunca una tasa de uso. Un refuerzo que tiene el 78% de los jugadores de un brawler es exactamente eso: lo tiene el 78%.",
+  "A API informa quais poderes de estrela, acessórios e engrenagens um jogador tem, e nada do que ele levou para uma partida. Nenhum endpoint mostra a configuração equipada. Por isso as páginas de brawlers mostram quais melhorias as pessoas têm, nunca uma taxa de uso. Uma engrenagem que 78% dos jogadores de um brawler têm é exatamente isso: 78% têm."
+ ],
+ "The Ranked meta, map by map": [
+  "El meta de Competitivo, mapa a mapa",
+  "O meta do Ranqueado, mapa por mapa"
+ ],
+ "The best trio to take together": [
+  "El mejor trío para jugar juntos",
+  "O melhor trio para jogar junto"
+ ],
+ "The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.": [
+  "El pool de mapas de la temporada actual de Competitivo, publicado cada temporada. Fijo hasta que cambie la temporada.",
+  "O pool de mapas da temporada atual do Ranqueado, publicado a cada temporada. Fixo até a temporada mudar."
+ ],
+ "The drafts were close to even": [
+  "Los drafts estaban casi igualados",
+  "Os drafts estavam quase empatados"
+ ],
+ "The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.": [
+  "Los mapas de la rotación de eventos en este momento, directamente de la API del juego. Es la única lista que es literalmente «ahora mismo».",
+  "Os mapas da rotação de eventos neste momento, direto da API do jogo. É a única lista que é literalmente “agora”."
+ ],
+ "The two windows were sampled at very different rates — {before} decided Ranked battles before against {after} after, a factor of {ratio}. Any difference would be partly the sampling and not the update, so nothing is scored.": [
+  "Los dos periodos se muestrearon a ritmos muy distintos: {before} partidas decididas de Competitivo antes frente a {after} después, un factor de {ratio}. Cualquier diferencia sería en parte por el muestreo y no por la actualización, así que no se puntúa nada.",
+  "Os dois períodos foram amostrados em ritmos bem diferentes: {before} partidas ranqueadas decididas antes contra {after} depois, um fator de {ratio}. Qualquer diferença seria em parte da amostragem, e não da atualização, então nada é pontuado."
+ ],
+ "They count toward the Power 11 brawler requirement for each rank, Mythic and above need more than 12.": [
+  "Cuentan para el requisito de brawlers con fuerza 11 de cada rango; de Mítico para arriba se necesitan más de 12.",
+  "Contam para o requisito de brawlers no poder 11 de cada rank; do Mítico para cima são precisos mais de 12."
+ ],
+ "Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.": [
+  "«Pocos datos», «Llenándose» y «Bien medido» indican cuántas partidas hay detrás de la clasificación de un mapa. Nada más. Un mapa con pocos datos no se esconde, se etiqueta, porque una advertencia que puedes leer es mejor que un número que no puedes comprobar.",
+  "“Poucos dados”, “Enchendo” e “Bem medido” dizem quantas partidas há por trás do ranking de um mapa. Nada mais. Um mapa com poucos dados não é escondido, é marcado, porque um aviso que você pode ler vale mais que um número que você não pode conferir."
+ ],
+ "Tier list percentages are adjusted": [
+  "Los porcentajes de la tier list están ajustados",
+  "As porcentagens da tier list são ajustadas"
+ ],
+ "Too little was sampled either side of this update to measure it: {before} decided Ranked battles before and {after} after.": [
+  "Se recogió muy poco a cada lado de esta actualización para medirla: {before} partidas decididas de Competitivo antes y {after} después.",
+  "Foi coletado muito pouco de cada lado desta atualização para medir: {before} partidas ranqueadas decididas antes e {after} depois."
+ ],
+ "Too many scans at once. Give it a minute.": [
+  "Demasiados análisis a la vez. Espera un minuto.",
+  "Análises demais ao mesmo tempo. Espere um minuto."
+ ],
+ "Totals unavailable right now": [
+  "Totales no disponibles ahora mismo",
+  "Totais indisponíveis agora"
+ ],
+ "Understand your level": [
+  "Entiende tu nivel",
+  "Entenda o seu nível"
+ ],
+ "We couldn’t find that player. Check the tag in-game under your profile.": [
+  "No encontramos a ese jugador. Revisa el tag en tu perfil del juego.",
+  "Não encontramos esse jogador. Confira a tag no seu perfil do jogo."
+ ],
+ "Where the next coins actually change a match.": [
+  "Dónde tus próximas monedas cambian de verdad una partida.",
+  "Onde as suas próximas moedas realmente mudam uma partida."
+ ],
+ "Which of your brawlers the meta has left behind.": [
+  "Qué brawlers tuyos ha dejado atrás el meta.",
+  "Quais dos seus brawlers o meta deixou para trás."
+ ],
+ "Your brawlers ticked, your icon on the bubble": [
+  "Tus brawlers marcados y tu icono en la burbuja",
+  "Seus brawlers marcados e o seu ícone na bolha"
+ ],
+ "adjusted win rate": [
+  "tasa de victorias ajustada",
+  "taxa de vitória ajustada"
+ ],
+ "meta score, 1 day": [
+  "puntuación meta, 1 día",
+  "pontuação meta, 1 dia"
+ ],
+ "of all picks": [
+  "de todas las elecciones",
+  "de todas as escolhas"
+ ],
+ "on {map}": [
+  "en {map}",
+  "em {map}"
+ ],
+ "this map": [
+  "este mapa",
+  "este mapa"
+ ],
+ "vs its usual form": [
+  "frente a su nivel normal",
+  "contra o nível normal"
+ ],
+ "when paired": [
+  "cuando van juntos",
+  "quando jogam juntos"
+ ],
+ "{map} · {battles} battles on this map": [
+  "{map} · {battles} partidas en este mapa",
+  "{map} · {battles} partidas neste mapa"
+ ],
+ "{name} and {other} belong together.": [
+  "{name} y {other} van juntos.",
+  "{name} e {other} combinam."
+ ],
+ "{name} climbed overnight.": [
+  "{name} subió de la noche a la mañana.",
+  "{name} subiu de um dia para o outro."
+ ],
+ "{name} is a different brawler on {map}.": [
+  "{name} es otro brawler en {map}.",
+  "{name} é outro brawler em {map}."
+ ],
+ "{name} is everywhere, and losing.": [
+  "{name} está en todas partes, y pierde.",
+  "{name} está em todo lugar, e perdendo."
+ ],
+ "{name} is picked constantly and losing.": [
+  "{name} se elige todo el tiempo y pierde.",
+  "{name} é escolhido o tempo todo e está perdendo."
+ ],
+ "{name} moved more than anything else since yesterday.": [
+  "{name} es el que más se movió desde ayer.",
+  "{name} foi quem mais se moveu desde ontem."
+ ],
+ "{name} owns {other}.": [
+  "{name} domina a {other}.",
+  "{name} domina {other}."
+ ],
+ "{rate} adjusted win rate on just {picks} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.": [
+  "{rate} de victorias ajustadas con solo el {picks} de uso: uno de los mejores récords de todos los brawlers, de un brawler que casi ningún draft tiene en cuenta.",
+  "{rate} de vitórias ajustadas com só {picks} de escolha: um dos melhores resultados de todos os brawlers, de um brawler que quase nenhum draft considera."
+ ],
+ "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.": [
+  "{rate} contra {other} en concreto, {edge} por encima del récord propio de {name}. El enfrentamiento más desigual de la muestra.",
+  "{rate} contra {other} especificamente, {edge} acima do resultado próprio de {name}. O confronto mais desigual da amostra."
+ ],
+ "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.": [
+  "{rate} aquí frente al {other} en el resto de mapas: la mayor diferencia entre un brawler y un terreno concreto.",
+  "{rate} aqui contra {other} em todos os outros mapas: a maior diferença entre um brawler e um terreno."
+ ],
+ "{winRate} win rate · {pickRate} picked · {battles} battles": [
+  "{winRate} de victorias · {pickRate} de uso · {battles} partidas",
+  "{winRate} de vitórias · {pickRate} de escolha · {battles} partidas"
+ ],
+ "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.": [
+  "La puntuación meta es un número de 0 a 10 que combina dos medidas: una tasa de victorias ajustada, que vale el 75%, y una tasa de uso en escala logarítmica, que vale el 25%. Las dos salen de partidas reales de los mejores jugadores del mundo, recogidas cada dos horas, y la lista de Competitivo solo cuenta partidas de Competitivo.",
+  "A pontuação meta é um número de 0 a 10 que junta duas medidas: uma taxa de vitória ajustada, que vale 75%, e uma taxa de escolha em escala logarítmica, que vale 25%. As duas vêm de partidas reais dos melhores jogadores do mundo, coletadas a cada duas horas, e a lista do Ranqueado só conta partidas ranqueadas."
+ ],
+ "Every win rate is pulled toward the average by 50 pseudo-battles, so a brawler needs roughly that many decided battles before its own record outweighs the prior. Without it the top of the list was whichever rarely-played brawler had a lucky week. Anything under 20 decided battles is not rated at all.": [
+  "Cada tasa de victorias se acerca a la media con 50 pseudopartidas, así que un brawler necesita más o menos esas partidas decididas para que su récord pese más que la media. Sin eso, lo más alto de la lista era el brawler poco jugado que tuvo una semana de suerte. Lo que tiene menos de 20 partidas decididas no se puntúa.",
+  "Cada taxa de vitória é puxada para a média com 50 pseudopartidas, então um brawler precisa de mais ou menos essas partidas decididas para o próprio resultado pesar mais que a média. Sem isso, o topo da lista era o brawler pouco jogado que teve uma semana de sorte. O que tem menos de 20 partidas decididas não é pontuado."
+ ]
+}

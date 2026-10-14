@@ -7,6 +7,8 @@ import { useMemo, useState, useSyncExternalStore } from 'react';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { readRosters, serverRosters, subscribeRosters } from '@/lib/roster';
 import { brawlerPath } from '@/lib/slugs';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 export interface DraftPick {
   brawlerId: number;
@@ -43,6 +45,8 @@ const THIN_SAMPLE = 30;
  * it are different questions.
  */
 export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemies: boolean }) {
+  const t = useT();
+  const lp = useLp();
   const [scope, setScope] = useState<'all' | 'owned' | 'power11'>('all');
 
   /*
@@ -63,31 +67,23 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
     <>
       {roster ? (
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted">Show</span>
-          <Scope active={scope === 'all'} onClick={() => setScope('all')}>
-            Every brawler
-          </Scope>
-          <Scope active={scope === 'owned'} onClick={() => setScope('owned')}>
-            {roster.name} owns
-          </Scope>
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted">{t('Show')}</span>
+          <Scope active={scope === 'all'} onClick={() => setScope('all')}>{t('Every brawler')}</Scope>
+          <Scope active={scope === 'owned'} onClick={() => setScope('owned')}>{t('{name} owns', { name: roster.name })}</Scope>
           {roster.power11.length > 0 ? (
-            <Scope active={scope === 'power11'} onClick={() => setScope('power11')}>
-              At power 11
-            </Scope>
+            <Scope active={scope === 'power11'} onClick={() => setScope('power11')}>{t('At power 11')}</Scope>
           ) : null}
         </div>
       ) : null}
 
       {shown.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          None of the brawlers with a record on this map are in that list.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('None of the brawlers with a record on this map are in that list.')}</p>
       ) : (
         <ol className="card divide-y divide-border overflow-hidden">
           {shown.map((pick, index) => (
             <li key={pick.brawlerId}>
               <Link
-                href={brawlerPath(pick.brawlerId, pick.brawlerName)}
+                href={lp(brawlerPath(pick.brawlerId, pick.brawlerName))}
                 className="row-interactive flex items-center gap-3 px-4 py-3"
               >
                 <span
@@ -117,9 +113,7 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
                     className={`block text-xs tabular-nums ${
                       pick.decidedSampleSize < THIN_SAMPLE ? 'text-defeat/80' : 'text-muted'
                     }`}
-                  >
-                    {formatNumber(pick.decidedSampleSize)} battles here
-                    {pick.decidedSampleSize < THIN_SAMPLE ? ' · thin' : ''}
+                  >{t('{decidedSampleSize} battles here', { decidedSampleSize: formatNumber(pick.decidedSampleSize) })}{pick.decidedSampleSize < THIN_SAMPLE ? t(' · thin') : ''}
                   </span>
                 </span>
                 <span className="shrink-0 text-right">
@@ -132,11 +126,9 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
                         pick.edge > 0 ? 'text-victory/80' : 'text-defeat/80'
                       }`}
                     >
-                      {pick.edge > 0 ? '+' : '−'}
-                      {Math.abs(pick.edge * 100).toFixed(1)} vs their picks
-                    </span>
+                      {pick.edge > 0 ? '+' : '−'}{t('{v} vs their picks', { v: Math.abs(pick.edge * 100).toFixed(1) })}</span>
                   ) : hasEnemies ? (
-                    <span className="block text-xs text-muted">no matchup data</span>
+                    <span className="block text-xs text-muted">{t('no matchup data')}</span>
                   ) : null}
 
                   {pick.allyEdge !== null ? (
@@ -145,9 +137,7 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
                         pick.allyEdge > 0 ? 'text-victory/80' : 'text-defeat/80'
                       }`}
                     >
-                      {pick.allyEdge > 0 ? '+' : '−'}
-                      {Math.abs(pick.allyEdge * 100).toFixed(1)} beside yours
-                    </span>
+                      {pick.allyEdge > 0 ? '+' : '−'}{t('{v} beside yours', { v: Math.abs(pick.allyEdge * 100).toFixed(1) })}</span>
                   ) : null}
                 </span>
               </Link>

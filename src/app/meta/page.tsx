@@ -14,6 +14,9 @@ import { brawlerPath, slugify } from '@/lib/slugs';
 import { TIER_COLOR, getMetaMovers, getTeamComps } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import type { MetaMover, Tier } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /* Daily: the movers are recomputed from each day's snapshot, so a weekly page
    that only changed on Mondays would sit stale for six days out of seven. */
@@ -41,6 +44,8 @@ const SHOWN = 5;
  * roughly nothing beyond what the tier list already pays for.
  */
 export default async function MetaReportPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const [movers, modes, modeMeta, brawlerMeta, catalogue] = await Promise.all([
     getMetaMovers(7).catch(() => [] as MetaMover[]),
     getTeamComps().catch(() => []),
@@ -90,29 +95,26 @@ export default async function MetaReportPage() {
       />
 
       <PageHeading
-        title="This week in the meta"
+        title={t('This week in the meta')}
         subtitle={
           window
-            ? `What moved between ${day(window.fromDate)} and ${day(window.toDate)}, measured from sampled battles.`
-            : 'What moved this week, measured from sampled battles.'
+            ? t('What moved between {fromDate} and {toDate}, measured from sampled battles.', { fromDate: day(window.fromDate), toDate: day(window.toDate) })
+            : t('What moved this week, measured from sampled battles.')
         }
       />
 
       {movers.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          Not enough comparable snapshots yet. This fills in once a week of daily snapshots has
-          been collected under a stable sample.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Not enough comparable snapshots yet. This fills in once a week of daily snapshots has been collected under a stable sample.')}</p>
       ) : null}
 
       {crossings.length > 0 ? (
         <section className="space-y-3">
-          <SectionHeading title="Tier changes" />
+          <SectionHeading title={t('Tier changes')} />
           <ul className="card divide-y divide-border overflow-hidden">
             {crossings.map((mover) => (
               <li key={mover.brawlerId}>
                 <Link
-                  href={brawlerPath(mover.brawlerId, mover.brawlerName)}
+                  href={lp(brawlerPath(mover.brawlerId, mover.brawlerName))}
                   prefetch={false}
                   className="row-interactive flex items-center gap-3 px-4 py-3"
                 >
@@ -129,10 +131,7 @@ export default async function MetaReportPage() {
                     <span className="block truncate font-semibold capitalize">
                       {mover.brawlerName.toLowerCase()}
                     </span>
-                    <span className="block text-xs tabular-nums text-muted">
-                      {formatNumber(mover.sampleSize)} battles ·{' '}
-                      {formatPercent(mover.winRateNow)} win rate
-                    </span>
+                    <span className="block text-xs tabular-nums text-muted">{t('{sampleSize} battles ·', { sampleSize: formatNumber(mover.sampleSize) })}{' '}{t('{winRateNow} win rate', { winRateNow: formatPercent(mover.winRateNow) })}</span>
                   </span>
                   <span className="flex shrink-0 items-center gap-1.5 text-sm font-black">
                     <TierPill tier={mover.tierBefore} muted />
@@ -149,23 +148,18 @@ export default async function MetaReportPage() {
       ) : null}
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <MoverColumn title="Rising" movers={risers} brawlerMeta={brawlerMeta} up />
-        <MoverColumn title="Falling" movers={fallers} brawlerMeta={brawlerMeta} up={false} />
+        <MoverColumn title={t('Rising')} movers={risers} brawlerMeta={brawlerMeta} up />
+        <MoverColumn title={t('Falling')} movers={fallers} brawlerMeta={brawlerMeta} up={false} />
       </div>
 
       {changes.length > 0 && notes ? (
         <section className="space-y-3">
           <SectionHeading
-            title="What the update changed"
+            title={t('What the update changed')}
             aside={notes.title}
             subtitle={
-              <>
-                The names Supercell published.{' '}
-                <Link href="/patches" className="font-medium text-brand hover:underline">
-                  Whether any of it moved
-                </Link>{' '}
-                is measured separately.
-              </>
+              <>{t('The names Supercell published.')}{' '}
+                <Link href={lp('/patches')} className="font-medium text-brand hover:underline">{t('Whether any of it moved')}</Link>{' '}{t('is measured separately.')}</>
             }
           />
           <ul className="card divide-y divide-border overflow-hidden">
@@ -180,24 +174,19 @@ export default async function MetaReportPage() {
               </li>
             ))}
           </ul>
-          <p className="text-xs text-muted">
-            A brawler listed here has a dashed marker on its own trend chart, so you can see what
-            the change actually did.
-          </p>
+          <p className="text-xs text-muted">{t('A brawler listed here has a dashed marker on its own trend chart, so you can see what the change actually did.')}</p>
         </section>
       ) : null}
 
       {topComps.length > 0 ? (
         <section className="space-y-3">
           <SectionHeading
-            title="Comps winning now"
+            title={t('Comps winning now')}
             aside={
               <Link
-                href="/comps"
+                href={lp('/comps')}
                 className="text-xs font-semibold text-brand transition-colors hover:underline"
-              >
-                All comps
-              </Link>
+              >{t('All comps')}</Link>
             }
           />
           {topComps.map(({ mode, comp }) => {
@@ -206,14 +195,12 @@ export default async function MetaReportPage() {
               <div key={mode.mode} className="space-y-1.5">
                 <p className="text-xs font-semibold text-muted">
                   <Link
-                    href={`/comps/${slugify(label)}`}
+                    href={lp(`/comps/${slugify(label)}`)}
                     className="transition-colors hover:text-foreground"
                   >
-                    {label}
-                  </Link>{' '}
-                  · mode average {formatPercent(mode.baseline)}
-                </p>
-                <CompList comps={[comp]} brawlerMeta={brawlerMeta} emptyLabel="No data yet." />
+                    {t(label)}
+                  </Link>{' '}{t('· mode average {baseline}', { baseline: formatPercent(mode.baseline) })}</p>
+                <CompList comps={[comp]} brawlerMeta={brawlerMeta} emptyLabel={t('No data yet.')} />
               </div>
             );
           })}
@@ -234,17 +221,19 @@ function MoverColumn({
   brawlerMeta: Map<number, BABrawler>;
   up: boolean;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <section className="space-y-3">
-      <SectionHeading title={title} />
+      <SectionHeading title={t(title)} />
       {movers.length === 0 ? (
-        <p className="card p-4 text-sm text-muted">Nothing moved enough to report.</p>
+        <p className="card p-4 text-sm text-muted">{t('Nothing moved enough to report.')}</p>
       ) : (
         <ul className="card divide-y divide-border overflow-hidden">
           {movers.map((mover) => (
             <li key={mover.brawlerId}>
               <Link
-                href={brawlerPath(mover.brawlerId, mover.brawlerName)}
+                href={lp(brawlerPath(mover.brawlerId, mover.brawlerName))}
                 prefetch={false}
                 className="row-interactive flex items-center gap-3 px-4 py-3"
               >
@@ -261,10 +250,7 @@ function MoverColumn({
                   <span className="block truncate font-semibold capitalize">
                     {mover.brawlerName.toLowerCase()}
                   </span>
-                  <span className="block text-xs tabular-nums text-muted">
-                    {formatNumber(mover.sampleSize)} battles · {formatPercent(mover.winRateNow)} win
-                    rate
-                  </span>
+                  <span className="block text-xs tabular-nums text-muted">{t('{sampleSize} battles · {winRateNow} win rate', { sampleSize: formatNumber(mover.sampleSize), winRateNow: formatPercent(mover.winRateNow) })}</span>
                 </span>
                 <span
                   className={`shrink-0 text-sm font-bold tabular-nums ${

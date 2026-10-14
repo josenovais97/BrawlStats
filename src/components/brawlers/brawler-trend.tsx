@@ -1,6 +1,9 @@
 import { formatPercent } from '@/lib/format';
 import { CHANGE_LABEL, type BalanceEvent } from '@/lib/release-notes';
 import type { BrawlerTrendPoint } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /** UTC-anchored so the server and the browser format the same string. */
 function shortDate(iso: string): string {
@@ -33,6 +36,8 @@ export function BrawlerTrend({
   accent: string;
   events?: BalanceEvent[];
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const usable = points.filter(
     (p): p is BrawlerTrendPoint & { normalizedWinRate: number } =>
       p.normalizedWinRate !== null,
@@ -85,9 +90,7 @@ export function BrawlerTrend({
     <div className="card p-4">
       <div className="flex items-baseline justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">
-            Adjusted win rate
-          </p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">{t('Adjusted win rate')}</p>
           <p className="mt-0.5 text-2xl font-black tabular-nums">
             {formatPercent(last)}
           </p>
@@ -97,9 +100,7 @@ export function BrawlerTrend({
             delta >= 0.002 ? 'text-victory' : delta <= -0.002 ? 'text-defeat' : 'text-muted'
           }`}
         >
-          {delta >= 0.002 ? '+' : delta <= -0.002 ? '−' : '±'}
-          {Math.abs(delta * 100).toFixed(1)} pts
-        </p>
+          {delta >= 0.002 ? '+' : delta <= -0.002 ? '−' : '±'}{t('{v} pts', { v: Math.abs(delta * 100).toFixed(1) })}</p>
       </div>
 
       {/* The markers are HTML over the chart rather than SVG inside it: the
@@ -111,11 +112,9 @@ export function BrawlerTrend({
           preserveAspectRatio="none"
           className="h-16 w-full"
           role="img"
-          aria-label={`Adjusted win rate over the last ${days} daily snapshots, from ${formatPercent(first)} to ${formatPercent(last)}${
-            marks.length > 0
+          aria-label={t('Adjusted win rate over the last {days} daily snapshots, from {first} to {last}{v}', { days: days, first: formatPercent(first), last: formatPercent(last), v: marks.length > 0
               ? `. Balance updates on ${marks.map((m) => shortDate(m.event.date)).join(' and ')}.`
-              : ''
-          }`}
+              : '' })}
         >
           <path d={area} fill={accent} opacity={0.16} />
           <path
@@ -153,22 +152,17 @@ export function BrawlerTrend({
                 {event.categories.map((c) => CHANGE_LABEL[c]).join(' · ')}
               </span>
               <a
-                href={event.url}
+                href={lp(event.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-brand transition-colors hover:underline"
-              >
-                Patch notes
-              </a>
+              >{t('Patch notes')}</a>
             </li>
           ))}
         </ul>
       ) : null}
 
-      <p className="mt-2 text-xs text-muted">
-        {days} daily snapshots. Adjusted against the sample average, so a shift here
-        is the brawler moving rather than the cohort.
-        {marks.length > 0 ? ' Dashed lines mark updates that changed this brawler.' : ''}
+      <p className="mt-2 text-xs text-muted">{t('{days} daily snapshots. Adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.', { days: days })}{marks.length > 0 ? t(' Dashed lines mark updates that changed this brawler.') : ''}
       </p>
     </div>
   );

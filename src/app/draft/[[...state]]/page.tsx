@@ -28,6 +28,10 @@ import { slugify } from '@/lib/slugs';
 import { RANKED_MAP_WINDOW_DAYS, getAllyScores, getBestPicksByMode, getCounterScores, getRankedMapPicks, getRoleCompositions } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { ModePick, RankedMapPick, RankedMapPicks } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
+import { mapNamer } from '@/lib/i18n-game';
 
 interface PageProps {
   params: Promise<{ state?: string[] }>;
@@ -47,14 +51,15 @@ interface PageProps {
  * draft state points at another draft state.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { state } = await params;
   const picked = (state ?? []).length > 0;
 
   return {
     // "Counter picks" and "free": what a drafter types, and the reason to click.
-    title: 'Brawl Stars draft helper: best counter picks for Ranked (free)',
+    title: t('Brawl Stars draft helper: best counter picks for Ranked (free)'),
     description:
-      'Pick the Ranked map, add the brawlers the enemy has drafted, and get the picks with the best record against that exact line-up on that map. Free, no account.',
+      t('Pick the Ranked map, add the brawlers the enemy has drafted, and get the picks with the best record against that exact line-up on that map. Free, no account.'),
     alternates: { canonical: '/draft' },
     ...(picked ? { robots: { index: false, follow: false } } : {}),
   };
@@ -108,6 +113,8 @@ const CANDIDATES = 12;
 const POOL = 40;
 
 export default async function DraftPage({ params }: PageProps) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { state } = await params;
   const route = resolveDraftRoute(state);
   // A path shape the tool does not have. See `resolveDraftRoute`.
@@ -238,24 +245,19 @@ export default async function DraftPage({ params }: PageProps) {
       <JsonLd data={breadcrumbSchema([{ name: 'Draft helper', path: '/draft' }])} />
 
       <PageHeading
-        title="Draft helper"
-        subtitle="Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen."
+        title={t('Draft helper')}
+        subtitle={t('Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen.')}
         aside={
           <Link
-            href="/ranked"
+            href={lp('/ranked')}
             className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
           >
-            <RankedIcon className="size-4" />
-            Ranked pool
-          </Link>
+            <RankedIcon className="size-4" />{t('Ranked pool')}</Link>
         }
       />
 
       {pool.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard
-          pool continuously, so this fills in over the next day or two.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.')}</p>
       ) : !selected ? (
         <MapChooser pool={pool} artFor={artFor} modeMeta={modeMeta} />
       ) : (
@@ -272,8 +274,8 @@ export default async function DraftPage({ params }: PageProps) {
           <section>
             <StepHeading
               step={2}
-              title="Bans"
-              hint={`Up to ${MAX_BANS}. Banned brawlers disappear from every suggestion below.`}
+              title={t('Bans')}
+              hint={t('Up to {MAX_BANS}. Banned brawlers disappear from every suggestion below.', { MAX_BANS: MAX_BANS })}
             />
 
             <div className="card p-4">
@@ -286,11 +288,11 @@ export default async function DraftPage({ params }: PageProps) {
                       /* scroll={false} throughout this step: removing a pick
                          is a navigation, and without it the reader is thrown
                          to the top of the page every time they undo one. */
-                      href={hrefFor({ ban: bans.filter((other) => other !== id) })}
+                      href={lp(hrefFor({ ban: bans.filter((other) => other !== id) }))}
                       rel="nofollow"
                       prefetch={false}
                       scroll={false}
-                      title={`Un-ban ${meta?.name ?? id}`}
+                      title={t('Un-ban {v}', { v: meta?.name ?? id })}
                       className="group flex items-center gap-2 rounded-xl border border-border bg-surface-2 px-2.5 py-2 text-sm font-semibold capitalize text-muted"
                     >
                       <Image
@@ -313,21 +315,17 @@ export default async function DraftPage({ params }: PageProps) {
                   <span className="flex items-center gap-2 rounded-xl border border-dashed border-border px-2.5 py-2 text-sm text-muted">
                     <span className="grid size-8 place-items-center rounded-lg bg-surface-2">
                       <Ban className="size-4" />
-                    </span>
-                    Nothing banned yet
-                  </span>
+                    </span>{t('Nothing banned yet')}</span>
                 ) : null}
 
                 {bans.length > 0 ? (
                   <Link
-                    href={hrefFor({ ban: [] })}
+                    href={lp(hrefFor({ ban: [] }))}
                     rel="nofollow"
                     prefetch={false}
                     scroll={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
-                  >
-                    Clear
-                  </Link>
+                  >{t('Clear')}</Link>
                 ) : null}
               </div>
 
@@ -335,8 +333,8 @@ export default async function DraftPage({ params }: PageProps) {
                 <BrawlerChooser
                   options={chooserOptions}
                   taken={[...bans, ...enemies, ...allies]}
-                  label="Ban a brawler"
-                  suggestedLabel="Most likely bans here"
+                  label={t('Ban a brawler')}
+                  suggestedLabel={t('Most likely bans here')}
                   hrefs={Object.fromEntries(
                     catalog.current.map((b) => [b.id, hrefFor({ ban: [...bans, b.id] })]),
                   )}
@@ -348,8 +346,8 @@ export default async function DraftPage({ params }: PageProps) {
           <section>
             <StepHeading
               step={3}
-              title="Enemy team"
-              hint={`Up to ${MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.`}
+              title={t('Enemy team')}
+              hint={t('Up to {MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.', { MAX_ENEMIES: MAX_ENEMIES })}
             />
 
             <div className="card p-4">
@@ -367,13 +365,13 @@ export default async function DraftPage({ params }: PageProps) {
                   return id ? (
                     <Link
                       key={slot}
-                      href={hrefFor({
+                      href={lp(hrefFor({
                         enemy: enemies.filter((other) => other !== id),
-                      })}
+                      }))}
                       rel="nofollow"
                       prefetch={false}
                       scroll={false}
-                      title={`Remove ${meta?.name ?? id}`}
+                      title={t('Remove {v}', { v: meta?.name ?? id })}
                       className="group flex items-center gap-2 rounded-xl border border-defeat/40 bg-defeat/10 px-2.5 py-2 text-sm font-semibold capitalize"
                     >
                       <Image
@@ -394,22 +392,18 @@ export default async function DraftPage({ params }: PageProps) {
                     >
                       <span className="grid size-8 place-items-center rounded-lg bg-surface-2">
                         <Target className="size-4" />
-                      </span>
-                      Empty slot
-                    </span>
+                      </span>{t('Empty slot')}</span>
                   );
                 })}
 
                 {enemies.length > 0 ? (
                   <Link
-                    href={hrefFor({ enemy: [] })}
+                    href={lp(hrefFor({ enemy: [] }))}
                     rel="nofollow"
                     prefetch={false}
                     scroll={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
-                  >
-                    Clear
-                  </Link>
+                  >{t('Clear')}</Link>
                 ) : null}
               </div>
 
@@ -417,8 +411,8 @@ export default async function DraftPage({ params }: PageProps) {
                 <BrawlerChooser
                   options={chooserOptions}
                   taken={[...bans, ...enemies, ...allies]}
-                  label="Add an enemy brawler"
-                  suggestedLabel="Most likely picks here"
+                  label={t('Add an enemy brawler')}
+                  suggestedLabel={t('Most likely picks here')}
                   hrefs={Object.fromEntries(
                     catalog.current.map((b) => [b.id, hrefFor({ enemy: [...enemies, b.id] })]),
                   )}
@@ -430,8 +424,8 @@ export default async function DraftPage({ params }: PageProps) {
           <section>
             <StepHeading
               step={4}
-              title="Your team"
-              hint={`Up to ${MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.`}
+              title={t('Your team')}
+              hint={t('Up to {MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.', { MAX_ALLIES: MAX_ALLIES })}
             />
 
             <div className="card p-4">
@@ -446,13 +440,13 @@ export default async function DraftPage({ params }: PageProps) {
                   return id ? (
                     <Link
                       key={slot}
-                      href={hrefFor({
+                      href={lp(hrefFor({
                         ally: allies.filter((other) => other !== id),
-                      })}
+                      }))}
                       rel="nofollow"
                       prefetch={false}
                       scroll={false}
-                      title={`Remove ${meta?.name ?? id}`}
+                      title={t('Remove {v}', { v: meta?.name ?? id })}
                       className="group flex items-center gap-2 rounded-xl border border-victory/40 bg-victory/10 px-2.5 py-2 text-sm font-semibold capitalize"
                     >
                       <Image
@@ -473,22 +467,18 @@ export default async function DraftPage({ params }: PageProps) {
                     >
                       <span className="grid size-8 place-items-center rounded-lg bg-surface-2">
                         <Target className="size-4" />
-                      </span>
-                      Empty slot
-                    </span>
+                      </span>{t('Empty slot')}</span>
                   );
                 })}
 
                 {allies.length > 0 ? (
                   <Link
-                    href={hrefFor({ ally: [] })}
+                    href={lp(hrefFor({ ally: [] }))}
                     rel="nofollow"
                     prefetch={false}
                     scroll={false}
                     className="ml-auto text-sm font-medium text-muted hover:text-foreground"
-                  >
-                    Clear
-                  </Link>
+                  >{t('Clear')}</Link>
                 ) : null}
               </div>
 
@@ -496,8 +486,8 @@ export default async function DraftPage({ params }: PageProps) {
                 <BrawlerChooser
                   options={chooserOptions}
                   taken={[...bans, ...enemies, ...allies]}
-                  label="Add a team-mate"
-                  suggestedLabel="Best here"
+                  label={t('Add a team-mate')}
+                  suggestedLabel={t('Best here')}
                   hrefs={Object.fromEntries(
                     catalog.current.map((b) => [b.id, hrefFor({ ally: [...allies, b.id] })]),
                   )}
@@ -521,22 +511,20 @@ export default async function DraftPage({ params }: PageProps) {
           <section>
             <StepHeading
               step={5}
-              title="Your pick"
+              title={t('Your pick')}
               hint={
                 enemies.length > 0 && allies.length > 0
-                  ? 'Map score, plus how each candidate does against their picks and beside yours.'
+                  ? t('Map score, plus how each candidate does against their picks and beside yours.')
                   : enemies.length > 0
-                    ? 'Map score plus how each candidate does against the brawlers you named.'
+                    ? t('Map score plus how each candidate does against the brawlers you named.')
                     : allies.length > 0
-                      ? 'Map score plus how each candidate does beside your team-mates.'
-                      : 'Ranked by record on this map. Name either team above to reweigh it.'
+                      ? t('Map score plus how each candidate does beside your team-mates.')
+                      : t('Ranked by record on this map. Name either team above to reweigh it.')
               }
             />
 
             {ranked.length === 0 ? (
-              <p className="card p-6 text-sm leading-relaxed text-muted">
-                No sampled battles for this map or mode yet.
-              </p>
+              <p className="card p-6 text-sm leading-relaxed text-muted">{t('No sampled battles for this map or mode yet.')}</p>
             ) : (
               /* Client-side because the "brawlers I own" filter reads a roster
                  kept in the visitor's own browser. Only the fields a row draws
@@ -556,12 +544,7 @@ export default async function DraftPage({ params }: PageProps) {
               />
             )}
 
-            <p className="mt-3 text-xs leading-relaxed text-muted">
-              Map score is a brawler&rsquo;s adjusted win rate here, weighed against its overall
-              Ranked form. The matchup figure is its win rate when one of the brawlers you named was
-              on the other team, minus its own average. So a brawler that simply wins a lot does not
-              appear to counter everything.
-            </p>
+            <p className="mt-3 text-xs leading-relaxed text-muted">{t('Map score is a brawler’s adjusted win rate here, weighed against its overall Ranked form. The matchup figure is its win rate when one of the brawlers you named was on the other team, minus its own average. So a brawler that simply wins a lot does not appear to counter everything.')}</p>
           </section>
         </>
       )}
@@ -580,6 +563,7 @@ function StepHeading({
   hint: string;
   aside?: React.ReactNode;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
       <div className="flex items-start gap-3">
@@ -587,8 +571,8 @@ function StepHeading({
           {step}
         </span>
         <div>
-          <h2 className="display text-xl uppercase leading-none">{title}</h2>
-          <p className="mt-1.5 max-w-xl text-sm text-muted">{hint}</p>
+          <h2 className="display text-xl uppercase leading-none">{t(title)}</h2>
+          <p className="mt-1.5 max-w-xl text-sm text-muted">{t(hint)}</p>
         </div>
       </div>
       {aside}
@@ -597,7 +581,7 @@ function StepHeading({
 }
 
 /** The chosen map, with its art and what is behind its ranking. */
-function SelectedMap({
+async function SelectedMap({
   map,
   art,
   modeMeta,
@@ -606,6 +590,9 @@ function SelectedMap({
   art?: GameMap;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const mode = modeMeta.get(map.mode.toLowerCase());
   const accent = mode?.color ?? '#8b95b8';
 
@@ -613,12 +600,10 @@ function SelectedMap({
     <section>
       <StepHeading
         step={1}
-        title="Map"
-        hint="The Ranked rotation only. Every map here has sampled competitive battles behind it."
+        title={t('Map')}
+        hint={t('The Ranked rotation only. Every map here has sampled competitive battles behind it.')}
         aside={
-          <Link href="/draft" className="text-sm font-medium text-muted hover:text-foreground">
-            Change map
-          </Link>
+          <Link href={lp('/draft')} className="text-sm font-medium text-muted hover:text-foreground">{t('Change map')}</Link>
         }
       />
 
@@ -628,7 +613,7 @@ function SelectedMap({
           {art?.map.imageUrl ? (
             <MapArt
               src={art.map.imageUrl}
-              alt={`${map.mapName} map layout`}
+              alt={t('{mapName} map layout', { mapName: nm(map.mapName) })}
               height="h-24"
               sizes="140px"
               className="w-32 shrink-0 rounded-xl"
@@ -639,20 +624,15 @@ function SelectedMap({
             <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
               {mode?.name ?? humanizeMode(map.mode)}
             </p>
-            <h3 className="display mt-1 truncate text-2xl uppercase">{map.mapName}</h3>
-            <p className="mt-1 text-sm text-muted">
-              {formatNumber(map.sampleSize)} sampled Ranked battles · {map.brawlersSeen} brawlers
-              seen
-            </p>
+            <h3 className="display mt-1 truncate text-2xl uppercase">{nm(map.mapName)}</h3>
+            <p className="mt-1 text-sm text-muted">{t('{sampleSize} sampled Ranked battles · {brawlersSeen} brawlers seen', { sampleSize: formatNumber(map.sampleSize), brawlersSeen: map.brawlersSeen })}</p>
           </div>
 
           {art ? (
             <Link
-              href={`/maps/${art.modeSlug}/${art.mapSlug}`}
+              href={lp(`/maps/${art.modeSlug}/${art.mapSlug}`)}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-            >
-              Map page
-              <ArrowRight className="size-4" />
+            >{t('Map page')}<ArrowRight className="size-4" />
             </Link>
           ) : null}
         </div>
@@ -662,7 +642,7 @@ function SelectedMap({
 }
 
 /** Map picker: the Ranked pool as cards, grouped by mode. */
-function MapChooser({
+async function MapChooser({
   pool,
   artFor,
   modeMeta,
@@ -671,6 +651,9 @@ function MapChooser({
   artFor: (map: RankedMapPicks) => GameMap | undefined;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const byMode = new Map<string, RankedMapPicks[]>();
   for (const map of pool) {
     const list = byMode.get(map.mode) ?? [];
@@ -682,8 +665,8 @@ function MapChooser({
     <section>
       <StepHeading
         step={1}
-        title="Pick the map"
-        hint="The current Ranked rotation. Everything after this step follows from it."
+        title={t('Pick the map')}
+        hint={t('The current Ranked rotation. Everything after this step follows from it.')}
       />
 
       <div className="space-y-6">
@@ -716,7 +699,7 @@ function MapChooser({
                   return (
                     <li key={`${map.mode}-${map.mapName}`}>
                       <Link
-                        href={draftHref({ mode: map.mode, map: map.mapName })}
+                        href={lp(draftHref({ mode: map.mode, map: map.mapName }))}
                         rel="nofollow"
                         prefetch={false}
                         className="card card-interactive group block h-full overflow-hidden"
@@ -728,11 +711,9 @@ function MapChooser({
                           sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
                         />
                         <span className="block truncate px-3 pt-2 text-sm font-semibold">
-                          {map.mapName}
+                          {nm(map.mapName)}
                         </span>
-                        <span className="block px-3 pb-2 text-xs tabular-nums text-muted">
-                          {formatNumber(map.sampleSize)} battles
-                        </span>
+                        <span className="block px-3 pb-2 text-xs tabular-nums text-muted">{t('{sampleSize} battles', { sampleSize: formatNumber(map.sampleSize) })}</span>
                       </Link>
                     </li>
                   );

@@ -67,18 +67,21 @@ import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { displayTag, normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { tag } = await params;
   try {
     const player = await getPlayer(tag);
     return {
       title: `${player.name} (${displayTag(player.tag)})`,
-      description: `${player.name} has ${player.trophies.toLocaleString('en-US')} trophies and ${player.brawlers.length} brawlers.`,
+      description: t('{name} has {v} trophies and {length} brawlers.', { name: player.name, v: player.trophies.toLocaleString('en-US'), length: player.brawlers.length }),
       // Normalised, so #ABC, %23ABC and abc all resolve to one indexable URL
       // rather than three competing ones.
       alternates: { canonical: `/player/${normalizeTag(player.tag)}` },
@@ -108,11 +111,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     };
   } catch {
-    return { title: `Player ${displayTag(tag)}` };
+    return { title: t('Player {tag}', { tag: displayTag(tag) }) };
   }
 }
 
 export default async function PlayerPage({ params }: PageProps) {
+  const t = getT(requestLocale());
   const { tag } = await params;
 
   let player;
@@ -123,10 +127,10 @@ export default async function PlayerPage({ params }: PageProps) {
     return (
       <ErrorState
         code={apiError.code}
-        title={apiError.code === 'notFound' ? 'Player not found' : undefined}
+        title={apiError.code === 'notFound' ? t('Player not found') : undefined}
         detail={
           apiError.code === 'notFound'
-            ? `No player exists with the tag ${displayTag(tag)}. Check it in-game under your profile.`
+            ? t('No player exists with the tag {tag}. Check it in-game under your profile.', { tag: displayTag(tag) })
             : undefined
         }
       />
@@ -343,9 +347,9 @@ export default async function PlayerPage({ params }: PageProps) {
         tabs={[
         {
           id: 'overview',
-          label: 'Overview',
+          label: t('Overview'),
           content: (
-            <ProfileGroup title="Overview">
+            <ProfileGroup title={t('Overview')}>
         {/*
          * The signature element first and on its own, then the game's own
          * verdict underneath it.
@@ -413,9 +417,9 @@ export default async function PlayerPage({ params }: PageProps) {
         },
         {
           id: 'account',
-          label: 'Account',
+          label: t('Account'),
           content: (
-            <ProfileGroup title="The account">
+            <ProfileGroup title={t('The account')}>
         <PlayerStats player={player} />
         {/* Streamed for the skin art; the fallback holds the hero row's
             height so the panels below do not jump when it lands. */}
@@ -446,9 +450,9 @@ export default async function PlayerPage({ params }: PageProps) {
         },
         {
           id: 'next',
-          label: 'Do next',
+          label: t('Do next'),
           content: (
-            <ProfileGroup title="What to do next">
+            <ProfileGroup title={t('What to do next')}>
         {/* Streamed for the skin art and map list; the fallback holds the
             card's height so the picks below do not jump. */}
         <Suspense fallback={<div className="skeleton h-[16rem] rounded-2xl" />}>
@@ -495,9 +499,9 @@ export default async function PlayerPage({ params }: PageProps) {
         },
         {
           id: 'battles',
-          label: 'Battles',
+          label: t('Battles'),
           content: (
-            <ProfileGroup title="Battles">
+            <ProfileGroup title={t('Battles')}>
         {/* Above the log rather than below it: this is the same subject read one
             level up, and the reader should meet the conclusion before scrolling
             twenty-five rows of evidence. */}
@@ -511,7 +515,7 @@ export default async function PlayerPage({ params }: PageProps) {
         </Suspense>
 
         <section>
-          <SectionHeading title="Recent battles" />
+          <SectionHeading title={t('Recent battles')} />
           <Suspense fallback={<BattleLogSkeleton />}>
             <BattleLog
               tag={tag}
@@ -526,9 +530,9 @@ export default async function PlayerPage({ params }: PageProps) {
         },
         {
           id: 'brawlers',
-          label: 'Brawlers',
+          label: t('Brawlers'),
           content: (
-            <ProfileGroup title="Brawlers" subtitle={`${player.brawlers.length} unlocked, read against the current tier list.`}>
+            <ProfileGroup title={t('Brawlers')} subtitle={t('{length} unlocked, read against the current tier list.', { length: player.brawlers.length })}>
         {/*
           The whole ranked meta, with this roster lit up on it.
 
@@ -543,7 +547,7 @@ export default async function PlayerPage({ params }: PageProps) {
         */}
         {hidden ? (
           <Panel
-            title="Your roster on the meta"
+            title={t('Your roster on the meta')}
             aside={`${hidden.rated} brawlers rated`}
           >
             <MetaRadar

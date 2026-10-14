@@ -16,6 +16,8 @@ import {
 import { Panel } from '@/components/ui/panel';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { OwnershipStat, PlaytimeEstimate, ProgressionSummary } from '@/lib/progression';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface Props {
   progression: ProgressionSummary;
@@ -26,6 +28,7 @@ interface Props {
 const NEARLY_COMPLETE = 0.97;
 
 export function PlayerProgression({ progression, playtime }: Props) {
+  const t = getT(requestLocale());
   /*
    * Two groups, not one list of seven bars.
    *
@@ -38,42 +41,42 @@ export function PlayerProgression({ progression, playtime }: Props) {
   const collection: Row[] = [
     {
       node: <BrawlersIcon className="size-4" />,
-      label: 'Brawlers',
+      label: t('Brawlers'),
       noun: ['brawler', 'brawlers'],
       stat: progression.brawlers,
       tone: 'text-brand',
     },
     {
       node: <StarPowerIcon className="size-4" />,
-      label: 'Star powers',
+      label: t('Star powers'),
       noun: ['star power', 'star powers'],
       stat: progression.starPowers,
       tone: 'text-brand',
     },
     {
       node: <GadgetIcon className="size-4" />,
-      label: 'Gadgets',
+      label: t('Gadgets'),
       noun: ['gadget', 'gadgets'],
       stat: progression.gadgets,
       tone: 'text-accent',
     },
     {
       node: <GearIcon className="size-4" />,
-      label: 'Gears equipped',
+      label: t('Gears equipped'),
       noun: ['gear', 'gears'],
       stat: progression.gears,
       tone: 'text-muted',
     },
     {
       node: <HyperchargeIcon className="size-4" />,
-      label: 'Hypercharges',
+      label: t('Hypercharges'),
       noun: ['hypercharge', 'hypercharges'],
       stat: progression.hyperCharges,
       tone: 'text-defeat',
     },
     {
       node: <BuffieIcon className="size-4" />,
-      label: 'Buffies',
+      label: t('Buffies'),
       noun: ['buffie', 'buffies'],
       stat: progression.buffies,
       tone: 'text-accent',
@@ -83,7 +86,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
   const maxed: Row[] = [
     {
       node: <Power11Icon className="size-4" />,
-      label: 'Brawlers at power 11',
+      label: t('Brawlers at power 11'),
       noun: ['brawler to power 11', 'brawlers to power 11'],
       stat: progression.maxedBrawlers,
       tone: 'text-victory',
@@ -98,10 +101,10 @@ export function PlayerProgression({ progression, playtime }: Props) {
 
   return (
     <Panel
-      title="Progression"
+      title={t('Progression')}
       aside={
         progression.totalsUnavailable
-          ? 'Totals unavailable right now'
+          ? t('Totals unavailable right now')
           : `${formatPercent(progression.completion)} of everything unlocked`
       }
     >
@@ -109,7 +112,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
         {/* Headline completion bar. */}
         <div className="mb-6">
           <div className="mb-2 flex items-baseline justify-between gap-3">
-            <span className="text-sm font-medium text-muted">Account completion</span>
+            <span className="text-sm font-medium text-muted">{t('Account completion')}</span>
             <span className="text-2xl font-black tabular-nums text-brand">
               {formatPercent(progression.completion)}
             </span>
@@ -139,13 +142,13 @@ export function PlayerProgression({ progression, playtime }: Props) {
                   <span className={done ? 'text-victory' : tone}>{node}</span>
                 </Ring>
                 <p className="mt-2 text-[11px] font-bold uppercase leading-tight tracking-wide">
-                  {label}
+                  {t(label)}
                 </p>
                 <p
                   className="mt-0.5 text-xs tabular-nums text-muted"
                   title={
                     stat.ownedRaw !== undefined && stat.ownedRaw > stat.owned
-                      ? `${formatNumber(stat.ownedRaw)} owned in total; completion counts the two per brawler that can be equipped`
+                      ? t('{ownedRaw} owned in total; completion counts the two per brawler that can be equipped', { ownedRaw: formatNumber(stat.ownedRaw) })
                       : undefined
                   }
                 >
@@ -162,12 +165,10 @@ export function PlayerProgression({ progression, playtime }: Props) {
         {nearlyComplete ? (
           <div className="mt-6 rounded-xl bg-surface-2/40 px-4 py-3.5 text-sm">
             {missing.length === 0 ? (
-              <p className="font-medium text-victory">Everything unlocked and maxed.</p>
+              <p className="font-medium text-victory">{t('Everything unlocked and maxed.')}</p>
             ) : (
               <>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted">
-                  Still to get
-                </p>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Still to get')}</p>
                 <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5">
                   {missing.map(({ node, noun, stat, tone }) => {
                     const left = stat.total - stat.owned;
@@ -187,49 +188,44 @@ export function PlayerProgression({ progression, playtime }: Props) {
           </div>
         ) : null}
 
-        <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-wider text-muted">
-          Investment <span className="font-medium normal-case tracking-normal">· what it cost</span>
+        <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-wider text-muted">{t('Investment')}{' '}<span className="font-medium normal-case tracking-normal">{t('· what it cost')}</span>
         </p>
         <div className="grid gap-3 @sm:grid-cols-2 @3xl:grid-cols-5">
           <Investment
             node={<CoinIcon className="size-5" />}
-            label="Coins invested"
+            label={t('Coins invested')}
             value={formatNumber(progression.coinsInvested)}
-            hint="Estimated"
+            hint={t('Estimated')}
           />
           <Investment
             node={<PowerPointIcon className="size-5" />}
-            label="Power points"
+            label={t('Power points')}
             value={formatNumber(progression.powerPointsInvested)}
-            hint="Estimated"
+            hint={t('Estimated')}
           />
           <Investment
             node={<ClockIcon className="size-5" />}
-            label="Time played"
+            label={t('Time played')}
             value={`${formatNumber(Math.round(playtime.hours))} h`}
-            hint="Estimated"
+            hint={t('Estimated')}
           />
           <Investment
             node={<BattlesIcon className="size-5" />}
-            label="Matches"
+            label={t('Matches')}
             value={formatNumber(playtime.matches)}
-            hint="Estimated"
+            hint={t('Estimated')}
           />
           <Investment
             node={<SkinsIcon className="size-5" />}
-            label="Skins equipped"
+            label={t('Skins equipped')}
             value={formatNumber(progression.skinsEquipped)}
-            hint="Currently in use"
+            hint={t('Currently in use')}
           />
         </div>
 
         {progression.coinsToMaxOwned > 0 ? (
           <p className="mt-4 rounded-lg bg-surface-2 px-4 py-3 text-sm text-muted">
-            <span className="font-semibold text-foreground">
-              {formatNumber(progression.coinsToMaxOwned)} coins
-            </span>{' '}
-            still needed to take every brawler already unlocked to power 11.
-          </p>
+            <span className="font-semibold text-foreground">{t('{coinsToMaxOwned} coins', { coinsToMaxOwned: formatNumber(progression.coinsToMaxOwned) })}</span>{' '}{t('still needed to take every brawler already unlocked to power 11.')}</p>
         ) : null}
       </div>
     </Panel>
@@ -265,15 +261,16 @@ function Investment({
   value: string;
   hint: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="flex items-center gap-3">
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-surface-2 text-brand">
         {node}
       </span>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+        <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">{t(label)}</p>
         <p className="truncate text-lg font-bold tabular-nums">{value}</p>
-        <p className="truncate text-xs text-muted">{hint}</p>
+        <p className="truncate text-xs text-muted">{t(hint)}</p>
       </div>
     </div>
   );

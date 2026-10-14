@@ -39,14 +39,33 @@ const NUMBER_LOCALE: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: '
 const DATE_LOCALE: Record<Locale, string> = { en: 'en-GB', es: 'es-419', pt: 'pt-BR' };
 
 /**
- * Whether a path has a translated version. The tier lists (not the maker,
- * which is a tool rather than an answer) and the counters pages.
+ * The sections that exist in Spanish and Portuguese, as path patterns. Grows
+ * as each part of the site is translated; a link to anything not listed goes
+ * to the English page rather than a 404.
  */
+const TRANSLATED: RegExp[] = [
+  // Everything a person reads, since 2026-10-14. Not: the API, files, the
+  // Bubble's in-app panel (it has its own 22 languages), the TikTok slides.
+  /^\/(?!api\/|bubble\/panel|downloads\/|daily\/[^/]+\/(?:[a-z]+\/)?(?:slides|slide)|.*\.(?:xml|txt|json|png|jpg|webmanifest)$)/,
+];
+
+/** Whether a path has a translated version. */
 export function isTranslatedPath(path: string): boolean {
   const bare = path.split(/[?#]/)[0];
-  return (
-    /^\/tier-list\/(ranked|trophy)(\/|$)/.test(bare) || /^\/brawlers\/[^/]+\/counters$/.test(bare)
-  );
+  return TRANSLATED.some((re) => re.test(bare));
+}
+
+/** The locale a path is in: its `/es` or `/pt` prefix, English otherwise. */
+export function localeOfPath(pathname: string | null | undefined): Locale {
+  const first = pathname?.split('/')[1];
+  return isIntlLocale(first) ? first : 'en';
+}
+
+/** A path with its `/es` or `/pt` prefix removed: the English page's path. */
+export function stripLocale(pathname: string): string {
+  const first = pathname.split('/')[1];
+  if (!isIntlLocale(first)) return pathname;
+  return pathname.slice(first.length + 1) || '/';
 }
 
 /**
@@ -55,8 +74,10 @@ export function isTranslatedPath(path: string): boolean {
  * goes to the English page rather than a 404.
  */
 export function localePath(locale: Locale, path: string): string {
+  // Already in a language (a link built by a caller that localised it).
+  if (isIntlLocale(path.split('/')[1])) return path;
   if (locale === 'en' || !isTranslatedPath(path)) return path;
-  return `/${locale}${path}`;
+  return path === '/' ? `/${locale}` : `/${locale}${path}`;
 }
 
 /**
@@ -65,10 +86,11 @@ export function localePath(locale: Locale, path: string): string {
  * other language should land on.
  */
 export function languageAlternates(path: string): Record<string, string> {
+  const under = (l: string) => (path === '/' ? `/${l}` : `/${l}${path}`);
   return {
     en: path,
-    es: `/es${path}`,
-    'pt-BR': `/pt${path}`,
+    es: under('es'),
+    'pt-BR': under('pt'),
     'x-default': path,
   };
 }

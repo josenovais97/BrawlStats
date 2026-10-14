@@ -7,6 +7,9 @@ import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /** Podium colours for the first three rows. Everything below is neutral. */
 const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
@@ -29,15 +32,14 @@ export async function TopPlayersPreview({
   limit?: number;
   revalidate: number;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   let players;
   try {
     players = (await getPlayerRankings('global', limit, revalidate)).items;
   } catch {
     return (
-      <div className="card p-6 text-sm text-muted">
-        The global leaderboard is unavailable right now. Player and club search still
-        work.
-      </div>
+      <div className="card p-6 text-sm text-muted">{t('The global leaderboard is unavailable right now. Player and club search still work.')}</div>
     );
   }
 
@@ -50,7 +52,7 @@ export async function TopPlayersPreview({
         return (
           <li key={player.tag}>
             <Link
-              href={`/player/${tag}`}
+              href={lp(`/player/${tag}`)}
               rel={playerLinkRel(tag)}
                 prefetch={false}
               className="row-interactive flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
@@ -88,7 +90,7 @@ export async function TopPlayersPreview({
                   {player.name}
                 </p>
                 <p className="mt-1 truncate text-xs text-muted">
-                  {player.club?.name ?? 'No club'}
+                  {player.club?.name ?? t('No club')}
                 </p>
               </div>
 

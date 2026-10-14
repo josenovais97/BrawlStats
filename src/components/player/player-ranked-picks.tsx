@@ -6,6 +6,8 @@ import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
 import { Panel } from '@/components/ui/panel';
 import type { ModeBestPicks } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The live Ranked rotation, read against what this player actually owns.
@@ -92,6 +94,7 @@ export function PlayerRankedPicks({
   brawlerMeta: Map<number, BABrawler>;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const t = getT(requestLocale());
   const owned = new Map(brawlers.map((b) => [b.id, b.power]));
 
   const answers: ModeAnswer[] = [];
@@ -153,13 +156,13 @@ export function PlayerRankedPicks({
      * title bar, and read as a different page pasted in.
      */
     <Panel
-      title="Your picks by mode"
+      title={t('Your picks by mode')}
       aside={ready > 0 ? `Best pick in ${ready} of ${answers.length}` : undefined}
-      subtitle="What to play in each mode you can queue right now, and what would improve that answer. Scored from sampled Ranked battles, not from the ladder."
+      subtitle={t('What to play in each mode you can queue right now, and what would improve that answer. Scored from sampled Ranked battles, not from the ladder.')}
     >
       <ul className="grid gap-2.5 @2xl:grid-cols-2">
         {answers.map((answer) => (
-          <ModeCard key={answer.mode} answer={answer} brawlerMeta={brawlerMeta} />
+          <ModeCard key={answer.mode} answer={t(answer)} brawlerMeta={brawlerMeta} />
         ))}
       </ul>
     </Panel>
@@ -194,6 +197,7 @@ function ModeCard({
   answer: ModeAnswer;
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const t = getT(requestLocale());
   const { play, others, label, meta } = answer;
   const accent = meta?.color ?? '#8b95b8';
 
@@ -215,7 +219,7 @@ function ModeCard({
           className="truncate text-xs font-bold uppercase tracking-wide"
           style={{ color: accent }}
         >
-          {label}
+          {t(label)}
         </span>
       </span>
 
@@ -232,11 +236,11 @@ function ModeCard({
           lead
           art={brawlerMeta.get(play.id)?.imageUrl}
           name={play.name}
-          note={play.rank === 1 ? 'Best pick in this mode' : `Your best here · #${play.rank}`}
+          note={play.rank === 1 ? t('Best pick in this mode') : t('Your best here · #{rank}', { rank: play.rank })}
           tone="good"
         />
       ) : (
-        <Empty>Nothing here at power {READY_POWER} yet</Empty>
+        <Empty>{t('Nothing here at power {READY_POWER} yet', { READY_POWER: READY_POWER })}</Empty>
       )}
 
       <div className="mt-2 space-y-2 border-t border-border pt-2">
@@ -251,9 +255,7 @@ function ModeCard({
           />
         ))}
         {Array.from({ length: Math.max(0, ALTERNATIVES - others.length) }).map((_, i) => (
-          <Empty key={`pad-${i}`} small>
-            No other picks with data yet
-          </Empty>
+          <Empty key={`pad-${i}`} small>{t('No other picks with data yet')}</Empty>
         ))}
       </div>
     </li>
@@ -309,6 +311,7 @@ function Row({
   /** The mode's recommended pick, drawn to dominate its two alternatives. */
   lead?: boolean;
 }) {
+  const t = getT(requestLocale());
   const box = lead ? 'size-14' : small ? 'size-8' : 'size-10';
   return (
     <span
@@ -342,7 +345,7 @@ function Row({
             tone === 'good' ? 'text-victory' : tone === 'invest' ? 'text-accent' : 'text-muted'
           }`}
         >
-          {note}
+          {t(note)}
         </span>
       </span>
     </span>

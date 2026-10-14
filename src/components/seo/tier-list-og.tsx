@@ -4,6 +4,8 @@ import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { SITE_NAME } from '@/lib/site';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 export interface TierListOgEntry {
   brawlerId: number;
@@ -38,6 +40,7 @@ export function tierListOgImage({
   top: TierListOgEntry[];
   size: { width: number; height: number };
 }) {
+  const t = getT(requestLocale());
   return new ImageResponse(
     (
       <div
@@ -75,7 +78,7 @@ export function tierListOgImage({
               color: accent,
             }}
           >
-            {heading}
+            {t(heading)}
           </div>
           <div style={{ fontSize: 30, color: '#8b95b8', marginTop: 12 }}>{scope}</div>
         </div>
@@ -134,9 +137,7 @@ export function tierListOgImage({
             ))}
           </div>
         ) : (
-          <div style={{ display: 'flex', fontSize: 30, color: '#8b95b8' }}>
-            Ranked and trophy ladder, scored separately from sampled battles
-          </div>
+          <div style={{ display: 'flex', fontSize: 30, color: '#8b95b8' }}>{t('Ranked and trophy ladder, scored separately from sampled battles')}</div>
         )}
 
         <div

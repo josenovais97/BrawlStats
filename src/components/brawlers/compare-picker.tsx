@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { BrawlerPicker } from '@/components/brawlers/brawler-picker';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * Two brawler pickers and a button, which is the whole interaction.
@@ -25,6 +27,8 @@ export function ComparePicker({
   initialA?: string;
   initialB?: string;
 }) {
+  const t = useT();
+  const lp = useLp();
   const router = useRouter();
   const [a, setA] = useState(initialA ?? brawlers[0]?.slug ?? '');
   const [b, setB] = useState(initialB ?? brawlers[1]?.slug ?? '');
@@ -34,23 +38,23 @@ export function ComparePicker({
       className="card flex flex-wrap items-center gap-2 p-3"
       onSubmit={(event) => {
         event.preventDefault();
-        if (a && b && a !== b) router.push(`/compare/${a}-vs-${b}`);
+        if (a && b && a !== b) router.push(lp(`/compare/${a}-vs-${b}`));
       }}
     >
       <BrawlerPicker
         id="compare-a"
-        label="First brawler"
+        label={t('First brawler')}
         brawlers={brawlers}
         value={a}
         onChange={setA}
         exclude={b}
       />
 
-      <span className="px-1 text-xs font-black uppercase tracking-wide text-muted">vs</span>
+      <span className="px-1 text-xs font-black uppercase tracking-wide text-muted">{t('vs')}</span>
 
       <BrawlerPicker
         id="compare-b"
-        label="Second brawler"
+        label={t('Second brawler')}
         brawlers={brawlers}
         value={b}
         onChange={setB}
@@ -63,9 +67,7 @@ export function ComparePicker({
         type="submit"
         disabled={!a || !b || a === b}
         className="inline-flex min-h-12 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-colors enabled:bg-brand enabled:text-brand-ink enabled:hover:bg-brand-strong disabled:cursor-not-allowed disabled:border disabled:border-border disabled:bg-surface-2 disabled:text-muted"
-      >
-        Compare
-        <ArrowRight aria-hidden className="size-4" />
+      >{t('Compare')}<ArrowRight aria-hidden className="size-4" />
       </button>
     </form>
   );

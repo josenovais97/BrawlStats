@@ -13,6 +13,8 @@ import { formatNumber, humanizeRole, nameColorToCss } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSClubMember, BSClubRole } from '@/types/brawlstars';
 import { playerLinkRel } from '@/lib/link-rel';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /** Higher is more senior — drives the default ordering and badge styling. */
 const ROLE_WEIGHT: Record<string, number> = {
@@ -33,6 +35,8 @@ const ROLE_STYLE: Record<
 };
 
 export function ClubMembers({ members }: { members: BSClubMember[] }) {
+  const t = useT();
+  const lp = useLp();
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<BSClubRole | 'all'>('all');
 
@@ -61,7 +65,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
   }, [members, query, roleFilter]);
 
   if (members.length === 0) {
-    return <p className="card p-6 text-sm text-muted">This club has no members listed.</p>;
+    return <p className="card p-6 text-sm text-muted">{t('This club has no members listed.')}</p>;
   }
 
   return (
@@ -72,8 +76,8 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search members by name or tag"
-            aria-label="Search club members"
+            placeholder={t('Search members by name or tag')}
+            aria-label={t('Search club members')}
             className="w-full rounded-lg border border-border bg-surface py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-brand/60"
           />
         </div>
@@ -90,14 +94,14 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
                   : 'border border-border text-muted hover:text-foreground'
               }`}
             >
-              {role === 'all' ? 'All' : humanizeRole(role)}
+              {role === 'all' ? t('All') : humanizeRole(role)}
             </button>
           ))}
         </div>
       </div>
 
       {visible.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">No members match that search.</p>
+        <p className="card p-6 text-sm text-muted">{t('No members match that search.')}</p>
       ) : (
         <ol className="space-y-2">
           {visible.map((member, index) => {
@@ -107,7 +111,7 @@ export function ClubMembers({ members }: { members: BSClubMember[] }) {
             return (
               <li key={member.tag}>
                 <Link
-                  href={`/player/${normalizeTag(member.tag)}`}
+                  href={lp(`/player/${normalizeTag(member.tag)}`)}
                   rel={playerLinkRel(normalizeTag(member.tag))}
                 prefetch={false}
                   className="card card-interactive flex items-center gap-3 p-3"

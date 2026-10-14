@@ -2,6 +2,7 @@
 
 import { Check, Share2 } from 'lucide-react';
 import { useState } from 'react';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * Shares the current profile, or copies its link.
@@ -21,6 +22,7 @@ export function ShareButton({
   /** Icon only, for the profile header on a phone. */
   compact?: boolean;
 }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   async function share() {
@@ -54,13 +56,13 @@ export function ShareButton({
          side in the profile header, and a different radius, padding and weight
          on each made them read as two unrelated controls that happened to be
          adjacent. */
-      aria-label={compact ? (copied ? 'Link copied' : 'Share this profile') : undefined}
+      aria-label={compact ? (copied ? t('Link copied') : t('Share this profile')) : undefined}
       className={`inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 text-sm font-semibold text-muted transition-colors hover:border-brand/40 hover:text-foreground ${
         compact ? 'size-9 shrink-0' : 'w-full px-3.5 py-2'
       }`}
     >
       {copied ? <Check className="size-4 text-victory" /> : <Share2 className="size-4" />}
-      {compact ? null : copied ? 'Link copied' : 'Share'}
+      {compact ? null : copied ? t('Link copied') : t('Share')}
     </button>
   );
 }

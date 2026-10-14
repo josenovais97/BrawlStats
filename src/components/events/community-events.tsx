@@ -2,6 +2,8 @@ import Image from 'next/image';
 
 import { formatDate } from '@/lib/format';
 import { COMMUNITY_EVENTS_URL, type CommunityEvent } from '@/lib/community-events';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The game-wide challenges, each with its milestones and what they paid out.
@@ -15,6 +17,7 @@ import { COMMUNITY_EVENTS_URL, type CommunityEvent } from '@/lib/community-event
  * other interactivity, and the browser already knows how to open a disclosure.
  */
 export function CommunityEvents({ events }: { events: CommunityEvent[] }) {
+  const t = getT(requestLocale());
   if (events.length === 0) return null;
 
   const [latest, ...rest] = events;
@@ -32,23 +35,18 @@ export function CommunityEvents({ events }: { events: CommunityEvent[] }) {
         </div>
       ) : null}
 
-      <p className="px-1 text-xs leading-relaxed text-muted">
-        Milestones and rewards are written up by the{' '}
+      <p className="px-1 text-xs leading-relaxed text-muted">{t('Milestones and rewards are written up by the')}{' '}
         <a
           href={COMMUNITY_EVENTS_URL}
           rel="noopener nofollow"
           className="font-medium text-foreground underline decoration-border-strong underline-offset-4 hover:decoration-brand"
-        >
-          Brawl Stars wiki
-        </a>{' '}
-        community and read from it automatically, so a new event appears here
-        without the site being changed. Text is CC BY-SA.
-      </p>
+        >{t('Brawl Stars wiki')}</a>{' '}{t('community and read from it automatically, so a new event appears here without the site being changed. Text is CC BY-SA.')}</p>
     </section>
   );
 }
 
 function EventCard({ event, open = false }: { event: CommunityEvent; open?: boolean }) {
+  const t = getT(requestLocale());
   return (
     <details
       id={event.slug}
@@ -73,8 +71,8 @@ function EventCard({ event, open = false }: { event: CommunityEvent; open?: bool
         <span className="min-w-0 flex-1">
           <span className="block truncate font-bold">{event.name}</span>
           <span className="block truncate text-xs text-muted">
-            {event.startedOn ? `Started ${formatDate(event.startedOn)}` : 'Date unknown'}
-            {event.table ? ` · ${event.table.rows.length} milestones` : ''}
+            {event.startedOn ? t('Started {startedOn}', { startedOn: formatDate(event.startedOn) }) : t('Date unknown')}
+            {event.table ? t(' · {length} milestones', { length: event.table.rows.length }) : ''}
           </span>
         </span>
 
@@ -94,7 +92,7 @@ function EventCard({ event, open = false }: { event: CommunityEvent; open?: bool
 
       <div className="space-y-4 border-t border-border p-4">
         {event.description ? (
-          <p className="max-w-3xl text-sm leading-relaxed text-muted">{event.description}</p>
+          <p className="max-w-3xl text-sm leading-relaxed text-muted">{t(event.description)}</p>
         ) : null}
 
         {event.table ? <MilestoneTable table={event.table} /> : null}

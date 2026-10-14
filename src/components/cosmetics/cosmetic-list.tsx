@@ -8,6 +8,8 @@ import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { brawlerPath } from '@/lib/slugs';
 import type { CosmeticUsage } from '@/lib/stats';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * The full catalogue of one cosmetic kind, ranked by how many people wear it.
@@ -38,6 +40,8 @@ export function CosmeticList({
   /** Skin artwork by `${brawler}|${skin}` key; icons resolve from their id. */
   art?: Record<string, string>;
 }) {
+  const t = useT();
+  const lp = useLp();
   const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
 
@@ -68,18 +72,18 @@ export function CosmeticList({
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={isIcon ? 'Search icons by number' : 'Search by skin or brawler'}
-          aria-label={isIcon ? 'Search profile icons' : 'Search skins'}
+          placeholder={isIcon ? t('Search icons by number') : t('Search by skin or brawler')}
+          aria-label={isIcon ? t('Search profile icons') : t('Search skins')}
           className="min-h-11 flex-1 rounded-xl border border-border bg-surface-2 px-4 text-sm outline-none transition-colors placeholder:text-muted/85 focus:border-brand"
         />
         <p className="text-sm text-muted">
-          <span className="font-semibold text-foreground">{formatNumber(matches.length)}</span> of{' '}
+          <span className="font-semibold text-foreground">{formatNumber(matches.length)}</span>{' '}{t('of')}{' '}
           {formatNumber(items.length)}
         </p>
       </div>
 
       {matches.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">Nothing matches &ldquo;{query}&rdquo;.</p>
+        <p className="card p-6 text-sm text-muted">{t('Nothing matches “{query}”.', { query: query })}</p>
       ) : (
         <ol className="card divide-y divide-border overflow-hidden">
           {visible.map(({ item, rank }, index) => (
@@ -106,7 +110,7 @@ export function CosmeticList({
                 </span>
                 {item.brawlerName && item.brawlerId ? (
                   <Link
-                    href={brawlerPath(item.brawlerId, item.brawlerName)}
+                    href={lp(brawlerPath(item.brawlerId, item.brawlerName))}
                     className="text-xs capitalize text-muted transition-colors hover:text-brand"
                   >
                     {item.brawlerName.toLowerCase()}
@@ -132,9 +136,7 @@ export function CosmeticList({
           type="button"
           onClick={() => setShowAll(true)}
           className="btn-game w-full bg-surface-2 py-3 text-sm uppercase hover:bg-surface-3"
-        >
-          Show all {formatNumber(matches.length)}
-        </button>
+        >{t('Show all {length}', { length: formatNumber(matches.length) })}</button>
       ) : null}
     </div>
   );

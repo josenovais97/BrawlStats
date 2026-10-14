@@ -17,6 +17,9 @@ import { DemoVideo, TutorialVideo } from "@/components/bubble/demo-video";
 import { DownloadButton } from "@/components/bubble/download-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { BUBBLE_APP, BUBBLE_CHANGELOG, bubbleAppSize } from "@/lib/bubble-app";
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The Android app's download page.
@@ -119,6 +122,8 @@ const GESTURES = [
 ];
 
 export default function BubblePage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div className="space-y-16 sm:space-y-24">
       {/* Hero. The claim, the proof and the button, before anything is explained. */}
@@ -133,21 +138,14 @@ export default function BubblePage() {
             <div className="max-w-3xl space-y-5">
               <p className="flex items-center gap-2.5">
                 <span aria-hidden className="rule h-4" />
-                <span className="eyebrow">Free Android app</span>
+                <span className="eyebrow">{t('Free Android app')}</span>
               </p>
 
-              <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">
-                The tier list,
-                <br />
-                <span className="text-brand">on top of the game</span>
+              <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">{t('The tier list,')}<br />
+                <span className="text-brand">{t('on top of the game')}</span>
               </h1>
 
-              <p className="max-w-2xl text-lg leading-relaxed text-muted">
-                Brawl Stars gives you seconds to pick. Leaving the game to check
-                a tier list costs more of them than you have — so the list comes
-                to you instead, one tap away, and gets out of the way when you
-                are done.
-              </p>
+              <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have — so the list comes to you instead, one tap away, and gets out of the way when you are done.')}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -155,13 +153,8 @@ export default function BubblePage() {
                 from="hero"
                 className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
               >
-                <Download className="size-5" />
-                Download for Android
-              </DownloadButton>
-              <p className="text-sm text-muted">
-                Version {BUBBLE_APP.version} · {bubbleAppSize()} · Android{" "}
-                {BUBBLE_APP.minAndroid} or newer
-              </p>
+                <Download className="size-5" />{t('Download for Android')}</DownloadButton>
+              <p className="text-sm text-muted">{t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}</p>
             </div>
 
             {/* The store listing, for readers who will not sideload. Same
@@ -169,7 +162,7 @@ export default function BubblePage() {
             {BUBBLE_APP.storeUrl ? (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <a
-                  href={BUBBLE_APP.storeUrl}
+                  href={lp(BUBBLE_APP.storeUrl)}
                   rel="noopener"
                   className="inline-flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-2.5 transition-[transform,border-color] hover:-translate-y-0.5 hover:border-brand/50"
                 >
@@ -182,16 +175,11 @@ export default function BubblePage() {
                     unoptimized
                   />
                   <span className="flex flex-col leading-tight">
-                    <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">
-                      Get it on
-                    </span>
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('Get it on')}</span>
                     <span className="font-bold">{BUBBLE_APP.storeName}</span>
                   </span>
                 </a>
-                <p className="text-sm text-muted">
-                  Prefer a store? The same signed file, so either one updates
-                  the other.
-                </p>
+                <p className="text-sm text-muted">{t('Prefer a store? The same signed file, so either one updates the other.')}</p>
               </div>
             ) : null}
 
@@ -221,18 +209,15 @@ export default function BubblePage() {
           <div className="hidden shrink-0 rounded-2xl border border-border bg-surface p-5 text-center lg:block">
             <Image
               src="/bubble/qr.svg"
-              alt="QR code linking to brawlzone.net/bubble"
+              alt={t('QR code linking to brawlzone.net/bubble')}
               width={330}
               height={330}
               className="mx-auto size-36 rounded-lg"
               unoptimized
             />
             <div className="mt-3 max-w-[13rem]">
-              <p className="font-bold">On a computer?</p>
-              <p className="mt-1 text-sm leading-relaxed text-muted">
-                Scan to open this page on your Android phone, where the app can
-                actually be installed.
-              </p>
+              <p className="font-bold">{t('On a computer?')}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">{t('Scan to open this page on your Android phone, where the app can actually be installed.')}</p>
             </div>
           </div>
         </div>
@@ -240,12 +225,7 @@ export default function BubblePage() {
         {/* The recording carries the page. Everything below it is detail. */}
         <figure className="card-glow overflow-hidden rounded-2xl border border-border">
           <DemoVideo />
-          <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-            One unedited take on a phone: queueing into Bounty on Hideout,
-            opening the bubble mid-draft, narrowing to that map, reading Brock’s
-            build — then picking Brock and giving him the star power the panel
-            pointed at.
-          </figcaption>
+          <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">{t('One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.')}</figcaption>
         </figure>
       </section>
 
@@ -259,28 +239,17 @@ export default function BubblePage() {
       */}
       <section className="card card-glow p-6 sm:p-10">
         <div className="max-w-3xl space-y-4">
-          <h2 className="display text-2xl uppercase sm:text-3xl">
-            A website cannot do this
-          </h2>
-          <p className="leading-relaxed text-muted">
-            Not this one, not any of them. A browser tab cannot draw on top of
-            another app — the sandbox forbids it, on every phone. Checking a
-            tier list in a browser means leaving the draft, and leaving the
-            draft is what costs you the pick.
-          </p>
-          <p className="leading-relaxed text-muted">
-            An installed app can. That is the whole reason this exists as an APK
-            rather than another page on the site, and it is all the app does:
-            draw the numbers over the game, then get out of the way.
-          </p>
+          <h2 className="display text-2xl uppercase sm:text-3xl">{t('A website cannot do this')}</h2>
+          <p className="leading-relaxed text-muted">{t('Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.')}</p>
+          <p className="leading-relaxed text-muted">{t('An installed app can. That is the whole reason this exists as an APK rather than another page on the site, and it is all the app does: draw the numbers over the game, then get out of the way.')}</p>
         </div>
       </section>
 
       {/* What you get, beside the thing itself. */}
       <section className="space-y-5">
         <SectionHeading
-          title="What is in the panel"
-          subtitle="The same data as the site, cut down to what a draft needs."
+          title={t('What is in the panel')}
+          subtitle={t('The same data as the site, cut down to what a draft needs.')}
         />
 
         {/* Both screens, because they answer different questions: what the
@@ -289,43 +258,37 @@ export default function BubblePage() {
           <figure className="space-y-2">
             <Image
               src="/bubble/app-panel.png"
-              alt="The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score"
+              alt={t('The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score')}
               width={720}
               height={1360}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />
-            <figcaption className="text-center text-xs text-muted">
-              Pick your mode
-            </figcaption>
+            <figcaption className="text-center text-xs text-muted">{t('Pick your mode')}</figcaption>
           </figure>
 
           <figure className="space-y-2">
             <Image
               src="/bubble/app-map.png"
-              alt="The panel with Knockout and Belle's Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there"
+              alt={t('The panel with Knockout and Belle\'s Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there')}
               width={720}
               height={1360}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />
-            <figcaption className="text-center text-xs text-muted">
-              Then the map you are on
-            </figcaption>
+            <figcaption className="text-center text-xs text-muted">{t('Then the map you are on')}</figcaption>
           </figure>
 
           <figure className="space-y-2">
             <Image
               src="/bubble/app-build.png"
-              alt="The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each"
+              alt={t('The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each')}
               width={720}
               height={1302}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />
-            <figcaption className="text-center text-xs text-muted">
-              Tap a brawler for its build
-            </figcaption>
+            <figcaption className="text-center text-xs text-muted">{t('Tap a brawler for its build')}</figcaption>
           </figure>
         </div>
 
@@ -333,9 +296,9 @@ export default function BubblePage() {
           {FEATURES.map((f) => (
             <article key={f.title} className="card p-5">
               <f.icon className="size-6 text-brand" />
-              <h3 className="mt-3 font-bold">{f.title}</h3>
+              <h3 className="mt-3 font-bold">{t(f.title)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">
-                {f.body}
+                {t(f.body)}
               </p>
             </article>
           ))}
@@ -345,15 +308,15 @@ export default function BubblePage() {
       {/* The second tab, which is the tool rather than the glance. */}
       <section className="space-y-5">
         <SectionHeading
-          title="Or draft with it"
-          subtitle="A second tab, for when you want more than the meta: the bans, your team, and theirs."
+          title={t('Or draft with it')}
+          subtitle={t('A second tab, for when you want more than the meta: the bans, your team, and theirs.')}
         />
 
         <div className="grid items-center gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="mx-auto w-full max-w-[300px]">
             <Image
               src="/bubble/app-draft.png"
-              alt="The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft"
+              alt={t('The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft')}
               width={720}
               height={1360}
               className="w-full rounded-2xl border border-border"
@@ -362,25 +325,11 @@ export default function BubblePage() {
           </div>
 
           <div className="space-y-4 text-muted">
-            <p className="leading-relaxed">
-              Enter the bans, what your team has taken and what theirs has, and
-              the list reorders around all three. A brawler that is merely
-              strong on the map is a different call from one that is strong on
-              the map <em>and</em> answers what they just picked.
-            </p>
-            <p className="leading-relaxed">
-              Every row shows its working: form on this map, edge against the
-              enemies you named, edge alongside your team-mates. A suggestion
-              you cannot check is a guess dressed up in a percentage — and
-              mid-draft the reason is usually what decides it.
-            </p>
+            <p className="leading-relaxed">{t('Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map')}{' '}<em>{t('and')}</em>{' '}{t('answers what they just picked.')}</p>
+            <p className="leading-relaxed">{t('Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.')}</p>
             <p className="leading-relaxed">
               {/* Said plainly because the alternative is a reader trusting a
-                  number that a dozen battles produced. */}
-              Thin evidence is flagged rather than hidden. A brawler backed by
-              eleven battles on this map says so in red, because 52% off eleven
-              battles and 52% off two hundred are not the same claim.
-            </p>
+                  number that a dozen battles produced. */}{t('Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.')}</p>
           </div>
         </div>
       </section>
@@ -396,26 +345,15 @@ export default function BubblePage() {
       */}
       <section className="space-y-5">
         <SectionHeading
-          title="What it cannot do"
-          subtitle="Worth knowing before you install it, not after."
+          title={t('What it cannot do')}
+          subtitle={t('Worth knowing before you install it, not after.')}
         />
         <div className="card border-border-strong p-6">
           <div className="flex gap-4">
             <ShieldCheck className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
-              <p>
-                The bubble does not read your screen, your match, or which map
-                you are on. It asks to draw over other apps, and to show a
-                notification — the one that says it is running, and the
-                download progress when you update it. No screen capture, no
-                storage access, nothing else.
-              </p>
-              <p>
-                It shows the meta; you match that to the draft in front of you.
-                It does not touch the game, read your account, or send anything
-                anywhere — there is no account, no analytics in the app, and
-                nothing to log in to.
-              </p>
+              <p>{t('The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.')}</p>
+              <p>{t('It shows the meta; you match that to the draft in front of you. It does not touch the game, read your account, or send anything anywhere — there is no account, no analytics in the app, and nothing to log in to.')}</p>
             </div>
           </div>
         </div>
@@ -424,8 +362,8 @@ export default function BubblePage() {
       {/* Install. Step four is the one that stops people. */}
       <section className="space-y-5">
         <SectionHeading
-          title="Installing it"
-          subtitle="Five steps, and the fourth is where Android gets in your way."
+          title={t('Installing it')}
+          subtitle={t('Five steps, and the fourth is where Android gets in your way.')}
         />
 
         <ol className="card divide-y divide-border overflow-hidden">
@@ -441,9 +379,9 @@ export default function BubblePage() {
                 {step.n}
               </span>
               <div className="min-w-0">
-                <h3 className="font-bold">{step.title}</h3>
+                <h3 className="font-bold">{t(step.title)}</h3>
                 <p className="mt-1 text-sm leading-relaxed text-muted">
-                  {step.body}
+                  {t(step.body)}
                 </p>
               </div>
             </li>
@@ -452,29 +390,18 @@ export default function BubblePage() {
 
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="card p-5">
-            <h3 className="text-sm font-bold">About Play Protect</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              Google Play Protect warns about any app installed outside the Play
-              Store. That warning is about where a file came from, not about
-              what is in it.
-            </p>
+            <h3 className="text-sm font-bold">{t('About Play Protect')}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{t('Google Play Protect warns about any app installed outside the Play Store. That warning is about where a file came from, not about what is in it.')}</p>
           </div>
 
           {/* A checksum is only worth printing if it is right, so it is generated
               from the committed file and asserted against it in the test run. */}
           <details className="card p-5">
-            <summary className="cursor-pointer text-sm font-bold">
-              Verify the download
-            </summary>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Confirm the file you got is the file published here. On a desktop:{" "}
-              <code className="rounded bg-surface-2 px-1.5 py-0.5 text-xs">
-                sha256sum brawlzone-bubble.apk
-              </code>
+            <summary className="cursor-pointer text-sm font-bold">{t('Verify the download')}</summary>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{t('Confirm the file you got is the file published here. On a desktop:')}{" "}
+              <code className="rounded bg-surface-2 px-1.5 py-0.5 text-xs">{t('sha256sum brawlzone-bubble.apk')}</code>
             </p>
-            <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">
-              SHA-256
-            </p>
+            <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">{t('SHA-256')}</p>
             <code className="mt-1 block overflow-x-auto rounded-lg bg-surface-2 p-3 text-xs">
               {BUBBLE_APP.sha256}
             </code>
@@ -492,24 +419,24 @@ export default function BubblePage() {
       */}
       <section className="space-y-5">
         <SectionHeading
-          title="Set it up, then draft with it"
-          subtitle="27 seconds: your tag once, then the bubble mid-draft."
+          title={t('Set it up, then draft with it')}
+          subtitle={t('27 seconds: your tag once, then the bubble mid-draft.')}
         />
 
         <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <ol className="space-y-4">
             {[
               {
-                title: "Add your player tag",
-                body: "The app finds your account. Brawlers you do not own are greyed out in the panel.",
+                title: t('Add your player tag'),
+                body: t('The app finds your account. Brawlers you do not own are greyed out in the panel.'),
               },
               {
-                title: "Hide what you cannot play",
-                body: "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.",
+                title: t('Hide what you cannot play'),
+                body: t('Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.'),
               },
               {
-                title: "Tap the bubble in the draft",
-                body: "Pick the mode and the map: the best brawlers for it, and the build to run on them.",
+                title: t('Tap the bubble in the draft'),
+                body: t('Pick the mode and the map: the best brawlers for it, and the build to run on them.'),
               },
             ].map((step, i) => (
               <li key={step.title} className="card flex gap-4 p-5">
@@ -517,8 +444,8 @@ export default function BubblePage() {
                   {i + 1}
                 </span>
                 <div className="min-w-0">
-                  <h3 className="font-bold">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">{step.body}</p>
+                  <h3 className="font-bold">{t(step.title)}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{t(step.body)}</p>
                 </div>
               </li>
             ))}
@@ -533,8 +460,8 @@ export default function BubblePage() {
       {/* Three gestures, and that is the entire app. */}
       <section className="space-y-5">
         <SectionHeading
-          title="Using it"
-          subtitle="Three gestures. There is nothing else to learn."
+          title={t('Using it')}
+          subtitle={t('Three gestures. There is nothing else to learn.')}
         />
 
         <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
@@ -543,9 +470,9 @@ export default function BubblePage() {
               <li key={g.title} className="card flex gap-4 p-5">
                 <g.icon className="size-6 shrink-0 text-brand" />
                 <div className="min-w-0">
-                  <h3 className="font-bold">{g.title}</h3>
+                  <h3 className="font-bold">{t(g.title)}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-muted">
-                    {g.body}
+                    {t(g.body)}
                   </p>
                 </div>
               </li>
@@ -555,7 +482,7 @@ export default function BubblePage() {
           <div className="mx-auto w-full max-w-[260px]">
             <Image
               src="/bubble/app-home.png"
-              alt="The BrawlZone app's main screen, showing the permission status and the Start bubble button"
+              alt={t('The BrawlZone app\'s main screen, showing the permission status and the Start bubble button')}
               width={540}
               height={1200}
               className="w-full rounded-2xl border border-border"
@@ -570,8 +497,8 @@ export default function BubblePage() {
           tell at a glance whether they are already on it. */}
       <section id="changelog" className="space-y-5 scroll-mt-24">
         <SectionHeading
-          title="What's new"
-          subtitle="The app updates by downloading again — it installs over the top and keeps your permission."
+          title={t('What\'s new')}
+          subtitle={t('The app updates by downloading again — it installs over the top and keeps your permission.')}
         />
 
         {/*
@@ -587,12 +514,8 @@ export default function BubblePage() {
         */}
         <article className="card p-5">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h3 className="display text-lg uppercase">
-              Version {BUBBLE_CHANGELOG[0].version}
-            </h3>
-            <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">
-              Latest
-            </span>
+            <h3 className="display text-lg uppercase">{t('Version {version}', { version: BUBBLE_CHANGELOG[0].version })}</h3>
+            <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-brand">{t('Latest')}</span>
             <time
               className="text-xs text-muted"
               dateTime={BUBBLE_CHANGELOG[0].date}
@@ -611,7 +534,7 @@ export default function BubblePage() {
                   aria-hidden
                   className="mt-2 size-1.5 shrink-0 rounded-full bg-brand/60"
                 />
-                <span>{change}</span>
+                <span>{t(change)}</span>
               </li>
             ))}
           </ul>
@@ -619,15 +542,14 @@ export default function BubblePage() {
 
         {BUBBLE_CHANGELOG.length > 1 ? (
           <details className="card p-5">
-            <summary className="cursor-pointer text-sm font-bold">
-              Earlier versions ({BUBBLE_CHANGELOG.length - 1})
+            <summary className="cursor-pointer text-sm font-bold">{t('Earlier versions (')}{BUBBLE_CHANGELOG.length - 1})
             </summary>
 
             <ol className="mt-4 space-y-5">
               {BUBBLE_CHANGELOG.slice(1).map((release) => (
                 <li key={release.versionCode}>
                   <div className="flex flex-wrap items-baseline gap-x-3">
-                    <h3 className="font-bold">Version {release.version}</h3>
+                    <h3 className="font-bold">{t('Version')}{' '}{release.version}</h3>
                     <time
                       className="text-xs text-muted"
                       dateTime={release.date}
@@ -645,7 +567,7 @@ export default function BubblePage() {
                           aria-hidden
                           className="mt-2 size-1.5 shrink-0 rounded-full bg-muted/40"
                         />
-                        <span>{change}</span>
+                        <span>{t(change)}</span>
                       </li>
                     ))}
                   </ul>
@@ -657,28 +579,18 @@ export default function BubblePage() {
       </section>
 
       <section className="card card-glow p-6 text-center sm:p-10">
-        <h2 className="display text-2xl uppercase sm:text-3xl">
-          Get it on your phone
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">
-          Free, {bubbleAppSize()}, no account. Everything it shows is on the
-          site too — the app only saves you the app switch, which is the part
-          that costs you the draft.
-        </p>
+        <h2 className="display text-2xl uppercase sm:text-3xl">{t('Get it on your phone')}</h2>
+        <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.', { v: bubbleAppSize() })}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <DownloadButton
             from="cta"
             className="inline-flex items-center gap-3 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
           >
-            <Download className="size-5" />
-            Download for Android
-          </DownloadButton>
+            <Download className="size-5" />{t('Download for Android')}</DownloadButton>
           <Link
-            href="/tier-list/ranked"
+            href={lp('/tier-list/ranked')}
             className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"
-          >
-            Or use the site
-            <ArrowRight className="size-4" />
+          >{t('Or use the site')}<ArrowRight className="size-4" />
           </Link>
         </div>
       </section>

@@ -5,6 +5,9 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { getIconCatalogue, getSkinCatalogue } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   title: 'Brawl Stars cosmetics: which skins and icons players actually use',
@@ -35,6 +38,8 @@ export const revalidate = 7200;
  * anyone who could already read the wiki.
  */
 export default async function CosmeticsPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const [skins, icons] = await Promise.all([getSkinCatalogue(), getIconCatalogue()]);
 
   const topSkins = skins.slice(0, 8);
@@ -44,41 +49,35 @@ export default async function CosmeticsPage() {
       <JsonLd data={breadcrumbSchema([{ name: 'Cosmetics', path: '/cosmetics' }])} />
 
       <PageHeading
-        title="Cosmetics"
-        subtitle="Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue."
+        title={t('Cosmetics')}
+        subtitle={t('Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.')}
       />
 
       <section className="grid gap-4 sm:grid-cols-2">
         <Link
-          href="/cosmetics/skins"
+          href={lp('/cosmetics/skins')}
           className="card card-interactive block p-5 transition-colors hover:border-brand/50"
         >
-          <p className="display text-lg uppercase">Skins</p>
-          <p className="mt-1 text-sm text-muted">
-            {formatNumber(skins.length)} seen across the roster, ranked by how many of the sampled
-            slots wear each one.
-          </p>
-          <p className="mt-3 text-sm font-semibold text-brand">Browse every skin &rarr;</p>
+          <p className="display text-lg uppercase">{t('Skins')}</p>
+          <p className="mt-1 text-sm text-muted">{t('{length} seen across the roster, ranked by how many of the sampled slots wear each one.', { length: formatNumber(skins.length) })}</p>
+          <p className="mt-3 text-sm font-semibold text-brand">{t('Browse every skin →')}</p>
         </Link>
 
         <Link
-          href="/cosmetics/icons"
+          href={lp('/cosmetics/icons')}
           className="card card-interactive block p-5 transition-colors hover:border-brand/50"
         >
-          <p className="display text-lg uppercase">Profile icons</p>
-          <p className="mt-1 text-sm text-muted">
-            {formatNumber(icons.length)} seen on sampled accounts. The icon sits on the account, so
-            these are shares of players rather than of brawlers.
-          </p>
-          <p className="mt-3 text-sm font-semibold text-brand">Browse every icon &rarr;</p>
+          <p className="display text-lg uppercase">{t('Profile icons')}</p>
+          <p className="mt-1 text-sm text-muted">{t('{length} seen on sampled accounts. The icon sits on the account, so these are shares of players rather than of brawlers.', { length: formatNumber(icons.length) })}</p>
+          <p className="mt-3 text-sm font-semibold text-brand">{t('Browse every icon →')}</p>
         </Link>
       </section>
 
       {topSkins.length > 0 ? (
         <section>
           <SectionHeading
-            title="Most worn skins"
-            subtitle="Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable."
+            title={t('Most worn skins')}
+            subtitle={t('Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.')}
           />
           <ol className="card divide-y divide-border overflow-hidden">
             {topSkins.map((skin, index) => (
@@ -104,20 +103,10 @@ export default async function CosmeticsPage() {
       ) : null}
 
       <section>
-        <SectionHeading title="How this is counted" />
+        <SectionHeading title={t('How this is counted')} />
         <div className="card space-y-3 p-5 text-sm leading-relaxed text-muted">
-          <p>
-            Numbers come from the rotating snapshot sample, which records a quarter of the sampled
-            player pool each day, so this is a survey rather than a census. That is enough for
-            shares, which is all it reports, and it is why a number here is never a count of how
-            many people own something in the game.
-          </p>
-          <p>
-            A skin&rsquo;s share is of sampled player-brawler slots; an icon&rsquo;s is of sampled
-            players. Default skins are left out — the one carrying the brawler&rsquo;s own name is
-            not something anyone chose. Per-brawler adoption, including the default, is on each
-            brawler&rsquo;s own page.
-          </p>
+          <p>{t('Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.')}</p>
+          <p>{t('A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.')}</p>
         </div>
       </section>
     </div>

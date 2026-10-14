@@ -6,6 +6,9 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 
 import { ensureTodayReport, listDailyReports } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export const revalidate = 3600;
 
@@ -24,6 +27,8 @@ export const metadata: Metadata = {
  * they want is a date, so the page gives them dates and gets out of the way.
  */
 export default async function DailyArchivePage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   // Before reading, not after. `next build` prerenders this page and `/daily`
   // in parallel workers, so without this the first build of a day can render
   // the archive against a table `/daily` has not written to yet — which is what
@@ -44,38 +49,30 @@ export default async function DailyArchivePage() {
       />
 
       <PageHeading
-        title="Daily archive"
-        subtitle="Each day's findings kept at its own address. They cannot be recomputed once their windows roll past, so this reaches back only as far as the day it started."
+        title={t('Daily archive')}
+        subtitle={t('Each day\'s findings kept at its own address. They cannot be recomputed once their windows roll past, so this reaches back only as far as the day it started.')}
         aside={
           <Link
-            href="/daily/feed.xml"
+            href={lp('/daily/feed.xml')}
             className="text-xs font-semibold text-brand transition-colors hover:underline"
-          >
-            RSS
-          </Link>
+          >{t('RSS')}</Link>
         }
       />
 
       {reports.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">
-          Nothing archived yet. Today&rsquo;s report is written as it is published, so the first
-          entry appears once{' '}
-          <Link href="/daily" className="text-brand hover:underline">
-            today&rsquo;s findings
-          </Link>{' '}
-          have been generated.
-        </p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Nothing archived yet. Today’s report is written as it is published, so the first entry appears once')}{' '}
+          <Link href={lp('/daily')} className="text-brand hover:underline">{t('today’s findings')}</Link>{' '}{t('have been generated.')}</p>
       ) : (
         <ul className="card divide-y divide-border overflow-hidden">
           {reports.map((report) => (
             <li key={report.day}>
               <Link
-                href={`/daily/${report.day}`}
+                href={lp(`/daily/${report.day}`)}
                 className="row-interactive flex items-center gap-3 px-4 py-3"
               >
                 <span className="min-w-0 flex-1 font-semibold">{dayLabel(report.day)}</span>
                 <span className="shrink-0 text-xs tabular-nums text-muted">
-                  {report.findings} {report.findings === 1 ? 'finding' : 'findings'}
+                  {report.findings} {report.findings === 1 ? t('finding') : t('findings')}
                 </span>
               </Link>
             </li>

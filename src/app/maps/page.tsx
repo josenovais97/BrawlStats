@@ -12,12 +12,17 @@ import { getActiveMaps, groupByMode, type GameMap } from '@/lib/game-maps';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { currentMonth } from '@/lib/site';
 import { slugify } from '@/lib/slugs';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
+import { mapNamer } from '@/lib/i18n-game';
 
 /* Generated rather than static, for the month — see the brawler index. */
 export function generateMetadata(): Metadata {
+  const t = getT(requestLocale());
   return {
-    title: `Brawl Stars maps and best brawlers (${currentMonth()})`,
-    description: `Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, ${currentMonth()}.`,
+    title: t('Brawl Stars maps and best brawlers ({v})', { v: currentMonth() }),
+    description: t('Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, {v}.', { v: currentMonth() }),
     alternates: { canonical: '/maps' },
   };
 }
@@ -43,6 +48,8 @@ export const revalidate = 3600;
 const ROTATION_REVALIDATE = 3600;
 
 export default async function MapsIndexPage() {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
   const maps = await getActiveMaps().catch(() => []);
 
   /*
@@ -89,21 +96,19 @@ export default async function MapsIndexPage() {
       <JsonLd data={breadcrumbSchema([{ name: 'Maps', path: '/maps' }])} />
 
       <PageHeading
-        title="Maps"
-        subtitle="What is live right now, this season's Ranked pool, and the full catalogue of maps still in the game. Each map page ranks the brawlers with the best records on it, from sampled battles."
+        title={t('Maps')}
+        subtitle={t('What is live right now, this season\'s Ranked pool, and the full catalogue of maps still in the game. Each map page ranks the brawlers with the best records on it, from sampled battles.')}
         aside={
           <span className="inline-flex items-center gap-2 text-sm text-muted">
-            <MapsIcon className="size-4" />
-            {maps.length} maps
-          </span>
+            <MapsIcon className="size-4" />{t('{length} maps', { length: maps.length })}</span>
         }
       />
 
       {live.length > 0 ? (
         <MapStrip
           id="live"
-          title="Live now"
-          subtitle="In the event rotation this minute, straight from the game API."
+          title={t('Live now')}
+          subtitle={t('In the event rotation this minute, straight from the game API.')}
           maps={live}
         />
       ) : null}
@@ -111,19 +116,19 @@ export default async function MapsIndexPage() {
       {rankedPool.length > 0 ? (
         <MapStrip
           id="ranked-pool"
-          title={`Ranked pool${season?.current ? ` · season ${season.current.number}` : ''}`}
-          subtitle="The competitive map pool for the current Ranked season. Fixed until the season turns over."
+          title={t('Ranked pool{v}', { v: season?.current ? ` · season ${season.current.number}` : '' })}
+          subtitle={t('The competitive map pool for the current Ranked season. Fixed until the season turns over.')}
           maps={rankedPool}
         />
       ) : null}
 
       {groups.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">The map catalogue is unavailable right now.</p>
+        <p className="card p-6 text-sm text-muted">{t('The map catalogue is unavailable right now.')}</p>
       ) : (
         <div>
           <SectionHeading
-            title="Full catalogue"
-            subtitle="Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can."
+            title={t('Full catalogue')}
+            subtitle={t('Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can.')}
           />
           {/*
             Only the fields a card draws cross to the client. The full BAMap
@@ -136,7 +141,7 @@ export default async function MapsIndexPage() {
               label: group.label,
               maps: group.maps.map((entry) => ({
                 id: entry.map.id,
-                name: entry.map.name,
+                name: nm(entry.map.name),
                 modeSlug: entry.modeSlug,
                 mapSlug: entry.mapSlug,
                 imageUrl: entry.map.imageUrl,
@@ -150,7 +155,7 @@ export default async function MapsIndexPage() {
 }
 
 /** A flat, horizontally-scrolling row of maps, for the two real rotations. */
-function MapStrip({
+async function MapStrip({
   id,
   title,
   subtitle,
@@ -161,10 +166,13 @@ function MapStrip({
   subtitle: string;
   maps: GameMap[];
 }) {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <section aria-labelledby={id}>
       <div id={id}>
-        <SectionHeading title={title} subtitle={subtitle} aside={`${maps.length} maps`} />
+        <SectionHeading title={t(title)} subtitle={t(subtitle)} aside={`${maps.length} maps`} />
       </div>
       {/* Scrolls rather than wraps: these are short, ordered lists and a grid
           of eight would push the catalogue below the fold on a phone. */}
@@ -172,12 +180,12 @@ function MapStrip({
         {maps.map((entry) => (
           <li key={`${entry.modeSlug}-${entry.mapSlug}`} className="w-36 shrink-0 snap-start">
             <Link
-              href={`/maps/${entry.modeSlug}/${entry.mapSlug}`}
+              href={lp(`/maps/${entry.modeSlug}/${entry.mapSlug}`)}
               className="card card-interactive group block h-full overflow-hidden"
             >
               <MapArt src={entry.map.imageUrl} alt="" height="h-28" sizes="144px" />
               <span className="block truncate px-3 pt-2 text-sm font-semibold">
-                {entry.map.name}
+                {nm(entry.map.name)}
               </span>
               <span className="block truncate px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
                 {entry.mode?.name ?? entry.map.gameMode.name}

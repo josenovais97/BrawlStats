@@ -5,6 +5,8 @@ import { ArrowLeft, Search, X } from 'lucide-react';
 import { useId, useMemo, useState } from 'react';
 
 import { MapArt } from '@/components/maps/map-art';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /** The minimum a card needs. The full BAMap payload never reaches the client. */
 export interface CatalogueMap {
@@ -49,6 +51,8 @@ export interface CatalogueGroup {
  * else fails when it stops being true.
  */
 export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
+  const t = useT();
+  const lp = useLp();
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<string | null>(null);
   const searchId = useId();
@@ -70,9 +74,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
   return (
     <div className="space-y-5">
       <div className="card relative overflow-hidden">
-        <label htmlFor={searchId} className="sr-only">
-          Search maps
-        </label>
+        <label htmlFor={searchId} className="sr-only">{t('Search maps')}</label>
         <Search
           aria-hidden
           className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted"
@@ -82,14 +84,14 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={`Search ${total} maps by name`}
+          placeholder={t('Search {total} maps by name', { total: total })}
           className="min-h-12 w-full bg-transparent pl-11 pr-11 text-sm outline-none placeholder:text-muted/85"
         />
         {query ? (
           <button
             type="button"
             onClick={() => setQuery('')}
-            aria-label="Clear search"
+            aria-label={t('Clear search')}
             className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
           >
             <X className="size-4" />
@@ -99,13 +101,12 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
 
       {matches ? (
         matches.length === 0 ? (
-          <p className="card p-6 text-sm text-muted">No map matches “{query}”.</p>
+          <p className="card p-6 text-sm text-muted">{t('No map matches “{query}”.', { query: query })}</p>
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted">
               <span className="font-semibold text-foreground">{matches.length}</span>{' '}
-              {matches.length === 1 ? 'map' : 'maps'} matching “{query}”
-            </p>
+              {matches.length === 1 ? t('map') : t('maps')}{' '}{t('matching “{query}”', { query: query })}</p>
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {matches.map((map) => (
                 <MapCard key={`${map.modeSlug}-${map.id}`} map={map} sublabel={map.modeLabel} />
@@ -121,24 +122,18 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
               onClick={() => setMode(null)}
               className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border bg-surface-2/60 px-3 text-xs font-semibold text-muted transition-colors hover:border-border-strong hover:text-foreground"
             >
-              <ArrowLeft aria-hidden className="size-4" />
-              All modes
-            </button>
+              <ArrowLeft aria-hidden className="size-4" />{t('All modes')}</button>
             <Link
-              href={`/maps/${open.mode}`}
+              href={lp(`/maps/${open.mode}`)}
               className="text-sm text-muted transition-colors hover:text-foreground"
-            >
-              Open the {open.label.toLowerCase()} page
-            </Link>
+            >{t('Open the {v} page', { v: open.label.toLowerCase() })}</Link>
           </div>
 
           <div className="flex items-start gap-3">
             <span className="rule mt-1" aria-hidden />
             <h3 className="display text-2xl uppercase">
-              {open.label}{' '}
-              <span className="text-base normal-case tracking-normal text-muted">
-                {open.maps.length} maps
-              </span>
+              {t(open.label)}{' '}
+              <span className="text-base normal-case tracking-normal text-muted">{t('{length} maps', { length: open.maps.length })}</span>
             </h3>
           </div>
 
@@ -166,7 +161,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                 open the mode page in a new tab like any other link.
               */}
               <Link
-                href={`/maps/${group.mode}`}
+                href={lp(`/maps/${group.mode}`)}
                 prefetch={false}
                 onClick={(event) => {
                   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -182,10 +177,10 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                   sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
                 />
                 <span className="block truncate px-3 pt-2 text-sm font-semibold">
-                  {group.label}
+                  {t(group.label)}
                 </span>
                 <span className="block px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
-                  {group.maps.length} {group.maps.length === 1 ? 'map' : 'maps'}
+                  {group.maps.length} {group.maps.length === 1 ? t('map') : t('maps')}
                 </span>
               </Link>
             </li>
@@ -197,13 +192,15 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
 }
 
 function MapCard({ map, sublabel }: { map: CatalogueMap; sublabel?: string }) {
+  const t = useT();
+  const lp = useLp();
   return (
     <li>
       {/* Not prefetched. /maps lists the whole catalogue — around 400 of
           these — and each is a cold ISR entry, so prefetching a screenful
           renders map pages nobody opened and pays an ISR write for each. */}
       <Link
-        href={`/maps/${map.modeSlug}/${map.mapSlug}`}
+        href={lp(`/maps/${map.modeSlug}/${map.mapSlug}`)}
         prefetch={false}
         className="card card-interactive group block h-full overflow-hidden"
       >
@@ -216,7 +213,7 @@ function MapCard({ map, sublabel }: { map: CatalogueMap; sublabel?: string }) {
         <span className="block truncate px-3 pt-2 text-sm font-semibold">{map.name}</span>
         {sublabel ? (
           <span className="block truncate px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
-            {sublabel}
+            {t(sublabel)}
           </span>
         ) : (
           <span className="block pb-2" />

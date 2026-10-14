@@ -2,7 +2,10 @@
 
 import { useMemo, useSyncExternalStore } from 'react';
 
+import { useLocale } from '@/components/i18n/use-locale';
 import { relativeTime } from '@/lib/format';
+import { HTML_LANG } from '@/lib/i18n';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * "2 hours ago", corrected in the reader's browser.
@@ -41,12 +44,16 @@ export function RelativeTime({
   fallback: string;
   className?: string;
 }) {
+  const t = useT();
   // Cached per instant: `getSnapshot` is called repeatedly and must not return
   // a fresh value each time, or React treats the store as perpetually changed.
+  // In the page's language, read from its address, so every caller on a
+  // translated page gets "hace 3 horas" without passing anything.
+  const lang = HTML_LANG[useLocale()];
   const getSnapshot = useMemo(() => {
     let cached: string | undefined;
-    return () => (cached ??= relativeTime(iso));
-  }, [iso]);
+    return () => (cached ??= relativeTime(iso, lang));
+  }, [iso, lang]);
 
   const getServerSnapshot = useMemo(() => () => fallback, [fallback]);
 
@@ -54,7 +61,7 @@ export function RelativeTime({
 
   return (
     <time dateTime={iso} className={className}>
-      {label}
+      {t(label)}
     </time>
   );
 }

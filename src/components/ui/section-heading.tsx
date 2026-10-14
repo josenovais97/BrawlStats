@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { getUT } from '@/lib/t-universal';
 
 /**
  * One heading treatment for every section, so pages share a rhythm instead of
@@ -28,6 +29,7 @@ export function SectionHeading({
   /** Right-aligned metadata or a link. */
   aside?: ReactNode;
 }) {
+  const t = getUT();
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div className="flex min-w-0 items-start gap-3">
@@ -39,14 +41,14 @@ export function SectionHeading({
                 {icon}
               </span>
             ) : null}
-            {title}
+            {t(title)}
             {count !== undefined && count !== null ? (
               <span className="text-base normal-case tracking-normal text-muted">
                 {count}
               </span>
             ) : null}
           </h2>
-          {subtitle ? <p className="mt-1 text-sm text-muted">{subtitle}</p> : null}
+          {subtitle ? <p className="mt-1 text-sm text-muted">{t(subtitle)}</p> : null}
         </div>
       </div>
       {aside ? <div className="shrink-0 text-sm text-muted">{aside}</div> : null}
@@ -67,17 +69,18 @@ export function PageHeading({
   subtitle?: ReactNode;
   aside?: ReactNode;
 }) {
+  const t = getUT();
   return (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
         {eyebrow ? (
           <p className="mb-2.5 flex items-center gap-2.5">
             <span aria-hidden className="rule h-4" />
-            <span className="eyebrow">{eyebrow}</span>
+            <span className="eyebrow">{t(eyebrow)}</span>
           </p>
         ) : null}
-        <h1 className="display text-3xl uppercase sm:text-4xl">{title}</h1>
-        {subtitle ? <p className="mt-2 max-w-3xl text-muted">{subtitle}</p> : null}
+        <h1 className="display text-3xl uppercase sm:text-4xl">{t(title)}</h1>
+        {subtitle ? <p className="mt-2 max-w-3xl text-muted">{t(subtitle)}</p> : null}
       </div>
       {aside}
     </header>

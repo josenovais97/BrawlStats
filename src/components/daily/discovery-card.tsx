@@ -5,6 +5,10 @@ import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import type { Discovery, DiscoveryKind } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getUT } from '@/lib/t-universal';
+import type { T } from '@/lib/t-core';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One finding, written as a sentence rather than shown as a row.
@@ -21,90 +25,102 @@ import type { BABrawler } from '@/types/brawlapi';
  */
 interface Copy {
   eyebrow: string;
-  headline: (d: Discovery) => string;
-  detail: (d: Discovery) => string;
-  stat: (d: Discovery) => { value: string; label: string };
+  headline: (d: Discovery, t: T) => string;
+  detail: (d: Discovery, t: T) => string;
+  stat: (d: Discovery, t: T) => { value: string; label: string };
   cta: string;
-  /** Drives the card's accent. Two hues only: a find, or a warning. */
   tone: 'good' | 'bad';
-  /**
-   * How the two portraits relate, for findings about a pair. Without it the
-   * giant killer and the secret duo render identically — two faces side by
-   * side — when one is an opposition and the other a partnership.
-   */
   pair?: 'vs' | '+';
 }
 
-const pts = (n: number) => `${n >= 0 ? '+' : '−'}${Math.abs(n * 100).toFixed(1)} pts`;
+/** "+3.4 pts", with the page's decimal separator. */
+const pts = (n: number) => `${n >= 0 ? '+' : '−'}${formatPercent(Math.abs(n)).replace('%', '')} pts`;
+const name = (d: Discovery, i: number) => titleCase(d.brawlerNames[i]);
+const dec = (n: number) => formatPercent(n / 100).replace('%', '');
 
+/*
+ * Every sentence is one template with named slots, so a translation can put
+ * the brawler, the map and the numbers wherever its grammar wants them.
+ */
 const COPY: Record<DiscoveryKind, Copy> = {
   'secret-pick': {
     eyebrow: 'The secret pick',
     tone: 'good',
-    headline: (d) => `Almost nobody picks ${titleCase(d.brawlerNames[0])}. It is winning anyway.`,
-    detail: (d) =>
-      `${formatPercent(d.value)} adjusted win rate on just ${formatPercent(d.comparison)} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.`,
-    stat: (d) => ({ value: formatPercent(d.value), label: 'adjusted win rate' }),
+    headline: (d, t) => t('Almost nobody picks {name}. It is winning anyway.', { name: name(d, 0) }),
+    detail: (d, t) =>
+      t(
+        '{rate} adjusted win rate on just {picks} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.',
+        { rate: formatPercent(d.value), picks: formatPercent(d.comparison) },
+      ),
+    stat: (d, t) => ({ value: formatPercent(d.value), label: t('adjusted win rate') }),
     cta: 'See the full record',
   },
   'meta-trap': {
     eyebrow: 'The meta trap',
     tone: 'bad',
-    headline: (d) => `${titleCase(d.brawlerNames[0])} is everywhere, and losing.`,
-    detail: (d) =>
-      `Picked in ${formatPercent(d.comparison)} of sampled battles and returning ${formatPercent(d.value)} adjusted — below the average of the very players picking it.`,
-    stat: (d) => ({ value: formatPercent(d.comparison), label: 'of all picks' }),
+    headline: (d, t) => t('{name} is everywhere, and losing.', { name: name(d, 0) }),
+    detail: (d, t) =>
+      t('Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.', {
+        picks: formatPercent(d.comparison),
+        rate: formatPercent(d.value),
+      }),
+    stat: (d, t) => ({ value: formatPercent(d.comparison), label: t('of all picks') }),
     cta: 'See why it underperforms',
   },
   'giant-killer': {
     eyebrow: 'The giant killer',
     tone: 'good',
     pair: 'vs',
-    headline: (d) => `${titleCase(d.brawlerNames[0])} owns ${titleCase(d.brawlerNames[1])}.`,
-    detail: (d) =>
-      `${formatPercent(d.value)} against ${titleCase(d.brawlerNames[1])} specifically, ${pts(
-        d.value - d.comparison,
-      )} above ${titleCase(d.brawlerNames[0])}'s own record. The most lopsided matchup in the sample.`,
-    stat: (d) => ({ value: pts(d.value - d.comparison), label: 'vs its usual form' }),
+    headline: (d, t) => t('{name} owns {other}.', { name: name(d, 0), other: name(d, 1) }),
+    detail: (d, t) =>
+      t("{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.", {
+        rate: formatPercent(d.value),
+        other: name(d, 1),
+        edge: pts(d.value - d.comparison),
+        name: name(d, 0),
+      }),
+    stat: (d, t) => ({ value: pts(d.value - d.comparison), label: t('vs its usual form') }),
     cta: 'See every matchup',
   },
   'secret-duo': {
     eyebrow: 'The secret duo',
     tone: 'good',
     pair: '+',
-    headline: (d) => `${titleCase(d.brawlerNames[0])} and ${titleCase(d.brawlerNames[1])} belong together.`,
-    detail: (d) =>
-      `Teamed up, ${titleCase(d.brawlerNames[0])} wins ${formatPercent(d.value)} — ${pts(
-        d.value - d.comparison,
-      )} better than it does otherwise. Neither is picked for the other.`,
-    stat: (d) => ({ value: pts(d.value - d.comparison), label: 'when paired' }),
+    headline: (d, t) => t('{name} and {other} belong together.', { name: name(d, 0), other: name(d, 1) }),
+    detail: (d, t) =>
+      t('Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.', {
+        name: name(d, 0),
+        rate: formatPercent(d.value),
+        edge: pts(d.value - d.comparison),
+      }),
+    stat: (d, t) => ({ value: pts(d.value - d.comparison), label: t('when paired') }),
     cta: 'See who else pairs well',
   },
   'map-surprise': {
     eyebrow: 'The map surprise',
     tone: 'good',
-    headline: (d) => `${titleCase(d.brawlerNames[0])} is a different brawler on ${d.context}.`,
-    detail: (d) =>
-      `${formatPercent(d.value)} here against ${formatPercent(
-        d.comparison,
-      )} across every other map — the widest gap between a brawler and one piece of terrain.`,
-    stat: (d) => ({ value: pts(d.value - d.comparison), label: `on ${d.context ?? 'this map'}` }),
+    headline: (d, t) => t('{name} is a different brawler on {map}.', { name: name(d, 0), map: d.context ?? t('this map') }),
+    detail: (d, t) =>
+      t('{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.', {
+        rate: formatPercent(d.value),
+        other: formatPercent(d.comparison),
+      }),
+    stat: (d, t) => ({ value: pts(d.value - d.comparison), label: t('on {map}', { map: d.context ?? t('this map') }) }),
     cta: 'See the map',
   },
   'overnight-rise': {
     eyebrow: 'The overnight rise',
     tone: 'good',
-    headline: (d) => `${titleCase(d.brawlerNames[0])} moved more than anything else since yesterday.`,
-    detail: (d) =>
-      `Meta score ${d.comparison.toFixed(1)} to ${d.value.toFixed(
-        1,
-      )} in a single day, on enough battles for the move to be real rather than noise.`,
-    stat: (d) => ({ value: `+${(d.value - d.comparison).toFixed(1)}`, label: 'meta score, 1 day' }),
+    headline: (d, t) => t('{name} moved more than anything else since yesterday.', { name: name(d, 0) }),
+    detail: (d, t) =>
+      t('Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.', {
+        from: dec(d.comparison),
+        to: dec(d.value),
+      }),
+    stat: (d, t) => ({ value: `+${dec(d.value - d.comparison)}`, label: t('meta score, 1 day') }),
     cta: 'See what changed',
   },
 };
-
-
 
 export function DiscoveryCard({
   discovery,
@@ -115,8 +131,10 @@ export function DiscoveryCard({
   brawlerMeta: Map<number, BABrawler>;
   index: number;
 }) {
+  const t = getUT();
+  const lp = (path: string) => localePath(requestLocale(), path);
   const copy = COPY[discovery.kind];
-  const stat = copy.stat(discovery);
+  const stat = copy.stat(discovery, t);
   const accent = copy.tone === 'good' ? 'var(--accent-2)' : 'var(--defeat, #ff6b6b)';
 
   return (
@@ -169,23 +187,21 @@ export function DiscoveryCard({
             className="text-xs font-bold uppercase tracking-wide"
             style={{ color: accent }}
           >
-            {copy.eyebrow}
+            {t(copy.eyebrow)}
           </p>
           <h2 className="mt-1 text-xl font-black leading-tight sm:text-2xl">
-            {copy.headline(discovery)}
+            {copy.headline(discovery, t)}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            {copy.detail(discovery)}
+            {copy.detail(discovery, t)}
           </p>
-          <p className="mt-2 text-xs tabular-nums text-muted">
-            From {formatNumber(discovery.sampleSize)} sampled battles.
-          </p>
+          <p className="mt-2 text-xs tabular-nums text-muted">{t('From {sampleSize} sampled battles.', { sampleSize: formatNumber(discovery.sampleSize) })}</p>
           <Link
-            href={discovery.href}
+            href={lp(discovery.href)}
             prefetch={false}
             className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand transition-colors hover:underline"
           >
-            {copy.cta}
+            {t(copy.cta)}
             <span aria-hidden>→</span>
           </Link>
         </div>

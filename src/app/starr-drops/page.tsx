@@ -7,6 +7,9 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { getStarrDrops, type DropReward, type DropTable, type DropType } from '@/lib/starr-drops';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   // "Chances", not "odds": the word in the queries Search Console shows
@@ -66,14 +69,16 @@ function liveEventExtras() {
 }
 
 export default async function StarrDropsPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const data = await getStarrDrops();
 
   if (!data) {
     return (
       <ErrorState
         code="upstreamDown"
-        title="Drop rates unavailable"
-        detail="The community wiki these numbers come from is not responding, or has changed shape. Rather than show odds that might be wrong, the page waits."
+        title={t('Drop rates unavailable')}
+        detail={t('The community wiki these numbers come from is not responding, or has changed shape. Rather than show odds that might be wrong, the page waits.')}
       />
     );
   }
@@ -86,9 +91,9 @@ export default async function StarrDropsPage() {
       <JsonLd data={breadcrumbSchema([{ name: 'Starr Drops', path: '/starr-drops' }])} />
 
       <PageHeading
-        eyebrow="Every drop rate"
-        title="Starr Drops"
-        subtitle="What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki."
+        eyebrow={t('Every drop rate')}
+        title={t('Starr Drops')}
+        subtitle={t('What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki.')}
       />
 
       {/*
@@ -101,26 +106,20 @@ export default async function StarrDropsPage() {
         date, so each one takes itself off the page when its event is over.
       */}
       <section aria-labelledby="schedule" className="space-y-3">
-        <SectionHeading title="How to get them: the daily schedule" />
+        <SectionHeading title={t('How to get them: the daily schedule')} />
         <div className="grid gap-3 md:grid-cols-2">
           <div className="card p-5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-brand">Every day</p>
-            <h3 className="display mt-1 text-xl">Your first 5 wins</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              Each of your first five wins of the day earns a reward drop: usually a Starr Drop,
-              sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the
-              Daily Wins screen in game shows exactly when.
-            </p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-brand">{t('Every day')}</p>
+            <h3 className="display mt-1 text-xl">{t('Your first 5 wins')}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{t('Each of your first five wins of the day earns a reward drop: usually a Starr Drop, sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.')}</p>
           </div>
           {liveEventExtras().map((e) => (
             <div key={e.name} className="card border-accent/40 p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-accent">
-                {e.event} · limited time
-              </p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-accent">{t('{event} · limited time', { event: e.event })}</p>
               <h3 className="display mt-1 text-xl">{e.name}</h3>
               <ul className="mt-2 list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted">
                 {e.points.map((point) => (
-                  <li key={point}>{point}</li>
+                  <li key={point}>{t(point)}</li>
                 ))}
               </ul>
             </div>
@@ -140,8 +139,8 @@ export default async function StarrDropsPage() {
       */}
       <section aria-labelledby="permanent" className="space-y-3">
         <SectionHeading
-          title="Permanent drops"
-          subtitle="Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop."
+          title={t('Permanent drops')}
+          subtitle={t('Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.')}
         />
         {core.map((type, index) => (
           <DropSection key={type.slug} type={type} defaultOpen={index === 0} />
@@ -151,8 +150,8 @@ export default async function StarrDropsPage() {
       {event.length > 0 ? (
         <section aria-labelledby="event" className="space-y-3">
           <SectionHeading
-            title="Event drops"
-            subtitle="Limited-time drops from past events. Kept for reference — most are no longer obtainable."
+            title={t('Event drops')}
+            subtitle={t('Limited-time drops from past events. Kept for reference — most are no longer obtainable.')}
             count={event.length}
           />
           {event.map((type) => (
@@ -161,22 +160,14 @@ export default async function StarrDropsPage() {
         </section>
       ) : null}
 
-      <p className="text-xs leading-relaxed text-muted">
-        Drop rates and contents from the{' '}
+      <p className="text-xs leading-relaxed text-muted">{t('Drop rates and contents from the')}{' '}
         <a
-          href={data.sourceUrl}
+          href={lp(data.sourceUrl)}
           rel="noreferrer noopener"
           target="_blank"
           className="font-medium text-brand hover:underline"
-        >
-          Brawl Stars Wiki
-        </a>
-        , CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from
-        datamines and in-game observation rather than official figures. For what the meta looks like
-        once you have the brawlers, see the{' '}
-        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-          Ranked tier list
-        </Link>
+        >{t('Brawl Stars Wiki')}</a>{t(', CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the')}{' '}
+        <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('Ranked tier list')}</Link>
         .
       </p>
     </div>
@@ -193,6 +184,7 @@ export default async function StarrDropsPage() {
  * scannable.
  */
 function DropSection({ type, defaultOpen = false }: { type: DropType; defaultOpen?: boolean }) {
+  const t = getT(requestLocale());
   const rewardCount = type.tables.reduce((sum, table) => sum + table.rewards.length, 0);
 
   return (
@@ -217,7 +209,7 @@ function DropSection({ type, defaultOpen = false }: { type: DropType; defaultOpe
             the summary without letting it set the row height.
           */}
           <p className="mt-0.5 line-clamp-1 text-xs leading-relaxed text-muted group-open:line-clamp-none sm:text-sm">
-            {type.description}
+            {t(type.description)}
           </p>
         </div>
 
@@ -225,13 +217,12 @@ function DropSection({ type, defaultOpen = false }: { type: DropType; defaultOpe
         <span className="hidden shrink-0 text-right text-xs text-muted sm:block">
           {rewardCount > 0 ? (
             <>
-              <span className="font-bold tabular-nums text-foreground">{rewardCount}</span> rewards
-              {type.rarityOdds.length > 0 ? (
-                <span className="block">{type.rarityOdds.length} rarities</span>
+              <span className="font-bold tabular-nums text-foreground">{rewardCount}</span>{' '}{t('rewards')}{type.rarityOdds.length > 0 ? (
+                <span className="block">{type.rarityOdds.length}{' '}{t('rarities')}</span>
               ) : null}
             </>
           ) : (
-            'No table'
+            t('No table')
           )}
         </span>
 
@@ -261,7 +252,7 @@ function DropSection({ type, defaultOpen = false }: { type: DropType; defaultOpe
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted">The wiki publishes no reward table for this drop.</p>
+          <p className="text-sm text-muted">{t('The wiki publishes no reward table for this drop.')}</p>
         )}
       </div>
     </details>
@@ -292,9 +283,10 @@ function rarityColor(rarity: string | null): string {
 }
 
 function RarityBar({ type }: { type: DropType }) {
+  const t = getT(requestLocale());
   return (
     <div>
-      <p className="eyebrow mb-2.5">Chance of rolling each rarity</p>
+      <p className="eyebrow mb-2.5">{t('Chance of rolling each rarity')}</p>
 
       <div
         className="flex h-2.5 w-full gap-0.5 overflow-hidden rounded-full bg-surface-2"
@@ -335,6 +327,7 @@ function RarityBar({ type }: { type: DropType }) {
 }
 
 function RewardTable({ table }: { table: DropTable }) {
+  const t = getT(requestLocale());
   const color = rarityColor(table.rarity);
   // A point of slack for the wiki's rounded percentages.
   const short = table.listed < 0.99;
@@ -368,10 +361,8 @@ function RewardTable({ table }: { table: DropTable }) {
       {short ? (
         <p
           className="border-t border-border bg-surface-2/60 px-2.5 py-2 text-xs leading-snug text-muted"
-          title={`The wiki lists rewards totalling ${(table.listed * 100).toFixed(1)}%, so a row covering the other ${((1 - table.listed) * 100).toFixed(1)}% is missing from the source.`}
-        >
-          Wiki lists {(table.listed * 100).toFixed(1)}% — a row is missing.
-        </p>
+          title={t('The wiki lists rewards totalling {v}%, so a row covering the other {v2}% is missing from the source.', { v: (table.listed * 100).toFixed(1), v2: ((1 - table.listed) * 100).toFixed(1) })}
+        >{t('Wiki lists {v}% — a row is missing.', { v: (table.listed * 100).toFixed(1) })}</p>
       ) : null}
     </div>
   );
@@ -387,6 +378,7 @@ function RewardRow({
   /** The biggest chance in this table, which the bars are scaled against. */
   most: number;
 }) {
+  const t = getT(requestLocale());
   return (
     <li className="flex items-start gap-2 px-2.5 py-2">
       {reward.iconUrl ? (
@@ -416,7 +408,7 @@ function RewardRow({
         */}
         <p className="text-sm leading-tight">
           {reward.amount ? <span className="font-bold tabular-nums">{reward.amount} </span> : null}
-          <span className={reward.amount ? 'text-muted' : ''}>{reward.label}</span>
+          <span className={reward.amount ? 'text-muted' : ''}>{t(reward.label)}</span>
         </p>
 
         <div className="mt-1.5 flex items-center gap-2">

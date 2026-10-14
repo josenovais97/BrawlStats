@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { Disclosure } from '@/components/ui/disclosure';
 import { brawlerPath } from '@/lib/slugs';
 import { TRIAL_BRAWLER_RULES, type SeasonState } from '@/lib/ranked-seasons';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Where the Ranked season is, who you can borrow while it runs, and which maps
@@ -29,6 +32,8 @@ export function SeasonPanel({
   /** Resolves a wiki map name to one of our map pages, or null if unknown. */
   mapHref: (mode: string, map: string) => string | null;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { current, next, latest, daysUntilNext } = state;
   const season = current ?? next ?? latest;
   if (!season) return null;
@@ -72,10 +77,10 @@ export function SeasonPanel({
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-accent">
             <Sparkles className="size-3.5" />
-            {isPreview ? 'Next season' : awaiting ? 'Season in progress' : 'Current season'}
+            {isPreview ? t('Next season') : awaiting ? t('Season in progress') : t('Current season')}
           </p>
           <h2 id="ranked-season" className="display mt-1.5 text-xl uppercase sm:text-2xl">
-            {awaiting ? `After season ${season.number}` : `Ranked season ${season.number}`}
+            {awaiting ? t('After season {number}', { number: season.number }) : t('Ranked season {number}', { number: season.number })}
           </h2>
         </div>
 
@@ -87,24 +92,18 @@ export function SeasonPanel({
             </Chip>
           ) : null}
           {season.featuredMode && !awaiting ? (
-            <Chip>{season.featuredMode} featured</Chip>
+            <Chip>{season.featuredMode}{' '}{t('featured')}</Chip>
           ) : null}
           {season.brawlers.length > 0 && !awaiting ? (
-            <Chip>
-              {season.brawlers.length} trial brawler
-              {season.brawlers.length === 1 ? '' : 's'}
+            <Chip>{t('{length} trial brawler', { length: season.brawlers.length })}{season.brawlers.length === 1 ? '' : 's'}
             </Chip>
           ) : null}
-          {poolCount > 0 ? <Chip>{poolCount} maps in the pool</Chip> : null}
+          {poolCount > 0 ? <Chip>{poolCount}{' '}{t('maps in the pool')}</Chip> : null}
         </ul>
       </div>
 
       {awaiting ? (
-        <p className="border-t border-border px-4 py-3 text-sm leading-relaxed text-muted sm:px-5">
-          Season {season.number} ended on {formatDay(season.endsOn)}. A new season
-          started that day, but its number and trial brawlers have not been published
-          yet.
-        </p>
+        <p className="border-t border-border px-4 py-3 text-sm leading-relaxed text-muted sm:px-5">{t('Season {number} ended on {endsOn}. A new season started that day, but its number and trial brawlers have not been published yet.', { number: season.number, endsOn: formatDay(season.endsOn) })}</p>
       ) : null}
 
       {season.brawlers.length > 0 && !awaiting ? (
@@ -115,9 +114,9 @@ export function SeasonPanel({
           <Disclosure
             defaultOpen
             tone="bare"
-            summary={`Trial brawlers: ${season.brawlers
+            summary={t('Trial brawlers: {v}', { v: season.brawlers
               .map((b) => titleCase(b.name))
-              .join(', ')}`}
+              .join(', ') })}
           >
             <ul className="grid grid-cols-3 gap-3 sm:max-w-md">
               {season.brawlers.map((brawler) => {
@@ -125,7 +124,7 @@ export function SeasonPanel({
                 return (
                   <li key={brawler.id}>
                     <Link
-                      href={brawlerPath(brawler.id, brawler.name)}
+                      href={lp(brawlerPath(brawler.id, brawler.name))}
                       className="card card-interactive flex h-full flex-col items-center gap-1.5 p-2.5"
                     >
                       <Image
@@ -157,7 +156,7 @@ export function SeasonPanel({
                     aria-hidden
                     className="mt-2 size-1 shrink-0 rounded-full bg-brand"
                   />
-                  {rule}
+                  {t(rule)}
                 </li>
               ))}
             </ul>
@@ -169,11 +168,9 @@ export function SeasonPanel({
         <div className="border-t border-border px-4 sm:px-5">
           <Disclosure
             tone="bare"
-            summary={`Full map pool${
-              state.mapPoolSeason !== null && state.mapPoolSeason !== season.number
+            summary={t('Full map pool{v}', { v: state.mapPoolSeason !== null && state.mapPoolSeason !== season.number
                 ? ` (season ${state.mapPoolSeason})`
-                : ''
-            }`}
+                : '' })}
           >
             <div className="space-y-3">
               {state.mapPool.map((entry) => (
@@ -184,9 +181,7 @@ export function SeasonPanel({
                   <span className="w-24 shrink-0 text-sm font-semibold text-foreground">
                     {entry.mode}
                     {entry.featured ? (
-                      <span className="ml-1.5 rounded bg-brand/15 px-1 py-0.5 text-xs font-bold uppercase text-brand">
-                        Featured
-                      </span>
+                      <span className="ml-1.5 rounded bg-brand/15 px-1 py-0.5 text-xs font-bold uppercase text-brand">{t('Featured')}</span>
                     ) : null}
                   </span>
                   <span className="flex flex-wrap gap-1.5">
@@ -195,7 +190,7 @@ export function SeasonPanel({
                       return href ? (
                         <Link
                           key={map}
-                          href={href}
+                          href={lp(href)}
                           className="rounded-lg bg-surface-2 px-2 py-1 text-xs font-medium text-foreground transition-colors hover:text-brand"
                         >
                           {map}
@@ -217,23 +212,15 @@ export function SeasonPanel({
             {/* Both facts matter to how the rankings above should be read: the
                 pool is fixed for the season, and nothing is modifying the
                 games. */}
-            <p className="mt-4 text-xs leading-relaxed">
-              The pool is fixed for the season. Modifiers were removed from Ranked in
-              the February 2025 rework, so every battle counted here is the plain mode
-              on the plain map.{' '}
+            <p className="mt-4 text-xs leading-relaxed">{t('The pool is fixed for the season. Modifiers were removed from Ranked in the February 2025 rework, so every battle counted here is the plain mode on the plain map.')}{' '}
               {state.source === 'wiki' ? (
-                <>
-                  Season and pool data from the{' '}
+                <>{t('Season and pool data from the')}{' '}
                   <a
                     href="https://brawlstars.fandom.com/wiki/Ranked"
                     rel="noreferrer noopener"
                     target="_blank"
                     className="font-medium text-brand hover:underline"
-                  >
-                    Brawl Stars Wiki
-                  </a>
-                  , CC-BY-SA.
-                </>
+                  >{t('Brawl Stars Wiki')}</a>{t(', CC-BY-SA.')}</>
               ) : null}
             </p>
           </Disclosure>
@@ -243,10 +230,7 @@ export function SeasonPanel({
       {/* Said plainly when the successor has not been announced: the date comes
           from the published cadence, not from a line-up anyone has seen. */}
       {!next && !isPreview && !awaiting && daysUntilNext !== null ? (
-        <p className="border-t border-border px-4 py-2.5 text-xs text-muted sm:px-5">
-          Turnover date from the published schedule (third Thursday); the next
-          line-up has not been announced.
-        </p>
+        <p className="border-t border-border px-4 py-2.5 text-xs text-muted sm:px-5">{t('Turnover date from the published schedule (third Thursday); the next line-up has not been announced.')}</p>
       ) : null}
     </section>
   );

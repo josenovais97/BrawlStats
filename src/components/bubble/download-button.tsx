@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 
 import { BUBBLE_APP } from '@/lib/bubble-app';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * The APK link, with a count of who taps it.
@@ -32,6 +33,7 @@ export function DownloadButton({
   className?: string;
   children: ReactNode;
 }) {
+  const lp = useLp();
   /*
    * No `download` attribute inside the app, and that is the whole difference
    * between a working button and a dead one.
@@ -54,7 +56,7 @@ export function DownloadButton({
 
   return (
     <a
-      href={BUBBLE_APP.path}
+      href={lp(BUBBLE_APP.path)}
       download={inApp ? undefined : ''}
       className={className}
       onClick={(event) => {

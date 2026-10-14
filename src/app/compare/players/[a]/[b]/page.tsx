@@ -5,6 +5,8 @@ import { CompareTool } from '@/components/compare/compare-tool';
 import { RivalRace } from '@/components/compare/rival-race';
 import { loadComparison } from '@/lib/player-compare';
 import { displayTag, normalizeTag } from '@/lib/tags';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ a: string; b: string }>;
@@ -20,12 +22,13 @@ interface PageProps {
  * of falling on `/compare` itself, which is static and is what gets crawled.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { a, b } = await params;
 
   return {
-    title: `${displayTag(a)} vs ${displayTag(b)} — Brawl Stars comparison`,
+    title: t('{a} vs {b} — Brawl Stars comparison', { a: displayTag(a), b: displayTag(b) }),
     description:
-      'Two Brawl Stars players side by side: trophies, Ranked, skill score, account completion and roster overlap.',
+      t('Two Brawl Stars players side by side: trophies, Ranked, skill score, account completion and roster overlap.'),
     // The bare tool page, not this one: a specific pairing is one of unbounded
     // many and should consolidate onto the page that explains the tool.
     alternates: { canonical: '/compare' },

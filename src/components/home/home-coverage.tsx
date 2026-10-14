@@ -3,6 +3,8 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { BattlesIcon, BrawlersIcon, PlayersIcon, RankedIcon } from '@/components/game-icons';
 import { relativeTime } from '@/lib/format';
 import { getCoverageStats, getLastAggregationRun } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The live-data rail at the base of the hero.
@@ -21,35 +23,35 @@ import { getCoverageStats, getLastAggregationRun } from '@/lib/stats';
  * of zeroes would undercut the credibility it exists to build.
  */
 export async function HomeCoverage() {
+  const t = getT(requestLocale());
   const [stats, lastRun] = await Promise.all([getCoverageStats(), getLastAggregationRun()]);
   if (!stats || stats.battles === 0) return null;
 
   const items = [
-    { icon: BrawlersIcon, label: 'Brawlers tracked', value: stats.brawlers },
-    { icon: PlayersIcon, label: 'Players sampled', value: stats.players },
-    { icon: BattlesIcon, label: 'Battles analysed', value: stats.battles },
-    { icon: RankedIcon, label: 'Ranked battles', value: stats.rankedBattles },
+    { icon: BrawlersIcon, label: t('Brawlers tracked'), value: stats.brawlers },
+    { icon: PlayersIcon, label: t('Players sampled'), value: stats.players },
+    { icon: BattlesIcon, label: t('Battles analysed'), value: stats.battles },
+    { icon: RankedIcon, label: t('Ranked battles'), value: stats.rankedBattles },
   ];
 
   return (
-    <section aria-label="Data coverage" className="relative">
+    <section aria-label={t('Data coverage')} className="relative">
       <div className="flex flex-col lg:flex-row lg:items-stretch">
         {/* Status, at the head of the readout. */}
         <p className="flex items-center gap-2.5 py-3.5 text-xs text-muted lg:w-56 lg:shrink-0 lg:border-r lg:border-border/60 lg:py-5 lg:pr-6">
           <span className="live-dot shrink-0" />
           <span className="min-w-0">
             {lastRun ? (
-              <>
-                Sampled{' '}
+              <>{t('Sampled')}{' '}
                 <RelativeTime
                   iso={lastRun.startedAt}
                   fallback={relativeTime(lastRun.startedAt)}
                   className="font-semibold text-foreground"
                 />
-                <span className="block text-muted">Re-read every two hours</span>
+                <span className="block text-muted">{t('Re-read every two hours')}</span>
               </>
             ) : (
-              <span className="font-semibold text-foreground">Live sample</span>
+              <span className="font-semibold text-foreground">{t('Live sample')}</span>
             )}
           </span>
         </p>
@@ -78,7 +80,7 @@ export async function HomeCoverage() {
                   <CountUp value={value} />
                 </p>
                 <p className="mt-1.5 truncate text-xs font-medium uppercase tracking-wide text-muted">
-                  {label}
+                  {t(label)}
                 </p>
               </div>
             </li>

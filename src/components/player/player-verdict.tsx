@@ -2,6 +2,8 @@ import Link from 'next/link';
 
 import { Panel } from '@/components/ui/panel';
 import type { ModeReadiness, RosterPlan } from '@/lib/roster-optimizer';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The account in one block, at the top, before any of the detail.
@@ -38,6 +40,7 @@ export function PlayerVerdict({
   /** Brawlers unlocked. */
   total: number;
 }) {
+  const t = getT(requestLocale());
   const { readiness, coveredBefore, banSafeBefore, modes, steps, totalCoins } = plan;
   if (readiness.length === 0) return null;
 
@@ -54,12 +57,12 @@ export function PlayerVerdict({
       ? `${worst.length} ranked ${worst.length === 1 ? 'mode has' : 'modes have'} nothing you can field`
       : gaps.length > 0
         ? `Every mode is covered, but ${gaps.length} of them ${gaps.length === 1 ? 'is' : 'are'} one ban from nothing`
-        : 'Every ranked mode is covered, with a pick spare';
+        : t('Every ranked mode is covered, with a pick spare');
 
   return (
     <Panel
-      title="Your account, in short"
-      subtitle="Read from the live Ranked rotation and the brawlers you have at power 9 or above."
+      title={t('Your account, in short')}
+      subtitle={t('Read from the live Ranked rotation and the brawlers you have at power 9 or above.')}
       bodyClassName=""
     >
       <div className="relative">
@@ -72,17 +75,12 @@ export function PlayerVerdict({
         <div className="space-y-4 p-5">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <p className="text-2xl font-black tabular-nums">{usable}</p>
-            <p className="text-sm text-muted">
-              of your <span className="font-semibold text-foreground">{total}</span> brawlers are
-              ready to play, covering{' '}
+            <p className="text-sm text-muted">{t('of your')}{' '}<span className="font-semibold text-foreground">{total}</span>{' '}{t('brawlers are ready to play, covering')}{' '}
               <span className="font-bold tabular-nums text-foreground">
                 {coveredBefore}/{modes}
-              </span>{' '}
-              modes
-              {banSafeBefore > 0 ? (
+              </span>{' '}{t('modes')}{banSafeBefore > 0 ? (
                 <>
-                  {' '}
-                  with a spare pick in{' '}
+                  {' '}{t('with a spare pick in')}{' '}
                   <span className="font-bold tabular-nums text-foreground">{banSafeBefore}</span>
                 </>
               ) : null}
@@ -90,7 +88,7 @@ export function PlayerVerdict({
             </p>
           </div>
 
-          <p className="text-sm font-semibold leading-relaxed">{headline}</p>
+          <p className="text-sm font-semibold leading-relaxed">{t(headline)}</p>
 
           <ul className="grid gap-x-4 gap-y-2 @xl:grid-cols-2">
             {readiness.map((mode) => {
@@ -101,11 +99,11 @@ export function PlayerVerdict({
                     aria-hidden
                     className={`size-2.5 shrink-0 rounded-full ${style.dot}`}
                   />
-                  <span className="min-w-0 flex-1 truncate font-medium">{mode.label}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium">{t(mode.label)}</span>
                   <span className={`shrink-0 text-xs font-semibold ${style.text}`}>
                     {/* The count, not just the colour: "2 ready" survives a
                         screenshot, a colour-blind reader and a grey print. */}
-                    {mode.ready > 0 ? `${mode.ready} ready` : style.label}
+                    {mode.ready > 0 ? t('{ready} ready', { ready: mode.ready }) : style.label}
                   </span>
                 </li>
               );
@@ -113,14 +111,9 @@ export function PlayerVerdict({
           </ul>
 
           {steps.length > 0 ? (
-            <p className="text-sm leading-relaxed text-muted">
-              The cheapest fix is{' '}
-              <span className="font-semibold tabular-nums text-foreground">
-                {totalCoins.toLocaleString('en-GB')} coins
-              </span>{' '}
-              — <Link href="#upgrade-next" className="font-medium text-brand hover:underline">
-                see what it buys
-              </Link>
+            <p className="text-sm leading-relaxed text-muted">{t('The cheapest fix is')}{' '}
+              <span className="font-semibold tabular-nums text-foreground">{t('{v} coins', { v: totalCoins.toLocaleString('en-GB') })}</span>{' '}
+              — <Link href="#upgrade-next" className="font-medium text-brand hover:underline">{t('see what it buys')}</Link>
               .
             </p>
           ) : null}

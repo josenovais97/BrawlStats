@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { INTL_LOCALES, languageAlternates } from '@/lib/i18n';
+import { INTL_LOCALES, isTranslatedPath, languageAlternates } from '@/lib/i18n';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { bracketTierListHref } from '@/lib/tier-list-route';
 
@@ -74,6 +74,9 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
       changeFrequency,
       priority,
       ...(lastModified ? { lastModified } : {}),
+      // hreflang has to point both ways: the English page names its
+      // translations here, as the `intl` section's entries name it.
+      ...(id !== 'intl' && isTranslatedPath(path || '/') ? { alternates: { languages: absoluteAlternates(path || '/') } } : {}),
     });
   };
 
@@ -273,36 +276,40 @@ async function compare(add: Add) {
 
 /**
  * The Spanish and Portuguese pages (see `lib/i18n`), in a file of their own so
- * Search Console reports them apart. Each entry carries its alternates, so
- * the three languages of a page are tied together here as well as in the
- * pages' own hreflang links. Same pages, and the same priorities, as their
- * English originals in `core`.
+ * Search Console reports them apart: the same pages as `core` and `maps`, each
+ * under `/es` and `/pt` with its three languages as alternates, so they are
+ * tied together here as well as in the pages' own hreflang links. Comparison
+ * pairs and player profiles stay English-only here -- they are the long tail,
+ * and doubling it twice would bury the pages that earn visits.
  */
 async function intl(entries: MetadataRoute.Sitemap, dataDay: Date | null) {
-  const pages: [string, number][] = [
-    ['/tier-list/ranked', 0.85],
-    ...RANK_BRACKETS.map((b) => [bracketTierListHref(b), 0.75] as [string, number]),
-    ['/tier-list/trophy', 0.85],
-  ];
-  for (const format of ['ranked', 'trophy'] as const) {
-    const modes = await getFilterableModes(30, 150, format).catch(() => []);
-    for (const mode of modes) pages.push([`/tier-list/${format}/${slugify(mode.mode)}`, 0.7]);
-  }
-  const catalog = await getBrawlerCatalog().catch(() => null);
-  for (const brawler of catalog?.current ?? []) pages.push([`/brawlers/${slugify(brawler.name)}/counters`, 0.65]);
+  const english: { path: string; f: Frequency; p: number; lastModified: Date | null }[] = [];
+  const collect: Add = (path, f, p, lastModified = dataDay) => {
+    english.push({ path, f, p, lastModified: lastModified ?? null });
+  };
+  await core(collect, dataDay);
+  await maps(collect, await getNewestDayByMap().catch(() => new Map<string, string>()));
 
-  for (const [path, priority] of pages) {
-    const languages = Object.fromEntries(
-      Object.entries(languageAlternates(path)).map(([lang, p]) => [lang, `${SITE_URL}${p}`]),
-    );
+  for (const { path, f, p, lastModified } of english) {
+    if (!isTranslatedPath(path || '/')) continue;
+    const enPath = path || '/';
+    const languages = absoluteAlternates(enPath);
     for (const locale of INTL_LOCALES) {
       entries.push({
         url: `${SITE_URL}/${locale}${path}`,
-        changeFrequency: 'daily',
-        priority,
+        changeFrequency: f,
+        // A notch under the English original, which is the x-default.
+        priority: Math.max(0.1, Math.round((p - 0.05) * 100) / 100),
         alternates: { languages },
-        ...(dataDay ? { lastModified: dataDay } : {}),
+        ...(lastModified ? { lastModified } : {}),
       });
     }
   }
+}
+
+/** `languageAlternates`, as absolute URLs, which is what a sitemap wants. */
+function absoluteAlternates(path: string): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(languageAlternates(path)).map(([lang, href]) => [lang, `${SITE_URL}${href === '/' ? '' : href}`]),
+  );
 }

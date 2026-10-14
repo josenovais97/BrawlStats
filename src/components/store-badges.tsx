@@ -1,3 +1,5 @@
+import { getUT } from '@/lib/t-universal';
+
 /**
  * App Store and Google Play download badges.
  *
@@ -19,12 +21,13 @@ interface BadgeProps {
 }
 
 export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
+  const t = getUT();
   return (
     <svg
       viewBox="0 0 135 40"
       className={className}
       role="img"
-      aria-label="Download on the App Store"
+      aria-label={t('Download on the App Store')}
     >
       <rect
         x="0.5"
@@ -52,9 +55,7 @@ export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fontSize="8.5"
         textLength="60"
         lengthAdjust="spacingAndGlyphs"
-      >
-        Download on the
-      </text>
+      >{t('Download on the')}</text>
       <text
         x="45"
         y="30"
@@ -64,20 +65,19 @@ export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fontWeight="600"
         textLength="78"
         lengthAdjust="spacingAndGlyphs"
-      >
-        App Store
-      </text>
+      >{t('App Store')}</text>
     </svg>
   );
 }
 
 export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
+  const t = getUT();
   return (
     <svg
       viewBox="0 0 135 40"
       className={className}
       role="img"
-      aria-label="Get it on Google Play"
+      aria-label={t('Get it on Google Play')}
     >
       <rect
         x="0.5"
@@ -103,9 +103,7 @@ export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fontSize="8.5"
         textLength="44"
         lengthAdjust="spacingAndGlyphs"
-      >
-        GET IT ON
-      </text>
+      >{t('GET IT ON')}</text>
       <text
         x="45"
         y="30"
@@ -115,9 +113,7 @@ export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
         fontWeight="600"
         textLength="78"
         lengthAdjust="spacingAndGlyphs"
-      >
-        Google Play
-      </text>
+      >{t('Google Play')}</text>
     </svg>
   );
 }

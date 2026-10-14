@@ -3,6 +3,9 @@
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
+import { useT } from '@/components/i18n/use-t';
+import type { T } from '@/lib/t-core';
+
 /**
  * Shows people where their tag actually is.
  *
@@ -34,6 +37,7 @@ export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' 
   }, []);
 
   const isClub = kind === 'club';
+  const t = useT();
 
   return (
     <>
@@ -42,7 +46,7 @@ export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' 
         onClick={() => ref.current?.showModal()}
         className="rounded font-semibold text-brand underline decoration-brand/40 underline-offset-2 transition-colors hover:decoration-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       >
-        Where do I find it?
+        {t('Where do I find it?')}
       </button>
 
       <dialog
@@ -53,18 +57,18 @@ export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' 
         <div className="flex items-start justify-between gap-4 border-b border-border p-5">
           <div>
             <h2 id="tag-hint-title" className="display text-lg uppercase">
-              {isClub ? 'Finding a club tag' : 'Finding your tag'}
+              {isClub ? t('Finding a club tag') : t('Finding your tag')}
             </h2>
             <p className="mt-1 text-sm text-muted">
               {isClub
-                ? 'Open the club screen. The tag sits under the club name.'
-                : 'Tap your profile icon in the top-left of the game. The tag is directly underneath it.'}
+                ? t('Open the club screen. The tag sits under the club name.')
+                : t('Tap your profile icon in the top-left of the game. The tag is directly underneath it.')}
             </p>
           </div>
           <button
             type="button"
             onClick={() => ref.current?.close()}
-            aria-label="Close"
+            aria-label={t('Close')}
             className="shrink-0 rounded-lg border border-border p-1.5 text-muted transition-colors hover:text-foreground"
           >
             <X className="size-4" />
@@ -72,12 +76,10 @@ export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' 
         </div>
 
         <div className="p-5">
-          <ProfileDiagram isClub={isClub} />
+          <ProfileDiagram isClub={isClub} t={t} />
 
           <p className="mt-4 text-sm leading-relaxed text-muted">
-            It always begins with <span className="font-mono font-semibold text-foreground">#</span>.
-            You can type it with or without the <span className="font-mono">#</span>, and case does
-            not matter.
+            {t('It always begins with #. You can type it with or without the #, and case does not matter.')}
           </p>
         </div>
       </dialog>
@@ -93,15 +95,15 @@ export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' 
  * matters. Colours come from the site's tokens via `currentColor` and explicit
  * classes, so it reads correctly in both themes.
  */
-function ProfileDiagram({ isClub }: { isClub: boolean }) {
+function ProfileDiagram({ isClub, t }: { isClub: boolean; t: T }) {
   return (
     <svg
       viewBox="0 0 340 168"
       role="img"
       aria-label={
         isClub
-          ? 'Diagram of the club screen with the club tag highlighted beneath the club name'
-          : 'Diagram of the game profile screen with the player tag highlighted beneath the profile icon'
+          ? t('Diagram of the club screen with the club tag highlighted beneath the club name')
+          : t('Diagram of the game profile screen with the player tag highlighted beneath the profile icon')
       }
       className="w-full rounded-xl border border-border bg-surface-2"
     >
@@ -156,7 +158,7 @@ function ProfileDiagram({ isClub }: { isClub: boolean }) {
         className="fill-brand"
         style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em' }}
       >
-        {isClub ? 'CLUB TAG' : 'YOUR TAG'}
+        {isClub ? t('CLUB TAG') : t('YOUR TAG')}
       </text>
 
       {/* Stat blocks below, so the crop reads as a real screen */}

@@ -12,6 +12,9 @@ import { getBattleLog, getPlayer } from '@/lib/bs-api';
 import { displayTag, normalizeTag } from '@/lib/tags';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -35,15 +38,18 @@ interface PageProps {
  * none of them enumerable, each costing an upstream call to render.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { tag } = await params;
   return {
-    title: `${displayTag(tag)} — recent run`,
-    description: 'A shareable summary of a Brawl Stars player’s last twenty-five battles.',
+    title: t('{tag} — recent run', { tag: displayTag(tag) }),
+    description: t('A shareable summary of a Brawl Stars player’s last twenty-five battles.'),
     robots: { index: false, follow: true },
   };
 }
 
 export default async function WrappedPage({ params }: PageProps) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { tag } = await params;
 
   const player = await getPlayer(tag).catch(() => null);
@@ -64,15 +70,15 @@ export default async function WrappedPage({ params }: PageProps) {
       <PageHeading
         eyebrow={
           <Link
-            href={`/player/${normalizeTag(player.tag)}`}
+            href={lp(`/player/${normalizeTag(player.tag)}`)}
             rel={playerLinkRel(normalizeTag(player.tag))}
             className="transition-colors hover:text-foreground"
           >
             {player.name}
           </Link>
         }
-        title="Recent run"
-        subtitle="The last twenty-five battles, summed up. Built to screenshot."
+        title={t('Recent run')}
+        subtitle={t('The last twenty-five battles, summed up. Built to screenshot.')}
       />
 
       <WrappedCard
@@ -82,11 +88,7 @@ export default async function WrappedPage({ params }: PageProps) {
         modeMeta={modeMeta}
       />
 
-      <p className="text-xs leading-relaxed text-muted">
-        Everything here is measured from the battle log the game exposes, which holds roughly the
-        last twenty-five games and no further. There is no history endpoint, so this is a snapshot
-        of a run rather than a season — open it again after playing and it will have moved.
-      </p>
+      <p className="text-xs leading-relaxed text-muted">{t('Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.')}</p>
     </div>
   );
 }

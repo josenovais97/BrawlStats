@@ -2,6 +2,8 @@ import { Radio } from 'lucide-react';
 
 import { getBattleLog } from '@/lib/bs-api';
 import { minutesSince, relativeTime } from '@/lib/format';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /** Under this many minutes since the last battle, treat the player as online. */
 const ONLINE_WINDOW_MINUTES = 15;
@@ -19,6 +21,7 @@ const ONLINE_WINDOW_MINUTES = 15;
  * answer: an absent log means we cannot say, not that they never played.
  */
 export async function LastOnline({ tag }: { tag: string }) {
+  const t = getT(requestLocale());
   let newest: string | undefined;
   try {
     newest = (await getBattleLog(tag)).items[0]?.battleTime;
@@ -45,7 +48,7 @@ export async function LastOnline({ tag }: { tag: string }) {
       ) : (
         <Radio className="size-3.5" aria-hidden />
       )}
-      {online ? 'In a match recently' : `Last seen ${relativeTime(newest)}`}
+      {online ? t('In a match recently') : t('Last seen {newest}', { newest: relativeTime(newest) })}
     </span>
   );
 }

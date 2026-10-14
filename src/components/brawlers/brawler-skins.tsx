@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BrawlerSkinUsage } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * What this brawler's owners actually equip.
@@ -32,6 +34,7 @@ export function BrawlerSkins({
   /** Resolves a skin to its wiki artwork, or null when the wiki has no file. */
   artFor: (skin: BrawlerSkinUsage) => string | null;
 }) {
+  const t = getT(requestLocale());
   if (skins.length === 0) return null;
 
   const name = brawlerName.toLowerCase();
@@ -45,14 +48,10 @@ export function BrawlerSkins({
       <p className="text-sm leading-relaxed text-muted">
         {dressed > 0 ? (
           <>
-            <span className="font-semibold text-foreground">{formatPercent(dressed)}</span> of
-            sampled {name} owners have a skin equipped.
-          </>
+            <span className="font-semibold text-foreground">{formatPercent(dressed)}</span>{' '}{t('of sampled {name} owners have a skin equipped.', { name: name })}</>
         ) : (
-          <>Almost every sampled {name} owner is on the default skin.</>
-        )}{' '}
-        Shares are of players who own {name}, from the rotating snapshot sample.
-      </p>
+          <>{t('Almost every sampled {name} owner is on the default skin.', { name: name })}</>
+        )}{' '}{t('Shares are of players who own {name}, from the rotating snapshot sample.', { name: name })}</p>
 
       <ul className="card divide-y divide-border overflow-hidden">
         {top.map((skin) => (
@@ -64,9 +63,7 @@ export function BrawlerSkins({
                   {skin.name.toLowerCase()}
                 </span>
                 {skin.isDefault ? (
-                  <span className="shrink-0 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-muted">
-                    Default
-                  </span>
+                  <span className="shrink-0 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-muted">{t('Default')}</span>
                 ) : null}
               </span>
               {/* The bar is the comparison; the number beside it is the detail. */}
@@ -94,9 +91,7 @@ export function BrawlerSkins({
 
       {skins.length > top.length ? (
         <p className="text-xs text-muted">
-          {skins.length - top.length} rarer {skins.length - top.length === 1 ? 'skin' : 'skins'} not
-          shown.
-        </p>
+          {skins.length - top.length}{' '}{t('rarer')}{' '}{skins.length - top.length === 1 ? t('skin') : t('skins')}{' '}{t('not shown.')}</p>
       ) : null}
     </div>
   );

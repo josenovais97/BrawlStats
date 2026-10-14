@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import type { BrawlerSplit } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Where a brawler is actually good: its best modes, and its best maps.
@@ -25,13 +28,14 @@ export function BrawlerSplits({
   /** Resolves a split to a map page path, when the map is still in rotation. */
   mapSlugFor: (split: BrawlerSplit) => string | null;
 }) {
+  const t = getT(requestLocale());
   if (modes.length === 0 && maps.length === 0) return null;
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <SplitList
-        title="Best modes"
-        empty="Not enough battles in any one mode yet."
+        title={t('Best modes')}
+        empty={t('Not enough battles in any one mode yet.')}
         rows={modes.slice(0, 6).map((split) => ({
           key: split.mode,
           label: humanizeMode(split.mode),
@@ -40,8 +44,8 @@ export function BrawlerSplits({
         }))}
       />
       <SplitList
-        title="Best maps"
-        empty="Not enough battles on any one map yet."
+        title={t('Best maps')}
+        empty={t('Not enough battles on any one map yet.')}
         rows={maps.slice(0, 6).map((split) => ({
           key: `${split.mode}-${split.mapName}`,
           label: split.mapName ?? '–',
@@ -69,10 +73,12 @@ function SplitList({
     split: BrawlerSplit;
   }[];
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div>
       <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
-        {title}
+        {t(title)}
       </h3>
       {rows.length === 0 ? (
         <p className="card p-4 text-sm text-muted">{empty}</p>
@@ -82,12 +88,9 @@ function SplitList({
             const body = (
               <>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{label}</span>
+                  <span className="block truncate text-sm font-semibold">{t(label)}</span>
                   <span className="block text-xs tabular-nums text-muted">
-                    {sublabel ? `${sublabel} · ` : ''}
-                    {formatNumber(split.decidedSampleSize)} battles ·{' '}
-                    {formatPercent(split.winRate)} raw
-                  </span>
+                    {sublabel ? `${sublabel} · ` : ''}{t('{decidedSampleSize} battles ·', { decidedSampleSize: formatNumber(split.decidedSampleSize) })}{' '}{t('{winRate} raw', { winRate: formatPercent(split.winRate) })}</span>
                 </span>
                 <span
                   className={`shrink-0 text-sm font-bold tabular-nums ${
@@ -103,13 +106,13 @@ function SplitList({
               <li key={key}>
                 {href ? (
                   <Link
-                    href={href}
+                    href={lp(href)}
                     className="row-interactive flex items-center gap-3 px-4 py-2.5"
                   >
-                    {body}
+                    {t(body)}
                   </Link>
                 ) : (
-                  <div className="flex items-center gap-3 px-4 py-2.5">{body}</div>
+                  <div className="flex items-center gap-3 px-4 py-2.5">{t(body)}</div>
                 )}
               </li>
             );

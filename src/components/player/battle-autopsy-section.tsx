@@ -18,6 +18,8 @@ import {
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSBattleLogEntry, BSPlayer } from '@/types/brawlstars';
 import { normalizeTag } from '@/lib/tags';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Loads everything the two autopsies need, then hands each its own inputs.
@@ -42,6 +44,7 @@ export async function BattleAutopsySection({
   brawlerMeta: Map<number, BABrawler>;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const t = getT(requestLocale());
   const [log, form] = await Promise.all([
     getBattleLog(tag)
       .then((r) => r.items)
@@ -129,8 +132,8 @@ export async function BattleAutopsySection({
   return (
     <section className="space-y-4">
       <SectionHeading
-        title="What went wrong"
-        subtitle="The last loss read against the map and the matchups, then the patterns across the whole log."
+        title={t('What went wrong')}
+        subtitle={t('The last loss read against the map and the matchups, then the patterns across the whole log.')}
       />
 
       {deep ? (

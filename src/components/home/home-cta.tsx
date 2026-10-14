@@ -3,6 +3,9 @@ import Link from 'next/link';
 
 import { TrophyIcon } from '@/components/game-icons';
 import { TagLocationHint } from '@/components/tag-location-hint';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Closing call to action.
@@ -16,6 +19,8 @@ import { TagLocationHint } from '@/components/tag-location-hint';
  * the footer directly beneath it. Same message, a fifth of the height.
  */
 export function HomeCta() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <section
       aria-labelledby="closing-cta"
@@ -36,23 +41,18 @@ export function HomeCta() {
             <TrophyIcon className="size-7" />
           </span>
           <div className="min-w-0">
-            <h2 id="closing-cta" className="display text-xl uppercase sm:text-2xl">
-              See where you stand
-            </h2>
-            <p className="mt-1 text-sm leading-relaxed text-muted">
-              Your tag is on your in-game profile, just below your profile icon.{' '}
+            <h2 id="closing-cta" className="display text-xl uppercase sm:text-2xl">{t('See where you stand')}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-muted">{t('Your tag is on your in-game profile, just below your profile icon.')}{' '}
               <TagLocationHint />
             </p>
           </div>
         </div>
 
         <Link
-          href="/#search"
+          href={lp('/#search')}
           className="btn-game inline-flex shrink-0 items-center justify-center gap-2.5 bg-brand px-6 py-3.5 text-base uppercase text-brand-ink hover:bg-brand-strong"
         >
-          <Search className="size-5" />
-          Search a player
-          <ArrowRight className="size-5" />
+          <Search className="size-5" />{t('Search a player')}<ArrowRight className="size-5" />
         </Link>
       </div>
     </section>

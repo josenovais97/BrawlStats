@@ -4,6 +4,8 @@ import { currentMonth } from '@/lib/site';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { isSupportedRegion, regionName } from '@/lib/regions';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /** The four rankings the page can show. */
 export type LeaderboardBoard = 'players' | 'clubs' | 'ranked' | 'cosmetics';
@@ -80,13 +82,13 @@ export function resolveLeaderboardRoute(
   if (!isLeaderboardBoard(board)) notFound();
 
   if (!second) {
-    if (board === DEFAULT_BOARD) permanentRedirect(leaderboardHref(board));
+    if (board === DEFAULT_BOARD) permanentRedirect(localePath(requestLocale(), leaderboardHref(board)));
     return { board, region: DEFAULT_REGION };
   }
 
   const region = second.toLowerCase();
   if (!BOARDS[board].regional || !isSupportedRegion(region)) notFound();
-  if (region === DEFAULT_REGION) permanentRedirect(leaderboardHref(board));
+  if (region === DEFAULT_REGION) permanentRedirect(localePath(requestLocale(), leaderboardHref(board)));
 
   return { board, region };
 }

@@ -6,6 +6,9 @@ import { draftWasTheProblem, type DraftAutopsy } from '@/lib/draft-autopsy';
 import { titleCase } from '@/lib/format';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One battle, explained as far as the data goes and no further.
@@ -30,6 +33,8 @@ export function DraftAutopsyCard({
   brawlerMeta: Map<number, BABrawler>;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const name = (id: number) => titleCase(brawlerMeta.get(id)?.name ?? `#${id}`);
   const art = (id: number) => brawlerMeta.get(id)?.imageUrl ?? brawlerIconUrl(id);
   const mode = modeLabel(modeMeta, autopsy.mode);
@@ -58,12 +63,12 @@ export function DraftAutopsyCard({
    */
   const headline =
     unclear || pct === null
-      ? 'Not enough sampled battles to judge this draft'
+      ? t('Not enough sampled battles to judge this draft')
       : pct >= 60
         ? `Your draft was ${pct}% to win this`
         : pct <= 40
           ? `Your draft was ${pct}% to win this`
-          : 'The drafts were close to even';
+          : t('The drafts were close to even');
 
   const accent = blamed ? 'var(--defeat)' : unclear ? 'var(--muted)' : 'var(--accent-2)';
 
@@ -73,13 +78,11 @@ export function DraftAutopsyCard({
 
       <div className="space-y-4 p-5">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
-            Last loss · {mode}
-            {autopsy.mapName ? (
+          <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>{t('Last loss · {mode}', { mode: mode })}{autopsy.mapName ? (
               <>
                 {' · '}
                 <Link
-                  href={`/maps/${slugify(mode)}/${slugify(autopsy.mapName)}`}
+                  href={lp(`/maps/${slugify(mode)}/${slugify(autopsy.mapName)}`)}
                   prefetch={false}
                   className="hover:underline"
                 >
@@ -88,12 +91,12 @@ export function DraftAutopsyCard({
               </>
             ) : null}
           </p>
-          <h3 className="mt-1 text-xl font-black leading-tight sm:text-2xl">{headline}</h3>
+          <h3 className="mt-1 text-xl font-black leading-tight sm:text-2xl">{t(headline)}</h3>
         </div>
 
         {/* The two drafts, side by side, because the comparison is the claim. */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-          <Side ids={autopsy.mine.brawlerIds} label="Yours" art={art} />
+          <Side ids={autopsy.mine.brawlerIds} label={t('Yours')} art={art} />
           {pct !== null ? (
             /* Both halves, because a lone "62%" invites the reader to wonder
                what the other side was. Two numbers that sum to 100 answer it
@@ -106,56 +109,42 @@ export function DraftAutopsyCard({
               >
                 {pct}%
               </span>
-              <span className="block text-[11px] leading-tight text-muted">
-                to win
-                <br />
-                <span className="tabular-nums">vs {100 - pct}%</span>
+              <span className="block text-[11px] leading-tight text-muted">{t('to win')}<br />
+                <span className="tabular-nums">{t('vs')}{' '}{100 - pct}%</span>
               </span>
             </p>
           ) : null}
-          <Side ids={autopsy.theirs.brawlerIds} label="Theirs" art={art} muted />
+          <Side ids={autopsy.theirs.brawlerIds} label={t('Theirs')} art={art} muted />
         </div>
 
         <ul className="space-y-1.5 text-sm leading-relaxed">
           {autopsy.worstMatchup ? (
             <Line>
-              <strong className="font-semibold">{name(autopsy.worstMatchup.brawlerId)}</strong> was
-              countered by{' '}
+              <strong className="font-semibold">{name(autopsy.worstMatchup.brawlerId)}</strong>{' '}{t('was countered by')}{' '}
               <Link
-                href={brawlerPath(
+                href={lp(brawlerPath(
                   autopsy.worstMatchup.againstId,
                   brawlerMeta.get(autopsy.worstMatchup.againstId)?.name ?? '',
-                )}
+                ))}
                 prefetch={false}
                 className="font-semibold transition-colors hover:text-brand"
               >
                 {name(autopsy.worstMatchup.againstId)}
-              </Link>{' '}
-              — {Math.abs(autopsy.worstMatchup.edge).toFixed(1)} points below its usual record,
-              over {autopsy.worstMatchup.battles.toLocaleString('en-US')} battles.
-            </Line>
+              </Link>{' '}{t('— {v} points below its usual record, over {v2} battles.', { v: Math.abs(autopsy.worstMatchup.edge).toFixed(1), v2: autopsy.worstMatchup.battles.toLocaleString('en-US') })}</Line>
           ) : null}
 
           {autopsy.keyEnemy ? (
-            <Line>
-              Their strongest pick here was{' '}
-              <strong className="font-semibold">{name(autopsy.keyEnemy.brawlerId)}</strong>, at{' '}
-              {autopsy.keyEnemy.edge >= 0 ? '+' : '−'}
-              {Math.abs(autopsy.keyEnemy.edge).toFixed(1)} points on this map.
-            </Line>
+            <Line>{t('Their strongest pick here was')}{' '}
+              <strong className="font-semibold">{name(autopsy.keyEnemy.brawlerId)}</strong>{t(', at')}{' '}
+              {autopsy.keyEnemy.edge >= 0 ? '+' : '−'}{t('{v} points on this map.', { v: Math.abs(autopsy.keyEnemy.edge).toFixed(1) })}</Line>
           ) : null}
 
           {autopsy.shape ? (
-            <Line>
-              Your shape —{' '}
+            <Line>{t('Your shape —')}{' '}
               <span className="font-semibold capitalize">
                 {autopsy.shape.roles.join(' + ').toLowerCase()}
-              </span>{' '}
-              — wins {(autopsy.shape.score * 100).toFixed(1)}% adjusted
-              {autopsy.shapeRank !== null && autopsy.shapeCount > 1 ? (
-                <>
-                  , {ordinal(autopsy.shapeRank)} of {autopsy.shapeCount} shapes
-                </>
+              </span>{' '}{t('— wins {v}% adjusted', { v: (autopsy.shape.score * 100).toFixed(1) })}{autopsy.shapeRank !== null && autopsy.shapeCount > 1 ? (
+                <>{t(', {shapeRank} of {shapeCount} shapes', { shapeRank: ordinal(autopsy.shapeRank), shapeCount: autopsy.shapeCount })}</>
               ) : null}
               . {/*
                 The best shape, because the reader cannot judge 49.1% without
@@ -163,35 +152,28 @@ export function DraftAutopsyCard({
                 strongest is yours" is a sentence that says nothing.
               */}
               {autopsy.bestShape && autopsy.shapeRank !== 1 ? (
-                <>
-                  The strongest is{' '}
+                <>{t('The strongest is')}{' '}
                   <span className="font-semibold capitalize">
                     {autopsy.bestShape.roles.join(' + ').toLowerCase()}
-                  </span>{' '}
-                  at {(autopsy.bestShape.score * 100).toFixed(1)}%.
-                </>
+                  </span>{' '}{t('at {v}%.', { v: (autopsy.bestShape.score * 100).toFixed(1) })}</>
               ) : (
-                <>Nothing measured beats it.</>
+                <>{t('Nothing measured beats it.')}</>
               )}
             </Line>
           ) : null}
 
           {autopsy.betterPick ? (
-            <Line>
-              From your own maxed roster,{' '}
+            <Line>{t('From your own maxed roster,')}{' '}
               <Link
-                href={brawlerPath(
+                href={lp(brawlerPath(
                   autopsy.betterPick.inId,
                   brawlerMeta.get(autopsy.betterPick.inId)?.name ?? '',
-                )}
+                ))}
                 prefetch={false}
                 className="font-semibold transition-colors hover:text-brand"
               >
                 {name(autopsy.betterPick.inId)}
-              </Link>{' '}
-              over <span className="font-semibold">{name(autopsy.betterPick.outId)}</span> would
-              have improved the draft most, by {autopsy.betterPick.gain.toFixed(1)} points.
-            </Line>
+              </Link>{' '}{t('over')}{' '}<span className="font-semibold">{name(autopsy.betterPick.outId)}</span>{' '}{t('would have improved the draft most, by {v} points.', { v: autopsy.betterPick.gain.toFixed(1) })}</Line>
           ) : null}
         </ul>
 
@@ -202,10 +184,10 @@ export function DraftAutopsyCard({
         */}
         <p className="border-t border-border pt-3 text-xs leading-relaxed text-muted">
           {unclear
-            ? 'Too few sampled battles on this map to compare the drafts. '
+            ? t('Too few sampled battles on this map to compare the drafts. ')
             : blamed
-              ? 'This explains the draft only. '
-              : 'The draft does not explain this loss. '}
+              ? t('This explains the draft only. ')
+              : t('The draft does not explain this loss. ')}
           {/*
             What the percentage is, said plainly.
 
@@ -214,17 +196,13 @@ export function DraftAutopsyCard({
             the chance the *draft* had, not the chance you had. Aim,
             positioning and gadget timing are not in the battle log and are not
             guessed at here.
-          */}
-          The percentage is the drafts compared:{' '}
+          */}{t('The percentage is the drafts compared:')}{' '}
           {autopsy.confidence === 'low'
-            ? 'mostly each side\u2019s overall Ranked form, because this map has too little data on these brawlers yet'
-            : 'each side\u2019s measured record on this map'}
-          , adjusted for how those brawlers fare against each other. It is the draft&apos;s
-          chance, not yours — aim, positioning and gadget timing are not in the battle log and
-          are not guessed at. Confidence:{' '}
+            ? t('mostly each side’s overall Ranked form, because this map has too little data on these brawlers yet')
+            : t('each side’s measured record on this map')}{t(', adjusted for how those brawlers fare against each other. It is the draft\'s chance, not yours — aim, positioning and gadget timing are not in the battle log and are not guessed at. Confidence:')}{' '}
           <span className="font-semibold">{autopsy.confidence}</span>
           {autopsy.supportingBattles > 0
-            ? `, from ${autopsy.supportingBattles.toLocaleString('en-US')} sampled battles on this map`
+            ? t(', from {v} sampled battles on this map', { v: autopsy.supportingBattles.toLocaleString('en-US') })
             : ''}
           .
         </p>
@@ -244,9 +222,10 @@ function Side({
   art: (id: number) => string;
   muted?: boolean;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="min-w-0">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t(label)}</p>
       <div className="mt-1 flex items-center gap-1.5">
         {ids.map((id) => (
           <Image

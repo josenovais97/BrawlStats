@@ -22,6 +22,8 @@ import type { BrawlerAbilityChoices, BrawlerBuffies } from '@/lib/stats';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
 import type { BSAccessory } from '@/types/brawlstars';
 import type { BrawlerBuild } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Everything a player unlocks, buys or equips, in one place.
@@ -79,6 +81,7 @@ export function BuildAndUpgrades({
   abilityChoices: BrawlerAbilityChoices | null;
   wiki?: BrawlerWiki | null;
 }) {
+  const t = getT(requestLocale());
   // Only a brawler whose owners are actually split has a first-buy preference
   // to show; otherwise the coin spend gets the full width to itself.
   const showChoices = hasAbilityChoices(abilityChoices);
@@ -108,8 +111,8 @@ export function BuildAndUpgrades({
   return (
     <section id="build" className="scroll-anchor">
       <SectionHeading
-        title="Build & upgrades"
-        subtitle={`What ${name}'s kit does, and what owners spend their coins on first.`}
+        title={t('Build & upgrades')}
+        subtitle={t('What {name}\'s kit does, and what owners spend their coins on first.', { name: name })}
       />
 
       <div className="space-y-4">
@@ -129,20 +132,11 @@ export function BuildAndUpgrades({
         <details className="group mb-4 text-sm text-muted">
           <summary className="flex cursor-pointer list-none items-center gap-2 leading-relaxed [&::-webkit-details-marker]:hidden">
             <span>
-              <strong className="font-semibold text-foreground">What owners bought</strong> and{' '}
-              <strong className="font-semibold text-foreground">how it has gone</strong> for them.
-            </span>
-            <span className="shrink-0 text-xs font-semibold text-brand group-open:hidden">
-              How to read this
-            </span>
+              <strong className="font-semibold text-foreground">{t('What owners bought')}</strong>{' '}{t('and')}{' '}
+              <strong className="font-semibold text-foreground">{t('how it has gone')}</strong>{' '}{t('for them.')}</span>
+            <span className="shrink-0 text-xs font-semibold text-brand group-open:hidden">{t('How to read this')}</span>
           </summary>
-          <p className="mt-2 leading-relaxed">
-            What owners bought is popularity — the game&apos;s API reports what a player has
-            unlocked, never what they took into a match. How it has gone is the win rate among
-            the players who made each choice, which covers the ability and the kind of player
-            who picks it together. Neither is a recommendation from us: BrawlZone does not rank{' '}
-            {name}&apos;s kit, and nothing here is an opinion about what you should buy.
-          </p>
+          <p className="mt-2 leading-relaxed">{t('What owners bought is popularity — the game\'s API reports what a player has unlocked, never what they took into a match. How it has gone is the win rate among the players who made each choice, which covers the ability and the kind of player who picks it together. Neither is a recommendation from us: BrawlZone does not rank')}{' '}{t('{name}\'s kit, and nothing here is an opinion about what you should buy.', { name: name })}</p>
         </details>
 
         {/* What other owners bought. First, because it is the part people
@@ -164,19 +158,19 @@ export function BuildAndUpgrades({
 
         <div className="grid items-start gap-4 lg:grid-cols-2">
           <AbilityCard
-            title="Star powers"
+            title={t('Star powers')}
             kind="starPower"
             icon={<StarPowerIcon className="size-5" />}
             items={starPowers}
-            emptyLabel="No star powers released."
+            emptyLabel={t('No star powers released.')}
             descriptionFor={describe}
           />
           <AbilityCard
-            title="Gadgets"
+            title={t('Gadgets')}
             kind="gadget"
             icon={<GadgetIcon className="size-5" />}
             items={gadgets}
-            emptyLabel="No gadgets released."
+            emptyLabel={t('No gadgets released.')}
             descriptionFor={describe}
             cooldownFor={cooldownOf}
           />
@@ -190,7 +184,7 @@ export function BuildAndUpgrades({
           <div className="grid items-start gap-4 lg:grid-cols-2">
             {hasHypercharge ? (
               <UpgradeCard
-                title="Hypercharge"
+                title={t('Hypercharge')}
                 kind="hypercharge"
                 icon={<HyperchargeIcon className="size-5" />}
               >
@@ -218,14 +212,11 @@ export function BuildAndUpgrades({
                       className="mt-1"
                       text={
                         hyperchargeDescription ??
-                        `Unlocked at Power 11. Charges from dealing and taking damage, then boosts ${name}'s speed, damage and shield for a few seconds.`
+                        t('Unlocked at Power 11. Charges from dealing and taking damage, then boosts {name}\'s speed, damage and shield for a few seconds.', { name: name })
                       }
                     />
                     {!hyperchargeDescription ? (
-                      <p className="mt-2 text-xs leading-relaxed text-muted/80">
-                        The exact boost percentages vary per brawler and are published
-                        neither by the game API nor by any artwork source.
-                      </p>
+                      <p className="mt-2 text-xs leading-relaxed text-muted/80">{t('The exact boost percentages vary per brawler and are published neither by the game API nor by any artwork source.')}</p>
                     ) : null}
                   </div>
                 </div>
@@ -234,7 +225,7 @@ export function BuildAndUpgrades({
 
             {hasBuffies ? (
               <UpgradeCard
-                title="Buffies"
+                title={t('Buffies')}
                 kind="buffie"
                 icon={<BuffieIcon className="size-5" />}
               >
@@ -262,16 +253,12 @@ export function BuildAndUpgrades({
                   </ul>
                 ) : (buffies?.none ?? true) ? (
                   <p className="p-4 text-sm text-muted">
-                    <span className="font-semibold text-foreground">Unreleased.</span>{' '}
-                    {name} has no buffies yet.
-                  </p>
+                    <span className="font-semibold text-foreground">{t('Unreleased.')}</span>{' '}{t('{name} has no buffies yet.', { name: name })}</p>
                 ) : (
                   /* Our own samples say buffies exist here, but the wiki has no
                      text for them. A brand-new release, most likely. */
                   <p className="p-4 text-sm text-muted">
-                    <span className="font-semibold text-foreground">Released.</span>{' '}
-                    {name} has buffies, but their effects have not been documented yet.
-                  </p>
+                    <span className="font-semibold text-foreground">{t('Released.')}</span>{' '}{t('{name} has buffies, but their effects have not been documented yet.', { name: name })}</p>
                 )}
               </UpgradeCard>
             ) : null}
@@ -280,7 +267,7 @@ export function BuildAndUpgrades({
 
         {gears.length > 0 ? (
           <UpgradeCard
-            title="Gears"
+            title={t('Gears')}
             kind="gear"
             icon={<GearIcon className="size-5" />}
             aside={`${gears.length} equippable`}
@@ -317,7 +304,7 @@ export function BuildAndUpgrades({
                           does, which left this list as six bare words. */}
                       {text ? (
                         <span className="mt-0.5 block text-xs leading-snug text-muted">
-                          {text}
+                          {t(text)}
                         </span>
                       ) : null}
                     </span>
@@ -346,6 +333,7 @@ function UpgradeCard({
   aside?: string;
   children: ReactNode;
 }) {
+  const t = getT(requestLocale());
   const { accent } = KIND[kind];
   return (
     <div className="card flex flex-col overflow-hidden">
@@ -360,7 +348,7 @@ function UpgradeCard({
         >
           {icon}
         </span>
-        <h3 className="display flex-1 text-lg uppercase leading-none">{title}</h3>
+        <h3 className="display flex-1 text-lg uppercase leading-none">{t(title)}</h3>
         {aside ? <span className="shrink-0 text-xs text-muted">{aside}</span> : null}
       </div>
       <div className="flex-1">{children}</div>
@@ -387,15 +375,16 @@ function AbilityCard({
   /** Gadgets only: the wiki records a cooldown, nothing else does. */
   cooldownFor?: (item: BAAccessory) => string | null;
 }) {
+  const t = getT(requestLocale());
   return (
     <UpgradeCard
-      title={title}
+      title={t(title)}
       kind={kind}
       icon={icon}
       aside={items.length > 0 ? `${items.length}` : undefined}
     >
       {items.length === 0 ? (
-        <p className="p-4 text-sm text-muted">{emptyLabel}</p>
+        <p className="p-4 text-sm text-muted">{t(emptyLabel)}</p>
       ) : (
         <ul className="divide-y divide-border">
           {items.map((item) => (
@@ -415,9 +404,7 @@ function AbilityCard({
                   {/* The cooldown decides whether a gadget is a habit or an
                       emergency button, and the game shows it nowhere. */}
                   {cooldownFor?.(item) ? (
-                    <span className="text-xs font-semibold normal-case text-muted">
-                      {cooldownFor(item)} cooldown
-                    </span>
+                    <span className="text-xs font-semibold normal-case text-muted">{t('{item} cooldown', { item: cooldownFor(item) })}</span>
                   ) : null}
                 </p>
                 {/* Descriptions run from eight words to sixty. Clamped past a

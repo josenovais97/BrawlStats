@@ -5,6 +5,8 @@ import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 import { formatNumber } from '@/lib/format';
 import { getIconCatalogue } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   title: 'Every Brawl Stars profile icon, ranked by how many players use it',
@@ -22,6 +24,7 @@ export const revalidate = 7200;
  * the share is simply the fraction of sampled players wearing one.
  */
 export default async function IconCataloguePage() {
+  const t = getT(requestLocale());
   const icons = await getIconCatalogue();
 
   return (
@@ -34,21 +37,19 @@ export default async function IconCataloguePage() {
       />
 
       <PageHeading
-        title="Profile icons"
-        eyebrow="Cosmetics"
+        title={t('Profile icons')}
+        eyebrow={t('Cosmetics')}
         subtitle={
           icons.length > 0
-            ? `${formatNumber(icons.length)} icons seen on sampled accounts, ranked by share of players.`
-            : 'No icon data has been sampled yet.'
+            ? t('{length} icons seen on sampled accounts, ranked by share of players.', { length: formatNumber(icons.length) })
+            : t('No icon data has been sampled yet.')
         }
       />
 
       {icons.length > 0 ? (
         <CosmeticList items={icons} kind="icon" />
       ) : (
-        <p className="card p-6 text-sm text-muted">
-          Nothing sampled yet. The pool refreshes every two hours.
-        </p>
+        <p className="card p-6 text-sm text-muted">{t('Nothing sampled yet. The pool refreshes every two hours.')}</p>
       )}
     </div>
   );

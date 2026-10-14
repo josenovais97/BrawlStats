@@ -8,6 +8,7 @@ import { Check, Link2, RotateCcw, Sparkles } from 'lucide-react';
 import { decodeBoard, decodeOrder, encodeBoard } from '@/lib/tier-board';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
+import { useT } from '@/components/i18n/use-t';
 
 export interface MakerBrawler {
   id: number;
@@ -59,6 +60,7 @@ const ROW_LABEL: Record<Tier, string> = {
 };
 
 export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
+  const tx = useT();
   /*
    * The shared board is read here rather than passed down from the page.
    *
@@ -179,7 +181,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
           className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-strong"
         >
           {copied ? <Check aria-hidden className="size-4" /> : <Link2 aria-hidden className="size-4" />}
-          {copied ? 'Link copied' : 'Copy share link'}
+          {copied ? tx('Link copied') : tx('Copy share link')}
         </button>
 
         <button
@@ -187,9 +189,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
           onClick={fromMeta}
           className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/60 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
         >
-          <Sparkles aria-hidden className="size-4" />
-          Start from the live meta
-        </button>
+          <Sparkles aria-hidden className="size-4" />{tx('Start from the live meta')}</button>
 
         <button
           type="button"
@@ -197,24 +197,19 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
           disabled={placedCount === 0}
           className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border px-3.5 text-sm font-semibold text-muted transition-colors enabled:hover:border-brand/50 enabled:hover:text-foreground disabled:cursor-not-allowed disabled:text-muted/40"
         >
-          <RotateCcw aria-hidden className="size-4" />
-          Clear
-        </button>
+          <RotateCcw aria-hidden className="size-4" />{tx('Clear')}</button>
 
         <p className="ml-auto text-xs text-muted">
           <span className="font-bold tabular-nums text-foreground">{placedCount}</span>
-          {' of '}
-          <span className="tabular-nums">{brawlers.length}</span> placed
-        </p>
+          {tx(' of ')}
+          <span className="tabular-nums">{brawlers.length}</span>{' '}{tx('placed')}</p>
       </div>
 
       {selected !== null ? (
         <p className="rounded-xl border border-brand/30 bg-brand/10 px-3.5 py-2.5 text-sm text-foreground">
           <span className="font-bold capitalize">
             {byId.get(selected)?.name.toLowerCase()}
-          </span>{' '}
-          selected — now tap a tier to place it.
-        </p>
+          </span>{' '}{tx('selected — now tap a tier to place it.')}</p>
       ) : null}
 
       <div className="overflow-hidden rounded-2xl border border-border">
@@ -231,8 +226,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
       </div>
 
       <div>
-        <p className="eyebrow mb-2.5">
-          Unranked{pool.length > 0 ? ` · ${pool.length}` : ''}
+        <p className="eyebrow mb-2.5">{tx('Unranked')}{pool.length > 0 ? ` · ${pool.length}` : ''}
         </p>
         <PoolArea
           brawlers={pool}
@@ -258,6 +252,7 @@ function TierRow({
   onSelect: (id: number | null) => void;
   onPlace: (id: number, tier: Slot) => void;
 }) {
+  const tx = useT();
   const [over, setOver] = useState(false);
   const color = TIER_COLOR[tier];
 
@@ -268,7 +263,7 @@ function TierRow({
       <button
         type="button"
         onClick={() => selected !== null && onPlace(selected, tier)}
-        aria-label={`Place the selected brawler in ${tier} tier`}
+        aria-label={tx('Place the selected brawler in {tier} tier', { tier: tier })}
         className="display grid w-14 shrink-0 place-items-center text-2xl transition-opacity sm:w-16 sm:text-3xl"
         style={{
           background: `color-mix(in srgb, ${color} 22%, transparent)`,
@@ -322,6 +317,7 @@ function PoolArea({
   onSelect: (id: number | null) => void;
   onPlace: (id: number, tier: Slot) => void;
 }) {
+  const tx = useT();
   const [over, setOver] = useState(false);
 
   return (
@@ -342,9 +338,7 @@ function PoolArea({
       }`}
     >
       {brawlers.length === 0 ? (
-        <p className="p-3 text-sm text-muted">
-          Every brawler is placed. Tap one in a row to send it back here.
-        </p>
+        <p className="p-3 text-sm text-muted">{tx('Every brawler is placed. Tap one in a row to send it back here.')}</p>
       ) : (
         brawlers.map((brawler) => (
           <Tile
@@ -371,6 +365,7 @@ function Tile({
   /** Present only for tiles already in a tier. */
   onReturn?: () => void;
 }) {
+  const tx = useT();
   return (
     <button
       type="button"
@@ -392,8 +387,8 @@ function Tile({
       }}
       title={
         onReturn
-          ? `${brawler.name}: tap to select, tap again to unrank`
-          : `${brawler.name}: tap to select, then tap a tier`
+          ? tx('{name}: tap to select, tap again to unrank', { name: brawler.name })
+          : tx('{name}: tap to select, then tap a tier', { name: brawler.name })
       }
       aria-pressed={selected}
       className={`relative size-12 shrink-0 overflow-hidden rounded-lg bg-surface-2 transition-transform sm:size-14 ${

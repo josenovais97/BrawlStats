@@ -12,6 +12,9 @@ import { comparePath } from '@/lib/compare';
 import { slugify } from '@/lib/slugs';
 import { getMetaIndex } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The compare tool, shared by the bare page and by a specific player pairing.
@@ -37,6 +40,8 @@ export async function CompareTool({
   tagA?: string;
   tagB?: string;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   // Withdrawn brawlers are not comparable options.
   const brawlers = (await getBrawlerCatalog()).current;
   const meta = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
@@ -66,14 +71,14 @@ export async function CompareTool({
       <JsonLd data={breadcrumbSchema([{ name: 'Compare', path: '/compare' }])} />
 
       <PageHeading
-        title="Compare"
-        subtitle="Two players or two brawlers, side by side. Player comparisons live entirely in the URL, so they are shareable and nothing is stored."
+        title={t('Compare')}
+        subtitle={t('Two players or two brawlers, side by side. Player comparisons live entirely in the URL, so they are shareable and nothing is stored.')}
       />
 
       <section>
         <SectionHeading
-          title="Compare players"
-          subtitle="Pick from the profiles you have looked up on this device, or type a tag. Works with or without the #."
+          title={t('Compare players')}
+          subtitle={t('Pick from the profiles you have looked up on this device, or type a tag. Works with or without the #.')}
         />
         <PlayerCompareForm initialA={tagA} initialB={tagB} />
       </section>
@@ -82,8 +87,8 @@ export async function CompareTool({
 
       <section>
         <SectionHeading
-          title="Compare brawlers"
-          subtitle="Win and pick rates, tier, where each performs best, and their head-to-head record."
+          title={t('Compare brawlers')}
+          subtitle={t('Win and pick rates, tier, where each performs best, and their head-to-head record.')}
         />
         <ComparePicker brawlers={options} />
       </section>
@@ -91,18 +96,18 @@ export async function CompareTool({
       {suggestions.length > 0 ? (
         <section>
           <SectionHeading
-            title="Comparisons worth making"
-            subtitle="Drawn from the current top of the Ranked tier list, so it follows the meta rather than a fixed list."
+            title={t('Comparisons worth making')}
+            subtitle={t('Drawn from the current top of the Ranked tier list, so it follows the meta rather than a fixed list.')}
           />
           <ul className="grid gap-2 sm:grid-cols-2">
             {suggestions.map(([a, b]) => (
               <li key={`${a.id}-${b.id}`}>
                 <Link
-                  href={comparePath(a, b)}
+                  href={lp(comparePath(a, b))}
                   className="card card-interactive flex items-center justify-center gap-3 px-4 py-3 text-sm font-semibold capitalize"
                 >
                   {a.name.toLowerCase()}
-                  <span className="text-xs font-black uppercase text-muted">vs</span>
+                  <span className="text-xs font-black uppercase text-muted">{t('vs')}</span>
                   {b.name.toLowerCase()}
                 </Link>
               </li>

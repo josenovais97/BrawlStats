@@ -16,6 +16,9 @@ import {
 } from '@/components/game-icons';
 import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { TIER_COLOR } from '@/lib/tiers';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The tools, weighted.
@@ -92,6 +95,8 @@ const SECONDARY = [
 ];
 
 export async function HomeTools() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const top = await getTopMetaBrawlers(3).catch(() => []);
 
   return (
@@ -100,23 +105,21 @@ export async function HomeTools() {
         <div className="min-w-0">
           <p className="flex items-center gap-2.5">
             <span aria-hidden className="rule h-4" />
-            <span className="eyebrow">Everything else</span>
+            <span className="eyebrow">{t('Everything else')}</span>
           </p>
-          <h2 id="tools" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
-            Tools
-          </h2>
+          <h2 id="tools" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{t('Tools')}</h2>
         </div>
-        <p className="text-sm text-muted">All of it from our own sampled battles.</p>
+        <p className="text-sm text-muted">{t('All of it from our own sampled battles.')}</p>
       </div>
 
       {/* Two featured, then four compact. The proportions are the hierarchy. */}
       <div className="reveal-row grid gap-4 md:grid-cols-2">
         <Featured
-          href="/tier-list/ranked"
+          href={lp('/tier-list/ranked')}
           icon={<TierListIcon className="size-6" />}
-          title="Tier lists"
-          body="Ranked and trophy ladder scored separately. They are different games, and the answers differ."
-          cta="Open the Ranked list"
+          title={t('Tier lists')}
+          body={t('Ranked and trophy ladder scored separately. They are different games, and the answers differ.')}
+          cta={t('Open the Ranked list')}
         >
           {top.length > 0 ? (
             <ul className="flex gap-2">
@@ -150,18 +153,18 @@ export async function HomeTools() {
         </Featured>
 
         <Featured
-          href="/draft"
+          href={lp('/draft')}
           icon={<DraftIcon className="size-6" />}
-          title="Draft helper"
-          body="Pick the map, name what the enemy took, and the list reorders around both."
-          cta="Open the draft helper"
+          title={t('Draft helper')}
+          body={t('Pick the map, name what the enemy took, and the list reorders around both.')}
+          cta={t('Open the draft helper')}
         >
           {/* The tool's own shape: your side, their side, and the gap you are
               filling. No match data, because none of it would be real. */}
           <div className="flex items-center gap-2">
-            <Slots label="Your team" tone="var(--accent-2)" filled={2} />
-            <span className="display shrink-0 text-xs uppercase text-muted">vs</span>
-            <Slots label="Enemy" tone="var(--defeat)" filled={3} />
+            <Slots label={t('Your team')} tone="var(--accent-2)" filled={2} />
+            <span className="display shrink-0 text-xs uppercase text-muted">{t('vs')}</span>
+            <Slots label={t('Enemy')} tone="var(--defeat)" filled={3} />
           </div>
         </Featured>
       </div>
@@ -183,7 +186,7 @@ export async function HomeTools() {
               tools once each one has a lit tile and room to breathe.
             */}
             <Link
-              href={href}
+              href={lp(href)}
               // One of a list: prefetching each would burst past the rate limit -- see site-footer.
               prefetch={false}
               className="group flex h-full items-center gap-3 p-3.5 transition-colors hover:bg-surface-2 lg:flex-col lg:items-start lg:gap-2.5 lg:p-4"
@@ -193,10 +196,10 @@ export async function HomeTools() {
               </span>
               <span className="min-w-0 flex-1 lg:flex-none">
                 <span className="block truncate text-sm font-bold leading-tight transition-colors group-hover:text-brand">
-                  {title}
+                  {t(title)}
                 </span>
                 <span className="mt-0.5 block truncate text-xs text-muted lg:whitespace-normal">
-                  {body}
+                  {t(body)}
                 </span>
               </span>
             </Link>
@@ -223,9 +226,11 @@ function Featured({
   cta: string;
   children: React.ReactNode;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <Link
-      href={href}
+      href={lp(href)}
       // One of a list: prefetching each would burst past the rate limit -- see site-footer.
       prefetch={false}
       className="card card-interactive group flex flex-col gap-4 p-5 hover:bg-surface-2/30"
@@ -235,15 +240,15 @@ function Featured({
           {icon}
         </span>
         <div className="min-w-0">
-          <h3 className="display text-lg uppercase leading-none">{title}</h3>
-          <p className="mt-1.5 text-sm leading-snug text-muted">{body}</p>
+          <h3 className="display text-lg uppercase leading-none">{t(title)}</h3>
+          <p className="mt-1.5 text-sm leading-snug text-muted">{t(body)}</p>
         </div>
       </div>
 
       <div className="flex-1">{children}</div>
 
       <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted transition-colors group-hover:text-brand">
-        {cta}
+        {t(cta)}
         <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
       </span>
     </Link>
@@ -252,10 +257,11 @@ function Featured({
 
 /** Three draft slots, some taken. Shape only — no brawlers are named. */
 function Slots({ label, tone, filled }: { label: string; tone: string; filled: number }) {
+  const t = getT(requestLocale());
   return (
     <span className="min-w-0 flex-1">
       <span className="block text-xs font-semibold uppercase tracking-wide text-muted">
-        {label}
+        {t(label)}
       </span>
       <span aria-hidden className="mt-1.5 flex gap-1.5">
         {[0, 1, 2].map((slot) => (

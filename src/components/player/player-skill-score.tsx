@@ -4,6 +4,9 @@ import { Power11Icon } from '@/components/game-icons';
 import Link from 'next/link';
 
 import type { AccountFlag, SkillScore } from '@/lib/skill-score';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The Skill Score panel: one number, its four inputs, and any flag on the
@@ -54,6 +57,8 @@ function toneFor(score: number): string {
 }
 
 export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const tone = toneFor(skill.score);
   const flag = skill.flag;
   const FlagIcon = flag ? FLAG_STYLE[flag.kind].icon : null;
@@ -116,9 +121,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
               >
                 {skill.tier}
               </span>
-              <span className="mt-0.5 text-[10px] uppercase tracking-wider text-muted">
-                Skill score
-              </span>
+              <span className="mt-0.5 text-[10px] uppercase tracking-wider text-muted">{t('Skill score')}</span>
             </div>
           </div>
 
@@ -141,14 +144,14 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
             {skill.components.map((component) => (
               <div key={component.key}>
                 <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
-                  <span className="font-medium">{component.label}</span>
-                  <span className="truncate text-xs text-muted">{component.detail}</span>
+                  <span className="font-medium">{t(component.label)}</span>
+                  <span className="truncate text-xs text-muted">{t(component.detail)}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div
                     className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2"
                     role="progressbar"
-                    aria-label={component.label}
+                    aria-label={t(component.label)}
                     aria-valuenow={Math.round(component.value * 100)}
                     aria-valuemin={0}
                     aria-valuemax={100}
@@ -175,26 +178,17 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
         <p className="mt-6 flex items-start gap-2.5 rounded-xl border border-border/70 bg-surface-2/50 px-4 py-3 text-sm leading-relaxed">
           <FlagIcon className={`mt-0.5 size-4 shrink-0 ${FLAG_STYLE[flag.kind].tone}`} />
           <span>
-            <strong className="font-semibold">{flag.label}.</strong>{' '}
-            <span className="text-muted">{flag.detail}</span>
+            <strong className="font-semibold">{t(flag.label)}.</strong>{' '}
+            <span className="text-muted">{t(flag.detail)}</span>
           </span>
         </p>
       ) : null}
 
-      <p className="mt-5 text-xs leading-relaxed text-muted">
-          Weighted toward{' '}
-          <Link href="/leaderboard" className="font-medium text-brand hover:underline">
-            Ranked
-          </Link>
-          , the only mode where matchmaking pairs comparable opponents, so the score
-          reflects how the account plays rather than how much has been poured into it.
-          Progression is capped at 15% for that reason.
-          {skill.rankedUnavailable
-            ? ` This account has no Ranked elo on record, so that weight is spread across the rest${
-                skill.capped
+      <p className="mt-5 text-xs leading-relaxed text-muted">{t('Weighted toward')}{' '}
+          <Link href={lp('/leaderboard')} className="font-medium text-brand hover:underline">{t('Ranked')}</Link>{t(', the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.')}{skill.rankedUnavailable
+            ? t(' This account has no Ranked elo on record, so that weight is spread across the rest{v}.', { v: skill.capped
                   ? ' and the score is held at 6.5. Without a Ranked record there is nothing here that can certify more'
-                  : ''
-              }.`
+                  : '' })
             : ''}
       </p>
           </div>

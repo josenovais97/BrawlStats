@@ -8,6 +8,9 @@ import { formatNumber, titleCase } from '@/lib/format';
 import type { RosterPlan } from '@/lib/roster-optimizer';
 import { brawlerPath } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
+import { andList, getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One spend, and what it buys.
@@ -28,14 +31,16 @@ export function PlayerRosterPlan({
   plan: RosterPlan;
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { steps, totalCoins, modes, coveredBefore, coveredAfter, banSafeAfter } = plan;
   const gained = coveredAfter - coveredBefore;
 
   return (
     <Panel
       id="upgrade-next"
-      title="What to upgrade next"
-      subtitle="The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns."
+      title={t('What to upgrade next')}
+      subtitle={t('The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns.')}
       bodyClassName=""
     >
       <div className="relative scroll-anchor-nav">
@@ -47,30 +52,23 @@ export function PlayerRosterPlan({
               <CoinIcon className="size-6" />
               {formatNumber(totalCoins)}
             </p>
-            <p className="text-sm text-muted">
-              to upgrade{' '}
+            <p className="text-sm text-muted">{t('to upgrade')}{' '}
               <span className="font-semibold capitalize text-foreground">
                 {steps.map((step) => titleCase(step.name)).join(', ')}
               </span>
             </p>
           </div>
 
-          <p className="text-sm leading-relaxed">
-            Ranked coverage goes from{' '}
+          <p className="text-sm leading-relaxed">{t('Ranked coverage goes from')}{' '}
             <span className="font-bold tabular-nums">
               {coveredBefore}/{modes}
-            </span>{' '}
-            to{' '}
+            </span>{' '}{t('to')}{' '}
             <span className="font-bold tabular-nums text-victory">
               {coveredAfter}/{modes}
-            </span>{' '}
-            modes
-            {gained > 0 ? '' : ' (already covered)'}
+            </span>{' '}{t('modes')}{gained > 0 ? '' : t(' (already covered)')}
             {banSafeAfter > 0 ? (
-              <>
-                , with a second pick spare in{' '}
-                <span className="font-bold tabular-nums">{banSafeAfter}</span> of them
-              </>
+              <>{t(', with a second pick spare in')}{' '}
+                <span className="font-bold tabular-nums">{banSafeAfter}</span>{' '}{t('of them')}</>
             ) : null}
             .
           </p>
@@ -82,7 +80,7 @@ export function PlayerRosterPlan({
                   {index + 1}
                 </span>
                 <Link
-                  href={brawlerPath(step.brawlerId, step.name)}
+                  href={lp(brawlerPath(step.brawlerId, step.name))}
                   prefetch={false}
                   className="shrink-0"
                 >
@@ -103,10 +101,10 @@ export function PlayerRosterPlan({
                     {/* Every step says what it bought, so the order can be
                         checked rather than taken on faith. */}
                     {step.covers.length > 0
-                      ? `Covers ${step.covers.join(' and ')}`
+                      ? t('Covers {v}', { v: andList(step.covers) })
                       : step.secures.length > 0
-                        ? `Second pick in ${step.secures.join(' and ')}`
-                        : 'Strengthens the rotation'}
+                        ? t('Second pick in {v}', { v: andList(step.secures) })
+                        : t('Strengthens the rotation')}
                   </span>
                 </span>
 
@@ -114,19 +112,13 @@ export function PlayerRosterPlan({
                   <span className="block text-sm font-bold tabular-nums">
                     {formatNumber(step.coins)}
                   </span>
-                  <span className="block text-[11px] text-muted">
-                    power {step.power} → 11
-                  </span>
+                  <span className="block text-[11px] text-muted">{t('power {power} → 11', { power: step.power })}</span>
                 </span>
               </li>
             ))}
           </ol>
 
-          <p className="text-xs leading-relaxed text-muted">
-            Coverage means owning a top-3 pick at power 9 or above in a mode that is live right
-            now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you
-            can make today, so every step here is one you could start immediately.
-          </p>
+          <p className="text-xs leading-relaxed text-muted">{t('Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.')}</p>
         </div>
       </div>
     </Panel>

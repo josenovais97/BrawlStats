@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import type { PlayerSide } from '@/lib/player-compare';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The two accounts as a race rather than a table.
@@ -27,6 +29,7 @@ function nextMilestone(leader: number): number {
 }
 
 export function RivalRace({ a, b }: { a: PlayerSide; b: PlayerSide }) {
+  const t = getT(requestLocale());
   const leader = a.player.trophies >= b.player.trophies ? a : b;
   const chaser = leader === a ? b : a;
   const target = nextMilestone(leader.player.trophies);
@@ -37,15 +40,15 @@ export function RivalRace({ a, b }: { a: PlayerSide; b: PlayerSide }) {
       <div>
         <p className="flex items-center gap-2.5">
           <span aria-hidden className="rule h-4" />
-          <span className="eyebrow text-accent">Race to {formatNumber(target)}</span>
+          <span className="eyebrow text-accent">{t('Race to')}{' '}{formatNumber(target)}</span>
         </p>
         <h2 className="display mt-2 text-2xl uppercase">
-          {gap === 0 ? 'Dead level' : `${leader.player.name} leads by ${formatNumber(gap)}`}
+          {gap === 0 ? t('Dead level') : t('{name} leads by {gap}', { name: leader.player.name, gap: formatNumber(gap) })}
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
           {gap === 0
-            ? 'Both accounts are on exactly the same trophy count.'
-            : `${formatNumber(target - leader.player.trophies)} to go for the leader. Reload after either of you plays — this reads both profiles live.`}
+            ? t('Both accounts are on exactly the same trophy count.')
+            : t('{v} to go for the leader. Reload after either of you plays — this reads both profiles live.', { v: formatNumber(target - leader.player.trophies) })}
         </p>
       </div>
 
@@ -59,6 +62,7 @@ export function RivalRace({ a, b }: { a: PlayerSide; b: PlayerSide }) {
 }
 
 function Lane({ side, target }: { side: PlayerSide; target: number }) {
+  const t = getT(requestLocale());
   const share = Math.max(0, Math.min(1, side.player.trophies / target));
 
   return (
@@ -86,9 +90,7 @@ function Lane({ side, target }: { side: PlayerSide; target: number }) {
           style={{ width: `${(share * 100).toFixed(2)}%` }}
         />
       </div>
-      <p className="mt-1 text-xs tabular-nums text-muted">
-        {formatNumber(Math.max(0, target - side.player.trophies))} to go
-      </p>
+      <p className="mt-1 text-xs tabular-nums text-muted">{t('{v} to go', { v: formatNumber(Math.max(0, target - side.player.trophies)) })}</p>
     </div>
   );
 }

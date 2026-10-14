@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 
 import { ClubIcon, PlayersIcon } from '@/components/game-icons';
+import { useLocale } from '@/components/i18n/use-locale';
+import { useT } from '@/components/i18n/use-t';
+import { localePath } from '@/lib/i18n';
 import {
   clearFavorites,
   readFavorites,
@@ -18,6 +21,8 @@ import {
  * empty, so the homepage does not show a hollow section to first-time users.
  */
 export function FavoritesList() {
+  const t = useT();
+  const locale = useLocale();
   const entries = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -35,7 +40,7 @@ export function FavoritesList() {
             id="saved-profiles"
             className="display mt-2.5 text-2xl uppercase sm:text-3xl"
           >
-            Saved profiles
+            {t('Saved profiles')}
           </h2>
         </div>
         <button
@@ -43,7 +48,7 @@ export function FavoritesList() {
           onClick={clearFavorites}
           className="shrink-0 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-muted transition-colors hover:border-defeat/50 hover:text-foreground"
         >
-          Clear all
+          {t('Clear all')}
         </button>
       </div>
 
@@ -53,7 +58,7 @@ export function FavoritesList() {
           return (
             <li key={`${entry.kind}:${entry.tag}`} className="group relative">
               <Link
-                href={`/${entry.kind}/${entry.tag}`}
+                href={localePath(locale, `/${entry.kind}/${entry.tag}`)}
                 className="card card-interactive flex items-center gap-3 p-3 pr-10"
               >
                 <span
@@ -76,7 +81,7 @@ export function FavoritesList() {
 
               <button
                 type="button"
-                aria-label={`Remove ${entry.name || entry.tag} from favourites`}
+                aria-label={t('Remove {name} from favourites', { name: entry.name || entry.tag })}
                 onClick={() => removeFavorite(entry.kind, entry.tag)}
                 className="absolute right-2 top-2 grid size-6 place-items-center rounded-md text-muted opacity-0 transition-opacity hover:bg-surface-2 hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
               >

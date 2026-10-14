@@ -5,6 +5,7 @@ import { bubbleLang } from '@/lib/bubble-langs';
 import { humanizeMode, titleCase } from '@/lib/format';
 import { nameKey } from '@/lib/game-l10n';
 import type { Locale } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Mode and map names in the game's own words for a translated page.
@@ -43,4 +44,23 @@ export async function gameWords(locale: Locale): Promise<GameWords> {
     mode: (m) => calm(names[nameKey(humanizeMode(m))] ?? humanizeMode(m), lang?.code ?? locale),
     map: (n) => calm(names[nameKey(n)] ?? titleCase(n), lang?.code ?? locale),
   };
+}
+
+/**
+ * Map names for the page being rendered: unchanged in English (each page
+ * already has the name the way it wants it), the game's own name otherwise.
+ */
+export async function mapNamer(): Promise<(name: string) => string> {
+  const locale = requestLocale();
+  if (locale === 'en') return (name) => name;
+  const words = await gameWords(locale);
+  return words.map;
+}
+
+/** Mode names likewise: unchanged in English, the game's own name otherwise. */
+export async function modeNamer(): Promise<(name: string) => string> {
+  const locale = requestLocale();
+  if (locale === 'en') return (name) => name;
+  const words = await gameWords(locale);
+  return words.mode;
 }

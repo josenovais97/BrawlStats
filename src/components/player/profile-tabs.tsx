@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useT } from '@/components/i18n/use-t';
 
 export interface ProfileTab {
   id: string;
@@ -32,6 +33,7 @@ export interface ProfileTab {
  * back button with five entries of it is not navigation.
  */
 export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
+  const tx = useT();
   const [active, setActive] = useState(tabs[0]?.id);
   const strip = useRef<HTMLDivElement>(null);
 
@@ -95,7 +97,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
       <div
         ref={strip}
         role="tablist"
-        aria-label="Profile sections"
+        aria-label={tx('Profile sections')}
         className="profile-tabs sticky top-16 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
       >
         {tabs.map((tab) => {
@@ -114,7 +116,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
                   : 'text-muted hover:bg-surface-2 hover:text-foreground'
               }`}
             >
-              {tab.label}
+              {tx(tab.label)}
             </button>
           );
         })}
@@ -125,7 +127,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
           key={tab.id}
           id={`panel-${tab.id}`}
           role="tabpanel"
-          aria-label={tab.label}
+          aria-label={tx(tab.label)}
           hidden={tab.id !== active}
           className="space-y-10"
         >

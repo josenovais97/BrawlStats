@@ -13,6 +13,9 @@ import { SAMPLE_PLAYER_TAG } from '@/lib/site';
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The flagship section: what BrawlZone actually does with a tag.
@@ -30,19 +33,16 @@ import { playerLinkRel } from '@/lib/link-rel';
  * button opens a real one.
  */
 export async function HomeAccountPreview() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const top = await getTopMetaBrawlers(4).catch(() => []);
 
   return (
     <section className="reveal" aria-labelledby="account-preview">
       <div className="mb-6 max-w-2xl">
-        <p className="eyebrow text-accent">After you search</p>
-        <h2 id="account-preview" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
-          Your account, explained
-        </h2>
-        <p className="mt-3 leading-relaxed text-muted">
-          A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads
-          yours against every player we sample and tells you what it means.
-        </p>
+        <p className="eyebrow text-accent">{t('After you search')}</p>
+        <h2 id="account-preview" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{t('Your account, explained')}</h2>
+        <p className="mt-3 leading-relaxed text-muted">{t('A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads yours against every player we sample and tells you what it means.')}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
@@ -54,50 +54,41 @@ export async function HomeAccountPreview() {
               #
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold">Your tag</p>
-              <p className="truncate text-xs text-muted">
-                Trophies, club, level and Ranked tier
-              </p>
+              <p className="truncate text-sm font-bold">{t('Your tag')}</p>
+              <p className="truncate text-xs text-muted">{t('Trophies, club, level and Ranked tier')}</p>
             </div>
-            <span className="hidden shrink-0 rounded-lg bg-surface-3 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-muted sm:block">
-              Live
-            </span>
+            <span className="hidden shrink-0 rounded-lg bg-surface-3 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-muted sm:block">{t('Live')}</span>
           </div>
 
           <div className="grid gap-px bg-border sm:grid-cols-2">
             <Module
               icon={<TrophyIcon className="size-5" />}
-              title="Skill score"
-              body="Out of 10, weighted toward Ranked — how you play, not how long you have played."
+              title={t('Skill score')}
+              body={t('Out of 10, weighted toward Ranked — how you play, not how long you have played.')}
             />
             <Module
               icon={<Power11Icon className="size-5" />}
-              title="Progression"
-              body="Account completion, coins invested, and what finishing the rest would cost."
+              title={t('Progression')}
+              body={t('Account completion, coins invested, and what finishing the rest would cost.')}
             />
 
             {/* The one module with real data in it: the live top of the meta,
                 which is exactly what a roster gets scored against. */}
             <div className="bg-surface p-4 sm:col-span-2 sm:p-5">
               <p className="flex items-center gap-2 text-sm font-bold">
-                <span aria-hidden className="rule" />
-                Roster vs the meta
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Every brawler you own, tiered against the list below. Your strong picks,
-                and the ones you are missing.
-              </p>
+                <span aria-hidden className="rule" />{t('Roster vs the meta')}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">{t('Every brawler you own, tiered against the list below. Your strong picks, and the ones you are missing.')}</p>
 
               {top.length > 0 ? (
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {top.map((brawler) => (
                     <li key={brawler.brawlerId}>
                       <Link
-                        href={brawlerPath(brawler.brawlerId, brawler.name)}
+                        href={lp(brawlerPath(brawler.brawlerId, brawler.name))}
                         // One of a list: prefetching each would burst past the rate limit -- see site-footer.
                         prefetch={false}
                         className="flex items-center gap-2 rounded-xl border border-border bg-surface-2/60 py-1 pl-1 pr-2.5 transition-colors hover:border-brand/50"
-                        title={`${brawler.name}: meta score ${brawler.score.toFixed(1)}`}
+                        title={t('{name}: meta score {v}', { name: brawler.name, v: brawler.score.toFixed(1) })}
                       >
                         <Image
                           src={brawler.imageUrl}
@@ -126,13 +117,13 @@ export async function HomeAccountPreview() {
 
             <Module
               icon={<HyperchargeIcon className="size-5" />}
-              title="Upgraded but not maxed"
-              body="Hypercharges stranded below power 11, cheapest to finish first."
+              title={t('Upgraded but not maxed')}
+              body={t('Hypercharges stranded below power 11, cheapest to finish first.')}
             />
             <Module
               icon={<BattlesIcon className="size-5" />}
-              title="Recent battles"
-              body="Your last matches, the maps, and who you keep running into."
+              title={t('Recent battles')}
+              body={t('Your last matches, the maps, and who you keep running into.')}
             />
           </div>
         </div>
@@ -151,9 +142,9 @@ export async function HomeAccountPreview() {
                   {index + 1}
                 </span>
                 <span className="min-w-0">
-                  <span className="block font-bold leading-tight">{title}</span>
+                  <span className="block font-bold leading-tight">{t(title)}</span>
                   <span className="mt-1 block text-sm leading-relaxed text-muted">
-                    {body}
+                    {t(body)}
                   </span>
                 </span>
               </li>
@@ -161,12 +152,10 @@ export async function HomeAccountPreview() {
           </ol>
 
           <Link
-            href={`/player/${SAMPLE_PLAYER_TAG}`}
+            href={lp(`/player/${SAMPLE_PLAYER_TAG}`)}
             rel={playerLinkRel(SAMPLE_PLAYER_TAG)}
             className="group mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border-strong/70 bg-surface px-4 text-sm font-bold transition-colors hover:border-brand/60 hover:text-brand"
-          >
-            See a complete example
-            <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
+          >{t('See a complete example')}<ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
           </Link>
         </div>
       </div>
@@ -184,15 +173,16 @@ function Module({
   title: string;
   body: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="bg-surface p-4 sm:p-5">
       <p className="flex items-center gap-2.5">
         <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-surface-2">
           {icon}
         </span>
-        <span className="text-sm font-bold">{title}</span>
+        <span className="text-sm font-bold">{t(title)}</span>
       </p>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{t(body)}</p>
     </div>
   );
 }

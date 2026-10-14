@@ -4,6 +4,8 @@ import { Panel } from '@/components/ui/panel';
 import { formatNumber } from '@/lib/format';
 import type { TrophyPoint } from '@/lib/stats';
 import { trophyCurve } from '@/lib/trophy-curve';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * What a player has actually done lately, read off the recorded history: one
@@ -26,6 +28,7 @@ export function PlayerProgress({
 }: {
   points: TrophyPoint[];
 }) {
+  const t = getT(requestLocale());
   const trophies = readTrack(points);
   const ranked = readTrack(
     points
@@ -37,8 +40,8 @@ export function PlayerProgress({
 
   return (
     <Panel
-      title="Recent progress"
-      subtitle="Trophies and Ranked, from the points recorded on each profile view."
+      title={t('Recent progress')}
+      subtitle={t('Trophies and Ranked, from the points recorded on each profile view.')}
     >
       {/* Stacked, Trophies over Ranked, with a rule between: two halves of one
           reading rather than two panels competing side by side. */}
@@ -50,10 +53,7 @@ export function PlayerProgress({
       {/* The caveat the history always needs: it is only as dense as the
           times someone opened this profile, which keeps "tracked 2 days"
           from reading as "played 2 days". */}
-      <p className="mt-5 text-xs text-muted">
-        One point per day, recorded when this profile is viewed, so it covers the days someone
-        checked rather than every day played.
-      </p>
+      <p className="mt-5 text-xs text-muted">{t('One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.')}</p>
     </Panel>
   );
 }
@@ -116,6 +116,7 @@ const KINDS = {
 } as const;
 
 function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) {
+  const t = getT(requestLocale());
   const k = KINDS[kind];
   const { last, week, month, best, curve, overall, tracked } = track;
   const gradient = `progress-fill-${kind}`;
@@ -125,14 +126,13 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
       <div className="mb-3 flex items-center justify-between gap-3">
         <h3 className={`flex items-center gap-2 text-sm font-black uppercase tracking-wide ${k.tone}`}>
           {k.icon('size-6')}
-          {k.title}
+          {t(k.title)}
         </h3>
-        <p className="text-sm tabular-nums text-muted">
-          Now{' '}
+        <p className="text-sm tabular-nums text-muted">{t('Now')}{' '}
           <strong className="text-lg font-black text-foreground">
             {formatNumber(last.trophies)}
           </strong>
-          {k.unit}
+          {t(k.unit)}
         </p>
       </div>
 
@@ -143,7 +143,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
             preserveAspectRatio="none"
             className="h-24 w-full sm:h-32"
             role="img"
-            aria-label={`${k.title} history over ${curve.days} days, from ${formatNumber(curve.low)} to ${formatNumber(curve.high)}`}
+            aria-label={t('{title} history over {days} days, from {low} to {high}', { title: k.title, days: curve.days, low: formatNumber(curve.low), high: formatNumber(curve.high) })}
           >
             <defs>
               <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
@@ -167,9 +167,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
           </svg>
           <figcaption className="mt-1.5 flex justify-between text-xs tabular-nums text-muted">
             <span>{formatNumber(curve.low)}</span>
-            <span>
-              {curve.points} views over {curve.days} days
-            </span>
+            <span>{t('{points} views over {days} days', { points: curve.points, days: curve.days })}</span>
             <span>{formatNumber(curve.high)}</span>
           </figcaption>
         </figure>
@@ -179,7 +177,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
         {week ? (
           <Figure
             node={k.gain('size-4')}
-            label={`Last ${week.days} days`}
+            label={t('Last {days} days', { days: week.days })}
             value={signed(week.change)}
             hint={`${formatNumber(week.from)} → ${formatNumber(week.to)}`}
             tone={week.change >= 0 ? 'text-victory' : 'text-defeat'}
@@ -188,7 +186,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
         {month ? (
           <Figure
             node={k.gain('size-4')}
-            label={`Last ${month.days} days`}
+            label={t('Last {days} days', { days: month.days })}
             value={signed(month.change)}
             hint={`${formatNumber(month.from)} → ${formatNumber(month.to)}`}
             tone={month.change >= 0 ? 'text-victory' : 'text-defeat'}
@@ -197,7 +195,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
         {best ? (
           <Figure
             node={k.gain('size-4')}
-            label="Best tracked day"
+            label={t('Best tracked day')}
             value={signed(best.change)}
             hint={best.date}
             tone={k.tone}
@@ -205,17 +203,14 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
         ) : null}
       </dl>
 
-      <p className="mt-3 text-sm text-muted">
-        Tracked {tracked} {tracked === 1 ? 'day' : 'days'} &middot;{' '}
+      <p className="mt-3 text-sm text-muted">{t('Tracked {tracked}', { tracked: tracked })}{' '}{tracked === 1 ? t('day') : t('days')} &middot;{' '}
         <strong
           className={`font-semibold tabular-nums ${
             overall > 0 ? 'text-victory' : overall < 0 ? 'text-defeat' : 'text-foreground'
           }`}
         >
           {signed(overall)}
-        </strong>
-        {k.unit} overall
-      </p>
+        </strong>{t('{unit} overall', { unit: k.unit })}</p>
     </section>
   );
 }
@@ -294,18 +289,19 @@ function Figure({
   hint: string;
   tone: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="min-w-0">
       <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
         <span aria-hidden className={`flex shrink-0 items-center ${tone}`}>
           {node}
         </span>
-        <span className="truncate">{label}</span>
+        <span className="truncate">{t(label)}</span>
       </dt>
       <dd className={`mt-1.5 truncate text-xl font-bold tabular-nums leading-none ${tone}`}>
         {value}
       </dd>
-      <dd className="mt-1 truncate text-xs text-muted">{hint}</dd>
+      <dd className="mt-1 truncate text-xs text-muted">{t(hint)}</dd>
     </div>
   );
 }

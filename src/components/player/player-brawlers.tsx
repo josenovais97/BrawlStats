@@ -20,6 +20,8 @@ import { formatNumber } from '@/lib/format';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
 import type { Tier } from '@/types/stats';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /** How far below its own record a brawler currently sits. Never negative. */
 function peakGap(brawler: BSPlayerBrawler): number {
@@ -83,6 +85,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 const FIRST_LOOK = 24;
 
 export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
+  const t = useT();
   const [sort, setSort] = useState<SortKey>('trophies');
   const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
@@ -135,8 +138,8 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Filter brawlers"
-            aria-label="Filter brawlers by name"
+            placeholder={t('Filter brawlers')}
+            aria-label={t('Filter brawlers by name')}
             className="w-full rounded-lg border border-border bg-surface py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-brand/60"
           />
         </div>
@@ -154,14 +157,14 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
                   : 'border border-border text-muted hover:text-foreground'
               }`}
             >
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
       </div>
 
       {visible.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">No brawlers match “{query}”.</p>
+        <p className="card p-6 text-sm text-muted">{t('No brawlers match “{query}”.', { query: query })}</p>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -175,8 +178,7 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
               type="button"
               onClick={() => setShowAll(true)}
               className="min-h-11 w-full rounded-xl border border-border bg-surface-2/60 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-            >
-              Show {hidden} more {hidden === 1 ? 'brawler' : 'brawlers'}
+            >{t('Show {hidden} more', { hidden: hidden })}{' '}{hidden === 1 ? t('brawler') : t('brawlers')}
             </button>
           ) : null}
         </>
@@ -195,6 +197,8 @@ function BrawlerTile({
   brawler: BSPlayerBrawler;
   meta?: BrawlerMetaLite;
 }) {
+  const t = useT();
+  const lp = useLp();
   const accent = meta?.rarityColor ?? '#8b95b8';
   const gap = peakGap(brawler);
   const tier = meta?.tier;
@@ -211,21 +215,21 @@ function BrawlerTile({
   const full = src !== portrait;
 
   const kit: { key: string; node: React.ReactNode; n: number; label: string }[] = [
-    { key: 'sp', node: <StarPowerIcon className="size-4" />, n: brawler.starPowers.length, label: 'Star powers' },
-    { key: 'gd', node: <GadgetIcon className="size-4" />, n: brawler.gadgets.length, label: 'Gadgets' },
-    { key: 'gr', node: <GearIcon className="size-4" />, n: brawler.gears?.length ?? 0, label: 'Gears' },
-    { key: 'hc', node: <HyperchargeIcon className="size-4" />, n: brawler.hyperCharges?.length ?? 0, label: 'Hypercharge' },
+    { key: 'sp', node: <StarPowerIcon className="size-4" />, n: brawler.starPowers.length, label: t('Star powers') },
+    { key: 'gd', node: <GadgetIcon className="size-4" />, n: brawler.gadgets.length, label: t('Gadgets') },
+    { key: 'gr', node: <GearIcon className="size-4" />, n: brawler.gears?.length ?? 0, label: t('Gears') },
+    { key: 'hc', node: <HyperchargeIcon className="size-4" />, n: brawler.hyperCharges?.length ?? 0, label: t('Hypercharge') },
     {
       key: 'bf',
       node: <BuffieIcon className="size-4" />,
       n: Object.values(brawler.buffies ?? {}).filter(Boolean).length,
-      label: 'Buffies',
+      label: t('Buffies'),
     },
   ].filter((k) => k.n > 0);
 
   return (
     <Link
-      href={brawlerPath(brawler.id, brawler.name)}
+      href={lp(brawlerPath(brawler.id, brawler.name))}
       prefetch={false}
       className="group relative flex flex-col overflow-hidden rounded-2xl border transition-colors hover:border-brand/60"
       style={{
@@ -234,15 +238,15 @@ function BrawlerTile({
       }}
       title={
         tier
-          ? `${brawler.name}: ${tier} tier on the trophy list, meta score ${meta?.metaScore?.toFixed(1) ?? '?'}`
-          : `${brawler.name}: not enough sampled battles to rate`
+          ? t('{name}: {tier} tier on the trophy list, meta score {v}', { name: brawler.name, tier: tier, v: meta?.metaScore?.toFixed(1) ?? '?' })
+          : t('{name}: not enough sampled battles to rate', { name: brawler.name })
       }
     >
       {/* Corner chips, opposite each other: prestige left, tier right. */}
       {prestige > 0 ? (
         <span
           className="absolute left-2 top-2 z-10 rounded-md bg-background/70 px-1.5 py-0.5 text-[10px] font-black text-accent backdrop-blur"
-          title={`Prestige ${prestige}`}
+          title={t('Prestige {prestige}', { prestige: prestige })}
         >
           P{prestige}
         </span>
@@ -283,7 +287,7 @@ function BrawlerTile({
         <span
           className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rounded-md px-2 py-0.5 text-xs font-black text-[#1a1200] shadow"
           style={{ background: 'var(--brand)' }}
-          title={`Power ${brawler.power}`}
+          title={t('Power {power}', { power: brawler.power })}
         >
           {brawler.power}
         </span>
@@ -297,7 +301,7 @@ function BrawlerTile({
             <TrophyIcon className="size-3.5" />
             {formatNumber(brawler.trophies)}
           </span>
-          <span className="flex items-center gap-1 tabular-nums text-muted" title={`Rank ${brawler.rank}`}>
+          <span className="flex items-center gap-1 tabular-nums text-muted" title={t('Rank {rank}', { rank: brawler.rank })}>
             <Star className="size-3" />
             {brawler.rank}
           </span>
@@ -307,11 +311,9 @@ function BrawlerTile({
             would be noise on a hundred tiles. */}
         <p className="text-[11px] tabular-nums text-muted">
           {gap > 0 ? (
-            <span title={`Peak ${formatNumber(brawler.highestTrophies)}`}>
-              −{formatNumber(gap)} off peak
-            </span>
+            <span title={t('Peak {highestTrophies}', { highestTrophies: formatNumber(brawler.highestTrophies) })}>{t('−{gap} off peak', { gap: formatNumber(gap) })}</span>
           ) : (
-            <span className="text-victory/80">At peak</span>
+            <span className="text-victory/80">{t('At peak')}</span>
           )}
         </p>
 
@@ -320,19 +322,15 @@ function BrawlerTile({
         {live >= HOT_STREAK ? (
           <p
             className="flex items-center gap-1 rounded-full bg-victory/15 px-2 py-0.5 text-[11px] font-bold tabular-nums text-victory"
-            title={`On ${live} in a row; best ${best}`}
+            title={t('On {live} in a row; best {best}', { live: live, best: best })}
           >
-            <WinStreakIcon className="size-3.5" />
-            {live} in a row
-          </p>
+            <WinStreakIcon className="size-3.5" />{t('{live} in a row', { live: live })}</p>
         ) : best > 0 ? (
           <p
             className="flex items-center gap-1 text-[11px] tabular-nums text-muted"
-            title={`Best win streak ${best}`}
+            title={t('Best win streak {best}', { best: best })}
           >
-            <WinStreakIcon className="size-3.5" />
-            best {best}
-          </p>
+            <WinStreakIcon className="size-3.5" />{t('best {best}', { best: best })}</p>
         ) : null}
 
         {/* The kit as the game's own icons with a count, in place of

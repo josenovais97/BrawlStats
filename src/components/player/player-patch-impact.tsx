@@ -7,6 +7,9 @@ import { titleCase } from '@/lib/format';
 import type { PatchImpact } from '@/lib/patch-impact';
 import { brawlerPath } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The update, read against this roster.
@@ -39,23 +42,21 @@ export function PlayerPatchImpact({
   patch: { title: string; url: string; date: string };
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { rows, buffed, nerfed, changedTotal } = impact;
 
   return (
     <Panel
-      title="What the update did to you"
-      subtitle={`Brawlers you own that the ${patchDay(patch.date)} update changed, and how they have actually moved since${
-        buffed + nerfed > 0 ? ` — ${buffed} up, ${nerfed} down` : ''
-      }.`}
+      title={t('What the update did to you')}
+      subtitle={t('Brawlers you own that the {date} update changed, and how they have actually moved since{v}.', { date: patchDay(patch.date), v: buffed + nerfed > 0 ? ` — ${buffed} up, ${nerfed} down` : '' })}
       aside={
         <a
-          href={patch.url}
+          href={lp(patch.url)}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-semibold text-brand transition-colors hover:underline"
-        >
-          Patch notes
-        </a>
+        >{t('Patch notes')}</a>
       }
       bodyClassName=""
     >
@@ -63,7 +64,7 @@ export function PlayerPatchImpact({
         {rows.map((row) => (
           <li key={row.brawlerId}>
             <Link
-              href={brawlerPath(row.brawlerId, row.name)}
+              href={lp(brawlerPath(row.brawlerId, row.name))}
               prefetch={false}
               className="row-interactive flex items-center gap-3 px-4 py-2.5"
             >
@@ -81,9 +82,7 @@ export function PlayerPatchImpact({
                 <span className="block truncate text-sm font-semibold">
                   {titleCase(row.name)}
                 </span>
-                <span className="block truncate text-xs text-muted">
-                  {row.categoryLabel} · your power {row.power}
-                </span>
+                <span className="block truncate text-xs text-muted">{t('{categoryLabel} · your power {power}', { categoryLabel: row.categoryLabel, power: row.power })}</span>
               </span>
 
               {row.delta === null ? null : (
@@ -100,7 +99,7 @@ export function PlayerPatchImpact({
                     {row.delta >= 0.005 ? '+' : row.delta <= -0.005 ? '−' : '±'}
                     {Math.abs(row.delta * 100).toFixed(1)}
                   </span>
-                  <span className="block text-[11px] text-muted">pts since</span>
+                  <span className="block text-[11px] text-muted">{t('pts since')}</span>
                 </span>
               )}
             </Link>
@@ -110,12 +109,8 @@ export function PlayerPatchImpact({
 
       <p className="text-xs leading-relaxed text-muted">
         {changedTotal > rows.length
-          ? `The ${rows.length} biggest moves of ${changedTotal} changed brawlers you own. `
-          : ''}
-        Win rates are adjusted against the sample average, so a shift here is the brawler moving
-        rather than the cohort. A brawler appears once there are a few days of snapshots behind
-        it — a two-day sample swings further than any balance change does.
-      </p>
+          ? t('The {length} biggest moves of {changedTotal} changed brawlers you own. ', { length: rows.length, changedTotal: changedTotal })
+          : ''}{t('Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.')}</p>
     </Panel>
   );
 }

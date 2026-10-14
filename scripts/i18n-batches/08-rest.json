@@ -1,0 +1,1166 @@
+{
+ " and others": [
+  " y otros",
+  " e outros"
+ ],
+ " — {up} up, {down} down": [
+  ": {up} suben, {down} bajan",
+  ": {up} subiram, {down} caíram"
+ ],
+ ", not what the update": [
+  ", no lo que la actualización",
+  ", e não o que a atualização"
+ ],
+ ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.": [
+  ". Un brawler puede recibir una mejora y que nadie lo juegue, un nerf y seguir subiendo, o moverse porque cambió la rotación de mapas en esas mismas dos semanas. El tamaño de muestra aparece al lado de cada fila para que lo valores tú, y todo lo que tiene menos de {PATCH_MIN_DECIDED} partidas decididas en cualquiera de los lados se deja fuera en vez de adivinarlo.",
+  ". Um brawler pode receber buff e ninguém jogar, receber nerf e continuar subindo, ou mudar porque a rotação de mapas virou nas mesmas duas semanas. O tamanho da amostra aparece ao lado de cada linha para você avaliar, e tudo com menos de {PATCH_MIN_DECIDED} partidas decididas em qualquer um dos lados fica de fora, em vez de ser chutado."
+ ],
+ ". The rest stayed where they were.": [
+  ". El resto se quedó donde estaba.",
+  ". O resto ficou onde estava."
+ ],
+ "Did the Brawl Stars balance changes work?": [
+  "¿Funcionaron los cambios de balance de Brawl Stars?",
+  "Os balanceamentos do Brawl Stars funcionaram?"
+ ],
+ "Did the balance changes work?": [
+  "¿Funcionaron los cambios de balance?",
+  "Os balanceamentos funcionaram?"
+ ],
+ "Every brawler an update changed, and what its adjusted win rate did in the {PATCH_WINDOW_DAYS} days afterwards against the {PATCH_WINDOW_DAYS2} before. From sampled Ranked battles.": [
+  "Cada brawler que cambió una actualización y qué hizo su tasa de victorias ajustada en los {PATCH_WINDOW_DAYS} días siguientes frente a los {PATCH_WINDOW_DAYS2} anteriores. Con partidas de Competitivo.",
+  "Cada brawler que uma atualização mudou e o que a taxa de vitória ajustada dele fez nos {PATCH_WINDOW_DAYS} dias seguintes contra os {PATCH_WINDOW_DAYS2} anteriores. Com partidas ranqueadas."
+ ],
+ "Every brawler each Brawl Stars update changed, and what its win rate actually did in the fortnight afterwards, measured from sampled Ranked battles.": [
+  "Cada brawler que cambió cada actualización de Brawl Stars y qué hizo de verdad su tasa de victorias en las dos semanas siguientes, medido con partidas de Competitivo.",
+  "Cada brawler que cada atualização do Brawl Stars mudou e o que a taxa de vitória dele realmente fez nas duas semanas seguintes, medido com partidas ranqueadas."
+ ],
+ "It changed {length} brawlers.": [
+  "Cambió {length} brawlers.",
+  "Mudou {length} brawlers."
+ ],
+ "Listed rather than hidden — an absence with a reason is a finding too.": [
+  "Aparecen en vez de esconderse: una ausencia con motivo también es un dato.",
+  "Aparecem em vez de ficarem escondidas: uma ausência com motivo também é um dado."
+ ],
+ "Measured, not announced": [
+  "Medido, no anunciado",
+  "Medido, não anunciado"
+ ],
+ "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.": [
+  "No se pudo leer ninguna actualización dentro del periodo guardado. Esto se llena cuando las notas de versión y los resúmenes diarios coinciden.",
+  "Não foi possível ler nenhuma atualização dentro do período guardado. Isso é preenchido quando as notas de atualização e os resumos diários se alinham."
+ ],
+ "None of them moved more than {NOTABLE_DELTA} points either way in the": [
+  "Ninguno se movió más de {NOTABLE_DELTA} puntos en ningún sentido en los",
+  "Nenhum se moveu mais de {NOTABLE_DELTA} pontos para nenhum lado nos"
+ ],
+ "Not measured: {v} — under": [
+  "Sin medir: {v}. Menos de",
+  "Sem medição: {v}. Menos de"
+ ],
+ "Patch notes": [
+  "Notas del parche",
+  "Notas do patch"
+ ],
+ "The window is still filling, so this is a partial reading.": [
+  "El periodo todavía se está llenando, así que es una lectura parcial.",
+  "O período ainda está sendo preenchido, então é uma leitura parcial."
+ ],
+ "This shows what each number": [
+  "Esto muestra lo que cada número",
+  "Isto mostra o que cada número"
+ ],
+ "This update changed": [
+  "Esta actualización cambió",
+  "Esta atualização mudou"
+ ],
+ "Updates that cannot be measured": [
+  "Actualizaciones que no se pueden medir",
+  "Atualizações que não dá para medir"
+ ],
+ "What each update actually did to the brawlers it changed, measured rather than announced.": [
+  "Lo que hizo de verdad cada actualización a los brawlers que cambió, medido y no anunciado.",
+  "O que cada atualização realmente fez com os brawlers que mudou, medido e não anunciado."
+ ],
+ "brawlers": [
+  "brawlers",
+  "brawlers"
+ ],
+ "by more than {NOTABLE_DELTA} points in the {PATCH_WINDOW_DAYS} days afterwards": [
+  "en más de {NOTABLE_DELTA} puntos en los {PATCH_WINDOW_DAYS} días siguientes",
+  "em mais de {NOTABLE_DELTA} pontos nos {PATCH_WINDOW_DAYS} dias seguintes"
+ ],
+ "caused": [
+  "causó",
+  "causou"
+ ],
+ "did": [
+  "hizo",
+  "fez"
+ ],
+ "{PATCH_MIN_DECIDED} decided battles on one side of the update, or released after it.": [
+  "{PATCH_MIN_DECIDED} partidas decididas en uno de los lados de la actualización, o salieron después.",
+  "{PATCH_MIN_DECIDED} partidas decididas em um dos lados da atualização, ou saíram depois dela."
+ ],
+ "{PATCH_WINDOW_DAYS} days afterwards.": [
+  "{PATCH_WINDOW_DAYS} días siguientes.",
+  "{PATCH_WINDOW_DAYS} dias seguintes."
+ ],
+ "{date} · {start} to {end} against {start2} to {end2}": [
+  "{date} · del {start} al {end} frente al {start2} al {end2}",
+  "{date} · de {start} a {end} contra {start2} a {end2}"
+ ],
+ "{length} moved": [
+  "{length} se movieron",
+  "{length} se moveram"
+ ],
+ "+{v} pts": [
+  "+{v} pts",
+  "+{v} pts"
+ ],
+ ". Only maps currently in rotation are included.": [
+  ". Solo se incluyen los mapas en rotación ahora.",
+  ". Só entram os mapas em rotação agora."
+ ],
+ "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.": [
+  "Cada brawler de aquí tiene al menos 300 partidas decididas de Competitivo. Estas listas son extremos elegidos, y sacar un máximo de muchas muestras pequeñas da extremos por casualidad y no por mérito: el mínimo es lo que lo evita.",
+  "Cada brawler aqui tem pelo menos 300 partidas ranqueadas decididas. Estas listas são extremos escolhidos, e tirar um máximo de muitas amostras pequenas gera extremos por acaso, e não por mérito: o mínimo é o que evita isso."
+ ],
+ "Everybody picks them and the results do not justify it — over {highUsage} pick rate.": [
+  "Todos los eligen y los resultados no lo justifican: más del {highUsage} de uso.",
+  "Todo mundo escolhe e os resultados não justificam: mais de {highUsage} de escolha."
+ ],
+ "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.": [
+  "Mucho mejores en un mapa de lo que sugiere su nivel general. El número son puntos de tasa de victorias por encima de su propia media, así que la fuerza general ya está descontada.",
+  "Muito melhores num mapa do que o nível geral deles sugere. O número são pontos de taxa de vitória acima da própria média, então a força geral já está descontada."
+ ],
+ "Fine overall, but losing win-rate points on a map that is in rotation right now.": [
+  "Bien en general, pero pierden puntos de tasa de victorias en un mapa que está en rotación ahora.",
+  "Bem no geral, mas perdem pontos de taxa de vitória num mapa que está em rotação agora."
+ ],
+ "Hidden gems": [
+  "Joyas ocultas",
+  "Joias escondidas"
+ ],
+ "How this is decided": [
+  "Cómo se decide",
+  "Como isso é decidido"
+ ],
+ "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the": [
+  "Las joyas y trampas por mapa comparan la puntuación de un brawler en un mapa con su propio nivel general, así que la lista no es una segunda copia de la",
+  "As joias e armadilhas por mapa comparam a pontuação de um brawler num mapa com o próprio nível geral, então a lista não é uma segunda cópia da"
+ ],
+ "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.": [
+  "Todavía no hay suficientes partidas para responder esto con honestidad. Se llena cuando suficientes brawlers superan el mínimo.",
+  "Ainda não há partidas suficientes para responder isso com honestidade. Isso é preenchido quando brawlers suficientes passam do mínimo."
+ ],
+ "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.": [
+  "Nada supera el listón esta semana, lo que significa que el meta se está jugando más o menos como se mide.",
+  "Nada passa do limite nesta semana, o que significa que o meta está sendo jogado mais ou menos como é medido."
+ ],
+ "Overrated": [
+  "Sobrevalorados",
+  "Superestimados"
+ ],
+ "See every pick on {mapName}": [
+  "Ver todos los brawlers en {mapName}",
+  "Ver todos os brawlers em {mapName}"
+ ],
+ "Sleeper picks": [
+  "Elecciones dormidas",
+  "Escolhas esquecidas"
+ ],
+ "Strong, and almost nobody picks them — under {lowUsage} pick rate.": [
+  "Fuertes, y casi nadie los elige: menos del {lowUsage} de uso.",
+  "Fortes, e quase ninguém escolhe: menos de {lowUsage} de escolha."
+ ],
+ "The hidden meta": [
+  "El meta oculto",
+  "O meta oculto"
+ ],
+ "Trap picks": [
+  "Elecciones trampa",
+  "Escolhas armadilha"
+ ],
+ "Underrated and overrated Brawl Stars brawlers": [
+  "Brawlers infravalorados y sobrevalorados de Brawl Stars",
+  "Brawlers subestimados e superestimados do Brawl Stars"
+ ],
+ "Who is everyone sleeping on, measured from sampled ranked battles.": [
+  "A quién está ignorando todo el mundo, medido con partidas de Competitivo.",
+  "Quem todo mundo está ignorando, medido com partidas ranqueadas."
+ ],
+ "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.": [
+  "A quién está ignorando todo el mundo. Con {rated} brawlers con suficientes partidas de Competitivo para juzgar, en los últimos {windowDays} días.",
+  "Quem todo mundo está ignorando. Com {rated} brawlers com partidas ranqueadas suficientes para avaliar, nos últimos {windowDays} dias."
+ ],
+ "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.": [
+  "A quién está ignorando todo el mundo. Brawlers fuertes que casi nadie elige, brawlers populares que los resultados no justifican y las joyas y trampas por mapa que esconde la tier list general, medido con partidas de Competitivo y no con opiniones.",
+  "Quem todo mundo está ignorando. Brawlers fortes que quase ninguém escolhe, brawlers populares que os resultados não justificam e as joias e armadilhas por mapa que a tier list geral esconde, medido com partidas ranqueadas, e não com opiniões."
+ ],
+ "tier list": [
+  "tier list",
+  "tier list"
+ ],
+ "{v} or better.": [
+  "{v} o más.",
+  "{v} ou mais."
+ ],
+ "{v} pts": [
+  "{v} pts",
+  "{v} pts"
+ ],
+ "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of": [
+  "«Poco usado» y «fuerte» son percentiles de los brawlers actuales, no números fijos, así que la pregunta es la misma aunque las respuestas cambien. Hoy significan menos del {lowUsage} de uso y una puntuación de",
+  "“Pouco escolhido” e “forte” são percentis dos brawlers atuais, e não números fixos, então a pergunta é a mesma mesmo com as respostas mudando. Hoje significam menos de {lowUsage} de escolha e uma pontuação de"
+ ],
+ ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the": [
+  ", CC-BY-SA. Supercell no publica las probabilidades en ninguna API, así que la comunidad las mantiene a partir de datamines y lo que se ve en el juego, no son cifras oficiales. Para ver cómo está el meta una vez tienes los brawlers, mira la",
+  ", CC-BY-SA. A Supercell não publica as chances em nenhuma API, então a comunidade mantém esses números a partir de datamines e do que se vê no jogo, e eles não são oficiais. Para ver como está o meta depois que você tiver os brawlers, veja a"
+ ],
+ "Brawl Stars Starr Drop chances: every drop rate and reward": [
+  "Probabilidades de los Premios Starr de Brawl Stars: todas las recompensas",
+  "Chances dos Sorteios Starr do Brawl Stars: todas as recompensas"
+ ],
+ "Chance of rolling each rarity": [
+  "Probabilidad de cada rareza",
+  "Chance de cada raridade"
+ ],
+ "Drop rates and contents from the": [
+  "Probabilidades y contenidos de la",
+  "Chances e conteúdos da"
+ ],
+ "Drop rates unavailable": [
+  "Probabilidades no disponibles",
+  "Chances indisponíveis"
+ ],
+ "Each of your first five wins of the day earns a reward drop: usually a Starr Drop, sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.": [
+  "Cada una de tus cinco primeras victorias del día da un premio: normalmente un Premio Starr, a veces un Premio del caos u otro. El contador se reinicia una vez al día; el temporizador de la pantalla de Victorias diarias del juego te dice exactamente cuándo.",
+  "Cada uma das suas cinco primeiras vitórias do dia dá um prêmio: normalmente um Sorteio Starr, às vezes um Sorteio do Caos ou outro. A contagem reinicia uma vez por dia; o cronômetro da tela de Vitórias diárias no jogo mostra exatamente quando."
+ ],
+ "Event drops": [
+  "Premios de eventos",
+  "Prêmios de eventos"
+ ],
+ "Every day": [
+  "Cada día",
+  "Todo dia"
+ ],
+ "Every drop rate": [
+  "Todas las probabilidades",
+  "Todas as chances"
+ ],
+ "How to get them: the daily schedule": [
+  "Cómo conseguirlos: el horario diario",
+  "Como conseguir: a programação diária"
+ ],
+ "Limited-time drops from past events. Kept for reference — most are no longer obtainable.": [
+  "Premios por tiempo limitado de eventos pasados. Se mantienen como referencia: la mayoría ya no se pueden conseguir.",
+  "Prêmios por tempo limitado de eventos passados. Mantidos como referência: a maioria não dá mais para conseguir."
+ ],
+ "No table": [
+  "Sin tabla",
+  "Sem tabela"
+ ],
+ "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.": [
+  "Disponibles ahora, en Victorias diarias, el Camino de trofeos, el Brawl Pass y la tienda.",
+  "Disponíveis agora, nas Vitórias diárias, no Caminho de troféus, no Brawl Pass e na loja."
+ ],
+ "Permanent drops": [
+  "Premios permanentes",
+  "Prêmios permanentes"
+ ],
+ "Starr Drop chances for every rarity, from Rare to Legendary, and every reward inside each drop. Plus Chaos Drops and every event drop, in one table.": [
+  "Las probabilidades del Premio Starr para cada rareza, de Raro a Legendario, y cada recompensa dentro de cada premio. Además los Premios del caos y todos los de eventos, en una tabla.",
+  "As chances do Sorteio Starr para cada raridade, de Raro a Lendário, e cada recompensa de cada sorteio. E também os Sorteios do Caos e todos os de eventos, numa tabela."
+ ],
+ "Starr Drops": [
+  "Premios Starr",
+  "Sorteios Starr"
+ ],
+ "The community wiki these numbers come from is not responding, or has changed shape. Rather than show odds that might be wrong, the page waits.": [
+  "La wiki de la comunidad de donde salen estos números no responde o ha cambiado de formato. En vez de mostrar probabilidades que podrían estar mal, la página espera.",
+  "A wiki da comunidade de onde vêm esses números não está respondendo ou mudou de formato. Em vez de mostrar chances que podem estar erradas, a página espera."
+ ],
+ "The wiki lists rewards totalling {v}%, so a row covering the other {v2}% is missing from the source.": [
+  "La wiki muestra recompensas que suman {v}%, así que falta en la fuente una fila con el otro {v2}%.",
+  "A wiki lista recompensas que somam {v}%, então falta na fonte uma linha com os outros {v2}%."
+ ],
+ "The wiki publishes no reward table for this drop.": [
+  "La wiki no publica tabla de recompensas para este premio.",
+  "A wiki não publica tabela de recompensas para este sorteio."
+ ],
+ "What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki.": [
+  "Qué puede traer cada premio y qué probabilidad tiene cada recompensa. El juego te enseña la apertura, nunca la tabla de detrás, y Supercell no publica probabilidades en ninguna API, así que salen de la wiki de la comunidad.",
+  "O que cada sorteio pode trazer e a chance de cada recompensa. O jogo mostra a abertura, nunca a tabela por trás, e a Supercell não publica chances em nenhuma API, então elas vêm da wiki da comunidade."
+ ],
+ "Wiki lists {v}% — a row is missing.": [
+  "La wiki suma {v}%: falta una fila.",
+  "A wiki soma {v}%: falta uma linha."
+ ],
+ "Your first 5 wins": [
+  "Tus 5 primeras victorias",
+  "Suas 5 primeiras vitórias"
+ ],
+ "rarities": [
+  "rarezas",
+  "raridades"
+ ],
+ "rewards": [
+  "recompensas",
+  "recompensas"
+ ],
+ "{event} · limited time": [
+  "{event} · tiempo limitado",
+  "{event} · tempo limitado"
+ ],
+ ", so it moves with the meta and always matches what the rest of the site says.": [
+  ", así que cambia con el meta y siempre coincide con lo que dice el resto del sitio.",
+  ", então muda com o meta e sempre bate com o que o resto do site diz."
+ ],
+ "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.": [
+  "Un brawler de Brawl Stars nuevo que adivinar cada día. Cada intento te dice lo cerca que estás en rareza, clase, movimiento, alcance, recarga, orden de salida y tier. Gratis, sin cuenta, un reto al día.",
+  "Um brawler do Brawl Stars novo para adivinhar todo dia. Cada palpite mostra quão perto você está em raridade, classe, movimento, alcance, recarga, ordem de lançamento e tier. Grátis, sem conta, um desafio por dia."
+ ],
+ "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.": [
+  "Después de cuatro intentos el tablero muestra la habilidad estelar de la respuesta, y después de ocho su gadget: los iconos reales del juego, sin los nombres, porque un nombre se puede buscar y una imagen es una prueba de memoria.",
+  "Depois de quatro palpites o quadro mostra o poder de estrela da resposta, e depois de oito o acessório: os ícones reais do jogo, sem os nomes, porque um nome dá para pesquisar e uma imagem é um teste de memória."
+ ],
+ "Amber": [
+  "Ámbar",
+  "Âmbar"
+ ],
+ "Brawl Stars daily challenge — guess the brawler": [
+  "Reto diario de Brawl Stars: adivina el brawler",
+  "Desafio diário do Brawl Stars: adivinhe o brawler"
+ ],
+ "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.": [
+  "La clase no tiene flecha, porque no hay dirección de Tirador a Tanque. Un brawler con muy pocas partidas de Competitivo para tener tier muestra un guion en vez de una suposición.",
+  "A classe não tem seta, porque não existe direção de Atirador para Tanque. Um brawler com poucas partidas ranqueadas para ter tier mostra um traço em vez de um chute."
+ ],
+ "Daily challenge": [
+  "Reto diario",
+  "Desafio diário"
+ ],
+ "Green": [
+  "Verde",
+  "Verde"
+ ],
+ "How the clues work": [
+  "Cómo funcionan las pistas",
+  "Como as dicas funcionam"
+ ],
+ "Movement": [
+  "Movimiento",
+  "Movimento"
+ ],
+ "One brawler a day. Everybody gets the same one, and it changes at midnight UTC.": [
+  "Un brawler al día. Es el mismo para todos y cambia a medianoche UTC.",
+  "Um brawler por dia. É o mesmo para todo mundo e muda à meia-noite UTC."
+ ],
+ "Released": [
+  "Salida",
+  "Lançamento"
+ ],
+ "Stuck?": [
+  "¿Atascado?",
+  "Travou?"
+ ],
+ "Today’s puzzle could not be prepared. It returns once the brawler catalogue is reachable again.": [
+  "No se pudo preparar el reto de hoy. Volverá cuando el catálogo de brawlers responda otra vez.",
+  "Não foi possível preparar o desafio de hoje. Ele volta quando o catálogo de brawlers responder de novo."
+ ],
+ "Your progress is kept in this browser only. No account, nothing stored on our side.": [
+  "Tu progreso se guarda solo en este navegador. Sin cuenta, no guardamos nada.",
+  "Seu progresso fica só neste navegador. Sem conta, não guardamos nada."
+ ],
+ "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.": [
+  "son los niveles con nombre que usa el juego (de Muy lento a Muy rápido, de Muy corto a Muy largo) y no números, porque nadie sabe si 855 es rápido y todo el mundo sabe que Muy rápido le gana a Rápido.",
+  "são os níveis com nome que o jogo usa (de Muito lento a Muito rápido, de Muito curto a Muito longo), e não números, porque ninguém sabe se 855 é rápido e todo mundo sabe que Muito rápido ganha de Rápido."
+ ],
+ "comes from the live": [
+  "sale de la",
+  "vem da"
+ ],
+ "is exact.": [
+  "es exacto.",
+  "é exato."
+ ],
+ "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.": [
+  "está a un paso: una rareza contigua, un tier vecino o un brawler que salió a cinco o menos de la respuesta. Una flecha apunta hacia la respuesta: ▲ significa más alto, ▼ más bajo.",
+  "está a um passo: uma raridade vizinha, um tier ao lado ou um brawler lançado a até cinco da resposta. Uma seta aponta para a resposta: ▲ significa mais alto, ▼ mais baixo."
+ ],
+ "is the brawler’s place in release order, not a date.": [
+  "es el puesto del brawler en el orden de salida, no una fecha.",
+  "é a posição do brawler na ordem de lançamento, e não uma data."
+ ],
+ "range": [
+  "alcance",
+  "alcance"
+ ],
+ "ranked tier list": [
+  "tier list de Competitivo actual",
+  "tier list do Ranqueado atual"
+ ],
+ "reload": [
+  "recarga",
+  "recarga"
+ ],
+ ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.": [
+  ". Estos hallazgos no se pueden recalcular después, así que el archivo empieza el día en que se creó y no va hacia atrás.",
+  ". Essas descobertas não podem ser recalculadas depois, então o arquivo começa no dia em que foi criado e não volta no tempo."
+ ],
+ "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.": [
+  "Cada tarjeta es el máximo de una cantidad concreta en un grupo concreto: la mayor tasa de victorias entre los brawlers con menos del 1% de uso, la mayor diferencia entre un brawler y un mapa, etc. Los mismos datos siempre dan el mismo resultado, así que nada de esto lo escribe un modelo ni se elige a mano. Las tasas de victoria se ajustan con la media de la muestra, así que una semana en la que los jugadores de la muestra son mejores no hace que todos los brawlers parezcan mejorados.",
+  "Cada cartão é o máximo de uma quantidade definida num grupo definido: a maior taxa de vitória entre brawlers com menos de 1% de escolha, a maior diferença entre um brawler e um mapa, e assim por diante. Os mesmos dados sempre dão o mesmo resultado, então nada aqui é escrito por um modelo ou escolhido à mão. As taxas de vitória são ajustadas pela média da amostra, então uma semana em que os jogadores da amostra são melhores não faz todos os brawlers parecerem fortalecidos."
+ ],
+ "Every day is kept at its own address —": [
+  "Cada día se guarda en su propia dirección:",
+  "Cada dia fica guardado no próprio endereço:"
+ ],
+ "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.": [
+  "Hallazgos sacados de las partidas de Brawl Stars de hoy: el brawler que nadie usa y que sigue ganando, el popular que pierde, el enfrentamiento más desigual y el brawler que se comporta distinto en un mapa.",
+  "Descobertas tiradas das partidas de Brawl Stars de hoje: o brawler que ninguém usa e que continua ganhando, o popular que perde, o confronto mais desigual e o brawler que se comporta diferente num mapa."
+ ],
+ "How these are chosen.": [
+  "Cómo se eligen.",
+  "Como são escolhidas."
+ ],
+ "What BrawlZone found in the data today": [
+  "Lo que BrawlZone encontró hoy en los datos",
+  "O que o BrawlZone encontrou hoje nos dados"
+ ],
+ "browse the archive": [
+  "mira el archivo",
+  "veja o arquivo"
+ ],
+ "or": [
+  "o",
+  "ou"
+ ],
+ "subscribe by RSS": [
+  "suscríbete por RSS",
+  "assine por RSS"
+ ],
+ "A brawler listed here has a dashed marker on its own trend chart, so you can see what the change actually did.": [
+  "Un brawler de esta lista tiene una marca discontinua en su gráfica de tendencia, para que veas qué hizo realmente el cambio.",
+  "Um brawler desta lista tem uma marca tracejada no próprio gráfico de tendência, para você ver o que a mudança realmente fez."
+ ],
+ "All comps": [
+  "Todos los equipos",
+  "Todos os times"
+ ],
+ "Comps winning now": [
+  "Equipos que ganan ahora",
+  "Times que estão ganhando agora"
+ ],
+ "Falling": [
+  "Bajando",
+  "Caindo"
+ ],
+ "Not enough comparable snapshots yet. This fills in once a week of daily snapshots has been collected under a stable sample.": [
+  "Todavía no hay suficientes mediciones comparables. Esto se llena cuando hay una semana de mediciones diarias con una muestra estable.",
+  "Ainda não há medições comparáveis suficientes. Isso é preenchido quando houver uma semana de medições diárias com uma amostra estável."
+ ],
+ "Nothing moved enough to report.": [
+  "Nada se movió lo suficiente como para contarlo.",
+  "Nada se moveu o suficiente para contar."
+ ],
+ "Rising": [
+  "Subiendo",
+  "Subindo"
+ ],
+ "The names Supercell published.": [
+  "Los nombres que publicó Supercell.",
+  "Os nomes que a Supercell publicou."
+ ],
+ "This week in the Brawl Stars meta": [
+  "Esta semana en el meta de Brawl Stars",
+  "Esta semana no meta do Brawl Stars"
+ ],
+ "This week in the meta": [
+  "Esta semana en el meta",
+  "Esta semana no meta"
+ ],
+ "Tier changes": [
+  "Cambios de tier",
+  "Mudanças de tier"
+ ],
+ "What moved between {fromDate} and {toDate}, measured from sampled battles.": [
+  "Qué se movió entre el {fromDate} y el {toDate}, medido con partidas reales.",
+  "O que se moveu entre {fromDate} e {toDate}, medido com partidas reais."
+ ],
+ "What moved in the Brawl Stars meta this week: the brawlers rising and falling, the tiers they crossed, what the latest update changed, and the team comps winning right now.": [
+  "Qué se movió en el meta de Brawl Stars esta semana: los brawlers que suben y bajan, los tiers que cruzaron, qué cambió la última actualización y los equipos que ganan ahora.",
+  "O que se moveu no meta do Brawl Stars nesta semana: os brawlers que sobem e caem, os tiers que cruzaram, o que a última atualização mudou e os times que estão ganhando agora."
+ ],
+ "What moved this week, measured from sampled battles.": [
+  "Qué se movió esta semana, medido con partidas reales.",
+  "O que se moveu nesta semana, medido com partidas reais."
+ ],
+ "What the update changed": [
+  "Qué cambió la actualización",
+  "O que a atualização mudou"
+ ],
+ "Whether any of it moved": [
+  "Si algo de eso se movió",
+  "Se alguma coisa disso se moveu"
+ ],
+ "is measured separately.": [
+  "se mide aparte.",
+  "é medido separadamente."
+ ],
+ "{sampleSize} battles ·": [
+  "{sampleSize} partidas ·",
+  "{sampleSize} partidas ·"
+ ],
+ "{sampleSize} battles · {winRateNow} win rate": [
+  "{sampleSize} partidas · {winRateNow} de victorias",
+  "{sampleSize} partidas · {winRateNow} de vitórias"
+ ],
+ "{winRateNow} win rate": [
+  "{winRateNow} de victorias",
+  "{winRateNow} de vitórias"
+ ],
+ "· mode average {baseline}": [
+  "· media del modo {baseline}",
+  "· média do modo {baseline}"
+ ],
+ "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.": [
+  "El porcentaje de un aspecto es sobre los brawlers de los jugadores de la muestra; el de un icono, sobre los jugadores. Los aspectos por defecto se dejan fuera: el que lleva el nombre del propio brawler no lo eligió nadie. El uso por brawler, incluido el aspecto por defecto, está en la página de cada brawler.",
+  "A porcentagem de um visual é sobre os brawlers dos jogadores da amostra; a de um ícone, sobre os jogadores. Os visuais padrão ficam de fora: o que leva o nome do próprio brawler ninguém escolheu. O uso por brawler, incluindo o padrão, está na página de cada brawler."
+ ],
+ "Brawl Stars cosmetics: which skins and icons players actually use": [
+  "Cosméticos de Brawl Stars: qué aspectos e iconos usa de verdad la gente",
+  "Cosméticos do Brawl Stars: quais visuais e ícones as pessoas realmente usam"
+ ],
+ "Browse every icon →": [
+  "Ver todos los iconos →",
+  "Ver todos os ícones →"
+ ],
+ "Browse every skin →": [
+  "Ver todos los aspectos →",
+  "Ver todos os visuais →"
+ ],
+ "Every skin and profile icon seen in the sampled player pool, ranked by how many people equip it. Not a list of what exists, a measurement of what gets worn.": [
+  "Cada aspecto e icono de perfil visto en la muestra de jugadores, ordenados por cuánta gente los equipa. No es una lista de lo que existe, sino una medida de lo que se usa.",
+  "Cada visual e ícone de perfil visto na amostra de jogadores, ordenados por quantas pessoas usam. Não é uma lista do que existe, e sim uma medida do que é usado."
+ ],
+ "How this is counted": [
+  "Cómo se cuenta",
+  "Como isso é contado"
+ ],
+ "Most worn skins": [
+  "Aspectos más usados",
+  "Visuais mais usados"
+ ],
+ "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.": [
+  "Los números salen de la muestra rotativa, que registra una cuarta parte de los jugadores cada día, así que es una encuesta y no un censo. Basta para porcentajes, que es todo lo que muestra, y por eso un número de aquí nunca es cuánta gente tiene algo en el juego.",
+  "Os números vêm da amostra rotativa, que registra um quarto dos jogadores por dia, então é uma pesquisa, e não um censo. Isso basta para porcentagens, que é tudo o que ela mostra, e por isso um número aqui nunca é quantas pessoas têm algo no jogo."
+ ],
+ "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.": [
+  "Porcentaje sobre todos los brawlers de los jugadores de la muestra, así que los aspectos de distintos brawlers se pueden comparar directamente.",
+  "Porcentagem sobre todos os brawlers dos jogadores da amostra, então os visuais de brawlers diferentes podem ser comparados diretamente."
+ ],
+ "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.": [
+  "Qué aspectos e iconos de perfil equipan de verdad los jugadores, medido con la muestra y no sacado de un catálogo.",
+  "Quais visuais e ícones de perfil os jogadores realmente usam, medido na amostra e não tirado de um catálogo."
+ ],
+ "{length} seen across the roster, ranked by how many of the sampled slots wear each one.": [
+  "{length} vistos entre todos los brawlers, ordenados por cuántos de los brawlers de la muestra lo llevan.",
+  "{length} vistos entre todos os brawlers, ordenados por quantos dos brawlers da amostra usam cada um."
+ ],
+ "{length} seen on sampled accounts. The icon sits on the account, so these are shares of players rather than of brawlers.": [
+  "{length} vistos en las cuentas de la muestra. El icono va en la cuenta, así que son porcentajes de jugadores y no de brawlers.",
+  "{length} vistos nas contas da amostra. O ícone fica na conta, então são porcentagens de jogadores, e não de brawlers."
+ ],
+ "Announced, not yet released": [
+  "Anunciados, todavía sin salir",
+  "Anunciados, ainda não lançados"
+ ],
+ "Brawl Stars update notes": [
+  "Notas de actualización de Brawl Stars",
+  "Notas de atualização do Brawl Stars"
+ ],
+ "Contents": [
+  "Contenido",
+  "Conteúdo"
+ ],
+ "Details not published yet": [
+  "Detalles todavía sin publicar",
+  "Detalhes ainda não publicados"
+ ],
+ "Every brawler named in {title}, linked to its page here.": [
+  "Cada brawler nombrado en {title}, con enlace a su página aquí.",
+  "Cada brawler citado em {title}, com link para a página dele aqui."
+ ],
+ "Published": [
+  "Publicado",
+  "Publicado"
+ ],
+ "Published by Supercell, reproduced here for convenience.": [
+  "Publicado por Supercell, reproducido aquí por comodidad.",
+  "Publicado pela Supercell, reproduzido aqui por conveniência."
+ ],
+ "Release notes": [
+  "Notas de versión",
+  "Notas de atualização"
+ ],
+ "Release notes are unavailable right now. Try again shortly, or read them on": [
+  "Las notas de versión no están disponibles ahora mismo. Vuelve a intentarlo en un rato o léelas en",
+  "As notas de atualização não estão disponíveis agora. Tente de novo daqui a pouco ou leia em"
+ ],
+ "Revealed in a Brawl Talk and coming to the game. Everything known so far.": [
+  "Anunciados en un Brawl Talk y de camino al juego. Todo lo que se sabe hasta ahora.",
+  "Anunciados num Brawl Talk e a caminho do jogo. Tudo o que se sabe até agora."
+ ],
+ "Stats and abilities come from the community wiki and fill in over the days after a reveal, so a brawler announced yesterday may show little beyond its name.": [
+  "Las estadísticas y habilidades vienen de la wiki de la comunidad y se completan en los días siguientes al anuncio, así que de un brawler anunciado ayer puede que solo se vea el nombre.",
+  "As estatísticas e habilidades vêm da wiki da comunidade e são completadas nos dias depois do anúncio, então de um brawler anunciado ontem pode aparecer pouco além do nome."
+ ],
+ "The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.": [
+  "Las últimas notas de versión oficiales de Brawl Stars: nuevos brawlers, hipercargas, cambios de balance y correcciones.",
+  "As últimas notas de atualização oficiais do Brawl Stars: novos brawlers, hipercargas, balanceamentos e correções."
+ ],
+ "The latest official update notes, straight from the Brawl Stars team.": [
+  "Las últimas notas oficiales, directamente del equipo de Brawl Stars.",
+  "As últimas notas oficiais, direto da equipe do Brawl Stars."
+ ],
+ "Who changed": [
+  "Quién cambió",
+  "Quem mudou"
+ ],
+ "for what we track ourselves.": [
+  "para ver lo que seguimos nosotros.",
+  "para ver o que nós mesmos acompanhamos."
+ ],
+ "see detected in-game changes": [
+  "mira los cambios detectados en el juego",
+  "veja as mudanças detectadas no jogo"
+ ],
+ "supercell.com": [
+  "supercell.com",
+  "supercell.com"
+ ],
+ "Announcements from the Brawl Stars team, and the new brawlers and abilities detected from the game API. For how the sampled meta is shifting, see the": [
+  "Anuncios del equipo de Brawl Stars, y los nuevos brawlers y habilidades detectados en la API del juego. Para ver cómo cambia el meta, mira la",
+  "Anúncios da equipe do Brawl Stars, e os novos brawlers e habilidades detectados na API do jogo. Para ver como o meta está mudando, veja a"
+ ],
+ "Brawl Stars news": [
+  "Noticias de Brawl Stars",
+  "Notícias do Brawl Stars"
+ ],
+ "Brawler removed": [
+  "Brawler eliminado",
+  "Brawler removido"
+ ],
+ "Change": [
+  "Cambio",
+  "Mudança"
+ ],
+ "Detected": [
+  "Detectado",
+  "Detectado"
+ ],
+ "Detected game changes": [
+  "Cambios detectados en el juego",
+  "Mudanças detectadas no jogo"
+ ],
+ "Gadget": [
+  "Gadget",
+  "Acessório"
+ ],
+ "Gear": [
+  "Refuerzo",
+  "Engrenagem"
+ ],
+ "New brawler": [
+  "Nuevo brawler",
+  "Novo brawler"
+ ],
+ "New brawlers, star powers, gadgets and hypercharges.": [
+  "Nuevos brawlers, habilidades estelares, gadgets e hipercargas.",
+  "Novos brawlers, poderes de estrela, acessórios e hipercargas."
+ ],
+ "News": [
+  "Noticias",
+  "Notícias"
+ ],
+ "Official Brawl Stars announcements, plus roster and kit changes detected from the game API.": [
+  "Anuncios oficiales de Brawl Stars, más los cambios de brawlers y habilidades detectados en la API del juego.",
+  "Anúncios oficiais do Brawl Stars, mais as mudanças de brawlers e habilidades detectadas na API do jogo."
+ ],
+ "Official news": [
+  "Noticias oficiales",
+  "Notícias oficiais"
+ ],
+ "Read on supercell.com": [
+  "Leer en supercell.com",
+  "Ler em supercell.com"
+ ],
+ "Removed": [
+  "Eliminado",
+  "Removido"
+ ],
+ "Star power": [
+  "Habilidad estelar",
+  "Poder de estrela"
+ ],
+ "Straight from the Brawl Stars team.": [
+  "Directamente del equipo de Brawl Stars.",
+  "Direto da equipe do Brawl Stars."
+ ],
+ "Straight from the game": [
+  "Directamente del juego",
+  "Direto do jogo"
+ ],
+ "What this means for the meta": [
+  "Qué significa para el meta",
+  "O que isso significa para o meta"
+ ],
+ "Brawl Stars findings for {label}.": [
+  "Hallazgos de Brawl Stars del {label}.",
+  "Descobertas do Brawl Stars de {label}."
+ ],
+ "Daily": [
+  "Diario",
+  "Diário"
+ ],
+ "Today": [
+  "Hoy",
+  "Hoje"
+ ],
+ "What BrawlZone found on {label}": [
+  "Lo que BrawlZone encontró el {label}",
+  "O que o BrawlZone encontrou em {label}"
+ ],
+ "{findings} findings from Brawl Stars battles sampled on {label}, including the strongest pick nobody used and the most one-sided matchup of the day.": [
+  "{findings} hallazgos de las partidas de Brawl Stars del {label}, incluidos el brawler más fuerte que nadie usó y el enfrentamiento más desigual del día.",
+  "{findings} descobertas das partidas de Brawl Stars de {label}, incluindo o brawler mais forte que ninguém usou e o confronto mais desigual do dia."
+ ],
+ "Brawl Stars tier list maker. Build and share your own": [
+  "Creador de tier lists de Brawl Stars: haz y comparte la tuya",
+  "Criador de tier lists do Brawl Stars: monte e compartilhe a sua"
+ ],
+ "Nothing here is saved on a server — the link": [
+  "Aquí no se guarda nada en un servidor: el enlace",
+  "Nada aqui é salvo num servidor: o link"
+ ],
+ "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.": [
+  "Clasifica tú mismo a los más de 100 brawlers y comparte el tablero con un enlace. Toca un brawler y luego un tier, o arrastra si estás en un ordenador.",
+  "Ranqueie você mesmo os mais de 100 brawlers e compartilhe o quadro com um link. Toque num brawler e depois num tier, ou arraste se estiver no computador."
+ ],
+ "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.": [
+  "Clasifica tú mismo a todos los brawlers de Brawl Stars y compártelo con un enlace. Empieza con el tablero vacío o con el meta actual de Competitivo, y luego discútelo.",
+  "Ranqueie você mesmo todos os brawlers do Brawl Stars e compartilhe com um link. Comece com o quadro vazio ou com o meta atual do Ranqueado, e depois discuta com ele."
+ ],
+ "The brawler metadata source is not responding, so there is nothing to rank yet. Try again shortly.": [
+  "La fuente de datos de los brawlers no responde, así que todavía no hay nada que clasificar. Vuelve a intentarlo en un rato.",
+  "A fonte de dados dos brawlers não está respondendo, então ainda não há o que ranquear. Tente de novo daqui a pouco."
+ ],
+ "Tier list maker": [
+  "Creador de tier lists",
+  "Criador de tier lists"
+ ],
+ "Your call": [
+  "Tú decides",
+  "Você decide"
+ ],
+ "is": [
+  "es",
+  "é"
+ ],
+ "or the": [
+  "o la",
+  "ou a"
+ ],
+ "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the": [
+  "la tier list, así que sigue funcionando mientras alguien lo tenga. Para la versión medida, hecha con partidas reales y no con opiniones, mira la",
+  "a tier list, então continua funcionando enquanto alguém tiver. Para a versão medida, feita com partidas reais e não com opiniões, veja a"
+ ],
+ "trophy list": [
+  "lista de trofeos",
+  "lista de troféus"
+ ],
+ "Cosmetics": [
+  "Cosméticos",
+  "Cosméticos"
+ ],
+ "Every Brawl Stars profile icon, ranked by how many players use it": [
+  "Todos los iconos de perfil de Brawl Stars, ordenados por cuántos jugadores los usan",
+  "Todos os ícones de perfil do Brawl Stars, ordenados por quantos jogadores usam"
+ ],
+ "No icon data has been sampled yet.": [
+  "Todavía no hay datos de iconos.",
+  "Ainda não há dados de ícones."
+ ],
+ "Nothing sampled yet. The pool refreshes every two hours.": [
+  "Todavía no hay datos. La muestra se actualiza cada dos horas.",
+  "Ainda não há dados. A amostra é atualizada a cada duas horas."
+ ],
+ "Profile icons": [
+  "Iconos de perfil",
+  "Ícones de perfil"
+ ],
+ "The full profile icon catalogue measured from sampled accounts: which icons players actually wear, and which are almost never seen.": [
+  "El catálogo completo de iconos de perfil medido con cuentas de la muestra: qué iconos usan de verdad los jugadores y cuáles casi no se ven.",
+  "O catálogo completo de ícones de perfil medido em contas da amostra: quais ícones os jogadores realmente usam e quais quase nunca aparecem."
+ ],
+ "{length} icons seen on sampled accounts, ranked by share of players.": [
+  "{length} iconos vistos en cuentas de la muestra, ordenados por porcentaje de jugadores.",
+  "{length} ícones vistos nas contas da amostra, ordenados pela porcentagem de jogadores."
+ ],
+ "Daily archive": [
+  "Archivo diario",
+  "Arquivo diário"
+ ],
+ "Daily findings archive": [
+  "Archivo de hallazgos diarios",
+  "Arquivo de descobertas diárias"
+ ],
+ "Each day's findings kept at its own address. They cannot be recomputed once their windows roll past, so this reaches back only as far as the day it started.": [
+  "Los hallazgos de cada día, cada uno en su propia dirección. No se pueden recalcular cuando pasa su periodo, así que esto solo llega hasta el día en que empezó.",
+  "As descobertas de cada dia, cada uma no próprio endereço. Elas não podem ser recalculadas depois que o período passa, então isto só vai até o dia em que começou."
+ ],
+ "Every day of BrawlZone findings, kept at its own address. What the sampled Brawl Stars battles showed on each date, from the strongest unused pick to the most one-sided matchup.": [
+  "Cada día de hallazgos de BrawlZone, en su propia dirección. Lo que mostraron las partidas de Brawl Stars en cada fecha, desde el brawler más fuerte sin usar hasta el enfrentamiento más desigual.",
+  "Cada dia de descobertas do BrawlZone, no próprio endereço. O que as partidas de Brawl Stars mostraram em cada data, do brawler mais forte não usado ao confronto mais desigual."
+ ],
+ "Nothing archived yet. Today’s report is written as it is published, so the first entry appears once": [
+  "Todavía no hay nada archivado. El informe de hoy se guarda al publicarse, así que la primera entrada aparece cuando se generen",
+  "Ainda não há nada arquivado. O relatório de hoje é guardado quando é publicado, então a primeira entrada aparece quando forem geradas"
+ ],
+ "RSS": [
+  "RSS",
+  "RSS"
+ ],
+ "finding": [
+  "hallazgo",
+  "descoberta"
+ ],
+ "findings": [
+  "hallazgos",
+  "descobertas"
+ ],
+ "have been generated.": [
+  ".",
+  "."
+ ],
+ "today’s findings": [
+  "los hallazgos de hoy",
+  "as descobertas de hoje"
+ ],
+ "Every Brawl Stars skin, ranked by how many players wear it": [
+  "Todos los aspectos de Brawl Stars, ordenados por cuántos jugadores los llevan",
+  "Todos os visuais do Brawl Stars, ordenados por quantos jogadores usam"
+ ],
+ "No skin data has been sampled yet.": [
+  "Todavía no hay datos de aspectos.",
+  "Ainda não há dados de visuais."
+ ],
+ "The full skin catalogue measured from sampled accounts: which skins are actually equipped, and which almost nobody uses. Searchable by skin or brawler.": [
+  "El catálogo completo de aspectos medido con cuentas de la muestra: cuáles se equipan de verdad y cuáles casi nadie usa. Se puede buscar por aspecto o brawler.",
+  "O catálogo completo de visuais medido em contas da amostra: quais são realmente usados e quais quase ninguém usa. Dá para buscar por visual ou brawler."
+ ],
+ "{length} skins seen in the sampled pool, ranked by share of player-brawler slots. Default skins are excluded.": [
+  "{length} aspectos vistos en la muestra, ordenados por porcentaje de brawlers de jugadores. Sin los aspectos por defecto.",
+  "{length} visuais vistos na amostra, ordenados pela porcentagem de brawlers dos jogadores. Sem os visuais padrão."
+ ],
+ "From {sampleSize} sampled battles.": [
+  "Con {sampleSize} partidas.",
+  "Com {sampleSize} partidas."
+ ],
+ "See every matchup": [
+  "Ver todos los enfrentamientos",
+  "Ver todos os confrontos"
+ ],
+ "See the full record": [
+  "Ver el récord completo",
+  "Ver o resultado completo"
+ ],
+ "See the map": [
+  "Ver el mapa",
+  "Ver o mapa"
+ ],
+ "See what changed": [
+  "Ver qué cambió",
+  "Ver o que mudou"
+ ],
+ "See who else pairs well": [
+  "Ver con quién más combina",
+  "Ver com quem mais combina"
+ ],
+ "See why it underperforms": [
+  "Ver por qué rinde menos",
+  "Ver por que rende menos"
+ ],
+ "The giant killer": [
+  "El matagigantes",
+  "O mata-gigantes"
+ ],
+ "The map surprise": [
+  "La sorpresa del mapa",
+  "A surpresa do mapa"
+ ],
+ "The meta trap": [
+  "La trampa del meta",
+  "A armadilha do meta"
+ ],
+ "The overnight rise": [
+  "La subida de la noche",
+  "A subida da noite"
+ ],
+ "The secret duo": [
+  "El dúo secreto",
+  "A dupla secreta"
+ ],
+ "The secret pick": [
+  "La elección secreta",
+  "A escolha secreta"
+ ],
+ "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.": [
+  "Nada superó el mínimo de pruebas. Cada hallazgo necesita al menos 300 partidas detrás, y la página prefiere no mostrar nada antes que una casualidad.",
+  "Nada passou do mínimo de provas. Cada descoberta precisa de pelo menos 300 partidas por trás, e a página prefere não mostrar nada do que uma coincidência."
+ ],
+ "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.": [
+  "Cosas que dicen las partidas y que una tabla de clasificación no dice. Cada una es la mayor diferencia de su tipo en los datos de ese día: no es una opinión ni una lista ordenada por la columna obvia.",
+  "Coisas que as partidas dizem e que uma tabela de ranking não diz. Cada uma é a maior diferença do tipo nos dados daquele dia: não é opinião nem uma lista ordenada pela coluna óbvia."
+ ],
+ "What we found": [
+  "Lo que encontramos",
+  "O que encontramos"
+ ],
+ "What we found today": [
+  "Lo que encontramos hoy",
+  "O que encontramos hoje"
+ ],
+ "Played": [
+  "Jugados",
+  "Jogados"
+ ],
+ " of ": [
+  " de ",
+  " de "
+ ],
+ "Copy share link": [
+  "Copiar enlace para compartir",
+  "Copiar link para compartilhar"
+ ],
+ "Every brawler is placed. Tap one in a row to send it back here.": [
+  "Todos los brawlers están colocados. Toca uno de una fila para devolverlo aquí.",
+  "Todos os brawlers estão colocados. Toque num de uma linha para mandá-lo de volta para cá."
+ ],
+ "Place the selected brawler in {tier} tier": [
+  "Colocar el brawler elegido en el tier {tier}",
+  "Colocar o brawler escolhido no tier {tier}"
+ ],
+ "Start from the live meta": [
+  "Empezar con el meta actual",
+  "Começar com o meta atual"
+ ],
+ "placed": [
+  "colocados",
+  "colocados"
+ ],
+ "selected — now tap a tier to place it.": [
+  "elegido: ahora toca un tier para colocarlo.",
+  "escolhido: agora toque num tier para colocá-lo."
+ ],
+ "{name}: tap to select, tap again to unrank": [
+  "{name}: toca para elegir, vuelve a tocar para quitarlo",
+  "{name}: toque para escolher, toque de novo para tirar"
+ ],
+ "{name}: tap to select, then tap a tier": [
+  "{name}: toca para elegir y luego toca un tier",
+  "{name}: toque para escolher e depois toque num tier"
+ ],
+ ". Bubble size is the sample behind each point. Tap one for its numbers.": [
+  ". El tamaño de cada burbuja es la muestra que tiene detrás. Toca una para ver sus números.",
+  ". O tamanho de cada bolha é a amostra por trás dela. Toque numa para ver os números."
+ ],
+ "Every rated brawler plotted by pick rate against meta score, over {windowDays} days": [
+  "Cada brawler puntuado, según su tasa de uso y su puntuación meta, en {windowDays} días",
+  "Cada brawler pontuado, pela taxa de escolha e pela pontuação meta, em {windowDays} dias"
+ ],
+ "How often it is picked →": [
+  "Cuánto se elige →",
+  "Quanto é escolhido →"
+ ],
+ "How well it does →": [
+  "Cuánto rinde →",
+  "Quanto rende →"
+ ],
+ "Lit brawlers are the ones this account can field. It has": [
+  "Los brawlers iluminados son los que esta cuenta puede usar. Tiene",
+  "Os brawlers acesos são os que esta conta pode usar. Ela tem"
+ ],
+ "Meta": [
+  "Meta",
+  "Meta"
+ ],
+ "Out of favour": [
+  "Fuera del meta",
+  "Fora do meta"
+ ],
+ "Sleepers": [
+  "Dormidos",
+  "Esquecidos"
+ ],
+ "in the meta corner": [
+  "en la esquina del meta",
+  "no canto do meta"
+ ],
+ "picked · {sampleSize} battles": [
+  "de uso · {sampleSize} partidas",
+  "de escolha · {sampleSize} partidas"
+ ],
+ "sleepers": [
+  "dormidos",
+  "esquecidos"
+ ],
+ "strongest 30%": [
+  "el 30% más fuerte",
+  "os 30% mais fortes"
+ ],
+ "weakest 40%": [
+  "el 40% más débil",
+  "os 40% mais fracos"
+ ],
+ "win rate ·": [
+  "de victorias ·",
+  "de vitórias ·"
+ ],
+ "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.": [
+  "{count} brawlers con suficientes partidas de Competitivo para puntuarlos en {windowDays} días. El tamaño de cada burbuja es la muestra que tiene detrás, así que los puntos menos seguros son los más pequeños. Toca uno para ver sus números.",
+  "{count} brawlers com partidas ranqueadas suficientes para pontuar em {windowDays} dias. O tamanho de cada bolha é a amostra por trás dela, então os pontos menos certos são os menores. Toque num para ver os números."
+ ],
+ "{haveMeta} of the {length}": [
+  "{haveMeta} de los {length}",
+  "{haveMeta} dos {length}"
+ ],
+ "{haveSleepers} of the {length}": [
+  "{haveSleepers} de los {length}",
+  "{haveSleepers} dos {length}"
+ ],
+ "A new brawler at midnight UTC.": [
+  "Un brawler nuevo a medianoche UTC.",
+  "Um brawler novo à meia-noite UTC."
+ ],
+ "Average {v} guesses": [
+  "Media de {v} intentos",
+  "Média de {v} palpites"
+ ],
+ "Best": [
+  "Mejor",
+  "Melhor"
+ ],
+ "Copied": [
+  "Copiado",
+  "Copiado"
+ ],
+ "Copy result": [
+  "Copiar resultado",
+  "Copiar resultado"
+ ],
+ "Got it in {length}": [
+  "Lo sacaste en {length}",
+  "Acertou em {length}"
+ ],
+ "Guess a brawler": [
+  "Adivina un brawler",
+  "Adivinhe um brawler"
+ ],
+ "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.": [
+  "Adivina el brawler de hoy. Cada intento muestra lo cerca que estás en cinco pistas: verde es exacto, ámbar está a un paso, y una flecha apunta hacia la respuesta.",
+  "Adivinhe o brawler de hoje. Cada palpite mostra quão perto você está em cinco dicas: verde é exato, âmbar está a um passo, e uma seta aponta para a resposta."
+ ],
+ "Guesses to solve": [
+  "Intentos para resolver",
+  "Palpites para acertar"
+ ],
+ "Next brawler in": [
+  "Siguiente brawler en",
+  "Próximo brawler em"
+ ],
+ "Range": [
+  "Alcance",
+  "Alcance"
+ ],
+ "Reload": [
+  "Recarga",
+  "Recarga"
+ ],
+ "Revealed": [
+  "Revelado",
+  "Revelado"
+ ],
+ "Streak": [
+  "Racha",
+  "Sequência"
+ ],
+ "Type a brawler name…": [
+  "Escribe el nombre de un brawler…",
+  "Digite o nome de um brawler…"
+ ],
+ "Won": [
+  "Ganados",
+  "Vencidos"
+ ],
+ "Yesterday was": [
+  "Ayer era",
+  "Ontem era"
+ ],
+ "guess": [
+  "intento",
+  "palpite"
+ ],
+ "guesses": [
+  "intentos",
+  "palpites"
+ ],
+ "higher": [
+  "más alto",
+  "mais alto"
+ ],
+ "in {left} {v}": [
+  "en {left} {v}",
+  "em {left} {v}"
+ ],
+ "lower": [
+  "más bajo",
+  "mais baixo"
+ ],
+ "Nothing matches “{query}”.": [
+  "Nada coincide con «{query}».",
+  "Nada corresponde a “{query}”."
+ ],
+ "Search by skin or brawler": [
+  "Buscar por aspecto o brawler",
+  "Buscar por visual ou brawler"
+ ],
+ "Search icons by number": [
+  "Buscar iconos por número",
+  "Buscar ícones pelo número"
+ ],
+ "Search profile icons": [
+  "Buscar iconos de perfil",
+  "Buscar ícones de perfil"
+ ],
+ "Search skins": [
+  "Buscar aspectos",
+  "Buscar visuais"
+ ],
+ "of": [
+  "de",
+  "de"
+ ],
+ "{stats} first-guess solve": [
+  "{stats} acierto al primer intento",
+  "{stats} acerto no primeiro palpite"
+ ],
+ "{stats} first-guess solves": [
+  "{stats} aciertos al primer intento",
+  "{stats} acertos no primeiro palpite"
+ ]
+}

@@ -17,6 +17,9 @@ import { computeBattleInsights, type PlayerAssociation } from '@/lib/battle-insi
 import { formatNumber, formatPercent, humanizeMode, relativeTime } from '@/lib/format';
 import type { BABrawler } from '@/types/brawlapi';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface Props {
   tag: string;
@@ -31,6 +34,8 @@ interface Props {
  * everywhere rather than presented as career data.
  */
 export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   let entries;
   try {
     entries = (await getBattleLog(tag)).items;
@@ -45,7 +50,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
 
   return (
     <Panel
-      title="Recent form"
+      title={t('Recent form')}
       aside={`Last ${insights.battles} battles${
         insights.lastBattleAt ? ` · ${relativeTime(insights.lastBattleAt)}` : ''
       }`}
@@ -54,7 +59,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         {/* Headline numbers */}
         <div className="rounded-xl bg-surface-2/40 p-5">
           <div className="flex items-baseline justify-between">
-            <span className="text-sm font-medium text-muted">Win rate</span>
+            <span className="text-sm font-medium text-muted">{t('Win rate')}</span>
             <span className="text-3xl font-black tabular-nums text-brand">
               {formatPercent(insights.winRate)}
             </span>
@@ -78,15 +83,13 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
               <span className="text-muted">{insights.draws}D</span>
             ) : null}
             {insights.averageRank !== null ? (
-              <span className="text-muted">
-                Avg place {insights.averageRank.toFixed(1)}
-              </span>
+              <span className="text-muted">{t('Avg place {v}', { v: insights.averageRank.toFixed(1) })}</span>
             ) : null}
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">Trophies</p>
+              <p className="text-xs uppercase tracking-wide text-muted">{t('Trophies')}</p>
               <p
                 className={`flex items-center gap-1 text-lg font-bold tabular-nums ${
                   insights.trophyChange >= 0 ? 'text-victory' : 'text-defeat'
@@ -100,7 +103,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">Star player</p>
+              <p className="text-xs uppercase tracking-wide text-muted">{t('Star player')}</p>
               <p className="flex items-center gap-1 text-lg font-bold tabular-nums">
                 <CrownIcon className="size-4" />
                 {insights.starPlayerCount}
@@ -112,9 +115,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
         {/* Most played brawlers */}
         <div className="rounded-xl bg-surface-2/40 p-5 lg:col-span-2">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <BrawlersIcon className="size-4" />
-            Most played
-          </h3>
+            <BrawlersIcon className="size-4" />{t('Most played')}</h3>
 
           <ul className="grid gap-3 @xl:grid-cols-2">
             {topBrawlers.map((brawler) => {
@@ -122,7 +123,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
               return (
                 <li key={brawler.brawlerId}>
                   <Link
-                    href={brawlerPath(brawler.brawlerId, brawler.brawlerName)}
+                    href={lp(brawlerPath(brawler.brawlerId, brawler.brawlerName))}
                     className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-surface-2"
                   >
                     <Image
@@ -138,9 +139,9 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                         {brawler.brawlerName.toLowerCase()}
                       </p>
                       <p className="truncate text-xs text-muted">
-                        {brawler.battles} {brawler.battles === 1 ? 'battle' : 'battles'}
+                        {brawler.battles} {brawler.battles === 1 ? t('battle') : t('battles')}
                         {brawler.winRate !== null
-                          ? ` · ${formatPercent(brawler.winRate)} win`
+                          ? t(' · {winRate} win', { winRate: formatPercent(brawler.winRate) })
                           : ''}
                       </p>
                     </div>
@@ -180,14 +181,14 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
       >
         {insights.teammates.length > 0 ? (
           <AssociationList
-            title="Played with"
+            title={t('Played with')}
             icon={PlayersIcon}
             people={insights.teammates.slice(0, 5)}
           />
         ) : null}
         {insights.opponents.length > 0 ? (
           <AssociationList
-            title="Faced most"
+            title={t('Faced most')}
             icon={BattlesIcon}
             people={insights.opponents.slice(0, 5)}
           />
@@ -195,23 +196,21 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
 
         <div className="rounded-xl bg-surface-2/40 p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <Activity className="size-4 text-accent" />
-            Activity
-          </h3>
+            <Activity className="size-4 text-accent" />{t('Activity')}</h3>
           <dl className="space-y-3 text-sm">
-            <Row label="Last 24 hours" value={`${insights.battlesLast24h} battles`} />
+            <Row label={t('Last 24 hours')} value={`${insights.battlesLast24h} battles`} />
             {/* Only once the log spans more than one day. Inside a single day
                 it is the battle count again with ".0" on the end, directly
                 under "Last 24 hours" saying the same thing. */}
             {insights.daysCovered > 1 ? (
-              <Row label="Battles per day" value={perDay.toFixed(1)} />
+              <Row label={t('Battles per day')} value={perDay.toFixed(1)} />
             ) : null}
             <Row
-              label="Last seen"
+              label={t('Last seen')}
               value={insights.lastBattleAt ? relativeTime(insights.lastBattleAt) : ', '}
             />
             {insights.modes[0] ? (
-              <Row label="Top mode" value={humanizeMode(insights.modes[0].mode)} />
+              <Row label={t('Top mode')} value={humanizeMode(insights.modes[0].mode)} />
             ) : null}
           </dl>
         </div>
@@ -221,9 +220,10 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
 }
 
 function Row({ label, value }: { label: string; value: string }) {
+  const t = getT(requestLocale());
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <dt className="text-muted">{label}</dt>
+      <dt className="text-muted">{t(label)}</dt>
       <dd className="font-semibold tabular-nums">{value}</dd>
     </div>
   );
@@ -238,18 +238,20 @@ function AssociationList({
   icon: (props: { className?: string }) => React.ReactNode;
   people: PlayerAssociation[];
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div className="rounded-xl bg-surface-2/40 p-5">
       <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
         <Icon className="size-4 text-accent" />
-        {title}
+        {t(title)}
       </h3>
 
       <ul className="space-y-2">
         {people.map((person) => (
           <li key={person.tag}>
             <Link
-              href={`/player/${person.tag}`}
+              href={lp(`/player/${person.tag}`)}
               rel={playerLinkRel(person.tag)}
               prefetch={false}
               className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-2"

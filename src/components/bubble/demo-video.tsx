@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useSyncExternalStore } from "react";
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * The app running, as a looping clip.
@@ -26,6 +27,7 @@ import { useSyncExternalStore } from "react";
  * megabyte to the image to serve nobody.
  */
 export function DemoVideo() {
+  const t = useT();
   /*
    * Motion is a preference, and autoplay ignores it.
    *
@@ -41,7 +43,7 @@ export function DemoVideo() {
     return (
       <Image
         src="/bubble/demo-poster.jpg"
-        alt="The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map"
+        alt={t('The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map')}
         width={1280}
         height={590}
         className="w-full"
@@ -58,7 +60,7 @@ export function DemoVideo() {
       loop
       playsInline
       poster="/bubble/demo-poster.jpg"
-      aria-label="A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power."
+      aria-label={t('A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power.')}
     >
       <source src="/bubble/demo.mp4" type="video/mp4" />
     </video>
@@ -91,6 +93,7 @@ function snapshot() {
  * source -- the captions carry it.
  */
 export function TutorialVideo() {
+  const t = useT();
   return (
     <video
       className="w-full rounded-2xl"
@@ -101,7 +104,7 @@ export function TutorialVideo() {
       poster="/bubble/tutorial-poster.jpg"
       width={720}
       height={1280}
-      aria-label="A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run."
+      aria-label={t('A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run.')}
     >
       <source src="/bubble/tutorial.mp4" type="video/mp4" />
     </video>

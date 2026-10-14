@@ -10,6 +10,9 @@ import { MAX_POWER_LEVEL } from '@/lib/progression';
 import { TIER_COLOR, type ScoredBrawler } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The player's roster read against the current tier list.
@@ -41,6 +44,8 @@ export function PlayerMetaFit({
   meta: Map<number, ScoredBrawler>;
   brawlerMeta: Map<number, BABrawler>;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   if (meta.size === 0) return null;
 
   const owned = new Map(brawlers.map((b) => [b.id, b]));
@@ -79,11 +84,11 @@ export function PlayerMetaFit({
   const cards = [
     {
       key: 'underlevelled',
-      title: 'Strong, not finished',
+      title: t('Strong, not finished'),
       icon: ArrowUpRight,
       tone: 'text-victory',
-      hint: 'Top-tier brawlers you own below power 11. The cheapest upgrades on this account.',
-      empty: 'Every top-tier brawler you own is at power 11.',
+      hint: t('Top-tier brawlers you own below power 11. The cheapest upgrades on this account.'),
+      empty: t('Every top-tier brawler you own is at power 11.'),
       rows: underlevelled.map((entry) => {
         const brawler = owned.get(entry.brawlerId)!;
         return (
@@ -94,18 +99,18 @@ export function PlayerMetaFit({
             icon={iconFor(entry.brawlerId)}
             tier={entry.tier}
             score={entry.metaScore}
-            detail={`Power ${brawler.power} · ${formatNumber(brawler.trophies)} trophies`}
+            detail={t('Power {power} · {trophies} trophies', { power: brawler.power, trophies: formatNumber(brawler.trophies) })}
           />
         );
       }),
     },
     {
       key: 'cold-mains',
-      title: 'Mains out of favour',
+      title: t('Mains out of favour'),
       icon: TrendingDown,
       tone: 'text-defeat',
-      hint: `Your ${MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.`,
-      empty: 'None of your most-played brawlers are struggling right now.',
+      hint: t('Your {MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.', { MAIN_COUNT: MAIN_COUNT }),
+      empty: t('None of your most-played brawlers are struggling right now.'),
       rows: coldMains.map(({ brawler, entry }) => (
         <Row
           key={brawler.id}
@@ -114,7 +119,7 @@ export function PlayerMetaFit({
           icon={iconFor(brawler.id)}
           tier={entry.tier}
           score={entry.metaScore}
-          detail={`${formatNumber(brawler.trophies)} trophies · power ${brawler.power}`}
+          detail={t('{trophies} trophies · power {power}', { trophies: formatNumber(brawler.trophies), power: brawler.power })}
         />
       )),
     },
@@ -124,21 +129,12 @@ export function PlayerMetaFit({
 
   return (
     <Panel
-      title="Roster vs the meta"
+      title={t('Roster vs the meta')}
       aside={`${ownedTop.length}/${top.length} top-tier unlocked`}
     >
-      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
-        This roster scored against the current{' '}
-        <Link href="/tier-list/trophy" className="font-medium text-brand hover:underline">
-          trophy tier list
-        </Link>
-        , which rates every brawler from sampled ladder battles. For competitive
-        play see the{' '}
-        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-          Ranked list
-        </Link>
-        , which covers the 3v3 modes only.
-      </p>
+      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">{t('This roster scored against the current')}{' '}
+        <Link href={lp('/tier-list/trophy')} className="font-medium text-brand hover:underline">{t('trophy tier list')}</Link>{t(', which rates every brawler from sampled ladder battles. For competitive play see the')}{' '}
+        <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('Ranked list')}</Link>{t(', which covers the 3v3 modes only.')}</p>
 
       {/*
         Only the cards with something in them get a column.
@@ -153,7 +149,7 @@ export function PlayerMetaFit({
       {filled.length > 0 ? (
         <div className={`grid gap-4 ${filled.length === 2 ? '@3xl:grid-cols-2' : ''}`}>
           {filled.map(({ key, title, icon, tone, hint, rows }) => (
-            <Card key={key} title={title} icon={icon} tone={tone} hint={hint}>
+            <Card key={key} title={t(title)} icon={icon} tone={tone} hint={t(hint)}>
               {rows}
             </Card>
           ))}
@@ -165,7 +161,7 @@ export function PlayerMetaFit({
             <li key={key} className="flex items-start gap-2">
               <Icon className={`mt-0.5 size-4 shrink-0 ${tone}`} />
               <span>
-                <span className="font-semibold text-foreground">{title}:</span> {empty}
+                <span className="font-semibold text-foreground">{t(title)}:</span> {empty}
               </span>
             </li>
           ))}
@@ -188,13 +184,14 @@ function Card({
   hint: string;
   children: React.ReactNode;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="card flex flex-col p-5">
       <h3 className={`flex items-center gap-2 text-sm font-bold ${tone}`}>
         <Icon className="size-4" />
-        {title}
+        {t(title)}
       </h3>
-      <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{hint}</p>
+      <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{t(hint)}</p>
       <ul className="space-y-1">{children}</ul>
     </div>
   );
@@ -217,10 +214,12 @@ function Row({
   detail: string;
   muted?: boolean;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <li>
       <Link
-        href={brawlerPath(id, name)}
+        href={lp(brawlerPath(id, name))}
         className="row-interactive flex items-center gap-3 rounded-lg p-2"
       >
         <Image
@@ -235,7 +234,7 @@ function Row({
           <span className="block truncate text-sm font-semibold capitalize">
             {name.toLowerCase()}
           </span>
-          <span className="block truncate text-xs text-muted">{detail}</span>
+          <span className="block truncate text-xs text-muted">{t(detail)}</span>
         </span>
         <span className="flex shrink-0 items-center gap-1.5">
           <span

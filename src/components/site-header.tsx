@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
+import { useLocale } from '@/components/i18n/use-locale';
+import { localePath, stripLocale, type Locale } from '@/lib/i18n';
 import {
   Battle3v3Icon,
   BubbleAppIcon,
@@ -113,6 +115,82 @@ const MORE: NavItem[] = [
 /** The mobile panel has room for the lot, so it never hides anything. */
 const ALL_NAV: NavItem[] = [...NAV, ...MORE];
 
+/** The menu in Spanish and Portuguese, by English label. */
+const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
+  es: {
+    Brawlers: 'Brawlers',
+    'Tier List': 'Tier list',
+    Ranked: 'Competitivo',
+    Maps: 'Mapas',
+    Draft: 'Draft',
+    Leaderboard: 'Rankings',
+    'Android App': 'App para Android',
+    Daily: 'Diario',
+    'Team Comps': 'Equipos',
+    'Meta Report': 'Informe del meta',
+    'Hidden Meta': 'Meta oculto',
+    'Daily Challenge': 'Reto diario',
+    'Patch Impact': 'Impacto de parches',
+    'Community Events': 'Eventos de la comunidad',
+    Clubs: 'Clubes',
+    Compare: 'Comparar',
+    'Tier List Maker': 'Crear tier list',
+    'Starr Drops': 'Starr Drops',
+    Cosmetics: 'Cosméticos',
+    News: 'Noticias',
+    'Release Notes': 'Notas de versión',
+    More: 'Más',
+    Search: 'Buscar',
+    searchLabel: 'Buscar un jugador o club',
+    home: 'Inicio de BrawlZone',
+    open: 'Abrir menú',
+    close: 'Cerrar menú',
+    main: 'Principal',
+  },
+  pt: {
+    Brawlers: 'Brawlers',
+    'Tier List': 'Tier list',
+    Ranked: 'Ranqueado',
+    Maps: 'Mapas',
+    Draft: 'Draft',
+    Leaderboard: 'Rankings',
+    'Android App': 'App para Android',
+    Daily: 'Diário',
+    'Team Comps': 'Times',
+    'Meta Report': 'Relatório do meta',
+    'Hidden Meta': 'Meta oculto',
+    'Daily Challenge': 'Desafio diário',
+    'Patch Impact': 'Impacto dos patches',
+    'Community Events': 'Eventos da comunidade',
+    Clubs: 'Clubes',
+    Compare: 'Comparar',
+    'Tier List Maker': 'Criar tier list',
+    'Starr Drops': 'Starr Drops',
+    Cosmetics: 'Cosméticos',
+    News: 'Notícias',
+    'Release Notes': 'Notas de atualização',
+    More: 'Mais',
+    Search: 'Buscar',
+    searchLabel: 'Buscar um jogador ou clube',
+    home: 'Início do BrawlZone',
+    open: 'Abrir menu',
+    close: 'Fechar menu',
+    main: 'Principal',
+  },
+};
+
+const EN_EXTRA: Record<string, string> = {
+  searchLabel: 'Search a player or club',
+  home: 'BrawlZone home',
+  open: 'Open menu',
+  close: 'Close menu',
+  main: 'Main',
+};
+
+function word(locale: Locale, english: string): string {
+  return locale === 'en' ? (EN_EXTRA[english] ?? english) : (LABELS[locale][english] ?? english);
+}
+
 /** `match` overrides `href` when a nav entry links into a section. */
 function isActive(pathname: string, href: string, match?: string) {
   const prefix = match ?? href;
@@ -120,16 +198,21 @@ function isActive(pathname: string, href: string, match?: string) {
 }
 
 export function SiteHeader() {
-  const pathname = usePathname();
+  const locale = useLocale();
+  const t = (english: string) => word(locale, english);
+  const href = (path: string) => localePath(locale, path);
+  // Active-tab matching runs on the English path, so /es/maps lights Maps.
+  const rawPath = usePathname();
+  const pathname = stripLocale(rawPath);
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [lastPath, setLastPath] = useState(pathname);
+  const [lastPath, setLastPath] = useState(rawPath);
 
   // Any route change closes both panels, including a browser back that no link
   // handler ever sees. Adjusting during render rather than in an effect keeps
   // the closed panel out of the committed frame.
-  if (lastPath !== pathname) {
-    setLastPath(pathname);
+  if (lastPath !== rawPath) {
+    setLastPath(rawPath);
     setOpen(false);
     setMoreOpen(false);
   }
@@ -148,9 +231,9 @@ export function SiteHeader() {
 
       <div className="relative mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link
-          href="/"
+          href={href('/')}
           className="group flex shrink-0 items-center gap-2.5"
-          aria-label="BrawlZone home"
+          aria-label={t('home')}
         >
           <BrandMark className="size-9 shrink-0 transition-transform duration-200 group-hover:-rotate-6" />
           <span className="display text-xl uppercase leading-none tracking-wide">
@@ -168,19 +251,19 @@ export function SiteHeader() {
           height of the whole bar and is far harder to notice in review than a
           crowded one.
         */}
-        <nav aria-label="Main" className="ml-auto hidden items-center lg:flex">
-          {NAV.map(({ href, match, label }) => {
-            const active = isActive(pathname, href, match);
+        <nav aria-label={t('main')} className="ml-auto hidden items-center lg:flex">
+          {NAV.map(({ href: path, match, label }) => {
+            const active = isActive(pathname, path, match);
             return (
               <Link
-                key={href}
-                href={href}
+                key={path}
+                href={href(path)}
                 aria-current={active ? 'page' : undefined}
                 className={`relative whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                   active ? 'text-brand' : 'text-muted hover:text-foreground'
                 }`}
               >
-                {label}
+                {t(label)}
                 {/* Underline marks the current page more clearly than a tint. */}
                 <span
                   aria-hidden
@@ -202,7 +285,7 @@ export function SiteHeader() {
                 moreActive || moreOpen ? 'text-brand' : 'text-muted hover:text-foreground'
               }`}
             >
-              More
+              {t('More')}
               <ChevronDown
                 className={`size-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`}
               />
@@ -227,12 +310,12 @@ export function SiteHeader() {
                   className="fixed inset-0 z-0 cursor-default"
                 />
                 <ul className="absolute right-0 z-10 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-surface shadow-lg shadow-black/40">
-                  {MORE.map(({ href, match, label, icon: Icon }) => {
-                    const active = isActive(pathname, href, match);
+                  {MORE.map(({ href: path, match, label, icon: Icon }) => {
+                    const active = isActive(pathname, path, match);
                     return (
-                      <li key={href}>
+                      <li key={path}>
                         <Link
-                          href={href}
+                          href={href(path)}
                           aria-current={active ? 'page' : undefined}
                           onClick={() => setMoreOpen(false)}
                           className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold transition-colors ${
@@ -242,7 +325,7 @@ export function SiteHeader() {
                           }`}
                         >
                           <Icon className="size-4 shrink-0" />
-                          {label}
+                          {t(label)}
                         </Link>
                       </li>
                     );
@@ -253,18 +336,18 @@ export function SiteHeader() {
           </div>
 
           <Link
-            href="/#search"
+            href={`${href('/')}#search`}
             className="ml-3 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink shadow-[0_2px_0_0_#b87d00] transition-colors hover:bg-brand-strong"
           >
             <Search className="size-4" />
-            Search
+            {t('Search')}
           </Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:hidden">
           <Link
-            href="/#search"
-            aria-label="Search a player or club"
+            href={`${href('/')}#search`}
+            aria-label={t('searchLabel')}
             className="grid size-10 place-items-center rounded-lg bg-brand text-brand-ink shadow-[0_2px_0_0_#b87d00]"
           >
             <Search className="size-5" />
@@ -272,7 +355,7 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? t('close') : t('open')}
             aria-expanded={open}
             aria-controls="mobile-nav"
             className="grid size-10 place-items-center rounded-lg border border-border text-muted transition-colors hover:text-foreground"
@@ -285,7 +368,7 @@ export function SiteHeader() {
       {open ? (
         <nav
           id="mobile-nav"
-          aria-label="Main"
+          aria-label={t('main')}
           className="border-t border-border/70 bg-surface/95 backdrop-blur-md lg:hidden"
         >
           {/*
@@ -293,12 +376,12 @@ export function SiteHeader() {
             clipped in a two-column grid on the narrowest phones.
           */}
           <ul className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2 px-4 py-4 min-[380px]:grid-cols-2 sm:px-6">
-            {ALL_NAV.map(({ href, match, label, icon: Icon }) => {
-              const active = isActive(pathname, href, match);
+            {ALL_NAV.map(({ href: path, match, label, icon: Icon }) => {
+              const active = isActive(pathname, path, match);
               return (
-                <li key={href}>
+                <li key={path}>
                   <Link
-                    href={href}
+                    href={href(path)}
                     aria-current={active ? 'page' : undefined}
                     onClick={() => setOpen(false)}
                     className={`flex items-center gap-2.5 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${
@@ -308,7 +391,7 @@ export function SiteHeader() {
                     }`}
                   >
                     <Icon className="size-4 shrink-0" />
-                    <span className="truncate">{label}</span>
+                    <span className="truncate">{t(label)}</span>
                   </Link>
                 </li>
               );

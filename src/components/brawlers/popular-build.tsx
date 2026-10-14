@@ -7,6 +7,9 @@ import { gearIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
 import type { BrawlerBuild, BuildOption } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface Props {
   build: BrawlerBuild | null;
@@ -36,21 +39,18 @@ interface Props {
  * anywhere in the player or battle payloads.
  */
 export function PopularBuild({ build, meta, gearNames }: Props) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   if (!build || build.sampleSize === 0) {
     return (
       /* An empty state that ends the visit is a wasted one, so it says what is
          missing and offers a page that does have an answer. */
       <div className="card p-6">
-        <p className="text-sm leading-relaxed text-muted">
-          No sampled player owns this brawler yet, so there is nothing to measure.
-          This fills in over the next few days as the sampler works through profiles.
-        </p>
+        <p className="text-sm leading-relaxed text-muted">{t('No sampled player owns this brawler yet, so there is nothing to measure. This fills in over the next few days as the sampler works through profiles.')}</p>
         <Link
-          href="/tier-list/trophy"
+          href={lp('/tier-list/trophy')}
           className="mt-4 inline-flex rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-        >
-          See what is strong right now
-        </Link>
+        >{t('See what is strong right now')}</Link>
       </div>
     );
   }
@@ -82,25 +82,25 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
     note?: string;
   }[] = [
     {
-      title: 'Gears owners buy',
+      title: t('Gears owners buy'),
       node: <GearIcon className="size-5" />,
       options: build.gears,
-      note: 'Gears cost coins and you can only run two, so what owners have bought is a real preference.',
+      note: t('Gears cost coins and you can only run two, so what owners have bought is a real preference.'),
     },
     ...(starPowersSplit
       ? [
           {
-            title: 'Star powers',
+            title: t('Star powers'),
             node: <StarPowerIcon className="size-5" />,
             options: build.starPowers,
-            note: 'One of these is noticeably more common than the other, which usually means it came first or is the one people buy.',
+            note: t('One of these is noticeably more common than the other, which usually means it came first or is the one people buy.'),
           },
         ]
       : []),
     ...(gadgetsSplit
       ? [
           {
-            title: 'Gadgets',
+            title: t('Gadgets'),
             node: <GadgetIcon className="size-5" />,
             options: build.gadgets,
             note: undefined,
@@ -118,10 +118,10 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
           <div key={title} className="card p-4">
             <h3 className="flex items-center gap-2 text-sm font-bold">
               {node}
-              {title}
+              {t(title)}
             </h3>
             {note ? (
-              <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{note}</p>
+              <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{t(note)}</p>
             ) : (
               <div className="mb-3" />
             )}
@@ -158,9 +158,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                         <span className="truncate text-sm font-medium capitalize">
                           {name.toLowerCase()}
                           {index === 0 && options.length > 1 && leadMargin > 0.1 ? (
-                            <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">
-                              Most picked
-                            </span>
+                            <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">{t('Most picked')}</span>
                           ) : null}
                         </span>
                         {/*
@@ -176,15 +174,13 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                           says how common the choice is — so both are named.
                         */}
                         <span className="flex shrink-0 items-baseline gap-2">
-                          <span className="text-xs text-muted">
-                            {formatPercent(option.unlockRate)} of owners
-                          </span>
+                          <span className="text-xs text-muted">{t('{unlockRate} of owners', { unlockRate: formatPercent(option.unlockRate) })}</span>
                           <span
                             className="text-sm font-bold tabular-nums"
-                            title={`${formatNumber(option.owners)} unlocks, out of every gear unlock recorded on this brawler`}
+                            title={t('{owners} unlocks, out of every gear unlock recorded on this brawler', { owners: formatNumber(option.owners) })}
                           >
                             {formatPercent(option.share)}
-                            <span className="ml-1 text-xs font-normal text-muted">of picks</span>
+                            <span className="ml-1 text-xs font-normal text-muted">{t('of picks')}</span>
                           </span>
                         </span>
                       </div>
@@ -205,17 +201,10 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
 
       {/* What the numbers are, in one line. The methodology behind them lives
           on the About page rather than under every chart. */}
-      <p className="text-xs leading-relaxed text-muted">
-        Measured across {formatNumber(build.sampleSize)} tracked players who own this
-        brawler.{' '}
-        <span className="text-muted/90">
-          &ldquo;Of owners&rdquo; is how many of them have that item; &ldquo;of
-          picks&rdquo; is its share of every unlock of that kind, which is what makes
-          the options comparable with each other. A player can own several gears, so
-          the first column does not add up to 100% and the second does.
-        </span>
+      <p className="text-xs leading-relaxed text-muted">{t('Measured across {sampleSize} tracked players who own this brawler.', { sampleSize: formatNumber(build.sampleSize) })}{' '}
+        <span className="text-muted/90">{t('“Of owners” is how many of them have that item; “of picks” is its share of every unlock of that kind, which is what makes the options comparable with each other. A player can own several gears, so the first column does not add up to 100% and the second does.')}</span>
         {!starPowersSplit && !gadgetsSplit
-          ? ' Almost all of them own both star powers and both gadgets.'
+          ? t(' Almost all of them own both star powers and both gadgets.')
           : ''}
       </p>
     </div>

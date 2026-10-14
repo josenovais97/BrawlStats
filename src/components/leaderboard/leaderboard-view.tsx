@@ -19,6 +19,9 @@ import { formatNumber, nameColorToCss } from '@/lib/format';
 import { regionName } from '@/lib/regions';
 import { normalizeTag } from '@/lib/tags';
 import { CLUB_LINK_REL, playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Must match `revalidate` on the three leaderboard routes.
@@ -45,20 +48,21 @@ export async function LeaderboardView({
   board: LeaderboardBoard;
   region: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="space-y-10">
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <TrophyIcon className="size-4" />
-          {board === 'cosmetics' || board === 'ranked' ? 'Our own data' : 'Official rankings'}
+          {board === 'cosmetics' || board === 'ranked' ? t('Our own data') : t('Official rankings')}
         </p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Leaderboard</h1>
+        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{t('Leaderboard')}</h1>
         <p className="mt-3 max-w-3xl leading-relaxed text-muted">
           {board === 'cosmetics'
-            ? 'What the sampled player pool is wearing. Built from our own daily samples, not from the game API.'
+            ? t('What the sampled player pool is wearing. Built from our own daily samples, not from the game API.')
             : board === 'ranked'
-              ? 'Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.'
-              : `The official top 100 ${board} by trophies in ${regionName(region)}, straight from the game API.`}
+              ? t('Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.')
+              : t('The official top 100 {board} by trophies in {region}, straight from the game API.', { board: board, region: regionName(region) })}
         </p>
       </header>
 
@@ -94,6 +98,8 @@ export async function LeaderboardView({
 }
 
 async function PlayerBoard({ region }: { region: string }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   let items;
   try {
     ({ items } = await getPlayerRankings(region, 100, RANKING_REVALIDATE));
@@ -113,22 +119,22 @@ async function PlayerBoard({ region }: { region: string }) {
           one is the game's own top 100. */}
       <div id="player-board">
         <SectionHeading
-          title={`Top players in ${regionName(region)}`}
-          subtitle="By total trophies, from the game API's own ranking."
+          title={t('Top players in {region}', { region: regionName(region) })}
+          subtitle={t('By total trophies, from the game API\'s own ranking.')}
           aside={`${items.length} shown`}
         />
       </div>
       {/* The top three as a podium, first place in the middle and raised:
           the world's best players were three rows like any other. */}
       {items.length >= 3 ? (
-        <ol className="mb-4 grid grid-cols-3 items-end gap-2 sm:gap-4" aria-label="Top three players">
+        <ol className="mb-4 grid grid-cols-3 items-end gap-2 sm:gap-4" aria-label={t('Top three players')}>
           {[1, 0, 2].map((i) => {
             const player = items[i];
             const first = i === 0;
             return (
               <li key={player.tag} className={first ? '' : 'pt-6 sm:pt-8'}>
                 <Link
-                  href={`/player/${normalizeTag(player.tag)}`}
+                  href={lp(`/player/${normalizeTag(player.tag)}`)}
                   rel={playerLinkRel(normalizeTag(player.tag))}
                   prefetch={false}
                   className="card card-interactive relative flex flex-col items-center px-2 pb-3 pt-4 text-center sm:px-3"
@@ -162,7 +168,7 @@ async function PlayerBoard({ region }: { region: string }) {
                     {player.name}
                   </p>
                   <p className="w-full truncate text-[11px] text-muted sm:text-xs">
-                    {player.club?.name ?? 'No club'}
+                    {player.club?.name ?? t('No club')}
                   </p>
                   <p className="mt-1 flex items-center gap-1 text-sm font-black tabular-nums text-brand sm:text-base">
                     <TrophyIcon className="size-4" />
@@ -178,7 +184,7 @@ async function PlayerBoard({ region }: { region: string }) {
         {(items.length >= 3 ? items.slice(3) : items).map((player) => (
           <li key={player.tag}>
             <Link
-              href={`/player/${normalizeTag(player.tag)}`}
+              href={lp(`/player/${normalizeTag(player.tag)}`)}
               rel={playerLinkRel(normalizeTag(player.tag))}
                 prefetch={false}
               className="card card-interactive flex items-center gap-3 p-3"
@@ -200,7 +206,7 @@ async function PlayerBoard({ region }: { region: string }) {
                   {player.name}
                 </p>
                 <p className="truncate text-xs text-muted">
-                  {player.club?.name ?? 'No club'}
+                  {player.club?.name ?? t('No club')}
                 </p>
               </div>
               <span className="flex shrink-0 items-center gap-1.5 font-bold tabular-nums text-brand">
@@ -216,6 +222,8 @@ async function PlayerBoard({ region }: { region: string }) {
 }
 
 async function ClubBoard({ region }: { region: string }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   let items;
   try {
     ({ items } = await getClubRankings(region, 100, RANKING_REVALIDATE));
@@ -231,8 +239,8 @@ async function ClubBoard({ region }: { region: string }) {
     <section aria-labelledby="club-board">
       <div id="club-board">
         <SectionHeading
-          title={`Top clubs in ${regionName(region)}`}
-          subtitle="By combined member trophies, from the game API's own ranking."
+          title={t('Top clubs in {region}', { region: regionName(region) })}
+          subtitle={t('By combined member trophies, from the game API\'s own ranking.')}
           aside={`${items.length} shown`}
         />
       </div>
@@ -240,7 +248,7 @@ async function ClubBoard({ region }: { region: string }) {
         {items.map((club) => (
           <li key={club.tag}>
             <Link
-              href={`/club/${normalizeTag(club.tag)}`}
+              href={lp(`/club/${normalizeTag(club.tag)}`)}
               rel={CLUB_LINK_REL}
                 prefetch={false}
               className="card card-interactive flex items-center gap-3 p-3"
@@ -257,9 +265,7 @@ async function ClubBoard({ region }: { region: string }) {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{club.name}</p>
                 <p className="flex items-center gap-1 truncate text-xs text-muted">
-                  <PlayersIcon className="size-3.5" />
-                  {club.memberCount}/30 members
-                </p>
+                  <PlayersIcon className="size-3.5" />{t('{memberCount}/30 members', { memberCount: club.memberCount })}</p>
               </div>
               <span className="flex shrink-0 items-center gap-1.5 font-bold tabular-nums text-brand">
                 <TrophyIcon className="size-4" />
@@ -292,15 +298,14 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 function EmptyRegion({ region }: { region: string }) {
+  const t = getT(requestLocale());
   return (
     <div className="card p-8 text-center">
       <span className="mx-auto grid size-12 place-items-center rounded-xl bg-surface-2 text-muted">
         <LeaderboardIcon className="size-6" />
       </span>
-      <p className="mt-3 font-semibold">No ranking data for {regionName(region)}</p>
-      <p className="mt-1 text-sm text-muted">
-        Not every country has a populated leaderboard. Try Global or a larger region.
-      </p>
+      <p className="mt-3 font-semibold">{t('No ranking data for')}{' '}{regionName(region)}</p>
+      <p className="mt-1 text-sm text-muted">{t('Not every country has a populated leaderboard. Try Global or a larger region.')}</p>
     </div>
   );
 }

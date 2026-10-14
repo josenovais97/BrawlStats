@@ -7,6 +7,8 @@ import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { currentMonth } from '@/lib/site';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { getMetaIndex } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /*
  * A function, not a `metadata` object, because of the month in the title.
@@ -17,10 +19,11 @@ import { getMetaIndex } from '@/lib/stats';
  * rebuild is then a backstop rather than the only thing keeping it honest.
  */
 export function generateMetadata(): Metadata {
+  const t = getT(requestLocale());
   return {
     alternates: { canonical: '/brawlers' },
-    title: `All Brawl Stars brawlers ranked (${currentMonth()})`,
-    description: `Every Brawl Stars brawler with its Ranked tier, class, rarity, star powers and gadgets, ${currentMonth()}. Sorted strongest first from sampled battles.`,
+    title: t('All Brawl Stars brawlers ranked ({v})', { v: currentMonth() }),
+    description: t('Every Brawl Stars brawler with its Ranked tier, class, rarity, star powers and gadgets, {v}. Sorted strongest first from sampled battles.', { v: currentMonth() }),
   };
 }
 
@@ -33,6 +36,7 @@ export function generateMetadata(): Metadata {
 export const revalidate = 3600;
 
 export default async function BrawlersPage() {
+  const t = getT(requestLocale());
   let catalog;
   try {
     catalog = await getBrawlerCatalog();
@@ -41,8 +45,8 @@ export default async function BrawlersPage() {
     return (
       <ErrorState
         code="upstreamDown"
-        title="Brawler data unavailable"
-        detail="The brawler metadata source (brawlapi.com) is not responding. Try again shortly."
+        title={t('Brawler data unavailable')}
+        detail={t('The brawler metadata source (brawlapi.com) is not responding. Try again shortly.')}
       />
     );
   }
@@ -72,12 +76,10 @@ export default async function BrawlersPage() {
           ones are listed too. Both carry a badge rather than being counted as
           current. */}
       <PageHeading
-        title="Brawlers"
-        subtitle={`All ${catalog.current.length} current brawlers with their Ranked tier, sortable by how strong they are right now${
-          catalog.legacy.length > 0
+        title={t('Brawlers')}
+        subtitle={t('All {length} current brawlers with their Ranked tier, sortable by how strong they are right now{v}', { length: catalog.current.length, v: catalog.legacy.length > 0
             ? `. Plus ${catalog.legacy.length} no longer playable.`
-            : '.'
-        }`}
+            : '.' })}
       />
 
       <BrawlerBrowser

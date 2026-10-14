@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { getUT } from '@/lib/t-universal';
 
 /**
  * The shared shape of the two whole-page dead ends: a 404, and a render that
@@ -23,6 +24,7 @@ export function FullPageMessage({
   /** The ways out: links, a retry button. */
   children?: React.ReactNode;
 }) {
+  const t = getUT();
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center py-10 text-center sm:py-16">
       <Image
@@ -33,8 +35,8 @@ export function FullPageMessage({
         priority
         className="h-auto w-40 sm:w-52"
       />
-      <h1 className="display mt-6 text-3xl uppercase sm:text-4xl">{title}</h1>
-      <p className="mt-3 leading-relaxed text-muted">{body}</p>
+      <h1 className="display mt-6 text-3xl uppercase sm:text-4xl">{t(title)}</h1>
+      <p className="mt-3 leading-relaxed text-muted">{t(body)}</p>
       {children ? (
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           {children}

@@ -6,6 +6,9 @@ import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import { brawlerPath } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
 import type { TeamComp } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The three-brawler compositions that win a mode.
@@ -35,8 +38,10 @@ export function CompList({
   brawlerMeta: Map<number, BABrawler>;
   emptyLabel: string;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   if (comps.length === 0) {
-    return <p className="card p-6 text-sm leading-relaxed text-muted">{emptyLabel}</p>;
+    return <p className="card p-6 text-sm leading-relaxed text-muted">{t(emptyLabel)}</p>;
   }
 
   return (
@@ -73,7 +78,7 @@ export function CompList({
                       </span>
                     ) : null}
                     <Link
-                      href={brawlerPath(id, meta?.name ?? String(id))}
+                      href={lp(brawlerPath(id, meta?.name ?? String(id)))}
                       prefetch={false}
                       className="group flex w-[4.5rem] flex-col items-center gap-1 rounded-lg py-1 transition-colors hover:bg-surface-2 sm:w-20"
                     >
@@ -104,12 +109,8 @@ export function CompList({
                 {edgePts >= 0.05 ? '+' : edgePts <= -0.05 ? '−' : '±'}
                 {Math.abs(edgePts).toFixed(1)}
               </span>
-              <span className="mt-1 block text-xs tabular-nums text-muted">
-                {formatPercent(comp.winRate)} won
-              </span>
-              <span className="mt-0.5 block text-[11px] tabular-nums text-muted/80">
-                {formatNumber(comp.battles)} battles · {formatNumber(comp.players)} players
-              </span>
+              <span className="mt-1 block text-xs tabular-nums text-muted">{t('{winRate} won', { winRate: formatPercent(comp.winRate) })}</span>
+              <span className="mt-0.5 block text-[11px] tabular-nums text-muted/80">{t('{battles} battles · {players} players', { battles: formatNumber(comp.battles), players: formatNumber(comp.players) })}</span>
             </div>
           </li>
         );

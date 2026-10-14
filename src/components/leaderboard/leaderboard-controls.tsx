@@ -13,6 +13,7 @@ import { useTransition } from 'react';
 
 import { RegionPicker } from '@/components/leaderboard/region-picker';
 import { leaderboardHref, type LeaderboardBoard } from '@/lib/leaderboard-route';
+import { useLp } from '@/components/i18n/use-lp';
 
 /* Defined with the URL scheme it is a segment of; re-exported so the callers
    that already import it from here keep working. */
@@ -40,6 +41,7 @@ const BOARDS: {
  * re-renders with fresh data and every view is linkable.
  */
 export function LeaderboardControls({ region, board }: LeaderboardControlsProps) {
+  const lp = useLp();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -50,7 +52,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
   function navigate(next: { region?: string; type?: LeaderboardBoard }) {
     const target = leaderboardHref(next.type ?? board, next.region ?? region);
     startTransition(() => {
-      router.push(target);
+      router.push(lp(target));
     });
   }
 
@@ -74,7 +76,7 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
           */
           <Link
             key={key}
-            href={leaderboardHref(key, region)}
+            href={lp(leaderboardHref(key, region))}
             onClick={(event) => {
               if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
               event.preventDefault();

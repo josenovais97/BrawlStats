@@ -4,6 +4,7 @@ import { Download, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * The event Chromium fires when a site meets the installability criteria.
@@ -24,6 +25,7 @@ const DISMISSED_KEY = 'brawlzone:install-dismissed';
  * support it. A dismissal is remembered so it is never nagging.
  */
 export function InstallPrompt() {
+  const t = useT();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -68,21 +70,19 @@ export function InstallPrompt() {
       <div className="card card-glow flex items-center gap-3 p-3 shadow-2xl shadow-black/60">
         <BrandMark className="size-10 shrink-0" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold">Install BrawlZone</p>
-          <p className="truncate text-xs text-muted">Add it to your home screen</p>
+          <p className="text-sm font-bold">{t('Install BrawlZone')}</p>
+          <p className="truncate text-xs text-muted">{t('Add it to your home screen')}</p>
         </div>
         <button
           type="button"
           onClick={install}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand px-3 py-2 text-sm font-bold text-[#1a1200]"
         >
-          <Download className="size-4" />
-          Install
-        </button>
+          <Download className="size-4" />{t('Install')}</button>
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Dismiss install prompt"
+          aria-label={t('Dismiss install prompt')}
           className="grid size-8 shrink-0 place-items-center rounded-lg text-muted hover:bg-surface-2"
         >
           <X className="size-4" />

@@ -5,6 +5,8 @@ import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import type { BattleInsights } from '@/lib/battle-insights';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayer } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One card, built to be screenshotted.
@@ -28,6 +30,7 @@ export function WrappedCard({
   brawlerMeta: Map<number, BABrawler>;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const t = getT(requestLocale());
   const topBrawler = insights.brawlers[0] ?? null;
   const topMode = insights.modes[0] ?? null;
   const up = insights.trophyChange >= 0;
@@ -62,38 +65,38 @@ export function WrappedCard({
             <span className="block text-lg font-black tabular-nums text-brand">
               {formatNumber(player.trophies)}
             </span>
-            <span className="block text-[11px] text-muted">trophies</span>
+            <span className="block text-[11px] text-muted">{t('trophies')}</span>
           </p>
         </header>
 
         <div className="grid grid-cols-2 gap-3">
           <Stat
-            label="Battles"
+            label={t('Battles')}
             value={formatNumber(insights.battles)}
             hint={`${insights.wins}W · ${insights.losses}L`}
           />
           <Stat
-            label="Win rate"
+            label={t('Win rate')}
             value={insights.winRate === null ? '—' : formatPercent(insights.winRate)}
-            hint={`${insights.decided} decided`}
+            hint={t('{decided} decided', { decided: insights.decided })}
             tone={insights.winRate !== null && insights.winRate >= 0.5 ? 'good' : undefined}
           />
           <Stat
-            label="Trophies"
+            label={t('Trophies')}
             value={`${up ? '+' : '−'}${formatNumber(Math.abs(insights.trophyChange))}`}
-            hint="across this run"
+            hint={t('across this run')}
             tone={up ? 'good' : 'bad'}
           />
           <Stat
-            label="Star player"
+            label={t('Star player')}
             value={formatNumber(insights.starPlayerCount)}
-            hint={insights.starPlayerCount === 1 ? 'time' : 'times'}
+            hint={insights.starPlayerCount === 1 ? t('time') : t('times')}
           />
         </div>
 
         {topBrawler ? (
           <Highlight
-            eyebrow="Most played"
+            eyebrow={t('Most played')}
             art={
               brawlerMeta.get(topBrawler.brawlerId)?.imageUrl ??
               brawlerIconUrl(topBrawler.brawlerId)
@@ -107,7 +110,7 @@ export function WrappedCard({
 
         {topMode ? (
           <Highlight
-            eyebrow="Most played mode"
+            eyebrow={t('Most played mode')}
             art={modeMeta.get(topMode.mode.toLowerCase())?.imageUrl}
             title={modeLabel(modeMeta, topMode.mode)}
             detail={`${topMode.battles} ${topMode.battles === 1 ? 'battle' : 'battles'}${
@@ -116,9 +119,7 @@ export function WrappedCard({
           />
         ) : null}
 
-        <p className="border-t border-border pt-3 text-center text-[11px] text-muted">
-          brawlzone.net · last {insights.battles} battles
-        </p>
+        <p className="border-t border-border pt-3 text-center text-[11px] text-muted">{t('brawlzone.net · last {battles} battles', { battles: insights.battles })}</p>
       </div>
     </article>
   );
@@ -135,9 +136,10 @@ function Stat({
   hint: string;
   tone?: 'good' | 'bad';
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="rounded-xl bg-surface-2/60 p-3">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{label}</p>
+      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t(label)}</p>
       <p
         className={`mt-0.5 text-2xl font-black tabular-nums ${
           tone === 'good' ? 'text-victory' : tone === 'bad' ? 'text-defeat' : ''
@@ -145,7 +147,7 @@ function Stat({
       >
         {value}
       </p>
-      <p className="text-[11px] text-muted">{hint}</p>
+      <p className="text-[11px] text-muted">{t(hint)}</p>
     </div>
   );
 }
@@ -161,6 +163,7 @@ function Highlight({
   title: string;
   detail: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="flex items-center gap-3 rounded-xl bg-surface-2/60 p-3">
       {art ? (
@@ -176,9 +179,9 @@ function Highlight({
         <span aria-hidden className="size-10 shrink-0 rounded-lg bg-surface-2" />
       )}
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{eyebrow}</p>
-        <p className="truncate font-bold">{title}</p>
-        <p className="truncate text-xs text-muted">{detail}</p>
+        <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t(eyebrow)}</p>
+        <p className="truncate font-bold">{t(title)}</p>
+        <p className="truncate text-xs text-muted">{t(detail)}</p>
       </div>
     </div>
   );

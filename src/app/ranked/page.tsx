@@ -28,13 +28,18 @@ import {
 import type { BABrawler, BAGameMode, BAMap } from '@/types/brawlapi';
 import type { MapConfidence, RankedMapPicks } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
+import { mapNamer } from '@/lib/i18n-game';
 
 /* A function, so the month is the month the page was last regenerated. */
 export function generateMetadata(): Metadata {
+  const t = getT(requestLocale());
   return {
     alternates: { canonical: '/ranked' },
-    title: `Brawl Stars Ranked maps and best brawlers (${currentMonth()})`,
-    description: `The best brawlers for every map in the current Ranked rotation, ${currentMonth()}. From sampled competitive battles, updated every few hours.`,
+    title: t('Brawl Stars Ranked maps and best brawlers ({v})', { v: currentMonth() }),
+    description: t('The best brawlers for every map in the current Ranked rotation, {v}. From sampled competitive battles, updated every few hours.', { v: currentMonth() }),
   };
 }
 
@@ -48,6 +53,8 @@ const CONFIDENCE_LABEL: Record<MapConfidence, string> = {
 };
 
 export default async function RankedPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const [maps, lastSeenRows, mapMeta, modeMeta, brawlerMeta, season, lastRun, metaIndex, ladder] = await Promise.all([
     getRankedMapPicks(3),
     getRankedMapLastSeen().catch(() => []),
@@ -240,10 +247,8 @@ export default async function RankedPage() {
       */}
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
-          <RankedIcon className="size-4" />
-          Competitive only
-        </p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">Ranked maps</h1>
+          <RankedIcon className="size-4" />{t('Competitive only')}</p>
+        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{t('Ranked maps')}</h1>
 
         {/*
           The answer first, as a sentence. Measured in Umami on 2026-09-21 this
@@ -255,28 +260,16 @@ export default async function RankedPage() {
         */}
         {top.length === 3 ? (
           <p className="mt-3 max-w-2xl text-base leading-relaxed">
-            <strong>
-              {titleCaseLabel(top[0].brawlerName)}, {titleCaseLabel(top[1].brawlerName)} and{' '}
-              {titleCaseLabel(top[2].brawlerName)} are the best brawlers in Ranked right now
-            </strong>
-            {lastRun ? ` (as of ${formatDate(lastRun.startedAt)})` : ''}, across every map in the
-            pool. {titleCaseLabel(top[0].brawlerName)} leads with a{' '}
-            {formatPercent(top[0].normalizedWinRate)} adjusted win rate over{' '}
-            {formatNumber(top[0].decidedSampleSize)} decided battles. Each map below has its own
-            answer.
-          </p>
+            <strong>{t('{brawlerName}, {brawlerName2} and', { brawlerName: titleCaseLabel(top[0].brawlerName), brawlerName2: titleCaseLabel(top[1].brawlerName) })}{' '}{t('{brawlerName} are the best brawlers in Ranked right now', { brawlerName: titleCaseLabel(top[2].brawlerName) })}</strong>
+            {lastRun ? t(' (as of {startedAt})', { startedAt: formatDate(lastRun.startedAt) }) : ''}{t(', across every map in the pool. {brawlerName} leads with a', { brawlerName: titleCaseLabel(top[0].brawlerName) })}{' '}{t('{normalizedWinRate} adjusted win rate over', { normalizedWinRate: formatPercent(top[0].normalizedWinRate) })}{' '}{t('{decidedSampleSize} decided battles. Each map below has its own answer.', { decidedSampleSize: formatNumber(top[0].decidedSampleSize) })}</p>
         ) : null}
-        <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">
-          The strongest brawlers on each map in the current Ranked rotation, from
-          sampled competitive battles only.
-        </p>
+        <p className="mt-2.5 max-w-2xl leading-relaxed text-muted">{t('The strongest brawlers on each map in the current Ranked rotation, from sampled competitive battles only.')}</p>
 
         {/* Everything needed to judge the numbers below, on one line. */}
         <ul className="mt-4 flex flex-wrap items-center gap-1.5">
-          <Fact tone="brand">{formatNumber(totalSamples)} Ranked battles</Fact>
+          <Fact tone="brand">{formatNumber(totalSamples)}{' '}{t('Ranked battles')}</Fact>
           {lastRun ? (
-            <Fact>
-              Sampled{' '}
+            <Fact>{t('Sampled')}{' '}
               <RelativeTime
                 iso={lastRun.startedAt}
                 fallback={relativeTime(lastRun.startedAt)}
@@ -284,9 +277,7 @@ export default async function RankedPage() {
             </Fact>
           ) : null}
           {onBoard.length > 0 ? (
-            <Fact>
-              {rated} of {onBoard.length} maps with a pick
-            </Fact>
+            <Fact>{t('{rated} of {length} maps with a pick', { rated: rated, length: onBoard.length })}</Fact>
           ) : null}
         </ul>
       </header>
@@ -312,12 +303,12 @@ export default async function RankedPage() {
       />
 
       {modeNav.length > 1 ? (
-        <nav aria-label="Jump to a mode" className="-mx-4 px-4 sm:mx-0 sm:px-0">
+        <nav aria-label={t('Jump to a mode')} className="-mx-4 px-4 sm:mx-0 sm:px-0">
           <ul className="flex gap-2 overflow-x-auto pb-1">
             {modeNav.map(({ mode, label, icon, count, color }) => (
               <li key={mode}>
                 <a
-                  href={`#mode-${mode}`}
+                  href={lp(`#mode-${mode}`)}
                   className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-3 text-sm font-semibold transition-colors hover:border-brand/50"
                 >
                   {icon ? (
@@ -330,7 +321,7 @@ export default async function RankedPage() {
                       unoptimized
                     />
                   ) : null}
-                  <span style={{ color }}>{label}</span>
+                  <span style={{ color }}>{t(label)}</span>
                   <span className="text-xs tabular-nums text-muted">{count}</span>
                 </a>
               </li>
@@ -341,18 +332,12 @@ export default async function RankedPage() {
 
       {shown.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
-          <h2 className="display text-xl uppercase">Collecting map data</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted">
-            Map names are recorded on newly sampled battles only, and the battle log
-            reaches back about 25 matches, so this fills in over the next day or two as
-            the sampler works through the pool.
-          </p>
+          <h2 className="display text-xl uppercase">{t('Collecting map data')}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted">{t('Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.')}</p>
           <Link
-            href="/tier-list/ranked"
+            href={lp('/tier-list/ranked')}
             className="mt-6 inline-flex rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-          >
-            See the Ranked tier list
-          </Link>
+          >{t('See the Ranked tier list')}</Link>
         </div>
       ) : (
         shown.map((row) => (
@@ -376,7 +361,7 @@ export default async function RankedPage() {
                   unoptimized
                 />
               ) : null}
-              <span style={{ color: row.accent }}>{row.label}</span>
+              <span style={{ color: row.accent }}>{t(row.label)}</span>
             </h2>
 
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -405,31 +390,15 @@ export default async function RankedPage() {
           because this is a finding rather than a footnote. */}
       <RankedLadder ladder={ladder} />
 
-      <Disclosure summary="How these picks are chosen">
-        <p>
-          Trophy-ladder games are excluded entirely. Ranked matchmaking pairs
-          comparable opponents, so what is left reflects the brawler rather than who
-          was holding it, and Ranked has carried no modifiers since the February 2025
-          rework &mdash; every battle counted here is the plain mode on the plain map.
-        </p>
+      <Disclosure summary={t('How these picks are chosen')}>
+        <p>{t('Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.')}</p>
         {onBoard.length > 0 ? (
-          <p className="mt-2">
-            Every map is scored against the same {formatPercent(baseline)} sample-wide
-            Ranked average, and each brawler&rsquo;s handful of battles on one map is
-            weighed against its overall Ranked form. A map needs real evidence to move
-            a brawler off that.
-            {rated < onBoard.length
-              ? ` ${onBoard.length - rated} of ${onBoard.length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.`
+          <p className="mt-2">{t('Every map is scored against the same {baseline} sample-wide Ranked average, and each brawler’s handful of battles on one map is weighed against its overall Ranked form. A map needs real evidence to move a brawler off that.', { baseline: formatPercent(baseline) })}{rated < onBoard.length
+              ? t(' {v} of {length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.', { v: onBoard.length - rated, length: onBoard.length })
               : ''}
           </p>
         ) : null}
-        <p className="mt-2">
-          Which maps appear is taken from the season&rsquo;s published pool rather than
-          from our own samples, so the board matches the rotation the day it changes.
-          Map names are recorded on newly sampled battles only and a battle log reaches
-          back about 25 matches, so a map that has just entered the pool carries no
-          picks for a day or two after it does.
-        </p>
+        <p className="mt-2">{t('Which maps appear is taken from the season’s published pool rather than from our own samples, so the board matches the rotation the day it changes. Map names are recorded on newly sampled battles only and a battle log reaches back about 25 matches, so a map that has just entered the pool carries no picks for a day or two after it does.')}</p>
       </Disclosure>
     </div>
   );
@@ -456,7 +425,7 @@ function Fact({
   );
 }
 
-function MapCard({
+async function MapCard({
   map,
   trio,
   art,
@@ -474,6 +443,9 @@ function MapCard({
   brawlerMeta: Map<number, BABrawler>;
   mapHref: string | null;
 }) {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <article className="card flex h-full flex-col overflow-hidden">
       {/* The map itself gets the top of the card, drawn whole rather than
@@ -481,7 +453,7 @@ function MapCard({
           faded-and-cropped banner made every card look alike. */}
       <MapPreview
         imageUrl={art?.imageUrl}
-        mapName={map.mapName}
+        mapName={nm(map.mapName)}
         modeLabel={modeLabel}
         accent={accent}
       />
@@ -494,8 +466,8 @@ function MapCard({
                 people here. Absent when the map is out of rotation, since
                 there is no page to send them to. */}
             {mapHref ? (
-              <Link href={mapHref} className="hover:text-brand">
-                {map.mapName}
+              <Link href={lp(mapHref)} className="hover:text-brand">
+                {nm(map.mapName)}
               </Link>
             ) : (
               map.mapName
@@ -515,20 +487,13 @@ function MapCard({
             {CONFIDENCE_LABEL[map.confidence]}
           </span>
         </div>
-        <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">
-          {formatNumber(map.sampleSize)} ranked battles · {map.brawlersSeen} brawlers
-          seen
-        </p>
+        <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">{t('{sampleSize} ranked battles · {brawlersSeen} brawlers seen', { sampleSize: formatNumber(map.sampleSize), brawlersSeen: map.brawlersSeen })}</p>
       </div>
 
       {map.picks.length === 0 ? (
         /* Naming a "best pick" the sample cannot support is worse than naming
            none, so a thin map says so instead of ranking noise. */
-        <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">
-          No brawler is clearly above average here yet. The map has been sampled{' '}
-          {formatNumber(map.sampleSize)} times, spread across {map.brawlersSeen}{' '}
-          brawlers. Not enough for any one of them to separate from the pack.
-        </p>
+        <p className="flex-1 px-3.5 py-4 text-xs leading-relaxed text-muted">{t('No brawler is clearly above average here yet. The map has been sampled')}{' '}{t('{sampleSize} times, spread across', { sampleSize: formatNumber(map.sampleSize) })}{' '}{map.brawlersSeen}{' '}{t('brawlers. Not enough for any one of them to separate from the pack.')}</p>
       ) : (
         <ol className="flex-1 divide-y divide-border">
           {map.picks.map((pick, index) => {
@@ -541,8 +506,8 @@ function MapCard({
             return (
               <li key={pick.brawlerId}>
                 <Link
-                  href={brawlerPath(pick.brawlerId, pick.brawlerName)}
-                  title={`${pick.brawlerName}: ${formatPercent(pick.winRate)} raw win rate over ${pick.decidedSampleSize} sampled Ranked battles on this map, against ${formatPercent(pick.overallScore)} adjusted form over ${formatNumber(pick.overallSampleSize)} Ranked battles overall`}
+                  href={lp(brawlerPath(pick.brawlerId, pick.brawlerName))}
+                  title={t('{brawlerName}: {winRate} raw win rate over {decidedSampleSize} sampled Ranked battles on this map, against {overallScore} adjusted form over {overallSampleSize} Ranked battles overall', { brawlerName: pick.brawlerName, winRate: formatPercent(pick.winRate), decidedSampleSize: pick.decidedSampleSize, overallScore: formatPercent(pick.overallScore), overallSampleSize: formatNumber(pick.overallSampleSize) })}
                   className="row-interactive flex items-center gap-2.5 px-3.5 py-2.5"
                 >
                   {/* A podium, not a list index. Three rows ranked against
@@ -580,9 +545,7 @@ function MapCard({
                     </span>
                     {/* Sample size is never hidden: on a per-map split it is
                         the difference between a signal and a coin flip. */}
-                    <span className="block text-xs tabular-nums text-muted">
-                      {pick.decidedSampleSize} battles here
-                    </span>
+                    <span className="block text-xs tabular-nums text-muted">{t('{decidedSampleSize} battles here', { decidedSampleSize: pick.decidedSampleSize })}</span>
                   </span>
                   <span className="shrink-0 text-right">
                     {/* The adjusted score, not the raw rate: ranking is by
@@ -601,9 +564,7 @@ function MapCard({
                         edge >= 0.005 ? 'text-victory/80' : 'text-muted'
                       }`}
                     >
-                      {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}
-                      {Math.abs(edge * 100).toFixed(1)} vs usual
-                    </span>
+                      {edge >= 0.005 ? '+' : edge <= -0.005 ? '−' : '±'}{t('{v} vs usual', { v: Math.abs(edge * 100).toFixed(1) })}</span>
                   </span>
                 </Link>
               </li>
@@ -616,9 +577,7 @@ function MapCard({
           line per map, so the page answers both "who" and "with whom". */}
       {trio ? (
         <div className="mt-auto flex items-center gap-2.5 border-t border-border/70 bg-surface-2/40 px-4 py-2.5">
-          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted">
-            Best trio
-          </span>
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted">{t('Best trio')}</span>
           <span className="flex shrink-0 -space-x-1.5">
             {trio.brawlerIds.map((id) => (
               <Image

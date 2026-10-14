@@ -6,6 +6,9 @@ import { titleCase } from '@/lib/format';
 import type { Autopsy } from '@/lib/battle-autopsy';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * The pattern behind the recent losses.
@@ -30,15 +33,14 @@ export function PlayerAutopsy({
   brawlerMeta: Map<number, BABrawler>;
   modeMeta: Map<string, BAGameMode>;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <section className="space-y-3">
       {/* The section title belongs to the parent now, which pairs this with the
           deep read of the last loss. This half only needs to say which of the
           two questions it answers. */}
-      <p className="text-sm text-muted">
-        Across the {autopsy.losses} {autopsy.losses === 1 ? 'loss' : 'losses'} in this log, rather
-        than one-off results:
-      </p>
+      <p className="text-sm text-muted">{t('Across the {losses}', { losses: autopsy.losses })}{' '}{autopsy.losses === 1 ? t('loss') : t('losses')}{' '}{t('in this log, rather than one-off results:')}</p>
 
       <ul className="card divide-y divide-border overflow-hidden">
         {autopsy.findings.map((finding) => {
@@ -67,16 +69,16 @@ export function PlayerAutopsy({
                   <>
                     <span className="block">
                       <Link
-                        href={brawlerPath(finding.brawlerId, finding.brawlerName)}
+                        href={lp(brawlerPath(finding.brawlerId, finding.brawlerName))}
                         prefetch={false}
                         className="font-semibold transition-colors hover:text-brand"
                       >
                         {name}
                       </Link>{' '}
-                      <span className="text-muted">is a weak pick on</span>{' '}
+                      <span className="text-muted">{t('is a weak pick on')}</span>{' '}
                       {mode && finding.mapName ? (
                         <Link
-                          href={`/maps/${slugify(mode)}/${slugify(finding.mapName)}`}
+                          href={lp(`/maps/${slugify(mode)}/${slugify(finding.mapName)}`)}
                           prefetch={false}
                           className="font-semibold transition-colors hover:text-brand"
                         >
@@ -87,25 +89,21 @@ export function PlayerAutopsy({
                       )}
                     </span>
                     <span className="block text-xs text-muted">
-                      {finding.losses} {finding.losses === 1 ? 'loss' : 'losses'} there ·{' '}
-                      {Math.abs((finding.edge ?? 0) * 100).toFixed(1)} pts below the map average
-                    </span>
+                      {finding.losses} {finding.losses === 1 ? t('loss') : t('losses')}{' '}{t('there ·')}{' '}{t('{v} pts below the map average', { v: Math.abs((finding.edge ?? 0) * 100).toFixed(1) })}</span>
                   </>
                 ) : (
                   <>
                     <span className="block">
                       <Link
-                        href={brawlerPath(finding.brawlerId, finding.brawlerName)}
+                        href={lp(brawlerPath(finding.brawlerId, finding.brawlerName))}
                         prefetch={false}
                         className="font-semibold transition-colors hover:text-brand"
                       >
                         {name}
                       </Link>{' '}
-                      <span className="text-muted">was on the other side</span>
+                      <span className="text-muted">{t('was on the other side')}</span>
                     </span>
-                    <span className="block text-xs text-muted">
-                      In {finding.losses} of your losses
-                    </span>
+                    <span className="block text-xs text-muted">{t('In {losses} of your losses', { losses: finding.losses })}</span>
                   </>
                 )}
               </span>
@@ -117,7 +115,7 @@ export function PlayerAutopsy({
                     : 'bg-surface-2 text-muted'
                 }`}
               >
-                {finding.kind === 'map-pick' ? 'Your pick' : 'Opponent'}
+                {finding.kind === 'map-pick' ? t('Your pick') : t('Opponent')}
               </span>
             </li>
           );

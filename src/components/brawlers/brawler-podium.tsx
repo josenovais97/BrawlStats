@@ -5,6 +5,9 @@ import { fullBodyArt } from '@/lib/brawler-art';
 import { titleCaseLabel } from '@/lib/format';
 import { brawlerPath } from '@/lib/slugs';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export interface PodiumItem {
   brawlerId: number;
@@ -34,6 +37,8 @@ export async function BrawlerPodium({
   brawlerMeta: Map<number, BABrawler>;
   label: string;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const top = items.slice(0, 3);
   if (top.length < 3) return null;
 
@@ -43,7 +48,7 @@ export async function BrawlerPodium({
 
   // Second, first, third: the winner in the middle, as podiums stand.
   return (
-    <ol className="mt-5 grid grid-cols-3 items-end gap-2 sm:gap-4" aria-label={label}>
+    <ol className="mt-5 grid grid-cols-3 items-end gap-2 sm:gap-4" aria-label={t(label)}>
       {[1, 0, 2].map((i) => {
         const b = top[i];
         const tint = brawlerMeta.get(b.brawlerId)?.rarity.color ?? 'var(--brand)';
@@ -51,7 +56,7 @@ export async function BrawlerPodium({
         return (
           <li key={b.brawlerId} className={first ? '' : 'pt-6 sm:pt-10'}>
             <Link
-              href={brawlerPath(b.brawlerId, b.brawlerName)}
+              href={lp(brawlerPath(b.brawlerId, b.brawlerName))}
               prefetch={false}
               className="group relative flex flex-col items-center overflow-hidden rounded-2xl border border-border pb-3 transition-colors hover:border-brand/60"
               style={{
@@ -89,13 +94,13 @@ export async function BrawlerPodium({
               <p className="mt-0.5 flex items-center gap-1.5 text-xs sm:text-sm">
                 {b.badge ? (
                   <span className="display" style={{ color: b.badge.color }}>
-                    {b.badge.text}
+                    {t(b.badge.text)}
                   </span>
                 ) : null}
-                <span className="font-black tabular-nums">{b.headline}</span>
+                <span className="font-black tabular-nums">{t(b.headline)}</span>
               </p>
               {b.detail ? (
-                <p className="px-1 text-center text-[10px] tabular-nums text-muted sm:text-xs">{b.detail}</p>
+                <p className="px-1 text-center text-[10px] tabular-nums text-muted sm:text-xs">{t(b.detail)}</p>
               ) : null}
             </Link>
           </li>

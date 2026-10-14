@@ -7,6 +7,9 @@ import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BrawlerPairing, BrawlerPairings } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Who this brawler beats, who beats it, and who it wants beside it.
@@ -40,22 +43,24 @@ export function BrawlerMatchups({
    */
   indexablePairs: ReadonlySet<string>;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const self = brawlerMeta.get(brawlerId);
   const name = brawlerName.toLowerCase();
   const columns: { title: string; hint: string; rows: BrawlerPairing[] }[] = [
     {
-      title: 'Strong against',
-      hint: `Opponents ${name} beats more often than its own average`,
+      title: t('Strong against'),
+      hint: t('Opponents {name} beats more often than its own average', { name: name }),
       rows: pairings.strongAgainst,
     },
     {
-      title: 'Weak against',
-      hint: `Opponents that pull ${name} below its own average`,
+      title: t('Weak against'),
+      hint: t('Opponents that pull {name} below its own average', { name: name }),
       rows: pairings.weakAgainst,
     },
     {
-      title: 'Best team-mates',
-      hint: `Allies ${name} wins more alongside`,
+      title: t('Best team-mates'),
+      hint: t('Allies {name} wins more alongside', { name: name }),
       rows: pairings.bestWith,
     },
   ];
@@ -69,9 +74,9 @@ export function BrawlerMatchups({
         {withRows.map((column) => (
           <div key={column.title}>
             <h3 className="text-sm font-bold uppercase tracking-wide text-muted">
-              {column.title}
+              {t(column.title)}
             </h3>
-            <p className="mb-2 text-xs text-muted/80">{column.hint}</p>
+            <p className="mb-2 text-xs text-muted/80">{t(column.hint)}</p>
             <ul className="card divide-y divide-border overflow-hidden">
               {column.rows.map((row) => {
                 const meta = brawlerMeta.get(row.brawlerId);
@@ -89,10 +94,10 @@ export function BrawlerMatchups({
                 return (
                   <li key={row.brawlerId}>
                     <Link
-                      href={href}
+                      href={lp(href)}
                       rel={followable ? undefined : 'nofollow'}
                       className="row-interactive flex items-center gap-3 px-3 py-2"
-                      title={`${formatPercent(row.winRate)} win rate over ${formatNumber(row.decidedSampleSize)} sampled battles, against a ${formatPercent(pairings.baseline)} average for this brawler`}
+                      title={t('{winRate} win rate over {decidedSampleSize} sampled battles, against a {baseline} average for this brawler', { winRate: formatPercent(row.winRate), decidedSampleSize: formatNumber(row.decidedSampleSize), baseline: formatPercent(pairings.baseline) })}
                     >
                       <Image
                         src={meta?.imageUrl ?? brawlerIconUrl(row.brawlerId)}
@@ -107,9 +112,7 @@ export function BrawlerMatchups({
                         <span className="block truncate text-sm font-semibold capitalize">
                           {(meta?.name ?? `#${row.brawlerId}`).toLowerCase()}
                         </span>
-                        <span className="block text-xs tabular-nums text-muted">
-                          {formatNumber(row.decidedSampleSize)} battles
-                        </span>
+                        <span className="block text-xs tabular-nums text-muted">{t('{decidedSampleSize} battles', { decidedSampleSize: formatNumber(row.decidedSampleSize) })}</span>
                       </span>
                       <span
                         className={`shrink-0 text-sm font-bold tabular-nums ${
@@ -128,13 +131,7 @@ export function BrawlerMatchups({
         ))}
       </div>
 
-      <p className="text-xs leading-relaxed text-muted">
-        Percentage points above or below this brawler&rsquo;s own{' '}
-        {formatPercent(pairings.baseline)} win rate across{' '}
-        {formatNumber(pairings.sampleSize)} sampled team battles. Counted once per
-        battle from one player&rsquo;s side, and kept out of the win-rate and pick-rate
-        numbers above. Those would be skewed by counting every participant.
-      </p>
+      <p className="text-xs leading-relaxed text-muted">{t('Percentage points above or below this brawler’s own')}{' '}{t('{baseline} win rate across', { baseline: formatPercent(pairings.baseline) })}{' '}{t('{sampleSize} sampled team battles. Counted once per battle from one player’s side, and kept out of the win-rate and pick-rate numbers above. Those would be skewed by counting every participant.', { sampleSize: formatNumber(pairings.sampleSize) })}</p>
     </div>
   );
 }

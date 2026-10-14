@@ -4,6 +4,8 @@ import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
 import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
 import { formatPercent } from '@/lib/format';
 import type { BrawlerBuild, BuildOption } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /** Only what naming a pick needs, so either brawler type satisfies it. */
 interface NamedAccessory {
@@ -44,6 +46,7 @@ export function RecommendedBuild({
    */
   variant?: 'strip' | 'hero';
 }) {
+  const t = getT(requestLocale());
   if (!build || build.sampleSize === 0) return null;
 
   const top = (options: BuildOption[]): BuildOption | null =>
@@ -90,10 +93,8 @@ export function RecommendedBuild({
     return (
       <div>
         <div className="mb-2.5 flex items-baseline justify-between gap-3">
-          <p className="display text-sm uppercase tracking-wide">The build owners run</p>
-          <a href="#build" className="text-xs font-semibold text-brand hover:underline">
-            Why, and what else
-          </a>
+          <p className="display text-sm uppercase tracking-wide">{t('The build owners run')}</p>
+          <a href="#build" className="text-xs font-semibold text-brand hover:underline">{t('Why, and what else')}</a>
         </div>
         <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {cards.map((c) => (
@@ -116,9 +117,7 @@ export function RecommendedBuild({
                 <span className="block truncate text-sm font-bold capitalize leading-tight">
                   {c.name.toLowerCase()}
                 </span>
-                <span className="block text-xs tabular-nums text-brand">
-                  {formatPercent(c.share)} of owners
-                </span>
+                <span className="block text-xs tabular-nums text-brand">{t('{share} of owners', { share: formatPercent(c.share) })}</span>
               </span>
             </li>
           ))}
@@ -129,7 +128,7 @@ export function RecommendedBuild({
 
   return (
     <div className="card flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">Most owned</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('Most owned')}</p>
 
       {starPower && starPowerName ? (
         <Pick
@@ -172,9 +171,7 @@ export function RecommendedBuild({
       <a
         href="#build"
         className="ml-auto text-xs font-semibold text-brand transition-colors hover:underline"
-      >
-        Why, and what else
-      </a>
+      >{t('Why, and what else')}</a>
     </div>
   );
 }

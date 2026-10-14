@@ -2,6 +2,9 @@ import { AlertTriangle, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 import { ERROR_COPY, type ApiErrorCode } from '@/lib/errors';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface ErrorStateProps {
   code: ApiErrorCode;
@@ -24,6 +27,8 @@ export function ErrorState({
   backHref = '/',
   backLabel = 'Back to search',
 }: ErrorStateProps) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const copy = ERROR_COPY[code];
   const isRetryable = code === 'rateLimited' || code === 'upstreamDown' || code === 'timeout';
 
@@ -37,7 +42,7 @@ export function ErrorState({
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link
-          href={backHref}
+          href={lp(backHref)}
           className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
@@ -45,9 +50,7 @@ export function ErrorState({
         </Link>
         {isRetryable ? (
           <span className="inline-flex items-center gap-2 rounded-lg bg-surface-2 px-4 py-2 text-sm text-muted">
-            <RefreshCw className="size-4" />
-            Refresh to retry
-          </span>
+            <RefreshCw className="size-4" />{t('Refresh to retry')}</span>
         ) : null}
       </div>
     </div>

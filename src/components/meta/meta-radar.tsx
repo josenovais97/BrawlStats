@@ -18,6 +18,8 @@ import {
   radiusFor,
 } from '@/lib/meta-radar';
 import { brawlerPath } from '@/lib/slugs';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * The meta as a picture.
@@ -79,6 +81,8 @@ export function MetaRadar({
   /** True inside a Panel, which already provides the surface. */
   bare?: boolean;
 }) {
+  const t = useT();
+  const lp = useLp();
   const [openId, setOpenId] = useState<number | null>(null);
 
   const layout = useMemo(() => {
@@ -228,7 +232,7 @@ export function MetaRadar({
           viewBox={`0 0 ${W} ${H}`}
           className="h-auto w-full min-w-[640px] touch-manipulation"
           role="img"
-          aria-label={`Every rated brawler plotted by pick rate against meta score, over ${windowDays} days`}
+          aria-label={t('Every rated brawler plotted by pick rate against meta score, over {windowDays} days', { windowDays: windowDays })}
         >
           {/* The four corners, tinted so the chart reads before anything is tapped. */}
           <Corner
@@ -237,7 +241,7 @@ export function MetaRadar({
             w={layout.xLow - PAD.left}
             h={layout.yStrong - PAD.top}
             fill="var(--victory)"
-            label="Sleepers"
+            label={t('Sleepers')}
             anchor="start"
             edge="top"
           />
@@ -247,7 +251,7 @@ export function MetaRadar({
             w={W - PAD.right - layout.xHigh}
             h={layout.yStrong - PAD.top}
             fill="var(--brand)"
-            label="Meta"
+            label={t('Meta')}
             anchor="end"
             edge="top"
           />
@@ -257,7 +261,7 @@ export function MetaRadar({
             w={layout.xLow - PAD.left}
             h={H - PAD.bottom - layout.yWeak}
             fill="var(--muted)"
-            label="Out of favour"
+            label={t('Out of favour')}
             anchor="start"
             edge="bottom"
           />
@@ -267,7 +271,7 @@ export function MetaRadar({
             w={W - PAD.right - layout.xHigh}
             h={H - PAD.bottom - layout.yWeak}
             fill="var(--defeat)"
-            label="Overrated"
+            label={t('Overrated')}
             anchor="end"
             edge="bottom"
           />
@@ -307,8 +311,8 @@ export function MetaRadar({
             </g>
           ))}
           {[
-            { v: cuts.strong, label: 'strongest 30%' },
-            { v: cuts.weak, label: 'weakest 40%' },
+            { v: cuts.strong, label: t('strongest 30%') },
+            { v: cuts.weak, label: t('weakest 40%') },
           ].map(({ v, label }) => (
             <g key={`y${v}`}>
               <line
@@ -325,7 +329,7 @@ export function MetaRadar({
                 textAnchor="end"
                 className="fill-[var(--muted)] text-[11px]"
               >
-                {label}
+                {t(label)}
               </text>
             </g>
           ))}
@@ -344,18 +348,14 @@ export function MetaRadar({
             y={H - 12}
             textAnchor="middle"
             className="fill-[var(--muted)] text-[13px]"
-          >
-            How often it is picked →
-          </text>
+          >{t('How often it is picked →')}</text>
           <text
             x={-(PAD.top + layout.plotH / 2)}
             y={16}
             transform="rotate(-90)"
             textAnchor="middle"
             className="fill-[var(--muted)] text-[13px]"
-          >
-            How well it does →
-          </text>
+          >{t('How well it does →')}</text>
 
           {/* One clip per named brawler, so each portrait is round. */}
           <defs>
@@ -406,7 +406,7 @@ export function MetaRadar({
                 */}
                 {face && point.imageUrl ? (
                   <image
-                    href={point.imageUrl}
+                    href={lp(point.imageUrl)}
                     x={cx - r}
                     y={cy - r}
                     width={r * 2}
@@ -454,6 +454,7 @@ function Corner({
   /** Which horizontal edge the title hugs; matches the strip left clear above. */
   edge: 'top' | 'bottom';
 }) {
+  const t = useT();
   // A corner can be zero-width when every brawler sits on one side of a cut.
   if (w <= 2 || h <= 2) return null;
   return (
@@ -467,7 +468,7 @@ function Corner({
         fill={fill}
         fillOpacity={0.75}
       >
-        {label}
+        {t(label)}
       </text>
     </>
   );
@@ -486,13 +487,10 @@ function Hint({
   points: RadarPoint[];
   cuts: RadarCuts;
 }) {
+  const t = useT();
   if (!owned) {
     return (
-      <p className="text-sm text-muted">
-        {count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble
-        size is the sample behind each one, so the least certain points are the
-        smallest. Tap one for its numbers.
-      </p>
+      <p className="text-sm text-muted">{t('{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.', { count: count, windowDays: windowDays })}</p>
     );
   }
 
@@ -508,31 +506,21 @@ function Hint({
   const haveSleepers = sleepers.filter((p) => owned.has(p.brawlerId)).length;
 
   return (
-    <p className="text-sm leading-relaxed text-muted">
-      Lit brawlers are the ones this account can field. It has{' '}
-      <span className="font-semibold text-brand">
-        {haveMeta} of the {metaPicks.length}
-      </span>{' '}
-      in the meta corner
-      {sleepers.length > 0 ? (
+    <p className="text-sm leading-relaxed text-muted">{t('Lit brawlers are the ones this account can field. It has')}{' '}
+      <span className="font-semibold text-brand">{t('{haveMeta} of the {length}', { haveMeta: haveMeta, length: metaPicks.length })}</span>{' '}{t('in the meta corner')}{sleepers.length > 0 ? (
         <>
-          {' '}
-          and{' '}
-          <span className="font-semibold text-victory">
-            {haveSleepers} of the {sleepers.length}
-          </span>{' '}
-          sleepers
-        </>
-      ) : null}
-      . Bubble size is the sample behind each point. Tap one for its numbers.
-    </p>
+          {' '}{t('and')}{' '}
+          <span className="font-semibold text-victory">{t('{haveSleepers} of the {length}', { haveSleepers: haveSleepers, length: sleepers.length })}</span>{' '}{t('sleepers')}</>
+      ) : null}{t('. Bubble size is the sample behind each point. Tap one for its numbers.')}</p>
   );
 }
 
 function Detail({ point, cell }: { point: RadarPoint; cell: RadarCell }) {
+  const t = useT();
+  const lp = useLp();
   return (
     <Link
-      href={brawlerPath(point.brawlerId, point.brawlerName)}
+      href={lp(brawlerPath(point.brawlerId, point.brawlerName))}
       className="card flex items-center gap-4 p-4 transition-colors hover:border-brand/40"
     >
       {point.imageUrl ? (
@@ -558,13 +546,10 @@ function Detail({ point, cell }: { point: RadarPoint; cell: RadarCell }) {
         <p className="mt-0.5 text-sm text-muted">
           <span className="font-semibold text-foreground">
             {formatPercent(point.winRate ?? 0)}
-          </span>{' '}
-          win rate ·{' '}
+          </span>{' '}{t('win rate ·')}{' '}
           <span className="font-semibold text-foreground">
             {formatPercent(point.usageRate ?? 0)}
-          </span>{' '}
-          picked · {formatNumber(point.sampleSize)} battles
-        </p>
+          </span>{' '}{t('picked · {sampleSize} battles', { sampleSize: formatNumber(point.sampleSize) })}</p>
       </div>
     </Link>
   );

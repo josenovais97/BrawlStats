@@ -14,6 +14,8 @@ import {
   subscribeRecentSearches,
   type RecentSearch,
 } from '@/lib/recent-searches';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 /**
  * Two tag inputs, fed by the profiles this device has already looked at.
@@ -39,6 +41,8 @@ export function PlayerCompareForm({
   initialA?: string;
   initialB?: string;
 }) {
+  const t = useT();
+  const lp = useLp();
   const router = useRouter();
   const [a, setA] = useState(initialA);
   const [b, setB] = useState(initialB);
@@ -63,7 +67,7 @@ export function PlayerCompareForm({
   // page it navigates from can stay static. See `/compare/players/[a]/[b]`.
   const go = (first: string, second: string) => {
     router.push(
-      `/compare/players/${encodeURIComponent(first)}/${encodeURIComponent(second)}`,
+      lp(`/compare/players/${encodeURIComponent(first)}/${encodeURIComponent(second)}`),
     );
   };
 
@@ -94,7 +98,7 @@ export function PlayerCompareForm({
     const url = window.location.href;
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Brawl Stars player comparison', url });
+        await navigator.share({ title: t('Brawl Stars player comparison'), url });
         return;
       } catch {
         // Cancelling the sheet rejects; fall through so the click still does
@@ -119,7 +123,7 @@ export function PlayerCompareForm({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <Side
           id={fieldA}
-          label="Player 1"
+          label={t('Player 1')}
           value={a}
           onChange={setA}
           placeholder="#2V0UL0GQV8"
@@ -135,17 +139,17 @@ export function PlayerCompareForm({
           type="button"
           onClick={swap}
           disabled={!one && !two}
-          aria-label="Swap the two players"
-          title="Swap players"
+          aria-label={t('Swap the two players')}
+          title={t('Swap players')}
           className="flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-border text-sm font-semibold text-muted transition-colors enabled:hover:border-brand/50 enabled:hover:text-foreground disabled:cursor-not-allowed disabled:text-muted/45 sm:mt-6 sm:w-11 sm:self-start"
         >
           <ArrowLeftRight className="size-4" />
-          <span className="sm:hidden">Swap players</span>
+          <span className="sm:hidden">{t('Swap players')}</span>
         </button>
 
         <Side
           id={fieldB}
-          label="Player 2"
+          label={t('Player 2')}
           value={b}
           onChange={setB}
           placeholder="#V8LLPPC"
@@ -158,24 +162,16 @@ export function PlayerCompareForm({
 
       {recent.length === 0 ? (
         /* Says how the list fills up rather than showing an empty box. */
-        <p className="rounded-lg bg-surface-2/60 px-3 py-2.5 text-xs leading-relaxed text-muted">
-          Look a player up from the search box and they are remembered on this device,
-          ready to pick here without typing the tag again. Nothing is sent to the
-          server.
-        </p>
+        <p className="rounded-lg bg-surface-2/60 px-3 py-2.5 text-xs leading-relaxed text-muted">{t('Look a player up from the search box and they are remembered on this device, ready to pick here without typing the tag again. Nothing is sent to the server.')}</p>
       ) : (
         <div className="flex items-center justify-between gap-3">
           <p className="flex items-center gap-1.5 text-xs text-muted">
-            <Clock aria-hidden className="size-3.5" />
-            Looked up on this device
-          </p>
+            <Clock aria-hidden className="size-3.5" />{t('Looked up on this device')}</p>
           <button
             type="button"
             onClick={clearRecentSearches}
             className="min-h-9 rounded-lg px-2 text-xs font-semibold text-muted transition-colors hover:text-foreground"
-          >
-            Clear recent
-          </button>
+          >{t('Clear recent')}</button>
         </div>
       )}
 
@@ -190,9 +186,7 @@ export function PlayerCompareForm({
           type="submit"
           disabled={!one || !two}
           className="min-h-11 flex-1 rounded-xl px-4 text-sm font-bold transition-colors enabled:bg-brand enabled:text-brand-ink enabled:hover:bg-brand-strong disabled:cursor-not-allowed disabled:border disabled:border-border disabled:bg-surface-2 disabled:text-muted"
-        >
-          Compare
-        </button>
+        >{t('Compare')}</button>
 
         {initialA && initialB ? (
           <>
@@ -206,16 +200,16 @@ export function PlayerCompareForm({
               ) : (
                 <Share2 className="size-4" />
               )}
-              {copied ? 'Copied' : 'Share'}
+              {copied ? t('Copied') : t('Share')}
             </button>
             <button
               type="button"
               onClick={() => {
                 setA('');
                 setB('');
-                router.push('/compare');
+                router.push(lp('/compare'));
               }}
-              aria-label="Clear the comparison"
+              aria-label={t('Clear the comparison')}
               className="grid min-h-11 w-11 place-items-center rounded-xl border border-border text-muted transition-colors hover:border-defeat/50 hover:text-foreground"
             >
               <X className="size-4" />
@@ -251,12 +245,13 @@ function Side({
   otherSelected: string;
   onPick: (entry: RecentSearch) => void;
 }) {
+  const t = useT();
   const chosen = recent.find((entry) => entry.tag === selected);
 
   return (
     <div className="min-w-0 flex-1">
       <label htmlFor={id} className="mb-1 block text-xs font-medium text-muted">
-        {label}
+        {t(label)}
       </label>
 
       <div className="relative">
@@ -274,7 +269,7 @@ function Side({
           <button
             type="button"
             onClick={() => onChange('')}
-            aria-label={`Clear ${label.toLowerCase()}`}
+            aria-label={t('Clear {v}', { v: label.toLowerCase() })}
             className="absolute right-1.5 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-3 hover:text-foreground"
           >
             <X className="size-3.5" />
@@ -337,9 +332,7 @@ function Side({
                   {isSelected ? (
                     <Check aria-hidden className="size-4 shrink-0 text-brand" />
                   ) : onOtherSide ? (
-                    <span className="shrink-0 rounded bg-surface-3 px-1.5 py-0.5 text-xs font-semibold text-muted">
-                      Other side
-                    </span>
+                    <span className="shrink-0 rounded bg-surface-3 px-1.5 py-0.5 text-xs font-semibold text-muted">{t('Other side')}</span>
                   ) : null}
                 </button>
               </li>

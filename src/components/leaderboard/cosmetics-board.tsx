@@ -6,6 +6,9 @@ import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, playerIconUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent, titleCaseLabel } from '@/lib/format';
 import { getIconUsage, getSkinUsage, type CosmeticUsage } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * What the sampled population is actually wearing.
@@ -21,6 +24,8 @@ import { getIconUsage, getSkinUsage, type CosmeticUsage } from '@/lib/stats';
  * ones. See `getSkinUsage`.
  */
 export async function CosmeticsBoard() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const [skins, icons] = await Promise.all([getSkinUsage(24), getIconUsage(12)]);
 
   if (skins.length === 0 && icons.length === 0) {
@@ -29,11 +34,8 @@ export async function CosmeticsBoard() {
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2 text-accent">
           <CosmeticsIcon className="size-7" />
         </span>
-        <h2 className="mt-4 text-xl font-bold">Collecting cosmetics</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          Equipped skins and icons are recorded as the sampler works through the player pool. This
-          board fills in over the next day or two.
-        </p>
+        <h2 className="mt-4 text-xl font-bold">{t('Collecting cosmetics')}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{t('Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.')}</p>
       </div>
     );
   }
@@ -41,20 +43,14 @@ export async function CosmeticsBoard() {
   return (
     <div className="space-y-10">
       <section aria-labelledby="skins">
-        <h2 id="skins" className="display text-2xl uppercase">
-          Most worn skins
-        </h2>
-        <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          Share of sampled brawlers wearing each skin. Default skins are left out of the list but
-          still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not
-          two in every hundred that had a skin on at all.
-        </p>
+        <h2 id="skins" className="display text-2xl uppercase">{t('Most worn skins')}</h2>
+        <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.')}</p>
 
         <ol className="grid gap-2 sm:grid-cols-2">
           {skins.map((skin, index) => (
             <li key={skin.id}>
               <Link
-                href={brawlerPath(skin.brawlerId ?? 0, skin.brawlerName)}
+                href={lp(brawlerPath(skin.brawlerId ?? 0, skin.brawlerName))}
                 className="row-interactive flex items-center gap-3 rounded-xl p-2.5"
               >
                 <span className="w-6 shrink-0 text-center text-sm font-bold tabular-nums text-muted">
@@ -85,13 +81,8 @@ export async function CosmeticsBoard() {
 
       {icons.length > 0 ? (
         <section aria-labelledby="icons">
-          <h2 id="icons" className="display text-2xl uppercase">
-            Most worn profile icons
-          </h2>
-          <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-            Share of sampled accounts using each icon. Everyone has one, so these shares are out of
-            the whole pool.
-          </p>
+          <h2 id="icons" className="display text-2xl uppercase">{t('Most worn profile icons')}</h2>
+          <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.')}</p>
 
           <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {icons.map((icon, index) => (
@@ -116,9 +107,7 @@ export async function CosmeticsBoard() {
         </section>
       ) : (
         <p className="flex items-center gap-2 text-sm text-muted">
-          <PlayersIcon className="size-4" />
-          Profile icons are still being recorded.
-        </p>
+          <PlayersIcon className="size-4" />{t('Profile icons are still being recorded.')}</p>
       )}
     </div>
   );

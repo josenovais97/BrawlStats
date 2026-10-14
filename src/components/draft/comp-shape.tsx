@@ -1,4 +1,6 @@
 import type { RoleComposition } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * What shape your team is becoming, and whether that shape wins.
@@ -29,6 +31,7 @@ export function CompShape({
   roleOf: Map<number, string | null>;
   comps: RoleComposition[];
 }) {
+  const t = getT(requestLocale());
   if (comps.length === 0) return null;
 
   const picked = allies.map((id) => roleOf.get(id) ?? null).filter((r): r is string => r !== null);
@@ -55,34 +58,25 @@ export function CompShape({
   return (
     <section className="space-y-3" aria-labelledby="comp-shape">
       <div>
-        <h2 id="comp-shape" className="display text-xl uppercase">
-          Team shape
-        </h2>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
-          How this combination of roles performs in Ranked, measured across both
-          teams of sampled battles. 50% is average for the sample, not a coin
-          flip — every shape is adjusted against the same baseline the tier list
-          uses.
-        </p>
+        <h2 id="comp-shape" className="display text-xl uppercase">{t('Team shape')}</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{t('How this combination of roles performs in Ranked, measured across both teams of sampled battles. 50% is average for the sample, not a coin flip — every shape is adjusted against the same baseline the tier list uses.')}</p>
       </div>
 
       {yours ? (
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">Your shape</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('Your shape')}</p>
           <ShapeRow comp={yours} emphasis />
         </div>
       ) : reachable ? (
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">
-            Strongest shape you can still reach
-          </p>
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('Strongest shape you can still reach')}</p>
           <ShapeRow comp={reachable} emphasis />
         </div>
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-victory">Shapes that win</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-victory">{t('Shapes that win')}</p>
           <ul className="mt-2 space-y-1.5">
             {best.map((c) => (
               <li key={key(c.roles)}>
@@ -92,7 +86,7 @@ export function CompShape({
           </ul>
         </div>
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-defeat">Shapes that lose</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-defeat">{t('Shapes that lose')}</p>
           <ul className="mt-2 space-y-1.5">
             {worst.map((c) => (
               <li key={key(c.roles)}>
@@ -107,6 +101,7 @@ export function CompShape({
 }
 
 function ShapeRow({ comp, emphasis = false }: { comp: RoleComposition; emphasis?: boolean }) {
+  const t = getT(requestLocale());
   const delta = (comp.score - 0.5) * 100;
   const good = delta >= 0;
 
@@ -122,7 +117,7 @@ function ShapeRow({ comp, emphasis = false }: { comp: RoleComposition; emphasis?
           {good ? '+' : ''}
           {delta.toFixed(1)}
         </span>
-        <span className="text-xs text-muted">{comp.decided.toLocaleString('en-GB')} battles</span>
+        <span className="text-xs text-muted">{comp.decided.toLocaleString('en-GB')}{' '}{t('battles')}</span>
       </span>
     </div>
   );

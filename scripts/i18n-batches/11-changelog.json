@@ -1,0 +1,322 @@
+{
+ "Make the bubble yours: choose its size, how faint it gets when you leave it alone, and whether it tucks half off the edge. A touch always brings it straight back.": [
+  "Haz tuya la burbuja: elige su tamaño, cuánto se atenúa cuando no la usas y si se esconde a medias en el borde. Un toque siempre la devuelve.",
+  "Deixe a bolha do seu jeito: escolha o tamanho, o quanto ela some quando você não usa e se ela se esconde pela metade na borda. Um toque sempre traz ela de volta."
+ ],
+ "The app now speaks your language: all 22 languages of the game, with a flag picker at the top. The app and this panel share one language setting.": [
+  "La app ya habla tu idioma: los 22 idiomas del juego, con un selector de banderas arriba. La app y este panel comparten un mismo ajuste de idioma.",
+  "O app agora fala a sua língua: as 22 línguas do jogo, com um seletor de bandeiras no topo. O app e este painel usam a mesma configuração de idioma."
+ ],
+ "“What to upgrade next” comes in your language too, with brawler and mode names as the game writes them.": [
+  "«Qué mejorar ahora» también sale en tu idioma, con los nombres de brawlers y modos como los escribe el juego.",
+  "“O que melhorar agora” também vem na sua língua, com os nomes de brawlers e modos como o jogo escreve."
+ ],
+ "A new look: chunky 3D buttons, bold display type and game-style panels throughout the app.": [
+  "Nuevo aspecto: botones 3D gruesos, letra grande y paneles al estilo del juego en toda la app.",
+  "Visual novo: botões 3D grossos, letras grandes e painéis no estilo do jogo no app todo."
+ ],
+ "The bubble wears your own player icon once your tag is set (open the app once after updating).": [
+  "La burbuja lleva tu propio icono de jugador cuando pones tu tag (abre la app una vez después de actualizar).",
+  "A bolha usa o seu próprio ícone de jogador quando a sua tag estiver configurada (abra o app uma vez depois de atualizar)."
+ ],
+ "Set-up is easier: until your player tag is added, the app says what it unlocks and takes you straight to the field.": [
+  "Configurarla es más fácil: hasta que añades tu tag, la app te dice qué desbloquea y te lleva directo al campo.",
+  "Configurar ficou mais fácil: até você adicionar a sua tag, o app diz o que ela desbloqueia e leva direto ao campo."
+ ],
+ "The panel filter is a clear choice now: All my brawlers, Power 11 only, or Power 11 + hypercharge, each with what it does and how many brawlers it leaves.": [
+  "El filtro del panel ahora es una elección clara: Todos mis brawlers, Solo fuerza 11 o Fuerza 11 + hipercarga, cada uno con lo que hace y cuántos brawlers deja.",
+  "O filtro do painel agora é uma escolha clara: Todos os meus brawlers, Só poder 11 ou Poder 11 + hipercarga, cada um com o que faz e quantos brawlers sobram."
+ ],
+ "The panel opens instantly. It used to load the page again on every tap, so it opened on a spinner mid-draft; it now keeps the page between opens and starts loading as soon as the bubble appears.": [
+  "El panel se abre al instante. Antes volvía a cargar la página en cada toque, así que se abría con un círculo de carga en pleno draft; ahora guarda la página entre aperturas y empieza a cargar en cuanto aparece la burbuja.",
+  "O painel abre na hora. Antes ele recarregava a página a cada toque, então abria com um círculo de carregamento no meio do draft; agora guarda a página entre aberturas e começa a carregar assim que a bolha aparece."
+ ],
+ "No signal? The panel shows the last saved list, marked “Offline”, instead of an error.": [
+  "¿Sin señal? El panel muestra la última lista guardada, marcada como «Sin conexión», en vez de un error.",
+  "Sem sinal? O painel mostra a última lista salva, marcada como “Offline”, em vez de um erro."
+ ],
+ "Each mode chip carries the mode’s own icon, the badge the game shows in the corner of the draft.": [
+  "Cada botón de modo lleva el icono del propio modo, la insignia que muestra el juego en la esquina del draft.",
+  "Cada botão de modo tem o ícone do próprio modo, a insígnia que o jogo mostra no canto do draft."
+ ],
+ "The three counts are the filter now. Tap owned, power 11 or hypercharge and the tile lights up — so the number the panel is using is the one you can see, instead of something to work out from two switches.": [
+  "Los tres contadores son ahora el filtro. Toca tenidos, fuerza 11 o hipercarga y la casilla se ilumina, así que el número que usa el panel es el que ves, en vez de algo que deducir de dos interruptores.",
+  "Os três contadores agora são o filtro. Toque em tidos, poder 11 ou hipercarga e o quadro acende, então o número que o painel usa é o que você vê, em vez de algo para deduzir de dois botões."
+ ],
+ "Those two switches are gone with it. They encoded three settings in four combinations, and the spare one was impossible: a hypercharge cannot be unlocked below power 11, so “hypercharge without power 11” had to be quietly rewritten every time it was set.": [
+  "Esos dos interruptores desaparecen. Codificaban tres ajustes en cuatro combinaciones, y la que sobraba era imposible: una hipercarga no se puede desbloquear por debajo de fuerza 11, así que «hipercarga sin fuerza 11» había que reescribirlo en silencio cada vez que se elegía.",
+  "Esses dois botões saíram. Eles codificavam três opções em quatro combinações, e a que sobrava era impossível: uma hipercarga não pode ser desbloqueada abaixo do poder 11, então “hipercarga sem poder 11” tinha que ser reescrito em silêncio toda vez que era escolhido."
+ ],
+ "The tag box has a label, and the filter says in words what it is doing underneath the tiles.": [
+  "La casilla del tag tiene una etiqueta, y el filtro dice con palabras lo que está haciendo debajo de las casillas.",
+  "A caixa da tag tem um rótulo, e o filtro diz em palavras o que está fazendo embaixo dos quadros."
+ ],
+ "The account tiles use the game’s own art: the brawler mark on what you own, the power 11 badge, the hypercharge symbol, and a trophy beside your count. A number under an icon you already recognise reads faster than a number under a word.": [
+  "Las casillas de la cuenta usan imágenes del propio juego: la marca de brawler en lo que tienes, la insignia de fuerza 11, el símbolo de hipercarga y un trofeo junto a tu contador. Un número bajo un icono que ya reconoces se lee más rápido que bajo una palabra.",
+  "Os quadros da conta usam imagens do próprio jogo: a marca de brawler no que você tem, a insígnia do poder 11, o símbolo da hipercarga e um troféu ao lado do seu contador. Um número embaixo de um ícone que você já conhece é lido mais rápido do que embaixo de uma palavra."
+ ],
+ "The app screen is rebuilt. State and action share one card instead of four stacked full-width blocks, Stop and Quick Settings sit side by side, and the screen ends on a footer rather than stopping mid-list.": [
+  "La pantalla de la app está rehecha. El estado y la acción comparten una tarjeta en vez de cuatro bloques apilados, Detener y Ajustes rápidos van lado a lado, y la pantalla termina con un pie en vez de cortarse a mitad de la lista.",
+  "A tela do app foi refeita. Status e ação dividem um cartão em vez de quatro blocos empilhados, Parar e Configurações rápidas ficam lado a lado, e a tela termina com um rodapé em vez de parar no meio da lista."
+ ],
+ "Your tag now resolves to a name and your player icon, with the counts each filter produces — owned, power 11, hypercharged. A tag is a string nobody can check by reading it, and one wrong character is a valid tag belonging to a stranger whose only symptom is that every filter looks broken.": [
+  "Tu tag ahora muestra un nombre y tu icono de jugador, con lo que da cada filtro: tenidos, fuerza 11, con hipercarga. Un tag es un texto que nadie puede comprobar leyéndolo, y un carácter mal puesto es un tag válido de un desconocido cuyo único síntoma es que todos los filtros parecen rotos.",
+  "A sua tag agora mostra um nome e o seu ícone de jogador, com o que cada filtro dá: tidos, poder 11, com hipercarga. Uma tag é um texto que ninguém consegue conferir lendo, e um caractere errado é uma tag válida de um desconhecido, cujo único sintoma é que todos os filtros parecem quebrados."
+ ],
+ "Pick and Ban tabs on every map. Pick is the list you already had, narrowed to what you can field. Ban is every brawler, whoever owns them, with how often it is actually taken here — because banning something nobody picks spends the ban for nothing.": [
+  "Pestañas de Elegir y Bloquear en cada mapa. Elegir es la lista que ya tenías, reducida a lo que puedes jugar. Bloquear incluye a todos los brawlers, los tenga quien los tenga, con lo a menudo que se eligen aquí, porque bloquear algo que nadie elige es gastar el bloqueo para nada.",
+  "Abas de Escolher e Banir em cada mapa. Escolher é a lista que você já tinha, reduzida ao que você pode usar. Banir tem todos os brawlers, seja de quem for, com a frequência com que são escolhidos aqui, porque banir algo que ninguém escolhe é gastar o banimento à toa."
+ ],
+ "A third switch on the app screen: hide the brawlers you cannot use instead of greying them out. Off by default — greying keeps the tier counts honest and keeps a brawler you are one upgrade away from in view.": [
+  "Un tercer interruptor en la pantalla de la app: esconde los brawlers que no puedes usar en vez de ponerlos en gris. Apagado por defecto: el gris mantiene honestos los contadores de tiers y deja a la vista un brawler al que te falta una mejora.",
+  "Um terceiro botão na tela do app: esconde os brawlers que você não pode usar em vez de deixá-los cinza. Desligado por padrão: o cinza mantém os contadores dos tiers honestos e deixa à vista um brawler que está a uma melhoria de distância."
+ ],
+ "Add your player tag on the app screen and the panel marks what you can actually field. The tier list stops being a list of brawlers you might not own: anything you cannot take is dimmed, and each map names your best available pick.": [
+  "Añade tu tag de jugador en la pantalla de la app y el panel marca lo que de verdad puedes usar. La tier list deja de ser una lista de brawlers que quizá no tienes: lo que no puedes elegir sale atenuado, y cada mapa dice tu mejor opción disponible.",
+  "Adicione a sua tag de jogador na tela do app e o painel marca o que você realmente pode usar. A tier list deixa de ser uma lista de brawlers que talvez você não tenha: o que você não pode escolher fica apagado, e cada mapa diz a sua melhor opção disponível."
+ ],
+ "Two filters beside it — power 11 only, and power 11 with a hypercharge — for when a pick is only worth making at full strength.": [
+  "Dos filtros al lado: solo fuerza 11, y fuerza 11 con hipercarga, para cuando una elección solo vale la pena al máximo.",
+  "Dois filtros ao lado: só poder 11, e poder 11 com hipercarga, para quando uma escolha só vale a pena com tudo no máximo."
+ ],
+ "Your roster is read once a day and kept on the phone, so none of this costs anything mid-draft. Leave the tag blank and the panel behaves exactly as it did before.": [
+  "Tus brawlers se leen una vez al día y se guardan en el móvil, así que nada de esto cuesta tiempo en pleno draft. Deja el tag vacío y el panel funciona exactamente como antes.",
+  "Os seus brawlers são lidos uma vez por dia e guardados no celular, então nada disso custa tempo no meio do draft. Deixe a tag em branco e o painel funciona exatamente como antes."
+ ],
+ "A BrawlZone tile for Quick Settings: swipe down from inside the game and tap it to put the bubble up or take it down, without opening the app. Android 13 and up can add it with one tap from the app screen; older versions find it by editing Quick Settings.": [
+  "Un botón de BrawlZone para Ajustes rápidos: desliza hacia abajo dentro del juego y tócalo para poner o quitar la burbuja sin abrir la app. En Android 13 o superior se añade con un toque desde la app; en versiones anteriores, editando los Ajustes rápidos.",
+  "Um botão do BrawlZone para as Configurações rápidas: deslize para baixo dentro do jogo e toque nele para colocar ou tirar a bolha sem abrir o app. No Android 13 ou superior dá para adicionar com um toque pelo app; em versões anteriores, editando as Configurações rápidas."
+ ],
+ "The notification has a Panel button, so the panel can be opened or closed from the shade when the bubble is under your thumb or behind the game’s own UI.": [
+  "La notificación tiene un botón Panel, para abrir o cerrar el panel desde la barra cuando la burbuja está bajo tu pulgar o detrás de la interfaz del juego.",
+  "A notificação tem um botão Painel, para abrir ou fechar o painel pela barra quando a bolha está embaixo do seu dedo ou atrás da interface do jogo."
+ ],
+ "The draft scan is gone. It never worked reliably enough across phones to keep, and an app that asks to record your screen for a feature that does not work is worse than one that does not ask. The app no longer requests screen capture at all.": [
+  "El escaneo del draft desaparece. Nunca funcionó lo bastante bien en todos los móviles como para mantenerlo, y una app que pide grabar tu pantalla para una función que no funciona es peor que una que no lo pide. La app ya no pide captura de pantalla.",
+  "O escaneamento do draft saiu. Ele nunca funcionou bem o suficiente em todos os celulares para continuar, e um app que pede para gravar a sua tela para algo que não funciona é pior do que um que não pede. O app não pede mais captura de tela."
+ ],
+ "The draft board stays: pick the map and enter the bans and picks by hand, and it ranks the remaining brawlers as before.": [
+  "El tablero de draft se queda: elige el mapa, pon los bloqueos y elecciones a mano y ordena a los brawlers que quedan como antes.",
+  "O quadro de draft continua: escolha o mapa, coloque os banimentos e escolhas à mão e ele ordena os brawlers que sobram como antes."
+ ],
+ "Smaller and simpler for it — the text-recognition library is gone too.": [
+  "Más pequeña y sencilla por ello: también se va la librería de reconocimiento de texto.",
+  "Menor e mais simples por isso: a biblioteca de reconhecimento de texto também saiu."
+ ],
+ "The draft scan is back, rebuilt: each scan owns its result, so a slow scan can no longer overwrite the next one, and a result that arrives while the panel is closed is shown when it reopens.": [
+  "El escaneo del draft vuelve, rehecho: cada escaneo tiene su propio resultado, así que uno lento ya no puede pisar al siguiente, y un resultado que llega con el panel cerrado se muestra al reabrirlo.",
+  "O escaneamento do draft voltou, refeito: cada escaneamento tem o próprio resultado, então um lento não sobrescreve mais o próximo, e um resultado que chega com o painel fechado aparece quando ele reabre."
+ ],
+ "Every slot now says why it is what it is — read, empty, unknown, or covered by the panel — and a later scan corrects a misread in place without touching anything you typed in.": [
+  "Cada hueco dice ahora por qué es lo que es (leído, vacío, desconocido o tapado por el panel), y un escaneo posterior corrige un error en su sitio sin tocar lo que escribiste.",
+  "Cada espaço agora diz por que está assim (lido, vazio, desconhecido ou coberto pelo painel), e um escaneamento seguinte corrige um erro no lugar sem mexer no que você digitou."
+ ],
+ "The screen is found from the picture itself, including the map name plate, so black bars, insets and other screen shapes no longer read the wrong pixels.": [
+  "La pantalla se encuentra a partir de la propia imagen, incluida la placa con el nombre del mapa, así que las barras negras, los márgenes y otras formas de pantalla ya no hacen leer los píxeles equivocados.",
+  "A tela é encontrada pela própria imagem, incluindo a placa com o nome do mapa, então faixas pretas, margens e outros formatos de tela não fazem mais ler os pixels errados."
+ ],
+ "Diagnostics can export the exact frame a scan used, so a misread on your phone can be fixed without guessing.": [
+  "Los diagnósticos pueden exportar la imagen exacta que usó un escaneo, para arreglar un error en tu móvil sin adivinar.",
+  "O diagnóstico pode exportar a imagem exata que um escaneamento usou, para corrigir um erro no seu celular sem adivinhar."
+ ],
+ "The scan now finds the draft screen in the picture instead of assuming where it is, so it works the same on any screen size or shape rather than only the one it was measured on.": [
+  "El escaneo ahora encuentra la pantalla del draft en la imagen en vez de suponer dónde está, así que funciona igual en cualquier tamaño o forma de pantalla, no solo en la que se midió.",
+  "O escaneamento agora encontra a tela do draft na imagem em vez de supor onde ela está, então funciona igual em qualquer tamanho ou formato de tela, e não só no que foi medido."
+ ],
+ "The scan now matches the screen it is capturing. A session started while the phone was a different shape kept producing frames of that shape, so everything was read from the wrong place — the timer instead of the map name, and picks in the wrong slots.": [
+  "El escaneo ahora coincide con la pantalla que captura. Una sesión iniciada con el móvil en otra orientación seguía dando imágenes de esa forma, así que todo se leía del sitio equivocado: el temporizador en vez del nombre del mapa y las elecciones en los huecos que no eran.",
+  "O escaneamento agora bate com a tela que captura. Uma sessão iniciada com o celular em outra posição continuava gerando imagens nesse formato, então tudo era lido do lugar errado: o cronômetro em vez do nome do mapa e as escolhas nos espaços errados."
+ ],
+ "Ban artwork that a phone refuses to decode the preferred way now falls back instead of failing — which left the ban list empty with nothing to say why.": [
+  "Las imágenes de bloqueos que un móvil no decodifica de la forma preferida ahora usan otra en vez de fallar, que dejaba la lista de bloqueos vacía sin explicación.",
+  "As imagens de banimento que um celular não consegue decodificar do jeito preferido agora usam outro caminho em vez de falhar, o que deixava a lista de banimentos vazia sem explicação."
+ ],
+ "Tapping Scan while the app is still loading shows the progress instead of asking to share your screen for a scan that could not run yet.": [
+  "Tocar Escanear mientras la app todavía carga muestra el progreso en vez de pedir compartir pantalla para un escaneo que aún no podía hacerse.",
+  "Tocar em Escanear enquanto o app ainda carrega mostra o progresso em vez de pedir para compartilhar a tela para um escaneamento que ainda não podia rodar."
+ ],
+ "Bans are matched against their own artwork, which is decoded correctly now — transparent edges were being darkened twice, which affected the ban icons and nothing else.": [
+  "Los bloqueos se comparan con sus propias imágenes, que ahora se decodifican bien: los bordes transparentes se oscurecían dos veces, lo que afectaba a los iconos de bloqueo y a nada más.",
+  "Os banimentos são comparados com as próprias imagens, que agora são decodificadas direito: as bordas transparentes eram escurecidas duas vezes, o que afetava os ícones de banimento e nada mais."
+ ],
+ "The app no longer reports itself ready to scan until the ban artwork has loaded too, instead of only the portraits.": [
+  "La app ya no dice que está lista para escanear hasta que también se han cargado las imágenes de bloqueos, no solo los retratos.",
+  "O app não diz mais que está pronto para escanear até as imagens de banimento também terem carregado, e não só os retratos."
+ ],
+ "Scanning no longer asks to share your screen over and over. Permission is a button you press, never something a scan asks for on its own, and it stops asking if Android keeps refusing.": [
+  "Escanear ya no pide compartir tu pantalla una y otra vez. El permiso es un botón que pulsas tú, nunca algo que pide un escaneo por su cuenta, y deja de pedirlo si Android lo sigue rechazando.",
+  "Escanear não pede mais para compartilhar a tela de novo e de novo. A permissão é um botão que você aperta, nunca algo que um escaneamento pede sozinho, e ele para de pedir se o Android continuar recusando."
+ ],
+ "Loading the portraits is about eight times faster, and shows how far along it is.": [
+  "Cargar los retratos es unas ocho veces más rápido, y muestra cuánto falta.",
+  "Carregar os retratos ficou umas oito vezes mais rápido, e mostra quanto falta."
+ ],
+ "A scan can no longer run against a half-loaded set of portraits, which made recognition look unreliable when it was simply not ready.": [
+  "Un escaneo ya no puede hacerse con los retratos a medio cargar, lo que hacía parecer poco fiable el reconocimiento cuando simplemente no estaba listo.",
+  "Um escaneamento não roda mais com os retratos carregados pela metade, o que fazia o reconhecimento parecer pouco confiável quando ele só não estava pronto."
+ ],
+ "Scanning is back, and the bans work for the first time — the game draws them from a different artwork set, which is why they never matched before.": [
+  "El escaneo vuelve, y los bloqueos funcionan por primera vez: el juego los dibuja con otro conjunto de imágenes, y por eso nunca coincidían.",
+  "O escaneamento voltou, e os banimentos funcionam pela primeira vez: o jogo desenha eles com outro conjunto de imagens, e por isso nunca batiam."
+ ],
+ "One tap reads the mode, the map, both teams’ picks and all six bans, then scores the picks for that map.": [
+  "Un toque lee el modo, el mapa, las elecciones de los dos equipos y los seis bloqueos, y luego puntúa las elecciones para ese mapa.",
+  "Um toque lê o modo, o mapa, as escolhas dos dois times e os seis banimentos, e depois pontua as escolhas para esse mapa."
+ ],
+ "The recognition is now tested against real captures of a real draft on every build, instead of only on your phone.": [
+  "El reconocimiento ahora se prueba con capturas reales de un draft real en cada versión, no solo en tu móvil.",
+  "O reconhecimento agora é testado com capturas reais de um draft real em cada versão, e não só no seu celular."
+ ],
+ "Starting the bubble no longer asks to share your screen. That prompt fired on every start once it had been allowed.": [
+  "Iniciar la burbuja ya no pide compartir tu pantalla. Ese aviso salía en cada inicio una vez permitido.",
+  "Iniciar a bolha não pede mais para compartilhar a tela. Esse aviso aparecia em todo início depois de permitido."
+ ],
+ "The update download now opens the installer itself when it finishes, instead of relying on a notification that may be switched off.": [
+  "La descarga de la actualización ahora abre el instalador al terminar, en vez de depender de una notificación que puede estar desactivada.",
+  "O download da atualização agora abre o instalador sozinho quando termina, em vez de depender de uma notificação que pode estar desligada."
+ ],
+ "The app finally asks for notification permission. Without it the update download finished invisibly and the bubble’s Stop control was hidden — both looked like features that did nothing.": [
+  "La app por fin pide permiso de notificaciones. Sin él, la descarga de la actualización terminaba sin que se viera y el botón Detener de la burbuja estaba oculto: las dos cosas parecían funciones que no hacían nada.",
+  "O app finalmente pede permissão de notificações. Sem ela, o download da atualização terminava sem aparecer e o botão Parar da bolha ficava escondido: as duas coisas pareciam funções que não faziam nada."
+ ],
+ "The download now says which folder the file landed in, so it is findable even with notifications turned off.": [
+  "La descarga ahora dice en qué carpeta quedó el archivo, para encontrarlo aunque las notificaciones estén desactivadas.",
+  "O download agora diz em que pasta o arquivo ficou, para dar para achar mesmo com as notificações desligadas."
+ ],
+ "Allowing screen sharing could ask again, and again, forever. Android was destroying the permission screen before it could receive your answer.": [
+  "Permitir compartir pantalla podía volver a preguntar una y otra vez, para siempre. Android destruía la pantalla de permiso antes de recibir tu respuesta.",
+  "Permitir compartilhar a tela podia perguntar de novo e de novo, para sempre. O Android destruía a tela de permissão antes de receber a sua resposta."
+ ],
+ "A second scan sometimes did nothing at all. One scan that never finished left the button jammed for the rest of the session.": [
+  "Un segundo escaneo a veces no hacía nada. Un escaneo que nunca terminaba dejaba el botón bloqueado el resto de la sesión.",
+  "Um segundo escaneamento às vezes não fazia nada. Um escaneamento que nunca terminava deixava o botão travado pelo resto da sessão."
+ ],
+ "The Download button in this notice finally downloads. Every version until now was blocked by Android from opening it, silently.": [
+  "El botón Descargar de este aviso por fin descarga. Hasta ahora, Android lo bloqueaba en silencio en todas las versiones.",
+  "O botão Baixar deste aviso finalmente baixa. Até agora, o Android bloqueava ele em silêncio em todas as versões."
+ ],
+ "The screen-capture prompt no longer interrupts a match. Once you have allowed it, it is asked as the bubble starts instead of on your first scan.": [
+  "El aviso de captura de pantalla ya no interrumpe una partida. Una vez permitido, se pide al iniciar la burbuja en vez de en tu primer escaneo.",
+  "O aviso de captura de tela não interrompe mais uma partida. Depois de permitido, ele é pedido quando a bolha inicia, e não no seu primeiro escaneamento."
+ ],
+ "The prompt can no longer be answered with \"Share one app\", which captured the wrong thing.": [
+  "El aviso ya no se puede responder con «Compartir una app», que capturaba lo que no era.",
+  "O aviso não pode mais ser respondido com “Compartilhar um app”, que capturava a coisa errada."
+ ],
+ "The Download button in the update notice works. It was a dead button inside the app.": [
+  "El botón Descargar del aviso de actualización funciona. Era un botón muerto dentro de la app.",
+  "O botão Baixar do aviso de atualização funciona. Era um botão morto dentro do app."
+ ],
+ "The map is read from the screen on the first scan, instead of only after you had confirmed it once.": [
+  "El mapa se lee de la pantalla en el primer escaneo, en vez de solo después de haberlo confirmado una vez.",
+  "O mapa é lido da tela no primeiro escaneamento, em vez de só depois de você ter confirmado uma vez."
+ ],
+ "A map it still cannot place falls back to the old behaviour — pick it once and it is remembered.": [
+  "Un mapa que todavía no reconoce vuelve a lo de antes: elígelo una vez y se recuerda.",
+  "Um mapa que ele ainda não reconhece volta ao jeito antigo: escolha uma vez e ele é lembrado."
+ ],
+ "Scanning recognised about one brawler in six. It now matches each brawler on the framing that suits it, and reads the picks on both teams.": [
+  "El escaneo reconocía más o menos un brawler de cada seis. Ahora compara cada brawler con el encuadre que le va mejor, y lee las elecciones de los dos equipos.",
+  "O escaneamento reconhecia mais ou menos um brawler a cada seis. Agora ele compara cada brawler com o enquadramento que funciona melhor para ele, e lê as escolhas dos dois times."
+ ],
+ "Bans are still left blank rather than guessed at — the game draws them with artwork nothing public matches. Tap one in and it is remembered.": [
+  "Los bloqueos se siguen dejando en blanco en vez de adivinarlos: el juego los dibuja con imágenes que no coinciden con nada público. Pon uno y se recuerda.",
+  "Os banimentos continuam em branco em vez de serem adivinhados: o jogo desenha eles com imagens que não batem com nada público. Coloque um e ele é lembrado."
+ ],
+ "The update notice now says which version you have, so you can tell a real update from a stuck banner.": [
+  "El aviso de actualización ahora dice qué versión tienes, para distinguir una actualización real de un aviso atascado.",
+  "O aviso de atualização agora diz qual versão você tem, para diferenciar uma atualização real de um aviso travado."
+ ],
+ "Scanning read only half the draft. The frame was often captured before the panel had got out of the way, so the panel itself covered the enemy picks — it now waits for a frame taken after the overlay is hidden.": [
+  "El escaneo solo leía la mitad del draft. La imagen se capturaba a menudo antes de que el panel se apartara, así que el propio panel tapaba las elecciones rivales; ahora espera una imagen tomada después de ocultar la capa.",
+  "O escaneamento só lia metade do draft. A imagem muitas vezes era capturada antes de o painel sair da frente, então o próprio painel cobria as escolhas inimigas; agora ele espera uma imagem tirada depois de esconder a camada."
+ ],
+ "What the scan found now shows immediately, instead of staying hidden until you had picked the map by hand.": [
+  "Lo que encuentra el escaneo se muestra al momento, en vez de quedar oculto hasta que eligieras el mapa a mano.",
+  "O que o escaneamento encontra aparece na hora, em vez de ficar escondido até você escolher o mapa à mão."
+ ],
+ "The panel says how many brawlers it read, so a scan that worked no longer looks like one that did nothing.": [
+  "El panel dice cuántos brawlers leyó, así que un escaneo que funcionó ya no parece uno que no hizo nada.",
+  "O painel diz quantos brawlers leu, então um escaneamento que funcionou não parece mais um que não fez nada."
+ ],
+ "Scan works again. It could get stuck on “Loading portraits…” with the button disabled for the rest of the session, and never recover.": [
+  "Escanear vuelve a funcionar. Podía quedarse atascado en «Cargando retratos…» con el botón desactivado el resto de la sesión, sin recuperarse nunca.",
+  "Escanear voltou a funcionar. Ele podia travar em “Carregando retratos…” com o botão desativado pelo resto da sessão, sem nunca se recuperar."
+ ],
+ "Tapping Scan before the portraits have finished downloading now waits and then scans, instead of doing nothing.": [
+  "Tocar Escanear antes de que terminen de bajarse los retratos ahora espera y luego escanea, en vez de no hacer nada.",
+  "Tocar em Escanear antes de os retratos terminarem de baixar agora espera e depois escaneia, em vez de não fazer nada."
+ ],
+ "Fixes 1.8, which crashed on launch and could not start the bubble at all. If you installed it, download again — this installs over the top.": [
+  "Corrige la 1.8, que se cerraba al abrirse y no podía iniciar la burbuja. Si la instalaste, descárgala otra vez: se instala encima.",
+  "Corrige a 1.8, que fechava ao abrir e não conseguia iniciar a bolha. Se você instalou, baixe de novo: ela instala por cima."
+ ],
+ "Scan the draft instead of typing it: one tap reads the bans and picks off your screen and fills the board.": [
+  "Escanea el draft en vez de escribirlo: un toque lee los bloqueos y elecciones de tu pantalla y rellena el tablero.",
+  "Escaneie o draft em vez de digitar: um toque lê os banimentos e escolhas da sua tela e preenche o quadro."
+ ],
+ "The map is remembered. Confirm it once and every later scan on that map fills it in for you.": [
+  "El mapa se recuerda. Confírmalo una vez y cada escaneo posterior en ese mapa lo rellena por ti.",
+  "O mapa é lembrado. Confirme uma vez e cada escaneamento seguinte naquele mapa preenche ele para você."
+ ],
+ "Anything it is not sure about is left blank rather than guessed at — and correcting it teaches it that brawler for next time.": [
+  "Lo que no tiene claro se deja en blanco en vez de adivinarlo, y corregirlo le enseña ese brawler para la próxima vez.",
+  "O que ele não tem certeza fica em branco em vez de ser adivinhado, e corrigir ensina aquele brawler para a próxima vez."
+ ],
+ "The keyboard no longer buries the draft picker: the panel moves above it, and searching is opt-in so the shortlist of likely picks is visible first.": [
+  "El teclado ya no tapa el selector del draft: el panel se mueve por encima, y la búsqueda es opcional para que primero se vea la lista corta de elecciones probables.",
+  "O teclado não cobre mais o seletor do draft: o painel sobe acima dele, e a busca é opcional para a lista curta de escolhas prováveis aparecer primeiro."
+ ],
+ "In landscape the keyboard no longer takes over the whole screen.": [
+  "En horizontal, el teclado ya no ocupa toda la pantalla.",
+  "Na horizontal, o teclado não ocupa mais a tela toda."
+ ],
+ "The panel says when it cannot reach the site, with a tap to retry, instead of spinning forever on a dropped connection.": [
+  "El panel avisa cuando no puede conectar con el sitio, con un toque para reintentar, en vez de dar vueltas para siempre con la conexión caída.",
+  "O painel avisa quando não consegue falar com o site, com um toque para tentar de novo, em vez de ficar girando para sempre com a conexão caída."
+ ],
+ "The update notice downloads the new version directly, instead of sending you to the site to find the button.": [
+  "El aviso de actualización descarga la nueva versión directamente, en vez de mandarte al sitio a buscar el botón.",
+  "O aviso de atualização baixa a versão nova direto, em vez de mandar você para o site procurar o botão."
+ ],
+ "Links in the panel now open in your browser rather than inside the overlay.": [
+  "Los enlaces del panel ahora se abren en tu navegador y no dentro de la capa.",
+  "Os links do painel agora abrem no seu navegador, e não dentro da camada."
+ ],
+ "The panel now tells you when a newer version of the app is out, and what changed in it.": [
+  "El panel ahora te avisa cuando sale una versión nueva de la app y qué cambió.",
+  "O painel agora avisa quando sai uma versão nova do app e o que mudou."
+ ],
+ "Fixed the panel in landscape, which is how the game is actually played — it was arriving a third of its intended height.": [
+  "Arreglado el panel en horizontal, que es como se juega de verdad: salía a un tercio de la altura que debía.",
+  "Corrigido o painel na horizontal, que é como o jogo é jogado de verdade: ele aparecia com um terço da altura que devia."
+ ],
+ "The bubble and panel now follow the screen when you rotate, instead of keeping coordinates from the previous orientation.": [
+  "La burbuja y el panel ahora siguen a la pantalla al girarla, en vez de quedarse con las coordenadas de la orientación anterior.",
+  "A bolha e o painel agora acompanham a tela quando você gira, em vez de ficar com as coordenadas da posição anterior."
+ ],
+ "The panel no longer lands on top of the bubble in landscape, which had been swallowing every tap meant for it.": [
+  "El panel ya no queda encima de la burbuja en horizontal, que se tragaba todos los toques que eran para ella.",
+  "O painel não fica mais por cima da bolha na horizontal, o que engolia todos os toques que eram para ela."
+ ],
+ "Filter the tier list by game mode, and the choice is remembered next time you open it.": [
+  "Filtra la tier list por modo de juego, y la elección se recuerda la próxima vez que la abras.",
+  "Filtre a tier list por modo de jogo, e a escolha fica lembrada na próxima vez que você abrir."
+ ],
+ "Tap any brawler for the star power, gadget and gears its owners run.": [
+  "Toca cualquier brawler para ver la habilidad estelar, el gadget y los refuerzos que usan sus jugadores.",
+  "Toque em qualquer brawler para ver o poder de estrela, o acessório e as engrenagens que os jogadores usam."
+ ],
+ "The panel opens on the Ranked tier list, built for the overlay, instead of loading the full site into a small window.": [
+  "El panel se abre en la tier list de Competitivo, hecha para la capa, en vez de cargar el sitio entero en una ventana pequeña.",
+  "O painel abre na tier list do Ranqueado, feita para a camada, em vez de carregar o site inteiro numa janela pequena."
+ ],
+ "Rebuilt the app screen: real spacing, the site’s palette, and system bars that match.": [
+  "Pantalla de la app rehecha: espacios de verdad, los colores del sitio y barras del sistema a juego.",
+  "Tela do app refeita: espaçamento de verdade, as cores do site e barras do sistema combinando."
+ ],
+ "First release. Tapping the bubble opens and closes the panel, dragging moves it, and dropping it on the target at the bottom closes it.": [
+  "Primera versión. Tocar la burbuja abre y cierra el panel, arrastrarla la mueve y soltarla en el objetivo de abajo la cierra.",
+  "Primeira versão. Tocar na bolha abre e fecha o painel, arrastar move e soltar no alvo lá embaixo fecha."
+ ]
+}

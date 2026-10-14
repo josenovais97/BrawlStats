@@ -18,6 +18,7 @@ import {
 } from '@/lib/brawldle-stats';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * The board.
@@ -102,6 +103,7 @@ function saveStats(stats: DailyStats) {
  * colour, so an Epic tile looks Epic.
  */
 function ClueTile({ clue, animate, delayMs }: { clue: Clue; animate: boolean; delayMs: number }) {
+  const t = useT();
   const tint =
     clue.key === 'tier' && clue.value in TIER_COLOR
       ? TIER_COLOR[clue.value as Tier]
@@ -143,7 +145,7 @@ function ClueTile({ clue, animate, delayMs }: { clue: Clue; animate: boolean; de
 
       {clue.direction ? (
         <span
-          aria-label={clue.direction === 'up' ? 'higher' : 'lower'}
+          aria-label={clue.direction === 'up' ? t('higher') : t('lower')}
           className="text-sm leading-none opacity-80"
         >
           {ARROW[clue.direction]}
@@ -167,10 +169,11 @@ interface Hints {
  * the puzzle, where the icon is a memory test — which is what a hint is for.
  */
 function HintPanel({ hints, guesses }: { hints: Hints | null; guesses: number }) {
+  const t = useT();
   if (!hints) return null;
   const rows = [
-    { key: 'sp', at: hints.thresholds.starPower, url: hints.starPower, label: 'Star power', Icon: StarPowerIcon },
-    { key: 'gd', at: hints.thresholds.gadget, url: hints.gadget, label: 'Gadget', Icon: GadgetIcon },
+    { key: 'sp', at: hints.thresholds.starPower, url: hints.starPower, label: t('Star power'), Icon: StarPowerIcon },
+    { key: 'gd', at: hints.thresholds.gadget, url: hints.gadget, label: t('Gadget'), Icon: GadgetIcon },
   ];
 
   return (
@@ -181,15 +184,15 @@ function HintPanel({ hints, guesses }: { hints: Hints | null; guesses: number })
           <div key={key} className="flex items-center gap-3">
             <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-surface-2">
               {url ? (
-                <Image src={url} alt={label} width={40} height={40} className="size-10" unoptimized />
+                <Image src={url} alt={t(label)} width={40} height={40} className="size-10" unoptimized />
               ) : (
                 <Icon className="size-5 opacity-30" />
               )}
             </div>
             <div className="text-xs leading-tight">
-              <p className="font-semibold">{label}</p>
+              <p className="font-semibold">{t(label)}</p>
               <p className="text-muted">
-                {url ? 'Revealed' : `in ${left} ${left === 1 ? 'guess' : 'guesses'}`}
+                {url ? t('Revealed') : t('in {left} {v}', { left: left, v: left === 1 ? t('guess') : t('guesses') })}
               </p>
             </div>
           </div>
@@ -201,10 +204,11 @@ function HintPanel({ hints, guesses }: { hints: Hints | null; guesses: number })
 
 /** A number with its label, the way the game shows a stat. */
 function Stat({ value, label }: { value: string | number; label: string }) {
+  const t = useT();
   return (
     <div className="flex flex-col items-center gap-0.5">
       <span className="text-2xl font-black tabular-nums leading-none">{value}</span>
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">{label}</span>
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t(label)}</span>
     </div>
   );
 }
@@ -226,6 +230,7 @@ function StatsPanel({
   today: string;
   todayGuesses: number | null;
 }) {
+  const t = useT();
   const streak = currentStreak(stats, today);
   const avg = averageGuesses(stats);
   const counts = Object.entries(stats.distribution)
@@ -238,20 +243,18 @@ function StatsPanel({
   return (
     <div className="card space-y-4 p-5">
       <div className="grid grid-cols-4 gap-2">
-        <Stat value={stats.played} label="Played" />
+        <Stat value={stats.played} label={t('Played')} />
         <Stat
           value={stats.played > 0 ? `${Math.round((stats.won / stats.played) * 100)}%` : '—'}
-          label="Won"
+          label={t('Won')}
         />
-        <Stat value={streak} label="Streak" />
-        <Stat value={stats.best} label="Best" />
+        <Stat value={streak} label={t('Streak')} />
+        <Stat value={stats.best} label={t('Best')} />
       </div>
 
       {counts.length > 0 ? (
         <div className="space-y-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
-            Guesses to solve
-          </p>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t('Guesses to solve')}</p>
           {counts.map(([guesses, times]) => (
             <div key={guesses} className="flex items-center gap-2 text-xs">
               <span className="w-4 shrink-0 text-right font-bold tabular-nums">{guesses}</span>
@@ -273,10 +276,9 @@ function StatsPanel({
       ) : null}
 
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted">
-        {avg !== null ? <span>Average {avg.toFixed(1)} guesses</span> : null}
+        {avg !== null ? <span>{t('Average {v} guesses', { v: avg.toFixed(1) })}</span> : null}
         {oneShots(stats) > 0 ? (
-          <span>
-            {oneShots(stats)} first-guess {oneShots(stats) === 1 ? 'solve' : 'solves'}
+          <span>{oneShots(stats) === 1 ? t('{stats} first-guess solve', { stats: oneShots(stats) }) : t('{stats} first-guess solves', { stats: oneShots(stats) })}
           </span>
         ) : null}
       </div>
@@ -285,6 +287,7 @@ function StatsPanel({
 }
 
 export function ChallengeBoard({ date, picker }: { date: string; picker: PickerEntry[] }) {
+  const t = useT();
   /*
    * One state object, hydrated once. `board === null` means localStorage has
    * not been read yet, which is a third state distinct from "no guesses" --
@@ -393,7 +396,7 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
         cache: 'no-store',
       });
       if (!res.ok) {
-        setError(res.status === 404 ? 'That is not a current brawler.' : 'Could not check that guess.');
+        setError(res.status === 404 ? t('That is not a current brawler.') : t('Could not check that guess.'));
         return;
       }
       const data = (await res.json()) as GuessResult & { correct: boolean };
@@ -421,7 +424,7 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
       setQuery('');
       inputRef.current?.focus();
     } catch {
-      setError('Could not reach the server. Try again.');
+      setError(t('Could not reach the server. Try again.'));
     } finally {
       setBusy(false);
     }
@@ -440,7 +443,7 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       },
-      () => setError('Could not copy. Select the grid and copy it by hand.'),
+      () => setError(t('Could not copy. Select the grid and copy it by hand.')),
     );
   }
 
@@ -461,8 +464,8 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
             onKeyDown={(e) => {
               if (e.key === 'Enter' && matches[0]) submit(matches[0].slug);
             }}
-            placeholder="Type a brawler name…"
-            aria-label="Guess a brawler"
+            placeholder={t('Type a brawler name…')}
+            aria-label={t('Guess a brawler')}
             autoComplete="off"
             disabled={busy}
             className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-base outline-none placeholder:text-muted focus:border-brand"
@@ -511,13 +514,13 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
           {/* Column headings once, so five labels are not repeated on every row */}
           <div className="grid min-w-[620px] grid-cols-[3rem_repeat(7,1fr)] gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
             <span />
-            <span className="text-center">Rarity</span>
-            <span className="text-center">Class</span>
-            <span className="text-center">Movement</span>
-            <span className="text-center">Range</span>
-            <span className="text-center">Reload</span>
-            <span className="text-center">Released</span>
-            <span className="text-center">Tier</span>
+            <span className="text-center">{t('Rarity')}</span>
+            <span className="text-center">{t('Class')}</span>
+            <span className="text-center">{t('Movement')}</span>
+            <span className="text-center">{t('Range')}</span>
+            <span className="text-center">{t('Reload')}</span>
+            <span className="text-center">{t('Released')}</span>
+            <span className="text-center">{t('Tier')}</span>
           </div>
 
           {[...results].reverse().map((r, i) => (
@@ -544,29 +547,24 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
           ))}
         </div>
       ) : (
-        <p className="card p-4 text-sm leading-relaxed text-muted">
-          Guess today&rsquo;s brawler. Each guess shows how close you are on five clues — green is
-          exact, amber is one step away, and an arrow points toward the answer.
-        </p>
+        <p className="card p-4 text-sm leading-relaxed text-muted">{t('Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.')}</p>
       )}
 
       {solved ? (
         <div className="card card-glow overflow-hidden">
           <span className="block h-1 w-full bg-emerald-400" />
           <div className="space-y-3 p-5">
-            <p className="text-lg font-black">
-              Got it in {results.length} {results.length === 1 ? 'guess' : 'guesses'}.
+            <p className="text-lg font-black">{t('Got it in {length}', { length: results.length })}{' '}{results.length === 1 ? t('guess') : t('guesses')}.
             </p>
             {/* A countdown rather than "midnight UTC": one is a fact you have
                 to convert, the other is an invitation with a number on it. */}
             <p className="text-sm text-muted">
               {countdown ? (
-                <>
-                  Next brawler in{' '}
+                <>{t('Next brawler in')}{' '}
                   <span className="font-bold tabular-nums text-foreground">{countdown}</span>
                 </>
               ) : (
-                'A new brawler at midnight UTC.'
+                t('A new brawler at midnight UTC.')
               )}
             </p>
 
@@ -575,13 +573,11 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
               onClick={share}
               className="rounded-lg bg-brand px-4 py-2 text-sm font-bold text-[#0b0f1d] transition-opacity hover:opacity-90"
             >
-              {copied ? 'Copied' : 'Copy result'}
+              {copied ? t('Copied') : t('Copy result')}
             </button>
 
             {yesterday ? (
-              <p className="flex items-center gap-2 pt-1 text-xs text-muted">
-                Yesterday was
-                {yesterday.imageUrl ? (
+              <p className="flex items-center gap-2 pt-1 text-xs text-muted">{t('Yesterday was')}{yesterday.imageUrl ? (
                   <Image
                     src={yesterday.imageUrl}
                     alt=""

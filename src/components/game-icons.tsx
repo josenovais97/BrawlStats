@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 import { prestigeTier } from '@/lib/prestige';
 import { slugify } from '@/lib/slugs';
+import { getUT } from '@/lib/t-universal';
 
 /**
  * Real in-game artwork, used everywhere a stat refers to a game concept.
@@ -49,119 +50,143 @@ function GameIcon({
 }
 
 export function HyperchargeIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/hypercharge.png" alt="Hypercharge" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/hypercharge.png" alt={t('Hypercharge')} className={className} />;
 }
 
 export function BuffieIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/buffie.png" alt="Buffie" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/buffie.png" alt={t('Buffie')} className={className} />;
 }
 
 export function CoinIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/coin.png" alt="Coins" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/coin.png" alt={t('Coins')} className={className} />;
 }
 
 export function StarrDropIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/starr-drop.png" alt="Starr Drop" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/starr-drop.png" alt={t('Starr Drop')} className={className} />;
 }
 
 export function PowerPointIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/power-point.png" alt="Power points" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/power-point.png" alt={t('Power points')} className={className} />;
 }
 
 /** The in-game power 11 badge. */
 export function Power11Icon({ className }: IconProps) {
-  return <GameIcon src="/icons/power-11.png" alt="Power 11" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/power-11.png" alt={t('Power 11')} className={className} />;
 }
 
 export function StarPowerIcon({ className }: IconProps) {
-  return <GameIcon src={GENERIC_STAR_POWER} alt="Star power" className={className} />;
+  const t = getUT();
+  return <GameIcon src={GENERIC_STAR_POWER} alt={t('Star power')} className={className} />;
 }
 
 export function GadgetIcon({ className }: IconProps) {
-  return <GameIcon src={GENERIC_GADGET} alt="Gadget" className={className} />;
+  const t = getUT();
+  return <GameIcon src={GENERIC_GADGET} alt={t('Gadget')} className={className} />;
 }
 
 export function GearIcon({ className }: IconProps) {
-  return <GameIcon src={GENERIC_GEAR} alt="Gear" className={className} />;
+  const t = getUT();
+  return <GameIcon src={GENERIC_GEAR} alt={t('Gear')} className={className} />;
 }
 
 /** The game's own trophy asset, replacing the previously hand-drawn SVG. */
 export function TrophyIcon({ className = 'size-5' }: IconProps) {
-  return <GameIcon src="/icons/trophy.png" alt="Trophies" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/trophy.png" alt={t('Trophies')} className={className} />;
 }
 
 /** 3v3 victories. */
 export function Battle3v3Icon({ className }: IconProps) {
-  return <GameIcon src="/icons/battle-3v3.png" alt="3v3 wins" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/battle-3v3.png" alt={t('3v3 wins')} className={className} />;
 }
 
 /** Solo showdown. */
 export function SoloShowdownIcon({ className }: IconProps) {
+  const t = getUT();
   return (
-    <GameIcon src="/icons/solo-showdown.png" alt="Solo showdown" className={className} />
+    <GameIcon src="/icons/solo-showdown.png" alt={t('Solo showdown')} className={className} />
   );
 }
 
 /** Duo showdown. */
 export function DuoShowdownIcon({ className }: IconProps) {
+  const t = getUT();
   return (
-    <GameIcon src="/icons/duo-showdown.png" alt="Duo showdown" className={className} />
+    <GameIcon src="/icons/duo-showdown.png" alt={t('Duo showdown')} className={className} />
   );
 }
 
 /** Brawler roster. */
 export function BrawlersIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/brawlers.png" alt="Brawlers" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/brawlers.png" alt={t('Brawlers')} className={className} />;
 }
 
 /** Experience. */
 export function ExperienceIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/experience.png" alt="Experience" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/experience.png" alt={t('Experience')} className={className} />;
 }
 
 /** Skins. */
 export function SkinsIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/skins.png" alt="Skins" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/skins.png" alt={t('Skins')} className={className} />;
 }
 
 /** Club badge placeholder. */
 export function ClubIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/club.png" alt="Club" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/club.png" alt={t('Club')} className={className} />;
 }
 
 /** Time played. */
 export function ClockIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/clock.png" alt="Time played" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/clock.png" alt={t('Time played')} className={className} />;
 }
 
 /** Win streak. */
 export function WinStreakIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/win-streak.png" alt="Win streak" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/win-streak.png" alt={t('Win streak')} className={className} />;
 }
 
 /** Robo Rumble. */
 export function RoboRumbleIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/robo-rumble.png" alt="Robo Rumble" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/robo-rumble.png" alt={t('Robo Rumble')} className={className} />;
 }
 
 /** Battles played. */
 export function BattlesIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/battles.png" alt="Battles" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/battles.png" alt={t('Battles')} className={className} />;
 }
 
 /** Ranked. */
 export function RankedIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/ranked.png" alt="Ranked" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/ranked.png" alt={t('Ranked')} className={className} />;
 }
 
 /** Leaderboards. */
 export function LeaderboardIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/leaderboard.png" alt="Leaderboard" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/leaderboard.png" alt={t('Leaderboard')} className={className} />;
 }
 
 /** Skins, pins and the rest of the cosmetic collection. */
 export function CosmeticsIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/cosmetics.png" alt="Cosmetics" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/cosmetics.png" alt={t('Cosmetics')} className={className} />;
 }
 
 /**
@@ -223,12 +248,14 @@ export function CombatStatIcon({
 
 /** The tier lists. */
 export function TierListIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/tier-list.png" alt="Tier list" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/tier-list.png" alt={t('Tier list')} className={className} />;
 }
 
 /** The draft helper. */
 export function DraftIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/draft.png" alt="Draft" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/draft.png" alt={t('Draft')} className={className} />;
 }
 
 /**
@@ -240,12 +267,14 @@ export function DraftIcon({ className }: IconProps) {
  * install and the thing on your screen are all visibly one product.
  */
 export function BubbleAppIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/bubble-app.png" alt="Android app" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/bubble-app.png" alt={t('Android app')} className={className} />;
 }
 
 /** Head-to-head comparison. */
 export function CompareIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/compare.png" alt="Compare" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/compare.png" alt={t('Compare')} className={className} />;
 }
 
 /**
@@ -258,11 +287,13 @@ export function CompareIcon({ className }: IconProps) {
  * where everything else is game art.
  */
 export function NewsIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/news.png" alt="News" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/news.png" alt={t('News')} className={className} />;
 }
 
 export function ReleaseNotesIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/release-notes.png" alt="Release notes" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/release-notes.png" alt={t('Release notes')} className={className} />;
 }
 
 /**
@@ -277,39 +308,46 @@ export function ReleaseNotesIcon({ className }: IconProps) {
  * cannot scan.
  */
 export function DailyChallengeIcon({ className }: IconProps) {
+  const t = getUT();
   return (
-    <GameIcon src="/icons/daily-challenge.png" alt="Daily challenge" className={className} />
+    <GameIcon src="/icons/daily-challenge.png" alt={t('Daily challenge')} className={className} />
   );
 }
 
 /** The live event rotation. */
 export function EventsIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/events.png" alt="Events" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/events.png" alt={t('Events')} className={className} />;
 }
 
 /** The map catalogue. */
 export function MapsIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/maps.png" alt="Maps" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/maps.png" alt={t('Maps')} className={className} />;
 }
 
 /** Longest run as the Big Brawler. */
 export function BigBrawlerIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/big-brawler.png" alt="Big Brawler" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/big-brawler.png" alt={t('Big Brawler')} className={className} />;
 }
 
 /** A player, wherever a profile or a count of profiles is meant. */
 export function PlayersIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/players.png" alt="Players" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/players.png" alt={t('Players')} className={className} />;
 }
 
 /** Trophies climbing: gains, streaks and best days. */
 export function TrophyGainIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/trophy-gain.png" alt="Trophy gain" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/trophy-gain.png" alt={t('Trophy gain')} className={className} />;
 }
 
 /** Club president, and anything else that ranks first. */
 export function CrownIcon({ className }: IconProps) {
-  return <GameIcon src="/icons/crown.png" alt="President" className={className} />;
+  const t = getUT();
+  return <GameIcon src="/icons/crown.png" alt={t('President')} className={className} />;
 }
 
 /**
@@ -323,9 +361,10 @@ export function PrestigeIcon({
   total,
   className,
 }: IconProps & { total: number | undefined | null }) {
+  const t = getUT();
   const tier = prestigeTier(total);
   if (tier === null) return null;
   return (
-    <GameIcon src={`/icons/prestige-${tier}.png`} alt="Prestige" className={className} />
+    <GameIcon src={`/icons/prestige-${tier}.png`} alt={t('Prestige')} className={className} />
   );
 }

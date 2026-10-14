@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * A section as one object: its title and its contents inside a single surface.
@@ -42,6 +44,7 @@ export function Panel({
   bodyClassName?: string;
   id?: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <section id={id} className="card flex h-full flex-col overflow-hidden">
       <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border/70 px-5 py-3.5 sm:px-6">
@@ -51,7 +54,7 @@ export function Panel({
               {icon}
             </span>
           ) : null}
-          <span className="truncate">{title}</span>
+          <span className="truncate">{t(title)}</span>
           {count !== undefined && count !== null ? (
             <span className="shrink-0 text-xs font-normal normal-case tracking-normal text-muted">
               {count}
@@ -60,7 +63,7 @@ export function Panel({
         </h2>
         {aside ? <span className="shrink-0 text-xs text-muted">{aside}</span> : null}
         {subtitle ? (
-          <p className="w-full text-sm leading-relaxed text-muted">{subtitle}</p>
+          <p className="w-full text-sm leading-relaxed text-muted">{t(subtitle)}</p>
         ) : null}
       </header>
 

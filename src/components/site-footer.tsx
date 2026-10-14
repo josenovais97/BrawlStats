@@ -1,10 +1,13 @@
+'use client';
+
 import { Coffee, ExternalLink, Mail, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
+import { useLocale } from '@/components/i18n/use-locale';
+import { localePath, type Locale } from '@/lib/i18n';
 import { AppStoreBadge, GooglePlayBadge } from '@/components/store-badges';
-import { CONTACT_EMAIL, SITE_NAME } from '@/lib/site';
-import { TIKTOK_PROFILE_URL } from '@/lib/tiktok-latest';
+import { CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL } from '@/lib/site';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/brawl-stars/id1229016807';
 const GOOGLE_PLAY_URL =
@@ -97,6 +100,62 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
  * mirror has not published — which is most of what a brawler page shows.
  * Crediting three of four sources is not crediting the sources.
  */
+/**
+ * The footer's words. A client component only so it can read the page's
+ * language from the address: the root layout renders it without the route.
+ */
+const WORDS: Record<Locale, Record<string, string>> = {
+  en: {},
+  es: {
+    Stats: 'Estadísticas', Tools: 'Herramientas', Game: 'Juego',
+    Brawlers: 'Brawlers', 'Tier List': 'Tier list', 'Ranked Maps': 'Mapas de Competitivo', Maps: 'Mapas',
+    Leaderboard: 'Rankings', Draft: 'Draft', 'Team Comps': 'Equipos', Compare: 'Comparar', Daily: 'Diario',
+    'Meta Report': 'Informe del meta', 'Hidden Meta': 'Meta oculto', 'Daily Challenge': 'Reto diario',
+    'Patch Impact': 'Impacto de parches', 'How Scores Work': 'Cómo funcionan las puntuaciones',
+    'Android App': 'App para Android', 'Community Events': 'Eventos de la comunidad', Cosmetics: 'Cosméticos',
+    'Starr Drops': 'Starr Drops', News: 'Noticias', 'Release Notes': 'Notas de versión',
+    tagline:
+      'Estadísticas de Brawl Stars que te muestran dónde estás. Búsqueda de jugadores y clubes, tier lists y mejores brawlers por mapa, con partidas que recogemos nosotros mismos.',
+    follow: 'Síguenos y apóyanos', coffee: 'Invítame a un café', free: 'Gratis, sin anuncios y sin pagos.',
+    appStore: 'Descarga Brawl Stars en la App Store (se abre en una pestaña nueva)',
+    googlePlay: 'Descarga Brawl Stars en Google Play (se abre en una pestaña nueva)',
+    getGame: 'Consigue Brawl Stars, gratis en iOS y Android', about: 'Sobre', privacy: 'Privacidad',
+    terms: 'Términos', contact: 'Contacto', sources: 'Datos e imágenes de',
+    disclaimer: 'Este material no es oficial y no está respaldado por Supercell. Para más información, consulta la',
+    policy: 'Política de contenido de fans de Supercell', notAffiliated: 'sin relación con Supercell',
+  },
+  pt: {
+    Stats: 'Estatísticas', Tools: 'Ferramentas', Game: 'Jogo',
+    Brawlers: 'Brawlers', 'Tier List': 'Tier list', 'Ranked Maps': 'Mapas do Ranqueado', Maps: 'Mapas',
+    Leaderboard: 'Rankings', Draft: 'Draft', 'Team Comps': 'Times', Compare: 'Comparar', Daily: 'Diário',
+    'Meta Report': 'Relatório do meta', 'Hidden Meta': 'Meta oculto', 'Daily Challenge': 'Desafio diário',
+    'Patch Impact': 'Impacto dos patches', 'How Scores Work': 'Como as pontuações funcionam',
+    'Android App': 'App para Android', 'Community Events': 'Eventos da comunidade', Cosmetics: 'Cosméticos',
+    'Starr Drops': 'Starr Drops', News: 'Notícias', 'Release Notes': 'Notas de atualização',
+    tagline:
+      'Estatísticas de Brawl Stars que mostram onde você está. Busca de jogadores e clubes, tier lists e melhores brawlers por mapa, com partidas que nós mesmos coletamos.',
+    follow: 'Siga e apoie', coffee: 'Me pague um café', free: 'Grátis, sem anúncios e sem pagamento.',
+    appStore: 'Baixe Brawl Stars na App Store (abre em uma nova aba)',
+    googlePlay: 'Baixe Brawl Stars no Google Play (abre em uma nova aba)',
+    getGame: 'Baixe Brawl Stars, grátis no iOS e no Android', about: 'Sobre o', privacy: 'Privacidade',
+    terms: 'Termos', contact: 'Contato', sources: 'Dados e imagens de',
+    disclaimer: 'Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a',
+    policy: 'Política de Conteúdo de Fãs da Supercell', notAffiliated: 'sem ligação com a Supercell',
+  },
+};
+
+const EN: Record<string, string> = {
+  tagline:
+    'Brawl Stars stats that show where you stand. Player and club lookups, tier lists and map picks, from battles we sample ourselves.',
+  follow: 'Follow and support', coffee: 'Buy me a coffee', free: 'Free, ad-free, no paywall.',
+  appStore: 'Download Brawl Stars on the App Store (opens in a new tab)',
+  googlePlay: 'Download Brawl Stars on Google Play (opens in a new tab)',
+  getGame: 'Get Brawl Stars — free on iOS and Android', about: 'About', privacy: 'Privacy', terms: 'Terms',
+  contact: 'Contact', sources: 'Data and artwork from',
+  disclaimer: 'This material is unofficial and is not endorsed by Supercell. For more information see',
+  policy: 'Supercell’s Fan Content Policy', notAffiliated: 'not affiliated with Supercell',
+};
+
 const SOURCES = [
   { href: 'https://developer.brawlstars.com', label: 'Brawl Stars API' },
   { href: 'https://docs.royaleapi.com/proxy.html', label: 'RoyaleAPI proxy' },
@@ -105,6 +164,9 @@ const SOURCES = [
 ];
 
 export function SiteFooter() {
+  const locale = useLocale();
+  const t = (key: string) => WORDS[locale][key] ?? EN[key] ?? key;
+  const href = (path: string) => localePath(locale, path);
   return (
     <footer className="relative mt-16 border-t border-border/70 bg-background sm:mt-20">
       {/*
@@ -147,17 +209,14 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
           <div className="min-w-0">
             <Link
-              href="/"
+              href={href('/')}
               prefetch={false}
               className="inline-flex items-center gap-2.5 rounded-lg font-black tracking-tight"
             >
               <BrandMark className="size-7" />
               <span className="display text-xl uppercase">{SITE_NAME}</span>
             </Link>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
-              Brawl Stars stats that show where you stand. Player and club lookups,
-              tier lists and map picks, from battles we sample ourselves.
-            </p>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">{t('tagline')}</p>
 
             {/*
               One row of equal-weight links, not three stacked buttons.
@@ -171,7 +230,7 @@ export function SiteFooter() {
               to the search button, and a donation should not be the loudest
               control on a page about looking up players.
             */}
-            <p className="eyebrow mt-7">Follow and support</p>
+            <p className="eyebrow mt-7">{t('follow')}</p>
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <a
                 href={DISCORD_URL}
@@ -214,25 +273,25 @@ export function SiteFooter() {
                 className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/35 bg-brand/10 px-3.5 text-sm font-bold text-brand transition-colors hover:border-brand/60 hover:bg-brand/15"
               >
                 <Coffee aria-hidden className="size-4" />
-                Buy me a coffee
+                {t('coffee')}
               </a>
             </div>
-            <p className="mt-2.5 text-xs text-muted/80">Free, ad-free, no paywall.</p>
+            <p className="mt-2.5 text-xs text-muted/80">{t('free')}</p>
 
           </div>
 
           {LINK_GROUPS.map((group) => (
-            <nav key={group.heading} aria-label={group.heading} className="min-w-0">
-              <p className="eyebrow">{group.heading}</p>
+            <nav key={group.heading} aria-label={t(group.heading)} className="min-w-0">
+              <p className="eyebrow">{t(group.heading)}</p>
               <ul className="mt-3 space-y-0.5">
                 {group.links.map(({ href, label }) => (
                   <li key={href}>
                     <Link
-                      href={href}
+                      href={localePath(locale, href)}
                       prefetch={false}
                       className="inline-flex min-h-9 items-center text-sm text-muted transition-colors hover:text-foreground"
                     >
-                      {label}
+                      {t(label)}
                     </Link>
                   </li>
                 ))}
@@ -265,7 +324,7 @@ export function SiteFooter() {
                 href={APP_STORE_URL}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Download Brawl Stars on the App Store (opens in a new tab)"
+                aria-label={t('appStore')}
                 className="rounded transition-opacity hover:opacity-80"
               >
                 <AppStoreBadge className="h-9 w-auto" />
@@ -274,30 +333,30 @@ export function SiteFooter() {
                 href={GOOGLE_PLAY_URL}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Download Brawl Stars on Google Play (opens in a new tab)"
+                aria-label={t('googlePlay')}
                 className="rounded transition-opacity hover:opacity-80"
               >
                 <GooglePlayBadge className="h-9 w-auto" />
               </a>
             </div>
-            <p className="text-muted/80">Get Brawl Stars &mdash; free on iOS and Android</p>
+            <p className="text-muted/80">{t('getGame')}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-t border-border/50 pt-4">
             <Link
-              href="/about"
+              href={href('/about')}
               prefetch={false}
               className="transition-colors hover:text-foreground"
             >
-              About {SITE_NAME}
+              {t('about')} {SITE_NAME}
             </Link>
             <Dot />
-            <Link href="/privacy" prefetch={false} className="transition-colors hover:text-foreground">
-              Privacy
+            <Link href={href('/privacy')} prefetch={false} className="transition-colors hover:text-foreground">
+              {t('privacy')}
             </Link>
             <Dot />
-            <Link href="/terms" prefetch={false} className="transition-colors hover:text-foreground">
-              Terms
+            <Link href={href('/terms')} prefetch={false} className="transition-colors hover:text-foreground">
+              {t('terms')}
             </Link>
             <Dot />
             <a
@@ -305,10 +364,10 @@ export function SiteFooter() {
               className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
             >
               <Mail aria-hidden className="size-3.5 shrink-0" />
-              Contact
+              {t('contact')}
             </a>
             <Dot />
-            <span className="text-muted/80">Data and artwork from</span>
+            <span className="text-muted/80">{t('sources')}</span>
             {SOURCES.map((source, index) => (
               <span key={source.href} className="inline-flex items-center gap-1">
                 <a
@@ -327,20 +386,19 @@ export function SiteFooter() {
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-2xl">
-              This material is unofficial and is not endorsed by Supercell. For more
-              information see{' '}
+              {t('disclaimer')}{' '}
               <a
                 href={FAN_CONTENT_POLICY_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand"
               >
-                Supercell&rsquo;s Fan Content Policy
+                {t('policy')}
               </a>
               .
             </p>
             <p className="shrink-0 text-muted/80">
-              {SITE_NAME} &middot; not affiliated with Supercell
+              {SITE_NAME} &middot; {t('notAffiliated')}
             </p>
           </div>
         </div>

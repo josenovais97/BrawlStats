@@ -2,13 +2,16 @@ import type { Metadata } from 'next';
 
 import { CompareTool } from '@/components/compare/compare-tool';
 import { currentMonth } from '@/lib/site';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /* A function, not an object, so the month is not frozen at module load —
    see `currentMonth`. */
 export function generateMetadata(): Metadata {
+  const t = getT(requestLocale());
   return {
-    title: `Compare Brawl Stars players and brawlers (${currentMonth()})`,
-    description: `Put two Brawl Stars players or two brawlers side by side, ${currentMonth()}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.`,
+    title: t('Compare Brawl Stars players and brawlers ({v})', { v: currentMonth() }),
+    description: t('Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.', { v: currentMonth() }),
     alternates: { canonical: '/compare' },
   };
 }

@@ -6,6 +6,9 @@ import { getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { getEventRotation } from '@/lib/bs-api';
 import { humanizeMode, partitionRotation, timeUntil } from '@/lib/format';
 import type { BAGameMode, BAMap } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Three live maps as a homepage teaser. Silent if the rotation is unavailable.
@@ -18,6 +21,8 @@ import type { BAGameMode, BAMap } from '@/types/brawlapi';
  * minutes, which was ~21,600 ISR writes a month for one URL.
  */
 export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   let rotation;
   try {
     rotation = await getEventRotation(revalidate);
@@ -63,7 +68,7 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                 same slots — and a teaser must not point somewhere the thing it
                 is teasing no longer is. */}
             <Link
-              href="/maps"
+              href={lp('/maps')}
               className="card card-interactive group flex h-full overflow-hidden sm:flex-col"
             >
               {/*
@@ -90,7 +95,7 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                 {map?.imageUrl ? (
                   <Image
                     src={map.imageUrl}
-                    alt={`${slot.event.map ?? modeName} map layout`}
+                    alt={t('{v} map layout', { v: slot.event.map ?? modeName })}
                     fill
                     sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 6rem"
                     /*
@@ -115,7 +120,7 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-victory/25 bg-victory/10 px-2 py-1">
                     <span className="live-dot" />
-                    <span className="eyebrow text-victory">Live</span>
+                    <span className="eyebrow text-victory">{t('Live')}</span>
                   </span>
                   <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold tabular-nums text-muted">
                     <ClockIcon className="size-4" />
@@ -143,7 +148,7 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                       {modeName}
                     </p>
                     <p className="display mt-1 truncate text-base leading-none">
-                      {slot.event.map ?? 'Unknown map'}
+                      {slot.event.map ?? t('Unknown map')}
                     </p>
                   </div>
                 </div>

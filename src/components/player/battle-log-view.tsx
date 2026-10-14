@@ -9,6 +9,8 @@ import { CrownIcon, TrophyIcon } from '@/components/game-icons';
 import { formatNumber } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import { playerLinkRel } from '@/lib/link-rel';
+import { useT } from '@/components/i18n/use-t';
+import { useLp } from '@/components/i18n/use-lp';
 
 export type BattleTone = 'win' | 'loss' | 'draw';
 
@@ -81,6 +83,7 @@ const TONE_COLOR: Record<BattleTone, string> = {
  * cost a hydration boundary of its own.
  */
 export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
+  const tx = useT();
   const [tone, setTone] = useState<BattleTone | 'all'>('all');
   const [mode, setMode] = useState('all');
 
@@ -130,23 +133,19 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
       {(tones.length > 1 || modes.length > 1) && (
         <div className="flex flex-wrap items-center gap-1.5">
           {tones.length > 1 ? (
-            <div role="group" aria-label="Filter by result" className="flex gap-1.5">
-              <Chip active={tone === 'all'} onClick={() => setTone('all')}>
-                All results
-              </Chip>
+            <div role="group" aria-label={tx('Filter by result')} className="flex gap-1.5">
+              <Chip active={tone === 'all'} onClick={() => setTone('all')}>{tx('All results')}</Chip>
               {tones.map((t) => (
                 <Chip key={t} active={tone === t} onClick={() => setTone(t)} dot={TONE_COLOR[t]}>
-                  {t === 'win' ? 'Wins' : t === 'loss' ? 'Losses' : 'Draws'}
+                  {t === 'win' ? tx('Wins') : t === 'loss' ? tx('Losses') : tx('Draws')}
                 </Chip>
               ))}
             </div>
           ) : null}
 
           {modes.length > 1 ? (
-            <div role="group" aria-label="Filter by mode" className="flex flex-wrap gap-1.5">
-              <Chip active={mode === 'all'} onClick={() => setMode('all')}>
-                All modes
-              </Chip>
+            <div role="group" aria-label={tx('Filter by mode')} className="flex flex-wrap gap-1.5">
+              <Chip active={mode === 'all'} onClick={() => setMode('all')}>{tx('All modes')}</Chip>
               {modes.map((m) => {
                 const icon = entries.find((e) => e.mode === m && e.modeIconUrl)?.modeIconUrl;
                 return (
@@ -171,7 +170,7 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
       )}
 
       {runs.length === 0 ? (
-        <p className="card p-6 text-sm text-muted">No battles match that filter.</p>
+        <p className="card p-6 text-sm text-muted">{tx('No battles match that filter.')}</p>
       ) : (
         <ol className="space-y-2">
           {runs.map((run) => (
@@ -197,6 +196,7 @@ export function BattleLogView({ entries }: { entries: BattleEntry[] }) {
  * answer "what was working" without the reader tallying rows.
  */
 function Session({ entries }: { entries: BattleEntry[] }) {
+  const tx = useT();
   const s = useMemo(() => summarise(entries), [entries]);
   const main = s.brawlers[0];
   const tint = main?.tint ?? 'var(--brand)';
@@ -228,12 +228,9 @@ function Session({ entries }: { entries: BattleEntry[] }) {
         ) : null}
 
         <div className="flex min-w-0 flex-1 basis-48 flex-col justify-center pb-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted">
-            Last {entries.length} games
-            {main ? (
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted">{tx('Last {length} games', { length: entries.length })}{main ? (
               <span className="normal-case tracking-normal">
-                {' '}
-                · mostly <span className="font-bold capitalize text-foreground">{main.name.toLowerCase()}</span>
+                {' '}{tx('· mostly')}{' '}<span className="font-bold capitalize text-foreground">{main.name.toLowerCase()}</span>
               </span>
             ) : null}
           </p>
@@ -251,15 +248,15 @@ function Session({ entries }: { entries: BattleEntry[] }) {
         </div>
 
         <dl className="flex shrink-0 items-center gap-5 pb-4 max-sm:w-full max-sm:justify-between">
-          <Stat label="Win rate" value={s.decided ? `${Math.round((s.wins / s.decided) * 100)}%` : '—'} />
+          <Stat label={tx('Win rate')} value={s.decided ? `${Math.round((s.wins / s.decided) * 100)}%` : '—'} />
           {s.trophies !== null ? (
             <Stat
-              label="Trophies"
+              label={tx('Trophies')}
               value={`${s.trophies > 0 ? '+' : s.trophies < 0 ? '−' : ''}${formatNumber(Math.abs(s.trophies))}`}
               tone={s.trophies > 0 ? 'text-victory' : s.trophies < 0 ? 'text-defeat' : undefined}
             />
           ) : null}
-          <Stat label="Star player" value={`×${s.stars}`} tone={s.stars ? 'text-brand' : undefined} />
+          <Stat label={tx('Star player')} value={`×${s.stars}`} tone={s.stars ? 'text-brand' : undefined} />
         </dl>
       </div>
 
@@ -276,8 +273,8 @@ function Session({ entries }: { entries: BattleEntry[] }) {
       </div>
 
       <div className="grid gap-x-6 gap-y-4 border-t border-border/70 px-4 py-4 sm:px-5 md:grid-cols-2">
-        <Breakdown title="By mode" rows={s.modes} />
-        <Breakdown title="By brawler" rows={s.brawlers} round />
+        <Breakdown title={tx('By mode')} rows={s.modes} />
+        <Breakdown title={tx('By brawler')} rows={s.brawlers} round />
       </div>
     </section>
   );
@@ -346,9 +343,10 @@ function summarise(entries: BattleEntry[]) {
 }
 
 function Stat({ label, value, tone }: { label: string; value: string; tone?: string }) {
+  const tx = useT();
   return (
     <div className="text-right">
-      <dt className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</dt>
+      <dt className="text-[10px] font-bold uppercase tracking-wider text-muted">{tx(label)}</dt>
       <dd className={`text-xl font-black tabular-nums leading-tight ${tone ?? ''}`}>{value}</dd>
     </div>
   );
@@ -358,10 +356,11 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
 const BREAKDOWN_ROWS = 4;
 
 function Breakdown({ title, rows, round = false }: { title: string; rows: Tally[]; round?: boolean }) {
+  const tx = useT();
   if (rows.length === 0) return null;
   return (
     <div className="min-w-0">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{title}</p>
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{tx(title)}</p>
       <ul className="space-y-2">
         {rows.slice(0, BREAKDOWN_ROWS).map((r) => {
           const decided = r.wins + r.losses;
@@ -438,6 +437,7 @@ function Chip({
 
 /** A run of identical consecutive battles, summed. */
 function RunRow({ run }: { run: BattleEntry[] }) {
+  const tx = useT();
   const head = run[0];
   const total = run.reduce((sum, entry) => sum + (entry.trophyChange ?? 0), 0);
   const stars = run.filter((entry) => entry.isStarPlayer).length;
@@ -461,9 +461,7 @@ function RunRow({ run }: { run: BattleEntry[] }) {
             <span className="truncate text-sm font-medium">{head.mode}</span>
             {stars > 0 ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
-                <CrownIcon className="size-3.5" />
-                Star player ×{stars}
-              </span>
+                <CrownIcon className="size-3.5" />{tx('Star player ×{stars}', { stars: stars })}</span>
             ) : null}
           </div>
           <p className="mt-0.5 truncate text-xs text-muted">
@@ -490,6 +488,7 @@ function RunRow({ run }: { run: BattleEntry[] }) {
 }
 
 function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boolean }) {
+  const tx = useT();
   return (
     <details
       className={`group overflow-hidden ${nested ? 'rounded-xl bg-surface' : 'card'}`}
@@ -508,9 +507,7 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
             <span className="truncate text-sm font-medium">{entry.mode}</span>
             {entry.isStarPlayer ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
-                <CrownIcon className="size-3.5" />
-                Star player
-              </span>
+                <CrownIcon className="size-3.5" />{tx('Star player')}</span>
             ) : null}
           </div>
           <p className="mt-0.5 truncate text-xs text-muted">
@@ -528,9 +525,7 @@ function BattleRow({ entry, nested = false }: { entry: BattleEntry; nested?: boo
       {entry.teams.length > 0 ? (
         <Lineup teams={entry.teams} isTeamMode={entry.isTeamMode} />
       ) : (
-        <p className="border-t border-border px-4 py-3 text-xs text-muted">
-          This battle reported no player list.
-        </p>
+        <p className="border-t border-border px-4 py-3 text-xs text-muted">{tx('This battle reported no player list.')}</p>
       )}
     </details>
   );
@@ -596,19 +591,21 @@ function TrophyDelta({ value }: { value: number | null }) {
  * headings that would be meaningless there.
  */
 function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMode: boolean }) {
+  const tx = useT();
+  const lp = useLp();
   return (
     <div className="border-t border-border bg-surface-2/30 p-3 sm:p-4">
       <div className="grid gap-3 sm:grid-cols-2">
         {teams.map((team, teamIndex) => (
           <div key={teamIndex}>
             {isTeamMode && teams.length > 1 ? (
-              <p className="eyebrow mb-2">Team {teamIndex + 1}</p>
+              <p className="eyebrow mb-2">{tx('Team')}{' '}{teamIndex + 1}</p>
             ) : null}
             <ul className="space-y-1">
               {team.map((participant) => (
                 <li key={participant.tag}>
                   <Link
-                    href={`/player/${normalizeTag(participant.tag)}`}
+                    href={lp(`/player/${normalizeTag(participant.tag)}`)}
                     rel={playerLinkRel(normalizeTag(participant.tag))}
                     prefetch={false}
                     className={`flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-surface-3 ${
@@ -643,8 +640,8 @@ function Lineup({ teams, isTeamMode }: { teams: BattleParticipant[][]; isTeamMod
                       <span className="block truncate text-xs capitalize text-muted">
                         {participant.brawlerName
                           ? participant.brawlerName.toLowerCase()
-                          : 'Unknown brawler'}
-                        {participant.brawlerPower ? ` · power ${participant.brawlerPower}` : ''}
+                          : tx('Unknown brawler')}
+                        {participant.brawlerPower ? tx(' · power {brawlerPower}', { brawlerPower: participant.brawlerPower }) : ''}
                       </span>
                     </span>
 

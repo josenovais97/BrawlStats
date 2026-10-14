@@ -4,6 +4,7 @@ import { Check, ChevronDown, Globe, Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { POPULAR_REGION_CODES, REGION_OPTIONS, regionName } from '@/lib/regions';
+import { useT } from '@/components/i18n/use-t';
 
 interface RegionPickerProps {
   value: string;
@@ -17,6 +18,7 @@ interface RegionPickerProps {
  * and keeps the high-traffic regions pinned to the top.
  */
 export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,24 +87,20 @@ export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search countries"
-              aria-label="Search countries"
+              placeholder={t('Search countries')}
+              aria-label={t('Search countries')}
               className="w-full bg-transparent py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-muted/85"
             />
           </div>
 
           <ul role="listbox" className="max-h-72 overflow-y-auto py-1">
             {results.length === 0 ? (
-              <li className="px-3 py-4 text-center text-sm text-muted">
-                No country matches “{query}”.
-              </li>
+              <li className="px-3 py-4 text-center text-sm text-muted">{t('No country matches “{query}”.', { query: query })}</li>
             ) : (
               results.map((region, index) => (
                 <li key={region.code}>
                   {!query && index === popularCount ? (
-                    <p className="border-t border-border px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">
-                      All countries
-                    </p>
+                    <p className="border-t border-border px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('All countries')}</p>
                   ) : null}
                   <button
                     type="button"

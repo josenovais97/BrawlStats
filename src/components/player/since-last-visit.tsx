@@ -9,6 +9,7 @@ import {
   subscribeSnapshot,
   writeSnapshot,
 } from '@/lib/player-history';
+import { useT } from '@/components/i18n/use-t';
 
 /**
  * "Since your last visit", from a snapshot kept in this browser.
@@ -36,6 +37,7 @@ export function SinceLastVisit({
   hyperCharges: number;
   skill: number;
 }) {
+  const t = useT();
   const current = { trophies, brawlers, power11, hyperCharges, skill };
 
   /*
@@ -71,11 +73,11 @@ export function SinceLastVisit({
   if (delta.unchanged) return null;
 
   const rows: { label: string; value: number; decimals?: number }[] = [
-    { label: 'Trophies', value: delta.trophies },
-    { label: 'Brawlers', value: delta.brawlers },
-    { label: 'Power 11', value: delta.power11 },
-    { label: 'Hypercharges', value: delta.hyperCharges },
-    { label: 'Skill score', value: delta.skill, decimals: 1 },
+    { label: t('Trophies'), value: delta.trophies },
+    { label: t('Brawlers'), value: delta.brawlers },
+    { label: t('Power 11'), value: delta.power11 },
+    { label: t('Hypercharges'), value: delta.hyperCharges },
+    { label: t('Skill score'), value: delta.skill, decimals: 1 },
   ].filter((row) => row.value !== 0);
 
   if (rows.length === 0) return null;
@@ -90,13 +92,9 @@ export function SinceLastVisit({
           id="since-last-visit"
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand"
         >
-          <History className="size-3.5" />
-          Since your last visit
-        </p>
+          <History className="size-3.5" />{t('Since your last visit')}</p>
         <p className="text-xs text-muted">
-          {delta.days === 1 ? '1 day ago' : `${delta.days} days ago`} · kept in this
-          browser only
-        </p>
+          {delta.days === 1 ? t('1 day ago') : t('{days} days ago', { days: delta.days })}{' '}{t('· kept in this browser only')}</p>
       </div>
 
       {/* Wraps rather than scrolls: at 320px this is two per row, which stays
@@ -105,7 +103,7 @@ export function SinceLastVisit({
         {rows.map((row) => (
           <div key={row.label}>
             <dt className="text-xs uppercase tracking-wide text-muted">
-              {row.label}
+              {t(row.label)}
             </dt>
             <dd
               className={`text-lg font-black tabular-nums ${

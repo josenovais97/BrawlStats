@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 export interface StatItem {
   /** Pre-rendered mark, for the game's own artwork. */
@@ -40,6 +42,7 @@ export function StatStrip({
   items: StatItem[];
   bare?: boolean;
 }) {
+  const t = getT(requestLocale());
   if (items.length === 0) return null;
 
   return (
@@ -53,13 +56,13 @@ export function StatStrip({
                   {item.node}
                 </span>
               ) : null}
-              <span className="truncate">{item.label}</span>
+              <span className="truncate">{t(item.label)}</span>
             </dt>
             <dd className="mt-1.5 truncate text-xl font-bold tabular-nums leading-none">
               {item.value}
             </dd>
             {item.hint ? (
-              <dd className="mt-1 truncate text-xs text-muted">{item.hint}</dd>
+              <dd className="mt-1 truncate text-xs text-muted">{t(item.hint)}</dd>
             ) : null}
           </div>
         ))}

@@ -15,6 +15,9 @@ import { ShareButton } from '@/components/player/share-button';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 import { CLUB_LINK_REL } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export function PlayerHeader({
   player,
@@ -24,6 +27,8 @@ export function PlayerHeader({
   /** Streamed in separately; derived from the battle log, not the player payload. */
   lastOnline?: React.ReactNode;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const nameColor = nameColorToCss(player.nameColor);
 
   /*
@@ -166,7 +171,7 @@ export function PlayerHeader({
                 {formatNumber(player.trophies)}
               </span>
               <span className="text-xs text-muted">
-                {atTrophyPeak ? 'At peak' : `Peak ${formatNumber(player.highestTrophies)}`}
+                {atTrophyPeak ? t('At peak') : t('Peak {highestTrophies}', { highestTrophies: formatNumber(player.highestTrophies) })}
               </span>
             </div>
 
@@ -184,14 +189,14 @@ export function PlayerHeader({
                 ) : null}
                 <div className="min-w-0 text-right">
                   <p className="truncate text-sm font-black uppercase leading-tight text-accent sm:text-lg">
-                    {player.rankedRankName ?? 'Unranked'}
+                    {player.rankedRankName ?? t('Unranked')}
                   </p>
                   <p className="truncate text-xs text-muted">
                     {atRankedPeak
-                      ? 'At peak'
+                      ? t('At peak')
                       : player.highestAllTimeRankedRankName
-                        ? `Peak ${titleCaseLabel(player.highestAllTimeRankedRankName)}`
-                        : 'No peak on record'}
+                        ? t('Peak {highestAllTimeRankedRankName}', { highestAllTimeRankedRankName: titleCaseLabel(player.highestAllTimeRankedRankName) })
+                        : t('No peak on record')}
                   </p>
                 </div>
               </div>
@@ -227,33 +232,27 @@ export function PlayerHeader({
 
         <div className="flex w-full flex-wrap items-center gap-1.5 text-xs sm:gap-2 sm:text-sm">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium">
-            <ExperienceIcon className="size-4" />
-            Level {player.expLevel}
-          </span>
+            <ExperienceIcon className="size-4" />{t('Level {expLevel}', { expLevel: player.expLevel })}</span>
 
           {/* The badge is the milestone reached (1, 25, 50, 100, 200), the
               number beside it is the exact total. */}
           {player.totalPrestigeLevel ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium">
-              <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />
-              Prestige {formatNumber(player.totalPrestigeLevel)}
-            </span>
+              <PrestigeIcon total={player.totalPrestigeLevel} className="size-4" />{t('Prestige {totalPrestigeLevel}', { totalPrestigeLevel: formatNumber(player.totalPrestigeLevel) })}</span>
           ) : null}
 
           {/* The card belongs in the chip row rather than as a section of its
               own: it is a link to a different view of this profile, not another
               thing to read here. */}
           <Link
-            href={`/wrapped/${normalizeTag(player.tag)}`}
+            href={lp(`/wrapped/${normalizeTag(player.tag)}`)}
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium transition-colors hover:border-brand/60 hover:text-foreground"
           >
-            <BattlesIcon className="size-4" />
-            Recent run
-          </Link>
+            <BattlesIcon className="size-4" />{t('Recent run')}</Link>
 
           {player.club?.tag ? (
             <Link
-              href={`/club/${normalizeTag(player.club.tag)}`}
+              href={lp(`/club/${normalizeTag(player.club.tag)}`)}
               rel={CLUB_LINK_REL}
               className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium transition-colors hover:border-accent/60 hover:text-foreground"
             >
@@ -263,17 +262,13 @@ export function PlayerHeader({
               <span className="truncate">{player.club.name}</span>
             </Link>
           ) : (
-            <span className="rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 text-muted">
-              No club
-            </span>
+            <span className="rounded-full border border-border bg-surface-2 px-2.5 py-0.5 sm:px-3 sm:py-1 text-muted">{t('No club')}</span>
           )}
 
           {lastOnline}
 
           {player.isQualifiedFromChampionshipChallenge ? (
-            <span className="rounded-full border border-brand/40 bg-brand/10 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium text-brand">
-              Championship qualified
-            </span>
+            <span className="rounded-full border border-brand/40 bg-brand/10 px-2.5 py-0.5 sm:px-3 sm:py-1 font-medium text-brand">{t('Championship qualified')}</span>
           ) : null}
         </div>
       </div>

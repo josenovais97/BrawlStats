@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * A head-to-head metric list that does not become a table on a phone.
@@ -57,6 +59,7 @@ export function VersusList({
   accentA?: string;
   accentB?: string;
 }) {
+  const t = getT(requestLocale());
   const visible = sections.filter((section) => section.metrics.length > 0);
   if (visible.length === 0) return null;
 
@@ -65,7 +68,7 @@ export function VersusList({
       {visible.map((section) => (
         <section key={section.title}>
           <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
-            {section.title}
+            {t(section.title)}
           </h3>
 
           <dl className="card divide-y divide-border overflow-hidden">
@@ -82,7 +85,7 @@ export function VersusList({
 
             {section.metrics.map((metric) => (
               <div key={metric.label} className="px-3 py-2.5">
-                <dt className="text-xs font-medium text-muted">{metric.label}</dt>
+                <dt className="text-xs font-medium text-muted">{t(metric.label)}</dt>
                 <dd className="mt-0.5 grid grid-cols-2 items-baseline gap-2">
                   <span
                     className={`min-w-0 truncate text-sm tabular-nums ${
@@ -121,7 +124,7 @@ export function VersusList({
                 ) : null}
                 {metric.hint ? (
                   <p className="mt-0.5 text-xs leading-snug text-muted">
-                    {metric.hint}
+                    {t(metric.hint)}
                   </p>
                 ) : null}
               </div>

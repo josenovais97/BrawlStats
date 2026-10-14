@@ -8,6 +8,9 @@ import { ClubIcon, PlayersIcon } from '@/components/game-icons';
 import { RecentSearches } from '@/components/recent-searches';
 import { isValidTag, normalizeTag } from '@/lib/tags';
 import { TagLocationHint } from '@/components/tag-location-hint';
+import { useLocale } from '@/components/i18n/use-locale';
+import { useT } from '@/components/i18n/use-t';
+import { localePath } from '@/lib/i18n';
 
 type Mode = 'player' | 'club';
 
@@ -47,6 +50,8 @@ export function SearchBar({
   footer,
 }: SearchBarProps) {
   const router = useRouter();
+  const t = useT();
+  const locale = useLocale();
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -60,17 +65,17 @@ export function SearchBar({
     const tag = normalizeTag(value);
 
     if (!tag) {
-      setError('Enter a tag to search.');
+      setError(t('Enter a tag to search.'));
       return;
     }
     if (!isValidTag(tag)) {
-      setError('Tags only use the characters 0289PYLQGRJCUV, so check for typos.');
+      setError(t('Tags only use the characters 0289PYLQGRJCUV, so check for typos.'));
       return;
     }
 
     setError(null);
     startTransition(() => {
-      router.push(`/${mode}/${tag}`);
+      router.push(localePath(locale, `/${mode}/${tag}`));
     });
   }
 
@@ -82,7 +87,7 @@ export function SearchBar({
       */}
       <div
         role="group"
-        aria-label="Search type"
+        aria-label={t('Search type')}
         className="inline-flex rounded-xl border border-border/80 bg-background/70 p-1 shadow-[inset_0_1px_3px_rgb(0_0_0/0.5)]"
       >
         {(['player', 'club'] as const).map((m) => {
@@ -104,7 +109,7 @@ export function SearchBar({
               }`}
             >
               {isClub ? <ClubIcon className="size-4" /> : <PlayersIcon className="size-4" />}
-              {m}
+              {t(m)}
             </button>
           );
         })}
@@ -135,7 +140,7 @@ export function SearchBar({
               if (error) setError(null);
             }}
             placeholder={PLACEHOLDER[mode]}
-            aria-label={`${mode} tag`}
+            aria-label={t(`${mode} tag`)}
             aria-invalid={error ? true : undefined}
             aria-describedby={hintId}
             spellCheck={false}
@@ -156,7 +161,7 @@ export function SearchBar({
           }`}
         >
           {pending ? <Loader2 className="size-5 animate-spin" /> : <Search className="size-5" />}
-          Search
+          {t('Search')}
           {hero ? <ArrowRight className="size-5 sm:hidden" /> : null}
         </button>
       </form>
@@ -168,8 +173,8 @@ export function SearchBar({
       ) : (
         <p id={hintId} className="mt-3 text-sm text-muted">
           {mode === 'player'
-            ? 'Your tag is on your in-game profile, just below your profile icon. '
-            : 'A club tag is shown on the club screen, under the club name. '}
+            ? `${t('Your tag is on your in-game profile, just below your profile icon.')} `
+            : `${t('A club tag is shown on the club screen, under the club name.')} `}
           <TagLocationHint kind={mode === 'player' ? 'player' : 'club'} />
         </p>
       )}

@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 
 import { ClubIcon, PlayersIcon } from '@/components/game-icons';
+import { useLocale } from '@/components/i18n/use-locale';
+import { useT } from '@/components/i18n/use-t';
+import { localePath } from '@/lib/i18n';
 import { playerIconUrl } from '@/lib/brawlapi';
 import {
   clearRecentSearches,
@@ -31,6 +34,8 @@ import {
 const SHOWN = 3;
 
 export function RecentSearches() {
+  const t = useT();
+  const locale = useLocale();
   const entries = useSyncExternalStore(
     subscribeRecentSearches,
     readRecentSearches,
@@ -43,7 +48,7 @@ export function RecentSearches() {
   return (
     <div className="mt-3 flex items-center gap-2.5 border-t border-border pt-3">
       <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:inline">
-        Continue with
+        {t('Continue with')}
       </span>
 
       {/* Scrolls rather than wraps: a second row here is the height this was
@@ -55,7 +60,7 @@ export function RecentSearches() {
           return (
             <li key={`${entry.kind}:${entry.tag}`} className="shrink-0">
               <Link
-                href={`/${entry.kind}/${entry.tag}`}
+                href={localePath(locale, `/${entry.kind}/${entry.tag}`)}
                 className="flex min-h-9 items-center gap-2 rounded-lg border border-border bg-surface-2/60 py-1 pl-1 pr-2.5 text-sm transition-colors hover:border-brand/50"
               >
                 {entry.icon && !isClub ? (
@@ -89,8 +94,8 @@ export function RecentSearches() {
       <button
         type="button"
         onClick={clearRecentSearches}
-        aria-label="Clear recent profiles"
-        title="Clear recent profiles"
+        aria-label={t('Clear recent profiles')}
+        title={t('Clear recent profiles')}
         className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
       >
         <X className="size-4" />

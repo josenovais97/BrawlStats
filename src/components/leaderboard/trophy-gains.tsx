@@ -5,6 +5,9 @@ import { TrophyIcon } from '@/components/game-icons';
 import { formatNumber } from '@/lib/format';
 import { getTrophyGains } from '@/lib/stats';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /** Podium colours for the first three. Everything below is neutral. */
 const PODIUM = ['#ffc53d', '#c9d3ee', '#e08a4a'];
@@ -21,6 +24,8 @@ const MIN_ROWS = 3;
 
 /** Biggest trophy climbers, from each player's own two most recent snapshots. */
 export async function TrophyGains({ limit = 5 }: { limit?: number }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const gains = await getTrophyGains(limit);
   if (gains.length < MIN_ROWS) return null;
 
@@ -34,11 +39,8 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-defeat">
-            <TrophyGainIcon className="size-4" />
-            Climbing fastest
-          </p>
-          <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">
-            Biggest trophy gains{uniformSpan === 1 ? ' today' : ''}
+            <TrophyGainIcon className="size-4" />{t('Climbing fastest')}</p>
+          <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">{t('Biggest trophy gains')}{uniformSpan === 1 ? t(' today') : ''}
           </h2>
           {/*
             The population is stated up front because this list sits directly
@@ -47,14 +49,8 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
             nowhere near the global board, and a name appearing here while
             missing below is the expected case rather than a bug.
           */}
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            From our own daily snapshots of the{' '}
-            <Link href="/about" className="font-medium text-brand hover:underline">
-              sampled player pool
-            </Link>
-            , ranked by trophies per day since each player was last read. A different population
-            from the official top 100 below, so these names mostly do not appear there.
-          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('From our own daily snapshots of the')}{' '}
+            <Link href={lp('/about')} className="font-medium text-brand hover:underline">{t('sampled player pool')}</Link>{t(', ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.')}</p>
         </div>
       </div>
 
@@ -94,7 +90,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                 style={{ left: `calc(${width}% - 1px)` }}
               />
               <Link
-                href={`/player/${player.tag}`}
+                href={lp(`/player/${player.tag}`)}
                 rel={playerLinkRel(player.tag)}
                 prefetch={false}
                 className="row-interactive relative flex items-center gap-3 p-3 sm:gap-4 sm:p-3.5"
@@ -121,7 +117,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                   <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-muted">
                     <TrophyIcon className="size-3" />
                     <span className="tabular-nums">{formatNumber(player.trophies)}</span>
-                    <span aria-hidden>total</span>
+                    <span aria-hidden>{t('total')}</span>
                   </p>
                 </div>
 
@@ -135,7 +131,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                   */}
                   {uniformSpan === null ? (
                     <p className="mt-1 text-[0.6875rem] uppercase tracking-wide text-muted">
-                      {player.days === 1 ? 'in 1 day' : `in ${player.days} days`}
+                      {player.days === 1 ? t('in 1 day') : t('in {days} days', { days: player.days })}
                     </p>
                   ) : null}
                 </div>

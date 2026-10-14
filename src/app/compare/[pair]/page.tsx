@@ -26,6 +26,9 @@ import {
 import { realBrawlerClass } from '@/lib/brawlapi';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BrawlerStatRow, Tier } from '@/types/stats';
+import { andList, getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ pair: string }>;
@@ -53,9 +56,10 @@ export async function generateStaticParams() {
 
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { pair } = await params;
   const resolved = await resolvePair(pair).catch(() => null);
-  if (!resolved) return { title: 'Compare brawlers' };
+  if (!resolved) return { title: t('Compare brawlers') };
 
   const a = titleCase(resolved.a.name);
   const b = titleCase(resolved.b.name);
@@ -84,8 +88,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
      * and this one is: both sides come from the same rolling 21-day window the
      * pairing threshold uses.
      */
-    title: `${a} vs ${b}: which is better in Brawl Stars? (${currentMonth()})`,
-    description: `${a} vs ${b} in Brawl Stars, ${currentMonth()}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.`,
+    title: t('{a} vs {b}: which is better in Brawl Stars? ({v})', { a: a, b: b, v: currentMonth() }),
+    description: t('{a} vs {b} in Brawl Stars, {v}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.', { a: a, b: b, v: currentMonth() }),
     alternates: { canonical: `/compare/${resolved.slug}` },
     /*
      * Indexable pages must be a deliberate set, and this is how that set is
@@ -111,13 +115,15 @@ interface Side {
 }
 
 export default async function ComparePage({ params }: PageProps) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { pair } = await params;
   const resolved = await resolvePair(pair).catch(() => null);
   if (!resolved) notFound();
 
   // "Shelly-VS-Colt" and "shelly-vs-colt" are the same page; only one of them
   // should be indexed, so anything that is not already canonical is sent there.
-  if (pair !== resolved.slug) redirect(`/compare/${resolved.slug}`);
+  if (pair !== resolved.slug) redirect(localePath(requestLocale(), `/compare/${resolved.slug}`));
 
   // Sequential database reads keep the page to a single connection.
   const sides: [Side, Side] = [
@@ -141,14 +147,14 @@ export default async function ComparePage({ params }: PageProps) {
   const verdict = buildVerdict(left, right);
   const faq = [
     {
-      question: `Is ${nameA} better than ${nameB}?`,
+      question: t('Is {nameA} better than {nameB}?', { nameA: nameA, nameB: nameB }),
       answer: verdict,
     },
     ...(leftVsRight
       ? [
           {
-            question: `What is the ${nameA} vs ${nameB} head-to-head record?`,
-            answer: `${nameA} wins ${formatPercent(leftVsRight.winRate)} of the ${formatNumber(leftVsRight.decidedSampleSize)} sampled battles where ${nameB} was on the other team.`,
+            question: t('What is the {nameA} vs {nameB} head-to-head record?', { nameA: nameA, nameB: nameB }),
+            answer: t('{nameA} wins {winRate} of the {decidedSampleSize} sampled battles where {nameB} was on the other team.', { nameA: nameA, winRate: formatPercent(leftVsRight.winRate), decidedSampleSize: formatNumber(leftVsRight.decidedSampleSize), nameB: nameB }),
           },
         ]
       : []),
@@ -165,12 +171,10 @@ export default async function ComparePage({ params }: PageProps) {
       <JsonLd data={faqSchema(faq)} />
 
       <Link
-        href="/compare"
+        href={lp('/compare')}
         className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" />
-        All comparisons
-      </Link>
+        <ArrowLeft className="size-4" />{t('All comparisons')}</Link>
 
       {/* A face-off: both brawlers full-body on their rarity colours, and the
           verdict inside the card it is about. Two 112px squares and a "vs"
@@ -185,18 +189,18 @@ export default async function ComparePage({ params }: PageProps) {
         />
         <div className="relative grid grid-cols-[1fr_auto_1fr] items-end gap-2 px-4 pt-5 sm:gap-4 sm:px-6">
           <Portrait side={left} align="end" art={leftArt} />
-          <span className="display mb-16 text-3xl uppercase text-brand sm:mb-24 sm:text-5xl">vs</span>
+          <span className="display mb-16 text-3xl uppercase text-brand sm:mb-24 sm:text-5xl">{t('vs')}</span>
           <Portrait side={right} align="start" art={rightArt} />
         </div>
         <p className="relative border-t border-border/70 px-4 py-3.5 text-center leading-relaxed sm:px-6">
-          {verdict}
+          {t(verdict)}
         </p>
       </header>
 
       <section>
         <SectionHeading
-          title="Side by side"
-          subtitle="Win rate is adjusted against the sample average, so both columns are on the same scale."
+          title={t('Side by side')}
+          subtitle={t('Win rate is adjusted against the sample average, so both columns are on the same scale.')}
         />
         {/* Stacked rows rather than a three-column table: at 320px a table
             either scrolls sideways or crushes the labels, and a comparison
@@ -214,17 +218,17 @@ export default async function ComparePage({ params }: PageProps) {
           }
           sections={[
             {
-              title: 'Performance',
+              title: t('Performance'),
               metrics: [
                 {
-                  label: 'Adjusted win rate',
+                  label: t('Adjusted win rate'),
                   a: formatPercent(left.adjusted),
                   b: formatPercent(right.adjusted),
                   leader: compareLeader(left.adjusted, right.adjusted),
                   values: [left.adjusted, right.adjusted],
                 },
                 {
-                  label: 'Pick rate',
+                  label: t('Pick rate'),
                   a: formatPercent(left.stat?.usageRate ?? null),
                   b: formatPercent(right.stat?.usageRate ?? null),
                   leader: compareLeader(
@@ -234,37 +238,37 @@ export default async function ComparePage({ params }: PageProps) {
                   values: [left.stat?.usageRate ?? null, right.stat?.usageRate ?? null],
                 },
                 {
-                  label: 'Tier',
+                  label: t('Tier'),
                   a: left.tier ?? '–',
                   b: right.tier ?? '–',
                   leader: null,
                 },
                 {
-                  label: 'Sampled battles',
+                  label: t('Sampled battles'),
                   a: formatNumber(left.stat?.decidedSampleSize ?? null),
                   b: formatNumber(right.stat?.decidedSampleSize ?? null),
                   leader: null,
-                  hint: 'More battles means a more reliable rate, not a better brawler.',
+                  hint: t('More battles means a more reliable rate, not a better brawler.'),
                 },
               ],
             },
             {
-              title: 'Profile',
+              title: t('Profile'),
               metrics: [
                 {
-                  label: 'Rarity',
+                  label: t('Rarity'),
                   a: left.brawler.rarity?.name ?? '–',
                   b: right.brawler.rarity?.name ?? '–',
                   leader: null,
                 },
                 {
-                  label: 'Class',
+                  label: t('Class'),
                   a: realBrawlerClass(left.brawler.class?.name) ?? '–',
                   b: realBrawlerClass(right.brawler.class?.name) ?? '–',
                   leader: null,
                 },
                 {
-                  label: 'Best mode',
+                  label: t('Best mode'),
                   a: left.splits[0] ? humanizeMode(left.splits[0].mode) : '–',
                   b: right.splits[0] ? humanizeMode(right.splits[0].mode) : '–',
                   leader: null,
@@ -277,18 +281,15 @@ export default async function ComparePage({ params }: PageProps) {
 
       <section>
         <SectionHeading
-          title="Head to head"
-          subtitle="Battles where one was on each team, counted once from the sampled player's side."
+          title={t('Head to head')}
+          subtitle={t('Battles where one was on each team, counted once from the sampled player\'s side.')}
         />
         {/* Why both can be above 50%: each figure is from a different set of
             players -- the left from players of the first brawler, the right
             from players of the second -- so they are two samples, not two
             halves of one. Said once, here, instead of left to look like a bug. */}
         {leftVsRight && rightVsLeft ? (
-          <p className="-mt-1 mb-3 text-xs leading-relaxed text-muted">
-            Each figure comes from a different set of sampled players, so the two do not add up to
-            100%.
-          </p>
+          <p className="-mt-1 mb-3 text-xs leading-relaxed text-muted">{t('Each figure comes from a different set of sampled players, so the two do not add up to 100%.')}</p>
         ) : null}
         {leftVsRight || rightVsLeft ? (
           <div className="grid gap-3 sm:grid-cols-2">
@@ -306,16 +307,12 @@ export default async function ComparePage({ params }: PageProps) {
             />
           </div>
         ) : (
-          <p className="card p-6 text-sm leading-relaxed text-muted">
-            These two have not met often enough in sampled battles to report a record.
-            Matchup data is collected from team modes only and needs a while to build
-            up for any specific pairing.
-          </p>
+          <p className="card p-6 text-sm leading-relaxed text-muted">{t('These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.')}</p>
         )}
       </section>
 
       <section>
-        <SectionHeading title="Where each one performs" />
+        <SectionHeading title={t('Where each one performs')} />
         <div className="grid gap-4 sm:grid-cols-2">
           {sides.map((side) => (
             <div key={side.brawler.id}>
@@ -323,9 +320,7 @@ export default async function ComparePage({ params }: PageProps) {
                 {titleCase(side.brawler.name)}
               </h3>
               {side.splits.length === 0 ? (
-                <p className="card p-4 text-sm text-muted">
-                  Not enough battles in any one mode yet.
-                </p>
+                <p className="card p-4 text-sm text-muted">{t('Not enough battles in any one mode yet.')}</p>
               ) : (
                 <ul className="card divide-y divide-border overflow-hidden">
                   {side.splits.slice(0, 5).map((split) => (
@@ -349,12 +344,12 @@ export default async function ComparePage({ params }: PageProps) {
       </section>
 
       <section>
-        <SectionHeading title={`${nameA} vs ${nameB} FAQ`} />
+        <SectionHeading title={t('{nameA} vs {nameB} FAQ', { nameA: nameA, nameB: nameB })} />
         <dl className="card divide-y divide-border">
           {faq.map((item) => (
             <div key={item.question} className="p-4">
-              <dt className="font-semibold">{item.question}</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
+              <dt className="font-semibold">{t(item.question)}</dt>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">{t(item.answer)}</dd>
             </div>
           ))}
         </dl>
@@ -406,7 +401,7 @@ function buildVerdict(left: Side, right: Side): string {
     (side) => (side.stat?.decidedSampleSize ?? 0) < MIN_SAMPLE_FOR_TIER,
   );
   if (thin.length > 0) {
-    const names = thin.map((side) => titleCase(side.brawler.name)).join(' and ');
+    const names = andList(thin.map((side) => titleCase(side.brawler.name)));
     return `Too little data to call this one: ${names} ${thin.length === 1 ? 'has' : 'have'} fewer than ${MIN_SAMPLE_FOR_TIER} sampled decided battles, which is below the floor either tier list uses. The table below shows what has been collected so far.`;
   }
 
@@ -437,30 +432,28 @@ function HeadToHeadCard({
   record: { winRate: number; decidedSampleSize: number } | null;
   accent: string;
 }) {
+  const t = getT(requestLocale());
   return (
     <div className="card p-4">
       <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
-        <span aria-hidden className="size-2 rounded-full" style={{ background: accent }} />
-        {subject} vs {opponent}
-      </p>
+        <span aria-hidden className="size-2 rounded-full" style={{ background: accent }} />{t('{subject} vs {opponent}', { subject: subject, opponent: opponent })}</p>
       {record ? (
         <>
           <p className="mt-1 text-sm">
-            <span className="font-semibold">{subject}</span> wins
-          </p>
+            <span className="font-semibold">{subject}</span>{' '}{t('wins')}</p>
           <p className="display text-4xl tabular-nums">{formatPercent(record.winRate)}</p>
-          <p className="mt-1 text-xs text-muted">
-            of {formatNumber(record.decidedSampleSize)} sampled games against {opponent}
-          </p>
+          <p className="mt-1 text-xs text-muted">{t('of {decidedSampleSize} sampled games against {opponent}', { decidedSampleSize: formatNumber(record.decidedSampleSize), opponent: opponent })}</p>
         </>
       ) : (
-        <p className="mt-2 text-sm text-muted">Not enough sampled battles yet.</p>
+        <p className="mt-2 text-sm text-muted">{t('Not enough sampled battles yet.')}</p>
       )}
     </div>
   );
 }
 
 function Portrait({ side, align, art }: { side: Side; align: 'start' | 'end'; art: string }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const accent = side.brawler.rarity?.color ?? '#8b95b8';
 
   return (
@@ -486,7 +479,7 @@ function Portrait({ side, align, art }: { side: Side; align: 'start' | 'end'; ar
         />
       </span>
       <Link
-        href={brawlerPath(side.brawler.id, side.brawler.name)}
+        href={lp(brawlerPath(side.brawler.id, side.brawler.name))}
         className="display truncate text-lg uppercase hover:underline sm:text-2xl"
       >
         {side.brawler.name}
@@ -498,9 +491,7 @@ function Portrait({ side, align, art }: { side: Side; align: 'start' | 'end'; ar
             background: `color-mix(in srgb, ${TIER_COLOR[side.tier]} 20%, transparent)`,
             color: TIER_COLOR[side.tier],
           }}
-        >
-          {side.tier} tier
-        </span>
+        >{t('{tier} tier', { tier: side.tier })}</span>
       ) : null}
     </div>
   );

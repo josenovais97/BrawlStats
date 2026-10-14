@@ -13,6 +13,9 @@ import {
   SCORE_THRESHOLDS,
   WIN_WEIGHT,
 } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * How the meta score is built, in full, including what it cannot do.
@@ -75,12 +78,14 @@ const FAQ = [
 ];
 
 export default function MetaScorePage() {
+  const tx = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div className="space-y-8">
       <JsonLd
         data={breadcrumbSchema([
           { name: 'Home', path: '/' },
-          { name: 'How the meta score works', path: '/meta-score' },
+          { name: tx('How the meta score works'), path: '/meta-score' },
         ])}
       />
       <JsonLd data={faqSchema(FAQ)} />
@@ -88,164 +93,88 @@ export default function MetaScorePage() {
       <PageHeading
         eyebrow={
           <span className="eyebrow flex items-center gap-2 text-accent">
-            <Calculator className="size-3.5" />
-            Method
-          </span>
+            <Calculator className="size-3.5" />{tx('Method')}</span>
         }
-        title="How the meta score is calculated"
-        subtitle="Every number on the tier lists, and where it comes from. Including what it cannot tell you."
+        title={tx('How the meta score is calculated')}
+        subtitle={tx('Every number on the tier lists, and where it comes from. Including what it cannot tell you.')}
       />
 
-      <p className="card border-border-strong p-5 leading-relaxed">
-        The meta score is a single 0&ndash;10 number combining{' '}
-        <strong>how well a brawler performs</strong> ({WIN_WEIGHT * 100}% of the
-        score) with <strong>how much it is actually played</strong> (
-        {PICK_WEIGHT * 100}%). It is computed from real battles, not votes,
-        opinion or a panel &mdash; and every figure on this page is read
-        directly from the code that produces the lists, so it cannot drift out
-        of date.
-      </p>
+      <p className="card border-border-strong p-5 leading-relaxed">{tx('The meta score is a single 0–10 number combining')}{' '}
+        <strong>{tx('how well a brawler performs')}</strong> ({WIN_WEIGHT * 100}{tx('% of the score) with')}{' '}<strong>{tx('how much it is actually played')}</strong> (
+        {PICK_WEIGHT * 100}{tx('%). It is computed from real battles, not votes, opinion or a panel — and every figure on this page is read directly from the code that produces the lists, so it cannot drift out of date.')}</p>
 
       <Step
         n={1}
-        title="Sampling real battles"
+        title={tx('Sampling real battles')}
         body={
           <>
-            <p>
-              Every two hours the sampler walks the global leaderboards and
-              reads the battle logs of the players it finds. A battle log holds
-              a player&apos;s last ~25 battles and there is no history endpoint,
-              so anything played between visits is lost permanently &mdash; the
-              two-hour interval is set by that, not by cost.
-            </p>
-            <p>
-              The Ranked list counts <strong>competitive battles only</strong>.
-              Ranked matchmaking pairs comparable opponents, so what is left
-              reflects the brawler rather than who was holding it. The trophy
-              list counts ladder battles, showdown included.
-            </p>
+            <p>{tx('Every two hours the sampler walks the global leaderboards and reads the battle logs of the players it finds. A battle log holds a player\'s last ~25 battles and there is no history endpoint, so anything played between visits is lost permanently — the two-hour interval is set by that, not by cost.')}</p>
+            <p>{tx('The Ranked list counts')}{' '}<strong>{tx('competitive battles only')}</strong>{tx('. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it. The trophy list counts ladder battles, showdown included.')}</p>
           </>
         }
       />
 
       <Step
         n={2}
-        title="Adjusting the win rate for mode"
+        title={tx('Adjusting the win rate for mode')}
         body={
           <>
-            <p>
-              A raw win rate is not comparable across brawlers, because modes
-              are not comparable. Finishing top four of ten in showdown caps the
-              achievable rate near 40%; the same cohort wins closer to 78% in
-              Brawl Ball. Ranking both on one number puts every showdown brawler
-              at the bottom regardless of how good it is.
-            </p>
-            <p>
-              So each brawler is measured against{' '}
-              <strong>the average for the mix of modes it is actually played
-              in</strong>, and the difference is re-centred on 50%. An adjusted
-              rate of 53% means &ldquo;three points better than average, given
-              where this brawler gets played&rdquo;.
-            </p>
+            <p>{tx('A raw win rate is not comparable across brawlers, because modes are not comparable. Finishing top four of ten in showdown caps the achievable rate near 40%; the same cohort wins closer to 78% in Brawl Ball. Ranking both on one number puts every showdown brawler at the bottom regardless of how good it is.')}</p>
+            <p>{tx('So each brawler is measured against')}{' '}
+              <strong>{tx('the average for the mix of modes it is actually played in')}</strong>{tx(', and the difference is re-centred on 50%. An adjusted rate of 53% means “three points better than average, given where this brawler gets played”.')}</p>
           </>
         }
       />
 
       <Step
         n={3}
-        title="Pulling thin samples toward the average"
+        title={tx('Pulling thin samples toward the average')}
         body={
           <>
-            <p>
-              A 90% win rate over 50 battles is not better than an 86% rate over
-              1,300, but a naive ranking says it is. Every rate is therefore
-              blended with the average, weighted by{' '}
-              <strong>{PRIOR_BATTLES} pseudo-battles</strong>: a brawler needs
-              roughly that many decided battles before its own record outweighs
-              the prior, which is about where the noise stops dominating.
-            </p>
-            <p>
-              Below <strong>{MIN_SAMPLE_FOR_TIER} decided battles</strong> a
-              brawler is not rated at all. &ldquo;We have not measured
-              this&rdquo; and &ldquo;we measured this and it is bad&rdquo; are
-              different claims, and collapsing them is how tier lists end up
-              implying the second about brawlers they have three battles for.
-            </p>
+            <p>{tx('A 90% win rate over 50 battles is not better than an 86% rate over 1,300, but a naive ranking says it is. Every rate is therefore blended with the average, weighted by')}{' '}
+              <strong>{PRIOR_BATTLES}{' '}{tx('pseudo-battles')}</strong>{tx(': a brawler needs roughly that many decided battles before its own record outweighs the prior, which is about where the noise stops dominating.')}</p>
+            <p>{tx('Below')}{' '}<strong>{MIN_SAMPLE_FOR_TIER}{' '}{tx('decided battles')}</strong>{' '}{tx('a brawler is not rated at all. “We have not measured this” and “we measured this and it is bad” are different claims, and collapsing them is how tier lists end up implying the second about brawlers they have three battles for.')}</p>
           </>
         }
       />
 
       <Step
         n={4}
-        title="Correcting for who is holding it"
+        title={tx('Correcting for who is holding it')}
         body={
           <>
-            <p>
-              A win rate says the side holding a brawler won. It does not say
-              the brawler is why. Strong players gravitate toward particular
-              brawlers and carry their results with them, and step 2 corrects
-              for <em>where</em> a brawler is played, not <em>who</em> is
-              playing it.
-            </p>
-            <p>
-              So each brawler is also measured a second way:{' '}
-              <strong>every player&apos;s win rate with it, minus that same
-              player&apos;s win rate without it</strong>. Comparing a player
-              against themselves removes skill exactly. The published figure is
-              the average of the two estimates, because they are wrong about
-              different things &mdash; the first carries the skill of whoever
-              played it, the second compares a showdown specialist&apos;s
-              showdown games against their own Brawl Ball games.
-            </p>
-            <p>
-              The two agree closely (r&nbsp;=&nbsp;+0.77) and disagree where it
-              matters. Bibi ranked 96th on win rate alone and 16th once every
-              player was compared against their own average, because she is
-              played mostly by weaker accounts and their results were being
-              read as hers.
-            </p>
+            <p>{tx('A win rate says the side holding a brawler won. It does not say the brawler is why. Strong players gravitate toward particular brawlers and carry their results with them, and step 2 corrects for')}{' '}<em>{tx('where')}</em>{' '}{tx('a brawler is played, not')}{' '}<em>{tx('who')}</em>{' '}{tx('is playing it.')}</p>
+            <p>{tx('So each brawler is also measured a second way:')}{' '}
+              <strong>{tx('every player\'s win rate with it, minus that same player\'s win rate without it')}</strong>{tx('. Comparing a player against themselves removes skill exactly. The published figure is the average of the two estimates, because they are wrong about different things — the first carries the skill of whoever played it, the second compares a showdown specialist\'s showdown games against their own Brawl Ball games.')}</p>
+            <p>{tx('The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.')}</p>
           </>
         }
       />
 
       <Step
         n={5}
-        title="Adding pick rate, on a log scale"
+        title={tx('Adding pick rate, on a log scale')}
         body={
           <>
-            <p>
-              Win rate alone cannot tell a genuinely strong staple from a niche
-              pick that happens to win. A brawler played in 0.13% of battles at
-              52% and one played in 3.4% at 52% score the same, even though only
-              the second is shaping the meta.
-            </p>
-            <p>
-              Pick rate is <strong>log-scaled</strong>, because the roster spans
-              two orders of magnitude of usage. On a linear scale everything
-              outside the top handful collapses into the same value.
-            </p>
+            <p>{tx('Win rate alone cannot tell a genuinely strong staple from a niche pick that happens to win. A brawler played in 0.13% of battles at 52% and one played in 3.4% at 52% score the same, even though only the second is shaping the meta.')}</p>
+            <p>{tx('Pick rate is')}{' '}<strong>{tx('log-scaled')}</strong>{tx(', because the roster spans two orders of magnitude of usage. On a linear scale everything outside the top handful collapses into the same value.')}</p>
           </>
         }
       />
 
       <Step
         n={6}
-        title="Fixing the scale, and checking it stays fixed"
+        title={tx('Fixing the scale, and checking it stays fixed')}
         body={
           <>
-            <p>
-              Both measurements are mapped onto 0&ndash;1 between fixed anchors,
-              so a score means the same thing from one week to the next rather
-              than being rescaled by whoever happens to be present. The anchors
-              sit just outside each list&apos;s own 5th&ndash;95th percentile:
-            </p>
+            <p>{tx('Both measurements are mapped onto 0–1 between fixed anchors, so a score means the same thing from one week to the next rather than being rescaled by whoever happens to be present. The anchors sit just outside each list\'s own 5th–95th percentile:')}</p>
             <div className="-mx-1 overflow-x-auto">
               <table className="w-full min-w-[26rem] text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wide text-muted">
-                    <th className="py-2 pr-3 font-semibold">List</th>
-                    <th className="py-2 pr-3 font-semibold">Adjusted win rate</th>
-                    <th className="py-2 font-semibold">Pick rate</th>
+                    <th className="py-2 pr-3 font-semibold">{tx('List')}</th>
+                    <th className="py-2 pr-3 font-semibold">{tx('Adjusted win rate')}</th>
+                    <th className="py-2 font-semibold">{tx('Pick rate')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -266,26 +195,18 @@ export default function MetaScorePage() {
                 </tbody>
               </table>
             </div>
-            <p>
-              Fixed is not the same as permanent, and that distinction has
-              already cost these lists their calibration once. The anchors were
-              set before the sampling rate rose eighteenfold in August 2026 and
-              nothing re-derived them, so by late September 42% of the Ranked
-              roster sat in D while 41% of the trophy roster sat in S or A.
-              Nothing failed and nobody was told. They are now re-measured on{' '}
-              <strong>every sampler run</strong>, and drifting back outside the
-              scale is reported rather than absorbed.
-            </p>
+            <p>{tx('Fixed is not the same as permanent, and that distinction has already cost these lists their calibration once. The anchors were set before the sampling rate rose eighteenfold in August 2026 and nothing re-derived them, so by late September 42% of the Ranked roster sat in D while 41% of the trophy roster sat in S or A. Nothing failed and nobody was told. They are now re-measured on')}{' '}
+              <strong>{tx('every sampler run')}</strong>{tx(', and drifting back outside the scale is reported rather than absorbed.')}</p>
           </>
         }
       />
 
       <Step
         n={7}
-        title="Turning the score into a tier"
+        title={tx('Turning the score into a tier')}
         body={
           <>
-            <p>The cut-offs are plain thresholds on the score:</p>
+            <p>{tx('The cut-offs are plain thresholds on the score:')}</p>
             <ul className="flex flex-wrap gap-2 not-prose">
               {SCORE_THRESHOLDS.map((t, i) => (
                 <li
@@ -300,7 +221,7 @@ export default function MetaScorePage() {
                         F were added under it. */}
                     {t.minScore > 0
                       ? `${t.minScore}+`
-                      : `below ${SCORE_THRESHOLDS[i - 1]?.minScore ?? 0}`}
+                      : tx('below {v}', { v: SCORE_THRESHOLDS[i - 1]?.minScore ?? 0 })}
                   </span>
                 </li>
               ))}
@@ -315,87 +236,40 @@ export default function MetaScorePage() {
       */}
       <section className="space-y-4">
         <SectionHeading
-          title="What the meta score cannot tell you"
-          subtitle="The honest limits, because a number without them is worth less."
+          title={tx('What the meta score cannot tell you')}
+          subtitle={tx('The honest limits, because a number without them is worth less.')}
         />
         <ul className="card divide-y divide-border overflow-hidden">
-          <Limit title="It mixes strength with popularity, on purpose">
-            Pick rate is {PICK_WEIGHT * 100}% of the score. That weight is
-            measured, not chosen: against an estimator that controls for player
-            skill exactly, the adjusted win rate scores r&nbsp;=&nbsp;+0.77 and
-            pick rate r&nbsp;=&nbsp;+0.22, so popularity is a weak but real
-            strength signal rather than noise &mdash; and its share of the
-            combined signal is about a fifth, which is the weight it now
-            carries. It was 35%, where it produced 45% of the actual spread and
-            moved brawlers forty places on popularity alone. Even so, a popular
-            brawler with a mediocre record will still outscore an unpopular one
-            with a better record. Both numbers are printed on every row so you
-            can weigh them yourself.
-          </Limit>
-          <Limit title="The skill correction is partial, not complete">
-            Step 4 removes the effect of who is holding a brawler, but the
-            estimator behind it compares a player&apos;s games with a brawler
-            against all their other games, across every mode. A specialist is
-            therefore compared against their own play elsewhere, which is its
-            own bias &mdash; smaller than the one it removes, and pointing the
-            other way, which is why the two estimates are averaged rather than
-            one being picked. A brawler carried by too few players is not
-            corrected at all and falls back to the mode-adjusted rate.
-          </Limit>
-          <Limit title="It does not control for who is playing">
-            A win rate says the brawler was on the winning side, not that it
-            caused the win. Strong players gravitate toward particular
-            brawlers, and the adjustment above corrects for the modes a brawler
-            is played in, not the skill of the people playing it.
-          </Limit>
-          <Limit title="It is a sample, not a census">
-            Battles come from players reachable through the global leaderboards
-            and their recent opponents, so the numbers lean toward more active
-            accounts than the game as a whole.
-          </Limit>
-          <Limit title="The two lists are not comparable">
-            Ranked and the trophy ladder are different populations against
-            different denominators, and each is calibrated against its own
-            distribution. A 7.0 on one is not a 7.0 on the other, which is why
-            they are never shown side by side.
-          </Limit>
+          <Limit title={tx('It mixes strength with popularity, on purpose')}>{tx('Pick rate is')}{' '}{PICK_WEIGHT * 100}{tx('% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.')}</Limit>
+          <Limit title={tx('The skill correction is partial, not complete')}>{tx('Step 4 removes the effect of who is holding a brawler, but the estimator behind it compares a player\'s games with a brawler against all their other games, across every mode. A specialist is therefore compared against their own play elsewhere, which is its own bias — smaller than the one it removes, and pointing the other way, which is why the two estimates are averaged rather than one being picked. A brawler carried by too few players is not corrected at all and falls back to the mode-adjusted rate.')}</Limit>
+          <Limit title={tx('It does not control for who is playing')}>{tx('A win rate says the brawler was on the winning side, not that it caused the win. Strong players gravitate toward particular brawlers, and the adjustment above corrects for the modes a brawler is played in, not the skill of the people playing it.')}</Limit>
+          <Limit title={tx('It is a sample, not a census')}>{tx('Battles come from players reachable through the global leaderboards and their recent opponents, so the numbers lean toward more active accounts than the game as a whole.')}</Limit>
+          <Limit title={tx('The two lists are not comparable')}>{tx('Ranked and the trophy ladder are different populations against different denominators, and each is calibrated against its own distribution. A 7.0 on one is not a 7.0 on the other, which is why they are never shown side by side.')}</Limit>
         </ul>
       </section>
 
       <section className="space-y-4">
-        <SectionHeading title={`Questions`} />
+        <SectionHeading title={tx('Questions')} />
         <dl className="card divide-y divide-border overflow-hidden">
           {FAQ.map((item) => (
             <div key={item.question} className="p-5">
-              <dt className="font-bold">{item.question}</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
+              <dt className="font-bold">{tx(item.question)}</dt>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">{tx(item.answer)}</dd>
             </div>
           ))}
         </dl>
       </section>
 
-      <p className="text-sm leading-relaxed text-muted">
-        See it applied on the{' '}
-        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-          Ranked tier list
-        </Link>{' '}
-        and the{' '}
-        <Link href="/tier-list/trophy" className="font-medium text-brand hover:underline">
-          trophy tier list
-        </Link>
-        , or disagree with it in the{' '}
-        <Link href="/tier-list/maker" className="font-medium text-brand hover:underline">
-          tier list maker
-        </Link>
-        . Sample sizes behind every figure are on the lists themselves; the
-        roll-ups they are computed from hold {formatNumber(120)} days of
-        history.
-      </p>
+      <p className="text-sm leading-relaxed text-muted">{tx('See it applied on the')}{' '}
+        <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{tx('Ranked tier list')}</Link>{' '}{tx('and the')}{' '}
+        <Link href={lp('/tier-list/trophy')} className="font-medium text-brand hover:underline">{tx('trophy tier list')}</Link>{tx(', or disagree with it in the')}{' '}
+        <Link href={lp('/tier-list/maker')} className="font-medium text-brand hover:underline">{tx('tier list maker')}</Link>{tx('. Sample sizes behind every figure are on the lists themselves; the roll-ups they are computed from hold {v} days of history.', { v: formatNumber(120) })}</p>
     </div>
   );
 }
 
 function Step({ n, title, body }: { n: number; title: string; body: React.ReactNode }) {
+  const tx = getT(requestLocale());
   return (
     <section className="flex gap-4">
       <span
@@ -405,9 +279,9 @@ function Step({ n, title, body }: { n: number; title: string; body: React.ReactN
         {n}
       </span>
       <div className="min-w-0 flex-1 space-y-3">
-        <h2 className="text-lg font-bold">{title}</h2>
+        <h2 className="text-lg font-bold">{tx(title)}</h2>
         <div className="space-y-3 text-sm leading-relaxed text-muted [&_strong]:font-semibold [&_strong]:text-foreground">
-          {body}
+          {tx(body)}
         </div>
       </div>
     </section>
@@ -415,9 +289,10 @@ function Step({ n, title, body }: { n: number; title: string; body: React.ReactN
 }
 
 function Limit({ title, children }: { title: string; children: React.ReactNode }) {
+  const tx = getT(requestLocale());
   return (
     <li className="p-5">
-      <p className="font-bold">{title}</p>
+      <p className="font-bold">{tx(title)}</p>
       <p className="mt-1 text-sm leading-relaxed text-muted">{children}</p>
     </li>
   );

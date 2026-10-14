@@ -10,6 +10,9 @@ import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatNumber } from '@/lib/format';
 import type { BrawlerPlacement } from '@/types/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface Props {
   placements: BrawlerPlacement[];
@@ -27,11 +30,12 @@ const SHOWN = 8;
 
 /** Colour bands so a top-10 placement reads differently from a top-200 one. */
 function band(rank: number): { label: string; color: string } {
-  if (rank <= 10) return { label: 'Top 10', color: '#ffc53d' };
-  if (rank <= 25) return { label: 'Top 25', color: '#c9d3e8' };
-  if (rank <= 50) return { label: 'Top 50', color: '#d08c4a' };
-  if (rank <= 100) return { label: 'Top 100', color: '#7c5cff' };
-  return { label: 'Top 200', color: '#35d07f' };
+  const t = getT(requestLocale());
+  if (rank <= 10) return { label: t('Top 10'), color: '#ffc53d' };
+  if (rank <= 25) return { label: t('Top 25'), color: '#c9d3e8' };
+  if (rank <= 50) return { label: t('Top 50'), color: '#d08c4a' };
+  if (rank <= 100) return { label: t('Top 100'), color: '#7c5cff' };
+  return { label: t('Top 200'), color: '#35d07f' };
 }
 
 /**
@@ -39,6 +43,7 @@ function band(rank: number): { label: string; color: string } {
  * at least one, so ordinary profiles are not padded with an empty section.
  */
 export function PlayerPlacements({ placements, iconFor }: Props) {
+  const t = getT(requestLocale());
   if (placements.length === 0) return null;
 
   const best = placements[0];
@@ -49,10 +54,10 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
   return (
     <Panel
       icon={<LeaderboardIcon className="size-5" />}
-      title="World ranked"
+      title={t('World ranked')}
       aside={
         placements.length === 1
-          ? 'On 1 global brawler leaderboard'
+          ? t('On 1 global brawler leaderboard')
           : `On ${placements.length} global brawler leaderboards`
       }
     >
@@ -69,14 +74,12 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
           unoptimized
         />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-muted">Best world ranking</p>
+          <p className="text-sm font-medium text-muted">{t('Best world ranking')}</p>
           <p className="truncate text-xl font-black capitalize">
             #{best.rank} <span className="text-brand">{best.brawlerName.toLowerCase()}</span>
           </p>
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
-            <Globe className="size-3" />
-            Global · {formatNumber(best.trophies)} trophies
-          </p>
+            <Globe className="size-3" />{t('Global · {trophies} trophies', { trophies: formatNumber(best.trophies) })}</p>
         </div>
         <span
           className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
@@ -85,7 +88,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
             color: band(best.rank).color,
           }}
         >
-          {band(best.rank).label}
+          {t(band(best.rank).label)}
         </span>
       </div>
 
@@ -108,7 +111,7 @@ export function PlayerPlacements({ placements, iconFor }: Props) {
         <Disclosure
           tone="bare"
           className="mt-1"
-          summary={`Show all ${placements.length} placements`}
+          summary={t('Show all {length} placements', { length: placements.length })}
         >
           <ul className="flex flex-wrap gap-2">
             {rest.map((placement) => (
@@ -131,12 +134,14 @@ function Chip({
   placement: BrawlerPlacement;
   iconFor: (id: number) => string | undefined;
 }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { color } = band(placement.rank);
   return (
     <Link
-      href={brawlerPath(placement.brawlerId, placement.brawlerName)}
+      href={lp(brawlerPath(placement.brawlerId, placement.brawlerName))}
       className="card card-interactive flex items-center gap-2 py-1.5 pl-1.5 pr-3"
-      title={`#${placement.rank} in the world on ${placement.brawlerName}`}
+      title={t('#{rank} in the world on {brawlerName}', { rank: placement.rank, brawlerName: placement.brawlerName })}
     >
       <Image
         src={iconFor(placement.brawlerId) ?? brawlerIconUrl(placement.brawlerId)}

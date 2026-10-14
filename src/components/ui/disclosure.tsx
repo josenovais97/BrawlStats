@@ -1,5 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Methodology, caveats and long tables, folded away.
@@ -33,6 +35,7 @@ export function Disclosure({
    */
   defaultOpen?: boolean;
 }) {
+  const t = getT(requestLocale());
   return (
     <details
       open={defaultOpen}
@@ -47,7 +50,7 @@ export function Disclosure({
           aria-hidden
           className="size-4 shrink-0 duration-200 group-open:rotate-180 motion-safe:transition-transform"
         />
-        {summary}
+        {t(summary)}
       </summary>
       <div
         className={
@@ -88,8 +91,9 @@ export function ClampedText({
   threshold?: number;
   className?: string;
 }) {
+  const t = getT(requestLocale());
   if (text.length <= threshold) {
-    return <p className={`text-sm leading-relaxed text-muted ${className}`}>{text}</p>;
+    return <p className={`text-sm leading-relaxed text-muted ${className}`}>{t(text)}</p>;
   }
 
   const clamp = { 2: 'line-clamp-2', 3: 'line-clamp-3', 4: 'line-clamp-4' }[lines];
@@ -100,11 +104,11 @@ export function ClampedText({
         <span
           className={`block text-sm leading-relaxed text-muted ${clamp} group-open:line-clamp-none`}
         >
-          {text}
+          {t(text)}
         </span>
         <span className="mt-1 inline-block text-xs font-semibold text-brand">
-          <span className="group-open:hidden">Read more</span>
-          <span className="hidden group-open:inline">Show less</span>
+          <span className="group-open:hidden">{t('Read more')}</span>
+          <span className="hidden group-open:inline">{t('Show less')}</span>
         </span>
       </summary>
     </details>

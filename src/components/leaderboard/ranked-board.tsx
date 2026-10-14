@@ -8,6 +8,9 @@ import { formatNumber, titleCaseLabel } from '@/lib/format';
 import { getRankedLeaderboard } from '@/lib/stats';
 import { displayTag } from '@/lib/tags';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Top players by Ranked elo.
@@ -24,6 +27,8 @@ import { playerLinkRel } from '@/lib/link-rel';
  * key — "who is on top now" is what a leaderboard is for.
  */
 export async function RankedBoard() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { players, pool } = await getRankedLeaderboard(100);
 
   if (players.length === 0) {
@@ -32,22 +37,15 @@ export async function RankedBoard() {
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-surface-2 text-accent">
           <RankedIcon className="size-7" />
         </span>
-        <h2 className="mt-4 text-xl font-bold">Collecting Ranked standings</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          Elo is recorded as the sampler works through the player pool, and as people look profiles
-          up. This board fills in over the next day or two.
-        </p>
+        <h2 className="mt-4 text-xl font-bold">{t('Collecting Ranked standings')}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{t('Elo is recorded as the sampler works through the player pool, and as people look profiles up. This board fills in over the next day or two.')}</p>
       </div>
     );
   }
 
   return (
     <section>
-      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">
-        Current season standing. The game API publishes no Ranked leaderboard, so this one is built
-        from the {formatNumber(pool)} sampled players who have played Ranked this season. The top{' '}
-        {players.length} of those, not a global board. Looking up a profile adds it to the pool.
-      </p>
+      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">{t('Current season standing. The game API publishes no Ranked leaderboard, so this one is built from the {pool} sampled players who have played Ranked this season. The top', { pool: formatNumber(pool) })}{' '}{t('{length} of those, not a global board. Looking up a profile adds it to the pool.', { length: players.length })}</p>
 
       <ol className="space-y-1.5">
         {players.map((player, index) => {
@@ -56,7 +54,7 @@ export async function RankedBoard() {
           return (
             <li key={player.tag}>
               <Link
-                href={`/player/${player.tag}`}
+                href={lp(`/player/${player.tag}`)}
                 rel={playerLinkRel(player.tag)}
                 prefetch={false}
                 className="row-interactive flex items-center gap-3 rounded-xl p-2.5"
@@ -112,9 +110,7 @@ export async function RankedBoard() {
                   {/* Peak only when it is actually higher, so a player at their
                       all-time best does not show the same number twice. */}
                   {player.peakElo > player.elo ? (
-                    <span className="block text-xs tabular-nums text-muted">
-                      peak {formatNumber(player.peakElo)}
-                    </span>
+                    <span className="block text-xs tabular-nums text-muted">{t('peak {peakElo}', { peakElo: formatNumber(player.peakElo) })}</span>
                   ) : null}
                 </span>
               </Link>

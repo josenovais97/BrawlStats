@@ -10,6 +10,9 @@ import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getMetaIndex } from '@/lib/stats';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   title: 'Brawl Stars tier list maker. Build and share your own',
@@ -35,14 +38,16 @@ export const revalidate = 3600;
  * is no table of saved tier lists, no accounts, and nothing to prune.
  */
 export default async function TierMakerPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const catalog = await getBrawlerCatalog().catch(() => null);
 
   if (!catalog || catalog.current.length === 0) {
     return (
       <ErrorState
         code="upstreamDown"
-        title="Brawler data unavailable"
-        detail="The brawler metadata source is not responding, so there is nothing to rank yet. Try again shortly."
+        title={t('Brawler data unavailable')}
+        detail={t('The brawler metadata source is not responding, so there is nothing to rank yet. Try again shortly.')}
       />
     );
   }
@@ -68,9 +73,9 @@ export default async function TierMakerPage() {
       />
 
       <PageHeading
-        eyebrow="Your call"
-        title="Tier list maker"
-        subtitle="Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop."
+        eyebrow={t('Your call')}
+        title={t('Tier list maker')}
+        subtitle={t('Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.')}
       />
 
       {/* The board comes out of the query string, which only the browser
@@ -80,17 +85,9 @@ export default async function TierMakerPage() {
         <TierMaker brawlers={brawlers} />
       </Suspense>
 
-      <p className="text-xs leading-relaxed text-muted">
-        Nothing here is saved on a server — the link <em>is</em> the tier list, so
-        it keeps working for as long as anyone has it. For the measured version,
-        built from sampled battles rather than opinion, see the{' '}
-        <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-          Ranked tier list
-        </Link>{' '}
-        or the{' '}
-        <Link href="/tier-list/trophy" className="font-medium text-brand hover:underline">
-          trophy list
-        </Link>
+      <p className="text-xs leading-relaxed text-muted">{t('Nothing here is saved on a server — the link')}{' '}<em>{t('is')}</em>{' '}{t('the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the')}{' '}
+        <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('Ranked tier list')}</Link>{' '}{t('or the')}{' '}
+        <Link href={lp('/tier-list/trophy')} className="font-medium text-brand hover:underline">{t('trophy list')}</Link>
         .
       </p>
     </div>

@@ -11,6 +11,8 @@ import { toApiError } from '@/lib/errors';
 import { humanizeMode, ordinal, relativeTime } from '@/lib/format';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSBattleLogEntry, BSBattlePlayer, BSPlayerBrawler } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 interface BattleLogProps {
   /** Tag used for the lookup (no "#"). */
@@ -41,6 +43,7 @@ export async function BattleLog({
   modeMeta,
   brawlers = [],
 }: BattleLogProps) {
+  const t = getT(requestLocale());
   let entries: BSBattleLogEntry[];
   try {
     entries = (await getBattleLog(tag)).items;
@@ -49,17 +52,15 @@ export async function BattleLog({
     return (
       <div className="card p-6 text-sm text-muted">
         {code === 'notFound'
-          ? 'No recent battles. The battle log only covers roughly the last 25 matches and expires after a while.'
-          : 'The battle log is unavailable right now. Try refreshing in a moment.'}
+          ? t('No recent battles. The battle log only covers roughly the last 25 matches and expires after a while.')
+          : t('The battle log is unavailable right now. Try refreshing in a moment.')}
       </div>
     );
   }
 
   if (entries.length === 0) {
     return (
-      <div className="card p-6 text-sm text-muted">
-        No battles recorded in the last 25 matches.
-      </div>
+      <div className="card p-6 text-sm text-muted">{t('No battles recorded in the last 25 matches.')}</div>
     );
   }
 
@@ -157,19 +158,20 @@ function allParticipants(entry: BSBattleLogEntry): BSBattlePlayer[] {
  * `rank`. Anything with neither (a friendly or an unfinished match) is neutral.
  */
 function resolveOutcome(entry: BSBattleLogEntry): { label: string; tone: BattleTone } {
+  const t = getT(requestLocale());
   const { result, rank } = entry.battle;
 
-  if (result === 'victory') return { label: 'Victory', tone: 'win' };
-  if (result === 'defeat') return { label: 'Defeat', tone: 'loss' };
-  if (result === 'draw') return { label: 'Draw', tone: 'draw' };
+  if (result === 'victory') return { label: t('Victory'), tone: 'win' };
+  if (result === 'defeat') return { label: t('Defeat'), tone: 'loss' };
+  if (result === 'draw') return { label: t('Draw'), tone: 'draw' };
 
   if (typeof rank === 'number') {
     // Solo showdown pays out for the top 4 of 10; duo for the top 2 of 5.
     return {
-      label: `${ordinal(rank)} place`,
+      label: t('{rank} place', { rank: ordinal(rank) }),
       tone: rank <= 4 ? 'win' : 'loss',
     };
   }
 
-  return { label: 'Played', tone: 'draw' };
+  return { label: t('Played'), tone: 'draw' };
 }

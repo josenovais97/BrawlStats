@@ -10,6 +10,9 @@ import { formatPercent } from '@/lib/format';
 import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { brawlerPath } from '@/lib/slugs';
 import { TIER_COLOR } from '@/lib/tiers';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * One look at what is happening right now.
@@ -24,6 +27,8 @@ import { TIER_COLOR } from '@/lib/tiers';
  * section read, so the extra prominence costs nothing upstream.
  */
 export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const top = await getTopMetaBrawlers(4).catch(() => []);
   const [leader, ...rest] = top;
 
@@ -32,16 +37,10 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-victory">
-            <span className="live-dot" />
-            Live snapshot
-          </p>
-          <h2 id="snapshot" className="display mt-2.5 text-2xl uppercase sm:text-4xl">
-            Where things stand
-          </h2>
+            <span className="live-dot" />{t('Live snapshot')}</p>
+          <h2 id="snapshot" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{t('Where things stand')}</h2>
         </div>
-        <p className="max-w-md text-sm text-muted">
-          From our own sampled battles, not from votes.
-        </p>
+        <p className="max-w-md text-sm text-muted">{t('From our own sampled battles, not from votes.')}</p>
       </div>
 
       <div className="reveal-row grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-start">
@@ -51,7 +50,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
               {/* The one brawler most worth knowing about, at a size that says
                   so. Every figure here is measured. */}
               <Link
-                href={brawlerPath(leader.brawlerId, leader.name)}
+                href={lp(brawlerPath(leader.brawlerId, leader.name))}
                 className="card card-glow card-interactive relative flex items-center gap-4 overflow-hidden p-4 sm:gap-5 sm:p-5"
               >
                 <span
@@ -71,7 +70,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                   unoptimized
                 />
                 <div className="relative min-w-0 flex-1">
-                  <p className="eyebrow">Top of the meta</p>
+                  <p className="eyebrow">{t('Top of the meta')}</p>
                   <p className="display mt-1.5 truncate text-2xl capitalize leading-none sm:text-3xl">
                     {leader.name.toLowerCase()}
                   </p>
@@ -82,24 +81,18 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                         background: `color-mix(in srgb, ${TIER_COLOR[leader.tier]} 18%, transparent)`,
                         color: TIER_COLOR[leader.tier],
                       }}
-                    >
-                      {leader.tier} tier
-                    </span>
+                    >{t('{tier} tier', { tier: leader.tier })}</span>
                     {leader.winRate !== null ? (
                       <span className="tabular-nums text-muted">
                         <strong className="font-bold text-victory">
                           {formatPercent(leader.winRate)}
-                        </strong>{' '}
-                        win
-                      </span>
+                        </strong>{' '}{t('win')}</span>
                     ) : null}
                     {leader.pickRate !== null ? (
                       <span className="tabular-nums text-muted">
                         <strong className="font-bold text-foreground">
                           {formatPercent(leader.pickRate)}
-                        </strong>{' '}
-                        pick
-                      </span>
+                        </strong>{' '}{t('pick')}</span>
                     ) : null}
                   </div>
                 </div>
@@ -110,9 +103,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                   >
                     {leader.score.toFixed(1)}
                   </p>
-                  <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted">
-                    Meta score
-                  </p>
+                  <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted">{t('Meta score')}</p>
                 </div>
               </Link>
 
@@ -121,7 +112,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                 {rest.map((brawler, index) => (
                   <li key={brawler.brawlerId}>
                     <Link
-                      href={brawlerPath(brawler.brawlerId, brawler.name)}
+                      href={lp(brawlerPath(brawler.brawlerId, brawler.name))}
                       // One of a list: prefetching each would burst past the rate limit -- see site-footer.
                       prefetch={false}
                       className="row-interactive flex items-center gap-3 bg-surface px-3 py-2"
@@ -153,41 +144,30 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
               </ol>
             </>
           ) : (
-            <p className="card p-6 text-sm text-muted">
-              Rankings are still being collected. Check back shortly.
-            </p>
+            <p className="card p-6 text-sm text-muted">{t('Rankings are still being collected. Check back shortly.')}</p>
           )}
 
           <Link
-            href="/tier-list/ranked"
+            href={lp('/tier-list/ranked')}
             className="group mt-3 inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-muted transition-colors hover:text-brand"
-          >
-            Full Ranked tier list
-            <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
+          >{t('Full Ranked tier list')}<ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
           </Link>
         </div>
 
         {/* Supporting, not mirroring: three rows, no podium chips, no scores. */}
         <div className="min-w-0">
           <p className="mb-2.5 flex items-center gap-2 text-sm font-bold">
-            <LeaderboardIcon className="size-5" />
-            Top players
-            <TrophyIcon className="ml-auto size-4" />
+            <LeaderboardIcon className="size-5" />{t('Top players')}<TrophyIcon className="ml-auto size-4" />
           </p>
           <Suspense fallback={<Skeleton className="h-40 rounded-2xl" />}>
             <TopPlayersPreview limit={3} revalidate={revalidate} />
           </Suspense>
           <Link
-            href="/leaderboard"
+            href={lp('/leaderboard')}
             className="group mt-3 inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-muted transition-colors hover:text-brand"
-          >
-            Full leaderboard
-            <ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
+          >{t('Full leaderboard')}<ArrowRight className="size-4 duration-200 group-hover:translate-x-0.5 motion-safe:transition-transform" />
           </Link>
-          <p className="mt-2 text-xs leading-relaxed text-muted/80">
-            Three of the top 200 worldwide. Our Ranked elo board, which the game API
-            does not publish, is on the full leaderboard.
-          </p>
+          <p className="mt-2 text-xs leading-relaxed text-muted/80">{t('Three of the top 200 worldwide. Our Ranked elo board, which the game API does not publish, is on the full leaderboard.')}</p>
         </div>
       </div>
     </section>

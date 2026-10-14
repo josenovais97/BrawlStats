@@ -10,6 +10,7 @@ import {
   toggleFavorite,
   type FavoriteKind,
 } from '@/lib/favorites';
+import { useT } from '@/components/i18n/use-t';
 
 interface Props {
   kind: FavoriteKind;
@@ -27,6 +28,7 @@ interface Props {
  * one so hydration matches without any state-setting effect.
  */
 export function FavoriteButton({ kind, tag, name, compact = false }: Props) {
+  const t = useT();
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -39,8 +41,8 @@ export function FavoriteButton({ kind, tag, name, compact = false }: Props) {
       type="button"
       onClick={() => toggleFavorite({ kind, tag, name })}
       aria-pressed={saved}
-      aria-label={saved ? `Remove ${name} from favourites` : `Save ${name} to favourites`}
-      title={saved ? 'Saved. Click to remove' : 'Save to favourites'}
+      aria-label={saved ? t('Remove {name} from favourites', { name: name }) : t('Save {name} to favourites', { name: name })}
+      title={saved ? t('Saved. Click to remove') : t('Save to favourites')}
       className={`inline-flex items-center justify-center gap-2 rounded-xl border text-sm font-semibold transition-colors ${
         compact ? 'size-9 shrink-0' : 'px-3.5 py-2'
       } ${
@@ -50,7 +52,7 @@ export function FavoriteButton({ kind, tag, name, compact = false }: Props) {
       }`}
     >
       <Star className={`size-4 ${saved ? 'fill-current' : ''}`} />
-      {compact ? null : saved ? 'Saved' : 'Save'}
+      {compact ? null : saved ? t('Saved') : t('Save')}
     </button>
   );
 }

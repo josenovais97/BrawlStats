@@ -1,16 +1,27 @@
 /** Presentation helpers shared across pages. */
 
+import { requestLocale } from '@/lib/request-locale';
+
+/**
+ * Number and date formatting follows the page's language on the server
+ * (`requestLocale`): 55.1% in English and Spanish, 55,1% in Portuguese. On the
+ * client it is always English, which only matters for numbers a client
+ * component formats itself.
+ */
+const NUMBER_TAG = { en: 'en-US', es: 'es-419', pt: 'pt-BR' } as const;
+const DATE_TAG = { en: 'en-GB', es: 'es-419', pt: 'pt-BR' } as const;
+
 /** 317840 -> "317,840" */
 export function formatNumber(n: number | null | undefined): string {
   if (n === null || n === undefined || Number.isNaN(n)) return '–';
-  return n.toLocaleString('en-US');
+  return n.toLocaleString(NUMBER_TAG[requestLocale()]);
 }
 
 /** 317840 -> "317.8K", for tight card layouts. */
 export function compactNumber(n: number | null | undefined): string {
   if (n === null || n === undefined || Number.isNaN(n)) return '–';
   if (Math.abs(n) < 1000) return String(n);
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(NUMBER_TAG[requestLocale()], {
     notation: 'compact',
     maximumFractionDigits: 1,
   }).format(n);
@@ -32,15 +43,18 @@ export function parseApiDate(value: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/** "3h ago", "2d ago". Returns "—" for unparseable input. */
-export function relativeTime(value: string | Date | null | undefined): string {
+/**
+ * "3 hours ago", "hace 3 horas". Returns "—" for unparseable input. `lang` is
+ * a BCP 47 tag: English unless a translated page passes its own.
+ */
+export function relativeTime(value: string | Date | null | undefined, lang: string = DATE_TAG[requestLocale()]): string {
   if (!value) return '–';
   const date = typeof value === 'string' ? parseApiDate(value) : value;
   if (!date) return '–';
 
   const diffMs = date.getTime() - Date.now();
   const abs = Math.abs(diffMs);
-  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
 
   const units: [Intl.RelativeTimeFormatUnit, number][] = [
     ['second', 1000],
@@ -160,6 +174,10 @@ export function titleCaseLabel(value: string | null | undefined): string {
 
 /** Rank suffix for showdown placements: 1 -> "1st". */
 export function ordinal(n: number): string {
+  // Spanish and Portuguese write "3.º" / "3º" for every number.
+  const locale = requestLocale();
+  if (locale === 'es') return `${n}.º`;
+  if (locale === 'pt') return `${n}º`;
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
   switch (n % 10) {
@@ -206,7 +224,9 @@ export function partitionRotation<T extends { startTime: string }>(
 /** Percentage with one decimal, e.g. 0.5432 -> "54.3%". */
 export function formatPercent(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '–';
-  return `${(value * 100).toFixed(1)}%`;
+  const locale = requestLocale();
+  if (locale === 'en') return `${(value * 100).toFixed(1)}%`;
+  return `${(value * 100).toLocaleString(NUMBER_TAG[locale], { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
 }
 
 /**
@@ -248,7 +268,7 @@ export function formatDate(value: string | Date | null | undefined): string {
   if (!value) return '';
   const date = typeof value === 'string' ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return date.toLocaleDateString(DATE_TAG[requestLocale()], { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
 
 /**
@@ -261,7 +281,7 @@ export function formatDate(value: string | Date | null | undefined): string {
  * with (AGENTS.md trap 3).
  */
 export function dayLabel(iso: string): string {
-  return new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', {
+  return new Date(`${iso.slice(0, 10)}T00:00:00Z`).toLocaleDateString(DATE_TAG[requestLocale()], {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

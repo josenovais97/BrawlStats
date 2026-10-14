@@ -70,6 +70,9 @@ import {
 } from '@/lib/stats';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
 import type { BSAccessory } from '@/types/brawlstars';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -203,13 +206,19 @@ function buildSentence(
 
   const gadget = pick(choices.gadgets);
   const starPower = pick(choices.starPowers);
-  const parts = [
-    gadget ? `the ${titleCase(gadget)} gadget` : null,
-    starPower ? `the ${titleCase(starPower)} star power` : null,
-  ].filter(Boolean);
-
-  if (parts.length === 0) return null;
-  return `Most ${name} owners buy ${parts.join(' and ')} first.`;
+  // Whole sentences rather than "the X gadget" fragments, so each language
+  // can put the item names where its grammar wants them.
+  const t = getT(requestLocale());
+  if (gadget && starPower) {
+    return t('Most {name} owners buy the {gadget} gadget and the {starPower} star power first.', {
+      name,
+      gadget: titleCase(gadget),
+      starPower: titleCase(starPower),
+    });
+  }
+  if (gadget) return t('Most {name} owners buy the {gadget} gadget first.', { name, gadget: titleCase(gadget) });
+  if (starPower) return t('Most {name} owners buy the {starPower} star power first.', { name, starPower: titleCase(starPower) });
+  return null;
 }
 
 /**
@@ -221,6 +230,7 @@ function buildSentence(
 const BALANCE_CHANGES_SHOWN = 8;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { slug } = await params;
   const resolved = await resolveBrawler(slug);
 
@@ -228,17 +238,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const b = resolved.brawler;
     const kind = [b.rarityName, b.className].filter(Boolean).join(' ');
     return {
-      title: `${b.name}: the new Brawl Stars brawler (${currentMonth()})`,
-      description: `${b.name} is a new${kind ? ` ${kind}` : ''} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.`,
+      title: t('{name}: the new Brawl Stars brawler ({v})', { name: b.name, v: currentMonth() }),
+      description: t('{name} is a new{v} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.', { name: b.name, v: kind ? ` ${kind}` : '' }),
       alternates: { canonical: `/brawlers/${slugify(b.name)}` },
     };
   }
 
-  if (resolved.kind !== 'ok') return { title: 'Brawler' };
+  if (resolved.kind !== 'ok') return { title: t('Brawler') };
 
   const brawlerId = resolved.id;
   const brawler = await getBrawler(brawlerId).catch(() => undefined);
-  if (!brawler) return { title: 'Brawler' };
+  if (!brawler) return { title: t('Brawler') };
 
   const name = titleCase(brawler.name);
   const [stat, choices] = await Promise.all([brawlerStat(brawlerId), abilityChoicesFor(brawlerId)]);
@@ -262,13 +272,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const recommendation = buildSentence(name, choices, accessories);
   const performance =
     stat && adjusted !== null
-      ? `${formatPercent(adjusted)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled battles.`
+      ? t('{rate} adjusted win rate and {pick} pick rate over {battles} sampled battles.', {
+          rate: formatPercent(adjusted),
+          pick: formatPercent(stat.usageRate),
+          battles: formatNumber(stat.decidedSampleSize),
+        })
       : null;
 
   const description = [
     recommendation,
     performance,
-    'Gears, star powers, gadgets, best modes and maps, updated daily from real battles.',
+    t('Gears, star powers, gadgets, best modes and maps, updated daily from real battles.'),
   ]
     .filter(Boolean)
     .join(' ');
@@ -279,17 +293,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
      * build in Brawl Stars" is what gets typed, and the month is the freshness
      * signal every page outranking us carries — see `currentMonth`.
      */
-    title: `Best ${name} build in Brawl Stars (${currentMonth()})`,
+    title: t('Best {name} build in Brawl Stars ({v})', { name: name, v: currentMonth() }),
     description,
     alternates: { canonical: `/brawlers/${resolved.slug}` },
     openGraph: {
-      title: `${name} build and stats, ${currentMonth()}`,
+      title: t('{name} build and stats, {v}', { name: name, v: currentMonth() }),
       description,
     },
   };
 }
 
 export default async function BrawlerDetailPage({ params }: PageProps) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { slug } = await params;
   const resolved = await resolveBrawler(slug);
 
@@ -311,10 +327,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     return (
       <ErrorState
         code="upstreamDown"
-        title="Brawler data unavailable"
-        detail="The brawler catalogue is not responding, so this page cannot be resolved. Try again shortly."
+        title={t('Brawler data unavailable')}
+        detail={t('The brawler catalogue is not responding, so this page cannot be resolved. Try again shortly.')}
         backHref="/brawlers"
-        backLabel="Back to brawlers"
+        backLabel={t('Back to brawlers')}
       />
     );
   }
@@ -326,7 +342,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * indexed and shared, and consolidating them onto the slug is the point of
    * moving. `permanentRedirect` throws, so nothing below it runs.
    */
-  if (resolved.numeric) permanentRedirect(`/brawlers/${resolved.slug}`);
+  if (resolved.numeric) permanentRedirect(localePath(requestLocale(), `/brawlers/${resolved.slug}`));
 
   const brawlerId = resolved.id;
   let brawler = await getBrawler(brawlerId).catch(() => undefined);
@@ -420,10 +436,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     return (
       <ErrorState
         code="notFound"
-        title="Brawler not found"
-        detail="No brawler exists with that id."
+        title={t('Brawler not found')}
+        detail={t('No brawler exists with that id.')}
         backHref="/brawlers"
-        backLabel="Back to brawlers"
+        backLabel={t('Back to brawlers')}
       />
     );
   }
@@ -553,7 +569,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       new Map([...brawler.starPowers, ...brawler.gadgets].map((a) => [a.id, a.name])),
     ),
     stat && normalizedWinRate !== null
-      ? `${name} has a ${formatPercent(normalizedWinRate)} adjusted win rate and ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled battles${tier ? `, ${tier} tier in Ranked` : ''}${lastRun ? `, as of ${formatDate(lastRun.startedAt)}` : ''}.`
+      ? t('{name} has a {rate} adjusted win rate and {pick} pick rate over {battles} sampled battles{tier}{date}.', {
+          name,
+          rate: formatPercent(normalizedWinRate),
+          pick: formatPercent(stat.usageRate),
+          battles: formatNumber(stat.decidedSampleSize),
+          tier: tier ? t(', {tier} tier in Ranked', { tier }) : '',
+          date: lastRun ? t(', as of {date}', { date: formatDate(lastRun.startedAt) }) : '',
+        })
       : null,
   ]
     .filter(Boolean)
@@ -600,38 +623,38 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // it would also be a lie to the reader.
   const faq = [
     {
-      question: `Is ${name} good in Brawl Stars?`,
+      question: t('Is {name} good in Brawl Stars?', { name: name }),
       answer:
         stat && normalizedWinRate !== null
-          ? `${name} has a ${formatPercent(normalizedWinRate)} adjusted win rate and a ${formatPercent(stat.usageRate)} pick rate over ${formatNumber(stat.decidedSampleSize)} sampled decided battles${tier ? `, which puts it in ${tier} tier` : ''}.`
-          : `${name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.`,
+          ? t('{name} has a {normalizedWinRate} adjusted win rate and a {usageRate} pick rate over {decidedSampleSize} sampled decided battles{v}.', { name: name, normalizedWinRate: formatPercent(normalizedWinRate), usageRate: formatPercent(stat.usageRate), decidedSampleSize: formatNumber(stat.decidedSampleSize), v: tier ? `, which puts it in ${tier} tier` : '' })
+          : t('{name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.', { name: name }),
     },
     ...(splits.modes.length > 0
       ? [
           {
-            question: `What is the best mode for ${name}?`,
-            answer: `${name} performs best in ${humanizeMode(splits.modes[0].mode)}, with a ${formatPercent(splits.modes[0].winRate)} raw win rate over ${formatNumber(splits.modes[0].decidedSampleSize)} sampled battles there.`,
+            question: t('What is the best mode for {name}?', { name: name }),
+            answer: t('{name} performs best in {mode}, with a {winRate} raw win rate over {decidedSampleSize} sampled battles there.', { name: name, mode: humanizeMode(splits.modes[0].mode), winRate: formatPercent(splits.modes[0].winRate), decidedSampleSize: formatNumber(splits.modes[0].decidedSampleSize) }),
           },
         ]
       : []),
     ...(splits.maps.length > 0 && splits.maps[0].mapName
       ? [
           {
-            question: `What is the best map for ${name}?`,
-            answer: `${splits.maps[0].mapName} (${humanizeMode(splits.maps[0].mode)}) is where ${name} has the strongest sampled record, at ${formatPercent(splits.maps[0].winRate)} over ${formatNumber(splits.maps[0].decidedSampleSize)} battles.`,
+            question: t('What is the best map for {name}?', { name: name }),
+            answer: t('{mapName} ({mode}) is where {name} has the strongest sampled record, at {winRate} over {decidedSampleSize} battles.', { mapName: splits.maps[0].mapName, mode: humanizeMode(splits.maps[0].mode), name: name, winRate: formatPercent(splits.maps[0].winRate), decidedSampleSize: formatNumber(splits.maps[0].decidedSampleSize) }),
           },
         ]
       : []),
     ...(pairings && pairings.weakAgainst.length > 0
       ? [
           {
-            question: `What counters ${name}?`,
-            answer: `${pairings.weakAgainst
+            question: t('What counters {name}?', { name: name }),
+            answer: t('{v} pull {name} furthest below its own {baseline} average in sampled team battles.', { v: pairings.weakAgainst
               .slice(0, 3)
               .map((p) => titleCase(brawlerMeta.get(p.brawlerId)?.name ?? `#${p.brawlerId}`))
               .join(
                 ', ',
-              )} pull ${name} furthest below its own ${formatPercent(pairings.baseline)} average in sampled team battles.`,
+              ), name: name, baseline: formatPercent(pairings.baseline) }),
           },
         ]
       : []),
@@ -642,16 +665,16 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     ...(brawler.description
       ? [
           {
-            question: `Who is ${name} in Brawl Stars?`,
+            question: t('Who is {name} in Brawl Stars?', { name: name }),
             answer: newestOrdinal
-              ? `${name} is the newest brawler in Brawl Stars and the ${newestOrdinal} to be released. ${brawler.description}`
+              ? t('{name} is the newest brawler in Brawl Stars and the {newestOrdinal} to be released. {description}', { name: name, newestOrdinal: newestOrdinal, description: brawler.description })
               : brawler.description,
           },
         ]
       : []),
     {
-      question: `What star powers and gadgets does ${name} have?`,
-      answer: `${name} has ${listOf(starPowers.map((a) => titleCase(a.name)))} as star powers and ${listOf(gadgets.map((a) => titleCase(a.name)))} as gadgets.`,
+      question: t('What star powers and gadgets does {name} have?', { name: name }),
+      answer: t('{name} has {v} as star powers and {v2} as gadgets.', { name: name, v: listOf(starPowers.map((a) => titleCase(a.name))), v2: listOf(gadgets.map((a) => titleCase(a.name))) }),
     },
   ];
 
@@ -666,12 +689,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       <JsonLd data={faqSchema(faq)} />
 
       <Link
-        href="/brawlers"
+        href={lp('/brawlers')}
         className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" />
-        All brawlers
-      </Link>
+        <ArrowLeft className="size-4" />{t('All brawlers')}</Link>
 
       {/* The rarity colour used to be a one-pixel rule, which made a hundred
           brawler pages look like one template with a different portrait. It now
@@ -752,20 +773,18 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                   color: accent,
                 }}
               >
-                {rarityName ?? 'Brawler'}
+                {t(rarityName ?? 'Brawler')}
               </span>
               {isLegacy ? (
                 <span
                   className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase tracking-wide text-muted"
-                  title="No longer available in the game. This page is kept for its history."
-                >
-                  Legacy
-                </span>
+                  title={t('No longer available in the game. This page is kept for its history.')}
+                >{t('Legacy')}</span>
               ) : null}
               {className ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
                   <ClassIcon name={className} className="size-4" />
-                  {className}
+                  {t(className)}
                 </span>
               ) : null}
               {/*
@@ -782,19 +801,15 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                     background: `color-mix(in srgb, ${TIER_COLOR[tier]} 20%, transparent)`,
                     color: TIER_COLOR[tier],
                   }}
-                >
-                  {tier} tier
-                </span>
+                >{t('{tier} tier', { tier: tier })}</span>
               ) : null}
               {metaScore !== null ? (
                 /* Same scoring pass the Ranked tier list uses, so the number
                    here cannot disagree with the number there. */
                 <span
                   className="inline-flex items-center gap-1.5 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted"
-                  title="Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list"
-                >
-                  Meta score
-                  <span className="font-bold tabular-nums text-foreground">
+                  title={t('Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list')}
+                >{t('Meta score')}<span className="font-bold tabular-nums text-foreground">
                     {metaScore.toFixed(1)}
                     <span className="font-semibold text-muted">/10</span>
                   </span>
@@ -809,10 +824,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 build", landing on these pages at position 17-60. The visible
                 heading now says what the title says. */}
             <h1 className="display mt-3 text-3xl sm:text-4xl">
-              {name} <span className="text-muted">build, stats and matchups</span>
+              {name} <span className="text-muted">{t('build, stats and matchups')}</span>
             </h1>
 
-            {lead ? <p className="mt-3 max-w-2xl leading-relaxed">{lead}</p> : null}
+            {lead ? <p className="mt-3 max-w-2xl leading-relaxed">{t(lead)}</p> : null}
 
             {/* The in-game tagline, which the artwork mirror does not carry.
                 Both titles live below the biography now. */}
@@ -820,7 +835,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 page's title promises -- below the first screen. The same
                 text is the FAQ's "Who is <name>?" answer further down. */}
             <p className="mt-2.5 hidden max-w-2xl leading-relaxed text-muted sm:block">
-              {brawler.description}
+              {t(brawler.description)}
             </p>
 
             {/* Both titles a brawler carries, presented as titles.
@@ -838,16 +853,12 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {wiki?.stats.title ? (
                   <p className="inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
-                    <TrophyIcon className="size-4" />
-                    Title
-                    <span className="font-bold text-foreground">{wiki.stats.title}</span>
+                    <TrophyIcon className="size-4" />{t('Title')}<span className="font-bold text-foreground">{t(wiki.stats.title)}</span>
                   </p>
                 ) : null}
                 {wiki?.stats.prestigeTitle ? (
                   <p className="inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
-                    <PrestigeIcon total={1} className="size-4" />
-                    Prestige title
-                    <span className="font-bold text-foreground">{wiki.stats.prestigeTitle}</span>
+                    <PrestigeIcon total={1} className="size-4" />{t('Prestige title')}<span className="font-bold text-foreground">{wiki.stats.prestigeTitle}</span>
                   </p>
                 ) : null}
               </div>
@@ -881,8 +892,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       {wiki && wiki.stats.health ? (
         <section>
           <SectionHeading
-            title="Combat stats"
-            subtitle="Power 1 values from the wiki, before gears and star powers. Health and damage double at Power 11; reload, range and speed do not change."
+            title={t('Combat stats')}
+            subtitle={t('Power 1 values from the wiki, before gears and star powers. Health and damage double at Power 11; reload, range and speed do not change.')}
           />
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {(
@@ -916,7 +927,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                         straight back. So the label gets the full width and the
                         mark sits with the number, which is always short. */}
                     <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
-                      {label}
+                      {t(label)}
                     </dt>
                     <dd className="mt-1.5 flex items-center gap-2">
                       <CombatStatIcon stat={stat} className="size-6 shrink-0" />
@@ -925,7 +936,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                       </span>
                     </dd>
                     {hint ? (
-                      <dd className="mt-0.5 text-xs leading-tight text-muted">{hint}</dd>
+                      <dd className="mt-0.5 text-xs leading-tight text-muted">{t(hint)}</dd>
                     ) : null}
                     {scales ? <PowerElevenHint main={main} /> : null}
                   </div>
@@ -948,30 +959,22 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {wiki.stats.shotsToSuper ? (
                 <div className="card p-3">
-                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
-                    Hits to Super
-                  </dt>
+                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">{t('Hits to Super')}</dt>
                   <dd className="mt-1.5 text-lg font-bold leading-tight tabular-nums">
                     {wiki.stats.shotsToSuper}
                   </dd>
-                  <dd className="mt-0.5 text-xs leading-tight text-muted">
-                    from empty, all hits landing
-                  </dd>
+                  <dd className="mt-0.5 text-xs leading-tight text-muted">{t('from empty, all hits landing')}</dd>
                 </div>
               ) : null}
 
               {wiki.stats.attackSuperCharge ? (
                 <div className="card p-3">
-                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
-                    Super charge
-                  </dt>
+                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">{t('Super charge')}</dt>
                   <dd className="mt-1.5 text-lg font-bold leading-tight tabular-nums">
                     {wiki.stats.attackSuperCharge}
                   </dd>
-                  <dd className="mt-0.5 text-xs leading-tight text-muted">
-                    per hit
-                    {wiki.stats.attackBullets
-                      ? ` · ${wiki.stats.attackBullets} per attack`
+                  <dd className="mt-0.5 text-xs leading-tight text-muted">{t('per hit')}{wiki.stats.attackBullets
+                      ? t(' · {attackBullets} per attack', { attackBullets: wiki.stats.attackBullets })
                       : ''}
                   </dd>
                 </div>
@@ -979,18 +982,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
               {wiki.stats.hyperchargeMultiplier ? (
                 <div className="card p-3">
-                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
-                    Hypercharge boost
-                  </dt>
+                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">{t('Hypercharge boost')}</dt>
                   <dd className="mt-1.5 flex items-center gap-2">
                     <HyperchargeIcon className="size-5 shrink-0" />
                     <span className="text-lg font-bold leading-tight tabular-nums">
                       {wiki.stats.hyperchargeMultiplier}
                     </span>
                   </dd>
-                  <dd className="mt-0.5 text-xs leading-tight text-muted">
-                    speed, damage and shield
-                  </dd>
+                  <dd className="mt-0.5 text-xs leading-tight text-muted">{t('speed, damage and shield')}</dd>
                 </div>
               ) : null}
             </dl>
@@ -1026,58 +1025,50 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       />
 
       <section>
-        <SectionHeading title="Performance" />
+        <SectionHeading title={t('Performance')} />
         {stat ? (
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard
               icon={BarChart3}
-              label="Win rate"
+              label={t('Win rate')}
               value={formatPercent(normalizedWinRate)}
-              hint={`${formatNumber(stat.decidedSampleSize)} battles`}
+              hint={t('{decidedSampleSize} battles', { decidedSampleSize: formatNumber(stat.decidedSampleSize) })}
               tone="text-victory"
             />
             <StatCard
               node={<PlayersIcon className="size-6" />}
-              label="Pick rate"
+              label={t('Pick rate')}
               value={formatPercent(stat.usageRate)}
-              hint="Last 7 days"
+              hint={t('Last 7 days')}
               tone="text-accent"
             />
             <StatCard
               node={<TrophyIcon className="size-6" />}
-              label="Avg trophies"
+              label={t('Avg trophies')}
               value={stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))}
-              hint="Across tracked players"
+              hint={t('Across tracked players')}
             />
             <StatCard
               icon={Sparkles}
-              label="Avg rank"
+              label={t('Avg rank')}
               value={stat.avgRank === null ? ', ' : stat.avgRank.toFixed(1)}
-              hint="Across tracked players"
+              hint={t('Across tracked players')}
             />
           </div>
         ) : (
           /* An empty state that ends the visit is a wasted one. This says what
              is missing and offers the two pages that do have an answer. */
           <div className="card p-6">
-            <p className="text-sm leading-relaxed text-muted">
-              Not enough sampled battles for {name} yet. The sampler works through the global
-              leaderboard pool continuously, so newly released brawlers fill in over the following
-              days.
-            </p>
+            <p className="text-sm leading-relaxed text-muted">{t('Not enough sampled battles for {name} yet. The sampler works through the global leaderboard pool continuously, so newly released brawlers fill in over the following days.', { name: name })}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
-                href="/tier-list/ranked"
+                href={lp('/tier-list/ranked')}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                Ranked tier list
-              </Link>
+              >{t('Ranked tier list')}</Link>
               <Link
-                href="/brawlers"
+                href={lp('/brawlers')}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                Browse all brawlers
-              </Link>
+              >{t('Browse all brawlers')}</Link>
             </div>
           </div>
         )}
@@ -1092,8 +1083,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       {splits.modes.length > 0 || splits.maps.length > 0 ? (
         <section>
           <SectionHeading
-            title="Where it performs"
-            subtitle="Each mode and map is scored against its own average, so a showdown record and a gem grab one can be read in the same list."
+            title={t('Where it performs')}
+            subtitle={t('Each mode and map is scored against its own average, so a showdown record and a gem grab one can be read in the same list.')}
           />
           <BrawlerSplits
             modes={splits.modes}
@@ -1111,8 +1102,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       {pairings ? (
         <section>
           <SectionHeading
-            title="Matchups"
-            subtitle={`Which brawlers ${name.toLowerCase()} beats, which ones win the matchup, and who to draft alongside.`}
+            title={t('Matchups')}
+            subtitle={t('Which brawlers {v} beats, which ones win the matchup, and who to draft alongside.', { v: name.toLowerCase() })}
           />
           <BrawlerMatchups
             pairings={pairings}
@@ -1122,16 +1113,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             indexablePairs={indexablePairs}
           />
           <Link
-            href={`/brawlers/${resolved.slug}/counters`}
+            href={lp(`/brawlers/${resolved.slug}/counters`)}
             className="mt-3 inline-flex text-sm font-semibold text-brand hover:underline"
-          >
-            How to counter {name} in Ranked, by rank →
-          </Link>
+          >{t('How to counter {name} in Ranked, by rank →', { name: name })}</Link>
         </section>
       ) : null}
 
       <section>
-        <SectionHeading title={`Top players with ${brawler.name.toLowerCase()}`} />
+        <SectionHeading title={t('Top players with {v}', { v: brawler.name.toLowerCase() })} />
         <Suspense fallback={<TableSkeleton rows={5} />}>
           <BrawlerLeaderboard brawlerId={brawlerId} />
         </Suspense>
@@ -1140,8 +1129,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       {skins.length > 0 ? (
         <section>
           <SectionHeading
-            title="Skins"
-            subtitle={`Which ${name} skins players actually equip, from the sampled snapshot pool.`}
+            title={t('Skins')}
+            subtitle={t('Which {name} skins players actually equip, from the sampled snapshot pool.', { name: name })}
           />
           <BrawlerSkins
             skins={skins}
@@ -1155,8 +1144,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       {wiki && wiki.history.length > 0 ? (
         <section>
           <SectionHeading
-            title="Balance history"
-            subtitle={`The last changes Supercell made to ${name}. Cosmetic releases are left out.`}
+            title={t('Balance history')}
+            subtitle={t('The last changes Supercell made to {name}. Cosmetic releases are left out.', { name: name })}
             aside={`${wiki.history.length} recorded`}
           />
           <ol className="card divide-y divide-border overflow-hidden">
@@ -1177,7 +1166,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 >
                   {change.kind}
                 </span>
-                <span className="min-w-0 flex-1 text-sm leading-relaxed">{change.text}</span>
+                <span className="min-w-0 flex-1 text-sm leading-relaxed">{t(change.text)}</span>
               </li>
             ))}
           </ol>
@@ -1188,28 +1177,22 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         /* Attribution, once, for everything on this page that came from the
            wiki: the combat stats, the resolved ability text, the hypercharge
            effect and the buffie effects. Their text is CC-BY-SA. */
-        <p className="text-xs leading-relaxed text-muted">
-          Combat stats, ability and gear descriptions, hypercharge and buffie effects, and balance
-          history from the{' '}
+        <p className="text-xs leading-relaxed text-muted">{t('Combat stats, ability and gear descriptions, hypercharge and buffie effects, and balance history from the')}{' '}
           <a
-            href={wikiPageUrl(wiki.title)}
+            href={lp(wikiPageUrl(wiki.title))}
             rel="noreferrer noopener"
             target="_blank"
             className="font-medium text-brand hover:underline"
-          >
-            Brawl Stars Wiki
-          </a>
-          , CC-BY-SA. Win rates, pick rates and matchups are our own.
-        </p>
+          >{t('Brawl Stars Wiki')}</a>{t(', CC-BY-SA. Win rates, pick rates and matchups are our own.')}</p>
       ) : null}
 
       <section>
-        <SectionHeading title={`${name} FAQ`} />
+        <SectionHeading title={t('{name} FAQ', { name: name })} />
         <dl className="card divide-y divide-border">
           {faq.map((item) => (
             <div key={item.question} className="p-4">
-              <dt className="font-semibold">{item.question}</dt>
-              <dd className="mt-1 text-sm leading-relaxed text-muted">{item.answer}</dd>
+              <dt className="font-semibold">{t(item.question)}</dt>
+              <dd className="mt-1 text-sm leading-relaxed text-muted">{t(item.answer)}</dd>
             </div>
           ))}
         </dl>
@@ -1266,6 +1249,7 @@ function listOf(items: string[]): string {
  * confident figure that happens to be wrong. Silence is the honest fallback.
  */
 function PowerElevenHint({ main }: { main: string }) {
+  const t = getT(requestLocale());
   const cleaned = main.replace(/,/g, '').trim();
   if (!/^\d+(\.\d+)?$/.test(cleaned)) return null;
 
@@ -1273,8 +1257,6 @@ function PowerElevenHint({ main }: { main: string }) {
   if (!Number.isFinite(doubled) || doubled === 0) return null;
 
   return (
-    <dd className="mt-0.5 text-xs font-semibold leading-tight text-brand tabular-nums">
-      {doubled.toLocaleString('en-US')} at Power 11
-    </dd>
+    <dd className="mt-0.5 text-xs font-semibold leading-tight text-brand tabular-nums">{t('{v} at Power 11', { v: doubled.toLocaleString('en-US') })}</dd>
   );
 }

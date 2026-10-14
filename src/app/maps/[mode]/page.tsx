@@ -14,6 +14,10 @@ import { slugify } from '@/lib/slugs';
 import { getBestPicksByMode } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
+import { mapNamer, modeNamer } from '@/lib/i18n-game';
 
 interface PageProps {
   params: Promise<{ mode: string }>;
@@ -36,7 +40,8 @@ async function resolveMode(slug: string) {
   const first = inMode[0];
   return {
     slug: wanted,
-    label: first.mode?.name ?? first.map.gameMode.name,
+    // In the page's language: every use of the label is display.
+    label: (await modeNamer())(first.mode?.name ?? first.map.gameMode.name),
     color: first.mode?.color ?? '#8b95b8',
     imageUrl: first.mode?.imageUrl,
     description: first.mode?.shortDescription ?? first.mode?.description ?? null,
@@ -46,18 +51,22 @@ async function resolveMode(slug: string) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = getT(requestLocale());
   const { mode } = await params;
   const resolved = await resolveMode(mode);
-  if (!resolved) return { title: 'Mode' };
+  if (!resolved) return { title: t('Mode') };
 
   return {
-    title: `${resolved.label} maps and best brawlers`,
-    description: `Every Brawl Stars ${resolved.label} map in rotation, plus the brawlers with the best records in the mode, ranked from sampled battles.`,
+    title: t('{label} maps and best brawlers', { label: resolved.label }),
+    description: t('Every Brawl Stars {label} map in rotation, plus the brawlers with the best records in the mode, ranked from sampled battles.', { label: resolved.label }),
     alternates: { canonical: `/maps/${resolved.slug}` },
   };
 }
 
 export default async function ModeMapsPage({ params }: PageProps) {
+  const nm = await mapNamer();
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { mode } = await params;
   const resolved = await resolveMode(mode);
   if (!resolved) notFound();
@@ -82,25 +91,23 @@ export default async function ModeMapsPage({ params }: PageProps) {
           `${resolved.label} maps`,
           `Active Brawl Stars ${resolved.label} maps.`,
           resolved.maps.map((entry) => ({
-            name: entry.map.name,
+            name: nm(entry.map.name),
             path: `/maps/${entry.modeSlug}/${entry.mapSlug}`,
           })),
         )}
       />
 
       <Link
-        href="/maps"
+        href={lp('/maps')}
         className="inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground"
       >
-        <ArrowLeft className="size-4" />
-        All maps
-      </Link>
+        <ArrowLeft className="size-4" />{t('All maps')}</Link>
 
       <PageHeading
-        title={resolved.label}
+        title={t(resolved.label)}
         subtitle={
           resolved.description ??
-          `Every ${resolved.label} map currently in rotation, and the brawlers with the best records in the mode.`
+          t('Every {label} map currently in rotation, and the brawlers with the best records in the mode.', { label: resolved.label })
         }
         aside={
           resolved.imageUrl ? (
@@ -119,27 +126,27 @@ export default async function ModeMapsPage({ params }: PageProps) {
       {picks && picks.picks.length > 0 ? (
         <section>
           <SectionHeading
-            title={`Best brawlers in ${resolved.label}`}
-            subtitle={`From ${formatNumber(picks.sampleSize)} sampled decided battles in this mode, scored against the mode's own average.`}
+            title={t('Best brawlers in {label}', { label: resolved.label })}
+            subtitle={t('From {sampleSize} sampled decided battles in this mode, scored against the mode\'s own average.', { sampleSize: formatNumber(picks.sampleSize) })}
           />
           <MapPickList
             picks={picks.picks}
             brawlerMeta={brawlerMeta}
-            emptyLabel="Not enough sampled battles in this mode yet."
+            emptyLabel={t('Not enough sampled battles in this mode yet.')}
           />
         </section>
       ) : null}
 
       <section>
         <SectionHeading
-          title="Maps in rotation"
+          title={t('Maps in rotation')}
           aside={`${resolved.maps.length} maps`}
         />
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {resolved.maps.map((entry) => (
             <li key={entry.map.id}>
               <Link
-                href={`/maps/${entry.modeSlug}/${entry.mapSlug}`}
+                href={lp(`/maps/${entry.modeSlug}/${entry.mapSlug}`)}
                 className="card card-interactive block h-full overflow-hidden"
               >
                 {entry.map.imageUrl ? (
@@ -157,7 +164,7 @@ export default async function ModeMapsPage({ params }: PageProps) {
                   <div className="h-24 w-full bg-surface-2" />
                 )}
                 <span className="block truncate px-3 py-2 text-sm font-semibold">
-                  {entry.map.name}
+                  {nm(entry.map.name)}
                 </span>
               </Link>
             </li>

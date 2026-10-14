@@ -11,9 +11,14 @@ import { formatNumber, humanizeRole } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSClub, BSClubMember } from '@/types/brawlstars';
 import { playerLinkRel } from '@/lib/link-rel';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 /** Roster composition, trophy spread and eligibility, derived from the member list. */
 export function ClubInsights({ club }: { club: BSClub }) {
+  const tx = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const members = club.members ?? [];
   if (members.length === 0) return null;
 
@@ -44,25 +49,23 @@ export function ClubInsights({ club }: { club: BSClub }) {
 
   return (
     <section>
-      <SectionHeading title="Roster insights" />
+      <SectionHeading title={tx('Roster insights')} />
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Trophy spread */}
         <div className="card card-glow p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <TrendingUp className="size-4 text-brand" />
-            Trophy spread
-          </h3>
+            <TrendingUp className="size-4 text-brand" />{tx('Trophy spread')}</h3>
 
           <Spread members={sorted} />
 
           <dl className="mt-4 space-y-2.5 border-t border-border pt-4 text-sm">
-            <Row label="Average" value={formatNumber(average)} />
-            <Row label="Median" value={formatNumber(median)} />
-            <Row label="Highest" value={formatNumber(highest.trophies)} />
-            <Row label="Lowest" value={formatNumber(lowest.trophies)} />
+            <Row label={tx('Average')} value={formatNumber(average)} />
+            <Row label={tx('Median')} value={formatNumber(median)} />
+            <Row label={tx('Highest')} value={formatNumber(highest.trophies)} />
+            <Row label={tx('Lowest')} value={formatNumber(lowest.trophies)} />
             <Row
-              label="Top 5 share"
+              label={tx('Top 5 share')}
               value={`${Math.round(topFiveShare * 100)}%`}
             />
           </dl>
@@ -71,9 +74,7 @@ export function ClubInsights({ club }: { club: BSClub }) {
         {/* Composition */}
         <div className="card p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <PlayersIcon className="size-4" />
-            Composition
-          </h3>
+            <PlayersIcon className="size-4" />{tx('Composition')}</h3>
 
           <ul className="space-y-3">
             {(
@@ -107,12 +108,12 @@ export function ClubInsights({ club }: { club: BSClub }) {
 
           <dl className="mt-4 space-y-2.5 border-t border-border pt-4 text-sm">
             <Row
-              label="Open slots"
+              label={tx('Open slots')}
               value={openSlots === 0 ? 'Full' : String(openSlots)}
             />
             {club.requiredTrophies > 0 ? (
               <Row
-                label="Below entry bar"
+                label={tx('Below entry bar')}
                 value={`${belowRequirement} ${belowRequirement === 1 ? 'member' : 'members'}`}
               />
             ) : null}
@@ -122,15 +123,13 @@ export function ClubInsights({ club }: { club: BSClub }) {
         {/* Top contributors */}
         <div className="card p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-bold">
-            <TrophyIcon className="size-4" />
-            Top contributors
-          </h3>
+            <TrophyIcon className="size-4" />{tx('Top contributors')}</h3>
 
           <ol className="space-y-1">
             {sorted.slice(0, 5).map((member, index) => (
               <li key={member.tag}>
                 <Link
-                  href={`/player/${normalizeTag(member.tag)}`}
+                  href={lp(`/player/${normalizeTag(member.tag)}`)}
                   rel={playerLinkRel(normalizeTag(member.tag))}
                 prefetch={false}
                   className="flex items-center gap-2.5 rounded-lg p-1.5 transition-colors hover:bg-surface-2"
@@ -184,9 +183,10 @@ function Spread({ members }: { members: BSClubMember[] }) {
 }
 
 function Row({ label, value }: { label: string; value: string }) {
+  const tx = getT(requestLocale());
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <dt className="text-muted">{label}</dt>
+      <dt className="text-muted">{tx(label)}</dt>
       <dd className="font-semibold tabular-nums">{value}</dd>
     </div>
   );

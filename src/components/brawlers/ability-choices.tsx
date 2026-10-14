@@ -5,6 +5,8 @@ import { Disclosure } from '@/components/ui/disclosure';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { AbilityChoice, BrawlerAbilityChoices } from '@/lib/stats';
 import type { BAAccessory } from '@/types/brawlapi';
+import { getT } from '@/lib/t';
+import { requestLocale } from '@/lib/request-locale';
 
 /**
  * Which star power and gadget players actually buy first, and how it goes.
@@ -50,15 +52,16 @@ export function AbilityChoices({
   starPowers: BAAccessory[];
   gadgets: BAAccessory[];
 }) {
+  const t = getT(requestLocale());
   const groups = [
     {
-      title: 'Star power',
+      title: t('Star power'),
       node: <StarPowerIcon className="size-5" />,
       rows: choices.starPowers,
       items: starPowers,
     },
     {
-      title: 'Gadget',
+      title: t('Gadget'),
       node: <GadgetIcon className="size-5" />,
       rows: choices.gadgets,
       items: gadgets,
@@ -85,10 +88,8 @@ export function AbilityChoices({
         return (
           <div key={title} className="card p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="flex items-center gap-2 text-sm font-bold">
-                {node}
-                {title} bought first
-              </h3>
+              <h3 className="flex items-center gap-2 text-sm font-bold">{node}
+                {t('{title} bought first', { title: t(title) })}</h3>
               {/* Quiet at "low", the same treatment the map cards use: a caveat
                   should not be the loudest thing on the card. */}
               <span
@@ -98,13 +99,10 @@ export function AbilityChoices({
                     : 'bg-brand/15 text-brand'
                 }`}
               >
-                {label}
+                {t(label)}
               </span>
             </div>
-            <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">
-              Among owners who have only one so far. Win rates cover the choice and the
-              chooser together.
-            </p>
+            <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{t('Among owners who have only one so far. Win rates cover the choice and the chooser together.')}</p>
 
             {rows.length > 1 ? (
               <ul className="space-y-3">
@@ -118,10 +116,7 @@ export function AbilityChoices({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted">
-                Almost every owner has both, so there are too few first-buyers left to
-                name a preference.
-              </p>
+              <p className="text-sm text-muted">{t('Almost every owner has both, so there are too few first-buyers left to name a preference.')}</p>
             )}
           </div>
         );
@@ -131,22 +126,10 @@ export function AbilityChoices({
           above the numbers it explains. */}
       <Disclosure
         tone="bare"
-        summary={`Read from ${formatNumber(choices.sampleSize)} first-buyers`}
-      >
-        Counted from tracked players who own exactly one of the pair: they chose it,
-        and every battle they played on this brawler was played with it, so this
-        measures a decision rather than ownership.
-        {' '}
-        <strong className="font-semibold text-foreground">
-          It is not a controlled comparison.
-        </strong>{' '}
-        Which option a player bought is their own choice, so each win rate covers the
-        ability and the kind of player who picks it together. Owning one option does
-        not make two groups otherwise alike, and nothing here separates the two. Read
-        it as how it has gone for the people who bought each one &mdash; not as what
-        the ability will do to your win rate.
-        {choices.confidence === 'low'
-          ? ' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.'
+        summary={t('Read from {sampleSize} first-buyers', { sampleSize: formatNumber(choices.sampleSize) })}
+      >{t('Counted from tracked players who own exactly one of the pair: they chose it, and every battle they played on this brawler was played with it, so this measures a decision rather than ownership.')}{' '}
+        <strong className="font-semibold text-foreground">{t('It is not a controlled comparison.')}</strong>{' '}{t('Which option a player bought is their own choice, so each win rate covers the ability and the kind of player who picks it together. Owning one option does not make two groups otherwise alike, and nothing here separates the two. Read it as how it has gone for the people who bought each one — not as what the ability will do to your win rate.')}{choices.confidence === 'low'
+          ? t(' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.')
           : ''}
       </Disclosure>
     </div>
@@ -162,6 +145,7 @@ function Row({
   item: BAAccessory | undefined;
   isLeader: boolean;
 }) {
+  const t = getT(requestLocale());
   return (
     <li className="flex items-center gap-3">
       {item ? (
@@ -183,9 +167,7 @@ function Row({
           <span className="truncate text-sm font-medium capitalize">
             {(item?.name ?? `#${row.itemId}`).toLowerCase()}
             {isLeader ? (
-              <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">
-                Most picked
-              </span>
+              <span className="ml-2 rounded bg-brand/15 px-1.5 py-0.5 text-xs font-bold uppercase text-brand">{t('Most picked')}</span>
             ) : null}
           </span>
           <span className="flex shrink-0 items-baseline gap-2 tabular-nums">
@@ -197,13 +179,10 @@ function Row({
                 with nothing to separate them -- and when the first was missing
                 the pair looked like one broken statistic. */}
             {row.winRate !== null ? (
-              <span className="text-sm font-bold text-victory">
-                {formatPercent(row.winRate)} win rate
-              </span>
+              <span className="text-sm font-bold text-victory">{t('{winRate} win rate', { winRate: formatPercent(row.winRate) })}</span>
             ) : null}
-            <span className="text-xs text-muted">
-              {formatPercent(row.share)} of first buyers &middot; {formatNumber(row.choosers)}{' '}
-              {row.choosers === 1 ? 'player' : 'players'}
+            <span className="text-xs text-muted">{t('{share} of first buyers ·', { share: formatPercent(row.share) })}{' '}{formatNumber(row.choosers)}{' '}
+              {row.choosers === 1 ? t('player') : t('players')}
             </span>
           </span>
         </div>

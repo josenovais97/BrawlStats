@@ -11,6 +11,9 @@ import { noteFor } from '@/lib/news-notes';
 import { getCatalogChanges } from '@/lib/stats';
 import type { CatalogChangeEntry } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getT } from '@/lib/t';
+import { localePath } from '@/lib/i18n';
+import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/news' },
@@ -33,6 +36,8 @@ function formatNewsDate(value: string): string {
 }
 
 export default async function UpdatesPage() {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   // Artwork (HTTP) overlaps with the database work, but the database reads run
   // one after another so the page never needs more than one connection.
   const [brawlerMeta, news] = await Promise.all([
@@ -46,15 +51,11 @@ export default async function UpdatesPage() {
   return (
     <div className="space-y-10">
       <PageHeading
-        eyebrow="Straight from the game"
-        title="News"
+        eyebrow={t('Straight from the game')}
+        title={t('News')}
         subtitle={
-          <>
-            Announcements from the Brawl Stars team, and the new brawlers and abilities detected
-            from the game API. For how the sampled meta is shifting, see the{' '}
-            <Link href="/tier-list/ranked" className="font-medium text-brand hover:underline">
-              Ranked tier list
-            </Link>
+          <>{t('Announcements from the Brawl Stars team, and the new brawlers and abilities detected from the game API. For how the sampled meta is shifting, see the')}{' '}
+            <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('Ranked tier list')}</Link>
             .
           </>
         }
@@ -62,13 +63,13 @@ export default async function UpdatesPage() {
 
       {news.length > 0 ? (
         <section>
-          <SectionHeading title="Official news" subtitle="Straight from the Brawl Stars team." />
+          <SectionHeading title={t('Official news')} subtitle={t('Straight from the Brawl Stars team.')} />
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {news.map((post) => (
               <a
                 key={post.url}
-                href={post.url}
+                href={lp(post.url)}
                 target="_blank"
                 rel="noreferrer"
                 className="card card-interactive group overflow-hidden"
@@ -95,11 +96,9 @@ export default async function UpdatesPage() {
                     {post.publishedAt ? <span>{formatNewsDate(post.publishedAt)}</span> : null}
                   </div>
                   <p className="mt-2 line-clamp-2 font-semibold leading-snug group-hover:text-brand">
-                    {post.title}
+                    {t(post.title)}
                   </p>
-                  <span className="mt-2 inline-flex items-center gap-1 text-xs text-muted">
-                    Read on supercell.com
-                    <ExternalLink className="size-3" />
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs text-muted">{t('Read on supercell.com')}<ExternalLink className="size-3" />
                   </span>
 
                   {/* Only where there is something to say — see lib/news-notes.
@@ -107,7 +106,7 @@ export default async function UpdatesPage() {
                       implication, and a note under those would be padding. */}
                   {noteFor(post.url) ? (
                     <span className="mt-3 block border-t border-border pt-3">
-                      <span className="eyebrow text-accent">What this means for the meta</span>
+                      <span className="eyebrow text-accent">{t('What this means for the meta')}</span>
                       <span className="mt-1 block text-xs leading-relaxed text-muted">
                         {noteFor(post.url)}
                       </span>
@@ -133,8 +132,8 @@ export default async function UpdatesPage() {
       {changes.length > 0 ? (
         <section>
           <SectionHeading
-            title="Detected game changes"
-            subtitle="New brawlers, star powers, gadgets and hypercharges."
+            title={t('Detected game changes')}
+            subtitle={t('New brawlers, star powers, gadgets and hypercharges.')}
           />
 
           <ol className="space-y-2">
@@ -194,9 +193,11 @@ const CHANGE_META: Record<
 };
 
 function ChangeRow({ change, imageUrl }: { change: CatalogChangeEntry; imageUrl?: string }) {
+  const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const meta = CHANGE_META[change.kind] ?? {
     icon: Star,
-    label: 'Change',
+    label: t('Change'),
     tone: 'text-muted',
     verb: 'changed on',
   };
@@ -204,7 +205,7 @@ function ChangeRow({ change, imageUrl }: { change: CatalogChangeEntry; imageUrl?
 
   return (
     <Link
-      href={brawlerPath(change.brawlerId, change.brawlerName)}
+      href={lp(brawlerPath(change.brawlerId, change.brawlerName))}
       className="card card-interactive flex items-center gap-3 p-3"
     >
       {imageUrl ? (
@@ -226,7 +227,7 @@ function ChangeRow({ change, imageUrl }: { change: CatalogChangeEntry; imageUrl?
             className={`inline-flex items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold ${meta.tone}`}
           >
             <Icon className="size-3" />
-            {meta.label}
+            {t(meta.label)}
           </span>
           <span className="truncate text-sm font-medium capitalize">
             {change.itemName
@@ -234,7 +235,7 @@ function ChangeRow({ change, imageUrl }: { change: CatalogChangeEntry; imageUrl?
               : `${change.brawlerName.toLowerCase()} ${meta.verb}`}
           </span>
         </p>
-        <p className="mt-0.5 text-xs text-muted">Detected {change.detectedOn}</p>
+        <p className="mt-0.5 text-xs text-muted">{t('Detected')}{' '}{change.detectedOn}</p>
       </div>
     </Link>
   );
