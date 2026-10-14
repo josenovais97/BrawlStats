@@ -491,12 +491,21 @@ print(data.get("publish_id") or "-", data.get("upload_url") or "-", (d.get("erro
   echo "uploaded ${DAY} video as ${PUBLISH_ID}"
 
   # Video is processed on TikTok's side before it reaches the inbox, which
-  # takes longer than fetching a few images.
-  wait_for_inbox 60
+  # takes longer than fetching a few images -- usually seconds, but on
+  # 2026-10-14 the counter video sat in PROCESSING_UPLOAD past five minutes
+  # and then arrived anyway. Fifteen minutes, then trust it: every byte was
+  # accepted (201), and a run that gives up there mails "FAILED" and never
+  # sends the caption for a post that is in fact on its way.
+  wait_for_inbox 180
   case "$STATUS" in
     SEND_TO_USER_INBOX|PUBLISH_COMPLETE) return 0 ;;
     FAILED) VIDEO_ERR="TikTok rejected the video after accepting it: ${FAIL_REASON}"; return 1 ;;
-    *) die "::error::the video did not reach a terminal state in five minutes (last seen: ${STATUS:-unknown}). Not falling back to the carousel: it may still arrive, and two drafts of one post would be worse." ;;
+    *)
+      # Not falling back to the carousel: it may still arrive, and two
+      # drafts of one post would be worse than a slow one.
+      echo "::warning::video still ${STATUS:-processing} after fifteen minutes; every byte was accepted, so treating it as on its way"
+      STATUS="SEND_TO_USER_INBOX (still processing)"
+      return 0 ;;
   esac
 }
 
