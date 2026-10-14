@@ -43,8 +43,14 @@ export function getPrisma(): PrismaClient | null {
        * The site itself opens no transactions, so this costs the pages nothing.
        * A minute is not a target; it is far enough above the measured worst
        * case that hitting it means something is actually wrong.
+       *
+       * Five minutes since 2026-10-14: the fold now aggregates whole lineups
+       * (pairs, teams, Ranked per rank), and on this 2-core box a build or a
+       * deploy running at the same time stretched one day's batch to 137s.
+       * Three roll-ups failed in two days that way. A failed fold is redone on
+       * the next run, so the cost was alert mail and two-hour-old stats.
        */
-      transactionOptions: { maxWait: 10_000, timeout: 60_000 },
+      transactionOptions: { maxWait: 10_000, timeout: 300_000 },
     });
   }
   return globalForPrisma.prisma;
