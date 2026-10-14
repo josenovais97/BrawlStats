@@ -4436,6 +4436,29 @@ export async function getBracketRoster(
   bracket: number,
   mode?: string,
 ): Promise<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | null> {
+  /*
+   * The precomputed row first (scripts/precompute.ts, after every sampler
+   * run). Each call here is a couple of seconds of lineup reads, and the
+   * Bubble's per-rank list makes one per mode in a row -- about ten seconds
+   * cold, on 2026-10-14, for a panel opened mid-draft.
+   */
+  const stored = await precomputed<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | 'none'>(
+    bracketRosterKey(bracket, mode),
+  );
+  if (stored === 'none') return null;
+  if (stored) return stored;
+  return compute_getBracketRoster(bracket, mode);
+}
+
+/** `precomputed_reads` key for one rank's list, all modes or one. */
+function bracketRosterKey(bracket: number, mode?: string): string {
+  return `bracket-roster:${bracket}:${mode ?? 'all'}`;
+}
+
+async function compute_getBracketRoster(
+  bracket: number,
+  mode?: string,
+): Promise<{ days: number; rows: BrawlerStatRow[]; scored: ScoredBrawler[] } | null> {
   const edges = await getSkillEdge('ranked').catch(() => new Map<number, SkillEdge>());
   for (const days of BRACKET_WINDOWS) {
     // Whole lineups first: all six brawlers of each battle, not the sampled
@@ -4733,6 +4756,12 @@ export async function getBracketMapPicks(
   perMap = 3,
   windowDays = RANKED_MAP_WINDOW_DAYS,
 ): Promise<RankedMapPicks[]> {
+  // The depths the site and the Bubble ask for are precomputed; any other
+  // shape is computed (and cached) as before.
+  if (windowDays === RANKED_MAP_WINDOW_DAYS && PRECOMPUTED_MAP_DEPTHS.includes(perMap)) {
+    const stored = await precomputed<RankedMapPicks[]>(`bracket-map-picks:${bracket}:${perMap}`);
+    if (stored) return stored;
+  }
   return cachedBracketMapPicks(bracket, perMap, windowDays);
 }
 
@@ -5176,12 +5205,39 @@ async function precomputed<T>(key: string): Promise<T | null> {
   }
 }
 
-/** The computations the precompute job runs, keyed as `precomputed` reads them. */
-export const PRECOMPUTE_JOBS: { key: string; run: () => Promise<unknown> }[] = [
-  { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
-  ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
-  ...[1, 2, 3, 4].map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
-];
+/** Map-pick depths that are precomputed: the rank pages' 60, the Bubble's 20. */
+const PRECOMPUTED_MAP_DEPTHS = [20, 60];
+
+const BRACKET_IDS = [1, 2, 3, 4];
+
+/**
+ * The computations the precompute job runs, keyed as `precomputed` reads them.
+ * A function rather than a list: the per-rank lists cover every Ranked mode
+ * with data, which is only known at run time.
+ */
+export async function precomputeJobs(): Promise<{ key: string; run: () => Promise<unknown>; keepEmpty?: boolean }[]> {
+  const modes = (await computeFilterableModes(30, 150, 'ranked').catch(() => [])).map((m) => m.mode);
+  return [
+    { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
+    ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
+    ...BRACKET_IDS.map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
+    // A rank too thin to list is stored as 'none', so the page shows every
+    // rank straight away instead of recomputing the same null each time.
+    ...BRACKET_IDS.flatMap((b) =>
+      [undefined, ...modes].map((mode) => ({
+        key: bracketRosterKey(b, mode),
+        run: async () => (await compute_getBracketRoster(b, mode)) ?? 'none',
+        keepEmpty: true,
+      })),
+    ),
+    ...BRACKET_IDS.flatMap((b) =>
+      PRECOMPUTED_MAP_DEPTHS.map((depth) => ({
+        key: `bracket-map-picks:${b}:${depth}`,
+        run: () => computeBracketMapPicks(b, depth, RANKED_MAP_WINDOW_DAYS),
+      })),
+    ),
+  ];
+}
 
 /** Letters and digits only, lowercased: "Belle's Rock" and "Belles Rock" agree. */
 export function mapNameKey(name: string): string {

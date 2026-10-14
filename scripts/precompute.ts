@@ -10,7 +10,7 @@
  * No top-level await: tsx compiles this to CommonJS.
  */
 import { getPrisma } from '@/lib/prisma';
-import { PRECOMPUTE_JOBS } from '@/lib/stats';
+import { precomputeJobs } from '@/lib/stats';
 
 function empty(value: unknown): boolean {
   if (Array.isArray(value)) return value.length === 0;
@@ -24,11 +24,11 @@ async function main(): Promise<void> {
   const prisma = getPrisma();
   if (!prisma) throw new Error('no database');
   let failed = 0;
-  for (const job of PRECOMPUTE_JOBS) {
+  for (const job of await precomputeJobs()) {
     const started = Date.now();
     try {
       const value = await job.run();
-      if (empty(value)) {
+      if (!job.keepEmpty && empty(value)) {
         console.log(`skipped ${job.key}: empty result`);
         continue;
       }
