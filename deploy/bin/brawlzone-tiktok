@@ -45,7 +45,7 @@ VIDEO_DIRECT_URL="https://open.tiktokapis.com/v2/post/publish/video/init/"
 # changed.
 FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
 
-# What to send: `video` (the default since 2026-10-14) or `photo`.
+# What to send: `photo` (the default) or `video`.
 #
 # TikTok gives video far more reach than photo carousels, and both come from
 # the same slides: the video is the carousel with a slow zoom on each slide
@@ -54,7 +54,11 @@ FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
 # TikTok's five pending uploads -- so a video REPLACES the carousel, and the
 # carousel is what goes out instead when the video cannot be made or TikTok
 # refuses it. A bad render must not cost the day's post.
-FORMAT="${TIKTOK_FORMAT:-video}"
+# Back to the carousel by default on 2026-10-14: TikTok's inbox upload
+# carries the caption for a photo post but not for a video, so every video
+# needed its caption pasted by hand -- and two went out without one. The
+# video path stays, behind TIKTOK_FORMAT=video.
+FORMAT="${TIKTOK_FORMAT:-photo}"
 
 # Back to MEDIA_UPLOAD on 2026-10-02 after a direct post was refused with
 # `unaudited_client_can_only_post_to_private_accounts`. See the note below the
