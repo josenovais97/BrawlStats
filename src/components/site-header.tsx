@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { BrandMark } from '@/components/brand-mark';
+import { LanguageMenu } from '@/components/i18n/language-menu';
 import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, stripLocale, type Locale } from '@/lib/i18n';
 import {
@@ -335,9 +336,13 @@ export function SiteHeader() {
             ) : null}
           </div>
 
+          <div className="ml-1">
+            <LanguageMenu />
+          </div>
+
           <Link
             href={`${href('/')}#search`}
-            className="ml-3 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink shadow-[0_2px_0_0_#b87d00] transition-colors hover:bg-brand-strong"
+            className="ml-2 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink shadow-[0_2px_0_0_#b87d00] transition-colors hover:bg-brand-strong"
           >
             <Search className="size-4" />
             {t('Search')}
@@ -345,6 +350,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:hidden">
+          <LanguageMenu compact />
           <Link
             href={`${href('/')}#search`}
             aria-label={t('searchLabel')}

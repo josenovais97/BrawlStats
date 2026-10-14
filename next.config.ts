@@ -69,6 +69,13 @@ const nextConfig: NextConfig = {
        * invite is ever regenerated, only this line changes and every link
        * already posted keeps working.
        */
+      /*
+       * /br for Brazil: the address Brazilian players guess. The site's
+       * Portuguese lives at /pt (the language, not the country), so /br is
+       * an alias for it and never a second copy.
+       */
+      { source: '/br', destination: '/pt', permanent: true },
+      { source: '/br/:path*', destination: '/pt/:path*', permanent: true },
       {
         source: '/discord',
         destination: 'https://discord.com/invite/964EMQBBUJ',
