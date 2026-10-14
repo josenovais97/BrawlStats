@@ -725,6 +725,14 @@ export const CLIENT_ES: Record<string, string> = {
     "Asesino",
   "Artillery":
     "Artillería",
+  "Type a brawler, e.g. Shade":
+    "Escribe un brawler, p. ej. Shade",
+  "Brawler to counter":
+    "Brawler a counterear",
+  "Counters":
+    "Counters",
+  "No brawler by that name.":
+    "No hay ningún brawler con ese nombre.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1449,4 +1457,12 @@ export const CLIENT_PT: Record<string, string> = {
     "Algoz",
   "Artillery":
     "Detonador",
+  "Type a brawler, e.g. Shade":
+    "Digite um brawler, ex.: Shade",
+  "Brawler to counter":
+    "Brawler para counterar",
+  "Counters":
+    "Counters",
+  "No brawler by that name.":
+    "Nenhum brawler com esse nome.",
 };

@@ -3594,4 +3594,28 @@ export const ES: Record<string, string> = {
     "Asesino",
   "Artillery":
     "Artillería",
+  "Play your rank, beat the meta":
+    "Juega a tu rango, vence al meta",
+  "The meta at your rank is not the meta at the top. And every pick has an answer.":
+    "El meta de tu rango no es el de arriba del todo. Y cada elección tiene respuesta.",
+  "Tier list at your rank":
+    "Tier list de tu rango",
+  "Built only from battles played at that rank.":
+    "Hecha solo con partidas jugadas en ese rango.",
+  "How to counter…":
+    "Cómo counterear a…",
+  "The brawlers picked most in Ranked this week. Tap one for what beats it, at every rank.":
+    "Los brawlers más elegidos en Competitivo esta semana. Toca uno para ver quién le gana, en cada rango.",
+  "How to counter {name}":
+    "Cómo counterear a {name}",
+  "{rate} picked":
+    "{rate} de uso",
+  "Type a brawler, e.g. Shade":
+    "Escribe un brawler, p. ej. Shade",
+  "Brawler to counter":
+    "Brawler a counterear",
+  "Counters":
+    "Counters",
+  "No brawler by that name.":
+    "No hay ningún brawler con ese nombre.",
 };

@@ -7,6 +7,7 @@ import { HomeCta } from '@/components/home/home-cta';
 import { HomeHero } from '@/components/home/home-hero';
 import { HomeLatestPost } from '@/components/home/home-latest-post';
 import { HomeRadarSection } from '@/components/home/home-radar-section';
+import { HomeYourRank } from '@/components/home/home-your-rank';
 import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
@@ -147,6 +148,12 @@ export default function HomePage() {
       */}
       <Suspense fallback={<Skeleton className="h-72 rounded-2xl" />}>
         <HomeRadarSection />
+      </Suspense>
+
+      {/* What is strong at my rank, and what beats what I keep losing to:
+          the rank tier lists and counters pages, which nothing here led to. */}
+      <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
+        <HomeYourRank />
       </Suspense>
 
       {/*
