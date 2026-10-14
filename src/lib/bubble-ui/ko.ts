@@ -80,6 +80,7 @@ const ko: UiStrings = {
   'draft.beats': "{name} 카운터",
   'draft.noCounters': "{name} 상대 전투 데이터가 아직 부족합니다.",
   'draft.removeShort': "제거",
+  'draft.allCounters': "카운터 전체 보기 →",
   'update.upToDate': '앱 {version} · 최신 버전',
   'update.isOut': '{version} 버전이 나왔어요',
   'update.youHave': '— 현재 {version}',

@@ -80,6 +80,7 @@ const ar: UiStrings = {
   'draft.beats': "من يهزم {name}",
   'draft.noCounters': "لا توجد معارك كافية ضد {name} بعد.",
   'draft.removeShort': "إزالة",
+  'draft.allCounters': "كل المضادات ←",
   'update.upToDate': 'التطبيق {version} · محدّث',
   'update.isOut': 'صدر الإصدار {version}',
   'update.youHave': '— لديك {version}',

@@ -80,6 +80,7 @@ const id: UiStrings = {
   'draft.beats': "Siapa yang mengalahkan {name}",
   'draft.noCounters': "Belum cukup pertarungan melawan {name}.",
   'draft.removeShort': "Hapus",
+  'draft.allCounters': "Semua counter →",
   'update.upToDate': 'Aplikasi {version} · terbaru',
   'update.isOut': 'Versi {version} sudah rilis',
   'update.youHave': '— kamu punya {version}',

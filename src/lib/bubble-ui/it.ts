@@ -80,6 +80,7 @@ const it: UiStrings = {
   'draft.beats': "Chi batte {name}",
   'draft.noCounters': "Non ci sono ancora abbastanza battaglie contro {name}.",
   'draft.removeShort': "Rimuovi",
+  'draft.allCounters': "Tutti i counter →",
   'update.upToDate': 'App {version} · aggiornata',
   'update.isOut': 'È uscita la versione {version}',
   'update.youHave': '— hai la {version}',

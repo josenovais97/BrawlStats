@@ -80,6 +80,7 @@ const fi: UiStrings = {
   'draft.beats': "Kuka voittaa: {name}",
   'draft.noCounters': "Ei vielä tarpeeksi otteluita vastaan: {name}.",
   'draft.removeShort': "Poista",
+  'draft.allCounters': "Kaikki vastavalinnat →",
   'update.upToDate': 'Sovellus {version} · ajan tasalla',
   'update.isOut': 'Versio {version} on julkaistu',
   'update.youHave': '– sinulla on {version}',

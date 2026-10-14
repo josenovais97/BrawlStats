@@ -80,6 +80,7 @@ const pl: UiStrings = {
   'draft.beats': "Kto pokonuje {name}",
   'draft.noCounters': "Za mało bitew przeciwko {name}.",
   'draft.removeShort': "Usuń",
+  'draft.allCounters': "Wszystkie kontry →",
   'update.upToDate': 'Aplikacja {version} · aktualna',
   'update.isOut': 'Wyszła wersja {version}',
   'update.youHave': '— masz {version}',

@@ -96,6 +96,7 @@ export const UI_EN = {
   'draft.beats': "Who beats {name}",
   'draft.noCounters': "Not enough battles against {name} yet.",
   'draft.removeShort': "Remove",
+  'draft.allCounters': "All counters →",
 
   'update.upToDate': 'App {version} · up to date',
   'update.isOut': 'Version {version} is out',

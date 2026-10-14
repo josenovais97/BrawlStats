@@ -80,6 +80,7 @@ const zhHans: UiStrings = {
   'draft.beats': "克制{name}的英雄",
   'draft.noCounters': "对阵{name}的对战数据还不够。",
   'draft.removeShort': "移除",
+  'draft.allCounters': "全部克制 →",
   'update.upToDate': '应用 {version} · 已是最新',
   'update.isOut': '{version} 版本已发布',
   'update.youHave': '— 你的是 {version}',

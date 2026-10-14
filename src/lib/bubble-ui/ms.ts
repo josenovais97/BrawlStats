@@ -80,6 +80,7 @@ const ms: UiStrings = {
   'draft.beats': "Siapa yang menewaskan {name}",
   'draft.noCounters': "Belum cukup pertarungan menentang {name}.",
   'draft.removeShort': "Buang",
+  'draft.allCounters': "Semua counter →",
   'update.upToDate': 'Aplikasi {version} · terkini',
   'update.isOut': 'Versi {version} sudah keluar',
   'update.youHave': '— anda ada {version}',

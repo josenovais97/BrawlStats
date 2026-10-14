@@ -80,6 +80,7 @@ const th: UiStrings = {
   'draft.beats': "ใครชนะ {name}",
   'draft.noCounters': "ยังมีการต่อสู้กับ {name} ไม่พอ",
   'draft.removeShort': "นำออก",
+  'draft.allCounters': "เคาน์เตอร์ทั้งหมด →",
   'update.upToDate': 'แอป {version} · เป็นเวอร์ชันล่าสุด',
   'update.isOut': 'เวอร์ชัน {version} ออกแล้ว',
   'update.youHave': '— คุณใช้ {version}',

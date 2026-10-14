@@ -80,6 +80,7 @@ const ru: UiStrings = {
   'draft.beats': "Кто побеждает {name}",
   'draft.noCounters': "Пока мало боёв против {name}.",
   'draft.removeShort': "Убрать",
+  'draft.allCounters': "Все контрпики →",
   'update.upToDate': 'Приложение {version} · обновлено',
   'update.isOut': 'Вышла версия {version}',
   'update.youHave': '— у тебя {version}',

@@ -80,6 +80,7 @@ const vi: UiStrings = {
   'draft.beats': "Ai khắc chế {name}",
   'draft.noCounters': "Chưa đủ trận đấu với {name}.",
   'draft.removeShort': "Xóa",
+  'draft.allCounters': "Tất cả khắc chế →",
   'update.upToDate': 'Ứng dụng {version} · mới nhất',
   'update.isOut': 'Đã có phiên bản {version}',
   'update.youHave': '— bạn đang dùng {version}',

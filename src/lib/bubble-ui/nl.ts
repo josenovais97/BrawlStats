@@ -80,6 +80,7 @@ const nl: UiStrings = {
   'draft.beats': "Wie {name} verslaat",
   'draft.noCounters': "Nog niet genoeg gevechten tegen {name}.",
   'draft.removeShort': "Verwijderen",
+  'draft.allCounters': "Alle counters →",
   'update.upToDate': 'App {version} · bijgewerkt',
   'update.isOut': 'Versie {version} is uit',
   'update.youHave': '— jij hebt {version}',

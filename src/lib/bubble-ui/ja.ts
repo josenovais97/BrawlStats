@@ -80,6 +80,7 @@ const ja: UiStrings = {
   'draft.beats': "{name}に強いキャラ",
   'draft.noCounters': "{name}との対戦データがまだ足りません。",
   'draft.removeShort': "外す",
+  'draft.allCounters': "カウンター一覧 →",
   'update.upToDate': 'アプリ {version} · 最新',
   'update.isOut': 'バージョン{version}が公開されました',
   'update.youHave': '— 現在 {version}',

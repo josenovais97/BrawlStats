@@ -8,6 +8,7 @@ import { recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/compo
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { UiKey } from '@/lib/bubble-ui-en';
 import { panelTrack } from '@/lib/panel-telemetry';
+import { slugify } from '@/lib/slugs';
 import type { PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 
 /**
@@ -809,8 +810,12 @@ function EnemyCounters({
   onRemove: () => void;
   onClose: () => void;
 }) {
-  const { t } = usePanelI18n();
+  const { t, lang } = usePanelI18n();
   const [counters, setCounters] = useState<Counter[] | null>(null);
+  // The site's full counters page, in the panel's language where the site has
+  // it. The app opens any link outside the panel in the phone's browser.
+  const sitePrefix = lang.startsWith('es') ? '/es' : lang.startsWith('pt') ? '/pt' : '';
+  const english = byId.get(id)?.brawlerName;
   const name = byId.get(id)?.localName ?? String(id);
 
   useEffect(() => {
@@ -877,6 +882,14 @@ function EnemyCounters({
           })}
         </ol>
       )}
+      {english ? (
+        <a
+          href={`${sitePrefix}/brawlers/${slugify(english)}/counters`}
+          className="block text-[10px] font-semibold text-brand"
+        >
+          {t('draft.allCounters')}
+        </a>
+      ) : null}
     </div>
   );
 }

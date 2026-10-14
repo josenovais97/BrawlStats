@@ -80,6 +80,7 @@ const he: UiStrings = {
   'draft.beats': "מי מנצח את {name}",
   'draft.noCounters': "עדיין אין מספיק קרבות נגד {name}.",
   'draft.removeShort': "הסרה",
+  'draft.allCounters': "כל הנגדים ←",
   'update.upToDate': 'אפליקציה {version} · מעודכנת',
   'update.isOut': 'גרסה {version} יצאה',
   'update.youHave': '— אצלכם {version}',

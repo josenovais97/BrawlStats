@@ -80,6 +80,7 @@ const tr: UiStrings = {
   'draft.beats': "{name} karşısında kim kazanır",
   'draft.noCounters': "{name} karşısında henüz yeterli maç yok.",
   'draft.removeShort': "Kaldır",
+  'draft.allCounters': "Tüm karşı seçimler →",
   'update.upToDate': 'Uygulama {version} · güncel',
   'update.isOut': '{version} sürümü çıktı',
   'update.youHave': '— sendeki {version}',

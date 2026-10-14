@@ -81,6 +81,7 @@ const pt: UiStrings = {
   'draft.beats': "Quem ganha de {name}",
   'draft.noCounters': "Ainda não há partidas suficientes contra {name}.",
   'draft.removeShort': "Remover",
+  'draft.allCounters': "Todos os counters →",
   'update.upToDate': 'App {version} · atualizado',
   'update.isOut': 'Saiu a versão {version}',
   'update.youHave': '— você tem a {version}',
