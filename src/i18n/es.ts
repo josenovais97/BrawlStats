@@ -3618,4 +3618,6 @@ export const ES: Record<string, string> = {
     "Counters",
   "No brawler by that name.":
     "No hay ningún brawler con ese nombre.",
+  "Two accounts? Every tag you use is saved, and the app shows the others under “Switch account”: one tap swaps, a long press forgets one.":
+    "¿Dos cuentas? Cada tag que usas queda guardado, y la app muestra las otras en “Cambiar de cuenta”: un toque para cambiar, mantén presionado para olvidar una.",
 };

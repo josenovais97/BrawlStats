@@ -1,0 +1,14 @@
+{
+ "Play your rank, beat the meta": ["Juega a tu rango, vence al meta", "Jogue no seu rank, vença o meta"],
+ "The meta at your rank is not the meta at the top. And every pick has an answer.": ["El meta de tu rango no es el de arriba del todo. Y cada elección tiene respuesta.", "O meta do seu rank não é o do topo. E toda escolha tem resposta."],
+ "Tier list at your rank": ["Tier list de tu rango", "Tier list do seu rank"],
+ "Built only from battles played at that rank.": ["Hecha solo con partidas jugadas en ese rango.", "Feita só com partidas jogadas nesse rank."],
+ "How to counter…": ["Cómo counterear a…", "Como counterar…"],
+ "The brawlers picked most in Ranked this week. Tap one for what beats it, at every rank.": ["Los brawlers más elegidos en Competitivo esta semana. Toca uno para ver quién le gana, en cada rango.", "Os brawlers mais escolhidos no Ranqueado nesta semana. Toque num para ver quem ganha dele, em cada rank."],
+ "How to counter {name}": ["Cómo counterear a {name}", "Como counterar {name}"],
+ "{rate} picked": ["{rate} de uso", "{rate} de escolha"],
+ "Type a brawler, e.g. Shade": ["Escribe un brawler, p. ej. Shade", "Digite um brawler, ex.: Shade"],
+ "Brawler to counter": ["Brawler a counterear", "Brawler para counterar"],
+ "Counters": ["Counters", "Counters"],
+ "No brawler by that name.": ["No hay ningún brawler con ese nombre.", "Nenhum brawler com esse nome."]
+}
