@@ -4,6 +4,7 @@ import Script from 'next/script';
 
 import { InstallPrompt } from '@/components/install-prompt';
 import { PwaTelemetry } from '@/components/pwa-telemetry';
+import { LanguageSuggest } from '@/components/i18n/language-suggest';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -100,6 +101,7 @@ export default function RootLayout({
       <body className="antialiased">
         <div className="flex min-h-dvh flex-col">
           <SiteHeader />
+          <LanguageSuggest />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
             {children}
           </main>
