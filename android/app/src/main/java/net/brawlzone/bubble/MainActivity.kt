@@ -21,6 +21,7 @@ import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat.Type
 
 /**
  * The launcher screen, which exists to do one thing: get the overlay permission
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         gameType(findViewById(R.id.scroll))
+        fitSystemBars()
 
         statusText = findViewById(R.id.status_text)
         statusDot = findViewById(R.id.status_dot)
@@ -95,6 +97,45 @@ class MainActivity : AppCompatActivity() {
             stopService(Intent(this, BubbleService::class.java))
         }
         offerTile()
+    }
+
+    /**
+     * Keeps the screen clear of the status bar, navigation bar, cutouts and
+     * keyboard (1.30).
+     *
+     * Targeting Android 15+ draws every activity edge to edge whether it asks
+     * or not, so without this the hero sat under the clock and the last card
+     * under the gesture bar. Opting in on every version makes older phones
+     * behave the same way rather than keeping two layouts. The padding goes on
+     * the scroll view with clipToPadding off, so the page still scrolls under
+     * the bars but always comes to rest clear of them; the keyboard takes the
+     * bottom when it is up, and the focused field (the tag) is scrolled back
+     * into view above it.
+     */
+    private fun fitSystemBars() {
+        val scroll = findViewById<android.widget.ScrollView>(R.id.scroll)
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        scroll.clipToPadding = false
+        val gap = (16 * resources.displayMetrics.density).toInt()
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(scroll) { view, insets ->
+            val bars = insets.getInsets(Type.systemBars() or Type.displayCutout())
+            val ime = insets.getInsets(Type.ime()).bottom
+            view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime))
+            if (ime > 0) {
+                view.findFocus()?.let { focused ->
+                    view.post {
+                        val box = android.graphics.Rect()
+                        focused.getDrawingRect(box)
+                        scroll.offsetDescendantRectToMyCoords(focused, box)
+                        val visibleBottom = scroll.scrollY + scroll.height - scroll.paddingBottom
+                        if (box.bottom + gap > visibleBottom) {
+                            scroll.smoothScrollBy(0, box.bottom + gap - visibleBottom)
+                        }
+                    }
+                }
+            }
+            insets
+        }
     }
 
     /**

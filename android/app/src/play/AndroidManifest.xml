@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Google Play build (1.30). Play updates the app itself and its policy
+  allows REQUEST_INSTALL_PACKAGES only for apps whose purpose is installing
+  packages, so the self-update permission the site build needs is removed here.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:node="remove" />
+</manifest>

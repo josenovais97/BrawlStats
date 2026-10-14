@@ -1381,6 +1381,12 @@ class BubbleService : Service() {
         collapsePanel()
 
         val isApk = uri.lastPathSegment?.endsWith(".apk", ignoreCase = true) == true
+        if (isApk && BuildConfig.STORE == "play") {
+            // The Play build never fetches an APK (1.30): Play's policy allows
+            // no update route but Play's own, so an APK link opens the listing.
+            openExternally(Uri.parse(PLAY_LISTING))
+            return
+        }
         if (isApk && downloadApk(uri)) return
 
         val opened = runCatching {
@@ -1708,6 +1714,12 @@ class BubbleService : Service() {
          * can be told about an update it does not contain.
          */
         private val PANEL_URL =
-            BuildConfig.PANEL_ORIGIN + "/bubble/panel?app=bubble#v=" + BuildConfig.VERSION_CODE
+            BuildConfig.PANEL_ORIGIN + "/bubble/panel?app=bubble#v=" + BuildConfig.VERSION_CODE +
+                // Which build is asking (1.30): the Play build is updated by
+                // Play, so the panel offers no download to it.
+                "&s=" + BuildConfig.STORE
+
+        private const val PLAY_LISTING =
+            "https://play.google.com/store/apps/details?id=net.brawlzone.bubble"
     }
 }

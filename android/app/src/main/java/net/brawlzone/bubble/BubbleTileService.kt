@@ -29,6 +29,8 @@ class BubbleTileService : TileService() {
         render()
     }
 
+    // The deprecated Intent form below runs on Android 13 and older only.
+    @android.annotation.SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
         if (BubbleService.running) {
@@ -47,6 +49,8 @@ class BubbleTileService : TileService() {
                     ),
                 )
             } else {
+                // Android 13 and older only, where the Intent form is the one
+                // that exists; the PendingIntent form above covers 14+.
                 startActivityAndCollapse(intent)
             }
             return

@@ -25,12 +25,17 @@ val hasSigning = keystoreProps.getProperty("storeFile") != null
 
 android {
   namespace = "net.brawlzone.bubble"
-  compileSdk = 34
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "net.brawlzone.bubble"
     minSdk = 26
-    targetSdk = 34
+    /*
+     * Android 16. Google Play refuses new apps and updates that target less
+     * since 2026-08-31. Targeting 35+ also makes the launcher screen draw edge
+     * to edge (see MainActivity.fitSystemBars).
+     */
+    targetSdk = 36
     versionCode = 50
     versionName = "1.29"
 
@@ -43,6 +48,32 @@ android {
      * without shipping one of them first.
      */
     buildConfigField("String", "PANEL_ORIGIN", "\"https://brawlzone.net\"")
+  }
+
+  /*
+   * Two builds of the same app, same package and same key, so either one
+   * installs as an update over the other (1.30).
+   *
+   * `site` is the APK served from brawlzone.net: it fetches its own updates,
+   * because nothing else will tell a sideloaded install a new version exists.
+   * `play` is what goes to Google Play, whose policy forbids an app updating
+   * itself by any route but Play's -- so it has no updater and does not ask
+   * for REQUEST_INSTALL_PACKAGES (removed in src/play/AndroidManifest.xml),
+   * and it tells the panel so, which then leaves updates to Play.
+   *
+   *   ./gradlew assembleSiteRelease   # the APK for the site
+   *   ./gradlew bundlePlayRelease     # the .aab for Google Play
+   */
+  flavorDimensions += "store"
+  productFlavors {
+    create("site") {
+      dimension = "store"
+      buildConfigField("String", "STORE", "\"site\"")
+    }
+    create("play") {
+      dimension = "store"
+      buildConfigField("String", "STORE", "\"play\"")
+    }
   }
 
   buildTypes {

@@ -43,6 +43,13 @@ export function PanelUpdate({
   // client can actually answer the question.
   if (hash === null) return null;
 
+  /*
+   * The Google Play build (app 1.30+, `&s=play` in the hash) is updated by
+   * Play, and Play's policy forbids pointing it at any other route. No banner,
+   * no download: Play shows its own update when the release reaches it.
+   */
+  if (/(?:^|[#&])s=play(?:&|$)/.test(hash)) return null;
+
   const running = parseVersion(hash);
 
   /*
