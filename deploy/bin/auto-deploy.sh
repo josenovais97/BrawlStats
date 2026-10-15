@@ -83,9 +83,25 @@ rm -f "$FAIL_STATE"
 
 local=$(git rev-parse HEAD)
 remote=$(git rev-parse origin/main)
-[ "$local" = "$remote" ] && [ "$force" -eq 0 ] && exit 0
+# The commit the last deploy actually FINISHED, written as its very last step.
+#
+# HEAD alone cannot say that: the reset below moves it before the build, so a
+# deploy killed mid-build (the unit's timeout, 2026-10-15 08:55, right after a
+# cache prune made the next build cold) left HEAD on the new commit and every
+# later run concluded there was nothing to do. A missing or different marker
+# now means "build it again".
+BUILT_STATE="$HOME/.brawlzone-built"
+built=$(cat "$BUILT_STATE" 2>/dev/null || true)
+unfinished=0
+[ "$local" = "$remote" ] && [ "$built" != "$local" ] && unfinished=1
 
-if [ "$local" = "$remote" ]; then
+[ "$local" = "$remote" ] && [ "$force" -eq 0 ] && [ "$unfinished" -eq 0 ] && exit 0
+
+if [ "$local" = "$remote" ] && [ "$force" -eq 0 ]; then
+  echo "The last deploy of ${local:0:7} did not finish; building it again"
+  changed=0
+  caddy_changed=0
+elif [ "$local" = "$remote" ]; then
   echo "Forced rebuild at ${local:0:7} (no new commits; refreshing dated titles)"
   changed=0
   caddy_changed=0
@@ -234,3 +250,4 @@ fi
 echo "Reclaimed ${freed} of images and ${freed_cache} of build cache"
 
 echo "Now on $(git log --oneline -1)"
+git rev-parse HEAD > "$BUILT_STATE"
