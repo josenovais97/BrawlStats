@@ -3784,4 +3784,6 @@ export const ES: Record<string, string> = {
     "Tu tag, una vez",
   "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
     "Un recorrido de 51 segundos por BrawlZone Bubble: la burbuja flotando sobre Brawl Stars, las mejores elecciones para el mapa exacto, la build que usan los jugadores, el panel en tu idioma y los ajustes de tamaño y transparencia de la burbuja.",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.":
+    "Instala BrawlZone Bubble desde su página en Play Store. ¿Ya tienes la versión de este sitio? Play la instala encima y conserva tu tag y tus ajustes. Si Play dice que no encuentra la app, espera un poco y vuelve a intentarlo: Google puede tardar en dejar entrar a un tester nuevo.",
 };

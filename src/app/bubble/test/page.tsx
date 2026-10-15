@@ -48,7 +48,7 @@ export default function BubbleTestPage() {
     },
     {
       title: t('Install from Google Play'),
-      body: t('Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings.'),
+      body: t('Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.'),
       href: PLAY_TEST.listingUrl,
       cta: t('Open Google Play'),
     },
