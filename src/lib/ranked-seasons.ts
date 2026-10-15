@@ -58,6 +58,19 @@ const FALLBACK_SEASONS: RankedSeason[] = [
     trialBrawlers: ['Trunk', 'Willow', 'Kaze'],
     featuredMode: 'Brawl Ball',
   },
+  {
+    // Pierce was swapped for Amber on 2026-09-22.
+    number: 49,
+    startsOn: '2026-09-17',
+    trialBrawlers: ['Ash', 'Mortis', 'Amber'],
+    featuredMode: 'Hot Zone',
+  },
+  {
+    number: 50,
+    startsOn: '2026-10-15',
+    trialBrawlers: ['Pearl', 'Byron', 'Sirius'],
+    featuredMode: 'Brawl Ball',
+  },
 ];
 
 /**
@@ -171,44 +184,56 @@ function boundaryAfter(today: number): string {
 
 /** Every `[[File:Name.png|…|link=Target]]` in a chunk, as `[name, target]`. */
 function fileLinks(text: string): [string, string][] {
-  return [...text.matchAll(/\[\[File:([^.|\]]+)[^\]]*?link=([^\]|]+)\]\]/g)].map(
+  // The whole file name, extension dropped: "Mr. P1-pfp.png" must stay one
+  // name, not stop at the dot and be mistaken for the featured mode.
+  return [...text.matchAll(/\[\[File:([^|\]]+?)\.(?:png|jpe?g|gif|webp)[^\]]*?link=([^\]|]+)\]\]/gi)].map(
     (m) => [m[1].trim(), m[2].trim()] as [string, string],
   );
 }
 
+/** A brawler's picture in the trial table: "Berry Portrait" before, "Pearl1-pfp" since 2026-10. */
+const BRAWLER_FILE = /portrait|-pfp$/i;
+
 /**
  * Pulls the trial-brawler table out of the page.
  *
- * Rows look like:
- *   |47||July 16, 2026||[[File:Berry Portrait.png|x41px|link=Berry]]…||
- *   [[File:Gem Grab.png|x41px|link=Gem Grab]]
+ * Rows look like (since 2026-10, one line each, no `|-` between them):
+ *   |50||October 15, 2026||[[File:Pearl1-pfp.png|x41px|link=Pearl]]…||[[File:Brawl Ball.png|x41px|link=Brawl Ball]]{{br}}
+ *   |49||September 17, 2026<ref>…</ref>||[[File:Ash1-pfp.png|x41px|link=Ash]]…
+ * and before that, separated by `|-`, with "Portrait" files and the mode cell
+ * sometimes wrapped onto its own line.
  *
- * Brawlers and the featured mode are told apart by the file name rather than
- * by position, because the mode cell wraps onto its own line and is sometimes
- * absent entirely.
+ * So a row is everything from one `|<number>||<date>` line to the next, which
+ * reads both layouts. Brawlers and the featured mode are told apart by the
+ * file name rather than by position, because the mode cell wraps and is
+ * sometimes absent. The October 2026 layout change made the old `|-` split
+ * find nothing, and the page silently fell back to season 48.
  */
-function parseSeasons(wikitext: string): RankedSeason[] {
+export function parseSeasons(wikitext: string): RankedSeason[] {
   const start = wikitext.indexOf('==Trial Brawlers==');
   if (start === -1) return [];
   const end = wikitext.indexOf('\n==', start + 5);
   const section = wikitext.slice(start, end === -1 ? undefined : end);
 
+  const rowStart = /^\|(\d+)\|\|\s*([A-Z][a-z]+ \d{1,2}, \d{4})/gm;
+  const starts = [...section.matchAll(rowStart)];
   const seasons: RankedSeason[] = [];
 
-  for (const chunk of section.split('|-')) {
-    const row = /^\s*\|(\d+)\|\|\s*([A-Z][a-z]+ \d{1,2}, \d{4})\s*\|\|/.exec(chunk);
-    if (!row) continue;
-
+  starts.forEach((row, i) => {
     const startsOn = toIsoDate(row[2]);
-    if (!startsOn) continue;
+    if (!startsOn) return;
+    // Footnotes can hold links of their own; they are not part of the row.
+    const chunk = section
+      .slice(row.index, starts[i + 1]?.index ?? section.length)
+      .replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, '');
 
     const links = fileLinks(chunk);
     const trialBrawlers = links
-      .filter(([file]) => /portrait/i.test(file))
+      .filter(([file]) => BRAWLER_FILE.test(file))
       .map(([, target]) => target);
-    const featured = links.find(([file]) => !/portrait/i.test(file));
+    const featured = links.find(([file]) => !BRAWLER_FILE.test(file));
 
-    if (trialBrawlers.length === 0) continue;
+    if (trialBrawlers.length === 0) return;
 
     seasons.push({
       number: Number(row[1]),
@@ -216,7 +241,7 @@ function parseSeasons(wikitext: string): RankedSeason[] {
       trialBrawlers,
       ...(featured ? { featuredMode: featured[1] } : {}),
     });
-  }
+  });
 
   return seasons.sort((a, b) => a.startsOn.localeCompare(b.startsOn));
 }
@@ -228,7 +253,7 @@ function parseSeasons(wikitext: string): RankedSeason[] {
  * mode cell is recognised by its `65xpx` thumbnail (the table's own convention,
  * typo included) and map cells by the `-Map.png` suffix.
  */
-function parseMapPool(wikitext: string): { season: number | null; pool: MapPoolEntry[] } {
+export function parseMapPool(wikitext: string): { season: number | null; pool: MapPoolEntry[] } {
   const start = wikitext.indexOf('==Maps==');
   if (start === -1) return { season: null, pool: [] };
   const end = wikitext.indexOf('\n==', start + 5);
@@ -283,10 +308,12 @@ async function fetchWiki(): Promise<{
     const wikitext = body?.parse?.wikitext?.['*'];
     if (typeof wikitext !== 'string') return null;
 
+    // Each half stands alone: a table the parser no longer reads must not take
+    // the other one down with it, which is how a broken season table also
+    // emptied the map pool in October 2026.
     const seasons = parseSeasons(wikitext);
-    if (seasons.length === 0) return null;
-
     const { season, pool } = parseMapPool(wikitext);
+    if (seasons.length === 0 && pool.length === 0) return null;
     return { seasons, mapPool: pool, mapPoolSeason: season };
   } catch {
     return null;
@@ -312,7 +339,7 @@ export async function getSeasonState(now: Date = new Date()): Promise<SeasonStat
     getBrawlers().catch(() => [] as BABrawler[]),
   ]);
 
-  const seasons = wiki?.seasons ?? FALLBACK_SEASONS;
+  const seasons = wiki?.seasons.length ? wiki.seasons : FALLBACK_SEASONS;
   const bySlug = new Map(brawlers.map((b) => [slugify(b.name), b]));
   const today = startOfUtcDay(now);
 
