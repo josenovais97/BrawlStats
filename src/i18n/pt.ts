@@ -3786,4 +3786,30 @@ export const PT: Record<string, string> = {
     "Um tour de 51 segundos pelo BrawlZone Bubble: a bolha flutuando sobre o Brawl Stars, as melhores escolhas para o mapa exato, a build que os jogadores usam, o painel no seu idioma e os ajustes de tamanho e transparência da bolha.",
   "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.":
     "Instale o BrawlZone Bubble pela página dele na Play Store. Já tem a versão deste site? O Play instala por cima e mantém sua tag e suas configurações. Se o Play disser que não encontrou o app, espere um pouco e tente de novo: o Google pode demorar para liberar um testador novo.",
+  "A draft helper that floats over Brawl Stars. Tap it mid-draft, tap again and it folds away.":
+    "Um ajudante de draft que flutua sobre o Brawl Stars. Toque no meio do draft e toque de novo para recolher.",
+  "About the group":
+    "Sobre o grupo",
+  "Free":
+    "Grátis",
+  "Keeps your tag and settings":
+    "Mantém sua tag e configurações",
+  "No ads":
+    "Sem anúncios",
+  "Now on Google Play":
+    "Agora no Google Play",
+  "Start with step 1":
+    "Comece pelo passo 1",
+  "Then Google reviews the app for everyone. Every tester who stays the two weeks brings that day closer.":
+    "Depois o Google revisa o app para todo mundo. Cada testador que fica as duas semanas deixa esse dia mais perto.",
+  "Three taps":
+    "Três toques",
+  "Updates through Google Play":
+    "Atualiza pelo Google Play",
+  "What you are testing":
+    "O que você vai testar",
+  "{days} days":
+    "{days} dias",
+  "{n} testers":
+    "{n} testadores",
 };
