@@ -24,6 +24,8 @@ export function HomePlayTest() {
   return (
     <Link
       href={href}
+      data-umami-event="playtest_entry"
+      data-umami-event-from="home"
       className="card card-glow card-interactive flex flex-col gap-5 border-victory/40 p-5 sm:flex-row sm:items-center sm:p-6"
     >
       <Image

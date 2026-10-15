@@ -323,6 +323,8 @@ export function SiteFooter() {
               <Link
                 href={href(BUBBLE_PATH)}
                 prefetch={false}
+                data-umami-event="playtest_entry"
+                data-umami-event-from="footer"
                 aria-label={t('googlePlay')}
                 className="rounded transition-opacity hover:opacity-80"
               >

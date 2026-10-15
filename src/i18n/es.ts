@@ -3818,4 +3818,6 @@ export const ES: Record<string, string> = {
     "¿Tu teléfono no tiene Google Play?",
   "Download the APK":
     "Descargar el APK",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, and tapping the buttons that lead into the Google Play test. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "También se cuentan algunos eventos con nombre, todos anónimos: instalar la app web, abrirla, tocar la descarga de Android y tocar los botones que llevan a la prueba de Google Play. El evento de descarga indica desde qué página vino y qué versión se ofreció, para distinguir una actualización de una primera instalación. Nada más.",
 };

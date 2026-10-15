@@ -209,11 +209,13 @@ export default function BubblePage() {
             {PLAY_TEST.open ? (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-4">
-                  <Link href={lp('/bubble/test')} aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
+                  <Link href={lp('/bubble/test')} data-umami-event="playtest_entry" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
                     <GooglePlayBadge className="h-14 w-auto" />
                   </Link>
                   <Link
                     href={lp('/bubble/test')}
+                    data-umami-event="playtest_entry"
+                    data-umami-event-from="bubble"
                     className="inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
                   >
                     {t('Join the test')}
@@ -670,7 +672,7 @@ export default function BubblePage() {
         <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.', { v: bubbleAppSize() })}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           {PLAY_TEST.open ? (
-            <Link href={lp('/bubble/test')} aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
+            <Link href={lp('/bubble/test')} data-umami-event="playtest_entry" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
               <GooglePlayBadge className="h-[3.25rem] w-auto" />
             </Link>
           ) : null}

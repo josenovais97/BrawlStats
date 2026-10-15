@@ -13,6 +13,8 @@ REPO=/home/ubuntu/brawlstats
 # the parent for three weeks, so every digest reported zero requests.
 ACCESS=/var/log/brawlzone/access/access.log
 psql() { (cd "$REPO" && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc "$1" 2>/dev/null); }
+# Umami lives in its own database on the same server.
+umami() { (cd "$REPO" && docker compose exec -T db psql -U brawlzone -d umami -Atc "$1" 2>/dev/null); }
 
 # ---- gather -----------------------------------------------------------------
 code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://brawlzone.net/ || echo 000)
@@ -105,6 +107,20 @@ print(f'{len(active)} {len(downloads)} {len(visitors)}')
 PY
 )
 
+# ---- Google Play closed test (from 2026-10-15) --------------------------------
+# The funnel into the test, from Umami: visits to /bubble/test (any language),
+# then taps on each step, and which route brought people in. "24h / total".
+# Counts are distinct Umami sessions, so a little high (a phone that changes
+# network counts twice); the Play Console's tester count is the real answer.
+PT_SINCE="2026-10-15"
+pt_q() { umami "select count(distinct session_id) filter (where created_at > now() - interval '24 hours') || ' / ' || count(distinct session_id) from website_event where created_at >= '$PT_SINCE' and $1;"; }
+pt_step() { pt_q "event_name = 'playtest_step' and event_id in (select website_event_id from event_data where data_key = 'step' and string_value = '$1')"; }
+pt_from() { pt_q "event_name = 'playtest_entry' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value = '$1')"; }
+pt_visits=$(pt_q "event_type = 1 and url_path ~ '^(/es|/pt)?/bubble/test'")
+pt_group=$(pt_step group); pt_optin=$(pt_step optin); pt_install=$(pt_step install)
+pt_home=$(pt_from home); pt_panel=$(pt_from panel); pt_bubble=$(pt_from bubble); pt_footer=$(pt_from footer)
+pt_snooze=$(pt_q "event_name = 'playtest_snooze'")
+
 bans=$(sudo -n fail2ban-client status sshd 2>/dev/null | awk -F'\t' '/Total banned/{print $2}' | tr -d ' ')
 deploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | head -6)
 ndeploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | wc -l)
@@ -134,6 +150,16 @@ html_row "Verdict" "$verdict" "$hdr_c"
 html_row "Uptime" "$up"
 html_row "Load average" "$load"
 html_row "Bubble (24h)" "${bubble_active:-?} active &middot; ${bubble_downloads:-?} downloads &middot; ${bubble_visitors:-?} visitors"
+html_rows_close
+
+html_section "Google Play test (24h / since $PT_SINCE)"
+html_rows_open
+html_row "Tester page visits" "${pt_visits:-?}"
+html_row "Tapped: join the group" "${pt_group:-?}"
+html_row "Tapped: become a tester" "${pt_optin:-?}"
+html_row "Tapped: open Google Play" "${pt_install:-?}"
+html_row "Came from" "home ${pt_home:-?} &middot; panel ${pt_panel:-?} &middot; /bubble ${pt_bubble:-?} &middot; footer ${pt_footer:-?}"
+html_row "Panel card snoozed" "${pt_snooze:-?}"
 html_rows_close
 
 html_section "Sampler"

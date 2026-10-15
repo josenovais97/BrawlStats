@@ -52,6 +52,7 @@ export default function BubbleTestPage() {
       body: t('Open the group and tap "Join group". Use the same Google account as the Play Store on your phone.'),
       href: PLAY_TEST.groupUrl,
       cta: t('Join the group'),
+      event: 'group',
     },
     {
       mark: (
@@ -64,6 +65,7 @@ export default function BubbleTestPage() {
       body: t('On the next page, tap "Become a tester". It can take a few minutes after joining the group before this works.'),
       href: PLAY_TEST.optInUrl,
       cta: t('Become a tester'),
+      event: 'optin',
     },
     {
       mark: (
@@ -76,6 +78,7 @@ export default function BubbleTestPage() {
       body: t('Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.'),
       href: PLAY_TEST.listingUrl,
       cta: t('Open Google Play'),
+      event: 'install',
     },
   ];
 
@@ -110,6 +113,8 @@ export default function BubbleTestPage() {
                 href={PLAY_TEST.groupUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-umami-event="playtest_step"
+                data-umami-event-step="group"
                 className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
               >
                 {t('Start with step 1')}
@@ -211,6 +216,8 @@ export default function BubbleTestPage() {
                   href={step.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-umami-event="playtest_step"
+                  data-umami-event-step={step.event}
                   className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-brand-ink transition-opacity hover:opacity-90"
                 >
                   {step.cta}

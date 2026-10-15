@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
+import { panelTrack } from '@/lib/panel-telemetry';
 
 const DISMISSED = 'brawlzone.bubble.playTestDismissed';
 /** "Remind me tomorrow" hides it for this long, not for good (2026-10-15). */
@@ -45,6 +46,7 @@ export function PanelPlayTest() {
       <div className="mt-2.5 flex items-center gap-3">
         <a
           href={`${prefix}/bubble/test`}
+          onClick={() => panelTrack('playtest_entry', { from: 'panel' })}
           className="rounded-lg bg-victory px-3.5 py-1.5 text-xs font-bold text-background"
         >
           {t('playTest.cta')}
@@ -55,6 +57,7 @@ export function PanelPlayTest() {
             try {
               localStorage.setItem(DISMISSED, String(Date.now()));
             } catch {}
+            panelTrack('playtest_snooze');
             setShow(false);
           }}
           className="text-[11px] font-semibold text-muted"
