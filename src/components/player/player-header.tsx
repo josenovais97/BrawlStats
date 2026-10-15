@@ -12,6 +12,7 @@ import {
 import { playerIconUrl, rankedLeagueIconUrl, rankedTierIconUrl } from '@/lib/brawlapi';
 import { formatNumber, nameColorToCss, titleCaseLabel } from '@/lib/format';
 import { ShareButton } from '@/components/player/share-button';
+import { ShareImageButton } from '@/components/share-image-button';
 import { normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 import { CLUB_LINK_REL } from '@/lib/link-rel';
@@ -228,6 +229,14 @@ export function PlayerHeader({
             />
             <ShareButton title={shareTitle} text={shareText} />
           </div>
+          {/* The profile as a story image, for posting rather than linking. */}
+          <ShareImageButton
+            src={`/player/${encodeURIComponent(normalizeTag(player.tag))}/story.png`}
+            fileName={`brawlzone-${normalizeTag(player.tag)}.png`}
+            kind="player"
+            label={t('Share my profile card')}
+            className="w-full"
+          />
         </div>
 
         <div className="flex w-full flex-wrap items-center gap-1.5 text-xs sm:gap-2 sm:text-sm">

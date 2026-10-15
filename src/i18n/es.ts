@@ -3826,4 +3826,44 @@ export const ES: Record<string, string> = {
     "Sin cuenta",
   "No tracking":
     "Sin rastreo",
+  "SKILL SCORE":
+    "SKILL SCORE",
+  "TOP BRAWLERS":
+    "MEJORES BRAWLERS",
+  "{n} trophies":
+    "{n} trofeos",
+  "Check your own Skill Score":
+    "Mira tu propio Skill Score",
+  "Elite":
+    "Élite",
+  "Expert":
+    "Experto",
+  "Skilled":
+    "Hábil",
+  "Competent":
+    "Competente",
+  "Casual":
+    "Casual",
+  "Beginner":
+    "Principiante",
+  "Share my profile card":
+    "Compartir mi tarjeta de perfil",
+  "Share as image":
+    "Compartir como imagen",
+  "Making your image…":
+    "Creando tu imagen…",
+  "Bronze":
+    "Bronce",
+  "Silver":
+    "Plata",
+  "Gold":
+    "Oro",
+  "Diamond":
+    "Diamante",
+  "Masters":
+    "Maestros",
+  "Pro":
+    "Pro",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "También se cuentan algunos eventos con nombre, todos anónimos: instalar la app web, abrirla, tocar la descarga de Android, tocar los botones que llevan a la prueba de Google Play y compartir una página como imagen. El evento de descarga indica desde qué página vino y qué versión se ofreció, para distinguir una actualización de una primera instalación. Nada más.",
 };

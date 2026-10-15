@@ -111,7 +111,7 @@ export default function PrivacyPage() {
               <p>{t('It records the page, the referrer, and coarse details your browser sends anyway: country, browser, operating system, screen size. It does not record IP addresses, and nothing links one visit to another or to a person.')}</p>
               <p>
                 {/* Named because a reader is entitled to know what is being counted, and
-                    because these are visible in the page source regardless. */}{t('A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, and tapping the buttons that lead into the Google Play test. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.')}</p>
+                    because these are visible in the page source regardless. */}{t('A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.')}</p>
             </div>
           </div>
         </div>
