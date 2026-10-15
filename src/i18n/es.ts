@@ -3716,4 +3716,72 @@ export const ES: Record<string, string> = {
     "El tablero de draft en Hard Rock Mine con un bloqueo, un compañero y dos rivales, y los brawlers restantes ordenados por lo bien que responden a ese draft",
   "The panel's Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out":
     "El meta de Competitivo del panel en Mítico: botones de rango y modo arriba y luego la tier list desde S, con los brawlers que no tienes en gris",
+  "22 languages, with brawler, mode and map names exactly as the game writes them. Choose the bubble's size, how faint it gets when idle, and whether it tucks half off the edge.":
+    "22 idiomas, con los nombres de brawlers, modos y mapas tal como los escribe el juego. Elige el tamaño de la burbuja, cuánto se atenúa cuando no la usas y si se esconde a medias en el borde.",
+  "A draft helper that floats over Brawl Stars: tier lists at your rank, the best picks for your map, counters, team comps and builds, with your own brawlers marked. Free, no ads, no account.":
+    "Un asistente de draft que flota sobre Brawl Stars: tier lists de tu rango, las mejores elecciones para tu mapa, counters, equipos y builds, con tus brawlers marcados. Gratis, sin anuncios, sin cuenta.",
+  "A short plan for your coins: the few brawlers that would give you a top pick in the most modes.":
+    "Un plan corto para tus monedas: los pocos brawlers que te darían una elección top en más modos.",
+  "Add the BrawlZone tile to Quick Settings: swipe down mid-match and tap it to show or hide the bubble, without opening the app.":
+    "Agrega el botón de BrawlZone a los Ajustes rápidos: desliza hacia abajo en plena partida y tócalo para mostrar u ocultar la burbuja, sin abrir la app.",
+  "Add your player tag once: brawlers you own are marked, the rest greyed out or hidden, and you can narrow it to power 11 or hypercharged.":
+    "Agrega tu tag de jugador una vez: tus brawlers quedan marcados, el resto en gris u oculto, y puedes limitarlo a nivel 11 o con hipercarga.",
+  "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
+    "Una app sí puede. La burbuja se queda en el borde de la pantalla, se abre con un toque sobre el juego y se vuelve a plegar.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "Brawl Stars te da segundos para elegir. Salir del juego para mirar una tier list cuesta más de los que tienes, así que la respuesta viene a ti: el meta de tu rango, las mejores elecciones para tu mapa y qué le gana al rival, a un toque sobre el juego.",
+  "Coming to Google Play":
+    "Próximamente en Google Play",
+  "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
+    "Diamante, Mítico, Legendario y Maestros juegan metas distintos, así que la lista se divide por rango y se abre en el tuyo. Todos los modos de Competitivo, actualizados cada dos horas con combates competitivos reales.",
+  "Draft counters":
+    "Counters en el draft",
+  "Enter the bans and both teams' picks and it ranks what is left. Tap an enemy to see who beats them.":
+    "Pon los bloqueos y las elecciones de ambos equipos y ordena lo que queda. Toca a un rival para ver quién le gana.",
+  "Every tag you use is saved. Switch between them from the account card; a long press removes one.":
+    "Cada tag que usas queda guardado. Cambia entre ellos desde la tarjeta de cuenta; mantén presionado uno para quitarlo.",
+  "Everything in one bubble":
+    "Todo en una burbuja",
+  "It shows the stats; you make the picks. It does not touch the game or log in to your account: your player tag only looks up your public profile, the same one anyone can see on the site. No ads, no sign-up, no in-app purchases.":
+    "Muestra las estadísticas; tú eliges. No toca el juego ni entra en tu cuenta: tu tag solo busca tu perfil público, el mismo que cualquiera ve en el sitio. Sin anuncios, sin registro, sin compras.",
+  "Join the test and install it from the Play Store instead: three taps.":
+    "Únete a la prueba e instálala desde Play Store: tres toques.",
+  "Made for your account":
+    "Hecha para tu cuenta",
+  "Ranked hands you one map, and the answer moves with it. Pick the map and get the brawlers that win there, with your own best pick named at the top.":
+    "Competitivo te da un mapa, y la respuesta cambia con él. Elige el mapa y verás los brawlers que ganan ahí, con tu mejor elección arriba.",
+  "Start it from inside the game":
+    "Actívala desde el juego",
+  "Tap an enemy pick to see the five brawlers that beat it most often at your rank, with a link to the full counters page on the site.":
+    "Toca la elección de un rival para ver los cinco brawlers que más le ganan en tu rango, con un enlace a la página completa de counters del sitio.",
+  "The app finds your account and puts your player icon on the bubble. Every pick the panel suggests is one you can actually make.":
+    "La app encuentra tu cuenta y pone tu ícono de jugador en la burbuja. Cada elección que sugiere el panel es una que de verdad puedes hacer.",
+  "The app's account card: the player name, tag and trophies, the choice between all owned brawlers, power 11 only or hypercharged, and a saved second account to switch to":
+    "La tarjeta de cuenta de la app: nombre, tag y trofeos, la opción entre todos tus brawlers, solo nivel 11 o con hipercarga, y una segunda cuenta guardada para cambiar",
+  "The best picks for your map":
+    "Las mejores elecciones para tu mapa",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps and to show a notification, the one that says it is running. No screen capture, no storage access, nothing else.":
+    "La burbuja no lee tu pantalla, tu partida ni el mapa en el que estás. Pide dibujar sobre otras apps y mostrar una notificación, la que dice que está activa. Sin captura de pantalla, sin acceso al almacenamiento, nada más.",
+  "The three that win together on your map, with the ones you own ticked.":
+    "Los tres que ganan juntos en tu mapa, con los que tienes marcados.",
+  "The tier list at your rank":
+    "La tier list de tu rango",
+  "The whole app in 51 seconds. Sound on.":
+    "Toda la app en 51 segundos. Con sonido.",
+  "Three gestures and a tile. There is nothing else to learn.":
+    "Tres gestos y un botón rápido. No hay nada más que aprender.",
+  "Two accounts? One tap":
+    "¿Dos cuentas? Un toque",
+  "Your brawlers marked":
+    "Tus brawlers marcados",
+  "Your draft helper,":
+    "Tu asistente de draft,",
+  "Your language, your bubble":
+    "Tu idioma, tu burbuja",
+  "Your tag is the only setup there is, and it changes every list in the panel.":
+    "Tu tag es toda la configuración que hay, y cambia cada lista del panel.",
+  "Your tag, once":
+    "Tu tag, una vez",
+  "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
+    "Un recorrido de 51 segundos por BrawlZone Bubble: la burbuja flotando sobre Brawl Stars, las mejores elecciones para el mapa exacto, la build que usan los jugadores, el panel en tu idioma y los ajustes de tamaño y transparencia de la burbuja.",
 };

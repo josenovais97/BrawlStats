@@ -5,18 +5,23 @@ import {
   Download,
   Hand,
   Layers,
+  ListOrdered,
+  Map as MapIcon,
   MousePointerClick,
   ShieldCheck,
-  Timer,
+  Swords,
+  Users,
+  UserCheck,
+  Wrench,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { DemoVideo, TutorialVideo } from "@/components/bubble/demo-video";
+import { DemoVideo } from "@/components/bubble/demo-video";
 import { DownloadButton } from "@/components/bubble/download-button";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { BUBBLE_APP, BUBBLE_CHANGELOG, bubbleAppSize } from "@/lib/bubble-app";
+import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_TEST, bubbleAppSize } from "@/lib/bubble-app";
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -46,7 +51,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/bubble" },
   title: "BrawlZone Bubble for Android",
   description:
-    "A floating bubble that puts the Ranked tier list on top of Brawl Stars, so you can check the meta mid-draft without leaving the game. Free, no ads, no account.",
+    "A draft helper that floats over Brawl Stars: tier lists at your rank, the best picks for your map, counters, team comps and builds, with your own brawlers marked. Free, no ads, no account.",
   openGraph: {
     title: "BrawlZone Bubble for Android",
     description:
@@ -56,23 +61,63 @@ export const metadata: Metadata = {
 
 const TRUST = ["Free forever", "No ads", "No account", "No tracking"];
 
+/*
+ * What the panel does, in the order a draft asks for it (rewritten for 1.29:
+ * the old three cards still described the tier list as the whole app).
+ */
 const FEATURES = [
   {
     icon: Layers,
-    title: "The full Ranked tier list",
-    body: "S through D, scored on adjusted win rate and pick rate from sampled competitive battles. The same numbers as the site, refreshed on the same schedule.",
+    title: "The tier list at your rank",
+    body: "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.",
   },
   {
-    icon: Timer,
-    title: "Down to the map you are on",
-    body: "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.",
+    icon: MapIcon,
+    title: "The best picks for your map",
+    body: "Ranked hands you one map, and the answer moves with it. Pick the map and get the brawlers that win there, with your own best pick named at the top.",
   },
   {
-    icon: MousePointerClick,
+    icon: Users,
+    title: "Team comps",
+    body: "The three that win together on your map, with the ones you own ticked.",
+  },
+  {
+    icon: Swords,
+    title: "Draft counters",
+    body: "Enter the bans and both teams' picks and it ranks what is left. Tap an enemy to see who beats them.",
+  },
+  {
+    icon: Wrench,
     title: "Builds on tap",
     body: "Tap any brawler for the star power, gadget and gears its owners actually run, with the sample size behind every number.",
   },
+  {
+    icon: UserCheck,
+    title: "Your brawlers marked",
+    body: "Add your player tag once: brawlers you own are marked, the rest greyed out or hidden, and you can narrow it to power 11 or hypercharged.",
+  },
 ];
+
+/* The account card, since 1.25; account switching since 1.29. */
+const ACCOUNT = [
+  {
+    title: "Your tag, once",
+    body: "The app finds your account and puts your player icon on the bubble. Every pick the panel suggests is one you can actually make.",
+  },
+  {
+    title: "Two accounts? One tap",
+    body: "Every tag you use is saved. Switch between them from the account card; a long press removes one.",
+  },
+  {
+    title: "What to upgrade next",
+    body: "A short plan for your coins: the few brawlers that would give you a top pick in the most modes.",
+  },
+  {
+    title: "Your language, your bubble",
+    body: "22 languages, with brawler, mode and map names exactly as the game writes them. Choose the bubble's size, how faint it gets when idle, and whether it tucks half off the edge.",
+  },
+];
+
 
 const STEPS = [
   {
@@ -119,7 +164,13 @@ const GESTURES = [
     title: "Drag down to close",
     body: "A target appears at the bottom of the screen while you drag. Drop the bubble on it, or use Stop in the notification.",
   },
+  {
+    icon: ListOrdered,
+    title: "Start it from inside the game",
+    body: "Add the BrawlZone tile to Quick Settings: swipe down mid-match and tap it to show or hide the bubble, without opening the app.",
+  },
 ];
+
 
 export default function BubblePage() {
   const t = getT(requestLocale());
@@ -141,11 +192,11 @@ export default function BubblePage() {
                 <span className="eyebrow">{t('Free Android app')}</span>
               </p>
 
-              <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">{t('The tier list,')}<br />
+              <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">{t('Your draft helper,')}<br />
                 <span className="text-brand">{t('on top of the game')}</span>
               </h1>
 
-              <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have — so the list comes to you instead, one tap away, and gets out of the way when you are done.')}</p>
+              <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.')}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -222,45 +273,40 @@ export default function BubblePage() {
           </div>
         </div>
 
-        {/* The recording carries the page. Everything below it is detail. */}
-        <figure className="card-glow overflow-hidden rounded-2xl border border-border">
-          <DemoVideo />
-          <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">{t('One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.')}</figcaption>
-        </figure>
-      </section>
+        {/*
+          The video beside the proof. The video is the tour (made for the Play
+          listing and TikTok); the photo is one unedited moment on a real
+          phone, which is the claim the section beside it makes.
+        */}
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+          <figure className="card-glow mx-auto w-full max-w-[20rem] overflow-hidden rounded-2xl border border-border">
+            <DemoVideo />
+            <figcaption className="border-t border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">{t('The whole app in 51 seconds. Sound on.')}</figcaption>
+          </figure>
 
-      {/*
-        Why it is an app at all.
-
-        The honest differentiator, and a fact rather than a boast: no website can
-        draw over another app, on any phone, for anyone. That is the browser
-        sandbox, not a gap in somebody's product, and unlike a claim about
-        competitors it will not go stale.
-      */}
-      <section className="card card-glow p-6 sm:p-10">
-        <div className="max-w-3xl space-y-4">
-          <h2 className="display text-2xl uppercase sm:text-3xl">{t('A website cannot do this')}</h2>
-          <p className="leading-relaxed text-muted">{t('Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.')}</p>
-          <p className="leading-relaxed text-muted">{t('An installed app can. That is the whole reason this exists as an APK rather than another page on the site, and it is all the app does: draw the numbers over the game, then get out of the way.')}</p>
+          <div className="card card-glow space-y-4 p-6 sm:p-8">
+            <h2 className="display text-2xl uppercase sm:text-3xl">{t('A website cannot do this')}</h2>
+            <p className="leading-relaxed text-muted">{t('Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.')}</p>
+            <p className="leading-relaxed text-muted">{t('An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.')}</p>
+            <figure className="space-y-2 pt-2">
+              <Image
+                src="/bubble/over-game.jpg"
+                alt={t('The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine')}
+                width={2048}
+                height={912}
+                className="w-full rounded-xl border border-border"
+                loading="lazy"
+              />
+              <figcaption className="text-center text-xs text-muted">{t('On a real phone, open over the game')}</figcaption>
+            </figure>
+          </div>
         </div>
-        {/* The claim above, shown: a real phone, the panel open over the lobby. */}
-        <figure className="mt-6 space-y-2">
-          <Image
-            src="/bubble/over-game.jpg"
-            alt={t('The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine')}
-            width={2048}
-            height={912}
-            className="w-full rounded-2xl border border-border"
-            loading="lazy"
-          />
-          <figcaption className="text-center text-xs text-muted">{t('On a real phone, open over the game')}</figcaption>
-        </figure>
       </section>
 
       {/* What you get, beside the thing itself. */}
       <section className="space-y-5">
         <SectionHeading
-          title={t('What is in the panel')}
+          title={t('Everything in one bubble')}
           subtitle={t('The same data as the site, cut down to what a draft needs.')}
         />
 
@@ -304,7 +350,7 @@ export default function BubblePage() {
           </figure>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <article key={f.title} className="card p-5">
               <f.icon className="size-6 text-brand" />
@@ -339,10 +385,41 @@ export default function BubblePage() {
           <div className="space-y-4 text-muted">
             <p className="leading-relaxed">{t('Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map')}{' '}<em>{t('and')}</em>{' '}{t('answers what they just picked.')}</p>
             <p className="leading-relaxed">{t('Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.')}</p>
+            <p className="leading-relaxed">{t('Tap an enemy pick to see the five brawlers that beat it most often at your rank, with a link to the full counters page on the site.')}</p>
             <p className="leading-relaxed">
               {/* Said plainly because the alternative is a reader trusting a
                   number that a dozen battles produced. */}{t('Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.')}</p>
           </div>
+        </div>
+      </section>
+
+      {/* The account card: what the app knows about you, and only that. */}
+      <section className="space-y-5">
+        <SectionHeading
+          title={t('Made for your account')}
+          subtitle={t('Your tag is the only setup there is, and it changes every list in the panel.')}
+        />
+
+        <div className="grid items-center gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="mx-auto w-full max-w-[300px]">
+            <Image
+              src="/bubble/app-account.jpg"
+              alt={t('The app\'s account card: the player name, tag and trophies, the choice between all owned brawlers, power 11 only or hypercharged, and a saved second account to switch to')}
+              width={912}
+              height={1290}
+              className="w-full rounded-2xl border border-border"
+              loading="lazy"
+            />
+          </div>
+
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {ACCOUNT.map((item) => (
+              <li key={item.title} className="card p-5">
+                <h3 className="font-bold">{t(item.title)}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{t(item.body)}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -364,8 +441,8 @@ export default function BubblePage() {
           <div className="flex gap-4">
             <ShieldCheck className="size-6 shrink-0 text-brand" />
             <div className="space-y-3 text-sm leading-relaxed text-muted">
-              <p>{t('The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.')}</p>
-              <p>{t('It shows the meta; you match that to the draft in front of you. It does not touch the game, read your account, or send anything anywhere — there is no account, no analytics in the app, and nothing to log in to.')}</p>
+              <p>{t('The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps and to show a notification, the one that says it is running. No screen capture, no storage access, nothing else.')}</p>
+              <p>{t('It shows the stats; you make the picks. It does not touch the game or log in to your account: your player tag only looks up your public profile, the same one anyone can see on the site. No ads, no sign-up, no in-app purchases.')}</p>
             </div>
           </div>
         </div>
@@ -400,6 +477,20 @@ export default function BubblePage() {
           ))}
         </ol>
 
+        {/* While the Google Play closed test is recruiting (PLAY_TEST). */}
+        {PLAY_TEST.open ? (
+          <Link
+            href={lp('/bubble/test')}
+            className="card card-interactive flex items-center justify-between gap-4 border-victory/40 p-5"
+          >
+            <span>
+              <span className="block font-bold text-victory">{t('Coming to Google Play')}</span>
+              <span className="mt-1 block text-sm text-muted">{t('Join the test and install it from the Play Store instead: three taps.')}</span>
+            </span>
+            <ArrowRight className="size-5 shrink-0 text-victory" />
+          </Link>
+        ) : null}
+
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="card p-5">
             <h3 className="text-sm font-bold">{t('About Play Protect')}</h3>
@@ -421,59 +512,12 @@ export default function BubblePage() {
         </div>
       </section>
 
-      {/*
-        Setup, then a draft, in under half a minute.
-
-        After the install steps because it is what comes next: the tag and the
-        hide switch are the only setup there is, and seeing them done is
-        quicker than reading about them. Not autoplaying -- the hero clip
-        already does, and this one only loads if someone presses play.
-      */}
-      <section className="space-y-5">
-        <SectionHeading
-          title={t('Set it up, then draft with it')}
-          subtitle={t('27 seconds: your tag once, then the bubble mid-draft.')}
-        />
-
-        <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <ol className="space-y-4">
-            {[
-              {
-                title: t('Add your player tag'),
-                body: t('The app finds your account. Brawlers you do not own are greyed out in the panel.'),
-              },
-              {
-                title: t('Hide what you cannot play'),
-                body: t('Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.'),
-              },
-              {
-                title: t('Tap the bubble in the draft'),
-                body: t('Pick the mode and the map: the best brawlers for it, and the build to run on them.'),
-              },
-            ].map((step, i) => (
-              <li key={step.title} className="card flex gap-4 p-5">
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-2 text-sm font-black tabular-nums text-muted">
-                  {i + 1}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="font-bold">{t(step.title)}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">{t(step.body)}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-
-          <div className="mx-auto w-full max-w-[18rem] overflow-hidden rounded-2xl border border-border">
-            <TutorialVideo />
-          </div>
-        </div>
-      </section>
 
       {/* Three gestures, and that is the entire app. */}
       <section className="space-y-5">
         <SectionHeading
           title={t('Using it')}
-          subtitle={t('Three gestures. There is nothing else to learn.')}
+          subtitle={t('Three gestures and a tile. There is nothing else to learn.')}
         />
 
         <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">

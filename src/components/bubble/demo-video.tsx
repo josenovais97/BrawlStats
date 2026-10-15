@@ -1,112 +1,39 @@
 "use client";
 
-import Image from "next/image";
-import { useSyncExternalStore } from "react";
 import { useT } from '@/components/i18n/use-t';
 
 /**
- * The app running, as a looping clip.
+ * The app in 51 seconds, as a vertical clip with sound.
  *
- * Deliberately a video and not a GIF. These twenty-two seconds as a GIF would
- * be north of 25 MB; as H.264 it is 1.5 MB, and this sits on the hero of the
- * page the app is downloaded from. On a box with fixed bandwidth and two shared
- * cores that difference is the whole argument — a muted, looping, inline video
- * behaves exactly like a GIF to a reader and costs a twentieth as much.
+ * Replaced the two silent clips (the Bounty demo and the setup tutorial) in
+ * October 2026: one video that covers the bubble over the game, map picks,
+ * builds, languages and the look settings, made for the Play listing and the
+ * TikTok account at the same time.
  *
- * Encoded at crf 32 rather than the 27 it started at. The content is flat UI on
- * a dark ground, which is the easiest thing there is to compress: the brawler
- * names and scores are pixel-identical between the two, and the file is a third
- * smaller.
+ * Tap to play, not autoplay. It is 6 MB with a soundtrack; autoplaying it muted
+ * would download all of it on every visit to show half of it, and the old
+ * clips were 1.5 MB for the same reason. `preload="none"` means a reader who
+ * never presses play never fetches a byte beyond the poster.
  *
- * `playsInline` is the one that bites: without it iOS Safari yanks the video
- * fullscreen the moment it autoplays, which on a page about an Android app is
- * a strange thing to do to an iPhone.
+ * 720x1280, crf 31, AAC 80k: flat UI on bright grounds compresses well, and
+ * the panel's small text stays legible at that rate.
  *
- * No WebM. VP9 was measured *larger* than H.264 here (975 KB against 877), and
- * every browser in use plays H.264 in MP4, so a second encode would add a
- * megabyte to the image to serve nobody.
+ * `playsInline` keeps iOS Safari from forcing it fullscreen.
  */
-export function DemoVideo() {
-  const t = useT();
-  /*
-   * Motion is a preference, and autoplay ignores it.
-   *
-   * `useSyncExternalStore` rather than an effect: a media query is exactly the
-   * external store it exists for, the server snapshot is a plain `false`, and
-   * it re-renders if the reader changes the setting while the page is open.
-   * Rendering the still instead also means the video is never fetched, which a
-   * CSS-only `display: none` would not achieve.
-   */
-  const reduced = useSyncExternalStore(subscribe, snapshot, () => false);
-
-  if (reduced) {
-    return (
-      <Image
-        src="/bubble/demo-poster.jpg"
-        alt={t('The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map')}
-        width={1280}
-        height={590}
-        className="w-full"
-        priority
-      />
-    );
-  }
-
-  return (
-    <video
-      className="w-full"
-      autoPlay
-      muted
-      loop
-      playsInline
-      poster="/bubble/demo-poster.jpg"
-      aria-label={t('A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power.')}
-    >
-      <source src="/bubble/demo.mp4" type="video/mp4" />
-    </video>
-  );
-}
-
-const QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribe(onChange: () => void) {
-  const mq = window.matchMedia(QUERY);
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-}
-
-function snapshot() {
-  return window.matchMedia(QUERY).matches;
-}
-
-/**
- * The setup-then-draft tutorial, as a vertical clip with controls.
- *
- * Secondary to the demo above, and built to cost nothing until it is wanted:
- * no autoplay and `preload="none"`, so a reader who never presses play never
- * downloads it. The hero clip already autoplays on this page, and two videos
- * playing at once is noise rather than a demo -- and on a box with fixed
- * bandwidth, a second 1.6 MB fetch on every visit is a real cost.
- *
- * Encoded at 720x1280, crf 31: measured indistinguishable from crf 28 on the
- * panel's smallest text, at three quarters of the size. Silent, like the
- * source -- the captions carry it.
- */
-export function TutorialVideo() {
+export function DemoVideo({ className = '' }: { className?: string }) {
   const t = useT();
   return (
     <video
-      className="w-full rounded-2xl"
+      className={`w-full ${className}`}
       controls
-      muted
       playsInline
       preload="none"
-      poster="/bubble/tutorial-poster.jpg"
+      poster="/bubble/bubble-demo-poster.jpg"
       width={720}
       height={1280}
-      aria-label={t('A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run.')}
+      aria-label={t('A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.')}
     >
-      <source src="/bubble/tutorial.mp4" type="video/mp4" />
+      <source src="/bubble/bubble-demo.mp4" type="video/mp4" />
     </video>
   );
 }

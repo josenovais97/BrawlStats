@@ -19,10 +19,10 @@ import { requestLocale } from '@/lib/request-locale';
  * not, and it is not a matter of them not having built it yet: a browser tab
  * cannot draw over another app on any phone.
  *
- * A still rather than the recording. The clip is 1.3 MB and belongs on the page
- * that exists to sell the app; the landing page's job here is to say the thing
- * exists and hand over a link, and a poster frame does that for a tenth of the
- * bytes on a page that already loads plenty.
+ * A still rather than the recording: the panel open over the lobby on a real
+ * phone. The video is 6 MB and belongs on the page that exists to sell the
+ * app; the landing page's job here is to say the thing exists and hand over a
+ * link, and one photo does that for a fraction of the bytes.
  */
 export function HomeBubble() {
   const t = getT(requestLocale());
@@ -43,10 +43,10 @@ export function HomeBubble() {
           aria-label={t('See the BrawlZone Bubble app')}
         >
           <Image
-            src="/bubble/demo-poster.jpg"
-            alt={t('The BrawlZone panel open over a live Hot Zone draft, showing the Ranked tier list filtered to that mode')}
-            width={1280}
-            height={590}
+            src="/bubble/over-game.jpg"
+            alt={t('The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine')}
+            width={2048}
+            height={912}
             className="w-full"
             loading="lazy"
           />

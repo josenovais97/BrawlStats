@@ -733,6 +733,8 @@ export const CLIENT_ES: Record<string, string> = {
     "Counters",
   "No brawler by that name.":
     "No hay ningún brawler con ese nombre.",
+  "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
+    "Un recorrido de 51 segundos por BrawlZone Bubble: la burbuja flotando sobre Brawl Stars, las mejores elecciones para el mapa exacto, la build que usan los jugadores, el panel en tu idioma y los ajustes de tamaño y transparencia de la burbuja.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1465,4 +1467,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Counters",
   "No brawler by that name.":
     "Nenhum brawler com esse nome.",
+  "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
+    "Um tour de 51 segundos pelo BrawlZone Bubble: a bolha flutuando sobre o Brawl Stars, as melhores escolhas para o mapa exato, a build que os jogadores usam, o painel no seu idioma e os ajustes de tamanho e transparência da bolha.",
 };
