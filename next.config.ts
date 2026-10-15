@@ -7,6 +7,17 @@ const nextConfig: NextConfig = {
   output: 'standalone',
 
   /*
+   * Three minutes per prerendered page, not the default one.
+   *
+   * Pages are prerendered against the live database during the build, and a
+   * build that overlaps the sampler's roll-up reads a busy Postgres on two
+   * shared cores: on 2026-10-15 /cosmetics and /cosmetics/skins took over 60s
+   * three times each and failed the deploy, then built normally ten minutes
+   * later. A slow page is still a page; failing the whole deploy over it is not.
+   */
+  staticPageGenerationTimeout: 180,
+
+  /*
    * The APK's own headers.
    *
    * Next serves everything in `public/` as `application/octet-stream` when it
