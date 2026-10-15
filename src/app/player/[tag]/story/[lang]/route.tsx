@@ -38,18 +38,14 @@ import { translate } from '@/lib/t';
  * story's own buttons and caption cover the picture.
  */
 
-export const revalidate = 3600;
-
-/* Runtime ISR -- see AGENTS.md trap 1. */
-export async function generateStaticParams() {
-  return [];
-}
-
 /*
- * The language is a path segment, not `?lang=`: a cached (ISR) route may not
- * read the request URL -- it threw DYNAMIC_SERVER_USAGE in production -- and
- * a segment also gives each language its own cached image.
+ * Rendered per request, like the profile page: the player comes from a live
+ * `no-store` fetch, which a cached (ISR) route may not make -- it threw, the
+ * catch below turned that into a 404, and every profile card was "Not found".
+ * Only a tap on Share asks for one, and /player is behind the proxy's rate
+ * limit (lib/hot-path-limit). The language is a path segment either way.
  */
+export const dynamic = 'force-dynamic';
 
 const PANEL = '#151a2e';
 const EDGE = '#242b45';
@@ -221,7 +217,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tag
   return new Response(await png.arrayBuffer(), {
     headers: {
       'content-type': 'image/png',
-      'cache-control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+      'cache-control': 'private, max-age=300',
     },
   });
 }

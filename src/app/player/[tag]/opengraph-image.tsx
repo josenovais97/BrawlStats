@@ -30,18 +30,15 @@ export const alt = 'Brawl Stars player profile';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-/** Matches the page it represents, so a shared card is never wildly stale. */
-export const revalidate = 3600;
-
 /*
- * Runtime ISR. Without this the `revalidate` above does nothing: a dynamic
- * route with no `generateStaticParams` is re-rendered per request, and this
- * one rasterises a 1200x630 PNG through Satori on every one of them. Same
- * trap the four other image routes carry this same line to avoid.
+ * Rendered per request, like the page. It used to be ISR (`revalidate` plus an
+ * empty `generateStaticParams`), but the player comes from a live `no-store`
+ * fetch, which a cached route may not make: the call threw, the catch below
+ * served the plain BRAWLZONE fallback, and every shared profile link previewed
+ * as that (found 2026-10-15). /player is behind the proxy's rate limit, and a
+ * preview is fetched once per share, by the app unfurling it.
  */
-export async function generateStaticParams() {
-  return [];
-}
+export const dynamic = 'force-dynamic';
 
 export default async function Image({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params;
