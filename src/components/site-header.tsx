@@ -2,6 +2,7 @@
 
 import { ChevronDown, Menu, Search, X } from 'lucide-react';
 import Link from 'next/link';
+import { ShareButton } from '@/components/player/share-button';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -9,6 +10,7 @@ import { BrandMark } from '@/components/brand-mark';
 import { LanguageMenu } from '@/components/i18n/language-menu';
 import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, stripLocale, type Locale } from '@/lib/i18n';
+import { SITE_NAME } from '@/lib/site';
 import {
   Battle3v3Icon,
   BubbleAppIcon,
@@ -143,6 +145,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     More: 'Más',
     Search: 'Buscar',
     searchLabel: 'Buscar un jugador o club',
+    shareText: 'Estadísticas de Brawl Stars en BrawlZone',
     home: 'Inicio de BrawlZone',
     open: 'Abrir menú',
     close: 'Cerrar menú',
@@ -173,6 +176,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     More: 'Mais',
     Search: 'Buscar',
     searchLabel: 'Buscar um jogador ou clube',
+    shareText: 'Estatísticas de Brawl Stars no BrawlZone',
     home: 'Início do BrawlZone',
     open: 'Abrir menu',
     close: 'Fechar menu',
@@ -182,6 +186,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
 
 const EN_EXTRA: Record<string, string> = {
   searchLabel: 'Search a player or club',
+  shareText: 'Brawl Stars stats on BrawlZone',
   home: 'BrawlZone home',
   open: 'Open menu',
   close: 'Close menu',
@@ -381,6 +386,11 @@ export function SiteHeader() {
             One column below 380px: "Release Notes" and "Leaderboard" both get
             clipped in a two-column grid on the narrowest phones.
           */}
+          {/* Sharing, first on a phone (three quarters of visitors): the bar
+              itself has no room for a fourth button at 360px. */}
+          <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
+            <ShareButton title={SITE_NAME} text={t('shareText')} />
+          </div>
           <ul className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2 px-4 py-4 min-[380px]:grid-cols-2 sm:px-6">
             {ALL_NAV.map(({ href: path, match, label, icon: Icon }) => {
               const active = isActive(pathname, path, match);

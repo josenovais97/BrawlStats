@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ArrowLeft, BarChart3, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ShareImageButton } from '@/components/share-image-button';
 import { Suspense } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
@@ -828,6 +829,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             </h1>
 
             {lead ? <p className="mt-3 max-w-2xl leading-relaxed">{t(lead)}</p> : null}
+
+            {/* The brawler as a story image: Ranked tier, best maps, matchups. */}
+            <ShareImageButton
+              src={`/brawlers/${slug}/story.png`}
+              fileName={`brawlzone-${slug}.png`}
+              kind="brawler"
+              className="mt-3"
+            />
 
             {/* The in-game tagline, which the artwork mirror does not carry.
                 Both titles live below the biography now. */}

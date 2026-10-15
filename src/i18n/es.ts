@@ -3878,4 +3878,16 @@ export const ES: Record<string, string> = {
     "De partidas reales de Competitivo, actualizado cada 2 horas",
   "Share this tier list":
     "Compartir esta tier list",
+  "in Ranked":
+    "en Competitivo",
+  "{p} win rate":
+    "{p} de victorias",
+  "BEST MAPS":
+    "MEJORES MAPAS",
+  "COUNTERED BY":
+    "LE GANAN",
+  "STRONG AGAINST":
+    "LES GANA A",
+  "BEST RANKED MAPS":
+    "MEJORES MAPAS DE COMPETITIVO",
 };

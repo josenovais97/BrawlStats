@@ -3878,4 +3878,16 @@ export const PT: Record<string, string> = {
     "De partidas reais do Ranqueado, atualizado a cada 2 horas",
   "Share this tier list":
     "Compartilhar esta tier list",
+  "in Ranked":
+    "no Ranqueado",
+  "{p} win rate":
+    "{p} de vitórias",
+  "BEST MAPS":
+    "MELHORES MAPAS",
+  "COUNTERED BY":
+    "PERDE PARA",
+  "STRONG AGAINST":
+    "VENCE",
+  "BEST RANKED MAPS":
+    "MELHORES MAPAS NO RANQUEADO",
 };
