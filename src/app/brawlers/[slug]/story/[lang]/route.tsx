@@ -33,9 +33,9 @@ const EDGE = '#242b45';
 /* A map's estimate needs this many decided battles behind it to be shown. */
 const MIN_MAP_SAMPLE = 60;
 
-export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const lang = new URL(request.url).searchParams.get('lang');
+export async function GET(_request: Request, { params }: { params: Promise<{ slug: string; lang: string }> }) {
+  // The language is a path segment: a cached route may not read the URL.
+  const { slug, lang } = await params;
   const locale: Locale = isIntlLocale(lang) ? lang : 'en';
   const t = (text: string, vars?: Record<string, string | number>) => translate(locale, text, vars);
 

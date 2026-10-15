@@ -31,7 +31,7 @@ import { translate } from '@/lib/t';
  *
  * Skill Score leads, as on the link card: it is the number only this site has
  * and the one people argue about. Then peak Ranked, trophies and the three
- * highest-trophy brawlers. `?lang=es|pt` sets the labels, from the page it was
+ * highest-trophy brawlers. `/story/es` or `/story/pt` sets the labels, from the page it was
  * shared from.
  *
  * Nothing important sits in the bottom ~330px or the right ~200px, where a
@@ -45,12 +45,17 @@ export async function generateStaticParams() {
   return [];
 }
 
+/*
+ * The language is a path segment, not `?lang=`: a cached (ISR) route may not
+ * read the request URL -- it threw DYNAMIC_SERVER_USAGE in production -- and
+ * a segment also gives each language its own cached image.
+ */
+
 const PANEL = '#151a2e';
 const EDGE = '#242b45';
 
-export async function GET(request: Request, { params }: { params: Promise<{ tag: string }> }) {
-  const { tag } = await params;
-  const lang = new URL(request.url).searchParams.get('lang');
+export async function GET(_request: Request, { params }: { params: Promise<{ tag: string; lang: string }> }) {
+  const { tag, lang } = await params;
   const locale: Locale = isIntlLocale(lang) ? lang : 'en';
   const t = (text: string, vars?: Record<string, string | number>) => translate(locale, text, vars);
   const fonts = await slideFonts();

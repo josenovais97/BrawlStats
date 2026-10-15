@@ -14,9 +14,8 @@ import { translate } from '@/lib/t';
  *
  * The Ranked tier list is the second most common way into the site, and a tier
  * list is the thing players post to argue about -- so this is the list as a
- * picture, with the site's name on it. `?rank=diamond|mythic|legendary|masters`
- * for one rank (the same precomputed roster the rank page reads), none for
- * every rank; `?lang=es|pt` for the labels.
+ * picture, with the site's name on it. `/story/<rank>/<lang>`: a rank slug
+ * (diamond, mythic, legendary, masters) or `all`, then en, es or pt.
  *
  * S, A and B (at most sixteen each) and C (twelve), with "+N" beyond: what fits a story
  * above the margin its own buttons cover, and the bottom of a tier list is not
@@ -31,12 +30,18 @@ const TIERS = ['S', 'A', 'B', 'C'] as const;
 const CAP: Record<(typeof TIERS)[number], number> = { S: PER_TIER, A: PER_TIER, B: PER_TIER, C: 12 };
 const ICON = 104;
 
-export async function GET(request: Request) {
-  const params = new URL(request.url).searchParams;
-  const lang = params.get('lang');
+/* Runtime ISR -- see AGENTS.md trap 1. */
+export async function generateStaticParams() {
+  return [];
+}
+
+export async function GET(_request: Request, { params }: { params: Promise<{ rank: string; lang: string }> }) {
+  // Rank and language are path segments ('all' for every rank): a cached route
+  // may not read the request URL, and each combination gets its own image.
+  const { rank, lang } = await params;
   const locale: Locale = isIntlLocale(lang) ? lang : 'en';
   const t = (text: string, vars?: Record<string, string | number>) => translate(locale, text, vars);
-  const bracket = bracketBySlug(params.get('rank'));
+  const bracket = bracketBySlug(rank);
 
   const [fonts, roster, season] = await Promise.all([
     slideFonts(),

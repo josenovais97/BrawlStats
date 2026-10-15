@@ -832,7 +832,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
             {/* The brawler as a story image: Ranked tier, best maps, matchups. */}
             <ShareImageButton
-              src={`/brawlers/${slug}/story.png`}
+              src={`/brawlers/${slug}/story`}
               fileName={`brawlzone-${slug}.png`}
               kind="brawler"
               className="mt-3"

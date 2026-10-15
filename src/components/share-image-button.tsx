@@ -13,8 +13,8 @@ import { useT } from '@/components/i18n/use-t';
  * image to the system share sheet -- Instagram or TikTok stories, WhatsApp
  * status, Discord -- through the Web Share API's file support. Where that is
  * missing (most desktops) it downloads the file instead, so the click always
- * produces the picture. `src` is the image route; `?lang=` is added so the
- * card speaks the page's language.
+ * produces the picture. `src` is the image route without its last segment; the
+ * page's language is appended as that segment (`.../story/pt`).
  *
  * Counted as an anonymous `share_image` event with its kind, like the APK
  * download, so we can see whether anyone uses it.
@@ -41,7 +41,7 @@ export function ShareImageButton({
     setState('busy');
     let how = 'download';
     try {
-      const url = `${src}${src.includes('?') ? '&' : '?'}lang=${locale}`;
+      const url = `${src}/${locale}`;
       const blob = await (await fetch(url)).blob();
       const file = new File([blob], fileName, { type: blob.type || 'image/png' });
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };

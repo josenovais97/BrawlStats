@@ -408,7 +408,7 @@ export async function TierListView({
             list people share, and the one with a per-rank roster to draw. */}
         {format === 'ranked' ? (
           <ShareImageButton
-            src={`/tier-list/ranked/story.png${bracket ? `?rank=${bracket.slug}` : ''}`}
+            src={`/tier-list/ranked/story/${bracket ? bracket.slug : 'all'}`}
             fileName={`brawlzone-ranked-tier-list${bracket ? `-${bracket.slug}` : ''}.png`}
             kind="tier-list"
             label={tr('Share this tier list')}

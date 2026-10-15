@@ -231,7 +231,7 @@ export function PlayerHeader({
           </div>
           {/* The profile as a story image, for posting rather than linking. */}
           <ShareImageButton
-            src={`/player/${encodeURIComponent(normalizeTag(player.tag))}/story.png`}
+            src={`/player/${encodeURIComponent(normalizeTag(player.tag))}/story`}
             fileName={`brawlzone-${normalizeTag(player.tag)}.png`}
             kind="player"
             label={t('Share my profile card')}
