@@ -28,6 +28,8 @@ import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { PendingArea, TierNav } from '@/components/tier-list/tier-nav';
 import type { RankBracket } from '@/lib/rank-brackets';
 import { TierPodium } from '@/components/tier-list/tier-podium';
+import { ShareImageButton } from '@/components/share-image-button';
+import { getT } from '@/lib/t';
 import { TIER_COPY, type TierCopy } from '@/components/tier-list/tier-list-copy';
 import { LanguageLinks } from '@/components/i18n/language-links';
 import { fmtDate, fmtDecimal, fmtNumber, fmtPercent, localePath, rankLabel, spanText, type Locale } from '@/lib/i18n';
@@ -129,6 +131,7 @@ export async function TierListView({
 }) {
   const { days } = TIER_WINDOWS[windowKey];
   const t = TIER_COPY[locale];
+  const tr = getT(locale);
   const copy = t.format[format];
   const words = await gameWords(locale);
   const pct = (v: number | null | undefined) => fmtPercent(v, locale);
@@ -400,6 +403,18 @@ export async function TierListView({
         </p>
 
 
+
+        {/* The list as a story image, for posting. Ranked only: that is the
+            list people share, and the one with a per-rank roster to draw. */}
+        {format === 'ranked' ? (
+          <ShareImageButton
+            src={`/tier-list/ranked/story.png${bracket ? `?rank=${bracket.slug}` : ''}`}
+            fileName={`brawlzone-ranked-tier-list${bracket ? `-${bracket.slug}` : ''}.png`}
+            kind="tier-list"
+            label={tr('Share this tier list')}
+            className="mt-3"
+          />
+        ) : null}
 
         <Disclosure className="mt-2" tone="bare" summary={t.howSummary}>
           <p>{t.how1(format)}</p>

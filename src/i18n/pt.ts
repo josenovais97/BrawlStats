@@ -3866,4 +3866,16 @@ export const PT: Record<string, string> = {
     "Pro",
   "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
     "Alguns eventos com nome também são contados, todos anônimos: instalar o app web, abri-lo, tocar no download para Android, tocar nos botões que levam ao teste do Google Play e compartilhar uma página como imagem. O evento de download diz de qual página veio e qual versão foi oferecida, para distinguir uma atualização de uma primeira instalação. Nada mais.",
+  "RANKED TIER LIST":
+    "TIER LIST DO RANQUEADO",
+  "All ranks":
+    "Todos os ranks",
+  "Season {n} · last 7 days":
+    "Temporada {n} · últimos 7 dias",
+  "Not enough battles yet":
+    "Ainda não há partidas suficientes",
+  "From real Ranked battles, updated every 2 hours":
+    "De partidas reais do Ranqueado, atualizado a cada 2 horas",
+  "Share this tier list":
+    "Compartilhar esta tier list",
 };
