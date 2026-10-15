@@ -110,7 +110,9 @@ const WINDOW_DAYS = 7;
  * recompute reserves, which was 530s, and 1,000 players took 127s on a good
  * run and 340s on a slow one. Three thousand at the slow rate is ~1,020s, so
  * the budget went to 25 minutes — still inside the unit's 30-minute
- * TimeoutStartSec, with the margin left deliberately.
+ * TimeoutStartSec, with the margin left deliberately. That margin was spent on
+ * 2026-10-14 by a per-run image rebuild, and every run was killed seconds from
+ * the end: the rebuild moved to the deploy and the unit allows 50 minutes now.
  *
  * Time rather than concurrency, deliberately: raising CONCURRENCY would hold
  * the wall clock flat but triple the request *rate* against an API key that is
