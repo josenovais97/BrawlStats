@@ -243,6 +243,18 @@ export default function BubblePage() {
           <p className="leading-relaxed text-muted">{t('Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.')}</p>
           <p className="leading-relaxed text-muted">{t('An installed app can. That is the whole reason this exists as an APK rather than another page on the site, and it is all the app does: draw the numbers over the game, then get out of the way.')}</p>
         </div>
+        {/* The claim above, shown: a real phone, the panel open over the lobby. */}
+        <figure className="mt-6 space-y-2">
+          <Image
+            src="/bubble/over-game.jpg"
+            alt={t('The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine')}
+            width={2048}
+            height={912}
+            className="w-full rounded-2xl border border-border"
+            loading="lazy"
+          />
+          <figcaption className="text-center text-xs text-muted">{t('On a real phone, open over the game')}</figcaption>
+        </figure>
       </section>
 
       {/* What you get, beside the thing itself. */}
@@ -257,20 +269,20 @@ export default function BubblePage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <figure className="space-y-2">
             <Image
-              src="/bubble/app-panel.png"
-              alt={t('The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score')}
+              src="/bubble/panel-meta.png"
+              alt={t('The panel\'s Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out')}
               width={720}
               height={1360}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />
-            <figcaption className="text-center text-xs text-muted">{t('Pick your mode')}</figcaption>
+            <figcaption className="text-center text-xs text-muted">{t('Pick your rank and mode')}</figcaption>
           </figure>
 
           <figure className="space-y-2">
             <Image
-              src="/bubble/app-map.png"
-              alt={t('The panel with Knockout and Belle\'s Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there')}
+              src="/bubble/panel-map.png"
+              alt={t('Pinball Dreams at Mythic: the best picks on that map, your best owned pick named above the list, and the battles behind each number')}
               width={720}
               height={1360}
               className="w-full rounded-2xl border border-border"
@@ -281,10 +293,10 @@ export default function BubblePage() {
 
           <figure className="space-y-2">
             <Image
-              src="/bubble/app-build.png"
-              alt={t('The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each')}
+              src="/bubble/panel-build.png"
+              alt={t('The build card for Shade: the most-owned star power, gadget and two gears, with the share of sampled owners holding each')}
               width={720}
-              height={1302}
+              height={1360}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />
@@ -315,8 +327,8 @@ export default function BubblePage() {
         <div className="grid items-center gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="mx-auto w-full max-w-[300px]">
             <Image
-              src="/bubble/app-draft.png"
-              alt={t('The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft')}
+              src="/bubble/panel-draft.png"
+              alt={t('The draft board on Hard Rock Mine with one ban, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft')}
               width={720}
               height={1360}
               className="w-full rounded-2xl border border-border"
@@ -481,10 +493,10 @@ export default function BubblePage() {
 
           <div className="mx-auto w-full max-w-[260px]">
             <Image
-              src="/bubble/app-home.png"
-              alt={t('The BrawlZone app\'s main screen, showing the permission status and the Start bubble button')}
-              width={540}
-              height={1200}
+              src="/bubble/app-home-2.jpg"
+              alt={t('The BrawlZone Bubble app\'s main screen: the Start bubble, Stop and Quick Settings buttons, and a list of what the panel does')}
+              width={912}
+              height={1854}
               className="w-full rounded-2xl border border-border"
               loading="lazy"
             />

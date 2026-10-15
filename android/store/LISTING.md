@@ -10,7 +10,7 @@ key; a store install and a site install update each other.
 2. Upload the APK at `BUBBLE_APP.path` in `src/lib/bubble-app.ts` — that is the only copy kept in
    `public/downloads/`, and its `version`/`versionCode` there are the numbers the form asks for.
    Package `net.brawlzone.bubble`.
-3. Fill the fields from the sections below. Icon: `android/store/icon-512.png`. Screenshots: `public/bubble/app-home.png`, `app-panel.png`, `app-draft.png`, `app-map.png`, `app-build.png`.
+3. Fill the fields from the sections below. Icon: `android/store/icon-512.png`. Screenshots: the six Play images made on 2026-10-14 (panel over the game, the bubble, best pick, home, account, upgrade plan), or `public/bubble/over-game.jpg`, `panel-meta.png`, `panel-map.png`, `panel-draft.png`, `panel-build.png`, `app-home-2.jpg`.
 4. Category: **Tools** (or Games › Utilities if offered). Price: Free. Contains ads: No. In-app purchases: No.
 5. Website: https://brawlzone.net/bubble · Privacy policy: https://brawlzone.net/privacy · Support: the site's contact on /about.
 6. When the listing is live, put its URL in `storeUrl` in `src/lib/bubble-app.ts` and push. The download page shows the link only once that is set.

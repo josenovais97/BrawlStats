@@ -3700,4 +3700,20 @@ export const PT: Record<string, string> = {
     "O teste abre em alguns dias, depois que o Google revisar. Volte em breve.",
   "What it asks of you":
     "O que é pedido de você",
+  "On a real phone, open over the game":
+    "Num celular de verdade, aberto por cima do jogo",
+  "Pick your rank and mode":
+    "Escolha seu rank e modo",
+  "Pinball Dreams at Mythic: the best picks on that map, your best owned pick named above the list, and the battles behind each number":
+    "Pinball Dreams no Mítico: as melhores escolhas nesse mapa, seu melhor brawler disponível acima da lista e as partidas por trás de cada número",
+  "The BrawlZone Bubble app's main screen: the Start bubble, Stop and Quick Settings buttons, and a list of what the panel does":
+    "A tela principal do app BrawlZone Bubble: os botões Start bubble, Stop e Quick Settings, e uma lista do que o painel faz",
+  "The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine":
+    "O painel do BrawlZone aberto por cima do lobby do Brawl Stars num celular, mostrando o meta do Ranqueado para Mestres+ em Undermine",
+  "The build card for Shade: the most-owned star power, gadget and two gears, with the share of sampled owners holding each":
+    "O card de build do Shade: a habilidade estelar, o acessório e as duas engrenagens mais comuns, com a parcela de donos amostrados que tem cada um",
+  "The draft board on Hard Rock Mine with one ban, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "O quadro de draft em Hard Rock Mine com um banimento, um aliado e dois inimigos, e os brawlers restantes ordenados por quão bem respondem a esse draft",
+  "The panel's Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out":
+    "O meta do Ranqueado no painel, no Mítico: botões de rank e modo no topo e depois a tier list a partir do S, com os brawlers que você não tem em cinza",
 };

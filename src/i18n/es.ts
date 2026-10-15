@@ -3700,4 +3700,20 @@ export const ES: Record<string, string> = {
     "La prueba abre en unos días, cuando Google la revise. Vuelve pronto.",
   "What it asks of you":
     "Lo que te pide",
+  "On a real phone, open over the game":
+    "En un teléfono real, abierto sobre el juego",
+  "Pick your rank and mode":
+    "Elige tu rango y modo",
+  "Pinball Dreams at Mythic: the best picks on that map, your best owned pick named above the list, and the battles behind each number":
+    "Pinball Dreams en Mítico: las mejores elecciones en ese mapa, tu mejor brawler disponible arriba de la lista y los combates detrás de cada número",
+  "The BrawlZone Bubble app's main screen: the Start bubble, Stop and Quick Settings buttons, and a list of what the panel does":
+    "La pantalla principal de la app BrawlZone Bubble: los botones Start bubble, Stop y Quick Settings, y una lista de lo que hace el panel",
+  "The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine":
+    "El panel de BrawlZone abierto sobre el lobby de Brawl Stars en un teléfono, con el meta de Competitivo para Maestros+ en Undermine",
+  "The build card for Shade: the most-owned star power, gadget and two gears, with the share of sampled owners holding each":
+    "La ficha de build de Shade: la habilidad estelar, el gadget y los dos engranajes más comunes, con el porcentaje de dueños muestreados que tiene cada uno",
+  "The draft board on Hard Rock Mine with one ban, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "El tablero de draft en Hard Rock Mine con un bloqueo, un compañero y dos rivales, y los brawlers restantes ordenados por lo bien que responden a ese draft",
+  "The panel's Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out":
+    "El meta de Competitivo del panel en Mítico: botones de rango y modo arriba y luego la tier list desde S, con los brawlers que no tienes en gris",
 };
