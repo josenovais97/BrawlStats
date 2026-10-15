@@ -20,6 +20,7 @@ import Link from "next/link";
 
 import { DemoVideo } from "@/components/bubble/demo-video";
 import { DownloadButton } from "@/components/bubble/download-button";
+import { GooglePlayBadge } from "@/components/store-badges";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_TEST, bubbleAppSize } from "@/lib/bubble-app";
 import { getT } from '@/lib/t';
@@ -199,14 +200,44 @@ export default function BubblePage() {
               <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.')}</p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-              <DownloadButton
-                from="hero"
-                className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
-              >
-                <Download className="size-5" />{t('Download for Android')}</DownloadButton>
-              <p className="text-sm text-muted">{t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}</p>
-            </div>
+            {/*
+              Google Play first while its closed test is recruiting: every new
+              install that goes through Play is a tester, and Play keeps the
+              app updated. The APK stays, smaller, for phones without Google
+              Play and for anyone who will not join a group.
+            */}
+            {PLAY_TEST.open ? (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-4">
+                  <Link href={lp('/bubble/test')} aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
+                    <GooglePlayBadge className="h-14 w-auto" />
+                  </Link>
+                  <Link
+                    href={lp('/bubble/test')}
+                    className="inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
+                  >
+                    {t('Join the test')}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </div>
+                <p className="text-sm text-muted">
+                  {t('No Google Play on your phone?')}{' '}
+                  <DownloadButton from="hero" className="font-semibold text-foreground underline underline-offset-2">
+                    {t('Download the APK')}
+                  </DownloadButton>{' '}
+                  {t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+                <DownloadButton
+                  from="hero"
+                  className="inline-flex items-center gap-3 rounded-xl bg-brand px-7 py-4 text-lg font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
+                >
+                  <Download className="size-5" />{t('Download for Android')}</DownloadButton>
+                <p className="text-sm text-muted">{t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}</p>
+              </div>
+            )}
 
             {/* The store listing, for readers who will not sideload. Same
                 build, same key; see `storeUrl`. */}
@@ -638,11 +669,20 @@ export default function BubblePage() {
         <h2 className="display text-2xl uppercase sm:text-3xl">{t('Get it on your phone')}</h2>
         <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.', { v: bubbleAppSize() })}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          {PLAY_TEST.open ? (
+            <Link href={lp('/bubble/test')} aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
+              <GooglePlayBadge className="h-[3.25rem] w-auto" />
+            </Link>
+          ) : null}
           <DownloadButton
             from="cta"
-            className="inline-flex items-center gap-3 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
+            className={
+              PLAY_TEST.open
+                ? "inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"
+                : "inline-flex items-center gap-3 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
+            }
           >
-            <Download className="size-5" />{t('Download for Android')}</DownloadButton>
+            <Download className="size-5" />{PLAY_TEST.open ? t('Download the APK') : t('Download for Android')}</DownloadButton>
           <Link
             href={lp('/tier-list/ranked')}
             className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"

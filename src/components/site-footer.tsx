@@ -6,12 +6,17 @@ import Link from 'next/link';
 import { BrandMark } from '@/components/brand-mark';
 import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, type Locale } from '@/lib/i18n';
-import { AppStoreBadge, GooglePlayBadge } from '@/components/store-badges';
+import { GooglePlayBadge } from '@/components/store-badges';
+import { PLAY_TEST } from '@/lib/bubble-app';
 import { CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL } from '@/lib/site';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/brawl-stars/id1229016807';
-const GOOGLE_PLAY_URL =
-  'https://play.google.com/store/apps/details?id=com.supercell.brawlstars';
+/*
+ * Our own app, not the game's (2026-10-15). The footer used to link Brawl
+ * Stars on both stores, which sent our visitors to Supercell's listing; it now
+ * points at BrawlZone Bubble: the tester page while the Google Play closed
+ * test is recruiting, the app page otherwise.
+ */
+const BUBBLE_PATH = PLAY_TEST.open ? '/bubble/test' : '/bubble';
 const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/josenovais';
 
 /**
@@ -117,9 +122,8 @@ const WORDS: Record<Locale, Record<string, string>> = {
     tagline:
       'Estadísticas de Brawl Stars que te muestran dónde estás. Búsqueda de jugadores y clubes, tier lists y mejores brawlers por mapa, con partidas que recogemos nosotros mismos.',
     follow: 'Síguenos y apóyanos', coffee: 'Invítame a un café', free: 'Gratis, sin anuncios y sin pagos.',
-    appStore: 'Descarga Brawl Stars en la App Store (se abre en una pestaña nueva)',
-    googlePlay: 'Descarga Brawl Stars en Google Play (se abre en una pestaña nueva)',
-    getGame: 'Consigue Brawl Stars, gratis en iOS y Android', about: 'Sobre', privacy: 'Privacidad',
+    googlePlay: 'BrawlZone Bubble en Google Play',
+    getGame: 'BrawlZone Bubble: el asistente de draft que flota sobre el juego. Gratis.', about: 'Sobre', privacy: 'Privacidad',
     terms: 'Términos', contact: 'Contacto', sources: 'Datos e imágenes de',
     disclaimer: 'Este material no es oficial y no está respaldado por Supercell. Para más información, consulta la',
     policy: 'Política de contenido de fans de Supercell', notAffiliated: 'sin relación con Supercell',
@@ -135,9 +139,8 @@ const WORDS: Record<Locale, Record<string, string>> = {
     tagline:
       'Estatísticas de Brawl Stars que mostram onde você está. Busca de jogadores e clubes, tier lists e melhores brawlers por mapa, com partidas que nós mesmos coletamos.',
     follow: 'Siga e apoie', coffee: 'Me pague um café', free: 'Grátis, sem anúncios e sem pagamento.',
-    appStore: 'Baixe Brawl Stars na App Store (abre em uma nova aba)',
-    googlePlay: 'Baixe Brawl Stars no Google Play (abre em uma nova aba)',
-    getGame: 'Baixe Brawl Stars, grátis no iOS e no Android', about: 'Sobre o', privacy: 'Privacidade',
+    googlePlay: 'BrawlZone Bubble no Google Play',
+    getGame: 'BrawlZone Bubble: o ajudante de draft que flutua sobre o jogo. Grátis.', about: 'Sobre o', privacy: 'Privacidade',
     terms: 'Termos', contact: 'Contato', sources: 'Dados e imagens de',
     disclaimer: 'Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a',
     policy: 'Política de Conteúdo de Fãs da Supercell', notAffiliated: 'sem ligação com a Supercell',
@@ -148,9 +151,8 @@ const EN: Record<string, string> = {
   tagline:
     'Brawl Stars stats that show where you stand. Player and club lookups, tier lists and map picks, from battles we sample ourselves.',
   follow: 'Follow and support', coffee: 'Buy me a coffee', free: 'Free, ad-free, no paywall.',
-  appStore: 'Download Brawl Stars on the App Store (opens in a new tab)',
-  googlePlay: 'Download Brawl Stars on Google Play (opens in a new tab)',
-  getGame: 'Get Brawl Stars — free on iOS and Android', about: 'About', privacy: 'Privacy', terms: 'Terms',
+  googlePlay: 'BrawlZone Bubble on Google Play',
+  getGame: 'BrawlZone Bubble: the draft helper that floats over the game. Free.', about: 'About', privacy: 'Privacy', terms: 'Terms',
   contact: 'Contact', sources: 'Data and artwork from',
   disclaimer: 'This material is unofficial and is not endorsed by Supercell. For more information see',
   policy: 'Supercell’s Fan Content Policy', notAffiliated: 'not affiliated with Supercell',
@@ -318,26 +320,14 @@ export function SiteFooter() {
           */}
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              {/* Both badges are locked to one height so they read as a pair
-                  rather than as two pieces of borrowed artwork. */}
-              <a
-                href={APP_STORE_URL}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={t('appStore')}
-                className="rounded transition-opacity hover:opacity-80"
-              >
-                <AppStoreBadge className="h-9 w-auto" />
-              </a>
-              <a
-                href={GOOGLE_PLAY_URL}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                href={href(BUBBLE_PATH)}
+                prefetch={false}
                 aria-label={t('googlePlay')}
                 className="rounded transition-opacity hover:opacity-80"
               >
                 <GooglePlayBadge className="h-9 w-auto" />
-              </a>
+              </Link>
             </div>
             <p className="text-muted/80">{t('getGame')}</p>
           </div>

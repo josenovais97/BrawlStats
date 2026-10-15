@@ -3814,4 +3814,8 @@ export const ES: Record<string, string> = {
     "{n} testers",
   "Join the test":
     "Unirme a la prueba",
+  "No Google Play on your phone?":
+    "¿Tu teléfono no tiene Google Play?",
+  "Download the APK":
+    "Descargar el APK",
 };
