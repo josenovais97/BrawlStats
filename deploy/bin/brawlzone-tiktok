@@ -219,7 +219,14 @@ case "$MODE" in
   # The Google Play closed-test recruiting carousel (2026-10), by hand like the
   # challenge: static slides and caption under public/tiktok/playtest/.
   playtest) MANIFEST="${SITE}/tiktok/playtest/slides.json" ;;
-  *)     die "::error::unknown mode '${MODE}' (expected counter, tiers, build, trio, patch, daily, hidden, challenge or playtest)" ;;
+  # Any one-off carousel kept under public/tiktok/<name>/, by hand:
+  #   brawlzone-tiktok promo season50
+  # The second argument names the folder here, so the date is today's.
+  promo)
+    case "$DAY" in *[!a-z0-9-]*|'') die "::error::promo needs a folder name, e.g. promo season50" ;; esac
+    MANIFEST="${SITE}/tiktok/${DAY}/slides.json"
+    DAY="$(date -u +%Y-%m-%d)" ;;
+  *)     die "::error::unknown mode '${MODE}' (expected counter, tiers, build, trio, patch, daily, hidden, challenge, playtest or promo <name>)" ;;
 esac
 
 # Before anything that can exit, so "the job ran and decided there was nothing
