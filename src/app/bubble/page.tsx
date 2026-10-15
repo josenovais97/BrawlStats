@@ -243,7 +243,9 @@ export default function BubblePage() {
 
             {/* The store listing, for readers who will not sideload. Same
                 build, same key; see `storeUrl`. */}
-            {BUBBLE_APP.storeUrl ? (
+            {/* Hidden during the Google Play test: a third route pulls people
+                away from the one that makes them testers. */}
+            {BUBBLE_APP.storeUrl && !PLAY_TEST.open ? (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <a
                   href={lp(BUBBLE_APP.storeUrl)}
@@ -274,7 +276,7 @@ export default function BubblePage() {
                   className="flex items-center gap-2 text-sm font-semibold"
                 >
                   <Check className="size-4 text-victory" />
-                  {item}
+                  {t(item)}
                 </li>
               ))}
             </ul>
