@@ -12,6 +12,7 @@ import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeBubble } from '@/components/home/home-bubble';
+import { HomePlayTest } from '@/components/home/home-play-test';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeSnapshot } from '@/components/home/home-snapshot';
 import { HomeSplit } from '@/components/home/home-split';
@@ -133,6 +134,9 @@ export default function HomePage() {
       {/* Renders nothing until the visitor has saved someone, so a first-time
           view goes straight from the search box to the product. */}
       <FavoritesList />
+
+      {/* While the Google Play closed test is recruiting; nothing otherwise. */}
+      <HomePlayTest />
 
       {/*
         The findings, directly under the search.

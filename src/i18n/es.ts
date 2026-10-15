@@ -3812,4 +3812,6 @@ export const ES: Record<string, string> = {
     "{days} días",
   "{n} testers":
     "{n} testers",
+  "Join the test":
+    "Unirme a la prueba",
 };
