@@ -456,7 +456,7 @@ export function releasesSince(versionCode: number): BubbleRelease[] {
  * error is worse than no page. Flip it, push, and both appear.
  */
 export const PLAY_TEST = {
-  open: false,
+  open: true,
   /** Joining the group is what lets a Google account into the test. */
   groupUrl: 'https://groups.google.com/g/brawlzone-bubble-testers',
   /** Play's opt-in page for the closed test. */
