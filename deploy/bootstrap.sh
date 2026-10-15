@@ -77,11 +77,9 @@ install -m 755 "$REPO_DIR/deploy/bin/backup-db.sh"  "$HOME/backup-db.sh"
 
 say "systemd units"
 sudo install -m 644 "$REPO_DIR"/deploy/systemd/* /etc/systemd/system/
-for u in sampler backup deploy verify-restore; do
-  sudo install -d "/etc/systemd/system/brawlzone-${u}.service.d"
-  printf '[Unit]\nOnFailure=brawlzone-alert@%%N.service\n' \
-    | sudo tee "/etc/systemd/system/brawlzone-${u}.service.d/onfailure.conf" >/dev/null
-done
+# OnFailure= lives in each unit now. The onfailure.conf drop-ins this loop used
+# to write named the job differently (%N, not %n), so systemd counted them as a
+# second alert and every failure was mailed twice; removed 2026-10-15.
 sudo systemctl daemon-reload
 
 say "logrotate, fail2ban, sshd"

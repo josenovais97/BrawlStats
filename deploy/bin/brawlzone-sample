@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Run the stats sampler and report what it did, not how it did it.
 #
-# `docker compose run --build` prints a few hundred lines of build progress,
+# The image is built by the deploy (auto-deploy.sh), not here: building on
+# every run cost ~5 minutes of the timeout and raced other builds.
+#
+# `docker compose run` prints a few hundred lines of build progress,
 # npm notices and layer hashes. On a successful run none of it is information
 # -- the question a log should answer is "did it work and what did it collect",
 # and that was buried under image digests.
@@ -17,7 +20,7 @@ trap 'rm -f "$out"' EXIT
 
 echo "Starting sampler"
 start=$(date +%s)
-docker compose run --rm --build sampler >"$out" 2>&1
+docker compose run --rm sampler >"$out" 2>&1
 rc=$?
 elapsed=$(( $(date +%s) - start ))
 

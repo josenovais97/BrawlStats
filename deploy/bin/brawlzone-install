@@ -27,11 +27,10 @@
 #   brawlzone-install            install anything that differs
 #   brawlzone-install --check    report what differs, change nothing, exit 1
 #
-# It never deletes. There are files on this box that no longer have a repo
-# counterpart -- the brawlzone-*.service.d/onfailure.conf drop-ins predate the
-# OnFailure= lines now inlined in the units -- and an installer that cleaned up
-# after itself would silently remove whatever a future hand-fix had added.
-# Removing something is a decision for a person.
+# It never deletes: an installer that cleaned up after itself would silently
+# remove whatever a future hand-fix had added. Removing something is a decision
+# for a person. (The onfailure.conf drop-ins that predated the inlined
+# OnFailure= lines were removed by hand on 2026-10-15: they doubled every alert.)
 set -uo pipefail
 
 REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd) || exit 1

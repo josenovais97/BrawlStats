@@ -11,7 +11,7 @@ cd /home/ubuntu/brawlstats || exit 1
 
 out=$(mktemp); trap 'rm -f "$out"' EXIT
 
-if ! docker compose run --rm --build sampler npm run discord:auto -- "$job" >"$out" 2>&1; then
+if ! docker compose run --rm sampler npm run discord:auto -- "$job" >"$out" 2>&1; then
   echo "Discord $job post FAILED. Output:"
   tail -25 "$out"
   exit 1

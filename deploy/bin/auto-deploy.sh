@@ -160,6 +160,23 @@ if ! docker compose up -d --build >"$build" 2>&1; then
 fi
 echo "Built and restarted in $(( $(date +%s) - start ))s: $(docker compose ps --services --status running | tr '\n' ' ')"
 
+# The sampler image too, here and only here (2026-10-15).
+#
+# The sampler, precompute and Discord jobs used to `docker compose run
+# --build sampler` each time, so that none of them ran a stale image. On a day
+# with many pushes that meant several full Next builds racing each other and
+# the deploy's own on two cores, sharing one build cache: builds failed
+# (precompute 2026-10-14 14:58, Discord 2026-10-15 08:09), and the sampler
+# spent ~5 of its 30 minutes rebuilding before sampling, until systemd killed
+# it seconds from the end every run. The image is the app's builder stage, so
+# right after `up --build` this is all cache hits and takes seconds; the jobs
+# now just run it.
+if ! docker compose build sampler >"$build" 2>&1; then
+  echo "Sampler image build FAILED -- the site is up, but jobs run the previous image. Output follows:"
+  tail -40 "$build"
+  exit 1
+fi
+
 if [ "$caddy_changed" -gt 0 ]; then
   # Gate on the EXIT CODE, not on the output. `caddy validate` prints its
   # progress as JSON and never says the word "valid", so grepping its text for

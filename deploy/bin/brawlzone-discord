@@ -11,11 +11,11 @@ cd /home/ubuntu/brawlstats || exit 1
 
 out=$(mktemp); trap 'rm -f "$out"' EXIT
 
-# `--build`, like brawlzone-sample: without it `docker compose run` reuses
-# whatever image exists, which on the first run was one built before this
-# script's npm entry existed -- "Missing script: discord:meta" against a
-# package.json that plainly has it.
-if ! docker compose run --rm --build sampler npm run discord:meta >"$out" 2>&1; then
+# No `--build`: the deploy builds the sampler image after every change
+# (auto-deploy.sh), so the image is current. It used to build here, which once
+# fixed "Missing script: discord:meta" from a stale image, and later raced the
+# deploy's build on busy days.
+if ! docker compose run --rm sampler npm run discord:meta >"$out" 2>&1; then
   echo "Discord meta post FAILED. Output:"
   # Build noise is a few hundred lines; the useful part is always the tail.
   tail -25 "$out"
