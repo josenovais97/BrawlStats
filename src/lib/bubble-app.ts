@@ -441,3 +441,28 @@ export const BUBBLE_CHANGELOG: BubbleRelease[] = [
 export function releasesSince(versionCode: number): BubbleRelease[] {
   return BUBBLE_CHANGELOG.filter((r) => r.versionCode > versionCode);
 }
+
+/**
+ * The Google Play closed test (2026-10).
+ *
+ * A new personal developer account may only publish after 12 or more testers
+ * have stayed opted in for 14 days in a row, so the first release goes to a
+ * closed test fed by a Google Group anyone can join. `/bubble/test` walks a
+ * player through the three steps, and the panel invites site-build users to
+ * it while `open` is true.
+ *
+ * `open` stays false until Google has approved the test release: before that
+ * the opt-in link answers with an error, and a page sending people into an
+ * error is worse than no page. Flip it, push, and both appear.
+ */
+export const PLAY_TEST = {
+  open: false,
+  /** Joining the group is what lets a Google account into the test. */
+  groupUrl: 'https://groups.google.com/g/brawlzone-bubble-testers',
+  /** Play's opt-in page for the closed test. */
+  optInUrl: 'https://play.google.com/apps/testing/net.brawlzone.bubble',
+  /** The listing; testers install from here once opted in. */
+  listingUrl: 'https://play.google.com/store/apps/details?id=net.brawlzone.bubble',
+  testersNeeded: 12,
+  days: 14,
+};

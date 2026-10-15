@@ -6,7 +6,8 @@ import { PanelI18nProvider, PanelRoot, PanelText } from '@/components/bubble/pan
 import { PanelShell } from '@/components/bubble/panel-shell';
 import type { PanelEntry, PanelMap, PanelMode } from '@/components/bubble/panel-tiers';
 import { PanelUpdate } from '@/components/bubble/panel-update';
-import { BUBBLE_APP, BUBBLE_CHANGELOG } from '@/lib/bubble-app';
+import { PanelPlayTest } from '@/components/bubble/panel-play-test';
+import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_TEST } from '@/lib/bubble-app';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { titleCase } from '@/lib/format';
@@ -226,6 +227,8 @@ export default async function BubblePanelPage() {
           latestVersionCode={BUBBLE_APP.versionCode}
           changes={BUBBLE_CHANGELOG}
         />
+        {/* The Google Play closed test, while it is recruiting (PLAY_TEST). */}
+        {PLAY_TEST.open ? <PanelPlayTest /> : null}
 
         {modes[0].entries.length === 0 ? (
           <p className="px-2 py-8 text-center text-sm text-muted">

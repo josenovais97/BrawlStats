@@ -11,6 +11,7 @@ const es419: UiStrings = {
   'draft.addEnemies': 'Agregar un rival…',
   'meta.vsUsual': '{n} vs lo habitual',
   'comps.vsAvg': '{n} vs promedio',
+  'playTest.body': 'Únete a la prueba: tres toques y quédate con la app 14 días.',
   'update.fallback': 'Si no pasa nada, abre {url} en tu navegador. El archivo lleva su número de versión, así puedes revisar qué instalas.',
   'bracket.title': 'Tu rango',
   'bracket.all': 'Todos los rangos',

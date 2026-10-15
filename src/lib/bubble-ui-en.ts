@@ -100,6 +100,10 @@ export const UI_EN = {
 
   'update.upToDate': 'App {version} · up to date',
   'update.isOut': 'Version {version} is out',
+  'playTest.title': "Help us get on Google Play",
+  'playTest.body': "Join the test: three taps, then keep the app for 14 days.",
+  'playTest.cta': "Join the test",
+  'playTest.later': "Not now",
   'update.youHave': '— you have {version}',
   'update.download': 'Download',
   'update.fallback': 'If nothing happens, open {url} in your browser. The file is named for its version, so you can check what you are installing.',

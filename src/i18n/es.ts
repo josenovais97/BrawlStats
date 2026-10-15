@@ -3658,4 +3658,46 @@ export const ES: Record<string, string> = {
     "para poder dibujar encima del juego. Ese permiso le deja poner píxeles en tu pantalla; no le deja leerlos. La app nunca captura ni lee tu pantalla, y no lee tu cuenta del juego, tus archivos, tus contactos ni tus otras apps.",
   "with the tag. It is done within 30 days, usually much sooner.":
     "con el tag. Se hace en un plazo de 30 días, normalmente mucho antes.",
+  ". Every message is read.":
+    ". Leemos todos los mensajes.",
+  "Become a tester":
+    "Hazte tester",
+  "Found a bug or have an idea? Email":
+    "¿Encontraste un error o tienes una idea? Escribe a",
+  "Google Play test":
+    "Prueba en Google Play",
+  "Google lets a new app on the Play Store only after {n} people have tested it for {days} days. Three taps, and you are one of them.":
+    "Google solo deja entrar una app nueva a Play Store después de que {n} personas la prueban durante {days} días. Tres toques y eres una de ellas.",
+  "Help launch BrawlZone Bubble on Google Play":
+    "Ayuda a lanzar BrawlZone Bubble en Google Play",
+  "Help us launch BrawlZone Bubble on Google Play":
+    "Ayúdanos a lanzar BrawlZone Bubble en Google Play",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings.":
+    "Instala BrawlZone Bubble desde su página en Play Store. ¿Ya tienes la versión de este sitio? Play la instala encima y conserva tu tag y tus ajustes.",
+  "Install from Google Play":
+    "Instala desde Google Play",
+  "It is the same app as the download on this site, with the same features and languages. When it goes public, you simply keep it, and it updates through Google Play.":
+    "Es la misma app que la descarga de este sitio, con las mismas funciones e idiomas. Cuando sea pública, simplemente te la quedas y se actualiza por Google Play.",
+  "Join the Google Play test of BrawlZone Bubble, the draft helper that floats over Brawl Stars. Three taps, free, no ads.":
+    "Únete a la prueba en Google Play de BrawlZone Bubble, el asistente de draft que flota sobre Brawl Stars. Tres toques, gratis, sin anuncios.",
+  "Join the group":
+    "Unirme al grupo",
+  "Join the testers group":
+    "Únete al grupo de testers",
+  "Keep the app installed for {days} days. Using it in your matches helps, and so does telling us what breaks. That is all: no sign-up beyond the group, no payment, nothing to fill in.":
+    "Mantén la app instalada durante {days} días. Usarla en tus partidas ayuda, y contarnos qué falla también. Eso es todo: ningún registro aparte del grupo, ningún pago, nada que llenar.",
+  "More about the Bubble":
+    "Más sobre el Bubble",
+  "On the next page, tap \"Become a tester\". It can take a few minutes after joining the group before this works.":
+    "En la siguiente página, toca \"Convertirse en tester\". Después de unirte al grupo, puede tardar unos minutos en funcionar.",
+  "Open Google Play":
+    "Abrir Google Play",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone.":
+    "Abre el grupo y toca \"Unirse al grupo\". Usa la misma cuenta de Google que la Play Store de tu teléfono.",
+  "The group is only a list of testers: nobody sends messages there, and joining shows nothing to other members. You can leave the test at any time from the same pages.":
+    "El grupo es solo una lista de testers: nadie envía mensajes ahí, y unirte no muestra nada a los demás miembros. Puedes salir de la prueba cuando quieras desde las mismas páginas.",
+  "The test opens in a few days, once Google has reviewed it. Check back soon.":
+    "La prueba abre en unos días, cuando Google la revise. Vuelve pronto.",
+  "What it asks of you":
+    "Lo que te pide",
 };
