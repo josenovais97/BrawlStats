@@ -743,6 +743,18 @@ export const CLIENT_ES: Record<string, string> = {
     "Calcular",
   "Your player tag, e.g. #2PQ8LJ9V":
     "Tu tag de jugador, ej. #2PQ8LJ9V",
+  "Compared with the Ranked tier list from the last 7 days of battles.":
+    "Comparada con la tier list de Competitivo de los últimos 7 días de combates.",
+  "No disagreements: you see the meta exactly as the battles do.":
+    "Sin desacuerdos: ves el meta exactamente como lo dicen los combates.",
+  "Save as image":
+    "Guardar como imagen",
+  "Your list matches the real data: {n}%":
+    "Tu lista coincide con los datos reales: {n}%",
+  "you put it in {mine}, the data says {data}: you rate it higher":
+    "lo pusiste en {mine}, los datos dicen {data}: lo valoras más",
+  "you put it in {mine}, the data says {data}: you rate it lower":
+    "lo pusiste en {mine}, los datos dicen {data}: lo valoras menos",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1485,4 +1497,16 @@ export const CLIENT_PT: Record<string, string> = {
     "Calcular",
   "Your player tag, e.g. #2PQ8LJ9V":
     "Sua tag de jogador, ex. #2PQ8LJ9V",
+  "Compared with the Ranked tier list from the last 7 days of battles.":
+    "Comparada com a tier list do Ranqueado dos últimos 7 dias de partidas.",
+  "No disagreements: you see the meta exactly as the battles do.":
+    "Sem discordâncias: você vê o meta exatamente como as partidas mostram.",
+  "Save as image":
+    "Salvar como imagem",
+  "Your list matches the real data: {n}%":
+    "Sua lista bate com os dados reais: {n}%",
+  "you put it in {mine}, the data says {data}: you rate it higher":
+    "você colocou em {mine}, os dados dizem {data}: você valoriza mais",
+  "you put it in {mine}, the data says {data}: you rate it lower":
+    "você colocou em {mine}, os dados dizem {data}: você valoriza menos",
 };

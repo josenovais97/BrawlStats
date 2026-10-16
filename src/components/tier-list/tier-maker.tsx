@@ -9,6 +9,8 @@ import { decodeBoard, decodeOrder, encodeBoard } from '@/lib/tier-board';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 import { useT } from '@/components/i18n/use-t';
+import { ShareImageButton } from '@/components/share-image-button';
+import { tierAgreement } from '@/lib/tier-agreement';
 
 export interface MakerBrawler {
   id: number;
@@ -170,6 +172,15 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
 
   const placedCount = Object.keys(placed).length;
 
+  /*
+   * The board against the measured Ranked list: the score, and the brawlers
+   * it disagrees with most, which is the part people post and argue about.
+   */
+  const agreement = useMemo(
+    () => tierAgreement(placed, new Map(brawlers.map((b) => [b.id, b.metaTier])), 3),
+    [brawlers, placed],
+  );
+
   return (
     <div className="space-y-4">
       {/* Controls first: on a phone the board is tall, and a control under it
@@ -183,6 +194,16 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
           {copied ? <Check aria-hidden className="size-4" /> : <Link2 aria-hidden className="size-4" />}
           {copied ? tx('Link copied') : tx('Copy share link')}
         </button>
+
+        <ShareImageButton
+          src="/tier-list/maker/image"
+          query={encodeBoard(rows)}
+          fileName="brawlzone-tier-list.png"
+          kind="tier-maker"
+          label={tx('Save as image')}
+          disabled={placedCount === 0}
+          className="min-h-10"
+        />
 
         <button
           type="button"
@@ -210,6 +231,29 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
           <span className="font-bold capitalize">
             {byId.get(selected)?.name.toLowerCase()}
           </span>{' '}{tx('selected — now tap a tier to place it.')}</p>
+      ) : null}
+
+      {agreement.compared >= 5 ? (
+        <div className="card space-y-2 border-brand/40 p-4">
+          <p className="font-bold">
+            {tx('Your list matches the real data: {n}%', { n: agreement.score })}
+          </p>
+          {agreement.biggest.length ? (
+            <ul className="space-y-1 text-sm text-muted">
+              {agreement.biggest.map((d) => (
+                <li key={d.id}>
+                  <span className="font-semibold capitalize text-foreground">{byId.get(d.id)?.name.toLowerCase()}</span>{' '}
+                  {d.gap < 0
+                    ? tx('you put it in {mine}, the data says {data}: you rate it lower', { mine: d.mine, data: d.data })
+                    : tx('you put it in {mine}, the data says {data}: you rate it higher', { mine: d.mine, data: d.data })}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">{tx('No disagreements: you see the meta exactly as the battles do.')}</p>
+          )}
+          <p className="text-xs text-muted">{tx('Compared with the Ranked tier list from the last 7 days of battles.')}</p>
+        </div>
       ) : null}
 
       <div className="overflow-hidden rounded-2xl border border-border">

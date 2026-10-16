@@ -77,8 +77,10 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * affordable size can be drained by it. Real visitors will still occasionally
    * meet a 429 here during a flood. That is a real cost and the alternative was
    * measured: a site that answers nothing at all.
+   *
+   * 4 -> 3 on 2026-10-16 for the tier-maker image below, under the ceiling.
    */
-  '/draft/': { perSecond: 4, burst: 30 },
+  '/draft/': { perSecond: 3, burst: 30 },
 
   /*
    * The one people notice when it fails, and the cheapest in the way that
@@ -127,6 +129,13 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * off `/player/` rather than out of the ceiling.
    */
   '/account-value/': { perSecond: 1, burst: 10 },
+
+  /*
+   * The tier maker's "Save as image" (2026-10-16): up to ~100 portraits drawn
+   * per request, from a query any client can vary, so it is rate-limited like
+   * the other per-request renders. Its 1/s came off `/draft/`.
+   */
+  '/tier-list/maker/image/': { perSecond: 1, burst: 5 },
 };
 
 /**
@@ -214,6 +223,7 @@ export const LIMITED_PREFIXES = [
   '/wrapped/',
   // A live player fetch per page and per share card, like /player.
   '/account-value/',
+  '/tier-list/maker/image/',
 ] as const;
 
 export function isLimitedPath(pathname: string): boolean {

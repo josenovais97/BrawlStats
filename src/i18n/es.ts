@@ -3962,4 +3962,26 @@ export const ES: Record<string, string> = {
     "Tu tag de jugador, ej. #2PQ8LJ9V",
   "How much is this account worth? See its value and how it ranks":
     "¿Cuánto vale esta cuenta? Mira su valor y cómo se compara",
+  "Brawl Stars, ranked by me":
+    "Brawl Stars, según yo",
+  "MY TIER LIST":
+    "MI TIER LIST",
+  "Make yours and compare it with the data":
+    "Haz la tuya y compárala con los datos",
+  "Matches the real data: {n}%":
+    "Coincide con los datos reales: {n}%",
+  "{name}: me {mine}, data {data}":
+    "{name}: yo {mine}, datos {data}",
+  "Compared with the Ranked tier list from the last 7 days of battles.":
+    "Comparada con la tier list de Competitivo de los últimos 7 días de combates.",
+  "No disagreements: you see the meta exactly as the battles do.":
+    "Sin desacuerdos: ves el meta exactamente como lo dicen los combates.",
+  "Save as image":
+    "Guardar como imagen",
+  "Your list matches the real data: {n}%":
+    "Tu lista coincide con los datos reales: {n}%",
+  "you put it in {mine}, the data says {data}: you rate it higher":
+    "lo pusiste en {mine}, los datos dicen {data}: lo valoras más",
+  "you put it in {mine}, the data says {data}: you rate it lower":
+    "lo pusiste en {mine}, los datos dicen {data}: lo valoras menos",
 };

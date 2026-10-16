@@ -24,9 +24,14 @@ export function ShareImageButton({
   fileName,
   kind,
   label,
+  query,
+  disabled = false,
   className = '',
 }: {
   src: string;
+  /** Appended after the language segment, for images drawn from state (the tier maker's board). */
+  query?: string;
+  disabled?: boolean;
   fileName: string;
   kind: string;
   label?: string;
@@ -41,7 +46,7 @@ export function ShareImageButton({
     setState('busy');
     let how = 'download';
     try {
-      const url = `${src}/${locale}`;
+      const url = `${src}/${locale}${query ? `?${query}` : ''}`;
       const blob = await (await fetch(url)).blob();
       const file = new File([blob], fileName, { type: blob.type || 'image/png' });
       const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
@@ -78,7 +83,7 @@ export function ShareImageButton({
     <button
       type="button"
       onClick={share}
-      disabled={state === 'busy'}
+      disabled={disabled || state === 'busy'}
       className={`inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink transition-opacity hover:opacity-90 disabled:opacity-70 ${className}`}
     >
       {state === 'busy' ? (
