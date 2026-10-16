@@ -8,7 +8,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { TierMakerSkeleton } from '@/components/ui/skeletons';
 import { PageHeading } from '@/components/ui/section-heading';
 import { brawlerIconUrl } from '@/lib/brawlapi';
-import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getMetaIndex } from '@/lib/stats';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
@@ -55,11 +55,15 @@ export default async function TierMakerPage() {
   // Falls back to an empty index: a maker with no meta is still a maker, it
   // just cannot offer to prefill from it.
   const meta = await getMetaIndex('ranked', 7).catch(() => new Map());
+  // The tier lists' art: the mirror's tile, or the wiki portrait while the
+  // mirror has a new brawler's details but not its picture (Cosmo and Vince,
+  // October 2026). The maker read the mirror only and showed them broken.
+  const art = await getBrawlerArtMap().catch(() => new Map());
 
   const brawlers: MakerBrawler[] = catalog.current.map((brawler) => ({
     id: brawler.id,
     name: brawler.name,
-    imageUrl: brawler.meta?.imageUrl ?? brawlerIconUrl(brawler.id),
+    imageUrl: art.get(brawler.id)?.imageUrl ?? brawler.meta?.imageUrl ?? brawlerIconUrl(brawler.id),
     metaTier: meta.get(brawler.id)?.tier ?? null,
   }));
 

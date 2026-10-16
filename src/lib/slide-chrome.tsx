@@ -132,7 +132,13 @@ const ICON_TIMEOUT_MS = 12_000;
 export async function loadIcon(url: string, box: number): Promise<string | null> {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(ICON_TIMEOUT_MS) });
+      // The wiki refuses image requests that do not say where they come from
+      // (403 without a Referer, 200 with ours); its portraits stand in for new
+      // brawlers the mirror has no art for yet.
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(ICON_TIMEOUT_MS),
+        headers: { Referer: 'https://brawlzone.net/' },
+      });
       // A 404 is an answer, not a stall: the mirror has not published this
       // brawler yet, and retrying cannot change that. Only a throw -- a
       // timeout or a dropped connection -- is worth a second go.
@@ -165,7 +171,13 @@ export async function loadSized(
 ): Promise<{ src: string; width: number; height: number } | null> {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(ICON_TIMEOUT_MS) });
+      // The wiki refuses image requests that do not say where they come from
+      // (403 without a Referer, 200 with ours); its portraits stand in for new
+      // brawlers the mirror has no art for yet.
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(ICON_TIMEOUT_MS),
+        headers: { Referer: 'https://brawlzone.net/' },
+      });
       if (!res.ok) return null;
       const { data, info } = await sharp(Buffer.from(await res.arrayBuffer()))
         .resize({ width: maxW, height: maxH, fit: 'inside', withoutEnlargement: false })

@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 import { brawlerIconUrl } from '@/lib/brawlapi';
-import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { isIntlLocale, type Locale } from '@/lib/i18n';
 import { BG, BODY, BRAND, DIM, DISPLAY, FG, SLIDE_SIZE, loadIcon, slideFonts } from '@/lib/slide-chrome';
 import { getMetaIndex } from '@/lib/stats';
@@ -28,10 +28,10 @@ import type { Tier } from '@/types/stats';
 export const dynamic = 'force-dynamic';
 
 const ICONS = new Map<string, string | null>();
-async function icon(id: number, size: number): Promise<string | null> {
+async function icon(id: number, size: number, url: string): Promise<string | null> {
   const key = `${id}:${size}`;
   if (ICONS.has(key)) return ICONS.get(key)!;
-  const data = await loadIcon(brawlerIconUrl(id), size);
+  const data = await loadIcon(url, size);
   if (ICONS.size > 2000) ICONS.clear();
   ICONS.set(key, data);
   return data;
@@ -83,7 +83,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ lang
 
   const { size } = fit(tiers.map((tier) => rows.get(tier)!.length));
   const portraits = new Map<number, string | null>();
-  await Promise.all(order.map(async (id) => portraits.set(id, await icon(id, size))));
+  // Same art as the tier lists: the wiki portrait while the mirror lacks one.
+  const art = await getBrawlerArtMap().catch(() => new Map());
+  await Promise.all(
+    order.map(async (id) => portraits.set(id, await icon(id, size, art.get(id)?.imageUrl ?? brawlerIconUrl(id)))),
+  );
   const [fonts] = await Promise.all([slideFonts()]);
   const title = (name: string) => name.charAt(0) + name.slice(1).toLowerCase();
 
