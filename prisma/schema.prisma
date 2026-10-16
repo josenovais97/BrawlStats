@@ -658,3 +658,30 @@ model DiscordLink {
 
   @@map("discord_links")
 }
+
+/// A club's members, once a day (2026-10-16), for the club page's weekly
+/// activity: who gained trophies and who went quiet. The game API has no club
+/// history, so this is the only record of one.
+model ClubMemberSnapshot {
+  clubTag   String   @map("club_tag")
+  day       DateTime @db.Date
+  playerTag String   @map("player_tag")
+  name      String
+  trophies  Int
+  role      String
+
+  @@id([clubTag, day, playerTag])
+  @@index([day])
+  @@map("club_member_snapshots")
+}
+
+/// Clubs whose members are snapshotted daily: any club page opened in the
+/// last 30 days. Opening the page tracks it; the sampler refreshes it.
+model TrackedClub {
+  clubTag        String    @id @map("club_tag")
+  lastViewedAt   DateTime  @map("last_viewed_at")
+  lastSnapshotOn DateTime? @db.Date @map("last_snapshot_on")
+
+  @@index([lastViewedAt])
+  @@map("tracked_clubs")
+}

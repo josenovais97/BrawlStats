@@ -1,0 +1,30 @@
+{
+ "Activity this week": [
+  "Actividad de esta semana",
+  "Atividade desta semana"
+ ],
+ "Club trophies gained": [
+  "Trofeos ganados por el club",
+  "Troféus ganhos pelo clube"
+ ],
+ "Inactive": [
+  "Inactivo",
+  "Inativo"
+ ],
+ "Inactive members": [
+  "Miembros inactivos",
+  "Membros inativos"
+ ],
+ "Shown after {n} days of tracking": [
+  "Se muestra tras {n} días de seguimiento",
+  "Aparece após {n} dias de acompanhamento"
+ ],
+ "Tracking started today. Come back tomorrow to see who is gaining trophies, and in a few days who has gone quiet.": [
+  "El seguimiento empezó hoy. Vuelve mañana para ver quién gana trofeos, y en unos días quién dejó de jugar.",
+  "O acompanhamento começou hoje. Volte amanhã para ver quem está ganhando troféus e, em alguns dias, quem parou de jogar."
+ ],
+ "Trophies gained since {date} ({n} days). Tracked daily while this page is visited.": [
+  "Trofeos ganados desde el {date} ({n} días). Se sigue a diario mientras se visite esta página.",
+  "Troféus ganhos desde {date} ({n} dias). Acompanhado diariamente enquanto esta página for visitada."
+ ]
+}

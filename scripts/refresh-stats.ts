@@ -87,6 +87,19 @@ async function main(): Promise<number> {
   console.log(`\nCompleted in ${seconds}s.`);
 
   /*
+   * Club activity (2026-10-16): today's snapshot of every club whose page was
+   * opened in the last 30 days, once a day each. After the run and outside
+   * its result, so a club fetch that fails can never fail the sampler.
+   */
+  try {
+    const { refreshTrackedClubs } = await import('@/lib/club-activity');
+    const clubs = await refreshTrackedClubs();
+    console.log(`Clubs: refreshed ${clubs.refreshed}, failed ${clubs.failed}, forgotten ${clubs.forgotten}.`);
+  } catch (error) {
+    console.log(`Clubs: refresh skipped (${error instanceof Error ? error.message : String(error)}).`);
+  }
+
+  /*
    * The checks below were bash in the workflow, reading this object back out
    * of an HTTP response. They live here now because this is where the object
    * is — and because a green run that did nothing is the failure mode that

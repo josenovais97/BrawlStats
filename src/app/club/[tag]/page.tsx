@@ -5,6 +5,9 @@ import { FavoriteButton } from '@/components/favorite-button';
 import { PlayersIcon, TrophyIcon } from '@/components/game-icons';
 import Image from 'next/image';
 
+import { after } from 'next/server';
+
+import { ClubActivitySection } from '@/components/club/club-activity';
 import { ClubInsights } from '@/components/club/club-insights';
 import { ClubPower } from '@/components/club/club-power';
 import { ClubMembers } from '@/components/club/club-members';
@@ -14,6 +17,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 import { StatCard } from '@/components/ui/stat-card';
 import { clubBadgeUrl } from '@/lib/brawlapi';
 import { getClub } from '@/lib/bs-api';
+import { getClubActivity, recordClubView } from '@/lib/club-activity';
 import { toApiError } from '@/lib/errors';
 import { formatNumber, humanizeRole } from '@/lib/format';
 import { displayTag, normalizeTag } from '@/lib/tags';
@@ -67,6 +71,11 @@ export default async function ClubPage({ params }: PageProps) {
   }
 
   const members = club.members ?? [];
+  // Read before recording, so a first visit shows "tracking started" rather
+  // than a zero-day week; the snapshot is written after the response.
+  const activity = await getClubActivity(club);
+  const viewed = club;
+  after(() => recordClubView(viewed));
   const averageTrophies =
     members.length > 0 ? Math.round(club.trophies / members.length) : 0;
 
@@ -159,6 +168,8 @@ export default async function ClubPage({ params }: PageProps) {
       <ClubInsights club={club} />
 
       <ClubPower tag={normalizeTag(club.tag)} name={club.name} />
+
+      {activity ? <ClubActivitySection activity={activity} /> : null}
 
       <section>
         <SectionHeading title={t('Members')} aside={`${members.length} of 30`} />

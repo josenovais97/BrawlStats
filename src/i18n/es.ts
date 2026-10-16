@@ -4006,4 +4006,18 @@ export const ES: Record<string, string> = {
     "en {n} días",
   "{n} brawlers revealed and coming soon":
     "{n} brawlers revelados que llegan pronto",
+  "Activity this week":
+    "Actividad de esta semana",
+  "Club trophies gained":
+    "Trofeos ganados por el club",
+  "Inactive":
+    "Inactivo",
+  "Inactive members":
+    "Miembros inactivos",
+  "Shown after {n} days of tracking":
+    "Se muestra tras {n} días de seguimiento",
+  "Tracking started today. Come back tomorrow to see who is gaining trophies, and in a few days who has gone quiet.":
+    "El seguimiento empezó hoy. Vuelve mañana para ver quién gana trofeos, y en unos días quién dejó de jugar.",
+  "Trophies gained since {date} ({n} days). Tracked daily while this page is visited.":
+    "Trofeos ganados desde el {date} ({n} días). Se sigue a diario mientras se visite esta página.",
 };
