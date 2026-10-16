@@ -21,6 +21,8 @@ import {
   type TeamComp,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
+import { getSeasonState } from '@/lib/ranked-seasons';
+import { slugify } from '@/lib/slugs';
 
 /**
  * The bubble's panel: the Ranked tier list, filterable by mode.
@@ -145,6 +147,37 @@ export default async function BubblePanelPage() {
     });
     mapsByMode.set(map.mode, bucket);
   }
+  /*
+   * The season's published pool decides which maps are listed; our battles
+   * only decide the picks. Without it the chips mixed in last season's maps
+   * (kept four days after their last sighting) and missed a new map nobody we
+   * sample had played yet -- Beach Ball on Season 50's second day. The same
+   * rule /ranked follows, with the same guard: trusted only when it overlaps
+   * what we have, so a restructured wiki table cannot empty the panel.
+   */
+  const season = await getSeasonState().catch(() => null);
+  const norm = (v: string) => slugify(v).replace(/-/g, '');
+  const pool = new Map<string, Set<string>>();
+  for (const entry of season?.mapPool ?? []) pool.set(norm(entry.mode), new Set(entry.maps.map(norm)));
+  const overlap = [...mapsByMode.entries()].some(([mode, maps]) =>
+    maps.some((m) => pool.get(norm(mode))?.has(norm(m.mapName))),
+  );
+  if (overlap) {
+    for (const [mode, bucket] of mapsByMode) {
+      const inPool = pool.get(norm(mode));
+      mapsByMode.set(mode, inPool ? bucket.filter((m) => inPool.has(norm(m.mapName))) : []);
+    }
+    for (const entry of season?.mapPool ?? []) {
+      const mode = modeKeys.find((key) => norm(key) === norm(entry.mode));
+      if (!mode) continue;
+      const bucket = mapsByMode.get(mode) ?? [];
+      for (const mapName of entry.maps) {
+        if (!bucket.some((m) => norm(m.mapName) === norm(mapName))) bucket.push({ mapName, mode, picks: [] });
+      }
+      mapsByMode.set(mode, bucket);
+    }
+  }
+
   // Alphabetical, so a map keeps its position between openings. Ranking the
   // chips by sample size would move them under the reader's thumb.
   for (const bucket of mapsByMode.values()) {
