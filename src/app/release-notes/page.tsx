@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CalendarDays, ExternalLink, FileText } from 'lucide-react';
+import { ArrowRight, CalendarDays, ExternalLink, FileText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -15,16 +15,27 @@ import { CHANGE_LABEL, changesFromNotes,
   type RichNode,
   type RichText,
   type ReleaseSection } from '@/lib/release-notes';
+import { formatDate } from '@/lib/format';
+import { getSeasonState } from '@/lib/ranked-seasons';
+import { currentMonth } from '@/lib/site';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 
-export const metadata: Metadata = {
-  alternates: { canonical: '/release-notes' },
-  title: 'Brawl Stars update notes',
-  description:
-    'The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.',
-};
+/*
+ * Titled for the searches that already find this page ("brawl stars update",
+ * "new update", "buffs and nerfs", positions 26-80 in Search Console on
+ * 2026-10-16), with the month as the freshness signal every result above it
+ * carries.
+ */
+export function generateMetadata(): Metadata {
+  const t = getT(requestLocale());
+  return {
+    alternates: { canonical: '/release-notes' },
+    title: t('Brawl Stars update: patch notes, new brawlers and balance changes ({v})', { v: currentMonth() }),
+    description: t('The latest Brawl Stars update at a glance: new brawlers, hypercharges, balance changes and whether they worked, plus what is coming next.'),
+  };
+}
 
 export const revalidate = 3600;
 
@@ -78,11 +89,16 @@ export default async function ReleaseNotesPage() {
    * API does not have yet.
    */
   const changes = changesFromNotes(notes, [...liveNames, ...upcoming.map((b) => b.name)]);
+  const season = await getSeasonState().catch(() => null);
+  const counts = changes
+    .map((c) => ({ label: t(CHANGE_LABEL[c.category]), n: c.brawlers.length, category: c.category }))
+    .filter((c) => c.n > 0);
 
   return (
     <div className="space-y-8">
       <PageHeading
-        title={t(notes.title)}
+        eyebrow={t(notes.title)}
+        title={t('Latest Brawl Stars update')}
         subtitle={t('The latest official update notes, straight from the Brawl Stars team.')}
         aside={
           <a
@@ -94,6 +110,52 @@ export default async function ReleaseNotesPage() {
           </a>
         }
       />
+
+      {/*
+        The update at a glance, and what is next. Only dates that are actually
+        known: the Ranked season boundary is a published rule, a Brawl Talk
+        date is not announced ahead, so none is guessed.
+      */}
+      <section className="grid gap-4 lg:grid-cols-2">
+        <div className="card card-glow space-y-4 p-5">
+          <h2 className="font-bold">{t('This update at a glance')}</h2>
+          {published ? <p className="text-sm text-muted">{t('Published {date}', { date: formatDate(published) })}</p> : null}
+          {counts.length ? (
+            <ul className="flex flex-wrap gap-2">
+              {counts.map((c) => (
+                <li key={c.category} className="rounded-xl border border-border bg-surface-2/60 px-3 py-1.5 text-sm">
+                  <span className="font-bold tabular-nums">{c.n}</span> <span className="text-muted">{c.label}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <Link href={lp('/patches')} className="inline-flex items-center gap-2 font-semibold text-brand hover:underline">
+            {t('Did the balance changes work? See the measured impact')}
+            <ArrowRight aria-hidden className="size-4" />
+          </Link>
+        </div>
+        <div className="card space-y-3 p-5">
+          <h2 className="font-bold">{t('What is next')}</h2>
+          {season?.nextStartsOn ? (
+            <p className="text-sm">
+              <span className="font-semibold">{t('Next Ranked season: {date}', { date: formatDate(season.nextStartsOn) })}</span>
+              {season.daysUntilNext !== null ? (
+                <span className="text-muted"> · {t('in {n} days', { n: season.daysUntilNext })}</span>
+              ) : null}
+            </p>
+          ) : null}
+          {upcoming.length > 0 ? (
+            <p className="text-sm">
+              <a href="#upcoming" className="font-semibold text-brand hover:underline">
+                {t('{n} brawlers revealed and coming soon', { n: upcoming.length })}
+              </a>
+            </p>
+          ) : null}
+          <p className="text-xs leading-relaxed text-muted">
+            {t('Supercell does not announce update or Brawl Talk dates far ahead. They appear here as soon as they are official, with the new notes the day they ship.')}
+          </p>
+        </div>
+      </section>
 
       {upcoming.length > 0 ? (
         <section aria-labelledby="upcoming">

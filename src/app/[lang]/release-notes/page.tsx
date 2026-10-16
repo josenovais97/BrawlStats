@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import EnglishPage, { metadata as englishMetadata } from '@/app/release-notes/page';
+import EnglishPage, { generateMetadata as englishMetadata } from '@/app/release-notes/page';
 import { isIntlLocale } from '@/lib/i18n';
 import { routePath, translateMetadata } from '@/lib/i18n-metadata';
 import { setRequestLocale } from '@/lib/request-locale';
@@ -26,7 +26,7 @@ async function language(props: Props) {
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const lang = await language(props);
   const path = routePath('/release-notes', (await props.params) as Record<string, string | string[]>);
-  return translateMetadata(englishMetadata, lang, path);
+  return translateMetadata(await englishMetadata(), lang, path);
 }
 
 export default async function IntlPage(props: Props) {

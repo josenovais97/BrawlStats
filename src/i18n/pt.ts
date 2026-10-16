@@ -3984,4 +3984,26 @@ export const PT: Record<string, string> = {
     "você colocou em {mine}, os dados dizem {data}: você valoriza mais",
   "you put it in {mine}, the data says {data}: you rate it lower":
     "você colocou em {mine}, os dados dizem {data}: você valoriza menos",
+  "Brawl Stars update: patch notes, new brawlers and balance changes ({v})":
+    "Atualização do Brawl Stars: notas, novos brawlers e mudanças de balanceamento ({v})",
+  "Did the balance changes work? See the measured impact":
+    "As mudanças de balanceamento funcionaram? Veja o impacto medido",
+  "Latest Brawl Stars update":
+    "Última atualização do Brawl Stars",
+  "Next Ranked season: {date}":
+    "Próxima temporada do Ranqueado: {date}",
+  "Published {date}":
+    "Publicada em {date}",
+  "Supercell does not announce update or Brawl Talk dates far ahead. They appear here as soon as they are official, with the new notes the day they ship.":
+    "A Supercell não anuncia com muita antecedência as datas das atualizações nem do Brawl Talk. Elas aparecem aqui assim que forem oficiais, com as notas novas no mesmo dia.",
+  "The latest Brawl Stars update at a glance: new brawlers, hypercharges, balance changes and whether they worked, plus what is coming next.":
+    "A última atualização do Brawl Stars num relance: novos brawlers, hipercargas, mudanças de balanceamento e se funcionaram, e o que vem a seguir.",
+  "This update at a glance":
+    "Esta atualização num relance",
+  "What is next":
+    "O que vem a seguir",
+  "in {n} days":
+    "em {n} dias",
+  "{n} brawlers revealed and coming soon":
+    "{n} brawlers revelados chegando em breve",
 };
