@@ -4245,6 +4245,24 @@ async function computeRankedMapPicks(
 const PAIR_INDEX_TOP_BRAWLERS = 30;
 
 /**
+ * How far a brawler can fall before its pairings stop being indexable: the
+ * other half of a sticky set.
+ *
+ * A pairing enters when both brawlers are in the top 30 and leaves only when
+ * one drops below 45. Without the gap, the brawlers hovering around 30th --
+ * two or three change every week -- flipped about sixty comparison pages a week
+ * between index and noindex. Google indexed them and was then told to drop
+ * them: Search Console showed ~200 such pages excluded by noindex on
+ * 2026-10-16. A longer popularity window was measured first and did not help
+ * (27 of 30 brawlers kept week to week over 60 days, 28 over 21).
+ *
+ * The set this produces is bounded by the pairings among 45 brawlers and in
+ * practice stays near the 435 the top 30 gives, since a pairing must first
+ * have entered from the top 30.
+ */
+const PAIR_INDEX_KEEP_BRAWLERS = 45;
+
+/**
  * The pairings worth letting search engines index.
  *
  * One source of truth for two callers that must agree: the sitemap lists these,
@@ -4254,7 +4272,9 @@ const PAIR_INDEX_TOP_BRAWLERS = 30;
  *
  * Returns unordered pairs of brawler ids; the route turns them into slugs.
  */
-async function computeIndexablePairs(): Promise<[number, number][]> {
+async function computeIndexablePairs(
+  previous: [number, number][] | null = null,
+): Promise<[number, number][]> {
   const prisma = getPrisma();
   if (!prisma) return [];
 
@@ -4267,10 +4287,12 @@ async function computeIndexablePairs(): Promise<[number, number][]> {
       where: { day: { gte: since } },
       _sum: { battles: true },
       orderBy: { _sum: { battles: 'desc' } },
-      take: PAIR_INDEX_TOP_BRAWLERS,
+      take: PAIR_INDEX_KEEP_BRAWLERS,
     });
     const ids = popular.map((row) => row.brawlerId);
     if (ids.length < 2) return [];
+    const top = new Set(ids.slice(0, PAIR_INDEX_TOP_BRAWLERS));
+    const was = new Set((previous ?? []).map(([x, y]) => `${Math.min(x, y)}-${Math.max(x, y)}`));
 
     // Both sides popular, and the pairing itself actually measured. `LEAST`
     // and `GREATEST` collapse the two directions into one unordered pair, so a
@@ -4287,7 +4309,11 @@ async function computeIndexablePairs(): Promise<[number, number][]> {
       HAVING SUM(battles) >= ${MIN_SAMPLE_FOR_PAIRING}
     `;
 
-    return rows.map((row) => [row.a, row.b] as [number, number]);
+    // In: both in the top 30. Staying in: indexable last run and both still
+    // in the top 45. Rows are already limited to the top 45 by the query.
+    return rows
+      .filter((row) => (top.has(row.a) && top.has(row.b)) || was.has(`${row.a}-${row.b}`))
+      .map((row) => [row.a, row.b] as [number, number]);
   } catch (error) {
     swallow('computeIndexablePairs', error);
     return [];
@@ -5219,6 +5245,7 @@ export async function precomputeJobs(): Promise<{ key: string; run: () => Promis
   const modes = (await computeFilterableModes(30, 150, 'ranked').catch(() => [])).map((m) => m.mode);
   return [
     { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
+    { key: 'indexable-pairs', run: computeStickyIndexablePairs },
     ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
     ...BRACKET_IDS.map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
     // A rank too thin to list is stored as 'none', so the page shows every
@@ -5810,4 +5837,23 @@ export const getIconUsage = cachedRead('icon-usage', compute_getIconUsage);
 export const getReleasedBuffieCount = cachedRead('released-buffie-count', compute_getReleasedBuffieCount);
 export const getRankedLeaderboard = cachedRead('ranked-leaderboard', compute_getRankedLeaderboard);
 export const getCatalogChanges = cachedRead('catalog-changes', compute_getCatalogChanges);
-export const getIndexablePairs = cachedRead('indexable-pairs', computeIndexablePairs);
+const cachedIndexablePairs = cachedRead('indexable-pairs', () => computeIndexablePairs(null));
+
+/**
+ * The precompute job's sticky set when it is fresh; otherwise the plain top-30
+ * set, which is the same thing minus the memory of the previous run.
+ */
+export async function getIndexablePairs(): Promise<[number, number][]> {
+  return (await precomputed<[number, number][]>('indexable-pairs')) ?? cachedIndexablePairs();
+}
+
+/** For the precompute job: the sticky set, seeded from the last stored one. */
+async function computeStickyIndexablePairs(): Promise<[number, number][]> {
+  const prisma = getPrisma();
+  // The previous set regardless of age: an old memory still beats none.
+  const row = prisma
+    ? await prisma.precomputedRead.findUnique({ where: { key: 'indexable-pairs' } }).catch(() => null)
+    : null;
+  const previous = Array.isArray(row?.value) ? (row.value as [number, number][]) : null;
+  return computeIndexablePairs(previous);
+}
