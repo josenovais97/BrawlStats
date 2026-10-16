@@ -3890,4 +3890,10 @@ export const ES: Record<string, string> = {
     "LES GANA A",
   "BEST RANKED MAPS":
     "MEJORES MAPAS DE COMPETITIVO",
+  "Ready for Android 16: the app screen now fits around the status bar, the navigation bar and the keyboard on newer phones.":
+    "Lista para Android 16: la pantalla de la app ahora se ajusta a la barra de estado, la barra de navegación y el teclado en los teléfonos nuevos.",
+  "A link to the privacy policy at the bottom of the app screen.":
+    "Un enlace a la política de privacidad al final de la pantalla de la app.",
+  "The same app is now being tested on Google Play. Installing it from there later keeps your tag and settings.":
+    "La misma app ahora está en prueba en Google Play. Instalarla desde ahí más adelante conserva tu tag y tus ajustes.",
 };

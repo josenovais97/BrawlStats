@@ -12,9 +12,9 @@
  */
 export const BUBBLE_APP = {
   /** Matches `versionName` in the app's build.gradle.kts. */
-  version: '1.29',
+  version: '1.30',
   /** Matches `versionCode`; Android upgrades compare this, not the name. */
-  versionCode: 50,
+  versionCode: 52,
   /**
    * Served from this origin rather than a third party, so the download and the
    * site people already trust come from the same place.
@@ -31,7 +31,7 @@ export const BUBBLE_APP = {
    * bytes. Bump this with `version` and `versionCode`; the test below fails if
    * the file at this path is not the one whose checksum is published.
    */
-  path: '/downloads/brawlzone-bubble-1.29.apk',
+  path: '/downloads/brawlzone-bubble-1.30.apk',
 
   /**
    * The old versionless address, kept for links and QR codes already in the
@@ -62,8 +62,8 @@ export const BUBBLE_APP = {
    */
   storeIcon: "/brand/stores/apkpure.png",
   /** Bytes, for the page and for `Content-Length` expectations. */
-  size: 2996878,
-  sha256: 'd9e8a4c9eb65775e754717fdcd89b71181ea308294e542690f427f3a5857d066',
+  size: 2989186,
+  sha256: '7eb010d03b2c78bbdc68c1839f7c69a685a3f46adc4e9fc383b6dc98727334c3',
   /** Android 8.0. Matches `minSdk = 26`. */
   minAndroid: '8.0',
   released: '2026-10-12',
@@ -95,6 +95,16 @@ export interface BubbleRelease {
  * number, not on the name, so it is the one that has to be right.
  */
 export const BUBBLE_CHANGELOG: BubbleRelease[] = [
+  {
+    version: '1.30',
+    versionCode: 52,
+    date: '2026-10-16',
+    changes: [
+      "Ready for Android 16: the app screen now fits around the status bar, the navigation bar and the keyboard on newer phones.",
+      "A link to the privacy policy at the bottom of the app screen.",
+      "The same app is now being tested on Google Play. Installing it from there later keeps your tag and settings.",
+    ],
+  },
   {
     version: '1.29',
     versionCode: 50,
