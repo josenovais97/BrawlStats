@@ -280,13 +280,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         })
       : null;
 
-  const description = [
-    recommendation,
-    performance,
-    t('Gears, star powers, gadgets, best modes and maps, updated daily from real battles.'),
-  ]
-    .filter(Boolean)
-    .join(' ');
+  /*
+   * The generic last sentence only when it still fits: Google shows about 155
+   * characters, and at 240 it was cutting off mid-sentence after the two parts
+   * that carry the page's actual answer (seen in the 2026-10-16 audit).
+   */
+  const lead = [recommendation, performance].filter(Boolean).join(' ');
+  const tail = t('Gears, star powers, gadgets, best modes and maps, updated daily from real battles.');
+  const description = lead.length + tail.length + 1 <= 160 ? `${lead} ${tail}`.trim() : lead || tail;
 
   return {
     /*

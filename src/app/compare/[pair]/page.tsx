@@ -88,8 +88,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
      * and this one is: both sides come from the same rolling 21-day window the
      * pairing threshold uses.
      */
-    title: t('{a} vs {b}: which is better in Brawl Stars? ({v})', { a: a, b: b, v: currentMonth() }),
-    description: t('{a} vs {b} in Brawl Stars, {v}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.', { a: a, b: b, v: currentMonth() }),
+    // Short enough for Google to show whole (the old one ran to 76 characters
+    // with the site suffix), keeping "Brawl Stars", which is what people type.
+    title: t('{a} vs {b} in Brawl Stars ({v})', { a: a, b: b, v: currentMonth() }),
+    description: t('{a} vs {b}: win rates, pick rates, best modes and their head-to-head record, from real sampled battles. Updated {v}.', { a: a, b: b, v: currentMonth() }),
     alternates: { canonical: `/compare/${resolved.slug}` },
     /*
      * Indexable pages must be a deliberate set, and this is how that set is
@@ -179,6 +181,12 @@ export default async function ComparePage({ params }: PageProps) {
       {/* A face-off: both brawlers full-body on their rarity colours, and the
           verdict inside the card it is about. Two 112px squares and a "vs"
           read as a form; this reads as the matchup. */}
+      {/* The page's one H1. The face-off below is pictures and a decorative
+          "vs", so without this the page had no main heading at all. */}
+      <h1 className="display text-3xl uppercase sm:text-4xl">
+        {t('{nameA} vs {nameB}', { nameA: nameA, nameB: nameB })}
+      </h1>
+
       <header className="card card-glow relative overflow-hidden">
         <span
           aria-hidden

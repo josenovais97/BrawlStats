@@ -1,0 +1,14 @@
+{
+ "{a} vs {b} in Brawl Stars ({v})": [
+  "{a} vs {b} en Brawl Stars ({v})",
+  "{a} vs {b} no Brawl Stars ({v})"
+ ],
+ "{a} vs {b}: win rates, pick rates, best modes and their head-to-head record, from real sampled battles. Updated {v}.": [
+  "{a} vs {b}: porcentaje de victorias, de uso, mejores modos y su historial cara a cara, con combates reales muestreados. Actualizado en {v}.",
+  "{a} vs {b}: taxa de vitória, de uso, melhores modos e o confronto direto, com partidas reais amostradas. Atualizado em {v}."
+ ],
+ "{nameA} vs {nameB}": [
+  "{nameA} vs {nameB}",
+  "{nameA} vs {nameB}"
+ ]
+}

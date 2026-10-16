@@ -3896,4 +3896,10 @@ export const ES: Record<string, string> = {
     "Un enlace a la política de privacidad al final de la pantalla de la app.",
   "The same app is now being tested on Google Play. Installing it from there later keeps your tag and settings.":
     "La misma app ahora está en prueba en Google Play. Instalarla desde ahí más adelante conserva tu tag y tus ajustes.",
+  "{a} vs {b} in Brawl Stars ({v})":
+    "{a} vs {b} en Brawl Stars ({v})",
+  "{a} vs {b}: win rates, pick rates, best modes and their head-to-head record, from real sampled battles. Updated {v}.":
+    "{a} vs {b}: porcentaje de victorias, de uso, mejores modos y su historial cara a cara, con combates reales muestreados. Actualizado en {v}.",
+  "{nameA} vs {nameB}":
+    "{nameA} vs {nameB}",
 };
