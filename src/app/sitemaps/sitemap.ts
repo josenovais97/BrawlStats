@@ -204,6 +204,7 @@ async function core(add: Add, dataDay: Date | null) {
   add('/cosmetics/skins', 'weekly', 0.6);
   add('/cosmetics/icons', 'weekly', 0.5);
   add('/tier-list/maker', 'monthly', 0.75, EVERGREEN);
+  add('/account-value', 'monthly', 0.75, EVERGREEN);
   add('/news', 'daily', 0.6, dataDay);
   add('/release-notes', 'weekly', 0.5, EVERGREEN);
   // The app's download page. Its panel at /bubble/panel is deliberately

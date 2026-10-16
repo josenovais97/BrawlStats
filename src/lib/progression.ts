@@ -302,3 +302,57 @@ export function computeProgression(
     totalsUnavailable,
   };
 }
+
+/* ------------------------------ account value ------------------------------ */
+
+export interface CoinBreakdown {
+  powerLevels: number;
+  hyperCharges: number;
+  starPowers: number;
+  gadgets: number;
+  gears: number;
+  /** Everything above. Equal to `coinsInvested` from `computeProgression`. */
+  total: number;
+  powerPoints: number;
+}
+
+/**
+ * What an account's coins went into, by category, priced from the same table
+ * as `computeProgression` so the two totals always agree (/account-value).
+ */
+export function coinBreakdown(player: BSPlayer): CoinBreakdown {
+  const out = { powerLevels: 0, hyperCharges: 0, starPowers: 0, gadgets: 0, gears: 0, total: 0, powerPoints: 0 };
+  for (const b of player.brawlers) {
+    const level = Math.min(Math.max(b.power, 1), MAX_POWER_LEVEL);
+    out.powerLevels += coinsToReachLevel(level);
+    out.powerPoints += powerPointsToReachLevel(level);
+    out.hyperCharges += (b.hyperCharges?.length ?? 0) * HYPERCHARGE_COINS;
+    out.starPowers += (b.starPowers?.length ?? 0) * STAR_POWER_COINS;
+    out.gadgets += (b.gadgets?.length ?? 0) * GADGET_COINS;
+    out.gears += (b.gears?.length ?? 0) * GEAR_COINS;
+  }
+  out.total = out.powerLevels + out.hyperCharges + out.starPowers + out.gadgets + out.gears;
+  return out;
+}
+
+/**
+ * Coins still needed to finish every brawler the player owns: power 11, every
+ * star power, gadget and hypercharge the catalogue lists for it, and the two
+ * gears it can equip. Unowned brawlers are not counted -- unlocking them is a
+ * different currency.
+ */
+export function coinsToFinishOwned(player: BSPlayer, catalogue: BSBrawler[]): number {
+  const byId = new Map(catalogue.map((b) => [b.id, b]));
+  let coins = 0;
+  for (const b of player.brawlers) {
+    const level = Math.min(Math.max(b.power, 1), MAX_POWER_LEVEL);
+    coins += coinsToReachLevel(MAX_POWER_LEVEL) - coinsToReachLevel(level);
+    const c = byId.get(b.id);
+    if (!c) continue;
+    coins += Math.max(0, (c.starPowers?.length ?? 0) - (b.starPowers?.length ?? 0)) * STAR_POWER_COINS;
+    coins += Math.max(0, (c.gadgets?.length ?? 0) - (b.gadgets?.length ?? 0)) * GADGET_COINS;
+    coins += Math.max(0, (c.hyperCharges?.length ?? 0) - (b.hyperCharges?.length ?? 0)) * HYPERCHARGE_COINS;
+    coins += Math.max(0, EQUIPPABLE_GEARS - (b.gears?.length ?? 0)) * GEAR_COINS;
+  }
+  return coins;
+}

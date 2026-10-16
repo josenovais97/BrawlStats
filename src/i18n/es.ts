@@ -3902,4 +3902,64 @@ export const ES: Record<string, string> = {
     "{a} vs {b}: porcentaje de victorias, de uso, mejores modos y su historial cara a cara, con combates reales muestreados. Actualizado en {v}.",
   "{nameA} vs {nameB}":
     "{nameA} vs {nameB}",
+  "A card to share":
+    "Una tarjeta para compartir",
+  "A story-sized picture of your result, ready for TikTok, Instagram or your club chat.":
+    "Una imagen tamaño historia con tu resultado, lista para TikTok, Instagram o el chat de tu club.",
+  "Brawl Stars account value calculator ({v})":
+    "Calculadora del valor de tu cuenta de Brawl Stars ({v})",
+  "Compared with about 58,000 active players we track, so you see where your account really stands.":
+    "Comparada con unos 58.000 jugadores activos que seguimos, para que veas dónde está de verdad tu cuenta.",
+  "Enter your player tag to see what your Brawl Stars account cost to build, and how it compares with other players.":
+    "Escribe tu tag de jugador para ver cuánto costó construir tu cuenta de Brawl Stars y cómo se compara con otros jugadores.",
+  "Every power level, hypercharge, star power, gadget and gear you own, priced in coins and power points.":
+    "Cada nivel, hipercarga, habilidad estelar, gadget y engranaje que tienes, con su precio en monedas y puntos de fuerza.",
+  "How it ranks":
+    "Cómo se compara",
+  "How much is your Brawl Stars account worth? Enter your tag: the coins and power points it took to build, and how it ranks against 58,000 active players.":
+    "¿Cuánto vale tu cuenta de Brawl Stars? Escribe tu tag: las monedas y puntos de fuerza que costó construirla y cómo se compara con 58.000 jugadores activos.",
+  "What it cost to build":
+    "Lo que costó construirla",
+  "Your tag is under your name on your in-game profile.":
+    "Tu tag está debajo de tu nombre en tu perfil del juego.",
+  "Account value":
+    "Valor de la cuenta",
+  "Account value of {tag}":
+    "Valor de la cuenta {tag}",
+  "Among {n} active players we track. Most of them play Ranked, so the bar is high.":
+    "Entre {n} jugadores activos que seguimos. La mayoría juega Competitivo, así que el listón está alto.",
+  "Brawlers owned":
+    "Brawlers que tienes",
+  "Check another account":
+    "Revisar otra cuenta",
+  "Coins to finish what you own":
+    "Monedas para completar lo que tienes",
+  "Power levels":
+    "Niveles de poder",
+  "See the full profile":
+    "Ver el perfil completo",
+  "Share my account value":
+    "Compartir el valor de mi cuenta",
+  "Top {n}% of players":
+    "Top {n}% de los jugadores",
+  "Values are in-game currency, not money: what it costs in coins and power points to build the same account. Buffies and skins are not included, because they also come from drops. Unofficial fan project, not affiliated with Supercell.":
+    "Los valores son moneda del juego, no dinero: lo que cuesta en monedas y puntos de fuerza construir la misma cuenta. No incluye buffies ni skins, porque también salen de recompensas. Proyecto de fans no oficial, sin relación con Supercell.",
+  "Where the coins went":
+    "En qué se fueron las monedas",
+  "Worth more than {n}% of players":
+    "Vale más que el {n}% de los jugadores",
+  "plus {pp} power points":
+    "más {pp} puntos de fuerza",
+  "How much is your account worth?":
+    "¿Cuánto vale tu cuenta?",
+  "MY ACCOUNT VALUE":
+    "VALOR DE MI CUENTA",
+  "WHERE THE COINS WENT":
+    "EN QUÉ SE FUERON LAS MONEDAS",
+  "Calculate":
+    "Calcular",
+  "Your player tag, e.g. #2PQ8LJ9V":
+    "Tu tag de jugador, ej. #2PQ8LJ9V",
+  "How much is this account worth? See its value and how it ranks":
+    "¿Cuánto vale esta cuenta? Mira su valor y cómo se compara",
 };

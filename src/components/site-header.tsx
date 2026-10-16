@@ -11,7 +11,7 @@ import { LanguageMenu } from '@/components/i18n/language-menu';
 import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, stripLocale, type Locale } from '@/lib/i18n';
 import { SITE_NAME } from '@/lib/site';
-import {
+import { CoinIcon,
   Battle3v3Icon,
   BubbleAppIcon,
   BrawlersIcon,
@@ -109,6 +109,7 @@ const MORE: NavItem[] = [
   { href: '/leaderboard/clubs', match: '/club', label: 'Clubs', icon: ClubIcon },
   { href: '/compare', label: 'Compare', icon: CompareIcon },
   { href: '/tier-list/maker', label: 'Tier List Maker', icon: TierListIcon },
+  { href: '/account-value', label: 'Account Value', icon: CoinIcon },
   { href: '/starr-drops', label: 'Starr Drops', icon: StarrDropIcon },
   { href: '/cosmetics', label: 'Cosmetics', icon: CosmeticsIcon },
   { href: '/news', label: 'News', icon: NewsIcon },
@@ -138,6 +139,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Clubs: 'Clubes',
     Compare: 'Comparar',
     'Tier List Maker': 'Crear tier list',
+    'Account Value': 'Valor de la cuenta',
     'Starr Drops': 'Starr Drops',
     Cosmetics: 'Cosméticos',
     News: 'Noticias',
@@ -169,6 +171,7 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     Clubs: 'Clubes',
     Compare: 'Comparar',
     'Tier List Maker': 'Criar tier list',
+    'Account Value': 'Valor da conta',
     'Starr Drops': 'Starr Drops',
     Cosmetics: 'Cosméticos',
     News: 'Notícias',

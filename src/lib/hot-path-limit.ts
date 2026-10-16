@@ -86,8 +86,11 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * on the game API, not computing: an I/O-bound request occupies a socket
    * rather than a core, which is the same distinction AGENTS.md draws about the
    * sampler being invisible to a CPU metric. Real demand measured at 0.3/s.
+   *
+   * 4 -> 3 on 2026-10-16 to make room for `/account-value/` under the ceiling:
+   * still ten times the measured demand.
    */
-  '/player/': { perSecond: 4, burst: 30 },
+  '/player/': { perSecond: 3, burst: 30 },
 
   /* 0.82s, and roughly one request every five minutes. */
   '/club/': { perSecond: 1, burst: 10 },
@@ -117,6 +120,13 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * all, which is the combination that deserves the tightest allowance.
    */
   '/wrapped/': { perSecond: 1, burst: 10 },
+
+  /*
+   * The account value calculator (2026-10-16): one live player fetch per page
+   * and per share card, the same shape and cost as a profile, so its 1/s came
+   * off `/player/` rather than out of the ceiling.
+   */
+  '/account-value/': { perSecond: 1, burst: 10 },
 };
 
 /**
@@ -202,6 +212,8 @@ export const LIMITED_PREFIXES = [
   '/draft/',
   '/compare/players/',
   '/wrapped/',
+  // A live player fetch per page and per share card, like /player.
+  '/account-value/',
 ] as const;
 
 export function isLimitedPath(pathname: string): boolean {

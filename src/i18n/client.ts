@@ -739,6 +739,10 @@ export const CLIENT_ES: Record<string, string> = {
     "Compartir como imagen",
   "Making your image…":
     "Creando tu imagen…",
+  "Calculate":
+    "Calcular",
+  "Your player tag, e.g. #2PQ8LJ9V":
+    "Tu tag de jugador, ej. #2PQ8LJ9V",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1477,4 +1481,8 @@ export const CLIENT_PT: Record<string, string> = {
     "Compartilhar como imagem",
   "Making your image…":
     "Criando sua imagem…",
+  "Calculate":
+    "Calcular",
+  "Your player tag, e.g. #2PQ8LJ9V":
+    "Sua tag de jogador, ex. #2PQ8LJ9V",
 };

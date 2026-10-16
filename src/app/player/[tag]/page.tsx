@@ -1,4 +1,7 @@
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { Suspense } from 'react';
+import { localePath } from '@/lib/i18n';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { after } from 'next/server';
@@ -117,6 +120,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PlayerPage({ params }: PageProps) {
   const t = getT(requestLocale());
+  const lp = (path: string) => localePath(requestLocale(), path);
   const { tag } = await params;
 
   let player;
@@ -445,7 +449,16 @@ export default async function PlayerPage({ params }: PageProps) {
           Skill score and Ranking do; these do not.
         */}
         <PlayerProgress points={trophyHistory} />
-        <PlayerProgression progression={progression} playtime={playtime} />            </ProfileGroup>
+        <PlayerProgression progression={progression} playtime={playtime} />
+        {/* The calculator ranks this same account against the sample. */}
+        <Link
+          href={lp(`/account-value/${normalizedTag}`)}
+          className="card card-interactive flex items-center justify-between gap-3 p-4 font-semibold"
+        >
+          <span>{t('How much is this account worth? See its value and how it ranks')}</span>
+          <ArrowRight aria-hidden className="size-4 shrink-0 text-brand" />
+        </Link>
+            </ProfileGroup>
           ),
         },
         {

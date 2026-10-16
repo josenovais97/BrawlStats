@@ -5246,6 +5246,7 @@ export async function precomputeJobs(): Promise<{ key: string; run: () => Promis
   return [
     { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
     { key: 'indexable-pairs', run: computeStickyIndexablePairs },
+    { key: 'account-value-dist', run: computeAccountValueDistribution },
     ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
     ...BRACKET_IDS.map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
     // A rank too thin to list is stored as 'none', so the page shows every
@@ -5845,6 +5846,56 @@ const cachedIndexablePairs = cachedRead('indexable-pairs', () => computeIndexabl
  */
 export async function getIndexablePairs(): Promise<[number, number][]> {
   return (await precomputed<[number, number][]>('indexable-pairs')) ?? cachedIndexablePairs();
+}
+
+/**
+ * How the coin value of accounts is spread across the players we sample, as
+ * 101 cut points (0th..100th percentile), for /account-value.
+ *
+ * Each player's latest roster snapshot in the last 14 days, priced with the
+ * same table as `lib/progression` (power levels plus star powers, gadgets,
+ * gears and hypercharges; buffies excluded there for the same reason). About
+ * 27s over ~58,000 players, so only the precompute job runs it: a page that
+ * finds no fresh row shows the value without the percentile.
+ */
+export interface AccountValueDistribution {
+  population: number;
+  /** cuts[p] = coin value at the p-th percentile, p = 0..100. */
+  cuts: number[];
+}
+
+async function computeAccountValueDistribution(): Promise<AccountValueDistribution | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+  try {
+    const rows = await prisma.$queryRaw<{ players: bigint; cuts: number[] }[]>`
+      WITH d AS (
+        SELECT player_tag, max(snapshot_date) AS md FROM player_brawler_snapshots
+        WHERE snapshot_date >= current_date - 14 GROUP BY 1),
+      v AS (
+        SELECT s.player_tag,
+          sum((ARRAY[0,20,55,130,270,560,1040,1840,3090,4965,7765])[least(greatest(s.power,1),11)]
+            + 2000 * cardinality(s.star_power_ids) + 1000 * cardinality(s.gadget_ids)
+            + 1000 * cardinality(s.gear_ids) + 5000 * cardinality(s.hyper_charge_ids))::float8 AS coins
+        FROM player_brawler_snapshots s
+        JOIN d ON d.player_tag = s.player_tag AND d.md = s.snapshot_date
+        GROUP BY 1)
+      SELECT count(*) AS players,
+        percentile_disc(ARRAY(SELECT g / 100.0 FROM generate_series(0, 100) g)) WITHIN GROUP (ORDER BY coins) AS cuts
+      FROM v
+    `;
+    const row = rows[0];
+    if (!row || Number(row.players) < 1000 || !Array.isArray(row.cuts)) return null;
+    return { population: Number(row.players), cuts: row.cuts.map(Number) };
+  } catch (error) {
+    swallow('computeAccountValueDistribution', error);
+    return null;
+  }
+}
+
+/** The stored distribution, or null when the job has not produced a fresh one. */
+export async function getAccountValueDistribution(): Promise<AccountValueDistribution | null> {
+  return precomputed<AccountValueDistribution>('account-value-dist');
 }
 
 /** For the precompute job: the sticky set, seeded from the last stored one. */
