@@ -754,7 +754,7 @@ async function helpCommand(token: string) {
           '',
           'Want it inside the game? The **Bubble app** floats the meta over your draft: https://brawlzone.net/bubble',
         ].join('\n'),
-        footer: { text: 'brawlzone.net · free, no ads' },
+        footer: { text: 'brawlzone.net · free' },
       },
     ],
   });

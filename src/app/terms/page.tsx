@@ -67,7 +67,7 @@ export default function TermsPage() {
           <Scale className="size-6 shrink-0 text-brand" />
           <div className="space-y-3 text-sm leading-relaxed text-muted">
             <h2 className="font-bold text-foreground">{t('The short version')}</h2>
-            <p>{t('{SITE_NAME} is a free Brawl Stars statistics site. There is no account, nothing to pay for, and no advertising. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.', { SITE_NAME: SITE_NAME })}</p>
+            <p>{t('{SITE_NAME} is a free Brawl Stars statistics site. There is no account and nothing to pay for; the website shows ads. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.', { SITE_NAME: SITE_NAME })}</p>
           </div>
         </div>
       </section>

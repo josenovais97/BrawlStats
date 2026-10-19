@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
 import Script from 'next/script';
 
+import { AdsenseLoader } from '@/components/ads/adsense-loader';
 import { InstallPrompt } from '@/components/install-prompt';
 import { PwaTelemetry } from '@/components/pwa-telemetry';
 import { LanguageSuggest } from '@/components/i18n/language-suggest';
@@ -64,6 +65,8 @@ export const metadata: Metadata = {
     google: 'MiIdig1YXgfLeQWD89d1Kagjh5w1wiXivuByKgHHHsw',
     other: {
       'tiktok-developers-site-verification': '2Q9Db1uMxpbb3dle79qa327RdWOsuLf7',
+      // Proves ownership of the site to Google AdSense (with public/ads.txt).
+      'google-adsense-account': 'ca-pub-9381565116085110',
     },
   },
 
@@ -109,6 +112,8 @@ export default function RootLayout({
         </div>
         <InstallPrompt />
         <PwaTelemetry />
+        {/* Google AdSense, website only: never on the Bubble panel (see the component). */}
+        <AdsenseLoader />
 
         {/*
           Umami, self-hosted on this project's own box. Replaces

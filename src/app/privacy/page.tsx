@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Database, HardDrive, Server, Shield, Smartphone, Trash2, User } from 'lucide-react';
+import { Database, HardDrive, Server, Shield, Smartphone, Trash2, User, Megaphone } from 'lucide-react';
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
   title: 'Privacy',
   description:
-    'What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, no cookies, no ads.',
+    'What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and ads only on the website.',
 };
 
 const NOTHING = [
   'No account, because there is nothing to sign in to.',
-  'No cookies. Not for analytics, not for preferences, not at all.',
-  'No advertising, no ad networks, and no third-party trackers.',
+  'No cookies of our own. The website\'s ads may set some, and in Europe only after you agree.',
+  'No trackers beyond Google\'s ad service on the website, and none at all in the Android app.',
   'No email address, name, phone number or payment details — none are ever asked for.',
 ];
 
@@ -107,11 +107,41 @@ export default function PrivacyPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-foreground underline underline-offset-2"
-                >{t('Umami')}</a>{t(', running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, which is why there is no consent banner on this site — there is nothing to consent to.')}</p>
+                >{t('Umami')}</a>{t(', running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent; the consent message European visitors may see is for the ads below.')}</p>
               <p>{t('It records the page, the referrer, and coarse details your browser sends anyway: country, browser, operating system, screen size. It does not record IP addresses, and nothing links one visit to another or to a person.')}</p>
               <p>
                 {/* Named because a reader is entitled to know what is being counted, and
                     because these are visible in the page source regardless. */}{t('A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeading
+          title={t('Advertising')}
+          subtitle={t('On the website only. The Android app shows no ads.')}
+        />
+        <div className="card p-6">
+          <div className="flex gap-4">
+            <Megaphone className="size-6 shrink-0 text-brand" />
+            <div className="space-y-3 text-sm leading-relaxed text-muted">
+              <p>{t('The website shows ads served by Google AdSense, which pay for the server. Google and its partners may use cookies and similar technology to show and measure ads, including ads based on earlier visits to this and other sites. Visitors in the EEA, the UK and Switzerland are asked first, through Google\'s consent message, and can refuse.')}</p>
+              <p>{t('You can turn off personalised ads in')}{' '}
+                <a
+                  href="https://adssettings.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >{t('Google\'s ad settings')}</a>{t('. How Google uses this data is explained in')}{' '}
+                <a
+                  href="https://policies.google.com/technologies/partner-sites"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >{t('Google\'s own policy')}</a>
+                {t('. The BrawlZone Bubble app and its panel show no ads.')}
+              </p>
             </div>
           </div>
         </div>

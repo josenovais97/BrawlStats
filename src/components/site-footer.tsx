@@ -121,7 +121,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
     'Starr Drops': 'Starr Drops', News: 'Noticias', 'Release Notes': 'Notas de versión',
     tagline:
       'Estadísticas de Brawl Stars que te muestran dónde estás. Búsqueda de jugadores y clubes, tier lists y mejores brawlers por mapa, con partidas que recogemos nosotros mismos.',
-    follow: 'Síguenos y apóyanos', coffee: 'Invítame a un café', free: 'Gratis, sin anuncios y sin pagos.',
+    follow: 'Síguenos y apóyanos', coffee: 'Invítame a un café', free: 'Gratis y sin pagos.',
     googlePlay: 'BrawlZone Bubble en Google Play',
     getGame: 'BrawlZone Bubble: el asistente de draft que flota sobre el juego. Gratis.', about: 'Sobre', privacy: 'Privacidad',
     terms: 'Términos', contact: 'Contacto', sources: 'Datos e imágenes de',
@@ -138,7 +138,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
     'Starr Drops': 'Starr Drops', News: 'Notícias', 'Release Notes': 'Notas de atualização',
     tagline:
       'Estatísticas de Brawl Stars que mostram onde você está. Busca de jogadores e clubes, tier lists e melhores brawlers por mapa, com partidas que nós mesmos coletamos.',
-    follow: 'Siga e apoie', coffee: 'Me pague um café', free: 'Grátis, sem anúncios e sem pagamento.',
+    follow: 'Siga e apoie', coffee: 'Me pague um café', free: 'Grátis e sem pagamento.',
     googlePlay: 'BrawlZone Bubble no Google Play',
     getGame: 'BrawlZone Bubble: o ajudante de draft que flutua sobre o jogo. Grátis.', about: 'Sobre o', privacy: 'Privacidade',
     terms: 'Termos', contact: 'Contato', sources: 'Dados e imagens de',
@@ -150,7 +150,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
 const EN: Record<string, string> = {
   tagline:
     'Brawl Stars stats that show where you stand. Player and club lookups, tier lists and map picks, from battles we sample ourselves.',
-  follow: 'Follow and support', coffee: 'Buy me a coffee', free: 'Free, ad-free, no paywall.',
+  follow: 'Follow and support', coffee: 'Buy me a coffee', free: 'Free, no paywall.',
   googlePlay: 'BrawlZone Bubble on Google Play',
   getGame: 'BrawlZone Bubble: the draft helper that floats over the game. Free.', about: 'About', privacy: 'Privacy', terms: 'Terms',
   contact: 'Contact', sources: 'Data and artwork from',

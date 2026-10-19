@@ -4020,4 +4020,28 @@ export const PT: Record<string, string> = {
     "O acompanhamento começou hoje. Volte amanhã para ver quem está ganhando troféus e, em alguns dias, quem parou de jogar.",
   "Trophies gained since {date} ({n} days). Tracked daily while this page is visited.":
     "Troféus ganhos desde {date} ({n} dias). Acompanhado diariamente enquanto esta página for visitada.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent; the consent message European visitors may see is for the ads below.":
+    ", que roda no mesmo servidor do site e não em um terceiro. Não usa cookies nem guarda dados pessoais, então não precisa de consentimento; o aviso de consentimento que visitantes europeus podem ver é pelos anúncios abaixo.",
+  ". How Google uses this data is explained in":
+    ". Como o Google usa esses dados é explicado na",
+  ". The BrawlZone Bubble app and its panel show no ads.":
+    ". O app BrawlZone Bubble e o painel dele não mostram anúncios.",
+  "Advertising":
+    "Publicidade",
+  "Google's ad settings":
+    "configurações de anúncios do Google",
+  "Google's own policy":
+    "política do próprio Google",
+  "On the website only. The Android app shows no ads.":
+    "Só no site. O app Android não mostra anúncios.",
+  "The website shows ads served by Google AdSense, which pay for the server. Google and its partners may use cookies and similar technology to show and measure ads, including ads based on earlier visits to this and other sites. Visitors in the EEA, the UK and Switzerland are asked first, through Google's consent message, and can refuse.":
+    "O site mostra anúncios do Google AdSense, que pagam o servidor. O Google e seus parceiros podem usar cookies e tecnologias semelhantes para mostrar e medir anúncios, incluindo anúncios baseados em visitas anteriores a este e a outros sites. Visitantes do EEE, do Reino Unido e da Suíça são consultados antes, pelo aviso de consentimento do Google, e podem recusar.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and ads only on the website.":
+    "O que o BrawlZone e o app BrawlZone Bubble guardam, o que não guardam e o que o app envia. Sem contas, e anúncios só no site.",
+  "You can turn off personalised ads in":
+    "Você pode desativar os anúncios personalizados nas",
+  "BrawlZone is free and has no paywall; a few ads on the website pay for the server. If it saved you some time, a coffee goes a long way.":
+    "O BrawlZone é grátis e não tem paywall; alguns anúncios no site pagam o servidor. Se ele te poupou tempo, um café ajuda muito.",
+  "{SITE_NAME} is a free Brawl Stars statistics site. There is no account and nothing to pay for; the website shows ads. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
+    "{SITE_NAME} é um site gratuito de estatísticas de Brawl Stars. Não há conta nem nada para pagar; o site mostra anúncios. Usá-lo significa aceitar os termos desta página. Se você discordar de algum deles, a solução é parar de usar o site, e nada se perde: você não nos deu nada.",
 };
