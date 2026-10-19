@@ -1,4 +1,12 @@
+import { formatNumber } from '@/lib/format';
 import type { AccountValueDistribution } from '@/lib/stats';
+
+/** Coins as the value card prints them: 1.23M, 456k, 9,876. */
+export function compactCoins(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 10_000) return `${Math.round(n / 1000)}k`;
+  return formatNumber(n);
+}
 
 /**
  * Where an account's coin value sits among the players we sample, 0..1.

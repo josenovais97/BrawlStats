@@ -1,7 +1,4 @@
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import { Suspense } from 'react';
-import { localePath } from '@/lib/i18n';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { after } from 'next/server';
@@ -32,6 +29,7 @@ import { MetaRadar } from '@/components/meta/meta-radar';
 import { Panel } from '@/components/ui/panel';
 import { ProfileGroup } from '@/components/player/profile-group';
 import { ProfileTabs } from '@/components/player/profile-tabs';
+import { PlayerValueTeaser } from '@/components/player/player-value-teaser';
 import { RecentSearchRecorder } from '@/components/recent-search-recorder';
 import { RosterRecorder } from '@/components/player/roster-recorder';
 import { PlayerInsights } from '@/components/player/player-insights';
@@ -121,7 +119,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PlayerPage({ params }: PageProps) {
   const t = getT(requestLocale());
-  const lp = (path: string) => localePath(requestLocale(), path);
   const { tag } = await params;
 
   let player;
@@ -348,6 +345,9 @@ export default async function PlayerPage({ params }: PageProps) {
         )}
         skill={skill.score}
       />
+      <Suspense fallback={<div className="skeleton h-[6.5rem] rounded-2xl" />}>
+        <PlayerValueTeaser player={player} tag={normalizedTag} />
+      </Suspense>
       <ProfileTabs
         tabs={[
         {
@@ -451,14 +451,6 @@ export default async function PlayerPage({ params }: PageProps) {
         */}
         <PlayerProgress points={trophyHistory} />
         <PlayerProgression progression={progression} playtime={playtime} />
-        {/* The calculator ranks this same account against the sample. */}
-        <Link
-          href={lp(`/account-value/${normalizedTag}`)}
-          className="card card-interactive flex items-center justify-between gap-3 p-4 font-semibold"
-        >
-          <span>{t('How much is this account worth? See its value and how it ranks')}</span>
-          <ArrowRight aria-hidden className="size-4 shrink-0 text-brand" />
-        </Link>
             </ProfileGroup>
           ),
         },

@@ -4058,4 +4058,6 @@ export const ES: Record<string, string> = {
     "El más jugado de ellos es {name}, en el {rate} de los combates. Popularidad y fuerza no son lo mismo: el orden de arriba es por tasa de victorias ajustada, que corrige cuánto se elige cada brawler y quién lo elige.",
   "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
     "Cada mapa tiene su propia página con las elecciones solo de ese mapa, que pueden ser muy distintas a las del modo en general: abre uno abajo.",
+  "See how it ranks against other players":
+    "Mira cómo se compara con otros jugadores",
 };

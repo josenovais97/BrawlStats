@@ -7,7 +7,7 @@ import { AccountValueForm } from '@/components/account-value/tag-form';
 import { ShareImageButton } from '@/components/share-image-button';
 import { SupportLine } from '@/components/support/support-line';
 import { ErrorState } from '@/components/ui/error-state';
-import { standingLabel, valuePercentile } from '@/lib/account-value';
+import { compactCoins, standingLabel, valuePercentile } from '@/lib/account-value';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { getOfficialBrawlers, getPlayer } from '@/lib/bs-api';
 import { toApiError } from '@/lib/errors';
@@ -44,12 +44,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /** "1.84M" on the hero, where seven digits would not fit a phone line. */
-function compact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 10_000) return `${Math.round(n / 1000)}k`;
-  return formatNumber(n);
-}
-
 export default async function AccountValuePage({ params }: PageProps) {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
@@ -116,7 +110,7 @@ export default async function AccountValuePage({ params }: PageProps) {
 
         <p className="mt-8 text-sm font-bold uppercase tracking-wide text-muted">{t('Account value')}</p>
         <p className="display mt-1 text-6xl leading-none text-brand sm:text-7xl">
-          {compact(coins.total)} <span className="text-3xl text-foreground sm:text-4xl">{t('coins')}</span>
+          {compactCoins(coins.total)} <span className="text-3xl text-foreground sm:text-4xl">{t('coins')}</span>
         </p>
         <p className="mt-2 text-lg text-muted">
           {t('plus {pp} power points', { pp: formatNumber(coins.powerPoints) })}
@@ -183,7 +177,7 @@ export default async function AccountValuePage({ params }: PageProps) {
         </div>
         <div className="card p-5">
           <p className="text-sm text-muted">{t('Coins to finish what you own')}</p>
-          <p className="display mt-1 text-3xl">{compact(toFinish)}</p>
+          <p className="display mt-1 text-3xl">{compactCoins(toFinish)}</p>
         </div>
       </section>
 
