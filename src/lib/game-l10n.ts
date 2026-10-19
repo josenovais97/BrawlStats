@@ -64,8 +64,13 @@ function shouting(text: string, locale: string): boolean {
 export function titleCaseIn(text: string, locale: string): string {
   return text
     .toLocaleLowerCase(locale)
-    .replace(/(^|[\s\-.&/'’(])(\p{L})/gu, (_, before: string, letter: string) =>
-      before + letter.toLocaleUpperCase(locale),
+    .replace(/(^|[\s\-.&/'’(])(\p{L})/gu, (match: string, before: string, letter: string, offset: number, whole: string) =>
+      // After an apostrophe, a lone final letter is a contraction or
+      // possessive ("Belle's", "don't"), not a word: only "L'Arène" style
+      // elisions are capitalised.
+      /['’]/.test(before) && !/\p{L}/u.test(whole.charAt(offset + match.length))
+        ? match
+        : before + letter.toLocaleUpperCase(locale),
     );
 }
 

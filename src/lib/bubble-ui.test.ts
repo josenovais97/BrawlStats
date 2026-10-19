@@ -66,3 +66,8 @@ test('title case follows the language', () => {
   // Turkish dotted capital I.
   assert.equal(titleCaseIn('İSTANBUL', 'tr'), 'İstanbul');
 });
+
+test('a possessive stays lowercase, an elision is capitalised', () => {
+  assert.equal(titleCaseIn("BELLE'S ROCK", 'en'), "Belle's Rock");
+  assert.equal(titleCaseIn("l'arène", 'fr'), "L'Arène");
+});
