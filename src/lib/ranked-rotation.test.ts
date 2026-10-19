@@ -34,3 +34,14 @@ test('a mode with no recent battles falls back to the published pool', () => {
 test('mode keys match across API ids and labels', () => {
   assert.equal(rotationKey('brawlBall'), rotationKey('Brawl Ball'));
 });
+
+test('after a rotation change, a map no longer played drops within hours', () => {
+  const r = rotationMaps({
+    recent: [
+      { mode: 'heist', mapName: 'Old Map', battles: 20000, lastSeen: '2026-11-19T08:00:00Z' },
+      { mode: 'heist', mapName: 'New Map', battles: 3000, lastSeen: '2026-11-19T16:00:00Z' },
+    ],
+    pool: [],
+  });
+  assert.deepEqual(r.get('heist'), ['New Map']);
+});

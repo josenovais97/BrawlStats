@@ -10,6 +10,14 @@ export const rotationKey = (value: string) => slugify(value).replace(/-/g, '');
 const STRAGGLER_SHARE = 0.1;
 
 /**
+ * A map whose newest battle is this much older than its mode's newest has
+ * left the rotation. A rotated-out map stops being played at once, while its
+ * 36-hour count stays large for a day and a half -- without this, last
+ * season's maps would linger beside the new ones that long after a switch.
+ */
+const GONE_AFTER_MS = 6 * 3600_000;
+
+/**
  * The Ranked maps in rotation right now, per mode, from what is being played.
  *
  * The battles are the authority, measured over the last 36 hours, because
@@ -25,26 +33,34 @@ const STRAGGLER_SHARE = 0.1;
  * an empty map list.
  */
 export function rotationMaps(input: {
-  /** Ranked battles per map over the last 36 hours. */
-  recent: { mode: string; mapName: string; battles: number }[];
+  /** Ranked battles per map over the last 36 hours, and when each was last played. */
+  recent: { mode: string; mapName: string; battles: number; lastSeen?: string }[];
   pool: { mode: string; maps: string[] }[];
 }): Map<string, string[]> {
-  const byMode = new Map<string, { mapName: string; battles: number }[]>();
+  const byMode = new Map<string, { mapName: string; battles: number; last: number }[]>();
   for (const row of input.recent) {
     const key = rotationKey(row.mode);
     const list = byMode.get(key) ?? [];
+    const last = row.lastSeen ? Date.parse(row.lastSeen) : Number.POSITIVE_INFINITY;
     const same = list.find((m) => rotationKey(m.mapName) === rotationKey(row.mapName));
-    if (same) same.battles += row.battles;
-    else list.push({ mapName: row.mapName, battles: row.battles });
+    if (same) {
+      same.battles += row.battles;
+      same.last = Math.max(same.last, last);
+    } else list.push({ mapName: row.mapName, battles: row.battles, last });
     byMode.set(key, list);
   }
 
   const out = new Map<string, string[]>();
   for (const [mode, list] of byMode) {
     const top = Math.max(...list.map((m) => m.battles));
+    const newest = Math.max(...list.map((m) => (Number.isFinite(m.last) ? m.last : 0)));
     out.set(
       mode,
-      list.filter((m) => m.battles >= top * STRAGGLER_SHARE).map((m) => m.mapName).sort((a, b) => a.localeCompare(b)),
+      list
+        .filter((m) => m.battles >= top * STRAGGLER_SHARE)
+        .filter((m) => !Number.isFinite(m.last) || newest - m.last <= GONE_AFTER_MS)
+        .map((m) => m.mapName)
+        .sort((a, b) => a.localeCompare(b)),
     );
   }
   for (const entry of input.pool) {

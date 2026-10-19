@@ -4882,12 +4882,19 @@ const cachedRankedMapPicks = cachedRead(
  * `rotationMaps` (lib/ranked-rotation), which decides which maps are in the
  * live rotation from what is actually being played.
  */
-async function compute_getRankedRecentMaps(): Promise<{ mode: string; mapName: string; battles: number }[]> {
+export interface RecentRankedMap {
+  mode: string;
+  mapName: string;
+  battles: number;
+  lastSeen: string;
+}
+
+async function compute_getRankedRecentMaps(): Promise<RecentRankedMap[]> {
   const prisma = getPrisma();
   if (!prisma) return [];
   try {
-    const rows = await prisma.$queryRaw<{ mode: string; map_name: string; battles: bigint }[]>`
-      SELECT mode, map_name, sum(battles) AS battles
+    const rows = await prisma.$queryRaw<{ mode: string; map_name: string; battles: bigint; last_seen: Date }[]>`
+      SELECT mode, map_name, sum(battles) AS battles, max(last_battle_time) AS last_seen
       FROM battle_daily_stats
       WHERE battle_type IN ('soloRanked', 'teamRanked')
         AND map_name IS NOT NULL
@@ -4895,7 +4902,12 @@ async function compute_getRankedRecentMaps(): Promise<{ mode: string; mapName: s
         AND last_battle_time >= now() - interval '36 hours'
       GROUP BY 1, 2
     `;
-    return rows.map((r) => ({ mode: r.mode, mapName: r.map_name, battles: Number(r.battles) }));
+    return rows.map((r) => ({
+      mode: r.mode,
+      mapName: r.map_name,
+      battles: Number(r.battles),
+      lastSeen: new Date(r.last_seen).toISOString(),
+    }));
   } catch (error) {
     swallow('getRankedRecentMaps', error);
     return [];
