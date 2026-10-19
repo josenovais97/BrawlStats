@@ -12,25 +12,31 @@
 # So: quiet on success, everything on failure. The full output is kept and
 # printed only when the exit code is non-zero, which is exactly when someone
 # needs it -- and when the OnFailure alert mails this log.
+#
+# A detached, named container since 2026-10-19. Run in the foreground, a run
+# longer than the unit's timeout had only its `docker compose run` client
+# killed: the container carried on with nobody reading its output, the log
+# showed "Starting sampler" and nothing else, OnFailure mailed a failure for
+# a run that went on to succeed, and the next run could start on top of it.
+# Runs took 53-98 minutes that day, sharing two cores with deploy builds.
+#
+# Now the job waits up to WAIT_LIMIT for the container. A run still going then
+# is handed off: the job exits cleanly and the container finishes on its own.
+# The next job reports that run's result before starting, skips its own turn
+# if the run is still going, and stops one stuck for STUCK_AFTER (which does
+# fail, and alert).
 set -uo pipefail
 
 cd "$HOME/brawlstats" || exit 1
 out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
-echo "Starting sampler"
-start=$(date +%s)
-docker compose run --rm sampler >"$out" 2>&1
-rc=$?
-elapsed=$(( $(date +%s) - start ))
+NAME=brawlzone-sampler-job
+WAIT_LIMIT=2700   # 45 minutes, inside the unit's 50
+STUCK_AFTER=14400 # 4 hours
 
-if [ "$rc" -ne 0 ]; then
-  echo "Sampler FAILED after ${elapsed}s (exit $rc). Full output follows:"
-  cat "$out"
-  exit "$rc"
-fi
-
-python3 - "$out" "$elapsed" <<'PY'
+report() { # <elapsed seconds>
+python3 - "$out" "$1" <<'PY'
 import json, re, sys
 
 raw = open(sys.argv[1], encoding="utf-8", errors="replace").read()
@@ -82,6 +88,70 @@ if dropped:
 status = result.get("status", "?")
 print(f"Status {status}, completed in {elapsed}s")
 PY
+}
+
+# Collects a finished container: its output into $out, its exit code echoed.
+collect() {
+  docker logs "$NAME" >"$out" 2>&1
+  local rc
+  rc=$(docker inspect -f '{{.State.ExitCode}}' "$NAME" 2>/dev/null || echo 1)
+  docker rm "$NAME" >/dev/null 2>&1
+  echo "$rc"
+}
+
+age_of() { # seconds since the container's StartedAt
+  local started
+  started=$(docker inspect -f '{{.State.StartedAt}}' "$NAME" 2>/dev/null) || { echo 0; return; }
+  echo $(( $(date +%s) - $(date -d "$started" +%s) ))
+}
+
+# 1. A previous run, still going or finished after its job had handed off.
+status=$(docker inspect -f '{{.State.Status}}' "$NAME" 2>/dev/null || true)
+if [ "$status" = running ]; then
+  age=$(age_of)
+  if [ "$age" -lt "$STUCK_AFTER" ]; then
+    echo "The previous run is still going ($((age / 60)) min); skipping this turn"
+    exit 0
+  fi
+  echo "The previous run has been going $((age / 60)) min; stopping it as stuck. Its last output:"
+  docker stop -t 60 "$NAME" >/dev/null 2>&1
+  collect >/dev/null
+  tail -c 3000 "$out"
+  exit 1
+elif [ -n "$status" ]; then
+  finished=$(docker inspect -f '{{.State.FinishedAt}}' "$NAME")
+  took=$(( $(date -d "$finished" +%s) - $(date -d "$(docker inspect -f '{{.State.StartedAt}}' "$NAME")" +%s) ))
+  rc=$(collect)
+  echo "The previous run finished after its hand-off, at $finished (exit $rc):"
+  if [ "$rc" -ne 0 ]; then tail -c 3000 "$out"; else report "$took"; fi
+  echo
+fi
+
+# 2. This run.
+echo "Starting sampler"
+start=$(date +%s)
+if ! docker compose run -d --name "$NAME" sampler >"$out" 2>&1; then
+  echo "Could not start the sampler container:"
+  cat "$out"
+  exit 1
+fi
+while [ "$(docker inspect -f '{{.State.Running}}' "$NAME" 2>/dev/null)" = true ]; do
+  if [ $(( $(date +%s) - start )) -ge "$WAIT_LIMIT" ]; then
+    echo "Still running after $((WAIT_LIMIT / 60)) minutes; handed off to finish on its own. The next run reports its result."
+    exit 0
+  fi
+  sleep 15
+done
+elapsed=$(( $(date +%s) - start ))
+rc=$(collect)
+
+if [ "$rc" -ne 0 ]; then
+  echo "Sampler FAILED after ${elapsed}s (exit $rc). Full output follows:"
+  cat "$out"
+  exit "$rc"
+fi
+
+report "$elapsed"
 
 # Both this and auto-deploy.sh build images, but only auto-deploy pruned. This
 # runs every two hours and the deploy only when a commit lands, so on a quiet

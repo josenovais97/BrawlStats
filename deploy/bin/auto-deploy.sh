@@ -111,7 +111,9 @@ unfinished=0
 # the health check the box is behind on purpose.
 DEFER_STATE="$HOME/.brawlzone-deploy-deferred"
 # A oneshot unit reads "activating" for the whole of its run, never "active".
-if [ "$force" -eq 0 ] && [ "$(systemctl is-active brawlzone-sampler.service)" = activating ]; then
+# A run handed off by brawlzone-sample outlives its unit, so the container counts too.
+if [ "$force" -eq 0 ] && { [ "$(systemctl is-active brawlzone-sampler.service)" = activating ] \
+     || [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ]; }; then
   since=$(cat "$DEFER_STATE" 2>/dev/null || true)
   [ -n "$since" ] || { since=$(date +%s); echo "$since" > "$DEFER_STATE"; }
   if [ $(( $(date +%s) - since )) -lt 3600 ]; then
