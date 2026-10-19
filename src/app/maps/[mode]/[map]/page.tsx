@@ -37,6 +37,7 @@ import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { andList } from '@/lib/t';
 import { mapNamer, modeNamer } from '@/lib/i18n-game';
+import { indexableMaps, mapIndexKey } from '@/lib/map-indexing';
 
 interface PageProps {
   params: Promise<{ mode: string; map: string }>;
@@ -75,8 +76,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // Display name in the page's language; the English one still keys the wiki.
   const modeLabelEn = entry.mode?.name ?? entry.map.gameMode.name;
   const modeLabel = (await modeNamer())(modeLabelEn);
+  // Only a map with its own picks is offered to search (lib/map-indexing).
+  const indexable = await indexableMaps();
+  const ownData =
+    !entry.retired && (!indexable || (!!entry.scHash && indexable.has(mapIndexKey(entry.scHash, entry.map.name))));
 
   return {
+    ...(ownData ? {} : { robots: { index: false, follow: true } }),
     // Written as the query, because that is how this page is found: people
     // search the map name plus the thing they want to know about it.
     //

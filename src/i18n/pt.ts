@@ -4048,4 +4048,14 @@ export const PT: Record<string, string> = {
     "O BrawlZone é grátis e feito por uma pessoa só. Se ajudou,",
   "a coffee keeps the server running":
     "um café mantém o servidor no ar",
+  "{label} this week":
+    "{label} nesta semana",
+  "{first} has the best record in {label} right now, with a {score} adjusted win rate over {n} decided battles, ahead of {second} and {third}.":
+    "{first} tem o melhor desempenho em {label} agora, com {score} de vitórias ajustado em {n} batalhas decididas, à frente de {second} e {third}.",
+  "Across every brawler, the mode has {total} sampled battles from the last 7 days on {maps} maps in rotation, and the average brawler wins {base} of them.":
+    "Contando todos os brawlers, o modo tem {total} batalhas amostradas dos últimos 7 dias em {maps} mapas em rotação, e o brawler médio vence {base} delas.",
+  "The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.":
+    "O mais jogado deles é {name}, em {rate} das batalhas. Popularidade e força não são a mesma coisa: a ordem acima é pela taxa de vitórias ajustada, que corrige o quanto cada brawler é escolhido e quem o escolhe.",
+  "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
+    "Cada mapa tem sua própria página com as escolhas só daquele mapa, que podem ser bem diferentes das do modo como um todo: abra um abaixo.",
 };

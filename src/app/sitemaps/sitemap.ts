@@ -9,8 +9,10 @@ import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { SECTIONS, type Section } from '@/lib/sitemap-sections';
 import { slugify } from '@/lib/slugs';
+import { indexableMaps, mapIndexKey } from '@/lib/map-indexing';
 import { PAIR_SEPARATOR } from '@/lib/compare';
 import {
+  getBestPicksByMode,
   getFilterableModes,
   getIndexablePairs,
   getNewestDayByMap,
@@ -219,13 +221,22 @@ async function core(add: Add, dataDay: Date | null) {
 async function maps(add: Add, byMap: Map<string, string>) {
   add('/maps', 'weekly', 0.85);
   const maps = await getActiveMaps().catch(() => []);
+  // Only modes with ranked picks: one without is a heading and a list of map
+  // names, and its page is noindex (maps/[mode], 2026-10-19). If the read
+  // fails, every mode is listed, as before.
+  const picks = await getBestPicksByMode(8).catch(() => null);
   for (const group of groupByMode(maps)) {
+    const scHash = group.maps[0]?.scHash;
+    if (picks && !(scHash && (picks.get(scHash)?.picks.length ?? 0) > 0)) continue;
     add(`/maps/${group.mode}`, 'weekly', 0.7);
   }
   // The largest indexable surface on the site, and every one of them answers
   // a real query ("<map> best brawlers"). Dated per map: the newest battle
   // sampled on it, or nothing at all for a map nobody has been able to play.
+  // Only maps with their own picks; the rest are noindex (lib/map-indexing).
+  const indexable = await indexableMaps();
   for (const entry of maps) {
+    if (indexable && (entry.retired || !entry.scHash || !indexable.has(mapIndexKey(entry.scHash, entry.map.name)))) continue;
     const day = entry.scHash ? byMap.get(`${entry.scHash}\u0000${entry.map.name}`) : undefined;
     add(
       `/maps/${entry.modeSlug}/${entry.mapSlug}`,
