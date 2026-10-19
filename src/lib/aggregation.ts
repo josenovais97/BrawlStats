@@ -778,7 +778,13 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  * observation that cannot be re-derived, which is why the raw battle window is
  * the one thing it will not touch.
  */
-const STORAGE_LIMIT_BYTES = 8 * 1024 * 1024 * 1024;
+/*
+ * 6 GB since 2026-10-19 (was 8). The database shares a 45 GB disk with the
+ * images, the build cache and the nightly dumps, and at 8 GB it sat at
+ * critical permanently while the disk ran at 66% before anything else. Six
+ * keeps the whole box near half full.
+ */
+const STORAGE_LIMIT_BYTES = 6 * 1024 * 1024 * 1024;
 
 /**
  * Two levels, because there is no useful third one at the top.
@@ -894,8 +900,10 @@ const RETENTION_UNDER_PRESSURE: Record<
    * emails. The team-comp and role reads that look back 14-21 days over raw
    * team rows read a shorter sample meanwhile -- accuracy, not a feature.
    */
-  high: { snapshots: 4, pairing: 30, rollup: 60, raw: 10 },
-  critical: { snapshots: 2, pairing: 22, rollup: 30, raw: 7 },
+  // Raw cut again on 2026-10-19 with the budget: 5 at critical is still two
+  // days past ROLLUP_REBUILD_DAYS, and a failed fold mails the same run.
+  high: { snapshots: 4, pairing: 30, rollup: 60, raw: 7 },
+  critical: { snapshots: 2, pairing: 22, rollup: 30, raw: 5 },
 };
 
 /**

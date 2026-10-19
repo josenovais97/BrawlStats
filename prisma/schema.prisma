@@ -141,10 +141,10 @@ model BattleSample {
   battleTime   DateTime @map("battle_time")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  // Only battleTime: every read of raw battles is a fold or prune by day. The
+  // brawler and per-map indexes (1.1 GB) were dropped on 2026-10-19 after two
+  // weeks at 0-1 scans -- the per-map tier list reads ranked_pair_daily.
   @@index([battleTime])
-  @@index([brawlerId, battleTime])
-  /// Drives the per-map ranked tier list.
-  @@index([battleType, mapName, battleTime])
   @@map("battle_samples")
 }
 
@@ -182,7 +182,6 @@ model BattleTeamSample {
   battleTime      DateTime @map("battle_time")
   createdAt       DateTime @default(now()) @map("created_at")
 
-  @@index([brawlerId, battleTime])
   @@index([battleTime])
   @@map("battle_team_samples")
 }

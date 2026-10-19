@@ -2,7 +2,12 @@
 # Nightly logical backup of the local Postgres.
 #
 # Dumps from inside the container, so it needs no exposed port and no client
-# on the host. Keeps 7 daily + 4 weekly (Sundays) copies.
+# on the host. Keeps 4 daily + 2 weekly (Sundays) copies.
+#
+# The raw battle tables go in as schema only (2026-10-19). They hold the last
+# few days before the fold, were ~60% of a 0.55 GB dump, and everything they
+# feed is in the roll-ups, which are dumped in full. A restore loses at most
+# the days not yet folded.
 #
 # These live on the same disk as the database, so on their own they defend
 # against operator error -- a bad migration, a wrong DELETE -- but not against
@@ -19,7 +24,9 @@ stamp=$(date -u +%Y%m%dT%H%M%SZ)
 out="$DIR/brawlzone-$stamp.sql.gz"
 
 docker compose exec -T db pg_dump -U brawlzone -d brawlzone \
-  --no-owner --no-privileges | gzip -9 > "$out.tmp"
+  --no-owner --no-privileges \
+  --exclude-table-data=battle_samples --exclude-table-data=battle_team_samples \
+  | gzip -9 > "$out.tmp"
 
 # Only promote a dump that gunzips cleanly and carries the tables we expect.
 # A truncated dump that silently replaces a good one is worse than no backup.
@@ -50,13 +57,13 @@ else
   echo "analytics dump failed (is the umami database present?)" >&2
 fi
 
-# Keep 7 most recent; plus any Sunday dump from the last 28 days.
+# Keep 4 most recent; plus any Sunday dump from the last 14 days.
 cd "$DIR"
-ls -1t umami-*.sql.gz 2>/dev/null | tail -n +8 | xargs -r rm -f
-ls -1t brawlzone-*.sql.gz 2>/dev/null | tail -n +8 | while read -r f; do
+ls -1t umami-*.sql.gz 2>/dev/null | tail -n +5 | xargs -r rm -f
+ls -1t brawlzone-*.sql.gz 2>/dev/null | tail -n +5 | while read -r f; do
   d=$(echo "$f" | grep -oP '\d{8}')
   if [ "$(date -d "$d" +%u 2>/dev/null)" = "7" ] && \
-     [ "$d" -ge "$(date -u -d "28 days ago" +%Y%m%d)" ]; then
+     [ "$d" -ge "$(date -u -d "14 days ago" +%Y%m%d)" ]; then
     continue
   fi
   rm -f "$f"

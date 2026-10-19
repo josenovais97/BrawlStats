@@ -27,7 +27,11 @@
 /var/log/brawlzone/access/*.log {
     daily
     maxsize 100M
-    rotate 7
+    # By age, not count (2026-10-19): maxsize makes hourly rotations on busy
+    # days, so a count of files is not a count of days. Three days is what
+    # anyone reads; `rotate` is only a ceiling.
+    rotate 200
+    maxage 3
     missingok
     notifempty
     compress

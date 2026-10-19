@@ -27,8 +27,9 @@ COPY prisma.config.ts ./
 RUN npm ci
 
 # ---- build ------------------------------------------------------------------
-FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
+# From deps rather than base + COPY of node_modules: the copy was a second
+# ~1 GB layer of the same files, in the sampler image and in the build cache.
+FROM deps AS builder
 COPY . .
 
 # NEXT_PUBLIC_* is inlined into the client bundle at build time, so it has to

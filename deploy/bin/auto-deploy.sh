@@ -276,10 +276,10 @@ fi
 # at 70% was doing all the work.
 #
 # Pruning everything after every deploy would cost every build its cache --
-# minutes of npm and Next on two cores. Past 6 GB is the compromise: builds
-# stay cached most of the time, and the cache can never pass ~7.5 GB (the
-# ceiling plus one build) before it is cleared.
-CACHE_CEILING_MB=6144
+# minutes of npm and Next on two cores. Past 4 GB is the compromise (6 until
+# 2026-10-19, when the builder stage stopped duplicating node_modules): builds
+# stay cached most of the time, and the cache is cleared before it grows far.
+CACHE_CEILING_MB=4096
 freed=$(docker image prune -f 2>/dev/null | grep -oP 'Total reclaimed space: \K.*' || echo "0B")
 cache_mb=$(docker system df --format '{{.Type}}\t{{.Size}}' 2>/dev/null | awk -F'\t' '
   /Build Cache/ {
