@@ -8,4 +8,4 @@ OnFailure=brawlzone-alert@%n.service
 Type=oneshot
 User=ubuntu
 ExecStart=/usr/local/bin/brawlzone-run precompute /usr/local/bin/brawlzone-precompute
-TimeoutStartSec=1500
+TimeoutStartSec=2700

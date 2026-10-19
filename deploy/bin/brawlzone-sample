@@ -127,7 +127,19 @@ elif [ -n "$status" ]; then
   echo
 fi
 
-# 2. This run.
+# 2. This run -- unless the disk is nearly full.
+#    Each run grows Postgres by ~100 MB, and Postgres is what dies when the disk
+#    fills (2026-09-09: five hours of "not enough data"). The health check
+#    clears space from 70% and harder from 85%; if the disk is still at
+#    DISK_STOP after that, missing a run is far cheaper than a dead database.
+DISK_STOP=92
+use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+if [ "$use" -ge "$DISK_STOP" ]; then
+  echo "Disk at ${use}% (limit ${DISK_STOP}%); not sampling this turn so the database cannot fill it"
+  df -h / | tail -1
+  exit 1
+fi
+
 echo "Starting sampler"
 start=$(date +%s)
 if ! docker compose run -d --name "$NAME" sampler >"$out" 2>&1; then

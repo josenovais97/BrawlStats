@@ -95,10 +95,40 @@ if [ "$use" -ge 70 ]; then
   echo "disk was ${before}%, reclaimed down to ${use}%"
 fi
 
+# Harder at 85% (2026-10-19). The tidy-up above only throws away what
+# regenerates for free, and that day it was not enough: two images kept for
+# live checks plus a day of builds took the disk to 88%, the weekly restore
+# test died with "No space left on device", and the only answer was mail.
+# This tier gives up things that are merely nice to have, oldest first:
+#   - images no compose service built (node, ffmpeg, screenshot tools) --
+#     the next job that wants one pulls it again;
+#   - access logs older than 3 days (kept 7 for reading, nobody reads past 3);
+#   - database dumps beyond the newest 3, weekly ones included -- 3 nights of
+#     restore points still on the box, the rest was redundancy;
+#   - the systemd journal beyond 100 MB, our job logs older than 14 days.
+# Never volumes, never compose images, never the newest dumps. If the disk is
+# still above 85% after this, the alert below says so, and the sampler stops
+# starting new runs at 92% so the database cannot be what fills it.
+if [ "$use" -ge 85 ]; then
+  before=$use
+  docker image prune -af --filter "label!=com.docker.compose.project" >/dev/null 2>&1
+  sudo -n find /var/log/brawlzone/access -name 'access.log-*' -mtime +3 -delete >/dev/null 2>&1
+  for kind in brawlzone umami; do
+    ls -1t /home/ubuntu/backups/"$kind"-*.sql.gz 2>/dev/null | tail -n +4 | xargs -r rm -f
+  done
+  sudo -n journalctl --vacuum-size=100M >/dev/null 2>&1
+  sudo -n find /var/log/brawlzone -name '*.log-*.gz' -mtime +14 -delete >/dev/null 2>&1
+  use=$(df --output=pcent / | tail -1 | tr -dc '0-9')
+  echo "disk still ${before}% after the tidy-up; emergency clean-up brought it to ${use}%"
+fi
+
 [ "$use" -lt 85 ] || problems+=("disk at ${use}%")
 
 # 4. Are all containers up?
-down=$(cd /home/ubuntu/brawlstats && docker compose ps --status exited --status dead -q 2>/dev/null | wc -l)
+#    The sampler's own container is not a service: it exits after every run and
+#    waits there for the next job to collect it (brawlzone-sample).
+down=$(cd /home/ubuntu/brawlstats && docker compose ps -a --status exited --status dead --format '{{.Name}}' 2>/dev/null \
+  | grep -vcx 'brawlzone-sampler-job')
 [ "$down" -eq 0 ] || problems+=("$down container(s) not running")
 
 # 5. Is the Discord invite in the footer still going to work?
@@ -179,8 +209,11 @@ fi
 #     2026-10-15. /api/v1/health/sources reports what each one is using.
 sources=$(curl -s --max-time 30 "$SITE/api/v1/health/sources" || echo "")
 if [ -n "$sources" ]; then
+  WIKI_STREAK=/var/lib/brawlzone/wiki-unreadable.count
+  wiki_down=0
   while IFS= read -r line; do
-    [ -n "$line" ] && problems+=("$line")
+    if [ "$line" = WIKI_UNREADABLE ]; then wiki_down=1
+    elif [ -n "$line" ]; then problems+=("$line"); fi
   done < <(printf '%s' "$sources" | python3 -c '
 import json, sys
 try:
@@ -193,13 +226,28 @@ if s.get("source") != "wiki":
 elif not s.get("current"):
     print("no current Ranked season resolved from the wiki")
 u = d.get("upcoming")
-if u and not u.get("ok"):
+# A wiki that could not be read at all (missingFromWiki empty) is usually a
+# blip on their side, and the site already hides the list meanwhile: only
+# report it once it has lasted, counted by the caller. A wiki that reads fine
+# but lacks a live brawler is a parser problem, reported at once.
+if u and not u.get("ok") and not u.get("missingFromWiki"):
+    print("WIKI_UNREADABLE")
+elif u and not u.get("ok"):
     gone = ", ".join(u.get("missingFromWiki") or []) or "wiki unreadable or short"
     print("upcoming-brawler list suppressed: wiki and game disagree (" + gone + ")")
 r = d.get("rotation") or {}
 if not r.get("maps"):
     print("no Ranked maps played in the last 36 hours (Ranked sampling stopped?)")
 ')
+  # Six runs is an hour: 2026-10-19 13:03 mailed for a wiki that was back by
+  # the next look.
+  if [ "$wiki_down" -eq 1 ]; then
+    streak=$(( $(cat "$WIKI_STREAK" 2>/dev/null || echo 0) + 1 ))
+    echo "$streak" > "$WIKI_STREAK"
+    [ "$streak" -lt 6 ] || problems+=("upcoming-brawler list suppressed for an hour: the wiki brawler category cannot be read")
+  else
+    echo 0 > "$WIKI_STREAK"
+  fi
 fi
 
 # 8. Has anyone proved the backups still restore?

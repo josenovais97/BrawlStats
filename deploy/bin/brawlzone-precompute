@@ -4,6 +4,22 @@
 set -uo pipefail
 cd /home/ubuntu/brawlstats || exit 1
 out=$(mktemp); trap 'rm -f "$out"' EXIT
+
+# Wait for the sampler (2026-10-19). This timer fires at :47, thirty minutes
+# after the sampler starts, which assumed runs of ~20 minutes. Runs now take
+# 50-80, and a sampler run handed off past its own timeout keeps going as the
+# container brawlzone-sampler-job: precompute then ran beside it on two cores,
+# hit its own timeout and mailed FAILED three times in one day. It waits up to
+# 20 minutes for the run to end; still going, it skips this turn -- the reads
+# it would store are recomputed on demand meanwhile, just slower.
+for _ in $(seq 40); do
+  [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ] || break
+  sleep 30
+done
+if [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ]; then
+  echo "Sampler run still going after 20 minutes of waiting; skipping this turn"
+  exit 0
+fi
 if ! docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/precompute.ts >"$out" 2>&1; then
   echo "Precompute FAILED. Output:"
   tail -25 "$out"

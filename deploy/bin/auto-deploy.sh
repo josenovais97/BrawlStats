@@ -124,6 +124,24 @@ if [ "$force" -eq 0 ] && { [ "$(systemctl is-active brawlzone-sampler.service)" 
 fi
 rm -f "$DEFER_STATE"
 
+# Room to build (2026-10-19). A build writes ~5 GB of cache and a new image
+# before the old one can go; starting one on a nearly full disk can fill it,
+# and Postgres shares that disk. Clear the build cache first if space is short
+# (the build is slower, nothing else is lost); still short, do not build --
+# the previous image keeps serving. Exit 0, or this would mail every five
+# minutes: the health check already reports the disk, and the box being
+# behind origin, once.
+free_gb=$(( $(df --output=avail / | tail -1) / 1048576 ))
+if [ "$free_gb" -lt 8 ]; then
+  docker builder prune -af >/dev/null 2>&1
+  free_gb=$(( $(df --output=avail / | tail -1) / 1048576 ))
+fi
+if [ "$free_gb" -lt 6 ]; then
+  echo "Only ${free_gb} GB free; not building ${remote:0:7} until there is room (needs 6)"
+  df -h / | tail -1
+  exit 0
+fi
+
 if [ "$local" = "$remote" ] && [ "$force" -eq 0 ]; then
   echo "The last deploy of ${local:0:7} did not finish; building it again"
   changed=0

@@ -14,4 +14,5 @@ ExecStart=/usr/local/bin/brawlzone-run deploy /home/ubuntu/auto-deploy.sh
 # 30 minutes: after the cache prune at the end of a deploy, the next build is
 # cold (migrate image, app, sampler image) and took over 15 minutes on
 # 2026-10-15, which killed it mid-build. The timer never overlaps two deploys.
-TimeoutStartSec=1800
+# 45 since 2026-10-19: two builds under load ran past 30 and were killed.
+TimeoutStartSec=2700
