@@ -72,6 +72,7 @@ import type { BSPlayer } from '@/types/brawlstars';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
+import { SupportLine } from '@/components/support/support-line';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -592,6 +593,7 @@ export default async function PlayerPage({ params }: PageProps) {
         ]}
       />
 
+      <SupportLine />
     </div>
   );
 }

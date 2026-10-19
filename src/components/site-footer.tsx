@@ -8,7 +8,7 @@ import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, type Locale } from '@/lib/i18n';
 import { GooglePlayBadge } from '@/components/store-badges';
 import { PLAY_TEST } from '@/lib/bubble-app';
-import { CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL } from '@/lib/site';
+import { BUY_ME_A_COFFEE_URL, CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL } from '@/lib/site';
 
 /*
  * Our own app, not the game's (2026-10-15). The footer used to link Brawl
@@ -17,7 +17,6 @@ import { CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL } from '@/lib/site';
  * test is recruiting, the app page otherwise.
  */
 const BUBBLE_PATH = PLAY_TEST.open ? '/bubble/test' : '/bubble';
-const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/josenovais';
 
 /**
  * `?sub_confirmation=1` opens YouTube's subscribe dialog straight away rather

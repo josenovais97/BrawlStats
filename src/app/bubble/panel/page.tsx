@@ -8,6 +8,7 @@ import type { PanelEntry, PanelMap, PanelMode } from '@/components/bubble/panel-
 import { PanelUpdate } from '@/components/bubble/panel-update';
 import { PanelPlayTest } from '@/components/bubble/panel-play-test';
 import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_TEST } from '@/lib/bubble-app';
+import { PanelSupport } from '@/components/bubble/panel-support';
 import { getGameModeMap, brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { titleCase } from '@/lib/format';
@@ -270,6 +271,9 @@ export default async function BubblePanelPage() {
         ) : (
           <PanelShell modes={modes} roster={roster} windowDays={WINDOW_DAYS} comps={comps} />
         )}
+
+        {/* Donation ask, site build only (see the component). */}
+        <PanelSupport />
 
 
         <p className="px-2 pb-2 pt-4 text-center text-[11px] leading-relaxed text-muted">

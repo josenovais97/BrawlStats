@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { AccountValueForm } from '@/components/account-value/tag-form';
 import { ShareImageButton } from '@/components/share-image-button';
+import { SupportLine } from '@/components/support/support-line';
 import { ErrorState } from '@/components/ui/error-state';
 import { standingLabel, valuePercentile } from '@/lib/account-value';
 import { playerIconUrl } from '@/lib/brawlapi';
@@ -195,6 +196,8 @@ export default async function AccountValuePage({ params }: PageProps) {
           <ArrowRight aria-hidden className="size-4" />
         </Link>
       </section>
+
+      <SupportLine />
 
       <section className="space-y-3">
         <h2 className="font-bold">{t('Check another account')}</h2>

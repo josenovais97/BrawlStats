@@ -4044,4 +4044,8 @@ export const PT: Record<string, string> = {
     "O BrawlZone é grátis e não tem paywall; alguns anúncios no site pagam o servidor. Se ele te poupou tempo, um café ajuda muito.",
   "{SITE_NAME} is a free Brawl Stars statistics site. There is no account and nothing to pay for; the website shows ads. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
     "{SITE_NAME} é um site gratuito de estatísticas de Brawl Stars. Não há conta nem nada para pagar; o site mostra anúncios. Usá-lo significa aceitar os termos desta página. Se você discordar de algum deles, a solução é parar de usar o site, e nada se perde: você não nos deu nada.",
+  "BrawlZone is free and made by one person. If this helped,":
+    "O BrawlZone é grátis e feito por uma pessoa só. Se ajudou,",
+  "a coffee keeps the server running":
+    "um café mantém o servidor no ar",
 };

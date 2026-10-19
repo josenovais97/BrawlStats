@@ -25,6 +25,7 @@ export const SITE_NAME = 'BrawlZone';
  * reach them.
  */
 export const CONTACT_EMAIL = 'contact@brawlzone.net';
+export const BUY_ME_A_COFFEE_URL = 'https://buymeacoffee.com/josenovais';
 
 /**
  * How this site identifies itself to the APIs it reads.
