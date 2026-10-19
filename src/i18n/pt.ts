@@ -4060,4 +4060,12 @@ export const PT: Record<string, string> = {
     "Cada mapa tem sua própria página com as escolhas só daquele mapa, que podem ser bem diferentes das do modo como um todo: abra um abaixo.",
   "See how it ranks against other players":
     "Veja como ela se compara com outros jogadores",
+  "Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors' YouTube or Google accounts. YouTube's use of data is covered by the":
+    "Nossos canais do TikTok e do YouTube são publicados a partir do nosso próprio servidor: o BrawlZone usa os Serviços de API do YouTube apenas para enviar os próprios vídeos ao próprio canal, e não lê nenhum dado das contas do YouTube ou do Google dos visitantes. O uso de dados pelo YouTube é regido pelos",
+  "YouTube Terms of Service":
+    "Termos de Serviço do YouTube",
+  " and the":
+    " e pela",
+  "Google Privacy Policy":
+    "Política de Privacidade do Google",
 };

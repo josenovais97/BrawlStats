@@ -142,6 +142,20 @@ export default function PrivacyPage() {
                 >{t('Google\'s own policy')}</a>
                 {t('. The BrawlZone Bubble app and its panel show no ads.')}
               </p>
+              <p>{t('Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors\' YouTube or Google accounts. YouTube\'s use of data is covered by the')}{' '}
+                <a
+                  href="https://www.youtube.com/t/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >{t('YouTube Terms of Service')}</a>{t(' and the')}{' '}
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >{t('Google Privacy Policy')}</a>.
+              </p>
             </div>
           </div>
         </div>
