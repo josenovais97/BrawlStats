@@ -13,8 +13,9 @@ import { brawlerPath } from '@/lib/slugs';
 import { brawlerIconUrl, getGameModeMap, getMapMap } from '@/lib/brawlapi';
 import { formatDate, formatNumber, formatPercent, humanizeMode, relativeTime, titleCaseLabel } from '@/lib/format';
 import { getActiveMaps } from '@/lib/game-maps';
+import { rotationKey, rotationMaps } from '@/lib/ranked-rotation';
 import { getSeasonState, type SeasonState } from '@/lib/ranked-seasons';
-import { getRankedMapLastSeen } from '@/lib/stats';
+import { getRankedMapLastSeen, getRankedRecentMaps } from '@/lib/stats';
 import { slugify } from '@/lib/slugs';
 import {
   getLastAggregationRun,
@@ -123,25 +124,23 @@ export default async function RankedPage() {
   const lastSeen = new Map(lastSeenRows.map((r) => [key(r.mode, r.mapName), r] as const));
 
   /*
-   * Only trusted when it overlaps what we have sampled. A wiki table that has
-   * been restructured, or whose map names have diverged from the API's, would
-   * otherwise filter the board down to nothing — an empty page is a worse
-   * failure than a slightly stale one.
+   * The live rotation (lib/ranked-rotation): maps played in Ranked over the
+   * last 36 hours, the published pool only for a mode with no recent battles.
+   * The board used the wiki's pool as the authority, which on 2026-10-19
+   * listed two Brawl Ball maps out of rotation and missed two live Knockout
+   * maps. Modes keep the pool's order where it has them.
    */
-  const poolMatches = season.mapPool.reduce(
-    (n, entry) => n + entry.maps.filter((m) => sampled.has(key(entry.mode, m))).length,
-    0,
-  );
-  const usePool = poolMatches > 0;
+  const recent = await getRankedRecentMaps().catch(() => []);
+  const rotation = rotationMaps({ recent, pool: season.mapPool });
+  const modeOrder = [
+    ...new Set([...season.mapPool.map((e) => slugify(e.mode)), ...recent.map((r) => slugify(r.mode))]),
+  ].filter((modeSlug) => rotation.has(rotationKey(modeSlug)));
 
-  /** One mode's row on the board, in the order the pool lists them. */
+  /** One mode's row on the board. */
   const board = (
-    usePool
-      ? season.mapPool.map((entry) => ({
-          modeSlug: slugify(entry.mode),
-          names: entry.maps,
-        }))
-      : // No usable pool: fall back to grouping whatever has been sampled.
+    modeOrder.length > 0
+      ? modeOrder.map((modeSlug) => ({ modeSlug, names: rotation.get(rotationKey(modeSlug)) ?? [] }))
+      : // Nothing recent and no pool: group whatever has been sampled.
         [...new Set(maps.map((m) => slugify(m.mode)))].map((modeSlug) => ({
           modeSlug,
           names: maps

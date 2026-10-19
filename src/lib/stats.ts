@@ -4877,6 +4877,32 @@ const cachedRankedMapPicks = cachedRead(
  *
  * Keyed on mode and map exactly as the roll-up stores them; callers slugify.
  */
+/**
+ * Ranked battles per map over the last 36 hours: the input to
+ * `rotationMaps` (lib/ranked-rotation), which decides which maps are in the
+ * live rotation from what is actually being played.
+ */
+async function compute_getRankedRecentMaps(): Promise<{ mode: string; mapName: string; battles: number }[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+  try {
+    const rows = await prisma.$queryRaw<{ mode: string; map_name: string; battles: bigint }[]>`
+      SELECT mode, map_name, sum(battles) AS battles
+      FROM battle_daily_stats
+      WHERE battle_type IN ('soloRanked', 'teamRanked')
+        AND map_name IS NOT NULL
+        AND day >= current_date - 2
+        AND last_battle_time >= now() - interval '36 hours'
+      GROUP BY 1, 2
+    `;
+    return rows.map((r) => ({ mode: r.mode, mapName: r.map_name, battles: Number(r.battles) }));
+  } catch (error) {
+    swallow('getRankedRecentMaps', error);
+    return [];
+  }
+}
+export const getRankedRecentMaps = cachedRead('ranked-recent-maps', compute_getRankedRecentMaps);
+
 export async function getRankedMapLastSeen(
   windowDays = RANKED_MAP_WINDOW_DAYS,
 ): Promise<{ mode: string; mapName: string; lastSeen: string; eventId: number | null }[]> {
