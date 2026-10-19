@@ -871,19 +871,31 @@ type StoragePressure = 'ok' | 'high' | 'critical';
  */
 const RETENTION_UNDER_PRESSURE: Record<
   StoragePressure,
-  { snapshots: number; pairing: number; rollup: number }
+  { snapshots: number; pairing: number; rollup: number; raw: number }
 > = {
   ok: {
     snapshots: SNAPSHOT_RETENTION_DAYS,
     pairing: PAIRING_ROLLUP_RETENTION_DAYS,
     rollup: ROLLUP_RETENTION_DAYS,
+    raw: RAW_BATTLE_RETENTION_DAYS,
   },
   // Scaled with the baselines on 2026-08-27. These stay meaningful reductions
   // rather than fixed numbers that happen to sit below the new defaults --
   // `critical` still serves the 21-day matchup and 30-day tier-list reads, so
   // even the tightest state degrades accuracy rather than emptying a feature.
-  high: { snapshots: 4, pairing: 30, rollup: 60 },
-  critical: { snapshots: 2, pairing: 22, rollup: 30 },
+  /*
+   * Raw battles joined the valve on 2026-10-19. Their 14 days was sized at
+   * ~15 MB/day; the pool doubling (2026-10-12) and whole-lineup team rows
+   * (2026-10-13) took it to ~400 MB/day, the two raw tables reached 5.6 GB of
+   * an 8.6 GB database, the valve sat at critical while the database kept
+   * growing (it governed every window but this one), and sampler runs slowed
+   * to 50-60 minutes and hit their timeout. Seven days at critical still
+   * exceeds ROLLUP_REBUILD_DAYS more than twice over, and a failed fold
+   * emails. The team-comp and role reads that look back 14-21 days over raw
+   * team rows read a shorter sample meanwhile -- accuracy, not a feature.
+   */
+  high: { snapshots: 4, pairing: 30, rollup: 60, raw: 10 },
+  critical: { snapshots: 2, pairing: 22, rollup: 30, raw: 7 },
 };
 
 /**
@@ -1328,7 +1340,9 @@ export async function pruneOldSamples(): Promise<number> {
   const pairingDays = Math.max(windows.pairing, MIN_ROLLUP_RETENTION_DAYS);
   const clamped = rollupDays !== windows.rollup || pairingDays !== windows.pairing;
 
-  const battleCutoff = new Date(Date.now() - RAW_BATTLE_RETENTION_DAYS * day);
+  // Never below the rebuild window: the fold must always have its source.
+  const rawDays = Math.max(windows.raw, ROLLUP_REBUILD_DAYS + 1);
+  const battleCutoff = new Date(Date.now() - rawDays * day);
   const snapshotCutoff = new Date(Date.now() - windows.snapshots * day);
   const rollupCutoff = new Date(Date.now() - rollupDays * day);
   const pairingCutoff = new Date(Date.now() - pairingDays * day);

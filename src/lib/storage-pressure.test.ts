@@ -83,3 +83,8 @@ test('the baseline plateau sits below the high-water mark', () => {
   const PROJECTED_PLATEAU = 330 * MB;
   assert.equal(pressureFor(PROJECTED_PLATEAU), 'ok');
 });
+
+test('raw battles are kept at least one day past the roll-up rebuild window at every pressure', async () => {
+  const src = (await import('node:fs')).readFileSync(new URL('./aggregation.ts', import.meta.url), 'utf8');
+  for (const m of src.matchAll(/raw: (\d+)/g)) assert.ok(Number(m[1]) >= 4, `raw window ${m[1]} is too short to rebuild from`);
+});
