@@ -144,7 +144,11 @@ cd /home/ubuntu/brawlstats 2>/dev/null && {
   if [ -n "$head_sha" ] && [ -n "$remote_sha" ] && [ "$head_sha" != "$remote_sha" ]; then
     pushed_at=$(git log -1 --format=%ct "$remote_sha" 2>/dev/null || echo 0)
     age=$(( $(date +%s) - pushed_at ))
-    if [ "$age" -gt 1200 ]; then
+    # A deploy waiting for the sampler (auto-deploy.sh) is behind on purpose,
+    # for up to an hour plus the build.
+    limit=1200
+    [ -f /home/ubuntu/.brawlzone-deploy-deferred ] && limit=6000
+    if [ "$age" -gt "$limit" ]; then
       problems+=("box is $((age/60))m behind origin/main (${remote_sha:0:7} not deployed)")
     fi
   fi

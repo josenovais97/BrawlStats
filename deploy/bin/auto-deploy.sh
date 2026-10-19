@@ -97,6 +97,31 @@ unfinished=0
 
 [ "$local" = "$remote" ] && [ "$force" -eq 0 ] && [ "$unfinished" -eq 0 ] && exit 0
 
+# Never build while the sampler runs (2026-10-19).
+#
+# The box has two cores. A Next build saturates both, and the sampler keeps
+# Postgres busy for up to 50 minutes; on 2026-10-19 the two overlapped and the
+# load average sat at 13, the site slow for everyone for half an hour. A deploy
+# waits instead: this timer fires every five minutes, so the build starts on
+# the first tick after the sampler finishes.
+#
+# Bounded, so a stuck sampler cannot hold deploys forever: after 60 minutes of
+# waiting the build goes ahead anyway. The forced monthly rebuild never waits,
+# since a skipped one would not come back for a month. The marker file tells
+# the health check the box is behind on purpose.
+DEFER_STATE="$HOME/.brawlzone-deploy-deferred"
+# A oneshot unit reads "activating" for the whole of its run, never "active".
+if [ "$force" -eq 0 ] && [ "$(systemctl is-active brawlzone-sampler.service)" = activating ]; then
+  since=$(cat "$DEFER_STATE" 2>/dev/null || true)
+  [ -n "$since" ] || { since=$(date +%s); echo "$since" > "$DEFER_STATE"; }
+  if [ $(( $(date +%s) - since )) -lt 3600 ]; then
+    echo "sampler is running; deploy of ${remote:0:7} waits for it"
+    exit 0
+  fi
+  echo "sampler still running after 60 minutes of waiting; deploying anyway"
+fi
+rm -f "$DEFER_STATE"
+
 if [ "$local" = "$remote" ] && [ "$force" -eq 0 ]; then
   echo "The last deploy of ${local:0:7} did not finish; building it again"
   changed=0
