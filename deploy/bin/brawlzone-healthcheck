@@ -167,6 +167,37 @@ if printf '%s' "$notes" | grep -q "Who changed"; then
   fi
 fi
 
+# 14. Are the outside data sources still being read? (2026-10-19)
+#     The season (wiki), the upcoming brawlers (wiki category against the
+#     game's catalogue) and the live Ranked rotation (our own battles) all
+#     degrade quietly: a parser that stops matching falls back to a built-in
+#     list and the pages look fine. That is how /ranked showed season 48 on
+#     2026-10-15. /api/v1/health/sources reports what each one is using.
+sources=$(curl -s --max-time 30 "$SITE/api/v1/health/sources" || echo "")
+if [ -n "$sources" ]; then
+  while IFS= read -r line; do
+    [ -n "$line" ] && problems+=("$line")
+  done < <(printf '%s' "$sources" | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+s = d.get("season") or {}
+if s.get("source") != "wiki":
+    print("Ranked season data is on the built-in fallback, not the wiki (season parser broken?)")
+elif not s.get("current"):
+    print("no current Ranked season resolved from the wiki")
+u = d.get("upcoming")
+if u and not u.get("ok"):
+    gone = ", ".join(u.get("missingFromWiki") or []) or "wiki unreadable or short"
+    print("upcoming-brawler list suppressed: wiki and game disagree (" + gone + ")")
+r = d.get("rotation") or {}
+if not r.get("maps"):
+    print("no Ranked maps played in the last 36 hours (Ranked sampling stopped?)")
+')
+fi
+
 # 8. Has anyone proved the backups still restore?
 #    The nightly dump checks its own file; only the weekly restore proves the
 #    SQL inside it replays into a database the site would accept. That job is

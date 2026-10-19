@@ -42,6 +42,54 @@ import { WIKI_API } from '@/lib/wiki';
 /** Announcements matter in hours, so this is polled far more often than the wiki changes. */
 const REVALIDATE = 1800;
 
+/** Why the upcoming list says what it says, for the health check. */
+export interface UpcomingHealth {
+  ok: boolean;
+  wiki: number;
+  live: number;
+  /** Live brawlers the wiki category does not name: these suppress the list. */
+  missingFromWiki: string[];
+  upcoming: string[];
+}
+
+export async function getUpcomingHealth(liveNames: string[]): Promise<UpcomingHealth> {
+  const wiki = await fetchWikiBrawlers();
+  if (!wiki) return { ok: false, wiki: 0, live: liveNames.length, missingFromWiki: [], upcoming: [] };
+  const live = new Set(liveNames.map((n) => n.toLowerCase()));
+  const wikiLower = new Set(wiki.map((n) => n.toLowerCase()));
+  const missingFromWiki = liveNames.filter((n) => !wikiLower.has(n.toLowerCase()));
+  return {
+    ok: wiki.length >= liveNames.length && missingFromWiki.length === 0,
+    wiki: wiki.length,
+    live: liveNames.length,
+    missingFromWiki,
+    upcoming: wiki.filter((n) => !live.has(n.toLowerCase())),
+  };
+}
+
+/** The wiki's brawler category, or null when it cannot be read. */
+async function fetchWikiBrawlers(): Promise<string[] | null> {
+  try {
+    const url = new URL(WIKI_API);
+    url.searchParams.set('action', 'query');
+    url.searchParams.set('list', 'categorymembers');
+    url.searchParams.set('cmtitle', 'Category:Brawlers');
+    url.searchParams.set('cmlimit', '500');
+    url.searchParams.set('cmnamespace', '0');
+    url.searchParams.set('format', 'json');
+    const res = await fetch(url, {
+      headers: { 'user-agent': 'BrawlZone (+https://brawlzone.net)' },
+      next: { revalidate: REVALIDATE },
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { query?: { categorymembers?: { title: string }[] } };
+    return (body.query?.categorymembers ?? []).map((m) => m.title).filter(Boolean);
+  } catch {
+    return null;
+  }
+}
+
 async function fetchUpcoming(liveNames: string[]): Promise<string[]> {
   try {
     const url = new URL(WIKI_API);

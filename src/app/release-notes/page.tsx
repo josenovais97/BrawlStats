@@ -76,9 +76,10 @@ export default async function ReleaseNotesPage() {
   const liveNames = [...brawlerMeta.values()].map((b) => b.name);
 
   /*
-   * Announced but not shipped. Curated by hand — see lib/announced for why
-   * there is no source to automate against — and self-retiring: a brawler that
-   * has reached the catalogue is no longer upcoming.
+   * Announced but not shipped: the wiki's brawler category minus the game's
+   * catalogue (lib/announced), so nothing to curate and self-retiring -- a
+   * brawler that has reached the catalogue is no longer upcoming. The health
+   * check alerts if the two ever stop agreeing on names.
    */
   const upcoming = await getUpcomingBrawlers(liveNames).catch(() => [] as UpcomingBrawler[]);
 
