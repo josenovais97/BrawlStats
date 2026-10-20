@@ -1,0 +1,13 @@
+[Unit]
+Description=Answer "BUBBLE" on Instagram every two minutes
+
+[Timer]
+# Two minutes is quick enough that a commenter still has the app open, and
+# costs about 60 API calls an hour when nothing happens -- under a third of
+# what Instagram allows the account.
+OnCalendar=*-*-* *:00/2:30
+Persistent=false
+Unit=brawlzone-instagram-replies.service
+
+[Install]
+WantedBy=timers.target

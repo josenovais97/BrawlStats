@@ -1,0 +1,10 @@
+[Unit]
+Description=BrawlZone: answer "BUBBLE" on Instagram with the Play tester links
+After=network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+TimeoutStartSec=300
+ExecStart=/usr/local/bin/brawlzone-run instagram-replies /usr/local/bin/brawlzone-instagram-replies

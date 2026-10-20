@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# Answer "BUBBLE" on Instagram with the Play tester links (2026-10-20).
+#
+#   brawlzone-instagram-replies
+#
+# Run every two minutes by brawlzone-instagram-replies.timer. Anyone who
+# comments a word containing "bubble" on one of the account's recent posts
+# gets the links as a private reply (Instagram's comment-to-DM, one per
+# comment, within 7 days of it) and a short public reply under the comment;
+# anyone who DMs it gets the links back in the same thread.
+#
+# Polled rather than pushed: webhooks need the Meta app published, which
+# needs app review, and the account only posts a few times a day.
+#
+# State in ~/.brawlzone-instagram-replies.json: which comments and messages
+# were already handled, and each post's last comment count, so a run with
+# nothing new costs two API calls. The first run marks every message already
+# in the inbox as seen rather than answering history.
+#
+# A failed send is a log line, not a failed unit: one commenter whose DMs are
+# closed must not mail an alert every two minutes. It is retried three times
+# across runs, then dropped.
+set -uo pipefail
+
+exec python3 - "$HOME/.brawlzone-instagram.json" "$HOME/.brawlzone-instagram-replies.json" <<'PY'
+import json, os, re, sys, urllib.error, urllib.parse, urllib.request
+
+TOKEN_FILE, STATE_FILE = sys.argv[1], sys.argv[2]
+API = 'https://graph.instagram.com/v23.0'
+ME = 'brawlzonenet'
+KEYWORD = re.compile(r'bubble', re.I)
+RECENT_POSTS = 15
+MAX_TRIES = 3
+
+LINKS = """Thanks for helping! 🙏
+1. Join: https://groups.google.com/g/brawlzone-bubble-testers
+2. Become a tester: https://play.google.com/apps/testing/net.brawlzone.bubble
+3. Install: https://play.google.com/store/apps/details?id=net.brawlzone.bubble
+(If Google Play says "not found", wait a bit and try again.) Keep it installed for 14 days"""
+PUBLIC_REPLY = 'Sent you a DM with the links 📩'
+
+token = json.load(open(TOKEN_FILE))['access_token']
+try:
+    state = json.load(open(STATE_FILE))
+except (OSError, ValueError):
+    state = {}
+first_run = not state
+handled = state.setdefault('handled', {})   # comment/message id -> "done" | tries
+counts = state.setdefault('counts', {})     # media id -> comments_count last seen
+
+
+def call(method, path, params=None, body=None):
+    url = f'{API}/{path}'
+    data = None
+    headers = {'Authorization': f'Bearer {token}'}
+    if method == 'GET' and params:
+        url += '?' + urllib.parse.urlencode(params)
+    elif body is not None:
+        data = json.dumps(body).encode()
+        headers['Content-Type'] = 'application/json'
+    elif params:
+        data = urllib.parse.urlencode(params).encode()
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        try:
+            msg = json.load(e).get('error', {}).get('message', '')
+        except ValueError:
+            msg = ''
+        raise RuntimeError(f'HTTP {e.code} {msg}'.strip()) from None
+
+
+def attempt(key, label, send):
+    """Run send() once for this key unless it already succeeded or ran out of tries."""
+    tries = handled.get(key, 0)
+    if tries == 'done' or tries >= MAX_TRIES:
+        return
+    try:
+        send()
+        handled[key] = 'done'
+        print(f'replied: {label}')
+    except Exception as e:  # noqa: BLE001 -- logged and retried next run
+        handled[key] = tries + 1
+        print(f'::warning::could not answer {label} (try {tries + 1}/{MAX_TRIES}): {e}')
+
+
+# ---- comments on recent posts
+media = call('GET', 'me/media', {'fields': 'id,comments_count', 'limit': RECENT_POSTS}).get('data', [])
+for m in media:
+    n = m.get('comments_count', 0)
+    if n == counts.get(m['id']) or n == 0:
+        continue
+    comments = call('GET', f"{m['id']}/comments", {'fields': 'id,text,username', 'limit': 50}).get('data', [])
+    pending = False
+    for c in comments:
+        if c.get('username') == ME or not KEYWORD.search(c.get('text', '')):
+            continue
+        key = f"c:{c['id']}"
+
+        def dm(c=c):
+            call('POST', 'me/messages', body={'recipient': {'comment_id': c['id']}, 'message': {'text': LINKS}})
+            # The public half is a courtesy; its failure must not resend the DM.
+            try:
+                call('POST', f"{c['id']}/replies", {'message': PUBLIC_REPLY})
+            except Exception as e:  # noqa: BLE001
+                print(f'::warning::DM sent but the public reply failed: {e}')
+
+        attempt(key, f"comment by @{c.get('username', '?')}", dm)
+        if handled.get(key) != 'done' and handled.get(key, 0) < MAX_TRIES:
+            pending = True
+    # Remembered only once everything on the post is settled, so a failed send
+    # is looked at again next run.
+    if not pending:
+        counts[m['id']] = n
+
+# ---- direct messages
+convs = call('GET', 'me/conversations', {
+    'platform': 'instagram',
+    'fields': 'messages.limit(5){id,message,from}',
+}).get('data', [])
+for conv in convs:
+    for msg in conv.get('messages', {}).get('data', []):
+        sender = msg.get('from', {})
+        key = f"m:{msg['id']}"
+        if sender.get('username') == ME or key in handled:
+            continue
+        if first_run or not KEYWORD.search(msg.get('message') or ''):
+            handled[key] = 'done'
+            continue
+        attempt(key, f"DM from @{sender.get('username', '?')}",
+                lambda sender=sender: call('POST', 'me/messages', body={'recipient': {'id': sender['id']}, 'message': {'text': LINKS}}))
+
+tmp = STATE_FILE + '.tmp'
+with open(tmp, 'w') as f:
+    json.dump(state, f)
+os.replace(tmp, STATE_FILE)
+PY
