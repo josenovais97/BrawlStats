@@ -783,8 +783,14 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  * images, the build cache and the nightly dumps, and at 8 GB it sat at
  * critical permanently while the disk ran at 66% before anything else. Six
  * keeps the whole box near half full.
+ *
+ * 12 GB since 2026-10-20, when the boot volume grew to 100 GB. The valve was
+ * holding raw battles at 7 days (high) against a 14-day baseline; at 12 the
+ * baseline windows fit under the high-water mark again, with the disk near
+ * 40%. If sampler runs start brushing their timeout as the raw tables grow
+ * back, that is the cost to weigh, not the disk.
  */
-const STORAGE_LIMIT_BYTES = 6 * 1024 * 1024 * 1024;
+const STORAGE_LIMIT_BYTES = 12 * 1024 * 1024 * 1024;
 
 /**
  * Two levels, because there is no useful third one at the top.

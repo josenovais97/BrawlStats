@@ -279,7 +279,8 @@ fi
 # minutes of npm and Next on two cores. Past 4 GB is the compromise (6 until
 # 2026-10-19, when the builder stage stopped duplicating node_modules): builds
 # stay cached most of the time, and the cache is cleared before it grows far.
-CACHE_CEILING_MB=4096
+# 8 GB since 2026-10-20 on the 100 GB volume: fewer cold builds.
+CACHE_CEILING_MB=8192
 freed=$(docker image prune -f 2>/dev/null | grep -oP 'Total reclaimed space: \K.*' || echo "0B")
 cache_mb=$(docker system df --format '{{.Type}}\t{{.Size}}' 2>/dev/null | awk -F'\t' '
   /Build Cache/ {
