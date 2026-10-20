@@ -723,6 +723,30 @@ if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   SLIDES=$TIKTOK_SLIDES
   rm -rf "$YT_WORK"
 fi
+
+# ------------------------------------------------------- the Instagram Reel
+#
+# The same slides again as a Reel (2026-10-20), on the same terms as the
+# Short: after the TikTok post, a failure is a row in the mail, INSTAGRAM=0
+# turns it off. Its own render, because the Short's last slide asks for a
+# YouTube subscription. Instagram has no clickable links in captions, hence
+# "link in bio".
+INSTAGRAM_RESULT="not set up"
+if [ "${INSTAGRAM:-1}" = "1" ] && [ -r "$HOME/.brawlzone-instagram.json" ]; then
+  IG_WORK=$(mktemp -d)
+  printf '%s\n\nEvery map, every brawler: brawlzone.net (link in bio)\n' "$DESCRIPTION" > "${IG_WORK}/caption.txt"
+  IG_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
+  VIDEO_ERR=""
+  # The script's last line is the outcome; a token-refresh warning may precede it.
+  if render_video "$IG_WORK" "$IG_MUSIC" \
+     && INSTAGRAM_RESULT=$(/usr/local/bin/brawlzone-instagram "${IG_WORK}/out.mp4" "${IG_WORK}/caption.txt" 2>&1 | tail -n 1); then
+    echo "$INSTAGRAM_RESULT"
+  else
+    INSTAGRAM_RESULT="failed: ${VIDEO_ERR:-$INSTAGRAM_RESULT}"
+    echo "::warning::Instagram Reel ${INSTAGRAM_RESULT}"
+  fi
+  rm -rf "$IG_WORK"
+fi
 # Which one went out, for the weekly report to compare.
 record_state "last_format.${MODE}" "$FORMAT" || true
 
@@ -759,6 +783,7 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
     html_row "Post" "$MODE"
     html_row "Mode" "$POST_MODE"
     html_row "YouTube" "$(printf '%s' "$YOUTUBE_RESULT" | esc)" "$(case "$YOUTUBE_RESULT" in youtube:*) printf '%s' "$OK" ;; failed*) printf '%s' "$BAD" ;; esac)"
+    html_row "Instagram" "$(printf '%s' "$INSTAGRAM_RESULT" | esc)" "$(case "$INSTAGRAM_RESULT" in instagram:*) printf '%s' "$OK" ;; failed*) printf '%s' "$BAD" ;; esac)"
     html_row "Status" "${STATUS:-?}" "$([ "${FAIL_REASON:--}" = "-" ] && printf '%s' "$OK" || printf '%s' "$BAD")"
     [ "${FAIL_REASON:--}" = "-" ] || html_row "Fail reason" "$(printf '%s' "$FAIL_REASON" | esc)" "$BAD"
     html_row "Findings page" "<a href=\"${SITE}/daily/${DAY}\" style=\"color:${ACCENT};\">/daily/${DAY}</a>"

@@ -128,6 +128,8 @@ services:
       # Access log lands beside the scheduled-job logs so one logrotate rule
       # covers everything and one directory answers "what happened".
       - /var/log/brawlzone:/var/log/brawlzone
+      # Reels waiting for Instagram to fetch them (deploy/bin/brawlzone-instagram).
+      - /var/lib/brawlzone/reels:/srv/reels:ro
     depends_on:
       - app
       - umami
