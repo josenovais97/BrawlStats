@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# Upload one MP4 to the BrawlZone YouTube channel as a Short (2026-10-20).
+#
+#   brawlzone-youtube <video.mp4> <title> <description-file>
+#
+# The daily TikTok job calls this with the same slides it posts, rendered by
+# its own post_video. Credentials: YOUTUBE_CLIENT_ID / _SECRET from
+# .env.production, and the refresh token the one-time /api/youtube/auth flow
+# produced, in ~/.brawlzone-youtube.json. Google refresh tokens do not
+# rotate, so this only ever reads that file.
+#
+# Until YouTube's API audit passes, YouTube itself locks every upload from
+# this project to private -- the request below asks for public regardless, so
+# nothing here changes on the day it is approved.
+#
+# Quota: an upload costs 1,600 of the project's 10,000 daily units, so six a
+# day at most. The four daily posts fit; a re-run of all four the same day
+# would not.
+set -uo pipefail
+
+ENV_FILE="/home/ubuntu/brawlstats/.env.production"
+TOKEN_FILE="$HOME/.brawlzone-youtube.json"
+
+die() { echo "$*" >&2; exit 1; }
+
+video="${1:-}"; title="${2:-}"; desc_file="${3:-}"
+[ -f "$video" ] && [ -n "$title" ] && [ -f "$desc_file" ] || die "usage: brawlzone-youtube <video.mp4> <title> <description-file>"
+[ -r "$TOKEN_FILE" ] || die "::error::$TOKEN_FILE missing -- authorise once at /api/youtube/auth?key=…"
+
+client_id=$(grep -oP '^YOUTUBE_CLIENT_ID=\K.*' "$ENV_FILE" | tr -d '"')
+client_secret=$(grep -oP '^YOUTUBE_CLIENT_SECRET=\K.*' "$ENV_FILE" | tr -d '"')
+[ -n "$client_id" ] && [ -n "$client_secret" ] || die "::error::YOUTUBE_CLIENT_ID/SECRET missing from $ENV_FILE"
+refresh=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["refresh_token"])' "$TOKEN_FILE") \
+  || die "::error::no refresh_token in $TOKEN_FILE"
+
+access=$(curl -sf --max-time 30 https://oauth2.googleapis.com/token \
+  --data-urlencode "client_id=${client_id}" --data-urlencode "client_secret=${client_secret}" \
+  --data-urlencode "refresh_token=${refresh}" -d grant_type=refresh_token \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))')
+# invalid_grant here means the channel owner revoked access, or the app went
+# back to "Testing" (whose tokens die after 7 days): authorise again.
+[ -n "$access" ] || die "::error::could not refresh the YouTube token (revoked? authorise again at /api/youtube/auth)"
+
+# YouTube makes a vertical video under three minutes a Short on its own;
+# #Shorts in the title is the belt to that brace. Titles stop at 100 chars.
+meta=$(python3 - "$title" "$desc_file" <<'PY'
+import json, sys
+title, desc = sys.argv[1], open(sys.argv[2], encoding='utf-8').read()
+title = (title if '#shorts' in title.lower() else f'{title} #Shorts')
+if len(title) > 100:
+    title = title[:100 - len(' #Shorts')].rstrip() + ' #Shorts'
+print(json.dumps({
+    'snippet': {
+        'title': title,
+        'description': desc[:4900],
+        'tags': ['brawl stars', 'brawl stars ranked', 'brawl stars meta', 'brawlzone'],
+        'categoryId': '20',  # Gaming
+        'defaultLanguage': 'en',
+    },
+    'status': {'privacyStatus': 'public', 'selfDeclaredMadeForKids': False},
+}))
+PY
+)
+
+size=$(stat -c %s "$video")
+opened=$(curl -s --max-time 60 -D - -X POST \
+  'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status' \
+  -H "Authorization: Bearer ${access}" -H 'Content-Type: application/json; charset=UTF-8' \
+  -H "X-Upload-Content-Length: ${size}" -H 'X-Upload-Content-Type: video/mp4' \
+  --data "$meta")
+session=$(printf '%s' "$opened" | grep -i '^location:' | cut -d' ' -f2- | tr -d '\r')
+# youtubeSignupRequired: the account authorised has no channel of its own --
+# a brand channel has to be picked on Google's account screen.
+# quotaExceeded: the day's 10,000 units are spent.
+[ -n "$session" ] || die "::error::YouTube did not open an upload session: $(printf '%s' "$opened" | grep -o '"reason": *"[^"]*"' | head -1)"
+
+reply=$(curl -s --max-time 600 -X PUT "$session" -H "Authorization: Bearer ${access}" \
+  -H 'Content-Type: video/mp4' --data-binary "@${video}")
+id=$(printf '%s' "$reply" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("id",""))' 2>/dev/null)
+[ -n "$id" ] || die "::error::upload failed: $(printf '%s' "$reply" | head -c 400)"
+privacy=$(printf '%s' "$reply" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status",{}).get("privacyStatus","?"))')
+echo "youtube: uploaded https://youtube.com/shorts/${id} (${privacy})"

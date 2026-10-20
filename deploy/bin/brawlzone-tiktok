@@ -390,8 +390,10 @@ print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
 # for failures that leave nothing in the inbox, so falling back can never
 # produce two drafts. A video TikTok accepted but is still processing after
 # five minutes is NOT one of those -- it may yet arrive -- and dies instead.
-post_video () { # work dir
-  local work="$1" n=0 slide size reply err upload_url http
+# Renders the slides into ${work}/out.mp4, into VIDEO_SIZE. Returns 1 with
+# VIDEO_ERR set. Shared by the TikTok video and the YouTube Short.
+render_video () { # work dir
+  local work="$1" n=0 slide size
   local -a args
 
   while IFS= read -r slide; do
@@ -452,6 +454,13 @@ PY
     return 1
   fi
   echo "video rendered: ${n} slides, ${size} bytes"
+  VIDEO_SIZE=$size
+}
+
+post_video () { # work dir
+  local work="$1" size reply err upload_url http
+  render_video "$work" || return 1
+  size=$VIDEO_SIZE
 
   reply=$(python3 - "$size" "$POST_MODE" "$TITLE" "$DESCRIPTION" "$PRIVACY" <<'PY'
 import json, sys
@@ -662,6 +671,28 @@ fi # the photo carousel
 # answer "is the posting still working", and a timestamp written before the
 # outcome was known would have reported 2026-09-28 as a successful post.
 record_state "last_post.${MODE}" "$(now_iso)" || true
+
+# ------------------------------------------------------- the YouTube Short
+#
+# The same slides as a Short on the YouTube channel (2026-10-20), fully
+# automatic: the Supercell Creator Code needs 100 YouTube subscribers against
+# 1,000 TikTok followers. After the TikTok post and never instead of it -- a
+# YouTube failure is a warning in the mail, not a failed job, because the
+# day's TikTok post already went out. Skipped until the channel is authorised
+# (~/.brawlzone-youtube.json), and with YOUTUBE=0.
+YOUTUBE_RESULT="not set up"
+if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
+  YT_WORK=$(mktemp -d)
+  printf '%s\n' "$DESCRIPTION" > "${YT_WORK}/description.txt"
+  if render_video "$YT_WORK" \
+     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" 2>&1); then
+    echo "$YOUTUBE_RESULT"
+  else
+    YOUTUBE_RESULT="failed: ${VIDEO_ERR:-$YOUTUBE_RESULT}"
+    echo "::warning::YouTube Short ${YOUTUBE_RESULT}"
+  fi
+  rm -rf "$YT_WORK"
+fi
 # Which one went out, for the weekly report to compare.
 record_state "last_format.${MODE}" "$FORMAT" || true
 
@@ -697,6 +728,7 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
     html_row "Format" "$FORMAT"
     html_row "Post" "$MODE"
     html_row "Mode" "$POST_MODE"
+    html_row "YouTube" "$(printf '%s' "$YOUTUBE_RESULT" | esc)" "$(case "$YOUTUBE_RESULT" in youtube:*) printf '%s' "$OK" ;; failed*) printf '%s' "$BAD" ;; esac)"
     html_row "Status" "${STATUS:-?}" "$([ "${FAIL_REASON:--}" = "-" ] && printf '%s' "$OK" || printf '%s' "$BAD")"
     [ "${FAIL_REASON:--}" = "-" ] || html_row "Fail reason" "$(printf '%s' "$FAIL_REASON" | esc)" "$BAD"
     html_row "Findings page" "<a href=\"${SITE}/daily/${DAY}\" style=\"color:${ACCENT};\">/daily/${DAY}</a>"
