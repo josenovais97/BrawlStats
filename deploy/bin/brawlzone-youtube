@@ -46,6 +46,10 @@ access=$(curl -sf --max-time 30 https://oauth2.googleapis.com/token \
 meta=$(python3 - "$title" "$desc_file" <<'PY'
 import json, sys
 title, desc = sys.argv[1], open(sys.argv[2], encoding='utf-8').read()
+# The subscribe ask leads: YouTube shows two lines of a Short's description
+# before "more", and the channel needs 100 subscribers for the Creator Code.
+desc = ('🔔 Subscribe for new Brawl Stars Ranked picks every day: '
+        'https://www.youtube.com/@brawlzonenet?sub_confirmation=1\n\n' + desc)
 title = (title if '#shorts' in title.lower() else f'{title} #Shorts')
 if len(title) > 100:
     title = title[:100 - len(' #Shorts')].rstrip() + ' #Shorts'

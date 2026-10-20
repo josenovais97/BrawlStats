@@ -418,6 +418,9 @@ FPS, T = 30, 0.4  # frame rate, slide-in length
 # The cover is the hook and is short; the last slide (the site) is shorter
 # still. The rest get four seconds, about what a ten-row list needs.
 dur = [2.6] + [4.0] * (n - 2) + [2.4] if n >= 3 else [3.5] * n
+if music:
+    # The Short's last slide is the subscribe ask: long enough to act on.
+    dur[-1] = 3.5
 args = ['-hide_banner', '-loglevel', 'error', '-y']
 for i in range(n):
     args += ['-i', f'/w/s{i}.jpg']
@@ -701,6 +704,9 @@ if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   YT_WORK=$(mktemp -d)
   printf '%s\n' "$DESCRIPTION" > "${YT_WORK}/description.txt"
   # A different library track each time; none there, a silent Short.
+  # The subscribe slide closes the Short only; TikTok never sees it.
+  TIKTOK_SLIDES=$SLIDES
+  SLIDES="${SLIDES}"$'\n'"${SITE}/youtube/subscribe.jpg"
   YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   if render_video "$YT_WORK" "$YT_MUSIC" \
      && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" 2>&1); then
@@ -709,6 +715,7 @@ if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
     YOUTUBE_RESULT="failed: ${VIDEO_ERR:-$YOUTUBE_RESULT}"
     echo "::warning::YouTube Short ${YOUTUBE_RESULT}"
   fi
+  SLIDES=$TIKTOK_SLIDES
   rm -rf "$YT_WORK"
 fi
 # Which one went out, for the weekly report to compare.
