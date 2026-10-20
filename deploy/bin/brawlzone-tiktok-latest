@@ -79,6 +79,23 @@ case "$ERR" in
     die "::error::TikTok refused the list: $(printf '%s' "$response" | head -c 400)" ;;
 esac
 
+# The last twenty posts' view counts, for the daily digest's Social section
+# (brawlzone-social-stats). Fetched here because this job already holds a
+# fresh access token: TikTok rotates the refresh token on every use, and a
+# second job refreshing it would race the posting jobs for it. A failure
+# costs the digest a line, so it is not checked beyond writing the file.
+curl -s --max-time 60 -X POST "$LIST_URL?fields=id,create_time,view_count,like_count,comment_count,share_count" \
+  -H "Authorization: Bearer ${ACCESS}" -H 'Content-Type: application/json; charset=UTF-8' \
+  --data-raw '{"max_count":20}' \
+  | python3 -c '
+import json, sys, os
+videos = json.load(sys.stdin).get("data", {}).get("videos")
+if videos is not None:
+    path = os.path.expanduser("~/.brawlzone-tiktok-videos.json")
+    json.dump({"videos": videos}, open(path + ".tmp", "w"))
+    os.replace(path + ".tmp", path)
+' 2>/dev/null || true
+
 # IFS=tab, or `read` splits on spaces: the title is a sentence, so without
 # this it takes the first WORD and every field after it shifts by one. The
 # posting job had the same fault and this reproduced it -- the tab is the

@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# Follower and view counts for the daily digest (2026-10-20).
+#
+#   brawlzone-social-stats
+#
+# Prints one "label<TAB>value" line per network, for brawlzone-digest to put
+# in its Social section, and appends today's raw numbers to $HISTORY so each
+# line can say how much changed since the day before. The goal they track:
+# 100 YouTube subscribers for the Supercell Creator Code.
+#
+#   YouTube    channel statistics with an API key (~/.brawlzone-youtube-key.json,
+#              {"api_key": ...}): the OAuth token the uploader holds is
+#              upload-only and cannot read them.
+#   Instagram  the posting token (~/.brawlzone-instagram.json) reads the
+#              account's follower count and its recent posts' likes.
+#   TikTok     read from $TIKTOK_CACHE, which brawlzone-tiktok-latest writes:
+#              TikTok rotates its refresh token on every use, so a second job
+#              refreshing it is how the integration gets locked out. Views
+#              only -- follower counts need the user.info.stats scope.
+#
+# Every network is optional and fails to a "?" line, never to an error: the
+# digest must go out whatever any one API thinks of us that morning.
+set -uo pipefail
+
+exec python3 - <<'PY'
+import datetime, json, os, urllib.parse, urllib.request
+
+HOME = os.path.expanduser('~')
+HISTORY = '/var/lib/brawlzone/social-history.jsonl'
+TIKTOK_CACHE = f'{HOME}/.brawlzone-tiktok-videos.json'
+CHANNEL = 'UCFHUOC2ySM5BLMVhY9Hxdjw'
+GOAL = 100
+
+
+def get(url, headers=None):
+    req = urllib.request.Request(url, headers=headers or {})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+
+def secret(path, key):
+    try:
+        return json.load(open(path))[key]
+    except Exception:
+        return None
+
+
+today = {}
+week_ago = datetime.datetime.now(datetime.UTC).timestamp() - 7 * 86400
+
+key = secret(f'{HOME}/.brawlzone-youtube-key.json', 'api_key')
+if key:
+    try:
+        s = get('https://www.googleapis.com/youtube/v3/channels?' + urllib.parse.urlencode(
+            {'part': 'statistics', 'id': CHANNEL, 'key': key}))['items'][0]['statistics']
+        today['yt_subs'] = int(s.get('subscriberCount', 0))
+        today['yt_views'] = int(s.get('viewCount', 0))
+        today['yt_videos'] = int(s.get('videoCount', 0))
+    except Exception as e:
+        today['yt_err'] = str(e)[:80]
+
+token = secret(f'{HOME}/.brawlzone-instagram.json', 'access_token')
+if token:
+    auth = {'Authorization': f'Bearer {token}'}
+    try:
+        me = get('https://graph.instagram.com/v23.0/me?fields=followers_count,media_count', auth)
+        today['ig_followers'] = int(me.get('followers_count', 0))
+        media = get('https://graph.instagram.com/v23.0/me/media?fields=timestamp,like_count,comments_count&limit=50', auth)
+        recent = [m for m in media.get('data', [])
+                  if datetime.datetime.fromisoformat(m['timestamp'].replace('+0000', '+00:00')).timestamp() >= week_ago]
+        today['ig_posts7'] = len(recent)
+        today['ig_likes7'] = sum(m.get('like_count', 0) for m in recent)
+        today['ig_comments7'] = sum(m.get('comments_count', 0) for m in recent)
+    except Exception as e:
+        today['ig_err'] = str(e)[:80]
+
+try:
+    videos = json.load(open(TIKTOK_CACHE)).get('videos', [])
+    recent = [v for v in videos if int(v.get('create_time') or 0) >= week_ago]
+    today['tt_posts7'] = len(recent)
+    today['tt_views7'] = sum(int(v.get('view_count') or 0) for v in recent)
+    today['tt_likes7'] = sum(int(v.get('like_count') or 0) for v in recent)
+except Exception:
+    pass
+
+# Yesterday's line, for the change.
+prev = {}
+try:
+    lines = open(HISTORY).read().splitlines()
+    date = datetime.date.today().isoformat()
+    for line in reversed(lines):
+        row = json.loads(line)
+        if row.get('date') != date:
+            prev = row
+            break
+except OSError:
+    pass
+try:
+    with open(HISTORY, 'a') as f:
+        f.write(json.dumps({'date': datetime.date.today().isoformat(), **today}) + '\n')
+except OSError:
+    pass
+
+
+def n(v): return f'{v:,}'
+
+
+def change(k):
+    if k not in today or k not in prev:
+        return ''
+    d = today[k] - prev[k]
+    return f' ({"+" if d >= 0 else ""}{d:,} since yesterday)'
+
+
+if 'yt_subs' in today:
+    left = max(0, GOAL - today['yt_subs'])
+    goal = 'Creator Code goal reached' if not left else f'{left} to go for the Creator Code'
+    print(f"YouTube\t{n(today['yt_subs'])} subscribers{change('yt_subs')} &middot; {goal} &middot; "
+          f"{n(today['yt_views'])} views on {today['yt_videos']} videos")
+else:
+    print('YouTube\t? ' + ('(no API key yet: ~/.brawlzone-youtube-key.json)' if not key else today.get('yt_err', '')))
+
+if 'ig_followers' in today:
+    print(f"Instagram\t{n(today['ig_followers'])} followers{change('ig_followers')} &middot; last 7 days: "
+          f"{today['ig_posts7']} posts, {n(today['ig_likes7'])} likes, {n(today['ig_comments7'])} comments")
+else:
+    print('Instagram\t? ' + today.get('ig_err', 'no token'))
+
+if 'tt_views7' in today:
+    print(f"TikTok\tlast 7 days: {today['tt_posts7']} posts, {n(today['tt_views7'])} views, {n(today['tt_likes7'])} likes")
+else:
+    print('TikTok\t? (no cached video list yet)')
+PY

@@ -152,6 +152,13 @@ html_row "Load average" "$load"
 html_row "Bubble (24h)" "${bubble_active:-?} active &middot; ${bubble_downloads:-?} downloads &middot; ${bubble_visitors:-?} visitors"
 html_rows_close
 
+html_section "Social"
+html_rows_open
+while IFS=$'\t' read -r net value; do
+  [ -n "$net" ] && html_row "$net" "$value"
+done < <(/usr/local/bin/brawlzone-social-stats 2>/dev/null)
+html_rows_close
+
 html_section "Google Play test (24h / since $PT_SINCE)"
 html_rows_open
 html_row "Tester page visits" "${pt_visits:-?}"
