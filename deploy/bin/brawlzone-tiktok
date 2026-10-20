@@ -757,6 +757,39 @@ print(t if len(t) <= 92 else title)
   rm -rf "$YT_WORK"
 fi
 
+# The Short in the Discord server's #🎬-clips too (2026-10-20), as soon as it
+# is up: Discord unfurls a YouTube link into a playable card, and the server's
+# members are the likeliest first subscribers. TikTok posts are announced by
+# brawlzone-tiktok-latest once published; a Short is public on upload, so
+# this job knows first. Never fatal.
+YT_URL=$(printf '%s' "$YOUTUBE_RESULT" | grep -o 'https://youtube.com/shorts/[A-Za-z0-9_-]*' | head -n 1)
+DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
+DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
+if [ -n "$YT_URL" ] && [ -n "${DISCORD_TOKEN:-}" ] && [ -n "${DISCORD_GUILD:-}" ]; then
+  DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" \
+  python3 - "$YT_URL" "${YT_TITLE:-$TITLE}" <<'PY' || echo "discord: Short announcement failed (not fatal)"
+import json, os, sys, urllib.request
+url, title = sys.argv[1], sys.argv[2]
+api = 'https://discord.com/api/v10'
+headers = {'Authorization': f"Bot {os.environ['DISCORD_TOKEN']}", 'Content-Type': 'application/json',
+           'User-Agent': 'BrawlZone (https://brawlzone.net, 1.0)'}
+def call(method, path, body=None):
+    req = urllib.request.Request(api + path, method=method, headers=headers,
+                                 data=None if body is None else json.dumps(body).encode())
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read() or b'{}')
+channels = call('GET', f"/guilds/{os.environ['DISCORD_GUILD']}/channels")
+clips = next((c['id'] for c in channels if c.get('name') == '🎬-clips'), None)
+if clips is None:
+    print('discord: no #🎬-clips channel; Short not announced')
+    sys.exit(0)
+content = (f'**{title}**\nNew Short 👉 {url}\n'
+           '🔔 Subscribe for one every few hours: <https://www.youtube.com/@brawlzonenet?sub_confirmation=1>')
+call('POST', f'/channels/{clips}/messages', {'content': content, 'allowed_mentions': {'parse': []}})
+print('discord: Short announced in #🎬-clips')
+PY
+fi
+
 # ------------------------------------------------------- the Instagram Reel
 #
 # The same slides again as a Reel (2026-10-20), on the same terms as the
