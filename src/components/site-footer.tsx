@@ -1,6 +1,6 @@
 'use client';
 
-import { Coffee, ExternalLink, Mail, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
+import { Camera, Coffee, ExternalLink, Mail, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -41,6 +41,9 @@ const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
  * expiry and no use limit, put the code below, and the alert stops on its own.
  */
 const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
+
+/** Every daily carousel goes out here as a Reel too, since 2026-10-20. */
+const INSTAGRAM_URL = 'https://www.instagram.com/brawlzonenet/';
 
 
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
@@ -266,6 +269,16 @@ export function SiteFooter() {
                     trademark, licensed only for unmodified use. */}
                 <Music2 aria-hidden className="size-4" />
                 TikTok
+              </a>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+              >
+                {/* A generic camera, not Instagram's glyph: same trademark rule. */}
+                <Camera aria-hidden className="size-4" />
+                Instagram
               </a>
               <a
                 href={BUY_ME_A_COFFEE_URL}

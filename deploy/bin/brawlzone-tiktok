@@ -715,9 +715,39 @@ if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   if curl -sf -o /dev/null --max-time 30 "${SITE}/youtube/subscribe.jpg"; then
     SLIDES="${SLIDES}"$'\n'"${SITE}/youtube/subscribe.jpg"
   fi
+  # YouTube is a search engine and TikTok is not: the TikTok title is a hook
+  # ("How to beat Mina in Ranked"), the Short's leads with what people type
+  # into the search box, game name included. Built from the manifest's own
+  # fields; anything unrecognised keeps the TikTok title plus the game name.
+  YT_TITLE=$(printf '%s' "$manifest_json" | python3 -c '
+import json, sys
+mode, title = sys.argv[1], sys.argv[2]
+try:
+    d = json.load(sys.stdin)
+except ValueError:
+    d = {}
+MODES = {"gemGrab": "Gem Grab", "heist": "Heist", "bounty": "Bounty", "hotZone": "Hot Zone",
+         "brawlBall": "Brawl Ball", "knockout": "Knockout", "wipeout": "Wipeout"}
+b, m = d.get("brawler"), d.get("map")
+gm = MODES.get(d.get("mode") or "", "")
+if mode == "counter" and b:
+    t = f"How to Counter {b} in Brawl Stars Ranked: Best Picks vs {b}"
+elif mode == "tiers" and m:
+    t = f"Best Brawlers for {m}" + (f" ({gm})" if gm else "") + " | Brawl Stars Ranked Tier List"
+elif mode == "build" and b:
+    t = f"Best {b} Build in Brawl Stars: Star Power, Gadget & Gears"
+elif mode == "trio" and m:
+    t = f"Best Team Comp for {m}" + (f" ({gm})" if gm else "") + " | Brawl Stars Ranked"
+elif "brawl stars" in title.lower():
+    t = title
+else:
+    t = f"{title} | Brawl Stars"
+# brawlzone-youtube appends " #Shorts" and cuts at 100.
+print(t if len(t) <= 92 else title)
+' "$MODE" "$TITLE")
   YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   if render_video "$YT_WORK" "$YT_MUSIC" \
-     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" 2>&1); then
+     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "${YT_TITLE:-$TITLE}" "${YT_WORK}/description.txt" 2>&1); then
     echo "$YOUTUBE_RESULT"
   else
     YOUTUBE_RESULT="failed: ${VIDEO_ERR:-$YOUTUBE_RESULT}"
