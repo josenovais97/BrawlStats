@@ -67,6 +67,7 @@ import {
 import type { BABrawler } from '@/types/brawlapi';
 import type { Tier, TierListEntry } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { YoutubeCard } from '@/components/youtube-card';
 
 /** How many meta movers to show on each side. */
 const MOVER_LIMIT = 8;
@@ -591,6 +592,8 @@ export async function TierListView({
           locale={locale}
         />
       ) : null}
+
+      <YoutubeCard />
     </div>
     </TierNav>
   );

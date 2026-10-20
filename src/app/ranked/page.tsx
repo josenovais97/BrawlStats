@@ -33,6 +33,7 @@ import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { mapNamer } from '@/lib/i18n-game';
+import { YoutubeCard } from '@/components/youtube-card';
 
 /* A function, so the month is the month the page was last regenerated. */
 export function generateMetadata(): Metadata {
@@ -388,6 +389,8 @@ export default async function RankedPage() {
           for <map>" wants the answer first — but before the methodology,
           because this is a finding rather than a footnote. */}
       <RankedLadder ladder={ladder} />
+
+      <YoutubeCard />
 
       <Disclosure summary={t('How these picks are chosen')}>
         <p>{t('Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.')}</p>

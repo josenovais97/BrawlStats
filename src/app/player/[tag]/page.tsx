@@ -71,6 +71,7 @@ import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
 import { SupportLine } from '@/components/support/support-line';
+import { YoutubeCard } from '@/components/youtube-card';
 
 interface PageProps {
   params: Promise<{ tag: string }>;
@@ -584,6 +585,8 @@ export default async function PlayerPage({ params }: PageProps) {
         },
         ]}
       />
+
+      <YoutubeCard />
 
       <SupportLine />
     </div>

@@ -755,6 +755,13 @@ export const CLIENT_ES: Record<string, string> = {
     "lo pusiste en {mine}, los datos dicen {data}: lo valoras más",
   "you put it in {mine}, the data says {data}: you rate it lower":
     "lo pusiste en {mine}, los datos dicen {data}: lo valoras menos",
+  // YouTube card (2026-10-20)
+  'The best Ranked picks, as 30-second Shorts': 'Los mejores picks de Competitivo, en Shorts de 30 segundos',
+  'A new one every few hours: counters, builds, best brawlers per map. Free on YouTube.':
+    'Uno nuevo cada pocas horas: counters, builds y los mejores brawlers por mapa. Gratis en YouTube.',
+  Subscribe: 'Suscribirme',
+  Later: 'Más tarde',
+  "Don't show again": 'No volver a mostrar',
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1509,4 +1516,11 @@ export const CLIENT_PT: Record<string, string> = {
     "você colocou em {mine}, os dados dizem {data}: você valoriza mais",
   "you put it in {mine}, the data says {data}: you rate it lower":
     "você colocou em {mine}, os dados dizem {data}: você valoriza menos",
+  // YouTube card (2026-10-20)
+  'The best Ranked picks, as 30-second Shorts': 'Os melhores picks do Ranqueado, em Shorts de 30 segundos',
+  'A new one every few hours: counters, builds, best brawlers per map. Free on YouTube.':
+    'Um novo a cada poucas horas: counters, builds e os melhores brawlers por mapa. Grátis no YouTube.',
+  Subscribe: 'Inscrever-se',
+  Later: 'Mais tarde',
+  "Don't show again": 'Não mostrar de novo',
 };
