@@ -130,6 +130,8 @@ services:
       - /var/log/brawlzone:/var/log/brawlzone
       # Reels waiting for Instagram to fetch them (deploy/bin/brawlzone-instagram).
       - /var/lib/brawlzone/reels:/srv/reels:ro
+      # Carousels drawn on the box rather than by the site (deploy/bin/brawlzone-weekly).
+      - /var/lib/brawlzone/social:/srv/social:ro
     depends_on:
       - app
       - umami

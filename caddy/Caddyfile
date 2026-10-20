@@ -100,6 +100,14 @@
 	# only. Written by deploy/bin/brawlzone-instagram under a random name and
 	# deleted once published, so the directory is empty almost all day. First,
 	# because the fetcher is Meta's and must not meet the agent block below.
+	# Carousels drawn on the box (deploy/bin/brawlzone-weekly), fetched
+	# by TikTok; the YouTube and Instagram uploads go through the job itself.
+	handle_path /social/* {
+		root * /srv/social
+		header Cache-Control "public, max-age=3600"
+		file_server
+	}
+
 	handle_path /reels/* {
 		root * /srv/reels
 		header Cache-Control no-store

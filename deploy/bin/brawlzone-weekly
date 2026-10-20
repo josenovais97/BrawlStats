@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# The weekly Ranked report carousel, made and posted every Monday (2026-10-20).
+#
+#   brawlzone-weekly [--no-post]
+#
+# 1. scripts/weekly-report.ts, in the sampler container, writes this week's
+#    numbers to $DATA/<date>.json.
+# 2. deploy/weekly/make.py draws the slides from that and the newest earlier
+#    file of the same season (so "since last week" is two saved files apart),
+#    into $PUBLIC/<date>/, which Caddy serves at /social/weekly/<date>/.
+# 3. slides.json goes next to them, and brawlzone-tiktok posts it like any
+#    other carousel: TikTok inbox, YouTube Short, Instagram Reel.
+#
+# The week-1 report of Season 50 (2026-10-19) was made by hand; its numbers
+# were saved as the first file in $DATA so week 2 has something to compare.
+#
+# --no-post stops after step 2, for looking at the slides first.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+DATA=/var/lib/brawlzone/weekly
+PUBLIC=/var/lib/brawlzone/social/weekly
+CACHE=/var/lib/brawlzone/weekly-cache   # Pillow and brawler portraits
+SITE=https://brawlzone.net
+# Pinned like the ffmpeg image in brawlzone-tiktok: a floating tag would be
+# pulled fresh on the one morning a week this runs.
+PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+
+die() { echo "$*" >&2; exit 1; }
+
+DAY=$(date -u +%Y-%m-%d)
+mkdir -p "$DATA" "$PUBLIC/$DAY" "$CACHE/icons" "$CACHE/assets" || die "::error::cannot create the weekly directories"
+
+# The sampler run takes both cores for up to an hour; the report's queries
+# are heavy enough to push it past its timeout. Same wait as precompute.
+for _ in $(seq 40); do
+  [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ] || break
+  sleep 30
+done
+
+cd "$REPO" || die "::error::no checkout at $REPO"
+docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/weekly-report.ts \
+  > "$DATA/$DAY.json.tmp" 2> "$CACHE/report.err" \
+  || die "::error::weekly-report.ts failed: $(tail -c 600 "$CACHE/report.err")"
+mv "$DATA/$DAY.json.tmp" "$DATA/$DAY.json"
+
+prev=$(find "$DATA" -maxdepth 1 -name '*.json' ! -name "$DAY.json" | sort | tail -n 1)
+echo "this week: $DATA/$DAY.json; compared with: ${prev:-nothing}"
+
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
+   "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"
+
+docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+  -v "$REPO/deploy/weekly:/code:ro" -v "$DATA:/data:ro" -v "$PUBLIC/$DAY:/out" -v "$CACHE:/cache" \
+  "$PYTHON_IMAGE" sh -c '
+    [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow >/dev/null 2>&1
+    PYTHONPATH=/cache/py python /code/make.py "/data/$1" "$2" /out /cache/assets /cache/icons' _ \
+  "$DAY.json" "${prev:+/data/$(basename "$prev")}" \
+  > "$CACHE/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$CACHE/make.log")"
+# make.py treats "-" as "no last week"; an empty second argument means the same.
+
+count=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["count"])' "$PUBLIC/$DAY/meta.json") \
+  || die "::error::make.py wrote no meta.json"
+echo "slides drawn: $count"
+
+# The manifest brawlzone-tiktok reads. ?v= keeps a re-run on the same day
+# from being served Cloudflare's copy of the first attempt.
+python3 - "$PUBLIC/$DAY" "$SITE/social/weekly/$DAY" "$(date +%s)" <<'PY' || die "::error::could not write slides.json"
+import json, sys
+out, base, v = sys.argv[1:4]
+meta = json.load(open(f'{out}/meta.json'))
+meta['date'] = out.rsplit('/', 1)[-1]
+meta['slides'] = [f'{base}/{i}.jpg?v={v}' for i in range(1, meta['count'] + 1)]
+json.dump(meta, open(f'{out}/slides.json', 'w'), indent=1)
+PY
+
+[ "${1:-}" = "--no-post" ] && { echo "--no-post: slides at $SITE/social/weekly/$DAY/"; exit 0; }
+exec /usr/local/bin/brawlzone-tiktok weekly "$DAY"
