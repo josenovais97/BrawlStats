@@ -706,7 +706,12 @@ if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   # A different library track each time; none there, a silent Short.
   # The subscribe slide closes the Short only; TikTok never sees it.
   TIKTOK_SLIDES=$SLIDES
-  SLIDES="${SLIDES}"$'\n'"${SITE}/youtube/subscribe.jpg"
+  # Checked first: during a deploy the scripts are installed before the site
+  # that serves the image is built, and a missing slide must cost the slide,
+  # not the Short.
+  if curl -sf -o /dev/null --max-time 30 "${SITE}/youtube/subscribe.jpg"; then
+    SLIDES="${SLIDES}"$'\n'"${SITE}/youtube/subscribe.jpg"
+  fi
   YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   if render_video "$YT_WORK" "$YT_MUSIC" \
      && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" 2>&1); then
