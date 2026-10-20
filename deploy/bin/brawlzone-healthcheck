@@ -421,6 +421,68 @@ else
   problems+=("deploy/bin/brawlzone-install is missing from the checkout")
 fi
 
+# 15. Is the Monday Ranked report still going out? (2026-10-20)
+#     A failed run mails through OnFailure; a run that never happens -- the
+#     timer disabled, the box off on a Monday -- mails nothing, and the report
+#     promises a fresh one every week. Eight days allows one late Monday.
+if ! systemctl is-enabled --quiet brawlzone-weekly.timer 2>/dev/null; then
+  problems+=("brawlzone-weekly.timer is not enabled -- the Monday Ranked report will not post")
+elif [ -r "$TIKTOK_STATE" ]; then
+  weekly_age=$(python3 - "$TIKTOK_STATE" <<'PY'
+import datetime, json, sys
+try:
+    stamp = (json.load(open(sys.argv[1])).get('last_post') or {}).get('weekly')
+    when = datetime.datetime.fromisoformat(stamp) if stamp else None
+except Exception:
+    when = None
+now = datetime.datetime.now(datetime.UTC)
+# The first one is due 2026-10-26; before then "never" is not a problem.
+if when is None:
+    print('never' if now > datetime.datetime(2026, 10, 27, tzinfo=datetime.UTC) else 'ok')
+else:
+    print(int((now - when).total_seconds() // 3600))
+PY
+  )
+  case "$weekly_age" in
+    never) problems+=("The weekly Ranked report has never posted") ;;
+    ok|'') ;;
+    *) [ "$weekly_age" -le 192 ] || problems+=("The weekly Ranked report last posted ${weekly_age}h ago (expected weekly)") ;;
+  esac
+fi
+
+# 16. Is Instagram still taking the Reels? (2026-10-20)
+#     The token lives 60 days and brawlzone-instagram renews it weekly, but a
+#     failed renewal is only a log line -- and two months later the Reels stop
+#     with nothing louder than a red row in the post mail. Fourteen days since
+#     the last renewal is two missed in a row; 36 hours since the newest post
+#     is a whole day of four posts gone missing.
+IG_TOKEN=/home/ubuntu/.brawlzone-instagram.json
+if [ -r "$IG_TOKEN" ]; then
+  while IFS= read -r line; do
+    [ -n "$line" ] && problems+=("$line")
+  done < <(python3 - "$IG_TOKEN" <<'PY'
+import datetime, json, sys, time, urllib.error, urllib.request
+data = json.load(open(sys.argv[1]))
+age = (time.time() - data.get('refreshed_at', 0)) / 86400
+if data.get('refreshed_at') and age > 14:
+    print(f'Instagram token not renewed for {int(age)} days (it expires at 60)')
+try:
+    req = urllib.request.Request('https://graph.instagram.com/v23.0/me/media?fields=timestamp&limit=1',
+                                 headers={'Authorization': f"Bearer {data['access_token']}"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        newest = json.load(r)['data'][0]['timestamp']
+    hours = (datetime.datetime.now(datetime.UTC)
+             - datetime.datetime.fromisoformat(newest.replace('+0000', '+00:00'))).total_seconds() / 3600
+    if hours > 36:
+        print(f'No Instagram Reel for {int(hours)}h (four a day expected)')
+except urllib.error.HTTPError as e:
+    print(f'Instagram refused the token (HTTP {e.code}) -- generate a new one in the Meta app')
+except Exception:
+    pass  # a network blink is not an Instagram problem
+PY
+  )
+fi
+
 # The state is the SET of problems, not a yes/no.
 #
 # It used to be the single word `ok` or `failed`, and alerting only on the
