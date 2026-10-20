@@ -392,9 +392,16 @@ print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
 # five minutes is NOT one of those -- it may yet arrive -- and dies instead.
 # Renders the slides into ${work}/out.mp4, into VIDEO_SIZE. Returns 1 with
 # VIDEO_ERR set. Shared by the TikTok video and the YouTube Short.
-render_video () { # work dir
-  local work="$1" n=0 slide size
+#
+# With a music file the soundtrack is that track, faded in and out; without
+# one it stays silent. Only the YouTube Short passes one: on TikTok a trending
+# sound is added by hand in the app, and a baked-in track would fight it.
+render_video () { # work dir [music file]
+  local work="$1" music="${2:-}" n=0 slide size
   local -a args
+  if [ -n "$music" ]; then
+    cp "$music" "${work}/music.mp3" || { VIDEO_ERR="could not read ${music}"; return 1; }
+  fi
 
   while IFS= read -r slide; do
     [ -n "$slide" ] || continue
@@ -404,9 +411,9 @@ render_video () { # work dir
 
   # One argument per line. The filter graph has no spaces in it, so nothing
   # here needs quoting beyond that.
-  mapfile -t args < <(python3 - "$n" <<'PY'
-import sys
-n = int(sys.argv[1])
+  mapfile -t args < <(python3 - "$n" "$([ -n "$music" ] && echo 1 || echo 0)" <<'PY'
+import random, sys
+n, music = int(sys.argv[1]), sys.argv[2] == '1'
 FPS, T = 30, 0.4  # frame rate, slide-in length
 # The cover is the hook and is short; the last slide (the site) is shorter
 # still. The rest get four seconds, about what a ten-row list needs.
@@ -418,7 +425,11 @@ for i in range(n):
 # byte counted) and then never finishes processing it: on 2026-10-13 a
 # video-only upload sat in PROCESSING_UPLOAD for good while the same video
 # with this track added reached the inbox in twenty seconds.
-args += ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo']
+if music:
+    # A few seconds in, skipping the quiet intro most library tracks open with.
+    args += ['-ss', str(random.randint(4, 15)), '-stream_loop', '-1', '-i', '/w/music.mp3']
+else:
+    args += ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo']
 parts = []
 for i in range(n):
     frames = round(dur[i] * FPS)
@@ -434,7 +445,12 @@ for i in range(1, n):
     offset += dur[i - 1] - T
     parts.append(f'[{last}][v{i}]xfade=transition=slideleft:duration={T}:offset={offset:.2f}[x{i}]')
     last = f'x{i}'
-args += ['-filter_complex', ';'.join(parts), '-map', f'[{last}]', '-map', f'{n}:a', '-shortest', '-r', str(FPS),
+audio = f'{n}:a'
+if music:
+    total = sum(dur) - T * (n - 1)
+    parts.append(f'[{n}:a]volume=0.8,afade=t=in:d=0.6,afade=t=out:st={total - 1.5:.2f}:d=1.5[a]')
+    audio = '[a]'
+args += ['-filter_complex', ';'.join(parts), '-map', f'[{last}]', '-map', audio, '-shortest', '-r', str(FPS),
          '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
          '-c:a', 'aac', '-b:a', '64k',
          '-movflags', '+faststart', '/w/out.mp4']
@@ -684,7 +700,9 @@ YOUTUBE_RESULT="not set up"
 if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   YT_WORK=$(mktemp -d)
   printf '%s\n' "$DESCRIPTION" > "${YT_WORK}/description.txt"
-  if render_video "$YT_WORK" \
+  # A different library track each time; none there, a silent Short.
+  YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
+  if render_video "$YT_WORK" "$YT_MUSIC" \
      && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" 2>&1); then
     echo "$YOUTUBE_RESULT"
   else
