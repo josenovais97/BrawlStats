@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Answer "BUBBLE" on Instagram with the Play tester links (2026-10-20).
+# Answer "BUBBLE" on Instagram with the Play early-access links (2026-10-20).
 #
 #   brawlzone-instagram-replies
 #
@@ -32,11 +32,12 @@ KEYWORD = re.compile(r'bubble', re.I)
 RECENT_POSTS = 15
 MAX_TRIES = 3
 
-LINKS = """Thanks for helping! 🙏
+LINKS = """Here you go! 🎮 BrawlZone Bubble, free early access:
 1. Join: https://groups.google.com/g/brawlzone-bubble-testers
 2. Become a tester: https://play.google.com/apps/testing/net.brawlzone.bubble
 3. Install: https://play.google.com/store/apps/details?id=net.brawlzone.bubble
-(If Google Play says "not found", wait a bit and try again.) Keep it installed for 14 days"""
+(If Google Play says "not found", wait a few minutes and try again.)
+Open Brawl Stars, start a draft and tap the bubble. Tell me what you think! 💬"""
 PUBLIC_REPLY = 'Sent you a DM with the links 📩'
 
 token = json.load(open(TOKEN_FILE))['access_token']
