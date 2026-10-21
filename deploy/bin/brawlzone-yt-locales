@@ -118,13 +118,13 @@ def main():
         if lang == 'pt':
             t = {
                 'counter': (f'Como Counterar {B} no Ranked do Brawl Stars: Melhores Escolhas contra {B}',
-                            f'Como Counterar {B} no Ranked do Brawl Stars'),
+                            f'Como vencer {B} no Ranked'),
                 'tiers': (f'Melhores Brawlers para {where} | Tier List do Ranked do Brawl Stars',
-                          f'Melhores Brawlers para {where} | Brawl Stars'),
+                          f'Melhores brawlers para {M}'),
                 'build': (f'Melhor Build de {B} no Brawl Stars: {sp}, {gadget} e {gears}',
-                          f'Melhor Build de {B} no Brawl Stars'),
+                          f'{B}: a build que vence'),
                 'trio': (f'Melhor Time para {where} | Ranked do Brawl Stars',
-                         f'Melhor Time para {M} | Brawl Stars'),
+                         f'Melhor time para {M}'),
             }[mode]
             body = {
                 'counter': f'Os melhores brawlers contra {B} no Ranked, com taxas de vitória de batalhas reais. Um brawler diferente todos os dias.',
@@ -136,13 +136,13 @@ def main():
         else:
             t = {
                 'counter': (f'Cómo Counterear a {B} en Ranked de Brawl Stars: Mejores Picks contra {B}',
-                            f'Cómo Counterear a {B} en Ranked de Brawl Stars'),
+                            f'Cómo ganarle a {B} en Ranked'),
                 'tiers': (f'Mejores Brawlers para {where} | Tier List de Ranked de Brawl Stars',
-                          f'Mejores Brawlers para {where} | Brawl Stars'),
+                          f'Mejores brawlers para {M}'),
                 'build': (f'Mejor Build de {B} en Brawl Stars: {sp}, {gadget} y {gears}',
-                          f'Mejor Build de {B} en Brawl Stars'),
+                          f'{B}: la build que gana'),
                 'trio': (f'Mejor Equipo para {where} | Ranked de Brawl Stars',
-                         f'Mejor Equipo para {M} | Brawl Stars'),
+                         f'Mejor equipo para {M}'),
             }[mode]
             body = {
                 'counter': f'Los mejores brawlers contra {B} en Ranked, con tasas de victoria de partidas reales. Un brawler distinto cada día.',
@@ -151,9 +151,12 @@ def main():
                 'trio': f'El equipo de 3 que más gana en {where} en Ranked, y dos opciones más. Un mapa distinto cada día.',
             }[mode]
             site = 'Todos los mapas y brawlers en español: https://brawlzone.net/es'
+        # The hook is the title, the search phrasing opens the description:
+        # see the note on YT_SEARCH in brawlzone-tiktok (2026-10-21).
+        search, hook = t
         entry = {
-            'title': fit(*t),
-            'description': f'{SUB[lang]}{CHANNEL}\n\n{body}\n\n{site}\n{tags}'.strip(),
+            'title': fit(hook, hook),
+            'description': f'{SUB[lang]}{CHANNEL}\n\n{search}\n\n{body}\n\n{site}\n{tags}'.strip(),
         }
         # YouTube matches a viewer's language by tag; both spellings cost nothing.
         for tag in ({'pt': ('pt', 'pt-BR'), 'es': ('es', 'es-419')}[lang]):

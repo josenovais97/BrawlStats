@@ -658,11 +658,15 @@ if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   if curl -sf -o /dev/null --max-time 30 "${SITE}/youtube/subscribe.jpg"; then
     SLIDES="${SLIDES}"$'\n'"${SITE}/youtube/subscribe.jpg"
   fi
-  # YouTube is a search engine and TikTok is not: the TikTok title is a hook
-  # ("How to beat Mina in Ranked"), the Short's leads with what people type
-  # into the search box, game name included. Built from the manifest's own
-  # fields; anything unrecognised keeps the TikTok title plus the game name.
-  YT_TITLE=$(printf '%s' "$manifest_json" | python3 -c '
+  # The Short keeps the TikTok hook as its title ("How to beat Mina in
+  # Ranked"), and the search phrasing ("How to Counter Mina in Brawl Stars
+  # Ranked: Best Picks vs Mina") opens the description instead. From 2026-10-20
+  # the search phrasing was the title, and the Shorts fell from ~1,100 views
+  # (Mina, Ring of Fire) to under 60: in the Shorts feed the title sits on the
+  # video, and a keyword string reads as spam and gets swiped. Search still
+  # reads the description. Built from the manifest's own fields; anything
+  # unrecognised adds the game name to the hook.
+  YT_SEARCH=$(printf '%s' "$manifest_json" | python3 -c '
 import json, sys
 mode, title = sys.argv[1], sys.argv[2]
 try:
@@ -688,6 +692,7 @@ else:
 # brawlzone-youtube appends " #Shorts" and cuts at 100.
 print(t if len(t) <= 92 else title)
 ' "$MODE" "$TITLE")
+  printf '%s\n\n%s\n' "$YT_SEARCH" "$DESCRIPTION" > "${YT_WORK}/description.txt"
   # The same Short's title and description in Portuguese and Spanish
   # (2026-10-21); none for a mode without a template, or on any failure.
   printf '%s' "$manifest_json" > "${YT_WORK}/manifest.json"
@@ -699,7 +704,7 @@ print(t if len(t) <= 92 else title)
   curl -sf -o "${YT_WORK}/banner-src.png" --max-time 30 "${SITE}/youtube/subscribe-banner.png" \
     && YT_BANNER="${YT_WORK}/banner-src.png"
   if render_video "$YT_WORK" "$YT_MUSIC" "$YT_BANNER" \
-     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "${YT_TITLE:-$TITLE}" "${YT_WORK}/description.txt" "${YT_WORK}/l10n.json" 2>&1); then
+     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" "${YT_WORK}/l10n.json" 2>&1); then
     echo "$YOUTUBE_RESULT"
   else
     YOUTUBE_RESULT="failed: ${VIDEO_ERR:-$YOUTUBE_RESULT}"
@@ -719,7 +724,7 @@ DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
 DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
 if [ -n "$YT_URL" ] && [ -n "${DISCORD_TOKEN:-}" ] && [ -n "${DISCORD_GUILD:-}" ]; then
   DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" \
-  python3 - "$YT_URL" "${YT_TITLE:-$TITLE}" <<'PY' || echo "discord: Short announcement failed (not fatal)"
+  python3 - "$YT_URL" "$TITLE" <<'PY' || echo "discord: Short announcement failed (not fatal)"
 import json, os, sys, urllib.request
 url, title = sys.argv[1], sys.argv[2]
 api = 'https://discord.com/api/v10'
