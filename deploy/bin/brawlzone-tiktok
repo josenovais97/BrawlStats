@@ -798,6 +798,21 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
     html_section "Caption"
     printf '%s\n' "$DESCRIPTION" | html_pre
 
+    # The WhatsApp channel (2026-10-21) has no API that does not mean logging
+    # in as the owner's own number, so it is posted by hand: the rewards and
+    # the map of the day, ready to paste. Hashtags out (they do nothing
+    # there); links stay, and are clickable there as nowhere else.
+    if [ "$MODE" = rewards ] || [ "$MODE" = tiers ]; then
+      html_section "For WhatsApp: copy, attach the image, send"
+      printf '%s' "$DESCRIPTION" | python3 -c '
+import re, sys
+text = re.sub(r"(?:^|\s)#\w+", "", sys.stdin.read()).rstrip()
+print(text + "\n\n📢 More every day: https://brawlzone.net")' | html_pre
+      html_rows_open
+      html_row "Image" "<a href=\"$(printf '%s\n' "$SLIDES" | head -n 1)\" style=\"color:${ACCENT};\">open the cover, long-press to save</a>"
+      html_rows_close
+    fi
+
     html_section "What to do"
     printf '%s\n' "$todo" | html_pre
 
