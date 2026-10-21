@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+# Post free Brawl Stars rewards everywhere, from just their links (2026-10-21).
+#
+#   brawlzone-rewards [--no-post] "Mega Box: https://link.brawlstars.com/en/voucher/..." ...
+#
+# Each argument is one reward, "Name: URL" or "Name=URL", up to four. Then:
+# 1. deploy/rewards/make.py draws the slides (cover, a QR code per reward, all
+#    codes on one slide, follow) into $PUBLIC/<id>/, which Caddy serves at
+#    /social/rewards/<id>/, with the caption in meta.json.
+# 2. The links go to Discord's announcements channel at once -- the only place
+#    they are clickable -- before the slower uploads.
+# 3. brawlzone-tiktok posts the carousel: TikTok inbox, YouTube Short,
+#    Instagram Reel, and the Short in #clips.
+#
+# Only Supercell's own hosts are accepted. A link already posted is refused
+# (FORCE=1 to post it again): rewards circulate for days, and the same one
+# posted twice reads as a bot. --no-post stops after the slides.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+PUBLIC=/var/lib/brawlzone/social/rewards
+CACHE=/var/lib/brawlzone/rewards-cache   # Pillow, qrcode and brawler portraits
+SEEN=/var/lib/brawlzone/rewards-seen.json
+SITE=https://brawlzone.net
+ENV_FILE="$REPO/.env.production"
+PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+
+die() { echo "$*" >&2; exit 1; }
+
+post=1
+[ "${1:-}" = "--no-post" ] && { post=0; shift; }
+[ $# -ge 1 ] || die "usage: brawlzone-rewards [--no-post] \"Mega Box: https://link.brawlstars.com/...\" ..."
+
+ID="$(date -u +%Y-%m-%d-%H%M)"
+OUT="$PUBLIC/$ID"
+mkdir -p "$OUT" "$CACHE/icons" "$CACHE/assets" || die "::error::cannot create $OUT"
+
+# Parse, check the host, refuse repeats. Writes rewards.json.
+python3 - "$OUT/rewards.json" "$SEEN" "${FORCE:-0}" "$@" <<'PY' || exit 1
+import json, re, sys
+out, seen_path, force, args = sys.argv[1], sys.argv[2], sys.argv[3] == '1', sys.argv[4:]
+try:
+    seen = set(json.load(open(seen_path)))
+except (OSError, ValueError):
+    seen = set()
+rewards = []
+for arg in args[:4]:
+    m = re.match(r'\s*(.+?)\s*[:=]\s*((?:https?://)?\S+)\s*$', arg)
+    if not m:
+        sys.exit(f'::error::not "Name: URL": {arg}')
+    name, url = m.group(1), m.group(2)
+    if not url.startswith('http'):
+        url = 'https://' + url
+    if not re.match(r'https://(link\.brawlstars\.com|store\.supercell\.com)/', url):
+        sys.exit(f'::error::not a Supercell link, refusing: {url}')
+    if url.rstrip('/') in seen and not force:
+        sys.exit(f'::error::already posted: {url} (FORCE=1 to post it again)')
+    rewards.append({'name': name.strip().strip('"'), 'url': url})
+json.dump(rewards, open(out, 'w'), ensure_ascii=False)
+print(f'{len(rewards)} reward(s): ' + ', '.join(r['name'] for r in rewards))
+PY
+
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
+   "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"
+
+docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+  -v "$REPO/deploy/rewards:/code:ro" -v "$OUT:/out" -v "$CACHE:/cache" \
+  "$PYTHON_IMAGE" sh -c '
+    [ -d /cache/py/qrcode ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
+    PYTHONPATH=/cache/py python /code/make.py /out/rewards.json /out /cache/assets /cache/icons' \
+  > "$CACHE/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$CACHE/make.log")"
+
+# The manifest brawlzone-tiktok reads, as brawlzone-weekly writes it.
+python3 - "$OUT" "$SITE/social/rewards/$ID" "$(date +%s)" <<'PY' || die "::error::could not write slides.json"
+import json, sys
+out, base, v = sys.argv[1:4]
+meta = json.load(open(f'{out}/meta.json'))
+meta['date'] = out.rsplit('/', 1)[-1]
+meta['slides'] = [f'{base}/{i}.jpg?v={v}' for i in range(1, meta['count'] + 1)]
+json.dump(meta, open(f'{out}/slides.json', 'w'), indent=1, ensure_ascii=False)
+PY
+echo "slides: $SITE/social/rewards/$ID/"
+[ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
+
+# Remembered before posting: a half-finished run must not post the same
+# links again on a retry without FORCE.
+python3 - "$OUT/rewards.json" "$SEEN" <<'PY'
+import json, os, sys
+rewards, seen_path = json.load(open(sys.argv[1])), sys.argv[2]
+try:
+    seen = json.load(open(seen_path))
+except (OSError, ValueError):
+    seen = []
+seen = sorted(set(seen) | {r['url'].rstrip('/') for r in rewards})
+json.dump(seen, open(seen_path + '.tmp', 'w')); os.replace(seen_path + '.tmp', seen_path)
+PY
+
+# Discord first: the links are clickable there, and it takes a second.
+DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
+DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
+if [ -n "$DISCORD_TOKEN" ] && [ -n "$DISCORD_GUILD" ]; then
+  DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" \
+  python3 - "$OUT/rewards.json" "$SITE/social/rewards/$ID" <<'PY' || echo "::warning::Discord announcement failed (not fatal)"
+import json, os, sys, urllib.request
+rewards, base = json.load(open(sys.argv[1])), sys.argv[2]
+api = 'https://discord.com/api/v10'
+headers = {'Authorization': f"Bot {os.environ['DISCORD_TOKEN']}", 'Content-Type': 'application/json',
+           'User-Agent': 'BrawlZone (https://brawlzone.net, 1.0)'}
+def call(method, path, body=None):
+    req = urllib.request.Request(api + path, method=method, headers=headers,
+                                 data=None if body is None else json.dumps(body).encode())
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read() or b'{}')
+channels = call('GET', f"/guilds/{os.environ['DISCORD_GUILD']}/channels")
+chan = next((c['id'] for c in channels if c.get('name') == '📢-announcements'), None)
+if not chan:
+    sys.exit('no 📢-announcements channel')
+n = len(rewards)
+lines = '\n'.join(f"🎁 **{r['name']}**: [claim]({r['url']})" for r in rewards)
+call('POST', f'/channels/{chan}/messages', {
+    'allowed_mentions': {'parse': []},
+    'embeds': [{
+        'title': f"🎁 Free Brawl Stars {'rewards' if n > 1 else 'reward'}",
+        'description': f"Tap {'each link' if n > 1 else 'the link'} and claim it in the game while it lasts:\n\n{lines}\n\n"
+                       f"On PC? Scan the QR {'codes' if n > 1 else 'code'} below with your phone.",
+        'color': 0xFFC72C,
+        'image': {'url': f"{base}/{n + 2 if n > 1 else 2}.jpg"},
+        'footer': {'text': 'Official Supercell links · BrawlZone is an unofficial fan project'},
+    }],
+})
+print('discord: announced in #📢-announcements')
+PY
+fi
+
+FORCE=1 exec /usr/local/bin/brawlzone-tiktok rewards "$ID"
