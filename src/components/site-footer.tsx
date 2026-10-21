@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, Coffee, ExternalLink, Mail, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
+import { Camera, Coffee, ExternalLink, Mail, MessageCircle, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -44,6 +44,12 @@ const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
 
 /** Every daily carousel goes out here as a Reel too, since 2026-10-20. */
 const INSTAGRAM_URL = 'https://www.instagram.com/brawlzonenet/';
+
+/**
+ * Free rewards and the map of the day, posted by hand (2026-10-21): Channels
+ * have no posting API. Links are clickable there, unlike TikTok or Instagram.
+ */
+const WHATSAPP_URL = 'https://whatsapp.com/channel/0029VbDyKwbGU3BEpdoHUK3l';
 
 
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
@@ -279,6 +285,16 @@ export function SiteFooter() {
                 {/* A generic camera, not Instagram's glyph: same trademark rule. */}
                 <Camera aria-hidden className="size-4" />
                 Instagram
+              </a>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
+              >
+                {/* A generic chat bubble, not WhatsApp's glyph: same trademark rule. */}
+                <MessageCircle aria-hidden className="size-4" />
+                WhatsApp
               </a>
               <a
                 href={BUY_ME_A_COFFEE_URL}
