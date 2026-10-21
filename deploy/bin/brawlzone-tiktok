@@ -399,11 +399,17 @@ print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
 # With a music file the soundtrack is that track, faded in and out; without
 # one it stays silent. Only the YouTube Short passes one: on TikTok a trending
 # sound is added by hand in the app, and a baked-in track would fight it.
-render_video () { # work dir [music file]
-  local work="$1" music="${2:-}" n=0 slide size
+#
+# With a banner (a transparent PNG) it slides in over the top of the cover:
+# the Short's subscribe ask, for the many who never reach the last slide.
+render_video () { # work dir [music file] [banner png]
+  local work="$1" music="${2:-}" banner="${3:-}" n=0 slide size
   local -a args
   if [ -n "$music" ]; then
     cp "$music" "${work}/music.mp3" || { VIDEO_ERR="could not read ${music}"; return 1; }
+  fi
+  if [ -n "$banner" ]; then
+    cp "$banner" "${work}/banner.png" || { VIDEO_ERR="could not read ${banner}"; return 1; }
   fi
 
   while IFS= read -r slide; do
@@ -414,9 +420,9 @@ render_video () { # work dir [music file]
 
   # One argument per line. The filter graph has no spaces in it, so nothing
   # here needs quoting beyond that.
-  mapfile -t args < <(python3 - "$n" "$([ -n "$music" ] && echo 1 || echo 0)" <<'PY'
+  mapfile -t args < <(python3 - "$n" "$([ -n "$music" ] && echo 1 || echo 0)" "$([ -n "$banner" ] && echo 1 || echo 0)" <<'PY'
 import random, sys
-n, music = int(sys.argv[1]), sys.argv[2] == '1'
+n, music, banner = int(sys.argv[1]), sys.argv[2] == '1', sys.argv[3] == '1'
 FPS, T = 30, 0.4  # frame rate, slide-in length
 # The cover is the hook and is short; the last slide (the site) is shorter
 # still. The rest get four seconds, about what a ten-row list needs.
@@ -436,16 +442,24 @@ if music:
     args += ['-ss', str(random.randint(4, 15)), '-stream_loop', '-1', '-i', '/w/music.mp3']
 else:
     args += ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo']
+if banner:
+    args += ['-loop', '1', '-i', '/w/banner.png']  # input n + 1
 parts = []
 for i in range(n):
     frames = round(dur[i] * FPS)
+    out = 'v0raw' if i == 0 and banner else f'v{i}'
     # Upscaled first: zoompan rounds its crop to whole pixels, which makes a
     # slow zoom at 1080 wide visibly shimmer. Ends 5% in, which stays inside
     # the slides' safe margins.
     parts.append(
         f"[{i}:v]scale=2160:3840,zoompan=z='1+0.05*on/{frames}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        f":d={frames}:s=1080x1920:fps={FPS},setsar=1,format=yuv420p[v{i}]"
+        f":d={frames}:s=1080x1920:fps={FPS},setsar=1,format=yuv420p[{out}]"
     )
+if banner:
+    # Drops in from above the frame a quarter-second in, over the logo row.
+    parts.append(f'[{n + 1}:v]format=rgba[bn]')
+    parts.append("[v0raw][bn]overlay=x=(W-w)/2:y='60-220*max(0,1-(t-0.25)/0.3)'"
+                 ":shortest=1:enable='gte(t,0.25)',format=yuv420p[v0]")
 last, offset = 'v0', 0.0
 for i in range(1, n):
     offset += dur[i - 1] - T
@@ -746,7 +760,11 @@ else:
 print(t if len(t) <= 92 else title)
 ' "$MODE" "$TITLE")
   YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
-  if render_video "$YT_WORK" "$YT_MUSIC" \
+  # And the ask up front, on the cover. Optional for the same reason.
+  YT_BANNER=""
+  curl -sf -o "${YT_WORK}/banner-src.png" --max-time 30 "${SITE}/youtube/subscribe-banner.png" \
+    && YT_BANNER="${YT_WORK}/banner-src.png"
+  if render_video "$YT_WORK" "$YT_MUSIC" "$YT_BANNER" \
      && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "${YT_TITLE:-$TITLE}" "${YT_WORK}/description.txt" 2>&1); then
     echo "$YOUTUBE_RESULT"
   else
