@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
-import { SeasonPanel } from '@/components/ranked/season-panel';
+import { SeasonPanel, type TrialStat } from '@/components/ranked/season-panel';
 import { RankedLadder } from '@/components/ranked/ranked-ladder';
 import { RankedIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
@@ -35,13 +35,31 @@ import { requestLocale } from '@/lib/request-locale';
 import { mapNamer } from '@/lib/i18n-game';
 import { YoutubeCard } from '@/components/youtube-card';
 
-/* A function, so the month is the month the page was last regenerated. */
-export function generateMetadata(): Metadata {
+/*
+ * A function, so the month is the month the page was last regenerated.
+ *
+ * With the season number when one is running (2026-10-21): "ranked season 50
+ * tier list" and its neighbours are how people search at every turnover, and
+ * the title is the strongest place to answer that. The season read is the
+ * same cached one the page itself makes.
+ */
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT(requestLocale());
+  const season = (await getSeasonState().catch(() => null))?.current ?? null;
+  if (!season) {
+    return {
+      alternates: { canonical: '/ranked' },
+      title: t('Brawl Stars Ranked maps and best brawlers ({v})', { v: currentMonth() }),
+      description: t('The best brawlers for every map in the current Ranked rotation, {v}. From sampled competitive battles, updated every few hours.', { v: currentMonth() }),
+    };
+  }
+  const trial = season.trialBrawlers.join(', ');
   return {
     alternates: { canonical: '/ranked' },
-    title: t('Brawl Stars Ranked maps and best brawlers ({v})', { v: currentMonth() }),
-    description: t('The best brawlers for every map in the current Ranked rotation, {v}. From sampled competitive battles, updated every few hours.', { v: currentMonth() }),
+    title: t('Brawl Stars Ranked Season {n}: best brawlers for every map ({v})', { n: season.number, v: currentMonth() }),
+    description: trial
+      ? t('The best brawlers for every map in Ranked Season {n}, and how the trial brawlers {names} are doing. From sampled competitive battles, updated every few hours.', { n: season.number, names: trial })
+      : t('The best brawlers for every map in Ranked Season {n}. From sampled competitive battles, updated every few hours.', { n: season.number }),
   };
 }
 
@@ -222,6 +240,30 @@ export default async function RankedPage() {
     }))
     .filter((row) => row.maps.length > 0);
 
+  /*
+   * The trial brawlers' season so far: their tier-list numbers, and the maps
+   * on this board where they make the top three. Same reads as the board, so
+   * the panel cannot disagree with the cards below it.
+   */
+  const panelSeason = season.current ?? season.next ?? season.latest;
+  const trialStats = new Map<number, TrialStat>(
+    (panelSeason?.brawlers ?? []).map((b) => {
+      const scored = metaIndex.get(b.id);
+      return [
+        b.id,
+        {
+          tier: scored?.tier ?? null,
+          winRate: scored?.normalizedWinRate ?? null,
+          bestMaps: shown.flatMap((row) =>
+            row.maps
+              .filter((m) => m.picks?.picks.slice(0, 3).some((p) => p.brawlerId === b.id))
+              .map((m) => ({ name: m.name, href: m.href })),
+          ),
+        },
+      ];
+    }),
+  );
+
   // In-page navigation, so a visitor after one mode does not scroll past five.
   // Counts follow what is drawn rather than what is in the pool: a chip
   // promising six maps that scrolls to four is worse than no chip.
@@ -248,7 +290,9 @@ export default async function RankedPage() {
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <RankedIcon className="size-4" />{t('Competitive only')}</p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{t('Ranked maps')}</h1>
+        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">
+          {season.current ? t('Ranked season {number} maps', { number: season.current.number }) : t('Ranked maps')}
+        </h1>
 
         {/*
           The answer first, as a sentence. Measured in Umami on 2026-09-21 this
@@ -289,6 +333,7 @@ export default async function RankedPage() {
           on a phone. */}
       <SeasonPanel
         state={season}
+        trialStats={metaIndex.size > 0 ? trialStats : undefined}
         mapHref={(mode, map) => {
           // Wiki names are the game's display names, which slug to the same
           // segments our own map routes use — but only link the ones we can

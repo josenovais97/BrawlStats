@@ -4,7 +4,9 @@ import Link from 'next/link';
 
 import { Disclosure } from '@/components/ui/disclosure';
 import { brawlerPath } from '@/lib/slugs';
+import { formatPercent } from '@/lib/format';
 import { TRIAL_BRAWLER_RULES, type SeasonState } from '@/lib/ranked-seasons';
+import type { Tier } from '@/types/stats';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -24,13 +26,32 @@ import { requestLocale } from '@/lib/request-locale';
  * over and what is featured are one line; the rest is reference, and reference
  * belongs behind a toggle rather than in front of the answer.
  */
+/**
+ * How a trial brawler is doing this season, from our own Ranked samples.
+ *
+ * Added 2026-10-21: the portraits answered "who can I borrow" and stopped
+ * short of the follow-up everyone has -- "is it worth picking them, and
+ * where". A borrowed brawler is played by people who do not own it, so its
+ * numbers are worth showing beside the name rather than a click away.
+ */
+export interface TrialStat {
+  tier: Tier | null;
+  /** The adjusted Ranked win rate, as the tier list publishes it. */
+  winRate: number | null;
+  /** Maps in the live rotation where it is one of the three best picks. */
+  bestMaps: { name: string; href: string | null }[];
+}
+
 export function SeasonPanel({
   state,
   mapHref,
+  trialStats,
 }: {
   state: SeasonState;
   /** Resolves a wiki map name to one of our map pages, or null if unknown. */
   mapHref: (mode: string, map: string) => string | null;
+  /** Keyed by brawler id. Without it the cards are portraits only. */
+  trialStats?: Map<number, TrialStat>;
 }) {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
@@ -118,36 +139,97 @@ export function SeasonPanel({
               .map((b) => titleCase(b.name))
               .join(', ') })}
           >
-            <ul className="grid grid-cols-3 gap-3 sm:max-w-md">
-              {season.brawlers.map((brawler) => {
-                const accent = brawler.rarity?.color ?? '#8b95b8';
-                return (
-                  <li key={brawler.id}>
-                    <Link
-                      href={lp(brawlerPath(brawler.id, brawler.name))}
-                      className="card card-interactive flex h-full flex-col items-center gap-1.5 p-2.5"
-                    >
-                      <Image
-                        src={brawler.imageUrl}
-                        alt=""
-                        width={72}
-                        height={72}
-                        sizes="72px"
-                        className="size-14 rounded-xl object-contain sm:size-16"
-                        style={{
-                          background: `color-mix(in srgb, ${accent} 14%, transparent)`,
-                        }}
-                        loading="lazy"
-                        unoptimized
-                      />
-                      <span className="truncate text-center text-xs font-semibold capitalize">
-                        {brawler.name.toLowerCase()}
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            {trialStats ? (
+              <ul className="grid gap-2.5 sm:grid-cols-3">
+                {season.brawlers.map((brawler) => {
+                  const accent = brawler.rarity?.color ?? '#8b95b8';
+                  const stat = trialStats.get(brawler.id);
+                  const best = stat?.bestMaps ?? [];
+                  return (
+                    <li key={brawler.id} className="card flex flex-col gap-2.5 p-3">
+                      <Link
+                        href={lp(brawlerPath(brawler.id, brawler.name))}
+                        className="flex items-center gap-3 transition-colors hover:text-brand"
+                      >
+                        <Image
+                          src={brawler.imageUrl}
+                          alt=""
+                          width={56}
+                          height={56}
+                          sizes="56px"
+                          className="size-12 shrink-0 rounded-xl object-contain"
+                          style={{ background: `color-mix(in srgb, ${accent} 14%, transparent)` }}
+                          loading="lazy"
+                          unoptimized
+                        />
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold">{titleCase(brawler.name)}</span>
+                          <span className="block text-xs text-muted">
+                            {stat?.tier ? `${t('Tier {tier}', { tier: stat.tier })} · ` : ''}
+                            {stat?.winRate !== null && stat?.winRate !== undefined
+                              ? t('{winRate} win rate', { winRate: formatPercent(stat.winRate) })
+                              : t('Not enough battles yet')}
+                          </span>
+                        </span>
+                      </Link>
+                      <p className="text-xs leading-relaxed text-muted">
+                        {best.length > 0 ? (
+                          <>
+                            {t('Top 3 pick on')}{' '}
+                            {best.slice(0, 3).map((m, i) => (
+                              <span key={m.name}>
+                                {i > 0 ? ', ' : ''}
+                                {m.href ? (
+                                  <Link href={lp(m.href)} className="font-medium text-foreground hover:text-brand">
+                                    {m.name}
+                                  </Link>
+                                ) : (
+                                  <span className="font-medium text-foreground">{m.name}</span>
+                                )}
+                              </span>
+                            ))}
+                            {best.length > 3 ? ` ${t('and {n} more', { n: best.length - 3 })}` : ''}
+                          </>
+                        ) : (
+                          t('Not a top 3 pick on any map in the rotation')
+                        )}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <ul className="grid grid-cols-3 gap-3 sm:max-w-md">
+                {season.brawlers.map((brawler) => {
+                  const accent = brawler.rarity?.color ?? '#8b95b8';
+                  return (
+                    <li key={brawler.id}>
+                      <Link
+                        href={lp(brawlerPath(brawler.id, brawler.name))}
+                        className="card card-interactive flex h-full flex-col items-center gap-1.5 p-2.5"
+                      >
+                        <Image
+                          src={brawler.imageUrl}
+                          alt=""
+                          width={72}
+                          height={72}
+                          sizes="72px"
+                          className="size-14 rounded-xl object-contain sm:size-16"
+                          style={{
+                            background: `color-mix(in srgb, ${accent} 14%, transparent)`,
+                          }}
+                          loading="lazy"
+                          unoptimized
+                        />
+                        <span className="truncate text-center text-xs font-semibold capitalize">
+                          {brawler.name.toLowerCase()}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
 
             <ul className="mt-4 space-y-1.5">
               {TRIAL_BRAWLER_RULES.map((rule) => (

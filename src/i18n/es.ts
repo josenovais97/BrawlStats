@@ -4068,4 +4068,18 @@ export const ES: Record<string, string> = {
     " y la",
   "Google Privacy Policy":
     "Política de Privacidad de Google",
+  "Top 3 pick on":
+    "Top 3 en",
+  "and {n} more":
+    "y {n} más",
+  "Not a top 3 pick on any map in the rotation":
+    "No está en el top 3 de ningún mapa de la rotación",
+  "Ranked season {number} maps":
+    "Mapas de la temporada {number} de Ranked",
+  "Brawl Stars Ranked Season {n}: best brawlers for every map ({v})":
+    "Temporada {n} de Ranked en Brawl Stars: los mejores brawlers para cada mapa ({v})",
+  "The best brawlers for every map in Ranked Season {n}, and how the trial brawlers {names} are doing. From sampled competitive battles, updated every few hours.":
+    "Los mejores brawlers para cada mapa de la temporada {n} de Ranked, y cómo les va a los brawlers de prueba {names}. Con partidas competitivas recogidas por nosotros, actualizado cada pocas horas.",
+  "The best brawlers for every map in Ranked Season {n}. From sampled competitive battles, updated every few hours.":
+    "Los mejores brawlers para cada mapa de la temporada {n} de Ranked. Con partidas competitivas recogidas por nosotros, actualizado cada pocas horas.",
 };
