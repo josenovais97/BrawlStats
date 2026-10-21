@@ -1,0 +1,12 @@
+[Unit]
+Description=BrawlZone: post free Brawl Stars rewards that land in Discord's #rewards-feed
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+# A post waits for any scheduled TikTok run to finish (the lock in
+# brawlzone-tiktok), then renders and uploads to three platforms.
+TimeoutStartSec=2700
+ExecStart=/usr/local/bin/brawlzone-run rewards-watch /usr/local/bin/brawlzone-rewards-watch

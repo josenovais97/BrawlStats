@@ -75,6 +75,13 @@ POST_MODE="MEDIA_UPLOAD"
 
 die() { echo "$*" >&2; exit 1; }
 
+# One TikTok run at a time (2026-10-21). TikTok rotates the refresh token on
+# every use, so two runs refreshing at once lock the integration out. The
+# timers were kept hours apart for that reason; brawlzone-rewards can now
+# start a post at any minute, so the separation is enforced here instead.
+exec 9>/var/lib/brawlzone/tiktok.lock
+flock -w 1800 9 || die "::error::another TikTok run held the lock for 30 minutes"
+
 # Write a timestamp into the state file, merging rather than replacing.
 #
 # Health check 11 reads these. A timer that stops firing never fails, so

@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+# Find new free Brawl Stars rewards and post them everywhere (2026-10-21).
+#
+#   brawlzone-rewards-watch
+#
+# Run every two minutes by brawlzone-rewards-watch.timer. Two sources:
+#
+# - brawlnetwork.com/rewards, read every ten minutes. Brawl Network (Chosen
+#   Network on X) lists every reward link with its name and the day it was
+#   added, and had the 2026-10-21 Mega Box / Credits / Power Points set the
+#   same day. Only links added in the last two days count: the page keeps
+#   pins from 2023, and those must never go out as new.
+# - Discord's #🎁-rewards-feed, private to the server owner and the bot. The
+#   owner can paste links there from a phone, and announcement channels of
+#   other servers can be followed into it; either is posted within minutes.
+#   Names come from the text on the link's own line ("Mega Box: link...").
+#
+# Every new link goes to brawlzone-rewards (Discord, TikTok, YouTube,
+# Instagram). Only Supercell's own hosts are accepted there, and a link
+# already posted is skipped, so a reward seen in both sources goes out once.
+# The first run of each source only records what it already lists.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+ENV_FILE="$REPO/.env.production"
+STATE=/var/lib/brawlzone/rewards-watch.json
+SEEN=/var/lib/brawlzone/rewards-seen.json
+
+DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
+DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
+
+# One line per batch to post: brawlzone-rewards' arguments, tab-separated.
+batches=$(DISCORD_TOKEN="$DISCORD_TOKEN" DISCORD_GUILD="$DISCORD_GUILD" python3 - "$STATE" "$SEEN" <<'PY'
+import datetime, html, json, os, re, sys, time, urllib.request
+
+state_path, seen_path = sys.argv[1], sys.argv[2]
+try:
+    state = json.load(open(state_path))
+except (OSError, ValueError):
+    state = {}
+try:
+    seen = {u.rstrip('/') for u in json.load(open(seen_path))}
+except (OSError, ValueError):
+    seen = set()
+
+URL = re.compile(r'(?:https?://)?(?:link\.brawlstars\.com/[a-z-]+/voucher/[0-9a-fA-F-]{36}|store\.supercell\.com/[^\s)>\]"\']*voucher=[0-9a-fA-F-]{36})/?')
+
+
+def norm(u):
+    return (u if u.startswith('http') else 'https://' + u).rstrip('/')
+
+
+def arg(name, url):
+    return f'{name}: {url}/' if 'link.brawlstars' in url else f'{name}: {url}'
+
+
+batches = []
+
+# ---- brawlnetwork.com/rewards
+if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
+    state['polled_brawlnetwork'] = time.time()
+    try:
+        req = urllib.request.Request('https://brawlnetwork.com/rewards/', headers={
+            'user-agent': 'Mozilla/5.0 (compatible; BrawlZone/1.0; +https://brawlzone.net)'})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            page = r.read().decode('utf-8', 'ignore')
+    except Exception as e:  # noqa: BLE001 -- the site being down is not our failure
+        print(f'::warning::brawlnetwork.com: {e}', file=sys.stderr)
+        page = ''
+    if page:
+        text = re.sub(r'<script.*?</script>|<style.*?</style>', ' ', page, flags=re.S)
+        # Each card reads "<name> | Added: October 21st, 2026 | ... | <a href=link>".
+        flat = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<(?!a\b)[^>]+>', ' | ', text)))
+        cutoff = datetime.date.today() - datetime.timedelta(days=2)
+        first = 'seeded_brawlnetwork' not in state
+        found = {}
+        pos = 0
+        for hit in URL.finditer(flat):
+            before = flat[pos:hit.start()]
+            pos = hit.end()
+            # The nearest card above the link: cards without a voucher link
+            # (store offers) sit between them.
+            cards = list(re.finditer(r'([^|]{2,60}?)\s*\|\s*(?:\|\s*)*Added:\s*([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,\s*(\d{4})', before))
+            if not cards:
+                continue
+            m = cards[-1]
+            try:
+                added = datetime.datetime.strptime(f'{m.group(2)} {m.group(3)} {m.group(4)}', '%B %d %Y').date()
+            except ValueError:
+                continue
+            u = norm(hit.group(0))
+            if first or added < cutoff or u in seen or u in found:
+                continue
+            found[u] = m.group(1).strip(' |')
+        state['seeded_brawlnetwork'] = True
+        if found:
+            batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
+            seen |= set(found)
+
+# ---- Discord #🎁-rewards-feed
+if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
+    api = 'https://discord.com/api/v10'
+    headers = {'Authorization': f"Bot {os.environ['DISCORD_TOKEN']}", 'User-Agent': 'BrawlZone (https://brawlzone.net, 1.0)'}
+
+    def call(path):
+        req = urllib.request.Request(api + path, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.load(r)
+
+    def name_for(line, start):
+        before = re.sub(r'\[|\]\(?$|<$', '', line[:start])
+        before = re.sub(r'[^\w\s&+.\'-]', ' ', before)  # emoji, colons, bullets
+        before = re.sub(r'\b(claim|here|link|free|get|use)\b', ' ', before, flags=re.I)
+        return ' '.join(before.split()[-5:]).strip(' .-') or 'Free Reward'
+
+    try:
+        guild = os.environ['DISCORD_GUILD']
+        channel = next((c for c in call(f'/guilds/{guild}/channels') if c.get('name') == '🎁-rewards-feed'), None)
+        if channel:
+            owner = call(f'/guilds/{guild}')['owner_id']
+            messages = call(f"/channels/{channel['id']}/messages?limit=25")
+            first = 'last_id' not in state
+            last = int(state.get('last_id', 0))
+            for m in sorted(messages, key=lambda m: int(m['id'])):
+                if int(m['id']) <= last:
+                    continue
+                last = int(m['id'])
+                # Followed posts arrive through a webhook; otherwise only the owner counts.
+                if first or not (m.get('webhook_id') or m['author']['id'] == owner):
+                    continue
+                parts = [m.get('content') or '']
+                for e in m.get('embeds', []):
+                    parts += [e.get('title') or '', e.get('description') or '']
+                    parts += [f"{f.get('name', '')}: {f.get('value', '')}" for f in e.get('fields', [])]
+                found = {}
+                for line in '\n'.join(parts).splitlines():
+                    for hit in URL.finditer(line):
+                        u = norm(hit.group(0))
+                        if u not in seen and u not in found:
+                            found[u] = name_for(line, hit.start())
+                if found:
+                    batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
+                    seen |= set(found)
+            state['last_id'] = str(last)
+    except Exception as e:  # noqa: BLE001
+        print(f'::warning::Discord: {e}', file=sys.stderr)
+
+json.dump(state, open(state_path + '.tmp', 'w')); os.replace(state_path + '.tmp', state_path)
+print('\n'.join(batches))
+PY
+) || { echo "::error::the rewards watcher failed" >&2; exit 1; }
+
+[ -n "$batches" ] || exit 0
+while IFS= read -r line; do
+  [ -n "$line" ] || continue
+  IFS=$'\t' read -r -a args <<< "$line"
+  echo "new rewards: ${args[*]}"
+  /usr/local/bin/brawlzone-rewards "${args[@]}" || echo "::warning::brawlzone-rewards failed for: ${args[*]}"
+done <<< "$batches"

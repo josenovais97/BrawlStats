@@ -1,0 +1,12 @@
+[Unit]
+Description=Check Discord's #rewards-feed for free rewards every two minutes
+
+[Timer]
+# Free rewards are a race: the first post with working links gets the
+# shares. Two minutes costs one Discord API read when nothing is new.
+OnCalendar=*-*-* *:00/2:15
+Persistent=false
+Unit=brawlzone-rewards-watch.service
+
+[Install]
+WantedBy=timers.target
