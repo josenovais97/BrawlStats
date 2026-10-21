@@ -31,6 +31,13 @@ post=1
 [ "${1:-}" = "--no-post" ] && { post=0; shift; }
 only="${1:-}"
 
+# A new brawler's first-stats post (brawlzone-newbrawler) took today's spare
+# YouTube upload: the daily quota fits about six.
+if [ "$post" = 1 ] && [ -z "$only" ] && [ -e "/var/lib/brawlzone/youtube-extra-$(date -u +%Y-%m-%d)" ]; then
+  echo "a new-brawler post used today's spare YouTube upload; rating again tomorrow"
+  exit 0
+fi
+
 KEY=$(grep -oP '^BRAWL_STARS_API_KEY=\K.*' "$ENV_FILE" | tr -d '"')
 [ -n "$KEY" ] || die "::error::no BRAWL_STARS_API_KEY in $ENV_FILE"
 API=$(grep -oP '^BRAWL_STARS_API_BASE=\K.*' "$ENV_FILE" | tr -d '"')

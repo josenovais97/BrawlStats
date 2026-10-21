@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# A new brawler's "first stats" post, two days after release (2026-10-21).
+#
+#   brawlzone-newbrawler [--no-post] [BRAWLER_ID]
+#
+# Run at 13:30 UTC by brawlzone-newbrawler.timer. A brawler is new the day it
+# first appears in BrawlAPI's catalogue that this job has not seen before; it
+# is posted once it has been out two days and has 5,000 decided trophy-match
+# battles behind its score, and given up on after ten days. Then:
+# scripts/new-brawler-report.ts (in the sampler container) for the numbers,
+# deploy/newbrawler/make.py for the slides, served from
+# /var/lib/brawlzone/social/newbrawler/<id>/, and brawlzone-tiktok posts them
+# everywhere like any carousel.
+#
+# A post day takes one of YouTube's ~6 daily uploads, so it leaves a flag that
+# brawlzone-rate reads and steps aside for.
+#
+# Also the housekeeping for the generated slides: anything under
+# /var/lib/brawlzone/social older than 30 days goes.
+#
+# --no-post draws the slides and stops. A BRAWLER_ID skips the waiting.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+ENV_FILE="$REPO/.env.production"
+SITE=https://brawlzone.net
+STATE=/var/lib/brawlzone/newbrawler.json
+SOCIAL=/var/lib/brawlzone/social
+CACHE=/var/lib/brawlzone/rewards-cache   # Pillow and fonts, shared
+GEARS="$CACHE/gear-names.json"
+PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+UA='BrawlZone (https://brawlzone.net)'
+
+die() { echo "$*" >&2; exit 1; }
+
+post=1
+[ "${1:-}" = "--no-post" ] && { post=0; shift; }
+only="${1:-}"
+
+find "$SOCIAL" -mindepth 2 -maxdepth 2 -type d -mtime +30 -exec rm -rf {} + 2>/dev/null
+
+# Which brawler, if any, is due today. Prints its id or nothing.
+if [ -n "$only" ]; then
+  due=$only
+else
+  due=$(curl -sf --max-time 60 -A "$UA" https://api.brawlapi.com/v1/brawlers | python3 -c '
+import datetime, json, os, sys
+path = sys.argv[1]
+today = datetime.date.today()
+ids = sorted(b["id"] for b in json.load(sys.stdin)["list"])
+try:
+    st = json.load(open(path))
+except (OSError, ValueError):
+    # First run: everything already out is old news. Vince was posted by hand.
+    st = {"known": ids, "pending": {}, "posted": [16000110]}
+for i in ids:
+    if i not in st["known"]:
+        st["known"].append(i)
+        st["pending"][str(i)] = today.isoformat()
+        print(f"new brawler in the catalogue: {i}", file=sys.stderr)
+due = ""
+for i, first in sorted(st["pending"].items(), key=lambda kv: kv[1]):
+    age = (today - datetime.date.fromisoformat(first)).days
+    if age > 10:
+        del st["pending"][i]
+        print(f"gave up on {i}: ten days without enough battles", file=sys.stderr)
+    elif age >= 2 and not due:
+        due = i
+json.dump(st, open(path + ".tmp", "w")); os.replace(path + ".tmp", path)
+print(due)
+' "$STATE") || die "::error::could not read the brawler catalogue"
+fi
+[ -n "$due" ] || { echo "no new brawler due"; exit 0; }
+echo "brawler due: $due"
+
+OUT="$SOCIAL/newbrawler/$due"
+mkdir -p "$OUT" "$CACHE/assets" || die "::error::cannot create $OUT"
+cd "$REPO" || die "::error::no checkout at $REPO"
+docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/new-brawler-report.ts "$due" \
+  > "$OUT/report.json.tmp" 2> "$OUT/report.err" || die "::error::new-brawler-report.ts failed: $(tail -c 600 "$OUT/report.err")"
+grep '^{' "$OUT/report.json.tmp" > "$OUT/report.json"
+
+ready=$(python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); print(1 if r["tier"] and r["battles"] >= 5000 and r["name"] else 0)' "$OUT/report.json")
+if [ "$ready" != 1 ] && [ -z "$only" ]; then
+  echo "not enough battles yet; trying again tomorrow"; exit 0
+fi
+
+# Gear names: the official API spells them, BrawlAPI does not list them.
+# Read from one leaderboard player's brawlers, refreshed weekly.
+if [ ! -s "$GEARS" ] || [ -n "$(find "$GEARS" -mtime +7)" ]; then
+  KEY=$(grep -oP '^BRAWL_STARS_API_KEY=\K.*' "$ENV_FILE" | tr -d '"')
+  API=$(grep -oP '^BRAWL_STARS_API_BASE=\K.*' "$ENV_FILE" | tr -d '"'); API=${API:-https://bsproxy.royaleapi.dev/v1}
+  tag=$(docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" brawlzone -At' <<'SQL'
+select tag from sampled_players where source = 'ranking' order by trophies desc nulls last limit 1
+SQL
+  )
+  curl -sf --max-time 30 -H "Authorization: Bearer $KEY" "$API/players/%23$tag" | python3 -c '
+import json, sys
+names = {}
+for b in json.load(sys.stdin)["brawlers"]:
+    for g in b.get("gears", []):
+        names[g["id"]] = g["name"]
+json.dump(names, open(sys.argv[1], "w"))' "$GEARS" || echo "::warning::gear names not refreshed"
+fi
+
+# The art: Brawlify's portrait when it has one, else the profile icon, which
+# exists from release day.
+avatar=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["avatarId"] or "")' "$OUT/report.json")
+curl -sf --max-time 30 -A "$UA" -o "$OUT/art.png" "https://cdn.brawlify.com/brawlers/borderless/$due.png" \
+  || curl -sf --max-time 30 -A "$UA" -o "$OUT/art.png" "https://cdn.brawlify.com/profile-icons/regular/$avatar.png" \
+  || die "::error::no art for brawler $due"
+
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
+   "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"
+docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+  -v "$REPO/deploy/newbrawler:/code:ro" -v "$OUT:/out" -v "$CACHE:/cache" \
+  "$PYTHON_IMAGE" sh -c '
+    [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
+    PYTHONPATH=/cache/py python /code/make.py /out/report.json /cache/gear-names.json /out/art.png /out /cache/assets' \
+  > "$OUT/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$OUT/make.log")"
+
+python3 - "$OUT" "$SITE/social/newbrawler/$due" "$(date +%s)" <<'PY' || die "::error::could not write slides.json"
+import json, sys
+out, base, v = sys.argv[1:4]
+meta = json.load(open(f'{out}/meta.json'))
+meta['date'] = out.rsplit('/', 1)[-1]
+meta['slides'] = [f'{base}/{i}.jpg?v={v}' for i in range(1, meta['count'] + 1)]
+json.dump(meta, open(f'{out}/slides.json', 'w'), indent=1, ensure_ascii=False)
+PY
+echo "slides: $SITE/social/newbrawler/$due/"
+[ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
+
+# Done with the waiting list before posting: a failed upload must not post twice.
+python3 - "$STATE" "$due" <<'PY'
+import json, os, sys
+path, due = sys.argv[1], sys.argv[2]
+st = json.load(open(path))
+st["pending"].pop(due, None)
+st["posted"] = sorted(set(st.get("posted", [])) | {int(due)})
+json.dump(st, open(path + ".tmp", "w")); os.replace(path + ".tmp", path)
+PY
+touch "/var/lib/brawlzone/youtube-extra-$(date -u +%Y-%m-%d)"
+FORCE=1 exec /usr/local/bin/brawlzone-tiktok newbrawler "$due"

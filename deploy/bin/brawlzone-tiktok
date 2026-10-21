@@ -222,6 +222,12 @@ case "$MODE" in
   # The Monday Ranked report, drawn on the box by brawlzone-weekly (not by
   # the site) and served by Caddy from /var/lib/brawlzone/social.
   weekly) MANIFEST="${SITE}/social/weekly/${DAY}/slides.json" ;;
+  # A new brawler's first stats, drawn on the box by brawlzone-newbrawler and
+  # served from /var/lib/brawlzone/social. The second argument is its id.
+  newbrawler)
+    case "$DAY" in *[!0-9]*|'') die "::error::newbrawler needs a brawler id" ;; esac
+    MANIFEST="${SITE}/social/newbrawler/${DAY}/slides.json"
+    DAY="$(date -u +%Y-%m-%d)" ;;
   # Free rewards, drawn on the box by brawlzone-rewards and served from
   # /var/lib/brawlzone/social the same way. The second argument is the run id.
   rewards)
@@ -242,7 +248,7 @@ case "$MODE" in
     case "$DAY" in *[!a-z0-9-]*|'') die "::error::promo needs a folder name, e.g. promo season50" ;; esac
     MANIFEST="${SITE}/tiktok/${DAY}/slides.json"
     DAY="$(date -u +%Y-%m-%d)" ;;
-  *)     die "::error::unknown mode '${MODE}' (expected counter, tiers, build, trio, patch, weekly, daily, hidden, challenge, playtest, rewards <id> or promo <name>)" ;;
+  *)     die "::error::unknown mode '${MODE}' (expected counter, tiers, build, trio, patch, weekly, daily, hidden, challenge, playtest, rewards <id>, newbrawler <id> or promo <name>)" ;;
 esac
 
 # Before anything that can exit, so "the job ran and decided there was nothing

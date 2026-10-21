@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for a new brawler due its first-stats post, daily at 13:30 UTC
+
+[Timer]
+# Before brawlzone-rate (14:00), which steps aside on a day this posts.
+OnCalendar=*-*-* 13:30:00
+Persistent=false
+Unit=brawlzone-newbrawler.service
+
+[Install]
+WantedBy=timers.target
