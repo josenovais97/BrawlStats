@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Upload one MP4 to the BrawlZone YouTube channel as a Short (2026-10-20).
 #
-#   brawlzone-youtube <video.mp4> <title> <description-file>
+#   brawlzone-youtube <video.mp4> <title> <description-file> [localizations.json]
 #
 # The daily TikTok job calls this with the same slides it posts, rendered by
 # its own post_video. Credentials: YOUTUBE_CLIENT_ID / _SECRET from
@@ -23,7 +23,7 @@ TOKEN_FILE="$HOME/.brawlzone-youtube.json"
 
 die() { echo "$*" >&2; exit 1; }
 
-video="${1:-}"; title="${2:-}"; desc_file="${3:-}"
+video="${1:-}"; title="${2:-}"; desc_file="${3:-}"; l10n_file="${4:-}"
 [ -f "$video" ] && [ -n "$title" ] && [ -f "$desc_file" ] || die "usage: brawlzone-youtube <video.mp4> <title> <description-file>"
 [ -r "$TOKEN_FILE" ] || die "::error::$TOKEN_FILE missing -- authorise once at /api/youtube/auth?key=…"
 
@@ -43,9 +43,16 @@ access=$(curl -sf --max-time 30 https://oauth2.googleapis.com/token \
 
 # YouTube makes a vertical video under three minutes a Short on its own;
 # #Shorts in the title is the belt to that brace. Titles stop at 100 chars.
-meta=$(python3 - "$title" "$desc_file" <<'PY'
-import json, sys
+# Translated titles and descriptions (brawlzone-yt-locales), when given: YouTube
+# shows each viewer the one in their language. Optional all the way down -- if
+# YouTube refuses them the upload is retried without, below.
+meta=$(python3 - "$title" "$desc_file" "$l10n_file" <<'PY'
+import json, os, sys
 title, desc = sys.argv[1], open(sys.argv[2], encoding='utf-8').read()
+try:
+    l10n = json.load(open(sys.argv[3], encoding='utf-8')) if sys.argv[3] and os.path.exists(sys.argv[3]) else {}
+except ValueError:
+    l10n = {}
 # The subscribe ask leads: YouTube shows two lines of a Short's description
 # before "more", and the channel needs 100 subscribers for the Creator Code.
 desc = ('🔔 Subscribe for new Brawl Stars Ranked picks every day: '
@@ -53,7 +60,7 @@ desc = ('🔔 Subscribe for new Brawl Stars Ranked picks every day: '
 title = (title if '#shorts' in title.lower() else f'{title} #Shorts')
 if len(title) > 100:
     title = title[:100 - len(' #Shorts')].rstrip() + ' #Shorts'
-print(json.dumps({
+body = {
     'snippet': {
         'title': title,
         'description': desc[:4900],
@@ -62,17 +69,38 @@ print(json.dumps({
         'defaultLanguage': 'en',
     },
     'status': {'privacyStatus': 'public', 'selfDeclaredMadeForKids': False},
-}))
+}
+if l10n:
+    body['localizations'] = {
+        lang: {'title': (v['title'] if '#shorts' in v['title'].lower() else f"{v['title']} #Shorts")[:100],
+               'description': v['description'][:4900]}
+        for lang, v in l10n.items()
+    }
+print(json.dumps(body))
 PY
 )
 
 size=$(stat -c %s "$video")
-opened=$(curl -s --max-time 60 -D - -X POST \
-  'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status' \
-  -H "Authorization: Bearer ${access}" -H 'Content-Type: application/json; charset=UTF-8' \
-  -H "X-Upload-Content-Length: ${size}" -H 'X-Upload-Content-Type: video/mp4' \
-  --data "$meta")
+open_session () { # metadata json, parts
+  curl -s --max-time 60 -D - -X POST \
+    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=$2" \
+    -H "Authorization: Bearer ${access}" -H 'Content-Type: application/json; charset=UTF-8' \
+    -H "X-Upload-Content-Length: ${size}" -H 'X-Upload-Content-Type: video/mp4' \
+    --data "$1"
+}
+if printf '%s' "$meta" | grep -q '"localizations"'; then
+  opened=$(open_session "$meta" snippet,status,localizations)
+else
+  opened=$(open_session "$meta" snippet,status)
+fi
 session=$(printf '%s' "$opened" | grep -i '^location:' | cut -d' ' -f2- | tr -d '\r')
+if [ -z "$session" ] && printf '%s' "$meta" | grep -q '"localizations"'; then
+  # The translations are the extra; the Short is the point.
+  echo "youtube: localizations refused ($(printf '%s' "$opened" | grep -o '"reason": *"[^"]*"' | head -1)), uploading in English only" >&2
+  meta=$(printf '%s' "$meta" | python3 -c 'import json,sys; d=json.load(sys.stdin); d.pop("localizations",None); print(json.dumps(d))')
+  opened=$(open_session "$meta" snippet,status)
+  session=$(printf '%s' "$opened" | grep -i '^location:' | cut -d' ' -f2- | tr -d '\r')
+fi
 # youtubeSignupRequired: the account authorised has no channel of its own --
 # a brand channel has to be picked on Google's account screen.
 # quotaExceeded: the day's 10,000 units are spent.

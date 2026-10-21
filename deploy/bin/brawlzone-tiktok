@@ -759,13 +759,18 @@ else:
 # brawlzone-youtube appends " #Shorts" and cuts at 100.
 print(t if len(t) <= 92 else title)
 ' "$MODE" "$TITLE")
+  # The same Short's title and description in Portuguese and Spanish
+  # (2026-10-21); none for a mode without a template, or on any failure.
+  printf '%s' "$manifest_json" > "${YT_WORK}/manifest.json"
+  /usr/local/bin/brawlzone-yt-locales "$MODE" "${YT_WORK}/manifest.json" "${YT_WORK}/description.txt" \
+    > "${YT_WORK}/l10n.json" 2>/dev/null || echo '{}' > "${YT_WORK}/l10n.json"
   YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   # And the ask up front, on the cover. Optional for the same reason.
   YT_BANNER=""
   curl -sf -o "${YT_WORK}/banner-src.png" --max-time 30 "${SITE}/youtube/subscribe-banner.png" \
     && YT_BANNER="${YT_WORK}/banner-src.png"
   if render_video "$YT_WORK" "$YT_MUSIC" "$YT_BANNER" \
-     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "${YT_TITLE:-$TITLE}" "${YT_WORK}/description.txt" 2>&1); then
+     && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "${YT_TITLE:-$TITLE}" "${YT_WORK}/description.txt" "${YT_WORK}/l10n.json" 2>&1); then
     echo "$YOUTUBE_RESULT"
   else
     YOUTUBE_RESULT="failed: ${VIDEO_ERR:-$YOUTUBE_RESULT}"

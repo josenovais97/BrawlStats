@@ -1,0 +1,165 @@
+#!/usr/bin/env python3
+"""Portuguese and Spanish titles and descriptions for a YouTube Short (2026-10-21).
+
+    brawlzone-yt-locales <mode> <manifest.json> <english-description-file>
+
+Prints {"pt-BR": {"title", "description"}, "es-419": {...}, ...} for
+brawlzone-youtube's `localizations`, or {} when the mode has no template.
+YouTube then shows each viewer the title in their own language: Brazil is
+the site's biggest country, and Latin America most of the rest.
+
+Map, mode and brawler names come from the game's own localisation files
+(BrawlAPI's raw/localization, the same files src/lib/game-l10n.ts reads), so
+a Brazilian viewer reads the map name they see on their draft screen. The
+files are ~2 MB each and cached for three days; when they cannot be read the
+names stay in English, which is what the game itself shows for most of them.
+"""
+import json
+import os
+import re
+import sys
+import time
+import urllib.request
+
+RAW = 'https://api.brawlapi.com/v2/raw/localization/'
+CACHE = '/var/lib/brawlzone/l10n'
+FILES = {'en': 'texts', 'pt': 'pt', 'es': 'es-419'}
+MODES = {'gemGrab': 'Gem Grab', 'heist': 'Heist', 'bounty': 'Bounty', 'hotZone': 'Hot Zone',
+         'brawlBall': 'Brawl Ball', 'knockout': 'Knockout', 'wipeout': 'Wipeout'}
+SUB = {
+    'pt': '🔔 Inscreva-se para ver novas escolhas do Ranked todos os dias: ',
+    'es': '🔔 Suscríbete para ver nuevos picks de Ranked cada día: ',
+}
+CHANNEL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1'
+BUILD_WORDS = {'pt': ('Poder de Estrela', 'Acessório', 'Engrenagens'),
+               'es': ('Habilidad Estelar', 'Gadget', 'Refuerzos')}
+
+
+def column(lang):
+    """TID -> string for one language, from the cache when it is fresh."""
+    path = f'{CACHE}/{FILES[lang]}.json'
+    try:
+        if time.time() - os.path.getmtime(path) < 3 * 86400:
+            return json.load(open(path))
+    except (OSError, ValueError):
+        pass
+    req = urllib.request.Request(RAW + FILES[lang], headers={'user-agent': 'BrawlZone (https://brawlzone.net)'})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        data = json.load(r)['data']
+    col = {}
+    for tid, row in data.items():
+        for key, value in row.items():
+            if key not in ('id', 'TID') and isinstance(value, str) and value.strip():
+                col[tid] = value.strip()
+    os.makedirs(CACHE, exist_ok=True)
+    with open(path + '.tmp', 'w') as f:
+        json.dump(col, f)
+    os.replace(path + '.tmp', path)
+    return col
+
+
+def key(s):
+    return re.sub(r'[^a-z0-9]', '', s.lower())
+
+
+def calm(s):
+    """"FÚTBRAWL" -> "Fútbrawl": the game shouts some names on buttons."""
+    return re.sub(r'\b(\w)(\w+)\b', lambda m: m.group(1) + m.group(2).lower() if m.group(0).isupper() and len(m.group(0)) > 1 else m.group(0), s)
+
+
+def namer(lang, en):
+    """English name -> the game's name for it in `lang`, or the English back."""
+    try:
+        local = column(lang)
+    except Exception:  # noqa: BLE001 -- English names are a fine fallback
+        return lambda name: name
+    index = {}
+    for tid, text in en.items():
+        index.setdefault(key(text), []).append(tid)
+
+    def name(english):
+        found = [local[t] for t in index.get(key(english), []) if t in local]
+        if not found:
+            return english
+        mixed = [f for f in found if not f.isupper()]
+        return mixed[0] if mixed else calm(found[0])
+    return name
+
+
+def fit(title, short):
+    """brawlzone-youtube appends " #Shorts" and YouTube stops at 100."""
+    return title if len(title) <= 92 else short[:92]
+
+
+def main():
+    mode, manifest_path, desc_path = sys.argv[1:4]
+    d = json.load(open(manifest_path))
+    english_desc = open(desc_path, encoding='utf-8').read()
+    tags = ' '.join(re.findall(r'#\w+', english_desc))
+    b, m, gm = d.get('brawler'), d.get('map'), MODES.get(d.get('mode') or '', '')
+    if not ((mode in ('counter', 'build') and b) or (mode in ('tiers', 'trio') and m)):
+        print('{}')
+        return
+    try:
+        en = column('en')
+    except Exception:  # noqa: BLE001
+        en = {}
+
+    out = {}
+    for lang in ('pt', 'es'):
+        n = namer(lang, en) if en else (lambda s: s)
+        B = n(b.title()) if b else ''
+        M = n(m) if m else ''
+        G = n(gm) if gm else ''
+        where = f'{M} ({G})' if G else M
+        # Fixed, not looked up: the game's files only have these as button
+        # labels, shouted and broken across lines ("PODER\\nDE ESTRELA").
+        sp, gadget, gears = BUILD_WORDS[lang]
+        if lang == 'pt':
+            t = {
+                'counter': (f'Como Counterar {B} no Ranked do Brawl Stars: Melhores Escolhas contra {B}',
+                            f'Como Counterar {B} no Ranked do Brawl Stars'),
+                'tiers': (f'Melhores Brawlers para {where} | Tier List do Ranked do Brawl Stars',
+                          f'Melhores Brawlers para {where} | Brawl Stars'),
+                'build': (f'Melhor Build de {B} no Brawl Stars: {sp}, {gadget} e {gears}',
+                          f'Melhor Build de {B} no Brawl Stars'),
+                'trio': (f'Melhor Time para {where} | Ranked do Brawl Stars',
+                         f'Melhor Time para {M} | Brawl Stars'),
+            }[mode]
+            body = {
+                'counter': f'Os melhores brawlers contra {B} no Ranked, com taxas de vitória de batalhas reais. Um brawler diferente todos os dias.',
+                'tiers': f'Os melhores brawlers para {where} no Ranked, com taxas de vitória de batalhas reais. Um mapa diferente todos os dias.',
+                'build': f'A build de {B} que mais vence no Ranked ({sp}, {gadget} e {gears}), com dados de jogadores reais.',
+                'trio': f'O time de 3 que mais vence em {where} no Ranked, e mais duas opções. Um mapa diferente todos os dias.',
+            }[mode]
+            site = 'Todos os mapas e brawlers em português: https://brawlzone.net/pt'
+        else:
+            t = {
+                'counter': (f'Cómo Counterear a {B} en Ranked de Brawl Stars: Mejores Picks contra {B}',
+                            f'Cómo Counterear a {B} en Ranked de Brawl Stars'),
+                'tiers': (f'Mejores Brawlers para {where} | Tier List de Ranked de Brawl Stars',
+                          f'Mejores Brawlers para {where} | Brawl Stars'),
+                'build': (f'Mejor Build de {B} en Brawl Stars: {sp}, {gadget} y {gears}',
+                          f'Mejor Build de {B} en Brawl Stars'),
+                'trio': (f'Mejor Equipo para {where} | Ranked de Brawl Stars',
+                         f'Mejor Equipo para {M} | Brawl Stars'),
+            }[mode]
+            body = {
+                'counter': f'Los mejores brawlers contra {B} en Ranked, con tasas de victoria de partidas reales. Un brawler distinto cada día.',
+                'tiers': f'Los mejores brawlers para {where} en Ranked, con tasas de victoria de partidas reales. Un mapa distinto cada día.',
+                'build': f'La build de {B} que más gana en Ranked ({sp}, {gadget} y {gears}), con datos de jugadores reales.',
+                'trio': f'El equipo de 3 que más gana en {where} en Ranked, y dos opciones más. Un mapa distinto cada día.',
+            }[mode]
+            site = 'Todos los mapas y brawlers en español: https://brawlzone.net/es'
+        entry = {
+            'title': fit(*t),
+            'description': f'{SUB[lang]}{CHANNEL}\n\n{body}\n\n{site}\n{tags}'.strip(),
+        }
+        # YouTube matches a viewer's language by tag; both spellings cost nothing.
+        for tag in ({'pt': ('pt', 'pt-BR'), 'es': ('es', 'es-419')}[lang]):
+            out[tag] = entry
+    print(json.dumps(out, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()
