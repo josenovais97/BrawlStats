@@ -322,15 +322,21 @@ echo "${slide_count} slides ready"
 #
 # The numbers belong in the caption as well as on the images because TikTok
 # indexes caption text and does not read pictures.
-IFS=$'\t' read -r TITLE DESCRIPTION < <(
+#
+# One read per field. Both used to come from a single `read`, which stops at
+# the first newline: every multi-line caption (rewards, weekly report, promos)
+# went out as its first paragraph only, without its links or hashtags, on
+# TikTok, YouTube and Instagram alike, until 2026-10-21.
+manifest_field () { # field, default, max length
   printf '%s' "$manifest_json" | python3 -c '
 import json, sys
-d = json.load(sys.stdin)
-title = (d.get("title") or "What the Brawl Stars data says today")[:90]
-desc = (d.get("description") or "Measured from sampled Brawl Stars battles.")[:3900]
-print(title.replace("\t", " ") + "\t" + desc.replace("\t", " "))
-'
-)
+field, default, cap = sys.argv[1], sys.argv[2], int(sys.argv[3])
+print((json.load(sys.stdin).get(field) or default)[:cap])
+' "$@"
+}
+TITLE=$(manifest_field title "What the Brawl Stars data says today" 90)
+TITLE=${TITLE//[$'\t\n']/ }
+DESCRIPTION=$(manifest_field description "Measured from sampled Brawl Stars battles." 3900)
 [ -n "$TITLE" ] || die "::error::manifest carried no caption"
 
 # ------------------------------------------------- privacy, for DIRECT_POST
