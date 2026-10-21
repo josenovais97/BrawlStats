@@ -74,7 +74,9 @@ standing = re.search(r'(Top [0-9.]+% of players|Worth more than [0-9.]+% of play
 if not value:
     sys.exit(1)
 json.dump({'value': value.group(1), 'standing': standing.group(1) if standing else '',
-           'rank': rank.title() if rank else ''}, open(out, 'w'))
+           # "MASTERS II" -> "Masters II": .title() would make it "Masters Ii".
+           'rank': ' '.join(w if re.fullmatch(r'[IVX]+', w) else w.capitalize() for w in rank.split())},
+          open(out, 'w'))
 PY
   picked=$tag
   break
