@@ -95,6 +95,25 @@ seen = sorted(set(seen) | {r['url'].rstrip('/') for r in rewards})
 json.dump(seen, open(seen_path + '.tmp', 'w')); os.replace(seen_path + '.tmp', seen_path)
 PY
 
+# The feed the Bubble app will poll for its "free reward" notification
+# (2026-10-21): the newest rewards first, at most twenty, as plain JSON that
+# Caddy already serves at /social/rewards/latest.json. A file rather than an
+# API route, so nothing in the site has to change and nothing has to run.
+python3 - "$OUT/rewards.json" "$PUBLIC/latest.json" "$ID" "$SITE/social/rewards/$ID" <<'PY' || echo "::warning::latest.json not updated"
+import datetime, json, os, sys
+rewards, path, run, base = json.load(open(sys.argv[1])), sys.argv[2], sys.argv[3], sys.argv[4]
+try:
+    feed = json.load(open(path))
+except (OSError, ValueError):
+    feed = {'items': []}
+now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+new = [{'id': r['url'].rstrip('/').rsplit('/', 1)[-1].split('=')[-1], 'name': r['name'], 'url': r['url'],
+        'image': f'{base}/1.jpg', 'postedAt': now} for r in rewards]
+known = {i['id'] for i in new}
+feed = {'updatedAt': now, 'items': (new + [i for i in feed['items'] if i['id'] not in known])[:20]}
+json.dump(feed, open(path + '.tmp', 'w'), indent=1, ensure_ascii=False); os.replace(path + '.tmp', path)
+PY
+
 # Discord first: the links are clickable there, and it takes a second.
 DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
 DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
