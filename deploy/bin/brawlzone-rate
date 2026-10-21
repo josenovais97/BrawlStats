@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# "Rating a top player's account": a daily Short on one leaderboard player (2026-10-21).
+#
+#   brawlzone-rate [--no-post] [TAG]
+#
+# Run at 14:00 UTC by brawlzone-rate.timer. Picks a player from the public
+# leaderboards we sample (sources "ranking" and "region": never "lookup", the
+# people who searched themselves on the site, and never anyone twice), and
+# turns their account into four slides with deploy/rate/make.py: who they
+# are, what the account is worth (the site's own /account-value card), their
+# best brawlers, and "how much is yours worth?". Then a YouTube Short (music,
+# subscribe banner) and an Instagram Reel. Not TikTok: its inbox holds five
+# pending uploads a day, and the four daily posts and the rewards need them.
+#
+# --no-post draws the slides and stops. A TAG rates that player instead.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+ENV_FILE="$REPO/.env.production"
+SITE=https://brawlzone.net
+PUBLIC=/var/lib/brawlzone/social/rate
+CACHE=/var/lib/brawlzone/rewards-cache   # Pillow and fonts, shared with brawlzone-rewards
+SEEN=/var/lib/brawlzone/rate-seen.json
+PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+
+die() { echo "$*" >&2; exit 1; }
+# shellcheck disable=SC1091
+. /usr/local/lib/brawlzone-video.sh || die "::error::/usr/local/lib/brawlzone-video.sh missing"
+
+post=1
+[ "${1:-}" = "--no-post" ] && { post=0; shift; }
+only="${1:-}"
+
+KEY=$(grep -oP '^BRAWL_STARS_API_KEY=\K.*' "$ENV_FILE" | tr -d '"')
+[ -n "$KEY" ] || die "::error::no BRAWL_STARS_API_KEY in $ENV_FILE"
+API=$(grep -oP '^BRAWL_STARS_API_BASE=\K.*' "$ENV_FILE" | tr -d '"')
+API=${API:-https://bsproxy.royaleapi.dev/v1}
+
+DAY=$(date -u +%Y-%m-%d)
+OUT="$PUBLIC/$DAY"
+mkdir -p "$OUT" "$CACHE/assets" "$CACHE/icons" || die "::error::cannot create $OUT"
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
+   "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"
+
+# Candidates: leaderboard players over 100k trophies, in random order.
+cd "$REPO" || die "::error::no checkout at $REPO"
+if [ -n "$only" ]; then
+  candidates="${only#\#}"$'\t'
+else
+  candidates=$(docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" brawlzone -At -F "$(printf "\t")"' <<'SQL'
+select tag, coalesce(highest_ranked_rank_name, '') from sampled_players
+ where source in ('ranking', 'region') and trophies >= 100000
+ order by random() limit 40
+SQL
+  ) || die "::error::could not read candidates"
+fi
+
+picked=""
+while IFS=$'\t' read -r tag rank; do
+  [ -n "$tag" ] || continue
+  if [ -z "$only" ] && python3 -c 'import json,sys; sys.exit(0 if sys.argv[2] in json.load(open(sys.argv[1])) else 1)' "$SEEN" "$tag" 2>/dev/null; then
+    continue
+  fi
+  curl -sf --max-time 30 -H "Authorization: Bearer $KEY" "$API/players/%23$tag" -o "$OUT/player.json" || continue
+  # Names are shown big: skip anything that reads as a link or an ad.
+  python3 -c 'import json,re,sys; n=json.load(open(sys.argv[1]))["name"]; sys.exit(0 if 2 <= len(n) <= 20 and not re.search(r"https?|www|\.(com|net|gg)|@", n, re.I) else 1)' "$OUT/player.json" || continue
+  curl -sf --max-time 120 "$SITE/account-value/$tag/story/en" -o "$OUT/value.png" || continue
+  curl -sf --max-time 120 "$SITE/account-value/$tag" | sed 's/<[^>]*>/ /g' | tr -s ' ' > "$OUT/page.txt" || continue
+  python3 - "$OUT/page.txt" "$OUT/facts.json" "$rank" <<'PY' || continue
+import json, re, sys
+text, out, rank = open(sys.argv[1]).read(), sys.argv[2], sys.argv[3]
+value = re.search(r'([0-9][0-9,.]*[MK]?) coins', text)
+standing = re.search(r'(Top [0-9.]+% of players|Worth more than [0-9.]+% of players)', text)
+if not value:
+    sys.exit(1)
+json.dump({'value': value.group(1), 'standing': standing.group(1) if standing else '',
+           'rank': rank.title() if rank else ''}, open(out, 'w'))
+PY
+  picked=$tag
+  break
+done <<< "$candidates"
+[ -n "$picked" ] || die "::error::no candidate could be rated"
+echo "rating #$picked"
+
+docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+  -v "$REPO/deploy/rate:/code:ro" -v "$OUT:/out" -v "$CACHE:/cache" \
+  "$PYTHON_IMAGE" sh -c '
+    [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
+    PYTHONPATH=/cache/py python /code/make.py /out/player.json /out/value.png /out/facts.json /out /cache/assets /cache/icons' \
+  > "$CACHE/rate-make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$CACHE/rate-make.log")"
+
+read -r TITLE < <(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["title"])' "$OUT/meta.json")
+python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["description"])' "$OUT/meta.json" > "$OUT/description.txt"
+echo "slides: $SITE/social/rate/$DAY/ -- $TITLE"
+[ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
+
+# Remembered before posting, so a failed upload does not feature them twice.
+python3 - "$SEEN" "$picked" <<'PY'
+import json, os, sys
+path, tag = sys.argv[1], sys.argv[2]
+try:
+    seen = json.load(open(path))
+except (OSError, ValueError):
+    seen = []
+json.dump(sorted(set(seen) | {tag}), open(path + '.tmp', 'w')); os.replace(path + '.tmp', path)
+PY
+
+SLIDES=$(for i in 1 2 3 4; do echo "file://$OUT/$i.jpg"; done)
+MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
+failed=0
+
+YT=$(mktemp -d); IG=$(mktemp -d)
+trap 'rm -rf "$YT" "$IG"' EXIT
+BANNER=""
+curl -sf -o "$YT/banner.png" --max-time 30 "$SITE/youtube/subscribe-banner.png" && BANNER="$YT/banner.png"
+if render_video "$YT" "$MUSIC" "$BANNER"; then
+  /usr/local/bin/brawlzone-youtube "$YT/out.mp4" "$TITLE" "$OUT/description.txt" || { echo "::warning::YouTube upload failed"; failed=1; }
+else
+  echo "::warning::YouTube render failed: ${VIDEO_ERR:-?}"; failed=1
+fi
+
+printf '%s\n\nCheck yours: link in bio\n' "$(cat "$OUT/description.txt")" > "$IG/caption.txt"
+VIDEO_ERR=""
+if render_video "$IG" "$MUSIC"; then
+  /usr/local/bin/brawlzone-instagram "$IG/out.mp4" "$IG/caption.txt" 2>&1 | tail -n 1 || failed=1
+else
+  echo "::warning::Instagram render failed: ${VIDEO_ERR:-?}"; failed=1
+fi
+exit "$failed"

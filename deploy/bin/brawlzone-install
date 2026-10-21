@@ -55,8 +55,9 @@ dest_for () { # relative path under deploy/ -> "<dest> <mode>"
   local rel=$1 name
   name=$(basename "$rel")
   case "$rel" in
-    # Sourced as a library by the mail-formatting jobs, not executed.
+    # Sourced as libraries (mail formatting, video rendering), not executed.
     bin/brawlzone-html.sh)          echo "/usr/local/lib/$name 644" ;;
+    bin/brawlzone-video.sh)         echo "/usr/local/lib/$name 644" ;;
     # The two entry points systemd invokes by absolute path from $HOME.
     bin/*.sh)                       echo "/home/ubuntu/$name 755" ;;
     bin/*)                          echo "/usr/local/bin/$name 755" ;;

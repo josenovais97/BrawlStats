@@ -1,0 +1,12 @@
+[Unit]
+Description=Post the daily account-rating Short at 14:00 UTC
+
+[Timer]
+# Between the 12:00 and 17:10 posts, an hour before the 15:00 Story; all of
+# them upload to Instagram, and the YouTube quota allows about six a day.
+OnCalendar=*-*-* 14:00:00
+Persistent=false
+Unit=brawlzone-rate.service
+
+[Install]
+WantedBy=timers.target

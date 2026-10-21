@@ -1,0 +1,10 @@
+[Unit]
+Description=BrawlZone: the daily "rating a top player's account" Short (YouTube, Instagram)
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+TimeoutStartSec=1200
+ExecStart=/usr/local/bin/brawlzone-run rate /usr/local/bin/brawlzone-rate
