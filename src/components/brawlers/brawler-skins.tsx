@@ -1,6 +1,5 @@
 import Image from 'next/image';
 
-import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BrawlerSkinUsage } from '@/lib/stats';
 import { getT } from '@/lib/t';
@@ -20,16 +19,20 @@ import { requestLocale } from '@/lib/request-locale';
  * newest — so a row without art still renders, with its bar and its numbers.
  *
  * The default skin falls back to the brawler's portrait rather than a blank,
- * because the portrait IS what the default looks like.
+ * because the portrait IS what the default looks like. The page's resolved
+ * portrait, not one built from the id: the mirror publishes a new brawler's
+ * art days after the brawler, and an id-built URL drew Vince's default skin as
+ * a broken image on the week he came out (2026-10-21).
  */
 export function BrawlerSkins({
   skins,
-  brawlerId,
+  portrait,
   brawlerName,
   artFor,
 }: {
   skins: BrawlerSkinUsage[];
-  brawlerId: number;
+  /** The portrait the page itself shows, already past the missing-art fallbacks. */
+  portrait: string;
   brawlerName: string;
   /** Resolves a skin to its wiki artwork, or null when the wiki has no file. */
   artFor: (skin: BrawlerSkinUsage) => string | null;
@@ -56,7 +59,7 @@ export function BrawlerSkins({
       <ul className="card divide-y divide-border overflow-hidden">
         {top.map((skin) => (
           <li key={skin.id} className="flex items-center gap-3 px-3 py-2.5">
-            <SkinArt src={skin.isDefault ? brawlerPortraitUrl(brawlerId) : artFor(skin)} alt="" />
+            <SkinArt src={skin.isDefault ? portrait : artFor(skin)} alt="" />
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-2">
                 <span className="truncate text-sm font-semibold capitalize">

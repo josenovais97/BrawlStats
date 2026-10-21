@@ -1144,7 +1144,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           />
           <BrawlerSkins
             skins={skins}
-            brawlerId={brawlerId}
+            portrait={brawlerMeta.get(brawler.id)?.imageUrl ?? brawler.imageUrl}
             brawlerName={brawler.name}
             artFor={(skin) => skinArtUrl(skinArt, brawler.name, skin.name, 96)}
           />
