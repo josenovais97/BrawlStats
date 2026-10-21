@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# The daily Instagram Story: today's Ranked tier list for one rank (2026-10-21).
+#
+#   brawlzone-ig-story [--no-post]
+#
+# Run at 15:00 UTC by brawlzone-ig-story.timer: afternoon in Brazil, evening
+# in India, Bangladesh and Pakistan, the site's biggest countries.
+#
+# The rank turns with the weekday, so the Story is a different list each day
+# rather than the same picture moving by one brawler. The image is the site's
+# own /tier-list/ranked/story/<rank>/en, with deploy/story/make.py adding a
+# question and a "link in bio" pill underneath -- the API cannot put a link
+# sticker on a Story.
+#
+# --no-post draws the image and stops, printing where it is.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+SITE=https://brawlzone.net
+CACHE=/var/lib/brawlzone/rewards-cache   # Pillow, shared with brawlzone-rewards
+PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+
+die() { echo "$*" >&2; exit 1; }
+
+# Monday is 1. Mythic twice: it is the rank most players are climbing through.
+case "$(date -u +%u)" in
+  1|6) rank=all;       prompt='AGREE? REPLY WITH YOUR MAIN' ;;
+  2)   rank=diamond;   prompt='DIAMOND AND BELOW: WHO DO YOU PICK?' ;;
+  3|7) rank=mythic;    prompt='MYTHIC PLAYERS: AGREE?' ;;
+  4)   rank=legendary; prompt='LEGENDARY: WHO IS MISSING FROM S?' ;;
+  5)   rank=masters;   prompt='WHAT THE BEST PLAYERS PICK' ;;
+esac
+
+WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
+mkdir -p "$CACHE/assets"
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" "$CACHE/assets/" \
+  || die "::error::fonts missing from the checkout"
+
+# A cold render of the tier image queries the roster; give it time.
+curl -sf --max-time 180 -o "$WORK/tier.png" "$SITE/tier-list/ranked/story/$rank/en?d=$(date -u +%Y%m%d)" \
+  || die "::error::the tier-list story image ($rank) did not load"
+
+docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
+  -v "$REPO/deploy/story:/code:ro" -v "$WORK:/w" -v "$CACHE:/cache" \
+  "$PYTHON_IMAGE" sh -c '
+    [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
+    PYTHONPATH=/cache/py python /code/make.py /w/tier.png "$1" /w/story.jpg /cache/assets' _ "$prompt" \
+  > "$WORK/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$WORK/make.log")"
+echo "story drawn: $rank"
+
+if [ "${1:-}" = "--no-post" ]; then
+  cp "$WORK/story.jpg" "/tmp/brawlzone-story-$rank.jpg"
+  echo "--no-post: /tmp/brawlzone-story-$rank.jpg"
+  exit 0
+fi
+/usr/local/bin/brawlzone-instagram --story "$WORK/story.jpg"

@@ -2,6 +2,11 @@
 # Publish one MP4 to the BrawlZone Instagram account as a Reel (2026-10-20).
 #
 #   brawlzone-instagram <video.mp4> <caption-file>
+#   brawlzone-instagram --story <image.jpg>
+#
+# --story publishes a JPEG as a Story instead (2026-10-21, for
+# brawlzone-ig-story). The API takes no stickers, so a Story from here cannot
+# carry a link sticker; the image itself has to point at the bio link.
 #
 # The daily TikTok job calls this with the same slides it posts, rendered by
 # its own render_video. Instagram's carousels cannot be 9:16, so the slides go
@@ -27,8 +32,14 @@ SITE="https://brawlzone.net"
 
 die() { echo "$*" >&2; exit 1; }
 
-video="${1:-}"; caption_file="${2:-}"
-[ -f "$video" ] && [ -f "$caption_file" ] || die "usage: brawlzone-instagram <video.mp4> <caption-file>"
+story=0
+if [ "${1:-}" = "--story" ]; then
+  story=1; video="${2:-}"; caption_file=""
+  [ -f "$video" ] || die "usage: brawlzone-instagram --story <image.jpg>"
+else
+  video="${1:-}"; caption_file="${2:-}"
+  [ -f "$video" ] && [ -f "$caption_file" ] || die "usage: brawlzone-instagram <video.mp4> <caption-file>"
+fi
 [ -r "$TOKEN_FILE" ] || die "::error::$TOKEN_FILE missing -- generate a token in the Meta app"
 
 json_field () { # field, reads JSON on stdin
@@ -69,24 +80,29 @@ fi
 
 # 1. Where Instagram will fetch it. Anything older than a day is a leftover
 # from a run that was killed before its trap.
-find "$REEL_DIR" -maxdepth 1 -name '*.mp4' -mmin +1440 -delete 2>/dev/null
-name="$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n').mp4"
+find "$REEL_DIR" -maxdepth 1 \( -name '*.mp4' -o -name '*.jpg' \) -mmin +1440 -delete 2>/dev/null
+name="$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n').$([ "$story" = 1 ] && echo jpg || echo mp4)"
 install -m 644 "$video" "${REEL_DIR}/${name}" || die "::error::could not stage the video in $REEL_DIR"
 trap 'rm -f "${REEL_DIR}/${name}"' EXIT
 curl -sf -o /dev/null --max-time 60 "${SITE}/reels/${name}" || die "::error::${SITE}/reels/ does not serve the video"
 
-# 2. The container. Instagram caps captions at 2,200 characters.
-caption=$(head -c 2200 "$caption_file")
-reply=$(curl -s --max-time 60 -X POST "${API}/me/media" -H "Authorization: Bearer ${token}" \
-  -d media_type=REELS -d share_to_feed=true \
-  --data-urlencode "video_url=${SITE}/reels/${name}" --data-urlencode "caption=${caption}")
+# 2. The container. Instagram caps captions at 2,200 characters; a Story has none.
+if [ "$story" = 1 ]; then
+  reply=$(curl -s --max-time 60 -X POST "${API}/me/media" -H "Authorization: Bearer ${token}" \
+    -d media_type=STORIES --data-urlencode "image_url=${SITE}/reels/${name}")
+else
+  caption=$(head -c 2200 "$caption_file")
+  reply=$(curl -s --max-time 60 -X POST "${API}/me/media" -H "Authorization: Bearer ${token}" \
+    -d media_type=REELS -d share_to_feed=true \
+    --data-urlencode "video_url=${SITE}/reels/${name}" --data-urlencode "caption=${caption}")
+fi
 container=$(printf '%s' "$reply" | json_field id)
 [ -n "$container" ] || die "::error::Instagram refused the container: $(printf '%s' "$reply" | api_error)"
 
 # 3. Instagram transcodes before it will publish; a minute is usual.
 status=""
 for _ in $(seq 1 40); do
-  sleep 15
+  sleep "$([ "$story" = 1 ] && echo 3 || echo 15)"
   status=$(curl -s --max-time 30 -G "${API}/${container}" -H "Authorization: Bearer ${token}" \
     -d fields=status_code | json_field status_code)
   case "$status" in FINISHED|ERROR|EXPIRED) break ;; esac
@@ -99,4 +115,8 @@ reply=$(curl -s --max-time 60 -X POST "${API}/me/media_publish" -H "Authorizatio
 media=$(printf '%s' "$reply" | json_field id)
 [ -n "$media" ] || die "::error::Instagram publish failed: $(printf '%s' "$reply" | api_error)"
 link=$(curl -s --max-time 30 -G "${API}/${media}" -H "Authorization: Bearer ${token}" -d fields=permalink | json_field permalink)
-echo "instagram: published ${link:-media ${media}}"
+if [ "$story" = 1 ]; then
+  echo "instagram: story published (media ${media})"
+else
+  echo "instagram: published ${link:-media ${media}}"
+fi

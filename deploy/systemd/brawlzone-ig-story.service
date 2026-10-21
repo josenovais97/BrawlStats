@@ -1,0 +1,10 @@
+[Unit]
+Description=BrawlZone: the daily Instagram Story (Ranked tier list for one rank)
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+TimeoutStartSec=900
+ExecStart=/usr/local/bin/brawlzone-run ig-story /usr/local/bin/brawlzone-ig-story

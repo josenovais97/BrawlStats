@@ -1,0 +1,12 @@
+[Unit]
+Description=Post the daily Instagram Story at 15:00 UTC
+
+[Timer]
+# Afternoon in Brazil, evening in South Asia. Clear of the posting timers
+# (09:10, 12:00, 17:10, 20:30), which also upload to Instagram.
+OnCalendar=*-*-* 15:00:00
+Persistent=false
+Unit=brawlzone-ig-story.service
+
+[Install]
+WantedBy=timers.target
