@@ -39,10 +39,8 @@ post=1
 kind="${1:-}"
 DAY=$(date -u +%Y-%m-%d)
 
-if [ -z "$kind" ] && [ -e "$ROOT/skip-$DAY" ]; then
-  echo "skip-$DAY is set: a hand-made video has today's slot"
-  exit 0
-fi
+skip=0
+[ -z "$kind" ] && [ -e "$ROOT/skip-$DAY" ] && skip=1
 if [ -z "$kind" ]; then
   case "$(date -u +%u)" in
     1|5) kind=broken ;;
@@ -65,6 +63,12 @@ docker compose run --rm -T sampler node --import tsx --conditions=react-server s
 mv "$ROOT/history/$DAY.json.new" "$ROOT/history/$DAY.json"
 # A month of snapshots is plenty; `broken` reads the one from a week ago.
 find "$ROOT/history" -name '*.json' -mtime +40 -delete 2>/dev/null
+
+# After the snapshot, so a skipped day still leaves one for next week.
+if [ "$skip" = 1 ]; then
+  echo "skip-$DAY is set: a hand-made video has today's slot"
+  exit 0
+fi
 
 # The snapshot closest to seven days old, at least four (so the two 3-day
 # windows do not overlap), or none: make.py then compares with the week.
