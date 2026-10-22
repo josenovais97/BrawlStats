@@ -762,6 +762,40 @@ export const CLIENT_ES: Record<string, string> = {
   Subscribe: 'Suscribirme',
   Later: 'Más tarde',
   "Don't show again": 'No volver a mostrar',
+  "All three done!":
+    "¡Los tres resueltos!",
+  "Classic":
+    "Clásico",
+  "Every wrong guess zooms out a little.":
+    "Cada intento fallido aleja un poco la imagen.",
+  "It was":
+    "Era",
+  "New puzzles in":
+    "Nuevos retos en",
+  "Out of guesses.":
+    "Sin intentos.",
+  "Shadow":
+    "Sombra",
+  "Share your results":
+    "Comparte tus resultados",
+  "Today’s mystery brawler":
+    "El brawler misterioso de hoy",
+  "Zoom":
+    "Zoom",
+  "new":
+    "nuevo",
+  "playing":
+    "jugando",
+  "{n} guesses left":
+    "quedan {n} intentos",
+  "{n} of 3 done":
+    "{n} de 3 resueltos",
+  "{n}-day streak":
+    "racha de {n} días",
+  "Who is this, up close?":
+    "¿Quién es, de cerca?",
+  "Whose shadow is this?":
+    "¿De quién es esta sombra?",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1523,4 +1557,38 @@ export const CLIENT_PT: Record<string, string> = {
   Subscribe: 'Inscrever-se',
   Later: 'Mais tarde',
   "Don't show again": 'Não mostrar de novo',
+  "All three done!":
+    "Os três resolvidos!",
+  "Classic":
+    "Clássico",
+  "Every wrong guess zooms out a little.":
+    "Cada palpite errado afasta um pouco a imagem.",
+  "It was":
+    "Era",
+  "New puzzles in":
+    "Novos desafios em",
+  "Out of guesses.":
+    "Sem palpites.",
+  "Shadow":
+    "Sombra",
+  "Share your results":
+    "Compartilhe seus resultados",
+  "Today’s mystery brawler":
+    "O brawler misterioso de hoje",
+  "Zoom":
+    "Zoom",
+  "new":
+    "novo",
+  "playing":
+    "jogando",
+  "{n} guesses left":
+    "restam {n} palpites",
+  "{n} of 3 done":
+    "{n} de 3 resolvidos",
+  "{n}-day streak":
+    "sequência de {n} dias",
+  "Who is this, up close?":
+    "Quem é, de perto?",
+  "Whose shadow is this?":
+    "De quem é essa sombra?",
 };

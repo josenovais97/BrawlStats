@@ -286,7 +286,19 @@ function StatsPanel({
   );
 }
 
-export function ChallengeBoard({ date, picker }: { date: string; picker: PickerEntry[] }) {
+export function ChallengeBoard({
+  date,
+  picker,
+  onChange,
+  onShare,
+}: {
+  date: string;
+  picker: PickerEntry[];
+  /** Where the board stands after each guess, for the daily hub's tabs. */
+  onChange?: (state: { solved: boolean; guesses: number }) => void;
+  /** The hub's share card for all three puzzles, instead of this board's grid. */
+  onShare?: () => void;
+}) {
   const t = useT();
   /*
    * One state object, hydrated once. `board === null` means localStorage has
@@ -407,6 +419,7 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
       };
       setBoard(next);
       save(next);
+      onChange?.({ solved: next.solved, guesses: next.results.length });
 
       /*
        * Counted the moment it is won, not on the next load. `recordResult` is
@@ -570,10 +583,10 @@ export function ChallengeBoard({ date, picker }: { date: string; picker: PickerE
 
             <button
               type="button"
-              onClick={share}
+              onClick={onShare ?? share}
               className="rounded-lg bg-brand px-4 py-2 text-sm font-bold text-[#0b0f1d] transition-opacity hover:opacity-90"
             >
-              {copied ? t('Copied') : t('Copy result')}
+              {copied ? t('Copied') : onShare ? t('Share your results') : t('Copy result')}
             </button>
 
             {yesterday ? (

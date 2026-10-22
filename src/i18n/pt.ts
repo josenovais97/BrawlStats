@@ -4128,4 +4128,50 @@ export const PT: Record<string, string> = {
     "Sorteio do Caos",
   "Credit":
     "Créditos",
+  "All three done!":
+    "Os três resolvidos!",
+  "Classic":
+    "Clássico",
+  "Every wrong guess zooms out a little.":
+    "Cada palpite errado afasta um pouco a imagem.",
+  "How the puzzles work":
+    "Como funcionam os desafios",
+  "It was":
+    "Era",
+  "New puzzles in":
+    "Novos desafios em",
+  "Out of guesses.":
+    "Sem palpites.",
+  "Shadow":
+    "Sombra",
+  "Share your results":
+    "Compartilhe seus resultados",
+  "Three brawlers to guess every day: from clues, from a shadow, and from a zoom. Everybody gets the same ones, new at midnight UTC.":
+    "Três brawlers para adivinhar todo dia: pelas dicas, pela sombra e pelo zoom. São os mesmos para todo mundo e mudam à meia-noite UTC.",
+  "Today’s mystery brawler":
+    "O brawler misterioso de hoje",
+  "Who is this, up close?":
+    "Quem é, de perto?",
+  "Whose shadow is this?":
+    "De quem é essa sombra?",
+  "Zoom":
+    "Zoom",
+  "an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.":
+    "um close extremo que se afasta um pouco a cada palpite errado. Os dois dão seis palpites.",
+  "new":
+    "novo",
+  "playing":
+    "jogando",
+  "shows only the brawler’s outline, and":
+    "mostra só a silhueta do brawler, e",
+  "{n} guesses left":
+    "restam {n} palpites",
+  "{n} of 3 done":
+    "{n} de 3 resolvidos",
+  "{n}-day streak":
+    "sequência de {n} dias",
+  "Brawl Stars daily challenge: guess the brawler (Classic, Shadow, Zoom)":
+    "Desafio diário de Brawl Stars: adivinhe o brawler (Clássico, Sombra, Zoom)",
+  "Three Brawl Stars puzzles every day: guess the brawler from clues, from its shadow, or from an extreme zoom. Keep your streak, share your score. Free, no account.":
+    "Três desafios de Brawl Stars todo dia: adivinhe o brawler pelas dicas, pela sombra ou por um zoom extremo. Mantenha sua sequência e compartilhe seu resultado. Grátis, sem conta.",
 };

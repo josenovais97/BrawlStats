@@ -1,5 +1,6 @@
 import { answerFor, compareGuess } from '@/lib/brawldle';
 import { brawldleRoster } from '@/lib/brawldle-data';
+import { PICTURE_MODES, type PictureMode, pictureAnswer } from '@/lib/brawldle-picture';
 
 
 /**
@@ -36,6 +37,31 @@ export async function GET(request: Request) {
   }
 
   const roster = await brawldleRoster().catch(() => []);
+
+  /*
+   * Shadow and Zoom (`mode`): right or wrong, nothing more. Their clue is the
+   * picture, which moves with the guess count on its own endpoint.
+   */
+  const mode = url.searchParams.get('mode') as PictureMode | null;
+  if (mode && PICTURE_MODES.includes(mode)) {
+    const pictured = await pictureAnswer(mode, date, roster);
+    const guessed = roster.find((b) => b.slug === slug);
+    if (!pictured) return Response.json({ error: 'no puzzle today' }, { status: 503 });
+    if (!guessed) return Response.json({ error: 'unknown brawler' }, { status: 404 });
+    const correct = guessed.id === pictured.id;
+    return Response.json(
+      {
+        date,
+        correct,
+        brawler: { id: guessed.id, name: guessed.name, slug: guessed.slug, imageUrl: guessed.imageUrl },
+        answer: correct
+          ? { id: pictured.id, name: pictured.name, slug: pictured.slug, imageUrl: pictured.imageUrl }
+          : null,
+      },
+      { headers: { 'cache-control': 'no-store' } },
+    );
+  }
+
   const answer = answerFor(date, roster);
   if (!answer) {
     return Response.json({ error: 'no puzzle today' }, { status: 503 });

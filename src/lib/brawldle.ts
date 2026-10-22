@@ -100,7 +100,7 @@ export function dayIndex(date: string): number {
  * The same finaliser `snapshot-sample` needs, and for a related reason: the
  * low bits of a simple counter are too regular to slice directly.
  */
-function fmix32(input: number): number {
+export function fmix32(input: number): number {
   let h = input >>> 0;
   h ^= h >>> 16;
   h = Math.imul(h, 0x85ebca6b) >>> 0;

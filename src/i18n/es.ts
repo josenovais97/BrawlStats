@@ -4128,4 +4128,50 @@ export const ES: Record<string, string> = {
     "Premio del caos",
   "Credit":
     "Créditos",
+  "All three done!":
+    "¡Los tres resueltos!",
+  "Classic":
+    "Clásico",
+  "Every wrong guess zooms out a little.":
+    "Cada intento fallido aleja un poco la imagen.",
+  "How the puzzles work":
+    "Cómo funcionan los retos",
+  "It was":
+    "Era",
+  "New puzzles in":
+    "Nuevos retos en",
+  "Out of guesses.":
+    "Sin intentos.",
+  "Shadow":
+    "Sombra",
+  "Share your results":
+    "Comparte tus resultados",
+  "Three brawlers to guess every day: from clues, from a shadow, and from a zoom. Everybody gets the same ones, new at midnight UTC.":
+    "Tres brawlers para adivinar cada día: por pistas, por su sombra y con zoom. Son los mismos para todos y cambian a medianoche UTC.",
+  "Today’s mystery brawler":
+    "El brawler misterioso de hoy",
+  "Who is this, up close?":
+    "¿Quién es, de cerca?",
+  "Whose shadow is this?":
+    "¿De quién es esta sombra?",
+  "Zoom":
+    "Zoom",
+  "an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.":
+    "un primer plano extremo que se aleja un poco tras cada intento fallido. Ambos te dan seis intentos.",
+  "new":
+    "nuevo",
+  "playing":
+    "jugando",
+  "shows only the brawler’s outline, and":
+    "muestra solo la silueta del brawler, y",
+  "{n} guesses left":
+    "quedan {n} intentos",
+  "{n} of 3 done":
+    "{n} de 3 resueltos",
+  "{n}-day streak":
+    "racha de {n} días",
+  "Brawl Stars daily challenge: guess the brawler (Classic, Shadow, Zoom)":
+    "Reto diario de Brawl Stars: adivina el brawler (Clásico, Sombra, Zoom)",
+  "Three Brawl Stars puzzles every day: guess the brawler from clues, from its shadow, or from an extreme zoom. Keep your streak, share your score. Free, no account.":
+    "Tres retos de Brawl Stars cada día: adivina el brawler por pistas, por su sombra o con un zoom extremo. Mantén tu racha y comparte tu resultado. Gratis, sin cuenta.",
 };

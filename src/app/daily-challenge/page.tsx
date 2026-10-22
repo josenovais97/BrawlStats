@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { ChallengeBoard } from '@/components/challenge/challenge-board';
+import { DailyHub } from '@/components/challenge/daily-hub';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { brawldleRoster, pickerEntries } from '@/lib/brawldle-data';
@@ -10,7 +10,8 @@ import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 
 /**
- * Guess the brawler. One puzzle a day, the same one for everybody.
+ * Guess the brawler, three ways a day (Classic, Shadow, Zoom since
+ * 2026-10-22), the same puzzles for everybody.
  *
  * The answer is not on this page. The board sends each guess to
  * /api/brawldle/guess and renders what comes back, so the solution is never in
@@ -28,9 +29,9 @@ import { requestLocale } from '@/lib/request-locale';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Brawl Stars daily challenge — guess the brawler',
+  title: 'Brawl Stars daily challenge: guess the brawler (Classic, Shadow, Zoom)',
   description:
-    'A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.',
+    'Three Brawl Stars puzzles every day: guess the brawler from clues, from its shadow, or from an extreme zoom. Keep your streak, share your score. Free, no account.',
   alternates: { canonical: '/daily-challenge' },
 };
 
@@ -51,17 +52,17 @@ export default async function DailyChallengePage() {
 
       <PageHeading
         title={t('Daily challenge')}
-        subtitle={t('One brawler a day. Everybody gets the same one, and it changes at midnight UTC.')}
+        subtitle={t('Three brawlers to guess every day: from clues, from a shadow, and from a zoom. Everybody gets the same ones, new at midnight UTC.')}
       />
 
       {roster.length === 0 ? (
         <p className="card p-6 text-sm leading-relaxed text-muted">{t('Today’s puzzle could not be prepared. It returns once the brawler catalogue is reachable again.')}</p>
       ) : (
-        <ChallengeBoard date={date} picker={pickerEntries(roster)} />
+        <DailyHub date={date} picker={pickerEntries(roster)} />
       )}
 
       <section className="space-y-3">
-        <SectionHeading title={t('How the clues work')} />
+        <SectionHeading title={t('How the puzzles work')} />
         <div className="card space-y-2 p-5 text-sm leading-relaxed text-muted">
           <p>
             <span className="font-semibold text-emerald-300">{t('Green')}</span>{' '}{t('is exact.')}{' '}
@@ -76,6 +77,9 @@ export default async function DailyChallengePage() {
           <p>{t('Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.')}</p>
           <p>
             <strong className="text-foreground">{t('Stuck?')}</strong>{' '}{t('After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.')}</p>
+          <p>
+            <strong className="text-foreground">{t('Shadow')}</strong>{' '}{t('shows only the brawler’s outline, and')}{' '}
+            <strong className="text-foreground">{t('Zoom')}</strong>{' '}{t('an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.')}</p>
           <p>{t('Your progress is kept in this browser only. No account, nothing stored on our side.')}</p>
         </div>
       </section>
