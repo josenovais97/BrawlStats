@@ -121,7 +121,8 @@ failed=0
 YT=$(mktemp -d); IG=$(mktemp -d)
 trap 'rm -rf "$YT" "$IG"' EXIT
 BANNER=""
-curl -sf -o "$YT/banner.png" --max-time 30 "$SITE/youtube/subscribe-banner.png" && BANNER="$YT/banner.png"
+# Not banner.png: render_video copies the banner to that name in the same dir.
+curl -sf -o "$YT/banner-src.png" --max-time 30 "$SITE/youtube/subscribe-banner.png" && BANNER="$YT/banner-src.png"
 if render_video "$YT" "$MUSIC" "$BANNER"; then
   /usr/local/bin/brawlzone-youtube "$YT/out.mp4" "$TITLE" "$OUT/description.txt" || { echo "::warning::YouTube upload failed"; failed=1; }
 else
