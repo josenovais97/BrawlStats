@@ -2,6 +2,7 @@
 # Send one of the day's carousels to TikTok as a draft.
 #
 #   brawlzone-tiktok [counter|tiers|build|trio|daily|hidden] [YYYY-MM-DD]
+#   VIDEO_FILE=x.mp4 [VIDEO_L10N=l10n.json] brawlzone-tiktok viral   (brawlzone-viral)
 #
 # Since 2026-10-13 the four daily posts are counter of the day (09:10), map of
 # the day (`tiers`, 12:00), build of the day (17:10) and trio of the day
@@ -241,6 +242,14 @@ case "$MODE" in
   # The Google Play closed-test recruiting carousel (2026-10), by hand like the
   # challenge: static slides and caption under public/tiktok/playtest/.
   playtest) MANIFEST="${SITE}/tiktok/playtest/slides.json" ;;
+  # The daily viral Short, drawn and encoded by brawlzone-viral, which passes
+  # the finished MP4 in VIDEO_FILE: every network gets that file as it is,
+  # music and all, instead of a slideshow made here. The manifest under
+  # /social/viral/<date>/ carries the caption and the cover.
+  viral)
+    [ -r "${VIDEO_FILE:-}" ] || die "::error::viral needs VIDEO_FILE, the finished video"
+    MANIFEST="${SITE}/social/viral/${DAY}/slides.json"
+    FORMAT=video ;;
   # Any one-off carousel kept under public/tiktok/<name>/, by hand:
   #   brawlzone-tiktok promo season50
   # The second argument names the folder here, so the date is today's.
@@ -422,9 +431,19 @@ print((d.get("status") or "?"), (d.get("fail_reason") or "-"))
 # shellcheck disable=SC1091
 . /usr/local/lib/brawlzone-video.sh || die "::error::/usr/local/lib/brawlzone-video.sh missing"
 
+# make_video: render_video, or the finished VIDEO_FILE copied in its place.
+make_video () { # work dir [music] [banner]
+  if [ -n "${VIDEO_FILE:-}" ]; then
+    cp "$VIDEO_FILE" "$1/out.mp4" || { VIDEO_ERR="could not read ${VIDEO_FILE}"; return 1; }
+    VIDEO_SIZE=$(stat -c %s "$1/out.mp4")
+    return 0
+  fi
+  render_video "$@"
+}
+
 post_video () { # work dir
   local work="$1" size reply err upload_url http
-  render_video "$work" || return 1
+  make_video "$work" || return 1
   size=$VIDEO_SIZE
 
   reply=$(python3 - "$size" "$POST_MODE" "$TITLE" "$DESCRIPTION" "$PRIVACY" <<'PY'
@@ -457,6 +476,10 @@ except Exception:
 data = d.get("data") or {}
 print(data.get("publish_id") or "-", data.get("upload_url") or "-", (d.get("error") or {}).get("code") or "-")
 ' 2>/dev/null)
+  if [ "$err" = "spam_risk_too_many_pending_share" ] && [ "$MODE" = viral ]; then
+    VIDEO_ERR="TikTok has 5 uploads already waiting in the inbox"
+    return 1
+  fi
   if [ "$err" = "spam_risk_too_many_pending_share" ]; then
     # The carousel would be refused for the same reason.
     echo "::warning::TikTok has 5 uploads already waiting in the inbox; skipping today rather than stacking another."
@@ -501,6 +524,12 @@ if [ "$FORMAT" = "video" ]; then
   VIDEO_WORK=$(mktemp -d)
   if post_video "$VIDEO_WORK"; then
     :
+  elif [ "$MODE" = viral ]; then
+    # No carousel: the viral manifest lists only the cover, and a one-image
+    # post of it would be worse than none. YouTube and Instagram still go.
+    echo "::warning::the viral video did not reach TikTok (${VIDEO_ERR:-unknown}); posting it elsewhere anyway"
+    STATUS="not sent: ${VIDEO_ERR:-unknown}"
+    FORMAT="none"
   else
     echo "::warning::no video today (${VIDEO_ERR:-unknown}); sending the photo carousel instead"
     FORMAT="photo"
@@ -696,14 +725,19 @@ print(t if len(t) <= 92 else title)
   # The same Short's title and description in Portuguese and Spanish
   # (2026-10-21); none for a mode without a template, or on any failure.
   printf '%s' "$manifest_json" > "${YT_WORK}/manifest.json"
-  /usr/local/bin/brawlzone-yt-locales "$MODE" "${YT_WORK}/manifest.json" "${YT_WORK}/description.txt" \
-    > "${YT_WORK}/l10n.json" 2>/dev/null || echo '{}' > "${YT_WORK}/l10n.json"
+  # A viral Short brings its own (brawlzone-viral writes it from make.py).
+  if [ "$MODE" = viral ] && [ -r "${VIDEO_L10N:-}" ]; then
+    cp "$VIDEO_L10N" "${YT_WORK}/l10n.json"
+  else
+    /usr/local/bin/brawlzone-yt-locales "$MODE" "${YT_WORK}/manifest.json" "${YT_WORK}/description.txt" \
+      > "${YT_WORK}/l10n.json" 2>/dev/null || echo '{}' > "${YT_WORK}/l10n.json"
+  fi
   YT_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   # And the ask up front, on the cover. Optional for the same reason.
   YT_BANNER=""
   curl -sf -o "${YT_WORK}/banner-src.png" --max-time 30 "${SITE}/youtube/subscribe-banner.png" \
     && YT_BANNER="${YT_WORK}/banner-src.png"
-  if render_video "$YT_WORK" "$YT_MUSIC" "$YT_BANNER" \
+  if make_video "$YT_WORK" "$YT_MUSIC" "$YT_BANNER" \
      && YOUTUBE_RESULT=$(/usr/local/bin/brawlzone-youtube "${YT_WORK}/out.mp4" "$TITLE" "${YT_WORK}/description.txt" "${YT_WORK}/l10n.json" 2>&1); then
     echo "$YOUTUBE_RESULT"
   else
@@ -761,7 +795,7 @@ if [ "${INSTAGRAM:-1}" = "1" ] && [ -r "$HOME/.brawlzone-instagram.json" ]; then
   IG_MUSIC=$(find "$HOME/youtube-music" -maxdepth 1 -type f \( -iname '*.mp3' -o -iname '*.m4a' \) 2>/dev/null | shuf -n 1)
   VIDEO_ERR=""
   # The script's last line is the outcome; a token-refresh warning may precede it.
-  if render_video "$IG_WORK" "$IG_MUSIC" \
+  if make_video "$IG_WORK" "$IG_MUSIC" \
      && INSTAGRAM_RESULT=$(/usr/local/bin/brawlzone-instagram "${IG_WORK}/out.mp4" "${IG_WORK}/caption.txt" 2>&1 | tail -n 1); then
     echo "$INSTAGRAM_RESULT"
   else
@@ -786,7 +820,12 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
   else
     subject="[brawlzone] TikTok ${MODE} ${FORMAT/photo/carousel} waiting -- ${DAY}"
     heading="Waiting in your TikTok inbox"
-    if [ "$FORMAT" = "video" ]; then
+    if [ "$MODE" = viral ] && [ "$FORMAT" = none ]; then
+      heading="Viral video: upload it to TikTok by hand"
+      todo="TikTok did not take it (${STATUS#not sent: }). Save ${SITE}/social/viral/${DAY}/video.mp4 to your phone and upload it in TikTok, KEEPING the video's own sound, with the caption above."
+    elif [ "$MODE" = viral ]; then
+      todo="Open TikTok, tap the notification, KEEP the video's own sound (the cuts follow its beat), paste the caption above, and publish. Then reply to the first comments: it is a daily series."
+    elif [ "$FORMAT" = "video" ]; then
       # TikTok's inbox upload carries no caption for a video.
       todo="Open TikTok, tap the notification, add a trending sound, paste the caption above, and publish."
     else

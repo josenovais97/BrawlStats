@@ -1,0 +1,13 @@
+[Unit]
+Description=Draw and post the daily viral Short at 15:30 UTC
+
+[Timer]
+# After school in Europe and late morning in the Americas, where most of the
+# audience is; between the 14:00 rating Short and the 17:10 build post, so the
+# TikTok and YouTube uploads never queue behind each other.
+OnCalendar=*-*-* 15:30:00
+Persistent=false
+Unit=brawlzone-viral.service
+
+[Install]
+WantedBy=timers.target

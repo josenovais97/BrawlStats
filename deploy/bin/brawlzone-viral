@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+# The daily viral Short (2026-10-22): a beat-synced motion-graphics video,
+# drawn from today's data and posted to TikTok (inbox), YouTube and Instagram.
+#
+#   brawlzone-viral [--no-post] [quiz|broken|ranks|modes]
+#
+# Run at 15:30 UTC by brawlzone-viral.timer. The format follows the weekday:
+#
+#   Mon broken  Tue quiz  Wed ranks  Thu quiz  Fri broken  Sat quiz  Sun modes
+#
+# deploy/viral/make.py draws it (formats described there). `broken` needs a
+# snapshot from about a week ago, which this job keeps in $ROOT/history, and
+# on a flat week it says so and the quiz goes out instead. Naming a format
+# overrides the day's; --no-post renders it and stops, for a look at
+# $PUBLIC/<date>/video.mp4 first.
+#
+# A file $ROOT/skip-YYYY-MM-DD makes that day's run do nothing: for a day a
+# hand-made video takes the slot.
+#
+# The posting is brawlzone-tiktok's `viral` mode: one TikTok inbox upload,
+# then the same file to YouTube, Instagram and Discord, then the mail with
+# the caption. This job remembers the episode numbers and the quiz answers
+# already used ($ROOT/state.json) only once that has run.
+set -uo pipefail
+
+REPO=/home/ubuntu/brawlstats
+ROOT=/var/lib/brawlzone/viral
+CACHE=/var/lib/brawlzone/viral-cache     # fonts, icon, models/, faces/, py/
+PUBLIC=/var/lib/brawlzone/social/viral    # served at https://brawlzone.net/social/viral/
+SITE=https://brawlzone.net
+MUSIC="$HOME/youtube-music/Fontana - Ryan Stasik, Kanika Moore.mp3"
+PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
+FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
+
+die() { echo "$*" >&2; exit 1; }
+
+post=1
+[ "${1:-}" = "--no-post" ] && { post=0; shift; }
+kind="${1:-}"
+DAY=$(date -u +%Y-%m-%d)
+
+if [ -z "$kind" ] && [ -e "$ROOT/skip-$DAY" ]; then
+  echo "skip-$DAY is set: a hand-made video has today's slot"
+  exit 0
+fi
+if [ -z "$kind" ]; then
+  case "$(date -u +%u)" in
+    1|5) kind=broken ;;
+    3) kind=ranks ;;
+    7) kind=modes ;;
+    *) kind=quiz ;;
+  esac
+fi
+case "$kind" in quiz|broken|ranks|modes) ;; *) die "::error::unknown format '$kind' (quiz, broken, ranks or modes)" ;; esac
+
+OUT="$PUBLIC/$DAY"
+mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::cannot create $ROOT or $OUT"
+[ -r "$MUSIC" ] || die "::error::the track is missing: $MUSIC"
+
+# ---------------------------------------------------------------- data
+cd "$REPO" || die "::error::no checkout at $REPO"
+docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/viral-data.ts \
+  2> "$CACHE/data.err" | grep '^{' > "$ROOT/history/$DAY.json.new"
+[ -s "$ROOT/history/$DAY.json.new" ] || die "::error::scripts/viral-data.ts printed nothing: $(tail -c 400 "$CACHE/data.err")"
+mv "$ROOT/history/$DAY.json.new" "$ROOT/history/$DAY.json"
+# A month of snapshots is plenty; `broken` reads the one from a week ago.
+find "$ROOT/history" -name '*.json' -mtime +40 -delete 2>/dev/null
+
+# The snapshot closest to seven days old, at least four (so the two 3-day
+# windows do not overlap), or none: make.py then compares with the week.
+PREV=$(python3 - "$ROOT/history" "$DAY" <<'PY'
+import datetime, os, sys
+d, today = sys.argv[1], datetime.date.fromisoformat(sys.argv[2])
+best = None
+for f in os.listdir(d):
+    try:
+        age = (today - datetime.date.fromisoformat(f[:10])).days
+    except ValueError:
+        continue
+    if 4 <= age <= 10 and (best is None or abs(age - 7) < abs(best[0] - 7)):
+        best = (age, f)
+print(f'/data/history/{best[1]}' if best else '-')
+PY
+)
+echo "format: $kind, compared with: $PREV"
+
+# ---------------------------------------------------------------- assets
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
+   "$REPO/public/bubble/app-icon.png" "$CACHE/" || die "::error::fonts or icon missing from the checkout"
+# Full-body models and portraits from Brawlify, once per brawler. A brawler
+# with no model yet (a new one) is drawn as a card, and never quizzed.
+python3 - "$ROOT/history/$DAY.json" "$CACHE" <<'PY'
+import json, os, sys, urllib.request
+data, cache = json.load(open(sys.argv[1])), sys.argv[2]
+ua = {'User-Agent': 'BrawlZone (https://brawlzone.net)'}
+for b in data['all']:
+    for kind, folder in (('model', 'models'), ('borderless', 'faces')):
+        path = f"{cache}/{folder}/{b['id']}.png"
+        if os.path.exists(path):
+            continue
+        try:
+            body = urllib.request.urlopen(urllib.request.Request(
+                f"https://cdn.brawlify.com/brawlers/{kind}/{b['id']}.png", headers=ua), timeout=30).read()
+            open(path + '.tmp', 'wb').write(body); os.replace(path + '.tmp', path)
+        except Exception as e:
+            print(f"no {kind} for {b['n']}: {e}")
+PY
+[ "$(find "$CACHE/faces" -name '*.png' | wc -l)" -gt 50 ] || die "::error::brawler portraits could not be fetched"
+
+# ---------------------------------------------------------------- render
+draw () { # kind
+  rm -rf "$OUT/frames"
+  docker run --rm --user "$(id -u):$(id -g)" -v "$CACHE:/cache" "$PYTHON_IMAGE" sh -c '
+    [ -d /cache/py/PIL ] && [ -d /cache/py/numpy ] || pip install -q --disable-pip-version-check --target /cache/py pillow numpy >/dev/null 2>&1' \
+    || return 1
+  # Two halves of the frames in parallel, one core each: the box has two,
+  # and the site keeps serving on whatever they leave.
+  local pids=() rc=0 part
+  for part in 0 1; do
+    docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 \
+      -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
+      "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 /data/history/$DAY.json $PREV /data/state.json /out" \
+      > "$CACHE/make-$part.log" 2>&1 &
+    pids+=($!)
+  done
+  for p in "${pids[@]}"; do wait "$p" || rc=$?; done
+  return "$rc"
+}
+
+draw "$kind"; rc=$?
+if [ "$rc" = 3 ] && [ "$kind" != quiz ]; then
+  echo "$(tail -n 1 "$CACHE/make-0.log"); drawing the quiz instead"
+  kind=quiz; draw quiz; rc=$?
+fi
+[ "$rc" = 0 ] || die "::error::make.py $kind failed: $(tail -c 600 "$CACHE/make-0.log") $(tail -c 300 "$CACHE/make-1.log")"
+
+DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"])' "$OUT/meta.json")
+frames=$(find "$OUT/frames" -name '*.jpg' | wc -l)
+[ "$frames" -gt 100 ] || die "::error::only $frames frames were drawn"
+
+# The cuts are on the beat of this track from MUSIC_START (engine.py). The
+# fade-out is the last 1.5 seconds; the music's own loudness is left alone.
+docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
+  -hide_banner -loglevel error -y -framerate 30 -i 'frames/%04d.jpg' -ss 63.994 -i "/m/$(basename "$MUSIC")" \
+  -filter_complex "[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 1.5))"):d=1.5[a]" \
+  -map 0:v -map '[a]' -t "$DUR" -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -c:a aac -b:a 160k \
+  -movflags +faststart video.mp4 \
+  || die "::error::ffmpeg could not encode the video"
+# The cover TikTok's manifest points at: a frame from the first reveal.
+cp "$OUT/frames/$(printf '%04d' $((frames / 4)))".jpg "$OUT/cover.jpg"
+rm -rf "$OUT/frames"
+
+# The manifest brawlzone-tiktok reads, and the YouTube titles in Portuguese
+# and Spanish (descriptions stay English, like the video).
+python3 - "$OUT" "$SITE/social/viral/$DAY" <<'PY'
+import json, sys
+out, url = sys.argv[1], sys.argv[2]
+m = json.load(open(f'{out}/meta.json'))
+json.dump({'count': 1, 'slides': [f'{url}/cover.jpg'], 'title': m['title'], 'description': m['description']},
+          open(f'{out}/slides.json', 'w'), ensure_ascii=False)
+json.dump({lang: {'title': t, 'description': m['description']} for lang, t in m.get('titles', {}).items()},
+          open(f'{out}/l10n.json', 'w'), ensure_ascii=False)
+PY
+echo "video: $SITE/social/viral/$DAY/video.mp4 ($kind, ${DUR}s)"
+[ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
+
+# ---------------------------------------------------------------- post
+VIDEO_FILE="$OUT/video.mp4" VIDEO_L10N="$OUT/l10n.json" /usr/local/bin/brawlzone-tiktok viral "$DAY" \
+  || die "::error::brawlzone-tiktok viral failed"
+
+# Posted: remember the episode and the quiz answers, so tomorrow's quiz is
+# #N+1 and asks about other brawlers.
+python3 - "$ROOT/state.json" "$OUT/meta.json" <<'PY'
+import json, os, sys
+path, meta = sys.argv[1], json.load(open(sys.argv[2]))
+try:
+    state = json.load(open(path))
+except (OSError, ValueError):
+    state = {}
+eps = state.setdefault('episodes', {})
+eps[meta['kind']] = meta['episode']
+if meta.get('used'):
+    state['quiz_recent'] = (state.get('quiz_recent', []) + meta['used'])[-60:]
+json.dump(state, open(path + '.tmp', 'w')); os.replace(path + '.tmp', path)
+PY

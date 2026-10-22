@@ -1,0 +1,11 @@
+[Unit]
+Description=BrawlZone: the daily viral Short (TikTok inbox, YouTube, Instagram)
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+# Data, two render processes of ~600 frames each, an encode, three uploads.
+TimeoutStartSec=3600
+ExecStart=/usr/local/bin/brawlzone-run viral /usr/local/bin/brawlzone-viral
