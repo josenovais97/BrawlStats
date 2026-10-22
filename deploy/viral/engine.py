@@ -44,7 +44,13 @@ def in_out(t): t = clamp(t); return 3 * t * t - 2 * t * t * t
 
 # ---------------------------------------------------------------- assets
 def load_face(b):
-    return Image.open(f"{ASSETS}/faces/{b['id']}.png").convert('RGBA')
+    p = f"{ASSETS}/faces/{b['id']}.png"
+    if os.path.exists(p):
+        return Image.open(p).convert('RGBA')
+    # A brawler too new for Brawlify's portraits: a plain tile with their initial.
+    im = Image.new('RGBA', (256, 256), (40, 46, 96, 255)); d = ImageDraw.Draw(im)
+    d.text((128, 128), b['n'][:1].upper(), font=ImageFont.truetype(LIL, 170), fill=WHITE, anchor='mm')
+    return im
 
 def load_model(b):
     p = f"{ASSETS}/models/{b['id']}.png"

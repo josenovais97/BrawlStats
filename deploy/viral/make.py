@@ -179,7 +179,12 @@ def quiz_scene(s, t, bt, lt):
 UP, DOWN = (60, 220, 120), (255, 70, 90)
 
 if KIND == 'broken':
-    base = {b['id']: b for b in (prev['recent'] if prev else data['all'])}
+    # Without last week's snapshot the only baseline is the 7-day window,
+    # which contains the 3 days being measured: every change comes out half
+    # its size, too small to call anything broken.
+    if not prev:
+        print('no snapshot from a week ago yet'); sys.exit(3)
+    base = {b['id']: b for b in prev['recent']}
     rows = []
     for b in data['recent']:
         o = base.get(b['id'])
