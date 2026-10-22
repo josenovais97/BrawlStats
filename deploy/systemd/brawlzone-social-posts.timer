@@ -1,0 +1,12 @@
+[Unit]
+Description=Snapshot social post numbers daily at 07:50 UTC
+
+[Timer]
+# After brawlzone-tiktok-latest's 07:35 run, which refreshes the TikTok
+# numbers this reads, and before the 09:10 post.
+OnCalendar=*-*-* 07:50:00
+Persistent=false
+Unit=brawlzone-social-posts.service
+
+[Install]
+WantedBy=timers.target

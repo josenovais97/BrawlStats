@@ -25,7 +25,9 @@ set -uo pipefail
 exec python3 - <<'PY'
 import datetime, json, os, urllib.parse, urllib.request
 
-HOME = os.path.expanduser('~')
+# Not "~": brawlzone-digest runs as root, whose home holds none of these
+# tokens, and every line came out "?" from 2026-10-21.
+HOME = '/home/ubuntu'
 HISTORY = '/var/lib/brawlzone/social-history.jsonl'
 TIKTOK_CACHE = f'{HOME}/.brawlzone-tiktok-videos.json'
 CHANNEL = 'UCFHUOC2ySM5BLMVhY9Hxdjw'

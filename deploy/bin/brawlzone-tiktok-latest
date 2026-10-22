@@ -91,7 +91,7 @@ esac
 # fresh access token: TikTok rotates the refresh token on every use, and a
 # second job refreshing it would race the posting jobs for it. A failure
 # costs the digest a line, so it is not checked beyond writing the file.
-curl -s --max-time 60 -X POST "$LIST_URL?fields=id,create_time,view_count,like_count,comment_count,share_count" \
+curl -s --max-time 60 -X POST "$LIST_URL?fields=id,title,video_description,create_time,view_count,like_count,comment_count,share_count" \
   -H "Authorization: Bearer ${ACCESS}" -H 'Content-Type: application/json; charset=UTF-8' \
   --data-raw '{"max_count":20}' \
   | python3 -c '

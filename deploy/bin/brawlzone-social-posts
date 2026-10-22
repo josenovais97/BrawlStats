@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# Every post's numbers, per network and per format, and a weekly "what worked" mail (2026-10-22).
+#
+#   brawlzone-social-posts [--report]
+#
+# Run daily at 07:50 UTC by brawlzone-social-posts.timer. Snapshots the
+# views, likes and comments of each recent post into
+# /var/lib/brawlzone/social-posts/<date>.json:
+#
+#   YouTube    uploads playlist + videos.list statistics, with the API key
+#              brawlzone-social-stats already uses.
+#   Instagram  the posting token: likes and comments (views need an insights
+#              permission the app does not have).
+#   TikTok     ~/.brawlzone-tiktok-videos.json, written by
+#              brawlzone-tiktok-latest -- TikTok rotates its refresh token on
+#              every use, so this job must not refresh it.
+#
+# On Mondays (or with --report) it mails the last seven days grouped by
+# format -- rewards, daily posts by kind, viral videos, account ratings --
+# so what gets made next follows what people watched.
+set -uo pipefail
+
+python3 - "${1:-}" <<'PY' || exit 1
+import datetime, json, os, re, sys, urllib.parse, urllib.request
+
+HOME = '/home/ubuntu'   # the tokens live here whoever runs this
+OUT = '/var/lib/brawlzone/social-posts'
+CHANNEL_UPLOADS = 'UUFHUOC2ySM5BLMVhY9Hxdjw'
+report = sys.argv[1] == '--report' or datetime.date.today().weekday() == 0
+os.makedirs(OUT, exist_ok=True)
+
+
+def get(url, headers=None):
+    req = urllib.request.Request(url, headers=headers or {})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+
+def kind(text):
+    """Which format a post is, from its own title or caption."""
+    t = (text or '').lower()
+    rules = [
+        ('rewards', r'free brawl stars reward|mega box|voucher|free reward'),
+        ('viral', r'every brawler ranked|stop picking|for every mode|guess the brawler|what masters pick|what legends pick|what you pick'),
+        ('new brawler', r'first stats|is \w+ (broken|good|bad)\?'),
+        ('account rating', r"account worth|rating a top"),
+        ('weekly report', r'week \d|weekly|season \d+ week'),
+        ('counter', r'how to (beat|counter)|struggling against|counters?\b'),
+        ('map picks', r'best brawlers for|who to pick on'),
+        ('build', r'\bbuild\b'),
+        ('team', r'best team|team comp|\brun \w+ \+'),
+        ('bubble app', r'bubble'),
+    ]
+    for name, rx in rules:
+        if re.search(rx, t):
+            return name
+    return 'other'
+
+
+posts = []
+errors = []
+
+try:
+    key = json.load(open(f'{HOME}/.brawlzone-youtube-key.json'))['api_key']
+    items = get('https://www.googleapis.com/youtube/v3/playlistItems?' + urllib.parse.urlencode(
+        {'part': 'contentDetails', 'playlistId': CHANNEL_UPLOADS, 'maxResults': 50, 'key': key}))['items']
+    ids = ','.join(i['contentDetails']['videoId'] for i in items)
+    for v in get('https://www.googleapis.com/youtube/v3/videos?' + urllib.parse.urlencode(
+            {'part': 'snippet,statistics', 'id': ids, 'key': key}))['items']:
+        s = v['statistics']
+        posts.append({'net': 'youtube', 'id': v['id'], 'at': v['snippet']['publishedAt'][:19],
+                      'title': v['snippet']['title'], 'kind': kind(v['snippet']['title'] + ' ' + v['snippet'].get('description', '')[:300]),
+                      'views': int(s.get('viewCount', 0)), 'likes': int(s.get('likeCount', 0)), 'comments': int(s.get('commentCount', 0)),
+                      'url': f"https://youtube.com/shorts/{v['id']}"})
+except Exception as e:  # noqa: BLE001 -- one network down still leaves a report
+    errors.append(f'YouTube: {e}')
+
+try:
+    token = json.load(open(f'{HOME}/.brawlzone-instagram.json'))['access_token']
+    media = get('https://graph.instagram.com/v23.0/me/media?fields=id,timestamp,caption,like_count,comments_count,permalink&limit=50',
+                {'Authorization': f'Bearer {token}'})['data']
+    for m in media:
+        cap = m.get('caption') or ''
+        posts.append({'net': 'instagram', 'id': m['id'], 'at': m['timestamp'][:19], 'title': cap.split('\n')[0][:100],
+                      'kind': kind(cap), 'views': None, 'likes': m.get('like_count', 0), 'comments': m.get('comments_count', 0),
+                      'url': m.get('permalink')})
+except Exception as e:  # noqa: BLE001
+    errors.append(f'Instagram: {e}')
+
+try:
+    for v in json.load(open(f'{HOME}/.brawlzone-tiktok-videos.json'))['videos']:
+        text = v.get('title') or v.get('video_description') or ''
+        posts.append({'net': 'tiktok', 'id': v['id'], 'at': datetime.datetime.fromtimestamp(int(v.get('create_time', 0)), datetime.timezone.utc).replace(tzinfo=None).isoformat(),
+                      'title': text.split('\n')[0][:100], 'kind': kind(text), 'views': v.get('view_count', 0),
+                      'likes': v.get('like_count', 0), 'comments': v.get('comment_count', 0), 'url': None})
+except Exception as e:  # noqa: BLE001
+    errors.append(f'TikTok: {e}')
+
+today = datetime.date.today().isoformat()
+json.dump({'date': today, 'posts': posts, 'errors': errors}, open(f'{OUT}/{today}.json', 'w'))
+print(f'{len(posts)} posts snapshotted' + (f'; errors: {errors}' if errors else ''))
+
+if not report:
+    sys.exit(0)
+
+since = (datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None) - datetime.timedelta(days=7)).isoformat()
+week = [p for p in posts if p['at'] >= since]
+nets = ['tiktok', 'youtube', 'instagram']
+by_kind = {}
+for p in week:
+    k = by_kind.setdefault(p['kind'], {n: {'posts': 0, 'views': 0, 'likes': 0} for n in nets})
+    k[p['net']]['posts'] += 1
+    k[p['net']]['views'] += p['views'] or 0
+    k[p['net']]['likes'] += p['likes'] or 0
+
+
+def avg(d, f):
+    return round(d[f] / d['posts']) if d['posts'] else None
+
+
+rows = sorted(by_kind.items(), key=lambda kv: -sum((avg(kv[1][n], 'views') or 0) for n in ('tiktok', 'youtube')))
+lines = []
+for k, d in rows:
+    cells = []
+    for n in nets:
+        if not d[n]['posts']:
+            cells.append(f'{n}: -'); continue
+        if n == 'instagram':
+            cells.append(f"{n}: {d[n]['posts']} posts, {avg(d[n], 'likes')} likes avg")
+        else:
+            cells.append(f"{n}: {d[n]['posts']} posts, {avg(d[n], 'views'):,} views avg")
+    lines.append((k, ' · '.join(cells)))
+
+top = sorted([p for p in week if p['views'] is not None], key=lambda p: -p['views'])[:5]
+json.dump({'lines': lines, 'top': top, 'errors': errors, 'count': len(week)}, open(f'{OUT}/report.json', 'w'))
+print('report written')
+PY
+
+[ -f /var/lib/brawlzone/social-posts/report.json ] && { [ "${1:-}" = "--report" ] || [ "$(date -u +%u)" = 1 ]; } || exit 0
+
+# The mail, with the same alerter as everything else on the box.
+. /usr/local/lib/brawlzone-html.sh
+python3 - <<'PY' > /tmp/brawlzone-social-report.txt
+import json
+r = json.load(open('/var/lib/brawlzone/social-posts/report.json'))
+print('BY FORMAT (average per post, last 7 days)')
+for k, line in r['lines']:
+    print(f'\n{k.upper()}\n  {line}')
+print('\nTOP 5 POSTS BY VIEWS')
+for p in r['top']:
+    print(f"  {p['views']:>6,}  {p['net']:<9} {p['kind']:<15} {p['title'][:60]}")
+if r['errors']:
+    print('\nNot read this week: ' + '; '.join(r['errors']))
+PY
+{
+  html_open "What worked this week" "$(python3 -c 'import json;print(json.load(open("/var/lib/brawlzone/social-posts/report.json"))["count"])') posts across TikTok, YouTube and Instagram" "$ACCENT"
+  html_section "Results"
+  html_pre < /tmp/brawlzone-social-report.txt
+  html_close "brawlzone-web &middot; brawlzone-social-posts, every Monday"
+} | /usr/local/bin/brawlzone-alert --html "[brawlzone] Social: what worked this week"
+rm -f /tmp/brawlzone-social-report.txt
+echo "report mailed"

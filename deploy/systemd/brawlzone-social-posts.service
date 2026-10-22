@@ -1,0 +1,10 @@
+[Unit]
+Description=BrawlZone: snapshot every post's numbers; the weekly "what worked" mail on Mondays
+After=network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+TimeoutStartSec=300
+ExecStart=/usr/local/bin/brawlzone-run social-posts /usr/local/bin/brawlzone-social-posts
