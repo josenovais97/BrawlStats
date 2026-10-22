@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Google Search, weekly: what people found us for, and which key pages Google knows (2026-10-22).
+# Search, weekly: what people found us for on Google and Bing, and which key pages Google knows (2026-10-22).
 #
 #   brawlzone-search-report
 #
@@ -74,6 +74,32 @@ if close:
     print('\nCLOSE TO PAGE 1 (positions 8-20): worth improving those pages')
     for r in sorted(close, key=lambda r: r['position'])[:8]:
         print(f"  pos {r['position']:5.1f}  {r['keys'][0][:42]:42} {r['keys'][1].replace('https://brawlzone.net', '')}")
+
+# ---- Bing (2026-10-22): its own API key, ~/.brawlzone-bing.json. Bing also
+# answers for DuckDuckGo, Yahoo, Ecosia and Copilot, and on 2026-10-22 it put
+# the build pages at positions 7-9 where Google had them at 40-60.
+try:
+    bkey = json.load(open('/home/ubuntu/.brawlzone-bing.json'))['api_key']
+    rows = json.load(urllib.request.urlopen(
+        f'https://ssl.bing.com/webmaster/api.svc/json/GetQueryStats?siteUrl=https%3A%2F%2Fbrawlzone.net%2F&apikey={bkey}', timeout=60))['d']
+    def day(r):
+        return datetime.date.fromtimestamp(int(re.search(r'\d+', r['Date']).group()) / 1000)
+    today = datetime.date.today()
+    b_this = [r for r in rows if (today - day(r)).days <= 7]
+    b_prev = [r for r in rows if 7 < (today - day(r)).days <= 14]
+    def tot(rs): return sum(r['Clicks'] for r in rs), sum(r['Impressions'] for r in rs)
+    print('\nBING (also DuckDuckGo, Yahoo, Ecosia, Copilot)')
+    for label, rs in (('this week', b_this), ('week before', b_prev)):
+        c, i = tot(rs)
+        print(f'  {label:12} {c:5} clicks  {i:6} impressions')
+    agg = {}
+    for r in b_this:
+        a = agg.setdefault(r['Query'], [0, 0, []]); a[0] += r['Impressions']; a[1] += r['Clicks']; a[2].append(r.get('AvgImpressionPosition', 0))
+    print('  top non-brand searches:')
+    for qy, (i, c, p) in sorted(((q, v) for q, v in agg.items() if not brand.search(q)), key=lambda kv: -kv[1][0])[:10]:
+        print(f'    pos {sum(p) / len(p):5.1f}  {i:4} seen  {c:3} clicks  {qy[:50]}')
+except Exception as e:  # noqa: BLE001 -- Bing down still leaves the Google half
+    print(f'\nBING: not read ({e})')
 
 print('\nKEY PAGES IN GOOGLE')
 for path in ['/', '/tier-list/ranked', '/ranked', '/brawlers/vince', '/account-value', '/brawlers/amber/counters',
