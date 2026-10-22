@@ -1,0 +1,10 @@
+[Unit]
+Description=Mail the Google Search report on Mondays at 08:10 UTC
+
+[Timer]
+OnCalendar=Mon *-*-* 08:10:00
+Persistent=false
+Unit=brawlzone-search-report.service
+
+[Install]
+WantedBy=timers.target
