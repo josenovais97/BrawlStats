@@ -500,7 +500,11 @@ if KIND == 'newbrawler':
     else:
         MYSTERY = silhouette(HERO, (255, 255, 255))
     ICONS = {'gadget': optional(f'{OUT}/gadget.png'), 'starPower': optional(f'{OUT}/starpower.png')}
-    maps = sorted(R.get('maps') or [], key=lambda m: -(m['wr'] - m['base']))[:3]
+    # Its best maps against each map's average, one per mode, on enough battles.
+    maps, modes_seen = [], set()
+    for m in sorted(R.get('maps') or [], key=lambda m: -(m['wr'] - m['base'])):
+        if m['n'] >= 2000 and m['mode'] not in modes_seen and len(maps) < 3:
+            maps.append(m); modes_seen.add(m['mode'])
     build = [(k, (R.get('build') or {}).get(k) or []) for k in ('gadget', 'starPower')]
     build = [(k, v[0]) for k, v in build if v and v[0].get('name')]
     NAME = R['name'].upper()
