@@ -4068,4 +4068,16 @@ export const ES: Record<string, string> = {
     " y la",
   "Google Privacy Policy":
     "Política de Privacidad de Google",
+  "{name} build: {gadget} gadget + {starPower} star power, the pick of most owners.":
+    "Build de {name}: gadget {gadget} + habilidad estelar {starPower}, lo que elige la mayoría.",
+  "{name} build: {gadget} gadget, the pick of most owners.":
+    "Build de {name}: gadget {gadget}, lo que elige la mayoría.",
+  "{name} build: {starPower} star power, the pick of most owners.":
+    "Build de {name}: habilidad estelar {starPower}, lo que elige la mayoría.",
+  "{rate} adjusted win rate over {battles} real battles.":
+    "{rate} de victorias ajustadas en {battles} partidas reales.",
+  "Gears, best modes and maps, updated daily.":
+    "Refuerzos, mejores modos y mapas, actualizado cada día.",
+  "Best {name} build in Brawl Stars ({v}): gadget and star power":
+    "Mejor build de {name} en Brawl Stars ({v}): gadget y habilidad estelar",
 };

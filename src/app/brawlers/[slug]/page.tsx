@@ -269,13 +269,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
    * typed. The query is "brock build", so the build leads, then the number
    * that makes it more than an opinion: ours is measured across sampled
    * players rather than voted on.
+   *
+   * Written as the answer itself ("Amber build: X gadget + Y star power")
+   * rather than the page's prose sentence: on 2026-10-22 Bing had the Griff,
+   * Wendy and Amber pages at positions 7-8 for "<name> build" with 214
+   * impressions and 2 clicks, under a snippet that read like a paragraph.
    */
-  const recommendation = buildSentence(name, choices, accessories);
+  const pick = (rows: { itemId: number; share: number }[] | undefined) =>
+    rows && rows.length > 1 ? accessories.get(rows[0].itemId) : undefined;
+  const gadget = pick(choices?.gadgets);
+  const starPower = pick(choices?.starPowers);
+  const recommendation =
+    gadget && starPower
+      ? t('{name} build: {gadget} gadget + {starPower} star power, the pick of most owners.', {
+          name,
+          gadget: titleCase(gadget),
+          starPower: titleCase(starPower),
+        })
+      : gadget
+        ? t('{name} build: {gadget} gadget, the pick of most owners.', { name, gadget: titleCase(gadget) })
+        : starPower
+          ? t('{name} build: {starPower} star power, the pick of most owners.', { name, starPower: titleCase(starPower) })
+          : null;
   const performance =
     stat && adjusted !== null
-      ? t('{rate} adjusted win rate and {pick} pick rate over {battles} sampled battles.', {
+      ? t('{rate} adjusted win rate over {battles} real battles.', {
           rate: formatPercent(adjusted),
-          pick: formatPercent(stat.usageRate),
           battles: formatNumber(stat.decidedSampleSize),
         })
       : null;
@@ -286,16 +305,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
    * that carry the page's actual answer (seen in the 2026-10-16 audit).
    */
   const lead = [recommendation, performance].filter(Boolean).join(' ');
-  const tail = t('Gears, star powers, gadgets, best modes and maps, updated daily from real battles.');
+  const tail = t('Gears, best modes and maps, updated daily.');
   const description = lead.length + tail.length + 1 <= 160 ? `${lead} ${tail}`.trim() : lead || tail;
 
   return {
     /*
      * Built to match the query rather than to describe the page. "Best <name>
      * build in Brawl Stars" is what gets typed, and the month is the freshness
-     * signal every page outranking us carries — see `currentMonth`.
+     * signal every page outranking us carries — see `currentMonth`. What a
+     * build is made of follows the date, so the words searchers add ("amber
+     * gadget", "griff star power") are in the title too.
      */
-    title: t('Best {name} build in Brawl Stars ({v})', { name: name, v: currentMonth() }),
+    title: t('Best {name} build in Brawl Stars ({v}): gadget and star power', { name: name, v: currentMonth() }),
     description,
     alternates: { canonical: `/brawlers/${resolved.slug}` },
     openGraph: {
