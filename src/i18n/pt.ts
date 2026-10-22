@@ -4094,4 +4094,38 @@ export const PT: Record<string, string> = {
     "Seguir no WhatsApp",
   "Supercell gives away free Starr Drops and boxes through links that expire. We share every one we find on our WhatsApp channel.":
     "A Supercell dá Sorteios Starr e caixas grátis por links que expiram. Compartilhamos cada um que encontramos no nosso canal do WhatsApp.",
+  "When you get Starr Drops: what each daily win gives this season, and the special days. Then the chances for every drop and box, and every reward inside.":
+    "Quando você ganha Sorteios Starr: o que cada vitória diária dá nesta temporada e os dias especiais. E as chances de cada sorteio e caixa, com cada recompensa.",
+  "Boxes":
+    "Caixas",
+  "Event and new-brawler boxes: the ones in this season's Daily Wins first, then newest first.":
+    "Caixas de eventos e de novos brawlers: primeiro as das vitórias diárias desta temporada, depois as mais novas.",
+  "In this season's Daily Wins":
+    "Nas vitórias diárias desta temporada",
+  "Added {date}":
+    "Adicionada em {date}",
+  "Each of your first {n} wins of the day gives a reward, and what each one gives changes every season. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Cada uma das suas {n} primeiras vitórias do dia dá uma recompensa, e o que cada uma dá muda a cada temporada. A contagem reinicia uma vez por dia; o cronômetro da tela de Vitórias diárias no jogo mostra exatamente quando.",
+  "Your first wins of the day each give a reward, and what each one gives changes every season.":
+    "Suas primeiras vitórias do dia dão uma recompensa cada, e o que cada uma dá muda a cada temporada.",
+  "Normal days":
+    "Dias normais",
+  "Lucky days":
+    "Dias de sorte",
+  "Luckiest days":
+    "Dias de mais sorte",
+  "one of these":
+    "uma destas",
+  "Special days":
+    "Dias especiais",
+  "Recent special days":
+    "Dias especiais recentes",
+  "Coming":
+    "Em breve",
+  "Only for new players.":
+    "Só para jogadores novos.",
+  "Chaos Drop":
+    "Sorteio do Caos",
+  "Credit":
+    "Créditos",
 };

@@ -4094,4 +4094,38 @@ export const ES: Record<string, string> = {
     "Seguir en WhatsApp",
   "Supercell gives away free Starr Drops and boxes through links that expire. We share every one we find on our WhatsApp channel.":
     "Supercell regala Premios Starr y cajas gratis con enlaces que caducan. Compartimos cada uno que encontramos en nuestro canal de WhatsApp.",
+  "When you get Starr Drops: what each daily win gives this season, and the special days. Then the chances for every drop and box, and every reward inside.":
+    "Cuándo consigues Premios Starr: qué da cada victoria diaria esta temporada y los días especiales. Y las probabilidades de cada premio y caja, con cada recompensa.",
+  "Boxes":
+    "Cajas",
+  "Event and new-brawler boxes: the ones in this season's Daily Wins first, then newest first.":
+    "Cajas de eventos y de nuevos brawlers: primero las de las victorias diarias de esta temporada, luego las más nuevas.",
+  "In this season's Daily Wins":
+    "En las victorias diarias de esta temporada",
+  "Added {date}":
+    "Añadida el {date}",
+  "Each of your first {n} wins of the day gives a reward, and what each one gives changes every season. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Cada una de tus primeras {n} victorias del día da una recompensa, y lo que da cada una cambia cada temporada. El contador se reinicia una vez al día; el temporizador de la pantalla de Victorias diarias del juego muestra exactamente cuándo.",
+  "Your first wins of the day each give a reward, and what each one gives changes every season.":
+    "Tus primeras victorias del día dan una recompensa cada una, y lo que da cada una cambia cada temporada.",
+  "Normal days":
+    "Días normales",
+  "Lucky days":
+    "Días de suerte",
+  "Luckiest days":
+    "Días de más suerte",
+  "one of these":
+    "una de estas",
+  "Special days":
+    "Días especiales",
+  "Recent special days":
+    "Días especiales recientes",
+  "Coming":
+    "Próximo",
+  "Only for new players.":
+    "Solo para jugadores nuevos.",
+  "Chaos Drop":
+    "Premio del caos",
+  "Credit":
+    "Créditos",
 };

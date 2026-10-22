@@ -75,12 +75,36 @@ export interface DropType {
   /** Chance of the drop rolling each rarity, 0–1. Empty when not stated. */
   rarityOdds: { rarity: string; chance: number }[];
   tables: DropTable[];
-  /** Which heading it came from: the permanent drops or the event ones. */
-  group: 'core' | 'event';
+  /** Which heading it came from: the permanent drops, the event ones, or boxes. */
+  group: 'core' | 'event' | 'box';
+  /** Boxes only: the last day the wiki's history says it was added, ISO. */
+  addedAt?: string | null;
+  /** Boxes only: this season's Daily Wins can give it, so it is live now. */
+  inDailyWins?: boolean;
+}
+
+/** One reward slot of a Daily Wins row: one icon, or two for a double drop. */
+export interface DailyCell {
+  items: { name: string; amount: string | null; iconUrl: string | null }[];
+  /** The wiki footnoted this slot, e.g. "Only for new players." */
+  footnote: boolean;
+}
+
+export interface DailySchedule {
+  /** How many wins a day pay out, from the wiki's own sentence. */
+  wins: number | null;
+  /** "Normal Days", "Lucky Days", ... each with the rows it can roll. */
+  days: { name: string; rows: DailyCell[][] }[];
+  /** The text of the footnote, when any slot carries one. */
+  footnote: string | null;
+  /** Dated one-off days, newest first. */
+  special: { startsAt: string; endsAt: string; cells: DailyCell[] }[];
 }
 
 export interface StarrDropData {
   types: DropType[];
+  /** What each daily win gives this season, read from the same page. */
+  daily: DailySchedule | null;
   /** Where the numbers came from, for attribution. */
   sourceUrl: string;
 }
@@ -346,7 +370,7 @@ function familyIcon(icon: string): { local?: string; wiki?: string } | null {
   // any rarity the game adds later.
   if (/\bskins?$/i.test(icon) || icon === 'Skin Upgrade') return { local: '/icons/skins.png' };
   if (/\bPin$/i.test(icon)) return { wiki: 'Pin.png' };
-  if (/\bDrop$|\bEgg$|\bBox$|\bPresent$/i.test(icon)) return { wiki: `${icon}.png` };
+  if (/drop$|\bEgg$|\bBox$|\bPresent$|\bRoll$|\bMeal$|\bPack$/i.test(icon)) return { wiki: `${icon}.png` };
   return null;
 }
 
@@ -357,7 +381,7 @@ function artworkFile(body: string): string | null {
 }
 
 /**
- * Turns wiki file names into image URLs, in one request for the whole page.
+ * Turns wiki file names into image URLs, in as few requests as the API allows.
  *
  * `[[File:Starr Drop.png]]` is a *name*, not an address — the real URL is a
  * content-hashed path on the wiki's CDN. The API resolves them in bulk, so
@@ -369,19 +393,29 @@ async function resolveArtwork(files: string[]): Promise<Map<string, string>> {
   const unique = [...new Set(files)];
   if (unique.length === 0) return out;
 
-  const titles = unique.map((file) => `File:${file}`).join('|');
-  const url = `${WIKI_API}?action=query&titles=${encodeURIComponent(
-    titles,
-  )}&prop=imageinfo&iiprop=url&format=json`;
+  // The API takes 50 titles a request; with the boxes the page needs more.
+  const batches: string[][] = [];
+  for (let i = 0; i < unique.length; i += 50) batches.push(unique.slice(i, i + 50));
 
-  const body = await fetchWikiJson<{
-    query?: { pages?: Record<string, { title?: string; imageinfo?: { url?: string }[] }> };
-  }>(url, REVALIDATE_DROPS);
+  const bodies = await Promise.all(
+    batches.map((batch) =>
+      fetchWikiJson<{
+        query?: { pages?: Record<string, { title?: string; imageinfo?: { url?: string }[] }> };
+      }>(
+        `${WIKI_API}?action=query&titles=${encodeURIComponent(
+          batch.map((file) => `File:${file}`).join('|'),
+        )}&prop=imageinfo&iiprop=url&format=json`,
+        REVALIDATE_DROPS,
+      ),
+    ),
+  );
 
-  for (const page of Object.values(body?.query?.pages ?? {})) {
-    const name = page.title?.replace(/^File:/, '');
-    const src = page.imageinfo?.[0]?.url;
-    if (name && src) out.set(name, src);
+  for (const body of bodies) {
+    for (const page of Object.values(body?.query?.pages ?? {})) {
+      const name = page.title?.replace(/^File:/, '');
+      const src = page.imageinfo?.[0]?.url;
+      if (name && src) out.set(name, src);
+    }
   }
 
   return out;
@@ -424,6 +458,191 @@ function parseGroup(wikitext: string, heading: string, group: DropType['group'])
     .filter((type) => type.description || type.tables.length > 0);
 }
 
+/* ---------------------------------- boxes --------------------------------- */
+
+/**
+ * The wiki's box pages, read the same way as the drops (2026-10-22).
+ *
+ * Boxes came back to the game as event and new-brawler rewards — a Mega Box
+ * voucher went out on 2026-10-21, and this season's Daily Wins can give a
+ * Pumpkin Box — but they live on `Boxes/…` subpages, not on the Starr Drops
+ * page, so the first version of this page never showed one. Each subpage is
+ * a list of `=== X Boxes ===` sections with the same chance tables.
+ */
+export const BOX_PAGES = ['Boxes/Event Boxes', 'Boxes/Brawler Boxes'] as const;
+
+/** "On 01/09/26, Cosmo Boxes and Vince Boxes were added to the game." */
+export function boxAddedDates(wikitext: string, names: string[]): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const line of wikitext.split('\n')) {
+    const date = line.match(/^\*\s*On (\d{2})\/(\d{2})\/(\d{2}),/);
+    if (!date) continue;
+    const iso = `20${date[3]}-${date[2]}-${date[1]}`;
+    // Sentence by sentence, so "Mecha Boxes were added. Mega Boxes were
+    // added back" dates both, and "X were removed and replaced by Y" dates Y.
+    for (const sentence of line.split(/\.\s/)) {
+      const added = sentence.search(/\b(?:were|was) added\b/);
+      const replaced = sentence.search(/\breplaced by\b/);
+      for (const name of names) {
+        const at = sentence.indexOf(name);
+        if (at === -1) continue;
+        if ((added !== -1 && at < added) || (replaced !== -1 && at > replaced)) {
+          if ((out.get(name) ?? '') < iso) out.set(name, iso);
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/** "Pumpkin Boxes" -> "Pumpkin Box", the name Daily Wins uses. */
+function singular(name: string): string {
+  return name.replace(/Boxes$/, 'Box');
+}
+
+export function parseBoxes(wikitext: string, dailyIcons: Set<string>): DropType[] {
+  const sections = subsections(wikitext).filter(({ body }) => tableBlocks(body).length > 0);
+  const names = sections.map(({ heading }) => heading.trim());
+  const added = boxAddedDates(wikitext, names);
+
+  return sections
+    .filter(({ heading }) => heading.trim() !== 'Fallback Rewards')
+    .map(({ heading, body }): DropType => {
+      const name = heading.trim();
+      const blocks = tableBlocks(body);
+      // A box reworked over the years keeps one tab per year ("2025",
+      // "2024"), newest first: only the current one is the box you get.
+      const yearly = blocks.length > 1 && /^\d{4}$/.test(rarityForTable(body, blocks[0].start) ?? '');
+      const tables = (yearly ? blocks.slice(0, 1) : blocks).map((block): DropTable => {
+        const rewards = parseTable(block.text);
+        return {
+          rarity: yearly ? null : rarityForTable(body, block.start),
+          rewards,
+          listed: rewards.reduce((sum, reward) => sum + (reward.chance ?? 0), 0),
+        };
+      });
+      return {
+        name,
+        slug: slugify(name),
+        imageUrl: artworkFile(body),
+        // The sections open on artwork and a table, with no prose to quote;
+        // the page says when each was added instead.
+        description: '',
+        rarityOdds: [],
+        tables: tables.filter((table) => table.rewards.length > 0),
+        group: 'box',
+        addedAt: added.get(name) ?? null,
+        inDailyWins: dailyIcons.has(singular(name)),
+      };
+    })
+    .filter((type) => type.tables.length > 0);
+}
+
+/* -------------------------------- daily wins ------------------------------- */
+
+function dailyCell(cell: string): DailyCell {
+  const footnote = /<ref\b/i.test(cell);
+  const clean = cell.replace(/<ref[^>]*\/>|<ref[^>]*>[\s\S]*?<\/ref>/gi, '');
+  const items = [...clean.matchAll(/(?:([\d,]+)\s*)?\{\{\s*Icon\s*\|\s*([^}|]+?)\s*\}\}/gi)].map((m) => ({
+    name: m[2],
+    amount: m[1] ?? null,
+    iconUrl: null,
+  }));
+  return { items, footnote };
+}
+
+/** A table's rows as cells, with the `!` header rows passed through. */
+function dailyRows(table: string): ({ header: string } | { cells: string[] })[] {
+  const out: ({ header: string } | { cells: string[] })[] = [];
+  for (const row of table.split(/\n\|-\s*\n?/)) {
+    const line = row.trim();
+    if (!line || line.startsWith('{|')) continue;
+    if (line.startsWith('!')) {
+      out.push({ header: toPlainText(line.replace(/^!+/, '').replace(/^[^|]*\|(?!\|)/, '')).trim() });
+      continue;
+    }
+    out.push({ cells: line.replace(/\n\|/g, '||').replace(/^\|/, '').split('||') });
+  }
+  return out;
+}
+
+/**
+ * The Daily Wins section: what each win of the day gives this season.
+ *
+ * This is the "starr drop schedule" people search for. It was written into
+ * the page by hand on 2026-10-09 as "your first 5 wins" and was out of date
+ * two weeks later, when the wiki said 6 — so it is read from the wiki now.
+ */
+export function parseDailyWins(wikitext: string): DailySchedule | null {
+  const at = wikitext.search(/^==\s*Daily Wins\s*==\s*$/m);
+  if (at === -1) return null;
+  const rest = wikitext.slice(at).replace(/^==[^\n]*\n/, '');
+  const nextTop = rest.search(/^==[^=]/m);
+  const section = nextTop === -1 ? rest : rest.slice(0, nextTop);
+
+  const wins = section.match(/first (\d+) wins/i);
+  const footnote = section.match(/<ref[^>/]*>([\s\S]*?)<\/ref>/i);
+  const parts = subsections(section);
+
+  const days: DailySchedule['days'] = [];
+  const current = parts.find((p) => /current season/i.test(p.heading));
+  const currentTable = current && tableBlocks(current.body)[0];
+  if (currentTable) {
+    for (const row of dailyRows(currentTable.text)) {
+      if ('header' in row) days.push({ name: row.header, rows: [] });
+      else if (days.length > 0) days[days.length - 1].rows.push(row.cells.map(dailyCell));
+    }
+  }
+
+  const special: DailySchedule['special'] = [];
+  const specialPart = parts.find((p) => /special days/i.test(p.heading));
+  const specialTable = specialPart && tableBlocks(specialPart.body)[0];
+  if (specialTable) {
+    for (const row of dailyRows(specialTable.text)) {
+      if ('header' in row || row.cells.length < 2) continue;
+      // "April 14, 2026 to \nApril 23, 2026" or a single date.
+      const [from, to] = toPlainText(row.cells[0]).split(/\s+to\s+/).map((d) => Date.parse(`${d.trim()} UTC`));
+      if (!Number.isFinite(from)) continue;
+      special.push({
+        startsAt: new Date(from).toISOString(),
+        endsAt: new Date(Number.isFinite(to) ? to : from).toISOString(),
+        cells: row.cells.slice(1).map(dailyCell),
+      });
+    }
+  }
+  special.sort((a, b) => b.startsAt.localeCompare(a.startsAt));
+
+  /*
+   * A footnoted slot is a variant ("160 Credits, only for new players") of a
+   * row that is otherwise listed in full. The variant is dropped when its
+   * twin exists, so the table shows what an established player gets.
+   */
+  const names = (cell: DailyCell) => cell.items.map((item) => item.name).join('+');
+  for (const day of days) {
+    day.rows = day.rows.filter(
+      (row) =>
+        !row.some((cell) => cell.footnote) ||
+        !day.rows.some(
+          (other) =>
+            other !== row &&
+            !other.some((cell) => cell.footnote) &&
+            other.length === row.length &&
+            other.every((cell, i) => row[i].footnote || names(cell) === names(row[i])),
+        ),
+    );
+  }
+  const anyFootnote = days.some((d) => d.rows.some((row) => row.some((cell) => cell.footnote)));
+
+  const filled = days.filter((d) => d.rows.length > 0);
+  if (filled.length === 0 && special.length === 0) return null;
+  return {
+    wins: wins ? Number(wins[1]) : null,
+    days: filled,
+    footnote: footnote && anyFootnote ? toPlainText(footnote[1]).trim() : null,
+    special,
+  };
+}
+
 /* ---------------------------------- read ---------------------------------- */
 
 function localIconPath(icon: string | null): string | null {
@@ -440,13 +659,35 @@ interface WikiParseResponse {
   parse?: { wikitext?: { '*'?: string } };
 }
 
+function boxPageUrl(page: string): string {
+  return `${WIKI_API}?action=parse&page=${encodeURIComponent(page).replace(/%20/g, '_')}&prop=wikitext&format=json`;
+}
+
 export async function getStarrDrops(): Promise<StarrDropData | null> {
   const body = await fetchWikiJson<WikiParseResponse>(WIKI_URL, REVALIDATE_DROPS);
   const wikitext = body?.parse?.wikitext?.['*'];
   if (!wikitext) return null;
 
+  const daily = parseDailyWins(wikitext);
+  const dailyIcons = new Set(
+    (daily?.days ?? []).flatMap((d) => d.rows.flat().flatMap((cell) => cell.items.map((item) => item.name))),
+  );
+
+  // The box pages are extras: one failing costs its boxes, not the page.
+  const boxPages = await Promise.all(
+    BOX_PAGES.map((page) => fetchWikiJson<WikiParseResponse>(boxPageUrl(page), REVALIDATE_DROPS)),
+  );
+  const boxes = boxPages
+    .flatMap((page) => {
+      const text = page?.parse?.wikitext?.['*'];
+      return text ? parseBoxes(text, dailyIcons) : [];
+    })
+    // What this season's Daily Wins can give first, then newest first.
+    .sort((a, b) => Number(b.inDailyWins) - Number(a.inDailyWins) || (b.addedAt ?? '').localeCompare(a.addedAt ?? ''));
+
   const types = [
     ...parseGroup(wikitext, 'Drop Types', 'core'),
+    ...boxes,
     ...parseGroup(wikitext, 'Event Drops', 'event'),
   ];
 
@@ -457,6 +698,18 @@ export async function getStarrDrops(): Promise<StarrDropData | null> {
    * icon we do not ship ourselves. Resolving these per row would be a hundred
    * calls to render one page.
    */
+  const dailyItems = [
+    ...(daily?.days ?? []).flatMap((d) => d.rows.flat()),
+    ...(daily?.special ?? []).flatMap((s) => s.cells),
+  ].flatMap((cell) => cell.items);
+  // A daily slot names its drop or box; the wiki's file is that name, or
+  // its plural ("Smoothie Drops.png").
+  const dailyFiles = (name: string): string[] => {
+    if (localIconPath(name)) return [];
+    const known = wikiIconFile(name);
+    return [...(known ? [known] : []), `${name}.png`, `${name}s.png`];
+  };
+
   const wanted = new Set<string>();
   for (const type of types) {
     if (type.imageUrl) wanted.add(type.imageUrl);
@@ -466,6 +719,9 @@ export async function getStarrDrops(): Promise<StarrDropData | null> {
         if (file) wanted.add(file);
       }
     }
+  }
+  for (const item of dailyItems) {
+    for (const file of dailyFiles(item.name)) wanted.add(file);
   }
 
   const artwork = await resolveArtwork([...wanted]);
@@ -481,9 +737,14 @@ export async function getStarrDrops(): Promise<StarrDropData | null> {
       }
     }
   }
+  for (const item of dailyItems) {
+    const found = dailyFiles(item.name).find((file) => artwork.has(file));
+    item.iconUrl = localIconPath(item.name) ?? (found ? artwork.get(found)! : null);
+  }
 
   return {
     types,
+    daily,
     sourceUrl: 'https://brawlstars.fandom.com/wiki/Starr_Drops',
   };
 }

@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
-import { getStarrDrops, type DropReward, type DropTable, type DropType } from '@/lib/starr-drops';
+import { getStarrDrops, type DailyCell, type DailySchedule, type DropReward, type DropTable, type DropType } from '@/lib/starr-drops';
+import { formatDate } from '@/lib/format';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   // seen query (position 9.8) and the title did not say the page answers it.
   title: 'Brawl Stars Starr Drops: daily schedule, chances and rewards',
   description:
-    'When you get Starr Drops: your first 5 wins every day, plus event extras. Then the chances for every rarity, Rare to Legendary, and every reward inside.',
+    'When you get Starr Drops: what each daily win gives this season, and the special days. Then the chances for every drop and box, and every reward inside.',
   alternates: { canonical: '/starr-drops' },
 };
 
@@ -87,6 +88,7 @@ export default async function StarrDropsPage() {
 
   const core = data.types.filter((type) => type.group === 'core');
   const event = data.types.filter((type) => type.group === 'event');
+  const boxes = data.types.filter((type) => type.group === 'box');
 
   return (
     <div className="space-y-10">
@@ -103,18 +105,15 @@ export default async function StarrDropsPage() {
 
         Search Console had this page answering "starr drop schedule" at
         position 9 -- people asking *when* and *how many*, landing on a page
-        that only said *what*. The daily-wins line is from in-game checks
-        (2026-10-09); event extras come from the patch notes and carry an end
-        date, so each one takes itself off the page when its event is over.
+        that only said *what*. The Daily Wins table is read from the wiki
+        (2026-10-22): the hand-written "first 5 wins" of 2026-10-09 was out of
+        date within two weeks. Event extras come from the patch notes and carry
+        an end date, so each one takes itself off the page when its event is over.
       */}
       <section aria-labelledby="schedule" className="space-y-3">
         <SectionHeading title={t('How to get them: the daily schedule')} />
+        {data.daily ? <DailyWins daily={data.daily} /> : null}
         <div className="grid gap-3 md:grid-cols-2">
-          <div className="card p-5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-brand">{t('Every day')}</p>
-            <h3 className="display mt-1 text-xl">{t('Your first 5 wins')}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">{t('Each of your first five wins of the day earns a reward drop: usually a Starr Drop, sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.')}</p>
-          </div>
           {liveEventExtras().map((e) => (
             <div key={e.name} className="card border-accent/40 p-5">
               <p className="text-[11px] font-bold uppercase tracking-wider text-accent">{t('{event} · limited time', { event: e.event })}</p>
@@ -149,6 +148,19 @@ export default async function StarrDropsPage() {
         ))}
       </section>
 
+      {boxes.length > 0 ? (
+        <section aria-labelledby="boxes" className="space-y-3">
+          <SectionHeading
+            title={t('Boxes')}
+            subtitle={t("Event and new-brawler boxes: the ones in this season's Daily Wins first, then newest first.")}
+            count={boxes.length}
+          />
+          {boxes.map((type) => (
+            <DropSection key={type.slug} type={type} />
+          ))}
+        </section>
+      ) : null}
+
       {event.length > 0 ? (
         <section aria-labelledby="event" className="space-y-3">
           <SectionHeading
@@ -173,6 +185,102 @@ export default async function StarrDropsPage() {
         .
       </p>
     </div>
+  );
+}
+
+/** Day kinds the wiki uses, so they can be translated; anything new shows as written. */
+const DAY_NAMES: Record<string, string> = {
+  'Normal Days': 'Normal days',
+  'Lucky Days': 'Lucky days',
+  'Luckiest Days': 'Luckiest days',
+};
+
+/** How many past special days to show. Upcoming ones are always shown. */
+const SPECIAL_DAYS_SHOWN = 3;
+
+/**
+ * What each daily win gives this season, slot by slot, then the special days.
+ *
+ * Icons rather than words, like the game's own Daily Wins screen: a reader
+ * recognises a Chaos Drop by its shape. The name is in the alt text.
+ */
+function DailyWins({ daily }: { daily: DailySchedule }) {
+  const t = getT(requestLocale());
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = daily.special.filter((day) => day.endsAt.slice(0, 10) >= today).reverse();
+  const past = daily.special.filter((day) => day.endsAt.slice(0, 10) < today).slice(0, SPECIAL_DAYS_SHOWN);
+  const range = (day: DailySchedule['special'][number]) =>
+    day.startsAt === day.endsAt ? formatDate(day.startsAt) : `${formatDate(day.startsAt)} – ${formatDate(day.endsAt)}`;
+
+  return (
+    <div className="card space-y-4 p-4 sm:p-5">
+      <p className="text-sm leading-relaxed text-muted">
+        {daily.wins
+          ? t('Each of your first {n} wins of the day gives a reward, and what each one gives changes every season. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.', { n: daily.wins })
+          : t('Your first wins of the day each give a reward, and what each one gives changes every season.')}
+      </p>
+
+      {daily.days.map((day) => (
+        <div key={day.name}>
+          <p className="eyebrow mb-2">
+            {t(DAY_NAMES[day.name] ?? day.name)}
+            {day.rows.length > 1 ? <span className="ml-2 normal-case tracking-normal text-muted">{t('one of these')}</span> : null}
+          </p>
+          <div className="space-y-2">
+            {day.rows.map((row, i) => (
+              <DailyRow key={i} cells={row} />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {daily.footnote ? <p className="text-xs text-muted">* {t(daily.footnote)}</p> : null}
+
+      {upcoming.length + past.length > 0 ? (
+        <div className="border-t border-border pt-4">
+          <p className="eyebrow mb-2">{upcoming.length > 0 ? t('Special days') : t('Recent special days')}</p>
+          <div className="space-y-3">
+            {[...upcoming, ...past].map((day) => (
+              <div key={day.startsAt} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
+                <p className="shrink-0 text-sm sm:w-56">
+                  {upcoming.includes(day) ? <span className="mr-1.5 font-bold text-victory">{t('Coming')}</span> : null}
+                  {range(day)}
+                </p>
+                <DailyRow cells={day.cells} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function DailyRow({ cells }: { cells: DailyCell[] }) {
+  const t = getT(requestLocale());
+  return (
+    <ol className="flex flex-wrap gap-1.5">
+      {cells.map((cell, i) => (
+        <li
+          key={i}
+          className="relative flex h-14 min-w-14 items-center justify-center gap-0.5 rounded-xl border border-border bg-surface-2/40 px-1.5"
+          title={cell.items.map((item) => `${item.amount ? `${item.amount} ` : ''}${t(item.name)}`).join(' + ')}
+        >
+          <span className="absolute left-1 top-0.5 text-[10px] font-bold tabular-nums text-muted">{i + 1}</span>
+          {cell.items.map((item, j) =>
+            item.iconUrl ? (
+              <span key={j} className="flex flex-col items-center">
+                <Image src={item.iconUrl} alt={t(item.name)} width={40} height={40} className="size-9 object-contain" loading="lazy" unoptimized />
+                {item.amount ? <span className="-mt-1 text-[10px] font-bold tabular-nums">{item.amount}</span> : null}
+              </span>
+            ) : (
+              <span key={j} className="px-1 text-center text-[10px] leading-tight">{item.amount ? `${item.amount} ` : ''}{t(item.name)}</span>
+            ),
+          )}
+          {cell.footnote ? <span className="absolute right-1 top-0.5 text-xs text-muted">*</span> : null}
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -211,7 +319,15 @@ function DropSection({ type, defaultOpen = false }: { type: DropType; defaultOpe
             the summary without letting it set the row height.
           */}
           <p className="mt-0.5 line-clamp-1 text-xs leading-relaxed text-muted group-open:line-clamp-none sm:text-sm">
-            {t(type.description)}
+            {type.group === 'box' ? (
+              <>
+                {type.inDailyWins ? <span className="font-semibold text-victory">{t("In this season's Daily Wins")}</span> : null}
+                {type.inDailyWins && type.addedAt ? ' · ' : null}
+                {type.addedAt ? t('Added {date}', { date: formatDate(type.addedAt) }) : null}
+              </>
+            ) : (
+              t(type.description)
+            )}
           </p>
         </div>
 

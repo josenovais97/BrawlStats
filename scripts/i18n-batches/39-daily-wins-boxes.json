@@ -1,0 +1,19 @@
+{
+ "When you get Starr Drops: what each daily win gives this season, and the special days. Then the chances for every drop and box, and every reward inside.": ["Cuándo consigues Premios Starr: qué da cada victoria diaria esta temporada y los días especiales. Y las probabilidades de cada premio y caja, con cada recompensa.", "Quando você ganha Sorteios Starr: o que cada vitória diária dá nesta temporada e os dias especiais. E as chances de cada sorteio e caixa, com cada recompensa."],
+ "Boxes": ["Cajas", "Caixas"],
+ "Event and new-brawler boxes: the ones in this season's Daily Wins first, then newest first.": ["Cajas de eventos y de nuevos brawlers: primero las de las victorias diarias de esta temporada, luego las más nuevas.", "Caixas de eventos e de novos brawlers: primeiro as das vitórias diárias desta temporada, depois as mais novas."],
+ "In this season's Daily Wins": ["En las victorias diarias de esta temporada", "Nas vitórias diárias desta temporada"],
+ "Added {date}": ["Añadida el {date}", "Adicionada em {date}"],
+ "Each of your first {n} wins of the day gives a reward, and what each one gives changes every season. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.": ["Cada una de tus primeras {n} victorias del día da una recompensa, y lo que da cada una cambia cada temporada. El contador se reinicia una vez al día; el temporizador de la pantalla de Victorias diarias del juego muestra exactamente cuándo.", "Cada uma das suas {n} primeiras vitórias do dia dá uma recompensa, e o que cada uma dá muda a cada temporada. A contagem reinicia uma vez por dia; o cronômetro da tela de Vitórias diárias no jogo mostra exatamente quando."],
+ "Your first wins of the day each give a reward, and what each one gives changes every season.": ["Tus primeras victorias del día dan una recompensa cada una, y lo que da cada una cambia cada temporada.", "Suas primeiras vitórias do dia dão uma recompensa cada, e o que cada uma dá muda a cada temporada."],
+ "Normal days": ["Días normales", "Dias normais"],
+ "Lucky days": ["Días de suerte", "Dias de sorte"],
+ "Luckiest days": ["Días de más suerte", "Dias de mais sorte"],
+ "one of these": ["una de estas", "uma destas"],
+ "Special days": ["Días especiales", "Dias especiais"],
+ "Recent special days": ["Días especiales recientes", "Dias especiais recentes"],
+ "Coming": ["Próximo", "Em breve"],
+ "Only for new players.": ["Solo para jugadores nuevos.", "Só para jogadores novos."],
+ "Chaos Drop": ["Premio del caos", "Sorteio do Caos"],
+ "Credit": ["Créditos", "Créditos"]
+}
