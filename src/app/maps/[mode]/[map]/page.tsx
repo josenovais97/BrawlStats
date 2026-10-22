@@ -81,6 +81,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ownData =
     !entry.retired && (!indexable || (!!entry.scHash && indexable.has(mapIndexKey(entry.scHash, entry.map.name))));
 
+  /*
+   * The top three by name, when the map has its own picks: "best brawlers for
+   * kaboom canyon" is answered in the snippet itself. On 2026-10-22 Bing had
+   * map pages at positions 5-6 with no clicks under a description that only
+   * promised a ranking. The same cached read as the page body, so this costs
+   * nothing extra.
+   */
+  const top =
+    ownData && entry.scHash
+      ? await getRankedMapPicks(PICK_COUNT, RANKED_MAP_WINDOW_DAYS, {
+          mapName: await resolveDataMapName(entry.scHash, entry.map.name).catch(() => entry.map.name),
+          mode: entry.scHash,
+        })
+          .then((rows) => rows[0] ?? null)
+          .catch(() => null)
+      : null;
+  const sinceSeen = minutesSince(top?.lastSeen);
+  const topNames =
+    top && sinceSeen !== null && sinceSeen < MAP_ROTATION_GRACE_DAYS * 24 * 60
+      ? top.picks.slice(0, 3).map((p) => titleCase(p.brawlerName))
+      : [];
+
   return {
     ...(ownData ? {} : { robots: { index: false, follow: true } }),
     // Written as the query, because that is how this page is found: people
@@ -94,7 +116,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       : t('{name} best brawlers, {modeLabel} ({v})', { name: nm(entry.map.name), modeLabel: modeLabel, v: currentMonth() }),
     description: entry.retired
       ? t('{name} was a {modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in {modeLabel2} generally.', { name: nm(entry.map.name), modeLabel: modeLabel, modeLabel2: modeLabel })
-      : t('The strongest brawlers on {name} ({modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.', { name: nm(entry.map.name), modeLabel: modeLabel }),
+      : topNames.length === 3
+        ? t('Best brawlers on {name} right now: {v}, from {sampleSize} Ranked battles on this map. Best teams, matchups and the map layout, updated daily.', { name: nm(entry.map.name), v: listOf(topNames), sampleSize: formatNumber(top!.sampleSize) })
+        : t('The strongest brawlers on {name} ({modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.', { name: nm(entry.map.name), modeLabel: modeLabel }),
     alternates: { canonical: `/maps/${entry.modeSlug}/${entry.mapSlug}` },
     openGraph: {
       title: t('{name} best brawlers', { name: nm(entry.map.name) }),

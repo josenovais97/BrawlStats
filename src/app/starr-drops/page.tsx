@@ -13,10 +13,12 @@ import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   // "Chances", not "odds": the word in the queries Search Console shows
-  // ("legendary starr drop chances", "star drop chances").
-  title: 'Brawl Stars Starr Drop chances: every drop rate and reward',
+  // ("legendary starr drop chances", "star drop chances"). "Schedule" since
+  // 2026-10-22, when "brawl stars starr drop schedule" was this page's most
+  // seen query (position 9.8) and the title did not say the page answers it.
+  title: 'Brawl Stars Starr Drops: daily schedule, chances and rewards',
   description:
-    'Starr Drop chances for every rarity, from Rare to Legendary, and every reward inside each drop. Plus Chaos Drops and every event drop, in one table.',
+    'When you get Starr Drops: your first 5 wins every day, plus event extras. Then the chances for every rarity, Rare to Legendary, and every reward inside.',
   alternates: { canonical: '/starr-drops' },
 };
 

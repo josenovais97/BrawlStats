@@ -12,6 +12,7 @@ import { HomeLiveEvents } from '@/components/home/home-live-events';
 import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeBubble } from '@/components/home/home-bubble';
+import { HomeFollow } from '@/components/home/home-follow';
 import { HomePlayTest } from '@/components/home/home-play-test';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeSnapshot } from '@/components/home/home-snapshot';
@@ -200,6 +201,9 @@ export default function HomePage() {
         phone. Burying it would repeat the mistake that section documents.
       */}
       <HomeBubble />
+
+      {/* Free reward links: the reason to follow the WhatsApp channel. */}
+      <HomeFollow />
 
       <HomeSection
         id="live-now"

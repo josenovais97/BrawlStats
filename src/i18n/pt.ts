@@ -4080,4 +4080,18 @@ export const PT: Record<string, string> = {
     "Engrenagens, melhores modos e mapas, atualizado todos os dias.",
   "Best {name} build in Brawl Stars ({v}): gadget and star power":
     "Melhor build de {name} no Brawl Stars ({v}): acessório e poder de estrela",
+  "Brawl Stars Starr Drops: daily schedule, chances and rewards":
+    "Sorteios Starr do Brawl Stars: horário diário, chances e recompensas",
+  "When you get Starr Drops: your first 5 wins every day, plus event extras. Then the chances for every rarity, Rare to Legendary, and every reward inside.":
+    "Quando você ganha Sorteios Starr: suas primeiras 5 vitórias de cada dia, mais extras de eventos. E as chances de cada raridade, de Raro a Lendário, com cada recompensa.",
+  "Best brawlers on {name} right now: {v}, from {sampleSize} Ranked battles on this map. Best teams, matchups and the map layout, updated daily.":
+    "Melhores brawlers em {name} agora: {v}, de {sampleSize} partidas de Ranqueado neste mapa. Melhores times, confrontos e o mapa, atualizado todo dia.",
+  "Free reward links":
+    "Links de recompensas grátis",
+  "Free reward links, the day they drop":
+    "Links de recompensas grátis, no dia em que saem",
+  "Follow on WhatsApp":
+    "Seguir no WhatsApp",
+  "Supercell gives away free Starr Drops and boxes through links that expire. We share every one we find on our WhatsApp channel.":
+    "A Supercell dá Sorteios Starr e caixas grátis por links que expiram. Compartilhamos cada um que encontramos no nosso canal do WhatsApp.",
 };

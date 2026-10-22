@@ -8,7 +8,7 @@ import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, type Locale } from '@/lib/i18n';
 import { GooglePlayBadge } from '@/components/store-badges';
 import { PLAY_TEST } from '@/lib/bubble-app';
-import { BUY_ME_A_COFFEE_URL, CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL } from '@/lib/site';
+import { BUY_ME_A_COFFEE_URL, CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL, WHATSAPP_URL } from '@/lib/site';
 
 /*
  * Our own app, not the game's (2026-10-15). The footer used to link Brawl
@@ -45,11 +45,6 @@ const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
 /** Every daily carousel goes out here as a Reel too, since 2026-10-20. */
 const INSTAGRAM_URL = 'https://www.instagram.com/brawlzonenet/';
 
-/**
- * Free rewards and the map of the day, posted by hand (2026-10-21): Channels
- * have no posting API. Links are clickable there, unlike TikTok or Instagram.
- */
-const WHATSAPP_URL = 'https://whatsapp.com/channel/0029VbDyKwbGU3BEpdoHUK3l';
 
 
 const FAN_CONTENT_POLICY_URL = 'https://supercell.com/en/fan-content-policy/';
