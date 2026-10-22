@@ -8,9 +8,10 @@
 # is posted once it has been out two days and has 5,000 decided trophy-match
 # battles behind its score, and given up on after ten days. Then:
 # scripts/new-brawler-report.ts (in the sampler container) for the numbers,
-# deploy/newbrawler/make.py for the slides, served from
-# /var/lib/brawlzone/social/newbrawler/<id>/, and brawlzone-tiktok posts them
-# everywhere like any carousel.
+# then since 2026-10-22 a motion video ("Is <name> broken?") drawn and posted
+# by brawlzone-viral from /var/lib/brawlzone/social/newbrawler/<id>/. Only if
+# that video cannot be drawn: deploy/newbrawler/make.py's slides, posted by
+# brawlzone-tiktok like any carousel.
 #
 # A post day takes one of YouTube's ~6 daily uploads, so it leaves a flag that
 # brawlzone-rate reads and steps aside for.
@@ -109,6 +110,42 @@ avatar=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["avatar
 curl -sf --max-time 30 -A "$UA" -o "$OUT/art.png" "https://cdn.brawlify.com/brawlers/borderless/$due.png" \
   || curl -sf --max-time 30 -A "$UA" -o "$OUT/art.png" "https://cdn.brawlify.com/profile-icons/regular/$avatar.png" \
   || die "::error::no art for brawler $due"
+
+# ------------------------------------------------------------ the video
+# Its hero is the full-body model once Brawlify has one (often days after
+# release), else the art above; the gadget and star power icons when they
+# exist, else the video names them on plain badges.
+cp "$OUT/art.png" "$OUT/hero.png"
+curl -sf --max-time 30 -A "$UA" -o "$OUT/hero.tmp" "https://cdn.brawlify.com/brawlers/model/$due.png" \
+  && mv "$OUT/hero.tmp" "$OUT/hero.png"
+rm -f "$OUT/hero.tmp" "$OUT/gadget.png" "$OUT/starpower.png" "$OUT/video.mp4"
+read -r gadget starpower < <(python3 -c '
+import json, sys
+b = json.load(open(sys.argv[1])).get("build") or {}
+first = lambda k: str(((b.get(k) or [{}])[0]).get("id") or "-")
+print(first("gadget"), first("starPower"))' "$OUT/report.json")
+[ "$gadget" = - ] || curl -sf --max-time 30 -A "$UA" -o "$OUT/gadget.png" "https://cdn.brawlify.com/gadgets/borderless/$gadget.png"
+[ "$starpower" = - ] || curl -sf --max-time 30 -A "$UA" -o "$OUT/starpower.png" "https://cdn.brawlify.com/star-powers/borderless/$starpower.png"
+
+if [ "$post" = 1 ]; then
+  # Off the waiting list before posting: a failed upload must not post twice.
+  python3 - "$STATE" "$due" <<'PY'
+import json, os, sys
+path, due = sys.argv[1], sys.argv[2]
+st = json.load(open(path))
+st["pending"].pop(due, None)
+st["posted"] = sorted(set(st.get("posted", [])) | {int(due)})
+json.dump(st, open(path + ".tmp", "w")); os.replace(path + ".tmp", path)
+PY
+  touch "/var/lib/brawlzone/youtube-extra-$(date -u +%Y-%m-%d)"
+  /usr/local/bin/brawlzone-viral newbrawler "$OUT"; rc=$?
+else
+  /usr/local/bin/brawlzone-viral --no-post newbrawler "$OUT"; rc=$?
+fi
+# The slides only when no video was drawn: once it exists, posting has begun,
+# and a carousel on top would be the same post twice.
+[ -s "$OUT/video.mp4" ] && exit "$rc"
+echo "::warning::the video could not be drawn; posting the slides instead"
 
 cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
    "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"

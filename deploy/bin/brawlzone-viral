@@ -3,6 +3,7 @@
 # drawn from today's data and posted to TikTok (inbox), YouTube and Instagram.
 #
 #   brawlzone-viral [--no-post] [quiz|broken|ranks|modes]
+#   brawlzone-viral [--no-post] newbrawler <dir>
 #
 # Run at 15:30 UTC by brawlzone-viral.timer. The format follows the weekday:
 #
@@ -16,6 +17,10 @@
 #
 # A file $ROOT/skip-YYYY-MM-DD makes that day's run do nothing: for a day a
 # hand-made video takes the slot.
+#
+# `newbrawler` is brawlzone-newbrawler's: <dir> (under /var/lib/brawlzone/
+# social) holds the brawler's report.json and hero.png, maybe gadget.png and
+# starpower.png, and the video is drawn and posted from there, any day.
 #
 # The posting is brawlzone-tiktok's `viral` mode: one TikTok inbox upload,
 # then the same file to YouTube, Instagram and Discord, then the mail with
@@ -49,11 +54,25 @@ if [ -z "$kind" ]; then
     *) kind=quiz ;;
   esac
 fi
-case "$kind" in quiz|broken|ranks|modes) ;; *) die "::error::unknown format '$kind' (quiz, broken, ranks or modes)" ;; esac
+case "$kind" in quiz|broken|ranks|modes|newbrawler) ;; *) die "::error::unknown format '$kind' (quiz, broken, ranks, modes or newbrawler)" ;; esac
 
-OUT="$PUBLIC/$DAY"
+if [ "$kind" = newbrawler ]; then
+  OUT="${2:-}"
+  case "$OUT" in /var/lib/brawlzone/social/?*) ;; *) die "::error::newbrawler needs its folder under /var/lib/brawlzone/social" ;; esac
+  [ -r "$OUT/report.json" ] && [ -r "$OUT/hero.png" ] || die "::error::no report.json or hero.png in $OUT"
+  DATA_IN=/out/report.json
+  PREV=-
+else
+  OUT="$PUBLIC/$DAY"
+  DATA_IN="/data/history/$DAY.json"
+fi
+FOLDER=${OUT#/var/lib/brawlzone/social/}
 mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::cannot create $ROOT or $OUT"
 [ -r "$MUSIC" ] || die "::error::the track is missing: $MUSIC"
+cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
+   "$REPO/public/bubble/app-icon.png" "$CACHE/" || die "::error::fonts or icon missing from the checkout"
+
+if [ "$kind" != newbrawler ]; then
 
 # ---------------------------------------------------------------- data
 cd "$REPO" || die "::error::no checkout at $REPO"
@@ -89,8 +108,6 @@ PY
 echo "format: $kind, compared with: $PREV"
 
 # ---------------------------------------------------------------- assets
-cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
-   "$REPO/public/bubble/app-icon.png" "$CACHE/" || die "::error::fonts or icon missing from the checkout"
 # Full-body models and portraits from Brawlify, once per brawler. A brawler
 # with no model yet (a new one) is drawn as a card, and never quizzed.
 python3 - "$ROOT/history/$DAY.json" "$CACHE" <<'PY'
@@ -110,6 +127,7 @@ for b in data['all']:
             print(f"no {kind} for {b['n']}: {e}")
 PY
 [ "$(find "$CACHE/faces" -name '*.png' | wc -l)" -gt 50 ] || die "::error::brawler portraits could not be fetched"
+fi  # not newbrawler
 
 # ---------------------------------------------------------------- render
 draw () { # kind
@@ -123,7 +141,7 @@ draw () { # kind
   for part in 0 1; do
     docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 \
       -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
-      "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 /data/history/$DAY.json $PREV /data/state.json /out" \
+      "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 $DATA_IN $PREV /data/state.json /out" \
       > "$CACHE/make-$part.log" 2>&1 &
     pids+=($!)
   done
@@ -132,7 +150,7 @@ draw () { # kind
 }
 
 draw "$kind"; rc=$?
-if [ "$rc" = 3 ] && [ "$kind" != quiz ]; then
+if [ "$rc" = 3 ] && [ "$kind" != quiz ] && [ "$kind" != newbrawler ]; then
   echo "$(tail -n 1 "$CACHE/make-0.log"); drawing the quiz instead"
   kind=quiz; draw quiz; rc=$?
 fi
@@ -156,7 +174,7 @@ rm -rf "$OUT/frames"
 
 # The manifest brawlzone-tiktok reads, and the YouTube titles in Portuguese
 # and Spanish (descriptions stay English, like the video).
-python3 - "$OUT" "$SITE/social/viral/$DAY" <<'PY'
+python3 - "$OUT" "$SITE/social/$FOLDER" <<'PY'
 import json, sys
 out, url = sys.argv[1], sys.argv[2]
 m = json.load(open(f'{out}/meta.json'))
@@ -165,11 +183,11 @@ json.dump({'count': 1, 'slides': [f'{url}/cover.jpg'], 'title': m['title'], 'des
 json.dump({lang: {'title': t, 'description': m['description']} for lang, t in m.get('titles', {}).items()},
           open(f'{out}/l10n.json', 'w'), ensure_ascii=False)
 PY
-echo "video: $SITE/social/viral/$DAY/video.mp4 ($kind, ${DUR}s)"
+echo "video: $SITE/social/$FOLDER/video.mp4 ($kind, ${DUR}s)"
 [ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
 
 # ---------------------------------------------------------------- post
-VIDEO_FILE="$OUT/video.mp4" VIDEO_L10N="$OUT/l10n.json" /usr/local/bin/brawlzone-tiktok viral "$DAY" \
+VIDEO_FILE="$OUT/video.mp4" VIDEO_L10N="$OUT/l10n.json" /usr/local/bin/brawlzone-tiktok viral "$FOLDER" \
   || die "::error::brawlzone-tiktok viral failed"
 
 # Posted: remember the episode and the quiz answers, so tomorrow's quiz is

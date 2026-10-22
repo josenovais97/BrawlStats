@@ -10,6 +10,9 @@ kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
                  the 7-day window).
          ranks   most-picked in Diamond and below against Masters+.
          modes   the brawler that is top 3 on the most live maps of each mode.
+         newbrawler  "Is <new brawler> broken?": tier after their first
+                 battles, best maps, the build; data is then
+                 scripts/new-brawler-report.ts output, art beside it in OUT.
 data     scripts/viral-data.ts output.
 state    what earlier episodes used (episode numbers, recent quiz answers);
          read only here, deploy/bin/brawlzone-viral updates it after posting.
@@ -22,7 +25,7 @@ draw the quiz instead. --only draws preview stills at those seconds.
 The selection is seeded with the data's date, so parallel PARTs agree on it.
 """
 import json, math, os, random, sys
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, clamp,
                     confetti, finish, follow_cta, grey, hits, impact, load_face, load_model, nice, out_back,
@@ -36,8 +39,8 @@ try:
     state = json.load(open(STATE))
 except (OSError, ValueError):
     state = {}
-rnd = random.Random(f"{data['date']}/{KIND}")
-by_id = {b['id']: b for b in data['all']}
+rnd = random.Random(f"{data.get('date', '')}/{KIND}")
+by_id = {b['id']: b for b in data.get('all', [])}
 tl = Timeline()
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -456,8 +459,159 @@ def modes_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ newbrawler
+# data is scripts/new-brawler-report.ts output; deploy/bin/brawlzone-viral
+# leaves the art next to it in OUT: hero.png (model, else portrait, else the
+# profile icon) and, when Brawlify has them yet, gadget.png and starpower.png.
+VERDICT = {'S': ('BROKEN!', (255, 60, 100)), 'A': ('STRONG', (255, 140, 40)), 'B': ('SOLID', (255, 205, 40)),
+           'C': ('MID', (70, 215, 120)), 'D': ('MID', (60, 170, 255)), 'E': ('WEAK...', (150, 105, 255)),
+           'F': ('WEAK...', (125, 135, 170))}
+
+
+def mode_label(m):
+    return ''.join(' ' + c if c.isupper() else c for c in m).strip().upper()
+
+
+def optional(path):
+    return Image.open(path).convert('RGBA') if os.path.exists(path) else None
+
+
+if KIND == 'newbrawler':
+    R = data
+    if not R.get('tier') or not R.get('name'):
+        print('no tier yet'); sys.exit(3)
+    HERO = optional(f'{OUT}/hero.png')
+    if HERO is None:
+        print('no art'); sys.exit(1)
+    sc = min(820 / HERO.height, 860 / HERO.width)
+    HERO = HERO.resize((int(HERO.width * sc), int(HERO.height * sc)), Image.LANCZOS)
+    if HERO.getpixel((2, 2))[3] == 255:
+        # The profile icon, a square: framed as a card, and hidden behind a
+        # blurred "?" for the intro since its shadow would be a black box.
+        w, h = HERO.size
+        framed = Image.new('RGBA', (w + 28, h + 28), (0, 0, 0, 0))
+        ImageDraw.Draw(framed).rounded_rectangle((0, 0, w + 27, h + 27), 70, fill=WHITE, outline=(10, 12, 28), width=8)
+        framed.paste(HERO, (14, 14), rounded_mask(w, h, 58))
+        HERO = framed
+        MYSTERY = Image.blend(HERO.filter(ImageFilter.GaussianBlur(36)), Image.new('RGBA', HERO.size, (20, 20, 50, 255)), 0.45)
+        MYSTERY.putalpha(HERO.getchannel('A'))
+        q = text_sprite('?', 520, WHITE)
+        MYSTERY.alpha_composite(q, ((MYSTERY.width - q.width) // 2, (MYSTERY.height - q.height) // 2))
+    else:
+        MYSTERY = silhouette(HERO, (255, 255, 255))
+    ICONS = {'gadget': optional(f'{OUT}/gadget.png'), 'starPower': optional(f'{OUT}/starpower.png')}
+    maps = sorted(R.get('maps') or [], key=lambda m: -(m['wr'] - m['base']))[:3]
+    build = [(k, (R.get('build') or {}).get(k) or []) for k in ('gadget', 'starPower')]
+    build = [(k, v[0]) for k, v in build if v and v[0].get('name')]
+    NAME = R['name'].upper()
+    tl.add(5, 'n_intro')
+    tl.add(5, 'n_reveal')
+    tl.add(6, 'n_tier')
+    if maps: tl.add(6, 'n_maps', maps=maps)
+    if build: tl.add(6, 'n_build', build=build)
+    tl.add(7, 'n_outro')
+    META = {
+        'title': f"Is {R['name']} broken? {R['tier']} tier after {R['battles']:,} battles 😳",
+        'titles': {'pt-BR': f"{R['name']} está quebrado? Tier {R['tier']} depois de {R['battles']:,} partidas 😳".replace(',', '.'),
+                   'es-419': f"¿{R['name']} está roto? Tier {R['tier']} tras {R['battles']:,} partidas 😳"},
+        'description': f"{R['name']}, the new {R.get('rarity') or ''} {R.get('class') or 'brawler'}: "
+                       f"{R['tier']} tier, #{R['rank']} of {R['of']} brawlers after {R['battles']:,} real battles since release. "
+                       + (f"Best maps so far: {', '.join(m['map'] for m in maps)}. " if maps else '')
+                       + (f"Most players run {' + '.join(b['name'] for _, b in build)}. " if build else '')
+                       + f"Are you buying {R['name']}? 👇\n\n"
+                       f"Full stats: https://brawlzone.net/brawlers/{'-'.join(''.join(c if c.isalnum() else ' ' for c in R['name'].lower()).split())}{FOOTER}\n"
+                       f"#brawlstars #{''.join(ch for ch in R['name'].lower() if ch.isalnum())} #brawlstarsnewbrawler #brawlstarsmeta #brawlzone",
+    }
+
+
+def nb_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    tier = R['tier']; tcol = TIER.get(tier, (255, 60, 100))
+    if k == 'n_intro':
+        siren = (255, 50, 70) if int(t * 4) % 2 == 0 else (60, 120, 255)
+        canvas = background(t, siren).convert('RGBA')
+        put_rays(canvas, siren, t, W / 2, 960, speed=60, alpha=0.6)
+        put(canvas, MYSTERY, W / 2, 980, scale=0.9 + 0.05 * math.sin(t * 8), alpha=0.95)
+        slam(canvas, 'NEW', 230, None, W / 2, 380, bt, gold=True)
+        slam(canvas, 'BRAWLER', 200, WHITE, W / 2, 590, bt - 1)
+        slam(canvas, 'IS IT BROKEN?', 120, WHITE, W / 2, 1520, bt - 3)
+        shake, flash = hits(bt, (0, 1, 3), 1.3, 0.5)
+    elif k == 'n_reveal':
+        canvas = background(t, tcol).convert('RGBA')
+        put_rays(canvas, tcol, t, W / 2, 900, speed=40, alpha=0.9)
+        put(canvas, HERO, W / 2, 880, scale=1 + 0.35 * (1 - out_back(bt / 0.45, 1.6)))
+        nm = 220 if len(NAME) <= 7 else 160
+        put(canvas, text_sprite(NAME, nm, gold=True), W / 2, 1360, scale=1 + 1.2 * (1 - out_back((bt - 0.3) / 0.5, 1.2)) if bt > 0.3 else 0)
+        tags = [x for x in (R.get('rarity'), R.get('class')) if x]
+        for j, tag in enumerate(tags):
+            u = (bt - 1.5 - j * 0.4) / 0.35
+            if u > 0: put(canvas, pill(tag.upper(), (30, 40, 90), size=52), W / 2 + (j - (len(tags) - 1) / 2) * 420, 1540, scale=out_back(u))
+        shake = impact(lt, 1.5); flash = impact(lt) * 0.9
+    elif k == 'n_tier':
+        canvas = background(t, tcol).convert('RGBA')
+        put(canvas, text_sprite('AFTER', 90, WHITE), W / 2, 380, alpha=clamp(bt * 3))
+        n = int(R['battles'] * out_cubic(bt / 1.2))
+        put(canvas, text_sprite(f'{n:,}', 200, gold=True), W / 2, 540)
+        put(canvas, text_sprite('REAL BATTLES', 90, WHITE), W / 2, 700, alpha=clamp(bt * 3))
+        if bt > 1.5:
+            u = bt - 1.5
+            put(canvas, tier_pill(tier), W / 2, 960, scale=1.9 * (1 + 1.2 * (1 - out_back(u / 0.5, 1.2))) if u < 0.5 else 1.9)
+        if bt > 2.6:
+            put(canvas, text_sprite(f"#{R['rank']} OF {R['of']} BRAWLERS", 96, WHITE), W / 2, 1180, scale=out_back((bt - 2.6) / 0.4))
+        if bt > 3.8:
+            word, col = VERDICT[tier]
+            put(canvas, text_sprite(word, 210, col), W / 2, 1420, scale=1 + 1.6 * (1 - out_back((bt - 3.8) / 0.4, 1.0)), rot=-8)
+            if tier in 'SA': confetti(canvas, (bt - 3.8) * P)
+        shake, flash = hits(bt, (1.5, 2.6, 3.8), 1.3, 0.5)
+    elif k == 'n_maps':
+        canvas = background(t, (40, 150, 255)).convert('RGBA')
+        slam(canvas, 'BEST MAPS', 170, None, W / 2, 380, bt, gold=True)
+        put(canvas, text_sprite(f"where {R['name']} wins most", 54, (200, 210, 235), stroke=5, font=G), W / 2, 500, alpha=clamp(bt * 2))
+        for j, m in enumerate(s['maps']):
+            u = (bt - 0.8 - j * 0.7) / 0.4
+            if u <= 0: continue
+            row = Image.new('RGBA', (940, 230), (0, 0, 0, 0)); d = ImageDraw.Draw(row)
+            row.paste(vgrad(940, 230, (60, 110, 200), (20, 40, 100)).convert('RGBA'), (0, 0), rounded_mask(940, 230, 44))
+            d.rounded_rectangle((0, 0, 939, 229), 44, outline=WHITE, width=5)
+            d.text((40, 30), f'#{j + 1}', font=F(80), fill=GOLD_TOP, stroke_width=6, stroke_fill=(10, 12, 28))
+            name = m['map']; fs = 84
+            while F(fs).getlength(name) > 720 and fs > 44: fs -= 4
+            d.text((180, 30), name, font=F(fs), fill=WHITE, stroke_width=6, stroke_fill=(10, 12, 28))
+            d.text((182, 140), mode_label(m['mode']), font=F(50), fill=(170, 200, 255), stroke_width=4, stroke_fill=(10, 12, 28))
+            put(canvas, row, W / 2 + 900 * (1 - out_back(u, 1.3)), 720 + j * 270)
+            if u < 0.5: shake = max(shake, impact(u * 0.4, 0.5))
+    elif k == 'n_build':
+        canvas = background(t, (150, 90, 255)).convert('RGBA')
+        slam(canvas, 'THE BUILD', 170, None, W / 2, 380, bt, gold=True)
+        put(canvas, text_sprite('what most players run', 54, (200, 210, 235), stroke=5, font=G), W / 2, 500, alpha=clamp(bt * 2))
+        for j, (kind, b) in enumerate(s['build']):
+            u = (bt - 0.8 - j * 1.2) / 0.45
+            if u <= 0: continue
+            y = 800 + j * 420
+            col = (60, 200, 110) if kind == 'gadget' else (255, 190, 40)
+            icon = ICONS.get(kind)
+            if icon is not None:
+                put(canvas, icon.resize((220, 220), Image.LANCZOS), W / 2, y - 40, scale=out_back(u, 1.8))
+            else:
+                put(canvas, pill('GADGET' if kind == 'gadget' else 'STAR POWER', col, size=70), W / 2, y - 40, scale=out_back(u, 1.8))
+            put(canvas, text_sprite(b['name'].upper(), 96 if len(b['name']) <= 14 else 74, WHITE), W / 2, y + 130, scale=out_back((u - 0.3) / 0.8))
+            put(canvas, text_sprite(f"{('GADGET' if kind == 'gadget' else 'STAR POWER')} · {b['share'] * 100:.0f}% PICK IT", 50, col, stroke=5),
+                W / 2, y + 230, alpha=clamp(u - 0.6))
+            if u < 0.5: shake = max(shake, impact(u * 0.45 * P, 0.9))
+    else:  # n_outro
+        canvas = background(t, (255, 170, 40)).convert('RGBA'); mark = False
+        put(canvas, HERO.resize((HERO.width // 2, HERO.height // 2)), W / 2, 470, scale=out_back(bt / 0.5))
+        slam(canvas, 'BUYING', 170, WHITE, W / 2, 780, bt - 0.5)
+        slam(canvas, f'{NAME}?', 170 if len(NAME) <= 8 else 130, None, W / 2, 950, bt - 1, gold=True)
+        slam(canvas, 'YES OR NO IN THE COMMENTS', 64, WHITE, W / 2, 1080, bt - 1.6)
+        follow_cta(canvas, bt - 2.6, 1320, 'FOR EVERY NEW BRAWLER')
+        shake, flash = hits(bt, (0.5, 1, 2.6), 0.9, 0.3)
+    return finish(canvas, shake, flash, mark)
+
+
 # ================================================================ render
-SCENE = {'quiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene}[KIND]
+SCENE = {'quiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
+         'newbrawler': nb_scene}[KIND]
 
 
 def frame(t):

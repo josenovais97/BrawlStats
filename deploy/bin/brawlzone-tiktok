@@ -2,7 +2,7 @@
 # Send one of the day's carousels to TikTok as a draft.
 #
 #   brawlzone-tiktok [counter|tiers|build|trio|daily|hidden] [YYYY-MM-DD]
-#   VIDEO_FILE=x.mp4 [VIDEO_L10N=l10n.json] brawlzone-tiktok viral   (brawlzone-viral)
+#   VIDEO_FILE=x.mp4 [VIDEO_L10N=l10n.json] brawlzone-tiktok viral <folder>   (brawlzone-viral)
 #
 # Since 2026-10-13 the four daily posts are counter of the day (09:10), map of
 # the day (`tiers`, 12:00), build of the day (17:10) and trio of the day
@@ -245,10 +245,17 @@ case "$MODE" in
   # The daily viral Short, drawn and encoded by brawlzone-viral, which passes
   # the finished MP4 in VIDEO_FILE: every network gets that file as it is,
   # music and all, instead of a slideshow made here. The manifest under
-  # /social/viral/<date>/ carries the caption and the cover.
+  # /social/<folder>/ (viral/<date>, or newbrawler/<id>) carries the caption
+  # and the cover. One post per folder, not per day: a new brawler's video
+  # and the daily one can share a day.
   viral)
     [ -r "${VIDEO_FILE:-}" ] || die "::error::viral needs VIDEO_FILE, the finished video"
-    MANIFEST="${SITE}/social/viral/${DAY}/slides.json"
+    case "$DAY" in viral/*|newbrawler/*) ;; *) die "::error::viral needs its folder, e.g. viral/2026-10-23" ;; esac
+    case "$DAY" in *..*) die "::error::bad folder $DAY" ;; esac
+    FOLDER=$DAY
+    MANIFEST="${SITE}/social/${FOLDER}/slides.json"
+    POST_KEY="viral:${FOLDER}"
+    DAY="$(date -u +%Y-%m-%d)"
     FORMAT=video ;;
   # Any one-off carousel kept under public/tiktok/<name>/, by hand:
   #   brawlzone-tiktok promo season50
@@ -269,7 +276,7 @@ record_state "last_run.${MODE}" "$(now_iso)" || true
 # 2026-10-13, when the build went out at 14:20 to be checked) would otherwise
 # be sent again by its timer, and the duplicate takes one of TikTok's five
 # pending-upload slots that the evening's post needs. FORCE=1 sends anyway.
-last_posted=$(python3 -c 'import json,sys;print((json.load(open(sys.argv[1])).get("last_post") or {}).get(sys.argv[2],"")[:10])' "$STATE" "$MODE" 2>/dev/null)
+last_posted=$(python3 -c 'import json,sys;print((json.load(open(sys.argv[1])).get("last_post") or {}).get(sys.argv[2],"")[:10])' "$STATE" "${POST_KEY:-$MODE}" 2>/dev/null)
 if [ "${FORCE:-0}" != "1" ] && [ "$last_posted" = "$DAY" ]; then
   echo "${MODE} already posted on ${DAY}; skipping (FORCE=1 to send again)"
   exit 0
@@ -664,7 +671,7 @@ fi # the photo carousel
 # Recorded here rather than at upload time: health check 11 reads this to
 # answer "is the posting still working", and a timestamp written before the
 # outcome was known would have reported 2026-09-28 as a successful post.
-record_state "last_post.${MODE}" "$(now_iso)" || true
+record_state "last_post.${POST_KEY:-$MODE}" "$(now_iso)" || true
 
 # ------------------------------------------------------- the YouTube Short
 #
@@ -822,7 +829,7 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
     heading="Waiting in your TikTok inbox"
     if [ "$MODE" = viral ] && [ "$FORMAT" = none ]; then
       heading="Viral video: upload it to TikTok by hand"
-      todo="TikTok did not take it (${STATUS#not sent: }). Save ${SITE}/social/viral/${DAY}/video.mp4 to your phone and upload it in TikTok, KEEPING the video's own sound, with the caption above."
+      todo="TikTok did not take it (${STATUS#not sent: }). Save ${SITE}/social/${FOLDER}/video.mp4 to your phone and upload it in TikTok, KEEPING the video's own sound, with the caption above."
     elif [ "$MODE" = viral ]; then
       todo="Open TikTok, tap the notification, KEEP the video's own sound (the cuts follow its beat), paste the caption above, and publish. Then reply to the first comments: it is a daily series."
     elif [ "$FORMAT" = "video" ]; then
