@@ -79,7 +79,7 @@ if KIND == 'quiz':
         'titles': {'pt-BR': f'Adivinhe o brawler #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler #{N} 👀 Solo los verdaderos fans aciertan 5/5'},
         'description': f'Guess the brawler #{N}: 5 rounds, easy to hard. Shadows, pixels and zoom-ins. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
-                       f'Tier lists, counters and builds: https://brawlzone.net{FOOTER}\n'
+                       f'3 more to guess today (shadow, zoom, clues): https://brawlzone.net/daily-challenge{FOOTER}\n'
                        '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
         'used': [b['id'] for b in picks],
         'answers': names,
