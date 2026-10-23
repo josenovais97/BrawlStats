@@ -5,7 +5,9 @@
 # hourly too -- which fragmented them and left `brawlzone-log tiktok` showing
 # an empty current file while the run it was meant to show sat in an archive.
 #
-# This file is what `brawlzone-logrotate.timer` runs hourly. The job logs stay
+# This file is what `brawlzone-logrotate.timer` runs hourly, and only that:
+# it is installed as /etc/logrotate-brawlzone-access, outside logrotate.d, so
+# the daily system run does not rotate the same file in the same second. The job logs stay
 # with the daily system run, where they belong: they come to a few hundred
 # kilobytes a day between them.
 #

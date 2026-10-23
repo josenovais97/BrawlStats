@@ -63,7 +63,9 @@ dest_for () { # relative path under deploy/ -> "<dest> <mode>"
     bin/*)                          echo "/usr/local/bin/$name 755" ;;
     systemd/*)                      echo "/etc/systemd/system/$name 644" ;;
     etc/logrotate-brawlzone)        echo "/etc/logrotate.d/brawlzone 644" ;;
-    etc/logrotate-brawlzone-access) echo "/etc/logrotate.d/brawlzone-access 644" ;;
+    # Outside logrotate.d (2026-10-23): the daily system run read it too, and
+    # at midnight both rotated the file in the same second and one failed.
+    etc/logrotate-brawlzone-access) echo "/etc/logrotate-brawlzone-access 644" ;;
     etc/fail2ban-jail.local)        echo "/etc/fail2ban/jail.local 644" ;;
     etc/sshd-99-brawlzone.conf)     echo "/etc/ssh/sshd_config.d/99-brawlzone.conf 644" ;;
     *) return 1 ;;
