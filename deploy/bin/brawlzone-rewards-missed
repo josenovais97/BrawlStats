@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+"""Free rewards that went unposted (2026-10-23), for brawlzone-healthcheck.
+
+    brawlzone-rewards-missed
+
+brawlzone-rewards-watch reads brawlnetwork.com every ten minutes, and on
+2026-10-23 a link without /en/ slipped past its pattern: the Vince Box sat on
+that page all day while nothing noticed. This reads the page independently and
+loosely -- any Supercell link under a card added in the last two days -- and
+compares voucher ids with what was posted. Prints one line per reward missing
+for over half an hour (the watcher may be posting it right now), else nothing.
+"""
+import datetime, html, json, os, re, sys, time, urllib.request
+
+SEEN = '/var/lib/brawlzone/rewards-seen.json'
+STATE = '/var/lib/brawlzone/rewards-missed.json'
+GRACE = 1800
+VOUCHER = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
+
+try:
+    seen = {m.group(0).lower() for u in json.load(open(SEEN)) for m in [VOUCHER.search(u)] if m}
+except (OSError, ValueError):
+    sys.exit()
+try:
+    req = urllib.request.Request('https://brawlnetwork.com/rewards/', headers={
+        'user-agent': 'Mozilla/5.0 (compatible; BrawlZone/1.0; +https://brawlzone.net)'})
+    page = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', 'ignore')
+except Exception:
+    sys.exit()  # their site being down is not ours
+
+text = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<(?!a\b)[^>]+>', ' | ', page)))
+today = datetime.date.today()
+missing = {}
+for m in re.finditer(r'([^|]{2,60}?)\s*\|\s*(?:\|\s*)*Added:\s*([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,\s*(\d{4})', text):
+    try:
+        added = datetime.datetime.strptime(f'{m.group(2)} {m.group(3)} {m.group(4)}', '%B %d %Y').date()
+    except ValueError:
+        continue
+    if not 0 <= (today - added).days <= 1:
+        continue
+    after = text[m.end():m.end() + 1500]
+    nxt = re.search(r'Added:', after)  # stop at the next card
+    link = re.search(r'href="(https?://(?:link\.brawlstars\.com|store\.supercell\.com)/[^"]+)"', after[:nxt.start()] if nxt else after)
+    v = VOUCHER.search(link.group(1)) if link else None
+    if v and v.group(0).lower() not in seen:
+        missing[v.group(0).lower()] = m.group(1).strip(' |')
+
+try:
+    first = json.load(open(STATE))
+except (OSError, ValueError):
+    first = {}
+now = time.time()
+first = {k: first.get(k, now) for k in missing}
+json.dump(first, open(STATE + '.tmp', 'w'))
+os.replace(STATE + '.tmp', STATE)
+late = [missing[k] for k, t in first.items() if now - t > GRACE]
+if late:
+    print(f"free reward not posted: {', '.join(late[:3])} is on brawlnetwork.com/rewards "
+          "but went to none of our channels (brawlzone-rewards-watch missed it or failed)")

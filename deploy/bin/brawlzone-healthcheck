@@ -528,6 +528,12 @@ if [ -n "$brawler" ]; then
   fi
 fi
 
+# 20. Did a free reward go unposted? (2026-10-23) See brawlzone-rewards-missed:
+#     the Vince Box sat on brawlnetwork.com all day because the watcher's link
+#     pattern missed it, and nothing noticed. This mails within the half hour.
+missed_reward=$(/usr/local/bin/brawlzone-rewards-missed 2>/dev/null || true)
+[ -n "$missed_reward" ] && problems+=("$missed_reward")
+
 # The state is the SET of problems, not a yes/no.
 #
 # It used to be the single word `ok` or `failed`, and alerting only on the
