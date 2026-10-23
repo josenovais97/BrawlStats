@@ -122,6 +122,24 @@ if [ "$force" -eq 0 ] && { [ "$(systemctl is-active brawlzone-sampler.service)" 
   fi
   echo "sampler still running after 60 minutes of waiting; deploying anyway"
 fi
+
+# Never restart the app on a box that is already struggling (2026-10-23).
+#
+# A deploy is a build on both cores and then a restart, after which every page
+# is rendered again on its first visit. On 2026-10-23 one landed while a crawl
+# had the database saturated, and the restart turned "slow" into an hour of
+# timeouts. Above a load of 4 on two cores it waits for the next tick, for up
+# to 90 minutes (the same marker as the sampler wait), then goes ahead.
+load5=$(cut -d' ' -f2 /proc/loadavg)
+if [ "$force" -eq 0 ] && [ "${load5%.*}" -ge 4 ]; then
+  since=$(cat "$DEFER_STATE" 2>/dev/null || true)
+  [ -n "$since" ] || { since=$(date +%s); echo "$since" > "$DEFER_STATE"; }
+  if [ $(( $(date +%s) - since )) -lt 5400 ]; then
+    echo "load is ${load5} on two cores; deploy of ${remote:0:7} waits"
+    exit 0
+  fi
+  echo "load still ${load5} after 90 minutes of waiting; deploying anyway"
+fi
 rm -f "$DEFER_STATE"
 
 # Room to build (2026-10-19). A build writes ~5 GB of cache and a new image
@@ -297,3 +315,8 @@ echo "Reclaimed ${freed} of images and ${freed_cache} of build cache"
 
 echo "Now on $(git log --oneline -1)"
 git rev-parse HEAD > "$BUILT_STATE"
+
+# Render every page once, sequentially, before visitors do (brawlzone-warm).
+# After the state file: the deploy is done either way, and a slow warm-up must
+# not make the next tick build the same commit again.
+/usr/local/bin/brawlzone-warm 900 || true

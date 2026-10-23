@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Open every page in the sitemaps once, one at a time, right after a deploy
+# (2026-10-23).
+#
+#   brawlzone-warm [seconds]     (default 900)
+#
+# A new build starts with no rendered pages: each one is rendered on its first
+# visit, 5-10 seconds for a brawler page with the database healthy. On
+# 2026-10-23 those first renders landed together, on top of an overloaded
+# database, and brawler pages timed out for an hour. Rendering them here,
+# sequentially, means no visitor is ever first, and two cores never render more
+# than one at a time on our account. English pages first (they also fill the
+# data cache the translations share), then the translations, until the time
+# runs out.
+set -uo pipefail
+SITE=https://brawlzone.net
+budget=${1:-900}
+end=$(( $(date +%s) + budget ))
+n=0; slow=0
+for map in core intl; do
+  urls=$(curl -s -m 60 "$SITE/sitemaps/sitemap/$map.xml" | grep -o '<loc>[^<]*</loc>' | sed 's#</\?loc>##g')
+  for u in $urls; do
+    [ "$(date +%s)" -lt "$end" ] || { echo "warmed $n pages ($slow slow) before the ${budget}s budget ran out"; exit 0; }
+    t=$(curl -s -o /dev/null -m 60 -A 'BrawlZone warm-up (https://brawlzone.net)' -w '%{time_total}' "$u")
+    n=$((n + 1)); [ "${t%.*}" -ge 5 ] && slow=$((slow + 1))
+  done
+done
+echo "warmed $n pages ($slow took 5s or more)"
