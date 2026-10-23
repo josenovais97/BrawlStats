@@ -60,6 +60,7 @@ const GUILD_ID = process.env.DISCORD_GUILD_ID ?? '';
 const SITE = 'https://brawlzone.net';
 const BRAND = 0xffc93c;
 const API = 'https://discord.com/api/v10';
+const SERVER_INVITE = 'https://discord.gg/964EMQBBUJ';
 
 type Embed = Record<string, unknown>;
 interface Reply {
@@ -273,7 +274,7 @@ async function roleIds(): Promise<Map<string, string>> {
   return new Map(((await res.json()) as { id: string; name: string }[]).map((r) => [r.name, r.id]));
 }
 
-async function linkCommand(token: string, raw: string | undefined, userId: string) {
+async function linkCommand(token: string, raw: string | undefined, userId: string, home: boolean) {
   const tag = normalizeTag(raw ?? '');
   if (!tag) {
     await respond(token, { content: 'Give your player tag, like `/link 2RLCPVGUG`. It is under your name in game.' });
@@ -305,7 +306,10 @@ async function linkCommand(token: string, raw: string | undefined, userId: strin
 
   const e = await emojis();
   await respond(token, {
-    content: `✅ Linked to **${player.name}** (\`#${tag}\`). Roles set: **${bracket ?? '—'}**${rank ? ` · ${e.get(`rank_${rank.toLowerCase()}`) ?? ''} **${rank}**` : ''}. Now \`/profile\` on its own shows you.`,
+    // Roles exist only in the BrawlZone server; anywhere else it just links.
+    content: home
+      ? `✅ Linked to **${player.name}** (\`#${tag}\`). Roles set: **${bracket ?? '—'}**${rank ? ` · ${e.get(`rank_${rank.toLowerCase()}`) ?? ''} **${rank}**` : ''}. Now \`/profile\` on its own shows you.`
+      : `✅ Linked to **${player.name}** (\`#${tag}\`). Now \`/profile\` on its own shows you. Rank roles come with it in the BrawlZone server: ${SERVER_INVITE}`,
     embeds: [profileEmbed(player, tag, e)],
   });
 }
@@ -732,7 +736,7 @@ async function teamCommand(token: string, mapQuery: string, rankSlug: string | u
 
 /* -------------------------------------------------------------------- /help */
 
-async function helpCommand(token: string) {
+async function helpCommand(token: string, home: boolean) {
   await respond(token, {
     embeds: [
       {
@@ -752,6 +756,7 @@ async function helpCommand(token: string) {
           '`/leaderboard` — the global top 10',
           '`/unlink` — remove your link and roles',
           '',
+          ...(home ? [] : [`**Join the BrawlZone server** for rank roles and daily meta posts: ${SERVER_INVITE}`]),
           'Want it inside the game? The **Bubble app** floats the meta over your draft: https://brawlzone.net/bubble',
         ].join('\n'),
         footer: { text: 'brawlzone.net · free' },
@@ -805,6 +810,7 @@ export async function POST(request: Request): Promise<Response> {
     data?: { name?: string; options?: unknown };
     member?: { user?: { id?: string } };
     user?: { id?: string };
+    guild_id?: string;
   };
 
   if (interaction.type === 1) return Response.json({ type: 1 });
@@ -820,11 +826,13 @@ export async function POST(request: Request): Promise<Response> {
     const options = interaction.data?.options;
     const token = interaction.token;
     const userId = interaction.member?.user?.id ?? interaction.user?.id ?? '';
+    // Our own server, where the roles are; anywhere else the bot only answers.
+    const home = interaction.guild_id === GUILD_ID;
 
     after(async () => {
       try {
         if (name === 'profile') await profileCommand(token, opt(options, 'tag'), userId);
-        else if (name === 'link') await linkCommand(token, opt(options, 'tag'), userId);
+        else if (name === 'link') await linkCommand(token, opt(options, 'tag'), userId, home);
         else if (name === 'unlink') await unlinkCommand(token, userId);
         else if (name === 'brawler' || name === 'tier') await brawlerCommand(token, opt(options, 'name') ?? opt(options, 'brawler') ?? '');
         else if (name === 'map') await mapCommand(token, opt(options, 'name') ?? '');
@@ -835,7 +843,7 @@ export async function POST(request: Request): Promise<Response> {
         else if (name === 'rotation') await rotationCommand(token);
         else if (name === 'compare') await compareCommand(token, opt(options, 'a') ?? '', opt(options, 'b') ?? '');
         else if (name === 'leaderboard') await leaderboardCommand(token);
-        else if (name === 'help') await helpCommand(token);
+        else if (name === 'help') await helpCommand(token, home);
         else await respond(token, { content: 'Unknown command. Try `/help`.' });
       } catch {
         await respond(token, { content: 'Something went wrong looking that up. Try again shortly.' });
