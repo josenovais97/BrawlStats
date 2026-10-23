@@ -1,0 +1,14 @@
+[Unit]
+Description=Draw and post the daily challenge teaser at 18:10 UTC
+
+[Timer]
+# An hour after the 17:10 build post, which refreshes the same TikTok token
+# (this job skips TikTok but brawlzone-tiktok still refreshes it, and TikTok
+# rotates it on use: two runs overlapping lock the integration out). It took
+# the build post's YouTube slot, so the day stays at six uploads.
+OnCalendar=*-*-* 18:10:00
+Persistent=false
+Unit=brawlzone-viral-daily.service
+
+[Install]
+WantedBy=timers.target

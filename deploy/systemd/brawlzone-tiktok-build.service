@@ -9,4 +9,8 @@ OnFailure=brawlzone-alert@%n.service
 [Service]
 Type=oneshot
 User=ubuntu
+# Not on YouTube since 2026-10-23: six uploads a day is the API quota, and the
+# build Shorts drew the fewest views there (383, 258, 152), so the daily Zoom
+# teaser (brawlzone-viral-daily) took their slot. TikTok still gets them.
+Environment=YOUTUBE=0
 ExecStart=/usr/local/bin/brawlzone-run tiktok-build /usr/local/bin/brawlzone-tiktok build

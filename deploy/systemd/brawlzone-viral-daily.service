@@ -1,0 +1,10 @@
+[Unit]
+Description=BrawlZone: the daily challenge teaser Short (YouTube, Instagram, Discord)
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+TimeoutStartSec=3600
+ExecStart=/usr/local/bin/brawlzone-run viral-daily /usr/local/bin/brawlzone-viral daily

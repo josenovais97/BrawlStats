@@ -2,7 +2,7 @@
 # Send one of the day's carousels to TikTok as a draft.
 #
 #   brawlzone-tiktok [counter|tiers|build|trio|daily|hidden] [YYYY-MM-DD]
-#   VIDEO_FILE=x.mp4 [VIDEO_L10N=l10n.json] brawlzone-tiktok viral <folder>   (brawlzone-viral)
+#   VIDEO_FILE=x.mp4 [VIDEO_L10N=l10n.json] [TIKTOK=0] brawlzone-tiktok viral <folder>   (brawlzone-viral)
 #
 # Since 2026-10-13 the four daily posts are counter of the day (09:10), map of
 # the day (`tiers`, 12:00), build of the day (17:10) and trio of the day
@@ -527,7 +527,12 @@ print(data.get("publish_id") or "-", data.get("upload_url") or "-", (d.get("erro
   esac
 }
 
-if [ "$FORMAT" = "video" ]; then
+if [ "$FORMAT" = "video" ] && [ "$MODE" = viral ] && [ "${TIKTOK:-1}" = 0 ]; then
+  # TIKTOK=0 (2026-10-23): the second daily video, the Zoom teaser, which goes
+  # to YouTube, Instagram and Discord only; TikTok gets one video a day.
+  STATUS="skipped: YouTube, Instagram and Discord only"
+  FORMAT="none"
+elif [ "$FORMAT" = "video" ]; then
   VIDEO_WORK=$(mktemp -d)
   if post_video "$VIDEO_WORK"; then
     :
@@ -827,7 +832,11 @@ if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
   else
     subject="[brawlzone] TikTok ${MODE} ${FORMAT/photo/carousel} waiting -- ${DAY}"
     heading="Waiting in your TikTok inbox"
-    if [ "$MODE" = viral ] && [ "$FORMAT" = none ]; then
+    if [ "$MODE" = viral ] && [ "${TIKTOK:-1}" = 0 ]; then
+      subject="[brawlzone] Daily teaser posted (YouTube, Instagram, Discord) -- ${DAY}"
+      heading="Daily teaser posted"
+      todo="Nothing to do on TikTok: this one skips it. Pin a comment on the YouTube Short pointing to brawlzone.net/daily-challenge, and keep the answer out of your replies."
+    elif [ "$MODE" = viral ] && [ "$FORMAT" = none ]; then
       heading="Viral video: upload it to TikTok by hand"
       todo="TikTok did not take it (${STATUS#not sent: }). Save ${SITE}/social/${FOLDER}/video.mp4 to your phone and upload it in TikTok, KEEPING the video's own sound, with the caption above."
     elif [ "$MODE" = viral ]; then

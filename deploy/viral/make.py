@@ -13,6 +13,11 @@ kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
          newbrawler  "Is <new brawler> broken?": tier after their first
                  battles, best maps, the build; data is then
                  scripts/new-brawler-report.ts output, art beside it in OUT.
+         daily   "Can you guess today's brawler?" (2026-10-23): the first four
+                 steps of the site's Zoom puzzle and its Shadow, never the
+                 answer, which is at brawlzone.net/daily-challenge. data is
+                 {"date", "number"}; zoom-0..3 and shadow images beside it in
+                 OUT, fetched from the site by the caller.
 data     scripts/viral-data.ts output.
 state    what earlier episodes used (episode numbers, recent quiz answers);
          read only here, deploy/bin/brawlzone-viral updates it after posting.
@@ -613,9 +618,115 @@ def nb_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ daily
+# The site's own puzzle as a dare. Every other format gives its answers away,
+# so nobody needs the site; this one stops before the answer and says where
+# it is. Four of the six zoom steps, so the site still has two to give.
+ZOOM_STEPS = 4
+
+if KIND == 'daily':
+    N = data['number']
+    ZOOMS = [Image.open(f'{OUT}/zoom-{i}.webp').convert('RGBA') for i in range(ZOOM_STEPS)]
+    SHADOW = Image.open(f'{OUT}/shadow.webp').convert('RGBA')
+    sc = 760 / max(SHADOW.size)
+    SHADOW = silhouette(SHADOW.resize((int(SHADOW.width * sc), int(SHADOW.height * sc)), Image.LANCZOS), (200, 180, 255))
+    tl.add(4, 'd_intro')
+    for i in range(ZOOM_STEPS):
+        tl.add(3, 'd_zoom', i=i)
+    tl.add(4, 'd_stuck')
+    tl.add(4, 'd_shadow')
+    tl.add(7, 'd_outro')
+    META = {
+        'title': f"Can you guess today's brawler? 🔍 BrawlZone Daily #{N}",
+        'titles': {'pt-BR': f'Você consegue adivinhar o brawler de hoje? 🔍 BrawlZone Daily #{N}',
+                   'es-419': f'¿Adivinas el brawler de hoy? 🔍 BrawlZone Daily #{N}'},
+        'description': f"Today's Zoom puzzle: an extreme close-up that pulls back with every wrong guess. "
+                       f"Who is it? Comment your guess 👇 No spoilers in the comments for 24 hours 😉\n\n"
+                       f"The answer, two more zoom steps and today's Shadow and Classic puzzles: "
+                       f"https://brawlzone.net/daily-challenge (new every day at midnight UTC){FOOTER}\n"
+                       '#brawlstars #brawlstarsquiz #guessthebrawler #brawldle #brawlzone',
+    }
+
+
+def zoom_frame(img):
+    """One zoom step from the site, in the same rounded white frame the site uses."""
+    win = 760
+    frame = Image.new('RGBA', (win + 24, win + 24), (0, 0, 0, 0)); d = ImageDraw.Draw(frame)
+    d.rounded_rectangle((0, 0, win + 23, win + 23), 70, fill=(12, 14, 34, 255), outline=WHITE, width=10)
+    frame.paste(img.resize((win, win), Image.LANCZOS), (12, 12), rounded_mask(win, win, 60))
+    return frame
+
+
+_heart = {}
+def heart(full):
+    if full not in _heart:
+        im = Image.new('RGBA', (96, 90), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        col = (255, 60, 100) if full else (70, 70, 110)
+        for c in ((6, 6, 50, 50), (46, 6, 90, 50)):
+            d.ellipse(c, fill=col, outline=(10, 12, 28), width=6)
+        d.polygon([(10, 36), (86, 36), (48, 84)], fill=col, outline=(10, 12, 28))
+        d.line([(10, 38), (48, 84), (86, 38)], fill=(10, 12, 28), width=6)
+        d.ellipse((12, 12, 46, 46), fill=col); d.ellipse((50, 12, 84, 46), fill=col)
+        d.polygon([(16, 34), (80, 34), (48, 76)], fill=col)
+        _heart[full] = im
+    return _heart[full]
+
+
+def daily_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    if k == 'd_intro':
+        canvas = background(t, (60, 170, 255)).convert('RGBA')
+        put_rays(canvas, (60, 170, 255), t, W / 2, 1300, speed=10, alpha=0.5)
+        put(canvas, zoom_frame(ZOOMS[0]), W / 2, 1330, scale=0.55 * out_back((bt - 0.5) / 0.5), rot=-6)
+        slam(canvas, "TODAY'S", 170, WHITE, W / 2, 420, bt)
+        slam(canvas, 'BRAWLER', 240, None, W / 2, 620, bt - 1, gold=True)
+        if bt > 2: put(canvas, pill(f'DAILY #{N}', (255, 60, 100), size=80), W / 2, 820, scale=out_back((bt - 2) / 0.4, 2.2), rot=-5)
+        if bt > 3: put(canvas, text_sprite('CAN YOU GUESS IT?', 80, WHITE, stroke=8), W / 2, 960, scale=out_back((bt - 3) / 0.4))
+        shake, flash = hits(bt, (0, 1, 2, 3), 1.2, 0.5)
+    elif k == 'd_zoom':
+        i = s['i']
+        canvas = background(t, (60, 170, 255)).convert('RGBA')
+        put_rays(canvas, (80, 150, 255), t, W / 2, 960, speed=12, alpha=0.5)
+        for j in range(6):  # the site's six hearts, one lost per zoom step
+            put(canvas, heart(j >= i), W / 2 + (j - 2.5) * 110, 330, scale=1.25 if j == i - 1 and bt < 0.5 else 1)
+        put(canvas, pill(f'ZOOM {i + 1}/6', (60, 170, 255), size=60), W / 2, 470)
+        put(canvas, zoom_frame(ZOOMS[i]), W / 2, 960, scale=1 + 0.35 * (1 - out_back(bt / 0.5, 1.4)))
+        put(canvas, text_sprite('WHO IS THIS?', 120, WHITE), W / 2, 1480, scale=out_back(bt / 0.4) if i == 0 else 1)
+        n = 3 - int(bt); u = bt % 1
+        put(canvas, text_sprite(str(n), 220, (255, 90, 110) if n == 1 else WHITE), W - 140, 700, scale=1 + 0.8 * (1 - out_back(u / 0.4, 1.3)))
+        shake = impact(lt, 1.0); flash = impact(lt) * 0.5
+        if u < 0.3: shake = max(shake, impact(u * P, 0.4))
+    elif k == 'd_stuck':
+        canvas = background(t, (255, 90, 120)).convert('RGBA')
+        z = zoom_frame(ZOOMS[-1]).filter(ImageFilter.GaussianBlur(4 + 10 * clamp(bt / 2)))
+        put(canvas, z, W / 2, 1000, scale=0.85)
+        put(canvas, text_sprite('?', 520, WHITE), W / 2, 1000, scale=out_back((bt - 0.5) / 0.4, 2.0), rot=8)
+        slam(canvas, 'STILL NO', 170, WHITE, W / 2, 330, bt)
+        slam(canvas, 'IDEA?', 230, None, W / 2, 520, bt - 1, gold=True)
+        slam(canvas, '2 MORE CLUES ON THE SITE', 70, WHITE, W / 2, 1520, bt - 2)
+        shake, flash = hits(bt, (0, 1, 2), 1.1, 0.4)
+    elif k == 'd_shadow':
+        canvas = background(t, (150, 90, 255)).convert('RGBA')
+        put_rays(canvas, (150, 90, 255), t, W / 2, 1020, speed=20, alpha=0.7)
+        slam(canvas, '+ A SHADOW', 170, WHITE, W / 2, 380, bt)
+        slam(canvas, 'TO GUESS', 150, None, W / 2, 560, bt - 0.7, gold=True)
+        put(canvas, SHADOW, W / 2, 1050, scale=out_back((bt - 1) / 0.5, 1.6))
+        slam(canvas, '+ THE CLASSIC PUZZLE', 76, WHITE, W / 2, 1560, bt - 2.2)
+        shake, flash = hits(bt, (0, 0.7, 1, 2.2), 1.0, 0.4)
+    else:  # d_outro
+        canvas = background(t, (60, 170, 255)).convert('RGBA'); mark = False
+        slam(canvas, 'ANSWER ON', 150, WHITE, W / 2, 360, bt)
+        slam(canvas, 'BRAWLZONE.NET', 122, None, W / 2, 540, bt - 0.6, gold=True)
+        if bt > 1.2: put(canvas, pill('DAILY CHALLENGE', (255, 60, 100), size=76), W / 2, 720, scale=out_back((bt - 1.2) / 0.4, 2.2), rot=-4)
+        slam(canvas, 'COMMENT YOUR GUESS', 92, WHITE, W / 2, 920, bt - 2)
+        follow_cta(canvas, bt - 3.2, 1220, 'NEW PUZZLE EVERY DAY')
+        shake, flash = hits(bt, (0, 0.6, 1.2, 2, 3.2), 0.9, 0.3)
+    return finish(canvas, shake, flash, mark)
+
+
 # ================================================================ render
 SCENE = {'quiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
-         'newbrawler': nb_scene}[KIND]
+         'newbrawler': nb_scene, 'daily': daily_scene}[KIND]
 
 
 def frame(t):
