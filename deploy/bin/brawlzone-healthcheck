@@ -483,6 +483,48 @@ PY
   )
 fi
 
+# 17-19. The early warnings the 2026-10-23 outage did not get (2026-10-23).
+#     A crawl fed the sampler 12,000 new players from about 04:00; every run
+#     overran, the precompute skipped six turns, and from 02:30 the stored
+#     reads were stale and every page computed them live. The homepage, the
+#     only page check 1 probes, is cached and stayed fast throughout, so
+#     nothing here said a word until brawler pages had been timing out for an
+#     hour. Each of these would have fired hours before that.
+#
+# 17. Are the stored reads fresh? The precompute runs every 2h; 3h means it
+#     skipped, and pages are about to compute them live.
+pre=$(cd /home/ubuntu/brawlstats && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
+  "select extract(epoch from (now() - max(computed_at)))::int from precomputed_reads;" 2>/dev/null || echo "")
+if [ -n "$pre" ] && [ "$pre" -gt 10800 ]; then
+  problems+=("precomputed reads are $((pre/3600))h old (the precompute keeps skipping; pages will compute them live)")
+fi
+
+# 18. Is something flooding the sample pool? People add a few new players an
+#     hour; the crawl added 6,000. Page views are capped at 60 an hour since,
+#     so past 1,000 in an hour something else is feeding it.
+newp=$(cd /home/ubuntu/brawlstats && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
+  "select count(*) from sampled_players where created_at > now() - interval '1 hour';" 2>/dev/null || echo "")
+if [ -n "$newp" ] && [ "$newp" -gt 1000 ]; then
+  problems+=("${newp} new players joined the sample pool in the last hour (normally a few dozen): a crawl or a seeding bug")
+fi
+
+# 19. Does a page that has to be rendered answer? A brawler page, a different
+#     one each hour, so it is not always the one in cache. Two tries, like
+#     check 1, so one slow render is not an alert.
+brawler=$(curl -s --max-time 20 "$SITE/sitemaps/sitemap/core.xml" | grep -o "$SITE/brawlers/[a-z0-9-]*<" | tr -d '<' \
+  | awk -v h="$(date +%H)" 'NR % 24 == h % 24 { print; exit }')
+if [ -n "$brawler" ]; then
+  r1=$(curl -s -o /dev/null -w '%{http_code} %{time_total}' --max-time 30 "$brawler" 2>/dev/null || echo '000 30')
+  set -- $r1
+  if [ "$1" != 200 ] || [ "${2%.*}" -ge 10 ]; then
+    r2=$(curl -s -o /dev/null -w '%{http_code} %{time_total}' --max-time 30 "$brawler" 2>/dev/null || echo '000 30')
+    set -- $r2
+    if [ "$1" != 200 ] || [ "${2%.*}" -ge 10 ]; then
+      problems+=("brawler pages failing or slow: ${brawler#$SITE} returned HTTP $1 in ${2}s, twice")
+    fi
+  fi
+fi
+
 # The state is the SET of problems, not a yes/no.
 #
 # It used to be the single word `ok` or `failed`, and alerting only on the
