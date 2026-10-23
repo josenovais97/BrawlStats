@@ -61,6 +61,8 @@ const SITE = 'https://brawlzone.net';
 const BRAND = 0xffc93c;
 const API = 'https://discord.com/api/v10';
 const SERVER_INVITE = 'https://discord.gg/964EMQBBUJ';
+/** Discord's own chooser: add to a server, or to your account. */
+const INSTALL_URL = `https://discord.com/oauth2/authorize?client_id=${APP_ID}`;
 
 type Embed = Record<string, unknown>;
 interface Reply {
@@ -756,6 +758,7 @@ async function helpCommand(token: string, home: boolean) {
           '`/leaderboard` — the global top 10',
           '`/unlink` — remove your link and roles',
           '',
+          `**Add the bot** to your server, or to your account to use it in any chat: ${INSTALL_URL}`,
           ...(home ? [] : [`**Join the BrawlZone server** for rank roles and daily meta posts: ${SERVER_INVITE}`]),
           'Want it inside the game? The **Bubble app** floats the meta over your draft: https://brawlzone.net/bubble',
         ].join('\n'),

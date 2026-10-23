@@ -4,11 +4,16 @@
  * Run once after changing a command's name, description or options — Discord
  * stores these, so editing the handler alone changes nothing a user sees.
  *
- * Registers against the guild, not globally. Global commands can take up to an
- * hour to propagate, and during that hour typing `/profile` does not open the
- * picker at all — it just sends the literal text as a message, which looks
- * exactly like a broken bot. Guild commands appear immediately. Global scope
- * only matters if the bot is ever added to a second server.
+ * Registers globally since 2026-10-23, when the bot went public: installable to
+ * any server, and to a user's own account so the commands work in any chat
+ * (integration types 0 and 1, every context). The guild's own copies are
+ * cleared, or the BrawlZone server would list every command twice. Global
+ * changes can take a while to reach every client, so re-run this only when
+ * something actually changed.
+ *
+ * It also sets the install links (Discord's "Add App" chooser): a server
+ * install adds the commands and a bot user with no permissions at all, since
+ * the bot answers through interactions and needs nothing in a server.
  *
  * Needs DISCORD_BOT_TOKEN and DISCORD_APP_ID in the environment:
  *   set -a && . .env.production && set +a && node scripts/discord-register-commands.mjs
@@ -67,7 +72,7 @@ const COMMANDS = [
   {
     name: 'link',
     type: 1,
-    description: 'Link your Brawl Stars account: sets your trophy and rank roles',
+    description: 'Link your Brawl Stars account (and get rank roles in the BrawlZone server)',
     options: [{ name: 'tag', type: STRING, required: true, description: 'Your player tag, under your name in game' }],
   },
   { name: 'unlink', type: 1, description: 'Remove your linked account and its roles' },
@@ -156,5 +161,17 @@ async function call(method, path, body) {
 await call('PATCH', '/applications/@me', { interactions_endpoint_url: ENDPOINT });
 console.log(`endpoint set and verified: ${ENDPOINT}`);
 
-const registered = await call('PUT', `/applications/${APP}/guilds/${GUILD}/commands`, COMMANDS);
+await call('PATCH', '/applications/@me', {
+  description: 'Brawl Stars stats in Discord: counters, the Ranked meta, best picks per map, drafts and player cards, from real sampled battles. Free, by brawlzone.net.',
+  tags: ['brawl stars', 'stats', 'gaming', 'meta', 'tier list'],
+  integration_types_config: {
+    0: { oauth2_install_params: { scopes: ['applications.commands', 'bot'], permissions: '0' } },
+    1: { oauth2_install_params: { scopes: ['applications.commands'], permissions: '0' } },
+  },
+});
+console.log(`install link: https://discord.com/oauth2/authorize?client_id=${APP}`);
+
+const everywhere = COMMANDS.map((c) => ({ ...c, integration_types: [0, 1], contexts: [0, 1, 2] }));
+const registered = await call('PUT', `/applications/${APP}/commands`, everywhere);
+await call('PUT', `/applications/${APP}/guilds/${GUILD}/commands`, []);
 for (const c of registered) console.log(`  /${c.name} — ${c.description}`);
