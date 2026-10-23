@@ -18,7 +18,8 @@ GRACE = 1800
 VOUCHER = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
 
 try:
-    seen = {m.group(0).lower() for u in json.load(open(SEEN)) for m in [VOUCHER.search(u)] if m}
+    posted = json.load(open(SEEN))
+    seen = {m.group(0).lower() for u in posted for m in [VOUCHER.search(u)] if m} | {u.rstrip('/') for u in posted}
 except (OSError, ValueError):
     sys.exit()
 try:
@@ -40,10 +41,17 @@ for m in re.finditer(r'([^|]{2,60}?)\s*\|\s*(?:\|\s*)*Added:\s*([A-Za-z]+)\s+(\d
         continue
     after = text[m.end():m.end() + 1500]
     nxt = re.search(r'Added:', after)  # stop at the next card
-    link = re.search(r'href="(https?://(?:link\.brawlstars\.com|store\.supercell\.com)/[^"]+)"', after[:nxt.start()] if nxt else after)
-    v = VOUCHER.search(link.group(1)) if link else None
-    if v and v.group(0).lower() not in seen:
-        missing[v.group(0).lower()] = m.group(1).strip(' |')
+    # Any outbound link in the card, not only Supercell's two known hosts: a
+    # reward on a new host is exactly what the watcher would miss, so this must
+    # not miss it too. Keyed by voucher id when there is one, else the link.
+    card = after[:nxt.start()] if nxt else after
+    link = re.search(r'href="(https?://(?!(?:www\.)?brawlnetwork\.com)[^"]+)"', card)
+    if not link:
+        continue
+    v = VOUCHER.search(link.group(1))
+    k = v.group(0).lower() if v else link.group(1).rstrip('/')
+    if k not in seen:
+        missing[k] = m.group(1).strip(' |')
 
 try:
     first = json.load(open(STATE))
