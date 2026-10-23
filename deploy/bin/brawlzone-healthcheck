@@ -499,13 +499,16 @@ if [ -n "$pre" ] && [ "$pre" -gt 10800 ]; then
   problems+=("precomputed reads are $((pre/3600))h old (the precompute keeps skipping; pages will compute them live)")
 fi
 
-# 18. Is something flooding the sample pool? People add a few new players an
-#     hour; the crawl added 6,000. Page views are capped at 60 an hour since,
-#     so past 1,000 in an hour something else is feeding it.
+# 18. Are page views flooding the sample pool? People add a few new players
+#     an hour by looking them up; the crawl added 6,000. Lookups only: the
+#     sampler recruits its own in batches of over a thousand into thin rank
+#     brackets, which is normal (counting those mailed a false alarm on the
+#     first run, 2026-10-23 14:20). Page views are capped at 60 an hour since,
+#     so past 200 the cap is not holding.
 newp=$(cd /home/ubuntu/brawlstats && docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
-  "select count(*) from sampled_players where created_at > now() - interval '1 hour';" 2>/dev/null || echo "")
-if [ -n "$newp" ] && [ "$newp" -gt 1000 ]; then
-  problems+=("${newp} new players joined the sample pool in the last hour (normally a few dozen): a crawl or a seeding bug")
+  "select count(*) from sampled_players where source = 'lookup' and created_at > now() - interval '1 hour';" 2>/dev/null || echo "")
+if [ -n "$newp" ] && [ "$newp" -gt 200 ]; then
+  problems+=("${newp} looked-up players joined the sample pool in the last hour (capped at 60): a crawl is getting past the cap")
 fi
 
 # 19. Does a page that has to be rendered answer? A brawler page, a different
