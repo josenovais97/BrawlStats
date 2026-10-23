@@ -46,7 +46,10 @@ except (OSError, ValueError):
     state = {}
 rnd = random.Random(f"{data.get('date', '')}/{KIND}")
 by_id = {b['id']: b for b in data.get('all', [])}
-tl = Timeline()
+# Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
+# holds where you read.
+PACING = {'quiz': {'pace': 2}, 'daily': {'pace': 2}}
+tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
 

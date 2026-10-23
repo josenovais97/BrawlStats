@@ -252,26 +252,39 @@ def impact(lt, k=1.0):
 
 
 class Timeline:
-    """Segments measured in beats; at(t) finds the one playing at t seconds."""
+    """Segments measured in beats; at(t) finds the one playing at t seconds.
 
-    def __init__(self):
+    Two ways to slow a video down (2026-10-23: "too fast, keep them a little
+    slower"), both still on the music:
+
+    pace  beats per step. 2 is half-time: every animation step, countdown
+          number and cut lands on every other beat, so a quiz round gives
+          ~3.7s to guess instead of ~1.9s. For the formats you have to think in.
+    hold  each scene lasts this many times longer, its animations unchanged:
+          the same punch, then time to read. For the list formats.
+    """
+
+    def __init__(self, pace=1, hold=1.0):
         self.segments, self.beats = [], 0
+        self.step = P * pace
+        self.hold = hold
 
     def add(self, length, kind, **kw):
+        length = math.ceil(length * self.hold)
         self.segments.append({'start': self.beats, 'len': length, 'kind': kind, **kw})
         self.beats += length
 
     @property
     def dur(self):
-        return self.beats * P
+        return self.beats * self.step
 
     def at(self, t):
-        bt = t / P
+        bt = t / self.step
         for s in self.segments:
             if s['start'] <= bt < s['start'] + s['len']:
-                return s, bt - s['start'], t - s['start'] * P
+                return s, bt - s['start'], t - s['start'] * self.step
         s = self.segments[-1]
-        return s, s['len'], s['len'] * P
+        return s, s['len'], s['len'] * self.step
 
 
 def hits(bt, beats, k=1.0, glare=0.3):
