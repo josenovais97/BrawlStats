@@ -1,0 +1,6 @@
+{
+  "average {n} guesses": ["promedio de {n} intentos", "média de {n} palpites"],
+  "{n} players solved today’s Classic": ["{n} jugadores resolvieron el Clásico de hoy", "{n} jogadores resolveram o Clássico de hoje"],
+  "{pct}% of players solved today’s {mode}": ["El {pct}% de los jugadores resolvió el reto {mode} de hoy", "{pct}% dos jogadores resolveram o desafio {mode} de hoje"],
+  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.": ["Tu progreso se guarda solo en este navegador. Sin cuenta. Cuando terminas un reto, el servidor suma uno a un contador para ese número de intentos, y así sabe qué parte de los jugadores lo resolvió; no se guarda nada sobre ti.", "Seu progresso fica salvo apenas neste navegador. Sem conta. Quando você termina um desafio, o servidor soma um a um contador para aquele número de palpites, e assim sabe quantos jogadores resolveram; nada sobre você é guardado."]
+}

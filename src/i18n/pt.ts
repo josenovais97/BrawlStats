@@ -4174,4 +4174,12 @@ export const PT: Record<string, string> = {
     "Desafio diário de Brawl Stars: adivinhe o brawler (Clássico, Sombra, Zoom)",
   "Three Brawl Stars puzzles every day: guess the brawler from clues, from its shadow, or from an extreme zoom. Keep your streak, share your score. Free, no account.":
     "Três desafios de Brawl Stars todo dia: adivinhe o brawler pelas dicas, pela sombra ou por um zoom extremo. Mantenha sua sequência e compartilhe seu resultado. Grátis, sem conta.",
+  "average {n} guesses":
+    "média de {n} palpites",
+  "{n} players solved today’s Classic":
+    "{n} jogadores resolveram o Clássico de hoje",
+  "{pct}% of players solved today’s {mode}":
+    "{pct}% dos jogadores resolveram o desafio {mode} de hoje",
+  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
+    "Seu progresso fica salvo apenas neste navegador. Sem conta. Quando você termina um desafio, o servidor soma um a um contador para aquele número de palpites, e assim sabe quantos jogadores resolveram; nada sobre você é guardado.",
 };

@@ -7,6 +7,7 @@ import { PictureBoard, type PictureMode, type PictureSaved, TRIES, loadPicture }
 import { useT } from '@/components/i18n/use-t';
 import type { PickerEntry } from '@/lib/brawldle-data';
 import { formatCountdown, msUntilReset } from '@/lib/brawldle-stats';
+import { type DayTally, TALLY_MIN_PLAYERS } from '@/lib/brawldle-tally';
 
 /**
  * Three puzzles a day (2026-10-22): the classic clue board, Shadow and Zoom.
@@ -15,6 +16,10 @@ import { formatCountdown, msUntilReset } from '@/lib/brawldle-stats';
  * a short daily habit, and one share card for all three is what gets posted in
  * a group chat. Each board keeps its own state in this browser; the hub only
  * reads where each one stands, for the tabs and the share card.
+ *
+ * It also reports each finished puzzle to /api/brawldle/tally (2026-10-23) and
+ * shows how everybody else did, so "solved in 3" becomes "solved in 3, when
+ * only 38% got it at all".
  */
 
 type Mode = 'classic' | PictureMode;
@@ -81,6 +86,17 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
   const [burst, setBurst] = useState(0);
   const [copied, setCopied] = useState(false);
   const [countdown, setCountdown] = useState<string | null>(null);
+  const [tally, setTally] = useState<DayTally | null>(null);
+
+  const loadTally = useCallback(() => {
+    fetch('/api/brawldle/tally', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { date: string; tally: DayTally } | null) => {
+        if (d?.date === date) setTally(d.tally);
+      })
+      .catch(() => {});
+  }, [date]);
+  useEffect(loadTally, [loadTally]);
 
   useEffect(() => {
     const read = {
@@ -109,12 +125,25 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
     current.current = status;
   }, [status]);
   const update = useCallback((key: Mode, next: Status) => {
-    if (next.solved && !(current.current?.[key]?.solved ?? false)) setBurst((n) => n + 1);
+    const before = current.current?.[key] ?? NONE;
+    if (next.solved && !before.solved) setBurst((n) => n + 1);
+    // Counted once, on the guess that finishes the puzzle; a reload reads the
+    // finished board from storage and never comes through here.
+    if (next.done && !before.done) {
+      fetch('/api/brawldle/tally', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ mode: key, solved: next.solved, guesses: next.guesses }),
+      })
+        .then(loadTally, () => {});
+    }
     setStatus((prev) => ({ ...(prev ?? { classic: NONE, shadow: NONE, zoom: NONE }), [key]: next }));
-  }, []);
+  }, [loadTally]);
 
   const number = Math.floor((Date.parse(`${date}T00:00:00Z`) - FIRST_DAY) / 86_400_000);
   const finished = status ? MODES.filter((m) => status[m.key].done).length : 0;
+  const crowd = tally?.[mode];
+  const crowdLabel = MODES.find((m) => m.key === mode)?.label ?? '';
 
   function shareText() {
     const line = (m: (typeof MODES)[number]) => {
@@ -176,6 +205,26 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
           );
         })}
       </div>
+
+      {crowd && crowd.players >= TALLY_MIN_PLAYERS ? (
+        <p className="animate-picture-in text-center text-sm text-muted">
+          {mode === 'classic' ? (
+            <>
+              👥 {t('{n} players solved today’s Classic', { n: crowd.solved })}
+              {crowd.average !== null ? <> · {t('average {n} guesses', { n: crowd.average })}</> : null}
+            </>
+          ) : (
+            <>
+              👥{' '}
+              {t('{pct}% of players solved today’s {mode}', {
+                pct: Math.round((crowd.solved / crowd.players) * 100),
+                mode: t(crowdLabel),
+              })}
+              {status?.[mode]?.done && crowd.average !== null ? <> · {t('average {n} guesses', { n: crowd.average })}</> : null}
+            </>
+          )}
+        </p>
+      ) : null}
 
       <div className={mode === 'classic' ? '' : 'hidden'}>
         <ChallengeBoard

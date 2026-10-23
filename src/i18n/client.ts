@@ -796,6 +796,12 @@ export const CLIENT_ES: Record<string, string> = {
     "¿Quién es, de cerca?",
   "Whose shadow is this?":
     "¿De quién es esta sombra?",
+  "average {n} guesses":
+    "promedio de {n} intentos",
+  "{n} players solved today’s Classic":
+    "{n} jugadores resolvieron el Clásico de hoy",
+  "{pct}% of players solved today’s {mode}":
+    "El {pct}% de los jugadores resolvió el reto {mode} de hoy",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1591,4 +1597,10 @@ export const CLIENT_PT: Record<string, string> = {
     "Quem é, de perto?",
   "Whose shadow is this?":
     "De quem é essa sombra?",
+  "average {n} guesses":
+    "média de {n} palpites",
+  "{n} players solved today’s Classic":
+    "{n} jogadores resolveram o Clássico de hoje",
+  "{pct}% of players solved today’s {mode}":
+    "{pct}% dos jogadores resolveram o desafio {mode} de hoje",
 };

@@ -80,7 +80,7 @@ export default async function DailyChallengePage() {
           <p>
             <strong className="text-foreground">{t('Shadow')}</strong>{' '}{t('shows only the brawler’s outline, and')}{' '}
             <strong className="text-foreground">{t('Zoom')}</strong>{' '}{t('an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.')}</p>
-          <p>{t('Your progress is kept in this browser only. No account, nothing stored on our side.')}</p>
+          <p>{t('Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.')}</p>
         </div>
       </section>
     </div>

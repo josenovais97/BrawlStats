@@ -684,3 +684,17 @@ model TrackedClub {
   @@index([lastViewedAt])
   @@map("tracked_clubs")
 }
+
+/// How the day's challenge went for everybody (2026-10-23): one counter per
+/// day, puzzle and number of guesses, bumped when a player finishes. Only
+/// counts, no player, address or device: it is what lets a finished board say
+/// "38% solved today's Zoom". `guesses` 0 is a lost picture puzzle.
+model DailyChallengeTally {
+  day     DateTime @db.Date
+  mode    String
+  guesses Int
+  count   Int      @default(0)
+
+  @@id([day, mode, guesses])
+  @@map("daily_challenge_tally")
+}
