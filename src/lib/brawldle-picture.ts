@@ -27,18 +27,15 @@ const ZOOM = [5, 3.9, 3.0, 2.4, 1.9, 1.5];
 const modelUrl = (id: number) => `https://cdn.brawlify.com/brawlers/model/${id}.png`;
 
 /*
- * The models, kept in memory for the day they are asked for. One or two
- * brawlers a day, ~200 KB each: a map is all the cache this needs, and it is
- * emptied when the date moves on so it cannot grow.
+ * The models, kept in memory. A handful of brawlers a day (today's two, and
+ * yesterday's for the answers line), ~200 KB each. Not keyed by day: asking
+ * for yesterday's answers must not empty today's (2026-10-23). Emptied at 24
+ * entries so it cannot grow.
  */
 const models = new Map<number, Buffer | null>();
-let modelsDay = '';
 
-async function model(id: number, date: string): Promise<Buffer | null> {
-  if (modelsDay !== date) {
-    models.clear();
-    modelsDay = date;
-  }
+async function model(id: number): Promise<Buffer | null> {
+  if (models.size >= 24 && !models.has(id)) models.clear();
   if (!models.has(id)) {
     const body = await fetch(modelUrl(id), { cache: 'no-store', signal: AbortSignal.timeout(15_000) })
       .then((r) => (r.ok ? r.arrayBuffer() : null))
@@ -71,7 +68,7 @@ export async function pictureAnswer(
   for (let i = 0; i < roster.length; i++) {
     const b = roster[(start + i) % roster.length];
     if (taken.has(b.id)) continue;
-    if (await model(b.id, date)) return b;
+    if (await model(b.id)) return b;
   }
   return null;
 }
@@ -86,7 +83,7 @@ export async function pictureImage(
   date: string,
   step: number,
 ): Promise<Buffer | null> {
-  const src = await model(answer.id, date);
+  const src = await model(answer.id);
   if (!src) return null;
   const trimmed = await sharp(src).trim().png().toBuffer({ resolveWithObject: true });
   const { width, height } = trimmed.info;

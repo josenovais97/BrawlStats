@@ -134,3 +134,32 @@ export function formatCountdown(ms: number): string {
   const s = total % 60;
   return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
 }
+
+/**
+ * The hub's streak (2026-10-23): days in a row with at least one of the three
+ * puzzles finished, won or lost. Each board keeps a streak of wins; this one
+ * is for showing up, which is the habit worth rewarding, and it sits at the top
+ * of the page where a player sees it before choosing a puzzle.
+ */
+export interface PlayRecord {
+  last: string | null;
+  streak: number;
+  best: number;
+}
+
+export const EMPTY_PLAY: PlayRecord = { last: null, streak: 0, best: 0 };
+
+/** Fold in a finished puzzle. Idempotent per day, like `recordResult`. */
+export function recordPlay(record: PlayRecord, today: string): PlayRecord {
+  if (record.last === today) return record;
+  const gap = record.last ? daysBetween(record.last, today) : null;
+  const streak = gap === 1 ? record.streak + 1 : 1;
+  return { last: today, streak, best: Math.max(record.best, streak) };
+}
+
+/** The streak as it stands today: alive through today if yesterday was played. */
+export function currentPlayStreak(record: PlayRecord, today: string): number {
+  if (!record.last) return 0;
+  const gap = daysBetween(record.last, today);
+  return gap !== null && gap >= 0 && gap <= 1 ? record.streak : 0;
+}

@@ -10,6 +10,9 @@ import {
   msUntilReset,
   oneShots,
   recordResult,
+  EMPTY_PLAY,
+  recordPlay,
+  currentPlayStreak,
 } from '@/lib/brawldle-stats';
 
 /**
@@ -117,4 +120,15 @@ test('day arithmetic survives a month boundary', () => {
   assert.equal(daysBetween('2026-09-30', '2026-10-01'), 1);
   assert.equal(daysBetween('2026-02-28', '2026-03-01'), 1, '2026 is not a leap year');
   assert.equal(daysBetween('nonsense', '2026-10-01'), null);
+});
+
+test('the play streak counts days with any puzzle finished, once a day', () => {
+  let r = recordPlay(EMPTY_PLAY, '2026-10-20');
+  r = recordPlay(r, '2026-10-20');
+  r = recordPlay(r, '2026-10-21');
+  assert.deepEqual(r, { last: '2026-10-21', streak: 2, best: 2 });
+  assert.equal(currentPlayStreak(r, '2026-10-22'), 2, 'alive until a full day passes');
+  assert.equal(currentPlayStreak(r, '2026-10-23'), 0, 'a missed day ends it');
+  r = recordPlay(r, '2026-10-24');
+  assert.deepEqual(r, { last: '2026-10-24', streak: 1, best: 2 });
 });

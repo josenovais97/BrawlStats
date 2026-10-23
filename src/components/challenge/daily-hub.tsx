@@ -1,12 +1,20 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ChallengeBoard } from '@/components/challenge/challenge-board';
 import { PictureBoard, type PictureMode, type PictureSaved, TRIES, loadPicture } from '@/components/challenge/picture-board';
 import { useT } from '@/components/i18n/use-t';
 import type { PickerEntry } from '@/lib/brawldle-data';
-import { formatCountdown, msUntilReset } from '@/lib/brawldle-stats';
+import {
+  EMPTY_PLAY,
+  type PlayRecord,
+  currentPlayStreak,
+  formatCountdown,
+  msUntilReset,
+  recordPlay,
+} from '@/lib/brawldle-stats';
 import { type DayTally, TALLY_MIN_PLAYERS } from '@/lib/brawldle-tally';
 
 /**
@@ -36,6 +44,21 @@ const MODES: { key: Mode; icon: string; label: string }[] = [
   { key: 'shadow', icon: '👤', label: 'Shadow' },
   { key: 'zoom', icon: '🔍', label: 'Zoom' },
 ];
+const PLAY_KEY = 'brawlzone-daily-played';
+
+function loadPlay(): PlayRecord {
+  try {
+    return { ...EMPTY_PLAY, ...(JSON.parse(localStorage.getItem(PLAY_KEY) ?? '{}') as Partial<PlayRecord>) };
+  } catch {
+    return EMPTY_PLAY;
+  }
+}
+
+interface Card {
+  name: string;
+  imageUrl: string | null;
+}
+
 /** The first daily puzzle went up on 2026-10-02: that is #1. */
 const FIRST_DAY = Date.UTC(2026, 9, 1);
 
@@ -87,6 +110,21 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
   const [copied, setCopied] = useState(false);
   const [countdown, setCountdown] = useState<string | null>(null);
   const [tally, setTally] = useState<DayTally | null>(null);
+  const [play, setPlay] = useState<PlayRecord | null>(null);
+  const [yesterday, setYesterday] = useState<Record<Mode, Card | null> | null>(null);
+
+  // The streak and yesterday's answers (2026-10-23): a reason to come back
+  // tomorrow, and the answer to the puzzle someone lost last night.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot read of browser storage
+    setPlay(loadPlay());
+    fetch('/api/brawldle/yesterday')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { brawler: Card | null; shadow?: Card | null; zoom?: Card | null } | null) => {
+        if (d) setYesterday({ classic: d.brawler, shadow: d.shadow ?? null, zoom: d.zoom ?? null });
+      })
+      .catch(() => {});
+  }, []);
 
   const loadTally = useCallback(() => {
     fetch('/api/brawldle/tally', { cache: 'no-store' })
@@ -130,6 +168,13 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
     // Counted once, on the guess that finishes the puzzle; a reload reads the
     // finished board from storage and never comes through here.
     if (next.done && !before.done) {
+      const played = recordPlay(loadPlay(), date);
+      try {
+        localStorage.setItem(PLAY_KEY, JSON.stringify(played));
+      } catch {
+        /* Private window: the streak just is not kept. */
+      }
+      setPlay(played);
       fetch('/api/brawldle/tally', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -138,10 +183,12 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
         .then(loadTally, () => {});
     }
     setStatus((prev) => ({ ...(prev ?? { classic: NONE, shadow: NONE, zoom: NONE }), [key]: next }));
-  }, [loadTally]);
+  }, [loadTally, date]);
 
   const number = Math.floor((Date.parse(`${date}T00:00:00Z`) - FIRST_DAY) / 86_400_000);
   const finished = status ? MODES.filter((m) => status[m.key].done).length : 0;
+  const streak = play ? currentPlayStreak(play, date) : 0;
+  const playedToday = play?.last === date;
   const crowd = tally?.[mode];
   const crowdLabel = MODES.find((m) => m.key === mode)?.label ?? '';
 
@@ -180,6 +227,14 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
   return (
     <div className="space-y-4">
       <Confetti burst={burst} />
+
+      {streak >= 2 ? (
+        <div className="card flex items-center justify-center gap-2 px-4 py-2 text-sm">
+          <span className="text-xl leading-none">🔥</span>
+          <span className="font-black">{t('{n}-day streak', { n: streak })}</span>
+          {!playedToday ? <span className="text-muted">· {t('finish one puzzle today to keep it')}</span> : null}
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-3 gap-2" role="tablist">
         {MODES.map((m) => {
@@ -257,6 +312,25 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
           >
             {copied ? t('Copied') : t('Share your results')}
           </button>
+        </div>
+      ) : null}
+
+      {yesterday && MODES.some((m) => yesterday[m.key]) ? (
+        <div className="card flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-xs text-muted">
+          <span className="font-semibold text-foreground">{t('Yesterday’s answers')}</span>
+          {MODES.map((m) => {
+            const c = yesterday[m.key];
+            if (!c) return null;
+            return (
+              <span key={m.key} className="flex items-center gap-1.5">
+                <span>{m.icon}</span>
+                {c.imageUrl ? (
+                  <Image src={c.imageUrl} alt="" width={20} height={20} className="size-5 rounded bg-surface-2" unoptimized />
+                ) : null}
+                <span className="font-semibold capitalize text-foreground">{c.name.toLowerCase()}</span>
+              </span>
+            );
+          })}
         </div>
       ) : null}
     </div>

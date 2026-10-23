@@ -4182,4 +4182,8 @@ export const ES: Record<string, string> = {
     "El {pct}% de los jugadores resolvió el reto {mode} de hoy",
   "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
     "Tu progreso se guarda solo en este navegador. Sin cuenta. Cuando terminas un reto, el servidor suma uno a un contador para ese número de intentos, y así sabe qué parte de los jugadores lo resolvió; no se guarda nada sobre ti.",
+  "Yesterday’s answers":
+    "Respuestas de ayer",
+  "finish one puzzle today to keep it":
+    "termina un reto hoy para mantenerla",
 };

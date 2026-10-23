@@ -1,5 +1,6 @@
 import { answerFor } from '@/lib/brawldle';
 import { brawldleRoster } from '@/lib/brawldle-data';
+import { pictureAnswer } from '@/lib/brawldle-picture';
 
 /**
  * Yesterday's answer.
@@ -7,6 +8,9 @@ import { brawldleRoster } from '@/lib/brawldle-data';
  * Safe to publish: that puzzle is finished and nobody can still be playing it.
  * It closes the loop for whoever failed it, and it is a small reason to come
  * back — which is the whole job of everything added around the board today.
+ *
+ * With the Shadow and Zoom answers too since 2026-10-23: whoever lost one of
+ * those never learnt who it was until now.
  *
  * Deliberately only yesterday. An endpoint that took any date would hand over
  * every past answer, and with the answer being a pure function of the date,
@@ -24,10 +28,18 @@ export async function GET() {
     return Response.json({ date: yesterday, brawler: null }, { status: 503 });
   }
 
+  const [shadow, zoom] = await Promise.all([
+    pictureAnswer('shadow', yesterday, roster).catch(() => null),
+    pictureAnswer('zoom', yesterday, roster).catch(() => null),
+  ]);
+  const card = (b: typeof answer | null) => (b ? { name: b.name, slug: b.slug, imageUrl: b.imageUrl } : null);
+
   return Response.json(
     {
       date: yesterday,
-      brawler: { name: answer.name, slug: answer.slug, imageUrl: answer.imageUrl },
+      brawler: card(answer),
+      shadow: card(shadow),
+      zoom: card(zoom),
     },
     // One hour: the value only changes at midnight UTC, and a stale hour on
     // either side of that is harmless where a stale day would be wrong.
