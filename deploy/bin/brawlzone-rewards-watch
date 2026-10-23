@@ -38,20 +38,31 @@ try:
     state = json.load(open(state_path))
 except (OSError, ValueError):
     state = {}
-try:
-    seen = {u.rstrip('/') for u in json.load(open(seen_path))}
-except (OSError, ValueError):
-    seen = set()
-
-URL = re.compile(r'(?:https?://)?(?:link\.brawlstars\.com/[a-z-]+/voucher/[0-9a-fA-F-]{36}|store\.supercell\.com/[^\s)>\]"\']*voucher=[0-9a-fA-F-]{36})/?')
+# The language segment is optional: the 2026-10-23 Vince Box link was
+# link.brawlstars.com/voucher/<id>, with no /en/, and a pattern that required
+# one let it go by unposted for the whole day.
+URL = re.compile(r'(?:https?://)?(?:link\.brawlstars\.com/(?:[a-z-]+/)?voucher/[0-9a-fA-F-]{36}|store\.supercell\.com/[^\s)>\]"\']*voucher=[0-9a-fA-F-]{36})/?')
+VOUCHER = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
 
 
 def norm(u):
     return (u if u.startswith('http') else 'https://' + u).rstrip('/')
 
 
+def key(u):
+    """One reward, however its link is spelt: the voucher id, else the link."""
+    m = VOUCHER.search(u)
+    return m.group(0).lower() if m else norm(u)
+
+
 def arg(name, url):
     return f'{name}: {url}/' if 'link.brawlstars' in url else f'{name}: {url}'
+
+
+try:
+    seen = {key(u) for u in json.load(open(seen_path))}
+except (OSError, ValueError):
+    seen = set()
 
 
 batches = []
@@ -89,13 +100,13 @@ if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
             except ValueError:
                 continue
             u = norm(hit.group(0))
-            if first or added < cutoff or u in seen or u in found:
+            if first or added < cutoff or key(u) in seen or u in found:
                 continue
             found[u] = m.group(1).strip(' |')
         state['seeded_brawlnetwork'] = True
         if found:
             batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
-            seen |= set(found)
+            seen |= {key(u) for u in found}
 
 # ---- Discord #🎁-rewards-feed
 if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
@@ -136,11 +147,11 @@ if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
                 for line in '\n'.join(parts).splitlines():
                     for hit in URL.finditer(line):
                         u = norm(hit.group(0))
-                        if u not in seen and u not in found:
+                        if key(u) not in seen and u not in found:
                             found[u] = name_for(line, hit.start())
                 if found:
                     batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
-                    seen |= set(found)
+                    seen |= {key(u) for u in found}
             state['last_id'] = str(last)
     except Exception as e:  # noqa: BLE001
         print(f'::warning::Discord: {e}', file=sys.stderr)

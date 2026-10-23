@@ -39,8 +39,13 @@ mkdir -p "$OUT" "$CACHE/icons" "$CACHE/assets" || die "::error::cannot create $O
 python3 - "$OUT/rewards.json" "$SEEN" "${FORCE:-0}" "$@" <<'PY' || exit 1
 import json, re, sys
 out, seen_path, force, args = sys.argv[1], sys.argv[2], sys.argv[3] == '1', sys.argv[4:]
+# Repeats by voucher id, so /en/voucher/<id> and /voucher/<id> are one reward.
+VOUCHER = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
+def key(u):
+    m = VOUCHER.search(u)
+    return m.group(0).lower() if m else u.rstrip('/')
 try:
-    seen = set(json.load(open(seen_path)))
+    seen = {key(u) for u in json.load(open(seen_path))}
 except (OSError, ValueError):
     seen = set()
 rewards = []
@@ -53,7 +58,7 @@ for arg in args[:4]:
         url = 'https://' + url
     if not re.match(r'https://(link\.brawlstars\.com|store\.supercell\.com)/', url):
         sys.exit(f'::error::not a Supercell link, refusing: {url}')
-    if url.rstrip('/') in seen and not force:
+    if key(url) in seen and not force:
         sys.exit(f'::error::already posted: {url} (FORCE=1 to post it again)')
     rewards.append({'name': name.strip().strip('"'), 'url': url})
 json.dump(rewards, open(out, 'w'), ensure_ascii=False)
