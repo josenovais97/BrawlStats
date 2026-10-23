@@ -137,10 +137,14 @@
 	# and the site behaves as it did before this block existed -- the
 	# advantage is lost, the protection is not.
 	#
-	# Only /draft, not every limited prefix: this is one measured flood with
-	# one measured shape, and a broader rule would be a guess.
+	# Every per-account prefix since 2026-10-23, no longer a guess: the same
+	# Referer came back on /player from ~5,000 addresses, about 7 requests a
+	# second for seven hours. Each one reached Node and queued the account for
+	# sampling; the sampler overran, the precompute starved, and the site went
+	# down. No browser can send this header, so the wider rule costs real
+	# visitors nothing.
 	@draft_flood {
-		path /draft/*
+		path /draft/* /player/* /club/* /wrapped/* /compare/players/* /account-value/*
 		header Referer https://brawlzone.net
 	}
 	handle @draft_flood {
