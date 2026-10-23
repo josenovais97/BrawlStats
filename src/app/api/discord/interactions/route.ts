@@ -6,6 +6,19 @@ import {
   playerIconUrl,
 } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { brawldleRoster } from '@/lib/brawldle-data';
+import { pictureAnswer } from '@/lib/brawldle-picture';
+import { tallyBucket } from '@/lib/brawldle-tally';
+import {
+  DAILY_TRIES,
+  type DailyMode,
+  type DailyRef,
+  dailyNumber,
+  decodeDaily,
+  encodeDaily,
+  hearts,
+  squares,
+} from '@/lib/discord-daily';
 import { getEventRotation, getOfficialBrawlers, getPlayer, getPlayerRankings } from '@/lib/bs-api';
 import { comparePath } from '@/lib/compare';
 import { bracketBySlug } from '@/lib/rank-brackets';
@@ -756,6 +769,7 @@ async function helpCommand(token: string, home: boolean) {
           '`/rotation` — maps live right now',
           '`/compare a b` — brawler vs brawler',
           '`/leaderboard` — the global top 10',
+          '`/daily [zoom|shadow]` — today’s puzzle: guess the brawler, then share your score',
           '`/unlink` — remove your link and roles',
           '',
           `**Add the bot** to your server, or to your account to use it in any chat: ${INSTALL_URL}`,
@@ -766,6 +780,90 @@ async function helpCommand(token: string, home: boolean) {
       },
     ],
   });
+}
+
+/* ------------------------------------------------------------------ /daily */
+
+const today = () => new Date().toISOString().slice(0, 10);
+const DAILY_LABEL: Record<DailyMode, { icon: string; name: string; ask: string }> = {
+  zoom: { icon: '🔍', name: 'Zoom', ask: 'Who is this, up close?' },
+  shadow: { icon: '👤', name: 'Shadow', ask: 'Whose shadow is this?' },
+};
+
+/**
+ * The board as one ephemeral message: only the player sees it, so nobody's
+ * guesses spoil the puzzle for the channel. `note` is the line about the last
+ * guess. Finished boards show the full model and a button to brag.
+ */
+function dailyBoard(mode: DailyMode, date: string, misses: number, note: string, end?: { solvedIn: number; answer: string }): Reply {
+  const label = DAILY_LABEL[mode];
+  const step = end ? DAILY_TRIES : misses;
+  const title = `${label.icon} ${label.name} · BrawlZone Daily #${dailyNumber(date)}`;
+  const description = end
+    ? [end.solvedIn > 0 ? `✅ **Solved in ${end.solvedIn}/${DAILY_TRIES}!**` : `💀 Out of guesses. It was **${end.answer}**.`, note].filter(Boolean).join('\n')
+    : [`${hearts(misses)}`, `**${label.ask}**`, note, mode === 'zoom' ? '-# Every wrong guess zooms out a little.' : ''].filter(Boolean).join('\n');
+  const site: [string, string] = ['More puzzles on BrawlZone', `${SITE}/daily-challenge`];
+  return {
+    embeds: [
+      {
+        title,
+        color: end ? (end.solvedIn > 0 ? 0x4ade80 : 0xfb7185) : BRAND,
+        description,
+        image: { url: `${SITE}/api/brawldle/picture?mode=${mode}&step=${step}&d=${date}` },
+        footer: { text: 'New puzzle every day at midnight UTC · brawlzone.net' },
+      },
+    ],
+    components: [
+      {
+        type: 1,
+        components: [
+          end
+            ? { type: 2, style: 1, label: 'Share result', emoji: { name: '📣' }, custom_id: encodeDaily({ action: 'share', mode, date, n: end.solvedIn }) }
+            : { type: 2, style: 1, label: 'Guess', emoji: { name: '✏️' }, custom_id: encodeDaily({ action: 'guess', mode, date, n: misses }) },
+          { type: 2, style: 5, label: site[0], url: site[1] },
+        ],
+      },
+    ],
+  };
+}
+
+/** A finished Discord game counts in the site's "X% solved today" too. */
+async function tallyDaily(mode: DailyMode, solved: boolean, guesses: number) {
+  const bucket = tallyBucket(mode, solved, guesses);
+  const prisma = getPrisma();
+  if (bucket === null || !prisma) return;
+  const key = { day: new Date(`${today()}T00:00:00Z`), mode, guesses: bucket };
+  await prisma.dailyChallengeTally
+    .upsert({ where: { day_mode_guesses: key }, create: { ...key, count: 1 }, update: { count: { increment: 1 } } })
+    .catch(() => undefined);
+}
+
+/** A typed guess, from the modal: checked against today's answer, then the board moves on. */
+async function dailyAnswer(token: string, ref: DailyRef, typed: string) {
+  const guess = await findBrawler(typed);
+  if (!guess) {
+    await respond(token, dailyBoard(ref.mode, ref.date, ref.n, `❓ No brawler called “${typed.slice(0, 30)}”. That one does not count.`));
+    return;
+  }
+  const roster = await brawldleRoster().catch(() => []);
+  const answer = await pictureAnswer(ref.mode, ref.date, roster).catch(() => null);
+  if (!answer) {
+    await respond(token, { content: 'Today’s puzzle could not be loaded. Try again shortly.', embeds: [], components: [] });
+    return;
+  }
+  const name = titleCase(guess.name);
+  if (guess.id === answer.id) {
+    await tallyDaily(ref.mode, true, ref.n + 1);
+    await respond(token, dailyBoard(ref.mode, ref.date, ref.n, `It was **${titleCase(answer.name)}**.`, { solvedIn: ref.n + 1, answer: titleCase(answer.name) }));
+    return;
+  }
+  const misses = ref.n + 1;
+  if (misses >= DAILY_TRIES) {
+    await tallyDaily(ref.mode, false, DAILY_TRIES);
+    await respond(token, dailyBoard(ref.mode, ref.date, misses, `Your last guess was ${name}.`, { solvedIn: 0, answer: titleCase(answer.name) }));
+    return;
+  }
+  await respond(token, dailyBoard(ref.mode, ref.date, misses, `❌ Not ${name}.`));
 }
 
 /* ------------------------------------------------------------- autocomplete */
@@ -810,13 +908,62 @@ export async function POST(request: Request): Promise<Response> {
   const interaction = JSON.parse(body) as {
     type: number;
     token: string;
-    data?: { name?: string; options?: unknown };
+    data?: {
+      name?: string;
+      options?: unknown;
+      custom_id?: string;
+      components?: { components?: { custom_id?: string; value?: string }[] }[];
+    };
     member?: { user?: { id?: string } };
     user?: { id?: string };
     guild_id?: string;
   };
 
   if (interaction.type === 1) return Response.json({ type: 1 });
+
+  // /daily's buttons (3) and its guess box (5). State is in the custom_id.
+  if (interaction.type === 3 || interaction.type === 5) {
+    const ref = decodeDaily(interaction.data?.custom_id ?? '');
+    if (!ref) return Response.json({ type: 4, data: { content: 'That button has expired.', flags: 64 } });
+    if (ref.date !== today() && ref.action !== 'share') {
+      return Response.json({ type: 4, data: { content: 'That puzzle is over. `/daily` has today’s.', flags: 64 } });
+    }
+    if (ref.action === 'guess') {
+      // 9 = a modal: the one place Discord lets a player type mid-interaction.
+      return Response.json({
+        type: 9,
+        data: {
+          custom_id: encodeDaily({ ...ref, action: 'answer' }),
+          title: `${DAILY_LABEL[ref.mode].name}: who is it?`,
+          components: [
+            { type: 1, components: [{ type: 4, custom_id: 'name', style: 1, label: 'Brawler name', min_length: 2, max_length: 30, required: true, placeholder: 'e.g. Shelly' }] },
+          ],
+        },
+      });
+    }
+    if (ref.action === 'share') {
+      const userId = interaction.member?.user?.id ?? interaction.user?.id ?? '';
+      const label = DAILY_LABEL[ref.mode];
+      const result = ref.n > 0 ? `${ref.n}/${DAILY_TRIES}` : `X/${DAILY_TRIES}`;
+      return Response.json({
+        type: 4,
+        data: {
+          content: `${label.icon} <@${userId}> ${ref.n > 0 ? 'solved' : 'played'} BrawlZone Daily #${dailyNumber(ref.date)} ${label.name}: **${result}** ${squares(ref.n)}\nYour turn: \`/daily\` · ${SITE}/daily-challenge`,
+          allowed_mentions: { parse: [] },
+        },
+      });
+    }
+    // The typed guess: defer an update (6), then edit the board in place.
+    const typed = interaction.data?.components?.[0]?.components?.[0]?.value ?? '';
+    after(async () => {
+      try {
+        await dailyAnswer(interaction.token, ref, typed);
+      } catch {
+        await respond(interaction.token, { content: 'Something went wrong checking that guess. Try again.' });
+      }
+    });
+    return Response.json({ type: 6 });
+  }
 
   // Autocomplete: answered inline, from cached reads only.
   if (interaction.type === 4) {
@@ -829,6 +976,12 @@ export async function POST(request: Request): Promise<Response> {
     const options = interaction.data?.options;
     const token = interaction.token;
     const userId = interaction.member?.user?.id ?? interaction.user?.id ?? '';
+    // Nothing to look up yet: the board is today's picture at step 0, sent at
+    // once and only to the player (64 = ephemeral).
+    if (name === 'daily') {
+      const mode: DailyMode = opt(options, 'mode') === 'shadow' ? 'shadow' : 'zoom';
+      return Response.json({ type: 4, data: { ...dailyBoard(mode, today(), 0, ''), flags: 64 } });
+    }
     // Our own server, where the roles are; anywhere else the bot only answers.
     const home = interaction.guild_id === GUILD_ID;
 

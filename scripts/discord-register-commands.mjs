@@ -139,6 +139,17 @@ const COMMANDS = [
     options: [brawlerOpt('a', 'First brawler'), brawlerOpt('b', 'Second brawler')],
   },
   { name: 'leaderboard', type: 1, description: 'The global top 10 players' },
+  {
+    name: 'daily',
+    type: 1,
+    description: 'Today’s puzzle: guess the brawler from a zoom or its shadow, then share your score',
+    options: [
+      {
+        name: 'mode', type: STRING, required: false, description: 'Zoom (default) or Shadow',
+        choices: [{ name: 'Zoom', value: 'zoom' }, { name: 'Shadow', value: 'shadow' }],
+      },
+    ],
+  },
   { name: 'help', type: 1, description: 'Everything the BrawlZone bot can do' },
 ];
 
