@@ -1037,6 +1037,30 @@ export async function getLastAggregationRun(): Promise<AggregationRunSummary | n
  */
 export const USABLE_POWER = 9;
 
+/**
+ * How many never-seen profiles a page view may add to the sample pool per
+ * hour (2026-10-23).
+ *
+ * People look up a few new accounts an hour. A crawler walking /player from
+ * thousands of addresses added 11,832 in a morning; the sampler reads new
+ * members first, so every run overran, the precompute behind it never ran,
+ * and the site went down computing everything live. Past the allowance the
+ * page still renders; the account just is not queued for sampling or history.
+ */
+const NEW_LOOKUPS_PER_HOUR = 60;
+let lookupHour = -1;
+let lookupsThisHour = 0;
+
+function admitNewLookup(): boolean {
+  const hour = Math.floor(Date.now() / 3_600_000);
+  if (hour !== lookupHour) {
+    lookupHour = hour;
+    lookupsThisHour = 0;
+  }
+  lookupsThisHour += 1;
+  return lookupsThisHour <= NEW_LOOKUPS_PER_HOUR;
+}
+
 export async function recordLookup(reading: {
   tag: string;
   name?: string;
@@ -1077,6 +1101,11 @@ export async function recordLookup(reading: {
   };
 
   try {
+    // A profile nobody sampled before joins the pool only within the hourly
+    // allowance; see admitNewLookup.
+    const known = await prisma.sampledPlayer.findUnique({ where: { tag }, select: { tag: true } });
+    if (!known && !admitNewLookup()) return;
+
     await prisma.sampledPlayer.upsert({
       where: { tag },
       create: { tag, name, trophies, source: 'lookup', ...standing },
@@ -2439,6 +2468,50 @@ const BUFFIE_RELEASED_SHARE = 0.02;
 
 /** Below this many owners the sample cannot say either way. */
 const MIN_OWNERS_FOR_BUFFIES = 50;
+
+/**
+ * Every brawler's buffies in one pass (2026-10-23), for the precompute job.
+ *
+ * The per-brawler query below reads ~100k scattered rows of a multi-GB table,
+ * and a deploy empties the in-app cache, so the first visits after one ran it
+ * for 100 brawlers at once: on 2026-10-23 that held every database connection
+ * for minutes. One sequential pass over the window, stored, costs less than
+ * three of those.
+ */
+async function computeAllBrawlerBuffies(windowDays = 7): Promise<Record<number, BrawlerBuffies>> {
+  const prisma = getPrisma();
+  if (!prisma) return {};
+  const since = windowStartUtc(windowDays);
+  const rows = await prisma.$queryRaw<
+    { brawler_id: number; owners: bigint; gadget: bigint; star_power: bigint; hyper_charge: bigint }[]
+  >`
+    WITH latest AS (
+      SELECT DISTINCT ON (brawler_id, player_tag)
+             brawler_id, buffie_gadget, buffie_star_power, buffie_hyper_charge
+      FROM player_brawler_snapshots
+      WHERE snapshot_date >= ${since}
+      ORDER BY brawler_id, player_tag, snapshot_date DESC
+    )
+    SELECT brawler_id,
+           COUNT(*) AS owners,
+           COUNT(*) FILTER (WHERE buffie_gadget) AS gadget,
+           COUNT(*) FILTER (WHERE buffie_star_power) AS star_power,
+           COUNT(*) FILTER (WHERE buffie_hyper_charge) AS hyper_charge
+    FROM latest
+    GROUP BY brawler_id
+  `;
+  const out: Record<number, BrawlerBuffies> = {};
+  for (const r of rows) {
+    const owners = Number(r.owners);
+    if (owners < MIN_OWNERS_FOR_BUFFIES) continue;
+    const released = (count: bigint) => Number(count) / owners >= BUFFIE_RELEASED_SHARE;
+    const gadget = released(r.gadget);
+    const starPower = released(r.star_power);
+    const hyperCharge = released(r.hyper_charge);
+    out[r.brawler_id] = { owners, gadget, starPower, hyperCharge, none: !gadget && !starPower && !hyperCharge };
+  }
+  return out;
+}
 
 async function compute_getBrawlerBuffies(
   brawlerId: number,
@@ -5249,8 +5322,16 @@ export function rankedCompsKey(limit: number, bracket?: number): string {
 
 /* -------------------------------------------------------------- precomputed */
 
-/** How old a precomputed row may be before the live computation is used. */
-const PRECOMPUTED_MAX_AGE_MS = 3 * 3600_000;
+/**
+ * How old a precomputed row may be before the live computation is used.
+ *
+ * A day, not three hours (2026-10-23). These numbers move by fractions of a
+ * percent an hour, and the live computation is exactly what takes the box
+ * down under load: when the precompute fell behind, every page computed them
+ * at once and the site stopped answering. A stale row is a cosmetic problem;
+ * computing live under load is an outage.
+ */
+const PRECOMPUTED_MAX_AGE_MS = 24 * 3600_000;
 
 /**
  * A read computed after the last sampler run (scripts/precompute.ts), or null
@@ -5285,6 +5366,7 @@ export async function precomputeJobs(): Promise<{ key: string; run: () => Promis
     { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
     { key: 'indexable-pairs', run: computeStickyIndexablePairs },
     { key: 'account-value-dist', run: computeAccountValueDistribution },
+    { key: 'brawler-buffies:7', run: () => computeAllBrawlerBuffies(7) },
     ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
     ...BRACKET_IDS.map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
     // A rank too thin to list is stored as 'none', so the page shows every
@@ -5861,7 +5943,16 @@ export async function getLadderMapForm(): Promise<Map<string, MapForm[]>> {
 }
 export const getDailyDiscoveries = cachedRead('daily-discoveries', compute_getDailyDiscoveries);
 export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
-export const getBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
+const cachedBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
+
+/** A brawler's buffies: from the precomputed table of all of them, else live. */
+export async function getBrawlerBuffies(brawlerId: number, windowDays = 7): Promise<BrawlerBuffies | null> {
+  if (windowDays === 7) {
+    const all = await precomputed<Record<number, BrawlerBuffies>>('brawler-buffies:7');
+    if (all) return all[brawlerId] ?? null;
+  }
+  return cachedBrawlerBuffies(brawlerId, windowDays);
+}
 export const getBrawlerAbilityChoices = cachedRead('brawler-ability-choices', compute_getBrawlerAbilityChoices);
 export const getLatestBrawlerStats = cachedRead('latest-brawler-stats', compute_getLatestBrawlerStats);
 export const getBrawlerStat = cachedRead('brawler-stat', compute_getBrawlerStat);

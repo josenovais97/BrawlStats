@@ -16,9 +16,19 @@ for _ in $(seq 40); do
   [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ] || break
   sleep 30
 done
+# But never two turns in a row (2026-10-23). A scraper fed the sampler 12,000
+# new players overnight, every run overran, this skipped six turns, the stored
+# reads went stale and every page computed them live: the site went down. The
+# stored reads are what keep it up, so once they are over 90 minutes old this
+# runs beside the sampler regardless.
 if [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ]; then
-  echo "Sampler run still going after 20 minutes of waiting; skipping this turn"
-  exit 0
+  age=$(docker compose exec -T db psql -U brawlzone -d brawlzone -Atc \
+    "select coalesce(extract(epoch from now() - max(computed_at))::int, 999999) from precomputed_reads" 2>/dev/null | tr -dc 0-9)
+  if [ "${age:-999999}" -lt 5400 ]; then
+    echo "Sampler run still going after 20 minutes of waiting; skipping this turn (stored reads are $((age / 60)) minutes old)"
+    exit 0
+  fi
+  echo "Sampler run still going, but the stored reads are $((${age:-999999} / 60)) minutes old: running anyway"
 fi
 if ! docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/precompute.ts >"$out" 2>&1; then
   echo "Precompute FAILED. Output:"
