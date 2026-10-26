@@ -55,6 +55,9 @@ export interface RoastFacts {
   winsSolo: number;
   winsDuo: number;
   hasClub: boolean;
+  clubName: string | null;
+  /** The club's name brags too ("Brawl Killers"). */
+  braggingClub: boolean;
   rankedNow: RankedStanding | null;
   rankedBest: RankedStanding | null;
   /** Most played in the recent log when it is clear, else most trophies. */
@@ -82,6 +85,8 @@ export interface RecentGames {
   starPlayer: number;
   /** The most played brawler and how many games, over the whole log. */
   topBrawler: { name: string; games: number } | null;
+  /** The top brawler was played strictly more than the runner-up. */
+  topBrawlerLead: boolean;
 }
 
 export interface RoastContext {
@@ -99,7 +104,10 @@ export function parseRanked(raw: string | null | undefined): RankedStanding | nu
   return index < 0 ? null : { tier: RANKED_TIERS[index], index, raw: raw.trim() };
 }
 
-const BRAG_WORDS = ['pro', 'god', 'king', 'queen', 'legend', 'boss', 'master', 'best', 'goat', 'killer', 'hacker', 'beast'];
+const BRAG_WORDS = [
+  'pro', 'god', 'king', 'queen', 'legend', 'boss', 'master', 'best', 'goat', 'killer', 'hacker', 'beast',
+  'insane', 'savage', 'demon', 'elite', 'toxic', 'sniper', 'ninja', 'monster', 'slayer', 'killers',
+];
 
 /**
  * "xXProGamerXx", "KingSlayer", "BOSS_77" brag; "Viking", "Problem" and
@@ -142,12 +150,18 @@ export function buildFacts(
   const byTrophies = [...brawlers].sort(
     (a, b) => b.trophies - a.trophies || b.highestTrophies - a.highestTrophies,
   );
-  // A third of the log on one brawler is a main; otherwise trophies say who.
+  /*
+   * Who the main is: the clear favourite of the recent log when there is one.
+   * Trophies stopped answering this with prestige, which resets a brawler to
+   * 1,000 -- a grinder's top six can sit within twenty trophies of each other.
+   * Without a log, prestige first, then trophies.
+   */
   const recentMain =
-    recent?.topBrawler && recent.topBrawler.games >= Math.max(5, recent.games / 3)
+    recent?.topBrawler && recent.topBrawler.games >= 4 && recent.topBrawlerLead
       ? brawlers.find((b) => b.name === recent.topBrawler!.name)
       : undefined;
-  const main = recentMain ?? byTrophies[0];
+  const byPrestige = [...byTrophies].sort((a, b) => (b.prestigeLevel ?? 0) - (a.prestigeLevel ?? 0));
+  const main = recentMain ?? byPrestige[0];
 
   const streakHolder = [...brawlers].sort((a, b) => (b.maxWinStreak ?? 0) - (a.maxWinStreak ?? 0))[0];
 
@@ -164,6 +178,8 @@ export function buildFacts(
     winsSolo: player.soloVictories ?? 0,
     winsDuo: player.duoVictories ?? 0,
     hasClub: Boolean(player.club?.tag),
+    clubName: player.club?.tag ? (player.club.name ?? null) : null,
+    braggingClub: Boolean(player.club?.tag && player.club.name && BRAG.test(player.club.name.normalize('NFKC'))),
     rankedNow: parseRanked(player.rankedRankName),
     rankedBest: parseRanked(player.highestAllTimeRankedRankName ?? player.highestSeasonRankedRankName),
     main: main ? toRoast(main) : null,
@@ -214,7 +230,7 @@ function summariseLog(tag: string, log: BSBattleLogEntry[]): RecentGames {
     else if (battle.result === 'victory') break;
   }
 
-  const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+  const [top, second] = [...counts.entries()].sort((a, b) => b[1] - a[1]);
   return {
     games: log.length,
     decided,
@@ -226,6 +242,7 @@ function summariseLog(tag: string, log: BSBattleLogEntry[]): RecentGames {
     rankedWins,
     starPlayer,
     topBrawler: top ? { name: top[0], games: top[1] } : null,
+    topBrawlerLead: Boolean(top && (!second || top[1] > second[1])),
   };
 }
 
