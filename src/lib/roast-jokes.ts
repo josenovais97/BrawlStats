@@ -499,6 +499,413 @@ const MAINS: Record<string, Line[]> = {
       pt: 'Main Kit. Você sobe na cabeça dos parceiros e chama isso de carregar o time.',
     },
   ],
+  // From here on written against each brawler's own kit and bio (Brawlify).
+  ALLI: [
+    {
+      en: 'Alli main. You stalk enemies like a horror movie, then miss like a comedy.',
+      es: 'Main Alli. Acechas a los enemigos como en una película de terror y fallas como en una comedia.',
+      pt: 'Main Alli. Você persegue os inimigos como num filme de terror e erra como numa comédia.',
+    },
+  ],
+  ANGELO: [
+    {
+      en: 'Angelo main. A mosquito with a bow. Just as annoying, just as easy to swat.',
+      es: 'Main Angelo. Un mosquito con arco. Igual de molesto, igual de fácil de aplastar.',
+      pt: 'Main Angelo. Um mosquito com arco. Irritante e tão fácil de esmagar quanto.',
+    },
+  ],
+  ASH: [
+    {
+      en: 'Ash main. You live in a trash can and play like it.',
+      es: 'Main Ash. Vives en un bote de basura y juegas a la altura.',
+      pt: 'Main Ash. Você mora numa lata de lixo e joga à altura.',
+    },
+  ],
+  BERRY: [
+    {
+      en: 'Berry main. A unicorn who hates the job. Your teammates can relate.',
+      es: 'Main Berry. Un unicornio que odia su trabajo. Tus compañeros te entienden.',
+      pt: 'Main Berry. Um unicórnio que odeia o trabalho. Seus parceiros entendem bem.',
+    },
+  ],
+  BO: [
+    {
+      en: 'Bo main. Your weapons came from the gift shop, on sale. It shows.',
+      es: 'Main Bo. Tus armas salieron de la tienda de regalos, en oferta. Se nota.',
+      pt: 'Main Bo. Suas armas vieram da lojinha, em promoção. Dá pra perceber.',
+    },
+  ],
+  BOLT: [
+    {
+      en: 'Bolt main. You wanted to be a race car. You ended up a bowling ball.',
+      es: 'Main Bolt. Querías ser auto de carreras y terminaste siendo una bola de boliche.',
+      pt: 'Main Bolt. Você queria ser carro de corrida e virou bola de boliche.',
+    },
+  ],
+  BONNIE: [
+    {
+      en: 'Bonnie main. Your dream is a cannon ride to the moon. Your team would happily help.',
+      es: 'Main Bonnie. Tu sueño es ir a la luna en cañón. Tu equipo te ayudaría encantado.',
+      pt: 'Main Bonnie. Seu sonho é ir pra lua de canhão. Seu time ajudaria com prazer.',
+    },
+  ],
+  BUSTER: [
+    {
+      en: 'Buster main. You brought a movie projector to a fight. Shame the plot is always you losing.',
+      es: 'Main Buster. Llevaste un proyector de cine a una pelea. Lástima que la trama siempre sea tú perdiendo.',
+      pt: 'Main Buster. Você levou um projetor de cinema pra briga. Pena que o roteiro é sempre você perdendo.',
+    },
+  ],
+  CARL: [
+    {
+      en: 'Carl main. Throw the pickaxe, wait for it to come back, die waiting.',
+      es: 'Main Carl. Lanzas el pico, esperas a que vuelva y mueres esperando.',
+      pt: 'Main Carl. Joga a picareta, espera ela voltar e morre esperando.',
+    },
+  ],
+  CHARLIE: [
+    {
+      en: 'Charlie main. A whole circus act, and the clown is you.',
+      es: 'Main Charlie. Todo un número de circo y el payaso eres tú.',
+      pt: 'Main Charlie. Um número de circo inteiro e o palhaço é você.',
+    },
+  ],
+  CHUCK: [
+    {
+      en: 'Chuck main. You place the posts, plan the route, and the train still goes nowhere.',
+      es: 'Main Chuck. Pones los postes, planeas la ruta y el tren igual no va a ningún lado.',
+      pt: 'Main Chuck. Você coloca os postes, planeja a rota e o trem não vai pra lugar nenhum.',
+    },
+  ],
+  CLANCY: [
+    {
+      en: 'Clancy main. A fake crustacean with real ambition. Shame about the aim.',
+      es: 'Main Clancy. Un crustáceo falso con ambición de verdad. Lástima la puntería.',
+      pt: 'Main Clancy. Um crustáceo falso com ambição de verdade. Pena a mira.',
+    },
+  ],
+  COLETTE: [
+    {
+      en: "Colette main. You collected every brawler's plushie. Collecting wins was harder, apparently.",
+      es: 'Main Colette. Coleccionaste el peluche de cada brawler. Coleccionar victorias, al parecer, cuesta más.',
+      pt: 'Main Colette. Você colecionou a pelúcia de todo brawler. Colecionar vitórias pelo jeito é mais difícil.',
+    },
+  ],
+  COSMO: [
+    {
+      en: 'Cosmo main. Always gazing at the stars. Never at the enemy.',
+      es: 'Main Cosmo. Siempre mirando las estrellas. Nunca al enemigo.',
+      pt: 'Main Cosmo. Sempre olhando as estrelas. Nunca o inimigo.',
+    },
+  ],
+  DAMIAN: [
+    {
+      en: 'Damian main. Loud, angry, breaks everything. Your team calls it a concert. The enemy calls it a free win.',
+      es: 'Main Damian. Ruidoso, furioso, rompe todo. Tu equipo lo llama concierto. El enemigo, victoria gratis.',
+      pt: 'Main Damian. Barulhento, furioso, quebra tudo. Seu time chama de show. O inimigo chama de vitória fácil.',
+    },
+  ],
+  DOUG: [
+    {
+      en: 'Doug main. You revive your teammates so they can die a second time.',
+      es: 'Main Doug. Revives a tus compañeros para que mueran por segunda vez.',
+      pt: 'Main Doug. Você revive os parceiros pra eles morrerem de novo.',
+    },
+  ],
+  DRACO: [
+    {
+      en: 'Draco main. An inflatable dragon. Fitting: it pops just as fast.',
+      es: 'Main Draco. Un dragón inflable. Tiene sentido: se pincha igual de rápido.',
+      pt: 'Main Draco. Um dragão inflável. Faz sentido: estoura tão rápido quanto.',
+    },
+  ],
+  EVE: [
+    {
+      en: 'Eve main. You fire eggs at people and call it parenting.',
+      es: 'Main Eve. Le disparas huevos a la gente y lo llamas maternidad.',
+      pt: 'Main Eve. Você atira ovos nas pessoas e chama isso de maternidade.',
+    },
+  ],
+  FINX: [
+    {
+      en: 'Finx main. You can rewind time, and you still make the same mistakes.',
+      es: 'Main Finx. Puedes retroceder el tiempo y aun así cometes los mismos errores.',
+      pt: 'Main Finx. Você volta no tempo e mesmo assim comete os mesmos erros.',
+    },
+  ],
+  GIGI: [
+    {
+      en: 'Gigi main. A cursed puppet. Your teammates feel the curse every game.',
+      es: 'Main Gigi. Una marioneta maldita. Tus compañeros sienten la maldición en cada partida.',
+      pt: 'Main Gigi. Uma marionete amaldiçoada. Seus parceiros sentem a maldição toda partida.',
+    },
+  ],
+  GLOWY: [
+    {
+      en: "Glowy main. You tether yourself to people. That's a lot of attachment for one game.",
+      es: 'Main Glowy. Te conectas a la gente con un rayo. Demasiado apego para una sola partida.',
+      pt: 'Main Glowy. Você se prende nas pessoas com um raio. É muito apego pra uma partida só.',
+    },
+  ],
+  GRAY: [
+    {
+      en: 'Gray main. A mime with finger guns. Silent, like your damage.',
+      es: 'Main Gray. Un mimo con pistolas de dedo. Silencioso, como tu daño.',
+      pt: 'Main Gray. Um mímico com arminha de dedo. Silencioso, igual ao seu dano.',
+    },
+  ],
+  GROM: [
+    {
+      en: 'Grom main. Kindergarten kids traumatised Grom. Your teammates know the feeling.',
+      es: 'Main Grom. Los niños del jardín de infantes traumatizaron a Grom. Tus compañeros saben lo que se siente.',
+      pt: 'Main Grom. As crianças do jardim de infância traumatizaram o Grom. Seus parceiros sabem como é.',
+    },
+  ],
+  'JAE-YONG': [
+    {
+      en: "Jae-Yong main. He thinks he's a karaoke god. You think you play well. You're both wrong.",
+      es: 'Main Jae-Yong. Él cree que es un dios del karaoke. Tú crees que juegas bien. Los dos se equivocan.',
+      pt: 'Main Jae-Yong. Ele acha que é um deus do karaokê. Você acha que joga bem. Os dois estão errados.',
+    },
+  ],
+  JANET: [
+    {
+      en: "Janet main. You fly over the whole map and still miss what's happening.",
+      es: 'Main Janet. Vuelas sobre todo el mapa y aun así no te enteras de lo que pasa.',
+      pt: 'Main Janet. Você voa por cima do mapa inteiro e mesmo assim não vê o que tá acontecendo.',
+    },
+  ],
+  JUJU: [
+    {
+      en: 'Juju main. Even your voodoo doll has a better win rate. His name is Gregory, by the way.',
+      es: 'Main Juju. Hasta tu muñeco vudú tiene mejor porcentaje de victorias. Se llama Gregory, por cierto.',
+      pt: 'Main Juju. Até seu boneco de vodu tem mais vitórias que você. O nome dele é Gregory, aliás.',
+    },
+  ],
+  KAZE: [
+    {
+      en: 'Kaze main. Two aspects, geisha and ninja. Neither of them wins.',
+      es: 'Main Kaze. Dos aspectos, geisha y ninja. Ninguno de los dos gana.',
+      pt: 'Main Kaze. Dois aspectos, gueixa e ninja. Nenhum dos dois ganha.',
+    },
+  ],
+  'LARRY & LAWRIE': [
+    {
+      en: 'Larry & Lawrie main. Two brawlers for the price of one, and still outnumbered.',
+      es: 'Main Larry y Lawrie. Dos brawlers por el precio de uno y aun así en desventaja.',
+      pt: 'Main Larry e Lawrie. Dois brawlers pelo preço de um e mesmo assim em desvantagem.',
+    },
+  ],
+  LILY: [
+    {
+      en: 'Lily main. You dive into the Shadow Realm. Your win rate stays there.',
+      es: 'Main Lily. Te metes al Reino de las Sombras. Tu porcentaje de victorias se queda ahí.',
+      pt: 'Main Lily. Você entra no Reino das Sombras. Sua taxa de vitória fica por lá.',
+    },
+  ],
+  LOU: [
+    {
+      en: 'Lou main. A snow cone robot that never made a sale. Your record looks familiar.',
+      es: 'Main Lou. Un robot de raspados que nunca vendió nada. Tu historial se parece.',
+      pt: 'Main Lou. Um robô de raspadinha que nunca vendeu nada. Seu histórico é parecido.',
+    },
+  ],
+  LUMI: [
+    {
+      en: 'Lumi main. A metal drummer. Loud, fast, and completely off beat.',
+      es: 'Main Lumi. Baterista de metal. Ruidosa, rápida y completamente fuera de ritmo.',
+      pt: 'Main Lumi. Baterista de metal. Barulhenta, rápida e totalmente fora do ritmo.',
+    },
+  ],
+  MAISIE: [
+    {
+      en: "Maisie main. A safety coordinator who walks straight into danger. That's every fight you take.",
+      es: 'Main Maisie. Una coordinadora de seguridad que se mete de cabeza en el peligro. Así son todas tus peleas.',
+      pt: 'Main Maisie. Uma coordenadora de segurança que vai direto pro perigo. Igual a toda briga sua.',
+    },
+  ],
+  MANDY: [
+    {
+      en: 'Mandy main. Queen of the candy kingdom, peasant of the scoreboard.',
+      es: 'Main Mandy. Reina del reino de los dulces, plebeya del marcador.',
+      pt: 'Main Mandy. Rainha do reino dos doces, plebeia do placar.',
+    },
+  ],
+  MEEPLE: [
+    {
+      en: 'Meeple main. Every board game rule memorised. Game sense still loading.',
+      es: 'Main Meeple. Te sabes las reglas de todos los juegos de mesa. El sentido del juego sigue cargando.',
+      pt: 'Main Meeple. Sabe a regra de todo jogo de tabuleiro. A noção de jogo ainda tá carregando.',
+    },
+  ],
+  MINA: [
+    {
+      en: 'Mina main. All that breakdancing, and the only thing you break is your win streak.',
+      es: 'Main Mina. Tanto breakdance y lo único que rompes es tu racha.',
+      pt: 'Main Mina. Tanto breakdance e a única coisa que você quebra é sua sequência de vitórias.',
+    },
+  ],
+  MOE: [
+    {
+      en: 'Moe main. A blind rat. That explains the aim.',
+      es: 'Main Moe. Una rata ciega. Eso explica la puntería.',
+      pt: 'Main Moe. Um rato cego. Isso explica a mira.',
+    },
+  ],
+  'MR. P': [
+    {
+      en: 'Mr. P main. Your porters do all the work while you yell. Like a real manager.',
+      es: 'Main Mr. P. Tus botones hacen todo el trabajo mientras gritas. Como un jefe de verdad.',
+      pt: 'Main Mr. P. Seus carregadores fazem todo o trabalho enquanto você grita. Igual a um chefe de verdade.',
+    },
+  ],
+  NAJIA: [
+    {
+      en: "Najia main. You hide in a vase. Honestly, the best idea you've had all game.",
+      es: 'Main Najia. Te escondes en un jarrón. Sinceramente, la mejor idea que tuviste en toda la partida.',
+      pt: 'Main Najia. Você se esconde num vaso. Sinceramente, a melhor ideia que você teve na partida.',
+    },
+  ],
+  NANI: [
+    {
+      en: "Nani main. Peep flies all over the map and still can't find a kill.",
+      es: 'Main Nani. Peep vuela por todo el mapa y no encuentra ni una eliminación.',
+      pt: 'Main Nani. O Peep voa pelo mapa inteiro e não acha um abate.',
+    },
+  ],
+  NORI: [
+    {
+      en: "Nori main. Kenji and Kaze's kid, destined for greatness. Destiny skipped your games.",
+      es: 'Main Nori. El hijo de Kenji y Kaze, destinado a la grandeza. El destino se saltó tus partidas.',
+      pt: 'Main Nori. Filho do Kenji e da Kaze, destinado à grandeza. O destino pulou as suas partidas.',
+    },
+  ],
+  OLLIE: [
+    {
+      en: 'Ollie main. You make the enemies dance. Then you lose the dance-off.',
+      es: 'Main Ollie. Haces bailar a los enemigos. Y después pierdes la batalla de baile.',
+      pt: 'Main Ollie. Você faz os inimigos dançarem. E depois perde a batalha de dança.',
+    },
+  ],
+  OTIS: [
+    {
+      en: "Otis main. A street artist. Shame your gameplay isn't a masterpiece.",
+      es: 'Main Otis. Un artista callejero. Lástima que tu forma de jugar no sea una obra maestra.',
+      pt: 'Main Otis. Um artista de rua. Pena que seu jogo não é uma obra-prima.',
+    },
+  ],
+  PAM: [
+    {
+      en: 'Pam main. You drop the healing turret and your team still finds a way to die next to it.',
+      es: 'Main Pam. Pones la torreta de curación y tu equipo igual encuentra la forma de morir al lado.',
+      pt: 'Main Pam. Você coloca a torreta de cura e o time ainda dá um jeito de morrer do lado dela.',
+    },
+  ],
+  PEARL: [
+    {
+      en: 'Pearl main. Burnt cookies and a burnt win rate.',
+      es: 'Main Pearl. Galletas quemadas y un porcentaje de victorias quemado.',
+      pt: 'Main Pearl. Biscoitos queimados e uma taxa de vitória queimada.',
+    },
+  ],
+  PIERCE: [
+    {
+      en: 'Pierce main. A lifeguard who shoots people instead of saving them. Your teammates noticed.',
+      es: 'Main Pierce. Un salvavidas que dispara en vez de salvar. Tus compañeros lo notaron.',
+      pt: 'Main Pierce. Um salva-vidas que atira em vez de salvar. Seus parceiros perceberam.',
+    },
+  ],
+  'R-T': [
+    {
+      en: "R-T main. An information kiosk with no idea what's going on.",
+      es: 'Main R-T. Un kiosco de información que no tiene idea de lo que pasa.',
+      pt: 'Main R-T. Um quiosque de informação que não faz ideia do que tá acontecendo.',
+    },
+  ],
+  RUFFS: [
+    {
+      en: 'Ruffs main. A space colonel. Your teammates get the power-ups, you get the belly rubs.',
+      es: 'Main Ruffs. Un coronel espacial. Tus compañeros reciben las mejoras, tú las caricias en la panza.',
+      pt: 'Main Ruffs. Um coronel espacial. Seus parceiros ganham os power-ups, você ganha carinho na barriga.',
+    },
+  ],
+  SHADE: [
+    {
+      en: 'Shade main. A pile of clothes with sunglasses. Your bedroom floor has the same energy.',
+      es: 'Main Shade. Una pila de ropa con lentes de sol. El piso de tu cuarto tiene la misma energía.',
+      pt: 'Main Shade. Uma pilha de roupa com óculos escuros. O chão do seu quarto tem a mesma energia.',
+    },
+  ],
+  SIRIUS: [
+    {
+      en: "Sirius main. Banned from Starr Park and back for revenge. The revenge isn't going well.",
+      es: 'Main Sirius. Expulsado de Starr Park y de vuelta para vengarse. La venganza no va bien.',
+      pt: 'Main Sirius. Expulso do Starr Park e de volta pra se vingar. A vingança não tá indo bem.',
+    },
+  ],
+  SPROUT: [
+    {
+      en: 'Sprout main. You build a wall to protect your team. From you, probably.',
+      es: 'Main Sprout. Construyes una pared para proteger a tu equipo. De ti, probablemente.',
+      pt: 'Main Sprout. Você constrói uma parede pra proteger o time. De você, provavelmente.',
+    },
+  ],
+  'STARR NOVA': [
+    {
+      en: "Starr Nova main. A cosplayer who thinks she's an anime hero. You think you're a pro. Same energy.",
+      es: 'Main Starr Nova. Una cosplayer que se cree heroína de anime. Tú te crees pro. La misma energía.',
+      pt: 'Main Starr Nova. Uma cosplayer que se acha heroína de anime. Você se acha pro. Mesma energia.',
+    },
+  ],
+  TICK: [
+    {
+      en: "Tick main. Your head is literally a bomb. Your plans aren't much better.",
+      es: 'Main Tick. Tu cabeza es literalmente una bomba. Tus planes no son mucho mejores.',
+      pt: 'Main Tick. Sua cabeça é literalmente uma bomba. Seus planos não são muito melhores.',
+    },
+  ],
+  TRUNK: [
+    {
+      en: 'Trunk main. A colony of ants pretending to be a tree. Still smarter than your draft.',
+      es: 'Main Trunk. Una colonia de hormigas que finge ser un árbol. Aun así, más inteligente que tu selección.',
+      pt: 'Main Trunk. Uma colônia de formigas fingindo ser árvore. Mesmo assim, mais esperta que o seu draft.',
+    },
+  ],
+  WENDY: [
+    {
+      en: 'Wendy main. You came to save the planet. Start with your win rate.',
+      es: 'Main Wendy. Viniste a salvar el planeta. Empieza por tu porcentaje de victorias.',
+      pt: 'Main Wendy. Você veio salvar o planeta. Começa pela sua taxa de vitória.',
+    },
+  ],
+  WILLOW: [
+    {
+      en: 'Willow main. You mind-control the enemy and still lose the fight.',
+      es: 'Main Willow. Controlas la mente del enemigo y aun así pierdes la pelea.',
+      pt: 'Main Willow. Você controla a mente do inimigo e mesmo assim perde a briga.',
+    },
+  ],
+  ZIGGY: [
+    {
+      en: 'Ziggy main. Not tricks, illusions. Like your rank.',
+      es: 'Main Ziggy. No son trucos, son ilusiones. Como tu rango.',
+      pt: 'Main Ziggy. Não são truques, são ilusões. Igual ao seu rank.',
+    },
+  ],
+  VINCE: [
+    {
+      en: 'Vince main. Coffee and bugs. Your customers ran away. So did your teammates.',
+      es: 'Main Vince. Café y bichos. Tus clientes huyeron. Tus compañeros también.',
+      pt: 'Main Vince. Café e insetos. Seus clientes fugiram. Seus parceiros também.',
+    },
+  ],
+  'BUZZ LIGHTYEAR': [
+    {
+      en: "Buzz Lightyear main. To infinity and beyond: the rank you'll never reach.",
+      es: 'Main Buzz Lightyear. Al infinito y más allá: el rango al que nunca vas a llegar.',
+      pt: 'Main Buzz Lightyear. Ao infinito e além: o rank que você nunca vai alcançar.',
+    },
+  ],
 };
 
 /** By class, for a main with no line of its own. */
