@@ -85,7 +85,10 @@ export function varsFor(f: RoastFacts, lang: Locale): Record<string, string | nu
     decided: log?.decided ?? 0,
     wins: log?.wins ?? 0,
     wr: log && log.decided > 0 ? pct(log.wins, log.decided) : '–',
+    losses: log ? log.decided - log.wins : 0,
     lossStreak: log?.lossStreak ?? 0,
+    rankedGames: log?.ranked ?? 0,
+    club: f.clubName ?? '–',
     star: log?.starPlayer ?? 0,
     friendly: log?.friendly ?? 0,
     showdownRecent: log?.showdown ?? 0,
@@ -703,6 +706,30 @@ export const JOKES: Joke[] = [
     ],
   },
   {
+    id: 'form-coin-flip',
+    topic: 'form',
+    when: (f) => (f.log && f.log.decided >= 12 && winRate(f)! > 0.42 && winRate(f)! < 0.58 ? 5 : 0),
+    lines: [
+      {
+        en: "{wins} wins and {losses} losses in your last games. You're not a player, you're a coin flip.",
+        es: '{wins} victorias y {losses} derrotas en tus últimas partidas. No eres un jugador, eres una moneda al aire.',
+        pt: '{wins} vitórias e {losses} derrotas nas últimas partidas. Você não é um jogador, é cara ou coroa.',
+      },
+    ],
+  },
+  {
+    id: 'ranked-grind',
+    topic: 'grind',
+    when: (f) => ((f.log?.ranked ?? 0) >= 12 && f.rankedNow && f.rankedNow.index <= 5 ? 6 : 0),
+    lines: [
+      {
+        en: "{rankedGames} of your last {games} games were Ranked, and you're still in {now}. Respect the commitment.",
+        es: '{rankedGames} de tus últimas {games} partidas fueron de Competitivo y sigues en {now}. Respeto el compromiso.',
+        pt: '{rankedGames} das suas últimas {games} partidas foram no Ranqueado e você continua no {now}. Respeito o compromisso.',
+      },
+    ],
+  },
+  {
     id: 'loss-streak',
     topic: 'streak-now',
     when: (f) => ((f.log?.lossStreak ?? 0) >= 4 ? 9 : 0),
@@ -820,11 +847,36 @@ export const JOKES: Joke[] = [
     ],
   },
 
+  {
+    id: 'club-brag',
+    topic: 'club',
+    when: (f) => (f.braggingClub ? 6 : 0),
+    lines: [
+      {
+        en: 'Your club is called "{club}". The scariest thing about it is the name.',
+        es: 'Tu club se llama "{club}". Lo más aterrador es el nombre.',
+        pt: 'Seu clube se chama "{club}". A coisa mais assustadora nele é o nome.',
+      },
+    ],
+  },
+  {
+    id: 'club-name',
+    topic: 'club',
+    when: (f) => (f.clubName && !f.braggingClub ? 3 : 0),
+    lines: [
+      {
+        en: 'Your club is called "{club}". Big name. Small Club League results, probably.',
+        es: 'Tu club se llama "{club}". Nombre grande. Resultados chicos en la Liga de Clubes, seguramente.',
+        pt: 'Seu clube se chama "{club}". Nome grande. Resultado pequeno na Liga de Clubes, com certeza.',
+      },
+    ],
+  },
+
   // ---- collection ---------------------------------------------------------
   {
     id: 'untouched',
     topic: 'collection',
-    when: (f) => (f.untouched >= 40 ? 6 : 0),
+    when: (f) => (f.untouched >= 15 ? (f.untouched >= 40 ? 6 : 4) : 0),
     lines: [
       {
         en: "{untouched} brawlers still at Power 1. That's not a roster, it's a museum.",
@@ -1040,6 +1092,21 @@ export const CLOSERS: { min: number; lines: Line[] }[] = [
         en: 'Good account. Terrible sleep schedule, probably.',
         es: 'Buena cuenta. Horario de sueño terrible, seguramente.',
         pt: 'Conta boa. Horário de sono péssimo, com certeza.',
+      },
+    ],
+  },
+  {
+    min: 6,
+    lines: [
+      {
+        en: 'Tryhard detected, {name}. The grind is real. The results are still loading.',
+        es: 'Tryhard detectado, {name}. El esfuerzo es real. Los resultados siguen cargando.',
+        pt: 'Tryhard detectado, {name}. O esforço é real. Os resultados ainda tão carregando.',
+      },
+      {
+        en: "You take this game very seriously, {name}. The game has noticed. It isn't impressed yet.",
+        es: 'Te tomas este juego muy en serio, {name}. El juego lo notó. Todavía no está impresionado.',
+        pt: 'Você leva esse jogo muito a sério, {name}. O jogo percebeu. Ainda não ficou impressionado.',
       },
     ],
   },
