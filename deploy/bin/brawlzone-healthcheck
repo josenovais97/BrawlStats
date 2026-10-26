@@ -131,6 +131,17 @@ down=$(cd /home/ubuntu/brawlstats && docker compose ps -a --status exited --stat
   | grep -vcx 'brawlzone-sampler-job')
 [ "$down" -eq 0 ] || problems+=("$down container(s) not running")
 
+# 4b. Is the app answering, and is the box keeping up? (2026-10-26)
+#     A crawl on /pt/draft left the app "unhealthy" (its own healthcheck timing
+#     out) with the load at 15 on two cores, while check 1 -- the cached
+#     homepage, served before the app is asked -- said all was well. Nobody
+#     was mailed; the owner found it. Docker's verdict on the app is the
+#     honest signal, and a 15-minute load average over 8 is not a blip.
+health=$(docker inspect -f '{{.State.Health.Status}}' brawlstats-app-1 2>/dev/null || echo unknown)
+[ "$health" = healthy ] || [ "$health" = starting ] || problems+=("app container is ${health} (it is not answering its own health probe)")
+load15=$(cut -d' ' -f3 /proc/loadavg)
+[ "${load15%.*}" -lt 8 ] || problems+=("load has averaged ${load15} for 15 minutes on two cores (a crawl, or jobs piling up)")
+
 # 5. Is the Discord invite in the footer still going to work?
 #    Discord's default invite lasts 30 days and cannot be extended, so the
 #    link on every page of the site expires quietly and nothing else would
