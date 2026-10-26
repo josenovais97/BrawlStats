@@ -13,6 +13,13 @@ kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
          newbrawler  "Is <new brawler> broken?": tier after their first
                  battles, best maps, the build; data is then
                  scripts/new-brawler-report.ts output, art beside it in OUT.
+         everyrank  "Every brawler ranked from worst to best" (2026-10-26):
+                 the whole roster by this week's meta score, the best Short
+                 of the channel's first month made a weekly format.
+         classrank  the same countdown inside one class or rarity ("every
+                 assassin ranked"), the next group each episode.
+         stop    "STOP picking these brawlers": the most-picked that lose,
+                 then the least-picked that win.
          daily   "Can you guess today's brawler?" (2026-10-23): the first four
                  steps of the site's Zoom puzzle and its Shadow, never the
                  answer, which is at brawlzone.net/daily-challenge. data is
@@ -32,8 +39,8 @@ The selection is seeded with the data's date, so parallel PARTs agree on it.
 import json, math, os, random, sys
 from PIL import Image, ImageDraw, ImageFilter
 
-from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, clamp,
-                    confetti, finish, follow_cta, grey, hits, impact, load_face, load_model, nice, out_back,
+from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, card, clamp,
+                    confetti, crown, finish, follow_cta, grey, hits, impact, load_face, load_model, nice, out_back,
                     out_cubic, pill, put, put_rays, rounded_mask, silhouette, slam, text_sprite, tier_pill, vgrad)
 
 KIND, DATA, PREV, STATE, OUT = sys.argv[1:6]
@@ -48,7 +55,7 @@ rnd = random.Random(f"{data.get('date', '')}/{KIND}")
 by_id = {b['id']: b for b in data.get('all', [])}
 # Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
 # holds where you read.
-PACING = {'quiz': {'pace': 2}, 'daily': {'pace': 2}}
+PACING = {'quiz': {'pace': 2}, 'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -727,9 +734,317 @@ def daily_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ countdowns
+# "Every brawler ranked from worst to best" was the best Short the channel
+# had (2026-10-22: 2.2k views, 63 likes, made by hand in ~/shots/viral2), so
+# it is a format now: `everyrank` weekly on fresh data, and `classrank`, the
+# same countdown inside one class or rarity -- a different group each
+# episode, so it is a series rather than a repeat. Both end on the question
+# the original ended on, because its comments were the point.
+GROUPS = [  # field, value, headline, plural in English / Brazilian Portuguese / Spanish
+    ('cls', 'Assassin', 'ASSASSIN', 'assassins', 'assassinos', 'asesinos'),
+    ('cls', 'Tank', 'TANK', 'tanks', 'tanques', 'tanques'),
+    ('cls', 'Marksman', 'SNIPER', 'snipers', 'atiradores', 'francotiradores'),
+    ('rar', 'Legendary', 'LEGENDARY', 'Legendary brawlers', 'brawlers lendários', 'brawlers legendarios'),
+    ('cls', 'Support', 'SUPPORT', 'supports', 'suportes', 'soportes'),
+    ('cls', 'Controller', 'CONTROLLER', 'controllers', 'controladores', 'controladores'),
+    ('cls', 'Artillery', 'THROWER', 'throwers', 'arremessadores', 'lanzadores'),
+    ('cls', 'Damage Dealer', 'DAMAGE DEALER', 'damage dealers', 'brawlers de dano', 'brawlers de daño'),
+]
+COUNT_HASHTAGS = '#brawlstars #brawlstarstierlist #brawlstarsranked #tierlist #brawlzone'
+
+if KIND in ('everyrank', 'classrank'):
+    N_EP = episode(KIND)
+    if KIND == 'everyrank':
+        ranked = sorted(data['all'], key=lambda b: -(b['score'] or 0))
+        WORD, BEST_LINE = 'BRAWLER', 'THE BEST IN RANKED'
+    else:
+        # Episode N takes group N, skipping a group the data cannot fill (a
+        # class the catalogue did not label, or fewer than five brawlers).
+        ranked = None
+        for k in range(len(GROUPS)):
+            field, value, WORD, en_pl, pt_pl, es_pl = GROUPS[(N_EP - 1 + k) % len(GROUPS)]
+            members = [b for b in data['all'] if b.get(field) == value]
+            if len(members) >= 5:
+                ranked = sorted(members, key=lambda b: -(b['score'] or 0))
+                break
+        if ranked is None:
+            print('no class or rarity group has five brawlers today'); sys.exit(3)
+        BEST_LINE = f'THE BEST {WORD}'
+    NB = len(ranked)
+    tl.add(6, 'c_intro')
+    if NB > 20:  # the original's shape: tier pages, then the top 20 in rows, then one at a time
+        bottom = [(i + 1, b) for i, b in enumerate(ranked) if i + 1 > 20][::-1]
+        groups = []
+        for r, b in bottom:
+            if not groups or groups[-1][0] != b['tier']: groups.append((b['tier'], []))
+            groups[-1][1].append((r, b))
+        for tier, items in groups:
+            tl.add(1, 'c_slam', tier=tier)
+            for i in range(0, len(items), 9):
+                tl.add(2, 'c_page', tier=tier, items=items[i:i + 9])
+        mid = [(i + 1, ranked[i]) for i in range(10, 20)][::-1]
+        tl.add(1, 'c_slam', tier=mid[0][1]['tier'], label='TOP 20')
+        for i in range(0, 10, 5):
+            tl.add(3, 'c_rows', label='TOP 20', items=mid[i:i + 5])
+        tl.add(1, 'c_slam', tier=ranked[3]['tier'], label='TOP 10')
+        singles = range(10, 1, -1)
+    else:  # a class: everything below the top five in rows, then one at a time
+        rest = [(i + 1, ranked[i]) for i in range(5, NB)][::-1]
+        for i in range(0, len(rest), 5):
+            tl.add(3, 'c_rows', label=f'#{rest[i][0]} TO #{rest[min(i + 4, len(rest) - 1)][0]}', items=rest[i:i + 5])
+        tl.add(1, 'c_slam', tier=ranked[1]['tier'], label='TOP 5')
+        singles = range(5, 1, -1)
+    for r in singles:
+        tl.add(3 if r <= 3 else 2, 'c_big', rank=r, b=ranked[r - 1], heavy=r <= 3)
+    tl.add(4, 'c_tease', b=ranked[0])
+    tl.add(7, 'c_one', b=ranked[0])
+    tl.add(7, 'c_outro')
+    top3 = ', '.join(nice(b['n']) for b in ranked[:3])
+    if KIND == 'everyrank':
+        META = {
+            'title': 'Every brawler ranked from WORST to BEST 😳 #Shorts',
+            'titles': {'pt-BR': 'Todos os brawlers do PIOR ao MELHOR 😳 #Shorts',
+                       'es-419': 'Todos los brawlers del PEOR al MEJOR 😳 #Shorts'},
+            'description': f"All {NB} brawlers ranked by this week's Ranked games (Season {data.get('season')}). "
+                           f'Top 3: {top3}. Where is your main? Comment below 👇 New ranking every week.\n\n'
+                           f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
+        }
+    else:
+        META = {
+            'title': f'Every {en_pl.split()[0] if en_pl[0].isupper() else en_pl[:-1]} ranked from WORST to BEST 😳 #Shorts',
+            'titles': {'pt-BR': f'Todos os {pt_pl} do PIOR ao MELHOR 😳 #Shorts',
+                       'es-419': f'Todos los {es_pl} del PEOR al MEJOR 😳 #Shorts'},
+            'description': f"All {NB} {en_pl} ranked by this week's Ranked games (Season {data.get('season')}). "
+                           f'Top 3: {top3}. Which one do you main? Comment below 👇 Another class next time.\n\n'
+                           f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
+        }
+
+
+def count_row(rank, b):
+    """One brawler as a wide row: portrait, rank, name, tier."""
+    row = Image.new('RGBA', (940, 210), (0, 0, 0, 0)); d = ImageDraw.Draw(row)
+    tc = TIER[b['tier']]
+    row.paste(vgrad(940, 210, tuple(min(255, int(c * 0.5 + 60)) for c in tc), tuple(int(c * 0.35) for c in tc)).convert('RGBA'),
+              (0, 0), rounded_mask(940, 210, 40))
+    d.rounded_rectangle((0, 0, 939, 209), 40, outline=WHITE, width=5)
+    row.alpha_composite(load_face(b).resize((176, 176), Image.LANCZOS), (18, 17))
+    d.text((220, 22), f'#{rank}', font=F(64), fill=GOLD_TOP, stroke_width=5, stroke_fill=(10, 12, 28))
+    name = nice(b['n']); fs = 88
+    while F(fs).getlength(name) > 520 and fs > 48: fs -= 4
+    d.text((220, 96), name, font=F(fs), fill=WHITE, stroke_width=6, stroke_fill=(10, 12, 28))
+    d.text((900 - F(150).getlength(b['tier']), 18), b['tier'], font=F(150), fill=WHITE, stroke_width=8, stroke_fill=(10, 12, 28))
+    return row
+
+
+_wall = None
+def count_wall():
+    """The intro's tilted wall of every portrait in the countdown, faded."""
+    global _wall
+    if _wall is None:
+        cols, size = 9, 170
+        rows = math.ceil(max(NB, 27) / cols) + 2
+        wall = Image.new('RGBA', (cols * size, rows * size), (0, 0, 0, 0))
+        for i in range(cols * rows):
+            f = load_face(ranked[i % NB]).resize((size - 12, size - 12), Image.LANCZOS)
+            wall.alpha_composite(f, ((i % cols) * size + 6, (i // cols) * size + 6))
+        wall = wall.rotate(-14, expand=True, resample=Image.BILINEAR)
+        wall.putalpha(wall.getchannel('A').point(lambda v: int(v * 0.32)))
+        _wall = wall
+    return _wall
+
+
+def count_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    col = TIER.get(s.get('tier') or (s.get('b') or {}).get('tier', 'S'), TIER['S'])
+    if k in ('c_intro', 'c_outro'): col = (255, 170, 40)
+    if k == 'c_tease': col = (40, 40, 80)
+    canvas = background(t, col).convert('RGBA')
+    if k == 'c_intro':
+        canvas.alpha_composite(count_wall(), (int(-300 - (t * 60) % 170), int(-200 - (t * 90) % 170)))
+        word_size = min(200, int(200 * 7 / max(7, len(WORD))))  # BRAWLER fits at 200, the original's size
+        for w_, at, gold, y, size in (('EVERY', 0, False, 360, 200), (WORD, 1, False, 560, word_size), ('RANKED', 2, True, 790, 250)):
+            slam(canvas, w_, size, WHITE, W / 2, y, bt - at, gold=gold, k=1.4)
+        shake, flash = hits(bt, (0, 1, 2), 0.8, 0.4)
+        if bt >= 3:
+            u = bt - 3
+            put(canvas, text_sprite('WORST', 110, (255, 90, 100)), W / 2 - 230 - 300 * (1 - out_back(u / 0.5)), 1040)
+            put(canvas, text_sprite('BEST', 110, (90, 230, 140)), W / 2 + 250 + 300 * (1 - out_back(u / 0.5)), 1040)
+            put(canvas, text_sprite('>', 120, WHITE), W / 2 + 10, 1040, scale=out_back(u / 0.5))
+        if bt >= 4:
+            put(canvas, text_sprite(f"THIS WEEK IN RANKED · SEASON {data.get('season')}", 56, GOLD_TOP, stroke=7), W / 2, 1210,
+                scale=out_back((bt - 4) / 0.4))
+        if bt >= 4.5:
+            put(canvas, text_sprite('wait for #1...', 92, WHITE), W / 2, 1380, alpha=0.65 + 0.35 * math.sin(t * 14),
+                scale=out_back((bt - 4.5) / 0.4))
+        mark = False
+    elif k == 'c_slam':
+        label = s.get('label') or f"{s['tier']} TIER"
+        put_rays(canvas, col, t, W / 2, 860, speed=30, alpha=0.7)
+        big = s['tier'] if not s.get('label') else label.split()[-1]
+        put(canvas, text_sprite(big, 520 if not s.get('label') else 380, col), W / 2, 820, scale=1 + 2.2 * (1 - out_back(bt / 0.6, 1.0)))
+        put(canvas, text_sprite(label, 110, WHITE), W / 2, 1180, scale=out_back((bt - 0.15) / 0.5))
+        shake = impact(lt, 1.3); flash = impact(lt) * 0.7
+    elif k == 'c_page':
+        items = s['items']; n = len(items)
+        put(canvas, text_sprite(f"{s['tier']} TIER", 86, col), W / 2, 330)
+        for j, (rank, b) in enumerate(items):
+            r_, c_ = divmod(j, 3)
+            in_row = min(3, n - r_ * 3)
+            x = W / 2 + (c_ - (in_row - 1) / 2) * 320; y = 700 + r_ * 400
+            u = (lt - j * 0.075) / 0.32
+            if u <= 0: continue
+            dy = 260 * (1 - out_cubic(u))
+            put(canvas, card(rank, b), x, y + dy, scale=out_back(u, 2.2), rot=(1 - out_cubic(u)) * (12 if c_ == 0 else -12 if c_ == 2 else 0))
+        shake = impact(lt, 0.25)
+    elif k == 'c_rows':
+        put(canvas, text_sprite(s['label'], 86, GOLD_TOP), W / 2, 330)
+        for j, (rank, b) in enumerate(s['items']):
+            u = (lt - j * 0.11) / 0.35
+            if u <= 0: continue
+            put(canvas, count_row(rank, b), W / 2 + 900 * (1 - out_back(u, 1.4)), 500 + j * 238)
+    elif k == 'c_tease':
+        b = s['b']; pulse = 1 + 0.06 * max(0.0, 1 - (bt % 1) / 0.35)
+        put(canvas, text_sprite('AND THE BEST', 130, WHITE), W / 2, 420, scale=pulse)
+        put(canvas, text_sprite(f'{WORD} IS...', min(130, int(130 * 12 / max(12, len(WORD) + 6))), GOLD_TOP), W / 2, 580, scale=pulse)
+        sil = silhouette(art(b, 900, 1000), (255, 200, 60))
+        put(canvas, sil, W / 2, 1300, scale=pulse)
+        shake = impact((bt % 1) * P, 0.35)
+    elif k in ('c_big', 'c_one'):
+        b = s['b']; one = k == 'c_one'; heavy = s.get('heavy') or one
+        tcol = TIER[b['tier']]
+        put_rays(canvas, tcol, t, W / 2, 1050, speed=40 if one else 18, alpha=0.9 if heavy else 0.6)
+        u = lt / 0.4
+        put(canvas, art(b, 980 if one else 900, 1000), W / 2, 1060 if one else 1000,
+            scale=1 + 0.5 * (1 - out_back(u, 1.6)) + 0.03 * (lt / (s['len'] * tl.step)))
+        if one:
+            put(canvas, crown(260), W / 2, 470 + 18 * math.sin(t * 5), scale=out_back((lt - 0.2) / 0.4))
+            put(canvas, text_sprite('#1', 230, gold=True), 230, 540, scale=out_back(u))
+            put(canvas, text_sprite(BEST_LINE, 84 if len(BEST_LINE) <= 20 else 70, GOLD_TOP), W / 2, 330, scale=out_back((lt - 0.1) / 0.4))
+            confetti(canvas, lt)
+        else:
+            put(canvas, text_sprite(f"#{s['rank']}", 240, gold=True), 250 - 500 * (1 - out_back(u, 1.2)), 420)
+            put(canvas, tier_pill(b['tier']), W - 250 + 500 * (1 - out_back((lt - 0.08) / 0.4, 1.2)), 420)
+        put(canvas, text_sprite(nice(b['n']).upper(), 170 if len(b['n']) <= 7 else 140 if len(b['n']) <= 10 else 110, WHITE),
+            W / 2, 1520, scale=out_back((lt - 0.1) / 0.4, 1.5))
+        shake = impact(lt, 1.6 if heavy else 0.9); flash = impact(lt) * (0.9 if one else 0.6 if heavy else 0.35)
+    else:  # c_outro: the question that made the original's comments
+        mark = False
+        bounce = abs(math.sin(bt * math.pi)) * 26
+        put(canvas, text_sprite("WHERE'S YOUR", 120, WHITE), W / 2, 460 - bounce * 0.4, scale=out_back(bt / 0.6))
+        put(canvas, text_sprite('MAIN?', 300, gold=True), W / 2, 700 - bounce, scale=out_back((bt - 0.3) / 0.6))
+        put(canvas, text_sprite('COMMENT BELOW', 96, WHITE), W / 2, 990, scale=out_back((bt - 1) / 0.5))
+        if bt > 1.3: arrow(canvas, W / 2, 1210 + abs(math.sin(t * 6)) * 40)
+        follow_cta(canvas, bt - 2.2, 1500, 'NEW RANKING EVERY WEEK')
+        shake, flash = hits(bt, (0, 0.3, 1), 0.7, 0.3)
+    return finish(canvas, shake, flash, mark)
+
+
+# ================================================================ stop
+# "STOP picking these brawlers" (2026-10-24, by hand in ~/shots/viral2/stop.py):
+# the five most-picked brawlers that win least, then the five least-picked
+# that win most, from the week's Ranked games. Made to be argued with.
+RED, GREEN = (255, 55, 75), (50, 225, 120)
+
+if KIND == 'stop':
+    a = [b for b in data['all'] if b['wr'] and b['use']]
+    by_use = sorted(a, key=lambda b: -b['use'])
+    use_rank = {b['id']: i + 1 for i, b in enumerate(by_use)}
+    uses = sorted(b['use'] for b in a)
+    q75 = uses[int(len(uses) * 0.75)]; med = uses[len(uses) // 2]
+    # Overrated has to mean it: below 50% even though everyone picks them.
+    over = [b for b in sorted((b for b in a if b['use'] >= q75), key=lambda b: b['wr']) if b['wr'] < 0.5][:5][::-1]
+    gems = [b for b in sorted((b for b in a if b['use'] <= med), key=lambda b: -b['wr']) if b['wr'] > 0.5][:5][::-1]
+    if len(over) < 3 or len(gems) < 3:
+        print('not enough overrated or hidden brawlers this week'); sys.exit(3)
+    TOTAL = len(a)
+    tl.add(6, 's_intro')
+    for i, b in enumerate(over): tl.add(3, 's_over', b=b, n=len(over) - i)
+    tl.add(3, 's_switch')
+    for i, b in enumerate(gems): tl.add(3, 's_gem', b=b, n=len(gems) - i)
+    tl.add(7, 's_outro')
+    worst, best = nice(over[-1]['n']), nice(gems[-1]['n'])
+    META = {
+        'title': 'STOP picking these brawlers 🛑 #Shorts',
+        'titles': {'pt-BR': 'PARE de escolher esses brawlers 🛑 #Shorts', 'es-419': 'DEJA de elegir estos brawlers 🛑 #Shorts'},
+        'description': f"Everyone picks them, and they lose: this week's most overrated brawlers in Ranked (worst: {worst}, "
+                       f"{over[-1]['wr'] * 100:.1f}% wins), and the hidden gems almost nobody picks (best: {best}, "
+                       f"{gems[-1]['wr'] * 100:.1f}%). Agree? Defend your main in the comments 👇\n\n"
+                       f'The full hidden meta: https://brawlzone.net/hidden-meta{FOOTER}\n'
+                       '#brawlstars #brawlstarsranked #brawlstarstips #overrated #brawlzone',
+    }
+
+
+_stamps = {}
+def stamp(label, col):
+    if label not in _stamps:
+        txt = text_sprite(label, 120, col, stroke=8)
+        w, h = txt.width + 70, txt.height + 50
+        im = Image.new('RGBA', (w, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+        d.rounded_rectangle((4, 4, w - 5, h - 5), 30, outline=col, width=14)
+        im.alpha_composite(txt, ((w - txt.width) // 2, (h - txt.height) // 2 + 4))
+        _stamps[label] = im.rotate(-12, expand=True, resample=Image.BICUBIC)
+    return _stamps[label]
+
+
+def stop_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    col = {'s_intro': RED, 's_over': RED, 's_switch': GREEN, 's_gem': GREEN, 's_outro': (255, 170, 40)}[k]
+    canvas = background(t, col).convert('RGBA')
+    if k == 's_intro':
+        slam(canvas, 'STOP', 300, RED, W / 2, 430, bt)
+        slam(canvas, 'PICKING', 190, WHITE, W / 2, 680, bt - 1)
+        slam(canvas, 'THESE BRAWLERS', 120, WHITE, W / 2, 880, bt - 2)
+        shake, flash = hits(bt, (0, 1, 2), 1.0, 0.4)
+        for i, b in enumerate(over[::-1]):
+            u = bt - 3 - i * 0.5
+            if u < 0: continue
+            x = W / 2 + (i - (len(over) - 1) / 2) * 190
+            put(canvas, card(use_rank[b['id']], b, 160, 190), x, 1230, scale=out_back(u / 0.3))
+            if u > 0.25: put(canvas, text_sprite('X', 170, RED, stroke=10), x, 1220, scale=1 + 1.2 * (1 - out_back((u - 0.25) / 0.3, 1.0)))
+        if bt > 4.6:
+            put(canvas, text_sprite('everyone plays them. they LOSE.', 58, (255, 200, 205), stroke=6), W / 2, 1480, scale=out_back((bt - 4.6) / 0.4))
+    elif k in ('s_over', 's_gem'):
+        b = s['b']; good = k == 's_gem'; c = GREEN if good else RED
+        put_rays(canvas, c, t, W / 2, 1000, speed=16 if good else -16, alpha=0.75)
+        u = lt / 0.4
+        put(canvas, art(b, 860, 900), W / 2, 1000, scale=1 + 0.45 * (1 - out_back(u, 1.6)) + 0.03 * bt)
+        put(canvas, text_sprite(f"#{s['n']}", 200, gold=True), 190 - 400 * (1 - out_back(u, 1.2)), 400)
+        r = use_rank[b['id']]
+        put(canvas, pill(f'#{r} MOST PICKED' if not good else f'#{r} OF {TOTAL} IN PICKS', (40, 50, 110), size=54),
+            W - 300 + 600 * (1 - out_back((lt - 0.1) / 0.4, 1.2)), 400)
+        put(canvas, text_sprite(nice(b['n']).upper(), 160 if len(b['n']) <= 8 else 120, WHITE), W / 2, 1490, scale=out_back((lt - 0.1) / 0.4, 1.5))
+        if bt >= 0.9:
+            v = 50 + (b['wr'] * 100 - 50) * out_cubic((bt - 0.9) / 0.8)
+            put(canvas, text_sprite(('WINS ' if good else 'WINS ONLY ') + f'{v:.1f}%', 100, c, stroke=9), W / 2, 1650, scale=out_back((bt - 0.9) / 0.3))
+        if bt >= 1.9:
+            uu = (bt - 1.9) / 0.35
+            put(canvas, stamp('HIDDEN GEM' if good else 'OVERRATED', c), W / 2 + 40, 1190, scale=1 + 1.6 * (1 - out_back(uu, 1.0)))
+            if uu < 1.2: shake = max(shake, impact((bt - 1.9) * tl.step, 1.3)); flash = max(flash, impact((bt - 1.9) * tl.step) * 0.35)
+        shake = max(shake, impact(lt, 0.8)); flash = max(flash, impact(lt) * 0.25)
+    elif k == 's_switch':
+        put_rays(canvas, GREEN, t, W / 2, 900, speed=40, alpha=0.8)
+        slam(canvas, 'PICK THESE', 190, WHITE, W / 2, 760, bt)
+        slam(canvas, 'INSTEAD', 260, GREEN, W / 2, 1010, bt - 1)
+        if bt > 1.8:
+            put(canvas, text_sprite('nobody picks them. they WIN.', 58, (200, 255, 215), stroke=6), W / 2, 1250, scale=out_back((bt - 1.8) / 0.4))
+        shake, flash = hits(bt, (0, 1), 1.2, 0.5)
+    else:  # s_outro
+        mark = False
+        bounce = abs(math.sin(bt * math.pi)) * 26
+        put(canvas, text_sprite('AGREE?', 280, gold=True), W / 2, 520 - bounce, scale=out_back(bt / 0.6))
+        put(canvas, text_sprite('DEFEND YOUR MAIN', 104, WHITE), W / 2, 780, scale=out_back((bt - 0.6) / 0.5))
+        put(canvas, text_sprite('IN THE COMMENTS', 104, WHITE), W / 2, 910, scale=out_back((bt - 0.9) / 0.5))
+        if bt > 1.4: arrow(canvas, W / 2, 1130 + abs(math.sin(t * 6)) * 40)
+        follow_cta(canvas, bt - 2.2, 1460, 'THE HIDDEN META: BRAWLZONE.NET')
+        shake, flash = hits(bt, (0, 0.6, 0.9), 0.7, 0.3)
+    return finish(canvas, shake, flash, mark)
+
+
 # ================================================================ render
 SCENE = {'quiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
-         'newbrawler': nb_scene, 'daily': daily_scene}[KIND]
+         'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
+         'stop': stop_scene}[KIND]
 
 
 def frame(t):

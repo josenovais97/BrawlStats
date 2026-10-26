@@ -3,6 +3,7 @@
 # drawn from today's data and posted to TikTok (inbox), YouTube and Instagram.
 #
 #   brawlzone-viral [--no-post] [quiz|broken|ranks|modes]
+#   brawlzone-viral [--no-post] extra|everyrank|classrank|stop
 #   brawlzone-viral [--no-post] newbrawler <dir>
 #   brawlzone-viral [--no-post] daily
 #
@@ -18,6 +19,17 @@
 #
 # A file $ROOT/skip-YYYY-MM-DD makes that day's run do nothing: for a day a
 # hand-made video takes the slot.
+#
+# `extra` is the second data video (2026-10-26, brawlzone-viral-extra at
+# 14:00), in the slot the account-value Short and the trio/build carousels
+# gave up for doing worst. By weekday:
+#
+#   Sun everyrank  Tue stop  other days classrank
+#
+# everyrank is "Every brawler ranked from worst to best" (the channel's best
+# Short so far, now weekly), classrank the same countdown for one class or
+# rarity at a time, stop "STOP picking these brawlers". Each has its own
+# folder, $PUBLIC/<date>-<kind>, beside the 15:30 one.
 #
 # `newbrawler` is brawlzone-newbrawler's: <dir> (under /var/lib/brawlzone/
 # social) holds the brawler's report.json and hero.png, maybe gadget.png and
@@ -60,7 +72,16 @@ if [ -z "$kind" ]; then
     *) kind=quiz ;;
   esac
 fi
-case "$kind" in quiz|broken|ranks|modes|newbrawler|daily) ;; *) die "::error::unknown format '$kind' (quiz, broken, ranks, modes, newbrawler or daily)" ;; esac
+if [ "$kind" = extra ]; then
+  case "$(date -u +%u)" in
+    7) kind=everyrank ;;
+    2) kind=stop ;;
+    *) kind=classrank ;;
+  esac
+fi
+
+case "$kind" in quiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop) ;;
+  *) die "::error::unknown format '$kind' (quiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank or stop)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -72,6 +93,9 @@ elif [ "$kind" = daily ]; then
   OUT="$PUBLIC/$DAY-daily"
   DATA_IN=/out/daily.json
   PREV=-
+elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ]; then
+  OUT="$PUBLIC/$DAY-$kind"
+  DATA_IN="/data/history/$DAY.json"
 else
   OUT="$PUBLIC/$DAY"
   DATA_IN="/data/history/$DAY.json"
@@ -172,7 +196,12 @@ draw () { # kind
 }
 
 draw "$kind"; rc=$?
-if [ "$rc" = 3 ] && [ "$kind" != quiz ] && [ "$kind" != newbrawler ] && [ "$kind" != daily ]; then
+if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ]; }; then
+  # The 14:00 slot falls back to the full countdown, which always has data,
+  # not to the quiz the 15:30 slot may already be posting today.
+  echo "$(tail -n 1 "$CACHE/make-0.log"); drawing everyrank instead"
+  kind=everyrank; draw everyrank; rc=$?
+elif [ "$rc" = 3 ] && [ "$kind" != quiz ] && [ "$kind" != newbrawler ] && [ "$kind" != daily ] && [ "$kind" != everyrank ]; then
   echo "$(tail -n 1 "$CACHE/make-0.log"); drawing the quiz instead"
   kind=quiz; draw quiz; rc=$?
 fi

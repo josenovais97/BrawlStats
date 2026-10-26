@@ -9,6 +9,7 @@
  * two windows a week apart that do not overlap), the top picks per live map
  * (`pool`) and the most-picked brawlers per rank bracket (`brackets`).
  */
+import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { rotationMaps } from '@/lib/ranked-rotation';
 import { slugify } from '@/lib/slugs';
@@ -23,12 +24,16 @@ const BRACKETS = [
 
 async function main() {
   const season = await getSeasonState();
-  const [picks, week, recent, maps] = await Promise.all([
+  const [picks, week, recent, maps, catalog] = await Promise.all([
     getRankedMapPicks(3),
     getScoredRoster(7, undefined, 'ranked'),
     getScoredRoster(3, undefined, 'ranked'),
     getRankedRecentMaps(),
+    // Class and rarity, for the "every assassin ranked" series. Optional: a
+    // missing catalogue only takes that format off the table for the day.
+    getBrawlerCatalog().catch(() => null),
   ]);
+  const facts = new Map((catalog?.all ?? []).map((b) => [b.id, b]));
   const live = rotationMaps({ recent: maps, pool: season.mapPool });
 
   const row = (b: (typeof week)[number]) => ({
@@ -39,6 +44,8 @@ async function main() {
     use: b.usageRate,
     score: b.metaScore,
     battles: b.decidedSampleSize,
+    cls: facts.get(b.brawlerId)?.className ?? null,
+    rar: facts.get(b.brawlerId)?.rarityName ?? null,
   });
 
   const key = (mode: string, map: string) => `${slugify(mode).replace(/-/g, '')}/${slugify(map).replace(/-/g, '')}`;

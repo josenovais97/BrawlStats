@@ -1,0 +1,13 @@
+[Unit]
+Description=Draw and post the second viral Short at 14:00 UTC
+
+[Timer]
+# The slot the account-value Short (brawlzone-rate) held until 2026-10-26,
+# when it, the trio and the build carousels were dropped for doing worst on
+# every network. Done by ~14:06, well before the 15:30 Short starts.
+OnCalendar=*-*-* 14:00:00
+Persistent=false
+Unit=brawlzone-viral-extra.service
+
+[Install]
+WantedBy=timers.target

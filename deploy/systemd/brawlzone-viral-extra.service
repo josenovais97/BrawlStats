@@ -1,0 +1,11 @@
+[Unit]
+Description=BrawlZone: the 14:00 viral Short (countdowns, stop picking)
+After=docker.service network-online.target
+OnFailure=brawlzone-alert@%n.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+# Data, two render processes, an encode, three uploads.
+TimeoutStartSec=3600
+ExecStart=/usr/local/bin/brawlzone-run viral-extra /usr/local/bin/brawlzone-viral extra
