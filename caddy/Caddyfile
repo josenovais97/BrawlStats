@@ -167,6 +167,9 @@
 	@no_browser_expensive {
 		path /draft/* /es/draft/* /pt/draft/* /player/* /es/player/* /pt/player/* /club/* /es/club/* /pt/club/* /wrapped/* /es/wrapped/* /pt/wrapped/* /compare/players/* /es/compare/players/* /pt/compare/players/* /account-value/* /es/account-value/* /pt/account-value/*
 		not header_regexp Accept-Language .+
+		# Our own jobs (the account-rating video reads /account-value) come
+		# from this box, through Cloudflare, with curl's headers.
+		not client_ip 141.147.53.176
 	}
 	handle @no_browser_expensive {
 		header Retry-After 30
