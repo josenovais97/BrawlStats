@@ -287,6 +287,33 @@ fi
 # it here would be a second implementation that drifts the first time either
 # carousel changes shape. The caption comes down the same way, for the same
 # reason -- it is made of the same numbers the slides draw.
+# Render it from inside the box first (2026-10-26). The manifest and its
+# slides are built on first request and then cached for the day, and the first
+# build can take minutes on a busy database -- past Cloudflare's 100-second cap
+# on any response, so the public fetch below got Cloudflare's timeout page and
+# the post died "unreadable manifest": six posts lost over the weekend of
+# 2026-10-24. Asked of the app directly there is no cap, and TikTok then pulls
+# slides that are already in cache.
+case "$MANIFEST" in
+  "$SITE"/daily/*)
+    docker exec brawlstats-app-1 node -e '
+const origin = "http://127.0.0.1:3000", site = process.argv[2], path = process.argv[1];
+const get = (p) => fetch(origin + p, { signal: AbortSignal.timeout(600_000), headers: { "accept-language": "en" } });
+(async () => {
+  const r = await get(path);
+  if (!r.ok) { console.log("warm: manifest HTTP " + r.status); return; }
+  const m = await r.json();
+  let n = 0;
+  for (const u of m.slides || []) {
+    const p = String(u).startsWith(site) ? String(u).slice(site.length) : null;
+    if (p && (await get(p)).ok) n++;
+  }
+  console.log("warm: manifest and " + n + " slides rendered");
+})().catch((e) => console.log("warm: " + e.message));
+' "${MANIFEST#"$SITE"}" "$SITE" 2>&1 || true
+    ;;
+esac
+
 try_read "manifest" --max-time 120 "$MANIFEST"
 manifest_json="$REPLY_BODY"
 
