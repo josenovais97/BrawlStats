@@ -178,3 +178,10 @@ test('social unfurlers are unaffected by the allowlist', () => {
   assert.equal(shouldBlockCrawl('/player/NOTONTHELIST', 'Discordbot', ALLOWED), false);
   assert.equal(shouldBlockCrawl('/api/player/X', 'Discordbot', ALLOWED), true);
 });
+
+test('the translated pages get the same refusal (2026-10-26)', () => {
+  assert.equal(shouldBlockCrawl('/pt/draft/brawl-ball/sneaky-fields/81-21/x/84', 'Googlebot/2.1'), true);
+  assert.equal(shouldBlockCrawl('/es/player/ABC123', 'bingbot/2.0'), true);
+  assert.equal(shouldBlockCrawl('/pt/brawlers/colt', 'Googlebot/2.1'), false);
+  assert.equal(shouldBlockCrawl('/pt/draft/x', 'Mozilla/5.0 (Windows NT 10.0) Chrome/140'), false);
+});

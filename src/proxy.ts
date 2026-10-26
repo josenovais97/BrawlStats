@@ -280,5 +280,18 @@ export const config = {
     '/draft/:path*',
     '/compare/players/:path*',
     '/wrapped/:path*',
+    // The same prefixes in Spanish and Portuguese. Without these the proxy
+    // never ran for them, so neither the limiter nor the crawler check did:
+    // the 2026-10-26 outage walked in through /pt/draft.
+    '/es/player/:path*',
+    '/pt/player/:path*',
+    '/es/club/:path*',
+    '/pt/club/:path*',
+    '/es/draft/:path*',
+    '/pt/draft/:path*',
+    '/es/compare/players/:path*',
+    '/pt/compare/players/:path*',
+    '/es/wrapped/:path*',
+    '/pt/wrapped/:path*',
   ],
 };

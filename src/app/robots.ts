@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
-import { BLOCKED_AGENTS, CRAWLER_DISALLOW, SOCIAL_AGENTS, SOCIAL_DISALLOW } from '@/lib/crawl-policy';
+import { BLOCKED_AGENTS, CRAWLER_DISALLOW, SOCIAL_AGENTS, SOCIAL_DISALLOW, localisedDisallow } from '@/lib/crawl-policy';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -78,7 +78,7 @@ export default function robots(): MetadataRoute.Robots {
          * is the cost this file exists to remove, and a path served here but
          * blocked there is a feature quietly broken.
          */
-        disallow: [...CRAWLER_DISALLOW],
+        disallow: localisedDisallow(CRAWLER_DISALLOW),
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

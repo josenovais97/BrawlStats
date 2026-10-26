@@ -143,6 +143,24 @@ export function disallowFor(
   return null;
 }
 
+/**
+ * The path without its language prefix: `/pt/draft/x` is `/draft/x`.
+ *
+ * Every page exists three times since the translations (2026-10-14), and the
+ * lists in this module and in `lib/hot-path-limit` name only the English
+ * spelling. On 2026-10-26 a crawler walked `/pt/draft/...` straight past all
+ * of them and took the site down. Matching on the bare path makes a prefix
+ * mean the same page in every language, with one budget between them.
+ */
+export function withoutLocale(pathname: string): string {
+  return pathname.replace(/^\/(?:es|pt)(?=\/)/, '');
+}
+
+/** The disallowed prefixes in every language, for robots.txt. */
+export function localisedDisallow(prefixes: readonly string[]): string[] {
+  return prefixes.flatMap((p) => (p === '/api/' ? [p] : [p, `/es${p}`, `/pt${p}`]));
+}
+
 /** True when `robots.txt` tells search crawlers to stay out of this path. */
 /**
  * The tag in `/player/<tag>`, normalised, or null for any other shape.
@@ -194,6 +212,7 @@ export function shouldBlockCrawl(
 ): boolean {
   const disallow = disallowFor(userAgent);
   if (disallow === null) return false;
+  pathname = withoutLocale(pathname);
   // Only search crawlers get the player carve-out. Social unfurlers were never
   // blocked from /player/ in the first place -- SOCIAL_DISALLOW is /api/ only
   // -- so this must not widen anything for them.

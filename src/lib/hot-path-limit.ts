@@ -230,9 +230,14 @@ export function isLimitedPath(pathname: string): boolean {
   return limitedPrefix(pathname) !== null;
 }
 
-/** Which prefix a path belongs to, or null when it is not limited. */
+/**
+ * Which prefix a path belongs to, or null when it is not limited. In any
+ * language: `/pt/draft/...` draws on the `/draft/` bucket (see `withoutLocale`;
+ * 2026-10-26, when it did not and a crawl walked the translations unlimited).
+ */
 export function limitedPrefix(pathname: string): string | null {
-  return LIMITED_PREFIXES.find((prefix) => pathname.startsWith(prefix)) ?? null;
+  const bare = pathname.replace(/^\/(?:es|pt)(?=\/)/, '');
+  return LIMITED_PREFIXES.find((prefix) => bare.startsWith(prefix)) ?? null;
 }
 
 /**

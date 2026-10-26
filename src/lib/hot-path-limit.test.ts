@@ -331,3 +331,10 @@ test('the flood cannot take the budget by looking like five audiences', () => {
     'suspect traffic must never be given more room than the readers it mimics',
   );
 });
+
+test('a translated path draws on the English prefix bucket (2026-10-26)', () => {
+  assert.equal(limitedPrefix('/pt/draft/brawl-ball/sneaky-fields/81-21/x/84'), '/draft/');
+  assert.equal(limitedPrefix('/es/player/2VLR2JJLJL'), '/player/');
+  assert.equal(limitedPrefix('/pt/brawlers/colt'), null);
+  assert.equal(limitedPrefix('/ptx/draft/a'), null);
+});
