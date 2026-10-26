@@ -847,7 +847,12 @@ fi
 record_state "last_format.${MODE}" "$FORMAT" || true
 
 HTML_LIB=/usr/local/lib/brawlzone-html.sh
-if [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
+# No mail for a post that needs nothing from anyone (2026-10-26, "a lot of
+# noise on the email"): the daily teaser skips TikTok, so there is no inbox
+# video to publish and no caption to paste. Its result is in the log.
+if [ "$MODE" = viral ] && [ "${TIKTOK:-1}" = 0 ]; then
+  echo "teaser posted (YouTube ${YOUTUBE_RESULT:-?}, Instagram ${INSTAGRAM_RESULT:-?}); no mail, nothing to do"
+elif [ -x /usr/local/bin/brawlzone-alert ] && [ -r "$HTML_LIB" ]; then
   # shellcheck disable=SC1090
   . "$HTML_LIB"
 
