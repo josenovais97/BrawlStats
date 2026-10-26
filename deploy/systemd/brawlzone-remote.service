@@ -1,0 +1,27 @@
+[Unit]
+Description=Claude Code Remote Control for the owner's phone (tmux session brawlzone-rc)
+After=network-online.target docker.service
+Wants=network-online.target
+
+# The owner fixes the site from a phone through the Claude app (2026-10-26):
+# `claude remote-control` in /home/ubuntu/ops spawns Claude Code sessions here
+# on request. In tmux because it is a terminal program; `tmux attach -t
+# brawlzone-rc` shows it. Trust for /home/ubuntu/ops and the Remote Control
+# opt-in were answered once by hand and are remembered. Installed with the
+# owner's explicit approval: it is standing remote access through their
+# Claude account.
+
+[Service]
+Type=forking
+User=ubuntu
+Environment=HOME=/home/ubuntu
+Environment=PATH=/home/ubuntu/.local/bin:/usr/local/bin:/usr/bin:/bin
+WorkingDirectory=/home/ubuntu/ops
+ExecStart=/usr/bin/tmux new-session -d -s brawlzone-rc -c /home/ubuntu/ops "claude remote-control --name 'BrawlZone server' --permission-mode auto"
+ExecStop=/usr/bin/tmux kill-session -t brawlzone-rc
+# tmux's server exits when the session ends, so a crashed claude restarts too.
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
