@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { BrawlApiError } from '@/lib/errors';
+import { isOptedOut } from '@/lib/opted-out';
 import { stripGameMarkup } from '@/lib/format';
 import { encodeTagForApi, isValidTag } from '@/lib/tags';
 import type {
@@ -156,13 +157,22 @@ function assertTag(tag: string): string {
 
 /* --------------------------------- players -------------------------------- */
 
+/*
+ * Players who asked to be removed (lib/opted-out) are "not found" here, the
+ * one place every profile, share image, Bubble call, Discord command and
+ * sampler run fetches a player through -- so no feature can show or collect
+ * them by forgetting a check of its own. Rejected rather than thrown, so a
+ * caller's `.catch` handles it like any other missing player.
+ */
 export function getPlayer(tag: string): Promise<BSPlayer> {
+  if (isOptedOut(tag)) return Promise.reject(new BrawlApiError('notFound'));
   const t = assertTag(tag);
   // Unbounded key space; see FetchOptions.persist.
   return bsFetch<BSPlayer>(`/players/${t}`, { persist: false });
 }
 
 export function getBattleLog(tag: string): Promise<BSBattleLog> {
+  if (isOptedOut(tag)) return Promise.reject(new BrawlApiError('notFound'));
   const t = assertTag(tag);
   return bsFetch<BSBattleLog>(`/players/${t}/battlelog`, { persist: false });
 }
@@ -171,10 +181,19 @@ export function getBattleLog(tag: string): Promise<BSBattleLog> {
 
 export function getClub(tag: string): Promise<BSClub> {
   const t = assertTag(tag);
-  return bsFetch<BSClub>(`/clubs/${t}`, { persist: false });
+  // Opted-out players are left out of the member list, so no club page, club
+  // snapshot or activity chart shows them.
+  return bsFetch<BSClub>(`/clubs/${t}`, { persist: false }).then((club) =>
+    club.members ? { ...club, members: club.members.filter((m) => !isOptedOut(m.tag)) } : club,
+  );
 }
 
 /* -------------------------------- rankings -------------------------------- */
+
+/** Leaderboards without the players who asked to be removed (lib/opted-out). */
+function withoutOptedOut(list: BSListResponse<BSPlayerRanking>): BSListResponse<BSPlayerRanking> {
+  return { ...list, items: list.items.filter((p) => !isOptedOut(p.tag)) };
+}
 
 export function getPlayerRankings(
   region = 'global',
@@ -189,7 +208,7 @@ export function getPlayerRankings(
   return bsFetch<BSListResponse<BSPlayerRanking>>(
     `/rankings/${encodeURIComponent(region)}/players?limit=${limit}`,
     { revalidate },
-  );
+  ).then(withoutOptedOut);
 }
 
 export function getClubRankings(
@@ -221,7 +240,7 @@ export function getBrawlerRankings(
   return bsFetch<BSListResponse<BSPlayerRanking>>(
     `/rankings/${encodeURIComponent(region)}/brawlers/${brawlerId}?limit=${limit}`,
     { revalidate },
-  );
+  ).then(withoutOptedOut);
 }
 
 /* --------------------------------- events --------------------------------- */

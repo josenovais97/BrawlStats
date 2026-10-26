@@ -9,6 +9,7 @@ import { cache } from 'react';
 import { Prisma, type BrawlerStat as BrawlerStatModel } from '@/generated/prisma/client';
 import { stripGameMarkup } from '@/lib/format';
 import { getPrisma } from '@/lib/prisma';
+import { isOptedOut } from '@/lib/opted-out';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import type {
   AggregationRunSummary,
@@ -1103,6 +1104,7 @@ export async function recordLookup(reading: {
   try {
     // A profile nobody sampled before joins the pool only within the hourly
     // allowance; see admitNewLookup.
+    if (isOptedOut(tag)) return;
     const known = await prisma.sampledPlayer.findUnique({ where: { tag }, select: { tag: true } });
     if (!known && !admitNewLookup()) return;
 

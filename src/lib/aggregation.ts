@@ -9,6 +9,7 @@ import {
   getPlayer,
   getPlayerRankings,
 } from '@/lib/bs-api';
+import { isOptedOut } from '@/lib/opted-out';
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
@@ -726,8 +727,9 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
 
   if (candidates.size === 0) return { seeded: 0, ranked };
 
+  // Never pooled: players who asked to be removed (lib/opted-out).
   const result = await prisma.sampledPlayer.createMany({
-    data: [...candidates.entries()].map(([tag, meta]) => ({
+    data: [...candidates.entries()].filter(([tag]) => !isOptedOut(tag)).map(([tag, meta]) => ({
       tag,
       name: meta.name,
       trophies: meta.trophies,
@@ -1500,7 +1502,10 @@ export async function recruitByBracket(met: Map<string, number>): Promise<number
   }
   if (chosen.length === 0) return 0;
 
-  const result = await prisma.sampledPlayer.createMany({ data: chosen, skipDuplicates: true });
+  const result = await prisma.sampledPlayer.createMany({
+    data: chosen.filter((c) => !isOptedOut(c.tag)),
+    skipDuplicates: true,
+  });
   return result.count;
 }
 
