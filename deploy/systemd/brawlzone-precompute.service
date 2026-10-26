@@ -8,4 +8,7 @@ OnFailure=brawlzone-alert@%n.service
 Type=oneshot
 User=ubuntu
 ExecStart=/usr/local/bin/brawlzone-run precompute /usr/local/bin/brawlzone-precompute
-TimeoutStartSec=2700
+# 90 minutes since 2026-10-26: at 45 it was killed 14 times in three days
+# while running beside a busy sampler (exit 15), mailing FAILED each time.
+# The timer fires every two hours, so a slow run still ends before the next.
+TimeoutStartSec=5400
