@@ -27,7 +27,7 @@ export const GIVEAWAY: Giveaway = {
   id: 'gw1',
   prize: '€10 Google Play or App Store gift card',
   // One month, opened 2026-10-27 at the owner's word.
-  opensAt: '2026-10-27T14:00:00Z',
+  opensAt: '2026-10-27T15:00:00Z',
   closesAt: '2026-11-27T20:00:00Z',
 };
 
