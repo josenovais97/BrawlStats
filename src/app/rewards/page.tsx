@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
-import { ExternalLink, Gift } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
-import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 import { relativeTime } from '@/lib/format';
-import { getFreeRewards, LIVE_DAYS, type FreeReward } from '@/lib/free-rewards';
+import { getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
 import { currentMonth, WHATSAPP_URL } from '@/lib/site';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
@@ -57,78 +56,93 @@ export default async function RewardsPage() {
     },
   ];
 
+  const [hero, ...more] = live;
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <JsonLd data={breadcrumbSchema([{ name: 'Free rewards', path: '/rewards' }])} />
       <JsonLd data={faqSchema(faq)} />
 
-      <PageHeading
-        title={t('Free Brawl Stars rewards')}
-        subtitle={t('Every free reward link Supercell gives out, as soon as it appears. Open this page on the phone with Brawl Stars, tap Claim, and the reward goes straight to your account.')}
-      />
+      <div className="max-w-2xl space-y-2">
+        <h1 className="display text-3xl leading-tight sm:text-4xl">{t('Free Brawl Stars rewards')}</h1>
+        <p className="text-muted">{t('Every free reward link Supercell gives out, as soon as it appears. Open this page on the phone with Brawl Stars, tap Claim, and the reward goes straight to your account.')}</p>
+      </div>
 
-      <section className="space-y-4">
-        <SectionHeading title={t('Live now')} subtitle={t('Found in the last {n} days. Claim them before they expire.', { n: LIVE_DAYS })} />
-        {live.length ? (
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {live.map((r) => (
-              <RewardCard key={r.id} reward={r} live />
-            ))}
-          </ul>
-        ) : (
-          <div className="card space-y-2 p-6 text-sm leading-relaxed text-muted">
-            <p className="font-semibold text-foreground">{t('No free reward right now.')}</p>
-            <p>{t('Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.')}</p>
-          </div>
-        )}
-      </section>
+      {hero ? <RewardStage reward={hero} total={live.length} /> : <EmptyStage />}
 
-      <section className="card space-y-4 p-6">
-        <h2 className="text-lg font-bold">{t('Get the next one first')}</h2>
-        <p className="text-sm leading-relaxed text-muted">{t('A new link goes to these the moment it is found, often hours before other sites have it.')}</p>
-        <div className="flex flex-wrap gap-3">
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 font-bold text-[#0b2b16]">
-            {t('WhatsApp channel')}
-            <ExternalLink aria-hidden className="size-4" />
-          </a>
-          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-[#5865F2] px-5 py-3 font-bold text-white">
-            {t('Discord server')}
-            <ExternalLink aria-hidden className="size-4" />
-          </a>
-        </div>
-      </section>
-
-      {earlier.length ? (
+      {more.length ? (
         <section className="space-y-4">
-          <SectionHeading title={t('Earlier rewards')} subtitle={t('Older than {n} days. They may have expired, but some still work, so try them.', { n: LIVE_DAYS })} />
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {earlier.map((r) => (
-              <RewardCard key={r.id} reward={r} />
+          <h2 className="display text-2xl">{t('More free rewards live now')}</h2>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {more.map((r) => (
+              <li key={r.id} className="reward-tile flex items-center gap-4 p-4">
+                {/* eslint-disable-next-line @next/next/no-img-element -- wiki art, loaded by the browser like the skin pages */}
+                <img src={r.art} alt="" width={88} height={88} className="size-20 shrink-0 object-contain drop-shadow-[0_6px_8px_rgb(0_0_0/0.5)]" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <p className="display text-game-stroke truncate text-xl text-white">{r.name}</p>
+                  <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(r.postedAt)) })}</p>
+                  <ClaimButton url={r.url} small />
+                </div>
+              </li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      <section className="card space-y-3 p-6 text-sm leading-relaxed text-muted">
-        <h2 className="text-base font-bold text-foreground">{t('How to claim a free reward')}</h2>
-        <ol className="list-decimal space-y-1.5 pl-5">
-          <li>{t('Open this page on the phone where Brawl Stars is installed and logged in to your account.')}</li>
-          <li>{t('Tap Claim. The link opens Brawl Stars by itself.')}</li>
-          <li>{t('Accept the reward in the game. It lands in your account straight away.')}</li>
+      {hero ? <FollowBand /> : null}
+
+      <section className="space-y-5">
+        <h2 className="display text-2xl">{t('How to claim a free reward')}</h2>
+        <ol className="grid gap-4 sm:grid-cols-3">
+          {[
+            t('Open this page on the phone where Brawl Stars is installed and logged in to your account.'),
+            t('Tap Claim. The link opens Brawl Stars by itself.'),
+            t('Accept the reward in the game. It lands in your account straight away.'),
+          ].map((step, i) => (
+            <li key={step} className="flex gap-4 rounded-2xl bg-surface p-5">
+              <span aria-hidden className="display text-game-stroke text-5xl leading-none text-brand">{i + 1}</span>
+              <span className="text-sm leading-relaxed">{step}</span>
+            </li>
+          ))}
         </ol>
-        <p>{t('Playing on more than one account? The game claims it for the one that is open, so switch first.')}</p>
+        <p className="text-sm text-muted">{t('Playing on more than one account? The game claims it for the one that is open, so switch first.')}</p>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-bold">{t('Questions')}</h2>
-        <dl className="space-y-4">
-          {faq.map((f) => (
-            <div key={f.question} className="card p-5">
-              <dt className="font-semibold">{f.question}</dt>
-              <dd className="mt-1.5 text-sm leading-relaxed text-muted">{f.answer}</dd>
-            </div>
-          ))}
-        </dl>
+      {earlier.length ? (
+        <section className="space-y-4">
+          <h2 className="display text-2xl">{t('Earlier rewards')}</h2>
+          <p className="text-sm text-muted">{t('Older than {n} days. They may have expired, but some still work, so try them.', { n: LIVE_DAYS })}</p>
+          <ul className="divide-y divide-border rounded-2xl bg-surface">
+            {earlier.map((r) => (
+              <li key={r.id} className="flex items-center gap-4 px-4 py-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- wiki art */}
+                <img src={r.art} alt="" width={48} height={48} className="size-11 shrink-0 object-contain opacity-60 grayscale" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold">{r.name}</p>
+                  <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(r.postedAt)) })}</p>
+                </div>
+                <a href={r.url} target="_blank" rel="noopener noreferrer nofollow" className="shrink-0 text-sm font-semibold text-brand hover:underline">
+                  {t('Try it')}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="space-y-3">
+        <h2 className="display text-2xl">{t('Questions')}</h2>
+        {faq.map((f) => (
+          <details key={f.question} className="group rounded-2xl bg-surface p-5 open:bg-surface-2">
+            <summary className="cursor-pointer list-none font-semibold marker:hidden">
+              <span className="flex items-center justify-between gap-4">
+                {f.question}
+                <ChevronDown aria-hidden className="size-5 shrink-0 text-muted transition-transform group-open:rotate-180" />
+              </span>
+            </summary>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{f.answer}</p>
+          </details>
+        ))}
       </section>
 
       <p className="text-xs leading-relaxed text-muted">
@@ -138,24 +152,94 @@ export default async function RewardsPage() {
   );
 }
 
-function RewardCard({ reward, live = false }: { reward: FreeReward; live?: boolean }) {
+/** The newest live reward, as the game's own reward screen. */
+function RewardStage({ reward, total }: { reward: FreeReward; total: number }) {
   const t = getT(requestLocale());
   return (
-    <li className={`card flex items-center gap-4 p-4 ${live ? 'card-glow' : 'opacity-80'}`}>
-      <Gift aria-hidden className={`size-10 shrink-0 ${live ? 'text-brand' : 'text-muted'}`} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-bold">{reward.name}</p>
-        <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(reward.postedAt)) })}</p>
+    <section className="reward-stage px-5 pb-10 pt-6 sm:px-10 sm:pb-12" aria-labelledby="reward-now">
+      <div aria-hidden className="reward-rays" />
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm font-semibold">
+        <span className="inline-flex items-center gap-2 rounded-full bg-black/35 px-3 py-1.5">
+          <span className="live-dot" />
+          {t('Live, found {when}', { when: relativeTime(new Date(reward.postedAt)) })}
+        </span>
+        {total > 1 ? (
+          <span className="rounded-full bg-brand px-3 py-1.5 text-brand-ink">{t('{n} free rewards to claim', { n: total })}</span>
+        ) : null}
       </div>
-      <a
-        href={reward.url}
-        target="_blank"
-        rel="noopener noreferrer nofollow"
-        className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold ${live ? 'bg-brand text-brand-ink' : 'bg-surface-2 text-foreground'}`}
-      >
-        {t('Claim')}
-        <ExternalLink aria-hidden className="size-3.5" />
+      <div className="mx-auto flex max-w-md flex-col items-center pt-6 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element -- wiki art, loaded by the browser like the skin pages */}
+        <img src={reward.art} alt="" width={260} height={260} className="reward-float size-52 object-contain sm:size-64" />
+        <p className="mt-4 text-sm font-semibold text-white/70">{t('Free reward')}</p>
+        <h2 id="reward-now" className="display text-game-stroke mt-1 text-4xl leading-none text-white sm:text-6xl">{reward.name}</h2>
+        <div className="mt-8 w-full max-w-xs">
+          <ClaimButton url={reward.url} />
+        </div>
+        <p className="mt-3 text-xs text-white/60">{t('Opens Brawl Stars. An official Supercell link.')}</p>
+      </div>
+    </section>
+  );
+}
+
+/** Nothing live: the stage stays, locked, and the way to the next one is right on it. */
+function EmptyStage() {
+  const t = getT(requestLocale());
+  return (
+    <section className="reward-stage px-5 py-10 text-center sm:px-10">
+      <div aria-hidden className="reward-rays opacity-40" />
+      {/* eslint-disable-next-line @next/next/no-img-element -- wiki art */}
+      <img src={rewardArt('Mega Box', [])} alt="" width={200} height={200} className="reward-locked mx-auto size-44 object-contain" />
+      <h2 className="display text-game-stroke mt-4 text-3xl text-white sm:text-4xl">{t('No free reward right now')}</h2>
+      <p className="mx-auto mt-3 max-w-md text-sm text-white/75">{t('Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.')}</p>
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <FollowButtons />
+      </div>
+    </section>
+  );
+}
+
+function FollowBand() {
+  const t = getT(requestLocale());
+  return (
+    <section className="flex flex-col gap-5 rounded-2xl bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="max-w-md space-y-1">
+        <h2 className="display text-2xl">{t('Get the next one first')}</h2>
+        <p className="text-sm text-muted">{t('A new link goes to these the moment it is found, often hours before other sites have it.')}</p>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <FollowButtons />
+      </div>
+    </section>
+  );
+}
+
+function FollowButtons() {
+  const t = getT(requestLocale());
+  return (
+    <>
+      <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-game inline-flex items-center gap-2 bg-[#25d366] px-5 py-3 text-[#06260f] [--btn-shadow:#12803c]">
+        {t('WhatsApp channel')}
       </a>
-    </li>
+      <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="btn-game inline-flex items-center gap-2 bg-[#5865f2] px-5 py-3 text-white [--btn-shadow:#343c9e]">
+        {t('Discord server')}
+      </a>
+    </>
+  );
+}
+
+/** The game's green claim button, in the site's btn-game shape. */
+function ClaimButton({ url, small = false }: { url: string; small?: boolean }) {
+  const t = getT(requestLocale());
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      className={`btn-game inline-flex items-center justify-center bg-[#3ddc63] text-[#0b2a14] [--btn-shadow:#1a7a33] hover:bg-[#52e676] ${
+        small ? 'px-4 py-2 text-base' : 'w-full px-8 py-4 text-3xl'
+      }`}
+    >
+      {t('Claim')}
+    </a>
   );
 }

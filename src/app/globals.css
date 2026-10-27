@@ -806,3 +806,58 @@ body {
   }
   .animate-confetti { display: none; }
 }
+
+/* /rewards (2026-10-27): the game's own "you got" screen, for a free reward.
+   One violet stage with slowly turning rays and the reward floating in it --
+   the look of the motion Shorts the channel does best with -- and nothing else
+   on the page moves. */
+.reward-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 3px solid #10142a;
+  border-radius: 2rem;
+  background: radial-gradient(ellipse 75% 62% at 50% 40%, #7b4dff 0%, #3b1f9e 36%, #160d40 70%, var(--background) 100%);
+  box-shadow: 0 6px 0 #10142a, inset 0 0 0 2px rgb(255 255 255 / 0.06);
+}
+.reward-rays {
+  position: absolute;
+  inset: -60%;
+  z-index: -1;
+  background: repeating-conic-gradient(from 0deg, rgb(255 255 255 / 0.11) 0deg 8deg, transparent 8deg 22.5deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 42%);
+  animation: reward-spin 48s linear infinite;
+}
+@keyframes reward-spin {
+  to { transform: rotate(1turn); }
+}
+.reward-float {
+  animation: reward-float 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 22px 22px rgb(0 0 0 / 0.5)) drop-shadow(0 0 44px rgb(255 197 61 / 0.35));
+}
+@keyframes reward-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+/* Game lettering: a thick dark outline drawn behind the fill. */
+.text-game-stroke {
+  -webkit-text-stroke: 0.16em #10142a;
+  paint-order: stroke fill;
+  text-shadow: 0 0.09em 0 #10142a;
+}
+/* A loot tile: the game's thick dark outline and hard drop, not a soft card. */
+.reward-tile {
+  border: 3px solid #10142a;
+  border-radius: 1.25rem;
+  background: linear-gradient(180deg, #2b2166, #171238);
+  box-shadow: 0 4px 0 #10142a;
+}
+.reward-locked {
+  filter: grayscale(1) brightness(0.42) contrast(1.15);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reward-rays,
+  .reward-float {
+    animation: none;
+  }
+}

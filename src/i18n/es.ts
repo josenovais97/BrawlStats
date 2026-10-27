@@ -4298,4 +4298,18 @@ export const ES: Record<string, string> = {
     "¿De dónde salen los links?",
   "Why does the game say the reward expired or was already claimed?":
     "¿Por qué el juego dice que la recompensa expiró o ya fue reclamada?",
+  "Free reward":
+    "Recompensa gratis",
+  "Live, found {when}":
+    "En vivo, encontrada {when}",
+  "More free rewards live now":
+    "Más recompensas gratis ahora mismo",
+  "No free reward right now":
+    "Ahora no hay recompensas gratis",
+  "Opens Brawl Stars. An official Supercell link.":
+    "Abre Brawl Stars. Un link oficial de Supercell.",
+  "Try it":
+    "Probar",
+  "{n} free rewards to claim":
+    "{n} recompensas gratis para reclamar",
 };
