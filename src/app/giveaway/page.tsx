@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { Countdown } from '@/components/giveaway/countdown';
 import { GiveawayPanel } from '@/components/giveaway/giveaway-panel';
-import { DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, isOpen, notOpenYet } from '@/lib/giveaway';
+import { BRAWL_PASS_ART, DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, PRIZE_FALLBACK_ART, isOpen, notOpenYet } from '@/lib/giveaway';
 import { leaderboard } from '@/lib/giveaway-data';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -62,9 +62,12 @@ export default async function GiveawayPage() {
           {t('Ends in')} <Countdown to={GIVEAWAY.closesAt} />
         </p>
         <div className="relative mx-auto mt-6 w-fit">
-          {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon */}
-          <img src="/rewards/box-rainbow.png" alt="" width={240} height={240} className="reward-float mx-auto size-48 object-contain sm:size-60" />
-          <span className="display absolute -right-6 top-2 rotate-12 rounded-2xl border-[3px] border-[#10142a] bg-brand px-3 py-1 text-3xl text-brand-ink shadow-[0_4px_0_#10142a]">
+          {/* The Brawl Pass, falling back to our box if the wiki's art does not load. */}
+          <object data={BRAWL_PASS_ART} type="image/png" aria-label={t('Brawl Pass')} className="reward-float mx-auto block h-44 w-72 sm:h-56 sm:w-96">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon */}
+            <img src={PRIZE_FALLBACK_ART} alt="" width={240} height={240} className="mx-auto size-44 object-contain sm:size-56" />
+          </object>
+          <span className="display absolute -right-4 -top-2 rotate-12 rounded-2xl border-[3px] border-[#10142a] bg-brand px-3 py-1 text-3xl text-brand-ink shadow-[0_4px_0_#10142a]">
             €10
           </span>
         </div>

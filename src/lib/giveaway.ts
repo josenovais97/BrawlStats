@@ -31,6 +31,15 @@ export const GIVEAWAY: Giveaway = {
   closesAt: '2026-11-27T20:00:00Z',
 };
 
+/**
+ * The Brawl Pass, which the prize pays for: the wiki's art, loaded by the
+ * visitor's browser like the skin pages' (the wiki's CDN refuses this box),
+ * with our own box as the fallback if it does not load.
+ */
+export const BRAWL_PASS_ART =
+  'https://static.wikia.nocookie.net/brawlstars/images/0/0f/Brawl_Pass.png/revision/latest/scale-to-width-down/600';
+export const PRIZE_FALLBACK_ART = '/rewards/box-rainbow.png';
+
 /** Whether the page and the form are public (launched 2026-10-27). */
 export const GIVEAWAY_PUBLIC = true;
 

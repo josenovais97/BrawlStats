@@ -4524,4 +4524,6 @@ export const ES: Record<string, string> = {
     "Participar gratis",
   "Entries open at {time}.":
     "Las participaciones abren el {time}.",
+  "Brawl Pass":
+    "Brawl Pass",
 };

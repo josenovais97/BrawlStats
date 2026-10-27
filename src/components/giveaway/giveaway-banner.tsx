@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { GIVEAWAY_PUBLIC, hasClosed } from '@/lib/giveaway';
+import { BRAWL_PASS_ART, GIVEAWAY_PUBLIC, PRIZE_FALLBACK_ART, hasClosed } from '@/lib/giveaway';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { getT } from '@/lib/t';
@@ -21,8 +21,10 @@ export function GiveawayBanner({ from }: { from: string }) {
       className="reward-stage flex items-center gap-4 px-5 py-4 sm:gap-6 sm:px-8"
     >
       <span aria-hidden className="reward-rays" />
-      {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon */}
-      <img src="/rewards/box-rainbow.png" alt="" width={96} height={96} className="reward-float size-16 shrink-0 object-contain sm:size-20" />
+      <object data={BRAWL_PASS_ART} type="image/png" aria-hidden className="reward-float h-14 w-24 shrink-0 sm:h-20 sm:w-32">
+        {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon */}
+        <img src={PRIZE_FALLBACK_ART} alt="" width={80} height={80} className="size-14 object-contain sm:size-20" />
+      </object>
       <span className="min-w-0 flex-1">
         <span className="display text-game-stroke block text-xl leading-tight text-white sm:text-3xl">
           {t('Giveaway: win a €10 gift card')}
