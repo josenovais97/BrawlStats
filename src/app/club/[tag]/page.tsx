@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       robots: { index: false, follow: true },
     };
   } catch {
-    return { title: t('Club {tag}', { tag: displayTag(tag) }) };
+    return { title: t('Club {tag}', { tag: displayTag(tag) }), robots: { index: false, follow: true } };
   }
 }
 

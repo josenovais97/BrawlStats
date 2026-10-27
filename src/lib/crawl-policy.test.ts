@@ -185,3 +185,14 @@ test('the translated pages get the same refusal (2026-10-26)', () => {
   assert.equal(shouldBlockCrawl('/pt/brawlers/colt', 'Googlebot/2.1'), false);
   assert.equal(shouldBlockCrawl('/pt/draft/x', 'Mozilla/5.0 (Windows NT 10.0) Chrome/140'), false);
 });
+
+test("Google's AdSense crawler can read the pages its ads go on", () => {
+  const ua =
+    'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 (compatible; Mediapartners-Google/2.1; +http://www.google.com/bot.html)';
+  for (const path of ['/player/2PP', '/pt/player/2PP', '/club/2PP', '/draft/hard-rock-mine', '/wrapped/2PP']) {
+    assert.equal(shouldBlockCrawl(path, ua), false, path);
+  }
+  assert.equal(shouldBlockCrawl('/api/player/2PP', ua), true);
+  // Googlebot itself is still a search crawler.
+  assert.equal(shouldBlockCrawl('/player/2PP', 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'), true);
+});

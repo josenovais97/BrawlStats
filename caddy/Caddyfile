@@ -170,6 +170,11 @@
 		# Our own jobs (the account-rating video reads /account-value) come
 		# from this box, through Cloudflare, with curl's headers.
 		not client_ip 141.147.53.176
+		# Google's AdSense crawler reads the pages its ads go on and may send
+		# no Accept-Language. Matching its name is safe here only because
+		# Cloudflare challenges these prefixes for anything not a verified
+		# bot (2026-10-27).
+		not header User-Agent *Mediapartners-Google*
 	}
 	handle @no_browser_expensive {
 		header Retry-After 30

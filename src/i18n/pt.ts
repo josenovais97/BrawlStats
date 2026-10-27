@@ -4186,4 +4186,20 @@ export const PT: Record<string, string> = {
     "Respostas de ontem",
   "finish one puzzle today to keep it":
     "termine um desafio hoje para mantê-la",
+  "How to make a Brawl Stars tier list":
+    "Como fazer uma tier list de Brawl Stars",
+  "Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.":
+    "Todos os brawlers do jogo começam na reserva, embaixo do quadro. Toque em um e depois no tier onde ele fica; no computador dá para arrastar também. Toque em um brawler já colocado para devolvê-lo à reserva, ou comece pela lista do Ranqueado ao vivo com um botão e discuta com o meta em vez de começar do zero.",
+  "When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.":
+    "Quando terminar, copie o link ou salve o quadro como imagem e publique. Quem abrir o link vê exatamente o seu quadro e pode mudá-lo para fazer o próprio, que é como começa quase toda discussão de tier list no chat do clube.",
+  "A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody's game.":
+    "Uma dica útil: monte a lista para um modo ou um rank de cada vez. Um brawler que domina um modo pode atrapalhar em outro, e o meta no Mestres não é o meta no Ouro, então um quadro só para tudo acaba não refletindo o jogo de ninguém.",
+  "How the draft helper works":
+    "Como funciona o assistente de draft",
+  "Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.":
+    "Cada número vem de batalhas reais do Ranqueado que o BrawlZone coleta por conta própria e atualiza a cada duas horas. Ao escolher um mapa, os brawlers são ordenados pelo desempenho real naquele mapa nas últimas três semanas, não por uma média da temporada inteira em todos os modos.",
+  "Then follow the game's own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.":
+    "Depois siga a mesma ordem do jogo. Os banimentos tiram um brawler de todas as listas. Cada escolha inimiga reordena as sugestões pelo desempenho de cada candidato contra ela, e cada escolha aliada pelo desempenho ao lado dela, que é uma pergunta diferente de fazer counter. Cada sugestão mostra quantas batalhas há por trás, então uma amostra pequena fica fácil de notar.",
+  "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
+    "As mesmas sugestões flutuam por cima do jogo no app BrawlZone Bubble, para você consultar no meio do draft sem sair do Brawl Stars.",
 };

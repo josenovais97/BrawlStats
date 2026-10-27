@@ -114,7 +114,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     };
   } catch {
-    return { title: t('Player {tag}', { tag: displayTag(tag) }) };
+    // A failed lookup renders "Player not found" (or an API error) with a 200,
+    // and an allowlisted tag sits in the sitemap: a banned top player left
+    // one such page there for Google to index (2026-10-27). Never index it.
+    return { title: t('Player {tag}', { tag: displayTag(tag) }), robots: { index: false, follow: true } };
   }
 }
 

@@ -88,6 +88,14 @@ export const SOCIAL_AGENTS = [
   'Discordbot',
   'WhatsApp',
   'TelegramBot',
+  // Google's AdSense crawler (2026-10-27). It reads a page to choose its ads,
+  // and only pages a visitor just loaded with ads on them -- so like an
+  // unfurler it fetches what people actually opened rather than walking the
+  // site. Under the crawler rules it got a 404 on every profile, the pages
+  // with the most ad impressions. A UA that only claims the name gets no
+  // further than before: Cloudflare challenges the expensive prefixes for
+  // anything that is not a verified bot.
+  'Mediapartners-Google',
 ] as const;
 
 const SOCIAL_PATTERN = new RegExp(SOCIAL_AGENTS.join('|'), 'i');

@@ -12,6 +12,7 @@ import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
+import { MIN_INDEXABLE_COMPS } from '@/lib/comps-indexing';
 import { getTeamComps, type ModeComps } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
 import { getT } from '@/lib/t';
@@ -69,6 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: t('Best {label} comps in Brawl Stars', { label: resolved.label }),
     description: t('The three-brawler compositions with the best records in Brawl Stars {label}, measured from sampled battles over the last 14 days.', { label: resolved.label }),
     alternates: { canonical: `/comps/${resolved.slug}` },
+    ...(resolved.comps.comps.length < MIN_INDEXABLE_COMPS ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

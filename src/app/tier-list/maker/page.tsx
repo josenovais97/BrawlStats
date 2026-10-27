@@ -89,6 +89,13 @@ export default async function TierMakerPage() {
         <TierMaker brawlers={brawlers} />
       </Suspense>
 
+      <section className="card space-y-3 p-6 text-sm leading-relaxed text-muted">
+        <h2 className="text-base font-bold text-foreground">{t('How to make a Brawl Stars tier list')}</h2>
+        <p>{t('Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.')}</p>
+        <p>{t('When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.')}</p>
+        <p>{t('A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody\'s game.')}</p>
+      </section>
+
       <p className="text-xs leading-relaxed text-muted">{t('Nothing here is saved on a server — the link')}{' '}<em>{t('is')}</em>{' '}{t('the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the')}{' '}
         <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('Ranked tier list')}</Link>{' '}{t('or the')}{' '}
         <Link href={lp('/tier-list/trophy')} className="font-medium text-brand hover:underline">{t('trophy list')}</Link>

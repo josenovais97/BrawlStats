@@ -259,7 +259,10 @@ export default async function DraftPage({ params }: PageProps) {
       {pool.length === 0 ? (
         <p className="card p-6 text-sm leading-relaxed text-muted">{t('No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.')}</p>
       ) : !selected ? (
-        <MapChooser pool={pool} artFor={artFor} modeMeta={modeMeta} />
+        <>
+          <MapChooser pool={pool} artFor={artFor} modeMeta={modeMeta} />
+          <DraftHowItWorks />
+        </>
       ) : (
         <>
           <SelectedMap map={selected} art={artFor(selected)} modeMeta={modeMeta} />
@@ -723,6 +726,23 @@ async function MapChooser({
           );
         })}
       </div>
+    </section>
+  );
+}
+
+/**
+ * What the tool does, under the map list on the bare /draft page -- the one
+ * page of the tool that is indexed, and before 2026-10-27 a grid of map tiles
+ * with ~140 words around it.
+ */
+function DraftHowItWorks() {
+  const t = getT(requestLocale());
+  return (
+    <section className="card space-y-3 p-6 text-sm leading-relaxed text-muted">
+      <h2 className="text-base font-bold text-foreground">{t('How the draft helper works')}</h2>
+      <p>{t('Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.')}</p>
+      <p>{t('Then follow the game\'s own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.')}</p>
+      <p>{t('The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.')}</p>
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { MIN_INDEXABLE_COMPS } from '@/lib/comps-indexing';
 import { INTL_LOCALES, isTranslatedPath, languageAlternates } from '@/lib/i18n';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { bracketTierListHref } from '@/lib/tier-list-route';
@@ -175,13 +176,14 @@ async function core(add: Add, dataDay: Date | null) {
   add('/leaderboard/ranked', 'daily', 0.65);
   add('/leaderboard/cosmetics', 'weekly', 0.6);
 
-  // One per mode that actually has comps clearing the sample floor. Listed off
+  // One per mode with enough comps clearing the sample floor (see
+  // lib/comps-indexing). Listed off
   // the same source the route resolves against, so the sitemap cannot advertise
   // a mode whose page would 404.
   const comps = await getTeamComps().catch(() => []);
   const modeNames = await getGameModeMap().catch(() => new Map());
   for (const mode of comps) {
-    if (mode.comps.length === 0) continue;
+    if (mode.comps.length < MIN_INDEXABLE_COMPS) continue;
     add(`/comps/${slugify(modeLabel(modeNames, mode.mode))}`, 'daily', 0.7);
   }
 
