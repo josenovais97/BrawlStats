@@ -42,6 +42,14 @@ export function isOpen(now = Date.now(), g = GIVEAWAY): boolean {
   return now >= Date.parse(g.opensAt) && now < Date.parse(g.closesAt);
 }
 
+export function notOpenYet(now = Date.now(), g = GIVEAWAY): boolean {
+  return now < Date.parse(g.opensAt);
+}
+
+export function hasClosed(now = Date.now(), g = GIVEAWAY): boolean {
+  return now >= Date.parse(g.closesAt);
+}
+
 export const FOLLOW_PLATFORMS = ['youtube', 'tiktok', 'instagram'] as const;
 export type FollowPlatform = (typeof FOLLOW_PLATFORMS)[number];
 

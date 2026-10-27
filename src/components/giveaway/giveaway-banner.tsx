@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { GIVEAWAY, GIVEAWAY_PUBLIC } from '@/lib/giveaway';
+import { GIVEAWAY_PUBLIC, hasClosed } from '@/lib/giveaway';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { getT } from '@/lib/t';
@@ -11,7 +11,7 @@ import { getT } from '@/lib/t';
  * closed, so it never outlives its purpose.
  */
 export function GiveawayBanner({ from }: { from: string }) {
-  if (!GIVEAWAY_PUBLIC || Date.now() >= Date.parse(GIVEAWAY.closesAt)) return null;
+  if (!GIVEAWAY_PUBLIC || hasClosed()) return null;
   const t = getT(requestLocale());
   return (
     <Link

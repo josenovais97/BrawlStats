@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { Countdown } from '@/components/giveaway/countdown';
 import { GiveawayPanel } from '@/components/giveaway/giveaway-panel';
-import { DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, isOpen } from '@/lib/giveaway';
+import { DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, isOpen, notOpenYet } from '@/lib/giveaway';
 import { leaderboard } from '@/lib/giveaway-data';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -93,7 +93,7 @@ export default async function GiveawayPage() {
       <section id="enter" className="mx-auto max-w-xl">
         <GiveawayPanel
           open={GIVEAWAY_PUBLIC && isOpen()}
-          closedNote={Date.now() < Date.parse(GIVEAWAY.opensAt) ? t('Entries open at {time}.', { time: opens }) : undefined}
+          closedNote={notOpenYet() ? t('Entries open at {time}.', { time: opens }) : undefined}
         />
       </section>
 
