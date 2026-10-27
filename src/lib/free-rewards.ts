@@ -33,32 +33,28 @@ export const LIVE_DAYS = 7;
 const OFFICIAL = /^https:\/\/(link\.brawlstars\.com|store\.supercell\.com)\//;
 
 /**
- * The game's art for what a reward gives, from the wiki, loaded by the
- * visitor's browser like the skin art (the wiki's CDN refuses this box).
- * Matched on the name the job saw ("Mega Box", "2000 Credits", "1x Vince
- * Box"); a brawler's own box shows the brawler. Anything unknown is a Mega
- * Box, which is what most free links are.
+ * Art for what a reward gives. Boxes are Brawlify's box icons (MIT, the
+ * same CDN as the gadget and gear marks), kept in public/rewards so they never
+ * depend on someone else's CDN; currencies reuse the site's own icons. Matched
+ * on the name the job saw ("Mega Box", "1000 Power Points"); a brawler's own
+ * box shows the brawler. Anything unknown gets the rainbow box.
  */
-const WIKI = 'https://static.wikia.nocookie.net/brawlstars/images';
 const ART: [RegExp, string][] = [
-  [/mega box/i, `${WIKI}/5/59/Mega_Box.png`],
-  [/big box/i, `${WIKI}/c/cc/Big_Box.png`],
-  [/starr drop/i, `${WIKI}/3/31/Starr_Drop.png`],
-  [/credit/i, `${WIKI}/2/2b/Credits.png`],
-  [/gem/i, `${WIKI}/d/d5/Gems.png`],
-  [/power point/i, `${WIKI}/4/41/Power_Points.png`],
-  [/coin/i, `${WIKI}/f/f0/Coins.png`],
-  [/bling/i, `${WIKI}/c/ca/Bling.png`],
-  [/box/i, `${WIKI}/7/71/Brawl_Box.png`],
+  [/mega box/i, '/rewards/box-red.png'],
+  [/big box/i, '/rewards/box-pink.png'],
+  [/starr drop/i, '/icons/starr-drop.png'],
+  [/power point/i, '/icons/power-point.png'],
+  [/coin/i, '/icons/coin.png'],
+  [/box/i, '/rewards/box-blue.png'],
 ];
-const sized = (url: string) => `${url}/revision/latest/scale-to-width-down/400`;
+const FALLBACK = '/rewards/box-rainbow.png';
 
 export function rewardArt(name: string, brawlers: { name: string; art: string }[]): string {
   const brawler = [...brawlers]
     .sort((a, b) => b.name.length - a.name.length)
     .find((b) => new RegExp(`\\b${b.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(name));
   if (brawler) return brawler.art;
-  return sized((ART.find(([re]) => re.test(name)) ?? ART[0])[1]);
+  return ART.find(([re]) => re.test(name))?.[1] ?? FALLBACK;
 }
 
 export async function getFreeRewards(): Promise<{ live: FreeReward[]; earlier: FreeReward[] }> {
