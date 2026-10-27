@@ -76,7 +76,7 @@ export default async function RewardsPage() {
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {more.map((r) => (
               <li key={r.id} className="reward-tile flex items-center gap-4 p-4">
-                {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon or Brawlify portrait, like the game icons */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon, like the game icons */}
                 <img src={r.art} alt="" width={88} height={88} className="size-20 shrink-0 object-contain drop-shadow-[0_6px_8px_rgb(0_0_0/0.5)]" />
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="display text-game-stroke truncate text-xl text-white">{r.name}</p>
@@ -168,7 +168,7 @@ function RewardStage({ reward, total }: { reward: FreeReward; total: number }) {
         ) : null}
       </div>
       <div className="mx-auto flex max-w-md flex-col items-center pt-6 text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon or Brawlify portrait, like the game icons */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon, like the game icons */}
         <img src={reward.art} alt="" width={260} height={260} className="reward-float size-52 object-contain sm:size-64" />
         <p className="mt-4 text-sm font-semibold text-white/70">{t('Free reward')}</p>
         <h2 id="reward-now" className="display text-game-stroke mt-1 text-4xl leading-none text-white sm:text-6xl">{reward.name}</h2>
@@ -188,7 +188,7 @@ function EmptyStage() {
     <section className="reward-stage px-5 py-10 text-center sm:px-10">
       <div aria-hidden className="reward-rays opacity-40" />
       {/* eslint-disable-next-line @next/next/no-img-element -- same art as above */}
-      <img src={rewardArt('Mega Box', [])} alt="" width={200} height={200} className="reward-locked mx-auto size-44 object-contain" />
+      <img src={rewardArt('Mega Box')} alt="" width={200} height={200} className="reward-locked mx-auto size-44 object-contain" />
       <h2 className="display text-game-stroke mt-4 text-3xl text-white sm:text-4xl">{t('No free reward right now')}</h2>
       <p className="mx-auto mt-3 max-w-md text-sm text-white/75">{t('Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.')}</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
