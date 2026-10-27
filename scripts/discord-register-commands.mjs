@@ -133,6 +133,12 @@ const COMMANDS = [
   },
   { name: 'rotation', type: 1, description: 'Maps live right now and when they end' },
   {
+    name: 'giveaway',
+    type: 1,
+    description: 'Confirm your giveaway entry for +2 entries (BrawlZone server only)',
+    options: [{ name: 'code', type: STRING, required: true, description: 'The 8-letter code on your entry page' }],
+  },
+  {
     name: 'compare',
     type: 1,
     description: 'Brawler vs brawler',

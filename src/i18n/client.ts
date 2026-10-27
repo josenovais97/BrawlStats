@@ -806,6 +806,68 @@ export const CLIENT_ES: Record<string, string> = {
     "Respuestas de ayer",
   "finish one puzzle today to keep it":
     "termina un reto hoy para mantenerla",
+  "A friend sent you: entering gives them +1 entry too.":
+    "Te invitó un amigo: si entras, él también gana +1 entrada.",
+  "Closed":
+    "Cerrado",
+  "Confirmed on Discord":
+    "Confirmado en Discord",
+  "Copy":
+    "Copiar",
+  "Enter for free":
+    "Participar gratis",
+  "Enter the giveaway":
+    "Participa en el sorteo",
+  "Entered the giveaway":
+    "Participando en el sorteo",
+  "Entering…":
+    "Participando…",
+  "Entries are closed.":
+    "Las participaciones están cerradas.",
+  "Free Brawl Stars giveaway: win a €10 gift card for the Brawl Pass. Enter here:":
+    "Sorteo gratis de Brawl Stars: gana una tarjeta regalo de 10 € para el Brawl Pass. Participa aquí:",
+  "Friends who entered with your link: {n} of {max}":
+    "Amigos que entraron con tu link: {n} de {max}",
+  "I am 13 or older (under 18: a parent knows I am entering) and I accept the":
+    "Tengo 13 años o más (si tengo menos de 18, mi madre, padre o tutor lo sabe) y acepto las",
+  "Join our Discord and type /giveaway {code}":
+    "Únete a nuestro Discord y escribe /giveaway {code}",
+  "Keep this page: it is saved in this browser, and the link with your code always shows it.":
+    "Guarda esta página: queda guardada en este navegador, y el link con tu código siempre la muestra.",
+  "Open Discord":
+    "Abrir Discord",
+  "Send on WhatsApp":
+    "Enviar por WhatsApp",
+  "You are in, {name}!":
+    "¡Ya estás dentro, {name}!",
+  "Your code":
+    "Tu código",
+  "Your email, only to tell you if you win":
+    "Tu email, solo para avisarte si ganas",
+  "Your friend link: +1 entry for every friend who enters with it":
+    "Tu link para amigos: +1 entrada por cada amigo que entre con él",
+  "Your player tag":
+    "Tu tag de jugador",
+  "entries":
+    "entradas",
+  "entry":
+    "entrada",
+  "giveaway rules":
+    "reglas del sorteo",
+  "Tick the box to confirm your age and the rules.":
+    "Marca la casilla para confirmar tu edad y las reglas.",
+  "That email does not look right.":
+    "Ese email no parece correcto.",
+  "No Brawl Stars account has that tag. Check it under your name in game.":
+    "Ninguna cuenta de Brawl Stars tiene ese tag. Revísalo debajo de tu nombre en el juego.",
+  "This tag is already entered. Lost your page? Write to contact@brawlzone.net.":
+    "Este tag ya está participando. ¿Perdiste tu página? Escribe a contact@brawlzone.net.",
+  "This email is already entered. One entry per person.":
+    "Este email ya está participando. Una participación por persona.",
+  "Too many entries from this network today. Try again tomorrow.":
+    "Demasiadas participaciones desde esta red hoy. Inténtalo mañana.",
+  "Something went wrong on our side. Try again in a minute.":
+    "Algo salió mal de nuestro lado. Inténtalo en un minuto.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1611,4 +1673,66 @@ export const CLIENT_PT: Record<string, string> = {
     "Respostas de ontem",
   "finish one puzzle today to keep it":
     "termine um desafio hoje para mantê-la",
+  "A friend sent you: entering gives them +1 entry too.":
+    "Um amigo te mandou: se você entrar, ele também ganha +1 entrada.",
+  "Closed":
+    "Encerrado",
+  "Confirmed on Discord":
+    "Confirmado no Discord",
+  "Copy":
+    "Copiar",
+  "Enter for free":
+    "Participar grátis",
+  "Enter the giveaway":
+    "Participe do sorteio",
+  "Entered the giveaway":
+    "Participando do sorteio",
+  "Entering…":
+    "Participando…",
+  "Entries are closed.":
+    "As participações estão encerradas.",
+  "Free Brawl Stars giveaway: win a €10 gift card for the Brawl Pass. Enter here:":
+    "Sorteio grátis de Brawl Stars: ganhe um gift card de 10 € para o Brawl Pass. Participe aqui:",
+  "Friends who entered with your link: {n} of {max}":
+    "Amigos que entraram com o seu link: {n} de {max}",
+  "I am 13 or older (under 18: a parent knows I am entering) and I accept the":
+    "Tenho 13 anos ou mais (se tenho menos de 18, meu responsável sabe que estou participando) e aceito as",
+  "Join our Discord and type /giveaway {code}":
+    "Entre no nosso Discord e digite /giveaway {code}",
+  "Keep this page: it is saved in this browser, and the link with your code always shows it.":
+    "Guarde esta página: ela fica salva neste navegador, e o link com o seu código sempre mostra ela.",
+  "Open Discord":
+    "Abrir Discord",
+  "Send on WhatsApp":
+    "Enviar no WhatsApp",
+  "You are in, {name}!":
+    "Você está dentro, {name}!",
+  "Your code":
+    "Seu código",
+  "Your email, only to tell you if you win":
+    "Seu email, só para avisar se você ganhar",
+  "Your friend link: +1 entry for every friend who enters with it":
+    "Seu link para amigos: +1 entrada para cada amigo que entrar com ele",
+  "Your player tag":
+    "Sua tag de jogador",
+  "entries":
+    "entradas",
+  "entry":
+    "entrada",
+  "giveaway rules":
+    "regras do sorteio",
+  "Tick the box to confirm your age and the rules.":
+    "Marque a caixa para confirmar sua idade e as regras.",
+  "That email does not look right.":
+    "Esse email não parece certo.",
+  "No Brawl Stars account has that tag. Check it under your name in game.":
+    "Nenhuma conta de Brawl Stars tem essa tag. Confira embaixo do seu nome no jogo.",
+  "This tag is already entered. Lost your page? Write to contact@brawlzone.net.":
+    "Esta tag já está participando. Perdeu sua página? Escreva para contact@brawlzone.net.",
+  "This email is already entered. One entry per person.":
+    "Este email já está participando. Uma participação por pessoa.",
+  "Too many entries from this network today. Try again tomorrow.":
+    "Participações demais desta rede hoje. Tente amanhã.",
+  "Something went wrong on our side. Try again in a minute.":
+    "Algo deu errado do nosso lado. Tente de novo em um minuto.",
 };

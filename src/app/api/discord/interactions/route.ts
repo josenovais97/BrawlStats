@@ -24,6 +24,8 @@ import { comparePath } from '@/lib/compare';
 import { bracketBySlug } from '@/lib/rank-brackets';
 import { verifyDiscordRequest } from '@/lib/discord-verify';
 import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
+import { DISCORD_BONUS, GIVEAWAY_PUBLIC } from '@/lib/giveaway';
+import { confirmDiscord } from '@/lib/giveaway-data';
 import { mains } from '@/lib/player-showcase';
 import { getPrisma } from '@/lib/prisma';
 import { computeSkillScore } from '@/lib/skill-score';
@@ -70,6 +72,24 @@ const PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY ?? '';
 const APP_ID = process.env.DISCORD_APP_ID ?? '';
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN ?? '';
 const GUILD_ID = process.env.DISCORD_GUILD_ID ?? '';
+
+async function giveawayCommand(raw: string, userId: string, home: boolean): Promise<string> {
+  if (!GIVEAWAY_PUBLIC) return 'The giveaway has not started yet. Watch #announcements.';
+  if (!home) return `The +${DISCORD_BONUS} entries are for joining the BrawlZone server. Join here and use \`/giveaway\` there: ${SERVER_INVITE}`;
+  const code = raw.trim().toUpperCase();
+  switch (await confirmDiscord(code, userId)) {
+    case 'confirmed':
+      return `Done! +${DISCORD_BONUS} entries for code **${code}**. See your total: https://brawlzone.net/giveaway?me=${code}`;
+    case 'already':
+      return 'This code is already confirmed with your account. You are all set.';
+    case 'otherAccount':
+      return 'That code, or your Discord account, is already used for another entry. One Discord account per entry.';
+    case 'closed':
+      return 'The giveaway is closed. Good luck in the draw!';
+    default:
+      return 'That code was not found. It is the 8 letters on your entry page at https://brawlzone.net/giveaway';
+  }
+}
 const SITE = 'https://brawlzone.net';
 const BRAND = 0xffc93c;
 const API = 'https://discord.com/api/v10';
@@ -984,6 +1004,15 @@ export async function POST(request: Request): Promise<Response> {
     }
     // Our own server, where the roles are; anywhere else the bot only answers.
     const home = interaction.guild_id === GUILD_ID;
+
+    // The giveaway's +2 (2026-10-27) is for joining this server, so it only
+    // counts here, and the reply is ephemeral: the code is the entrant's.
+    if (name === 'giveaway') {
+      after(async () => {
+        await respond(token, { content: await giveawayCommand(opt(options, 'code') ?? '', userId, home) }).catch(() => {});
+      });
+      return Response.json({ type: 5, data: { flags: 64 } });
+    }
 
     after(async () => {
       try {

@@ -698,3 +698,25 @@ model DailyChallengeTally {
   @@id([day, mode, guesses])
   @@map("daily_challenge_tally")
 }
+
+/// One entrant in a BrawlZone giveaway (2026-10-27). `email` is only for
+/// telling the winner and is deleted after the prize is delivered.
+model GiveawayEntry {
+  id            Int      @id @default(autoincrement())
+  giveaway      String
+  code          String   @unique
+  playerTag     String   @map("player_tag")
+  playerName    String   @map("player_name")
+  email         String
+  referredBy    String?  @map("referred_by")
+  discordUserId String?  @map("discord_user_id")
+  ipHash        String   @map("ip_hash")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@unique([giveaway, playerTag])
+  @@unique([giveaway, email])
+  @@unique([giveaway, discordUserId])
+  @@index([referredBy])
+  @@index([ipHash, createdAt])
+  @@map("giveaway_entries")
+}

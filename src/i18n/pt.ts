@@ -4312,4 +4312,146 @@ export const PT: Record<string, string> = {
     "Tentar",
   "{n} free rewards to claim":
     "{n} recompensas grátis para resgatar",
+  "+{discord} entries for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, up to {cap}. Following or subscribing on any platform is welcome but never gives entries.":
+    "+{discord} entradas por confirmar sua participação com /giveaway no servidor do Discord do BrawlZone (uma conta do Discord por participação), e +1 para cada amigo que entrar com o seu link, até {cap}. Seguir ou se inscrever em qualquer plataforma é bem-vindo, mas nunca dá entradas.",
+  "A draw nobody can rig, us included":
+    "Um sorteio que ninguém consegue manipular, nem nós",
+  "A friend sent you: entering gives them +1 entry too.":
+    "Um amigo te mandou: se você entrar, ele também ganha +1 entrada.",
+  "After entries close, one winner is drawn at random, weighted by entries, using the first drand public randomness round after the close (drand.love). The entry list (tags and entry counts, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "Quando as participações fecharem, um vencedor é sorteado ao acaso, conforme o número de entradas, usando a primeira rodada de aleatoriedade pública do drand depois do encerramento (drand.love). A lista de participantes (tags e entradas, sem emails) e a rodada usada são publicadas para qualquer um conferir. O vencedor é anunciado em um vídeo e no brawlzone.net.",
+  "Anyone aged 13 or older with a Brawl Stars account, where giveaways like this are allowed. If you are under 18, a parent or guardian must know you are entering and may need to accept the prize for you. Entering is free and needs no purchase.":
+    "Qualquer pessoa com 13 anos ou mais e uma conta de Brawl Stars, onde sorteios assim são permitidos. Se você tem menos de 18, seu pai, mãe ou responsável precisa saber que você está participando e pode ter que aceitar o prêmio por você. Participar é grátis e não exige nenhuma compra.",
+  "Brawl Stars giveaway: win a €10 gift card for the Brawl Pass":
+    "Sorteio de Brawl Stars: ganhe um gift card de 10 € para o Brawl Pass",
+  "BrawlZone (brawlzone.net), an unofficial Brawl Stars fan project. Contact: {email}. This giveaway is not sponsored, endorsed or run by Supercell, Google, Apple, YouTube, TikTok, Instagram or Discord.":
+    "BrawlZone (brawlzone.net), um projeto de fãs de Brawl Stars não oficial. Contato: {email}. Este sorteio não é patrocinado, apoiado nem organizado pela Supercell, Google, Apple, YouTube, TikTok, Instagram ou Discord.",
+  "Claiming the prize":
+    "Como receber o prêmio",
+  "Closed":
+    "Encerrado",
+  "Confirmed on Discord":
+    "Confirmado no Discord",
+  "Copy":
+    "Copiar",
+  "Dates":
+    "Datas",
+  "Each friend":
+    "Cada amigo",
+  "Ends in":
+    "Termina em",
+  "Enter":
+    "Participe",
+  "Enter for free":
+    "Participar grátis",
+  "Enter the giveaway":
+    "Participe do sorteio",
+  "Enter your player tag and an email address at brawlzone.net/giveaway. One entry form per person, per player tag and per email address.":
+    "Digite sua tag de jogador e um email em brawlzone.net/giveaway. Uma participação por pessoa, por tag de jogador e por email.",
+  "Entered the giveaway":
+    "Participando do sorteio",
+  "Entering…":
+    "Participando…",
+  "Entries are closed.":
+    "As participações estão encerradas.",
+  "Entries open {open} and close {close}.":
+    "As participações abrem em {open} e fecham em {close}.",
+  "Every friend who enters with your link, up to {max}.":
+    "Cada amigo que entrar com o seu link, até {max}.",
+  "Extra entries":
+    "Entradas extras",
+  "Fair play":
+    "Jogo limpo",
+  "Fake tags, fake email addresses or several entries for one person are removed, along with any entries they brought. At most {n} entries a day are accepted from one network.":
+    "Tags falsas, emails falsos ou várias participações da mesma pessoa são removidos, junto com as entradas que tenham trazido. São aceitas no máximo {n} participações por dia da mesma rede.",
+  "Follow so you see it the moment it is out. Following does not change your entries.":
+    "Siga para ver assim que sair. Seguir não muda suas entradas.",
+  "Free Brawl Stars giveaway: win a €10 gift card for the Brawl Pass. Enter here:":
+    "Sorteio grátis de Brawl Stars: ganhe um gift card de 10 € para o Brawl Pass. Participe aqui:",
+  "Free to enter with your player tag. Get more entries on Discord and for every friend you bring. One winner, drawn in public.":
+    "Participe grátis com sua tag de jogador. Ganhe mais entradas no Discord e por cada amigo que trouxer. Um vencedor, sorteado em público.",
+  "Friends who entered with your link: {n} of {max}":
+    "Amigos que entraram com o seu link: {n} de {max}",
+  "Giveaway rules":
+    "Regras do sorteio",
+  "Google Play or App Store, your choice. Free to enter. One winner on {date}.":
+    "Google Play ou App Store, você escolhe. Participar é grátis. Um vencedor em {date}.",
+  "How to enter":
+    "Como participar",
+  "How to get entries":
+    "Como ganhar entradas",
+  "I am 13 or older (under 18: a parent knows I am entering) and I accept the":
+    "Tenho 13 anos ou mais (se tenho menos de 18, meu responsável sabe que estou participando) e aceito as",
+  "Join our Discord":
+    "Entre no nosso Discord",
+  "Join our Discord and type /giveaway {code}":
+    "Entre no nosso Discord e digite /giveaway {code}",
+  "Keep this page: it is saved in this browser, and the link with your code always shows it.":
+    "Guarde esta página: ela fica salva neste navegador, e o link com o seu código sempre mostra ela.",
+  "More entries, more chances: someone with 5 entries is 5 times as likely to win as someone with 1.":
+    "Mais entradas, mais chances: quem tem 5 entradas tem 5 vezes mais chance de ganhar do que quem tem 1.",
+  "One €10 gift card for Google Play or the App Store, the winner's choice, sent by email as a code. The prize cannot be swapped for cash.":
+    "Um gift card de 10 € do Google Play ou da App Store, à escolha do vencedor, enviado por email como código. O prêmio não pode ser trocado por dinheiro.",
+  "Open Discord":
+    "Abrir Discord",
+  "Organiser":
+    "Organizador",
+  "Prize":
+    "Prêmio",
+  "Read the full rules":
+    "Leia as regras completas",
+  "Run by BrawlZone, an unofficial fan project. Not sponsored, endorsed or run by Supercell, Google, Apple, YouTube, TikTok, Instagram or Discord.":
+    "Organizado pelo BrawlZone, um projeto de fãs não oficial. Não é patrocinado, apoiado nem organizado pela Supercell, Google, Apple, YouTube, TikTok, Instagram ou Discord.",
+  "Send on WhatsApp":
+    "Enviar no WhatsApp",
+  "The draw":
+    "O sorteio",
+  "The winner is revealed in a video":
+    "O vencedor é revelado em um vídeo",
+  "Type /giveaway with your code in the BrawlZone server.":
+    "Digite /giveaway com o seu código no servidor do BrawlZone.",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, a new winner is drawn the same way.":
+    "Enviamos um email ao vencedor a partir de {email}. Se não houver resposta em 14 dias, ou se o vencedor quebrar estas regras, um novo vencedor é sorteado da mesma forma.",
+  "When entries close, the winner is picked using a public random number that nobody can know in advance: the drand beacon, published every 30 seconds by a group of universities and companies. We publish the full entry list (tags only) and the number, so anyone can check the result.":
+    "Quando as participações fecharem, o vencedor é escolhido com um número aleatório público que ninguém pode saber antes: o farol drand, publicado a cada 30 segundos por um grupo de universidades e empresas. Publicamos a lista completa de participantes (só tags) e o número, para qualquer um conferir o resultado.",
+  "Who can enter":
+    "Quem pode participar",
+  "Win a €10 gift card for the Brawl Pass":
+    "Ganhe um gift card de 10 € para o Brawl Pass",
+  "You are in, {name}!":
+    "Você está dentro, {name}!",
+  "Your code":
+    "Seu código",
+  "Your data":
+    "Seus dados",
+  "Your email, only to tell you if you win":
+    "Seu email, só para avisar se você ganhar",
+  "Your friend link: +1 entry for every friend who enters with it":
+    "Seu link para amigos: +1 entrada para cada amigo que entrar com ele",
+  "Your player tag":
+    "Sua tag de jogador",
+  "Your player tag and an email to reach you if you win.":
+    "Sua tag de jogador e um email para avisar se você ganhar.",
+  "Your player tag and email are used only to run this giveaway. The email is seen only by the organiser, never published or shared, and deleted once the prize is delivered. Write to {email} to remove your entry at any time.":
+    "Sua tag de jogador e seu email são usados só para este sorteio. O email só é visto pelo organizador, nunca é publicado nem compartilhado, e é apagado quando o prêmio for entregue. Escreva para {email} para remover sua participação quando quiser.",
+  "entries":
+    "entradas",
+  "entry":
+    "entrada",
+  "giveaway rules":
+    "regras do sorteio",
+  "Tick the box to confirm your age and the rules.":
+    "Marque a caixa para confirmar sua idade e as regras.",
+  "That email does not look right.":
+    "Esse email não parece certo.",
+  "No Brawl Stars account has that tag. Check it under your name in game.":
+    "Nenhuma conta de Brawl Stars tem essa tag. Confira embaixo do seu nome no jogo.",
+  "This tag is already entered. Lost your page? Write to contact@brawlzone.net.":
+    "Esta tag já está participando. Perdeu sua página? Escreva para contact@brawlzone.net.",
+  "This email is already entered. One entry per person.":
+    "Este email já está participando. Uma participação por pessoa.",
+  "Too many entries from this network today. Try again tomorrow.":
+    "Participações demais desta rede hoje. Tente amanhã.",
+  "Something went wrong on our side. Try again in a minute.":
+    "Algo deu errado do nosso lado. Tente de novo em um minuto.",
 };
