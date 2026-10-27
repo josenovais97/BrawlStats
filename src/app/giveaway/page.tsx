@@ -38,6 +38,9 @@ export default async function GiveawayPage() {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
   const locale = requestLocale();
+  const opens = new Date(GIVEAWAY.opensAt).toLocaleString(locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-419' : 'pt-BR', {
+    day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
+  });
   const ends = new Date(GIVEAWAY.closesAt).toLocaleString(locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-419' : 'pt-BR', {
     day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
   });
@@ -88,7 +91,10 @@ export default async function GiveawayPage() {
       </section>
 
       <section id="enter" className="mx-auto max-w-xl">
-        <GiveawayPanel open={GIVEAWAY_PUBLIC && isOpen()} />
+        <GiveawayPanel
+          open={GIVEAWAY_PUBLIC && isOpen()}
+          closedNote={Date.now() < Date.parse(GIVEAWAY.opensAt) ? t('Entries open at {time}.', { time: opens }) : undefined}
+        />
       </section>
 
       <section className="rounded-3xl bg-surface p-6 text-center sm:p-8">

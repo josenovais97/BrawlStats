@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ChevronDown } from 'lucide-react';
 
+import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { relativeTime } from '@/lib/format';
 import { getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
@@ -69,6 +70,8 @@ export default async function RewardsPage() {
       </div>
 
       {hero ? <RewardStage reward={hero} total={live.length} /> : <EmptyStage />}
+
+      <GiveawayBanner from="rewards" />
 
       {more.length ? (
         <section className="space-y-4">

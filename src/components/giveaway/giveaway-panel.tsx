@@ -52,7 +52,7 @@ const FOLLOW: Record<FollowPlatform, { url: string; label: string; done: string;
   },
 };
 
-export function GiveawayPanel({ open }: { open: boolean }) {
+export function GiveawayPanel({ open, closedNote }: { open: boolean; closedNote?: string }) {
   const t = useT();
   const [ref, setRef] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
@@ -90,7 +90,7 @@ export function GiveawayPanel({ open }: { open: boolean }) {
   if (status) return <MyEntries status={status} onChange={() => load(status.code)} />;
   if (!open) {
     return (
-      <div className="rounded-3xl bg-surface p-6 text-center text-muted">{t('Entries are closed.')}</div>
+      <div className="rounded-3xl bg-surface p-6 text-center text-muted">{closedNote ?? t('Entries are closed.')}</div>
     );
   }
   return <EntryForm referredBy={ref} onEntered={load} />;

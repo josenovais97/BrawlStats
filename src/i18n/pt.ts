@@ -4516,4 +4516,12 @@ export const PT: Record<string, string> = {
     "Seguindo no TikTok",
   "Following on Instagram":
     "Seguindo no Instagram",
+  "Giveaway: win a €10 gift card":
+    "Sorteio: ganhe um gift card de 10 €",
+  "Free to enter. Most points wins. Bring your friends.":
+    "Participar é grátis. Quem tiver mais pontos ganha. Traga seus amigos.",
+  "Enter free":
+    "Participar grátis",
+  "Entries open at {time}.":
+    "As participações abrem em {time}.",
 };

@@ -13,6 +13,7 @@ import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeBubble } from '@/components/home/home-bubble';
 import { HomeFollow } from '@/components/home/home-follow';
+import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
 import { HomePlayTest } from '@/components/home/home-play-test';
 import { HomeSection } from '@/components/home/home-section';
 import { HomeSnapshot } from '@/components/home/home-snapshot';
@@ -135,6 +136,9 @@ export default function HomePage() {
       {/* Renders nothing until the visitor has saved someone, so a first-time
           view goes straight from the search box to the product. */}
       <FavoritesList />
+
+      {/* While the giveaway runs; nothing otherwise. */}
+      <GiveawayBanner from="home" />
 
       {/* While the Google Play closed test is recruiting; nothing otherwise. */}
       <HomePlayTest />
