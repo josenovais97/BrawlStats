@@ -135,7 +135,7 @@ const COMMANDS = [
   {
     name: 'giveaway',
     type: 1,
-    description: 'Confirm your giveaway entry for +2 entries (BrawlZone server only)',
+    description: 'Confirm your giveaway entry for +2 points (BrawlZone server only)',
     options: [{ name: 'code', type: STRING, required: true, description: 'The 8-letter code on your entry page' }],
   },
   {

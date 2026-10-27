@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
-import { DISCORD_BONUS, REFERRAL_CAP, isCode } from '@/lib/giveaway';
+import { DISCORD_BONUS, isCode } from '@/lib/giveaway';
 
 /**
  * The giveaway's interactive half (2026-10-27): the entry form, then the
@@ -115,7 +115,7 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
   return (
     <form onSubmit={submit} className="space-y-4 rounded-3xl bg-surface p-6 sm:p-8">
       <h2 className="display text-2xl">{t('Enter the giveaway')}</h2>
-      {referredBy ? <p className="text-sm text-victory">{t('A friend sent you: entering gives them +1 entry too.')}</p> : null}
+      {referredBy ? <p className="text-sm text-victory">{t('A friend sent you: entering gives them +1 point.')}</p> : null}
       <label className="block space-y-1.5">
         <span className="text-sm font-semibold">{t('Your player tag')}</span>
         <input
@@ -175,7 +175,7 @@ function MyEntries({ status }: { status: Status }) {
         <div>
           <p className="text-sm text-muted">{t('You are in, {name}!', { name: status.playerName })}</p>
           <p className="display text-game-stroke text-6xl leading-none text-brand">
-            {entries.total} <span className="text-3xl text-white">{entries.total === 1 ? t('entry') : t('entries')}</span>
+            {entries.total} <span className="text-3xl text-white">{entries.total === 1 ? t('point') : t('points')}</span>
           </p>
         </div>
         <p className="text-sm text-muted">
@@ -199,13 +199,13 @@ function MyEntries({ status }: { status: Status }) {
         />
         <Row
           done={entries.referrals > 0}
-          label={t('Friends who entered with your link: {n} of {max}', { n: entries.referrals, max: REFERRAL_CAP })}
+          label={t('Friends who entered with your link: {n}', { n: entries.referrals })}
           value={`+${entries.referrals}`}
         />
       </ul>
 
       <div className="space-y-3 rounded-2xl bg-surface-2 p-4">
-        <p className="font-semibold">{t('Your friend link: +1 entry for every friend who enters with it')}</p>
+        <p className="font-semibold">{t('Your friend link: +1 point for every friend who enters with it')}</p>
         <div className="flex gap-2">
           <input readOnly value={link} className="min-w-0 flex-1 rounded-xl bg-background px-3 py-2.5 text-sm" onFocus={(e) => e.currentTarget.select()} />
           <button type="button" onClick={() => copy(link, 'link')} className="btn-game inline-flex items-center gap-1.5 bg-brand px-4 text-brand-ink">

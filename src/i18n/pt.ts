@@ -4454,4 +4454,44 @@ export const PT: Record<string, string> = {
     "Participações demais desta rede hoje. Tente amanhã.",
   "Something went wrong on our side. Try again in a minute.":
     "Algo deu errado do nosso lado. Tente de novo em um minuto.",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, with no limit. Following or subscribing on any platform is welcome but never gives points.":
+    "1 ponto por participar, +{discord} por confirmar sua participação com /giveaway no servidor do Discord do BrawlZone (uma conta do Discord por participação), e +1 para cada amigo que entrar com o seu link, sem limite. Seguir ou se inscrever em qualquer plataforma é bem-vindo, mas nunca dá pontos.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The leaders are checked before the winner is announced.":
+    "Tags falsas, emails falsos, tags de outras pessoas ou várias participações da mesma pessoa são removidos, junto com os pontos que tenham trazido. São aceitas no máximo {n} participações por dia da mesma rede. Os primeiros colocados são conferidos antes de anunciar o vencedor.",
+  "Nothing is left to luck: whoever has the most points when entries close wins. If two entrants have the same points, whoever entered first wins. The winner is announced in a video and on brawlzone.net.":
+    "Não tem sorte nenhuma: ganha quem tiver mais pontos quando as participações fecharem. Se dois participantes tiverem os mesmos pontos, ganha quem entrou primeiro. O vencedor é anunciado em um vídeo e no brawlzone.net.",
+  "Points":
+    "Pontos",
+  "The winner":
+    "O vencedor",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, the prize goes to the next entrant on the leaderboard.":
+    "Enviamos um email ao vencedor a partir de {email}. Se não houver resposta em 14 dias, ou se o vencedor quebrar estas regras, o prêmio vai para o próximo da classificação.",
+  "Every friend who enters with your link. No limit.":
+    "Cada amigo que entrar com o seu link. Sem limite.",
+  "Follow so you see it the moment it is out. Following does not change your points.":
+    "Siga para ver assim que sair. Seguir não muda seus pontos.",
+  "Free to enter with your player tag. Get points on Discord and for every friend you bring. Most points wins.":
+    "Participe grátis com sua tag de jogador. Ganhe pontos no Discord e por cada amigo que trouxer. Quem tiver mais pontos ganha.",
+  "How to get points":
+    "Como ganhar pontos",
+  "No luck involved: whoever has the most points when it ends wins. A tie goes to whoever entered first.":
+    "Sem sorte envolvida: ganha quem tiver mais pontos no final. Em caso de empate, ganha quem entrou primeiro.",
+  "Nobody yet. Enter now and you are first.":
+    "Ninguém ainda. Participe agora e seja o primeiro.",
+  "Top recruiters right now":
+    "Quem mais trouxe amigos agora",
+  "Updated every few minutes. Leaders are checked for fake or duplicate friends before the winner is announced.":
+    "Atualizado a cada poucos minutos. Antes de anunciar o vencedor, os primeiros são conferidos para ver se não têm amigos falsos ou repetidos.",
+  "{n} pts":
+    "{n} pts",
+  "A friend sent you: entering gives them +1 point.":
+    "Um amigo te mandou: se você participar, ele ganha +1 ponto.",
+  "Friends who entered with your link: {n}":
+    "Amigos que entraram com o seu link: {n}",
+  "Your friend link: +1 point for every friend who enters with it":
+    "Seu link para amigos: +1 ponto para cada amigo que entrar com ele",
+  "point":
+    "ponto",
+  "points":
+    "pontos",
 };

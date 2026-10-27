@@ -75,17 +75,17 @@ const GUILD_ID = process.env.DISCORD_GUILD_ID ?? '';
 
 async function giveawayCommand(raw: string, userId: string, home: boolean): Promise<string> {
   if (!GIVEAWAY_PUBLIC) return 'The giveaway has not started yet. Watch #announcements.';
-  if (!home) return `The +${DISCORD_BONUS} entries are for joining the BrawlZone server. Join here and use \`/giveaway\` there: ${SERVER_INVITE}`;
+  if (!home) return `The +${DISCORD_BONUS} points are for joining the BrawlZone server. Join here and use \`/giveaway\` there: ${SERVER_INVITE}`;
   const code = raw.trim().toUpperCase();
   switch (await confirmDiscord(code, userId)) {
     case 'confirmed':
-      return `Done! +${DISCORD_BONUS} entries for code **${code}**. See your total: https://brawlzone.net/giveaway?me=${code}`;
+      return `Done! +${DISCORD_BONUS} points for code **${code}**. See your total: https://brawlzone.net/giveaway?me=${code}`;
     case 'already':
       return 'This code is already confirmed with your account. You are all set.';
     case 'otherAccount':
       return 'That code, or your Discord account, is already used for another entry. One Discord account per entry.';
     case 'closed':
-      return 'The giveaway is closed. Good luck in the draw!';
+      return 'The giveaway is closed. The winner is announced soon!';
     default:
       return 'That code was not found. It is the 8 letters on your entry page at https://brawlzone.net/giveaway';
   }

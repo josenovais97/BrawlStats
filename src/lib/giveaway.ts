@@ -1,18 +1,17 @@
 /**
  * The first BrawlZone giveaway (2026-10-27): rules as code, no server state.
  *
- * Entries: 1 for entering, +2 for confirming in the Discord server, +1 for
- * each friend who enters with your link, up to 10. Following and
- * subscribing are asked for but never rewarded -- YouTube treats rewarding a
- * subscription as fake engagement, which would cost the channel the Creator
- * Code this is meant to bring closer.
+ * A contest, not a draw: points for entering (1), for confirming in the
+ * Discord server (+2) and for every friend who enters with your link (+1,
+ * no limit). Most points when it closes wins; a tie goes to whoever entered
+ * first. Nothing is left to luck -- the owner checked Portuguese law, where a
+ * prize decided by chance needs a council's authorisation weeks ahead.
  *
- * The winner is drawn from a public randomness beacon (drand, a new value
- * every 30 seconds, published by the League of Entropy) at the first round
- * after the giveaway closes: a number nobody, the organiser included, can
- * know while entries are still open. `drawWinner` (lib/giveaway-draw) is
- * deterministic given that value and the entry list, so anyone with both can
- * check the result. This file has no server imports: the form uses it too.
+ * Following and subscribing are asked for but never rewarded: YouTube
+ * treats a rewarded subscription as fake engagement, which would cost the
+ * channel the Creator Code this is meant to bring closer.
+ *
+ * This file has no server imports: the form uses it too.
  */
 export interface Giveaway {
   id: string;
@@ -25,16 +24,15 @@ export interface Giveaway {
 export const GIVEAWAY: Giveaway = {
   id: 'gw1',
   prize: '€10 Google Play or App Store gift card',
-  // Placeholder dates until the owner launches it: one month, opening day TBD.
-  opensAt: '2026-10-30T15:00:00Z',
-  closesAt: '2026-11-30T20:00:00Z',
+  // One month, opened 2026-10-27 at the owner's word.
+  opensAt: '2026-10-27T14:00:00Z',
+  closesAt: '2026-11-27T20:00:00Z',
 };
 
-/** Whether the page and the form are public yet (owner's go-ahead pending). */
-export const GIVEAWAY_PUBLIC = false;
+/** Whether the page and the form are public (launched 2026-10-27). */
+export const GIVEAWAY_PUBLIC = true;
 
 export const DISCORD_BONUS = 2;
-export const REFERRAL_CAP = 10;
 /** Entries from one network in a day, so one phone cannot mint "friends". */
 export const ENTRIES_PER_IP_PER_DAY = 3;
 
@@ -51,8 +49,20 @@ export interface EntryCounts {
 
 export function entriesFor(discordConfirmed: boolean, referralCount: number): EntryCounts {
   const discord = discordConfirmed ? DISCORD_BONUS : 0;
-  const referrals = Math.min(REFERRAL_CAP, Math.max(0, referralCount));
+  const referrals = Math.max(0, referralCount);
   return { base: 1, discord, referrals, total: 1 + discord + referrals };
+}
+
+export interface Standing {
+  code: string;
+  playerName: string;
+  points: number;
+  enteredAt: number;
+}
+
+/** Most points first; a tie goes to whoever entered first. */
+export function rank<T extends Standing>(rows: T[]): T[] {
+  return [...rows].sort((a, b) => b.points - a.points || a.enteredAt - b.enteredAt || a.code.localeCompare(b.code));
 }
 
 /** Eight characters a kid can read out over voice chat: no 0/O, 1/I/L. */

@@ -1,13 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { entriesFor, isCode, isOpen, newCode, normaliseEmail, REFERRAL_CAP } from '@/lib/giveaway';
-import { drawWinner } from '@/lib/giveaway-draw';
+import { entriesFor, isCode, isOpen, newCode, normaliseEmail, rank } from '@/lib/giveaway';
 
-test('entries: 1 to enter, +2 for Discord, +1 per friend up to the cap', () => {
+test('points: 1 to enter, +2 for Discord, +1 per friend with no cap', () => {
   assert.deepEqual(entriesFor(false, 0), { base: 1, discord: 0, referrals: 0, total: 1 });
   assert.equal(entriesFor(true, 3).total, 6);
-  assert.equal(entriesFor(true, 50).referrals, REFERRAL_CAP);
+  assert.equal(entriesFor(true, 50).total, 53);
 });
 
 test('codes are eight readable characters', () => {
@@ -32,19 +31,11 @@ test('open between the dates only', () => {
   assert.equal(isOpen(Date.parse('2026-02-01T00:00:00Z'), g), false);
 });
 
-test('the draw is deterministic, order-proof and weighted by entries', () => {
-  const tickets = [
-    { code: 'AAAAAAAA', playerTag: '#A', entries: 1 },
-    { code: 'BBBBBBBB', playerTag: '#B', entries: 9 },
+test('most points wins; a tie goes to whoever entered first', () => {
+  const rows = [
+    { code: 'A', playerName: 'late tie', points: 9, enteredAt: 20 },
+    { code: 'B', playerName: 'low', points: 3, enteredAt: 1 },
+    { code: 'C', playerName: 'early tie', points: 9, enteredAt: 10 },
   ];
-  const r = 'ab'.repeat(32);
-  const one = drawWinner(tickets, r);
-  assert.deepEqual(drawWinner([...tickets].reverse(), r), one, 'input order does not matter');
-  assert.equal(one.total, 10);
-  // Over many beacon values, the 9-entry ticket should win about 90% of draws.
-  let b = 0;
-  for (let i = 0; i < 2000; i++) {
-    if (drawWinner(tickets, i.toString(16).padStart(64, '0')).winner.code === 'BBBBBBBB') b++;
-  }
-  assert.ok(b > 1700 && b < 1900, String(b));
+  assert.deepEqual(rank(rows).map((r) => r.playerName), ['early tie', 'late tie', 'low']);
 });

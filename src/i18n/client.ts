@@ -868,6 +868,16 @@ export const CLIENT_ES: Record<string, string> = {
     "Demasiadas participaciones desde esta red hoy. Inténtalo mañana.",
   "Something went wrong on our side. Try again in a minute.":
     "Algo salió mal de nuestro lado. Inténtalo en un minuto.",
+  "A friend sent you: entering gives them +1 point.":
+    "Te invitó un amigo: si participas, él gana +1 punto.",
+  "Friends who entered with your link: {n}":
+    "Amigos que entraron con tu link: {n}",
+  "Your friend link: +1 point for every friend who enters with it":
+    "Tu link para amigos: +1 punto por cada amigo que entre con él",
+  "point":
+    "punto",
+  "points":
+    "puntos",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1735,4 +1745,14 @@ export const CLIENT_PT: Record<string, string> = {
     "Participações demais desta rede hoje. Tente amanhã.",
   "Something went wrong on our side. Try again in a minute.":
     "Algo deu errado do nosso lado. Tente de novo em um minuto.",
+  "A friend sent you: entering gives them +1 point.":
+    "Um amigo te mandou: se você participar, ele ganha +1 ponto.",
+  "Friends who entered with your link: {n}":
+    "Amigos que entraram com o seu link: {n}",
+  "Your friend link: +1 point for every friend who enters with it":
+    "Seu link para amigos: +1 ponto para cada amigo que entrar com ele",
+  "point":
+    "ponto",
+  "points":
+    "pontos",
 };

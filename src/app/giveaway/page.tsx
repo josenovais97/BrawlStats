@@ -3,19 +3,19 @@ import Link from 'next/link';
 
 import { Countdown } from '@/components/giveaway/countdown';
 import { GiveawayPanel } from '@/components/giveaway/giveaway-panel';
-import { DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, REFERRAL_CAP, isOpen } from '@/lib/giveaway';
+import { DISCORD_BONUS, GIVEAWAY, GIVEAWAY_PUBLIC, isOpen } from '@/lib/giveaway';
+import { leaderboard } from '@/lib/giveaway-data';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { TIKTOK_PROFILE_URL } from '@/lib/site';
 import { getT } from '@/lib/t';
 
 /**
- * The first BrawlZone giveaway (2026-10-27): a €10 gift card, one month,
- * entries for entering, for confirming in Discord and for friends. Built to
- * bring visits and followers; see lib/giveaway for the rules as code.
- *
- * Hidden until the owner launches it (GIVEAWAY_PUBLIC): noindex, linked from
- * nowhere, and the API refuses entries.
+ * The first BrawlZone giveaway (2026-10-27): a €10 gift card, one month, won
+ * by whoever has the most points -- for entering, for confirming in Discord
+ * and for every friend they bring. Built to bring visits and followers; see
+ * lib/giveaway for the rules as code. The leaderboard is the hook: names and
+ * points only, refreshed with the page every five minutes.
  */
 
 const YOUTUBE_URL = 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1';
@@ -26,7 +26,7 @@ export function generateMetadata(): Metadata {
   return {
     alternates: { canonical: '/giveaway' },
     title: t('Brawl Stars giveaway: win a €10 gift card for the Brawl Pass'),
-    description: t('Free to enter with your player tag. Get more entries on Discord and for every friend you bring. One winner, drawn in public.'),
+    description: t('Free to enter with your player tag. Get points on Discord and for every friend you bring. Most points wins.'),
     ...(GIVEAWAY_PUBLIC ? {} : { robots: { index: false, follow: false } }),
   };
 }
@@ -34,7 +34,7 @@ export function generateMetadata(): Metadata {
 /** The open/closed state flips on a date, so a few minutes stale at most. */
 export const revalidate = 300;
 
-export default function GiveawayPage() {
+export default async function GiveawayPage() {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
   const locale = requestLocale();
@@ -42,10 +42,11 @@ export default function GiveawayPage() {
     day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
   });
 
+  const top = await leaderboard(10);
   const ways = [
     { amount: '+1', title: t('Enter'), body: t('Your player tag and an email to reach you if you win.') },
     { amount: `+${DISCORD_BONUS}`, title: t('Join our Discord'), body: t('Type /giveaway with your code in the BrawlZone server.') },
-    { amount: '+1', title: t('Each friend'), body: t('Every friend who enters with your link, up to {max}.', { max: REFERRAL_CAP }) },
+    { amount: '+1', title: t('Each friend'), body: t('Every friend who enters with your link. No limit.') },
   ];
 
   return (
@@ -72,7 +73,7 @@ export default function GiveawayPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="display text-2xl">{t('How to get entries')}</h2>
+        <h2 className="display text-2xl">{t('How to get points')}</h2>
         <ul className="grid gap-4 sm:grid-cols-3">
           {ways.map((w) => (
             <li key={w.title} className="reward-tile p-5">
@@ -82,7 +83,7 @@ export default function GiveawayPage() {
             </li>
           ))}
         </ul>
-        <p className="text-sm text-muted">{t('More entries, more chances: someone with 5 entries is 5 times as likely to win as someone with 1.')}</p>
+        <p className="text-sm text-muted">{t('No luck involved: whoever has the most points when it ends wins. A tie goes to whoever entered first.')}</p>
       </section>
 
       <section id="enter" className="mx-auto max-w-xl">
@@ -91,7 +92,7 @@ export default function GiveawayPage() {
 
       <section className="rounded-3xl bg-surface p-6 text-center sm:p-8">
         <h2 className="display text-2xl">{t('The winner is revealed in a video')}</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t('Follow so you see it the moment it is out. Following does not change your entries.')}</p>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t('Follow so you see it the moment it is out. Following does not change your points.')}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <a href={YOUTUBE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-[#ff0033] px-5 py-3 text-white [--btn-shadow:#a3001f]">YouTube</a>
           <a href={TIKTOK_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-white px-5 py-3 text-[#10142a] [--btn-shadow:#9aa3c0]">TikTok</a>
@@ -99,10 +100,23 @@ export default function GiveawayPage() {
         </div>
       </section>
 
-      <section className="space-y-2 text-sm text-muted">
-        <h2 className="display text-xl text-foreground">{t('A draw nobody can rig, us included')}</h2>
-        <p>{t('When entries close, the winner is picked using a public random number that nobody can know in advance: the drand beacon, published every 30 seconds by a group of universities and companies. We publish the full entry list (tags only) and the number, so anyone can check the result.')}</p>
-        <p>
+      <section className="space-y-4">
+        <h2 className="display text-2xl">{t('Top recruiters right now')}</h2>
+        {top.length ? (
+          <ol className="divide-y divide-border overflow-hidden rounded-2xl bg-surface">
+            {top.map((row, i) => (
+              <li key={`${row.playerName}-${i}`} className={`flex items-center gap-4 px-4 py-3 ${i === 0 ? 'bg-brand/10' : ''}`}>
+                <span className={`display w-8 text-2xl ${i === 0 ? 'text-brand' : 'text-muted'}`}>{i + 1}</span>
+                <span className="min-w-0 flex-1 truncate font-semibold">{row.playerName}</span>
+                <span className="display text-xl">{t('{n} pts', { n: row.points })}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="rounded-2xl bg-surface p-5 text-sm text-muted">{t('Nobody yet. Enter now and you are first.')}</p>
+        )}
+        <p className="text-sm text-muted">
+          {t('Updated every few minutes. Leaders are checked for fake or duplicate friends before the winner is announced.')}{' '}
           <Link href={lp('/giveaway/rules')} className="font-semibold text-brand hover:underline">{t('Read the full rules')}</Link>
         </p>
       </section>

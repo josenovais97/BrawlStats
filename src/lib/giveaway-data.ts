@@ -12,6 +12,7 @@ import {
   isOpen,
   newCode,
   normaliseEmail,
+  rank,
   type EntryCounts,
 } from '@/lib/giveaway';
 import { getPrisma } from '@/lib/prisma';
@@ -140,4 +141,36 @@ export async function confirmDiscord(code: string, discordUserId: string): Promi
   if (used) return 'otherAccount';
   await prisma.giveawayEntry.update({ where: { code }, data: { discordUserId } });
   return 'confirmed';
+}
+
+export interface LeaderRow {
+  playerName: string;
+  points: number;
+}
+
+/**
+ * The public top recruiters: in-game names and points only, never tags or
+ * emails. Read by the static page, so at most every few minutes.
+ */
+export async function leaderboard(limit = 10): Promise<LeaderRow[]> {
+  const prisma = getPrisma();
+  if (!prisma) return [];
+  const rows = await prisma.giveawayEntry
+    .findMany({
+      where: { giveaway: GIVEAWAY.id },
+      select: { code: true, playerName: true, discordUserId: true, referredBy: true, createdAt: true },
+    })
+    .catch(() => []);
+  const referrals = new Map<string, number>();
+  for (const r of rows) if (r.referredBy) referrals.set(r.referredBy, (referrals.get(r.referredBy) ?? 0) + 1);
+  return rank(
+    rows.map((r) => ({
+      code: r.code,
+      playerName: r.playerName,
+      points: entriesFor(Boolean(r.discordUserId), referrals.get(r.code) ?? 0).total,
+      enteredAt: r.createdAt.getTime(),
+    })),
+  )
+    .slice(0, limit)
+    .map(({ playerName, points }) => ({ playerName, points }));
 }
