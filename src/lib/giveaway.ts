@@ -2,14 +2,16 @@
  * The first BrawlZone giveaway (2026-10-27): rules as code, no server state.
  *
  * A contest, not a draw: points for entering (1), for confirming in the
- * Discord server (+2) and for every friend who enters with your link (+1,
- * no limit). Most points when it closes wins; a tie goes to whoever entered
+ * Discord server (+2), for following on Instagram and TikTok and
+ * subscribing on YouTube (+1 each, on the entrant's word: no platform lets
+ * anyone check) and for every friend who enters with your link (+1, no
+ * limit). Most points when it closes wins; a tie goes to whoever entered
  * first. Nothing is left to luck -- the owner checked Portuguese law, where a
  * prize decided by chance needs a council's authorisation weeks ahead.
  *
- * Following and subscribing are asked for but never rewarded: YouTube
- * treats a rewarded subscription as fake engagement, which would cost the
- * channel the Creator Code this is meant to bring closer.
+ * The YouTube point is the owner's call (2026-10-27), made after being told
+ * YouTube treats a rewarded subscription as fake engagement and that the
+ * Creator Code application could suffer for it.
  *
  * This file has no server imports: the form uses it too.
  */
@@ -40,17 +42,22 @@ export function isOpen(now = Date.now(), g = GIVEAWAY): boolean {
   return now >= Date.parse(g.opensAt) && now < Date.parse(g.closesAt);
 }
 
+export const FOLLOW_PLATFORMS = ['youtube', 'tiktok', 'instagram'] as const;
+export type FollowPlatform = (typeof FOLLOW_PLATFORMS)[number];
+
 export interface EntryCounts {
   base: 1;
   discord: number;
+  follows: number;
   referrals: number;
   total: number;
 }
 
-export function entriesFor(discordConfirmed: boolean, referralCount: number): EntryCounts {
+export function entriesFor(discordConfirmed: boolean, referralCount: number, follows = 0): EntryCounts {
   const discord = discordConfirmed ? DISCORD_BONUS : 0;
   const referrals = Math.max(0, referralCount);
-  return { base: 1, discord, referrals, total: 1 + discord + referrals };
+  const followed = Math.min(FOLLOW_PLATFORMS.length, Math.max(0, follows));
+  return { base: 1, discord, follows: followed, referrals, total: 1 + discord + followed + referrals };
 }
 
 export interface Standing {

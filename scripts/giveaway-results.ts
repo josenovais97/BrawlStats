@@ -26,7 +26,11 @@ async function main(): Promise<void> {
   const ranked = rank(
     rows.map((r) => ({
       ...r,
-      points: entriesFor(Boolean(r.discordUserId), friends.get(r.code)?.length ?? 0).total,
+      points: entriesFor(
+        Boolean(r.discordUserId),
+        friends.get(r.code)?.length ?? 0,
+        Number(r.followedInstagram) + Number(r.followedTiktok) + Number(r.followedYoutube),
+      ).total,
       enteredAt: r.createdAt.getTime(),
     })),
   );

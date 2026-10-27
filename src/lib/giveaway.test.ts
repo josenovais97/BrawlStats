@@ -4,9 +4,11 @@ import { test } from 'node:test';
 import { entriesFor, isCode, isOpen, newCode, normaliseEmail, rank } from '@/lib/giveaway';
 
 test('points: 1 to enter, +2 for Discord, +1 per friend with no cap', () => {
-  assert.deepEqual(entriesFor(false, 0), { base: 1, discord: 0, referrals: 0, total: 1 });
+  assert.deepEqual(entriesFor(false, 0), { base: 1, discord: 0, follows: 0, referrals: 0, total: 1 });
   assert.equal(entriesFor(true, 3).total, 6);
   assert.equal(entriesFor(true, 50).total, 53);
+  assert.equal(entriesFor(false, 0, 2).total, 3, '+1 per followed platform');
+  assert.equal(entriesFor(false, 0, 9).follows, 3, 'never more than the three platforms');
 });
 
 test('codes are eight readable characters', () => {

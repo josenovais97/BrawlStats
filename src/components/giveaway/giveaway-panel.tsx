@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
-import { DISCORD_BONUS, isCode } from '@/lib/giveaway';
+import { DISCORD_BONUS, FOLLOW_PLATFORMS, isCode, type FollowPlatform } from '@/lib/giveaway';
 
 /**
  * The giveaway's interactive half (2026-10-27): the entry form, then the
@@ -23,11 +23,34 @@ interface Status {
   playerName: string;
   playerTag: string;
   discord: boolean;
-  entries: { base: 1; discord: number; referrals: number; total: number };
+  followed: Record<FollowPlatform, boolean>;
+  entries: { base: 1; discord: number; follows: number; referrals: number; total: number };
 }
 
 const KEY = 'bz-giveaway-gw1';
 const DISCORD_URL = 'https://discord.gg/964EMQBBUJ';
+
+/** Where each follow button goes, and its colours (the site's btn-game shape). */
+const FOLLOW: Record<FollowPlatform, { url: string; label: string; done: string; className: string }> = {
+  youtube: {
+    url: 'https://www.youtube.com/@brawlzonenet?sub_confirmation=1',
+    label: 'Subscribe on YouTube',
+    done: 'Subscribed on YouTube',
+    className: 'bg-[#ff0033] text-white [--btn-shadow:#a3001f]',
+  },
+  tiktok: {
+    url: 'https://www.tiktok.com/@brawlzone.net',
+    label: 'Follow on TikTok',
+    done: 'Following on TikTok',
+    className: 'bg-white text-[#10142a] [--btn-shadow:#9aa3c0]',
+  },
+  instagram: {
+    url: 'https://www.instagram.com/brawlzonenet/',
+    label: 'Follow on Instagram',
+    done: 'Following on Instagram',
+    className: 'bg-[#e1306c] text-white [--btn-shadow:#8f1c45]',
+  },
+};
 
 export function GiveawayPanel({ open }: { open: boolean }) {
   const t = useT();
@@ -64,7 +87,7 @@ export function GiveawayPanel({ open }: { open: boolean }) {
   }, []);
 
   if (loading) return <div className="skeleton h-80 rounded-3xl" />;
-  if (status) return <MyEntries status={status} />;
+  if (status) return <MyEntries status={status} onChange={() => load(status.code)} />;
   if (!open) {
     return (
       <div className="rounded-3xl bg-surface p-6 text-center text-muted">{t('Entries are closed.')}</div>
@@ -158,8 +181,21 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
   );
 }
 
-function MyEntries({ status }: { status: Status }) {
+function MyEntries({ status, onChange }: { status: Status; onChange: () => Promise<void> }) {
   const t = useT();
+
+  /* The profile opens in a new tab from the click itself (a popup opened
+     after an await is blocked), and the point is claimed alongside it. */
+  function follow(platform: FollowPlatform) {
+    window.open(FOLLOW[platform].url, '_blank', 'noopener,noreferrer');
+    fetch('/api/giveaway/follow', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code: status.code, platform }),
+    })
+      .then(() => onChange())
+      .catch(() => {});
+  }
   const [copied, setCopied] = useState<string | null>(null);
   const link = `https://brawlzone.net/giveaway?ref=${status.code}`;
   const { entries } = status;
@@ -197,6 +233,21 @@ function MyEntries({ status }: { status: Status }) {
             )
           }
         />
+        {FOLLOW_PLATFORMS.map((p) => (
+          <Row
+            key={p}
+            done={status.followed[p]}
+            label={status.followed[p] ? t(FOLLOW[p].done) : t(FOLLOW[p].label)}
+            value="+1"
+            action={
+              status.followed[p] ? null : (
+                <button type="button" onClick={() => follow(p)} className={`btn-game inline-flex px-4 py-2 ${FOLLOW[p].className}`}>
+                  {t('Follow')}
+                </button>
+              )
+            }
+          />
+        ))}
         <Row
           done={entries.referrals > 0}
           label={t('Friends who entered with your link: {n}', { n: entries.referrals })}

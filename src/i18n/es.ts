@@ -4494,4 +4494,26 @@ export const ES: Record<string, string> = {
     "punto",
   "points":
     "puntos",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), +1 each for subscribing on YouTube, following on TikTok and following on Instagram, and +1 for each friend who enters with your link, with no limit. Follow points are taken on your word, and we may check the winner's.":
+    "1 punto por participar, +{discord} por confirmar tu participación con /giveaway en el servidor de Discord de BrawlZone (una cuenta de Discord por participación), +1 por suscribirte en YouTube, +1 por seguirnos en TikTok, +1 por seguirnos en Instagram, y +1 por cada amigo que entre con tu link, sin límite. Los puntos por seguirnos se dan por tu palabra, y podemos comprobar los del ganador.",
+  "Each follow":
+    "Cada seguimiento",
+  "Follow so you see it the moment it is out, and claim your follow points on your entry page above.":
+    "Síguenos para verlo en cuanto salga, y reclama tus puntos por seguirnos en tu página de participación, arriba.",
+  "Subscribe on YouTube, follow on TikTok and on Instagram: +1 each.":
+    "Suscríbete en YouTube, síguenos en TikTok y en Instagram: +1 cada uno.",
+  "Follow":
+    "Seguir",
+  "Follow on Instagram":
+    "Síguenos en Instagram",
+  "Follow on TikTok":
+    "Síguenos en TikTok",
+  "Subscribe on YouTube":
+    "Suscríbete en YouTube",
+  "Subscribed on YouTube":
+    "Suscrito en YouTube",
+  "Following on TikTok":
+    "Siguiendo en TikTok",
+  "Following on Instagram":
+    "Siguiendo en Instagram",
 };

@@ -710,6 +710,10 @@ model GiveawayEntry {
   email         String
   referredBy    String?  @map("referred_by")
   discordUserId String?  @map("discord_user_id")
+  /// Claimed, not checked: neither platform shows who follows an account.
+  followedInstagram Boolean @default(false) @map("followed_instagram")
+  followedTiktok    Boolean @default(false) @map("followed_tiktok")
+  followedYoutube   Boolean @default(false) @map("followed_youtube")
   ipHash        String   @map("ip_hash")
   createdAt     DateTime @default(now()) @map("created_at")
 

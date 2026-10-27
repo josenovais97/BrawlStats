@@ -14,6 +14,7 @@ import {
   normaliseEmail,
   rank,
   type EntryCounts,
+  type FollowPlatform,
 } from '@/lib/giveaway';
 import { getPrisma } from '@/lib/prisma';
 import { normalizeTag } from '@/lib/tags';
@@ -106,8 +107,12 @@ export interface EntryStatus {
   playerName: string;
   playerTag: string;
   discord: boolean;
+  followed: Record<FollowPlatform, boolean>;
   entries: EntryCounts;
 }
+
+const followCount = (e: { followedInstagram: boolean; followedTiktok: boolean; followedYoutube: boolean }) =>
+  Number(e.followedInstagram) + Number(e.followedTiktok) + Number(e.followedYoutube);
 
 /** What the entrant's own page shows. Never the email. */
 export async function status(code: string): Promise<EntryStatus | null> {
@@ -122,8 +127,27 @@ export async function status(code: string): Promise<EntryStatus | null> {
     playerName: entry.playerName,
     playerTag: entry.playerTag,
     discord: Boolean(entry.discordUserId),
-    entries: entriesFor(Boolean(entry.discordUserId), referrals),
+    followed: { youtube: entry.followedYoutube, tiktok: entry.followedTiktok, instagram: entry.followedInstagram },
+    entries: entriesFor(Boolean(entry.discordUserId), referrals, followCount(entry)),
   };
+}
+
+const FOLLOW_COLUMN = {
+  youtube: 'followedYoutube',
+  tiktok: 'followedTiktok',
+  instagram: 'followedInstagram',
+} as const satisfies Record<FollowPlatform, string>;
+
+/** "I followed": taken on the entrant's word, since no platform can be asked. */
+export async function claimFollow(code: string, platform: FollowPlatform): Promise<boolean> {
+  if (!isOpen() || !isCode(code) || !(platform in FOLLOW_COLUMN)) return false;
+  const prisma = getPrisma();
+  if (!prisma) return false;
+  const { count } = await prisma.giveawayEntry.updateMany({
+    where: { code, giveaway: GIVEAWAY.id },
+    data: { [FOLLOW_COLUMN[platform]]: true },
+  });
+  return count === 1;
 }
 
 export type DiscordResult = 'confirmed' | 'already' | 'unknownCode' | 'otherAccount' | 'closed';
@@ -158,7 +182,16 @@ export async function leaderboard(limit = 10): Promise<LeaderRow[]> {
   const rows = await prisma.giveawayEntry
     .findMany({
       where: { giveaway: GIVEAWAY.id },
-      select: { code: true, playerName: true, discordUserId: true, referredBy: true, createdAt: true },
+      select: {
+        code: true,
+        playerName: true,
+        discordUserId: true,
+        referredBy: true,
+        createdAt: true,
+        followedInstagram: true,
+        followedTiktok: true,
+        followedYoutube: true,
+      },
     })
     .catch(() => []);
   const referrals = new Map<string, number>();
@@ -167,7 +200,7 @@ export async function leaderboard(limit = 10): Promise<LeaderRow[]> {
     rows.map((r) => ({
       code: r.code,
       playerName: r.playerName,
-      points: entriesFor(Boolean(r.discordUserId), referrals.get(r.code) ?? 0).total,
+      points: entriesFor(Boolean(r.discordUserId), referrals.get(r.code) ?? 0, followCount(r)).total,
       enteredAt: r.createdAt.getTime(),
     })),
   )

@@ -46,6 +46,7 @@ export default async function GiveawayPage() {
   const ways = [
     { amount: '+1', title: t('Enter'), body: t('Your player tag and an email to reach you if you win.') },
     { amount: `+${DISCORD_BONUS}`, title: t('Join our Discord'), body: t('Type /giveaway with your code in the BrawlZone server.') },
+    { amount: '+1', title: t('Each follow'), body: t('Subscribe on YouTube, follow on TikTok and on Instagram: +1 each.') },
     { amount: '+1', title: t('Each friend'), body: t('Every friend who enters with your link. No limit.') },
   ];
 
@@ -74,7 +75,7 @@ export default async function GiveawayPage() {
 
       <section className="space-y-4">
         <h2 className="display text-2xl">{t('How to get points')}</h2>
-        <ul className="grid gap-4 sm:grid-cols-3">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ways.map((w) => (
             <li key={w.title} className="reward-tile p-5">
               <p className="display text-game-stroke text-5xl leading-none text-brand">{w.amount}</p>
@@ -92,7 +93,7 @@ export default async function GiveawayPage() {
 
       <section className="rounded-3xl bg-surface p-6 text-center sm:p-8">
         <h2 className="display text-2xl">{t('The winner is revealed in a video')}</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t('Follow so you see it the moment it is out. Following does not change your points.')}</p>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t('Follow so you see it the moment it is out, and claim your follow points on your entry page above.')}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <a href={YOUTUBE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-[#ff0033] px-5 py-3 text-white [--btn-shadow:#a3001f]">YouTube</a>
           <a href={TIKTOK_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-game bg-white px-5 py-3 text-[#10142a] [--btn-shadow:#9aa3c0]">TikTok</a>

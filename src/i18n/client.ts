@@ -878,6 +878,20 @@ export const CLIENT_ES: Record<string, string> = {
     "punto",
   "points":
     "puntos",
+  "Follow":
+    "Seguir",
+  "Follow on Instagram":
+    "Síguenos en Instagram",
+  "Follow on TikTok":
+    "Síguenos en TikTok",
+  "Subscribe on YouTube":
+    "Suscríbete en YouTube",
+  "Subscribed on YouTube":
+    "Suscrito en YouTube",
+  "Following on TikTok":
+    "Siguiendo en TikTok",
+  "Following on Instagram":
+    "Siguiendo en Instagram",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1755,4 +1769,18 @@ export const CLIENT_PT: Record<string, string> = {
     "ponto",
   "points":
     "pontos",
+  "Follow":
+    "Seguir",
+  "Follow on Instagram":
+    "Siga no Instagram",
+  "Follow on TikTok":
+    "Siga no TikTok",
+  "Subscribe on YouTube":
+    "Se inscreva no YouTube",
+  "Subscribed on YouTube":
+    "Inscrito no YouTube",
+  "Following on TikTok":
+    "Seguindo no TikTok",
+  "Following on Instagram":
+    "Seguindo no Instagram",
 };
