@@ -1,12 +1,15 @@
 'use client';
 
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, HelpCircle } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
+import { playerIconUrl } from '@/lib/brawlapi';
 import { DISCORD_BONUS, FOLLOW_PLATFORMS, isCode, type FollowPlatform } from '@/lib/giveaway';
+import { readRecentSearches, serverRecentSearches, subscribeRecentSearches } from '@/lib/recent-searches';
 
 /**
  * The giveaway's interactive half (2026-10-27): the entry form, then the
@@ -115,6 +118,11 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [help, setHelp] = useState(false);
+  // Profiles this browser has looked up: most visitors have searched their own.
+  const recent = useSyncExternalStore(subscribeRecentSearches, readRecentSearches, serverRecentSearches)
+    .filter((r) => r.kind === 'player')
+    .slice(0, 3);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -139,18 +147,48 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
     <form onSubmit={submit} className="space-y-4 rounded-3xl bg-surface p-6 sm:p-8">
       <h2 className="display text-2xl">{t('Enter the giveaway')}</h2>
       {referredBy ? <p className="text-sm text-victory">{t('A friend sent you: entering gives them +1 point.')}</p> : null}
-      <label className="block space-y-1.5">
-        <span className="text-sm font-semibold">{t('Your player tag')}</span>
-        <input
-          value={tag}
-          onChange={(e) => setTag(e.target.value.toUpperCase())}
-          required
-          placeholder="#2PQ8LJ9V"
-          autoCapitalize="characters"
-          spellCheck={false}
-          className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3.5 text-base outline-none focus:border-brand/60"
-        />
-      </label>
+      <div className="space-y-2">
+        <label className="block space-y-1.5">
+          <span className="flex items-center justify-between gap-3 text-sm font-semibold">
+            {t('Your player tag')}
+            <button
+              type="button"
+              onClick={() => setHelp((h) => !h)}
+              aria-expanded={help}
+              className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
+            >
+              <HelpCircle aria-hidden className="size-4" />
+              {t("Where's my tag?")}
+            </button>
+          </span>
+          <input
+            value={tag}
+            onChange={(e) => setTag(e.target.value.toUpperCase())}
+            required
+            placeholder="#2PQ8LJ9V"
+            autoCapitalize="characters"
+            spellCheck={false}
+            className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3.5 text-base outline-none focus:border-brand/60"
+          />
+        </label>
+        {recent.length && !tag ? (
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-muted">{t('Is this you?')}</span>
+            {recent.map((r) => (
+              <button
+                key={r.tag}
+                type="button"
+                onClick={() => setTag(`#${r.tag}`)}
+                className="inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pl-1 pr-3 font-semibold hover:bg-surface-3"
+              >
+                <Image src={playerIconUrl(r.icon)} alt="" width={24} height={24} className="size-6 rounded-full" unoptimized />
+                {r.name ?? `#${r.tag}`}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {help ? <TagHelp /> : null}
+      </div>
       <label className="block space-y-1.5">
         <span className="text-sm font-semibold">{t('Your email, only to tell you if you win')}</span>
         <input
@@ -288,5 +326,33 @@ function Row({ done, label, value, action }: { done: boolean; label: string; val
       {action}
       <span className={`display text-xl ${done ? 'text-victory' : 'text-muted'}`}>{value}</span>
     </li>
+  );
+}
+
+/**
+ * Where the tag is, drawn rather than screenshotted: a mini profile card with
+ * the tag marked, and the three steps. Most kids have never needed their tag,
+ * and not finding it is the likeliest reason to leave without entering.
+ */
+function TagHelp() {
+  const t = useT();
+  return (
+    <div className="space-y-4 rounded-2xl bg-surface-2 p-4">
+      <div className="mx-auto flex w-fit items-center gap-3 rounded-2xl border-[3px] border-[#10142a] bg-[#2b2166] p-3 pr-5 shadow-[0_4px_0_#10142a]">
+        <Image src={playerIconUrl(28000000)} alt="" width={56} height={56} className="size-14 rounded-xl" unoptimized />
+        <div>
+          <p className="display text-lg leading-tight text-white">{t('Your name')}</p>
+          <p className="relative mt-1 inline-block rounded-lg bg-brand px-2 py-0.5 font-mono text-sm font-bold text-brand-ink ring-4 ring-brand/30">
+            #2PQ8LJ9V
+          </p>
+        </div>
+        <span aria-hidden className="display text-3xl text-brand">←</span>
+      </div>
+      <ol className="list-decimal space-y-1.5 pl-5 text-sm">
+        <li>{t('Open Brawl Stars and tap your profile picture, top left.')}</li>
+        <li>{t('Your tag is right under your name. It starts with #.')}</li>
+        <li>{t('Type it here, with or without the #.')}</li>
+      </ol>
+    </div>
   );
 }

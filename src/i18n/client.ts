@@ -892,6 +892,18 @@ export const CLIENT_ES: Record<string, string> = {
     "Siguiendo en TikTok",
   "Following on Instagram":
     "Siguiendo en Instagram",
+  "Where's my tag?":
+    "¿Dónde está mi tag?",
+  "Is this you?":
+    "¿Eres tú?",
+  "Your name":
+    "Tu nombre",
+  "Open Brawl Stars and tap your profile picture, top left.":
+    "Abre Brawl Stars y toca tu foto de perfil, arriba a la izquierda.",
+  "Your tag is right under your name. It starts with #.":
+    "Tu tag está justo debajo de tu nombre. Empieza con #.",
+  "Type it here, with or without the #.":
+    "Escríbelo aquí, con o sin el #.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1783,4 +1795,16 @@ export const CLIENT_PT: Record<string, string> = {
     "Seguindo no TikTok",
   "Following on Instagram":
     "Seguindo no Instagram",
+  "Where's my tag?":
+    "Onde está a minha tag?",
+  "Is this you?":
+    "É você?",
+  "Your name":
+    "Seu nome",
+  "Open Brawl Stars and tap your profile picture, top left.":
+    "Abra o Brawl Stars e toque na sua foto de perfil, no canto superior esquerdo.",
+  "Your tag is right under your name. It starts with #.":
+    "Sua tag fica logo abaixo do seu nome. Começa com #.",
+  "Type it here, with or without the #.":
+    "Digite aqui, com ou sem o #.",
 };

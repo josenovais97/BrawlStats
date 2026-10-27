@@ -4540,4 +4540,16 @@ export const PT: Record<string, string> = {
     "Quando as participações fecharem, um vencedor é sorteado ao acaso conforme os pontos (cada ponto é um bilhete), usando a primeira rodada de aleatoriedade pública do drand depois do encerramento (drand.love). A lista de participantes (tags e pontos, sem emails) e a rodada usada são publicadas para qualquer um conferir. O vencedor é anunciado em um vídeo e no brawlzone.net.",
   "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The winner is checked before being announced.":
     "Tags falsas, emails falsos, tags de outras pessoas ou várias participações da mesma pessoa são removidos, junto com os pontos que tenham trazido. São aceitas no máximo {n} participações por dia da mesma rede. O vencedor é conferido antes de ser anunciado.",
+  "Where's my tag?":
+    "Onde está a minha tag?",
+  "Is this you?":
+    "É você?",
+  "Your name":
+    "Seu nome",
+  "Open Brawl Stars and tap your profile picture, top left.":
+    "Abra o Brawl Stars e toque na sua foto de perfil, no canto superior esquerdo.",
+  "Your tag is right under your name. It starts with #.":
+    "Sua tag fica logo abaixo do seu nome. Começa com #.",
+  "Type it here, with or without the #.":
+    "Digite aqui, com ou sem o #.",
 };
