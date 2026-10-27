@@ -121,6 +121,21 @@ pt_group=$(pt_step group); pt_optin=$(pt_step optin); pt_install=$(pt_step insta
 pt_home=$(pt_from home); pt_panel=$(pt_from panel); pt_bubble=$(pt_from bubble); pt_footer=$(pt_from footer)
 pt_snooze=$(pt_q "event_name = 'playtest_snooze'")
 
+# ---- giveaway (2026-10-27, closes 2026-11-30) --------------------------------
+# Is it bringing people, and is anyone gaming it? Points as the draw counts
+# them (1 + 2 Discord + 1 per follow + 1 per friend). The two "watch" numbers
+# are what cheating looks like: one network close to its daily cap of 3, and
+# one entrant gaining many friends in a day. Names are escaped: they are
+# whatever players typed in game.
+GW="giveaway = 'gw1'"
+gw_people=$(psql "select count(*) || ' (+' || count(*) filter (where created_at > now() - interval '24 hours') || ' today)' from giveaway_entries where $GW;")
+gw_extras=$(psql "select count(discord_user_id) || ' Discord &middot; ' || coalesce(sum(followed_youtube::int + followed_tiktok::int + followed_instagram::int),0) || ' follows &middot; ' || count(referred_by) || ' friends' from giveaway_entries where $GW;")
+gw_top=$(psql "select string_agg(n || ' (' || p || ')', ' &middot; ') from (select replace(replace(replace(e.player_name,'&','&amp;'),'<','&lt;'),'>','&gt;') n, 1 + case when e.discord_user_id is null then 0 else 2 end + e.followed_youtube::int + e.followed_tiktok::int + e.followed_instagram::int + (select count(*) from giveaway_entries r where r.referred_by = e.code) p from giveaway_entries e where e.$GW order by p desc, e.created_at limit 3) t;")
+gw_net=$(psql "select coalesce(max(c),0) from (select count(*) c from giveaway_entries where $GW and created_at > now() - interval '24 hours' group by ip_hash) t;")
+gw_burst=$(psql "select coalesce(max(c),0) from (select count(*) c from giveaway_entries where $GW and referred_by is not null and created_at > now() - interval '24 hours' group by referred_by) t;")
+gw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/es|/pt)?/giveaway';")
+gw_banner=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_banner';")
+
 bans=$(sudo -n fail2ban-client status sshd 2>/dev/null | awk -F'\t' '/Total banned/{print $2}' | tr -d ' ')
 deploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | head -6)
 ndeploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | wc -l)
@@ -157,6 +172,16 @@ html_rows_open
 while IFS=$'\t' read -r net value; do
   [ -n "$net" ] && html_row "$net" "$value"
 done < <(/usr/local/bin/brawlzone-social-stats 2>/dev/null)
+html_rows_close
+
+html_section "Giveaway (ends Nov 30)"
+html_rows_open
+html_row "Entrants" "${gw_people:-?}"
+html_row "Extra points" "${gw_extras:-?}"
+html_row "Most points" "${gw_top:-none yet}"
+html_row "Page visits (24h)" "${gw_visits:-?} &middot; banner clicks ${gw_banner:-?}"
+html_row "Watch: one network today" "${gw_net:-0} entries (cap 3)" "$([ "${gw_net:-0}" -ge 3 ] && echo "$WARN" || echo "$OK")"
+html_row "Watch: friends to one entrant today" "${gw_burst:-0}" "$([ "${gw_burst:-0}" -ge 15 ] && echo "$WARN" || echo "$OK")"
 html_rows_close
 
 html_section "Google Play test (24h / since $PT_SINCE)"
