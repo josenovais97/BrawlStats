@@ -1,11 +1,10 @@
 [Unit]
-Description=Weekly Ranked report, Mondays
+Description=Draw and post the weekly Ranked meta video, Mondays 05:00 UTC
 
 [Timer]
-# Monday 14:10 UTC: two hours after the map-of-the-day post and an hour
-# before the build post, and clear of tiktok-latest at :35 -- every TikTok
-# job refreshes the same rotating token, so no two may overlap.
-OnCalendar=Mon *-*-* 14:10:00
+# Between the 04:17 and 06:17 sampler runs and after the Monday restore
+# check (04:30, seconds long), so ~25 minutes of rendering has the box.
+OnCalendar=Mon *-*-* 05:00:00
 Persistent=false
 Unit=brawlzone-weekly.service
 

@@ -1,78 +1,81 @@
 #!/usr/bin/env bash
-# The weekly Ranked report carousel, made and posted every Monday (2026-10-20).
+# The weekly Ranked meta video (2026-10-27): ~3.5 minutes, a regular YouTube
+# video rather than a Short, so its description links (tier list, draft,
+# rewards, giveaway) and chapters work -- the Shorts' links cannot be tapped.
 #
 #   brawlzone-weekly [--no-post]
 #
-# 1. scripts/weekly-report.ts, in the sampler container, writes this week's
-#    numbers to $DATA/<date>.json.
-# 2. deploy/weekly/make.py draws the slides from that and the newest earlier
-#    file of the same season (so "since last week" is two saved files apart),
-#    into $PUBLIC/<date>/, which Caddy serves at /social/weekly/<date>/.
-# 3. slides.json goes next to them, and brawlzone-tiktok posts it like any
-#    other carousel: TikTok inbox, YouTube Short, Instagram Reel.
-#
-# The week-1 report of Season 50 (2026-10-19) was made by hand; its numbers
-# were saved as the first file in $DATA so week 2 has something to compare.
-#
-# --no-post stops after step 2, for looking at the slides first.
+# Run Mondays at 05:00 UTC by brawlzone-weekly.timer, between the 04:17 and
+# 06:17 sampler runs. Uses today's viral-data snapshot (writing it if the
+# daily job has not yet) and the one from about a week ago for the climbers.
+# deploy/viral/weekly.py draws it; the track loops with crossfades because
+# the video outlasts it. YouTube only (LONG=1), then a mail with the link.
 set -uo pipefail
-
 REPO=/home/ubuntu/brawlstats
-DATA=/var/lib/brawlzone/weekly
-PUBLIC=/var/lib/brawlzone/social/weekly
-CACHE=/var/lib/brawlzone/weekly-cache   # Pillow and brawler portraits
-SITE=https://brawlzone.net
-# Pinned like the ffmpeg image in brawlzone-tiktok: a floating tag would be
-# pulled fresh on the one morning a week this runs.
+ROOT=/var/lib/brawlzone/viral
+CACHE=/var/lib/brawlzone/viral-cache
+PUBLIC=/var/lib/brawlzone/social/viral
+MUSIC="$HOME/youtube-music/Fontana - Ryan Stasik, Kanika Moore.mp3"
 PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
-
+FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
 die() { echo "$*" >&2; exit 1; }
-
+post=1; [ "${1:-}" = "--no-post" ] && post=0
 DAY=$(date -u +%Y-%m-%d)
-mkdir -p "$DATA" "$PUBLIC/$DAY" "$CACHE/icons" "$CACHE/assets" || die "::error::cannot create the weekly directories"
+OUT="$PUBLIC/$DAY-weekly"
+mkdir -p "$ROOT/history" "$OUT" || die "::error::cannot create $OUT"
+[ -r "$MUSIC" ] || die "::error::the track is missing: $MUSIC"
 
-# The sampler run takes both cores for up to an hour; the report's queries
-# are heavy enough to push it past its timeout. Same wait as precompute.
-for _ in $(seq 40); do
-  [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null)" = true ] || break
-  sleep 30
-done
-
-cd "$REPO" || die "::error::no checkout at $REPO"
-docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/weekly-report.ts \
-  > "$DATA/$DAY.json.tmp" 2> "$CACHE/report.err" \
-  || die "::error::weekly-report.ts failed: $(tail -c 600 "$CACHE/report.err")"
-mv "$DATA/$DAY.json.tmp" "$DATA/$DAY.json"
-
-prev=$(find "$DATA" -maxdepth 1 -name '*.json' ! -name "$DAY.json" | sort | tail -n 1)
-echo "this week: $DATA/$DAY.json; compared with: ${prev:-nothing}"
-
-cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
-   "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"
-
-docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
-  -v "$REPO/deploy/weekly:/code:ro" -v "$DATA:/data:ro" -v "$PUBLIC/$DAY:/out" -v "$CACHE:/cache" \
-  "$PYTHON_IMAGE" sh -c '
-    [ -d /cache/py/PIL ] || pip install -q --disable-pip-version-check --target /cache/py pillow >/dev/null 2>&1
-    PYTHONPATH=/cache/py python /code/make.py "/data/$1" "$2" /out /cache/assets /cache/icons' _ \
-  "$DAY.json" "${prev:+/data/$(basename "$prev")}" \
-  > "$CACHE/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$CACHE/make.log")"
-# make.py treats "-" as "no last week"; an empty second argument means the same.
-
-count=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["count"])' "$PUBLIC/$DAY/meta.json") \
-  || die "::error::make.py wrote no meta.json"
-echo "slides drawn: $count"
-
-# The manifest brawlzone-tiktok reads. ?v= keeps a re-run on the same day
-# from being served Cloudflare's copy of the first attempt.
-python3 - "$PUBLIC/$DAY" "$SITE/social/weekly/$DAY" "$(date +%s)" <<'PY' || die "::error::could not write slides.json"
-import json, sys
-out, base, v = sys.argv[1:4]
-meta = json.load(open(f'{out}/meta.json'))
-meta['date'] = out.rsplit('/', 1)[-1]
-meta['slides'] = [f'{base}/{i}.jpg?v={v}' for i in range(1, meta['count'] + 1)]
-json.dump(meta, open(f'{out}/slides.json', 'w'), indent=1)
+if [ ! -s "$ROOT/history/$DAY.json" ]; then
+  (cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/viral-data.ts) \
+    2> "$CACHE/weekly-data.err" | grep '^{' > "$ROOT/history/$DAY.json.new"
+  [ -s "$ROOT/history/$DAY.json.new" ] || die "::error::scripts/viral-data.ts printed nothing: $(tail -c 400 "$CACHE/weekly-data.err")"
+  mv "$ROOT/history/$DAY.json.new" "$ROOT/history/$DAY.json"
+fi
+PREV=$(python3 - "$ROOT/history" "$DAY" <<'PY'
+import datetime, os, sys
+d, today = sys.argv[1], datetime.date.fromisoformat(sys.argv[2])
+best = None
+for f in os.listdir(d):
+    try:
+        age = (today - datetime.date.fromisoformat(f[:10])).days
+    except ValueError:
+        continue
+    if 4 <= age <= 10 and (best is None or abs(age - 7) < abs(best[0] - 7)):
+        best = (age, f)
+print(f'/data/history/{best[1]}' if best else '-')
 PY
+)
 
-[ "${1:-}" = "--no-post" ] && { echo "--no-post: slides at $SITE/social/weekly/$DAY/"; exit 0; }
-exec /usr/local/bin/brawlzone-tiktok weekly "$DAY"
+rm -rf "$OUT/frames"
+pids=(); rc=0
+for part in 0 1; do
+  docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 \
+    -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
+    "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python weekly.py /data/history/$DAY.json $PREV /out" \
+    > "$CACHE/weekly-$part.log" 2>&1 &
+  pids+=($!)
+done
+for p in "${pids[@]}"; do wait "$p" || rc=$?; done
+[ "$rc" = 0 ] || die "::error::weekly.py failed: $(tail -c 600 "$CACHE/weekly-0.log")"
+
+DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"])' "$OUT/meta.json")
+# Three passes of the track, crossfaded: the first from the drop the daily
+# videos use, so the opening lands on the beat.
+docker run --rm --user "$(id -u):$(id -g)" --entrypoint ffmpeg -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
+  -hide_banner -loglevel error -y -framerate 30 -i 'frames/%04d.jpg' \
+  -ss 63.994 -i "/m/$(basename "$MUSIC")" -i "/m/$(basename "$MUSIC")" -i "/m/$(basename "$MUSIC")" \
+  -filter_complex "[1:a][2:a]acrossfade=d=2[ab];[ab][3:a]acrossfade=d=2,volume=0.75,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 2.5))"):d=2.5[a]" \
+  -map 0:v -map '[a]' -t "$DUR" -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p -c:a aac -b:a 160k \
+  -movflags +faststart video.mp4 || die "::error::ffmpeg could not encode the video"
+rm -rf "$OUT/frames"
+echo "video: https://brawlzone.net/social/viral/$DAY-weekly/video.mp4 (${DUR}s)"
+[ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
+
+python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); open(sys.argv[2],"w").write(m["description"]); print(m["title"])' \
+  "$OUT/meta.json" "$OUT/description.txt" > "$OUT/title.txt"
+result=$(LONG=1 /usr/local/bin/brawlzone-youtube "$OUT/video.mp4" "$(cat "$OUT/title.txt")" "$OUT/description.txt") \
+  || die "::error::YouTube upload failed: $result"
+echo "$result"
+url=$(printf '%s\n' "$result" | grep -o 'https://youtube.com/watch?v=[A-Za-z0-9_-]*' | head -1)
+printf 'The weekly Ranked meta video is live:\n%s\n\nPin a comment pointing to it from the newest Shorts, or set it as their related video in YouTube Studio.\n' "$url" \
+  | /usr/local/bin/brawlzone-alert "[brawlzone] Weekly meta video live" || true

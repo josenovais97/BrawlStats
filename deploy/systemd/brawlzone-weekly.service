@@ -1,10 +1,11 @@
 [Unit]
-Description=BrawlZone: weekly Ranked report carousel to TikTok, YouTube and Instagram
-After=docker.service
+Description=BrawlZone: the weekly Ranked meta video (YouTube, Mondays)
+After=docker.service network-online.target
 OnFailure=brawlzone-alert@%n.service
 
 [Service]
 Type=oneshot
 User=ubuntu
+# Data, ~6,400 frames on two cores (~25 min), an encode, one upload.
 TimeoutStartSec=3600
 ExecStart=/usr/local/bin/brawlzone-run weekly /usr/local/bin/brawlzone-weekly
