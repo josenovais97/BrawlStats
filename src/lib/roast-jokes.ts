@@ -35,8 +35,8 @@ export interface Joke {
 
 const RANK_WORDS: Record<Locale, string[]> = {
   en: ['Bronze', 'Silver', 'Gold', 'Diamond', 'Mythic', 'Legendary', 'Masters', 'Pro'],
-  es: ['Bronce', 'Plata', 'Oro', 'Diamante', 'Mítico', 'Legendario', 'Maestro', 'Pro'],
-  pt: ['Bronze', 'Prata', 'Ouro', 'Diamante', 'Mítico', 'Lendário', 'Mestre', 'Pro'],
+  es: ['Bronce', 'Plata', 'Oro', 'Diamante', 'Mítico', 'Legendario', 'Maestros', 'Pro'],
+  pt: ['Bronze', 'Prata', 'Ouro', 'Diamante', 'Mítico', 'Lendário', 'Mestres', 'Pro'],
 };
 
 export function rankName(r: RankedStanding | null, lang: Locale): string {

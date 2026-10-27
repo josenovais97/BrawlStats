@@ -114,8 +114,8 @@ export const ALLOWANCES: Record<string, Allowance> = {
    */
   '/club/scan/': { perSecond: 1, burst: 3 },
 
-  /* No measured demand; moderate cost. */
-  '/compare/players/': { perSecond: 1, burst: 10 },
+  /* No measured demand; moderate cost. Half of its 1/s went to /roast/ (2026-10-27). */
+  '/compare/players/': { perSecond: 0.5, burst: 10 },
 
   /*
    * The most expensive single render left — 3.4s — and no measured demand at
@@ -136,6 +136,14 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * the other per-request renders. Its 1/s came off `/draft/`.
    */
   '/tier-list/maker/image/': { perSecond: 1, burst: 5 },
+
+  /*
+   * Roast My Account (2026-10-27): a player fetch, a battle log and a share
+   * card per roast, like the account value. Half of `/compare/players/`'s 1/s,
+   * which had no measured demand, while it is not public; give it a real
+   * budget at launch by lowering something else, not the ceiling.
+   */
+  '/roast/': { perSecond: 0.5, burst: 5 },
 };
 
 /**
@@ -224,6 +232,7 @@ export const LIMITED_PREFIXES = [
   // A live player fetch per page and per share card, like /player.
   '/account-value/',
   '/tier-list/maker/image/',
+  '/roast/',
 ] as const;
 
 export function isLimitedPath(pathname: string): boolean {

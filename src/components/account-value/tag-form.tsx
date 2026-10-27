@@ -12,7 +12,19 @@ function cleanTag(raw: string): string {
   return raw.trim().replace(/^#/, '').toUpperCase().replace(/\s+/g, '').replace(/O/g, '0');
 }
 
-export function AccountValueForm({ initial = '' }: { initial?: string }) {
+/**
+ * A tag box that opens `<base>/<tag>`. Roast My Account (2026-10-27) uses it
+ * with its own base and button; `cta` arrives already translated.
+ */
+export function AccountValueForm({
+  initial = '',
+  base = '/account-value',
+  cta,
+}: {
+  initial?: string;
+  base?: string;
+  cta?: string;
+}) {
   const t = useT();
   const lp = useLp();
   const router = useRouter();
@@ -24,7 +36,7 @@ export function AccountValueForm({ initial = '' }: { initial?: string }) {
       className="flex w-full max-w-xl flex-col gap-3 sm:flex-row"
       onSubmit={(e) => {
         e.preventDefault();
-        if (valid) router.push(lp(`/account-value/${cleanTag(tag)}`));
+        if (valid) router.push(lp(`${base}/${cleanTag(tag)}`));
       }}
     >
       <input
@@ -40,7 +52,7 @@ export function AccountValueForm({ initial = '' }: { initial?: string }) {
         disabled={!valid}
         className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-opacity disabled:opacity-50"
       >
-        {t('Calculate')}
+        {cta ?? t('Calculate')}
         <ArrowRight aria-hidden className="size-4" />
       </button>
     </form>

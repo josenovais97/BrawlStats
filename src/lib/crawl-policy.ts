@@ -53,6 +53,10 @@ export const CRAWLER_DISALLOW = [
   // One URL per tag, unbounded and unenumerable, each costing an upstream call
   // to render — the same reasoning as /player/.
   '/wrapped/',
+  // Roast My Account, all of it until it launches (lib/roast-data,
+  // ROAST_PUBLIC); at launch this becomes '/roast/', like /account-value's
+  // tag pages, so the landing page can be found.
+  '/roast',
 ] as const;
 
 /**

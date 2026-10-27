@@ -4202,4 +4202,42 @@ export const PT: Record<string, string> = {
     "Depois siga a mesma ordem do jogo. Os banimentos tiram um brawler de todas as listas. Cada escolha inimiga reordena as sugestões pelo desempenho de cada candidato contra ela, e cada escolha aliada pelo desempenho ao lado dela, que é uma pergunta diferente de fazer counter. Cada sugestão mostra quantas batalhas há por trás, então uma amostra pequena fica fácil de notar.",
   "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
     "As mesmas sugestões flutuam por cima do jogo no app BrawlZone Bubble, para você consultar no meio do draft sem sair do Brawl Stars.",
+  "A new roast every day":
+    "Um roast novo todo dia",
+  "Enter your player tag and get roasted by your own stats: your main, your Ranked rank, your last games. A score out of 10 and a card to share.":
+    "Digite sua tag de jogador e seja zoado pelas suas próprias estatísticas: seu main, seu rank no Ranqueado, suas últimas partidas. Uma nota de 0 a 10 e um card para compartilhar.",
+  "Enter your player tag. BrawlZone reads your stats and tells you the truth, with no mercy and a score out of 10.":
+    "Digite sua tag de jogador. O BrawlZone lê suas estatísticas e fala a verdade, sem dó e com uma nota de 0 a 10.",
+  "It is a joke: the roast is about the account and the gameplay, never about the person. It uses the same public stats as your profile. Unofficial fan project, not affiliated with Supercell.":
+    "É uma brincadeira: o roast é sobre a conta e o jeito de jogar, nunca sobre a pessoa. Usa as mesmas estatísticas públicas do seu perfil. Projeto de fãs não oficial, sem vínculo com a Supercell.",
+  "Roast my Brawl Stars account":
+    "Faça um roast na minha conta de Brawl Stars",
+  "Roast my account":
+    "Roast na minha conta",
+  "The same roast all day, so a screenshot is your roast. Tomorrow it may find something else.":
+    "O mesmo roast o dia todo, então um print é o seu roast. Amanhã ele pode achar outra coisa.",
+  "Think your account is good?":
+    "Acha que sua conta é boa?",
+  "Your main, your Ranked rank, your win rate, your club and the brawlers you left at Power 1. Every joke is about a number on your account.":
+    "Seu main, seu rank no Ranqueado, sua taxa de vitória, seu clube e os brawlers que você largou no poder 1. Cada piada vem de um número da sua conta.",
+  "Your real stats":
+    "Suas estatísticas reais",
+  "Your score out of 10 and the best lines, story-sized, for TikTok, Instagram or your club chat.":
+    "Sua nota de 0 a 10 e as melhores frases, no formato de story, para TikTok, Instagram ou o chat do seu clube.",
+  "A new roast every day, from the same public stats as the profile. It is a joke about the account, never about the person. Unofficial fan project, not affiliated with Supercell.":
+    "Um roast novo todo dia, com as mesmas estatísticas públicas do perfil. É uma brincadeira sobre a conta, nunca sobre a pessoa. Projeto de fãs não oficial, sem vínculo com a Supercell.",
+  "Account rating":
+    "Nota da conta",
+  "Roast another account":
+    "Faça um roast em outra conta",
+  "Roast me":
+    "Me zoa",
+  "Roast of {tag}":
+    "Roast de {tag}",
+  "Share my roast":
+    "Compartilhar meu roast",
+  "MY ACCOUNT GOT ROASTED":
+    "MINHA CONTA FOI ZOADA",
+  "Think your account is good? Get roasted.":
+    "Acha que sua conta é boa? Peça seu roast.",
 };

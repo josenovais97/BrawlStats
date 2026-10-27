@@ -293,5 +293,18 @@ export const config = {
     '/pt/compare/players/:path*',
     '/es/wrapped/:path*',
     '/pt/wrapped/:path*',
+    // The account value had a budget in LIMITED_PREFIXES from 2026-10-16 but
+    // was never matched here, so the budget never ran (found 2026-10-27).
+    '/account-value/:path*',
+    '/es/account-value/:path*',
+    '/pt/account-value/:path*',
+    // Roast My Account, the whole section while it is not public (see
+    // ROAST_PUBLIC): the bare /roast too, so crawlers are refused it.
+    '/roast',
+    '/roast/:path*',
+    '/es/roast',
+    '/es/roast/:path*',
+    '/pt/roast',
+    '/pt/roast/:path*',
   ],
 };

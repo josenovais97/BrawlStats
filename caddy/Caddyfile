@@ -165,7 +165,7 @@
 	# and noindex, so refusing these costs search nothing. Per-account pages
 	# are refused the same way: they are uncached renders and live API calls.
 	@no_browser_expensive {
-		path /draft/* /es/draft/* /pt/draft/* /player/* /es/player/* /pt/player/* /club/* /es/club/* /pt/club/* /wrapped/* /es/wrapped/* /pt/wrapped/* /compare/players/* /es/compare/players/* /pt/compare/players/* /account-value/* /es/account-value/* /pt/account-value/*
+		path /draft/* /es/draft/* /pt/draft/* /player/* /es/player/* /pt/player/* /club/* /es/club/* /pt/club/* /wrapped/* /es/wrapped/* /pt/wrapped/* /compare/players/* /es/compare/players/* /pt/compare/players/* /account-value/* /es/account-value/* /pt/account-value/* /roast/* /es/roast/* /pt/roast/*
 		not header_regexp Accept-Language .+
 		# Our own jobs (the account-rating video reads /account-value) come
 		# from this box, through Cloudflare, with curl's headers.
