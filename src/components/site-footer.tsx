@@ -91,6 +91,7 @@ const LINK_GROUPS: { heading: string; links: { href: string; label: string }[] }
   {
     heading: 'Game',
     links: [
+      { href: '/rewards', label: 'Free Rewards' },
       { href: '/events', label: 'Community Events' },
       { href: '/cosmetics', label: 'Cosmetics' },
       { href: '/starr-drops', label: 'Starr Drops' },
@@ -121,7 +122,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
     'Meta Report': 'Informe del meta', 'Hidden Meta': 'Meta oculto', 'Daily Challenge': 'Reto diario',
     'Patch Impact': 'Impacto de parches', 'How Scores Work': 'Cómo funcionan las puntuaciones',
     'Android App': 'App para Android', 'Community Events': 'Eventos de la comunidad', Cosmetics: 'Cosméticos',
-    'Starr Drops': 'Starr Drops', News: 'Noticias', 'Release Notes': 'Notas de versión',
+    'Starr Drops': 'Starr Drops', News: 'Noticias', 'Release Notes': 'Notas de versión', 'Free Rewards': 'Recompensas gratis',
     tagline:
       'Estadísticas de Brawl Stars que te muestran dónde estás. Búsqueda de jugadores y clubes, tier lists y mejores brawlers por mapa, con partidas que recogemos nosotros mismos.',
     follow: 'Síguenos y apóyanos', coffee: 'Invítame a un café', free: 'Gratis y sin pagos.',
@@ -138,7 +139,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
     'Meta Report': 'Relatório do meta', 'Hidden Meta': 'Meta oculto', 'Daily Challenge': 'Desafio diário',
     'Patch Impact': 'Impacto dos patches', 'How Scores Work': 'Como as pontuações funcionam',
     'Android App': 'App para Android', 'Community Events': 'Eventos da comunidade', Cosmetics: 'Cosméticos',
-    'Starr Drops': 'Starr Drops', News: 'Notícias', 'Release Notes': 'Notas de atualização',
+    'Starr Drops': 'Starr Drops', News: 'Notícias', 'Release Notes': 'Notas de atualização', 'Free Rewards': 'Recompensas grátis',
     tagline:
       'Estatísticas de Brawl Stars que mostram onde você está. Busca de jogadores e clubes, tier lists e melhores brawlers por mapa, com partidas que nós mesmos coletamos.',
     follow: 'Siga e apoie', coffee: 'Me pague um café', free: 'Grátis e sem pagamento.',

@@ -202,6 +202,7 @@ title = f"FREE Brawl Stars {'rewards' if n > 1 else 'reward'}: {listed}"[:90]
 description = (
     f"🎁 FREE Brawl Stars {'rewards' if n > 1 else 'reward'}! Claim {listed} before {'they are' if n > 1 else 'it is'} gone 👀\n\n"
     f"Scan the QR {'codes' if n > 1 else 'code'} (screenshot → Google Lens works) or use the {'links' if n > 1 else 'link'}:\n{links}\n\n"
+    "Every free reward in one place, with claim buttons: brawlzone.net/rewards\n"
     "Follow for every free reward the moment it drops, and the best Ranked picks every day.\n"
     "Unofficial fan project, not affiliated with Supercell.\n"
     "#brawlstars #brawlstarsfree #brawlstarsrewards #freerewards #brawlzone"

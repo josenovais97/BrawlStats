@@ -4240,4 +4240,62 @@ export const ES: Record<string, string> = {
     "ME HICIERON UN ROAST",
   "Think your account is good? Get roasted.":
     "¿Crees que tu cuenta es buena? Pide tu roast.",
+  "A new link goes to these the moment it is found, often hours before other sites have it.":
+    "Cada link nuevo llega aquí en cuanto aparece, muchas veces horas antes que en otros sitios.",
+  "Accept the reward in the game. It lands in your account straight away.":
+    "Acepta la recompensa en el juego. Llega a tu cuenta al instante.",
+  "Are there Brawl Stars codes for free gems?":
+    "¿Hay códigos de Brawl Stars para gemas gratis?",
+  "Are these links safe?":
+    "¿Estos links son seguros?",
+  "Claim":
+    "Reclamar",
+  "Discord server":
+    "Servidor de Discord",
+  "Each link works for a limited time and usually once per account. Supercell does not say for how long, so a link here can stop working before it leaves the list. If it has expired, it is gone for everyone.":
+    "Cada link funciona por tiempo limitado y normalmente una vez por cuenta. Supercell no dice cuánto dura, así que un link puede dejar de funcionar antes de salir de la lista. Si expiró, ya no está para nadie.",
+  "Earlier rewards":
+    "Recompensas anteriores",
+  "Every free reward link Supercell gives out, as soon as it appears. Open this page on the phone with Brawl Stars, tap Claim, and the reward goes straight to your account.":
+    "Cada link de recompensa gratis que da Supercell, en cuanto aparece. Abre esta página en el teléfono que tiene Brawl Stars, toca Reclamar y la recompensa va directo a tu cuenta.",
+  "Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No codes, no generators.":
+    "Cada link de recompensa gratis que da Supercell, publicado en cuanto aparece: cajas, créditos, puntos de poder. Toca Reclamar y va a tu cuenta. Sin códigos ni generadores.",
+  "Found in the last {n} days. Claim them before they expire.":
+    "Encontradas en los últimos {n} días. Reclámalas antes de que expiren.",
+  "Found {when}":
+    "Encontrada {when}",
+  "Free Brawl Stars rewards":
+    "Recompensas gratis de Brawl Stars",
+  "Free Brawl Stars rewards today ({v}): every claim link":
+    "Recompensas gratis de Brawl Stars hoy ({v}): todos los links",
+  "Get the next one first":
+    "Recibe la próxima primero",
+  "How to claim a free reward":
+    "Cómo reclamar una recompensa gratis",
+  "No free reward right now.":
+    "Ahora mismo no hay recompensas gratis.",
+  "No. Brawl Stars has no redeem codes. Free rewards come as links from Supercell that open the game and add the reward to your account. Any site that asks for a code, your login or to \"verify\" with a survey to get free gems is a scam.":
+    "No. Brawl Stars no tiene códigos para canjear. Las recompensas gratis llegan como links de Supercell que abren el juego y añaden la recompensa a tu cuenta. Cualquier sitio que pida un código, tu inicio de sesión o \"verificar\" con una encuesta para darte gemas gratis es una estafa.",
+  "Older than {n} days. They may have expired, but some still work, so try them.":
+    "De hace más de {n} días. Puede que hayan expirado, pero algunas todavía funcionan, así que pruébalas.",
+  "Open this page on the phone where Brawl Stars is installed and logged in to your account.":
+    "Abre esta página en el teléfono donde tienes Brawl Stars instalado y con tu cuenta abierta.",
+  "Playing on more than one account? The game claims it for the one that is open, so switch first.":
+    "¿Juegas con más de una cuenta? El juego la reclama para la que está abierta, así que cambia primero.",
+  "Rewards are given by Supercell, not by BrawlZone, and Supercell decides how long each one lasts. Unofficial fan project, not affiliated with Supercell.":
+    "Las recompensas las da Supercell, no BrawlZone, y Supercell decide cuánto dura cada una. Proyecto de fans no oficial, sin afiliación con Supercell.",
+  "Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.":
+    "Supercell las lanza unas cuantas veces al mes, muchas veces durante eventos. Síguenos abajo y te enterarás de la próxima en cuanto aparezca.",
+  "Supercell shares them on its own channels, often during events or after a live stream. BrawlZone checks for new ones every few minutes and posts them here and on Discord, WhatsApp, YouTube, TikTok and Instagram.":
+    "Supercell los comparte en sus propios canales, muchas veces durante eventos o después de una transmisión en vivo. BrawlZone busca links nuevos cada pocos minutos y los publica aquí y en Discord, WhatsApp, YouTube, TikTok e Instagram.",
+  "Tap Claim. The link opens Brawl Stars by itself.":
+    "Toca Reclamar. El link abre Brawl Stars solo.",
+  "They are Supercell's own links, from link.brawlstars.com or store.supercell.com, and this page shows no other kind. Claiming opens Brawl Stars and never asks for your password. BrawlZone never asks for your account either.":
+    "Son links de la propia Supercell, de link.brawlstars.com o store.supercell.com, y esta página no muestra ningún otro tipo. Reclamar abre Brawl Stars y nunca pide tu contraseña. BrawlZone tampoco te pide nunca tu cuenta.",
+  "WhatsApp channel":
+    "Canal de WhatsApp",
+  "Where do the links come from?":
+    "¿De dónde salen los links?",
+  "Why does the game say the reward expired or was already claimed?":
+    "¿Por qué el juego dice que la recompensa expiró o ya fue reclamada?",
 };

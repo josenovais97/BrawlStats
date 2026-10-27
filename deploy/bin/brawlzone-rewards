@@ -146,7 +146,8 @@ call('POST', f'/channels/{chan}/messages', {
     'embeds': [{
         'title': f"🎁 Free Brawl Stars {'rewards' if n > 1 else 'reward'}",
         'description': f"Tap {'each link' if n > 1 else 'the link'} and claim it in the game while it lasts:\n\n{lines}\n\n"
-                       f"On PC? Scan the QR {'codes' if n > 1 else 'code'} below with your phone.",
+                       f"On PC? Scan the QR {'codes' if n > 1 else 'code'} below with your phone.\n"
+                       "Every free reward in one place: https://brawlzone.net/rewards",
         'color': 0xFFC72C,
         'image': {'url': f"{base}/{n + 2 if n > 1 else 2}.jpg"},
         'footer': {'text': 'Official Supercell links · BrawlZone is an unofficial fan project'},

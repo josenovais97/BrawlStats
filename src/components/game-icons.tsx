@@ -1,3 +1,4 @@
+import { Gift } from 'lucide-react';
 import Image from 'next/image';
 
 import { prestigeTier } from '@/lib/prestige';
@@ -367,4 +368,13 @@ export function PrestigeIcon({
   return (
     <GameIcon src={`/icons/prestige-${tier}.png`} alt={t('Prestige')} className={className} />
   );
+}
+
+/**
+ * Free rewards (2026-10-27). No game asset fits: every box and currency icon
+ * here already names something else in the menu, so a plain gift mark in the
+ * brand colour, sized like the others.
+ */
+export function RewardsIcon({ className }: IconProps) {
+  return <Gift aria-hidden className={`${className} text-brand`} strokeWidth={2.4} />;
 }

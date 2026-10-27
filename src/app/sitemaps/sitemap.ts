@@ -158,6 +158,8 @@ async function core(add: Add, dataDay: Date | null) {
   add('/meta-score', 'monthly', 0.75, EVERGREEN);
   add('/comps', 'daily', 0.8);
   add('/starr-drops', 'weekly', 0.8, EVERGREEN);
+  // Changes whenever Supercell drops a link; daily is the honest cadence.
+  add('/rewards', 'daily', 0.8);
   add('/draft', 'weekly', 0.8);
   // Was hourly for the live rotation; it now changes when the wiki's
   // community-event write-ups do.
