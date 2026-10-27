@@ -26,7 +26,7 @@ export function generateMetadata(): Metadata {
   return {
     alternates: { canonical: '/giveaway' },
     title: t('Brawl Stars giveaway: win a €10 gift card for the Brawl Pass'),
-    description: t('Free to enter with your player tag. Get points on Discord and for every friend you bring. Most points wins.'),
+    description: t('Free to enter with your player tag. Get points on Discord, for following and for every friend you bring. More points, more chances.'),
     ...(GIVEAWAY_PUBLIC ? {} : { robots: { index: false, follow: false } }),
   };
 }
@@ -90,7 +90,7 @@ export default async function GiveawayPage() {
             </li>
           ))}
         </ul>
-        <p className="text-sm text-muted">{t('No luck involved: whoever has the most points when it ends wins. A tie goes to whoever entered first.')}</p>
+        <p className="text-sm text-muted">{t('Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.')}</p>
       </section>
 
       <section id="enter" className="mx-auto max-w-xl">
@@ -111,7 +111,7 @@ export default async function GiveawayPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="display text-2xl">{t('Top recruiters right now')}</h2>
+        <h2 className="display text-2xl">{t('Most points right now')}</h2>
         {top.length ? (
           <ol className="divide-y divide-border overflow-hidden rounded-2xl bg-surface">
             {top.map((row, i) => (
@@ -126,7 +126,7 @@ export default async function GiveawayPage() {
           <p className="rounded-2xl bg-surface p-5 text-sm text-muted">{t('Nobody yet. Enter now and you are first.')}</p>
         )}
         <p className="text-sm text-muted">
-          {t('Updated every few minutes. Leaders are checked for fake or duplicate friends before the winner is announced.')}{' '}
+          {t('More points, more chances. The winner is drawn at random when it ends, with a public random number nobody can know in advance, so nobody can rig it, us included.')}{' '}
           <Link href={lp('/giveaway/rules')} className="font-semibold text-brand hover:underline">{t('Read the full rules')}</Link>
         </p>
       </section>

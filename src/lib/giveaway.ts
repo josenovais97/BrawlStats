@@ -1,13 +1,16 @@
 /**
  * The first BrawlZone giveaway (2026-10-27): rules as code, no server state.
  *
- * A contest, not a draw: points for entering (1), for confirming in the
+ * A raffle: points for entering (1), for confirming in the
  * Discord server (+2), for following on Instagram and TikTok and
  * subscribing on YouTube (+1 each, on the entrant's word: no platform lets
  * anyone check) and for every friend who enters with your link (+1, no
- * limit). Most points when it closes wins; a tie goes to whoever entered
- * first. Nothing is left to luck -- the owner checked Portuguese law, where a
- * prize decided by chance needs a council's authorisation weeks ahead.
+ * limit). Each point is a ticket: the winner is drawn at random, weighted by
+ * points, from a public randomness beacon (drand) at the first round after
+ * the close, so nobody -- us included -- could know it while entries were
+ * open; lib/giveaway-draw and scripts/giveaway-draw.ts. The owner chose a
+ * raffle over a most-points contest knowing a chance prize in Portugal can
+ * need a council's authorisation.
  *
  * The YouTube point is the owner's call (2026-10-27), made after being told
  * YouTube treats a rewarded subscription as fake engagement and that the

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { entriesFor, isCode, isOpen, newCode, normaliseEmail, rank } from '@/lib/giveaway';
+import { drawWinner } from '@/lib/giveaway-draw';
 
 test('points: 1 to enter, +2 for Discord, +1 per friend with no cap', () => {
   assert.deepEqual(entriesFor(false, 0), { base: 1, discord: 0, follows: 0, referrals: 0, total: 1 });
@@ -40,4 +41,19 @@ test('most points wins; a tie goes to whoever entered first', () => {
     { code: 'C', playerName: 'early tie', points: 9, enteredAt: 10 },
   ];
   assert.deepEqual(rank(rows).map((r) => r.playerName), ['early tie', 'late tie', 'low']);
+});
+
+test('the draw is deterministic, order-proof and weighted by points', () => {
+  const tickets = [
+    { code: 'AAAAAAAA', playerTag: '#A', entries: 1 },
+    { code: 'BBBBBBBB', playerTag: '#B', entries: 9 },
+  ];
+  const r = 'ab'.repeat(32);
+  const one = drawWinner(tickets, r);
+  assert.deepEqual(drawWinner([...tickets].reverse(), r), one, 'input order does not matter');
+  let b = 0;
+  for (let i = 0; i < 2000; i++) {
+    if (drawWinner(tickets, i.toString(16).padStart(64, '0')).winner.code === 'BBBBBBBB') b++;
+  }
+  assert.ok(b > 1700 && b < 1900, String(b));
 });

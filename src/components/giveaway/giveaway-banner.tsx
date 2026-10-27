@@ -29,7 +29,7 @@ export function GiveawayBanner({ from }: { from: string }) {
         <span className="display text-game-stroke block text-xl leading-tight text-white sm:text-3xl">
           {t('Giveaway: win a €10 gift card')}
         </span>
-        <span className="mt-1 block text-sm text-white/80">{t('Free to enter. Most points wins. Bring your friends.')}</span>
+        <span className="mt-1 block text-sm text-white/80">{t('Free to enter. More points, more chances. Bring your friends.')}</span>
       </span>
       <span className="btn-game hidden shrink-0 bg-[#3ddc63] px-5 py-3 text-lg text-[#0b2a14] [--btn-shadow:#1a7a33] sm:inline-flex">
         {t('Enter free')}

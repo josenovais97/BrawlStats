@@ -85,7 +85,7 @@ async function giveawayCommand(raw: string, userId: string, home: boolean): Prom
     case 'otherAccount':
       return 'That code, or your Discord account, is already used for another entry. One Discord account per entry.';
     case 'closed':
-      return 'The giveaway is closed. The winner is announced soon!';
+      return 'The giveaway is closed. Good luck in the draw!';
     default:
       return 'That code was not found. It is the 8 letters on your entry page at https://brawlzone.net/giveaway';
   }

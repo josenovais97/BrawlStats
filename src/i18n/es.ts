@@ -4526,4 +4526,18 @@ export const ES: Record<string, string> = {
     "Las participaciones abren el {time}.",
   "Brawl Pass":
     "Brawl Pass",
+  "Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.":
+    "Cada punto es un boleto en el sorteo: alguien con 10 puntos tiene 10 veces más posibilidades de ganar que alguien con 1.",
+  "Most points right now":
+    "Más puntos ahora mismo",
+  "More points, more chances. The winner is drawn at random when it ends, with a public random number nobody can know in advance, so nobody can rig it, us included.":
+    "Más puntos, más posibilidades. El ganador se sortea al azar al final, con un número aleatorio público que nadie puede conocer de antemano, así que nadie puede trucarlo, ni nosotros.",
+  "Free to enter with your player tag. Get points on Discord, for following and for every friend you bring. More points, more chances.":
+    "Participa gratis con tu tag de jugador. Consigue puntos en Discord, por seguirnos y por cada amigo que traigas. Más puntos, más posibilidades.",
+  "Free to enter. More points, more chances. Bring your friends.":
+    "Participar es gratis. Más puntos, más posibilidades. Trae a tus amigos.",
+  "After entries close, one winner is drawn at random, weighted by points (each point is one ticket), using the first drand public randomness round after the close (drand.love). The entry list (tags and points, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "Cuando se cierren las participaciones, se sortea un ganador al azar según los puntos (cada punto es un boleto), con la primera ronda de aleatoriedad pública de drand después del cierre (drand.love). Se publican la lista de participantes (tags y puntos, sin emails) y la ronda usada, para que cualquiera pueda comprobarlo. El ganador se anuncia en un video y en brawlzone.net.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The winner is checked before being announced.":
+    "Los tags falsos, los emails falsos, los tags de otras personas o varias participaciones de una misma persona se eliminan, junto con los puntos que hayan traído. Se aceptan como máximo {n} participaciones al día desde una misma red. El ganador se revisa antes de anunciarlo.",
 };
