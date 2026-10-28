@@ -8,6 +8,10 @@ kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
                  (2026-10-28): "Guess the brawler by its SHADOW #N" and "from
                  this ZOOM #N", their own episode numbers, the same answer
                  history as the quiz so no brawler repeats across the three.
+         giveaway  the weekly giveaway reminder (2026-10-28, Fridays at 14:00
+                 until it closes): the prize, the days left, how to enter.
+                 Never asks for a subscription: YouTube counts rewarded
+                 subscriptions as fake engagement. Exits 3 once it has closed.
          broken  "Who got BROKEN this week?": the three biggest win-rate
                  climbers and the two biggest fallers, last 3 days against the
                  same 3 days a week before (prev.json; without one, against
@@ -1087,10 +1091,115 @@ def stop_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ giveaway
+GW_END = (2026, 11, 30)  # draw at 20:00 UTC, lib/giveaway
+
+if KIND == 'giveaway':
+    import datetime
+    DAYS = (datetime.date(*GW_END) - datetime.date.today()).days
+    if DAYS < 1:
+        print('the giveaway has closed'); sys.exit(3)
+    tl.add(4, 'g_intro')
+    tl.add(3, 'g_days')
+    tl.add(7, 'g_how')
+    tl.add(4, 'g_more')
+    tl.add(5, 'g_outro')
+    last = DAYS <= 3
+    META = {
+        'title': (f'LAST CHANCE: free Brawl Pass giveaway ends in {DAYS} days 🎁 #Shorts' if last
+                  else f'FREE Brawl Pass giveaway 🎁 {DAYS} days left! #Shorts'),
+        'titles': {'pt-BR': (f'ÚLTIMA CHANCE: sorteio grátis do Brawl Pass acaba em {DAYS} dias 🎁 #Shorts' if last
+                             else f'Sorteio GRÁTIS do Brawl Pass 🎁 Faltam {DAYS} dias! #Shorts'),
+                   'es-419': (f'ÚLTIMA OPORTUNIDAD: el sorteo gratis del Brawl Pass termina en {DAYS} días 🎁 #Shorts' if last
+                              else f'Sorteo GRATIS del Brawl Pass 🎁 ¡Quedan {DAYS} días! #Shorts')},
+        'description': 'Win a €10 Google Play or App Store gift card, enough for the Brawl Pass. Free to enter, '
+                       'no login: just your player tag. More points = more chances: +2 for joining our Discord, '
+                       '+1 for every friend who enters with your link. Drawn on Nov 30 at 20:00 UTC with public '
+                       'randomness anyone can check.\n\n'
+                       f'Enter: https://brawlzone.net/giveaway\nRules: https://brawlzone.net/giveaway/rules{FOOTER}\n'
+                       '#brawlstars #brawlpass #giveaway #brawlstarsgiveaway #brawlzone',
+    }
+
+
+_prize = []
+def prize_art(w):
+    """The Brawl Pass ticket the owner supplied (in the cache), else a box."""
+    if not _prize:
+        for name in ('brawl-pass.png', 'box-rainbow.png'):
+            path = f"{os.environ.get('ASSETS', '.')}/{name}"
+            if os.path.exists(path):
+                _prize.append(Image.open(path).convert('RGBA')); break
+    if not _prize: return None
+    im = _prize[0]
+    return im.resize((w, int(im.height * w / im.width)), Image.LANCZOS)
+
+
+GW_PURPLE = (150, 90, 255)
+def fit(txt, size, maxw, *a, **kw):
+    """text_sprite, made smaller until it is at most maxw wide."""
+    sp = text_sprite(txt, size, *a, **kw)
+    return sp if sp.width <= maxw else text_sprite(txt, int(size * maxw / sp.width), *a, **kw)
+
+
+def giveaway_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    canvas = background(t, GW_PURPLE).convert('RGBA')
+    if k == 'g_intro':
+        put_rays(canvas, GOLD_TOP, t, W / 2, 1150, speed=14, alpha=0.7)
+        slam(canvas, 'FREE', 260, None, W / 2, 420, bt, gold=True)
+        slam(canvas, 'GIVEAWAY', 190, WHITE, W / 2, 640, bt - 1)
+        a = prize_art(700)
+        if a is not None and bt > 1.6:
+            put(canvas, a, W / 2, 1150 + 14 * math.sin(t * 3), scale=out_back((bt - 1.6) / 0.5, 1.8), rot=-4)
+        if bt > 2.6:
+            put(canvas, pill('WIN THE BRAWL PASS', (255, 60, 100), size=74), W / 2, 1560, scale=out_back((bt - 2.6) / 0.4, 2.0), rot=-3)
+        shake, flash = hits(bt, (0, 1, 1.6, 2.6), 1.2, 0.45)
+    elif k == 'g_days':
+        put_rays(canvas, (255, 60, 100), t, W / 2, 820, speed=30, alpha=0.8)
+        last = DAYS <= 3
+        if last: slam(canvas, 'LAST CHANCE', 150, (255, 90, 110), W / 2, 420, bt)
+        n = text_sprite(str(DAYS), 520, gold=True, stroke=16)
+        put(canvas, n, W / 2, 830, scale=1 + 0.9 * (1 - out_back(bt / 0.45, 1.4)) + 0.04 * math.sin(t * 8))
+        slam(canvas, 'DAYS LEFT' if DAYS != 1 else 'DAY LEFT', 170, WHITE, W / 2, 1180, bt - 0.8)
+        if bt > 1.6:
+            put(canvas, pill('ENDS NOV 30', (40, 50, 110), size=70), W / 2, 1420, scale=out_back((bt - 1.6) / 0.4))
+        shake, flash = hits(bt, (0, 0.8), 1.4, 0.5)
+    elif k == 'g_how':
+        slam(canvas, 'HOW TO ENTER', 150, None, W / 2, 380, bt, gold=True)
+        steps = [('1', 'GO TO', 'BRAWLZONE.NET/GIVEAWAY'), ('2', 'TYPE YOUR', 'PLAYER TAG'), ('3', "DONE! IT'S", 'FREE')]
+        for i, (num, a, b) in enumerate(steps):
+            u = bt - 0.8 - i * 1.6
+            if u < 0: continue
+            y = 700 + i * 360
+            put(canvas, pill(num, (255, 60, 100), size=110), 150, y, scale=out_back(u / 0.35, 2.0))
+            put(canvas, text_sprite(a, 64, (220, 210, 255), stroke=6), 610, y - 55, scale=out_back((u - 0.1) / 0.35))
+            put(canvas, fit(b, 110, 740, WHITE, stroke=8), 610, y + 40, scale=out_back((u - 0.15) / 0.35))
+            if u < 0.4: shake = max(shake, impact(u * tl.step, 0.8))
+    elif k == 'g_more':
+        slam(canvas, 'MORE POINTS', 170, WHITE, W / 2, 520, bt)
+        slam(canvas, '= MORE CHANCES', 130, None, W / 2, 720, bt - 0.7, gold=True)
+        for i, (txt, col) in enumerate((('+2 JOIN OUR DISCORD', (88, 101, 242)), ('+1 PER FRIEND', (60, 200, 120)))):
+            u = bt - 1.4 - i * 0.5
+            if u > 0: put(canvas, pill(txt, col, size=80), W / 2, 1060 + i * 200, scale=out_back(u / 0.4, 2.0), rot=(-3 if i else 3))
+        shake, flash = hits(bt, (0, 0.7, 1.4, 1.9), 1.0, 0.35)
+    else:  # g_outro
+        mark = False
+        confetti(canvas, lt)
+        bounce = abs(math.sin(bt * math.pi)) * 26
+        put(canvas, fit('ENTER NOW', 230, 960, gold=True), W / 2, 460 - bounce, scale=out_back(bt / 0.5))
+        put(canvas, fit('BRAWLZONE.NET/GIVEAWAY', 92, 960, WHITE, stroke=8), W / 2, 680, scale=out_back((bt - 0.6) / 0.4))
+        if bt > 1.1: arrow(canvas, W / 2, 880 + abs(math.sin(t * 6)) * 40)
+        a = prize_art(420)
+        if a is not None and bt > 1.4: put(canvas, a, W / 2, 1150, scale=out_back((bt - 1.4) / 0.4), rot=4 * math.sin(t * 2))
+        follow_cta(canvas, bt - 2.4, 1500, 'FOR THE WINNER ON NOV 30')
+        shake, flash = hits(bt, (0, 0.6), 0.8, 0.3)
+    return finish(canvas, shake, flash, mark)
+
+
 # ================================================================ render
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
-         'stop': stop_scene}[KIND]
+         'stop': stop_scene, 'giveaway': giveaway_scene}[KIND]
 
 
 def frame(t):

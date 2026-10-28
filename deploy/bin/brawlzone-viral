@@ -28,6 +28,8 @@
 #
 #   Mon broken  Tue stop  Wed ranks  Thu classrank  Fri classrank  Sat modes  Sun everyrank
 #
+# Fridays until the giveaway closes (2026-11-30) are its reminder instead.
+#
 # everyrank is "Every brawler ranked from worst to best" (the channel's best
 # Short so far, now weekly), classrank the same countdown for one class or
 # rarity at a time, stop "STOP picking these brawlers". Each has its own
@@ -78,14 +80,15 @@ if [ "$kind" = extra ]; then
     1) kind=broken ;;
     2) kind=stop ;;
     3) kind=ranks ;;
+    5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway; else kind=classrank; fi ;;
     6) kind=modes ;;
     7) kind=everyrank ;;
     *) kind=classrank ;;
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank or stop)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop or giveaway)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -98,7 +101,7 @@ elif [ "$kind" = daily ]; then
   DATA_IN=/out/daily.json
   PREV=-
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
-     || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ]; then
+     || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
 else
@@ -113,7 +116,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank')
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -125,6 +128,9 @@ MUSIC="$MUSIC_DIR/${TR[0]}" MUSIC_START="${TR[1]}"
 echo "music: $TRACK"
 cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
    "$REPO/public/bubble/app-icon.png" "$CACHE/" || die "::error::fonts or icon missing from the checkout"
+# The giveaway's prize art: the owner's Brawl Pass in $CACHE/brawl-pass.png when
+# present, else this box (make.py prize_art).
+cp "$REPO/public/rewards/box-rainbow.png" "$CACHE/" 2>/dev/null
 
 if [ "$kind" = daily ]; then
   # The puzzle as the site serves it right now: four zoom steps and the
@@ -216,7 +222,7 @@ draw () { # kind
 }
 
 draw "$kind"; rc=$?
-if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ]; }; then
+if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ]; }; then
   # The 14:00 slot falls back to the full countdown, which always has data,
   # not to the quiz the 15:30 slot may already be posting today.
   echo "$(tail -n 1 "$CACHE/make-0.log"); drawing everyrank instead"

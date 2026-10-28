@@ -40,6 +40,7 @@ def kind(text):
     """Which format a post is, from its own title or caption."""
     t = (text or '').lower()
     rules = [
+        ('giveaway', r'giveaway'),
         ('rewards', r'free brawl stars reward|mega box|voucher|free reward'),
         # The daily viral series (brawlzone-viral), one line per format, so the
         # weakest can give its weekday to the strongest.
