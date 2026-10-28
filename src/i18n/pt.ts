@@ -4584,4 +4584,16 @@ export const PT: Record<string, string> = {
     "Novo no Google Play",
   "The best picks for your map and what beats the enemy, floating over Brawl Stars while you draft. Free, no ads.":
     "Os melhores brawlers para o seu mapa e o que ganha do inimigo, flutuando sobre o Brawl Stars enquanto você escolhe. Grátis, sem anúncios.",
+  "Already in the group? You are not counted yet.":
+    "Já está no grupo? Você ainda não conta.",
+  "Google only counts you after step 2: tap here and then \"Become a tester\".":
+    "O Google só conta você depois do passo 2: toque aqui e depois em \"Tornar-se testador\".",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone. Then come back to this page: you are not a tester until step 2.":
+    "Abra o grupo e toque em \"Participar do grupo\". Use a mesma conta Google da Play Store do seu celular. Depois volte para esta página: você só vira testador no passo 2.",
+  "Joined the group? You are not a tester yet.":
+    "Entrou no grupo? Você ainda não é testador.",
+  "One more tap: Google only counts you after step 2.":
+    "Mais um toque: o Google só conta você depois do passo 2.",
+  "Step 2: Become a tester":
+    "Passo 2: Torne-se testador",
 };

@@ -920,6 +920,12 @@ export const CLIENT_ES: Record<string, string> = {
     "Te avisaremos",
   "Checked for new rewards {when}. New ones show up here within minutes.":
     "Buscamos recompensas nuevas {when}. Las nuevas aparecen aquí en minutos.",
+  "Joined the group? You are not a tester yet.":
+    "¿Te uniste al grupo? Todavía no eres tester.",
+  "One more tap: Google only counts you after step 2.":
+    "Un toque más: Google solo te cuenta después del paso 2.",
+  "Step 2: Become a tester":
+    "Paso 2: Hazte tester",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1839,4 +1845,10 @@ export const CLIENT_PT: Record<string, string> = {
     "Aviso ativado",
   "Checked for new rewards {when}. New ones show up here within minutes.":
     "Procuramos recompensas novas {when}. As novas aparecem aqui em minutos.",
+  "Joined the group? You are not a tester yet.":
+    "Entrou no grupo? Você ainda não é testador.",
+  "One more tap: Google only counts you after step 2.":
+    "Mais um toque: o Google só conta você depois do passo 2.",
+  "Step 2: Become a tester":
+    "Passo 2: Torne-se testador",
 };

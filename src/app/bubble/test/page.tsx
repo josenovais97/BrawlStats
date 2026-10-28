@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { StepTwoNudge } from '@/components/bubble/step-two-nudge';
 import { GooglePlayBadge, PlayMark } from '@/components/store-badges';
 import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
 import { localePath } from '@/lib/i18n';
@@ -52,7 +53,7 @@ export default function BubbleTestPage() {
       ),
       where: 'Google Groups',
       title: t('Join the testers group'),
-      body: t('Open the group and tap "Join group". Use the same Google account as the Play Store on your phone.'),
+      body: t('Open the group and tap "Join group". Use the same Google account as the Play Store on your phone. Then come back to this page: you are not a tester until step 2.'),
       href: PLAY_TEST.groupUrl,
       cta: t('Join the group'),
       event: 'group',
@@ -122,6 +123,22 @@ export default function BubbleTestPage() {
               >
                 {t('Start with step 1')}
                 <ArrowRight aria-hidden className="size-4" />
+              </a>
+              {/* Half of those who joined the group never opted in (see StepTwoNudge). */}
+              <a
+                href={PLAY_TEST.optInUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="playtest_step"
+                data-umami-event-step="optin"
+                data-umami-event-from="hero"
+                className="flex w-full items-center gap-3 rounded-xl border-2 border-victory/60 bg-victory/10 p-4 text-sm transition-colors hover:bg-victory/20"
+              >
+                <span className="flex-1">
+                  <span className="block font-bold text-victory">{t('Already in the group? You are not counted yet.')}</span>
+                  <span className="text-muted">{t('Google only counts you after step 2: tap here and then "Become a tester".')}</span>
+                </span>
+                <ArrowRight aria-hidden className="size-5 shrink-0 text-victory" />
               </a>
             </div>
           ) : (
@@ -198,6 +215,8 @@ export default function BubbleTestPage() {
           {t('Then Google reviews the app for everyone. Every tester who stays the two weeks brings that day closer.')}
         </p>
       </section>
+
+      {open ? <StepTwoNudge optInUrl={PLAY_TEST.optInUrl} /> : null}
 
       {/* The three steps. */}
       <section id="steps" className="scroll-mt-24 space-y-5">
