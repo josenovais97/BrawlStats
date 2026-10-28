@@ -57,6 +57,15 @@ const nextConfig: NextConfig = {
         source: '/downloads/brawlzone-bubble.apk',
         headers: [{ key: 'Cache-Control', value: 'no-store' }],
       },
+      /*
+       * The notification service worker (2026-10-28): browsers fetch it past
+       * their own cache, but Cloudflare held it for four hours, so a fix to
+       * how notifications look would reach phones half a day late.
+       */
+      {
+        source: '/sw.js',
+        headers: [{ key: 'Cache-Control', value: 'no-cache' }],
+      },
     ];
   },
 

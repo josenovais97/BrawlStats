@@ -16,8 +16,10 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title || '🎁 New free Brawl Stars reward', {
       body: data.body || 'Tap to claim it before it expires.',
-      icon: '/bubble/app-icon.png',
-      badge: '/bubble/app-icon.png',
+      icon: '/apple-icon.png',
+      // The small status-bar icon: Android paints every opaque pixel white, so
+      // it must be a silhouette on transparency, not the square app icon.
+      badge: '/notification-badge.png',
       tag: data.tag || 'brawlzone-reward',
       renotify: true,
       data: { url: data.url || '/rewards' },
