@@ -944,6 +944,8 @@ export const CLIENT_ES: Record<string, string> = {
     "Busca por nombre o tag. Tu tag está en tu perfil del juego, justo debajo de tu icono.",
   "Your name or tag":
     "Tu nombre o tag",
+  "Tick this box to enter.":
+    "Marca esta casilla para participar.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1887,4 +1889,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Busque por nome ou tag. Sua tag está no seu perfil do jogo, logo abaixo do seu ícone.",
   "Your name or tag":
     "Seu nome ou tag",
+  "Tick this box to enter.":
+    "Marque esta caixa para participar.",
 };

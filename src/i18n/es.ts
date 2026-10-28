@@ -4614,4 +4614,6 @@ export const ES: Record<string, string> = {
     "Busca por nombre o tag. Tu tag está en tu perfil del juego, justo debajo de tu icono.",
   "Your name or tag":
     "Tu nombre o tag",
+  "Tick this box to enter.":
+    "Marca esta casilla para participar.",
 };

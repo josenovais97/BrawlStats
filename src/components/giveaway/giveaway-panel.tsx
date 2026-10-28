@@ -119,6 +119,10 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [help, setHelp] = useState(false);
+  // The box was only checked on the server, whose small red line above the
+  // button people missed (2026-10-28: 5 of 6 tries that day were refused,
+  // one player gave up after three taps). Now it is checked here first.
+  const [missingConsent, setMissingConsent] = useState(false);
   // Profiles this browser has looked up: most visitors have searched their own.
   const recent = useSyncExternalStore(subscribeRecentSearches, readRecentSearches, serverRecentSearches)
     .filter((r) => r.kind === 'player')
@@ -126,6 +130,11 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!consent) {
+      setMissingConsent(true);
+      window.umami?.track('giveaway_error', { code: 'consent-local' });
+      return;
+    }
     setBusy(true);
     setError(null);
     const res = await fetch('/api/giveaway/enter', {
@@ -139,6 +148,8 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
       await onEntered(body.code);
     } else {
       setError(t(ERRORS[body?.error ?? 'unavailable'] ?? ERRORS.unavailable));
+      // Which refusal, so a form that fails people shows up in the numbers.
+      window.umami?.track('giveaway_error', { code: String(body?.error ?? 'network') });
     }
     setBusy(false);
   }
@@ -200,13 +211,26 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
           className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3.5 text-base outline-none focus:border-brand/60"
         />
       </label>
-      <label className="flex items-start gap-3 text-sm">
-        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[var(--brand)]" />
+      <label
+        className={`flex items-start gap-3 rounded-xl text-sm transition-colors ${missingConsent ? 'bg-defeat/15 p-3 ring-2 ring-defeat' : ''}`}
+      >
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => {
+            setConsent(e.target.checked);
+            if (e.target.checked) setMissingConsent(false);
+          }}
+          className="mt-0.5 size-6 shrink-0 accent-[var(--brand)]"
+        />
         <span>
           {t('I am 13 or older (under 18: a parent knows I am entering) and I accept the')}{' '}
           <Link href={lp('/giveaway/rules')} className="font-semibold text-brand underline">{t('giveaway rules')}</Link>.
         </span>
       </label>
+      {missingConsent ? (
+        <p className="text-sm font-semibold text-defeat" role="alert">{t('Tick this box to enter.')}</p>
+      ) : null}
       {error ? <p className="rounded-xl bg-defeat/15 px-4 py-3 text-sm text-defeat" role="alert">{error}</p> : null}
       <button
         type="submit"
