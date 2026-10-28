@@ -904,6 +904,10 @@ export const CLIENT_ES: Record<string, string> = {
     "Tu tag está justo debajo de tu nombre. Empieza con #.",
   "Type it here, with or without the #.":
     "Escríbelo aquí, con o sin el #.",
+  "Win the Brawl Pass: free giveaway, more points = more chances.":
+    "Gana el Brawl Pass: sorteo gratis, más puntos = más posibilidades.",
+  "Enter now":
+    "Participa ya",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1807,4 +1811,8 @@ export const CLIENT_PT: Record<string, string> = {
     "Sua tag fica logo abaixo do seu nome. Começa com #.",
   "Type it here, with or without the #.":
     "Digite aqui, com ou sem o #.",
+  "Win the Brawl Pass: free giveaway, more points = more chances.":
+    "Ganhe o Brawl Pass: sorteio grátis, mais pontos = mais chances.",
+  "Enter now":
+    "Participe agora",
 };

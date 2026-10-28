@@ -4552,4 +4552,8 @@ export const ES: Record<string, string> = {
     "Tu tag está justo debajo de tu nombre. Empieza con #.",
   "Type it here, with or without the #.":
     "Escríbelo aquí, con o sin el #.",
+  "Win the Brawl Pass: free giveaway, more points = more chances.":
+    "Gana el Brawl Pass: sorteo gratis, más puntos = más posibilidades.",
+  "Enter now":
+    "Participa ya",
 };
