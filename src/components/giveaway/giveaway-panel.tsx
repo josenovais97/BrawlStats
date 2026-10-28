@@ -257,6 +257,25 @@ function MyEntries({ status, onChange }: { status: Status; onChange: () => Promi
         </p>
       </div>
 
+      {/* First after the total (2026-10-28): on day one nobody had used it at the bottom. */}
+      <div className="space-y-3 rounded-2xl border-2 border-brand/60 bg-brand/10 p-4">
+        <p className="font-semibold">{t('Your friend link: +1 point for every friend who enters with it')}</p>
+        <div className="flex gap-2">
+          <input readOnly value={link} className="min-w-0 flex-1 rounded-xl bg-background px-3 py-2.5 text-sm" onFocus={(e) => e.currentTarget.select()} />
+          <button type="button" onClick={() => copy(link, 'link')} className="btn-game inline-flex items-center gap-1.5 bg-brand px-4 text-brand-ink">
+            {copied === 'link' ? <Check aria-hidden className="size-4" /> : <Copy aria-hidden className="size-4" />}
+            {copied === 'link' ? t('Copied') : t('Copy')}
+          </button>
+        </div>
+        <a
+          href={`https://wa.me/?text=${share}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-game flex w-full items-center justify-center bg-[#25d366] py-3 text-lg text-[#06260f] [--btn-shadow:#12803c]"
+        >
+          {t('Send on WhatsApp')}
+        </a>
+      </div>
       <ul className="space-y-3">
         <Row done label={t('Entered the giveaway')} value="+1" />
         <Row
@@ -293,24 +312,6 @@ function MyEntries({ status, onChange }: { status: Status; onChange: () => Promi
         />
       </ul>
 
-      <div className="space-y-3 rounded-2xl bg-surface-2 p-4">
-        <p className="font-semibold">{t('Your friend link: +1 point for every friend who enters with it')}</p>
-        <div className="flex gap-2">
-          <input readOnly value={link} className="min-w-0 flex-1 rounded-xl bg-background px-3 py-2.5 text-sm" onFocus={(e) => e.currentTarget.select()} />
-          <button type="button" onClick={() => copy(link, 'link')} className="btn-game inline-flex items-center gap-1.5 bg-brand px-4 text-brand-ink">
-            {copied === 'link' ? <Check aria-hidden className="size-4" /> : <Copy aria-hidden className="size-4" />}
-            {copied === 'link' ? t('Copied') : t('Copy')}
-          </button>
-        </div>
-        <a
-          href={`https://wa.me/?text=${share}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-game flex w-full items-center justify-center bg-[#25d366] py-3 text-lg text-[#06260f] [--btn-shadow:#12803c]"
-        >
-          {t('Send on WhatsApp')}
-        </a>
-      </div>
       <p className="text-xs text-muted">{t('Keep this page: it is saved in this browser, and the link with your code always shows it.')}</p>
     </div>
   );
