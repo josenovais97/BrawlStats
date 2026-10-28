@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { SITE_URL, USER_AGENT } from '@/lib/site';
+import { WIKI_API, fetchWikiJson } from '@/lib/wiki';
 
 /**
  * The free reward links Supercell hands out, for /rewards (2026-10-27).
@@ -32,15 +33,13 @@ export const LIVE_DAYS = 7;
 const OFFICIAL = /^https:\/\/(link\.brawlstars\.com|store\.supercell\.com)\//;
 
 /**
- * Art for what a reward gives. Boxes are Brawlify's box icons (MIT, the
- * same CDN as the gadget and gear marks), kept in public/rewards so they never
- * depend on someone else's CDN; currencies reuse the site's own icons. Matched
- * on the name the job saw ("Mega Box", "1000 Power Points"). A brawler's own
- * box ("1x Vince Box") is a box too: the brawler's portrait was tried and is
- * exactly what Brawlify lacks for a new brawler, which is when those boxes
- * are given out. Anything unknown gets the rainbow box.
+ * Art we ship ourselves, for when the wiki has nothing better. Boxes are
+ * Brawlify's box icons (MIT, the same CDN as the gadget and gear marks), kept
+ * in public/rewards; currencies reuse the site's own icons. Matched loosely on
+ * the name the job saw, so "Legendary Starr Drop", which has no art of its
+ * own on the wiki, still gets a Starr Drop.
  */
-const ART: [RegExp, string][] = [
+const LOCAL_ART: [RegExp, string][] = [
   [/mega box/i, '/rewards/box-red.png'],
   [/big box/i, '/rewards/box-pink.png'],
   [/starr drop/i, '/icons/starr-drop.png'],
@@ -48,14 +47,100 @@ const ART: [RegExp, string][] = [
   [/coin/i, '/icons/coin.png'],
   [/box/i, '/rewards/box-blue.png'],
 ];
-const FALLBACK = '/rewards/box-rainbow.png';
 
+/**
+ * A gift of our own drawing, for a reward nothing matches.
+ *
+ * It was the rainbow box until 2026-10-28, when a Chaos Drop went out and the
+ * page showed it as a box: a specific item's art on the wrong reward reads as
+ * a promise. A plain gift says "a reward" and nothing more.
+ */
+const FALLBACK = '/rewards/gift.png';
+
+/** Our own art for a reward, or the gift. The wiki's comes first; see `withArt`. */
 export function rewardArt(name: string): string {
-  return ART.find(([re]) => re.test(name))?.[1] ?? FALLBACK;
+  return LOCAL_ART.find(([re]) => re.test(name))?.[1] ?? FALLBACK;
+}
+
+/**
+ * "1x Chaos Drop" -> "Chaos Drop", "2000 Credits" -> "Credits".
+ *
+ * Supercell's vouchers are named by what they give, with a count in front or
+ * behind; the art is for the thing, not the count.
+ */
+export function rewardBase(name: string): string {
+  return name
+    .replace(/^\s*\d[\d,.]*\s*[x×]?\s*/i, '')
+    .replace(/\s*[x×]\s*\d+\s*$/i, '')
+    .trim();
+}
+
+/**
+ * Wiki file names worth trying for a reward, best first.
+ *
+ * The wiki names most items' art after the item ("Chaos Drop.png",
+ * "Vince Box.png"); currencies are the exception and have `Icon-` files that
+ * are the in-game marks rather than a pile of them.
+ */
+const WIKI_ALIAS: Record<string, string> = {
+  gem: 'Icon-Gem.png',
+  credit: 'Icon-Credit.png',
+  bling: 'Icon-Bling.png',
+  coin: 'Icon-Coin.png',
+  'power point': 'Icon-Power Point.png',
+  'xp doubler': 'XP Doubler.png',
+};
+
+export function wikiArtCandidates(name: string): string[] {
+  const base = rewardBase(name);
+  if (!base) return [];
+  // "Boxes" -> "Box", "Credits" -> "Credit"; "Bling" and "Brawl Pass" stay.
+  const one = base.replace(/(box)es$/i, '$1').replace(/([^s])s$/i, '$1');
+  const title = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const alias = WIKI_ALIAS[one.toLowerCase()];
+  return [...new Set([...(alias ? [alias] : []), `${title(base)}.png`, `${title(one)}.png`])];
+}
+
+interface ImageInfoResponse {
+  query?: {
+    normalized?: { from: string; to: string }[];
+    pages?: Record<string, { title?: string; imageinfo?: { url?: string; thumburl?: string }[] }>;
+  };
+}
+
+/**
+ * Each reward's art: the wiki's own image when it has one, else ours.
+ *
+ * One API call for every candidate of every reward, cached for a day: the
+ * names in the feed change a few times a month and the art behind a name
+ * almost never. The images load from the wiki's CDN in the reader's browser,
+ * as the Starr Drops page's do; a failed lookup costs the art, never the page.
+ */
+async function withArt(items: Omit<FreeReward, 'art'>[]): Promise<FreeReward[]> {
+  const wanted = [...new Set(items.flatMap((r) => wikiArtCandidates(r.name)))].slice(0, 50);
+  const found = new Map<string, string>();
+  if (wanted.length > 0) {
+    const body = await fetchWikiJson<ImageInfoResponse>(
+      `${WIKI_API}?action=query&titles=${encodeURIComponent(wanted.map((f) => `File:${f}`).join('|'))}` +
+        '&prop=imageinfo&iiprop=url&iiurlwidth=320&format=json',
+      86_400,
+    );
+    const asked = new Map((body?.query?.normalized ?? []).map((n) => [n.to, n.from]));
+    for (const page of Object.values(body?.query?.pages ?? {})) {
+      const info = page.imageinfo?.[0];
+      const src = info?.thumburl ?? info?.url;
+      if (!page.title || !src) continue;
+      found.set((asked.get(page.title) ?? page.title).replace(/^File:/, ''), src);
+    }
+  }
+  return items.map((r) => ({
+    ...r,
+    art: wikiArtCandidates(r.name).map((f) => found.get(f)).find(Boolean) ?? rewardArt(r.name),
+  }));
 }
 
 export async function getFreeRewards(): Promise<{ live: FreeReward[]; earlier: FreeReward[] }> {
-  let items: FreeReward[] = [];
+  let items: Omit<FreeReward, 'art'>[] = [];
   try {
     const res = await fetch(`${SITE_URL}/social/rewards/latest.json`, {
       headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
@@ -63,15 +148,15 @@ export async function getFreeRewards(): Promise<{ live: FreeReward[]; earlier: F
       next: { revalidate: 300 },
     });
     if (res.ok) {
-      const feed = (await res.json()) as { items?: FreeReward[] };
+      const feed = (await res.json()) as { items?: Omit<FreeReward, 'art'>[] };
       items = (feed.items ?? []).filter((r) => r && typeof r.name === 'string' && OFFICIAL.test(r.url));
     }
   } catch {
     // An empty page that says "nothing right now" beats an error page.
   }
-  items = items.map((r) => ({ ...r, art: rewardArt(r.name) }));
+  const withArtwork = await withArt(items);
   const cutoff = Date.now() - LIVE_DAYS * 86_400_000;
-  const newest = [...items].sort((a, b) => Date.parse(b.postedAt) - Date.parse(a.postedAt));
+  const newest = [...withArtwork].sort((a, b) => Date.parse(b.postedAt) - Date.parse(a.postedAt));
   return {
     live: newest.filter((r) => Date.parse(r.postedAt) >= cutoff),
     earlier: newest.filter((r) => Date.parse(r.postedAt) < cutoff),
