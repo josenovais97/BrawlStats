@@ -4596,4 +4596,10 @@ export const ES: Record<string, string> = {
     "Un toque más: Google solo te cuenta después del paso 2.",
   "Step 2: Become a tester":
     "Paso 2: Hazte tester",
+  "Get a notification on this phone the moment a new free reward appears, often hours before other sites have it. No account, turn it off any time.":
+    "Recibe una notificación en este teléfono en cuanto aparezca una nueva recompensa gratis, muchas veces horas antes que en otros sitios. Sin cuenta, la desactivas cuando quieras.",
+  "Not now":
+    "Ahora no",
+  "🎁 Claimed! Want the next one first?":
+    "🎁 ¡Reclamada! ¿Quieres la próxima antes que nadie?",
 };

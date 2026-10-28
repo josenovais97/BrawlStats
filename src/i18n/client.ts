@@ -926,6 +926,12 @@ export const CLIENT_ES: Record<string, string> = {
     "Un toque más: Google solo te cuenta después del paso 2.",
   "Step 2: Become a tester":
     "Paso 2: Hazte tester",
+  "Get a notification on this phone the moment a new free reward appears, often hours before other sites have it. No account, turn it off any time.":
+    "Recibe una notificación en este teléfono en cuanto aparezca una nueva recompensa gratis, muchas veces horas antes que en otros sitios. Sin cuenta, la desactivas cuando quieras.",
+  "Not now":
+    "Ahora no",
+  "🎁 Claimed! Want the next one first?":
+    "🎁 ¡Reclamada! ¿Quieres la próxima antes que nadie?",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1851,4 +1857,10 @@ export const CLIENT_PT: Record<string, string> = {
     "Mais um toque: o Google só conta você depois do passo 2.",
   "Step 2: Become a tester":
     "Passo 2: Torne-se testador",
+  "Get a notification on this phone the moment a new free reward appears, often hours before other sites have it. No account, turn it off any time.":
+    "Receba uma notificação neste celular assim que aparecer uma nova recompensa grátis, muitas vezes horas antes dos outros sites. Sem conta, desative quando quiser.",
+  "Not now":
+    "Agora não",
+  "🎁 Claimed! Want the next one first?":
+    "🎁 Resgatada! Quer a próxima antes de todo mundo?",
 };

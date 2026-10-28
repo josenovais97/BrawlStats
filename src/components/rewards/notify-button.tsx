@@ -19,7 +19,16 @@ function keyBytes(b64u: string): Uint8Array {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
-export function NotifyButton({ vapidKey }: { vapidKey: string }) {
+export function NotifyButton({
+  vapidKey,
+  from = 'page',
+  onSubscribed,
+}: {
+  vapidKey: string;
+  /** Where the tap came from, for the Umami event. */
+  from?: string;
+  onSubscribed?: () => void;
+}) {
   const t = useT();
   const lang = useLocale();
   const [state, setState] = useState<State>('loading');
@@ -59,6 +68,7 @@ export function NotifyButton({ vapidKey }: { vapidKey: string }) {
         body: JSON.stringify({ subscription: sub.toJSON(), lang }),
       });
       setState(res.ok ? 'on' : 'off');
+      if (res.ok) onSubscribed?.();
     } catch {
       setState('off');
     }
@@ -108,6 +118,7 @@ export function NotifyButton({ vapidKey }: { vapidKey: string }) {
       onClick={turnOn}
       disabled={state === 'busy'}
       data-umami-event="rewards_notify"
+      data-umami-event-from={from}
       className="btn-game inline-flex items-center gap-2 bg-brand px-5 py-3 text-brand-ink disabled:opacity-60"
     >
       <BellRing aria-hidden className="size-5" />

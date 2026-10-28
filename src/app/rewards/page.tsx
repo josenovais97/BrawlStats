@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ChevronDown } from 'lucide-react';
 
 import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
+import { ClaimNudge } from '@/components/rewards/claim-nudge';
 import { LastChecked } from '@/components/rewards/last-checked';
 import { NotifyButton } from '@/components/rewards/notify-button';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
@@ -65,6 +66,7 @@ export default async function RewardsPage() {
     <div className="space-y-12">
       <JsonLd data={breadcrumbSchema([{ name: 'Free rewards', path: '/rewards' }])} />
       <JsonLd data={faqSchema(faq)} />
+      <ClaimNudge vapidKey={process.env.VAPID_PUBLIC_KEY ?? ''} />
 
       <div className="max-w-2xl space-y-2">
         <h1 className="display text-3xl leading-tight sm:text-4xl">{t('Free Brawl Stars rewards')}</h1>
@@ -127,7 +129,7 @@ export default async function RewardsPage() {
                   <p className="truncate font-semibold">{r.name}</p>
                   <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(r.postedAt)) })}</p>
                 </div>
-                <a href={r.url} target="_blank" rel="noopener noreferrer nofollow" className="shrink-0 text-sm font-semibold text-brand hover:underline">
+                <a href={r.url} target="_blank" rel="noopener noreferrer nofollow" data-claim data-umami-event="reward_claim" data-umami-event-from="earlier" className="shrink-0 text-sm font-semibold text-brand hover:underline">
                   {t('Try it')}
                 </a>
               </li>
@@ -243,6 +245,9 @@ function ClaimButton({ url, small = false }: { url: string; small?: boolean }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer nofollow"
+      data-claim
+      data-umami-event="reward_claim"
+      data-umami-event-from={small ? 'tile' : 'hero'}
       className={`btn-game inline-flex items-center justify-center bg-[#3ddc63] text-[#0b2a14] [--btn-shadow:#1a7a33] hover:bg-[#52e676] ${
         small ? 'px-4 py-2 text-base' : 'w-full px-8 py-4 text-3xl'
       }`}
