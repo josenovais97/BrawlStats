@@ -66,6 +66,9 @@ except (OSError, ValueError):
 
 
 batches = []
+# Whether any source was actually read this run: /rewards shows "checked N
+# minutes ago" from it (2026-10-28), so a run where both failed must not count.
+read_ok = False
 
 # ---- brawlnetwork.com/rewards
 if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
@@ -79,6 +82,7 @@ if time.time() - state.get('polled_brawlnetwork', 0) >= 600:
         print(f'::warning::brawlnetwork.com: {e}', file=sys.stderr)
         page = ''
     if page:
+        read_ok = True
         text = re.sub(r'<script.*?</script>|<style.*?</style>', ' ', page, flags=re.S)
         # Each card reads "<name> | Added: October 21st, 2026 | ... | <a href=link>".
         flat = html.unescape(re.sub(r'\s+', ' ', re.sub(r'<(?!a\b)[^>]+>', ' | ', text)))
@@ -153,8 +157,17 @@ if os.environ.get('DISCORD_TOKEN') and os.environ.get('DISCORD_GUILD'):
                     batches.append('\t'.join(arg(n, u) for u, n in list(found.items())[:4]))
                     seen |= {key(u) for u in found}
             state['last_id'] = str(last)
+            read_ok = True
     except Exception as e:  # noqa: BLE001
         print(f'::warning::Discord: {e}', file=sys.stderr)
+
+if read_ok:
+    checked = '/var/lib/brawlzone/social/rewards/checked.json'
+    try:
+        json.dump({'checkedAt': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}, open(checked + '.tmp', 'w'))
+        os.replace(checked + '.tmp', checked)
+    except OSError as e:
+        print(f'::warning::checked.json: {e}', file=sys.stderr)
 
 json.dump(state, open(state_path + '.tmp', 'w')); os.replace(state_path + '.tmp', state_path)
 print('\n'.join(batches))

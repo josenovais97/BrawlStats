@@ -918,6 +918,8 @@ export const CLIENT_ES: Record<string, string> = {
     "Desactivar",
   "You will be notified":
     "Te avisaremos",
+  "Checked for new rewards {when}. New ones show up here within minutes.":
+    "Buscamos recompensas nuevas {when}. Las nuevas aparecen aquí en minutos.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1835,4 +1837,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Desativar",
   "You will be notified":
     "Aviso ativado",
+  "Checked for new rewards {when}. New ones show up here within minutes.":
+    "Procuramos recompensas novas {when}. As novas aparecem aqui em minutos.",
 };

@@ -4576,4 +4576,6 @@ export const PT: Record<string, string> = {
     "Desativar",
   "You will be notified":
     "Aviso ativado",
+  "Checked for new rewards {when}. New ones show up here within minutes.":
+    "Procuramos recompensas novas {when}. As novas aparecem aqui em minutos.",
 };

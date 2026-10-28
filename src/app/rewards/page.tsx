@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ChevronDown } from 'lucide-react';
 
 import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
+import { LastChecked } from '@/components/rewards/last-checked';
 import { NotifyButton } from '@/components/rewards/notify-button';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { relativeTime } from '@/lib/format';
@@ -68,6 +69,7 @@ export default async function RewardsPage() {
       <div className="max-w-2xl space-y-2">
         <h1 className="display text-3xl leading-tight sm:text-4xl">{t('Free Brawl Stars rewards')}</h1>
         <p className="text-muted">{t('Every free reward link Supercell gives out, as soon as it appears. Open this page on the phone with Brawl Stars, tap Claim, and the reward goes straight to your account.')}</p>
+        <LastChecked />
       </div>
 
       {hero ? <RewardStage reward={hero} total={live.length} /> : <EmptyStage />}

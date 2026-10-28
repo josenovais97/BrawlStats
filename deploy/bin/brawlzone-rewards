@@ -126,6 +126,13 @@ mapfile -t NAMES < <(python3 -c 'import json,sys; [print(r["name"]) for r in jso
 (cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/push-rewards.ts "${NAMES[@]}") 2>&1 \
   | grep -E '^push:' || echo "::warning::push notifications not sent (not fatal)"
 
+# Bing (and through it DuckDuckGo and ChatGPT search) straight away rather
+# than at brawlzone-indexnow's 07:40 batch (2026-10-28): a reward link is
+# news for a few days, and the page that lists it changed just now.
+curl -s -o /dev/null -w 'indexnow: HTTP %{http_code}\n' --max-time 20 -H 'Content-Type: application/json' \
+  -d '{"host":"brawlzone.net","key":"7c5d42c3d2b23f04c659bb537275876b","urlList":["https://brawlzone.net/rewards","https://brawlzone.net/es/rewards","https://brawlzone.net/pt/rewards"]}' \
+  https://api.indexnow.org/IndexNow || echo "::warning::indexnow not reached (not fatal)"
+
 # Discord first: the links are clickable there, and it takes a second.
 DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
 DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')
