@@ -10,12 +10,18 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageChops
 
 W, H, FPS = 1080, 1920, 30
-# Every cut lands on the beat of one track: "Fontana" (129 BPM), from the
-# YouTube Audio Library, cut in at MUSIC_START. Its period came from
-# ~/shots/viral2/beats.py (onset autocorrelation).
-MUSIC = 'Fontana - Ryan Stasik, Kanika Moore.mp3'
-MUSIC_START = 63.994
-P = 0.4644
+# Every cut lands on the beat of the track in $TRACK (tracks.json beside this
+# file; Fontana, 129 BPM, when unset), from the YouTube Audio Library, cut in
+# at its `start`. Fontana's period came from ~/shots/viral2/beats.py; the
+# others (2026-10-28) from librosa's beat tracker, keeping only tracks whose
+# beats sit within ~40 ms of a straight grid -- a track that drifts puts
+# every cut visibly off the music.
+TRACKS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tracks.json')))
+_track = TRACKS[os.environ.get('TRACK') or 'fontana']
+MUSIC, MUSIC_START, P = _track['file'], _track['start'], _track['period']
+# Every format was paced against Fontana's beat; Timeline rescales to it so a
+# faster or slower track keeps the video about as long.
+BASE_P = 0.4644
 # Fonts, the app icon, and per-brawler art (models/, faces/), all under ASSETS.
 ASSETS = os.environ.get('ASSETS', '.')
 NAVY = (9, 12, 26)
@@ -266,6 +272,12 @@ class Timeline:
 
     def __init__(self, pace=1, hold=1.0):
         self.segments, self.beats = [], 0
+        scale = BASE_P / P
+        if pace > 1:
+            # Steps stay on the beat or the half beat, as near Fontana's length as that allows.
+            pace = max(1.0, round(pace * scale * 2) / 2)
+        else:
+            hold *= scale
         self.step = P * pace
         self.hold = hold
 

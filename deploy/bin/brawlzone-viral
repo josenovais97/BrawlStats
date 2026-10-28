@@ -53,7 +53,7 @@ ROOT=/var/lib/brawlzone/viral
 CACHE=/var/lib/brawlzone/viral-cache     # fonts, icon, models/, faces/, py/
 PUBLIC=/var/lib/brawlzone/social/viral    # served at https://brawlzone.net/social/viral/
 SITE=https://brawlzone.net
-MUSIC="$HOME/youtube-music/Fontana - Ryan Stasik, Kanika Moore.mp3"
+MUSIC_DIR="$HOME/youtube-music"
 PYTHON_IMAGE="python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1"
 FFMPEG_IMAGE="lscr.io/linuxserver/ffmpeg:9.0-cli-ls84"
 
@@ -107,7 +107,22 @@ else
 fi
 FOLDER=${OUT#/var/lib/brawlzone/social/}
 mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::cannot create $ROOT or $OUT"
+# The music (2026-10-28, owner: "it's always the same"): the tracks in
+# deploy/viral/tracks.json in turn by day, the 14:00 slot one ahead of the
+# others so the two videos of a day differ. TRACK=<name> overrides.
+TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
+import datetime, json, sys
+names = sorted(json.load(open(sys.argv[1])))
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank')
+print(names[(datetime.date.today().toordinal() + extra) % len(names)])
+PY
+)}
+mapfile -t TR < <(python3 -c 'import json,sys; t=json.load(open(sys.argv[1]))[sys.argv[2]]; print(t["file"]); print(t["start"])' \
+  "$REPO/deploy/viral/tracks.json" "$TRACK" 2>/dev/null)
+[ "${#TR[@]}" = 2 ] || die "::error::unknown track '$TRACK'"
+MUSIC="$MUSIC_DIR/${TR[0]}" MUSIC_START="${TR[1]}"
 [ -r "$MUSIC" ] || die "::error::the track is missing: $MUSIC"
+echo "music: $TRACK"
 cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.ttf" \
    "$REPO/public/bubble/app-icon.png" "$CACHE/" || die "::error::fonts or icon missing from the checkout"
 
@@ -190,7 +205,7 @@ draw () { # kind
   # and the site keeps serving on whatever they leave.
   local pids=() rc=0 part
   for part in 0 1; do
-    docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 \
+    docker run --rm --cpus=0.9 --user "$(id -u):$(id -g)" -e ASSETS=/cache -e PART=$part -e PARTS=2 -e TRACK="$TRACK" \
       -v "$REPO/deploy/viral:/code:ro" -v "$CACHE:/cache" -v "$ROOT:/data" -v "$OUT:/out" -w /code \
       "$PYTHON_IMAGE" sh -c "PYTHONPATH=/cache/py python make.py $1 $DATA_IN $PREV /data/state.json /out" \
       > "$CACHE/make-$part.log" 2>&1 &
@@ -216,10 +231,10 @@ DUR=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["duration"
 frames=$(find "$OUT/frames" -name '*.jpg' | wc -l)
 [ "$frames" -gt 100 ] || die "::error::only $frames frames were drawn"
 
-# The cuts are on the beat of this track from MUSIC_START (engine.py). The
+# The cuts are on the beat of $TRACK from its start (tracks.json). The
 # fade-out is the last 1.5 seconds; the music's own loudness is left alone.
 docker run --rm --user "$(id -u):$(id -g)" -v "$OUT:/w" -v "$(dirname "$MUSIC"):/m:ro" -w /w "$FFMPEG_IMAGE" \
-  -hide_banner -loglevel error -y -framerate 30 -i 'frames/%04d.jpg' -ss 63.994 -i "/m/$(basename "$MUSIC")" \
+  -hide_banner -loglevel error -y -framerate 30 -i 'frames/%04d.jpg' -ss "$MUSIC_START" -i "/m/$(basename "$MUSIC")" \
   -filter_complex "[1:a]volume=0.9,afade=t=in:d=0.15,afade=t=out:st=$(python3 -c "print(max(0, $DUR - 1.5))"):d=1.5[a]" \
   -map 0:v -map '[a]' -t "$DUR" -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -c:a aac -b:a 160k \
   -movflags +faststart video.mp4 \
