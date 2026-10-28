@@ -4602,4 +4602,16 @@ export const ES: Record<string, string> = {
     "Ahora no",
   "🎁 Claimed! Want the next one first?":
     "🎁 ¡Reclamada! ¿Quieres la próxima antes que nadie?",
+  "Enter your name or tag to search.":
+    "Escribe tu nombre o tag para buscar.",
+  "No player with that name here yet. Search once with your tag, and your name will work next time.":
+    "Todavía no hay ningún jugador con ese nombre aquí. Busca una vez con tu tag y la próxima vez funcionará tu nombre.",
+  "Pick your profile from the list below.":
+    "Elige tu perfil en la lista de abajo.",
+  "Player name or tag":
+    "Nombre o tag del jugador",
+  "Search by name or tag. Your tag is on your in-game profile, just below your profile icon.":
+    "Busca por nombre o tag. Tu tag está en tu perfil del juego, justo debajo de tu icono.",
+  "Your name or tag":
+    "Tu nombre o tag",
 };

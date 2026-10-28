@@ -738,3 +738,16 @@ model PushSubscription {
 
   @@map("push_subscriptions")
 }
+
+/// Players whose profile was opened on the site, for the name search
+/// (2026-10-28). Pruned a year after the last opening.
+model PlayerName {
+  tag      String   @id
+  name     String
+  trophies Int?
+  iconId   Int?     @map("icon_id")
+  seenAt   DateTime @default(now()) @map("seen_at")
+
+  @@index([seenAt])
+  @@map("player_names")
+}

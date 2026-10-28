@@ -1105,6 +1105,15 @@ export async function recordLookup(reading: {
     // A profile nobody sampled before joins the pool only within the hourly
     // allowance; see admitNewLookup.
     if (isOptedOut(tag)) return;
+    // Every lookup, inside the allowance or not, makes the name searchable
+    // (2026-10-28, lib/player-search): one small row, no API calls.
+    if (name) {
+      await prisma.playerName.upsert({
+        where: { tag },
+        create: { tag, name, trophies: trophies ?? null, iconId: iconId ?? null },
+        update: { name, trophies: trophies ?? null, iconId: iconId ?? null, seenAt: new Date() },
+      });
+    }
     const known = await prisma.sampledPlayer.findUnique({ where: { tag }, select: { tag: true } });
     if (!known && !admitNewLookup()) return;
 

@@ -932,6 +932,18 @@ export const CLIENT_ES: Record<string, string> = {
     "Ahora no",
   "🎁 Claimed! Want the next one first?":
     "🎁 ¡Reclamada! ¿Quieres la próxima antes que nadie?",
+  "Enter your name or tag to search.":
+    "Escribe tu nombre o tag para buscar.",
+  "No player with that name here yet. Search once with your tag, and your name will work next time.":
+    "Todavía no hay ningún jugador con ese nombre aquí. Busca una vez con tu tag y la próxima vez funcionará tu nombre.",
+  "Pick your profile from the list below.":
+    "Elige tu perfil en la lista de abajo.",
+  "Player name or tag":
+    "Nombre o tag del jugador",
+  "Search by name or tag. Your tag is on your in-game profile, just below your profile icon.":
+    "Busca por nombre o tag. Tu tag está en tu perfil del juego, justo debajo de tu icono.",
+  "Your name or tag":
+    "Tu nombre o tag",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1863,4 +1875,16 @@ export const CLIENT_PT: Record<string, string> = {
     "Agora não",
   "🎁 Claimed! Want the next one first?":
     "🎁 Resgatada! Quer a próxima antes de todo mundo?",
+  "Enter your name or tag to search.":
+    "Digite seu nome ou tag para buscar.",
+  "No player with that name here yet. Search once with your tag, and your name will work next time.":
+    "Ainda não há nenhum jogador com esse nome aqui. Busque uma vez com sua tag e da próxima vez seu nome vai funcionar.",
+  "Pick your profile from the list below.":
+    "Escolha seu perfil na lista abaixo.",
+  "Player name or tag":
+    "Nome ou tag do jogador",
+  "Search by name or tag. Your tag is on your in-game profile, just below your profile icon.":
+    "Busque por nome ou tag. Sua tag está no seu perfil do jogo, logo abaixo do seu ícone.",
+  "Your name or tag":
+    "Seu nome ou tag",
 };

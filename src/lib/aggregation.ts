@@ -1423,6 +1423,11 @@ export async function pruneOldSamples(): Promise<number> {
       },
     });
 
+    // The name search's list (2026-10-28): a year after the profile was last opened.
+    const names = await prisma.playerName.deleteMany({
+      where: { seenAt: { lt: new Date(Date.now() - 365 * day) } },
+    });
+
     // The roll-ups themselves age out on the window the site reads. Nothing
     // guards these: they are derived, and a lost day costs a thinner average
     // rather than an unrecoverable observation.
@@ -1450,6 +1455,7 @@ export async function pruneOldSamples(): Promise<number> {
       teams +
       snapshots.count +
       trophyPoints.count +
+      names.count +
       dailyStats.count +
       playerDaily.count +
       pairDaily.count +
