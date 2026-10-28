@@ -135,6 +135,18 @@ gw_net=$(psql "select coalesce(max(c),0) from (select count(*) c from giveaway_e
 gw_burst=$(psql "select coalesce(max(c),0) from (select count(*) c from giveaway_entries where $GW and referred_by is not null and created_at > now() - interval '24 hours' group by referred_by) t;")
 gw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/es|/pt)?/giveaway';")
 gw_banner=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_banner';")
+# The strip under the header on every page (2026-10-28) against the two banners.
+gw_strip=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_banner' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value = 'strip');")
+# Step 2 taps from the 2026-10-28 nudges (hero box, bottom bar) on the tester page.
+pt_nudge=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_name = 'playtest_step' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value in ('hero','nudge'));")
+
+# ---- free rewards (2026-10-28) -------------------------------------------------
+# Does /rewards turn visitors into notification subscribers? Visits, claim taps,
+# the after-claim sheet (shown / dismissed), and the subscriptions themselves.
+ev() { umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_name = '$1';"; }
+rw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/es|/pt)?/rewards';")
+rw_claims=$(ev reward_claim); rw_notify=$(ev rewards_notify); rw_shown=$(ev notify_nudge_shown); rw_dismiss=$(ev notify_nudge_dismiss)
+rw_subs=$(psql "select count(*) || ' (+' || count(*) filter (where created_at > now() - interval '24 hours') || ' today)' from push_subscriptions;")
 
 bans=$(sudo -n fail2ban-client status sshd 2>/dev/null | awk -F'\t' '/Total banned/{print $2}' | tr -d ' ')
 deploys=$(cd "$REPO" && git log --since='24 hours ago' --oneline 2>/dev/null | head -6)
@@ -179,7 +191,7 @@ html_rows_open
 html_row "Entrants" "${gw_people:-?}"
 html_row "Extra points" "${gw_extras:-?}"
 html_row "Most points" "${gw_top:-none yet}"
-html_row "Page visits (24h)" "${gw_visits:-?} &middot; banner clicks ${gw_banner:-?}"
+html_row "Page visits (24h)" "${gw_visits:-?} &middot; banner clicks ${gw_banner:-?} (${gw_strip:-?} from the strip)"
 html_row "Watch: one network today" "${gw_net:-0} entries (cap 3)" "$([ "${gw_net:-0}" -ge 3 ] && echo "$WARN" || echo "$OK")"
 html_row "Watch: friends to one entrant today" "${gw_burst:-0}" "$([ "${gw_burst:-0}" -ge 15 ] && echo "$WARN" || echo "$OK")"
 html_rows_close
@@ -192,6 +204,14 @@ html_row "Tapped: become a tester" "${pt_optin:-?}"
 html_row "Tapped: open Google Play" "${pt_install:-?}"
 html_row "Came from" "home ${pt_home:-?} &middot; panel ${pt_panel:-?} &middot; /bubble ${pt_bubble:-?} &middot; footer ${pt_footer:-?}"
 html_row "Panel card snoozed" "${pt_snooze:-?}"
+html_row "Step 2 from the new nudges (24h)" "${pt_nudge:-?}"
+html_rows_close
+
+html_section "Free rewards (24h)"
+html_rows_open
+html_row "Page visits" "${rw_visits:-?} &middot; claim taps ${rw_claims:-?}"
+html_row "Notify taps" "${rw_notify:-?} &middot; after-claim sheet shown ${rw_shown:-?}, dismissed ${rw_dismiss:-?}"
+html_row "Subscribed browsers" "${rw_subs:-?}"
 html_rows_close
 
 html_section "Sampler"
