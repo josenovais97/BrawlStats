@@ -17,8 +17,10 @@ export interface FreeReward {
   url: string;
   image: string | null;
   postedAt: string;
-  /** The reward's own game art (see `rewardArt`), added here, not in the feed. */
+  /** The reward's own game art (see `withArt`), added here, not in the feed. */
   art: string;
+  /** Our own art for it, shown if `art` fails to load. */
+  fallbackArt: string;
 }
 
 /** How long a link is shown as live. Supercell does not say; most last days, not weeks. */
@@ -116,7 +118,7 @@ interface ImageInfoResponse {
  * almost never. The images load from the wiki's CDN in the reader's browser,
  * as the Starr Drops page's do; a failed lookup costs the art, never the page.
  */
-async function withArt(items: Omit<FreeReward, 'art'>[]): Promise<FreeReward[]> {
+async function withArt(items: Omit<FreeReward, 'art' | 'fallbackArt'>[]): Promise<FreeReward[]> {
   const wanted = [...new Set(items.flatMap((r) => wikiArtCandidates(r.name)))].slice(0, 50);
   const found = new Map<string, string>();
   if (wanted.length > 0) {
@@ -136,11 +138,12 @@ async function withArt(items: Omit<FreeReward, 'art'>[]): Promise<FreeReward[]> 
   return items.map((r) => ({
     ...r,
     art: wikiArtCandidates(r.name).map((f) => found.get(f)).find(Boolean) ?? rewardArt(r.name),
+    fallbackArt: rewardArt(r.name),
   }));
 }
 
 export async function getFreeRewards(): Promise<{ live: FreeReward[]; earlier: FreeReward[] }> {
-  let items: Omit<FreeReward, 'art'>[] = [];
+  let items: Omit<FreeReward, 'art' | 'fallbackArt'>[] = [];
   try {
     const res = await fetch(`${SITE_URL}/social/rewards/latest.json`, {
       headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
@@ -148,7 +151,7 @@ export async function getFreeRewards(): Promise<{ live: FreeReward[]; earlier: F
       next: { revalidate: 300 },
     });
     if (res.ok) {
-      const feed = (await res.json()) as { items?: Omit<FreeReward, 'art'>[] };
+      const feed = (await res.json()) as { items?: Omit<FreeReward, 'art' | 'fallbackArt'>[] };
       items = (feed.items ?? []).filter((r) => r && typeof r.name === 'string' && OFFICIAL.test(r.url));
     }
   } catch {
