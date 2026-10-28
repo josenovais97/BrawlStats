@@ -69,10 +69,10 @@ cp "$REPO/public/fonts/LilitaOne-Regular.ttf" "$REPO/public/fonts/Geist-Regular.
    "$REPO/public/bubble/app-icon.png" "$CACHE/assets/" || die "::error::fonts or icon missing from the checkout"
 
 docker run --rm --cpus=1 --user "$(id -u):$(id -g)" \
-  -v "$REPO/deploy/rewards:/code:ro" -v "$OUT:/out" -v "$CACHE:/cache" \
+  -v "$REPO/deploy/rewards:/code:ro" -v "$REPO/public:/public:ro" -v "$OUT:/out" -v "$CACHE:/cache" \
   "$PYTHON_IMAGE" sh -c '
     [ -d /cache/py/qrcode ] || pip install -q --disable-pip-version-check --target /cache/py pillow qrcode >/dev/null 2>&1
-    PYTHONPATH=/cache/py python /code/make.py /out/rewards.json /out /cache/assets /cache/icons' \
+    PYTHONPATH=/cache/py python /code/make.py /out/rewards.json /out /cache/assets /cache/icons /public' \
   > "$CACHE/make.log" 2>&1 || die "::error::make.py failed: $(tail -c 600 "$CACHE/make.log")"
 
 # The manifest brawlzone-tiktok reads, as brawlzone-weekly writes it.

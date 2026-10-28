@@ -1,15 +1,21 @@
 """Slides for a free-rewards post (2026-10-21), drawn by brawlzone-rewards.
 
-    python make.py <rewards.json> <out dir> <assets dir> <portrait cache dir>
+    python make.py <rewards.json> <out dir> <assets dir> <portrait cache dir> [public dir]
 
 rewards.json is [{"name": "Mega Box", "url": "https://link.brawlstars.com/..."}].
 Writes 1.jpg.. and meta.json ({count, title, description}) to the out dir.
 
-Our own art throughout: a drawn gift box, or the brawler's portrait when the
-reward names one ("Wendy Box"). The first set (2026-10-21, by hand in
-~/shots/vouchers) cropped Supercell's announcement image; a post that goes
-out unattended cannot rely on there being one.
+Art, best first (2026-10-28): a high-res file for the reward in
+public/rewards/art (`art_slug`, e.g. chaos-drop.png), the brawler's portrait
+when the reward names one ("Wendy Box"), the site's own icons for what it has
+them for, and a plain gift for anything else. The first set (2026-10-21, by
+hand in ~/shots/vouchers) cropped Supercell's announcement image; a post that
+goes out unattended cannot rely on there being one.
+
+The look is the /rewards page's: a violet stage with rays and the reward
+floating in it, because the first slide is the whole hook on TikTok.
 """
+import os
 import json
 import re
 import sys
@@ -20,6 +26,7 @@ import qrcode
 import qrcode.constants
 
 rewards_path, OUT, ASSETS, ICONS = sys.argv[1:5]
+PUBLIC = sys.argv[5] if len(sys.argv) > 5 else None
 rewards = json.load(open(rewards_path))[:4]
 W, H = 1080, 1920
 YEL = (255, 199, 44); WHITE = (245, 247, 255); MUTED = (176, 186, 222); NAVY = (11, 15, 29); CARD = (28, 38, 86)
@@ -28,12 +35,40 @@ F = lambda s: ImageFont.truetype(f'{ASSETS}/LilitaOne-Regular.ttf', s)
 G = lambda s: ImageFont.truetype(f'{ASSETS}/Geist-Regular.ttf', s)
 
 
-def bg():
-    im = Image.new('RGB', (W, H)); dr = ImageDraw.Draw(im)
-    for y in range(H):
-        t = y / (H - 1); dr.line([(0, y), (W, y)], fill=(int(11 + 19 * t), int(15 + 27 * t), int(29 + 67 * t)))
-    g = Image.new('L', (W, H), 0); ImageDraw.Draw(g).ellipse((-300, -350, 900, 700), fill=70); g = g.filter(ImageFilter.GaussianBlur(220))
-    return Image.composite(Image.new('RGB', (W, H), (110, 85, 10)), im, g)
+def bg(cy=760):
+    """The /rewards stage: violet radial light, slow rays, a gold glow at `cy`."""
+    im = Image.new('RGB', (W, H), (8, 11, 22)); g = ImageDraw.Draw(im)
+    stops = [(0, (123, 77, 255)), (.36, (59, 31, 158)), (.7, (22, 13, 64)), (1, (8, 11, 22))]
+    R = 1500
+    for r in range(R, 0, -6):
+        t = r / R
+        for (a, ca), (b, cb) in zip(stops, stops[1:]):
+            if a <= t <= b:
+                k = (t - a) / (b - a); col = tuple(int(ca[j] + (cb[j] - ca[j]) * k) for j in range(3)); break
+        g.ellipse((W // 2 - r * .75, cy - r * .62, W // 2 + r * .75, cy + r * .62), fill=col)
+    rays = Image.new('L', (W, H), 0); rd = ImageDraw.Draw(rays)
+    for k in range(16):
+        a0 = k * 22.5; a1 = a0 + 8
+        rd.pieslice((W // 2 - 2400, cy - 2400, W // 2 + 2400, cy + 2400), a0, a1, fill=34)
+    fade = Image.new('L', (W, H), 0); ImageDraw.Draw(fade).ellipse((W // 2 - 760, cy - 760, W // 2 + 760, cy + 760), fill=255)
+    fade = fade.filter(ImageFilter.GaussianBlur(260))
+    rays = Image.composite(rays, Image.new('L', (W, H), 0), fade)
+    im = Image.composite(Image.new('RGB', (W, H), (255, 255, 255)), im, rays)
+    glow = Image.new('L', (W, H), 0); ImageDraw.Draw(glow).ellipse((W // 2 - 300, cy - 300, W // 2 + 300, cy + 300), fill=110)
+    glow = glow.filter(ImageFilter.GaussianBlur(120))
+    return Image.composite(Image.new('RGB', (W, H), (255, 197, 61)), im, glow)
+
+
+def stext(im, txt, y, font, fill, maxw=980, stroke=None, cx=W // 2):
+    """Game lettering: centred on `cx`, with the game's thick dark outline and hard drop."""
+    dr = ImageDraw.Draw(im)
+    while font.size > 30 and dr.textlength(txt, font=font) > maxw:
+        font = F(font.size - 4)
+    sw = stroke if stroke is not None else max(4, font.size // 9)
+    x = cx - dr.textlength(txt, font=font) / 2
+    dr.text((x, y + sw + 2), txt, font=font, fill=NAVY, stroke_width=sw, stroke_fill=NAVY)
+    dr.text((x, y), txt, font=font, fill=fill, stroke_width=sw, stroke_fill=NAVY)
+    return y + int(font.size * 1.1) + sw
 
 
 def rounded(img, r):
@@ -98,8 +133,53 @@ def portrait(name):
     return None
 
 
-def gift(size, col):
-    """A drawn gift box: ours, so nothing borrowed needs to be on hand."""
+def art_slug(name):
+    """ "1x Chaos Drop" -> "chaos-drop", "2000 Credits" -> "credits": the file name in public/rewards/art. """
+    base = re.sub(r'^\s*\d[\d,.]*\s*[x×]?\s*', '', name, flags=re.I)
+    base = re.sub(r'\s*[x×]\s*\d+\s*$', '', base, flags=re.I)
+    return re.sub(r'[^a-z0-9]+', '-', base.lower()).strip('-')
+
+
+def display_name(name):
+    """What the slide says: "1x Chaos Drop" is a Chaos Drop; "2000 Credits" keeps its number."""
+    return re.sub(r'^\s*1\s*[x×]\s*', '', name, flags=re.I).strip()
+
+
+# The site's own icons, for when there is no high-res file (same order as
+# LOCAL_ART in src/lib/free-rewards.ts).
+LOCAL_ART = [
+    (r'mega box', 'rewards/box-red.png'), (r'big box', 'rewards/box-pink.png'),
+    (r'starr drop', 'icons/starr-drop.png'), (r'power point', 'icons/power-point.png'),
+    (r'coin', 'icons/coin.png'), (r'box', 'rewards/box-blue.png'),
+]
+
+
+def open_rgba(path):
+    try:
+        return Image.open(path).convert('RGBA')
+    except OSError:
+        return None
+
+
+def reward_image(name):
+    """The best art we have for a reward, as RGBA, or the gift."""
+    if PUBLIC:
+        hi = open_rgba(f'{PUBLIC}/rewards/art/{art_slug(name)}.png')
+        if hi: return hi
+    face = portrait(name)
+    if face: return face
+    if PUBLIC:
+        for pat, rel in LOCAL_ART:
+            if re.search(pat, name, re.I):
+                im = open_rgba(f'{PUBLIC}/{rel}')
+                if im: return im
+        g = open_rgba(f'{PUBLIC}/rewards/gift.png')
+        if g: return g
+    return gift_drawn(512)
+
+
+def gift_drawn(size, col=(255, 72, 104)):
+    """A drawn gift box, if even public/ is missing."""
     im = Image.new('RGBA', (size, size), (0, 0, 0, 0)); d = ImageDraw.Draw(im); s = size
     d.rounded_rectangle((s * .12, s * .42, s * .88, s * .92), s * .06, fill=col)
     d.rounded_rectangle((s * .06, s * .28, s * .94, s * .46), s * .05, fill=tuple(min(255, c + 40) for c in col))
@@ -109,11 +189,27 @@ def gift(size, col):
     return im
 
 
+def fit(img, size):
+    """Scaled to fit a size x size square, keeping its shape."""
+    k = size / max(img.width, img.height)
+    return img.resize((max(1, int(img.width * k)), max(1, int(img.height * k))), Image.LANCZOS)
+
+
+def floating(im, img, cx, cy, size):
+    """The reward on the stage: centred at (cx, cy), with a soft drop shadow."""
+    a = fit(img, size)
+    sh = Image.new('L', im.size, 0)
+    sh.paste(a.getchannel('A').point(lambda v: v * .55), (cx - a.width // 2, cy - a.height // 2 + size // 14))
+    sh = sh.filter(ImageFilter.GaussianBlur(size // 18))
+    im.paste((10, 6, 30), (0, 0), sh)
+    im.paste(a, (cx - a.width // 2, cy - a.height // 2), a)
+
+
 def art(i, size):
-    name = rewards[i]['name']; col = ACCENTS[i % 4]
-    face = portrait(name)
+    """A square tile of the reward's art, for rows and the follow slide."""
+    col = ACCENTS[i % 4]
     tile = Image.new('RGB', (size, size), tuple(int(c * .35) for c in col))
-    inner = face.resize((int(size * .86), int(size * .86)), Image.LANCZOS) if face else gift(int(size * .8), col)
+    inner = fit(reward_image(rewards[i]['name']), int(size * .82))
     tile.paste(inner, ((size - inner.width) // 2, (size - inner.height) // 2), inner)
     return tile
 
@@ -131,37 +227,41 @@ def qr(url, size):
 
 n = len(rewards)
 slides = []
+names = [display_name(r['name']) for r in rewards]
 
-# cover
-im = bg(); logo(im)
-ctext(im, 'FREE', 250, F(230), YEL); ctext(im, 'REWARDS' if n > 1 else 'REWARD', 480, F(150), WHITE)
-ctext(im, f'{n} official Brawl Stars gifts. Claim them all!' if n > 1 else 'An official Brawl Stars gift. Claim it now!', 680, G(50), WHITE, shadow=False)
-y = 790
-for i, r in enumerate(rewards):
-    rowh = 170 if n > 2 else 230
-    dr = ImageDraw.Draw(im); dr.rounded_rectangle((90, y, 990, y + rowh), 36, fill=CARD, outline=ACCENTS[i % 4], width=5)
-    a = art(i, rowh - 30); im.paste(a, (110, y + 15), rounded(a, 24))
-    f = F(72)
-    while f.size > 34 and dr.textlength(r['name'], font=f) > 990 - (150 + rowh) - 30: f = F(f.size - 4)
-    dr.text((130 + rowh, y + (rowh - f.size) // 2 - 6), r['name'], font=f, fill=WHITE)
-    y += rowh + 30
-pill(im, 'Scan the codes inside' if n > 1 else 'Scan the code inside', min(y + 30, 1640), size=54)
+# cover: the reward itself, as the game shows it, because this slide is the hook
+im = bg(cy=880); logo(im, y=90)
+stext(im, 'FREE', 200, F(200), YEL)
+if n == 1:
+    floating(im, reward_image(rewards[0]['name']), W // 2, 880, 620)
+    stext(im, names[0].upper(), 1250, F(120), WHITE)
+else:
+    cell = 400
+    for i, r in enumerate(rewards):
+        cx = int(W // 2 + (i % 2 - .5) * 460)
+        cy = 880 if n == 2 else 700 + (i // 2) * 420
+        if n == 3 and i == 2: cx = W // 2
+        floating(im, reward_image(r['name']), cx, cy, cell - 80)
+        stext(im, names[i].upper(), cy + cell // 2 - 50, F(56), WHITE, maxw=430, cx=cx)
+pill(im, 'Official Brawl Stars gift' + ('s' if n > 1 else '') + ' · claim now', 1450, size=50)
+stext(im, 'SWIPE FOR THE CODE →' if n == 1 else 'SWIPE FOR THE CODES →', 1560, F(64), WHITE)
 mark(im); slides.append(im)
 
-# one per reward
+# one per reward: the code, and the one-tap way that needs no scanning
 for i, r in enumerate(rewards):
-    im = bg(); logo(im)
-    ctext(im, f'GIFT {i + 1} OF {n}' if n > 1 else 'FREE GIFT', 230, F(70), YEL)
-    ctext(im, r['name'].upper(), 320, F(110), WHITE)
-    a = art(i, 520); card(im, a, (W - 536) // 2, 490, ACCENTS[i % 4])
-    q = qr(r['url'], 520); card(im, q, (W - 536) // 2, 1060, YEL, r=24)
-    ctext(im, 'Screenshot → scan it with Google Lens', 1610, G(44), WHITE, shadow=False)
+    im = bg(cy=520); logo(im, y=90)
+    stext(im, f'GIFT {i + 1} OF {n}' if n > 1 else 'FREE GIFT', 200, F(64), YEL)
+    stext(im, names[i].upper(), 285, F(96), WHITE)
+    floating(im, reward_image(r['name']), W // 2, 590, 300)
+    q = qr(r['url'], 500); card(im, q, (W - 516) // 2, 790, YEL, r=24)
+    ctext(im, 'Screenshot → scan it with Google Lens', 1335, G(42), WHITE, shadow=False)
+    pill(im, 'or tap Claim on brawlzone.net/rewards', 1420, size=46)
     mark(im); slides.append(im)
 
 # all codes on one slide, for a screenshot
 if n > 1:
-    im = bg(); logo(im)
-    ctext(im, 'SCREENSHOT THIS', 240, F(110), YEL)
+    im = bg(cy=900); logo(im, y=90)
+    stext(im, 'SCREENSHOT THIS', 220, F(104), YEL)
     ctext(im, f'All {n} codes in one picture', 370, G(50), WHITE, shadow=False)
     rowh = 380 if n <= 3 else 290
     y = 470
@@ -169,40 +269,36 @@ if n > 1:
         dr = ImageDraw.Draw(im); col = ACCENTS[i % 4]
         dr.rounded_rectangle((60, y, 1020, y + rowh), 40, fill=CARD, outline=col, width=5)
         q = qr(r['url'], rowh - 50); im.paste(q, (1020 - q.width - 25, y + 25))
-        words = r['name'].split(' ', 1)
-        f1 = F(72 if n <= 3 else 60)
-        while f1.size > 34 and dr.textlength(words[0], font=f1) > 560 - q.width + 300: f1 = F(f1.size - 4)
-        dr.text((100, y + rowh // 2 - 90), words[0], font=f1, fill=WHITE)
-        if len(words) > 1:
-            f2 = F(54)
-            while f2.size > 28 and dr.textlength(words[1], font=f2) > 1020 - q.width - 160: f2 = F(f2.size - 2)
-            dr.text((100, y + rowh // 2 + 5), words[1], font=f2, fill=col)
+        a = fit(reward_image(r['name']), rowh - 150); im.paste(a, (100, y + 30), a)
+        f1 = F(60 if n <= 3 else 50)
+        while f1.size > 30 and dr.textlength(names[i], font=f1) > 1020 - q.width - 160: f1 = F(f1.size - 4)
+        dr.text((100, y + rowh - 30 - f1.size), names[i], font=f1, fill=WHITE)
         y += rowh + 30
     mark(im); slides.append(im)
 
-# follow
-im = bg(); logo(im)
-ctext(im, 'FOLLOW', 330, F(190), YEL)
-ctext(im, 'FOR MORE FREE STUFF', 540, F(96), WHITE)
-ctext(im, 'We post every free reward the moment it drops,', 720, G(48), WHITE, shadow=False)
-ctext(im, '+ the best Ranked picks for every map.', 785, G(48), WHITE, shadow=False)
+# the next one: the site's notifications, then follow
+im = bg(cy=760); logo(im, y=90)
+stext(im, 'GET THE NEXT', 250, F(120), WHITE)
+stext(im, 'ONE FIRST', 390, F(150), YEL)
 x0 = (W - (n * 260 - 30)) // 2
 for i in range(n):
-    a = art(i, 230); im.paste(a, (x0 + i * 260, 930), rounded(a, 30))
-pill(im, 'Links are in the caption too', 1260, size=54)
+    a = art(i, 230); card(im, a, x0 + i * 260, 640, ACCENTS[i % 4], r=30)
+ctext(im, 'Tap "Notify me" on brawlzone.net/rewards', 1010, G(48), WHITE, shadow=False)
+ctext(im, 'and your phone pings the minute one drops.', 1075, G(48), WHITE, shadow=False)
+pill(im, 'Follow for every free reward', 1230, size=56)
+ctext(im, 'Links are in the caption too', 1360, G(42), MUTED, shadow=False)
 mark(im); slides.append(im)
 
 for i, s in enumerate(slides, 1):
     s.save(f'{OUT}/{i}.jpg', quality=92)
 
-names = [r['name'] for r in rewards]
 listed = names[0] if n == 1 else ', '.join(names[:-1]) + ' and ' + names[-1]
 links = '\n'.join(f"🎁 {r['name']}: {r['url']}" for r in rewards)
 title = f"FREE Brawl Stars {'rewards' if n > 1 else 'reward'}: {listed}"[:90]
 description = (
     f"🎁 FREE Brawl Stars {'rewards' if n > 1 else 'reward'}! Claim {listed} before {'they are' if n > 1 else 'it is'} gone 👀\n\n"
     f"Scan the QR {'codes' if n > 1 else 'code'} (screenshot → Google Lens works) or use the {'links' if n > 1 else 'link'}:\n{links}\n\n"
-    "Every free reward in one place, with claim buttons: brawlzone.net/rewards\n"
+    "Claim in one tap, and get a notification for the next one: brawlzone.net/rewards\n"
     "Follow for every free reward the moment it drops, and the best Ranked picks every day.\n"
     "Unofficial fan project, not affiliated with Supercell.\n"
     "#brawlstars #brawlstarsfree #brawlstarsrewards #freerewards #brawlzone"
