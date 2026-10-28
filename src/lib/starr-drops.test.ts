@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { boxAddedDates, parseBoxes, parseDailyWins } from '@/lib/starr-drops';
+import { atLeastOnce, atOrAbove, boxAddedDates, nextSpecialDay, parseBoxes, parseDailyWins, perNormalDay } from '@/lib/starr-drops';
 
 /**
  * The Daily Wins and box parsers, on trimmed copies of the wiki's own markup
@@ -131,4 +131,32 @@ test('Boxes: newest year only, history dates, Daily Wins flag', () => {
 test('Box history: "replaced by" dates the replacement', () => {
   const dates = boxAddedDates(BOXES, ['Dead Boxes', 'Mega Boxes']);
   assert.equal(dates.get('Dead Boxes'), '2024-10-29');
+});
+
+test('odds: at least once, at or above, per normal day, next special day', () => {
+  assert.equal(atLeastOnce(0.02, 0), 0);
+  assert.ok(Math.abs(atLeastOnce(0.02, 1) - 0.02) < 1e-12);
+  // A week of five Starr Drops a day: about a coin flip, not 7 x 9.6%.
+  assert.ok(Math.abs(atLeastOnce(0.02, 35) - 0.5069) < 0.0001);
+  assert.equal(atLeastOnce(1, 3), 1);
+
+  const chaos = [
+    { rarity: 'Super Rare', chance: 0.5 },
+    { rarity: 'Epic', chance: 0.28 },
+    { rarity: 'Mythic', chance: 0.12 },
+    { rarity: 'Legendary', chance: 0.06 },
+    { rarity: 'Ultra', chance: 0.02 },
+  ];
+  assert.ok(Math.abs(atOrAbove(chaos, 'Legendary')! - 0.08) < 1e-9);
+  assert.equal(atOrAbove(chaos, 'Rare'), null);
+
+  const daily = parseDailyWins(DAILY)!;
+  // Two normal rows (the new-player one is dropped), each with five Starr Drops.
+  assert.equal(perNormalDay(daily, 'Starr Drop'), 5);
+  assert.equal(perNormalDay(daily, 'Chaos Drop'), 0);
+  assert.equal(perNormalDay({ ...daily, days: [] }, 'Starr Drop'), null);
+
+  assert.equal(nextSpecialDay(daily, new Date('2026-09-26T12:00:00Z'))?.startsAt.slice(0, 10), '2026-09-26');
+  assert.equal(nextSpecialDay(daily, new Date('2026-05-01T00:00:00Z'))?.startsAt.slice(0, 10), '2026-05-16');
+  assert.equal(nextSpecialDay(daily, new Date('2026-10-28T00:00:00Z')), null);
 });

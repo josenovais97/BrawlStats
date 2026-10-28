@@ -643,6 +643,58 @@ export function parseDailyWins(wikitext: string): DailySchedule | null {
   };
 }
 
+/* ---------------------------------- odds ---------------------------------- */
+
+/**
+ * The chance of at least one hit in `n` independent openings at `p` each.
+ *
+ * What people actually want to know about a 2% Legendary is not the 2% but
+ * "will I get one this week", and the answer is not 7 x the daily figure.
+ */
+export function atLeastOnce(p: number, n: number): number {
+  if (n <= 0 || p <= 0) return 0;
+  if (p >= 1) return 1;
+  return 1 - (1 - p) ** n;
+}
+
+/**
+ * How many of `item` a normal day's Daily Wins give this season.
+ *
+ * A season can roll one of several normal rows ("one of these"), so this is
+ * the fewest any of them gives -- the number a player can count on. Null when
+ * the wiki lists no normal day, so the page falls back to per-drop odds
+ * rather than inventing a daily rate.
+ */
+export function perNormalDay(daily: DailySchedule | null, item: string): number | null {
+  const normal = daily?.days.find((day) => /^normal/i.test(day.name));
+  if (!normal || normal.rows.length === 0) return null;
+  return Math.min(
+    ...normal.rows.map((row) =>
+      row.reduce((sum, cell) => sum + cell.items.filter((entry) => entry.name === item).length, 0),
+    ),
+  );
+}
+
+/**
+ * The chance of a rarity or anything rarer.
+ *
+ * The wiki writes a drop's odds from commonest to rarest, so "Legendary or
+ * better" on a Chaos Drop is Legendary plus Ultra. Null when the drop has no
+ * such rarity, rather than 0, which would claim it can't roll.
+ */
+export function atOrAbove(odds: { rarity: string; chance: number }[], rarity: string): number | null {
+  const at = odds.findIndex((odd) => odd.rarity === rarity);
+  if (at === -1) return null;
+  return odds.slice(at).reduce((sum, odd) => sum + odd.chance, 0);
+}
+
+/** The next special day that has not ended, or null. `special` is newest first. */
+export function nextSpecialDay(daily: DailySchedule | null, now: Date): DailySchedule['special'][number] | null {
+  const today = now.toISOString().slice(0, 10);
+  const upcoming = (daily?.special ?? []).filter((day) => day.endsAt.slice(0, 10) >= today);
+  return upcoming.length > 0 ? upcoming[upcoming.length - 1] : null;
+}
+
 /* ---------------------------------- read ---------------------------------- */
 
 function localIconPath(icon: string | null): string | null {

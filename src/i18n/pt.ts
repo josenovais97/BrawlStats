@@ -4616,4 +4616,84 @@ export const PT: Record<string, string> = {
     "Seu nome ou tag",
   "Tick this box to enter.":
     "Marque esta caixa para participar.",
+  "1 in {n}":
+    "1 em {n}",
+  "A Chaos Drop starts at Super Rare: {list}.":
+    "Um Sorteio do Caos começa em Super-raro: {list}.",
+  "A Chaos Drop starts at Super Rare: {list}. That makes {p} of them Legendary or better, against {s} for a Starr Drop.":
+    "Um Sorteio do Caos começa em Super-raro: {list}. Assim, {p} deles saem Lendários ou melhores, contra {s} de um Sorteio Starr.",
+  "About {d} days on average, at {n} Starr Drops a day from Daily Wins. The chance of at least one is {w} in a week and {m} in a month.":
+    "Cerca de {d} dias em média, com {n} Sorteios Starr por dia das vitórias diárias. A chance de pelo menos um é de {w} em uma semana e {m} em um mês.",
+  "Are these drop rates official?":
+    "Essas chances são oficiais?",
+  "Brawl Stars Starr Drops: daily schedule, drop rates and rewards":
+    "Sorteios Starr do Brawl Stars: calendário diário, chances e recompensas",
+  "Chaos Drops are better odds: {p} of them are Legendary or rarer.":
+    "Os Sorteios do Caos têm chances melhores: {p} deles saem Lendários ou mais raros.",
+  "Daily schedule":
+    "Calendário diário",
+  "Every Starr Drop starts Rare and can upgrade. The chance it ends as each:":
+    "Todo Sorteio Starr começa Raro e pode melhorar. A chance de terminar em cada raridade:",
+  "How long does it take to get a Legendary Starr Drop?":
+    "Quanto tempo leva para conseguir um Sorteio Starr Lendário?",
+  "How many Starr Drops do you get a day?":
+    "Quantos Sorteios Starr você ganha por dia?",
+  "On average one Starr Drop in {k} is Legendary.":
+    "Em média, 1 em cada {k} Sorteios Starr é Lendário.",
+  "On average one Starr Drop in {k} is Legendary: about one every {d} days of Daily Wins.":
+    "Em média, 1 em cada {k} Sorteios Starr é Lendário: mais ou menos um a cada {d} dias de vitórias diárias.",
+  "On this page":
+    "Nesta página",
+  "One of: {list}.":
+    "Uma destas: {list}.",
+  "Quick answers":
+    "Respostas rápidas",
+  "Starr Drops on a normal day":
+    "Sorteios Starr em um dia normal",
+  "The chance of at least one Legendary Starr Drop from your Daily Wins, at {n} Starr Drops a day.":
+    "A chance de pelo menos um Sorteio Starr Lendário das suas vitórias diárias, com {n} Sorteios Starr por dia.",
+  "The chance of at least one Legendary in that many Starr Drops.":
+    "A chance de pelo menos um Lendário nessa quantidade de Sorteios Starr.",
+  "They come from the Brawl Stars Wiki, which the community keeps up to date from datamines and in-game observation. Supercell publishes no drop-rate API. This page reads the wiki twice a day, so it changes when the game does.":
+    "Elas vêm da Brawl Stars Wiki, que a comunidade mantém atualizada com datamines e observação no jogo. A Supercell não publica nenhuma API de chances. Esta página lê a wiki duas vezes por dia, então muda quando o jogo muda.",
+  "This month":
+    "Este mês",
+  "This season's Starr Drop schedule, your chance of a Legendary today, this week and this month, and every reward inside each drop and box. Updated twice a day.":
+    "O calendário de Sorteios Starr desta temporada, sua chance de um Lendário hoje, nesta semana e neste mês, e cada recompensa de cada sorteio e caixa. Atualizado duas vezes por dia.",
+  "This season's daily schedule, the chance of every rarity, and every reward inside each drop and box. Read from the Brawl Stars Wiki twice a day, so it changes when the game does.":
+    "O calendário diário desta temporada, a chance de cada raridade e cada recompensa de cada sorteio e caixa. Lido da Brawl Stars Wiki duas vezes por dia, então muda quando o jogo muda.",
+  "This week":
+    "Esta semana",
+  "Updated {date}":
+    "Atualizado em {date}",
+  "What are the Chaos Drop chances?":
+    "Quais são as chances do Sorteio do Caos?",
+  "What are the chances of a Legendary Starr Drop?":
+    "Qual é a chance de um Sorteio Starr Lendário?",
+  "What can you get from a Legendary Starr Drop?":
+    "O que pode sair de um Sorteio Starr Lendário?",
+  "Your Legendary odds":
+    "Sua chance de Lendário",
+  "Your chance of a Legendary":
+    "Sua chance de um Lendário",
+  "Your first {wins} wins of the day each give a reward, and this season all {wins} are Starr Drops on a normal day.":
+    "Cada uma das suas primeiras {wins} vitórias do dia dá uma recompensa, e nesta temporada as {wins} são Sorteios Starr em um dia normal.",
+  "Your first {wins} wins of the day each give a reward. On a normal day this season {n} of them are Starr Drops, and the rest are the other drops and boxes in the schedule above.":
+    "Cada uma das suas primeiras {wins} vitórias do dia dá uma recompensa. Em um dia normal desta temporada, {n} são Sorteios Starr e o resto são os outros sorteios e caixas do calendário acima.",
+  "next special day":
+    "próximo dia especial",
+  "no special day announced yet":
+    "nenhum dia especial anunciado ainda",
+  "of Chaos Drops are Legendary or better":
+    "dos Sorteios do Caos são Lendários ou melhores",
+  "wins a day give a reward":
+    "vitórias por dia dão recompensa",
+  "{n} Starr Drops":
+    "{n} Sorteios Starr",
+  "{n} drops":
+    "{n} sorteios",
+  "{p} per Starr Drop, about 1 in {k}. Every Starr Drop starts Rare and can upgrade; the chance it ends as each rarity is {list}.":
+    "{p} por Sorteio Starr, mais ou menos 1 em {k}. Todo Sorteio Starr começa Raro e pode melhorar; a chance de terminar em cada raridade é {list}.",
+  "Chaos Drops":
+    "Sorteios do Caos",
 };

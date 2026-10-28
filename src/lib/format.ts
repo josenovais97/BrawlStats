@@ -271,6 +271,13 @@ export function formatDate(value: string | Date | null | undefined): string {
   return date.toLocaleDateString(DATE_TAG[requestLocale()], { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
 
+/** "26 Sep", for a tile too narrow for the full date. UTC-anchored like `formatDate`. */
+export function formatDayMonth(value: string | Date): string {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString(DATE_TAG[requestLocale()], { day: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+
 /**
  * "2 September 2026", UTC-anchored so the server and browser agree.
  *
