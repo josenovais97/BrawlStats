@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { ArrowRight, CalendarCheck, Check, ExternalLink, Mail, ShieldCheck, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { GooglePlayBadge, PlayMark } from '@/components/store-badges';
-import { PLAY_TEST } from '@/lib/bubble-app';
+import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { CONTACT_EMAIL } from '@/lib/site';
@@ -38,6 +39,8 @@ const GROUPS_BLUE = '#4285F4';
 export default function BubbleTestPage() {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
+  // The test is over once the app is public: testers' bookmarks land on /bubble.
+  if (PLAY_LIVE) redirect(lp('/bubble'));
   const open = PLAY_TEST.open;
 
   const steps = [

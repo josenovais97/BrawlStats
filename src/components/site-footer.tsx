@@ -7,7 +7,7 @@ import { BrandMark } from '@/components/brand-mark';
 import { useLocale } from '@/components/i18n/use-locale';
 import { localePath, type Locale } from '@/lib/i18n';
 import { GooglePlayBadge } from '@/components/store-badges';
-import { PLAY_TEST } from '@/lib/bubble-app';
+import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
 import { BUY_ME_A_COFFEE_URL, CONTACT_EMAIL, SITE_NAME, TIKTOK_PROFILE_URL, WHATSAPP_URL } from '@/lib/site';
 
 /*
@@ -344,16 +344,29 @@ export function SiteFooter() {
           */}
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
             <div className="flex flex-wrap items-center gap-2.5">
-              <Link
-                href={href(BUBBLE_PATH)}
-                prefetch={false}
-                data-umami-event="playtest_entry"
-                data-umami-event-from="footer"
-                aria-label={t('googlePlay')}
-                className="rounded transition-opacity hover:opacity-80"
-              >
-                <GooglePlayBadge className="h-9 w-auto" />
-              </Link>
+              {PLAY_LIVE ? (
+                <a
+                  href={PLAY_TEST.listingUrl}
+                  rel="noopener"
+                  data-umami-event="play_store"
+                  data-umami-event-from="footer"
+                  aria-label={t('googlePlay')}
+                  className="rounded transition-opacity hover:opacity-80"
+                >
+                  <GooglePlayBadge className="h-9 w-auto" />
+                </a>
+              ) : (
+                <Link
+                  href={href(BUBBLE_PATH)}
+                  prefetch={false}
+                  data-umami-event="playtest_entry"
+                  data-umami-event-from="footer"
+                  aria-label={t('googlePlay')}
+                  className="rounded transition-opacity hover:opacity-80"
+                >
+                  <GooglePlayBadge className="h-9 w-auto" />
+                </Link>
+              )}
             </div>
             <p className="text-muted/80">{t('getGame')}</p>
           </div>

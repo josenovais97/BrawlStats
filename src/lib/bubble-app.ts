@@ -465,8 +465,20 @@ export function releasesSince(versionCode: number): BubbleRelease[] {
  * the opt-in link answers with an error, and a page sending people into an
  * error is worse than no page. Flip it, push, and both appear.
  */
+/**
+ * The Bubble is public on Google Play (prepared 2026-10-28, off until Google
+ * approves the production release; the review has no fixed length).
+ *
+ * The one switch for launch day: true ends the closed test everywhere
+ * (`PLAY_TEST.open` follows it), points every Google Play badge straight at
+ * the listing, turns the home page's tester card into a launch card,
+ * redirects /bubble/test to /bubble, and keeps the APK as the fallback for
+ * phones without Play.
+ */
+export const PLAY_LIVE = false;
+
 export const PLAY_TEST = {
-  open: true,
+  open: !PLAY_LIVE,
   /** Joining the group is what lets a Google account into the test. */
   groupUrl: 'https://groups.google.com/g/brawlzone-bubble-testers',
   /** Play's opt-in page for the closed test. */

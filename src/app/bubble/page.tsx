@@ -22,7 +22,7 @@ import { DemoVideo } from "@/components/bubble/demo-video";
 import { DownloadButton } from "@/components/bubble/download-button";
 import { GooglePlayBadge } from "@/components/store-badges";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_TEST, bubbleAppSize } from "@/lib/bubble-app";
+import { BUBBLE_APP, BUBBLE_CHANGELOG, PLAY_LIVE, PLAY_TEST, bubbleAppSize } from "@/lib/bubble-app";
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -206,7 +206,20 @@ export default function BubblePage() {
               app updated. The APK stays, smaller, for phones without Google
               Play and for anyone who will not join a group.
             */}
-            {PLAY_TEST.open ? (
+            {PLAY_LIVE ? (
+              <div className="space-y-3">
+                <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="inline-block transition-transform hover:-translate-y-0.5">
+                  <GooglePlayBadge className="h-16 w-auto" />
+                </a>
+                <p className="text-sm text-muted">
+                  {t('No Google Play on your phone?')}{' '}
+                  <DownloadButton from="hero" className="font-semibold text-foreground underline underline-offset-2">
+                    {t('Download the APK')}
+                  </DownloadButton>{' '}
+                  {t('Version {version} · {v} · Android', { version: BUBBLE_APP.version, v: bubbleAppSize() })}{" "}{t('{minAndroid} or newer', { minAndroid: BUBBLE_APP.minAndroid })}
+                </p>
+              </div>
+            ) : PLAY_TEST.open ? (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-4">
                   <Link href={lp('/bubble/test')} data-umami-event="playtest_entry" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
@@ -245,7 +258,7 @@ export default function BubblePage() {
                 build, same key; see `storeUrl`. */}
             {/* Hidden during the Google Play test: a third route pulls people
                 away from the one that makes them testers. */}
-            {BUBBLE_APP.storeUrl && !PLAY_TEST.open ? (
+            {BUBBLE_APP.storeUrl && !PLAY_TEST.open && !PLAY_LIVE ? (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <a
                   href={lp(BUBBLE_APP.storeUrl)}
@@ -673,7 +686,11 @@ export default function BubblePage() {
         <h2 className="display text-2xl uppercase sm:text-3xl">{t('Get it on your phone')}</h2>
         <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.', { v: bubbleAppSize() })}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          {PLAY_TEST.open ? (
+          {PLAY_LIVE ? (
+            <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble-cta" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
+              <GooglePlayBadge className="h-[3.25rem] w-auto" />
+            </a>
+          ) : PLAY_TEST.open ? (
             <Link href={lp('/bubble/test')} data-umami-event="playtest_entry" data-umami-event-from="bubble" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">
               <GooglePlayBadge className="h-[3.25rem] w-auto" />
             </Link>
@@ -681,12 +698,12 @@ export default function BubblePage() {
           <DownloadButton
             from="cta"
             className={
-              PLAY_TEST.open
+              PLAY_TEST.open || PLAY_LIVE
                 ? "inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"
                 : "inline-flex items-center gap-3 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
             }
           >
-            <Download className="size-5" />{PLAY_TEST.open ? t('Download the APK') : t('Download for Android')}</DownloadButton>
+            <Download className="size-5" />{PLAY_TEST.open || PLAY_LIVE ? t('Download the APK') : t('Download for Android')}</DownloadButton>
           <Link
             href={lp('/tier-list/ranked')}
             className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:border-brand/50"

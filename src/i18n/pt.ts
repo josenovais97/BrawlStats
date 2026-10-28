@@ -4578,4 +4578,10 @@ export const PT: Record<string, string> = {
     "Aviso ativado",
   "Checked for new rewards {when}. New ones show up here within minutes.":
     "Procuramos recompensas novas {when}. As novas aparecem aqui em minutos.",
+  "BrawlZone Bubble is on Google Play":
+    "BrawlZone Bubble chegou ao Google Play",
+  "New on Google Play":
+    "Novo no Google Play",
+  "The best picks for your map and what beats the enemy, floating over Brawl Stars while you draft. Free, no ads.":
+    "Os melhores brawlers para o seu mapa e o que ganha do inimigo, flutuando sobre o Brawl Stars enquanto você escolhe. Grátis, sem anúncios.",
 };
