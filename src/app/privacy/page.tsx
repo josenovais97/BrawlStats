@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Database, HardDrive, Server, Shield, Smartphone, Trash2, User, Megaphone } from 'lucide-react';
+import { BellRing, Database, HardDrive, Megaphone, Server, Shield, Smartphone, Trash2, User } from 'lucide-react';
 import Link from 'next/link';
 
 import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
@@ -156,6 +156,22 @@ export default function PrivacyPage() {
                   className="font-semibold text-foreground underline underline-offset-2"
                 >{t('Google Privacy Policy')}</a>.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeading
+          title={t('Notifications and the giveaway')}
+          subtitle={t('Only if you ask for them, and only what they need.')}
+        />
+        <div className="card p-6">
+          <div className="flex gap-4">
+            <BellRing className="size-6 shrink-0 text-brand" />
+            <div className="space-y-3 text-sm leading-relaxed text-muted">
+              <p>{t('If you tap "Notify me" on the free rewards page, your browser gives us an address at its own push service (Google\'s, Apple\'s or Mozilla\'s) and two keys, and we store them with the page\'s language. They identify a browser, not a person, and are used only to tell you about new free rewards. Tap "Turn off" on the same page, or block notifications in your browser, and the subscription is deleted.')}</p>
+              <p>{t('If you enter the giveaway, we store your player tag, the email you give and a scrambled, daily-changing code made from your network address (to stop one network creating fake entries). The email is used only to contact the winner, is never published or shared, and is deleted once the prize is delivered.')}</p>
             </div>
           </div>
         </div>

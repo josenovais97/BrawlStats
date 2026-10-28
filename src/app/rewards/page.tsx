@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ChevronDown } from 'lucide-react';
 
 import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
+import { NotifyButton } from '@/components/rewards/notify-button';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { relativeTime } from '@/lib/format';
 import { getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
@@ -207,7 +208,7 @@ function FollowBand() {
     <section className="flex flex-col gap-5 rounded-2xl bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="max-w-md space-y-1">
         <h2 className="display text-2xl">{t('Get the next one first')}</h2>
-        <p className="text-sm text-muted">{t('A new link goes to these the moment it is found, often hours before other sites have it.')}</p>
+        <p className="text-sm text-muted">{t('Get a notification on this phone, or follow a channel: a new link goes out the moment it is found, often hours before other sites have it.')}</p>
       </div>
       <div className="flex flex-wrap gap-3">
         <FollowButtons />
@@ -220,6 +221,8 @@ function FollowButtons() {
   const t = getT(requestLocale());
   return (
     <>
+      {/* The public key is read at render; the private one never leaves the server. */}
+      <NotifyButton vapidKey={process.env.VAPID_PUBLIC_KEY ?? ''} />
       <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-game inline-flex items-center gap-2 bg-[#25d366] px-5 py-3 text-[#06260f] [--btn-shadow:#12803c]">
         {t('WhatsApp channel')}
       </a>

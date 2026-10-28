@@ -119,6 +119,13 @@ feed = {'updatedAt': now, 'items': (new + [i for i in feed['items'] if i['id'] n
 json.dump(feed, open(path + '.tmp', 'w'), indent=1, ensure_ascii=False); os.replace(path + '.tmp', path)
 PY
 
+# Browsers that asked to be told (2026-10-28), before anything else: a
+# notification is the quickest way from the drop to the claim button, and
+# brawlzone.net/rewards already lists the batch (latest.json above).
+mapfile -t NAMES < <(python3 -c 'import json,sys; [print(r["name"]) for r in json.load(open(sys.argv[1]))]' "$OUT/rewards.json")
+(cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/push-rewards.ts "${NAMES[@]}") 2>&1 \
+  | grep -E '^push:' || echo "::warning::push notifications not sent (not fatal)"
+
 # Discord first: the links are clickable there, and it takes a second.
 DISCORD_TOKEN=$(grep -oP '^DISCORD_BOT_TOKEN=\K.*' "$ENV_FILE" | tr -d '"')
 DISCORD_GUILD=$(grep -oP '^DISCORD_GUILD_ID=\K.*' "$ENV_FILE" | tr -d '"')

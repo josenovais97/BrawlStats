@@ -4556,4 +4556,24 @@ export const ES: Record<string, string> = {
     "Gana el Brawl Pass: sorteo gratis, más puntos = más posibilidades.",
   "Enter now":
     "Participa ya",
+  "Get a notification on this phone, or follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Recibe una notificación en este teléfono o sigue un canal: cada link nuevo sale en cuanto aparece, muchas veces horas antes que en otros sitios.",
+  "If you enter the giveaway, we store your player tag, the email you give and a scrambled, daily-changing code made from your network address (to stop one network creating fake entries). The email is used only to contact the winner, is never published or shared, and is deleted once the prize is delivered.":
+    "Si participas en el sorteo, guardamos tu tag de jugador, el email que nos des y un código cifrado que cambia cada día, hecho a partir de tu dirección de red (para evitar que una misma red cree participaciones falsas). El email solo se usa para contactar al ganador, nunca se publica ni se comparte, y se borra cuando se entrega el premio.",
+  "If you tap \"Notify me\" on the free rewards page, your browser gives us an address at its own push service (Google's, Apple's or Mozilla's) and two keys, and we store them with the page's language. They identify a browser, not a person, and are used only to tell you about new free rewards. Tap \"Turn off\" on the same page, or block notifications in your browser, and the subscription is deleted.":
+    "Si tocas \"Avísame\" en la página de recompensas gratis, tu navegador nos da una dirección en su propio servicio de notificaciones (de Google, Apple o Mozilla) y dos claves, y las guardamos con el idioma de la página. Identifican un navegador, no a una persona, y solo se usan para avisarte de nuevas recompensas gratis. Toca \"Desactivar\" en la misma página, o bloquea las notificaciones en tu navegador, y la suscripción se borra.",
+  "Notifications and the giveaway":
+    "Notificaciones y el sorteo",
+  "Only if you ask for them, and only what they need.":
+    "Solo si las pides, y solo lo que necesitan.",
+  "Notifications are blocked for this site. Allow them in your browser settings to get new rewards.":
+    "Las notificaciones están bloqueadas para este sitio. Permítelas en la configuración del navegador para recibir nuevas recompensas.",
+  "Notifications: open this page in Chrome on Android, or add the site to your home screen on iPhone.":
+    "Notificaciones: abre esta página en Chrome en Android, o agrega el sitio a tu pantalla de inicio en iPhone.",
+  "Notify me when a new reward drops":
+    "Avísame cuando salga una recompensa nueva",
+  "Turn off":
+    "Desactivar",
+  "You will be notified":
+    "Te avisaremos",
 };

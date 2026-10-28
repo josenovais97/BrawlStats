@@ -908,6 +908,16 @@ export const CLIENT_ES: Record<string, string> = {
     "Gana el Brawl Pass: sorteo gratis, más puntos = más posibilidades.",
   "Enter now":
     "Participa ya",
+  "Notifications are blocked for this site. Allow them in your browser settings to get new rewards.":
+    "Las notificaciones están bloqueadas para este sitio. Permítelas en la configuración del navegador para recibir nuevas recompensas.",
+  "Notifications: open this page in Chrome on Android, or add the site to your home screen on iPhone.":
+    "Notificaciones: abre esta página en Chrome en Android, o agrega el sitio a tu pantalla de inicio en iPhone.",
+  "Notify me when a new reward drops":
+    "Avísame cuando salga una recompensa nueva",
+  "Turn off":
+    "Desactivar",
+  "You will be notified":
+    "Te avisaremos",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1815,4 +1825,14 @@ export const CLIENT_PT: Record<string, string> = {
     "Ganhe o Brawl Pass: sorteio grátis, mais pontos = mais chances.",
   "Enter now":
     "Participe agora",
+  "Notifications are blocked for this site. Allow them in your browser settings to get new rewards.":
+    "As notificações estão bloqueadas para este site. Permita nas configurações do navegador para receber novas recompensas.",
+  "Notifications: open this page in Chrome on Android, or add the site to your home screen on iPhone.":
+    "Notificações: abra esta página no Chrome no Android, ou adicione o site à tela de início no iPhone.",
+  "Notify me when a new reward drops":
+    "Me avise quando sair uma recompensa nova",
+  "Turn off":
+    "Desativar",
+  "You will be notified":
+    "Aviso ativado",
 };

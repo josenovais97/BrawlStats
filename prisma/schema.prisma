@@ -724,3 +724,17 @@ model GiveawayEntry {
   @@index([ipHash, createdAt])
   @@map("giveaway_entries")
 }
+
+/// A browser that asked to be told about new free rewards (2026-10-28).
+/// Deleted when its push service says it is gone (404/410).
+model PushSubscription {
+  id         Int       @id @default(autoincrement())
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  lang       String    @default("en")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSentAt DateTime? @map("last_sent_at")
+
+  @@map("push_subscriptions")
+}
