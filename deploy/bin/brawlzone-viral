@@ -80,8 +80,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop) ;;
-  *) die "::error::unknown format '$kind' (quiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank or stop)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank or stop)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"

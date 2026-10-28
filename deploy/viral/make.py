@@ -4,6 +4,10 @@
 
 kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
                  shadow, a pixelated model or an extreme zoom, 3-2-1, reveal.
+         shadowquiz / zoomquiz  the quiz with one kind of clue throughout
+                 (2026-10-28): "Guess the brawler by its SHADOW #N" and "from
+                 this ZOOM #N", their own episode numbers, the same answer
+                 history as the quiz so no brawler repeats across the three.
          broken  "Who got BROKEN this week?": the three biggest win-rate
                  climbers and the two biggest fallers, last 3 days against the
                  same 3 days a week before (prev.json; without one, against
@@ -55,7 +59,7 @@ rnd = random.Random(f"{data.get('date', '')}/{KIND}")
 by_id = {b['id']: b for b in data.get('all', [])}
 # Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
 # holds where you read.
-PACING = {'quiz': {'pace': 2}, 'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}}
+PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -71,9 +75,17 @@ def pct(x, sign=False):
 # ================================================================ quiz
 EASY, MEDIUM, HARD = (60, 210, 110), (255, 180, 40), (255, 60, 90)
 CLUES = {'shadow': 'WHO IS THIS?', 'pixel': 'WHO IS THIS?', 'zoom': 'ZOOMED IN: WHO?'}
+# The quiz is the channel's best format (2026-10-28: 1,676 views in a day
+# against ~900 for the rest), so it runs daily; the themed episodes give it
+# a new title hook on the days between the mixed ones.
+QUIZ_STYLE = {'quiz': None, 'shadowquiz': 'shadow', 'zoomquiz': 'zoom'}
+# Where the zoom starts, per level, in the themed zoom quiz: five rounds of
+# the same clue need the hard ones to be harder.
+ZOOM_FROM = {'EASY': 3.4, 'MEDIUM': 4.2, 'HARD': 5.2}
 
-if KIND == 'quiz':
-    N = episode('quiz')
+if KIND in QUIZ_STYLE:
+    STYLE = QUIZ_STYLE[KIND]
+    N = episode(KIND)
     recent = set(state.get('quiz_recent', [])[-45:])
     pool = sorted((b for b in data['all'] if load_model(b) is not None and b['id'] not in recent),
                   key=lambda b: -(b['use'] or 0))
@@ -82,19 +94,45 @@ if KIND == 'quiz':
     third = len(pool) // 3
     picks = (rnd.sample(pool[:third], 2) + rnd.sample(pool[third:2 * third], 1) + rnd.sample(pool[2 * third:], 2))
     levels = ['EASY', 'EASY', 'MEDIUM', 'HARD', 'HARD']
-    clues = ['shadow', 'pixel', 'zoom'] + rnd.sample(['shadow', 'pixel', 'zoom'], 2)
-    rnd.shuffle(clues)
-    tl.add(4, 'q_intro', n=N, faces=picks)
+    if STYLE:
+        clues = [STYLE] * 5
+    else:
+        clues = ['shadow', 'pixel', 'zoom'] + rnd.sample(['shadow', 'pixel', 'zoom'], 2)
+        rnd.shuffle(clues)
+    tl.add(4, 'q_intro', n=N, faces=picks, style=STYLE)
     for i, (b, lvl, clue) in enumerate(zip(picks, levels, clues)):
-        tl.add(6, 'q', b=b, i=i, lvl=lvl, clue=clue)
+        tl.add(6, 'q', b=b, i=i, lvl=lvl, clue=clue, style=STYLE)
     tl.add(8, 'q_outro', n=N, picks=picks)
     names = ', '.join(nice(b['n']) for b in picks)
+if KIND == 'quiz':
     META = {
         'title': f'Guess the brawler #{N} 👀 Only real fans get 5/5',
         'titles': {'pt-BR': f'Adivinhe o brawler #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler #{N} 👀 Solo los verdaderos fans aciertan 5/5'},
         'description': f'Guess the brawler #{N}: 5 rounds, easy to hard. Shadows, pixels and zoom-ins. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f'3 more to guess today (shadow, zoom, clues): https://brawlzone.net/daily-challenge{FOOTER}\n'
+                       '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
+        'used': [b['id'] for b in picks],
+        'answers': names,
+    }
+elif KIND == 'shadowquiz':
+    META = {
+        'title': f'Guess the brawler by its SHADOW #{N} 👤 Only real fans get 5/5',
+        'titles': {'pt-BR': f'Adivinhe o brawler pela SOMBRA #{N} 👤 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su SOMBRA #{N} 👤 Solo los verdaderos fans aciertan 5/5'},
+        'description': f'Guess the brawler by its shadow #{N}: 5 silhouettes, easy to hard. '
+                       f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
+                       f"Today's shadow puzzle on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
+                       '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
+        'used': [b['id'] for b in picks],
+        'answers': names,
+    }
+elif KIND == 'zoomquiz':
+    META = {
+        'title': f'Guess the brawler from this ZOOM #{N} 🔍 Only real fans get 5/5',
+        'titles': {'pt-BR': f'Adivinhe o brawler pelo ZOOM #{N} 🔍 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por el ZOOM #{N} 🔍 Solo los verdaderos fans aciertan 5/5'},
+        'description': f'Guess the brawler from an extreme zoom #{N}: 5 rounds, easy to hard. '
+                       f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
+                       f"Today's zoom puzzle on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
                        '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
         'used': [b['id'] for b in picks],
         'answers': names,
@@ -135,8 +173,15 @@ def quiz_scene(s, t, bt, lt):
         for j, b in enumerate(s['faces']):  # the five answers, hidden as shadows, sliding past
             x = (j * 260 + t * 160) % (W + 260) - 130
             put(canvas, shadow_face(b), x, 1400 + 40 * math.sin(t * 3 + j), alpha=0.9)
-        slam(canvas, 'GUESS THE', 180, WHITE, W / 2, 560, bt)
-        slam(canvas, 'BRAWLER', 250, None, W / 2, 770, bt - 1, gold=True)
+        if s.get('style') == 'shadow':
+            slam(canvas, 'GUESS THE', 180, WHITE, W / 2, 560, bt)
+            slam(canvas, 'SHADOW', 250, None, W / 2, 770, bt - 1, gold=True)
+        elif s.get('style') == 'zoom':
+            slam(canvas, 'ZOOMED IN', 190, WHITE, W / 2, 560, bt)
+            slam(canvas, 'WHO IS IT?', 210, None, W / 2, 770, bt - 1, gold=True)
+        else:
+            slam(canvas, 'GUESS THE', 180, WHITE, W / 2, 560, bt)
+            slam(canvas, 'BRAWLER', 250, None, W / 2, 770, bt - 1, gold=True)
         if bt > 2: put(canvas, pill(f"#{s['n']}", (255, 60, 100), size=90), W / 2, 990, scale=out_back((bt - 2) / 0.4, 2.2), rot=-6)
         if bt > 3: put(canvas, text_sprite('ONLY REAL FANS GET 5/5', 66, WHITE, stroke=7), W / 2, 1160, scale=out_back((bt - 3) / 0.4))
         shake, flash = hits(bt, (0, 1, 2, 3), 1.2, 0.5)
@@ -161,7 +206,8 @@ def quiz_scene(s, t, bt, lt):
                 step = min(3, int(bt))  # sharper on every beat: 9, 13, 19, 28 blocks across
                 put(canvas, pixelated(a, (7, 10, 14, 22)[step]), W / 2, 980, scale=pop)
             else:
-                z = 4.2 - 0.55 * min(bt, 3.6)  # slowly pulling back
+                z0 = ZOOM_FROM[s['lvl']] if s.get('style') == 'zoom' else 4.2
+                z = z0 - 0.55 * min(bt, 3.6)  # slowly pulling back
                 put(canvas, zoom_view(b, z), W / 2, 960, scale=pop)
             put(canvas, text_sprite(CLUES[s['clue']], 110, WHITE), W / 2, 1480, scale=out_back(bt / 0.4))
             if bt >= 1:
@@ -188,7 +234,7 @@ def quiz_scene(s, t, bt, lt):
                 put(canvas, f, x, 810, scale=out_back(u))
                 put(canvas, text_sprite(nice(b['n']).upper()[:9], 34, WHITE, stroke=5, shadow=False), x, 920, alpha=clamp(u))
         slam(canvas, 'COMMENT YOUR SCORE', 92, WHITE, W / 2, 1050, bt - 2.2)
-        follow_cta(canvas, bt - 3.4, 1260, f"FOR QUIZ #{s['n'] + 1} TOMORROW")
+        follow_cta(canvas, bt - 3.4, 1260, 'FOR A NEW QUIZ EVERY DAY')
         shake, flash = hits(bt, (0, 0.6, 2.2, 3.4), 0.8, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -1042,7 +1088,7 @@ def stop_scene(s, t, bt, lt):
 
 
 # ================================================================ render
-SCENE = {'quiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
+SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
          'stop': stop_scene}[KIND]
 
