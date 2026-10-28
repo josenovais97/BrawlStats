@@ -346,6 +346,9 @@ const LOCAL_ICON: Record<string, string> = {
 };
 
 const WIKI_ICON: Record<string, string> = {
+  // "Chaos Drop.png" is the grey, colourless drop; the schedule showed it
+  // as a dark smudge. The Rare one is the art the wiki's own section uses.
+  'Chaos Drop': 'Rare Chaos Drop.png',
   Credit: 'Icon-Credit.png',
   Bling: 'Bling.png',
   Gem: 'Icon-Gem.png',

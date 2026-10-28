@@ -85,6 +85,10 @@ export function rewardBase(name: string): string {
  * are the in-game marks rather than a pile of them.
  */
 const WIKI_ALIAS: Record<string, string> = {
+  // The wiki's plain "Chaos Drop.png" is the grey, colourless drop; the
+  // coloured art is per rarity, and its own Chaos Drops section leads with
+  // the Rare one (2026-10-28).
+  'chaos drop': 'Rare Chaos Drop.png',
   gem: 'Icon-Gem.png',
   credit: 'Icon-Credit.png',
   bling: 'Icon-Bling.png',

@@ -16,7 +16,7 @@ test('reward names come down to the thing they give', () => {
 });
 
 test('wiki candidates: currencies use the Icon- files, items their own name', () => {
-  assert.deepEqual(wikiArtCandidates('1x Chaos Drop'), ['Chaos Drop.png']);
+  assert.deepEqual(wikiArtCandidates('1x Chaos Drop'), ['Rare Chaos Drop.png', 'Chaos Drop.png']);
   assert.deepEqual(wikiArtCandidates('2000 Credits'), ['Icon-Credit.png', 'Credits.png', 'Credit.png']);
   assert.deepEqual(wikiArtCandidates('500 Gems'), ['Icon-Gem.png', 'Gems.png', 'Gem.png']);
   assert.deepEqual(wikiArtCandidates('1x Vince Box'), ['Vince Box.png']);
