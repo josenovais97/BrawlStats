@@ -28,6 +28,9 @@ kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
                  assassin ranked"), the next group each episode.
          stop    "STOP picking these brawlers": the most-picked that lose,
                  then the least-picked that win.
+         drops   "1,000 Chaos Drops with the real drop rates" (2026-10-29): what
+                 a thousand give, rolled from the wiki's tables in data['drops'],
+                 seeded by date. Exits 3 without the table or the drop's art.
          daily   "Can you guess today's brawler?" (2026-10-23): the first four
                  steps of the site's Zoom puzzle and its Shadow, never the
                  answer, which is at brawlzone.net/daily-challenge. data is
@@ -1196,10 +1199,228 @@ def giveaway_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+
+# ================================================================ drops
+# "1,000 Chaos Drops with the real drop rates" (2026-10-29): the drop opener on
+# /starr-drops as a Short. Rolled from the wiki's tables (data['drops'], from
+# viral-data.ts) with a seed from the date, so the two PARTs agree; the
+# screen says it is a simulation the whole way through.
+DROP_N = 1000
+RAR_COL = {'Rare': (95, 212, 95), 'Super Rare': (62, 168, 255), 'Epic': (192, 91, 255), 'Mythic': (255, 77, 109),
+           'Legendary': (255, 197, 61), 'Ultra': (255, 138, 61)}
+RAR_NAME = {'Ultra': 'ULTRA LEGENDARY'}
+BRAWLER_RAR = {'Epic Brawler': 'Epic', 'Mythic Brawler': 'Mythic', 'Legendary Brawler': 'Legendary', 'Ultra Brawler': 'Ultra Legendary'}
+
+_dimg = {}
+def dimg(name, size):
+    """Art the job copies into ASSETS/drops: the grey Chaos Drop, reward icons."""
+    key = (name, size)
+    if key not in _dimg:
+        path = f"{os.environ.get('ASSETS', '.')}/drops/{name}"
+        if not os.path.exists(path):
+            _dimg[key] = None
+        else:
+            im = Image.open(path).convert('RGBA'); sc = size / max(im.size)
+            _dimg[key] = im.resize((max(1, int(im.width * sc)), max(1, int(im.height * sc))), Image.LANCZOS)
+    return _dimg[key]
+
+_tint = {}
+def chaos_drop(rarity, size):
+    """The wiki's grey Chaos Drop in a rarity's colour, as the game shows it upgrading."""
+    key = (rarity, size)
+    if key not in _tint:
+        from PIL import ImageOps
+        base = dimg('chaos-drop.png', size)
+        col = RAR_COL.get(rarity, (200, 200, 220))
+        im = ImageOps.colorize(base.convert('L'), black=tuple(int(c * 0.22) for c in col), mid=col,
+                               white=tuple(min(255, int(c * 0.55 + 255 * 0.45)) for c in col)).convert('RGBA')
+        im.putalpha(base.getchannel('A'))
+        _tint[key] = im
+    return _tint[key]
+
+if KIND == 'drops':
+    DROP = data.get('drops', {}).get('chaos-drops')
+    if not DROP or dimg('chaos-drop.png', 16) is None:
+        print('no Chaos Drop table or art'); sys.exit(3)
+    ODDS = DROP['odds']
+    TABLES = {t['rarity']: [r for r in t['rewards'] if r['chance']] for t in DROP['tables'] if t['rarity']}
+    sim = random.Random(f"{data.get('date', '')}/drops")
+    def wpick(items, w):
+        x = sim.random() * sum(w(i) for i in items)
+        for i in items:
+            x -= w(i)
+            if x < 0: return i
+        return items[-1]
+    COUNT = {o['rarity']: 0 for o in ODDS}; TOTAL = {}; ITEMS = {}
+    for _ in range(DROP_N):
+        o = wpick(ODDS, lambda o: o['chance']); COUNT[o['rarity']] += 1
+        if not TABLES.get(o['rarity']): continue
+        r = wpick(TABLES[o['rarity']], lambda r: r['chance'])
+        if r['amount']:
+            TOTAL[r['label']] = TOTAL.get(r['label'], 0) + int(r['amount'].replace(',', ''))
+        else:
+            key = 'Skin' if r['reward'].lower().startswith('skin') else r['reward']
+            ITEMS[key] = ITEMS.get(key, 0) + 1
+    # Which brawlers, for the art: a draw from that rarity, as the game does for a brawler you lack.
+    def brawlers_of(item, n):
+        pool = [b for b in data['all'] if b.get('rar') == BRAWLER_RAR[item] and load_model(b) is not None]
+        return sim.sample(pool, min(n, len(pool)))
+    LEGS = brawlers_of('Legendary Brawler', min(ITEMS.get('Legendary Brawler', 0), 3))
+    ULTRAS = brawlers_of('Ultra Brawler', min(ITEMS.get('Ultra Brawler', 0), 1))
+    ultra_odd = next((o['chance'] for o in ODDS if o['rarity'] == 'Ultra'), 0)
+    ultra_row = next((r['chance'] for r in TABLES.get('Ultra', []) if r['reward'] == 'Ultra Brawler'), 0)
+    ULTRA_IN = round(1 / (ultra_odd * ultra_row)) if ultra_odd and ultra_row else None
+    GOOD = [(k, f) for k, f in (('Star Power', 'star-power.png'), ('Hypercharge', 'hypercharge.png'), ('Gadget', 'gadget.png'),
+                                ('Skin', 'skin-legendary.png'), ('Buffie', 'buffie.png'), ('Mythic Brawler', 'brawlers.png'))
+            if ITEMS.get(k)][:6]
+    LOOT = [(k, f) for k, f in (('Coins', 'coins.png'), ('Power Points', 'power-points.png'), ('Credits', 'credits.png')) if TOTAL.get(k)]
+
+    tl.add(4, 'd_intro')
+    tl.add(6, 'd_open')
+    if LOOT: tl.add(2 + len(LOOT), 'd_loot')
+    if GOOD: tl.add(2 + len(GOOD), 'd_good')
+    tl.add(5, 'd_leg')
+    if ULTRA_IN: tl.add(7, 'd_ultra')
+    tl.add(8, 'd_outro')
+
+    legs = ITEMS.get('Legendary Brawler', 0); ultras = ITEMS.get('Ultra Brawler', 0)
+    summary = (f"{TOTAL.get('Coins', 0):,} coins, {TOTAL.get('Power Points', 0):,} power points, "
+               f"{ITEMS.get('Star Power', 0)} Star Powers, {ITEMS.get('Hypercharge', 0)} Hypercharges, "
+               f"{legs} Legendary Brawler{'s' if legs != 1 else ''} and {ultras} Ultra Legendary.")
+    META = {
+        'title': '1,000 Chaos Drops with the REAL drop rates: what do you get? 😱',
+        'titles': {'pt-BR': '1.000 Sorteios do Caos com as chances REAIS: o que você ganha? 😱',
+                   'es-419': '1.000 Premios del caos con las probabilidades REALES: ¿qué te toca? 😱'},
+        'description': f'What 1,000 Chaos Drops give you, simulated with the real drop rates from the Brawl Stars Wiki: {summary} '
+                       f'How many Legendaries would you get? Comment 👇\n\n'
+                       f'Open your own Starr and Chaos Drops (free, in your browser): https://brawlzone.net/starr-drops{FOOTER}\n'
+                       '#brawlstars #chaosdrop #starrdrop #brawlstarsgame #brawlzone',
+    }
+
+
+def sim_note(canvas):
+    put(canvas, text_sprite('SIMULATED WITH THE REAL DROP RATES', 36, (225, 220, 255), stroke=5, shadow=False), W / 2, 160)
+
+
+def drops_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    order = [o['rarity'] for o in ODDS]
+    if k == 'd_intro':
+        rar = order[int(bt * 2) % len(order)]
+        canvas = background(t, RAR_COL[rar]).convert('RGBA')
+        put_rays(canvas, RAR_COL[rar], t, W / 2, 1180, speed=16, alpha=0.8)
+        slam(canvas, '1,000', 300, None, W / 2, 540, bt, gold=True)
+        slam(canvas, 'CHAOS DROPS', 150, WHITE, W / 2, 770, bt - 1)
+        if bt > 1.5:
+            put(canvas, chaos_drop(rar, 520), W / 2, 1180 + 16 * math.sin(t * 3), scale=out_back((bt - 1.5) / 0.5, 1.8), rot=4 * math.sin(t * 5))
+        if bt > 2.6:
+            put(canvas, pill('WHAT DO YOU GET?', (255, 60, 100), size=78), W / 2, 1560, scale=out_back((bt - 2.6) / 0.4, 2.0), rot=-3)
+        shake, flash = hits(bt, (0, 1, 1.5, 2.6), 1.2, 0.4)
+    elif k == 'd_open':
+        prog = out_cubic(bt / 4.5)
+        top = max((r for r in order if COUNT[r] * prog >= 1), key=order.index, default=order[0])
+        rar = order[int(t * 9) % len(order)] if prog < 1 else top
+        canvas = background(t, RAR_COL[rar]).convert('RGBA')
+        put_rays(canvas, RAR_COL[rar], t, W / 2, 860, speed=40, alpha=0.7)
+        put(canvas, text_sprite('OPENING...' if prog < 1 else 'OPENED!', 90, WHITE, stroke=8), W / 2, 400)
+        put(canvas, text_sprite(f'{int(DROP_N * prog):,}', 220, gold=True, stroke=14), W / 2, 580)
+        wob = 0 if prog >= 1 else 7 * math.sin(t * 45)
+        put(canvas, chaos_drop(rar, 400), W / 2, 880, scale=1 + 0.05 * abs(math.sin(t * 20)) * (prog < 1), rot=wob)
+        most = max(COUNT.values()) or 1
+        for i, r in enumerate(order):
+            y = 1150 + i * 92; n = int(COUNT[r] * prog); col = RAR_COL[r]
+            put(canvas, text_sprite(RAR_NAME.get(r, r.upper()), 44, col, stroke=6, shadow=False), 250, y)
+            bar = Image.new('RGBA', (440, 46), (0, 0, 0, 0)); d = ImageDraw.Draw(bar)
+            d.rounded_rectangle((0, 0, 439, 45), 23, fill=(10, 12, 28, 220))
+            wbar = int(434 * n / most)
+            if wbar > 20: d.rounded_rectangle((3, 3, 3 + wbar, 42), 20, fill=col)
+            canvas.alpha_composite(bar, (450, int(y - 23)))
+            put(canvas, text_sprite(f'{n:,}', 54, WHITE, stroke=6, shadow=False), 980, y)
+        if 4.5 <= bt < 5: shake, flash = hits(bt, (4.5,), 1.0, 0.5)
+    elif k == 'd_loot':
+        canvas = background(t, GOLD_TOP).convert('RGBA')
+        slam(canvas, 'THE LOOT', 160, None, W / 2, 420, bt, gold=True)
+        for i, (key, f) in enumerate(LOOT):
+            u = bt - 1 - i; y = 720 + i * 320
+            if u < 0: continue
+            icon = dimg(f, 230)
+            if icon is not None: put(canvas, icon, 250, y, scale=out_back(u / 0.4, 2.0))
+            put(canvas, text_sprite(f'{TOTAL[key]:,}', 150, gold=True, stroke=12), 640, y - 30, scale=out_back((u - 0.1) / 0.4))
+            put(canvas, text_sprite(key.upper(), 60, WHITE, stroke=6), 640, y + 85, scale=out_back((u - 0.2) / 0.4))
+        shake, flash = hits(bt, [0] + [1 + i for i in range(len(LOOT))], 1.0, 0.3)
+    elif k == 'd_good':
+        canvas = background(t, (192, 91, 255)).convert('RGBA')
+        slam(canvas, 'THE GOOD STUFF', 140, None, W / 2, 420, bt, gold=True)
+        for i, (key, f) in enumerate(GOOD):
+            u = bt - 1 - i; x = 290 if i % 2 == 0 else 790; y = 730 + (i // 2) * 330
+            if u < 0: continue
+            sc = out_back(u / 0.4, 2.0)
+            tile = Image.new('RGBA', (440, 300), (0, 0, 0, 0))
+            ImageDraw.Draw(tile).rounded_rectangle((0, 0, 439, 299), 40, fill=(10, 12, 28, 200), outline=(10, 12, 28), width=6)
+            put(canvas, tile, x, y, scale=sc)
+            icon = dimg(f, 150)
+            if icon is not None: put(canvas, icon, x - 105, y - 20, scale=sc)
+            put(canvas, text_sprite(f'x{ITEMS[key]}', 110, gold=True, stroke=10), x + 80, y - 30, scale=sc)
+            label = {'Skin': 'SKINS', 'Mythic Brawler': 'MYTHIC BRAWLERS'}.get(key, key.upper() + 'S')
+            put(canvas, fit(label, 46, 400, WHITE, stroke=5, shadow=False), x, y + 100, scale=sc)
+        shake, flash = hits(bt, [0] + [1 + i for i in range(len(GOOD))], 0.9, 0.3)
+    elif k == 'd_leg':
+        legs = ITEMS.get('Legendary Brawler', 0)
+        canvas = background(t, RAR_COL['Legendary']).convert('RGBA')
+        put_rays(canvas, RAR_COL['Legendary'], t, W / 2, 1150, speed=14, alpha=0.8)
+        slam(canvas, 'LEGENDARY', 150, None, W / 2, 400, bt, gold=True)
+        slam(canvas, 'BRAWLERS', 130, WHITE, W / 2, 560, bt - 0.5)
+        if bt > 1.2:
+            put(canvas, text_sprite(f'x{legs}', 230, gold=True, stroke=14), W / 2, 760, scale=1 + 0.8 * (1 - out_back((bt - 1.2) / 0.45, 1.4)))
+        xs = {1: [W / 2], 2: [330, 750], 3: [220, W / 2, 860]}.get(len(LEGS), [])
+        for i, (b, x) in enumerate(zip(LEGS, xs)):
+            u = bt - 2 - i * 0.6
+            if u < 0: continue
+            put(canvas, art(b, 560, 420), x, 1230, scale=out_back(u / 0.4, 1.8))
+            put(canvas, fit(nice(b['n']).upper(), 60, 320, WHITE, stroke=6), x, 1560, scale=out_back((u - 0.2) / 0.4))
+        if not LEGS and bt > 2:
+            slam(canvas, 'NONE...', 150, (255, 90, 110), W / 2, 1200, bt - 2)
+        shake, flash = hits(bt, [0, 0.5, 1.2] + [2 + i * 0.6 for i in range(len(LEGS))], 1.1, 0.4)
+    elif k == 'd_ultra':
+        got = bool(ULTRAS)
+        canvas = background(t, RAR_COL['Ultra']).convert('RGBA')
+        slam(canvas, 'ULTRA BRAWLER?', 130, None, W / 2, 420, bt, gold=True)
+        if bt > 0.8:
+            put(canvas, pill(f'1 IN {ULTRA_IN:,}', (255, 60, 100), size=80), W / 2, 600, scale=out_back((bt - 0.8) / 0.4, 2.0), rot=-3)
+        if bt < 6:
+            put_rays(canvas, RAR_COL['Ultra'], t, W / 2, 1100, speed=20 + bt * 25, alpha=min(1, 0.5 + bt * 0.09))
+            put(canvas, chaos_drop('Ultra', 480), W / 2, 1100, scale=1 + 0.02 * bt * abs(math.sin(t * 30)), rot=(bt * 2) * math.sin(t * 40))
+            if bt > 1.5: put(canvas, text_sprite('...', 160, WHITE), W / 2, 1480 + 10 * math.sin(t * 8))
+        elif got:
+            confetti(canvas, lt - 6 * tl.step)
+            put_rays(canvas, GOLD_TOP, t, W / 2, 1100, speed=30)
+            b = ULTRAS[0]
+            put(canvas, art(b, 640, 640), W / 2, 1120, scale=out_back((bt - 6) / 0.45, 1.8))
+            slam(canvas, f'WE GOT {nice(b["n"]).upper()}!', 110, None, W / 2, 1530, bt - 6.3, gold=True)
+        else:
+            put(canvas, grey(chaos_drop('Ultra', 480)), W / 2, 1060)
+            slam(canvas, '0', 300, (255, 90, 110), W / 2, 1060, bt - 6)
+            slam(canvas, 'NOT EVEN ONE', 120, WHITE, W / 2, 1450, bt - 6.6)
+        shake, flash = hits(bt, (0, 0.8, 6, 6.6), 1.4, 0.6)
+    else:  # d_outro
+        mark = False
+        canvas = background(t, RAR_COL['Legendary']).convert('RGBA')
+        bounce = abs(math.sin(bt * math.pi)) * 22
+        put(canvas, fit('OPEN YOUR OWN', 170, 960, gold=True), W / 2, 420 - bounce, scale=out_back(bt / 0.5))
+        put(canvas, fit('BRAWLZONE.NET/STARR-DROPS', 88, 980, WHITE, stroke=8), W / 2, 600, scale=out_back((bt - 0.6) / 0.4))
+        if bt > 1.1: arrow(canvas, W / 2, 790 + abs(math.sin(t * 6)) * 36)
+        if bt > 1.4:
+            rar = order[int(bt) % len(order)]
+            put(canvas, chaos_drop(rar, 330), W / 2, 1090, scale=out_back((bt - 1.4) / 0.4), rot=5 * math.sin(t * 3))
+        follow_cta(canvas, bt - 2.4, 1390, 'FOR THE NEXT 1,000')
+        shake, flash = hits(bt, (0, 0.6), 0.8, 0.3)
+    if k != 'd_outro': sim_note(canvas)
+    return finish(canvas, shake, flash, mark)
+
 # ================================================================ render
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
-         'stop': stop_scene, 'giveaway': giveaway_scene}[KIND]
+         'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene}[KIND]
 
 
 def frame(t):

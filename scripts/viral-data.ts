@@ -13,6 +13,7 @@ import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { rotationMaps } from '@/lib/ranked-rotation';
 import { slugify } from '@/lib/slugs';
+import { getStarrDrops } from '@/lib/starr-drops';
 import { getBracketRoster, getRankedMapPicks, getRankedRecentMaps, getScoredRoster } from '@/lib/stats';
 
 const BRACKETS = [
@@ -74,6 +75,26 @@ async function main() {
     };
   }
 
+  // The drop tables for the "1,000 Chaos Drops" Short (2026-10-29), from the
+  // same wiki read as /starr-drops. A failed read leaves them out and make.py
+  // draws something else.
+  const starrDrops = await getStarrDrops().catch(() => null);
+  const drops = Object.fromEntries(
+    (starrDrops?.types ?? [])
+      .filter((type) => type.group === 'core' && type.rarityOdds.length > 0)
+      .map((type) => [
+        type.slug,
+        {
+          name: type.name,
+          odds: type.rarityOdds,
+          tables: type.tables.map((table) => ({
+            rarity: table.rarity,
+            rewards: table.rewards.map((r) => ({ reward: r.reward, amount: r.amount, label: r.label, icon: r.icon, chance: r.chance })),
+          })),
+        },
+      ]),
+  );
+
   console.log(
     JSON.stringify({
       date: new Date().toISOString().slice(0, 10),
@@ -82,6 +103,7 @@ async function main() {
       recent: recent.filter((b) => b.tier).map(row),
       pool,
       brackets,
+      drops,
     }),
   );
 }
