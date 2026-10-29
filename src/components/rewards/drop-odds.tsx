@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { pct, rarityColor } from '@/components/starr/rarity';
+import { dropRewardName, pct, rarityColor } from '@/components/starr/rarity';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import {
@@ -8,11 +8,10 @@ import {
   atOrAbove,
   bestRewards,
   perNormalDay,
-  type DropHighlight,
   type DropType,
   type StarrDropData,
 } from '@/lib/starr-drops';
-import { getT, type T } from '@/lib/t';
+import { getT } from '@/lib/t';
 
 /**
  * "What can it give me?", on /rewards (2026-10-29).
@@ -70,7 +69,7 @@ export function DropOdds({ data, drop }: { data: StarrDropData; drop: DropType }
                   <span aria-hidden className="size-8 shrink-0" />
                 )}
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold leading-tight">{rewardName(reward, t)}</p>
+                  <p className="text-sm font-semibold leading-tight">{dropRewardName(reward, t)}</p>
                   <p className="text-xs text-muted">
                     <span className="font-bold tabular-nums text-foreground">{pct(reward.chance)}</span> · {t('1 in {n}', { n: Math.round(1 / reward.chance).toLocaleString(requestLocale()) })}
                   </p>
@@ -92,16 +91,14 @@ export function DropOdds({ data, drop }: { data: StarrDropData; drop: DropType }
         </p>
       ) : null}
 
-      <Link href={localePath(requestLocale(), '/starr-drops')} className="btn-game inline-flex items-center gap-2 bg-brand px-5 py-3 text-brand-ink">
-        {t('Daily schedule and every reward')}
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link href={`${localePath(requestLocale(), '/starr-drops')}#open`} className="btn-game inline-flex items-center gap-2 bg-[#3ddc63] px-5 py-3 text-[#0b2a14] [--btn-shadow:#1a7a33]">
+          {t('Try opening one')}
+        </Link>
+        <Link href={localePath(requestLocale(), '/starr-drops')} className="btn-game inline-flex items-center gap-2 bg-brand px-5 py-3 text-brand-ink">
+          {t('Daily schedule and every reward')}
+        </Link>
+      </div>
     </section>
   );
-}
-
-/** "Skin 80-149 Gem" is a skin worth 80 to 149 gems; the rest read as the wiki writes them. */
-function rewardName(reward: DropHighlight, t: T): string {
-  const skin = reward.reward.match(/^Skin (\d+-\d+) Gem$/i);
-  if (skin) return t('{n}-gem skin', { n: skin[1] });
-  return `${reward.amount ? `${reward.amount} ` : ''}${t(reward.label)}`;
 }

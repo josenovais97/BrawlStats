@@ -954,6 +954,36 @@ export const CLIENT_ES: Record<string, string> = {
     "Toca tu cuenta en la lista de abajo o escribe tu tag.",
   "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
     "No encontramos ningún jugador con ese nombre. Escribe tu tag: empieza por # y está debajo de tu nombre en el juego.",
+  "A simulation with the real odds from the Brawl Stars Wiki. Nothing is added to your game account.":
+    "Una simulación con las probabilidades reales de la Wiki de Brawl Stars. No se añade nada a tu cuenta del juego.",
+  "Copied!":
+    "¡Copiado!",
+  "Keep tapping!":
+    "¡Sigue tocando!",
+  "Open 10 at once":
+    "Abrir 10 de golpe",
+  "Open another":
+    "Abrir otro",
+  "Open another {drop}":
+    "Abrir otro {drop}",
+  "Share my best":
+    "Compartir mi mejor",
+  "Tap the drop to open it":
+    "Toca el premio para abrirlo",
+  "Tap the {drop}":
+    "Toca el {drop}",
+  "Which drop":
+    "Qué premio",
+  "Your best so far: {best} ({rarity}).":
+    "Tu mejor hasta ahora: {best} ({rarity}).",
+  "{n} drops opened on BrawlZone, best pull: {best} ({rarity}). Try your luck:":
+    "{n} premios abiertos en BrawlZone, mi mejor: {best} ({rarity}). Prueba tu suerte:",
+  "{n} opened · {k} Legendary or better":
+    "{n} abiertos · {k} legendarios o mejores",
+  "{p} chance per drop, 1 in {n}":
+    "{p} de probabilidad por premio, 1 de cada {n}",
+  "{rarity} {drop}":
+    "{drop} {rarity}",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1907,4 +1937,34 @@ export const CLIENT_PT: Record<string, string> = {
     "Toque na sua conta na lista abaixo ou digite sua tag.",
   "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
     "Não encontramos nenhum jogador com esse nome. Digite sua tag: ela começa com # e fica embaixo do seu nome no jogo.",
+  "A simulation with the real odds from the Brawl Stars Wiki. Nothing is added to your game account.":
+    "Uma simulação com as chances reais da Wiki do Brawl Stars. Nada é adicionado à sua conta do jogo.",
+  "Copied!":
+    "Copiado!",
+  "Keep tapping!":
+    "Continue tocando!",
+  "Open 10 at once":
+    "Abrir 10 de uma vez",
+  "Open another":
+    "Abrir outro",
+  "Open another {drop}":
+    "Abrir outro {drop}",
+  "Share my best":
+    "Compartilhar meu melhor",
+  "Tap the drop to open it":
+    "Toque no sorteio para abrir",
+  "Tap the {drop}":
+    "Toque no {drop}",
+  "Which drop":
+    "Qual sorteio",
+  "Your best so far: {best} ({rarity}).":
+    "Seu melhor até agora: {best} ({rarity}).",
+  "{n} drops opened on BrawlZone, best pull: {best} ({rarity}). Try your luck:":
+    "{n} sorteios abertos no BrawlZone, meu melhor: {best} ({rarity}). Teste sua sorte:",
+  "{n} opened · {k} Legendary or better":
+    "{n} abertos · {k} lendários ou melhores",
+  "{p} chance per drop, 1 in {n}":
+    "{p} de chance por sorteio, 1 em {n}",
+  "{rarity} {drop}":
+    "{drop} {rarity}",
 };

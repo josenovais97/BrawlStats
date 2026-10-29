@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChallengeBoard } from '@/components/challenge/challenge-board';
 import { PictureBoard, type PictureMode, type PictureSaved, TRIES, loadPicture } from '@/components/challenge/picture-board';
 import { useT } from '@/components/i18n/use-t';
+import { Confetti } from '@/components/ui/confetti';
 import type { PickerEntry } from '@/lib/brawldle-data';
 import {
   EMPTY_PLAY,
@@ -76,30 +77,6 @@ function pictureStatus(saved: PictureSaved | null): Status {
   if (!saved) return NONE;
   const misses = saved.guesses.filter((g) => !g.correct).length;
   return { done: saved.solved || misses >= TRIES, solved: saved.solved, guesses: saved.guesses.length };
-}
-
-/** A burst of confetti over the page, once per solve. */
-function Confetti({ burst }: { burst: number }) {
-  if (burst === 0) return null;
-  const colors = ['#fde047', '#f472b6', '#38bdf8', '#4ade80', '#ffffff', '#fb923c'];
-  return (
-    <div key={burst} className="pointer-events-none fixed inset-0 z-50 overflow-hidden" aria-hidden>
-      {Array.from({ length: 60 }, (_unused, i) => (
-        <span
-          key={i}
-          className="animate-confetti absolute top-[-5%] block h-3 w-2 rounded-sm"
-          style={{
-            left: `${(i * 37) % 100}%`,
-            background: colors[i % colors.length],
-            animationDelay: `${(i % 12) * 40}ms`,
-            animationDuration: `${1400 + ((i * 53) % 900)}ms`,
-            ['--drift' as string]: `${((i * 29) % 160) - 80}px`,
-            ['--spin' as string]: `${((i * 71) % 720) - 360}deg`,
-          }}
-        />
-      ))}
-    </div>
-  );
 }
 
 export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[] }) {

@@ -4726,4 +4726,42 @@ export const ES: Record<string, string> = {
     "Brawler legendario",
   "Ultra Brawler":
     "Brawler ultralegendario",
+  "Open a Starr Drop":
+    "Abre un Premio Starr",
+  "Open a drop":
+    "Abre un premio",
+  "Tap it like in the game and see what the real odds give you.":
+    "Tócalo como en el juego y mira lo que te dan las probabilidades reales.",
+  "Try opening one":
+    "Prueba a abrir uno",
+  "A simulation with the real odds from the Brawl Stars Wiki. Nothing is added to your game account.":
+    "Una simulación con las probabilidades reales de la Wiki de Brawl Stars. No se añade nada a tu cuenta del juego.",
+  "Copied!":
+    "¡Copiado!",
+  "Keep tapping!":
+    "¡Sigue tocando!",
+  "Open 10 at once":
+    "Abrir 10 de golpe",
+  "Open another":
+    "Abrir otro",
+  "Open another {drop}":
+    "Abrir otro {drop}",
+  "Share my best":
+    "Compartir mi mejor",
+  "Tap the drop to open it":
+    "Toca el premio para abrirlo",
+  "Tap the {drop}":
+    "Toca el {drop}",
+  "Which drop":
+    "Qué premio",
+  "Your best so far: {best} ({rarity}).":
+    "Tu mejor hasta ahora: {best} ({rarity}).",
+  "{n} drops opened on BrawlZone, best pull: {best} ({rarity}). Try your luck:":
+    "{n} premios abiertos en BrawlZone, mi mejor: {best} ({rarity}). Prueba tu suerte:",
+  "{n} opened · {k} Legendary or better":
+    "{n} abiertos · {k} legendarios o mejores",
+  "{p} chance per drop, 1 in {n}":
+    "{p} de probabilidad por premio, 1 de cada {n}",
+  "{rarity} {drop}":
+    "{drop} {rarity}",
 };

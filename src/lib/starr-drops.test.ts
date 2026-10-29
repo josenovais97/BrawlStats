@@ -190,3 +190,27 @@ test('the drop a free reward is', () => {
   assert.equal(dropForReward(['Mega Box'], types)?.slug, 'starr-drops');
   assert.equal(dropForReward(['Ranked Starr Drop'], types)?.slug, 'starr-drops');
 });
+
+test('opening a drop: rarity by odds, reward by table, best by rarity then rarity of reward', async () => {
+  const { isBetter, pickWeighted, rollDrop } = await import('@/lib/drop-roll');
+  assert.equal(pickWeighted([1, 3], (n) => n, 0.2), 1);
+  assert.equal(pickWeighted([1, 3], (n) => n, 0.3), 3);
+  assert.equal(pickWeighted([1], () => 0, 0.5), null);
+
+  const drop = {
+    slug: 'starr-drops', name: 'Starr Drop', image: '', tint: true,
+    odds: [{ rarity: 'Rare', label: 'Rare', chance: 0.9 }, { rarity: 'Legendary', label: 'Legendary', chance: 0.1 }],
+    tables: { Legendary: [{ name: 'Star Power', iconUrl: null, chance: 0.3 }, { name: 'Skin', iconUrl: null, chance: 0.6 }] },
+  };
+  const seq = (...v: number[]) => () => v.shift()!;
+  const top = rollDrop(drop, seq(0.95, 0.5));
+  assert.equal(top.level, 1);
+  assert.equal(top.reward?.name, 'Skin');
+  // The table lists 90%, so a Skin is two thirds of Legendaries.
+  assert.ok(Math.abs(top.chance - 0.1 * (0.6 / 0.9)) < 1e-9);
+  const rare = rollDrop(drop, seq(0.1, 0.5));
+  assert.deepEqual([rare.level, rare.reward, rare.chance], [0, null, 0.9]);
+  assert.equal(isBetter(top, rare), true);
+  assert.equal(isBetter(rare, top), false);
+  assert.equal(isBetter(rare, null), true);
+});

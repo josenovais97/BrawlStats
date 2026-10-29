@@ -4,8 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
+import { DropOpener } from '@/components/starr/drop-opener';
 import { OpenOnHash } from '@/components/starr/open-on-hash';
-import { pct, rarityColor } from '@/components/starr/rarity';
+import { dropRewardName, pct, RARITY_TINT, rarityColor } from '@/components/starr/rarity';
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import {
@@ -20,7 +21,9 @@ import {
   type DropTable,
   type DropType,
 } from '@/lib/starr-drops';
+import type { OpenerDrop } from '@/lib/drop-roll';
 import { formatDate, formatDayMonth } from '@/lib/format';
+import { SITE_URL } from '@/lib/site';
 import { andList, getT, type T } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -118,6 +121,7 @@ export default async function StarrDropsPage() {
   const perDayRaw = perNormalDay(data.daily, 'Starr Drop');
   const perDay = perDayRaw && perDayRaw > 0 ? perDayRaw : null;
   const next = nextSpecialDay(data.daily, new Date());
+  const openers = [starr, chaos].filter((type): type is DropType => type !== null && type.rarityOdds.length > 0).map((type) => toOpener(type, t));
   const faq = buildFaq(t, { starr, chaos, legendary, chaosLegendary, perDay, daily: data.daily });
 
   return (
@@ -137,6 +141,7 @@ export default async function StarrDropsPage() {
 
       <nav aria-label={t('On this page')} className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
         {[
+          ...(openers.length > 0 ? [{ href: '#open', label: t('Open a drop') }] : []),
           { href: '#schedule', label: t('Daily schedule') },
           ...(legendary ? [{ href: '#odds', label: t('Your Legendary odds') }] : []),
           ...(starr ? [{ href: `#${starr.slug}`, label: starr.name }] : []),
@@ -183,6 +188,17 @@ export default async function StarrDropsPage() {
       </section>
 
       {legendary ? <LegendaryOdds legendary={legendary} perDay={perDay} chaosLegendary={chaosLegendary} /> : null}
+
+      {/*
+        The odds above, felt rather than read (2026-10-29): the game's tap-to-
+        upgrade ritual, rolled from the same tables the page prints.
+      */}
+      {openers.length > 0 ? (
+        <section id="open" className="scroll-mt-24 space-y-3">
+          <SectionHeading title={t('Open a Starr Drop')} subtitle={t('Tap it like in the game and see what the real odds give you.')} />
+          <DropOpener drops={openers} shareUrl={`${SITE_URL}${lp('/starr-drops')}#open`} />
+        </section>
+      ) : null}
 
       {/*
         Every drop is folded shut, and the whole page is the list of them.
@@ -670,21 +686,6 @@ function RewardRow({
 /* ------------------------------ hero and odds ------------------------------ */
 
 /**
- * The Starr Drop in each rarity's colour.
- *
- * In the game the drop itself changes colour as it upgrades -- green, blue,
- * purple, red, gold -- so the ladder shows the one gold artwork turned to each.
- * A hue rotation of our own copy rather than five downloaded images: there is
- * one asset to keep, and a rarity the game adds later still gets a drop.
- */
-const RARITY_TINT: Record<string, string> = {
-  Rare: 'hue-rotate(75deg) saturate(1.2)',
-  'Super Rare': 'hue-rotate(165deg) saturate(1.3)',
-  Epic: 'hue-rotate(235deg) saturate(1.2)',
-  Mythic: 'hue-rotate(310deg) saturate(1.5)',
-};
-
-/**
  * The game's own reward screen for the page's subject: the drop floating in
  * turning rays (the /rewards stage), the rarity ladder it can climb, and the
  * four numbers people come for. All of it from this render's wiki read.
@@ -842,6 +843,32 @@ function LegendaryOdds({
       </p>
     </section>
   );
+}
+
+/**
+ * A drop as the opener needs it: names already translated, and only rows
+ * with a chance, since a reward the source cannot weigh cannot be rolled.
+ * The Starr Drop uses our own art so each rarity can tint it, like the hero.
+ */
+function toOpener(type: DropType, t: T): OpenerDrop {
+  const own = type.slug === 'starr-drops' || !type.imageUrl;
+  return {
+    slug: type.slug,
+    name: t(type.name.replace(/s$/, '')),
+    image: own ? '/icons/starr-drop.png' : type.imageUrl!,
+    tint: own,
+    odds: type.rarityOdds.map((odd) => ({ rarity: odd.rarity, label: t(odd.rarity === 'Ultra' ? 'Ultra Legendary' : odd.rarity), chance: odd.chance })),
+    tables: Object.fromEntries(
+      type.tables
+        .filter((table) => table.rarity !== null)
+        .map((table) => [
+          table.rarity!,
+          table.rewards
+            .filter((reward) => reward.chance !== null)
+            .map((reward) => ({ name: dropRewardName(reward, t), iconUrl: reward.iconUrl, chance: reward.chance! })),
+        ]),
+    ),
+  };
 }
 
 /**
