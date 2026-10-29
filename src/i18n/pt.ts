@@ -4704,4 +4704,26 @@ export const PT: Record<string, string> = {
     "Toque na sua conta na lista abaixo ou digite sua tag.",
   "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
     "Não encontramos nenhum jogador com esse nome. Digite sua tag: ela começa com # e fica embaixo do seu nome no jogo.",
+  "Daily schedule and every reward":
+    "Calendário diário e todas as recompensas",
+  "It rolls a rarity first, then one reward of that rarity. The chance of each rarity:":
+    "Primeiro sai uma raridade e depois uma recompensa dessa raridade. A chance de cada raridade:",
+  "The best rewards, and your chance in one {drop}":
+    "As melhores recompensas e a sua chance em um {drop}",
+  "What can a {drop} give you?":
+    "O que um {drop} pode te dar?",
+  "Your Daily Wins give {n} Starr Drops a day: a {d} chance of at least one Legendary today, {w} this week and {m} this month.":
+    "Suas vitórias diárias dão {n} Sorteios Starr por dia: {d} de chance de pelo menos um Lendário hoje, {w} nesta semana e {m} neste mês.",
+  "{n}-gem skin":
+    "Skin de {n} gemas",
+  "Star Power":
+    "Poder de Estrela",
+  "Epic Brawler":
+    "Brawler Épico",
+  "Mythic Brawler":
+    "Brawler Mítico",
+  "Legendary Brawler":
+    "Brawler Lendário",
+  "Ultra Brawler":
+    "Brawler Ultralendário",
 };

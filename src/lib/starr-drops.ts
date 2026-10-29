@@ -803,3 +803,59 @@ export async function getStarrDrops(): Promise<StarrDropData | null> {
     sourceUrl: 'https://brawlstars.fandom.com/wiki/Starr_Drops',
   };
 }
+
+/* ------------------------------ for /rewards ------------------------------ */
+
+/** A reward and its chance from one unopened drop, rarity roll included. */
+export interface DropHighlight {
+  reward: string;
+  amount: string | null;
+  label: string;
+  iconUrl: string | null;
+  chance: number;
+}
+
+/**
+ * The best a drop can give, and the chance of each per drop opened.
+ *
+ * A row's own chance is "once the drop has rolled this rarity"; someone
+ * holding an unopened drop wants the product, summed over every rarity that
+ * can give it -- an Epic Brawler is in the Mythic and Legendary tables alike.
+ * "Best" is what Legendary and anything rarer can give, likeliest first.
+ * Empty when the drop has no rarity odds to multiply by.
+ */
+export function bestRewards(type: DropType): DropHighlight[] {
+  const odds = new Map(type.rarityOdds.map((odd) => [odd.rarity, odd.chance]));
+  const tables = type.tables.filter((table) => table.rarity !== null && odds.has(table.rarity));
+  if (tables.length === 0) return [];
+  const legendaryAt = type.rarityOdds.findIndex((odd) => odd.rarity === 'Legendary');
+  const top = new Set(
+    legendaryAt === -1 ? [type.rarityOdds[type.rarityOdds.length - 1].rarity] : type.rarityOdds.slice(legendaryAt).map((odd) => odd.rarity),
+  );
+  const wanted = new Set(tables.filter((table) => top.has(table.rarity!)).flatMap((table) => table.rewards.map((r) => r.reward)));
+
+  const total = new Map<string, DropHighlight>();
+  for (const table of tables) {
+    for (const row of table.rewards) {
+      if (!wanted.has(row.reward) || row.chance === null) continue;
+      const entry = total.get(row.reward) ?? { reward: row.reward, amount: row.amount, label: row.label, iconUrl: row.iconUrl, chance: 0 };
+      entry.chance += odds.get(table.rarity!)! * row.chance;
+      total.set(row.reward, entry);
+    }
+  }
+  return [...total.values()].sort((a, b) => b.chance - a.chance);
+}
+
+/**
+ * Which drop a free reward is, by its name: "1x Chaos Drop" is a Chaos Drop.
+ * Anything else (a box, Credits) gets the Starr Drop, the one every player
+ * opens daily.
+ */
+export function dropForReward(names: string[], types: DropType[]): DropType | null {
+  const bySlug = (slug: string) => types.find((type) => type.slug === slug && type.rarityOdds.length > 0) ?? null;
+  for (const name of names) {
+    if (/chaos\s*drop/i.test(name)) return bySlug('chaos-drops') ?? bySlug('starr-drops');
+    if (/starr\s*drop/i.test(name) && !/ranked|hypercharge/i.test(name)) return bySlug('starr-drops');
+  }
+  return bySlug('starr-drops');
+}

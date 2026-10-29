@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { atLeastOnce, atOrAbove, boxAddedDates, nextSpecialDay, parseBoxes, parseDailyWins, perNormalDay } from '@/lib/starr-drops';
+import { atLeastOnce, atOrAbove, bestRewards, boxAddedDates, dropForReward, nextSpecialDay, parseBoxes, parseDailyWins, perNormalDay, type DropType } from '@/lib/starr-drops';
 
 /**
  * The Daily Wins and box parsers, on trimmed copies of the wiki's own markup
@@ -159,4 +159,34 @@ test('odds: at least once, at or above, per normal day, next special day', () =>
   assert.equal(nextSpecialDay(daily, new Date('2026-09-26T12:00:00Z'))?.startsAt.slice(0, 10), '2026-09-26');
   assert.equal(nextSpecialDay(daily, new Date('2026-05-01T00:00:00Z'))?.startsAt.slice(0, 10), '2026-05-16');
   assert.equal(nextSpecialDay(daily, new Date('2026-10-28T00:00:00Z')), null);
+});
+
+const row = (reward: string, chance: number) => ({ reward, amount: null, label: reward, icon: null, iconUrl: null, chance });
+const drop = (slug: string, odds: [string, number][], tables: [string, [string, number][]][]): DropType => ({
+  name: slug,
+  slug,
+  imageUrl: null,
+  description: '',
+  group: 'core',
+  rarityOdds: odds.map(([rarity, chance]) => ({ rarity, chance })),
+  tables: tables.map(([rarity, rows]) => ({ rarity, listed: 1, rewards: rows.map(([r, c]) => row(r, c)) })),
+});
+
+test('best rewards: Legendary and up, chance per unopened drop, summed over rarities', () => {
+  const chaos = drop('chaos-drops', [['Mythic', 0.9], ['Legendary', 0.08], ['Ultra', 0.02]], [
+    ['Mythic', [['Coins', 0.8], ['Epic Brawler', 0.2]]],
+    ['Legendary', [['Epic Brawler', 0.5], ['Star Power', 0.5]]],
+    ['Ultra', [['Ultra Brawler', 1]]],
+  ]);
+  const best = bestRewards(chaos);
+  assert.deepEqual(best.map((b) => b.reward), ['Epic Brawler', 'Star Power', 'Ultra Brawler']);
+  assert.ok(Math.abs(best[0].chance - (0.9 * 0.2 + 0.08 * 0.5)) < 1e-9);
+  assert.deepEqual(bestRewards(drop('ranked', [], [['', [['Spray', 1]]]])), []);
+});
+
+test('the drop a free reward is', () => {
+  const types = [drop('starr-drops', [['Rare', 1]], []), drop('chaos-drops', [['Epic', 1]], [])];
+  assert.equal(dropForReward(['2000 Credits', '1x Chaos Drop'], types)?.slug, 'chaos-drops');
+  assert.equal(dropForReward(['Mega Box'], types)?.slug, 'starr-drops');
+  assert.equal(dropForReward(['Ranked Starr Drop'], types)?.slug, 'starr-drops');
 });

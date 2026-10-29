@@ -3,12 +3,14 @@ import { ChevronDown } from 'lucide-react';
 
 import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
 import { ClaimNudge } from '@/components/rewards/claim-nudge';
+import { DropOdds } from '@/components/rewards/drop-odds';
 import { LastChecked } from '@/components/rewards/last-checked';
 import { NotifyButton } from '@/components/rewards/notify-button';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { relativeTime } from '@/lib/format';
 import { RewardArt } from '@/components/rewards/reward-art';
 import { getFreeRewards, LIVE_DAYS, rewardArt, type FreeReward } from '@/lib/free-rewards';
+import { dropForReward, getStarrDrops } from '@/lib/starr-drops';
 import { currentMonth, WHATSAPP_URL } from '@/lib/site';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
@@ -40,7 +42,10 @@ export const revalidate = 300;
 
 export default async function RewardsPage() {
   const t = getT(requestLocale());
-  const { live, earlier } = await getFreeRewards();
+  // The drop tables are cached for twelve hours, well past this page's five
+  // minutes, so they cost the wiki nothing extra.
+  const [{ live, earlier }, drops] = await Promise.all([getFreeRewards(), getStarrDrops()]);
+  const drop = drops ? dropForReward(live.map((r) => r.name), drops.types) : null;
 
   const faq = [
     {
@@ -98,6 +103,8 @@ export default async function RewardsPage() {
       ) : null}
 
       {hero ? <FollowBand /> : null}
+
+      {drops && drop ? <DropOdds data={drops} drop={drop} /> : null}
 
       <section className="space-y-5">
         <h2 className="display text-2xl">{t('How to claim a free reward')}</h2>
