@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useLocale } from '@/components/i18n/use-locale';
 import { useT } from '@/components/i18n/use-t';
-import { pct, RARITY_TINT, rarityColor } from '@/components/starr/rarity';
+import { pct, rarityColor } from '@/components/starr/rarity';
 import { Confetti } from '@/components/ui/confetti';
 import { isBetter, rollDrop, type OpenerDrop, type Roll } from '@/lib/drop-roll';
 
@@ -198,7 +198,7 @@ export function DropOpener({ drops, shareUrl }: { drops: OpenerDrop[]; shareUrl:
               width={200}
               height={200}
               className={`${taps > 0 ? 'animate-picture-shake' : 'reward-float'} relative size-40 object-contain sm:size-52`}
-              style={{ filter: `${drop.tint ? (RARITY_TINT[odd.rarity] ?? '') : ''} drop-shadow(0 0 26px ${color})` }}
+              style={{ filter: `${drop.tint?.[odd.rarity] ?? ''} drop-shadow(0 0 26px ${color})` }}
             />
           )}
         </button>

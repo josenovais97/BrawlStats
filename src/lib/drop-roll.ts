@@ -19,8 +19,8 @@ export interface OpenerDrop {
   /** "Starr Drop", translated. */
   name: string;
   image: string;
-  /** Tint the image per rarity (our own Starr Drop art); off for wiki art. */
-  tint: boolean;
+  /** CSS filter per rarity, so the drop changes colour as it climbs; null keeps the art as it is. */
+  tint: Record<string, string> | null;
   /** Commonest first, as the wiki writes them. */
   odds: { rarity: string; label: string; chance: number }[];
   /** Keyed by rarity. A rarity with no table opens to its rarity alone. */

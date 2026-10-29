@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured-data';
 import { DropOpener } from '@/components/starr/drop-opener';
 import { OpenOnHash } from '@/components/starr/open-on-hash';
-import { dropRewardName, pct, RARITY_TINT, rarityColor } from '@/components/starr/rarity';
+import { CHAOS_TINT, dropRewardName, pct, RARITY_TINT, rarityColor } from '@/components/starr/rarity';
 import { ErrorState } from '@/components/ui/error-state';
 import { SectionHeading } from '@/components/ui/section-heading';
 import {
@@ -856,7 +856,7 @@ function toOpener(type: DropType, t: T): OpenerDrop {
     slug: type.slug,
     name: t(type.name.replace(/s$/, '')),
     image: own ? '/icons/starr-drop.png' : type.imageUrl!,
-    tint: own,
+    tint: own ? RARITY_TINT : type.slug === 'chaos-drops' ? CHAOS_TINT : null,
     odds: type.rarityOdds.map((odd) => ({ rarity: odd.rarity, label: t(odd.rarity === 'Ultra' ? 'Ultra Legendary' : odd.rarity), chance: odd.chance })),
     tables: Object.fromEntries(
       type.tables

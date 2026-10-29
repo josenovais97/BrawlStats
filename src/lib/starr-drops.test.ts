@@ -198,7 +198,7 @@ test('opening a drop: rarity by odds, reward by table, best by rarity then rarit
   assert.equal(pickWeighted([1], () => 0, 0.5), null);
 
   const drop = {
-    slug: 'starr-drops', name: 'Starr Drop', image: '', tint: true,
+    slug: 'starr-drops', name: 'Starr Drop', image: '', tint: null,
     odds: [{ rarity: 'Rare', label: 'Rare', chance: 0.9 }, { rarity: 'Legendary', label: 'Legendary', chance: 0.1 }],
     tables: { Legendary: [{ name: 'Star Power', iconUrl: null, chance: 0.3 }, { name: 'Skin', iconUrl: null, chance: 0.6 }] },
   };

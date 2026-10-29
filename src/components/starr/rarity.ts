@@ -51,6 +51,18 @@ export const RARITY_TINT: Record<string, string> = {
   Mythic: 'hue-rotate(310deg) saturate(1.5)',
 };
 
+/**
+ * The same for the Chaos Drop, whose wiki artwork is the green Rare one:
+ * each rarity turned from green rather than from gold.
+ */
+export const CHAOS_TINT: Record<string, string> = {
+  'Super Rare': 'hue-rotate(95deg) saturate(1.2)',
+  Epic: 'hue-rotate(165deg) saturate(1.2)',
+  Mythic: 'hue-rotate(230deg) saturate(1.4)',
+  Legendary: 'hue-rotate(-75deg) saturate(1.4) brightness(1.1)',
+  Ultra: 'hue-rotate(-95deg) saturate(1.6)',
+};
+
 /** "Skin 80-149 Gem" is a skin worth 80 to 149 gems; the rest read as the wiki writes them. */
 export function dropRewardName(reward: { reward: string; amount: string | null; label: string }, t: T): string {
   const skin = reward.reward.match(/^Skin (\d+-\d+) Gem$/i);
