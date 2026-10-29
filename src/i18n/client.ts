@@ -946,6 +946,14 @@ export const CLIENT_ES: Record<string, string> = {
     "Tu nombre o tag",
   "Tick this box to enter.":
     "Marca esta casilla para participar.",
+  "Your player tag or name":
+    "Tu tag de jugador o tu nombre",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V o tu nombre",
+  "Tap your account in the list under the box, or type your tag.":
+    "Toca tu cuenta en la lista de abajo o escribe tu tag.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "No encontramos ningún jugador con ese nombre. Escribe tu tag: empieza por # y está debajo de tu nombre en el juego.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1891,4 +1899,12 @@ export const CLIENT_PT: Record<string, string> = {
     "Seu nome ou tag",
   "Tick this box to enter.":
     "Marque esta caixa para participar.",
+  "Your player tag or name":
+    "Sua tag de jogador ou seu nome",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V ou seu nome",
+  "Tap your account in the list under the box, or type your tag.":
+    "Toque na sua conta na lista abaixo ou digite sua tag.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "Não encontramos nenhum jogador com esse nome. Digite sua tag: ela começa com # e fica embaixo do seu nome no jogo.",
 };

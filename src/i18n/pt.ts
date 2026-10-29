@@ -4696,4 +4696,12 @@ export const PT: Record<string, string> = {
     "{p} por Sorteio Starr, mais ou menos 1 em {k}. Todo Sorteio Starr começa Raro e pode melhorar; a chance de terminar em cada raridade é {list}.",
   "Chaos Drops":
     "Sorteios do Caos",
+  "Your player tag or name":
+    "Sua tag de jogador ou seu nome",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V ou seu nome",
+  "Tap your account in the list under the box, or type your tag.":
+    "Toque na sua conta na lista abaixo ou digite sua tag.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "Não encontramos nenhum jogador com esse nome. Digite sua tag: ela começa com # e fica embaixo do seu nome no jogo.",
 };

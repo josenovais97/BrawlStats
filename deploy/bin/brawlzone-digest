@@ -139,6 +139,9 @@ gw_banner=$(umami "select count(*) from website_event where created_at > now() -
 gw_strip=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_banner' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value = 'strip');")
 # Refused entries by reason (2026-10-28: a day of 5 refusals in 6 tries).
 gw_errors=$(umami "select coalesce(string_agg(code || ' ' || n, ' &middot; '), 'none') from (select d.string_value code, count(*) n from website_event e join event_data d on d.website_event_id = e.event_id and d.data_key = 'code' where e.created_at > now() - interval '24 hours' and e.event_name = 'giveaway_error' group by 1 order by 2 desc) t;")
+# Accounts picked from the name list in the entry form (2026-10-29), the fix
+# for "no account has that tag" being most refusals.
+gw_names=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_name_pick';")
 # Step 2 taps from the 2026-10-28 nudges (hero box, bottom bar) on the tester page.
 pt_nudge=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_name = 'playtest_step' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value in ('hero','nudge'));")
 
@@ -195,6 +198,7 @@ html_row "Extra points" "${gw_extras:-?}"
 html_row "Most points" "${gw_top:-none yet}"
 html_row "Page visits (24h)" "${gw_visits:-?} &middot; banner clicks ${gw_banner:-?} (${gw_strip:-?} from the strip)"
 html_row "Refused entries (24h)" "${gw_errors:-?}"
+html_row "Found by name (24h)" "${gw_names:-?}"
 html_row "Watch: one network today" "${gw_net:-0} entries (cap 3)" "$([ "${gw_net:-0}" -ge 3 ] && echo "$WARN" || echo "$OK")"
 html_row "Watch: friends to one entrant today" "${gw_burst:-0}" "$([ "${gw_burst:-0}" -ge 15 ] && echo "$WARN" || echo "$OK")"
 html_rows_close

@@ -4696,4 +4696,12 @@ export const ES: Record<string, string> = {
     "El {p} por Premio Starr, más o menos 1 de cada {k}. Todo Premio Starr empieza Especial y puede mejorar; la probabilidad de que termine en cada rareza es {list}.",
   "Chaos Drops":
     "Premios del caos",
+  "Your player tag or name":
+    "Tu tag de jugador o tu nombre",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V o tu nombre",
+  "Tap your account in the list under the box, or type your tag.":
+    "Toca tu cuenta en la lista de abajo o escribe tu tag.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "No encontramos ningún jugador con ese nombre. Escribe tu tag: empieza por # y está debajo de tu nombre en el juego.",
 };

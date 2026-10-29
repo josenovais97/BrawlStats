@@ -9,7 +9,9 @@ import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
 import { playerIconUrl } from '@/lib/brawlapi';
 import { DISCORD_BONUS, FOLLOW_PLATFORMS, isCode, type FollowPlatform } from '@/lib/giveaway';
+import type { NameMatch } from '@/lib/player-search';
 import { readRecentSearches, serverRecentSearches, subscribeRecentSearches } from '@/lib/recent-searches';
+import { isValidTag, normalizeTag } from '@/lib/tags';
 
 /**
  * The giveaway's interactive half (2026-10-27): the entry form, then the
@@ -128,6 +130,40 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
     .filter((r) => r.kind === 'player')
     .slice(0, 3);
 
+  /*
+   * A name works too (2026-10-29). On 2026-10-28 seven of eleven refusals were
+   * "no account has that tag" -- people who know their name and not their
+   * tag. Anything not starting with # is also looked up by name, the way the
+   * site's search box does it, and picking a match fills in the real tag.
+   */
+  const [matches, setMatches] = useState<NameMatch[] | null>(null);
+  const query = tag.trim();
+  useEffect(() => {
+    if (query.startsWith('#') || [...query].length < 2) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clearing stale results as the query changes
+      setMatches(null);
+      return;
+    }
+    const ctl = new AbortController();
+    const timer = setTimeout(() => {
+      fetch(`/api/players/search?q=${encodeURIComponent(query)}`, { signal: ctl.signal })
+        .then((r) => (r.ok ? r.json() : { players: [] }))
+        .then((d: { players?: NameMatch[] }) => setMatches(d.players ?? []))
+        .catch(() => {});
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      ctl.abort();
+    };
+  }, [query]);
+
+  function pick(m: NameMatch) {
+    setTag(`#${m.tag}`);
+    setMatches(null);
+    setError(null);
+    window.umami?.track('giveaway_name_pick');
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!consent) {
@@ -135,12 +171,20 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
       window.umami?.track('giveaway_error', { code: 'consent-local' });
       return;
     }
+    if (!isValidTag(tag)) {
+      // A name, not a tag: sending it would only come back as "no such tag".
+      setError(matches?.length
+        ? t('Tap your account in the list under the box, or type your tag.')
+        : t('No player found with that name. Type your tag instead: it starts with # and is under your name in game.'));
+      window.umami?.track('giveaway_error', { code: 'name-unpicked' });
+      return;
+    }
     setBusy(true);
     setError(null);
     const res = await fetch('/api/giveaway/enter', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ tag: tag.trim().replace(/^#/, ''), email, consent, ref: referredBy }),
+      body: JSON.stringify({ tag: normalizeTag(tag), email, consent, ref: referredBy }),
     }).catch(() => null);
     const body = res ? await res.json().catch(() => null) : null;
     if (body?.ok) {
@@ -161,7 +205,7 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
       <div className="space-y-2">
         <label className="block space-y-1.5">
           <span className="flex items-center justify-between gap-3 text-sm font-semibold">
-            {t('Your player tag')}
+            {t('Your player tag or name')}
             <button
               type="button"
               onClick={() => setHelp((h) => !h)}
@@ -174,14 +218,31 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
           </span>
           <input
             value={tag}
-            onChange={(e) => setTag(e.target.value.toUpperCase())}
+            onChange={(e) => setTag(e.target.value)}
             required
-            placeholder="#2PQ8LJ9V"
-            autoCapitalize="characters"
+            placeholder={t('#2PQ8LJ9V or your name')}
+            autoCapitalize="none"
+            autoComplete="off"
             spellCheck={false}
             className="w-full rounded-xl border border-border bg-surface-2 px-4 py-3.5 text-base outline-none focus:border-brand/60"
           />
         </label>
+        {matches?.length ? (
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface-2">
+            {matches.map((m) => (
+              <li key={m.tag}>
+                <button type="button" onClick={() => pick(m)} className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-3">
+                  <Image src={playerIconUrl(m.iconId ?? undefined)} alt="" width={32} height={32} className="size-8 shrink-0 rounded-lg" unoptimized />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{m.name}</span>
+                    <span className="block font-mono text-xs text-muted">#{m.tag}</span>
+                  </span>
+                  {m.trophies !== null ? <span className="shrink-0 text-sm font-semibold tabular-nums text-muted">🏆 {m.trophies}</span> : null}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         {recent.length && !tag ? (
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="text-muted">{t('Is this you?')}</span>
