@@ -64,7 +64,6 @@ import {
   getTrophyPercentile,
   recordLookup,
 } from '@/lib/stats';
-import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { displayTag, normalizeTag } from '@/lib/tags';
 import type { BSPlayer } from '@/types/brawlstars';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
@@ -89,29 +88,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       // rather than three competing ones.
       alternates: { canonical: `/player/${normalizeTag(player.tag)}` },
       /*
-       * Indexable pages must be a deliberate set, and this one now has one.
-       *
-       * The reasoning behind the blanket `noindex` still holds for the general
-       * case: player URLs are effectively unbounded and a crawler walking them
-       * costs real API budget for pages nobody searched for. What changed is
-       * that a bounded allowlist exists — the current global top boards, baked
-       * at build time — and it is already threaded through `robots.ts`, the
-       * sitemap and the crawler guard in `proxy.ts`.
-       *
-       * All three of those were being cancelled here. Search Console on
-       * 2026-09-02 reported 789 pages "excluded by noindex" while robots.txt
-       * invited crawlers to exactly these URLs and the sitemap listed them:
-       * Google fetched each one, at the cost of an upstream call, and threw it
-       * away. Listing a page in a sitemap while asking not to have it indexed
-       * is the contradiction the sitemap's own comment warns about.
-       *
-       * `follow` stays either way, so links out of a non-indexed profile still
-       * pass value to the pages that matter.
+       * 2026-10-29: none indexed any more. AdSense rejected the site as "low
+       * value content", and a hundred profiles of API data with no search
+       * visits in 90 days were the clearest example. The allowlist still opens
+       * them to crawlers in robots.txt, so Google can read this and drop them.
        */
-      robots: {
-        index: INDEXABLE_PLAYER_TAGS.has(normalizeTag(player.tag)),
-        follow: true,
-      },
+      robots: { index: false, follow: true },
     };
   } catch {
     // A failed lookup renders "Player not found" (or an API error) with a 200,

@@ -4764,4 +4764,8 @@ export const PT: Record<string, string> = {
     "{p} de chance por sorteio, 1 em {n}",
   "{rarity} {drop}":
     "{drop} {rarity}",
+  "The full patch notes are on supercell.com:":
+    "As notas completas da atualização estão em supercell.com:",
+  "What the latest update changed, which brawlers it touched, and what is coming next.":
+    "O que a última atualização mudou, quais brawlers ela afetou e o que vem a seguir.",
 };

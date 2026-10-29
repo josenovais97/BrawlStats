@@ -4317,7 +4317,11 @@ async function computeRankedMapPicks(
  * point. Measured 2026-08-24, *every* one of the 5,565 possible pairings had
  * been sampled and 4,601 cleared MIN_SAMPLE_FOR_PAIRING — so gating on
  * evidence bounds nothing, and indexing on it would have multiplied the site's
- * crawlable surface roughly eightfold. Each of those is a server-rendered page
+ * crawlable surface roughly eightfold.
+ *
+ * 2026-10-29: cut from top 30 (keep 45) to top 12 (keep 18), about 66 pages
+ * instead of ~550. AdSense rejected the site as "low value content"; 550
+ * templated comparisons had earned 5 search clicks in 90 days. Each of those is a server-rendered page
  * that queries the database, which is exactly what put public network transfer
  * on course to overrun its allowance in the first place.
  *
@@ -4326,7 +4330,7 @@ async function computeRankedMapPicks(
  * is self-limiting — the top 30 yields at most 435 pairings, a surface the
  * crawl budget can absorb.
  */
-const PAIR_INDEX_TOP_BRAWLERS = 30;
+const PAIR_INDEX_TOP_BRAWLERS = 12;
 
 /**
  * How far a brawler can fall before its pairings stop being indexable: the
@@ -4344,7 +4348,7 @@ const PAIR_INDEX_TOP_BRAWLERS = 30;
  * practice stays near the 435 the top 30 gives, since a pairing must first
  * have entered from the top 30.
  */
-const PAIR_INDEX_KEEP_BRAWLERS = 45;
+const PAIR_INDEX_KEEP_BRAWLERS = 18;
 
 /**
  * The pairings worth letting search engines index.

@@ -3,5 +3,5 @@
  * generator at `src/app/sitemaps/sitemap.ts`. Kept apart from both because a
  * metadata route file is only allowed its own exports.
  */
-export const SECTIONS = ['core', 'maps', 'compare', 'players', 'intl'] as const;
+export const SECTIONS = ['core', 'maps', 'compare', 'intl'] as const;
 export type Section = (typeof SECTIONS)[number];

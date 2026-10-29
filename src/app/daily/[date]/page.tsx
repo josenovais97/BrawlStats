@@ -36,9 +36,6 @@ export async function generateStaticParams() {
   return [];
 }
 
-/** A day is only worth indexing when it actually found something. */
-const MIN_FINDINGS_TO_INDEX = 4;
-
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -61,10 +58,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
      * entry — it is the kind of near-empty URL that costs crawl budget across
      * the whole set.
      */
-    robots: {
-      index: (report?.findings ?? 0) >= MIN_FINDINGS_TO_INDEX,
-      follow: true,
-    },
+    // 2026-10-29: no dated report is indexed. AdSense rejected the site as
+    // "low value content"; fifty near-identical generated pages were part of
+    // it, and none had ever been shown in search. /daily stays indexed.
+    robots: { index: false, follow: true },
   };
 }
 

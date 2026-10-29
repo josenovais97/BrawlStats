@@ -91,10 +91,9 @@ function EventCard({ event, open = false }: { event: CommunityEvent; open?: bool
       </summary>
 
       <div className="space-y-4 border-t border-border p-4">
-        {event.description ? (
-          <p className="max-w-3xl text-sm leading-relaxed text-muted">{t(event.description)}</p>
-        ) : null}
-
+        {/* The wiki's write-up is not shown (2026-10-29): it was the wiki's own
+            prose, word for word, and AdSense rejected the site as "low value
+            content". The milestones table is the part this page structures. */}
         {event.table ? <MilestoneTable table={event.table} /> : null}
       </div>
     </details>

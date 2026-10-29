@@ -5,7 +5,6 @@ import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { bracketTierListHref } from '@/lib/tier-list-route';
 
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
-import { INDEXABLE_PLAYER_TAGS } from '@/generated/indexable-players';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
 import { SECTIONS, type Section } from '@/lib/sitemap-sections';
@@ -18,7 +17,6 @@ import {
   getIndexablePairs,
   getNewestDayByMap,
   getTeamComps,
-  listDailyReports,
 } from '@/lib/stats';
 import { getGameModeMap, modeLabel } from '@/lib/brawlapi';
 
@@ -92,9 +90,6 @@ export default async function sitemap(props: { id: Promise<string> }): Promise<M
       break;
     case 'compare':
       await compare(add);
-      break;
-    case 'players':
-      for (const tag of INDEXABLE_PLAYER_TAGS) add(`/player/${tag}`, 'daily', 0.5);
       break;
     case 'intl':
       await intl(entries, dataDay);
@@ -189,22 +184,9 @@ async function core(add: Add, dataDay: Date | null) {
     add(`/comps/${slugify(modeLabel(modeNames, mode.mode))}`, 'daily', 0.7);
   }
 
-  /*
-   * Archived daily reports, but only the ones worth a crawl.
-   *
-   * The floor matches the `noindex` the dated route applies to a thin day, so
-   * the sitemap and the page directive cannot disagree — listing a URL while
-   * asking not to have it indexed is the contradiction that put ~98 profiles
-   * through Google's crawler for nothing.
-   *
-   * Dated on the day they report, which is the one kind of page here whose
-   * content genuinely never changes afterwards.
-   */
+  // The archive, but no dated report (2026-10-29): they are noindex since
+  // AdSense rejected the site as "low value content" (daily/[date]).
   add('/daily/archive', 'daily', 0.6);
-  const daily = await listDailyReports(400, 4).catch(() => []);
-  for (const report of daily) {
-    add(`/daily/${report.day}`, 'yearly', 0.5, new Date(`${report.day}T00:00:00Z`));
-  }
 
   add('/cosmetics', 'weekly', 0.6);
   add('/cosmetics/skins', 'weekly', 0.6);
@@ -279,7 +261,8 @@ async function compare(add: Add) {
 }
 
 /*
- * Player and club pages beyond the indexable set are deliberately absent.
+ * Player and club pages are deliberately absent, all of them since
+ * 2026-10-29 (AdSense "low value content"; see player/[tag]).
  *
  * They carry `noindex, follow` — there is one URL per tag in existence, they
  * cannot be enumerated, and each costs an upstream API call to render, so they

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ArrowRight, CalendarDays, ExternalLink, FileText } from 'lucide-react';
+import { ArrowRight, CalendarDays, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -9,12 +9,7 @@ import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 
 import { brawlerPath, slugify } from '@/lib/slugs';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
-import { CHANGE_LABEL, changesFromNotes,
-  getLatestReleaseNotes,
-  type RichHeading,
-  type RichNode,
-  type RichText,
-  type ReleaseSection } from '@/lib/release-notes';
+import { CHANGE_LABEL, changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { formatDate } from '@/lib/format';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { currentMonth } from '@/lib/site';
@@ -100,7 +95,7 @@ export default async function ReleaseNotesPage() {
       <PageHeading
         eyebrow={t(notes.title)}
         title={t('Latest Brawl Stars update')}
-        subtitle={t('The latest official update notes, straight from the Brawl Stars team.')}
+        subtitle={t('What the latest update changed, which brawlers it touched, and what is coming next.')}
         aside={
           <a
             href={lp(notes.url)}
@@ -298,183 +293,20 @@ export default async function ReleaseNotesPage() {
         </p>
       ) : null}
 
-      <div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
-        <Contents sections={notes.sections} />
-
-        <div className="min-w-0 space-y-6">
-          {notes.sections.map((section, index) => (
-            <section
-              key={`${section.title ?? 'section'}-${index}`}
-              id={sectionId(section, index)}
-              className="card scroll-mt-24 p-6"
-            >
-              {section.title ? <SectionHeading title={t(section.title)} /> : null}
-              <RichContent nodes={section.nodes} startLevel={section.title ? 3 : 2} />
-            </section>
-          ))}
-        </div>
-      </div>
-
-      <p className="text-xs text-muted">{t('Published by Supercell, reproduced here for convenience.')}{' '}
-        <Link href={lp('/news')} className="text-brand hover:underline">{t('see detected in-game changes')}</Link>{' '}{t('for what we track ourselves.')}</p>
+      {/*
+        Supercell's own notes are linked rather than reproduced (2026-10-29).
+        The page used to carry their full text, ~4,900 words of someone
+        else's writing, and AdSense rejected the site as "low value content".
+        What is ours stays: the summary, who changed, what is coming.
+      */}
+      <p className="card p-5 text-sm leading-relaxed">
+        {t('The full patch notes are on supercell.com:')}{' '}
+        <a href={notes.url} target="_blank" rel="noreferrer" className="font-semibold text-brand hover:underline">
+          {t(notes.title)}
+        </a>
+        {'. '}
+        <Link href={lp('/patches')} className="text-brand hover:underline">{t('Did the balance changes work? See the measured impact')}</Link>
+      </p>
     </div>
-  );
-}
-
-function sectionId(section: ReleaseSection, index: number): string {
-  const base = section.title
-    ? section.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-    : `section-${index}`;
-  return base || `section-${index}`;
-}
-
-/** Sticky in-page navigation — these posts are long. */
-function Contents({ sections }: { sections: ReleaseSection[] }) {
-  const t = getT(requestLocale());
-  const lp = (path: string) => localePath(requestLocale(), path);
-  const linkable = sections.filter((s) => s.title);
-  if (linkable.length < 2) return null;
-
-  return (
-    <nav className="lg:sticky lg:top-24 lg:self-start">
-      <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
-        <FileText className="size-4" />{t('Contents')}</p>
-      <ul className="space-y-1">
-        {sections.map((section, index) =>
-          section.title ? (
-            <li key={`${section.title}-${index}`}>
-              <a
-                href={lp(`#${sectionId(section, index)}`)}
-                className="block truncate rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
-              >
-                {t(section.title)}
-              </a>
-            </li>
-          ) : null,
-        )}
-      </ul>
-    </nav>
-  );
-}
-
-/**
- * Supercell's own heading levels are not a contiguous scale.
- *
- * A section's body can contain level-3 headings with no level 2 anywhere above
- * them, and mapping level to tag directly emitted h2 -> h4 seven times over on
- * this page. Heading level is how a screen reader moves through a long
- * document, and this is the longest text page on the site.
- *
- * So the levels present are ranked rather than translated: whatever is
- * shallowest in *this* section becomes the first tag below its wrapper, and
- * anything deeper becomes exactly one step further down. The outline is then
- * contiguous no matter what the source did.
- */
-function RichContent({
-  nodes,
-  startLevel = 3,
-}: {
-  nodes: RichNode[];
-  /** h3 under a titled section's h2; h2 when the section has no title. */
-  startLevel?: 2 | 3;
-}) {
-  const present = [
-    ...new Set(nodes.flatMap((node) => (node.type === 'heading' ? [node.level] : []))),
-  ].sort((a, b) => a - b);
-
-  const deepest = (level: RichHeading['level']) => present.indexOf(level) > 0;
-
-  const tagFor = (level: RichHeading['level']) =>
-    (deepest(level) ? `h${startLevel + 1}` : `h${startLevel}`) as 'h2' | 'h3' | 'h4';
-
-  return (
-    <div className="space-y-3">
-      {nodes.map((node, index) => {
-        switch (node.type) {
-          case 'heading': {
-            const Tag = tagFor(node.level);
-            const deep = deepest(node.level);
-            return (
-              <Tag
-                key={index}
-                className={
-                  deep
-                    ? 'mt-5 font-bold capitalize text-brand first:mt-0'
-                    : 'mt-6 text-lg font-bold tracking-tight first:mt-0'
-                }
-              >
-                <Spans spans={node.spans} />
-              </Tag>
-            );
-          }
-
-          case 'list':
-            return (
-              <ul key={index} className="space-y-1.5">
-                {node.items.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex gap-2.5 text-sm leading-relaxed">
-                    <span
-                      aria-hidden
-                      className="mt-[0.55rem] size-1.5 shrink-0 rounded-full bg-brand/70"
-                    />
-                    <span className="min-w-0 text-muted">
-                      {item.map((paragraph, pIndex) => (
-                        <span key={pIndex} className="block">
-                          <Spans spans={paragraph.spans} />
-                        </span>
-                      ))}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            );
-
-          default:
-            return (
-              <p key={index} className="text-sm leading-relaxed text-muted">
-                <Spans spans={node.spans} />
-              </p>
-            );
-        }
-      })}
-    </div>
-  );
-}
-
-function Spans({ spans }: { spans: RichText[] }) {
-  if (spans.length === 0) return null;
-
-  return (
-    <>
-      {spans.map((span, index) => {
-        // Preserve the newlines the source uses for spacing inside a run.
-        const parts = span.value.split('\n');
-        const content = parts.map((part, partIndex) => (
-          <span key={partIndex}>
-            {partIndex > 0 ? <br /> : null}
-            {part}
-          </span>
-        ));
-
-        const className = [
-          span.marks.includes('bold') ? 'font-semibold text-foreground' : '',
-          span.marks.includes('italic') ? 'italic' : '',
-          span.marks.includes('underline') ? 'underline underline-offset-2' : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
-
-        return className ? (
-          <span key={index} className={className}>
-            {content}
-          </span>
-        ) : (
-          <span key={index}>{content}</span>
-        );
-      })}
-    </>
   );
 }
