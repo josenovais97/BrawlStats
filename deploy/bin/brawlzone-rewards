@@ -171,4 +171,11 @@ print('discord: announced in #📢-announcements')
 PY
 fi
 
+# Other servers' channels that asked for every free reward (/rewards-feed
+# setup, 2026-10-29), with the slide that carries the codes for PC players.
+CODES_SLIDE=$(python3 -c 'import json,sys; n=len(json.load(open(sys.argv[1]))); print(n + 2 if n > 1 else 2)' "$OUT/rewards.json")
+(cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/discord-reward-feeds.ts \
+  "$(cat "$OUT/rewards.json")" "$SITE/social/rewards/$ID/$CODES_SLIDE.jpg") 2>&1 \
+  | grep -E '^discord feeds:' || echo "::warning::Discord reward feeds not posted (not fatal)"
+
 FORCE=1 exec /usr/local/bin/brawlzone-tiktok rewards "$ID"

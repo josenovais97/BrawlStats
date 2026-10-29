@@ -739,6 +739,21 @@ model PushSubscription {
   @@map("push_subscriptions")
 }
 
+/// Discord channels that asked for every free reward (2026-10-29), set by a
+/// server admin with /rewards-feed setup. One channel per server; removed
+/// with /rewards-feed stop, or after three posts in a row fail (the bot was
+/// kicked, the channel deleted or its permissions taken away).
+model DiscordRewardFeed {
+  guildId    String    @id @map("guild_id")
+  channelId  String    @map("channel_id")
+  addedBy    String    @map("added_by")
+  failures   Int       @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSentAt DateTime? @map("last_sent_at")
+
+  @@map("discord_reward_feeds")
+}
+
 /// Players whose profile was opened on the site, for the name search
 /// (2026-10-28). Pruned a year after the last opening.
 model PlayerName {

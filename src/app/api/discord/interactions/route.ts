@@ -24,6 +24,8 @@ import { comparePath } from '@/lib/compare';
 import { bracketBySlug } from '@/lib/rank-brackets';
 import { verifyDiscordRequest } from '@/lib/discord-verify';
 import { formatNumber, formatPercent, humanizeMode, titleCase } from '@/lib/format';
+import { canManageServer, postToChannel, rewardFeedMessage } from '@/lib/discord-reward-feed';
+import { getFreeRewards } from '@/lib/free-rewards';
 import { DISCORD_BONUS, GIVEAWAY_PUBLIC } from '@/lib/giveaway';
 import { confirmDiscord } from '@/lib/giveaway-data';
 import { mains } from '@/lib/player-showcase';
@@ -771,6 +773,102 @@ async function teamCommand(token: string, mapQuery: string, rankSlug: string | u
 
 /* -------------------------------------------------------------------- /help */
 
+/* ------------------------------------------------------ /rewards and feeds */
+
+/** The batch the job posted, with the slide that carries the codes for PC players. */
+async function liveRewards() {
+  const { live } = await getFreeRewards();
+  // One batch shares a postedAt and an image; the newest batch is what's live now.
+  const newest = live[0];
+  const batch = newest ? live.filter((r) => r.postedAt === newest.postedAt) : [];
+  const codes = newest?.image ? newest.image.replace(/\/1\.jpg$/, `/${batch.length > 1 ? batch.length + 2 : 2}.jpg`) : null;
+  return { live, batch, codes };
+}
+
+/** Anyone: what can be claimed right now. Public, so a server sees it too. */
+async function rewardsCommand(token: string) {
+  const { live, codes } = await liveRewards();
+  if (live.length === 0) {
+    await respond(token, {
+      content: `No free rewards right now. Supercell drops them a few times a month: every one goes up at ${SITE}/rewards the moment it appears.
+Server admins: \`/rewards-feed setup\` posts each new one in a channel automatically.`,
+    });
+    return;
+  }
+  await respond(token, rewardFeedMessage(live.slice(0, 10), live.length === 1 ? codes : null));
+}
+
+interface SubOption {
+  name: string;
+  type?: number;
+  options?: { name: string; value?: string }[];
+}
+
+/**
+ * Admins: `/rewards-feed setup #channel` and `/rewards-feed stop`.
+ *
+ * Setup posts into the channel before saving it, so a channel the bot cannot
+ * write to is refused with how to fix it, rather than saved and silently
+ * failing on the next drop. If something is claimable right now, that is the
+ * first post, so the channel shows what it will get straight away.
+ */
+async function rewardsFeedCommand(token: string, options: unknown, guildId: string | undefined, userId: string, permissions: string | undefined) {
+  if (!guildId) {
+    await respond(token, { content: 'Run this inside a server: it sets which channel gets the free rewards.' });
+    return;
+  }
+  if (!canManageServer(permissions)) {
+    await respond(token, { content: 'Only server admins (Manage Server permission) can set the rewards feed.' });
+    return;
+  }
+  const prisma = getPrisma();
+  if (!prisma) {
+    await respond(token, { content: 'Something went wrong on our side. Try again in a minute.' });
+    return;
+  }
+  const sub = (Array.isArray(options) ? (options as SubOption[]) : [])[0];
+
+  if (sub?.name === 'stop') {
+    const removed = await prisma.discordRewardFeed.deleteMany({ where: { guildId } });
+    await respond(token, {
+      content: removed.count ? 'Done: no more free reward posts in this server. `/rewards-feed setup` turns them back on.' : 'This server had no rewards feed set up.',
+    });
+    return;
+  }
+
+  const channelId = sub?.options?.find((o) => o.name === 'channel')?.value;
+  if (!channelId) {
+    await respond(token, { content: 'Pick a channel: `/rewards-feed setup #free-rewards`.' });
+    return;
+  }
+
+  const { batch, codes } = await liveRewards();
+  const hello = {
+    allowed_mentions: { parse: [] },
+    content: batch.length
+      ? '✅ **BrawlZone free rewards feed is on.** Every new free Brawl Stars reward will be posted here the moment it drops. Here is what you can claim right now:'
+      : '✅ **BrawlZone free rewards feed is on.** Every new free Brawl Stars reward will be posted here the moment it drops.',
+  };
+  const first = await postToChannel(channelId, hello, BOT_TOKEN);
+  if (first.result !== 'sent') {
+    await respond(token, {
+      content:
+        `I can't post in <#${channelId}>. Open that channel's settings → Permissions, add **BrawlZone**, and allow **View Channel**, **Send Messages** and **Embed Links**. Then run \`/rewards-feed setup\` again.`,
+    });
+    return;
+  }
+  if (batch.length) await postToChannel(channelId, rewardFeedMessage(batch, codes), BOT_TOKEN);
+
+  await prisma.discordRewardFeed.upsert({
+    where: { guildId },
+    create: { guildId, channelId, addedBy: userId },
+    update: { channelId, addedBy: userId, failures: 0 },
+  });
+  await respond(token, {
+    content: `Done: free rewards will be posted in <#${channelId}>. \`/rewards-feed stop\` turns it off. (One channel per server; running setup again moves it.)`,
+  });
+}
+
 async function helpCommand(token: string, home: boolean) {
   await respond(token, {
     embeds: [
@@ -790,6 +888,8 @@ async function helpCommand(token: string, home: boolean) {
           '`/compare a b` — brawler vs brawler',
           '`/leaderboard` — the global top 10',
           '`/daily [zoom|shadow]` — today’s puzzle: guess the brawler, then share your score',
+          '`/rewards` — free Brawl Stars rewards you can claim right now',
+          '`/rewards-feed setup #channel` — (admins) every new free reward posted in that channel',
           '`/unlink` — remove your link and roles',
           '',
           `**Add the bot** to your server, or to your account to use it in any chat: ${INSTALL_URL}`,
@@ -934,7 +1034,7 @@ export async function POST(request: Request): Promise<Response> {
       custom_id?: string;
       components?: { components?: { custom_id?: string; value?: string }[] }[];
     };
-    member?: { user?: { id?: string } };
+    member?: { user?: { id?: string }; permissions?: string };
     user?: { id?: string };
     guild_id?: string;
   };
@@ -1007,6 +1107,16 @@ export async function POST(request: Request): Promise<Response> {
 
     // The giveaway's +2 (2026-10-27) is for joining this server, so it only
     // counts here, and the reply is ephemeral: the code is the entrant's.
+    // Ephemeral: only the admin who ran it needs to see how it went.
+    if (name === 'rewards-feed') {
+      after(async () => {
+        await rewardsFeedCommand(token, options, interaction.guild_id, userId, interaction.member?.permissions).catch(() =>
+          respond(token, { content: 'Something went wrong setting that up. Try again in a minute.' }),
+        );
+      });
+      return Response.json({ type: 5, data: { flags: 64 } });
+    }
+
     if (name === 'giveaway') {
       after(async () => {
         await respond(token, { content: await giveawayCommand(opt(options, 'code') ?? '', userId, home) }).catch(() => {});
@@ -1028,6 +1138,7 @@ export async function POST(request: Request): Promise<Response> {
         else if (name === 'rotation') await rotationCommand(token);
         else if (name === 'compare') await compareCommand(token, opt(options, 'a') ?? '', opt(options, 'b') ?? '');
         else if (name === 'leaderboard') await leaderboardCommand(token);
+        else if (name === 'rewards') await rewardsCommand(token);
         else if (name === 'help') await helpCommand(token, home);
         else await respond(token, { content: 'Unknown command. Try `/help`.' });
       } catch {

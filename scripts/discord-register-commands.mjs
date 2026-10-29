@@ -12,8 +12,8 @@
  * something actually changed.
  *
  * It also sets the install links (Discord's "Add App" chooser): a server
- * install adds the commands and a bot user with no permissions at all, since
- * the bot answers through interactions and needs nothing in a server.
+ * install adds the commands and a bot user that can post in channels, for
+ * /rewards-feed (2026-10-29); the commands themselves need no permission.
  *
  * Needs DISCORD_BOT_TOKEN and DISCORD_APP_ID in the environment:
  *   set -a && . .env.production && set +a && node scripts/discord-register-commands.mjs
@@ -145,6 +145,26 @@ const COMMANDS = [
     options: [brawlerOpt('a', 'First brawler'), brawlerOpt('b', 'Second brawler')],
   },
   { name: 'leaderboard', type: 1, description: 'The global top 10 players' },
+  { name: 'rewards', type: 1, description: 'Free Brawl Stars rewards you can claim right now' },
+  {
+    // Server admins only (Manage Server = 32), and only in servers: it picks
+    // a channel there for every new free reward (2026-10-29).
+    name: 'rewards-feed',
+    type: 1,
+    description: 'Post every new free Brawl Stars reward in a channel of this server',
+    default_member_permissions: '32',
+    integration_types: [0],
+    contexts: [0],
+    options: [
+      {
+        name: 'setup',
+        type: 1,
+        description: 'Choose the channel for free reward posts',
+        options: [{ name: 'channel', type: 7, required: true, channel_types: [0, 5], description: 'Where to post them' }],
+      },
+      { name: 'stop', type: 1, description: 'Stop posting free rewards in this server' },
+    ],
+  },
   {
     name: 'daily',
     type: 1,
@@ -182,13 +202,17 @@ await call('PATCH', '/applications/@me', {
   description: 'Brawl Stars stats in Discord: counters, the Ranked meta, best picks per map, drafts and player cards, from real sampled battles. Free, by brawlzone.net.',
   tags: ['brawl stars', 'stats', 'gaming', 'meta', 'tier list'],
   integration_types_config: {
-    0: { oauth2_install_params: { scopes: ['applications.commands', 'bot'], permissions: '0' } },
+    // View Channel + Send Messages + Embed Links (1024 + 2048 + 16384): what
+    // /rewards-feed needs to post. Everything else is answered through
+    // interactions and needs no permission at all.
+    0: { oauth2_install_params: { scopes: ['applications.commands', 'bot'], permissions: '19456' } },
     1: { oauth2_install_params: { scopes: ['applications.commands'], permissions: '0' } },
   },
 });
 console.log(`install link: https://discord.com/oauth2/authorize?client_id=${APP}`);
 
-const everywhere = COMMANDS.map((c) => ({ ...c, integration_types: [0, 1], contexts: [0, 1, 2] }));
+// A command's own integration types and contexts win: /rewards-feed is servers only.
+const everywhere = COMMANDS.map((c) => ({ integration_types: [0, 1], contexts: [0, 1, 2], ...c }));
 const registered = await call('PUT', `/applications/${APP}/commands`, everywhere);
 await call('PUT', `/applications/${APP}/guilds/${GUILD}/commands`, []);
 for (const c of registered) console.log(`  /${c.name} — ${c.description}`);
