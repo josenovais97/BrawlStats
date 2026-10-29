@@ -72,7 +72,7 @@ export function DropOdds({ data, drop }: { data: StarrDropData; drop: DropType }
                 <div className="min-w-0">
                   <p className="text-sm font-semibold leading-tight">{rewardName(reward, t)}</p>
                   <p className="text-xs text-muted">
-                    <span className="font-bold tabular-nums text-foreground">{pct(reward.chance)}</span> · {t('1 in {n}', { n: Math.round(1 / reward.chance).toLocaleString('en') })}
+                    <span className="font-bold tabular-nums text-foreground">{pct(reward.chance)}</span> · {t('1 in {n}', { n: Math.round(1 / reward.chance).toLocaleString(requestLocale()) })}
                   </p>
                 </div>
               </li>
