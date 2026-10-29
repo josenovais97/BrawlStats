@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
 import Script from 'next/script';
 
 import { AdsenseLoader } from '@/components/ads/adsense-loader';
+import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { InstallPrompt } from '@/components/install-prompt';
 import { PwaTelemetry } from '@/components/pwa-telemetry';
 import { LanguageSuggest } from '@/components/i18n/language-suggest';
@@ -116,6 +117,8 @@ export default function RootLayout({
         <PwaTelemetry />
         {/* Google AdSense, website only: never on the Bubble panel (see the component). */}
         <AdsenseLoader />
+        {/* Google Analytics, for ad networks that read traffic from it (see the component). */}
+        <GoogleAnalytics />
 
         {/*
           Umami, self-hosted on this project's own box. Replaces

@@ -4768,4 +4768,14 @@ export const ES: Record<string, string> = {
     "Las notas completas de la actualización están en supercell.com:",
   "What the latest update changed, which brawlers it touched, and what is coming next.":
     "Qué cambió la última actualización, a qué brawlers afectó y qué viene después.",
+  " to measure visits in aggregate, which advertising partners use to judge the site. It may set cookies. Visitors in the EEA, the UK and Switzerland are asked first, through the same Google consent message as the ads below; until they agree, no analytics cookies are set. The Bubble panel and the Android app do not load it.":
+    " para medir las visitas en conjunto, que los socios publicitarios usan para evaluar el sitio. Puede usar cookies. A los visitantes del EEE, el Reino Unido y Suiza se les pregunta antes, con el mismo mensaje de consentimiento de Google que los anuncios de abajo; hasta que acepten, no se usan cookies de analítica. El panel de Bubble y la app de Android no lo cargan.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent.":
+    ", que funciona en el mismo servidor que el sitio y no en un tercero. No usa cookies ni guarda datos personales, así que no necesita consentimiento.",
+  "Google Analytics":
+    "Google Analytics",
+  "Our own counter, plus Google Analytics.":
+    "Nuestro propio contador, más Google Analytics.",
+  "The website also uses":
+    "El sitio también usa",
 };

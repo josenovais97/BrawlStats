@@ -95,7 +95,7 @@ export default function PrivacyPage() {
       <section className="space-y-4">
         <SectionHeading
           title={t('Analytics')}
-          subtitle={t('One counter, self-hosted, with nothing that identifies you.')}
+          subtitle={t('Our own counter, plus Google Analytics.')}
         />
         <div className="card p-6">
           <div className="flex gap-4">
@@ -107,11 +107,18 @@ export default function PrivacyPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-foreground underline underline-offset-2"
-                >{t('Umami')}</a>{t(', running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent; the consent message European visitors may see is for the ads below.')}</p>
+                >{t('Umami')}</a>{t(', running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent.')}</p>
               <p>{t('It records the page, the referrer, and coarse details your browser sends anyway: country, browser, operating system, screen size. It does not record IP addresses, and nothing links one visit to another or to a person.')}</p>
               <p>
                 {/* Named because a reader is entitled to know what is being counted, and
                     because these are visible in the page source regardless. */}{t('A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.')}</p>
+              <p>{t('The website also uses')}{' '}
+                <a
+                  href="https://policies.google.com/technologies/partner-sites"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                >{t('Google Analytics')}</a>{t(' to measure visits in aggregate, which advertising partners use to judge the site. It may set cookies. Visitors in the EEA, the UK and Switzerland are asked first, through the same Google consent message as the ads below; until they agree, no analytics cookies are set. The Bubble panel and the Android app do not load it.')}</p>
             </div>
           </div>
         </div>
