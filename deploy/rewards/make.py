@@ -6,7 +6,8 @@ rewards.json is [{"name": "Mega Box", "url": "https://link.brawlstars.com/..."}]
 Writes 1.jpg.. and meta.json ({count, title, description}) to the out dir.
 
 Art, best first (2026-10-28): a high-res file for the reward in
-public/rewards/art (`art_slug`, e.g. chaos-drop.png), the brawler's portrait
+public/rewards/art (`art_slug`, e.g. credits.png; from Supercell's Fan Kit,
+which has no Chaos Drop or plain Starr Drop), the brawler's portrait
 when the reward names one ("Wendy Box"), the site's own icons for what it has
 them for, and a plain gift for anything else. The first set (2026-10-21, by
 hand in ~/shots/vouchers) cropped Supercell's announcement image; a post that
@@ -164,8 +165,11 @@ def open_rgba(path):
 def reward_image(name):
     """The best art we have for a reward, as RGBA, or the gift."""
     if PUBLIC:
-        hi = open_rgba(f'{PUBLIC}/rewards/art/{art_slug(name)}.png')
-        if hi: return hi
+        slug = art_slug(name)
+        # "100 XP Doubler" and "XP Doublers" are one file; so are Box / Boxes.
+        for s in (slug, re.sub(r'(box)es$', r'\1', slug), slug.rstrip('s'), slug + 's'):
+            hi = open_rgba(f'{PUBLIC}/rewards/art/{s}.png')
+            if hi: return hi
     face = portrait(name)
     if face: return face
     if PUBLIC:

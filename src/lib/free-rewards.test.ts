@@ -29,6 +29,9 @@ test('wiki candidates: currencies use the Icon- files, items their own name', ()
 test('our own art, then the gift for anything unknown', () => {
   assert.equal(rewardArt('Legendary Starr Drop'), '/icons/starr-drop.png');
   assert.equal(rewardArt('Mega Box'), '/rewards/box-red.png');
+  assert.equal(rewardArt('2000 Credits'), '/rewards/art/credits.png');
+  assert.equal(rewardArt('1x Ranked Starr Drop'), '/rewards/art/ranked-starr-drop.png');
+  assert.equal(rewardArt('1x Wendy Box'), '/rewards/art/wendy-box.png');
   assert.equal(rewardArt('1x Chaos Drop'), '/rewards/gift.png');
   assert.equal(rewardArt('Pirate Gene'), '/rewards/gift.png');
 });

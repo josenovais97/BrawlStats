@@ -35,18 +35,29 @@ export const LIVE_DAYS = 7;
 const OFFICIAL = /^https:\/\/(link\.brawlstars\.com|store\.supercell\.com)\//;
 
 /**
- * Art we ship ourselves, for when the wiki has nothing better. Boxes are
- * Brawlify's box icons (MIT, the same CDN as the gadget and gear marks), kept
+ * Art we ship ourselves, for when the wiki has nothing better or its image
+ * fails to load. Generic boxes are Brawlify's box icons (MIT, the same CDN as the gadget and gear marks), kept
  * in public/rewards; currencies reuse the site's own icons. Matched loosely on
  * the name the job saw, so "Legendary Starr Drop", which has no art of its
  * own on the wiki, still gets a Starr Drop.
  */
 const LOCAL_ART: [RegExp, string][] = [
+  // Supercell's Fan Kit art (fankit.supercell.com, 2026-10-29), in
+  // public/rewards/art: the reward posts read the same files.
+  [/ranked starr drop/i, '/rewards/art/ranked-starr-drop.png'],
+  [/credit/i, '/rewards/art/credits.png'],
+  [/gem/i, '/rewards/art/gems.png'],
+  [/bling/i, '/rewards/art/bling.png'],
+  [/xp doubler/i, '/rewards/art/xp-doublers.png'],
+  [/power point/i, '/rewards/art/power-points.png'],
+  [/coin/i, '/rewards/art/coins.png'],
+  [/coffin box/i, '/rewards/art/coffin-box.png'],
+  [/nori box/i, '/rewards/art/nori-box.png'],
+  [/wendy box/i, '/rewards/art/wendy-box.png'],
+  [/mecha box/i, '/rewards/art/mecha-box.png'],
   [/mega box/i, '/rewards/box-red.png'],
   [/big box/i, '/rewards/box-pink.png'],
   [/starr drop/i, '/icons/starr-drop.png'],
-  [/power point/i, '/icons/power-point.png'],
-  [/coin/i, '/icons/coin.png'],
   [/box/i, '/rewards/box-blue.png'],
 ];
 
