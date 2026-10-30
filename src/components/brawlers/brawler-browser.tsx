@@ -3,7 +3,7 @@
 import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState, type CSSProperties } from 'react';
 
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
@@ -329,8 +329,10 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
 /**
  * One brawler.
  *
- * The portrait and the name are the card; everything else is one quiet line
- * underneath. Star power and gadget counts used to sit below that, and they
+ * Drawn as the game's own brawler collection draws one (2026-10-30): the
+ * card in the brawler's rarity colour, the portrait framed in the middle,
+ * the name on a dark banner across the foot. The portrait and the name are
+ * the card; everything else is one quiet line underneath. Star power and gadget counts used to sit below that, and they
  * are the same two numbers on almost every brawler — three lines of chrome
  * that pushed the portrait down and made a two-column phone layout tall enough
  * to fit four cards on a screen.
@@ -344,108 +346,93 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
     <Link
       href={lp(brawlerPath(brawler.id, brawler.name))}
       prefetch={false}
-      className="card card-interactive group relative flex h-full flex-col overflow-hidden p-2.5 sm:p-3"
-      style={{
-        borderColor: `color-mix(in srgb, ${brawler.rarityColor} 32%, transparent)`,
-      }}
+      data-fx="pop"
+      className="brawler-card group"
+      style={{ '--rarity': brawler.rarityColor } as CSSProperties}
     >
-      {/* The rarity reads off the plate behind the portrait as well as off the
-          label, so a Legendary is recognisable before anything is read. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-70"
-        style={{
-          background: `radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, ${brawler.rarityColor} 22%, transparent), transparent 70%)`,
-        }}
-      />
-
       {brawler.status === 'upcoming' ? (
         <span
-          className="label-game absolute left-2 top-2 z-10 rounded-md bg-accent/20 px-1.5 py-0.5 text-xs text-accent"
+          className="label-game absolute left-1.5 top-1.5 z-10 rounded-md border-2 border-ink bg-accent px-1.5 py-0.5 text-xs text-white"
           title={tx('Revealed but not in the game yet.')}
         >{tx('Soon')}</span>
       ) : null}
 
       {brawler.status === 'legacy' ? (
         <span
-          className="label-game absolute left-2 top-2 z-10 rounded-md bg-surface-3/90 px-1.5 py-0.5 text-xs text-muted"
+          className="label-game absolute left-1.5 top-1.5 z-10 rounded-md border-2 border-ink bg-surface-3 px-1.5 py-0.5 text-xs text-muted"
           title={tx('No longer available in the game. Kept for its history.')}
         >{tx('Legacy')}</span>
       ) : null}
 
-      {/*
-        An unreleased brawler may have no portrait drawn yet, and an empty src
-        renders as the browser's broken-image glyph — which reads as a bug
-        rather than as artwork that does not exist. Same dashed placeholder the
-        skin list and the upcoming brawler page already use.
-      */}
-      {brawler.imageUrl ? (
-        <Image
-          src={brawler.imageUrl}
-          alt={brawler.name}
-          width={140}
-          height={140}
-          sizes="(max-width: 640px) 45vw, 180px"
-          className="relative mx-auto aspect-square w-full max-w-[7rem] object-contain duration-200 group-hover:scale-105 motion-safe:transition-transform"
-          /* The cards above the fold used to come in blank for a second or two:
-             `next/image` lazy-loads by default, and the portrait IS the card. */
-          loading={eager ? 'eager' : 'lazy'}
-          fetchPriority={eager ? 'high' : 'auto'}
-          unoptimized
-        />
-      ) : (
-        <span
-          aria-hidden
-          className="relative mx-auto grid aspect-square w-full max-w-[7rem] place-items-center rounded-xl border border-dashed border-border bg-surface-2 text-2xl text-muted"
-        >
-          ?
-        </span>
-      )}
-
-      <p className="relative mt-1.5 truncate text-center font-bold capitalize">
-        {brawler.name.toLowerCase()}
-      </p>
-
-      {/*
-        Rarity carries the colour, class stays quiet — but on two lines rather
-        than one. Squeezed side by side, "Super Rare · Damage Dealer" did not
-        fit a five-across cell and truncated to "Super Ra… Damage Deal…", which
-        is the wrong way round: the *widest* layout was the one that could not
-        show its labels. Wrapping costs a line of height and lets every label
-        say what it is at every breakpoint.
-      */}
       {brawler.tier ? (
-        /* Corner chip, matching the profile grid and the tier list, so the
+        /* The same badge the home podium and the brawler pages use, so the
            same letter always means the same thing across the site. */
         <span
-          className="absolute right-1.5 top-1.5 z-10 grid size-5 place-items-center rounded-md text-xs font-black"
-          style={{
-            background: `color-mix(in srgb, ${TIER_COLOR[brawler.tier]} 18%, transparent)`,
-            color: TIER_COLOR[brawler.tier],
-          }}
+          className="tier-badge tier-badge-sm absolute right-1.5 top-1.5 z-10"
+          style={{ '--tier': TIER_COLOR[brawler.tier] } as CSSProperties}
           title={tx('{tier} tier in Ranked{v}', { tier: brawler.tier, v: brawler.metaScore !== null ? `, meta score ${brawler.metaScore.toFixed(1)}` : '' })}
         >
-          {brawler.tier}
+          <span className="display text-game-stroke text-lg leading-none">{brawler.tier}</span>
         </span>
       ) : null}
 
-      <div className="relative mt-1 flex min-w-0 flex-col items-center gap-0.5 text-xs">
-        {brawler.rarityName ? (
+      <span className="brawler-card-art">
+        {/*
+          An unreleased brawler may have no portrait drawn yet, and an empty src
+          renders as the browser's broken-image glyph — which reads as a bug
+          rather than as artwork that does not exist. Same dashed placeholder the
+          skin list and the upcoming brawler page already use.
+        */}
+        {brawler.imageUrl ? (
+          <Image
+            src={brawler.imageUrl}
+            alt={brawler.name}
+            width={140}
+            height={140}
+            sizes="(max-width: 640px) 45vw, 180px"
+            className="aspect-square w-full max-w-[7.5rem] rounded-xl border-2 border-ink object-cover duration-200 group-hover:scale-105 motion-safe:transition-transform"
+            /* The cards above the fold used to come in blank for a second or two:
+               `next/image` lazy-loads by default, and the portrait IS the card. */
+            loading={eager ? 'eager' : 'lazy'}
+            fetchPriority={eager ? 'high' : 'auto'}
+            unoptimized
+          />
+        ) : (
           <span
-            className="max-w-full truncate font-semibold"
-            style={{ color: brawler.rarityColor }}
+            aria-hidden
+            className="grid aspect-square w-full max-w-[7.5rem] place-items-center rounded-xl border-2 border-dashed border-ink bg-black/25 text-2xl text-white/70"
           >
-            {brawler.rarityName}
+            ?
           </span>
-        ) : null}
-        {/* Omitted rather than shown as a placeholder when unknown. */}
-        {brawler.className ? (
-          <span className="inline-flex max-w-full min-w-0 items-center gap-1 text-muted">
-            <ClassIcon name={brawler.className} className="size-3.5 shrink-0" />
-            <span className="truncate">{brawler.className}</span>
-          </span>
-        ) : null}
-      </div>
+        )}
+      </span>
+
+      {/*
+        The name on a dark banner across the foot of the card, as the game
+        labels its own brawler cards; rarity is the card's colour and is
+        also written out, class under it. Two lines rather than one: squeezed
+        side by side, "Super Rare · Damage Dealer" truncated in a five-across
+        cell.
+      */}
+      <span className="brawler-card-foot">
+        <span className="display text-game-stroke block truncate text-lg capitalize leading-tight">
+          {brawler.name.toLowerCase()}
+        </span>
+        <span className="mt-0.5 flex min-w-0 flex-col items-center gap-0.5 text-xs text-white/85">
+          {brawler.rarityName ? (
+            <span className="label-game max-w-full truncate" style={{ color: brawler.rarityColor }}>
+              {brawler.rarityName}
+            </span>
+          ) : null}
+          {/* Omitted rather than shown as a placeholder when unknown. */}
+          {brawler.className ? (
+            <span className="inline-flex max-w-full min-w-0 items-center gap-1">
+              <ClassIcon name={brawler.className} className="size-3.5 shrink-0" />
+              <span className="truncate">{brawler.className}</span>
+            </span>
+          ) : null}
+        </span>
+      </span>
     </Link>
   );
 }

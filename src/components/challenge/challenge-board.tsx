@@ -584,7 +584,7 @@ export function ChallengeBoard({
             <button
               type="button"
               onClick={onShare ?? share}
-              className="rounded-lg bg-brand px-4 py-2 text-sm font-bold text-[#0b0f1d] transition-opacity hover:opacity-90"
+              className="btn-game bg-brand hover:bg-brand-strong px-4 py-2 text-sm text-[#0b0f1d]"
             >
               {copied ? t('Copied') : onShare ? t('Share your results') : t('Copy result')}
             </button>

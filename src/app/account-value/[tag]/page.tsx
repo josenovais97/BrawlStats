@@ -138,7 +138,7 @@ export default async function AccountValuePage({ params }: PageProps) {
             fileName={`brawlzone-account-value-${clean}.png`}
             kind="account-value"
             label={t('Share my account value')}
-            className="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-3 font-bold text-brand-ink"
+            className="btn-game inline-flex items-center gap-2 bg-brand hover:bg-brand-strong px-5 py-3 text-brand-ink"
           />
         </div>
       </section>

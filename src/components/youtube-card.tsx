@@ -107,7 +107,7 @@ export function YoutubeCard({ className = '' }: { className?: string }) {
           target="_blank"
           rel="noreferrer"
           onClick={() => close('subscribe')}
-          className="inline-flex min-h-10 items-center rounded-xl bg-brand px-4 text-sm font-bold text-[#1a1200]"
+          className="btn-game inline-flex min-h-10 items-center bg-brand hover:bg-brand-strong px-4 text-sm text-[#1a1200]"
         >
           {t('Subscribe')}
         </a>

@@ -189,7 +189,7 @@ export function TierMaker({ brawlers }: { brawlers: MakerBrawler[] }) {
         <button
           type="button"
           onClick={share}
-          className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-brand px-4 text-sm font-bold text-brand-ink transition-colors hover:bg-brand-strong"
+          className="btn-game inline-flex min-h-10 items-center gap-2 bg-brand px-4 text-sm text-brand-ink hover:bg-brand-strong"
         >
           {copied ? <Check aria-hidden className="size-4" /> : <Link2 aria-hidden className="size-4" />}
           {copied ? tx('Link copied') : tx('Copy share link')}

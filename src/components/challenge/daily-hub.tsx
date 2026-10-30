@@ -285,7 +285,7 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
           <button
             type="button"
             onClick={share}
-            className="rounded-lg bg-brand px-4 py-2 text-sm font-bold text-[#0b0f1d] transition-opacity hover:opacity-90"
+            className="btn-game bg-brand hover:bg-brand-strong px-4 py-2 text-sm text-[#0b0f1d]"
           >
             {copied ? t('Copied') : t('Share your results')}
           </button>

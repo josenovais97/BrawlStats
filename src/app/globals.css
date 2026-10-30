@@ -91,10 +91,11 @@ body {
 }
 
 /*
- * The game menu's backdrop (2026-10-30): broad diagonal bands and scattered
- * sparkles, faint, over the blue. Fixed and on its own layer, so it costs a
- * composite rather than a repaint on scroll, and fading out down the screen
- * so it never competes with text.
+ * The game menu's backdrop (2026-10-30): broad diagonal bands over the blue,
+ * faint, the way the game's own menus are striped. (Scattered sparkles were
+ * tried first and dropped the same day: the owner was not sold on them.)
+ * Fixed and on its own layer, so it costs a composite rather than a repaint
+ * on scroll, and fading out down the screen so it never competes with text.
  */
 body::before {
   content: '';
@@ -102,10 +103,8 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='132' viewBox='0 0 132 132'%3E%3Cg fill='%23fff' fill-opacity='.07'%3E%3Cpath d='M26 12l3 9 9 3-9 3-3 9-3-9-9-3 9-3z'/%3E%3Cpath d='M92 74l2.2 6.6 6.6 2.2-6.6 2.2L92 91.6l-2.2-6.6-6.6-2.2 6.6-2.2z'/%3E%3Ccircle cx='100' cy='22' r='2.2'/%3E%3Ccircle cx='34' cy='100' r='2.6'/%3E%3Ccircle cx='66' cy='50' r='1.6'/%3E%3Ccircle cx='120' cy='118' r='1.4'/%3E%3C/g%3E%3C/svg%3E"),
-    repeating-linear-gradient(135deg, rgb(255 255 255 / 0.022) 0 34px, transparent 34px 68px);
-  mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.55) 100%);
+  background: repeating-linear-gradient(135deg, rgb(255 255 255 / 0.028) 0 38px, transparent 38px 76px);
+  mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.5) 100%);
 }
 
 /*
@@ -923,6 +922,57 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .lobby-tile { transition: none; }
 }
+/* A brawler card as the game's collection draws one (2026-10-30; see
+   brawler-browser.tsx): the whole card in the rarity colour (--rarity),
+   lit at the top and darkening to the foot, the portrait framed in it and
+   the name on a dark banner. It lifts and presses like a button. */
+.brawler-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  color: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  background:
+    radial-gradient(90% 60% at 50% 30%, rgb(255 255 255 / 0.28), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--rarity) 88%, #fff) 0%, var(--rarity) 40%, color-mix(in srgb, var(--rarity) 50%, #050a1f) 100%);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.4), 0 4px 0 var(--ink);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.brawler-card:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.4), 0 7px 0 var(--ink);
+}
+.brawler-card:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.4), 0 2px 0 var(--ink);
+}
+.brawler-card:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+.brawler-card-art {
+  display: grid;
+  place-items: center;
+  padding: 0.7rem 0.7rem 0.6rem;
+}
+.brawler-card-art img {
+  box-shadow: 0 4px 0 rgb(5 10 31 / 0.45);
+}
+.brawler-card-foot {
+  margin-top: auto;
+  padding: 0.4rem 0.5rem 0.55rem;
+  text-align: center;
+  background: rgb(5 10 31 / 0.62);
+  border-top: 2px solid var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brawler-card { transition: none; }
+}
+
 /* The footer: a deeper slab under a dark ledge, like the bottom bar of a
    game menu (2026-10-30). */
 .site-footer {

@@ -84,7 +84,7 @@ export function ShareImageButton({
       type="button"
       onClick={share}
       disabled={disabled || state === 'busy'}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink transition-opacity hover:opacity-90 disabled:opacity-70 ${className}`}
+      className={`btn-game inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-strong px-3.5 py-2 text-sm text-brand-ink disabled:opacity-70 ${className}`}
     >
       {state === 'busy' ? (
         <Loader2 aria-hidden className="size-4 animate-spin" />

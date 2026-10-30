@@ -84,7 +84,7 @@ export function LanguageSuggest() {
             setTarget(null);
             router.push(localePath(target, stripLocale(pathname)));
           }}
-          className="shrink-0 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-brand-ink hover:bg-brand-strong"
+          className="btn-game shrink-0 bg-brand px-3 py-1.5 text-xs text-brand-ink hover:bg-brand-strong"
         >
           {copy.go}
         </button>

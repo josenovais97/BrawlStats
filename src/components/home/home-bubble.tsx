@@ -94,7 +94,7 @@ export function HomeBubble() {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
             <DownloadButton
               from="home"
-              className="inline-flex items-center gap-2.5 rounded-xl bg-brand px-5 py-3 font-bold text-brand-ink transition-transform hover:-translate-y-0.5"
+              className="btn-game inline-flex items-center gap-2.5 bg-brand hover:bg-brand-strong px-5 py-3 text-brand-ink"
             >
               <Download className="size-4" />{t('Download for Android')}</DownloadButton>
             <p className="text-xs text-muted">{t('{v} · Android {minAndroid}+', { v: bubbleAppSize(), minAndroid: BUBBLE_APP.minAndroid })}</p>

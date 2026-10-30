@@ -76,7 +76,7 @@ export function InstallPrompt() {
         <button
           type="button"
           onClick={install}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand px-3 py-2 text-sm font-bold text-[#1a1200]"
+          className="btn-game inline-flex shrink-0 items-center gap-1.5 bg-brand hover:bg-brand-strong px-3 py-2 text-sm text-[#1a1200]"
         >
           <Download className="size-4" />{t('Install')}</button>
         <button

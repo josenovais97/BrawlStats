@@ -47,7 +47,7 @@ export function CounterSearch({ brawlers }: { brawlers: { name: string; slug: st
         />
         <button
           type="submit"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand px-4 text-sm font-bold text-brand-ink hover:bg-brand-strong"
+          className="btn-game inline-flex shrink-0 items-center gap-1.5 bg-brand px-4 text-sm text-brand-ink hover:bg-brand-strong"
         >
           <Search aria-hidden className="size-4" />
           {t('Counters')}

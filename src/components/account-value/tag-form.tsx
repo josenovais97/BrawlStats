@@ -50,7 +50,7 @@ export function AccountValueForm({
       <button
         type="submit"
         disabled={!valid}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3.5 font-bold text-brand-ink transition-opacity disabled:opacity-50"
+        className="btn-game inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-strong px-6 py-3.5 text-brand-ink disabled:opacity-50"
       >
         {cta ?? t('Calculate')}
         <ArrowRight aria-hidden className="size-4" />
