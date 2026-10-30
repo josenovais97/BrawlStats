@@ -871,6 +871,64 @@ body {
   box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35), 0 4px 0 var(--ink);
   color: #fff;
 }
+.tier-badge-sm {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.7rem;
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35), 0 3px 0 var(--ink);
+}
+/* The home page's "Today" row (2026-10-30): an event slot from the game's
+   lobby. A coloured tile (--tone), a darker header bar, the art on turning
+   rays, the title in outlined lettering and one button. The whole tile is the
+   link, so it lifts and presses like one. */
+.lobby-tile {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+  background: var(--tone);
+  border: 2px solid var(--ink);
+  border-radius: 1.25rem;
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.3), 0 5px 0 var(--ink);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.lobby-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.3), 0 8px 0 var(--ink);
+}
+.lobby-tile:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.3), 0 2px 0 var(--ink);
+}
+.lobby-tile:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+.lobby-tile .reward-rays {
+  inset: -80%;
+  mask-image: radial-gradient(circle, #000 0%, transparent 34%);
+}
+.lobby-tile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  background: rgb(5 10 31 / 0.35);
+  border-bottom: 2px solid var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lobby-tile { transition: none; }
+}
+/* The footer: a deeper slab under a dark ledge, like the bottom bar of a
+   game menu (2026-10-30). */
+.site-footer {
+  background: linear-gradient(180deg, #0a1233 0%, #070c24 100%);
+  border-top: 3px solid var(--ink);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.06);
+}
 /* A loot tile: the game's thick dark outline and hard drop, not a soft card. */
 .reward-tile {
   border: 3px solid #10142a;

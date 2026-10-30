@@ -4792,4 +4792,36 @@ export const ES: Record<string, string> = {
     ", un estudio de una sola persona en Portugal que también desarrolla la app BrawlZone Bubble para Android. Las preguntas, a la dirección de abajo.",
   "Your in-game name or #tag.":
     "Tu nombre en el juego o tu #tag.",
+  "Best in Ranked right now":
+    "Los mejores en Competitivo ahora",
+  "Full tier list":
+    "Tier list completa",
+  "Pick the brawler you keep losing to.":
+    "Elige el brawler contra el que siempre pierdes.",
+  "{rate} win":
+    "{rate} de victorias",
+  "Claim it":
+    "Reclamar",
+  "Free rewards":
+    "Recompensas gratis",
+  "Get the next one":
+    "Recibe la próxima",
+  "Giveaway":
+    "Sorteo",
+  "Guess":
+    "Adivinar",
+  "New every day":
+    "Nuevo cada día",
+  "No free link live right now":
+    "Ningún link gratis activo ahora",
+  "Today in Brawl Stars":
+    "Hoy en Brawl Stars",
+  "Who is this brawler?":
+    "¿Quién es este brawler?",
+  "{n} live":
+    "{n} activos",
+  "From {battles} battles of {players} players we sampled ourselves.":
+    "De {battles} partidas de {players} jugadores que recogemos nosotros mismos.",
+  "Updated":
+    "Actualizado",
 };

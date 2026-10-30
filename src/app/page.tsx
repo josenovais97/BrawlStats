@@ -2,22 +2,16 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { FavoritesList } from '@/components/favorites-list';
-import { HomeCoverage } from '@/components/home/home-coverage';
-import { HomeCta } from '@/components/home/home-cta';
-import { HomeHero } from '@/components/home/home-hero';
-import { HomeLatestPost } from '@/components/home/home-latest-post';
-import { HomeRadarSection } from '@/components/home/home-radar-section';
-import { HomeYourRank } from '@/components/home/home-your-rank';
-import { HomeLiveEvents } from '@/components/home/home-live-events';
-import { HomeAccountPreview } from '@/components/home/home-account-preview';
 import { HomeBand } from '@/components/home/home-band';
 import { HomeBubble } from '@/components/home/home-bubble';
-import { HomeFollow } from '@/components/home/home-follow';
-import { GiveawayBanner } from '@/components/giveaway/giveaway-banner';
+import { HomeHero } from '@/components/home/home-hero';
+import { HomeLiveEvents } from '@/components/home/home-live-events';
+import { HomeLobby } from '@/components/home/home-lobby';
+import { HomeMetaNow } from '@/components/home/home-meta-now';
 import { HomePlayTest } from '@/components/home/home-play-test';
+import { HomeProof } from '@/components/home/home-proof';
+import { HomeRadarSection } from '@/components/home/home-radar-section';
 import { HomeSection } from '@/components/home/home-section';
-import { HomeSnapshot } from '@/components/home/home-snapshot';
-import { HomeSplit } from '@/components/home/home-split';
 import { HomeTools } from '@/components/home/home-tools';
 import { Skeleton } from '@/components/ui/skeletons';
 import { SITE_NAME, SITE_URL } from '@/lib/site';
@@ -54,11 +48,15 @@ export const metadata: Metadata = {
  * is not simply static. Everything else on the page reads the 1-hour data
  * cache and never wanted two minutes.
  *
+ * Five minutes since 2026-10-30: the "Today" row reads the free-rewards feed,
+ * whose fetch revalidates every 300s, and the shortest cache inside a route is
+ * the route's (trap 2), so the page says so rather than claiming ten.
+ *
  * `/events` used to be the other page on this TTL and is no longer: the
  * rotation left it on 2026-09-24, so this component and `/maps` are now the
  * only places the live slots appear.
  */
-export const revalidate = 600;
+export const revalidate = 300;
 
 /**
  * Must match `revalidate` above, and must be passed to every component that
@@ -66,7 +64,7 @@ export const revalidate = 600;
  * default to 120s, and either one left at its default silently sets the whole
  * route — which is how this page came to rebuild every two minutes.
  */
-const LIVE_REVALIDATE = 600;
+const LIVE_REVALIDATE = 300;
 
 /**
  * Structured data for the search box, so the site can surface a search action
@@ -118,6 +116,13 @@ const WEBSITE_SCHEMA = {
 export default function HomePage() {
   const t = getT(requestLocale());
   return (
+    /*
+      The landing page, rebuilt 2026-10-30 as a game lobby: search, today's
+      three events, the meta in one row, our own findings, the live maps, the
+      tools, the app. It was fourteen sections and thirteen phone screens,
+      with the search box and the giveaway twice each; the long explanations
+      (two games two answers, your account explained) live on their own pages.
+    */
     <div className="space-y-14 sm:space-y-20">
       <script
         type="application/ld+json"
@@ -127,94 +132,30 @@ export default function HomePage() {
 
       <HomeHero
         stats={
-          <Suspense fallback={<Skeleton className="h-[7.5rem] rounded-2xl" />}>
-            <HomeCoverage />
+          <Suspense fallback={<Skeleton className="h-12 rounded-2xl" />}>
+            <HomeProof />
           </Suspense>
         }
       />
 
-      {/* Renders nothing until the visitor has saved someone, so a first-time
-          view goes straight from the search box to the product. */}
+      {/* Renders nothing until the visitor has saved someone. */}
       <FavoritesList />
 
-      {/* While the giveaway runs; nothing otherwise. */}
-      <GiveawayBanner from="home" />
+      <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
+        <HomeLobby />
+      </Suspense>
 
-      {/* While the Google Play closed test is recruiting; nothing otherwise. */}
-      <HomePlayTest />
+      <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
+        <HomeMetaNow />
+      </Suspense>
 
-      {/*
-        The findings, directly under the search.
-
-        They were four screens down on /daily, which is the same mistake the
-        section below documents: a tier list is a table anyone can build from
-        the same API, while "almost nobody picks Nita, it is winning anyway" is
-        a claim only this project's own sampling can make. It is also the kind
-        of thing people repeat to each other, which a table never is.
-
-        Renders nothing on a day with no findings rather than announcing that
-        there are none.
-      */}
+      {/* Our own findings: what no tier list says. Nothing on a quiet day. */}
       <Suspense fallback={<Skeleton className="h-72 rounded-2xl" />}>
         <HomeRadarSection />
       </Suspense>
 
-      {/* What is strong at my rank, and what beats what I keep losing to:
-          the rank tier lists and counters pages, which nothing here led to. */}
-      <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
-        <HomeYourRank />
-      </Suspense>
-
-      {/*
-        The claim that separates this site from every other one, moved up here
-        on 2026-08-28.
-
-        It used to sit last, on the argument that it was the footnote the
-        snapshot earns. That reasoning holds for a reader who arrives at it —
-        the problem is that most never did. It was the eighth section, four
-        screens down, so the one thing a competitor cannot copy was the one
-        thing a bouncing visitor never saw, and everything above it (search, a
-        profile, live events, a tier list) is something the other sites also
-        have. Stating the difference before the evidence costs a little rigour
-        and is the only way it gets read at all.
-
-        It carries its own deep band — see `HomeSplit`.
-      */}
-      <Suspense fallback={null}>
-        <HomeSplit />
-      </Suspense>
-
-      {/*
-        Then the flagship: the search box above feeds it directly.
-
-        Live events used to hold this slot, which meant the first thing the
-        page demonstrated was a rotation anyone can see in the game. What a
-        visitor cannot see anywhere else is what BrawlZone does with their tag,
-        so that goes first now.
-      */}
-      <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
-        <HomeAccountPreview />
-      </Suspense>
-
-      {/*
-        The app, directly under the flagship.
-
-        High for the same reason HomeSplit is high: it is the one thing on this
-        page a competitor's website cannot copy, and not because they have not
-        got round to it — a browser tab cannot draw over another app on any
-        phone. Burying it would repeat the mistake that section documents.
-      */}
-      <HomeBubble />
-
-      {/* Free reward links: the reason to follow the WhatsApp channel. */}
-      <HomeFollow />
-
       <HomeSection
         id="live-now"
-        eyebrow={
-          <span className="inline-flex items-center gap-2 text-victory">
-            <span className="live-dot" />{t('In rotation now')}</span>
-        }
         title={t('Live Brawl Stars events')}
         subtitle={t('The maps everyone is playing this slot, straight from the game API.')}
         ctaHref="/maps"
@@ -233,27 +174,16 @@ export default function HomePage() {
         </Suspense>
       </HomeSection>
 
-      {/* The first of two changes of ground: this one raised, under the tools.
-          The other sinks, under the argument near the foot of the page. Two is
-          the limit — a third and the rhythm becomes the decoration. */}
       <HomeBand>
         <Suspense fallback={<Skeleton className="h-80 rounded-2xl" />}>
           <HomeTools />
         </Suspense>
       </HomeBand>
 
-      <Suspense fallback={<Skeleton className="h-96 rounded-2xl" />}>
-        <HomeSnapshot revalidate={LIVE_REVALIDATE} />
-      </Suspense>
+      <HomeBubble />
 
-      {/* Under the snapshot on purpose: someone who has just read the numbers
-          is the one person on the page who might want to follow them daily.
-          Renders nothing until the box has written a post. */}
-      <Suspense fallback={null}>
-        <HomeLatestPost />
-      </Suspense>
-
-      <HomeCta />
+      {/* While the Google Play closed test is recruiting; nothing otherwise. */}
+      <HomePlayTest />
     </div>
   );
 }

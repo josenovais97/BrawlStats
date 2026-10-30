@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, Coffee, ExternalLink, Mail, MessageCircle, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
+import { Camera, Coffee, Mail, MessageCircle, MessagesSquare, Music2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -173,149 +173,60 @@ export function SiteFooter() {
   const locale = useLocale();
   const t = (key: string) => WORDS[locale][key] ?? EN[key] ?? key;
   const href = (path: string) => localePath(locale, path);
+  const chip = 'bz-chip inline-flex min-h-10 items-center gap-2 px-3.5 text-sm';
+  /*
+    Rebuilt 2026-10-30 in the game-menu style: the brand and the channels on
+    one row, the three link groups three across even on a phone (they ran two
+    and a half screens stacked), the Play badge once, and the legal lines in
+    one quiet block. Every link keeps prefetch off: ~25 links scrolling into
+    view at once used to trip the per-IP rate limit (2026-10-07).
+  */
   return (
-    <footer className="relative mt-16 border-t border-border/70 bg-background sm:mt-20">
-      {/*
-        A single hairline of brand light along the top edge, which is what ties
-        the footer to the page above it rather than letting it read as a
-        detached slab.
-      */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 45%, transparent), color-mix(in srgb, var(--accent) 35%, transparent), transparent)',
-        }}
-      />
-
-      <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        {/*
-          Four columns rather than three, and the link groups carry their own
-          headings. The old layout put the brand in one column and everything
-          else in two, which left three hundred pixels of dead space under the
-          store badges while the right-hand column ran on past it — the reason
-          the whole block read as unbalanced.
-        */}
-        {/*
-          Every link in the footer has prefetching off, and that is a fix, not a
-          micro-optimisation.
-
-          Next prefetches each <Link> the moment it scrolls into view. The
-          footer is ~25 links on every page, so reaching the bottom of any page
-          fired ~25 requests at once -- on top of the page's own. Measured on
-          2026-10-07: one visitor opening the home page and scrolling it once
-          sent 112 requests in ten seconds, and Cloudflare's rate limit bans an
-          IP at 100. Real visitors were reaching it -- nine in a week -- and
-          the reward for reading to the bottom of the page was Error 1015.
-
-          Nobody needs the footer's links instant. They still navigate; the
-          next page just loads when it is clicked instead of before.
-        */}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
-          <div className="min-w-0">
-            <Link
-              href={href('/')}
-              prefetch={false}
-              className="inline-flex items-center gap-2.5 rounded-lg font-black tracking-tight"
-            >
-              <BrandMark className="size-7" />
-              <span className="display text-xl uppercase">{SITE_NAME}</span>
+    <footer className="site-footer relative mt-16 sm:mt-24">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-sm">
+            <Link href={href('/')} prefetch={false} className="inline-flex items-center gap-2.5">
+              <BrandMark className="size-8" />
+              <span className="display text-game-stroke text-2xl">{SITE_NAME}</span>
             </Link>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">{t('tagline')}</p>
-
-            {/*
-              One row of equal-weight links, not three stacked buttons.
-
-              They used to be a filled brand pill above two outlined ones, which
-              read as three unrelated calls to action of descending importance —
-              and put a donation button at the visual top of the stack. They are
-              three ways to follow the same project, so they now look like it.
-              The coffee link keeps a warm tint because it is an offer rather
-              than a destination, but never the solid brand fill: that belongs
-              to the search button, and a donation should not be the loudest
-              control on a page about looking up players.
-            */}
-            <p className="eyebrow mt-7">{t('follow')}</p>
-            <div className="mt-2.5 flex flex-wrap items-center gap-2">
-              <a
-                href={DISCORD_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                {/* Generic speech marks rather than Discord's own wordmark:
-                    it is a trademark, licensed only for unmodified use. */}
-                <MessagesSquare aria-hidden className="size-4" />
-                Discord
-              </a>
-              <a
-                href={YOUTUBE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                {/* lucide dropped its brand icons, so this is the generic play
-                    mark rather than YouTube's own, for the same reason. */}
-                <PlayCircle aria-hidden className="size-4" />
-                YouTube
-              </a>
-              <a
-                href={TIKTOK_PROFILE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                {/* A generic music note rather than TikTok's own mark, for the
-                    same reason as Discord and YouTube above: the logo is a
-                    trademark, licensed only for unmodified use. */}
-                <Music2 aria-hidden className="size-4" />
-                TikTok
-              </a>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                {/* A generic camera, not Instagram's glyph: same trademark rule. */}
-                <Camera aria-hidden className="size-4" />
-                Instagram
-              </a>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3.5 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-              >
-                {/* A generic chat bubble, not WhatsApp's glyph: same trademark rule. */}
-                <MessageCircle aria-hidden className="size-4" />
-                WhatsApp
-              </a>
-              <a
-                href={BUY_ME_A_COFFEE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/35 bg-brand/10 px-3.5 text-sm font-bold text-brand transition-colors hover:border-brand/60 hover:bg-brand/15"
-              >
-                <Coffee aria-hidden className="size-4" />
-                {t('coffee')}
-              </a>
-            </div>
-            <p className="mt-2.5 text-xs text-muted/80">{t('free')}</p>
-
+            <p className="mt-2 text-sm leading-relaxed text-muted">{t('tagline')}</p>
           </div>
+          {/* Generic icons, not the networks' own marks: those are trademarks
+              licensed only for unmodified use. */}
+          <div className="flex flex-wrap gap-2 lg:max-w-md lg:justify-end">
+            <a href={DISCORD_URL} target="_blank" rel="noreferrer" className={chip}>
+              <MessagesSquare aria-hidden className="size-4" />Discord
+            </a>
+            <a href={YOUTUBE_URL} target="_blank" rel="noreferrer" className={chip}>
+              <PlayCircle aria-hidden className="size-4" />YouTube
+            </a>
+            <a href={TIKTOK_PROFILE_URL} target="_blank" rel="noreferrer" className={chip}>
+              <Music2 aria-hidden className="size-4" />TikTok
+            </a>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className={chip}>
+              <Camera aria-hidden className="size-4" />Instagram
+            </a>
+            <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className={chip}>
+              <MessageCircle aria-hidden className="size-4" />WhatsApp
+            </a>
+            <a href={BUY_ME_A_COFFEE_URL} target="_blank" rel="noreferrer" className={`${chip.replace('bz-chip', 'bz-chip-on')}`}>
+              <Coffee aria-hidden className="size-4" />{t('coffee')}
+            </a>
+          </div>
+        </div>
 
+        <div className="mt-9 grid grid-cols-3 gap-x-4 gap-y-8 lg:grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.2fr)]">
           {LINK_GROUPS.map((group) => (
             <nav key={group.heading} aria-label={t(group.heading)} className="min-w-0">
-              <p className="eyebrow">{t(group.heading)}</p>
-              <ul className="mt-3 space-y-0.5">
-                {group.links.map(({ href, label }) => (
-                  <li key={href}>
+              <p className="display text-lg text-foreground">{t(group.heading)}</p>
+              <ul className="mt-2">
+                {group.links.map(({ href: path, label }) => (
+                  <li key={path}>
                     <Link
-                      href={localePath(locale, href)}
+                      href={localePath(locale, path)}
                       prefetch={false}
-                      className="inline-flex min-h-9 items-center text-sm text-muted transition-colors hover:text-foreground"
+                      className="inline-flex min-h-8 items-center text-[13px] leading-tight text-muted transition-colors hover:text-foreground sm:text-sm"
                     >
                       {t(label)}
                     </Link>
@@ -324,123 +235,71 @@ export function SiteFooter() {
               </ul>
             </nav>
           ))}
+          <div className="col-span-3 flex flex-wrap items-center gap-4 lg:col-span-1 lg:flex-col lg:items-start">
+            {PLAY_LIVE ? (
+              <a
+                href={PLAY_TEST.listingUrl}
+                rel="noopener"
+                data-umami-event="play_store"
+                data-umami-event-from="footer"
+                aria-label={t('googlePlay')}
+                className="rounded transition-opacity hover:opacity-80"
+              >
+                <GooglePlayBadge className="h-10 w-auto" />
+              </a>
+            ) : (
+              <Link
+                href={href(BUBBLE_PATH)}
+                prefetch={false}
+                data-umami-event="playtest_entry"
+                data-umami-event-from="footer"
+                aria-label={t('googlePlay')}
+                className="rounded transition-opacity hover:opacity-80"
+              >
+                <GooglePlayBadge className="h-10 w-auto" />
+              </Link>
+            )}
+            <p className="max-w-xs text-sm text-muted">{t('getGame')}</p>
+          </div>
         </div>
 
-        {/*
-          About, contact and attribution together on one quiet line.
-
-          Sources used to sit in a column of navigation styled exactly like it,
-          which made "RoyaleAPI proxy" look like a page on this site. They are
-          credit, not destinations, so they belong with the disclaimer that is
-          also credit.
-        */}
-        <div className="mt-10 space-y-4 border-t border-border/70 pt-6 text-xs leading-relaxed text-muted">
-          {/*
-            The store badges close the footer rather than sitting in the brand
-            column. Up there they made that column half again as tall as the
-            three beside it, so the block ended in a wide empty rectangle; down
-            here they balance the attribution line and read as what they are —
-            a link out, next to the other links out.
-          */}
-          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-            <div className="flex flex-wrap items-center gap-2.5">
-              {PLAY_LIVE ? (
-                <a
-                  href={PLAY_TEST.listingUrl}
-                  rel="noopener"
-                  data-umami-event="play_store"
-                  data-umami-event-from="footer"
-                  aria-label={t('googlePlay')}
-                  className="rounded transition-opacity hover:opacity-80"
-                >
-                  <GooglePlayBadge className="h-9 w-auto" />
-                </a>
-              ) : (
-                <Link
-                  href={href(BUBBLE_PATH)}
-                  prefetch={false}
-                  data-umami-event="playtest_entry"
-                  data-umami-event-from="footer"
-                  aria-label={t('googlePlay')}
-                  className="rounded transition-opacity hover:opacity-80"
-                >
-                  <GooglePlayBadge className="h-9 w-auto" />
-                </Link>
-              )}
-            </div>
-            <p className="text-muted/80">{t('getGame')}</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-t border-border/50 pt-4">
-            <Link
-              href={href('/about')}
-              prefetch={false}
-              className="transition-colors hover:text-foreground"
-            >
+        {/* Credit and the legal lines: what they are, not destinations. */}
+        <div className="mt-9 space-y-3 border-t-2 border-[var(--ink)] pt-5 text-xs leading-relaxed text-muted">
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <Link href={href('/about')} prefetch={false} className="font-semibold text-foreground hover:text-brand">
               {t('about')} {SITE_NAME}
             </Link>
-            <Dot />
-            <Link href={href('/privacy')} prefetch={false} className="transition-colors hover:text-foreground">
-              {t('privacy')}
-            </Link>
-            <Dot />
-            <Link href={href('/terms')} prefetch={false} className="transition-colors hover:text-foreground">
-              {t('terms')}
-            </Link>
-            <Dot />
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
-            >
-              <Mail aria-hidden className="size-3.5 shrink-0" />
-              {t('contact')}
+            <Link href={href('/privacy')} prefetch={false} className="hover:text-foreground">{t('privacy')}</Link>
+            <Link href={href('/terms')} prefetch={false} className="hover:text-foreground">{t('terms')}</Link>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-1.5 hover:text-foreground">
+              <Mail aria-hidden className="size-3.5 shrink-0" />{t('contact')}
             </a>
-            <Dot />
-            <span className="text-muted/80">{t('sources')}</span>
+          </p>
+          <p>
+            {t('sources')}{' '}
             {SOURCES.map((source, index) => (
-              <span key={source.href} className="inline-flex items-center gap-1">
-                <a
-                  href={source.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
-                >
+              <span key={source.href}>
+                <a href={source.href} target="_blank" rel="noreferrer" className="underline decoration-border underline-offset-2 hover:text-foreground">
                   {source.label}
-                  <ExternalLink aria-hidden className="size-3 shrink-0" />
                 </a>
-                {index < SOURCES.length - 1 ? <Dot /> : null}
+                {index < SOURCES.length - 1 ? ', ' : '.'}
               </span>
             ))}
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-2xl">
-              {t('disclaimer')}{' '}
-              <a
-                href={FAN_CONTENT_POLICY_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-brand"
-              >
-                {t('policy')}
-              </a>
-              .
-            </p>
-            <p className="shrink-0 text-muted/80">
-              {SITE_NAME} &middot; {t('notAffiliated')}
-            </p>
-          </div>
+          </p>
+          <p className="max-w-3xl">
+            {t('disclaimer')}{' '}
+            <a
+              href={FAN_CONTENT_POLICY_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-border underline-offset-2 hover:text-foreground"
+            >
+              {t('policy')}
+            </a>
+            . {SITE_NAME} {t('notAffiliated')}.
+          </p>
         </div>
       </div>
     </footer>
-  );
-}
-
-/** The separator between attribution links, so they read as one sentence. */
-function Dot() {
-  return (
-    <span aria-hidden className="px-0.5 text-muted/40">
-      &middot;
-    </span>
   );
 }
