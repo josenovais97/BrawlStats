@@ -93,7 +93,7 @@ export function RecommendedBuild({
     return (
       <div>
         <div className="mb-2.5 flex items-baseline justify-between gap-3">
-          <p className="label-game display text-sm">{t('The build owners run')}</p>
+          <p className="display text-sm">{t('The build owners run')}</p>
           <a href="#build" className="text-xs font-semibold text-brand hover:underline">{t('Why, and what else')}</a>
         </div>
         <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">

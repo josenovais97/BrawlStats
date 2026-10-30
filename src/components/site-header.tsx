@@ -234,13 +234,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40">
-      {/* The bar's surface is a layer rather than the header's own background,
-          so it can fade in on scroll while the nav sitting on it never moves.
-          See `header-veil` in globals.css. */}
-      <span
-        aria-hidden
-        className="header-veil pointer-events-none absolute inset-0 -z-10 border-b border-border/70 bg-background/85 backdrop-blur-md"
-      />
+      {/* The game's top bar (2026-10-30): solid, lit from above, on a thick
+          dark edge. It used to be a see-through veil that faded in on scroll,
+          which read as a web page's header rather than a game's. */}
+      <span aria-hidden className="game-bar pointer-events-none absolute inset-0 -z-10" />
 
       <div className="relative mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link
@@ -249,7 +246,7 @@ export function SiteHeader() {
           aria-label={t('home')}
         >
           <BrandMark className="size-9 shrink-0 transition-transform duration-200 group-hover:-rotate-6" />
-          <span className="label-game display text-xl leading-none">
+          <span className="display text-game-stroke text-xl uppercase leading-none tracking-wide">
             Brawl<span className="text-brand">Zone</span>
           </span>
         </Link>
@@ -272,18 +269,11 @@ export function SiteHeader() {
                 key={path}
                 href={href(path)}
                 aria-current={active ? 'page' : undefined}
-                className={`relative whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                  active ? 'text-brand' : 'text-muted hover:text-foreground'
+                className={`whitespace-nowrap px-3 py-1.5 text-[0.9375rem] ${
+                  active ? 'bz-chip-on' : 'nav-game'
                 }`}
               >
                 {t(label)}
-                {/* Underline marks the current page more clearly than a tint. */}
-                <span
-                  aria-hidden
-                  className={`absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand transition-opacity ${
-                    active ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
               </Link>
             );
           })}
@@ -294,19 +284,13 @@ export function SiteHeader() {
               onClick={() => setMoreOpen((v) => !v)}
               aria-expanded={moreOpen}
               aria-haspopup="true"
-              className={`relative flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                moreActive || moreOpen ? 'text-brand' : 'text-muted hover:text-foreground'
+              className={`flex items-center gap-1 whitespace-nowrap px-3 py-1.5 text-[0.9375rem] ${
+                moreActive ? 'bz-chip-on' : moreOpen ? 'nav-game text-white' : 'nav-game'
               }`}
             >
               {t('More')}
               <ChevronDown
                 className={`size-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`}
-              />
-              <span
-                aria-hidden
-                className={`absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand transition-opacity ${
-                  moreActive ? 'opacity-100' : 'opacity-0'
-                }`}
               />
             </button>
 
@@ -322,7 +306,7 @@ export function SiteHeader() {
                   onClick={() => setMoreOpen(false)}
                   className="fixed inset-0 z-0 cursor-default"
                 />
-                <ul className="absolute right-0 z-10 mt-1 w-52 overflow-hidden rounded-xl border border-border bg-surface shadow-lg shadow-black/40">
+                <ul className="card absolute right-0 z-10 mt-2 grid w-56 gap-2 p-2">
                   {MORE.map(({ href: path, match, label, icon: Icon }) => {
                     const active = isActive(pathname, path, match);
                     return (
@@ -331,10 +315,8 @@ export function SiteHeader() {
                           href={href(path)}
                           aria-current={active ? 'page' : undefined}
                           onClick={() => setMoreOpen(false)}
-                          className={`flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold transition-colors ${
-                            active
-                              ? 'bg-brand/10 text-brand'
-                              : 'text-muted hover:bg-surface-2 hover:text-foreground'
+                          className={`flex items-center gap-2.5 px-3 py-2 text-[0.9375rem] ${
+                            active ? 'bz-chip-on' : 'bz-chip hover:text-white'
                           }`}
                         >
                           <Icon className="size-4 shrink-0" />
@@ -354,7 +336,7 @@ export function SiteHeader() {
 
           <Link
             href={`${href('/')}#search`}
-            className="ml-2 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-brand px-3.5 py-2 text-sm font-bold text-brand-ink shadow-[0_2px_0_0_#b87d00] transition-colors hover:bg-brand-strong"
+            className="btn-game ml-2 inline-flex shrink-0 items-center gap-2 whitespace-nowrap bg-brand px-3.5 py-1.5 text-[0.9375rem] text-brand-ink hover:bg-brand-strong"
           >
             <Search className="size-4" />
             {t('Search')}
@@ -366,7 +348,7 @@ export function SiteHeader() {
           <Link
             href={`${href('/')}#search`}
             aria-label={t('searchLabel')}
-            className="grid size-10 place-items-center rounded-lg bg-brand text-brand-ink shadow-[0_2px_0_0_#b87d00]"
+            className="btn-game grid size-10 place-items-center bg-brand text-brand-ink"
           >
             <Search className="size-5" />
           </Link>
@@ -376,7 +358,7 @@ export function SiteHeader() {
             aria-label={open ? t('close') : t('open')}
             aria-expanded={open}
             aria-controls="mobile-nav"
-            className="grid size-10 place-items-center rounded-lg border border-border text-muted transition-colors hover:text-foreground"
+            className={`grid size-10 place-items-center ${open ? 'bz-chip-on' : 'bz-chip hover:text-white'}`}
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
@@ -387,7 +369,7 @@ export function SiteHeader() {
         <nav
           id="mobile-nav"
           aria-label={t('main')}
-          className="border-t border-border/70 bg-surface/95 backdrop-blur-md lg:hidden"
+          className="game-drawer lg:hidden"
         >
           {/*
             One column below 380px: "Release Notes" and "Leaderboard" both get
@@ -407,13 +389,11 @@ export function SiteHeader() {
                     href={href(path)}
                     aria-current={active ? 'page' : undefined}
                     onClick={() => setOpen(false)}
-                    className={`flex items-center gap-2.5 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${
-                      active
-                        ? 'border-brand/40 bg-brand/10 text-brand'
-                        : 'border-border bg-surface-2/60 text-muted hover:text-foreground'
+                    className={`flex items-center gap-2.5 px-3 py-2.5 text-base ${
+                      active ? 'bz-chip-on' : 'bz-chip hover:text-white'
                     }`}
                   >
-                    <Icon className="size-4 shrink-0" />
+                    <Icon className="size-5 shrink-0" />
                     <span className="truncate">{t(label)}</span>
                   </Link>
                 </li>

@@ -354,34 +354,37 @@ body::before {
   }
 }
 
-/*
- * The header's own surface, faded in over the first inch of scroll.
- *
- * At the very top there is nothing to separate the bar from, and painting a
- * bar and a rule there anyway is what stopped the hero's lighting from
- * reaching the top of the window — the scene began an inch below the fold of
- * its own page. Once anything is scrolling underneath, the surface is what
- * keeps the nav readable, so it arrives exactly then.
- *
- * The fallback is the important half: without a scroll timeline the veil is
- * simply opaque, which is the solid bar this replaced. Nothing is ever
- * illegible because the effect is unavailable.
- */
-@keyframes veil-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
-@utility header-veil {
-  @supports (animation-timeline: scroll()) {
-    opacity: 0;
-    animation: veil-in linear both;
-    animation-timeline: scroll(root block);
-    animation-range: 0 4.5rem;
+/*
+ * The site's top bar and its phone menu, as the game draws them (2026-10-30):
+ * a solid blue slab lit along the top, sitting on a thick dark edge. Nav
+ * labels are in the display face; the current page is a yellow chip
+ * (bz-chip-on), the rest plain lettering until hovered.
+ */
+@utility game-bar {
+  background: linear-gradient(180deg, #1d2d78 0%, #132058 100%);
+  border-bottom: 3px solid var(--ink);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.12),
+    0 4px 0 rgb(5 10 31 / 0.35);
+}
+@utility game-drawer {
+  background: linear-gradient(180deg, #172463 0%, #0f1848 100%);
+  border-bottom: 3px solid var(--ink);
+  box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.7);
+}
+@utility nav-game {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #c3cdf2;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.4);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  transition: color 120ms ease, background-color 120ms ease;
+  &:hover {
+    color: #fff;
+    background: rgb(255 255 255 / 0.07);
   }
 }
 
@@ -471,12 +474,6 @@ body::before {
   .drift-back {
     animation: none;
     transform: none;
-  }
-
-  /* The veil is legibility, not decoration, so it stays — just permanently. */
-  .header-veil {
-    animation: none;
-    opacity: 1;
   }
 }
 
