@@ -4786,4 +4786,8 @@ export const PT: Record<string, string> = {
     "Ou siga um canal: cada link novo sai assim que o encontramos.",
   "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
     "Compartilhar, depois em \"Adicionar à Tela de Início\", e abra o BrawlZone por lá.",
+  "BrawlZone is made and run by":
+    "O BrawlZone é feito e mantido pela",
+  ", a one-person studio in Portugal that also develops the BrawlZone Bubble app for Android. Questions go to the address below.":
+    ", um estúdio de uma pessoa só em Portugal que também desenvolve o app BrawlZone Bubble para Android. Dúvidas podem ir para o endereço abaixo.",
 };

@@ -70,6 +70,10 @@ export default function AboutPage() {
       <p className="max-w-prose leading-relaxed text-muted">{t('BrawlZone — often written')}{' '}<strong className="text-foreground">{t('Brawl Zone')}</strong>{' '}{t('— is an independent Brawl Stars statistics site covering player and club lookups, Ranked analysis and brawler tier lists. It lives at')}{' '}
         <a href="https://brawlzone.net" className="text-brand hover:underline">{t('brawlzone.net')}</a>{' '}{t('and is not affiliated with Supercell.')}</p>
 
+      {/* Who is behind it (2026-10-30): a named publisher is part of what
+          AdSense reviewers look for, and the same name is on Google Play. */}
+      <p className="max-w-prose leading-relaxed text-muted">{t('BrawlZone is made and run by')}{' '}<strong className="text-foreground">Novais Labs</strong>{t(', a one-person studio in Portugal that also develops the BrawlZone Bubble app for Android. Questions go to the address below.')}</p>
+
       <section>
         <SectionHeading title={t('What it does')} />
         <div className="grid gap-4 sm:grid-cols-2">
