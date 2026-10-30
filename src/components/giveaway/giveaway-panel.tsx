@@ -176,6 +176,9 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
       setError(matches?.length
         ? t('Tap your account in the list under the box, or type your tag.')
         : t('No player found with that name. Type your tag instead: it starts with # and is under your name in game.'));
+      // Four visitors tried a name 27 times in a week (2026-10-30): with no
+      // match, open the picture of where the tag is rather than repeat the line.
+      if (!matches?.length) setHelp(true);
       window.umami?.track('giveaway_error', { code: 'name-unpicked' });
       return;
     }

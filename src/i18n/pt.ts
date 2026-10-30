@@ -4778,4 +4778,12 @@ export const PT: Record<string, string> = {
     "Nosso próprio contador, mais o Google Analytics.",
   "The website also uses":
     "O site também usa",
+  "Follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Siga um canal: cada link novo sai assim que o encontramos, muitas vezes horas antes de outros sites.",
+  "On iPhone, notifications work once BrawlZone is on your home screen: tap":
+    "No iPhone, as notificações funcionam quando o BrawlZone está na sua Tela de Início: toque em",
+  "Or follow a channel: a new link goes out the moment it is found.":
+    "Ou siga um canal: cada link novo sai assim que o encontramos.",
+  "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
+    "Compartilhar, depois em \"Adicionar à Tela de Início\", e abra o BrawlZone por lá.",
 };

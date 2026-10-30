@@ -984,6 +984,18 @@ export const CLIENT_ES: Record<string, string> = {
     "{p} de probabilidad por premio, 1 de cada {n}",
   "{rarity} {drop}":
     "{drop} {rarity}",
+  "Discord server":
+    "Servidor de Discord",
+  "WhatsApp channel":
+    "Canal de WhatsApp",
+  "Follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Sigue un canal: cada link nuevo sale en cuanto lo encontramos, a menudo horas antes que en otros sitios.",
+  "On iPhone, notifications work once BrawlZone is on your home screen: tap":
+    "En iPhone, las notificaciones funcionan cuando BrawlZone está en tu pantalla de inicio: toca",
+  "Or follow a channel: a new link goes out the moment it is found.":
+    "O sigue un canal: cada link nuevo sale en cuanto lo encontramos.",
+  "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
+    "Compartir, luego \"Agregar a inicio\", y abre BrawlZone desde ahí.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1967,4 +1979,16 @@ export const CLIENT_PT: Record<string, string> = {
     "{p} de chance por sorteio, 1 em {n}",
   "{rarity} {drop}":
     "{drop} {rarity}",
+  "Discord server":
+    "Servidor no Discord",
+  "WhatsApp channel":
+    "Canal no WhatsApp",
+  "Follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Siga um canal: cada link novo sai assim que o encontramos, muitas vezes horas antes de outros sites.",
+  "On iPhone, notifications work once BrawlZone is on your home screen: tap":
+    "No iPhone, as notificações funcionam quando o BrawlZone está na sua Tela de Início: toque em",
+  "Or follow a channel: a new link goes out the moment it is found.":
+    "Ou siga um canal: cada link novo sai assim que o encontramos.",
+  "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
+    "Compartilhar, depois em \"Adicionar à Tela de Início\", e abra o BrawlZone por lá.",
 };

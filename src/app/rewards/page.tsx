@@ -72,7 +72,7 @@ export default async function RewardsPage() {
     <div className="space-y-12">
       <JsonLd data={breadcrumbSchema([{ name: 'Free rewards', path: '/rewards' }])} />
       <JsonLd data={faqSchema(faq)} />
-      <ClaimNudge vapidKey={process.env.VAPID_PUBLIC_KEY ?? ''} />
+      <ClaimNudge vapidKey={process.env.VAPID_PUBLIC_KEY ?? ''} discordUrl={DISCORD_URL} />
 
       <div className="max-w-2xl space-y-2">
         <h1 className="display text-3xl leading-tight sm:text-4xl">{t('Free Brawl Stars rewards')}</h1>
