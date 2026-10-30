@@ -1,4 +1,3 @@
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { getT } from '@/lib/t';
@@ -51,12 +50,12 @@ export function HomeSection({
           ) : null}
         </div>
 
+        {/* A game button rather than a text link with an arrow (2026-10-30). */}
         <Link
           href={lp(ctaHref)}
-          className="group inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface px-3.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-brand/50 hover:text-brand"
+          className="btn-game inline-flex shrink-0 items-center bg-surface-3 px-4 py-2 text-base text-white [--btn-shadow:var(--ink)] hover:bg-[#31439a]"
         >
           {t(ctaLabel)}
-          <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Link>
       </div>
 

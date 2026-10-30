@@ -136,7 +136,7 @@ function Verdict({
   const t = getT(requestLocale());
   return (
     <span className="w-14 text-center sm:w-16">
-      <span className="block text-xs font-semibold uppercase tracking-wide text-muted">
+      <span className="block text-xs font-semibold text-muted">
         {t(label)}
       </span>
       <span

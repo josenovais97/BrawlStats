@@ -37,7 +37,7 @@ export function HomePlayTest() {
         className="size-16 shrink-0 rounded-2xl shadow-lg shadow-black/40"
       />
       <span className="min-w-0 flex-1 space-y-1.5">
-        <span className="block text-xs font-bold uppercase tracking-wide text-victory">{t('Google Play test')}</span>
+        <span className="block text-xs font-bold text-victory">{t('Google Play test')}</span>
         <span className="display block text-xl uppercase leading-tight sm:text-2xl">
           {t('Help us launch BrawlZone Bubble on Google Play')}
         </span>
@@ -78,7 +78,7 @@ function HomePlayLaunch() {
         className="size-16 shrink-0 rounded-2xl shadow-lg shadow-black/40"
       />
       <span className="min-w-0 flex-1 space-y-1.5">
-        <span className="block text-xs font-bold uppercase tracking-wide text-victory">{t('New on Google Play')}</span>
+        <span className="block text-xs font-bold text-victory">{t('New on Google Play')}</span>
         <span className="display block text-xl uppercase leading-tight sm:text-2xl">
           {t('BrawlZone Bubble is on Google Play')}
         </span>

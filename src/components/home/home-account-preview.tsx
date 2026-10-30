@@ -57,7 +57,7 @@ export async function HomeAccountPreview() {
               <p className="truncate text-sm font-bold">{t('Your tag')}</p>
               <p className="truncate text-xs text-muted">{t('Trophies, club, level and Ranked tier')}</p>
             </div>
-            <span className="hidden shrink-0 rounded-lg bg-surface-3 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-muted sm:block">{t('Live')}</span>
+            <span className="hidden shrink-0 rounded-lg bg-surface-3 px-2.5 py-1 text-xs font-bold text-muted sm:block">{t('Live')}</span>
           </div>
 
           <div className="grid gap-px bg-border sm:grid-cols-2">

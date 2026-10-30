@@ -103,7 +103,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
                   >
                     {leader.score.toFixed(1)}
                   </p>
-                  <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted">{t('Meta score')}</p>
+                  <p className="mt-1 text-xs font-medium text-muted">{t('Meta score')}</p>
                 </div>
               </Link>
 

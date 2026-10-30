@@ -663,6 +663,8 @@ body {
  */
 @utility btn-game {
   position: relative;
+  /* The dark outline every button in the game has (2026-10-30). */
+  border: 2px solid var(--ink);
   border-radius: 0.875rem;
   font-family: var(--font-display), var(--font-sans), sans-serif;
   letter-spacing: 0.02em;

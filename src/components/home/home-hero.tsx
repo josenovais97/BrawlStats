@@ -316,7 +316,7 @@ async function Stage() {
       {/* The six words that explain the whole conceit. Anchored under the
           podium rather than floated beside it. */}
       {ranked ? (
-        <p className="absolute inset-x-0 bottom-0 text-center text-xs font-semibold uppercase tracking-[0.16em] text-muted/80">{t('Top 3 in Ranked right now')}</p>
+        <p className="absolute inset-x-0 bottom-0 text-center text-xs font-semibold text-muted/80">{t('Top 3 in Ranked right now')}</p>
       ) : null}
     </>
   );
@@ -562,7 +562,7 @@ function Plinth({ className, place, slot }: { className: string; place: Place; s
           >
             {slot.rank}
           </span>
-          <span className="flex max-w-full items-baseline gap-1 px-1.5 text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.12em] text-muted">
+          <span className="flex max-w-full items-baseline gap-1 px-1.5 text-[0.6875rem] font-semibold leading-none text-muted">
             <span className="min-w-0 truncate">{slot.name}</span>
             {slot.tier ? (
               <span className="shrink-0" style={{ color: accent }}>

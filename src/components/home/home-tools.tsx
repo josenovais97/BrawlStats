@@ -260,7 +260,7 @@ function Slots({ label, tone, filled }: { label: string; tone: string; filled: n
   const t = getT(requestLocale());
   return (
     <span className="min-w-0 flex-1">
-      <span className="block text-xs font-semibold uppercase tracking-wide text-muted">
+      <span className="block text-xs font-semibold text-muted">
         {t(label)}
       </span>
       <span aria-hidden className="mt-1.5 flex gap-1.5">

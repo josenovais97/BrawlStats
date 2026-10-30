@@ -142,7 +142,7 @@ export async function HomeLiveEvents({ revalidate }: { revalidate: number }) {
                   ) : null}
                   <div className="min-w-0 flex-1">
                     <p
-                      className="truncate text-xs font-bold uppercase tracking-[0.14em]"
+                      className="truncate text-xs font-bold"
                       style={{ color: accent }}
                     >
                       {modeName}

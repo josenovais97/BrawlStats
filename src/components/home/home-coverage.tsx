@@ -79,7 +79,7 @@ export async function HomeCoverage() {
                 <p className="display text-2xl leading-none tabular-nums text-foreground sm:text-[1.75rem]">
                   <CountUp value={value} />
                 </p>
-                <p className="mt-1.5 truncate text-xs font-medium uppercase tracking-wide text-muted">
+                <p className="mt-1.5 truncate text-xs font-medium text-muted">
                   {t(label)}
                 </p>
               </div>
