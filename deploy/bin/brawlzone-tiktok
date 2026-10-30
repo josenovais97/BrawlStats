@@ -714,6 +714,15 @@ record_state "last_post.${POST_KEY:-$MODE}" "$(now_iso)" || true
 # day's TikTok post already went out. Skipped until the channel is authorised
 # (~/.brawlzone-youtube.json), and with YOUTUBE=0.
 YOUTUBE_RESULT="not set up"
+# Not the daily "How to beat X" (counter) and "Best brawlers for <map>" (tiers)
+# templates (2026-10-30): the same 17 seconds every day, they fell from
+# ~1,000 views to ~20 from 2026-10-28 while every other format held ~1,000
+# -- YouTube treating them as repetitive. TikTok and Instagram keep them;
+# YOUTUBE=1 posts one anyway.
+if [ "$MODE" = counter ] || [ "$MODE" = tiers ]; then
+  YOUTUBE="${YOUTUBE:-0}"
+  YOUTUBE_RESULT="skipped (repetitive on YouTube)"
+fi
 if [ "${YOUTUBE:-1}" = "1" ] && [ -r "$HOME/.brawlzone-youtube.json" ]; then
   YT_WORK=$(mktemp -d)
   printf '%s\n' "$DESCRIPTION" > "${YT_WORK}/description.txt"
