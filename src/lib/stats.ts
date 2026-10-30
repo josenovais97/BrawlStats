@@ -636,10 +636,22 @@ async function compute_getCatalogChanges(limit = 40): Promise<CatalogChangeEntry
   try {
     const rows = await prisma.catalogChange.findMany({
       orderBy: [{ detectedOn: 'desc' }, { id: 'desc' }],
-      take: limit,
+      take: limit * 4,
     });
 
-    return rows.map((row) => ({
+    // One line per change. Rows with no item (a brawler added or removed)
+    // escaped the unique index, whose NULLs never collide, and Vince and
+    // Cosmo were each written eight times on 2026-09-01 -- /news printed
+    // them all (found 2026-10-30). The writer skips them now too.
+    const seen = new Set<string>();
+    const unique = rows.filter((row) => {
+      const key = `${toIsoDate(row.detectedOn)}|${row.kind}|${row.brawlerId}|${row.itemId ?? ''}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return unique.slice(0, limit).map((row) => ({
       id: row.id,
       detectedOn: toIsoDate(row.detectedOn),
       kind: row.kind,

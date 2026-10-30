@@ -120,7 +120,7 @@ export async function snapshotAndDiffCatalog(): Promise<{
     }
   }
 
-  const pending: PendingChange[] = [];
+  let pending: PendingChange[] = [];
 
   for (const row of rows) {
     const before = previousById.get(row.brawlerId);
@@ -187,6 +187,18 @@ export async function snapshotAndDiffCatalog(): Promise<{
   }
 
   let written = 0;
+  // skipDuplicates leans on the unique index, and a row with no item (a
+  // brawler added or removed) never collides there: NULLs are distinct. So
+  // those are checked against today's rows by hand, or every run that day
+  // writes them again (eight times each for Vince and Cosmo on 2026-09-01).
+  if (pending.some((c) => c.itemId === null)) {
+    const today = await prisma.catalogChange.findMany({
+      where: { detectedOn: snapshotDate, itemId: null },
+      select: { kind: true, brawlerId: true },
+    });
+    const have = new Set(today.map((c) => `${c.kind}|${c.brawlerId}`));
+    pending = pending.filter((c) => c.itemId !== null || !have.has(`${c.kind}|${c.brawlerId}`));
+  }
   if (pending.length > 0) {
     const result = await prisma.catalogChange.createMany({
       data: pending.map((c) => ({ ...c, detectedOn: snapshotDate })),
