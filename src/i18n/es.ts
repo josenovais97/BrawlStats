@@ -4824,4 +4824,6 @@ export const ES: Record<string, string> = {
     "De {battles} partidas de {players} jugadores que recogemos nosotros mismos.",
   "Updated":
     "Actualizado",
+  "Scroll to reveal the top 3":
+    "Desliza para descubrir el top 3",
 };

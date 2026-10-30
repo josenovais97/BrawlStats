@@ -230,12 +230,12 @@ export function SearchBar({
           {error}
         </p>
       ) : (
-        <p id={hintId} className="mt-3 text-sm text-muted">
+        <div id={hintId} className="mt-3 text-sm text-muted">
           {mode === 'player'
             ? `${t('Your in-game name or #tag.')} `
             : `${t('A club tag is shown on the club screen, under the club name.')} `}
           <TagLocationHint kind={mode === 'player' ? 'player' : 'club'} />
-        </p>
+        </div>
       )}
 
       {footer}

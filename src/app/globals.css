@@ -995,3 +995,258 @@ html.fx-ready [data-fx='stamp'].fx-in:not(.fx-instant) { animation-name: fx-stam
   0% { transform: translateX(-130%); }
   18%, 100% { transform: translateX(130%); }
 }
+
+/*
+ * The home podium scene (2026-10-30; see home-podium.tsx and
+ * podium-scroll.tsx). Without `data-armed` this is a plain podium with every
+ * place lit. Armed, the track grows a screen and a half taller, the stage
+ * pins under the header, and each place stays a silhouette on a grey step
+ * until the script lights it. Reveals use `backwards` fill, so a place
+ * waiting out its catch-up delay still shows the silhouette.
+ */
+.podium {
+  background: #070c26;
+  border-block: 3px solid var(--ink);
+}
+.podium-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.25rem;
+  padding: 3rem 0 2.5rem;
+  background:
+    radial-gradient(ellipse 70% 42% at 50% 0%, rgb(110 130 255 / 0.2), transparent 70%),
+    radial-gradient(ellipse 80% 30% at 50% 88%, rgb(123 77 255 / 0.28), transparent 70%),
+    linear-gradient(180deg, #0e1745 0%, #080d2c 65%, #070c26 100%);
+}
+.podium[data-armed] {
+  height: calc(100vh - 4rem + 150vh);
+  height: calc(100svh - 4rem + 150svh);
+}
+.podium[data-armed] .podium-stage {
+  position: sticky;
+  top: 4rem;
+  height: calc(100vh - 4rem);
+  height: calc(100svh - 4rem);
+  padding-block: 1.5rem;
+}
+.podium-row {
+  position: relative;
+  width: 100%;
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-inline: 0.75rem;
+}
+.podium-places {
+  display: grid;
+  grid-template-columns: 31fr 38fr 31fr;
+  align-items: end;
+}
+/* The spotlight: one cone that travels to whichever place was just lit. */
+.podium-beam {
+  position: absolute;
+  bottom: 3rem;
+  top: -48rem;
+  left: var(--beam-x, 50%);
+  z-index: -1;
+  width: 46%;
+  translate: -50% 0;
+  background: linear-gradient(180deg, rgb(255 244 214 / 0) 0%, rgb(255 244 214 / 0.1) 60%, rgb(255 236 190 / 0.3) 100%);
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+  transition: left 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease;
+}
+.podium-row::after {
+  content: '';
+  position: absolute;
+  inset-inline: 4%;
+  bottom: -1.75rem;
+  z-index: -1;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(139 107 255 / 0.6), transparent);
+  filter: blur(6px);
+}
+.podium-slot { min-width: 0; margin-inline: -1.5px; }
+.podium-slot[data-rank='2'] { order: 1; }
+.podium-slot[data-rank='1'] { order: 2; z-index: 1; }
+.podium-slot[data-rank='3'] { order: 3; }
+.podium-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  border-radius: 1rem;
+}
+.podium-link:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 4px;
+}
+.podium-figure {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 9.5rem;
+}
+.podium-slot[data-rank='1'] .podium-figure { height: 12rem; }
+.podium-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  filter: drop-shadow(0 14px 16px rgb(0 0 0 / 0.6));
+  transition: translate 200ms ease;
+}
+.podium-link:hover .podium-art { translate: 0 -6px; }
+/* A portrait tile, when the full-body renders are missing: a framed disc. */
+.podium-disc {
+  inset: auto;
+  left: 50%;
+  bottom: 0.6rem;
+  width: 6.5rem;
+  height: 6.5rem;
+  translate: -50% 0;
+  object-fit: cover;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--tier);
+}
+.podium-link:hover .podium-disc { translate: -50% -6px; }
+.podium-badge {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 2;
+}
+.podium-rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: 22rem;
+  height: 22rem;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgb(255 205 80 / 0.24) 0deg 9deg, transparent 9deg 22.5deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 62%);
+  animation: reward-spin 40s linear infinite;
+}
+.podium-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  height: 7rem;
+  margin-top: -0.25rem;
+  padding: 0.45rem 0.4rem 0;
+  background: var(--step);
+  border: 3px solid var(--ink);
+  border-radius: 0.9rem 0.9rem 0 0;
+  box-shadow: inset 0 3px 0 rgb(255 255 255 / 0.55), inset 0 -12px 0 rgb(0 0 0 / 0.16);
+}
+.podium-slot[data-rank='1'] .podium-step { height: 9.25rem; }
+.podium-slot[data-rank='3'] .podium-step { height: 5.75rem; }
+.podium-info {
+  width: 100%;
+  min-width: 0;
+  padding: 0.25rem 0.35rem;
+  border-radius: 0.6rem;
+  background: rgb(5 10 31 / 0.6);
+  text-align: center;
+}
+.podium-num {
+  margin-top: auto;
+  padding-bottom: 0.2rem;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+.podium-slot[data-rank='1'] .podium-num { font-size: 3.4rem; }
+@media (min-width: 640px) {
+  .podium-figure { height: 14rem; }
+  .podium-slot[data-rank='1'] .podium-figure { height: 18rem; }
+  .podium-disc { width: 9rem; height: 9rem; }
+  .podium-step { height: 8.5rem; padding-inline: 0.6rem; }
+  .podium-slot[data-rank='1'] .podium-step { height: 11rem; }
+  .podium-slot[data-rank='3'] .podium-step { height: 7rem; }
+  .podium-num { font-size: 3.4rem; }
+  .podium-slot[data-rank='1'] .podium-num { font-size: 4.4rem; }
+  .podium-rays { width: 32rem; height: 32rem; }
+}
+.podium-hint { display: none; }
+
+/* Armed: waiting places, then each reveal. */
+.podium[data-armed] .podium-hint {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.75);
+  text-align: center;
+  transition: opacity 300ms ease;
+}
+.podium[data-armed] .podium-hint::after {
+  content: '';
+  display: block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin: 0.55rem auto 0;
+  border-right: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  rotate: 45deg;
+  animation: podium-nudge 1.4s ease-in-out infinite;
+}
+.podium[data-armed][data-beat='3'] .podium-hint { opacity: 0; }
+.podium[data-armed][data-beat='0'] .podium-beam { opacity: 0; }
+.podium[data-armed][data-beat='1'] .podium-beam { --beam-x: 84.5%; }
+.podium[data-armed][data-beat='2'] .podium-beam { --beam-x: 15.5%; }
+
+.podium[data-armed] .podium-slot:not(.is-lit) .podium-art {
+  filter: brightness(0) drop-shadow(0 0 1px rgb(150 165 255 / 0.7));
+}
+.podium[data-armed] .podium-slot:not(.is-lit) .podium-step { filter: grayscale(1) brightness(0.42); }
+.podium[data-armed] .podium-slot:not(.is-lit) :is(.podium-badge, .podium-info, .podium-rays) { opacity: 0; }
+
+.podium[data-armed] .podium-slot.is-lit .podium-art {
+  animation: podium-reveal 760ms cubic-bezier(0.2, 0.9, 0.3, 1.2) var(--lit-delay, 0ms) backwards;
+}
+.podium[data-armed] .podium-slot.is-lit .podium-step {
+  animation: podium-step 560ms ease-out var(--lit-delay, 0ms) backwards;
+}
+.podium[data-armed] .podium-slot.is-lit .podium-info {
+  animation: fx-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--lit-delay, 0ms) + 280ms) backwards;
+}
+.podium[data-armed] .podium-slot.is-lit .podium-badge {
+  animation: fx-stamp 480ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--lit-delay, 0ms) + 420ms) backwards;
+}
+.podium[data-armed] .podium-slot.is-lit .podium-rays {
+  animation:
+    podium-rays-in 900ms ease-out calc(var(--lit-delay, 0ms) + 150ms) backwards,
+    reward-spin 40s linear infinite;
+}
+@keyframes podium-reveal {
+  0% { filter: brightness(0) drop-shadow(0 0 1px rgb(150 165 255 / 0.7)); transform: scale(0.94); }
+  30% { filter: brightness(2.4) drop-shadow(0 0 22px rgb(255 236 190 / 0.8)); transform: translateY(-22px) scale(1.06); }
+  65% { transform: translateY(3px) scale(0.98); }
+  100% { filter: drop-shadow(0 14px 16px rgb(0 0 0 / 0.6)); transform: none; }
+}
+@keyframes podium-step {
+  0% { filter: grayscale(1) brightness(0.42); }
+  40% { filter: brightness(1.45); }
+  100% { filter: none; }
+}
+@keyframes podium-rays-in {
+  from { opacity: 0; scale: 0.3; }
+}
+@keyframes podium-nudge {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .podium-rays { animation: none; }
+  .podium-art, .podium-beam { transition: none; }
+}
