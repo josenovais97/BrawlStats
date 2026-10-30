@@ -2,11 +2,9 @@
 
 import { Share2, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
-import { DiscoveryCard } from '@/components/daily/discovery-card';
 import type { Discovery } from '@/lib/stats';
-import type { BABrawler } from '@/types/brawlapi';
 import { useT } from '@/components/i18n/use-t';
 import type { T } from '@/lib/t-core';
 import { useLp } from '@/components/i18n/use-lp';
@@ -55,10 +53,17 @@ const SWIPE_RATIO = 1.5;
 
 export function HomeRadar({
   discoveries,
-  brawlerMeta,
+  cards,
 }: {
   discoveries: Discovery[];
-  brawlerMeta: Map<number, BABrawler>;
+  /**
+   * Each discovery's card, rendered on the server. Rendered here they read
+   * their language and number format through `requestLocale`, which is
+   * always English while a client component renders on the server -- so
+   * /es and /pt served English cards and the browser rewrote them in its
+   * own language, a hydration error (#418) on every visit.
+   */
+  cards: ReactNode[];
 }) {
   const tx = useT();
   const lp = useLp();
@@ -229,7 +234,7 @@ export function HomeRadar({
         data-dir={dir}
         className="radar-slide touch-pan-y"
       >
-        <DiscoveryCard discovery={current} brawlerMeta={brawlerMeta} index={0} />
+        {cards[Math.min(index, count - 1)]}
       </div>
 
       {count > 1 ? (

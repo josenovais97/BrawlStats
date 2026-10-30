@@ -1,3 +1,4 @@
+import { DiscoveryCard } from '@/components/daily/discovery-card';
 import { HomeRadar } from '@/components/home/home-radar';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { getDailyDiscoveries } from '@/lib/stats';
@@ -21,5 +22,14 @@ export async function HomeRadarSection() {
 
   if (discoveries.length === 0) return null;
 
-  return <HomeRadar discoveries={discoveries} brawlerMeta={brawlerMeta} />;
+  // The cards render here, as server components, so they come out in the
+  // page's language; the carousel only chooses which one shows.
+  return (
+    <HomeRadar
+      discoveries={discoveries}
+      cards={discoveries.map((d) => (
+        <DiscoveryCard key={`${d.kind}${d.brawlerIds.join('-')}`} discovery={d} brawlerMeta={brawlerMeta} index={0} />
+      ))}
+    />
+  );
 }
