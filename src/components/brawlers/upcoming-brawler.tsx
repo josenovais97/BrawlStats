@@ -84,7 +84,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
 
       {stats.length > 0 ? (
         <section aria-labelledby="stats">
-          <h2 id="stats" className="display text-2xl uppercase">{t('Combat stats')}</h2>
+          <h2 id="stats" className="display text-game-stroke text-2xl">{t('Combat stats')}</h2>
           <p className="mt-1 text-sm text-muted">{t('Base values, before gears and star powers. Provisional until release.')}</p>
           <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {stats.map((stat) => (
@@ -99,7 +99,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
 
       {abilities.length > 0 ? (
         <section aria-labelledby="abilities">
-          <h2 id="abilities" className="display text-2xl uppercase">{t('Gadgets and star powers')}</h2>
+          <h2 id="abilities" className="display text-game-stroke text-2xl">{t('Gadgets and star powers')}</h2>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <AbilityCard
               title={t('Gadgets')}
@@ -131,7 +131,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       */}
       {MEASURED_SECTIONS.map((section) => (
         <section key={section.id} aria-labelledby={section.id}>
-          <h2 id={section.id} className="display text-2xl uppercase">
+          <h2 id={section.id} className="display text-game-stroke text-2xl">
             {t(section.title)}
           </h2>
           <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-muted">

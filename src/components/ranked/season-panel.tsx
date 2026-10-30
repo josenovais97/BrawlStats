@@ -79,7 +79,7 @@ export function SeasonPanel({
             <Sparkles className="size-3.5" />
             {isPreview ? t('Next season') : awaiting ? t('Season in progress') : t('Current season')}
           </p>
-          <h2 id="ranked-season" className="display mt-1.5 text-xl uppercase sm:text-2xl">
+          <h2 id="ranked-season" className="display text-game-stroke mt-1.5 text-xl sm:text-2xl">
             {awaiting ? t('After season {number}', { number: season.number }) : t('Ranked season {number}', { number: season.number })}
           </h2>
         </div>

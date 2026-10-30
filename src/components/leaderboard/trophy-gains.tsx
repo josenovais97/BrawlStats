@@ -40,7 +40,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-defeat">
             <TrophyGainIcon className="size-4" />{t('Climbing fastest')}</p>
-          <h2 id="trophy-gains" className="display mt-2.5 text-2xl uppercase sm:text-3xl">{t('Biggest trophy gains')}{uniformSpan === 1 ? t(' today') : ''}
+          <h2 id="trophy-gains" className="display text-game-stroke mt-2.5 text-2xl sm:text-3xl">{t('Biggest trophy gains')}{uniformSpan === 1 ? t(' today') : ''}
           </h2>
           {/*
             The population is stated up front because this list sits directly

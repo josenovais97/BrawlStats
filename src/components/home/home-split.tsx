@@ -44,12 +44,11 @@ export async function HomeSplit() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:items-center lg:gap-10">
           <div className="min-w-0">
             <p className="flex items-center gap-2.5">
-              <span aria-hidden className="rule h-4" />
               <span className="eyebrow text-accent">{t('Why the numbers differ here')}</span>
             </p>
             <h2
               id="split"
-              className="display mt-2.5 text-2xl uppercase sm:text-4xl"
+              className="display text-game-stroke mt-2.5 text-2xl sm:text-4xl"
             >{t('Two games.')}<br />{t('Two answers.')}</h2>
             <p className="mt-3.5 leading-relaxed text-muted">{t('Ranked drafts and bans between comparable opponents. The ladder does neither. We score them from separate halves of our own sample, so a brawler can be a first-pick in one and a trap in the other.')}</p>
             <p className="mt-3 text-sm leading-relaxed text-muted/85">{t('Most sites give you one list for both.')}</p>

@@ -198,12 +198,7 @@ export function HomeRadar({
     >
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <p className="flex items-center gap-2.5">
-            <span aria-hidden className="rule h-4" />
-            <span className="eyebrow flex items-center gap-2 text-accent-2">
-              <span className="live-dot" />{tx('Discovered today')}</span>
-          </p>
-          <h2 id="radar" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{tx('BrawlZone Radar')}</h2>
+          <h2 id="radar" className="display text-game-stroke text-3xl sm:text-4xl">{tx('BrawlZone Radar')}</h2>
           <p className="mt-2 max-w-xl text-sm text-muted">{tx('Things our own sampling turned up that no tier list would tell you.')}</p>
         </div>
 

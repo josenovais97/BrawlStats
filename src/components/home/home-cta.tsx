@@ -41,7 +41,7 @@ export function HomeCta() {
             <TrophyIcon className="size-7" />
           </span>
           <div className="min-w-0">
-            <h2 id="closing-cta" className="display text-xl uppercase sm:text-2xl">{t('See where you stand')}</h2>
+            <h2 id="closing-cta" className="display text-game-stroke text-xl sm:text-2xl">{t('See where you stand')}</h2>
             <p className="mt-1 text-sm leading-relaxed text-muted">{t('Your tag is on your in-game profile, just below your profile icon.')}{' '}
               <TagLocationHint />
             </p>

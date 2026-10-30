@@ -189,11 +189,10 @@ export default function BubblePage() {
           <div className="space-y-6">
             <div className="max-w-3xl space-y-5">
               <p className="flex items-center gap-2.5">
-                <span aria-hidden className="rule h-4" />
                 <span className="eyebrow">{t('Free Android app')}</span>
               </p>
 
-              <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl">{t('Your draft helper,')}<br />
+              <h1 className="display text-game-stroke text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">{t('Your draft helper,')}<br />
                 <span className="text-brand">{t('on top of the game')}</span>
               </h1>
 
@@ -333,7 +332,7 @@ export default function BubblePage() {
           </figure>
 
           <div className="card card-glow space-y-4 p-6 sm:p-8">
-            <h2 className="display text-2xl uppercase sm:text-3xl">{t('A website cannot do this')}</h2>
+            <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('A website cannot do this')}</h2>
             <p className="leading-relaxed text-muted">{t('Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.')}</p>
             <p className="leading-relaxed text-muted">{t('An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.')}</p>
             <figure className="space-y-2 pt-2">
@@ -683,7 +682,7 @@ export default function BubblePage() {
       </section>
 
       <section className="card card-glow p-6 text-center sm:p-10">
-        <h2 className="display text-2xl uppercase sm:text-3xl">{t('Get it on your phone')}</h2>
+        <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('Get it on your phone')}</h2>
         <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.', { v: bubbleAppSize() })}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           {PLAY_LIVE ? (

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Loader2, Search } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useState, useTransition, type FormEvent, type ReactNode } from 'react';
 
@@ -197,7 +197,6 @@ export function SearchBar({
         >
           {pending ? <Loader2 className="size-5 animate-spin" /> : <Search className="size-5" />}
           {t('Search')}
-          {hero ? <ArrowRight className="size-5 sm:hidden" /> : null}
         </button>
       </form>
 

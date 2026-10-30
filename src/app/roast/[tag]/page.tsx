@@ -79,7 +79,7 @@ export default async function RoastPage({ params }: PageProps) {
             unoptimized
           />
           <div className="min-w-0">
-            <h1 className="display truncate text-2xl uppercase sm:text-3xl">{player.name}</h1>
+            <h1 className="display text-game-stroke truncate text-2xl sm:text-3xl">{player.name}</h1>
             <p className="text-sm text-muted">{displayTag(player.tag)}</p>
           </div>
         </div>

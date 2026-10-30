@@ -56,7 +56,7 @@ export function TagLocationHint({ kind = 'player' }: { kind?: 'player' | 'club' 
       >
         <div className="flex items-start justify-between gap-4 border-b border-border p-5">
           <div>
-            <h2 id="tag-hint-title" className="display text-lg uppercase">
+            <h2 id="tag-hint-title" className="display text-lg">
               {isClub ? t('Finding a club tag') : t('Finding your tag')}
             </h2>
             <p className="mt-1 text-sm text-muted">

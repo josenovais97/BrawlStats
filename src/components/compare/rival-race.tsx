@@ -39,10 +39,9 @@ export function RivalRace({ a, b }: { a: PlayerSide; b: PlayerSide }) {
     <section className="space-y-3">
       <div>
         <p className="flex items-center gap-2.5">
-          <span aria-hidden className="rule h-4" />
           <span className="eyebrow text-accent">{t('Race to')}{' '}{formatNumber(target)}</span>
         </p>
-        <h2 className="display mt-2 text-2xl uppercase">
+        <h2 className="display text-game-stroke mt-2 text-2xl">
           {gap === 0 ? t('Dead level') : t('{name} leads by {gap}', { name: leader.player.name, gap: formatNumber(gap) })}
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">

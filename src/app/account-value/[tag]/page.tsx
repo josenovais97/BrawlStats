@@ -103,7 +103,7 @@ export default async function AccountValuePage({ params }: PageProps) {
             unoptimized
           />
           <div className="min-w-0">
-            <h1 className="display truncate text-2xl uppercase sm:text-3xl">{player.name}</h1>
+            <h1 className="display text-game-stroke truncate text-2xl sm:text-3xl">{player.name}</h1>
             <p className="text-sm text-muted">{displayTag(player.tag)}</p>
           </div>
         </div>
@@ -145,7 +145,7 @@ export default async function AccountValuePage({ params }: PageProps) {
 
       {/* Where the coins went. */}
       <section className="space-y-4">
-        <h2 className="display text-2xl uppercase">{t('Where the coins went')}</h2>
+        <h2 className="display text-game-stroke text-2xl">{t('Where the coins went')}</h2>
         <ul className="card divide-y divide-border">
           {parts.map((p) => (
             <li key={p.label} className="flex items-center gap-4 p-4">

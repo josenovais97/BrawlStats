@@ -98,10 +98,9 @@ export default function BubbleTestPage() {
       <section className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
         <div className="space-y-6">
           <p className="flex items-center gap-2.5">
-            <span aria-hidden className="rule h-4" />
             <span className="eyebrow">{t('Google Play test')}</span>
           </p>
-          <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl">
+          <h1 className="display text-game-stroke text-4xl leading-[1.05] sm:text-5xl">
             {t('Help us launch BrawlZone Bubble on Google Play')}
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-muted">
@@ -220,7 +219,7 @@ export default function BubbleTestPage() {
 
       {/* The three steps. */}
       <section id="steps" className="scroll-mt-24 space-y-5">
-        <h2 className="display text-2xl uppercase sm:text-3xl">{t('Three taps')}</h2>
+        <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('Three taps')}</h2>
         <ol className="space-y-4">
           {steps.map((step, i) => (
             <li key={step.href} className="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
@@ -254,7 +253,7 @@ export default function BubbleTestPage() {
       {/* What they are testing. */}
       <section className="space-y-5">
         <div className="space-y-1">
-          <h2 className="display text-2xl uppercase sm:text-3xl">{t('What you are testing')}</h2>
+          <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('What you are testing')}</h2>
           <p className="text-muted">{t('A draft helper that floats over Brawl Stars. Tap it mid-draft, tap again and it folds away.')}</p>
         </div>
         <div className="grid grid-cols-3 gap-3 sm:gap-5">

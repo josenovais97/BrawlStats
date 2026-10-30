@@ -35,7 +35,7 @@ export function FullPageMessage({
         priority
         className="h-auto w-40 sm:w-52"
       />
-      <h1 className="display mt-6 text-3xl uppercase sm:text-4xl">{t(title)}</h1>
+      <h1 className="display text-game-stroke mt-6 text-3xl sm:text-4xl">{t(title)}</h1>
       <p className="mt-3 leading-relaxed text-muted">{t(body)}</p>
       {children ? (
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">

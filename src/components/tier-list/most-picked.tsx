@@ -94,7 +94,7 @@ export function MostPicked({
 
   return (
     <section aria-labelledby="most-picked">
-      <h2 id="most-picked" className="display text-2xl uppercase">
+      <h2 id="most-picked" className="display text-game-stroke text-2xl">
         {w.title}
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">

@@ -183,7 +183,7 @@ export default async function ComparePage({ params }: PageProps) {
           read as a form; this reads as the matchup. */}
       {/* The page's one H1. The face-off below is pictures and a decorative
           "vs", so without this the page had no main heading at all. */}
-      <h1 className="display text-3xl uppercase sm:text-4xl">
+      <h1 className="display text-game-stroke text-3xl sm:text-4xl">
         {t('{nameA} vs {nameB}', { nameA: nameA, nameB: nameB })}
       </h1>
 

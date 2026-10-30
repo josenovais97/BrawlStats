@@ -38,7 +38,7 @@ export function FavoritesList() {
           <p className="eyebrow">On this device</p>
           <h2
             id="saved-profiles"
-            className="display mt-2.5 text-2xl uppercase sm:text-3xl"
+            className="display text-game-stroke mt-2.5 text-2xl sm:text-3xl"
           >
             {t('Saved profiles')}
           </h2>

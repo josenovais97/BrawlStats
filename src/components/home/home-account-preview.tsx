@@ -41,7 +41,7 @@ export async function HomeAccountPreview() {
     <section className="reveal" aria-labelledby="account-preview">
       <div className="mb-6 max-w-2xl">
         <p className="eyebrow text-accent">{t('After you search')}</p>
-        <h2 id="account-preview" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{t('Your account, explained')}</h2>
+        <h2 id="account-preview" className="display text-game-stroke mt-2.5 text-2xl sm:text-4xl">{t('Your account, explained')}</h2>
         <p className="mt-3 leading-relaxed text-muted">{t('A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads yours against every player we sample and tells you what it means.')}</p>
       </div>
 
@@ -75,8 +75,7 @@ export async function HomeAccountPreview() {
             {/* The one module with real data in it: the live top of the meta,
                 which is exactly what a roster gets scored against. */}
             <div className="bg-surface p-4 sm:col-span-2 sm:p-5">
-              <p className="flex items-center gap-2 text-sm font-bold">
-                <span aria-hidden className="rule" />{t('Roster vs the meta')}</p>
+              <p className="flex items-center gap-2 text-sm font-bold">{t('Roster vs the meta')}</p>
               <p className="mt-1.5 text-sm leading-relaxed text-muted">{t('Every brawler you own, tiered against the list below. Your strong picks, and the ones you are missing.')}</p>
 
               {top.length > 0 ? (

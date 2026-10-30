@@ -116,7 +116,7 @@ export function PlayerHeader({
                 rather than an ellipsis there, because the end of a name is
                 where players put the emoji and the clan suffix. */}
             <h1
-              className="display line-clamp-2 break-words text-2xl uppercase sm:line-clamp-1 sm:text-4xl lg:text-5xl"
+              className="display text-game-stroke line-clamp-2 break-words text-2xl sm:line-clamp-1 sm:text-4xl lg:text-5xl"
               style={{ color: nameColor }}
             >
               {player.name}

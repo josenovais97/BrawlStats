@@ -248,7 +248,7 @@ export default async function RankedPage() {
       <header>
         <p className="eyebrow flex items-center gap-2 text-accent">
           <RankedIcon className="size-4" />{t('Competitive only')}</p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{t('Ranked maps')}</h1>
+        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{t('Ranked maps')}</h1>
 
         {/*
           The answer first, as a sentence. Measured in Umami on 2026-09-21 this
@@ -332,7 +332,7 @@ export default async function RankedPage() {
 
       {shown.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
-          <h2 className="display text-xl uppercase">{t('Collecting map data')}</h2>
+          <h2 className="display text-game-stroke text-xl">{t('Collecting map data')}</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted">{t('Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.')}</p>
           <Link
             href={lp('/tier-list/ranked')}
@@ -349,7 +349,7 @@ export default async function RankedPage() {
           >
             <h2
               id={`mode-${row.modeSlug}-heading`}
-              className="display mb-4 flex items-center gap-2.5 text-2xl uppercase sm:text-3xl"
+              className="display text-game-stroke mb-4 flex items-center gap-2.5 text-2xl sm:text-3xl"
             >
               {row.icon ? (
                 <Image

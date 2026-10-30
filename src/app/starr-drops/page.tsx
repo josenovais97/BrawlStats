@@ -723,7 +723,7 @@ function StarrHero({
             <span className="live-dot" />
             {t('Updated {date}', { date: formatDate(new Date()) })}
           </p>
-          <h1 id="starr-title" className="display text-game-stroke mt-3 text-5xl uppercase leading-none text-white sm:text-7xl">
+          <h1 id="starr-title" className="display text-game-stroke mt-3 text-5xl leading-none text-white sm:text-7xl">
             {t('Starr Drops')}
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/80 sm:mx-0 sm:text-base">

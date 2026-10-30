@@ -130,7 +130,6 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
           </div>
 
           <div className="flex items-start gap-3">
-            <span className="rule mt-1" aria-hidden />
             <h3 className="display text-2xl uppercase">
               {t(open.label)}{' '}
               <span className="text-base normal-case tracking-normal text-muted">{t('{length} maps', { length: open.maps.length })}</span>

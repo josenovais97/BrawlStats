@@ -56,7 +56,7 @@ export async function LeaderboardView({
           <TrophyIcon className="size-4" />
           {board === 'cosmetics' || board === 'ranked' ? t('Our own data') : t('Official rankings')}
         </p>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{t('Leaderboard')}</h1>
+        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{t('Leaderboard')}</h1>
         <p className="mt-3 max-w-3xl leading-relaxed text-muted">
           {board === 'cosmetics'
             ? t('What the sampled player pool is wearing. Built from our own daily samples, not from the game API.')

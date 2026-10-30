@@ -43,7 +43,7 @@ export async function CosmeticsBoard() {
   return (
     <div className="space-y-10">
       <section aria-labelledby="skins">
-        <h2 id="skins" className="display text-2xl uppercase">{t('Most worn skins')}</h2>
+        <h2 id="skins" className="display text-game-stroke text-2xl">{t('Most worn skins')}</h2>
         <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.')}</p>
 
         <ol className="grid gap-2 sm:grid-cols-2">
@@ -81,7 +81,7 @@ export async function CosmeticsBoard() {
 
       {icons.length > 0 ? (
         <section aria-labelledby="icons">
-          <h2 id="icons" className="display text-2xl uppercase">{t('Most worn profile icons')}</h2>
+          <h2 id="icons" className="display text-game-stroke text-2xl">{t('Most worn profile icons')}</h2>
           <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.')}</p>
 
           <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">

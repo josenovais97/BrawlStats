@@ -341,7 +341,7 @@ export async function TierListView({
           </p>
           <LanguageLinks locale={locale} path={currentPath(format, windowKey, mode, bracket)} />
         </div>
-        <h1 className="display mt-2.5 text-3xl uppercase sm:text-4xl">{heading}</h1>
+        <h1 className="display text-game-stroke mt-2.5 text-3xl sm:text-4xl">{heading}</h1>
 
         {/*
           The answer, in one sentence, before anything else.

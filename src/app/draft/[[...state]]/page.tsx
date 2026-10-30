@@ -574,7 +574,7 @@ function StepHeading({
           {step}
         </span>
         <div>
-          <h2 className="display text-xl uppercase leading-none">{t(title)}</h2>
+          <h2 className="display text-game-stroke text-xl leading-none">{t(title)}</h2>
           <p className="mt-1.5 max-w-xl text-sm text-muted">{t(hint)}</p>
         </div>
       </div>

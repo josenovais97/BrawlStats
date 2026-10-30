@@ -191,7 +191,7 @@ export function WhatChanged({
   return (
     <section className="card p-4 sm:p-5" aria-labelledby="what-changed">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="what-changed" className="display text-lg uppercase">
+        <h2 id="what-changed" className="display text-lg">
           {w.whatChanged}
         </h2>
         <p className="text-xs text-muted">{w.against(span)}</p>

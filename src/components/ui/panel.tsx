@@ -48,7 +48,7 @@ export function Panel({
   return (
     <section id={id} className="card flex h-full flex-col overflow-hidden">
       <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border/70 px-5 py-3.5 sm:px-6">
-        <h2 className="display flex min-w-0 items-center gap-2 text-base uppercase leading-none tracking-wide sm:text-lg">
+        <h2 className="display flex min-w-0 items-center gap-2 text-base leading-none sm:text-lg">
           {icon ? (
             <span aria-hidden className="flex shrink-0 items-center">
               {icon}

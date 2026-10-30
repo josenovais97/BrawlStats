@@ -38,7 +38,7 @@ export async function HomeSnapshot({ revalidate }: { revalidate: number }) {
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2 text-victory">
             <span className="live-dot" />{t('Live snapshot')}</p>
-          <h2 id="snapshot" className="display mt-2.5 text-2xl uppercase sm:text-4xl">{t('Where things stand')}</h2>
+          <h2 id="snapshot" className="display text-game-stroke mt-2.5 text-2xl sm:text-4xl">{t('Where things stand')}</h2>
         </div>
         <p className="max-w-md text-sm text-muted">{t('From our own sampled battles, not from votes.')}</p>
       </div>

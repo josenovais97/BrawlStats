@@ -38,10 +38,9 @@ export default function AccountValueLanding() {
     <div className="space-y-12">
       <section className="space-y-6">
         <p className="flex items-center gap-2.5">
-          <span aria-hidden className="rule h-4" />
           <span className="eyebrow">{t('Account value')}</span>
         </p>
-        <h1 className="display text-4xl uppercase leading-[1.05] sm:text-5xl">{t('How much is your account worth?')}</h1>
+        <h1 className="display text-game-stroke text-4xl leading-[1.05] sm:text-5xl">{t('How much is your account worth?')}</h1>
         <p className="max-w-2xl text-lg leading-relaxed text-muted">
           {t('Enter your player tag to see what your Brawl Stars account cost to build, and how it compares with other players.')}
         </p>

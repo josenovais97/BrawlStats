@@ -252,7 +252,7 @@ export default function AboutPage() {
         />
         <div className="relative">
           <Coffee className="mx-auto size-8 text-brand" />
-          <h2 className="display mt-4 text-2xl uppercase sm:text-3xl">{t('Built by one person')}</h2>
+          <h2 className="display text-game-stroke mt-4 text-2xl sm:text-3xl">{t('Built by one person')}</h2>
           <p className="mx-auto mt-3 max-w-lg text-muted">{t('BrawlZone is free and has no paywall; a few ads on the website pay for the server. If it saved you some time, a coffee goes a long way.')}</p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a

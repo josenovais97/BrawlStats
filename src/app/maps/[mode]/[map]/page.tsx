@@ -296,7 +296,7 @@ export default async function MapPage({ params }: PageProps) {
             ) : null}
           </div>
 
-          <h1 className="display mt-3 text-3xl uppercase sm:text-4xl">
+          <h1 className="display text-game-stroke mt-3 text-3xl sm:text-4xl">
             {nm(entry.map.name)}
           </h1>
           <p className="mt-3 max-w-3xl leading-relaxed text-muted">

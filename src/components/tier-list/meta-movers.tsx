@@ -136,7 +136,7 @@ export function MetaMovers({
 
   return (
     <section aria-labelledby="meta-movers">
-      <h2 id="meta-movers" className="display text-2xl uppercase">
+      <h2 id="meta-movers" className="display text-game-stroke text-2xl">
         {w.title}
       </h2>
       <p className="mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted">

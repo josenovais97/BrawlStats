@@ -1,4 +1,3 @@
-import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -49,7 +48,6 @@ export function HomePlayTest() {
         <GooglePlayBadge className="h-11 w-auto" />
         <span className="inline-flex items-center gap-2 rounded-xl bg-victory px-4 py-2 text-sm font-bold text-background">
           {t('Join the test')}
-          <ArrowRight aria-hidden className="size-4" />
         </span>
       </span>
     </Link>
@@ -90,7 +88,6 @@ function HomePlayLaunch() {
         <GooglePlayBadge className="h-11 w-auto" />
         <span className="inline-flex items-center gap-2 rounded-xl bg-victory px-4 py-2 text-sm font-bold text-background">
           {t('Install')}
-          <ArrowRight aria-hidden className="size-4" />
         </span>
       </span>
     </a>
