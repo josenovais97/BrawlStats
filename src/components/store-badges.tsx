@@ -1,3 +1,4 @@
+import type { T } from '@/lib/t-core';
 import { getUT } from '@/lib/t-universal';
 
 /**
@@ -18,10 +19,17 @@ import { getUT } from '@/lib/t-universal';
 
 interface BadgeProps {
   className?: string;
+  /**
+   * The page's language, from a client component that has it (`useT`).
+   * Without it the badge reads `requestLocale`, which is right in a server
+   * component and always English while a client component renders on the
+   * server -- the footer's badge said GET IT ON on /es and /pt and the
+   * browser corrected it, a hydration error (#418) on every translated page.
+   */
+  t?: T;
 }
 
-export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
-  const t = getUT();
+export function AppStoreBadge({ className = 'h-11 w-auto', t = getUT() }: BadgeProps) {
   return (
     <svg
       viewBox="0 0 135 40"
@@ -70,8 +78,7 @@ export function AppStoreBadge({ className = 'h-11 w-auto' }: BadgeProps) {
   );
 }
 
-export function GooglePlayBadge({ className = 'h-11 w-auto' }: BadgeProps) {
-  const t = getUT();
+export function GooglePlayBadge({ className = 'h-11 w-auto', t = getUT() }: BadgeProps) {
   return (
     <svg
       viewBox="0 0 135 40"

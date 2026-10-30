@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { BrandMark } from '@/components/brand-mark';
 import { useLocale } from '@/components/i18n/use-locale';
+import { useT } from '@/components/i18n/use-t';
 import { localePath, type Locale } from '@/lib/i18n';
 import { GooglePlayBadge } from '@/components/store-badges';
 import { PLAY_LIVE, PLAY_TEST } from '@/lib/bubble-app';
@@ -172,6 +173,8 @@ const SOURCES = [
 export function SiteFooter() {
   const locale = useLocale();
   const t = (key: string) => WORDS[locale][key] ?? EN[key] ?? key;
+  // The site's client dictionary, for the store badge (see store-badges).
+  const ut = useT();
   const href = (path: string) => localePath(locale, path);
   const chip = 'bz-chip inline-flex min-h-10 items-center gap-2 px-3.5 text-sm';
   /*
@@ -245,7 +248,7 @@ export function SiteFooter() {
                 aria-label={t('googlePlay')}
                 className="rounded transition-opacity hover:opacity-80"
               >
-                <GooglePlayBadge className="h-10 w-auto" />
+                <GooglePlayBadge className="h-10 w-auto" t={ut} />
               </a>
             ) : (
               <Link
@@ -256,7 +259,7 @@ export function SiteFooter() {
                 aria-label={t('googlePlay')}
                 className="rounded transition-opacity hover:opacity-80"
               >
-                <GooglePlayBadge className="h-10 w-auto" />
+                <GooglePlayBadge className="h-10 w-auto" t={ut} />
               </Link>
             )}
             <p className="max-w-xs text-sm text-muted">{t('getGame')}</p>
