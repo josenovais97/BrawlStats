@@ -38,7 +38,6 @@ export default async function IconCataloguePage() {
 
       <PageHeading
         title={t('Profile icons')}
-        eyebrow={t('Cosmetics')}
         subtitle={
           icons.length > 0
             ? t('{length} icons seen on sampled accounts, ranked by share of players.', { length: formatNumber(icons.length) })

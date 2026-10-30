@@ -60,7 +60,6 @@ export default async function EventsPage() {
       />
 
       <PageHeading
-        eyebrow={t('Everyone, one target')}
         title={t('Community events')}
         subtitle={t('Game-wide challenges: the whole player base grinds one milestone, and everybody collects the reward.')}
       />

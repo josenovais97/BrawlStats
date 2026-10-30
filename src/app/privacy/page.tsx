@@ -43,7 +43,6 @@ export default function PrivacyPage() {
   return (
     <div className="space-y-12">
       <PageHeading
-        eyebrow={t('Privacy')}
         title={t('What we collect')}
         subtitle={t('Very little, and this page says exactly what. Every claim below is something you can check in the source.')}
       />

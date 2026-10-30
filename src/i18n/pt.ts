@@ -4790,4 +4790,6 @@ export const PT: Record<string, string> = {
     "O BrawlZone é feito e mantido pela",
   ", a one-person studio in Portugal that also develops the BrawlZone Bubble app for Android. Questions go to the address below.":
     ", um estúdio de uma pessoa só em Portugal que também desenvolve o app BrawlZone Bubble para Android. Dúvidas podem ir para o endereço abaixo.",
+  "Your in-game name or #tag.":
+    "Seu nome no jogo ou sua #tag.",
 };

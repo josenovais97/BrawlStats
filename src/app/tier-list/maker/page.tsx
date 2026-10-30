@@ -77,7 +77,6 @@ export default async function TierMakerPage() {
       />
 
       <PageHeading
-        eyebrow={t('Your call')}
         title={t('Tier list maker')}
         subtitle={t('Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.')}
       />

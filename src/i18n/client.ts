@@ -996,6 +996,8 @@ export const CLIENT_ES: Record<string, string> = {
     "O sigue un canal: cada link nuevo sale en cuanto lo encontramos.",
   "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
     "Compartir, luego \"Agregar a inicio\", y abre BrawlZone desde ahí.",
+  "Your in-game name or #tag.":
+    "Tu nombre en el juego o tu #tag.",
 };
 
 export const CLIENT_PT: Record<string, string> = {
@@ -1991,4 +1993,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Ou siga um canal: cada link novo sai assim que o encontramos.",
   "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
     "Compartilhar, depois em \"Adicionar à Tela de Início\", e abra o BrawlZone por lá.",
+  "Your in-game name or #tag.":
+    "Seu nome no jogo ou sua #tag.",
 };

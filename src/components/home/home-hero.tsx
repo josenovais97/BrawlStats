@@ -72,8 +72,6 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
           */}
           <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-10">
             <div className="reveal-now min-w-0">
-              <Eyebrow />
-
               {/*
                 Three lines, and only the last one gold.
                 
@@ -83,9 +81,9 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
                 brown. Solid colour, same shadow, and the highlight now falls
                 on the four words that carry the promise.
               */}
-              <h1 className="display-hero mt-5 text-[1.875rem] uppercase leading-[0.92] sm:text-[2.5rem] lg:text-[3.25rem]">{t('Brawl Stars|hero-1')}<br />{t('stats that show|hero-2')}<br />
-                <span className="text-brand">{t('where you stand|hero-3')}</span>
-              </h1>
+              {/* One colour, outlined like the game's own titles (2026-10-30):
+                  the gold last line and the label above were template habits. */}
+              <h1 className="display-hero text-game-stroke text-[2.375rem] leading-[1.02] sm:text-[3rem] lg:text-[3.75rem]">{t('Brawl Stars|hero-1')}{' '}{t('stats that show|hero-2')}{' '}{t('where you stand|hero-3')}</h1>
 
               <p className="mt-3.5 max-w-md leading-relaxed text-muted">{t('Search any player or club. See skill score, roster gaps, progression and live meta context in seconds.')}</p>
 
@@ -134,17 +132,6 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
   );
 }
 
-/** The live-data marker, built into the composition rather than floated on it. */
-function Eyebrow() {
-  const t = getT(requestLocale());
-  return (
-    <p className="flex items-center gap-2.5">
-      <span aria-hidden className="rule h-4" />
-      <span className="live-dot" />
-      <span className="eyebrow text-brand">{t('Live Brawl Stars data')}</span>
-    </p>
-  );
-}
 
 /**
  * The lookup console.

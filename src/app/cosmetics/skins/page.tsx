@@ -42,7 +42,6 @@ export default async function SkinCataloguePage() {
 
       <PageHeading
         title={t('Skins')}
-        eyebrow={t('Cosmetics')}
         subtitle={
           skins.length > 0
             ? t('{length} skins seen in the sampled pool, ranked by share of player-brawler slots. Default skins are excluded.', { length: formatNumber(skins.length) })

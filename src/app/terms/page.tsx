@@ -48,7 +48,6 @@ export default function TermsPage() {
   return (
     <div className="space-y-12">
       <PageHeading
-        eyebrow={t('Terms')}
         title={t('Terms of service')}
         subtitle={t('Short, because the honest version is short. This site is free, fan-made, and measured rather than official.')}
       />

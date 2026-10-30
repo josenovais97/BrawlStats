@@ -22,7 +22,15 @@ import { GIVEAWAY_PUBLIC, hasClosed } from '@/lib/giveaway';
 const DISMISS_KEY = 'bz-giveaway-strip';
 const WEEK = 7 * 86_400_000;
 
-const HIDDEN = [/^\/(?:es\/|pt\/)?bubble\/(?:panel|test)/, /^\/(?:es\/|pt\/)?giveaway/];
+// Also not where the page has its own giveaway banner (2026-10-30): on the
+// home page and /rewards the strip stacked on top of a better one, which got
+// 51 and 126 clicks in three days against the strip's 37 and 36 closes.
+const HIDDEN = [
+  /^\/(?:es\/|pt\/)?bubble\/(?:panel|test)/,
+  /^\/(?:es\/|pt\/)?giveaway/,
+  /^\/(?:es|pt)?\/?$/,
+  /^\/(?:es\/|pt\/)?rewards\/?$/,
+];
 
 export function GiveawayStrip() {
   const t = useT();

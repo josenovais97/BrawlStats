@@ -51,7 +51,6 @@ export default async function UpdatesPage() {
   return (
     <div className="space-y-10">
       <PageHeading
-        eyebrow={t('Straight from the game')}
         title={t('News')}
         subtitle={
           <>{t('Announcements from the Brawl Stars team, and the new brawlers and abilities detected from the game API. For how the sampled meta is shifting, see the')}{' '}
