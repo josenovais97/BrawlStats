@@ -2,7 +2,7 @@
 
     python make.py <kind> <data.json> <prev.json|-> <state.json> <out dir> [--only SECONDS ...]
 
-kind     quiz    "Guess the brawler #N": five rounds, easy to hard, each a
+kind     quiz    "Guess the brawler #N": five rounds, medium to expert, each a
                  shadow, a pixelated model or an extreme zoom, 3-2-1, reveal.
          shadowquiz / zoomquiz  the quiz with one kind of clue throughout
                  (2026-10-28): "Guess the brawler by its SHADOW #N" and "from
@@ -80,15 +80,22 @@ def pct(x, sign=False):
 
 
 # ================================================================ quiz
-EASY, MEDIUM, HARD = (60, 210, 110), (255, 180, 40), (255, 60, 90)
+EASY, MEDIUM, HARD, EXPERT = (60, 210, 110), (255, 180, 40), (255, 60, 90), (190, 70, 255)
 CLUES = {'shadow': 'WHO IS THIS?', 'pixel': 'WHO IS THIS?', 'zoom': 'ZOOMED IN: WHO?'}
 # The quiz is the channel's best format (2026-10-28: 1,676 views in a day
 # against ~900 for the rest), so it runs daily; the themed episodes give it
 # a new title hook on the days between the mixed ones.
 QUIZ_STYLE = {'quiz': None, 'shadowquiz': 'shadow', 'zoomquiz': 'zoom'}
-# Where the zoom starts, per level, in the themed zoom quiz: five rounds of
-# the same clue need the hard ones to be harder.
-ZOOM_FROM = {'EASY': 3.4, 'MEDIUM': 4.2, 'HARD': 5.2}
+# Harder from 2026-10-30, when the owner called the quizzes "really easy":
+# no EASY round, an EXPERT one last, rarer brawlers, and every clue tighter
+# per level. Where the zoom starts and how far it pulls back per beat:
+ZOOM_FROM = {'MEDIUM': 4.6, 'HARD': 5.6, 'EXPERT': 6.6}
+ZOOM_PULL = 0.4
+# Pixel blocks across on each beat (was 7, 10, 14, 22 for every round).
+PIXEL_STEPS = {'MEDIUM': (5, 7, 10, 14), 'HARD': (4, 6, 9, 12), 'EXPERT': (3, 5, 7, 10)}
+# How much of the shadow shows, from the top: HARD loses the legs, EXPERT
+# is head and shoulders, mirrored.
+SHADOW_KEEP = {'MEDIUM': 1.0, 'HARD': 0.7, 'EXPERT': 0.52}
 
 if KIND in QUIZ_STYLE:
     STYLE = QUIZ_STYLE[KIND]
@@ -99,14 +106,19 @@ if KIND in QUIZ_STYLE:
     if len(pool) < 15:  # the history ate the roster: start over
         pool = sorted((b for b in data['all'] if load_model(b) is not None), key=lambda b: -(b['use'] or 0))
     third = len(pool) // 3
-    picks = (rnd.sample(pool[:third], 2) + rnd.sample(pool[third:2 * third], 1) + rnd.sample(pool[2 * third:], 2))
-    levels = ['EASY', 'EASY', 'MEDIUM', 'HARD', 'HARD']
+    # One popular brawler, two from the middle, two rarely played.
+    picks = (rnd.sample(pool[:third], 1) + rnd.sample(pool[third:2 * third], 2) + rnd.sample(pool[2 * third:], 2))
+    levels = ['MEDIUM', 'MEDIUM', 'HARD', 'HARD', 'EXPERT']
+    # The intro's sliding shadows were the five answers -- a free look at
+    # every one before round 1. Five others now.
+    chosen = {b['id'] for b in picks}
+    decoys = rnd.sample([b for b in data['all'] if b['id'] not in chosen and load_model(b) is not None], 5)
     if STYLE:
         clues = [STYLE] * 5
     else:
         clues = ['shadow', 'pixel', 'zoom'] + rnd.sample(['shadow', 'pixel', 'zoom'], 2)
         rnd.shuffle(clues)
-    tl.add(4, 'q_intro', n=N, faces=picks, style=STYLE)
+    tl.add(4, 'q_intro', n=N, faces=decoys, style=STYLE)
     for i, (b, lvl, clue) in enumerate(zip(picks, levels, clues)):
         tl.add(6, 'q', b=b, i=i, lvl=lvl, clue=clue, style=STYLE)
     tl.add(8, 'q_outro', n=N, picks=picks)
@@ -115,7 +127,7 @@ if KIND == 'quiz':
     META = {
         'title': f'Guess the brawler #{N} 👀 Only real fans get 5/5',
         'titles': {'pt-BR': f'Adivinhe o brawler #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler #{N} 👀 Solo los verdaderos fans aciertan 5/5'},
-        'description': f'Guess the brawler #{N}: 5 rounds, easy to hard. Shadows, pixels and zoom-ins. '
+        'description': f'Guess the brawler #{N}: 5 rounds, medium to expert. Shadows, pixels and zoom-ins. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f'3 more to guess today (shadow, zoom, clues): https://brawlzone.net/daily-challenge{FOOTER}\n'
                        '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
@@ -126,7 +138,7 @@ elif KIND == 'shadowquiz':
     META = {
         'title': f'Guess the brawler by its SHADOW #{N} 👤 Only real fans get 5/5',
         'titles': {'pt-BR': f'Adivinhe o brawler pela SOMBRA #{N} 👤 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su SOMBRA #{N} 👤 Solo los verdaderos fans aciertan 5/5'},
-        'description': f'Guess the brawler by its shadow #{N}: 5 silhouettes, easy to hard. '
+        'description': f'Guess the brawler by its shadow #{N}: 5 silhouettes, medium to expert. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f"Today's shadow puzzle on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
                        '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
@@ -137,7 +149,7 @@ elif KIND == 'zoomquiz':
     META = {
         'title': f'Guess the brawler from this ZOOM #{N} 🔍 Only real fans get 5/5',
         'titles': {'pt-BR': f'Adivinhe o brawler pelo ZOOM #{N} 🔍 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por el ZOOM #{N} 🔍 Solo los verdaderos fans aciertan 5/5'},
-        'description': f'Guess the brawler from an extreme zoom #{N}: 5 rounds, easy to hard. '
+        'description': f'Guess the brawler from an extreme zoom #{N}: 5 rounds, medium to expert. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f"Today's zoom puzzle on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
                        '#brawlstars #brawlstarsquiz #guessthebrawler #brawlstarsgame #brawlzone',
@@ -146,11 +158,35 @@ elif KIND == 'zoomquiz':
     }
 
 
-def zoom_view(b, z):
-    """The model cropped around its head at z times, inside a rounded window."""
+_zoom_at = {}
+def zoom_center(b, m, lvl):
+    """Where to zoom: the head for MEDIUM; for HARD and EXPERT a spot on the
+    body (seeded by brawler, so every frame agrees) that is mostly model
+    rather than background."""
+    key = (b['id'], lvl)
+    if key not in _zoom_at:
+        alpha = m.getchannel('A')
+        a = alpha.getbbox() or (0, 0, m.width, m.height)
+        at = ((a[0] + a[2]) / 2, a[1] + (a[3] - a[1]) * 0.22)
+        if lvl in ('HARD', 'EXPERT'):
+            pick = random.Random(b['id'] * 7 + len(lvl))
+            side = 760 / ZOOM_FROM[lvl]
+            for _ in range(40):
+                x = a[0] + (a[2] - a[0]) * pick.uniform(0.25, 0.75)
+                y = a[1] + (a[3] - a[1]) * pick.uniform(0.3, 0.75)
+                box = tuple(int(v) for v in (x - side / 2, y - side / 2, x + side / 2, y + side / 2))
+                hist = alpha.crop(box).histogram()
+                if sum(hist[128:]) > 0.7 * sum(hist):
+                    at = (x, y)
+                    break
+        _zoom_at[key] = at
+    return _zoom_at[key]
+
+
+def zoom_view(b, z, lvl='MEDIUM'):
+    """The model cropped at z times around zoom_center, inside a rounded window."""
     m = art(b, 900)
-    a = m.getchannel('A').getbbox() or (0, 0, m.width, m.height)
-    cx, cy = (a[0] + a[2]) / 2, a[1] + (a[3] - a[1]) * 0.22
+    cx, cy = zoom_center(b, m, lvl)
     win = 760; side = win / z
     box = (cx - side / 2, cy - side / 2, cx + side / 2, cy + side / 2)
     crop = m.crop(tuple(int(v) for v in box)).resize((win, win), Image.BILINEAR)
@@ -164,6 +200,27 @@ def zoom_view(b, z):
 def pixelated(img, blocks):
     w = max(2, blocks); h = max(2, int(blocks * img.height / img.width))
     return img.resize((w, h), Image.BILINEAR).resize(img.size, Image.NEAREST)
+
+
+_partial = {}
+def partial_shadow(b, a, lvl):
+    """The silhouette with only its top SHADOW_KEEP showing; EXPERT mirrored."""
+    key = (b['id'], lvl)
+    if key not in _partial:
+        sil = silhouette(a, (200, 180, 255))
+        keep = SHADOW_KEEP[lvl]
+        if keep < 1:
+            # The kept part, blown up to the full shadow's height so it fills
+            # the frame rather than floating small at the top of it.
+            box = sil.getchannel('A').getbbox() or (0, 0, sil.width, sil.height)
+            bottom = int(box[1] + (box[3] - box[1]) * keep)
+            part = sil.crop((box[0], box[1], box[2], bottom))
+            k = min((box[3] - box[1]) * 0.85 / part.height, 900 / part.width)
+            sil = part.resize((int(part.width * k), int(part.height * k)), Image.LANCZOS)
+        if lvl == 'EXPERT':
+            sil = sil.transpose(Image.FLIP_LEFT_RIGHT)
+        _partial[key] = sil
+    return _partial[key]
 
 
 _shadows = {}
@@ -202,20 +259,19 @@ def quiz_scene(s, t, bt, lt):
             d = ImageDraw.Draw(canvas); x = W / 2 + (j - 2) * 80
             d.ellipse((x - r, 330 - r, x + r, 330 + r), fill=GOLD_TOP if j < s['i'] or (j == s['i'] and reveal) else (60, 60, 110), outline=(10, 12, 28), width=5)
         put(canvas, text_sprite(f"#{s['i'] + 1}", 150, gold=True), 170, 470)
-        put(canvas, pill(s['lvl'], {'EASY': EASY, 'MEDIUM': MEDIUM, 'HARD': HARD}[s['lvl']], size=56), W - 220, 470)
+        put(canvas, pill(s['lvl'], {'EASY': EASY, 'MEDIUM': MEDIUM, 'HARD': HARD, 'EXPERT': EXPERT}[s['lvl']], size=56), W - 220, 470)
         a = art(b, 820)
         if not reveal:
             put_rays(canvas, (120, 100, 255), t, W / 2, 980, speed=10, alpha=0.5)
             pop = 1 + 0.4 * (1 - out_back(bt / 0.5, 1.4))
             if s['clue'] == 'shadow':
-                put(canvas, silhouette(a, (200, 180, 255)), W / 2, 980, scale=pop)
+                put(canvas, partial_shadow(b, a, s['lvl']), W / 2, 980, scale=pop)
             elif s['clue'] == 'pixel':
-                step = min(3, int(bt))  # sharper on every beat: 9, 13, 19, 28 blocks across
-                put(canvas, pixelated(a, (7, 10, 14, 22)[step]), W / 2, 980, scale=pop)
+                step = min(3, int(bt))  # sharper on every beat, never sharp
+                put(canvas, pixelated(a, PIXEL_STEPS[s['lvl']][step]), W / 2, 980, scale=pop)
             else:
-                z0 = ZOOM_FROM[s['lvl']] if s.get('style') == 'zoom' else 4.2
-                z = z0 - 0.55 * min(bt, 3.6)  # slowly pulling back
-                put(canvas, zoom_view(b, z), W / 2, 960, scale=pop)
+                z = ZOOM_FROM[s['lvl']] - ZOOM_PULL * min(bt, 3.6)  # slowly pulling back
+                put(canvas, zoom_view(b, z, s['lvl']), W / 2, 960, scale=pop)
             put(canvas, text_sprite(CLUES[s['clue']], 110, WHITE), W / 2, 1480, scale=out_back(bt / 0.4))
             if bt >= 1:
                 n = 4 - int(bt); u = bt % 1
