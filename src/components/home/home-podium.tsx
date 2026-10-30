@@ -21,12 +21,12 @@ const STEP: Record<number, string> = {
 };
 
 /**
- * The top three in Ranked as a scene (2026-10-30), the one pinned moment on
- * the page: a dark arena where scrolling turns the spotlight on third place,
- * then second, then first. The owner pointed at oryzo.ai's pinned 3D story;
- * this keeps the idea -- the screen holds while the scene changes -- without
- * the 15 MB of WebGL, using the brawlers' own renders and our real ranking.
- * How it plays is in podium-scroll.tsx; without it, this is a plain podium.
+ * The top three in Ranked as a scene (2026-10-30), the one staged moment on
+ * the page: a dark arena where the spotlight finds third place, then second,
+ * then first. The owner pointed at oryzo.ai's 3D scroll story; this keeps
+ * the idea of a scene that plays as you arrive without the 15 MB of WebGL,
+ * using the brawlers' own renders and our real ranking. How it plays is in
+ * podium-scroll.tsx; without it, this is a plain podium.
  *
  * Full-body art when all three have it, from the mirror or the wiki, else
  * three portraits: one cut-out beside two framed tiles reads as a failure
@@ -101,8 +101,6 @@ export async function HomePodium({ top }: { top: TopMetaBrawler[] }) {
             })}
           </ol>
         </div>
-
-        <p aria-hidden className="podium-hint">{t('Scroll to reveal the top 3')}</p>
       </div>
     </PodiumScroll>
   );
