@@ -220,7 +220,7 @@ export function WhatChanged({
         ) : null}
 
         <div className="rounded-xl bg-surface-2 p-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">{w.tierChanges}</p>
+          <p className="label-game text-xs text-muted">{w.tierChanges}</p>
           {crossings.length === 0 ? (
             <p className="mt-1.5 text-sm text-muted">{w.held(notable.length)}</p>
           ) : (
@@ -280,7 +280,7 @@ function Mover({
         />
       ) : null}
       <span className="min-w-0 flex-1">
-        <span className="block text-xs font-bold uppercase tracking-wide text-muted">{label}</span>
+        <span className="label-game block text-xs text-muted">{label}</span>
         <span className="block truncate text-sm font-bold capitalize">
           {mover.brawlerName.toLowerCase()}
         </span>

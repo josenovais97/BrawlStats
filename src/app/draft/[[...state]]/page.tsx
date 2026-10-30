@@ -624,7 +624,7 @@ async function SelectedMap({
           ) : null}
 
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
+            <p className="label-game text-xs" style={{ color: accent }}>
               {mode?.name ?? humanizeMode(map.mode)}
             </p>
             <h3 className="display mt-1 truncate text-2xl uppercase">{nm(map.mapName)}</h3>
@@ -680,7 +680,7 @@ async function MapChooser({
           return (
             <div key={mode}>
               <h3
-                className="mb-2.5 flex items-center gap-2 text-sm font-bold uppercase tracking-wide"
+                className="label-game mb-2.5 flex items-center gap-2 text-sm"
                 style={{ color: accent }}
               >
                 {meta?.imageUrl ? (

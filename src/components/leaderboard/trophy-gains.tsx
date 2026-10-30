@@ -130,7 +130,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
                     row states its own. Hidden when every row shares one.
                   */}
                   {uniformSpan === null ? (
-                    <p className="mt-1 text-[0.6875rem] uppercase tracking-wide text-muted">
+                    <p className="label-game mt-1 text-xs text-muted">
                       {player.days === 1 ? t('in 1 day') : t('in {days} days', { days: player.days })}
                     </p>
                   ) : null}

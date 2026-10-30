@@ -119,7 +119,7 @@ function MilestoneTable({ table }: { table: NonNullable<CommunityEvent['table']>
               <th
                 key={`${header}-${i}`}
                 scope="col"
-                className="whitespace-nowrap border-b border-border-strong px-2 py-2 text-xs font-bold uppercase tracking-wide text-muted"
+                className="label-game whitespace-nowrap border-b border-border-strong px-2 py-2 text-xs text-muted"
               >
                 {header}
               </th>

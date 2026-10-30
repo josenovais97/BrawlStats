@@ -120,7 +120,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
             <button
               type="button"
               onClick={() => setMode(null)}
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border bg-surface-2/60 px-3 text-xs font-semibold text-muted transition-colors hover:border-border-strong hover:text-foreground"
+              className="bz-chip inline-flex min-h-10 items-center gap-2 px-3 text-sm hover:text-white"
             >
               <ArrowLeft aria-hidden className="size-4" />{t('All modes')}</button>
             <Link
@@ -178,7 +178,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                 <span className="block truncate px-3 pt-2 text-sm font-semibold">
                   {t(group.label)}
                 </span>
-                <span className="block px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
+                <span className="label-game block px-3 pb-2 text-xs text-muted">
                   {group.maps.length} {group.maps.length === 1 ? t('map') : t('maps')}
                 </span>
               </Link>
@@ -211,7 +211,7 @@ function MapCard({ map, sublabel }: { map: CatalogueMap; sublabel?: string }) {
         />
         <span className="block truncate px-3 pt-2 text-sm font-semibold">{map.name}</span>
         {sublabel ? (
-          <span className="block truncate px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
+          <span className="label-game block truncate px-3 pb-2 text-xs text-muted">
             {t(sublabel)}
           </span>
         ) : (

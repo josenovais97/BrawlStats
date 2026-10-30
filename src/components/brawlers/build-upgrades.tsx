@@ -243,7 +243,7 @@ export function BuildAndUpgrades({
                           <span className="font-semibold capitalize">
                             {entry.ability.toLowerCase()}
                           </span>
-                          <span className="rounded-md bg-surface-2 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted">
+                          <span className="label-game rounded-md bg-surface-2 px-1.5 py-0.5 text-xs text-muted">
                             {entry.kind}
                           </span>
                         </p>

@@ -64,19 +64,19 @@ export function CompShape({
 
       {yours ? (
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('Your shape')}</p>
+          <p className="label-game text-xs text-muted">{t('Your shape')}</p>
           <ShapeRow comp={yours} emphasis />
         </div>
       ) : reachable ? (
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('Strongest shape you can still reach')}</p>
+          <p className="label-game text-xs text-muted">{t('Strongest shape you can still reach')}</p>
           <ShapeRow comp={reachable} emphasis />
         </div>
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-victory">{t('Shapes that win')}</p>
+          <p className="label-game text-xs text-victory">{t('Shapes that win')}</p>
           <ul className="mt-2 space-y-1.5">
             {best.map((c) => (
               <li key={key(c.roles)}>
@@ -86,7 +86,7 @@ export function CompShape({
           </ul>
         </div>
         <div className="card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-defeat">{t('Shapes that lose')}</p>
+          <p className="label-game text-xs text-defeat">{t('Shapes that lose')}</p>
           <ul className="mt-2 space-y-1.5">
             {worst.map((c) => (
               <li key={key(c.roles)}>

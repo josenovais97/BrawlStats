@@ -249,7 +249,7 @@ export function SiteHeader() {
           aria-label={t('home')}
         >
           <BrandMark className="size-9 shrink-0 transition-transform duration-200 group-hover:-rotate-6" />
-          <span className="display text-xl uppercase leading-none tracking-wide">
+          <span className="label-game display text-xl leading-none">
             Brawl<span className="text-brand">Zone</span>
           </span>
         </Link>

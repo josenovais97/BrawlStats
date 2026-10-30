@@ -41,7 +41,7 @@ export function StatCard({
         {node ?? (Icon ? <Icon className="size-5" /> : null)}
       </span>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">
+        <p className="label-game truncate text-xs text-muted">
           {t(label)}
         </p>
         <p className="truncate text-lg font-bold tabular-nums">{value}</p>

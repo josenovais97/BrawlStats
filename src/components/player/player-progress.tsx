@@ -124,7 +124,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
   return (
     <section className="min-w-0">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className={`flex items-center gap-2 text-sm font-black uppercase tracking-wide ${k.tone}`}>
+        <h3 className={`label-game flex items-center gap-2 text-sm ${k.tone}`}>
           {k.icon('size-6')}
           {t(k.title)}
         </h3>
@@ -292,7 +292,7 @@ function Figure({
   const t = getT(requestLocale());
   return (
     <div className="min-w-0">
-      <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
+      <dt className="label-game flex items-center gap-1.5 text-xs text-muted">
         <span aria-hidden className={`flex shrink-0 items-center ${tone}`}>
           {node}
         </span>

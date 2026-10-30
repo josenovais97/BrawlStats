@@ -139,7 +139,7 @@ function Stat({
   const t = getT(requestLocale());
   return (
     <div className="rounded-xl bg-surface-2/60 p-3">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t(label)}</p>
+      <p className="label-game text-xs text-muted">{t(label)}</p>
       <p
         className={`mt-0.5 text-2xl font-black tabular-nums ${
           tone === 'good' ? 'text-victory' : tone === 'bad' ? 'text-defeat' : ''
@@ -179,7 +179,7 @@ function Highlight({
         <span aria-hidden className="size-10 shrink-0 rounded-lg bg-surface-2" />
       )}
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t(eyebrow)}</p>
+        <p className="label-game text-xs text-muted">{t(eyebrow)}</p>
         <p className="truncate font-bold">{t(title)}</p>
         <p className="truncate text-xs text-muted">{t(detail)}</p>
       </div>

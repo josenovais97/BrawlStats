@@ -175,7 +175,7 @@ export default async function StarrDropsPage() {
         <div className="grid gap-3 md:grid-cols-2">
           {liveEventExtras().map((e) => (
             <div key={e.name} className="card border-accent/40 p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-accent">{t('{event} · limited time', { event: e.event })}</p>
+              <p className="label-game text-xs text-accent">{t('{event} · limited time', { event: e.event })}</p>
               <h3 className="display mt-1 text-xl">{e.name}</h3>
               <ul className="mt-2 list-disc space-y-1 pl-4 text-sm leading-relaxed text-muted">
                 {e.points.map((point) => (
@@ -575,7 +575,7 @@ function RewardTable({ table }: { table: DropTable }) {
     <div className="overflow-hidden rounded-xl border border-border bg-surface-2/20">
       {table.rarity ? (
         <p
-          className="border-b border-border px-3.5 py-2 text-xs font-bold uppercase tracking-wide"
+          className="label-game border-b border-border px-3.5 py-2 text-xs"
           style={{
             color,
             background: `color-mix(in srgb, ${color} 12%, transparent)`,
@@ -755,7 +755,7 @@ function StarrHero({
                   style={{ filter: RARITY_TINT[odd.rarity] }}
                 />
                 <span
-                  className="mt-1.5 text-[9px] font-bold uppercase leading-tight tracking-wide sm:text-xs"
+                  className="label-game mt-1.5 text-[9px] leading-tight sm:text-xs"
                   style={{ color: rarityColor(odd.rarity) }}
                 >
                   {t(odd.rarity)}

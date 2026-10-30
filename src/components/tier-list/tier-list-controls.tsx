@@ -146,7 +146,7 @@ function FormatTabs({ format, windowKey, locale }: { format: TierFormat; windowK
     <div
       role="group"
       aria-label={w.formatGroup}
-      className="inline-flex gap-1 rounded-2xl border border-border bg-surface-2/70 p-1"
+      className="inline-flex gap-2"
     >
       {FORMATS.map(({ key, icon: Icon }) => {
         const current = key === format;
@@ -156,20 +156,12 @@ function FormatTabs({ format, windowKey, locale }: { format: TierFormat; windowK
             key={key}
             href={localePath(locale, tierListHref(key, windowKey))}
             aria-current={current ? 'page' : undefined}
-            className={`flex items-center gap-2.5 rounded-xl px-4 py-2.5 transition-colors ${
-              current
-                ? 'bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]'
-                : 'text-muted hover:bg-surface-3/60 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2.5 px-4 py-2 ${current ? 'bz-chip-on' : 'bz-chip hover:text-white'}`}
           >
             <Icon className="size-4 shrink-0" />
             <span className="text-left leading-tight">
-              <span className="block text-sm font-bold">{label}</span>
-              <span
-                className={`block text-xs font-semibold ${
-                  current ? 'text-brand-ink/70' : 'text-muted'
-                }`}
-              >
+              <span className="block text-base">{label}</span>
+              <span className={`block text-xs ${current ? 'text-brand-ink/70' : 'text-muted'}`}>
                 {sublabel}
               </span>
             </span>
@@ -201,7 +193,7 @@ function WindowTabs({
     <div
       role="group"
       aria-label={w.windowGroup}
-      className="inline-flex rounded-xl border border-border bg-surface-2/70 p-1"
+      className="inline-flex gap-2"
     >
       {(Object.keys(TIER_WINDOWS) as TierWindowKey[]).map((key) => {
         const { sublabel } = TIER_WINDOWS[key];
@@ -212,12 +204,10 @@ function WindowTabs({
             key={key}
             href={localePath(locale, tierListHref(format, key, mode))}
             aria-current={current ? 'page' : undefined}
-            className={`flex items-baseline gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
-              current ? 'bg-surface-3 text-foreground' : 'text-muted hover:text-foreground'
-            }`}
+            className={`flex items-baseline gap-1.5 px-3.5 py-1.5 text-sm ${current ? 'bz-chip-on' : 'bz-chip hover:text-white'}`}
           >
             {label}
-            <span className={`text-xs font-bold ${current ? 'text-foreground' : 'text-muted'}`}>
+            <span className={`text-xs ${current ? 'text-brand-ink/70' : 'text-muted'}`}>
               {sublabel}
             </span>
           </NavLink>
@@ -236,10 +226,9 @@ function WindowTabs({
  */
 function BracketTabs({ bracket, mode, locale }: { bracket: RankBracket | null; mode?: string; locale: Locale }) {
   const w = WORDS[locale];
-  const chip =
-    'inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-bold transition-colors';
-  const on = 'border-brand bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]';
-  const off = 'border-border bg-surface-2/70 text-muted hover:text-foreground';
+  const chip = 'inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm';
+  const on = 'bz-chip-on';
+  const off = 'bz-chip hover:text-white';
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div role="group" aria-label={w.yourRank} className="flex w-max items-center gap-2">
@@ -314,9 +303,9 @@ function ModeFilter({
   const href = (m?: string) =>
     localePath(locale, bracket ? bracketTierListHref(bracket, m) : tierListHref(format, windowKey, m));
 
-  const chip = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors';
-  const on = 'border-brand/40 bg-brand/10 text-brand';
-  const off = 'border-border bg-surface text-muted hover:text-foreground';
+  const chip = 'inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm';
+  const on = 'bz-chip-on';
+  const off = 'bz-chip hover:text-white';
 
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">

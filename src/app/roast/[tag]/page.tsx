@@ -84,7 +84,7 @@ export default async function RoastPage({ params }: PageProps) {
           </div>
         </div>
 
-        <p className="mt-8 text-sm font-bold uppercase tracking-wide text-muted">{t('Account rating')}</p>
+        <p className="label-game mt-8 text-sm text-muted">{t('Account rating')}</p>
         <p className="display mt-1 text-6xl leading-none text-brand sm:text-7xl">
           {roast.score.toFixed(1)}
           <span className="text-3xl text-foreground sm:text-4xl">/10</span>

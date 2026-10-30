@@ -49,7 +49,8 @@
   --color-defeat: var(--defeat);
   --color-draw: var(--draw);
   --color-brand-ink: var(--brand-ink);
-  --font-sans: var(--font-geist-sans);
+  --color-ink: var(--ink);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -90,6 +91,24 @@ body {
 }
 
 /*
+ * The game menu's backdrop (2026-10-30): broad diagonal bands and scattered
+ * sparkles, faint, over the blue. Fixed and on its own layer, so it costs a
+ * composite rather than a repaint on scroll, and fading out down the screen
+ * so it never competes with text.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='132' viewBox='0 0 132 132'%3E%3Cg fill='%23fff' fill-opacity='.07'%3E%3Cpath d='M26 12l3 9 9 3-9 3-3 9-3-9-9-3 9-3z'/%3E%3Cpath d='M92 74l2.2 6.6 6.6 2.2-6.6 2.2L92 91.6l-2.2-6.6-6.6-2.2 6.6-2.2z'/%3E%3Ccircle cx='100' cy='22' r='2.2'/%3E%3Ccircle cx='34' cy='100' r='2.6'/%3E%3Ccircle cx='66' cy='50' r='1.6'/%3E%3Ccircle cx='120' cy='118' r='1.4'/%3E%3C/g%3E%3C/svg%3E"),
+    repeating-linear-gradient(135deg, rgb(255 255 255 / 0.022) 0 34px, transparent 34px 68px);
+  mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.55) 100%);
+}
+
+/*
  * Card: a game panel (2026-10-30). The look of the game's own menus rather
  * than a web card: a dark outline, a light top edge and a hard ledge under
  * it instead of a soft blurred shadow. Tailwind border colours on a card
@@ -97,12 +116,13 @@ body {
  */
 @utility card {
   position: relative;
-  background: linear-gradient(180deg, #1c2a6c 0%, var(--surface) 55%);
+  background: linear-gradient(180deg, #22348a 0%, #1b296e 34%, var(--surface) 100%);
   border: 2px solid var(--ink);
   border-radius: 1.125rem;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    0 4px 0 var(--ink);
+    inset 0 2px 0 rgb(255 255 255 / 0.14),
+    inset 0 0 0 1px rgb(130 160 255 / 0.07),
+    0 5px 0 var(--ink);
 }
 
 /*
@@ -168,6 +188,17 @@ body {
  * tell of a generated page (2026-10-30); now plain bold text, and most of
  * the labels that only decorated a heading are gone.
  */
+/*
+ * A small label in the game's lettering (2026-10-30): what the site's tiny
+ * tracked capitals ("STAR POWER", "BIGGEST RISER") became. The game labels
+ * a stat in its display face, in sentence case, never in spaced-out caps.
+ */
+@utility label-game {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+}
+
 @utility eyebrow {
   font-size: 0.8125rem;
   font-weight: 700;

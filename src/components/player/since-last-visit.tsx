@@ -90,7 +90,7 @@ export function SinceLastVisit({
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border bg-surface-2/50 px-4 py-2">
         <p
           id="since-last-visit"
-          className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-brand"
+          className="label-game flex items-center gap-2 text-xs text-brand"
         >
           <History className="size-3.5" />{t('Since your last visit')}</p>
         <p className="text-xs text-muted">
@@ -102,7 +102,7 @@ export function SinceLastVisit({
       <dl className="flex flex-wrap gap-x-6 gap-y-3 px-4 py-3">
         {rows.map((row) => (
           <div key={row.label}>
-            <dt className="text-xs uppercase tracking-wide text-muted">
+            <dt className="label-game text-xs text-muted">
               {t(row.label)}
             </dt>
             <dd

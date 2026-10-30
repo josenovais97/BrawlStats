@@ -946,7 +946,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                         one to "Main attack damage per…" puts the ambiguity
                         straight back. So the label gets the full width and the
                         mark sits with the number, which is always short. */}
-                    <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">
+                    <dt className="label-game text-xs leading-tight text-muted">
                       {t(label)}
                     </dt>
                     <dd className="mt-1.5 flex items-center gap-2">
@@ -979,7 +979,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {wiki.stats.shotsToSuper ? (
                 <div className="card p-3">
-                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">{t('Hits to Super')}</dt>
+                  <dt className="label-game text-xs leading-tight text-muted">{t('Hits to Super')}</dt>
                   <dd className="mt-1.5 text-lg font-bold leading-tight tabular-nums">
                     {wiki.stats.shotsToSuper}
                   </dd>
@@ -989,7 +989,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
               {wiki.stats.attackSuperCharge ? (
                 <div className="card p-3">
-                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">{t('Super charge')}</dt>
+                  <dt className="label-game text-xs leading-tight text-muted">{t('Super charge')}</dt>
                   <dd className="mt-1.5 text-lg font-bold leading-tight tabular-nums">
                     {wiki.stats.attackSuperCharge}
                   </dd>
@@ -1002,7 +1002,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
 
               {wiki.stats.hyperchargeMultiplier ? (
                 <div className="card p-3">
-                  <dt className="text-xs font-medium uppercase leading-tight tracking-wide text-muted">{t('Hypercharge boost')}</dt>
+                  <dt className="label-game text-xs leading-tight text-muted">{t('Hypercharge boost')}</dt>
                   <dd className="mt-1.5 flex items-center gap-2">
                     <HyperchargeIcon className="size-5 shrink-0" />
                     <span className="text-lg font-bold leading-tight tabular-nums">
@@ -1176,7 +1176,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               >
                 <span className="w-20 shrink-0 text-xs tabular-nums text-muted">{change.date}</span>
                 <span
-                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
+                  className={`label-game shrink-0 rounded-md px-1.5 py-0.5 text-xs ${
                     change.kind === 'Buff'
                       ? 'bg-victory/15 text-victory'
                       : change.kind === 'Nerf'

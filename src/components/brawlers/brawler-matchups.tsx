@@ -73,7 +73,7 @@ export function BrawlerMatchups({
       <div className="grid gap-4 lg:grid-cols-3">
         {withRows.map((column) => (
           <div key={column.title}>
-            <h3 className="text-sm font-bold uppercase tracking-wide text-muted">
+            <h3 className="label-game text-sm text-muted">
               {t(column.title)}
             </h3>
             <p className="mb-2 text-xs text-muted/80">{t(column.hint)}</p>

@@ -165,7 +165,7 @@ export default async function MetaReportPage() {
           <ul className="card divide-y divide-border overflow-hidden">
             {changes.map((change) => (
               <li key={change.category} className="px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-muted">
+                <p className="label-game text-xs text-muted">
                   {CHANGE_LABEL[change.category]}
                 </p>
                 <p className="mt-1 text-sm capitalize leading-relaxed">

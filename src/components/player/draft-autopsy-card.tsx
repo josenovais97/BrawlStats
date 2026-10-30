@@ -78,7 +78,7 @@ export function DraftAutopsyCard({
 
       <div className="space-y-4 p-5">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>{t('Last loss · {mode}', { mode: mode })}{autopsy.mapName ? (
+          <p className="label-game text-xs" style={{ color: accent }}>{t('Last loss · {mode}', { mode: mode })}{autopsy.mapName ? (
               <>
                 {' · '}
                 <Link
@@ -225,7 +225,7 @@ function Side({
   const t = getT(requestLocale());
   return (
     <div className="min-w-0">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{t(label)}</p>
+      <p className="label-game text-xs text-muted">{t(label)}</p>
       <div className="mt-1 flex items-center gap-1.5">
         {ids.map((id) => (
           <Image

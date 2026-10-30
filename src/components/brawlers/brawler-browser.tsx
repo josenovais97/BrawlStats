@@ -361,14 +361,14 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
 
       {brawler.status === 'upcoming' ? (
         <span
-          className="absolute left-2 top-2 z-10 rounded-md bg-accent/20 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-accent"
+          className="label-game absolute left-2 top-2 z-10 rounded-md bg-accent/20 px-1.5 py-0.5 text-xs text-accent"
           title={tx('Revealed but not in the game yet.')}
         >{tx('Soon')}</span>
       ) : null}
 
       {brawler.status === 'legacy' ? (
         <span
-          className="absolute left-2 top-2 z-10 rounded-md bg-surface-3/90 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-muted"
+          className="label-game absolute left-2 top-2 z-10 rounded-md bg-surface-3/90 px-1.5 py-0.5 text-xs text-muted"
           title={tx('No longer available in the game. Kept for its history.')}
         >{tx('Legacy')}</span>
       ) : null}
@@ -486,7 +486,7 @@ function FilterRow({
     <div className="sm:flex sm:items-center sm:gap-3">
       <span
         id={`filter-${label}`}
-        className="block shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:w-12"
+        className="label-game block shrink-0 text-xs text-muted sm:w-12"
       >
         {tx(label)}
       </span>
@@ -503,10 +503,8 @@ function FilterRow({
               type="button"
               aria-pressed={active}
               onClick={() => onChange(option)}
-              className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors ${
-                active
-                  ? 'bg-brand text-brand-ink'
-                  : 'border border-border bg-surface-2/60 text-muted hover:border-border-strong hover:text-foreground'
+              className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 px-3 text-sm ${
+                active ? 'bz-chip-on' : 'bz-chip hover:text-white'
               }`}
             >
               {option === 'all' ? null : renderIcon?.(option)}

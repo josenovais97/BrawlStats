@@ -48,7 +48,7 @@ export function DropOdds({ data, drop }: { data: StarrDropData; drop: DropType }
             className="flex flex-col items-center rounded-xl border-t-4 bg-surface-2 px-0.5 py-2.5 text-center"
             style={{ borderColor: rarityColor(odd.rarity) }}
           >
-            <span className="text-[9px] font-bold uppercase leading-tight tracking-wide sm:text-xs" style={{ color: rarityColor(odd.rarity) }}>
+            <span className="label-game text-[9px] leading-tight sm:text-xs" style={{ color: rarityColor(odd.rarity) }}>
               {t(odd.rarity === 'Ultra' ? 'Ultra Legendary' : odd.rarity)}
             </span>
             <span className="display mt-1 text-lg leading-none sm:text-3xl">{pct(odd.chance)}</span>

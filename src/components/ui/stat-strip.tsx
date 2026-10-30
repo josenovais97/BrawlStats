@@ -50,7 +50,7 @@ export function StatStrip({
       <dl className="grid grid-cols-2 gap-x-6 gap-y-6 @md:grid-cols-3 @3xl:grid-cols-5">
         {items.map((item) => (
           <div key={item.label} className="min-w-0">
-            <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
+            <dt className="label-game flex items-center gap-1.5 text-xs text-muted">
               {item.node ? (
                 <span aria-hidden className="flex shrink-0 items-center opacity-90">
                   {item.node}

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
+import { Geist_Mono, Lilita_One, Nunito } from 'next/font/google';
 import Script from 'next/script';
 
 import { AdsenseLoader } from '@/components/ads/adsense-loader';
@@ -15,15 +15,19 @@ import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 import './globals.css';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+/**
+ * Body face: Nunito, rounded like the game's own menu text (2026-10-30).
+ * Geist read as a web app; the rounded terminals are most of what makes a
+ * paragraph look like it belongs next to the game's lettering.
+ */
+const nunito = Nunito({ variable: '--font-body', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 /**
  * Display face for headings and the wordmark.
  *
  * Brawl Stars uses a heavy rounded display type; Lilita One is the closest
- * free match and is what gives the site its game feel. Body copy stays on
- * Geist, which is far more readable at small sizes.
+ * free match and is what gives the site its game feel.
  */
 const lilita = Lilita_One({
   variable: '--font-display',
@@ -95,14 +99,14 @@ export default function RootLayout({
   return (
     /*
       The font variables have to land on <html>, not <body>. Tailwind's theme
-      maps `--font-sans` to `--font-geist-sans` at `:root`, and a custom
+      maps `--font-sans` to `--font-body` at `:root`, and a custom
       property that references an undefined variable computes to
       guaranteed-invalid and stays that way for every descendant. Which
-      silently dropped Geist and Lilita One across the whole site.
+      silently dropped both faces across the whole site.
     */
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${lilita.variable}`}
+      className={`${nunito.variable} ${geistMono.variable} ${lilita.variable}`}
     >
       <body className="antialiased">
         {/* overflow-x: clip here, not only on body (2026-10-30): body's value

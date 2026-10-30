@@ -66,7 +66,7 @@ export function BrawlerSkins({
                   {skin.name.toLowerCase()}
                 </span>
                 {skin.isDefault ? (
-                  <span className="shrink-0 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-muted">{t('Default')}</span>
+                  <span className="label-game shrink-0 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-xs text-muted">{t('Default')}</span>
                 ) : null}
               </span>
               {/* The bar is the comparison; the number beside it is the detail. */}

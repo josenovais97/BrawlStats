@@ -50,7 +50,7 @@ export function ComparePicker({
         exclude={b}
       />
 
-      <span className="px-1 text-xs font-black uppercase tracking-wide text-muted">{t('vs')}</span>
+      <span className="label-game px-1 text-xs text-muted">{t('vs')}</span>
 
       <BrawlerPicker
         id="compare-b"

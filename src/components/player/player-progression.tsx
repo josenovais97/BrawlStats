@@ -141,7 +141,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
                 <Ring value={value} tone={done ? 'text-victory' : tone}>
                   <span className={done ? 'text-victory' : tone}>{node}</span>
                 </Ring>
-                <p className="mt-2 text-[11px] font-bold uppercase leading-tight tracking-wide">
+                <p className="label-game mt-2 text-xs leading-tight">
                   {t(label)}
                 </p>
                 <p
@@ -168,7 +168,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
               <p className="font-medium text-victory">{t('Everything unlocked and maxed.')}</p>
             ) : (
               <>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-muted">{t('Still to get')}</p>
+                <p className="label-game text-xs text-muted">{t('Still to get')}</p>
                 <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5">
                   {missing.map(({ node, noun, stat, tone }) => {
                     const left = stat.total - stat.owned;
@@ -188,7 +188,7 @@ export function PlayerProgression({ progression, playtime }: Props) {
           </div>
         ) : null}
 
-        <p className="mb-3 mt-7 text-[11px] font-bold uppercase tracking-wider text-muted">{t('Investment')}{' '}<span className="font-medium normal-case tracking-normal">{t('· what it cost')}</span>
+        <p className="label-game mb-3 mt-7 text-xs text-muted">{t('Investment')}{' '}<span className="font-medium normal-case tracking-normal">{t('· what it cost')}</span>
         </p>
         <div className="grid gap-3 @sm:grid-cols-2 @3xl:grid-cols-5">
           <Investment
@@ -268,7 +268,7 @@ function Investment({
         {node}
       </span>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium uppercase tracking-wide text-muted">{t(label)}</p>
+        <p className="label-game truncate text-xs text-muted">{t(label)}</p>
         <p className="truncate text-lg font-bold tabular-nums">{value}</p>
         <p className="truncate text-xs text-muted">{t(hint)}</p>
       </div>

@@ -155,7 +155,7 @@ export function DiscoveryCard({
               {i > 0 && copy.pair ? (
                 <span
                   aria-hidden
-                  className="text-xs font-black uppercase tracking-wide text-muted"
+                  className="label-game text-xs text-muted"
                 >
                   {copy.pair}
                 </span>

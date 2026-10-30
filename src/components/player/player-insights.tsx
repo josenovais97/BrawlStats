@@ -89,7 +89,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
 
           <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">{t('Trophies')}</p>
+              <p className="label-game text-xs text-muted">{t('Trophies')}</p>
               <p
                 className={`flex items-center gap-1 text-lg font-bold tabular-nums ${
                   insights.trophyChange >= 0 ? 'text-victory' : 'text-defeat'
@@ -103,7 +103,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">{t('Star player')}</p>
+              <p className="label-game text-xs text-muted">{t('Star player')}</p>
               <p className="flex items-center gap-1 text-lg font-bold tabular-nums">
                 <CrownIcon className="size-4" />
                 {insights.starPlayerCount}

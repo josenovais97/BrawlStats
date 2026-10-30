@@ -110,7 +110,7 @@ export function BrawlerChooser({
     <div className="mt-4 border-t border-border pt-4">
       <label
         htmlFor={inputId}
-        className="mb-2.5 block text-xs font-bold uppercase tracking-wide text-muted"
+        className="label-game mb-2.5 block text-xs text-muted"
       >
         {t(label)}
       </label>
@@ -143,7 +143,7 @@ export function BrawlerChooser({
 
       {suggested.length > 0 && !query ? (
         <div className="mt-3">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-muted">
+          <p className="label-game text-xs text-muted">
             {suggestedLabel}
           </p>
           <ul className="mt-1.5 flex flex-wrap gap-1.5">

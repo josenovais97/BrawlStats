@@ -49,7 +49,7 @@ export function PlayerStats({ player }: { player: BSPlayer }) {
      * `@md` *of*.
      */
     <section className="@container">
-      <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted">{tx('Lifetime')}{' '}
+      <p className="label-game mb-4 text-xs text-muted">{tx('Lifetime')}{' '}
         <span className="font-medium normal-case tracking-normal">{tx('· since the account was made')}</span>
       </p>
       <StatStrip
@@ -222,7 +222,7 @@ export async function PlayerRecords({
                     />
 
                     <div className="relative z-10 flex min-w-0 flex-1 flex-col justify-center gap-1 p-4 @xl:p-5">
-                      <p className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider ${h.tone}`}>
+                      <p className={`label-game flex items-center gap-1.5 text-xs ${h.tone}`}>
                         <span aria-hidden className="flex shrink-0 items-center">{h.icon}</span>
                         {tx(h.label)}
                       </p>
@@ -267,7 +267,7 @@ export async function PlayerRecords({
                   {t.mark}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate text-[11px] font-bold uppercase tracking-wider text-muted">
+                  <p className="label-game truncate text-xs text-muted">
                     {tx(t.label)}
                   </p>
                   <p className="truncate text-2xl font-black leading-tight tabular-nums">{t.value}</p>

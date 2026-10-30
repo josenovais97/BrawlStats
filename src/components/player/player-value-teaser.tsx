@@ -38,7 +38,7 @@ export async function PlayerValueTeaser({ player, tag }: { player: BSPlayer; tag
         <Coins aria-hidden className="size-6" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-xs font-bold uppercase tracking-wide text-muted">{t('Account value')}</span>
+        <span className="label-game block text-xs text-muted">{t('Account value')}</span>
         <span className="display block text-3xl leading-tight text-brand">
           {compactCoins(coins.total)} <span className="text-lg text-foreground">{t('coins')}</span>
         </span>

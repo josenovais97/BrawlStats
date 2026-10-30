@@ -187,7 +187,7 @@ export default async function ReleaseNotesPage() {
 
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold capitalize">{b.name.toLowerCase()}</p>
-                  <p className="mt-0.5 text-xs uppercase tracking-wide text-muted">
+                  <p className="label-game mt-0.5 text-xs text-muted">
                     {[b.rarityName, b.className].filter(Boolean).join(' · ') ||
                       t('Details not published yet')}
                   </p>
@@ -245,7 +245,7 @@ export default async function ReleaseNotesPage() {
           <div className="space-y-4">
             {changes.map((change) => (
               <div key={change.category} className="card p-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-muted">
+                <p className="label-game text-xs text-muted">
                   {CHANGE_LABEL[change.category]}
                 </p>
                 <ul className="mt-3 flex flex-wrap gap-2">

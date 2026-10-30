@@ -206,7 +206,7 @@ export function DropOpener({ drops, shareUrl }: { drops: OpenerDrop[]; shareUrl:
         <div className="mt-2 min-h-24 text-center" aria-live="polite">
           {opened ? (
             <>
-              <p className="text-xs font-bold uppercase tracking-wide" style={{ color: rarityColor(drop.odds[roll.level].rarity) }}>
+              <p className="label-game text-xs" style={{ color: rarityColor(drop.odds[roll.level].rarity) }}>
                 {drop.odds[roll.level].label}
               </p>
               <p key={`n${taps}`} className="animate-picture-in display text-game-stroke mt-1 text-3xl leading-none text-white sm:text-5xl">

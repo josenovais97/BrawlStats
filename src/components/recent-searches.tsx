@@ -47,7 +47,7 @@ export function RecentSearches() {
 
   return (
     <div className="mt-3 flex items-center gap-2.5 border-t border-border pt-3">
-      <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:inline">
+      <span className="label-game hidden shrink-0 text-xs text-muted sm:inline">
         {t('Continue with')}
       </span>
 

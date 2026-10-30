@@ -171,7 +171,7 @@ export default function MetaScorePage() {
             <div className="-mx-1 overflow-x-auto">
               <table className="w-full min-w-[26rem] text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-muted">
+                  <tr className="label-game text-left text-xs text-muted">
                     <th className="py-2 pr-3 font-semibold">{tx('List')}</th>
                     <th className="py-2 pr-3 font-semibold">{tx('Adjusted win rate')}</th>
                     <th className="py-2 font-semibold">{tx('Pick rate')}</th>

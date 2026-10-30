@@ -112,7 +112,7 @@ export async function PlayerPushNow({
           </Link>
 
           <div className="flex min-w-0 flex-1 basis-52 flex-col justify-center pt-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-victory">{t('Your best move right now')}</p>
+            <p className="label-game text-xs text-victory">{t('Your best move right now')}</p>
             {/* The mode leads, the map follows underneath.
                 People think in modes -- "I'm going to play some Knockout" -- and
                 a map name alone asks the reader to remember which mode it

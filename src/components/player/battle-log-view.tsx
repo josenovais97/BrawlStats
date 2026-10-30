@@ -228,7 +228,7 @@ function Session({ entries }: { entries: BattleEntry[] }) {
         ) : null}
 
         <div className="flex min-w-0 flex-1 basis-48 flex-col justify-center pb-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted">{tx('Last {length} games', { length: entries.length })}{main ? (
+          <p className="label-game text-xs text-muted">{tx('Last {length} games', { length: entries.length })}{main ? (
               <span className="normal-case tracking-normal">
                 {' '}{tx('· mostly')}{' '}<span className="font-bold capitalize text-foreground">{main.name.toLowerCase()}</span>
               </span>
@@ -346,7 +346,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
   const tx = useT();
   return (
     <div className="text-right">
-      <dt className="text-[10px] font-bold uppercase tracking-wider text-muted">{tx(label)}</dt>
+      <dt className="label-game text-xs text-muted">{tx(label)}</dt>
       <dd className={`text-xl font-black tabular-nums leading-tight ${tone ?? ''}`}>{value}</dd>
     </div>
   );
@@ -360,7 +360,7 @@ function Breakdown({ title, rows, round = false }: { title: string; rows: Tally[
   if (rows.length === 0) return null;
   return (
     <div className="min-w-0">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted">{tx(title)}</p>
+      <p className="label-game mb-2 text-xs text-muted">{tx(title)}</p>
       <ul className="space-y-2">
         {rows.slice(0, BREAKDOWN_ROWS).map((r) => {
           const decided = r.wins + r.losses;

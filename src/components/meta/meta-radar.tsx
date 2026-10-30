@@ -464,7 +464,7 @@ function Corner({
         x={anchor === 'start' ? x + 10 : x + w - 10}
         y={edge === 'top' ? y + 20 : y + h - 10}
         textAnchor={anchor}
-        className="text-[12px] font-bold uppercase tracking-wide"
+        className="label-game text-[12px]"
         fill={fill}
         fillOpacity={0.75}
       >
@@ -537,7 +537,7 @@ function Detail({ point, cell }: { point: RadarPoint; cell: RadarCell }) {
         <p className="flex flex-wrap items-baseline gap-x-2">
           <span className="text-lg font-black">{titleCaseLabel(point.brawlerName)}</span>
           <span
-            className="text-xs font-bold uppercase tracking-wide"
+            className="label-game text-xs"
             style={{ color: CELL_FILL[cell] }}
           >
             {CELL_LABEL[cell]}

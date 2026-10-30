@@ -324,7 +324,7 @@ export default async function ComparePage({ params }: PageProps) {
         <div className="grid gap-4 sm:grid-cols-2">
           {sides.map((side) => (
             <div key={side.brawler.id}>
-              <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+              <h3 className="label-game mb-2 text-sm text-muted">
                 {titleCase(side.brawler.name)}
               </h3>
               {side.splits.length === 0 ? (
@@ -443,7 +443,7 @@ function HeadToHeadCard({
   const t = getT(requestLocale());
   return (
     <div className="card p-4">
-      <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
+      <p className="label-game flex items-center gap-2 text-xs text-muted">
         <span aria-hidden className="size-2 rounded-full" style={{ background: accent }} />{t('{subject} vs {opponent}', { subject: subject, opponent: opponent })}</p>
       {record ? (
         <>

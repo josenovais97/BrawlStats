@@ -67,7 +67,7 @@ export function DraftPicks({ picks, hasEnemies }: { picks: DraftPick[]; hasEnemi
     <>
       {roster ? (
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted">{t('Show')}</span>
+          <span className="label-game text-xs text-muted">{t('Show')}</span>
           <Scope active={scope === 'all'} onClick={() => setScope('all')}>{t('Every brawler')}</Scope>
           <Scope active={scope === 'owned'} onClick={() => setScope('owned')}>{t('{name} owns', { name: roster.name })}</Scope>
           {roster.power11.length > 0 ? (

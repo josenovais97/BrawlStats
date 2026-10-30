@@ -77,7 +77,7 @@ function SplitList({
   const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div>
-      <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+      <h3 className="label-game mb-2 text-sm text-muted">
         {t(title)}
       </h3>
       {rows.length === 0 ? (

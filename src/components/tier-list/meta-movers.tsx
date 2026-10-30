@@ -196,7 +196,7 @@ function MoverList({
           <ArrowDownRight className="size-4" />
         )}
         {title}
-        <span className="ml-auto text-xs font-semibold uppercase tracking-wide text-muted">
+        <span className="label-game ml-auto text-xs text-muted">
           {w.unit}
         </span>
       </h3>

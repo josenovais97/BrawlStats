@@ -116,12 +116,12 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
                 {skill.score.toFixed(1)}
               </span>
               <span
-                className="mt-1.5 text-xs font-bold uppercase tracking-[0.2em]"
+                className="label-game mt-1.5 text-xs"
                 style={{ color: tone }}
               >
                 {skill.tier}
               </span>
-              <span className="mt-0.5 text-[10px] uppercase tracking-wider text-muted">{t('Skill score')}</span>
+              <span className="label-game mt-0.5 text-xs text-muted">{t('Skill score')}</span>
             </div>
           </div>
 

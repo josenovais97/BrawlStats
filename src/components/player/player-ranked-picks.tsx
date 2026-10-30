@@ -216,7 +216,7 @@ function ModeCard({
           />
         ) : null}
         <span
-          className="truncate text-xs font-bold uppercase tracking-wide"
+          className="label-game truncate text-xs"
           style={{ color: accent }}
         >
           {t(label)}

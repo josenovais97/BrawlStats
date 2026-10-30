@@ -645,7 +645,7 @@ function TierRow({
           >
             {tier}
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
+          <span className="label-game text-xs text-muted">
             {entries.length}
           </span>
         </div>

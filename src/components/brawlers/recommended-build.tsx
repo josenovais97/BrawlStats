@@ -93,7 +93,7 @@ export function RecommendedBuild({
     return (
       <div>
         <div className="mb-2.5 flex items-baseline justify-between gap-3">
-          <p className="display text-sm uppercase tracking-wide">{t('The build owners run')}</p>
+          <p className="label-game display text-sm">{t('The build owners run')}</p>
           <a href="#build" className="text-xs font-semibold text-brand hover:underline">{t('Why, and what else')}</a>
         </div>
         <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -111,7 +111,7 @@ export function RecommendedBuild({
                 unoptimized
               />
               <span className="min-w-0">
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
+                <span className="label-game block text-xs text-muted">
                   {c.kind}
                 </span>
                 <span className="block truncate text-sm font-bold capitalize leading-tight">
@@ -128,7 +128,7 @@ export function RecommendedBuild({
 
   return (
     <div className="card flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('Most owned')}</p>
+      <p className="label-game text-xs text-muted">{t('Most owned')}</p>
 
       {starPower && starPowerName ? (
         <Pick

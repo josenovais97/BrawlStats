@@ -161,7 +161,7 @@ function AbilityCard({
   if (items.length === 0) return null;
   return (
     <div className="card p-4">
-      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted">
+      <p className="label-game flex items-center gap-2 text-xs text-muted">
         {icon}
         {t(title)}
       </p>

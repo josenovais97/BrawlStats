@@ -221,7 +221,7 @@ function SideStatus({
   if (outcome.ok) {
     return (
       <div className="card p-4">
-        <p className="text-xs uppercase tracking-wide text-muted">{position}</p>
+        <p className="label-game text-xs text-muted">{position}</p>
         <p className="mt-1 font-bold">{outcome.side.player.name}</p>
         <p className="text-sm text-muted">{t('Ready. Waiting on the other player.')}</p>
       </div>
@@ -236,7 +236,7 @@ function SideStatus({
 
   return (
     <div className="card border-defeat/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-muted">{position}</p>
+      <p className="label-game text-xs text-muted">{position}</p>
       <p className="mt-1 text-sm leading-relaxed text-muted">{t(message)}</p>
     </div>
   );

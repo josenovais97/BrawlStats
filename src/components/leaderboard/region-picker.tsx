@@ -100,7 +100,7 @@ export function RegionPicker({ value, onChange, disabled }: RegionPickerProps) {
               results.map((region, index) => (
                 <li key={region.code}>
                   {!query && index === popularCount ? (
-                    <p className="border-t border-border px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">{t('All countries')}</p>
+                    <p className="label-game border-t border-border px-3 pb-1 pt-2 text-xs text-muted">{t('All countries')}</p>
                   ) : null}
                   <button
                     type="button"

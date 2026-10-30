@@ -208,7 +208,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-0.5">
       <span className="text-2xl font-black tabular-nums leading-none">{value}</span>
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t(label)}</span>
+      <span className="label-game text-xs text-muted">{t(label)}</span>
     </div>
   );
 }
@@ -254,7 +254,7 @@ function StatsPanel({
 
       {counts.length > 0 ? (
         <div className="space-y-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t('Guesses to solve')}</p>
+          <p className="label-game text-xs text-muted">{t('Guesses to solve')}</p>
           {counts.map(([guesses, times]) => (
             <div key={guesses} className="flex items-center gap-2 text-xs">
               <span className="w-4 shrink-0 text-right font-bold tabular-nums">{guesses}</span>
@@ -525,7 +525,7 @@ export function ChallengeBoard({
            It scrolls sideways instead. */
         <div className="-mx-4 space-y-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
           {/* Column headings once, so five labels are not repeated on every row */}
-          <div className="grid min-w-[620px] grid-cols-[3rem_repeat(7,1fr)] gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
+          <div className="label-game grid min-w-[620px] grid-cols-[3rem_repeat(7,1fr)] gap-1.5 px-1 text-xs text-muted">
             <span />
             <span className="text-center">{t('Rarity')}</span>
             <span className="text-center">{t('Class')}</span>

@@ -167,7 +167,7 @@ export function MostPicked({
                   <span className="block text-sm font-bold tabular-nums">
                     {fmtPercent(usage, locale)}
                   </span>
-                  <span className="block text-xs uppercase tracking-wide text-muted">
+                  <span className="label-game block text-xs text-muted">
                     {w.pick}
                   </span>
                 </span>

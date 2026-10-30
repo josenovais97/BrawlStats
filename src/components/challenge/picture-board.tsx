@@ -167,7 +167,7 @@ export function PictureBoard({
       <div className="card relative overflow-hidden p-4">
         <div className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${GLOW[mode]}`} />
         <div className="relative flex items-center justify-between">
-          <p className="text-sm font-black uppercase tracking-wide">
+          <p className="label-game text-sm">
             {mode === 'shadow' ? t('Whose shadow is this?') : t('Who is this, up close?')}
           </p>
           {/* Hearts: what a wrong guess costs, visible before it is spent. */}

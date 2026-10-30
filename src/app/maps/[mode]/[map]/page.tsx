@@ -260,7 +260,7 @@ export default async function MapPage({ params }: PageProps) {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={lp(`/maps/${entry.modeSlug}`)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide transition-opacity hover:opacity-80"
+              className="label-game inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition-opacity hover:opacity-80"
               style={{
                 background: `color-mix(in srgb, ${accent} 20%, transparent)`,
                 color: accent,

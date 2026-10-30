@@ -93,7 +93,7 @@ export function AbilityChoices({
               {/* Quiet at "low", the same treatment the map cards use: a caveat
                   should not be the loudest thing on the card. */}
               <span
-                className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
+                className={`label-game shrink-0 rounded-md px-1.5 py-0.5 text-xs ${
                   choices.confidence === 'low'
                     ? 'bg-surface-2 text-muted'
                     : 'bg-brand/15 text-brand'

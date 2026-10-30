@@ -479,7 +479,7 @@ async function MapCard({
               thing on the card, and right now every map carries one. It picks
               up the mode colour once the map has earned it. */}
           <span
-            className="shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide"
+            className="label-game shrink-0 rounded-md px-1.5 py-0.5 text-xs"
             style={
               map.confidence === 'low'
                 ? { color: 'var(--muted)', background: 'var(--surface-2)' }
@@ -489,7 +489,7 @@ async function MapCard({
             {CONFIDENCE_LABEL[map.confidence]}
           </span>
         </div>
-        <p className="mt-1.5 text-xs uppercase tracking-wide text-muted">{t('{sampleSize} ranked battles · {brawlersSeen} brawlers seen', { sampleSize: formatNumber(map.sampleSize), brawlersSeen: map.brawlersSeen })}</p>
+        <p className="label-game mt-1.5 text-xs text-muted">{t('{sampleSize} ranked battles · {brawlersSeen} brawlers seen', { sampleSize: formatNumber(map.sampleSize), brawlersSeen: map.brawlersSeen })}</p>
       </div>
 
       {map.picks.length === 0 ? (
@@ -579,7 +579,7 @@ async function MapCard({
           line per map, so the page answers both "who" and "with whom". */}
       {trio ? (
         <div className="mt-auto flex items-center gap-2.5 border-t border-border/70 bg-surface-2/40 px-4 py-2.5">
-          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-muted">{t('Best trio')}</span>
+          <span className="label-game shrink-0 text-xs text-muted">{t('Best trio')}</span>
           <span className="flex shrink-0 -space-x-1.5">
             {trio.brawlerIds.map((id) => (
               <Image

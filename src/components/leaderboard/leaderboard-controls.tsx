@@ -82,10 +82,8 @@ export function LeaderboardControls({ region, board }: LeaderboardControlsProps)
               event.preventDefault();
               navigate({ type: key });
             }}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-colors ${
-              board === key
-                ? 'bg-brand text-[#1a1200]'
-                : 'border border-border text-muted hover:text-foreground'
+            className={`flex items-center gap-2 px-3 py-2 text-sm capitalize ${
+              board === key ? 'bz-chip-on' : 'bz-chip hover:text-white'
             }`}
           >
             <Icon className="size-4" />

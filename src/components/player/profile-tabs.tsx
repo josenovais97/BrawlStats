@@ -98,7 +98,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
         ref={strip}
         role="tablist"
         aria-label={tx('Profile sections')}
-        className="profile-tabs sticky top-16 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
+        className="profile-tabs sticky top-16 z-20 -mx-4 flex gap-2 overflow-x-auto border-b-2 border-ink bg-background/90 px-4 pb-3 pt-2 backdrop-blur sm:-mx-6 sm:px-6"
       >
         {tabs.map((tab) => {
           const current = tab.id === active;
@@ -110,11 +110,7 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
               aria-selected={current}
               aria-controls={`panel-${tab.id}`}
               onClick={() => choose(tab.id)}
-              className={`shrink-0 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors sm:px-3.5 sm:text-sm ${
-                current
-                  ? 'bg-brand text-brand-ink'
-                  : 'text-muted hover:bg-surface-2 hover:text-foreground'
-              }`}
+              className={`shrink-0 px-3 py-1.5 text-sm sm:px-3.5 ${current ? 'bz-chip-on' : 'bz-chip hover:text-white'}`}
             >
               {tx(tab.label)}
             </button>

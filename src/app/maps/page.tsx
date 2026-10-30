@@ -187,7 +187,7 @@ async function MapStrip({
               <span className="block truncate px-3 pt-2 text-sm font-semibold">
                 {nm(entry.map.name)}
               </span>
-              <span className="block truncate px-3 pb-2 text-[0.6875rem] uppercase tracking-wide text-muted">
+              <span className="label-game block truncate px-3 pb-2 text-xs text-muted">
                 {entry.mode?.name ?? entry.map.gameMode.name}
               </span>
             </Link>

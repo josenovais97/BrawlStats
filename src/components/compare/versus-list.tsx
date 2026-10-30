@@ -67,14 +67,14 @@ export function VersusList({
     <div className="space-y-6">
       {visible.map((section) => (
         <section key={section.title}>
-          <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+          <h3 className="label-game mb-2 text-sm text-muted">
             {t(section.title)}
           </h3>
 
           <dl className="card divide-y divide-border overflow-hidden">
             {/* Sticky within its own card so the reader never loses track of
                 which column is whom while scanning a long section. */}
-            <div className="sticky top-0 z-10 grid grid-cols-2 gap-2 bg-surface-2/95 px-3 py-1.5 text-xs font-bold uppercase tracking-wide backdrop-blur">
+            <div className="label-game sticky top-0 z-10 grid grid-cols-2 gap-2 bg-surface-2/95 px-3 py-1.5 text-xs backdrop-blur">
               <span className="truncate" style={{ color: accentA }}>
                 {labelA}
               </span>

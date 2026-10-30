@@ -219,7 +219,7 @@ function Tier({
   const t = getT(requestLocale());
   return (
     <div className="flex flex-col items-center gap-1.5 px-2 py-4 text-center">
-      <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
+      <span className="label-game text-xs text-muted">
         {t(label)}
       </span>
       {art && name ? (
@@ -312,7 +312,7 @@ function Cell({
         )}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-medium uppercase tracking-wide text-muted">
+        <p className="label-game truncate text-xs text-muted">
           {t(label)}
         </p>
         <p className="truncate text-base font-bold leading-tight">{titleCaseLabel(value)}</p>

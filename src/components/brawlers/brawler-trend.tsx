@@ -90,7 +90,7 @@ export function BrawlerTrend({
     <div className="card p-4">
       <div className="flex items-baseline justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">{t('Adjusted win rate')}</p>
+          <p className="label-game text-xs text-muted">{t('Adjusted win rate')}</p>
           <p className="mt-0.5 text-2xl font-black tabular-nums">
             {formatPercent(last)}
           </p>
