@@ -855,6 +855,20 @@ body {
   paint-order: stroke fill;
   text-shadow: 0 0.09em 0 #10142a;
 }
+/* A tier as the game draws a rank: a chunky coloured tile, outlined, on a
+   ledge, the letter in outlined lettering (brawler pages, 2026-10-30). */
+.tier-badge {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tier) 100%, #fff 18%) 0%, var(--tier) 55%, color-mix(in srgb, var(--tier) 100%, #000 22%) 100%);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35), 0 4px 0 var(--ink);
+  color: #fff;
+}
 /* A loot tile: the game's thick dark outline and hard drop, not a soft card. */
 .reward-tile {
   border: 3px solid #10142a;

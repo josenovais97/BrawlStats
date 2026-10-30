@@ -3,7 +3,7 @@ import { ArrowLeft, BarChart3, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShareImageButton } from '@/components/share-image-button';
-import { Suspense } from 'react';
+import { Suspense, type CSSProperties } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
 import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
@@ -788,56 +788,45 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             160px left beside a 112px portrait.
           */}
           <div className="min-w-0 flex-1 basis-60">
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <span
-                className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
-                style={{
-                  background: `color-mix(in srgb, ${accent} 20%, transparent)`,
-                  color: accent,
-                }}
-              >
-                {t(rarityName ?? 'Brawler')}
-              </span>
-              {isLegacy ? (
-                <span
-                  className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase tracking-wide text-muted"
-                  title={t('No longer available in the game. This page is kept for its history.')}
-                >{t('Legacy')}</span>
-              ) : null}
-              {className ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
-                  <ClassIcon name={className} className="size-4" />
-                  {t(className)}
-                </span>
-              ) : null}
-              {/*
-                Tier and score are two facts and used to be one pill reading
-                "C tier 4.8", which asks the reader to work out what the number
-                measures and how it relates to the letter. Split, and the score
-                says what it is: 4.8 out of 10 is a meta score, not a rating
-                anyone gave this brawler out of five.
-              */}
+            {/*
+              One tier badge in the game's style, and rarity and class as
+              plain text beside it (2026-10-30). It was four pills in a row,
+              five with Legacy, which read as a template's tag cloud. The
+              score keeps its own line so "4.8/10" still says what it is.
+            */}
+            <div className="flex items-center gap-3.5">
               {tier ? (
                 <span
-                  className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
-                  style={{
-                    background: `color-mix(in srgb, ${TIER_COLOR[tier]} 20%, transparent)`,
-                    color: TIER_COLOR[tier],
-                  }}
-                >{t('{tier} tier', { tier: tier })}</span>
-              ) : null}
-              {metaScore !== null ? (
-                /* Same scoring pass the Ranked tier list uses, so the number
-                   here cannot disagree with the number there. */
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted"
-                  title={t('Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list')}
-                >{t('Meta score')}<span className="font-bold tabular-nums text-foreground">
-                    {metaScore.toFixed(1)}
-                    <span className="font-semibold text-muted">/10</span>
-                  </span>
+                  className="tier-badge"
+                  style={{ '--tier': TIER_COLOR[tier] } as CSSProperties}
+                  title={t('{tier} tier', { tier: tier })}
+                >
+                  <span aria-hidden className="display text-game-stroke text-4xl leading-none">{tier}</span>
+                  <span className="sr-only">{t('{tier} tier', { tier: tier })}</span>
                 </span>
               ) : null}
+              <div className="min-w-0 space-y-1">
+                <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold">
+                  <span style={{ color: accent }}>{t(rarityName ?? 'Brawler')}</span>
+                  {className ? (
+                    <span className="inline-flex items-center gap-1.5 text-muted">
+                      <ClassIcon name={className} className="size-4" />
+                      {t(className)}
+                    </span>
+                  ) : null}
+                  {isLegacy ? (
+                    <span className="text-muted" title={t('No longer available in the game. This page is kept for its history.')}>{t('Legacy')}</span>
+                  ) : null}
+                </p>
+                {metaScore !== null ? (
+                  /* Same scoring pass the Ranked tier list uses, so the number
+                     here cannot disagree with the number there. */
+                  <p
+                    className="text-sm text-muted"
+                    title={t('Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list')}
+                  >{t('Meta score')}{' '}<span className="font-bold tabular-nums text-foreground">{metaScore.toFixed(1)}</span>/10</p>
+                ) : null}
+              </div>
             </div>
 
             {/* Cased in the markup, not by CSS. The lowercase name under a
@@ -846,8 +835,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 Console on 2026-09-21: 74 of 267 queries were "best <name>
                 build", landing on these pages at position 17-60. The visible
                 heading now says what the title says. */}
-            <h1 className="display mt-3 text-3xl sm:text-4xl">
-              {name} <span className="text-muted">{t('build, stats and matchups')}</span>
+            <h1 className="display text-game-stroke mt-4 text-4xl leading-tight sm:text-5xl">
+              {name} {t('build, stats and matchups')}
             </h1>
 
             {lead ? <p className="mt-3 max-w-2xl leading-relaxed">{t(lead)}</p> : null}
@@ -881,14 +870,14 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 still the rarer of the pair, which is why it keeps its own
                 icon rather than sharing the trophy. */}
             {wiki?.stats.title || wiki?.stats.prestigeTitle ? (
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-muted">
                 {wiki?.stats.title ? (
-                  <p className="inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                  <p className="inline-flex items-center gap-2">
                     <TrophyIcon className="size-4" />{t('Title')}<span className="font-bold text-foreground">{t(wiki.stats.title)}</span>
                   </p>
                 ) : null}
                 {wiki?.stats.prestigeTitle ? (
-                  <p className="inline-flex items-center gap-2 rounded-full border border-border-strong/60 bg-surface-2/80 px-3 py-1 text-xs font-semibold text-muted">
+                  <p className="inline-flex items-center gap-2">
                     <PrestigeIcon total={1} className="size-4" />{t('Prestige title')}<span className="font-bold text-foreground">{wiki.stats.prestigeTitle}</span>
                   </p>
                 ) : null}
