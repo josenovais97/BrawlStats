@@ -642,7 +642,8 @@ function TierRow({
           </span>
         </div>
 
-        <div className="flex flex-1 flex-wrap gap-2 p-3">
+        {/* Three across on a phone, filling the row; fixed tiles from sm. */}
+        <div className="grid flex-1 grid-cols-3 gap-2 p-3 sm:flex sm:flex-wrap">
           {entries.map((entry) => {
             const change = changes.get(entry.brawlerId);
             return (
@@ -650,7 +651,7 @@ function TierRow({
                 key={entry.brawlerId}
                 href={brawlerPath(entry.brawlerId, entry.brawlerName)}
                 style={{ '--tier': color } as React.CSSProperties}
-                className="tier-chip group w-[92px] p-2"
+                className="tier-chip group min-w-0 p-2 sm:w-[92px]"
                 title={copy.chipTitle({
                   name: entry.brawlerName,
                   score: String(entry.metaScore ?? '?'),

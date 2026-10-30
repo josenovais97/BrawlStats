@@ -115,13 +115,13 @@ export function SearchBar({
   return (
     <div id="search" className="w-full scroll-mt-24">
       {/*
-        Segmented control rather than two loose buttons: the sliding pill makes
-        it obvious the two options are one setting with one active value.
+        One setting with one active value, as two game chips (2026-10-30):
+        the yellow one is the choice, as on every other control on the site.
       */}
       <div
         role="group"
         aria-label={t('Search type')}
-        className="inline-flex rounded-xl border border-border/80 bg-background/70 p-1 shadow-[inset_0_1px_3px_rgb(0_0_0/0.5)]"
+        className="inline-flex gap-2"
       >
         {(['player', 'club'] as const).map((m) => {
           const isClub = m === 'club';
@@ -135,10 +135,8 @@ export function SearchBar({
                 setMode(m);
                 setError(null);
               }}
-              className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold capitalize transition-colors ${
-                active
-                  ? 'bg-brand text-brand-ink shadow-[0_1px_2px_rgb(0_0_0/0.35)]'
-                  : 'text-muted hover:text-foreground'
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-[0.9375rem] capitalize ${
+                active ? 'bz-chip-on' : 'bz-chip hover:text-white'
               }`}
             >
               {isClub ? <ClubIcon className="size-4" /> : <PlayersIcon className="size-4" />}
