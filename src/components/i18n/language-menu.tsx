@@ -66,8 +66,8 @@ export function LanguageMenu({ compact = false }: { compact?: boolean }) {
         aria-label={`${LABEL[locale]}: ${LOCALE_NAME[locale]}`}
         className={
           compact
-            ? 'grid h-10 min-w-10 place-items-center gap-1 rounded-lg border border-border px-2 text-xs font-bold uppercase text-muted transition-colors hover:text-foreground'
-            : 'flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:text-foreground'
+            ? 'bz-chip grid h-10 min-w-10 place-items-center gap-1 px-2 text-xs uppercase hover:text-white'
+            : 'nav-game flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-[0.9375rem]'
         }
       >
         <span className="flex items-center gap-1">
