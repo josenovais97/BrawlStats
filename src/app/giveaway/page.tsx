@@ -63,9 +63,9 @@ export default async function GiveawayPage() {
         </p>
         <div className="relative mx-auto mt-6 w-fit">
           {/* The Brawl Pass, falling back to our box if the wiki's art does not load. */}
-          <object data={BRAWL_PASS_ART} type="image/png" aria-label={t('Brawl Pass')} className="reward-float mx-auto block h-44 w-72 sm:h-56 sm:w-96">
+          <object data={BRAWL_PASS_ART} type="image/png" aria-label={t('Brawl Pass')} className="reward-float mx-auto block h-32 w-52 sm:h-56 sm:w-96">
             {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon */}
-            <img src={PRIZE_FALLBACK_ART} alt="" width={240} height={240} className="mx-auto size-44 object-contain sm:size-56" />
+            <img src={PRIZE_FALLBACK_ART} alt="" width={240} height={240} className="mx-auto size-32 object-contain sm:size-56" />
           </object>
           <span className="display absolute -right-4 -top-2 rotate-12 rounded-2xl border-[3px] border-[#10142a] bg-brand px-3 py-1 text-3xl text-brand-ink shadow-[0_4px_0_#10142a]">
             €10
@@ -77,6 +77,16 @@ export default async function GiveawayPage() {
         <p className="mx-auto mt-3 max-w-md text-white/80">
           {t('Google Play or App Store, your choice. Free to enter. One winner on {date}.', { date: ends })}
         </p>
+      </section>
+
+      {/* Straight after the prize (2026-10-30): below the points cards the form
+          sat two phone screens down, and 178 visits in three days gave about
+          ten entries. The cards explain the extra points underneath. */}
+      <section id="enter" className="mx-auto max-w-xl">
+        <GiveawayPanel
+          open={GIVEAWAY_PUBLIC && isOpen()}
+          closedNote={notOpenYet() ? t('Entries open at {time}.', { time: opens }) : undefined}
+        />
       </section>
 
       <section className="space-y-4">
@@ -91,13 +101,6 @@ export default async function GiveawayPage() {
           ))}
         </ul>
         <p className="text-sm text-muted">{t('Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.')}</p>
-      </section>
-
-      <section id="enter" className="mx-auto max-w-xl">
-        <GiveawayPanel
-          open={GIVEAWAY_PUBLIC && isOpen()}
-          closedNote={notOpenYet() ? t('Entries open at {time}.', { time: opens }) : undefined}
-        />
       </section>
 
       <section className="rounded-3xl bg-surface p-6 text-center sm:p-8">
