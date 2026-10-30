@@ -198,7 +198,7 @@ export function HomeRadar({
     >
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <h2 id="radar" className="display text-game-stroke text-3xl sm:text-4xl">{tx('BrawlZone Radar')}</h2>
+          <h2 id="radar" className="sd-slam display text-game-stroke text-3xl sm:text-4xl">{tx('BrawlZone Radar')}</h2>
           <p className="mt-2 max-w-xl text-sm text-muted">{tx('Things our own sampling turned up that no tier list would tell you.')}</p>
         </div>
 
@@ -229,7 +229,9 @@ export function HomeRadar({
         data-dir={dir}
         className="radar-slide touch-pan-y"
       >
-        <DiscoveryCard discovery={current} brawlerMeta={brawlerMeta} index={0} />
+        <div className="sd-swing">
+          <DiscoveryCard discovery={current} brawlerMeta={brawlerMeta} index={0} />
+        </div>
       </div>
 
       {count > 1 ? (

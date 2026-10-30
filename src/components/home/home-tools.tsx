@@ -103,7 +103,7 @@ export async function HomeTools() {
     <section className="reveal" aria-labelledby="tools">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div className="min-w-0">
-          <h2 id="tools" className="display text-game-stroke text-3xl sm:text-4xl">{t('Tools')}</h2>
+          <h2 id="tools" className="sd-slam display text-game-stroke text-3xl sm:text-4xl">{t('Tools')}</h2>
         </div>
         <p className="text-sm text-muted">{t('All of it from our own sampled battles.')}</p>
       </div>
@@ -172,7 +172,7 @@ export async function HomeTools() {
         only from the header menu, which is the one place nobody looks for a
         tool they do not already know exists.
       */}
-      <ul className="reveal-row mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="sd-swing mt-4 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
         {SECONDARY.map(({ href, icon: Icon, title, body }) => (
           <li key={href} className="bg-surface">
             {/*
@@ -229,7 +229,7 @@ function Featured({
       href={lp(href)}
       // One of a list: prefetching each would burst past the rate limit -- see site-footer.
       prefetch={false}
-      className="card card-interactive group flex flex-col gap-4 p-5 hover:bg-surface-2/30"
+      className="sd-swing card card-interactive group flex flex-col gap-4 p-5 hover:bg-surface-2/30"
     >
       <div className="flex items-center gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2">

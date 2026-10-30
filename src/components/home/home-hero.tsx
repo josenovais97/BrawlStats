@@ -70,7 +70,7 @@ export function HomeHero({ stats }: { stats?: ReactNode }) {
             come before the artwork, so the stage is a later sibling that the
             desktop grid pulls up beside the copy.
           */}
-          <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-10">
+          <div className="sd-lobby-out grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-10">
             <div className="reveal-now min-w-0">
               {/*
                 Three lines, and only the last one gold.

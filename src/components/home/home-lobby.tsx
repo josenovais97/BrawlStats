@@ -29,10 +29,11 @@ export async function HomeLobby() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <section aria-labelledby="today" className="min-w-0">
-      <h2 id="today" className="display text-game-stroke text-3xl sm:text-4xl">{t('Today in Brawl Stars')}</h2>
+    <section aria-labelledby="today" className="sd-lobby min-w-0">
+      <h2 id="today" className="sd-slam display text-game-stroke text-3xl sm:text-4xl">{t('Today in Brawl Stars')}</h2>
       <ul className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0">
         <LobbyTile
+          index={0}
           href={lp('/rewards')}
           tone="linear-gradient(180deg, #ffbf3a 0%, #f2860f 100%)"
           label={t('Free rewards')}
@@ -55,6 +56,7 @@ export async function HomeLobby() {
         />
         {giveaway ? (
           <LobbyTile
+            index={1}
             href={lp('/giveaway')}
             tone="linear-gradient(180deg, #a06bff 0%, #5a2fd1 100%)"
             label={t('Giveaway')}
@@ -73,6 +75,7 @@ export async function HomeLobby() {
           />
         ) : null}
         <LobbyTile
+          index={giveaway ? 2 : 1}
           href={lp('/daily-challenge')}
           tone="linear-gradient(180deg, #3cc8ff 0%, #1668de 100%)"
           label={t('Daily challenge')}
@@ -91,6 +94,7 @@ export async function HomeLobby() {
 }
 
 function LobbyTile({
+  index,
   href,
   tone,
   label,
@@ -101,6 +105,8 @@ function LobbyTile({
   art,
   umami,
 }: {
+  /** Position in the row, for the deal-in stagger. */
+  index: number;
   href: string;
   /** The tile's colour, as a CSS background. */
   tone: string;
@@ -114,7 +120,7 @@ function LobbyTile({
   umami?: string;
 }) {
   return (
-    <li className="w-[78%] shrink-0 snap-center sm:w-auto">
+    <li className="sd-deal w-[78%] shrink-0 snap-center sm:w-auto" style={{ '--i': index } as CSSProperties}>
       <Link
         href={href}
         prefetch={false}
