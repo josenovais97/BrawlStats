@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Lilita_One } from 'next/font/google';
 import Script from 'next/script';
 
 import { AdsenseLoader } from '@/components/ads/adsense-loader';
+import { ScrollFx } from '@/components/scroll-fx';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { InstallPrompt } from '@/components/install-prompt';
 import { PwaTelemetry } from '@/components/pwa-telemetry';
@@ -118,6 +119,8 @@ export default function RootLayout({
           </main>
           <SiteFooter />
         </div>
+        {/* Entrance animations, site-wide; never hides what is already on screen. */}
+        <ScrollFx />
         <InstallPrompt />
         <PwaTelemetry />
         {/* Google AdSense, website only: never on the Bubble panel (see the component). */}

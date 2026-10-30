@@ -29,8 +29,8 @@ export async function HomeLobby() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <section aria-labelledby="today" className="sd-lobby min-w-0">
-      <h2 id="today" className="sd-slam display text-game-stroke text-3xl sm:text-4xl">{t('Today in Brawl Stars')}</h2>
+    <section aria-labelledby="today" className="min-w-0">
+      <h2 id="today" className="display text-game-stroke text-3xl sm:text-4xl">{t('Today in Brawl Stars')}</h2>
       <ul className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0">
         <LobbyTile
           index={0}
@@ -120,7 +120,7 @@ function LobbyTile({
   umami?: string;
 }) {
   return (
-    <li className="sd-deal w-[78%] shrink-0 snap-center sm:w-auto" style={{ '--i': index } as CSSProperties}>
+    <li data-fx="deal" className="w-[78%] shrink-0 snap-center sm:w-auto" style={{ '--i': index } as CSSProperties}>
       <Link
         href={href}
         prefetch={false}

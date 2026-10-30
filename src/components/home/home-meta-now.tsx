@@ -34,9 +34,9 @@ export async function HomeMetaNow() {
   if (top.length === 0) return null;
 
   return (
-    <section aria-labelledby="meta-now" className="sd-meta min-w-0">
+    <section aria-labelledby="meta-now" className="min-w-0">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 id="meta-now" className="sd-slam display text-game-stroke text-3xl sm:text-4xl">{t('Best in Ranked right now')}</h2>
+        <h2 id="meta-now" className="display text-game-stroke text-3xl sm:text-4xl">{t('Best in Ranked right now')}</h2>
         <Link
           href={lp('/tier-list/ranked')}
           className="btn-game inline-flex shrink-0 items-center bg-surface-3 px-4 py-2 text-base text-white [--btn-shadow:var(--ink)] hover:bg-[#31439a]"
@@ -47,7 +47,7 @@ export async function HomeMetaNow() {
 
       <ol className="-mx-4 mt-5 flex snap-x gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-4 sm:overflow-visible sm:px-0">
         {top.map((b, i) => (
-          <li key={b.brawlerId} className="sd-pop w-[40%] shrink-0 snap-start sm:w-auto" style={{ '--i': i } as CSSProperties}>
+          <li key={b.brawlerId} className="w-[40%] shrink-0 snap-start sm:w-auto">
             <Link
               href={lp(brawlerPath(b.brawlerId, b.name))}
               prefetch={false}
@@ -60,8 +60,8 @@ export async function HomeMetaNow() {
               />
               <span className="display absolute left-2 top-2 z-10 text-sm text-muted">#{i + 1}</span>
               <span
-                className="sd-stamp tier-badge tier-badge-sm absolute right-2 top-2 z-10"
-                style={{ '--tier': TIER_COLOR[b.tier], '--i': i } as CSSProperties}
+                className="tier-badge tier-badge-sm absolute right-2 top-2 z-10"
+                style={{ '--tier': TIER_COLOR[b.tier] } as CSSProperties}
                 title={t('{tier} tier', { tier: b.tier })}
               >
                 <span aria-hidden className="display text-game-stroke text-xl leading-none">{b.tier}</span>
@@ -86,9 +86,9 @@ export async function HomeMetaNow() {
       </ol>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div className="sd-swing card min-w-0 space-y-3 p-4 sm:p-5">
+        <div className="card min-w-0 space-y-3 p-4 sm:p-5">
           <h3 className="display text-xl">{t('Tier list at your rank')}</h3>
-          <ul className="grid grid-cols-2 gap-2">
+          <ul data-fx-cascade className="grid grid-cols-2 gap-2">
             {RANK_BRACKETS.map((b) => (
               <li key={b.slug} className="min-w-0">
                 <Link
@@ -103,7 +103,7 @@ export async function HomeMetaNow() {
             ))}
           </ul>
         </div>
-        <div className="sd-swing card min-w-0 space-y-3 p-4 sm:p-5">
+        <div className="card min-w-0 space-y-3 p-4 sm:p-5">
           <h3 className="display text-xl">{t('How to counter…')}</h3>
           <p className="text-sm text-muted">{t('Pick the brawler you keep losing to.')}</p>
           <CounterSearch brawlers={all} />

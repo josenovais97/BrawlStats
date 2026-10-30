@@ -42,7 +42,7 @@ export function HomeSection({
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
           {/* No label above the title any more (2026-10-30): the title says it. */}
-          <h2 id={id} className="sd-slam display text-game-stroke text-3xl sm:text-4xl">
+          <h2 id={id} className="display text-game-stroke text-3xl sm:text-4xl">
             {t(title)}
           </h2>
           {subtitle ? (

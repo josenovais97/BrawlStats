@@ -213,17 +213,11 @@ body {
   }
 }
 
+/* Scroll-scrubbed fade-ups, retired 2026-10-30 for ScrollFx (entrances that
+   play once, see scroll-fx.tsx): a reader who stopped mid-fade saw half-faded
+   panels. Kept as names so the markup that carries them stays valid. */
 @utility reveal {
-  @supports (animation-timeline: view()) {
-    animation: reveal linear both;
-    animation-timeline: view();
-    /*
-     * Finishes while the element is still entering, so anything more than
-     * halfway on screen is already at full opacity. Ranges that run into
-     * `cover` leave tall sections faded for most of their height.
-     */
-    animation-range: entry 0% entry 55%;
-  }
+  --reveal: none;
 }
 
 /*
@@ -287,28 +281,7 @@ body {
  * long finished, and the row reads as broken rather than choreographed.
  */
 @utility reveal-row {
-  @supports (animation-timeline: view()) {
-    & > * {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 55%;
-    }
-    & > *:nth-child(2) {
-      animation-range: entry 7% entry 62%;
-    }
-    & > *:nth-child(3) {
-      animation-range: entry 14% entry 69%;
-    }
-    & > *:nth-child(4) {
-      animation-range: entry 21% entry 76%;
-    }
-    & > *:nth-child(5) {
-      animation-range: entry 28% entry 83%;
-    }
-    & > *:nth-child(n + 6) {
-      animation-range: entry 35% entry 90%;
-    }
-  }
+  --reveal-row: none;
 }
 
 /*
@@ -946,86 +919,79 @@ body {
   }
 }
 
+
 /*
- * The landing page's scroll scenes (2026-10-30), in the game's own motion:
- * banners slam in, event tiles are dealt like cards, brawlers pop up and
- * their tier is stamped on, panels swing up into place, and the lobby drifts
- * away as you leave it. Driven by scroll position in CSS alone -- no script,
- * nothing to download, nothing on the main thread -- so it costs the phone
- * nothing. Browsers without scroll timelines (Firefox today) and anyone
- * asking for reduced motion get the page as it stands, never hidden content.
- *
- * Lists that scroll sideways on a phone are their own scroll containers, so
- * their items follow a named timeline set on the section (--lobby, --meta)
- * rather than view(), which would bind to the sideways scroller and never
- * move. --i is each item's index, for the stagger.
+ * ScrollFx entrances (2026-10-30; see scroll-fx.tsx). Everything here applies
+ * only once the script has put `fx-ready` on <html>, so a page without it is
+ * simply visible. `backwards` fill, never `both`: once an entrance ends it
+ * lets go of `transform`, or hover lifts and button presses would stop
+ * working on everything it touched.
  */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .sd-slam {
-      animation: sd-slam linear both;
-      animation-timeline: view();
-      animation-range: entry 15% cover 32%;
-      transform-origin: left center;
-    }
-    .sd-lobby { view-timeline: --lobby block; }
-    .sd-deal {
-      animation: sd-deal linear both;
-      animation-timeline: --lobby;
-      animation-range: entry calc(10% + var(--i, 0) * 12%) cover calc(30% + var(--i, 0) * 8%);
-    }
-    .sd-meta { view-timeline: --meta block; }
-    .sd-pop {
-      animation: sd-pop linear both;
-      animation-timeline: --meta;
-      animation-range: entry calc(8% + var(--i, 0) * 7%) cover calc(22% + var(--i, 0) * 5%);
-    }
-    .sd-stamp {
-      animation: sd-stamp linear both;
-      animation-timeline: --meta;
-      animation-range: entry calc(30% + var(--i, 0) * 7%) cover calc(30% + var(--i, 0) * 5%);
-    }
-    .sd-swing {
-      animation: sd-swing linear both;
-      animation-timeline: view();
-      animation-range: entry 5% cover 28%;
-      transform-origin: center bottom;
-    }
-    /* Desktop only: on a phone the hero is taller than the screen, and the
-       search box would fade while it is still being used. */
-    @media (min-width: 1024px) {
-      .sd-lobby-out {
-        animation: sd-lobby-out linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 75vh;
-      }
-    }
+html.fx-ready [data-fx]:not(.fx-in) {
+  opacity: 0;
+}
+html.fx-ready [data-fx].fx-in:not(.fx-instant) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-delay: var(--fx-delay, 0ms);
+  animation-fill-mode: backwards;
+}
+html.fx-ready [data-fx='slam'].fx-in:not(.fx-instant) {
+  animation-name: fx-slam;
+  animation-duration: 520ms;
+  transform-origin: left center;
+}
+html.fx-ready [data-fx='pop'].fx-in:not(.fx-instant) { animation-name: fx-pop; }
+html.fx-ready [data-fx='rise'].fx-in:not(.fx-instant) { animation-name: fx-rise; animation-duration: 460ms; }
+html.fx-ready [data-fx='deal'].fx-in:not(.fx-instant) { animation-name: fx-deal; animation-duration: 680ms; }
+html.fx-ready [data-fx='stamp'].fx-in:not(.fx-instant) { animation-name: fx-stamp; animation-duration: 480ms; }
+
+@keyframes fx-slam {
+  0% { opacity: 0; transform: scale(1.32) rotate(-4deg); }
+  55% { opacity: 1; transform: scale(0.95) rotate(1deg); }
+  78% { transform: scale(1.02) rotate(-0.4deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-pop {
+  0% { opacity: 0; transform: translateY(34px) scale(0.9); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.025); }
+  82% { transform: translateY(2px) scale(0.995); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-rise {
+  0% { opacity: 0; transform: translateY(18px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-deal {
+  0% { opacity: 0; transform: translate(70px, 30px) rotate(12deg) scale(0.82); }
+  62% { opacity: 1; transform: translate(-6px, -8px) rotate(-2.5deg) scale(1.04); }
+  84% { transform: translate(2px, 2px) rotate(0.6deg) scale(0.99); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fx-stamp {
+  0% { opacity: 0; transform: scale(2.7) rotate(-26deg); }
+  65% { opacity: 1; transform: scale(0.86) rotate(5deg); }
+  85% { transform: scale(1.06) rotate(-1deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* The "Today" tiles keep a glint sweeping across them now and then, the way
+   the game makes its rarest items shine. One sweep per tile every few
+   seconds, offset per tile so they never flash together. */
+@media (prefers-reduced-motion: no-preference) {
+  .lobby-tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.42) 50%, transparent 62%);
+    transform: translateX(-130%);
+    animation: fx-glint 5.5s ease-in-out infinite;
+    animation-delay: calc(1.2s + var(--i, 0) * 1.4s);
   }
 }
-@keyframes sd-slam {
-  0% { opacity: 0; transform: scale(1.25) rotate(-4deg); }
-  65% { opacity: 1; transform: scale(0.97) rotate(1deg); }
-  100% { opacity: 1; transform: none; }
-}
-@keyframes sd-deal {
-  0% { opacity: 0; transform: translate(35%, 25%) rotate(calc(14deg - var(--i, 0) * 6deg)) scale(0.82); }
-  70% { opacity: 1; transform: translate(0, -4%) rotate(-1.5deg) scale(1.03); }
-  100% { opacity: 1; transform: none; }
-}
-@keyframes sd-pop {
-  0% { opacity: 0; transform: translateY(45%) scale(0.7); }
-  70% { opacity: 1; transform: translateY(-7%) scale(1.05); }
-  100% { opacity: 1; transform: none; }
-}
-@keyframes sd-stamp {
-  0% { opacity: 0; transform: scale(2.8) rotate(-28deg); }
-  75% { opacity: 1; transform: scale(0.88) rotate(5deg); }
-  100% { opacity: 1; transform: none; }
-}
-@keyframes sd-swing {
-  0% { opacity: 0; transform: perspective(900px) rotateX(38deg) translateY(18%); }
-  100% { opacity: 1; transform: none; }
-}
-@keyframes sd-lobby-out {
-  to { opacity: 0.15; transform: translateY(-14vh) scale(0.92); }
+@keyframes fx-glint {
+  0% { transform: translateX(-130%); }
+  18%, 100% { transform: translateX(130%); }
 }
