@@ -41,8 +41,16 @@ export async function HomeLobby() {
           cta={reward ? t('Claim it') : t('Get the next one')}
           ctaClass="bg-[#3ddc63] text-[#0b2a14] [--btn-shadow:#1a7a33]"
           art={
-            /* eslint-disable-next-line @next/next/no-img-element -- our own reward art, as on /rewards */
-            <img src={reward?.art ?? '/rewards/gift.png'} alt="" width={160} height={160} className="reward-float size-32 object-contain sm:size-36" />
+            reward ? (
+              /* The reward's game art, our own box if it does not load (as on /rewards). */
+              <object data={reward.art} type="image/png" aria-hidden className="reward-float block size-32 sm:size-36">
+                {/* eslint-disable-next-line @next/next/no-img-element -- our own fallback art */}
+                <img src={reward.fallbackArt} alt="" width={140} height={140} className="size-32 object-contain sm:size-36" />
+              </object>
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element -- our own gift art */
+              <img src="/rewards/gift.png" alt="" width={140} height={140} className="reward-float size-32 object-contain sm:size-36" />
+            )
           }
         />
         {giveaway ? (

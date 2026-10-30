@@ -103,10 +103,7 @@ export async function HomeTools() {
     <section className="reveal" aria-labelledby="tools">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div className="min-w-0">
-          <p className="flex items-center gap-2.5">
-            <span className="eyebrow">{t('Everything else')}</span>
-          </p>
-          <h2 id="tools" className="display text-game-stroke mt-2.5 text-2xl sm:text-4xl">{t('Tools')}</h2>
+          <h2 id="tools" className="display text-game-stroke text-3xl sm:text-4xl">{t('Tools')}</h2>
         </div>
         <p className="text-sm text-muted">{t('All of it from our own sampled battles.')}</p>
       </div>
@@ -239,7 +236,7 @@ function Featured({
           {icon}
         </span>
         <div className="min-w-0">
-          <h3 className="display text-lg uppercase leading-none">{t(title)}</h3>
+          <h3 className="display text-xl leading-none">{t(title)}</h3>
           <p className="mt-1.5 text-sm leading-snug text-muted">{t(body)}</p>
         </div>
       </div>

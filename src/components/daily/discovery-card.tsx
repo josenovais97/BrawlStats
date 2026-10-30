@@ -184,7 +184,7 @@ export function DiscoveryCard({
 
         <div className="min-w-0 flex-1">
           <p
-            className="text-xs font-bold uppercase tracking-wide"
+            className="display text-base"
             style={{ color: accent }}
           >
             {t(copy.eyebrow)}
