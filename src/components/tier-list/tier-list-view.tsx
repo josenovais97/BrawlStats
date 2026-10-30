@@ -629,23 +629,15 @@ function TierRow({
           tier is — which is information the eye otherwise has to gather by
           scanning the row.
         */}
+        {/* Since 2026-10-30 a solid slab of the tier colour with the letter
+            in the game's outlined lettering, like the tier badges elsewhere:
+            a tint was a web table's idea of a tier. */}
         <div
-          className="relative flex shrink-0 items-center justify-center gap-3 px-6 py-3 sm:w-24 sm:flex-col sm:gap-1 sm:py-6"
-          style={{
-            background: `linear-gradient(155deg, color-mix(in srgb, ${color} 52%, transparent) 0%, color-mix(in srgb, ${color} 14%, transparent) 65%, transparent 100%)`,
-            boxShadow: `inset 0 1px 0 color-mix(in srgb, #ffffff 12%, transparent), inset -1px 0 0 color-mix(in srgb, ${color} 45%, transparent)`,
-          }}
+          className="tier-band relative flex shrink-0 items-center gap-3 px-4 py-2 sm:w-24 sm:flex-col sm:justify-center sm:gap-1.5 sm:py-6"
+          style={{ '--tier': color } as React.CSSProperties}
         >
-          <span
-            className="text-4xl font-black leading-none"
-            style={{
-              color,
-              textShadow: `0 0 26px color-mix(in srgb, ${color} 60%, transparent)`,
-            }}
-          >
-            {tier}
-          </span>
-          <span className="label-game text-xs text-muted">
+          <span className="display text-game-stroke text-4xl leading-none text-white sm:text-5xl">{tier}</span>
+          <span className="label-game ml-auto rounded-full bg-black/30 px-2.5 py-0.5 text-sm text-white sm:ml-0">
             {entries.length}
           </span>
         </div>
@@ -658,7 +650,7 @@ function TierRow({
                 key={entry.brawlerId}
                 href={brawlerPath(entry.brawlerId, entry.brawlerName)}
                 style={{ '--tier': color } as React.CSSProperties}
-                className="group w-[92px] rounded-xl border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.05)_0%,transparent_45%),var(--surface-2)] p-2 transition-[transform,border-color,box-shadow] duration-150 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--tier)_55%,transparent)] hover:shadow-[0_8px_20px_-10px_color-mix(in_srgb,var(--tier)_70%,transparent)]"
+                className="tier-chip group w-[92px] p-2"
                 title={copy.chipTitle({
                   name: entry.brawlerName,
                   score: String(entry.metaScore ?? '?'),
@@ -686,12 +678,12 @@ function TierRow({
                 ) : (
                   <div className="mx-auto aspect-square w-full rounded-lg bg-surface" />
                 )}
-                <p className="mt-1 truncate text-center text-xs font-semibold capitalize">
+                <p className="display mt-1 truncate text-center text-sm capitalize leading-tight">
                   {entry.brawlerName.toLowerCase()}
                 </p>
                 {/* Score leads, because it is what the ordering uses. The two
                   inputs sit underneath so the number is never a black box. */}
-                <p className="text-center text-sm font-black tabular-nums" style={{ color }}>
+                <p className="display text-game-stroke text-center text-lg leading-tight tabular-nums" style={{ color }}>
                   {entry.metaScore !== null && entry.metaScore !== undefined ? fmtDecimal(entry.metaScore, locale) : '–'}
                 </p>
                 {/*

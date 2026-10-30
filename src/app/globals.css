@@ -922,6 +922,38 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .lobby-tile { transition: none; }
 }
+/* Tier list rows (2026-10-30; tier-list-view.tsx): the band is a solid slab
+   of the tier colour (--tier), lit at the top, on a dark edge; each brawler
+   is a small game tile that lifts towards you and presses. */
+.tier-band {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tier) 100%, #fff 18%) 0%, var(--tier) 50%, color-mix(in srgb, var(--tier) 100%, #000 24%) 100%);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35);
+  border-bottom: 2px solid var(--ink);
+}
+@media (min-width: 640px) {
+  .tier-band { border-bottom: 0; border-right: 2px solid var(--ink); }
+}
+.tier-chip {
+  display: block;
+  border: 2px solid var(--ink);
+  border-radius: 0.85rem;
+  background: linear-gradient(180deg, #2a3d94 0%, var(--surface-2) 45%, #18235e 100%);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.12), 0 3px 0 var(--ink);
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.tier-chip:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--tier) 70%, var(--ink));
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.12), 0 6px 0 var(--ink);
+}
+.tier-chip:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.12), 0 1px 0 var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tier-chip { transition: none; }
+}
+
 /* A brawler card as the game's collection draws one (2026-10-30; see
    brawler-browser.tsx): the whole card in the rarity colour (--rarity),
    lit at the top and darkening to the foot, the portrait framed in it and
