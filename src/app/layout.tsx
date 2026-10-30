@@ -104,7 +104,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${lilita.variable}`}
     >
       <body className="antialiased">
-        <div className="flex min-h-dvh flex-col">
+        {/* overflow-x: clip here, not only on body (2026-10-30): body's value
+            is handed to the viewport, and a phone still widened its layout
+            viewport to fit anything wider -- 569px of page on a 412px screen,
+            so the page zoomed out and every scroll animation ran early.
+            `clip` makes no scroll container, so the sticky header still works. */}
+        <div className="flex min-h-dvh flex-col overflow-x-clip">
           <SiteHeader />
           <GiveawayStrip />
           <LanguageSuggest />
