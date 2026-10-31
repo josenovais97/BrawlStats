@@ -116,13 +116,16 @@ async function checkStarrDrops(): Promise<string[]> {
     return problems;
   }
 
+  // Boxes come from the `Boxes/…` subpages, not this page, so they are not
+  // part of this count.
+  const fromPage = parsed.types.filter((t) => t.group !== 'box');
   const onWiki = groups.flatMap((g) => sectionsAt(g.body, 3));
-  if (onWiki.length !== parsed.types.length) {
+  if (onWiki.length !== fromPage.length) {
     problems.push(
-      `Starr Drops: the wiki lists ${onWiki.length} drop types and ${parsed.types.length} parsed` +
+      `Starr Drops: the wiki lists ${onWiki.length} drop types and ${fromPage.length} parsed` +
         ` (missing: ${onWiki
           .map((s) => s.heading)
-          .filter((h) => !parsed.types.some((t) => t.name === h))
+          .filter((h) => !fromPage.some((t) => t.name === h))
           .join(', ') || 'none by name'})`,
     );
   }
