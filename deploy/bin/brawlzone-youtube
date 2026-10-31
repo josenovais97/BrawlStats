@@ -54,13 +54,32 @@ try:
     l10n = json.load(open(sys.argv[3], encoding='utf-8')) if sys.argv[3] and os.path.exists(sys.argv[3]) else {}
 except ValueError:
     l10n = {}
-# The subscribe ask leads: YouTube shows two lines of a Short's description
-# before "more", and the channel needs 100 subscribers for the Creator Code.
-# The giveaway (2026-10-27 to 2026-11-30 20:00 UTC) second, while it runs:
+# The comment question and the subscribe ask lead: YouTube shows two lines of
+# a Short's description before "more". The giveaway (2026-10-27 to 2026-11-30 20:00 UTC) second, while it runs:
 # the site's banners only reach people already on the site.
-import datetime
+import datetime, re
 giveaway = (datetime.datetime.now(datetime.timezone.utc) < datetime.datetime(2026, 11, 30, 20, tzinfo=datetime.timezone.utc))
-desc = ('🔔 Subscribe for new Brawl Stars Ranked picks every day: '
+# A question to answer in the comments, ahead of the subscribe ask (2026-10-31):
+# the Supercell Creators quests count YouTube comments, and the Shorts with the
+# most comments were the ones that asked something. A ranking also gets the
+# question in its title, the only text the Shorts feed shows, when it fits.
+low = title.lower()
+ranking = bool(re.search(r'\b(ranked from|best|worst|tier)\b', low)) and not low.startswith('how to')
+if 'guess' in low:
+    ask = "💬 How many did you get right? Comment your score 👇"
+elif ranking:
+    ask = "💬 Agree? Comment who you'd move up or down 👇"
+    if not title.rstrip().endswith('?') and len(title) + len(' Agree? 👇 #Shorts') <= 100:
+        title = f'{title} Agree? 👇'
+elif low.startswith('how to beat') or 'counter' in low:
+    ask = "💬 What do you pick against them? Comment below 👇"
+else:
+    ask = "💬 Who's your main? Comment below 👇"
+ASK = {'pt': '💬 Concorda? Comente o seu main 👇', 'es': '💬 ¿De acuerdo? Comenta tu main 👇'}
+for lang, v in l10n.items():
+    if lang in ASK and v.get('description'):
+        v['description'] = ASK[lang] + '\n' + v['description']
+desc = ask + '\n' + ('🔔 Subscribe for new Brawl Stars Ranked picks every day: '
         'https://www.youtube.com/@brawlzonenet?sub_confirmation=1\n'
         + ('🎁 Giveaway: win the Brawl Pass, free to enter: https://brawlzone.net/giveaway\n' if giveaway else '')
         + '\n' + desc)
