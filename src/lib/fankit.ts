@@ -33,6 +33,7 @@ const accessories: Record<string, string> = data.accessories;
 const hypercharges: Record<string, string> = data.hypercharges;
 const modes: Record<string, string> = data.modes;
 const gears: Record<string, string> = data.gears;
+const items: Record<string, string> = data.items;
 
 /** The brawler's default skin, full body, trimmed to the figure. */
 export function fankitBody(brawlerId: number): string | null {
@@ -84,6 +85,15 @@ export function fankitMode(modeName: string, width = 96): string | null {
  */
 export function fankitGear(gearName: string, brawlerName?: string | null, width = 128): string | null {
   const url = gears[norm(gearName)] ?? (brawlerName ? gears[`mythic:${norm(brawlerName)}`] : undefined);
+  return url ? `${url}?width=${width}` : null;
+}
+
+/**
+ * A reward's or box's art, by the wiki file name the Starr Drops and
+ * free-rewards pages look it up under ("Gigi Box.png", "Icon-Gem.png").
+ */
+export function fankitItem(wikiFile: string, width = 192): string | null {
+  const url = items[norm(wikiFile.replace(/\.(png|jpe?g|gif|webp)$/i, ''))];
   return url ? `${url}?width=${width}` : null;
 }
 

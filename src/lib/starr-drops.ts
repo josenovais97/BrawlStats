@@ -1,4 +1,5 @@
 import { WIKI_API, fetchWikiJson, subsections, toPlainText } from '@/lib/wiki';
+import { fankitItem } from '@/lib/fankit';
 import { fankitGeneric } from '@/lib/fankit-icons';
 
 /**
@@ -394,7 +395,14 @@ function artworkFile(body: string): string | null {
  */
 async function resolveArtwork(files: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
-  const unique = [...new Set(files)];
+  // The Fan Kit's picture where it has the item (lib/fankit); only the rest
+  // are asked of the wiki.
+  const unique: string[] = [];
+  for (const file of new Set(files)) {
+    const official = fankitItem(file);
+    if (official) out.set(file, official);
+    else unique.push(file);
+  }
   if (unique.length === 0) return out;
 
   // The API takes 50 titles a request; with the boxes the page needs more.

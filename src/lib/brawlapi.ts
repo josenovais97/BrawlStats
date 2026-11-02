@@ -1,4 +1,4 @@
-import { fankitIcon, fankitLeague, fankitPlayerIcon, fankitRank } from '@/lib/fankit-icons';
+import { fankitClubBadge, fankitIcon, fankitLeague, fankitPlayerIcon, fankitRank } from '@/lib/fankit-icons';
 import { stripGameMarkup } from '@/lib/format';
 import type {
   BAAccessory,
@@ -287,7 +287,8 @@ export function cdnBrawlerIconUrl(brawlerId: number): string {
 }
 
 export function clubBadgeUrl(badgeId: number | undefined): string {
-  return `https://cdn.brawlify.com/club-badges/regular/${badgeId ?? 8000000}.png`;
+  // The Fan Kit's own file where it has the badge (lib/fankit-icons).
+  return fankitClubBadge(badgeId ?? 8000000) ?? `https://cdn.brawlify.com/club-badges/regular/${badgeId ?? 8000000}.png`;
 }
 
 /**

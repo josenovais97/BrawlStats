@@ -138,8 +138,18 @@ unplaced = []
 # the framed badge is the game's own look, so it wins, and so does the
 # shortest title when two name the same thing (`gadget_nori_1` over
 # `gadget_nori_1_1`).
+# Files named for an ability the game calls something else, matched by eye
+# against the old icons (2026-11-02).
+ACCESSORY_FILES = {
+    'damian_gadget_thirsty': 23001247, 'damian_gadget_builder': 23001248,  # Spiritual Healing, Wall Of Sound
+    'damian_starpower_tko': 23001245, 'damian_starpower_firepower': 23001246,  # Crowdkill, Vulgar Display Of Punch
+    'starrnova_gadget_fluffytime': 23001255,  # Floaty Time
+}
 for kind, field in (('Gadgets', 'gadgets'), ('Star Powers', 'starPowers')):
     for a in sorted(assets(kind), key=lambda a: len(a['title'])):
+        if a['title'].lower() in ACCESSORY_FILES:
+            index['accessories'].setdefault(str(ACCESSORY_FILES[a['title'].lower()]), file_url(a))
+            continue
         words = tokens(a['title'])
         if {'icon', 'emoji'} & set(words) or any(w.startswith('starpowerbase') for w in words):
             continue
@@ -523,9 +533,8 @@ for rank, league, n in tiers:
 # by game id under a year-long immutable cache, so a corrected picture needs a
 # new folder, not a new file.
 PLAYER_INDEX = os.path.join(ROOT, 'scripts', 'fankit-player-icons.json')
-PLAYER_DIR = os.path.join(ROOT, 'public', 'fankit', 'player')
-PLAYER_W = 160
-PLAYER_MATCH_RMS = 10
+CLUB_INDEX = os.path.join(ROOT, 'scripts', 'fankit-club-badges.json')
+MATCH_RMS = 10
 
 
 def thumb_feature(url):
@@ -542,71 +551,125 @@ def safe(f, *args):
         return None
 
 
-game_icons = fetch('https://api.brawlapi.com/v1/icons')['player']
-try:
-    with open(PLAYER_INDEX) as f:
-        player_known = json.load(f)
-except FileNotFoundError:
-    player_known = {}
-kit_icons = assets('Player Icons')
-_ids = {a['id'] for a in kit_icons}
-kit_icons += [a for a in EVERYTHING if a['id'] not in _ids and re.match(r'(player|profile)[ _]icon', a['title'].lower())]
-todo = [v for k, v in sorted(game_icons.items()) if k not in player_known and not v.get('brawler')]
-if todo:
+def load_known(path):
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+
+def match_by_image(known, game, kit):
+    """Adds to `known` each game icon whose picture is unmistakably a kit file."""
+    todo = [v for k, v in sorted(game.items()) if k not in known and not v.get('brawler')]
+    if not todo or not kit:
+        return
     with ThreadPoolExecutor(max_workers=3) as pool:
-        kit_f = list(pool.map(lambda a: safe(thumb_feature, a['generic_url'].replace('{width}', '64')), kit_icons))
+        kit_f = list(pool.map(lambda a: safe(thumb_feature, a['generic_url'].replace('{width}', '64')), kit))
         game_f = list(pool.map(lambda v: safe(thumb_feature, v['imageUrl']), todo))
-    kit_ok = [(a, f) for a, f in zip(kit_icons, kit_f) if f is not None]
+    kit_ok = [(a, f) for a, f in zip(kit, kit_f) if f is not None]
     K = np.stack([f for _, f in kit_ok])
     for v, f in zip(todo, game_f):
         if f is None:
             continue
         rms = np.sqrt(((K - f) ** 2).mean(axis=1))
         i = int(rms.argmin())
-        if rms[i] < PLAYER_MATCH_RMS:
-            player_known[str(v['id'])] = file_url(kit_ok[i][0])
+        if rms[i] < MATCH_RMS:
+            known[str(v['id'])] = file_url(kit_ok[i][0])
+
+
+def write_icons(known, folder, size):
+    """Saves each known icon as public/fankit/<folder>/<game id>.webp, once."""
+    out = os.path.join(ROOT, 'public', 'fankit', folder)
+
+    def save(item):
+        gid, src = item
+        path = os.path.join(out, f'{gid}.webp')
+        if os.path.exists(path):
+            return gid
+        if src.startswith('icon:'):
+            img = Image.open(os.path.join(ROOT, 'public', icon_index[src[5:]].lstrip('/'))).convert('RGBA')
+        else:
+            img = Image.open(io.BytesIO(fetch(f'{src}?width={size}', binary=True))).convert('RGBA')
+        img.thumbnail((size, size), Image.LANCZOS)
+        canvas = Image.new('RGBA', (max(img.size),) * 2, (0, 0, 0, 0))
+        canvas.paste(img, ((canvas.width - img.width) // 2, (canvas.height - img.height) // 2), img)
+        canvas.save(path, 'WEBP', quality=80, method=6)
+        return gid
+
+    if CHECK:
+        return list(known)
+    os.makedirs(out, exist_ok=True)
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        return [g for g in pool.map(lambda it: safe(save, it), sorted(known.items())) if g]
+
+
+def id_ranges(ids, base):
+    """The client's list of ids with a file: offsets from `base` as ranges ("0-2,5,9-40")."""
+    offsets = sorted(int(g) - base for g in ids)
+    ranges, start = [], None
+    for i, o in enumerate(offsets):
+        if start is None:
+            start = o
+        if i + 1 == len(offsets) or offsets[i + 1] != o + 1:
+            ranges.append(str(start) if start == o else f'{start}-{o}')
+            start = None
+    return ','.join(ranges)
+
+
+game_icon_lists = fetch('https://api.brawlapi.com/v1/icons')
+game_icons, game_clubs = game_icon_lists['player'], game_icon_lists['club']
+
+player_known = load_known(PLAYER_INDEX)
+kit_icons = assets('Player Icons')
+_ids = {a['id'] for a in kit_icons}
+kit_icons += [a for a in EVERYTHING if a['id'] not in _ids and re.match(r'(player|profile)[ _]icon', a['title'].lower())]
+match_by_image(player_known, game_icons, kit_icons)
 # The brawler icons, from the square portraits made above.
 for k, v in game_icons.items():
     if v.get('brawler') and k not in player_known and str(v['brawler']) in icon_index:
         player_known[k] = f"icon:{v['brawler']}"
-
-
-def save_player(item):
-    gid, src = item
-    path = os.path.join(PLAYER_DIR, f'{gid}.webp')
-    if os.path.exists(path):
-        return gid
-    if src.startswith('icon:'):
-        img = Image.open(os.path.join(ROOT, 'public', icon_index[src[5:]].lstrip('/'))).convert('RGBA')
-    else:
-        img = Image.open(io.BytesIO(fetch(f'{src}?width={PLAYER_W}', binary=True))).convert('RGBA')
-    img.thumbnail((PLAYER_W, PLAYER_W), Image.LANCZOS)
-    canvas = Image.new('RGBA', (max(img.size),) * 2, (0, 0, 0, 0))
-    canvas.paste(img, ((canvas.width - img.width) // 2, (canvas.height - img.height) // 2), img)
-    canvas.save(path, 'WEBP', quality=80, method=6)
-    return gid
-
-
-if not CHECK:
-    os.makedirs(PLAYER_DIR, exist_ok=True)
-    with ThreadPoolExecutor(max_workers=3) as pool:
-        written = [g for g in pool.map(lambda it: safe(save_player, it), sorted(player_known.items())) if g]
-else:
-    written = list(player_known)
-# The client's list of ids with a file: offsets from 28000000, as ranges
-# ("0-2,5,9-40"), a couple of kilobytes for a thousand icons.
-offsets = sorted(int(g) - 28000000 for g in written)
-ranges, start = [], None
-for i, o in enumerate(offsets):
-    if start is None:
-        start = o
-    if i + 1 == len(offsets) or offsets[i + 1] != o + 1:
-        ranges.append(str(start) if start == o else f'{start}-{o}')
-        start = None
-icon_index['players'] = ','.join(ranges)
+written = write_icons(player_known, 'player', 160)
+icon_index['players'] = id_ranges(written, 28000000)
 print(f"player icons {len(written)}/{len(game_icons)} "
       f"({sum(not str(v).startswith('icon:') for v in player_known.values())} matched, "
       f"{sum(str(v).startswith('icon:') for v in player_known.values())} brawler portraits)")
+
+# Club badges, the same way. The kit has only a handful (`icon_club_badge_1`
+# to `_10`), so most clubs keep the mirror's badge.
+club_known = load_known(CLUB_INDEX)
+match_by_image(club_known, game_clubs,
+               [a for a in EVERYTHING if re.match(r'icon_club_badge_\d+$', a['title'].lower())])
+clubs_written = write_icons(club_known, 'club', 128)
+icon_index['clubs'] = id_ranges(clubs_written, 8000000)
+print(f'club badges {len(clubs_written)}/{len(game_clubs)}')
+
+# Reward and box art for the Starr Drops and free-rewards pages, keyed by the
+# wiki file name those pages look up (letters and digits only: "Gigi Box.png"
+# -> gigibox), so the Fan Kit's picture is used and the wiki is not asked.
+# Matched by eye against the wiki's files on 2026-11-02; the kit has no
+# regular Starr Drop, Mega Box, or the boxes of most newer brawlers.
+ITEM_FILES = {
+    'icongem': 'icon_gems', 'iconcredit': 'icon_credits', 'bling': 'icon_bling_stack', 'iconbling': 'icon_bling',
+    'iconcoin': 'icon_coin_stack', 'iconpowerpoint': 'icon_powerpoints_stack', 'brawlpass': 'icon_brawl_pass',
+    'propassxp': 'icon_pro_pass_icon', 'xpdoubler': 'icon_xp_doubler', 'monsteregg': 'icon_godzila_egg',
+    'powermeal': 'icon_power_meal_box_1', 'sushiroll': 'icon_sushi_roll', 'nanodrops': 'gachabox_green',
+    'nanodrop': 'gachabox_green', 'rankedstarrdrop': 'icon_ranked_starr_drop',
+    'angelicdrop': 'pin_angels_vs_demons_angelic_drop_1', 'boombox': 'ic_boom_box',
+    'coffinbox': 'coffin_box_ui_render', 'gigibox': 'image_box_gigi', 'minabox': 'image_box_mina',
+    'ziggybox': 'image_box_ziggy', 'najiabox': 'shop_item_brawler_box_najia', 'siriusbox': 'image_box_sirius',
+    'mechabox': 'mecha_box_shop_item', 'wendybox': 'wendy_box_ui_render', 'noribox': 'nori_box_ui_render',
+    'pumpkinbox': 'trick_box1',
+}
+kit_by_title = {}
+for a in sorted(EVERYTHING, key=lambda a: a.get('width') or 0):
+    kit_by_title[a['title'].lower()] = a  # the largest file of a name wins
+index['items'] = {}
+for key, title in ITEM_FILES.items():
+    if title in kit_by_title:
+        index['items'][key] = file_url(kit_by_title[title])
+    else:
+        unplaced.append(f'item {key}: no {title}')
 
 names = {b['id']: b['name'] for b in brawlers}
 gaps = lambda field: [b['name'] for b in brawlers if any(str(x['id']) not in index['accessories'] for x in b[field])]
@@ -629,7 +692,8 @@ if not CHECK:
     with open(ICON_INDEX, 'w') as f:
         json.dump(icon_index, f, indent=1, sort_keys=True)
         f.write('\n')
-    with open(PLAYER_INDEX, 'w') as f:
-        json.dump(player_known, f, indent=0, sort_keys=True)
-        f.write('\n')
-    print('wrote', INDEX, ICON_INDEX, PLAYER_INDEX)
+    for path, known in ((PLAYER_INDEX, player_known), (CLUB_INDEX, club_known)):
+        with open(path, 'w') as f:
+            json.dump(known, f, indent=0, sort_keys=True)
+            f.write('\n')
+    print('wrote', INDEX, ICON_INDEX, PLAYER_INDEX, CLUB_INDEX)

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { fankitItem } from '@/lib/fankit';
 import { SITE_URL, USER_AGENT } from '@/lib/site';
 import { WIKI_API, fetchWikiJson } from '@/lib/wiki';
 
@@ -134,7 +135,11 @@ interface ImageInfoResponse {
  * as the Starr Drops page's do; a failed lookup costs the art, never the page.
  */
 async function withArt(items: Omit<FreeReward, 'art' | 'fallbackArt'>[]): Promise<FreeReward[]> {
-  const wanted = [...new Set(items.flatMap((r) => wikiArtCandidates(r.name)))].slice(0, 50);
+  // The Fan Kit's picture where it has the item (lib/fankit); only the rest
+  // are asked of the wiki.
+  const wanted = [...new Set(items.flatMap((r) => wikiArtCandidates(r.name)))]
+    .filter((f) => !fankitItem(f))
+    .slice(0, 50);
   const found = new Map<string, string>();
   if (wanted.length > 0) {
     const body = await fetchWikiJson<ImageInfoResponse>(
@@ -152,7 +157,7 @@ async function withArt(items: Omit<FreeReward, 'art' | 'fallbackArt'>[]): Promis
   }
   return items.map((r) => ({
     ...r,
-    art: wikiArtCandidates(r.name).map((f) => found.get(f)).find(Boolean) ?? rewardArt(r.name),
+    art: wikiArtCandidates(r.name).map((f) => fankitItem(f) ?? found.get(f)).find(Boolean) ?? rewardArt(r.name),
     fallbackArt: rewardArt(r.name),
   }));
 }

@@ -38,17 +38,27 @@ export function fankitRank(rank: number): string | null {
   return byId[`rank:${rank}`] ?? null;
 }
 
-/*
- * The player icons the Fan Kit has, as ranges of offsets from 28000000
- * ("0-2,5,9-40"): a thousand ids in a few hundred characters, because every
- * search box and leaderboard row draws one in the browser.
+/**
+ * The ids in a range list -- offsets from `base`, "0-2,5,9-40" -- as a set.
+ * The player icons and club badges the Fan Kit has are listed this way: a
+ * thousand ids in a few hundred characters, because every search box and
+ * leaderboard row draws one in the browser.
  */
-const PLAYER_ICON_BASE = 28000000;
-const playerIcons = new Set<number>();
-for (const part of (byId.players ?? '').split(',')) {
-  if (!part) continue;
-  const [from, to = from] = part.split('-').map(Number);
-  for (let o = from; o <= to; o += 1) playerIcons.add(PLAYER_ICON_BASE + o);
+function idSet(ranges: string | undefined, base: number): Set<number> {
+  const out = new Set<number>();
+  for (const part of (ranges ?? '').split(',')) {
+    if (!part) continue;
+    const [from, to = from] = part.split('-').map(Number);
+    for (let o = from; o <= to; o += 1) out.add(base + o);
+  }
+  return out;
+}
+const playerIcons = idSet(byId.players, 28000000);
+const clubBadges = idSet(byId.clubs, 8000000);
+
+/** A club badge from the Fan Kit, by the game's badge id -- the kit has a handful. */
+export function fankitClubBadge(badgeId: number): string | null {
+  return clubBadges.has(badgeId) ? `/fankit/club/${badgeId}.webp` : null;
 }
 
 /** A player icon from the Fan Kit, by the game's icon id. */
