@@ -303,7 +303,7 @@ chosen = {**frames, **standing}
 # Patrol Amber" finds `amber_starr_patrol_amber_happy_402`. A standing render
 # beats an animation frame; a sad frame is never used.
 FRAMES = {'happy', 'idle', 'win', 'loop', 'happyloop'}
-skins, skin_rank = {}, {}
+skins, skin_rank, skin_words = {}, {}, {}
 for a in SKINS:
     words = tokens(a['title'])
     while words and words[0].isdigit():
@@ -334,6 +334,12 @@ for a in SKINS:
     key = f"{b['id']}|{variant}"
     if key not in skin_rank or rank < skin_rank[key]:
         skins[key], skin_rank[key] = a, rank
+        words = list(rest)
+        if words and words[-1] == bt:
+            words = words[:-1]
+        if words and words[0] == bt:
+            words = words[1:]
+        skin_words[key] = ' '.join(words) or variant
 
 # Square icons for lists: each brawler's portrait, cropped to a square from the
 # top. The classic in-game portrait wins over a newer, larger one of the same
@@ -734,6 +740,12 @@ if not CHECK:
     # The list icons apart, and small: client components draw them.
     with open(ICON_INDEX, 'w') as f:
         json.dump(icon_index, f, indent=1, sort_keys=True)
+        f.write('\n')
+    # Each skin's Fan Kit file and words, for the skin quiz video
+    # (deploy/viral/make.py skinquiz), which fetches the few it uses large.
+    with open(os.path.join(ROOT, 'scripts', 'fankit-skin-sources.json'), 'w') as f:
+        json.dump({k: {'url': file_url(a), 'w': a['width'], 'name': skin_words.get(k, k.split('|')[1])}
+                   for k, a in sorted(skins.items())}, f, indent=0, sort_keys=True)
         f.write('\n')
     for path, known in ((PLAYER_INDEX, player_known), (CLUB_INDEX, club_known)):
         with open(path, 'w') as f:

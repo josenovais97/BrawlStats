@@ -10,7 +10,8 @@
 # Run at 15:30 UTC by brawlzone-viral.timer. A quiz every day since
 # 2026-10-29 (the channel's best format), themed by weekday:
 #
-#   Mon shadowquiz  Tue quiz  Wed zoomquiz  Thu quiz  Fri shadowquiz  Sat quiz  Sun zoomquiz
+#   Mon shadowquiz  Tue quiz  Wed zoomquiz  Thu skinquiz  Fri shadowquiz  Sat quiz  Sun iconquiz
+#   (skinquiz and iconquiz from 2026-11-05: the brawler in one of its Fan Kit skins, or from one of its ability icons)
 #
 # deploy/viral/make.py draws it (formats described there). `broken` needs a
 # snapshot from about a week ago, which this job keeps in $ROOT/history, and
@@ -26,7 +27,8 @@
 # gave up for doing worst. By weekday, since 2026-10-29 with the data
 # formats the daily quiz moved out of 15:30:
 #
-#   Mon broken  Tue stop  Wed ranks  Thu whatsnew  Fri classrank (giveaway to Nov 30)  Sat modes  Sun everyrank
+#   Mon drops  Tue stop  Wed ranks  Thu whatsnew  Fri classrank (giveaway to Nov 30)  Sat modes  Sun everyrank
+#   (drops: "I opened 1,000 X", a different drop or box each week, from 2026-11-09)
 #
 # Fridays until the giveaway closes (2026-11-30) are its reminder instead.
 #
@@ -71,13 +73,15 @@ skip=0
 if [ -z "$kind" ]; then
   case "$(date -u +%u)" in
     1|5) kind=shadowquiz ;;
-    3|7) kind=zoomquiz ;;
+    3) kind=zoomquiz ;;
+    4) kind=skinquiz ;;
+    7) kind=iconquiz ;;
     *) kind=quiz ;;
   esac
 fi
 if [ "$kind" = extra ]; then
   case "$(date -u +%u)" in
-    1) kind=broken ;;
+    1) kind=drops ;;
     2) kind=stop ;;
     3) kind=ranks ;;
     4) kind=whatsnew ;;
@@ -88,8 +92,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops or whatsnew)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops or whatsnew)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -200,7 +204,8 @@ from PIL import Image
 data = json.load(open(sys.argv[1]))
 fk = json.load(open('/repo/src/data/fankit.json'))
 icons = json.load(open('/repo/src/data/fankit-icons.json'))
-ua = {'User-Agent': 'BrawlZone (https://brawlzone.net)'}
+# The wiki's CDN refuses images without a Referer (some drop art is the wiki's).
+ua = {'User-Agent': 'BrawlZone (https://brawlzone.net)', 'Referer': 'https://brawlzone.net/'}
 def get(url):
     return urllib.request.urlopen(urllib.request.Request(url, headers=ua), timeout=60).read()
 def save(img, path, src):
@@ -246,6 +251,62 @@ for bid, v in fk.get('buffies', {}).items():
     except Exception as e:
         print(f"no buffies for {bid}: {e}")
 json.dump(order, open('/cache/buffies/index.json', 'w'))
+# Each drop and box's own art for the weekly "1,000 X" Short (make.py drops),
+# from the Fan Kit or the wiki as /starr-drops resolves it; the Chaos Drop
+# keeps the hand-cached grey one it tints. And the gem icon for its loot.
+for slug, d in (data.get('drops') or {}).items():
+    src = d.get('image')
+    path = f'/cache/drops/{slug}.png'
+    if not src or slug == 'chaos-drops' or cached_from(path) == src:
+        continue
+    try:
+        img = Image.open(io.BytesIO(get(src))).convert('RGBA')
+        img = img.crop(img.getchannel('A').point(lambda a: 255 if a > 12 else 0).getbbox() or (0, 0, img.width, img.height))
+        img.thumbnail((700, 700), Image.LANCZOS)
+        save(img, path, src)
+    except Exception as e:
+        print(f"no art for {slug}: {e}")
+# The skin quiz's list of Fan Kit skins (it fetches the five it uses), and the
+# ability quiz's icons: every gadget, star power and hypercharge the Fan Kit
+# has, named from BrawlAPI, once each.
+os.makedirs('/cache/skins', exist_ok=True)
+try:
+    with open('/repo/scripts/fankit-skin-sources.json') as f:
+        open('/cache/skins/sources.json', 'w').write(f.read())
+except OSError as e:
+    print(f"no skin list: {e}")
+os.makedirs('/cache/abilities', exist_ok=True)
+abilities = []
+try:
+    roster = json.loads(get('https://api.brawlapi.com/v1/brawlers'))['list']
+    acc, hcs = fk.get('accessories', {}), fk.get('hypercharges', {})
+    for r in roster:
+        for kind, field in (('gadget', 'gadgets'), ('starPower', 'starPowers')):
+            for x in r.get(field) or []:
+                if str(x['id']) in acc:
+                    abilities.append({'bid': r['id'], 'kind': kind, 'name': x['name'], 'file': f"abilities/{x['id']}.png", 'src': acc[str(x['id'])]})
+        if str(r['id']) in hcs:
+            abilities.append({'bid': r['id'], 'kind': 'hyperCharge', 'name': None, 'file': f"abilities/hc-{r['id']}.png", 'src': hcs[str(r['id'])]})
+except Exception as e:
+    print(f"no ability list: {e}")
+for a in abilities:
+    path = f"/cache/{a['file']}"
+    if cached_from(path) == a['src']:
+        continue
+    try:
+        img = Image.open(io.BytesIO(get(a['src'] + '?width=400'))).convert('RGBA')
+        img = img.crop(img.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox() or (0, 0, img.width, img.height))
+        save(img, path, a['src'])
+    except Exception as e:
+        print(f"no icon for {a['name'] or a['kind']}: {e}")
+if abilities:
+    json.dump(abilities, open('/cache/abilities/index.json', 'w'))
+gem = fk.get('items', {}).get('icongem')
+if gem and cached_from('/cache/drops/gems.png') != gem:
+    try:
+        save(Image.open(io.BytesIO(get(gem + '?width=320'))).convert('RGBA'), '/cache/drops/gems.png', gem)
+    except Exception as e:
+        print(f"no gem icon: {e}")
 PY
 [ "$(find "$CACHE/faces" -name '*.png' | wc -l)" -gt 50 ] || die "::error::brawler portraits could not be fetched"
 fi  # not newbrawler or daily

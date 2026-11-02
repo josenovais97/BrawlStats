@@ -46,6 +46,8 @@ def kind(text):
         # weakest can give its weekday to the strongest.
         ('viral: shadow quiz', r'guess the brawler by its shadow'),
         ('viral: zoom quiz', r'guess the brawler from this zoom'),
+        ('viral: skin quiz', r'guess the brawler by its skin'),
+        ('viral: ability quiz', r'guess the brawler from its gadget'),
         ('viral: quiz', r'guess the brawler'),
         ('viral: broken', r'who got broken'),
         ('viral: ranks', r'what masters pick|what legends pick|what you pick'),

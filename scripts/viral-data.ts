@@ -79,13 +79,22 @@ async function main() {
   // same wiki read as /starr-drops. A failed read leaves them out and make.py
   // draws something else.
   const starrDrops = await getStarrDrops().catch(() => null);
+  // Since 2026-11-02 every drop or box the Short can simulate honestly: one
+  // with rarity odds and a table per rarity, or a box with one complete table
+  // (one roll per box), plus its art for brawlzone-viral to cache.
+  const simulatable = (type: NonNullable<typeof starrDrops>['types'][number]) =>
+    type.rarityOdds.length > 0
+      ? type.tables.length > 0 && type.tables.every((t) => t.rarity && t.rewards.length > 0)
+      : type.tables.length === 1 && type.tables[0].listed > 0.95 && type.tables[0].listed < 1.06;
   const drops = Object.fromEntries(
     (starrDrops?.types ?? [])
-      .filter((type) => type.group === 'core' && type.rarityOdds.length > 0)
+      .filter(simulatable)
       .map((type) => [
         type.slug,
         {
           name: type.name,
+          group: type.group,
+          image: type.imageUrl,
           odds: type.rarityOdds,
           tables: type.tables.map((table) => ({
             rarity: table.rarity,
