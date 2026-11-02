@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-import { getBrawlerMap, gearIconUrl } from '@/lib/brawlapi';
+import { gadgetIconUrl, gearIconUrl, getBrawlerMap, starPowerIconUrl } from '@/lib/brawlapi';
 import { getOfficialBrawlers } from '@/lib/bs-api';
 import { BrawlApiError } from '@/lib/errors';
 import { errorResponse, okResponse } from '@/lib/route-helpers';
@@ -45,10 +45,12 @@ export async function GET(
     // The artwork mirror names star powers and gadgets; the official catalogue
     // is the only place gear names appear.
     const meta = brawlerMeta.get(brawlerId);
+    // The mirror's icons, which the app was built against, rather than the
+    // site's Fan Kit ones (`getBrawlerMap` carries those): what the app shows
+    // is its owner's call, made in an app release.
     const accessories = new Map<number, { name: string; imageUrl: string }>();
-    for (const a of [...(meta?.starPowers ?? []), ...(meta?.gadgets ?? [])]) {
-      accessories.set(a.id, { name: a.name, imageUrl: a.imageUrl });
-    }
+    for (const a of meta?.starPowers ?? []) accessories.set(a.id, { name: a.name, imageUrl: starPowerIconUrl(a.id) });
+    for (const a of meta?.gadgets ?? []) accessories.set(a.id, { name: a.name, imageUrl: gadgetIconUrl(a.id) });
     const gearNames = new Map((official?.gears ?? []).map((g) => [g.id, g.name]));
 
     /*

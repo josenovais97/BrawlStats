@@ -115,8 +115,10 @@ async function main(): Promise<void> {
 
   // Thumbnail is the riser's portrait, which makes the post scannable in a
   // feed before a word of it is read.
+  // A whole address: the Fan Kit portraits are paths on this domain.
   const art = await getBrawlerMap()
     .then((m) => m.get(riser.brawlerId)?.imageUrl)
+    .then((url) => (url?.startsWith('/') ? `${SITE}${url}` : url))
     .catch(() => undefined);
 
   const body = {

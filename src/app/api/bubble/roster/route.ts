@@ -1,4 +1,4 @@
-import { playerIconUrl } from '@/lib/brawlapi';
+import { cdnPlayerIconUrl } from '@/lib/brawlapi';
 import { getPlayer } from '@/lib/bs-api';
 import { normalizeTag } from '@/lib/tags';
 import { recordLookup } from '@/lib/stats';
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
        * of characters is not, and a tag with one wrong character is otherwise
        * a silent mistake that just makes every filter look broken.
        */
-      iconUrl: playerIconUrl(player.icon?.id),
+      iconUrl: cdnPlayerIconUrl(player.icon?.id),
       trophies: player.trophies,
       // Current Ranked rank, so the panel can open on the player's bracket.
       rankName: player.rankedRankName ?? null,

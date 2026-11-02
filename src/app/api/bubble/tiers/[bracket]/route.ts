@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 
 import type { PanelComp, PanelModeComps } from '@/components/bubble/panel-comps';
 import type { PanelEntry, PanelMapPick } from '@/components/bubble/panel-tiers';
-import { brawlerIconUrl } from '@/lib/brawlapi';
+import { cdnBrawlerIconUrl } from '@/lib/brawlapi';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { BrawlApiError } from '@/lib/errors';
 import { bracketBySlug } from '@/lib/rank-brackets';
@@ -34,6 +34,19 @@ import type { BABrawler } from '@/types/brawlapi';
 
 export const revalidate = 600;
 
+/**
+ * The app's picture of a brawler: the mirror's framed tile it was built
+ * against. The site's own art is the Fan Kit's now (lib/fankit-icons), served
+ * from paths on brawlzone.net that an Android image loader cannot resolve --
+ * on 2026-11-02 that change sent the app relative paths for every brawler. A
+ * brawler the mirror has no tile for keeps the catalogue's own absolute
+ * fallback.
+ */
+function appIcon(meta: Map<number, BABrawler>, brawlerId: number): string {
+  const url = meta.get(brawlerId)?.imageUrl;
+  return url && /^https?:/.test(url) ? url : cdnBrawlerIconUrl(brawlerId);
+}
+
 function shape(scored: ScoredBrawler[], meta: Map<number, BABrawler>): PanelEntry[] {
   return scored
     .filter((e) => e.tier !== null)
@@ -43,7 +56,7 @@ function shape(scored: ScoredBrawler[], meta: Map<number, BABrawler>): PanelEntr
       brawlerName: e.brawlerName,
       metaScore: e.metaScore,
       tier: e.tier!,
-      imageUrl: meta.get(e.brawlerId)?.imageUrl ?? brawlerIconUrl(e.brawlerId),
+      imageUrl: appIcon(meta, e.brawlerId),
     }));
 }
 
@@ -73,7 +86,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       maps[`${map.mode}|${map.mapName}`] = map.picks.map((pick) => ({
         brawlerId: pick.brawlerId,
         brawlerName: pick.brawlerName,
-        imageUrl: meta.get(pick.brawlerId)?.imageUrl ?? brawlerIconUrl(pick.brawlerId),
+        imageUrl: appIcon(meta, pick.brawlerId),
         score: pick.score,
         overallScore: pick.overallScore,
         battles: pick.decidedSampleSize,
@@ -87,7 +100,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       brawlers: c.brawlerIds.map((id) => ({
         brawlerId: id,
         brawlerName: titleCase(meta.get(id)?.name ?? `#${id}`),
-        imageUrl: meta.get(id)?.imageUrl ?? brawlerIconUrl(id),
+        imageUrl: appIcon(meta, id),
       })),
       winRate: c.winRate,
       edge: c.edge,

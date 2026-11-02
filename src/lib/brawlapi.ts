@@ -270,6 +270,21 @@ export function playerIconUrl(iconId: number | undefined): string {
   return `https://cdn.brawlify.com/profile-icons/regular/${iconId ?? 28000000}.png`;
 }
 
+/*
+ * The mirror's addresses, absolute, for what leaves the site: the BrawlZone
+ * Bubble app's feeds and Discord embeds. The site's own Fan Kit art is served
+ * from paths on this domain, which mean nothing to an Android image loader or
+ * to Discord, and the app shows what it was built against until its owner
+ * ships a version that says otherwise.
+ */
+export function cdnPlayerIconUrl(iconId: number | undefined): string {
+  return `https://cdn.brawlify.com/profile-icons/regular/${iconId ?? 28000000}.png`;
+}
+
+export function cdnBrawlerIconUrl(brawlerId: number): string {
+  return `https://cdn.brawlify.com/brawlers/borders/${brawlerId}.png`;
+}
+
 export function clubBadgeUrl(badgeId: number | undefined): string {
   return `https://cdn.brawlify.com/club-badges/regular/${badgeId ?? 8000000}.png`;
 }

@@ -93,6 +93,8 @@ async function giveawayCommand(raw: string, userId: string, home: boolean): Prom
   }
 }
 const SITE = 'https://brawlzone.net';
+/** Discord needs a whole address: the site's own art is a path on this domain. */
+const abs = (url: string) => (url.startsWith('/') ? `${SITE}${url}` : url);
 const BRAND = 0xffc93c;
 const API = 'https://discord.com/api/v10';
 const SERVER_INVITE = 'https://discord.gg/964EMQBBUJ';
@@ -225,7 +227,7 @@ function profileEmbed(player: BSPlayer, tag: string, e: Map<string, string>): Em
     title: player.name ?? `#${tag}`,
     url: `${SITE}/player/${tag}`,
     color: BRAND,
-    thumbnail: { url: playerIconUrl(player.icon?.id) },
+    thumbnail: { url: abs(playerIconUrl(player.icon?.id)) },
     description: [
       `\`#${tag}\`${player.club?.name ? ` · ${player.club.name}` : ''}`,
       '',
@@ -414,7 +416,7 @@ async function brawlerCommand(token: string, query: string) {
         url: `${SITE}${brawlerPath(b.id, b.name)}`,
         description,
         color: parseInt((b.rarity?.color ?? '#ffc93c').replace('#', ''), 16) || BRAND,
-        thumbnail: { url: b.imageUrl ?? brawlerPortraitUrl(b.id) },
+        thumbnail: { url: abs(b.imageUrl ?? brawlerPortraitUrl(b.id)) },
         fields,
         footer: { text: `brawlzone.net · from ${formatNumber(build?.sampleSize ?? 0)} sampled owners` },
       },
@@ -453,7 +455,7 @@ async function mapCommand(token: string, query: string) {
         title: `${map.mapName} · ${humanizeMode(map.mode)}`,
         url: href,
         color: BRAND,
-        ...(art ? { thumbnail: { url: art } } : {}),
+        ...(art ? { thumbnail: { url: abs(art) } } : {}),
         description: `Best picks from ${formatNumber(map.sampleSize)} sampled Ranked battles on this map.`,
         fields: [
           {
@@ -719,7 +721,7 @@ async function counterCommand(token: string, query: string, rankSlug: string | u
         title: `How to beat ${name}${bracket ? ` · ${bracket.label}` : ''}`,
         url: href,
         color: BRAND,
-        ...(target.imageUrl ? { thumbnail: { url: target.imageUrl } } : {}),
+        ...(target.imageUrl ? { thumbnail: { url: abs(target.imageUrl) } } : {}),
         description: `Ranked win rates against ${name} over the last 21 days${bracket ? `, ${bracket.label} lobbies only` : ', every rank'}.`,
         fields: [
           { name: 'Pick these', value: counters.length ? counters.map(line).join('\n') : 'Not enough Ranked games yet.' },

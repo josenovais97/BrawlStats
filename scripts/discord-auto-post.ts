@@ -299,7 +299,8 @@ async function botd(g: Guild): Promise<string> {
           { name: 'Pick rate', value: pct(pick.usageRate), inline: true },
           ...(buildLines.length ? [{ name: 'The build owners run', value: buildLines.join('\n') }] : []),
         ],
-        ...(art ? { image: { url: art } } : {}),
+        // A whole address: the Fan Kit renders are paths on this domain.
+        ...(art ? { image: { url: art.startsWith('/') ? `${SITE}${art}` : art } } : {}),
         footer: { text: 'brawlzone.net · /brawler for any brawler, any time' },
       },
     ],
