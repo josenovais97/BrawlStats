@@ -66,7 +66,7 @@ export async function HomeLobby() {
             ctaClass="bg-brand text-brand-ink"
             umami="giveaway_banner"
             art={
-              /* The Brawl Pass, falling back to our box if the wiki's art does not load. */
+              /* The Brawl Pass, falling back to our box if the Fan Kit's art does not load. */
               <object data={BRAWL_PASS_ART} type="image/png" aria-label={t('Brawl Pass')} className="reward-float block h-32 w-52 sm:h-36 sm:w-56">
                 {/* eslint-disable-next-line @next/next/no-img-element -- a small pre-compressed icon */}
                 <img src={PRIZE_FALLBACK_ART} alt="" width={140} height={140} className="mx-auto size-32 object-contain" />

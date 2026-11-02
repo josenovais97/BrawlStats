@@ -35,12 +35,11 @@ export const GIVEAWAY: Giveaway = {
 };
 
 /**
- * The Brawl Pass, which the prize pays for: the wiki's art, loaded by the
- * visitor's browser like the skin pages' (the wiki's CDN refuses this box),
+ * The Brawl Pass, which the prize pays for: the Fan Kit's ticket
+ * (`icon_brawl_pass`, the same picture the wiki had), from its CDN,
  * with our own box as the fallback if it does not load.
  */
-export const BRAWL_PASS_ART =
-  'https://static.wikia.nocookie.net/brawlstars/images/0/0f/Brawl_Pass.png/revision/latest/scale-to-width-down/600';
+export const BRAWL_PASS_ART = 'https://media.ffycdn.net/eu/supercell/SV13DysQgucrc6QejnYd.png?width=600';
 export const PRIZE_FALLBACK_ART = '/rewards/box-rainbow.png';
 
 /** Whether the page and the form are public (launched 2026-10-27). */
