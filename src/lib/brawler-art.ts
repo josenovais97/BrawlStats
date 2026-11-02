@@ -1,7 +1,7 @@
 import { brawlerIconUrl, brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
-import { fankitBody } from '@/lib/fankit';
+import { fankitBody, fankitSkin } from '@/lib/fankit';
 import { skinLabel } from '@/lib/player-showcase';
-import { getSkinArt, skinArtUrl, wikiThumb } from '@/lib/skin-art';
+import { wikiThumb } from '@/lib/skin-art';
 import { getWikiModel } from '@/lib/wiki-art';
 import type { BABrawler } from '@/types/brawlapi';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
@@ -22,16 +22,15 @@ export async function brawlerArt(
   brawlers: BSPlayerBrawler[],
   brawlerMeta: Map<number, BABrawler>,
 ): Promise<Map<number, string>> {
-  const [skinArt, models] = await Promise.all([
-    getSkinArt().catch(() => ({}) as Record<string, string>),
-    // Only asked where the Fan Kit has no render: it wins anyway.
-    Promise.all(brawlers.map((b) => (fankitBody(b.id) ? false : hasBrawlerModel(b.id).catch(() => false)))),
-  ]);
+  // Only asked where the Fan Kit has no render: it wins anyway.
+  const models = await Promise.all(
+    brawlers.map((b) => (fankitBody(b.id) ? false : hasBrawlerModel(b.id).catch(() => false))),
+  );
 
   const art = new Map<number, string>();
   brawlers.forEach((b, i) => {
     const label = skinLabel(b);
-    const skin = label ? skinArtUrl(skinArt, b.name, label) : null;
+    const skin = label ? fankitSkin(b.id, b.name, label) : null;
     art.set(
       b.id,
       skin ??

@@ -1,3 +1,4 @@
+import { fankitIcon, fankitLeague } from '@/lib/fankit-icons';
 import { stripGameMarkup } from '@/lib/format';
 import type {
   BAAccessory,
@@ -70,6 +71,9 @@ export async function getBrawlers(): Promise<BABrawler[]> {
       // Every consumer reads `rarity.color` straight into a style, so it is
       // normalised at the source and never arrives broken.
       rarity: { ...b.rarity, color: rarityColor(b.rarity?.color) },
+      // The official portrait where the Fan Kit has one (lib/fankit-icons).
+      imageUrl: fankitIcon(b.id) ?? b.imageUrl,
+      imageUrl2: fankitIcon(b.id) ?? b.imageUrl2,
       starPowers: b.starPowers.map((a) => normalizeAccessory(a, (id) => fankitAccessory(id) ?? starPowerIconUrl(id))),
       gadgets: b.gadgets.map((a) => normalizeAccessory(a, (id) => fankitAccessory(id) ?? gadgetIconUrl(id))),
     }));
@@ -156,7 +160,10 @@ export function realBrawlerClass(name: string | null | undefined): string | null
 
 export async function getGameModes(): Promise<BAGameMode[]> {
   const data = await baFetch<BAGameModeList>('/gamemodes');
-  return data.list;
+  // The Fan Kit's mode icons where it has them; see getBrawlers for why the
+  // import is here.
+  const { fankitMode } = await import('@/lib/fankit');
+  return data.list.map((m) => ({ ...m, imageUrl: fankitMode(m.name) ?? m.imageUrl }));
 }
 
 /**
@@ -263,9 +270,12 @@ export function clubBadgeUrl(badgeId: number | undefined): string {
   return `https://cdn.brawlify.com/club-badges/regular/${badgeId ?? 8000000}.png`;
 }
 
-/** Square brawler icon with rarity border, by id. */
+/**
+ * Square brawler icon, by id: the brawler's official portrait from the Fan
+ * Kit, cut square (lib/fankit-icons), else the mirror's framed tile.
+ */
 export function brawlerIconUrl(brawlerId: number): string {
-  return `https://cdn.brawlify.com/brawlers/borders/${brawlerId}.png`;
+  return fankitIcon(brawlerId) ?? `https://cdn.brawlify.com/brawlers/borders/${brawlerId}.png`;
 }
 
 /**
@@ -285,7 +295,7 @@ export function isFramedTile(url: string): boolean {
 
 /** Borderless brawler portrait, by id. Still a square tile, just unframed. */
 export function brawlerPortraitUrl(brawlerId: number): string {
-  return `https://cdn.brawlify.com/brawlers/borderless/${brawlerId}.png`;
+  return fankitIcon(brawlerId) ?? `https://cdn.brawlify.com/brawlers/borderless/${brawlerId}.png`;
 }
 
 /**
@@ -373,7 +383,9 @@ export function hasBrawlerModel(brawlerId: number): Promise<boolean> {
  * question that matters.
  */
 export function hasBrawlerPortrait(brawlerId: number): Promise<boolean> {
-  return hasArtwork(brawlerIconUrl(brawlerId));
+  // A Fan Kit icon is a file in this repo: it exists.
+  if (fankitIcon(brawlerId)) return Promise.resolve(true);
+  return hasArtwork(`https://cdn.brawlify.com/brawlers/borders/${brawlerId}.png`);
 }
 
 /**
@@ -398,7 +410,8 @@ export function rankedLeagueIconUrl(rankName: string | undefined | null): string
   const league = rankName.trim().split(/\s+/)[0];
   if (!league) return null;
   const normalized = league.charAt(0).toUpperCase() + league.slice(1).toLowerCase();
-  return `https://cdn.brawlify.com/ranked/regular/${normalized}.png`;
+  // The Fan Kit's own badge where it has one (lib/fankit-icons).
+  return fankitLeague(league) ?? `https://cdn.brawlify.com/ranked/regular/${normalized}.png`;
 }
 
 /**

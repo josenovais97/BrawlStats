@@ -5,7 +5,8 @@ import { cloneElement, type ReactElement } from 'react';
 import sharp from 'sharp';
 
 import { brawlerModelUrl, brawlerPortraitUrl } from '@/lib/brawlapi';
-import { SITE_NAME } from '@/lib/site';
+import { fankitBody } from '@/lib/fankit';
+import { SITE_NAME, SITE_URL } from '@/lib/site';
 
 /**
  * The frame, palette and closing slide every BrawlZone carousel is built from.
@@ -129,13 +130,30 @@ const FOOTER_BOTTOM = 232;
  */
 const ICON_TIMEOUT_MS = 12_000;
 
+/**
+ * The Fan Kit art the site keeps itself (`/fankit/...`, see lib/fankit) has a
+ * site-relative address, which a server-side fetch cannot follow on its own.
+ */
+const absolute = (url: string) => (url.startsWith('/') ? `${SITE_URL}${url}` : url);
+
+/**
+ * A brawler's square icon as a PNG data URI, for Satori, which can neither
+ * follow a site-relative address nor read the WebP the Fan Kit icons are.
+ */
+export async function brawlerIconData(brawlerId: number, box: number): Promise<string | null> {
+  return (
+    (await loadIcon(brawlerPortraitUrl(brawlerId), box)) ??
+    (await loadIcon(`https://cdn.brawlify.com/brawlers/borderless/${brawlerId}.png`, box))
+  );
+}
+
 export async function loadIcon(url: string, box: number): Promise<string | null> {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       // The wiki refuses image requests that do not say where they come from
       // (403 without a Referer, 200 with ours); its portraits stand in for new
       // brawlers the mirror has no art for yet.
-      const res = await fetch(url, {
+      const res = await fetch(absolute(url), {
         signal: AbortSignal.timeout(ICON_TIMEOUT_MS),
         headers: { Referer: 'https://brawlzone.net/' },
       });
@@ -174,7 +192,7 @@ export async function loadSized(
       // The wiki refuses image requests that do not say where they come from
       // (403 without a Referer, 200 with ours); its portraits stand in for new
       // brawlers the mirror has no art for yet.
-      const res = await fetch(url, {
+      const res = await fetch(absolute(url), {
         signal: AbortSignal.timeout(ICON_TIMEOUT_MS),
         headers: { Referer: 'https://brawlzone.net/' },
       });
@@ -207,7 +225,10 @@ export async function loadArt(
    * with no art at all: on 2026-09-25 all three CDN paths for Cosmo returned
    * 404, which is the same gap that broke the tier list in September.
    */
-  const candidates = [brawlerModelUrl(brawlerId), brawlerPortraitUrl(brawlerId)];
+  // Supercell's own render from the Fan Kit first (lib/fankit).
+  const candidates = [fankitBody(brawlerId), brawlerModelUrl(brawlerId), brawlerPortraitUrl(brawlerId)].filter(
+    (u): u is string => Boolean(u),
+  );
   if (fallbackUrl) candidates.push(fallbackUrl);
 
   for (const url of candidates) {

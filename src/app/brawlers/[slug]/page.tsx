@@ -7,7 +7,6 @@ import { Suspense, type CSSProperties } from 'react';
 
 import { BrawlerLeaderboard } from '@/components/brawlers/brawler-leaderboard';
 import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
-import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
@@ -45,7 +44,7 @@ import {
 } from '@/lib/brawler-wiki';
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getBalanceEvents } from '@/lib/release-notes';
-import { fankitBody, fankitHypercharge } from '@/lib/fankit';
+import { fankitBody, fankitHypercharge, fankitSkin } from '@/lib/fankit';
 import { getWikiAbilityArt, getWikiModel } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
@@ -522,13 +521,10 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
   // Fetched together: the matchup rows need to know which of their pairs the
   // sitemap actually claims, so a non-indexable one can be nofollowed rather
   // than quietly widening the crawlable set. See BrawlerMatchups.
-  const [pairings, indexable, skins, skinArt] = await Promise.all([
+  const [pairings, indexable, skins] = await Promise.all([
     getBrawlerPairings(brawlerId),
     getIndexablePairs(),
     getBrawlerSkins(brawlerId),
-    // One cached sweep of the wiki's file list serves every brawler page; see
-    // lib/skin-art for why the artwork cannot come from the metadata API.
-    getSkinArt(),
   ]);
   const indexablePairs = new Set(indexable.map(([a, b]) => (a < b ? `${a}:${b}` : `${b}:${a}`)));
 
@@ -1166,7 +1162,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
             skins={skins}
             portrait={brawlerMeta.get(brawler.id)?.imageUrl ?? brawler.imageUrl}
             brawlerName={brawler.name}
-            artFor={(skin) => skinArtUrl(skinArt, brawler.name, skin.name, 96)}
+            artFor={(skin) => fankitSkin(brawler.id, brawler.name, skin.name)}
           />
         </section>
       ) : null}

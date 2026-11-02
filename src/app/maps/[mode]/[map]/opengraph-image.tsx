@@ -1,9 +1,9 @@
 import { ImageResponse } from 'next/og';
 
-import { brawlerIconUrl } from '@/lib/brawlapi';
 import { formatPercent, titleCase } from '@/lib/format';
 import { resolveMap } from '@/lib/game-maps';
 import { SITE_NAME } from '@/lib/site';
+import { brawlerIconData } from '@/lib/slide-chrome';
 import { RANKED_MAP_WINDOW_DAYS, getRankedMapPicks } from '@/lib/stats';
 
 /**
@@ -59,6 +59,8 @@ export default async function Image({
         .catch(() => [])
     : [];
 
+  // Loaded up front as PNG data: Satori cannot read the Fan Kit icons' WebP.
+  const icons = await Promise.all(picks.map((pick) => brawlerIconData(pick.brawlerId, 64)));
   return new ImageResponse(
     (
       <div
@@ -118,7 +120,7 @@ export default async function Image({
 
         {picks.length > 0 ? (
           <div style={{ display: 'flex', gap: 20 }}>
-            {picks.map((pick) => (
+            {picks.map((pick, i) => (
               <div
                 key={pick.brawlerId}
                 style={{
@@ -132,13 +134,11 @@ export default async function Image({
                   border: '1px solid #242b45',
                 }}
               >
-                <img
-                  src={brawlerIconUrl(pick.brawlerId)}
-                  alt=""
-                  width={64}
-                  height={64}
-                  style={{ borderRadius: 14 }}
-                />
+                {icons[i] ? (
+                  <img src={icons[i]} alt="" width={64} height={64} style={{ borderRadius: 14 }} />
+                ) : (
+                  <div style={{ width: 64, height: 64, borderRadius: 14, background: '#1b2136' }} />
+                )}
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ fontSize: 26, color: '#8b95b8' }}>
                     {titleCase(pick.brawlerName)}

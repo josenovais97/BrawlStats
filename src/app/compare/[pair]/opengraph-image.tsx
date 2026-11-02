@@ -1,9 +1,9 @@
 import { ImageResponse } from 'next/og';
 
-import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { formatPercent, titleCase } from '@/lib/format';
 import { resolvePair } from '@/lib/compare';
 import { SITE_NAME } from '@/lib/site';
+import { brawlerIconData } from '@/lib/slide-chrome';
 import {
   MIN_SAMPLE_FOR_TIER,
   assignTier,
@@ -54,6 +54,8 @@ export default async function Image({ params }: { params: Promise<{ pair: string
     }),
   );
 
+  // Loaded up front as PNG data: Satori cannot read the Fan Kit icons' WebP.
+  const portraits = await Promise.all(sides.map((side) => brawlerIconData(side.brawler.id, 200)));
   return new ImageResponse(
     (
       <div
@@ -99,7 +101,7 @@ export default async function Image({ params }: { params: Promise<{ pair: string
         />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {sides.map((side) => (
+          {sides.map((side, i) => (
             <div
               key={side.brawler.id}
               style={{
@@ -109,13 +111,11 @@ export default async function Image({ params }: { params: Promise<{ pair: string
                 width: 420,
               }}
             >
-              <img
-                src={brawlerPortraitUrl(side.brawler.id)}
-                alt=""
-                width={200}
-                height={200}
-                style={{ borderRadius: 32, background: '#1b2136' }}
-              />
+              {portraits[i] ? (
+                <img src={portraits[i]} alt="" width={200} height={200} style={{ borderRadius: 32, background: '#1b2136' }} />
+              ) : (
+                <div style={{ width: 200, height: 200, borderRadius: 32, background: '#1b2136' }} />
+              )}
               <div
                 style={{
                   fontSize: 54,

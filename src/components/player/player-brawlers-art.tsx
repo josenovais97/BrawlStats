@@ -1,8 +1,7 @@
 import { PlayerBrawlers, type BrawlerMetaLite } from '@/components/player/player-brawlers';
 import { brawlerModelUrl } from '@/lib/brawlapi';
-import { fankitBody } from '@/lib/fankit';
+import { fankitBody, fankitSkin } from '@/lib/fankit';
 import { skinLabel } from '@/lib/player-showcase';
-import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
 import type { BSPlayerBrawler } from '@/types/brawlstars';
 
 /**
@@ -21,12 +20,10 @@ export async function PlayerBrawlersWithArt({
   brawlers: BSPlayerBrawler[];
   meta: Record<string, BrawlerMetaLite>;
 }) {
-  const skins = await getSkinArt().catch(() => ({}) as Record<string, string>);
-
   const withArt: Record<string, BrawlerMetaLite> = { ...meta };
   for (const b of brawlers) {
     const label = skinLabel(b);
-    const skin = label ? skinArtUrl(skins, b.name, label) : null;
+    const skin = label ? fankitSkin(b.id, b.name, label) : null;
     const base = meta[b.id];
     if (!base) continue;
     withArt[b.id] = { ...base, artUrl: skin ?? fankitBody(b.id) ?? brawlerModelUrl(b.id) };

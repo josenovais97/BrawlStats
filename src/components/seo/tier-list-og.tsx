@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
-import { brawlerPortraitUrl } from '@/lib/brawlapi';
 import { SITE_NAME } from '@/lib/site';
+import { brawlerIconData } from '@/lib/slide-chrome';
 import { TIER_COLOR } from '@/lib/tiers';
 import type { Tier } from '@/types/stats';
 import { getT } from '@/lib/t';
@@ -26,7 +26,7 @@ export interface TierListOgEntry {
  * custom properties, no Tailwind. Every element with more than one child needs
  * an explicit `display`.
  */
-export function tierListOgImage({
+export async function tierListOgImage({
   heading,
   scope,
   accent,
@@ -41,6 +41,8 @@ export function tierListOgImage({
   size: { width: number; height: number };
 }) {
   const t = getT(requestLocale());
+  // Loaded up front as PNG data: Satori cannot read the Fan Kit icons' WebP.
+  const icons = await Promise.all(top.map((entry) => brawlerIconData(entry.brawlerId, 112)));
   return new ImageResponse(
     (
       <div
@@ -101,14 +103,18 @@ export function tierListOgImage({
               >
                 {/* Satori renders to a PNG on the server; `next/image` has no
                     meaning inside an ImageResponse. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={brawlerPortraitUrl(entry.brawlerId)}
-                  alt=""
-                  width={112}
-                  height={112}
-                  style={{ borderRadius: 22, background: '#1b2136' }}
-                />
+                {icons[index] ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={icons[index]}
+                    alt=""
+                    width={112}
+                    height={112}
+                    style={{ borderRadius: 22, background: '#1b2136' }}
+                  />
+                ) : (
+                  <div style={{ width: 112, height: 112, borderRadius: 22, background: '#1b2136' }} />
+                )}
                 <div
                   style={{
                     fontSize: 28,

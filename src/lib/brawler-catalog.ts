@@ -1,4 +1,5 @@
 import {
+  brawlerIconUrl,
   getBrawlerMap,
   getBrawlers,
   hasBrawlerPortrait,
@@ -128,7 +129,7 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
           : 'legacy') as BrawlerStatus,
         meta,
         // Overwritten below when the mirror has nothing and the wiki does.
-        imageUrl: meta?.imageUrl ?? `https://cdn.brawlify.com/brawlers/borders/${id}.png`,
+        imageUrl: meta?.imageUrl ?? brawlerIconUrl(id),
         className: realBrawlerClass(meta?.class?.name),
         rarityName: realValue(meta?.rarity?.name),
         rarityColor: realColor(meta?.rarity?.color),

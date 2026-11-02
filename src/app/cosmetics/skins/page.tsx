@@ -4,7 +4,7 @@ import { CosmeticList } from '@/components/cosmetics/cosmetic-list';
 import { JsonLd, breadcrumbSchema } from '@/components/seo/structured-data';
 import { PageHeading } from '@/components/ui/section-heading';
 import { formatNumber } from '@/lib/format';
-import { getSkinArt, skinArtUrl } from '@/lib/skin-art';
+import { fankitSkin } from '@/lib/fankit';
 import { getSkinCatalogue } from '@/lib/stats';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
@@ -21,13 +21,13 @@ export const revalidate = 7200;
 
 export default async function SkinCataloguePage() {
   const t = getT(requestLocale());
-  const [skins, wikiArt] = await Promise.all([getSkinCatalogue(), getSkinArt()]);
+  const skins = await getSkinCatalogue();
 
-  // Resolved here, not in the client component: the matching rules live in
-  // lib/skin-art and the browser has no reason to learn them.
+  // Resolved here, not in the client component: the Fan Kit index lives in
+  // lib/fankit and the browser has no reason to download it.
   const art: Record<string, string> = {};
   for (const skin of skins) {
-    const url = skinArtUrl(wikiArt, skin.brawlerName ?? '', skin.name);
+    const url = skin.brawlerId ? fankitSkin(skin.brawlerId, skin.brawlerName ?? '', skin.name) : null;
     if (url) art[`${skin.brawlerName ?? ''}|${skin.name}`] = url;
   }
 

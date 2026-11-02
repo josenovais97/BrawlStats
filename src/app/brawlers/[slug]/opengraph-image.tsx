@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 
-import { brawlerPortraitUrl, getBrawler, realBrawlerClass } from '@/lib/brawlapi';
+import { getBrawler, realBrawlerClass } from '@/lib/brawlapi';
+import { brawlerIconData } from '@/lib/slide-chrome';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { slugify } from '@/lib/slugs';
 import { formatPercent } from '@/lib/format';
@@ -64,6 +65,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       ]
     : [];
 
+  // Loaded up front as PNG data: Satori cannot read the Fan Kit icons' WebP.
+  const portrait = await brawlerIconData(brawler.id, 196);
   return new ImageResponse(
     (
       <div
@@ -94,13 +97,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 40 }}>
-          <img
-            src={brawlerPortraitUrl(brawler.id)}
-            alt=""
-            width={196}
-            height={196}
-            style={{ borderRadius: 32, background: '#1b2136' }}
-          />
+          {portrait ? (
+            <img src={portrait} alt="" width={196} height={196} style={{ borderRadius: 32, background: '#1b2136' }} />
+          ) : (
+            <div style={{ width: 196, height: 196, borderRadius: 32, background: '#1b2136' }} />
+          )}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{

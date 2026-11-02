@@ -1,3 +1,5 @@
+import { rankedLeagueIconUrl } from '@/lib/brawlapi';
+
 /**
  * Ranked brackets: which part of the ladder a tier list describes.
  *
@@ -92,7 +94,7 @@ export function lobbyTier(tiers: (number | null | undefined)[], players = tiers.
   return valid.length % 2 === 1 ? valid[mid] : Math.round((valid[mid - 1] + valid[mid]) / 2);
 }
 
-/** The league badge the game shows, from the same CDN as `rankedLeagueIconUrl`. */
+/** The league badge the game shows, the same one `rankedLeagueIconUrl` draws. */
 export function bracketIconUrl(bracket: RankBracket): string {
-  return `https://cdn.brawlify.com/ranked/regular/${bracket.icon}.png`;
+  return rankedLeagueIconUrl(bracket.icon) ?? `https://cdn.brawlify.com/ranked/regular/${bracket.icon}.png`;
 }

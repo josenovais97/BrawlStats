@@ -44,6 +44,7 @@ import re
 import sys
 import time
 import unicodedata
+from concurrent.futures import ThreadPoolExecutor
 import urllib.parse
 import urllib.request
 from datetime import date
@@ -54,7 +55,7 @@ FANKIT = 'https://fankit.supercell.com/api/assets/search/324'
 BRAWLAPI = 'https://api.brawlapi.com/v1/brawlers'
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX = os.path.join(ROOT, 'src', 'data', 'fankit.json')
-BODY_DIR = os.path.join(ROOT, 'public', 'fankit', 'body')
+ICON_INDEX = os.path.join(ROOT, 'src', 'data', 'fankit-icons.json')
 CHECK = '--check' in sys.argv
 HEADERS = {'User-Agent': 'BrawlZone fankit-sync (brawlzone.net)', 'Accept': 'application/json'}
 
@@ -64,9 +65,10 @@ BODY_MAX_W, BODY_MAX_H = 520, 760
 # The figure must come out at least this wide, so a small figure on a big
 # canvas is fetched at a higher resolution before it is cut out.
 BODY_MIN_FIGURE_W = 440
+FETCH_MAX_W = 1800
 
 # How the Fan Kit's file names spell a brawler, where that is not its name.
-ALIASES = {'primo': 'elprimo', 'twins': 'larrylawrie', 'larry': 'larrylawrie', 'jae': 'jaeyong'}
+ALIASES = {'primo': 'elprimo', 'twins': 'larrylawrie', 'larry': 'larrylawrie', 'jae': 'jaeyong', 'colonelruffs': 'ruffs', 'ruff': 'ruffs'}
 
 
 def norm(s):
@@ -166,11 +168,72 @@ for a in sorted(assets('Hypercharge'), key=lambda a: len(a['title'])):
         continue
     index['hypercharges'].setdefault(str(b['id']), file_url(a))
 
+# Game mode icons and ranked league badges, embedded from the CDN like the
+# accessory icons. Named by hand in a table, because the Fan Kit has one
+# file per mode under no shared scheme and several decoys per name
+# (`hot_zone_blue_icon`, `icon_heist_challenge`). Modes missing from the Fan
+# Kit -- Knockout, Duo Showdown, Brawl Hockey, Siege on 2026-11-02 -- keep
+# the old icon.
+MODE_FILES = {
+    'gemgrab': 'gem_grab_icon', 'brawlball': 'brawl_ball_icon', 'heist': 'heist_icon',
+    'bounty': 'bounty_icon', 'hotzone': 'hot_zone_icon', 'soloshowdown': 'showdown_icon',
+    'showdown': 'showdown_icon', 'trioshowdown': 'trio_showdown_icon', 'duels': 'duels_icon',
+    'wipeout': 'wipeout_icon', 'payload': 'payload_icon', 'basketbrawl': 'basket_brawl_icon',
+    'volleybrawl': 'volley_brawl_icon', 'hunters': 'icon_hunters', 'takedown': 'takedown_icon',
+    'lonestar': 'lone_star_icon', 'roborumble': 'robo_rumble_icon', 'presentplunder': 'present_plunder_icon',
+    'trophythieves': 'trophy_thieves_icon', 'laststand': 'last_stand_icon', 'dodgebrawl': 'icon_game_mode_dodge_ball',
+}
+LEAGUE_FILES = {
+    'bronze': 'icon_ranked_bronze', 'silver': 'icon_ranked_silver', 'gold': 'icon_ranked_gold',
+    'diamond': 'icon_ranked_diamond', 'mythic': 'icon_ranked_mythic', 'legendary': 'icon_ranked_legendary',
+    'masters': 'icon_ranked_masters', 'pro': 'icon_ranked_pro_card',
+}
+by_title = {}
+for a in sorted(assets('Icons & Buttons'), key=lambda a: a['width']):
+    by_title[a['title'].lower()] = a  # the largest file of a name wins
+index['modes'] = {m: file_url(by_title[t]) for m, t in MODE_FILES.items() if t in by_title}
+leagues = {l: file_url(by_title[t]) for l, t in LEAGUE_FILES.items() if t in by_title}
+for m, t in MODE_FILES.items():
+    if t not in by_title:
+        unplaced.append(f'mode {m}: no {t}')
+
+# Our own icon files that have an exact Fan Kit counterpart, overwritten in
+# place at their current size: the components that draw them keep working
+# unchanged. Checked side by side on 2026-11-02; where the Fan Kit's nearest
+# file is a different picture (the hypercharge drop, the winged Ranked skull,
+# the Starr Drop) ours stays.
+LOCAL_ICONS = {
+    'class-artillery.png': 'icon_class_artillery', 'class-assassin.png': 'icon_class_assassin',
+    'class-controller.png': 'icon_class_controller', 'class-damage-dealer.png': 'icon_class_damage',
+    'class-marksman.png': 'icon_class_marksmen', 'class-support.png': 'icon_class_support',
+    'class-tank.png': 'icon_class_tank', 'skin-rare.png': 'icon_catalogue_skins_rare',
+    'skin-super-rare.png': 'icon_catalogue_skins_super_rare', 'skin-epic.png': 'icon_catalogue_skins_epic',
+    'skin-mythic.png': 'icon_catalogue_skins_mythic', 'skin-legendary.png': 'icon_catalogue_skins_legendary',
+    'power-point.png': 'icon_powerpoints_stack', 'leaderboard.png': 'icon_leaderboards',
+    'solo-showdown.png': 'showdown_icon', 'coin.png': 'icon_coin_stack', 'trophy.png': 'icon_trophy',
+}
+for local, title in LOCAL_ICONS.items():
+    a = by_title.get(title)
+    path = os.path.join(ROOT, 'public', 'icons', local)
+    if not a or not os.path.exists(path):
+        unplaced.append(f'icon {local}: no {title}')
+        continue
+    if CHECK:
+        continue
+    box = Image.open(path).size
+    img = Image.open(io.BytesIO(fetch(a['generic_url'].replace('{width}', str(max(box) * 2)), binary=True))).convert('RGBA')
+    img.thumbnail(box, Image.LANCZOS)
+    canvas = Image.new('RGBA', box, (0, 0, 0, 0))
+    canvas.paste(img, ((box[0] - img.width) // 2, (box[1] - img.height) // 2), img)
+    canvas.save(path, 'PNG', optimize=True)
+
+SKINS = assets('Skins')
+
 # Full-body art: the default skin standing (`amber_default_001`, `spike_default`)
 # and, for brawlers that have no standing render, an animation frame of it
 # (`vince_default_happy_002`).
 standing, frames = {}, {}
-for a in sorted(assets('Skins'), key=lambda a: len(a['title'])):
+for a in sorted(SKINS, key=lambda a: len(a['title'])):
     t = a['title'].lower()
     m = re.match(r'^(.+?)_default(?:_(happy|idle))?(?:_\d+)?$', t)
     if not m:
@@ -181,42 +244,145 @@ for a in sorted(assets('Skins'), key=lambda a: len(a['title'])):
     (frames if m.group(2) else standing).setdefault(b['id'], a)
 chosen = {**frames, **standing}
 
+# Every other skin, one render each, keyed `<brawler id>|<skin>` where <skin>
+# is the skin's own words with the brawler's name taken off either end -- the
+# same key `lib/fankit` builds from the game API's skin name, so "Starr
+# Patrol Amber" finds `amber_starr_patrol_amber_happy_402`. A standing render
+# beats an animation frame; a sad frame is never used.
+FRAMES = {'happy', 'idle', 'win', 'loop', 'happyloop'}
+skins, skin_rank = {}, {}
+for a in SKINS:
+    words = tokens(a['title'])
+    while words and words[0].isdigit():
+        words = words[1:]
+    if not words:
+        continue
+    pair = words[0] + (words[1] if len(words) > 1 else '')
+    b = by_token.get(ALIASES.get(pair, pair)) if len(words) > 1 else None
+    rest = words[2:] if b else []
+    if not b:
+        b = by_token.get(ALIASES.get(words[0], words[0]))
+        rest = words[1:]
+    if not b or 'sad' in rest or 'default' in rest:
+        continue
+    rank = 0
+    while rest and (rest[-1].isdigit() or rest[-1] in FRAMES):
+        if rest[-1] in FRAMES:
+            rank = 1
+        rest = rest[:-1]
+    bt = norm(b['name'])
+    variant = ''.join(rest)
+    if variant.startswith(bt):
+        variant = variant[len(bt):]
+    if variant.endswith(bt):
+        variant = variant[: -len(bt)]
+    if not variant:
+        continue
+    key = f"{b['id']}|{variant}"
+    if key not in skin_rank or rank < skin_rank[key]:
+        skins[key], skin_rank[key] = a, rank
 
-def trimmed(a):
+# Square icons for lists: each brawler's portrait, cropped to a square from the
+# top. The classic in-game portrait wins over a newer, larger one of the same
+# brawler (`Portrait_Colt` exists in both), so neighbours in a grid match.
+icons = {}
+for a in sorted(assets('Brawler Portraits'), key=lambda a: a['width']):
+    words = tokens(a['title'])
+    words = [w for w in words if w != 'portrait']
+    b, rest = brawler_in(words)
+    if b and not rest:
+        icons.setdefault(b['id'], a)
+
+
+def alpha_box(img):
+    return img.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox()
+
+
+def trimmed(a, min_figure_w, max_w, max_h):
     """The render cut to its figure, at a size the site can use."""
     probe = Image.open(io.BytesIO(fetch(a['generic_url'].replace('{width}', '400'), binary=True))).convert('RGBA')
-    box = probe.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox()
+    box = alpha_box(probe)
     if not box:
         return None
     share = (box[2] - box[0]) / probe.width
-    width = min(a['width'], max(400, math.ceil(BODY_MIN_FIGURE_W / max(share, 0.05))))
+    # Capped: a figure that is a sliver of an 8,000px master is not worth
+    # decoding the master for, on a box that is also serving the site.
+    width = min(a['width'], FETCH_MAX_W, max(400, math.ceil(min_figure_w / max(share, 0.05))))
     img = Image.open(io.BytesIO(fetch(a['generic_url'].replace('{width}', str(width)), binary=True))).convert('RGBA')
-    img = img.crop(img.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
-    img.thumbnail((BODY_MAX_W, BODY_MAX_H), Image.LANCZOS)
+    img = img.crop(alpha_box(img))
+    img.thumbnail((max_w, max_h), Image.LANCZOS)
     return img
 
 
-if not CHECK:
-    os.makedirs(BODY_DIR, exist_ok=True)
-for bid, a in sorted(chosen.items()):
-    # Named for the Fan Kit file it came from, so a changed render is a new
-    # address and the year-long cache on /fankit never serves a stale one.
-    name = f"{bid}-{hashlib.sha1(file_url(a).encode()).hexdigest()[:8]}.webp"
+# Where across a wide portrait the face is, for the few that are not centred:
+# 0 is the left edge, 1 the right. Cosmo's face is the lens on the right; a
+# centred square of him was a cannon (2026-11-02).
+SQUARE_ACROSS = {'Portrait_Cosmo': 1.0}
+
+
+def square(a, size=192):
+    """
+    The portrait cropped to a square from its top. A cut-out on a transparent
+    canvas (Wendy) is trimmed to its figure first, so it fills the tile like
+    its neighbours rather than sitting small in the middle of one.
+    """
+    img = Image.open(io.BytesIO(fetch(a['generic_url'].replace('{width}', str(min(a['width'], 600))), binary=True))).convert('RGBA')
+    box = alpha_box(img)
+    if box and (box[2] - box[0] < img.width * 0.97 or box[3] - box[1] < img.height * 0.97):
+        img = img.crop(box)
+    side = min(img.size)
+    x = round((img.width - side) * SQUARE_ACROSS.get(a['title'], 0.5))
+    return img.crop((x, 0, x + side, side)).resize((size, size), Image.LANCZOS)
+
+
+def saved(folder, stem, a, make, quality):
+    """
+    The site path of `a` rendered by `make`, writing it once. Named for the
+    Fan Kit file it came from, so a changed render is a new address and the
+    year-long cache on /fankit never serves a stale one.
+    """
+    name = f"{stem}-{hashlib.sha1(file_url(a).encode()).hexdigest()[:8]}.webp"
     if not CHECK:
-        path = os.path.join(BODY_DIR, name)
+        os.makedirs(os.path.join(ROOT, 'public', 'fankit', folder), exist_ok=True)
+        path = os.path.join(ROOT, 'public', 'fankit', folder, name)
         if not os.path.exists(path):
-            img = trimmed(a)
+            img = make(a)
             if img is None:
-                unplaced.append(f"Skins (empty): {a['title']}")
-                continue
-            img.save(path, 'WEBP', quality=84, method=6)
-            time.sleep(0.2)
-    index['bodies'][str(bid)] = f'/fankit/body/{name}'
+                unplaced.append(f"empty render: {a['title']}")
+                return None
+            img.save(path, 'WEBP', quality=quality, method=6)
+    return f'/fankit/{folder}/{name}'
+
+
+# Three at a time: the first request for a size makes Frontify resize the
+# original, which takes seconds, so one at a time is slow -- but the decode
+# and trim run on the box that serves the site, which more would crowd.
+def render_all(items, folder, stem, make, quality):
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        paths = pool.map(lambda kv: saved(folder, stem(kv[0]), kv[1], make, quality), items)
+        return {k: p for (k, _), p in zip(items, paths) if p}
+
+
+index['bodies'] = {
+    str(k): p
+    for k, p in render_all(sorted(chosen.items()), 'body', str,
+                           lambda a: trimmed(a, BODY_MIN_FIGURE_W, BODY_MAX_W, BODY_MAX_H), 84).items()
+}
+index['skins'] = render_all(sorted(skins.items()), 'skin',
+                            lambda key: '-'.join([key.split('|')[0], key.split('|')[1][:24]]),
+                            lambda a: trimmed(a, 200, 200, 300), 72)
+icon_index = {str(k): p for k, p in render_all(sorted(icons.items()), 'icon', str, square, 82).items()}
+# League badges ride in the small client index too (`league:<name>`): the
+# rank chips and the ranked ladder that draw them are client components.
+icon_index.update({f'league:{l}': f'{u}?width=96' for l, u in leagues.items()})
 
 names = {b['id']: b['name'] for b in brawlers}
 gaps = lambda field: [b['name'] for b in brawlers if any(str(x['id']) not in index['accessories'] for x in b[field])]
 print(f"bodies {len(index['bodies'])}/{len(brawlers)} ({len(standing)} standing, the rest animation frames), "
-      f"accessories {len(index['accessories'])}, hypercharges {len(index['hypercharges'])}")
+      f"icons {sum(k.isdigit() for k in icon_index)}/{len(brawlers)}, skins {len(index['skins'])}, "
+      f"accessories {len(index['accessories'])}, hypercharges {len(index['hypercharges'])}, "
+      f"modes {len(index['modes'])}, leagues {len(leagues)}")
+print('no icon:', ', '.join(names[b['id']] for b in brawlers if str(b['id']) not in icon_index) or 'none')
 print('no body:', ', '.join(names[b['id']] for b in brawlers if str(b['id']) not in index['bodies']) or 'none')
 print('gadget gaps:', ', '.join(gaps('gadgets')) or 'none')
 print('star power gaps:', ', '.join(gaps('starPowers')) or 'none')
@@ -227,4 +393,8 @@ if not CHECK:
     with open(INDEX, 'w') as f:
         json.dump(index, f, indent=1, sort_keys=True)
         f.write('\n')
-    print('wrote', INDEX)
+    # The list icons apart, and small: client components draw them.
+    with open(ICON_INDEX, 'w') as f:
+        json.dump(icon_index, f, indent=1, sort_keys=True)
+        f.write('\n')
+    print('wrote', INDEX, ICON_INDEX)
