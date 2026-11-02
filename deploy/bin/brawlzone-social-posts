@@ -51,6 +51,7 @@ def kind(text):
         ('viral: ranks', r'what masters pick|what legends pick|what you pick'),
         ('viral: modes', r'for every mode'),
         ('viral: one-off', r'every brawler ranked|stop picking|inside these boxes'),
+        ('viral: whats new', r'new brawlers & buffies|buffies'),
         ('new brawler', r'first stats|is \w+ (broken|good|bad)\?'),
         ('account rating', r"account worth|rating a top"),
         ('weekly report', r'week \d|weekly|season \d+ week'),

@@ -594,6 +594,164 @@
   "16000109": "https://media.ffycdn.net/eu/supercell/XaucyAm29WX52Qac6mKK.png?width=1977",
   "16000110": "https://media.ffycdn.net/eu/supercell/GsRgVp37akutTyWfBR6Q.png?width=2220"
  },
+ "buffies": {
+  "16000000": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/8qDLBZ3oJN34d2XbcQrJ.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/pNMf8GhUKSTWVbacjLbb.png",
+   "order": 258,
+   "starPower": "https://media.ffycdn.net/eu/supercell/KPbkJdoVYbDUrRWg65QY.png"
+  },
+  "16000001": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/JqBerousLarPYg7RMpNC.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/HaVkqNuuzimx5x34RxzL.png",
+   "order": 275,
+   "starPower": "https://media.ffycdn.net/eu/supercell/2KrifxsvmNxNpnLSLP39.png"
+  },
+  "16000002": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/dD7eDuJzU2byoTS6TNjV.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/GZFHTzaroBKx4TXAFEyf.png",
+   "order": 171,
+   "starPower": "https://media.ffycdn.net/eu/supercell/LntYGzyjmJeVcTVZTfuB.png"
+  },
+  "16000003": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/yvKpPesVFGXAUzaecHgX.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/nascESjWuMFSDgznoLiE.png",
+   "order": 40,
+   "starPower": "https://media.ffycdn.net/eu/supercell/ho4qHUccgHavAhcWUpnp.png"
+  },
+  "16000004": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/wJ8dGgZh89GMTn29eNVw.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/VXLgXjctyWieUCUc3EJB.png",
+   "order": 47,
+   "starPower": "https://media.ffycdn.net/eu/supercell/KK6SsdU2wPYENC2z2tMJ.png"
+  },
+  "16000005": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/PXJqcCeePqQ5Qs7mguFe.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/hUVmiFYHhD729UB87vh3.png",
+   "order": 255,
+   "starPower": "https://media.ffycdn.net/eu/supercell/7ZGu8Yy9hv1MnEJpKEhD.png"
+  },
+  "16000008": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/kRzHnb95sHerd4THcCcw.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/AeA9pfozXBzNTJtL6xio.png",
+   "order": 124,
+   "starPower": "https://media.ffycdn.net/eu/supercell/oKVc81c8jhhpJpyqwCfw.png"
+  },
+  "16000010": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/n2f56bGC1DzK8ovtPJpW.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/C9X9ioSiopFRSNzj5Skn.png",
+   "order": 27,
+   "starPower": "https://media.ffycdn.net/eu/supercell/7YsFdgeXMK24SvMPnyNy.png"
+  },
+  "16000011": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/WdaMS9qMKvhgb7N6Nf4Y.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/9sDvcgeTEY5n2oLjMg5P.png",
+   "order": 262,
+   "starPower": "https://media.ffycdn.net/eu/supercell/fo7uwKruVH8qksk7YpEu.png"
+  },
+  "16000012": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/zxNxgLkaTW1DaKYc6oh2.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/2barGvHeetD4VJQKHXYq.png",
+   "order": 156,
+   "starPower": "https://media.ffycdn.net/eu/supercell/7CS7aDNq3MEaHZc5xACq.png"
+  },
+  "16000013": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/FVxBvdJyZredjJsJCHim.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/DyDJ5iwFb9boQX9TJJ9q.png",
+   "order": 23,
+   "starPower": "https://media.ffycdn.net/eu/supercell/e58xs6o53vgxF74TuQ7p.png"
+  },
+  "16000014": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/VYciLRM9yYMrhozE5t5z.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/m7yHJbyScu3U8NWmErCW.png",
+   "order": 187,
+   "starPower": "https://media.ffycdn.net/eu/supercell/pjZbeUuDhLV42EuYVZw3.png"
+  },
+  "16000020": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/JebVCBye6Kv5sBichNVf.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/TsTeSePHVMi6LnSSFQHT.png",
+   "order": 266,
+   "starPower": "https://media.ffycdn.net/eu/supercell/nEfbpxJbHt87VaBtJTKL.png"
+  },
+  "16000023": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/SULWrXDj1GhGnRhRRM1R.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/Ws3EbXQ9dcrSWLhVft1y.png",
+   "order": 140,
+   "starPower": "https://media.ffycdn.net/eu/supercell/Cebyo8zWUXhHT3TZbaqR.png"
+  },
+  "16000026": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/1n5Rk4NcqxBxo5szsbLF.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/Y8V6oXtp7PP4EL1EyKr4.png",
+   "order": 204,
+   "starPower": "https://media.ffycdn.net/eu/supercell/J5di1wMNWwXG9A5Sv2zo.png"
+  },
+  "16000030": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/nkECWjC9SGc8Xt1vi2sT.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/A9VjppMNrDBKpJPVptXV.png",
+   "order": 270,
+   "starPower": "https://media.ffycdn.net/eu/supercell/ctoCP2NUy2CnqLmY4ekz.png"
+  },
+  "16000032": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/CBi7GgENiHwy2vZhLNB3.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/w1DL8rHuKppNQvt8hNwf.png",
+   "order": 44,
+   "starPower": "https://media.ffycdn.net/eu/supercell/YeKirWTCJGgACCfVa4Cs.png"
+  },
+  "16000038": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/7PuU5x6JVvLu3X3ku5GU.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/Qgd6PHZK3hTqD91x7TLH.png",
+   "order": 51,
+   "starPower": "https://media.ffycdn.net/eu/supercell/odoHXTPvkZSMa8j15BuQ.png"
+  },
+  "16000039": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/pMbakfEerAeRU9oM58V9.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/1ZgGNULBQak1y1xx3jMh.png",
+   "order": 97,
+   "starPower": "https://media.ffycdn.net/eu/supercell/B5xWXJ66rTzJnEVT5MfQ.png"
+  },
+  "16000040": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/6T7JeMJsnwmprzTRCe9y.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/tNPra1WCxH3D1iQDpMVU.png",
+   "order": 35,
+   "starPower": "https://media.ffycdn.net/eu/supercell/Zurp1yHGabe5wDiddfjv.png"
+  },
+  "16000043": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/VSLgjm4fkFYv5156NUm3.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/FaWekUquYHzRjbEJQRHM.png",
+   "order": 105,
+   "starPower": "https://media.ffycdn.net/eu/supercell/XbPTdC48Gn6z6GUsKvoN.png"
+  },
+  "16000050": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/6gzfGNGMTLsMRzm8ddDv.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/pn1ZiYDwpjr37nfkmmXm.png",
+   "order": 101,
+   "starPower": "https://media.ffycdn.net/eu/supercell/cMPEomqkFoyHycdqFjTE.png"
+  },
+  "16000052": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/1PTzAW2ru8hu9e2SkAwG.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/1QjkcAjTQ3AGwfkQNtqA.png",
+   "order": 56,
+   "starPower": "https://media.ffycdn.net/eu/supercell/d4rasEJTtgW8HQUXq245.png"
+  },
+  "16000061": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/EA9ARiRuMfbh1cckRrwz.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/cGJ64eEfXNTN4Kwn37hU.png",
+   "order": 15,
+   "starPower": "https://media.ffycdn.net/eu/supercell/EvsphzcsiLer79LWjc53.png"
+  },
+  "16000073": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/Edj3uaNoizfthXkfwsYS.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/qnyJkE9JWRbWV6o15aVE.png",
+   "order": 31,
+   "starPower": "https://media.ffycdn.net/eu/supercell/U4SWaV6qqwAad21WtUpZ.png"
+  },
+  "16000086": {
+   "gadget": "https://media.ffycdn.net/eu/supercell/tq5RowqoRCuMHoVGhatj.png",
+   "hyperCharge": "https://media.ffycdn.net/eu/supercell/dMrmbS4CuT9p6pPogrK9.png",
+   "order": 20,
+   "starPower": "https://media.ffycdn.net/eu/supercell/aGCga4VeuLGSjQKKup4e.png"
+  }
+ },
  "gears": {
   "damage": "https://media.ffycdn.net/eu/supercell/wGcky1SY28aTHdUAiCwp.png",
   "gadgetcharge": "https://media.ffycdn.net/eu/supercell/Q188bJm3BqsBMm49f3nV.png",

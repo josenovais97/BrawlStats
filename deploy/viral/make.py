@@ -1482,9 +1482,134 @@ def drops_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 # ================================================================ render
+# ================================================================ whatsnew
+# "What's new" (2026-11-02, owner: "one showcasing the new brawlers/new
+# buffies would be awesome"): the five newest brawlers, each revealed in
+# Supercell's Fan Kit render with its Ranked tier, then the five newest
+# Buffies, each brawler with its gadget, star power and hypercharge Buffie.
+# The Buffie icons and their newest-first order come from the Fan Kit
+# (scripts/fankit-sync.py), cached by brawlzone-viral in $ASSETS/buffies.
+BUFFIE_COL = {'gadget': (60, 200, 110), 'starPower': (255, 190, 40), 'hyperCharge': (255, 80, 200)}
+BUFFIE_LABEL = {'gadget': 'GADGET', 'starPower': 'STAR POWER', 'hyperCharge': 'HYPERCHARGE'}
+if KIND == 'whatsnew':
+    scored = sorted((b for b in data['all'] if b.get('tier')), key=lambda b: -(b['score'] or 0))
+    RANK = {b['id']: i + 1 for i, b in enumerate(scored)}
+    NEWEST = [b for b in sorted(scored, key=lambda b: -b['id']) if has_model(b)][:5]
+    try:
+        _bi = json.load(open(f"{os.environ.get('ASSETS', '.')}/buffies/index.json"))
+    except (OSError, ValueError):
+        _bi = {}
+    BUFFIES = []
+    for bid, v in sorted(_bi.items(), key=lambda kv: kv[1].get('order', 1e9)):
+        b = by_id.get(int(bid))
+        icons = {k: optional(f"{os.environ.get('ASSETS', '.')}/buffies/{bid}-{k}.png") for k in BUFFIE_COL}
+        if b and b.get('tier') and has_model(b) and all(icons.values()):
+            BUFFIES.append((b, icons))
+        if len(BUFFIES) == 5:
+            break
+    if len(NEWEST) < 3 or len(BUFFIES) < 3:
+        print('not enough new brawlers or buffies'); sys.exit(3)
+    tl.add(5, 'w_intro')
+    tl.add(2, 'w_part', label='NEW BRAWLERS', col=(255, 60, 100))
+    for b in reversed(NEWEST):  # oldest of the five first, the newest last
+        tl.add(4, 'w_brawler', b=b)
+    tl.add(2, 'w_part', label='NEW BUFFIES', col=(139, 107, 255))
+    for b, icons in reversed(BUFFIES):
+        tl.add(4, 'w_buffie', b=b, icons=icons)
+    tl.add(7, 'w_outro')
+    nb = ', '.join(f"{nice(b['n'])} ({b['tier']} tier)" for b in reversed(NEWEST))
+    bf = ', '.join(nice(b['n']) for b, _ in reversed(BUFFIES))
+    META = {
+        'title': 'NEW brawlers & Buffies: are they actually good? 🔥',
+        'titles': {'pt-BR': 'Brawlers e Buffies NOVOS: são bons mesmo? 🔥',
+                   'es-419': '¿Los NUEVOS brawlers y Buffies son buenos? 🔥'},
+        'description': f"The newest brawlers in Ranked right now: {nb}. The newest Buffies: {bf}. "
+                       f"Which one is your favourite? 👇\n\n"
+                       f"Every brawler's tier, from real Ranked battles: https://brawlzone.net/tier-list/ranked{FOOTER}\n"
+                       f"#brawlstars #brawlstarsnewbrawler #buffies #brawlstarsmeta #brawlzone",
+    }
+
+
+def wn_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    if k == 'w_intro':
+        col = (255, 60, 100) if int(t * 3) % 2 == 0 else (139, 107, 255)
+        canvas = background(t, col).convert('RGBA')
+        put_rays(canvas, col, t, W / 2, 1100, speed=50, alpha=0.6)
+        for j, b in enumerate(NEWEST[:3]):
+            sil = silhouette(art(b, 520, 420), (255, 255, 255))
+            x = W / 2 + (j - 1) * 330
+            put(canvas, sil, x, 1180 + (j % 2) * 40, scale=0.85 + 0.04 * math.sin(t * 6 + j), alpha=clamp(bt - j * 0.3))
+        slam(canvas, 'NEW', 230, None, W / 2, 330, bt, gold=True)
+        slam(canvas, 'BRAWLERS', 170, WHITE, W / 2, 520, bt - 1)
+        slam(canvas, '+ BUFFIES', 150, (190, 160, 255), W / 2, 690, bt - 2)
+        slam(canvas, 'ARE THEY GOOD?', 110, WHITE, W / 2, 1660, bt - 3.2)
+        shake, flash = hits(bt, (0, 1, 2, 3.2), 1.3, 0.5)
+    elif k == 'w_part':
+        canvas = background(t, s['col']).convert('RGBA')
+        put_rays(canvas, s['col'], t, W / 2, 960, speed=70, alpha=0.8)
+        a, b_ = s['label'].split(' ', 1)
+        slam(canvas, a, 210, None, W / 2, 840, bt, gold=True)
+        slam(canvas, b_, 190, WHITE, W / 2, 1060, bt - 0.5)
+        shake, flash = hits(bt, (0, 0.5), 1.4, 0.6)
+    elif k == 'w_brawler':
+        b = s['b']; tier = b['tier']; tcol = TIER.get(tier, (255, 60, 100))
+        canvas = background(t, tcol).convert('RGBA')
+        put_rays(canvas, tcol, t, W / 2, 860, speed=40, alpha=0.9)
+        put(canvas, art(b, 860, 900), W / 2, 820, scale=1 + 0.35 * (1 - out_back(bt / 0.45, 1.6)))
+        nm = nice(b['n']).upper(); fs = 170 if len(nm) <= 8 else 130 if len(nm) <= 12 else 100
+        if bt > 0.3:
+            put(canvas, text_sprite(nm, fs, gold=True), W / 2, 1330, scale=1 + 1.2 * (1 - out_back((bt - 0.3) / 0.5, 1.2)))
+        if bt > 1.3:
+            u = bt - 1.3
+            put(canvas, tier_pill(tier), W / 2, 1520, scale=1.5 * (1 + 1.0 * (1 - out_back(u / 0.5, 1.2))) if u < 0.5 else 1.5)
+        if bt > 2.2:
+            put(canvas, text_sprite(f"#{RANK[b['id']]} OF {len(RANK)} IN RANKED", 64, WHITE, stroke=6), W / 2, 1680,
+                scale=out_back((bt - 2.2) / 0.4))
+        if bt > 2.9:
+            word, vcol = VERDICT[tier]
+            put(canvas, text_sprite(word, 150, vcol), W / 2, 330, scale=1 + 1.6 * (1 - out_back((bt - 2.9) / 0.4, 1.0)), rot=-8)
+            if tier in 'SA': confetti(canvas, (bt - 2.9) * P)
+        shake = max(impact(lt, 1.2), hits(bt, (1.3, 2.9), 1.1, 0.4)[0])
+        flash = max(impact(lt) * 0.8, hits(bt, (1.3, 2.9), 1.1, 0.4)[1])
+    elif k == 'w_buffie':
+        b = s['b']; tier = b['tier']
+        canvas = background(t, (139, 107, 255)).convert('RGBA')
+        put_rays(canvas, (139, 107, 255), t, W / 2, 640, speed=40, alpha=0.8)
+        put(canvas, art(b, 700, 760), W / 2, 640, scale=1 + 0.3 * (1 - out_back(bt / 0.45, 1.6)))
+        nm = nice(b['n']).upper(); fs = 150 if len(nm) <= 8 else 115 if len(nm) <= 12 else 90
+        if bt > 0.3:
+            put(canvas, text_sprite(nm, fs, gold=True), W / 2, 1080, scale=1 + 1.2 * (1 - out_back((bt - 0.3) / 0.5, 1.2)))
+        for j, kind in enumerate(('gadget', 'starPower', 'hyperCharge')):
+            u = (bt - 1.0 - j * 0.5) / 0.35
+            if u <= 0:
+                continue
+            x = W / 2 + (j - 1) * 330
+            put(canvas, s['icons'][kind].resize((250, 250), Image.LANCZOS), x, 1340, scale=out_back(u, 1.9))
+            put(canvas, text_sprite(BUFFIE_LABEL[kind], 44, BUFFIE_COL[kind], stroke=5), x, 1500, alpha=clamp(u - 0.4))
+            if u < 0.5: shake = max(shake, impact(u * 0.4 * P, 0.8))
+        if bt > 2.9:
+            put(canvas, tier_pill(tier), W / 2, 1690, scale=1.3 * (1 + 1.0 * (1 - out_back((bt - 2.9) / 0.5, 1.2))) if bt < 3.4 else 1.3)
+        shake = max(shake, impact(lt, 1.0)); flash = max(flash, impact(lt) * 0.7)
+    else:  # w_outro
+        canvas = background(t, (255, 170, 40)).convert('RGBA'); mark = False
+        faces = [b for b in NEWEST] + [b for b, _ in BUFFIES]
+        for j, b in enumerate(faces):
+            u = (bt - j * 0.08) / 0.3
+            if u <= 0: continue
+            x = W / 2 + ((j % 5) - 2) * 190; y = 330 + (j // 5) * 200
+            put(canvas, load_face(b).resize((170, 170), Image.LANCZOS), x, y, scale=out_back(u, 1.6))
+        slam(canvas, 'WHICH ONE IS', 120, WHITE, W / 2, 790, bt - 0.8)
+        slam(canvas, 'YOUR FAVOURITE?', 130, None, W / 2, 940, bt - 1.3, gold=True)
+        slam(canvas, 'TELL US IN THE COMMENTS', 62, WHITE, W / 2, 1070, bt - 1.9)
+        follow_cta(canvas, bt - 2.8, 1320, 'FOR EVERY NEW BRAWLER')
+        shake, flash = hits(bt, (0.8, 1.3, 2.8), 0.9, 0.3)
+    return finish(canvas, shake, flash, mark)
+
+
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
-         'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene}[KIND]
+         'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene}[KIND]
 
 
 def frame(t):

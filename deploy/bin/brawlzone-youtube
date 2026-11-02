@@ -71,6 +71,8 @@ elif ranking:
     ask = "💬 Agree? Comment who you'd move up or down 👇"
     if not title.rstrip().endswith('?') and len(title) + len(' Agree? 👇 #Shorts') <= 100:
         title = f'{title} Agree? 👇'
+elif 'buffies' in low:
+    ask = "💬 Which new brawler or Buffie is your favourite? Comment below 👇"
 elif low.startswith('how to beat') or 'counter' in low:
     ask = "💬 What do you pick against them? Comment below 👇"
 else:

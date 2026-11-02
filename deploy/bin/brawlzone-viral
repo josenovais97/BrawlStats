@@ -3,7 +3,7 @@
 # drawn from today's data and posted to TikTok (inbox), YouTube and Instagram.
 #
 #   brawlzone-viral [--no-post] [quiz|broken|ranks|modes]
-#   brawlzone-viral [--no-post] extra|everyrank|classrank|stop|drops
+#   brawlzone-viral [--no-post] extra|everyrank|classrank|stop|drops|whatsnew
 #   brawlzone-viral [--no-post] newbrawler <dir>
 #   brawlzone-viral [--no-post] daily
 #
@@ -26,7 +26,7 @@
 # gave up for doing worst. By weekday, since 2026-10-29 with the data
 # formats the daily quiz moved out of 15:30:
 #
-#   Mon broken  Tue stop  Wed ranks  Thu classrank  Fri classrank  Sat modes  Sun everyrank
+#   Mon broken  Tue stop  Wed ranks  Thu whatsnew  Fri classrank (giveaway to Nov 30)  Sat modes  Sun everyrank
 #
 # Fridays until the giveaway closes (2026-11-30) are its reminder instead.
 #
@@ -80,6 +80,7 @@ if [ "$kind" = extra ]; then
     1) kind=broken ;;
     2) kind=stop ;;
     3) kind=ranks ;;
+    4) kind=whatsnew ;;
     5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway; else kind=classrank; fi ;;
     6) kind=modes ;;
     7) kind=everyrank ;;
@@ -87,8 +88,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway or drops)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops or whatsnew)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -101,7 +102,8 @@ elif [ "$kind" = daily ]; then
   DATA_IN=/out/daily.json
   PREV=-
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
-     || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ]; then
+     || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] \
+     || [ "$kind" = whatsnew ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
 else
@@ -116,7 +118,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops')
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -229,6 +231,21 @@ for b in data['all']:
             open(face, 'wb').write(get(f"https://cdn.brawlify.com/brawlers/borderless/{bid}.png"))
     except Exception as e:
         print(f"no face for {b['n']}: {e}")
+# Buffie icons for the "what's new" video, and their newest-first order.
+os.makedirs('/cache/buffies', exist_ok=True)
+order = {}
+for bid, v in fk.get('buffies', {}).items():
+    try:
+        for kind in ('gadget', 'starPower', 'hyperCharge'):
+            path = f'/cache/buffies/{bid}-{kind}.png'
+            if cached_from(path) != v[kind]:
+                img = Image.open(io.BytesIO(get(v[kind] + '?width=320'))).convert('RGBA')
+                img = img.crop(img.getchannel('A').point(lambda a: 255 if a > 12 else 0).getbbox())
+                save(img, path, v[kind])
+        order[bid] = {'order': v['order']}
+    except Exception as e:
+        print(f"no buffies for {bid}: {e}")
+json.dump(order, open('/cache/buffies/index.json', 'w'))
 PY
 [ "$(find "$CACHE/faces" -name '*.png' | wc -l)" -gt 50 ] || die "::error::brawler portraits could not be fetched"
 fi  # not newbrawler or daily
@@ -254,7 +271,7 @@ draw () { # kind
 }
 
 draw "$kind"; rc=$?
-if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ]; }; then
+if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] || [ "$kind" = whatsnew ]; }; then
   # The 14:00 slot falls back to the full countdown, which always has data,
   # not to the quiz the 15:30 slot may already be posting today.
   echo "$(tail -n 1 "$CACHE/make-0.log"); drawing everyrank instead"

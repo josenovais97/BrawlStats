@@ -665,6 +665,28 @@ clubs_written = write_icons(club_known, 'club', 128)
 icon_index['clubs'] = id_ranges(clubs_written, 8000000)
 print(f'club badges {len(clubs_written)}/{len(game_clubs)}')
 
+# Buffies (added to the game December 2025): each brawler's gadget, star
+# power and hypercharge Buffie icons, for the "what's new" video. Named
+# `buddy_icon_gus_star_power`, `emoji_nita_buffy_hc`, `emoji_colt_keychain_gadget`;
+# `order` is the brawler's place in the kit's newest-first listing, so the
+# latest Buffies come first.
+BUFFIE_KIND = {'gadget': 'gadget', 'star': 'starPower', 'starpower': 'starPower', 'power': 'starPower',
+               'hc': 'hyperCharge', 'hypercharge': 'hyperCharge'}
+index['buffies'] = {}
+for n, a in enumerate(assets('Buffies')):
+    title = a['title'].lower().replace('@4x', '')
+    if not re.match(r'(buddy_icon_|emoji_[a-z0-9]+_(buffy|keychain)_)', title):
+        continue
+    words = [w for w in tokens(title) if w not in ('buddy', 'icon', 'emoji', 'buffy', 'keychain')]
+    b, rest = brawler_in(words)
+    kind = next((BUFFIE_KIND[w] for w in rest if w in BUFFIE_KIND), None)
+    if not b or not kind:
+        continue
+    entry = index['buffies'].setdefault(str(b['id']), {'order': n})
+    entry.setdefault(kind, file_url(a))
+index['buffies'] = {k: v for k, v in index['buffies'].items() if all(x in v for x in ('gadget', 'starPower', 'hyperCharge'))}
+print(f"buffies: {len(index['buffies'])} brawlers")
+
 # Reward and box art for the Starr Drops and free-rewards pages, keyed by the
 # wiki file name those pages look up (letters and digits only: "Gigi Box.png"
 # -> gigibox), so the Fan Kit's picture is used and the wiki is not asked.
