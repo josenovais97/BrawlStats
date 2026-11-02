@@ -51,7 +51,7 @@ import json, math, os, random, sys
 from PIL import Image, ImageDraw, ImageFilter
 
 from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, card, clamp,
-                    confetti, crown, finish, follow_cta, grey, hits, impact, load_face, load_model, nice, out_back,
+                    confetti, crown, finish, follow_cta, grey, hits, impact, has_model, load_face, load_model, nice, out_back,
                     out_cubic, pill, put, put_rays, rounded_mask, silhouette, slam, text_sprite, tier_pill, vgrad)
 
 KIND, DATA, PREV, STATE, OUT = sys.argv[1:6]
@@ -88,31 +88,34 @@ CLUES = {'shadow': 'WHO IS THIS?', 'pixel': 'WHO IS THIS?', 'zoom': 'ZOOMED IN: 
 QUIZ_STYLE = {'quiz': None, 'shadowquiz': 'shadow', 'zoomquiz': 'zoom'}
 # Harder from 2026-10-30, when the owner called the quizzes "really easy":
 # no EASY round, an EXPERT one last, rarer brawlers, and every clue tighter
-# per level. Where the zoom starts and how far it pulls back per beat:
-ZOOM_FROM = {'MEDIUM': 4.6, 'HARD': 5.6, 'EXPERT': 6.6}
+# per level. Harder again from 2026-11-02 ("people are getting everything"):
+# two EXPERT rounds, no popular pick, and every clue tighter still -- the
+# Fan Kit's large renders keep a deep zoom sharp. Where the zoom starts and
+# how far it pulls back per beat:
+ZOOM_FROM = {'MEDIUM': 5.6, 'HARD': 6.8, 'EXPERT': 8.2}
 ZOOM_PULL = 0.4
 # Pixel blocks across on each beat (was 7, 10, 14, 22 for every round).
-PIXEL_STEPS = {'MEDIUM': (5, 7, 10, 14), 'HARD': (4, 6, 9, 12), 'EXPERT': (3, 5, 7, 10)}
-# How much of the shadow shows, from the top: HARD loses the legs, EXPERT
-# is head and shoulders, mirrored.
-SHADOW_KEEP = {'MEDIUM': 1.0, 'HARD': 0.7, 'EXPERT': 0.52}
+PIXEL_STEPS = {'MEDIUM': (4, 6, 9, 12), 'HARD': (3, 5, 7, 10), 'EXPERT': (3, 4, 6, 8)}
+# How much of the shadow shows, from the top: MEDIUM loses the feet, HARD
+# the legs, EXPERT is head and shoulders, mirrored.
+SHADOW_KEEP = {'MEDIUM': 0.8, 'HARD': 0.62, 'EXPERT': 0.52}
 
 if KIND in QUIZ_STYLE:
     STYLE = QUIZ_STYLE[KIND]
     N = episode(KIND)
     recent = set(state.get('quiz_recent', [])[-45:])
-    pool = sorted((b for b in data['all'] if load_model(b) is not None and b['id'] not in recent),
+    pool = sorted((b for b in data['all'] if has_model(b) and b['id'] not in recent),
                   key=lambda b: -(b['use'] or 0))
     if len(pool) < 15:  # the history ate the roster: start over
-        pool = sorted((b for b in data['all'] if load_model(b) is not None), key=lambda b: -(b['use'] or 0))
+        pool = sorted((b for b in data['all'] if has_model(b)), key=lambda b: -(b['use'] or 0))
     third = len(pool) // 3
-    # One popular brawler, two from the middle, two rarely played.
-    picks = (rnd.sample(pool[:third], 1) + rnd.sample(pool[third:2 * third], 2) + rnd.sample(pool[2 * third:], 2))
-    levels = ['MEDIUM', 'MEDIUM', 'HARD', 'HARD', 'EXPERT']
+    # Two from the middle, three rarely played (a popular one was a free point).
+    picks = rnd.sample(pool[third:2 * third], 2) + rnd.sample(pool[2 * third:], 3)
+    levels = ['MEDIUM', 'HARD', 'HARD', 'EXPERT', 'EXPERT']
     # The intro's sliding shadows were the five answers -- a free look at
     # every one before round 1. Five others now.
     chosen = {b['id'] for b in picks}
-    decoys = rnd.sample([b for b in data['all'] if b['id'] not in chosen and load_model(b) is not None], 5)
+    decoys = rnd.sample([b for b in data['all'] if b['id'] not in chosen and has_model(b)], 5)
     if STYLE:
         clues = [STYLE] * 5
     else:
@@ -158,6 +161,7 @@ elif KIND == 'zoomquiz':
     }
 
 
+HI_ZOOM = 2.4
 _zoom_at = {}
 def zoom_center(b, m, lvl):
     """Where to zoom: the head for MEDIUM; for HARD and EXPERT a spot on the
@@ -187,9 +191,13 @@ def zoom_view(b, z, lvl='MEDIUM'):
     """The model cropped at z times around zoom_center, inside a rounded window."""
     m = art(b, 900)
     cx, cy = zoom_center(b, m, lvl)
-    win = 760; side = win / z
-    box = (cx - side / 2, cy - side / 2, cx + side / 2, cy + side / 2)
-    crop = m.crop(tuple(int(v) for v in box)).resize((win, win), Image.BILINEAR)
+    # Cropped from the body at 2.4x that size, so a deep zoom shows the Fan
+    # Kit render's own detail instead of a blown-up 900px picture.
+    hi = art(b, 900 * HI_ZOOM, 900 * HI_ZOOM)
+    k = hi.width / m.width
+    win = 760; side = win / z * k
+    box = (cx * k - side / 2, cy * k - side / 2, cx * k + side / 2, cy * k + side / 2)
+    crop = hi.crop(tuple(int(v) for v in box)).resize((win, win), Image.BILINEAR)
     frame = Image.new('RGBA', (win + 24, win + 24), (0, 0, 0, 0)); d = ImageDraw.Draw(frame)
     d.rounded_rectangle((0, 0, win + 23, win + 23), 70, fill=(12, 14, 34, 255), outline=WHITE, width=10)
     inner = Image.new('RGBA', (win, win), (30, 34, 80, 255)); inner.alpha_composite(crop)
@@ -1319,7 +1327,7 @@ if KIND == 'drops':
             ITEMS[key] = ITEMS.get(key, 0) + 1
     # Which brawlers, for the art: a draw from that rarity, as the game does for a brawler you lack.
     def brawlers_of(item, n):
-        pool = [b for b in data['all'] if b.get('rar') == BRAWLER_RAR[item] and load_model(b) is not None]
+        pool = [b for b in data['all'] if b.get('rar') == BRAWLER_RAR[item] and has_model(b)]
         return sim.sample(pool, min(n, len(pool)))
     LEGS = brawlers_of('Legendary Brawler', min(ITEMS.get('Legendary Brawler', 0), 3))
     ULTRAS = brawlers_of('Ultra Brawler', min(ITEMS.get('Ultra Brawler', 0), 1))

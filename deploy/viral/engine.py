@@ -62,6 +62,11 @@ def load_model(b):
     p = f"{ASSETS}/models/{b['id']}.png"
     return Image.open(p).convert('RGBA') if os.path.exists(p) else None
 
+def has_model(b):
+    """Whether a full body exists, without decoding it: the Fan Kit's are
+    ~2,000px tall, and the quiz asks this of every brawler."""
+    return os.path.exists(f"{ASSETS}/models/{b['id']}.png")
+
 def vgrad(w, h, top, bot):
     a = np.linspace(0, 1, h)[:, None, None]
     arr = (np.array(top)[None, None, :] * (1 - a) + np.array(bot)[None, None, :] * a)

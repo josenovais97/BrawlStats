@@ -97,6 +97,13 @@ def assets(kind=None):
         time.sleep(0.25)
 
 
+def safe(f, *args):
+    try:
+        return f(*args)
+    except Exception:
+        return None
+
+
 def file_url(a):
     """The file's address without the `?width={width}` template."""
     return a['generic_url'].split('?')[0]
@@ -418,6 +425,27 @@ index['skins'] = render_all(sorted(skins.items()), 'skin',
                             lambda key: '-'.join([key.split('|')[0], key.split('|')[1][:24]]),
                             lambda a: trimmed(a, 200, 200, 300), 72)
 icon_index = {str(k): p for k, p in render_all(sorted(icons.items()), 'icon', str, square, 82).items()}
+
+
+# Where to fetch each body large, for the puzzles that zoom into it -- the
+# site's daily Shadow and Zoom pictures and the quiz videos: the Fan Kit file
+# at a width that makes the figure about HIRES_FIGURE_W across (the canvases
+# are loose, so the figure's share of the width is measured first), capped so
+# a sliver on an 8,000px master is not decoded whole.
+HIRES_FIGURE_W = 1400
+
+
+def hires(a):
+    probe = Image.open(io.BytesIO(fetch(a['generic_url'].replace('{width}', '400'), binary=True))).convert('RGBA')
+    box = alpha_box(probe)
+    share = (box[2] - box[0]) / probe.width if box else 1
+    width = min(a['width'], 4000, max(400, math.ceil(HIRES_FIGURE_W / max(share, 0.05))))
+    return f'{file_url(a)}?width={width}'
+
+
+with ThreadPoolExecutor(max_workers=3) as pool:
+    _bodies = sorted(chosen.items())
+    index['bodySources'] = {str(k): u for (k, _), u in zip(_bodies, pool.map(lambda kv: safe(hires, kv[1]), _bodies)) if u}
 # League badges ride in the small client index too (`league:<name>`): the
 # rank chips and the ranked ladder that draw them are client components.
 icon_index.update({f'league:{l}': f'{u}?width=96' for l, u in leagues.items()})
@@ -542,13 +570,6 @@ def thumb_feature(url):
     bg = Image.new('RGBA', img.size, (128, 128, 128, 255))
     bg.alpha_composite(img)
     return np.asarray(bg.convert('RGB').resize((16, 16), Image.BILINEAR), dtype=np.float32).ravel()
-
-
-def safe(f, *args):
-    try:
-        return f(*args)
-    except Exception:
-        return None
 
 
 def load_known(path):

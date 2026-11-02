@@ -34,10 +34,20 @@ const hypercharges: Record<string, string> = data.hypercharges;
 const modes: Record<string, string> = data.modes;
 const gears: Record<string, string> = data.gears;
 const items: Record<string, string> = data.items;
+const bodySources: Record<string, string> = data.bodySources;
 
 /** The brawler's default skin, full body, trimmed to the figure. */
 export function fankitBody(brawlerId: number): string | null {
   return bodies[String(brawlerId)] ?? null;
+}
+
+/**
+ * The default skin's full body as the Fan Kit's own file, large -- the figure
+ * about 1,400px across -- for pictures that zoom into it (the daily Shadow and
+ * Zoom puzzles). On the Fan Kit's loose canvas: trim before use.
+ */
+export function fankitBodySource(brawlerId: number): string | null {
+  return bodySources[String(brawlerId)] ?? null;
 }
 
 /**
