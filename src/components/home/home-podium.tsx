@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 
 import { PodiumScroll } from '@/components/home/podium-scroll';
 import { brawlerModelUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { fankitBody } from '@/lib/fankit';
 import { titleCase } from '@/lib/format';
 import type { TopMetaBrawler } from '@/lib/home-meta';
 import { localePath } from '@/lib/i18n';
@@ -40,6 +41,9 @@ export async function HomePodium({ top }: { top: TopMetaBrawler[] }) {
 
   const bodies = await Promise.all(
     top.map(async (b) => {
+      // Supercell's own render from the Fan Kit first (lib/fankit).
+      const official = fankitBody(b.brawlerId);
+      if (official) return official;
       if (await hasBrawlerModel(b.brawlerId).catch(() => false)) return brawlerModelUrl(b.brawlerId);
       const wiki = await getWikiModel(b.name).catch(() => null);
       return wiki ? wikiThumb(wiki, 460) : null;

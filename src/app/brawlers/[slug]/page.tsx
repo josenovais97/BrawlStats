@@ -45,6 +45,7 @@ import {
 } from '@/lib/brawler-wiki';
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getBalanceEvents } from '@/lib/release-notes';
+import { fankitBody, fankitHypercharge } from '@/lib/fankit';
 import { getWikiAbilityArt, getWikiModel } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
@@ -569,10 +570,15 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
    * with it — while `/model/` still 404s. Metadata and artwork arrive
    * separately, and this has to key on the artwork.
    */
-  const hasModel = await hasBrawlerModel(brawler.id);
-  const modelSrc = hasModel
-    ? brawlerModelUrl(brawler.id)
-    : (wikiModel ?? (await getWikiModel(brawler.name).catch(() => null)));
+  // Supercell's own render from the Fan Kit comes first (lib/fankit); the
+  // mirror and the wiki are only asked when it has none.
+  const fankitModel = fankitBody(brawler.id);
+  // This brawler's own hypercharge badge from the Fan Kit, else the generic one.
+  const hyperchargeArt = fankitHypercharge(brawler.id, 64);
+  const hasModel = fankitModel ? false : await hasBrawlerModel(brawler.id);
+  const modelSrc =
+    fankitModel ??
+    (hasModel ? brawlerModelUrl(brawler.id) : (wikiModel ?? (await getWikiModel(brawler.name).catch(() => null))));
   const name = titleCase(brawler.name);
 
   /*
@@ -1004,7 +1010,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                 <div className="card p-3">
                   <dt className="label-game text-xs leading-tight text-muted">{t('Hypercharge boost')}</dt>
                   <dd className="mt-1.5 flex items-center gap-2">
-                    <HyperchargeIcon className="size-5 shrink-0" />
+                    {hyperchargeArt ? (
+                      <Image src={hyperchargeArt} alt="" width={28} height={28} className="size-7 shrink-0 object-contain" unoptimized />
+                    ) : (
+                      <HyperchargeIcon className="size-5 shrink-0" />
+                    )}
                     <span className="text-lg font-bold leading-tight tabular-nums">
                       {wiki.stats.hyperchargeMultiplier}
                     </span>

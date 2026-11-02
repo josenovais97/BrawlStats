@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 
 import { SearchBar } from '@/components/search-bar';
 import { brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { fankitBody } from '@/lib/fankit';
 import { getTopMetaBrawlers } from '@/lib/home-meta';
 import { wikiThumb } from '@/lib/skin-art';
 import { getWikiModel } from '@/lib/wiki-art';
@@ -257,6 +258,9 @@ async function Stage() {
    */
   const bodies = await Promise.all(
     slots.map(async (s) => {
+      // Supercell's own render from the Fan Kit first (lib/fankit).
+      const official = fankitBody(s.brawlerId);
+      if (official) return official;
       if (await hasBrawlerModel(s.brawlerId).catch(() => false)) return brawlerModelUrl(s.brawlerId);
       const wiki = await getWikiModel(s.name).catch(() => null);
       return wiki ? wikiThumb(wiki, 460) : null;

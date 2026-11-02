@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { TrophyIcon, WinStreakIcon } from '@/components/game-icons';
 import { Panel } from '@/components/ui/panel';
 import { brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { fankitBody } from '@/lib/fankit';
 import { formatNumber, titleCase } from '@/lib/format';
 import {
   HIGHEST_KNOWN_MARK,
@@ -55,16 +56,18 @@ export async function PlayerShowcase({
 
   const [skinArt, models] = await Promise.all([
     getSkinArt().catch(() => ({}) as Record<string, string>),
-    Promise.all(top.map((b) => hasBrawlerModel(b.id).catch(() => false))),
+    Promise.all(top.map((b) => (fankitBody(b.id) ? false : hasBrawlerModel(b.id).catch(() => false)))),
   ]);
 
-  // The equipped skin first, then the brawler's own model, then the portrait.
-  // A default skin has no wiki file of its own, so it goes straight to the
-  // model -- which is exactly what the default skin looks like.
+  // The equipped skin first, then the brawler's default look -- Supercell's
+  // Fan Kit render, else the mirror's model -- then the portrait. A default
+  // skin has no wiki file of its own, so it goes straight to the default look.
   const artFor = (b: BSPlayerBrawler, i: number): string => {
     const label = skinLabel(b);
     const skin = label ? skinArtUrl(skinArt, b.name, label) : null;
     if (skin) return skin;
+    const official = fankitBody(b.id);
+    if (official) return official;
     if (models[i]) return brawlerModelUrl(b.id);
     return brawlerMeta.get(b.id)?.imageUrl ?? brawlerPortraitUrl(b.id);
   };

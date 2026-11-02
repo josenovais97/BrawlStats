@@ -59,6 +59,10 @@ export function rarityColor(value: string | undefined | null): string {
 
 export async function getBrawlers(): Promise<BABrawler[]> {
   const data = await baFetch<BABrawlerList>('/brawlers');
+  // The Fan Kit's official icons where it has them (lib/fankit). Imported
+  // here, inside a server-only fetch, so its index never reaches the client
+  // components that import this module for its URL helpers.
+  const { fankitAccessory } = await import('@/lib/fankit');
   return [...data.list]
     .sort((a, b) => a.id - b.id)
     .map((b) => ({
@@ -66,8 +70,8 @@ export async function getBrawlers(): Promise<BABrawler[]> {
       // Every consumer reads `rarity.color` straight into a style, so it is
       // normalised at the source and never arrives broken.
       rarity: { ...b.rarity, color: rarityColor(b.rarity?.color) },
-      starPowers: b.starPowers.map((a) => normalizeAccessory(a, starPowerIconUrl)),
-      gadgets: b.gadgets.map((a) => normalizeAccessory(a, gadgetIconUrl)),
+      starPowers: b.starPowers.map((a) => normalizeAccessory(a, (id) => fankitAccessory(id) ?? starPowerIconUrl(id))),
+      gadgets: b.gadgets.map((a) => normalizeAccessory(a, (id) => fankitAccessory(id) ?? gadgetIconUrl(id))),
     }));
 }
 

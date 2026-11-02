@@ -57,6 +57,12 @@ const nextConfig: NextConfig = {
         source: '/downloads/brawlzone-bubble.apk',
         headers: [{ key: 'Cache-Control', value: 'no-store' }],
       },
+      {
+        // Trimmed Fan Kit renders. The file name carries a hash of its source,
+        // so a changed render is a new address and these never go stale.
+        source: '/fankit/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
       /*
        * The notification service worker (2026-10-28): browsers fetch it past
        * their own cache, but Cloudflare held it for four hours, so a fix to
@@ -118,6 +124,8 @@ const nextConfig: NextConfig = {
     // All artwork comes from Brawlify's CDN (via api.brawlapi.com metadata).
     remotePatterns: [
       { protocol: 'https', hostname: 'cdn.brawlify.com', pathname: '/**' },
+      // Supercell's Brawl Stars Fan Kit, on Frontify's CDN. See lib/fankit.
+      { protocol: 'https', hostname: 'media.ffycdn.net', pathname: '/eu/supercell/**' },
       { protocol: 'https', hostname: 'cdn-misc.brawlify.com', pathname: '/**' },
       { protocol: 'https', hostname: 'cdn-old.brawlify.com', pathname: '/**' },
       // Thumbnails on official Brawl Stars news posts.

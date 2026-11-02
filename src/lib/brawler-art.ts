@@ -1,4 +1,5 @@
 import { brawlerIconUrl, brawlerModelUrl, brawlerPortraitUrl, hasBrawlerModel } from '@/lib/brawlapi';
+import { fankitBody } from '@/lib/fankit';
 import { skinLabel } from '@/lib/player-showcase';
 import { getSkinArt, skinArtUrl, wikiThumb } from '@/lib/skin-art';
 import { getWikiModel } from '@/lib/wiki-art';
@@ -7,7 +8,8 @@ import type { BSPlayerBrawler } from '@/types/brawlstars';
 
 /**
  * The best picture of each brawler as this account has it: the equipped skin,
- * then the brawler's own model, then the portrait.
+ * then the brawler's default look (Supercell's Fan Kit render, else the
+ * mirror's model), then the portrait.
  *
  * The same order the Overview showcase uses, so a brawler looks the same on
  * every tab. A default skin has no wiki file of its own, so it goes straight
@@ -22,7 +24,8 @@ export async function brawlerArt(
 ): Promise<Map<number, string>> {
   const [skinArt, models] = await Promise.all([
     getSkinArt().catch(() => ({}) as Record<string, string>),
-    Promise.all(brawlers.map((b) => hasBrawlerModel(b.id).catch(() => false))),
+    // Only asked where the Fan Kit has no render: it wins anyway.
+    Promise.all(brawlers.map((b) => (fankitBody(b.id) ? false : hasBrawlerModel(b.id).catch(() => false)))),
   ]);
 
   const art = new Map<number, string>();
@@ -32,6 +35,7 @@ export async function brawlerArt(
     art.set(
       b.id,
       skin ??
+        fankitBody(b.id) ??
         (models[i] ? brawlerModelUrl(b.id) : null) ??
         brawlerMeta.get(b.id)?.imageUrl ??
         brawlerPortraitUrl(b.id),
@@ -42,14 +46,17 @@ export async function brawlerArt(
 
 /**
  * A brawler drawn full-body in its default look, for podiums and face-offs:
- * the mirror's model, then the wiki's full-body render, then the portrait --
- * so two figures side by side never become a figure and a square tile.
+ * Supercell's own render from the Fan Kit, then the mirror's model, then the
+ * wiki's full-body render, then the portrait -- so two figures side by side
+ * never become a figure and a square tile.
  */
 export async function fullBodyArt(
   brawlerId: number,
   brawlerName: string,
   portrait?: string | null,
 ): Promise<string> {
+  const official = fankitBody(brawlerId);
+  if (official) return official;
   if (await hasBrawlerModel(brawlerId).catch(() => false)) return brawlerModelUrl(brawlerId);
   const wiki = await getWikiModel(brawlerName).catch(() => null);
   if (wiki) return wikiThumb(wiki, 400);
