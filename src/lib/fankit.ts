@@ -1,3 +1,4 @@
+import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
 import data from '@/data/fankit.json';
 
 /**
@@ -31,6 +32,7 @@ const skins: Record<string, string> = data.skins;
 const accessories: Record<string, string> = data.accessories;
 const hypercharges: Record<string, string> = data.hypercharges;
 const modes: Record<string, string> = data.modes;
+const gears: Record<string, string> = data.gears;
 
 /** The brawler's default skin, full body, trimmed to the figure. */
 export function fankitBody(brawlerId: number): string | null {
@@ -75,3 +77,22 @@ export function fankitMode(modeName: string, width = 96): string | null {
   const url = modes[norm(modeName)];
   return url ? `${url}?width=${width}` : null;
 }
+
+/**
+ * A gear's icon, by the game's name for it ("SHIELD"), or -- for a mythic
+ * gear, whose name is its own -- by the brawler it belongs to.
+ */
+export function fankitGear(gearName: string, brawlerName?: string | null, width = 128): string | null {
+  const url = gears[norm(gearName)] ?? (brawlerName ? gears[`mythic:${norm(brawlerName)}`] : undefined);
+  return url ? `${url}?width=${width}` : null;
+}
+
+/*
+ * The id-based icon helpers with the Fan Kit in front, for server code that
+ * has only an id (a build's picks). Client code keeps lib/brawlapi's plain
+ * ones: the index behind these stays on the server.
+ */
+export const starPowerArt = (id: number) => fankitAccessory(id) ?? starPowerIconUrl(id);
+export const gadgetArt = (id: number) => fankitAccessory(id) ?? gadgetIconUrl(id);
+export const gearArt = (id: number, gearName?: string | null, brawlerName?: string | null) =>
+  (gearName ? fankitGear(gearName, brawlerName) : null) ?? gearIconUrl(id);

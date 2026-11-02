@@ -15,7 +15,7 @@ import {
 } from '@/components/game-icons';
 import { ClampedText } from '@/components/ui/disclosure';
 import { SectionHeading } from '@/components/ui/section-heading';
-import { gearIconUrl } from '@/lib/brawlapi';
+import { gearArt } from '@/lib/fankit';
 import type { BrawlerWiki } from '@/lib/brawler-wiki';
 import { slugify } from '@/lib/slugs';
 import type { BrawlerAbilityChoices, BrawlerBuffies } from '@/lib/stats';
@@ -288,7 +288,7 @@ export function BuildAndUpgrades({
                     className="flex gap-3 rounded-xl bg-surface-2/50 p-3"
                   >
                     <Image
-                      src={gearIconUrl(gear.id)}
+                      src={gearArt(gear.id, gear.name, brawler.name)}
                       alt=""
                       width={36}
                       height={36}

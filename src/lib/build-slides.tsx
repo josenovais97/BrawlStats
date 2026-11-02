@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
 
 import type { BrawlerOfDay } from '@/lib/brawler-of-day';
-import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
+import { gearIconUrl } from '@/lib/brawlapi';
+import { gadgetArt, starPowerArt } from '@/lib/fankit';
 import { titleCase } from '@/lib/format';
 import {
   DISPLAY,
@@ -268,10 +269,10 @@ export async function buildSlides(
   const [art, starIcons, gadgetIcons, gearIcons, logo] = await Promise.all([
     wanted('cover') ? loadArt(day.brawlerId, 700, day.imageUrl) : Promise.resolve(null),
     wanted('star')
-      ? Promise.all(starTop.map((r) => loadIcon(starPowerIconUrl(r.itemId), 128)))
+      ? Promise.all(starTop.map((r) => loadIcon(starPowerArt(r.itemId), 128)))
       : Promise.resolve<(string | null)[]>([]),
     wanted('gadget')
-      ? Promise.all(gadgetTop.map((r) => loadIcon(gadgetIconUrl(r.itemId), 128)))
+      ? Promise.all(gadgetTop.map((r) => loadIcon(gadgetArt(r.itemId), 128)))
       : Promise.resolve<(string | null)[]>([]),
     wanted('gears')
       ? Promise.all(gearTop.map((r) => loadIcon(gearIconUrl(r.itemId), 96)))

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { GadgetIcon, GearIcon, StarPowerIcon } from '@/components/game-icons';
 
-import { gearIconUrl } from '@/lib/brawlapi';
+import { gearArt } from '@/lib/fankit';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { BAAccessory, BABrawler } from '@/types/brawlapi';
 import type { BrawlerBuild, BuildOption } from '@/types/stats';
@@ -136,7 +136,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
                 const isGear = title.startsWith('Gears');
                 const name =
                   accessory?.name ?? gearNames.get(option.itemId) ?? `#${option.itemId}`;
-                const imageUrl = accessory?.imageUrl ?? (isGear ? gearIconUrl(option.itemId) : null);
+                const imageUrl = accessory?.imageUrl ?? (isGear ? gearArt(option.itemId, name, meta?.name) : null);
 
                 return (
                   <li key={option.itemId} className="flex items-center gap-3">

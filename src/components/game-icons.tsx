@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { prestigeTier } from '@/lib/prestige';
 import { slugify } from '@/lib/slugs';
 import { getUT } from '@/lib/t-universal';
+import { fankitGeneric } from '@/lib/fankit-icons';
 
 /**
  * Real in-game artwork, used everywhere a stat refers to a game concept.
@@ -23,11 +24,11 @@ interface IconProps {
   className?: string;
 }
 
-/** Representative CDN assets used as generic category marks. */
+/** Representative assets used as generic category marks, from the Fan Kit. */
 const GENERIC_STAR_POWER =
-  'https://cdn.brawlify.com/star-powers/borderless/23000076.png';
-const GENERIC_GADGET = 'https://cdn.brawlify.com/gadgets/borderless/23000255.png';
-const GENERIC_GEAR = 'https://cdn.brawlify.com/gears/regular/62000000.png';
+  fankitGeneric('starpower') ?? 'https://cdn.brawlify.com/star-powers/borderless/23000076.png';
+const GENERIC_GADGET = fankitGeneric('gadget') ?? 'https://cdn.brawlify.com/gadgets/borderless/23000255.png';
+const GENERIC_GEAR = fankitGeneric('gear') ?? 'https://cdn.brawlify.com/gears/regular/62000000.png';
 
 function GameIcon({
   src,

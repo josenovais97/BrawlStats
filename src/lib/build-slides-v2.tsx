@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
 
 import type { BrawlerOfDay } from '@/lib/brawler-of-day';
-import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
+import { gearIconUrl } from '@/lib/brawlapi';
+import { gadgetArt, starPowerArt } from '@/lib/fankit';
 import { titleCase } from '@/lib/format';
 import { loadArt, loadIcon, loadLogo } from '@/lib/slide-chrome';
 import {
@@ -334,8 +335,8 @@ export async function buildSlidesV2(day: BrawlerOfDay, only?: number): Promise<R
   const slides: ReactElement[] = [];
   if (want(0)) {
     const picks = [
-      star.pick ? { url: starPowerIconUrl(star.pick.itemId), label: 'Star power' } : null,
-      gadget.pick ? { url: gadgetIconUrl(gadget.pick.itemId), label: 'Gadget' } : null,
+      star.pick ? { url: starPowerArt(star.pick.itemId), label: 'Star power' } : null,
+      gadget.pick ? { url: gadgetArt(gadget.pick.itemId), label: 'Gadget' } : null,
       ...gears.slice(0, 2).map((g) => ({ url: gearIconUrl(g.itemId), label: 'Gear' })),
     ].filter((x): x is { url: string; label: string } => x !== null);
     const [art, ...icons] = await Promise.all([
@@ -346,8 +347,8 @@ export async function buildSlidesV2(day: BrawlerOfDay, only?: number): Promise<R
   }
   if (want(1)) {
     const items = [
-      ...star.pair.map((r) => [r.itemId, starPowerIconUrl(r.itemId)] as const),
-      ...gadget.pair.map((r) => [r.itemId, gadgetIconUrl(r.itemId)] as const),
+      ...star.pair.map((r) => [r.itemId, starPowerArt(r.itemId)] as const),
+      ...gadget.pair.map((r) => [r.itemId, gadgetArt(r.itemId)] as const),
     ];
     const icons = new Map(await Promise.all(items.map(async ([id, url]) => [id, await loadIcon(url, 110)] as const)));
     slides[1] = abilities(day, icons);

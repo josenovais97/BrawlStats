@@ -242,7 +242,11 @@ export async function getGameModeIdMap(): Promise<Map<number, BAGameMode>> {
 
 export async function getMaps(): Promise<BAMap[]> {
   const data = await baFetch<BAMapList>('/maps');
-  return data.list;
+  // Each map carries its mode's icon too; the Fan Kit's where it has one.
+  const { fankitMode } = await import('@/lib/fankit');
+  return data.list.map((m) =>
+    m.gameMode ? { ...m, gameMode: { ...m.gameMode, imageUrl: fankitMode(m.gameMode.name) ?? m.gameMode.imageUrl } } : m,
+  );
 }
 
 /** Keyed by the numeric event id used by the official rotation endpoint. */

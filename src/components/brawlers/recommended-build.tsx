@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
-import { gadgetIconUrl, gearIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
+import { gadgetArt, gearArt, starPowerArt } from '@/lib/fankit';
 import { formatPercent } from '@/lib/format';
 import type { BrawlerBuild, BuildOption } from '@/types/stats';
 import { getT } from '@/lib/t';
@@ -37,7 +37,7 @@ export function RecommendedBuild({
   variant = 'strip',
 }: {
   build: BrawlerBuild | null;
-  meta?: { gadgets: NamedAccessory[]; starPowers: NamedAccessory[] };
+  meta?: { name?: string; gadgets: NamedAccessory[]; starPowers: NamedAccessory[] };
   gearNames: Map<number, string>;
   /**
    * `hero` draws the build as four icon cards inside the page's header: the
@@ -72,7 +72,7 @@ export function RecommendedBuild({
         kind: 'Star power',
         name: starPowerName,
         share: starPower.share,
-        icon: starPowerIconUrl(starPower.itemId),
+        icon: starPowerArt(starPower.itemId),
       });
     }
     if (gadget && gadgetName) {
@@ -81,13 +81,13 @@ export function RecommendedBuild({
         kind: 'Gadget',
         name: gadgetName,
         share: gadget.share,
-        icon: gadgetIconUrl(gadget.itemId),
+        icon: gadgetArt(gadget.itemId),
       });
     }
     for (const gear of gears) {
       const name = gearNames.get(gear.itemId);
       if (name) {
-        cards.push({ key: `gr-${gear.itemId}`, kind: 'Gear', name, share: gear.share, icon: gearIconUrl(gear.itemId) });
+        cards.push({ key: `gr-${gear.itemId}`, kind: 'Gear', name, share: gear.share, icon: gearArt(gear.itemId, name, meta?.name) });
       }
     }
     return (
@@ -154,7 +154,7 @@ export function RecommendedBuild({
             key={gear.itemId}
             icon={
               <Image
-                src={gearIconUrl(gear.itemId)}
+                src={gearArt(gear.itemId, name, meta?.name)}
                 alt=""
                 width={20}
                 height={20}

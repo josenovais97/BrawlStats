@@ -496,6 +496,28 @@
   "16000109": "/fankit/body/16000109-fd3d20ab.webp",
   "16000110": "/fankit/body/16000110-325a672a.webp"
  },
+ "gears": {
+  "damage": "https://media.ffycdn.net/eu/supercell/wGcky1SY28aTHdUAiCwp.png",
+  "gadgetcharge": "https://media.ffycdn.net/eu/supercell/Q188bJm3BqsBMm49f3nV.png",
+  "gadgetcooldown": "https://media.ffycdn.net/eu/supercell/oxj7kJFYjEufQYyvZZZR.png",
+  "health": "https://media.ffycdn.net/eu/supercell/9iDtsMjDsFmdY4bGBQTD.png",
+  "mythic:amber": "https://media.ffycdn.net/eu/supercell/N9WGaxas12o37xM6UPGD.png",
+  "mythic:crow": "https://media.ffycdn.net/eu/supercell/xSKpfYvEJKMLKLb8GNje.png",
+  "mythic:eve": "https://media.ffycdn.net/eu/supercell/muQ3qDodFMSNUb2ogUXe.png",
+  "mythic:gene": "https://media.ffycdn.net/eu/supercell/H6NoWFdQmzEgymzcFpJK.png",
+  "mythic:leon": "https://media.ffycdn.net/eu/supercell/wzi46WAWei7DhnexfgD2.png",
+  "mythic:mortis": "https://media.ffycdn.net/eu/supercell/WSvfgapX4yWEr9UgQ4wo.png",
+  "mythic:pam": "https://media.ffycdn.net/eu/supercell/GY3RVGAxBmzMRyCZtDAG.png",
+  "mythic:sandy": "https://media.ffycdn.net/eu/supercell/7tMCgtuVwDJbMQzH1yfv.png",
+  "mythic:spike": "https://media.ffycdn.net/eu/supercell/6FPcSGx8ZT2HrjNZsPnZ.png",
+  "mythic:tick": "https://media.ffycdn.net/eu/supercell/8j5dVkqopQhYGjxo44sN.png",
+  "petpower": "https://media.ffycdn.net/eu/supercell/sAvKJ9S2GXcXvPc9gXas.png",
+  "reloadspeed": "https://media.ffycdn.net/eu/supercell/xzFJAtGgjqF3B5XYruoC.png",
+  "shield": "https://media.ffycdn.net/eu/supercell/8ui6fPBEEwwY33Lr7wAy.png",
+  "speed": "https://media.ffycdn.net/eu/supercell/rLpiNrawBCGMX7zBpYps.png",
+  "supercharge": "https://media.ffycdn.net/eu/supercell/iWvWTQ956T2sci4VRCCA.png",
+  "vision": "https://media.ffycdn.net/eu/supercell/awcyLxSk7EcgQ8iy81S2.png"
+ },
  "hypercharges": {
   "16000000": "https://media.ffycdn.net/eu/supercell/uLk2YBMKMJKw6Y4ydKJq.png",
   "16000001": "https://media.ffycdn.net/eu/supercell/LsJFmCqHhwJ7qxAAm8bZ.png",

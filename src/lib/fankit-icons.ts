@@ -19,6 +19,11 @@ export function fankitIcon(brawlerId: number): string | null {
  * Kit's CDN. Kept in the same small index under `league:` keys, because the
  * rank chips and the ranked ladder that draw them run in the browser too.
  */
+/** The generic gadget, star power or gear mark drawn beside a heading. */
+export function fankitGeneric(kind: 'gadget' | 'starpower' | 'gear'): string | null {
+  return byId[`generic:${kind}`] ?? null;
+}
+
 export function fankitLeague(rankName: string): string | null {
   const league = rankName.trim().split(/\s+/)[0]?.toLowerCase();
   return league ? (byId[`league:${league}`] ?? null) : null;

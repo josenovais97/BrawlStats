@@ -227,6 +227,24 @@ for local, title in LOCAL_ICONS.items():
     canvas.paste(img, ((box[0] - img.width) // 2, (box[1] - img.height) // 2), img)
     canvas.save(path, 'PNG', optimize=True)
 
+# Gears, keyed by the game's gear name ("SHIELD" -> shield) since that is what
+# every page drawing one already has, and mythic gears by their brawler
+# (`mythic:amber`), whose gear names are their own. Where the Fan Kit has a
+# gear at two rarities the current one is named.
+GEAR_FILES = {
+    'speed': 'gear_superrare_speed', 'vision': 'gear_superrare_vision', 'health': 'gear_superrare_heal',
+    'damage': 'gear_superrare_damage', 'shield': 'gear_superrare_shield', 'gadgetcharge': 'gear_plus_gadgets',
+    'supercharge': 'gear_epic_super', 'reloadspeed': 'gear_epic_reload', 'petpower': 'gear_epic_pet',
+    'gadgetcooldown': 'gear_gadget_cooldown',
+}
+gear_assets = {a['title'].lower(): a for a in sorted(assets('Gears'), key=lambda a: a['width'])}
+index['gears'] = {k: file_url(gear_assets[t]) for k, t in GEAR_FILES.items() if t in gear_assets}
+for t, a in gear_assets.items():
+    m = re.match(r'^gear_mythic_(.+)$', t)
+    b = by_token.get(norm(m.group(1))) if m else None
+    if b:
+        index['gears'][f"mythic:{norm(b['name'])}"] = file_url(a)
+
 SKINS = assets('Skins')
 
 # Full-body art: the default skin standing (`amber_default_001`, `spike_default`)
@@ -375,13 +393,20 @@ icon_index = {str(k): p for k, p in render_all(sorted(icons.items()), 'icon', st
 # League badges ride in the small client index too (`league:<name>`): the
 # rank chips and the ranked ladder that draw them are client components.
 icon_index.update({f'league:{l}': f'{u}?width=96' for l, u in leagues.items()})
+# The generic gadget, star power and gear marks the site draws beside a
+# heading -- the same Shelly badges and Speed gear it used before, from the
+# Fan Kit now.
+for key, url in (('gadget', index['accessories'].get('23000255')), ('starpower', index['accessories'].get('23000076')),
+                 ('gear', index['gears'].get('speed'))):
+    if url:
+        icon_index[f'generic:{key}'] = f'{url}?width=96'
 
 names = {b['id']: b['name'] for b in brawlers}
 gaps = lambda field: [b['name'] for b in brawlers if any(str(x['id']) not in index['accessories'] for x in b[field])]
 print(f"bodies {len(index['bodies'])}/{len(brawlers)} ({len(standing)} standing, the rest animation frames), "
       f"icons {sum(k.isdigit() for k in icon_index)}/{len(brawlers)}, skins {len(index['skins'])}, "
       f"accessories {len(index['accessories'])}, hypercharges {len(index['hypercharges'])}, "
-      f"modes {len(index['modes'])}, leagues {len(leagues)}")
+      f"modes {len(index['modes'])}, leagues {len(leagues)}, gears {len(index['gears'])}")
 print('no icon:', ', '.join(names[b['id']] for b in brawlers if str(b['id']) not in icon_index) or 'none')
 print('no body:', ', '.join(names[b['id']] for b in brawlers if str(b['id']) not in index['bodies']) or 'none')
 print('gadget gaps:', ', '.join(gaps('gadgets')) or 'none')

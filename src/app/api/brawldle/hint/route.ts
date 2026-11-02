@@ -1,7 +1,7 @@
 import { answerFor } from '@/lib/brawldle';
 import { brawldleRoster } from '@/lib/brawldle-data';
 import { getOfficialBrawlers } from '@/lib/bs-api';
-import { gadgetIconUrl, starPowerIconUrl } from '@/lib/brawlapi';
+import { gadgetArt, starPowerArt } from '@/lib/fankit';
 
 /**
  * Hints, unlocked by guess count.
@@ -60,10 +60,10 @@ export async function GET(request: Request) {
       thresholds,
       starPower:
         unlocked.starPower && official?.starPowers?.[0]
-          ? starPowerIconUrl(official.starPowers[0].id)
+          ? starPowerArt(official.starPowers[0].id)
           : null,
       gadget:
-        unlocked.gadget && official?.gadgets?.[0] ? gadgetIconUrl(official.gadgets[0].id) : null,
+        unlocked.gadget && official?.gadgets?.[0] ? gadgetArt(official.gadgets[0].id) : null,
     },
     { headers: { 'cache-control': 'no-store' } },
   );

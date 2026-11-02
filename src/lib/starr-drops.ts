@@ -1,4 +1,5 @@
 import { WIKI_API, fetchWikiJson, subsections, toPlainText } from '@/lib/wiki';
+import { fankitGeneric } from '@/lib/fankit-icons';
 
 /**
  * Starr Drop contents and the odds of each one.
@@ -317,7 +318,7 @@ function slugify(name: string): string {
  * They resolve through the same batched call as the drop artwork.
  */
 const LOCAL_ICON: Record<string, string> = {
-  Gadget: 'https://cdn.brawlify.com/gadgets/borderless/23000255.png',
+  Gadget: fankitGeneric('gadget') ?? 'https://cdn.brawlify.com/gadgets/borderless/23000255.png',
   Coin: '/icons/coin.png',
   'Power Point': '/icons/power-point.png',
   'XP Doubler': '/icons/experience.png',
