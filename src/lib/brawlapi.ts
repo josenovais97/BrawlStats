@@ -1,4 +1,4 @@
-import { fankitIcon, fankitLeague } from '@/lib/fankit-icons';
+import { fankitIcon, fankitLeague, fankitPlayerIcon, fankitRank } from '@/lib/fankit-icons';
 import { stripGameMarkup } from '@/lib/format';
 import type {
   BAAccessory,
@@ -267,7 +267,8 @@ export async function getIcons(): Promise<BAIcons> {
  * render one image.
  */
 export function playerIconUrl(iconId: number | undefined): string {
-  return `https://cdn.brawlify.com/profile-icons/regular/${iconId ?? 28000000}.png`;
+  // The Fan Kit's own file where it has the icon (lib/fankit-icons).
+  return fankitPlayerIcon(iconId ?? 28000000) ?? cdnPlayerIconUrl(iconId);
 }
 
 /*
@@ -419,7 +420,8 @@ const RANKED_TIER_COUNT = 22;
 
 export function rankedTierIconUrl(rank: number | undefined | null): string | null {
   if (!rank || rank < 1 || rank > RANKED_TIER_COUNT) return null;
-  return `https://cdn.brawlify.com/ranked/tiered/${RANKED_TIER_BASE_ID + rank - 1}.png`;
+  // The Fan Kit's rank head with the numeral drawn under it (lib/fankit-icons).
+  return fankitRank(rank) ?? `https://cdn.brawlify.com/ranked/tiered/${RANKED_TIER_BASE_ID + rank - 1}.png`;
 }
 
 /** Broad ranked league badge, e.g. "Bronze" or "Masters". */

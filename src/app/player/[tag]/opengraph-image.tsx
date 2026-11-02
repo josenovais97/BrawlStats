@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og';
 
 import { getOfficialBrawlers, getPlayer } from '@/lib/bs-api';
 import { playerIconUrl } from '@/lib/brawlapi';
+import { loadIcon } from '@/lib/slide-chrome';
 import { nameColorToCss, titleCaseLabel } from '@/lib/format';
 import { SITE_NAME } from '@/lib/site';
 import { computeSkillScore } from '@/lib/skill-score';
@@ -65,6 +66,9 @@ export default async function Image({ params }: { params: Promise<{ tag: string 
     .then((res) => res.items.length)
     .catch(() => undefined);
   const skill = computeSkillScore(player, catalogue);
+  // As PNG data: the Fan Kit icons are WebP paths on this domain, which the
+  // card renderer can neither fetch nor decode.
+  const icon = await loadIcon(playerIconUrl(player.icon?.id), 296);
 
   /*
    * Peak is dropped. It equals Trophies for anyone currently at their highest,
@@ -132,13 +136,11 @@ export default async function Image({ params }: { params: Promise<{ tag: string 
         />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-          <img
-            src={playerIconUrl(player.icon?.id)}
-            alt=""
-            width={148}
-            height={148}
-            style={{ borderRadius: 28, background: '#1b2136' }}
-          />
+          {icon ? (
+            <img src={icon} alt="" width={148} height={148} style={{ borderRadius: 28, background: '#1b2136' }} />
+          ) : (
+            <div style={{ display: 'flex', width: 148, height: 148, borderRadius: 28, background: '#1b2136' }} />
+          )}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{

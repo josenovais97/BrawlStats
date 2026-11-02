@@ -49,7 +49,8 @@ import urllib.parse
 import urllib.request
 from datetime import date
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
+import numpy as np
 
 FANKIT = 'https://fankit.supercell.com/api/assets/search/324'
 BRAWLAPI = 'https://api.brawlapi.com/v1/brawlers'
@@ -83,10 +84,11 @@ def fetch(url, binary=False):
     return data if binary else json.loads(data)
 
 
-def assets(kind):
+def assets(kind=None):
+    """Every asset of one type, or every asset in the kit with no type."""
     out, page = [], 1
     while True:
-        q = urllib.parse.urlencode({'limit': 100, 'page': page, 'order': 'NEWEST', 'asset-type18': kind})
+        q = urllib.parse.urlencode({'limit': 100, 'page': page, 'order': 'NEWEST', **({'asset-type18': kind} if kind else {})})
         d = fetch(f'{FANKIT}?{q}')
         out += d['data']
         if not d.get('hasMore'):
@@ -182,14 +184,18 @@ MODE_FILES = {
     'volleybrawl': 'volley_brawl_icon', 'hunters': 'icon_hunters', 'takedown': 'takedown_icon',
     'lonestar': 'lone_star_icon', 'roborumble': 'robo_rumble_icon', 'presentplunder': 'present_plunder_icon',
     'trophythieves': 'trophy_thieves_icon', 'laststand': 'last_stand_icon', 'dodgebrawl': 'icon_game_mode_dodge_ball',
+    'knockout': 'knock_out_icon',
 }
+# The rank's own head, as the game draws it beside a player's name: the
+# numbered tier badges are these with I, II or III under the chin.
 LEAGUE_FILES = {
-    'bronze': 'icon_ranked_bronze', 'silver': 'icon_ranked_silver', 'gold': 'icon_ranked_gold',
-    'diamond': 'icon_ranked_diamond', 'mythic': 'icon_ranked_mythic', 'legendary': 'icon_ranked_legendary',
-    'masters': 'icon_ranked_masters', 'pro': 'icon_ranked_pro_card',
+    'bronze': 'icon_rank_sticker_bronze', 'silver': 'icon_rank_sticker_silver', 'gold': 'icon_rank_sticker_gold',
+    'diamond': 'icon_rank_sticker_diamond', 'mythic': 'icon_rank_sticker_mythic',
+    'legendary': 'icon_rank_sticker_legendary', 'masters': 'icon_rank_sticker_masters', 'pro': 'icon_rank_sticker_pro',
 }
 by_title = {}
-for a in sorted(assets('Icons & Buttons'), key=lambda a: a['width']):
+# UI Assets too: the Buffie key (`icon_key_buddy`) is filed there.
+for a in sorted(assets('Icons & Buttons') + assets('UI Assets'), key=lambda a: a['width']):
     by_title[a['title'].lower()] = a  # the largest file of a name wins
 index['modes'] = {m: file_url(by_title[t]) for m, t in MODE_FILES.items() if t in by_title}
 leagues = {l: file_url(by_title[t]) for l, t in LEAGUE_FILES.items() if t in by_title}
@@ -200,8 +206,8 @@ for m, t in MODE_FILES.items():
 # Our own icon files that have an exact Fan Kit counterpart, overwritten in
 # place at their current size: the components that draw them keep working
 # unchanged. Checked side by side on 2026-11-02; where the Fan Kit's nearest
-# file is a different picture (the hypercharge drop, the winged Ranked skull,
-# the Starr Drop) ours stays.
+# file is a different picture (the hypercharge drop, the Starr Drop, the win
+# streak flame, the crown) ours stays.
 LOCAL_ICONS = {
     'class-artillery.png': 'icon_class_artillery', 'class-assassin.png': 'icon_class_assassin',
     'class-controller.png': 'icon_class_controller', 'class-damage-dealer.png': 'icon_class_damage',
@@ -211,6 +217,9 @@ LOCAL_ICONS = {
     'skin-mythic.png': 'icon_catalogue_skins_mythic', 'skin-legendary.png': 'icon_catalogue_skins_legendary',
     'power-point.png': 'icon_powerpoints_stack', 'leaderboard.png': 'icon_leaderboards',
     'solo-showdown.png': 'showdown_icon', 'coin.png': 'icon_coin_stack', 'trophy.png': 'icon_trophy',
+    'battles.png': 'duels_icon', 'buffie.png': 'icon_key_buddy', 'robo-rumble.png': 'robo_rumble_icon',
+    'skins.png': 'icon_catalogue_skins_legendary', 'cosmetics.png': 'skin_rarity_hypercharge',
+    'ranked.png': 'icon_ranked_front',
 }
 for local, title in LOCAL_ICONS.items():
     a = by_title.get(title)
@@ -246,6 +255,15 @@ for t, a in gear_assets.items():
         index['gears'][f"mythic:{norm(b['name'])}"] = file_url(a)
 
 SKINS = assets('Skins')
+# The whole kit, untyped: some renders were never filed under Skins --
+# `trunk_royale_trunk_happy_730`, `najia_default_happy_458` -- and some player
+# icons were never filed under Player Icons.
+EVERYTHING = assets()
+_skin_ids = {a['id'] for a in SKINS}
+# Outside Skins only a numbered animation frame counts as a render: `sirius_happy`
+# and `primo_mha_happy` there are the emote, not the figure.
+SKINS += [a for a in EVERYTHING if a['id'] not in _skin_ids
+          and re.search(r'_(happy|idle|win|happyloop)_\d+$', a['title'].lower())]
 
 # Full-body art: the default skin standing (`amber_default_001`, `spike_default`)
 # and, for brawlers that have no standing render, an animation frame of it
@@ -401,6 +419,195 @@ for key, url in (('gadget', index['accessories'].get('23000255')), ('starpower',
     if url:
         icon_index[f'generic:{key}'] = f'{url}?width=96'
 
+
+# Numbered rank badges, `rank:<n>` for the API's 1-based `rankedRank`:
+# Bronze I is 1, Masters III is 21, Pro is 22. The game's badge is the rank's
+# head with a Roman numeral under the chin; the Fan Kit has the heads alone,
+# so the numeral is drawn here -- in the rank's colour, with the same white
+# rim and dark outline the head has -- and Pro is its trophy as it comes.
+TIER_LEAGUES = ['bronze', 'silver', 'gold', 'diamond', 'mythic', 'legendary', 'masters']
+TIER_COLOURS = {
+    'bronze': (240, 138, 36), 'silver': (184, 176, 240), 'gold': (255, 210, 58), 'diamond': (63, 224, 240),
+    'mythic': (240, 60, 230), 'legendary': (255, 59, 48), 'masters': (255, 210, 58),
+}
+TIER_DESIGN = 'numeral-v1'  # change to re-render every badge under new names
+TIER_W = 192
+OUTLINE = (24, 22, 34, 255)
+
+
+def dilate(mask, r):
+    return mask.filter(ImageFilter.MaxFilter(2 * r + 1)) if r > 0 else mask
+
+
+def tier_badge(a, league, n):
+    """The head with `n` serifed strokes under it, as the game draws I to III."""
+    W = TIER_W * 2  # drawn at twice the size and scaled down, for clean edges
+    head = Image.open(io.BytesIO(fetch(a['generic_url'].replace('{width}', str(W * 2)), binary=True))).convert('RGBA')
+    head = head.crop(alpha_box(head))
+    head.thumbnail((round(W * 0.92), W * 2), Image.LANCZOS)
+    h = round(head.height * 0.34)  # numeral height
+    bar, gap, over, serif = round(h * 0.26), round(h * 0.13), round(h * 0.17), round(h * 0.17)
+    rim, line = max(2, round(h * 0.07)), max(2, round(h * 0.07))
+    nw = n * bar + (n - 1) * gap + 2 * over
+    pad = rim + line + 2
+    mask = Image.new('L', (nw + 2 * pad, h + 2 * pad), 0)
+    d = ImageDraw.Draw(mask)
+    d.rectangle((pad, pad, pad + nw - 1, pad + serif - 1), fill=255)
+    d.rectangle((pad, pad + h - serif, pad + nw - 1, pad + h - 1), fill=255)
+    for i in range(n):
+        x = pad + over + i * (bar + gap)
+        d.rectangle((x, pad, x + bar - 1, pad + h - 1), fill=255)
+    if n > 1:  # the strokes stand apart between the serifs, as in the game
+        for i in range(n - 1):
+            x = pad + over + i * (bar + gap) + bar
+            d.rectangle((x, pad + serif, x + gap - 1, pad + h - serif - 1), fill=0)
+    white = dilate(mask, rim)
+    dark = dilate(white, line)
+    r, g, b = TIER_COLOURS[league]
+    shade = Image.linear_gradient('L').resize(mask.size)  # lighter at the top
+    fill = Image.merge('RGB', [c.point(lambda v, c0=c0: round(c0 * (1 - 0.28 * v / 255))) for c, c0 in
+                               zip((shade, shade, shade), (r, g, b))]).convert('RGBA')
+    numeral = Image.new('RGBA', mask.size, (0, 0, 0, 0))
+    numeral.paste(OUTLINE, None, dark)
+    numeral.paste((255, 255, 255, 255), None, white)
+    numeral.paste(fill, (0, 0), mask)
+    top = head.height - round(h * 0.42)
+    canvas = Image.new('RGBA', (max(head.width, numeral.width), top + numeral.height), (0, 0, 0, 0))
+    canvas.alpha_composite(head, ((canvas.width - head.width) // 2, 0))
+    canvas.alpha_composite(numeral, ((canvas.width - numeral.width) // 2, top))
+    canvas = canvas.crop(alpha_box(canvas))
+    canvas.thumbnail((TIER_W, TIER_W * 2), Image.LANCZOS)
+    return canvas
+
+
+def save_tier(rank, league, n):
+    a = by_title.get(LEAGUE_FILES[league])
+    if not a:
+        return None
+    digest = hashlib.sha1(f'{file_url(a)}|{n}|{TIER_DESIGN}'.encode()).hexdigest()[:8]
+    name = f'{rank}-{digest}.webp'
+    if not CHECK:
+        folder = os.path.join(ROOT, 'public', 'fankit', 'rank')
+        os.makedirs(folder, exist_ok=True)
+        path = os.path.join(folder, name)
+        if not os.path.exists(path):
+            img = tier_badge(a, league, n) if n else Image.open(io.BytesIO(
+                fetch(a['generic_url'].replace('{width}', str(TIER_W * 2)), binary=True))).convert('RGBA')
+            if not n:
+                img = img.crop(alpha_box(img))
+                img.thumbnail((TIER_W, TIER_W * 2), Image.LANCZOS)
+            img.save(path, 'WEBP', quality=90, method=6)
+    return f'/fankit/rank/{name}'
+
+
+tiers = [(i * 3 + n, league, n) for i, league in enumerate(TIER_LEAGUES) for n in (1, 2, 3)] + [(22, 'pro', 0)]
+for rank, league, n in tiers:
+    url = save_tier(rank, league, n)
+    if url:
+        icon_index[f'rank:{rank}'] = url
+    else:
+        unplaced.append(f'rank {rank}: no {LEAGUE_FILES[league]}')
+
+# Player icons, by the game's icon id. The Fan Kit names its files by hand
+# (`player_icon_frank_royale`) and the game API gives only an id, so each id's
+# picture is matched by eye -- the mirror's copy against every Fan Kit icon,
+# both shrunk to 16x16 over grey -- and kept when it is unmistakably the same
+# image (an RMS difference under 10 of 255; the nearest wrong match measured
+# 13+ and the right ones mostly under 5, checked by eye on 2026-11-02). The
+# plain brawler icons (`hero1`...) are not in the kit as player icons, and are
+# the brawler's portrait, so they are cut from the same Fan Kit portraits as
+# the square brawler icons.
+#
+# Matches are remembered in scripts/fankit-player-icons.json and never
+# re-matched, and a file once written is never rewritten: the files are named
+# by game id under a year-long immutable cache, so a corrected picture needs a
+# new folder, not a new file.
+PLAYER_INDEX = os.path.join(ROOT, 'scripts', 'fankit-player-icons.json')
+PLAYER_DIR = os.path.join(ROOT, 'public', 'fankit', 'player')
+PLAYER_W = 160
+PLAYER_MATCH_RMS = 10
+
+
+def thumb_feature(url):
+    img = Image.open(io.BytesIO(fetch(url, binary=True))).convert('RGBA').resize((64, 64), Image.LANCZOS)
+    bg = Image.new('RGBA', img.size, (128, 128, 128, 255))
+    bg.alpha_composite(img)
+    return np.asarray(bg.convert('RGB').resize((16, 16), Image.BILINEAR), dtype=np.float32).ravel()
+
+
+def safe(f, *args):
+    try:
+        return f(*args)
+    except Exception:
+        return None
+
+
+game_icons = fetch('https://api.brawlapi.com/v1/icons')['player']
+try:
+    with open(PLAYER_INDEX) as f:
+        player_known = json.load(f)
+except FileNotFoundError:
+    player_known = {}
+kit_icons = assets('Player Icons')
+_ids = {a['id'] for a in kit_icons}
+kit_icons += [a for a in EVERYTHING if a['id'] not in _ids and re.match(r'(player|profile)[ _]icon', a['title'].lower())]
+todo = [v for k, v in sorted(game_icons.items()) if k not in player_known and not v.get('brawler')]
+if todo:
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        kit_f = list(pool.map(lambda a: safe(thumb_feature, a['generic_url'].replace('{width}', '64')), kit_icons))
+        game_f = list(pool.map(lambda v: safe(thumb_feature, v['imageUrl']), todo))
+    kit_ok = [(a, f) for a, f in zip(kit_icons, kit_f) if f is not None]
+    K = np.stack([f for _, f in kit_ok])
+    for v, f in zip(todo, game_f):
+        if f is None:
+            continue
+        rms = np.sqrt(((K - f) ** 2).mean(axis=1))
+        i = int(rms.argmin())
+        if rms[i] < PLAYER_MATCH_RMS:
+            player_known[str(v['id'])] = file_url(kit_ok[i][0])
+# The brawler icons, from the square portraits made above.
+for k, v in game_icons.items():
+    if v.get('brawler') and k not in player_known and str(v['brawler']) in icon_index:
+        player_known[k] = f"icon:{v['brawler']}"
+
+
+def save_player(item):
+    gid, src = item
+    path = os.path.join(PLAYER_DIR, f'{gid}.webp')
+    if os.path.exists(path):
+        return gid
+    if src.startswith('icon:'):
+        img = Image.open(os.path.join(ROOT, 'public', icon_index[src[5:]].lstrip('/'))).convert('RGBA')
+    else:
+        img = Image.open(io.BytesIO(fetch(f'{src}?width={PLAYER_W}', binary=True))).convert('RGBA')
+    img.thumbnail((PLAYER_W, PLAYER_W), Image.LANCZOS)
+    canvas = Image.new('RGBA', (max(img.size),) * 2, (0, 0, 0, 0))
+    canvas.paste(img, ((canvas.width - img.width) // 2, (canvas.height - img.height) // 2), img)
+    canvas.save(path, 'WEBP', quality=80, method=6)
+    return gid
+
+
+if not CHECK:
+    os.makedirs(PLAYER_DIR, exist_ok=True)
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        written = [g for g in pool.map(lambda it: safe(save_player, it), sorted(player_known.items())) if g]
+else:
+    written = list(player_known)
+# The client's list of ids with a file: offsets from 28000000, as ranges
+# ("0-2,5,9-40"), a couple of kilobytes for a thousand icons.
+offsets = sorted(int(g) - 28000000 for g in written)
+ranges, start = [], None
+for i, o in enumerate(offsets):
+    if start is None:
+        start = o
+    if i + 1 == len(offsets) or offsets[i + 1] != o + 1:
+        ranges.append(str(start) if start == o else f'{start}-{o}')
+        start = None
+icon_index['players'] = ','.join(ranges)
+print(f"player icons {len(written)}/{len(game_icons)} "
+      f"({sum(not str(v).startswith('icon:') for v in player_known.values())} matched, "
+      f"{sum(str(v).startswith('icon:') for v in player_known.values())} brawler portraits)")
+
 names = {b['id']: b['name'] for b in brawlers}
 gaps = lambda field: [b['name'] for b in brawlers if any(str(x['id']) not in index['accessories'] for x in b[field])]
 print(f"bodies {len(index['bodies'])}/{len(brawlers)} ({len(standing)} standing, the rest animation frames), "
@@ -422,4 +629,7 @@ if not CHECK:
     with open(ICON_INDEX, 'w') as f:
         json.dump(icon_index, f, indent=1, sort_keys=True)
         f.write('\n')
-    print('wrote', INDEX, ICON_INDEX)
+    with open(PLAYER_INDEX, 'w') as f:
+        json.dump(player_known, f, indent=0, sort_keys=True)
+        f.write('\n')
+    print('wrote', INDEX, ICON_INDEX, PLAYER_INDEX)
