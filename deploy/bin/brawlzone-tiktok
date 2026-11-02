@@ -837,6 +837,14 @@ fi
 # YouTube subscription. Instagram has no clickable links in captions, hence
 # "link in bio".
 INSTAGRAM_RESULT="not set up"
+# Not the counter and map-pick templates either (owner, 2026-11-02: drop the
+# videos that don't get views): 1 to 4 likes a Reel across Oct 29-31, the
+# least of anything on the account. TikTok keeps them -- 258-313 views there,
+# more than the quizzes get on TikTok. INSTAGRAM=1 posts one anyway.
+if [ "$MODE" = counter ] || [ "$MODE" = tiers ]; then
+  INSTAGRAM="${INSTAGRAM:-0}"
+  INSTAGRAM_RESULT="skipped (no views on Instagram)"
+fi
 if [ "${INSTAGRAM:-1}" = "1" ] && [ -r "$HOME/.brawlzone-instagram.json" ]; then
   IG_WORK=$(mktemp -d)
   printf '%s\n\nEvery map, every brawler: brawlzone.net (link in bio)\n' "$DESCRIPTION" > "${IG_WORK}/caption.txt"
