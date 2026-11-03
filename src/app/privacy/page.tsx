@@ -280,7 +280,7 @@ export default function PrivacyPage() {
           subtitle={t('What your browser fetches from elsewhere.')}
         />
         <div className="card p-6 text-sm leading-relaxed text-muted">
-          <p>{t('Artwork is served from Brawlify\'s CDN, and some images come from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading an image means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.')}</p>
+          <p>{t('Most artwork comes from Supercell\'s Fan Kit and is served from this site itself. Map images and a few others come from Brawlify\'s CDN, and some from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading those means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.')}</p>
           <p className="mt-3">{t('The site and the app\'s panel are delivered through Cloudflare, which handles each request (including your IP address) in order to serve and protect it, under its own privacy policy. We do not log IP addresses ourselves.')}</p>
           <p className="mt-3">{t('BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.')}</p>
         </div>

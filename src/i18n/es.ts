@@ -2394,10 +2394,14 @@ export const ES: Record<string, string> = {
     "BrawlZone es gratis, sin anuncios y sin pagos. Si te ahorró algo de tiempo, un café ayuda mucho.",
   "BrawlZone — often written":
     "BrawlZone, que a menudo se escribe",
-  "Brawler portraits, star power and gadget art, gears, ranked badges, maps and game mode icons.":
-    "Retratos de los brawlers, imágenes de habilidades estelares y gadgets, refuerzos, insignias de rango, mapas e iconos de los modos.",
+  "Map layouts, and the art the Fan Kit does not have yet.":
+    "Los diseños de los mapas, y el arte que el Fan Kit aún no tiene.",
   "Brawlify CDN":
     "CDN de Brawlify",
+  "Supercell Fan Kit":
+    "Fan Kit de Supercell",
+  "Brawler artwork, skins, star power and gadget icons, ranked badges and game mode icons: Supercell's own art for fan content, served from this site.":
+    "Arte de los brawlers, skins, iconos de poderes estelares y gadgets, insignias de rango e iconos de modos: el arte de la propia Supercell para contenido de fans, servido desde este sitio.",
   "Built by one person":
     "Hecho por una persona",
   "Buy me a coffee":
@@ -2416,8 +2420,8 @@ export const ES: Record<string, string> = {
     "Buscar un tag es algo público: los mismos datos están disponibles para cualquiera a través de la API oficial.",
   "Official Brawl Stars API":
     "API oficial de Brawl Stars",
-  "Official announcements and the full text of each update, resolved automatically as new posts go live.":
-    "Anuncios oficiales y el texto completo de cada actualización, que se cargan solos en cuanto se publican.",
+  "Official announcements and each update's notes, summarised here with a link to the full text, picked up automatically as new posts go live.":
+    "Anuncios oficiales y las notas de cada actualización, resumidas aquí con un enlace al texto completo, detectadas automáticamente en cuanto se publican.",
   "One person reads every message, so a reply can take a few days.":
     "Una sola persona lee todos los mensajes, así que la respuesta puede tardar unos días.",
   "Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.":
@@ -2560,8 +2564,8 @@ export const ES: Record<string, string> = {
     "Un tag que escribes es una consulta, no un registro.",
   "Analytics":
     "Analítica",
-  "Artwork is served from Brawlify's CDN, and some images come from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading an image means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
-    "Las imágenes vienen de la CDN de Brawlify, y algunas de las noticias de Brawl Stars, de la wiki de la comunidad y de miniaturas de YouTube. Cargar una imagen significa que tu navegador contacta directamente con esos servidores, y ellos ven la petición como cualquier web que visitas. No les enviamos nada sobre ti.",
+  "Most artwork comes from Supercell's Fan Kit and is served from this site itself. Map images and a few others come from Brawlify's CDN, and some from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading those means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
+    "La mayoría de las imágenes vienen del Fan Kit de Supercell y se sirven desde este mismo sitio. Las imágenes de mapas y algunas otras vienen de la CDN de Brawlify, y algunas de las noticias de Brawl Stars, de la wiki de la comunidad y de miniaturas de YouTube. Cargarlas significa que tu navegador contacta directamente con esos servidores, y ellos ven la petición como cualquier web que visitas. No les enviamos nada sobre ti.",
   "BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.":
     "BrawlZone no es oficial y no está respaldado por Supercell. Los datos del juego vienen de la API oficial de Brawl Stars según sus términos para desarrolladores.",
   "Display over other apps":

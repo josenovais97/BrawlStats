@@ -131,7 +131,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
     getGame: 'BrawlZone Bubble: el asistente de draft que flota sobre el juego. Gratis.', about: 'Sobre', privacy: 'Privacidad',
     terms: 'Términos', contact: 'Contacto', sources: 'Datos e imágenes de',
     disclaimer: 'Este material no es oficial y no está respaldado por Supercell. Para más información, consulta la',
-    policy: 'Política de contenido de fans de Supercell', notAffiliated: 'sin relación con Supercell',
+    policy: 'Política de contenido de fans de Supercell', notAffiliated: 'no está afiliado a Supercell',
   },
   pt: {
     Stats: 'Estatísticas', Tools: 'Ferramentas', Game: 'Jogo',
@@ -148,7 +148,7 @@ const WORDS: Record<Locale, Record<string, string>> = {
     getGame: 'BrawlZone Bubble: o ajudante de draft que flutua sobre o jogo. Grátis.', about: 'Sobre o', privacy: 'Privacidade',
     terms: 'Termos', contact: 'Contato', sources: 'Dados e imagens de',
     disclaimer: 'Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a',
-    policy: 'Política de Conteúdo de Fãs da Supercell', notAffiliated: 'sem ligação com a Supercell',
+    policy: 'Política de Conteúdo de Fãs da Supercell', notAffiliated: 'não tem ligação com a Supercell',
   },
 };
 
@@ -160,10 +160,12 @@ const EN: Record<string, string> = {
   getGame: 'BrawlZone Bubble: the draft helper that floats over the game. Free.', about: 'About', privacy: 'Privacy', terms: 'Terms',
   contact: 'Contact', sources: 'Data and artwork from',
   disclaimer: 'This material is unofficial and is not endorsed by Supercell. For more information see',
-  policy: 'Supercell’s Fan Content Policy', notAffiliated: 'not affiliated with Supercell',
+  policy: 'Supercell’s Fan Content Policy', notAffiliated: 'is not affiliated with Supercell',
 };
 
 const SOURCES = [
+  // Most of the art since 2026-11-02; Brawlify and the wiki fill its gaps (maps, some drops and events).
+  { href: 'https://fankit.supercell.com', label: 'Supercell Fan Kit' },
   { href: 'https://developer.brawlstars.com', label: 'Brawl Stars API' },
   { href: 'https://docs.royaleapi.com/proxy.html', label: 'RoyaleAPI proxy' },
   { href: 'https://brawlify.com', label: 'Brawlify artwork' },

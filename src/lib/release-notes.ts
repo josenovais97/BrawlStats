@@ -5,7 +5,10 @@ import { USER_AGENT } from '@/lib/site';
  * Official release notes, resolved automatically.
  *
  * Supercell publishes one post per game update at a predictable URL:
- *   /blog/release-notes/release-notes-<month>-<year>/
+ *   /blog/game-updates/release-notes-<month>-<year>/
+ * (/blog/release-notes/ until August 2026: November 2026's notes went up
+ * under game-updates on 2026-11-03 and the old path 404s for them, while
+ * the older posts stay where they were -- so both are tried, newest first).
  *
  * There is no index endpoint listing them, so the latest is found by walking
  * backwards from the current month until one responds. That keeps the page
@@ -16,7 +19,10 @@ import { USER_AGENT } from '@/lib/site';
  * payload, which is far more stable to parse than rendered markup.
  */
 
-const BLOG_BASE = 'https://supercell.com/en/games/brawlstars/blog/release-notes';
+const BLOG_BASES = [
+  'https://supercell.com/en/games/brawlstars/blog/game-updates',
+  'https://supercell.com/en/games/brawlstars/blog/release-notes',
+];
 
 /** How many months back to look before giving up. */
 const MAX_MONTHS_BACK = 14;
@@ -166,8 +172,14 @@ interface RawPageProps {
 }
 
 async function fetchNotes(slug: string): Promise<ReleaseNotes | null> {
-  const url = `${BLOG_BASE}/release-notes-${slug}/`;
+  for (const base of BLOG_BASES) {
+    const notes = await fetchNotesAt(`${base}/release-notes-${slug}/`, slug);
+    if (notes) return notes;
+  }
+  return null;
+}
 
+async function fetchNotesAt(url: string, slug: string): Promise<ReleaseNotes | null> {
   let html: string;
   try {
     const res = await fetch(url, {

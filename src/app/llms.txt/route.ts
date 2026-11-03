@@ -86,8 +86,9 @@ ${SITE_URL}
 ## Sources and standing
 
 - Battle and player data: the official Brawl Stars API, via the RoyaleAPI proxy.
-- Brawler artwork: Brawlify's CDN, with the Brawl Stars Fandom wiki covering
-  what it has not published yet.
+- Artwork: Supercell's Brawl Stars Fan Kit, served from this site; map
+  layouts and the art the Fan Kit lacks from Brawlify's CDN and the Brawl
+  Stars Fandom wiki.
 - Combat stats, ability text, prestige titles and balance history: the Brawl
   Stars Fandom wiki.
 - ${SITE_NAME} is unofficial and not endorsed by Supercell. See Supercell's Fan

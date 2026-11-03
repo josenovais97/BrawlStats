@@ -5,6 +5,7 @@ import {
   Database,
   ExternalLink,
   Lock,
+  Palette,
   RefreshCw,
   Search,
   Shield,
@@ -33,16 +34,22 @@ const SOURCES = [
     body: 'Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.',
   },
   {
+    icon: Palette,
+    title: 'Supercell Fan Kit',
+    href: 'https://fankit.supercell.com',
+    body: "Brawler artwork, skins, star power and gadget icons, ranked badges and game mode icons: Supercell's own art for fan content, served from this site.",
+  },
+  {
     icon: Database,
     title: 'Brawlify CDN',
     href: 'https://brawlify.com',
-    body: 'Brawler portraits, star power and gadget art, gears, ranked badges, maps and game mode icons.',
+    body: 'Map layouts, and the art the Fan Kit does not have yet.',
   },
   {
     icon: RefreshCw,
     title: 'Supercell news & release notes',
     href: 'https://supercell.com/en/games/brawlstars/blog/',
-    body: 'Official announcements and the full text of each update, resolved automatically as new posts go live.',
+    body: "Official announcements and each update's notes, summarised here with a link to the full text, picked up automatically as new posts go live.",
   },
 ];
 
@@ -92,7 +99,7 @@ export default function AboutPage() {
 
       <section>
         <SectionHeading title={t('Where the data comes from')} />
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {SOURCES.map(({ icon: Icon, title, href, body }) => (
             <a
               key={title}

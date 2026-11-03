@@ -2394,10 +2394,14 @@ export const PT: Record<string, string> = {
     "O BrawlZone é grátis, sem anúncios e sem pagamento. Se ele te poupou algum tempo, um café ajuda muito.",
   "BrawlZone — often written":
     "O BrawlZone, muitas vezes escrito",
-  "Brawler portraits, star power and gadget art, gears, ranked badges, maps and game mode icons.":
-    "Retratos dos brawlers, imagens de poderes de estrela e acessórios, engrenagens, insígnias de rank, mapas e ícones dos modos.",
+  "Map layouts, and the art the Fan Kit does not have yet.":
+    "Os layouts dos mapas e a arte que o Fan Kit ainda não tem.",
   "Brawlify CDN":
     "CDN do Brawlify",
+  "Supercell Fan Kit":
+    "Fan Kit da Supercell",
+  "Brawler artwork, skins, star power and gadget icons, ranked badges and game mode icons: Supercell's own art for fan content, served from this site.":
+    "Arte dos brawlers, skins, ícones de poderes de estrela e acessórios, insígnias de rank e ícones dos modos: a arte da própria Supercell para conteúdo de fãs, servida por este site.",
   "Built by one person":
     "Feito por uma pessoa",
   "Buy me a coffee":
@@ -2416,8 +2420,8 @@ export const PT: Record<string, string> = {
     "Buscar uma tag é uma ação pública: os mesmos dados estão disponíveis para qualquer um pela API oficial.",
   "Official Brawl Stars API":
     "API oficial do Brawl Stars",
-  "Official announcements and the full text of each update, resolved automatically as new posts go live.":
-    "Anúncios oficiais e o texto completo de cada atualização, carregados sozinhos assim que são publicados.",
+  "Official announcements and each update's notes, summarised here with a link to the full text, picked up automatically as new posts go live.":
+    "Anúncios oficiais e as notas de cada atualização, resumidas aqui com um link para o texto completo, detectadas sozinhas assim que são publicadas.",
   "One person reads every message, so a reply can take a few days.":
     "Uma pessoa só lê todas as mensagens, então a resposta pode levar alguns dias.",
   "Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.":
@@ -2560,8 +2564,8 @@ export const PT: Record<string, string> = {
     "Uma tag que você digita é uma consulta, não um registro.",
   "Analytics":
     "Análise de uso",
-  "Artwork is served from Brawlify's CDN, and some images come from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading an image means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
-    "As imagens vêm da CDN do Brawlify, e algumas das notícias do Brawl Stars, da wiki da comunidade e de miniaturas do YouTube. Carregar uma imagem significa que o seu navegador fala direto com esses servidores, e eles veem o pedido como qualquer site que você visita. Não mandamos nada sobre você para eles.",
+  "Most artwork comes from Supercell's Fan Kit and is served from this site itself. Map images and a few others come from Brawlify's CDN, and some from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading those means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
+    "A maioria das imagens vem do Fan Kit da Supercell e é servida pelo próprio site. As imagens de mapas e algumas outras vêm da CDN do Brawlify, e algumas das notícias do Brawl Stars, da wiki da comunidade e de miniaturas do YouTube. Carregá-las significa que o seu navegador fala direto com esses servidores, e eles veem o pedido como qualquer site que você visita. Não mandamos nada sobre você para eles.",
   "BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.":
     "O BrawlZone não é oficial e não é endossado pela Supercell. Os dados do jogo vêm da API oficial do Brawl Stars, conforme os termos para desenvolvedores.",
   "Display over other apps":
