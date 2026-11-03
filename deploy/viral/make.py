@@ -1679,15 +1679,54 @@ if KIND == 'whatsnew':
         NEWEST = [b for b in data['newest'] if has_model(b)][:5]
     else:
         NEWEST = [b for b in sorted(scored, key=lambda b: -b['id']) if has_model(b)][:5]
+    # The latest update (2026-11-03): its own new brawlers and Buffies, read
+    # from Supercell's release notes by viral-data (lib/release-notes
+    # updateHeadliners), lead for two weeks after it ships.
+    import datetime
+    UPD = data.get('update') or {}
+    try:
+        FRESH = (datetime.date.fromisoformat(data['date']) - datetime.date.fromisoformat(UPD['date'])).days <= 14
+    except (KeyError, TypeError, ValueError):
+        FRESH = False
+    _pool = {b['id']: b for b in data.get('newest') or []}
+    if FRESH:
+        _heads = [_pool.get(e['id']) or by_id.get(e['id']) or {'n': e['n'], 'id': e['id'], 'tier': None}
+                  for e in UPD.get('brawlers', [])]
+        _heads = [b for b in _heads if has_model(b)]
+        _ids = {b['id'] for b in _heads}
+        NEWEST = (_heads + [b for b in NEWEST if b['id'] not in _ids])[:5]
     try:
         _bi = json.load(open(f"{os.environ.get('ASSETS', '.')}/buffies/index.json"))
     except (OSError, ValueError):
         _bi = {}
     BUFFIES = []
+    if FRESH and UPD.get('buffies'):
+        try:
+            _ab = json.load(open(f"{os.environ.get('ASSETS', '.')}/abilities/index.json"))
+        except (OSError, ValueError):
+            _ab = []
+        for e in UPD['buffies']:
+            b = by_id.get(e['id']) or _pool.get(e['id'])
+            if not b or not has_model(b):
+                continue
+            icons = {k: optional(f"{os.environ.get('ASSETS', '.')}/buffies/{e['id']}-{k}.png") for k in BUFFIE_COL}
+            if not all(icons.values()):
+                # An update's Buffie icons reach the Fan Kit weeks late: the
+                # brawler's own gadget, star power and hypercharge stand in
+                # (Buffies upgrade exactly those). One missing, and it is skipped.
+                files = {k: next((x['file'] for x in _ab if x.get('bid') == e['id'] and x.get('kind') == k), None)
+                         for k in BUFFIE_COL}
+                icons = {k: optional(f"{os.environ.get('ASSETS', '.')}/{f}") if f else None for k, f in files.items()}
+            if all(icons.values()):
+                BUFFIES.append((b, icons))
+            if len(BUFFIES) == 5:
+                break
     for bid, v in sorted(_bi.items(), key=lambda kv: kv[1].get('order', 1e9)):
+        if len(BUFFIES) >= 3 and FRESH and UPD.get('buffies'):
+            break  # the update's own are enough; older ones only make up numbers
         b = by_id.get(int(bid))
         icons = {k: optional(f"{os.environ.get('ASSETS', '.')}/buffies/{bid}-{k}.png") for k in BUFFIE_COL}
-        if b and b.get('tier') and has_model(b) and all(icons.values()):
+        if b and b.get('tier') and has_model(b) and all(icons.values()) and all(x[0]['id'] != b['id'] for x in BUFFIES):
             BUFFIES.append((b, icons))
         if len(BUFFIES) == 5:
             break
@@ -1705,7 +1744,8 @@ if KIND == 'whatsnew':
                                           if b.get('trophyTier') else 'just released') + ')' for b in reversed(NEWEST))
     bf = ', '.join(nice(b['n']) for b, _ in reversed(BUFFIES))
     META = {
-        'title': 'NEW brawlers & Buffies: are they actually good? 🔥',
+        'title': (f"{UPD['title'].split()[-2]} update: NEW brawlers & Buffies, are they good? 🔥"
+                  if FRESH and len(UPD.get('title', '').split()) >= 2 else 'NEW brawlers & Buffies: are they actually good? 🔥'),
         'titles': {'pt-BR': 'Brawlers e Buffies NOVOS: são bons mesmo? 🔥',
                    'es-419': '¿Los NUEVOS brawlers y Buffies son buenos? 🔥'},
         'description': f"The newest brawlers right now: {nb}. The newest Buffies: {bf}. "
@@ -1762,7 +1802,7 @@ def wn_scene(s, t, bt, lt):
         shake = max(impact(lt, 1.2), hits(bt, (1.3, 2.9), 1.1, 0.4)[0])
         flash = max(impact(lt) * 0.8, hits(bt, (1.3, 2.9), 1.1, 0.4)[1])
     elif k == 'w_buffie':
-        b = s['b']; tier = b['tier']
+        b = s['b']; tier = b.get('tier') or b.get('trophyTier')
         canvas = background(t, (139, 107, 255)).convert('RGBA')
         put_rays(canvas, (139, 107, 255), t, W / 2, 640, speed=40, alpha=0.8)
         put(canvas, art(b, 700, 760), W / 2, 640, scale=1 + 0.3 * (1 - out_back(bt / 0.45, 1.6)))
@@ -1777,7 +1817,7 @@ def wn_scene(s, t, bt, lt):
             put(canvas, s['icons'][kind].resize((250, 250), Image.LANCZOS), x, 1340, scale=out_back(u, 1.9))
             put(canvas, text_sprite(BUFFIE_LABEL[kind], 44, BUFFIE_COL[kind], stroke=5), x, 1500, alpha=clamp(u - 0.4))
             if u < 0.5: shake = max(shake, impact(u * 0.4 * P, 0.8))
-        if bt > 2.9:
+        if bt > 2.9 and tier:
             put(canvas, tier_pill(tier), W / 2, 1690, scale=1.3 * (1 + 1.0 * (1 - out_back((bt - 2.9) / 0.5, 1.2))) if bt < 3.4 else 1.3)
         shake = max(shake, impact(lt, 1.0)); flash = max(flash, impact(lt) * 0.7)
     else:  # w_outro
@@ -1796,10 +1836,106 @@ def wn_scene(s, t, bt, lt):
     return finish(canvas, shake, flash, mark)
 
 
+# ================================================================ rankedrefresh
+# "Ranked just changed" (2026-11-03, owner: yes to a Ranked Refresh Short):
+# the November update's Ranked rework, one change a card, before -> after.
+# Written from Supercell's release notes, not from data, and posted once by
+# hand (`brawlzone-viral rankedrefresh`), not part of the rotation.
+RR = [
+    dict(icon='trophy', big='5,000 TROPHIES', line='TO UNLOCK RANKED', was='WAS 1,000',
+         note='ALREADY UNLOCKED? YOU KEEP IT', col=(255, 140, 40)),
+    dict(icon='power-11', big='POWER 11', line='BRAWLERS AT EVERY RANK', was='WAS POWER 9 UP TO DIAMOND',
+         note='DIAMOND NOW NEEDS 12 BRAWLERS', col=(255, 60, 100)),
+    dict(icon='brawlers', big='6 FREE MAXED', line='BRAWLERS EVERY SEASON', was='WAS 3', note=None, col=(70, 215, 120)),
+    dict(icon='league-mythic', big='ONLY -2 RANKS', line='AT THE SEASON RESET', was='WAS -6',
+         note='LESS CLIMBING BACK UP', col=(139, 107, 255)),
+    dict(icon='ranked', big='2-0 = MORE ELO', line='1-2 = YOU LOSE LESS', was=None,
+         note='EPIC WIN AND CLOSE MATCH', col=(60, 170, 255)),
+    dict(icon='league-masters', big='NO TEAMS', line='AT MASTERS I AND ABOVE', was=None,
+         note='SOLO QUEUE AT THE TOP', col=(255, 205, 40)),
+    dict(icon='draft', big='NEW DRAFT', line='BAN SUGGESTIONS + QUICK CHAT', was=None,
+         note='AND YOU CAN SWAP PICK ORDER', col=(255, 90, 60)),
+]
+RR_LEAGUES = ['bronze', 'silver', 'gold', 'diamond', 'mythic', 'legendary', 'masters', 'pro']
+if KIND == 'rankedrefresh':
+    tl.add(4, 'r_intro')
+    for i, c in enumerate(RR):
+        tl.add(4, 'r_change', i=i, c=c)
+    tl.add(5, 'r_outro')
+    META = {
+        'title': 'Ranked just CHANGED: 7 things you need to know 😱 #Shorts',
+        'titles': {'pt-BR': 'O Ranked MUDOU: 7 coisas que você precisa saber 😱 #Shorts',
+                   'es-419': 'El Ranked CAMBIÓ: 7 cosas que tienes que saber 😱 #Shorts'},
+        'description': 'The November update\'s Ranked Refresh: Ranked now unlocks at 5,000 trophies (you keep it if '
+                       'you already had it), needs Power 11 brawlers at every rank, gives 6 free maxed brawlers a '
+                       'season, and the season reset drops you only 2 ranks. 2-0 wins give more Elo, 1-2 losses '
+                       'cost less, no teams at Masters I and above, and a new draft screen. Good or bad? 👇\n\n'
+                       'The best brawlers for the new season (Nov 19), from real Ranked battles: '
+                       f'https://brawlzone.net/tier-list/ranked{FOOTER}\n'
+                       '#brawlstars #brawlstarsranked #ranked #brawlstarsupdate #brawlzone',
+    }
+
+_rr_icons = {}
+def rr_icon(name, w):
+    """An icon from $ASSETS/ranked (brawlzone-viral copies them), w wide."""
+    if (name, w) not in _rr_icons:
+        path = f"{os.environ.get('ASSETS', '.')}/ranked/{name}.png"
+        im = Image.open(path).convert('RGBA') if os.path.exists(path) else None
+        _rr_icons[(name, w)] = im.resize((w, int(im.height * w / im.width)), Image.LANCZOS) if im else None
+    return _rr_icons[(name, w)]
+
+
+def rr_scene(s, t, bt, lt):
+    k = s['kind']; shake = flash = 0.0; mark = True
+    if k == 'r_intro':
+        canvas = background(t, (255, 90, 60)).convert('RGBA')
+        put_rays(canvas, (255, 190, 60), t, W / 2, 1250, speed=50, alpha=0.8)
+        for j, name in enumerate(RR_LEAGUES):
+            im = rr_icon(f'league-{name}', 165)
+            u = (bt - 0.3 - j * 0.12) / 0.3
+            if im is None or u <= 0:
+                continue
+            ang = (j - 3.5) * 0.36
+            put(canvas, im, W / 2 + math.sin(ang) * 470, 1380 - math.cos(ang) * 300, scale=out_back(u, 1.8))
+        slam(canvas, 'RANKED', 240, None, W / 2, 380, bt, gold=True)
+        slam(canvas, 'JUST CHANGED', 140, WHITE, W / 2, 590, bt - 0.8)
+        slam(canvas, '7 THINGS TO KNOW', 96, (255, 235, 170), W / 2, 1700, bt - 2.0)
+        shake, flash = hits(bt, (0, 0.8, 2.0), 1.3, 0.5)
+    elif k == 'r_change':
+        c = s['c']; col = c['col']
+        canvas = background(t, col).convert('RGBA')
+        put_rays(canvas, col, t, W / 2, 720, speed=40, alpha=0.8)
+        put(canvas, pill(f"{s['i'] + 1}/{len(RR)}", (12, 14, 30), size=64), W / 2, 400, scale=out_back(bt / 0.3, 1.8))
+        icon = rr_icon(c['icon'], 300)
+        if icon is not None:
+            put(canvas, icon, W / 2, 720, scale=1 + 0.4 * (1 - out_back(bt / 0.45, 1.6)))
+        slam(canvas, c['big'], 160, None, W / 2, 1060, bt - 0.4, gold=True)
+        if bt > 0.9:
+            put(canvas, fit(c['line'], 82, W - 120, WHITE, stroke=7), W / 2, 1220, scale=out_back((bt - 0.9) / 0.35))
+        if c['was'] and bt > 1.6:
+            put(canvas, pill(c['was'], (70, 74, 110), size=58), W / 2, 1390, scale=out_back((bt - 1.6) / 0.35, 1.8))
+        if c['note'] and bt > 2.3:
+            put(canvas, fit(c['note'], 58, W - 140, (255, 235, 170), stroke=5), W / 2, 1550 if c['was'] else 1400,
+                alpha=clamp((bt - 2.3) * 3))
+        shake, flash = hits(bt, (0.4, 1.6), 1.1, 0.4)
+    else:  # r_outro
+        canvas = background(t, (255, 170, 40)).convert('RGBA'); mark = False
+        put_rays(canvas, (255, 220, 120), t, W / 2, 700, speed=60, alpha=0.7)
+        slam(canvas, 'GOOD', 210, WHITE, W / 2, 520, bt)
+        slam(canvas, 'OR BAD?', 210, None, W / 2, 730, bt - 0.5, gold=True)
+        slam(canvas, 'TELL US IN THE COMMENTS', 62, WHITE, W / 2, 900, bt - 1.2)
+        follow_cta(canvas, bt - 2.0, 1240, 'NEW SEASON: NOV 19')
+        if bt > 2.6:
+            put(canvas, text_sprite('BEST PICKS: BRAWLZONE.NET', 58, WHITE, stroke=5), W / 2, 1600, alpha=clamp(bt - 2.6))
+        shake, flash = hits(bt, (0, 0.5, 1.2), 1.3, 0.5)
+    return finish(canvas, shake, flash, mark)
+
+
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'skinquiz': quiz_scene, 'iconquiz': quiz_scene,
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
          'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
-         'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene}[KIND]
+         'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
+         'rankedrefresh': rr_scene}[KIND]
 
 
 def frame(t):

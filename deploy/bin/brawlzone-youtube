@@ -73,6 +73,8 @@ elif ranking:
         title = f'{title} Agree? 👇'
 elif 'buffies' in low:
     ask = "💬 Which new brawler or Buffie is your favourite? Comment below 👇"
+elif 'changed' in low:  # "Ranked just CHANGED" (2026-11-03)
+    ask = "💬 Good or bad change? Comment below 👇"
 elif low.startswith('how to beat') or 'counter' in low:
     ask = "💬 What do you pick against them? Comment below 👇"
 else:

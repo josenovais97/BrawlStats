@@ -3,7 +3,7 @@
 # drawn from today's data and posted to TikTok (inbox), YouTube and Instagram.
 #
 #   brawlzone-viral [--no-post] [quiz|broken|ranks|modes]
-#   brawlzone-viral [--no-post] extra|everyrank|classrank|stop|drops|whatsnew
+#   brawlzone-viral [--no-post] extra|everyrank|classrank|stop|drops|whatsnew|rankedrefresh
 #   brawlzone-viral [--no-post] newbrawler <dir>
 #   brawlzone-viral [--no-post] daily
 #
@@ -92,8 +92,8 @@ if [ "$kind" = extra ]; then
   esac
 fi
 
-case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew) ;;
-  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops or whatsnew)" ;; esac
+case "$kind" in quiz|shadowquiz|zoomquiz|skinquiz|iconquiz|broken|ranks|modes|newbrawler|daily|everyrank|classrank|stop|giveaway|drops|whatsnew|rankedrefresh) ;;
+  *) die "::error::unknown format '$kind' (quiz, shadowquiz, zoomquiz, skinquiz, iconquiz, broken, ranks, modes, newbrawler, daily, extra, everyrank, classrank, stop, giveaway, drops, whatsnew or rankedrefresh)" ;; esac
 
 if [ "$kind" = newbrawler ]; then
   OUT="${2:-}"
@@ -107,7 +107,7 @@ elif [ "$kind" = daily ]; then
   PREV=-
 elif [ "$kind" = everyrank ] || [ "$kind" = classrank ] || [ "$kind" = stop ] \
      || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] \
-     || [ "$kind" = whatsnew ]; then
+     || [ "$kind" = whatsnew ] || [ "$kind" = rankedrefresh ]; then
   OUT="$PUBLIC/$DAY-$kind"
   DATA_IN="/data/history/$DAY.json"
 else
@@ -122,7 +122,7 @@ mkdir -p "$ROOT/history" "$CACHE/models" "$CACHE/faces" "$OUT" || die "::error::
 TRACK=${TRACK:-$(python3 - "$REPO/deploy/viral/tracks.json" "$kind" <<'PY'
 import datetime, json, sys
 names = sorted(json.load(open(sys.argv[1])))
-extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew')
+extra = sys.argv[2] in ('broken', 'ranks', 'modes', 'stop', 'everyrank', 'classrank', 'giveaway', 'drops', 'whatsnew', 'rankedrefresh')
 print(names[(datetime.date.today().toordinal() + extra) % len(names)])
 PY
 )}
@@ -142,6 +142,10 @@ cp "$REPO/public/rewards/box-rainbow.png" "$CACHE/" 2>/dev/null
 # make.py exits 3 without the drop.
 mkdir -p "$CACHE/drops"
 cp "$REPO"/public/rewards/art/{coins,power-points,credits,bling}.png "$REPO"/public/icons/{hypercharge,buffie,skin-legendary,brawlers}.png "$CACHE/drops/" 2>/dev/null
+# The Ranked Refresh Short's icons (2026-11-03); its league badges are fetched
+# large from the Fan Kit with the other art below.
+mkdir -p "$CACHE/ranked"
+cp "$REPO"/public/icons/{trophy,power-11,brawlers,ranked,draft}.png "$CACHE/ranked/" 2>/dev/null
 
 if [ "$kind" = daily ]; then
   # The puzzle as the site serves it right now: four zoom steps and the
@@ -266,6 +270,17 @@ for b in data['all'] + [n for n in data.get('newest', []) if n['id'] not in _see
                 from_wiki(b['n'], 'Portrait', face)
     except Exception as e:
         print(f"no face for {b['n']}: {e}")
+# League badges for the Ranked Refresh Short, large (the site keeps 96px).
+os.makedirs('/cache/ranked', exist_ok=True)
+for key, url in icons.items():
+    if key.startswith('league:') and url.startswith('https://media.ffycdn.net/'):
+        path = f"/cache/ranked/league-{key.split(':')[1]}.png"
+        src = url.split('?')[0] + '?width=420'
+        try:
+            if cached_from(path) != src:
+                save(Image.open(io.BytesIO(get(src))).convert('RGBA'), path, src)
+        except Exception as e:
+            print(f"no league badge {key}: {e}")
 # Buffie icons for the "what's new" video, and their newest-first order.
 os.makedirs('/cache/buffies', exist_ok=True)
 order = {}

@@ -10,6 +10,7 @@
  * (`pool`) and the most-picked brawlers per rank bracket (`brackets`).
  */
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
+import { getLatestReleaseNotes, updateHeadliners } from '@/lib/release-notes';
 import { getSeasonState } from '@/lib/ranked-seasons';
 import { rotationMaps } from '@/lib/ranked-rotation';
 import { slugify } from '@/lib/slugs';
@@ -25,7 +26,7 @@ const BRACKETS = [
 
 async function main() {
   const season = await getSeasonState();
-  const [picks, week, recent, maps, catalog, trophyWeek] = await Promise.all([
+  const [picks, week, recent, maps, catalog, trophyWeek, notes] = await Promise.all([
     getRankedMapPicks(3),
     getScoredRoster(7, undefined, 'ranked'),
     getScoredRoster(3, undefined, 'ranked'),
@@ -35,6 +36,8 @@ async function main() {
     getBrawlerCatalog().catch(() => null),
     // For "what's new": a launch-week brawler is in trophy games first.
     getScoredRoster(7, undefined, 'trophy').catch(() => []),
+    // The latest update's own new brawlers and Buffies, for "what's new".
+    getLatestReleaseNotes().catch(() => null),
   ]);
   const facts = new Map((catalog?.all ?? []).map((b) => [b.id, b]));
   const live = rotationMaps({ recent: maps, pool: season.mapPool });
@@ -112,6 +115,7 @@ async function main() {
       season: season.current?.number ?? null,
       all: week.filter((b) => b.tier).map(row),
       recent: recent.filter((b) => b.tier).map(row),
+      update: notes ? headliners(notes, catalog?.all ?? []) : null,
       // The newest brawlers in the game, Ranked tier or not (2026-11-03): the
       // "what's new" video read them from `all`, which only holds brawlers
       // with a Ranked tier, so it skipped a launch week's brawlers entirely.
@@ -130,6 +134,26 @@ async function main() {
       drops,
     }),
   );
+}
+
+/** The update's headliners as catalogue ids; a new brawler the catalogue lacks is dropped. */
+function headliners(
+  notes: NonNullable<Awaited<ReturnType<typeof getLatestReleaseNotes>>>,
+  all: { id: number; name: string }[],
+) {
+  const h = updateHeadliners(notes, all.map((b) => b.name));
+  const ids = (names: string[]) =>
+    names.flatMap((name) => {
+      const b = all.find((c) => slugify(c.name) === slugify(name));
+      return b ? [{ id: b.id, n: b.name }] : [];
+    });
+  return {
+    title: notes.title,
+    date: notes.publishedAt?.slice(0, 10) ?? null,
+    brawlers: ids(h.brawlers),
+    buffies: ids(h.buffies),
+    hypercharges: ids(h.hypercharges),
+  };
 }
 
 main().then(

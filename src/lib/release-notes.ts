@@ -361,6 +361,52 @@ export function changesFromNotes(
   return out;
 }
 
+/**
+ * The brawlers an update headlines, read from the lines that introduce them
+ * rather than from any mention (2026-11-03, for the "what's new" video): the
+ * new brawlers' "Thunder Frogs - Legendary - Artillery" lines, the Buffies
+ * section's lines that are just a brawler's name, and the hypercharges'
+ * "Cosmo (COSMIC CAPTURE): ..." lines. `changesFromNotes` matches any
+ * mention, which is right for "who was touched" and wrong for a headline:
+ * the Thunder Frogs blurb names Ziggy, who is not new.
+ *
+ * New brawlers are taken as the post spells them (the catalogue may not have
+ * them yet); the others are returned as the matching `known` name.
+ */
+export function updateHeadliners(
+  notes: ReleaseNotes,
+  known: string[],
+): { brawlers: string[]; buffies: string[]; hypercharges: string[] } {
+  const out = { brawlers: [] as string[], buffies: [] as string[], hypercharges: [] as string[] };
+  const lower = new Map(known.map((k) => [k.toLowerCase(), k]));
+  const lines = (nodes: RichNode[]) =>
+    nodes.flatMap((n) => (n.type === 'list' ? n.items.flat().map(nodeText) : [nodeText(n)])).map((t) => t.replace(/\s+/g, ' ').trim());
+  const add = (list: string[], name: string) => {
+    if (name && !list.includes(name)) list.push(name);
+  };
+  for (const section of notes.sections) {
+    const title = section.title ?? '';
+    if (/new\s+brawler/i.test(title)) {
+      for (const line of lines(section.nodes)) {
+        const m = /^(.+?)\s+-\s+(?:Common|Rare|Super Rare|Epic|Mythic|Legendary|Ultra Legendary)\b/i.exec(line);
+        if (m) add(out.brawlers, lower.get(m[1].toLowerCase()) ?? m[1]);
+      }
+    } else if (/buffie/i.test(title)) {
+      for (const line of lines(section.nodes)) {
+        const name = lower.get(line.toLowerCase());
+        if (name) add(out.buffies, name);
+      }
+    } else if (/hypercharge/i.test(title)) {
+      for (const line of lines(section.nodes)) {
+        const m = /^(.+?)\s*\(/.exec(line);
+        const name = m ? lower.get(m[1].trim().toLowerCase()) : undefined;
+        if (name) add(out.hypercharges, name);
+      }
+    }
+  }
+  return out;
+}
+
 export interface BalanceEvent {
   /** ISO date the update was published. */
   date: string;
