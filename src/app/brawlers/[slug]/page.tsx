@@ -249,17 +249,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const brawlerId = resolved.id;
   const brawler = await getBrawler(brawlerId).catch(() => undefined);
-  if (!brawler) return { title: t('Brawler') };
 
-  const name = titleCase(brawler.name);
+  /*
+   * A brawler the artwork mirror does not have yet is named from the
+   * catalogue and its abilities from the game API, as the page body does
+   * (below). This used to return a bare "Brawler" title with no canonical:
+   * on 2026-11-03 the three newest brawlers' pages, nine with /es and /pt,
+   * were all "Brawler · BrawlZone" with the site's generic description.
+   */
+  let name: string;
+  let accessoryList: { id: number; name: string }[];
+  if (brawler) {
+    name = titleCase(brawler.name);
+    accessoryList = [...brawler.starPowers, ...brawler.gadgets];
+  } else {
+    const [catalogue, official] = await Promise.all([
+      getBrawlerCatalog().catch(() => null),
+      getOfficialBrawlers()
+        .then((r) => r.items)
+        .catch(() => []),
+    ]);
+    const entry = catalogue?.byId.get(brawlerId);
+    if (!entry) return { title: t('Brawler') };
+    const live = official.find((b: { id: number }) => b.id === brawlerId);
+    name = titleCase(entry.name);
+    accessoryList = [...(live?.starPowers ?? []), ...(live?.gadgets ?? [])];
+  }
+
   const [stat, choices] = await Promise.all([brawlerStat(brawlerId), abilityChoicesFor(brawlerId)]);
   const adjusted = stat
     ? normalizeWinRate(stat.winRate, stat.baselineWinRate, stat.decidedSampleSize)
     : null;
 
-  const accessories = new Map(
-    [...brawler.starPowers, ...brawler.gadgets].map((a) => [a.id, a.name]),
-  );
+  const accessories = new Map(accessoryList.map((a) => [a.id, a.name]));
 
   /*
    * The snippet has to answer the query in its first clause.

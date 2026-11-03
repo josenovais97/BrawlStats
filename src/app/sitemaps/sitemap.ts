@@ -4,6 +4,7 @@ import { INTL_LOCALES, isTranslatedPath, languageAlternates } from '@/lib/i18n';
 import { RANK_BRACKETS } from '@/lib/rank-brackets';
 import { bracketTierListHref } from '@/lib/tier-list-route';
 
+import { countersHaveRows } from '@/components/brawlers/counters-view';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getActiveMaps, groupByMode } from '@/lib/game-maps';
 import { SITE_URL } from '@/lib/site';
@@ -129,7 +130,8 @@ async function core(add: Add, dataDay: Date | null) {
   const catalog = await getBrawlerCatalog().catch(() => null);
   for (const brawler of catalog?.current ?? []) {
     add(`/brawlers/${slugify(brawler.name)}`, 'daily', 0.8);
-    add(`/brawlers/${slugify(brawler.name)}/counters`, 'daily', 0.7);
+    // Only with something to list: an empty one is noindex (countersMetadata).
+    if (await countersHaveRows(brawler.id)) add(`/brawlers/${slugify(brawler.name)}/counters`, 'daily', 0.7);
   }
 
   // Per-mode tier lists, listed only for the modes that actually have enough

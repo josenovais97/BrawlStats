@@ -219,6 +219,25 @@ function split(scores: Map<number, CounterScore>, self: number, minGames: number
   };
 }
 
+/**
+ * Whether a brawler's counters page has anything to list, which is what
+ * makes it indexable (see `countersMetadata`). The sitemap asks, so that it
+ * stops listing the pages that say noindex: twelve on 2026-11-03, the
+ * newest brawlers' in all three languages.
+ */
+export async function countersHaveRows(id: number): Promise<boolean> {
+  const scores = await getRankedCounterScores([id], WINDOW_DAYS).catch(() => new Map<number, CounterScore>());
+  const { counters, avoid } = split(scores, id, MIN_GAMES, (s) => ({
+    brawlerId: s.brawlerId,
+    name: '',
+    slug: '',
+    winRate: s.winRate,
+    edge: s.edge,
+    games: s.decidedSampleSize,
+  }));
+  return counters.length > 0 || avoid.length > 0;
+}
+
 export async function countersMetadata(slug: string, locale: Locale): Promise<Metadata> {
   const w = WORDS[locale];
   const b = await resolve(slug);
