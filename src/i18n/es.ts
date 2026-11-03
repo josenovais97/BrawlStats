@@ -4828,4 +4828,50 @@ export const ES: Record<string, string> = {
     "De {battles} partidas de {players} jugadores que recogemos nosotros mismos.",
   "Updated":
     "Actualizado",
+  "November 2026 update":
+    "Actualización de noviembre de 2026",
+  "Ranked Refresh: what changed":
+    "Renovación del Competitivo: qué cambió",
+  "The biggest change to Ranked since the 2025 rework.":
+    "El mayor cambio del Competitivo desde la renovación de 2025.",
+  "The first season reset under the new rules is on {date}.":
+    "El primer reinicio de temporada con las nuevas reglas es el {date}.",
+  "Unlocks at 5,000 trophies":
+    "Se desbloquea con 5000 trofeos",
+  "Up from 1,000. If you already have Ranked you keep it, and get a Chaos Drop at 5,000 trophies instead.":
+    "Antes eran 1000. Si ya tienes el Competitivo, lo conservas y a los 5000 trofeos recibes un Chaos Drop en su lugar.",
+  "Power 11 at every rank":
+    "Fuerza 11 en todos los rangos",
+  "Bronze to Diamond used to take Power 9. Diamond now needs 12 brawlers, the same as Mythic, up from 9.":
+    "De Bronce a Diamante antes bastaba fuerza 9. Diamante ahora pide 12 brawlers, igual que Mítico (antes eran 9).",
+  "6 free maxed brawlers a season":
+    "6 brawlers al máximo gratis por temporada",
+  "Up from 3, to make up for the stricter requirements.":
+    "Antes eran 3, para compensar los requisitos más altos.",
+  "The season reset drops you 2 ranks":
+    "El reinicio de temporada solo te baja 2 rangos",
+  "Down from 6, so you start each season much closer to your best. No change to the boost.":
+    "Antes eran 6, así que empiezas cada temporada mucho más cerca de tu mejor rango. El impulso no cambia.",
+  "A 2-0 win earns more Elo":
+    "Ganar 2-0 da más Elo",
+  "An Epic Win (2-0) gives extra Elo and a Close Match loss (1-2) costs less. Early and middle ranks climb faster.":
+    "Una Victoria Épica (2-0) da Elo extra y perder un Partido Reñido (1-2) cuesta menos. En los rangos bajos y medios se sube más rápido.",
+  "No teams from Masters I up":
+    "Sin equipos desde Maestros I",
+  "From Masters I and above, Ranked is played without a premade team.":
+    "Desde Maestros I en adelante, el Competitivo se juega sin equipo armado.",
+  "A new Pick & Ban screen":
+    "Nueva pantalla de selección y baneo",
+  "A bigger brawler grid with filters, ban suggestions, pick-order swaps and quick chat while you draft.":
+    "Una cuadrícula de brawlers más grande con filtros, sugerencias de baneo, cambio del orden de selección y chat rápido durante el draft.",
+  "Pro no longer qualifies for BSC":
+    "Llegar a Pro ya no clasifica a la BSC",
+  "Reaching Pro does not qualify you for BSC 2027. The way in is the Championship Challenge.":
+    "Llegar a Pro no te clasifica a la BSC 2027. La vía de entrada es el Desafío del Campeonato.",
+  "Source:":
+    "Fuente:",
+  "Supercell’s November 2026 release notes":
+    "Notas de versión de noviembre de 2026 de Supercell",
+  "Every balance change in this update":
+    "Todos los cambios de equilibrio de esta actualización",
 };

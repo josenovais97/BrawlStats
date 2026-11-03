@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { MapPreview } from '@/components/ranked/map-preview';
 import { SeasonPanel } from '@/components/ranked/season-panel';
+import { RankedRefresh } from '@/components/ranked/ranked-refresh';
 import { RankedLadder } from '@/components/ranked/ranked-ladder';
 import { RankedIcon } from '@/components/game-icons';
 import { Disclosure } from '@/components/ui/disclosure';
@@ -301,6 +302,9 @@ export default async function RankedPage() {
           return match ? `/maps/${match.modeSlug}/${match.mapSlug}` : null;
         }}
       />
+
+      {/* The November 2026 rules change, under the season it applies to. */}
+      <RankedRefresh nextReset={season.nextStartsOn} />
 
       {modeNav.length > 1 ? (
         <nav aria-label={t('Jump to a mode')} className="-mx-4 px-4 sm:mx-0 sm:px-0">

@@ -26,6 +26,8 @@ kind     quiz    "Guess the brawler #N": five rounds, medium to expert, each a
                  of the channel's first month made a weekly format.
          classrank  the same countdown inside one class or rarity ("every
                  assassin ranked"), the next group each episode.
+         seasonclimb  the countdown's top 10 on the day a Ranked season
+                 starts ("the 10 best brawlers to climb", 2026-11-03).
          stop    "STOP picking these brawlers": the most-picked that lose,
                  then the least-picked that win.
          drops   "1,000 Chaos Drops with the real drop rates" (2026-10-29): what
@@ -67,7 +69,7 @@ by_id = {b['id']: b for b in data.get('all', [])}
 # Slower since 2026-10-23 (see Timeline): half-time where you guess, longer
 # holds where you read.
 PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2}, 'skinquiz': {'pace': 2}, 'iconquiz': {'pace': 2},
-          'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}}
+          'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
 
@@ -996,9 +998,9 @@ GROUPS = [  # field, value, headline, plural in English / Brazilian Portuguese /
 ]
 COUNT_HASHTAGS = '#brawlstars #brawlstarstierlist #brawlstarsranked #tierlist #brawlzone'
 
-if KIND in ('everyrank', 'classrank'):
+if KIND in ('everyrank', 'classrank', 'seasonclimb'):
     N_EP = episode(KIND)
-    if KIND == 'everyrank':
+    if KIND in ('everyrank', 'seasonclimb'):
         ranked = sorted(data['all'], key=lambda b: -(b['score'] or 0))
         WORD, BEST_LINE = 'BRAWLER', 'THE BEST IN RANKED'
     else:
@@ -1016,7 +1018,9 @@ if KIND in ('everyrank', 'classrank'):
         BEST_LINE = f'THE BEST {WORD}'
     NB = len(ranked)
     tl.add(6, 'c_intro')
-    if NB > 20:  # the original's shape: tier pages, then the top 20 in rows, then one at a time
+    if KIND == 'seasonclimb':  # only the top ten, one at a time
+        singles = range(10, 1, -1)
+    elif NB > 20:  # the original's shape: tier pages, then the top 20 in rows, then one at a time
         bottom = [(i + 1, b) for i, b in enumerate(ranked) if i + 1 > 20][::-1]
         groups = []
         for r, b in bottom:
@@ -1044,7 +1048,21 @@ if KIND in ('everyrank', 'classrank'):
     tl.add(7, 'c_one', b=ranked[0])
     tl.add(7, 'c_outro')
     top3 = ', '.join(nice(b['n']) for b in ranked[:3])
-    if KIND == 'everyrank':
+    if KIND == 'seasonclimb':
+        # The first season under the Ranked Refresh (19 November 2026) says so.
+        refresh = str(data.get('date', '')) <= '2026-11-30'
+        META = {
+            'title': 'NEW Ranked season: the 10 BEST brawlers to climb 🏆 #Shorts',
+            'titles': {'pt-BR': 'NOVA temporada do Ranqueado: os 10 MELHORES brawlers para subir 🏆 #Shorts',
+                       'es-419': 'NUEVA temporada de Competitivo: los 10 MEJORES brawlers para subir 🏆 #Shorts'},
+            'description': 'A new Ranked season starts today. '
+                           + ('It is the first under the Ranked Refresh: Power 11 at every rank, and the reset only '
+                              'drops you 2 ranks. ' if refresh else '')
+                           + f"The 10 best brawlers to climb with, from this week's Ranked games. Top 3: {top3}. "
+                             f'Who are you climbing with? Comment below 👇\n\n'
+                             f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
+        }
+    elif KIND == 'everyrank':
         META = {
             'title': 'Every brawler ranked from WORST to BEST 😳 #Shorts',
             'titles': {'pt-BR': 'Todos os brawlers do PIOR ao MELHOR 😳 #Shorts',
@@ -1106,17 +1124,22 @@ def count_scene(s, t, bt, lt):
     if k == 'c_intro':
         canvas.alpha_composite(count_wall(), (int(-300 - (t * 60) % 170), int(-200 - (t * 90) % 170)))
         word_size = min(200, int(200 * 7 / max(7, len(WORD))))  # BRAWLER fits at 200, the original's size
-        for w_, at, gold, y, size in (('EVERY', 0, False, 360, 200), (WORD, 1, False, 560, word_size), ('RANKED', 2, True, 790, 250)):
+        climb = KIND == 'seasonclimb'
+        words = ((('NEW', 0, False, 360, 200), ('SEASON', 1, False, 560, 200), ('TOP 10', 2, True, 790, 250)) if climb else
+                 (('EVERY', 0, False, 360, 200), (WORD, 1, False, 560, word_size), ('RANKED', 2, True, 790, 250)))
+        for w_, at, gold, y, size in words:
             slam(canvas, w_, size, WHITE, W / 2, y, bt - at, gold=gold, k=1.4)
         shake, flash = hits(bt, (0, 1, 2), 0.8, 0.4)
-        if bt >= 3:
+        if bt >= 3 and climb:
+            put(canvas, text_sprite('BEST TO CLIMB', 110, (90, 230, 140)), W / 2, 1040, scale=out_back((bt - 3) / 0.5))
+        elif bt >= 3:
             u = bt - 3
             put(canvas, text_sprite('WORST', 110, (255, 90, 100)), W / 2 - 230 - 300 * (1 - out_back(u / 0.5)), 1040)
             put(canvas, text_sprite('BEST', 110, (90, 230, 140)), W / 2 + 250 + 300 * (1 - out_back(u / 0.5)), 1040)
             put(canvas, text_sprite('>', 120, WHITE), W / 2 + 10, 1040, scale=out_back(u / 0.5))
         if bt >= 4:
-            put(canvas, text_sprite(f"THIS WEEK IN RANKED · SEASON {data.get('season')}", 56, GOLD_TOP, stroke=7), W / 2, 1210,
-                scale=out_back((bt - 4) / 0.4))
+            put(canvas, text_sprite("FROM THIS WEEK'S RANKED GAMES" if climb else f"THIS WEEK IN RANKED · SEASON {data.get('season')}",
+                                    56, GOLD_TOP, stroke=7), W / 2, 1210, scale=out_back((bt - 4) / 0.4))
         if bt >= 4.5:
             put(canvas, text_sprite('wait for #1...', 92, WHITE), W / 2, 1380, alpha=0.65 + 0.35 * math.sin(t * 14),
                 scale=out_back((bt - 4.5) / 0.4))
@@ -1933,7 +1956,7 @@ def rr_scene(s, t, bt, lt):
 
 SCENE = {'quiz': quiz_scene, 'shadowquiz': quiz_scene, 'zoomquiz': quiz_scene, 'skinquiz': quiz_scene, 'iconquiz': quiz_scene,
          'broken': broken_scene, 'ranks': ranks_scene, 'modes': modes_scene,
-         'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene,
+         'newbrawler': nb_scene, 'daily': daily_scene, 'everyrank': count_scene, 'classrank': count_scene, 'seasonclimb': count_scene,
          'stop': stop_scene, 'giveaway': giveaway_scene, 'drops': drops_scene, 'whatsnew': wn_scene,
          'rankedrefresh': rr_scene}[KIND]
 
