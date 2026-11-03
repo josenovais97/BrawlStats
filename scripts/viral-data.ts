@@ -25,7 +25,7 @@ const BRACKETS = [
 
 async function main() {
   const season = await getSeasonState();
-  const [picks, week, recent, maps, catalog] = await Promise.all([
+  const [picks, week, recent, maps, catalog, trophyWeek] = await Promise.all([
     getRankedMapPicks(3),
     getScoredRoster(7, undefined, 'ranked'),
     getScoredRoster(3, undefined, 'ranked'),
@@ -33,6 +33,8 @@ async function main() {
     // Class and rarity, for the "every assassin ranked" series. Optional: a
     // missing catalogue only takes that format off the table for the day.
     getBrawlerCatalog().catch(() => null),
+    // For "what's new": a launch-week brawler is in trophy games first.
+    getScoredRoster(7, undefined, 'trophy').catch(() => []),
   ]);
   const facts = new Map((catalog?.all ?? []).map((b) => [b.id, b]));
   const live = rotationMaps({ recent: maps, pool: season.mapPool });
@@ -110,6 +112,19 @@ async function main() {
       season: season.current?.number ?? null,
       all: week.filter((b) => b.tier).map(row),
       recent: recent.filter((b) => b.tier).map(row),
+      // The newest brawlers in the game, Ranked tier or not (2026-11-03): the
+      // "what's new" video read them from `all`, which only holds brawlers
+      // with a Ranked tier, so it skipped a launch week's brawlers entirely.
+      newest: [...(catalog?.current ?? [])]
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 8)
+        .map((c) => {
+          const ranked = week.find((b) => b.brawlerId === c.id && b.tier);
+          return {
+            ...(ranked ? row(ranked) : { n: c.name, id: c.id, tier: null, cls: c.className, rar: c.rarityName }),
+            trophyTier: trophyWeek.find((b) => b.brawlerId === c.id)?.tier ?? null,
+          };
+        }),
       pool,
       brackets,
       drops,

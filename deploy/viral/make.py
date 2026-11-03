@@ -1671,7 +1671,14 @@ BUFFIE_LABEL = {'gadget': 'GADGET', 'starPower': 'STAR POWER', 'hyperCharge': 'H
 if KIND == 'whatsnew':
     scored = sorted((b for b in data['all'] if b.get('tier')), key=lambda b: -(b['score'] or 0))
     RANK = {b['id']: i + 1 for i, b in enumerate(scored)}
-    NEWEST = [b for b in sorted(scored, key=lambda b: -b['id']) if has_model(b)][:5]
+    # The newest brawlers whether or not they have a Ranked tier yet
+    # (2026-11-03): a launch-week brawler has none, so Thunder Frogs, Rey and
+    # Ruby were skipped in their own week. `newest` comes from the catalogue
+    # (scripts/viral-data.ts); older data files only have the ranked roster.
+    if data.get('newest'):
+        NEWEST = [b for b in data['newest'] if has_model(b)][:5]
+    else:
+        NEWEST = [b for b in sorted(scored, key=lambda b: -b['id']) if has_model(b)][:5]
     try:
         _bi = json.load(open(f"{os.environ.get('ASSETS', '.')}/buffies/index.json"))
     except (OSError, ValueError):
@@ -1694,13 +1701,14 @@ if KIND == 'whatsnew':
     for b, icons in reversed(BUFFIES):
         tl.add(4, 'w_buffie', b=b, icons=icons)
     tl.add(7, 'w_outro')
-    nb = ', '.join(f"{nice(b['n'])} ({b['tier']} tier)" for b in reversed(NEWEST))
+    nb = ', '.join(f"{nice(b['n'])} (" + (f"{b['tier']} tier" if b.get('tier') else f"{b['trophyTier']} tier in trophy games"
+                                          if b.get('trophyTier') else 'just released') + ')' for b in reversed(NEWEST))
     bf = ', '.join(nice(b['n']) for b, _ in reversed(BUFFIES))
     META = {
         'title': 'NEW brawlers & Buffies: are they actually good? 🔥',
         'titles': {'pt-BR': 'Brawlers e Buffies NOVOS: são bons mesmo? 🔥',
                    'es-419': '¿Los NUEVOS brawlers y Buffies son buenos? 🔥'},
-        'description': f"The newest brawlers in Ranked right now: {nb}. The newest Buffies: {bf}. "
+        'description': f"The newest brawlers right now: {nb}. The newest Buffies: {bf}. "
                        f"Which one is your favourite? 👇\n\n"
                        f"Every brawler's tier, from real Ranked battles: https://brawlzone.net/tier-list/ranked{FOOTER}\n"
                        f"#brawlstars #brawlstarsnewbrawler #buffies #brawlstarsmeta #brawlzone",
@@ -1730,7 +1738,9 @@ def wn_scene(s, t, bt, lt):
         slam(canvas, b_, 190, WHITE, W / 2, 1060, bt - 0.5)
         shake, flash = hits(bt, (0, 0.5), 1.4, 0.6)
     elif k == 'w_brawler':
-        b = s['b']; tier = b['tier']; tcol = TIER.get(tier, (255, 60, 100))
+        # No Ranked tier (launch week, or kept out of Ranked): the trophy-game
+        # tier stands in, and with neither it is just released.
+        b = s['b']; tier = b.get('tier') or b.get('trophyTier'); tcol = TIER.get(tier, (255, 60, 100))
         canvas = background(t, tcol).convert('RGBA')
         put_rays(canvas, tcol, t, W / 2, 860, speed=40, alpha=0.9)
         put(canvas, art(b, 860, 900), W / 2, 820, scale=1 + 0.35 * (1 - out_back(bt / 0.45, 1.6)))
@@ -1739,14 +1749,16 @@ def wn_scene(s, t, bt, lt):
             put(canvas, text_sprite(nm, fs, gold=True), W / 2, 1330, scale=1 + 1.2 * (1 - out_back((bt - 0.3) / 0.5, 1.2)))
         if bt > 1.3:
             u = bt - 1.3
-            put(canvas, tier_pill(tier), W / 2, 1520, scale=1.5 * (1 + 1.0 * (1 - out_back(u / 0.5, 1.2))) if u < 0.5 else 1.5)
+            badge = tier_pill(tier) if tier else pill('JUST RELEASED', (255, 60, 100), size=72)
+            put(canvas, badge, W / 2, 1520, scale=1.5 * (1 + 1.0 * (1 - out_back(u / 0.5, 1.2))) if u < 0.5 else 1.5)
         if bt > 2.2:
-            put(canvas, text_sprite(f"#{RANK[b['id']]} OF {len(RANK)} IN RANKED", 64, WHITE, stroke=6), W / 2, 1680,
-                scale=out_back((bt - 2.2) / 0.4))
+            line = (f"#{RANK[b['id']]} OF {len(RANK)} IN RANKED" if b.get('tier') and b['id'] in RANK
+                    else 'IN TROPHY GAMES' if tier else 'TOO NEW FOR RANKED')
+            put(canvas, text_sprite(line, 64, WHITE, stroke=6), W / 2, 1680, scale=out_back((bt - 2.2) / 0.4))
         if bt > 2.9:
-            word, vcol = VERDICT[tier]
+            word, vcol = VERDICT[tier] if tier else ('BRAND NEW!', (255, 60, 100))
             put(canvas, text_sprite(word, 150, vcol), W / 2, 330, scale=1 + 1.6 * (1 - out_back((bt - 2.9) / 0.4, 1.0)), rot=-8)
-            if tier in 'SA': confetti(canvas, (bt - 2.9) * P)
+            if not tier or tier in 'SA': confetti(canvas, (bt - 2.9) * P)
         shake = max(impact(lt, 1.2), hits(bt, (1.3, 2.9), 1.1, 0.4)[0])
         flash = max(impact(lt) * 0.8, hits(bt, (1.3, 2.9), 1.1, 0.4)[1])
     elif k == 'w_buffie':

@@ -199,7 +199,7 @@ echo "format: $kind, compared with: $PREV"
 # model at all (a new one) is drawn as a card, and never quizzed.
 docker run -i --rm --user "$(id -u):$(id -g)" -v "$CACHE:/cache" -v "$REPO:/repo:ro" -v "$ROOT/history:/history:ro" \
   -e PYTHONPATH=/cache/py "$PYTHON_IMAGE" python - "/history/$DAY.json" <<'PY'
-import io, json, os, sys, urllib.request
+import io, json, os, re, sys, urllib.error, urllib.parse, urllib.request
 from PIL import Image
 data = json.load(open(sys.argv[1]))
 fk = json.load(open('/repo/src/data/fankit.json'))
@@ -214,7 +214,29 @@ def save(img, path, src):
 def cached_from(path):
     try: return open(path[:-4] + '.src').read()
     except OSError: return None
-for b in data['all']:
+# The wiki last (2026-11-03): a brawler released today is on neither the
+# Fan Kit nor Brawlify for days, and the "what's new" video skipped Thunder
+# Frogs, Rey and Ruby in their own launch week. Its files are "<Name>
+# Skin-Default.png" (the render) and "<Name> Portrait.png", looked up through
+# the MediaWiki API, the way the site does (lib/wiki-art).
+def wiki_file(title):
+    q = urllib.parse.urlencode({'action': 'query', 'prop': 'imageinfo', 'titles': f'File:{title}',
+                                'iiprop': 'url', 'format': 'json'})
+    pages = json.loads(get(f'https://brawlstars.fandom.com/api.php?{q}'))['query']['pages']
+    for p in pages.values():
+        for i in p.get('imageinfo') or []:
+            if i.get('url'): return i['url']
+    return None
+def wiki_name(name):  # "THUNDER FROGS" -> "Thunder Frogs", "8-BIT" -> "8-Bit"
+    return re.sub(r"(^|[ -])([a-z])", lambda m: m.group(1) + m.group(2).upper(), name.lower())
+def from_wiki(name, suffix, path):
+    url = wiki_file(f"{wiki_name(name)} {suffix}.png")
+    if not url: raise LookupError(f'no wiki {suffix}')
+    img = Image.open(io.BytesIO(get(url))).convert('RGBA')
+    img = img.crop(img.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
+    save(img, path, url)
+_seen = {b['id'] for b in data['all']}
+for b in data['all'] + [n for n in data.get('newest', []) if n['id'] not in _seen]:
     bid = str(b['id'])
     model, face = f"/cache/models/{bid}.png", f"/cache/faces/{bid}.png"
     src = fk.get('bodySources', {}).get(bid)
@@ -225,7 +247,11 @@ for b in data['all']:
             img.thumbnail((2000, 2000), Image.LANCZOS)
             save(img, model, src)
         elif not src and not os.path.exists(model):
-            open(model, 'wb').write(get(f"https://cdn.brawlify.com/brawlers/model/{bid}.png"))
+            try:
+                body = get(f"https://cdn.brawlify.com/brawlers/model/{bid}.png")
+                open(model, 'wb').write(body)
+            except urllib.error.HTTPError:
+                from_wiki(b['n'], 'Skin-Default', model)
     except Exception as e:
         print(f"no model for {b['n']}: {e}")
     icon = icons.get(bid)
@@ -233,7 +259,11 @@ for b in data['all']:
         if icon and cached_from(face) != icon:
             save(Image.open('/repo/public' + icon).convert('RGBA').resize((170, 170), Image.LANCZOS), face, icon)
         elif not icon and not os.path.exists(face):
-            open(face, 'wb').write(get(f"https://cdn.brawlify.com/brawlers/borderless/{bid}.png"))
+            try:
+                body = get(f"https://cdn.brawlify.com/brawlers/borderless/{bid}.png")
+                open(face, 'wb').write(body)
+            except urllib.error.HTTPError:
+                from_wiki(b['n'], 'Portrait', face)
     except Exception as e:
         print(f"no face for {b['n']}: {e}")
 # Buffie icons for the "what's new" video, and their newest-first order.
