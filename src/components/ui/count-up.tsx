@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { isAutomated } from '@/lib/automated';
 import { compactNumber } from '@/lib/format';
 
 /**
@@ -52,6 +53,8 @@ export function CountUp({
 
     // Motion for its own sake, which is the one kind this query switches off.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // A crawler's snapshot never scrolls, so it would keep the zero.
+    if (isAutomated()) return;
 
     setShown(0);
 

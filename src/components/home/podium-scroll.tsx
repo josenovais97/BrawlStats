@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 
+import { isAutomated } from '@/lib/automated';
+
 /** Gap between one place lighting and the next. */
 const STEP_MS = 650;
 
@@ -32,6 +34,7 @@ export function PodiumScroll({ className, children }: { className: string; child
     if (!el) return;
     if (!('IntersectionObserver' in window)) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (isAutomated()) return;
     if (el.getBoundingClientRect().top < window.innerHeight) return;
 
     // Third place first.

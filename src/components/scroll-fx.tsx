@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { isAutomated } from '@/lib/automated';
+
 /**
  * Entrance animations for the whole site, in the game's motion (2026-10-30).
  *
@@ -44,6 +46,8 @@ export function ScrollFx() {
     if (/^\/(?:es\/|pt\/)?bubble\/(?:panel|test)/.test(path)) return;
     if (!('IntersectionObserver' in window)) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Nor for crawlers, which snapshot without scrolling (see isAutomated).
+    if (isAutomated()) return;
 
     const root = document.documentElement;
     root.classList.add('fx-ready');
