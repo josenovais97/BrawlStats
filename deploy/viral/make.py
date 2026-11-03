@@ -1331,7 +1331,12 @@ GW_PURPLE = (150, 90, 255)
 def fit(txt, size, maxw, *a, **kw):
     """text_sprite, made smaller until it is at most maxw wide."""
     sp = text_sprite(txt, size, *a, **kw)
-    return sp if sp.width <= maxw else text_sprite(txt, int(size * maxw / sp.width), *a, **kw)
+    # A loop, not one step: text_sprite caps a sprite at the frame's width, so
+    # its width stops following the size for long text.
+    while sp.width > maxw and size > 20:
+        size = max(20, min(size - 2, int(size * maxw / sp.width)))
+        sp = text_sprite(txt, size, *a, **kw)
+    return sp
 
 
 def giveaway_scene(s, t, bt, lt):

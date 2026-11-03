@@ -38,6 +38,7 @@ const ZOOM = [5, 3.9, 3.0, 2.4, 1.9, 1.5];
 const SHADOW_HARD = [2.4, 1.95, 1.6, 1.35, 1.15, 1.0];
 const ZOOM_HARD = [7, 5.4, 4.2, 3.2, 2.4, 1.7];
 const SILHOUETTE = { r: 14, g: 16, b: 34 };
+const ZOOM_FACE_CHECKED_FROM = '2026-11-04';
 
 /** A seeded run of numbers in [0, 1) for one day and one purpose. */
 function seeded(date: string, salt: number): () => number {
@@ -55,13 +56,9 @@ function seeded(date: string, salt: number): () => number {
  */
 async function zoomSpot(figure: Buffer, width: number, height: number, date: string): Promise<[number, number]> {
   const rnd = seeded(date, 0x51ed270b);
-  const face: [number, number] = [width / 2 + (rnd() - 0.5) * width * 0.25, height * 0.28];
-  if (rnd() < 0.34) return face;
   const alpha = await sharp(figure).extractChannel('alpha').raw().toBuffer();
   const side = Math.min(width, height) / ZOOM_HARD[0];
-  for (let tries = 0; tries < 40; tries++) {
-    const cx = width * (0.25 + rnd() * 0.5);
-    const cy = height * (0.3 + rnd() * 0.45);
+  const solidAt = (cx: number, cy: number) => {
     let solid = 0;
     let all = 0;
     const step = Math.max(1, Math.floor(side / 24));
@@ -71,7 +68,17 @@ async function zoomSpot(figure: Buffer, width: number, height: number, date: str
         if (alpha[Math.floor(y) * width + Math.floor(x)] > 128) solid += 1;
       }
     }
-    if (all > 0 && solid / all > 0.75) return [cx, cy];
+    return all > 0 ? solid / all : 0;
+  };
+  const face: [number, number] = [width / 2 + (rnd() - 0.5) * width * 0.25, height * 0.28];
+  // The face spot is a guess at where a face is, and on some figures it is
+  // beside the head: 2026-11-03 opened on a frame of mostly background. From
+  // the next day it must be mostly figure too, or the day takes a body spot.
+  if (rnd() < 0.34 && (date < ZOOM_FACE_CHECKED_FROM || solidAt(...face) > 0.6)) return face;
+  for (let tries = 0; tries < 40; tries++) {
+    const cx = width * (0.25 + rnd() * 0.5);
+    const cy = height * (0.3 + rnd() * 0.45);
+    if (solidAt(cx, cy) > 0.75) return [cx, cy];
   }
   return face;
 }

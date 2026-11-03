@@ -31,10 +31,25 @@ TIER = {'S': (255, 60, 100), 'A': (255, 140, 40), 'B': (255, 205, 40), 'C': (70,
         'D': (60, 170, 255), 'E': (150, 105, 255), 'F': (125, 135, 170)}
 TIER_NAME = {'S': 'S TIER', 'A': 'A TIER', 'B': 'B TIER', 'C': 'C TIER', 'D': 'D TIER', 'E': 'E TIER', 'F': 'F TIER'}
 LIL = f'{ASSETS}/LilitaOne-Regular.ttf'; GEI = f'{ASSETS}/Geist-Regular.ttf'
+# The headline font (owner, 2026-11-03): Nougat Extra Black, the game's own,
+# from the Fan Kit's fonts page. Licensed to the Fan Kit, not to us to pass on,
+# so it lives only in the cache (fonts/), never in the repo or on the site:
+# a copy with narrower word spaces and a narrower "1" (the original's are
+# 0.54em and tabular). Without it, or for a character it lacks (€, →), Lilita.
+NOU = f'{ASSETS}/fonts/Nougat-ExtraBlack-tight.ttf'
+HEAD = NOU if os.path.exists(NOU) else LIL
+try: NOU_CHARS = set(open(f'{ASSETS}/fonts/Nougat-ExtraBlack-tight.chars', encoding='utf-8').read()) | {' '}
+except OSError: NOU_CHARS = set()
 _fonts = {}
 def F(s):
+    if ('H', s) not in _fonts: _fonts[('H', s)] = ImageFont.truetype(HEAD, s)
+    return _fonts[('H', s)]
+def L(s):
     if ('L', s) not in _fonts: _fonts[('L', s)] = ImageFont.truetype(LIL, s)
     return _fonts[('L', s)]
+def head_for(txt):
+    """F, unless the headline font lacks one of txt's characters."""
+    return F if HEAD == LIL or set(txt) <= NOU_CHARS else L
 def G(s):
     if ('G', s) not in _fonts: _fonts[('G', s)] = ImageFont.truetype(GEI, s)
     return _fonts[('G', s)]
@@ -117,8 +132,16 @@ _txt = {}
 def text_sprite(txt, size, fill=WHITE, gold=False, stroke=10, shadow=True, font=None):
     key = (txt, size, fill, gold, stroke, shadow, font)
     if key in _txt: return _txt[key]
-    f = (font or F)(size)
+    face_of = font or head_for(txt)
+    f = face_of(size)
     l, t_, r, b = f.getbbox(txt, stroke_width=stroke)
+    # Never wider than the frame less a margin: Nougat runs ~10% wider than
+    # the Lilita the layouts were drawn for, and long names ("Larry & Lawrie")
+    # went off the edges.
+    while r - l > W - 90 and size > 24:
+        size = max(24, int(size * (W - 90) / (r - l)))
+        f = face_of(size)
+        l, t_, r, b = f.getbbox(txt, stroke_width=stroke)
     w, h = r - l + 30, b - t_ + 40
     mask = Image.new('L', (w, h), 0)
     ImageDraw.Draw(mask).text((15 - l, 15 - t_), txt, font=f, fill=255)
