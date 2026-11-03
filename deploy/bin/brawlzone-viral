@@ -27,7 +27,7 @@
 # gave up for doing worst. By weekday, since 2026-10-29 with the data
 # formats the daily quiz moved out of 15:30:
 #
-#   Mon drops  Tue stop  Wed ranks  Thu whatsnew  Fri classrank (giveaway to Nov 30)  Sat modes  Sun everyrank
+#   Mon drops  Tue stop  Wed ranks  Thu whatsnew  Fri broken (giveaway to Nov 30)  Sat modes  Sun everyrank
 #   (drops: "I opened 1,000 X", a different drop or box each week, from 2026-11-09)
 #
 # Fridays until the giveaway closes (2026-11-30) are its reminder instead.
@@ -85,7 +85,7 @@ if [ "$kind" = extra ]; then
     2) kind=stop ;;
     3) kind=ranks ;;
     4) kind=whatsnew ;;
-    5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway; else kind=classrank; fi ;;
+    5) if [ "$DAY" \< 2026-11-30 ]; then kind=giveaway; else kind=broken; fi ;;
     6) kind=modes ;;
     7) kind=everyrank ;;
     *) kind=classrank ;;
@@ -375,7 +375,12 @@ echo "video: $SITE/social/$FOLDER/video.mp4 ($kind, ${DUR}s)"
 [ "$post" = 1 ] || { echo "--no-post: nothing published"; exit 0; }
 
 # ---------------------------------------------------------------- post
+# The daily teaser is not posted to YouTube from 2026-11-03: the same
+# template every day, it fell from ~1,100 views to 5-24 from 2026-10-31, as
+# the counter and map-pick templates did (YouTube treating it as repetitive).
+# Instagram keeps it, where it gets more likes than anything else (12-31).
 TIKTOK=$([ "$kind" = daily ] && echo 0 || echo 1) \
+YOUTUBE=$([ "$kind" = daily ] && echo 0 || echo 1) \
 VIDEO_FILE="$OUT/video.mp4" VIDEO_L10N="$OUT/l10n.json" /usr/local/bin/brawlzone-tiktok viral "$FOLDER" \
   || die "::error::brawlzone-tiktok viral failed"
 
