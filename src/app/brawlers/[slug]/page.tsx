@@ -45,6 +45,7 @@ import {
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { getBalanceEvents } from '@/lib/release-notes';
 import { fankitBody, fankitHypercharge, fankitSkin } from '@/lib/fankit';
+import { fankitGeneric } from '@/lib/fankit-icons';
 import { getWikiAbilityArt, getWikiModel } from '@/lib/wiki-art';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
@@ -442,15 +443,17 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
        * and star powers in the order the wiki numbers its files, and an empty
        * src renders as an empty box — which is what this page showed on
        * launch day, four blank squares beside four real ability names.
+       * Until the wiki uploads them (Rey and Ruby, 2026-11-03), the Fan Kit's
+       * generic gadget or star power mark stands in.
        */
       const accessory =
-        (art: string[]) =>
+        (art: string[], generic: string | null) =>
         (a: { id: number; name: string }, i: number): BAAccessory => ({
           id: a.id,
           name: a.name,
           description: '',
           descriptionHtml: '',
-          imageUrl: art[i] ?? '',
+          imageUrl: art[i] ?? generic ?? '',
           released: true,
         });
 
@@ -461,8 +464,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         description: '',
         class: { id: 0, name: entry.className ?? '' },
         rarity: { id: 0, name: entry.rarityName ?? '', color: entry.rarityColor ?? '#8b95b8' },
-        starPowers: (live?.starPowers ?? []).map(accessory(abilityArt.starPowers)),
-        gadgets: (live?.gadgets ?? []).map(accessory(abilityArt.gadgets)),
+        starPowers: (live?.starPowers ?? []).map(accessory(abilityArt.starPowers, fankitGeneric('starpower'))),
+        gadgets: (live?.gadgets ?? []).map(accessory(abilityArt.gadgets, fankitGeneric('gadget'))),
         // Unused by this page; present to satisfy the mirror's shape.
         avatarId: 0,
         hash: '',
