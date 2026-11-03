@@ -109,8 +109,11 @@ async function main() {
       ]),
   );
 
-  console.log(
-    JSON.stringify({
+  // Written with a callback and awaited, not console.log: stdout is a pipe
+  // here, Node writes to pipes asynchronously, and main's caller exits the
+  // process at once -- which cut the file at 65,536 bytes the day it first
+  // grew past that (2026-11-03), and every video of the day failed to parse.
+  const out = JSON.stringify({
       date: new Date().toISOString().slice(0, 10),
       season: season.current?.number ?? null,
       all: week.filter((b) => b.tier).map(row),
@@ -132,8 +135,8 @@ async function main() {
       pool,
       brackets,
       drops,
-    }),
-  );
+    });
+  await new Promise<void>((resolve, reject) => process.stdout.write(out + '\n', (e) => (e ? reject(e) : resolve())));
 }
 
 /** The update's headliners as catalogue ids; a new brawler the catalogue lacks is dropped. */
