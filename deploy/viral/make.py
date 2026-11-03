@@ -72,6 +72,10 @@ PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
+# Under the follow button of every ranking video (2026-11-03, owner): the
+# videos are what send people to the site, and the site is where the ads are.
+def site_cta(canvas, u, y):
+    follow_cta(canvas, u, y, 'FULL TIER LIST', sub='BRAWLZONE.NET')
 
 
 def episode(kind):
@@ -557,7 +561,7 @@ def broken_scene(s, t, bt, lt):
         put(canvas, text_sprite('AGREE?', 260, gold=True), W / 2, 520 - bounce, scale=out_back(bt / 0.6))
         slam(canvas, "WHO'S BROKEN NEXT?", 100, WHITE, W / 2, 770, bt - 0.8)
         slam(canvas, 'TELL US IN THE COMMENTS', 70, WHITE, W / 2, 880, bt - 1.4)
-        follow_cta(canvas, bt - 2.6, 1200, 'FOR THE NEXT ONE')
+        site_cta(canvas, bt - 2.6, 1200)
         shake, flash = hits(bt, (0, 0.8, 2.6), 0.8, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -635,7 +639,7 @@ def ranks_scene(s, t, bt, lt):
         slam(canvas, 'WHAT RANK', 190, WHITE, W / 2, 470, bt)
         slam(canvas, 'ARE YOU?', 230, None, W / 2, 690, bt - 0.6, gold=True)
         slam(canvas, 'TELL US + YOUR MAIN', 96, WHITE, W / 2, 910, bt - 1.2)
-        follow_cta(canvas, bt - 2.4, 1200, 'A NEW ONE EVERY DAY')
+        site_cta(canvas, bt - 2.4, 1200)
         shake, flash = hits(bt, (0, 0.6, 1.2, 2.4), 0.8, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -714,7 +718,7 @@ def modes_scene(s, t, bt, lt):
         slam(canvas, 'SAVE THIS', 230, None, W / 2, 480, bt, gold=True)
         slam(canvas, 'FOR YOUR NEXT GAME', 104, WHITE, W / 2, 700, bt - 0.7)
         slam(canvas, 'WHO DO YOU MAIN?', 90, WHITE, W / 2, 860, bt - 1.4)
-        follow_cta(canvas, bt - 2.6, 1200, 'A NEW ONE EVERY DAY')
+        site_cta(canvas, bt - 2.6, 1200)
         shake, flash = hits(bt, (0, 0.7, 1.4, 2.6), 0.8, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -868,7 +872,7 @@ def nb_scene(s, t, bt, lt):
         slam(canvas, 'BUYING', 170, WHITE, W / 2, 780, bt - 0.5)
         slam(canvas, f'{NAME}?', 170 if len(NAME) <= 8 else 130, None, W / 2, 950, bt - 1, gold=True)
         slam(canvas, 'YES OR NO IN THE COMMENTS', 64, WHITE, W / 2, 1080, bt - 1.6)
-        follow_cta(canvas, bt - 2.6, 1320, 'FOR EVERY NEW BRAWLER')
+        site_cta(canvas, bt - 2.6, 1320)
         shake, flash = hits(bt, (0.5, 1, 2.6), 0.9, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -1200,8 +1204,8 @@ def count_scene(s, t, bt, lt):
         put(canvas, text_sprite("WHERE'S YOUR", 120, WHITE), W / 2, 460 - bounce * 0.4, scale=out_back(bt / 0.6))
         put(canvas, text_sprite('MAIN?', 300, gold=True), W / 2, 700 - bounce, scale=out_back((bt - 0.3) / 0.6))
         put(canvas, text_sprite('COMMENT BELOW', 96, WHITE), W / 2, 990, scale=out_back((bt - 1) / 0.5))
-        if bt > 1.3: arrow(canvas, W / 2, 1210 + abs(math.sin(t * 6)) * 40)
-        follow_cta(canvas, bt - 2.2, 1500, 'NEW RANKING EVERY WEEK')
+        if bt > 1.3: arrow(canvas, W / 2, 1180 + abs(math.sin(t * 6)) * 40)
+        site_cta(canvas, bt - 2.2, 1420)
         shake, flash = hits(bt, (0, 0.3, 1), 0.7, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -1854,7 +1858,7 @@ def wn_scene(s, t, bt, lt):
         slam(canvas, 'WHICH ONE IS', 120, WHITE, W / 2, 790, bt - 0.8)
         slam(canvas, 'YOUR FAVOURITE?', 130, None, W / 2, 940, bt - 1.3, gold=True)
         slam(canvas, 'TELL US IN THE COMMENTS', 62, WHITE, W / 2, 1070, bt - 1.9)
-        follow_cta(canvas, bt - 2.8, 1320, 'FOR EVERY NEW BRAWLER')
+        site_cta(canvas, bt - 2.8, 1320)
         shake, flash = hits(bt, (0.8, 1.3, 2.8), 0.9, 0.3)
     return finish(canvas, shake, flash, mark)
 

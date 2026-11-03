@@ -377,9 +377,11 @@ def follow_button():
     return _follow
 
 
-def follow_cta(canvas, u, y, line):
+def follow_cta(canvas, u, y, line, sub=None):
     """The follow ask that closes every video: the button pops, pulses, and a
-    hand-drawn tap ring goes out from it each beat. u in beats since it starts."""
+    hand-drawn tap ring goes out from it each beat. u in beats since it starts.
+    With `sub`, `line` is a small white lead-in and `sub` the big gold line
+    under it (the site address, 2026-11-03)."""
     if u < 0: return
     pulse = 1 + 0.06 * abs(math.sin(u * math.pi))
     if u > 0.6:
@@ -388,7 +390,11 @@ def follow_cta(canvas, u, y, line):
         ImageDraw.Draw(layer).ellipse((W / 2 - r * 2.4, 450 - r, W / 2 + r * 2.4, 450 + r), outline=(255, 255, 255, int(170 * (1 - ring))), width=8)
         canvas.alpha_composite(layer, (0, int(y - 450)))
     put(canvas, follow_button(), W / 2, y, scale=out_back(u / 0.45, 2.2) * pulse)
-    put(canvas, text_sprite(line, 64, GOLD_TOP, stroke=7), W / 2, y + 150, scale=out_back((u - 0.5) / 0.4))
+    if sub:
+        put(canvas, text_sprite(line, 56, WHITE, stroke=7), W / 2, y + 140, scale=out_back((u - 0.5) / 0.4))
+        put(canvas, text_sprite(sub, 104, gold=True), W / 2, y + 240, scale=out_back((u - 0.7) / 0.4))
+    else:
+        put(canvas, text_sprite(line, 64, GOLD_TOP, stroke=7), W / 2, y + 150, scale=out_back((u - 0.5) / 0.4))
 
 
 _art = {}
