@@ -20,7 +20,7 @@ const files = [];
 })('src');
 const run = (p) => { const exports = {}; new Function('exports', fs.readFileSync(p, 'utf8').replace(/export const (\w+)[^=]*=/g, 'exports.$1 =').replace(/^import.*$/gm, ''))(exports); return exports; };
 const { ES } = run('src/i18n/es.ts');
-const { CLIENT_ES } = run('src/i18n/client.ts');
+const { CLIENT_ES } = run('src/i18n/client/es.ts');
 const out = {};
 for (const f of files) {
   const src = fs.readFileSync(f, 'utf8');

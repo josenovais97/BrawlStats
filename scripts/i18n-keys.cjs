@@ -2,13 +2,15 @@
 /**
  * Lists every sentence the site passes to `t` that a dictionary lacks.
  *
- *   node scripts/i18n-keys.cjs            -> counts
+ *   node scripts/i18n-keys.cjs            -> counts, per language
  *   node scripts/i18n-keys.cjs --json out  -> {server: [...], client: [...]}
  *
  * A key is the first argument of `t(...)` / `tx(...)` when it is a literal,
  * plus text-named strings (title, body, label...) defined at module level in
  * files that translate by value, plus every page's static metadata. Client
- * files' keys belong in `i18n/client.ts`, the rest in `i18n/es.ts` / `pt.ts`.
+ * files' keys belong in `i18n/client/<lang>.ts`, the rest in `i18n/<lang>.ts`.
+ * Every language in INTL_LOCALES is checked: a key missing from any one of
+ * them is listed (owner's rule, 2026-11-04: new text ships in every language).
  */
 const fs = require('fs');
 const path = require('path');
@@ -54,19 +56,20 @@ for (const f of files) {
     ts.forEachChild(n, visit);
   })(sf);
 }
-const load = (p, name) => {
-  const src = fs.readFileSync(p, 'utf8');
-  const m = new Function(src.replace(/export const (\w+)[^=]*=/g, 'exports.$1 =').replace(/^import.*$/gm, '') + '; return exports;');
-  return m.call(null, {}) ;
-};
 const run = (p) => { const exports = {}; new Function('exports', fs.readFileSync(p, 'utf8').replace(/export const (\w+)[^=]*=/g, 'exports.$1 =').replace(/^import.*$/gm, ''))(exports); return exports; };
-const { ES } = run('src/i18n/es.ts');
-const { PT } = run('src/i18n/pt.ts');
-const { CLIENT_ES, CLIENT_PT } = run('src/i18n/client.ts');
+const LANGS = JSON.parse(fs.readFileSync('src/lib/i18n.ts', 'utf8').match(/INTL_LOCALES = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
+const dict = (p, name) => run(p)[name];
+const SERVER = LANGS.map((l) => [l, dict(`src/i18n/${l}.ts`, l.toUpperCase())]);
+const CLIENT = LANGS.map((l) => [l, dict(`src/i18n/client/${l}.ts`, `CLIENT_${l.toUpperCase()}`)]);
+const lacks = (dicts, k) => dicts.some(([, d]) => !(k in d));
 const missing = {
-  server: [...server].filter((k) => !(k in ES) || !(k in PT)).sort(),
-  client: [...client].filter((k) => !(k in CLIENT_ES) || !(k in CLIENT_PT)).sort(),
+  server: [...server].filter((k) => lacks(SERVER, k)).sort(),
+  client: [...client].filter((k) => lacks(CLIENT, k)).sort(),
 };
+for (const [l, d] of SERVER) {
+  const c = CLIENT.find(([x]) => x === l)[1];
+  console.log(`${l}: server missing ${[...server].filter((k) => !(k in d)).length}, client missing ${[...client].filter((k) => !(k in c)).length}`);
+}
 const i = process.argv.indexOf('--json');
 if (i > 0) {
   const group = (keys) => { const g = {}; for (const k of keys) (g[where.get(k) || '?'] ??= []).push(k); return g; };
