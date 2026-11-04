@@ -12,9 +12,7 @@ import { getUT } from '@/lib/t-universal';
  *
  * The artwork carries it rather than an icon. These are the only two screens
  * on the site with nothing useful to show, so they are the two that can afford
- * to spend space on something with a bit of character. Bolt's crying pin with
- * the empty battery, from Supercell's Fan Kit (2026-11-04), replaced a blurry
- * 460px copy of the game's connection-lost icon.
+ * to spend space on something with a bit of character.
  */
 export function FullPageMessage({
   title,
@@ -30,10 +28,10 @@ export function FullPageMessage({
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center py-10 text-center sm:py-16">
       <Image
-        src="/art/error-bolt.png"
+        src="/art/connection-error.png"
         alt=""
-        width={484}
-        height={512}
+        width={460}
+        height={391}
         priority
         className="h-auto w-40 sm:w-52"
       />
