@@ -3604,4 +3604,1274 @@ export const TR: Record<string, string> = {
     "Senin rütbendeki meta zirvedeki meta değil. Ve her seçimin bir cevabı var.",
   "Tier list at your rank":
     "Rütbendeki tier listesi",
+  "Built only from battles played at that rank.":
+    "Yalnızca o rütbede oynanan maçlardan oluşturuldu.",
+  "How to counter…":
+    "Neye karşı ne seçilir…",
+  "The brawlers picked most in Ranked this week. Tap one for what beats it, at every rank.":
+    "Bu hafta Aşamalı'da en çok seçilen savaşçılar. Her rütbede onu neyin yendiği için birine dokun.",
+  "How to counter {name}":
+    "{name} karşısında ne seçilir",
+  "{rate} picked":
+    "{rate} seçilme",
+  "Type a brawler, e.g. Shade":
+    "Bir savaşçı yaz, ör. Shade",
+  "Brawler to counter":
+    "Karşı seçim yapılacak savaşçı",
+  "Counters":
+    "Counter'lar",
+  "No brawler by that name.":
+    "Bu adda bir savaşçı yok.",
+  "Two accounts? Every tag you use is saved, and the app shows the others under “Switch account”: one tap swaps, a long press forgets one.":
+    "İki hesap mı? Kullandığın her etiket kaydedilir ve uygulama diğerlerini “Hesap değiştir” altında gösterir: tek dokunuş değiştirir, uzun basmak birini unutturur.",
+  "The site and the app's panel are delivered through Cloudflare, which handles each request (including your IP address) in order to serve and protect it, under its own privacy policy. We do not log IP addresses ourselves.":
+    "Site ve uygulamanın paneli Cloudflare üzerinden sunulur; Cloudflare her isteği (IP adresin dahil) sunmak ve korumak için kendi gizlilik politikası altında işler. Biz IP adreslerini kendimiz kaydetmeyiz.",
+  ", it comes with a SHA-256 checksum so you can verify the file is the one we published.":
+    "; dosyanın yayınladığımız dosya olduğunu doğrulayabilmen için bir SHA-256 sağlama toplamıyla gelir.",
+  ", so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). The app contains no advertising or analytics SDK and shares nothing with third parties.":
+    "; bu yüzden açmak burada anonim bir sayfa görüntülemesi olarak sayılır, o kadar. Tüm trafik şifrelidir (HTTPS). Uygulamada reklam veya analiz SDK'sı yoktur ve üçüncü taraflarla hiçbir şey paylaşmaz.",
+  "BrawlZone (brawlzone.net) and the BrawlZone Bubble Android app are made by Novais Labs, an independent developer in Portugal. This policy covers both. Contact:":
+    "BrawlZone (brawlzone.net) ve BrawlZone Bubble Android uygulaması, Portekiz'de bağımsız bir geliştirici olan Novais Labs tarafından yapılmıştır. Bu politika ikisini de kapsar. İletişim:",
+  "BrawlZone is not directed at children and knowingly collects no personal information from anyone, of any age.":
+    "BrawlZone çocuklara yönelik değildir ve hiçbir yaştan kimseden bilerek kişisel bilgi toplamaz.",
+  "Deleting your data":
+    "Verilerini silmek",
+  "If you enter your player tag, the app sends it to brawlzone.net to show your profile, your brawlers and what to upgrade next, exactly as the site does for a search (see above). The tags you have used, with their player names, and your settings are kept on your phone so you can switch accounts; they are removed when you uninstall the app or clear its data, and a long press removes one.":
+    "Oyuncu etiketini girersen uygulama, sitenin bir aramada yaptığı gibi (yukarıya bak) profilini, savaşçılarını ve sırada ne yükseltmen gerektiğini göstermek için onu brawlzone.net'e gönderir. Kullandığın etiketler oyuncu adlarıyla ve ayarların, hesap değiştirebilmen için telefonunda tutulur; uygulamayı kaldırdığında veya verilerini temizlediğinde silinir, uzun basmak da birini siler.",
+  "Installed from Google Play, the app is covered by Google's own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports. Downloaded from the":
+    "Google Play'den yüklendiğinde uygulama, Google'ın Play Store için kendi gizlilik politikasının kapsamındadır ve Google bize yükleme sayıları ve çökme raporları gibi toplu istatistikler verir. Şuradan indirildiğinde:",
+  "Its panel is a web view of":
+    "Paneli şunun bir web görünümüdür:",
+  "No account, no ads, no trackers, and it cannot see your screen.":
+    "Hesap yok, reklam yok, izleyici yok ve ekranını göremez.",
+  "Nothing to delete on our side for most people.":
+    "Çoğu kişi için bizim tarafımızda silinecek bir şey yok.",
+  "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":
+    "İncelenen maç verileri yalnızca istatistiklerin ihtiyaç duyduğu sürece tutulur, sonra silinir ya da hiçbir oyuncuyu tek başına tanımlamayan özetlere indirgenir.",
+  "Searching a player tag, on the site or in the app, sends it to the official Brawl Stars API to fetch that profile. The public game stats that come back (player name, tag, trophies, rank and brawler counts) are saved once a day so the profile can show progress over time, and the account joins the pool sampled for statistics. Nothing about the person searching is stored: no IP address, no device, no link between a search and whoever made it.":
+    "Bir oyuncu etiketini aramak, sitede veya uygulamada, o profili getirmek için onu resmi Brawl Stars API'sine gönderir. Dönen herkese açık oyun istatistikleri (oyuncu adı, etiket, kupalar, rütbe ve savaşçı sayıları) profilin zaman içindeki ilerlemeyi gösterebilmesi için günde bir kez kaydedilir ve hesap istatistikler için incelenen havuza katılır. Arayan kişi hakkında hiçbir şey saklanmaz: IP adresi yok, cihaz yok, bir arama ile onu yapan arasında bağlantı yok.",
+  "We keep the public game profile, never who searched for it.":
+    "Herkese açık oyun profilini tutarız, onu kimin aradığını asla.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, no cookies, no ads.":
+    "BrawlZone ve BrawlZone Bubble uygulaması neyi saklar, neyi saklamaz ve uygulama ne gönderir. Hesap yok, çerez yok, reklam yok.",
+  "What is on your device is yours to remove: clear the site's data in your browser, or uninstall the app. To have a player profile's saved stats deleted and the tag excluded from future sampling, email":
+    "Cihazındakileri sen silebilirsin: tarayıcında sitenin verilerini temizle ya da uygulamayı kaldır. Bir oyuncu profilinin kayıtlı istatistiklerini sildirmek ve etiketi gelecekteki incelemelerden hariç tutmak için şu adrese e-posta gönder:",
+  "Who we are":
+    "Biz kimiz",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them. The app never captures or reads your screen, and does not read your game account, your files, your contacts or your other apps.":
+    "; böylece oyunun üzerine çizebilir. Bu izin ekranına piksel koymasını sağlar; onları okumasını değil. Uygulama ekranını asla yakalamaz veya okumaz; oyun hesabını, dosyalarını, kişilerini veya diğer uygulamalarını okumaz.",
+  "with the tag. It is done within 30 days, usually much sooner.":
+    "; etiketi yaz. 30 gün içinde, genelde çok daha erken yapılır.",
+  ". Every message is read.":
+    ". Her mesaj okunur.",
+  "Become a tester":
+    "Test kullanıcısı ol",
+  "Found a bug or have an idea? Email":
+    "Bir hata mı buldun ya da bir fikrin mi var? E-posta:",
+  "Google Play test":
+    "Google Play testi",
+  "Google lets a new app on the Play Store only after {n} people have tested it for {days} days. Three taps, and you are one of them.":
+    "Google, yeni bir uygulamaya Play Store'da ancak {n} kişi onu {days} gün test ettikten sonra izin veriyor. Üç dokunuş ve sen de onlardan birisin.",
+  "Help launch BrawlZone Bubble on Google Play":
+    "BrawlZone Bubble'ı Google Play'de yayınlamamıza yardım et",
+  "Help us launch BrawlZone Bubble on Google Play":
+    "BrawlZone Bubble'ı Google Play'de yayınlamamıza yardım et",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings.":
+    "BrawlZone Bubble'ı Play Store sayfasından yükle. Bu sitedeki sürüm zaten sende mi? Play onun üzerine yükler ve etiketini ve ayarlarını korur.",
+  "Install from Google Play":
+    "Google Play'den yükle",
+  "It is the same app as the download on this site, with the same features and languages. When it goes public, you simply keep it, and it updates through Google Play.":
+    "Bu sitedeki indirmeyle aynı uygulama; aynı özellikler ve diller. Herkese açıldığında onu tutarsın ve Google Play üzerinden güncellenir.",
+  "Join the Google Play test of BrawlZone Bubble, the draft helper that floats over Brawl Stars. Three taps, free, no ads.":
+    "Brawl Stars'ın üzerinde yüzen draft yardımcısı BrawlZone Bubble'ın Google Play testine katıl. Üç dokunuş, ücretsiz, reklamsız.",
+  "Join the group":
+    "Gruba katıl",
+  "Join the testers group":
+    "Test kullanıcıları grubuna katıl",
+  "Keep the app installed for {days} days. Using it in your matches helps, and so does telling us what breaks. That is all: no sign-up beyond the group, no payment, nothing to fill in.":
+    "Uygulamayı {days} gün yüklü tut. Maçlarında kullanmak da, neyin bozulduğunu bize söylemek de yardımcı olur. Hepsi bu: grup dışında kayıt yok, ödeme yok, doldurulacak bir şey yok.",
+  "More about the Bubble":
+    "Bubble hakkında daha fazlası",
+  "On the next page, tap \"Become a tester\". It can take a few minutes after joining the group before this works.":
+    "Sonraki sayfada \"Test kullanıcısı ol\"a dokun. Gruba katıldıktan sonra bunun çalışması birkaç dakika sürebilir.",
+  "Open Google Play":
+    "Google Play'i aç",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone.":
+    "Grubu aç ve \"Gruba katıl\"a dokun. Telefonundaki Play Store ile aynı Google hesabını kullan.",
+  "The group is only a list of testers: nobody sends messages there, and joining shows nothing to other members. You can leave the test at any time from the same pages.":
+    "Grup sadece bir test kullanıcısı listesidir: oraya kimse mesaj göndermez ve katılmak diğer üyelere hiçbir şey göstermez. Testten istediğin zaman aynı sayfalardan çıkabilirsin.",
+  "The test opens in a few days, once Google has reviewed it. Check back soon.":
+    "Test, Google inceledikten sonra birkaç gün içinde açılacak. Yakında tekrar bak.",
+  "What it asks of you":
+    "Senden istediği",
+  "On a real phone, open over the game":
+    "Gerçek bir telefonda, oyunun üzerinde açık",
+  "Pick your rank and mode":
+    "Rütbeni ve modunu seç",
+  "Pinball Dreams at Mythic: the best picks on that map, your best owned pick named above the list, and the battles behind each number":
+    "Gizemli'de Pinball Dreams: o haritadaki en iyi seçimler, listenin üstünde sahip olduğun en iyi seçim ve her sayının arkasındaki maçlar",
+  "The BrawlZone Bubble app's main screen: the Start bubble, Stop and Quick Settings buttons, and a list of what the panel does":
+    "BrawlZone Bubble uygulamasının ana ekranı: Baloncuğu başlat, Durdur ve Hızlı Ayarlar düğmeleri ve panelin yaptıklarının listesi",
+  "The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine":
+    "Bir telefonda Brawl Stars lobisinin üzerinde açık BrawlZone paneli, Undermine'da Ustalar+ için Aşamalı metasını gösteriyor",
+  "The build card for Shade: the most-owned star power, gadget and two gears, with the share of sampled owners holding each":
+    "Shade için dizilim kartı: en çok sahip olunan yıldız gücü, aksesuar ve iki eşya, her birine sahip incelenen sahiplerin payıyla",
+  "The draft board on Hard Rock Mine with one ban, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "Hard Rock Mine'da bir ban, bir takım arkadaşı ve iki rakip girilmiş draft tahtası; kalan savaşçılar o drafta ne kadar iyi cevap verdiklerine göre sıralı",
+  "The panel's Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out":
+    "Panelin Gizemli'deki Aşamalı metası: üstte rütbe ve mod çipleri, sonra S'den aşağı tier listesi; sahip olmadığın savaşçılar gri",
+  "22 languages, with brawler, mode and map names exactly as the game writes them. Choose the bubble's size, how faint it gets when idle, and whether it tucks half off the edge.":
+    "22 dil; savaşçı, mod ve harita adları tam olarak oyunun yazdığı gibi. Baloncuğun boyutunu, boştayken ne kadar soluklaşacağını ve kenardan yarı yarıya gizlenip gizlenmeyeceğini seç.",
+  "A draft helper that floats over Brawl Stars: tier lists at your rank, the best picks for your map, counters, team comps and builds, with your own brawlers marked. Free, no ads, no account.":
+    "Brawl Stars'ın üzerinde yüzen bir draft yardımcısı: rütbene göre tier listeleri, haritan için en iyi seçimler, counter'lar, takım dizilimleri ve dizilimler; kendi savaşçıların işaretli. Ücretsiz, reklamsız, hesap gerekmez.",
+  "A short plan for your coins: the few brawlers that would give you a top pick in the most modes.":
+    "Altınların için kısa bir plan: sana en çok modda en iyi seçimi verecek birkaç savaşçı.",
+  "Add the BrawlZone tile to Quick Settings: swipe down mid-match and tap it to show or hide the bubble, without opening the app.":
+    "BrawlZone kutusunu Hızlı Ayarlar'a ekle: maç ortasında aşağı kaydır ve uygulamayı açmadan baloncuğu göstermek veya gizlemek için dokun.",
+  "Add your player tag once: brawlers you own are marked, the rest greyed out or hidden, and you can narrow it to power 11 or hypercharged.":
+    "Oyuncu etiketini bir kez ekle: sahip olduğun savaşçılar işaretlenir, diğerleri gri ya da gizli olur ve Güç 11 veya hiperşarjlılara daraltabilirsin.",
+  "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
+    "Bir uygulama yapabilir. Baloncuk ekranın kenarında durur, oyunun üzerinde bir dokunuşla açılır ve tekrar kapanır.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "Brawl Stars seçim için sana saniyeler verir. Bir tier listesine bakmak için oyundan çıkmak elindekinden fazlasını yer; bu yüzden cevap sana gelir: rütbendeki meta, haritan için en iyi seçimler ve rakibi neyin yendiği, oyunun üzerinde bir dokunuş uzaklıkta.",
+  "Coming to Google Play":
+    "Google Play'e geliyor",
+  "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
+    "Elmas, Gizemli, Efsanevi ve Ustalar farklı metalar oynar, bu yüzden liste rütbeye göre bölünür ve seninkiyle açılır. Her Aşamalı modu, gerçek rekabetçi maçlardan iki saatte bir yenilenir.",
+  "Draft counters":
+    "Draft counter'ları",
+  "Enter the bans and both teams' picks and it ranks what is left. Tap an enemy to see who beats them.":
+    "Banları ve iki takımın seçimlerini gir, geri kalanı sıralasın. Onu kimin yendiğini görmek için bir rakibe dokun.",
+  "Every tag you use is saved. Switch between them from the account card; a long press removes one.":
+    "Kullandığın her etiket kaydedilir. Aralarında hesap kartından geçiş yap; uzun basmak birini siler.",
+  "Everything in one bubble":
+    "Her şey tek bir baloncukta",
+  "It shows the stats; you make the picks. It does not touch the game or log in to your account: your player tag only looks up your public profile, the same one anyone can see on the site. No ads, no sign-up, no in-app purchases.":
+    "İstatistikleri gösterir; seçimleri sen yaparsın. Oyuna dokunmaz ve hesabına giriş yapmaz: oyuncu etiketin yalnızca herkese açık profiline bakar, sitede herkesin görebildiği profilin aynısı. Reklam yok, kayıt yok, uygulama içi satın alma yok.",
+  "Join the test and install it from the Play Store instead: three taps.":
+    "Teste katıl ve onun yerine Play Store'dan yükle: üç dokunuş.",
+  "Made for your account":
+    "Hesabın için yapıldı",
+  "Ranked hands you one map, and the answer moves with it. Pick the map and get the brawlers that win there, with your own best pick named at the top.":
+    "Aşamalı sana tek bir harita verir ve cevap onunla değişir. Haritayı seç, orada kazanan savaşçıları al; kendi en iyi seçimin en üstte.",
+  "Start it from inside the game":
+    "Oyunun içinden başlat",
+  "Tap an enemy pick to see the five brawlers that beat it most often at your rank, with a link to the full counters page on the site.":
+    "Rütbende onu en sık yenen beş savaşçıyı görmek için bir rakip seçimine dokun; sitedeki tam counter sayfasına bağlantıyla.",
+  "The app finds your account and puts your player icon on the bubble. Every pick the panel suggests is one you can actually make.":
+    "Uygulama hesabını bulur ve oyuncu simgeni baloncuğa koyar. Panelin önerdiği her seçim gerçekten yapabileceğin bir seçimdir.",
+  "The app's account card: the player name, tag and trophies, the choice between all owned brawlers, power 11 only or hypercharged, and a saved second account to switch to":
+    "Uygulamanın hesap kartı: oyuncu adı, etiket ve kupalar; tüm sahip olunan savaşçılar, yalnızca Güç 11 veya hiperşarjlılar seçimi ve geçiş yapılacak kayıtlı ikinci bir hesap",
+  "The best picks for your map":
+    "Haritan için en iyi seçimler",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps and to show a notification, the one that says it is running. No screen capture, no storage access, nothing else.":
+    "Baloncuk ekranını, maçını ya da hangi haritada olduğunu okumaz. Diğer uygulamaların üzerine çizmek ve bir bildirim göstermek için izin ister: çalıştığını söyleyen bildirim. Ekran kaydı yok, depolama erişimi yok, başka bir şey yok.",
+  "The three that win together on your map, with the ones you own ticked.":
+    "Haritanda birlikte kazanan üçlü; sahip oldukların işaretli.",
+  "The tier list at your rank":
+    "Rütbendeki tier listesi",
+  "The whole app in 51 seconds. Sound on.":
+    "Tüm uygulama 51 saniyede. Sesi aç.",
+  "Three gestures and a tile. There is nothing else to learn.":
+    "Üç hareket ve bir kutu. Öğrenilecek başka bir şey yok.",
+  "Two accounts? One tap":
+    "İki hesap mı? Tek dokunuş",
+  "Your brawlers marked":
+    "Savaşçıların işaretli",
+  "Your draft helper,":
+    "Draft yardımcın,",
+  "Your language, your bubble":
+    "Senin dilin, senin baloncuğun",
+  "Your tag is the only setup there is, and it changes every list in the panel.":
+    "Tek kurulum etiketin ve paneldeki her listeyi değiştirir.",
+  "Your tag, once":
+    "Etiketin, bir kez",
+  "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
+    "BrawlZone Bubble'ın 51 saniyelik turu: Brawl Stars'ın üzerinde yüzen baloncuk, tam o harita için en iyi seçimler, sahiplerin kullandığı dizilim, kendi dilinde panel ve baloncuğun boyut ve solma ayarları.",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.":
+    "BrawlZone Bubble'ı Play Store sayfasından yükle. Bu sitedeki sürüm zaten sende mi? Play onun üzerine yükler ve etiketini ve ayarlarını korur. Play uygulamanın bulunamadığını söylerse biraz bekle ve tekrar dene: Google'ın yeni bir test kullanıcısını içeri alması biraz zaman alabilir.",
+  "A draft helper that floats over Brawl Stars. Tap it mid-draft, tap again and it folds away.":
+    "Brawl Stars'ın üzerinde yüzen bir draft yardımcısı. Draft ortasında dokun, tekrar dokun, kapansın.",
+  "About the group":
+    "Grup hakkında",
+  "Free":
+    "Ücretsiz",
+  "Keeps your tag and settings":
+    "Etiketini ve ayarlarını korur",
+  "No ads":
+    "Reklam yok",
+  "Now on Google Play":
+    "Artık Google Play'de",
+  "Start with step 1":
+    "1. adımla başla",
+  "Then Google reviews the app for everyone. Every tester who stays the two weeks brings that day closer.":
+    "Ardından Google uygulamayı herkes için inceler. İki hafta kalan her test kullanıcısı o günü yaklaştırır.",
+  "Three taps":
+    "Üç dokunuş",
+  "Updates through Google Play":
+    "Google Play üzerinden güncellenir",
+  "What you are testing":
+    "Ne test ediyorsun",
+  "{days} days":
+    "{days} gün",
+  "{n} testers":
+    "{n} test kullanıcısı",
+  "Join the test":
+    "Teste katıl",
+  "No Google Play on your phone?":
+    "Telefonunda Google Play yok mu?",
+  "Download the APK":
+    "APK'yı indir",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, and tapping the buttons that lead into the Google Play test. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Birkaç adlandırılmış olay da sayılır, hepsi anonim: web uygulamasını yüklemek, açmak, Android indirmesine dokunmak ve Google Play testine götüren düğmelere dokunmak. İndirme olayı hangi sayfadan geldiğini ve hangi sürümün sunulduğunu taşır, böylece bir güncelleme ilk yüklemeden ayırt edilebilir. Başka bir şey yok.",
+  "Free forever":
+    "Sonsuza kadar ücretsiz",
+  "No account":
+    "Hesap yok",
+  "No tracking":
+    "Takip yok",
+  "SKILL SCORE":
+    "BECERİ PUANI",
+  "TOP BRAWLERS":
+    "EN İYİ SAVAŞÇILAR",
+  "{n} trophies":
+    "{n} kupa",
+  "Check your own Skill Score":
+    "Kendi Beceri Puanına bak",
+  "Elite":
+    "Elit",
+  "Expert":
+    "Uzman",
+  "Skilled":
+    "Yetenekli",
+  "Competent":
+    "Yetkin",
+  "Casual":
+    "Gündelik",
+  "Beginner":
+    "Acemi",
+  "Share my profile card":
+    "Profil kartımı paylaş",
+  "Share as image":
+    "Görsel olarak paylaş",
+  "Making your image…":
+    "Görselin hazırlanıyor…",
+  "Bronze":
+    "Bronz",
+  "Silver":
+    "Gümüş",
+  "Gold":
+    "Altın",
+  "Diamond":
+    "Elmas",
+  "Masters":
+    "Ustalar",
+  "Pro":
+    "Pro",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Birkaç adlandırılmış olay da sayılır, hepsi anonim: web uygulamasını yüklemek, açmak, Android indirmesine dokunmak, Google Play testine götüren düğmelere dokunmak ve bir sayfayı resim olarak paylaşmak. İndirme olayı hangi sayfadan geldiğini ve hangi sürümün sunulduğunu taşır, böylece bir güncelleme ilk yüklemeden ayırt edilebilir. Başka bir şey yok.",
+  "RANKED TIER LIST":
+    "AŞAMALI TIER LİSTESİ",
+  "All ranks":
+    "Tüm rütbeler",
+  "Season {n} · last 7 days":
+    "Sezon {n} · son 7 gün",
+  "Not enough battles yet":
+    "Henüz yeterli maç yok",
+  "From real Ranked battles, updated every 2 hours":
+    "Gerçek Aşamalı maçlarından, 2 saatte bir güncellenir",
+  "Share this tier list":
+    "Bu tier listesini paylaş",
+  "in Ranked":
+    "Aşamalı'da",
+  "{p} win rate":
+    "{p} kazanma oranı",
+  "BEST MAPS":
+    "EN İYİ HARİTALAR",
+  "COUNTERED BY":
+    "ZORLANDIĞI RAKİPLER",
+  "STRONG AGAINST":
+    "GÜÇLÜ OLDUĞU RAKİPLER",
+  "BEST RANKED MAPS":
+    "EN İYİ AŞAMALI HARİTALARI",
+  "Ready for Android 16: the app screen now fits around the status bar, the navigation bar and the keyboard on newer phones.":
+    "Android 16'ya hazır: uygulama ekranı artık yeni telefonlarda durum çubuğu, gezinme çubuğu ve klavyenin etrafına sığıyor.",
+  "A link to the privacy policy at the bottom of the app screen.":
+    "Uygulama ekranının altında gizlilik politikasına bağlantı.",
+  "The same app is now being tested on Google Play. Installing it from there later keeps your tag and settings.":
+    "Aynı uygulama artık Google Play'de test ediliyor. Daha sonra oradan yüklemek etiketini ve ayarlarını korur.",
+  "{a} vs {b} in Brawl Stars ({v})":
+    "Brawl Stars'ta {a} vs {b} ({v})",
+  "{a} vs {b}: win rates, pick rates, best modes and their head-to-head record, from real sampled battles. Updated {v}.":
+    "{a} vs {b}: kazanma oranları, seçilme oranları, en iyi modlar ve kafa kafaya kayıtları, gerçek incelenen maçlardan. Güncelleme: {v}.",
+  "{nameA} vs {nameB}":
+    "{nameA} vs {nameB}",
+  "A card to share":
+    "Paylaşılacak bir kart",
+  "A story-sized picture of your result, ready for TikTok, Instagram or your club chat.":
+    "Sonucunun hikâye boyutunda bir resmi; TikTok, Instagram veya kulüp sohbetin için hazır.",
+  "Brawl Stars account value calculator ({v})":
+    "Brawl Stars hesap değeri hesaplayıcı ({v})",
+  "Compared with about 58,000 active players we track, so you see where your account really stands.":
+    "Takip ettiğimiz yaklaşık 58.000 aktif oyuncuyla karşılaştırılır, böylece hesabının gerçekte nerede durduğunu görürsün.",
+  "Enter your player tag to see what your Brawl Stars account cost to build, and how it compares with other players.":
+    "Brawl Stars hesabını oluşturmanın neye mal olduğunu ve diğer oyuncularla nasıl karşılaştırıldığını görmek için oyuncu etiketini gir.",
+  "Every power level, hypercharge, star power, gadget and gear you own, priced in coins and power points.":
+    "Sahip olduğun her güç seviyesi, hiperşarj, yıldız gücü, aksesuar ve eşya; altın ve güç puanı olarak fiyatlandırılmış.",
+  "How it ranks":
+    "Nasıl sıralanıyor",
+  "How much is your Brawl Stars account worth? Enter your tag: the coins and power points it took to build, and how it ranks against 58,000 active players.":
+    "Brawl Stars hesabın ne kadar değerli? Etiketini gir: oluşturmak için gereken altın ve güç puanı ve 58.000 aktif oyuncuya karşı sırası.",
+  "What it cost to build":
+    "Oluşturmanın maliyeti",
+  "Your tag is under your name on your in-game profile.":
+    "Etiketin oyundaki profilinde adının altında.",
+  "Account value":
+    "Hesap değeri",
+  "Account value of {tag}":
+    "{tag} hesap değeri",
+  "Among {n} active players we track. Most of them play Ranked, so the bar is high.":
+    "Takip ettiğimiz {n} aktif oyuncu arasında. Çoğu Aşamalı oynuyor, bu yüzden çıta yüksek.",
+  "Brawlers owned":
+    "Sahip olunan savaşçılar",
+  "Check another account":
+    "Başka bir hesaba bak",
+  "Coins to finish what you own":
+    "Sahip olduklarını bitirmek için gereken altın",
+  "Power levels":
+    "Güç seviyeleri",
+  "See the full profile":
+    "Tam profili gör",
+  "Share my account value":
+    "Hesap değerimi paylaş",
+  "Top {n}% of players":
+    "Oyuncuların ilk %{n}'i",
+  "Values are in-game currency, not money: what it costs in coins and power points to build the same account. Buffies and skins are not included, because they also come from drops. Unofficial fan project, not affiliated with Supercell.":
+    "Değerler para değil oyun içi para birimidir: aynı hesabı oluşturmanın altın ve güç puanı maliyeti. Buffie'ler ve kostümler dahil değildir, çünkü hediyelerden de gelirler. Resmi olmayan hayran projesi, Supercell ile bağlantılı değildir.",
+  "Where the coins went":
+    "Altınlar nereye gitti",
+  "Worth more than {n}% of players":
+    "Oyuncuların %{n}'inden daha değerli",
+  "plus {pp} power points":
+    "artı {pp} güç puanı",
+  "How much is your account worth?":
+    "Hesabın ne kadar değerli?",
+  "MY ACCOUNT VALUE":
+    "HESAP DEĞERİM",
+  "WHERE THE COINS WENT":
+    "ALTINLAR NEREYE GİTTİ",
+  "Calculate":
+    "Hesapla",
+  "Your player tag, e.g. #2PQ8LJ9V":
+    "Oyuncu etiketin, ör. #2PQ8LJ9V",
+  "How much is this account worth? See its value and how it ranks":
+    "Bu hesap ne kadar değerli? Değerini ve sırasını gör",
+  "Brawl Stars, ranked by me":
+    "Brawl Stars, benim sıralamam",
+  "MY TIER LIST":
+    "TIER LİSTEM",
+  "Make yours and compare it with the data":
+    "Kendininkini yap ve verilerle karşılaştır",
+  "Matches the real data: {n}%":
+    "Gerçek verilerle uyuşma: %{n}",
+  "{name}: me {mine}, data {data}":
+    "{name}: ben {mine}, veri {data}",
+  "Compared with the Ranked tier list from the last 7 days of battles.":
+    "Son 7 günün maçlarından Aşamalı tier listesiyle karşılaştırıldı.",
+  "No disagreements: you see the meta exactly as the battles do.":
+    "Hiç anlaşmazlık yok: metayı tam olarak maçların gördüğü gibi görüyorsun.",
+  "Save as image":
+    "Görsel olarak kaydet",
+  "Your list matches the real data: {n}%":
+    "Listen gerçek verilerle %{n} uyuşuyor",
+  "you put it in {mine}, the data says {data}: you rate it higher":
+    "sen {mine} yaptın, veri {data} diyor: daha yüksek değerlendiriyorsun",
+  "you put it in {mine}, the data says {data}: you rate it lower":
+    "sen {mine} yaptın, veri {data} diyor: daha düşük değerlendiriyorsun",
+  "Brawl Stars update: patch notes, new brawlers and balance changes ({v})":
+    "Brawl Stars güncellemesi: yama notları, yeni savaşçılar ve denge değişiklikleri ({v})",
+  "Did the balance changes work? See the measured impact":
+    "Denge değişiklikleri işe yaradı mı? Ölçülen etkiyi gör",
+  "Latest Brawl Stars update":
+    "Son Brawl Stars güncellemesi",
+  "Next Ranked season: {date}":
+    "Sonraki Aşamalı sezonu: {date}",
+  "Published {date}":
+    "Yayınlandı: {date}",
+  "Supercell does not announce update or Brawl Talk dates far ahead. They appear here as soon as they are official, with the new notes the day they ship.":
+    "Supercell güncelleme veya Brawl Talk tarihlerini çok önceden duyurmaz. Resmileşir resmileşmez burada görünürler; yeni notlar çıktıkları gün eklenir.",
+  "The latest Brawl Stars update at a glance: new brawlers, hypercharges, balance changes and whether they worked, plus what is coming next.":
+    "Son Brawl Stars güncellemesine bir bakış: yeni savaşçılar, hiperşarjlar, denge değişiklikleri ve işe yarayıp yaramadıkları, ayrıca sırada ne var.",
+  "This update at a glance":
+    "Bir bakışta bu güncelleme",
+  "What is next":
+    "Sırada ne var",
+  "in {n} days":
+    "{n} gün içinde",
+  "{n} brawlers revealed and coming soon":
+    "{n} savaşçı duyuruldu ve yakında geliyor",
+  "Activity this week":
+    "Bu haftaki aktivite",
+  "Club trophies gained":
+    "Kazanılan kulüp kupaları",
+  "Inactive":
+    "Aktif değil",
+  "Inactive members":
+    "Aktif olmayan üyeler",
+  "Shown after {n} days of tracking":
+    "{n} günlük takipten sonra gösterilir",
+  "Tracking started today. Come back tomorrow to see who is gaining trophies, and in a few days who has gone quiet.":
+    "Takip bugün başladı. Kimin kupa kazandığını görmek için yarın, kimin sessizleştiğini görmek için birkaç gün sonra tekrar gel.",
+  "Trophies gained since {date} ({n} days). Tracked daily while this page is visited.":
+    "{date} tarihinden bu yana kazanılan kupalar ({n} gün). Bu sayfa ziyaret edildikçe her gün takip edilir.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent; the consent message European visitors may see is for the ads below.":
+    "; üçüncü bir tarafta değil, siteyle aynı sunucuda çalışır. Çerez kullanmaz ve kişisel veri saklamaz, bu yüzden onay gerektirmez; Avrupalı ziyaretçilerin görebileceği onay mesajı aşağıdaki reklamlar içindir.",
+  ". How Google uses this data is explained in":
+    ". Google'ın bu verileri nasıl kullandığı şurada açıklanır:",
+  ". The BrawlZone Bubble app and its panel show no ads.":
+    ". BrawlZone Bubble uygulaması ve paneli reklam göstermez.",
+  "Advertising":
+    "Reklam",
+  "Google's ad settings":
+    "Google reklam ayarları",
+  "Google's own policy":
+    "Google'ın kendi politikası",
+  "On the website only. The Android app shows no ads.":
+    "Yalnızca web sitesinde. Android uygulaması reklam göstermez.",
+  "The website shows ads served by Google AdSense, which pay for the server. Google and its partners may use cookies and similar technology to show and measure ads, including ads based on earlier visits to this and other sites. Visitors in the EEA, the UK and Switzerland are asked first, through Google's consent message, and can refuse.":
+    "Web sitesi, sunucunun masrafını karşılayan Google AdSense reklamları gösterir. Google ve ortakları reklamları göstermek ve ölçmek için çerezler ve benzer teknolojiler kullanabilir; bu ve diğer sitelere önceki ziyaretlere dayalı reklamlar dahil. AEA, Birleşik Krallık ve İsviçre'deki ziyaretçilere önce Google'ın onay mesajıyla sorulur ve reddedebilirler.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and ads only on the website.":
+    "BrawlZone ve BrawlZone Bubble uygulaması neyi saklar, neyi saklamaz ve uygulama ne gönderir. Hesap yok, reklamlar yalnızca web sitesinde.",
+  "You can turn off personalised ads in":
+    "Kişiselleştirilmiş reklamları şuradan kapatabilirsin:",
+  "BrawlZone is free and has no paywall; a few ads on the website pay for the server. If it saved you some time, a coffee goes a long way.":
+    "BrawlZone ücretsiz ve ödeme duvarı yok; web sitesindeki birkaç reklam sunucunun masrafını karşılıyor. Sana zaman kazandırdıysa, bir kahve çok işe yarar.",
+  "{SITE_NAME} is a free Brawl Stars statistics site. There is no account and nothing to pay for; the website shows ads. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
+    "{SITE_NAME} ücretsiz bir Brawl Stars istatistik sitesidir. Hesap yok ve ödenecek bir şey yok; web sitesi reklam gösterir. Kullanmak bu sayfadaki koşulları kabul etmek demektir. Herhangi birine katılmıyorsan çözüm siteyi kullanmayı bırakmaktır ve hiçbir şey kaybolmaz: bize hiçbir şey vermedin.",
+  "BrawlZone is free and made by one person. If this helped,":
+    "BrawlZone ücretsiz ve tek bir kişi tarafından yapılıyor. Bu işine yaradıysa,",
+  "a coffee keeps the server running":
+    "bir kahve sunucuyu ayakta tutar",
+  "{label} this week":
+    "Bu hafta {label}",
+  "{first} has the best record in {label} right now, with a {score} adjusted win rate over {n} decided battles, ahead of {second} and {third}.":
+    "Şu anda {label} modunda en iyi kayıt {first} savaşçısında: {n} sonuçlanmış maçta {score} düzeltilmiş kazanma oranı; arkasında {second} ve {third}.",
+  "Across every brawler, the mode has {total} sampled battles from the last 7 days on {maps} maps in rotation, and the average brawler wins {base} of them.":
+    "Tüm savaşçılar genelinde modda, rotasyondaki {maps} haritada son 7 günden {total} incelenmiş maç var ve ortalama bir savaşçı bunların {base} kadarını kazanıyor.",
+  "The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.":
+    "Bunlardan en çok oynanan {name}; maçların {rate} kadarında. Popülerlik ve güç aynı şey değil: yukarıdaki sıra, her savaşçının ne sıklıkla seçildiğine ve onu seçen oyunculara göre düzelten düzeltilmiş kazanma oranına göredir.",
+  "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
+    "Her haritanın yalnızca o haritanın seçimleriyle kendi sayfası var ve bunlar modun genelinden çok farklı olabilir: aşağıdan birini aç.",
+  "See how it ranks against other players":
+    "Diğer oyunculara karşı nasıl sıralandığını gör",
+  "Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors' YouTube or Google accounts. YouTube's use of data is covered by the":
+    "TikTok ve YouTube kanallarımız kendi sunucumuzdan yayınlanır: BrawlZone YouTube API Hizmetleri'ni yalnızca kendi videolarını kendi kanalına yüklemek için kullanır ve ziyaretçilerin YouTube veya Google hesaplarından hiçbir veri okumaz. YouTube'un veri kullanımı şunların kapsamındadır:",
+  "YouTube Terms of Service":
+    "YouTube Hizmet Şartları",
+  " and the":
+    " ve",
+  "Google Privacy Policy":
+    "Google Gizlilik Politikası",
+  "{name} build: {gadget} gadget + {starPower} star power, the pick of most owners.":
+    "{name} dizilimi: {gadget} aksesuarı + {starPower} yıldız gücü, sahiplerin çoğunun seçimi.",
+  "{name} build: {gadget} gadget, the pick of most owners.":
+    "{name} dizilimi: {gadget} aksesuarı, sahiplerin çoğunun seçimi.",
+  "{name} build: {starPower} star power, the pick of most owners.":
+    "{name} dizilimi: {starPower} yıldız gücü, sahiplerin çoğunun seçimi.",
+  "{rate} adjusted win rate over {battles} real battles.":
+    "{battles} gerçek maçta {rate} düzeltilmiş kazanma oranı.",
+  "Gears, best modes and maps, updated daily.":
+    "Eşyalar, en iyi modlar ve haritalar, her gün güncellenir.",
+  "Best {name} build in Brawl Stars ({v}): gadget and star power":
+    "Brawl Stars'ta en iyi {name} dizilimi ({v}): aksesuar ve yıldız gücü",
+  "Brawl Stars Starr Drops: daily schedule, chances and rewards":
+    "Brawl Stars Starr Hediyeleri: günlük takvim, şanslar ve ödüller",
+  "When you get Starr Drops: your first 5 wins every day, plus event extras. Then the chances for every rarity, Rare to Legendary, and every reward inside.":
+    "Starr Hediyelerini ne zaman alırsın: her gün ilk 5 galibiyetin, artı etkinlik ekstraları. Ardından Nadirden Efsaneviye her nadirliğin şansı ve içindeki her ödül.",
+  "Best brawlers on {name} right now: {v}, from {sampleSize} Ranked battles on this map. Best teams, matchups and the map layout, updated daily.":
+    "Şu anda {name} haritasında en iyi savaşçılar: {v}; bu haritada {sampleSize} Aşamalı maçından. En iyi takımlar, eşleşmeler ve harita düzeni, her gün güncellenir.",
+  "Free reward links":
+    "Ücretsiz ödül bağlantıları",
+  "Free reward links, the day they drop":
+    "Ücretsiz ödül bağlantıları, çıktıkları gün",
+  "Follow on WhatsApp":
+    "WhatsApp'ta takip et",
+  "Supercell gives away free Starr Drops and boxes through links that expire. We share every one we find on our WhatsApp channel.":
+    "Supercell, süresi dolan bağlantılarla ücretsiz Starr Hediyeleri ve kutular dağıtır. Bulduğumuz her birini WhatsApp kanalımızda paylaşıyoruz.",
+  "When you get Starr Drops: what each daily win gives this season, and the special days. Then the chances for every drop and box, and every reward inside.":
+    "Starr Hediyelerini ne zaman alırsın: bu sezon her günlük galibiyetin ne verdiği ve özel günler. Ardından her hediye ve kutunun şansları ve içindeki her ödül.",
+  "Boxes":
+    "Kutular",
+  "Event and new-brawler boxes: the ones in this season's Daily Wins first, then newest first.":
+    "Etkinlik ve yeni savaşçı kutuları: önce bu sezonun Günlük Galibiyetlerindekiler, sonra en yeniden başlayarak.",
+  "In this season's Daily Wins":
+    "Bu sezonun Günlük Galibiyetlerinde",
+  "Added {date}":
+    "Eklendi: {date}",
+  "Each of your first {n} wins of the day gives a reward, and what each one gives changes every season. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Günün ilk {n} galibiyetinin her biri bir ödül verir ve her birinin ne verdiği her sezon değişir. Sayı günde bir kez sıfırlanır; oyundaki Günlük Galibiyetler ekranındaki sayaç tam olarak ne zaman olduğunu gösterir.",
+  "Your first wins of the day each give a reward, and what each one gives changes every season.":
+    "Günün ilk galibiyetlerinin her biri bir ödül verir ve her birinin ne verdiği her sezon değişir.",
+  "Normal days":
+    "Normal günler",
+  "Lucky days":
+    "Şanslı günler",
+  "Luckiest days":
+    "En şanslı günler",
+  "one of these":
+    "bunlardan biri",
+  "Special days":
+    "Özel günler",
+  "Recent special days":
+    "Son özel günler",
+  "Coming":
+    "Yakında",
+  "Only for new players.":
+    "Yalnızca yeni oyuncular için.",
+  "Chaos Drop":
+    "Kaos Hediyesi",
+  "Credit":
+    "Kredi",
+  "All three done!":
+    "Üçü de tamam!",
+  "Classic":
+    "Klasik",
+  "Every wrong guess zooms out a little.":
+    "Her yanlış tahmin biraz uzaklaştırır.",
+  "How the puzzles work":
+    "Bulmacalar nasıl çalışır",
+  "It was":
+    "Cevap:",
+  "New puzzles in":
+    "Yeni bulmacalara",
+  "Out of guesses.":
+    "Tahmin hakkın bitti.",
+  "Shadow":
+    "Gölge",
+  "Share your results":
+    "Sonuçlarını paylaş",
+  "Three brawlers to guess every day: from clues, from a shadow, and from a zoom. Everybody gets the same ones, new at midnight UTC.":
+    "Her gün tahmin edilecek üç savaşçı: ipuçlarından, bir gölgeden ve bir yakınlaştırmadan. Herkese aynıları düşer, UTC gece yarısı yenilenir.",
+  "Today’s mystery brawler":
+    "Bugünün gizemli savaşçısı",
+  "Who is this, up close?":
+    "Yakından bu kim?",
+  "Whose shadow is this?":
+    "Bu gölge kimin?",
+  "Zoom":
+    "Yakınlaştırma",
+  "an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.":
+    "her yanlış tahminden sonra biraz geri çekilen aşırı yakın bir çekimdir. İkisi de altı tahmin hakkı verir.",
+  "new":
+    "yeni",
+  "playing":
+    "oynanıyor",
+  "shows only the brawler’s outline, and":
+    "yalnızca savaşçının siluetini gösterir,",
+  "{n} guesses left":
+    "{n} tahmin hakkı kaldı",
+  "{n} of 3 done":
+    "{n}/3 tamam",
+  "{n}-day streak":
+    "{n} günlük seri",
+  "Brawl Stars daily challenge: guess the brawler (Classic, Shadow, Zoom)":
+    "Brawl Stars günlük bulmacası: savaşçıyı tahmin et (Klasik, Gölge, Yakınlaştırma)",
+  "Three Brawl Stars puzzles every day: guess the brawler from clues, from its shadow, or from an extreme zoom. Keep your streak, share your score. Free, no account.":
+    "Her gün üç Brawl Stars bulmacası: savaşçıyı ipuçlarından, gölgesinden veya aşırı bir yakınlaştırmadan tahmin et. Serini koru, puanını paylaş. Ücretsiz, hesap gerekmez.",
+  "average {n} guesses":
+    "ortalama {n} tahmin",
+  "{n} players solved today’s Classic":
+    "Bugünkü Klasik'i {n} oyuncu çözdü",
+  "{pct}% of players solved today’s {mode}":
+    "Oyuncuların %{pct}'i bugünkü {mode} bulmacasını çözdü",
+  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
+    "İlerlemen yalnızca bu tarayıcıda tutulur. Hesap yok. Bir bulmacayı bitirdiğinde sunucu o tahmin sayısı için bir sayaca bir ekler; oyuncuların ne kadarının çözdüğünü böyle bilir, senin hakkında hiçbir şey saklanmaz.",
+  "Yesterday’s answers":
+    "Dünkü cevaplar",
+  "finish one puzzle today to keep it":
+    "korumak için bugün bir bulmaca bitir",
+  "How to make a Brawl Stars tier list":
+    "Brawl Stars tier listesi nasıl yapılır",
+  "Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.":
+    "Oyundaki her savaşçı tahtanın altındaki havuzda başlar. Birine dokun, sonra ait olduğu tier'a dokun; bilgisayarda onun yerine sürükleyebilirsin. Yerleştirilmiş bir savaşçıyı havuza geri göndermek için ona dokun ya da sıfırdan başlamak yerine tek düğmeyle canlı Aşamalı listesinden başla ve metayla tartış.",
+  "When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.":
+    "Bitince bağlantıyı kopyala ya da tahtayı görsel olarak kaydet ve paylaş. Bağlantıyı açan herkes senin tahtanı tam olarak görür ve kendininkini yapmak için değiştirebilir; kulüp sohbetlerindeki tier listesi tartışmalarının çoğu böyle başlar.",
+  "A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody's game.":
+    "Faydalı bir ipucu: her seferinde tek bir mod veya tek bir rütbe için sırala. Elmas Kapmaca'da baskın olan bir savaşçı Nakavt'ta yük olabilir ve Ustalar'daki meta Altın'daki meta değildir; her şey için tek bir tahta kimsenin oyununu sıralamamış olur.",
+  "How the draft helper works":
+    "Draft yardımcısı nasıl çalışır",
+  "Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.":
+    "Her sayı, BrawlZone'un kendisinin incelediği gerçek Aşamalı maçlarından gelir ve iki saatte bir yenilenir. Bir harita seçmek, savaşçıları tüm modlarda sezon boyu bir ortalamaya göre değil, son üç haftada o haritada gerçekte nasıl oynadıklarına göre sıralar.",
+  "Then follow the game's own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.":
+    "Ardından oyunun kendi sırasını izle. Banlar bir savaşçıyı her listeden çıkarır. Her rakip seçimi önerileri her adayın ona karşı nasıl oynadığına göre, her takım arkadaşı seçimi de onun yanında nasıl oynadığına göre yeniden tartar; bu counter seçmekten farklı bir sorudur. Her öneri arkasında kaç maç olduğunu gösterir, böylece az bir örneklem kolayca fark edilir.",
+  "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
+    "Aynı seçimler BrawlZone Bubble uygulamasında oyunun kendisinin üzerinde yüzer; böylece Brawl Stars'tan çıkmadan draft ortasında kontrol edebilirsin.",
+  "A new roast every day":
+    "Her gün yeni bir kapak",
+  "Enter your player tag and get roasted by your own stats: your main, your Ranked rank, your last games. A score out of 10 and a card to share.":
+    "Oyuncu etiketini gir ve kendi istatistiklerin tarafından kapağı ye: ana savaşçın, Aşamalı rütben, son maçların. 10 üzerinden bir puan ve paylaşılacak bir kart.",
+  "Enter your player tag. BrawlZone reads your stats and tells you the truth, with no mercy and a score out of 10.":
+    "Oyuncu etiketini gir. BrawlZone istatistiklerini okur ve sana gerçeği acımadan, 10 üzerinden bir puanla söyler.",
+  "It is a joke: the roast is about the account and the gameplay, never about the person. It uses the same public stats as your profile. Unofficial fan project, not affiliated with Supercell.":
+    "Bu bir şaka: kapak hesapla ve oynanışla ilgilidir, asla kişiyle değil. Profilinle aynı herkese açık istatistikleri kullanır. Resmi olmayan hayran projesi, Supercell ile bağlantılı değildir.",
+  "Roast my Brawl Stars account":
+    "Brawl Stars hesabıma kapak at",
+  "Roast my account":
+    "Hesabıma kapak at",
+  "The same roast all day, so a screenshot is your roast. Tomorrow it may find something else.":
+    "Gün boyu aynı kapak, yani ekran görüntüsü senin kapağın. Yarın başka bir şey bulabilir.",
+  "Think your account is good?":
+    "Hesabının iyi olduğunu mu düşünüyorsun?",
+  "Your main, your Ranked rank, your win rate, your club and the brawlers you left at Power 1. Every joke is about a number on your account.":
+    "Ana savaşçın, Aşamalı rütben, kazanma oranın, kulübün ve Güç 1'de bıraktığın savaşçılar. Her şaka hesabındaki bir sayıyla ilgili.",
+  "Your real stats":
+    "Gerçek istatistiklerin",
+  "Your score out of 10 and the best lines, story-sized, for TikTok, Instagram or your club chat.":
+    "10 üzerinden puanın ve en iyi satırlar, hikâye boyutunda; TikTok, Instagram veya kulüp sohbetin için.",
+  "A new roast every day, from the same public stats as the profile. It is a joke about the account, never about the person. Unofficial fan project, not affiliated with Supercell.":
+    "Her gün yeni bir kapak, profille aynı herkese açık istatistiklerden. Hesapla ilgili bir şaka, asla kişiyle ilgili değil. Resmi olmayan hayran projesi, Supercell ile bağlantılı değildir.",
+  "Account rating":
+    "Hesap puanı",
+  "Roast another account":
+    "Başka bir hesaba kapak at",
+  "Roast me":
+    "Bana kapak at",
+  "Roast of {tag}":
+    "{tag} kapağı",
+  "Share my roast":
+    "Kapağımı paylaş",
+  "MY ACCOUNT GOT ROASTED":
+    "HESABIM KAPAĞI YEDİ",
+  "Think your account is good? Get roasted.":
+    "Hesabının iyi olduğunu mu düşünüyorsun? Kapağı ye.",
+  "A new link goes to these the moment it is found, often hours before other sites have it.":
+    "Yeni bir bağlantı bulunduğu anda buralara gider, çoğu zaman diğer sitelerden saatler önce.",
+  "Accept the reward in the game. It lands in your account straight away.":
+    "Ödülü oyunda kabul et. Hemen hesabına düşer.",
+  "Are there Brawl Stars codes for free gems?":
+    "Ücretsiz elmas için Brawl Stars kodları var mı?",
+  "Are these links safe?":
+    "Bu bağlantılar güvenli mi?",
+  "Claim":
+    "Al",
+  "Discord server":
+    "Discord sunucusu",
+  "Each link works for a limited time and usually once per account. Supercell does not say for how long, so a link here can stop working before it leaves the list. If it has expired, it is gone for everyone.":
+    "Her bağlantı sınırlı bir süre ve genelde hesap başına bir kez çalışır. Supercell ne kadar süreceğini söylemez, bu yüzden buradaki bir bağlantı listeden çıkmadan çalışmayı bırakabilir. Süresi dolduysa herkes için gitmiştir.",
+  "Earlier rewards":
+    "Önceki ödüller",
+  "Every free reward link Supercell gives out, as soon as it appears. Open this page on the phone with Brawl Stars, tap Claim, and the reward goes straight to your account.":
+    "Supercell'in verdiği her ücretsiz ödül bağlantısı, çıktığı anda. Bu sayfayı Brawl Stars'ın olduğu telefonda aç, Al'a dokun, ödül doğrudan hesabına gitsin.",
+  "Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No codes, no generators.":
+    "Supercell'in verdiği her ücretsiz ödül bağlantısı, çıktığı anda paylaşılır: kutular, krediler, güç puanları. Al'a dokun, hesabına gitsin. Kod yok, üretici yok.",
+  "Found in the last {n} days. Claim them before they expire.":
+    "Son {n} günde bulundu. Süreleri dolmadan al.",
+  "Found {when}":
+    "Bulundu: {when}",
+  "Free Brawl Stars rewards":
+    "Ücretsiz Brawl Stars ödülleri",
+  "Free Brawl Stars rewards today ({v}): every claim link":
+    "Bugünün ücretsiz Brawl Stars ödülleri ({v}): tüm alma bağlantıları",
+  "Get the next one first":
+    "Bir sonrakini ilk sen al",
+  "How to claim a free reward":
+    "Ücretsiz bir ödül nasıl alınır",
+  "No free reward right now.":
+    "Şu anda ücretsiz ödül yok.",
+  "No. Brawl Stars has no redeem codes. Free rewards come as links from Supercell that open the game and add the reward to your account. Any site that asks for a code, your login or to \"verify\" with a survey to get free gems is a scam.":
+    "Hayır. Brawl Stars'ta kullanılabilir kod yok. Ücretsiz ödüller Supercell'den oyunu açan ve ödülü hesabına ekleyen bağlantılar olarak gelir. Ücretsiz elmas için kod, giriş bilgilerini ya da bir anketle \"doğrulama\" isteyen her site dolandırıcıdır.",
+  "Older than {n} days. They may have expired, but some still work, so try them.":
+    "{n} günden eski. Süreleri dolmuş olabilir ama bazıları hâlâ çalışıyor, dene.",
+  "Open this page on the phone where Brawl Stars is installed and logged in to your account.":
+    "Bu sayfayı Brawl Stars'ın yüklü ve hesabına giriş yapılmış olduğu telefonda aç.",
+  "Playing on more than one account? The game claims it for the one that is open, so switch first.":
+    "Birden fazla hesapla mı oynuyorsun? Oyun ödülü açık olan hesaba verir, bu yüzden önce hesap değiştir.",
+  "Rewards are given by Supercell, not by BrawlZone, and Supercell decides how long each one lasts. Unofficial fan project, not affiliated with Supercell.":
+    "Ödüller BrawlZone tarafından değil Supercell tarafından verilir ve her birinin ne kadar süreceğine Supercell karar verir. Resmi olmayan hayran projesi, Supercell ile bağlantılı değildir.",
+  "Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.":
+    "Supercell bunları ayda birkaç kez, çoğu zaman etkinlikler sırasında verir. Aşağıdan takip et, bir sonrakini çıktığı dakika duy.",
+  "Supercell shares them on its own channels, often during events or after a live stream. BrawlZone checks for new ones every few minutes and posts them here and on Discord, WhatsApp, YouTube, TikTok and Instagram.":
+    "Supercell bunları kendi kanallarında, çoğu zaman etkinlikler sırasında veya bir canlı yayından sonra paylaşır. BrawlZone birkaç dakikada bir yenilerini kontrol eder ve onları burada ve Discord, WhatsApp, YouTube, TikTok ve Instagram'da paylaşır.",
+  "Tap Claim. The link opens Brawl Stars by itself.":
+    "Al'a dokun. Bağlantı Brawl Stars'ı kendisi açar.",
+  "They are Supercell's own links, from link.brawlstars.com or store.supercell.com, and this page shows no other kind. Claiming opens Brawl Stars and never asks for your password. BrawlZone never asks for your account either.":
+    "Bunlar Supercell'in kendi bağlantılarıdır, link.brawlstars.com veya store.supercell.com adresinden; bu sayfa başka türlüsünü göstermez. Almak Brawl Stars'ı açar ve asla şifreni sormaz. BrawlZone da asla hesabını sormaz.",
+  "WhatsApp channel":
+    "WhatsApp kanalı",
+  "Where do the links come from?":
+    "Bağlantılar nereden geliyor?",
+  "Why does the game say the reward expired or was already claimed?":
+    "Oyun neden ödülün süresinin dolduğunu ya da zaten alındığını söylüyor?",
+  "Free reward":
+    "Ücretsiz ödül",
+  "Live, found {when}":
+    "Aktif, bulundu: {when}",
+  "More free rewards live now":
+    "Şu an aktif başka ücretsiz ödüller",
+  "No free reward right now":
+    "Şu anda ücretsiz ödül yok",
+  "Opens Brawl Stars. An official Supercell link.":
+    "Brawl Stars'ı açar. Resmi bir Supercell bağlantısı.",
+  "Try it":
+    "Dene",
+  "{n} free rewards to claim":
+    "Alınacak {n} ücretsiz ödül",
+  "+{discord} entries for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, up to {cap}. Following or subscribing on any platform is welcome but never gives entries.":
+    "BrawlZone Discord sunucusunda /giveaway ile katılımını onaylamak için +{discord} hak (katılım başına bir Discord hesabı) ve bağlantınla katılan her arkadaş için +1, en fazla {cap}. Herhangi bir platformda takip etmek veya abone olmak memnuniyetle karşılanır ama asla hak kazandırmaz.",
+  "A draw nobody can rig, us included":
+    "Bizim de dahil, kimsenin hile yapamayacağı bir çekiliş",
+  "A friend sent you: entering gives them +1 entry too.":
+    "Bir arkadaşın gönderdi: katılman ona da +1 hak kazandırır.",
+  "After entries close, one winner is drawn at random, weighted by entries, using the first drand public randomness round after the close (drand.love). The entry list (tags and entry counts, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "Katılımlar kapandıktan sonra, kapanıştan sonraki ilk drand herkese açık rastgelelik turu (drand.love) kullanılarak, haklara göre ağırlıklı rastgele bir kazanan çekilir. Katılım listesi (etiketler ve hak sayıları, e-posta yok) ve kullanılan tur yayınlanır, böylece herkes kontrol edebilir. Kazanan bir videoda ve brawlzone.net'te duyurulur.",
+  "Anyone aged 13 or older with a Brawl Stars account, where giveaways like this are allowed. If you are under 18, a parent or guardian must know you are entering and may need to accept the prize for you. Entering is free and needs no purchase.":
+    "Bu tür çekilişlere izin verilen yerlerde Brawl Stars hesabı olan 13 yaş ve üstü herkes. 18 yaşından küçüksen bir ebeveyn veya vasinin katıldığını bilmesi gerekir ve ödülü senin adına kabul etmesi gerekebilir. Katılım ücretsizdir ve satın alma gerektirmez.",
+  "Brawl Stars giveaway: win a €10 gift card for the Brawl Pass":
+    "Brawl Stars çekilişi: Brawl Pass için 10 €'luk hediye kartı kazan",
+  "BrawlZone (brawlzone.net), an unofficial Brawl Stars fan project. Contact: {email}. This giveaway is not sponsored, endorsed or run by Supercell, Google, Apple, YouTube, TikTok, Instagram or Discord.":
+    "BrawlZone (brawlzone.net), resmi olmayan bir Brawl Stars hayran projesi. İletişim: {email}. Bu çekiliş Supercell, Google, Apple, YouTube, TikTok, Instagram veya Discord tarafından sponsorlanmaz, onaylanmaz veya yürütülmez.",
+  "Claiming the prize":
+    "Ödülü almak",
+  "Closed":
+    "Kapandı",
+  "Confirmed on Discord":
+    "Discord'da onaylandı",
+  "Copy":
+    "Kopyala",
+  "Dates":
+    "Tarihler",
+  "Each friend":
+    "Her arkadaş",
+  "Ends in":
+    "Bitişe",
+  "Enter":
+    "Katıl",
+  "Enter for free":
+    "Ücretsiz katıl",
+  "Enter the giveaway":
+    "Çekilişe katıl",
+  "Enter your player tag and an email address at brawlzone.net/giveaway. One entry form per person, per player tag and per email address.":
+    "brawlzone.net/giveaway adresinde oyuncu etiketini ve bir e-posta adresi gir. Kişi başına, oyuncu etiketi başına ve e-posta adresi başına bir katılım formu.",
+  "Entered the giveaway":
+    "Çekilişe katıldın",
+  "Entering…":
+    "Katılınıyor…",
+  "Entries are closed.":
+    "Katılımlar kapandı.",
+  "Entries open {open} and close {close}.":
+    "Katılımlar {open} tarihinde açılır ve {close} tarihinde kapanır.",
+  "Every friend who enters with your link, up to {max}.":
+    "Bağlantınla katılan her arkadaş, en fazla {max}.",
+  "Extra entries":
+    "Ek haklar",
+  "Fair play":
+    "Adil oyun",
+  "Fake tags, fake email addresses or several entries for one person are removed, along with any entries they brought. At most {n} entries a day are accepted from one network.":
+    "Sahte etiketler, sahte e-posta adresleri veya bir kişi için birden fazla katılım, getirdikleri haklarla birlikte silinir. Bir ağdan günde en fazla {n} katılım kabul edilir.",
+  "Follow so you see it the moment it is out. Following does not change your entries.":
+    "Çıktığı anda görmek için takip et. Takip etmek haklarını değiştirmez.",
+  "Free Brawl Stars giveaway: win a €10 gift card for the Brawl Pass. Enter here:":
+    "Ücretsiz Brawl Stars çekilişi: Brawl Pass için 10 €'luk hediye kartı kazan. Buradan katıl:",
+  "Free to enter with your player tag. Get more entries on Discord and for every friend you bring. One winner, drawn in public.":
+    "Oyuncu etiketinle ücretsiz katıl. Discord'da ve getirdiğin her arkadaş için daha fazla hak kazan. Tek kazanan, herkesin önünde çekilir.",
+  "Friends who entered with your link: {n} of {max}":
+    "Bağlantınla katılan arkadaşlar: {n} / {max}",
+  "Giveaway rules":
+    "Çekiliş kuralları",
+  "Google Play or App Store, your choice. Free to enter. One winner on {date}.":
+    "Google Play veya App Store, seçim senin. Katılım ücretsiz. {date} tarihinde tek kazanan.",
+  "How to enter":
+    "Nasıl katılınır",
+  "How to get entries":
+    "Nasıl hak kazanılır",
+  "I am 13 or older (under 18: a parent knows I am entering) and I accept the":
+    "13 yaşında veya daha büyüğüm (18 yaş altıysam ebeveynim katıldığımı biliyor) ve şunu kabul ediyorum:",
+  "Join our Discord":
+    "Discord'umuza katıl",
+  "Join our Discord and type /giveaway {code}":
+    "Discord'umuza katıl ve /giveaway {code} yaz",
+  "Keep this page: it is saved in this browser, and the link with your code always shows it.":
+    "Bu sayfayı sakla: bu tarayıcıda kayıtlı ve kodunla birlikte bağlantı onu her zaman gösterir.",
+  "More entries, more chances: someone with 5 entries is 5 times as likely to win as someone with 1.":
+    "Daha fazla hak, daha fazla şans: 5 hakkı olan biri, 1 hakkı olan birinden 5 kat daha fazla kazanma şansına sahip.",
+  "One €10 gift card for Google Play or the App Store, the winner's choice, sent by email as a code. The prize cannot be swapped for cash.":
+    "Google Play veya App Store için bir adet 10 €'luk hediye kartı, kazananın seçimi; e-postayla kod olarak gönderilir. Ödül nakde çevrilemez.",
+  "Open Discord":
+    "Discord'u aç",
+  "Organiser":
+    "Düzenleyen",
+  "Prize":
+    "Ödül",
+  "Read the full rules":
+    "Tüm kuralları oku",
+  "Run by BrawlZone, an unofficial fan project. Not sponsored, endorsed or run by Supercell, Google, Apple, YouTube, TikTok, Instagram or Discord.":
+    "Resmi olmayan bir hayran projesi olan BrawlZone tarafından düzenlenir. Supercell, Google, Apple, YouTube, TikTok, Instagram veya Discord tarafından sponsorlanmaz, onaylanmaz veya yürütülmez.",
+  "Send on WhatsApp":
+    "WhatsApp'ta gönder",
+  "The draw":
+    "Çekiliş",
+  "The winner is revealed in a video":
+    "Kazanan bir videoda açıklanacak",
+  "Type /giveaway with your code in the BrawlZone server.":
+    "BrawlZone sunucusunda kodunla birlikte /giveaway yaz.",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, a new winner is drawn the same way.":
+    "Kazanana {email} adresinden e-posta göndeririz. 14 gün içinde cevap gelmezse ya da kazanan bu kuralları ihlal ederse aynı şekilde yeni bir kazanan çekilir.",
+  "When entries close, the winner is picked using a public random number that nobody can know in advance: the drand beacon, published every 30 seconds by a group of universities and companies. We publish the full entry list (tags only) and the number, so anyone can check the result.":
+    "Katılımlar kapanınca kazanan, kimsenin önceden bilemeyeceği herkese açık rastgele bir sayıyla seçilir: bir grup üniversite ve şirket tarafından 30 saniyede bir yayınlanan drand işareti. Tam katılım listesini (yalnızca etiketler) ve sayıyı yayınlarız, böylece herkes sonucu kontrol edebilir.",
+  "Who can enter":
+    "Kimler katılabilir",
+  "Win a €10 gift card for the Brawl Pass":
+    "Brawl Pass için 10 €'luk hediye kartı kazan",
+  "You are in, {name}!":
+    "Katıldın, {name}!",
+  "Your code":
+    "Kodun",
+  "Your data":
+    "Verilerin",
+  "Your email, only to tell you if you win":
+    "E-postan, yalnızca kazanırsan sana haber vermek için",
+  "Your friend link: +1 entry for every friend who enters with it":
+    "Arkadaş bağlantın: onunla katılan her arkadaş için +1 hak",
+  "Your player tag":
+    "Oyuncu etiketin",
+  "Your player tag and an email to reach you if you win.":
+    "Oyuncu etiketin ve kazanırsan sana ulaşmak için bir e-posta.",
+  "Your player tag and email are used only to run this giveaway. The email is seen only by the organiser, never published or shared, and deleted once the prize is delivered. Write to {email} to remove your entry at any time.":
+    "Oyuncu etiketin ve e-postan yalnızca bu çekilişi yürütmek için kullanılır. E-postayı yalnızca düzenleyen görür, asla yayınlanmaz veya paylaşılmaz ve ödül teslim edilince silinir. Katılımını istediğin zaman silmek için {email} adresine yaz.",
+  "entries":
+    "hak",
+  "entry":
+    "hak",
+  "giveaway rules":
+    "çekiliş kurallarını",
+  "Tick the box to confirm your age and the rules.":
+    "Yaşını ve kuralları onaylamak için kutuyu işaretle.",
+  "That email does not look right.":
+    "Bu e-posta doğru görünmüyor.",
+  "No Brawl Stars account has that tag. Check it under your name in game.":
+    "Bu etikete sahip bir Brawl Stars hesabı yok. Oyunda adının altından kontrol et.",
+  "This tag is already entered. Lost your page? Write to contact@brawlzone.net.":
+    "Bu etiket zaten katıldı. Sayfanı mı kaybettin? contact@brawlzone.net adresine yaz.",
+  "This email is already entered. One entry per person.":
+    "Bu e-posta zaten katıldı. Kişi başına bir katılım.",
+  "Too many entries from this network today. Try again tomorrow.":
+    "Bugün bu ağdan çok fazla katılım var. Yarın tekrar dene.",
+  "Something went wrong on our side. Try again in a minute.":
+    "Bizim tarafımızda bir şeyler ters gitti. Bir dakika sonra tekrar dene.",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, with no limit. Following or subscribing on any platform is welcome but never gives points.":
+    "Katılmak için 1 puan, BrawlZone Discord sunucusunda /giveaway ile katılımını onaylamak için +{discord} (katılım başına bir Discord hesabı) ve bağlantınla katılan her arkadaş için +1, sınırsız. Herhangi bir platformda takip etmek veya abone olmak memnuniyetle karşılanır ama asla puan kazandırmaz.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The leaders are checked before the winner is announced.":
+    "Sahte etiketler, sahte e-posta adresleri, başkalarının etiketleri veya bir kişi için birden fazla katılım, getirdikleri puanlarla birlikte silinir. Bir ağdan günde en fazla {n} katılım kabul edilir. Kazanan duyurulmadan önce liderler kontrol edilir.",
+  "Nothing is left to luck: whoever has the most points when entries close wins. If two entrants have the same points, whoever entered first wins. The winner is announced in a video and on brawlzone.net.":
+    "Hiçbir şey şansa bırakılmaz: katılımlar kapandığında en çok puana sahip olan kazanır. İki katılımcının puanı eşitse önce katılan kazanır. Kazanan bir videoda ve brawlzone.net'te duyurulur.",
+  "Points":
+    "Puanlar",
+  "The winner":
+    "Kazanan",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, the prize goes to the next entrant on the leaderboard.":
+    "Kazanana {email} adresinden e-posta göndeririz. 14 gün içinde cevap gelmezse ya da kazanan bu kuralları ihlal ederse ödül sıralamadaki bir sonraki katılımcıya gider.",
+  "Every friend who enters with your link. No limit.":
+    "Bağlantınla katılan her arkadaş. Sınır yok.",
+  "Follow so you see it the moment it is out. Following does not change your points.":
+    "Çıktığı anda görmek için takip et. Takip etmek puanlarını değiştirmez.",
+  "Free to enter with your player tag. Get points on Discord and for every friend you bring. Most points wins.":
+    "Oyuncu etiketinle ücretsiz katıl. Discord'da ve getirdiğin her arkadaş için puan kazan. En çok puan kazanır.",
+  "How to get points":
+    "Nasıl puan kazanılır",
+  "No luck involved: whoever has the most points when it ends wins. A tie goes to whoever entered first.":
+    "Şans yok: bittiğinde en çok puana sahip olan kazanır. Eşitlikte önce katılan kazanır.",
+  "Nobody yet. Enter now and you are first.":
+    "Henüz kimse yok. Şimdi katıl, ilk sen ol.",
+  "Top recruiters right now":
+    "Şu an en çok arkadaş getirenler",
+  "Updated every few minutes. Leaders are checked for fake or duplicate friends before the winner is announced.":
+    "Birkaç dakikada bir güncellenir. Kazanan duyurulmadan önce liderler sahte veya mükerrer arkadaşlar için kontrol edilir.",
+  "{n} pts":
+    "{n} puan",
+  "A friend sent you: entering gives them +1 point.":
+    "Bir arkadaşın gönderdi: katılman ona +1 puan kazandırır.",
+  "Friends who entered with your link: {n}":
+    "Bağlantınla katılan arkadaşlar: {n}",
+  "Your friend link: +1 point for every friend who enters with it":
+    "Arkadaş bağlantın: onunla katılan her arkadaş için +1 puan",
+  "point":
+    "puan",
+  "points":
+    "puan",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), +1 each for subscribing on YouTube, following on TikTok and following on Instagram, and +1 for each friend who enters with your link, with no limit. Follow points are taken on your word, and we may check the winner's.":
+    "Katılmak için 1 puan, BrawlZone Discord sunucusunda /giveaway ile katılımını onaylamak için +{discord} (katılım başına bir Discord hesabı), YouTube'da abone olmak, TikTok'ta takip etmek ve Instagram'da takip etmek için her biri +1 ve bağlantınla katılan her arkadaş için +1, sınırsız. Takip puanları sözüne güvenilerek verilir ve kazananınkini kontrol edebiliriz.",
+  "Each follow":
+    "Her takip",
+  "Follow so you see it the moment it is out, and claim your follow points on your entry page above.":
+    "Çıktığı anda görmek için takip et ve takip puanlarını yukarıdaki katılım sayfandan al.",
+  "Subscribe on YouTube, follow on TikTok and on Instagram: +1 each.":
+    "YouTube'da abone ol, TikTok'ta ve Instagram'da takip et: her biri +1.",
+  "Follow":
+    "Takip et",
+  "Follow on Instagram":
+    "Instagram'da takip et",
+  "Follow on TikTok":
+    "TikTok'ta takip et",
+  "Subscribe on YouTube":
+    "YouTube'da abone ol",
+  "Subscribed on YouTube":
+    "YouTube'da abone olundu",
+  "Following on TikTok":
+    "TikTok'ta takip ediliyor",
+  "Following on Instagram":
+    "Instagram'da takip ediliyor",
+  "Giveaway: win a €10 gift card":
+    "Çekiliş: 10 €'luk hediye kartı kazan",
+  "Free to enter. Most points wins. Bring your friends.":
+    "Katılım ücretsiz. En çok puan kazanır. Arkadaşlarını getir.",
+  "Enter free":
+    "Ücretsiz katıl",
+  "Entries open at {time}.":
+    "Katılımlar {time} saatinde açılır.",
+  "Brawl Pass":
+    "Brawl Pass",
+  "Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.":
+    "Her puan çekilişte bir bilettir: 10 puanı olan biri, 1 puanı olandan 10 kat daha fazla kazanma şansına sahip.",
+  "Most points right now":
+    "Şu an en çok puan",
+  "More points, more chances. The winner is drawn at random when it ends, with a public random number nobody can know in advance, so nobody can rig it, us included.":
+    "Daha fazla puan, daha fazla şans. Bittiğinde kazanan, kimsenin önceden bilemeyeceği herkese açık rastgele bir sayıyla rastgele çekilir; bu yüzden biz dahil kimse hile yapamaz.",
+  "Free to enter with your player tag. Get points on Discord, for following and for every friend you bring. More points, more chances.":
+    "Oyuncu etiketinle ücretsiz katıl. Discord'da, takip için ve getirdiğin her arkadaş için puan kazan. Daha fazla puan, daha fazla şans.",
+  "Free to enter. More points, more chances. Bring your friends.":
+    "Katılım ücretsiz. Daha fazla puan, daha fazla şans. Arkadaşlarını getir.",
+  "After entries close, one winner is drawn at random, weighted by points (each point is one ticket), using the first drand public randomness round after the close (drand.love). The entry list (tags and points, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "Katılımlar kapandıktan sonra, kapanıştan sonraki ilk drand herkese açık rastgelelik turu (drand.love) kullanılarak, puanlara göre ağırlıklı (her puan bir bilet) rastgele bir kazanan çekilir. Katılım listesi (etiketler ve puanlar, e-posta yok) ve kullanılan tur yayınlanır, böylece herkes kontrol edebilir. Kazanan bir videoda ve brawlzone.net'te duyurulur.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The winner is checked before being announced.":
+    "Sahte etiketler, sahte e-posta adresleri, başkalarının etiketleri veya bir kişi için birden fazla katılım, getirdikleri puanlarla birlikte silinir. Bir ağdan günde en fazla {n} katılım kabul edilir. Kazanan duyurulmadan önce kontrol edilir.",
+  "Where's my tag?":
+    "Etiketim nerede?",
+  "Is this you?":
+    "Bu sen misin?",
+  "Your name":
+    "Adın",
+  "Open Brawl Stars and tap your profile picture, top left.":
+    "Brawl Stars'ı aç ve sol üstteki profil resmine dokun.",
+  "Your tag is right under your name. It starts with #.":
+    "Etiketin adının hemen altında. # ile başlar.",
+  "Type it here, with or without the #.":
+    "Buraya yaz, # ile veya # olmadan.",
+  "Win the Brawl Pass: free giveaway, more points = more chances.":
+    "Brawl Pass kazan: ücretsiz çekiliş, daha fazla puan = daha fazla şans.",
+  "Enter now":
+    "Şimdi katıl",
+  "Get a notification on this phone, or follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Bu telefonda bildirim al ya da bir kanalı takip et: yeni bir bağlantı bulunduğu anda paylaşılır, çoğu zaman diğer sitelerden saatler önce.",
+  "If you enter the giveaway, we store your player tag, the email you give and a scrambled, daily-changing code made from your network address (to stop one network creating fake entries). The email is used only to contact the winner, is never published or shared, and is deleted once the prize is delivered.":
+    "Çekilişe katılırsan oyuncu etiketini, verdiğin e-postayı ve ağ adresinden üretilen, her gün değişen karıştırılmış bir kodu (bir ağın sahte katılımlar oluşturmasını engellemek için) saklarız. E-posta yalnızca kazananla iletişim için kullanılır, asla yayınlanmaz veya paylaşılmaz ve ödül teslim edilince silinir.",
+  "If you tap \"Notify me\" on the free rewards page, your browser gives us an address at its own push service (Google's, Apple's or Mozilla's) and two keys, and we store them with the page's language. They identify a browser, not a person, and are used only to tell you about new free rewards. Tap \"Turn off\" on the same page, or block notifications in your browser, and the subscription is deleted.":
+    "Ücretsiz ödüller sayfasında \"Bana haber ver\"e dokunursan tarayıcın bize kendi bildirim hizmetinde (Google'ın, Apple'ın veya Mozilla'nın) bir adres ve iki anahtar verir; biz bunları sayfanın diliyle birlikte saklarız. Bunlar bir kişiyi değil bir tarayıcıyı tanımlar ve yalnızca sana yeni ücretsiz ödülleri bildirmek için kullanılır. Aynı sayfada \"Kapat\"a dokun ya da tarayıcında bildirimleri engelle, abonelik silinir.",
+  "Notifications and the giveaway":
+    "Bildirimler ve çekiliş",
+  "Only if you ask for them, and only what they need.":
+    "Yalnızca sen istersen ve yalnızca ihtiyaç duydukları kadar.",
+  "Notifications are blocked for this site. Allow them in your browser settings to get new rewards.":
+    "Bu site için bildirimler engelli. Yeni ödüller için tarayıcı ayarlarından izin ver.",
+  "Notifications: open this page in Chrome on Android, or add the site to your home screen on iPhone.":
+    "Bildirimler: bu sayfayı Android'de Chrome ile aç ya da iPhone'da siteyi ana ekranına ekle.",
+  "Notify me when a new reward drops":
+    "Yeni bir ödül çıkınca bana haber ver",
+  "Turn off":
+    "Kapat",
+  "You will be notified":
+    "Haber verilecek",
+  "Checked for new rewards {when}. New ones show up here within minutes.":
+    "Yeni ödüller {when} kontrol edildi. Yenileri birkaç dakika içinde burada görünür.",
+  "BrawlZone Bubble is on Google Play":
+    "BrawlZone Bubble Google Play'de",
+  "New on Google Play":
+    "Google Play'de yeni",
+  "The best picks for your map and what beats the enemy, floating over Brawl Stars while you draft. Free, no ads.":
+    "Haritan için en iyi seçimler ve rakibi neyin yendiği, draft yaparken Brawl Stars'ın üzerinde yüzüyor. Ücretsiz, reklamsız.",
+  "Already in the group? You are not counted yet.":
+    "Zaten grupta mısın? Henüz sayılmıyorsun.",
+  "Google only counts you after step 2: tap here and then \"Become a tester\".":
+    "Google seni ancak 2. adımdan sonra sayar: buraya dokun, sonra \"Test kullanıcısı ol\".",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone. Then come back to this page: you are not a tester until step 2.":
+    "Grubu aç ve \"Gruba katıl\"a dokun. Telefonundaki Play Store ile aynı Google hesabını kullan. Sonra bu sayfaya geri dön: 2. adıma kadar test kullanıcısı değilsin.",
+  "Joined the group? You are not a tester yet.":
+    "Gruba katıldın mı? Henüz test kullanıcısı değilsin.",
+  "One more tap: Google only counts you after step 2.":
+    "Bir dokunuş daha: Google seni ancak 2. adımdan sonra sayar.",
+  "Step 2: Become a tester":
+    "2. adım: Test kullanıcısı ol",
+  "Get a notification on this phone the moment a new free reward appears, often hours before other sites have it. No account, turn it off any time.":
+    "Yeni bir ücretsiz ödül çıktığı anda bu telefonda bildirim al, çoğu zaman diğer sitelerden saatler önce. Hesap yok, istediğin zaman kapat.",
+  "Not now":
+    "Şimdi değil",
+  "🎁 Claimed! Want the next one first?":
+    "🎁 Alındı! Bir sonrakini ilk sen almak ister misin?",
+  "Enter your name or tag to search.":
+    "Aramak için adını veya etiketini gir.",
+  "No player with that name here yet. Search once with your tag, and your name will work next time.":
+    "Burada henüz bu adda bir oyuncu yok. Bir kez etiketinle ara, bir dahaki sefere adın çalışır.",
+  "Pick your profile from the list below.":
+    "Aşağıdaki listeden profilini seç.",
+  "Player name or tag":
+    "Oyuncu adı veya etiketi",
+  "Search by name or tag. Your tag is on your in-game profile, just below your profile icon.":
+    "Ada veya etikete göre ara. Etiketin oyundaki profilinde, profil simgenin hemen altında.",
+  "Your name or tag":
+    "Adın veya etiketin",
+  "Tick this box to enter.":
+    "Katılmak için bu kutuyu işaretle.",
+  "1 in {n}":
+    "{n}'de 1",
+  "A Chaos Drop starts at Super Rare: {list}.":
+    "Bir Kaos Hediyesi Süper Ender'den başlar: {list}.",
+  "A Chaos Drop starts at Super Rare: {list}. That makes {p} of them Legendary or better, against {s} for a Starr Drop.":
+    "Bir Kaos Hediyesi Süper Ender'den başlar: {list}. Bu da onların {p} kadarını Efsanevi veya daha iyi yapar; bir Starr Hediyesi için bu oran {s}.",
+  "About {d} days on average, at {n} Starr Drops a day from Daily Wins. The chance of at least one is {w} in a week and {m} in a month.":
+    "Günlük Galibiyetlerden günde {n} Starr Hediyesiyle ortalama yaklaşık {d} gün. En az bir tane çıkma şansı bir haftada {w}, bir ayda {m}.",
+  "Are these drop rates official?":
+    "Bu hediye oranları resmi mi?",
+  "Brawl Stars Starr Drops: daily schedule, drop rates and rewards":
+    "Brawl Stars Starr Hediyeleri: günlük takvim, hediye oranları ve ödüller",
+  "Chaos Drops are better odds: {p} of them are Legendary or rarer.":
+    "Kaos Hediyelerinin şansı daha iyi: {p} kadarı Efsanevi veya daha nadir.",
+  "Daily schedule":
+    "Günlük takvim",
+  "Every Starr Drop starts Rare and can upgrade. The chance it ends as each:":
+    "Her Starr Hediyesi Ender başlar ve yükselebilir. Her biri olarak bitme şansı:",
+  "How long does it take to get a Legendary Starr Drop?":
+    "Efsanevi bir Starr Hediyesi almak ne kadar sürer?",
+  "How many Starr Drops do you get a day?":
+    "Günde kaç Starr Hediyesi alınır?",
+  "On average one Starr Drop in {k} is Legendary.":
+    "Ortalama olarak her {k} Starr Hediyesinden biri Efsanevi.",
+  "On average one Starr Drop in {k} is Legendary: about one every {d} days of Daily Wins.":
+    "Ortalama olarak her {k} Starr Hediyesinden biri Efsanevi: Günlük Galibiyetlerle yaklaşık her {d} günde bir.",
+  "On this page":
+    "Bu sayfada",
+  "One of: {list}.":
+    "Şunlardan biri: {list}.",
+  "Quick answers":
+    "Kısa cevaplar",
+  "Starr Drops on a normal day":
+    "Normal bir günde Starr Hediyeleri",
+  "The chance of at least one Legendary Starr Drop from your Daily Wins, at {n} Starr Drops a day.":
+    "Günde {n} Starr Hediyesiyle, Günlük Galibiyetlerinden en az bir Efsanevi Starr Hediyesi çıkma şansı.",
+  "The chance of at least one Legendary in that many Starr Drops.":
+    "O kadar Starr Hediyesinde en az bir Efsanevi çıkma şansı.",
+  "They come from the Brawl Stars Wiki, which the community keeps up to date from datamines and in-game observation. Supercell publishes no drop-rate API. This page reads the wiki twice a day, so it changes when the game does.":
+    "Topluluğun oyun dosyalarından ve oyun içi gözlemden güncel tuttuğu Brawl Stars Wiki'den gelir. Supercell bir hediye oranı API'si yayınlamaz. Bu sayfa wikiyi günde iki kez okur, yani oyun değişince değişir.",
+  "This month":
+    "Bu ay",
+  "This season's Starr Drop schedule, your chance of a Legendary today, this week and this month, and every reward inside each drop and box. Updated twice a day.":
+    "Bu sezonun Starr Hediyesi takvimi, bugün, bu hafta ve bu ay Efsanevi çıkma şansın ve her hediye ve kutunun içindeki her ödül. Günde iki kez güncellenir.",
+  "This season's daily schedule, the chance of every rarity, and every reward inside each drop and box. Read from the Brawl Stars Wiki twice a day, so it changes when the game does.":
+    "Bu sezonun günlük takvimi, her nadirliğin şansı ve her hediye ve kutunun içindeki her ödül. Günde iki kez Brawl Stars Wiki'den okunur, yani oyun değişince değişir.",
+  "This week":
+    "Bu hafta",
+  "Updated {date}":
+    "Güncellendi: {date}",
+  "What are the Chaos Drop chances?":
+    "Kaos Hediyesi şansları nedir?",
+  "What are the chances of a Legendary Starr Drop?":
+    "Efsanevi Starr Hediyesi şansı nedir?",
+  "What can you get from a Legendary Starr Drop?":
+    "Efsanevi bir Starr Hediyesinden ne çıkabilir?",
+  "Your Legendary odds":
+    "Efsanevi şansların",
+  "Your chance of a Legendary":
+    "Efsanevi çıkma şansın",
+  "Your first {wins} wins of the day each give a reward, and this season all {wins} are Starr Drops on a normal day.":
+    "Günün ilk {wins} galibiyetinin her biri bir ödül verir ve bu sezon normal bir günde {wins} galibiyetin hepsi Starr Hediyesi.",
+  "Your first {wins} wins of the day each give a reward. On a normal day this season {n} of them are Starr Drops, and the rest are the other drops and boxes in the schedule above.":
+    "Günün ilk {wins} galibiyetinin her biri bir ödül verir. Bu sezon normal bir günde bunların {n} tanesi Starr Hediyesi, geri kalanı yukarıdaki takvimdeki diğer hediyeler ve kutular.",
+  "next special day":
+    "sonraki özel gün",
+  "no special day announced yet":
+    "henüz özel gün duyurulmadı",
+  "of Chaos Drops are Legendary or better":
+    "Kaos Hediyelerinin Efsanevi veya daha iyisi",
+  "wins a day give a reward":
+    "günlük galibiyet ödül verir",
+  "{n} Starr Drops":
+    "{n} Starr Hediyesi",
+  "{n} drops":
+    "{n} hediye",
+  "{p} per Starr Drop, about 1 in {k}. Every Starr Drop starts Rare and can upgrade; the chance it ends as each rarity is {list}.":
+    "Starr Hediyesi başına {p}, yaklaşık {k}'da 1. Her Starr Hediyesi Ender başlar ve yükselebilir; her nadirlik olarak bitme şansı: {list}.",
+  "Chaos Drops":
+    "Kaos Hediyeleri",
+  "Your player tag or name":
+    "Oyuncu etiketin veya adın",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V veya adın",
+  "Tap your account in the list under the box, or type your tag.":
+    "Kutunun altındaki listeden hesabına dokun ya da etiketini yaz.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "Bu adda oyuncu bulunamadı. Onun yerine etiketini yaz: # ile başlar ve oyunda adının altında.",
+  "Daily schedule and every reward":
+    "Günlük takvim ve her ödül",
+  "It rolls a rarity first, then one reward of that rarity. The chance of each rarity:":
+    "Önce bir nadirlik belirler, sonra o nadirlikten bir ödül. Her nadirliğin şansı:",
+  "The best rewards, and your chance in one {drop}":
+    "En iyi ödüller ve tek bir {drop} içindeki şansın",
+  "What can a {drop} give you?":
+    "Bir {drop} sana ne verebilir?",
+  "Your Daily Wins give {n} Starr Drops a day: a {d} chance of at least one Legendary today, {w} this week and {m} this month.":
+    "Günlük Galibiyetlerin günde {n} Starr Hediyesi veriyor: bugün en az bir Efsanevi için {d}, bu hafta {w} ve bu ay {m} şans.",
+  "{n}-gem skin":
+    "{n} elmaslık kostüm",
+  "Star Power":
+    "Yıldız Gücü",
+  "Epic Brawler":
+    "Destansı Savaşçı",
+  "Mythic Brawler":
+    "Gizemli Savaşçı",
+  "Legendary Brawler":
+    "Efsanevi Savaşçı",
+  "Ultra Brawler":
+    "Ultra Savaşçı",
+  "Open a Starr Drop":
+    "Bir Starr Hediyesi aç",
+  "Open a drop":
+    "Bir hediye aç",
+  "Tap it like in the game and see what the real odds give you.":
+    "Oyundaki gibi dokun ve gerçek oranların sana ne verdiğini gör.",
+  "Try opening one":
+    "Birini açmayı dene",
+  "A simulation with the real odds from the Brawl Stars Wiki. Nothing is added to your game account.":
+    "Brawl Stars Wiki'deki gerçek oranlarla bir simülasyon. Oyun hesabına hiçbir şey eklenmez.",
+  "Copied!":
+    "Kopyalandı!",
+  "Keep tapping!":
+    "Dokunmaya devam et!",
+  "Open 10 at once":
+    "10 tanesini birden aç",
+  "Open another":
+    "Bir tane daha aç",
+  "Open another {drop}":
+    "Bir {drop} daha aç",
+  "Share my best":
+    "En iyimi paylaş",
+  "Tap the drop to open it":
+    "Açmak için hediyeye dokun",
+  "Tap the {drop}":
+    "{drop} hediyesine dokun",
+  "Which drop":
+    "Hangi hediye",
+  "Your best so far: {best} ({rarity}).":
+    "Şimdiye kadarki en iyin: {best} ({rarity}).",
+  "{n} drops opened on BrawlZone, best pull: {best} ({rarity}). Try your luck:":
+    "BrawlZone'da {n} hediye açıldı, en iyi çıkan: {best} ({rarity}). Şansını dene:",
+  "{n} opened · {k} Legendary or better":
+    "{n} açıldı · {k} Efsanevi veya daha iyi",
+  "{p} chance per drop, 1 in {n}":
+    "Hediye başına {p} şans, {n}'de 1",
+  "{rarity} {drop}":
+    "{rarity} {drop}",
+  "The full patch notes are on supercell.com:":
+    "Tüm yama notları supercell.com'da:",
+  "What the latest update changed, which brawlers it touched, and what is coming next.":
+    "Son güncelleme neyi değiştirdi, hangi savaşçılara dokundu ve sırada ne var.",
+  " to measure visits in aggregate, which advertising partners use to judge the site. It may set cookies. Visitors in the EEA, the UK and Switzerland are asked first, through the same Google consent message as the ads below; until they agree, no analytics cookies are set. The Bubble panel and the Android app do not load it.":
+    " kullanır; ziyaretleri toplu olarak ölçmek için, reklam ortaklarının siteyi değerlendirmek için kullandığı bir araç. Çerez ayarlayabilir. AEA, Birleşik Krallık ve İsviçre'deki ziyaretçilere önce aşağıdaki reklamlarla aynı Google onay mesajıyla sorulur; kabul edene kadar hiçbir analiz çerezi ayarlanmaz. Bubble paneli ve Android uygulaması onu yüklemez.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent.":
+    "; üçüncü bir tarafta değil, siteyle aynı sunucuda çalışır. Çerez kullanmaz ve kişisel veri saklamaz, bu yüzden onay gerektirmez.",
+  "Google Analytics":
+    "Google Analytics",
+  "Our own counter, plus Google Analytics.":
+    "Kendi sayacımız, artı Google Analytics.",
+  "The website also uses":
+    "Web sitesi ayrıca şunu",
+  "Follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Bir kanalı takip et: yeni bir bağlantı bulunduğu anda paylaşılır, çoğu zaman diğer sitelerden saatler önce.",
+  "On iPhone, notifications work once BrawlZone is on your home screen: tap":
+    "iPhone'da bildirimler BrawlZone ana ekranındayken çalışır: dokun:",
+  "Or follow a channel: a new link goes out the moment it is found.":
+    "Ya da bir kanalı takip et: yeni bir bağlantı bulunduğu anda paylaşılır.",
+  "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
+    "Paylaş, sonra \"Ana Ekrana Ekle\", ve BrawlZone'u oradan aç.",
+  "BrawlZone is made and run by":
+    "BrawlZone'u yapan ve yöneten:",
+  ", a one-person studio in Portugal that also develops the BrawlZone Bubble app for Android. Questions go to the address below.":
+    "; Portekiz'de tek kişilik bir stüdyo, Android için BrawlZone Bubble uygulamasını da geliştiriyor. Sorular aşağıdaki adrese.",
+  "Your in-game name or #tag.":
+    "Oyundaki adın veya #etiketin.",
+  "Best in Ranked right now":
+    "Şu an Aşamalı'da en iyiler",
+  "Full tier list":
+    "Tam tier listesi",
+  "Pick the brawler you keep losing to.":
+    "Sürekli kaybettiğin savaşçıyı seç.",
+  "{rate} win":
+    "{rate} kazanma",
+  "Claim it":
+    "Al",
+  "Free rewards":
+    "Ücretsiz ödüller",
+  "Get the next one":
+    "Bir sonrakini al",
+  "Giveaway":
+    "Çekiliş",
+  "Guess":
+    "Tahmin et",
+  "New every day":
+    "Her gün yeni",
+  "No free link live right now":
+    "Şu an aktif ücretsiz bağlantı yok",
+  "Today in Brawl Stars":
+    "Bugün Brawl Stars'ta",
+  "Who is this brawler?":
+    "Bu savaşçı kim?",
+  "{n} live":
+    "{n} aktif",
+  "From {battles} battles of {players} players we sampled ourselves.":
+    "Kendi incelediğimiz {players} oyuncunun {battles} maçından.",
+  "Updated":
+    "Güncellendi",
+  "November 2026 update":
+    "Kasım 2026 güncellemesi",
+  "Ranked Refresh: what changed":
+    "Aşamalı yenilendi: neler değişti",
+  "The biggest change to Ranked since the 2025 rework.":
+    "2025 yenilemesinden beri Aşamalı'daki en büyük değişiklik.",
+  "The first season reset under the new rules is on {date}.":
+    "Yeni kurallarla ilk sezon sıfırlaması {date} tarihinde.",
+  "Unlocks at 5,000 trophies":
+    "5.000 kupada açılır",
+  "Up from 1,000. If you already have Ranked you keep it, and get a Chaos Drop at 5,000 trophies instead.":
+    "Önceden 1.000'di. Aşamalı zaten açıksa sende kalır ve onun yerine 5.000 kupada bir Kaos Hediyesi alırsın.",
+  "Power 11 at every rank":
+    "Her rütbede Güç 11",
+  "Bronze to Diamond used to take Power 9. Diamond now needs 12 brawlers, the same as Mythic, up from 9.":
+    "Bronz'dan Elmas'a kadar Güç 9 yeterliydi. Elmas artık Gizemli ile aynı şekilde 12 savaşçı istiyor, önceden 9'du.",
+  "6 free maxed brawlers a season":
+    "Her sezon 6 ücretsiz maksimum savaşçı",
+  "Up from 3, to make up for the stricter requirements.":
+    "Önceden 3'tü; daha sıkı şartları telafi etmek için.",
+  "The season reset drops you 2 ranks":
+    "Sezon sıfırlaması 2 rütbe düşürür",
+  "Down from 6, so you start each season much closer to your best. No change to the boost.":
+    "Önceden 6'ydı; böylece her sezona en iyi seviyene çok daha yakın başlarsın. Güçlendirmede değişiklik yok.",
+  "A 2-0 win earns more Elo":
+    "2-0 galibiyet daha fazla Elo kazandırır",
+  "An Epic Win (2-0) gives extra Elo and a Close Match loss (1-2) costs less. Early and middle ranks climb faster.":
+    "Destansı Galibiyet (2-0) ekstra Elo verir, Kıl Payı Maç yenilgisi (1-2) daha az kaybettirir. Başlangıç ve orta rütbelerde daha hızlı yükselinir.",
+  "No teams from Masters I up":
+    "Ustalar I'den itibaren takım yok",
+  "From Masters I and above, Ranked is played without a premade team.":
+    "Ustalar I ve üstünde Aşamalı hazır takım olmadan oynanır.",
+  "A new Pick & Ban screen":
+    "Yeni bir Seçim ve Ban ekranı",
+  "A bigger brawler grid with filters, ban suggestions, pick-order swaps and quick chat while you draft.":
+    "Filtreli daha büyük bir savaşçı ızgarası, ban önerileri, seçim sırası değiştirme ve draft sırasında hızlı sohbet.",
+  "Pro no longer qualifies for BSC":
+    "Pro artık BSC'ye katılım hakkı vermiyor",
+  "Reaching Pro does not qualify you for BSC 2027. The way in is the Championship Challenge.":
+    "Pro'ya ulaşmak sana BSC 2027 için katılım hakkı vermiyor. Yol artık Championship Challenge.",
+  "Source:":
+    "Kaynak:",
+  "Supercell’s November 2026 release notes":
+    "Supercell'in Kasım 2026 sürüm notları",
+  "Every balance change in this update":
+    "Bu güncellemedeki tüm denge değişiklikleri",
 };
