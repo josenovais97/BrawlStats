@@ -69,6 +69,14 @@ const WORDS = {
       `${name}: ${adj} bereinigte Siegquote in ${games} entschiedenen Matches, ${pick} Pickrate`,
     pick: 'Pickrate',
   },
+  ru: {
+    title: 'Сильные, но редко выбираемые',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Бойцы с лучшим скорректированным процентом побед в менее популярной половине состава, среди собранных ${battles}${mode ? ` в режиме «${mode}»` : ''} за последние ${w}. Они побеждают, когда их берут, но берут их редко, а это обычно значит, что их недооценивают, а не что они слабые.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: скорректированный процент побед ${adj}, решённых боёв: ${games}, частота выбора ${pick}`,
+    pick: 'частота выбора',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function Underrated({

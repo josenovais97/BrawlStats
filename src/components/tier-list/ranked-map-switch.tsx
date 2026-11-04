@@ -74,6 +74,19 @@ const WORDS = {
     note: 'Bereinigte Siegquote auf dieser Map in den letzten drei Wochen, bei wenigen Matches an die allgemeine Ranked-Form jedes Brawlers angenähert. Brawler mit weniger als 150 entschiedenen Matches hier werden weggelassen.',
     full: 'Ganze Map-Seite',
   },
+  ru: {
+    group: 'Карта ранговых боёв',
+    all: 'Все карты',
+    empty: (map: string) =>
+      `На карте ${map} ещё ни у одного бойца нет достаточно собранных боёв для места в списке. Это заполнится, когда здесь соберётся больше боёв.`,
+    atRank: (n: string, rank: string, all: string) => `${n} на ранге ${rank} · ${all} всего`,
+    here: (n: string) => `боёв здесь: ${n}`,
+    usual: 'к обычной форме',
+    noteRank: (rank: string) =>
+      `Результаты всех рангов на этой карте с поправкой на то, как каждый боец играет на ранге ${rank}, и с опорой на бои ранга ${rank}, сыгранные здесь. Бойцы, у которых здесь меньше 20 боёв ранга ${rank}, не показаны.`,
+    note: 'Скорректированный процент побед на этой карте за последние три недели; при малом числе боёв опирается на общую ранговую форму бойца. Бойцы, у которых здесь меньше 150 решённых боёв, не показаны.',
+    full: 'Полная страница карты',
+  },
 } satisfies Record<Locale, unknown>;
 
 /** One brawler's record on one Ranked map, as the page serialises it. */

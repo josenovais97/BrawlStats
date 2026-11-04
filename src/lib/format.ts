@@ -180,6 +180,9 @@ export function ordinal(n: number): string {
   if (locale === 'es') return `${n}.º`;
   if (locale === 'pt') return `${n}º`;
   if (locale === 'tr' || locale === 'de') return `${n}.`; // Turkish and German: "3."
+  // Russian: the suffix agrees with the noun (3-е место, 107-й боец), so the
+  // dictionary sentence carries it and this is the bare number.
+  if (locale === 'ru') return `${n}`;
 
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;

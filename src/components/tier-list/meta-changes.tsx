@@ -12,7 +12,7 @@ import {
   spanLabel,
   tierRank,
 } from '@/lib/meta-changes';
-import { fmtDecimal, spanText, type Locale } from '@/lib/i18n';
+import { fmtDecimal, ruPlural, spanText, type Locale } from '@/lib/i18n';
 import type { BABrawler } from '@/types/brawlapi';
 import type { MetaMover, Tier } from '@/types/stats';
 
@@ -98,6 +98,22 @@ const WORDS = {
     scoreWord: 'Score',
     placeWord: (n: number) => (n === 1 ? 'Platz' : 'Plätze'),
     newIn: (t: string) => `neu in ${t}`,
+  },
+  ru: {
+    tierMove: (from: string, to: string) => `из тира ${from} в ${to}, `,
+    places: (n: number, up: boolean) => `${up ? 'вверх' : 'вниз'} на ${n} ${ruPlural(n, 'место', 'места', 'мест')}, `,
+    score: 'Мета-рейтинг',
+    tier: (t: string) => `Тир ${t}`,
+    whatChanged: 'Что изменилось',
+    against: (span: string) => `По сравнению с последним сопоставимым замером, ${span}`,
+    riser: 'Главный взлёт',
+    faller: 'Главное падение',
+    tierChanges: 'Смена тиров',
+    held: (n: number) => `Все бойцы остались в своих тирах. Сдвинулись внутри них: ${n}.`,
+    upDown: (up: number, down: number) => `${up} вверх, ${down} вниз`,
+    scoreWord: 'Рейтинг',
+    placeWord: (n: number) => ruPlural(n, 'место', 'места', 'мест'),
+    newIn: (t: string) => `новый в ${t}`,
   },
 } satisfies Record<Locale, unknown>;
 

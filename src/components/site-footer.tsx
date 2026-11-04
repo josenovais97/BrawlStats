@@ -184,6 +184,23 @@ const WORDS: Record<Locale, Record<string, string>> = {
     disclaimer: 'Dieses Material ist inoffiziell und wird nicht von Supercell unterstützt. Weitere Informationen findest du in der',
     policy: 'Fan-Content-Richtlinie von Supercell', notAffiliated: 'steht in keiner Verbindung zu Supercell',
   },
+  ru: {
+    Stats: 'Статистика', Tools: 'Инструменты', Game: 'Игра',
+    Brawlers: 'Бойцы', 'Tier List': 'Тир-лист', 'Ranked Maps': 'Карты ранговых боёв', Maps: 'Карты',
+    Leaderboard: 'Рейтинг игроков', Draft: 'Драфт', 'Team Comps': 'Составы команд', Compare: 'Сравнить', Daily: 'Каждый день',
+    'Meta Report': 'Обзор меты', 'Hidden Meta': 'Скрытая мета', 'Daily Challenge': 'Загадка дня',
+    'Patch Impact': 'Влияние патчей', 'How Scores Work': 'Как считается рейтинг',
+    'Android App': 'Приложение для Android', 'Community Events': 'События сообщества', Cosmetics: 'Косметика',
+    'Starr Drops': 'Призы Старр', News: 'Новости', 'Release Notes': 'Описание обновлений', 'Free Rewards': 'Бесплатные награды',
+    tagline:
+      'Статистика Brawl Stars, которая показывает, где ты находишься. Поиск игроков и клубов, тир-листы и лучшие бойцы для каждой карты по боям, которые мы собираем сами.',
+    follow: 'Подписаться и поддержать', coffee: 'Угости меня кофе', free: 'Бесплатно, без платного доступа.',
+    googlePlay: 'BrawlZone Bubble в Google Play',
+    getGame: 'BrawlZone Bubble: помощник драфта поверх игры. Бесплатно.', about: 'О сайте', privacy: 'Конфиденциальность',
+    terms: 'Условия использования', contact: 'Контакты', sources: 'Данные и изображения:',
+    disclaimer: 'Этот материал неофициальный и не одобрен Supercell. Подробнее читай в',
+    policy: 'Правилах Supercell для фан-контента', notAffiliated: 'не связан с Supercell',
+  },
 };
 
 const EN: Record<string, string> = {

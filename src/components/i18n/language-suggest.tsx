@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { LocaleFlags } from '@/components/i18n/flags';
-import { isTranslatedPath, localeOfPath, localePath, stripLocale, type Locale } from '@/lib/i18n';
+import { isIntlLocale, isTranslatedPath, localeOfPath, localePath, stripLocale, type Locale } from '@/lib/i18n';
 
 /**
  * "This page is also in Portuguese" -- for a visitor whose browser asks for
@@ -42,7 +42,7 @@ function remembered(): string | null {
 function browserLocale(): Locale | null {
   for (const tag of navigator.languages ?? [navigator.language]) {
     const base = tag.toLowerCase().split('-')[0];
-    if (base === 'es' || base === 'pt' || base === 'tr' || base === 'de' || base === 'en') return base;
+    if (base === 'en' || isIntlLocale(base)) return base;
   }
   return null;
 }
@@ -53,6 +53,7 @@ const COPY: Record<Locale, { text: string; go: string; close: string }> = {
   pt: { text: 'Esta página também está em português.', go: 'Ver em português', close: 'Fechar' },
   tr: { text: 'Bu sayfa Türkçe olarak da var.', go: 'Türkçe oku', close: 'Kapat' },
   de: { text: 'Diese Seite gibt es auch auf Deutsch.', go: 'Auf Deutsch lesen', close: 'Schließen' },
+  ru: { text: 'Эта страница есть и на русском.', go: 'Читать на русском', close: 'Закрыть' },
 };
 
 export function LanguageSuggest() {

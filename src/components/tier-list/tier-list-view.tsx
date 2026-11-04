@@ -32,7 +32,7 @@ import { ShareImageButton } from '@/components/share-image-button';
 import { getT } from '@/lib/t';
 import { TIER_COPY, type TierCopy } from '@/components/tier-list/tier-list-copy';
 import { LanguageLinks } from '@/components/i18n/language-links';
-import { fmtDate, fmtDecimal, fmtNumber, fmtPercent, localePath, rankLabel, spanText, type Locale } from '@/lib/i18n';
+import { fmtDate, fmtDecimal, fmtNumber, fmtPercent, localePath, rankLabel, ruPlural, spanText, type Locale } from '@/lib/i18n';
 import { gameWords } from '@/lib/i18n-game';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
 import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
@@ -102,6 +102,7 @@ function windowText(windowKey: TierWindowKey, locale: Locale): string {
   if (locale === 'en') return sublabel;
   if (locale === 'tr') return days === 1 ? '24 saat' : `${days} gün`;
   if (locale === 'de') return days === 1 ? '24 Stunden' : `${days} Tage`;
+  if (locale === 'ru') return days === 1 ? '24 часа' : `${days} ${ruPlural(days, 'день', 'дня', 'дней')}`;
   if (days === 1) return '24 horas';
   return locale === 'es' ? `${days} días` : `${days} dias`;
 }

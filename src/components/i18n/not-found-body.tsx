@@ -38,6 +38,12 @@ const WORDS = {
     back: 'Zurück zur Suche',
     tiers: 'Tierlist',
   },
+  ru: {
+    title: 'Страница не найдена',
+    body: 'Такой страницы нет, или она когда-то была, а теперь её нет. Карты и режимы меняются, поэтому старая ссылка может пережить то, на что она указывала.',
+    back: 'Вернуться к поиску',
+    tiers: 'Тир-лист',
+  },
 };
 
 /** The 404, in the language of the address that was asked for. */

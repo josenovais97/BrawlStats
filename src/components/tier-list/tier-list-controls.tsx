@@ -106,6 +106,18 @@ const WORDS: Record<
     modeGroup: 'Spielmodus',
     sampled: (n) => `${n} erfasste Matches`,
   },
+  ru: {
+    format: { ranked: { label: 'Ранговые', sublabel: 'Соревновательные' }, trophy: { label: 'Трофеи', sublabel: 'Путь к славе' } },
+    window: { '24h': 'Мета', '7d': 'Свежее' },
+    formatGroup: 'Вид тир-листа',
+    windowGroup: 'Период',
+    yourRank: 'Твой ранг',
+    allRanks: 'Все',
+    lobbies: (rank) => `Ранговые бои на ранге ${rank}`,
+    allModes: 'Все режимы',
+    modeGroup: 'Режим игры',
+    sampled: (n) => `собрано боёв: ${n}`,
+  },
 };
 
 export function TierListControls({
