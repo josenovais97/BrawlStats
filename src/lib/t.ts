@@ -1,5 +1,6 @@
 import { ES } from '@/i18n/es';
 import { PT } from '@/i18n/pt';
+import { TR } from '@/i18n/tr';
 import type { Locale } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { fill, makeT, type T, type Vars } from '@/lib/t-core';
@@ -19,7 +20,7 @@ export { fill, type T, type Vars };
  * from `components/i18n/use-t`, which carries a much smaller dictionary.
  */
 
-const DICTS: Partial<Record<Locale, Record<string, string>>> = { es: ES, pt: PT };
+const DICTS: Partial<Record<Locale, Record<string, string>>> = { es: ES, pt: PT, tr: TR };
 
 export function translate(locale: Locale, text: string, vars?: Vars): string {
   return fill(DICTS[locale]?.[text] ?? text, vars);
