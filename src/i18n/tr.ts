@@ -2797,11 +2797,811 @@ export const TR: Record<string, string> = {
   "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
     "Dört tahminden sonra tahta cevabın yıldız gücünü, sekizden sonra aksesuarını gösterir; oyundaki gerçek simgeler, adları gizli, çünkü bir ad aranabilir ama bir resim hafıza testidir.",
   "Amber":
-    "Amber",
+    "Sarı",
   "Brawl Stars daily challenge — guess the brawler":
     "Brawl Stars günlük bulmacası: savaşçıyı tahmin et",
   "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
     "Sınıfın oku yok, çünkü Keskin Nişancı'dan Tank'a bir yön yok. Tier'a girecek kadar Aşamalı maçı olmayan bir savaşçı tahmin yerine bir tire gösterir.",
   "Daily challenge":
     "Günlük bulmaca",
+  "Green":
+    "Yeşil",
+  "How the clues work":
+    "İpuçları nasıl çalışır",
+  "Movement":
+    "Hareket",
+  "One brawler a day. Everybody gets the same one, and it changes at midnight UTC.":
+    "Günde bir savaşçı. Herkese aynısı düşer ve UTC gece yarısı değişir.",
+  "Released":
+    "Çıkış",
+  "Stuck?":
+    "Takıldın mı?",
+  "Today’s puzzle could not be prepared. It returns once the brawler catalogue is reachable again.":
+    "Bugünün bulmacası hazırlanamadı. Savaşçı kataloğuna tekrar ulaşılınca geri gelir.",
+  "Your progress is kept in this browser only. No account, nothing stored on our side.":
+    "İlerlemen yalnızca bu tarayıcıda tutulur. Hesap yok, bizim tarafımızda hiçbir şey saklanmaz.",
+  "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.":
+    "oyunun kullandığı adlandırılmış kademelerdir (Çok Yavaş'tan Çok Hızlı'ya, Çok Kısa'dan Çok Uzun'a), ham sayılar değil; çünkü kimse 855'in hızlı olup olmadığını bilmez ama herkes Çok Hızlı'nın Hızlı'yı geçtiğini bilir.",
+  "comes from the live":
+    "canlı şu listeden gelir:",
+  "is exact.":
+    "tam doğru.",
+  "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.":
+    "bir adım uzakta: komşu bir nadirlik, yanındaki tier ya da cevaptan en fazla beş sıra önce veya sonra çıkmış bir savaşçı. Bir ok cevabı gösterir: ▲ daha yüksek, ▼ daha düşük demek.",
+  "is the brawler’s place in release order, not a date.":
+    "savaşçının çıkış sırasındaki yeridir, bir tarih değil.",
+  "range":
+    "menzil",
+  "ranked tier list":
+    "Aşamalı tier listesi",
+  "reload":
+    "şarjör dolumu",
+  ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.":
+    ". Bu bulgular sonradan yeniden hesaplanamaz, bu yüzden arşiv geriye doğru uzanmak yerine oluşturulduğu günden başlar.",
+  "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.":
+    "Her kart, belirtilen bir topluluk üzerinde belirtilen bir niceliğin en büyük değeridir: %1'in altında kullanılan savaşçılar arasında en yüksek kazanma oranı, bir savaşçı ile bir harita arasındaki en büyük fark vb. Aynı veri her zaman aynı seti üretir; yani buradaki hiçbir şey bir model tarafından yazılmaz ya da elle seçilmez. Kazanma oranları örneklem ortalamasına göre düzeltilir, böylece incelenen oyuncuların daha güçlü olduğu bir hafta her savaşçıyı güçlendirilmiş gibi göstermez.",
+  "Every day is kept at its own address —":
+    "Her gün kendi adresinde saklanır:",
+  "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.":
+    "Bugün incelenen Brawl Stars maçlarından çıkan bulgular: kimsenin kullanmadığı ama kazanmaya devam eden seçim, kaybeden popüler seçim, en tek taraflı eşleşme ve bir haritada farklı davranan savaşçı.",
+  "How these are chosen.":
+    "Bunlar nasıl seçiliyor.",
+  "What BrawlZone found in the data today":
+    "BrawlZone bugün verilerde ne buldu",
+  "browse the archive":
+    "arşive göz at",
+  "or":
+    "veya",
+  "subscribe by RSS":
+    "RSS ile abone ol",
+  "A brawler listed here has a dashed marker on its own trend chart, so you can see what the change actually did.":
+    "Burada listelenen bir savaşçının kendi trend grafiğinde kesikli bir işaret var; böylece değişikliğin gerçekte ne yaptığını görebilirsin.",
+  "All comps":
+    "Tüm dizilimler",
+  "Comps winning now":
+    "Şu an kazanan dizilimler",
+  "Falling":
+    "Düşenler",
+  "Not enough comparable snapshots yet. This fills in once a week of daily snapshots has been collected under a stable sample.":
+    "Henüz yeterli karşılaştırılabilir ölçüm yok. Kararlı bir örneklemle bir haftalık günlük ölçüm toplanınca dolar.",
+  "Nothing moved enough to report.":
+    "Bildirilecek kadar hareket eden bir şey yok.",
+  "Rising":
+    "Yükselenler",
+  "The names Supercell published.":
+    "Supercell'in yayınladığı isimler.",
+  "This week in the Brawl Stars meta":
+    "Bu hafta Brawl Stars metasında",
+  "This week in the meta":
+    "Bu hafta metada",
+  "Tier changes":
+    "Tier değişiklikleri",
+  "What moved between {fromDate} and {toDate}, measured from sampled battles.":
+    "{fromDate} ile {toDate} arasında neler hareket etti, incelenen maçlardan ölçüldü.",
+  "What moved in the Brawl Stars meta this week: the brawlers rising and falling, the tiers they crossed, what the latest update changed, and the team comps winning right now.":
+    "Bu hafta Brawl Stars metasında neler hareket etti: yükselen ve düşen savaşçılar, geçtikleri tier'lar, son güncellemenin değiştirdikleri ve şu an kazanan takım dizilimleri.",
+  "What moved this week, measured from sampled battles.":
+    "Bu hafta neler hareket etti, incelenen maçlardan ölçüldü.",
+  "What the update changed":
+    "Güncelleme neyi değiştirdi",
+  "Whether any of it moved":
+    "Bunun bir şeyi oynatıp oynatmadığı",
+  "is measured separately.":
+    "ayrıca ölçülür.",
+  "{sampleSize} battles ·":
+    "{sampleSize} maç ·",
+  "{sampleSize} battles · {winRateNow} win rate":
+    "{sampleSize} maç · {winRateNow} kazanma oranı",
+  "{winRateNow} win rate":
+    "{winRateNow} kazanma oranı",
+  "· mode average {baseline}":
+    "· mod ortalaması {baseline}",
+  "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.":
+    "Bir kostümün payı incelenen oyuncu-savaşçı yerlerine, bir simgeninki incelenen oyunculara göredir. Varsayılan kostümler dışarıda bırakılır: savaşçının kendi adını taşıyan kostüm kimsenin seçtiği bir şey değildir. Varsayılan dahil savaşçı bazlı kullanım her savaşçının kendi sayfasında.",
+  "Brawl Stars cosmetics: which skins and icons players actually use":
+    "Brawl Stars kozmetikleri: oyuncuların gerçekten kullandığı kostümler ve simgeler",
+  "Browse every icon →":
+    "Tüm simgelere göz at →",
+  "Browse every skin →":
+    "Tüm kostümlere göz at →",
+  "Every skin and profile icon seen in the sampled player pool, ranked by how many people equip it. Not a list of what exists, a measurement of what gets worn.":
+    "İncelenen oyuncu havuzunda görülen her kostüm ve profil simgesi, kaç kişinin taktığına göre sıralı. Var olanların listesi değil, giyilenlerin ölçümü.",
+  "How this is counted":
+    "Bu nasıl sayılıyor",
+  "Most worn skins":
+    "En çok giyilen kostümler",
+  "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.":
+    "Sayılar dönen ölçüm örnekleminden gelir; bu örneklem her gün incelenen oyuncu havuzunun dörtte birini kaydeder, yani bu bir sayım değil bir ankettir. Bildirdiği tek şey olan paylar için bu yeterli ve buradaki bir sayının asla oyunda bir şeye kaç kişinin sahip olduğunun sayısı olmamasının sebebi de bu.",
+  "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.":
+    "İncelenen tüm oyuncu-savaşçı yerlerinin payı; böylece farklı savaşçılardaki kostümler doğrudan karşılaştırılabilir.",
+  "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.":
+    "Oyuncuların gerçekten taktığı kostümler ve profil simgeleri; bir katalogdan listelenmez, incelenen havuzdan ölçülür.",
+  "{length} seen across the roster, ranked by how many of the sampled slots wear each one.":
+    "Kadro genelinde {length} tane görüldü; incelenen yerlerin kaçında giyildiğine göre sıralı.",
+  "{length} seen on sampled accounts. The icon sits on the account, so these are shares of players rather than of brawlers.":
+    "İncelenen hesaplarda {length} tane görüldü. Simge hesapta durur, bu yüzden bunlar savaşçıların değil oyuncuların paylarıdır.",
+  "Announced, not yet released":
+    "Duyuruldu, henüz çıkmadı",
+  "Brawl Stars update notes":
+    "Brawl Stars güncelleme notları",
+  "Contents":
+    "İçindekiler",
+  "Details not published yet":
+    "Ayrıntılar henüz yayınlanmadı",
+  "Every brawler named in {title}, linked to its page here.":
+    "{title} içinde adı geçen her savaşçı, buradaki sayfasına bağlantıyla.",
+  "Published":
+    "Yayınlandı",
+  "Published by Supercell, reproduced here for convenience.":
+    "Supercell tarafından yayınlandı, kolaylık olsun diye burada aktarıldı.",
+  "Release notes":
+    "Sürüm notları",
+  "Release notes are unavailable right now. Try again shortly, or read them on":
+    "Sürüm notları şu anda kullanılamıyor. Birazdan tekrar dene ya da şurada oku:",
+  "Revealed in a Brawl Talk and coming to the game. Everything known so far.":
+    "Bir Brawl Talk'ta duyuruldu ve oyuna geliyor. Şimdiye kadar bilinen her şey.",
+  "Stats and abilities come from the community wiki and fill in over the days after a reveal, so a brawler announced yesterday may show little beyond its name.":
+    "İstatistikler ve yetenekler topluluk wikisinden gelir ve duyurudan sonraki günlerde dolar; yani dün duyurulan bir savaşçı adından başka pek bir şey göstermeyebilir.",
+  "The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.":
+    "En son resmi Brawl Stars sürüm notları: yeni savaşçılar, hiperşarjlar, denge değişiklikleri ve hata düzeltmeleri.",
+  "The latest official update notes, straight from the Brawl Stars team.":
+    "Doğrudan Brawl Stars ekibinden en son resmi güncelleme notları.",
+  "Who changed":
+    "Kim değişti",
+  "for what we track ourselves.":
+    "(kendi takip ettiklerimiz için).",
+  "see detected in-game changes":
+    "oyunda tespit edilen değişikliklere bak",
+  "supercell.com":
+    "supercell.com",
+  "Announcements from the Brawl Stars team, and the new brawlers and abilities detected from the game API. For how the sampled meta is shifting, see the":
+    "Brawl Stars ekibinden duyurular ve oyun API'sinden tespit edilen yeni savaşçılar ve yetenekler. İncelenen metanın nasıl değiştiği için bak:",
+  "Brawl Stars news":
+    "Brawl Stars haberleri",
+  "Brawler removed":
+    "Savaşçı kaldırıldı",
+  "Change":
+    "Değişiklik",
+  "Detected":
+    "Tespit edildi",
+  "Detected game changes":
+    "Tespit edilen oyun değişiklikleri",
+  "Gadget":
+    "Aksesuar",
+  "Gear":
+    "Eşya",
+  "New brawler":
+    "Yeni savaşçı",
+  "New brawlers, star powers, gadgets and hypercharges.":
+    "Yeni savaşçılar, yıldız güçleri, aksesuarlar ve hiperşarjlar.",
+  "News":
+    "Haberler",
+  "Official Brawl Stars announcements, plus roster and kit changes detected from the game API.":
+    "Resmi Brawl Stars duyuruları, ayrıca oyun API'sinden tespit edilen kadro ve kit değişiklikleri.",
+  "Official news":
+    "Resmi haberler",
+  "Read on supercell.com":
+    "supercell.com'da oku",
+  "Removed":
+    "Kaldırıldı",
+  "Star power":
+    "Yıldız gücü",
+  "Straight from the Brawl Stars team.":
+    "Doğrudan Brawl Stars ekibinden.",
+  "Straight from the game":
+    "Doğrudan oyundan",
+  "What this means for the meta":
+    "Bu, meta için ne anlama geliyor",
+  "Brawl Stars findings for {label}.":
+    "{label} için Brawl Stars bulguları.",
+  "Daily":
+    "Günlük",
+  "Today":
+    "Bugün",
+  "What BrawlZone found on {label}":
+    "BrawlZone {label} tarihinde ne buldu",
+  "{findings} findings from Brawl Stars battles sampled on {label}, including the strongest pick nobody used and the most one-sided matchup of the day.":
+    "{label} tarihinde incelenen Brawl Stars maçlarından {findings} bulgu; kimsenin kullanmadığı en güçlü seçim ve günün en tek taraflı eşleşmesi dahil.",
+  "Brawl Stars tier list maker. Build and share your own":
+    "Brawl Stars tier listesi yapıcı. Kendi listeni yap ve paylaş",
+  "Nothing here is saved on a server — the link":
+    "Burada hiçbir şey bir sunucuya kaydedilmez: bağlantı",
+  "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.":
+    "Yüz küsur savaşçının hepsini kendin sırala, sonra tahtayı tek bir bağlantıyla paylaş. Bir savaşçıya ve bir tier'a dokun ya da bilgisayardaysan sürükle.",
+  "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.":
+    "Her Brawl Stars savaşçısını kendin sırala ve tek bir bağlantıyla paylaş. Boş bir tahtadan ya da canlı Aşamalı metasından başla, sonra onunla tartış.",
+  "The brawler metadata source is not responding, so there is nothing to rank yet. Try again shortly.":
+    "Savaşçı veri kaynağı yanıt vermiyor, bu yüzden henüz sıralanacak bir şey yok. Birazdan tekrar dene.",
+  "Tier list maker":
+    "Tier listesi yapıcı",
+  "Your call":
+    "Senin kararın",
+  "is":
+    "zaten",
+  "or the":
+    "veya",
+  "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the":
+    "tier listesinin kendisidir, bu yüzden biri ona sahip olduğu sürece çalışır. Görüşten değil incelenen maçlardan oluşturulan ölçülmüş sürüm için bak:",
+  "trophy list":
+    "kupa listesi",
+  "Cosmetics":
+    "Kozmetikler",
+  "Every Brawl Stars profile icon, ranked by how many players use it":
+    "Her Brawl Stars profil simgesi, kaç oyuncunun kullandığına göre sıralı",
+  "No icon data has been sampled yet.":
+    "Henüz simge verisi incelenmedi.",
+  "Nothing sampled yet. The pool refreshes every two hours.":
+    "Henüz incelenmiş bir şey yok. Havuz iki saatte bir yenilenir.",
+  "Profile icons":
+    "Profil simgeleri",
+  "The full profile icon catalogue measured from sampled accounts: which icons players actually wear, and which are almost never seen.":
+    "İncelenen hesaplardan ölçülen tam profil simgesi kataloğu: oyuncuların gerçekten kullandığı simgeler ve neredeyse hiç görülmeyenler.",
+  "{length} icons seen on sampled accounts, ranked by share of players.":
+    "İncelenen hesaplarda {length} simge görüldü, oyuncu payına göre sıralı.",
+  "Daily archive":
+    "Günlük arşiv",
+  "Daily findings archive":
+    "Günlük bulgular arşivi",
+  "Each day's findings kept at its own address. They cannot be recomputed once their windows roll past, so this reaches back only as far as the day it started.":
+    "Her günün bulguları kendi adresinde saklanır. Dönemleri geçtikten sonra yeniden hesaplanamazlar, bu yüzden bu arşiv yalnızca başladığı güne kadar uzanır.",
+  "Every day of BrawlZone findings, kept at its own address. What the sampled Brawl Stars battles showed on each date, from the strongest unused pick to the most one-sided matchup.":
+    "BrawlZone bulgularının her günü kendi adresinde. İncelenen Brawl Stars maçlarının her tarihte ne gösterdiği; kullanılmayan en güçlü seçimden en tek taraflı eşleşmeye.",
+  "Nothing archived yet. Today’s report is written as it is published, so the first entry appears once":
+    "Henüz arşivlenen bir şey yok. Bugünün raporu yayınlandıkça yazılır, bu yüzden ilk kayıt",
+  "RSS":
+    "RSS",
+  "finding":
+    "bulgu",
+  "findings":
+    "bulgu",
+  "have been generated.":
+    "oluşturulunca görünür.",
+  "today’s findings":
+    "bugünün bulguları",
+  "Every Brawl Stars skin, ranked by how many players wear it":
+    "Her Brawl Stars kostümü, kaç oyuncunun giydiğine göre sıralı",
+  "No skin data has been sampled yet.":
+    "Henüz kostüm verisi incelenmedi.",
+  "The full skin catalogue measured from sampled accounts: which skins are actually equipped, and which almost nobody uses. Searchable by skin or brawler.":
+    "İncelenen hesaplardan ölçülen tam kostüm kataloğu: hangi kostümler gerçekten takılı ve hangilerini neredeyse kimse kullanmıyor. Kostüme veya savaşçıya göre aranabilir.",
+  "{length} skins seen in the sampled pool, ranked by share of player-brawler slots. Default skins are excluded.":
+    "İncelenen havuzda {length} kostüm görüldü, oyuncu-savaşçı yeri payına göre sıralı. Varsayılan kostümler hariç.",
+  "From {sampleSize} sampled battles.":
+    "İncelenen {sampleSize} maçtan.",
+  "See every matchup":
+    "Tüm eşleşmeleri gör",
+  "See the full record":
+    "Tam kaydı gör",
+  "See the map":
+    "Haritayı gör",
+  "See what changed":
+    "Neyin değiştiğini gör",
+  "See who else pairs well":
+    "Başka kimlerin iyi eşleştiğini gör",
+  "See why it underperforms":
+    "Neden düşük performans gösterdiğini gör",
+  "The giant killer":
+    "Dev avcısı",
+  "The map surprise":
+    "Harita sürprizi",
+  "The meta trap":
+    "Meta tuzağı",
+  "The overnight rise":
+    "Bir gecede yükselen",
+  "The secret duo":
+    "Gizli ikili",
+  "The secret pick":
+    "Gizli seçim",
+  "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.":
+    "Hiçbir şey kanıt alt sınırını geçmedi. Her bulgunun arkasında en az 300 incelenmiş maç olmalı ve sayfa bir tesadüf göstermektense hiçbir şey göstermemeyi tercih eder.",
+  "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.":
+    "İncelenen maçların bir sıralama tablosunun söylemediği şeyler. Her biri o gün verideki türünün en büyük farkıdır: bir görüş değil ve bariz sütuna göre sıralanmış bir liste değil.",
+  "What we found":
+    "Ne bulduk",
+  "What we found today":
+    "Bugün ne bulduk",
+  "Played":
+    "Oynanan",
+  " of ":
+    " / ",
+  "Copy share link":
+    "Paylaşım bağlantısını kopyala",
+  "Every brawler is placed. Tap one in a row to send it back here.":
+    "Her savaşçı yerleşti. Buraya geri göndermek için bir satırdakine dokun.",
+  "Place the selected brawler in {tier} tier":
+    "Seçili savaşçıyı {tier} tier'a yerleştir",
+  "Start from the live meta":
+    "Canlı metadan başla",
+  "placed":
+    "yerleşti",
+  "selected — now tap a tier to place it.":
+    "seçildi; şimdi yerleştirmek için bir tier'a dokun.",
+  "{name}: tap to select, tap again to unrank":
+    "{name}: seçmek için dokun, sıralamadan çıkarmak için tekrar dokun",
+  "{name}: tap to select, then tap a tier":
+    "{name}: seçmek için dokun, sonra bir tier'a dokun",
+  ". Bubble size is the sample behind each point. Tap one for its numbers.":
+    ". Baloncuk boyutu her noktanın arkasındaki örneklemdir. Rakamları için birine dokun.",
+  "Every rated brawler plotted by pick rate against meta score, over {windowDays} days":
+    "Puanlanan her savaşçı, {windowDays} gün boyunca seçilme oranına karşı meta puanıyla çizildi",
+  "How often it is picked →":
+    "Ne sıklıkla seçiliyor →",
+  "How well it does →":
+    "Ne kadar iyi oynuyor →",
+  "Lit brawlers are the ones this account can field. It has":
+    "Parlayan savaşçılar bu hesabın sahaya sürebildikleri. Sahip oldukları:",
+  "Meta":
+    "Meta",
+  "Out of favour":
+    "Gözden düşenler",
+  "Sleepers":
+    "Uykudakiler",
+  "in the meta corner":
+    "meta köşesinde",
+  "picked · {sampleSize} battles":
+    "seçilme · {sampleSize} maç",
+  "sleepers":
+    "uykudakilerden",
+  "strongest 30%":
+    "en güçlü %30",
+  "weakest 40%":
+    "en zayıf %40",
+  "win rate ·":
+    "kazanma oranı ·",
+  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
+    "{windowDays} gün boyunca puanlanacak kadar Aşamalı maçı olan {count} savaşçı. Baloncuk boyutu her birinin arkasındaki örneklemdir, yani en belirsiz noktalar en küçükleridir. Rakamları için birine dokun.",
+  "{haveMeta} of the {length}":
+    "{length} tanenin {haveMeta} tanesi",
+  "{haveSleepers} of the {length}":
+    "{length} tanenin {haveSleepers} tanesi",
+  "A new brawler at midnight UTC.":
+    "UTC gece yarısı yeni bir savaşçı.",
+  "Average {v} guesses":
+    "Ortalama {v} tahmin",
+  "Best":
+    "En iyi",
+  "Copied":
+    "Kopyalandı",
+  "Copy result":
+    "Sonucu kopyala",
+  "Got it in {length}":
+    "{length} tahminde bildin",
+  "Guess a brawler":
+    "Bir savaşçı tahmin et",
+  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
+    "Bugünün savaşçısını tahmin et. Her tahmin beş ipucunda ne kadar yakın olduğunu gösterir: yeşil tam doğru, sarı bir adım uzakta ve bir ok cevabı gösterir.",
+  "Guesses to solve":
+    "Çözmek için tahmin",
+  "Next brawler in":
+    "Sonraki savaşçıya",
+  "Range":
+    "Menzil",
+  "Reload":
+    "Şarjör dolumu",
+  "Revealed":
+    "Açıldı",
+  "Streak":
+    "Seri",
+  "Type a brawler name…":
+    "Bir savaşçı adı yaz…",
+  "Won":
+    "Kazanılan",
+  "Yesterday was":
+    "Dünkü:",
+  "guess":
+    "tahmin",
+  "guesses":
+    "tahmin",
+  "higher":
+    "daha yüksek",
+  "in {left} {v}":
+    "{left} {v} içinde",
+  "lower":
+    "daha düşük",
+  "Nothing matches “{query}”.":
+    "“{query}” ile eşleşen bir şey yok.",
+  "Search by skin or brawler":
+    "Kostüme veya savaşçıya göre ara",
+  "Search icons by number":
+    "Simgeleri numaraya göre ara",
+  "Search profile icons":
+    "Profil simgelerinde ara",
+  "Search skins":
+    "Kostümlerde ara",
+  "of":
+    "/",
+  "{stats} first-guess solve":
+    "{stats} ilk tahminde çözüm",
+  "{stats} first-guess solves":
+    "{stats} ilk tahminde çözüm",
+  "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.":
+    "% payı. Bu ağırlık seçilmedi, ölçüldü: oyuncu becerisini tam olarak kontrol eden bir tahminciye karşı düzeltilmiş kazanma oranı r = +0,77, seçilme oranı r = +0,22 puan alır; yani popülerlik gürültü değil zayıf ama gerçek bir güç işaretidir ve birleşik işaretteki payı yaklaşık beşte birdir, şu an taşıdığı ağırlık da bu. Eskiden %35'ti; o hâliyle gerçek dağılımın %45'ini üretiyor ve savaşçıları sadece popülerlikle kırk sıra oynatıyordu. Yine de vasat kayda sahip popüler bir savaşçı, daha iyi kayda sahip popüler olmayan birini geçebilir. İki sayı da her satırda yazılıdır, böylece kendin tartabilirsin.",
+  "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.":
+    "İkisi büyük ölçüde uyuşur (r = +0,77) ve önemli yerde ayrışır. Bibi sadece kazanma oranıyla 96., her oyuncu kendi ortalamasıyla karşılaştırılınca 16. oldu; çünkü çoğunlukla daha zayıf hesaplar tarafından oynanıyor ve onların sonuçları onunmuş gibi okunuyordu.",
+  "A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.":
+    "Bir harita sayfası savaşçıları o haritada oynanan maçlardan sıralar. Bir haritada bir şey söyleyecek kadar incelenmiş maç yoksa modun seçimlerine geri döner ve bunu sayfada söyler. Bir öneri, haritaya özel değilse asla haritaya özelmiş gibi sunulmaz.",
+  "Almost nobody picks {name}. It is winning anyway.":
+    "Neredeyse kimse {name} seçmiyor. Yine de kazanıyor.",
+  "Back to brawlers":
+    "Savaşçılara dön",
+  "Battle history only goes back ~25 matches":
+    "Maç geçmişi yalnızca ~25 maç geriye gider",
+  "Best here":
+    "Burada en iyi",
+  "Best picks for your map":
+    "Haritan için en iyi seçimler",
+  "Brawl Stars data is temporarily unavailable. Try again shortly.":
+    "Brawl Stars verileri geçici olarak kullanılamıyor. Birazdan tekrar dene.",
+  "Brawl-O-Ween":
+    "Brawl-O-Ween",
+  "Claim by pressing and holding Loony once all 6 daily wins are done.":
+    "6 günlük galibiyetin hepsi bitince Loony'ye basılı tutarak al.",
+  "Coins, power points and playtime are estimates":
+    "Altın, güç puanı ve oynama süresi tahminidir",
+  "Could not check that guess.":
+    "Bu tahmin kontrol edilemedi.",
+  "Could not copy. Select the grid and copy it by hand.":
+    "Kopyalanamadı. Izgarayı seç ve elle kopyala.",
+  "Could not reach the server. Try again.":
+    "Sunucuya ulaşılamadı. Tekrar dene.",
+  "Could not read this club right now.":
+    "Bu kulüp şu an okunamadı.",
+  "Decide what to upgrade":
+    "Ne yükselteceğine karar ver",
+  "Derived from published upgrade costs and victory counts. Bling is not exposed by the API at all, so we do not show it.":
+    "Yayınlanan yükseltme maliyetlerinden ve galibiyet sayılarından türetilir. Mücevher API tarafından hiç sunulmadığı için göstermiyoruz.",
+  "Enter bans and picks, get the answer":
+    "Banları ve seçimleri gir, cevabı al",
+  "Every daily win adds a reward to Loony, up to 6 wins a day.":
+    "Her günlük galibiyet Loony'ye bir ödül ekler, günde en fazla 6 galibiyet.",
+  "Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.":
+    "Oyunda hâlâ bulunan her harita. Yaklaşık dört yüz. Bilerek rotasyon denmiyor: görsel kaynağı son oynanma tarihini yayınlamaz, bu yüzden içindeki hiçbir şey bu haritalardan hangilerinin bugün gerçekten aktif olduğunu söyleyemez.",
+  "Every ranked mode is covered, with a pick spare":
+    "Her Aşamalı modu kapsandı, yedek bir seçimle",
+  "Every top-tier brawler you own is at power 11.":
+    "Sahip olduğun her üst tier savaşçı Güç 11'de.",
+  "Fielded at Power 11 with every Gadget, Star Power, Gear, Buffie and their Hypercharge, exactly as in Friendly Battles.":
+    "Dostluk Maçlarında olduğu gibi her Aksesuar, Yıldız Gücü, Eşya, Buffie ve Hiperşarjlarıyla Güç 11'de sahaya çıkar.",
+  "Find roster weaknesses":
+    "Kadro zayıflıklarını bul",
+  "Forgot to claim? The rewards are granted automatically the next day.":
+    "Almayı mı unuttun? Ödüller ertesi gün otomatik olarak verilir.",
+  "Gears, star powers, gadgets, best modes and maps, updated daily from real battles.":
+    "Eşyalar, yıldız güçleri, aksesuarlar, en iyi modlar ve haritalar; gerçek maçlardan her gün güncellenir.",
+  "How the meta score works":
+    "Meta puanı nasıl çalışır",
+  "Leaderboards stop at 200":
+    "Sıralamalar 200'de durur",
+  "Loadouts are not published":
+    "Dizilimler yayınlanmaz",
+  "Map picks vs mode picks":
+    "Harita seçimleri ve mod seçimleri",
+  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
+    "Tek bir günde meta puanı {from} → {to}; hareketin gürültü değil gerçek olması için yeterli maçla.",
+  "Most likely bans here":
+    "Burada en olası banlar",
+  "Most likely picks here":
+    "Burada en olası seçimler",
+  "Most {name} owners buy the {gadget} gadget and the {starPower} star power first.":
+    "{name} sahiplerinin çoğu önce {gadget} aksesuarını ve {starPower} yıldız gücünü alıyor.",
+  "Most {name} owners buy the {gadget} gadget first.":
+    "{name} sahiplerinin çoğu önce {gadget} aksesuarını alıyor.",
+  "Most {name} owners buy the {starPower} star power first.":
+    "{name} sahiplerinin çoğu önce {starPower} yıldız gücünü alıyor.",
+  "None of your most-played brawlers are struggling right now.":
+    "En çok oynadığın savaşçıların hiçbiri şu an zorlanmıyor.",
+  "Not enough sampled battles to judge this draft":
+    "Bu draftı değerlendirmek için yeterli incelenmiş maç yok",
+  "On 1 global brawler leaderboard":
+    "1 küresel savaşçı sıralamasında",
+  "One score, comparable to everyone we sample.":
+    "Tek bir puan, incelediğimiz herkesle karşılaştırılabilir.",
+  "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.":
+    "Örneklemimiz yüksek kupalı oyunculara kayar; onlar her şeyle daha çok kazanır. Kazanma oranları bu temele göre yeniden ortalanır, böylece savaşçılar arası karşılaştırma adil kalır.",
+  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
+    "İncelenen maçların {picks} kadarında seçiliyor ve düzeltilmiş {rate} getiriyor: onu seçen oyuncuların kendi ortalamasının altında.",
+  "Playable in Ranked even if you have not unlocked them.":
+    "Kilidini açmamış olsan bile Aşamalı'da oynanabilir.",
+  "Progress resets every day, like Daily Wins.":
+    "İlerleme Günlük Galibiyetler gibi her gün sıfırlanır.",
+  "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
+    "Ödüller Starr Hediyeleri veya Kaos Hediyeleridir; günde en fazla 2 Starr Hediyesi.",
+  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
+    "Birlikte oynadığında {name} {rate} kazanıyor: diğer durumlardan {edge} daha iyi. Hiçbiri diğeri için seçilmiyor.",
+  "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
+    "API'nin tuttuğu her şey bu. “Son” diye etiketlenen her şey gerçekten son. Gösterilecek bir kariyer maç geçmişi yok.",
+  "That is not a current brawler.":
+    "Bu güncel bir savaşçı değil.",
+  "The API refuses to return more, so top-200 is the deepest placement that exists. There is no top-500.":
+    "API daha fazlasını döndürmeyi reddeder, bu yüzden ilk 200 var olan en derin sıralamadır. İlk 500 yok.",
+  "The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler’s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.":
+    "API bir oyuncunun hangi yıldız güçlerine, aksesuarlara ve eşyalara sahip olduğunu bildirir, maça ne götürdüğü hakkında hiçbir şey bildirmez. Takılı bir dizilimi gösteren bir uç nokta yok. Bu yüzden savaşçı sayfaları yükseltme sahipliğini gösterir, asla kullanım veya seçilme oranını değil. Bir savaşçının sahiplerinin %78'inin sahip olduğu bir eşya tam olarak budur: %78'inin sahip olduğu. Sahiplik genelde kullanımı izler ama onun bir ölçümü değildir.",
+  "The Ranked meta, map by map":
+    "Aşamalı metası, harita harita",
+  "The best trio to take together":
+    "Birlikte alınacak en iyi üçlü",
+  "The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.":
+    "Güncel Aşamalı sezonunun rekabetçi harita havuzu, sezon başına yayınlanır. Sezon değişene kadar sabit.",
+  "The drafts were close to even":
+    "Draftlar neredeyse eşitti",
+  "The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.":
+    "Şu dakika etkinlik rotasyonundaki haritalar, doğrudan oyun API'sinden. Kelimenin tam anlamıyla “şu an” olan tek liste bu.",
+  "The two windows were sampled at very different rates — {before} decided Ranked battles before against {after} after, a factor of {ratio}. Any difference would be partly the sampling and not the update, so nothing is scored.":
+    "İki dönem çok farklı hızlarda incelendi: önce {before}, sonra {after} sonuçlanmış Aşamalı maçı, {ratio} kat. Herhangi bir fark kısmen güncellemeden değil örneklemeden kaynaklanırdı, bu yüzden hiçbir şey puanlanmadı.",
+  "They count toward the Power 11 brawler requirement for each rank, Mythic and above need more than 12.":
+    "Her rütbenin Güç 11 savaşçı şartına sayılırlar; Gizemli ve üstü için 12'den fazlası gerekir.",
+  "Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.":
+    "Az örneklem, Oluşuyor ve İyi örneklem, bir haritanın sıralamasının arkasında kaç maç olduğunu anlatır. Başka bir şey değil. Az örneklemli bir harita gizlenmez, etiketlenir; çünkü okuyabildiğin bir uyarı kontrol edemediğin bir sayıdan iyidir.",
+  "Tier list percentages are adjusted":
+    "Tier listesi yüzdeleri düzeltilmiştir",
+  "Too little was sampled either side of this update to measure it: {before} decided Ranked battles before and {after} after.":
+    "Bu güncellemenin iki tarafında ölçmeye yetecek kadar inceleme yapılmadı: önce {before}, sonra {after} sonuçlanmış Aşamalı maçı.",
+  "Too many scans at once. Give it a minute.":
+    "Aynı anda çok fazla tarama. Bir dakika bekle.",
+  "Totals unavailable right now":
+    "Toplamlar şu an kullanılamıyor",
+  "Understand your level":
+    "Seviyeni anla",
+  "We couldn’t find that player. Check the tag in-game under your profile.":
+    "O oyuncuyu bulamadık. Etiketi oyunda profilinin altından kontrol et.",
+  "Where the next coins actually change a match.":
+    "Sonraki altınların bir maçı gerçekten değiştirdiği yer.",
+  "Which of your brawlers the meta has left behind.":
+    "Metanın geride bıraktığı savaşçıların.",
+  "Your brawlers ticked, your icon on the bubble":
+    "Savaşçıların işaretli, baloncukta senin simgen",
+  "adjusted win rate":
+    "düzeltilmiş kazanma oranı",
+  "meta score, 1 day":
+    "meta puanı, 1 gün",
+  "of all picks":
+    "tüm seçimlerin",
+  "on {map}":
+    "{map} haritasında",
+  "this map":
+    "bu harita",
+  "vs its usual form":
+    "normal formuna göre",
+  "when paired":
+    "birlikte oynayınca",
+  "{map} · {battles} battles on this map":
+    "{map} · bu haritada {battles} maç",
+  "{name} and {other} belong together.":
+    "{name} ve {other} birbirine yakışıyor.",
+  "{name} climbed overnight.":
+    "{name} bir gecede yükseldi.",
+  "{name} is a different brawler on {map}.":
+    "{name}, {map} haritasında bambaşka bir savaşçı.",
+  "{name} is everywhere, and losing.":
+    "{name} her yerde ve kaybediyor.",
+  "{name} is picked constantly and losing.":
+    "{name} sürekli seçiliyor ve kaybediyor.",
+  "{name} moved more than anything else since yesterday.":
+    "{name} dünden bu yana her şeyden daha çok hareket etti.",
+  "{name} owns {other}.":
+    "{name}, {other} karşısında üstün.",
+  "{rate} adjusted win rate on just {picks} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.":
+    "Seçimlerin yalnızca {picks} kadarında {rate} düzeltilmiş kazanma oranı: kadronun en güçlü kayıtlarından biri, çoğu draftın hiç düşünmediği bir savaşçıdan.",
+  "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
+    "Özellikle {other} karşısında {rate}, {name} savaşçısının kendi kaydının {edge} üstünde. Örneklemdeki en tek taraflı eşleşme.",
+  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
+    "Burada {other} karşısında {rate}, diğer tüm haritalarda: bir savaşçı ile bir arazi arasındaki en büyük fark.",
+  "{winRate} win rate · {pickRate} picked · {battles} battles":
+    "{winRate} kazanma oranı · {pickRate} seçilme · {battles} maç",
+  "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.":
+    "Meta puanı iki ölçümü birleştiren 0-10 arası bir sayıdır: %75 değerinde düzeltilmiş kazanma oranı ve %25 değerinde logaritmik ölçekli seçilme oranı. İkisi de küresel sıralama oyuncularından iki saatte bir incelenen gerçek maçlardan gelir ve Aşamalı listesi yalnızca rekabetçi maçları sayar.",
+  "Every win rate is pulled toward the average by 50 pseudo-battles, so a brawler needs roughly that many decided battles before its own record outweighs the prior. Without it the top of the list was whichever rarely-played brawler had a lucky week. Anything under 20 decided battles is not rated at all.":
+    "Her kazanma oranı 50 sanal maçla ortalamaya çekilir, yani bir savaşçının kendi kaydının öncül değeri geçmesi için yaklaşık o kadar sonuçlanmış maç gerekir. Bu olmasaydı listenin zirvesi, şanslı bir hafta geçiren az oynanan bir savaşçı olurdu. 20 sonuçlanmış maçın altındaki hiçbir şey puanlanmaz.",
+  "Make the bubble yours: choose its size, how faint it gets when you leave it alone, and whether it tucks half off the edge. A touch always brings it straight back.":
+    "Baloncuğu kendine göre ayarla: boyutunu, kendi hâline bırakınca ne kadar soluklaşacağını ve kenardan yarı yarıya gizlenip gizlenmeyeceğini seç. Bir dokunuş onu her zaman hemen geri getirir.",
+  "The app now speaks your language: all 22 languages of the game, with a flag picker at the top. The app and this panel share one language setting.":
+    "Uygulama artık senin dilini konuşuyor: oyunun 22 dilinin hepsi, üstte bayrak seçiciyle. Uygulama ve bu panel tek bir dil ayarını paylaşır.",
+  "“What to upgrade next” comes in your language too, with brawler and mode names as the game writes them.":
+    "“Sırada ne yükseltilmeli” de senin dilinde; savaşçı ve mod adları oyunun yazdığı gibi.",
+  "A new look: chunky 3D buttons, bold display type and game-style panels throughout the app.":
+    "Yeni bir görünüm: uygulama genelinde tıknaz 3B düğmeler, kalın başlık yazısı ve oyun tarzı paneller.",
+  "The bubble wears your own player icon once your tag is set (open the app once after updating).":
+    "Etiketin ayarlanınca baloncuk senin oyuncu simgeni taşır (güncellemeden sonra uygulamayı bir kez aç).",
+  "Set-up is easier: until your player tag is added, the app says what it unlocks and takes you straight to the field.":
+    "Kurulum daha kolay: oyuncu etiketin eklenene kadar uygulama neyin kilidini açacağını söyler ve seni doğrudan alana götürür.",
+  "The panel filter is a clear choice now: All my brawlers, Power 11 only, or Power 11 + hypercharge, each with what it does and how many brawlers it leaves.":
+    "Panel filtresi artık net bir seçim: Tüm savaşçılarım, Yalnızca Güç 11 veya Güç 11 + hiperşarj; her birinin ne yaptığı ve kaç savaşçı bıraktığıyla.",
+  "The panel opens instantly. It used to load the page again on every tap, so it opened on a spinner mid-draft; it now keeps the page between opens and starts loading as soon as the bubble appears.":
+    "Panel anında açılır. Eskiden her dokunuşta sayfayı yeniden yüklüyordu ve draft ortasında dönen bir simgeyle açılıyordu; artık açılışlar arasında sayfayı tutar ve baloncuk çıkar çıkmaz yüklemeye başlar.",
+  "No signal? The panel shows the last saved list, marked “Offline”, instead of an error.":
+    "Bağlantı yok mu? Panel hata yerine “Çevrimdışı” işaretli son kaydedilen listeyi gösterir.",
+  "Each mode chip carries the mode’s own icon, the badge the game shows in the corner of the draft.":
+    "Her mod çipinde modun kendi simgesi var: oyunun draftın köşesinde gösterdiği rozet.",
+  "The three counts are the filter now. Tap owned, power 11 or hypercharge and the tile lights up — so the number the panel is using is the one you can see, instead of something to work out from two switches.":
+    "Artık filtre üç sayının kendisi. Sahip olunan, Güç 11 veya hiperşarja dokun, kutu yanar; böylece panelin kullandığı sayı, iki düğmeden çıkarman gereken bir şey değil, görebildiğin sayıdır.",
+  "Those two switches are gone with it. They encoded three settings in four combinations, and the spare one was impossible: a hypercharge cannot be unlocked below power 11, so “hypercharge without power 11” had to be quietly rewritten every time it was set.":
+    "O iki düğme de onunla birlikte gitti. Dört kombinasyonda üç ayar kodluyorlardı ve fazla olanı imkânsızdı: Güç 11'in altında hiperşarj açılamaz, bu yüzden “Güç 11 olmadan hiperşarj” her ayarlandığında sessizce yeniden yazılmak zorundaydı.",
+  "The tag box has a label, and the filter says in words what it is doing underneath the tiles.":
+    "Etiket kutusunun bir etiketi var ve filtre, kutuların altında ne yaptığını kelimelerle söylüyor.",
+  "The account tiles use the game’s own art: the brawler mark on what you own, the power 11 badge, the hypercharge symbol, and a trophy beside your count. A number under an icon you already recognise reads faster than a number under a word.":
+    "Hesap kutuları oyunun kendi görsellerini kullanıyor: sahip olduklarında savaşçı işareti, Güç 11 rozeti, hiperşarj sembolü ve sayının yanında bir kupa. Zaten tanıdığın bir simgenin altındaki sayı, bir kelimenin altındaki sayıdan daha hızlı okunur.",
+  "The app screen is rebuilt. State and action share one card instead of four stacked full-width blocks, Stop and Quick Settings sit side by side, and the screen ends on a footer rather than stopping mid-list.":
+    "Uygulama ekranı yeniden yapıldı. Durum ve eylem, dört üst üste tam genişlik blok yerine tek bir kartı paylaşıyor; Durdur ve Hızlı Ayarlar yan yana duruyor ve ekran listenin ortasında durmak yerine bir altbilgiyle bitiyor.",
+  "Your tag now resolves to a name and your player icon, with the counts each filter produces — owned, power 11, hypercharged. A tag is a string nobody can check by reading it, and one wrong character is a valid tag belonging to a stranger whose only symptom is that every filter looks broken.":
+    "Etiketin artık bir ada ve oyuncu simgene dönüşüyor; her filtrenin ürettiği sayılarla birlikte: sahip olunan, Güç 11, hiperşarjlı. Bir etiket okuyarak kimsenin kontrol edemeyeceği bir dizedir ve tek yanlış karakter, tek belirtisi her filtrenin bozuk görünmesi olan bir yabancıya ait geçerli bir etikettir.",
+  "Pick and Ban tabs on every map. Pick is the list you already had, narrowed to what you can field. Ban is every brawler, whoever owns them, with how often it is actually taken here — because banning something nobody picks spends the ban for nothing.":
+    "Her haritada Seç ve Banla sekmeleri. Seç, zaten sahip olduğun liste; sahaya sürebildiklerine daraltılmış. Banla, kime ait olursa olsun her savaşçı, burada gerçekte ne sıklıkla alındığıyla; çünkü kimsenin seçmediği bir şeyi banlamak banı boşa harcar.",
+  "A third switch on the app screen: hide the brawlers you cannot use instead of greying them out. Off by default — greying keeps the tier counts honest and keeps a brawler you are one upgrade away from in view.":
+    "Uygulama ekranında üçüncü bir düğme: kullanamadığın savaşçıları griye boyamak yerine gizle. Varsayılan olarak kapalı: griye boyamak tier sayılarını dürüst tutar ve bir yükseltme uzağındaki savaşçıyı görünür bırakır.",
+  "Add your player tag on the app screen and the panel marks what you can actually field. The tier list stops being a list of brawlers you might not own: anything you cannot take is dimmed, and each map names your best available pick.":
+    "Uygulama ekranına oyuncu etiketini ekle, panel sahaya gerçekten sürebildiklerini işaretlesin. Tier listesi sahip olmayabileceğin savaşçıların listesi olmaktan çıkar: alamadığın her şey soluklaşır ve her harita kullanabileceğin en iyi seçimi söyler.",
+  "Two filters beside it — power 11 only, and power 11 with a hypercharge — for when a pick is only worth making at full strength.":
+    "Yanında iki filtre: yalnızca Güç 11 ve hiperşarjlı Güç 11; bir seçim ancak tam güçte yapılmaya değerse.",
+  "Your roster is read once a day and kept on the phone, so none of this costs anything mid-draft. Leave the tag blank and the panel behaves exactly as it did before.":
+    "Kadron günde bir kez okunur ve telefonda tutulur, böylece bunların hiçbiri draft ortasında bir şeye mal olmaz. Etiketi boş bırak, panel tam olarak eskisi gibi davransın.",
+  "A BrawlZone tile for Quick Settings: swipe down from inside the game and tap it to put the bubble up or take it down, without opening the app. Android 13 and up can add it with one tap from the app screen; older versions find it by editing Quick Settings.":
+    "Hızlı Ayarlar için bir BrawlZone kutusu: oyunun içinden aşağı kaydır ve uygulamayı açmadan baloncuğu açmak veya kapatmak için dokun. Android 13 ve üstü uygulama ekranından tek dokunuşla ekleyebilir; eski sürümler Hızlı Ayarlar'ı düzenleyerek bulur.",
+  "The notification has a Panel button, so the panel can be opened or closed from the shade when the bubble is under your thumb or behind the game’s own UI.":
+    "Bildirimde bir Panel düğmesi var; baloncuk başparmağının altında ya da oyunun kendi arayüzünün arkasındayken panel bildirim alanından açılıp kapatılabilir.",
+  "The draft scan is gone. It never worked reliably enough across phones to keep, and an app that asks to record your screen for a feature that does not work is worse than one that does not ask. The app no longer requests screen capture at all.":
+    "Draft taraması kaldırıldı. Telefonlar arasında tutmaya değecek kadar güvenilir çalışmadı ve çalışmayan bir özellik için ekranını kaydetmek isteyen bir uygulama, hiç istemeyen bir uygulamadan kötüdür. Uygulama artık ekran kaydı hiç istemiyor.",
+  "The draft board stays: pick the map and enter the bans and picks by hand, and it ranks the remaining brawlers as before.":
+    "Draft tahtası kalıyor: haritayı seç ve banları ve seçimleri elle gir; kalan savaşçıları eskisi gibi sıralar.",
+  "Smaller and simpler for it — the text-recognition library is gone too.":
+    "Bu sayede daha küçük ve daha basit: metin tanıma kütüphanesi de gitti.",
+  "The draft scan is back, rebuilt: each scan owns its result, so a slow scan can no longer overwrite the next one, and a result that arrives while the panel is closed is shown when it reopens.":
+    "Draft taraması geri döndü, yeniden yapıldı: her tarama kendi sonucuna sahip, böylece yavaş bir tarama artık bir sonrakinin üzerine yazamıyor ve panel kapalıyken gelen bir sonuç yeniden açılınca gösteriliyor.",
+  "Every slot now says why it is what it is — read, empty, unknown, or covered by the panel — and a later scan corrects a misread in place without touching anything you typed in.":
+    "Her yer artık neden öyle olduğunu söylüyor (okundu, boş, bilinmiyor ya da panelin altında kaldı) ve sonraki bir tarama yanlış okumayı, yazdığın hiçbir şeye dokunmadan yerinde düzeltiyor.",
+  "The screen is found from the picture itself, including the map name plate, so black bars, insets and other screen shapes no longer read the wrong pixels.":
+    "Ekran, harita adı plakası dahil, resmin kendisinden bulunuyor; böylece siyah şeritler, kenar boşlukları ve diğer ekran şekilleri artık yanlış pikselleri okutmuyor.",
+  "Diagnostics can export the exact frame a scan used, so a misread on your phone can be fixed without guessing.":
+    "Tanılama, bir taramanın kullandığı tam kareyi dışa aktarabiliyor; böylece telefonundaki bir yanlış okuma tahmin etmeden düzeltilebiliyor.",
+  "The scan now finds the draft screen in the picture instead of assuming where it is, so it works the same on any screen size or shape rather than only the one it was measured on.":
+    "Tarama artık draft ekranının nerede olduğunu varsaymak yerine resimde buluyor; böylece yalnızca ölçüldüğü ekranda değil, her ekran boyutu ve şeklinde aynı çalışıyor.",
+  "The scan now matches the screen it is capturing. A session started while the phone was a different shape kept producing frames of that shape, so everything was read from the wrong place — the timer instead of the map name, and picks in the wrong slots.":
+    "Tarama artık yakaladığı ekranla eşleşiyor. Telefon farklı bir şekildeyken başlayan bir oturum o şekilde kareler üretmeye devam ediyordu, bu yüzden her şey yanlış yerden okunuyordu: harita adı yerine sayaç ve yanlış yerlerde seçimler.",
+  "Ban artwork that a phone refuses to decode the preferred way now falls back instead of failing — which left the ban list empty with nothing to say why.":
+    "Bir telefonun tercih edilen yolla çözmeyi reddettiği ban görselleri artık başarısız olmak yerine yedeğe düşüyor; bu, ban listesini neden olduğunu söylemeden boş bırakıyordu.",
+  "Tapping Scan while the app is still loading shows the progress instead of asking to share your screen for a scan that could not run yet.":
+    "Uygulama hâlâ yüklenirken Tara'ya dokunmak, henüz çalışamayacak bir tarama için ekranını paylaşmanı istemek yerine ilerlemeyi gösteriyor.",
+  "Bans are matched against their own artwork, which is decoded correctly now — transparent edges were being darkened twice, which affected the ban icons and nothing else.":
+    "Banlar kendi görselleriyle eşleştiriliyor ve bunlar artık doğru çözülüyor: saydam kenarlar iki kez karartılıyordu, bu da yalnızca ban simgelerini etkiliyordu.",
+  "The app no longer reports itself ready to scan until the ban artwork has loaded too, instead of only the portraits.":
+    "Uygulama artık yalnızca portreler değil ban görselleri de yüklenene kadar taramaya hazır olduğunu bildirmiyor.",
+  "Scanning no longer asks to share your screen over and over. Permission is a button you press, never something a scan asks for on its own, and it stops asking if Android keeps refusing.":
+    "Tarama artık ekranını paylaşmanı tekrar tekrar istemiyor. İzin bastığın bir düğmedir, bir taramanın kendi başına istediği bir şey değil ve Android reddetmeye devam ederse sormayı bırakıyor.",
+  "Loading the portraits is about eight times faster, and shows how far along it is.":
+    "Portrelerin yüklenmesi yaklaşık sekiz kat daha hızlı ve ne kadar ilerlediğini gösteriyor.",
+  "A scan can no longer run against a half-loaded set of portraits, which made recognition look unreliable when it was simply not ready.":
+    "Bir tarama artık yarı yüklenmiş bir portre setine karşı çalışamıyor; bu, tanıma sadece hazır değilken güvenilmez görünmesine yol açıyordu.",
+  "Scanning is back, and the bans work for the first time — the game draws them from a different artwork set, which is why they never matched before.":
+    "Tarama geri döndü ve banlar ilk kez çalışıyor: oyun onları farklı bir görsel setinden çiziyor, daha önce hiç eşleşmemelerinin sebebi bu.",
+  "One tap reads the mode, the map, both teams’ picks and all six bans, then scores the picks for that map.":
+    "Tek dokunuş modu, haritayı, iki takımın seçimlerini ve altı banın hepsini okur, sonra seçimleri o harita için puanlar.",
+  "The recognition is now tested against real captures of a real draft on every build, instead of only on your phone.":
+    "Tanıma artık yalnızca senin telefonunda değil, her sürümde gerçek bir draftın gerçek yakalamalarına karşı test ediliyor.",
+  "Starting the bubble no longer asks to share your screen. That prompt fired on every start once it had been allowed.":
+    "Baloncuğu başlatmak artık ekranını paylaşmanı istemiyor. O soru, bir kez izin verildikten sonra her başlangıçta çıkıyordu.",
+  "The update download now opens the installer itself when it finishes, instead of relying on a notification that may be switched off.":
+    "Güncelleme indirmesi bittiğinde, kapalı olabilecek bir bildirime güvenmek yerine yükleyiciyi kendisi açıyor.",
+  "The app finally asks for notification permission. Without it the update download finished invisibly and the bubble’s Stop control was hidden — both looked like features that did nothing.":
+    "Uygulama nihayet bildirim izni istiyor. O olmadan güncelleme indirmesi görünmeden bitiyor ve baloncuğun Durdur kontrolü gizleniyordu; ikisi de hiçbir şey yapmayan özellikler gibi görünüyordu.",
+  "The download now says which folder the file landed in, so it is findable even with notifications turned off.":
+    "İndirme artık dosyanın hangi klasöre indiğini söylüyor, böylece bildirimler kapalıyken bile bulunabiliyor.",
+  "Allowing screen sharing could ask again, and again, forever. Android was destroying the permission screen before it could receive your answer.":
+    "Ekran paylaşımına izin vermek sonsuza kadar tekrar tekrar sorabiliyordu. Android izin ekranını cevabını alamadan yok ediyordu.",
+  "A second scan sometimes did nothing at all. One scan that never finished left the button jammed for the rest of the session.":
+    "İkinci bir tarama bazen hiçbir şey yapmıyordu. Hiç bitmeyen bir tarama, düğmeyi oturumun geri kalanı için kilitli bırakıyordu.",
+  "The Download button in this notice finally downloads. Every version until now was blocked by Android from opening it, silently.":
+    "Bu bildirimdeki İndir düğmesi nihayet indiriyor. Şimdiye kadarki her sürümde Android onu açmayı sessizce engelliyordu.",
+  "The screen-capture prompt no longer interrupts a match. Once you have allowed it, it is asked as the bubble starts instead of on your first scan.":
+    "Ekran kaydı sorusu artık bir maçı bölmüyor. Bir kez izin verdikten sonra ilk taramanda değil, baloncuk başlarken soruluyor.",
+  "The prompt can no longer be answered with \"Share one app\", which captured the wrong thing.":
+    "Soru artık yanlış şeyi yakalayan \"Tek bir uygulamayı paylaş\" ile cevaplanamıyor.",
+  "The Download button in the update notice works. It was a dead button inside the app.":
+    "Güncelleme bildirimindeki İndir düğmesi çalışıyor. Uygulamanın içinde ölü bir düğmeydi.",
+  "The map is read from the screen on the first scan, instead of only after you had confirmed it once.":
+    "Harita, bir kez onayladıktan sonra değil, ilk taramada ekrandan okunuyor.",
+  "A map it still cannot place falls back to the old behaviour — pick it once and it is remembered.":
+    "Hâlâ yerleştiremediği bir harita eski davranışa döner: bir kez seç, hatırlansın.",
+  "Scanning recognised about one brawler in six. It now matches each brawler on the framing that suits it, and reads the picks on both teams.":
+    "Tarama altı savaşçıdan yaklaşık birini tanıyordu. Artık her savaşçıyı ona uyan çerçeveyle eşleştiriyor ve iki takımın seçimlerini de okuyor.",
+  "Bans are still left blank rather than guessed at — the game draws them with artwork nothing public matches. Tap one in and it is remembered.":
+    "Banlar tahmin edilmek yerine yine boş bırakılıyor: oyun onları hiçbir herkese açık görselin eşleşmediği görsellerle çiziyor. Birini dokunarak gir, hatırlansın.",
+  "The update notice now says which version you have, so you can tell a real update from a stuck banner.":
+    "Güncelleme bildirimi artık hangi sürüme sahip olduğunu söylüyor, böylece gerçek bir güncellemeyi takılı kalmış bir banner'dan ayırt edebilirsin.",
+  "Scanning read only half the draft. The frame was often captured before the panel had got out of the way, so the panel itself covered the enemy picks — it now waits for a frame taken after the overlay is hidden.":
+    "Tarama draftın yalnızca yarısını okuyordu. Kare çoğu zaman panel yoldan çekilmeden yakalanıyordu, bu yüzden panelin kendisi rakip seçimlerini örtüyordu; artık katman gizlendikten sonra alınan bir kareyi bekliyor.",
+  "What the scan found now shows immediately, instead of staying hidden until you had picked the map by hand.":
+    "Taramanın bulduğu şey artık haritayı elle seçene kadar gizli kalmak yerine hemen görünüyor.",
+  "The panel says how many brawlers it read, so a scan that worked no longer looks like one that did nothing.":
+    "Panel kaç savaşçı okuduğunu söylüyor, böylece çalışan bir tarama artık hiçbir şey yapmamış gibi görünmüyor.",
+  "Scan works again. It could get stuck on “Loading portraits…” with the button disabled for the rest of the session, and never recover.":
+    "Tarama tekrar çalışıyor. “Portreler yükleniyor…” ekranında takılıp düğme oturumun geri kalanı için devre dışı kalabiliyor ve asla düzelmiyordu.",
+  "Tapping Scan before the portraits have finished downloading now waits and then scans, instead of doing nothing.":
+    "Portrelerin indirilmesi bitmeden Tara'ya dokunmak artık hiçbir şey yapmamak yerine bekliyor ve sonra tarıyor.",
+  "Fixes 1.8, which crashed on launch and could not start the bubble at all. If you installed it, download again — this installs over the top.":
+    "Açılışta çöken ve baloncuğu hiç başlatamayan 1.8'i düzeltir. Yüklediysen tekrar indir; üzerine yüklenir.",
+  "Scan the draft instead of typing it: one tap reads the bans and picks off your screen and fills the board.":
+    "Draftı yazmak yerine tara: tek dokunuş banları ve seçimleri ekranından okur ve tahtayı doldurur.",
+  "The map is remembered. Confirm it once and every later scan on that map fills it in for you.":
+    "Harita hatırlanıyor. Bir kez onayla, o haritadaki sonraki her tarama onu senin için doldursun.",
+  "Anything it is not sure about is left blank rather than guessed at — and correcting it teaches it that brawler for next time.":
+    "Emin olmadığı her şey tahmin edilmek yerine boş bırakılıyor; düzeltmek de ona o savaşçıyı bir dahaki sefere öğretiyor.",
+  "The keyboard no longer buries the draft picker: the panel moves above it, and searching is opt-in so the shortlist of likely picks is visible first.":
+    "Klavye artık draft seçiciyi gömmüyor: panel onun üstüne çıkıyor ve arama isteğe bağlı, böylece olası seçimlerin kısa listesi önce görünüyor.",
+  "In landscape the keyboard no longer takes over the whole screen.":
+    "Yatay modda klavye artık tüm ekranı kaplamıyor.",
+  "The panel says when it cannot reach the site, with a tap to retry, instead of spinning forever on a dropped connection.":
+    "Panel siteye ulaşamadığında, kopan bir bağlantıda sonsuza kadar dönmek yerine bunu söylüyor ve tekrar denemek için dokunmanı istiyor.",
+  "The update notice downloads the new version directly, instead of sending you to the site to find the button.":
+    "Güncelleme bildirimi yeni sürümü, düğmeyi bulman için seni siteye göndermek yerine doğrudan indiriyor.",
+  "Links in the panel now open in your browser rather than inside the overlay.":
+    "Paneldeki bağlantılar artık katmanın içinde değil tarayıcında açılıyor.",
+  "The panel now tells you when a newer version of the app is out, and what changed in it.":
+    "Panel artık uygulamanın yeni bir sürümü çıktığında ve neyin değiştiğini sana söylüyor.",
+  "Fixed the panel in landscape, which is how the game is actually played — it was arriving a third of its intended height.":
+    "Oyunun gerçekte oynandığı yatay modda panel düzeltildi: amaçlanan yüksekliğinin üçte biri kadar açılıyordu.",
+  "The bubble and panel now follow the screen when you rotate, instead of keeping coordinates from the previous orientation.":
+    "Baloncuk ve panel artık döndürdüğünde önceki yönün koordinatlarını tutmak yerine ekranı takip ediyor.",
+  "The panel no longer lands on top of the bubble in landscape, which had been swallowing every tap meant for it.":
+    "Panel artık yatay modda baloncuğun üzerine düşmüyor; bu, ona yönelik her dokunuşu yutuyordu.",
+  "Filter the tier list by game mode, and the choice is remembered next time you open it.":
+    "Tier listesini oyun moduna göre filtrele; seçim bir dahaki açışta hatırlanır.",
+  "Tap any brawler for the star power, gadget and gears its owners run.":
+    "Sahiplerinin kullandığı yıldız gücü, aksesuar ve eşyalar için herhangi bir savaşçıya dokun.",
+  "The panel opens on the Ranked tier list, built for the overlay, instead of loading the full site into a small window.":
+    "Panel, tüm siteyi küçük bir pencereye yüklemek yerine katman için yapılmış Aşamalı tier listesiyle açılıyor.",
+  "Rebuilt the app screen: real spacing, the site’s palette, and system bars that match.":
+    "Uygulama ekranı yeniden yapıldı: gerçek boşluklar, sitenin renk paleti ve uyumlu sistem çubukları.",
+  "First release. Tapping the bubble opens and closes the panel, dragging moves it, and dropping it on the target at the bottom closes it.":
+    "İlk sürüm. Baloncuğa dokunmak paneli açar ve kapatır, sürüklemek taşır, alttaki hedefe bırakmak kapatır.",
+  "Brawl Stars|hero-1":
+    "Brawl Stars",
+  "stats that show|hero-2":
+    "istatistikleri",
+  "where you stand|hero-3":
+    "nerede durduğunu gösterir",
+  "{rate} adjusted win rate and {pick} pick rate over {battles} sampled battles.":
+    "İncelenen {battles} maçta {rate} düzeltilmiş kazanma oranı ve {pick} seçilme oranı.",
+  "{name} has a {rate} adjusted win rate and {pick} pick rate over {battles} sampled battles{tier}{date}.":
+    "{name}: incelenen {battles} maçta {rate} düzeltilmiş kazanma oranı ve {pick} seçilme oranı{tier}{date}.",
+  ", {tier} tier in Ranked":
+    ", Aşamalı'da {tier} tier",
+  ", as of {date}":
+    ", {date} itibarıyla",
+  "The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
+    "Bir {mode} haritası olan {name} haritasında en iyi kayıtlara sahip savaşçılar. Küresel sıralama havuzundan incelenen maçlarla sıralanır ve haritanın kendi ortalamasına değil örneklem geneli ortalamaya göre puanlanır; yani bir seçim sadece lobiyi değil tüm alanı yenmelidir.",
+  "Common":
+    "Sıradan",
+  "Rare":
+    "Ender",
+  "Super Rare":
+    "Süper Ender",
+  "Epic":
+    "Destansı",
+  "Mythic":
+    "Gizemli",
+  "Legendary":
+    "Efsanevi",
+  "Ultra Legendary":
+    "Ultra Efsanevi",
+  "Starting Brawler":
+    "Başlangıç Savaşçısı",
+  "Damage Dealer":
+    "Yüksek Hasar",
+  "Tank":
+    "Tank",
+  "Marksman":
+    "Keskin Nişancı",
+  "Support":
+    "Destek",
+  "Controller":
+    "Alan Kontrolü",
+  "Assassin":
+    "Suikastçı",
+  "Artillery":
+    "Topçu",
+  "Play your rank, beat the meta":
+    "Rütbende oyna, metayı yen",
+  "The meta at your rank is not the meta at the top. And every pick has an answer.":
+    "Senin rütbendeki meta zirvedeki meta değil. Ve her seçimin bir cevabı var.",
+  "Tier list at your rank":
+    "Rütbendeki tier listesi",
 };
