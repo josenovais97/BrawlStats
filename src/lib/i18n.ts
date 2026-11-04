@@ -17,26 +17,34 @@
  * Client-safe: no server imports, so client components can format with it.
  */
 
-export type Locale = 'en' | 'es' | 'pt';
-export const INTL_LOCALES = ['es', 'pt'] as const;
+/**
+ * The site's languages besides English. Turkish joined Spanish and Portuguese
+ * on 2026-11-04, the first of the languages the visitors ChatGPT and Google
+ * send actually speak (then German, Russian, Indonesian, French, Polish). A
+ * language is added here only once all of its text exists: every
+ * `Record<Locale, …>` in the code then refuses to compile until it has that
+ * language's entry, which is the checklist.
+ */
+export const INTL_LOCALES = ['es', 'pt', 'tr'] as const;
 export type IntlLocale = (typeof INTL_LOCALES)[number];
+export type Locale = 'en' | IntlLocale;
 
 export function isIntlLocale(value: string | null | undefined): value is IntlLocale {
-  return value === 'es' || value === 'pt';
+  return (INTL_LOCALES as readonly string[]).includes(value ?? '');
 }
 
 /** For `<html lang>`-style attributes and hreflang. */
-export const HTML_LANG: Record<Locale, string> = { en: 'en', es: 'es', pt: 'pt-BR' };
+export const HTML_LANG: Record<Locale, string> = { en: 'en', es: 'es', pt: 'pt-BR', tr: 'tr' };
 
-export const LOCALE_NAME: Record<Locale, string> = { en: 'English', es: 'Español', pt: 'Português' };
+export const LOCALE_NAME: Record<Locale, string> = { en: 'English', es: 'Español', pt: 'Português', tr: 'Türkçe' };
 
 /**
  * Number formatting per locale. Spanish as Latin America writes it (55.1,
  * 12,345 -- Mexico's convention, the largest audience), Portuguese as Brazil
  * does (55,1 and 12.345).
  */
-const NUMBER_LOCALE: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: 'pt-BR' };
-const DATE_LOCALE: Record<Locale, string> = { en: 'en-GB', es: 'es-419', pt: 'pt-BR' };
+export const NUMBER_LOCALE: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR' };
+export const DATE_LOCALE: Record<Locale, string> = { en: 'en-GB', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR' };
 
 /**
  * The sections that exist in Spanish and Portuguese, as path patterns. Grows
@@ -89,8 +97,7 @@ export function languageAlternates(path: string): Record<string, string> {
   const under = (l: string) => (path === '/' ? `/${l}` : `/${l}${path}`);
   return {
     en: path,
-    es: under('es'),
-    'pt-BR': under('pt'),
+    ...Object.fromEntries(INTL_LOCALES.map((l) => [HTML_LANG[l], under(l)])),
     'x-default': path,
   };
 }
