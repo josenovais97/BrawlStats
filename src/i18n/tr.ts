@@ -1204,4 +1204,804 @@ export const TR: Record<string, string> = {
     " (zaten karşılandı)",
   ", with a second pick spare in":
     ", ikinci bir yedek seçim de var:",
+  "Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.":
+    "Kapsam, şu an aktif bir modda Güç 9 veya üstünde ilk 3'ten bir seçime sahip olmak demektir. Kilit açımları bilerek hariç tutulur: sahip olmadığın bir savaşçı bugün yapabileceğin bir harcama değildir, bu yüzden buradaki her adıma hemen başlayabilirsin.",
+  "Covers {v}":
+    "Kapsadığı: {v}",
+  "Ranked coverage goes from":
+    "Aşamalı kapsamı:",
+  "Second pick in {v}":
+    "{v} için ikinci seçim",
+  "Strengthens the rotation":
+    "Rotasyonu güçlendirir",
+  "The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns.":
+    "Bu hesabın zaten sahip olduğu savaşçılardan, aktif Aşamalı rotasyonunun en çoğunu kapsayan en ucuz yükseltme seti.",
+  "What to upgrade next":
+    "Sırada ne yükseltilmeli",
+  "modes":
+    "mod",
+  "of them":
+    "tanesi",
+  "power {power} → 11":
+    "Güç {power} → 11",
+  "to":
+    "→",
+  "to upgrade":
+    "yükseltilecek",
+  " Elo":
+    " Elo",
+  "Best tracked day":
+    "Takip edilen en iyi gün",
+  "Last {days} days":
+    "Son {days} gün",
+  "Now":
+    "Şimdi",
+  "One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.":
+    "Günde bir nokta; bu profile bakıldığında kaydedilir, yani oynanan her günü değil birinin baktığı günleri kapsar.",
+  "Recent progress":
+    "Son ilerleme",
+  "Tracked {tracked}":
+    "Takip: {tracked}",
+  "Trophies and Ranked, from the points recorded on each profile view.":
+    "Kupalar ve Aşamalı; her profil görüntülemesinde kaydedilen noktalardan.",
+  "day":
+    "gün",
+  "days":
+    "gün",
+  "{points} views over {days} days":
+    "{days} günde {points} görüntüleme",
+  "{title} history over {days} days, from {low} to {high}":
+    "{days} gün boyunca {title} geçmişi, {low} ile {high} arası",
+  "{unit} overall":
+    "genel {unit}",
+  " This account has no Ranked elo on record, so that weight is spread across the rest{v}.":
+    " Bu hesabın kayıtlı Aşamalı elosu yok, bu yüzden o ağırlık geri kalanlara dağıtılır{v}.",
+  ", the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.":
+    "; eşleştirmenin birbirine yakın rakipleri karşılaştırdığı tek mod, bu yüzden puan hesaba ne kadar yatırım yapıldığını değil nasıl oynandığını yansıtır. Bu nedenle ilerlemenin payı %15 ile sınırlıdır.",
+  "Weighted toward":
+    "Ağırlık şuna veriliyor:",
+  " today":
+    " bugün",
+  ", ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.":
+    "; her oyuncunun son okunmasından bu yana günlük kupa artışına göre sıralı. Aşağıdaki resmi ilk 100'den farklı bir topluluk, bu yüzden bu isimler çoğunlukla orada görünmez.",
+  "Biggest trophy gains":
+    "En büyük kupa artışları",
+  "Climbing fastest":
+    "En hızlı yükselenler",
+  "From our own daily snapshots of the":
+    "Kendi günlük ölçümlerimizden:",
+  "in 1 day":
+    "1 günde",
+  "in {days} days":
+    "{days} günde",
+  "sampled player pool":
+    "incelenen oyuncu havuzu",
+  "total":
+    "toplam",
+  " · {winRate} win":
+    " · {winRate} kazanma",
+  "Activity":
+    "Aktivite",
+  "Avg place {v}":
+    "Ort. sıra {v}",
+  "Battles per day":
+    "Günlük maç",
+  "Faced most":
+    "En çok karşılaşılan",
+  "Last 24 hours":
+    "Son 24 saat",
+  "Last seen":
+    "Son görülme",
+  "Most played":
+    "En çok oynanan",
+  "Played with":
+    "Birlikte oynadıkları",
+  "Recent form":
+    "Son form",
+  "Top mode":
+    "En iyi mod",
+  "battle":
+    "maç",
+  "#{rank} in the world on {brawlerName}":
+    "{brawlerName} ile dünyada {rank}. sıra",
+  "Best world ranking":
+    "En iyi dünya sıralaması",
+  "Global · {trophies} trophies":
+    "Küresel · {trophies} kupa",
+  "Show all {length} placements":
+    "Tüm {length} sıralamayı göster",
+  "Top 10":
+    "İlk 10",
+  "Top 100":
+    "İlk 100",
+  "Top 200":
+    "İlk 200",
+  "Top 25":
+    "İlk 25",
+  "Top 50":
+    "İlk 50",
+  "World ranked":
+    "Dünya sıralamasında",
+  ", which covers the 3v3 modes only.":
+    "; yalnızca 3v3 modları kapsar.",
+  ", which rates every brawler from sampled ladder battles. For competitive play see the":
+    "; her savaşçıyı incelenen kupa maçlarından puanlar. Rekabetçi oyun için bak:",
+  "Mains out of favour":
+    "Gözden düşen favoriler",
+  "Power {power} · {trophies} trophies":
+    "Güç {power} · {trophies} kupa",
+  "Strong, not finished":
+    "Güçlü ama bitmemiş",
+  "This roster scored against the current":
+    "Bu kadro güncel şu listeye göre puanlandı:",
+  "Top-tier brawlers you own below power 11. The cheapest upgrades on this account.":
+    "Güç 11'in altında sahip olduğun üst tier savaşçılar. Bu hesaptaki en ucuz yükseltmeler.",
+  "Your {MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.":
+    "Şu anda C veya D tier'da olan en yüksek kupalı {MAIN_COUNT} savaşçın.",
+  "{trophies} trophies · power {power}":
+    "{trophies} kupa · Güç {power}",
+  "trophy tier list":
+    "kupa tier listesi",
+  "3v3 wins":
+    "3v3 galibiyet",
+  "A BrawlZone metric out of 10, not an official Brawl Stars statistic.":
+    "10 üzerinden bir BrawlZone ölçüsü, resmi bir Brawl Stars istatistiği değil.",
+  "Account strength":
+    "Hesap gücü",
+  "Average per brawler":
+    "Savaşçı başına ortalama",
+  "Best win streak":
+    "En iyi kazanma serisi",
+  "Both accounts read live from the official API. Nothing is stored.":
+    "İki hesap da resmi API'den canlı okunur. Hiçbir şey saklanmaz.",
+  "Brawlers unlocked":
+    "Açılan savaşçılar",
+  "Comparison":
+    "Karşılaştırma",
+  "Competitive":
+    "Rekabetçi",
+  "Current trophies":
+    "Güncel kupalar",
+  "Hypercharges":
+    "Hiperşarjlar",
+  "Peak Ranked":
+    "Aşamalı zirvesi",
+  "Peak trophies":
+    "Kupa zirvesi",
+  "Power 11 brawlers":
+    "Güç 11 savaşçılar",
+  "Prestige":
+    "Prestij",
+  "Ranked elo":
+    "Aşamalı elo",
+  "Ready. Waiting on the other player.":
+    "Hazır. Diğer oyuncu bekleniyor.",
+  "Roster unlocked":
+    "Açılan kadro",
+  "Skill score":
+    "Beceri puanı",
+  "The highest streak on any single brawler. The API publishes no account-wide streak.":
+    "Tek bir savaşçıdaki en yüksek seri. API hesap geneli bir seri yayınlamaz.",
+  "Total trophies divided by brawlers unlocked. A rough measure of depth rather than breadth.":
+    "Toplam kupaların açılan savaşçı sayısına bölümü. Genişlikten çok derinliğin kaba bir ölçüsü.",
+  "Trophies":
+    "Kupalar",
+  "A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.":
+    "Bir hiperşarj maksimum seviyede savaşçı gerektirmez; bu yüzden en iyi yükseltmeyi, şarj olmadan dövüşü kaybeden bir savaşçıda tutmak kolaydır. Her birinin Güç {MAX_POWER_LEVEL} seviyesine ne kadar yakın olduğuna göre sıralı, yani bitirmesi en ucuz olanlar önce.",
+  "Finishing":
+    "Tamamlama:",
+  "One brawler carries":
+    "Bir savaşçıda",
+  "Start here":
+    "Buradan başla",
+  "Why this matters":
+    "Bu neden önemli",
+  "a hypercharge or buffie below power {MAX_POWER_LEVEL}.":
+    "Güç {MAX_POWER_LEVEL} altında bir hiperşarj veya buffie var.",
+  "coins":
+    "altın",
+  "costs about":
+    "yaklaşık tutarı:",
+  "it":
+    "onu",
+  "them all":
+    "hepsini",
+  "to power {MAX_POWER_LEVEL} for about":
+    "Güç {MAX_POWER_LEVEL} seviyesine çıkarmak yaklaşık",
+  "{length} buffie":
+    "{length} buffie",
+  "{length} carry":
+    "{length} savaşçıda",
+  "{name}: about {cost} coins from power {power} to {MAX_POWER_LEVEL}":
+    "{name}: Güç {power} seviyesinden {MAX_POWER_LEVEL} seviyesine yaklaşık {cost} altın",
+  "{power} coins":
+    "{power} altın",
+  "Show all {length}":
+    "Tümünü göster ({length})",
+  "Hypercharge":
+    "Hiperşarj",
+  "A shareable summary of a Brawl Stars player’s last twenty-five battles.":
+    "Bir Brawl Stars oyuncusunun son yirmi beş maçının paylaşılabilir özeti.",
+  "Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.":
+    "Buradaki her şey oyunun sunduğu maç geçmişinden ölçülür; bu geçmiş yaklaşık son yirmi beş maçı tutar, daha fazlasını değil. Geçmiş için bir uç nokta yok, bu yüzden bu bir sezonun değil bir dönemin anlık görüntüsüdür: oynadıktan sonra tekrar aç, değişmiş olacak.",
+  "Recent run":
+    "Son dönem",
+  "The last twenty-five battles, summed up. Built to screenshot.":
+    "Son yirmi beş maç, özetlenmiş. Ekran görüntüsü için hazırlandı.",
+  "{tag} — recent run":
+    "{tag}: son dönem",
+  "Account":
+    "Hesap",
+  "Battles":
+    "Maçlar",
+  "Do next":
+    "Sıradaki",
+  "No player exists with the tag {tag}. Check it in-game under your profile.":
+    "{tag} etiketine sahip bir oyuncu yok. Oyunda profilinin altından kontrol et.",
+  "Overview":
+    "Genel bakış",
+  "Player not found":
+    "Oyuncu bulunamadı",
+  "Player {tag}":
+    "Oyuncu {tag}",
+  "Recent battles":
+    "Son maçlar",
+  "The account":
+    "Hesap",
+  "What to do next":
+    "Sırada ne yapmalı",
+  "Your roster on the meta":
+    "Kadron ve meta",
+  "{length} unlocked, read against the current tier list.":
+    "{length} açık savaşçı, güncel tier listesine göre okunmuş.",
+  "{name} has {v} trophies and {length} brawlers.":
+    "{name}: {v} kupa ve {length} savaşçı.",
+  "Account completion":
+    "Hesap tamamlanma oranı",
+  "Brawlers at power 11":
+    "Güç 11 savaşçılar",
+  "Coins invested":
+    "Harcanan altın",
+  "Currently in use":
+    "Şu an kullanılan",
+  "Estimated":
+    "Tahmini",
+  "Everything unlocked and maxed.":
+    "Her şey açık ve maksimumda.",
+  "Gears equipped":
+    "Takılı eşyalar",
+  "Investment":
+    "Yatırım",
+  "Matches":
+    "Maçlar",
+  "Skins equipped":
+    "Takılı kostümler",
+  "Still to get":
+    "Hâlâ alınacaklar",
+  "still needed to take every brawler already unlocked to power 11.":
+    "zaten açılmış her savaşçıyı Güç 11 seviyesine çıkarmak için hâlâ gerekli.",
+  "{coinsToMaxOwned} coins":
+    "{coinsToMaxOwned} altın",
+  "{ownedRaw} owned in total; completion counts the two per brawler that can be equipped":
+    "Toplam {ownedRaw} sahip olunan; tamamlanma, savaşçı başına takılabilen ikisini sayar",
+  "· what it cost":
+    "· maliyeti",
+  "Across the {losses}":
+    "Bu kayıttaki {losses}",
+  "In {losses} of your losses":
+    "Yenilgilerinin {losses} tanesinde",
+  "Opponent":
+    "Rakip",
+  "in this log, rather than one-off results:":
+    "genelinde, tek seferlik sonuçlar yerine:",
+  "is a weak pick on":
+    "zayıf bir seçim:",
+  "loss":
+    "yenilgi",
+  "losses":
+    "yenilgi",
+  "there ·":
+    "·",
+  "was on the other side":
+    "karşı taraftaydı",
+  "{v} pts below the map average":
+    "harita ortalamasının {v} puan altında",
+  "Adjusted win rate":
+    "Düzeltilmiş kazanma oranı",
+  "All comparisons":
+    "Tüm karşılaştırmalar",
+  "Battles where one was on each team, counted once from the sampled player's side.":
+    "Her takımda birinin bulunduğu maçlar, incelenen oyuncunun tarafından bir kez sayıldı.",
+  "Best mode":
+    "En iyi mod",
+  "Class":
+    "Sınıf",
+  "Compare brawlers":
+    "Savaşçıları karşılaştır",
+  "Each figure comes from a different set of sampled players, so the two do not add up to 100%.":
+    "Her rakam farklı bir incelenen oyuncu grubundan gelir, bu yüzden ikisinin toplamı %100 etmez.",
+  "Head to head":
+    "Kafa kafaya",
+  "Is {nameA} better than {nameB}?":
+    "{nameA}, {nameB} karakterinden daha mı iyi?",
+  "More battles means a more reliable rate, not a better brawler.":
+    "Daha fazla maç daha güvenilir bir oran demektir, daha iyi bir savaşçı değil.",
+  "Not enough battles in any one mode yet.":
+    "Henüz hiçbir modda yeterli maç yok.",
+  "Not enough sampled battles yet.":
+    "Henüz yeterli incelenmiş maç yok.",
+  "Profile":
+    "Profil",
+  "Rarity":
+    "Nadirlik",
+  "Sampled battles":
+    "İncelenen maçlar",
+  "Side by side":
+    "Yan yana",
+  "These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.":
+    "Bu ikisi, bir kayıt bildirecek kadar sık incelenen maçlarda karşılaşmadı. Eşleşme verileri yalnızca takım modlarından toplanır ve belirli bir eşleşme için birikmesi zaman alır.",
+  "Tier":
+    "Tier",
+  "What is the {nameA} vs {nameB} head-to-head record?":
+    "{nameA} ile {nameB} kafa kafaya kaydı nedir?",
+  "Where each one performs":
+    "Her birinin performans gösterdiği yerler",
+  "Win rate is adjusted against the sample average, so both columns are on the same scale.":
+    "Kazanma oranı örneklem ortalamasına göre düzeltilir, böylece iki sütun aynı ölçekte olur.",
+  "of {decidedSampleSize} sampled games against {opponent}":
+    "— {opponent} karşısında incelenen {decidedSampleSize} maçta",
+  "vs":
+    "vs",
+  "wins":
+    "kazanır",
+  "{a} vs {b} in Brawl Stars, {v}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.":
+    "Brawl Stars'ta {a} vs {b}, {v}: kazanma oranları, seçilme oranları, tier'lar ve en iyi modlar yan yana; gerçekten karşılaştıklarında kafa kafaya kayıtları da. Görüşlerden değil incelenen maçlardan ölçüldü.",
+  "{a} vs {b}: which is better in Brawl Stars? ({v})":
+    "{a} vs {b}: Brawl Stars'ta hangisi daha iyi? ({v})",
+  "{nameA} vs {nameB} FAQ":
+    "{nameA} vs {nameB} SSS",
+  "{nameA} wins {winRate} of the {decidedSampleSize} sampled battles where {nameB} was on the other team.":
+    "{nameB} karşı takımdayken incelenen {decidedSampleSize} maçın {winRate} kadarını {nameA} kazanıyor.",
+  "{subject} vs {opponent}":
+    "{subject} vs {opponent}",
+  "All-time best":
+    "Tüm zamanların en iyisi",
+  "Current":
+    "Güncel",
+  "Current, season best and all-time best":
+    "Güncel, sezonun en iyisi ve tüm zamanların en iyisi",
+  "Global trophies":
+    "Küresel kupalar",
+  "Of {population} ranked players":
+    "{population} Aşamalı oyuncusu içinde",
+  "Of {population} tracked players":
+    "{population} takip edilen oyuncu içinde",
+  "Ranked standing":
+    "Aşamalı sıralaması",
+  "Ranking":
+    "Sıralama",
+  "Season best":
+    "Sezonun en iyisi",
+  "Trophy standing":
+    "Kupa sıralaması",
+  "World rank":
+    "Dünya sırası",
+  "best":
+    "en iyi",
+  "elo":
+    "elo",
+  "elo now":
+    "şu anki elo",
+  "At its peak right now":
+    "Şu an zirvesinde",
+  "Duo SD wins":
+    "İkili HS galibiyeti",
+  "Exp points":
+    "Deneyim puanı",
+  "Highest trophies":
+    "En yüksek kupa",
+  "In a row, all-time":
+    "Üst üste, tüm zamanlar",
+  "Lifetime":
+    "Tüm zamanlar",
+  "Longest survival":
+    "En uzun hayatta kalma",
+  "Longest time held":
+    "En uzun tutma süresi",
+  "Longest win streak":
+    "En uzun kazanma serisi",
+  "Now on {trophies}":
+    "Şu an {trophies}",
+  "On {live} in a row right now":
+    "Şu an üst üste {live}",
+  "Personal bests":
+    "Kişisel rekorlar",
+  "Solo SD wins":
+    "Tekli HS galibiyeti",
+  "{length} at power 11":
+    "Güç 11'de {length}",
+  "· since the account was made":
+    "· hesap açıldığından beri",
+  "Average":
+    "Ortalama",
+  "Below entry bar":
+    "Giriş sınırının altında",
+  "Composition":
+    "Kompozisyon",
+  "Highest":
+    "En yüksek",
+  "Lowest":
+    "En düşük",
+  "Median":
+    "Medyan",
+  "Open slots":
+    "Boş yerler",
+  "Roster insights":
+    "Kadro analizi",
+  "Top 5 share":
+    "İlk 5'in payı",
+  "Top contributors":
+    "En çok katkı verenler",
+  "Trophy spread":
+    "Kupa dağılımı",
+  "Best pick in this mode":
+    "Bu moddaki en iyi seçim",
+  "No other picks with data yet":
+    "Verisi olan başka seçim yok",
+  "Nothing here at power {READY_POWER} yet":
+    "Burada henüz Güç {READY_POWER} seviyesinde bir şey yok",
+  "What to play in each mode you can queue right now, and what would improve that answer. Scored from sampled Ranked battles, not from the ladder.":
+    "Şu an sıraya girebileceğin her modda ne oynamalı ve bu cevabı ne iyileştirir. Kupa maçlarından değil, incelenen Aşamalı maçlarından puanlandı.",
+  "Your best here · #{rank}":
+    "Buradaki en iyin · #{rank}",
+  "Your picks by mode":
+    "Moda göre seçimlerin",
+  "Both accounts are on exactly the same trophy count.":
+    "İki hesap da tam olarak aynı kupa sayısında.",
+  "Dead level":
+    "Tam eşit",
+  "Race to":
+    "Hedef:",
+  "{name} leads by {gap}":
+    "{name} {gap} farkla önde",
+  "{v} to go":
+    "{v} kaldı",
+  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
+    "Öndeki için {v} kaldı. İkinizden biri oynadıktan sonra yenile; bu iki profili de canlı okur.",
+  "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
+    "{date} güncellemesinin değiştirdiği, sahip olduğun savaşçılar ve o zamandan beri gerçekte nasıl hareket ettikleri{v}.",
+  "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
+    "Sahip olduğun {changedTotal} değişen savaşçının en büyük {length} hareketi. ",
+  "What the update did to you":
+    "Güncelleme sana ne yaptı",
+  "Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.":
+    "Kazanma oranları örneklem ortalamasına göre düzeltilir, bu yüzden buradaki bir değişim grubun değil savaşçının hareketidir. Bir savaşçı arkasında birkaç günlük ölçüm olunca görünür: iki günlük bir örneklem herhangi bir denge değişikliğinden daha fazla oynar.",
+  "pts since":
+    "puan, şu tarihten beri:",
+  "{categoryLabel} · your power {power}":
+    "{categoryLabel} · senin gücün {power}",
+  "By combined member trophies, from the game API's own ranking.":
+    "Üyelerin toplam kupalarına göre, oyun API'sinin kendi sıralamasından.",
+  "By total trophies, from the game API's own ranking.":
+    "Toplam kupaya göre, oyun API'sinin kendi sıralamasından.",
+  "No ranking data for":
+    "Sıralama verisi yok:",
+  "Not every country has a populated leaderboard. Try Global or a larger region.":
+    "Her ülkenin dolu bir sıralaması yok. Küresel'i veya daha büyük bir bölgeyi dene.",
+  "Official rankings":
+    "Resmi sıralamalar",
+  "Our own data":
+    "Kendi verilerimiz",
+  "The official top 100 {board} by trophies in {region}, straight from the game API.":
+    "{region} bölgesinde kupaya göre resmi ilk 100 {board}, doğrudan oyun API'sinden.",
+  "Top clubs in {region}":
+    "{region} bölgesinde en iyi kulüpler",
+  "Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.":
+    "Aşamalı eloya göre en iyi oyuncular. Oyun API'sinde Aşamalı sıralaması yok, bu yüzden bu bizim.",
+  "Top players in {region}":
+    "{region} bölgesinde en iyi oyuncular",
+  "Top three players":
+    "İlk üç oyuncu",
+  "What the sampled player pool is wearing. Built from our own daily samples, not from the game API.":
+    "İncelenen oyuncu havuzunun ne giydiği. Oyun API'sinden değil, kendi günlük örneklerimizden oluşturuldu.",
+  "{memberCount}/30 members":
+    "{memberCount}/30 üye",
+  "Championship qualified":
+    "Şampiyonaya katılmaya hak kazandı",
+  "Level {expLevel}":
+    "Seviye {expLevel}",
+  "No peak on record":
+    "Kayıtlı zirve yok",
+  "Peak {highestAllTimeRankedRankName}":
+    "Zirve {highestAllTimeRankedRankName}",
+  "Prestige {totalPrestigeLevel}":
+    "Prestij {totalPrestigeLevel}",
+  "Unranked":
+    "Derecesiz",
+  "Club not found":
+    "Kulüp bulunamadı",
+  "Club trophies":
+    "Kulüp kupaları",
+  "Club {tag}":
+    "Kulüp {tag}",
+  "Family friendly":
+    "Aile dostu",
+  "Members":
+    "Üyeler",
+  "No club exists with the tag {tag}. Club tags are shown on the club's info screen in-game.":
+    "{tag} etiketine sahip bir kulüp yok. Kulüp etiketleri oyunda kulübün bilgi ekranında gösterilir.",
+  "Required":
+    "Gerekli",
+  "To join":
+    "Katılmak için",
+  "Type":
+    "Tür",
+  "Collecting cosmetics":
+    "Kozmetikler toplanıyor",
+  "Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.":
+    "Takılı kostümler ve simgeler, sistem oyuncu havuzunu taradıkça kaydedilir. Bu tablo önümüzdeki bir iki günde dolar.",
+  "Most worn profile icons":
+    "En çok kullanılan profil simgeleri",
+  "Profile icons are still being recorded.":
+    "Profil simgeleri hâlâ kaydediliyor.",
+  "Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.":
+    "Her simgeyi kullanan incelenen hesapların payı. Herkesin bir simgesi var, bu yüzden bu paylar tüm havuzdan.",
+  "Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.":
+    "Her kostümü giyen incelenen savaşçıların payı. Varsayılan kostümler listede gösterilmez ama toplamda sayılır; yani %2'lik bir pay, gördüğümüz her yüz savaşçıdan ikisi demektir. Kostüm takmış her yüz savaşçıdan ikisi değil.",
+  "Compare Brawl Stars players and brawlers ({v})":
+    "Brawl Stars oyuncularını ve savaşçılarını karşılaştır ({v})",
+  "Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.":
+    "İki Brawl Stars oyuncusunu veya iki savaşçıyı yan yana koy, {v}: kupalar, Aşamalı, beceri puanı, hesap tamamlanma oranı, kazanma oranları ve kafa kafaya kayıtlar.",
+  "Compare players":
+    "Oyuncuları karşılaştır",
+  "Comparisons worth making":
+    "Yapmaya değer karşılaştırmalar",
+  "Drawn from the current top of the Ranked tier list, so it follows the meta rather than a fixed list.":
+    "Aşamalı tier listesinin güncel zirvesinden alındı, yani sabit bir listeyi değil metayı izler.",
+  "Pick from the profiles you have looked up on this device, or type a tag. Works with or without the #.":
+    "Bu cihazda baktığın profillerden seç ya da bir etiket yaz. # ile veya # olmadan çalışır.",
+  "Two players or two brawlers, side by side. Player comparisons live entirely in the URL, so they are shareable and nothing is stored.":
+    "İki oyuncu veya iki savaşçı, yan yana. Oyuncu karşılaştırmaları tamamen adreste durur; paylaşılabilirler ve hiçbir şey saklanmaz.",
+  "Win and pick rates, tier, where each performs best, and their head-to-head record.":
+    "Kazanma ve seçilme oranları, tier, her birinin en iyi olduğu yer ve kafa kafaya kayıtları.",
+  "Covered":
+    "Karşılandı",
+  "No ready pick":
+    "Hazır seçim yok",
+  "One ban from nothing":
+    "Bir ban uzaklıkta hiçlik",
+  "Read from the live Ranked rotation and the brawlers you have at power 9 or above.":
+    "Canlı Aşamalı rotasyonundan ve Güç 9 veya üstündeki savaşçılarından okundu.",
+  "The cheapest fix is":
+    "En ucuz çözüm:",
+  "Your account, in short":
+    "Hesabın, kısaca",
+  "brawlers are ready to play, covering":
+    "savaşçın oynamaya hazır; kapsadığı:",
+  "of your":
+    "/",
+  "see what it buys":
+    "ne kazandırdığına bak",
+  "with a spare pick in":
+    ", yedek seçimle birlikte:",
+  "{ready} ready":
+    "{ready} hazır",
+  "{v} coins":
+    "{v} altın",
+  "Default skin":
+    "Varsayılan kostüm",
+  "Next prestige":
+    "Sonraki prestij",
+  "On fire right now":
+    "Şu an alev alev",
+  "Past {HIGHEST_KNOWN_MARK}":
+    "{HIGHEST_KNOWN_MARK} üstü",
+  "Prestige {b}":
+    "Prestij {b}",
+  "Showcase":
+    "Vitrin",
+  "Wins in a row, as of the latest battle.":
+    "Üst üste galibiyetler, son maça göre.",
+  "in a row":
+    "üst üste",
+  "main":
+    "ana",
+  "to P{level}":
+    "P{level} için",
+  "{toGo} to P{level}":
+    "P{level} için {toGo} kaldı",
+  "Defeat":
+    "Yenilgi",
+  "Draw":
+    "Beraberlik",
+  "No battles recorded in the last 25 matches.":
+    "Son 25 maçta kayıtlı maç yok.",
+  "No recent battles. The battle log only covers roughly the last 25 matches and expires after a while.":
+    "Yakın zamanda maç yok. Maç geçmişi yalnızca yaklaşık son 25 maçı kapsar ve bir süre sonra silinir.",
+  "The battle log is unavailable right now. Try refreshing in a moment.":
+    "Maç geçmişi şu anda kullanılamıyor. Birazdan yenilemeyi dene.",
+  "Victory":
+    "Zafer",
+  "{rank} place":
+    "{rank}. sıra",
+  "From {battles} sampled battles on this map":
+    "Bu haritada incelenen {battles} maçtan",
+  "Low trophies for this account":
+    "Bu hesap için düşük kupa",
+  "Play {brawlerName} in":
+    "{brawlerName} ile oyna:",
+  "Push now":
+    "Şimdi kas",
+  "The best map in the live rotation for the brawlers this account already owns.":
+    "Bu hesabın zaten sahip olduğu savaşçılar için canlı rotasyondaki en iyi harita.",
+  "Your best move right now":
+    "Şu an en iyi hamlen",
+  "in":
+    "–",
+  "points above":
+    "puan yukarıda —",
+  "this map’s average":
+    "bu haritanın ortalamasına göre",
+  "{mapName} layout":
+    "{mapName} düzeni",
+  "· in":
+    "·",
+  "In a match recently":
+    "Yakın zamanda bir maçta",
+  "Last seen {newest}":
+    "Son görülme {newest}",
+  "Most played mode":
+    "En çok oynanan mod",
+  "across this run":
+    "bu dönem boyunca",
+  "brawlzone.net · last {battles} battles":
+    "brawlzone.net · son {battles} maç",
+  "time":
+    "kez",
+  "times":
+    "kez",
+  "trophies":
+    "kupa",
+  "{decided} decided":
+    "{decided} sonuçlanmış",
+  "Star player":
+    "Yıldız oyuncu",
+  "The last loss read against the map and the matchups, then the patterns across the whole log.":
+    "Son yenilgi harita ve eşleşmelere göre okundu, ardından tüm kayıttaki kalıplar.",
+  "What went wrong":
+    "Ne ters gitti",
+  "Two Brawl Stars players side by side: trophies, Ranked, skill score, account completion and roster overlap.":
+    "Yan yana iki Brawl Stars oyuncusu: kupalar, Aşamalı, beceri puanı, hesap tamamlanma oranı ve ortak kadro.",
+  "{a} vs {b} — Brawl Stars comparison":
+    "{a} vs {b}: Brawl Stars karşılaştırması",
+  " · power {brawlerPower}":
+    " · Güç {brawlerPower}",
+  "All results":
+    "Tüm sonuçlar",
+  "By brawler":
+    "Savaşçıya göre",
+  "By mode":
+    "Moda göre",
+  "Draws":
+    "Beraberlikler",
+  "Filter by mode":
+    "Moda göre filtrele",
+  "Filter by result":
+    "Sonuca göre filtrele",
+  "Last {length} games":
+    "Son {length} maç",
+  "Losses":
+    "Yenilgiler",
+  "No battles match that filter.":
+    "Bu filtreye uyan maç yok.",
+  "Star player ×{stars}":
+    "Yıldız oyuncu ×{stars}",
+  "Team":
+    "Takım",
+  "This battle reported no player list.":
+    "Bu maç oyuncu listesi bildirmedi.",
+  "Unknown brawler":
+    "Bilinmeyen savaşçı",
+  "Wins":
+    "Galibiyetler",
+  "· mostly":
+    "· çoğunlukla",
+  "Brawl Stars player comparison":
+    "Brawl Stars oyuncu karşılaştırması",
+  "Clear recent":
+    "Son aramaları temizle",
+  "Clear the comparison":
+    "Karşılaştırmayı temizle",
+  "Clear {v}":
+    "{v} temizle",
+  "Look a player up from the search box and they are remembered on this device, ready to pick here without typing the tag again. Nothing is sent to the server.":
+    "Arama kutusundan bir oyuncuya bak; bu cihazda hatırlanır ve etiketi tekrar yazmadan burada seçmeye hazır olur. Sunucuya hiçbir şey gönderilmez.",
+  "Looked up on this device":
+    "Bu cihazda bakılanlar",
+  "Other side":
+    "Diğer taraf",
+  "Player 1":
+    "Oyuncu 1",
+  "Player 2":
+    "Oyuncu 2",
+  "Share":
+    "Paylaş",
+  "Swap players":
+    "Oyuncuların yerini değiştir",
+  "Swap the two players":
+    "İki oyuncunun yerini değiştir",
+  ", so the real figure is this or better.":
+    ", yani gerçek rakam bu kadar veya daha iyi.",
+  "30 members’ rosters":
+    "30 üyenin kadrosunu",
+  "Club power":
+    "Kulüp gücü",
+  "Every member's roster read against the current Ranked S and A tier — what this club can actually put on the field.":
+    "Her üyenin kadrosu güncel Aşamalı S ve A tier'a göre okunur: bu kulübün sahaya gerçekte ne sürebileceği.",
+  "No hypercharge in the club:":
+    "Kulüpte hiperşarjı olmayan:",
+  "Nobody can field:":
+    "Kimsenin sahaya süremediği:",
+  "Rank this club":
+    "Bu kulübü değerlendir",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
+    "Önce üst tier'ın hiperşarjlı kapsamına, sonra hiç sahaya sürebildiklerine göre sıralı. Kupalar yalnızca eşitliği bozar; oyun üye listesini zaten öyle sıralıyor.",
+  "Reading rosters…":
+    "Kadrolar okunuyor…",
+  "Reads all":
+    "Tüm",
+  "The game’s API only answered for {length} of":
+    "Oyunun API'si yalnızca {length} /",
+  "can field":
+    "sahaya sürebilir",
+  "could not be read":
+    "okunamadı",
+  "fieldable,":
+    "sahaya sürülebilir,",
+  "hyper":
+    "hiper",
+  "hypercharged":
+    "hiperşarjlı",
+  "hypercharged.":
+    "hiperşarjlı.",
+  "live. It takes a few seconds, so it only runs when you ask.":
+    "canlı okur. Birkaç saniye sürer, bu yüzden yalnızca sen istediğinde çalışır.",
+  "member":
+    "üye",
+  "members":
+    "üye",
+  "members, so this is incomplete and has not been saved.":
+    "üye için yanıt verdi; bu yüzden eksik ve kaydedilmedi.",
+  "of the {topTierSize} brawlers in the current Ranked S and A tier, for the typical member of {name}. Between all {length} of them:":
+    "/ {topTierSize}: güncel Aşamalı S ve A tier savaşçılarından, {name} kulübünün tipik bir üyesi için. Toplam {length} üyenin hepsinde:",
+  "only hypercharged":
+    "yalnızca hiperşarjlı",
+  "{coverage} fieldable · {powerEleven} at power 11 ·":
+    "{coverage} sahaya sürülebilir · Güç 11'de {powerEleven} ·",
+  "1 day ago":
+    "1 gün önce",
+  "Since your last visit":
+    "Son ziyaretinden beri",
+  "{days} days ago":
+    "{days} gün önce",
+  "· kept in this browser only":
+    "· yalnızca bu tarayıcıda tutulur",
+  "All countries":
+    "Tüm ülkeler",
+  "No country matches “{query}”.":
+    "“{query}” ile eşleşen ülke yok.",
+  "Search countries":
+    "Ülke ara",
+  "Link copied":
+    "Bağlantı kopyalandı",
+  "Share this profile":
+    "Bu profili paylaş",
+  "No members match that search.":
+    "Bu aramaya uyan üye yok.",
+  "Search club members":
+    "Kulüp üyelerinde ara",
+  "Search members by name or tag":
+    "Üyeleri ada veya etikete göre ara",
+  "This club has no members listed.":
+    "Bu kulübün listelenmiş üyesi yok.",
 };
