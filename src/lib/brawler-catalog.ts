@@ -182,7 +182,9 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
   for (let i = 0; i < all.length; i += CONCURRENCY) {
     const batch = all.slice(i, i + CONCURRENCY);
     const present = await Promise.all(
-      batch.map((b) => (b.meta?.imageUrl ? hasBrawlerPortrait(b.id) : Promise.resolve(false))),
+      // Asked for brawlers the mirror's metadata lacks too: its CDN can publish
+      // the portrait first (Rey and Ruby on 2026-11-03, a day after release).
+      batch.map((b) => (b.meta?.imageUrl || b.imageUrl.startsWith('https://cdn.brawlify.com/') ? hasBrawlerPortrait(b.id) : Promise.resolve(false))),
     );
     batch.forEach((b, j) => {
       if (!present[j]) missingArt.push(b.name);

@@ -30,6 +30,7 @@ import {
 } from '@/components/game-icons';
 import {
   brawlerModelUrl,
+  existingAccessoryArt,
   getBrawler,
   hasBrawlerModel,
   rarityColor,
@@ -432,9 +433,11 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
        * word, so the bug was invisible and would have surfaced on whichever
        * future release happened to have a space in its name.
        */
-      const [abilityArt, model] = await Promise.all([
+      const [abilityArt, model, cdnStarPowers, cdnGadgets] = await Promise.all([
         getWikiAbilityArt(entry.name).catch(() => ({ gadgets: [], starPowers: [] })),
         getWikiModel(entry.name).catch(() => null),
+        Promise.all((live?.starPowers ?? []).map((a: { id: number }) => existingAccessoryArt('starPower', a.id).catch(() => null))),
+        Promise.all((live?.gadgets ?? []).map((a: { id: number }) => existingAccessoryArt('gadget', a.id).catch(() => null))),
       ]);
       wikiModel = model;
 
@@ -443,17 +446,19 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
        * and star powers in the order the wiki numbers its files, and an empty
        * src renders as an empty box — which is what this page showed on
        * launch day, four blank squares beside four real ability names.
-       * Until the wiki uploads them (Rey and Ruby, 2026-11-03), the Fan Kit's
-       * generic gadget or star power mark stands in.
+       * The CDN's own icon comes first when it already has the file (it
+       * matches every other brawler's page), then the wiki's; until either
+       * publishes one (Rey and Ruby, 2026-11-03), the Fan Kit's generic
+       * gadget or star power mark stands in.
        */
       const accessory =
-        (art: string[], generic: string | null) =>
+        (cdn: (string | null)[], art: string[], generic: string | null) =>
         (a: { id: number; name: string }, i: number): BAAccessory => ({
           id: a.id,
           name: a.name,
           description: '',
           descriptionHtml: '',
-          imageUrl: art[i] ?? generic ?? '',
+          imageUrl: cdn[i] ?? art[i] ?? generic ?? '',
           released: true,
         });
 
@@ -464,8 +469,8 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         description: '',
         class: { id: 0, name: entry.className ?? '' },
         rarity: { id: 0, name: entry.rarityName ?? '', color: entry.rarityColor ?? '#8b95b8' },
-        starPowers: (live?.starPowers ?? []).map(accessory(abilityArt.starPowers, fankitGeneric('starpower'))),
-        gadgets: (live?.gadgets ?? []).map(accessory(abilityArt.gadgets, fankitGeneric('gadget'))),
+        starPowers: (live?.starPowers ?? []).map(accessory(cdnStarPowers, abilityArt.starPowers, fankitGeneric('starpower'))),
+        gadgets: (live?.gadgets ?? []).map(accessory(cdnGadgets, abilityArt.gadgets, fankitGeneric('gadget'))),
         // Unused by this page; present to satisfy the mirror's shape.
         avatarId: 0,
         hash: '',

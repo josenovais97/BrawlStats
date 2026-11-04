@@ -451,6 +451,16 @@ export function gadgetIconUrl(id: number): string {
   return `https://cdn.brawlify.com/gadgets/regular/${id}.png`;
 }
 
+/**
+ * A star power's or gadget's CDN icon when the file really exists, else null.
+ * For a brawler the mirror's metadata does not list yet: the CDN can publish
+ * the art first (Rey and Ruby on 2026-11-03), and a URL is not evidence.
+ */
+export async function existingAccessoryArt(kind: 'starPower' | 'gadget', id: number): Promise<string | null> {
+  const url = kind === 'starPower' ? starPowerIconUrl(id) : gadgetIconUrl(id);
+  return (await hasArtwork(url)) ? url : null;
+}
+
 /** Gear artwork, by gear id. */
 export function gearIconUrl(id: number): string {
   return `https://cdn.brawlify.com/gears/regular/${id}.png`;
