@@ -405,4 +405,804 @@ export const DE: Record<string, string> = {
     "Was ist der beste Modus für {name}?",
   "What star powers and gadgets does {name} have?":
     "Welche Starpowers und Gadgets hat {name}?",
+  "Where it performs":
+    "Wo er stark ist",
+  "Which brawlers {v} beats, which ones win the matchup, and who to draft alongside.":
+    "Welche Brawler {v} schlägt, welche das Matchup gewinnen und wen man dazu draftet.",
+  "Which {name} skins players actually equip, from the sampled snapshot pool.":
+    "Welche {name}-Skins Spieler wirklich ausrüsten, aus der erfassten Momentaufnahmen-Stichprobe.",
+  "Who is {name} in Brawl Stars?":
+    "Wer ist {name} in Brawl Stars?",
+  "Win rate":
+    "Siegquote",
+  "build, stats and matchups":
+    "Build, Stats und Matchups",
+  "from empty, all hits landing":
+    "von leer, alle Treffer sitzen",
+  "per hit":
+    "pro Treffer",
+  "speed, damage and shield":
+    "Tempo, Schaden und Schild",
+  "{decidedSampleSize} battles":
+    "{decidedSampleSize} Matches",
+  "{mapName} ({mode}) is where {name} has the strongest sampled record, at {winRate} over {decidedSampleSize} battles.":
+    "Auf {mapName} ({mode}) hat {name} die stärkste erfasste Bilanz: {winRate} über {decidedSampleSize} Matches.",
+  "{name} FAQ":
+    "{name} FAQ",
+  "{name} build and stats, {v}":
+    "{name}: Build und Stats, {v}",
+  "{name} has a {normalizedWinRate} adjusted win rate and a {usageRate} pick rate over {decidedSampleSize} sampled decided battles{v}.":
+    "{name} hat eine bereinigte Siegquote von {normalizedWinRate} und eine Pickrate von {usageRate} über {decidedSampleSize} erfasste entschiedene Matches{v}.",
+  "{name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.":
+    "{name} wurde noch nicht genug erfasst für eine Siegquote. Die Tierlists enthalten jeden Brawler mit genug Matches.",
+  "{name} has {v} as star powers and {v2} as gadgets.":
+    "{name} hat {v} als Starpowers und {v2} als Gadgets.",
+  "{name} is a new{v} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.":
+    "{name} ist ein neuer{v} Brawler, der für Brawl Stars angekündigt, aber noch nicht erschienen ist. Stats, Gadgets und Starpowers, sobald sie bekannt sind.",
+  "{name} is the newest brawler in Brawl Stars and the {newestOrdinal} to be released. {description}":
+    "{name} ist der neueste Brawler in Brawl Stars und der {newestOrdinal}, der erschienen ist. {description}",
+  "{name} performs best in {mode}, with a {winRate} raw win rate over {decidedSampleSize} sampled battles there.":
+    "{name} ist in {mode} am stärksten, mit einer rohen Siegquote von {winRate} über {decidedSampleSize} erfasste Matches dort.",
+  "{name}: the new Brawl Stars brawler ({v})":
+    "{name}: der neue Brawl-Stars-Brawler ({v})",
+  "{tier} tier":
+    "Tier {tier}",
+  "{v} at Power 11":
+    "{v} auf Power 11",
+  "{v} pull {name} furthest below its own {baseline} average in sampled team battles.":
+    "{v} drücken {name} in erfassten Team-Matches am weitesten unter den eigenen Durchschnitt von {baseline}.",
+  "All Brawl Stars brawlers ranked ({v})":
+    "Alle Brawl-Stars-Brawler im Ranking ({v})",
+  "All {length} current brawlers with their Ranked tier, sortable by how strong they are right now{v}":
+    "Alle {length} aktuellen Brawler mit ihrem Ranked-Tier, sortierbar danach, wie stark sie gerade sind{v}",
+  "Brawlers":
+    "Brawler",
+  "Every Brawl Stars brawler with its Ranked tier, class, rarity, star powers and gadgets, {v}. Sorted strongest first from sampled battles.":
+    "Jeder Brawl-Stars-Brawler mit Ranked-Tier, Klasse, Seltenheit, Starpowers und Gadgets, {v}. Die stärksten zuerst, aus erfassten Matches.",
+  "The brawler metadata source (brawlapi.com) is not responding. Try again shortly.":
+    "Die Quelle für Brawler-Daten (brawlapi.com) antwortet nicht. Versuch es gleich noch mal.",
+  "Allies {name} wins more alongside":
+    "Teamkollegen, mit denen {name} öfter gewinnt",
+  "Best team-mates":
+    "Beste Teamkollegen",
+  "Opponents that pull {name} below its own average":
+    "Gegner, die {name} unter den eigenen Durchschnitt drücken",
+  "Opponents {name} beats more often than its own average":
+    "Gegner, die {name} öfter schlägt als im eigenen Durchschnitt",
+  "Percentage points above or below this brawler’s own":
+    "Prozentpunkte über oder unter der eigenen",
+  "Strong against":
+    "Stark gegen",
+  "Weak against":
+    "Schwach gegen",
+  "{baseline} win rate across":
+    "Siegquote von {baseline} dieses Brawlers über",
+  "{sampleSize} sampled team battles. Counted once per battle from one player’s side, and kept out of the win-rate and pick-rate numbers above. Those would be skewed by counting every participant.":
+    "{sampleSize} erfasste Team-Matches. Pro Match einmal aus Sicht eines Spielers gezählt und nicht in die Sieg- und Pickraten oben einbezogen, die durch das Zählen jedes Teilnehmers verzerrt würden.",
+  "{winRate} win rate over {decidedSampleSize} sampled battles, against a {baseline} average for this brawler":
+    "{winRate} Siegquote über {decidedSampleSize} erfasste Matches, gegenüber einem Durchschnitt von {baseline} für diesen Brawler",
+  "Almost every sampled {name} owner is on the default skin.":
+    "Fast jeder erfasste {name}-Besitzer nutzt den Standard-Skin.",
+  "Default":
+    "Standard",
+  "Shares are of players who own {name}, from the rotating snapshot sample.":
+    "Anteile beziehen sich auf Spieler, die {name} besitzen, aus der wechselnden Momentaufnahmen-Stichprobe.",
+  "not shown.":
+    "nicht angezeigt.",
+  "of sampled {name} owners have a skin equipped.":
+    "der erfassten {name}-Besitzer haben einen Skin ausgerüstet.",
+  "rarer":
+    "seltener",
+  "skin":
+    "Skin",
+  "skins":
+    "Skins",
+  "At peak":
+    "Auf dem Höchststand",
+  "Peak {highestTrophies}":
+    "Höchststand {highestTrophies}",
+  "Power {power}":
+    "Power {power}",
+  "Base values, before gears and star powers. Provisional until release.":
+    "Grundwerte, vor Ausrüstung und Starpowers. Vorläufig bis zum Release.",
+  "Gadgets and star powers":
+    "Gadgets und Starpowers",
+  "Not named yet":
+    "Noch ohne Namen",
+  "Not released yet":
+    "Noch nicht erschienen",
+  "Nothing beyond the name has been published for {name} yet. This page fills in as the wiki does.":
+    "Über {name} wurde bisher nur der Name veröffentlicht. Diese Seite füllt sich, wenn das Wiki es tut.",
+  "Ranked and ladder win rates, pick rate and tier.":
+    "Ranked- und Trophäen-Siegquoten, Pickrate und Tier.",
+  "The highest-trophy accounts playing it.":
+    "Die Accounts mit den meisten Trophäen, die ihn spielen.",
+  "The maps and modes it is strongest on.":
+    "Die Maps und Modi, auf denen er am stärksten ist.",
+  "The star power, gadget and gears owners actually run.":
+    "Starpower, Gadget und Ausrüstung, die Besitzer wirklich nutzen.",
+  "Top players":
+    "Top-Spieler",
+  "Which brawlers it beats, and which beat it.":
+    "Welche Brawler er schlägt und welche ihn schlagen.",
+  "{name} has been revealed but is not playable yet, so there are no sampled battles behind this page. Everything below comes from the community wiki and fills in over the days after a reveal.":
+    "{name} wurde angekündigt, ist aber noch nicht spielbar, deshalb stehen hinter dieser Seite keine erfassten Matches. Alles unten stammt aus dem Community-Wiki und füllt sich in den Tagen nach einer Ankündigung.",
+  "{name} is not playable, so no battles have been sampled. This fills in within a day or two of release.":
+    "{name} ist nicht spielbar, deshalb wurden keine Matches erfasst. Das füllt sich ein bis zwei Tage nach dem Release.",
+  "· Stats and abilities from the Brawl Stars Wiki, which is community edited and may change before release.":
+    "· Stats und Fähigkeiten aus dem Brawl Stars Wiki, das von der Community bearbeitet wird und sich bis zum Release ändern kann.",
+  "Best maps":
+    "Beste Maps",
+  "Best modes":
+    "Beste Modi",
+  "Not enough battles on any one map yet.":
+    "Noch auf keiner Map genug Matches.",
+  "{decidedSampleSize} battles ·":
+    "{decidedSampleSize} Matches ·",
+  "{winRate} raw":
+    "{winRate} roh",
+  "Buffie":
+    "Buffie",
+  "Buffies":
+    "Buffies",
+  "Build & upgrades":
+    "Build und Upgrades",
+  "Gadgets":
+    "Gadgets",
+  "Gears":
+    "Ausrüstung",
+  "How to read this":
+    "So liest du das",
+  "No gadgets released.":
+    "Keine Gadgets erschienen.",
+  "No star powers released.":
+    "Keine Starpowers erschienen.",
+  "Released.":
+    "Erschienen.",
+  "Star powers":
+    "Starpowers",
+  "The exact boost percentages vary per brawler and are published neither by the game API nor by any artwork source.":
+    "Die genauen Boost-Prozente unterscheiden sich je nach Brawler und werden weder von der Spiel-API noch von einer Grafikquelle veröffentlicht.",
+  "Unlocked at Power 11. Charges from dealing and taking damage, then boosts {name}'s speed, damage and shield for a few seconds.":
+    "Ab Power 11 freigeschaltet. Lädt sich durch ausgeteilten und erlittenen Schaden auf und verstärkt dann für ein paar Sekunden Tempo, Schaden und Schild von {name}.",
+  "Unreleased.":
+    "Nicht erschienen.",
+  "What owners bought":
+    "Was Besitzer gekauft haben",
+  "What owners bought is popularity — the game's API reports what a player has unlocked, never what they took into a match. How it has gone is the win rate among the players who made each choice, which covers the ability and the kind of player who picks it together. Neither is a recommendation from us: BrawlZone does not rank":
+    "Was Besitzer gekauft haben, ist Beliebtheit: Die API des Spiels meldet, was ein Spieler freigeschaltet hat, nie, was er ins Match mitgenommen hat. Wie es gelaufen ist, ist die Siegquote unter den Spielern, die sich jeweils so entschieden haben, und umfasst die Fähigkeit und die Art von Spieler, die sie wählt. Beides ist keine Empfehlung von uns: BrawlZone bewertet",
+  "What {name}'s kit does, and what owners spend their coins on first.":
+    "Was das Kit von {name} kann und wofür Besitzer ihre Münzen zuerst ausgeben.",
+  "for them.":
+    "für sie gelaufen ist.",
+  "how it has gone":
+    "wie es",
+  "{item} cooldown":
+    "Abklingzeit: {item}",
+  "{name} has buffies, but their effects have not been documented yet.":
+    "{name} hat Buffies, aber ihre Effekte sind noch nicht dokumentiert.",
+  "{name} has no buffies yet.":
+    "{name} hat noch keine Buffies.",
+  "{name}'s kit, and nothing here is an opinion about what you should buy.":
+    "das Kit von {name} nicht, und nichts hier ist eine Meinung dazu, was du kaufen solltest.",
+  "Compare":
+    "Vergleichen",
+  "Most owned":
+    "Am häufigsten",
+  "The build owners run":
+    "Der Build, den Besitzer nutzen",
+  "Why, and what else":
+    "Warum, und was sonst",
+  "{share} of owners":
+    "{share} der Besitzer",
+  "No ranking data for this brawler yet.":
+    "Noch keine Ranglisten-Daten für diesen Brawler.",
+  "The brawler leaderboard is unavailable right now.":
+    "Die Brawler-Bestenliste ist gerade nicht verfügbar.",
+  " of {length}":
+    " von {length}",
+  ", {legacy} withdrawn":
+    ", {legacy} entfernt",
+  ", {upcoming} not released yet":
+    ", {upcoming} noch nicht erschienen",
+  "All":
+    "Alle",
+  "Clear filters":
+    "Filter löschen",
+  "Clear search":
+    "Suche löschen",
+  "Filters":
+    "Filter",
+  "Name A–Z":
+    "Name A–Z",
+  "Newest first":
+    "Neueste zuerst",
+  "No brawlers match those filters.":
+    "Keine Brawler passen zu diesen Filtern.",
+  "No longer available in the game. Kept for its history.":
+    "Nicht mehr im Spiel verfügbar. Bleibt für den Verlauf erhalten.",
+  "Rarest first":
+    "Seltenste zuerst",
+  "Release order":
+    "Erscheinungsreihenfolge",
+  "Revealed but not in the game yet.":
+    "Angekündigt, aber noch nicht im Spiel.",
+  "Search brawlers":
+    "Brawler suchen",
+  "Search brawlers by name":
+    "Brawler nach Namen suchen",
+  "Soon":
+    "Bald",
+  "Sort":
+    "Sortieren",
+  "Strongest":
+    "Stärkste",
+  "brawler":
+    "Brawler",
+  "{tier} tier in Ranked{v}":
+    "Tier {tier} im Ranked{v}",
+  "· {playable} currently playable":
+    "· {playable} aktuell spielbar",
+  "Best win streak {best}":
+    "Beste Siegesserie {best}",
+  "Filter brawlers":
+    "Brawler filtern",
+  "Filter brawlers by name":
+    "Brawler nach Namen filtern",
+  "Name":
+    "Name",
+  "No brawlers match “{query}”.":
+    "Keine Brawler passen zu „{query}“.",
+  "Off peak":
+    "Unter Höchststand",
+  "On {live} in a row; best {best}":
+    "Gerade {live} in Folge; Bestwert {best}",
+  "Power":
+    "Power",
+  "Prestige {prestige}":
+    "Prestige {prestige}",
+  "Rank":
+    "Rang",
+  "Rank {rank}":
+    "Rang {rank}",
+  "Show {hidden} more":
+    "{hidden} weitere anzeigen",
+  "best {best}":
+    "Bestwert {best}",
+  "{live} in a row":
+    "{live} in Folge",
+  "{name}: not enough sampled battles to rate":
+    "{name}: nicht genug erfasste Matches für eine Bewertung",
+  "{name}: {tier} tier on the trophy list, meta score {v}":
+    "{name}: Tier {tier} auf der Trophäenliste, Meta-Score {v}",
+  "−{gap} off peak":
+    "−{gap} unter Höchststand",
+  "Choose a brawler":
+    "Wähle einen Brawler",
+  "No brawler matches “{query}”.":
+    "Kein Brawler passt zu „{query}“.",
+  "First brawler":
+    "Erster Brawler",
+  "Second brawler":
+    "Zweiter Brawler",
+  " (as of {startedAt})":
+    " (Stand: {startedAt})",
+  " {v} of {length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.":
+    " {v} von {length} Maps reichen noch nicht für einen Pick, und trotzdem einen zu nennen wäre schlechter als keinen.",
+  ", across every map in the pool. {brawlerName} leads with a":
+    ", über alle Maps im Pool. {brawlerName} führt mit einer",
+  "Best trio":
+    "Bestes Trio",
+  "Brawl Stars Ranked maps and best brawlers ({v})":
+    "Brawl Stars Ranked-Maps und beste Brawler ({v})",
+  "Collecting map data":
+    "Map-Daten werden gesammelt",
+  "Competitive only":
+    "Nur kompetitiv",
+  "Every map is scored against the same {baseline} sample-wide Ranked average, and each brawler’s handful of battles on one map is weighed against its overall Ranked form. A map needs real evidence to move a brawler off that.":
+    "Jede Map wird am selben Ranked-Durchschnitt von {baseline} der ganzen Stichprobe gemessen, und die wenigen Matches eines Brawlers auf einer Map werden gegen seine allgemeine Ranked-Form abgewogen. Eine Map braucht echte Belege, um einen Brawler davon wegzubewegen.",
+  "How these picks are chosen":
+    "So werden diese Picks ausgewählt",
+  "Jump to a mode":
+    "Zu einem Modus springen",
+  "Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.":
+    "Map-Namen werden nur bei neu erfassten Matches gespeichert, und der Match-Verlauf reicht etwa 25 Matches zurück, deshalb füllt sich das in den nächsten ein, zwei Tagen.",
+  "No brawler is clearly above average here yet. The map has been sampled":
+    "Hier liegt noch kein Brawler klar über dem Durchschnitt. Die Map wurde",
+  "Ranked battles":
+    "Ranked-Matches",
+  "Ranked maps":
+    "Ranked-Maps",
+  "Sampled":
+    "Erfasst",
+  "See the Ranked tier list":
+    "Zur Ranked-Tierlist",
+  "The best brawlers for every map in the current Ranked rotation, {v}. From sampled competitive battles, updated every few hours.":
+    "Die besten Brawler für jede Map der aktuellen Ranked-Rotation, {v}. Aus erfassten kompetitiven Matches, alle paar Stunden aktualisiert.",
+  "The strongest brawlers on each map in the current Ranked rotation, from sampled competitive battles only.":
+    "Die stärksten Brawler auf jeder Map der aktuellen Ranked-Rotation, nur aus erfassten kompetitiven Matches.",
+  "Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.":
+    "Trophäen-Matches sind komplett ausgeschlossen. Das Ranked-Matchmaking bringt vergleichbare Gegner zusammen, was übrig bleibt, spiegelt also den Brawler wider und nicht, wer ihn gespielt hat, und im Ranked gibt es seit der Überarbeitung im Februar 2025 keine Modifikatoren mehr: Jedes Match hier ist der normale Modus auf der normalen Map.",
+  "Which maps appear is taken from the season’s published pool rather than from our own samples, so the board matches the rotation the day it changes. Map names are recorded on newly sampled battles only and a battle log reaches back about 25 matches, so a map that has just entered the pool carries no picks for a day or two after it does.":
+    "Welche Maps erscheinen, kommt aus dem veröffentlichten Pool der Saison und nicht aus unseren eigenen Daten, so passt die Übersicht am Tag des Wechsels zur Rotation. Map-Namen werden nur bei neu erfassten Matches gespeichert und ein Match-Verlauf reicht etwa 25 Matches zurück, deshalb hat eine gerade neu aufgenommene Map ein, zwei Tage lang keine Picks.",
+  "brawlers. Not enough for any one of them to separate from the pack.":
+    "Brawler. Nicht genug, damit sich einer davon absetzt.",
+  "{brawlerName} are the best brawlers in Ranked right now":
+    "{brawlerName} sind gerade die besten Brawler im Ranked",
+  "{brawlerName}, {brawlerName2} and":
+    "{brawlerName}, {brawlerName2} und",
+  "{brawlerName}: {winRate} raw win rate over {decidedSampleSize} sampled Ranked battles on this map, against {overallScore} adjusted form over {overallSampleSize} Ranked battles overall":
+    "{brawlerName}: {winRate} rohe Siegquote über {decidedSampleSize} erfasste Ranked-Matches auf dieser Map, gegenüber einer bereinigten Form von {overallScore} über {overallSampleSize} Ranked-Matches insgesamt",
+  "{decidedSampleSize} battles here":
+    "{decidedSampleSize} Matches hier",
+  "{decidedSampleSize} decided battles. Each map below has its own answer.":
+    "{decidedSampleSize} entschiedene Matches. Jede Map unten hat ihre eigene Antwort.",
+  "{normalizedWinRate} adjusted win rate over":
+    "bereinigten Siegquote von {normalizedWinRate} über",
+  "{rated} of {length} maps with a pick":
+    "{rated} von {length} Maps mit Pick",
+  "{sampleSize} ranked battles · {brawlersSeen} brawlers seen":
+    "{sampleSize} Ranked-Matches · {brawlersSeen} Brawler gesehen",
+  "{sampleSize} times, spread across":
+    "{sampleSize}-mal erfasst, verteilt auf",
+  "{v} vs usual":
+    "{v} ggü. normal",
+  " · {length} milestones":
+    " · {length} Meilensteine",
+  "Brawl Stars wiki":
+    "Brawl Stars Wiki",
+  "Date unknown":
+    "Datum unbekannt",
+  "Milestones and rewards are written up by the":
+    "Meilensteine und Belohnungen werden von der",
+  "Started {startedOn}":
+    "Gestartet am {startedOn}",
+  "community and read from it automatically, so a new event appears here without the site being changed. Text is CC BY-SA.":
+    "Community geschrieben und automatisch übernommen, so erscheint ein neues Event hier, ohne dass die Seite geändert wird. Text unter CC BY-SA.",
+  "'s own Ranked average; small samples are pulled toward it. The same trios, with your roster ticked, are in the":
+    "; kleine Stichproben werden daran angenähert. Dieselben Trios, mit deinem Kader abgehakt, findest du in der",
+  "Best Ranked trios in {modeLabel}":
+    "Beste Ranked-Trios in {modeLabel}",
+  "Best Ranked trios on {mapName}":
+    "Beste Ranked-Trios auf {mapName}",
+  "The three brawlers that win most together on this map, from sampled Ranked battles in the last 14 days.":
+    "Die drei Brawler, die auf dieser Map zusammen am meisten gewinnen, aus erfassten Ranked-Matches der letzten 14 Tage.",
+  "Win rate against this":
+    "Siegquote gegenüber dem Ranked-Durchschnitt dieses",
+  "app's Team comp tab.":
+    "-App im Tab „Team-Kombos“.",
+  "mode":
+    "Modus",
+  "{battles} games · {players} players":
+    "{battles} Matches · {players} Spieler",
+  "{mapName} has too few Ranked teams to rank on its own yet, so these are the best trios across {modeLabel}.":
+    "{mapName} hat noch zu wenige Ranked-Teams für ein eigenes Ranking, deshalb sind das die besten Trios in ganz {modeLabel}.",
+  "{v} vs avg":
+    "{v} ggü. Ø",
+  ", CC-BY-SA.":
+    ", CC-BY-SA.",
+  "After season {number}":
+    "Nach Saison {number}",
+  "Current season":
+    "Aktuelle Saison",
+  "Featured":
+    "Im Fokus",
+  "Full map pool{v}":
+    "Ganzer Map-Pool{v}",
+  "Next season":
+    "Nächste Saison",
+  "Ranked season {number}":
+    "Ranked-Saison {number}",
+  "Season and pool data from the":
+    "Saison- und Pool-Daten aus dem",
+  "Season in progress":
+    "Saison läuft",
+  "Season {number} ended on {endsOn}. A new season started that day, but its number and trial brawlers have not been published yet.":
+    "Saison {number} endete am {endsOn}. An dem Tag hat eine neue Saison begonnen, aber ihre Nummer und die Test-Brawler sind noch nicht veröffentlicht.",
+  "The pool is fixed for the season. Modifiers were removed from Ranked in the February 2025 rework, so every battle counted here is the plain mode on the plain map.":
+    "Der Pool steht für die ganze Saison fest. Modifikatoren wurden bei der Überarbeitung im Februar 2025 aus dem Ranked entfernt, jedes Match hier ist also der normale Modus auf der normalen Map.",
+  "Trial brawlers: {v}":
+    "Test-Brawler: {v}",
+  "Turnover date from the published schedule (third Thursday); the next line-up has not been announced.":
+    "Wechseldatum laut veröffentlichtem Zeitplan (dritter Donnerstag); die nächste Aufstellung ist noch nicht angekündigt.",
+  "featured":
+    "im Fokus",
+  "maps in the pool":
+    "Maps im Pool",
+  "{length} trial brawler":
+    "{length} Test-Brawler",
+  ", CC-BY-SA. The rankings above are our own.":
+    ", CC-BY-SA. Die Rankings oben stammen von uns.",
+  "All {modeLabel} maps":
+    "Alle {modeLabel}-Maps",
+  "Best Brawl Stars brawlers on {name} ({modeLabel}), from sampled battles.":
+    "Die besten Brawl-Stars-Brawler auf {name} ({modeLabel}), aus erfassten Matches.",
+  "Best brawlers here":
+    "Beste Brawler hier",
+  "Best brawlers in {modeLabel}":
+    "Beste Brawler in {modeLabel}",
+  "Each row is measured against that brawler’s own record on this map, so a map that simply favours a brawler does not make all of its matchups look winning. Only matchups with at least 40 sampled battles appear.":
+    "Jede Zeile wird an der eigenen Bilanz dieses Brawlers auf dieser Map gemessen, so lässt eine Map, die einen Brawler einfach begünstigt, nicht alle seine Matchups wie Siege aussehen. Nur Matchups mit mindestens 40 erfassten Matches erscheinen.",
+  "From {sampleSize} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.":
+    "Aus {sampleSize} erfassten Ranked-Matches auf dieser Map, abgewogen gegen die allgemeine Ranked-Form jedes Brawlers.",
+  "How is {name} laid out?":
+    "Wie ist {name} aufgebaut?",
+  "How the map is built, and what that rewards.":
+    "Wie die Map gebaut ist und was das belohnt.",
+  "Layout":
+    "Layout",
+  "Layout description from the":
+    "Layout-Beschreibung aus dem",
+  "Map by":
+    "Map von",
+  "Matchups on this map":
+    "Matchups auf dieser Map",
+  "New":
+    "Neu",
+  "No sampled battles for {modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
+    "Noch keine erfassten Matches für {modeLabel}. Die Erfassung geht ständig den Bestenlisten-Pool durch, das füllt sich in den nächsten ein, zwei Tagen.",
+  "Other {modeLabel} maps":
+    "Weitere {modeLabel}-Maps",
+  "Retired":
+    "Entfernt",
+  "Scores are shown against a":
+    "Die Scores werden gegenüber einem",
+  "The brawlers with the best records on {name}, a":
+    "Die Brawler mit der besten Bilanz auf {name}, einer",
+  "The strongest brawlers on {name} ({modeLabel}) in Brawl Stars, ranked from sampled battles, with the map layout and how much evidence is behind each pick.":
+    "Die stärksten Brawler auf {name} ({modeLabel}) in Brawl Stars, nach erfassten Matches sortiert, mit Map-Layout und wie viele Belege hinter jedem Pick stehen.",
+  "Top three on {name}":
+    "Top drei auf {name}",
+  "What are the best brawlers on {name}?":
+    "Was sind die besten Brawler auf {name}?",
+  "What game mode is {name}?":
+    "Zu welchem Spielmodus gehört {name}?",
+  "Where a brawler does measurably better or worse against a specific opponent here than it does on {name} generally.":
+    "Wo ein Brawler hier gegen einen bestimmten Gegner messbar besser oder schlechter abschneidet als auf {name} insgesamt.",
+  "map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
+    "-Map. Sortiert nach Matches aus dem globalen Bestenlisten-Pool, gemessen am Durchschnitt der ganzen Stichprobe statt an dem der Map. Ein Pick muss also das ganze Feld schlagen, nicht nur die Lobby.",
+  "sample-wide Ranked average. A brawler with a handful of battles here is pulled toward its overall Ranked form, so the map has to produce real evidence before it moves anyone.":
+    "Ranked-Durchschnitt der ganzen Stichprobe gezeigt. Ein Brawler mit nur wenigen Matches hier wird an seine allgemeine Ranked-Form angenähert, die Map muss also echte Belege liefern, bevor sie jemanden bewegt.",
+  "{brawlersSeen} brawlers seen":
+    "{brawlersSeen} Brawler gesehen",
+  "{modeLabel} tier list":
+    "{modeLabel}-Tierlist",
+  "{name} ({modeLabel}) — retired Brawl Stars map":
+    "{name} ({modeLabel}): entfernte Brawl-Stars-Map",
+  "{name} best brawlers":
+    "{name}: beste Brawler",
+  "{name} best brawlers, {modeLabel} ({v})":
+    "{name}: beste Brawler, {modeLabel} ({v})",
+  "{name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the closest answer.":
+    "{name} wurde aus Brawl Stars entfernt und kann nicht mehr gespielt werden, deshalb gibt es keine aktuellen Matches für ein Ranking. Die stärksten Brawler in {modeLabel} insgesamt sind die beste Antwort.",
+  "{name} has been retired from Brawl Stars, so these are {modeLabel} picks across every map in the mode instead.":
+    "{name} wurde aus Brawl Stars entfernt, deshalb sind das {modeLabel}-Picks über alle Maps des Modus.",
+  "{name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in {modeLabel} overall are the best available answer until it fills in.":
+    "{name} wurde noch nicht genug erfasst, um Brawler auf der Map selbst zu ranken. Bis das passiert, sind die stärksten Brawler in {modeLabel} insgesamt die beste Antwort.",
+  "{name} has too few sampled battles to rank on its own yet, so these are {modeLabel} picks across every map in the mode.":
+    "{name} hat noch zu wenige erfasste Matches für ein eigenes Ranking, deshalb sind das {modeLabel}-Picks über alle Maps des Modus.",
+  "{name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the best available answer while it is out.":
+    "{name} ist nicht in der aktuellen Ranked-Rotation, deshalb gibt es keine neuen kompetitiven Matches für ein Ranking. Solange sie raus ist, sind die stärksten Brawler in {modeLabel} insgesamt die beste Antwort.",
+  "{name} is not in the current Ranked rotation, so these are {modeLabel} picks across every map in the mode instead.":
+    "{name} ist nicht in der aktuellen Ranked-Rotation, deshalb sind das {modeLabel}-Picks über alle Maps des Modus.",
+  "{name} was a {modeLabel} map and has been retired from Brawl Stars, so it can no longer be played. Its layout and environment are below, along with the brawlers that perform best in {modeLabel2} as a whole — the closest thing to a ranking now that the map itself sees no battles.":
+    "{name} war eine {modeLabel}-Map und wurde aus Brawl Stars entfernt, sie kann nicht mehr gespielt werden. Layout und Umgebung stehen unten, zusammen mit den Brawlern, die in {modeLabel2} insgesamt am besten abschneiden: das, was einem Ranking am nächsten kommt, jetzt wo die Map selbst keine Matches mehr sieht.",
+  "{name} was a {modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in {modeLabel2} generally.":
+    "{name} war eine {modeLabel}-Map in Brawl Stars und wurde inzwischen entfernt. Das Map-Layout, ihre Umgebung und die Brawler, die in {modeLabel2} allgemein am besten abschneiden.",
+  "{v} has the strongest adjusted win rate on {name}, from {sampleSize} sampled Ranked battles on the map.":
+    "{v} hat die stärkste bereinigte Siegquote auf {name}, aus {sampleSize} erfassten Ranked-Matches auf der Map.",
+  "{v} have the strongest adjusted win rates on {name}, from {sampleSize} sampled Ranked battles on the map.":
+    "{v} haben die stärksten bereinigten Siegquoten auf {name}, aus {sampleSize} erfassten Ranked-Matches auf der Map.",
+  "{name} was a {modeLabel} map in Brawl Stars{environment}, and has since been retired.":
+    "{name} war eine {modeLabel}-Map in Brawl Stars{environment} und wurde inzwischen entfernt.",
+  "{name} is a {modeLabel} map in Brawl Stars{environment}.":
+    "{name} ist eine {modeLabel}-Map in Brawl Stars{environment}.",
+  ", set in the {environment} environment":
+    ", in der Umgebung {environment}",
+  "{v}{v2} vs usual":
+    "{v}{v2} ggü. normal",
+  ", adjusted for how those brawlers fare against each other. It is the draft's chance, not yours — aim, positioning and gadget timing are not in the battle log and are not guessed at. Confidence:":
+    ", bereinigt danach, wie diese Brawler gegeneinander abschneiden. Das ist die Chance des Drafts, nicht deine: Zielen, Positionierung und Gadget-Timing stehen nicht im Match-Verlauf und werden nicht geraten. Zuverlässigkeit:",
+  ", at":
+    ", mit",
+  ", from {v} sampled battles on this map":
+    ", aus {v} erfassten Matches auf dieser Map",
+  ", {shapeRank} of {shapeCount} shapes":
+    ", {shapeRank} von {shapeCount} Aufstellungen",
+  "From your own maxed roster,":
+    "Aus deinem eigenen maximierten Kader:",
+  "Last loss · {mode}":
+    "Letzte Niederlage · {mode}",
+  "Nothing measured beats it.":
+    "Nichts Gemessenes schlägt das.",
+  "The draft does not explain this loss. ":
+    "Der Draft erklärt diese Niederlage nicht. ",
+  "The percentage is the drafts compared:":
+    "Der Prozentwert vergleicht die Drafts:",
+  "The strongest is":
+    "Der stärkste ist",
+  "Their strongest pick here was":
+    "Ihr stärkster Pick hier war",
+  "Theirs":
+    "Ihrer",
+  "This explains the draft only. ":
+    "Das erklärt nur den Draft. ",
+  "Too few sampled battles on this map to compare the drafts. ":
+    "Zu wenige erfasste Matches auf dieser Map, um die Drafts zu vergleichen. ",
+  "Your shape —":
+    "Deine Aufstellung –",
+  "Yours":
+    "Deiner",
+  "at {v}%.":
+    "mit {v} %.",
+  "each side’s measured record on this map":
+    "die gemessene Bilanz jeder Seite auf dieser Map",
+  "mostly each side’s overall Ranked form, because this map has too little data on these brawlers yet":
+    "vor allem die allgemeine Ranked-Form jeder Seite, weil diese Map zu diesen Brawlern noch zu wenige Daten hat",
+  "over":
+    "über",
+  "to win":
+    "Siegchance",
+  "was countered by":
+    "wurde gekontert von",
+  "would have improved the draft most, by {v} points.":
+    "hätte den Draft am meisten verbessert, um {v} Punkte.",
+  "{v} points on this map.":
+    "{v} Punkte auf dieser Map.",
+  "— wins {v}% adjusted":
+    "– gewinnt bereinigt {v} %",
+  "— {v} points below its usual record, over {v2} battles.":
+    "– {v} Punkte unter der normalen Bilanz, über {v2} Matches.",
+  "A comp appears here once at least fifteen different players have used it across at least forty decided battles. The player floor matters more than the battle count: a squad that queues together brings the same trio every game, so without it the list ranks strong teams rather than strong comps. Ranked and ladder battles both count.":
+    "Eine Kombo erscheint hier, sobald mindestens fünfzehn verschiedene Spieler sie in mindestens vierzig entschiedenen Matches genutzt haben. Die Spieler-Untergrenze zählt mehr als die Match-Zahl: Ein Team, das zusammen in die Warteschlange geht, bringt jedes Match dasselbe Trio, ohne sie würde die Liste starke Teams statt starker Kombos ranken. Ranked- und Trophäen-Matches zählen beide.",
+  "All modes":
+    "Alle Modi",
+  "Best {label} comps":
+    "Beste {label}-Kombos",
+  "Best {label} comps in Brawl Stars":
+    "Beste {label}-Kombos in Brawl Stars",
+  "Not enough data for this mode yet.":
+    "Für diesen Modus gibt es noch nicht genug Daten.",
+  "Ranked by how far each trio sits above the mode's own average of {baseline}, from {sampleSize} sampled battles over the last 14 days.":
+    "Sortiert danach, wie weit jedes Trio über dem Modus-Durchschnitt von {baseline} liegt, aus {sampleSize} erfassten Matches der letzten 14 Tage.",
+  "Team comps":
+    "Team-Kombos",
+  "The three-brawler compositions with the best records in Brawl Stars {label}, measured from sampled battles over the last 14 days.":
+    "Die Drei-Brawler-Aufstellungen mit der besten Bilanz in Brawl Stars {label}, gemessen an erfassten Matches der letzten 14 Tage.",
+  "Add a team-mate":
+    "Teamkollegen hinzufügen",
+  "Add an enemy brawler":
+    "Gegnerischen Brawler hinzufügen",
+  "Ban a brawler":
+    "Brawler bannen",
+  "Bans":
+    "Bans",
+  "Brawl Stars draft helper: best counter picks for Ranked (free)":
+    "Brawl Stars Draft-Helfer: die besten Konter-Picks fürs Ranked (kostenlos)",
+  "Change map":
+    "Map ändern",
+  "Clear":
+    "Löschen",
+  "Draft helper":
+    "Draft-Helfer",
+  "Empty slot":
+    "Leerer Platz",
+  "Enemy team":
+    "Gegnerisches Team",
+  "Map":
+    "Map",
+  "Map page":
+    "Map-Seite",
+  "Map score is a brawler’s adjusted win rate here, weighed against its overall Ranked form. The matchup figure is its win rate when one of the brawlers you named was on the other team, minus its own average. So a brawler that simply wins a lot does not appear to counter everything.":
+    "Der Map-Score ist die bereinigte Siegquote eines Brawlers hier, abgewogen gegen seine allgemeine Ranked-Form. Der Matchup-Wert ist seine Siegquote, wenn einer der von dir genannten Brawler im anderen Team war, minus seines eigenen Durchschnitts. So scheint ein Brawler, der einfach viel gewinnt, nicht alles zu kontern.",
+  "Map score plus how each candidate does against the brawlers you named.":
+    "Map-Score plus, wie jeder Kandidat gegen die genannten Brawler abschneidet.",
+  "Map score plus how each candidate does beside your team-mates.":
+    "Map-Score plus, wie jeder Kandidat neben deinen Teamkollegen abschneidet.",
+  "Map score, plus how each candidate does against their picks and beside yours.":
+    "Map-Score plus, wie jeder Kandidat gegen ihre Picks und neben deinen abschneidet.",
+  "No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
+    "Noch keine Ranked-Map hat genug erfasste Matches. Die Erfassung geht ständig den Bestenlisten-Pool durch, das füllt sich in den nächsten ein, zwei Tagen.",
+  "No sampled battles for this map or mode yet.":
+    "Noch keine erfassten Matches für diese Map oder diesen Modus.",
+  "Nothing banned yet":
+    "Noch nichts gebannt",
+  "Pick the Ranked map, add the brawlers the enemy has drafted, and get the picks with the best record against that exact line-up on that map. Free, no account.":
+    "Wähle die Ranked-Map, füge die Brawler hinzu, die der Gegner gedraftet hat, und erhalte die Picks mit der besten Bilanz gegen genau diese Aufstellung auf dieser Map. Kostenlos, ohne Account.",
+  "Pick the map":
+    "Wähle die Map",
+  "Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen.":
+    "Wähle die Map, gib an, was der Gegner genommen hat, und die Liste ordnet sich um beides neu. Jeder Zustand hat seine eigene URL, ein Draft lässt sich also teilen oder auf einem zweiten Bildschirm offen halten.",
+  "Ranked by record on this map. Name either team above to reweigh it.":
+    "Sortiert nach Bilanz auf dieser Map. Gib oben ein Team an, um neu zu gewichten.",
+  "Ranked pool":
+    "Ranked-Pool",
+  "Remove {v}":
+    "{v} entfernen",
+  "The Ranked rotation only. Every map here has sampled competitive battles behind it.":
+    "Nur die Ranked-Rotation. Hinter jeder Map hier stehen erfasste kompetitive Matches.",
+  "The current Ranked rotation. Everything after this step follows from it.":
+    "Die aktuelle Ranked-Rotation. Alles nach diesem Schritt ergibt sich daraus.",
+  "Un-ban {v}":
+    "Bann von {v} aufheben",
+  "Up to {MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.":
+    "Bis zu {MAX_ALLIES}. Jeder gewichtet die Liste neu danach, wie Kandidaten *neben* ihm wirklich abschneiden, und das ist eine andere Frage als Kontern.",
+  "Up to {MAX_BANS}. Banned brawlers disappear from every suggestion below.":
+    "Bis zu {MAX_BANS}. Gebannte Brawler verschwinden aus jedem Vorschlag unten.",
+  "Up to {MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.":
+    "Bis zu {MAX_ENEMIES}. Jeder gewichtet die Liste neu danach, wie Kandidaten gegen ihn wirklich abschneiden.",
+  "Your pick":
+    "Dein Pick",
+  "Your team":
+    "Dein Team",
+  "{mapName} map layout":
+    "{mapName} Map-Layout",
+  "{sampleSize} battles":
+    "{sampleSize} Matches",
+  "{sampleSize} sampled Ranked battles · {brawlersSeen} brawlers seen":
+    "{sampleSize} erfasste Ranked-Matches · {brawlersSeen} Brawler gesehen",
+  "All maps":
+    "Alle Maps",
+  "Best brawlers in {label}":
+    "Beste Brawler in {label}",
+  "Every Brawl Stars {label} map in rotation, plus the brawlers with the best records in the mode, ranked from sampled battles.":
+    "Jede Brawl-Stars-{label}-Map in der Rotation, plus die Brawler mit der besten Bilanz im Modus, sortiert nach erfassten Matches.",
+  "Every {label} map currently in rotation, and the brawlers with the best records in the mode.":
+    "Jede {label}-Map in der aktuellen Rotation und die Brawler mit der besten Bilanz im Modus.",
+  "From {sampleSize} sampled decided battles in this mode, scored against the mode's own average.":
+    "Aus {sampleSize} erfassten entschiedenen Matches in diesem Modus, gemessen am eigenen Durchschnitt des Modus.",
+  "Maps in rotation":
+    "Maps in der Rotation",
+  "Mode":
+    "Modus",
+  "Not enough sampled battles in this mode yet.":
+    "Noch nicht genug erfasste Matches in diesem Modus.",
+  "{label} maps and best brawlers":
+    "{label}-Maps und beste Brawler",
+  "All {length} comps":
+    "Alle {length} Kombos",
+  "Best team comps":
+    "Beste Team-Kombos",
+  "Best team comps in Brawl Stars":
+    "Beste Team-Kombos in Brawl Stars",
+  "No comps have enough data yet. This fills in as battles are sampled.":
+    "Noch keine Kombo hat genug Daten. Das füllt sich, während Matches erfasst werden.",
+  "No data yet.":
+    "Noch keine Daten.",
+  "The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it.":
+    "Die Drei-Brawler-Kombinationen, die wirklich gewinnen, nach Modus. Jede Kombo hier wurde von mindestens fünfzehn verschiedenen Spielern über vierzig Matches gespielt, du liest also die Kombo und nicht das Team, das sie mag.",
+  "The three-brawler compositions with the best records in each Brawl Stars mode, measured from sampled battles and filtered so one strong premade team cannot skew a comp.":
+    "Die Drei-Brawler-Aufstellungen mit der besten Bilanz in jedem Brawl-Stars-Modus, gemessen an erfassten Matches und so gefiltert, dass ein starkes vorgefertigtes Team eine Kombo nicht verzerren kann.",
+  "{sampleSize} sampled battles · mode average":
+    "{sampleSize} erfasste Matches · Modus-Durchschnitt",
+  "Brawl Stars community events: every reward, milestone and date":
+    "Brawl Stars Community-Events: jede Belohnung, jeder Meilenstein, jedes Datum",
+  "Community events":
+    "Community-Events",
+  "Every Brawl Stars community event in one place: the milestones the whole player base had to hit, what each one paid out, and when it ran.":
+    "Alle Brawl-Stars-Community-Events an einem Ort: die Meilensteine, die alle Spieler erreichen mussten, was jeder gebracht hat und wann es lief.",
+  "Everyone, one target":
+    "Alle, ein Ziel",
+  "Game-wide challenges: the whole player base grinds one milestone, and everybody collects the reward.":
+    "Spielweite Herausforderungen: Alle Spieler grinden auf einen Meilenstein hin, und jeder bekommt die Belohnung.",
+  "Milestones, tasks and rewards for every game-wide community event.":
+    "Meilensteine, Aufgaben und Belohnungen für jedes spielweite Community-Event.",
+  "The community-event write-ups could not be read just now. They come from the Brawl Stars wiki and this fills back in on its own.":
+    "Die Beschreibungen der Community-Events konnten gerade nicht gelesen werden. Sie kommen aus dem Brawl Stars Wiki und füllen sich von selbst wieder.",
+  "Brawl Stars maps and best brawlers ({v})":
+    "Brawl-Stars-Maps und beste Brawler ({v})",
+  "Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, {v}.":
+    "Jede aktive Brawl-Stars-Map, nach Spielmodus gruppiert, mit den stärksten Brawlern auf jeder, sortiert nach erfassten Matches, {v}.",
+  "Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can.":
+    "Jede Map, die noch im Spiel ist, nach Modus. Such nach Namen oder öffne einen Modus, um seine Maps zu sehen. Keine Rotation: Die Grafikquelle veröffentlicht kein Datum des letzten Einsatzes, deshalb kann das nicht sagen, welche davon heute live sind. Das können die zwei Abschnitte oben.",
+  "Full catalogue":
+    "Ganzer Katalog",
+  "In the event rotation this minute, straight from the game API.":
+    "Gerade in der Event-Rotation, direkt aus der Spiel-API.",
+  "Live now":
+    "Jetzt live",
+  "Maps":
+    "Maps",
+  "Ranked pool{v}":
+    "Ranked-Pool{v}",
+  "The competitive map pool for the current Ranked season. Fixed until the season turns over.":
+    "Der kompetitive Map-Pool der aktuellen Ranked-Saison. Fest bis zum Saisonwechsel.",
+  "The map catalogue is unavailable right now.":
+    "Der Map-Katalog ist gerade nicht verfügbar.",
+  "What is live right now, this season's Ranked pool, and the full catalogue of maps still in the game. Each map page ranks the brawlers with the best records on it, from sampled battles.":
+    "Was gerade live ist, der Ranked-Pool dieser Saison und der ganze Katalog der Maps im Spiel. Jede Map-Seite sortiert die Brawler mit der besten Bilanz darauf, aus erfassten Matches.",
+  "{length} maps":
+    "{length} Maps",
+  "Collecting Ranked standings":
+    "Ranked-Stände werden gesammelt",
+  "Current season standing. The game API publishes no Ranked leaderboard, so this one is built from the {pool} sampled players who have played Ranked this season. The top":
+    "Stand der aktuellen Saison. Die Spiel-API veröffentlicht keine Ranked-Bestenliste, deshalb wird diese aus den {pool} erfassten Spielern gebildet, die diese Saison Ranked gespielt haben. Die oberen",
+  "Elo is recorded as the sampler works through the player pool, and as people look profiles up. This board fills in over the next day or two.":
+    "Elo wird gespeichert, während die Erfassung den Spieler-Pool durchgeht und Leute Profile aufrufen. Diese Liste füllt sich in den nächsten ein, zwei Tagen.",
+  "peak {peakElo}":
+    "Höchststand {peakElo}",
+  "{length} of those, not a global board. Looking up a profile adds it to the pool.":
+    "{length} davon, keine globale Liste. Ein Profil aufzurufen fügt es dem Pool hinzu.",
+  "Every rung of the Ranked ladder across {population} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.":
+    "Jede Stufe der Ranked-Leiter über {population} erfasste Spieler. Das Spiel veröffentlicht keine Rangverteilung; das hier ist gemessen an dem, was die Erfassung sieht.",
+  "Sampled from players reachable through the global leaderboards and their recent opponents, so it leans slightly toward more active accounts than the game as a whole. Players who have not played Ranked this season are excluded rather than counted at the bottom.":
+    "Erfasst aus Spielern, die über die globalen Bestenlisten und ihre letzten Gegner erreichbar sind, also leicht verschoben hin zu aktiveren Accounts als im Spiel insgesamt. Spieler, die diese Saison kein Ranked gespielt haben, werden weggelassen statt ganz unten gezählt.",
+  "Where everyone actually is":
+    "Wo alle wirklich stehen",
+  "{atOrAbove} here or above":
+    "{atOrAbove} hier oder darüber",
+  "How this combination of roles performs in Ranked, measured across both teams of sampled battles. 50% is average for the sample, not a coin flip — every shape is adjusted against the same baseline the tier list uses.":
+    "Wie diese Rollenkombination im Ranked abschneidet, gemessen über beide Teams erfasster Matches. 50 % ist der Durchschnitt der Stichprobe, kein Münzwurf: Jede Aufstellung wird an derselben Basis bereinigt wie die Tierlist.",
+  "Shapes that lose":
+    "Aufstellungen, die verlieren",
+  "Shapes that win":
+    "Aufstellungen, die gewinnen",
+  "Strongest shape you can still reach":
+    "Stärkste Aufstellung, die du noch erreichen kannst",
+  "Team shape":
+    "Team-Aufstellung",
+  "Your shape":
+    "Deine Aufstellung",
+  "battles":
+    "Matches",
+  "No preview":
+    "Keine Vorschau",
+  "beats":
+    "schlägt",
+  "loses to":
+    "verliert gegen",
+  "{battles} battles here":
+    "{battles} Matches hier",
+  "map":
+    "Map",
+  "maps":
+    "Maps",
+  "{battles} battles · {players} players":
+    "{battles} Matches · {players} Spieler",
+  "{winRate} won":
+    "{winRate} gewonnen",
+  "{decidedSampleSize} decided battles ·":
+    "{decidedSampleSize} entschiedene Matches ·",
+  "{pickRate} picked":
+    "{pickRate} gepickt",
+  " · thin":
+    " · dünn",
+  "At power 11":
+    "Auf Power 11",
+  "Every brawler":
+    "Jeder Brawler",
+  "None of the brawlers with a record on this map are in that list.":
+    "Keiner der Brawler mit Bilanz auf dieser Map ist in dieser Liste.",
+  "Show":
+    "Anzeigen",
+  "no matchup data":
+    "keine Matchup-Daten",
+  "{name} owns":
+    "{name} besitzt",
+  "{v} beside yours":
+    "{v} neben deinen",
+  "{v} vs their picks":
+    "{v} gegen ihre Picks",
+  "Close map preview":
+    "Map-Vorschau schließen",
+  "Expand the {mapName} map layout":
+    "{mapName} Map-Layout vergrößern",
+  "No map preview":
+    "Keine Map-Vorschau",
+  "No map matches “{query}”.":
+    "Keine Map passt zu „{query}“.",
+  "Open the {v} page":
+    "Seite {v} öffnen",
+  "Search maps":
+    "Maps suchen",
+  "Search {total} maps by name":
+    "{total} Maps nach Namen durchsuchen",
+  "matching “{query}”":
+    "passend zu „{query}“",
+  "and":
+    "und",
+  " (already covered)":
+    " (bereits abgedeckt)",
+  ", with a second pick spare in":
+    ", mit einem zweiten Pick als Reserve in",
 };
