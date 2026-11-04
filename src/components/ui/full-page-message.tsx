@@ -12,7 +12,9 @@ import { getUT } from '@/lib/t-universal';
  *
  * The artwork carries it rather than an icon. These are the only two screens
  * on the site with nothing useful to show, so they are the two that can afford
- * to spend space on something with a bit of character.
+ * to spend space on something with a bit of character. Supercell's "ERROR:
+ * NPC DETECTED" pin from the Fan Kit (owner's pick, 2026-11-04) replaced a
+ * blurry 460px copy of the game's connection-lost icon.
  */
 export function FullPageMessage({
   title,
@@ -28,12 +30,12 @@ export function FullPageMessage({
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center py-10 text-center sm:py-16">
       <Image
-        src="/art/connection-error.png"
+        src="/art/error-npc.png"
         alt=""
-        width={460}
-        height={391}
+        width={560}
+        height={384}
         priority
-        className="h-auto w-40 sm:w-52"
+        className="h-auto w-56 sm:w-72"
       />
       <h1 className="display text-game-stroke mt-6 text-3xl sm:text-4xl">{t(title)}</h1>
       <p className="mt-3 leading-relaxed text-muted">{t(body)}</p>
