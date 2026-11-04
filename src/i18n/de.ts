@@ -1205,4 +1205,804 @@ export const DE: Record<string, string> = {
     " (bereits abgedeckt)",
   ", with a second pick spare in":
     ", mit einem zweiten Pick als Reserve in",
+  "Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.":
+    "Abdeckung heißt, in einem gerade aktiven Modus einen Top-3-Pick auf Power 9 oder höher zu besitzen. Freischaltungen sind bewusst ausgeschlossen: Ein Brawler, den du nicht besitzt, ist keine Ausgabe, die du heute machen kannst, deshalb kannst du jeden Schritt hier sofort angehen.",
+  "Covers {v}":
+    "Deckt {v} ab",
+  "Ranked coverage goes from":
+    "Ranked-Abdeckung steigt von",
+  "Second pick in {v}":
+    "Zweiter Pick in {v}",
+  "Strengthens the rotation":
+    "Stärkt die Rotation",
+  "The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns.":
+    "Die günstigste Reihe von Upgrades, die am meisten von der aktuellen Ranked-Rotation abdeckt, aus Brawlern, die dieser Account schon besitzt.",
+  "What to upgrade next":
+    "Was du als Nächstes verbessern solltest",
+  "modes":
+    "Modi",
+  "of them":
+    "davon",
+  "power {power} → 11":
+    "Power {power} → 11",
+  "to":
+    "auf",
+  "to upgrade":
+    "zu verbessern",
+  " Elo":
+    " Elo",
+  "Best tracked day":
+    "Bester erfasster Tag",
+  "Last {days} days":
+    "Letzte {days} Tage",
+  "Now":
+    "Jetzt",
+  "One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.":
+    "Ein Punkt pro Tag, gespeichert, wenn dieses Profil aufgerufen wird, er umfasst also die Tage, an denen jemand nachgesehen hat, nicht jeden gespielten Tag.",
+  "Recent progress":
+    "Letzter Fortschritt",
+  "Tracked {tracked}":
+    "Erfasst seit {tracked}",
+  "Trophies and Ranked, from the points recorded on each profile view.":
+    "Trophäen und Ranked, aus den Punkten, die bei jedem Profilaufruf gespeichert werden.",
+  "day":
+    "Tag",
+  "days":
+    "Tage",
+  "{points} views over {days} days":
+    "{points} Aufrufe über {days} Tage",
+  "{title} history over {days} days, from {low} to {high}":
+    "{title}-Verlauf über {days} Tage, von {low} bis {high}",
+  "{unit} overall":
+    "{unit} insgesamt",
+  " This account has no Ranked elo on record, so that weight is spread across the rest{v}.":
+    " Dieser Account hat keine Ranked-Elo gespeichert, deshalb wird dieses Gewicht auf den Rest verteilt{v}.",
+  ", the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.":
+    ", dem einzigen Modus, in dem das Matchmaking vergleichbare Gegner zusammenbringt, der Score spiegelt also wider, wie der Account spielt, und nicht, wie viel hineingesteckt wurde. Deshalb zählt der Fortschritt höchstens 15 %.",
+  "Weighted toward":
+    "Gewichtet in Richtung",
+  " today":
+    " heute",
+  ", ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.":
+    ", sortiert nach Trophäen pro Tag seit dem letzten Abruf jedes Spielers. Eine andere Gruppe als die offiziellen Top 100 unten, deshalb tauchen diese Namen dort meist nicht auf.",
+  "Biggest trophy gains":
+    "Größte Trophäengewinne",
+  "Climbing fastest":
+    "Am schnellsten im Aufstieg",
+  "From our own daily snapshots of the":
+    "Aus unseren eigenen täglichen Momentaufnahmen des",
+  "in 1 day":
+    "an 1 Tag",
+  "in {days} days":
+    "in {days} Tagen",
+  "sampled player pool":
+    "erfassten Spieler-Pools",
+  "total":
+    "gesamt",
+  " · {winRate} win":
+    " · {winRate} Siege",
+  "Activity":
+    "Aktivität",
+  "Avg place {v}":
+    "Ø Platz {v}",
+  "Battles per day":
+    "Matches pro Tag",
+  "Faced most":
+    "Am häufigsten getroffen",
+  "Last 24 hours":
+    "Letzte 24 Stunden",
+  "Last seen":
+    "Zuletzt gesehen",
+  "Most played":
+    "Am meisten gespielt",
+  "Played with":
+    "Gespielt mit",
+  "Recent form":
+    "Aktuelle Form",
+  "Top mode":
+    "Bester Modus",
+  "battle":
+    "Match",
+  "#{rank} in the world on {brawlerName}":
+    "Platz {rank} weltweit mit {brawlerName}",
+  "Best world ranking":
+    "Beste Weltplatzierung",
+  "Global · {trophies} trophies":
+    "Global · {trophies} Trophäen",
+  "Show all {length} placements":
+    "Alle {length} Platzierungen anzeigen",
+  "Top 10":
+    "Top 10",
+  "Top 100":
+    "Top 100",
+  "Top 200":
+    "Top 200",
+  "Top 25":
+    "Top 25",
+  "Top 50":
+    "Top 50",
+  "World ranked":
+    "Weltweit platziert",
+  ", which covers the 3v3 modes only.":
+    ", die nur die 3-gegen-3-Modi abdeckt.",
+  ", which rates every brawler from sampled ladder battles. For competitive play see the":
+    " bewertet, die jeden Brawler aus erfassten Trophäen-Matches einstuft. Für kompetitives Spiel siehe die",
+  "Mains out of favour":
+    "Mains aus der Gunst gefallen",
+  "Power {power} · {trophies} trophies":
+    "Power {power} · {trophies} Trophäen",
+  "Strong, not finished":
+    "Stark, aber nicht fertig",
+  "This roster scored against the current":
+    "Dieser Kader wurde gegen die aktuelle",
+  "Top-tier brawlers you own below power 11. The cheapest upgrades on this account.":
+    "Top-Tier-Brawler, die du unter Power 11 besitzt. Die günstigsten Upgrades auf diesem Account.",
+  "Your {MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.":
+    "Deine {MAIN_COUNT} Brawler mit den meisten Trophäen, die gerade in C oder D liegen.",
+  "{trophies} trophies · power {power}":
+    "{trophies} Trophäen · Power {power}",
+  "trophy tier list":
+    "Trophäen-Tierlist",
+  "3v3 wins":
+    "3-gegen-3-Siege",
+  "A BrawlZone metric out of 10, not an official Brawl Stars statistic.":
+    "Eine BrawlZone-Kennzahl von 10, keine offizielle Brawl-Stars-Statistik.",
+  "Account strength":
+    "Account-Stärke",
+  "Average per brawler":
+    "Durchschnitt pro Brawler",
+  "Best win streak":
+    "Beste Siegesserie",
+  "Both accounts read live from the official API. Nothing is stored.":
+    "Beide Accounts werden live aus der offiziellen API gelesen. Nichts wird gespeichert.",
+  "Brawlers unlocked":
+    "Freigeschaltete Brawler",
+  "Comparison":
+    "Vergleich",
+  "Competitive":
+    "Kompetitiv",
+  "Current trophies":
+    "Aktuelle Trophäen",
+  "Hypercharges":
+    "Hyperladungen",
+  "Peak Ranked":
+    "Bester Ranked-Rang",
+  "Peak trophies":
+    "Höchste Trophäen",
+  "Power 11 brawlers":
+    "Brawler auf Power 11",
+  "Prestige":
+    "Prestige",
+  "Ranked elo":
+    "Ranked-Elo",
+  "Ready. Waiting on the other player.":
+    "Bereit. Warte auf den anderen Spieler.",
+  "Roster unlocked":
+    "Kader freigeschaltet",
+  "Skill score":
+    "Skill-Score",
+  "The highest streak on any single brawler. The API publishes no account-wide streak.":
+    "Die längste Serie mit einem einzelnen Brawler. Die API veröffentlicht keine Serie für den ganzen Account.",
+  "Total trophies divided by brawlers unlocked. A rough measure of depth rather than breadth.":
+    "Gesamttrophäen geteilt durch freigeschaltete Brawler. Ein grobes Maß für Tiefe statt Breite.",
+  "Trophies":
+    "Trophäen",
+  "A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.":
+    "Eine Hyperladung braucht keinen maximierten Brawler, deshalb hat man schnell das beste Upgrade auf etwas, das den Kampf verliert, bevor es auflädt. Sortiert danach, wie nah jeder an Power {MAX_POWER_LEVEL} ist, die günstigsten zuerst.",
+  "Finishing":
+    "Fertigstellen:",
+  "One brawler carries":
+    "Ein Brawler hat",
+  "Start here":
+    "Fang hier an",
+  "Why this matters":
+    "Warum das wichtig ist",
+  "a hypercharge or buffie below power {MAX_POWER_LEVEL}.":
+    "eine Hyperladung oder ein Buffie unter Power {MAX_POWER_LEVEL}.",
+  "coins":
+    "Münzen",
+  "costs about":
+    "kostet etwa",
+  "it":
+    "ihn",
+  "them all":
+    "alle",
+  "to power {MAX_POWER_LEVEL} for about":
+    "auf Power {MAX_POWER_LEVEL} für etwa",
+  "{length} buffie":
+    "{length} Buffie",
+  "{length} carry":
+    "{length} haben",
+  "{name}: about {cost} coins from power {power} to {MAX_POWER_LEVEL}":
+    "{name}: etwa {cost} Münzen von Power {power} auf {MAX_POWER_LEVEL}",
+  "{power} coins":
+    "{power} Münzen",
+  "Show all {length}":
+    "Alle {length} anzeigen",
+  "Hypercharge":
+    "Hyperladung",
+  "A shareable summary of a Brawl Stars player’s last twenty-five battles.":
+    "Eine teilbare Zusammenfassung der letzten fünfundzwanzig Matches eines Brawl-Stars-Spielers.",
+  "Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.":
+    "Alles hier stammt aus dem Match-Verlauf, den das Spiel bereitstellt, und der umfasst ungefähr die letzten fünfundzwanzig Spiele, nicht mehr. Einen Verlaufs-Endpunkt gibt es nicht, das ist also eine Momentaufnahme einer Phase und keine Saison: Öffne es nach dem Spielen wieder, und es hat sich verändert.",
+  "Recent run":
+    "Letzte Phase",
+  "The last twenty-five battles, summed up. Built to screenshot.":
+    "Die letzten fünfundzwanzig Matches, zusammengefasst. Gemacht für Screenshots.",
+  "{tag} — recent run":
+    "{tag}: letzte Phase",
+  "Account":
+    "Account",
+  "Battles":
+    "Matches",
+  "Do next":
+    "Als Nächstes",
+  "No player exists with the tag {tag}. Check it in-game under your profile.":
+    "Es gibt keinen Spieler mit dem Tag {tag}. Prüf ihn im Spiel unter deinem Profil.",
+  "Overview":
+    "Übersicht",
+  "Player not found":
+    "Spieler nicht gefunden",
+  "Player {tag}":
+    "Spieler {tag}",
+  "Recent battles":
+    "Letzte Matches",
+  "The account":
+    "Der Account",
+  "What to do next":
+    "Was du als Nächstes tun kannst",
+  "Your roster on the meta":
+    "Dein Kader im Meta",
+  "{length} unlocked, read against the current tier list.":
+    "{length} freigeschaltet, eingeordnet nach der aktuellen Tierlist.",
+  "{name} has {v} trophies and {length} brawlers.":
+    "{name} hat {v} Trophäen und {length} Brawler.",
+  "Account completion":
+    "Account-Fortschritt",
+  "Brawlers at power 11":
+    "Brawler auf Power 11",
+  "Coins invested":
+    "Investierte Münzen",
+  "Currently in use":
+    "Gerade genutzt",
+  "Estimated":
+    "Geschätzt",
+  "Everything unlocked and maxed.":
+    "Alles freigeschaltet und maximiert.",
+  "Gears equipped":
+    "Ausgerüstete Ausrüstung",
+  "Investment":
+    "Investition",
+  "Matches":
+    "Matches",
+  "Skins equipped":
+    "Ausgerüstete Skins",
+  "Still to get":
+    "Noch zu holen",
+  "still needed to take every brawler already unlocked to power 11.":
+    "noch nötig, um jeden bereits freigeschalteten Brawler auf Power 11 zu bringen.",
+  "{coinsToMaxOwned} coins":
+    "{coinsToMaxOwned} Münzen",
+  "{ownedRaw} owned in total; completion counts the two per brawler that can be equipped":
+    "{ownedRaw} insgesamt im Besitz; der Fortschritt zählt die zwei pro Brawler, die ausgerüstet werden können",
+  "· what it cost":
+    "· was es gekostet hat",
+  "Across the {losses}":
+    "Über die {losses}",
+  "In {losses} of your losses":
+    "In {losses} deiner Niederlagen",
+  "Opponent":
+    "Gegner",
+  "in this log, rather than one-off results:":
+    "in diesem Verlauf, statt Einzelergebnissen:",
+  "is a weak pick on":
+    "ist ein schwacher Pick auf",
+  "loss":
+    "Niederlage",
+  "losses":
+    "Niederlagen",
+  "there ·":
+    "dort ·",
+  "was on the other side":
+    "war auf der anderen Seite",
+  "{v} pts below the map average":
+    "{v} Pkt. unter dem Map-Durchschnitt",
+  "Adjusted win rate":
+    "Bereinigte Siegquote",
+  "All comparisons":
+    "Alle Vergleiche",
+  "Battles where one was on each team, counted once from the sampled player's side.":
+    "Matches, in denen je einer in jedem Team war, einmal aus Sicht des erfassten Spielers gezählt.",
+  "Best mode":
+    "Bester Modus",
+  "Class":
+    "Klasse",
+  "Compare brawlers":
+    "Brawler vergleichen",
+  "Each figure comes from a different set of sampled players, so the two do not add up to 100%.":
+    "Jede Zahl stammt aus einer anderen Gruppe erfasster Spieler, deshalb ergeben beide zusammen nicht 100 %.",
+  "Head to head":
+    "Direkter Vergleich",
+  "Is {nameA} better than {nameB}?":
+    "Ist {nameA} besser als {nameB}?",
+  "More battles means a more reliable rate, not a better brawler.":
+    "Mehr Matches heißt verlässlichere Quote, nicht besserer Brawler.",
+  "Not enough battles in any one mode yet.":
+    "Noch in keinem Modus genug Matches.",
+  "Not enough sampled battles yet.":
+    "Noch nicht genug erfasste Matches.",
+  "Profile":
+    "Profil",
+  "Rarity":
+    "Seltenheit",
+  "Sampled battles":
+    "Erfasste Matches",
+  "Side by side":
+    "Nebeneinander",
+  "These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.":
+    "Diese beiden haben sich in erfassten Matches noch nicht oft genug getroffen, um eine Bilanz zu nennen. Matchup-Daten kommen nur aus Team-Modi und brauchen eine Weile für jede einzelne Paarung.",
+  "Tier":
+    "Tier",
+  "What is the {nameA} vs {nameB} head-to-head record?":
+    "Wie ist die direkte Bilanz von {nameA} gegen {nameB}?",
+  "Where each one performs":
+    "Wo jeder stark ist",
+  "Win rate is adjusted against the sample average, so both columns are on the same scale.":
+    "Die Siegquote ist am Durchschnitt der Stichprobe bereinigt, beide Spalten stehen also auf derselben Skala.",
+  "of {decidedSampleSize} sampled games against {opponent}":
+    "von {decidedSampleSize} erfassten Matches gegen {opponent}",
+  "vs":
+    "vs",
+  "wins":
+    "gewinnt",
+  "{a} vs {b} in Brawl Stars, {v}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.":
+    "{a} vs {b} in Brawl Stars, {v}: Siegquoten, Pickraten, Tiers und beste Modi nebeneinander, plus die direkte Bilanz, wenn sie wirklich aufeinandertrafen, gemessen an erfassten Matches statt Meinungen.",
+  "{a} vs {b}: which is better in Brawl Stars? ({v})":
+    "{a} vs {b}: Wer ist besser in Brawl Stars? ({v})",
+  "{nameA} vs {nameB} FAQ":
+    "{nameA} vs {nameB} FAQ",
+  "{nameA} wins {winRate} of the {decidedSampleSize} sampled battles where {nameB} was on the other team.":
+    "{nameA} gewinnt {winRate} der {decidedSampleSize} erfassten Matches, in denen {nameB} im anderen Team war.",
+  "{subject} vs {opponent}":
+    "{subject} vs {opponent}",
+  "All-time best":
+    "Allzeit-Bestwert",
+  "Current":
+    "Aktuell",
+  "Current, season best and all-time best":
+    "Aktuell, Saisonbestwert und Allzeit-Bestwert",
+  "Global trophies":
+    "Globale Trophäen",
+  "Of {population} ranked players":
+    "Von {population} Ranked-Spielern",
+  "Of {population} tracked players":
+    "Von {population} erfassten Spielern",
+  "Ranked standing":
+    "Ranked-Stand",
+  "Ranking":
+    "Platzierung",
+  "Season best":
+    "Saisonbestwert",
+  "Trophy standing":
+    "Trophäen-Stand",
+  "World rank":
+    "Weltrang",
+  "best":
+    "Bestwert",
+  "elo":
+    "Elo",
+  "elo now":
+    "Elo jetzt",
+  "At its peak right now":
+    "Gerade auf dem Höchststand",
+  "Duo SD wins":
+    "Duo-SD-Siege",
+  "Exp points":
+    "Erfahrungspunkte",
+  "Highest trophies":
+    "Höchste Trophäen",
+  "In a row, all-time":
+    "In Folge, Allzeit",
+  "Lifetime":
+    "Gesamt",
+  "Longest survival":
+    "Längstes Überleben",
+  "Longest time held":
+    "Längste Haltezeit",
+  "Longest win streak":
+    "Längste Siegesserie",
+  "Now on {trophies}":
+    "Jetzt bei {trophies}",
+  "On {live} in a row right now":
+    "Gerade {live} in Folge",
+  "Personal bests":
+    "Persönliche Bestwerte",
+  "Solo SD wins":
+    "Solo-SD-Siege",
+  "{length} at power 11":
+    "{length} auf Power 11",
+  "· since the account was made":
+    "· seit Erstellung des Accounts",
+  "Average":
+    "Durchschnitt",
+  "Below entry bar":
+    "Unter der Einstiegsgrenze",
+  "Composition":
+    "Zusammensetzung",
+  "Highest":
+    "Höchster",
+  "Lowest":
+    "Niedrigster",
+  "Median":
+    "Median",
+  "Open slots":
+    "Freie Plätze",
+  "Roster insights":
+    "Kader-Einblicke",
+  "Top 5 share":
+    "Anteil der Top 5",
+  "Top contributors":
+    "Größte Beiträge",
+  "Trophy spread":
+    "Trophäen-Verteilung",
+  "Best pick in this mode":
+    "Bester Pick in diesem Modus",
+  "No other picks with data yet":
+    "Noch keine anderen Picks mit Daten",
+  "Nothing here at power {READY_POWER} yet":
+    "Hier noch nichts auf Power {READY_POWER}",
+  "What to play in each mode you can queue right now, and what would improve that answer. Scored from sampled Ranked battles, not from the ladder.":
+    "Was du in jedem Modus spielen solltest, den du gerade spielen kannst, und was diese Antwort verbessern würde. Bewertet nach erfassten Ranked-Matches, nicht nach dem Trophäenpfad.",
+  "Your best here · #{rank}":
+    "Dein Bester hier · Platz {rank}",
+  "Your picks by mode":
+    "Deine Picks nach Modus",
+  "Both accounts are on exactly the same trophy count.":
+    "Beide Accounts haben genau gleich viele Trophäen.",
+  "Dead level":
+    "Gleichstand",
+  "Race to":
+    "Rennen bis",
+  "{name} leads by {gap}":
+    "{name} führt mit {gap}",
+  "{v} to go":
+    "noch {v}",
+  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
+    "Noch {v} für den Führenden. Neu laden, nachdem einer von euch gespielt hat: Das liest beide Profile live.",
+  "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
+    "Brawler in deinem Besitz, die das Update vom {date} verändert hat, und wie sie sich seitdem wirklich bewegt haben{v}.",
+  "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
+    "Die {length} größten Bewegungen von {changedTotal} veränderten Brawlern in deinem Besitz. ",
+  "What the update did to you":
+    "Was das Update mit dir gemacht hat",
+  "Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.":
+    "Siegquoten sind am Durchschnitt der Stichprobe bereinigt, eine Verschiebung hier ist also der Brawler und nicht die Gruppe. Ein Brawler erscheint, sobald ein paar Tage Messungen hinter ihm stehen: Eine Zwei-Tage-Stichprobe schwankt stärker als jede Balance-Änderung.",
+  "pts since":
+    "Pkt. seit",
+  "{categoryLabel} · your power {power}":
+    "{categoryLabel} · deine Power {power}",
+  "By combined member trophies, from the game API's own ranking.":
+    "Nach den gemeinsamen Trophäen der Mitglieder, aus dem eigenen Ranking der Spiel-API.",
+  "By total trophies, from the game API's own ranking.":
+    "Nach Gesamttrophäen, aus dem eigenen Ranking der Spiel-API.",
+  "No ranking data for":
+    "Keine Ranglisten-Daten für",
+  "Not every country has a populated leaderboard. Try Global or a larger region.":
+    "Nicht jedes Land hat eine gefüllte Bestenliste. Probier Global oder eine größere Region.",
+  "Official rankings":
+    "Offizielle Ranglisten",
+  "Our own data":
+    "Unsere eigenen Daten",
+  "The official top 100 {board} by trophies in {region}, straight from the game API.":
+    "Die offiziellen Top 100 {board} nach Trophäen in {region}, direkt aus der Spiel-API.",
+  "Top clubs in {region}":
+    "Top-Clubs in {region}",
+  "Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.":
+    "Top-Spieler nach Ranked-Elo. Die Spiel-API hat keine Ranked-Bestenliste, diese hier ist unsere.",
+  "Top players in {region}":
+    "Top-Spieler in {region}",
+  "Top three players":
+    "Die drei besten Spieler",
+  "What the sampled player pool is wearing. Built from our own daily samples, not from the game API.":
+    "Was der erfasste Spieler-Pool trägt. Aus unseren eigenen täglichen Stichproben, nicht aus der Spiel-API.",
+  "{memberCount}/30 members":
+    "{memberCount}/30 Mitglieder",
+  "Championship qualified":
+    "Für die Championship qualifiziert",
+  "Level {expLevel}":
+    "Level {expLevel}",
+  "No peak on record":
+    "Kein Höchststand gespeichert",
+  "Peak {highestAllTimeRankedRankName}":
+    "Höchststand {highestAllTimeRankedRankName}",
+  "Prestige {totalPrestigeLevel}":
+    "Prestige {totalPrestigeLevel}",
+  "Unranked":
+    "Ohne Rang",
+  "Club not found":
+    "Club nicht gefunden",
+  "Club trophies":
+    "Club-Trophäen",
+  "Club {tag}":
+    "Club {tag}",
+  "Family friendly":
+    "Familienfreundlich",
+  "Members":
+    "Mitglieder",
+  "No club exists with the tag {tag}. Club tags are shown on the club's info screen in-game.":
+    "Es gibt keinen Club mit dem Tag {tag}. Club-Tags stehen im Spiel auf dem Info-Bildschirm des Clubs.",
+  "Required":
+    "Erforderlich",
+  "To join":
+    "Zum Beitreten",
+  "Type":
+    "Typ",
+  "Collecting cosmetics":
+    "Kosmetik wird gesammelt",
+  "Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.":
+    "Ausgerüstete Skins und Icons werden gespeichert, während die Erfassung den Spieler-Pool durchgeht. Diese Liste füllt sich in den nächsten ein, zwei Tagen.",
+  "Most worn profile icons":
+    "Am häufigsten genutzte Profil-Icons",
+  "Profile icons are still being recorded.":
+    "Profil-Icons werden noch erfasst.",
+  "Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.":
+    "Anteil der erfassten Accounts, die jedes Icon nutzen. Jeder hat eins, die Anteile beziehen sich also auf den ganzen Pool.",
+  "Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.":
+    "Anteil der erfassten Brawler mit jedem Skin. Standard-Skins sind nicht in der Liste, zählen aber zur Gesamtzahl, ein Anteil von 2 % heißt also zwei von hundert gesehenen Brawlern, nicht zwei von hundert mit irgendeinem Skin.",
+  "Compare Brawl Stars players and brawlers ({v})":
+    "Brawl-Stars-Spieler und -Brawler vergleichen ({v})",
+  "Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.":
+    "Stell zwei Brawl-Stars-Spieler oder zwei Brawler nebeneinander, {v}: Trophäen, Ranked, Skill-Score, Account-Fortschritt, Siegquoten und direkte Bilanzen.",
+  "Compare players":
+    "Spieler vergleichen",
+  "Comparisons worth making":
+    "Vergleiche, die sich lohnen",
+  "Drawn from the current top of the Ranked tier list, so it follows the meta rather than a fixed list.":
+    "Aus der aktuellen Spitze der Ranked-Tierlist, folgt also dem Meta statt einer festen Liste.",
+  "Pick from the profiles you have looked up on this device, or type a tag. Works with or without the #.":
+    "Wähle aus den Profilen, die du auf diesem Gerät aufgerufen hast, oder gib einen Tag ein. Geht mit oder ohne #.",
+  "Two players or two brawlers, side by side. Player comparisons live entirely in the URL, so they are shareable and nothing is stored.":
+    "Zwei Spieler oder zwei Brawler nebeneinander. Spielervergleiche stehen komplett in der URL, sie lassen sich also teilen und nichts wird gespeichert.",
+  "Win and pick rates, tier, where each performs best, and their head-to-head record.":
+    "Sieg- und Pickraten, Tier, wo jeder am stärksten ist, und ihre direkte Bilanz.",
+  "Covered":
+    "Abgedeckt",
+  "No ready pick":
+    "Kein Pick bereit",
+  "One ban from nothing":
+    "Ein Bann von nichts entfernt",
+  "Read from the live Ranked rotation and the brawlers you have at power 9 or above.":
+    "Aus der aktuellen Ranked-Rotation und deinen Brawlern auf Power 9 oder höher.",
+  "The cheapest fix is":
+    "Die günstigste Lösung ist",
+  "Your account, in short":
+    "Dein Account, kurz gesagt",
+  "brawlers are ready to play, covering":
+    "Brawler sind spielbereit und decken ab:",
+  "of your":
+    "deiner",
+  "see what it buys":
+    "sieh, was es bringt",
+  "with a spare pick in":
+    "mit einem Reserve-Pick in",
+  "{ready} ready":
+    "{ready} bereit",
+  "{v} coins":
+    "{v} Münzen",
+  "Default skin":
+    "Standard-Skin",
+  "Next prestige":
+    "Nächstes Prestige",
+  "On fire right now":
+    "Gerade on fire",
+  "Past {HIGHEST_KNOWN_MARK}":
+    "Über {HIGHEST_KNOWN_MARK}",
+  "Prestige {b}":
+    "Prestige {b}",
+  "Showcase":
+    "Vitrine",
+  "Wins in a row, as of the latest battle.":
+    "Siege in Folge, Stand letztes Match.",
+  "in a row":
+    "in Folge",
+  "main":
+    "Main",
+  "to P{level}":
+    "bis P{level}",
+  "{toGo} to P{level}":
+    "noch {toGo} bis P{level}",
+  "Defeat":
+    "Niederlage",
+  "Draw":
+    "Unentschieden",
+  "No battles recorded in the last 25 matches.":
+    "In den letzten 25 Matches keine Matches gespeichert.",
+  "No recent battles. The battle log only covers roughly the last 25 matches and expires after a while.":
+    "Keine aktuellen Matches. Der Match-Verlauf umfasst nur ungefähr die letzten 25 Matches und läuft nach einer Weile ab.",
+  "The battle log is unavailable right now. Try refreshing in a moment.":
+    "Der Match-Verlauf ist gerade nicht verfügbar. Versuch gleich neu zu laden.",
+  "Victory":
+    "Sieg",
+  "{rank} place":
+    "Platz {rank}",
+  "From {battles} sampled battles on this map":
+    "Aus {battles} erfassten Matches auf dieser Map",
+  "Low trophies for this account":
+    "Wenig Trophäen für diesen Account",
+  "Play {brawlerName} in":
+    "Spiel {brawlerName} in",
+  "Push now":
+    "Jetzt pushen",
+  "The best map in the live rotation for the brawlers this account already owns.":
+    "Die beste Map in der aktuellen Rotation für die Brawler, die dieser Account schon besitzt.",
+  "Your best move right now":
+    "Dein bester Zug gerade",
+  "in":
+    "in",
+  "points above":
+    "Punkte über",
+  "this map’s average":
+    "dem Durchschnitt dieser Map",
+  "{mapName} layout":
+    "{mapName} Layout",
+  "· in":
+    "· in",
+  "In a match recently":
+    "Kürzlich in einem Match",
+  "Last seen {newest}":
+    "Zuletzt gesehen {newest}",
+  "Most played mode":
+    "Meistgespielter Modus",
+  "across this run":
+    "in dieser Phase",
+  "brawlzone.net · last {battles} battles":
+    "brawlzone.net · letzte {battles} Matches",
+  "time":
+    "Mal",
+  "times":
+    "Mal",
+  "trophies":
+    "Trophäen",
+  "{decided} decided":
+    "{decided} entschieden",
+  "Star player":
+    "Star-Spieler",
+  "The last loss read against the map and the matchups, then the patterns across the whole log.":
+    "Die letzte Niederlage im Licht von Map und Matchups, dann die Muster im ganzen Verlauf.",
+  "What went wrong":
+    "Was schiefging",
+  "Two Brawl Stars players side by side: trophies, Ranked, skill score, account completion and roster overlap.":
+    "Zwei Brawl-Stars-Spieler nebeneinander: Trophäen, Ranked, Skill-Score, Account-Fortschritt und gemeinsame Brawler.",
+  "{a} vs {b} — Brawl Stars comparison":
+    "{a} vs {b}: Brawl-Stars-Vergleich",
+  " · power {brawlerPower}":
+    " · Power {brawlerPower}",
+  "All results":
+    "Alle Ergebnisse",
+  "By brawler":
+    "Nach Brawler",
+  "By mode":
+    "Nach Modus",
+  "Draws":
+    "Unentschieden",
+  "Filter by mode":
+    "Nach Modus filtern",
+  "Filter by result":
+    "Nach Ergebnis filtern",
+  "Last {length} games":
+    "Letzte {length} Spiele",
+  "Losses":
+    "Niederlagen",
+  "No battles match that filter.":
+    "Keine Matches passen zu diesem Filter.",
+  "Star player ×{stars}":
+    "Star-Spieler ×{stars}",
+  "Team":
+    "Team",
+  "This battle reported no player list.":
+    "Dieses Match hat keine Spielerliste gemeldet.",
+  "Unknown brawler":
+    "Unbekannter Brawler",
+  "Wins":
+    "Siege",
+  "· mostly":
+    "· meistens",
+  "Brawl Stars player comparison":
+    "Brawl-Stars-Spielervergleich",
+  "Clear recent":
+    "Verlauf löschen",
+  "Clear the comparison":
+    "Vergleich löschen",
+  "Clear {v}":
+    "{v} löschen",
+  "Look a player up from the search box and they are remembered on this device, ready to pick here without typing the tag again. Nothing is sent to the server.":
+    "Ruf einen Spieler über die Suche auf, und er wird auf diesem Gerät gemerkt, bereit zum Auswählen hier, ohne den Tag erneut einzugeben. Nichts wird an den Server gesendet.",
+  "Looked up on this device":
+    "Auf diesem Gerät aufgerufen",
+  "Other side":
+    "Andere Seite",
+  "Player 1":
+    "Spieler 1",
+  "Player 2":
+    "Spieler 2",
+  "Share":
+    "Teilen",
+  "Swap players":
+    "Spieler tauschen",
+  "Swap the two players":
+    "Die beiden Spieler tauschen",
+  ", so the real figure is this or better.":
+    ", der echte Wert ist also so hoch oder besser.",
+  "30 members’ rosters":
+    "Kader der 30 Mitglieder",
+  "Club power":
+    "Club-Stärke",
+  "Every member's roster read against the current Ranked S and A tier — what this club can actually put on the field.":
+    "Der Kader jedes Mitglieds im Vergleich zu den aktuellen Ranked-Tiers S und A: was dieser Club wirklich aufs Feld bringen kann.",
+  "No hypercharge in the club:":
+    "Keine Hyperladung im Club:",
+  "Nobody can field:":
+    "Niemand kann aufstellen:",
+  "Rank this club":
+    "Diesen Club bewerten",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
+    "Sortiert nach der Hyperladungs-Abdeckung des Top-Tiers, dann danach, was sie überhaupt aufstellen können. Trophäen entscheiden nur bei Gleichstand, so sortiert das Spiel die Mitgliederliste ohnehin.",
+  "Reading rosters…":
+    "Kader werden gelesen…",
+  "Reads all":
+    "Liest alle",
+  "The game’s API only answered for {length} of":
+    "Die Spiel-API hat nur für {length} von",
+  "can field":
+    "kann aufstellen",
+  "could not be read":
+    "konnte nicht gelesen werden",
+  "fieldable,":
+    "aufstellbar,",
+  "hyper":
+    "Hyper",
+  "hypercharged":
+    "mit Hyperladung",
+  "hypercharged.":
+    "mit Hyperladung.",
+  "live. It takes a few seconds, so it only runs when you ask.":
+    "live. Das dauert ein paar Sekunden, deshalb läuft es nur auf Anfrage.",
+  "member":
+    "Mitglied",
+  "members":
+    "Mitglieder",
+  "members, so this is incomplete and has not been saved.":
+    "Mitgliedern geantwortet, das hier ist also unvollständig und wurde nicht gespeichert.",
+  "of the {topTierSize} brawlers in the current Ranked S and A tier, for the typical member of {name}. Between all {length} of them:":
+    "von den {topTierSize} Brawlern in den aktuellen Ranked-Tiers S und A, für das typische Mitglied von {name}. Zwischen allen {length}:",
+  "only hypercharged":
+    "nur mit Hyperladung",
+  "{coverage} fieldable · {powerEleven} at power 11 ·":
+    "{coverage} aufstellbar · {powerEleven} auf Power 11 ·",
+  "1 day ago":
+    "vor 1 Tag",
+  "Since your last visit":
+    "Seit deinem letzten Besuch",
+  "{days} days ago":
+    "vor {days} Tagen",
+  "· kept in this browser only":
+    "· nur in diesem Browser gespeichert",
+  "All countries":
+    "Alle Länder",
+  "No country matches “{query}”.":
+    "Kein Land passt zu „{query}“.",
+  "Search countries":
+    "Länder suchen",
+  "Link copied":
+    "Link kopiert",
+  "Share this profile":
+    "Dieses Profil teilen",
+  "No members match that search.":
+    "Keine Mitglieder passen zu dieser Suche.",
+  "Search club members":
+    "Club-Mitglieder durchsuchen",
+  "Search members by name or tag":
+    "Mitglieder nach Name oder Tag suchen",
+  "This club has no members listed.":
+    "Dieser Club hat keine Mitglieder gelistet.",
 };
