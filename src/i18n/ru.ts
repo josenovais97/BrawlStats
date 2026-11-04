@@ -2805,4 +2805,804 @@ export const RU: Record<string, string> = {
     "У класса нет стрелки, потому что от Стрелка к Танку нет направления. Боец, у которого слишком мало ранговых боёв для тира, показан прочерком, а не догадкой.",
   "Daily challenge":
     "Загадка дня",
+  "Green":
+    "Зелёный",
+  "How the clues work":
+    "Как работают подсказки",
+  "Movement":
+    "Скорость",
+  "One brawler a day. Everybody gets the same one, and it changes at midnight UTC.":
+    "Один боец в день. У всех один и тот же, и он меняется в полночь по UTC.",
+  "Released":
+    "Выход",
+  "Stuck?":
+    "Застрял?",
+  "Today’s puzzle could not be prepared. It returns once the brawler catalogue is reachable again.":
+    "Сегодняшнюю загадку не удалось подготовить. Она вернётся, как только каталог бойцов снова станет доступен.",
+  "Your progress is kept in this browser only. No account, nothing stored on our side.":
+    "Твой прогресс хранится только в этом браузере. Без аккаунта, у нас ничего не сохраняется.",
+  "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.":
+    "— это именованные уровни из игры (от «очень низкой» до «очень высокой», от «очень малой» до «очень большой»), а не сырые числа, потому что никто не знает, быстро ли 855, а все знают, что «очень высокая» быстрее «высокой».",
+  "comes from the live":
+    "берётся из текущего",
+  "is exact.":
+    "— точное совпадение.",
+  "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.":
+    "— на шаг в стороне: соседняя редкость, соседний тир или боец, вышедший не дальше чем через пять от ответа. Стрелка указывает на ответ: ▲ значит выше, ▼ значит ниже.",
+  "is the brawler’s place in release order, not a date.":
+    "— место бойца в порядке выхода, а не дата.",
+  "range":
+    "дальность",
+  "ranked tier list":
+    "тир-листа ранговых боёв",
+  "reload":
+    "перезарядка",
+  ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.":
+    ". Эти находки нельзя пересчитать позже, поэтому архив начинается со дня, когда его создали, а не уходит в прошлое.",
+  "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.":
+    "Каждая карточка — максимум указанной величины по указанной группе: самый высокий процент побед среди бойцов с долей выбора ниже 1%, самый большой разрыв между бойцом и одной картой и так далее. Одни и те же данные всегда дают один и тот же набор, поэтому ничего здесь не написано моделью и не выбрано вручную. Процент побед скорректирован по среднему выборки, поэтому неделя, когда игроки в выборке сильнее, не делает всех бойцов усиленными на вид.",
+  "Every day is kept at its own address —":
+    "Каждый день хранится по своему адресу —",
+  "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.":
+    "Находки из собранных сегодня боёв Brawl Stars: пик, который никто не берёт, но он побеждает, популярный пик, который проигрывает, самый односторонний матчап и боец, который ведёт себя иначе на одной карте.",
+  "How these are chosen.":
+    "Как они выбираются.",
+  "What BrawlZone found in the data today":
+    "Что BrawlZone нашёл в данных сегодня",
+  "browse the archive":
+    "открой архив",
+  "or":
+    "или",
+  "subscribe by RSS":
+    "подпишись через RSS",
+  "A brawler listed here has a dashed marker on its own trend chart, so you can see what the change actually did.":
+    "У перечисленного здесь бойца на его графике тренда есть пунктирная отметка, чтобы было видно, что изменение на самом деле сделало.",
+  "All comps":
+    "Все составы",
+  "Comps winning now":
+    "Составы, которые побеждают сейчас",
+  "Falling":
+    "Падают",
+  "Not enough comparable snapshots yet. This fills in once a week of daily snapshots has been collected under a stable sample.":
+    "Пока недостаточно сопоставимых замеров. Это заполнится, когда наберётся неделя ежедневных замеров на стабильной выборке.",
+  "Nothing moved enough to report.":
+    "Ничего не сдвинулось достаточно, чтобы об этом сообщать.",
+  "Rising":
+    "Растут",
+  "The names Supercell published.":
+    "Имена, которые опубликовала Supercell.",
+  "This week in the Brawl Stars meta":
+    "Эта неделя в мете Brawl Stars",
+  "This week in the meta":
+    "Эта неделя в мете",
+  "Tier changes":
+    "Смена тиров",
+  "What moved between {fromDate} and {toDate}, measured from sampled battles.":
+    "Что сдвинулось между {fromDate} и {toDate}, по собранным боям.",
+  "What moved in the Brawl Stars meta this week: the brawlers rising and falling, the tiers they crossed, what the latest update changed, and the team comps winning right now.":
+    "Что сдвинулось в мете Brawl Stars на этой неделе: растущие и падающие бойцы, тиры, которые они пересекли, что изменило последнее обновление и составы, которые побеждают прямо сейчас.",
+  "What moved this week, measured from sampled battles.":
+    "Что сдвинулось на этой неделе, по собранным боям.",
+  "What the update changed":
+    "Что изменило обновление",
+  "Whether any of it moved":
+    "Сдвинулось ли что-то из этого,",
+  "is measured separately.":
+    "измеряется отдельно.",
+  "{sampleSize} battles ·":
+    "боёв: {sampleSize} ·",
+  "{sampleSize} battles · {winRateNow} win rate":
+    "боёв: {sampleSize} · {winRateNow} побед",
+  "{winRateNow} win rate":
+    "{winRateNow} побед",
+  "· mode average {baseline}":
+    "· среднее режима {baseline}",
+  "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.":
+    "Доля скина считается от собранных слотов «игрок–боец»; доля иконки — от собранных игроков. Стандартные скины не учитываются: тот, что носит имя самого бойца, никто не выбирал. Популярность по каждому бойцу, включая стандартный, — на странице бойца.",
+  "Brawl Stars cosmetics: which skins and icons players actually use":
+    "Косметика Brawl Stars: какие скины и иконки игроки реально используют",
+  "Browse every icon →":
+    "Все иконки →",
+  "Browse every skin →":
+    "Все скины →",
+  "Every skin and profile icon seen in the sampled player pool, ranked by how many people equip it. Not a list of what exists, a measurement of what gets worn.":
+    "Каждый скин и иконка профиля, замеченные в выборке игроков, по тому, сколько людей их носят. Не список того, что существует, а замер того, что носят.",
+  "How this is counted":
+    "Как это считается",
+  "Most worn skins":
+    "Самые популярные скины",
+  "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.":
+    "Числа берутся из сменяющейся выборки срезов, которая каждый день записывает четверть игроков выборки, так что это опрос, а не перепись. Для долей этого достаточно, а ничего, кроме долей, здесь и не показывается, поэтому число здесь никогда не означает, сколько людей чем-то владеют в игре.",
+  "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.":
+    "Доля от всех собранных слотов «игрок–боец», поэтому скины разных бойцов напрямую сравнимы.",
+  "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.":
+    "Какие скины и иконки профиля игроки реально надевают — по выборке, а не по каталогу.",
+  "{length} seen across the roster, ranked by how many of the sampled slots wear each one.":
+    "Замечено по всему составу: {length}, по тому, сколько собранных слотов носят каждый.",
+  "{length} seen on sampled accounts. The icon sits on the account, so these are shares of players rather than of brawlers.":
+    "Замечено на аккаунтах выборки: {length}. Иконка принадлежит аккаунту, поэтому это доли игроков, а не бойцов.",
+  "Announced, not yet released":
+    "Анонсирован, ещё не вышел",
+  "Brawl Stars update notes":
+    "Описания обновлений Brawl Stars",
+  "Contents":
+    "Содержание",
+  "Details not published yet":
+    "Подробности ещё не опубликованы",
+  "Every brawler named in {title}, linked to its page here.":
+    "Каждый боец, упомянутый в «{title}», со ссылкой на его страницу здесь.",
+  "Published":
+    "Опубликовано",
+  "Published by Supercell, reproduced here for convenience.":
+    "Опубликовано Supercell, приводится здесь для удобства.",
+  "Release notes":
+    "Описание обновления",
+  "Release notes are unavailable right now. Try again shortly, or read them on":
+    "Описание обновления сейчас недоступно. Попробуй чуть позже или прочитай его на",
+  "Revealed in a Brawl Talk and coming to the game. Everything known so far.":
+    "Показан в Brawl Talk и скоро появится в игре. Всё, что известно на сейчас.",
+  "Stats and abilities come from the community wiki and fill in over the days after a reveal, so a brawler announced yesterday may show little beyond its name.":
+    "Характеристики и способности берутся из вики сообщества и заполняются в дни после анонса, поэтому у бойца, анонсированного вчера, может быть видно мало что, кроме имени.",
+  "The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.":
+    "Последнее официальное описание обновления Brawl Stars: новые бойцы, гиперзаряды, изменения баланса и исправления ошибок.",
+  "The latest official update notes, straight from the Brawl Stars team.":
+    "Последнее официальное описание обновления, прямо от команды Brawl Stars.",
+  "Who changed":
+    "Кого изменили",
+  "for what we track ourselves.":
+    "по тому, что мы отслеживаем сами.",
+  "see detected in-game changes":
+    "смотреть изменения, обнаруженные в игре",
+  "supercell.com":
+    "supercell.com",
+  "Announcements from the Brawl Stars team, and the new brawlers and abilities detected from the game API. For how the sampled meta is shifting, see the":
+    "Анонсы команды Brawl Stars и новые бойцы и способности, обнаруженные через API игры. Как меняется собранная мета, смотри в разделе",
+  "Brawl Stars news":
+    "Новости Brawl Stars",
+  "Brawler removed":
+    "Боец удалён",
+  "Change":
+    "Изменение",
+  "Detected":
+    "Обнаружено",
+  "Detected game changes":
+    "Обнаруженные изменения в игре",
+  "Gadget":
+    "Гаджет",
+  "Gear":
+    "Снаряжение",
+  "New brawler":
+    "Новый боец",
+  "New brawlers, star powers, gadgets and hypercharges.":
+    "Новые бойцы, звёздные силы, гаджеты и гиперзаряды.",
+  "News":
+    "Новости",
+  "Official Brawl Stars announcements, plus roster and kit changes detected from the game API.":
+    "Официальные анонсы Brawl Stars, плюс изменения состава и наборов способностей, обнаруженные через API игры.",
+  "Official news":
+    "Официальные новости",
+  "Read on supercell.com":
+    "Читать на supercell.com",
+  "Removed":
+    "Удалено",
+  "Star power":
+    "Звёздная сила",
+  "Straight from the Brawl Stars team.":
+    "Прямо от команды Brawl Stars.",
+  "Straight from the game":
+    "Прямо из игры",
+  "What this means for the meta":
+    "Что это значит для меты",
+  "Brawl Stars findings for {label}.":
+    "Находки Brawl Stars за {label}.",
+  "Daily":
+    "Ежедневно",
+  "Today":
+    "Сегодня",
+  "What BrawlZone found on {label}":
+    "Что BrawlZone нашёл за {label}",
+  "{findings} findings from Brawl Stars battles sampled on {label}, including the strongest pick nobody used and the most one-sided matchup of the day.":
+    "{findings} {findings|one:находка|few:находки|many:находок|other:находки} по боям Brawl Stars, собранным за {label}, включая самый сильный пик, который никто не брал, и самый односторонний матчап дня.",
+  "Brawl Stars tier list maker. Build and share your own":
+    "Конструктор тир-листов Brawl Stars. Составь и поделись своим",
+  "Nothing here is saved on a server — the link":
+    "Здесь ничего не сохраняется на сервере: ссылка",
+  "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.":
+    "Расставь сам всех сто с лишним бойцов, а потом поделись доской одной ссылкой. Нажми на бойца и на тир или перетаскивай, если ты за компьютером.",
+  "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.":
+    "Расставь каждого бойца Brawl Stars сам и поделись одной ссылкой. Начни с пустой доски или с текущей меты ранговых боёв, а потом поспорь с ней.",
+  "The brawler metadata source is not responding, so there is nothing to rank yet. Try again shortly.":
+    "Источник данных о бойцах не отвечает, так что расставлять пока нечего. Попробуй чуть позже.",
+  "Tier list maker":
+    "Конструктор тир-листов",
+  "Your call":
+    "Твой выбор",
+  "is":
+    "и есть",
+  "or the":
+    "или",
+  "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the":
+    "тир-лист, поэтому она работает, пока она у кого-то есть. Измеренная версия, по собранным боям, а не по мнениям, —",
+  "trophy list":
+    "список по трофеям",
+  "Cosmetics":
+    "Косметика",
+  "Every Brawl Stars profile icon, ranked by how many players use it":
+    "Все иконки профиля Brawl Stars по тому, сколько игроков ими пользуется",
+  "No icon data has been sampled yet.":
+    "Данных по иконкам пока не собрано.",
+  "Nothing sampled yet. The pool refreshes every two hours.":
+    "Пока ничего не собрано. Пул обновляется каждые два часа.",
+  "Profile icons":
+    "Иконки профиля",
+  "The full profile icon catalogue measured from sampled accounts: which icons players actually wear, and which are almost never seen.":
+    "Полный каталог иконок профиля по аккаунтам выборки: какие иконки игроки реально носят, а какие почти не встречаются.",
+  "{length} icons seen on sampled accounts, ranked by share of players.":
+    "Иконок замечено на аккаунтах выборки: {length}, по доле игроков.",
+  "Daily archive":
+    "Архив по дням",
+  "Daily findings archive":
+    "Архив находок дня",
+  "Each day's findings kept at its own address. They cannot be recomputed once their windows roll past, so this reaches back only as far as the day it started.":
+    "Находки каждого дня хранятся по своему адресу. Их нельзя пересчитать, когда период прошёл, поэтому архив уходит назад только до дня, когда он начался.",
+  "Every day of BrawlZone findings, kept at its own address. What the sampled Brawl Stars battles showed on each date, from the strongest unused pick to the most one-sided matchup.":
+    "Все дни находок BrawlZone, каждый по своему адресу. Что показали собранные бои Brawl Stars в каждый день, от самого сильного неиспользуемого пика до самого одностороннего матчапа.",
+  "Nothing archived yet. Today’s report is written as it is published, so the first entry appears once":
+    "В архиве пока пусто. Отчёт дня записывается при публикации, поэтому первая запись появится, как только",
+  "RSS":
+    "RSS",
+  "finding":
+    "находка",
+  "findings":
+    "{n|one:находка|few:находки|many:находок|other:находки}",
+  "have been generated.":
+    "будут сформированы.",
+  "today’s findings":
+    "находки дня",
+  "Every Brawl Stars skin, ranked by how many players wear it":
+    "Все скины Brawl Stars по тому, сколько игроков их носят",
+  "No skin data has been sampled yet.":
+    "Данных по скинам пока не собрано.",
+  "The full skin catalogue measured from sampled accounts: which skins are actually equipped, and which almost nobody uses. Searchable by skin or brawler.":
+    "Полный каталог скинов по аккаунтам выборки: какие скины реально надеты, а какие почти никто не носит. С поиском по скину или бойцу.",
+  "{length} skins seen in the sampled pool, ranked by share of player-brawler slots. Default skins are excluded.":
+    "Скинов замечено в выборке: {length}, по доле слотов «игрок–боец». Стандартные скины исключены.",
+  "From {sampleSize} sampled battles.":
+    "По собранным боям: {sampleSize}.",
+  "See every matchup":
+    "Все матчапы",
+  "See the full record":
+    "Полная статистика",
+  "See the map":
+    "Открыть карту",
+  "See what changed":
+    "Что изменилось",
+  "See who else pairs well":
+    "С кем ещё он хорошо сочетается",
+  "See why it underperforms":
+    "Почему он проседает",
+  "The giant killer":
+    "Убийца гигантов",
+  "The map surprise":
+    "Сюрприз карты",
+  "The meta trap":
+    "Ловушка меты",
+  "The overnight rise":
+    "Взлёт за ночь",
+  "The secret duo":
+    "Тайный дуэт",
+  "The secret pick":
+    "Тайный пик",
+  "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.":
+    "Ничто не прошло порог доказательств. Каждой находке нужно не меньше 300 собранных боёв, и страница лучше покажет ничего, чем совпадение.",
+  "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.":
+    "То, что говорят собранные бои и чего не скажет таблица рейтинга. Каждая находка — самый большой разрыв своего вида в данных этого дня: не мнение и не список, отсортированный по очевидной колонке.",
+  "What we found":
+    "Что мы нашли",
+  "What we found today":
+    "Что мы нашли сегодня",
+  "Played":
+    "Сыграно",
+  " of ":
+    " из ",
+  "Copy share link":
+    "Скопировать ссылку",
+  "Every brawler is placed. Tap one in a row to send it back here.":
+    "Все бойцы расставлены. Нажми на бойца в строке, чтобы вернуть его сюда.",
+  "Place the selected brawler in {tier} tier":
+    "Поставить выбранного бойца в тир {tier}",
+  "Start from the live meta":
+    "Начать с текущей меты",
+  "placed":
+    "расставлено",
+  "selected — now tap a tier to place it.":
+    "выбран — теперь нажми на тир, чтобы поставить его.",
+  "{name}: tap to select, tap again to unrank":
+    "{name}: нажми, чтобы выбрать, ещё раз — чтобы убрать",
+  "{name}: tap to select, then tap a tier":
+    "{name}: нажми, чтобы выбрать, затем нажми на тир",
+  ". Bubble size is the sample behind each point. Tap one for its numbers.":
+    ". Размер пузыря — выборка за каждой точкой. Нажми на неё, чтобы увидеть числа.",
+  "Every rated brawler plotted by pick rate against meta score, over {windowDays} days":
+    "Все оценённые бойцы: частота выбора против мета-рейтинга за {windowDays} {windowDays|one:день|few:дня|many:дней|other:дня}",
+  "How often it is picked →":
+    "Как часто его берут →",
+  "How well it does →":
+    "Насколько хорошо играет →",
+  "Lit brawlers are the ones this account can field. It has":
+    "Подсвечены бойцы, которых этот аккаунт может выставить. У него",
+  "Meta":
+    "Мета",
+  "Out of favour":
+    "Не в фаворе",
+  "Sleepers":
+    "Тёмные лошадки",
+  "in the meta corner":
+    "в углу меты",
+  "picked · {sampleSize} battles":
+    "выбор · боёв: {sampleSize}",
+  "sleepers":
+    "тёмных лошадок",
+  "strongest 30%":
+    "сильнейшие 30%",
+  "weakest 40%":
+    "слабейшие 40%",
+  "win rate ·":
+    "побед ·",
+  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
+    "Бойцов с достаточным числом ранговых боёв для оценки за {windowDays} {windowDays|one:день|few:дня|many:дней|other:дня}: {count}. Размер пузыря — выборка за каждым, поэтому самые неуверенные точки — самые маленькие. Нажми на точку, чтобы увидеть числа.",
+  "{haveMeta} of the {length}":
+    "{haveMeta} из {length}",
+  "{haveSleepers} of the {length}":
+    "{haveSleepers} из {length}",
+  "A new brawler at midnight UTC.":
+    "Новый боец в полночь по UTC.",
+  "Average {v} guesses":
+    "В среднем {v} {v|one:попытка|few:попытки|many:попыток|other:попытки}",
+  "Best":
+    "Лучший",
+  "Copied":
+    "Скопировано",
+  "Copy result":
+    "Скопировать результат",
+  "Got it in {length}":
+    "Угадано за {length}",
+  "Guess a brawler":
+    "Угадай бойца",
+  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
+    "Угадай бойца дня. Каждая попытка показывает, насколько ты близок по пяти подсказкам: зелёный — точно, жёлтый — на шаг в стороне, а стрелка указывает на ответ.",
+  "Guesses to solve":
+    "Попыток до ответа",
+  "Next brawler in":
+    "Следующий боец через",
+  "Range":
+    "Дальность",
+  "Reload":
+    "Перезарядка",
+  "Revealed":
+    "Открыто",
+  "Streak":
+    "Серия",
+  "Type a brawler name…":
+    "Введи имя бойца…",
+  "Won":
+    "Победы",
+  "Yesterday was":
+    "Вчера был",
+  "guess":
+    "попытку",
+  "guesses":
+    "{n|one:попытку|few:попытки|many:попыток|other:попытки}",
+  "higher":
+    "выше",
+  "in {left} {v}":
+    "через {left} {v}",
+  "lower":
+    "ниже",
+  "Nothing matches “{query}”.":
+    "Ничего не найдено по запросу «{query}».",
+  "Search by skin or brawler":
+    "Поиск по скину или бойцу",
+  "Search icons by number":
+    "Поиск иконок по номеру",
+  "Search profile icons":
+    "Поиск иконок профиля",
+  "Search skins":
+    "Поиск скинов",
+  "of":
+    "из",
+  "{stats} first-guess solve":
+    "с первой попытки: {stats}",
+  "{stats} first-guess solves":
+    "с первой попытки: {stats}",
+  "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.":
+    "% рейтинга. Этот вес измерен, а не выбран: против оценки, которая точно учитывает навык игрока, скорректированный процент побед даёт r = +0,77, а частота выбора r = +0,22, так что популярность — слабый, но настоящий сигнал силы, а не шум, и её доля в общем сигнале около пятой части, как раз такой вес она сейчас и имеет. Раньше было 35%, и тогда она давала 45% реального разброса и сдвигала бойцов на сорок мест одной лишь популярностью. И всё же популярный боец со средним результатом всё равно обойдёт непопулярного с лучшим результатом. Оба числа выводятся в каждой строке, чтобы ты мог взвесить их сам.",
+  "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.":
+    "Обе оценки тесно согласуются (r = +0,77) и расходятся там, где это важно. Bibi была 96-й по одному проценту побед и 16-й, когда каждого игрока сравнили с его собственным средним, потому что ею играют в основном слабые аккаунты, и их результаты принимались за её.",
+  "A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.":
+    "Страница карты ранжирует бойцов по боям, сыгранным на этой карте. Если на карте слишком мало собранных боёв, чтобы что-то сказать, она берёт пики режима и говорит об этом на странице. Рекомендация никогда не выдаётся за относящуюся к карте, если это не так.",
+  "Almost nobody picks {name}. It is winning anyway.":
+    "{name} почти никто не берёт. А он всё равно побеждает.",
+  "Back to brawlers":
+    "Назад к бойцам",
+  "Battle history only goes back ~25 matches":
+    "История боёв охватывает только ~25 матчей",
+  "Best here":
+    "Лучшие здесь",
+  "Best picks for your map":
+    "Лучшие пики для твоей карты",
+  "Brawl Stars data is temporarily unavailable. Try again shortly.":
+    "Данные Brawl Stars временно недоступны. Попробуй чуть позже.",
+  "Brawl-O-Ween":
+    "Brawl-O-Ween",
+  "Claim by pressing and holding Loony once all 6 daily wins are done.":
+    "Забери награду, нажав и удерживая Loony, когда все 6 побед дня получены.",
+  "Coins, power points and playtime are estimates":
+    "Монеты, очки силы и время в игре — оценки",
+  "Could not check that guess.":
+    "Не удалось проверить эту попытку.",
+  "Could not copy. Select the grid and copy it by hand.":
+    "Не удалось скопировать. Выдели сетку и скопируй вручную.",
+  "Could not reach the server. Try again.":
+    "Не удалось связаться с сервером. Попробуй снова.",
+  "Could not read this club right now.":
+    "Сейчас не удалось прочитать этот клуб.",
+  "Decide what to upgrade":
+    "Реши, что улучшать",
+  "Derived from published upgrade costs and victory counts. Bling is not exposed by the API at all, so we do not show it.":
+    "Выведено из опубликованных цен улучшений и числа побед. Блинги API вообще не отдаёт, поэтому мы их не показываем.",
+  "Enter bans and picks, get the answer":
+    "Укажи запреты и пики — получи ответ",
+  "Every daily win adds a reward to Loony, up to 6 wins a day.":
+    "Каждая победа дня добавляет награду Loony, до 6 побед в день.",
+  "Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.":
+    "Все карты, которые ещё есть в игре. Около четырёхсот. Это намеренно не называется ротацией: источник изображений не публикует дату последнего появления, поэтому ничто в нём не скажет, какие из этих карт в игре сегодня.",
+  "Every ranked mode is covered, with a pick spare":
+    "Все режимы ранговых боёв покрыты, с запасным пиком",
+  "Every top-tier brawler you own is at power 11.":
+    "Все твои бойцы из верхних тиров на 11-м уровне силы.",
+  "Fielded at Power 11 with every Gadget, Star Power, Gear, Buffie and their Hypercharge, exactly as in Friendly Battles.":
+    "Выставляются на 11-м уровне силы со всеми гаджетами, звёздными силами, снаряжением, баффи и гиперзарядом, как в дружеских боях.",
+  "Find roster weaknesses":
+    "Найди слабые места состава",
+  "Forgot to claim? The rewards are granted automatically the next day.":
+    "Забыл забрать? Награды выдаются автоматически на следующий день.",
+  "Gears, star powers, gadgets, best modes and maps, updated daily from real battles.":
+    "Снаряжение, звёздные силы, гаджеты, лучшие режимы и карты, обновляются ежедневно по настоящим боям.",
+  "How the meta score works":
+    "Как работает мета-рейтинг",
+  "Leaderboards stop at 200":
+    "Рейтинги заканчиваются на 200",
+  "Loadouts are not published":
+    "Сборки в бою не публикуются",
+  "Map picks vs mode picks":
+    "Пики карты и пики режима",
+  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
+    "Мета-рейтинг с {from} до {to} за один день, на достаточном числе боёв, чтобы сдвиг был настоящим, а не шумом.",
+  "Most likely bans here":
+    "Самые вероятные запреты здесь",
+  "Most likely picks here":
+    "Самые вероятные пики здесь",
+  "Most {name} owners buy the {gadget} gadget and the {starPower} star power first.":
+    "Большинство владельцев {name} первыми покупают гаджет {gadget} и звёздную силу {starPower}.",
+  "Most {name} owners buy the {gadget} gadget first.":
+    "Большинство владельцев {name} первым покупают гаджет {gadget}.",
+  "Most {name} owners buy the {starPower} star power first.":
+    "Большинство владельцев {name} первой покупают звёздную силу {starPower}.",
+  "None of your most-played brawlers are struggling right now.":
+    "Ни один из твоих самых популярных бойцов сейчас не проседает.",
+  "Not enough sampled battles to judge this draft":
+    "Недостаточно собранных боёв, чтобы оценить этот драфт",
+  "On 1 global brawler leaderboard":
+    "В 1 мировом рейтинге бойцов",
+  "One score, comparable to everyone we sample.":
+    "Одна оценка, сопоставимая со всеми, кого мы собираем.",
+  "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.":
+    "Наша выборка смещена к игрокам с большим числом трофеев, которые чаще побеждают на ком угодно. Процент побед центрируется на этой базе, чтобы сравнение бойцов оставалось честным.",
+  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
+    "Берут в {picks} собранных боёв, а результат с поправкой — {rate}: ниже среднего тех самых игроков, которые его берут.",
+  "Playable in Ranked even if you have not unlocked them.":
+    "Доступны в ранговых боях, даже если ты их не открыл.",
+  "Progress resets every day, like Daily Wins.":
+    "Прогресс сбрасывается каждый день, как и «Победы дня».",
+  "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
+    "Награды — Призы Старр или Призы хаоса, до 2 Призов Старр в день.",
+  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
+    "В команде {name} побеждает в {rate} — на {edge} лучше, чем обычно. Ни один не берётся ради другого.",
+  "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
+    "Это всё, что хранит API. Всё, что помечено как «недавнее», действительно недавнее. Истории матчей за всю карьеру нет.",
+  "That is not a current brawler.":
+    "Это не текущий боец.",
+  "The API refuses to return more, so top-200 is the deepest placement that exists. There is no top-500.":
+    "API не отдаёт больше, поэтому топ-200 — самое глубокое место, какое существует. Топ-500 нет.",
+  "The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler’s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.":
+    "API сообщает, какие звёздные силы, гаджеты и снаряжение есть у игрока, и ничего о том, что он взял в бой. Ни один эндпоинт не показывает надетую сборку. Поэтому страницы бойцов показывают владение улучшениями, но никогда не долю использования или выбора. Снаряжение, которое есть у 78% владельцев бойца, — ровно это: есть у 78%. Владение обычно следует за использованием, но не измеряет его.",
+  "The Ranked meta, map by map":
+    "Мета ранговых боёв, карта за картой",
+  "The best trio to take together":
+    "Лучшая тройка для совместной игры",
+  "The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.":
+    "Пул соревновательных карт текущего рангового сезона, публикуется на каждый сезон. Не меняется до смены сезона.",
+  "The drafts were close to even":
+    "Драфты были почти равны",
+  "The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.":
+    "Карты, которые прямо сейчас в ротации событий, из API игры. Это единственный список, который буквально «прямо сейчас».",
+  "The two windows were sampled at very different rates — {before} decided Ranked battles before against {after} after, a factor of {ratio}. Any difference would be partly the sampling and not the update, so nothing is scored.":
+    "Два периода собраны с очень разной частотой: {before} решённых ранговых боёв до против {after} после, разница в {ratio} раза. Любая разница отчасти была бы следствием сбора, а не обновления, поэтому ничего не оценивается.",
+  "They count toward the Power 11 brawler requirement for each rank, Mythic and above need more than 12.":
+    "Они засчитываются в требование по бойцам 11-го уровня силы для каждого ранга; для Мифического и выше нужно больше 12.",
+  "Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.":
+    "«Мало данных», «Набирается» и «Хорошая выборка» описывают, сколько боёв стоит за рейтингом карты. Не больше. Карту с малыми данными не прячут, а помечают, потому что оговорка, которую можно прочитать, лучше числа, которое нельзя проверить.",
+  "Tier list percentages are adjusted":
+    "Проценты в тир-листе скорректированы",
+  "Too little was sampled either side of this update to measure it: {before} decided Ranked battles before and {after} after.":
+    "С обеих сторон этого обновления собрано слишком мало, чтобы его измерить: {before} решённых ранговых боёв до и {after} после.",
+  "Too many scans at once. Give it a minute.":
+    "Слишком много сканирований сразу. Подожди минуту.",
+  "Totals unavailable right now":
+    "Итоги сейчас недоступны",
+  "Understand your level":
+    "Пойми свой уровень",
+  "We couldn’t find that player. Check the tag in-game under your profile.":
+    "Не удалось найти этого игрока. Проверь тег в игре в своём профиле.",
+  "Where the next coins actually change a match.":
+    "Где следующие монеты реально меняют матч.",
+  "Which of your brawlers the meta has left behind.":
+    "Кого из твоих бойцов мета оставила позади.",
+  "Your brawlers ticked, your icon on the bubble":
+    "Твои бойцы отмечены, твоя иконка на пузыре",
+  "adjusted win rate":
+    "скорректированный процент побед",
+  "meta score, 1 day":
+    "мета-рейтинг, 1 день",
+  "of all picks":
+    "от всех выборов",
+  "on {map}":
+    "на карте {map}",
+  "this map":
+    "эта карта",
+  "vs its usual form":
+    "к обычной форме",
+  "when paired":
+    "в паре",
+  "{map} · {battles} battles on this map":
+    "{map} · боёв на этой карте: {battles}",
+  "{name} and {other} belong together.":
+    "{name} и {other} созданы друг для друга.",
+  "{name} climbed overnight.":
+    "{name} взлетел за ночь.",
+  "{name} is a different brawler on {map}.":
+    "{name} на карте {map} — совсем другой боец.",
+  "{name} is everywhere, and losing.":
+    "{name} повсюду — и проигрывает.",
+  "{name} is picked constantly and losing.":
+    "{name} берут постоянно — и он проигрывает.",
+  "{name} moved more than anything else since yesterday.":
+    "{name} сдвинулся со вчерашнего дня сильнее всех.",
+  "{name} owns {other}.":
+    "{name} доминирует над {other}.",
+  "{rate} adjusted win rate on just {picks} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.":
+    "Скорректированный процент побед {rate} при доле выбора всего {picks}: один из сильнейших результатов в составе у бойца, о котором большинство драфтов даже не думает.",
+  "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
+    "{rate} именно против {other}, на {edge} выше собственного результата {name}. Самый односторонний матчап в выборке.",
+  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
+    "{rate} здесь против {other} на всех остальных картах: самый большой разрыв между бойцом и одним участком местности.",
+  "{winRate} win rate · {pickRate} picked · {battles} battles":
+    "{winRate} побед · выбор {pickRate} · боёв: {battles}",
+  "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.":
+    "Мета-рейтинг — число от 0 до 10 из двух измерений: скорректированного процента побед с весом 75% и частоты выбора в логарифмической шкале с весом 25%. Оба берутся из настоящих боёв игроков мирового рейтинга, собираемых каждые два часа, а список ранговых боёв учитывает только соревновательные бои.",
+  "Every win rate is pulled toward the average by 50 pseudo-battles, so a brawler needs roughly that many decided battles before its own record outweighs the prior. Without it the top of the list was whichever rarely-played brawler had a lucky week. Anything under 20 decided battles is not rated at all.":
+    "Каждый процент побед подтягивается к среднему 50 псевдобоями, поэтому бойцу нужно примерно столько решённых боёв, чтобы его собственный результат перевесил исходное значение. Без этого вверху списка оказывался редко используемый боец, которому повезло на неделе. Всё, где меньше 20 решённых боёв, вообще не оценивается.",
+  "Make the bubble yours: choose its size, how faint it gets when you leave it alone, and whether it tucks half off the edge. A touch always brings it straight back.":
+    "Сделай пузырь своим: выбери его размер, насколько он бледнеет, когда его не трогают, и прячется ли он наполовину за край. Одно касание всегда сразу его возвращает.",
+  "The app now speaks your language: all 22 languages of the game, with a flag picker at the top. The app and this panel share one language setting.":
+    "Приложение теперь говорит на твоём языке: все 22 языка игры, с выбором флага сверху. У приложения и этой панели одна настройка языка.",
+  "“What to upgrade next” comes in your language too, with brawler and mode names as the game writes them.":
+    "«Что улучшить дальше» тоже на твоём языке, с именами бойцов и режимов, как их пишет игра.",
+  "A new look: chunky 3D buttons, bold display type and game-style panels throughout the app.":
+    "Новый вид: объёмные 3D-кнопки, жирные заголовки и панели в стиле игры по всему приложению.",
+  "The bubble wears your own player icon once your tag is set (open the app once after updating).":
+    "Пузырь носит твою собственную иконку игрока, как только указан тег (открой приложение один раз после обновления).",
+  "Set-up is easier: until your player tag is added, the app says what it unlocks and takes you straight to the field.":
+    "Настройка проще: пока тег игрока не добавлен, приложение говорит, что он открывает, и ведёт прямо к полю.",
+  "The panel filter is a clear choice now: All my brawlers, Power 11 only, or Power 11 + hypercharge, each with what it does and how many brawlers it leaves.":
+    "Фильтр панели теперь — понятный выбор: «Все мои бойцы», «Только 11-й уровень силы» или «11-й уровень + гиперзаряд», у каждого написано, что он делает и сколько бойцов оставляет.",
+  "The panel opens instantly. It used to load the page again on every tap, so it opened on a spinner mid-draft; it now keeps the page between opens and starts loading as soon as the bubble appears.":
+    "Панель открывается мгновенно. Раньше она перезагружала страницу при каждом нажатии и открывалась со спиннером посреди драфта; теперь она держит страницу между открытиями и начинает загрузку, как только появляется пузырь.",
+  "No signal? The panel shows the last saved list, marked “Offline”, instead of an error.":
+    "Нет сети? Панель показывает последний сохранённый список с пометкой «Офлайн» вместо ошибки.",
+  "Each mode chip carries the mode’s own icon, the badge the game shows in the corner of the draft.":
+    "На каждой кнопке режима — его собственная иконка, тот значок, который игра показывает в углу драфта.",
+  "The three counts are the filter now. Tap owned, power 11 or hypercharge and the tile lights up — so the number the panel is using is the one you can see, instead of something to work out from two switches.":
+    "Три счётчика теперь и есть фильтр. Нажми «есть», «11-й уровень» или «гиперзаряд», и плитка подсветится: число, которое использует панель, — то, что ты видишь, а не то, что нужно вычислять из двух переключателей.",
+  "Those two switches are gone with it. They encoded three settings in four combinations, and the spare one was impossible: a hypercharge cannot be unlocked below power 11, so “hypercharge without power 11” had to be quietly rewritten every time it was set.":
+    "Вместе с этим исчезли два переключателя. Они кодировали три настройки в четырёх комбинациях, и лишняя была невозможной: гиперзаряд нельзя открыть ниже 11-го уровня силы, поэтому «гиперзаряд без 11-го уровня» приходилось каждый раз тихо переписывать.",
+  "The tag box has a label, and the filter says in words what it is doing underneath the tiles.":
+    "У поля тега есть подпись, а фильтр словами пишет под плитками, что он делает.",
+  "The account tiles use the game’s own art: the brawler mark on what you own, the power 11 badge, the hypercharge symbol, and a trophy beside your count. A number under an icon you already recognise reads faster than a number under a word.":
+    "Плитки аккаунта используют изображения самой игры: знак бойца у тех, что у тебя есть, значок 11-го уровня силы, символ гиперзаряда и трофей рядом с твоим числом. Число под знакомой иконкой читается быстрее, чем число под словом.",
+  "The app screen is rebuilt. State and action share one card instead of four stacked full-width blocks, Stop and Quick Settings sit side by side, and the screen ends on a footer rather than stopping mid-list.":
+    "Экран приложения переделан. Статус и действие на одной карточке вместо четырёх блоков друг под другом, «Стоп» и «Быстрые настройки» рядом, а экран заканчивается подвалом, а не обрывается посреди списка.",
+  "Your tag now resolves to a name and your player icon, with the counts each filter produces — owned, power 11, hypercharged. A tag is a string nobody can check by reading it, and one wrong character is a valid tag belonging to a stranger whose only symptom is that every filter looks broken.":
+    "Твой тег теперь превращается в имя и иконку игрока, со счётчиками для каждого фильтра: есть, 11-й уровень, с гиперзарядом. Тег — строка, которую никто не проверит на глаз, а один неверный символ даёт действующий тег незнакомца, и единственный симптом — что все фильтры выглядят сломанными.",
+  "Pick and Ban tabs on every map. Pick is the list you already had, narrowed to what you can field. Ban is every brawler, whoever owns them, with how often it is actually taken here — because banning something nobody picks spends the ban for nothing.":
+    "Вкладки «Пик» и «Запрет» на каждой карте. «Пик» — список, который у тебя уже был, суженный до тех, кого ты можешь выставить. «Запрет» — все бойцы, у кого бы они ни были, с тем, как часто их реально берут здесь, потому что запрет того, кого никто не берёт, тратит запрет впустую.",
+  "A third switch on the app screen: hide the brawlers you cannot use instead of greying them out. Off by default — greying keeps the tier counts honest and keeps a brawler you are one upgrade away from in view.":
+    "Третий переключатель на экране приложения: скрывать бойцов, которыми нельзя играть, а не делать их серыми. По умолчанию выключен: серый цвет сохраняет честные счётчики тиров и оставляет на виду бойца, которому не хватает одного улучшения.",
+  "Add your player tag on the app screen and the panel marks what you can actually field. The tier list stops being a list of brawlers you might not own: anything you cannot take is dimmed, and each map names your best available pick.":
+    "Добавь свой тег игрока на экране приложения, и панель отметит, кого ты реально можешь выставить. Тир-лист перестаёт быть списком бойцов, которых у тебя может не быть: всё, что ты не можешь взять, затемнено, а для каждой карты назван твой лучший доступный пик.",
+  "Two filters beside it — power 11 only, and power 11 with a hypercharge — for when a pick is only worth making at full strength.":
+    "Рядом два фильтра — только 11-й уровень силы и 11-й уровень с гиперзарядом — для пиков, которые стоят того только на полной силе.",
+  "Your roster is read once a day and kept on the phone, so none of this costs anything mid-draft. Leave the tag blank and the panel behaves exactly as it did before.":
+    "Твой состав читается раз в день и хранится на телефоне, так что посреди драфта это ничего не стоит. Оставь тег пустым, и панель будет вести себя ровно как раньше.",
+  "A BrawlZone tile for Quick Settings: swipe down from inside the game and tap it to put the bubble up or take it down, without opening the app. Android 13 and up can add it with one tap from the app screen; older versions find it by editing Quick Settings.":
+    "Плитка BrawlZone для быстрых настроек: смахни вниз прямо в игре и нажми на неё, чтобы показать или убрать пузырь, не открывая приложение. На Android 13 и новее её можно добавить одним нажатием с экрана приложения; на старых версиях она находится при редактировании быстрых настроек.",
+  "The notification has a Panel button, so the panel can be opened or closed from the shade when the bubble is under your thumb or behind the game’s own UI.":
+    "В уведомлении есть кнопка «Панель», так что панель можно открыть или закрыть из шторки, когда пузырь под пальцем или за интерфейсом игры.",
+  "The draft scan is gone. It never worked reliably enough across phones to keep, and an app that asks to record your screen for a feature that does not work is worse than one that does not ask. The app no longer requests screen capture at all.":
+    "Сканирование драфта убрано. Оно так и не работало достаточно надёжно на разных телефонах, чтобы его оставить, а приложение, которое просит записывать экран ради функции, которая не работает, хуже того, которое не просит. Приложение больше вообще не запрашивает запись экрана.",
+  "The draft board stays: pick the map and enter the bans and picks by hand, and it ranks the remaining brawlers as before.":
+    "Доска драфта остаётся: выбери карту, введи запреты и пики вручную, и она ранжирует оставшихся бойцов, как и раньше.",
+  "Smaller and simpler for it — the text-recognition library is gone too.":
+    "Заодно приложение стало меньше и проще: библиотеки распознавания текста тоже больше нет.",
+  "The draft scan is back, rebuilt: each scan owns its result, so a slow scan can no longer overwrite the next one, and a result that arrives while the panel is closed is shown when it reopens.":
+    "Сканирование драфта вернулось, переделанное: у каждого сканирования свой результат, поэтому медленное сканирование больше не перезапишет следующее, а результат, пришедший при закрытой панели, показывается при её открытии.",
+  "Every slot now says why it is what it is — read, empty, unknown, or covered by the panel — and a later scan corrects a misread in place without touching anything you typed in.":
+    "Каждый слот теперь говорит, почему он такой — прочитан, пуст, неизвестен или закрыт панелью, — а следующее сканирование исправляет ошибку на месте, не трогая то, что ты ввёл.",
+  "The screen is found from the picture itself, including the map name plate, so black bars, insets and other screen shapes no longer read the wrong pixels.":
+    "Экран находится по самой картинке, включая табличку с названием карты, поэтому чёрные полосы, отступы и другие формы экрана больше не заставляют читать не те пиксели.",
+  "Diagnostics can export the exact frame a scan used, so a misread on your phone can be fixed without guessing.":
+    "Диагностика может экспортировать тот самый кадр, который использовало сканирование, чтобы ошибку на твоём телефоне можно было исправить без догадок.",
+  "The scan now finds the draft screen in the picture instead of assuming where it is, so it works the same on any screen size or shape rather than only the one it was measured on.":
+    "Сканирование теперь находит экран драфта на картинке, а не предполагает, где он, поэтому работает одинаково на любом размере и форме экрана, а не только на том, на котором его измеряли.",
+  "The scan now matches the screen it is capturing. A session started while the phone was a different shape kept producing frames of that shape, so everything was read from the wrong place — the timer instead of the map name, and picks in the wrong slots.":
+    "Сканирование теперь соответствует экрану, который записывает. Сеанс, начатый при другой ориентации телефона, продолжал выдавать кадры той формы, и всё читалось не с того места: таймер вместо названия карты и пики не в тех слотах.",
+  "Ban artwork that a phone refuses to decode the preferred way now falls back instead of failing — which left the ban list empty with nothing to say why.":
+    "Изображения запретов, которые телефон отказывается декодировать предпочтительным способом, теперь используют запасной вариант, а не ломаются, — раньше список запретов оставался пустым без объяснения причин.",
+  "Tapping Scan while the app is still loading shows the progress instead of asking to share your screen for a scan that could not run yet.":
+    "Нажатие «Сканировать», пока приложение ещё загружается, показывает прогресс, а не просит поделиться экраном ради сканирования, которое ещё не могло запуститься.",
+  "Bans are matched against their own artwork, which is decoded correctly now — transparent edges were being darkened twice, which affected the ban icons and nothing else.":
+    "Запреты сравниваются с их собственными изображениями, которые теперь декодируются правильно: прозрачные края затемнялись дважды, и это касалось только иконок запретов.",
+  "The app no longer reports itself ready to scan until the ban artwork has loaded too, instead of only the portraits.":
+    "Приложение больше не сообщает о готовности к сканированию, пока не загрузятся и изображения запретов, а не только портреты.",
+  "Scanning no longer asks to share your screen over and over. Permission is a button you press, never something a scan asks for on its own, and it stops asking if Android keeps refusing.":
+    "Сканирование больше не просит снова и снова поделиться экраном. Разрешение — это кнопка, которую ты нажимаешь, а не то, что сканирование запрашивает само, и оно перестаёт спрашивать, если Android продолжает отказывать.",
+  "Loading the portraits is about eight times faster, and shows how far along it is.":
+    "Портреты загружаются примерно в восемь раз быстрее и показывают, сколько осталось.",
+  "A scan can no longer run against a half-loaded set of portraits, which made recognition look unreliable when it was simply not ready.":
+    "Сканирование больше не может запуститься на наполовину загруженных портретах, из-за чего распознавание казалось ненадёжным, хотя оно просто было не готово.",
+  "Scanning is back, and the bans work for the first time — the game draws them from a different artwork set, which is why they never matched before.":
+    "Сканирование вернулось, и запреты впервые работают: игра рисует их из другого набора изображений, поэтому раньше они никогда не совпадали.",
+  "One tap reads the mode, the map, both teams’ picks and all six bans, then scores the picks for that map.":
+    "Одно нажатие читает режим, карту, пики обеих команд и все шесть запретов, а затем оценивает пики для этой карты.",
+  "The recognition is now tested against real captures of a real draft on every build, instead of only on your phone.":
+    "Распознавание теперь проверяется на настоящих записях настоящего драфта при каждой сборке, а не только на твоём телефоне.",
+  "Starting the bubble no longer asks to share your screen. That prompt fired on every start once it had been allowed.":
+    "Запуск пузыря больше не просит поделиться экраном. Этот запрос появлялся при каждом запуске, если его однажды разрешили.",
+  "The update download now opens the installer itself when it finishes, instead of relying on a notification that may be switched off.":
+    "Загрузка обновления теперь сама открывает установщик, когда заканчивается, а не полагается на уведомление, которое может быть выключено.",
+  "The app finally asks for notification permission. Without it the update download finished invisibly and the bubble’s Stop control was hidden — both looked like features that did nothing.":
+    "Приложение наконец просит разрешение на уведомления. Без него загрузка обновления заканчивалась незаметно, а кнопка «Стоп» у пузыря была скрыта: и то и другое выглядело как функции, которые ничего не делают.",
+  "The download now says which folder the file landed in, so it is findable even with notifications turned off.":
+    "Загрузка теперь сообщает, в какую папку попал файл, так что его можно найти даже с выключенными уведомлениями.",
+  "Allowing screen sharing could ask again, and again, forever. Android was destroying the permission screen before it could receive your answer.":
+    "Разрешение на показ экрана могло спрашиваться снова и снова, бесконечно. Android уничтожал экран разрешения раньше, чем тот успевал получить твой ответ.",
+  "A second scan sometimes did nothing at all. One scan that never finished left the button jammed for the rest of the session.":
+    "Второе сканирование иногда ничего не делало. Одно незавершённое сканирование блокировало кнопку до конца сеанса.",
+  "The Download button in this notice finally downloads. Every version until now was blocked by Android from opening it, silently.":
+    "Кнопка «Скачать» в этом уведомлении наконец скачивает. Во всех версиях до этой Android молча блокировал её открытие.",
+  "The screen-capture prompt no longer interrupts a match. Once you have allowed it, it is asked as the bubble starts instead of on your first scan.":
+    "Запрос на запись экрана больше не прерывает матч. Когда ты его разрешил, он задаётся при запуске пузыря, а не при первом сканировании.",
+  "The prompt can no longer be answered with \"Share one app\", which captured the wrong thing.":
+    "На запрос больше нельзя ответить «Показать одно приложение» — это записывало не то.",
+  "The Download button in the update notice works. It was a dead button inside the app.":
+    "Кнопка «Скачать» в уведомлении об обновлении работает. Раньше внутри приложения это была мёртвая кнопка.",
+  "The map is read from the screen on the first scan, instead of only after you had confirmed it once.":
+    "Карта читается с экрана при первом сканировании, а не только после того, как ты однажды её подтвердил.",
+  "A map it still cannot place falls back to the old behaviour — pick it once and it is remembered.":
+    "Карта, которую оно ещё не может определить, использует старое поведение: выбери её один раз, и она запомнится.",
+  "Scanning recognised about one brawler in six. It now matches each brawler on the framing that suits it, and reads the picks on both teams.":
+    "Сканирование распознавало примерно одного бойца из шести. Теперь каждый боец сравнивается в том кадрировании, которое ему подходит, и читаются пики обеих команд.",
+  "Bans are still left blank rather than guessed at — the game draws them with artwork nothing public matches. Tap one in and it is remembered.":
+    "Запреты по-прежнему остаются пустыми, а не угадываются: игра рисует их изображениями, которым ничто публичное не соответствует. Впиши одного, и он запомнится.",
+  "The update notice now says which version you have, so you can tell a real update from a stuck banner.":
+    "Уведомление об обновлении теперь говорит, какая у тебя версия, так что настоящее обновление можно отличить от зависшего баннера.",
+  "Scanning read only half the draft. The frame was often captured before the panel had got out of the way, so the panel itself covered the enemy picks — it now waits for a frame taken after the overlay is hidden.":
+    "Сканирование читало только половину драфта. Кадр часто снимался до того, как панель уходила с дороги, и панель сама закрывала пики врага; теперь оно ждёт кадр, снятый после скрытия слоя.",
+  "What the scan found now shows immediately, instead of staying hidden until you had picked the map by hand.":
+    "Найденное сканированием теперь показывается сразу, а не прячется, пока ты не выберешь карту вручную.",
+  "The panel says how many brawlers it read, so a scan that worked no longer looks like one that did nothing.":
+    "Панель говорит, сколько бойцов она прочитала, так что сработавшее сканирование больше не выглядит как ничего не сделавшее.",
+  "Scan works again. It could get stuck on “Loading portraits…” with the button disabled for the rest of the session, and never recover.":
+    "Сканирование снова работает. Оно могло застрять на «Загрузка портретов…» с неактивной кнопкой до конца сеанса и так и не прийти в себя.",
+  "Tapping Scan before the portraits have finished downloading now waits and then scans, instead of doing nothing.":
+    "Нажатие «Сканировать» до окончания загрузки портретов теперь ждёт и затем сканирует, а не ничего не делает.",
+  "Fixes 1.8, which crashed on launch and could not start the bubble at all. If you installed it, download again — this installs over the top.":
+    "Исправляет 1.8, которая падала при запуске и вообще не могла запустить пузырь. Если ты её установил, скачай заново: установится поверх.",
+  "Scan the draft instead of typing it: one tap reads the bans and picks off your screen and fills the board.":
+    "Сканируй драфт вместо того, чтобы вводить его: одно нажатие читает запреты и пики с экрана и заполняет доску.",
+  "The map is remembered. Confirm it once and every later scan on that map fills it in for you.":
+    "Карта запоминается. Подтверди её один раз, и каждое следующее сканирование на этой карте заполнит её за тебя.",
+  "Anything it is not sure about is left blank rather than guessed at — and correcting it teaches it that brawler for next time.":
+    "Всё, в чём оно не уверено, остаётся пустым, а не угадывается, а исправление учит его этому бойцу на следующий раз.",
+  "The keyboard no longer buries the draft picker: the panel moves above it, and searching is opt-in so the shortlist of likely picks is visible first.":
+    "Клавиатура больше не закрывает выбор драфта: панель поднимается над ней, а поиск включается по желанию, чтобы сначала был виден короткий список вероятных пиков.",
+  "In landscape the keyboard no longer takes over the whole screen.":
+    "В горизонтальном положении клавиатура больше не занимает весь экран.",
+  "The panel says when it cannot reach the site, with a tap to retry, instead of spinning forever on a dropped connection.":
+    "Панель сообщает, когда не может связаться с сайтом, и предлагает повторить по нажатию, а не крутится вечно при оборванном соединении.",
+  "The update notice downloads the new version directly, instead of sending you to the site to find the button.":
+    "Уведомление об обновлении скачивает новую версию напрямую, а не отправляет тебя на сайт искать кнопку.",
+  "Links in the panel now open in your browser rather than inside the overlay.":
+    "Ссылки в панели теперь открываются в браузере, а не внутри слоя.",
+  "The panel now tells you when a newer version of the app is out, and what changed in it.":
+    "Панель теперь сообщает, когда вышла новая версия приложения и что в ней изменилось.",
+  "Fixed the panel in landscape, which is how the game is actually played — it was arriving a third of its intended height.":
+    "Исправлена панель в горизонтальном положении, в котором и играют в игру: она открывалась на треть от нужной высоты.",
+  "The bubble and panel now follow the screen when you rotate, instead of keeping coordinates from the previous orientation.":
+    "Пузырь и панель теперь следуют за экраном при повороте, а не сохраняют координаты прежней ориентации.",
+  "The panel no longer lands on top of the bubble in landscape, which had been swallowing every tap meant for it.":
+    "Панель в горизонтальном положении больше не ложится поверх пузыря, из-за чего съедалось каждое нажатие на него.",
+  "Filter the tier list by game mode, and the choice is remembered next time you open it.":
+    "Фильтруй тир-лист по режиму игры, и выбор запомнится при следующем открытии.",
+  "Tap any brawler for the star power, gadget and gears its owners run.":
+    "Нажми на любого бойца, чтобы увидеть звёздную силу, гаджет и снаряжение, которые берут его владельцы.",
+  "The panel opens on the Ranked tier list, built for the overlay, instead of loading the full site into a small window.":
+    "Панель открывается с тир-листом ранговых боёв, сделанным для слоя, а не загружает весь сайт в маленькое окно.",
+  "Rebuilt the app screen: real spacing, the site’s palette, and system bars that match.":
+    "Экран приложения переделан: нормальные отступы, цвета сайта и подходящие системные панели.",
+  "First release. Tapping the bubble opens and closes the panel, dragging moves it, and dropping it on the target at the bottom closes it.":
+    "Первая версия. Нажатие на пузырь открывает и закрывает панель, перетаскивание двигает его, а если бросить его на цель внизу, он закроется.",
+  "Brawl Stars|hero-1":
+    "Brawl Stars",
+  "stats that show|hero-2":
+    "статистика, которая показывает,",
+  "where you stand|hero-3":
+    "где ты находишься",
+  "{rate} adjusted win rate and {pick} pick rate over {battles} sampled battles.":
+    "Скорректированный процент побед {rate} и частота выбора {pick} по собранным боям: {battles}.",
+  "{name} has a {rate} adjusted win rate and {pick} pick rate over {battles} sampled battles{tier}{date}.":
+    "У {name} скорректированный процент побед {rate} и частота выбора {pick} по собранным боям ({battles}){tier}{date}.",
+  ", {tier} tier in Ranked":
+    ", тир {tier} в ранговых боях",
+  ", as of {date}":
+    ", на {date}",
+  "The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
+    "Бойцы с лучшими результатами на карте {name}, карте режима «{mode}». По боям из пула мирового рейтинга, относительно среднего по всей выборке, а не по карте. Так что пик должен обойти всё поле, а не только лобби.",
+  "Common":
+    "Обычный",
+  "Rare":
+    "Редкий",
+  "Super Rare":
+    "Сверхредкий",
+  "Epic":
+    "Эпический",
+  "Mythic":
+    "Мифический",
+  "Legendary":
+    "Легендарный",
+  "Ultra Legendary":
+    "Ультралегендарный",
+  "Starting Brawler":
+    "Стартовый боец",
+  "Damage Dealer":
+    "Урон",
+  "Tank":
+    "Танк",
+  "Marksman":
+    "Стрелок",
+  "Support":
+    "Поддержка",
+  "Controller":
+    "Контроль",
+  "Assassin":
+    "Убийца",
+  "Artillery":
+    "Артиллерия",
+  "Play your rank, beat the meta":
+    "Играй на своём ранге, обыграй мету",
+  "The meta at your rank is not the meta at the top. And every pick has an answer.":
+    "Мета на твоём ранге — не та, что на самом верху. И у каждого пика есть ответ.",
+  "Tier list at your rank":
+    "Тир-лист на твоём ранге",
 };
