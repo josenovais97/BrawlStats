@@ -98,16 +98,12 @@ function De({ className = '' }: FlagProps) {
   );
 }
 
-/**
- * Russian gets a letter badge, not a flag (2026-11-04): it is read by players
- * from Ukraine, Kazakhstan and the rest of the region as much as from Russia,
- * and a single country's flag would tell most of them the page is not theirs.
- */
 function Ru({ className = '' }: FlagProps) {
   return (
     <svg viewBox="0 0 60 40" aria-hidden className={`${box} ${className}`}>
-      <rect width="60" height="40" fill="#3B4252" />
-      <text x="30" y="29" textAnchor="middle" fontSize="26" fontWeight="700" fontFamily="system-ui, sans-serif" fill="#fff">RU</text>
+      <rect width="60" height="13.34" fill="#fff" />
+      <rect y="13.33" width="60" height="13.34" fill="#0039A6" />
+      <rect y="26.66" width="60" height="13.34" fill="#D52B1E" />
     </svg>
   );
 }
