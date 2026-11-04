@@ -44,6 +44,12 @@ const WORDS = {
     back: 'Вернуться к поиску',
     tiers: 'Тир-лист',
   },
+  fr: {
+    title: 'Page introuvable',
+    body: "Cette page n'existe pas, ou elle a existé et n'existe plus. Les cartes et les modes tournent, donc un vieux lien peut survivre à ce qu'il montrait.",
+    back: 'Retour à la recherche',
+    tiers: 'Tier list',
+  },
 };
 
 /** The 404, in the language of the address that was asked for. */

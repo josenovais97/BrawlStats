@@ -77,6 +77,14 @@ const WORDS = {
       `${name}: скорректированный процент побед ${adj}, решённых боёв: ${games}, частота выбора ${pick}`,
     pick: 'частота выбора',
   },
+  fr: {
+    title: 'Forts mais peu choisis',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Les brawlers avec le meilleur taux de victoire ajusté dans la moitié la moins jouée du roster, d'après les ${battles} collectés${mode ? ` en ${mode}` : ''} ces ${w} derniers. Ils gagnent quand on les joue mais on les joue rarement, ce qui veut généralement dire qu'ils sont sous-estimés, pas mauvais.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name} : taux de victoire ajusté de ${adj} sur ${games} combats décisifs, taux de sélection de ${pick}`,
+    pick: 'taux de sélection',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function Underrated({

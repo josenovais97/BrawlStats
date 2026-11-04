@@ -77,6 +77,15 @@ const WORDS = {
     win: 'победы',
     pick: 'выбор',
   },
+  fr: {
+    title: 'Les brawlers les plus choisis',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Les brawlers qui apparaissent dans le plus de ${battles} collectés${mode ? ` en ${mode}` : ''} ces ${w} derniers. C'est de la popularité, pas de la force : les tiers ci-dessus classent ce que vaut un brawler, et les deux divergent souvent. Un taux de sélection est une part de tous les combats collectés, donc il s'additionne sur tout le roster et pas à 100 % par combat.`,
+    tier: (t: string) => `Tier ${t} dans cette liste`,
+    battles: 'combats',
+    win: 'victoires',
+    pick: 'sélection',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function MostPicked({

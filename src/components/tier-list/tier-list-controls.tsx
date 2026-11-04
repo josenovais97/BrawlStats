@@ -118,6 +118,18 @@ const WORDS: Record<
     modeGroup: 'Режим игры',
     sampled: (n) => `собрано боёв: ${n}`,
   },
+  fr: {
+    format: { ranked: { label: 'Classé', sublabel: 'Compétitif' }, trophy: { label: 'Trophées', sublabel: 'Voie des trophées' } },
+    window: { '24h': 'Méta', '7d': 'Récent' },
+    formatGroup: 'Type de tier list',
+    windowGroup: 'Période',
+    yourRank: 'Ton rang',
+    allRanks: 'Tous',
+    lobbies: (rank) => `Combats Classé en ${rank}`,
+    allModes: 'Tous les modes',
+    modeGroup: 'Mode de jeu',
+    sampled: (n) => `${n} combats collectés`,
+  },
 };
 
 export function TierListControls({

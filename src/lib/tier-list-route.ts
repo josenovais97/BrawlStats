@@ -244,6 +244,26 @@ const INTL: Record<
     ],
     last24: ', последние 24 часа',
   },
+  fr: {
+    where: { ranked: 'Ranked', trophy: 'Trophies' },
+    index: (where, month) => [
+      `Tier list Brawl Stars ${where === 'Ranked' ? 'Classé' : 'des trophées'} (${month}) : les meilleurs brawlers`,
+      `Les meilleurs brawlers de Brawl Stars ${where === 'Ranked' ? 'en Classé' : 'sur la Voie des trophées'}, ${month}. D'après les taux de victoire et de sélection de vrais combats, mis à jour toutes les quelques heures.`,
+    ],
+    mode: (mode, where, month) => [
+      `Meilleurs brawlers en ${mode} sur Brawl Stars (${month}) : tier list ${where === 'Ranked' ? 'Classé' : 'des trophées'}`,
+      `Les brawlers qui gagnent le plus en ${mode} en ce moment, classés d'après de vrais combats ${where === 'Ranked' ? 'Classé' : 'de trophées'} et mis à jour toutes les quelques heures. Regarde les meilleurs avant ton prochain combat en ${mode}.`,
+    ],
+    rank: (rank, month) => [
+      `Tier list Brawl Stars pour ${rank} (${month}) : les meilleurs brawlers à ton rang`,
+      `Les meilleurs brawlers de Brawl Stars en ${rank}, ${month}. Uniquement d'après les combats Classé joués en ${rank}, parce que la méta à ton rang n'est pas celle du sommet.`,
+    ],
+    rankMode: (mode, rank, month) => [
+      `Meilleurs brawlers en ${mode} en ${rank} (${month}) : tier list Brawl Stars`,
+      `Les brawlers qui gagnent le plus en ${mode} en ${rank}, d'après de vrais combats Classé à ce rang, mis à jour toutes les quelques heures.`,
+    ],
+    last24: ', dernières 24 heures',
+  },
 };
 
 export async function tierListMetadata(

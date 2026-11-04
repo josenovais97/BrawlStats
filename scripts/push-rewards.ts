@@ -20,6 +20,7 @@ const TEXT: Record<Locale, { title: string; body: (names: string) => string; pat
   tr: { title: '🎁 Yeni ücretsiz Brawl Stars ödülü!', body: (n) => `${n}. Süresi dolmadan almak için dokun.`, path: '/tr/rewards' },
   de: { title: '🎁 Neue Gratis-Belohnung für Brawl Stars!', body: (n) => `${n}. Tippe, um sie abzuholen, bevor sie abläuft.`, path: '/de/rewards' },
   ru: { title: '🎁 Новая бесплатная награда в Brawl Stars!', body: (n) => `${n}. Нажми, чтобы забрать, пока она не истекла.`, path: '/ru/rewards' },
+  fr: { title: '🎁 Nouvelle récompense gratuite Brawl Stars !', body: (n) => `${n}. Touche pour la récupérer avant qu’elle expire.`, path: '/fr/rewards' },
 };
 
 async function main(): Promise<void> {

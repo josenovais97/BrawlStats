@@ -103,6 +103,7 @@ function windowText(windowKey: TierWindowKey, locale: Locale): string {
   if (locale === 'tr') return days === 1 ? '24 saat' : `${days} gün`;
   if (locale === 'de') return days === 1 ? '24 Stunden' : `${days} Tage`;
   if (locale === 'ru') return days === 1 ? '24 часа' : `${days} ${ruPlural(days, 'день', 'дня', 'дней')}`;
+  if (locale === 'fr') return days === 1 ? '24 heures' : `${days} jours`;
   if (days === 1) return '24 horas';
   return locale === 'es' ? `${days} días` : `${days} dias`;
 }

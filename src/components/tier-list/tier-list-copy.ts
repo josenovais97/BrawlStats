@@ -655,4 +655,100 @@ const ru: TierCopy = {
   podiumDetail: (rate) => `${rate} побед`,
 };
 
-export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr, de, ru };
+const fr: TierCopy = {
+  format: {
+    ranked: {
+      eyebrow: 'Compétitif uniquement',
+      heading: 'Tier list Classé',
+      battles: 'combats Classé',
+      intro:
+        "Comment les brawlers s'en sortent en Classé, où le matchmaking oppose des adversaires de même niveau. Ce qui reste reflète donc le brawler, et pas celui qui le jouait.",
+      caveat:
+        "Le Classé ne compte que des modes en 3 contre 3 et ne représente qu'une petite partie des combats collectés, donc la liste est plus courte et bouge plus vite que la liste des trophées.",
+      unratedHeading: 'Pas assez de données Classé',
+      unratedBody:
+        "Le Classé ne représente qu'une petite partie des combats collectés, donc beaucoup de brawlers joués régulièrement sur la Voie des trophées ont encore trop peu de combats Classé pour être placés.",
+      where: 'Classé',
+    },
+    trophy: {
+      eyebrow: 'Voie des trophées',
+      heading: 'Tier list des trophées',
+      battles: 'combats de trophées',
+      intro:
+        "Comment les brawlers s'en sortent sur la Voie des trophées. Les combats que la plupart des joueurs font vraiment, Survivant compris, où tu prends ce que tu as, pas ce que le draft te laisse.",
+      caveat:
+        "Le matchmaking sur la Voie des trophées est plus souple qu'en Classé, donc une partie du bilan d'un brawler ici dépend du lobby, pas du brawler. Chaque mode est comparé à sa propre moyenne pour que ça ne décide pas de la liste.",
+      unratedHeading: 'Pas assez de données de trophées',
+      unratedBody:
+        "Les brawlers tout juste sortis et ceux qu'on joue peu sur la Voie des trophées ont besoin de plus de combats avant qu'un taux de victoire veuille dire quelque chose.",
+      where: 'Voie des trophées',
+    },
+  },
+  heading: (format, mode, rank) => {
+    const h = fr.format[format].heading;
+    const base = mode ? `${h} ${mode}` : h;
+    return rank ? `${base} (${rank})` : base;
+  },
+  scopeLabel: (w, mode) => (mode ? `${mode} · ${w}` : w),
+  faq: {
+    bestQ: (format, mode) =>
+      mode
+        ? `Quel est le meilleur brawler en ${mode} sur Brawl Stars ?`
+        : `Quel est le meilleur brawler de Brawl Stars ${format === 'ranked' ? 'en Classé' : 'sur la Voie des trophées'} ?`,
+    bestA: (a) =>
+      `${a.first} est en tête${a.mode ? ` en ${a.mode}` : ''}, avec un taux de victoire ajusté de ${a.rate} sur ${a.games} ${a.battles} décisifs ces ${a.window} derniers.${a.third ? ` Suivent ${a.second} et ${a.third}.` : ''}`,
+    noneA: (a) =>
+      `Pas encore assez de ${a.battles} collectés${a.mode ? ` en ${a.mode}` : ''} ces ${a.window} derniers pour classer les brawlers. Un brawler a besoin de ${a.floor} combats décisifs avant d'être placé.`,
+    howQ: 'Comment cette tier list est-elle faite ?',
+    howA: (a) =>
+      `À partir de ${a.sampled} ${a.scope} collectés dans de vrais combats, pas de sondages ni d'avis. Le taux de victoire est ajusté sur la moyenne du même échantillon, parce que les joueurs collectés gagnent plus de la moitié de leurs combats quel que soit le brawler. Un tier reflète donc le brawler, et pas celui qui le jouait. Un brawler a besoin de ${a.floor} combats décisifs sur la période avant d'être noté.`,
+    oftenQ: 'À quelle fréquence la tier list est-elle mise à jour ?',
+    oftenA:
+      'De nouveaux combats sont collectés toutes les quelques heures et la page est reconstruite à partir des dernières données, donc elle ne prend jamais plus de quelques heures de retard.',
+  },
+  scopeName: (format, mode) => (mode ? `combats ${mode} (${fr.format[format].eyebrow.toLowerCase()})` : fr.format[format].battles),
+  itemList: (mode) => `Les brawlers de Brawl Stars classés par meta score${mode ? ` en ${mode}` : ''}.`,
+  breadcrumbRoot: 'Tier list',
+  answer: (a) =>
+    `${a.first}, ${a.second} et ${a.third} sont les meilleurs brawlers${a.mode ? ` en ${a.mode}` : ''} ${a.format === 'ranked' ? 'en Classé' : 'sur la Voie des trophées'} en ce moment`,
+  lead: (a) => `${a.first} mène avec un taux de victoire ajusté de ${a.rate} sur ${a.games} combats décisifs.`,
+  based: (a) =>
+    `Basé sur ${a.sampled ? `${a.sampled} ` : ''}${a.battles} collectés${a.mode ? ` en ${a.mode}` : ''}${
+      a.rank && a.days ? `, joués dans des lobbys ${a.rank} ces ${a.days} derniers jours.` : ' auprès de joueurs de toute l’échelle du Classé.'
+    }`,
+  disagree: "Pas d'accord ? Fais la tienne",
+  howSummary: 'Comment marche le meta score',
+  how1: (format) => `Le meta score combine le taux de victoire ajusté et le taux de sélection, par rapport à cette liste ${format === 'ranked' ? 'Classé' : 'des trophées'}.`,
+  how2a: 'Les brawlers sont classés par',
+  metaScore: 'meta score',
+  how2b:
+    "sur 10, qui combine un taux de victoire ajusté et un taux de sélection en échelle logarithmique. Le taux de victoire seul noterait un brawler que personne ne joue comme un incontournable aux mêmes résultats, donc la popularité départage les égalités.",
+  how3a: "L'échelle est calibrée au sein de cette liste, donc les scores classent les brawlers entre eux ici et ne sont pas comparables avec la",
+  otherList: (format) => (format === 'ranked' ? 'liste des trophées' : 'liste Classé'),
+  how3b: (floor) =>
+    `. Un brawler a besoin de ${floor} combats décisifs sur la période avant d'être noté. Touche ou survole un brawler pour le détail complet, ou lis`,
+  fullMethod: 'la méthode complète',
+  how3c: "— échantillon, ajustement par mode, points d'ancrage et ce qu'elle ne peut pas dire.",
+  bracketMissingStrong: (rank) => `Pas encore assez de combats dans les lobbys ${rank}`,
+  bracketMissingRest:
+    " pour noter les brawlers à ce rang, donc voici la liste tous rangs confondus. Elle se remplira dans les prochains jours, à mesure que d'autres seront collectés.",
+  bracketWidened: (rank, days, normal) =>
+    `Les lobbys ${rank} sont rares dans l'échantillon en ce moment (c'est souvent le cas les premiers jours d'une saison Classé), donc cette liste couvre les ${days} derniers jours au lieu de ${normal}.`,
+  unratedSub: (floor, w) =>
+    `Chacun a besoin de ${floor} combats décisifs sur ${w} ; le chiffre en dessous montre où il en est. Les plus proches d'abord.`,
+  unratedChip: (name, games, floor, battles) => `${name} : ${games} sur ${floor} ${battles} décisifs pour être placé`,
+  chipTitle: (a) =>
+    `${a.name} : meta score ${a.score}, avec un taux de victoire ajusté de ${a.adj} (${a.raw} brut, contre une moyenne de ${a.base} dans ses modes) et un taux de sélection de ${a.pick}, sur ${a.games} combats décisifs`,
+  winLetter: 'V',
+  winTitle: 'Taux de victoire ajusté',
+  pickLetter: 'S',
+  pickTitle: 'Taux de sélection',
+  emptyTitle: (c) => (c ? 'Pas encore de données agrégées' : 'Base de données non configurée'),
+  emptyBody: (c, w) =>
+    c ? `Pas encore assez de combats collectés sur ${w}. Essaie une période plus longue ou reviens un peu plus tard.` : 'Les classements sont indisponibles pour le moment.',
+  browse: 'Parcourir la base des brawlers',
+  podium: 'Le top 3 du moment',
+  podiumDetail: (rate) => `${rate} de victoires`,
+};
+
+export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr, de, ru, fr };

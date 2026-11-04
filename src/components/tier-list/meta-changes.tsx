@@ -115,6 +115,22 @@ const WORDS = {
     placeWord: (n: number) => ruPlural(n, 'место', 'места', 'мест'),
     newIn: (t: string) => `новый в ${t}`,
   },
+  fr: {
+    tierMove: (from: string, to: string) => `du tier ${from} au tier ${to}, `,
+    places: (n: number, up: boolean) => `${up ? 'gagne' : 'perd'} ${n} ${n === 1 ? 'place' : 'places'}, `,
+    score: 'Meta score',
+    tier: (t: string) => `Tier ${t}`,
+    whatChanged: 'Ce qui a changé',
+    against: (span: string) => `Par rapport à la dernière mesure comparable, ${span}`,
+    riser: 'Plus forte hausse',
+    faller: 'Plus forte baisse',
+    tierChanges: 'Changements de tier',
+    held: (n: number) => `Tous les brawlers ont gardé leur tier. ${n} ont bougé à l'intérieur.`,
+    upDown: (up: number, down: number) => `${up} en hausse, ${down} en baisse`,
+    scoreWord: 'Score',
+    placeWord: (n: number) => (n === 1 ? 'place' : 'places'),
+    newIn: (t: string) => `nouveau en ${t}`,
+  },
 } satisfies Record<Locale, unknown>;
 
 /**

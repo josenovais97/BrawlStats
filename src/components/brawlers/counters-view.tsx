@@ -286,6 +286,42 @@ const WORDS: Record<Locale, Words> = {
     ],
     join: list('и'),
   },
+  fr: {
+    title: (n, m) => `Comment contrer ${n} sur Brawl Stars (${m})`,
+    ogTitle: (n) => `Comment contrer ${n}`,
+    description: (n, top) =>
+      `Les meilleurs counters de ${n} en Classé sont ${top}. Taux de victoire contre ${n} dans de vrais combats Classé, par rang, mis à jour toutes les deux heures.`,
+    descriptionNone: (n) => `Qui bat ${n} en Classé sur Brawl Stars, d'après de vrais combats, par rang.`,
+    fallbackTitle: 'Counters',
+    heading: (n) => `Comment contrer ${n}`,
+    intro: (n, top) => `En Classé en ce moment, ${top} sont ceux qui battent le plus ${n}. `,
+    method: (n, d) =>
+      `D'après de vrais combats Classé des ${d} derniers jours, tous rangs, mis à jour toutes les deux heures. Chaque chiffre est un taux de victoire contre ${n}, et de combien il dépasse ce qu'on attendrait du niveau habituel des deux brawlers.`,
+    best: 'Meilleurs counters',
+    avoid: (n) => `À éviter contre ${n}`,
+    atRank: 'Counters à ton rang',
+    games: (g, n) => `${g} combats contre ${n}`,
+    expected: 'vs attendu',
+    none: (n) => `Pas encore assez de combats Classé contre ${n}.`,
+    noneAtRank: 'Pas encore assez de combats à ce rang.',
+    faqWhat: (n) => `Qui contre ${n} sur Brawl Stars ?`,
+    faqWhatA: (n, top, d) =>
+      `En Classé, ${top} gagnent le plus souvent contre ${n} ces ${d} derniers jours, plus que ne le diraient leurs taux de victoire habituels.`,
+    faqWhatNone: (n) => `Pas encore assez de combats Classé contre ${n} pour nommer ses counters.`,
+    faqAvoid: (n) => `Qui ne faut-il pas prendre contre ${n} ?`,
+    faqAvoidA: (n, l) => `${l} perdent contre ${n} en Classé plus souvent que prévu.`,
+    faqAvoidNone: (n) => `Aucun brawler ne perd encore nettement plus souvent que prévu contre ${n}.`,
+    crumbs: 'Brawlers',
+    counters: 'Counters',
+    draft: [
+      'En plein draft ? Notre',
+      'assistant de draft',
+      'combine counters, coéquipiers et carte pour tout ton draft, et notre',
+      'appli Bubble',
+      'gratuite l’affiche au-dessus du jeu, selon ton rang.',
+    ],
+    join: list('et'),
+  },
 };
 
 interface Row {

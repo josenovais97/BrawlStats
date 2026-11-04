@@ -183,6 +183,7 @@ export function ordinal(n: number): string {
   // Russian: the suffix agrees with the noun (3-е место, 107-й боец), so the
   // dictionary sentence carries it and this is the bare number.
   if (locale === 'ru') return `${n}`;
+  if (locale === 'fr') return n === 1 ? '1er' : `${n}e`; // French: "1er", "3e"
 
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
@@ -233,7 +234,8 @@ export function formatPercent(value: number | null | undefined): string {
   const locale = requestLocale();
   if (locale === 'en') return `${(value * 100).toFixed(1)}%`;
   const n = (value * 100).toLocaleString(NUMBER_TAG[locale], { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  return locale === 'tr' ? `%${n}` : `${n}%`; // Turkish puts the sign first: "%54,3"
+  // Turkish puts the sign first ("%54,3"); French spaces it ("54,3 %").
+  return locale === 'tr' ? `%${n}` : locale === 'fr' ? `${n}\u202f%` : `${n}%`;
 }
 
 /**

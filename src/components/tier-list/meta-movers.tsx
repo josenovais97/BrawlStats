@@ -160,6 +160,28 @@ const WORDS = {
     pick: 'выбор',
     decided: 'решённых боёв',
   },
+  fr: {
+    title: 'Mouvements de la méta',
+    change: 'Évolution du',
+    score: 'meta score',
+    scale:
+      ", sur la même échelle de 0 à 10 que les tiers ci-dessus, d'après les mesures quotidiennes enregistrées : ceux qui apparaissent ici montent ou descendent vraiment dans la méta Classé.",
+    over: (days: number, from: string, to: string) =>
+      `Mesuré ${days === 1 ? 'sur le dernier jour' : `sur les ${days} derniers jours`}, en comparant les mesures du ${from} et du ${to}.`,
+    between: 'Mesuré entre les deux mesures les plus récentes.',
+    floor:
+      "Les deux côtés respectent le même minimum de combats que la tier list, et des mesures faites avec des méthodes différentes ne sont jamais comparées.",
+    allModes: 'Tous les modes',
+    allModesRest: " : les mesures quotidiennes ne sont pas séparées par mode, donc le filtre ci-dessus ne s'applique pas ici.",
+    up: 'En hausse',
+    down: 'En baisse',
+    noUp: "Personne n'a progressé sur cette période.",
+    noDown: "Personne n'a reculé sur cette période.",
+    unit: 'meta score /10',
+    win: 'victoires',
+    pick: 'sélection',
+    decided: 'combats décisifs',
+  },
 } satisfies Record<Locale, unknown>;
 
 type Words = (typeof WORDS)[Locale];

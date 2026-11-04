@@ -87,6 +87,19 @@ const WORDS = {
     note: 'Скорректированный процент побед на этой карте за последние три недели; при малом числе боёв опирается на общую ранговую форму бойца. Бойцы, у которых здесь меньше 150 решённых боёв, не показаны.',
     full: 'Полная страница карты',
   },
+  fr: {
+    group: 'Carte Classé',
+    all: 'Toutes les cartes',
+    empty: (map: string) =>
+      `Sur ${map}, aucun brawler n'a encore assez de combats collectés pour être placé. Ça se remplira à mesure que d'autres combats seront collectés ici.`,
+    atRank: (n: string, rank: string, all: string) => `${n} en ${rank} · ${all} au total`,
+    here: (n: string) => `${n} combats ici`,
+    usual: 'vs habituel',
+    noteRank: (rank: string) =>
+      `Les résultats de tous les rangs sur cette carte, ajustés selon les performances de chaque brawler en ${rank} et rapprochés des combats ${rank} joués ici. Les brawlers avec moins de 20 combats ${rank} ici ne sont pas affichés.`,
+    note: "Taux de victoire ajusté sur cette carte ces trois dernières semaines, rapproché de la forme générale en Classé de chaque brawler quand il y a peu de combats. Les brawlers avec moins de 150 combats décisifs ici ne sont pas affichés.",
+    full: 'Page complète de la carte',
+  },
 } satisfies Record<Locale, unknown>;
 
 /** One brawler's record on one Ranked map, as the page serialises it. */
