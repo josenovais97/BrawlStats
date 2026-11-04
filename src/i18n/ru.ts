@@ -1334,7 +1334,7 @@ export const RU: Record<string, string> = {
   "Strong, not finished":
     "Сильные, но не доведённые",
   "This roster scored against the current":
-    "Этот состав оценён по текущему",
+    "Этот состав сравнивается с текущим списком —",
   "Top-tier brawlers you own below power 11. The cheapest upgrades on this account.":
     "Бойцы из верхних тиров ниже 11-го уровня силы. Самые дешёвые улучшения на этом аккаунте.",
   "Your {MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.":
@@ -1342,7 +1342,7 @@ export const RU: Record<string, string> = {
   "{trophies} trophies · power {power}":
     "{trophies} {trophies|one:трофей|few:трофея|many:трофеев|other:трофея} · сила {power}",
   "trophy tier list":
-    "тир-листу по трофеям",
+    "тир-лист по трофеям",
   "3v3 wins":
     "Победы 3 на 3",
   "A BrawlZone metric out of 10, not an official Brawl Stars statistic.":
@@ -2005,4 +2005,804 @@ export const RU: Record<string, string> = {
     "Искать участников по имени или тегу",
   "This club has no members listed.":
     "У этого клуба нет участников в списке.",
+  "Profile sections":
+    "Разделы профиля",
+  "27 seconds: your tag once, then the bubble mid-draft.":
+    "27 секунд: один раз твой тег, а потом пузырь посреди драфта.",
+  "A floating bubble that puts the Ranked tier list on top of Brawl Stars, so you can check the meta mid-draft without leaving the game. Free, no ads, no account.":
+    "Плавающий пузырь, который кладёт тир-лист ранговых боёв поверх Brawl Stars, чтобы проверить мету посреди драфта, не выходя из игры. Бесплатно, без рекламы, без аккаунта.",
+  "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.":
+    "Режим — слишком грубое деление для драфта: ранговые бои дают тебе одну карту из пула, и ответ меняется вместе с ней. Выбери режим, потом карту, и оба запомнятся на следующий раз.",
+  "A second tab, for when you want more than the meta: the bans, your team, and theirs.":
+    "Вторая вкладка — для тех случаев, когда нужно больше, чем мета: запреты, твоя команда и их.",
+  "A target appears at the bottom of the screen while you drag. Drop the bubble on it, or use Stop in the notification.":
+    "Пока ты тащишь, внизу экрана появляется цель. Брось пузырь на неё или нажми «Стоп» в уведомлении.",
+  "A website cannot do this":
+    "Сайт так не умеет",
+  "About Play Protect":
+    "О Play Защите",
+  "Add your player tag":
+    "Добавь свой тег игрока",
+  "Allow installing from your browser":
+    "Разреши установку из браузера",
+  "An installed app can. That is the whole reason this exists as an APK rather than another page on the site, and it is all the app does: draw the numbers over the game, then get out of the way.":
+    "А установленное приложение может. Именно поэтому это APK, а не ещё одна страница сайта, и это всё, что делает приложение: рисует числа поверх игры и не мешает.",
+  "Android asks once per app that installs other apps. \"Allow from this source\" appears the first time; after that it remembers.":
+    "Android спрашивает один раз для каждого приложения, которое устанавливает другие приложения. «Разрешить из этого источника» появляется в первый раз, потом запоминается.",
+  "Android blocks this permission for apps installed outside a store. Go to Settings › Apps › BrawlZone, tap the ⋮ menu at the top right, choose \"Allow restricted settings\", then try again. This catches almost everyone, and Android never explains it.":
+    "Android блокирует это разрешение для приложений, установленных не из магазина. Открой Настройки › Приложения › BrawlZone, нажми меню ⋮ справа вверху, выбери «Разрешить ограниченные настройки» и попробуй снова. На этом спотыкаются почти все, а Android никогда этого не объясняет.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have — so the list comes to you instead, one tap away, and gets out of the way when you are done.":
+    "Brawl Stars даёт на выбор считаные секунды. Выйти из игры, чтобы посмотреть тир-лист, стоит больше, чем у тебя есть, поэтому список приходит к тебе сам, в одно касание, и убирается, когда ты закончил.",
+  "BrawlZone Bubble for Android":
+    "BrawlZone Bubble для Android",
+  "Builds on tap":
+    "Сборки по нажатию",
+  "Confirm the file you got is the file published here. On a desktop:":
+    "Проверь, что полученный файл — тот, что опубликован здесь. На компьютере:",
+  "Down to the map you are on":
+    "Вплоть до карты, на которой ты играешь",
+  "Download and open the file":
+    "Скачай и открой файл",
+  "Download for Android":
+    "Скачать для Android",
+  "Drag down to close":
+    "Потяни вниз, чтобы закрыть",
+  "Drag to move":
+    "Потяни, чтобы переместить",
+  "Earlier versions (":
+    "Прошлые версии (",
+  "Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map":
+    "Укажи запреты, кого взяла твоя команда и кого их, и список перестроится под все три условия. Боец, который просто силён на карте, — это другой выбор, чем тот, кто силён на карте и",
+  "Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.":
+    "Каждая строка показывает расчёт: форма на этой карте, преимущество против названных врагов, преимущество рядом с союзниками. Подсказка, которую нельзя проверить, — это догадка в обёртке процента, а посреди драфта решает обычно именно причина.",
+  "Five steps, and the fourth is where Android gets in your way.":
+    "Пять шагов, и на четвёртом Android встаёт у тебя на пути.",
+  "Free Android app":
+    "Бесплатное приложение для Android",
+  "Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.":
+    "Бесплатно, {v}, без аккаунта. Всё, что оно показывает, есть и на сайте: приложение лишь избавляет от переключения, а именно оно стоит тебе драфта.",
+  "Get it on":
+    "Доступно в",
+  "Get it on your phone":
+    "Установи на телефон",
+  "Google Play Protect warns about any app installed outside the Play Store. That warning is about where a file came from, not about what is in it.":
+    "Google Play Защита предупреждает о любом приложении, установленном не из Play Маркета. Это предупреждение о том, откуда файл, а не о том, что в нём.",
+  "Hide what you cannot play":
+    "Скрыть тех, за кого нельзя играть",
+  "If the toggle is greyed out":
+    "Если переключатель серый",
+  "Installing it":
+    "Установка",
+  "It shows the meta; you match that to the draft in front of you. It does not touch the game, read your account, or send anything anywhere — there is no account, no analytics in the app, and nothing to log in to.":
+    "Оно показывает мету, а сопоставить её с драфтом перед тобой — твоя задача. Оно не трогает игру, не читает твой аккаунт и никуда ничего не отправляет: нет аккаунта, нет аналитики в приложении и некуда входить.",
+  "Latest":
+    "Последняя",
+  "Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.":
+    "Ни этот, ни какой-либо другой. Вкладка браузера не может рисовать поверх другого приложения: песочница это запрещает на любом телефоне. Смотреть тир-лист в браузере значит выйти из драфта, а выход из драфта стоит тебе пика.",
+  "On a computer?":
+    "На компьютере?",
+  "One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.":
+    "Один дубль без монтажа на телефоне: очередь в «Награду за поимку» на карте Hideout, пузырь посреди драфта, фильтр по этой карте, сборка Brock — а затем пик Brock со звёздной силой, на которую указала панель.",
+  "Open BrawlZone and tap Start bubble":
+    "Открой BrawlZone и нажми «Запустить пузырь»",
+  "Or draft with it":
+    "Или драфти с ним",
+  "Or use the site":
+    "Или пользуйся сайтом",
+  "Pick the mode and the map: the best brawlers for it, and the build to run on them.":
+    "Выбери режим и карту: лучшие бойцы для неё и сборка для них.",
+  "Pick your mode":
+    "Выбери режим",
+  "Prefer a store? The same signed file, so either one updates the other.":
+    "Предпочитаешь магазин? Это тот же подписанный файл, так что один обновляет другой.",
+  "Put it wherever it is not in the way. It rests against the nearest edge when you let go, and stays there.":
+    "Поставь его туда, где он не мешает. Когда отпускаешь, он прилипает к ближайшему краю и остаётся там.",
+  "QR code linking to brawlzone.net/bubble":
+    "QR-код со ссылкой на brawlzone.net/bubble",
+  "S through D, scored on adjusted win rate and pick rate from sampled competitive battles. The same numbers as the site, refreshed on the same schedule.":
+    "От S до D, по скорректированному проценту побед и частоте выбора в собранных соревновательных боях. Те же числа, что и на сайте, обновляются по тому же расписанию.",
+  "SHA-256":
+    "SHA-256",
+  "Scan to open this page on your Android phone, where the app can actually be installed.":
+    "Отсканируй, чтобы открыть эту страницу на телефоне с Android, где приложение можно установить.",
+  "Set it up, then draft with it":
+    "Настрой, а потом драфти с ним",
+  "Switch it on and go back":
+    "Включи и вернись",
+  "Tap a brawler for its build":
+    "Нажми на бойца, чтобы увидеть сборку",
+  "Tap any brawler for the star power, gadget and gears its owners actually run, with the sample size behind every number.":
+    "Нажми на любого бойца, чтобы увидеть звёздную силу, гаджет и снаряжение, которые реально берут владельцы, с размером выборки за каждым числом.",
+  "Tap the bubble in the draft":
+    "Нажми на пузырь в драфте",
+  "Tap to open":
+    "Нажми, чтобы открыть",
+  "The BrawlZone app's main screen, showing the permission status and the Start bubble button":
+    "Главный экран приложения BrawlZone со статусом разрешения и кнопкой «Запустить пузырь»",
+  "The Ranked tier list, floating on top of the game. Free download, no ads, no account.":
+    "Тир-лист ранговых боёв поверх игры. Бесплатно, без рекламы, без аккаунта.",
+  "The app finds your account. Brawlers you do not own are greyed out in the panel.":
+    "Приложение находит твой аккаунт. Бойцы, которых у тебя нет, в панели серые.",
+  "The app updates by downloading again — it installs over the top and keeps your permission.":
+    "Приложение обновляется повторной загрузкой: оно ставится поверх и сохраняет разрешение.",
+  "The bubble appears straight away and stays on top of whatever you open next, including the game.":
+    "Пузырь появляется сразу и остаётся поверх всего, что ты откроешь дальше, включая игру.",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.":
+    "Пузырь не читает твой экран, твой матч и не знает, на какой ты карте. Он просит разрешение показываться поверх других приложений и показывать уведомление: о том, что он работает, и прогресс загрузки при обновлении. Никакой записи экрана, никакого доступа к хранилищу, больше ничего.",
+  "The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each":
+    "Карточка сборки Amber: самая частая звёздная сила, гаджет и два снаряжения с долей владельцев, которые их берут",
+  "The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "Доска драфта с двумя запретами, одним союзником и двумя врагами, остальные бойцы отсортированы по тому, насколько хорошо они отвечают на этот драфт",
+  "The first tap sends you to Android's \"Display over other apps\" screen, because no app is allowed to grant itself that permission.":
+    "Первое нажатие откроет экран Android «Поверх других приложений», потому что ни одно приложение не может выдать себе это разрешение само.",
+  "The full Ranked tier list":
+    "Весь тир-лист ранговых боёв",
+  "The panel folds out of the bubble. Tap the bubble again and it folds back in.":
+    "Панель раскрывается из пузыря. Нажми на пузырь ещё раз, и она свернётся обратно.",
+  "The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score":
+    "Панель с фильтром режимов наверху и тир-листом ранговых боёв от S до D, у каждого бойца — мета-рейтинг",
+  "The panel with Knockout and Belle's Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there":
+    "Панель с выбранными «Нокаутом» и картой Belle's Rock: десять лучших бойцов на этой карте, сколько боёв за каждым и насколько он там выше своей обычной формы",
+  "The same data as the site, cut down to what a draft needs.":
+    "Те же данные, что и на сайте, урезанные до того, что нужно в драфте.",
+  "The tier list,":
+    "Тир-лист,",
+  "Then the map you are on":
+    "Потом карта, на которой ты играешь",
+  "Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.":
+    "Недостаток данных отмечается, а не скрывается. Боец, за которым одиннадцать боёв на этой карте, помечен красным, потому что 52% на одиннадцати боях и 52% на двухстах — не одно и то же утверждение.",
+  "Three gestures. There is nothing else to learn.":
+    "Три жеста. Больше учить нечего.",
+  "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.":
+    "Включи «Скрыть недоступных бойцов», и они исчезнут из списка совсем, так что каждый показанный пик можно сделать.",
+  "Using it":
+    "Использование",
+  "Verify the download":
+    "Проверь загрузку",
+  "Version":
+    "Версия",
+  "Version {version}":
+    "Версия {version}",
+  "Version {version} · {v} · Android":
+    "Версия {version} · {v} · Android",
+  "What is in the panel":
+    "Что есть в панели",
+  "What it cannot do":
+    "Чего оно не умеет",
+  "What's new":
+    "Что нового",
+  "Worth knowing before you install it, not after.":
+    "Это стоит знать до установки, а не после.",
+  "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.":
+    "Браузер спросит, сохранить ли файл такого типа. Это установщик приложения, поэтому и Chrome, и Android сначала уточняют у тебя: это обычный запрос.",
+  "answers what they just picked.":
+    "отвечает на то, что они только что взяли.",
+  "on top of the game":
+    "поверх игры",
+  "sha256sum brawlzone-bubble.apk":
+    "sha256sum brawlzone-bubble.apk",
+  "{minAndroid} or newer":
+    "{minAndroid} или новее",
+  "Ranked and trophy ladder, scored separately from sampled battles":
+    "Ранговые бои и путь к славе, оценены отдельно по собранным боям",
+  "Read more":
+    "Читать дальше",
+  "Show less":
+    "Свернуть",
+  "Refresh to retry":
+    "Обнови, чтобы попробовать снова",
+  "A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run.":
+    "Обучение на 27 секунд: добавить тег игрока, чтобы бойцы, которых у тебя нет, стали серыми, включить «Скрыть недоступных бойцов», а затем открыть пузырь посреди драфта, чтобы увидеть лучшие пики на карте и сборку для них.",
+  "A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power.":
+    "Драфт «Награды за поимку» на карте Hideout: пузырь открывает тир-лист ранговых боёв, фильтр сужает его до этой карты, панель показывает самую частую сборку Brock, а затем Brock выбирают и дают ему эту звёздную силу.",
+  "The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map":
+    "Панель BrawlZone открыта во время драфта «Награды за поимку» на карте Hideout, со списком лучших по замерам бойцов на этой карте",
+  "Add it to your home screen":
+    "Добавь на главный экран",
+  "Dismiss install prompt":
+    "Закрыть предложение установки",
+  "Install":
+    "Установить",
+  "Install BrawlZone":
+    "Установить BrawlZone",
+  "Back to search":
+    "Назад к поиску",
+  "Something went wrong":
+    "Что-то пошло не так",
+  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
+    "Не удалось загрузить эту страницу. Обычно это API игры тормозит или упирается в лимит запросов, и это проходит само — повторная попытка часто просто срабатывает.",
+  "Try again":
+    "Попробовать снова",
+  "Save":
+    "Сохранить",
+  "Save to favourites":
+    "Сохранить в избранное",
+  "Save {name} to favourites":
+    "Сохранить {name} в избранное",
+  "Saved":
+    "Сохранено",
+  "Saved. Click to remove":
+    "Сохранено. Нажми, чтобы убрать",
+  "% of the score) with":
+    "% рейтинга) с",
+  "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.":
+    "% рейтинга. Этот вес измерен, а не выбран: против оценки, которая точно учитывает навык игрока, скорректированный процент побед даёт r = +0,77, а частота выбора r = +0,22, так что популярность — слабый, но настоящий сигнал силы, а не шум, и её доля в общем сигнале около пятой части, как раз такой вес она сейчас и имеет. Раньше было 35%, и тогда она давала 45% реального разброса и сдвигала бойцов на сорок мест одной лишь популярностью. И всё же популярный боец со средним результатом всё равно обойдёт непопулярного с лучшим результатом. Оба числа выводятся в каждой строке, чтобы ты мог взвесить их сам.",
+  "%). It is computed from real battles, not votes, opinion or a panel — and every figure on this page is read directly from the code that produces the lists, so it cannot drift out of date.":
+    "%). Он считается по настоящим боям, а не по голосам, мнениям или экспертам, и каждое число на этой странице читается прямо из кода, который строит списки, поэтому не может устареть.",
+  ", and drifting back outside the scale is reported rather than absorbed.":
+    ", а выход за пределы шкалы сообщается, а не поглощается.",
+  ", and the difference is re-centred on 50%. An adjusted rate of 53% means “three points better than average, given where this brawler gets played”.":
+    ", а разница снова центрируется на 50%. Скорректированный процент 53% означает «на три пункта лучше среднего с учётом того, где этим бойцом играют».",
+  ", because the roster spans two orders of magnitude of usage. On a linear scale everything outside the top handful collapses into the same value.":
+    ", потому что популярность бойцов в составе различается на два порядка. В линейной шкале всё, что за пределами горстки лидеров, слипается в одно значение.",
+  ", or disagree with it in the":
+    ", а поспорить с ним можно в",
+  ". Comparing a player against themselves removes skill exactly. The published figure is the average of the two estimates, because they are wrong about different things — the first carries the skill of whoever played it, the second compares a showdown specialist's showdown games against their own Brawl Ball games.":
+    ". Сравнение игрока с самим собой точно убирает навык. Публикуемое число — среднее двух оценок, потому что они ошибаются в разном: первая несёт навык того, кто играл, вторая сравнивает игры специалиста по Столкновению в Столкновении с его же играми в Броулбол.",
+  ". Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it. The trophy list counts ladder battles, showdown included.":
+    ". Подбор в ранговых боях сводит соперников одного уровня, поэтому результат отражает бойца, а не того, кто за него играл. Список по трофеям учитывает бои на пути к славе, включая Столкновение.",
+  ". Sample sizes behind every figure are on the lists themselves; the roll-ups they are computed from hold {v} days of history.":
+    ". Размер выборки за каждым числом указан в самих списках; сводки, по которым они считаются, хранят историю за дни: {v}.",
+  ": a brawler needs roughly that many decided battles before its own record outweighs the prior, which is about where the noise stops dominating.":
+    ": примерно столько решённых боёв нужно бойцу, чтобы его собственный результат перевесил исходное значение, — примерно там шум перестаёт доминировать.",
+  "A 90% win rate over 50 battles is not better than an 86% rate over 1,300, but a naive ranking says it is. Every rate is therefore blended with the average, weighted by":
+    "90% побед на 50 боях — не лучше, чем 86% на 1 300, но наивный рейтинг говорит обратное. Поэтому каждый процент смешивается со средним, с весом",
+  "A brawler's raw win rate is compared against the average for the modes it is actually played in, then re-centred on 50%. A showdown brawler is judged against showdown, where finishing in the top half caps the ceiling near 40%, and a Brawl Ball brawler against Brawl Ball, where the same cohort wins far more often. One number for both would put every showdown brawler at the bottom.":
+    "Процент побед бойца без поправки сравнивается со средним по режимам, в которых им реально играют, а затем снова центрируется на 50%. Бойца для Столкновения судят по Столкновению, где попадание в верхнюю половину ограничивает потолок примерно 40%, а бойца для Броулбола — по Броулболу, где тот же состав игроков побеждает гораздо чаще. Одно число на оба режима опустило бы каждого бойца Столкновения на самое дно.",
+  "A raw win rate is not comparable across brawlers, because modes are not comparable. Finishing top four of ten in showdown caps the achievable rate near 40%; the same cohort wins closer to 78% in Brawl Ball. Ranking both on one number puts every showdown brawler at the bottom regardless of how good it is.":
+    "Процент побед без поправки нельзя сравнивать между бойцами, потому что режимы несравнимы. Попадание в четвёрку из десяти в Столкновении ограничивает достижимый процент примерно 40%; тот же состав игроков в Броулболе побеждает ближе к 78%. Если ранжировать оба режима одним числом, каждый боец Столкновения окажется внизу, как бы хорош он ни был.",
+  "A win rate says the brawler was on the winning side, not that it caused the win. Strong players gravitate toward particular brawlers, and the adjustment above corrects for the modes a brawler is played in, not the skill of the people playing it.":
+    "Процент побед говорит, что боец был на стороне победителей, а не что он принёс победу. Сильные игроки тяготеют к определённым бойцам, а поправка выше учитывает режимы, в которых бойцом играют, а не навык тех, кто им играет.",
+  "A win rate says the side holding a brawler won. It does not say the brawler is why. Strong players gravitate toward particular brawlers and carry their results with them, and step 2 corrects for":
+    "Процент побед говорит, что победила сторона с этим бойцом. Он не говорит, что победа из-за него. Сильные игроки тяготеют к определённым бойцам и переносят на них свои результаты, а шаг 2 поправляет на то,",
+  "Adding pick rate, on a log scale":
+    "Добавляем частоту выбора в логарифмической шкале",
+  "Adjusting the win rate for mode":
+    "Поправка процента побед на режим",
+  "Are the Ranked and trophy scores comparable?":
+    "Сравнимы ли рейтинги ранговых боёв и по трофеям?",
+  "Battles come from players reachable through the global leaderboards and their recent opponents, so the numbers lean toward more active accounts than the game as a whole.":
+    "Бои берутся у игроков, до которых можно дойти через мировые рейтинги и их недавних соперников, поэтому числа смещены к более активным аккаунтам, чем игра в целом.",
+  "Below":
+    "Если меньше",
+  "Both measurements are mapped onto 0–1 between fixed anchors, so a score means the same thing from one week to the next rather than being rescaled by whoever happens to be present. The anchors sit just outside each list's own 5th–95th percentile:":
+    "Оба измерения переводятся в диапазон 0–1 между фиксированными опорными точками, поэтому рейтинг означает одно и то же неделю за неделей, а не пересчитывается под тех, кто оказался рядом. Опорные точки стоят чуть за пределами 5-го и 95-го процентилей каждого списка:",
+  "Correcting for who is holding it":
+    "Поправка на то, кто играет",
+  "Does the tier list account for player skill?":
+    "Учитывает ли тир-лист навык игроков?",
+  "Every number on the tier lists, and where it comes from. Including what it cannot tell you.":
+    "Каждое число в тир-листах и откуда оно берётся. Включая то, чего оно сказать не может.",
+  "Every two hours the sampler walks the global leaderboards and reads the battle logs of the players it finds. A battle log holds a player's last ~25 battles and there is no history endpoint, so anything played between visits is lost permanently — the two-hour interval is set by that, not by cost.":
+    "Каждые два часа сборщик проходит мировые рейтинги и читает историю боёв найденных игроков. История хранит последние ~25 боёв игрока, а эндпоинта истории нет, поэтому всё сыгранное между визитами теряется навсегда — интервал в два часа задан этим, а не стоимостью.",
+  "Fixed is not the same as permanent, and that distinction has already cost these lists their calibration once. The anchors were set before the sampling rate rose eighteenfold in August 2026 and nothing re-derived them, so by late September 42% of the Ranked roster sat in D while 41% of the trophy roster sat in S or A. Nothing failed and nobody was told. They are now re-measured on":
+    "Фиксированные — не значит вечные, и это различие уже однажды стоило спискам калибровки. Опорные точки задали до того, как частота сбора выросла в восемнадцать раз в августе 2026 года, и никто их не пересчитал, так что к концу сентября 42% состава ранговых боёв сидели в D, а 41% состава по трофеям — в S или A. Ничего не сломалось, и никто об этом не узнал. Теперь они перемеряются при",
+  "Fixing the scale, and checking it stays fixed":
+    "Фиксируем шкалу и проверяем, что она остаётся фиксированной",
+  "How is the Brawl Stars meta score calculated?":
+    "Как считается мета-рейтинг Brawl Stars?",
+  "How the Brawl Stars meta score is calculated":
+    "Как считается мета-рейтинг Brawl Stars",
+  "How the meta score is calculated":
+    "Как считается мета-рейтинг",
+  "It does not control for who is playing":
+    "Он не учитывает, кто играет",
+  "It is a sample, not a census":
+    "Это выборка, а не перепись",
+  "It mixes strength with popularity, on purpose":
+    "Он намеренно смешивает силу с популярностью",
+  "List":
+    "Список",
+  "Method":
+    "Методика",
+  "No. They are different populations measured against different denominators, so each list is calibrated against its own distribution. A 7.0 on the Ranked list and a 7.0 on the trophy list are not the same claim, which is why the two are never shown side by side.":
+    "Нет. Это разные группы, измеренные относительно разных знаменателей, поэтому каждый список откалиброван по своему распределению. 7,0 в списке ранговых боёв и 7,0 в списке по трофеям — не одно и то же утверждение, поэтому их никогда не показывают рядом.",
+  "Partly, and deliberately. Alongside the plain win rate each brawler is measured a second way: every player's win rate with it minus that same player's win rate without it, which removes player skill exactly because it compares people against themselves. The published strength is the average of the two, because each is biased in a different direction. It changes real placements — one brawler ranked 96th on win rate alone and 16th once every player was compared against their own average.":
+    "Частично и намеренно. Помимо простого процента побед каждого бойца измеряют вторым способом: процент побед каждого игрока с ним минус процент побед того же игрока без него, что точно убирает навык, потому что сравнивает людей с самими собой. Публикуемая сила — среднее двух оценок, потому что каждая смещена в свою сторону. Это меняет реальные места: один боец был 96-м по одному проценту побед и 16-м, когда каждого игрока сравнили с его собственным средним.",
+  "Pick rate is":
+    "Частота выбора —",
+  "Pulling thin samples toward the average":
+    "Подтягиваем малые выборки к среднему",
+  "Questions":
+    "Вопросы",
+  "Ranked and the trophy ladder are different populations against different denominators, and each is calibrated against its own distribution. A 7.0 on one is not a 7.0 on the other, which is why they are never shown side by side.":
+    "Ранговые бои и путь к славе — разные группы с разными знаменателями, и каждый откалиброван по своему распределению. 7,0 в одном — не 7,0 в другом, поэтому их никогда не показывают рядом.",
+  "Sampling real battles":
+    "Сбор настоящих боёв",
+  "Sampling, baseline adjustment, shrinkage, log-scaled pick rate, and the limits of all of it.":
+    "Выборка, поправка на базу, сжатие, частота выбора в логарифмической шкале и пределы всего этого.",
+  "See it applied on the":
+    "Посмотри применение:",
+  "So each brawler is also measured a second way:":
+    "Поэтому каждого бойца измеряют ещё и вторым способом:",
+  "So each brawler is measured against":
+    "Поэтому каждый боец сравнивается со",
+  "Step 4 removes the effect of who is holding a brawler, but the estimator behind it compares a player's games with a brawler against all their other games, across every mode. A specialist is therefore compared against their own play elsewhere, which is its own bias — smaller than the one it removes, and pointing the other way, which is why the two estimates are averaged rather than one being picked. A brawler carried by too few players is not corrected at all and falls back to the mode-adjusted rate.":
+    "Шаг 4 убирает влияние того, кто играет бойцом, но оценка за ним сравнивает игры игрока на этом бойце со всеми его остальными играми во всех режимах. Специалиста поэтому сравнивают с его же игрой в другом, и это своё смещение — меньше того, что убирается, и в другую сторону, поэтому две оценки усредняются, а не выбирается одна. Бойца, которым играет слишком мало игроков, не корректируют вовсе: он остаётся с процентом, скорректированным по режиму.",
+  "The Ranked list counts":
+    "Список ранговых боёв учитывает",
+  "The cut-offs are plain thresholds on the score:":
+    "Границы — простые пороги рейтинга:",
+  "The full method behind BrawlZone tier lists: where the battles come from, how win rates are adjusted for mode and sample size, how pick rate is weighted, and what the score cannot tell you.":
+    "Вся методика тир-листов BrawlZone: откуда берутся бои, как процент побед корректируется на режим и размер выборки, какой вес у частоты выбора и чего рейтинг сказать не может.",
+  "The honest limits, because a number without them is worth less.":
+    "Честные ограничения, потому что число без них стоит меньше.",
+  "The meta score is a single 0–10 number combining":
+    "Мета-рейтинг — это одно число от 0 до 10, которое объединяет",
+  "The skill correction is partial, not complete":
+    "Поправка на навык частичная, а не полная",
+  "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.":
+    "Обе оценки тесно согласуются (r = +0,77) и расходятся там, где это важно. Bibi была 96-й по одному проценту побед и 16-й, когда каждого игрока сравнили с его собственным средним, потому что ею играют в основном слабые аккаунты, и их результаты принимались за её.",
+  "The two lists are not comparable":
+    "Два списка несравнимы",
+  "Turning the score into a tier":
+    "Превращаем рейтинг в тир",
+  "What is an adjusted win rate?":
+    "Что такое скорректированный процент побед?",
+  "What the meta score cannot tell you":
+    "Чего мета-рейтинг сказать не может",
+  "Why do rarely-played brawlers not top the tier list?":
+    "Почему редко выбираемые бойцы не возглавляют тир-лист?",
+  "Win rate alone cannot tell a genuinely strong staple from a niche pick that happens to win. A brawler played in 0.13% of battles at 52% and one played in 3.4% at 52% score the same, even though only the second is shaping the meta.":
+    "Один процент побед не отличит по-настоящему сильного бойца от нишевого пика, которому просто везёт. Боец, которого берут в 0,13% боёв с 52% побед, и боец, которого берут в 3,4% с теми же 52%, получают одинаковую оценку, хотя мету формирует только второй.",
+  "a brawler is not rated at all. “We have not measured this” and “we measured this and it is bad” are different claims, and collapsing them is how tier lists end up implying the second about brawlers they have three battles for.":
+    "— боец вообще не оценивается. «Мы это не измеряли» и «мы измерили, и это плохо» — разные утверждения, и если их смешать, тир-листы начинают утверждать второе о бойцах, по которым у них три боя.",
+  "a brawler is played, not":
+    "играют бойцом, а не на то,",
+  "and the":
+    "и",
+  "below {v}":
+    "ниже {v}",
+  "competitive battles only":
+    "только соревновательные бои",
+  "decided battles":
+    "решённых боёв",
+  "every player's win rate with it, minus that same player's win rate without it":
+    "процент побед каждого игрока с ним минус процент побед того же игрока без него",
+  "every sampler run":
+    "каждом запуске сборщика",
+  "how much it is actually played":
+    "тем, насколько часто его реально берут",
+  "how well a brawler performs":
+    "насколько хорошо боец играет",
+  "is playing it.":
+    "им играет.",
+  "log-scaled":
+    "в логарифмической шкале",
+  "pseudo-battles":
+    "псевдобоёв",
+  "the average for the mix of modes it is actually played in":
+    "средним по набору режимов, в которых им реально играют",
+  "tier list maker":
+    "конструкторе тир-листов",
+  "where":
+    "где",
+  "who":
+    "кто",
+  "A fast, honest stats site for Brawl Stars. Built for players who want to know exactly where they stand.":
+    "Быстрый и честный сайт статистики Brawl Stars. Для игроков, которые хотят точно знать, где они находятся.",
+  "About":
+    "О сайте",
+  "About BrawlZone":
+    "О BrawlZone",
+  "Account help, bans and purchases are Supercell's — this site only reads the public API and cannot change anything about your account.":
+    "Помощь с аккаунтом, баны и покупки — это к Supercell: этот сайт только читает публичный API и ничего не может изменить в твоём аккаунте.",
+  "Being straight about the limits is more useful than pretending they don't exist.":
+    "Честно говорить об ограничениях полезнее, чем делать вид, что их нет.",
+  "Brawl Zone":
+    "Brawl Zone",
+  "BrawlZone is free, ad-free and has no paywall. If it saved you some time, a coffee goes a long way.":
+    "BrawlZone бесплатный, без рекламы и без платного доступа. Если он сэкономил тебе время, кофе очень поможет.",
+  "BrawlZone — often written":
+    "BrawlZone (часто пишут",
+  "Map layouts, and the art the Fan Kit does not have yet.":
+    "Схемы карт и изображения, которых пока нет в Fan Kit.",
+  "Brawlify CDN":
+    "Brawlify CDN",
+  "Supercell Fan Kit":
+    "Supercell Fan Kit",
+  "Brawler artwork, skins, star power and gadget icons, ranked badges and game mode icons: Supercell's own art for fan content, served from this site.":
+    "Изображения бойцов, скины, иконки звёздных сил и гаджетов, значки рангов и иконки режимов: собственные изображения Supercell для фан-контента, раздаются с этого сайта.",
+  "Built by one person":
+    "Сделано одним человеком",
+  "Buy me a coffee":
+    "Угости меня кофе",
+  "Four different things get called “maps”, and they mean different things.":
+    "«Картами» называют четыре разные вещи, и значат они разное.",
+  "Get in touch":
+    "Связаться",
+  "Ideas, corrections, or just to say hello.":
+    "Идеи, исправления или просто поздороваться.",
+  "Is there a feature you would like to see on BrawlZone? Something that looks wrong, or a page you wish existed? Send it over — ideas for what this site should do next are the most useful thing you can put in my inbox.":
+    "Есть функция, которую ты хотел бы видеть на BrawlZone? Что-то выглядит неправильно, или не хватает какой-то страницы? Присылай: идеи о том, что сайту делать дальше, — самое полезное, что может оказаться у меня в почте.",
+  "Look anyone up":
+    "Найди кого угодно",
+  "Looking up a tag is a public action: the same data is available to anyone through the official API.":
+    "Поиск по тегу — публичное действие: те же данные доступны любому через официальный API.",
+  "Official Brawl Stars API":
+    "Официальный API Brawl Stars",
+  "Official announcements and each update's notes, summarised here with a link to the full text, picked up automatically as new posts go live.":
+    "Официальные анонсы и описание каждого обновления, кратко и со ссылкой на полный текст, подтягиваются автоматически, как только выходят новые посты.",
+  "One person reads every message, so a reply can take a few days.":
+    "Каждое сообщение читает один человек, поэтому ответ может занять несколько дней.",
+  "Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.":
+    "Игроки, клубы, история боёв, рейтинги и ротация событий. Всё о конкретном аккаунте берётся отсюда, вживую.",
+  "Privacy":
+    "Конфиденциальность",
+  "Reading the map pages":
+    "Как читать страницы карт",
+  "Search any player or club tag for trophies, ranked tiers, world rankings, progression and recent form. Save the profiles you follow and they stay one tap away.":
+    "Найди любой тег игрока или клуба: трофеи, ранги, место в мире, прогресс и недавняя форма. Сохрани профили, за которыми следишь, и они будут в одном касании.",
+  "Start searching":
+    "Начать поиск",
+  "Supercell news & release notes":
+    "Новости Supercell и описание обновлений",
+  "The site counts page views with Umami, a privacy-friendly analytics tool that runs on our own server. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.":
+    "Сайт считает просмотры страниц через Umami — дружелюбный к приватности инструмент аналитики на нашем собственном сервере. Он не ставит cookies, не строит твой профиль и не следит за тобой на других сайтах. Это счётчик посещений, а не рекламное отслеживание.",
+  "There is no account system, so there is nothing to sign up for and no password to store. Your recent searches and saved profiles live in your own browser's local storage and are never sent to us. Clearing your browser data removes them for good.":
+    "Системы аккаунтов нет, так что регистрироваться не нужно и пароль хранить негде. Твои недавние поиски и сохранённые профили лежат в локальном хранилище твоего браузера и никогда нам не отправляются. Очистка данных браузера удаляет их навсегда.",
+  "This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy.":
+    "Этот материал неофициальный и не одобрен Supercell. Подробнее см. Правила Supercell для фан-контента.",
+  "Tier lists and per-map picks aggregated from thousands of sampled battles, refreshed daily. Plus upgrade-ownership rates, release notes and news in one place.":
+    "Тир-листы и пики для каждой карты по тысячам собранных боёв, обновляются ежедневно. Плюс доли владения улучшениями, описания обновлений и новости в одном месте.",
+  "Track the meta":
+    "Следи за метой",
+  "What BrawlZone is, where its data comes from, and what it can and cannot tell you.":
+    "Что такое BrawlZone, откуда его данные и что они могут и не могут сказать.",
+  "What it does":
+    "Что он делает",
+  "What we can't tell you":
+    "Чего мы сказать не можем",
+  "Where the data comes from":
+    "Откуда данные",
+  "and is not affiliated with Supercell.":
+    "и не связан с Supercell.",
+  "brawlzone.net":
+    "brawlzone.net",
+  "— is an independent Brawl Stars statistics site covering player and club lookups, Ranked analysis and brawler tier lists. It lives at":
+    ") — независимый сайт статистики Brawl Stars: поиск игроков и клубов, аналитика ранговых боёв и тир-листы бойцов. Он находится по адресу",
+  "This page is a translation. If it differs from the English version, the English version applies.":
+    "Эта страница — перевод. Если она расходится с английской версией, действует английская версия.",
+  "Read anything here, as often as you like, without an account.":
+    "Читай здесь что угодно и сколько угодно, без аккаунта.",
+  "Quote or screenshot the numbers, including in videos and articles. A link back is appreciated, never required.":
+    "Цитируй числа или делай скриншоты, в том числе в видео и статьях. Ссылка на нас приветствуется, но никогда не обязательна.",
+  "Install and use the Android app on any device you own.":
+    "Устанавливай и используй приложение для Android на любом своём устройстве.",
+  "Scraping the site at a rate that degrades it for other readers. There is no published API quota because there is no published API; automated traffic that costs more than it returns gets rate-limited.":
+    "Скачивать сайт с такой скоростью, что он тормозит для других читателей. Опубликованной квоты API нет, потому что нет опубликованного API; автоматический трафик, который стоит больше, чем даёт, ограничивается.",
+  "Passing the site off as official, or as affiliated with Supercell.":
+    "Выдавать сайт за официальный или связанный с Supercell.",
+  "Redistributing the Android app repackaged, modified, or signed with a different key.":
+    "Распространять приложение для Android в перепакованном, изменённом виде или подписанным другим ключом.",
+  "No account, because there is nothing to sign in to.":
+    "Нет аккаунта, потому что входить некуда.",
+  "No cookies. Not for analytics, not for preferences, not at all.":
+    "Никаких cookies. Ни для аналитики, ни для настроек, вообще никаких.",
+  "No advertising, no ad networks, and no third-party trackers.":
+    "Никакой рекламы, рекламных сетей и сторонних трекеров.",
+  "No email address, name, phone number or payment details — none are ever asked for.":
+    "Ни email, ни имени, ни телефона, ни платёжных данных: ничего из этого никогда не спрашивают.",
+  ", and the answer is nothing.":
+    ", и ответ — ничего.",
+  ", which are dated.":
+    ", у которых указаны даты.",
+  ". Use the numbers to inform a decision, not as a guarantee of one. Nothing here is advice, and no outcome in the game is promised.":
+    ". Используй числа, чтобы принять решение, а не как его гарантию. Ничто здесь не является советом, и никакой результат в игре не обещан.",
+  "And, more usefully, what they are not.":
+    "И, что полезнее, чем они не являются.",
+  "BrawlZone Bubble":
+    "BrawlZone Bubble",
+  "Changes, and getting in touch":
+    "Изменения и связь",
+  "Every statistic here is computed from a":
+    "Каждая статистика здесь посчитана по",
+  "It is distributed from this site, so it is covered here too.":
+    "Оно распространяется с этого сайта, поэтому на него это тоже распространяется.",
+  "It is not a modification of Brawl Stars, does not interact with the game, and does not automate play. Using it should not put an account at risk, but the site cannot make promises on Supercell's behalf about what their rules permit.":
+    "Это не модификация Brawl Stars, оно не взаимодействует с игрой и не автоматизирует игру. Его использование не должно подвергать аккаунт риску, но сайт не может обещать от имени Supercell, что разрешают их правила.",
+  "No warranty":
+    "Без гарантий",
+  "Not affiliated with Supercell":
+    "Не связан с Supercell",
+  "Questions, corrections, or a takedown request:":
+    "Вопросы, исправления или запрос на удаление:",
+  "Short, because the honest version is short. This site is free, fan-made, and measured rather than official.":
+    "Коротко, потому что честная версия короткая. Этот сайт бесплатный, сделан фанатом и основан на измерениях, а не официальный.",
+  "Stated first, because it is the thing most worth being clear about.":
+    "Сказано первым, потому что это важнее всего прояснить.",
+  "Supercell's Fan Content Policy":
+    "Правилам Supercell для фан-контента",
+  "Terms":
+    "Условия",
+  "Terms of service":
+    "Условия использования",
+  "The":
+    "",
+  "The method is published in full, including its limitations, on":
+    "Методика опубликована полностью, включая её ограничения, на странице",
+  "The site and the app are provided “as is”, without warranty of any kind. They may be unavailable, incomplete, or wrong at any time. To the extent the law allows,":
+    "Сайт и приложение предоставляются «как есть», без каких-либо гарантий. Они могут быть недоступны, неполны или ошибочны в любой момент. В той мере, в какой это допускает закон,",
+  "The terms for using BrawlZone: a free, fan-made Brawl Stars statistics site. What the numbers are, what they are not, and what you may do with them.":
+    "Условия использования BrawlZone — бесплатного фанатского сайта статистики Brawl Stars. Что такое числа, чем они не являются и что с ними можно делать.",
+  "These terms may change as the site does. Material changes are noted in the":
+    "Эти условия могут меняться вместе с сайтом. Существенные изменения отмечаются в",
+  "What the numbers are":
+    "Что такое числа",
+  "What you may do":
+    "Что можно",
+  "What you may not do":
+    "Чего нельзя",
+  "accepts no liability for any loss arising from using them — including decisions made in a game on the strength of a number printed here.":
+    "не несёт ответственности за любые потери от их использования, включая решения в игре, принятые на основании напечатанного здесь числа.",
+  "app is free and provided as-is. It draws an overlay showing this site's data over other apps, with your permission, and reads nothing from your device or from the game. What it collects is covered by the":
+    "— бесплатное приложение, предоставляется «как есть». Оно с твоего разрешения показывает поверх других приложений слой с данными этого сайта и ничего не читает ни с твоего устройства, ни из игры. Что оно собирает, описано в",
+  "how the meta score is calculated":
+    "как считается мета-рейтинг",
+  "of real battles, read from the official Brawl Stars API. It is not a census of every game played, and it is not official. Win rates, tier lists and recommendations are estimates with sample sizes printed beside them, and they can be wrong.":
+    "настоящих боёв, прочитанной из официального API Brawl Stars. Это не перепись всех сыгранных игр и не официальные данные. Процент побед, тир-листы и рекомендации — оценки, рядом с которыми указаны размеры выборки, и они могут ошибаться.",
+  "privacy policy":
+    "политике конфиденциальности",
+  "release notes":
+    "описаниях обновлений",
+  "sample":
+    "выборке",
+  "{SITE_NAME} is a free Brawl Stars statistics site. There is no account, nothing to pay for, and no advertising. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
+    "{SITE_NAME} — бесплатный сайт статистики Brawl Stars. Нет аккаунта, нечего оплачивать и нет рекламы. Пользоваться им значит принимать условия на этой странице. Если ты не согласен с каким-то из них, просто перестань пользоваться сайтом, и ничего не пропадёт: ты нам ничего не давал.",
+  "{SITE_NAME} is an independent, fan-made project. It is not endorsed by, sponsored by, or affiliated with Supercell. Brawl Stars, its brawler names, artwork and trademarks belong to Supercell, and are used here to describe the game the site is about. This site follows":
+    "{SITE_NAME} — независимый фанатский проект. Он не одобрен, не спонсируется и не связан с Supercell. Brawl Stars, имена бойцов, изображения и товарные знаки принадлежат Supercell и используются здесь, чтобы описывать игру, которой посвящён сайт. Этот сайт следует",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, which is why there is no consent banner on this site — there is nothing to consent to.":
+    ", который работает на том же сервере, что и сайт, а не у третьей стороны. Он не ставит cookies и не хранит персональные данные, поэтому на этом сайте нет баннера согласия: соглашаться не на что.",
+  ", so it counts as a page view here and nothing more. It does not read your game account, your files, or your other apps.":
+    ", так что это считается здесь просмотром страницы и не более. Оно не читает твой игровой аккаунт, твои файлы или другие приложения.",
+  ". If this page ever stops matching what the site actually does, that is a bug — say so and it will be fixed.":
+    ". Если эта страница когда-нибудь перестанет совпадать с тем, что сайт делает на самом деле, это ошибка: сообщи, и её исправят.",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, and tapping the Android download. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Ещё считаются несколько именованных событий, все анонимные: установка веб-приложения, его открытие и нажатие на загрузку для Android. Событие загрузки содержит, с какой страницы оно пришло и какая версия была предложена, чтобы отличать обновление от первой установки. Больше ничего.",
+  "A handful of preferences live in your browser's local storage: saved players and clubs, recent searches, saved rosters, whether you dismissed the install prompt, and — in the Android app's panel — the game mode and map you last looked at.":
+    "Немного настроек хранится в локальном хранилище браузера: сохранённые игроки и клубы, недавние поиски, сохранённые составы, закрыл ли ты предложение установки и, в панели приложения для Android, последний просмотренный режим и карта.",
+  "A tag you type is a request, not a record.":
+    "Введённый тег — это запрос, а не запись.",
+  "Analytics":
+    "Аналитика",
+  "Most artwork comes from Supercell's Fan Kit and is served from this site itself. Map images and a few others come from Brawlify's CDN, and some from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading those means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
+    "Большинство изображений взято из Fan Kit от Supercell и раздаётся с самого сайта. Изображения карт и некоторые другие берутся из CDN Brawlify, часть — из ленты новостей Brawl Stars, вики сообщества и превью YouTube. Их загрузка означает, что твой браузер обращается к этим серверам напрямую, и они видят запрос, как любой сайт, который ты посещаешь. Мы им ничего о тебе не отправляем.",
+  "BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.":
+    "BrawlZone — неофициальный сайт, не одобренный Supercell. Игровые данные берутся из официального API Brawl Stars по их условиям для разработчиков.",
+  "Display over other apps":
+    "Поверх других приложений",
+  "Email":
+    "Email",
+  "If your profile appears in the sampled data and you would rather it did not, email":
+    "Если твой профиль есть в собранных данных и ты предпочёл бы, чтобы его там не было, напиши на",
+  "It asks for one permission, and it is not the one people fear.":
+    "Оно просит одно разрешение, и это не то, которого боятся.",
+  "It is not on the Play Store, so nothing is reported to Google about your use of it. The":
+    "Его нет в Play Маркете, поэтому Google ничего не сообщается о том, как ты им пользуешься. На",
+  "It records the page, the referrer, and coarse details your browser sends anyway: country, browser, operating system, screen size. It does not record IP addresses, and nothing links one visit to another or to a person.":
+    "Он записывает страницу, источник перехода и общие данные, которые браузер и так отправляет: страну, браузер, операционную систему, размер экрана. Он не записывает IP-адреса, и ничто не связывает один визит с другим или с человеком.",
+  "Kept on your device, never sent anywhere.":
+    "Хранится на твоём устройстве и никуда не отправляется.",
+  "Looking up a player":
+    "Поиск игрока",
+  "One counter, self-hosted, with nothing that identifies you.":
+    "Один счётчик на нашем сервере, без всего, что может тебя идентифицировать.",
+  "Other people's servers":
+    "Чужие серверы",
+  "Page views are counted by":
+    "Просмотры страниц считает",
+  "Questions, or a change":
+    "Вопросы или изменения",
+  "Reading the screen is a separate thing, and it is off unless you turn it on. Version 1.8 can scan the draft, and to do that Android makes you accept its own screen-capture dialog — every time the app starts, because the system will not let an app keep that permission — and shows a recording indicator for as long as a session is open. One frame is read when you tap Scan, measured on your phone, and dropped. It is never written to storage and never sent anywhere; what comes out of it is a handful of brawler names.":
+    "Чтение экрана — отдельная вещь, и оно выключено, пока ты его не включишь. Версия 1.8 умеет сканировать драфт, и для этого Android заставляет подтверждать свой диалог записи экрана при каждом запуске приложения, потому что система не даёт приложению сохранить это разрешение, и показывает значок записи, пока сеанс открыт. При нажатии «Сканировать» читается один кадр, обрабатывается на твоём телефоне и удаляется. Он никогда не сохраняется и никуда не отправляется; на выходе — несколько имён бойцов.",
+  "Searching a player tag sends it to the official Brawl Stars API to fetch that profile. We do not store a record of who searched for what.":
+    "Поиск по тегу игрока отправляет его в официальный API Brawl Stars, чтобы получить профиль. Мы не храним, кто что искал.",
+  "Separately, BrawlZone samples public profiles and battle logs from that same official API to build the statistics the site is for — tier lists, map picks, matchups. That data is public in the game, is stored as aggregates rather than as a dossier on any player, and is bounded by retention windows. There is more about where it comes from on the":
+    "Отдельно BrawlZone собирает публичные профили и истории боёв из того же официального API, чтобы строить статистику, ради которой сайт и существует: тир-листы, пики для карт, матчапы. Эти данные публичны в игре, хранятся как сводные данные, а не как досье на игрока, и ограничены сроками хранения. Подробнее о том, откуда они, — на",
+  "The Android app":
+    "Приложение для Android",
+  "The app has no account, collects nothing, and sends nothing anywhere. Its panel is a web view of":
+    "У приложения нет аккаунта, оно ничего не собирает и никуда ничего не отправляет. Его панель — это веб-просмотр",
+  "The bubble needs":
+    "Пузырю нужно разрешение",
+  "The short version":
+    "Коротко",
+  "These never leave your device. They are not synced, not backed up by us, and not readable by the server. Clearing your browser data removes them, and the site works without them.":
+    "Они никогда не покидают твоё устройство. Они не синхронизируются, мы их не копируем, и сервер не может их прочитать. Очистка данных браузера удаляет их, а сайт работает и без них.",
+  "Umami":
+    "Umami",
+  "Very little, and this page says exactly what. Every claim below is something you can check in the source.":
+    "Очень мало, и эта страница говорит, что именно. Каждое утверждение ниже можно проверить в исходном коде.",
+  "What BrawlZone stores, what it does not, and what the Android app sends. No accounts, no cookies, no personal data.":
+    "Что BrawlZone хранит, чего не хранит и что отправляет приложение для Android. Без аккаунтов, без cookies, без персональных данных.",
+  "What stays in your browser":
+    "Что остаётся в твоём браузере",
+  "What we collect":
+    "Что мы собираем",
+  "What your browser fetches from elsewhere.":
+    "Что твой браузер загружает из других мест.",
+  "a page on this site":
+    "страницы этого сайта",
+  "about page":
+    "странице «О сайте»",
+  "download page":
+    "странице загрузки",
+  "publishes a SHA-256 checksum so you can verify the file you got is the file we published.":
+    "публикуется контрольная сумма SHA-256, чтобы ты мог проверить, что твой файл — тот, что опубликовали мы.",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them.":
+    ", чтобы рисовать поверх игры. Это разрешение позволяет выводить пиксели на экран, но не читать их.",
+  "with your tag and it will be excluded.":
+    "со своим тегом, и его исключат.",
+  " and others":
+    " и другие",
+  " — {up} up, {down} down":
+    " — {up} вверх, {down} вниз",
+  ", not what the update":
+    ", а не что обновление",
+  ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.":
+    ". Бойца могут усилить, а его будут игнорировать, ослабить, а он всё равно поднимется, или сдвинуть сменой ротации карт за те же две недели. Размер выборки указан рядом с каждой строкой, чтобы ты мог взвесить сам, а всё, где с одной из сторон меньше {PATCH_MIN_DECIDED} решённых боёв, не показывается, а не угадывается.",
+  ". The rest stayed where they were.":
+    ". Остальные остались на месте.",
+  "Did the Brawl Stars balance changes work?":
+    "Сработали ли изменения баланса в Brawl Stars?",
+  "Did the balance changes work?":
+    "Сработали ли изменения баланса?",
+  "Every brawler an update changed, and what its adjusted win rate did in the {PATCH_WINDOW_DAYS} days afterwards against the {PATCH_WINDOW_DAYS2} before. From sampled Ranked battles.":
+    "Каждый боец, которого изменило обновление, и что стало с его скорректированным процентом побед за {PATCH_WINDOW_DAYS} {PATCH_WINDOW_DAYS|one:день|few:дня|many:дней|other:дня} после него по сравнению с {PATCH_WINDOW_DAYS2} {PATCH_WINDOW_DAYS2|one:днём|few:днями|many:днями|other:днями} до. По собранным ранговым боям.",
+  "Every brawler each Brawl Stars update changed, and what its win rate actually did in the fortnight afterwards, measured from sampled Ranked battles.":
+    "Каждый боец, которого меняло каждое обновление Brawl Stars, и что на самом деле стало с его процентом побед за две недели после, по собранным ранговым боям.",
+  "It changed {length} brawlers.":
+    "Оно изменило {length} {length|one:бойца|few:бойцов|many:бойцов|other:бойцов}.",
+  "Listed rather than hidden — an absence with a reason is a finding too.":
+    "Перечислены, а не скрыты: отсутствие с причиной — тоже находка.",
+  "Measured, not announced":
+    "Измерено, а не объявлено",
+  "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
+    "Ни одно обновление в хранимом периоде не удалось прочитать. Это заполнится, когда описания обновлений и ежедневные сводки совпадут.",
+  "None of them moved more than {NOTABLE_DELTA} points either way in the":
+    "Ни один из них не сдвинулся больше чем на {NOTABLE_DELTA} {NOTABLE_DELTA|one:пункт|few:пункта|many:пунктов|other:пункта} в любую сторону за",
+  "Not measured: {v} — under":
+    "Не измерены: {v} — меньше",
+  "Patch notes":
+    "Описание обновления",
+  "The window is still filling, so this is a partial reading.":
+    "Период ещё заполняется, так что это предварительное измерение.",
+  "This shows what each number":
+    "Здесь показано, что с каждым числом",
+  "This update changed":
+    "Это обновление затронуло",
+  "Updates that cannot be measured":
+    "Обновления, которые нельзя измерить",
+  "What each update actually did to the brawlers it changed, measured rather than announced.":
+    "Что каждое обновление на самом деле сделало с изменёнными бойцами — измерено, а не объявлено.",
+  "brawlers":
+    "{n|one:бойца|few:бойцов|many:бойцов|other:бойцов}",
+  "by more than {NOTABLE_DELTA} points in the {PATCH_WINDOW_DAYS} days afterwards":
+    "больше чем на {NOTABLE_DELTA} {NOTABLE_DELTA|one:пункт|few:пункта|many:пунктов|other:пункта} за {PATCH_WINDOW_DAYS} {PATCH_WINDOW_DAYS|one:день|few:дня|many:дней|other:дня} после",
+  "caused":
+    "вызвало",
+  "did":
+    "произошло",
+  "{PATCH_MIN_DECIDED} decided battles on one side of the update, or released after it.":
+    "{PATCH_MIN_DECIDED} решённых боёв с одной из сторон обновления или вышли после него.",
+  "{PATCH_WINDOW_DAYS} days afterwards.":
+    "{PATCH_WINDOW_DAYS} {PATCH_WINDOW_DAYS|one:день|few:дня|many:дней|other:дня} после него.",
+  "{date} · {start} to {end} against {start2} to {end2}":
+    "{date} · с {start} по {end} против с {start2} по {end2}",
+  "{length} moved":
+    "Сдвинулись: {length}",
+  "+{v} pts":
+    "+{v} п.",
+  ". Only maps currently in rotation are included.":
+    ". Учитываются только карты, которые сейчас в ротации.",
+  "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.":
+    "У каждого бойца здесь не меньше 300 решённых ранговых боёв. Эти списки — отобранные крайности, а выбор максимума среди множества маленьких выборок даёт крайности случайно, а не по заслугам: именно порог это и предотвращает.",
+  "Everybody picks them and the results do not justify it — over {highUsage} pick rate.":
+    "Их берут все, а результаты этого не оправдывают: частота выбора выше {highUsage}.",
+  "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.":
+    "На одной карте гораздо лучше, чем подсказывает общая форма. Число — пункты процента побед сверх собственного среднего, так что общая сила уже вычтена.",
+  "Fine overall, but losing win-rate points on a map that is in rotation right now.":
+    "В целом неплохо, но теряет пункты процента побед на карте, которая сейчас в ротации.",
+  "Hidden gems":
+    "Скрытые жемчужины",
+  "How this is decided":
+    "Как это решается",
+  "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the":
+    "Жемчужины и ловушки карт сравнивают рейтинг бойца на одной карте с его собственной общей формой, поэтому список — не вторая копия",
+  "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.":
+    "Пока недостаточно собранных боёв, чтобы честно ответить. Это заполнится, когда достаточно бойцов пройдут порог выборки.",
+  "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.":
+    "На этой неделе порог никто не прошёл, а значит, мету играют примерно так, как она измеряется.",
+  "Overrated":
+    "Переоценённые",
+  "See every pick on {mapName}":
+    "Все пики на карте {mapName}",
+  "Sleeper picks":
+    "Тёмные лошадки",
+  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
+    "Сильные, а их почти никто не берёт: частота выбора ниже {lowUsage}.",
+  "The hidden meta":
+    "Скрытая мета",
+  "Trap picks":
+    "Пики-ловушки",
+  "Underrated and overrated Brawl Stars brawlers":
+    "Недооценённые и переоценённые бойцы Brawl Stars",
+  "Who is everyone sleeping on, measured from sampled ranked battles.":
+    "Кого все недооценивают, по собранным ранговым боям.",
+  "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.":
+    "Кого все недооценивают. По бойцам, у которых достаточно ранговых боёв для оценки ({rated}), за последние {windowDays} {windowDays|one:день|few:дня|many:дней|other:дня}.",
+  "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.":
+    "Кого все недооценивают. Сильные бойцы, которых почти никто не берёт, популярные бойцы, чьи результаты этого не оправдывают, и жемчужины и ловушки отдельных карт, которые прячет общий тир-лист, — по собранным ранговым боям, а не по мнениям.",
+  "tier list":
+    "тир-листа",
+  "{v} or better.":
+    "{v} или лучше.",
+  "{v} pts":
+    "{v} п.",
+  "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of":
+    "«Низкая частота выбора» и «сильный» — это процентили текущего состава, а не фиксированные числа, поэтому вопрос остаётся тем же, а ответы меняются. Сегодня это значит: выбирают реже {lowUsage} и рейтинг",
+  ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the":
+    ", CC-BY-SA. Supercell не публикует API шансов выпадения, поэтому их поддерживает сообщество по данным датамайнов и наблюдениям в игре, это не официальные цифры. Как выглядит мета, когда бойцы у тебя уже есть, смотри в",
+  "Brawl Stars Starr Drop chances: every drop rate and reward":
+    "Шансы Призов Старр в Brawl Stars: все шансы выпадения и награды",
+  "Chance of rolling each rarity":
+    "Шанс выпадения каждой редкости",
+  "Drop rates and contents from the":
+    "Шансы выпадения и содержимое из",
+  "Drop rates unavailable":
+    "Шансы выпадения недоступны",
+  "Each of your first five wins of the day earns a reward drop: usually a Starr Drop, sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Каждая из первых пяти побед за день приносит приз: обычно Приз Старр, иногда Приз хаоса или другой приз. Счётчик сбрасывается раз в день; таймер на экране «Победы дня» в игре показывает, когда именно.",
+  "Event drops":
+    "Призы событий",
+  "Every day":
+    "Каждый день",
+  "Every drop rate":
+    "Все шансы выпадения",
+  "How to get them: the daily schedule":
+    "Как их получить: расписание на день",
+  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
+    "Призы ограниченных событий прошлого. Оставлены для справки — большинство уже не получить.",
+  "No table":
+    "Нет таблицы",
+  "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
+    "Можно получить прямо сейчас: «Победы дня», путь к славе, Brawl Pass и магазин.",
+  "Permanent drops":
+    "Постоянные призы",
+  "Starr Drop chances for every rarity, from Rare to Legendary, and every reward inside each drop. Plus Chaos Drops and every event drop, in one table.":
+    "Шансы Призов Старр для каждой редкости, от редкой до легендарной, и каждая награда внутри каждого приза. Плюс Призы хаоса и все призы событий в одной таблице.",
+  "Starr Drops":
+    "Призы Старр",
+  "The community wiki these numbers come from is not responding, or has changed shape. Rather than show odds that might be wrong, the page waits.":
+    "Вики сообщества, откуда берутся эти числа, не отвечает или изменила формат. Вместо того чтобы показывать шансы, которые могут быть неверны, страница ждёт.",
+  "The wiki lists rewards totalling {v}%, so a row covering the other {v2}% is missing from the source.":
+    "В вики награды в сумме дают {v}%, значит, в источнике не хватает строки на остальные {v2}%.",
+  "The wiki publishes no reward table for this drop.":
+    "Вики не публикует таблицу наград для этого приза.",
+  "What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki.":
+    "Что может быть в каждом призе и насколько вероятна каждая награда. Игра показывает тебе открытие, но никогда — таблицу за ним, а Supercell не публикует шансы ни через какой API, поэтому они берутся из вики сообщества.",
+  "Wiki lists {v}% — a row is missing.":
+    "В вики {v}% — не хватает строки.",
+  "Your first 5 wins":
+    "Твои первые 5 побед",
+  "rarities":
+    "редкости",
+  "rewards":
+    "награды",
+  "{event} · limited time":
+    "{event} · ограниченное время",
+  ", so it moves with the meta and always matches what the rest of the site says.":
+    ", поэтому он меняется вместе с метой и всегда совпадает с остальным сайтом.",
+  "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.":
+    "Новый боец Brawl Stars для угадывания каждый день. Каждая попытка показывает, насколько ты близок по редкости, классу, скорости, дальности, перезарядке, порядку выхода и тиру. Бесплатно, без аккаунта, одна загадка в день.",
+  "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
+    "После четырёх попыток доска показывает звёздную силу ответа, а после восьми — его гаджет: настоящие иконки из игры без названий, потому что название можно найти, а картинка — проверка памяти.",
+  "Amber":
+    "Жёлтый",
+  "Brawl Stars daily challenge — guess the brawler":
+    "Загадка дня Brawl Stars — угадай бойца",
+  "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
+    "У класса нет стрелки, потому что от Стрелка к Танку нет направления. Боец, у которого слишком мало ранговых боёв для тира, показан прочерком, а не догадкой.",
+  "Daily challenge":
+    "Загадка дня",
 };
