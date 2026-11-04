@@ -82,6 +82,25 @@ def episode(kind):
     return int(state.get('episodes', {}).get(kind, 0)) + 1
 
 
+SHOWN = []
+def fresh_or_exit(keys, repeat=0.6):
+    """Exit 3 when a weekly format would mostly repeat its last episode.
+
+    YouTube stops showing a Short that looks like one the channel already
+    posted: the daily counter, map-pick and teaser templates fell from ~1,000
+    views to ~20, and the 3 Nov "STOP picking these brawlers", 8 of whose 10
+    brawlers were the 27 Oct one's, got 3 views to its predecessor's 1,182.
+    So these formats remember what they showed (meta.json `shown`, kept in
+    state.json by brawlzone-viral after posting) and step aside when 60% of it
+    would come back; the job then draws something else (2026-11-04)."""
+    global SHOWN
+    SHOWN = [str(k) for k in keys]
+    last = set(state.get('last_shown', {}).get(KIND, []))
+    same = sum(1 for k in SHOWN if k in last)
+    if SHOWN and same >= repeat * len(SHOWN):
+        print(f'too close to the last {KIND}: {same} of {len(SHOWN)} repeat'); sys.exit(3)
+
+
 def pct(x, sign=False):
     return f"{'+' if sign and x >= 0 else ''}{x * 100:.1f}%"
 
@@ -465,6 +484,7 @@ if KIND == 'broken':
     down = [r for r in reversed(rows) if r['was'] in 'SABC' and r['d'] < 0][:2]
     if len(up) < 3 or len(down) < 2 or up[0]['d'] < 0.015 or up[2]['d'] < 0.005:
         print('a flat week: nothing got broken'); sys.exit(3)
+    fresh_or_exit(r['id'] for r in up + down)
     battles = sum(b.get('battles') or 0 for b in data['recent']) // 6  # six brawlers a battle
     tl.add(4, 'b_intro')
     for i, r in enumerate(reversed(up)):  # #3, #2, then #1
@@ -573,6 +593,7 @@ if KIND == 'ranks':
     BR = data['brackets']
     low = BR['low']['top'][:5]; leg = BR['pro']['top'][:5]
     leg_ids = {b['id'] for b in BR['pro']['top']}
+    fresh_or_exit([f"low:{b['id']}" for b in low] + [f"pro:{b['id']}" for b in leg])
     tl.add(4, 'p_intro')
     tl.add(6, 'p_list', side='low', items=low)
     tl.add(6, 'p_list', side='leg', items=leg)
@@ -671,6 +692,7 @@ if KIND == 'modes':
         best.append((mk, by_id.get(top) or {'id': top, 'n': '?', 'tier': 'B'}, c[top], maps))
     if len(best) < 4:
         print('not enough live modes'); sys.exit(3)
+    fresh_or_exit(f"{mk}:{b['id']}" for mk, b, _, _ in best)
     tl.add(5, 'm_intro', modes=[b[0] for b in best])
     seen = set()
     for mk, b, n_hits, maps in best:
@@ -1227,6 +1249,7 @@ if KIND == 'stop':
     gems = [b for b in sorted((b for b in a if b['use'] <= med), key=lambda b: -b['wr']) if b['wr'] > 0.5][:5][::-1]
     if len(over) < 3 or len(gems) < 3:
         print('not enough overrated or hidden brawlers this week'); sys.exit(3)
+    fresh_or_exit([f"over:{b['id']}" for b in over] + [f"gem:{b['id']}" for b in gems])
     TOTAL = len(a)
     tl.add(6, 's_intro')
     for i, b in enumerate(over): tl.add(3, 's_over', b=b, n=len(over) - i)
@@ -1759,6 +1782,7 @@ if KIND == 'whatsnew':
             break
     if len(NEWEST) < 3 or len(BUFFIES) < 3:
         print('not enough new brawlers or buffies'); sys.exit(3)
+    fresh_or_exit([b['id'] for b in NEWEST] + [f"buffie:{b['id']}" for b, _ in BUFFIES])
     tl.add(5, 'w_intro')
     tl.add(2, 'w_part', label='NEW BRAWLERS', col=(255, 60, 100))
     for b in reversed(NEWEST):  # oldest of the five first, the newest last
@@ -1975,6 +1999,7 @@ if __name__ == '__main__':
     META['duration'] = round(tl.dur, 3)
     META['kind'] = KIND
     META['episode'] = episode(KIND)
+    if SHOWN: META['shown'] = SHOWN
     json.dump(META, open(f'{OUT}/meta.json', 'w'), ensure_ascii=False)
     if ONLY is not None:
         for sec in ONLY:

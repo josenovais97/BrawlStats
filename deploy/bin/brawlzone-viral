@@ -381,12 +381,31 @@ draw () { # kind
   return "$rc"
 }
 
+recent () { # kind: drawn in the last three days, whichever folder it went to
+  local i
+  for i in 1 2 3; do
+    grep -qs "\"kind\": \"$1\"" "$PUBLIC/$(date -u -d "-$i day" +%Y-%m-%d)"*/meta.json && return 0
+  done
+  return 1
+}
+
 draw "$kind"; rc=$?
 if [ "$rc" = 3 ] && { [ "$kind" = classrank ] || [ "$kind" = stop ] || [ "$kind" = broken ] || [ "$kind" = ranks ] || [ "$kind" = modes ] || [ "$kind" = giveaway ] || [ "$kind" = drops ] || [ "$kind" = whatsnew ] || [ "$kind" = seasonclimb ]; }; then
-  # The 14:00 slot falls back to the full countdown, which always has data,
-  # not to the quiz the 15:30 slot may already be posting today.
-  echo "$(tail -n 1 "$CACHE/make-0.log"); drawing everyrank instead"
-  kind=everyrank; draw everyrank; rc=$?
+  # The 14:00 slot never falls back to the quiz the 15:30 slot may already be
+  # posting today. From 2026-11-04 (make.py fresh_or_exit: a format that
+  # would repeat itself steps aside) it takes the next drop or box simulation,
+  # the channel's best format, unless one ran in the last three days; else the
+  # next class countdown, a different class every episode and so never a
+  # repeat. The full countdown, which always has data, is the last resort.
+  orig=$kind; why=$(tail -n 1 "$CACHE/make-0.log")
+  for alt in drops classrank everyrank; do
+    [ "$alt" = "$orig" ] && continue
+    [ "$alt" = drops ] && recent drops && continue
+    echo "$why; drawing $alt instead"
+    kind=$alt; draw "$alt"; rc=$?
+    [ "$rc" = 3 ] || break
+    why=$(tail -n 1 "$CACHE/make-0.log")
+  done
 elif [ "$rc" = 3 ] && [ "$kind" != quiz ] && [ "$kind" != newbrawler ] && [ "$kind" != daily ] && [ "$kind" != everyrank ]; then
   echo "$(tail -n 1 "$CACHE/make-0.log"); drawing the quiz instead"
   kind=quiz; draw quiz; rc=$?
@@ -447,5 +466,9 @@ eps = state.setdefault('episodes', {})
 eps[meta['kind']] = meta['episode']
 if meta.get('used'):
     state['quiz_recent'] = (state.get('quiz_recent', []) + meta['used'])[-60:]
+# What a weekly format showed, so its next episode can tell it would repeat
+# itself (make.py fresh_or_exit).
+if meta.get('shown'):
+    state.setdefault('last_shown', {})[meta['kind']] = meta['shown']
 json.dump(state, open(path + '.tmp', 'w')); os.replace(path + '.tmp', path)
 PY
