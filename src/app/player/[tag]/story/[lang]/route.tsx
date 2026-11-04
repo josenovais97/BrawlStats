@@ -19,6 +19,7 @@ import {
 } from '@/lib/slide-chrome';
 import { displayTag } from '@/lib/tags';
 import { translate } from '@/lib/t';
+import { NUMBER_LOCALE } from '@/lib/i18n';
 
 /**
  * A player's profile as a phone-story image (1080x1920), to share.
@@ -64,7 +65,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tag
   }
 
   const accent = nameColorToCss(player.nameColor);
-  const number = (n: number) => n.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-419' : 'pt-BR');
+  const number = (n: number) => n.toLocaleString(NUMBER_LOCALE[locale]);
   const catalogue = await getOfficialBrawlers()
     .then((res) => res.items.length)
     .catch(() => undefined);

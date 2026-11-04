@@ -26,10 +26,10 @@ const WEEK = 7 * 86_400_000;
 // home page and /rewards the strip stacked on top of a better one, which got
 // 51 and 126 clicks in three days against the strip's 37 and 36 closes.
 const HIDDEN = [
-  /^\/(?:es\/|pt\/)?bubble\/(?:panel|test)/,
-  /^\/(?:es\/|pt\/)?giveaway/,
-  /^\/(?:es|pt)?\/?$/,
-  /^\/(?:es\/|pt\/)?rewards\/?$/,
+  /^\/(?:(?:es|pt|tr)\/)?bubble\/(?:panel|test)/,
+  /^\/(?:(?:es|pt|tr)\/)?giveaway/,
+  /^\/(?:es|pt|tr)?\/?$/,
+  /^\/(?:(?:es|pt|tr)\/)?rewards\/?$/,
 ];
 
 export function GiveawayStrip() {

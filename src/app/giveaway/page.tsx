@@ -9,6 +9,7 @@ import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
 import { TIKTOK_PROFILE_URL } from '@/lib/site';
 import { getT } from '@/lib/t';
+import { DATE_LOCALE } from '@/lib/i18n';
 
 /**
  * The first BrawlZone giveaway (2026-10-27): a €10 gift card, one month, won
@@ -38,10 +39,10 @@ export default async function GiveawayPage() {
   const t = getT(requestLocale());
   const lp = (path: string) => localePath(requestLocale(), path);
   const locale = requestLocale();
-  const opens = new Date(GIVEAWAY.opensAt).toLocaleString(locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-419' : 'pt-BR', {
+  const opens = new Date(GIVEAWAY.opensAt).toLocaleString(DATE_LOCALE[locale], {
     day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
   });
-  const ends = new Date(GIVEAWAY.closesAt).toLocaleString(locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-419' : 'pt-BR', {
+  const ends = new Date(GIVEAWAY.closesAt).toLocaleString(DATE_LOCALE[locale], {
     day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
   });
 

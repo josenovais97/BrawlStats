@@ -43,6 +43,10 @@
  * what the sitemap lists and what is worth indexing — stay crawlable.
  */
 import { normalizeTag } from '@/lib/tags';
+import { INTL_LOCALES } from '@/lib/i18n';
+
+/** `/es/…`, `/pt/…`, `/tr/…`: every language prefix, from the one list. */
+const LOCALE_PREFIX = new RegExp(`^/(?:${INTL_LOCALES.join('|')})(?=/)`);
 
 export const CRAWLER_DISALLOW = [
   '/api/',
@@ -165,12 +169,12 @@ export function disallowFor(
  * mean the same page in every language, with one budget between them.
  */
 export function withoutLocale(pathname: string): string {
-  return pathname.replace(/^\/(?:es|pt)(?=\/)/, '');
+  return pathname.replace(LOCALE_PREFIX, '');
 }
 
 /** The disallowed prefixes in every language, for robots.txt. */
 export function localisedDisallow(prefixes: readonly string[]): string[] {
-  return prefixes.flatMap((p) => (p === '/api/' ? [p] : [p, `/es${p}`, `/pt${p}`]));
+  return prefixes.flatMap((p) => (p === '/api/' ? [p] : [p, ...INTL_LOCALES.map((l) => `/${l}${p}`)]));
 }
 
 /** True when `robots.txt` tells search crawlers to stay out of this path. */

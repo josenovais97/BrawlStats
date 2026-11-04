@@ -285,19 +285,25 @@ export const config = {
     // the 2026-10-26 outage walked in through /pt/draft.
     '/es/player/:path*',
     '/pt/player/:path*',
+    '/tr/player/:path*',
     '/es/club/:path*',
     '/pt/club/:path*',
+    '/tr/club/:path*',
     '/es/draft/:path*',
     '/pt/draft/:path*',
+    '/tr/draft/:path*',
     '/es/compare/players/:path*',
     '/pt/compare/players/:path*',
+    '/tr/compare/players/:path*',
     '/es/wrapped/:path*',
     '/pt/wrapped/:path*',
+    '/tr/wrapped/:path*',
     // The account value had a budget in LIMITED_PREFIXES from 2026-10-16 but
     // was never matched here, so the budget never ran (found 2026-10-27).
     '/account-value/:path*',
     '/es/account-value/:path*',
     '/pt/account-value/:path*',
+    '/tr/account-value/:path*',
     // Roast My Account, the whole section while it is not public (see
     // ROAST_PUBLIC): the bare /roast too, so crawlers are refused it.
     '/roast',
@@ -305,6 +311,8 @@ export const config = {
     '/es/roast',
     '/es/roast/:path*',
     '/pt/roast',
+    '/tr/roast',
     '/pt/roast/:path*',
+    '/tr/roast/:path*',
   ],
 };

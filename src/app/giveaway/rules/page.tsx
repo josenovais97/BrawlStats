@@ -4,6 +4,7 @@ import { DISCORD_BONUS, ENTRIES_PER_IP_PER_DAY, GIVEAWAY, GIVEAWAY_PUBLIC } from
 import { requestLocale } from '@/lib/request-locale';
 import { CONTACT_EMAIL } from '@/lib/site';
 import { getT } from '@/lib/t';
+import { DATE_LOCALE } from '@/lib/i18n';
 
 /** The giveaway's official rules (2026-10-27): plain language, every promise the page makes. */
 
@@ -22,7 +23,7 @@ export default function GiveawayRules() {
   const t = getT(requestLocale());
   const locale = requestLocale();
   const fmt = (iso: string) =>
-    new Date(iso).toLocaleString(locale === 'en' ? 'en-GB' : locale === 'es' ? 'es-419' : 'pt-BR', {
+    new Date(iso).toLocaleString(DATE_LOCALE[locale], {
       day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
     });
 

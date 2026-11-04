@@ -95,7 +95,7 @@ export function SeasonPanel({
             <Chip>{season.featuredMode}{' '}{t('featured')}</Chip>
           ) : null}
           {season.brawlers.length > 0 && !awaiting ? (
-            <Chip>{t('{length} trial brawler', { length: season.brawlers.length })}{season.brawlers.length === 1 ? '' : 's'}
+            <Chip>{t('{length} trial brawler', { length: season.brawlers.length })}{season.brawlers.length === 1 || requestLocale() !== 'en' ? '' : 's'}
             </Chip>
           ) : null}
           {poolCount > 0 ? <Chip>{poolCount}{' '}{t('maps in the pool')}</Chip> : null}

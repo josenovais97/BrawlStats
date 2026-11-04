@@ -1,4 +1,4 @@
-import { CLIENT_ES, CLIENT_PT } from '@/i18n/client';
+import { CLIENT_ES, CLIENT_PT, CLIENT_TR } from '@/i18n/client';
 import { requestLocale } from '@/lib/request-locale';
 import { makeT, type T } from '@/lib/t-core';
 
@@ -11,5 +11,5 @@ import { makeT, type T } from '@/lib/t-core';
  */
 export function getUT(): T {
   const locale = requestLocale();
-  return makeT(locale === 'es' ? CLIENT_ES : locale === 'pt' ? CLIENT_PT : null);
+  return makeT(locale === 'es' ? CLIENT_ES : locale === 'pt' ? CLIENT_PT : locale === 'tr' ? CLIENT_TR : null);
 }

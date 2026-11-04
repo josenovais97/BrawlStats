@@ -1,3 +1,8 @@
+import { INTL_LOCALES } from '@/lib/i18n';
+
+/** Every language prefix (`/es/`, `/pt/`, `/tr/`), from the one list. */
+const LOCALE_PREFIX = new RegExp(`^/(?:${INTL_LOCALES.join('|')})(?=/)`);
+
 /**
  * A ceiling on how fast the uncached routes can be asked for.
  *
@@ -245,7 +250,7 @@ export function isLimitedPath(pathname: string): boolean {
  * 2026-10-26, when it did not and a crawl walked the translations unlimited).
  */
 export function limitedPrefix(pathname: string): string | null {
-  const bare = pathname.replace(/^\/(?:es|pt)(?=\/)/, '');
+  const bare = pathname.replace(LOCALE_PREFIX, '');
   return LIMITED_PREFIXES.find((prefix) => bare.startsWith(prefix)) ?? null;
 }
 

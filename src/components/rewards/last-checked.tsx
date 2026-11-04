@@ -12,7 +12,7 @@ import { useT } from '@/components/i18n/use-t';
  * two-minute check look ten minutes stale. Shows nothing if the file is
  * missing or older than an hour -- a stale "checked" line is worse than none.
  */
-const TAG: Record<string, string> = { en: 'en', es: 'es', pt: 'pt-BR' };
+const TAG: Record<string, string> = { en: 'en', es: 'es', pt: 'pt-BR', tr: 'tr' };
 
 export function LastChecked() {
   const t = useT();

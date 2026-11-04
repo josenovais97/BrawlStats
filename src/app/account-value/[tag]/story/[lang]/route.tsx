@@ -10,6 +10,7 @@ import { BG, BODY, BRAND, DIM, DISPLAY, FG, SLIDE_SIZE, loadIcon, slideFonts } f
 import { getAccountValueDistribution } from '@/lib/stats';
 import { displayTag } from '@/lib/tags';
 import { translate } from '@/lib/t';
+import { NUMBER_LOCALE } from '@/lib/i18n';
 
 /**
  * An account's value as a phone-story image (1080x1920), to post.
@@ -38,7 +39,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tag
     return new Response('Not found', { status: 404 });
   }
 
-  const number = (n: number) => n.toLocaleString(locale === 'en' ? 'en-US' : locale === 'es' ? 'es-419' : 'pt-BR');
+  const number = (n: number) => n.toLocaleString(NUMBER_LOCALE[locale]);
   const coins = coinBreakdown(player);
   const dist = await getAccountValueDistribution();
   const standing = dist ? standingLabel(valuePercentile(coins.total, dist)) : null;
