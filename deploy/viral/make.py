@@ -72,10 +72,21 @@ PACING = {'quiz': {'pace': 2}, 'shadowquiz': {'pace': 2}, 'zoomquiz': {'pace': 2
           'daily': {'pace': 2}, 'everyrank': {'hold': 1.2}, 'seasonclimb': {'hold': 1.2}}
 tl = Timeline(**PACING.get(KIND, {'hold': 1.5}))
 FOOTER = '\nUnofficial fan project, not affiliated with Supercell.'
+
+
+def more_titles(**titles):
+    """YouTube titles in Indonesian, German, Turkish and Polish (2026-11-04):
+    after English, the people who look the site up come most from Indonesia,
+    the Philippines, Germany, Turkey and Poland (Search Console, 4 weeks), and
+    YouTube shows each viewer the title in their own language. Keyed by
+    YouTube's language codes, beside the pt-BR and es-419 every format has."""
+    return {k: v for k, v in titles.items() if v}
+
 # Under the follow button of every ranking video (2026-11-03, owner): the
 # videos are what send people to the site, and the site is where the ads are.
-def site_cta(canvas, u, y):
-    follow_cta(canvas, u, y, 'FULL TIER LIST', sub='BRAWLZONE.NET')
+# The quizzes (2026-11-04) point at the site's own daily puzzle instead.
+def site_cta(canvas, u, y, lead='FULL TIER LIST'):
+    follow_cta(canvas, u, y, lead, sub='BRAWLZONE.NET')
 
 
 def episode(kind):
@@ -235,7 +246,11 @@ if KIND in QUIZ_STYLE:
 if KIND == 'quiz':
     META = {
         'title': f'Guess the brawler #{N} 👀 Only real fans get 5/5',
-        'titles': {'pt-BR': f'Adivinhe o brawler #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler #{N} 👀 Solo los verdaderos fans aciertan 5/5'},
+        'titles': {'pt-BR': f'Adivinhe o brawler #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler #{N} 👀 Solo los verdaderos fans aciertan 5/5',
+                   **more_titles(id=f'Tebak brawler-nya #{N} 👀 Cuma fans sejati yang dapat 5/5',
+                                 de=f'Errate den Brawler #{N} 👀 Nur echte Fans schaffen 5/5',
+                                 tr=f"Brawler'ı tahmin et #{N} 👀 Sadece gerçek hayranlar 5/5 yapar",
+                                 pl=f'Zgadnij brawlera #{N} 👀 Tylko prawdziwi fani mają 5/5')},
         'description': f'Guess the brawler #{N}: 5 rounds, medium to expert. Shadows, pixels and zoom-ins. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f'3 more to guess today (shadow, zoom, clues): https://brawlzone.net/daily-challenge{FOOTER}\n'
@@ -246,7 +261,11 @@ if KIND == 'quiz':
 elif KIND == 'skinquiz':
     META = {
         'title': f'Guess the brawler by its SKIN #{N} 👀 Only real fans get 5/5',
-        'titles': {'pt-BR': f'Adivinhe o brawler pela SKIN #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su SKIN #{N} 👀 Solo los verdaderos fans aciertan 5/5'},
+        'titles': {'pt-BR': f'Adivinhe o brawler pela SKIN #{N} 👀 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su SKIN #{N} 👀 Solo los verdaderos fans aciertan 5/5',
+                   **more_titles(id=f'Tebak brawler dari SKIN-nya #{N} 👀 Cuma fans sejati yang dapat 5/5',
+                                 de=f'Errate den Brawler am SKIN #{N} 👀 Nur echte Fans schaffen 5/5',
+                                 tr=f"Brawler'ı SKIN'inden tahmin et #{N} 👀 Sadece gerçek hayranlar 5/5 yapar",
+                                 pl=f'Zgadnij brawlera po SKINIE #{N} 👀 Tylko prawdziwi fani mają 5/5')},
         'description': f'Guess the brawler by its skin #{N}: 5 rounds, medium to expert, in skins from the Brawl Stars Fan Kit. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f"Today's puzzles on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
@@ -257,7 +276,11 @@ elif KIND == 'skinquiz':
 elif KIND == 'iconquiz':
     META = {
         'title': f'Guess the brawler from its GADGET #{N} 🧩 Only real fans get 5/5',
-        'titles': {'pt-BR': f'Adivinhe o brawler pelo GADGET #{N} 🧩 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su GADGET #{N} 🧩 Solo los verdaderos fans aciertan 5/5'},
+        'titles': {'pt-BR': f'Adivinhe o brawler pelo GADGET #{N} 🧩 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su GADGET #{N} 🧩 Solo los verdaderos fans aciertan 5/5',
+                   **more_titles(id=f'Tebak brawler dari GADGET-nya #{N} 🧩 Cuma fans sejati yang dapat 5/5',
+                                 de=f'Errate den Brawler am GADGET #{N} 🧩 Nur echte Fans schaffen 5/5',
+                                 tr=f"Brawler'ı GADGET'ından tahmin et #{N} 🧩 Sadece gerçek hayranlar 5/5 yapar",
+                                 pl=f'Zgadnij brawlera po GADŻECIE #{N} 🧩 Tylko prawdziwi fani mają 5/5')},
         'description': f'Guess the brawler from its gadget, star power or hypercharge #{N}: 5 rounds, medium to expert. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f"Today's puzzles on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
@@ -268,7 +291,11 @@ elif KIND == 'iconquiz':
 elif KIND == 'shadowquiz':
     META = {
         'title': f'Guess the brawler by its SHADOW #{N} 👤 Only real fans get 5/5',
-        'titles': {'pt-BR': f'Adivinhe o brawler pela SOMBRA #{N} 👤 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su SOMBRA #{N} 👤 Solo los verdaderos fans aciertan 5/5'},
+        'titles': {'pt-BR': f'Adivinhe o brawler pela SOMBRA #{N} 👤 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por su SOMBRA #{N} 👤 Solo los verdaderos fans aciertan 5/5',
+                   **more_titles(id=f'Tebak brawler dari BAYANGAN-nya #{N} 👤 Cuma fans sejati yang dapat 5/5',
+                                 de=f'Errate den Brawler am SCHATTEN #{N} 👤 Nur echte Fans schaffen 5/5',
+                                 tr=f"Brawler'ı GÖLGESİNDEN tahmin et #{N} 👤 Sadece gerçek hayranlar 5/5 yapar",
+                                 pl=f'Zgadnij brawlera po CIENIU #{N} 👤 Tylko prawdziwi fani mają 5/5')},
         'description': f'Guess the brawler by its shadow #{N}: 5 silhouettes, medium to expert. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f"Today's shadow puzzle on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
@@ -279,7 +306,11 @@ elif KIND == 'shadowquiz':
 elif KIND == 'zoomquiz':
     META = {
         'title': f'Guess the brawler from this ZOOM #{N} 🔍 Only real fans get 5/5',
-        'titles': {'pt-BR': f'Adivinhe o brawler pelo ZOOM #{N} 🔍 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por el ZOOM #{N} 🔍 Solo los verdaderos fans aciertan 5/5'},
+        'titles': {'pt-BR': f'Adivinhe o brawler pelo ZOOM #{N} 🔍 Só fãs de verdade acertam 5/5', 'es-419': f'Adivina el brawler por el ZOOM #{N} 🔍 Solo los verdaderos fans aciertan 5/5',
+                   **more_titles(id=f'Tebak brawler dari ZOOM ini #{N} 🔍 Cuma fans sejati yang dapat 5/5',
+                                 de=f'Errate den Brawler im ZOOM #{N} 🔍 Nur echte Fans schaffen 5/5',
+                                 tr=f"Bu ZOOM'dan brawler'ı tahmin et #{N} 🔍 Sadece gerçek hayranlar 5/5 yapar",
+                                 pl=f'Zgadnij brawlera z tego ZBLIŻENIA #{N} 🔍 Tylko prawdziwi fani mają 5/5')},
         'description': f'Guess the brawler from an extreme zoom #{N}: 5 rounds, medium to expert. '
                        f'How many did you get? Comment your score 👇 New quiz every day.\n\n'
                        f"Today's zoom puzzle on the site: https://brawlzone.net/daily-challenge{FOOTER}\n"
@@ -456,7 +487,7 @@ def quiz_scene(s, t, bt, lt):
                 put(canvas, f, x, 810, scale=out_back(u))
                 put(canvas, text_sprite(nice(b['n']).upper()[:9], 34, WHITE, stroke=5, shadow=False), x, 920, alpha=clamp(u))
         slam(canvas, 'COMMENT YOUR SCORE', 92, WHITE, W / 2, 1050, bt - 2.2)
-        follow_cta(canvas, bt - 3.4, 1260, 'FOR A NEW QUIZ EVERY DAY')
+        site_cta(canvas, bt - 3.4, 1260, "PLAY TODAY'S PUZZLE")
         shake, flash = hits(bt, (0, 0.6, 2.2, 3.4), 0.8, 0.3)
     return finish(canvas, shake, flash, mark)
 
@@ -497,7 +528,11 @@ if KIND == 'broken':
     line = lambda r: f"{nice(r['n'])} {pct(r['d'], True)}" + (f" ({r['was']} → {r['tier']})" if r['was'] != r['tier'] else '')
     META = {
         'title': 'Who got BROKEN this week? 📈 Brawl Stars Ranked',
-        'titles': {'pt-BR': 'Quem ficou QUEBRADO esta semana? 📈 Brawl Stars Ranqueado', 'es-419': '¿Quién está ROTO esta semana? 📈 Brawl Stars Competitivo'},
+        'titles': {'pt-BR': 'Quem ficou QUEBRADO esta semana? 📈 Brawl Stars Ranqueado', 'es-419': '¿Quién está ROTO esta semana? 📈 Brawl Stars Competitivo',
+                   **more_titles(id='Siapa yang BROKEN minggu ini? 📈 Brawl Stars Ranked',
+                                 de='Wer ist diese Woche BROKEN? 📈 Brawl Stars Ranked',
+                                 tr='Bu hafta kim OP oldu? 📈 Brawl Stars Ranked',
+                                 pl='Kto jest OP w tym tygodniu? 📈 Brawl Stars Ranked')},
         'description': 'Biggest win-rate climbers in Brawl Stars Ranked this week: '
                        + ', '.join(line(r) for r in up) + '. And who fell off: '
                        + ', '.join(line(r) for r in down)
@@ -601,7 +636,11 @@ if KIND == 'ranks':
     tl.add(7, 'p_outro')
     META = {
         'title': 'What you pick vs what MASTERS pick 😳',
-        'titles': {'pt-BR': 'O que você escolhe vs o que os MESTRES escolhem 😳', 'es-419': 'Lo que tú eliges vs lo que eligen los MAESTROS 😳'},
+        'titles': {'pt-BR': 'O que você escolhe vs o que os MESTRES escolhem 😳', 'es-419': 'Lo que tú eliges vs lo que eligen los MAESTROS 😳',
+                   **more_titles(id='Pilihanmu vs pilihan pemain MASTERS 😳',
+                                 de='Was du pickst vs was MASTERS picken 😳',
+                                 tr="Senin seçtiğin vs MASTERS oyuncularının seçtiği 😳",
+                                 pl='Co ty wybierasz vs co wybierają gracze MASTERS 😳')},
         'description': f"What you pick vs what MASTERS pick in Brawl Stars Ranked this week. "
                        f"Diamond & below: {', '.join(nice(b['n']) for b in low[:3])}. "
                        f"Masters+: {', '.join(nice(b['n']) for b in leg[:3])}. What rank are you? 👇\n\n"
@@ -700,7 +739,11 @@ if KIND == 'modes':
     tl.add(7, 'm_outro')
     META = {
         'title': 'The BEST brawler for EVERY mode 🏆',
-        'titles': {'pt-BR': 'O MELHOR brawler para CADA modo 🏆', 'es-419': 'El MEJOR brawler para CADA modo 🏆'},
+        'titles': {'pt-BR': 'O MELHOR brawler para CADA modo 🏆', 'es-419': 'El MEJOR brawler para CADA modo 🏆',
+                   **more_titles(id='Brawler TERBAIK untuk SETIAP mode 🏆',
+                                 de='Der BESTE Brawler für JEDEN Modus 🏆',
+                                 tr='HER mod için EN İYİ brawler 🏆',
+                                 pl='NAJLEPSZY brawler do KAŻDEGO trybu 🏆')},
         'description': 'The best brawler for every Ranked mode right now: '
                        + ', '.join(f"{MODE_NAME[mk].title()}: {nice(b['n'])}" for mk, b, _, _ in best)
                        + ". The pick that is top 3 on the most live maps of each mode. Save this for your next game 👇\n\n"
@@ -803,7 +846,11 @@ if KIND == 'newbrawler':
     META = {
         'title': f"Is {R['name']} broken? {R['tier']} tier after {R['battles']:,} battles 😳",
         'titles': {'pt-BR': f"{R['name']} está quebrado? Tier {R['tier']} depois de {R['battles']:,} partidas 😳".replace(',', '.'),
-                   'es-419': f"¿{R['name']} está roto? Tier {R['tier']} tras {R['battles']:,} partidas 😳"},
+                   'es-419': f"¿{R['name']} está roto? Tier {R['tier']} tras {R['battles']:,} partidas 😳",
+                   **more_titles(id=f"Apakah {R['name']} broken? Tier {R['tier']} setelah {R['battles']:,} pertandingan 😳".replace(',', '.'),
+                                 de=f"Ist {R['name']} broken? {R['tier']}-Tier nach {R['battles']:,} Matches 😳".replace(',', '.'),
+                                 tr=f"{R['name']} OP mi? {R['battles']:,} maçtan sonra {R['tier']} tier 😳".replace(',', '.'),
+                                 pl=f"Czy {R['name']} jest OP? Tier {R['tier']} po {R['battles']:,} meczach 😳".replace(',', ' '))},
         'description': f"{R['name']}, the new {R.get('rarity') or ''} {R.get('class') or 'brawler'}: "
                        f"{R['tier']} tier, #{R['rank']} of {R['of']} brawlers after {R['battles']:,} real battles since release. "
                        + (f"Best maps so far: {', '.join(m['map'] for m in maps)}. " if maps else '')
@@ -1022,6 +1069,18 @@ GROUPS = [  # field, value, headline, plural in English / Brazilian Portuguese /
     ('cls', 'Artillery', 'THROWER', 'throwers', 'arremessadores', 'lanzadores'),
     ('cls', 'Damage Dealer', 'DAMAGE DEALER', 'damage dealers', 'brawlers de dano', 'brawlers de daño'),
 ]
+# The class countdown's group in the four extra title languages (more_titles);
+# Polish carries its own "all", whose form depends on the noun.
+GROUP_L10N = {
+    'ASSASSIN': {'id': 'assassin', 'de': 'Assassinen', 'tr': 'suikastçılar', 'pl': 'Wszyscy asasyni'},
+    'TANK': {'id': 'tank', 'de': 'Tanks', 'tr': 'tanklar', 'pl': 'Wszystkie tanki'},
+    'SNIPER': {'id': 'sniper', 'de': 'Scharfschützen', 'tr': 'keskin nişancılar', 'pl': 'Wszyscy snajperzy'},
+    'LEGENDARY': {'id': 'brawler Legendaris', 'de': 'legendären Brawler', 'tr': 'Efsanevi brawlerlar', 'pl': 'Wszyscy legendarni brawlerzy'},
+    'SUPPORT': {'id': 'support', 'de': 'Supporter', 'tr': 'destekçiler', 'pl': 'Wszystkie supporty'},
+    'CONTROLLER': {'id': 'controller', 'de': 'Controller', 'tr': 'kontrolcüler', 'pl': 'Wszyscy kontrolerzy'},
+    'THROWER': {'id': 'thrower', 'de': 'Werfer', 'tr': 'atıcılar', 'pl': 'Wszyscy miotacze'},
+    'DAMAGE DEALER': {'id': 'damage dealer', 'de': 'Damage Dealer', 'tr': 'hasarcılar', 'pl': 'Wszyscy damage dealerzy'},
+}
 COUNT_HASHTAGS = '#brawlstars #brawlstarstierlist #brawlstarsranked #tierlist #brawlzone'
 
 if KIND in ('everyrank', 'classrank', 'seasonclimb'):
@@ -1080,7 +1139,11 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb'):
         META = {
             'title': 'NEW Ranked season: the 10 BEST brawlers to climb 🏆 #Shorts',
             'titles': {'pt-BR': 'NOVA temporada do Ranqueado: os 10 MELHORES brawlers para subir 🏆 #Shorts',
-                       'es-419': 'NUEVA temporada de Competitivo: los 10 MEJORES brawlers para subir 🏆 #Shorts'},
+                       'es-419': 'NUEVA temporada de Competitivo: los 10 MEJORES brawlers para subir 🏆 #Shorts',
+                       **more_titles(id='Season Ranked BARU: 10 brawler TERBAIK buat naik rank 🏆 #Shorts',
+                                     de='NEUE Ranked-Saison: die 10 BESTEN Brawler zum Aufsteigen 🏆 #Shorts',
+                                     tr='YENİ Ranked sezonu: rank atlamak için EN İYİ 10 brawler 🏆 #Shorts',
+                                     pl='NOWY sezon Ranked: 10 NAJLEPSZYCH brawlerów do wbijania rangi 🏆 #Shorts')},
             'description': 'A new Ranked season starts today. '
                            + ('It is the first under the Ranked Refresh: Power 11 at every rank, and the reset only '
                               'drops you 2 ranks. ' if refresh else '')
@@ -1092,7 +1155,11 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb'):
         META = {
             'title': 'Every brawler ranked from WORST to BEST 😳 #Shorts',
             'titles': {'pt-BR': 'Todos os brawlers do PIOR ao MELHOR 😳 #Shorts',
-                       'es-419': 'Todos los brawlers del PEOR al MEJOR 😳 #Shorts'},
+                       'es-419': 'Todos los brawlers del PEOR al MEJOR 😳 #Shorts',
+                       **more_titles(id='Semua brawler dari TERBURUK ke TERBAIK 😳 #Shorts',
+                                     de='Alle Brawler vom SCHLECHTESTEN zum BESTEN 😳 #Shorts',
+                                     tr='Tüm brawlerlar EN KÖTÜDEN EN İYİYE 😳 #Shorts',
+                                     pl='Wszyscy brawlerzy od NAJGORSZEGO do NAJLEPSZEGO 😳 #Shorts')},
             'description': f"All {NB} brawlers ranked by this week's Ranked games (Season {data.get('season')}). "
                            f'Top 3: {top3}. Where is your main? Comment below 👇 New ranking every week.\n\n'
                            f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
@@ -1101,7 +1168,12 @@ if KIND in ('everyrank', 'classrank', 'seasonclimb'):
         META = {
             'title': f'Every {en_pl.split()[0] if en_pl[0].isupper() else en_pl[:-1]} ranked from WORST to BEST 😳 #Shorts',
             'titles': {'pt-BR': f'Todos os {pt_pl} do PIOR ao MELHOR 😳 #Shorts',
-                       'es-419': f'Todos los {es_pl} del PEOR al MEJOR 😳 #Shorts'},
+                       'es-419': f'Todos los {es_pl} del PEOR al MEJOR 😳 #Shorts',
+                       **more_titles(**{lang: t.format(GROUP_L10N[WORD][lang]) for lang, t in (
+                           ('id', 'Semua {} dari TERBURUK ke TERBAIK 😳 #Shorts'),
+                           ('de', 'Alle {} vom SCHLECHTESTEN zum BESTEN 😳 #Shorts'),
+                           ('tr', 'Tüm {} EN KÖTÜDEN EN İYİYE 😳 #Shorts'),
+                           ('pl', '{} od NAJGORSZEGO do NAJLEPSZEGO 😳 #Shorts'))} if WORD in GROUP_L10N else {})},
             'description': f"All {NB} {en_pl} ranked by this week's Ranked games (Season {data.get('season')}). "
                            f'Top 3: {top3}. Which one do you main? Comment below 👇 Another class next time.\n\n'
                            f'Full tier list for your rank: https://brawlzone.net/tier-list/ranked{FOOTER}\n{COUNT_HASHTAGS}',
@@ -1259,7 +1331,11 @@ if KIND == 'stop':
     worst, best = nice(over[-1]['n']), nice(gems[-1]['n'])
     META = {
         'title': 'STOP picking these brawlers 🛑 #Shorts',
-        'titles': {'pt-BR': 'PARE de escolher esses brawlers 🛑 #Shorts', 'es-419': 'DEJA de elegir estos brawlers 🛑 #Shorts'},
+        'titles': {'pt-BR': 'PARE de escolher esses brawlers 🛑 #Shorts', 'es-419': 'DEJA de elegir estos brawlers 🛑 #Shorts',
+                   **more_titles(id='BERHENTI pakai brawler ini 🛑 #Shorts',
+                                 de='HÖR AUF, diese Brawler zu picken 🛑 #Shorts',
+                                 tr='Bu brawlerları SEÇMEYİ BIRAK 🛑 #Shorts',
+                                 pl='PRZESTAŃ wybierać tych brawlerów 🛑 #Shorts')},
         'description': f"Everyone picks them, and they lose: this week's most overrated brawlers in Ranked (worst: {worst}, "
                        f"{over[-1]['wr'] * 100:.1f}% wins), and the hidden gems almost nobody picks (best: {best}, "
                        f"{gems[-1]['wr'] * 100:.1f}%). Agree? Defend your main in the comments 👇\n\n"
@@ -1354,7 +1430,15 @@ if KIND == 'giveaway':
         'titles': {'pt-BR': (f'ÚLTIMA CHANCE: sorteio grátis do Brawl Pass acaba em {DAYS} dias 🎁 #Shorts' if last
                              else f'Sorteio GRÁTIS do Brawl Pass 🎁 Faltam {DAYS} dias! #Shorts'),
                    'es-419': (f'ÚLTIMA OPORTUNIDAD: el sorteo gratis del Brawl Pass termina en {DAYS} días 🎁 #Shorts' if last
-                              else f'Sorteo GRATIS del Brawl Pass 🎁 ¡Quedan {DAYS} días! #Shorts')},
+                              else f'Sorteo GRATIS del Brawl Pass 🎁 ¡Quedan {DAYS} días! #Shorts'),
+                   **more_titles(id=(f'KESEMPATAN TERAKHIR: giveaway Brawl Pass gratis berakhir {DAYS} hari lagi 🎁 #Shorts' if last
+                                     else f'GIVEAWAY Brawl Pass GRATIS 🎁 Sisa {DAYS} hari! #Shorts'),
+                                 de=(f'LETZTE CHANCE: Gratis-Brawl-Pass-Gewinnspiel endet in {DAYS} Tagen 🎁 #Shorts' if last
+                                     else f'GRATIS Brawl Pass Gewinnspiel 🎁 Noch {DAYS} Tage! #Shorts'),
+                                 tr=(f'SON ŞANS: Ücretsiz Brawl Pass çekilişi {DAYS} gün sonra bitiyor 🎁 #Shorts' if last
+                                     else f'ÜCRETSİZ Brawl Pass çekilişi 🎁 {DAYS} gün kaldı! #Shorts'),
+                                 pl=(f'OSTATNIA SZANSA: darmowy konkurs o Brawl Pass kończy się za {DAYS} dni 🎁 #Shorts' if last
+                                     else f'DARMOWY Brawl Pass do wygrania 🎁 Zostało {DAYS} dni! #Shorts'))},
         'description': 'Win a €10 Google Play or App Store gift card, enough for the Brawl Pass. Free to enter, '
                        'no login: just your player tag. More points = more chances: +2 for joining our Discord, '
                        '+1 for every friend who enters with your link. Drawn on Nov 30 at 20:00 UTC with public '
@@ -1573,7 +1657,11 @@ if KIND == 'drops':
     META = {
         'title': f'1,000 {plain} with the REAL drop rates: what do you get? 😱',
         'titles': {'pt-BR': f'1.000 {plain} com as chances REAIS: o que você ganha? 😱',
-                   'es-419': f'1.000 {plain} con las probabilidades REALES: ¿qué te toca? 😱'},
+                   'es-419': f'1.000 {plain} con las probabilidades REALES: ¿qué te toca? 😱',
+                   **more_titles(id=f'1.000 {plain} dengan peluang ASLI: dapat apa? 😱',
+                                 de=f'1.000 {plain} mit den ECHTEN Drop-Chancen: was bekommst du? 😱',
+                                 tr=f'GERÇEK oranlarla 1.000 {plain}: ne çıkar? 😱',
+                                 pl=f'1000 {plain} z PRAWDZIWYMI szansami: co wypadnie? 😱')},
         'description': f'What 1,000 {plain} give you, simulated with the real drop rates from the Brawl Stars Wiki: {summary} '
                        f'What would you hope for? Comment 👇\n\n'
                        f'Every drop and box with its odds: https://brawlzone.net/starr-drops{FOOTER}\n'
@@ -1798,7 +1886,11 @@ if KIND == 'whatsnew':
         'title': (f"{UPD['title'].split()[-2]} update: NEW brawlers & Buffies, are they good? 🔥"
                   if FRESH and len(UPD.get('title', '').split()) >= 2 else 'NEW brawlers & Buffies: are they actually good? 🔥'),
         'titles': {'pt-BR': 'Brawlers e Buffies NOVOS: são bons mesmo? 🔥',
-                   'es-419': '¿Los NUEVOS brawlers y Buffies son buenos? 🔥'},
+                   'es-419': '¿Los NUEVOS brawlers y Buffies son buenos? 🔥',
+                   **more_titles(id='Brawler & Buffie BARU: beneran bagus? 🔥',
+                                 de='NEUE Brawler & Buffies: sind sie wirklich gut? 🔥',
+                                 tr="YENİ brawlerlar ve Buffie'ler: gerçekten iyi mi? 🔥",
+                                 pl='NOWI brawlerzy i Buffie: czy są naprawdę dobrzy? 🔥')},
         'description': f"The newest brawlers right now: {nb}. The newest Buffies: {bf}. "
                        f"Which one is your favourite? 👇\n\n"
                        f"Every brawler's tier, from real Ranked battles: https://brawlzone.net/tier-list/ranked{FOOTER}\n"

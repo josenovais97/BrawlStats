@@ -79,8 +79,16 @@ elif low.startswith('how to beat') or 'counter' in low:
     ask = "💬 What do you pick against them? Comment below 👇"
 else:
     ask = "💬 Who's your main? Comment below 👇"
-ASK = {'pt': '💬 Concorda? Comente o seu main 👇', 'es': '💬 ¿De acuerdo? Comenta tu main 👇'}
+ASK = {'pt': '💬 Concorda? Comente o seu main 👇', 'es': '💬 ¿De acuerdo? Comenta tu main 👇',
+       # Indonesian, German, Turkish, Polish titles since 2026-11-04 (make.py more_titles)
+       'id': '💬 Setuju? Komen main kamu 👇', 'de': '💬 Einverstanden? Schreib deinen Main in die Kommentare 👇',
+       'tr': "💬 Katılıyor musun? Main'ini yorumlara yaz 👇", 'pl': '💬 Zgadzasz się? Napisz swojego maina w komentarzu 👇'}
+if 'guess' in low:  # the quizzes ask for a score, in every language
+    ASK = {'pt': '💬 Quantos você acertou? Comente seu placar 👇', 'es': '💬 ¿Cuántos acertaste? Comenta tu puntuación 👇',
+           'id': '💬 Berapa yang kamu tebak benar? Komen skormu 👇', 'de': '💬 Wie viele hattest du richtig? Schreib deinen Score in die Kommentare 👇',
+           'tr': '💬 Kaç tane bildin? Skorunu yorumlara yaz 👇', 'pl': '💬 Ile zgadłeś? Napisz swój wynik w komentarzu 👇'}
 for lang, v in l10n.items():
+    lang = lang.split('-')[0]  # 'pt-BR' -> 'pt': before 2026-11-04 the codes never matched and no ask was added
     if lang in ASK and v.get('description'):
         v['description'] = ASK[lang] + '\n' + v['description']
 desc = ask + '\n' + ('🔔 Subscribe for new Brawl Stars Ranked picks every day: '

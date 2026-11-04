@@ -12,9 +12,12 @@ import { getT } from '@/lib/t';
  * "Today", right under the search (2026-10-30): the three things that are new
  * every day, as the game's own event slots -- a coloured tile each, a header
  * bar with what it is and how long it lasts, the art in the middle, one
- * button. Free rewards first: they are what most visitors come for (ChatGPT
- * alone sent 675 visits to /rewards in a week). The giveaway tile replaces
- * the home banner, the daily challenge shows today's real mystery shadow.
+ * button. The daily challenge first since 2026-11-04 (owner): nearly every
+ * visitor now arrives from the Shorts by searching "brawlzone", and the daily
+ * quiz Shorts end on "PLAY TODAY'S PUZZLE"; it shows today's real mystery
+ * shadow. Free rewards second, peeking in on a phone: most people who come
+ * for them land on /rewards directly (ChatGPT sent 675 visits there in a
+ * week). The giveaway tile replaces the home banner.
  *
  * A row that scrolls sideways on a phone, so the third tile peeking in says
  * there is more; three across from `sm`.
@@ -34,6 +37,20 @@ export async function HomeLobby() {
       <ul className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0">
         <LobbyTile
           index={0}
+          href={lp('/daily-challenge')}
+          tone="linear-gradient(180deg, #3cc8ff 0%, #1668de 100%)"
+          label={t('Daily challenge')}
+          badge={t('New every day')}
+          title={t('Who is this brawler?')}
+          cta={t('Guess')}
+          ctaClass="bg-white text-[#10142a] [--btn-shadow:#9aa3c0]"
+          art={
+            /* eslint-disable-next-line @next/next/no-img-element -- today's puzzle shadow, drawn by our own API */
+            <img src={`/api/brawldle/picture?mode=shadow&step=0&d=${today}`} alt="" width={160} height={160} className="reward-float size-32 object-contain sm:size-36" />
+          }
+        />
+        <LobbyTile
+          index={1}
           href={lp('/rewards')}
           tone="linear-gradient(180deg, #ffbf3a 0%, #f2860f 100%)"
           label={t('Free rewards')}
@@ -56,7 +73,7 @@ export async function HomeLobby() {
         />
         {giveaway ? (
           <LobbyTile
-            index={1}
+            index={2}
             href={lp('/giveaway')}
             tone="linear-gradient(180deg, #a06bff 0%, #5a2fd1 100%)"
             label={t('Giveaway')}
@@ -74,20 +91,6 @@ export async function HomeLobby() {
             }
           />
         ) : null}
-        <LobbyTile
-          index={giveaway ? 2 : 1}
-          href={lp('/daily-challenge')}
-          tone="linear-gradient(180deg, #3cc8ff 0%, #1668de 100%)"
-          label={t('Daily challenge')}
-          badge={t('New every day')}
-          title={t('Who is this brawler?')}
-          cta={t('Guess')}
-          ctaClass="bg-white text-[#10142a] [--btn-shadow:#9aa3c0]"
-          art={
-            /* eslint-disable-next-line @next/next/no-img-element -- today's puzzle shadow, drawn by our own API */
-            <img src={`/api/brawldle/picture?mode=shadow&step=0&d=${today}`} alt="" width={160} height={160} className="reward-float size-32 object-contain sm:size-36" />
-          }
-        />
       </ul>
     </section>
   );
