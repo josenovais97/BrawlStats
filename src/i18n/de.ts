@@ -3605,4 +3605,404 @@ export const DE: Record<string, string> = {
     "Das Meta auf deinem Rang ist nicht das Meta ganz oben. Und jeder Pick hat eine Antwort.",
   "Tier list at your rank":
     "Tierlist für deinen Rang",
+  "Built only from battles played at that rank.":
+    "Nur aus Matches, die auf diesem Rang gespielt wurden.",
+  "How to counter…":
+    "So konterst du…",
+  "The brawlers picked most in Ranked this week. Tap one for what beats it, at every rank.":
+    "Die meistgepickten Brawler im Ranked diese Woche. Tippe auf einen, um zu sehen, was ihn schlägt, auf jedem Rang.",
+  "How to counter {name}":
+    "So konterst du {name}",
+  "{rate} picked":
+    "{rate} gepickt",
+  "Type a brawler, e.g. Shade":
+    "Gib einen Brawler ein, z. B. Shade",
+  "Brawler to counter":
+    "Brawler zum Kontern",
+  "Counters":
+    "Konter",
+  "No brawler by that name.":
+    "Kein Brawler mit diesem Namen.",
+  "Two accounts? Every tag you use is saved, and the app shows the others under “Switch account”: one tap swaps, a long press forgets one.":
+    "Zwei Accounts? Jeder Tag, den du nutzt, wird gespeichert, und die App zeigt die anderen unter „Account wechseln“: Ein Tipp wechselt, langes Drücken vergisst einen.",
+  "The site and the app's panel are delivered through Cloudflare, which handles each request (including your IP address) in order to serve and protect it, under its own privacy policy. We do not log IP addresses ourselves.":
+    "Die Website und das Panel der App werden über Cloudflare ausgeliefert, das jede Anfrage (einschließlich deiner IP-Adresse) unter seiner eigenen Datenschutzerklärung verarbeitet, um sie auszuliefern und zu schützen. Wir selbst speichern keine IP-Adressen.",
+  ", it comes with a SHA-256 checksum so you can verify the file is the one we published.":
+    ", kommt sie mit einer SHA-256-Prüfsumme, damit du prüfen kannst, dass es die von uns veröffentlichte Datei ist.",
+  ", so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). The app contains no advertising or analytics SDK and shares nothing with third parties.":
+    ", das Öffnen zählt hier also als anonymer Seitenaufruf und nicht mehr. Der gesamte Verkehr ist verschlüsselt (HTTPS). Die App enthält kein Werbe- oder Analyse-SDK und teilt nichts mit Dritten.",
+  "BrawlZone (brawlzone.net) and the BrawlZone Bubble Android app are made by Novais Labs, an independent developer in Portugal. This policy covers both. Contact:":
+    "BrawlZone (brawlzone.net) und die Android-App BrawlZone Bubble werden von Novais Labs gemacht, einem unabhängigen Entwickler in Portugal. Diese Erklärung gilt für beides. Kontakt:",
+  "BrawlZone is not directed at children and knowingly collects no personal information from anyone, of any age.":
+    "BrawlZone richtet sich nicht an Kinder und erhebt wissentlich von niemandem, egal welchen Alters, personenbezogene Daten.",
+  "Deleting your data":
+    "Deine Daten löschen",
+  "If you enter your player tag, the app sends it to brawlzone.net to show your profile, your brawlers and what to upgrade next, exactly as the site does for a search (see above). The tags you have used, with their player names, and your settings are kept on your phone so you can switch accounts; they are removed when you uninstall the app or clear its data, and a long press removes one.":
+    "Wenn du deinen Spieler-Tag eingibst, sendet die App ihn an brawlzone.net, um dein Profil, deine Brawler und deine nächsten Upgrades zu zeigen, genau wie die Website bei einer Suche (siehe oben). Die genutzten Tags mit ihren Spielernamen und deine Einstellungen bleiben auf deinem Handy, damit du Accounts wechseln kannst; sie werden entfernt, wenn du die App deinstallierst oder ihre Daten löschst, und langes Drücken entfernt einen.",
+  "Installed from Google Play, the app is covered by Google's own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports. Downloaded from the":
+    "Aus Google Play installiert, gilt für die App Googles eigene Datenschutzerklärung für den Play Store, und Google gibt uns zusammengefasste Statistiken wie Installationszahlen und Absturzberichte. Von der",
+  "Its panel is a web view of":
+    "Ihr Panel ist eine Web-Ansicht von",
+  "No account, no ads, no trackers, and it cannot see your screen.":
+    "Kein Account, keine Werbung, keine Tracker, und sie kann deinen Bildschirm nicht sehen.",
+  "Nothing to delete on our side for most people.":
+    "Für die meisten gibt es bei uns nichts zu löschen.",
+  "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":
+    "Erfasste Match-Daten werden nur so lange aufbewahrt, wie die Statistiken sie brauchen, und dann gelöscht oder zu Aggregaten zusammengefasst, die keinen einzelnen Spieler beschreiben.",
+  "Searching a player tag, on the site or in the app, sends it to the official Brawl Stars API to fetch that profile. The public game stats that come back (player name, tag, trophies, rank and brawler counts) are saved once a day so the profile can show progress over time, and the account joins the pool sampled for statistics. Nothing about the person searching is stored: no IP address, no device, no link between a search and whoever made it.":
+    "Einen Spieler-Tag zu suchen, auf der Website oder in der App, schickt ihn an die offizielle Brawl-Stars-API, um das Profil abzurufen. Die zurückgegebenen öffentlichen Spielwerte (Spielername, Tag, Trophäen, Rang und Brawler-Anzahl) werden einmal am Tag gespeichert, damit das Profil den Fortschritt zeigen kann, und der Account kommt in den Pool, der für Statistiken erfasst wird. Über die suchende Person wird nichts gespeichert: keine IP-Adresse, kein Gerät, keine Verbindung zwischen einer Suche und dem, der sie gemacht hat.",
+  "We keep the public game profile, never who searched for it.":
+    "Wir speichern das öffentliche Spielprofil, nie, wer danach gesucht hat.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, no cookies, no ads.":
+    "Was BrawlZone und die App BrawlZone Bubble speichern, was nicht und was die App sendet. Keine Accounts, keine Cookies, keine Werbung.",
+  "What is on your device is yours to remove: clear the site's data in your browser, or uninstall the app. To have a player profile's saved stats deleted and the tag excluded from future sampling, email":
+    "Was auf deinem Gerät ist, kannst du selbst entfernen: Lösch die Website-Daten in deinem Browser oder deinstalliere die App. Um die gespeicherten Werte eines Spielerprofils löschen und den Tag von künftigen Erfassungen ausschließen zu lassen, schreib eine E-Mail an",
+  "Who we are":
+    "Wer wir sind",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them. The app never captures or reads your screen, and does not read your game account, your files, your contacts or your other apps.":
+    ", damit sie über dem Spiel zeichnen kann. Diese Berechtigung erlaubt ihr, Pixel auf deinen Bildschirm zu setzen, nicht, sie zu lesen. Die App nimmt deinen Bildschirm nie auf und liest ihn nicht, und sie liest weder deinen Spiel-Account noch deine Dateien, Kontakte oder anderen Apps.",
+  "with the tag. It is done within 30 days, usually much sooner.":
+    "mit dem Tag. Es wird innerhalb von 30 Tagen erledigt, meist viel schneller.",
+  ". Every message is read.":
+    ". Jede Nachricht wird gelesen.",
+  "Become a tester":
+    "Tester werden",
+  "Found a bug or have an idea? Email":
+    "Einen Fehler gefunden oder eine Idee? Schreib an",
+  "Google Play test":
+    "Google-Play-Test",
+  "Google lets a new app on the Play Store only after {n} people have tested it for {days} days. Three taps, and you are one of them.":
+    "Google lässt eine neue App erst in den Play Store, wenn {n} Leute sie {days} Tage getestet haben. Drei Tipps, und du bist einer davon.",
+  "Help launch BrawlZone Bubble on Google Play":
+    "Hilf mit, BrawlZone Bubble auf Google Play zu bringen",
+  "Help us launch BrawlZone Bubble on Google Play":
+    "Hilf uns, BrawlZone Bubble auf Google Play zu bringen",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings.":
+    "Installiere BrawlZone Bubble über die Play-Store-Seite. Hast du schon die Version von dieser Website? Play installiert darüber und behält deinen Tag und deine Einstellungen.",
+  "Install from Google Play":
+    "Von Google Play installieren",
+  "It is the same app as the download on this site, with the same features and languages. When it goes public, you simply keep it, and it updates through Google Play.":
+    "Es ist dieselbe App wie der Download auf dieser Website, mit denselben Features und Sprachen. Wenn sie öffentlich wird, behältst du sie einfach, und sie aktualisiert sich über Google Play.",
+  "Join the Google Play test of BrawlZone Bubble, the draft helper that floats over Brawl Stars. Three taps, free, no ads.":
+    "Mach beim Google-Play-Test von BrawlZone Bubble mit, dem Draft-Helfer, der über Brawl Stars schwebt. Drei Tipps, kostenlos, ohne Werbung.",
+  "Join the group":
+    "Der Gruppe beitreten",
+  "Join the testers group":
+    "Der Tester-Gruppe beitreten",
+  "Keep the app installed for {days} days. Using it in your matches helps, and so does telling us what breaks. That is all: no sign-up beyond the group, no payment, nothing to fill in.":
+    "Behalte die App {days} Tage installiert. Sie in deinen Matches zu nutzen hilft, genau wie uns zu sagen, was kaputtgeht. Das ist alles: keine Anmeldung außer der Gruppe, keine Zahlung, nichts auszufüllen.",
+  "More about the Bubble":
+    "Mehr über die Bubble",
+  "On the next page, tap \"Become a tester\". It can take a few minutes after joining the group before this works.":
+    "Tippe auf der nächsten Seite auf „Tester werden“. Nach dem Gruppenbeitritt kann es ein paar Minuten dauern, bis das funktioniert.",
+  "Open Google Play":
+    "Google Play öffnen",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone.":
+    "Öffne die Gruppe und tippe auf „Gruppe beitreten“. Nutze dasselbe Google-Konto wie im Play Store auf deinem Handy.",
+  "The group is only a list of testers: nobody sends messages there, and joining shows nothing to other members. You can leave the test at any time from the same pages.":
+    "Die Gruppe ist nur eine Liste der Tester: Niemand schreibt dort Nachrichten, und der Beitritt zeigt anderen Mitgliedern nichts. Du kannst den Test jederzeit über dieselben Seiten verlassen.",
+  "The test opens in a few days, once Google has reviewed it. Check back soon.":
+    "Der Test öffnet in ein paar Tagen, sobald Google ihn geprüft hat. Schau bald wieder vorbei.",
+  "What it asks of you":
+    "Was sie von dir braucht",
+  "On a real phone, open over the game":
+    "Auf einem echten Handy, offen über dem Spiel",
+  "Pick your rank and mode":
+    "Wähle deinen Rang und Modus",
+  "Pinball Dreams at Mythic: the best picks on that map, your best owned pick named above the list, and the battles behind each number":
+    "Pinball Dreams auf Mythisch: die besten Picks auf dieser Map, dein bester eigener Pick über der Liste und die Matches hinter jeder Zahl",
+  "The BrawlZone Bubble app's main screen: the Start bubble, Stop and Quick Settings buttons, and a list of what the panel does":
+    "Der Hauptbildschirm der App BrawlZone Bubble: die Buttons Bubble starten, Stopp und Schnelleinstellungen und eine Liste dessen, was das Panel kann",
+  "The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine":
+    "Das BrawlZone-Panel über der Brawl-Stars-Lobby auf einem Handy, mit dem Ranked-Meta für Meister+ auf Undermine",
+  "The build card for Shade: the most-owned star power, gadget and two gears, with the share of sampled owners holding each":
+    "Die Build-Karte für Shade: die häufigste Starpower, das Gadget und zwei Ausrüstungen, mit dem Anteil der erfassten Besitzer",
+  "The draft board on Hard Rock Mine with one ban, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "Das Draft-Board auf Hard Rock Mine mit einem Bann, einem Teamkollegen und zwei Gegnern, die übrigen Brawler danach sortiert, wie gut sie auf diesen Draft antworten",
+  "The panel's Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out":
+    "Das Ranked-Meta des Panels auf Mythisch: Rang- und Modus-Chips oben, darunter die Tierlist von S abwärts, mit ausgegrauten Brawlern, die du nicht besitzt",
+  "22 languages, with brawler, mode and map names exactly as the game writes them. Choose the bubble's size, how faint it gets when idle, and whether it tucks half off the edge.":
+    "22 Sprachen, mit Brawler-, Modus- und Map-Namen genau so, wie das Spiel sie schreibt. Wähle die Größe der Bubble, wie blass sie im Leerlauf wird und ob sie sich halb am Rand versteckt.",
+  "A draft helper that floats over Brawl Stars: tier lists at your rank, the best picks for your map, counters, team comps and builds, with your own brawlers marked. Free, no ads, no account.":
+    "Ein Draft-Helfer, der über Brawl Stars schwebt: Tierlists für deinen Rang, die besten Picks für deine Map, Konter, Team-Kombos und Builds, mit deinen eigenen Brawlern markiert. Kostenlos, ohne Werbung, ohne Account.",
+  "A short plan for your coins: the few brawlers that would give you a top pick in the most modes.":
+    "Ein kurzer Plan für deine Münzen: die paar Brawler, die dir in den meisten Modi einen Top-Pick geben würden.",
+  "Add the BrawlZone tile to Quick Settings: swipe down mid-match and tap it to show or hide the bubble, without opening the app.":
+    "Füge die BrawlZone-Kachel zu den Schnelleinstellungen hinzu: Wisch mitten im Match nach unten und tippe darauf, um die Bubble ein- oder auszublenden, ohne die App zu öffnen.",
+  "Add your player tag once: brawlers you own are marked, the rest greyed out or hidden, and you can narrow it to power 11 or hypercharged.":
+    "Füge einmal deinen Spieler-Tag hinzu: Brawler in deinem Besitz werden markiert, der Rest ausgegraut oder ausgeblendet, und du kannst auf Power 11 oder Hyperladung eingrenzen.",
+  "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
+    "Eine App kann es. Die Bubble sitzt am Bildschirmrand, öffnet sich mit einem Tipp über dem Spiel und klappt wieder zu.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "Brawl Stars gibt dir Sekunden zum Picken. Das Spiel zu verlassen, um eine Tierlist anzusehen, kostet mehr davon, als du hast, deshalb kommt die Antwort zu dir: das Meta auf deinem Rang, die besten Picks für deine Map und was den Gegner schlägt, einen Tipp entfernt über dem Spiel.",
+  "Coming to Google Play":
+    "Bald auf Google Play",
+  "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
+    "Diamant, Mythisch, Legendär und Meister spielen verschiedene Metas, deshalb ist die Liste nach Rang aufgeteilt und öffnet mit deinem. Jeder Ranked-Modus, alle zwei Stunden aus echten kompetitiven Matches aktualisiert.",
+  "Draft counters":
+    "Draft-Konter",
+  "Enter the bans and both teams' picks and it ranks what is left. Tap an enemy to see who beats them.":
+    "Gib die Bans und die Picks beider Teams ein, und es rankt, was übrig ist. Tippe auf einen Gegner, um zu sehen, wer ihn schlägt.",
+  "Every tag you use is saved. Switch between them from the account card; a long press removes one.":
+    "Jeder Tag, den du nutzt, wird gespeichert. Wechsle über die Account-Karte; langes Drücken entfernt einen.",
+  "Everything in one bubble":
+    "Alles in einer Bubble",
+  "It shows the stats; you make the picks. It does not touch the game or log in to your account: your player tag only looks up your public profile, the same one anyone can see on the site. No ads, no sign-up, no in-app purchases.":
+    "Sie zeigt die Stats; die Picks machst du. Sie greift nicht ins Spiel ein und loggt sich nicht in deinen Account ein: Dein Spieler-Tag ruft nur dein öffentliches Profil ab, dasselbe, das jeder auf der Website sehen kann. Keine Werbung, keine Anmeldung, keine In-App-Käufe.",
+  "Join the test and install it from the Play Store instead: three taps.":
+    "Mach beim Test mit und installier sie stattdessen aus dem Play Store: drei Tipps.",
+  "Made for your account":
+    "Für deinen Account gemacht",
+  "Ranked hands you one map, and the answer moves with it. Pick the map and get the brawlers that win there, with your own best pick named at the top.":
+    "Ranked gibt dir eine Map, und die Antwort ändert sich mit ihr. Wähle die Map und bekomm die Brawler, die dort gewinnen, mit deinem eigenen besten Pick ganz oben.",
+  "Start it from inside the game":
+    "Starte sie aus dem Spiel heraus",
+  "Tap an enemy pick to see the five brawlers that beat it most often at your rank, with a link to the full counters page on the site.":
+    "Tippe auf einen gegnerischen Pick, um die fünf Brawler zu sehen, die ihn auf deinem Rang am häufigsten schlagen, mit Link zur ganzen Konter-Seite auf der Website.",
+  "The app finds your account and puts your player icon on the bubble. Every pick the panel suggests is one you can actually make.":
+    "Die App findet deinen Account und setzt dein Spieler-Icon auf die Bubble. Jeder Pick, den das Panel vorschlägt, ist einer, den du wirklich machen kannst.",
+  "The app's account card: the player name, tag and trophies, the choice between all owned brawlers, power 11 only or hypercharged, and a saved second account to switch to":
+    "Die Account-Karte der App: Spielername, Tag und Trophäen, die Wahl zwischen allen eigenen Brawlern, nur Power 11 oder mit Hyperladung, und ein gespeicherter zweiter Account zum Wechseln",
+  "The best picks for your map":
+    "Die besten Picks für deine Map",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps and to show a notification, the one that says it is running. No screen capture, no storage access, nothing else.":
+    "Die Bubble liest weder deinen Bildschirm noch dein Match noch, auf welcher Map du bist. Sie bittet darum, über anderen Apps zu zeichnen und eine Benachrichtigung zu zeigen, die, dass sie läuft. Keine Bildschirmaufnahme, kein Speicherzugriff, sonst nichts.",
+  "The three that win together on your map, with the ones you own ticked.":
+    "Die drei, die auf deiner Map zusammen gewinnen, mit deinen eigenen abgehakt.",
+  "The tier list at your rank":
+    "Die Tierlist für deinen Rang",
+  "The whole app in 51 seconds. Sound on.":
+    "Die ganze App in 51 Sekunden. Ton an.",
+  "Three gestures and a tile. There is nothing else to learn.":
+    "Drei Gesten und eine Kachel. Mehr gibt es nicht zu lernen.",
+  "Two accounts? One tap":
+    "Zwei Accounts? Ein Tipp",
+  "Your brawlers marked":
+    "Deine Brawler markiert",
+  "Your draft helper,":
+    "Dein Draft-Helfer,",
+  "Your language, your bubble":
+    "Deine Sprache, deine Bubble",
+  "Your tag is the only setup there is, and it changes every list in the panel.":
+    "Dein Tag ist die einzige Einrichtung, und er verändert jede Liste im Panel.",
+  "Your tag, once":
+    "Dein Tag, einmal",
+  "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
+    "Eine 51-Sekunden-Tour durch BrawlZone Bubble: die Bubble über Brawl Stars, die besten Picks für genau diese Map, der Build, den Besitzer nutzen, das Panel in deiner Sprache und die Größen- und Ausblend-Einstellungen der Bubble.",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.":
+    "Installiere BrawlZone Bubble über die Play-Store-Seite. Hast du schon die Version von dieser Website? Play installiert darüber und behält deinen Tag und deine Einstellungen. Wenn Play sagt, dass die App nicht gefunden wurde, warte ein bisschen und versuch es erneut: Google braucht manchmal etwas, um einen neuen Tester reinzulassen.",
+  "A draft helper that floats over Brawl Stars. Tap it mid-draft, tap again and it folds away.":
+    "Ein Draft-Helfer, der über Brawl Stars schwebt. Tippe mitten im Draft darauf, tippe erneut, und er klappt zu.",
+  "About the group":
+    "Über die Gruppe",
+  "Free":
+    "Kostenlos",
+  "Keeps your tag and settings":
+    "Behält deinen Tag und deine Einstellungen",
+  "No ads":
+    "Keine Werbung",
+  "Now on Google Play":
+    "Jetzt auf Google Play",
+  "Start with step 1":
+    "Fang mit Schritt 1 an",
+  "Then Google reviews the app for everyone. Every tester who stays the two weeks brings that day closer.":
+    "Dann prüft Google die App für alle. Jeder Tester, der die zwei Wochen dabeibleibt, bringt diesen Tag näher.",
+  "Three taps":
+    "Drei Tipps",
+  "Updates through Google Play":
+    "Updates über Google Play",
+  "What you are testing":
+    "Was du testest",
+  "{days} days":
+    "{days} Tage",
+  "{n} testers":
+    "{n} Tester",
+  "Join the test":
+    "Beim Test mitmachen",
+  "No Google Play on your phone?":
+    "Kein Google Play auf deinem Handy?",
+  "Download the APK":
+    "APK herunterladen",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, and tapping the buttons that lead into the Google Play test. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Ein paar benannte Ereignisse werden ebenfalls gezählt, alle anonym: die Web-App installieren, sie öffnen, auf den Android-Download tippen und auf die Buttons tippen, die zum Google-Play-Test führen. Das Download-Ereignis enthält, von welcher Seite es kam und welche Version angeboten wurde, damit sich ein Update von einer Erstinstallation unterscheiden lässt. Sonst nichts.",
+  "Free forever":
+    "Für immer kostenlos",
+  "No account":
+    "Kein Account",
+  "No tracking":
+    "Kein Tracking",
+  "SKILL SCORE":
+    "SKILL-SCORE",
+  "TOP BRAWLERS":
+    "TOP-BRAWLER",
+  "{n} trophies":
+    "{n} Trophäen",
+  "Check your own Skill Score":
+    "Prüfe deinen eigenen Skill-Score",
+  "Elite":
+    "Elite",
+  "Expert":
+    "Experte",
+  "Skilled":
+    "Geübt",
+  "Competent":
+    "Solide",
+  "Casual":
+    "Gelegenheitsspieler",
+  "Beginner":
+    "Anfänger",
+  "Share my profile card":
+    "Meine Profilkarte teilen",
+  "Share as image":
+    "Als Bild teilen",
+  "Making your image…":
+    "Dein Bild wird erstellt…",
+  "Bronze":
+    "Bronze",
+  "Silver":
+    "Silber",
+  "Gold":
+    "Gold",
+  "Diamond":
+    "Diamant",
+  "Masters":
+    "Meister",
+  "Pro":
+    "Pro",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Ein paar benannte Ereignisse werden ebenfalls gezählt, alle anonym: die Web-App installieren, sie öffnen, auf den Android-Download tippen, auf die Buttons zum Google-Play-Test tippen und eine Seite als Bild teilen. Das Download-Ereignis enthält, von welcher Seite es kam und welche Version angeboten wurde, damit sich ein Update von einer Erstinstallation unterscheiden lässt. Sonst nichts.",
+  "RANKED TIER LIST":
+    "RANKED-TIERLIST",
+  "All ranks":
+    "Alle Ränge",
+  "Season {n} · last 7 days":
+    "Saison {n} · letzte 7 Tage",
+  "Not enough battles yet":
+    "Noch nicht genug Matches",
+  "From real Ranked battles, updated every 2 hours":
+    "Aus echten Ranked-Matches, alle 2 Stunden aktualisiert",
+  "Share this tier list":
+    "Diese Tierlist teilen",
+  "in Ranked":
+    "im Ranked",
+  "{p} win rate":
+    "{p} Siegquote",
+  "BEST MAPS":
+    "BESTE MAPS",
+  "COUNTERED BY":
+    "GEKONTERT VON",
+  "STRONG AGAINST":
+    "STARK GEGEN",
+  "BEST RANKED MAPS":
+    "BESTE RANKED-MAPS",
+  "Ready for Android 16: the app screen now fits around the status bar, the navigation bar and the keyboard on newer phones.":
+    "Bereit für Android 16: Der App-Bildschirm passt sich auf neueren Handys jetzt an Statusleiste, Navigationsleiste und Tastatur an.",
+  "A link to the privacy policy at the bottom of the app screen.":
+    "Ein Link zur Datenschutzerklärung unten auf dem App-Bildschirm.",
+  "The same app is now being tested on Google Play. Installing it from there later keeps your tag and settings.":
+    "Dieselbe App wird jetzt auf Google Play getestet. Sie später von dort zu installieren behält deinen Tag und deine Einstellungen.",
+  "{a} vs {b} in Brawl Stars ({v})":
+    "{a} vs {b} in Brawl Stars ({v})",
+  "{a} vs {b}: win rates, pick rates, best modes and their head-to-head record, from real sampled battles. Updated {v}.":
+    "{a} vs {b}: Siegquoten, Pickraten, beste Modi und ihre direkte Bilanz, aus echten erfassten Matches. Aktualisiert {v}.",
+  "{nameA} vs {nameB}":
+    "{nameA} vs {nameB}",
+  "A card to share":
+    "Eine Karte zum Teilen",
+  "A story-sized picture of your result, ready for TikTok, Instagram or your club chat.":
+    "Ein Bild deines Ergebnisses im Story-Format, bereit für TikTok, Instagram oder deinen Club-Chat.",
+  "Brawl Stars account value calculator ({v})":
+    "Brawl Stars Account-Wert-Rechner ({v})",
+  "Compared with about 58,000 active players we track, so you see where your account really stands.":
+    "Verglichen mit rund 58.000 aktiven Spielern, die wir erfassen, damit du siehst, wo dein Account wirklich steht.",
+  "Enter your player tag to see what your Brawl Stars account cost to build, and how it compares with other players.":
+    "Gib deinen Spieler-Tag ein, um zu sehen, was dein Brawl-Stars-Account gekostet hat und wie er im Vergleich zu anderen Spielern dasteht.",
+  "Every power level, hypercharge, star power, gadget and gear you own, priced in coins and power points.":
+    "Jedes Power-Level, jede Hyperladung, Starpower, jedes Gadget und jede Ausrüstung in deinem Besitz, in Münzen und Powerpunkten bewertet.",
+  "How it ranks":
+    "Wie er abschneidet",
+  "How much is your Brawl Stars account worth? Enter your tag: the coins and power points it took to build, and how it ranks against 58,000 active players.":
+    "Wie viel ist dein Brawl-Stars-Account wert? Gib deinen Tag ein: die Münzen und Powerpunkte, die er gekostet hat, und wo er unter 58.000 aktiven Spielern steht.",
+  "What it cost to build":
+    "Was er gekostet hat",
+  "Your tag is under your name on your in-game profile.":
+    "Dein Tag steht im Spielprofil unter deinem Namen.",
+  "Account value":
+    "Account-Wert",
+  "Account value of {tag}":
+    "Account-Wert von {tag}",
+  "Among {n} active players we track. Most of them play Ranked, so the bar is high.":
+    "Unter {n} aktiven Spielern, die wir erfassen. Die meisten spielen Ranked, die Messlatte liegt also hoch.",
+  "Brawlers owned":
+    "Eigene Brawler",
+  "Check another account":
+    "Anderen Account prüfen",
+  "Coins to finish what you own":
+    "Münzen, um deinen Besitz fertigzustellen",
+  "Power levels":
+    "Power-Level",
+  "See the full profile":
+    "Ganzes Profil ansehen",
+  "Share my account value":
+    "Meinen Account-Wert teilen",
+  "Top {n}% of players":
+    "Top {n} % der Spieler",
+  "Values are in-game currency, not money: what it costs in coins and power points to build the same account. Buffies and skins are not included, because they also come from drops. Unofficial fan project, not affiliated with Supercell.":
+    "Die Werte sind Spielwährung, kein Geld: was es an Münzen und Powerpunkten kostet, denselben Account aufzubauen. Buffies und Skins sind nicht enthalten, weil sie auch aus Drops kommen. Inoffizielles Fan-Projekt, keine Verbindung zu Supercell.",
+  "Where the coins went":
+    "Wohin die Münzen gingen",
+  "Worth more than {n}% of players":
+    "Mehr wert als {n} % der Spieler",
+  "plus {pp} power points":
+    "plus {pp} Powerpunkte",
+  "How much is your account worth?":
+    "Wie viel ist dein Account wert?",
+  "MY ACCOUNT VALUE":
+    "MEIN ACCOUNT-WERT",
+  "WHERE THE COINS WENT":
+    "WOHIN DIE MÜNZEN GINGEN",
+  "Calculate":
+    "Berechnen",
+  "Your player tag, e.g. #2PQ8LJ9V":
+    "Dein Spieler-Tag, z. B. #2PQ8LJ9V",
+  "How much is this account worth? See its value and how it ranks":
+    "Wie viel ist dieser Account wert? Sieh seinen Wert und wo er steht",
+  "Brawl Stars, ranked by me":
+    "Brawl Stars, von mir gerankt",
+  "MY TIER LIST":
+    "MEINE TIERLIST",
+  "Make yours and compare it with the data":
+    "Erstell deine und vergleich sie mit den Daten",
+  "Matches the real data: {n}%":
+    "Übereinstimmung mit den echten Daten: {n} %",
+  "{name}: me {mine}, data {data}":
+    "{name}: ich {mine}, Daten {data}",
+  "Compared with the Ranked tier list from the last 7 days of battles.":
+    "Verglichen mit der Ranked-Tierlist aus den Matches der letzten 7 Tage.",
+  "No disagreements: you see the meta exactly as the battles do.":
+    "Keine Abweichungen: Du siehst das Meta genau so wie die Matches.",
+  "Save as image":
+    "Als Bild speichern",
+  "Your list matches the real data: {n}%":
+    "Deine Liste stimmt zu {n} % mit den echten Daten überein",
+  "you put it in {mine}, the data says {data}: you rate it higher":
+    "du hast ihn in {mine}, die Daten sagen {data}: du bewertest ihn höher",
+  "you put it in {mine}, the data says {data}: you rate it lower":
+    "du hast ihn in {mine}, die Daten sagen {data}: du bewertest ihn niedriger",
+  "Brawl Stars update: patch notes, new brawlers and balance changes ({v})":
+    "Brawl-Stars-Update: Patch Notes, neue Brawler und Balance-Änderungen ({v})",
+  "Did the balance changes work? See the measured impact":
+    "Haben die Balance-Änderungen funktioniert? Sieh die gemessene Wirkung",
+  "Latest Brawl Stars update":
+    "Neuestes Brawl-Stars-Update",
+  "Next Ranked season: {date}":
+    "Nächste Ranked-Saison: {date}",
+  "Published {date}":
+    "Veröffentlicht am {date}",
+  "Supercell does not announce update or Brawl Talk dates far ahead. They appear here as soon as they are official, with the new notes the day they ship.":
+    "Supercell kündigt Update- oder Brawl-Talk-Termine nicht lange im Voraus an. Sie erscheinen hier, sobald sie offiziell sind, mit den neuen Notes am Tag ihres Erscheinens.",
+  "The latest Brawl Stars update at a glance: new brawlers, hypercharges, balance changes and whether they worked, plus what is coming next.":
+    "Das neueste Brawl-Stars-Update im Überblick: neue Brawler, Hyperladungen, Balance-Änderungen und ob sie funktioniert haben, dazu, was als Nächstes kommt.",
+  "This update at a glance":
+    "Dieses Update im Überblick",
 };
