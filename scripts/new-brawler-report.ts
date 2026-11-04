@@ -16,6 +16,7 @@
  * once made the strongest brawler of the week read as the weakest.
  */
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
+import { getOfficialBrawlers } from '@/lib/bs-api';
 import { getPrisma } from '@/lib/prisma';
 import { getMetaIndex } from '@/lib/stats';
 
@@ -25,10 +26,13 @@ async function main() {
   const prisma = getPrisma();
   if (!prisma) throw new Error('no database');
 
-  const [trophy, ranked, art] = await Promise.all([
+  const [trophy, ranked, art, official] = await Promise.all([
     getMetaIndex('trophy', 7),
     getMetaIndex('ranked', 7),
     getBrawlerArtMap(),
+    getOfficialBrawlers()
+      .then((r) => r.items.find((b: { id: number }) => b.id === id))
+      .catch(() => undefined),
   ]);
   const tiered = [...trophy.values()]
     .filter((b) => b.tier !== null)
@@ -63,6 +67,12 @@ async function main() {
 
   const names = new Map<number, string>();
   for (const a of [...(brawler?.starPowers ?? []), ...(brawler?.gadgets ?? [])]) names.set(a.id, a.name);
+  // A brawler the mirror does not list yet has no abilities there; the game's
+  // own catalogue names them from release day (2026-11-04: Thunder Frogs, Rey
+  // and Ruby).
+  for (const a of [...(official?.starPowers ?? []), ...(official?.gadgets ?? [])]) {
+    if (!names.has(a.id)) names.set(a.id, a.name);
+  }
   const top = (kind: string, count: number) =>
     build
       .filter((r) => r.kind === kind)

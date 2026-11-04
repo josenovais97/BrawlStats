@@ -4,7 +4,10 @@
 #   brawlzone-newbrawler [--no-post] [BRAWLER_ID]
 #
 # Run at 13:30 UTC by brawlzone-newbrawler.timer. A brawler is new the day it
-# first appears in BrawlAPI's catalogue that this job has not seen before; it
+# first appears in the official game API's /brawlers that this job has not
+# seen before (BrawlAPI's catalogue only if that call fails: on 2026-11-04 it
+# still lacked Thunder Frogs, Rey and Ruby a day after release, so none of the
+# three was ever picked up); it
 # is posted once it has been out two days and has 5,000 decided trophy-match
 # battles behind its score, and given up on after ten days. Then:
 # scripts/new-brawler-report.ts (in the sampler container) for the numbers,
@@ -40,15 +43,25 @@ only="${1:-}"
 
 find "$SOCIAL" -mindepth 2 -maxdepth 2 -type d -mtime +30 -exec rm -rf {} + 2>/dev/null
 
+KEY=$(grep -oP '^BRAWL_STARS_API_KEY=\K.*' "$ENV_FILE" | tr -d '"')
+API=$(grep -oP '^BRAWL_STARS_API_BASE=\K.*' "$ENV_FILE" | tr -d '"'); API=${API:-https://bsproxy.royaleapi.dev/v1}
+catalogue () { # the game's own list first; BrawlAPI's if the game API is down
+  curl -sf --max-time 60 -H "Authorization: Bearer $KEY" "$API/brawlers" \
+    || curl -sf --max-time 60 -A "$UA" https://api.brawlapi.com/v1/brawlers
+}
+
 # Which brawler, if any, is due today. Prints its id or nothing.
 if [ -n "$only" ]; then
   due=$only
 else
-  due=$(curl -sf --max-time 60 -A "$UA" https://api.brawlapi.com/v1/brawlers | python3 -c '
+  due=$(catalogue | python3 -c '
 import datetime, json, os, sys
 path = sys.argv[1]
 today = datetime.date.today()
-ids = sorted(b["id"] for b in json.load(sys.stdin)["list"])
+d = json.load(sys.stdin)
+ids = sorted(b["id"] for b in (d.get("items") or d.get("list") or []))
+if not ids:
+    raise SystemExit("empty brawler list")
 try:
     st = json.load(open(path))
 except (OSError, ValueError):
@@ -89,8 +102,6 @@ fi
 # Gear names: the official API spells them, BrawlAPI does not list them.
 # Read from one leaderboard player's brawlers, refreshed weekly.
 if [ ! -s "$GEARS" ] || [ -n "$(find "$GEARS" -mtime +7)" ]; then
-  KEY=$(grep -oP '^BRAWL_STARS_API_KEY=\K.*' "$ENV_FILE" | tr -d '"')
-  API=$(grep -oP '^BRAWL_STARS_API_BASE=\K.*' "$ENV_FILE" | tr -d '"'); API=${API:-https://bsproxy.royaleapi.dev/v1}
   tag=$(docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" brawlzone -At' <<'SQL'
 select tag from sampled_players where source = 'ranking' order by trophies desc nulls last limit 1
 SQL
