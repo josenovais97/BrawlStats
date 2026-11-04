@@ -40,7 +40,7 @@ export function PlayerAutopsy({
       {/* The section title belongs to the parent now, which pairs this with the
           deep read of the last loss. This half only needs to say which of the
           two questions it answers. */}
-      <p className="text-sm text-muted">{t('Across the {losses}', { losses: autopsy.losses })}{' '}{autopsy.losses === 1 ? t('loss') : t('losses')}{' '}{t('in this log, rather than one-off results:')}</p>
+      <p className="text-sm text-muted">{t('Across the {losses}', { losses: autopsy.losses })}{' '}{autopsy.losses === 1 ? t('loss') : t('losses', { n: autopsy.losses })}{' '}{t('in this log, rather than one-off results:')}</p>
 
       <ul className="card divide-y divide-border overflow-hidden">
         {autopsy.findings.map((finding) => {
@@ -89,7 +89,7 @@ export function PlayerAutopsy({
                       )}
                     </span>
                     <span className="block text-xs text-muted">
-                      {finding.losses} {finding.losses === 1 ? t('loss') : t('losses')}{' '}{t('there ·')}{' '}{t('{v} pts below the map average', { v: Math.abs((finding.edge ?? 0) * 100).toFixed(1) })}</span>
+                      {finding.losses} {finding.losses === 1 ? t('loss') : t('losses', { n: finding.losses })}{' '}{t('there ·')}{' '}{t('{v} pts below the map average', { v: Math.abs((finding.edge ?? 0) * 100).toFixed(1) })}</span>
                   </>
                 ) : (
                   <>

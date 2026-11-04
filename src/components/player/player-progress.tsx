@@ -203,7 +203,7 @@ function TrackView({ track, kind }: { track: Track; kind: keyof typeof KINDS }) 
         ) : null}
       </dl>
 
-      <p className="mt-3 text-sm text-muted">{t('Tracked {tracked}', { tracked: tracked })}{' '}{tracked === 1 ? t('day') : t('days')} &middot;{' '}
+      <p className="mt-3 text-sm text-muted">{t('Tracked {tracked}', { tracked: tracked })}{' '}{tracked === 1 ? t('day') : t('days', { n: tracked })} &middot;{' '}
         <strong
           className={`font-semibold tabular-nums ${
             overall > 0 ? 'text-victory' : overall < 0 ? 'text-defeat' : 'text-foreground'

@@ -106,7 +106,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
           <div className="space-y-3">
             <p className="text-sm text-muted">
               <span className="font-semibold text-foreground">{matches.length}</span>{' '}
-              {matches.length === 1 ? t('map') : t('maps')}{' '}{t('matching “{query}”', { query: query })}</p>
+              {matches.length === 1 ? t('map') : t('maps', { n: matches.length })}{' '}{t('matching “{query}”', { query: query })}</p>
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {matches.map((map) => (
                 <MapCard key={`${map.modeSlug}-${map.id}`} map={map} sublabel={map.modeLabel} />
@@ -179,7 +179,7 @@ export function MapCatalogue({ groups }: { groups: CatalogueGroup[] }) {
                   {t(group.label)}
                 </span>
                 <span className="label-game block px-3 pb-2 text-xs text-muted">
-                  {group.maps.length} {group.maps.length === 1 ? t('map') : t('maps')}
+                  {group.maps.length} {group.maps.length === 1 ? t('map') : t('maps', { n: group.maps.length })}
                 </span>
               </Link>
             </li>

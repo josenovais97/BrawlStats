@@ -11,5 +11,5 @@ import { makeT, type T } from '@/lib/t-core';
  */
 export function getUT(): T {
   const locale = requestLocale();
-  return makeT(clientDict(locale));
+  return makeT(clientDict(locale), locale);
 }

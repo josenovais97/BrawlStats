@@ -161,7 +161,7 @@ function Result({
             <>
               {' '}
               <span className="text-foreground">
-                {scan.missed} {scan.missed === 1 ? t('member') : t('members')}{' '}{t('could not be read')}</span>{t(', so the real figure is this or better.')}</>
+                {scan.missed} {scan.missed === 1 ? t('member') : t('members', { n: scan.missed })}{' '}{t('could not be read')}</span>{t(', so the real figure is this or better.')}</>
           ) : null}
         </p>
 

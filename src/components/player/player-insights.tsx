@@ -139,7 +139,7 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                         {brawler.brawlerName.toLowerCase()}
                       </p>
                       <p className="truncate text-xs text-muted">
-                        {brawler.battles} {brawler.battles === 1 ? t('battle') : t('battles')}
+                        {brawler.battles} {brawler.battles === 1 ? t('battle') : t('battles', { n: brawler.battles })}
                         {brawler.winRate !== null
                           ? t(' · {winRate} win', { winRate: formatPercent(brawler.winRate) })
                           : ''}

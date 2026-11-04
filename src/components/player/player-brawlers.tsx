@@ -178,7 +178,7 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
               type="button"
               onClick={() => setShowAll(true)}
               className="min-h-11 w-full rounded-xl border border-border bg-surface-2/60 text-sm font-semibold text-muted transition-colors hover:border-brand/50 hover:text-foreground"
-            >{t('Show {hidden} more', { hidden: hidden })}{' '}{hidden === 1 ? t('brawler') : t('brawlers')}
+            >{t('Show {hidden} more', { hidden: hidden })}{' '}{hidden === 1 ? t('brawler') : t('brawlers', { n: hidden })}
             </button>
           ) : null}
         </>

@@ -265,7 +265,7 @@ export function PictureBoard({
             <div>
               <p className="text-lg font-black">
                 {solved
-                  ? t('Got it in {length}', { length: guesses.length }) + ' ' + (guesses.length === 1 ? t('guess') : t('guesses')) + '!'
+                  ? t('Got it in {length}', { length: guesses.length }) + ' ' + (guesses.length === 1 ? t('guess') : t('guesses', { n: guesses.length })) + '!'
                   : t('Out of guesses.')}
               </p>
               {board.answer ? (

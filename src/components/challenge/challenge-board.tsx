@@ -192,7 +192,7 @@ function HintPanel({ hints, guesses }: { hints: Hints | null; guesses: number })
             <div className="text-xs leading-tight">
               <p className="font-semibold">{t(label)}</p>
               <p className="text-muted">
-                {url ? t('Revealed') : t('in {left} {v}', { left: left, v: left === 1 ? t('guess') : t('guesses') })}
+                {url ? t('Revealed') : t('in {left} {v}', { left: left, v: left === 1 ? t('guess') : t('guesses', { n: left }) })}
               </p>
             </div>
           </div>
@@ -567,7 +567,7 @@ export function ChallengeBoard({
         <div className="card card-glow overflow-hidden">
           <span className="block h-1 w-full bg-emerald-400" />
           <div className="space-y-3 p-5">
-            <p className="text-lg font-black">{t('Got it in {length}', { length: results.length })}{' '}{results.length === 1 ? t('guess') : t('guesses')}.
+            <p className="text-lg font-black">{t('Got it in {length}', { length: results.length })}{' '}{results.length === 1 ? t('guess') : t('guesses', { n: results.length })}.
             </p>
             {/* A countdown rather than "midnight UTC": one is a fact you have
                 to convert, the other is an invitation with a number on it. */}

@@ -90,7 +90,7 @@ export function WrappedCard({
           <Stat
             label={t('Star player')}
             value={formatNumber(insights.starPlayerCount)}
-            hint={insights.starPlayerCount === 1 ? t('time') : t('times')}
+            hint={insights.starPlayerCount === 1 ? t('time') : t('times', { n: insights.starPlayerCount })}
           />
         </div>
 

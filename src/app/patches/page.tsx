@@ -173,7 +173,7 @@ function Scoreboard({
         large update touches most of the roster and moves a handful of it.
       */}
       <p className="card border-border-strong p-5 leading-relaxed">{t('This update changed')}{' '}
-        <strong>{impact.movements.length + impact.unmeasured.length}{' '}{t('brawlers')}</strong>.{' '}
+        <strong>{impact.movements.length + impact.unmeasured.length}{' '}{t('brawlers', { n: impact.movements.length + impact.unmeasured.length })}</strong>.{' '}
         {moved.length === 0 ? (
           <>{t('None of them moved more than {NOTABLE_DELTA} points either way in the', { NOTABLE_DELTA: NOTABLE_DELTA })}{' '}{t('{PATCH_WINDOW_DAYS} days afterwards.', { PATCH_WINDOW_DAYS: PATCH_WINDOW_DAYS })}</>
         ) : (

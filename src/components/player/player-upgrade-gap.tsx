@@ -74,7 +74,7 @@ export function PlayerUpgradeGap({
         <p className="text-sm leading-relaxed text-muted">
           {stranded.length === 1 ? t('One brawler carries') : t('{length} carry', { length: stranded.length })}{' '}{t('a hypercharge or buffie below power {MAX_POWER_LEVEL}.', { MAX_POWER_LEVEL: MAX_POWER_LEVEL })}{coins > 0 ? (
             <>
-              {' '}{t('Finishing')}{' '}{stranded.length === 1 ? t('it') : t('them all')}{' '}{t('costs about')}{' '}
+              {' '}{t('Finishing')}{' '}{stranded.length === 1 ? t('it') : t('them all', { n: stranded.length })}{' '}{t('costs about')}{' '}
               <strong className="font-semibold text-foreground">{formatNumber(coins)}{' '}{t('coins')}</strong>
               .
             </>

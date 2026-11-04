@@ -94,7 +94,7 @@ export function BrawlerSkins({
 
       {skins.length > top.length ? (
         <p className="text-xs text-muted">
-          {skins.length - top.length}{' '}{t('rarer')}{' '}{skins.length - top.length === 1 ? t('skin') : t('skins')}{' '}{t('not shown.')}</p>
+          {skins.length - top.length}{' '}{t('rarer')}{' '}{skins.length - top.length === 1 ? t('skin') : t('skins', { n: skins.length - top.length })}{' '}{t('not shown.')}</p>
       ) : null}
     </div>
   );

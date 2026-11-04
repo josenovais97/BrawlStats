@@ -173,7 +173,7 @@ export function DailyHub({ date, picker }: { date: string; picker: PickerEntry[]
     const line = (m: (typeof MODES)[number]) => {
       const s = status?.[m.key] ?? NONE;
       if (!s.done) return `${m.icon} ${t(m.label)}: —`;
-      if (m.key === 'classic') return `${m.icon} ${t(m.label)}: ${s.guesses} ${s.guesses === 1 ? t('guess') : t('guesses')}`;
+      if (m.key === 'classic') return `${m.icon} ${t(m.label)}: ${s.guesses} ${s.guesses === 1 ? t('guess') : t('guesses', { n: s.guesses })}`;
       const misses = s.solved ? s.guesses - 1 : TRIES;
       const squares = '🟥'.repeat(misses) + (s.solved ? '🟩' : '');
       return `${m.icon} ${t(m.label)}: ${s.solved ? `${s.guesses}/${TRIES}` : `X/${TRIES}`} ${squares}`;

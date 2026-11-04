@@ -1144,7 +1144,7 @@ export const RU: Record<string, string> = {
   "Your shape":
     "Твоя схема",
   "battles":
-    "боёв",
+    "{n|one:бой|few:боя|many:боёв|other:бои}",
   "No preview":
     "Нет превью",
   "beats":
@@ -1156,7 +1156,7 @@ export const RU: Record<string, string> = {
   "map":
     "карта",
   "maps":
-    "карты",
+    "{n|one:карта|few:карты|many:карт|other:карты}",
   "{battles} battles · {players} players":
     "боёв: {battles} · игроков: {players}",
   "{winRate} won":
@@ -1205,4 +1205,804 @@ export const RU: Record<string, string> = {
     " (уже покрыто)",
   ", with a second pick spare in":
     ", и ещё один запасной пик есть в",
+  "Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.":
+    "Покрытие — это наличие пика из топ-3 на 9-м уровне силы или выше в режиме, который сейчас в игре. Открытие новых бойцов намеренно не учитывается: бойца, которого у тебя нет, нельзя прокачать сегодня, поэтому каждый шаг здесь можно начать сразу.",
+  "Covers {v}":
+    "Покрывает: {v}",
+  "Ranked coverage goes from":
+    "Покрытие в ранговых боях растёт с",
+  "Second pick in {v}":
+    "Второй пик: {v}",
+  "Strengthens the rotation":
+    "Усиливает ротацию",
+  "The cheapest set of upgrades that covers the most of the live Ranked rotation, from brawlers this account already owns.":
+    "Самый дешёвый набор улучшений, который покрывает большую часть текущей ротации ранговых боёв, из бойцов, которые уже есть на этом аккаунте.",
+  "What to upgrade next":
+    "Что улучшить дальше",
+  "modes":
+    "режимов",
+  "of them":
+    "из них",
+  "power {power} → 11":
+    "сила {power} → 11",
+  "to":
+    "до",
+  "to upgrade":
+    "на улучшение",
+  " Elo":
+    " Эло",
+  "Best tracked day":
+    "Лучший отслеженный день",
+  "Last {days} days":
+    "Последние дни: {days}",
+  "Now":
+    "Сейчас",
+  "One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.":
+    "Одна точка в день, записывается при просмотре этого профиля, поэтому покрывает дни, когда кто-то заходил, а не все сыгранные дни.",
+  "Recent progress":
+    "Недавний прогресс",
+  "Tracked {tracked}":
+    "Отслежено {tracked}",
+  "Trophies and Ranked, from the points recorded on each profile view.":
+    "Трофеи и ранговые бои по точкам, записанным при каждом просмотре профиля.",
+  "day":
+    "день",
+  "days":
+    "{n|one:день|few:дня|many:дней|other:дни}",
+  "{points} views over {days} days":
+    "{points} {points|one:просмотр|few:просмотра|many:просмотров|other:просмотра} за {days} {days|one:день|few:дня|many:дней|other:дня}",
+  "{title} history over {days} days, from {low} to {high}":
+    "История {title} за {days} {days|one:день|few:дня|many:дней|other:дня}, от {low} до {high}",
+  "{unit} overall":
+    "{unit} всего",
+  " This account has no Ranked elo on record, so that weight is spread across the rest{v}.":
+    " У этого аккаунта нет записанного Эло в ранговых боях, поэтому этот вес распределён по остальному{v}.",
+  ", the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.":
+    " — единственный режим, где подбор сводит соперников одного уровня, поэтому оценка отражает то, как играет аккаунт, а не сколько в него вложено. По той же причине прогресс ограничен 15%.",
+  "Weighted toward":
+    "С упором на",
+  " today":
+    " сегодня",
+  ", ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.":
+    ", по трофеям в день с момента последнего чтения каждого игрока. Это другая выборка, чем официальная сотня лучших ниже, поэтому эти имена там в основном не встречаются.",
+  "Biggest trophy gains":
+    "Самый большой прирост трофеев",
+  "Climbing fastest":
+    "Быстрее всех растут",
+  "From our own daily snapshots of the":
+    "По нашим ежедневным срезам",
+  "in 1 day":
+    "за 1 день",
+  "in {days} days":
+    "за {days} {days|one:день|few:дня|many:дней|other:дня}",
+  "sampled player pool":
+    "выборки игроков",
+  "total":
+    "всего",
+  " · {winRate} win":
+    " · {winRate} побед",
+  "Activity":
+    "Активность",
+  "Avg place {v}":
+    "Среднее место {v}",
+  "Battles per day":
+    "Боёв в день",
+  "Faced most":
+    "Чаще всего против",
+  "Last 24 hours":
+    "Последние 24 часа",
+  "Last seen":
+    "Последний раз в игре",
+  "Most played":
+    "Чаще всего играет",
+  "Played with":
+    "Играл вместе с",
+  "Recent form":
+    "Недавняя форма",
+  "Top mode":
+    "Лучший режим",
+  "battle":
+    "бой",
+  "#{rank} in the world on {brawlerName}":
+    "#{rank} в мире на {brawlerName}",
+  "Best world ranking":
+    "Лучшее место в мире",
+  "Global · {trophies} trophies":
+    "Мир · {trophies} {trophies|one:трофей|few:трофея|many:трофеев|other:трофея}",
+  "Show all {length} placements":
+    "Показать все места ({length})",
+  "Top 10":
+    "Топ-10",
+  "Top 100":
+    "Топ-100",
+  "Top 200":
+    "Топ-200",
+  "Top 25":
+    "Топ-25",
+  "Top 50":
+    "Топ-50",
+  "World ranked":
+    "В мировом рейтинге",
+  ", which covers the 3v3 modes only.":
+    ", который охватывает только режимы 3 на 3.",
+  ", which rates every brawler from sampled ladder battles. For competitive play see the":
+    ", который оценивает каждого бойца по собранным боям на пути к славе. Для соревновательной игры смотри",
+  "Mains out of favour":
+    "Мейны не в фаворе",
+  "Power {power} · {trophies} trophies":
+    "Сила {power} · {trophies} {trophies|one:трофей|few:трофея|many:трофеев|other:трофея}",
+  "Strong, not finished":
+    "Сильные, но не доведённые",
+  "This roster scored against the current":
+    "Этот состав оценён по текущему",
+  "Top-tier brawlers you own below power 11. The cheapest upgrades on this account.":
+    "Бойцы из верхних тиров ниже 11-го уровня силы. Самые дешёвые улучшения на этом аккаунте.",
+  "Your {MAIN_COUNT} highest-trophy brawlers that currently sit in C or D.":
+    "Твои бойцы с наибольшим числом трофеев (их {MAIN_COUNT}), которые сейчас в тирах C или D.",
+  "{trophies} trophies · power {power}":
+    "{trophies} {trophies|one:трофей|few:трофея|many:трофеев|other:трофея} · сила {power}",
+  "trophy tier list":
+    "тир-листу по трофеям",
+  "3v3 wins":
+    "Победы 3 на 3",
+  "A BrawlZone metric out of 10, not an official Brawl Stars statistic.":
+    "Метрика BrawlZone из 10, а не официальная статистика Brawl Stars.",
+  "Account strength":
+    "Сила аккаунта",
+  "Average per brawler":
+    "В среднем на бойца",
+  "Best win streak":
+    "Лучшая серия побед",
+  "Both accounts read live from the official API. Nothing is stored.":
+    "Оба аккаунта читаются вживую из официального API. Ничего не сохраняется.",
+  "Brawlers unlocked":
+    "Открыто бойцов",
+  "Comparison":
+    "Сравнение",
+  "Competitive":
+    "Соревновательные",
+  "Current trophies":
+    "Текущие трофеи",
+  "Hypercharges":
+    "Гиперзаряды",
+  "Peak Ranked":
+    "Пик в ранговых боях",
+  "Peak trophies":
+    "Пик трофеев",
+  "Power 11 brawlers":
+    "Бойцы 11-го уровня силы",
+  "Prestige":
+    "Прайм",
+  "Ranked elo":
+    "Эло в ранговых боях",
+  "Ready. Waiting on the other player.":
+    "Готово. Ждём второго игрока.",
+  "Roster unlocked":
+    "Открыто из состава",
+  "Skill score":
+    "Оценка навыка",
+  "The highest streak on any single brawler. The API publishes no account-wide streak.":
+    "Самая длинная серия на одном бойце. API не публикует серию по всему аккаунту.",
+  "Total trophies divided by brawlers unlocked. A rough measure of depth rather than breadth.":
+    "Все трофеи, делённые на число открытых бойцов. Грубая мера глубины, а не ширины.",
+  "Trophies":
+    "Трофеи",
+  "A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.":
+    "Гиперзаряд не требует прокачанного до максимума бойца, поэтому легко оказаться с лучшим доступным улучшением на том, кто проигрывает драку раньше, чем он зарядится. По тому, насколько каждый близок к {MAX_POWER_LEVEL}-му уровню силы, самые дешёвые — первыми.",
+  "Finishing":
+    "Довести",
+  "One brawler carries":
+    "Один боец несёт",
+  "Start here":
+    "Начни отсюда",
+  "Why this matters":
+    "Почему это важно",
+  "a hypercharge or buffie below power {MAX_POWER_LEVEL}.":
+    "гиперзаряд или баффи ниже {MAX_POWER_LEVEL}-го уровня силы.",
+  "coins":
+    "монет",
+  "costs about":
+    "до максимума обойдётся примерно в",
+  "it":
+    "его",
+  "them all":
+    "их всех",
+  "to power {MAX_POWER_LEVEL} for about":
+    "до {MAX_POWER_LEVEL}-го уровня силы примерно за",
+  "{length} buffie":
+    "{length} {length|one:баффи|few:баффи|many:баффи|other:баффи}",
+  "{length} carry":
+    "Бойцов, которые несут: {length} —",
+  "{name}: about {cost} coins from power {power} to {MAX_POWER_LEVEL}":
+    "{name}: примерно {cost} монет с {power}-го до {MAX_POWER_LEVEL}-го уровня силы",
+  "{power} coins":
+    "{power} монет",
+  "Show all {length}":
+    "Показать все ({length})",
+  "Hypercharge":
+    "Гиперзаряд",
+  "A shareable summary of a Brawl Stars player’s last twenty-five battles.":
+    "Сводка последних двадцати пяти боёв игрока Brawl Stars, которой можно поделиться.",
+  "Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.":
+    "Всё здесь измерено по истории боёв, которую отдаёт игра, а она хранит примерно последние двадцать пять игр и не больше. Эндпоинта истории нет, поэтому это снимок отрезка, а не сезона: открой снова после игры, и он изменится.",
+  "Recent run":
+    "Недавний отрезок",
+  "The last twenty-five battles, summed up. Built to screenshot.":
+    "Последние двадцать пять боёв в одной сводке. Создано для скриншота.",
+  "{tag} — recent run":
+    "{tag} — недавний отрезок",
+  "Account":
+    "Аккаунт",
+  "Battles":
+    "Бои",
+  "Do next":
+    "Что дальше",
+  "No player exists with the tag {tag}. Check it in-game under your profile.":
+    "Игрока с тегом {tag} не существует. Проверь его в игре в своём профиле.",
+  "Overview":
+    "Обзор",
+  "Player not found":
+    "Игрок не найден",
+  "Player {tag}":
+    "Игрок {tag}",
+  "Recent battles":
+    "Недавние бои",
+  "The account":
+    "Аккаунт",
+  "What to do next":
+    "Что делать дальше",
+  "Your roster on the meta":
+    "Твой состав в мете",
+  "{length} unlocked, read against the current tier list.":
+    "Открыто: {length}, в сравнении с текущим тир-листом.",
+  "{name} has {v} trophies and {length} brawlers.":
+    "У {name} {v} трофеев и {length} {length|one:боец|few:бойца|many:бойцов|other:бойца}.",
+  "Account completion":
+    "Прогресс аккаунта",
+  "Brawlers at power 11":
+    "Бойцы на 11-м уровне силы",
+  "Coins invested":
+    "Вложено монет",
+  "Currently in use":
+    "Сейчас используется",
+  "Estimated":
+    "Примерно",
+  "Everything unlocked and maxed.":
+    "Всё открыто и прокачано до максимума.",
+  "Gears equipped":
+    "Надето снаряжения",
+  "Investment":
+    "Вложения",
+  "Matches":
+    "Матчи",
+  "Skins equipped":
+    "Надето скинов",
+  "Still to get":
+    "Ещё получить",
+  "still needed to take every brawler already unlocked to power 11.":
+    "ещё нужно, чтобы довести каждого уже открытого бойца до 11-го уровня силы.",
+  "{coinsToMaxOwned} coins":
+    "{coinsToMaxOwned} монет",
+  "{ownedRaw} owned in total; completion counts the two per brawler that can be equipped":
+    "Всего есть: {ownedRaw}; прогресс считает по два на бойца, которые можно надеть",
+  "· what it cost":
+    "· сколько это стоило",
+  "Across the {losses}":
+    "Всего {losses}",
+  "In {losses} of your losses":
+    "В {losses} {losses|one:твоём поражении|few:твоих поражениях|many:твоих поражениях|other:твоих поражениях}",
+  "Opponent":
+    "Соперник",
+  "in this log, rather than one-off results:":
+    "в этой истории — закономерности, а не разовые результаты:",
+  "is a weak pick on":
+    "— слабый пик на карте",
+  "loss":
+    "поражение",
+  "losses":
+    "{n|one:поражение|few:поражения|many:поражений|other:поражения}",
+  "there ·":
+    "там ·",
+  "was on the other side":
+    "был на другой стороне",
+  "{v} pts below the map average":
+    "на {v} пункта ниже среднего карты",
+  "Adjusted win rate":
+    "Скорректированный процент побед",
+  "All comparisons":
+    "Все сравнения",
+  "Battles where one was on each team, counted once from the sampled player's side.":
+    "Бои, где по одному было в каждой команде, считаются один раз со стороны игрока из выборки.",
+  "Best mode":
+    "Лучший режим",
+  "Class":
+    "Класс",
+  "Compare brawlers":
+    "Сравнить бойцов",
+  "Each figure comes from a different set of sampled players, so the two do not add up to 100%.":
+    "Каждое число взято из своего набора игроков выборки, поэтому в сумме они не дают 100%.",
+  "Head to head":
+    "Лицом к лицу",
+  "Is {nameA} better than {nameB}?":
+    "{nameA} лучше, чем {nameB}?",
+  "More battles means a more reliable rate, not a better brawler.":
+    "Больше боёв значит более надёжный процент, а не лучшего бойца.",
+  "Not enough battles in any one mode yet.":
+    "Пока недостаточно боёв ни в одном режиме.",
+  "Not enough sampled battles yet.":
+    "Пока недостаточно собранных боёв.",
+  "Profile":
+    "Профиль",
+  "Rarity":
+    "Редкость",
+  "Sampled battles":
+    "Собранные бои",
+  "Side by side":
+    "Бок о бок",
+  "These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.":
+    "Эти двое встречались в собранных боях слишком редко, чтобы показать счёт. Данные матчапов собираются только в командных режимах, и для конкретной пары им нужно время.",
+  "Tier":
+    "Тир",
+  "What is the {nameA} vs {nameB} head-to-head record?":
+    "Какой счёт в противостоянии {nameA} и {nameB}?",
+  "Where each one performs":
+    "Где каждый силён",
+  "Win rate is adjusted against the sample average, so both columns are on the same scale.":
+    "Процент побед скорректирован по среднему выборки, поэтому обе колонки в одной шкале.",
+  "of {decidedSampleSize} sampled games against {opponent}":
+    "из {decidedSampleSize} собранных игр против {opponent}",
+  "vs":
+    "против",
+  "wins":
+    "побед",
+  "{a} vs {b} in Brawl Stars, {v}: win rates, pick rates, tiers and best modes side by side, plus their head-to-head record when they actually met — measured from sampled battles rather than opinion.":
+    "{a} против {b} в Brawl Stars, {v}: процент побед, частота выбора, тиры и лучшие режимы рядом, плюс их личный счёт, когда они встречались, — по собранным боям, а не по мнениям.",
+  "{a} vs {b}: which is better in Brawl Stars? ({v})":
+    "{a} против {b}: кто лучше в Brawl Stars? ({v})",
+  "{nameA} vs {nameB} FAQ":
+    "{nameA} против {nameB}: частые вопросы",
+  "{nameA} wins {winRate} of the {decidedSampleSize} sampled battles where {nameB} was on the other team.":
+    "{nameA} побеждает в {winRate} из {decidedSampleSize} собранных боёв, где {nameB} был в другой команде.",
+  "{subject} vs {opponent}":
+    "{subject} против {opponent}",
+  "All-time best":
+    "Лучшее за всё время",
+  "Current":
+    "Текущее",
+  "Current, season best and all-time best":
+    "Текущее, лучшее за сезон и за всё время",
+  "Global trophies":
+    "Мировые трофеи",
+  "Of {population} ranked players":
+    "Из {population} игроков в ранговых боях",
+  "Of {population} tracked players":
+    "Из {population} отслеживаемых игроков",
+  "Ranked standing":
+    "Положение в ранговых боях",
+  "Ranking":
+    "Рейтинг",
+  "Season best":
+    "Лучшее за сезон",
+  "Trophy standing":
+    "Положение по трофеям",
+  "World rank":
+    "Место в мире",
+  "best":
+    "лучшее",
+  "elo":
+    "Эло",
+  "elo now":
+    "Эло сейчас",
+  "At its peak right now":
+    "Сейчас на пике",
+  "Duo SD wins":
+    "Победы в парном Столкновении",
+  "Exp points":
+    "Очки опыта",
+  "Highest trophies":
+    "Максимум трофеев",
+  "In a row, all-time":
+    "Подряд, за всё время",
+  "Lifetime":
+    "За всё время",
+  "Longest survival":
+    "Дольше всех выжил",
+  "Longest time held":
+    "Дольше всех удерживал",
+  "Longest win streak":
+    "Самая длинная серия побед",
+  "Now on {trophies}":
+    "Сейчас на {trophies}",
+  "On {live} in a row right now":
+    "Сейчас подряд: {live}",
+  "Personal bests":
+    "Личные рекорды",
+  "Solo SD wins":
+    "Победы в одиночном Столкновении",
+  "{length} at power 11":
+    "На 11-м уровне силы: {length}",
+  "· since the account was made":
+    "· с момента создания аккаунта",
+  "Average":
+    "Среднее",
+  "Below entry bar":
+    "Ниже порога входа",
+  "Composition":
+    "Состав",
+  "Highest":
+    "Максимум",
+  "Lowest":
+    "Минимум",
+  "Median":
+    "Медиана",
+  "Open slots":
+    "Свободные места",
+  "Roster insights":
+    "Аналитика состава",
+  "Top 5 share":
+    "Доля топ-5",
+  "Top contributors":
+    "Главные вкладчики",
+  "Trophy spread":
+    "Разброс трофеев",
+  "Best pick in this mode":
+    "Лучший пик в этом режиме",
+  "No other picks with data yet":
+    "Других пиков с данными пока нет",
+  "Nothing here at power {READY_POWER} yet":
+    "Здесь пока никого на {READY_POWER}-м уровне силы",
+  "What to play in each mode you can queue right now, and what would improve that answer. Scored from sampled Ranked battles, not from the ladder.":
+    "Что играть в каждом режиме, куда можно встать в очередь прямо сейчас, и что улучшило бы этот ответ. По собранным ранговым боям, а не по пути к славе.",
+  "Your best here · #{rank}":
+    "Твой лучший здесь · #{rank}",
+  "Your picks by mode":
+    "Твои пики по режимам",
+  "Both accounts are on exactly the same trophy count.":
+    "У обоих аккаунтов ровно одинаковое число трофеев.",
+  "Dead level":
+    "Ровно поровну",
+  "Race to":
+    "Гонка до",
+  "{name} leads by {gap}":
+    "{name} впереди на {gap}",
+  "{v} to go":
+    "Осталось {v}",
+  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
+    "Лидеру осталось {v}. Обнови страницу после того, как кто-то из вас сыграет: профили читаются вживую.",
+  "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
+    "Твои бойцы, которых изменило обновление от {date}, и как они на самом деле сдвинулись с тех пор{v}.",
+  "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
+    "Самые большие сдвиги ({length}) из {changedTotal} изменённых бойцов, которые у тебя есть. ",
+  "What the update did to you":
+    "Что обновление сделало с тобой",
+  "Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.":
+    "Процент побед скорректирован по среднему выборки, так что сдвиг здесь — это движение бойца, а не состава игроков. Боец появляется, когда за ним есть несколько дней замеров: двухдневная выборка колеблется сильнее, чем любое изменение баланса.",
+  "pts since":
+    "пункта с",
+  "{categoryLabel} · your power {power}":
+    "{categoryLabel} · твой уровень силы {power}",
+  "By combined member trophies, from the game API's own ranking.":
+    "По сумме трофеев участников, из собственного рейтинга API игры.",
+  "By total trophies, from the game API's own ranking.":
+    "По общему числу трофеев, из собственного рейтинга API игры.",
+  "No ranking data for":
+    "Нет данных рейтинга для",
+  "Not every country has a populated leaderboard. Try Global or a larger region.":
+    "Не у каждой страны заполнен рейтинг. Попробуй мировой или регион побольше.",
+  "Official rankings":
+    "Официальные рейтинги",
+  "Our own data":
+    "Наши данные",
+  "The official top 100 {board} by trophies in {region}, straight from the game API.":
+    "Официальная сотня лучших ({board}) по трофеям, {region}, прямо из API игры.",
+  "Top clubs in {region}":
+    "Лучшие клубы: {region}",
+  "Top players by Ranked elo. The game API has no Ranked leaderboard, so this one is ours.":
+    "Лучшие игроки по Эло в ранговых боях. В API игры нет рейтинга ранговых боёв, поэтому этот наш.",
+  "Top players in {region}":
+    "Лучшие игроки: {region}",
+  "Top three players":
+    "Тройка лучших игроков",
+  "What the sampled player pool is wearing. Built from our own daily samples, not from the game API.":
+    "Что носит наша выборка игроков. Собрано по нашим ежедневным выборкам, а не из API игры.",
+  "{memberCount}/30 members":
+    "Участников: {memberCount}/30",
+  "Championship qualified":
+    "Квалификация на чемпионат",
+  "Level {expLevel}":
+    "Уровень {expLevel}",
+  "No peak on record":
+    "Пик не записан",
+  "Peak {highestAllTimeRankedRankName}":
+    "Пик: {highestAllTimeRankedRankName}",
+  "Prestige {totalPrestigeLevel}":
+    "Прайм {totalPrestigeLevel}",
+  "Unranked":
+    "Без ранга",
+  "Club not found":
+    "Клуб не найден",
+  "Club trophies":
+    "Трофеи клуба",
+  "Club {tag}":
+    "Клуб {tag}",
+  "Family friendly":
+    "Для всей семьи",
+  "Members":
+    "Участники",
+  "No club exists with the tag {tag}. Club tags are shown on the club's info screen in-game.":
+    "Клуба с тегом {tag} не существует. Теги клубов показаны в информации о клубе в игре.",
+  "Required":
+    "Требуется",
+  "To join":
+    "Вступление",
+  "Type":
+    "Тип",
+  "Collecting cosmetics":
+    "Собираем косметику",
+  "Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.":
+    "Надетые скины и иконки записываются по мере того, как сборщик проходит пул игроков. Этот рейтинг заполнится за следующий день-два.",
+  "Most worn profile icons":
+    "Самые популярные иконки профиля",
+  "Profile icons are still being recorded.":
+    "Иконки профиля ещё записываются.",
+  "Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.":
+    "Доля аккаунтов выборки с каждой иконкой. Иконка есть у всех, поэтому доли считаются от всего пула.",
+  "Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.":
+    "Доля бойцов выборки в каждом скине. Стандартные скины не показаны в списке, но учтены в сумме, поэтому доля 2% значит два из каждых ста бойцов, которых мы видели. А не два из ста тех, у кого вообще был скин.",
+  "Compare Brawl Stars players and brawlers ({v})":
+    "Сравнение игроков и бойцов Brawl Stars ({v})",
+  "Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.":
+    "Сравни двух игроков или двух бойцов Brawl Stars бок о бок, {v}: трофеи, ранговые бои, оценка навыка, прогресс аккаунта, процент побед и личные встречи.",
+  "Compare players":
+    "Сравнить игроков",
+  "Comparisons worth making":
+    "Сравнения, которые стоит сделать",
+  "Drawn from the current top of the Ranked tier list, so it follows the meta rather than a fixed list.":
+    "Взяты из верхушки текущего тир-листа ранговых боёв, поэтому следуют за метой, а не за фиксированным списком.",
+  "Pick from the profiles you have looked up on this device, or type a tag. Works with or without the #.":
+    "Выбери из профилей, которые ты открывал на этом устройстве, или введи тег. Работает с # и без.",
+  "Two players or two brawlers, side by side. Player comparisons live entirely in the URL, so they are shareable and nothing is stored.":
+    "Два игрока или два бойца бок о бок. Сравнение игроков целиком хранится в адресе, поэтому им можно поделиться, и ничего не сохраняется.",
+  "Win and pick rates, tier, where each performs best, and their head-to-head record.":
+    "Процент побед и выбора, тир, где каждый силён и их личные встречи.",
+  "Covered":
+    "Покрыто",
+  "No ready pick":
+    "Нет готового пика",
+  "One ban from nothing":
+    "Один запрет до пустоты",
+  "Read from the live Ranked rotation and the brawlers you have at power 9 or above.":
+    "По текущей ротации ранговых боёв и твоим бойцам на 9-м уровне силы или выше.",
+  "The cheapest fix is":
+    "Самое дешёвое решение —",
+  "Your account, in short":
+    "Твой аккаунт коротко",
+  "brawlers are ready to play, covering":
+    "бойцов готовы к игре и покрывают",
+  "of your":
+    "из твоих",
+  "see what it buys":
+    "посмотреть, что это даст",
+  "with a spare pick in":
+    "; запасной пик есть в",
+  "{ready} ready":
+    "Готово: {ready}",
+  "{v} coins":
+    "{v} монет",
+  "Default skin":
+    "Стандартный скин",
+  "Next prestige":
+    "Следующий прайм",
+  "On fire right now":
+    "В огне прямо сейчас",
+  "Past {HIGHEST_KNOWN_MARK}":
+    "Больше {HIGHEST_KNOWN_MARK}",
+  "Prestige {b}":
+    "Прайм {b}",
+  "Showcase":
+    "Витрина",
+  "Wins in a row, as of the latest battle.":
+    "Побед подряд на момент последнего боя.",
+  "in a row":
+    "подряд",
+  "main":
+    "мейн",
+  "to P{level}":
+    "до P{level}",
+  "{toGo} to P{level}":
+    "{toGo} до P{level}",
+  "Defeat":
+    "Поражение",
+  "Draw":
+    "Ничья",
+  "No battles recorded in the last 25 matches.":
+    "В последних 25 матчах боёв не записано.",
+  "No recent battles. The battle log only covers roughly the last 25 matches and expires after a while.":
+    "Нет недавних боёв. История боёв охватывает примерно последние 25 матчей и со временем очищается.",
+  "The battle log is unavailable right now. Try refreshing in a moment.":
+    "История боёв сейчас недоступна. Попробуй обновить через минуту.",
+  "Victory":
+    "Победа",
+  "{rank} place":
+    "{rank}-е место",
+  "From {battles} sampled battles on this map":
+    "По собранным боям на этой карте: {battles}",
+  "Low trophies for this account":
+    "Мало трофеев для этого аккаунта",
+  "Play {brawlerName} in":
+    "Играй за {brawlerName} на карте",
+  "Push now":
+    "Апай сейчас",
+  "The best map in the live rotation for the brawlers this account already owns.":
+    "Лучшая карта текущей ротации для бойцов, которые уже есть на этом аккаунте.",
+  "Your best move right now":
+    "Твой лучший ход прямо сейчас",
+  "in":
+    "на",
+  "points above":
+    "пункта выше",
+  "this map’s average":
+    "среднего этой карты",
+  "{mapName} layout":
+    "Схема карты {mapName}",
+  "· in":
+    "· в",
+  "In a match recently":
+    "Недавно был в матче",
+  "Last seen {newest}":
+    "Последний раз: {newest}",
+  "Most played mode":
+    "Самый частый режим",
+  "across this run":
+    "за этот отрезок",
+  "brawlzone.net · last {battles} battles":
+    "brawlzone.net · последние бои: {battles}",
+  "time":
+    "раз",
+  "times":
+    "{n|one:раз|few:раза|many:раз|other:раза}",
+  "trophies":
+    "трофеев",
+  "{decided} decided":
+    "решено: {decided}",
+  "Star player":
+    "Звёздный игрок",
+  "The last loss read against the map and the matchups, then the patterns across the whole log.":
+    "Последнее поражение в разрезе карты и матчапов, а затем закономерности по всей истории.",
+  "What went wrong":
+    "Что пошло не так",
+  "Two Brawl Stars players side by side: trophies, Ranked, skill score, account completion and roster overlap.":
+    "Два игрока Brawl Stars бок о бок: трофеи, ранговые бои, оценка навыка, прогресс аккаунта и общие бойцы.",
+  "{a} vs {b} — Brawl Stars comparison":
+    "{a} против {b} — сравнение в Brawl Stars",
+  " · power {brawlerPower}":
+    " · сила {brawlerPower}",
+  "All results":
+    "Все результаты",
+  "By brawler":
+    "По бойцам",
+  "By mode":
+    "По режимам",
+  "Draws":
+    "Ничьи",
+  "Filter by mode":
+    "Фильтр по режиму",
+  "Filter by result":
+    "Фильтр по результату",
+  "Last {length} games":
+    "Последние игры: {length}",
+  "Losses":
+    "Поражения",
+  "No battles match that filter.":
+    "Нет боёв под этот фильтр.",
+  "Star player ×{stars}":
+    "Звёздный игрок ×{stars}",
+  "Team":
+    "Команда",
+  "This battle reported no player list.":
+    "В этом бою нет списка игроков.",
+  "Unknown brawler":
+    "Неизвестный боец",
+  "Wins":
+    "Победы",
+  "· mostly":
+    "· в основном",
+  "Brawl Stars player comparison":
+    "Сравнение игроков Brawl Stars",
+  "Clear recent":
+    "Очистить недавние",
+  "Clear the comparison":
+    "Очистить сравнение",
+  "Clear {v}":
+    "Убрать {v}",
+  "Look a player up from the search box and they are remembered on this device, ready to pick here without typing the tag again. Nothing is sent to the server.":
+    "Найди игрока через поиск, и он запомнится на этом устройстве: его можно будет выбрать здесь, не вводя тег снова. На сервер ничего не отправляется.",
+  "Looked up on this device":
+    "Открытые на этом устройстве",
+  "Other side":
+    "Другая сторона",
+  "Player 1":
+    "Игрок 1",
+  "Player 2":
+    "Игрок 2",
+  "Share":
+    "Поделиться",
+  "Swap players":
+    "Поменять игроков",
+  "Swap the two players":
+    "Поменять двух игроков местами",
+  ", so the real figure is this or better.":
+    ", так что реальная цифра такая или лучше.",
+  "30 members’ rosters":
+    "всех 30 участников",
+  "Club power":
+    "Сила клуба",
+  "Every member's roster read against the current Ranked S and A tier — what this club can actually put on the field.":
+    "Состав каждого участника в сравнении с текущими тирами S и A в ранговых боях: что этот клуб реально может выставить.",
+  "No hypercharge in the club:":
+    "Ни у кого в клубе нет гиперзаряда:",
+  "Nobody can field:":
+    "Никто не может выставить:",
+  "Rank this club":
+    "Оценить этот клуб",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
+    "По охвату верхних тиров с гиперзарядом, затем по тому, кого вообще можно выставить. Трофеи решают только при равенстве: игра и так сортирует участников по ним.",
+  "Reading rosters…":
+    "Читаем составы…",
+  "Reads all":
+    "Читает составы",
+  "The game’s API only answered for {length} of":
+    "API игры ответил только по {length} из",
+  "can field":
+    "могут выставить",
+  "could not be read":
+    "не удалось прочитать",
+  "fieldable,":
+    "доступно,",
+  "hyper":
+    "гипер",
+  "hypercharged":
+    "с гиперзарядом",
+  "hypercharged.":
+    "с гиперзарядом.",
+  "live. It takes a few seconds, so it only runs when you ask.":
+    "вживую. Это занимает несколько секунд, поэтому запускается только по запросу.",
+  "member":
+    "участника",
+  "members":
+    "{n|one:участника|few:участников|many:участников|other:участников}",
+  "members, so this is incomplete and has not been saved.":
+    "участников, поэтому данные неполные и не сохранены.",
+  "of the {topTierSize} brawlers in the current Ranked S and A tier, for the typical member of {name}. Between all {length} of them:":
+    "из {topTierSize} бойцов текущих тиров S и A в ранговых боях — у типичного участника клуба {name}. Вместе все {length}:",
+  "only hypercharged":
+    "только с гиперзарядом",
+  "{coverage} fieldable · {powerEleven} at power 11 ·":
+    "доступно: {coverage} · на 11-м уровне силы: {powerEleven} ·",
+  "1 day ago":
+    "1 день назад",
+  "Since your last visit":
+    "С твоего последнего визита",
+  "{days} days ago":
+    "{days} {days|one:день|few:дня|many:дней|other:дня} назад",
+  "· kept in this browser only":
+    "· хранится только в этом браузере",
+  "All countries":
+    "Все страны",
+  "No country matches “{query}”.":
+    "Нет страны по запросу «{query}».",
+  "Search countries":
+    "Поиск стран",
+  "Link copied":
+    "Ссылка скопирована",
+  "Share this profile":
+    "Поделиться профилем",
+  "No members match that search.":
+    "Нет участников по этому запросу.",
+  "Search club members":
+    "Поиск участников клуба",
+  "Search members by name or tag":
+    "Искать участников по имени или тегу",
+  "This club has no members listed.":
+    "У этого клуба нет участников в списке.",
 };

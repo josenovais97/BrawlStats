@@ -72,7 +72,7 @@ export default async function DailyArchivePage() {
               >
                 <span className="min-w-0 flex-1 font-semibold">{dayLabel(report.day)}</span>
                 <span className="shrink-0 text-xs tabular-nums text-muted">
-                  {report.findings} {report.findings === 1 ? t('finding') : t('findings')}
+                  {report.findings} {report.findings === 1 ? t('finding') : t('findings', { n: report.findings })}
                 </span>
               </Link>
             </li>

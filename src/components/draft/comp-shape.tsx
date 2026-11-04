@@ -117,7 +117,7 @@ function ShapeRow({ comp, emphasis = false }: { comp: RoleComposition; emphasis?
           {good ? '+' : ''}
           {delta.toFixed(1)}
         </span>
-        <span className="text-xs text-muted">{comp.decided.toLocaleString('en-GB')}{' '}{t('battles')}</span>
+        <span className="text-xs text-muted">{comp.decided.toLocaleString('en-GB')}{' '}{t('battles', { n: comp.decided })}</span>
       </span>
     </div>
   );

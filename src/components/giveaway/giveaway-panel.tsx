@@ -337,7 +337,7 @@ function MyEntries({ status, onChange }: { status: Status; onChange: () => Promi
         <div>
           <p className="text-sm text-muted">{t('You are in, {name}!', { name: status.playerName })}</p>
           <p className="display text-game-stroke text-6xl leading-none text-brand">
-            {entries.total} <span className="text-3xl text-white">{entries.total === 1 ? t('point') : t('points')}</span>
+            {entries.total} <span className="text-3xl text-white">{entries.total === 1 ? t('point') : t('points', { n: entries.total })}</span>
           </p>
         </div>
         <p className="text-sm text-muted">

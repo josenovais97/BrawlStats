@@ -24,11 +24,11 @@ export { fill, type T, type Vars };
 const DICTS: Partial<Record<Locale, Record<string, string>>> = { es: ES, pt: PT, tr: TR, de: DE };
 
 export function translate(locale: Locale, text: string, vars?: Vars): string {
-  return fill(DICTS[locale]?.[text] ?? text, vars);
+  return fill(DICTS[locale]?.[text] ?? text, vars, locale);
 }
 
 export function getT(locale: Locale): T {
-  return makeT(DICTS[locale] ?? null);
+  return makeT(DICTS[locale] ?? null, locale);
 }
 
 /** ["A", "B", "C"] -> "A, B and C", with the page's own word for "and". */

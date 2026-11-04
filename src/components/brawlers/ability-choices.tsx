@@ -182,7 +182,7 @@ function Row({
               <span className="text-sm font-bold text-victory">{t('{winRate} win rate', { winRate: formatPercent(row.winRate) })}</span>
             ) : null}
             <span className="text-xs text-muted">{t('{share} of first buyers ·', { share: formatPercent(row.share) })}{' '}{formatNumber(row.choosers)}{' '}
-              {row.choosers === 1 ? t('player') : t('players')}
+              {row.choosers === 1 ? t('player') : t('players', { n: row.choosers })}
             </span>
           </span>
         </div>
