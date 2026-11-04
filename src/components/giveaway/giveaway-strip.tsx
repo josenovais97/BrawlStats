@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useLp } from '@/components/i18n/use-lp';
 import { useT } from '@/components/i18n/use-t';
 import { GIVEAWAY_PUBLIC, hasClosed } from '@/lib/giveaway';
+import { INTL_LOCALES } from '@/lib/i18n';
 
 /**
  * A thin giveaway line under the header on every page (2026-10-28).
@@ -25,11 +26,12 @@ const WEEK = 7 * 86_400_000;
 // Also not where the page has its own giveaway banner (2026-10-30): on the
 // home page and /rewards the strip stacked on top of a better one, which got
 // 51 and 126 clicks in three days against the strip's 37 and 36 closes.
+const L = INTL_LOCALES.join('|');
 const HIDDEN = [
-  /^\/(?:(?:es|pt|tr)\/)?bubble\/(?:panel|test)/,
-  /^\/(?:(?:es|pt|tr)\/)?giveaway/,
-  /^\/(?:es|pt|tr)?\/?$/,
-  /^\/(?:(?:es|pt|tr)\/)?rewards\/?$/,
+  new RegExp(`^/(?:(?:${L})/)?bubble/(?:panel|test)`),
+  new RegExp(`^/(?:(?:${L})/)?giveaway`),
+  new RegExp(`^/(?:${L})?/?$`),
+  new RegExp(`^/(?:(?:${L})/)?rewards/?$`),
 ];
 
 export function GiveawayStrip() {

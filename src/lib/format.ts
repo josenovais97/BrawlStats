@@ -179,7 +179,7 @@ export function ordinal(n: number): string {
   const locale = requestLocale();
   if (locale === 'es') return `${n}.º`;
   if (locale === 'pt') return `${n}º`;
-  if (locale === 'tr') return `${n}.`; // Turkish: "3."
+  if (locale === 'tr' || locale === 'de') return `${n}.`; // Turkish and German: "3."
 
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;

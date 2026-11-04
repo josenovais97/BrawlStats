@@ -1,3 +1,4 @@
+import { DE } from '@/i18n/de';
 import { ES } from '@/i18n/es';
 import { PT } from '@/i18n/pt';
 import { TR } from '@/i18n/tr';
@@ -20,7 +21,7 @@ export { fill, type T, type Vars };
  * from `components/i18n/use-t`, which carries a much smaller dictionary.
  */
 
-const DICTS: Partial<Record<Locale, Record<string, string>>> = { es: ES, pt: PT, tr: TR };
+const DICTS: Partial<Record<Locale, Record<string, string>>> = { es: ES, pt: PT, tr: TR, de: DE };
 
 export function translate(locale: Locale, text: string, vars?: Vars): string {
   return fill(DICTS[locale]?.[text] ?? text, vars);

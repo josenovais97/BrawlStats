@@ -101,6 +101,7 @@ function windowText(windowKey: TierWindowKey, locale: Locale): string {
   const { days, sublabel } = TIER_WINDOWS[windowKey];
   if (locale === 'en') return sublabel;
   if (locale === 'tr') return days === 1 ? '24 saat' : `${days} gün`;
+  if (locale === 'de') return days === 1 ? '24 Stunden' : `${days} Tage`;
   if (days === 1) return '24 horas';
   return locale === 'es' ? `${days} días` : `${days} dias`;
 }

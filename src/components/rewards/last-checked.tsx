@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useLocale } from '@/components/i18n/use-locale';
 import { useT } from '@/components/i18n/use-t';
+import { HTML_LANG } from '@/lib/i18n';
 
 /**
  * "Checked for new rewards 2 minutes ago" (2026-10-28). Read in the browser
@@ -12,8 +13,6 @@ import { useT } from '@/components/i18n/use-t';
  * two-minute check look ten minutes stale. Shows nothing if the file is
  * missing or older than an hour -- a stale "checked" line is worse than none.
  */
-const TAG: Record<string, string> = { en: 'en', es: 'es', pt: 'pt-BR', tr: 'tr' };
-
 export function LastChecked() {
   const t = useT();
   const lang = useLocale();
@@ -34,7 +33,7 @@ export function LastChecked() {
 
   if (at === null || now - at > 3_600_000) return null;
   const minutes = Math.max(0, Math.round((now - at) / 60_000));
-  const when = new Intl.RelativeTimeFormat(TAG[lang] ?? 'en', { numeric: 'auto' }).format(-minutes, 'minute');
+  const when = new Intl.RelativeTimeFormat(HTML_LANG[lang], { numeric: 'auto' }).format(-minutes, 'minute');
   return (
     <p className="inline-flex items-center gap-2 text-sm text-muted">
       <span aria-hidden className="relative flex size-2.5">

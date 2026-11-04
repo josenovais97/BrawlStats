@@ -5,9 +5,9 @@ import type { RankedStanding, RoastFacts } from '@/lib/roast';
 /**
  * The joke bank behind `lib/roast`.
  *
- * Every line is written here in all three languages rather than keyed through
+ * Every line is written here in every site language rather than keyed through
  * `src/i18n`: a joke is rewritten for each language, not translated sentence
- * by sentence, and keeping the three side by side is what stops one drifting.
+ * by sentence, and keeping them side by side is what stops one drifting.
  * Game words follow the game's own translations (Competitivo / Ranqueado,
  * Supervivencia / Combate, habilidad estelar / poder de estrela).
  *
@@ -38,6 +38,7 @@ const RANK_WORDS: Record<Locale, string[]> = {
   es: ['Bronce', 'Plata', 'Oro', 'Diamante', 'Mítico', 'Legendario', 'Maestros', 'Pro'],
   pt: ['Bronze', 'Prata', 'Ouro', 'Diamante', 'Mítico', 'Lendário', 'Mestres', 'Pro'],
   tr: ['Bronz', 'Gümüş', 'Altın', 'Elmas', 'Gizemli', 'Efsanevi', 'Ustalar', 'Pro'],
+  de: ['Bronze', 'Silber', 'Gold', 'Diamant', 'Mythisch', 'Legendär', 'Meister', 'Pro'],
 };
 
 export function rankName(r: RankedStanding | null, lang: Locale): string {
@@ -52,7 +53,7 @@ export function brawlerName(name: string | null | undefined): string {
   return name ? titleCase(name) : '–';
 }
 
-const NUMBER_TAG: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR' };
+const NUMBER_TAG: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR', de: 'de-DE' };
 
 /** Numbers in the roast's language, whatever page it is printed on. */
 export function formatIn(n: number, lang: Locale): string {
@@ -114,12 +115,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Tu main es Shelly. La brawler que te da el tutorial. Simplemente nunca saliste del tutorial.',
       pt: 'Seu main é a Shelly. A brawler que o tutorial te dá. Você só nunca saiu do tutorial.',
       tr: "Main'in Shelly. Eğitimin eline tutuşturduğu savaşçı. Sen de eğitimden hiç çıkmadın.",
+      de: 'Dein Main ist Shelly. Die Brawlerin, die dir das Tutorial in die Hand drückt. Du hast das Tutorial nur nie verlassen.',
     },
     {
       en: 'Shelly main: sit in a bush, press super, call it strategy.',
       es: 'Main Shelly: esperar en un arbusto, apretar el súper y llamarlo estrategia.',
       pt: 'Main Shelly: ficar na moita, apertar o super e chamar isso de estratégia.',
       tr: "Shelly main'i: çalıya otur, süpere bas, adına strateji de.",
+      de: 'Shelly-Main: im Busch sitzen, Super drücken, das Ganze Strategie nennen.',
     },
   ],
   EDGAR: [
@@ -128,12 +131,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Tu main es Edgar. Saltar, morir, culpar al equipo. Todas las partidas.',
       pt: 'Seu main é o Edgar. Pular, morrer, culpar o time. Toda santa partida.',
       tr: "Main'in Edgar. Atla, öl, takımı suçla. Her maç.",
+      de: 'Dein Main ist Edgar. Reinspringen, sterben, dem Team die Schuld geben. Jedes einzelne Spiel.',
     },
     {
       en: 'Edgar main. Your whole game plan fits in one button.',
       es: 'Main Edgar. Todo tu plan de juego cabe en un botón.',
       pt: 'Main Edgar. Todo o seu plano de jogo cabe em um botão.',
       tr: "Edgar main'i. Bütün oyun planın tek bir tuşa sığıyor.",
+      de: 'Edgar-Main. Dein ganzer Spielplan passt auf einen Knopf.',
     },
   ],
   MORTIS: [
@@ -142,12 +147,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Mortis. Tus compañeros juegan 2 contra 3 mientras tú haces dash al spawn enemigo.',
       pt: 'Main Mortis. Seus parceiros jogam 2 contra 3 enquanto você dá dash no spawn inimigo.',
       tr: "Mortis main'i. Sen rakibin doğma noktasına atılırken takım arkadaşların 2'ye 3 oynuyor.",
+      de: 'Mortis-Main. Dein Team spielt 2 gegen 3, während du in den gegnerischen Spawn dashst.',
     },
     {
       en: 'You main Mortis. Three dashes in, zero kills out.',
       es: 'Tu main es Mortis. Tres dashes para entrar, cero eliminaciones para salir.',
       pt: 'Seu main é o Mortis. Três dashes pra entrar, zero abates pra sair.',
       tr: "Main'in Mortis. Üç atılışla gir, sıfır leşle çık.",
+      de: 'Dein Main ist Mortis. Drei Dashes rein, null Kills raus.',
     },
   ],
   COLT: [
@@ -156,12 +163,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Colt. Seis balas por disparo y de algún modo ninguna acierta.',
       pt: 'Main Colt. Seis balas por tiro e de algum jeito nenhuma acerta.',
       tr: "Colt main'i. Atış başına altı mermi ve nasılsa hiçbiri isabet etmiyor.",
+      de: 'Colt-Main. Sechs Kugeln pro Schuss, und irgendwie trifft keine.',
     },
     {
       en: "You main Colt. The walls you broke this season respect you. The enemies don't.",
       es: 'Tu main es Colt. Las paredes que rompiste esta temporada te respetan. Los enemigos no.',
       pt: 'Seu main é o Colt. As paredes que você quebrou nessa temporada te respeitam. Os inimigos, não.',
       tr: "Main'in Colt. Bu sezon kırdığın duvarlar sana saygı duyuyor. Rakipler duymuyor.",
+      de: 'Dein Main ist Colt. Die Wände, die du diese Saison zerlegt hast, respektieren dich. Die Gegner nicht.',
     },
   ],
   SPIKE: [
@@ -170,6 +179,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Spike. Lanzas un cactus y rezas. Más que nada rezas.',
       pt: 'Main Spike. Você joga um cacto e reza. Mais reza do que joga.',
       tr: "Spike main'i. Bir kaktüs fırlatıp dua ediyorsun. Çoğunlukla dua ediyorsun.",
+      de: 'Spike-Main. Du wirfst einen Kaktus und betest. Hauptsächlich betest du.',
     },
   ],
   LEON: [
@@ -178,12 +188,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Leon. Invisible en la partida, invisible en el marcador.',
       pt: 'Main Leon. Invisível na partida, invisível no placar.',
       tr: "Leon main'i. Maçta görünmez, skor tablosunda da görünmez.",
+      de: 'Leon-Main. Unsichtbar im Match, unsichtbar auf der Anzeigetafel.',
     },
     {
       en: "You main Leon. Going invisible to run away isn't the play, by the way.",
       es: 'Tu main es Leon. Volverse invisible para huir no es la jugada, por cierto.',
       pt: 'Seu main é o Leon. Ficar invisível pra fugir não é a jogada, só avisando.',
       tr: "Main'in Leon. Bu arada, kaçmak için görünmez olmak taktik değil.",
+      de: 'Dein Main ist Leon. Unsichtbar werden, um wegzulaufen, ist übrigens nicht der Plan.',
     },
   ],
   CROW: [
@@ -192,6 +204,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Crow. Envenenas a todos y no rematas a nadie.',
       pt: 'Main Crow. Você envenena todo mundo e não finaliza ninguém.',
       tr: "Crow main'i. Herkesi zehirliyorsun, kimseyi bitiremiyorsun.",
+      de: 'Crow-Main. Du vergiftest alle und erledigst keinen.',
     },
   ],
   'EL PRIMO': [
@@ -200,12 +213,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main El Primo. Tu súper es un boleto de ida al medio del equipo enemigo.',
       pt: 'Main El Primo. Seu super é uma passagem só de ida pro meio do time inimigo.',
       tr: "El Primo main'i. Süperin rakip takımın ortasına tek yön bilet.",
+      de: 'El-Primo-Main. Dein Super ist ein One-Way-Ticket ins gegnerische Team.',
     },
     {
       en: 'You main El Primo. Big muscles, small plans.',
       es: 'Tu main es El Primo. Músculos grandes, planes pequeños.',
       pt: 'Seu main é o El Primo. Músculos grandes, planos pequenos.',
       tr: "Main'in El Primo. Büyük kaslar, küçük planlar.",
+      de: 'Dein Main ist El Primo. Große Muskeln, kleine Pläne.',
     },
   ],
   DYNAMIKE: [
@@ -214,12 +229,14 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Dynamike. La pared recibió más daño que los enemigos.',
       pt: 'Main Dynamike. A parede tomou mais dano que os inimigos.',
       tr: "Dynamike main'i. Duvar rakiplerden daha çok hasar aldı.",
+      de: 'Dynamike-Main. Die Wand hat mehr Schaden abbekommen als die Gegner.',
     },
     {
       en: 'You main Dynamike. Your bombs land where the enemy was three seconds ago.',
       es: 'Tu main es Dynamike. Tus bombas caen donde estaba el enemigo hace tres segundos.',
       pt: 'Seu main é o Dynamike. Suas bombas caem onde o inimigo estava três segundos atrás.',
       tr: "Main'in Dynamike. Bombaların rakibin üç saniye önce olduğu yere düşüyor.",
+      de: 'Dein Main ist Dynamike. Deine Bomben landen da, wo der Gegner vor drei Sekunden stand.',
     },
   ],
   FRANK: [
@@ -228,6 +245,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Frank. Dos segundos para golpear, medio segundo para que te aturdan.',
       pt: 'Main Frank. Dois segundos pra bater, meio segundo pra ser atordoado.',
       tr: "Frank main'i. Çekiçi sallamak iki saniye, sersemlemek yarım saniye.",
+      de: 'Frank-Main. Zwei Sekunden zum Ausholen, eine halbe Sekunde, um betäubt zu werden.',
     },
   ],
   BULL: [
@@ -236,6 +254,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Tu main es Bull. Tu súper te llevó al gas más veces que a una eliminación.',
       pt: 'Seu main é o Bull. Seu super já te levou mais vezes pro gás do que pra um abate.',
       tr: "Main'in Bull. Süperin seni leşten çok gazın içine götürdü.",
+      de: 'Dein Main ist Bull. Dein Super hat dich öfter ins Gas getragen als zu einem Kill.',
     },
   ],
   PIPER: [
@@ -244,6 +263,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Piper. Vives en la esquina de atrás y lo llamas control del mapa.',
       pt: 'Main Piper. Você mora no cantinho lá de trás e chama isso de controle do mapa.',
       tr: "Piper main'i. Arka köşede yaşıyorsun ve buna harita kontrolü diyorsun.",
+      de: 'Piper-Main. Du wohnst in der hinteren Ecke und nennst das Map-Kontrolle.',
     },
   ],
   BIBI: [
@@ -252,6 +272,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Bibi. Bateas como si la pelota te debiera dinero.',
       pt: 'Main Bibi. Você gira esse taco como se a bola te devesse dinheiro.',
       tr: "Bibi main'i. O sopayı top sana borçluymuş gibi sallıyorsun.",
+      de: 'Bibi-Main. Du schwingst den Schläger, als schulde dir der Ball Geld.',
     },
   ],
   POCO: [
@@ -260,6 +281,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Poco. Tocas la guitarra mientras el equipo muere a tu alrededor.',
       pt: 'Main Poco. Você toca violão enquanto o time morre do seu lado.',
       tr: "Poco main'i. Takım etrafında ölürken sen gitar çalıyorsun.",
+      de: 'Poco-Main. Du spielst Gitarre, während das Team um dich herum stirbt.',
     },
   ],
   NITA: [
@@ -268,6 +290,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Nita. El oso hace el trabajo y tú te llevas el crédito.',
       pt: 'Main Nita. O urso faz o trabalho e você leva o crédito.',
       tr: "Nita main'i. İşi ayı yapıyor, övgüyü sen topluyorsun.",
+      de: 'Nita-Main. Der Bär macht die Arbeit, und du kassierst das Lob.',
     },
   ],
   RICO: [
@@ -276,6 +299,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Rico. Todas las balas rebotan en una pared. Ninguna en un enemigo.',
       pt: 'Main Rico. Toda bala quica na parede. Nenhuma no inimigo.',
       tr: "Rico main'i. Her mermi bir duvardan sekiyor. Tek biri bile rakipten sekmiyor.",
+      de: 'Rico-Main. Jede Kugel prallt von einer Wand ab. Keine einzige von einem Gegner.',
     },
   ],
   DARRYL: [
@@ -284,6 +308,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Darryl. Rodar adentro, rodar afuera y esperar que nadie lo haya visto.',
       pt: 'Main Darryl. Rolar pra dentro, rolar pra fora e torcer pra ninguém ter visto.',
       tr: "Darryl main'i. Yuvarlan gir, yuvarlan çık, kimse görmemiştir umarım.",
+      de: 'Darryl-Main. Reinrollen, rausrollen, hoffen, dass es keiner gesehen hat.',
     },
   ],
   GALE: [
@@ -292,6 +317,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Gale. Mandaste a más enemigos a un lugar seguro que contra una pared.',
       pt: 'Main Gale. Você já soprou mais inimigos pra um lugar seguro do que pra parede.',
       tr: "Gale main'i. Rakipleri duvara savurduğundan çok güvenli yere savurdun.",
+      de: 'Gale-Main. Du hast mehr Gegner in Sicherheit gepustet als gegen eine Wand.',
     },
   ],
   '8-BIT': [
@@ -300,6 +326,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main 8-Bit. El brawler más lento del juego y aun así llegas tarde.',
       pt: 'Main 8-Bit. O brawler mais lento do jogo e mesmo assim você chega atrasado.',
       tr: "8-Bit main'i. Oyunun en yavaş savaşçısı ve nasılsa yine de geç kalıyorsun.",
+      de: '8-Bit-Main. Der langsamste Brawler im Spiel, und trotzdem kommst du irgendwie zu spät.',
     },
   ],
   BROCK: [
@@ -308,6 +335,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Brock. Un lanzacohetes y un sueño.',
       pt: 'Main Brock. Um lança-foguetes e um sonho.',
       tr: "Brock main'i. Bir roketatar ve bir hayal.",
+      de: 'Brock-Main. Ein Raketenwerfer und ein Traum.',
     },
   ],
   FANG: [
@@ -316,6 +344,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Fang. Patada, cadena, muerte. Tus compañeros ya se saben la rutina.',
       pt: 'Main Fang. Chute, corrente, morte. Seus parceiros já decoraram a rotina.',
       tr: "Fang main'i. Tekme, zincir, ölüm. Takım arkadaşların rutini artık ezbere biliyor.",
+      de: 'Fang-Main. Kick, Kette, tot. Dein Team kennt den Ablauf inzwischen.',
     },
   ],
   KENJI: [
@@ -324,6 +353,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Kenji. Espada de samurái, cero honor.',
       pt: 'Main Kenji. Espada de samurai, zero honra.',
       tr: "Kenji main'i. Samuray kılıcı, sıfır onur.",
+      de: 'Kenji-Main. Samurai-Schwert, null Ehre.',
     },
   ],
   MICO: [
@@ -332,6 +362,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Mico. Mono ve, mono salta, mono muere.',
       pt: 'Main Mico. Macaco vê, macaco pula, macaco morre.',
       tr: "Mico main'i. Maymun görür, maymun zıplar, maymun ölür.",
+      de: 'Mico-Main. Affe sieht, Affe springt, Affe stirbt.',
     },
   ],
   GUS: [
@@ -340,6 +371,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Gus. Tus compañeros reciben escudos. Tú, excusas.',
       pt: 'Main Gus. Seus parceiros ganham escudo. Você ganha desculpas.',
       tr: "Gus main'i. Takım arkadaşların kalkan alıyor. Sen bahane.",
+      de: 'Gus-Main. Dein Team bekommt Schilde. Du bekommst Ausreden.',
     },
   ],
   SURGE: [
@@ -348,6 +380,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Surge. Tres etapas de mejora y nunca viste la tercera.',
       pt: 'Main Surge. Três estágios de melhoria e você nunca viu o terceiro.',
       tr: "Surge main'i. Üç yükseltme aşaması ve üçüncüsünü hiç görmedin.",
+      de: 'Surge-Main. Drei Upgrade-Stufen, und die dritte hast du nie gesehen.',
     },
   ],
   STU: [
@@ -356,6 +389,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Stu. Haces tantos dashes que ni tú sabes dónde estás.',
       pt: 'Main Stu. Você dá tanto dash que nem você sabe onde está.',
       tr: "Stu main'i. O kadar çok atılıyorsun ki sen bile nerede olduğunu bilmiyorsun.",
+      de: 'Stu-Main. Du dashst so viel, dass nicht mal du weißt, wo du bist.',
     },
   ],
   BUZZ: [
@@ -364,6 +398,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Buzz. Un salvavidas que nunca salva a nadie.',
       pt: 'Main Buzz. Um salva-vidas que nunca salva ninguém.',
       tr: "Buzz main'i. Kimseyi kurtarmayan bir cankurtaran.",
+      de: 'Buzz-Main. Ein Rettungsschwimmer, der nie jemanden rettet.',
     },
   ],
   TARA: [
@@ -372,6 +407,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Tara. Tu súper junta a todos. ¿Y después qué?',
       pt: 'Main Tara. Seu super junta todo mundo. E depois?',
       tr: "Tara main'i. Süperin herkesi bir araya topluyor. Peki sonra?",
+      de: 'Tara-Main. Dein Super zieht alle zusammen. Und dann?',
     },
   ],
   GENE: [
@@ -380,6 +416,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Gene. Atrajiste al tanque enemigo hacia tu propio equipo. Otra vez.',
       pt: 'Main Gene. Você puxou o tanque inimigo pro seu próprio time. De novo.',
       tr: "Gene main'i. Rakip tankı kendi takımının ortasına çektin. Yine.",
+      de: 'Gene-Main. Du hast den gegnerischen Tank in dein eigenes Team gezogen. Schon wieder.',
     },
   ],
   BYRON: [
@@ -388,6 +425,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Byron. Curas desde tan lejos que el equipo olvida que existes.',
       pt: 'Main Byron. Você cura de tão longe que o time esquece que você existe.',
       tr: "Byron main'i. O kadar geriden iyileştiriyorsun ki takım var olduğunu unutuyor.",
+      de: 'Byron-Main. Du heilst von so weit hinten, dass das Team vergisst, dass es dich gibt.',
     },
   ],
   MAX: [
@@ -396,6 +434,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Max. La brawler más rápida del juego y la primera en volver al spawn.',
       pt: 'Main Max. A brawler mais rápida do jogo e a primeira a voltar pro spawn.',
       tr: "Max main'i. Oyunun en hızlı savaşçısı ve doğma noktasına ilk dönen.",
+      de: 'Max-Main. Der schnellste Brawler im Spiel, und der Erste zurück im Spawn.',
     },
   ],
   SANDY: [
@@ -404,6 +443,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Sandy. Hasta tu forma de jugar tiene sueño.',
       pt: 'Main Sandy. Até o seu jeito de jogar tá com sono.',
       tr: "Sandy main'i. Oynayışın bile uykulu görünüyor.",
+      de: 'Sandy-Main. Sogar dein Gameplay sieht müde aus.',
     },
   ],
   JESSIE: [
@@ -412,6 +452,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Jessie. La torreta es la verdadera MVP.',
       pt: 'Main Jessie. A torreta é a verdadeira MVP.',
       tr: "Jessie main'i. Asıl MVP taret.",
+      de: 'Jessie-Main. Das Geschütz ist der wahre MVP.',
     },
   ],
   PENNY: [
@@ -420,6 +461,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Penny. Tu cañón tiene más eliminaciones que tú.',
       pt: 'Main Penny. Seu canhão tem mais abates que você.',
       tr: "Penny main'i. Topunun senden daha çok leşi var.",
+      de: 'Penny-Main. Deine Kanone hat mehr Kills als du.',
     },
   ],
   BARLEY: [
@@ -428,6 +470,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Barley. Lanzas botellas desde detrás de una pared y lo llamas trabajo en equipo.',
       pt: 'Main Barley. Você joga garrafa atrás da parede e chama isso de trabalho em equipe.',
       tr: "Barley main'i. Duvarın arkasından şişe atıyorsun ve buna takım oyunu diyorsun.",
+      de: 'Barley-Main. Du wirfst Flaschen hinter einer Wand hervor und nennst das Teamwork.',
     },
   ],
   ROSA: [
@@ -436,6 +479,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Rosa. Arbusto, golpe, escudo, repetir. La jardinería es un estilo de vida.',
       pt: 'Main Rosa. Moita, soco, escudo, repete. Jardinagem é um estilo de vida.',
       tr: "Rosa main'i. Çalı, yumruk, kalkan, tekrar. Bahçıvanlık bir yaşam tarzı.",
+      de: 'Rosa-Main. Busch, Schlag, Schild, Wiederholung. Gärtnern ist ein Lebensstil.',
     },
   ],
   EMZ: [
@@ -444,6 +488,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Emz. Tanto spray para el pelo y sigues sin seguidores.',
       pt: 'Main Emz. Tanto spray de cabelo e ainda sem seguidores.',
       tr: "Emz main'i. O kadar saç spreyi ve hâlâ takipçi yok.",
+      de: 'Emz-Main. So viel Haarspray, und immer noch keine Follower.',
     },
   ],
   BEA: [
@@ -452,6 +497,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Bea. Un disparo supercargado por partida. Si acierta.',
       pt: 'Main Bea. Um tiro supercarregado por partida. Se acertar.',
       tr: "Bea main'i. Maç başına bir süper şarjlı atış. İsabet ederse.",
+      de: 'Bea-Main. Ein supergeladener Schuss pro Spiel. Wenn er trifft.',
     },
   ],
   SQUEAK: [
@@ -460,6 +506,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Squeak. Bombas pegajosas por todas partes, daño en ninguna.',
       pt: 'Main Squeak. Bomba grudenta pra todo lado, dano em lugar nenhum.',
       tr: "Squeak main'i. Her yerde yapışkan bomba, hiçbir yerde hasar.",
+      de: 'Squeak-Main. Klebebomben überall, Schaden nirgends.',
     },
   ],
   GRIFF: [
@@ -468,6 +515,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Griff. Tantas monedas y todavía no puedes comprar una victoria.',
       pt: 'Main Griff. Tanta moeda e ainda não dá pra comprar uma vitória.',
       tr: "Griff main'i. O kadar altın ve hâlâ bir galibiyet satın alamıyorsun.",
+      de: 'Griff-Main. So viele Münzen, und du kannst dir trotzdem keinen Sieg kaufen.',
     },
   ],
   LOLA: [
@@ -476,6 +524,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Lola. Tu clon apunta mejor que tú.',
       pt: 'Main Lola. Seu clone mira melhor que você.',
       tr: "Lola main'i. Klonun senden iyi nişan alıyor.",
+      de: 'Lola-Main. Dein Klon zielt besser als du.',
     },
   ],
   SAM: [
@@ -484,6 +533,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Sam. Lanzas tus nudilleras y caminas a buscarlas. En cada pelea.',
       pt: 'Main Sam. Você joga as soqueiras longe e anda pra buscar. Em toda luta.',
       tr: "Sam main'i. Muştalarını fırlatıp almaya yürüyorsun. Her kavgada.",
+      de: 'Sam-Main. Du wirfst deine Schlagringe weg und läufst hin, um sie zu holen. In jedem Kampf.',
     },
   ],
   MELODIE: [
@@ -492,6 +542,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Melodie. Tres notas girando a tu alrededor y ninguna es un plan.',
       pt: 'Main Melodie. Três notas girando em volta de você e nenhuma é um plano.',
       tr: "Melodie main'i. Etrafında dönen üç nota var ve hiçbiri bir plan değil.",
+      de: 'Melodie-Main. Drei Noten kreisen um dich, und keine davon ist ein Plan.',
     },
   ],
   BELLE: [
@@ -500,6 +551,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Belle. Marcas al enemigo para que el equipo sepa a quién fallaste.',
       pt: 'Main Belle. Você marca o inimigo pro time saber em quem você errou.',
       tr: "Belle main'i. Rakibi işaretliyorsun ki takım kimi ıskaladığını bilsin.",
+      de: 'Belle-Main. Du markierst den Gegner, damit das Team weiß, wen du verfehlt hast.',
     },
   ],
   AMBER: [
@@ -508,6 +560,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Amber. Prendes fuego todo el mapa, menos a los enemigos.',
       pt: 'Main Amber. Você bota fogo no mapa inteiro, menos nos inimigos.',
       tr: "Amber main'i. Rakipler hariç bütün haritayı ateşe veriyorsun.",
+      de: 'Amber-Main. Du setzt die ganze Map in Brand, außer die Gegner.',
     },
   ],
   MEG: [
@@ -516,6 +569,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Meg. Pierdes el robot y pierdes las ganas de vivir.',
       pt: 'Main Meg. Perdeu o robô, perdeu a vontade de viver.',
       tr: "Meg main'i. Robotu kaybet, yaşama isteğini kaybet.",
+      de: 'Meg-Main. Mech weg, Lebenswille weg.',
     },
   ],
   CHESTER: [
@@ -524,6 +578,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Chester. Ni tú sabes qué súper viene después.',
       pt: 'Main Chester. Nem você sabe qual super vem depois.',
       tr: "Chester main'i. Sıradaki süperin hangisi olacağını sen bile bilmiyorsun.",
+      de: 'Chester-Main. Nicht mal du weißt, welcher Super als Nächstes kommt.',
     },
   ],
   HANK: [
@@ -532,6 +587,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Hank. Cargas esa burbuja tanto tiempo que la partida termina antes.',
       pt: 'Main Hank. Você carrega essa bolha por tanto tempo que a partida acaba antes.',
       tr: "Hank main'i. O baloncuğu o kadar uzun dolduruyorsun ki önce maç bitiyor.",
+      de: 'Hank-Main. Du lädst die Blase so lange auf, dass das Match vorher endet.',
     },
   ],
   JACKY: [
@@ -540,6 +596,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Jacky. Arrastras a todos a una pelea que estás a punto de perder.',
       pt: 'Main Jacky. Você puxa todo mundo pra uma briga que tá prestes a perder.',
       tr: "Jacky main'i. Herkesi kaybetmek üzere olduğun bir kavgaya çekiyorsun.",
+      de: 'Jacky-Main. Du ziehst alle in einen Kampf, den du gleich verlierst.',
     },
   ],
   CORDELIUS: [
@@ -548,6 +605,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Cordelius. Los arrastras al reino de las sombras y también pierdes allí.',
       pt: 'Main Cordelius. Você leva eles pro reino das sombras e perde lá também.',
       tr: "Cordelius main'i. Onları gölge diyarına sürüklüyorsun ve orada da kaybediyorsun.",
+      de: 'Cordelius-Main. Du ziehst sie ins Schattenreich und verlierst auch dort.',
     },
   ],
   KIT: [
@@ -556,6 +614,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Kit. Te subes a la cabeza de tus compañeros y lo llamas cargar al equipo.',
       pt: 'Main Kit. Você sobe na cabeça dos parceiros e chama isso de carregar o time.',
       tr: "Kit main'i. Takım arkadaşlarının kafasına binip buna takımı taşımak diyorsun.",
+      de: 'Kit-Main. Du reitest auf den Köpfen deiner Teamkollegen und nennst das Carry.',
     },
   ],
   // From here on written against each brawler's own kit and bio (Brawlify).
@@ -565,6 +624,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Alli. Acechas a los enemigos como en una película de terror y fallas como en una comedia.',
       pt: 'Main Alli. Você persegue os inimigos como num filme de terror e erra como numa comédia.',
       tr: "Alli main'i. Rakipleri korku filmi gibi takip ediyorsun, sonra komedi gibi ıskalıyorsun.",
+      de: 'Alli-Main. Du schleichst Gegnern nach wie in einem Horrorfilm und verfehlst dann wie in einer Komödie.',
     },
   ],
   ANGELO: [
@@ -573,6 +633,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Angelo. Un mosquito con arco. Igual de molesto, igual de fácil de aplastar.',
       pt: 'Main Angelo. Um mosquito com arco. Irritante e tão fácil de esmagar quanto.',
       tr: "Angelo main'i. Yaylı bir sivrisinek. Aynı derecede sinir bozucu, aynı derecede kolay ezilen.",
+      de: 'Angelo-Main. Eine Mücke mit Bogen. Genauso nervig, genauso leicht zu erschlagen.',
     },
   ],
   ASH: [
@@ -581,6 +642,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Ash. Vives en un bote de basura y juegas a la altura.',
       pt: 'Main Ash. Você mora numa lata de lixo e joga à altura.',
       tr: "Ash main'i. Bir çöp kutusunda yaşıyorsun ve öyle oynuyorsun.",
+      de: 'Ash-Main. Du wohnst in einer Mülltonne und spielst auch so.',
     },
   ],
   BERRY: [
@@ -589,6 +651,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Berry. Un unicornio que odia su trabajo. Tus compañeros te entienden.',
       pt: 'Main Berry. Um unicórnio que odeia o trabalho. Seus parceiros entendem bem.',
       tr: "Berry main'i. İşinden nefret eden bir tek boynuzlu at. Takım arkadaşların seni anlıyor.",
+      de: 'Berry-Main. Ein Einhorn, das seinen Job hasst. Dein Team kann das nachfühlen.',
     },
   ],
   BO: [
@@ -597,6 +660,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Bo. Tus armas salieron de la tienda de regalos, en oferta. Se nota.',
       pt: 'Main Bo. Suas armas vieram da lojinha, em promoção. Dá pra perceber.',
       tr: "Bo main'i. Silahların hediyelik eşya dükkanından, indirimde alınmış. Belli oluyor.",
+      de: 'Bo-Main. Deine Waffen kommen aus dem Souvenirladen, im Angebot. Man merkt es.',
     },
   ],
   BOLT: [
@@ -605,6 +669,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Bolt. Querías ser auto de carreras y terminaste siendo una bola de boliche.',
       pt: 'Main Bolt. Você queria ser carro de corrida e virou bola de boliche.',
       tr: "Bolt main'i. Yarış arabası olmak istedin. Bowling topu oldun.",
+      de: 'Bolt-Main. Du wolltest ein Rennwagen sein. Geworden ist es eine Bowlingkugel.',
     },
   ],
   BONNIE: [
@@ -613,6 +678,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Bonnie. Tu sueño es ir a la luna en cañón. Tu equipo te ayudaría encantado.',
       pt: 'Main Bonnie. Seu sonho é ir pra lua de canhão. Seu time ajudaria com prazer.',
       tr: "Bonnie main'i. Hayalin topla Ay'a uçmak. Takımın seve seve yardım eder.",
+      de: 'Bonnie-Main. Dein Traum ist ein Kanonenflug zum Mond. Dein Team würde gern helfen.',
     },
   ],
   BUSTER: [
@@ -621,6 +687,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Buster. Llevaste un proyector de cine a una pelea. Lástima que la trama siempre sea tú perdiendo.',
       pt: 'Main Buster. Você levou um projetor de cinema pra briga. Pena que o roteiro é sempre você perdendo.',
       tr: "Buster main'i. Kavgaya film projektörü getirdin. Ne yazık ki konu hep senin kaybetmen.",
+      de: 'Buster-Main. Du bringst einen Filmprojektor zum Kampf. Schade, dass die Handlung immer deine Niederlage ist.',
     },
   ],
   CARL: [
@@ -629,6 +696,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Carl. Lanzas el pico, esperas a que vuelva y mueres esperando.',
       pt: 'Main Carl. Joga a picareta, espera ela voltar e morre esperando.',
       tr: "Carl main'i. Kazmayı fırlat, geri gelmesini bekle, beklerken öl.",
+      de: 'Carl-Main. Spitzhacke werfen, warten, bis sie zurückkommt, beim Warten sterben.',
     },
   ],
   CHARLIE: [
@@ -637,6 +705,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Charlie. Todo un número de circo y el payaso eres tú.',
       pt: 'Main Charlie. Um número de circo inteiro e o palhaço é você.',
       tr: "Charlie main'i. Koca bir sirk gösterisi ve palyaço sensin.",
+      de: 'Charlie-Main. Eine ganze Zirkusnummer, und der Clown bist du.',
     },
   ],
   CHUCK: [
@@ -645,6 +714,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Chuck. Pones los postes, planeas la ruta y el tren igual no va a ningún lado.',
       pt: 'Main Chuck. Você coloca os postes, planeja a rota e o trem não vai pra lugar nenhum.',
       tr: "Chuck main'i. Direkleri dikiyorsun, rotayı planlıyorsun ve tren yine hiçbir yere gitmiyor.",
+      de: 'Chuck-Main. Du setzt die Pfosten, planst die Strecke, und der Zug fährt trotzdem nirgendwohin.',
     },
   ],
   CLANCY: [
@@ -653,6 +723,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Clancy. Un crustáceo falso con ambición de verdad. Lástima la puntería.',
       pt: 'Main Clancy. Um crustáceo falso com ambição de verdade. Pena a mira.',
       tr: "Clancy main'i. Gerçek hırsları olan sahte bir kabuklu. Nişan için üzgünüz.",
+      de: 'Clancy-Main. Ein falsches Krustentier mit echtem Ehrgeiz. Schade ums Zielen.',
     },
   ],
   COLETTE: [
@@ -661,6 +732,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Colette. Coleccionaste el peluche de cada brawler. Coleccionar victorias, al parecer, cuesta más.',
       pt: 'Main Colette. Você colecionou a pelúcia de todo brawler. Colecionar vitórias pelo jeito é mais difícil.',
       tr: "Colette main'i. Her savaşçının peluşunu topladın. Galibiyet toplamak anlaşılan daha zormuş.",
+      de: 'Colette-Main. Du hast das Plüschtier jedes Brawlers gesammelt. Siege zu sammeln war offenbar schwerer.',
     },
   ],
   COSMO: [
@@ -669,6 +741,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Cosmo. Siempre mirando las estrellas. Nunca al enemigo.',
       pt: 'Main Cosmo. Sempre olhando as estrelas. Nunca o inimigo.',
       tr: "Cosmo main'i. Gözü hep yıldızlarda. Rakipte asla.",
+      de: 'Cosmo-Main. Immer den Blick bei den Sternen. Nie beim Gegner.',
     },
   ],
   DAMIAN: [
@@ -677,6 +750,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Damian. Ruidoso, furioso, rompe todo. Tu equipo lo llama concierto. El enemigo, victoria gratis.',
       pt: 'Main Damian. Barulhento, furioso, quebra tudo. Seu time chama de show. O inimigo chama de vitória fácil.',
       tr: "Damian main'i. Gürültülü, sinirli, her şeyi kırıyor. Takımın buna konser diyor. Rakip bedava galibiyet diyor.",
+      de: 'Damian-Main. Laut, wütend, macht alles kaputt. Dein Team nennt es Konzert. Der Gegner nennt es Gratis-Sieg.',
     },
   ],
   DOUG: [
@@ -685,6 +759,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Doug. Revives a tus compañeros para que mueran por segunda vez.',
       pt: 'Main Doug. Você revive os parceiros pra eles morrerem de novo.',
       tr: "Doug main'i. Takım arkadaşlarını ikinci kez ölebilsinler diye diriltiyorsun.",
+      de: 'Doug-Main. Du belebst deine Teamkollegen wieder, damit sie ein zweites Mal sterben können.',
     },
   ],
   DRACO: [
@@ -693,6 +768,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Draco. Un dragón inflable. Tiene sentido: se pincha igual de rápido.',
       pt: 'Main Draco. Um dragão inflável. Faz sentido: estoura tão rápido quanto.',
       tr: "Draco main'i. Şişme bir ejderha. Yakışıyor: o da aynı hızla patlıyor.",
+      de: 'Draco-Main. Ein aufblasbarer Drache. Passend: Er platzt genauso schnell.',
     },
   ],
   EVE: [
@@ -701,6 +777,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Eve. Le disparas huevos a la gente y lo llamas maternidad.',
       pt: 'Main Eve. Você atira ovos nas pessoas e chama isso de maternidade.',
       tr: "Eve main'i. İnsanlara yumurta atıyorsun ve buna ebeveynlik diyorsun.",
+      de: 'Eve-Main. Du schießt mit Eiern auf Leute und nennst das Erziehung.',
     },
   ],
   FINX: [
@@ -709,6 +786,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Finx. Puedes retroceder el tiempo y aun así cometes los mismos errores.',
       pt: 'Main Finx. Você volta no tempo e mesmo assim comete os mesmos erros.',
       tr: "Finx main'i. Zamanı geri sarabiliyorsun ve yine aynı hataları yapıyorsun.",
+      de: 'Finx-Main. Du kannst die Zeit zurückspulen und machst trotzdem dieselben Fehler.',
     },
   ],
   GIGI: [
@@ -717,6 +795,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Gigi. Una marioneta maldita. Tus compañeros sienten la maldición en cada partida.',
       pt: 'Main Gigi. Uma marionete amaldiçoada. Seus parceiros sentem a maldição toda partida.',
       tr: "Gigi main'i. Lanetli bir kukla. Takım arkadaşların laneti her maç hissediyor.",
+      de: 'Gigi-Main. Eine verfluchte Puppe. Dein Team spürt den Fluch in jedem Spiel.',
     },
   ],
   GLOWY: [
@@ -725,6 +804,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Glowy. Te conectas a la gente con un rayo. Demasiado apego para una sola partida.',
       pt: 'Main Glowy. Você se prende nas pessoas com um raio. É muito apego pra uma partida só.',
       tr: "Glowy main'i. Kendini insanlara bağlıyorsun. Tek bir maç için fazla bağlılık.",
+      de: 'Glowy-Main. Du bindest dich an Leute. Ganz schön viel Bindung für ein Spiel.',
     },
   ],
   GRAY: [
@@ -733,6 +813,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Gray. Un mimo con pistolas de dedo. Silencioso, como tu daño.',
       pt: 'Main Gray. Um mímico com arminha de dedo. Silencioso, igual ao seu dano.',
       tr: "Gray main'i. Parmak tabancalı bir pandomimci. Hasarın gibi sessiz.",
+      de: 'Gray-Main. Ein Pantomime mit Fingerpistolen. Stumm, wie dein Schaden.',
     },
   ],
   GROM: [
@@ -741,6 +822,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Grom. Los niños del jardín de infantes traumatizaron a Grom. Tus compañeros saben lo que se siente.',
       pt: 'Main Grom. As crianças do jardim de infância traumatizaram o Grom. Seus parceiros sabem como é.',
       tr: "Grom main'i. Anaokulu çocukları Grom'u travmatize etti. Takım arkadaşların o hissi biliyor.",
+      de: 'Grom-Main. Kindergartenkinder haben Grom traumatisiert. Dein Team kennt das Gefühl.',
     },
   ],
   'JAE-YONG': [
@@ -749,6 +831,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Jae-Yong. Él cree que es un dios del karaoke. Tú crees que juegas bien. Los dos se equivocan.',
       pt: 'Main Jae-Yong. Ele acha que é um deus do karaokê. Você acha que joga bem. Os dois estão errados.',
       tr: "Jae-Yong main'i. O karaoke tanrısı olduğunu sanıyor. Sen iyi oynadığını sanıyorsun. İkiniz de yanılıyorsunuz.",
+      de: 'Jae-Yong-Main. Er hält sich für einen Karaoke-Gott. Du hältst dich für gut. Ihr liegt beide falsch.',
     },
   ],
   JANET: [
@@ -757,6 +840,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Janet. Vuelas sobre todo el mapa y aun así no te enteras de lo que pasa.',
       pt: 'Main Janet. Você voa por cima do mapa inteiro e mesmo assim não vê o que tá acontecendo.',
       tr: "Janet main'i. Bütün haritanın üzerinde uçuyorsun ve yine de olan biteni kaçırıyorsun.",
+      de: 'Janet-Main. Du fliegst über die ganze Map und verpasst trotzdem, was passiert.',
     },
   ],
   JUJU: [
@@ -765,6 +849,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Juju. Hasta tu muñeco vudú tiene mejor porcentaje de victorias. Se llama Gregory, por cierto.',
       pt: 'Main Juju. Até seu boneco de vodu tem mais vitórias que você. O nome dele é Gregory, aliás.',
       tr: "Juju main'i. Vudu bebeğinin bile kazanma oranı daha iyi. Bu arada adı Gregory.",
+      de: 'Juju-Main. Sogar deine Voodoo-Puppe hat eine bessere Siegquote. Sie heißt übrigens Gregory.',
     },
   ],
   KAZE: [
@@ -773,6 +858,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Kaze. Dos aspectos, geisha y ninja. Ninguno de los dos gana.',
       pt: 'Main Kaze. Dois aspectos, gueixa e ninja. Nenhum dos dois ganha.',
       tr: "Kaze main'i. İki yüzü var, geyşa ve ninja. Hiçbiri kazanmıyor.",
+      de: 'Kaze-Main. Zwei Seiten, Geisha und Ninja. Keine davon gewinnt.',
     },
   ],
   'LARRY & LAWRIE': [
@@ -781,6 +867,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Larry y Lawrie. Dos brawlers por el precio de uno y aun así en desventaja.',
       pt: 'Main Larry e Lawrie. Dois brawlers pelo preço de um e mesmo assim em desvantagem.',
       tr: "Larry & Lawrie main'i. Bir fiyatına iki savaşçı ve yine de sayıca azsın.",
+      de: 'Larry-&-Lawrie-Main. Zwei Brawler zum Preis von einem, und trotzdem in der Unterzahl.',
     },
   ],
   LILY: [
@@ -789,6 +876,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Lily. Te metes al Reino de las Sombras. Tu porcentaje de victorias se queda ahí.',
       pt: 'Main Lily. Você entra no Reino das Sombras. Sua taxa de vitória fica por lá.',
       tr: "Lily main'i. Gölge Diyarı'na dalıyorsun. Kazanma oranın orada kalıyor.",
+      de: 'Lily-Main. Du tauchst ins Schattenreich ab. Deine Siegquote bleibt dort.',
     },
   ],
   LOU: [
@@ -797,6 +885,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Lou. Un robot de raspados que nunca vendió nada. Tu historial se parece.',
       pt: 'Main Lou. Um robô de raspadinha que nunca vendeu nada. Seu histórico é parecido.',
       tr: "Lou main'i. Hiç satış yapamamış bir buzlu karlı robot. Kaydın tanıdık geliyor.",
+      de: 'Lou-Main. Ein Schneekegel-Roboter, der nie etwas verkauft hat. Deine Bilanz kommt mir bekannt vor.',
     },
   ],
   LUMI: [
@@ -805,6 +894,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Lumi. Baterista de metal. Ruidosa, rápida y completamente fuera de ritmo.',
       pt: 'Main Lumi. Baterista de metal. Barulhenta, rápida e totalmente fora do ritmo.',
       tr: "Lumi main'i. Bir metal davulcu. Gürültülü, hızlı ve tamamen ritimsiz.",
+      de: 'Lumi-Main. Eine Metal-Drummerin. Laut, schnell und komplett aus dem Takt.',
     },
   ],
   MAISIE: [
@@ -813,6 +903,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Maisie. Una coordinadora de seguridad que se mete de cabeza en el peligro. Así son todas tus peleas.',
       pt: 'Main Maisie. Uma coordenadora de segurança que vai direto pro perigo. Igual a toda briga sua.',
       tr: "Maisie main'i. Doğrudan tehlikeye yürüyen bir güvenlik sorumlusu. Girdiğin her kavga bu.",
+      de: 'Maisie-Main. Eine Sicherheitsbeauftragte, die direkt in die Gefahr läuft. Das ist jeder Kampf, den du annimmst.',
     },
   ],
   MANDY: [
@@ -821,6 +912,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Mandy. Reina del reino de los dulces, plebeya del marcador.',
       pt: 'Main Mandy. Rainha do reino dos doces, plebeia do placar.',
       tr: "Mandy main'i. Şeker krallığının kraliçesi, skor tablosunun köylüsü.",
+      de: 'Mandy-Main. Königin des Süßigkeitenreichs, Bäuerin auf der Anzeigetafel.',
     },
   ],
   MEEPLE: [
@@ -829,6 +921,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Meeple. Te sabes las reglas de todos los juegos de mesa. El sentido del juego sigue cargando.',
       pt: 'Main Meeple. Sabe a regra de todo jogo de tabuleiro. A noção de jogo ainda tá carregando.',
       tr: "Meeple main'i. Her kutu oyunu kuralı ezber. Oyun zekâsı hâlâ yükleniyor.",
+      de: 'Meeple-Main. Jede Brettspielregel auswendig gelernt. Spielverständnis lädt noch.',
     },
   ],
   MINA: [
@@ -837,6 +930,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Mina. Tanto breakdance y lo único que rompes es tu racha.',
       pt: 'Main Mina. Tanto breakdance e a única coisa que você quebra é sua sequência de vitórias.',
       tr: "Mina main'i. O kadar breakdans ve kırdığın tek şey kazanma serin.",
+      de: 'Mina-Main. So viel Breakdance, und das Einzige, was du brichst, ist deine Siegesserie.',
     },
   ],
   MOE: [
@@ -845,6 +939,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Moe. Una rata ciega. Eso explica la puntería.',
       pt: 'Main Moe. Um rato cego. Isso explica a mira.',
       tr: "Moe main'i. Kör bir fare. Nişanı açıklıyor.",
+      de: 'Moe-Main. Eine blinde Ratte. Das erklärt das Zielen.',
     },
   ],
   'MR. P': [
@@ -853,6 +948,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Mr. P. Tus botones hacen todo el trabajo mientras gritas. Como un jefe de verdad.',
       pt: 'Main Mr. P. Seus carregadores fazem todo o trabalho enquanto você grita. Igual a um chefe de verdade.',
       tr: "Mr. P main'i. Sen bağırırken bütün işi hamalların yapıyor. Gerçek bir müdür gibi.",
+      de: 'Mr.-P-Main. Deine Träger machen die ganze Arbeit, während du rumschreist. Wie ein echter Manager.',
     },
   ],
   NAJIA: [
@@ -861,6 +957,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Najia. Te escondes en un jarrón. Sinceramente, la mejor idea que tuviste en toda la partida.',
       pt: 'Main Najia. Você se esconde num vaso. Sinceramente, a melhor ideia que você teve na partida.',
       tr: "Najia main'i. Bir vazoda saklanıyorsun. Açıkçası maç boyunca aklına gelen en iyi fikir.",
+      de: 'Najia-Main. Du versteckst dich in einer Vase. Ehrlich gesagt die beste Idee, die du das ganze Spiel hattest.',
     },
   ],
   NANI: [
@@ -869,6 +966,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Nani. Peep vuela por todo el mapa y no encuentra ni una eliminación.',
       pt: 'Main Nani. O Peep voa pelo mapa inteiro e não acha um abate.',
       tr: "Nani main'i. Peep bütün haritayı uçuyor ve yine de bir leş bulamıyor.",
+      de: 'Nani-Main. Peep fliegt über die ganze Map und findet trotzdem keinen Kill.',
     },
   ],
   NORI: [
@@ -877,6 +975,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Nori. El hijo de Kenji y Kaze, destinado a la grandeza. El destino se saltó tus partidas.',
       pt: 'Main Nori. Filho do Kenji e da Kaze, destinado à grandeza. O destino pulou as suas partidas.',
       tr: "Nori main'i. Kenji ile Kaze'nin çocuğu, büyüklüğe yazgılı. Kader senin maçlarını atlamış.",
+      de: 'Nori-Main. Das Kind von Kenji und Kaze, zu Großem bestimmt. Das Schicksal hat deine Spiele übersprungen.',
     },
   ],
   OLLIE: [
@@ -885,6 +984,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Ollie. Haces bailar a los enemigos. Y después pierdes la batalla de baile.',
       pt: 'Main Ollie. Você faz os inimigos dançarem. E depois perde a batalha de dança.',
       tr: "Ollie main'i. Rakipleri dans ettiriyorsun. Sonra dans yarışmasını kaybediyorsun.",
+      de: 'Ollie-Main. Du bringst die Gegner zum Tanzen. Dann verlierst du das Tanzduell.',
     },
   ],
   OTIS: [
@@ -893,6 +993,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Otis. Un artista callejero. Lástima que tu forma de jugar no sea una obra maestra.',
       pt: 'Main Otis. Um artista de rua. Pena que seu jogo não é uma obra-prima.',
       tr: "Otis main'i. Bir sokak sanatçısı. Ne yazık ki oynayışın bir başyapıt değil.",
+      de: 'Otis-Main. Ein Straßenkünstler. Schade, dass dein Gameplay kein Meisterwerk ist.',
     },
   ],
   PAM: [
@@ -901,6 +1002,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Pam. Pones la torreta de curación y tu equipo igual encuentra la forma de morir al lado.',
       pt: 'Main Pam. Você coloca a torreta de cura e o time ainda dá um jeito de morrer do lado dela.',
       tr: "Pam main'i. İyileştirme taretini koyuyorsun ve takımın yine de yanında ölmenin bir yolunu buluyor.",
+      de: 'Pam-Main. Du stellst das Heilgeschütz hin, und dein Team schafft es trotzdem, daneben zu sterben.',
     },
   ],
   PEARL: [
@@ -909,6 +1011,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Pearl. Galletas quemadas y un porcentaje de victorias quemado.',
       pt: 'Main Pearl. Biscoitos queimados e uma taxa de vitória queimada.',
       tr: "Pearl main'i. Yanık kurabiyeler ve yanık bir kazanma oranı.",
+      de: 'Pearl-Main. Verbrannte Kekse und eine verbrannte Siegquote.',
     },
   ],
   PIERCE: [
@@ -917,6 +1020,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Pierce. Un salvavidas que dispara en vez de salvar. Tus compañeros lo notaron.',
       pt: 'Main Pierce. Um salva-vidas que atira em vez de salvar. Seus parceiros perceberam.',
       tr: "Pierce main'i. İnsanları kurtarmak yerine vuran bir cankurtaran. Takım arkadaşların fark etti.",
+      de: 'Pierce-Main. Ein Rettungsschwimmer, der auf Leute schießt, statt sie zu retten. Dein Team hat es gemerkt.',
     },
   ],
   'R-T': [
@@ -925,6 +1029,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main R-T. Un kiosco de información que no tiene idea de lo que pasa.',
       pt: 'Main R-T. Um quiosque de informação que não faz ideia do que tá acontecendo.',
       tr: "R-T main'i. Neler olduğu hakkında hiçbir fikri olmayan bir bilgi kulübesi.",
+      de: 'R-T-Main. Ein Infokiosk, der keine Ahnung hat, was los ist.',
     },
   ],
   RUFFS: [
@@ -933,6 +1038,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Ruffs. Un coronel espacial. Tus compañeros reciben las mejoras, tú las caricias en la panza.',
       pt: 'Main Ruffs. Um coronel espacial. Seus parceiros ganham os power-ups, você ganha carinho na barriga.',
       tr: "Ruffs main'i. Bir uzay albayı. Güçlendirmeleri takım arkadaşların alıyor, göbek okşamayı sen.",
+      de: 'Ruffs-Main. Ein Weltraum-Oberst. Dein Team bekommt die Power-ups, du bekommst Bauchkraulen.',
     },
   ],
   SHADE: [
@@ -941,6 +1047,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Shade. Una pila de ropa con lentes de sol. El piso de tu cuarto tiene la misma energía.',
       pt: 'Main Shade. Uma pilha de roupa com óculos escuros. O chão do seu quarto tem a mesma energia.',
       tr: "Shade main'i. Güneş gözlüklü bir yığın kıyafet. Yatak odanın zemini de aynı enerjide.",
+      de: 'Shade-Main. Ein Kleiderhaufen mit Sonnenbrille. Dein Zimmerboden hat dieselbe Energie.',
     },
   ],
   SIRIUS: [
@@ -949,6 +1056,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Sirius. Expulsado de Starr Park y de vuelta para vengarse. La venganza no va bien.',
       pt: 'Main Sirius. Expulso do Starr Park e de volta pra se vingar. A vingança não tá indo bem.',
       tr: "Sirius main'i. Starr Park'tan kovuldu ve intikam için geri döndü. İntikam iyi gitmiyor.",
+      de: 'Sirius-Main. Aus dem Starr Park verbannt und zurück für Rache. Die Rache läuft nicht so gut.',
     },
   ],
   SPROUT: [
@@ -957,6 +1065,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Sprout. Construyes una pared para proteger a tu equipo. De ti, probablemente.',
       pt: 'Main Sprout. Você constrói uma parede pra proteger o time. De você, provavelmente.',
       tr: "Sprout main'i. Takımını korumak için duvar örüyorsun. Muhtemelen senden.",
+      de: 'Sprout-Main. Du baust eine Mauer, um dein Team zu schützen. Vor dir, wahrscheinlich.',
     },
   ],
   'STARR NOVA': [
@@ -965,6 +1074,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Starr Nova. Una cosplayer que se cree heroína de anime. Tú te crees pro. La misma energía.',
       pt: 'Main Starr Nova. Uma cosplayer que se acha heroína de anime. Você se acha pro. Mesma energia.',
       tr: "Starr Nova main'i. Kendini anime kahramanı sanan bir cosplayer. Sen de kendini pro sanıyorsun. Aynı enerji.",
+      de: 'Starr-Nova-Main. Eine Cosplayerin, die sich für eine Anime-Heldin hält. Du hältst dich für einen Profi. Dieselbe Energie.',
     },
   ],
   TICK: [
@@ -973,6 +1083,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Tick. Tu cabeza es literalmente una bomba. Tus planes no son mucho mejores.',
       pt: 'Main Tick. Sua cabeça é literalmente uma bomba. Seus planos não são muito melhores.',
       tr: "Tick main'i. Kafan kelimenin tam anlamıyla bomba. Planların da pek farklı değil.",
+      de: 'Tick-Main. Dein Kopf ist buchstäblich eine Bombe. Deine Pläne sind nicht viel besser.',
     },
   ],
   TRUNK: [
@@ -981,6 +1092,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Trunk. Una colonia de hormigas que finge ser un árbol. Aun así, más inteligente que tu selección.',
       pt: 'Main Trunk. Uma colônia de formigas fingindo ser árvore. Mesmo assim, mais esperta que o seu draft.',
       tr: "Trunk main'i. Ağaç kılığına girmiş bir karınca kolonisi. Yine de draftından daha akıllı.",
+      de: 'Trunk-Main. Eine Ameisenkolonie, die so tut, als wäre sie ein Baum. Immer noch klüger als dein Draft.',
     },
   ],
   WENDY: [
@@ -989,6 +1101,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Wendy. Viniste a salvar el planeta. Empieza por tu porcentaje de victorias.',
       pt: 'Main Wendy. Você veio salvar o planeta. Começa pela sua taxa de vitória.',
       tr: "Wendy main'i. Gezegeni kurtarmaya geldin. Kazanma oranınla başla.",
+      de: 'Wendy-Main. Du bist gekommen, um den Planeten zu retten. Fang mit deiner Siegquote an.',
     },
   ],
   WILLOW: [
@@ -997,6 +1110,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Willow. Controlas la mente del enemigo y aun así pierdes la pelea.',
       pt: 'Main Willow. Você controla a mente do inimigo e mesmo assim perde a briga.',
       tr: "Willow main'i. Rakibin zihnini kontrol ediyorsun ve yine de kavgayı kaybediyorsun.",
+      de: 'Willow-Main. Du kontrollierst den Gegner mit deinem Geist und verlierst den Kampf trotzdem.',
     },
   ],
   ZIGGY: [
@@ -1005,6 +1119,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Ziggy. No son trucos, son ilusiones. Como tu rango.',
       pt: 'Main Ziggy. Não são truques, são ilusões. Igual ao seu rank.',
       tr: "Ziggy main'i. Numara değil, illüzyon. Rütben gibi.",
+      de: 'Ziggy-Main. Keine Tricks, Illusionen. Wie dein Rang.',
     },
   ],
   VINCE: [
@@ -1013,6 +1128,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Vince. Café y bichos. Tus clientes huyeron. Tus compañeros también.',
       pt: 'Main Vince. Café e insetos. Seus clientes fugiram. Seus parceiros também.',
       tr: "Vince main'i. Kahve ve böcekler. Müşterilerin kaçtı. Takım arkadaşların da.",
+      de: 'Vince-Main. Kaffee und Käfer. Deine Kunden sind weggelaufen. Dein Team auch.',
     },
   ],
   'BUZZ LIGHTYEAR': [
@@ -1021,6 +1137,7 @@ const MAINS: Record<string, Line[]> = {
       es: 'Main Buzz Lightyear. Al infinito y más allá: el rango al que nunca vas a llegar.',
       pt: 'Main Buzz Lightyear. Ao infinito e além: o rank que você nunca vai alcançar.',
       tr: "Buzz Lightyear main'i. Sonsuzluğa ve ötesine: asla ulaşamayacağın rütbe.",
+      de: 'Buzz-Lightyear-Main. Bis zur Unendlichkeit und noch viel weiter: der Rang, den du nie erreichst.',
     },
   ],
 };
@@ -1032,42 +1149,49 @@ const CLASS_MAINS: Record<string, Line> = {
     es: 'Main {main}. Meterte solo contra tres enemigos es una personalidad, no una estrategia.',
     pt: 'Main {main}. Mergulhar sozinho em três inimigos é personalidade, não estratégia.',
     tr: "{main} main'i. Üç rakibin üstüne tek başına dalmak bir kişilik, strateji değil.",
+    de: '{main}-Main. Allein in drei Gegner zu springen ist eine Persönlichkeit, keine Strategie.',
   },
   Tank: {
     en: '{main} main. All that health, and you still find a way to waste it.',
     es: 'Main {main}. Tanta vida y aun así encuentras la forma de desperdiciarla.',
     pt: 'Main {main}. Tanta vida e mesmo assim você dá um jeito de desperdiçar.',
     tr: "{main} main'i. O kadar can ve yine de onu harcamanın bir yolunu buluyorsun.",
+    de: '{main}-Main. So viel Leben, und du findest trotzdem einen Weg, es zu verschwenden.',
   },
   Marksman: {
     en: "{main} main. You stay so far back you're basically spectating.",
     es: 'Main {main}. Te quedas tan atrás que básicamente eres espectador.',
     pt: 'Main {main}. Você fica tão lá atrás que é praticamente espectador.',
     tr: "{main} main'i. O kadar geride duruyorsun ki resmen izleyicisin.",
+    de: '{main}-Main. Du bleibst so weit hinten, dass du praktisch zuschaust.',
   },
   Artillery: {
     en: '{main} main. Behind a wall, far from danger, far from mattering.',
     es: 'Main {main}. Detrás de una pared, lejos del peligro, lejos de importar.',
     pt: 'Main {main}. Atrás da parede, longe do perigo, longe de fazer diferença.',
     tr: "{main} main'i. Duvarın arkasında, tehlikeden uzak, önemli olmaktan da uzak.",
+    de: '{main}-Main. Hinter einer Wand, weit weg von der Gefahr, weit weg von jeder Bedeutung.',
   },
   Support: {
     en: '{main} main. Healing the team so it can lose more slowly.',
     es: 'Main {main}. Curas al equipo para que pierda más despacio.',
     pt: 'Main {main}. Cura o time pra ele perder mais devagar.',
     tr: "{main} main'i. Takımı daha yavaş kaybetsin diye iyileştiriyorsun.",
+    de: '{main}-Main. Du heilst das Team, damit es langsamer verliert.',
   },
   Controller: {
     en: '{main} main. You control the map. Just not the scoreboard.',
     es: 'Main {main}. Controlas el mapa. Pero no el marcador.',
     pt: 'Main {main}. Você controla o mapa. Só não controla o placar.',
     tr: "{main} main'i. Haritayı kontrol ediyorsun. Sadece skor tablosunu değil.",
+    de: '{main}-Main. Du kontrollierst die Map. Nur nicht die Anzeigetafel.',
   },
   'Damage Dealer': {
     en: '{main} main. "Damage Dealer", says the class. Your stats say otherwise.',
     es: 'Main {main}. "Daño", dice la clase. Tus estadísticas dicen otra cosa.',
     pt: 'Main {main}. "Dano", diz a classe. Suas estatísticas dizem outra coisa.',
     tr: "{main} main'i. Sınıfı \"Yüksek Hasar\" diyor. İstatistiklerin başka söylüyor.",
+    de: '{main}-Main. „Damage-Dealer“, sagt die Klasse. Deine Stats sagen was anderes.',
   },
 };
 
@@ -1106,6 +1230,7 @@ export const JOKES: Joke[] = [
         es: 'Main {main}. De {total} brawlers, elegiste este. Interesante.',
         pt: 'Main {main}. De {total} brawlers, você escolheu esse. Interessante.',
         tr: "{main} main'i. {total} savaşçı arasından seçtiğin bu. İlginç.",
+        de: '{main}-Main. Von {total} Brawlern hast du dir genau den ausgesucht. Interessant.',
       },
     ],
   },
@@ -1121,6 +1246,7 @@ export const JOKES: Joke[] = [
         es: '{main} está en tier {mainTier} en Competitivo ahora mismo y sigue siendo tu main. Qué tierna la lealtad.',
         pt: '{main} tá no tier {mainTier} no Ranqueado agora e continua sendo seu main. Que fofa essa lealdade.',
         tr: "{main} şu an Aşamalı'da {mainTier} tier ve hâlâ main'in. Sadakat tatlı bir şey.",
+        de: '{main} ist gerade Tier {mainTier} im Ranked, und du mainst ihn immer noch. Treue ist süß.',
       },
     ],
   },
@@ -1134,6 +1260,7 @@ export const JOKES: Joke[] = [
         es: '{main} está en tier S ahora mismo. Tus victorias son del parche, no tuyas.',
         pt: '{main} tá no tier S agora. Suas vitórias são do patch, não suas.',
         tr: "{main} şu an S tier. Galibiyetlerin sana değil yamaya ait.",
+        de: '{main} ist gerade S-Tier. Deine Siege gehören dem Patch, nicht dir.',
       },
     ],
   },
@@ -1149,6 +1276,7 @@ export const JOKES: Joke[] = [
         es: 'Ni un rango en Competitivo. ¿Te da miedo la pantalla de selección?',
         pt: 'Nenhum rank no Ranqueado. Medo da tela de draft?',
         tr: "Hiç Aşamalı rütben yok. Draft ekranından mı korkuyorsun?",
+        de: 'Überhaupt kein Ranked-Rang. Angst vor dem Draft-Bildschirm?',
       },
     ],
   },
@@ -1164,6 +1292,7 @@ export const JOKES: Joke[] = [
         es: 'Tu mejor rango histórico: {best}. Esta temporada: {now}. La remontada se está tomando su tiempo.',
         pt: 'Melhor rank da vida: {best}. Nessa temporada: {now}. A volta por cima tá demorando.',
         tr: "Tüm zamanların en iyisi: {best}. Bu sezon: {now}. Geri dönüş biraz zaman alıyor.",
+        de: 'Bester Rang aller Zeiten: {best}. Diese Saison: {now}. Das Comeback lässt sich Zeit.',
       },
     ],
   },
@@ -1177,6 +1306,7 @@ export const JOKES: Joke[] = [
         es: 'Tu mejor rango en Competitivo: {best}. Hasta los bots suben más.',
         pt: 'Seu melhor rank no Ranqueado: {best}. Até os bots sobem mais.',
         tr: "Ulaştığın en iyi Aşamalı rütbesi: {best}. Botlar bile daha yükseğe çıkıyor.",
+        de: 'Bester Ranked-Rang aller Zeiten: {best}. Sogar die Bots klettern höher.',
       },
     ],
   },
@@ -1190,6 +1320,7 @@ export const JOKES: Joke[] = [
         es: 'Tu mejor rango en Competitivo: {best}. Ni bueno ni malo. Simplemente ahí.',
         pt: 'Seu melhor rank no Ranqueado: {best}. Nem bom nem ruim. Só tá lá.',
         tr: "En iyi Aşamalı rütben: {best}. Ne iyi, ne kötü. Sadece orada.",
+        de: 'Bester Ranked-Rang: {best}. Nicht gut, nicht schlecht. Einfach da.',
       },
     ],
   },
@@ -1203,6 +1334,7 @@ export const JOKES: Joke[] = [
         es: '{best} en Competitivo. Lo bastante cerca de Maestro para verlo, lo bastante lejos para nunca tocarlo.',
         pt: '{best} no Ranqueado. Perto do Mestre pra ver, longe demais pra encostar.',
         tr: "Aşamalı'da {best}. Ustalar'ı görecek kadar yakın, asla dokunamayacak kadar uzak.",
+        de: '{best} im Ranked. Nah genug an Meister, um es zu sehen, weit genug, um es nie zu berühren.',
       },
     ],
   },
@@ -1216,6 +1348,7 @@ export const JOKES: Joke[] = [
         es: '{best} en Competitivo. Impresionante. ¿Qué tal la luz del sol estos días?',
         pt: '{best} no Ranqueado. Impressionante. Como anda a luz do sol?',
         tr: "Aşamalı'da {best}. Etkileyici. Bu aralar güneş ışığı nasıl?",
+        de: '{best} im Ranked. Beeindruckend. Wie ist eigentlich das Sonnenlicht so?',
       },
     ],
   },
@@ -1231,6 +1364,7 @@ export const JOKES: Joke[] = [
         es: '{wins} victorias en tus últimas {decided} partidas. Tus compañeros merecen una compensación.',
         pt: '{wins} vitórias nas suas últimas {decided} partidas. Seus parceiros merecem uma indenização.',
         tr: "Son {decided} maçında {wins} galibiyet. Takım arkadaşların tazminatı hak ediyor.",
+        de: '{wins} Siege in deinen letzten {decided} Spielen. Dein Team verdient eine Entschädigung.',
       },
     ],
   },
@@ -1244,6 +1378,7 @@ export const JOKES: Joke[] = [
         es: '{wr} de victorias en tus últimas partidas. ¿Quién está jugando en tu cuenta?',
         pt: '{wr} de vitórias nas últimas partidas. Quem anda jogando na sua conta?',
         tr: "Son maçlarında {wr} kazanma oranı. Hesabında kim oynuyor?",
+        de: '{wr} Siegquote in deinen letzten Spielen. Wer hat auf deinem Account gespielt?',
       },
     ],
   },
@@ -1257,6 +1392,7 @@ export const JOKES: Joke[] = [
         es: '{wins} victorias y {losses} derrotas en tus últimas partidas. No eres un jugador, eres una moneda al aire.',
         pt: '{wins} vitórias e {losses} derrotas nas últimas partidas. Você não é um jogador, é cara ou coroa.',
         tr: "Son maçlarında {wins} galibiyet ve {losses} yenilgi. Sen bir oyuncu değilsin, yazı turasın.",
+        de: '{wins} Siege und {losses} Niederlagen in deinen letzten Spielen. Du bist kein Spieler, du bist ein Münzwurf.',
       },
     ],
   },
@@ -1270,6 +1406,7 @@ export const JOKES: Joke[] = [
         es: '{rankedGames} de tus últimas {games} partidas fueron de Competitivo y sigues en {now}. Respeto el compromiso.',
         pt: '{rankedGames} das suas últimas {games} partidas foram no Ranqueado e você continua no {now}. Respeito o compromisso.',
         tr: "Son {games} maçının {rankedGames} tanesi Aşamalı'ydı ve hâlâ {now} rütbesindesin. Bu bağlılığa saygı.",
+        de: '{rankedGames} deiner letzten {games} Spiele waren Ranked, und du bist immer noch {now}. Respekt für den Einsatz.',
       },
     ],
   },
@@ -1283,6 +1420,7 @@ export const JOKES: Joke[] = [
         es: 'Perdiste tus últimas {lossStreak} partidas seguidas. ¿Probaste apagarlo y volver a encenderlo?',
         pt: 'Perdeu as últimas {lossStreak} partidas seguidas. Já tentou desligar e ligar de novo?',
         tr: "Son {lossStreak} maçını üst üste kaybettin. Kapatıp tekrar açmayı denedin mi?",
+        de: 'Deine letzten {lossStreak} Spiele in Folge verloren. Schon mal aus- und wieder eingeschaltet?',
       },
     ],
   },
@@ -1296,6 +1434,7 @@ export const JOKES: Joke[] = [
         es: 'Cero veces jugador estrella en tus últimas {games} partidas. Ni el juego te notó.',
         pt: 'Zero vezes MVP nas suas últimas {games} partidas. Nem o jogo te notou.',
         tr: "Son {games} maçında sıfır Yıldız Oyuncu. Oyun bile seni fark etmedi.",
+        de: 'Null Mal Starspieler in deinen letzten {games} Spielen. Nicht mal das Spiel hat dich bemerkt.',
       },
     ],
   },
@@ -1309,6 +1448,7 @@ export const JOKES: Joke[] = [
         es: 'Jugador estrella {star} veces en tus últimas {games} partidas. Cargar al equipo es un trabajo. ¿Te pagan?',
         pt: 'MVP {star} vezes nas suas últimas {games} partidas. Carregar o time é trabalho. Tão te pagando?',
         tr: "Son {games} maçında {star} kez Yıldız Oyuncu. Takımı taşımak bir iş. Para alıyor musun?",
+        de: '{star} Mal Starspieler in deinen letzten {games} Spielen. Carry ist ein Job. Wirst du bezahlt?',
       },
     ],
   },
@@ -1322,6 +1462,7 @@ export const JOKES: Joke[] = [
         es: '{friendly} de tus últimas {games} partidas fueron amistosas. Entrenando para un partido que nunca llega.',
         pt: '{friendly} das suas últimas {games} partidas foram amistosos. Treinando pra uma partida que nunca chega.',
         tr: "Son {games} maçının {friendly} tanesi dostluk maçıydı. Hiç gelmeyecek bir maça hazırlanıyorsun.",
+        de: '{friendly} deiner letzten {games} Spiele waren Freundschaftsspiele. Training für ein Match, das nie kommt.',
       },
     ],
   },
@@ -1335,6 +1476,7 @@ export const JOKES: Joke[] = [
         es: '{topGames} de tus últimas {games} partidas con {topB}. Existen otros brawlers, ¿sabías?',
         pt: '{topGames} das suas últimas {games} partidas de {topB}. Existem outros brawlers, sabia?',
         tr: "Son {games} maçının {topGames} tanesi {topB} ile. Bilgin olsun, başka savaşçılar da var.",
+        de: '{topGames} deiner letzten {games} Spiele mit {topB}. Es gibt auch andere Brawler, weißt du.',
       },
     ],
   },
@@ -1350,6 +1492,7 @@ export const JOKES: Joke[] = [
         es: '{sdWins} victorias en Supervivencia y {v3} en 3c3. ¿Alergia a los compañeros?',
         pt: '{sdWins} vitórias no Combate e {v3} no 3x3. Alergia a parceiro?',
         tr: "{sdWins} Hesaplaşma galibiyeti ve {v3} 3v3 galibiyeti. Takım arkadaşlarına alerjin mi var?",
+        de: '{sdWins} Showdown-Siege und {v3} 3-gegen-3-Siege. Allergisch gegen Teamkollegen?',
       },
     ],
   },
@@ -1363,6 +1506,7 @@ export const JOKES: Joke[] = [
         es: '{soloWins} victorias en Supervivencia (solo). ¿Y cuántas fueron haciendo "teaming"?',
         pt: '{soloWins} vitórias no Combate solitário. E quantas foram de "teaming"?',
         tr: "{soloWins} Tek Kişilik Hesaplaşma galibiyeti. Peki bunların kaçı \"takımlaşma\"ydı?",
+        de: '{soloWins} Solo-Showdown-Siege. Und wie viele davon waren „Teaming“?',
       },
     ],
   },
@@ -1376,6 +1520,7 @@ export const JOKES: Joke[] = [
         es: '{showdownRecent} de tus últimas {games} partidas fueron de Supervivencia. Escondido en un arbusto hasta que el gas haga tu trabajo.',
         pt: '{showdownRecent} das suas últimas {games} partidas foram de Combate. Escondido na moita até o gás fazer o seu trabalho.',
         tr: "Son {games} maçının {showdownRecent} tanesi Hesaplaşma. Gaz senin işini yapana kadar çalıda saklanıyorsun.",
+        de: '{showdownRecent} deiner letzten {games} Spiele waren Showdown. Im Busch verstecken, bis das Gas deinen Job macht.',
       },
     ],
   },
@@ -1391,12 +1536,14 @@ export const JOKES: Joke[] = [
         es: 'Sin club. Hasta los bots tienen club.',
         pt: 'Sem clube. Até os bots têm clube.',
         tr: "Kulüp yok. Botların bile kulübü var.",
+        de: 'Kein Club. Sogar die Bots haben einen Club.',
       },
       {
         en: 'No club. Nobody sent an invite, or did everyone kick you?',
         es: 'Sin club. ¿Nadie te invitó o todos te expulsaron?',
         pt: 'Sem clube. Ninguém te convidou ou todo mundo te expulsou?',
         tr: "Kulüp yok. Kimse davet göndermedi mi, yoksa herkes seni mi attı?",
+        de: 'Kein Club. Hat dir niemand eine Einladung geschickt, oder haben dich alle rausgeworfen?',
       },
     ],
   },
@@ -1411,6 +1558,7 @@ export const JOKES: Joke[] = [
         es: 'Tu club se llama "{club}". Lo más aterrador es el nombre.',
         pt: 'Seu clube se chama "{club}". A coisa mais assustadora nele é o nome.',
         tr: "Kulübünün adı \"{club}\". Onunla ilgili en korkutucu şey adı.",
+        de: 'Dein Club heißt „{club}“. Das Gruseligste daran ist der Name.',
       },
     ],
   },
@@ -1424,6 +1572,7 @@ export const JOKES: Joke[] = [
         es: 'Tu club se llama "{club}". Nombre grande. Resultados chicos en la Liga de Clubes, seguramente.',
         pt: 'Seu clube se chama "{club}". Nome grande. Resultado pequeno na Liga de Clubes, com certeza.',
         tr: "Kulübünün adı \"{club}\". Büyük isim. Muhtemelen küçük Kulüp Ligi sonuçları.",
+        de: 'Dein Club heißt „{club}“. Großer Name. Kleine Clubliga-Ergebnisse, vermutlich.',
       },
     ],
   },
@@ -1439,6 +1588,7 @@ export const JOKES: Joke[] = [
         es: '{untouched} brawlers siguen en poder 1. Eso no es un plantel, es un museo.',
         pt: '{untouched} brawlers ainda no poder 1. Isso não é um elenco, é um museu.',
         tr: "{untouched} savaşçı hâlâ Güç 1'de. Bu bir kadro değil, bir müze.",
+        de: '{untouched} Brawler noch auf Power 1. Das ist kein Kader, das ist ein Museum.',
       },
     ],
   },
@@ -1452,6 +1602,7 @@ export const JOKES: Joke[] = [
         es: 'Los {maxed} brawlers en poder 11. Eso no es una cuenta, es un segundo trabajo.',
         pt: 'Todos os {maxed} brawlers no poder 11. Isso não é uma conta, é um segundo emprego.',
         tr: "{maxed} savaşçının hepsi Güç 11'de. Bu bir hesap değil, ikinci bir iş.",
+        de: 'Alle {maxed} Brawler auf Power 11. Das ist kein Account, das ist ein Zweitjob.',
       },
     ],
   },
@@ -1465,6 +1616,7 @@ export const JOKES: Joke[] = [
         es: 'Solo {owned} de {total} brawlers desbloqueados. Los Premios Starr deben odiarte.',
         pt: 'Só {owned} de {total} brawlers desbloqueados. Os Sorteios Starr devem te odiar.',
         tr: "{total} savaşçının yalnızca {owned} tanesi açık. Starr Hediyeleri senden nefret ediyor olmalı.",
+        de: 'Nur {owned} von {total} Brawlern freigeschaltet. Die Starr-Drops müssen dich hassen.',
       },
     ],
   },
@@ -1478,6 +1630,7 @@ export const JOKES: Joke[] = [
         es: '{noSp} brawlers en poder 11 sin habilidad estelar. Compraste el auto y te olvidaste del motor.',
         pt: '{noSp} brawlers no poder 11 sem poder de estrela. Comprou o carro e esqueceu o motor.',
         tr: "Yıldız gücü olmayan {noSp} Güç 11 savaşçı. Arabayı almışsın, motoru unutmuşsun.",
+        de: '{noSp} Brawler auf Power 11 ohne Starpower. Das Auto gekauft, den Motor vergessen.',
       },
     ],
   },
@@ -1493,6 +1646,7 @@ export const JOKES: Joke[] = [
         es: 'Nivel {lvl} y tu mejor rango es {best}. Años de experiencia, cero lecciones aprendidas.',
         pt: 'Nível {lvl} e seu melhor rank é {best}. Anos de experiência, zero lições aprendidas.',
         tr: "Seviye {lvl} ve en iyi Aşamalı rütben {best}. Yılların tecrübesi, sıfır ders.",
+        de: 'Level {lvl}, und dein bester Ranked-Rang ist {best}. Jahre an Erfahrung, null Lektionen gelernt.',
       },
     ],
   },
@@ -1506,6 +1660,7 @@ export const JOKES: Joke[] = [
         es: '¿Nivel {lvl} con {tr} trofeos? O eres un prodigio o esta cuenta la juega otra persona.',
         pt: 'Nível {lvl} com {tr} troféus? Ou é um prodígio ou outra pessoa joga nessa conta.',
         tr: "Seviye {lvl} ve {tr} kupa mı? Ya bir dâhisin ya da bu hesabı başkası oynuyor.",
+        de: 'Level {lvl} mit {tr} Trophäen? Entweder ein Wunderkind, oder jemand anderes spielt diesen Account.',
       },
     ],
   },
@@ -1519,6 +1674,7 @@ export const JOKES: Joke[] = [
         es: 'Nivel {lvl}. Pasaste más tiempo en Brawl Stars que en la escuela.',
         pt: 'Nível {lvl}. Você passou mais tempo no Brawl Stars do que na escola.',
         tr: "Seviye {lvl}. Brawl Stars'ta okulda geçirdiğinden daha çok zaman geçirdin.",
+        de: 'Level {lvl}. Du hast mehr Zeit in Brawl Stars verbracht als in der Schule.',
       },
     ],
   },
@@ -1534,6 +1690,7 @@ export const JOKES: Joke[] = [
         es: 'Una racha de {streak} victorias con {streakB}. Una vez. Desde entonces persigues esa sensación.',
         pt: 'Uma sequência de {streak} vitórias de {streakB}. Uma vez. Desde então você corre atrás dessa sensação.',
         tr: "{streakB} ile {streak} maçlık galibiyet serisi. Bir kez. O zamandan beri o hissin peşindesin.",
+        de: 'Eine Siegesserie von {streak} mit {streakB}. Einmal. Seitdem jagst du diesem Gefühl hinterher.',
       },
     ],
   },
@@ -1547,6 +1704,7 @@ export const JOKES: Joke[] = [
         es: 'Tu mejor racha de victorias es de {streak}. La constancia no es lo tuyo.',
         pt: 'Sua melhor sequência de vitórias é {streak}. Constância não é com você.',
         tr: "Tüm zamanların en iyi galibiyet serin {streak}. İstikrar senin işin değil.",
+        de: 'Deine beste Siegesserie aller Zeiten ist {streak}. Beständigkeit ist nicht dein Ding.',
       },
     ],
   },
@@ -1560,6 +1718,7 @@ export const JOKES: Joke[] = [
         es: 'Prestigio {prestige} con {main}. Dormir es gratis, ¿sabías?',
         pt: 'Prestígio {prestige} no {main}. Dormir é de graça, sabia?',
         tr: "{main} ile Prestij {prestige}. Bilgin olsun, uyku bedava.",
+        de: 'Prestige {prestige} auf {main}. Schlafen ist kostenlos, weißt du.',
       },
     ],
   },
@@ -1575,6 +1734,7 @@ export const JOKES: Joke[] = [
         es: 'Te pusiste "{name}" de nombre. Valiente, con {wr} de victorias.',
         pt: 'Você se chamou de "{name}". Coragem, pra quem tem {wr} de vitórias.',
         tr: "Kendine \"{name}\" adını vermişsin. {wr} kazanma oranı için cesurca.",
+        de: 'Du nennst dich „{name}“. Mutig, bei {wr} Siegquote.',
       },
     ],
   },
@@ -1588,6 +1748,7 @@ export const JOKES: Joke[] = [
         es: 'Un nombre con letras de lujo. El esfuerzo fue para la fuente, no para el juego.',
         pt: 'Nome com letrinha estilizada. O esforço foi pra fonte, não pro jogo.',
         tr: "Süslü harflerle bir isim. Emek oynayışa değil yazı tipine gitmiş.",
+        de: 'Ein Name in schicken Buchstaben. Die Mühe ging in die Schrift, nicht ins Gameplay.',
       },
     ],
   },
@@ -1603,12 +1764,14 @@ export const JOKES: Joke[] = [
         es: '{tr} trofeos. Cada uno ganado por las malas: lentamente.',
         pt: '{tr} troféus. Cada um conquistado do jeito difícil: devagar.',
         tr: "{tr} kupa. Her biri zor yoldan kazanıldı: yavaş yavaş.",
+        de: '{tr} Trophäen. Jede davon auf die harte Tour verdient: langsam.',
       },
       {
         en: '{tr} trophies. Somewhere, a bot is proud of you.',
         es: '{tr} trofeos. En algún lugar, un bot está orgulloso de ti.',
         pt: '{tr} troféus. Em algum lugar, um bot tá orgulhoso de você.',
         tr: "{tr} kupa. Bir yerlerde bir bot seninle gurur duyuyor.",
+        de: '{tr} Trophäen. Irgendwo ist ein Bot stolz auf dich.',
       },
     ],
   },
@@ -1623,6 +1786,7 @@ export const JOKES: Joke[] = [
         es: '{owned} brawlers y sigues eligiendo el mismo en cada partida.',
         pt: '{owned} brawlers e você ainda escolhe o mesmo toda partida.',
         tr: "{owned} savaşçı ve yine de her maç aynısını seçiyorsun.",
+        de: '{owned} Brawler, und du nimmst trotzdem jedes Spiel denselben.',
       },
     ],
   },
@@ -1641,13 +1805,13 @@ export function jokeLines(joke: Joke, f: RoastFacts): Line[] {
 /* ---------------------------- titles and closers ---------------------------- */
 
 export const TITLES: { min: number; title: Line }[] = [
-  { min: 9, title: { en: 'Touch Grass Immediately', es: 'Sal a tocar pasto YA', pt: 'Vai tocar grama AGORA', tr: 'Hemen Dışarı Çık' } },
-  { min: 7.5, title: { en: 'Actually Cracked', es: 'Muy roto, la verdad', pt: 'Brabo demais, sendo honesto', tr: 'Gerçekten Çok İyi' } },
-  { min: 6, title: { en: 'Sweaty Tryhard', es: 'Tryhard sudoroso', pt: 'Tryhard suado', tr: 'Terli Tryhard' } },
-  { min: 4.5, title: { en: 'Professional Mid', es: 'Mediocre profesional', pt: 'Mediano profissional', tr: 'Profesyonel Ortalama' } },
-  { min: 3, title: { en: 'Bush Camper', es: 'Campero de arbustos', pt: 'Campeiro de moita', tr: 'Çalı Kampçısı' } },
-  { min: 1.5, title: { en: "Teammates' Nightmare", es: 'La pesadilla de tus compañeros', pt: 'O pesadelo dos parceiros', tr: 'Takım Arkadaşlarının Kâbusu' } },
-  { min: 0, title: { en: 'Certified Bot', es: 'Bot certificado', pt: 'Bot certificado', tr: 'Onaylı Bot' } },
+  { min: 9, title: { en: 'Touch Grass Immediately', es: 'Sal a tocar pasto YA', pt: 'Vai tocar grama AGORA', tr: 'Hemen Dışarı Çık', de: 'Sofort an die frische Luft' } },
+  { min: 7.5, title: { en: 'Actually Cracked', es: 'Muy roto, la verdad', pt: 'Brabo demais, sendo honesto', tr: 'Gerçekten Çok İyi', de: 'Richtig stark' } },
+  { min: 6, title: { en: 'Sweaty Tryhard', es: 'Tryhard sudoroso', pt: 'Tryhard suado', tr: 'Terli Tryhard', de: 'Verschwitzter Tryhard' } },
+  { min: 4.5, title: { en: 'Professional Mid', es: 'Mediocre profesional', pt: 'Mediano profissional', tr: 'Profesyonel Ortalama', de: 'Profi-Mittelmaß' } },
+  { min: 3, title: { en: 'Bush Camper', es: 'Campero de arbustos', pt: 'Campeiro de moita', tr: 'Çalı Kampçısı', de: 'Busch-Camper' } },
+  { min: 1.5, title: { en: "Teammates' Nightmare", es: 'La pesadilla de tus compañeros', pt: 'O pesadelo dos parceiros', tr: 'Takım Arkadaşlarının Kâbusu', de: 'Albtraum deines Teams' } },
+  { min: 0, title: { en: 'Certified Bot', es: 'Bot certificado', pt: 'Bot certificado', tr: 'Onaylı Bot', de: 'Zertifizierter Bot' } },
 ];
 
 export const CLOSERS: { min: number; lines: Line[] }[] = [
@@ -1659,12 +1823,14 @@ export const CLOSERS: { min: number; lines: Line[] }[] = [
         es: 'Está bien, {name}, juegas bien. Ahora ve a tomar agua.',
         pt: 'Tá bom, {name}, você joga bem. Agora vai beber uma água.',
         tr: "Tamam {name}, iyi oynuyorsun. Şimdi git biraz su iç.",
+        de: 'Na gut, {name}, du spielst gut. Jetzt trink mal ein Glas Wasser.',
       },
       {
         en: 'Good account. Terrible sleep schedule, probably.',
         es: 'Buena cuenta. Horario de sueño terrible, seguramente.',
         pt: 'Conta boa. Horário de sono péssimo, com certeza.',
         tr: "İyi hesap. Muhtemelen berbat bir uyku düzeni.",
+        de: 'Guter Account. Furchtbarer Schlafrhythmus, vermutlich.',
       },
     ],
   },
@@ -1676,12 +1842,14 @@ export const CLOSERS: { min: number; lines: Line[] }[] = [
         es: 'Tryhard detectado, {name}. El esfuerzo es real. Los resultados siguen cargando.',
         pt: 'Tryhard detectado, {name}. O esforço é real. Os resultados ainda tão carregando.',
         tr: "Tryhard tespit edildi {name}. Kasma gerçek. Sonuçlar hâlâ yükleniyor.",
+        de: 'Tryhard erkannt, {name}. Der Grind ist echt. Die Ergebnisse laden noch.',
       },
       {
         en: "You take this game very seriously, {name}. The game has noticed. It isn't impressed yet.",
         es: 'Te tomas este juego muy en serio, {name}. El juego lo notó. Todavía no está impresionado.',
         pt: 'Você leva esse jogo muito a sério, {name}. O jogo percebeu. Ainda não ficou impressionado.',
         tr: "Bu oyunu çok ciddiye alıyorsun {name}. Oyun fark etti. Henüz etkilenmedi.",
+        de: 'Du nimmst dieses Spiel sehr ernst, {name}. Das Spiel hat es bemerkt. Beeindruckt ist es noch nicht.',
       },
     ],
   },
@@ -1693,12 +1861,14 @@ export const CLOSERS: { min: number; lines: Line[] }[] = [
         es: 'No es la peor cuenta que vimos hoy. Tampoco la mejor.',
         pt: 'Não é a pior conta que vimos hoje. Nem a melhor.',
         tr: "Bugün gördüğümüz en kötü hesap değil. En iyisi de değil.",
+        de: 'Nicht der schlechteste Account, den wir heute gesehen haben. Aber auch nicht der beste.',
       },
       {
         en: 'A mid account, {name}. But mid is a place you can climb out of.',
         es: 'Una cuenta promedio, {name}. Pero de lo promedio se puede salir.',
         pt: 'Uma conta mediana, {name}. Mas do mediano dá pra sair.',
         tr: "Ortalama bir hesap {name}. Ama ortalama, tırmanıp çıkabileceğin bir yer.",
+        de: 'Ein mittelmäßiger Account, {name}. Aber aus dem Mittelmaß kann man rausklettern.',
       },
     ],
   },
@@ -1710,12 +1880,14 @@ export const CLOSERS: { min: number; lines: Line[] }[] = [
         es: '¿Borrar el juego? No. Pero tal vez mira la tier list de vez en cuando.',
         pt: 'Apagar o jogo? Não. Mas talvez dê uma olhada na tier list de vez em quando.',
         tr: "Oyunu sil mi? Hayır. Ama arada bir tier listesine bakabilirsin.",
+        de: 'Das Spiel löschen? Nein. Aber vielleicht ab und zu mal die Tierlist anschauen.',
       },
       {
         en: "It's okay, {name}. Every pro started as a bot. Most of them stayed bots, though.",
         es: 'Tranqui, {name}. Todo pro empezó como bot. Aunque la mayoría siguió siendo bot.',
         pt: 'Relaxa, {name}. Todo pro começou como bot. Mas a maioria continuou bot.',
         tr: "Sorun değil {name}. Her pro bot olarak başladı. Gerçi çoğu bot olarak kaldı.",
+        de: 'Alles gut, {name}. Jeder Profi hat als Bot angefangen. Die meisten sind allerdings Bots geblieben.',
       },
     ],
   },
