@@ -3605,4 +3605,1274 @@ export const RU: Record<string, string> = {
     "Мета на твоём ранге — не та, что на самом верху. И у каждого пика есть ответ.",
   "Tier list at your rank":
     "Тир-лист на твоём ранге",
+  "Built only from battles played at that rank.":
+    "Только по боям, сыгранным на этом ранге.",
+  "How to counter…":
+    "Как контрить…",
+  "The brawlers picked most in Ranked this week. Tap one for what beats it, at every rank.":
+    "Самые популярные бойцы в ранговых боях на этой неделе. Нажми на бойца, чтобы увидеть, кто его побеждает, на каждом ранге.",
+  "How to counter {name}":
+    "Как контрить {name}",
+  "{rate} picked":
+    "выбирают в {rate}",
+  "Type a brawler, e.g. Shade":
+    "Введи бойца, например Shade",
+  "Brawler to counter":
+    "Боец, которого нужно законтрить",
+  "Counters":
+    "Контрпики",
+  "No brawler by that name.":
+    "Нет бойца с таким именем.",
+  "Two accounts? Every tag you use is saved, and the app shows the others under “Switch account”: one tap swaps, a long press forgets one.":
+    "Два аккаунта? Каждый тег, который ты используешь, сохраняется, а приложение показывает остальные в разделе «Сменить аккаунт»: одно нажатие переключает, долгое нажатие удаляет.",
+  "The site and the app's panel are delivered through Cloudflare, which handles each request (including your IP address) in order to serve and protect it, under its own privacy policy. We do not log IP addresses ourselves.":
+    "Сайт и панель приложения доставляются через Cloudflare, который обрабатывает каждый запрос (включая твой IP-адрес), чтобы доставить и защитить его, по собственной политике конфиденциальности. Сами мы IP-адреса не записываем.",
+  ", it comes with a SHA-256 checksum so you can verify the file is the one we published.":
+    ", к нему прилагается контрольная сумма SHA-256, чтобы ты мог проверить, что это опубликованный нами файл.",
+  ", so opening it counts as an anonymous page view here and nothing more. All traffic is encrypted (HTTPS). The app contains no advertising or analytics SDK and shares nothing with third parties.":
+    ", так что его открытие считается здесь анонимным просмотром страницы и не более. Весь трафик зашифрован (HTTPS). В приложении нет рекламных и аналитических SDK, и оно ничего не передаёт третьим лицам.",
+  "BrawlZone (brawlzone.net) and the BrawlZone Bubble Android app are made by Novais Labs, an independent developer in Portugal. This policy covers both. Contact:":
+    "BrawlZone (brawlzone.net) и приложение для Android BrawlZone Bubble делает Novais Labs — независимый разработчик из Португалии. Эта политика распространяется на оба. Контакт:",
+  "BrawlZone is not directed at children and knowingly collects no personal information from anyone, of any age.":
+    "BrawlZone не предназначен для детей и сознательно не собирает персональные данные ни у кого, в любом возрасте.",
+  "Deleting your data":
+    "Удаление твоих данных",
+  "If you enter your player tag, the app sends it to brawlzone.net to show your profile, your brawlers and what to upgrade next, exactly as the site does for a search (see above). The tags you have used, with their player names, and your settings are kept on your phone so you can switch accounts; they are removed when you uninstall the app or clear its data, and a long press removes one.":
+    "Если ты вводишь свой тег игрока, приложение отправляет его на brawlzone.net, чтобы показать твой профиль, твоих бойцов и что улучшить дальше, ровно как сайт при поиске (см. выше). Использованные теги с именами игроков и твои настройки хранятся на телефоне, чтобы можно было переключать аккаунты; они удаляются при удалении приложения или очистке его данных, а долгое нажатие удаляет один.",
+  "Installed from Google Play, the app is covered by Google's own privacy policy for the Play Store, and Google gives us aggregate statistics such as install counts and crash reports. Downloaded from the":
+    "При установке из Google Play на приложение распространяется собственная политика конфиденциальности Google для Play Маркета, и Google передаёт нам сводную статистику, например число установок и отчёты о сбоях. При загрузке со",
+  "Its panel is a web view of":
+    "Его панель — это веб-просмотр",
+  "No account, no ads, no trackers, and it cannot see your screen.":
+    "Без аккаунта, без рекламы, без трекеров, и оно не видит твой экран.",
+  "Nothing to delete on our side for most people.":
+    "Для большинства у нас нечего удалять.",
+  "Sampled battle data is kept only as long as the statistics need it and is then deleted or reduced to aggregates that describe no individual player.":
+    "Собранные данные боёв хранятся только столько, сколько они нужны статистике, а затем удаляются или сводятся к агрегатам, которые не описывают ни одного игрока.",
+  "Searching a player tag, on the site or in the app, sends it to the official Brawl Stars API to fetch that profile. The public game stats that come back (player name, tag, trophies, rank and brawler counts) are saved once a day so the profile can show progress over time, and the account joins the pool sampled for statistics. Nothing about the person searching is stored: no IP address, no device, no link between a search and whoever made it.":
+    "Поиск по тегу игрока на сайте или в приложении отправляет его в официальный API Brawl Stars, чтобы получить профиль. Вернувшиеся публичные игровые данные (имя игрока, тег, трофеи, ранг и число бойцов) сохраняются раз в день, чтобы профиль мог показывать прогресс, и аккаунт попадает в пул, собираемый для статистики. О человеке, который ищет, ничего не хранится: ни IP-адреса, ни устройства, ни связи между поиском и тем, кто его сделал.",
+  "We keep the public game profile, never who searched for it.":
+    "Мы храним публичный игровой профиль, но никогда — того, кто его искал.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, no cookies, no ads.":
+    "Что хранят BrawlZone и приложение BrawlZone Bubble, чего не хранят и что отправляет приложение. Без аккаунтов, без cookies, без рекламы.",
+  "What is on your device is yours to remove: clear the site's data in your browser, or uninstall the app. To have a player profile's saved stats deleted and the tag excluded from future sampling, email":
+    "То, что на твоём устройстве, ты удаляешь сам: очисти данные сайта в браузере или удали приложение. Чтобы удалить сохранённые данные профиля игрока и исключить тег из будущего сбора, напиши на",
+  "Who we are":
+    "Кто мы",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them. The app never captures or reads your screen, and does not read your game account, your files, your contacts or your other apps.":
+    ", чтобы рисовать поверх игры. Это разрешение позволяет выводить пиксели на экран, но не читать их. Приложение никогда не записывает и не читает твой экран и не читает твой игровой аккаунт, файлы, контакты или другие приложения.",
+  "with the tag. It is done within 30 days, usually much sooner.":
+    "с тегом. Это делается в течение 30 дней, обычно гораздо быстрее.",
+  ". Every message is read.":
+    ". Каждое сообщение читается.",
+  "Become a tester":
+    "Стать тестировщиком",
+  "Found a bug or have an idea? Email":
+    "Нашёл ошибку или есть идея? Пиши на",
+  "Google Play test":
+    "Тест в Google Play",
+  "Google lets a new app on the Play Store only after {n} people have tested it for {days} days. Three taps, and you are one of them.":
+    "Google пускает новое приложение в Play Маркет, только когда его протестировали {n} человек в течение {days} {days|one:дня|few:дней|many:дней|other:дня}. Три нажатия, и ты один из них.",
+  "Help launch BrawlZone Bubble on Google Play":
+    "Помоги выпустить BrawlZone Bubble в Google Play",
+  "Help us launch BrawlZone Bubble on Google Play":
+    "Помоги нам выпустить BrawlZone Bubble в Google Play",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings.":
+    "Установи BrawlZone Bubble со страницы в Play Маркете. Уже есть версия с этого сайта? Play установит поверх и сохранит твой тег и настройки.",
+  "Install from Google Play":
+    "Установить из Google Play",
+  "It is the same app as the download on this site, with the same features and languages. When it goes public, you simply keep it, and it updates through Google Play.":
+    "Это то же приложение, что и загрузка на этом сайте, с теми же функциями и языками. Когда оно станет публичным, ты просто оставишь его, и оно будет обновляться через Google Play.",
+  "Join the Google Play test of BrawlZone Bubble, the draft helper that floats over Brawl Stars. Three taps, free, no ads.":
+    "Присоединяйся к тесту BrawlZone Bubble в Google Play — помощника драфта, который парит над Brawl Stars. Три нажатия, бесплатно, без рекламы.",
+  "Join the group":
+    "Вступить в группу",
+  "Join the testers group":
+    "Вступить в группу тестировщиков",
+  "Keep the app installed for {days} days. Using it in your matches helps, and so does telling us what breaks. That is all: no sign-up beyond the group, no payment, nothing to fill in.":
+    "Держи приложение установленным {days} {days|one:день|few:дня|many:дней|other:дня}. Помогает, если пользоваться им в матчах, и если рассказывать нам, что ломается. Это всё: никакой регистрации, кроме группы, никакой оплаты, ничего заполнять не нужно.",
+  "More about the Bubble":
+    "Подробнее о Bubble",
+  "On the next page, tap \"Become a tester\". It can take a few minutes after joining the group before this works.":
+    "На следующей странице нажми «Стать тестировщиком». После вступления в группу может пройти несколько минут, прежде чем это заработает.",
+  "Open Google Play":
+    "Открыть Google Play",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone.":
+    "Открой группу и нажми «Вступить в группу». Используй тот же аккаунт Google, что и в Play Маркете на телефоне.",
+  "The group is only a list of testers: nobody sends messages there, and joining shows nothing to other members. You can leave the test at any time from the same pages.":
+    "Группа — это только список тестировщиков: там никто не пишет сообщений, и вступление ничего не показывает другим участникам. Выйти из теста можно в любой момент на тех же страницах.",
+  "The test opens in a few days, once Google has reviewed it. Check back soon.":
+    "Тест откроется через несколько дней, когда Google его проверит. Загляни скоро.",
+  "What it asks of you":
+    "Что от тебя нужно",
+  "On a real phone, open over the game":
+    "На настоящем телефоне, поверх игры",
+  "Pick your rank and mode":
+    "Выбери ранг и режим",
+  "Pinball Dreams at Mythic: the best picks on that map, your best owned pick named above the list, and the battles behind each number":
+    "Pinball Dreams на Мифическом: лучшие пики на этой карте, твой лучший собственный пик над списком и бои за каждым числом",
+  "The BrawlZone Bubble app's main screen: the Start bubble, Stop and Quick Settings buttons, and a list of what the panel does":
+    "Главный экран приложения BrawlZone Bubble: кнопки «Запустить пузырь», «Стоп» и «Быстрые настройки» и список того, что умеет панель",
+  "The BrawlZone panel open on top of the Brawl Stars lobby on a phone, showing the Ranked meta for Masters+ on Undermine":
+    "Панель BrawlZone поверх лобби Brawl Stars на телефоне, с метой ранговых боёв для Мастера+ на карте Undermine",
+  "The build card for Shade: the most-owned star power, gadget and two gears, with the share of sampled owners holding each":
+    "Карточка сборки Shade: самая частая звёздная сила, гаджет и два снаряжения с долей владельцев из выборки",
+  "The draft board on Hard Rock Mine with one ban, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "Доска драфта на карте Hard Rock Mine с одним запретом, одним союзником и двумя врагами, остальные бойцы отсортированы по тому, насколько хорошо они отвечают на этот драфт",
+  "The panel's Ranked meta at Mythic: rank and mode chips across the top, then the tier list from S down, with the brawlers you do not own greyed out":
+    "Мета ранговых боёв в панели на Мифическом: кнопки рангов и режимов сверху, ниже тир-лист от S и вниз, бойцы, которых у тебя нет, серые",
+  "22 languages, with brawler, mode and map names exactly as the game writes them. Choose the bubble's size, how faint it gets when idle, and whether it tucks half off the edge.":
+    "22 языка, с именами бойцов, режимов и карт ровно как в игре. Выбери размер пузыря, насколько он бледнеет в простое и прячется ли наполовину за край.",
+  "A draft helper that floats over Brawl Stars: tier lists at your rank, the best picks for your map, counters, team comps and builds, with your own brawlers marked. Free, no ads, no account.":
+    "Помощник драфта, который парит над Brawl Stars: тир-листы на твоём ранге, лучшие пики для твоей карты, контрпики, составы команд и сборки, с отмеченными твоими бойцами. Бесплатно, без рекламы, без аккаунта.",
+  "A short plan for your coins: the few brawlers that would give you a top pick in the most modes.":
+    "Короткий план для твоих монет: несколько бойцов, которые дали бы тебе топ-пик в большинстве режимов.",
+  "Add the BrawlZone tile to Quick Settings: swipe down mid-match and tap it to show or hide the bubble, without opening the app.":
+    "Добавь плитку BrawlZone в быстрые настройки: смахни вниз посреди матча и нажми на неё, чтобы показать или скрыть пузырь, не открывая приложение.",
+  "Add your player tag once: brawlers you own are marked, the rest greyed out or hidden, and you can narrow it to power 11 or hypercharged.":
+    "Добавь тег игрока один раз: твои бойцы отмечены, остальные серые или скрыты, а список можно сузить до 11-го уровня силы или гиперзаряда.",
+  "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
+    "А приложение может. Пузырь сидит у края экрана, открывается по нажатию поверх игры и снова сворачивается.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "Brawl Stars даёт на выбор считаные секунды. Выйти из игры, чтобы посмотреть тир-лист, стоит больше, чем у тебя есть, поэтому ответ приходит к тебе: мета на твоём ранге, лучшие пики для твоей карты и кто побеждает врага — в одном касании поверх игры.",
+  "Coming to Google Play":
+    "Скоро в Google Play",
+  "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
+    "Алмазный, Мифический, Легендарный и Мастер играют в разные меты, поэтому список разделён по рангам и открывается на твоём. Все режимы ранговых боёв, обновление каждые два часа по настоящим соревновательным боям.",
+  "Draft counters":
+    "Контрпики в драфте",
+  "Enter the bans and both teams' picks and it ranks what is left. Tap an enemy to see who beats them.":
+    "Укажи запреты и пики обеих команд, и оно ранжирует оставшихся. Нажми на врага, чтобы увидеть, кто его побеждает.",
+  "Every tag you use is saved. Switch between them from the account card; a long press removes one.":
+    "Каждый тег, который ты используешь, сохраняется. Переключайся с карточки аккаунта; долгое нажатие удаляет.",
+  "Everything in one bubble":
+    "Всё в одном пузыре",
+  "It shows the stats; you make the picks. It does not touch the game or log in to your account: your player tag only looks up your public profile, the same one anyone can see on the site. No ads, no sign-up, no in-app purchases.":
+    "Оно показывает статистику, а пики делаешь ты. Оно не трогает игру и не входит в твой аккаунт: тег игрока лишь открывает твой публичный профиль, тот же, что любой может увидеть на сайте. Без рекламы, без регистрации, без покупок в приложении.",
+  "Join the test and install it from the Play Store instead: three taps.":
+    "Присоединяйся к тесту и установи его из Play Маркета: три нажатия.",
+  "Made for your account":
+    "Сделано для твоего аккаунта",
+  "Ranked hands you one map, and the answer moves with it. Pick the map and get the brawlers that win there, with your own best pick named at the top.":
+    "Ранговые бои дают тебе одну карту, и ответ меняется вместе с ней. Выбери карту и получи бойцов, которые на ней побеждают, с твоим лучшим пиком наверху.",
+  "Start it from inside the game":
+    "Запускай прямо из игры",
+  "Tap an enemy pick to see the five brawlers that beat it most often at your rank, with a link to the full counters page on the site.":
+    "Нажми на пик врага, чтобы увидеть пять бойцов, которые чаще всего побеждают его на твоём ранге, со ссылкой на полную страницу контрпиков на сайте.",
+  "The app finds your account and puts your player icon on the bubble. Every pick the panel suggests is one you can actually make.":
+    "Приложение находит твой аккаунт и ставит твою иконку игрока на пузырь. Каждый пик, который предлагает панель, ты действительно можешь сделать.",
+  "The app's account card: the player name, tag and trophies, the choice between all owned brawlers, power 11 only or hypercharged, and a saved second account to switch to":
+    "Карточка аккаунта в приложении: имя игрока, тег и трофеи, выбор между всеми своими бойцами, только 11-м уровнем силы или с гиперзарядом, и сохранённый второй аккаунт для переключения",
+  "The best picks for your map":
+    "Лучшие пики для твоей карты",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps and to show a notification, the one that says it is running. No screen capture, no storage access, nothing else.":
+    "Пузырь не читает твой экран, твой матч и не знает, на какой ты карте. Он просит разрешение показываться поверх других приложений и показывать уведомление — о том, что он работает. Никакой записи экрана, никакого доступа к хранилищу, больше ничего.",
+  "The three that win together on your map, with the ones you own ticked.":
+    "Тройка, которая побеждает вместе на твоей карте, с отмеченными твоими бойцами.",
+  "The tier list at your rank":
+    "Тир-лист на твоём ранге",
+  "The whole app in 51 seconds. Sound on.":
+    "Всё приложение за 51 секунду. Со звуком.",
+  "Three gestures and a tile. There is nothing else to learn.":
+    "Три жеста и плитка. Больше учить нечего.",
+  "Two accounts? One tap":
+    "Два аккаунта? Одно нажатие",
+  "Your brawlers marked":
+    "Твои бойцы отмечены",
+  "Your draft helper,":
+    "Твой помощник драфта",
+  "Your language, your bubble":
+    "Твой язык, твой пузырь",
+  "Your tag is the only setup there is, and it changes every list in the panel.":
+    "Твой тег — вся настройка, и он меняет каждый список в панели.",
+  "Your tag, once":
+    "Твой тег, один раз",
+  "A 51-second tour of BrawlZone Bubble: the bubble floating over Brawl Stars, the best picks for the exact map, the build owners run, the panel in your language, and the bubble’s size and fade settings.":
+    "Обзор BrawlZone Bubble за 51 секунду: пузырь над Brawl Stars, лучшие пики для конкретной карты, сборка владельцев, панель на твоём языке и настройки размера и прозрачности пузыря.",
+  "Install BrawlZone Bubble from its Play Store page. Already have the version from this site? Play installs over it and keeps your tag and settings. If Play says the app is not found, give it a little while and try again: Google can take some time to let a new tester in.":
+    "Установи BrawlZone Bubble со страницы в Play Маркете. Уже есть версия с этого сайта? Play установит поверх и сохранит твой тег и настройки. Если Play пишет, что приложение не найдено, подожди немного и попробуй снова: Google нужно время, чтобы впустить нового тестировщика.",
+  "A draft helper that floats over Brawl Stars. Tap it mid-draft, tap again and it folds away.":
+    "Помощник драфта, который парит над Brawl Stars. Нажми на него посреди драфта, нажми ещё раз — и он свернётся.",
+  "About the group":
+    "О группе",
+  "Free":
+    "Бесплатно",
+  "Keeps your tag and settings":
+    "Сохраняет тег и настройки",
+  "No ads":
+    "Без рекламы",
+  "Now on Google Play":
+    "Уже в Google Play",
+  "Start with step 1":
+    "Начни с шага 1",
+  "Then Google reviews the app for everyone. Every tester who stays the two weeks brings that day closer.":
+    "Потом Google проверяет приложение для всех. Каждый тестировщик, который остаётся все две недели, приближает этот день.",
+  "Three taps":
+    "Три нажатия",
+  "Updates through Google Play":
+    "Обновления через Google Play",
+  "What you are testing":
+    "Что ты тестируешь",
+  "{days} days":
+    "{days} {days|one:день|few:дня|many:дней|other:дня}",
+  "{n} testers":
+    "{n} {n|one:тестировщик|few:тестировщика|many:тестировщиков|other:тестировщика}",
+  "Join the test":
+    "Присоединиться к тесту",
+  "No Google Play on your phone?":
+    "Нет Google Play на телефоне?",
+  "Download the APK":
+    "Скачать APK",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, and tapping the buttons that lead into the Google Play test. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Ещё считаются несколько именованных событий, все анонимные: установка веб-приложения, его открытие, нажатие на загрузку для Android и нажатие на кнопки, ведущие в тест в Google Play. Событие загрузки содержит, с какой страницы оно пришло и какая версия была предложена, чтобы отличать обновление от первой установки. Больше ничего.",
+  "Free forever":
+    "Навсегда бесплатно",
+  "No account":
+    "Без аккаунта",
+  "No tracking":
+    "Без отслеживания",
+  "SKILL SCORE":
+    "ОЦЕНКА НАВЫКА",
+  "TOP BRAWLERS":
+    "ЛУЧШИЕ БОЙЦЫ",
+  "{n} trophies":
+    "{n} {n|one:трофей|few:трофея|many:трофеев|other:трофея}",
+  "Check your own Skill Score":
+    "Узнай свою оценку навыка",
+  "Elite":
+    "Элита",
+  "Expert":
+    "Эксперт",
+  "Skilled":
+    "Умелый",
+  "Competent":
+    "Уверенный",
+  "Casual":
+    "Казуальный",
+  "Beginner":
+    "Новичок",
+  "Share my profile card":
+    "Поделиться карточкой профиля",
+  "Share as image":
+    "Поделиться картинкой",
+  "Making your image…":
+    "Создаём картинку…",
+  "Bronze":
+    "Бронзовый",
+  "Silver":
+    "Серебряный",
+  "Gold":
+    "Золотой",
+  "Diamond":
+    "Алмазный",
+  "Masters":
+    "Мастер",
+  "Pro":
+    "Про",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, tapping the Android download, tapping the buttons that lead into the Google Play test, and sharing a page as a picture. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Ещё считаются несколько именованных событий, все анонимные: установка веб-приложения, его открытие, нажатие на загрузку для Android, нажатие на кнопки, ведущие в тест в Google Play, и отправка страницы картинкой. Событие загрузки содержит, с какой страницы оно пришло и какая версия была предложена, чтобы отличать обновление от первой установки. Больше ничего.",
+  "RANKED TIER LIST":
+    "ТИР-ЛИСТ РАНГОВЫХ БОЁВ",
+  "All ranks":
+    "Все ранги",
+  "Season {n} · last 7 days":
+    "Сезон {n} · последние 7 дней",
+  "Not enough battles yet":
+    "Пока недостаточно боёв",
+  "From real Ranked battles, updated every 2 hours":
+    "По настоящим ранговым боям, обновление каждые 2 часа",
+  "Share this tier list":
+    "Поделиться этим тир-листом",
+  "in Ranked":
+    "в ранговых боях",
+  "{p} win rate":
+    "{p} побед",
+  "BEST MAPS":
+    "ЛУЧШИЕ КАРТЫ",
+  "COUNTERED BY":
+    "КОНТРИТСЯ",
+  "STRONG AGAINST":
+    "СИЛЁН ПРОТИВ",
+  "BEST RANKED MAPS":
+    "ЛУЧШИЕ КАРТЫ РАНГОВЫХ БОЁВ",
+  "Ready for Android 16: the app screen now fits around the status bar, the navigation bar and the keyboard on newer phones.":
+    "Готово к Android 16: экран приложения теперь учитывает строку состояния, панель навигации и клавиатуру на новых телефонах.",
+  "A link to the privacy policy at the bottom of the app screen.":
+    "Ссылка на политику конфиденциальности внизу экрана приложения.",
+  "The same app is now being tested on Google Play. Installing it from there later keeps your tag and settings.":
+    "То же приложение теперь тестируется в Google Play. Если потом установить его оттуда, тег и настройки сохранятся.",
+  "{a} vs {b} in Brawl Stars ({v})":
+    "{a} против {b} в Brawl Stars ({v})",
+  "{a} vs {b}: win rates, pick rates, best modes and their head-to-head record, from real sampled battles. Updated {v}.":
+    "{a} против {b}: процент побед, частота выбора, лучшие режимы и их личные встречи, по настоящим собранным боям. Обновлено {v}.",
+  "{nameA} vs {nameB}":
+    "{nameA} против {nameB}",
+  "A card to share":
+    "Карточка, чтобы поделиться",
+  "A story-sized picture of your result, ready for TikTok, Instagram or your club chat.":
+    "Картинка с твоим результатом в формате сторис, готовая для TikTok, Instagram или чата клуба.",
+  "Brawl Stars account value calculator ({v})":
+    "Калькулятор стоимости аккаунта Brawl Stars ({v})",
+  "Compared with about 58,000 active players we track, so you see where your account really stands.":
+    "В сравнении с примерно 58 000 активных игроков, которых мы отслеживаем, чтобы ты видел, где на самом деле стоит твой аккаунт.",
+  "Enter your player tag to see what your Brawl Stars account cost to build, and how it compares with other players.":
+    "Введи свой тег игрока, чтобы узнать, во что обошёлся твой аккаунт Brawl Stars и как он выглядит на фоне других игроков.",
+  "Every power level, hypercharge, star power, gadget and gear you own, priced in coins and power points.":
+    "Каждый уровень силы, гиперзаряд, звёздная сила, гаджет и снаряжение, которые у тебя есть, в монетах и очках силы.",
+  "How it ranks":
+    "Как он выглядит на фоне других",
+  "How much is your Brawl Stars account worth? Enter your tag: the coins and power points it took to build, and how it ranks against 58,000 active players.":
+    "Сколько стоит твой аккаунт Brawl Stars? Введи тег: сколько монет и очков силы ушло на его прокачку и где он среди 58 000 активных игроков.",
+  "What it cost to build":
+    "Во что он обошёлся",
+  "Your tag is under your name on your in-game profile.":
+    "Твой тег — в профиле в игре, под твоим именем.",
+  "Account value":
+    "Стоимость аккаунта",
+  "Account value of {tag}":
+    "Стоимость аккаунта {tag}",
+  "Among {n} active players we track. Most of them play Ranked, so the bar is high.":
+    "Среди {n} активных игроков, которых мы отслеживаем. Большинство из них играют в ранговые бои, так что планка высокая.",
+  "Brawlers owned":
+    "Открыто бойцов",
+  "Check another account":
+    "Проверить другой аккаунт",
+  "Coins to finish what you own":
+    "Монет, чтобы доделать то, что есть",
+  "Power levels":
+    "Уровни силы",
+  "See the full profile":
+    "Открыть полный профиль",
+  "Share my account value":
+    "Поделиться стоимостью аккаунта",
+  "Top {n}% of players":
+    "Топ-{n}% игроков",
+  "Values are in-game currency, not money: what it costs in coins and power points to build the same account. Buffies and skins are not included, because they also come from drops. Unofficial fan project, not affiliated with Supercell.":
+    "Стоимость — в игровой валюте, а не в деньгах: сколько монет и очков силы стоит прокачать такой же аккаунт. Баффи и скины не учитываются, потому что они тоже выпадают из призов. Неофициальный фанатский проект, не связан с Supercell.",
+  "Where the coins went":
+    "Куда ушли монеты",
+  "Worth more than {n}% of players":
+    "Дороже, чем у {n}% игроков",
+  "plus {pp} power points":
+    "плюс {pp} очков силы",
+  "How much is your account worth?":
+    "Сколько стоит твой аккаунт?",
+  "MY ACCOUNT VALUE":
+    "СТОИМОСТЬ МОЕГО АККАУНТА",
+  "WHERE THE COINS WENT":
+    "КУДА УШЛИ МОНЕТЫ",
+  "Calculate":
+    "Посчитать",
+  "Your player tag, e.g. #2PQ8LJ9V":
+    "Твой тег игрока, например #2PQ8LJ9V",
+  "How much is this account worth? See its value and how it ranks":
+    "Сколько стоит этот аккаунт? Узнай его стоимость и место",
+  "Brawl Stars, ranked by me":
+    "Brawl Stars, моя расстановка",
+  "MY TIER LIST":
+    "МОЙ ТИР-ЛИСТ",
+  "Make yours and compare it with the data":
+    "Составь свой и сравни с данными",
+  "Matches the real data: {n}%":
+    "Совпадение с реальными данными: {n}%",
+  "{name}: me {mine}, data {data}":
+    "{name}: у меня {mine}, по данным {data}",
+  "Compared with the Ranked tier list from the last 7 days of battles.":
+    "В сравнении с тир-листом ранговых боёв за последние 7 дней.",
+  "No disagreements: you see the meta exactly as the battles do.":
+    "Никаких расхождений: ты видишь мету ровно так, как её видят бои.",
+  "Save as image":
+    "Сохранить картинкой",
+  "Your list matches the real data: {n}%":
+    "Твой список совпадает с реальными данными на {n}%",
+  "you put it in {mine}, the data says {data}: you rate it higher":
+    "ты поставил его в {mine}, данные говорят {data}: ты ценишь его выше",
+  "you put it in {mine}, the data says {data}: you rate it lower":
+    "ты поставил его в {mine}, данные говорят {data}: ты ценишь его ниже",
+  "Brawl Stars update: patch notes, new brawlers and balance changes ({v})":
+    "Обновление Brawl Stars: описание, новые бойцы и изменения баланса ({v})",
+  "Did the balance changes work? See the measured impact":
+    "Сработали ли изменения баланса? Смотри измеренный эффект",
+  "Latest Brawl Stars update":
+    "Последнее обновление Brawl Stars",
+  "Next Ranked season: {date}":
+    "Следующий ранговый сезон: {date}",
+  "Published {date}":
+    "Опубликовано {date}",
+  "Supercell does not announce update or Brawl Talk dates far ahead. They appear here as soon as they are official, with the new notes the day they ship.":
+    "Supercell не объявляет даты обновлений или Brawl Talk заранее. Они появляются здесь, как только становятся официальными, а новое описание — в день выхода.",
+  "The latest Brawl Stars update at a glance: new brawlers, hypercharges, balance changes and whether they worked, plus what is coming next.":
+    "Последнее обновление Brawl Stars коротко: новые бойцы, гиперзаряды, изменения баланса и сработали ли они, плюс что будет дальше.",
+  "This update at a glance":
+    "Это обновление коротко",
+  "What is next":
+    "Что дальше",
+  "in {n} days":
+    "через {n} {n|one:день|few:дня|many:дней|other:дня}",
+  "{n} brawlers revealed and coming soon":
+    "Анонсировано и скоро выйдет бойцов: {n}",
+  "Activity this week":
+    "Активность на этой неделе",
+  "Club trophies gained":
+    "Трофеев клуба получено",
+  "Inactive":
+    "Неактивен",
+  "Inactive members":
+    "Неактивные участники",
+  "Shown after {n} days of tracking":
+    "Показывается после {n} {n|one:дня|few:дней|many:дней|other:дня} отслеживания",
+  "Tracking started today. Come back tomorrow to see who is gaining trophies, and in a few days who has gone quiet.":
+    "Отслеживание началось сегодня. Загляни завтра, чтобы увидеть, кто набирает трофеи, а через несколько дней — кто затих.",
+  "Trophies gained since {date} ({n} days). Tracked daily while this page is visited.":
+    "Трофеев получено с {date} ({n} {n|one:день|few:дня|many:дней|other:дня}). Отслеживается ежедневно, пока эту страницу посещают.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent; the consent message European visitors may see is for the ads below.":
+    ", который работает на том же сервере, что и сайт, а не у третьей стороны. Он не ставит cookies и не хранит персональные данные, поэтому согласие ему не нужно; сообщение о согласии, которое могут видеть посетители из Европы, относится к рекламе ниже.",
+  ". How Google uses this data is explained in":
+    ". Как Google использует эти данные, объясняется в",
+  ". The BrawlZone Bubble app and its panel show no ads.":
+    ". Приложение BrawlZone Bubble и его панель рекламу не показывают.",
+  "Advertising":
+    "Реклама",
+  "Google's ad settings":
+    "настройках рекламы Google",
+  "Google's own policy":
+    "собственной политике Google",
+  "On the website only. The Android app shows no ads.":
+    "Только на сайте. Приложение для Android рекламу не показывает.",
+  "The website shows ads served by Google AdSense, which pay for the server. Google and its partners may use cookies and similar technology to show and measure ads, including ads based on earlier visits to this and other sites. Visitors in the EEA, the UK and Switzerland are asked first, through Google's consent message, and can refuse.":
+    "Сайт показывает рекламу от Google AdSense, которая оплачивает сервер. Google и его партнёры могут использовать cookies и похожие технологии, чтобы показывать и измерять рекламу, в том числе рекламу на основе прошлых посещений этого и других сайтов. Посетителей из ЕЭЗ, Великобритании и Швейцарии сначала спрашивают через сообщение о согласии от Google, и они могут отказаться.",
+  "What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and ads only on the website.":
+    "Что хранят BrawlZone и приложение BrawlZone Bubble, чего не хранят и что отправляет приложение. Без аккаунтов, а реклама только на сайте.",
+  "You can turn off personalised ads in":
+    "Персонализированную рекламу можно отключить в",
+  "BrawlZone is free and has no paywall; a few ads on the website pay for the server. If it saved you some time, a coffee goes a long way.":
+    "BrawlZone бесплатный и без платного доступа; немного рекламы на сайте оплачивает сервер. Если он сэкономил тебе время, кофе очень поможет.",
+  "{SITE_NAME} is a free Brawl Stars statistics site. There is no account and nothing to pay for; the website shows ads. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
+    "{SITE_NAME} — бесплатный сайт статистики Brawl Stars. Нет аккаунта и нечего оплачивать; сайт показывает рекламу. Пользоваться им значит принимать условия на этой странице. Если ты не согласен с каким-то из них, просто перестань пользоваться сайтом, и ничего не пропадёт: ты нам ничего не давал.",
+  "BrawlZone is free and made by one person. If this helped,":
+    "BrawlZone бесплатный и сделан одним человеком. Если он помог,",
+  "a coffee keeps the server running":
+    "кофе поможет держать сервер включённым",
+  "{label} this week":
+    "{label} на этой неделе",
+  "{first} has the best record in {label} right now, with a {score} adjusted win rate over {n} decided battles, ahead of {second} and {third}.":
+    "Лучший результат в режиме «{label}» сейчас у {first}: скорректированный процент побед {score}, решённых боёв: {n}. Следом идут {second} и {third}.",
+  "Across every brawler, the mode has {total} sampled battles from the last 7 days on {maps} maps in rotation, and the average brawler wins {base} of them.":
+    "По всем бойцам у режима {total} собранных боёв за последние 7 дней на картах в ротации ({maps}), и средний боец побеждает в {base} из них.",
+  "The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.":
+    "Чаще всех из них играют за {name}, в {rate} боёв. Популярность и сила — не одно и то же: порядок выше — по скорректированному проценту побед, который учитывает, как часто берут каждого бойца и кто его берёт.",
+  "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
+    "У каждой карты своя страница с пиками только для неё, и они могут сильно отличаться от режима в целом: открой одну ниже.",
+  "See how it ranks against other players":
+    "Узнай, как он выглядит на фоне других игроков",
+  "Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors' YouTube or Google accounts. YouTube's use of data is covered by the":
+    "Наши каналы в TikTok и YouTube публикуются с нашего собственного сервера: BrawlZone использует сервисы YouTube API только для загрузки своих видео на свой канал и не читает никаких данных из аккаунтов YouTube или Google посетителей. Использование данных YouTube регулируется",
+  "YouTube Terms of Service":
+    "Условиями использования YouTube",
+  " and the":
+    " и",
+  "Google Privacy Policy":
+    "Политикой конфиденциальности Google",
+  "{name} build: {gadget} gadget + {starPower} star power, the pick of most owners.":
+    "Сборка на {name}: гаджет {gadget} + звёздная сила {starPower}, выбор большинства владельцев.",
+  "{name} build: {gadget} gadget, the pick of most owners.":
+    "Сборка на {name}: гаджет {gadget}, выбор большинства владельцев.",
+  "{name} build: {starPower} star power, the pick of most owners.":
+    "Сборка на {name}: звёздная сила {starPower}, выбор большинства владельцев.",
+  "{rate} adjusted win rate over {battles} real battles.":
+    "Скорректированный процент побед {rate} по настоящим боям: {battles}.",
+  "Gears, best modes and maps, updated daily.":
+    "Снаряжение, лучшие режимы и карты, обновляются ежедневно.",
+  "Best {name} build in Brawl Stars ({v}): gadget and star power":
+    "Лучшая сборка на {name} в Brawl Stars ({v}): гаджет и звёздная сила",
+  "Brawl Stars Starr Drops: daily schedule, chances and rewards":
+    "Призы Старр в Brawl Stars: расписание на день, шансы и награды",
+  "When you get Starr Drops: your first 5 wins every day, plus event extras. Then the chances for every rarity, Rare to Legendary, and every reward inside.":
+    "Когда ты получаешь Призы Старр: первые 5 побед каждый день плюс бонусы событий. Затем шансы каждой редкости, от редкой до легендарной, и каждая награда внутри.",
+  "Best brawlers on {name} right now: {v}, from {sampleSize} Ranked battles on this map. Best teams, matchups and the map layout, updated daily.":
+    "Лучшие бойцы на карте {name} сейчас: {v}, по ранговым боям на этой карте ({sampleSize}). Лучшие команды, матчапы и схема карты, обновляются ежедневно.",
+  "Free reward links":
+    "Ссылки на бесплатные награды",
+  "Free reward links, the day they drop":
+    "Ссылки на бесплатные награды — в день появления",
+  "Follow on WhatsApp":
+    "Подписаться в WhatsApp",
+  "Supercell gives away free Starr Drops and boxes through links that expire. We share every one we find on our WhatsApp channel.":
+    "Supercell раздаёт бесплатные Призы Старр и ящики по ссылкам, срок действия которых истекает. Мы публикуем каждую, что находим, в нашем канале WhatsApp.",
+  "When you get Starr Drops: what each daily win gives this season, and the special days. Then the chances for every drop and box, and every reward inside.":
+    "Когда ты получаешь Призы Старр: что даёт каждая победа дня в этом сезоне и особые дни. Затем шансы каждого приза и ящика и каждая награда внутри.",
+  "Boxes":
+    "Ящики",
+  "Event and new-brawler boxes: the ones in this season's Daily Wins first, then newest first.":
+    "Ящики событий и новых бойцов: сначала те, что в «Победах дня» этого сезона, потом самые новые.",
+  "In this season's Daily Wins":
+    "В «Победах дня» этого сезона",
+  "Added {date}":
+    "Добавлено {date}",
+  "Each of your first {n} wins of the day gives a reward, and what each one gives changes every season. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Каждая из первых {n} {n|one:победы|few:побед|many:побед|other:победы} за день приносит награду, и что именно она даёт, меняется каждый сезон. Счётчик сбрасывается раз в день; таймер на экране «Победы дня» в игре показывает, когда именно.",
+  "Your first wins of the day each give a reward, and what each one gives changes every season.":
+    "Каждая из первых побед за день приносит награду, и что именно она даёт, меняется каждый сезон.",
+  "Normal days":
+    "Обычные дни",
+  "Lucky days":
+    "Удачные дни",
+  "Luckiest days":
+    "Самые удачные дни",
+  "one of these":
+    "одно из",
+  "Special days":
+    "Особые дни",
+  "Recent special days":
+    "Недавние особые дни",
+  "Coming":
+    "Скоро",
+  "Only for new players.":
+    "Только для новых игроков.",
+  "Chaos Drop":
+    "Приз хаоса",
+  "Credit":
+    "Кредиты",
+  "All three done!":
+    "Все три готовы!",
+  "Classic":
+    "Классика",
+  "Every wrong guess zooms out a little.":
+    "Каждая неверная попытка немного отдаляет картинку.",
+  "How the puzzles work":
+    "Как работают загадки",
+  "It was":
+    "Это был",
+  "New puzzles in":
+    "Новые загадки через",
+  "Out of guesses.":
+    "Попытки закончились.",
+  "Shadow":
+    "Тень",
+  "Share your results":
+    "Поделись результатами",
+  "Three brawlers to guess every day: from clues, from a shadow, and from a zoom. Everybody gets the same ones, new at midnight UTC.":
+    "Три бойца для угадывания каждый день: по подсказкам, по тени и по крупному плану. У всех одни и те же, новые в полночь по UTC.",
+  "Today’s mystery brawler":
+    "Загадочный боец дня",
+  "Who is this, up close?":
+    "Кто это крупным планом?",
+  "Whose shadow is this?":
+    "Чья это тень?",
+  "Zoom":
+    "Крупный план",
+  "an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.":
+    "сверхкрупный план, который немного отдаляется после каждой неверной попытки. В обеих по шесть попыток.",
+  "new":
+    "новое",
+  "playing":
+    "в игре",
+  "shows only the brawler’s outline, and":
+    "показывает только силуэт бойца, а",
+  "{n} guesses left":
+    "Осталось попыток: {n}",
+  "{n} of 3 done":
+    "Готово {n} из 3",
+  "{n}-day streak":
+    "Серия: {n} {n|one:день|few:дня|many:дней|other:дня}",
+  "Brawl Stars daily challenge: guess the brawler (Classic, Shadow, Zoom)":
+    "Загадка дня Brawl Stars: угадай бойца (Классика, Тень, Крупный план)",
+  "Three Brawl Stars puzzles every day: guess the brawler from clues, from its shadow, or from an extreme zoom. Keep your streak, share your score. Free, no account.":
+    "Три загадки Brawl Stars каждый день: угадай бойца по подсказкам, по тени или по сверхкрупному плану. Держи серию, делись результатом. Бесплатно, без аккаунта.",
+  "average {n} guesses":
+    "в среднем {n} {n|one:попытка|few:попытки|many:попыток|other:попытки}",
+  "{n} players solved today’s Classic":
+    "Сегодняшнюю Классику разгадали игроков: {n}",
+  "{pct}% of players solved today’s {mode}":
+    "{pct}% игроков разгадали сегодняшний режим «{mode}»",
+  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
+    "Твой прогресс хранится только в этом браузере. Без аккаунта. Когда ты заканчиваешь загадку, сервер добавляет единицу к счётчику для этого числа попыток — так он знает, какая доля игроков её разгадала; ничего о тебе при этом не сохраняется.",
+  "Yesterday’s answers":
+    "Вчерашние ответы",
+  "finish one puzzle today to keep it":
+    "разгадай сегодня хотя бы одну загадку, чтобы сохранить её",
+  "How to make a Brawl Stars tier list":
+    "Как составить тир-лист Brawl Stars",
+  "Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.":
+    "Все бойцы игры начинают в пуле под доской. Нажми на бойца, затем на тир, в который он попадает; на компьютере можно перетаскивать. Нажми на поставленного бойца, чтобы вернуть его в пул, или начни одной кнопкой с текущего списка ранговых боёв и поспорь с метой, а не начинай с нуля.",
+  "When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.":
+    "Когда закончишь, скопируй ссылку или сохрани доску картинкой и опубликуй. Кто откроет ссылку, увидит именно твою доску и сможет переделать её в свою — так начинается большинство споров о тир-листах в чате клуба.",
+  "A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody's game.":
+    "Полезный совет: расставляй для одного режима или одного ранга за раз. Боец, который доминирует в «Захвате кристаллов», может быть обузой в «Нокауте», а мета на Мастере — не мета на Золотом, поэтому одна доска на всё в итоге не описывает ничью игру.",
+  "How the draft helper works":
+    "Как работает помощник драфта",
+  "Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.":
+    "Каждое число взято из настоящих ранговых боёв, которые BrawlZone собирает сам, с обновлением каждые два часа. Выбор карты сортирует бойцов по тому, как они на самом деле играют на этой карте за последние три недели, а не по среднему за сезон по всем режимам.",
+  "Then follow the game's own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.":
+    "Дальше следуй порядку игры. Запреты убирают бойца из всех списков. Каждый пик врага пересчитывает подсказки по тому, как каждый кандидат играет против него, а каждый пик союзника — по тому, как кандидат играет рядом с ним, а это другой вопрос, чем контрпик. У каждой подсказки указано, сколько боёв за ней стоит, так что малую выборку легко заметить.",
+  "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
+    "Те же пики парят прямо над игрой в приложении BrawlZone Bubble, так что их можно проверить посреди драфта, не выходя из Brawl Stars.",
+  "A new roast every day":
+    "Новая прожарка каждый день",
+  "Enter your player tag and get roasted by your own stats: your main, your Ranked rank, your last games. A score out of 10 and a card to share.":
+    "Введи свой тег игрока и получи прожарку от собственной статистики: твой мейн, твой ранг, твои последние игры. Оценка из 10 и карточка, чтобы поделиться.",
+  "Enter your player tag. BrawlZone reads your stats and tells you the truth, with no mercy and a score out of 10.":
+    "Введи свой тег игрока. BrawlZone читает твою статистику и говорит правду, без пощады и с оценкой из 10.",
+  "It is a joke: the roast is about the account and the gameplay, never about the person. It uses the same public stats as your profile. Unofficial fan project, not affiliated with Supercell.":
+    "Это шутка: прожарка про аккаунт и игру, а не про человека. Она использует ту же публичную статистику, что и твой профиль. Неофициальный фанатский проект, не связан с Supercell.",
+  "Roast my Brawl Stars account":
+    "Прожарь мой аккаунт Brawl Stars",
+  "Roast my account":
+    "Прожарь мой аккаунт",
+  "The same roast all day, so a screenshot is your roast. Tomorrow it may find something else.":
+    "Весь день одна и та же прожарка, так что скриншот — это твоя прожарка. Завтра она может найти что-то другое.",
+  "Think your account is good?":
+    "Думаешь, твой аккаунт хорош?",
+  "Your main, your Ranked rank, your win rate, your club and the brawlers you left at Power 1. Every joke is about a number on your account.":
+    "Твой мейн, твой ранг, твой процент побед, твой клуб и бойцы, которых ты оставил на 1-м уровне силы. Каждая шутка — про число на твоём аккаунте.",
+  "Your real stats":
+    "Твоя настоящая статистика",
+  "Your score out of 10 and the best lines, story-sized, for TikTok, Instagram or your club chat.":
+    "Твоя оценка из 10 и лучшие строчки в формате сторис для TikTok, Instagram или чата клуба.",
+  "A new roast every day, from the same public stats as the profile. It is a joke about the account, never about the person. Unofficial fan project, not affiliated with Supercell.":
+    "Новая прожарка каждый день, по той же публичной статистике, что и профиль. Это шутка про аккаунт, а не про человека. Неофициальный фанатский проект, не связан с Supercell.",
+  "Account rating":
+    "Оценка аккаунта",
+  "Roast another account":
+    "Прожарить другой аккаунт",
+  "Roast me":
+    "Прожарь меня",
+  "Roast of {tag}":
+    "Прожарка {tag}",
+  "Share my roast":
+    "Поделиться прожаркой",
+  "MY ACCOUNT GOT ROASTED":
+    "МОЙ АККАУНТ ПРОЖАРИЛИ",
+  "Think your account is good? Get roasted.":
+    "Думаешь, твой аккаунт хорош? Получи прожарку.",
+  "A new link goes to these the moment it is found, often hours before other sites have it.":
+    "Новая ссылка отправляется сюда в момент, когда её находят, часто за несколько часов до других сайтов.",
+  "Accept the reward in the game. It lands in your account straight away.":
+    "Прими награду в игре. Она сразу попадёт на твой аккаунт.",
+  "Are there Brawl Stars codes for free gems?":
+    "Есть ли коды Brawl Stars на бесплатные кристаллы?",
+  "Are these links safe?":
+    "Эти ссылки безопасны?",
+  "Claim":
+    "Забрать",
+  "Discord server":
+    "Discord-сервер",
+  "Each link works for a limited time and usually once per account. Supercell does not say for how long, so a link here can stop working before it leaves the list. If it has expired, it is gone for everyone.":
+    "Каждая ссылка работает ограниченное время и обычно один раз на аккаунт. Supercell не говорит, как долго, поэтому ссылка здесь может перестать работать раньше, чем уйдёт из списка. Если её срок истёк, она пропала для всех.",
+  "Earlier rewards":
+    "Прошлые награды",
+  "Every free reward link Supercell gives out, as soon as it appears. Open this page on the phone with Brawl Stars, tap Claim, and the reward goes straight to your account.":
+    "Каждая ссылка на бесплатную награду от Supercell, как только она появляется. Открой эту страницу на телефоне с Brawl Stars, нажми «Забрать», и награда сразу попадёт на твой аккаунт.",
+  "Every free reward link Supercell gives out, posted as soon as it appears: boxes, credits, power points. Tap Claim and it goes to your account. No codes, no generators.":
+    "Каждая ссылка на бесплатную награду от Supercell, сразу как появляется: ящики, кредиты, очки силы. Нажми «Забрать», и она попадёт на твой аккаунт. Никаких кодов, никаких генераторов.",
+  "Found in the last {n} days. Claim them before they expire.":
+    "Найдено за последние {n} {n|one:день|few:дня|many:дней|other:дня}. Забери, пока не истекли.",
+  "Found {when}":
+    "Найдено {when}",
+  "Free Brawl Stars rewards":
+    "Бесплатные награды Brawl Stars",
+  "Free Brawl Stars rewards today ({v}): every claim link":
+    "Бесплатные награды Brawl Stars сегодня ({v}): все ссылки",
+  "Get the next one first":
+    "Получи следующую первым",
+  "How to claim a free reward":
+    "Как забрать бесплатную награду",
+  "No free reward right now.":
+    "Сейчас бесплатных наград нет.",
+  "No. Brawl Stars has no redeem codes. Free rewards come as links from Supercell that open the game and add the reward to your account. Any site that asks for a code, your login or to \"verify\" with a survey to get free gems is a scam.":
+    "Нет. В Brawl Stars нет кодов погашения. Бесплатные награды приходят ссылками от Supercell, которые открывают игру и добавляют награду на твой аккаунт. Любой сайт, который просит код, твой логин или «подтверждение» опросом ради бесплатных кристаллов, — мошенничество.",
+  "Older than {n} days. They may have expired, but some still work, so try them.":
+    "Старше {n} {n|one:дня|few:дней|many:дней|other:дня}. Возможно, они истекли, но некоторые ещё работают, так что попробуй.",
+  "Open this page on the phone where Brawl Stars is installed and logged in to your account.":
+    "Открой эту страницу на телефоне, где установлен Brawl Stars и выполнен вход в твой аккаунт.",
+  "Playing on more than one account? The game claims it for the one that is open, so switch first.":
+    "Играешь на нескольких аккаунтах? Игра зачислит награду на тот, что открыт, так что сначала переключись.",
+  "Rewards are given by Supercell, not by BrawlZone, and Supercell decides how long each one lasts. Unofficial fan project, not affiliated with Supercell.":
+    "Награды выдаёт Supercell, а не BrawlZone, и Supercell решает, сколько действует каждая. Неофициальный фанатский проект, не связан с Supercell.",
+  "Supercell drops them a few times a month, often during events. Follow below and you will hear about the next one the minute it appears.":
+    "Supercell выпускает их несколько раз в месяц, часто во время событий. Подпишись ниже, и ты узнаешь о следующей в ту же минуту, как она появится.",
+  "Supercell shares them on its own channels, often during events or after a live stream. BrawlZone checks for new ones every few minutes and posts them here and on Discord, WhatsApp, YouTube, TikTok and Instagram.":
+    "Supercell публикует их в своих каналах, часто во время событий или после трансляции. BrawlZone проверяет новые каждые несколько минут и публикует их здесь и в Discord, WhatsApp, YouTube, TikTok и Instagram.",
+  "Tap Claim. The link opens Brawl Stars by itself.":
+    "Нажми «Забрать». Ссылка сама откроет Brawl Stars.",
+  "They are Supercell's own links, from link.brawlstars.com or store.supercell.com, and this page shows no other kind. Claiming opens Brawl Stars and never asks for your password. BrawlZone never asks for your account either.":
+    "Это собственные ссылки Supercell, с link.brawlstars.com или store.supercell.com, и других эта страница не показывает. Получение открывает Brawl Stars и никогда не спрашивает пароль. BrawlZone тоже никогда не просит твой аккаунт.",
+  "WhatsApp channel":
+    "Канал в WhatsApp",
+  "Where do the links come from?":
+    "Откуда берутся ссылки?",
+  "Why does the game say the reward expired or was already claimed?":
+    "Почему игра пишет, что награда истекла или уже получена?",
+  "Free reward":
+    "Бесплатная награда",
+  "Live, found {when}":
+    "Активна, найдена {when}",
+  "More free rewards live now":
+    "Ещё бесплатные награды прямо сейчас",
+  "No free reward right now":
+    "Сейчас бесплатных наград нет",
+  "Opens Brawl Stars. An official Supercell link.":
+    "Открывает Brawl Stars. Официальная ссылка Supercell.",
+  "Try it":
+    "Попробовать",
+  "{n} free rewards to claim":
+    "Бесплатных наград: {n}",
+  "+{discord} entries for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, up to {cap}. Following or subscribing on any platform is welcome but never gives entries.":
+    "+{discord} за подтверждение участия командой /giveaway на Discord-сервере BrawlZone (один аккаунт Discord на участника) и +1 за каждого друга, который участвует по твоей ссылке, до {cap}. Подписки на любой платформе приветствуются, но никогда не дают шансов.",
+  "A draw nobody can rig, us included":
+    "Розыгрыш, который никто не подкрутит, даже мы",
+  "A friend sent you: entering gives them +1 entry too.":
+    "Тебя прислал друг: твоё участие даст ему тоже +1 шанс.",
+  "After entries close, one winner is drawn at random, weighted by entries, using the first drand public randomness round after the close (drand.love). The entry list (tags and entry counts, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "После окончания приёма заявок один победитель выбирается случайно, с весом по шансам, по первому публичному раунду случайности drand после закрытия (drand.love). Список участников (теги и число шансов, без email) и использованный раунд публикуются, чтобы любой мог проверить. Победитель объявляется в видео и на brawlzone.net.",
+  "Anyone aged 13 or older with a Brawl Stars account, where giveaways like this are allowed. If you are under 18, a parent or guardian must know you are entering and may need to accept the prize for you. Entering is free and needs no purchase.":
+    "Любой от 13 лет с аккаунтом Brawl Stars, там, где такие розыгрыши разрешены. Если тебе меньше 18, родитель или опекун должен знать о твоём участии и, возможно, принять приз за тебя. Участие бесплатное и не требует покупок.",
+  "Brawl Stars giveaway: win a €10 gift card for the Brawl Pass":
+    "Розыгрыш Brawl Stars: выиграй подарочную карту на 10 € для Brawl Pass",
+  "BrawlZone (brawlzone.net), an unofficial Brawl Stars fan project. Contact: {email}. This giveaway is not sponsored, endorsed or run by Supercell, Google, Apple, YouTube, TikTok, Instagram or Discord.":
+    "BrawlZone (brawlzone.net), неофициальный фанатский проект по Brawl Stars. Контакт: {email}. Этот розыгрыш не спонсируется, не одобряется и не проводится Supercell, Google, Apple, YouTube, TikTok, Instagram или Discord.",
+  "Claiming the prize":
+    "Получение приза",
+  "Closed":
+    "Завершён",
+  "Confirmed on Discord":
+    "Подтверждено в Discord",
+  "Copy":
+    "Копировать",
+  "Dates":
+    "Даты",
+  "Each friend":
+    "Каждый друг",
+  "Ends in":
+    "До конца",
+  "Enter":
+    "Участвовать",
+  "Enter for free":
+    "Участвовать бесплатно",
+  "Enter the giveaway":
+    "Участвовать в розыгрыше",
+  "Enter your player tag and an email address at brawlzone.net/giveaway. One entry form per person, per player tag and per email address.":
+    "Введи свой тег игрока и email на brawlzone.net/giveaway. Одна заявка на человека, на тег игрока и на email.",
+  "Entered the giveaway":
+    "Участвует в розыгрыше",
+  "Entering…":
+    "Отправляем…",
+  "Entries are closed.":
+    "Приём заявок закрыт.",
+  "Entries open {open} and close {close}.":
+    "Приём заявок с {open} до {close}.",
+  "Every friend who enters with your link, up to {max}.":
+    "Каждый друг, который участвует по твоей ссылке, до {max}.",
+  "Extra entries":
+    "Дополнительные шансы",
+  "Fair play":
+    "Честная игра",
+  "Fake tags, fake email addresses or several entries for one person are removed, along with any entries they brought. At most {n} entries a day are accepted from one network.":
+    "Фальшивые теги, фальшивые email или несколько заявок от одного человека удаляются вместе со всеми шансами, которые они принесли. С одной сети принимается не больше {n} заявок в день.",
+  "Follow so you see it the moment it is out. Following does not change your entries.":
+    "Подпишись, чтобы увидеть, как только выйдет. Подписка не меняет твоих шансов.",
+  "Free Brawl Stars giveaway: win a €10 gift card for the Brawl Pass. Enter here:":
+    "Бесплатный розыгрыш Brawl Stars: выиграй подарочную карту на 10 € для Brawl Pass. Участвуй здесь:",
+  "Free to enter with your player tag. Get more entries on Discord and for every friend you bring. One winner, drawn in public.":
+    "Участие бесплатное по тегу игрока. Больше шансов в Discord и за каждого приведённого друга. Один победитель, выбор публичный.",
+  "Friends who entered with your link: {n} of {max}":
+    "Друзья, которые участвуют по твоей ссылке: {n} из {max}",
+  "Giveaway rules":
+    "Правила розыгрыша",
+  "Google Play or App Store, your choice. Free to enter. One winner on {date}.":
+    "Google Play или App Store — на твой выбор. Участие бесплатное. Один победитель {date}.",
+  "How to enter":
+    "Как участвовать",
+  "How to get entries":
+    "Как получить шансы",
+  "I am 13 or older (under 18: a parent knows I am entering) and I accept the":
+    "Мне 13 лет или больше (если меньше 18 — родитель знает о моём участии), и я принимаю",
+  "Join our Discord":
+    "Заходи в наш Discord",
+  "Join our Discord and type /giveaway {code}":
+    "Заходи в наш Discord и напиши /giveaway {code}",
+  "Keep this page: it is saved in this browser, and the link with your code always shows it.":
+    "Сохрани эту страницу: она запомнена в этом браузере, а ссылка с твоим кодом всегда её покажет.",
+  "More entries, more chances: someone with 5 entries is 5 times as likely to win as someone with 1.":
+    "Больше шансов — больше вероятность: у того, у кого 5 шансов, вероятность выиграть в 5 раз выше, чем у того, у кого 1.",
+  "One €10 gift card for Google Play or the App Store, the winner's choice, sent by email as a code. The prize cannot be swapped for cash.":
+    "Одна подарочная карта на 10 € для Google Play или App Store, по выбору победителя, отправляется по email в виде кода. Приз нельзя обменять на деньги.",
+  "Open Discord":
+    "Открыть Discord",
+  "Organiser":
+    "Организатор",
+  "Prize":
+    "Приз",
+  "Read the full rules":
+    "Читать все правила",
+  "Run by BrawlZone, an unofficial fan project. Not sponsored, endorsed or run by Supercell, Google, Apple, YouTube, TikTok, Instagram or Discord.":
+    "Проводит BrawlZone, неофициальный фанатский проект. Не спонсируется, не одобряется и не проводится Supercell, Google, Apple, YouTube, TikTok, Instagram или Discord.",
+  "Send on WhatsApp":
+    "Отправить в WhatsApp",
+  "The draw":
+    "Розыгрыш",
+  "The winner is revealed in a video":
+    "Победитель будет показан в видео",
+  "Type /giveaway with your code in the BrawlZone server.":
+    "Напиши /giveaway со своим кодом на сервере BrawlZone.",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, a new winner is drawn the same way.":
+    "Мы напишем победителю с {email}. Если ответа нет 14 дней или победитель нарушает эти правила, тем же способом выбирается новый победитель.",
+  "When entries close, the winner is picked using a public random number that nobody can know in advance: the drand beacon, published every 30 seconds by a group of universities and companies. We publish the full entry list (tags only) and the number, so anyone can check the result.":
+    "Когда приём заявок закрывается, победитель выбирается по публичному случайному числу, которое никто не может знать заранее: маяку drand, который каждые 30 секунд публикует группа университетов и компаний. Мы публикуем полный список участников (только теги) и число, чтобы любой мог проверить результат.",
+  "Who can enter":
+    "Кто может участвовать",
+  "Win a €10 gift card for the Brawl Pass":
+    "Выиграй подарочную карту на 10 € для Brawl Pass",
+  "You are in, {name}!":
+    "Ты участвуешь, {name}!",
+  "Your code":
+    "Твой код",
+  "Your data":
+    "Твои данные",
+  "Your email, only to tell you if you win":
+    "Твой email — только чтобы сообщить, если ты выиграешь",
+  "Your friend link: +1 entry for every friend who enters with it":
+    "Твоя ссылка для друзей: +1 шанс за каждого друга, который участвует по ней",
+  "Your player tag":
+    "Твой тег игрока",
+  "Your player tag and an email to reach you if you win.":
+    "Твой тег игрока и email, чтобы связаться, если ты выиграешь.",
+  "Your player tag and email are used only to run this giveaway. The email is seen only by the organiser, never published or shared, and deleted once the prize is delivered. Write to {email} to remove your entry at any time.":
+    "Твой тег игрока и email используются только для этого розыгрыша. Email видит только организатор, он никогда не публикуется и не передаётся и удаляется после вручения приза. Напиши на {email}, чтобы удалить свою заявку в любой момент.",
+  "entries":
+    "{n|one:шанс|few:шанса|many:шансов|other:шансы}",
+  "entry":
+    "шанс",
+  "giveaway rules":
+    "правила розыгрыша",
+  "Tick the box to confirm your age and the rules.":
+    "Поставь галочку, чтобы подтвердить возраст и правила.",
+  "That email does not look right.":
+    "Этот email выглядит неправильно.",
+  "No Brawl Stars account has that tag. Check it under your name in game.":
+    "Ни у одного аккаунта Brawl Stars нет такого тега. Проверь его в игре под своим именем.",
+  "This tag is already entered. Lost your page? Write to contact@brawlzone.net.":
+    "Этот тег уже участвует. Потерял свою страницу? Напиши на contact@brawlzone.net.",
+  "This email is already entered. One entry per person.":
+    "Этот email уже участвует. Одна заявка на человека.",
+  "Too many entries from this network today. Try again tomorrow.":
+    "Слишком много заявок с этой сети сегодня. Попробуй завтра.",
+  "Something went wrong on our side. Try again in a minute.":
+    "У нас что-то пошло не так. Попробуй через минуту.",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, with no limit. Following or subscribing on any platform is welcome but never gives points.":
+    "1 очко за участие, +{discord} за подтверждение участия командой /giveaway на Discord-сервере BrawlZone (один аккаунт Discord на участника) и +1 за каждого друга, который участвует по твоей ссылке, без ограничений. Подписки на любой платформе приветствуются, но никогда не дают очков.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The leaders are checked before the winner is announced.":
+    "Фальшивые теги, фальшивые email, чужие теги или несколько заявок от одного человека удаляются вместе со всеми очками, которые они принесли. С одной сети принимается не больше {n} заявок в день. Лидеров проверяют перед объявлением победителя.",
+  "Nothing is left to luck: whoever has the most points when entries close wins. If two entrants have the same points, whoever entered first wins. The winner is announced in a video and on brawlzone.net.":
+    "Ничего не оставлено на удачу: побеждает тот, у кого больше всего очков на момент закрытия приёма заявок. Если у двух участников поровну очков, побеждает тот, кто подал заявку раньше. Победитель объявляется в видео и на brawlzone.net.",
+  "Points":
+    "Очки",
+  "The winner":
+    "Победитель",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, the prize goes to the next entrant on the leaderboard.":
+    "Мы напишем победителю с {email}. Если ответа нет 14 дней или победитель нарушает эти правила, приз переходит следующему участнику в таблице лидеров.",
+  "Every friend who enters with your link. No limit.":
+    "Каждый друг, который участвует по твоей ссылке. Без ограничений.",
+  "Follow so you see it the moment it is out. Following does not change your points.":
+    "Подпишись, чтобы увидеть, как только выйдет. Подписка не меняет твоих очков.",
+  "Free to enter with your player tag. Get points on Discord and for every friend you bring. Most points wins.":
+    "Участие бесплатное по тегу игрока. Очки в Discord и за каждого приведённого друга. Побеждает тот, у кого больше всего очков.",
+  "How to get points":
+    "Как получить очки",
+  "No luck involved: whoever has the most points when it ends wins. A tie goes to whoever entered first.":
+    "Никакой удачи: побеждает тот, у кого больше всего очков в конце. При равенстве побеждает тот, кто подал заявку раньше.",
+  "Nobody yet. Enter now and you are first.":
+    "Пока никого. Участвуй сейчас, и будешь первым.",
+  "Top recruiters right now":
+    "Лучшие рекрутеры сейчас",
+  "Updated every few minutes. Leaders are checked for fake or duplicate friends before the winner is announced.":
+    "Обновляется каждые несколько минут. Лидеров проверяют на фальшивых и повторяющихся друзей перед объявлением победителя.",
+  "{n} pts":
+    "{n} {n|one:очко|few:очка|many:очков|other:очка}",
+  "A friend sent you: entering gives them +1 point.":
+    "Тебя прислал друг: твоё участие даст ему +1 очко.",
+  "Friends who entered with your link: {n}":
+    "Друзья, которые участвуют по твоей ссылке: {n}",
+  "Your friend link: +1 point for every friend who enters with it":
+    "Твоя ссылка для друзей: +1 очко за каждого друга, который участвует по ней",
+  "point":
+    "очко",
+  "points":
+    "{n|one:очко|few:очка|many:очков|other:очки}",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), +1 each for subscribing on YouTube, following on TikTok and following on Instagram, and +1 for each friend who enters with your link, with no limit. Follow points are taken on your word, and we may check the winner's.":
+    "1 очко за участие, +{discord} за подтверждение участия командой /giveaway на Discord-сервере BrawlZone (один аккаунт Discord на участника), по +1 за подписку на YouTube, TikTok и Instagram и +1 за каждого друга, который участвует по твоей ссылке, без ограничений. Очки за подписки засчитываются на слово, а у победителя мы можем их проверить.",
+  "Each follow":
+    "Каждая подписка",
+  "Follow so you see it the moment it is out, and claim your follow points on your entry page above.":
+    "Подпишись, чтобы увидеть, как только выйдет, и получи очки за подписки на своей странице участия выше.",
+  "Subscribe on YouTube, follow on TikTok and on Instagram: +1 each.":
+    "Подпишись на YouTube, TikTok и Instagram: по +1 за каждую.",
+  "Follow":
+    "Подписаться",
+  "Follow on Instagram":
+    "Подписаться в Instagram",
+  "Follow on TikTok":
+    "Подписаться в TikTok",
+  "Subscribe on YouTube":
+    "Подписаться на YouTube",
+  "Subscribed on YouTube":
+    "Подписан на YouTube",
+  "Following on TikTok":
+    "Подписан в TikTok",
+  "Following on Instagram":
+    "Подписан в Instagram",
+  "Giveaway: win a €10 gift card":
+    "Розыгрыш: выиграй подарочную карту на 10 €",
+  "Free to enter. Most points wins. Bring your friends.":
+    "Участие бесплатное. Побеждает тот, у кого больше всего очков. Зови друзей.",
+  "Enter free":
+    "Участвовать бесплатно",
+  "Entries open at {time}.":
+    "Приём заявок открывается в {time}.",
+  "Brawl Pass":
+    "Brawl Pass",
+  "Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.":
+    "Каждое очко — билет в розыгрыше: у того, у кого 10 очков, вероятность выиграть в 10 раз выше, чем у того, у кого 1.",
+  "Most points right now":
+    "Больше всего очков сейчас",
+  "More points, more chances. The winner is drawn at random when it ends, with a public random number nobody can know in advance, so nobody can rig it, us included.":
+    "Больше очков — больше шансов. Победитель выбирается случайно в конце по публичному случайному числу, которое никто не может знать заранее, так что подкрутить результат не может никто, даже мы.",
+  "Free to enter with your player tag. Get points on Discord, for following and for every friend you bring. More points, more chances.":
+    "Участие бесплатное по тегу игрока. Очки в Discord, за подписки и за каждого приведённого друга. Больше очков — больше шансов.",
+  "Free to enter. More points, more chances. Bring your friends.":
+    "Участие бесплатное. Больше очков — больше шансов. Зови друзей.",
+  "After entries close, one winner is drawn at random, weighted by points (each point is one ticket), using the first drand public randomness round after the close (drand.love). The entry list (tags and points, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "После окончания приёма заявок один победитель выбирается случайно, с весом по очкам (каждое очко — один билет), по первому публичному раунду случайности drand после закрытия (drand.love). Список участников (теги и очки, без email) и использованный раунд публикуются, чтобы любой мог проверить. Победитель объявляется в видео и на brawlzone.net.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The winner is checked before being announced.":
+    "Фальшивые теги, фальшивые email, чужие теги или несколько заявок от одного человека удаляются вместе со всеми очками, которые они принесли. С одной сети принимается не больше {n} заявок в день. Победителя проверяют перед объявлением.",
+  "Where's my tag?":
+    "Где мой тег?",
+  "Is this you?":
+    "Это ты?",
+  "Your name":
+    "Твоё имя",
+  "Open Brawl Stars and tap your profile picture, top left.":
+    "Открой Brawl Stars и нажми на картинку профиля слева вверху.",
+  "Your tag is right under your name. It starts with #.":
+    "Твой тег прямо под твоим именем. Он начинается с #.",
+  "Type it here, with or without the #.":
+    "Введи его здесь, с # или без.",
+  "Win the Brawl Pass: free giveaway, more points = more chances.":
+    "Выиграй Brawl Pass: бесплатный розыгрыш, больше очков = больше шансов.",
+  "Enter now":
+    "Участвовать",
+  "Get a notification on this phone, or follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Получай уведомление на этот телефон или подпишись на канал: новая ссылка выходит в момент, когда её находят, часто за несколько часов до других сайтов.",
+  "If you enter the giveaway, we store your player tag, the email you give and a scrambled, daily-changing code made from your network address (to stop one network creating fake entries). The email is used only to contact the winner, is never published or shared, and is deleted once the prize is delivered.":
+    "Если ты участвуешь в розыгрыше, мы храним твой тег игрока, указанный email и зашифрованный, ежедневно меняющийся код из твоего сетевого адреса (чтобы одна сеть не создавала фальшивых заявок). Email используется только для связи с победителем, никогда не публикуется и не передаётся и удаляется после вручения приза.",
+  "If you tap \"Notify me\" on the free rewards page, your browser gives us an address at its own push service (Google's, Apple's or Mozilla's) and two keys, and we store them with the page's language. They identify a browser, not a person, and are used only to tell you about new free rewards. Tap \"Turn off\" on the same page, or block notifications in your browser, and the subscription is deleted.":
+    "Если ты нажмёшь «Уведомить меня» на странице бесплатных наград, браузер передаст нам адрес в своей службе уведомлений (Google, Apple или Mozilla) и два ключа, и мы сохраним их вместе с языком страницы. Они идентифицируют браузер, а не человека, и используются только для уведомлений о новых бесплатных наградах. Нажми «Выключить» на той же странице или заблокируй уведомления в браузере, и подписка удалится.",
+  "Notifications and the giveaway":
+    "Уведомления и розыгрыш",
+  "Only if you ask for them, and only what they need.":
+    "Только если ты сам попросишь, и только то, что для них нужно.",
+  "Notifications are blocked for this site. Allow them in your browser settings to get new rewards.":
+    "Уведомления для этого сайта заблокированы. Разреши их в настройках браузера, чтобы получать новые награды.",
+  "Notifications: open this page in Chrome on Android, or add the site to your home screen on iPhone.":
+    "Уведомления: открой эту страницу в Chrome на Android или добавь сайт на главный экран iPhone.",
+  "Notify me when a new reward drops":
+    "Уведомить меня о новой награде",
+  "Turn off":
+    "Выключить",
+  "You will be notified":
+    "Ты получишь уведомление",
+  "Checked for new rewards {when}. New ones show up here within minutes.":
+    "Новые награды проверялись {when}. Новые появляются здесь в течение нескольких минут.",
+  "BrawlZone Bubble is on Google Play":
+    "BrawlZone Bubble уже в Google Play",
+  "New on Google Play":
+    "Новинка в Google Play",
+  "The best picks for your map and what beats the enemy, floating over Brawl Stars while you draft. Free, no ads.":
+    "Лучшие пики для твоей карты и кто побеждает врага, поверх Brawl Stars прямо во время драфта. Бесплатно, без рекламы.",
+  "Already in the group? You are not counted yet.":
+    "Уже в группе? Тебя пока не засчитали.",
+  "Google only counts you after step 2: tap here and then \"Become a tester\".":
+    "Google засчитывает тебя только после шага 2: нажми здесь, а затем «Стать тестировщиком».",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone. Then come back to this page: you are not a tester until step 2.":
+    "Открой группу и нажми «Вступить в группу». Используй тот же аккаунт Google, что и в Play Маркете на телефоне. Потом вернись на эту страницу: ты не тестировщик до шага 2.",
+  "Joined the group? You are not a tester yet.":
+    "Вступил в группу? Ты ещё не тестировщик.",
+  "One more tap: Google only counts you after step 2.":
+    "Ещё одно нажатие: Google засчитывает тебя только после шага 2.",
+  "Step 2: Become a tester":
+    "Шаг 2: стать тестировщиком",
+  "Get a notification on this phone the moment a new free reward appears, often hours before other sites have it. No account, turn it off any time.":
+    "Получай уведомление на этот телефон в момент, когда появляется новая бесплатная награда, часто за несколько часов до других сайтов. Без аккаунта, отключается в любой момент.",
+  "Not now":
+    "Не сейчас",
+  "🎁 Claimed! Want the next one first?":
+    "🎁 Получено! Хочешь следующую первым?",
+  "Enter your name or tag to search.":
+    "Введи своё имя или тег для поиска.",
+  "No player with that name here yet. Search once with your tag, and your name will work next time.":
+    "Игрока с таким именем здесь пока нет. Найди себя один раз по тегу, и в следующий раз сработает имя.",
+  "Pick your profile from the list below.":
+    "Выбери свой профиль из списка ниже.",
+  "Player name or tag":
+    "Имя игрока или тег",
+  "Search by name or tag. Your tag is on your in-game profile, just below your profile icon.":
+    "Ищи по имени или тегу. Твой тег — в профиле в игре, прямо под иконкой профиля.",
+  "Your name or tag":
+    "Твоё имя или тег",
+  "Tick this box to enter.":
+    "Поставь эту галочку, чтобы участвовать.",
+  "1 in {n}":
+    "1 из {n}",
+  "A Chaos Drop starts at Super Rare: {list}.":
+    "Приз хаоса начинается со сверхредкого: {list}.",
+  "A Chaos Drop starts at Super Rare: {list}. That makes {p} of them Legendary or better, against {s} for a Starr Drop.":
+    "Приз хаоса начинается со сверхредкого: {list}. Значит, {p} из них — легендарные или лучше, против {s} у Приза Старр.",
+  "About {d} days on average, at {n} Starr Drops a day from Daily Wins. The chance of at least one is {w} in a week and {m} in a month.":
+    "В среднем около {d} {d|one:дня|few:дней|many:дней|other:дня} при {n} {n|one:Призе|few:Призах|many:Призах|other:Призах} Старр в день из «Побед дня». Шанс получить хотя бы один — {w} за неделю и {m} за месяц.",
+  "Are these drop rates official?":
+    "Это официальные шансы выпадения?",
+  "Brawl Stars Starr Drops: daily schedule, drop rates and rewards":
+    "Призы Старр в Brawl Stars: расписание на день, шансы выпадения и награды",
+  "Chaos Drops are better odds: {p} of them are Legendary or rarer.":
+    "У Призов хаоса шансы лучше: {p} из них — легендарные или реже.",
+  "Daily schedule":
+    "Расписание на день",
+  "Every Starr Drop starts Rare and can upgrade. The chance it ends as each:":
+    "Каждый Приз Старр начинается с редкого и может улучшиться. Шанс, что он окажется:",
+  "How long does it take to get a Legendary Starr Drop?":
+    "Сколько ждать легендарный Приз Старр?",
+  "How many Starr Drops do you get a day?":
+    "Сколько Призов Старр можно получить в день?",
+  "On average one Starr Drop in {k} is Legendary.":
+    "В среднем легендарный — один Приз Старр из {k}.",
+  "On average one Starr Drop in {k} is Legendary: about one every {d} days of Daily Wins.":
+    "В среднем легендарный — один Приз Старр из {k}: примерно один за {d} {d|one:день|few:дня|many:дней|other:дня} «Побед дня».",
+  "On this page":
+    "На этой странице",
+  "One of: {list}.":
+    "Одно из: {list}.",
+  "Quick answers":
+    "Быстрые ответы",
+  "Starr Drops on a normal day":
+    "Призы Старр в обычный день",
+  "The chance of at least one Legendary Starr Drop from your Daily Wins, at {n} Starr Drops a day.":
+    "Шанс получить хотя бы один легендарный Приз Старр из «Побед дня» при {n} {n|one:Призе|few:Призах|many:Призах|other:Призах} Старр в день.",
+  "The chance of at least one Legendary in that many Starr Drops.":
+    "Шанс получить хотя бы один легендарный среди такого числа Призов Старр.",
+  "They come from the Brawl Stars Wiki, which the community keeps up to date from datamines and in-game observation. Supercell publishes no drop-rate API. This page reads the wiki twice a day, so it changes when the game does.":
+    "Они взяты из Brawl Stars Wiki, которую сообщество поддерживает по данным датамайнов и наблюдениям в игре. Supercell не публикует API шансов выпадения. Эта страница читает вики дважды в день, поэтому меняется вместе с игрой.",
+  "This month":
+    "За месяц",
+  "This season's Starr Drop schedule, your chance of a Legendary today, this week and this month, and every reward inside each drop and box. Updated twice a day.":
+    "Расписание Призов Старр в этом сезоне, твой шанс на легендарный сегодня, за неделю и за месяц и каждая награда в каждом призе и ящике. Обновляется дважды в день.",
+  "This season's daily schedule, the chance of every rarity, and every reward inside each drop and box. Read from the Brawl Stars Wiki twice a day, so it changes when the game does.":
+    "Расписание на день в этом сезоне, шанс каждой редкости и каждая награда в каждом призе и ящике. Читается из Brawl Stars Wiki дважды в день, поэтому меняется вместе с игрой.",
+  "This week":
+    "За неделю",
+  "Updated {date}":
+    "Обновлено {date}",
+  "What are the Chaos Drop chances?":
+    "Какие шансы у Приза хаоса?",
+  "What are the chances of a Legendary Starr Drop?":
+    "Какой шанс получить легендарный Приз Старр?",
+  "What can you get from a Legendary Starr Drop?":
+    "Что может выпасть из легендарного Приза Старр?",
+  "Your Legendary odds":
+    "Твои шансы на легендарный",
+  "Your chance of a Legendary":
+    "Твой шанс на легендарный",
+  "Your first {wins} wins of the day each give a reward, and this season all {wins} are Starr Drops on a normal day.":
+    "Каждая из первых {wins} {wins|one:победы|few:побед|many:побед|other:победы} за день приносит награду, и в этом сезоне в обычный день все {wins} — Призы Старр.",
+  "Your first {wins} wins of the day each give a reward. On a normal day this season {n} of them are Starr Drops, and the rest are the other drops and boxes in the schedule above.":
+    "Каждая из первых {wins} {wins|one:победы|few:побед|many:побед|other:победы} за день приносит награду. В обычный день этого сезона Призов Старр среди них: {n}, остальное — другие призы и ящики из расписания выше.",
+  "next special day":
+    "следующий особый день",
+  "no special day announced yet":
+    "особый день пока не объявлен",
+  "of Chaos Drops are Legendary or better":
+    "Призов хаоса — легендарные или лучше",
+  "wins a day give a reward":
+    "побед в день приносят награду",
+  "{n} Starr Drops":
+    "{n} {n|one:Приз|few:Приза|many:Призов|other:Приза} Старр",
+  "{n} drops":
+    "{n} {n|one:приз|few:приза|many:призов|other:приза}",
+  "{p} per Starr Drop, about 1 in {k}. Every Starr Drop starts Rare and can upgrade; the chance it ends as each rarity is {list}.":
+    "{p} на Приз Старр, примерно 1 из {k}. Каждый Приз Старр начинается с редкого и может улучшиться; шанс каждой редкости: {list}.",
+  "Chaos Drops":
+    "Призы хаоса",
+  "Your player tag or name":
+    "Твой тег игрока или имя",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V или твоё имя",
+  "Tap your account in the list under the box, or type your tag.":
+    "Нажми на свой аккаунт в списке под полем или введи тег.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "Игрок с таким именем не найден. Введи лучше тег: он начинается с # и находится в игре под твоим именем.",
+  "Daily schedule and every reward":
+    "Расписание на день и все награды",
+  "It rolls a rarity first, then one reward of that rarity. The chance of each rarity:":
+    "Сначала выпадает редкость, затем одна награда этой редкости. Шанс каждой редкости:",
+  "The best rewards, and your chance in one {drop}":
+    "Лучшие награды и твой шанс в одном призе «{drop}»",
+  "What can a {drop} give you?":
+    "Что может дать «{drop}»?",
+  "Your Daily Wins give {n} Starr Drops a day: a {d} chance of at least one Legendary today, {w} this week and {m} this month.":
+    "«Победы дня» дают {n} {n|one:Приз|few:Приза|many:Призов|other:Приза} Старр в день: шанс получить хотя бы один легендарный — {d} сегодня, {w} за неделю и {m} за месяц.",
+  "{n}-gem skin":
+    "Скин за {n} {n|one:кристалл|few:кристалла|many:кристаллов|other:кристалла}",
+  "Star Power":
+    "Звёздная сила",
+  "Epic Brawler":
+    "Эпический боец",
+  "Mythic Brawler":
+    "Мифический боец",
+  "Legendary Brawler":
+    "Легендарный боец",
+  "Ultra Brawler":
+    "Ультралегендарный боец",
+  "Open a Starr Drop":
+    "Открой Приз Старр",
+  "Open a drop":
+    "Открой приз",
+  "Tap it like in the game and see what the real odds give you.":
+    "Нажимай как в игре и смотри, что дают настоящие шансы.",
+  "Try opening one":
+    "Попробуй открыть",
+  "A simulation with the real odds from the Brawl Stars Wiki. Nothing is added to your game account.":
+    "Симуляция с настоящими шансами из Brawl Stars Wiki. На твой игровой аккаунт ничего не добавляется.",
+  "Copied!":
+    "Скопировано!",
+  "Keep tapping!":
+    "Жми ещё!",
+  "Open 10 at once":
+    "Открыть 10 сразу",
+  "Open another":
+    "Открыть ещё",
+  "Open another {drop}":
+    "Открыть ещё: «{drop}»",
+  "Share my best":
+    "Поделиться лучшим",
+  "Tap the drop to open it":
+    "Нажми на приз, чтобы открыть",
+  "Tap the {drop}":
+    "Нажми на «{drop}»",
+  "Which drop":
+    "Какой приз",
+  "Your best so far: {best} ({rarity}).":
+    "Твой лучший результат: {best} ({rarity}).",
+  "{n} drops opened on BrawlZone, best pull: {best} ({rarity}). Try your luck:":
+    "Открыто призов на BrawlZone: {n}, лучшая награда: {best} ({rarity}). Испытай удачу:",
+  "{n} opened · {k} Legendary or better":
+    "Открыто: {n} · легендарных или лучше: {k}",
+  "{p} chance per drop, 1 in {n}":
+    "{p} шанс на приз, 1 из {n}",
+  "{rarity} {drop}":
+    "{drop} ({rarity})",
+  "The full patch notes are on supercell.com:":
+    "Полное описание обновления — на supercell.com:",
+  "What the latest update changed, which brawlers it touched, and what is coming next.":
+    "Что изменило последнее обновление, каких бойцов оно затронуло и что будет дальше.",
+  " to measure visits in aggregate, which advertising partners use to judge the site. It may set cookies. Visitors in the EEA, the UK and Switzerland are asked first, through the same Google consent message as the ads below; until they agree, no analytics cookies are set. The Bubble panel and the Android app do not load it.":
+    ", чтобы измерять посещения в сводном виде — по этим данным рекламные партнёры оценивают сайт. Он может ставить cookies. Посетителей из ЕЭЗ, Великобритании и Швейцарии сначала спрашивают через то же сообщение о согласии от Google, что и для рекламы ниже; пока они не согласятся, аналитические cookies не ставятся. Панель Bubble и приложение для Android его не загружают.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent.":
+    ", который работает на том же сервере, что и сайт, а не у третьей стороны. Он не ставит cookies и не хранит персональные данные, поэтому согласие ему не нужно.",
+  "Google Analytics":
+    "Google Analytics",
+  "Our own counter, plus Google Analytics.":
+    "Наш собственный счётчик, плюс Google Analytics.",
+  "The website also uses":
+    "Сайт также использует",
+  "Follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Подпишись на канал: новая ссылка выходит в момент, когда её находят, часто за несколько часов до других сайтов.",
+  "On iPhone, notifications work once BrawlZone is on your home screen: tap":
+    "На iPhone уведомления работают, когда BrawlZone добавлен на главный экран: нажми",
+  "Or follow a channel: a new link goes out the moment it is found.":
+    "Или подпишись на канал: новая ссылка выходит в момент, когда её находят.",
+  "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
+    "«Поделиться», затем «На экран „Домой“», и открывай BrawlZone оттуда.",
+  "BrawlZone is made and run by":
+    "BrawlZone делает и поддерживает",
+  ", a one-person studio in Portugal that also develops the BrawlZone Bubble app for Android. Questions go to the address below.":
+    ", студия из одного человека в Португалии, которая также разрабатывает приложение BrawlZone Bubble для Android. Вопросы — на адрес ниже.",
+  "Your in-game name or #tag.":
+    "Твоё имя в игре или #тег.",
+  "Best in Ranked right now":
+    "Лучшие в ранговых боях сейчас",
+  "Full tier list":
+    "Весь тир-лист",
+  "Pick the brawler you keep losing to.":
+    "Выбери бойца, которому ты постоянно проигрываешь.",
+  "{rate} win":
+    "{rate} побед",
+  "Claim it":
+    "Забрать",
+  "Free rewards":
+    "Бесплатные награды",
+  "Get the next one":
+    "Получи следующую",
+  "Giveaway":
+    "Розыгрыш",
+  "Guess":
+    "Угадать",
+  "New every day":
+    "Каждый день новое",
+  "No free link live right now":
+    "Сейчас активных бесплатных ссылок нет",
+  "Today in Brawl Stars":
+    "Сегодня в Brawl Stars",
+  "Who is this brawler?":
+    "Кто этот боец?",
+  "{n} live":
+    "Активных: {n}",
+  "From {battles} battles of {players} players we sampled ourselves.":
+    "По {battles} {battles|one:бою|few:боям|many:боям|other:боям} {players} {players|one:игрока|few:игроков|many:игроков|other:игрока}, которые мы собрали сами.",
+  "Updated":
+    "Обновлено",
+  "November 2026 update":
+    "Обновление ноября 2026 года",
+  "Ranked Refresh: what changed":
+    "Обновление ранговых боёв: что изменилось",
+  "The biggest change to Ranked since the 2025 rework.":
+    "Самое большое изменение ранговых боёв со времён переработки 2025 года.",
+  "The first season reset under the new rules is on {date}.":
+    "Первый сброс сезона по новым правилам — {date}.",
+  "Unlocks at 5,000 trophies":
+    "Открываются с 5 000 трофеев",
+  "Up from 1,000. If you already have Ranked you keep it, and get a Chaos Drop at 5,000 trophies instead.":
+    "Раньше было 1 000. Если ранговые бои у тебя уже открыты, они остаются, а за 5 000 трофеев ты получишь Приз хаоса.",
+  "Power 11 at every rank":
+    "11-й уровень силы на каждом ранге",
+  "Bronze to Diamond used to take Power 9. Diamond now needs 12 brawlers, the same as Mythic, up from 9.":
+    "Раньше от Бронзового до Алмазного хватало 9-го уровня силы. Теперь для Алмазного нужно 12 бойцов, как для Мифического, а не 9.",
+  "6 free maxed brawlers a season":
+    "6 бесплатных прокачанных бойцов за сезон",
+  "Up from 3, to make up for the stricter requirements.":
+    "Раньше было 3 — в компенсацию за более строгие требования.",
+  "The season reset drops you 2 ranks":
+    "Сброс сезона опускает тебя на 2 ранга",
+  "Down from 6, so you start each season much closer to your best. No change to the boost.":
+    "Раньше на 6, так что каждый сезон начинается гораздо ближе к твоему лучшему результату. Бонус не изменился.",
+  "A 2-0 win earns more Elo":
+    "Победа 2:0 приносит больше Эло",
+  "An Epic Win (2-0) gives extra Elo and a Close Match loss (1-2) costs less. Early and middle ranks climb faster.":
+    "Эпическая победа (2:0) даёт дополнительное Эло, а поражение в упорном матче (1:2) отнимает меньше. Ранние и средние ранги растут быстрее.",
+  "No teams from Masters I up":
+    "Без команд начиная с Мастера I",
+  "From Masters I and above, Ranked is played without a premade team.":
+    "Начиная с Мастера I ранговые бои играются без заранее собранной команды.",
+  "A new Pick & Ban screen":
+    "Новый экран выбора и запретов",
+  "A bigger brawler grid with filters, ban suggestions, pick-order swaps and quick chat while you draft.":
+    "Большая сетка бойцов с фильтрами, подсказками запретов, обменом порядка пиков и быстрым чатом во время драфта.",
+  "Pro no longer qualifies for BSC":
+    "Про больше не даёт квалификацию на BSC",
+  "Reaching Pro does not qualify you for BSC 2027. The way in is the Championship Challenge.":
+    "Ранг Про не даёт квалификацию на BSC 2027. Путь туда — через Championship Challenge.",
+  "Source:":
+    "Источник:",
+  "Supercell’s November 2026 release notes":
+    "Описание обновления Supercell за ноябрь 2026 года",
+  "Every balance change in this update":
+    "Все изменения баланса в этом обновлении",
 };

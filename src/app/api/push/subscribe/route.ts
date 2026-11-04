@@ -1,3 +1,4 @@
+import { isIntlLocale } from '@/lib/i18n';
 import { getPrisma } from '@/lib/prisma';
 
 /**
@@ -10,7 +11,6 @@ import { getPrisma } from '@/lib/prisma';
  */
 export const dynamic = 'force-dynamic';
 
-const LANGS = new Set(['en', 'es', 'pt']);
 const b64u = /^[A-Za-z0-9_-]+$/;
 
 function valid(endpoint: unknown): endpoint is string {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   if (!valid(s?.endpoint) || typeof p256dh !== 'string' || typeof auth !== 'string' || !b64u.test(p256dh) || !b64u.test(auth) || p256dh.length > 200 || auth.length > 50) {
     return Response.json({ ok: false }, { status: 400 });
   }
-  const lang = typeof body.lang === 'string' && LANGS.has(body.lang) ? body.lang : 'en';
+  const lang = typeof body.lang === 'string' && isIntlLocale(body.lang) ? body.lang : 'en';
   const prisma = getPrisma();
   if (!prisma) return Response.json({ ok: false }, { status: 503 });
   await prisma.pushSubscription.upsert({

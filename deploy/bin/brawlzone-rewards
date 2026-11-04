@@ -130,7 +130,7 @@ mapfile -t NAMES < <(python3 -c 'import json,sys; [print(r["name"]) for r in jso
 # than at brawlzone-indexnow's 07:40 batch (2026-10-28): a reward link is
 # news for a few days, and the page that lists it changed just now.
 curl -s -o /dev/null -w 'indexnow: HTTP %{http_code}\n' --max-time 20 -H 'Content-Type: application/json' \
-  -d '{"host":"brawlzone.net","key":"7c5d42c3d2b23f04c659bb537275876b","urlList":["https://brawlzone.net/rewards","https://brawlzone.net/es/rewards","https://brawlzone.net/pt/rewards"]}' \
+  -d '{"host":"brawlzone.net","key":"7c5d42c3d2b23f04c659bb537275876b","urlList":["https://brawlzone.net/rewards","https://brawlzone.net/es/rewards","https://brawlzone.net/pt/rewards","https://brawlzone.net/tr/rewards","https://brawlzone.net/de/rewards","https://brawlzone.net/ru/rewards"]}' \
   https://api.indexnow.org/IndexNow || echo "::warning::indexnow not reached (not fatal)"
 
 # Discord first: the links are clickable there, and it takes a second.

@@ -194,7 +194,8 @@ body::before {
  */
 @utility label-game {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.015em;
 }
 
@@ -374,7 +375,8 @@ body::before {
 }
 @utility nav-game {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.02em;
   color: #c3cdf2;
   text-shadow: 0 2px 0 rgb(0 0 0 / 0.4);
@@ -489,7 +491,8 @@ body::before {
     "Apple Color Emoji",
     "Segoe UI Emoji",
     "Noto Color Emoji";
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.01em;
   text-shadow: 0 2px 0 rgb(0 0 0 / 0.35);
 }
@@ -532,7 +535,8 @@ body::before {
 
 @utility bz-chip {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.02em;
   color: #cdd6f7;
   text-shadow: 0 1px 0 rgb(0 0 0 / 0.45);
@@ -555,7 +559,8 @@ body::before {
 
 @utility bz-chip-on {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.02em;
   color: #1a1200;
   text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
@@ -580,7 +585,8 @@ body::before {
 
 @utility bz-chip-map-on {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.02em;
   color: #04121f;
   text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
@@ -606,7 +612,8 @@ body::before {
 /* Heavier variant for the hero, with a dark outline like in-game titles. */
 @utility display-hero {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-weight: 400;
+  font-weight: 900; /* Lilita has one weight; Cyrillic falls to Nunito at its heaviest */
+  font-synthesis: none;
   letter-spacing: 0.005em;
   text-shadow:
     0 3px 0 rgb(0 0 0 / 0.45),

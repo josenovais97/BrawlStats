@@ -116,7 +116,7 @@ PT_SINCE="2026-10-15"
 pt_q() { umami "select count(distinct session_id) filter (where created_at > now() - interval '24 hours') || ' / ' || count(distinct session_id) from website_event where created_at >= '$PT_SINCE' and $1;"; }
 pt_step() { pt_q "event_name = 'playtest_step' and event_id in (select website_event_id from event_data where data_key = 'step' and string_value = '$1')"; }
 pt_from() { pt_q "event_name = 'playtest_entry' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value = '$1')"; }
-pt_visits=$(pt_q "event_type = 1 and url_path ~ '^(/es|/pt)?/bubble/test'")
+pt_visits=$(pt_q "event_type = 1 and url_path ~ '^(/[a-z]{2})?/bubble/test'")
 pt_group=$(pt_step group); pt_optin=$(pt_step optin); pt_install=$(pt_step install)
 pt_home=$(pt_from home); pt_panel=$(pt_from panel); pt_bubble=$(pt_from bubble); pt_footer=$(pt_from footer)
 pt_snooze=$(pt_q "event_name = 'playtest_snooze'")
@@ -133,7 +133,7 @@ gw_extras=$(psql "select count(discord_user_id) || ' Discord &middot; ' || coale
 gw_top=$(psql "select string_agg(n || ' (' || p || ')', ' &middot; ') from (select replace(replace(replace(e.player_name,'&','&amp;'),'<','&lt;'),'>','&gt;') n, 1 + case when e.discord_user_id is null then 0 else 2 end + e.followed_youtube::int + e.followed_tiktok::int + e.followed_instagram::int + (select count(*) from giveaway_entries r where r.referred_by = e.code) p from giveaway_entries e where e.$GW order by p desc, e.created_at limit 3) t;")
 gw_net=$(psql "select coalesce(max(c),0) from (select count(*) c from giveaway_entries where $GW and created_at > now() - interval '24 hours' group by ip_hash) t;")
 gw_burst=$(psql "select coalesce(max(c),0) from (select count(*) c from giveaway_entries where $GW and referred_by is not null and created_at > now() - interval '24 hours' group by referred_by) t;")
-gw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/es|/pt)?/giveaway';")
+gw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/[a-z]{2})?/giveaway';")
 gw_banner=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_banner';")
 # The strip under the header on every page (2026-10-28) against the two banners.
 gw_strip=$(umami "select count(*) from website_event where created_at > now() - interval '24 hours' and event_name = 'giveaway_banner' and event_id in (select website_event_id from event_data where data_key = 'from' and string_value = 'strip');")
@@ -149,7 +149,7 @@ pt_nudge=$(umami "select count(distinct session_id) from website_event where cre
 # Does /rewards turn visitors into notification subscribers? Visits, claim taps,
 # the after-claim sheet (shown / dismissed), and the subscriptions themselves.
 ev() { umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_name = '$1';"; }
-rw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/es|/pt)?/rewards';")
+rw_visits=$(umami "select count(distinct session_id) from website_event where created_at > now() - interval '24 hours' and event_type = 1 and url_path ~ '^(/[a-z]{2})?/rewards';")
 rw_claims=$(ev reward_claim); rw_notify=$(ev rewards_notify); rw_shown=$(ev notify_nudge_shown); rw_dismiss=$(ev notify_nudge_dismiss)
 # The drop opener on /starr-drops (2026-10-29): people playing, drops opened
 # (an "Open 10" counts once), and best pulls shared.

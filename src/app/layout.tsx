@@ -33,6 +33,11 @@ const lilita = Lilita_One({
   variable: '--font-display',
   weight: '400',
   subsets: ['latin'],
+  // No metric-matched Arial fallback (2026-11-04): Lilita One has no Cyrillic,
+  // and with Arial next in the stack every Russian heading came out in Arial.
+  // Without it, Cyrillic falls through to Nunito, which the display rules ask
+  // for at weight 900 (see `display` in globals.css).
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {

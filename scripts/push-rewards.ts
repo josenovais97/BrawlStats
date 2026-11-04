@@ -8,13 +8,18 @@
  * that language. Subscriptions the push service calls gone (404/410) are
  * deleted. Prints "push: sent N, gone N, failed N".
  */
+import { isIntlLocale, type Locale } from '@/lib/i18n';
 import { getPrisma } from '@/lib/prisma';
 import { sendPush, type SendResult } from '@/lib/web-push';
 
-const TEXT: Record<string, { title: string; body: (names: string) => string; path: string }> = {
+// Every live language must be here: Record<Locale, …> fails to compile otherwise.
+const TEXT: Record<Locale, { title: string; body: (names: string) => string; path: string }> = {
   en: { title: '🎁 New free Brawl Stars reward!', body: (n) => `${n}. Tap to claim it before it expires.`, path: '/rewards' },
   es: { title: '🎁 ¡Nueva recompensa gratis de Brawl Stars!', body: (n) => `${n}. Toca para reclamarla antes de que expire.`, path: '/es/rewards' },
   pt: { title: '🎁 Nova recompensa grátis de Brawl Stars!', body: (n) => `${n}. Toque para resgatar antes que expire.`, path: '/pt/rewards' },
+  tr: { title: '🎁 Yeni ücretsiz Brawl Stars ödülü!', body: (n) => `${n}. Süresi dolmadan almak için dokun.`, path: '/tr/rewards' },
+  de: { title: '🎁 Neue Gratis-Belohnung für Brawl Stars!', body: (n) => `${n}. Tippe, um sie abzuholen, bevor sie abläuft.`, path: '/de/rewards' },
+  ru: { title: '🎁 Новая бесплатная награда в Brawl Stars!', body: (n) => `${n}. Нажми, чтобы забрать, пока она не истекла.`, path: '/ru/rewards' },
 };
 
 async function main(): Promise<void> {
@@ -29,7 +34,7 @@ async function main(): Promise<void> {
   for (let i = 0; i < subs.length; i += 10) {
     await Promise.all(
       subs.slice(i, i + 10).map(async (s) => {
-        const text = TEXT[s.lang] ?? TEXT.en;
+        const text = isIntlLocale(s.lang) ? TEXT[s.lang] : TEXT.en;
         const result = await sendPush(s, { title: text.title, body: text.body(listed), url: text.path, tag: 'brawlzone-reward' });
         tally[result] += 1;
         if (result === 'gone') await prisma.pushSubscription.delete({ where: { id: s.id } }).catch(() => {});

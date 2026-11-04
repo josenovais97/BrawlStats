@@ -147,7 +147,7 @@
 		path /draft/* /player/* /club/* /wrapped/* /compare/players/* /account-value/*
 		path /es/draft/* /es/player/* /es/club/* /es/wrapped/* /es/compare/players/* /es/account-value/*
 		path /pt/draft/* /pt/player/* /pt/club/* /pt/wrapped/* /pt/compare/players/* /pt/account-value/*
-		path /tr/draft/* /tr/player/* /tr/club/* /tr/wrapped/* /tr/compare/players/* /tr/account-value/* /de/draft/* /de/player/* /de/club/* /de/wrapped/* /de/compare/players/* /de/account-value/*
+		path /tr/draft/* /tr/player/* /tr/club/* /tr/wrapped/* /tr/compare/players/* /tr/account-value/* /de/draft/* /de/player/* /de/club/* /de/wrapped/* /de/compare/players/* /de/account-value/* /ru/draft/* /ru/player/* /ru/club/* /ru/wrapped/* /ru/compare/players/* /ru/account-value/*
 		header Referer https://brawlzone.net
 	}
 	handle @draft_flood {
@@ -166,7 +166,7 @@
 	# and noindex, so refusing these costs search nothing. Per-account pages
 	# are refused the same way: they are uncached renders and live API calls.
 	@no_browser_expensive {
-		path /draft/* /es/draft/* /pt/draft/* /player/* /es/player/* /pt/player/* /club/* /es/club/* /pt/club/* /wrapped/* /es/wrapped/* /pt/wrapped/* /compare/players/* /es/compare/players/* /pt/compare/players/* /account-value/* /es/account-value/* /pt/account-value/* /tr/account-value/* /roast/* /es/roast/* /pt/roast/* /tr/roast/* /tr/draft/* /tr/player/* /tr/club/* /tr/wrapped/* /tr/compare/players/* /de/account-value/* /de/roast/* /de/draft/* /de/player/* /de/club/* /de/wrapped/* /de/compare/players/*
+		path /draft/* /es/draft/* /pt/draft/* /player/* /es/player/* /pt/player/* /club/* /es/club/* /pt/club/* /wrapped/* /es/wrapped/* /pt/wrapped/* /compare/players/* /es/compare/players/* /pt/compare/players/* /account-value/* /es/account-value/* /pt/account-value/* /tr/account-value/* /roast/* /es/roast/* /pt/roast/* /tr/roast/* /tr/draft/* /tr/player/* /tr/club/* /tr/wrapped/* /tr/compare/players/* /de/account-value/* /de/roast/* /de/draft/* /de/player/* /de/club/* /de/wrapped/* /de/compare/players/* /ru/account-value/* /ru/roast/* /ru/draft/* /ru/player/* /ru/club/* /ru/wrapped/* /ru/compare/players/*
 		not header_regexp Accept-Language .+
 		# Our own jobs (the account-rating video reads /account-value) come
 		# from this box, through Cloudflare, with curl's headers.

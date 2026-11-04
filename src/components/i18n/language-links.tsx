@@ -1,9 +1,11 @@
 import { Languages } from 'lucide-react';
 import Link from 'next/link';
 
-import { HTML_LANG, LOCALE_NAME, type Locale } from '@/lib/i18n';
+import { HTML_LANG, INTL_LOCALES, LOCALE_NAME, type Locale } from '@/lib/i18n';
 
-const ORDER: Locale[] = ['en', 'es', 'pt'];
+// Every live language, so a new one is linked the day it ships (2026-11-04:
+// this said en/es/pt, and Turkish and German pages never appeared in it).
+const ORDER: Locale[] = ['en', ...INTL_LOCALES];
 
 /**
  * The same page in the other languages, as plain links.
@@ -15,7 +17,7 @@ const ORDER: Locale[] = ['en', 'es', 'pt'];
  */
 export function LanguageLinks({ locale, path }: { locale: Locale; path: string }) {
   return (
-    <nav aria-label="Language" className="flex items-center gap-1.5 text-xs font-semibold text-muted">
+    <nav aria-label="Language" className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs font-semibold text-muted">
       <Languages aria-hidden className="size-3.5" />
       {ORDER.map((l, i) => (
         <span key={l} className="flex items-center gap-1.5">
