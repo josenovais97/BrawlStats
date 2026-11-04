@@ -2005,4 +2005,804 @@ export const FR: Record<string, string> = {
     "Chercher des membres par nom ou tag",
   "This club has no members listed.":
     "Ce club n'a aucun membre listé.",
+  "Profile sections":
+    "Sections du profil",
+  "27 seconds: your tag once, then the bubble mid-draft.":
+    "27 secondes : ton tag une fois, puis la bulle en plein draft.",
+  "A floating bubble that puts the Ranked tier list on top of Brawl Stars, so you can check the meta mid-draft without leaving the game. Free, no ads, no account.":
+    "Une bulle flottante qui pose la tier list Classé par-dessus Brawl Stars, pour vérifier la méta en plein draft sans quitter le jeu. Gratuit, sans pub, sans compte.",
+  "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.":
+    "Un mode, c'est trop grossier pour drafter : le Classé te donne une carte de son pool et la réponse change avec elle. Choisis le mode, puis la carte, et les deux sont mémorisés pour la prochaine fois.",
+  "A second tab, for when you want more than the meta: the bans, your team, and theirs.":
+    "Un deuxième onglet, pour quand tu veux plus que la méta : les bans, ton équipe et la leur.",
+  "A target appears at the bottom of the screen while you drag. Drop the bubble on it, or use Stop in the notification.":
+    "Une cible apparaît en bas de l'écran pendant que tu fais glisser. Lâche la bulle dessus, ou utilise Arrêter dans la notification.",
+  "A website cannot do this":
+    "Un site web ne peut pas faire ça",
+  "About Play Protect":
+    "À propos de Play Protect",
+  "Add your player tag":
+    "Ajoute ton tag de joueur",
+  "Allow installing from your browser":
+    "Autorise l'installation depuis ton navigateur",
+  "An installed app can. That is the whole reason this exists as an APK rather than another page on the site, and it is all the app does: draw the numbers over the game, then get out of the way.":
+    "Une appli installée, si. C'est toute la raison pour laquelle ceci existe en APK plutôt qu'en page de plus sur le site, et c'est tout ce que fait l'appli : afficher les chiffres par-dessus le jeu, puis s'effacer.",
+  "Android asks once per app that installs other apps. \"Allow from this source\" appears the first time; after that it remembers.":
+    "Android demande une fois par appli qui installe d'autres applis. « Autoriser cette source » apparaît la première fois ; ensuite, c'est mémorisé.",
+  "Android blocks this permission for apps installed outside a store. Go to Settings › Apps › BrawlZone, tap the ⋮ menu at the top right, choose \"Allow restricted settings\", then try again. This catches almost everyone, and Android never explains it.":
+    "Android bloque cette autorisation pour les applis installées hors d'un store. Va dans Paramètres › Applis › BrawlZone, touche le menu ⋮ en haut à droite, choisis « Autoriser les paramètres restreints », puis réessaie. Ça bloque presque tout le monde, et Android ne l'explique jamais.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have — so the list comes to you instead, one tap away, and gets out of the way when you are done.":
+    "Brawl Stars te laisse quelques secondes pour choisir. Quitter le jeu pour regarder une tier list t'en coûte plus que tu n'en as, alors c'est la liste qui vient à toi, à un tap, et qui s'efface quand tu as fini.",
+  "BrawlZone Bubble for Android":
+    "BrawlZone Bubble pour Android",
+  "Builds on tap":
+    "Builds en un tap",
+  "Confirm the file you got is the file published here. On a desktop:":
+    "Vérifie que le fichier que tu as reçu est bien celui publié ici. Sur un ordinateur :",
+  "Down to the map you are on":
+    "Jusqu'à la carte où tu joues",
+  "Download and open the file":
+    "Télécharge et ouvre le fichier",
+  "Download for Android":
+    "Télécharger pour Android",
+  "Drag down to close":
+    "Glisse vers le bas pour fermer",
+  "Drag to move":
+    "Glisse pour déplacer",
+  "Earlier versions (":
+    "Versions précédentes (",
+  "Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map":
+    "Indique les bans, ce que ton équipe a pris et ce que la leur a pris, et la liste se réorganise selon les trois. Un brawler simplement fort sur la carte, ce n'est pas le même choix qu'un brawler fort sur la carte et qui",
+  "Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.":
+    "Chaque ligne montre son calcul : forme sur cette carte, avantage contre les ennemis indiqués, avantage aux côtés de tes coéquipiers. Une suggestion que tu ne peux pas vérifier, c'est une supposition déguisée en pourcentage, et en plein draft c'est souvent la raison qui décide.",
+  "Five steps, and the fourth is where Android gets in your way.":
+    "Cinq étapes, et c'est à la quatrième qu'Android te barre la route.",
+  "Free Android app":
+    "Appli Android gratuite",
+  "Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.":
+    "Gratuit, {v}, sans compte. Tout ce qu'elle affiche est aussi sur le site : l'appli t'évite juste de changer d'appli, et c'est ça qui te coûte le draft.",
+  "Get it on":
+    "Disponible sur",
+  "Get it on your phone":
+    "Installe-la sur ton téléphone",
+  "Google Play Protect warns about any app installed outside the Play Store. That warning is about where a file came from, not about what is in it.":
+    "Google Play Protect avertit pour toute appli installée hors du Play Store. Cet avertissement porte sur la provenance d'un fichier, pas sur son contenu.",
+  "Hide what you cannot play":
+    "Masquer ce que tu ne peux pas jouer",
+  "If the toggle is greyed out":
+    "Si l'interrupteur est grisé",
+  "Installing it":
+    "L'installer",
+  "It shows the meta; you match that to the draft in front of you. It does not touch the game, read your account, or send anything anywhere — there is no account, no analytics in the app, and nothing to log in to.":
+    "Elle montre la méta ; c'est toi qui l'appliques au draft devant toi. Elle ne touche pas au jeu, ne lit pas ton compte et n'envoie rien nulle part : pas de compte, pas de statistiques d'usage dans l'appli, rien à quoi se connecter.",
+  "Latest":
+    "Dernière",
+  "Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.":
+    "Ni celui-ci, ni aucun autre. Un onglet de navigateur ne peut pas s'afficher par-dessus une autre appli : le bac à sable l'interdit, sur tous les téléphones. Regarder une tier list dans un navigateur, c'est quitter le draft, et quitter le draft, c'est ce qui te coûte le pick.",
+  "On a computer?":
+    "Sur un ordinateur ?",
+  "One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.":
+    "Une prise sans montage sur un téléphone : file d'attente en Prime sur Hideout, bulle ouverte en plein draft, filtre sur cette carte, lecture du build de Brock — puis Brock choisi avec le pouvoir star que le panneau indiquait.",
+  "Open BrawlZone and tap Start bubble":
+    "Ouvre BrawlZone et touche Lancer la bulle",
+  "Or draft with it":
+    "Ou drafte avec",
+  "Or use the site":
+    "Ou utilise le site",
+  "Pick the mode and the map: the best brawlers for it, and the build to run on them.":
+    "Choisis le mode et la carte : les meilleurs brawlers pour elle, et le build à leur mettre.",
+  "Pick your mode":
+    "Choisis ton mode",
+  "Prefer a store? The same signed file, so either one updates the other.":
+    "Tu préfères un store ? C'est le même fichier signé, donc l'un met à jour l'autre.",
+  "Put it wherever it is not in the way. It rests against the nearest edge when you let go, and stays there.":
+    "Place-la là où elle ne gêne pas. Elle se colle au bord le plus proche quand tu la lâches, et elle y reste.",
+  "QR code linking to brawlzone.net/bubble":
+    "QR code vers brawlzone.net/bubble",
+  "S through D, scored on adjusted win rate and pick rate from sampled competitive battles. The same numbers as the site, refreshed on the same schedule.":
+    "De S à D, notés sur le taux de victoire ajusté et le taux de sélection des combats compétitifs collectés. Les mêmes chiffres que le site, mis à jour au même rythme.",
+  "SHA-256":
+    "SHA-256",
+  "Scan to open this page on your Android phone, where the app can actually be installed.":
+    "Scanne pour ouvrir cette page sur ton téléphone Android, où l'appli peut vraiment être installée.",
+  "Set it up, then draft with it":
+    "Configure-la, puis drafte avec",
+  "Switch it on and go back":
+    "Active-la et reviens",
+  "Tap a brawler for its build":
+    "Touche un brawler pour son build",
+  "Tap any brawler for the star power, gadget and gears its owners actually run, with the sample size behind every number.":
+    "Touche n'importe quel brawler pour voir le pouvoir star, le gadget et les équipements que ses propriétaires utilisent vraiment, avec la taille de l'échantillon derrière chaque chiffre.",
+  "Tap the bubble in the draft":
+    "Touche la bulle pendant le draft",
+  "Tap to open":
+    "Touche pour ouvrir",
+  "The BrawlZone app's main screen, showing the permission status and the Start bubble button":
+    "L'écran principal de l'appli BrawlZone, avec l'état de l'autorisation et le bouton Lancer la bulle",
+  "The Ranked tier list, floating on top of the game. Free download, no ads, no account.":
+    "La tier list Classé, par-dessus le jeu. Téléchargement gratuit, sans pub, sans compte.",
+  "The app finds your account. Brawlers you do not own are greyed out in the panel.":
+    "L'appli trouve ton compte. Les brawlers que tu n'as pas sont grisés dans le panneau.",
+  "The app updates by downloading again — it installs over the top and keeps your permission.":
+    "L'appli se met à jour en la retéléchargeant : elle s'installe par-dessus et garde ton autorisation.",
+  "The bubble appears straight away and stays on top of whatever you open next, including the game.":
+    "La bulle apparaît tout de suite et reste au-dessus de tout ce que tu ouvres ensuite, jeu compris.",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.":
+    "La bulle ne lit pas ton écran, ni ton match, ni la carte où tu es. Elle demande à s'afficher par-dessus les autres applis et à montrer une notification : celle qui dit qu'elle tourne, et la progression du téléchargement quand tu la mets à jour. Pas de capture d'écran, pas d'accès au stockage, rien d'autre.",
+  "The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each":
+    "La fiche build d'Amber, avec son pouvoir star, son gadget et ses deux équipements les plus possédés, et la part des propriétaires qui les utilisent",
+  "The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "Le tableau de draft avec deux bans, un coéquipier et deux ennemis indiqués, et les autres brawlers classés selon leur réponse à ce draft",
+  "The first tap sends you to Android's \"Display over other apps\" screen, because no app is allowed to grant itself that permission.":
+    "Le premier tap t'envoie sur l'écran Android « Superposition à d'autres applis », parce qu'aucune appli n'a le droit de s'accorder cette autorisation toute seule.",
+  "The full Ranked tier list":
+    "La tier list Classé complète",
+  "The panel folds out of the bubble. Tap the bubble again and it folds back in.":
+    "Le panneau se déplie depuis la bulle. Touche la bulle à nouveau et il se replie.",
+  "The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score":
+    "Le panneau avec le filtre de mode en haut et la tier list Classé de S à D, chaque brawler avec son meta score",
+  "The panel with Knockout and Belle's Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there":
+    "Le panneau avec Hors-jeu et Belle's Rock sélectionnés, listant les dix meilleurs brawlers sur cette carte avec le nombre de combats derrière chacun et de combien il dépasse sa forme habituelle",
+  "The same data as the site, cut down to what a draft needs.":
+    "Les mêmes données que le site, réduites à ce dont un draft a besoin.",
+  "The tier list,":
+    "La tier list,",
+  "Then the map you are on":
+    "Puis la carte où tu joues",
+  "Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.":
+    "Les données trop minces sont signalées plutôt que cachées. Un brawler qui ne s'appuie que sur onze combats sur cette carte l'affiche en rouge, parce que 52 % sur onze combats et 52 % sur deux cents ne disent pas la même chose.",
+  "Three gestures. There is nothing else to learn.":
+    "Trois gestes. Il n'y a rien d'autre à apprendre.",
+  "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.":
+    "Active Masquer les brawlers indisponibles et ils quittent complètement la liste, donc chaque pick affiché est un pick que tu peux faire.",
+  "Using it":
+    "L'utiliser",
+  "Verify the download":
+    "Vérifier le téléchargement",
+  "Version":
+    "Version",
+  "Version {version}":
+    "Version {version}",
+  "Version {version} · {v} · Android":
+    "Version {version} · {v} · Android",
+  "What is in the panel":
+    "Ce qu'il y a dans le panneau",
+  "What it cannot do":
+    "Ce qu'elle ne peut pas faire",
+  "What's new":
+    "Nouveautés",
+  "Worth knowing before you install it, not after.":
+    "À savoir avant de l'installer, pas après.",
+  "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.":
+    "Ton navigateur demande s'il faut garder un fichier de ce type. C'est un installateur d'appli, donc Chrome et Android te demandent d'abord : cette question est normale.",
+  "answers what they just picked.":
+    "répond à ce qu'ils viennent de prendre.",
+  "on top of the game":
+    "par-dessus le jeu",
+  "sha256sum brawlzone-bubble.apk":
+    "sha256sum brawlzone-bubble.apk",
+  "{minAndroid} or newer":
+    "{minAndroid} ou plus récent",
+  "Ranked and trophy ladder, scored separately from sampled battles":
+    "Classé et Voie des trophées, notés séparément d'après les combats collectés",
+  "Read more":
+    "Lire la suite",
+  "Show less":
+    "Réduire",
+  "Refresh to retry":
+    "Recharge pour réessayer",
+  "A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run.":
+    "Un tuto de 27 secondes : ajouter un tag de joueur pour griser les brawlers que tu n'as pas, activer Masquer les brawlers indisponibles, puis ouvrir la bulle en plein draft pour les meilleurs picks sur la carte et le build à prendre.",
+  "A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power.":
+    "Un draft Prime sur Hideout : la bulle ouvre la tier list Classé, le filtre la réduit à cette carte, le panneau montre le build de Brock le plus possédé, puis Brock est choisi avec ce pouvoir star.",
+  "The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map":
+    "Le panneau BrawlZone ouvert pendant un draft Prime sur Hideout, listant les brawlers mesurés comme les meilleurs sur cette carte",
+  "Add it to your home screen":
+    "Ajoute-le à ton écran d'accueil",
+  "Dismiss install prompt":
+    "Fermer l'invitation à installer",
+  "Install":
+    "Installer",
+  "Install BrawlZone":
+    "Installer BrawlZone",
+  "Back to search":
+    "Retour à la recherche",
+  "Something went wrong":
+    "Un problème est survenu",
+  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
+    "Cette page n'a pas pu être chargée. C'est généralement l'API du jeu qui est lente ou limitée, ce qui se règle tout seul : réessayer suffit souvent.",
+  "Try again":
+    "Réessayer",
+  "Save":
+    "Enregistrer",
+  "Save to favourites":
+    "Ajouter aux favoris",
+  "Save {name} to favourites":
+    "Ajouter {name} aux favoris",
+  "Saved":
+    "Enregistré",
+  "Saved. Click to remove":
+    "Enregistré. Clique pour retirer",
+  "% of the score) with":
+    "% du score) et",
+  "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.":
+    "% du score. Ce poids est mesuré, pas choisi : face à un estimateur qui neutralise exactement le niveau des joueurs, le taux de victoire ajusté obtient r = +0,77 et le taux de sélection r = +0,22, donc la popularité est un signal de force faible mais réel, pas du bruit, et sa part dans le signal combiné tourne autour d'un cinquième, soit le poids qu'elle a maintenant. Elle était à 35 %, où elle produisait 45 % de l'écart réel et faisait bouger des brawlers de quarante places sur la seule popularité. Malgré ça, un brawler populaire au bilan moyen dépassera encore un brawler impopulaire au meilleur bilan. Les deux chiffres sont affichés sur chaque ligne pour que tu puisses les peser toi-même.",
+  "%). It is computed from real battles, not votes, opinion or a panel — and every figure on this page is read directly from the code that produces the lists, so it cannot drift out of date.":
+    "%). Il est calculé à partir de vrais combats, pas de votes, d'avis ou d'un jury, et chaque chiffre de cette page est lu directement dans le code qui produit les listes, donc il ne peut pas être dépassé.",
+  ", and drifting back outside the scale is reported rather than absorbed.":
+    ", et toute dérive hors de l'échelle est signalée plutôt qu'absorbée.",
+  ", and the difference is re-centred on 50%. An adjusted rate of 53% means “three points better than average, given where this brawler gets played”.":
+    ", et l'écart est recentré sur 50 %. Un taux ajusté de 53 % veut dire « trois points au-dessus de la moyenne, compte tenu de là où ce brawler est joué ».",
+  ", because the roster spans two orders of magnitude of usage. On a linear scale everything outside the top handful collapses into the same value.":
+    ", parce que l'usage des brawlers du roster varie de deux ordres de grandeur. Sur une échelle linéaire, tout ce qui est hors de la poignée de tête s'écrase sur la même valeur.",
+  ", or disagree with it in the":
+    ", ou conteste-le dans le",
+  ". Comparing a player against themselves removes skill exactly. The published figure is the average of the two estimates, because they are wrong about different things — the first carries the skill of whoever played it, the second compares a showdown specialist's showdown games against their own Brawl Ball games.":
+    ". Comparer un joueur à lui-même supprime exactement l'effet du niveau. Le chiffre publié est la moyenne des deux estimations, parce qu'elles se trompent sur des choses différentes : la première porte le niveau de celui qui joue, la seconde compare les parties Survivant d'un spécialiste du Survivant à ses propres parties de Brawlball.",
+  ". Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it. The trophy list counts ladder battles, showdown included.":
+    ". Le matchmaking Classé oppose des adversaires de même niveau, donc ce qui reste reflète le brawler plutôt que celui qui le jouait. La liste des trophées compte les combats de la Voie des trophées, Survivant compris.",
+  ". Sample sizes behind every figure are on the lists themselves; the roll-ups they are computed from hold {v} days of history.":
+    ". La taille de l'échantillon derrière chaque chiffre est indiquée sur les listes elles-mêmes ; les cumuls à partir desquels elles sont calculées gardent {v} jours d'historique.",
+  ": a brawler needs roughly that many decided battles before its own record outweighs the prior, which is about where the noise stops dominating.":
+    " : un brawler a besoin d'à peu près autant de combats décisifs avant que son propre bilan pèse plus que l'a priori, ce qui correspond à peu près au moment où le bruit cesse de dominer.",
+  "A 90% win rate over 50 battles is not better than an 86% rate over 1,300, but a naive ranking says it is. Every rate is therefore blended with the average, weighted by":
+    "Un taux de victoire de 90 % sur 50 combats n'est pas meilleur qu'un taux de 86 % sur 1 300, mais un classement naïf dit le contraire. Chaque taux est donc mélangé à la moyenne, avec un poids de",
+  "A brawler's raw win rate is compared against the average for the modes it is actually played in, then re-centred on 50%. A showdown brawler is judged against showdown, where finishing in the top half caps the ceiling near 40%, and a Brawl Ball brawler against Brawl Ball, where the same cohort wins far more often. One number for both would put every showdown brawler at the bottom.":
+    "Le taux de victoire brut d'un brawler est comparé à la moyenne des modes où il est vraiment joué, puis recentré sur 50 %. Un brawler de Survivant est jugé par rapport au Survivant, où finir dans la moitié haute plafonne autour de 40 %, et un brawler de Brawlball par rapport au Brawlball, où le même groupe gagne bien plus souvent. Un seul chiffre pour les deux mettrait tous les brawlers de Survivant en bas.",
+  "A raw win rate is not comparable across brawlers, because modes are not comparable. Finishing top four of ten in showdown caps the achievable rate near 40%; the same cohort wins closer to 78% in Brawl Ball. Ranking both on one number puts every showdown brawler at the bottom regardless of how good it is.":
+    "Un taux de victoire brut n'est pas comparable d'un brawler à l'autre, parce que les modes ne sont pas comparables. Finir dans les quatre premiers sur dix en Survivant plafonne le taux possible autour de 40 % ; le même groupe gagne plutôt 78 % en Brawlball. Classer les deux sur un seul chiffre met tous les brawlers de Survivant en bas, quelle que soit leur valeur.",
+  "A win rate says the brawler was on the winning side, not that it caused the win. Strong players gravitate toward particular brawlers, and the adjustment above corrects for the modes a brawler is played in, not the skill of the people playing it.":
+    "Un taux de victoire dit que le brawler était dans le camp gagnant, pas qu'il a causé la victoire. Les bons joueurs se tournent vers certains brawlers, et l'ajustement ci-dessus corrige les modes où un brawler est joué, pas le niveau de ceux qui le jouent.",
+  "A win rate says the side holding a brawler won. It does not say the brawler is why. Strong players gravitate toward particular brawlers and carry their results with them, and step 2 corrects for":
+    "Un taux de victoire dit que le camp qui avait un brawler a gagné. Il ne dit pas que c'est grâce au brawler. Les bons joueurs se tournent vers certains brawlers et emportent leurs résultats avec eux, et l'étape 2 corrige",
+  "Adding pick rate, on a log scale":
+    "Ajouter le taux de sélection, en échelle logarithmique",
+  "Adjusting the win rate for mode":
+    "Ajuster le taux de victoire selon le mode",
+  "Are the Ranked and trophy scores comparable?":
+    "Les scores Classé et trophées sont-ils comparables ?",
+  "Battles come from players reachable through the global leaderboards and their recent opponents, so the numbers lean toward more active accounts than the game as a whole.":
+    "Les combats viennent de joueurs accessibles via les classements mondiaux et leurs adversaires récents, donc les chiffres penchent vers des comptes plus actifs que l'ensemble du jeu.",
+  "Below":
+    "En dessous de",
+  "Both measurements are mapped onto 0–1 between fixed anchors, so a score means the same thing from one week to the next rather than being rescaled by whoever happens to be present. The anchors sit just outside each list's own 5th–95th percentile:":
+    "Les deux mesures sont ramenées entre 0 et 1 entre des points d'ancrage fixes, donc un score veut dire la même chose d'une semaine à l'autre au lieu d'être réétalonné selon qui est présent. Les points d'ancrage se situent juste au-delà des 5e et 95e centiles de chaque liste :",
+  "Correcting for who is holding it":
+    "Corriger selon qui le joue",
+  "Does the tier list account for player skill?":
+    "La tier list tient-elle compte du niveau des joueurs ?",
+  "Every number on the tier lists, and where it comes from. Including what it cannot tell you.":
+    "Chaque chiffre des tier lists, et d'où il vient. Y compris ce qu'il ne peut pas te dire.",
+  "Every two hours the sampler walks the global leaderboards and reads the battle logs of the players it finds. A battle log holds a player's last ~25 battles and there is no history endpoint, so anything played between visits is lost permanently — the two-hour interval is set by that, not by cost.":
+    "Toutes les deux heures, la collecte parcourt les classements mondiaux et lit le journal de combat des joueurs qu'elle trouve. Un journal contient les ~25 derniers combats d'un joueur et il n'y a pas d'historique, donc tout ce qui est joué entre deux passages est perdu pour toujours : l'intervalle de deux heures est fixé par ça, pas par le coût.",
+  "Fixed is not the same as permanent, and that distinction has already cost these lists their calibration once. The anchors were set before the sampling rate rose eighteenfold in August 2026 and nothing re-derived them, so by late September 42% of the Ranked roster sat in D while 41% of the trophy roster sat in S or A. Nothing failed and nobody was told. They are now re-measured on":
+    "Fixe ne veut pas dire permanent, et cette différence a déjà coûté leur calibrage à ces listes une fois. Les points d'ancrage ont été fixés avant que le rythme de collecte soit multiplié par dix-huit en août 2026, et rien ne les a recalculés, donc fin septembre 42 % du roster Classé était en D pendant que 41 % du roster trophées était en S ou A. Rien n'a planté et personne n'a été prévenu. Ils sont désormais remesurés à",
+  "Fixing the scale, and checking it stays fixed":
+    "Fixer l'échelle, et vérifier qu'elle le reste",
+  "How is the Brawl Stars meta score calculated?":
+    "Comment le meta score de Brawl Stars est-il calculé ?",
+  "How the Brawl Stars meta score is calculated":
+    "Comment est calculé le meta score de Brawl Stars",
+  "How the meta score is calculated":
+    "Comment est calculé le meta score",
+  "It does not control for who is playing":
+    "Il ne tient pas compte de qui joue",
+  "It is a sample, not a census":
+    "C'est un échantillon, pas un recensement",
+  "It mixes strength with popularity, on purpose":
+    "Il mélange force et popularité, exprès",
+  "List":
+    "Liste",
+  "Method":
+    "Méthode",
+  "No. They are different populations measured against different denominators, so each list is calibrated against its own distribution. A 7.0 on the Ranked list and a 7.0 on the trophy list are not the same claim, which is why the two are never shown side by side.":
+    "Non. Ce sont des populations différentes, mesurées par rapport à des dénominateurs différents, donc chaque liste est calibrée sur sa propre distribution. Un 7,0 dans la liste Classé et un 7,0 dans la liste des trophées ne disent pas la même chose, c'est pourquoi les deux ne sont jamais affichés côte à côte.",
+  "Partly, and deliberately. Alongside the plain win rate each brawler is measured a second way: every player's win rate with it minus that same player's win rate without it, which removes player skill exactly because it compares people against themselves. The published strength is the average of the two, because each is biased in a different direction. It changes real placements — one brawler ranked 96th on win rate alone and 16th once every player was compared against their own average.":
+    "En partie, et volontairement. En plus du simple taux de victoire, chaque brawler est mesuré d'une deuxième façon : le taux de victoire de chaque joueur avec lui moins le taux de victoire de ce même joueur sans lui, ce qui supprime exactement le niveau du joueur puisqu'on compare les gens à eux-mêmes. La force publiée est la moyenne des deux, parce que chacune est biaisée dans un sens différent. Ça change de vrais classements : un brawler était 96e sur le seul taux de victoire et 16e une fois chaque joueur comparé à sa propre moyenne.",
+  "Pick rate is":
+    "Le taux de sélection est",
+  "Pulling thin samples toward the average":
+    "Rapprocher les petits échantillons de la moyenne",
+  "Questions":
+    "Questions",
+  "Ranked and the trophy ladder are different populations against different denominators, and each is calibrated against its own distribution. A 7.0 on one is not a 7.0 on the other, which is why they are never shown side by side.":
+    "Le Classé et la Voie des trophées sont des populations différentes avec des dénominateurs différents, et chacun est calibré sur sa propre distribution. Un 7,0 dans l'un n'est pas un 7,0 dans l'autre, c'est pourquoi ils ne sont jamais affichés côte à côte.",
+  "Sampling real battles":
+    "Collecter de vrais combats",
+  "Sampling, baseline adjustment, shrinkage, log-scaled pick rate, and the limits of all of it.":
+    "Échantillonnage, ajustement de base, rétrécissement, taux de sélection logarithmique, et les limites de tout ça.",
+  "See it applied on the":
+    "Vois-le appliqué dans la",
+  "So each brawler is also measured a second way:":
+    "Chaque brawler est donc aussi mesuré d'une deuxième façon :",
+  "So each brawler is measured against":
+    "Chaque brawler est donc mesuré par rapport à",
+  "Step 4 removes the effect of who is holding a brawler, but the estimator behind it compares a player's games with a brawler against all their other games, across every mode. A specialist is therefore compared against their own play elsewhere, which is its own bias — smaller than the one it removes, and pointing the other way, which is why the two estimates are averaged rather than one being picked. A brawler carried by too few players is not corrected at all and falls back to the mode-adjusted rate.":
+    "L'étape 4 supprime l'effet de qui joue un brawler, mais l'estimateur derrière compare les parties d'un joueur avec un brawler à toutes ses autres parties, dans tous les modes. Un spécialiste est donc comparé à son propre jeu ailleurs, ce qui est un biais en soi : plus petit que celui qu'il supprime, et dans l'autre sens, c'est pourquoi les deux estimations sont moyennées au lieu d'en choisir une. Un brawler joué par trop peu de joueurs n'est pas corrigé du tout et revient au taux ajusté par mode.",
+  "The Ranked list counts":
+    "La liste Classé ne compte que",
+  "The cut-offs are plain thresholds on the score:":
+    "Les seuils sont de simples paliers sur le score :",
+  "The full method behind BrawlZone tier lists: where the battles come from, how win rates are adjusted for mode and sample size, how pick rate is weighted, and what the score cannot tell you.":
+    "La méthode complète derrière les tier lists BrawlZone : d'où viennent les combats, comment les taux de victoire sont ajustés selon le mode et la taille de l'échantillon, comment le taux de sélection est pondéré, et ce que le score ne peut pas te dire.",
+  "The honest limits, because a number without them is worth less.":
+    "Les vraies limites, parce qu'un chiffre sans elles vaut moins.",
+  "The meta score is a single 0–10 number combining":
+    "Le meta score est un seul chiffre de 0 à 10 qui combine",
+  "The skill correction is partial, not complete":
+    "La correction du niveau est partielle, pas complète",
+  "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.":
+    "Les deux concordent de près (r = +0,77) et divergent là où ça compte. Bibi était 96e sur le seul taux de victoire et 16e une fois chaque joueur comparé à sa propre moyenne, parce qu'elle est surtout jouée par des comptes plus faibles et que leurs résultats lui étaient attribués.",
+  "The two lists are not comparable":
+    "Les deux listes ne sont pas comparables",
+  "Turning the score into a tier":
+    "Transformer le score en tier",
+  "What is an adjusted win rate?":
+    "Qu'est-ce qu'un taux de victoire ajusté ?",
+  "What the meta score cannot tell you":
+    "Ce que le meta score ne peut pas te dire",
+  "Why do rarely-played brawlers not top the tier list?":
+    "Pourquoi les brawlers peu joués ne dominent-ils pas la tier list ?",
+  "Win rate alone cannot tell a genuinely strong staple from a niche pick that happens to win. A brawler played in 0.13% of battles at 52% and one played in 3.4% at 52% score the same, even though only the second is shaping the meta.":
+    "Le taux de victoire seul ne distingue pas un incontournable vraiment fort d'un pick de niche qui gagne par hasard. Un brawler joué dans 0,13 % des combats à 52 % et un autre joué dans 3,4 % à 52 % obtiennent le même score, alors que seul le second façonne la méta.",
+  "a brawler is not rated at all. “We have not measured this” and “we measured this and it is bad” are different claims, and collapsing them is how tier lists end up implying the second about brawlers they have three battles for.":
+    ", un brawler n'est pas noté du tout. « On ne l'a pas mesuré » et « on l'a mesuré et c'est mauvais » sont deux affirmations différentes, et les confondre, c'est comme ça que des tier lists finissent par affirmer la seconde sur des brawlers pour lesquels elles ont trois combats.",
+  "a brawler is played, not":
+    "on joue un brawler, pas",
+  "and the":
+    "et la",
+  "below {v}":
+    "sous {v}",
+  "competitive battles only":
+    "les combats compétitifs",
+  "decided battles":
+    "combats décisifs",
+  "every player's win rate with it, minus that same player's win rate without it":
+    "le taux de victoire de chaque joueur avec lui, moins le taux de victoire de ce même joueur sans lui",
+  "every sampler run":
+    "chaque passage de la collecte",
+  "how much it is actually played":
+    "à quel point il est vraiment joué",
+  "how well a brawler performs":
+    "les performances d'un brawler",
+  "is playing it.":
+    "le joue.",
+  "log-scaled":
+    "en échelle logarithmique",
+  "pseudo-battles":
+    "pseudo-combats",
+  "the average for the mix of modes it is actually played in":
+    "la moyenne des modes où il est vraiment joué",
+  "tier list maker":
+    "créateur de tier list",
+  "where":
+    "où",
+  "who":
+    "qui",
+  "A fast, honest stats site for Brawl Stars. Built for players who want to know exactly where they stand.":
+    "Un site de stats Brawl Stars rapide et honnête. Fait pour les joueurs qui veulent savoir exactement où ils en sont.",
+  "About":
+    "À propos",
+  "About BrawlZone":
+    "À propos de BrawlZone",
+  "Account help, bans and purchases are Supercell's — this site only reads the public API and cannot change anything about your account.":
+    "L'aide sur les comptes, les bannissements et les achats, c'est Supercell : ce site ne fait que lire l'API publique et ne peut rien changer à ton compte.",
+  "Being straight about the limits is more useful than pretending they don't exist.":
+    "Être franc sur les limites est plus utile que de faire comme si elles n'existaient pas.",
+  "Brawl Zone":
+    "Brawl Zone",
+  "BrawlZone is free, ad-free and has no paywall. If it saved you some time, a coffee goes a long way.":
+    "BrawlZone est gratuit, sans pub et sans paywall. S'il t'a fait gagner du temps, un café aide beaucoup.",
+  "BrawlZone — often written":
+    "BrawlZone (souvent écrit",
+  "Map layouts, and the art the Fan Kit does not have yet.":
+    "Les plans des cartes, et les images que le Fan Kit n'a pas encore.",
+  "Brawlify CDN":
+    "Brawlify CDN",
+  "Supercell Fan Kit":
+    "Supercell Fan Kit",
+  "Brawler artwork, skins, star power and gadget icons, ranked badges and game mode icons: Supercell's own art for fan content, served from this site.":
+    "Images des brawlers, skins, icônes de pouvoirs star et de gadgets, badges de rang et icônes de modes : les images de Supercell destinées au contenu de fans, servies depuis ce site.",
+  "Built by one person":
+    "Fait par une seule personne",
+  "Buy me a coffee":
+    "Offre-moi un café",
+  "Four different things get called “maps”, and they mean different things.":
+    "Quatre choses différentes s'appellent « cartes », et elles ne veulent pas dire la même chose.",
+  "Get in touch":
+    "Nous contacter",
+  "Ideas, corrections, or just to say hello.":
+    "Des idées, des corrections, ou juste dire bonjour.",
+  "Is there a feature you would like to see on BrawlZone? Something that looks wrong, or a page you wish existed? Send it over — ideas for what this site should do next are the most useful thing you can put in my inbox.":
+    "Il y a une fonctionnalité que tu aimerais voir sur BrawlZone ? Quelque chose qui semble faux, ou une page qui te manque ? Envoie-la : les idées sur ce que ce site devrait faire ensuite sont ce que tu peux mettre de plus utile dans ma boîte mail.",
+  "Look anyone up":
+    "Cherche n'importe qui",
+  "Looking up a tag is a public action: the same data is available to anyone through the official API.":
+    "Chercher un tag est une action publique : les mêmes données sont accessibles à tout le monde via l'API officielle.",
+  "Official Brawl Stars API":
+    "API officielle de Brawl Stars",
+  "Official announcements and each update's notes, summarised here with a link to the full text, picked up automatically as new posts go live.":
+    "Les annonces officielles et les notes de chaque mise à jour, résumées ici avec un lien vers le texte complet, récupérées automatiquement dès que de nouveaux posts sont publiés.",
+  "One person reads every message, so a reply can take a few days.":
+    "Une seule personne lit chaque message, donc une réponse peut prendre quelques jours.",
+  "Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.":
+    "Joueurs, clubs, journaux de combat, classements et rotation des événements. Tout ce qui concerne un compte précis vient d'ici, en direct.",
+  "Privacy":
+    "Confidentialité",
+  "Reading the map pages":
+    "Lire les pages des cartes",
+  "Search any player or club tag for trophies, ranked tiers, world rankings, progression and recent form. Save the profiles you follow and they stay one tap away.":
+    "Cherche n'importe quel tag de joueur ou de club pour les trophées, les rangs Classé, les classements mondiaux, la progression et la forme récente. Enregistre les profils que tu suis et ils restent à un tap.",
+  "Start searching":
+    "Commencer à chercher",
+  "Supercell news & release notes":
+    "Actus Supercell et notes de mise à jour",
+  "The site counts page views with Umami, a privacy-friendly analytics tool that runs on our own server. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.":
+    "Le site compte les pages vues avec Umami, un outil de statistiques respectueux de la vie privée qui tourne sur notre propre serveur. Il n'utilise aucun cookie, ne crée pas de profil sur toi et ne te suit pas sur d'autres sites. C'est un compteur de visites, pas du pistage publicitaire.",
+  "There is no account system, so there is nothing to sign up for and no password to store. Your recent searches and saved profiles live in your own browser's local storage and are never sent to us. Clearing your browser data removes them for good.":
+    "Il n'y a pas de système de compte, donc rien à créer et aucun mot de passe à stocker. Tes recherches récentes et tes profils enregistrés vivent dans le stockage local de ton navigateur et ne nous sont jamais envoyés. Effacer les données de ton navigateur les supprime pour de bon.",
+  "This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy.":
+    "Ce contenu n'est pas officiel et n'est pas approuvé par Supercell. Pour en savoir plus, consulte la Politique de Supercell relative au contenu des fans.",
+  "Tier lists and per-map picks aggregated from thousands of sampled battles, refreshed daily. Plus upgrade-ownership rates, release notes and news in one place.":
+    "Des tier lists et des picks par carte tirés de milliers de combats collectés, mis à jour chaque jour. Plus les taux de possession des améliorations, les notes de mise à jour et les actus au même endroit.",
+  "Track the meta":
+    "Suivre la méta",
+  "What BrawlZone is, where its data comes from, and what it can and cannot tell you.":
+    "Ce qu'est BrawlZone, d'où viennent ses données, et ce qu'elles peuvent et ne peuvent pas te dire.",
+  "What it does":
+    "Ce qu'il fait",
+  "What we can't tell you":
+    "Ce qu'on ne peut pas te dire",
+  "Where the data comes from":
+    "D'où viennent les données",
+  "and is not affiliated with Supercell.":
+    "et n'est pas affilié à Supercell.",
+  "brawlzone.net":
+    "brawlzone.net",
+  "— is an independent Brawl Stars statistics site covering player and club lookups, Ranked analysis and brawler tier lists. It lives at":
+    ") est un site indépendant de stats Brawl Stars : recherche de joueurs et de clubs, analyse du Classé et tier lists des brawlers. Il se trouve sur",
+  "This page is a translation. If it differs from the English version, the English version applies.":
+    "Cette page est une traduction. Si elle diffère de la version anglaise, c'est la version anglaise qui s'applique.",
+  "Read anything here, as often as you like, without an account.":
+    "Lire tout ce qu'il y a ici, aussi souvent que tu veux, sans compte.",
+  "Quote or screenshot the numbers, including in videos and articles. A link back is appreciated, never required.":
+    "Citer les chiffres ou en faire des captures, y compris dans des vidéos et des articles. Un lien vers nous fait plaisir, mais n'est jamais obligatoire.",
+  "Install and use the Android app on any device you own.":
+    "Installer et utiliser l'appli Android sur n'importe quel appareil qui t'appartient.",
+  "Scraping the site at a rate that degrades it for other readers. There is no published API quota because there is no published API; automated traffic that costs more than it returns gets rate-limited.":
+    "Aspirer le site à un rythme qui le ralentit pour les autres lecteurs. Il n'y a pas de quota d'API publié, parce qu'il n'y a pas d'API publiée ; le trafic automatisé qui coûte plus qu'il ne rapporte est limité.",
+  "Passing the site off as official, or as affiliated with Supercell.":
+    "Faire passer le site pour officiel, ou pour affilié à Supercell.",
+  "Redistributing the Android app repackaged, modified, or signed with a different key.":
+    "Redistribuer l'appli Android repackagée, modifiée ou signée avec une autre clé.",
+  "No account, because there is nothing to sign in to.":
+    "Pas de compte, parce qu'il n'y a rien à quoi se connecter.",
+  "No cookies. Not for analytics, not for preferences, not at all.":
+    "Pas de cookies. Ni pour les statistiques, ni pour les préférences, pas du tout.",
+  "No advertising, no ad networks, and no third-party trackers.":
+    "Pas de publicité, pas de régies publicitaires et pas de traceurs tiers.",
+  "No email address, name, phone number or payment details — none are ever asked for.":
+    "Pas d'adresse e-mail, de nom, de numéro de téléphone ni de données de paiement : rien de tout ça n'est jamais demandé.",
+  ", and the answer is nothing.":
+    ", et la réponse est : rien.",
+  ", which are dated.":
+    ", qui sont datées.",
+  ". Use the numbers to inform a decision, not as a guarantee of one. Nothing here is advice, and no outcome in the game is promised.":
+    ". Utilise les chiffres pour éclairer une décision, pas comme une garantie. Rien ici n'est un conseil, et aucun résultat en jeu n'est promis.",
+  "And, more usefully, what they are not.":
+    "Et, plus utile encore, ce qu'ils ne sont pas.",
+  "BrawlZone Bubble":
+    "BrawlZone Bubble",
+  "Changes, and getting in touch":
+    "Changements et contact",
+  "Every statistic here is computed from a":
+    "Chaque statistique ici est calculée à partir d'un",
+  "It is distributed from this site, so it is covered here too.":
+    "Elle est distribuée depuis ce site, donc elle est couverte ici aussi.",
+  "It is not a modification of Brawl Stars, does not interact with the game, and does not automate play. Using it should not put an account at risk, but the site cannot make promises on Supercell's behalf about what their rules permit.":
+    "Ce n'est pas une modification de Brawl Stars, elle n'interagit pas avec le jeu et n'automatise pas le jeu. L'utiliser ne devrait pas mettre un compte en danger, mais le site ne peut rien promettre au nom de Supercell sur ce que ses règles autorisent.",
+  "No warranty":
+    "Aucune garantie",
+  "Not affiliated with Supercell":
+    "Non affilié à Supercell",
+  "Questions, corrections, or a takedown request:":
+    "Questions, corrections ou demande de retrait :",
+  "Short, because the honest version is short. This site is free, fan-made, and measured rather than official.":
+    "Court, parce que la version honnête est courte. Ce site est gratuit, fait par un fan, et mesuré plutôt qu'officiel.",
+  "Stated first, because it is the thing most worth being clear about.":
+    "Dit en premier, parce que c'est ce qu'il est le plus important de clarifier.",
+  "Supercell's Fan Content Policy":
+    "Politique de Supercell relative au contenu des fans",
+  "Terms":
+    "Conditions",
+  "Terms of service":
+    "Conditions d'utilisation",
+  "The":
+    "L'appli",
+  "The method is published in full, including its limitations, on":
+    "La méthode est publiée en entier, limites comprises, sur la page",
+  "The site and the app are provided “as is”, without warranty of any kind. They may be unavailable, incomplete, or wrong at any time. To the extent the law allows,":
+    "Le site et l'appli sont fournis « tels quels », sans aucune garantie. Ils peuvent être indisponibles, incomplets ou faux à tout moment. Dans la mesure permise par la loi,",
+  "The terms for using BrawlZone: a free, fan-made Brawl Stars statistics site. What the numbers are, what they are not, and what you may do with them.":
+    "Les conditions d'utilisation de BrawlZone, un site gratuit de stats Brawl Stars fait par un fan. Ce que sont les chiffres, ce qu'ils ne sont pas, et ce que tu peux en faire.",
+  "These terms may change as the site does. Material changes are noted in the":
+    "Ces conditions peuvent changer en même temps que le site. Les changements importants sont signalés dans les",
+  "What the numbers are":
+    "Ce que sont les chiffres",
+  "What you may do":
+    "Ce que tu peux faire",
+  "What you may not do":
+    "Ce que tu ne peux pas faire",
+  "accepts no liability for any loss arising from using them — including decisions made in a game on the strength of a number printed here.":
+    "décline toute responsabilité pour toute perte liée à leur utilisation, y compris les décisions prises en jeu sur la foi d'un chiffre affiché ici.",
+  "app is free and provided as-is. It draws an overlay showing this site's data over other apps, with your permission, and reads nothing from your device or from the game. What it collects is covered by the":
+    "est gratuite et fournie telle quelle. Avec ton autorisation, elle affiche par-dessus les autres applis une couche avec les données de ce site, et ne lit rien sur ton appareil ni dans le jeu. Ce qu'elle collecte est décrit dans la",
+  "how the meta score is calculated":
+    "comment est calculé le meta score",
+  "of real battles, read from the official Brawl Stars API. It is not a census of every game played, and it is not official. Win rates, tier lists and recommendations are estimates with sample sizes printed beside them, and they can be wrong.":
+    "de vrais combats, lu depuis l'API officielle de Brawl Stars. Ce n'est pas un recensement de toutes les parties jouées, et ce n'est pas officiel. Les taux de victoire, les tier lists et les recommandations sont des estimations, avec la taille de l'échantillon affichée à côté, et elles peuvent être fausses.",
+  "privacy policy":
+    "politique de confidentialité",
+  "release notes":
+    "notes de mise à jour",
+  "sample":
+    "échantillon",
+  "{SITE_NAME} is a free Brawl Stars statistics site. There is no account, nothing to pay for, and no advertising. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
+    "{SITE_NAME} est un site gratuit de stats Brawl Stars. Il n'y a pas de compte, rien à payer et pas de publicité. L'utiliser veut dire accepter les conditions de cette page. Si tu n'es pas d'accord avec l'une d'elles, il suffit d'arrêter d'utiliser le site, et rien n'est perdu : tu ne nous as rien donné.",
+  "{SITE_NAME} is an independent, fan-made project. It is not endorsed by, sponsored by, or affiliated with Supercell. Brawl Stars, its brawler names, artwork and trademarks belong to Supercell, and are used here to describe the game the site is about. This site follows":
+    "{SITE_NAME} est un projet indépendant, fait par un fan. Il n'est ni approuvé, ni sponsorisé par Supercell, ni affilié à Supercell. Brawl Stars, les noms des brawlers, les images et les marques appartiennent à Supercell et sont utilisés ici pour décrire le jeu dont parle le site. Ce site respecte la",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, which is why there is no consent banner on this site — there is nothing to consent to.":
+    ", qui tourne sur le même serveur que le site plutôt que chez un tiers. Il ne pose aucun cookie et ne stocke aucune donnée personnelle, c'est pourquoi il n'y a pas de bandeau de consentement sur ce site : il n'y a rien à accepter.",
+  ", so it counts as a page view here and nothing more. It does not read your game account, your files, or your other apps.":
+    ", donc ça compte ici comme une page vue et rien de plus. Elle ne lit pas ton compte de jeu, tes fichiers ni tes autres applis.",
+  ". If this page ever stops matching what the site actually does, that is a bug — say so and it will be fixed.":
+    ". Si cette page cesse un jour de correspondre à ce que fait réellement le site, c'est un bug : signale-le et il sera corrigé.",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, and tapping the Android download. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Quelques événements nommés sont aussi comptés, tous anonymes : installer l'appli web, l'ouvrir et toucher le téléchargement Android. L'événement de téléchargement indique de quelle page il vient et quelle version était proposée, pour distinguer une mise à jour d'une première installation. Rien d'autre.",
+  "A handful of preferences live in your browser's local storage: saved players and clubs, recent searches, saved rosters, whether you dismissed the install prompt, and — in the Android app's panel — the game mode and map you last looked at.":
+    "Quelques préférences vivent dans le stockage local de ton navigateur : joueurs et clubs enregistrés, recherches récentes, rosters enregistrés, si tu as fermé l'invitation à installer et, dans le panneau de l'appli Android, le dernier mode de jeu et la dernière carte consultés.",
+  "A tag you type is a request, not a record.":
+    "Un tag que tu tapes est une requête, pas une donnée enregistrée.",
+  "Analytics":
+    "Statistiques",
+  "Most artwork comes from Supercell's Fan Kit and is served from this site itself. Map images and a few others come from Brawlify's CDN, and some from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading those means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
+    "La plupart des images viennent du Fan Kit de Supercell et sont servies par ce site lui-même. Les images des cartes et quelques autres viennent du CDN de Brawlify, et certaines du fil d'actus de Brawl Stars, du wiki communautaire et des miniatures YouTube. Les charger veut dire que ton navigateur contacte directement ces serveurs, et qu'ils voient la requête comme n'importe quel site que tu visites. Nous ne leur envoyons rien sur toi.",
+  "BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.":
+    "BrawlZone n'est pas officiel et n'est pas approuvé par Supercell. Les données du jeu viennent de l'API officielle de Brawl Stars, selon ses conditions pour les développeurs.",
+  "Display over other apps":
+    "Superposition à d'autres applis",
+  "Email":
+    "E-mail",
+  "If your profile appears in the sampled data and you would rather it did not, email":
+    "Si ton profil apparaît dans les données collectées et que tu préfères qu'il n'y soit pas, écris à",
+  "It asks for one permission, and it is not the one people fear.":
+    "Elle demande une seule autorisation, et ce n'est pas celle que les gens craignent.",
+  "It is not on the Play Store, so nothing is reported to Google about your use of it. The":
+    "Elle n'est pas sur le Play Store, donc rien n'est signalé à Google sur ton usage. La",
+  "It records the page, the referrer, and coarse details your browser sends anyway: country, browser, operating system, screen size. It does not record IP addresses, and nothing links one visit to another or to a person.":
+    "Il enregistre la page, le référent et des informations générales que ton navigateur envoie de toute façon : pays, navigateur, système d'exploitation, taille d'écran. Il n'enregistre pas les adresses IP, et rien ne relie une visite à une autre ou à une personne.",
+  "Kept on your device, never sent anywhere.":
+    "Gardé sur ton appareil, jamais envoyé nulle part.",
+  "Looking up a player":
+    "Chercher un joueur",
+  "One counter, self-hosted, with nothing that identifies you.":
+    "Un compteur, hébergé chez nous, sans rien qui t'identifie.",
+  "Other people's servers":
+    "Les serveurs des autres",
+  "Page views are counted by":
+    "Les pages vues sont comptées par",
+  "Questions, or a change":
+    "Questions, ou un changement",
+  "Reading the screen is a separate thing, and it is off unless you turn it on. Version 1.8 can scan the draft, and to do that Android makes you accept its own screen-capture dialog — every time the app starts, because the system will not let an app keep that permission — and shows a recording indicator for as long as a session is open. One frame is read when you tap Scan, measured on your phone, and dropped. It is never written to storage and never sent anywhere; what comes out of it is a handful of brawler names.":
+    "Lire l'écran, c'est autre chose, et c'est désactivé tant que tu ne l'actives pas. La version 1.8 peut scanner le draft, et pour ça Android te fait accepter sa propre fenêtre de capture d'écran, à chaque lancement de l'appli, parce que le système ne laisse pas une appli garder cette autorisation, et affiche un indicateur d'enregistrement tant qu'une session est ouverte. Une image est lue quand tu touches Scanner, analysée sur ton téléphone puis jetée. Elle n'est jamais enregistrée ni envoyée nulle part ; ce qui en sort, c'est une poignée de noms de brawlers.",
+  "Searching a player tag sends it to the official Brawl Stars API to fetch that profile. We do not store a record of who searched for what.":
+    "Chercher un tag de joueur l'envoie à l'API officielle de Brawl Stars pour récupérer ce profil. Nous ne gardons aucune trace de qui a cherché quoi.",
+  "Separately, BrawlZone samples public profiles and battle logs from that same official API to build the statistics the site is for — tier lists, map picks, matchups. That data is public in the game, is stored as aggregates rather than as a dossier on any player, and is bounded by retention windows. There is more about where it comes from on the":
+    "Par ailleurs, BrawlZone collecte des profils publics et des journaux de combat depuis cette même API officielle pour construire les statistiques qui sont la raison d'être du site : tier lists, picks par carte, matchups. Ces données sont publiques dans le jeu, stockées sous forme agrégée plutôt que comme un dossier sur un joueur, et limitées par des durées de conservation. Plus d'infos sur leur provenance sur la",
+  "The Android app":
+    "L'appli Android",
+  "The app has no account, collects nothing, and sends nothing anywhere. Its panel is a web view of":
+    "L'appli n'a pas de compte, ne collecte rien et n'envoie rien nulle part. Son panneau affiche",
+  "The bubble needs":
+    "La bulle a besoin de l'autorisation",
+  "The short version":
+    "La version courte",
+  "These never leave your device. They are not synced, not backed up by us, and not readable by the server. Clearing your browser data removes them, and the site works without them.":
+    "Elles ne quittent jamais ton appareil. Elles ne sont pas synchronisées, pas sauvegardées par nous et pas lisibles par le serveur. Effacer les données de ton navigateur les supprime, et le site fonctionne sans elles.",
+  "Umami":
+    "Umami",
+  "Very little, and this page says exactly what. Every claim below is something you can check in the source.":
+    "Très peu, et cette page dit exactement quoi. Chaque affirmation ci-dessous est vérifiable dans le code source.",
+  "What BrawlZone stores, what it does not, and what the Android app sends. No accounts, no cookies, no personal data.":
+    "Ce que BrawlZone stocke, ce qu'il ne stocke pas, et ce que l'appli Android envoie. Pas de comptes, pas de cookies, pas de données personnelles.",
+  "What stays in your browser":
+    "Ce qui reste dans ton navigateur",
+  "What we collect":
+    "Ce que nous collectons",
+  "What your browser fetches from elsewhere.":
+    "Ce que ton navigateur charge ailleurs.",
+  "a page on this site":
+    "une page de ce site",
+  "about page":
+    "page À propos",
+  "download page":
+    "page de téléchargement",
+  "publishes a SHA-256 checksum so you can verify the file you got is the file we published.":
+    "publie une somme de contrôle SHA-256 pour que tu puisses vérifier que ton fichier est bien celui que nous avons publié.",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them.":
+    "pour s'afficher par-dessus le jeu. Cette autorisation lui permet de mettre des pixels sur ton écran, pas de les lire.",
+  "with your tag and it will be excluded.":
+    "avec ton tag et il sera exclu.",
+  " and others":
+    " et d'autres",
+  " — {up} up, {down} down":
+    " — {up} en hausse, {down} en baisse",
+  ", not what the update":
+    ", pas ce que la mise à jour",
+  ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.":
+    ". Un brawler peut être renforcé et ignoré, affaibli et quand même monter, ou bouger à cause du changement de rotation des cartes dans la même quinzaine. La taille de l'échantillon est affichée à côté de chaque ligne pour que tu puisses juger toi-même, et tout ce qui a moins de {PATCH_MIN_DECIDED} combats décisifs d'un côté est écarté plutôt que deviné.",
+  ". The rest stayed where they were.":
+    ". Les autres sont restés où ils étaient.",
+  "Did the Brawl Stars balance changes work?":
+    "Les équilibrages de Brawl Stars ont-ils marché ?",
+  "Did the balance changes work?":
+    "Les équilibrages ont-ils marché ?",
+  "Every brawler an update changed, and what its adjusted win rate did in the {PATCH_WINDOW_DAYS} days afterwards against the {PATCH_WINDOW_DAYS2} before. From sampled Ranked battles.":
+    "Chaque brawler modifié par une mise à jour, et ce que son taux de victoire ajusté a fait dans les {PATCH_WINDOW_DAYS} jours qui ont suivi par rapport aux {PATCH_WINDOW_DAYS2} jours d'avant. D'après les combats Classé collectés.",
+  "Every brawler each Brawl Stars update changed, and what its win rate actually did in the fortnight afterwards, measured from sampled Ranked battles.":
+    "Chaque brawler modifié par chaque mise à jour de Brawl Stars, et ce que son taux de victoire a vraiment fait dans la quinzaine qui a suivi, mesuré sur les combats Classé collectés.",
+  "It changed {length} brawlers.":
+    "Elle a modifié {length} brawlers.",
+  "Listed rather than hidden — an absence with a reason is a finding too.":
+    "Listés plutôt que cachés : une absence avec une raison, c'est aussi un résultat.",
+  "Measured, not announced":
+    "Mesuré, pas annoncé",
+  "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
+    "Aucune mise à jour dans la période conservée n'a pu être lue. Ça se remplira quand les notes de mise à jour et les cumuls quotidiens concorderont.",
+  "None of them moved more than {NOTABLE_DELTA} points either way in the":
+    "Aucun n'a bougé de plus de {NOTABLE_DELTA} points dans un sens ou dans l'autre dans les",
+  "Not measured: {v} — under":
+    "Non mesurés : {v} — moins de",
+  "Patch notes":
+    "Notes de patch",
+  "The window is still filling, so this is a partial reading.":
+    "La période se remplit encore, donc c'est une mesure partielle.",
+  "This shows what each number":
+    "Ceci montre ce que chaque chiffre",
+  "This update changed":
+    "Cette mise à jour a modifié",
+  "Updates that cannot be measured":
+    "Mises à jour impossibles à mesurer",
+  "What each update actually did to the brawlers it changed, measured rather than announced.":
+    "Ce que chaque mise à jour a vraiment fait aux brawlers qu'elle a modifiés, mesuré et non annoncé.",
+  "brawlers":
+    "brawlers",
+  "by more than {NOTABLE_DELTA} points in the {PATCH_WINDOW_DAYS} days afterwards":
+    "de plus de {NOTABLE_DELTA} points dans les {PATCH_WINDOW_DAYS} jours suivants",
+  "caused":
+    "a causé",
+  "did":
+    "a fait",
+  "{PATCH_MIN_DECIDED} decided battles on one side of the update, or released after it.":
+    "{PATCH_MIN_DECIDED} combats décisifs d'un côté de la mise à jour, ou sortis après.",
+  "{PATCH_WINDOW_DAYS} days afterwards.":
+    "{PATCH_WINDOW_DAYS} jours suivants.",
+  "{date} · {start} to {end} against {start2} to {end2}":
+    "{date} · du {start} au {end} contre du {start2} au {end2}",
+  "{length} moved":
+    "{length} ont bougé",
+  "+{v} pts":
+    "+{v} pts",
+  ". Only maps currently in rotation are included.":
+    ". Seules les cartes actuellement en rotation sont prises en compte.",
+  "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.":
+    "Chaque brawler ici a au moins 300 combats Classé décisifs. Ces listes sont des extrêmes sélectionnés, et choisir un maximum parmi beaucoup de petits échantillons produit des extrêmes par hasard plutôt que par mérite : le seuil, c'est ce qui l'empêche.",
+  "Everybody picks them and the results do not justify it — over {highUsage} pick rate.":
+    "Tout le monde les choisit et les résultats ne le justifient pas : plus de {highUsage} de sélection.",
+  "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.":
+    "Bien meilleurs sur une carte que leur forme générale ne le laisse penser. Le chiffre, ce sont des points de taux de victoire au-dessus de leur propre moyenne, donc la force générale est déjà retirée.",
+  "Fine overall, but losing win-rate points on a map that is in rotation right now.":
+    "Bons en général, mais perdent des points de taux de victoire sur une carte en rotation en ce moment.",
+  "Hidden gems":
+    "Pépites cachées",
+  "How this is decided":
+    "Comment c'est décidé",
+  "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the":
+    "Les pépites et pièges de carte comparent le score d'un brawler sur une carte à sa propre forme générale, donc la liste n'est pas une deuxième copie de la",
+  "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.":
+    "Pas encore assez de combats collectés pour répondre honnêtement. Ça se remplira quand assez de brawlers auront passé le seuil d'échantillon.",
+  "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.":
+    "Personne ne passe la barre cette semaine, ce qui veut dire que la méta est jouée à peu près comme elle se mesure.",
+  "Overrated":
+    "Surcotés",
+  "See every pick on {mapName}":
+    "Voir tous les picks sur {mapName}",
+  "Sleeper picks":
+    "Picks dormants",
+  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
+    "Forts, et presque personne ne les prend : moins de {lowUsage} de sélection.",
+  "The hidden meta":
+    "La méta cachée",
+  "Trap picks":
+    "Picks pièges",
+  "Underrated and overrated Brawl Stars brawlers":
+    "Brawlers sous-cotés et surcotés de Brawl Stars",
+  "Who is everyone sleeping on, measured from sampled ranked battles.":
+    "Ceux que tout le monde sous-estime, mesurés sur les combats Classé collectés.",
+  "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.":
+    "Ceux que tout le monde sous-estime. D'après {rated} brawlers ayant assez de combats Classé pour être jugés, sur les {windowDays} derniers jours.",
+  "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.":
+    "Ceux que tout le monde sous-estime. Des brawlers forts que presque personne ne prend, des brawlers populaires que les résultats ne justifient pas, et les pépites et pièges propres à chaque carte que la tier list générale cache, mesurés sur les combats Classé collectés plutôt que sur des avis.",
+  "tier list":
+    "tier list",
+  "{v} or better.":
+    "{v} ou mieux.",
+  "{v} pts":
+    "{v} pts",
+  "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of":
+    "« Peu choisi » et « fort » sont des centiles du roster actuel, pas des chiffres fixes, donc la question reste la même pendant que les réponses bougent. Aujourd'hui, ça donne moins de {lowUsage} de sélection et une note de",
+  ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the":
+    ", CC-BY-SA. Supercell ne publie aucune API de chances d'obtention, donc elles sont tenues à jour par la communauté à partir de dataminages et d'observations en jeu, ce ne sont pas des chiffres officiels. Pour voir à quoi ressemble la méta une fois que tu as les brawlers, vois la",
+  "Brawl Stars Starr Drop chances: every drop rate and reward":
+    "Chances des Prix Starr de Brawl Stars : chaque taux d'obtention et chaque récompense",
+  "Chance of rolling each rarity":
+    "Chance d'obtenir chaque rareté",
+  "Drop rates and contents from the":
+    "Taux d'obtention et contenus tirés du",
+  "Drop rates unavailable":
+    "Taux d'obtention indisponibles",
+  "Each of your first five wins of the day earns a reward drop: usually a Starr Drop, sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Chacune de tes cinq premières victoires du jour rapporte un prix : en général un Prix Starr, parfois un Prix du chaos ou un autre prix. Le compteur se remet à zéro une fois par jour ; le minuteur de l'écran Victoires du jour en jeu indique exactement quand.",
+  "Event drops":
+    "Prix d'événement",
+  "Every day":
+    "Chaque jour",
+  "Every drop rate":
+    "Tous les taux d'obtention",
+  "How to get them: the daily schedule":
+    "Comment les obtenir : le programme du jour",
+  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
+    "Prix à durée limitée d'événements passés. Gardés pour référence : la plupart ne s'obtiennent plus.",
+  "No table":
+    "Pas de tableau",
+  "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
+    "Disponibles en ce moment via les Victoires du jour, la Voie des trophées, le Pass Brawl et la Boutique.",
+  "Permanent drops":
+    "Prix permanents",
+  "Starr Drop chances for every rarity, from Rare to Legendary, and every reward inside each drop. Plus Chaos Drops and every event drop, in one table.":
+    "Les chances des Prix Starr pour chaque rareté, de Rare à Légendaire, et chaque récompense de chaque prix. Plus les Prix du chaos et tous les prix d'événement, dans un seul tableau.",
+  "Starr Drops":
+    "Prix Starr",
+  "The community wiki these numbers come from is not responding, or has changed shape. Rather than show odds that might be wrong, the page waits.":
+    "Le wiki communautaire d'où viennent ces chiffres ne répond pas, ou a changé de format. Plutôt que d'afficher des chances qui pourraient être fausses, la page attend.",
+  "The wiki lists rewards totalling {v}%, so a row covering the other {v2}% is missing from the source.":
+    "Le wiki liste des récompenses pour un total de {v} %, donc il manque à la source une ligne couvrant les {v2} % restants.",
+  "The wiki publishes no reward table for this drop.":
+    "Le wiki ne publie pas de tableau de récompenses pour ce prix.",
+  "What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki.":
+    "Ce que chaque prix peut contenir et la probabilité de chaque récompense. Le jeu te montre l'ouverture, jamais le tableau derrière, et Supercell ne publie aucun taux via une API, donc ils viennent du wiki communautaire.",
+  "Wiki lists {v}% — a row is missing.":
+    "Le wiki liste {v} % : il manque une ligne.",
+  "Your first 5 wins":
+    "Tes 5 premières victoires",
+  "rarities":
+    "raretés",
+  "rewards":
+    "récompenses",
+  "{event} · limited time":
+    "{event} · durée limitée",
+  ", so it moves with the meta and always matches what the rest of the site says.":
+    ", donc il bouge avec la méta et correspond toujours à ce que dit le reste du site.",
+  "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.":
+    "Un nouveau brawler de Brawl Stars à deviner chaque jour. Chaque essai te dit à quel point tu es proche sur la rareté, la classe, la vitesse, la portée, la recharge, l'ordre de sortie et le tier. Gratuit, sans compte, une énigme par jour.",
+  "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
+    "Après quatre essais, le tableau montre le pouvoir star de la réponse, et après huit son gadget : les vraies icônes du jeu, sans les noms, parce qu'un nom se cherche et qu'une image est un test de mémoire.",
+  "Amber":
+    "Orange",
+  "Brawl Stars daily challenge — guess the brawler":
+    "Défi du jour Brawl Stars : devine le brawler",
+  "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
+    "La classe n'a pas de flèche, parce qu'il n'y a pas de sens entre Tir d'élite et Tank. Un brawler avec trop peu de combats Classé pour avoir un tier affiche un tiret plutôt qu'une supposition.",
+  "Daily challenge":
+    "Défi du jour",
 };
