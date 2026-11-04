@@ -366,4 +366,101 @@ const pt: TierCopy = {
   podiumDetail: (rate) => `${rate} de vitórias`,
 };
 
-export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt };
+const tr: TierCopy = {
+  format: {
+    ranked: {
+      eyebrow: 'Sadece rekabetçi',
+      heading: 'Aşamalı tier listesi',
+      battles: 'Aşamalı maçı',
+      intro:
+        'Savaşçıların rekabetçi Aşamalı modundaki performansı. Eşleştirme birbirine yakın rakipleri karşılaştırır; böylece geriye kalan, savaşçıyı oynayan kişiyi değil savaşçının kendisini yansıtır.',
+      caveat:
+        'Aşamalı yalnızca 3v3 modlardan oluşur ve incelenen maçların küçük bir kısmıdır; bu yüzden liste kupa listesinden daha kısadır ve daha hızlı değişir.',
+      unratedHeading: 'Yeterli Aşamalı verisi yok',
+      unratedBody:
+        'Rekabetçi Aşamalı, incelenen maçların küçük bir kısmı. Bu yüzden kupa maçlarında düzenli oynanan pek çok savaşçının sıralanacak kadar Aşamalı maçı henüz yok.',
+      where: 'Aşamalı',
+    },
+    trophy: {
+      eyebrow: 'Kupa maçları',
+      heading: 'Kupa tier listesi',
+      battles: 'kupa maçı',
+      intro:
+        'Savaşçıların kupa maçlarındaki performansı. Hesaplaşma dahil, çoğu oyuncunun gerçekten oynadığı maçlar; burada draftın sana bıraktığını değil, sahip olduğunu seçersin.',
+      caveat:
+        'Kupa maçlarında eşleştirme Aşamalı kadar sıkı değildir, bu yüzden bir savaşçının buradaki sonuçlarının bir kısmı savaşçıdan değil lobiden gelir. Listeyi bunun belirlememesi için her mod kendi ortalamasına göre puanlanır.',
+      unratedHeading: 'Yeterli kupa verisi yok',
+      unratedBody:
+        'Yeni çıkan savaşçılar ve kupa maçlarında neredeyse hiç oynanmayanlar, kazanma oranı bir anlam ifade etmeden önce daha fazla maça ihtiyaç duyar.',
+      where: 'kupa maçları',
+    },
+  },
+  heading: (format, mode, rank) => {
+    const h = tr.format[format].heading;
+    const base = mode ? `${mode} ${h}` : h;
+    return rank ? `${base} (${rank})` : base;
+  },
+  scopeLabel: (w, mode) => (mode ? `${mode} · ${w}` : w),
+  faq: {
+    bestQ: (format, mode) =>
+      mode
+        ? `Brawl Stars'ta ${mode} için en iyi savaşçı hangisi?`
+        : `Brawl Stars'ta ${format === 'ranked' ? 'Aşamalı modunda' : 'kupa maçlarında'} en iyi savaşçı hangisi?`,
+    bestA: (a) =>
+      `${a.first}${a.mode ? `, ${a.mode} için` : ''} son ${a.window} içinde ${a.games} sonuçlanmış ${a.battles} boyunca ${a.rate} düzeltilmiş kazanma oranıyla en üst sırada.${a.third ? ` Onu ${a.second} ve ${a.third} izliyor.` : ''}`,
+    noneA: (a) =>
+      `Son ${a.window} içinde${a.mode ? ` ${a.mode} için` : ''} savaşçıları sıralamaya yetecek kadar ${a.battles} henüz incelenmedi. Bir savaşçının listeye girmesi için ${a.floor} sonuçlanmış maç gerekir.`,
+    howQ: 'Bu tier listesi nasıl hazırlanıyor?',
+    howA: (a) =>
+      `Oylardan ya da görüşlerden değil, gerçek maçlardan incelenen ${a.sampled} ${a.scope} üzerinden. Kazanma oranı aynı örneklemin ortalamasına göre düzeltilir, çünkü incelenen oyuncular hangi savaşçıyı oynarsa oynasın maçlarının yarısından fazlasını kazanır. Böylece bir tier, savaşçıyı oynayanı değil savaşçının kendisini yansıtır. Bir savaşçının puanlanması için dönem içinde ${a.floor} sonuçlanmış maç gerekir.`,
+    oftenQ: 'Tier listesi ne sıklıkla güncelleniyor?',
+    oftenA:
+      'Sistem birkaç saatte bir yeni maçlar topluyor ve bu sayfa en son verilerle yeniden oluşturuluyor; bu yüzden veriden birkaç saatten fazla geride kalmaz.',
+  },
+  scopeName: (format, mode) => (mode ? `${mode} (${tr.format[format].eyebrow.toLocaleLowerCase('tr')})` : tr.format[format].battles),
+  itemList: (mode) => `Meta puanına göre sıralanmış Brawl Stars savaşçıları${mode ? ` (${mode})` : ''}.`,
+  breadcrumbRoot: 'Tier listesi',
+  answer: (a) =>
+    `Şu anda ${a.format === 'ranked' ? 'Aşamalı modunda' : 'kupa maçlarında'}${a.mode ? ` ${a.mode} için` : ''} en iyi savaşçılar ${a.first}, ${a.second} ve ${a.third}`,
+  lead: (a) => `${a.games} sonuçlanmış maçta ${a.rate} düzeltilmiş kazanma oranıyla ${a.first} önde.`,
+  based: (a) =>
+    a.rank && a.days
+      ? `Son ${a.days} günde ${a.rank} lobilerinde oynanan ${a.sampled ? `${a.sampled} ` : ''}incelenmiş ${a.battles}${a.mode ? ` (${a.mode})` : ''} verisine dayanır.`
+      : `Aşamalı sıralamasının her kademesinden oyuncuların ${a.sampled ? `${a.sampled} ` : ''}incelenmiş ${a.battles}${a.mode ? ` (${a.mode})` : ''} verisine dayanır.`,
+  disagree: 'Katılmıyor musun? Kendi listeni yap',
+  howSummary: 'Meta puanı nasıl çalışır',
+  how1: (format) =>
+    `Meta puanı, bu ${format === 'ranked' ? 'Aşamalı' : 'kupa'} listesine göre düzeltilmiş kazanma oranını ve seçilme oranını birleştirir.`,
+  how2a: 'Savaşçılar 10 üzerinden',
+  metaScore: 'meta puanına',
+  how2b:
+    'göre sıralanır; bu puan düzeltilmiş kazanma oranını logaritmik ölçekli seçilme oranıyla birleştirir. Tek başına kazanma oranı, kimsenin oynamadığı bir savaşçıyı aynı sonuçlara sahip popüler bir savaşçıyla eşit puanlardı; popülerlik bu eşitliği bozar.',
+  how3a: 'Ölçek bu liste içinde ayarlanır; yani puanlar savaşçıları burada birbirleriyle karşılaştırır ve şununla karşılaştırılamaz:',
+  otherList: (format) => (format === 'ranked' ? 'kupa listesi' : 'Aşamalı listesi'),
+  how3b: (floor) =>
+    `. Bir savaşçının puanlanması için dönem içinde ${floor} sonuçlanmış maç gerekir. Tam döküm için bir savaşçıya dokun ya da üzerine gel, veya şunu oku:`,
+  fullMethod: 'yöntemin tamamı',
+  how3c: '— örnekleme, mod düzeltmesi, referans noktaları ve neyi söyleyemeyeceği.',
+  bracketMissingStrong: (rank) => `${rank} lobilerinden henüz yeterli maç yok`,
+  bracketMissingRest:
+    '— bu rütbe için savaşçılar puanlanamıyor, bu yüzden bu liste tüm rütbeleri kapsıyor. Daha fazla maç incelendikçe önümüzdeki günlerde dolacak.',
+  bracketWidened: (rank, days, normal) =>
+    `${rank} lobileri şu anda örneklemde az (bir Aşamalı sezonunun ilk günleri genelde böyledir), bu yüzden bu liste ${normal} yerine son ${days} günü kapsıyor.`,
+  unratedSub: (floor, w) =>
+    `Her biri ${w} döneminde ${floor} sonuçlanmış maça ihtiyaç duyar; aşağıdaki sayı ne kadar yaklaştığını gösterir. En yakın olanlar önce.`,
+  unratedChip: (name, games, floor, battles) => `${name}: sıralanmak için ${floor} sonuçlanmış ${battles} gerekiyor, şu an ${games}`,
+  chipTitle: (a) =>
+    `${a.name}: ${a.games} sonuçlanmış maçta ${a.adj} düzeltilmiş kazanma oranı (ham ${a.raw}, oynandığı modların ${a.base} ortalamasına karşı) ve ${a.pick} seçilme oranıyla meta puanı ${a.score}`,
+  winLetter: 'K',
+  winTitle: 'Düzeltilmiş kazanma oranı',
+  pickLetter: 'S',
+  pickTitle: 'Seçilme oranı',
+  emptyTitle: (c) => (c ? 'Henüz toplanmış veri yok' : 'Veritabanı yapılandırılmadı'),
+  emptyBody: (c, w) =>
+    c ? `${w} döneminde henüz yeterli maç incelenmedi. Daha uzun bir dönem dene ya da biraz sonra tekrar bak.` : 'Sıralamalar şu anda kullanılamıyor.',
+  browse: 'Savaşçı veritabanına göz at',
+  podium: 'Şu an ilk üç',
+  podiumDetail: (rate) => `${rate} kazanma oranı`,
+};
+
+export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr };

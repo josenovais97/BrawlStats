@@ -94,6 +94,28 @@ const WORDS = {
     pick: 'escolha',
     decided: 'partidas decididas',
   },
+  tr: {
+    title: 'Metada yükselenler ve düşenler',
+    change: 'Değişim:',
+    score: 'meta puanı',
+    scale:
+      '; yukarıdaki tier\'larla aynı 0-10 ölçeği, kaydedilen günlük ölçümler üzerinden hesaplanır: burada görünen, Aşamalı metasında gerçekten yükseliyor ya da düşüyor.',
+    over: (days: number, from: string, to: string) =>
+      `${days === 1 ? 'Son bir günde' : `Son ${days} günde`} ölçüldü; ${from} ve ${to} ölçümleri karşılaştırıldı.`,
+    between: 'En son iki ölçüm arasında ölçüldü.',
+    floor:
+      'İki taraf da tier listesiyle aynı asgari maç sayısını geçer ve farklı yöntemlerle yapılan ölçümler asla karşılaştırılmaz.',
+    allModes: 'Tüm modlar',
+    allModesRest: ': günlük ölçümler moda göre ayrılmaz, bu yüzden yukarıdaki filtre burada geçerli değil.',
+    up: 'Yükselenler',
+    down: 'Düşenler',
+    noUp: 'Bu dönemde yükselen olmadı.',
+    noDown: 'Bu dönemde düşen olmadı.',
+    unit: 'Meta puanı /10',
+    win: 'kazanma',
+    pick: 'seçilme',
+    decided: 'sonuçlanmış maç',
+  },
 } satisfies Record<Locale, unknown>;
 
 type Words = (typeof WORDS)[Locale];

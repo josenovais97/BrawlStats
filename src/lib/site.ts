@@ -1,4 +1,5 @@
 import { requestLocale } from '@/lib/request-locale';
+import { DATE_LOCALE } from '@/lib/i18n';
 
 /**
  * Canonical origin for the deployed site.
@@ -91,7 +92,7 @@ export const SAMPLE_PLAYER_TAG = '2RLCPVGUG';
  */
 export function currentMonth(): string {
   // In the page's language: "octubre de 2026" on a Spanish page.
-  const tag = { en: 'en-GB', es: 'es-419', pt: 'pt-BR' }[requestLocale()];
+  const tag = DATE_LOCALE[requestLocale()];
   return new Date().toLocaleDateString(tag, { month: 'long', year: 'numeric' });
 }
 

@@ -48,6 +48,19 @@ const WORDS = {
     note: 'Taxa de vitória ajustada neste mapa nas últimas três semanas, aproximada do nível geral de cada brawler no Ranqueado quando há poucas partidas. Brawlers com menos de 150 partidas decididas aqui ficam de fora.',
     full: 'Página do mapa (em inglês)',
   },
+  tr: {
+    group: 'Aşamalı haritası',
+    all: 'Tüm haritalar',
+    empty: (map: string) =>
+      `${map} haritasında henüz hiçbir savaşçının sıralanacak kadar incelenmiş maçı yok. Burada daha fazla maç incelendikçe dolacak.`,
+    atRank: (n: string, rank: string, all: string) => `${rank} rütbesinde ${n} · tüm rütbelerde ${all}`,
+    here: (n: string) => `burada ${n} maç`,
+    usual: 'normale göre',
+    noteRank: (rank: string) =>
+      `Bu haritadaki tüm rütbelerin sonuçları, her savaşçının ${rank} lobilerindeki performansına göre düzeltilir ve burada oynanan ${rank} maçlarına yaklaştırılır. Burada 20'den az ${rank} maçı olan savaşçılar dahil edilmez.`,
+    note: "Son üç haftada bu haritadaki düzeltilmiş kazanma oranı; örneklem azsa her savaşçının genel Aşamalı formuna yaklaştırılır. Burada 150'den az sonuçlanmış maçı olan savaşçılar dahil edilmez.",
+    full: 'Haritanın tam sayfası',
+  },
 } satisfies Record<Locale, unknown>;
 
 /** One brawler's record on one Ranked map, as the page serialises it. */

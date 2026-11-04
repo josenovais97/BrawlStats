@@ -50,6 +50,15 @@ const WORDS = {
     win: 'vitórias',
     pick: 'escolha',
   },
+  tr: {
+    title: 'En çok seçilen savaşçılar',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Son ${w} içinde incelenen ${battles}${mode ? ` (${mode})` : ''} arasında en sık görülen savaşçılar. Bu güç değil popülerlik: yukarıdaki tier'lar bir savaşçının ne kadar iyi performans gösterdiğini sıralar ve ikisi çoğu zaman uyuşmaz. Seçilme oranı incelenen tüm maçların bir payıdır, yani maç başına %100 değil, tüm savaşçılar boyunca toplanır.`,
+    tier: (t: string) => `Bu listede ${t} tier`,
+    battles: 'maç',
+    win: 'kazanma',
+    pick: 'seçilme',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function MostPicked({

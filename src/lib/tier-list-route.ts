@@ -184,6 +184,26 @@ const INTL: Record<
     ],
     last24: ', últimas 24 horas',
   },
+  tr: {
+    where: { ranked: 'Aşamalı', trophy: 'kupa' },
+    index: (where, month) => [
+      `Brawl Stars ${where} tier listesi (${month}): en iyi karakterler`,
+      `${month} itibarıyla Brawl Stars'ın ${where === 'Aşamalı' ? 'Aşamalı modundaki' : 'kupa maçlarındaki'} en iyi savaşçıları. Gerçek maçların kazanma ve seçilme oranlarıyla hazırlanır, birkaç saatte bir güncellenir.`,
+    ],
+    mode: (mode, where, month) => [
+      `Brawl Stars ${mode} için en iyi karakterler (${month}): ${where} tier listesi`,
+      `Şu anda ${mode} modunda en çok kazanan savaşçılar; gerçek ${where} maçlarıyla sıralanır ve birkaç saatte bir güncellenir. Bir sonraki ${mode} maçından önce en iyilerine bak.`,
+    ],
+    rank: (rank, month) => [
+      `Brawl Stars ${rank} tier listesi (${month}): rütbendeki en iyi karakterler`,
+      `${month} itibarıyla ${rank} rütbesinde Brawl Stars'ın en iyi savaşçıları. Yalnızca ${rank} rütbesinde oynanan Aşamalı maçlarıyla hazırlanır, çünkü senin rütbendeki meta üst rütbelerdekiyle aynı değil.`,
+    ],
+    rankMode: (mode, rank, month) => [
+      `${rank} rütbesinde ${mode} için en iyi karakterler (${month}): Brawl Stars tier listesi`,
+      `${rank} rütbesinde ${mode} modunda en çok kazanan savaşçılar; o rütbenin gerçek Aşamalı maçlarıyla, birkaç saatte bir güncellenir.`,
+    ],
+    last24: ', son 24 saat',
+  },
 };
 
 export async function tierListMetadata(

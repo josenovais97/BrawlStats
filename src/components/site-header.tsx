@@ -121,7 +121,7 @@ const MORE: NavItem[] = [
 /** The mobile panel has room for the lot, so it never hides anything. */
 const ALL_NAV: NavItem[] = [...NAV, ...MORE];
 
-/** The menu in Spanish and Portuguese, by English label. */
+/** The menu in each language, by English label. */
 const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
   es: {
     Brawlers: 'Brawlers',
@@ -188,6 +188,39 @@ const LABELS: Record<Exclude<Locale, 'en'>, Record<string, string>> = {
     open: 'Abrir menu',
     close: 'Fechar menu',
     main: 'Principal',
+  },
+  tr: {
+    Brawlers: 'Savaşçılar',
+    'Tier List': 'Tier listesi',
+    Ranked: 'Aşamalı',
+    Maps: 'Haritalar',
+    Draft: 'Draft',
+    Leaderboard: 'Sıralamalar',
+    'Android App': 'Android uygulaması',
+    Daily: 'Günlük',
+    'Team Comps': 'Takımlar',
+    'Meta Report': 'Meta raporu',
+    'Hidden Meta': 'Gizli meta',
+    'Daily Challenge': 'Günlük bulmaca',
+    'Patch Impact': 'Yamaların etkisi',
+    'Community Events': 'Topluluk etkinlikleri',
+    Clubs: 'Kulüpler',
+    Compare: 'Karşılaştır',
+    'Tier List Maker': 'Tier listesi yap',
+    'Account Value': 'Hesap değeri',
+    'Free Rewards': 'Ücretsiz ödüller',
+    'Starr Drops': 'Starr Hediyeleri',
+    Cosmetics: 'Kozmetikler',
+    News: 'Haberler',
+    'Release Notes': 'Sürüm notları',
+    More: 'Daha fazla',
+    Search: 'Ara',
+    searchLabel: 'Oyuncu veya kulüp ara',
+    shareText: "BrawlZone'da Brawl Stars istatistikleri",
+    home: 'BrawlZone ana sayfa',
+    open: 'Menüyü aç',
+    close: 'Menüyü kapat',
+    main: 'Ana menü',
   },
 };
 

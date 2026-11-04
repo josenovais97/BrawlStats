@@ -1,6 +1,7 @@
 /** Presentation helpers shared across pages. */
 
 import { requestLocale } from '@/lib/request-locale';
+import { DATE_LOCALE, NUMBER_LOCALE } from '@/lib/i18n';
 
 /**
  * Number and date formatting follows the page's language on the server
@@ -8,8 +9,8 @@ import { requestLocale } from '@/lib/request-locale';
  * client it is always English, which only matters for numbers a client
  * component formats itself.
  */
-const NUMBER_TAG = { en: 'en-US', es: 'es-419', pt: 'pt-BR' } as const;
-const DATE_TAG = { en: 'en-GB', es: 'es-419', pt: 'pt-BR' } as const;
+const NUMBER_TAG = NUMBER_LOCALE;
+const DATE_TAG = DATE_LOCALE;
 
 /** 317840 -> "317,840" */
 export function formatNumber(n: number | null | undefined): string {
@@ -178,6 +179,8 @@ export function ordinal(n: number): string {
   const locale = requestLocale();
   if (locale === 'es') return `${n}.º`;
   if (locale === 'pt') return `${n}º`;
+  if (locale === 'tr') return `${n}.`; // Turkish: "3."
+
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
   switch (n % 10) {
@@ -226,7 +229,8 @@ export function formatPercent(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '–';
   const locale = requestLocale();
   if (locale === 'en') return `${(value * 100).toFixed(1)}%`;
-  return `${(value * 100).toLocaleString(NUMBER_TAG[locale], { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  const n = (value * 100).toLocaleString(NUMBER_TAG[locale], { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  return locale === 'tr' ? `%${n}` : `${n}%`; // Turkish puts the sign first: "%54,3"
 }
 
 /**

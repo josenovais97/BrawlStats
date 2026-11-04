@@ -53,6 +53,14 @@ const WORDS = {
       `${name}: ${adj} de vitórias ajustadas em ${games} partidas decididas, ${pick} de escolha`,
     pick: 'de escolha',
   },
+  tr: {
+    title: 'Güçlü ama az seçilenler',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Kadronun daha az oynanan yarısı içinde en iyi düzeltilmiş kazanma oranına sahip savaşçılar; son ${w} içinde incelenen ${battles}${mode ? ` (${mode})` : ''} verisine göre. Oynandıklarında kazanıyorlar ama pek oynanmıyorlar; bu genelde kötü oldukları değil, hafife alındıkları anlamına gelir.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: ${games} sonuçlanmış maçta ${adj} düzeltilmiş kazanma oranı, ${pick} seçilme oranı`,
+    pick: 'seçilme oranı',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function Underrated({

@@ -77,10 +77,22 @@ function Br({ className = '' }: FlagProps) {
   );
 }
 
+function Tr({ className = '' }: FlagProps) {
+  return (
+    <svg viewBox="0 0 60 40" aria-hidden className={`${box} ${className}`}>
+      <rect width="60" height="40" fill="#E30A17" />
+      <circle cx="21" cy="20" r="10" fill="#fff" />
+      <circle cx="23.5" cy="20" r="8" fill="#E30A17" />
+      <path d="M28.10 20.00 L31.14 19.01 L31.14 15.82 L33.02 18.40 L36.06 17.41 L34.18 20.00 L36.06 22.59 L33.02 21.60 L31.14 24.18 L31.14 20.99z" fill="#fff" />
+    </svg>
+  );
+}
+
 const FLAGS: Record<Locale, ((p: FlagProps) => React.ReactNode)[]> = {
   en: [Uk, Us],
   es: [Es, Mx],
   pt: [Pt, Br],
+  tr: [Tr],
 };
 
 /** The flags for a language, side by side. */

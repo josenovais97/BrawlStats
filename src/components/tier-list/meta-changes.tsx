@@ -67,6 +67,22 @@ const WORDS = {
     placeWord: (n: number) => (n === 1 ? 'posição' : 'posições'),
     newIn: (t: string) => `novo no ${t}`,
   },
+  tr: {
+    tierMove: (from: string, to: string) => `${from} tier'dan ${to} tier'a, `,
+    places: (n: number, up: boolean) => `${n} sıra ${up ? 'yukarı' : 'aşağı'}, `,
+    score: 'meta puanı',
+    tier: (t: string) => `${t} tier`,
+    whatChanged: 'Ne değişti',
+    against: (span: string) => `Son karşılaştırılabilir ölçüme göre, ${span}`,
+    riser: 'En çok yükselen',
+    faller: 'En çok düşen',
+    tierChanges: 'Tier değişiklikleri',
+    held: (n: number) => `Tüm savaşçılar tier'ını korudu. ${n} tanesi kendi tier'ı içinde yer değiştirdi.`,
+    upDown: (up: number, down: number) => `${up} yükseldi, ${down} düştü`,
+    scoreWord: 'Puan',
+    placeWord: () => 'sıra',
+    newIn: (t: string) => `${t} tier'a yeni girdi`,
+  },
 } satisfies Record<Locale, unknown>;
 
 /**

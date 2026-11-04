@@ -114,7 +114,7 @@ export function fmtPercent(value: number | null | undefined, locale: Locale): st
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   });
-  return `${n}%`;
+  return locale === 'tr' ? `%${n}` : `${n}%`; // Turkish puts the sign first
 }
 
 /** One decimal, signless, in the locale's separator: 7.4 / 7,4. */
@@ -145,6 +145,7 @@ export const RANK_LABEL: Record<Locale, Record<string, string>> = {
   en: { diamond: 'Diamond and below', mythic: 'Mythic', legendary: 'Legendary', masters: 'Masters to Pro' },
   es: { diamond: 'Diamante o menos', mythic: 'Mítico', legendary: 'Legendario', masters: 'Maestros a Pro' },
   pt: { diamond: 'Diamante ou abaixo', mythic: 'Mítico', legendary: 'Lendário', masters: 'Mestres a Pro' },
+  tr: { diamond: 'Elmas ve altı', mythic: 'Gizemli', legendary: 'Efsanevi', masters: "Ustalar'dan Pro'ya" },
 };
 
 export function rankLabel(bracket: { slug: string; label: string }, locale: Locale): string {
@@ -158,6 +159,7 @@ export function spanText(from: string, to: string, locale: Locale): string {
     en: ['since the last snapshot', 'since yesterday', 'in the last week', (d: number) => `in the last ${d} days`],
     es: ['desde la última medición', 'desde ayer', 'en la última semana', (d: number) => `en los últimos ${d} días`],
     pt: ['desde a última medição', 'desde ontem', 'na última semana', (d: number) => `nos últimos ${d} dias`],
+    tr: ['son ölçümden beri', 'dünden beri', 'son bir haftada', (d: number) => `son ${d} günde`],
   } as const;
   const [none, one, week, many] = words[locale];
   if (!Number.isFinite(days) || days <= 0) return none;

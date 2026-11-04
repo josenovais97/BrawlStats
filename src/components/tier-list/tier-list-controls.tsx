@@ -82,6 +82,18 @@ const WORDS: Record<
     modeGroup: 'Modo de jogo',
     sampled: (n) => `${n} partidas coletadas`,
   },
+  tr: {
+    format: { ranked: { label: 'Aşamalı', sublabel: 'Rekabetçi' }, trophy: { label: 'Kupa', sublabel: 'Kupa yolu' } },
+    window: { '24h': 'Meta', '7d': 'Son günler' },
+    formatGroup: 'Tier listesi türü',
+    windowGroup: 'Dönem',
+    yourRank: 'Rütben',
+    allRanks: 'Tümü',
+    lobbies: (rank) => `${rank} Aşamalı maçları`,
+    allModes: 'Tüm modlar',
+    modeGroup: 'Oyun modu',
+    sampled: (n) => `${n} incelenen maç`,
+  },
 };
 
 export function TierListControls({

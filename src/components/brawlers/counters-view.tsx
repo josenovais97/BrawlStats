@@ -178,6 +178,42 @@ const WORDS: Record<Locale, Words> = {
     ],
     join: list('e'),
   },
+  tr: {
+    title: (n, m) => `Brawl Stars'ta ${n} counter'ları: karşısında en iyi seçimler (${m})`,
+    ogTitle: (n) => `${n} counter'ları`,
+    description: (n, top) =>
+      `Aşamalı'da ${n} karşısında en iyi counter'lar: ${top}. ${n} karşısındaki kazanma oranları gerçek Aşamalı maçlarından, rütbeye göre, iki saatte bir güncellenir.`,
+    descriptionNone: (n) => `Brawl Stars Aşamalı'da ${n} karşısında kim kazanıyor: gerçek maçlardan, rütbeye göre.`,
+    fallbackTitle: "Counter'lar",
+    heading: (n) => `${n} karşısında ne seçilir`,
+    intro: (n, top) => `Şu anda Aşamalı'da ${n} karşısında en sık kazananlar: ${top}. `,
+    method: (n, d) =>
+      `Son ${d} günün gerçek Aşamalı maçlarından, tüm rütbeler, iki saatte bir güncellenir. Her sayı ${n} karşısındaki kazanma oranı ve iki savaşçının normal oranlarının öngördüğünü ne kadar aştığıdır.`,
+    best: "En iyi counter'lar",
+    avoid: (n) => `${n} karşısında seçme`,
+    atRank: "Rütbendeki counter'lar",
+    games: (g, n) => `${n} karşısında ${g} maç`,
+    expected: 'beklenene göre',
+    none: (n) => `${n} karşısında henüz yeterli Aşamalı maçı yok.`,
+    noneAtRank: 'Bu rütbede henüz yeterli maç yok.',
+    faqWhat: (n) => `Brawl Stars'ta ${n} karşısında hangi savaşçılar iyi?`,
+    faqWhatA: (n, top, d) =>
+      `Aşamalı'da son ${d} günde ${n} karşısında en sık kazananlar ${top}; normal kazanma oranlarının öngördüğünden daha fazla.`,
+    faqWhatNone: (n) => `${n} karşısındaki counter'ları söyleyecek kadar Aşamalı maçı henüz yok.`,
+    faqAvoid: (n) => `${n} karşısında kimi seçmemeliyim?`,
+    faqAvoidA: (n, l) => `${l}, Aşamalı'da ${n} karşısında beklenenden fazla kaybediyor.`,
+    faqAvoidNone: (n) => `Henüz ${n} karşısında belirgin şekilde kaybeden bir savaşçı yok.`,
+    crumbs: 'Savaşçılar',
+    counters: "Counter'lar",
+    draft: [
+      'Şu an draft mı yapıyorsun?',
+      'Draft yardımcısı',
+      "tüm draftın için counter'ları, takım arkadaşlarını ve haritayı hesaba katar; ücretsiz",
+      'Bubble uygulaması',
+      'da bunu rütbene göre oyunun üzerinde gösterir.',
+    ],
+    join: list('ve'),
+  },
 };
 
 interface Row {

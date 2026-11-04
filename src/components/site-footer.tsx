@@ -150,6 +150,23 @@ const WORDS: Record<Locale, Record<string, string>> = {
     disclaimer: 'Este material não é oficial e não é endossado pela Supercell. Para mais informações, veja a',
     policy: 'Política de Conteúdo de Fãs da Supercell', notAffiliated: 'não tem ligação com a Supercell',
   },
+  tr: {
+    Stats: 'İstatistikler', Tools: 'Araçlar', Game: 'Oyun',
+    Brawlers: 'Savaşçılar', 'Tier List': 'Tier listesi', 'Ranked Maps': 'Aşamalı haritaları', Maps: 'Haritalar',
+    Leaderboard: 'Sıralamalar', Draft: 'Draft', 'Team Comps': 'Takım dizilimleri', Compare: 'Karşılaştır', Daily: 'Günlük',
+    'Meta Report': 'Meta raporu', 'Hidden Meta': 'Gizli meta', 'Daily Challenge': 'Günlük bulmaca',
+    'Patch Impact': 'Yamaların etkisi', 'How Scores Work': 'Puanlar nasıl hesaplanır',
+    'Android App': 'Android uygulaması', 'Community Events': 'Topluluk etkinlikleri', Cosmetics: 'Kozmetikler',
+    'Starr Drops': 'Starr Hediyeleri', News: 'Haberler', 'Release Notes': 'Sürüm notları', 'Free Rewards': 'Ücretsiz ödüller',
+    tagline:
+      'Nerede durduğunu gösteren Brawl Stars istatistikleri. Oyuncu ve kulüp arama, tier listeleri ve haritaya göre en iyi savaşçılar; hepsi kendi topladığımız maçlardan.',
+    follow: 'Takip et ve destekle', coffee: 'Bana bir kahve ısmarla', free: 'Ücretsiz, ödeme yok.',
+    googlePlay: "Google Play'de BrawlZone Bubble",
+    getGame: 'BrawlZone Bubble: oyunun üzerinde duran draft yardımcısı. Ücretsiz.', about: 'Hakkında:', privacy: 'Gizlilik',
+    terms: 'Koşullar', contact: 'İletişim', sources: 'Veriler ve görseller:',
+    disclaimer: 'Bu içerik resmi değildir ve Supercell tarafından onaylanmamıştır. Daha fazla bilgi için:',
+    policy: 'Supercell Hayran İçeriği Politikası', notAffiliated: 'Supercell ile bağlantılı değildir',
+  },
 };
 
 const EN: Record<string, string> = {

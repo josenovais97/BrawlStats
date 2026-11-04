@@ -26,6 +26,12 @@ const WORDS = {
     back: 'Voltar para a busca',
     tiers: 'Tier list',
   },
+  tr: {
+    title: 'Sayfa bulunamadı',
+    body: 'Bu sayfa yok, ya da bir zamanlar vardı ama artık yok. Haritalar ve modlar değişir, bu yüzden eski bir bağlantı gösterdiği şeyden daha uzun yaşayabilir.',
+    back: 'Aramaya dön',
+    tiers: 'Tier listesi',
+  },
 };
 
 /** The 404, in the language of the address that was asked for. */
