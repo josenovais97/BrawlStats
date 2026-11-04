@@ -53,7 +53,7 @@ import json, math, os, random, sys
 from PIL import Image, ImageDraw, ImageFilter
 
 from engine import (W, H, FPS, P, WHITE, GOLD_TOP, NAVY, TIER, F, G, Timeline, art, arrow, background, card, clamp,
-                    confetti, crown, finish, follow_cta, grey, hits, impact, has_model, load_face, load_model, nice, out_back,
+                    confetti, crown, finish, follow_cta, grey, hits, impact, has_art, has_model, load_face, load_model, nice, out_back,
                     out_cubic, pill, put, put_rays, rounded_mask, silhouette, slam, text_sprite, tier_pill, vgrad)
 
 KIND, DATA, PREV, STATE, OUT = sys.argv[1:6]
@@ -1719,7 +1719,7 @@ if KIND == 'whatsnew':
     if FRESH:
         _heads = [_pool.get(e['id']) or by_id.get(e['id']) or {'n': e['n'], 'id': e['id'], 'tier': None}
                   for e in UPD.get('brawlers', [])]
-        _heads = [b for b in _heads if has_model(b)]
+        _heads = [b for b in _heads if has_art(b)]  # an interim crop will do for the update's own
         _ids = {b['id'] for b in _heads}
         NEWEST = (_heads + [b for b in NEWEST if b['id'] not in _ids])[:5]
     try:
@@ -1788,7 +1788,7 @@ def wn_scene(s, t, bt, lt):
         col = (255, 60, 100) if int(t * 3) % 2 == 0 else (139, 107, 255)
         canvas = background(t, col).convert('RGBA')
         put_rays(canvas, col, t, W / 2, 1100, speed=50, alpha=0.6)
-        for j, b in enumerate(NEWEST[:3]):
+        for j, b in enumerate([b for b in NEWEST if has_model(b)][:3]):  # a framed crop has no silhouette
             sil = silhouette(art(b, 520, 420), (255, 255, 255))
             x = W / 2 + (j - 1) * 330
             put(canvas, sil, x, 1180 + (j % 2) * 40, scale=0.85 + 0.04 * math.sin(t * 6 + j), alpha=clamp(bt - j * 0.3))

@@ -64,10 +64,18 @@ def in_cubic(t): t = clamp(t); return t ** 3
 def in_out(t): t = clamp(t); return 3 * t * t - 2 * t * t * t
 
 # ---------------------------------------------------------------- assets
+def interim_path(b, full=False):
+    """Our own crop for a brawler no source has art for yet (2026-11-04: Rey
+    and Ruby, from Supercell's reveal; public/icons/interim, copied to
+    $ASSETS/interim by brawlzone-viral). Real art always comes first."""
+    return f"{ASSETS}/interim/{b['id']}{'-full' if full else ''}.png"
+
 def load_face(b):
     p = f"{ASSETS}/faces/{b['id']}.png"
     if os.path.exists(p):
         return Image.open(p).convert('RGBA')
+    if os.path.exists(interim_path(b)):
+        return Image.open(interim_path(b)).convert('RGBA')
     # A brawler too new for Brawlify's portraits: a plain tile with their initial.
     im = Image.new('RGBA', (256, 256), (40, 46, 96, 255)); d = ImageDraw.Draw(im)
     d.text((128, 128), b['n'][:1].upper(), font=ImageFont.truetype(LIL, 170), fill=WHITE, anchor='mm')
@@ -81,6 +89,11 @@ def has_model(b):
     """Whether a full body exists, without decoding it: the Fan Kit's are
     ~2,000px tall, and the quiz asks this of every brawler."""
     return os.path.exists(f"{ASSETS}/models/{b['id']}.png")
+
+def has_art(b):
+    """A full body, or an interim crop that art() can frame instead. Only for
+    showing a brawler: a quiz needs a real cut-out, so it asks has_model."""
+    return has_model(b) or os.path.exists(interim_path(b, True))
 
 def vgrad(w, h, top, bot):
     a = np.linspace(0, 1, h)[:, None, None]
@@ -403,7 +416,17 @@ def art(b, h=860, wmax=900):
     key = (b['id'], h, wmax)
     if key not in _art:
         m = load_model(b)
-        if m is None:
+        if m is None and os.path.exists(interim_path(b, True)):
+            # A screenshot crop has its scene behind it, so it is shown as a
+            # picture: rounded, in a white frame, rather than as a cut-out.
+            im = Image.open(interim_path(b, True)).convert('RGBA'); bd = 14
+            sc = min((h - 2 * bd) / im.height, (wmax - 2 * bd) / im.width)
+            im = im.resize((int(im.width * sc), int(im.height * sc)), Image.LANCZOS)
+            out = Image.new('RGBA', (im.width + 2 * bd, im.height + 2 * bd), (0, 0, 0, 0))
+            out.paste(Image.new('RGBA', out.size, WHITE + (255,)), (0, 0), rounded_mask(out.width, out.height, 52))
+            out.paste(im, (bd, bd), rounded_mask(im.width, im.height, 40))
+            _art[key] = out
+        elif m is None:
             _art[key] = card(0, b, 600, 690)
         else:
             sc = min(h / m.height, wmax / m.width)

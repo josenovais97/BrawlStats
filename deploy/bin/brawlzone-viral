@@ -147,6 +147,10 @@ cp "$REPO"/public/rewards/art/{coins,power-points,credits,bling}.png "$REPO"/pub
 # large from the Fan Kit with the other art below.
 mkdir -p "$CACHE/ranked"
 cp "$REPO"/public/icons/{trophy,power-11,brawlers,ranked,draft}.png "$CACHE/ranked/" 2>/dev/null
+# Our crops for brawlers no source has art for yet (engine interim_path),
+# mirrored so a crop deleted from the repo once real art lands goes here too.
+mkdir -p "$CACHE/interim"
+rsync -a --delete "$REPO/public/icons/interim/" "$CACHE/interim/" 2>/dev/null || cp "$REPO"/public/icons/interim/*.png "$CACHE/interim/" 2>/dev/null
 
 if [ "$kind" = daily ]; then
   # The puzzle as the site serves it right now: four zoom steps and the

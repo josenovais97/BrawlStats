@@ -15,6 +15,19 @@ import type { BABrawler } from '@/types/brawlapi';
 const NO_PORTRAIT = '/icons/brawlers.png';
 
 /**
+ * Hand-cropped portraits for brawlers released before any source has art
+ * (2026-11-04: Rey and Ruby, cut from a screenshot of Supercell's own reveal,
+ * in public/icons/interim). Last before NO_PORTRAIT, so the Fan Kit, the
+ * mirror and the wiki each take over by themselves the day they publish one.
+ * The `-full` crops beside them are for the Shorts (deploy/bin/brawlzone-viral).
+ * Delete an entry, and its files, once official art is live.
+ */
+export const INTERIM_PORTRAITS: Readonly<Record<number, string>> = {
+  16000112: '/icons/interim/16000112.png', // Rey
+  16000113: '/icons/interim/16000113.png', // Ruby
+};
+
+/**
  * The one canonical answer to "which brawlers exist, and which count".
  *
  * Two sources disagree, and the disagreement is meaningful rather than a bug:
@@ -186,10 +199,11 @@ export async function getBrawlerCatalog(): Promise<BrawlerCatalog> {
       const portrait = portraits.get(brawler.name.toLowerCase());
       if (portrait) brawler.imageUrl = portrait;
       // Unknown to the mirror and not on the wiki either (Rey and Ruby on
-      // 2026-11-03): the constructed mirror URL is a broken image, so the
-      // generic brawler icon stands in until either publishes art.
+      // 2026-11-03): the constructed mirror URL is a broken image, so our own
+      // interim crop, else the generic brawler icon, stands in until either
+      // publishes art.
       else if (!brawler.meta && brawler.imageUrl.startsWith('https://cdn.brawlify.com/')) {
-        brawler.imageUrl = NO_PORTRAIT;
+        brawler.imageUrl = INTERIM_PORTRAITS[brawler.id] ?? NO_PORTRAIT;
       }
     }
   }
