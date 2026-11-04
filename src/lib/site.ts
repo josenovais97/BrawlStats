@@ -93,7 +93,8 @@ export const SAMPLE_PLAYER_TAG = '2RLCPVGUG';
 export function currentMonth(): string {
   // In the page's language: "octubre de 2026" on a Spanish page.
   const tag = DATE_LOCALE[requestLocale()];
-  return new Date().toLocaleDateString(tag, { month: 'long', year: 'numeric' });
+  // Russian appends "г." ("ноябрь 2026 г."), which reads as clutter in a title.
+  return new Date().toLocaleDateString(tag, { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
 }
 
 /** The account the box posts to. `@brawlzone` is a different account. */
