@@ -115,6 +115,22 @@ const WORDS = {
     placeWord: (n: number) => ruPlural(n, 'место', 'места', 'мест'),
     newIn: (t: string) => `новый в ${t}`,
   },
+  id: {
+    tierMove: (from: string, to: string) => `dari tier ${from} ke ${to}, `,
+    places: (n: number, up: boolean) => `${up ? 'naik' : 'turun'} ${n} peringkat, `,
+    score: 'Meta score',
+    tier: (t: string) => `Tier ${t}`,
+    whatChanged: 'Apa yang berubah',
+    against: (span: string) => `Dibanding pengukuran sebanding terakhir, ${span}`,
+    riser: 'Kenaikan terbesar',
+    faller: 'Penurunan terbesar',
+    tierChanges: 'Perubahan tier',
+    held: (n: number) => `Semua jagoan bertahan di tiernya. ${n} bergerak di dalamnya.`,
+    upDown: (up: number, down: number) => `${up} naik, ${down} turun`,
+    scoreWord: 'Skor',
+    placeWord: () => 'peringkat',
+    newIn: (t: string) => `baru di ${t}`,
+  },
 } satisfies Record<Locale, unknown>;
 
 /**

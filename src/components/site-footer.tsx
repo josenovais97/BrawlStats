@@ -201,6 +201,23 @@ const WORDS: Record<Locale, Record<string, string>> = {
     disclaimer: 'Этот материал неофициальный и не одобрен Supercell. Подробнее читай в',
     policy: 'Правилах Supercell для фан-контента', notAffiliated: 'не связан с Supercell',
   },
+  id: {
+    Stats: 'Statistik', Tools: 'Alat', Game: 'Game',
+    Brawlers: 'Jagoan', 'Tier List': 'Tier list', 'Ranked Maps': 'Peta Berperingkat', Maps: 'Peta',
+    Leaderboard: 'Papan peringkat', Draft: 'Draft', 'Team Comps': 'Komposisi tim', Compare: 'Bandingkan', Daily: 'Harian',
+    'Meta Report': 'Laporan meta', 'Hidden Meta': 'Meta tersembunyi', 'Daily Challenge': 'Tantangan harian',
+    'Patch Impact': 'Dampak patch', 'How Scores Work': 'Cara kerja skor',
+    'Android App': 'Aplikasi Android', 'Community Events': 'Event komunitas', Cosmetics: 'Kosmetik',
+    'Starr Drops': 'Hadiah Starr', News: 'Berita', 'Release Notes': 'Catatan rilis', 'Free Rewards': 'Hadiah gratis',
+    tagline:
+      'Statistik Brawl Stars yang menunjukkan posisimu. Pencarian pemain dan geng, tier list, dan jagoan terbaik per peta, dari pertarungan yang kami kumpulkan sendiri.',
+    follow: 'Ikuti dan dukung', coffee: 'Traktir aku kopi', free: 'Gratis, tanpa paywall.',
+    googlePlay: 'BrawlZone Bubble di Google Play',
+    getGame: 'BrawlZone Bubble: asisten draft yang melayang di atas game. Gratis.', about: 'Tentang', privacy: 'Privasi',
+    terms: 'Ketentuan', contact: 'Kontak', sources: 'Data dan gambar dari',
+    disclaimer: 'Materi ini tidak resmi dan tidak didukung oleh Supercell. Untuk informasi lebih lanjut, lihat',
+    policy: 'Kebijakan Konten Penggemar Supercell', notAffiliated: 'tidak berafiliasi dengan Supercell',
+  },
 };
 
 const EN: Record<string, string> = {

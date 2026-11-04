@@ -98,6 +98,15 @@ function De({ className = '' }: FlagProps) {
   );
 }
 
+function Id({ className = '' }: FlagProps) {
+  return (
+    <svg viewBox="0 0 60 40" aria-hidden className={`${box} ${className}`}>
+      <rect width="60" height="20" fill="#CE1126" />
+      <rect y="20" width="60" height="20" fill="#fff" />
+    </svg>
+  );
+}
+
 /**
  * Russian gets a letter badge, not a flag (2026-11-04): it is read by players
  * from Ukraine, Kazakhstan and the rest of the region as much as from Russia,
@@ -119,6 +128,7 @@ const FLAGS: Record<Locale, ((p: FlagProps) => React.ReactNode)[]> = {
   tr: [Tr],
   de: [De],
   ru: [Ru],
+  id: [Id],
 };
 
 /** The flags for a language, side by side. */

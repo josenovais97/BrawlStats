@@ -118,6 +118,18 @@ const WORDS: Record<
     modeGroup: 'Режим игры',
     sampled: (n) => `собрано боёв: ${n}`,
   },
+  id: {
+    format: { ranked: { label: 'Berperingkat', sublabel: 'Kompetitif' }, trophy: { label: 'Trofi', sublabel: 'Ambang Trofi' } },
+    window: { '24h': 'Meta', '7d': 'Terkini' },
+    formatGroup: 'Jenis tier list',
+    windowGroup: 'Periode',
+    yourRank: 'Peringkatmu',
+    allRanks: 'Semua',
+    lobbies: (rank) => `Pertarungan Berperingkat di ${rank}`,
+    allModes: 'Semua mode',
+    modeGroup: 'Mode game',
+    sampled: (n) => `${n} pertarungan dikumpulkan`,
+  },
 };
 
 export function TierListControls({

@@ -9,9 +9,9 @@ import { LocaleFlags } from '@/components/i18n/flags';
 import { rememberLocale } from '@/components/i18n/language-suggest';
 import { HTML_LANG, LOCALE_NAME, localeOfPath, stripLocale, type Locale } from '@/lib/i18n';
 
-const ORDER: Locale[] = ['en', 'es', 'pt', 'de', 'tr', 'ru'];
+const ORDER: Locale[] = ['en', 'es', 'pt', 'de', 'tr', 'ru', 'id'];
 
-const LABEL: Record<Locale, string> = { en: 'Language', es: 'Idioma', pt: 'Idioma', tr: 'Dil', de: 'Sprache', ru: 'Язык' };
+const LABEL: Record<Locale, string> = { en: 'Language', es: 'Idioma', pt: 'Idioma', tr: 'Dil', de: 'Sprache', ru: 'Язык', id: 'Bahasa' };
 
 /** The current page's address in another language. */
 function pathIn(locale: Locale, englishPath: string): string {

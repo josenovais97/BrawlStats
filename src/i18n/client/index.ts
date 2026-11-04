@@ -18,4 +18,5 @@ export const CLIENT_LOADERS: Record<IntlLocale, () => Promise<ClientDict>> = {
   tr: () => import('./tr').then((m) => m.CLIENT_TR),
   de: () => import('./de').then((m) => m.CLIENT_DE),
   ru: () => import('./ru').then((m) => m.CLIENT_RU),
+  id: () => import('./id').then((m) => m.CLIENT_ID),
 };

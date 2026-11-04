@@ -44,6 +44,12 @@ const WORDS = {
     back: 'Вернуться к поиску',
     tiers: 'Тир-лист',
   },
+  id: {
+    title: 'Halaman tidak ditemukan',
+    body: 'Halaman ini tidak ada, atau dulu ada dan sekarang sudah tidak. Peta dan mode berganti, jadi link lama bisa bertahan lebih lama daripada yang ditunjuknya.',
+    back: 'Kembali ke pencarian',
+    tiers: 'Tier list',
+  },
 };
 
 /** The 404, in the language of the address that was asked for. */

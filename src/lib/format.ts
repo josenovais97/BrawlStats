@@ -183,6 +183,7 @@ export function ordinal(n: number): string {
   // Russian: the suffix agrees with the noun (3-е место, 107-й боец), so the
   // dictionary sentence carries it and this is the bare number.
   if (locale === 'ru') return `${n}`;
+  if (locale === 'id') return `ke-${n}`; // Indonesian: "ke-3"
 
   const rem100 = n % 100;
   if (rem100 >= 11 && rem100 <= 13) return `${n}th`;

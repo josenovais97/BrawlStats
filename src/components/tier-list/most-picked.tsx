@@ -77,6 +77,15 @@ const WORDS = {
     win: 'победы',
     pick: 'выбор',
   },
+  id: {
+    title: 'Jagoan yang paling sering dipilih',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Jagoan yang paling sering muncul di ${battles} yang dikumpulkan${mode ? ` di ${mode}` : ''} dalam ${w} terakhir. Ini popularitas, bukan kekuatan: tier di atas mengurutkan seberapa bagus jagoan bermain, dan keduanya sering berbeda. Tingkat pilih adalah bagian dari semua pertarungan yang dikumpulkan, jadi dijumlahkan di seluruh roster, bukan 100% per pertarungan.`,
+    tier: (t: string) => `Tier ${t} di daftar ini`,
+    battles: 'pertarungan',
+    win: 'menang',
+    pick: 'pilih',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function MostPicked({

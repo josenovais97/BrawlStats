@@ -160,6 +160,28 @@ const WORDS = {
     pick: 'выбор',
     decided: 'решённых боёв',
   },
+  id: {
+    title: 'Pergerakan meta',
+    change: 'Perubahan',
+    score: 'meta score',
+    scale:
+      ', dengan skala 0 sampai 10 yang sama seperti tier di atas, diukur dari pengukuran harian yang disimpan: yang muncul di sini benar-benar naik atau turun di meta Berperingkat.',
+    over: (days: number, from: string, to: string) =>
+      `Diukur ${days === 1 ? 'dalam sehari terakhir' : `dalam ${days} hari terakhir`}, membandingkan pengukuran ${from} dan ${to}.`,
+    between: 'Diukur di antara dua pengukuran terbaru.',
+    floor:
+      'Kedua sisi memenuhi batas minimum pertarungan yang sama seperti tier list, dan pengukuran dengan metode berbeda tidak pernah dibandingkan.',
+    allModes: 'Semua mode',
+    allModesRest: ': pengukuran harian tidak dipisah per mode, jadi filter di atas tidak berlaku di sini.',
+    up: 'Naik',
+    down: 'Turun',
+    noUp: 'Tidak ada yang naik dalam periode ini.',
+    noDown: 'Tidak ada yang turun dalam periode ini.',
+    unit: 'meta score /10',
+    win: 'menang',
+    pick: 'pilih',
+    decided: 'pertarungan selesai',
+  },
 } satisfies Record<Locale, unknown>;
 
 type Words = (typeof WORDS)[Locale];

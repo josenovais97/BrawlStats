@@ -87,6 +87,19 @@ const WORDS = {
     note: 'Скорректированный процент побед на этой карте за последние три недели; при малом числе боёв опирается на общую ранговую форму бойца. Бойцы, у которых здесь меньше 150 решённых боёв, не показаны.',
     full: 'Полная страница карты',
   },
+  id: {
+    group: 'Peta Berperingkat',
+    all: 'Semua peta',
+    empty: (map: string) =>
+      `Di ${map} belum ada jagoan dengan cukup pertarungan yang dikumpulkan untuk diberi peringkat. Ini akan terisi saat lebih banyak pertarungan terkumpul di sini.`,
+    atRank: (n: string, rank: string, all: string) => `${n} di ${rank} · ${all} total`,
+    here: (n: string) => `${n} pertarungan di sini`,
+    usual: 'vs biasanya',
+    noteRank: (rank: string) =>
+      `Hasil semua peringkat di peta ini, disesuaikan dengan performa tiap jagoan di ${rank} dan mengacu pada pertarungan ${rank} yang dimainkan di sini. Jagoan dengan kurang dari 20 pertarungan ${rank} di sini tidak ditampilkan.`,
+    note: 'Persentase menang yang disesuaikan di peta ini dalam tiga minggu terakhir, mengacu pada performa Berperingkat umum tiap jagoan saat pertarungannya sedikit. Jagoan dengan kurang dari 150 pertarungan yang selesai di sini tidak ditampilkan.',
+    full: 'Halaman peta lengkap',
+  },
 } satisfies Record<Locale, unknown>;
 
 /** One brawler's record on one Ranked map, as the page serialises it. */

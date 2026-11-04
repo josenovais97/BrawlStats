@@ -25,7 +25,7 @@
  * `Record<Locale, …>` in the code then refuses to compile until it has that
  * language's entry, which is the checklist.
  */
-export const INTL_LOCALES = ['es', 'pt', 'tr', 'de', 'ru'] as const;
+export const INTL_LOCALES = ['es', 'pt', 'tr', 'de', 'ru', 'id'] as const;
 export type IntlLocale = (typeof INTL_LOCALES)[number];
 export type Locale = 'en' | IntlLocale;
 
@@ -34,17 +34,17 @@ export function isIntlLocale(value: string | null | undefined): value is IntlLoc
 }
 
 /** For `<html lang>`-style attributes and hreflang. */
-export const HTML_LANG: Record<Locale, string> = { en: 'en', es: 'es', pt: 'pt-BR', tr: 'tr', de: 'de', ru: 'ru' };
+export const HTML_LANG: Record<Locale, string> = { en: 'en', es: 'es', pt: 'pt-BR', tr: 'tr', de: 'de', ru: 'ru', id: 'id' };
 
-export const LOCALE_NAME: Record<Locale, string> = { en: 'English', es: 'Español', pt: 'Português', tr: 'Türkçe', de: 'Deutsch', ru: 'Русский' };
+export const LOCALE_NAME: Record<Locale, string> = { en: 'English', es: 'Español', pt: 'Português', tr: 'Türkçe', de: 'Deutsch', ru: 'Русский', id: 'Bahasa Indonesia' };
 
 /**
  * Number formatting per locale. Spanish as Latin America writes it (55.1,
  * 12,345 -- Mexico's convention, the largest audience), Portuguese as Brazil
  * does (55,1 and 12.345).
  */
-export const NUMBER_LOCALE: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR', de: 'de-DE', ru: 'ru-RU' };
-export const DATE_LOCALE: Record<Locale, string> = { en: 'en-GB', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR', de: 'de-DE', ru: 'ru-RU' };
+export const NUMBER_LOCALE: Record<Locale, string> = { en: 'en-US', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR', de: 'de-DE', ru: 'ru-RU', id: 'id-ID' };
+export const DATE_LOCALE: Record<Locale, string> = { en: 'en-GB', es: 'es-419', pt: 'pt-BR', tr: 'tr-TR', de: 'de-DE', ru: 'ru-RU', id: 'id-ID' };
 
 /**
  * The sections that exist in Spanish and Portuguese, as path patterns. Grows
@@ -149,6 +149,7 @@ export const RANK_LABEL: Record<Locale, Record<string, string>> = {
   tr: { diamond: 'Elmas ve altı', mythic: 'Gizemli', legendary: 'Efsanevi', masters: "Ustalar'dan Pro'ya" },
   de: { diamond: 'Diamant und darunter', mythic: 'Mythisch', legendary: 'Legendär', masters: 'Meister bis Pro' },
   ru: { diamond: 'Алмазный и ниже', mythic: 'Мифический', legendary: 'Легендарный', masters: 'От Мастера до Про' },
+  id: { diamond: 'Berlian ke bawah', mythic: 'Mistis', legendary: 'Legendaris', masters: 'Master sampai Pro' },
 };
 
 export function rankLabel(bracket: { slug: string; label: string }, locale: Locale): string {
@@ -165,6 +166,7 @@ export function spanText(from: string, to: string, locale: Locale): string {
     tr: ['son ölçümden beri', 'dünden beri', 'son bir haftada', (d: number) => `son ${d} günde`],
     de: ['seit der letzten Messung', 'seit gestern', 'in der letzten Woche', (d: number) => `in den letzten ${d} Tagen`],
     ru: ['с последнего замера', 'со вчерашнего дня', 'за последнюю неделю', (d: number) => `за последние дни: ${d}`],
+    id: ['sejak pengukuran terakhir', 'sejak kemarin', 'dalam seminggu terakhir', (d: number) => `dalam ${d} hari terakhir`],
   } as const;
   const [none, one, week, many] = words[locale];
   if (!Number.isFinite(days) || days <= 0) return none;

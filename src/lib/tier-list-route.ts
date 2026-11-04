@@ -244,6 +244,26 @@ const INTL: Record<
     ],
     last24: ', последние 24 часа',
   },
+  id: {
+    where: { ranked: 'Ranked', trophy: 'Trophies' },
+    index: (where, month) => [
+      `Tier list Brawl Stars ${where === 'Ranked' ? 'Berperingkat' : 'trofi'} (${month}): jagoan terbaik`,
+      `Jagoan terbaik Brawl Stars ${where === 'Ranked' ? 'di Berperingkat' : 'di Ambang Trofi'}, ${month}. Dari persentase menang dan tingkat pilih di pertarungan sungguhan, diperbarui setiap beberapa jam.`,
+    ],
+    mode: (mode, where, month) => [
+      `Jagoan terbaik untuk ${mode} di Brawl Stars (${month}): tier list ${where === 'Ranked' ? 'Berperingkat' : 'trofi'}`,
+      `Jagoan yang paling sering menang di ${mode} saat ini, diurutkan dari pertarungan ${where === 'Ranked' ? 'Berperingkat' : 'trofi'} sungguhan dan diperbarui setiap beberapa jam. Cek yang terbaik sebelum pertarungan ${mode} berikutnya.`,
+    ],
+    rank: (rank, month) => [
+      `Tier list Brawl Stars untuk ${rank} (${month}): jagoan terbaik di peringkatmu`,
+      `Jagoan terbaik Brawl Stars di ${rank}, ${month}. Hanya dari pertarungan Berperingkat yang dimainkan di ${rank}, karena meta di peringkatmu berbeda dengan meta di puncak.`,
+    ],
+    rankMode: (mode, rank, month) => [
+      `Jagoan terbaik untuk ${mode} di ${rank} (${month}): tier list Brawl Stars`,
+      `Jagoan yang paling sering menang di ${mode} di ${rank}, dari pertarungan Berperingkat sungguhan di peringkat itu, diperbarui setiap beberapa jam.`,
+    ],
+    last24: ', 24 jam terakhir',
+  },
 };
 
 export async function tierListMetadata(

@@ -655,4 +655,100 @@ const ru: TierCopy = {
   podiumDetail: (rate) => `${rate} побед`,
 };
 
-export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr, de, ru };
+const id: TierCopy = {
+  format: {
+    ranked: {
+      eyebrow: 'Hanya kompetitif',
+      heading: 'Tier list Berperingkat',
+      battles: 'pertarungan Berperingkat',
+      intro:
+        'Seberapa bagus jagoan di mode Berperingkat, tempat matchmaking mempertemukan lawan yang setara. Jadi hasilnya mencerminkan jagoannya, bukan siapa yang memainkannya.',
+      caveat:
+        'Berperingkat hanya berisi mode 3 lawan 3 dan cuma sebagian kecil dari pertarungan yang kami kumpulkan, jadi daftarnya lebih pendek dan bergerak lebih cepat daripada daftar trofi.',
+      unratedHeading: 'Data Berperingkat belum cukup',
+      unratedBody:
+        'Berperingkat hanya sebagian kecil dari pertarungan yang dikumpulkan, jadi banyak jagoan yang sering dimainkan di Ambang Trofi masih punya terlalu sedikit pertarungan Berperingkat untuk diberi peringkat.',
+      where: 'Berperingkat',
+    },
+    trophy: {
+      eyebrow: 'Ambang Trofi',
+      heading: 'Tier list trofi',
+      battles: 'pertarungan trofi',
+      intro:
+        'Seberapa bagus jagoan di Ambang Trofi. Ini pertarungan yang paling banyak dimainkan orang, termasuk Showdown, tempat kamu memilih jagoan yang kamu punya, bukan yang tersisa dari draft.',
+      caveat:
+        'Matchmaking di Ambang Trofi lebih longgar daripada Berperingkat, jadi sebagian hasil jagoan di sini ditentukan oleh lobi, bukan jagoannya. Setiap mode dibandingkan dengan rata-ratanya sendiri supaya hal itu tidak menentukan daftar.',
+      unratedHeading: 'Data trofi belum cukup',
+      unratedBody:
+        'Jagoan yang baru rilis dan yang jarang dimainkan di Ambang Trofi butuh lebih banyak pertarungan sebelum persentase menang punya arti.',
+      where: 'Ambang Trofi',
+    },
+  },
+  heading: (format, mode, rank) => {
+    const h = id.format[format].heading;
+    const base = mode ? `${h} ${mode}` : h;
+    return rank ? `${base} (${rank})` : base;
+  },
+  scopeLabel: (w, mode) => (mode ? `${mode} · ${w}` : w),
+  faq: {
+    bestQ: (format, mode) =>
+      mode
+        ? `Siapa jagoan terbaik untuk ${mode} di Brawl Stars?`
+        : `Siapa jagoan terbaik di Brawl Stars ${format === 'ranked' ? 'di Berperingkat' : 'di Ambang Trofi'}?`,
+    bestA: (a) =>
+      `${a.first} memimpin${a.mode ? ` di ${a.mode}` : ''} dengan persentase menang yang disesuaikan ${a.rate} dari ${a.games} ${a.battles} yang selesai dalam ${a.window} terakhir.${a.third ? ` Diikuti ${a.second} dan ${a.third}.` : ''}`,
+    noneA: (a) =>
+      `Belum cukup ${a.battles} yang dikumpulkan${a.mode ? ` di ${a.mode}` : ''} dalam ${a.window} terakhir untuk memberi peringkat jagoan. Jagoan butuh ${a.floor} pertarungan yang selesai sebelum masuk daftar.`,
+    howQ: 'Bagaimana tier list ini dibuat?',
+    howA: (a) =>
+      `Dari ${a.sampled} ${a.scope} yang dikumpulkan dari pertarungan sungguhan, bukan dari survei atau pendapat. Persentase menang disesuaikan dengan rata-rata sampel yang sama, karena pemain yang kami kumpulkan memenangkan lebih dari separuh pertarungannya dengan jagoan apa pun. Jadi tier mencerminkan jagoannya, bukan siapa yang memainkannya. Jagoan butuh ${a.floor} pertarungan yang selesai dalam periode ini sebelum dinilai.`,
+    oftenQ: 'Seberapa sering tier list diperbarui?',
+    oftenA:
+      'Pertarungan baru dikumpulkan setiap beberapa jam dan halaman ini dibuat ulang dari data terbaru, jadi tidak pernah tertinggal lebih dari beberapa jam.',
+  },
+  scopeName: (format, mode) => (mode ? `${mode} (${id.format[format].eyebrow.toLowerCase()})` : id.format[format].battles),
+  itemList: (mode) => `Jagoan Brawl Stars berdasarkan meta score${mode ? ` di ${mode}` : ''}.`,
+  breadcrumbRoot: 'Tier list',
+  answer: (a) =>
+    `${a.first}, ${a.second}, dan ${a.third} adalah jagoan terbaik${a.mode ? ` ${a.mode}` : ''} ${a.format === 'ranked' ? 'di Berperingkat' : 'di Ambang Trofi'} saat ini`,
+  lead: (a) => `${a.first} memimpin dengan persentase menang yang disesuaikan ${a.rate} dari ${a.games} pertarungan yang selesai.`,
+  based: (a) =>
+    `Berdasarkan ${a.sampled ? `${a.sampled} ` : ''}${a.battles} yang dikumpulkan${a.mode ? ` di ${a.mode}` : ''}${
+      a.rank && a.days ? `, dimainkan di lobi ${a.rank} dalam ${a.days} hari terakhir.` : ' dari pemain di seluruh tangga Berperingkat.'
+    }`,
+  disagree: 'Tidak setuju? Buat versimu sendiri',
+  howSummary: 'Cara kerja meta score',
+  how1: (format) => `Meta score menggabungkan persentase menang yang disesuaikan dan tingkat pilih, relatif terhadap daftar ${format === 'ranked' ? 'Berperingkat' : 'trofi'} ini.`,
+  how2a: 'Jagoan diurutkan berdasarkan',
+  metaScore: 'meta score',
+  how2b:
+    'dari 10, yang menggabungkan persentase menang yang disesuaikan dengan tingkat pilih berskala logaritmik. Persentase menang saja akan menilai jagoan yang tidak pernah dipakai sama dengan jagoan andalan semua orang yang hasilnya sama, jadi popularitas menjadi penentu saat imbang.',
+  how3a: 'Skalanya dikalibrasi di dalam daftar ini, jadi skor membandingkan jagoan di sini satu sama lain dan tidak bisa dibandingkan dengan',
+  otherList: (format) => (format === 'ranked' ? 'daftar trofi' : 'daftar Berperingkat'),
+  how3b: (floor) =>
+    `. Jagoan butuh ${floor} pertarungan yang selesai dalam periode ini sebelum dinilai. Ketuk atau arahkan kursor ke jagoan untuk rincian lengkap, atau baca`,
+  fullMethod: 'metode lengkapnya',
+  how3c: '— sampel, penyesuaian mode, titik acuan, dan apa yang tidak bisa dikatakannya.',
+  bracketMissingStrong: (rank) => `Belum cukup pertarungan dari lobi ${rank}`,
+  bracketMissingRest:
+    ' untuk menilai jagoan di peringkat ini, jadi ini daftar untuk semua peringkat. Daftarnya akan terisi dalam beberapa hari ke depan saat lebih banyak yang terkumpul.',
+  bracketWidened: (rank, days, normal) =>
+    `Lobi ${rank} sedang sedikit di sampel (biasanya begitu di hari-hari pertama musim Berperingkat), jadi daftar ini mencakup ${days} hari terakhir, bukan ${normal}.`,
+  unratedSub: (floor, w) =>
+    `Masing-masing butuh ${floor} pertarungan yang selesai dalam ${w}; angka di bawah menunjukkan sudah sejauh mana. Yang paling dekat lebih dulu.`,
+  unratedChip: (name, games, floor, battles) => `${name}: ${games} dari ${floor} ${battles} yang selesai untuk masuk peringkat`,
+  chipTitle: (a) =>
+    `${a.name}: meta score ${a.score} dari persentase menang yang disesuaikan ${a.adj} (${a.raw} mentah, dibanding rata-rata ${a.base} di mode-modenya) dan tingkat pilih ${a.pick}, dari ${a.games} pertarungan yang selesai`,
+  winLetter: 'M',
+  winTitle: 'Persentase menang yang disesuaikan',
+  pickLetter: 'P',
+  pickTitle: 'Tingkat pilih',
+  emptyTitle: (c) => (c ? 'Belum ada data gabungan' : 'Database belum diatur'),
+  emptyBody: (c, w) =>
+    c ? `Belum cukup pertarungan yang dikumpulkan dalam ${w}. Coba periode yang lebih panjang atau cek lagi sebentar lagi.` : 'Peringkat sedang tidak tersedia.',
+  browse: 'Lihat database jagoan',
+  podium: 'Tiga teratas saat ini',
+  podiumDetail: (rate) => `${rate} menang`,
+};
+
+export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr, de, ru, id };

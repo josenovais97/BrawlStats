@@ -77,6 +77,14 @@ const WORDS = {
       `${name}: скорректированный процент побед ${adj}, решённых боёв: ${games}, частота выбора ${pick}`,
     pick: 'частота выбора',
   },
+  id: {
+    title: 'Kuat tapi jarang dipilih',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Jagoan dengan persentase menang yang disesuaikan terbaik di separuh roster yang lebih jarang dimainkan, dari ${battles} yang dikumpulkan${mode ? ` di ${mode}` : ''} dalam ${w} terakhir. Mereka menang saat dimainkan tapi jarang dimainkan, yang biasanya berarti diremehkan, bukan lemah.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: persentase menang yang disesuaikan ${adj} dari ${games} pertarungan yang selesai, tingkat pilih ${pick}`,
+    pick: 'tingkat pilih',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function Underrated({

@@ -286,6 +286,42 @@ const WORDS: Record<Locale, Words> = {
     ],
     join: list('и'),
   },
+  id: {
+    title: (n, m) => `Cara counter ${n} di Brawl Stars (${m})`,
+    ogTitle: (n) => `Cara counter ${n}`,
+    description: (n, top) =>
+      `Counter terbaik untuk ${n} di Berperingkat adalah ${top}. Persentase menang melawan ${n} dari pertarungan Berperingkat sungguhan, per peringkat, diperbarui setiap dua jam.`,
+    descriptionNone: (n) => `Siapa yang mengalahkan ${n} di Brawl Stars Berperingkat, dari pertarungan sungguhan, per peringkat.`,
+    fallbackTitle: 'Counter',
+    heading: (n) => `Cara counter ${n}`,
+    intro: (n, top) => `Di Berperingkat saat ini, ${top} paling sering mengalahkan ${n}. `,
+    method: (n, d) =>
+      `Dari pertarungan Berperingkat sungguhan dalam ${d} hari terakhir, semua peringkat, diperbarui setiap dua jam. Setiap angka adalah persentase menang melawan ${n}, dan seberapa jauh di atas yang diperkirakan dari performa normal kedua jagoan.`,
+    best: 'Counter terbaik',
+    avoid: (n) => `Jangan pilih melawan ${n}`,
+    atRank: 'Counter di peringkatmu',
+    games: (g, n) => `${g} pertarungan melawan ${n}`,
+    expected: 'vs perkiraan',
+    none: (n) => `Belum cukup pertarungan Berperingkat melawan ${n}.`,
+    noneAtRank: 'Belum cukup pertarungan di peringkat ini.',
+    faqWhat: (n) => `Siapa counter ${n} di Brawl Stars?`,
+    faqWhatA: (n, top, d) =>
+      `Di Berperingkat, ${top} paling sering menang melawan ${n} dalam ${d} hari terakhir, lebih dari yang diperkirakan dari persentase menang normal mereka.`,
+    faqWhatNone: (n) => `Belum cukup pertarungan Berperingkat melawan ${n} untuk menyebut counter-nya.`,
+    faqAvoid: (n) => `Siapa yang sebaiknya tidak dipilih melawan ${n}?`,
+    faqAvoidA: (n, l) => `${l} kalah dari ${n} di Berperingkat lebih sering dari perkiraan.`,
+    faqAvoidNone: (n) => `Belum ada jagoan yang kalah dari ${n} jauh lebih sering dari perkiraan.`,
+    crumbs: 'Jagoan',
+    counters: 'Counter',
+    draft: [
+      'Sedang draft?',
+      'Asisten draft',
+      'menggabungkan counter, rekan tim, dan peta untuk seluruh draft-mu, dan',
+      'aplikasi Bubble',
+      'gratis menampilkannya di atas game sesuai peringkatmu.',
+    ],
+    join: list('dan'),
+  },
 };
 
 interface Row {

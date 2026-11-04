@@ -54,6 +54,7 @@ const COPY: Record<Locale, { text: string; go: string; close: string }> = {
   tr: { text: 'Bu sayfa Türkçe olarak da var.', go: 'Türkçe oku', close: 'Kapat' },
   de: { text: 'Diese Seite gibt es auch auf Deutsch.', go: 'Auf Deutsch lesen', close: 'Schließen' },
   ru: { text: 'Эта страница есть и на русском.', go: 'Читать на русском', close: 'Закрыть' },
+  id: { text: 'Halaman ini juga tersedia dalam bahasa Indonesia.', go: 'Baca dalam bahasa Indonesia', close: 'Tutup' },
 };
 
 export function LanguageSuggest() {
