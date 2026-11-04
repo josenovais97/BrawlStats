@@ -2004,4 +2004,804 @@ export const TR: Record<string, string> = {
     "Üyeleri ada veya etikete göre ara",
   "This club has no members listed.":
     "Bu kulübün listelenmiş üyesi yok.",
+  "Profile sections":
+    "Profil bölümleri",
+  "27 seconds: your tag once, then the bubble mid-draft.":
+    "27 saniye: etiketini bir kez gir, sonra draft ortasında baloncuk.",
+  "A floating bubble that puts the Ranked tier list on top of Brawl Stars, so you can check the meta mid-draft without leaving the game. Free, no ads, no account.":
+    "Aşamalı tier listesini Brawl Stars'ın üzerine koyan yüzen bir baloncuk; oyundan çıkmadan draft ortasında metaya bakabilirsin. Ücretsiz, reklamsız, hesap gerekmez.",
+  "A mode is too coarse to draft on — Ranked hands you one map out of its pool and the answer moves with it. Pick the mode, then the map, and both are remembered for next time.":
+    "Draft için mod çok geneldir: Aşamalı sana havuzundan tek bir harita verir ve cevap onunla değişir. Modu, sonra haritayı seç; ikisi de bir dahaki sefere hatırlanır.",
+  "A second tab, for when you want more than the meta: the bans, your team, and theirs.":
+    "Metadan fazlasını istediğinde ikinci bir sekme: banlar, senin takımın ve onlarınki.",
+  "A target appears at the bottom of the screen while you drag. Drop the bubble on it, or use Stop in the notification.":
+    "Sürüklerken ekranın altında bir hedef çıkar. Baloncuğu üzerine bırak ya da bildirimdeki Durdur'u kullan.",
+  "A website cannot do this":
+    "Bir web sitesi bunu yapamaz",
+  "About Play Protect":
+    "Play Protect hakkında",
+  "Add your player tag":
+    "Oyuncu etiketini ekle",
+  "Allow installing from your browser":
+    "Tarayıcından yüklemeye izin ver",
+  "An installed app can. That is the whole reason this exists as an APK rather than another page on the site, and it is all the app does: draw the numbers over the game, then get out of the way.":
+    "Yüklü bir uygulama yapabilir. Bunun sitede bir sayfa daha değil de bir APK olmasının tek sebebi bu ve uygulamanın tek yaptığı da bu: sayıları oyunun üzerine çizmek, sonra yoldan çekilmek.",
+  "Android asks once per app that installs other apps. \"Allow from this source\" appears the first time; after that it remembers.":
+    "Android, başka uygulama yükleyen her uygulama için bir kez sorar. \"Bu kaynaktan izin ver\" ilk seferde çıkar; sonrasında hatırlar.",
+  "Android blocks this permission for apps installed outside a store. Go to Settings › Apps › BrawlZone, tap the ⋮ menu at the top right, choose \"Allow restricted settings\", then try again. This catches almost everyone, and Android never explains it.":
+    "Android, mağaza dışından yüklenen uygulamalar için bu izni engeller. Ayarlar › Uygulamalar › BrawlZone'a git, sağ üstteki ⋮ menüsüne dokun, \"Kısıtlanmış ayarlara izin ver\"i seç ve tekrar dene. Neredeyse herkes buna takılır ve Android bunu hiç açıklamaz.",
+  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have — so the list comes to you instead, one tap away, and gets out of the way when you are done.":
+    "Brawl Stars seçim için sana saniyeler verir. Bir tier listesine bakmak için oyundan çıkmak elindekinden fazlasını yer; bu yüzden liste sana gelir, bir dokunuş uzaklıkta, işin bitince de yoldan çekilir.",
+  "BrawlZone Bubble for Android":
+    "Android için BrawlZone Bubble",
+  "Builds on tap":
+    "Dokununca dizilimler",
+  "Confirm the file you got is the file published here. On a desktop:":
+    "İndirdiğin dosyanın burada yayınlanan dosya olduğunu doğrula. Bir bilgisayarda:",
+  "Down to the map you are on":
+    "Bulunduğun haritaya kadar",
+  "Download and open the file":
+    "Dosyayı indir ve aç",
+  "Download for Android":
+    "Android için indir",
+  "Drag down to close":
+    "Kapatmak için aşağı sürükle",
+  "Drag to move":
+    "Taşımak için sürükle",
+  "Earlier versions (":
+    "Önceki sürümler (",
+  "Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map":
+    "Banları, takımının ve rakibin aldıklarını gir; liste üçüne göre yeniden sıralanır. Sadece haritada güçlü olan bir savaşçı, haritada güçlü olup aynı zamanda",
+  "Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.":
+    "Her satır hesabını gösterir: bu haritadaki form, yazdığın rakiplere karşı üstünlük, takım arkadaşlarının yanında üstünlük. Kontrol edemediğin bir öneri, yüzdeye bürünmüş bir tahmindir; draft ortasında da genelde sebep karar verdirir.",
+  "Five steps, and the fourth is where Android gets in your way.":
+    "Beş adım; dördüncüsünde Android araya girer.",
+  "Free Android app":
+    "Ücretsiz Android uygulaması",
+  "Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.":
+    "Ücretsiz, {v}, hesap gerekmez. Gösterdiği her şey sitede de var; uygulama sadece uygulama değiştirme zahmetini kurtarır, draftı kaybettiren de o kısım.",
+  "Get it on":
+    "Şuradan al:",
+  "Get it on your phone":
+    "Telefonuna al",
+  "Google Play Protect warns about any app installed outside the Play Store. That warning is about where a file came from, not about what is in it.":
+    "Google Play Protect, Play Store dışından yüklenen her uygulama için uyarır. Bu uyarı dosyanın içinde ne olduğuyla değil, nereden geldiğiyle ilgilidir.",
+  "Hide what you cannot play":
+    "Oynayamadıklarını gizle",
+  "If the toggle is greyed out":
+    "Düğme griyse",
+  "Installing it":
+    "Yükleme",
+  "It shows the meta; you match that to the draft in front of you. It does not touch the game, read your account, or send anything anywhere — there is no account, no analytics in the app, and nothing to log in to.":
+    "Metayı gösterir; onu önündeki drafta sen uyarlarsın. Oyuna dokunmaz, hesabını okumaz, hiçbir yere bir şey göndermez: hesap yok, uygulamada analiz yok, giriş yapılacak bir şey yok.",
+  "Latest":
+    "En yeni",
+  "Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.":
+    "Ne bu, ne de herhangi biri. Bir tarayıcı sekmesi başka bir uygulamanın üzerine çizemez; her telefonda korumalı alan buna izin vermez. Tier listesine tarayıcıdan bakmak drafttan çıkmak demektir, seçimi kaybettiren de drafttan çıkmaktır.",
+  "On a computer?":
+    "Bilgisayarda mısın?",
+  "One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.":
+    "Bir telefonda kesintisiz tek çekim: Hideout'ta Ödül Avı'na sıraya giriş, draft ortasında baloncuğu açma, o haritaya daraltma, Brock'un dizilimini okuma; sonra Brock'u seçip panelin gösterdiği yıldız gücünü verme.",
+  "Open BrawlZone and tap Start bubble":
+    "BrawlZone'u aç ve Baloncuğu başlat'a dokun",
+  "Or draft with it":
+    "Ya da onunla draft yap",
+  "Or use the site":
+    "Ya da siteyi kullan",
+  "Pick the mode and the map: the best brawlers for it, and the build to run on them.":
+    "Modu ve haritayı seç: oraya en iyi savaşçılar ve onlarla kullanılacak dizilim.",
+  "Pick your mode":
+    "Modunu seç",
+  "Prefer a store? The same signed file, so either one updates the other.":
+    "Mağaza mı tercih ediyorsun? Aynı imzalı dosya, yani biri diğerini günceller.",
+  "Put it wherever it is not in the way. It rests against the nearest edge when you let go, and stays there.":
+    "Yoluna çıkmayacağı bir yere koy. Bıraktığında en yakın kenara yaslanır ve orada kalır.",
+  "QR code linking to brawlzone.net/bubble":
+    "brawlzone.net/bubble adresine giden QR kod",
+  "S through D, scored on adjusted win rate and pick rate from sampled competitive battles. The same numbers as the site, refreshed on the same schedule.":
+    "S'den D'ye, incelenen rekabetçi maçların düzeltilmiş kazanma oranı ve seçilme oranıyla puanlanır. Sitedeki sayıların aynısı, aynı takvimle yenilenir.",
+  "SHA-256":
+    "SHA-256",
+  "Scan to open this page on your Android phone, where the app can actually be installed.":
+    "Uygulamanın gerçekten yüklenebileceği Android telefonunda bu sayfayı açmak için tara.",
+  "Set it up, then draft with it":
+    "Kur, sonra onunla draft yap",
+  "Switch it on and go back":
+    "Aç ve geri dön",
+  "Tap a brawler for its build":
+    "Dizilimi için bir savaşçıya dokun",
+  "Tap any brawler for the star power, gadget and gears its owners actually run, with the sample size behind every number.":
+    "Sahiplerinin gerçekten kullandığı yıldız gücü, aksesuar ve eşyalar için herhangi bir savaşçıya dokun; her sayının arkasındaki örneklem büyüklüğüyle.",
+  "Tap the bubble in the draft":
+    "Draftta baloncuğa dokun",
+  "Tap to open":
+    "Açmak için dokun",
+  "The BrawlZone app's main screen, showing the permission status and the Start bubble button":
+    "İzin durumunu ve Baloncuğu başlat düğmesini gösteren BrawlZone uygulamasının ana ekranı",
+  "The Ranked tier list, floating on top of the game. Free download, no ads, no account.":
+    "Oyunun üzerinde yüzen Aşamalı tier listesi. Ücretsiz indir, reklam yok, hesap yok.",
+  "The app finds your account. Brawlers you do not own are greyed out in the panel.":
+    "Uygulama hesabını bulur. Sahip olmadığın savaşçılar panelde gri görünür.",
+  "The app updates by downloading again — it installs over the top and keeps your permission.":
+    "Uygulama yeniden indirilerek güncellenir: üzerine yüklenir ve iznini korur.",
+  "The bubble appears straight away and stays on top of whatever you open next, including the game.":
+    "Baloncuk hemen çıkar ve sonra açtığın her şeyin, oyun dahil, üzerinde kalır.",
+  "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.":
+    "Baloncuk ekranını, maçını ya da hangi haritada olduğunu okumaz. Diğer uygulamaların üzerine çizmek ve bir bildirim göstermek için izin ister: çalıştığını söyleyen bildirim ve güncellerken indirme ilerlemesi. Ekran kaydı yok, depolama erişimi yok, başka bir şey yok.",
+  "The build card for Amber, listing her most-owned star power, gadget and two gears with the share of owners running each":
+    "Amber için dizilim kartı: en çok sahip olunan yıldız gücü, aksesuar ve iki eşya, her birini kullanan sahiplerin payıyla",
+  "The draft board with two bans, one team-mate and two enemies entered, and the remaining brawlers ranked by how well they answer that draft":
+    "İki ban, bir takım arkadaşı ve iki rakip girilmiş draft tahtası; kalan savaşçılar o drafta ne kadar iyi cevap verdiklerine göre sıralı",
+  "The first tap sends you to Android's \"Display over other apps\" screen, because no app is allowed to grant itself that permission.":
+    "İlk dokunuş seni Android'in \"Diğer uygulamaların üzerinde göster\" ekranına götürür, çünkü hiçbir uygulama bu izni kendine veremez.",
+  "The full Ranked tier list":
+    "Tam Aşamalı tier listesi",
+  "The panel folds out of the bubble. Tap the bubble again and it folds back in.":
+    "Panel baloncuktan açılır. Baloncuğa tekrar dokun, geri kapanır.",
+  "The panel showing the mode filter across the top and the Ranked tier list from S to D, each brawler with its meta score":
+    "Üstte mod filtresi ve S'den D'ye Aşamalı tier listesini gösteren panel; her savaşçı meta puanıyla",
+  "The panel with Knockout and Belle's Rock selected, listing the ten best brawlers on that map with how many battles back each one and how far above its usual form it runs there":
+    "Nakavt ve Belle's Rock seçili panel; o haritadaki en iyi on savaşçıyı, her birinin arkasındaki maç sayısını ve orada normal formunun ne kadar üstünde olduğunu listeliyor",
+  "The same data as the site, cut down to what a draft needs.":
+    "Sitedeki verilerin aynısı, bir draftın ihtiyacına göre kısaltılmış.",
+  "The tier list,":
+    "Tier listesi,",
+  "Then the map you are on":
+    "Sonra bulunduğun harita",
+  "Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.":
+    "Zayıf kanıt gizlenmez, işaretlenir. Bu haritada on bir maçla desteklenen bir savaşçı bunu kırmızıyla belirtir, çünkü on bir maçtan %52 ile iki yüz maçtan %52 aynı iddia değildir.",
+  "Three gestures. There is nothing else to learn.":
+    "Üç hareket. Öğrenilecek başka bir şey yok.",
+  "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.":
+    "Kullanılamayan savaşçıları gizle'yi aç, listeden tamamen çıkarlar; böylece gösterilen her seçim yapabileceğin bir seçimdir.",
+  "Using it":
+    "Kullanım",
+  "Verify the download":
+    "İndirmeyi doğrula",
+  "Version":
+    "Sürüm",
+  "Version {version}":
+    "Sürüm {version}",
+  "Version {version} · {v} · Android":
+    "Sürüm {version} · {v} · Android",
+  "What is in the panel":
+    "Panelde neler var",
+  "What it cannot do":
+    "Neler yapamaz",
+  "What's new":
+    "Yenilikler",
+  "Worth knowing before you install it, not after.":
+    "Yüklemeden önce bilmeye değer, sonra değil.",
+  "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.":
+    "Tarayıcın bu tür bir dosyayı tutup tutmayacağını sorar. Bu bir uygulama yükleyicisi; Chrome da Android de önce sana sorar, bu uyarı normaldir.",
+  "answers what they just picked.":
+    "rakibin az önce seçtiğine de cevap veren bir savaşçıdan farklı bir karardır.",
+  "on top of the game":
+    "oyunun üzerinde",
+  "sha256sum brawlzone-bubble.apk":
+    "sha256sum brawlzone-bubble.apk",
+  "{minAndroid} or newer":
+    "{minAndroid} veya daha yeni",
+  "Ranked and trophy ladder, scored separately from sampled battles":
+    "Aşamalı ve kupa maçları, incelenen maçlardan ayrı puanlanır",
+  "Read more":
+    "Devamını oku",
+  "Show less":
+    "Daha az göster",
+  "Refresh to retry":
+    "Tekrar denemek için yenile",
+  "A 27-second tutorial: adding a player tag so brawlers you do not own are greyed out, turning on Hide unavailable brawlers, then opening the bubble mid-draft for the best picks on the map and the build to run.":
+    "27 saniyelik bir eğitim: sahip olmadığın savaşçılar gri görünsün diye oyuncu etiketi ekleme, Kullanılamayan savaşçıları gizle'yi açma, sonra haritadaki en iyi seçimler ve kullanılacak dizilim için draft ortasında baloncuğu açma.",
+  "A Bounty draft on Hideout: the bubble opens the Ranked tier list, the filter narrows to that map, the panel shows Brock’s most-owned build, and Brock is then picked and given that star power.":
+    "Hideout'ta bir Ödül Avı draftı: baloncuk Aşamalı tier listesini açar, filtre o haritaya daralır, panel Brock'un en çok sahip olunan dizilimini gösterir; sonra Brock seçilir ve o yıldız gücü verilir.",
+  "The BrawlZone panel open during a Bounty draft on Hideout, listing the brawlers measured best on that map":
+    "Hideout'ta bir Ödül Avı draftı sırasında açık BrawlZone paneli, o haritada en iyi ölçülen savaşçıları listeliyor",
+  "Add it to your home screen":
+    "Ana ekranına ekle",
+  "Dismiss install prompt":
+    "Yükleme önerisini kapat",
+  "Install":
+    "Yükle",
+  "Install BrawlZone":
+    "BrawlZone'u yükle",
+  "Back to search":
+    "Aramaya dön",
+  "Something went wrong":
+    "Bir şeyler ters gitti",
+  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
+    "Bu sayfa yüklenemedi. Genelde oyun API'si yavaştır ya da istek sınırına takılmıştır, bu kendiliğinden geçer; tekrar denemek çoğu zaman işe yarar.",
+  "Try again":
+    "Tekrar dene",
+  "Save":
+    "Kaydet",
+  "Save to favourites":
+    "Favorilere kaydet",
+  "Save {name} to favourites":
+    "{name} savaşçısını favorilere kaydet",
+  "Saved":
+    "Kaydedildi",
+  "Saved. Click to remove":
+    "Kaydedildi. Kaldırmak için tıkla",
+  "% of the score) with":
+    "% payı) ile",
+  "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.":
+    "% payı. Bu ağırlık seçilmedi, ölçüldü: oyuncu becerisini tam olarak kontrol eden bir tahminciye karşı düzeltilmiş kazanma oranı r = +0,77, seçilme oranı r = +0,22 puan alır; yani popülerlik gürültü değil zayıf ama gerçek bir güç işaretidir ve birleşik işaretteki payı yaklaşık beşte birdir, şu an taşıdığı ağırlık da bu. Eskiden %35'ti; o hâliyle gerçek dağılımın %45'ini üretiyor ve savaşçıları sadece popülerlikle kırk sıra oynatıyordu. Yine de vasat kayda sahip popüler bir savaşçı, daha iyi kayda sahip popüler olmayan birini geçebilir. İki sayı da her satırda yazılıdır, böylece kendin tartabilirsin.",
+  "%). It is computed from real battles, not votes, opinion or a panel — and every figure on this page is read directly from the code that produces the lists, so it cannot drift out of date.":
+    "%). Oylardan, görüşlerden ya da bir panelden değil gerçek maçlardan hesaplanır; bu sayfadaki her rakam listeleri üreten koddan doğrudan okunur, bu yüzden eskiyemez.",
+  ", and drifting back outside the scale is reported rather than absorbed.":
+    "; ölçeğin dışına geri kaymak sessizce emilmez, bildirilir.",
+  ", and the difference is re-centred on 50%. An adjusted rate of 53% means “three points better than average, given where this brawler gets played”.":
+    "; fark %50'ye göre yeniden ortalanır. %53'lük düzeltilmiş oran, “bu savaşçının oynandığı yerler göz önüne alındığında ortalamadan üç puan iyi” demektir.",
+  ", because the roster spans two orders of magnitude of usage. On a linear scale everything outside the top handful collapses into the same value.":
+    "; çünkü kadronun kullanım oranları iki büyüklük mertebesine yayılır. Doğrusal bir ölçekte ilk birkaçın dışındaki her şey aynı değere çöker.",
+  ", or disagree with it in the":
+    ", ya da ona itiraz et:",
+  ". Comparing a player against themselves removes skill exactly. The published figure is the average of the two estimates, because they are wrong about different things — the first carries the skill of whoever played it, the second compares a showdown specialist's showdown games against their own Brawl Ball games.":
+    ". Bir oyuncuyu kendisiyle karşılaştırmak beceriyi tam olarak ortadan kaldırır. Yayınlanan rakam iki tahminin ortalamasıdır, çünkü farklı şeylerde yanılırlar: ilki onu oynayanın becerisini taşır, ikincisi bir hesaplaşma uzmanının hesaplaşma maçlarını kendi Savaş Topu maçlarıyla karşılaştırır.",
+  ". Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it. The trophy list counts ladder battles, showdown included.":
+    ". Aşamalı eşleştirmesi birbirine yakın rakipleri karşılaştırır, bu yüzden geriye kalan savaşçıyı oynayanı değil savaşçının kendisini yansıtır. Kupa listesi hesaplaşma dahil kupa maçlarını sayar.",
+  ". Sample sizes behind every figure are on the lists themselves; the roll-ups they are computed from hold {v} days of history.":
+    ". Her rakamın arkasındaki örneklem büyüklükleri listelerin kendisinde yazar; hesaplandıkları özetler {v} günlük geçmiş tutar.",
+  ": a brawler needs roughly that many decided battles before its own record outweighs the prior, which is about where the noise stops dominating.":
+    ": bir savaşçının kendi kaydının öncül değeri geçmesi için yaklaşık bu kadar sonuçlanmış maç gerekir; gürültünün baskın olmayı bıraktığı yer de aşağı yukarı orasıdır.",
+  "A 90% win rate over 50 battles is not better than an 86% rate over 1,300, but a naive ranking says it is. Every rate is therefore blended with the average, weighted by":
+    "50 maçta %90 kazanma oranı, 1.300 maçta %86'dan daha iyi değildir, ama saf bir sıralama öyle der. Bu yüzden her oran ortalamayla harmanlanır; ağırlık:",
+  "A brawler's raw win rate is compared against the average for the modes it is actually played in, then re-centred on 50%. A showdown brawler is judged against showdown, where finishing in the top half caps the ceiling near 40%, and a Brawl Ball brawler against Brawl Ball, where the same cohort wins far more often. One number for both would put every showdown brawler at the bottom.":
+    "Bir savaşçının ham kazanma oranı gerçekte oynandığı modların ortalamasıyla karşılaştırılır, sonra %50'ye göre yeniden ortalanır. Bir hesaplaşma savaşçısı, ilk yarıda bitirmenin tavanı %40 civarında sınırladığı hesaplaşmaya göre; bir Savaş Topu savaşçısı da aynı grubun çok daha sık kazandığı Savaş Topu'na göre değerlendirilir. İkisi için tek bir sayı, her hesaplaşma savaşçısını en alta koyardı.",
+  "A raw win rate is not comparable across brawlers, because modes are not comparable. Finishing top four of ten in showdown caps the achievable rate near 40%; the same cohort wins closer to 78% in Brawl Ball. Ranking both on one number puts every showdown brawler at the bottom regardless of how good it is.":
+    "Ham kazanma oranı savaşçılar arasında karşılaştırılamaz, çünkü modlar karşılaştırılamaz. Hesaplaşmada ondan ilk dörde girmek ulaşılabilir oranı %40 civarında sınırlar; aynı grup Savaş Topu'nda %78'e yakın kazanır. İkisini tek bir sayıyla sıralamak, ne kadar iyi olursa olsun her hesaplaşma savaşçısını en alta koyar.",
+  "A win rate says the brawler was on the winning side, not that it caused the win. Strong players gravitate toward particular brawlers, and the adjustment above corrects for the modes a brawler is played in, not the skill of the people playing it.":
+    "Kazanma oranı savaşçının kazanan tarafta olduğunu söyler, kazanmaya onun sebep olduğunu değil. Güçlü oyuncular belirli savaşçılara yönelir ve yukarıdaki düzeltme onu oynayanların becerisini değil, savaşçının oynandığı modları düzeltir.",
+  "A win rate says the side holding a brawler won. It does not say the brawler is why. Strong players gravitate toward particular brawlers and carry their results with them, and step 2 corrects for":
+    "Kazanma oranı bir savaşçıyı tutan tarafın kazandığını söyler. Savaşçının sebep olduğunu söylemez. Güçlü oyuncular belirli savaşçılara yönelir ve sonuçlarını onlarla taşır; 2. adım şunu düzeltir:",
+  "Adding pick rate, on a log scale":
+    "Seçilme oranını logaritmik ölçekte eklemek",
+  "Adjusting the win rate for mode":
+    "Kazanma oranını moda göre düzeltmek",
+  "Are the Ranked and trophy scores comparable?":
+    "Aşamalı ve kupa puanları karşılaştırılabilir mi?",
+  "Battles come from players reachable through the global leaderboards and their recent opponents, so the numbers lean toward more active accounts than the game as a whole.":
+    "Maçlar, küresel sıralamalar ve son rakipleri üzerinden ulaşılabilen oyunculardan gelir; bu yüzden sayılar oyunun geneline göre daha aktif hesaplara kayar.",
+  "Below":
+    "Altında",
+  "Both measurements are mapped onto 0–1 between fixed anchors, so a score means the same thing from one week to the next rather than being rescaled by whoever happens to be present. The anchors sit just outside each list's own 5th–95th percentile:":
+    "İki ölçüm de sabit referans noktaları arasında 0–1'e yerleştirilir; böylece bir puan, o an kim varsa ona göre yeniden ölçeklenmek yerine haftadan haftaya aynı şeyi ifade eder. Referans noktaları her listenin kendi %5–%95 diliminin hemen dışındadır:",
+  "Correcting for who is holding it":
+    "Onu kimin tuttuğuna göre düzeltmek",
+  "Does the tier list account for player skill?":
+    "Tier listesi oyuncu becerisini hesaba katıyor mu?",
+  "Every number on the tier lists, and where it comes from. Including what it cannot tell you.":
+    "Tier listelerindeki her sayı ve nereden geldiği. Neyi söyleyemeyeceği dahil.",
+  "Every two hours the sampler walks the global leaderboards and reads the battle logs of the players it finds. A battle log holds a player's last ~25 battles and there is no history endpoint, so anything played between visits is lost permanently — the two-hour interval is set by that, not by cost.":
+    "Sistem her iki saatte bir küresel sıralamaları dolaşır ve bulduğu oyuncuların maç geçmişlerini okur. Bir maç geçmişi oyuncunun son ~25 maçını tutar ve geçmiş için bir uç nokta yoktur; ziyaretler arasında oynanan her şey kalıcı olarak kaybolur. İki saatlik aralığı maliyet değil bu belirler.",
+  "Fixed is not the same as permanent, and that distinction has already cost these lists their calibration once. The anchors were set before the sampling rate rose eighteenfold in August 2026 and nothing re-derived them, so by late September 42% of the Ranked roster sat in D while 41% of the trophy roster sat in S or A. Nothing failed and nobody was told. They are now re-measured on":
+    "Sabit, kalıcı ile aynı şey değil ve bu fark bu listelerin ayarını bir kez bozdu. Referans noktaları, Ağustos 2026'da örnekleme hızı on sekiz kat artmadan önce belirlenmişti ve kimse onları yeniden hesaplamadı; Eylül sonunda Aşamalı kadrosunun %42'si D'de, kupa kadrosunun %41'i S veya A'daydı. Hiçbir şey bozulmadı ve kimseye söylenmedi. Artık şurada yeniden ölçülüyorlar:",
+  "Fixing the scale, and checking it stays fixed":
+    "Ölçeği sabitlemek ve sabit kaldığını kontrol etmek",
+  "How is the Brawl Stars meta score calculated?":
+    "Brawl Stars meta puanı nasıl hesaplanıyor?",
+  "How the Brawl Stars meta score is calculated":
+    "Brawl Stars meta puanı nasıl hesaplanır",
+  "How the meta score is calculated":
+    "Meta puanı nasıl hesaplanır",
+  "It does not control for who is playing":
+    "Kimin oynadığını kontrol etmez",
+  "It is a sample, not a census":
+    "Bir sayım değil, bir örneklemdir",
+  "It mixes strength with popularity, on purpose":
+    "Gücü popülerlikle bilerek karıştırır",
+  "List":
+    "Liste",
+  "Method":
+    "Yöntem",
+  "No. They are different populations measured against different denominators, so each list is calibrated against its own distribution. A 7.0 on the Ranked list and a 7.0 on the trophy list are not the same claim, which is why the two are never shown side by side.":
+    "Hayır. Farklı paydalara göre ölçülen farklı topluluklardır, bu yüzden her liste kendi dağılımına göre ayarlanır. Aşamalı listesinde 7,0 ile kupa listesinde 7,0 aynı iddia değildir; ikisi bu yüzden asla yan yana gösterilmez.",
+  "Partly, and deliberately. Alongside the plain win rate each brawler is measured a second way: every player's win rate with it minus that same player's win rate without it, which removes player skill exactly because it compares people against themselves. The published strength is the average of the two, because each is biased in a different direction. It changes real placements — one brawler ranked 96th on win rate alone and 16th once every player was compared against their own average.":
+    "Kısmen ve bilerek. Düz kazanma oranının yanında her savaşçı ikinci bir yolla ölçülür: her oyuncunun onunla kazanma oranından aynı oyuncunun onsuz kazanma oranı çıkarılır; insanları kendileriyle karşılaştırdığı için oyuncu becerisini tam olarak ortadan kaldırır. Yayınlanan güç ikisinin ortalamasıdır, çünkü her biri farklı bir yöne yanlıdır. Gerçek sıralamaları değiştirir: bir savaşçı sadece kazanma oranıyla 96. sıradaydı, her oyuncu kendi ortalamasıyla karşılaştırılınca 16. oldu.",
+  "Pick rate is":
+    "Seçilme oranı",
+  "Pulling thin samples toward the average":
+    "Az örneklemleri ortalamaya çekmek",
+  "Questions":
+    "Sorular",
+  "Ranked and the trophy ladder are different populations against different denominators, and each is calibrated against its own distribution. A 7.0 on one is not a 7.0 on the other, which is why they are never shown side by side.":
+    "Aşamalı ve kupa maçları, farklı paydalara karşı farklı topluluklardır ve her biri kendi dağılımına göre ayarlanır. Birinde 7,0 diğerinde 7,0 değildir; bu yüzden asla yan yana gösterilmezler.",
+  "Sampling real battles":
+    "Gerçek maçları incelemek",
+  "Sampling, baseline adjustment, shrinkage, log-scaled pick rate, and the limits of all of it.":
+    "Örnekleme, temel düzeltme, büzülme, logaritmik ölçekli seçilme oranı ve hepsinin sınırları.",
+  "See it applied on the":
+    "Uygulanmış hâlini gör:",
+  "So each brawler is also measured a second way:":
+    "Bu yüzden her savaşçı ikinci bir yolla da ölçülür:",
+  "So each brawler is measured against":
+    "Bu yüzden her savaşçı şuna göre ölçülür:",
+  "Step 4 removes the effect of who is holding a brawler, but the estimator behind it compares a player's games with a brawler against all their other games, across every mode. A specialist is therefore compared against their own play elsewhere, which is its own bias — smaller than the one it removes, and pointing the other way, which is why the two estimates are averaged rather than one being picked. A brawler carried by too few players is not corrected at all and falls back to the mode-adjusted rate.":
+    "4. adım bir savaşçıyı kimin tuttuğunun etkisini kaldırır, ama arkasındaki tahminci bir oyuncunun bir savaşçıyla maçlarını, tüm modlardaki diğer tüm maçlarıyla karşılaştırır. Bu yüzden bir uzman başka yerlerdeki kendi oyunuyla karşılaştırılır; bu da kendi başına bir yanlılıktır, kaldırdığından daha küçük ve ters yönde. İki tahminin birini seçmek yerine ortalamasının alınmasının sebebi bu. Çok az oyuncunun taşıdığı bir savaşçı hiç düzeltilmez ve moda göre düzeltilmiş orana geri düşer.",
+  "The Ranked list counts":
+    "Aşamalı listesi şunu sayar:",
+  "The cut-offs are plain thresholds on the score:":
+    "Sınırlar puan üzerinde düz eşiklerdir:",
+  "The full method behind BrawlZone tier lists: where the battles come from, how win rates are adjusted for mode and sample size, how pick rate is weighted, and what the score cannot tell you.":
+    "BrawlZone tier listelerinin arkasındaki tam yöntem: maçlar nereden geliyor, kazanma oranları mod ve örneklem büyüklüğüne göre nasıl düzeltiliyor, seçilme oranı nasıl ağırlıklandırılıyor ve puanın neyi söyleyemeyeceği.",
+  "The honest limits, because a number without them is worth less.":
+    "Dürüst sınırlar, çünkü sınırları olmayan bir sayı daha az değerlidir.",
+  "The meta score is a single 0–10 number combining":
+    "Meta puanı 0–10 arası tek bir sayıdır ve şunları birleştirir:",
+  "The skill correction is partial, not complete":
+    "Beceri düzeltmesi kısmi, tam değil",
+  "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.":
+    "İkisi büyük ölçüde uyuşur (r = +0,77) ve önemli yerde ayrışır. Bibi sadece kazanma oranıyla 96., her oyuncu kendi ortalamasıyla karşılaştırılınca 16. oldu; çünkü çoğunlukla daha zayıf hesaplar tarafından oynanıyor ve onların sonuçları onunmuş gibi okunuyordu.",
+  "The two lists are not comparable":
+    "İki liste karşılaştırılamaz",
+  "Turning the score into a tier":
+    "Puanı tier'a çevirmek",
+  "What is an adjusted win rate?":
+    "Düzeltilmiş kazanma oranı nedir?",
+  "What the meta score cannot tell you":
+    "Meta puanının söyleyemedikleri",
+  "Why do rarely-played brawlers not top the tier list?":
+    "Az oynanan savaşçılar neden tier listesinin zirvesinde değil?",
+  "Win rate alone cannot tell a genuinely strong staple from a niche pick that happens to win. A brawler played in 0.13% of battles at 52% and one played in 3.4% at 52% score the same, even though only the second is shaping the meta.":
+    "Kazanma oranı tek başına gerçekten güçlü popüler bir savaşçıyı, tesadüfen kazanan niş bir seçimden ayıramaz. Maçların %0,13'ünde %52 ile oynanan bir savaşçı ile %3,4'ünde %52 ile oynanan aynı puanı alır, oysa metayı şekillendiren yalnızca ikincisidir.",
+  "a brawler is not rated at all. “We have not measured this” and “we measured this and it is bad” are different claims, and collapsing them is how tier lists end up implying the second about brawlers they have three battles for.":
+    "bir savaşçı hiç puanlanmaz. “Bunu ölçmedik” ile “bunu ölçtük ve kötü” farklı iddialardır; ikisini birleştirmek, tier listelerinin üç maçlık veriye sahip oldukları savaşçılar için ikincisini ima etmesine yol açar.",
+  "a brawler is played, not":
+    "bir savaşçının nerede oynandığına göre, değil",
+  "and the":
+    "ve",
+  "below {v}":
+    "{v} altında",
+  "competitive battles only":
+    "yalnızca rekabetçi maçlar",
+  "decided battles":
+    "sonuçlanmış maç",
+  "every player's win rate with it, minus that same player's win rate without it":
+    "her oyuncunun onunla kazanma oranından aynı oyuncunun onsuz kazanma oranı çıkarılır",
+  "every sampler run":
+    "her sistem çalışması",
+  "how much it is actually played":
+    "gerçekte ne kadar oynandığı",
+  "how well a brawler performs":
+    "bir savaşçının ne kadar iyi performans gösterdiği",
+  "is playing it.":
+    "kimin oynadığına göre.",
+  "log-scaled":
+    "logaritmik ölçekli",
+  "pseudo-battles":
+    "sanal maç",
+  "the average for the mix of modes it is actually played in":
+    "gerçekte oynandığı mod karışımının ortalaması",
+  "tier list maker":
+    "tier listesi yapıcı",
+  "where":
+    "nerede",
+  "who":
+    "kim",
+  "A fast, honest stats site for Brawl Stars. Built for players who want to know exactly where they stand.":
+    "Brawl Stars için hızlı ve dürüst bir istatistik sitesi. Tam olarak nerede durduğunu bilmek isteyen oyuncular için yapıldı.",
+  "About":
+    "Hakkında",
+  "About BrawlZone":
+    "BrawlZone hakkında",
+  "Account help, bans and purchases are Supercell's — this site only reads the public API and cannot change anything about your account.":
+    "Hesap yardımı, banlar ve satın almalar Supercell'in işidir; bu site yalnızca herkese açık API'yi okur ve hesabınla ilgili hiçbir şeyi değiştiremez.",
+  "Being straight about the limits is more useful than pretending they don't exist.":
+    "Sınırlar konusunda dürüst olmak, yokmuş gibi yapmaktan daha faydalıdır.",
+  "Brawl Zone":
+    "Brawl Zone",
+  "BrawlZone is free, ad-free and has no paywall. If it saved you some time, a coffee goes a long way.":
+    "BrawlZone ücretsiz, reklamsız ve ödeme duvarı yok. Sana zaman kazandırdıysa, bir kahve çok işe yarar.",
+  "BrawlZone — often written":
+    "BrawlZone (sık sık",
+  "Map layouts, and the art the Fan Kit does not have yet.":
+    "Harita düzenleri ve Fan Kit'te henüz olmayan görseller.",
+  "Brawlify CDN":
+    "Brawlify CDN",
+  "Supercell Fan Kit":
+    "Supercell Fan Kit",
+  "Brawler artwork, skins, star power and gadget icons, ranked badges and game mode icons: Supercell's own art for fan content, served from this site.":
+    "Savaşçı görselleri, kostümler, yıldız gücü ve aksesuar simgeleri, Aşamalı rozetleri ve oyun modu simgeleri: Supercell'in hayran içeriği için kendi görselleri, bu siteden sunulur.",
+  "Built by one person":
+    "Tek bir kişi tarafından yapıldı",
+  "Buy me a coffee":
+    "Bana bir kahve ısmarla",
+  "Four different things get called “maps”, and they mean different things.":
+    "Dört farklı şeye “harita” deniyor ve farklı anlamlara geliyorlar.",
+  "Get in touch":
+    "İletişime geç",
+  "Ideas, corrections, or just to say hello.":
+    "Fikirler, düzeltmeler ya da sadece merhaba demek için.",
+  "Is there a feature you would like to see on BrawlZone? Something that looks wrong, or a page you wish existed? Send it over — ideas for what this site should do next are the most useful thing you can put in my inbox.":
+    "BrawlZone'da görmek istediğin bir özellik mi var? Yanlış görünen bir şey ya da keşke olsaydı dediğin bir sayfa? Gönder; bu sitenin bundan sonra ne yapması gerektiğine dair fikirler gelen kutuma koyabileceğin en faydalı şey.",
+  "Look anyone up":
+    "Herkese bak",
+  "Looking up a tag is a public action: the same data is available to anyone through the official API.":
+    "Bir etikete bakmak herkese açık bir işlemdir: aynı veriler resmi API üzerinden herkese açıktır.",
+  "Official Brawl Stars API":
+    "Resmi Brawl Stars API'si",
+  "Official announcements and each update's notes, summarised here with a link to the full text, picked up automatically as new posts go live.":
+    "Resmi duyurular ve her güncellemenin notları; burada özetlenir, tam metne bağlantıyla birlikte, yeni yazılar yayınlandıkça otomatik olarak alınır.",
+  "One person reads every message, so a reply can take a few days.":
+    "Her mesajı tek bir kişi okur, bu yüzden cevap birkaç gün sürebilir.",
+  "Players, clubs, battle logs, leaderboards and the event rotation. Everything about a specific account comes from here, live.":
+    "Oyuncular, kulüpler, maç geçmişleri, sıralamalar ve etkinlik rotasyonu. Belirli bir hesapla ilgili her şey canlı olarak buradan gelir.",
+  "Privacy":
+    "Gizlilik",
+  "Reading the map pages":
+    "Harita sayfalarını okumak",
+  "Search any player or club tag for trophies, ranked tiers, world rankings, progression and recent form. Save the profiles you follow and they stay one tap away.":
+    "Kupalar, Aşamalı tier'ları, dünya sıralamaları, ilerleme ve son form için herhangi bir oyuncu veya kulüp etiketini ara. Takip ettiğin profilleri kaydet, bir dokunuş uzaklıkta kalsınlar.",
+  "Start searching":
+    "Aramaya başla",
+  "Supercell news & release notes":
+    "Supercell haberleri ve sürüm notları",
+  "The site counts page views with Umami, a privacy-friendly analytics tool that runs on our own server. It records no cookies and does not build a profile of you or follow you across other sites. It is a visit counter, not ad tracking.":
+    "Site sayfa görüntülemelerini kendi sunucumuzda çalışan, gizlilik dostu bir analiz aracı olan Umami ile sayar. Çerez kaydetmez, senin hakkında profil oluşturmaz ve seni başka sitelerde takip etmez. Bir ziyaret sayacıdır, reklam takibi değil.",
+  "There is no account system, so there is nothing to sign up for and no password to store. Your recent searches and saved profiles live in your own browser's local storage and are never sent to us. Clearing your browser data removes them for good.":
+    "Hesap sistemi yok; yani kaydolacak bir şey ve saklanacak bir şifre yok. Son aramaların ve kayıtlı profillerin kendi tarayıcının yerel depolamasında durur ve bize asla gönderilmez. Tarayıcı verilerini temizlemek onları kalıcı olarak siler.",
+  "This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy.":
+    "Bu içerik resmi değildir ve Supercell tarafından onaylanmamıştır. Daha fazla bilgi için Supercell'in Hayran İçeriği Politikası'na bak.",
+  "Tier lists and per-map picks aggregated from thousands of sampled battles, refreshed daily. Plus upgrade-ownership rates, release notes and news in one place.":
+    "Binlerce incelenen maçtan derlenen tier listeleri ve harita bazlı seçimler, her gün yenilenir. Ayrıca yükseltme sahiplik oranları, sürüm notları ve haberler tek yerde.",
+  "Track the meta":
+    "Metayı takip et",
+  "What BrawlZone is, where its data comes from, and what it can and cannot tell you.":
+    "BrawlZone nedir, verileri nereden gelir ve neyi söyleyebilir, neyi söyleyemez.",
+  "What it does":
+    "Ne yapar",
+  "What we can't tell you":
+    "Neyi söyleyemeyiz",
+  "Where the data comes from":
+    "Veriler nereden geliyor",
+  "and is not affiliated with Supercell.":
+    "; Supercell ile bağlantılı değildir.",
+  "brawlzone.net":
+    "brawlzone.net",
+  "— is an independent Brawl Stars statistics site covering player and club lookups, Ranked analysis and brawler tier lists. It lives at":
+    "olarak da yazılır) oyuncu ve kulüp arama, Aşamalı analizi ve savaşçı tier listeleri sunan bağımsız bir Brawl Stars istatistik sitesidir. Adresi:",
+  "This page is a translation. If it differs from the English version, the English version applies.":
+    "Bu sayfa bir çeviridir. İngilizce sürümden farklıysa İngilizce sürüm geçerlidir.",
+  "Read anything here, as often as you like, without an account.":
+    "Buradaki her şeyi istediğin sıklıkta, hesap olmadan oku.",
+  "Quote or screenshot the numbers, including in videos and articles. A link back is appreciated, never required.":
+    "Sayıları alıntıla veya ekran görüntüsünü al; videolar ve makaleler dahil. Geri bağlantı makbule geçer ama asla zorunlu değildir.",
+  "Install and use the Android app on any device you own.":
+    "Android uygulamasını sahip olduğun her cihaza yükle ve kullan.",
+  "Scraping the site at a rate that degrades it for other readers. There is no published API quota because there is no published API; automated traffic that costs more than it returns gets rate-limited.":
+    "Siteyi diğer okuyucular için yavaşlatacak hızda kazımak. Yayınlanmış bir API kotası yok, çünkü yayınlanmış bir API yok; getirdiğinden fazlasına mal olan otomatik trafik sınırlanır.",
+  "Passing the site off as official, or as affiliated with Supercell.":
+    "Siteyi resmi ya da Supercell ile bağlantılıymış gibi göstermek.",
+  "Redistributing the Android app repackaged, modified, or signed with a different key.":
+    "Android uygulamasını yeniden paketlenmiş, değiştirilmiş ya da farklı bir anahtarla imzalanmış olarak dağıtmak.",
+  "No account, because there is nothing to sign in to.":
+    "Hesap yok, çünkü giriş yapılacak bir şey yok.",
+  "No cookies. Not for analytics, not for preferences, not at all.":
+    "Çerez yok. Ne analiz için, ne tercihler için, hiç yok.",
+  "No advertising, no ad networks, and no third-party trackers.":
+    "Reklam yok, reklam ağı yok, üçüncü taraf izleyici yok.",
+  "No email address, name, phone number or payment details — none are ever asked for.":
+    "E-posta adresi, isim, telefon numarası veya ödeme bilgisi yok; hiçbiri asla istenmez.",
+  ", and the answer is nothing.":
+    "; cevap: hiçbir şey.",
+  ", which are dated.":
+    "; bunlar tarihlidir.",
+  ". Use the numbers to inform a decision, not as a guarantee of one. Nothing here is advice, and no outcome in the game is promised.":
+    ". Sayıları bir kararı bilgilendirmek için kullan, bir garanti olarak değil. Buradaki hiçbir şey tavsiye değildir ve oyunda hiçbir sonuç vaat edilmez.",
+  "And, more usefully, what they are not.":
+    "Ve daha faydalısı, ne olmadıkları.",
+  "BrawlZone Bubble":
+    "BrawlZone Bubble",
+  "Changes, and getting in touch":
+    "Değişiklikler ve iletişim",
+  "Every statistic here is computed from a":
+    "Buradaki her istatistik, resmi Brawl Stars API'sinden okunan gerçek maçlardan oluşan bir",
+  "It is distributed from this site, so it is covered here too.":
+    "Bu siteden dağıtılıyor, bu yüzden burada da kapsanıyor.",
+  "It is not a modification of Brawl Stars, does not interact with the game, and does not automate play. Using it should not put an account at risk, but the site cannot make promises on Supercell's behalf about what their rules permit.":
+    "Brawl Stars'ın bir modifikasyonu değildir, oyunla etkileşime girmez ve oyunu otomatikleştirmez. Kullanmak bir hesabı riske atmamalıdır, ama site Supercell adına kurallarının neye izin verdiği konusunda söz veremez.",
+  "No warranty":
+    "Garanti yok",
+  "Not affiliated with Supercell":
+    "Supercell ile bağlantılı değil",
+  "Questions, corrections, or a takedown request:":
+    "Sorular, düzeltmeler veya kaldırma talebi:",
+  "Short, because the honest version is short. This site is free, fan-made, and measured rather than official.":
+    "Kısa, çünkü dürüst sürüm kısa. Bu site ücretsiz, hayranlar tarafından yapılmış ve resmi değil, ölçüme dayalı.",
+  "Stated first, because it is the thing most worth being clear about.":
+    "Önce bu söyleniyor, çünkü en çok açık olunması gereken şey bu.",
+  "Supercell's Fan Content Policy":
+    "Supercell Hayran İçeriği Politikası",
+  "Terms":
+    "Koşullar",
+  "Terms of service":
+    "Kullanım koşulları",
+  "The":
+    "",
+  "The method is published in full, including its limitations, on":
+    "Yöntem, sınırlamaları dahil, tamamen şurada yayınlanmıştır:",
+  "The site and the app are provided “as is”, without warranty of any kind. They may be unavailable, incomplete, or wrong at any time. To the extent the law allows,":
+    "Site ve uygulama hiçbir garanti olmaksızın “olduğu gibi” sunulur. Her an kullanılamaz, eksik veya yanlış olabilirler. Yasanın izin verdiği ölçüde",
+  "The terms for using BrawlZone: a free, fan-made Brawl Stars statistics site. What the numbers are, what they are not, and what you may do with them.":
+    "BrawlZone'u kullanma koşulları: ücretsiz, hayranlar tarafından yapılmış bir Brawl Stars istatistik sitesi. Sayılar ne, ne değil ve onlarla ne yapabilirsin.",
+  "These terms may change as the site does. Material changes are noted in the":
+    "Bu koşullar site değiştikçe değişebilir. Önemli değişiklikler şurada belirtilir:",
+  "What the numbers are":
+    "Sayılar ne",
+  "What you may do":
+    "Neler yapabilirsin",
+  "What you may not do":
+    "Neler yapamazsın",
+  "accepts no liability for any loss arising from using them — including decisions made in a game on the strength of a number printed here.":
+    "bunları kullanmaktan doğan hiçbir kayıptan sorumlu değildir; burada yazan bir sayıya dayanarak oyunda verilen kararlar dahil.",
+  "app is free and provided as-is. It draws an overlay showing this site's data over other apps, with your permission, and reads nothing from your device or from the game. What it collects is covered by the":
+    "uygulaması ücretsizdir ve olduğu gibi sunulur. İzninle diğer uygulamaların üzerine bu sitenin verilerini gösteren bir katman çizer; cihazından ya da oyundan hiçbir şey okumaz. Ne topladığı şurada anlatılır:",
+  "how the meta score is calculated":
+    "meta puanı nasıl hesaplanır",
+  "of real battles, read from the official Brawl Stars API. It is not a census of every game played, and it is not official. Win rates, tier lists and recommendations are estimates with sample sizes printed beside them, and they can be wrong.":
+    "üzerinden hesaplanır. Oynanan her maçın bir sayımı değildir ve resmi değildir. Kazanma oranları, tier listeleri ve öneriler yanlarında örneklem büyüklükleri yazılı tahminlerdir ve yanlış olabilirler.",
+  "privacy policy":
+    "gizlilik politikası",
+  "release notes":
+    "sürüm notları",
+  "sample":
+    "örneklem",
+  "{SITE_NAME} is a free Brawl Stars statistics site. There is no account, nothing to pay for, and no advertising. Using it means accepting the terms on this page. If you disagree with any of them, the remedy is to stop using the site, and nothing is lost — you have given us nothing.":
+    "{SITE_NAME} ücretsiz bir Brawl Stars istatistik sitesidir. Hesap yok, ödenecek bir şey yok, reklam yok. Kullanmak bu sayfadaki koşulları kabul etmek demektir. Herhangi birine katılmıyorsan çözüm siteyi kullanmayı bırakmaktır ve hiçbir şey kaybolmaz: bize hiçbir şey vermedin.",
+  "{SITE_NAME} is an independent, fan-made project. It is not endorsed by, sponsored by, or affiliated with Supercell. Brawl Stars, its brawler names, artwork and trademarks belong to Supercell, and are used here to describe the game the site is about. This site follows":
+    "{SITE_NAME} bağımsız, hayranlar tarafından yapılmış bir projedir. Supercell tarafından onaylanmamış, desteklenmemiş ve Supercell ile bağlantılı değildir. Brawl Stars, savaşçı adları, görselleri ve ticari markaları Supercell'e aittir ve burada sitenin konusu olan oyunu tanımlamak için kullanılır. Bu site şuna uyar:",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, which is why there is no consent banner on this site — there is nothing to consent to.":
+    "; üçüncü bir tarafta değil, siteyle aynı sunucuda çalışır. Çerez kullanmaz ve kişisel veri saklamaz; bu sitede onay banner'ı olmamasının sebebi bu: onaylanacak bir şey yok.",
+  ", so it counts as a page view here and nothing more. It does not read your game account, your files, or your other apps.":
+    "; bu yüzden burada bir sayfa görüntülemesi olarak sayılır, o kadar. Oyun hesabını, dosyalarını veya diğer uygulamalarını okumaz.",
+  ". If this page ever stops matching what the site actually does, that is a bug — say so and it will be fixed.":
+    ". Bu sayfa bir gün sitenin gerçekte yaptığıyla uyuşmazsa bu bir hatadır; söyle, düzeltilsin.",
+  "A few named events are also counted, all of them anonymous: installing the web app, opening it, and tapping the Android download. The download event carries which page it came from and which version was offered, so an upgrade can be told apart from a first install. Nothing else.":
+    "Birkaç adlandırılmış olay da sayılır, hepsi anonim: web uygulamasını yüklemek, açmak ve Android indirmesine dokunmak. İndirme olayı hangi sayfadan geldiğini ve hangi sürümün sunulduğunu taşır, böylece bir güncelleme ilk yüklemeden ayırt edilebilir. Başka bir şey yok.",
+  "A handful of preferences live in your browser's local storage: saved players and clubs, recent searches, saved rosters, whether you dismissed the install prompt, and — in the Android app's panel — the game mode and map you last looked at.":
+    "Birkaç tercih tarayıcının yerel depolamasında durur: kayıtlı oyuncular ve kulüpler, son aramalar, kayıtlı kadrolar, yükleme önerisini kapatıp kapatmadığın ve Android uygulamasının panelinde en son baktığın oyun modu ve harita.",
+  "A tag you type is a request, not a record.":
+    "Yazdığın bir etiket bir istektir, bir kayıt değil.",
+  "Analytics":
+    "Analiz",
+  "Most artwork comes from Supercell's Fan Kit and is served from this site itself. Map images and a few others come from Brawlify's CDN, and some from the Brawl Stars news feed, the community wiki and YouTube thumbnails. Loading those means your browser contacts those hosts directly, and they see the request the way any website you visit does. We do not send them anything about you.":
+    "Görsellerin çoğu Supercell'in Fan Kit'inden gelir ve bu sitenin kendisinden sunulur. Harita görselleri ve birkaç diğeri Brawlify'ın CDN'inden, bazıları Brawl Stars haber akışından, topluluk wikisinden ve YouTube küçük resimlerinden gelir. Bunları yüklemek tarayıcının bu sunuculara doğrudan bağlanması demektir ve onlar isteği ziyaret ettiğin her web sitesi gibi görür. Onlara senin hakkında hiçbir şey göndermeyiz.",
+  "BrawlZone is unofficial and not endorsed by Supercell. Game data comes from the official Brawl Stars API under their developer terms.":
+    "BrawlZone resmi değildir ve Supercell tarafından onaylanmamıştır. Oyun verileri, geliştirici koşulları altında resmi Brawl Stars API'sinden gelir.",
+  "Display over other apps":
+    "Diğer uygulamaların üzerinde göster",
+  "Email":
+    "E-posta",
+  "If your profile appears in the sampled data and you would rather it did not, email":
+    "Profilin incelenen verilerde görünüyorsa ve görünmesini istemiyorsan, şu adrese e-posta gönder:",
+  "It asks for one permission, and it is not the one people fear.":
+    "Tek bir izin ister ve bu insanların korktuğu izin değil.",
+  "It is not on the Play Store, so nothing is reported to Google about your use of it. The":
+    "Play Store'da değil, bu yüzden kullanımın hakkında Google'a hiçbir şey bildirilmez.",
+  "It records the page, the referrer, and coarse details your browser sends anyway: country, browser, operating system, screen size. It does not record IP addresses, and nothing links one visit to another or to a person.":
+    "Sayfayı, yönlendireni ve tarayıcının zaten gönderdiği kaba ayrıntıları kaydeder: ülke, tarayıcı, işletim sistemi, ekran boyutu. IP adreslerini kaydetmez ve hiçbir şey bir ziyareti başka bir ziyarete ya da bir kişiye bağlamaz.",
+  "Kept on your device, never sent anywhere.":
+    "Cihazında tutulur, hiçbir yere gönderilmez.",
+  "Looking up a player":
+    "Bir oyuncuya bakmak",
+  "One counter, self-hosted, with nothing that identifies you.":
+    "Tek bir sayaç, kendi sunucumuzda, seni tanımlayan hiçbir şey olmadan.",
+  "Other people's servers":
+    "Başkalarının sunucuları",
+  "Page views are counted by":
+    "Sayfa görüntülemelerini sayan:",
+  "Questions, or a change":
+    "Sorular veya bir değişiklik",
+  "Reading the screen is a separate thing, and it is off unless you turn it on. Version 1.8 can scan the draft, and to do that Android makes you accept its own screen-capture dialog — every time the app starts, because the system will not let an app keep that permission — and shows a recording indicator for as long as a session is open. One frame is read when you tap Scan, measured on your phone, and dropped. It is never written to storage and never sent anywhere; what comes out of it is a handful of brawler names.":
+    "Ekranı okumak ayrı bir şeydir ve sen açmadıkça kapalıdır. Sürüm 1.8 draftı tarayabilir; bunun için Android seni kendi ekran kaydı penceresini kabul etmeye zorlar (sistem bir uygulamanın bu izni tutmasına izin vermediği için uygulama her başladığında) ve oturum açık olduğu sürece bir kayıt göstergesi gösterir. Tara'ya dokunduğunda tek bir kare okunur, telefonunda ölçülür ve atılır. Asla depolamaya yazılmaz ve hiçbir yere gönderilmez; içinden çıkan birkaç savaşçı adıdır.",
+  "Searching a player tag sends it to the official Brawl Stars API to fetch that profile. We do not store a record of who searched for what.":
+    "Bir oyuncu etiketini aramak, o profili getirmek için onu resmi Brawl Stars API'sine gönderir. Kimin neyi aradığının kaydını tutmayız.",
+  "Separately, BrawlZone samples public profiles and battle logs from that same official API to build the statistics the site is for — tier lists, map picks, matchups. That data is public in the game, is stored as aggregates rather than as a dossier on any player, and is bounded by retention windows. There is more about where it comes from on the":
+    "Ayrıca BrawlZone, sitenin var olma sebebi olan istatistikleri (tier listeleri, harita seçimleri, eşleşmeler) oluşturmak için aynı resmi API'den herkese açık profilleri ve maç geçmişlerini inceler. Bu veriler oyunda herkese açıktır, herhangi bir oyuncu hakkında dosya olarak değil özet olarak saklanır ve saklama süreleriyle sınırlıdır. Nereden geldiğiyle ilgili daha fazlası şurada:",
+  "The Android app":
+    "Android uygulaması",
+  "The app has no account, collects nothing, and sends nothing anywhere. Its panel is a web view of":
+    "Uygulamanın hesabı yok, hiçbir şey toplamaz ve hiçbir yere bir şey göndermez. Paneli şunun bir web görünümüdür:",
+  "The bubble needs":
+    "Baloncuğun ihtiyacı:",
+  "The short version":
+    "Kısa sürüm",
+  "These never leave your device. They are not synced, not backed up by us, and not readable by the server. Clearing your browser data removes them, and the site works without them.":
+    "Bunlar cihazından asla çıkmaz. Senkronize edilmez, tarafımızdan yedeklenmez ve sunucu tarafından okunamaz. Tarayıcı verilerini temizlemek onları siler ve site onlar olmadan da çalışır.",
+  "Umami":
+    "Umami",
+  "Very little, and this page says exactly what. Every claim below is something you can check in the source.":
+    "Çok az ve bu sayfa tam olarak neyi söylüyor. Aşağıdaki her iddia kaynak kodda kontrol edebileceğin bir şey.",
+  "What BrawlZone stores, what it does not, and what the Android app sends. No accounts, no cookies, no personal data.":
+    "BrawlZone neyi saklar, neyi saklamaz ve Android uygulaması ne gönderir. Hesap yok, çerez yok, kişisel veri yok.",
+  "What stays in your browser":
+    "Tarayıcında kalanlar",
+  "What we collect":
+    "Ne topluyoruz",
+  "What your browser fetches from elsewhere.":
+    "Tarayıcının başka yerlerden getirdikleri.",
+  "a page on this site":
+    "bu sitedeki bir sayfa",
+  "about page":
+    "hakkında sayfası",
+  "download page":
+    "İndirme sayfası",
+  "publishes a SHA-256 checksum so you can verify the file you got is the file we published.":
+    "bir SHA-256 sağlama toplamı yayınlar; böylece aldığın dosyanın yayınladığımız dosya olduğunu doğrulayabilirsin.",
+  "so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them.":
+    "; böylece oyunun üzerine çizebilir. Bu izin ekranına piksel koymasını sağlar; onları okumasını değil.",
+  "with your tag and it will be excluded.":
+    "; etiketini yaz, hariç tutulsun.",
+  " and others":
+    " ve diğerleri",
+  " — {up} up, {down} down":
+    " — {up} yükseldi, {down} düştü",
+  ", not what the update":
+    "; güncellemenin neye",
+  ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.":
+    ". Bir savaşçı güçlendirilip görmezden gelinebilir, zayıflatılıp yine de yükselebilir ya da aynı iki haftada dönen harita rotasyonuyla hareket edebilir. Her satırın yanında örneklem büyüklükleri yazar, böylece kendin tartabilirsin; iki taraftan birinde {PATCH_MIN_DECIDED} sonuçlanmış maçın altında olanlar tahmin edilmek yerine dışarıda bırakılır.",
+  ". The rest stayed where they were.":
+    ". Geri kalanlar yerinde kaldı.",
+  "Did the Brawl Stars balance changes work?":
+    "Brawl Stars denge değişiklikleri işe yaradı mı?",
+  "Did the balance changes work?":
+    "Denge değişiklikleri işe yaradı mı?",
+  "Every brawler an update changed, and what its adjusted win rate did in the {PATCH_WINDOW_DAYS} days afterwards against the {PATCH_WINDOW_DAYS2} before. From sampled Ranked battles.":
+    "Bir güncellemenin değiştirdiği her savaşçı ve düzeltilmiş kazanma oranının sonraki {PATCH_WINDOW_DAYS} günde, önceki {PATCH_WINDOW_DAYS2} güne göre ne yaptığı. İncelenen Aşamalı maçlarından.",
+  "Every brawler each Brawl Stars update changed, and what its win rate actually did in the fortnight afterwards, measured from sampled Ranked battles.":
+    "Her Brawl Stars güncellemesinin değiştirdiği her savaşçı ve kazanma oranının sonraki iki haftada gerçekte ne yaptığı, incelenen Aşamalı maçlarından ölçüldü.",
+  "It changed {length} brawlers.":
+    "{length} savaşçıyı değiştirdi.",
+  "Listed rather than hidden — an absence with a reason is a finding too.":
+    "Gizlenmek yerine listelendi: sebebi olan bir yokluk da bir bulgudur.",
+  "Measured, not announced":
+    "Duyurulmadı, ölçüldü",
+  "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
+    "Saklanan dönem içindeki hiçbir güncelleme okunamadı. Sürüm notları ve günlük özetler hizalandıkça dolar.",
+  "None of them moved more than {NOTABLE_DELTA} points either way in the":
+    "Hiçbiri iki yönde de {NOTABLE_DELTA} puandan fazla oynamadı; ölçüm dönemi:",
+  "Not measured: {v} — under":
+    "Ölçülmedi: {v} —",
+  "Patch notes":
+    "Yama notları",
+  "The window is still filling, so this is a partial reading.":
+    "Dönem hâlâ doluyor, bu yüzden bu kısmi bir okuma.",
+  "This shows what each number":
+    "Bu, her sayının ne",
+  "This update changed":
+    "Bu güncellemenin değiştirdiği:",
+  "Updates that cannot be measured":
+    "Ölçülemeyen güncellemeler",
+  "What each update actually did to the brawlers it changed, measured rather than announced.":
+    "Her güncellemenin değiştirdiği savaşçılara gerçekte ne yaptığı, duyurulduğu gibi değil ölçüldüğü gibi.",
+  "brawlers":
+    "savaşçı",
+  "by more than {NOTABLE_DELTA} points in the {PATCH_WINDOW_DAYS} days afterwards":
+    "(sonraki {PATCH_WINDOW_DAYS} günde {NOTABLE_DELTA} puandan fazla)",
+  "caused":
+    "sebep olduğunu değil",
+  "did":
+    "yaptığını gösterir",
+  "{PATCH_MIN_DECIDED} decided battles on one side of the update, or released after it.":
+    "güncellemenin bir tarafında {PATCH_MIN_DECIDED} sonuçlanmış maçın altında veya güncellemeden sonra çıktı.",
+  "{PATCH_WINDOW_DAYS} days afterwards.":
+    "sonraki {PATCH_WINDOW_DAYS} gün.",
+  "{date} · {start} to {end} against {start2} to {end2}":
+    "{date} · {start}–{end}, karşılaştırma: {start2}–{end2}",
+  "{length} moved":
+    "{length} tanesi hareket etti",
+  "+{v} pts":
+    "+{v} puan",
+  ". Only maps currently in rotation are included.":
+    ". Yalnızca şu an rotasyondaki haritalar dahildir.",
+  "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.":
+    "Buradaki her savaşçının en az 300 sonuçlanmış Aşamalı maçı var. Bu listeler seçilmiş uç değerlerdir ve birçok küçük örneklemden maksimum seçmek, liyakatle değil tesadüfen uç değerler üretir; bunu durduran alt sınırdır.",
+  "Everybody picks them and the results do not justify it — over {highUsage} pick rate.":
+    "Herkes onları seçiyor ama sonuçlar bunu haklı çıkarmıyor: {highUsage} üstü seçilme oranı.",
+  "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.":
+    "Bir haritada genel formlarının gösterdiğinden çok daha iyiler. Sayı kendi ortalamalarının üstündeki kazanma oranı puanıdır, yani genel güç zaten çıkarılmıştır.",
+  "Fine overall, but losing win-rate points on a map that is in rotation right now.":
+    "Genelde iyi ama şu an rotasyondaki bir haritada kazanma oranı puanı kaybediyor.",
+  "Hidden gems":
+    "Gizli cevherler",
+  "How this is decided":
+    "Buna nasıl karar veriliyor",
+  "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the":
+    "Harita cevherleri ve tuzakları, bir savaşçının bir haritadaki puanını kendi genel formuyla karşılaştırır; böylece liste şunun ikinci bir kopyası olmaz:",
+  "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.":
+    "Bunu dürüstçe cevaplamak için henüz yeterli incelenmiş maç yok. Yeterli savaşçı örneklem alt sınırını geçince dolar.",
+  "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.":
+    "Bu hafta hiçbir şey çıtayı geçmiyor; bu da metanın kabaca ölçüldüğü gibi oynandığı anlamına gelir.",
+  "Overrated":
+    "Abartılanlar",
+  "See every pick on {mapName}":
+    "{mapName} haritasındaki tüm seçimleri gör",
+  "Sleeper picks":
+    "Uykudaki seçimler",
+  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
+    "Güçlüler ve neredeyse kimse onları seçmiyor: {lowUsage} altı seçilme oranı.",
+  "The hidden meta":
+    "Gizli meta",
+  "Trap picks":
+    "Tuzak seçimler",
+  "Underrated and overrated Brawl Stars brawlers":
+    "Hafife alınan ve abartılan Brawl Stars savaşçıları",
+  "Who is everyone sleeping on, measured from sampled ranked battles.":
+    "Herkes kimi gözden kaçırıyor, incelenen Aşamalı maçlarından ölçüldü.",
+  "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.":
+    "Herkes kimi gözden kaçırıyor. Son {windowDays} günde değerlendirilecek kadar Aşamalı maçı olan {rated} savaşçıdan okundu.",
+  "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.":
+    "Herkes kimi gözden kaçırıyor. Neredeyse kimsenin seçmediği güçlü savaşçılar, sonuçların haklı çıkarmadığı popüler savaşçılar ve genel tier listesinin gizlediği haritaya özel cevherler ve tuzaklar; görüşlerden değil incelenen Aşamalı maçlarından ölçüldü.",
+  "tier list":
+    "tier listesi",
+  "{v} or better.":
+    "{v} veya daha iyi.",
+  "{v} pts":
+    "{v} puan",
+  "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of":
+    "“Düşük seçilme oranı” ve “güçlü”, canlı kadronun yüzdelik dilimleridir, sabit sayılar değil; böylece soru aynı kalır, cevaplar değişir. Bugün bunlar {lowUsage} altında seçilme ve şu puana denk geliyor:",
+  ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the":
+    ", CC-BY-SA. Supercell bir hediye oranı API'si yayınlamaz, bu yüzden bunlar resmi rakamlar değil; topluluk tarafından oyun dosyalarından ve oyun içi gözlemden derlenir. Savaşçılar elinde olunca metanın neye benzediği için bak:",
+  "Brawl Stars Starr Drop chances: every drop rate and reward":
+    "Brawl Stars Starr Hediyesi şansları: her hediye oranı ve ödül",
+  "Chance of rolling each rarity":
+    "Her nadirliğin çıkma şansı",
+  "Drop rates and contents from the":
+    "Hediye oranları ve içerikleri:",
+  "Drop rates unavailable":
+    "Hediye oranları kullanılamıyor",
+  "Each of your first five wins of the day earns a reward drop: usually a Starr Drop, sometimes a Chaos Drop or another drop. The count resets once a day; the timer on the Daily Wins screen in game shows exactly when.":
+    "Günün ilk beş galibiyetinin her biri bir ödül hediyesi kazandırır: genelde bir Starr Hediyesi, bazen bir Kaos Hediyesi ya da başka bir hediye. Sayı günde bir kez sıfırlanır; oyundaki Günlük Galibiyetler ekranındaki sayaç tam olarak ne zaman olduğunu gösterir.",
+  "Event drops":
+    "Etkinlik hediyeleri",
+  "Every day":
+    "Her gün",
+  "Every drop rate":
+    "Her hediye oranı",
+  "How to get them: the daily schedule":
+    "Nasıl alınır: günlük takvim",
+  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
+    "Geçmiş etkinliklerden sınırlı süreli hediyeler. Referans için tutuluyor; çoğu artık alınamıyor.",
+  "No table":
+    "Tablo yok",
+  "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
+    "Şu an alınabilir: Günlük Galibiyetler, Kupa Yolu, Brawl Pass ve Mağaza'dan.",
+  "Permanent drops":
+    "Kalıcı hediyeler",
+  "Starr Drop chances for every rarity, from Rare to Legendary, and every reward inside each drop. Plus Chaos Drops and every event drop, in one table.":
+    "Nadirden Efsaneviye her nadirlik için Starr Hediyesi şansları ve her hediyenin içindeki her ödül. Ayrıca Kaos Hediyeleri ve tüm etkinlik hediyeleri, tek tabloda.",
+  "Starr Drops":
+    "Starr Hediyeleri",
+  "The community wiki these numbers come from is not responding, or has changed shape. Rather than show odds that might be wrong, the page waits.":
+    "Bu sayıların geldiği topluluk wikisi yanıt vermiyor ya da yapısı değişti. Yanlış olabilecek oranlar göstermek yerine sayfa bekliyor.",
+  "The wiki lists rewards totalling {v}%, so a row covering the other {v2}% is missing from the source.":
+    "Wiki toplamı %{v} eden ödüller listeliyor, yani kalan %{v2}'yi kapsayan bir satır kaynakta eksik.",
+  "The wiki publishes no reward table for this drop.":
+    "Wiki bu hediye için bir ödül tablosu yayınlamıyor.",
+  "What each drop can contain and how likely each reward is. The game shows you the opening, never the table behind it — and Supercell publishes no drop rates through any API, so these come from the community wiki.":
+    "Her hediyenin ne içerebileceği ve her ödülün ne kadar olası olduğu. Oyun sana açılışı gösterir, arkasındaki tabloyu asla; Supercell de hiçbir API üzerinden hediye oranı yayınlamaz, bu yüzden bunlar topluluk wikisinden gelir.",
+  "Wiki lists {v}% — a row is missing.":
+    "Wiki %{v} listeliyor; bir satır eksik.",
+  "Your first 5 wins":
+    "İlk 5 galibiyetin",
+  "rarities":
+    "nadirlik",
+  "rewards":
+    "ödül",
+  "{event} · limited time":
+    "{event} · sınırlı süre",
+  ", so it moves with the meta and always matches what the rest of the site says.":
+    "; böylece metayla birlikte değişir ve sitenin geri kalanıyla her zaman uyuşur.",
+  "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.":
+    "Her gün tahmin edilecek yeni bir Brawl Stars savaşçısı. Her tahmin nadirlik, sınıf, hareket, menzil, şarjör dolumu, çıkış sırası ve tier'da ne kadar yakın olduğunu söyler. Ücretsiz, hesap gerekmez, günde bir bulmaca.",
+  "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
+    "Dört tahminden sonra tahta cevabın yıldız gücünü, sekizden sonra aksesuarını gösterir; oyundaki gerçek simgeler, adları gizli, çünkü bir ad aranabilir ama bir resim hafıza testidir.",
+  "Amber":
+    "Amber",
+  "Brawl Stars daily challenge — guess the brawler":
+    "Brawl Stars günlük bulmacası: savaşçıyı tahmin et",
+  "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
+    "Sınıfın oku yok, çünkü Keskin Nişancı'dan Tank'a bir yön yok. Tier'a girecek kadar Aşamalı maçı olmayan bir savaşçı tahmin yerine bir tire gösterir.",
+  "Daily challenge":
+    "Günlük bulmaca",
 };
