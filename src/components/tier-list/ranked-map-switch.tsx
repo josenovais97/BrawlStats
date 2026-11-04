@@ -61,6 +61,19 @@ const WORDS = {
     note: "Son üç haftada bu haritadaki düzeltilmiş kazanma oranı; örneklem azsa her savaşçının genel Aşamalı formuna yaklaştırılır. Burada 150'den az sonuçlanmış maçı olan savaşçılar dahil edilmez.",
     full: 'Haritanın tam sayfası',
   },
+  de: {
+    group: 'Ranked-Map',
+    all: 'Alle Maps',
+    empty: (map: string) =>
+      `Auf ${map} hat noch kein Brawler genug erfasste Matches für eine Platzierung. Das füllt sich, sobald hier mehr Matches erfasst werden.`,
+    atRank: (n: string, rank: string, all: string) => `${n} in ${rank} · ${all} insgesamt`,
+    here: (n: string) => `${n} Matches hier`,
+    usual: 'ggü. normal',
+    noteRank: (rank: string) =>
+      `Die Ergebnisse aller Ränge auf dieser Map, angepasst daran, wie jeder Brawler in ${rank} abschneidet, und an die hier gespielten ${rank}-Matches angenähert. Brawler mit weniger als 20 ${rank}-Matches hier werden weggelassen.`,
+    note: 'Bereinigte Siegquote auf dieser Map in den letzten drei Wochen, bei wenigen Matches an die allgemeine Ranked-Form jedes Brawlers angenähert. Brawler mit weniger als 150 entschiedenen Matches hier werden weggelassen.',
+    full: 'Ganze Map-Seite',
+  },
 } satisfies Record<Locale, unknown>;
 
 /** One brawler's record on one Ranked map, as the page serialises it. */

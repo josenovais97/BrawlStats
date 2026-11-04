@@ -42,7 +42,7 @@ function remembered(): string | null {
 function browserLocale(): Locale | null {
   for (const tag of navigator.languages ?? [navigator.language]) {
     const base = tag.toLowerCase().split('-')[0];
-    if (base === 'es' || base === 'pt' || base === 'tr' || base === 'en') return base;
+    if (base === 'es' || base === 'pt' || base === 'tr' || base === 'de' || base === 'en') return base;
   }
   return null;
 }
@@ -52,6 +52,7 @@ const COPY: Record<Locale, { text: string; go: string; close: string }> = {
   es: { text: 'Esta página también está en español.', go: 'Ver en español', close: 'Cerrar' },
   pt: { text: 'Esta página também está em português.', go: 'Ver em português', close: 'Fechar' },
   tr: { text: 'Bu sayfa Türkçe olarak da var.', go: 'Türkçe oku', close: 'Kapat' },
+  de: { text: 'Diese Seite gibt es auch auf Deutsch.', go: 'Auf Deutsch lesen', close: 'Schließen' },
 };
 
 export function LanguageSuggest() {

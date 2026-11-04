@@ -463,4 +463,100 @@ const tr: TierCopy = {
   podiumDetail: (rate) => `${rate} kazanma oranı`,
 };
 
-export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr };
+const de: TierCopy = {
+  format: {
+    ranked: {
+      eyebrow: 'Nur kompetitiv',
+      heading: 'Ranked-Tierlist',
+      battles: 'Ranked-Matches',
+      intro:
+        'Wie Brawler im kompetitiven Ranked abschneiden, wo das Matchmaking vergleichbare Gegner zusammenbringt. Was übrig bleibt, spiegelt also den Brawler wider und nicht, wer ihn gespielt hat.',
+      caveat:
+        'Ranked besteht nur aus 3-gegen-3-Modi und ist ein kleiner Teil der erfassten Matches, deshalb ist die Liste kürzer und bewegt sich schneller als die Trophäenliste.',
+      unratedHeading: 'Nicht genug Ranked-Daten',
+      unratedBody:
+        'Kompetitives Ranked ist ein kleiner Teil der erfassten Matches, deshalb haben viele Brawler, die auf dem Trophäenpfad regelmäßig gespielt werden, noch zu wenige Ranked-Matches für eine Platzierung.',
+      where: 'Ranked',
+    },
+    trophy: {
+      eyebrow: 'Trophäenpfad',
+      heading: 'Trophäen-Tierlist',
+      battles: 'Trophäen-Matches',
+      intro:
+        'Wie Brawler auf dem Trophäenpfad abschneiden. Die Matches, die die meisten wirklich spielen, Showdown eingeschlossen, in denen du pickst, was du besitzt, und nicht, was der Draft dir übrig lässt.',
+      caveat:
+        'Das Matchmaking auf dem Trophäenpfad ist lockerer als im Ranked, deshalb ist ein Teil der Bilanz eines Brawlers hier die Lobby und nicht der Brawler. Jeder Modus wird an seinem eigenen Durchschnitt gemessen, damit das nicht die Liste bestimmt.',
+      unratedHeading: 'Nicht genug Trophäen-Daten',
+      unratedBody:
+        'Neu erschienene Brawler und alles, was auf dem Trophäenpfad kaum gespielt wird, brauchen mehr Matches, bevor eine Siegquote etwas bedeutet.',
+      where: 'Trophäenpfad',
+    },
+  },
+  heading: (format, mode, rank) => {
+    const h = de.format[format].heading;
+    const base = mode ? `${mode} ${h}` : h;
+    return rank ? `${base} (${rank})` : base;
+  },
+  scopeLabel: (w, mode) => (mode ? `${mode} · ${w}` : w),
+  faq: {
+    bestQ: (format, mode) =>
+      mode
+        ? `Was ist der beste Brawler für ${mode} in Brawl Stars?`
+        : `Was ist der beste Brawler in Brawl Stars ${format === 'ranked' ? 'im Ranked' : 'auf dem Trophäenpfad'}?`,
+    bestA: (a) =>
+      `${a.first} liegt${a.mode ? ` in ${a.mode}` : ''} vorne, mit einer bereinigten Siegquote von ${a.rate} über ${a.games} entschiedene ${a.battles} der letzten ${a.window}.${a.third ? ` Dahinter folgen ${a.second} und ${a.third}.` : ''}`,
+    noneA: (a) =>
+      `In den letzten ${a.window} wurden${a.mode ? ` in ${a.mode}` : ''} noch nicht genug ${a.battles} erfasst, um Brawler zu platzieren. Ein Brawler braucht ${a.floor} entschiedene Matches, bevor er eingeordnet wird.`,
+    howQ: 'Wie entsteht diese Tierlist?',
+    howA: (a) =>
+      `Aus ${a.sampled} ${a.scope}, erfasst aus echten Matches, nicht aus Umfragen oder Meinungen. Die Siegquote wird am Durchschnitt derselben Stichprobe bereinigt, weil die erfassten Spieler unabhängig vom Brawler mehr als die Hälfte ihrer Matches gewinnen. So spiegelt ein Tier den Brawler wider und nicht, wer ihn gespielt hat. Ein Brawler braucht im Zeitraum ${a.floor} entschiedene Matches, bevor er überhaupt bewertet wird.`,
+    oftenQ: 'Wie oft wird die Tierlist aktualisiert?',
+    oftenA:
+      'Alle paar Stunden werden neue Matches erfasst und diese Seite wird aus den neuesten Daten neu erstellt, sie hinkt den Daten also nie mehr als ein paar Stunden hinterher.',
+  },
+  scopeName: (format, mode) => (mode ? `${mode} (${de.format[format].eyebrow.toLowerCase()})` : de.format[format].battles),
+  itemList: (mode) => `Brawl-Stars-Brawler nach Meta-Score sortiert${mode ? ` in ${mode}` : ''}.`,
+  breadcrumbRoot: 'Tierlist',
+  answer: (a) =>
+    `${a.first}, ${a.second} und ${a.third} sind gerade die besten${a.mode ? ` ${a.mode}-` : ' '}Brawler ${a.format === 'ranked' ? 'im Ranked' : 'auf dem Trophäenpfad'}`,
+  lead: (a) => `${a.first} führt mit einer bereinigten Siegquote von ${a.rate} über ${a.games} entschiedene Matches.`,
+  based: (a) =>
+    `Basierend auf ${a.sampled ? `${a.sampled} erfassten ` : 'erfassten '}${a.battles}${a.mode ? ` in ${a.mode}` : ''}${
+      a.rank && a.days ? `, gespielt in ${a.rank}-Lobbys in den letzten ${a.days} Tagen.` : ' von Spielern quer durch die Ranked-Leiter.'
+    }`,
+  disagree: 'Anderer Meinung? Erstell deine eigene',
+  howSummary: 'So funktioniert der Meta-Score',
+  how1: (format) => `Der Meta-Score kombiniert bereinigte Siegquote und Pickrate, relativ zu dieser ${format === 'ranked' ? 'Ranked' : 'Trophäen'}-Liste.`,
+  how2a: 'Brawler werden nach',
+  metaScore: 'Meta-Score',
+  how2b:
+    'von 10 sortiert, der eine bereinigte Siegquote mit einer logarithmisch skalierten Pickrate kombiniert. Die Siegquote allein würde einen Brawler, den niemand spielt, genauso bewerten wie einen Dauerbrenner mit denselben Ergebnissen, deshalb entscheidet die Beliebtheit bei Gleichstand.',
+  how3a: 'Die Skala ist innerhalb dieser Liste kalibriert, die Scores ordnen Brawler also hier gegeneinander und sind nicht vergleichbar mit der',
+  otherList: (format) => (format === 'ranked' ? 'Trophäenliste' : 'Ranked-Liste'),
+  how3b: (floor) =>
+    `. Ein Brawler braucht im Zeitraum ${floor} entschiedene Matches, bevor er überhaupt bewertet wird. Tippe oder fahre über einen Brawler für die volle Aufschlüsselung, oder lies`,
+  fullMethod: 'die ganze Methode',
+  how3c: '– Stichprobe, Modus-Bereinigung, Ankerpunkte und was sie nicht sagen kann.',
+  bracketMissingStrong: (rank) => `Noch nicht genug Matches aus ${rank}-Lobbys`,
+  bracketMissingRest:
+    ', um Brawler auf diesem Rang zu bewerten, deshalb ist das die Liste für alle Ränge. Sie füllt sich in den nächsten Tagen, wenn mehr davon erfasst werden.',
+  bracketWidened: (rank, days, normal) =>
+    `${rank}-Lobbys sind in der Stichprobe gerade dünn (die ersten Tage einer Ranked-Saison sind das meistens), deshalb umfasst diese Liste die letzten ${days} Tage statt ${normal}.`,
+  unratedSub: (floor, w) =>
+    `Jeder braucht ${floor} entschiedene Matches im Zeitraum ${w}; die Zahl unten zeigt, wie weit er ist. Die nächsten zuerst.`,
+  unratedChip: (name, games, floor, battles) => `${name}: ${games} von ${floor} entschiedenen ${battles} für eine Platzierung`,
+  chipTitle: (a) =>
+    `${a.name}: Meta-Score ${a.score} aus ${a.adj} bereinigter Siegquote (${a.raw} roh, gegen einen Durchschnitt von ${a.base} in seinen Modi) und ${a.pick} Pickrate, über ${a.games} entschiedene Matches`,
+  winLetter: 'S',
+  winTitle: 'Bereinigte Siegquote',
+  pickLetter: 'P',
+  pickTitle: 'Pickrate',
+  emptyTitle: (c) => (c ? 'Noch keine aggregierten Daten' : 'Datenbank nicht eingerichtet'),
+  emptyBody: (c, w) =>
+    c ? `Im Zeitraum ${w} wurden noch nicht genug Matches erfasst. Probier einen längeren Zeitraum oder schau gleich wieder vorbei.` : 'Ranglisten sind gerade nicht verfügbar.',
+  browse: 'Brawler-Datenbank durchsuchen',
+  podium: 'Die Top drei gerade',
+  podiumDetail: (rate) => `${rate} Siegquote`,
+};
+
+export const TIER_COPY: Record<Locale, TierCopy> = { en, es, pt, tr, de };

@@ -88,11 +88,22 @@ function Tr({ className = '' }: FlagProps) {
   );
 }
 
+function De({ className = '' }: FlagProps) {
+  return (
+    <svg viewBox="0 0 60 40" aria-hidden className={`${box} ${className}`}>
+      <rect width="60" height="13.34" fill="#000" />
+      <rect y="13.33" width="60" height="13.34" fill="#DD0000" />
+      <rect y="26.66" width="60" height="13.34" fill="#FFCE00" />
+    </svg>
+  );
+}
+
 const FLAGS: Record<Locale, ((p: FlagProps) => React.ReactNode)[]> = {
   en: [Uk, Us],
   es: [Es, Mx],
   pt: [Pt, Br],
   tr: [Tr],
+  de: [De],
 };
 
 /** The flags for a language, side by side. */

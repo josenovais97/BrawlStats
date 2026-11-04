@@ -23,7 +23,7 @@ export interface GameWords {
 }
 
 /** Which of the game's files each locale reads. */
-const GAME_LANG: Record<Exclude<Locale, 'en'>, string> = { es: 'es-419', pt: 'pt', tr: 'tr' };
+const GAME_LANG: Record<Exclude<Locale, 'en'>, string> = { es: 'es-419', pt: 'pt', tr: 'tr', de: 'de' };
 
 /**
  * "FÚTBRAWL 5c5" -> "Fútbrawl 5c5". The game shouts a few names, the 5v5

@@ -59,6 +59,15 @@ const WORDS = {
     win: 'kazanma',
     pick: 'seçilme',
   },
+  de: {
+    title: 'Die meistgepickten Brawler',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Die Brawler, die in den meisten erfassten ${battles}${mode ? ` in ${mode}` : ''} der letzten ${w} auftauchen. Das ist Beliebtheit, nicht Stärke: Die Tiers oben ordnen, wie gut ein Brawler abschneidet, und beides weicht oft voneinander ab. Eine Pickrate ist ein Anteil an allen erfassten Matches, sie summiert sich also über den Kader und nicht auf 100 % pro Match.`,
+    tier: (t: string) => `Tier ${t} auf dieser Liste`,
+    battles: 'Matches',
+    win: 'Siege',
+    pick: 'Picks',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function MostPicked({

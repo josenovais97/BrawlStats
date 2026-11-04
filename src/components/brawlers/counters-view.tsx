@@ -214,6 +214,42 @@ const WORDS: Record<Locale, Words> = {
     ],
     join: list('ve'),
   },
+  de: {
+    title: (n, m) => `So konterst du ${n} in Brawl Stars (${m})`,
+    ogTitle: (n) => `So konterst du ${n}`,
+    description: (n, top) =>
+      `Die besten Konter gegen ${n} im Ranked sind ${top}. Siegquoten gegen ${n} aus echten Ranked-Matches, nach Rang, alle zwei Stunden aktualisiert.`,
+    descriptionNone: (n) => `Wer ${n} in Brawl Stars Ranked schlägt, aus echten Matches, nach Rang.`,
+    fallbackTitle: 'Konter',
+    heading: (n) => `So konterst du ${n}`,
+    intro: (n, top) => `Im Ranked schlagen gerade ${top} ${n} am häufigsten. `,
+    method: (n, d) =>
+      `Aus echten Ranked-Matches der letzten ${d} Tage, alle Ränge, alle zwei Stunden aktualisiert. Jede Zahl ist eine Siegquote gegen ${n}, und wie weit sie über dem liegt, was die normalen Werte der beiden Brawler erwarten lassen.`,
+    best: 'Beste Konter',
+    avoid: (n) => `Nicht gegen ${n} picken`,
+    atRank: 'Konter auf deinem Rang',
+    games: (g, n) => `${g} Matches gegen ${n}`,
+    expected: 'ggü. erwartet',
+    none: (n) => `Noch nicht genug Ranked-Matches gegen ${n}.`,
+    noneAtRank: 'Noch nicht genug Matches auf diesem Rang.',
+    faqWhat: (n) => `Was kontert ${n} in Brawl Stars?`,
+    faqWhatA: (n, top, d) =>
+      `Im Ranked gewinnen ${top} in den letzten ${d} Tagen am häufigsten gegen ${n}, mehr als ihre normalen Siegquoten erwarten lassen.`,
+    faqWhatNone: (n) => `Es gibt noch nicht genug Ranked-Matches gegen ${n}, um Konter zu nennen.`,
+    faqAvoid: (n) => `Wen sollte ich gegen ${n} nicht picken?`,
+    faqAvoidA: (n, l) => `${l} verlieren im Ranked öfter als erwartet gegen ${n}.`,
+    faqAvoidNone: (n) => `Noch kein Brawler verliert auffällig oft gegen ${n}.`,
+    crumbs: 'Brawler',
+    counters: 'Konter',
+    draft: [
+      'Gerade im Draft? Der',
+      'Draft-Helfer',
+      'rechnet Konter, Teamkollegen und die Map für deinen ganzen Draft zusammen, und die kostenlose',
+      'Bubble-App',
+      'zeigt das über dem Spiel an, passend zu deinem Rang.',
+    ],
+    join: list('und'),
+  },
 };
 
 interface Row {

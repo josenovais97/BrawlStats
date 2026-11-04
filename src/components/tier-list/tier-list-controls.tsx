@@ -94,6 +94,18 @@ const WORDS: Record<
     modeGroup: 'Oyun modu',
     sampled: (n) => `${n} incelenen maç`,
   },
+  de: {
+    format: { ranked: { label: 'Ranked', sublabel: 'Kompetitiv' }, trophy: { label: 'Trophäen', sublabel: 'Trophäenpfad' } },
+    window: { '24h': 'Meta', '7d': 'Aktuell' },
+    formatGroup: 'Art der Tierlist',
+    windowGroup: 'Zeitraum',
+    yourRank: 'Dein Rang',
+    allRanks: 'Alle',
+    lobbies: (rank) => `Ranked-Matches in ${rank}`,
+    allModes: 'Alle Modi',
+    modeGroup: 'Spielmodus',
+    sampled: (n) => `${n} erfasste Matches`,
+  },
 };
 
 export function TierListControls({

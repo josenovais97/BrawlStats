@@ -83,6 +83,22 @@ const WORDS = {
     placeWord: () => 'sıra',
     newIn: (t: string) => `${t} tier'a yeni girdi`,
   },
+  de: {
+    tierMove: (from: string, to: string) => `von Tier ${from} auf ${to}, `,
+    places: (n: number, up: boolean) => `${n} ${n === 1 ? 'Platz' : 'Plätze'} ${up ? 'hoch' : 'runter'}, `,
+    score: 'Meta-Score',
+    tier: (t: string) => `Tier ${t}`,
+    whatChanged: 'Was sich geändert hat',
+    against: (span: string) => `Verglichen mit der letzten vergleichbaren Messung, ${span}`,
+    riser: 'Größter Aufsteiger',
+    faller: 'Größter Absteiger',
+    tierChanges: 'Tier-Wechsel',
+    held: (n: number) => `Jeder Brawler hat sein Tier gehalten. ${n} haben sich innerhalb davon bewegt.`,
+    upDown: (up: number, down: number) => `${up} hoch, ${down} runter`,
+    scoreWord: 'Score',
+    placeWord: (n: number) => (n === 1 ? 'Platz' : 'Plätze'),
+    newIn: (t: string) => `neu in ${t}`,
+  },
 } satisfies Record<Locale, unknown>;
 
 /**

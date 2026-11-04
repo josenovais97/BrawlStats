@@ -116,6 +116,28 @@ const WORDS = {
     pick: 'seçilme',
     decided: 'sonuçlanmış maç',
   },
+  de: {
+    title: 'Bewegung im Meta',
+    change: 'Veränderung beim',
+    score: 'Meta-Score',
+    scale:
+      ', auf derselben Skala von 0 bis 10 wie die Tiers oben, gemessen an den gespeicherten täglichen Messungen: Wer hier auftaucht, steigt oder fällt im Ranked-Meta wirklich.',
+    over: (days: number, from: string, to: string) =>
+      `Gemessen ${days === 1 ? 'am letzten Tag' : `in den letzten ${days} Tagen`}, Vergleich der Messungen vom ${from} und ${to}.`,
+    between: 'Gemessen zwischen den zwei neuesten Messungen.',
+    floor:
+      'Beide Seiten erfüllen dasselbe Match-Minimum wie die Tierlist, und Messungen mit unterschiedlichen Methoden werden nie verglichen.',
+    allModes: 'Alle Modi',
+    allModesRest: ': Die täglichen Messungen sind nicht nach Modus getrennt, deshalb gilt der Filter oben hier nicht.',
+    up: 'Im Aufwind',
+    down: 'Im Abwind',
+    noUp: 'In diesem Zeitraum ist niemand gestiegen.',
+    noDown: 'In diesem Zeitraum ist niemand gefallen.',
+    unit: 'Meta-Score /10',
+    win: 'Siege',
+    pick: 'Picks',
+    decided: 'entschiedene Matches',
+  },
 } satisfies Record<Locale, unknown>;
 
 type Words = (typeof WORDS)[Locale];

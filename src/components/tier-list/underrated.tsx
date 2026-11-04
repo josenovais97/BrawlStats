@@ -61,6 +61,14 @@ const WORDS = {
       `${name}: ${games} sonuçlanmış maçta ${adj} düzeltilmiş kazanma oranı, ${pick} seçilme oranı`,
     pick: 'seçilme oranı',
   },
+  de: {
+    title: 'Stark, aber selten gepickt',
+    body: (battles: string, mode: string | undefined, w: string) =>
+      `Die Brawler mit der besten bereinigten Siegquote in der weniger gespielten Hälfte des Kaders, aus erfassten ${battles}${mode ? ` in ${mode}` : ''} der letzten ${w}. Sie gewinnen, wenn sie gespielt werden, werden aber selten gespielt, was meist heißt, dass sie unterschätzt sind und nicht schlecht.`,
+    title2: (name: string, adj: string, games: string, pick: string) =>
+      `${name}: ${adj} bereinigte Siegquote in ${games} entschiedenen Matches, ${pick} Pickrate`,
+    pick: 'Pickrate',
+  },
 } satisfies Record<Locale, unknown>;
 
 export function Underrated({

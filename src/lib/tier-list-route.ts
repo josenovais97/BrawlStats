@@ -204,6 +204,26 @@ const INTL: Record<
     ],
     last24: ', son 24 saat',
   },
+  de: {
+    where: { ranked: 'Ranked', trophy: 'Trophäen' },
+    index: (where, month) => [
+      `Brawl Stars ${where === 'Ranked' ? 'Ranked' : 'Trophäen'}-Tierlist (${month}): die besten Brawler`,
+      `Die besten Brawler in Brawl Stars ${where === 'Ranked' ? 'im Ranked' : 'auf dem Trophäenpfad'}, ${month}. Aus Sieg- und Pickraten echter Matches, alle paar Stunden aktualisiert.`,
+    ],
+    mode: (mode, where, month) => [
+      `Beste Brawler für ${mode} in Brawl Stars (${month}): ${where === 'Ranked' ? 'Ranked' : 'Trophäen'}-Tierlist`,
+      `Die Brawler, die in ${mode} gerade am meisten gewinnen, sortiert nach echten ${where === 'Ranked' ? 'Ranked' : 'Trophäen'}-Matches und alle paar Stunden aktualisiert. Sieh dir die besten vor deinem nächsten ${mode}-Match an.`,
+    ],
+    rank: (rank, month) => [
+      `Brawl Stars Tierlist für ${rank} (${month}): die besten Brawler auf deinem Rang`,
+      `Die besten Brawler in Brawl Stars auf ${rank}, ${month}. Nur aus Ranked-Matches, die auf ${rank} gespielt wurden, denn das Meta auf deinem Rang ist nicht das ganz oben.`,
+    ],
+    rankMode: (mode, rank, month) => [
+      `Beste Brawler für ${mode} auf ${rank} (${month}): Brawl Stars Tierlist`,
+      `Die Brawler, die in ${mode} auf ${rank} am meisten gewinnen, aus echten Ranked-Matches dieses Rangs, alle paar Stunden aktualisiert.`,
+    ],
+    last24: ', letzte 24 Stunden',
+  },
 };
 
 export async function tierListMetadata(

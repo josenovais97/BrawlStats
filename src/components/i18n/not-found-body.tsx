@@ -32,6 +32,12 @@ const WORDS = {
     back: 'Aramaya dön',
     tiers: 'Tier listesi',
   },
+  de: {
+    title: 'Seite nicht gefunden',
+    body: 'Diese Seite gibt es nicht, oder es gab sie mal und jetzt nicht mehr. Maps und Modi rotieren, deshalb kann ein alter Link länger leben als das, worauf er gezeigt hat.',
+    back: 'Zurück zur Suche',
+    tiers: 'Tierlist',
+  },
 };
 
 /** The 404, in the language of the address that was asked for. */
