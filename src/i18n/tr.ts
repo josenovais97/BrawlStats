@@ -4874,4 +4874,20 @@ export const TR: Record<string, string> = {
     "Supercell'in Kasım 2026 sürüm notları",
   "Every balance change in this update":
     "Bu güncellemedeki tüm denge değişiklikleri",
+  "Brawl Stars leaderboard: top 200 players by trophies":
+    "Brawl Stars sıralaması: kupaya göre ilk 200 oyuncu",
+  "Brawl Stars club leaderboard":
+    "Brawl Stars kulüp sıralaması",
+  "Brawl Stars Ranked leaderboard":
+    "Brawl Stars Aşamalı sıralaması",
+  "Brawl Stars skin and icon popularity":
+    "Brawl Stars kostüm ve simge popülerliği",
+  "Who has the most trophies in Brawl Stars right now: the global top 200 and every regional board, from the game's own official ranking, refreshed every 15 minutes.":
+    "Şu anda Brawl Stars'ta en çok kupası olan kim: dünya genelinde ilk 200 ve her bölgesel sıralama, oyunun kendi resmi sıralamasından, 15 dakikada bir güncellenir.",
+  "The top Brawl Stars clubs by combined member trophies, from the game API's own global ranking, with per-region boards.":
+    "Üyelerinin toplam kupasına göre en iyi Brawl Stars kulüpleri, oyun API'sinin kendi küresel sıralamasından, bölge bazında sıralamalarla.",
+  "The highest Ranked elo among the players BrawlZone samples. The game API publishes no Ranked leaderboard, so this board is built from our own daily samples rather than mirrored from Supercell.":
+    "BrawlZone'un örneklediği oyuncular arasındaki en yüksek Aşamalı elo. Oyun API'si Aşamalı sıralaması yayınlamıyor, bu yüzden bu sıralama Supercell'den kopyalanmak yerine kendi günlük örneklerimizden oluşturuluyor.",
+  "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
+    "Brawl Stars oyuncularının gerçekten kullandığı kostümler ve profil simgeleri, BrawlZone'un oyuncu havuzundan aldığı günlük örneklerle sayıldı.",
 };

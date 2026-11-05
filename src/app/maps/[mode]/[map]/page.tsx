@@ -154,6 +154,11 @@ export default async function MapPage({ params }: PageProps) {
   // Layout and environment. The mode is passed so a map name shared across
   // modes cannot pick up the wrong page's description.
   const mapWiki = await getMapWiki(entry.map.name, modeLabelEn).catch(() => null);
+  // The wiki's prose is English. On a translated page it would sit in English
+  // in the middle of the page's language, and the same paragraph would repeat
+  // on every language version, so only the English page quotes it. The
+  // environment name is a proper noun and stays on every version.
+  const wikiProse = requestLocale() === 'en' ? mapWiki : null;
 
   // Database reads run one after the other so the page never needs more than
   // one connection, and each degrades to empty on its own.
@@ -221,11 +226,11 @@ export default async function MapPage({ params }: PageProps) {
         },
       ),
     },
-    ...(mapWiki?.layout
+    ...(wikiProse?.layout
       ? [
           {
             question: t('How is {name} laid out?', { name: nm(entry.map.name) }),
-            answer: mapWiki.layout,
+            answer: wikiProse.layout,
           },
         ]
       : []),
@@ -380,20 +385,20 @@ export default async function MapPage({ params }: PageProps) {
         </section>
       ) : null}
 
-      {mapWiki?.layout ? (
+      {wikiProse?.layout ? (
         <section>
           <SectionHeading
             title={t('Layout')}
             subtitle={t('How the map is built, and what that rewards.')}
           />
           <div className="card space-y-3 p-5">
-            {mapWiki.intro ? (
-              <p className="text-sm leading-relaxed text-muted">{mapWiki.intro}</p>
+            {wikiProse.intro ? (
+              <p className="text-sm leading-relaxed text-muted">{wikiProse.intro}</p>
             ) : null}
-            <p className="leading-relaxed">{mapWiki.layout}</p>
+            <p className="leading-relaxed">{wikiProse.layout}</p>
             <p className="text-xs text-muted">{t('Layout description from the')}{' '}
               <a
-                href={lp(wikiPageUrl(mapWiki.title))}
+                href={lp(wikiPageUrl(wikiProse.title))}
                 rel="noreferrer noopener"
                 target="_blank"
                 className="font-medium text-brand hover:underline"

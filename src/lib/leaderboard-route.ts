@@ -136,8 +136,16 @@ const BOARD_COPY: Record<LeaderboardBoard, { title: string; description: string 
   },
 };
 
-export function leaderboardMetadata({ board, region }: LeaderboardRoute): Metadata {
-  const copy = BOARD_COPY[board];
+/**
+ * `t` comes from the calling page: this module is also loaded by the proxy and
+ * a client component, so it must not import the dictionaries itself. The
+ * language wrappers translate metadata after the fact, but by then the month
+ * is already in the title and no dictionary key matches, so the copy is
+ * translated here, before the month goes in.
+ */
+export function leaderboardMetadata({ board, region }: LeaderboardRoute, t: (text: string) => string = (text) => text): Metadata {
+  const en = BOARD_COPY[board];
+  const copy = { title: t(en.title), description: t(en.description) };
   const atDefaultRegion = region === DEFAULT_REGION;
 
   if (atDefaultRegion) {

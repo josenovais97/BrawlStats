@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import { LeaderboardView } from '@/components/leaderboard/leaderboard-view';
 import { leaderboardMetadata, resolveLeaderboardRoute } from '@/lib/leaderboard-route';
+import { requestLocale } from '@/lib/request-locale';
+import { getT } from '@/lib/t';
 
 /**
  * Fifteen minutes, not two.
@@ -30,7 +32,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { board } = await params;
-  return leaderboardMetadata(resolveLeaderboardRoute([board]));
+  return leaderboardMetadata(resolveLeaderboardRoute([board]), getT(requestLocale()));
 }
 
 /** One board at the default region. See `resolveLeaderboardRoute`. */

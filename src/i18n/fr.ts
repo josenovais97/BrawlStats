@@ -4875,4 +4875,20 @@ export const FR: Record<string, string> = {
     "Les notes de mise à jour de novembre 2026 de Supercell",
   "Every balance change in this update":
     "Tous les équilibrages de cette mise à jour",
+  "Brawl Stars leaderboard: top 200 players by trophies":
+    "Classement Brawl Stars : top 200 des joueurs par trophées",
+  "Brawl Stars club leaderboard":
+    "Classement des clubs Brawl Stars",
+  "Brawl Stars Ranked leaderboard":
+    "Classement du mode Classé de Brawl Stars",
+  "Brawl Stars skin and icon popularity":
+    "Popularité des skins et icônes de Brawl Stars",
+  "Who has the most trophies in Brawl Stars right now: the global top 200 and every regional board, from the game's own official ranking, refreshed every 15 minutes.":
+    "Qui a le plus de trophées sur Brawl Stars en ce moment : le top 200 mondial et chaque classement régional, d'après le classement officiel du jeu, mis à jour toutes les 15 minutes.",
+  "The top Brawl Stars clubs by combined member trophies, from the game API's own global ranking, with per-region boards.":
+    "Les meilleurs clubs Brawl Stars par trophées cumulés de leurs membres, d'après le classement mondial de l'API du jeu, avec des classements par région.",
+  "The highest Ranked elo among the players BrawlZone samples. The game API publishes no Ranked leaderboard, so this board is built from our own daily samples rather than mirrored from Supercell.":
+    "L'elo Classé le plus élevé parmi les joueurs qu'échantillonne BrawlZone. L'API du jeu ne publie aucun classement Classé, donc celui-ci est construit à partir de nos propres échantillons quotidiens au lieu d'être copié de Supercell.",
+  "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
+    "Les skins et icônes de profil que les joueurs de Brawl Stars équipent vraiment, comptés à partir des échantillons quotidiens de BrawlZone.",
 };

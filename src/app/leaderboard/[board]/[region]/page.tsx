@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import { LeaderboardView } from '@/components/leaderboard/leaderboard-view';
 import { leaderboardMetadata, resolveLeaderboardRoute } from '@/lib/leaderboard-route';
+import { requestLocale } from '@/lib/request-locale';
+import { getT } from '@/lib/t';
 
 /**
  * Fifteen minutes, not two.
@@ -29,7 +31,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { board, region } = await params;
-  return leaderboardMetadata(resolveLeaderboardRoute([board, region]));
+  return leaderboardMetadata(resolveLeaderboardRoute([board, region]), getT(requestLocale()));
 }
 
 /** One board in one region. 404s on the boards that have no region dimension. */

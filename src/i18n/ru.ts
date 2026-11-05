@@ -4875,4 +4875,20 @@ export const RU: Record<string, string> = {
     "Описание обновления Supercell за ноябрь 2026 года",
   "Every balance change in this update":
     "Все изменения баланса в этом обновлении",
+  "Brawl Stars leaderboard: top 200 players by trophies":
+    "Рейтинг Brawl Stars: топ-200 игроков по трофеям",
+  "Brawl Stars club leaderboard":
+    "Рейтинг клубов Brawl Stars",
+  "Brawl Stars Ranked leaderboard":
+    "Рейтинг ранговых боёв Brawl Stars",
+  "Brawl Stars skin and icon popularity":
+    "Популярность скинов и иконок в Brawl Stars",
+  "Who has the most trophies in Brawl Stars right now: the global top 200 and every regional board, from the game's own official ranking, refreshed every 15 minutes.":
+    "У кого больше всего трофеев в Brawl Stars прямо сейчас: мировой топ-200 и все региональные рейтинги по официальным данным самой игры, с обновлением каждые 15 минут.",
+  "The top Brawl Stars clubs by combined member trophies, from the game API's own global ranking, with per-region boards.":
+    "Лучшие клубы Brawl Stars по сумме трофеев участников — по мировому рейтингу из API самой игры, с рейтингами по регионам.",
+  "The highest Ranked elo among the players BrawlZone samples. The game API publishes no Ranked leaderboard, so this board is built from our own daily samples rather than mirrored from Supercell.":
+    "Самое высокое Эло в ранговых боях среди игроков, которых собирает BrawlZone. API игры не публикует рейтинг ранговых боёв, поэтому этот рейтинг построен на наших собственных ежедневных выборках, а не скопирован у Supercell.",
+  "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
+    "Какие скины и иконки профиля игроки Brawl Stars ставят на самом деле — по ежедневным выборкам BrawlZone.",
 };

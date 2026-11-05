@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import { LeaderboardView } from '@/components/leaderboard/leaderboard-view';
 import { leaderboardMetadata, resolveLeaderboardRoute } from '@/lib/leaderboard-route';
+import { requestLocale } from '@/lib/request-locale';
+import { getT } from '@/lib/t';
 
 /**
  * Fifteen minutes, not two.
@@ -19,7 +21,7 @@ import { leaderboardMetadata, resolveLeaderboardRoute } from '@/lib/leaderboard-
 export const revalidate = 900;
 
 export function generateMetadata(): Metadata {
-  return leaderboardMetadata(resolveLeaderboardRoute([]));
+  return leaderboardMetadata(resolveLeaderboardRoute([]), getT(requestLocale()));
 }
 
 export default function LeaderboardPage() {
