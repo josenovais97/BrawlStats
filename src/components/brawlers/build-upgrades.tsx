@@ -129,15 +129,10 @@ export function BuildAndUpgrades({
         {/* One line, then the full caveat on request. The paragraph opened
             the section people came to the page for, three lines deep, before
             a single card; the caveat still travels with the numbers. */}
-        <details className="group mb-4 text-sm text-muted">
-          <summary className="flex cursor-pointer list-none items-center gap-2 leading-relaxed [&::-webkit-details-marker]:hidden">
-            <span>
-              <strong className="font-semibold text-foreground">{t('What owners bought')}</strong>{' '}{t('and')}{' '}
-              <strong className="font-semibold text-foreground">{t('how it has gone')}</strong>{' '}{t('for them.')}</span>
-            <span className="shrink-0 text-xs font-semibold text-brand group-open:hidden">{t('How to read this')}</span>
-          </summary>
-          <p className="mt-2 leading-relaxed">{t('What owners bought is popularity — the game\'s API reports what a player has unlocked, never what they took into a match. How it has gone is the win rate among the players who made each choice, which covers the ability and the kind of player who picks it together. Neither is a recommendation from us: BrawlZone does not rank')}{' '}{t('{name}\'s kit, and nothing here is an opinion about what you should buy.', { name: name })}</p>
-        </details>
+        <p className="mb-4 text-sm leading-relaxed text-muted">
+          <strong className="font-semibold text-foreground">{t('What owners bought')}</strong>{' '}{t('and')}{' '}
+          <strong className="font-semibold text-foreground">{t('how it has gone')}</strong>{' '}{t('for them.')}
+        </p>
 
         {/* What other owners bought. First, because it is the part people
             came for; the kit reference follows. */}
@@ -216,7 +211,7 @@ export function BuildAndUpgrades({
                       }
                     />
                     {!hyperchargeDescription ? (
-                      <p className="mt-2 text-xs leading-relaxed text-muted/80">{t('The exact boost percentages vary per brawler and are published neither by the game API nor by any artwork source.')}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-muted/80">{t('Exact boost values vary per brawler.')}</p>
                     ) : null}
                   </div>
                 </div>

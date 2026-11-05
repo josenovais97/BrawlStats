@@ -266,16 +266,10 @@ export const TR: Record<string, string> = {
     "Kendi incelememizin ortaya çıkardığı, hiçbir tier listesinin söylemeyeceği şeyler.",
   " Almost all of them own both star powers and both gadgets.":
     " Neredeyse hepsinde iki yıldız gücü ve iki aksesuar da var.",
-  "Gears cost coins and you can only run two, so what owners have bought is a real preference.":
-    "Eşyalar altına mal olur ve yalnızca ikisini kullanabilirsin; bu yüzden sahiplerinin satın aldıkları gerçek bir tercihtir.",
   "Gears owners buy":
     "Sahiplerin aldığı eşyalar",
   "Measured across {sampleSize} tracked players who own this brawler.":
     "Bu savaşçıya sahip {sampleSize} takip edilen oyuncu üzerinden ölçüldü.",
-  "No sampled player owns this brawler yet, so there is nothing to measure. This fills in over the next few days as the sampler works through profiles.":
-    "Henüz incelenen hiçbir oyuncu bu savaşçıya sahip değil, yani ölçülecek bir şey yok. Sistem profilleri taradıkça önümüzdeki günlerde dolacak.",
-  "One of these is noticeably more common than the other, which usually means it came first or is the one people buy.":
-    "Bunlardan biri diğerinden belirgin şekilde daha yaygın; bu genelde önce o çıktığı ya da insanların onu satın aldığı anlamına gelir.",
   "See what is strong right now":
     "Şu an neyin güçlü olduğuna bak",
   "of picks":
@@ -284,30 +278,12 @@ export const TR: Record<string, string> = {
     "Bu savaşçıda kaydedilen tüm eşya kilit açımları içinde {owners} açım",
   "{unlockRate} of owners":
     "sahiplerin {unlockRate} kadarı",
-  "“Of owners” is how many of them have that item; “of picks” is its share of every unlock of that kind, which is what makes the options comparable with each other. A player can own several gears, so the first column does not add up to 100% and the second does.":
-    "“Sahiplerin” o öğeye sahip olanların oranıdır; “seçimlerin” ise o türdeki tüm kilit açımları içindeki payıdır ve seçenekleri birbiriyle karşılaştırılabilir yapan budur. Bir oyuncu birden fazla eşyaya sahip olabilir, bu yüzden ilk sütun %100 etmez, ikincisi eder.",
   " Dashed lines mark updates that changed this brawler.":
     " Kesikli çizgiler bu savaşçıyı değiştiren güncellemeleri gösterir.",
   "Adjusted win rate over the last {days} daily snapshots, from {first} to {last}{v}":
     "Son {days} günlük ölçümde düzeltilmiş kazanma oranı, {first} ile {last} arası{v}",
-  "{days} daily snapshots. Adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.":
-    "{days} günlük ölçüm. Örneklem ortalamasına göre düzeltildi; buradaki bir değişim grubun değil savaşçının hareketidir.",
-  " On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.":
-    " Uzun süredir oyunda olan bir savaşçıda neredeyse herkes ikisine de sahiptir; sahip olmayan az sayıdaki kişi küçük ve kendi kendini seçmiş bir gruptur. Bunu bir gösterge olarak al.",
-  "Almost every owner has both, so there are too few first-buyers left to name a preference.":
-    "Neredeyse her sahip ikisine de sahip; bir tercihten söz edecek kadar ilk alıcı kalmadı.",
-  "Among owners who have only one so far. Win rates cover the choice and the chooser together.":
-    "Şimdilik yalnızca birine sahip olanlar arasında. Kazanma oranları seçimi ve seçeni birlikte kapsar.",
-  "Counted from tracked players who own exactly one of the pair: they chose it, and every battle they played on this brawler was played with it, so this measures a decision rather than ownership.":
-    "Çiftin tam olarak birine sahip takip edilen oyunculardan sayıldı: onu seçtiler ve bu savaşçıyla oynadıkları her maç onunla oynandı; yani bu sahipliği değil bir kararı ölçer.",
-  "It is not a controlled comparison.":
-    "Kontrollü bir karşılaştırma değildir.",
   "Most picked":
     "En çok seçilen",
-  "Read from {sampleSize} first-buyers":
-    "{sampleSize} ilk alıcıdan okundu",
-  "Which option a player bought is their own choice, so each win rate covers the ability and the kind of player who picks it together. Owning one option does not make two groups otherwise alike, and nothing here separates the two. Read it as how it has gone for the people who bought each one — not as what the ability will do to your win rate.":
-    "Bir oyuncunun hangi seçeneği aldığı kendi tercihidir; bu yüzden her kazanma oranı yeteneği ve onu seçen oyuncu tipini birlikte kapsar. Bir seçeneğe sahip olmak iki grubu başka yönlerden benzer yapmaz ve buradaki hiçbir şey ikisini ayırmaz. Bunu her birini alanlar için işlerin nasıl gittiği olarak oku; yeteneğin senin kazanma oranına ne yapacağı olarak değil.",
   "player":
     "oyuncu",
   "players":
@@ -324,8 +300,6 @@ export const TR: Record<string, string> = {
     ", CC-BY-SA. Kazanma oranları, seçilme oranları ve eşleşmeler bize aittir.",
   "Across tracked players":
     "Takip edilen oyuncular genelinde",
-  "Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list":
-    "Logaritmik ölçekli seçilme oranıyla birleştirilmiş düzeltilmiş kazanma oranı, Aşamalı tier listesi içinde ayarlanmış",
   "All brawlers":
     "Tüm savaşçılar",
   "Avg rank":
@@ -350,8 +324,6 @@ export const TR: Record<string, string> = {
     "Savaş istatistikleri",
   "Combat stats, ability and gear descriptions, hypercharge and buffie effects, and balance history from the":
     "Savaş istatistikleri, yetenek ve eşya açıklamaları, hiperşarj ve buffie etkileri ve denge geçmişi şuradan:",
-  "Each mode and map is scored against its own average, so a showdown record and a gem grab one can be read in the same list.":
-    "Her mod ve harita kendi ortalamasına göre puanlanır; böylece bir hesaplaşma kaydı ile bir elmas kapmaca kaydı aynı listede okunabilir.",
   "Hits to Super":
     "Süper için vuruş",
   "How to counter {name} in Ranked, by rank →":
@@ -372,8 +344,6 @@ export const TR: Record<string, string> = {
     "Bu kimliğe sahip bir savaşçı yok.",
   "No longer available in the game. This page is kept for its history.":
     "Artık oyunda yok. Bu sayfa geçmişi için tutuluyor.",
-  "Not enough sampled battles for {name} yet. The sampler works through the global leaderboard pool continuously, so newly released brawlers fill in over the following days.":
-    "{name} için henüz yeterli incelenmiş maç yok. Sistem küresel sıralama havuzunu sürekli tarar; yeni çıkan savaşçılar sonraki günlerde dolar.",
   "Performance":
     "Performans",
   "Pick rate":
@@ -432,8 +402,6 @@ export const TR: Record<string, string> = {
     "{name} dizilimi ve istatistikleri, {v}",
   "{name} has a {normalizedWinRate} adjusted win rate and a {usageRate} pick rate over {decidedSampleSize} sampled decided battles{v}.":
     "{name}, {decidedSampleSize} incelenmiş sonuçlanan maçta {normalizedWinRate} düzeltilmiş kazanma oranına ve {usageRate} seçilme oranına sahip{v}.",
-  "{name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.":
-    "{name} kazanma oranı için henüz yeterince incelenmedi. Tier listeleri arkasında yeterli maç olan her savaşçıyı kapsar.",
   "{name} has {v} as star powers and {v2} as gadgets.":
     "{name} yıldız güçleri: {v}; aksesuarları: {v2}.",
   "{name} is a new{v} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.":
@@ -476,8 +444,6 @@ export const TR: Record<string, string> = {
     "Zayıf olduğu rakipler",
   "{baseline} win rate across":
     "{baseline} kazanma oranının üstünde veya altında kalan yüzde puan; kapsam:",
-  "{sampleSize} sampled team battles. Counted once per battle from one player’s side, and kept out of the win-rate and pick-rate numbers above. Those would be skewed by counting every participant.":
-    "{sampleSize} incelenmiş takım maçı. Her maç bir oyuncunun tarafından bir kez sayılır ve yukarıdaki kazanma ve seçilme oranlarına katılmaz; her katılımcıyı saymak onları çarpıtırdı.",
   "{winRate} win rate over {decidedSampleSize} sampled battles, against a {baseline} average for this brawler":
     "İncelenen {decidedSampleSize} maçta {winRate} kazanma oranı; bu savaşçının ortalaması {baseline}",
   "Almost every sampled {name} owner is on the default skin.":
@@ -510,8 +476,6 @@ export const TR: Record<string, string> = {
     "Henüz adı yok",
   "Not released yet":
     "Henüz çıkmadı",
-  "Nothing beyond the name has been published for {name} yet. This page fills in as the wiki does.":
-    "{name} için henüz addan başka bir şey yayınlanmadı. Bu sayfa wiki doldukça dolar.",
   "Ranked and ladder win rates, pick rate and tier.":
     "Aşamalı ve kupa kazanma oranları, seçilme oranı ve tier.",
   "The highest-trophy accounts playing it.":
@@ -524,12 +488,6 @@ export const TR: Record<string, string> = {
     "En iyi oyuncular",
   "Which brawlers it beats, and which beat it.":
     "Hangi savaşçıları yendiği ve hangilerinin onu yendiği.",
-  "{name} has been revealed but is not playable yet, so there are no sampled battles behind this page. Everything below comes from the community wiki and fills in over the days after a reveal.":
-    "{name} duyuruldu ama henüz oynanabilir değil, bu yüzden bu sayfanın arkasında incelenmiş maç yok. Aşağıdaki her şey topluluk wikisinden gelir ve duyurudan sonraki günlerde dolar.",
-  "{name} is not playable, so no battles have been sampled. This fills in within a day or two of release.":
-    "{name} oynanabilir değil, bu yüzden hiç maç incelenmedi. Çıkıştan sonraki bir iki gün içinde dolar.",
-  "· Stats and abilities from the Brawl Stars Wiki, which is community edited and may change before release.":
-    "· İstatistikler ve yetenekler topluluk tarafından düzenlenen Brawl Stars Wiki'den alınır ve çıkıştan önce değişebilir.",
   "Best maps":
     "En iyi haritalar",
   "Best modes":
@@ -550,8 +508,6 @@ export const TR: Record<string, string> = {
     "Aksesuarlar",
   "Gears":
     "Eşyalar",
-  "How to read this":
-    "Nasıl okunur",
   "No gadgets released.":
     "Çıkmış aksesuar yok.",
   "No star powers released.":
@@ -560,16 +516,12 @@ export const TR: Record<string, string> = {
     "Çıktı.",
   "Star powers":
     "Yıldız güçleri",
-  "The exact boost percentages vary per brawler and are published neither by the game API nor by any artwork source.":
-    "Tam güçlendirme yüzdeleri savaşçıya göre değişir ve ne oyun API'si ne de herhangi bir görsel kaynak tarafından yayınlanır.",
   "Unlocked at Power 11. Charges from dealing and taking damage, then boosts {name}'s speed, damage and shield for a few seconds.":
     "Güç 11'de açılır. Hasar verip aldıkça dolar, ardından birkaç saniyeliğine {name} savaşçısının hızını, hasarını ve kalkanını artırır.",
   "Unreleased.":
     "Çıkmadı.",
   "What owners bought":
     "Sahiplerin aldıkları",
-  "What owners bought is popularity — the game's API reports what a player has unlocked, never what they took into a match. How it has gone is the win rate among the players who made each choice, which covers the ability and the kind of player who picks it together. Neither is a recommendation from us: BrawlZone does not rank":
-    "Sahiplerin aldıkları popülerliktir: oyunun API'si bir oyuncunun neyin kilidini açtığını bildirir, maça ne götürdüğünü asla. Nasıl gittiği, her seçimi yapan oyuncular arasındaki kazanma oranıdır ve yeteneği ve onu seçen oyuncu tipini birlikte kapsar. İkisi de bizden bir tavsiye değil: BrawlZone",
   "What {name}'s kit does, and what owners spend their coins on first.":
     "{name} kitinin ne yaptığı ve sahiplerin altınlarını önce neye harcadığı.",
   "for them.":
@@ -582,8 +534,6 @@ export const TR: Record<string, string> = {
     "{name} savaşçısının buffie'leri var ama etkileri henüz belgelenmedi.",
   "{name} has no buffies yet.":
     "{name} savaşçısının henüz buffie'si yok.",
-  "{name}'s kit, and nothing here is an opinion about what you should buy.":
-    "{name} kitini sıralamaz ve buradaki hiçbir şey ne alman gerektiğine dair bir görüş değildir.",
   "Compare":
     "Karşılaştır",
   "Most owned":
@@ -4892,4 +4842,32 @@ export const TR: Record<string, string> = {
     "Brawl Stars oyuncularının gerçekten kullandığı kostümler ve profil simgeleri, BrawlZone'un oyuncu havuzundan aldığı günlük örneklerle sayıldı.",
   "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
     "Brawl Stars'ta {name}: aksesuarlar, yıldız güçleri, eşyalar, en iyi modlar ve haritalar, her gün güncellenir.",
+  "Not enough battles for {name} yet to give a win rate.":
+    "{name} için henüz kazanma oranı verecek kadar maç yok.",
+  "Win rate and pick rate combined, out of 10":
+    "Kazanma ve seçilme oranı birlikte, 10 üzerinden",
+  "Not enough battles for {name} yet. New brawlers fill in within a few days.":
+    "{name} için henüz yeterli maç yok. Yeni savaşçıların verisi birkaç gün içinde dolar.",
+  "Each mode and map is compared with its own average.":
+    "Her mod ve harita kendi ortalamasıyla karşılaştırılır.",
+  "Players who own only one of the two.":
+    "İkisinden yalnızca birine sahip oyuncular.",
+  "Almost every owner has both, so there is no clear first pick.":
+    "Neredeyse tüm sahiplerde ikisi de var, bu yüzden net bir ilk tercih yok.",
+  "{sampleSize} team battles.":
+    "{sampleSize} takım maçı.",
+  "{days} daily snapshots.":
+    "{days} günlük kayıt.",
+  "Exact boost values vary per brawler.":
+    "Kesin artış değerleri savaşçıya göre değişir.",
+  "No data yet. This fills in within a few days.":
+    "Henüz veri yok. Birkaç gün içinde dolar.",
+  "{name} is not out yet. Everything below is from the Brawl Stars Wiki.":
+    "{name} henüz çıkmadı. Aşağıdaki her şey Brawl Stars Wiki'den.",
+  "Only the name of {name} is known so far.":
+    "Şimdilik {name} hakkında yalnızca isim biliniyor.",
+  "No battles yet. Stats for {name} appear a day or two after release.":
+    "Henüz maç yok. {name} istatistikleri çıkıştan bir iki gün sonra görünür.",
+  "· Stats from the Brawl Stars Wiki. They may change before release.":
+    "· İstatistikler Brawl Stars Wiki'den. Çıkıştan önce değişebilir.",
 };

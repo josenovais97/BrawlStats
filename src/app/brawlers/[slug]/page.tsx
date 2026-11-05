@@ -686,7 +686,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
       answer:
         stat && normalizedWinRate !== null
           ? t('{name} has a {normalizedWinRate} adjusted win rate and a {usageRate} pick rate over {decidedSampleSize} sampled decided battles{v}.', { name: name, normalizedWinRate: formatPercent(normalizedWinRate), usageRate: formatPercent(stat.usageRate), decidedSampleSize: formatNumber(stat.decidedSampleSize), v: tier ? `, which puts it in ${tier} tier` : '' })
-          : t('{name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.', { name: name }),
+          : t('Not enough battles for {name} yet to give a win rate.', { name: name }),
     },
     ...(splits.modes.length > 0
       ? [
@@ -859,7 +859,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
                      here cannot disagree with the number there. */
                   <p
                     className="text-sm text-muted"
-                    title={t('Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list')}
+                    title={t('Win rate and pick rate combined, out of 10')}
                   >{t('Meta score')}{' '}<span className="font-bold tabular-nums text-foreground">{metaScore.toFixed(1)}</span>/10</p>
                 ) : null}
               </div>
@@ -1119,7 +1119,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           /* An empty state that ends the visit is a wasted one. This says what
              is missing and offers the two pages that do have an answer. */
           <div className="card p-6">
-            <p className="text-sm leading-relaxed text-muted">{t('Not enough sampled battles for {name} yet. The sampler works through the global leaderboard pool continuously, so newly released brawlers fill in over the following days.', { name: name })}</p>
+            <p className="text-sm leading-relaxed text-muted">{t('Not enough battles for {name} yet. New brawlers fill in within a few days.', { name: name })}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link
                 href={lp('/tier-list/ranked')}
@@ -1144,7 +1144,7 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
         <section>
           <SectionHeading
             title={t('Where it performs')}
-            subtitle={t('Each mode and map is scored against its own average, so a showdown record and a gem grab one can be read in the same list.')}
+            subtitle={t('Each mode and map is compared with its own average.')}
           />
           <BrawlerSplits
             modes={splits.modes}

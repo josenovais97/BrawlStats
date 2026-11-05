@@ -162,7 +162,7 @@ export function BrawlerTrend({
         </ul>
       ) : null}
 
-      <p className="mt-2 text-xs text-muted">{t('{days} daily snapshots. Adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.', { days: days })}{marks.length > 0 ? t(' Dashed lines mark updates that changed this brawler.') : ''}
+      <p className="mt-2 text-xs text-muted">{t('{days} daily snapshots.', { days: days })}{marks.length > 0 ? t(' Dashed lines mark updates that changed this brawler.') : ''}
       </p>
     </div>
   );

@@ -131,7 +131,7 @@ export function BrawlerMatchups({
         ))}
       </div>
 
-      <p className="text-xs leading-relaxed text-muted">{t('Percentage points above or below this brawler’s own')}{' '}{t('{baseline} win rate across', { baseline: formatPercent(pairings.baseline) })}{' '}{t('{sampleSize} sampled team battles. Counted once per battle from one player’s side, and kept out of the win-rate and pick-rate numbers above. Those would be skewed by counting every participant.', { sampleSize: formatNumber(pairings.sampleSize) })}</p>
+      <p className="text-xs leading-relaxed text-muted">{t('Percentage points above or below this brawler’s own')}{' '}{t('{baseline} win rate across', { baseline: formatPercent(pairings.baseline) })}{' '}{t('{sampleSize} team battles.', { sampleSize: formatNumber(pairings.sampleSize) })}</p>
     </div>
   );
 }

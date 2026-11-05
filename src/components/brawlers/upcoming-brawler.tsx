@@ -77,7 +77,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
               ) : null}
             </div>
             <h1 className="display mt-3 text-3xl capitalize sm:text-4xl">{name.toLowerCase()}</h1>
-            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">{t('{name} has been revealed but is not playable yet, so there are no sampled battles behind this page. Everything below comes from the community wiki and fills in over the days after a reveal.', { name: name })}</p>
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">{t('{name} is not out yet. Everything below is from the Brawl Stars Wiki.', { name: name })}</p>
           </div>
         </div>
       </header>
@@ -116,7 +116,7 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
       ) : null}
 
       {bare ? (
-        <p className="card p-5 text-sm leading-relaxed text-muted">{t('Nothing beyond the name has been published for {name} yet. This page fills in as the wiki does.', { name: name })}</p>
+        <p className="card p-5 text-sm leading-relaxed text-muted">{t('Only the name of {name} is known so far.', { name: name })}</p>
       ) : null}
 
       {/*
@@ -138,12 +138,12 @@ export function UpcomingBrawlerPage({ brawler }: { brawler: UpcomingBrawler }) {
             {t(section.blurb)}
           </p>
           <p className="card mt-3 p-4 text-sm text-muted">
-            <span className="font-semibold text-foreground">{t('No data yet.')}</span>{' '}{t('{name} is not playable, so no battles have been sampled. This fills in within a day or two of release.', { name: name })}</p>
+            <span className="font-semibold text-foreground">{t('No data yet.')}</span>{' '}{t('No battles yet. Stats for {name} appear a day or two after release.', { name: name })}</p>
         </section>
       ))}
 
       <p className="text-sm text-muted">
-        <Link href={lp('/brawlers')} className="text-brand hover:underline">{t('All brawlers')}</Link>{' '}{t('· Stats and abilities from the Brawl Stars Wiki, which is community edited and may change before release.')}</p>
+        <Link href={lp('/brawlers')} className="text-brand hover:underline">{t('All brawlers')}</Link>{' '}{t('· Stats from the Brawl Stars Wiki. They may change before release.')}</p>
     </div>
   );
 }

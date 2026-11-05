@@ -267,16 +267,10 @@ export const FR: Record<string, string> = {
     "Ce que notre propre collecte a déniché et qu'aucune tier list ne te dirait.",
   " Almost all of them own both star powers and both gadgets.":
     " Presque tous possèdent les deux pouvoirs star et les deux gadgets.",
-  "Gears cost coins and you can only run two, so what owners have bought is a real preference.":
-    "Les équipements coûtent des pièces et on ne peut en prendre que deux, donc ce que les propriétaires ont acheté est une vraie préférence.",
   "Gears owners buy":
     "Équipements achetés par les propriétaires",
   "Measured across {sampleSize} tracked players who own this brawler.":
     "Mesuré sur {sampleSize} joueurs suivis qui possèdent ce brawler.",
-  "No sampled player owns this brawler yet, so there is nothing to measure. This fills in over the next few days as the sampler works through profiles.":
-    "Aucun joueur de l'échantillon ne possède encore ce brawler, donc il n'y a rien à mesurer. Ça se remplira dans les prochains jours, à mesure que la collecte parcourt les profils.",
-  "One of these is noticeably more common than the other, which usually means it came first or is the one people buy.":
-    "L'un est nettement plus courant que l'autre, ce qui veut généralement dire qu'il arrive en premier ou que c'est celui qu'on achète.",
   "See what is strong right now":
     "Voir ce qui est fort en ce moment",
   "of picks":
@@ -285,30 +279,12 @@ export const FR: Record<string, string> = {
     "{owners} déblocages, sur tous les déblocages d'équipement enregistrés pour ce brawler",
   "{unlockRate} of owners":
     "{unlockRate} des propriétaires",
-  "“Of owners” is how many of them have that item; “of picks” is its share of every unlock of that kind, which is what makes the options comparable with each other. A player can own several gears, so the first column does not add up to 100% and the second does.":
-    "« Des propriétaires », c'est combien d'entre eux ont cet objet ; « des sélections », c'est sa part parmi tous les déblocages de ce type, ce qui rend les options comparables entre elles. Un joueur peut posséder plusieurs équipements, donc la première colonne ne fait pas 100 % au total et la seconde, si.",
   " Dashed lines mark updates that changed this brawler.":
     " Les lignes pointillées marquent les mises à jour qui ont modifié ce brawler.",
   "Adjusted win rate over the last {days} daily snapshots, from {first} to {last}{v}":
     "Taux de victoire ajusté sur les {days} dernières mesures quotidiennes, du {first} au {last}{v}",
-  "{days} daily snapshots. Adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.":
-    "{days} mesures quotidiennes. Ajusté sur la moyenne de l'échantillon, donc une variation ici vient du brawler, pas du groupe de joueurs.",
-  " On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.":
-    " Sur un brawler sorti depuis longtemps, presque tout le monde possède les deux, donc ceux qui ne les ont pas forment un petit groupe à part. À prendre comme une indication.",
-  "Almost every owner has both, so there are too few first-buyers left to name a preference.":
-    "Presque tous les propriétaires ont les deux, donc il reste trop peu de premiers acheteurs pour dégager une préférence.",
-  "Among owners who have only one so far. Win rates cover the choice and the chooser together.":
-    "Parmi les propriétaires qui n'en ont qu'un pour l'instant. Les taux de victoire couvrent à la fois le choix et celui qui choisit.",
-  "Counted from tracked players who own exactly one of the pair: they chose it, and every battle they played on this brawler was played with it, so this measures a decision rather than ownership.":
-    "Compté sur les joueurs suivis qui possèdent exactement un des deux : ils l'ont choisi, et chaque combat joué avec ce brawler l'a été avec lui, donc ça mesure une décision plutôt qu'une possession.",
-  "It is not a controlled comparison.":
-    "Ce n'est pas une comparaison contrôlée.",
   "Most picked":
     "Le plus choisi",
-  "Read from {sampleSize} first-buyers":
-    "D'après {sampleSize} premiers acheteurs",
-  "Which option a player bought is their own choice, so each win rate covers the ability and the kind of player who picks it together. Owning one option does not make two groups otherwise alike, and nothing here separates the two. Read it as how it has gone for the people who bought each one — not as what the ability will do to your win rate.":
-    "L'option qu'un joueur a achetée est son propre choix, donc chaque taux de victoire couvre à la fois la capacité et le type de joueur qui la choisit. Posséder une option ne rend pas deux groupes identiques par ailleurs, et rien ici ne sépare les deux. Lis-le comme la façon dont ça s'est passé pour ceux qui ont acheté chaque option, pas comme ce que la capacité fera à ton taux de victoire.",
   "player":
     "joueur",
   "players":
@@ -325,8 +301,6 @@ export const FR: Record<string, string> = {
     ", CC-BY-SA. Les taux de victoire, de sélection et les matchups sont les nôtres.",
   "Across tracked players":
     "Sur les joueurs suivis",
-  "Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list":
-    "Taux de victoire ajusté combiné à un taux de sélection en échelle logarithmique, calibré au sein de la tier list Classé",
   "All brawlers":
     "Tous les brawlers",
   "Avg rank":
@@ -351,8 +325,6 @@ export const FR: Record<string, string> = {
     "Stats de combat",
   "Combat stats, ability and gear descriptions, hypercharge and buffie effects, and balance history from the":
     "Stats de combat, descriptions des capacités et des équipements, effets d'hypercharge et de buffies, et historique d'équilibrage tirés du",
-  "Each mode and map is scored against its own average, so a showdown record and a gem grab one can be read in the same list.":
-    "Chaque mode et chaque carte sont comparés à leur propre moyenne, donc un bilan en Survivant et un en Razzia de gemmes peuvent se lire dans la même liste.",
   "Hits to Super":
     "Coups pour le super",
   "How to counter {name} in Ranked, by rank →":
@@ -373,8 +345,6 @@ export const FR: Record<string, string> = {
     "Aucun brawler n'existe avec cet identifiant.",
   "No longer available in the game. This page is kept for its history.":
     "N'est plus disponible dans le jeu. Cette page est conservée pour son historique.",
-  "Not enough sampled battles for {name} yet. The sampler works through the global leaderboard pool continuously, so newly released brawlers fill in over the following days.":
-    "Pas encore assez de combats collectés pour {name}. La collecte parcourt en continu le pool du classement mondial, donc les brawlers qui viennent de sortir se remplissent dans les jours suivants.",
   "Performance":
     "Performances",
   "Pick rate":
@@ -433,8 +403,6 @@ export const FR: Record<string, string> = {
     "Build et stats de {name}, {v}",
   "{name} has a {normalizedWinRate} adjusted win rate and a {usageRate} pick rate over {decidedSampleSize} sampled decided battles{v}.":
     "{name} a un taux de victoire ajusté de {normalizedWinRate} et un taux de sélection de {usageRate} sur {decidedSampleSize} combats décisifs collectés{v}.",
-  "{name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.":
-    "{name} n'a pas encore été assez échantillonné pour un taux de victoire. Les tier lists couvrent tous les brawlers qui ont assez de combats.",
   "{name} has {v} as star powers and {v2} as gadgets.":
     "Les pouvoirs star de {name} sont {v} et ses gadgets {v2}.",
   "{name} is a new{v} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.":
@@ -477,8 +445,6 @@ export const FR: Record<string, string> = {
     "Faible contre",
   "{baseline} win rate across":
     "soit {baseline}, sur",
-  "{sampleSize} sampled team battles. Counted once per battle from one player’s side, and kept out of the win-rate and pick-rate numbers above. Those would be skewed by counting every participant.":
-    "{sampleSize} combats en équipe collectés. Comptés une fois par combat, du côté d'un seul joueur, et exclus des taux de victoire et de sélection ci-dessus, qui seraient faussés si on comptait chaque participant.",
   "{winRate} win rate over {decidedSampleSize} sampled battles, against a {baseline} average for this brawler":
     "{winRate} de victoires sur {decidedSampleSize} combats collectés, contre une moyenne de {baseline} pour ce brawler",
   "Almost every sampled {name} owner is on the default skin.":
@@ -511,8 +477,6 @@ export const FR: Record<string, string> = {
     "Pas encore nommé",
   "Not released yet":
     "Pas encore sorti",
-  "Nothing beyond the name has been published for {name} yet. This page fills in as the wiki does.":
-    "Rien n'a encore été publié sur {name} à part son nom. Cette page se remplit au rythme du wiki.",
   "Ranked and ladder win rates, pick rate and tier.":
     "Taux de victoire Classé et Voie des trophées, taux de sélection et tier.",
   "The highest-trophy accounts playing it.":
@@ -525,12 +489,6 @@ export const FR: Record<string, string> = {
     "Meilleurs joueurs",
   "Which brawlers it beats, and which beat it.":
     "Les brawlers qu'il bat, et ceux qui le battent.",
-  "{name} has been revealed but is not playable yet, so there are no sampled battles behind this page. Everything below comes from the community wiki and fills in over the days after a reveal.":
-    "{name} a été dévoilé mais n'est pas encore jouable, donc aucun combat collecté ne soutient cette page. Tout ce qui suit vient du wiki communautaire et se remplit dans les jours qui suivent une révélation.",
-  "{name} is not playable, so no battles have been sampled. This fills in within a day or two of release.":
-    "{name} n'est pas jouable, donc aucun combat n'a été collecté. Ça se remplira dans un jour ou deux après sa sortie.",
-  "· Stats and abilities from the Brawl Stars Wiki, which is community edited and may change before release.":
-    "· Stats et capacités tirées du Brawl Stars Wiki, modifié par la communauté et susceptible de changer avant la sortie.",
   "Best maps":
     "Meilleures cartes",
   "Best modes":
@@ -551,8 +509,6 @@ export const FR: Record<string, string> = {
     "Gadgets",
   "Gears":
     "Équipements",
-  "How to read this":
-    "Comment lire ceci",
   "No gadgets released.":
     "Aucun gadget sorti.",
   "No star powers released.":
@@ -561,16 +517,12 @@ export const FR: Record<string, string> = {
     "Sorti.",
   "Star powers":
     "Pouvoirs star",
-  "The exact boost percentages vary per brawler and are published neither by the game API nor by any artwork source.":
-    "Les pourcentages exacts du bonus varient selon le brawler et ne sont publiés ni par l'API du jeu ni par aucune source d'images.",
   "Unlocked at Power 11. Charges from dealing and taking damage, then boosts {name}'s speed, damage and shield for a few seconds.":
     "Débloquée au niveau de pouvoir 11. Se charge en infligeant et en subissant des dégâts, puis augmente pendant quelques secondes la vitesse, les dégâts et le bouclier de {name}.",
   "Unreleased.":
     "Pas sorti.",
   "What owners bought":
     "Ce que les propriétaires ont acheté",
-  "What owners bought is popularity — the game's API reports what a player has unlocked, never what they took into a match. How it has gone is the win rate among the players who made each choice, which covers the ability and the kind of player who picks it together. Neither is a recommendation from us: BrawlZone does not rank":
-    "Ce que les propriétaires ont acheté, c'est de la popularité : l'API du jeu indique ce qu'un joueur a débloqué, jamais ce qu'il a emporté en combat. Comment ça s'est passé, c'est le taux de victoire des joueurs qui ont fait chaque choix, qui couvre à la fois la capacité et le type de joueur qui la choisit. Ni l'un ni l'autre n'est une recommandation de notre part : BrawlZone ne classe pas",
   "What {name}'s kit does, and what owners spend their coins on first.":
     "Ce que fait le kit de {name}, et ce que ses propriétaires achètent en premier avec leurs pièces.",
   "for them.":
@@ -583,8 +535,6 @@ export const FR: Record<string, string> = {
     "{name} a des buffies, mais leurs effets n'ont pas encore été documentés.",
   "{name} has no buffies yet.":
     "{name} n'a pas encore de buffies.",
-  "{name}'s kit, and nothing here is an opinion about what you should buy.":
-    "le kit de {name}, et rien ici n'est un avis sur ce que tu devrais acheter.",
   "Compare":
     "Comparer",
   "Most owned":
@@ -4893,4 +4843,32 @@ export const FR: Record<string, string> = {
     "Les skins et icônes de profil que les joueurs de Brawl Stars équipent vraiment, comptés à partir des échantillons quotidiens de BrawlZone.",
   "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
     "{name} sur Brawl Stars : gadgets, pouvoirs star, équipements, meilleurs modes et cartes, mis à jour chaque jour.",
+  "Not enough battles for {name} yet to give a win rate.":
+    "Pas encore assez de combats avec {name} pour donner un taux de victoire.",
+  "Win rate and pick rate combined, out of 10":
+    "Taux de victoire et de sélection combinés, sur 10",
+  "Not enough battles for {name} yet. New brawlers fill in within a few days.":
+    "Pas encore assez de combats avec {name}. Les nouveaux brawlers se remplissent en quelques jours.",
+  "Each mode and map is compared with its own average.":
+    "Chaque mode et chaque carte sont comparés à leur propre moyenne.",
+  "Players who own only one of the two.":
+    "Les joueurs qui n'en possèdent qu'une sur les deux.",
+  "Almost every owner has both, so there is no clear first pick.":
+    "Presque tous les propriétaires ont les deux, donc pas de premier choix net.",
+  "{sampleSize} team battles.":
+    "{sampleSize} combats en équipe.",
+  "{days} daily snapshots.":
+    "{days} relevés quotidiens.",
+  "Exact boost values vary per brawler.":
+    "Les valeurs exactes du bonus varient selon le brawler.",
+  "No data yet. This fills in within a few days.":
+    "Pas encore de données. Ça se remplit en quelques jours.",
+  "{name} is not out yet. Everything below is from the Brawl Stars Wiki.":
+    "{name} n'est pas encore sorti. Tout ce qui suit vient du Brawl Stars Wiki.",
+  "Only the name of {name} is known so far.":
+    "Pour l'instant, on ne connaît que le nom de {name}.",
+  "No battles yet. Stats for {name} appear a day or two after release.":
+    "Pas encore de combats. Les stats de {name} arrivent un ou deux jours après la sortie.",
+  "· Stats from the Brawl Stars Wiki. They may change before release.":
+    "· Stats issues du Brawl Stars Wiki. Elles peuvent changer avant la sortie.",
 };

@@ -1,7 +1,6 @@
 import Image from 'next/image';
 
 import { GadgetIcon, StarPowerIcon } from '@/components/game-icons';
-import { Disclosure } from '@/components/ui/disclosure';
 import { formatNumber, formatPercent } from '@/lib/format';
 import type { AbilityChoice, BrawlerAbilityChoices } from '@/lib/stats';
 import type { BAAccessory } from '@/types/brawlapi';
@@ -102,7 +101,7 @@ export function AbilityChoices({
                 {t(label)}
               </span>
             </div>
-            <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{t('Among owners who have only one so far. Win rates cover the choice and the chooser together.')}</p>
+            <p className="mb-3 mt-1 text-xs leading-relaxed text-muted">{t('Players who own only one of the two.')}</p>
 
             {rows.length > 1 ? (
               <ul className="space-y-3">
@@ -116,22 +115,12 @@ export function AbilityChoices({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted">{t('Almost every owner has both, so there are too few first-buyers left to name a preference.')}</p>
+              <p className="text-sm text-muted">{t('Almost every owner has both, so there is no clear first pick.')}</p>
             )}
           </div>
         );
       })}
 
-      {/* The methodology is worth keeping and is not worth three paragraphs
-          above the numbers it explains. */}
-      <Disclosure
-        tone="bare"
-        summary={t('Read from {sampleSize} first-buyers', { sampleSize: formatNumber(choices.sampleSize) })}
-      >{t('Counted from tracked players who own exactly one of the pair: they chose it, and every battle they played on this brawler was played with it, so this measures a decision rather than ownership.')}{' '}
-        <strong className="font-semibold text-foreground">{t('It is not a controlled comparison.')}</strong>{' '}{t('Which option a player bought is their own choice, so each win rate covers the ability and the kind of player who picks it together. Owning one option does not make two groups otherwise alike, and nothing here separates the two. Read it as how it has gone for the people who bought each one — not as what the ability will do to your win rate.')}{choices.confidence === 'low'
-          ? t(' On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.')
-          : ''}
-      </Disclosure>
     </div>
   );
 }

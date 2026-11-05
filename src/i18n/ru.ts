@@ -267,16 +267,10 @@ export const RU: Record<string, string> = {
     "То, что нашла наша собственная выборка и чего не расскажет ни один тир-лист.",
   " Almost all of them own both star powers and both gadgets.":
     " Почти у всех есть обе звёздные силы и оба гаджета.",
-  "Gears cost coins and you can only run two, so what owners have bought is a real preference.":
-    "Снаряжение стоит монет, а взять можно только два, поэтому то, что покупают владельцы, — настоящее предпочтение.",
   "Gears owners buy":
     "Снаряжение, которое покупают владельцы",
   "Measured across {sampleSize} tracked players who own this brawler.":
     "Измерено по отслеживаемым игрокам, у которых есть этот боец: {sampleSize}.",
-  "No sampled player owns this brawler yet, so there is nothing to measure. This fills in over the next few days as the sampler works through profiles.":
-    "Ни у одного игрока из выборки пока нет этого бойца, так что мерить нечего. Это заполнится в ближайшие дни, по мере того как сборщик проходит профили.",
-  "One of these is noticeably more common than the other, which usually means it came first or is the one people buy.":
-    "Одно из них заметно популярнее другого, а это обычно значит, что его открывают первым или именно его покупают.",
   "See what is strong right now":
     "Посмотреть, что сейчас сильно",
   "of picks":
@@ -285,30 +279,12 @@ export const RU: Record<string, string> = {
     "открытий: {owners}, из всех открытий снаряжения на этом бойце",
   "{unlockRate} of owners":
     "{unlockRate} владельцев",
-  "“Of owners” is how many of them have that item; “of picks” is its share of every unlock of that kind, which is what makes the options comparable with each other. A player can own several gears, so the first column does not add up to 100% and the second does.":
-    "«Владельцев» — сколько из них имеют этот предмет; «от выборов» — его доля среди всех открытий такого типа, и именно это делает варианты сопоставимыми. Снаряжения у игрока может быть несколько, поэтому первая колонка не даёт в сумме 100%, а вторая даёт.",
   " Dashed lines mark updates that changed this brawler.":
     " Пунктиром отмечены обновления, которые меняли этого бойца.",
   "Adjusted win rate over the last {days} daily snapshots, from {first} to {last}{v}":
     "Скорректированный процент побед по последним ежедневным замерам ({days}), с {first} по {last}{v}",
-  "{days} daily snapshots. Adjusted against the sample average, so a shift here is the brawler moving rather than the cohort.":
-    "Ежедневных замеров: {days}. С поправкой на среднее выборки, так что сдвиг здесь — это движение бойца, а не состава игроков.",
-  " On a long-established brawler almost everyone owns both, so the few who do not are a small and self-selected group. Treat this as indicative.":
-    " У давно вышедшего бойца почти у всех есть оба, поэтому те немногие, у кого нет, — маленькая и особая группа. Считай это ориентиром.",
-  "Almost every owner has both, so there are too few first-buyers left to name a preference.":
-    "Почти у всех владельцев есть оба, так что первых покупателей слишком мало, чтобы назвать предпочтение.",
-  "Among owners who have only one so far. Win rates cover the choice and the chooser together.":
-    "Среди владельцев, у которых пока только один. Процент побед отражает и выбор, и того, кто выбирает.",
-  "Counted from tracked players who own exactly one of the pair: they chose it, and every battle they played on this brawler was played with it, so this measures a decision rather than ownership.":
-    "Посчитано по отслеживаемым игрокам, у которых есть ровно один из пары: они его выбрали, и каждый бой на этом бойце сыгран с ним, поэтому это измеряет решение, а не владение.",
-  "It is not a controlled comparison.":
-    "Это не контролируемое сравнение.",
   "Most picked":
     "Чаще всего выбирают",
-  "Read from {sampleSize} first-buyers":
-    "По первым покупателям: {sampleSize}",
-  "Which option a player bought is their own choice, so each win rate covers the ability and the kind of player who picks it together. Owning one option does not make two groups otherwise alike, and nothing here separates the two. Read it as how it has gone for the people who bought each one — not as what the ability will do to your win rate.":
-    "Какой вариант купить, игрок решает сам, поэтому каждый процент побед отражает и способность, и тип игрока, который её выбирает. Владение одним вариантом не делает две группы в остальном одинаковыми, и ничто здесь их не разделяет. Читай это как то, как сложилось у тех, кто купил каждый вариант, а не как то, что способность сделает с твоим процентом побед.",
   "player":
     "игрок",
   "players":
@@ -325,8 +301,6 @@ export const RU: Record<string, string> = {
     ", CC-BY-SA. Процент побед, частота выбора и матчапы — наши собственные.",
   "Across tracked players":
     "По отслеживаемым игрокам",
-  "Adjusted win rate combined with a log-scaled pick rate, calibrated within the Ranked tier list":
-    "Скорректированный процент побед вместе с частотой выбора в логарифмической шкале, откалиброванный внутри тир-листа ранговых боёв",
   "All brawlers":
     "Все бойцы",
   "Avg rank":
@@ -351,8 +325,6 @@ export const RU: Record<string, string> = {
     "Боевые характеристики",
   "Combat stats, ability and gear descriptions, hypercharge and buffie effects, and balance history from the":
     "Боевые характеристики, описания способностей и снаряжения, эффекты гиперзаряда и баффи и история баланса из",
-  "Each mode and map is scored against its own average, so a showdown record and a gem grab one can be read in the same list.":
-    "Каждый режим и карта сравниваются со своим средним, поэтому результат в Столкновении и в Захвате кристаллов можно читать в одном списке.",
   "Hits to Super":
     "Попаданий до суперспособности",
   "How to counter {name} in Ranked, by rank →":
@@ -373,8 +345,6 @@ export const RU: Record<string, string> = {
     "Бойца с таким id не существует.",
   "No longer available in the game. This page is kept for its history.":
     "Больше недоступен в игре. Страница сохранена ради истории.",
-  "Not enough sampled battles for {name} yet. The sampler works through the global leaderboard pool continuously, so newly released brawlers fill in over the following days.":
-    "Пока мало собранных боёв на {name}. Сборщик постоянно проходит пул мирового рейтинга, так что новые бойцы заполняются в следующие дни.",
   "Performance":
     "Результаты",
   "Pick rate":
@@ -433,8 +403,6 @@ export const RU: Record<string, string> = {
     "Сборка и характеристики {name}, {v}",
   "{name} has a {normalizedWinRate} adjusted win rate and a {usageRate} pick rate over {decidedSampleSize} sampled decided battles{v}.":
     "У {name} скорректированный процент побед {normalizedWinRate} и частота выбора {usageRate} по собранным решённым боям ({decidedSampleSize}){v}.",
-  "{name} has not been sampled enough yet for a win rate. The tier lists cover every brawler with enough battles behind it.":
-    "По {name} пока собрано слишком мало боёв для процента побед. Тир-листы охватывают всех бойцов, у которых достаточно боёв.",
   "{name} has {v} as star powers and {v2} as gadgets.":
     "Звёздные силы {name}: {v}, гаджеты: {v2}.",
   "{name} is a new{v} brawler revealed for Brawl Stars and not yet released. Stats, gadgets and star powers as they are announced.":
@@ -477,8 +445,6 @@ export const RU: Record<string, string> = {
     "Слаб против",
   "{baseline} win rate across":
     "{baseline} побед по",
-  "{sampleSize} sampled team battles. Counted once per battle from one player’s side, and kept out of the win-rate and pick-rate numbers above. Those would be skewed by counting every participant.":
-    "Собранных командных боёв: {sampleSize}. Каждый бой считается один раз со стороны одного игрока и не входит в процент побед и частоту выбора выше — их исказил бы подсчёт каждого участника.",
   "{winRate} win rate over {decidedSampleSize} sampled battles, against a {baseline} average for this brawler":
     "{winRate} побед, собранных боёв: {decidedSampleSize}, при среднем {baseline} для этого бойца",
   "Almost every sampled {name} owner is on the default skin.":
@@ -511,8 +477,6 @@ export const RU: Record<string, string> = {
     "Пока без названия",
   "Not released yet":
     "Ещё не вышел",
-  "Nothing beyond the name has been published for {name} yet. This page fills in as the wiki does.":
-    "О {name} пока не опубликовано ничего, кроме имени. Страница заполняется вместе с вики.",
   "Ranked and ladder win rates, pick rate and tier.":
     "Процент побед в ранговых боях и на пути к славе, частота выбора и тир.",
   "The highest-trophy accounts playing it.":
@@ -525,12 +489,6 @@ export const RU: Record<string, string> = {
     "Лучшие игроки",
   "Which brawlers it beats, and which beat it.":
     "Каких бойцов он побеждает и кто побеждает его.",
-  "{name} has been revealed but is not playable yet, so there are no sampled battles behind this page. Everything below comes from the community wiki and fills in over the days after a reveal.":
-    "{name} анонсирован, но ещё недоступен в игре, поэтому собранных боёв за этой страницей нет. Всё ниже взято из вики сообщества и заполняется в дни после анонса.",
-  "{name} is not playable, so no battles have been sampled. This fills in within a day or two of release.":
-    "{name} недоступен в игре, поэтому бои не собирались. Это заполнится в течение пары дней после выхода.",
-  "· Stats and abilities from the Brawl Stars Wiki, which is community edited and may change before release.":
-    "· Характеристики и способности из Brawl Stars Wiki, которую редактирует сообщество, и они могут измениться до выхода.",
   "Best maps":
     "Лучшие карты",
   "Best modes":
@@ -551,8 +509,6 @@ export const RU: Record<string, string> = {
     "Гаджеты",
   "Gears":
     "Снаряжение",
-  "How to read this":
-    "Как это читать",
   "No gadgets released.":
     "Гаджеты не вышли.",
   "No star powers released.":
@@ -561,16 +517,12 @@ export const RU: Record<string, string> = {
     "Вышел.",
   "Star powers":
     "Звёздные силы",
-  "The exact boost percentages vary per brawler and are published neither by the game API nor by any artwork source.":
-    "Точные проценты бонуса у каждого бойца свои, и их не публикуют ни API игры, ни источники изображений.",
   "Unlocked at Power 11. Charges from dealing and taking damage, then boosts {name}'s speed, damage and shield for a few seconds.":
     "Открывается на 11-м уровне силы. Заряжается от нанесённого и полученного урона, затем на несколько секунд усиливает скорость, урон и щит {name}.",
   "Unreleased.":
     "Не вышел.",
   "What owners bought":
     "Что купили владельцы",
-  "What owners bought is popularity — the game's API reports what a player has unlocked, never what they took into a match. How it has gone is the win rate among the players who made each choice, which covers the ability and the kind of player who picks it together. Neither is a recommendation from us: BrawlZone does not rank":
-    "То, что купили владельцы, — это популярность: API игры сообщает, что игрок открыл, но никогда — что он взял в бой. Как сложилось — это процент побед среди игроков, сделавших каждый выбор, и он отражает и способность, и тип игрока, который её выбирает. Ни то, ни другое не наша рекомендация: BrawlZone не ранжирует",
   "What {name}'s kit does, and what owners spend their coins on first.":
     "Что умеет набор способностей {name} и на что владельцы тратят монеты в первую очередь.",
   "for them.":
@@ -583,8 +535,6 @@ export const RU: Record<string, string> = {
     "У {name} есть баффи, но их эффекты ещё не описаны.",
   "{name} has no buffies yet.":
     "У {name} пока нет баффи.",
-  "{name}'s kit, and nothing here is an opinion about what you should buy.":
-    "набор способностей {name}, и ничто здесь не является мнением о том, что тебе покупать.",
   "Compare":
     "Сравнить",
   "Most owned":
@@ -4893,4 +4843,32 @@ export const RU: Record<string, string> = {
     "Какие скины и иконки профиля игроки Brawl Stars ставят на самом деле — по ежедневным выборкам BrawlZone.",
   "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
     "{name} в Brawl Stars: гаджеты, звёздные силы, снаряжение, лучшие режимы и карты, обновляются ежедневно.",
+  "Not enough battles for {name} yet to give a win rate.":
+    "Пока слишком мало боёв на {name}, чтобы посчитать процент побед.",
+  "Win rate and pick rate combined, out of 10":
+    "Процент побед и частота выбора вместе, из 10",
+  "Not enough battles for {name} yet. New brawlers fill in within a few days.":
+    "Пока мало боёв на {name}. Данные по новым бойцам появляются за несколько дней.",
+  "Each mode and map is compared with its own average.":
+    "Каждый режим и карта сравниваются со своим средним.",
+  "Players who own only one of the two.":
+    "Игроки, у которых есть только одна из двух.",
+  "Almost every owner has both, so there is no clear first pick.":
+    "Почти у всех владельцев есть обе, так что явного первого выбора нет.",
+  "{sampleSize} team battles.":
+    "Командных боёв: {sampleSize}.",
+  "{days} daily snapshots.":
+    "Ежедневных срезов: {days}.",
+  "Exact boost values vary per brawler.":
+    "Точные значения усиления зависят от бойца.",
+  "No data yet. This fills in within a few days.":
+    "Пока нет данных. Они появятся через несколько дней.",
+  "{name} is not out yet. Everything below is from the Brawl Stars Wiki.":
+    "{name} ещё не вышел. Всё ниже взято из Brawl Stars Wiki.",
+  "Only the name of {name} is known so far.":
+    "Пока известно только имя: {name}.",
+  "No battles yet. Stats for {name} appear a day or two after release.":
+    "Боёв пока нет. Статистика по {name} появится через день-два после выхода.",
+  "· Stats from the Brawl Stars Wiki. They may change before release.":
+    "· Характеристики из Brawl Stars Wiki. До выхода они могут измениться.",
 };

@@ -46,7 +46,7 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       /* An empty state that ends the visit is a wasted one, so it says what is
          missing and offers a page that does have an answer. */
       <div className="card p-6">
-        <p className="text-sm leading-relaxed text-muted">{t('No sampled player owns this brawler yet, so there is nothing to measure. This fills in over the next few days as the sampler works through profiles.')}</p>
+        <p className="text-sm leading-relaxed text-muted">{t('No data yet. This fills in within a few days.')}</p>
         <Link
           href={lp('/tier-list/trophy')}
           className="mt-4 inline-flex rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
@@ -85,7 +85,6 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       title: t('Gears owners buy'),
       node: <GearIcon className="size-5" />,
       options: build.gears,
-      note: t('Gears cost coins and you can only run two, so what owners have bought is a real preference.'),
     },
     ...(starPowersSplit
       ? [
@@ -93,7 +92,6 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
             title: t('Star powers'),
             node: <StarPowerIcon className="size-5" />,
             options: build.starPowers,
-            note: t('One of these is noticeably more common than the other, which usually means it came first or is the one people buy.'),
           },
         ]
       : []),
@@ -202,7 +200,6 @@ export function PopularBuild({ build, meta, gearNames }: Props) {
       {/* What the numbers are, in one line. The methodology behind them lives
           on the About page rather than under every chart. */}
       <p className="text-xs leading-relaxed text-muted">{t('Measured across {sampleSize} tracked players who own this brawler.', { sampleSize: formatNumber(build.sampleSize) })}{' '}
-        <span className="text-muted/90">{t('“Of owners” is how many of them have that item; “of picks” is its share of every unlock of that kind, which is what makes the options comparable with each other. A player can own several gears, so the first column does not add up to 100% and the second does.')}</span>
         {!starPowersSplit && !gadgetsSplit
           ? t(' Almost all of them own both star powers and both gadgets.')
           : ''}
