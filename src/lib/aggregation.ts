@@ -2405,6 +2405,30 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
 
     const evictedMissing = await evictDeletedAccounts(gone, targets.length);
 
+    /*
+     * A player the API calls missing has still been visited: stamp it, so it
+     * takes its turn at the back of the queue like everyone else.
+     *
+     * Only successes used to stamp `lastSampledAt`. That was harmless while a
+     * 404 meant a deleted account (a dozen a run), but since the game's
+     * November 2026 update (3 Nov, new stats in the battle log) the API
+     * answers 404 for the battle logs of thousands of accounts whose profiles
+     * still load, the global top four among them. Unstamped, they stayed
+     * "never sampled": first in every run's queue, protected from
+     * `evictStalePool`, and 5,600-7,100 of each run's 10,000 visits went to
+     * the same unreadable players while eviction removed players who did
+     * produce battles. Battles per run halved (~90k to ~50k).
+     *
+     * Stamped, a missing account is a silent one: last in the queue and the
+     * first `evictStalePool` sheds. If the API recovers, the next rotation
+     * reads it, and the leaderboards re-seed the top players every run.
+     */
+    if (gone.length > evictedMissing) {
+      await prisma.sampledPlayer
+        .updateMany({ where: { tag: { in: gone } }, data: { lastSampledAt: new Date() } })
+        .catch(() => 0);
+    }
+
     // Players met in this run's Ranked battles, into the brackets short of
     // their quota. Sampled next run, as the never-sampled go first.
     const met = new Map<string, number>();
