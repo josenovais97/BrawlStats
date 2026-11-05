@@ -2805,4 +2805,404 @@ export const FR: Record<string, string> = {
     "La classe n'a pas de flèche, parce qu'il n'y a pas de sens entre Tir d'élite et Tank. Un brawler avec trop peu de combats Classé pour avoir un tier affiche un tiret plutôt qu'une supposition.",
   "Daily challenge":
     "Défi du jour",
+  "Green":
+    "Vert",
+  "How the clues work":
+    "Comment marchent les indices",
+  "Movement":
+    "Vitesse",
+  "One brawler a day. Everybody gets the same one, and it changes at midnight UTC.":
+    "Un brawler par jour. Le même pour tout le monde, et il change à minuit UTC.",
+  "Released":
+    "Sortie",
+  "Stuck?":
+    "Bloqué ?",
+  "Today’s puzzle could not be prepared. It returns once the brawler catalogue is reachable again.":
+    "L'énigme du jour n'a pas pu être préparée. Elle reviendra dès que le catalogue des brawlers sera de nouveau joignable.",
+  "Your progress is kept in this browser only. No account, nothing stored on our side.":
+    "Ta progression est gardée uniquement dans ce navigateur. Pas de compte, rien n'est stocké chez nous.",
+  "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.":
+    "sont les paliers nommés du jeu (de Très lente à Très rapide, de Très courte à Très longue), pas des chiffres bruts, parce que personne ne sait si 855 c'est rapide et que tout le monde sait que Très rapide bat Rapide.",
+  "comes from the live":
+    "vient de la",
+  "is exact.":
+    "est exact.",
+  "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.":
+    "est à un pas : une rareté voisine, un tier voisin, ou un brawler sorti à moins de cinq places de la réponse. Une flèche indique la réponse : ▲ veut dire plus haut, ▼ plus bas.",
+  "is the brawler’s place in release order, not a date.":
+    "est la place du brawler dans l'ordre de sortie, pas une date.",
+  "range":
+    "portée",
+  "ranked tier list":
+    "tier list Classé",
+  "reload":
+    "recharge",
+  ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.":
+    ". Ces découvertes ne peuvent pas être recalculées plus tard, donc l'archive commence au jour de sa création au lieu de remonter dans le temps.",
+  "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.":
+    "Chaque carte est le maximum d'une quantité précise sur une population précise : le meilleur taux de victoire parmi les brawlers sous 1 % de sélection, le plus grand écart entre un brawler et une carte, et ainsi de suite. Les mêmes données donnent toujours le même ensemble, donc rien ici n'est écrit par un modèle ni choisi à la main. Les taux de victoire sont ajustés sur la moyenne de l'échantillon, donc une semaine où les joueurs collectés sont plus forts ne fait pas paraître tous les brawlers renforcés.",
+  "Every day is kept at its own address —":
+    "Chaque jour est gardé à sa propre adresse :",
+  "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.":
+    "Les découvertes tirées des combats Brawl Stars collectés aujourd'hui : le pick que personne ne prend et qui gagne quand même, le pick populaire qui perd, le matchup le plus déséquilibré, et le brawler qui se comporte autrement sur une carte.",
+  "How these are chosen.":
+    "Comment elles sont choisies.",
+  "What BrawlZone found in the data today":
+    "Ce que BrawlZone a trouvé dans les données aujourd'hui",
+  "browse the archive":
+    "parcours l'archive",
+  "or":
+    "ou",
+  "subscribe by RSS":
+    "abonne-toi par RSS",
+  "A brawler listed here has a dashed marker on its own trend chart, so you can see what the change actually did.":
+    "Un brawler listé ici a un repère en pointillé sur sa propre courbe de tendance, pour voir ce que le changement a vraiment fait.",
+  "All comps":
+    "Toutes les compos",
+  "Comps winning now":
+    "Les compos qui gagnent en ce moment",
+  "Falling":
+    "En baisse",
+  "Not enough comparable snapshots yet. This fills in once a week of daily snapshots has been collected under a stable sample.":
+    "Pas encore assez de relevés comparables. Ça se remplira quand une semaine de relevés quotidiens aura été collectée sur un échantillon stable.",
+  "Nothing moved enough to report.":
+    "Rien n'a assez bougé pour être signalé.",
+  "Rising":
+    "En hausse",
+  "The names Supercell published.":
+    "Les noms publiés par Supercell.",
+  "This week in the Brawl Stars meta":
+    "Cette semaine dans la méta Brawl Stars",
+  "This week in the meta":
+    "Cette semaine dans la méta",
+  "Tier changes":
+    "Changements de tier",
+  "What moved between {fromDate} and {toDate}, measured from sampled battles.":
+    "Ce qui a bougé entre le {fromDate} et le {toDate}, mesuré sur les combats collectés.",
+  "What moved in the Brawl Stars meta this week: the brawlers rising and falling, the tiers they crossed, what the latest update changed, and the team comps winning right now.":
+    "Ce qui a bougé dans la méta Brawl Stars cette semaine : les brawlers qui montent et qui descendent, les tiers qu'ils ont franchis, ce que la dernière mise à jour a changé, et les compos qui gagnent en ce moment.",
+  "What moved this week, measured from sampled battles.":
+    "Ce qui a bougé cette semaine, mesuré sur les combats collectés.",
+  "What the update changed":
+    "Ce que la mise à jour a changé",
+  "Whether any of it moved":
+    "Si quelque chose a bougé",
+  "is measured separately.":
+    "est mesuré à part.",
+  "{sampleSize} battles ·":
+    "{sampleSize} combats ·",
+  "{sampleSize} battles · {winRateNow} win rate":
+    "{sampleSize} combats · {winRateNow} de victoires",
+  "{winRateNow} win rate":
+    "{winRateNow} de victoires",
+  "· mode average {baseline}":
+    "· moyenne du mode {baseline}",
+  "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.":
+    "La part d'un skin porte sur les emplacements joueur-brawler collectés ; celle d'une icône sur les joueurs collectés. Les skins par défaut sont écartés : celui qui porte le nom du brawler n'a été choisi par personne. L'adoption par brawler, défaut compris, est sur la page de chaque brawler.",
+  "Brawl Stars cosmetics: which skins and icons players actually use":
+    "Cosmétiques Brawl Stars : les skins et icônes vraiment utilisés par les joueurs",
+  "Browse every icon →":
+    "Voir toutes les icônes →",
+  "Browse every skin →":
+    "Voir tous les skins →",
+  "Every skin and profile icon seen in the sampled player pool, ranked by how many people equip it. Not a list of what exists, a measurement of what gets worn.":
+    "Chaque skin et chaque icône de profil vus dans le pool de joueurs échantillonnés, classés selon le nombre de gens qui les équipent. Pas une liste de ce qui existe, une mesure de ce qui est porté.",
+  "How this is counted":
+    "Comment c'est compté",
+  "Most worn skins":
+    "Skins les plus portés",
+  "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.":
+    "Les chiffres viennent de l'échantillon tournant de relevés, qui enregistre chaque jour un quart du pool de joueurs échantillonnés, donc c'est un sondage et pas un recensement. Ça suffit pour des parts, et c'est tout ce qui est affiché, c'est pourquoi un chiffre ici n'est jamais le nombre de gens qui possèdent quelque chose dans le jeu.",
+  "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.":
+    "Part de tous les emplacements joueur-brawler collectés, donc les skins de brawlers différents sont directement comparables.",
+  "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.":
+    "Les skins et icônes de profil que les joueurs équipent vraiment, mesurés sur le pool collecté plutôt que listés depuis un catalogue.",
+  "{length} seen across the roster, ranked by how many of the sampled slots wear each one.":
+    "{length} vus sur tout le roster, classés selon le nombre d'emplacements collectés qui portent chacun.",
+  "{length} seen on sampled accounts. The icon sits on the account, so these are shares of players rather than of brawlers.":
+    "{length} vues sur les comptes collectés. L'icône est liée au compte, donc ce sont des parts de joueurs plutôt que de brawlers.",
+  "Announced, not yet released":
+    "Annoncé, pas encore sorti",
+  "Brawl Stars update notes":
+    "Notes de mise à jour Brawl Stars",
+  "Contents":
+    "Sommaire",
+  "Details not published yet":
+    "Détails pas encore publiés",
+  "Every brawler named in {title}, linked to its page here.":
+    "Chaque brawler cité dans {title}, avec un lien vers sa page ici.",
+  "Published":
+    "Publié",
+  "Published by Supercell, reproduced here for convenience.":
+    "Publié par Supercell, reproduit ici par commodité.",
+  "Release notes":
+    "Notes de mise à jour",
+  "Release notes are unavailable right now. Try again shortly, or read them on":
+    "Les notes de mise à jour sont indisponibles pour le moment. Réessaie dans un instant, ou lis-les sur",
+  "Revealed in a Brawl Talk and coming to the game. Everything known so far.":
+    "Dévoilé dans un Brawl Talk et bientôt dans le jeu. Tout ce qu'on sait pour l'instant.",
+  "Stats and abilities come from the community wiki and fill in over the days after a reveal, so a brawler announced yesterday may show little beyond its name.":
+    "Les stats et les capacités viennent du wiki communautaire et se remplissent dans les jours qui suivent une révélation, donc un brawler annoncé hier peut n'afficher guère plus que son nom.",
+  "The latest official Brawl Stars release notes: new brawlers, hypercharges, balance changes and bug fixes.":
+    "Les dernières notes de mise à jour officielles de Brawl Stars : nouveaux brawlers, hypercharges, équilibrages et corrections de bugs.",
+  "The latest official update notes, straight from the Brawl Stars team.":
+    "Les dernières notes de mise à jour officielles, directement de l'équipe Brawl Stars.",
+  "Who changed":
+    "Qui a changé",
+  "for what we track ourselves.":
+    "pour ce que nous suivons nous-mêmes.",
+  "see detected in-game changes":
+    "voir les changements détectés en jeu",
+  "supercell.com":
+    "supercell.com",
+  "Announcements from the Brawl Stars team, and the new brawlers and abilities detected from the game API. For how the sampled meta is shifting, see the":
+    "Les annonces de l'équipe Brawl Stars, et les nouveaux brawlers et capacités détectés via l'API du jeu. Pour voir comment bouge la méta collectée, consulte le",
+  "Brawl Stars news":
+    "Actus Brawl Stars",
+  "Brawler removed":
+    "Brawler retiré",
+  "Change":
+    "Changement",
+  "Detected":
+    "Détecté",
+  "Detected game changes":
+    "Changements détectés dans le jeu",
+  "Gadget":
+    "Gadget",
+  "Gear":
+    "Équipement",
+  "New brawler":
+    "Nouveau brawler",
+  "New brawlers, star powers, gadgets and hypercharges.":
+    "Nouveaux brawlers, pouvoirs star, gadgets et hypercharges.",
+  "News":
+    "Actus",
+  "Official Brawl Stars announcements, plus roster and kit changes detected from the game API.":
+    "Les annonces officielles de Brawl Stars, plus les changements de roster et de kits détectés via l'API du jeu.",
+  "Official news":
+    "Actus officielles",
+  "Read on supercell.com":
+    "Lire sur supercell.com",
+  "Removed":
+    "Retiré",
+  "Star power":
+    "Pouvoir star",
+  "Straight from the Brawl Stars team.":
+    "Directement de l'équipe Brawl Stars.",
+  "Straight from the game":
+    "Directement du jeu",
+  "What this means for the meta":
+    "Ce que ça change pour la méta",
+  "Brawl Stars findings for {label}.":
+    "Découvertes Brawl Stars du {label}.",
+  "Daily":
+    "Quotidien",
+  "Today":
+    "Aujourd'hui",
+  "What BrawlZone found on {label}":
+    "Ce que BrawlZone a trouvé le {label}",
+  "{findings} findings from Brawl Stars battles sampled on {label}, including the strongest pick nobody used and the most one-sided matchup of the day.":
+    "{findings} découvertes tirées des combats Brawl Stars collectés le {label}, dont le pick le plus fort que personne n'a pris et le matchup le plus déséquilibré du jour.",
+  "Brawl Stars tier list maker. Build and share your own":
+    "Créateur de tier list Brawl Stars. Crée et partage la tienne",
+  "Nothing here is saved on a server — the link":
+    "Rien n'est enregistré sur un serveur : le lien",
+  "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.":
+    "Classe toi-même la centaine de brawlers, puis partage le tableau avec un seul lien. Touche un brawler puis un tier, ou fais glisser si tu es sur ordinateur.",
+  "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.":
+    "Classe chaque brawler de Brawl Stars toi-même et partage-le avec un seul lien. Pars d'un tableau vide ou de la méta Classé actuelle, puis conteste-la.",
+  "The brawler metadata source is not responding, so there is nothing to rank yet. Try again shortly.":
+    "La source des données des brawlers ne répond pas, donc il n'y a encore rien à classer. Réessaie dans un instant.",
+  "Tier list maker":
+    "Créateur de tier list",
+  "Your call":
+    "À toi de voir",
+  "is":
+    "est",
+  "or the":
+    "ou la",
+  "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the":
+    "la tier list, donc il marche tant que quelqu'un l'a. Pour la version mesurée, construite à partir de combats collectés plutôt que d'avis, vois la",
+  "trophy list":
+    "liste des trophées",
+  "Cosmetics":
+    "Cosmétiques",
+  "Every Brawl Stars profile icon, ranked by how many players use it":
+    "Toutes les icônes de profil de Brawl Stars, classées selon le nombre de joueurs qui les utilisent",
+  "No icon data has been sampled yet.":
+    "Aucune donnée d'icône n'a encore été collectée.",
+  "Nothing sampled yet. The pool refreshes every two hours.":
+    "Rien de collecté pour l'instant. Le pool se rafraîchit toutes les deux heures.",
+  "Profile icons":
+    "Icônes de profil",
+  "The full profile icon catalogue measured from sampled accounts: which icons players actually wear, and which are almost never seen.":
+    "Le catalogue complet des icônes de profil mesuré sur les comptes collectés : les icônes que les joueurs portent vraiment, et celles qu'on ne voit presque jamais.",
+  "{length} icons seen on sampled accounts, ranked by share of players.":
+    "{length} icônes vues sur les comptes collectés, classées par part de joueurs.",
+  "Daily archive":
+    "Archive quotidienne",
+  "Daily findings archive":
+    "Archive des découvertes du jour",
+  "Each day's findings kept at its own address. They cannot be recomputed once their windows roll past, so this reaches back only as far as the day it started.":
+    "Les découvertes de chaque jour gardées à leur propre adresse. Elles ne peuvent pas être recalculées une fois leur période passée, donc l'archive ne remonte qu'au jour où elle a commencé.",
+  "Every day of BrawlZone findings, kept at its own address. What the sampled Brawl Stars battles showed on each date, from the strongest unused pick to the most one-sided matchup.":
+    "Chaque jour de découvertes BrawlZone, gardé à sa propre adresse. Ce que les combats Brawl Stars collectés ont montré à chaque date, du pick inutilisé le plus fort au matchup le plus déséquilibré.",
+  "Nothing archived yet. Today’s report is written as it is published, so the first entry appears once":
+    "Rien d'archivé pour l'instant. Le rapport du jour est écrit à sa publication, donc la première entrée apparaît dès que",
+  "RSS":
+    "RSS",
+  "finding":
+    "découverte",
+  "findings":
+    "découvertes",
+  "have been generated.":
+    "ont été générées.",
+  "today’s findings":
+    "les découvertes du jour",
+  "Every Brawl Stars skin, ranked by how many players wear it":
+    "Tous les skins de Brawl Stars, classés selon le nombre de joueurs qui les portent",
+  "No skin data has been sampled yet.":
+    "Aucune donnée de skin n'a encore été collectée.",
+  "The full skin catalogue measured from sampled accounts: which skins are actually equipped, and which almost nobody uses. Searchable by skin or brawler.":
+    "Le catalogue complet des skins mesuré sur les comptes collectés : les skins vraiment équipés, et ceux que presque personne n'utilise. Recherche par skin ou par brawler.",
+  "{length} skins seen in the sampled pool, ranked by share of player-brawler slots. Default skins are excluded.":
+    "{length} skins vus dans le pool collecté, classés par part des emplacements joueur-brawler. Les skins par défaut sont exclus.",
+  "From {sampleSize} sampled battles.":
+    "D'après {sampleSize} combats collectés.",
+  "See every matchup":
+    "Voir tous les matchups",
+  "See the full record":
+    "Voir le bilan complet",
+  "See the map":
+    "Voir la carte",
+  "See what changed":
+    "Voir ce qui a changé",
+  "See who else pairs well":
+    "Voir avec qui d'autre il s'associe bien",
+  "See why it underperforms":
+    "Voir pourquoi il est à la traîne",
+  "The giant killer":
+    "Le tueur de géants",
+  "The map surprise":
+    "La surprise de la carte",
+  "The meta trap":
+    "Le piège de la méta",
+  "The overnight rise":
+    "L'ascension éclair",
+  "The secret duo":
+    "Le duo secret",
+  "The secret pick":
+    "Le pick secret",
+  "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.":
+    "Rien n'a passé le seuil de preuve. Chaque découverte a besoin d'au moins 300 combats collectés derrière elle, et la page préfère ne rien montrer plutôt qu'une coïncidence.",
+  "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.":
+    "Ce que disent les combats collectés et qu'un tableau de classement ne dit pas. Chacune est le plus grand écart de son genre dans les données du jour : pas un avis, et pas une liste triée sur la colonne évidente.",
+  "What we found":
+    "Ce que nous avons trouvé",
+  "What we found today":
+    "Ce que nous avons trouvé aujourd'hui",
+  "Played":
+    "Joué",
+  " of ":
+    " sur ",
+  "Copy share link":
+    "Copier le lien de partage",
+  "Every brawler is placed. Tap one in a row to send it back here.":
+    "Tous les brawlers sont placés. Touche-en un dans une ligne pour le renvoyer ici.",
+  "Place the selected brawler in {tier} tier":
+    "Placer le brawler sélectionné dans le tier {tier}",
+  "Start from the live meta":
+    "Partir de la méta actuelle",
+  "placed":
+    "placés",
+  "selected — now tap a tier to place it.":
+    "sélectionné — touche maintenant un tier pour le placer.",
+  "{name}: tap to select, tap again to unrank":
+    "{name} : touche pour sélectionner, touche à nouveau pour retirer",
+  "{name}: tap to select, then tap a tier":
+    "{name} : touche pour sélectionner, puis touche un tier",
+  ". Bubble size is the sample behind each point. Tap one for its numbers.":
+    ". La taille de la bulle correspond à l'échantillon derrière chaque point. Touche-en un pour voir ses chiffres.",
+  "Every rated brawler plotted by pick rate against meta score, over {windowDays} days":
+    "Chaque brawler noté, placé selon son taux de sélection et son meta score, sur {windowDays} jours",
+  "How often it is picked →":
+    "À quel point il est choisi →",
+  "How well it does →":
+    "À quel point il gagne →",
+  "Lit brawlers are the ones this account can field. It has":
+    "Les brawlers éclairés sont ceux que ce compte peut aligner. Il en a",
+  "Meta":
+    "Méta",
+  "Out of favour":
+    "En perte de vitesse",
+  "Sleepers":
+    "Dormeurs",
+  "in the meta corner":
+    "dans le coin de la méta",
+  "picked · {sampleSize} battles":
+    "choisi · {sampleSize} combats",
+  "sleepers":
+    "dormeurs",
+  "strongest 30%":
+    "30 % les plus forts",
+  "weakest 40%":
+    "40 % les plus faibles",
+  "win rate ·":
+    "de victoires ·",
+  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
+    "{count} brawlers avec assez de combats Classé pour être notés sur {windowDays} jours. La taille de la bulle correspond à l'échantillon derrière chacun, donc les points les moins sûrs sont les plus petits. Touche-en un pour voir ses chiffres.",
+  "{haveMeta} of the {length}":
+    "{haveMeta} sur les {length}",
+  "{haveSleepers} of the {length}":
+    "{haveSleepers} sur les {length}",
+  "A new brawler at midnight UTC.":
+    "Un nouveau brawler à minuit UTC.",
+  "Average {v} guesses":
+    "En moyenne {v} essais",
+  "Best":
+    "Record",
+  "Copied":
+    "Copié",
+  "Copy result":
+    "Copier le résultat",
+  "Got it in {length}":
+    "Trouvé en {length}",
+  "Guess a brawler":
+    "Devine un brawler",
+  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
+    "Devine le brawler du jour. Chaque essai montre à quel point tu es proche sur cinq indices : vert, c'est exact, orange, c'est à un pas, et une flèche indique la réponse.",
+  "Guesses to solve":
+    "Essais pour trouver",
+  "Next brawler in":
+    "Prochain brawler dans",
+  "Range":
+    "Portée",
+  "Reload":
+    "Recharge",
+  "Revealed":
+    "Révélé",
+  "Streak":
+    "Série",
+  "Type a brawler name…":
+    "Tape un nom de brawler…",
+  "Won":
+    "Gagnées",
+  "Yesterday was":
+    "Hier, c'était",
+  "guess":
+    "essai",
+  "guesses":
+    "essais",
+  "higher":
+    "plus haut",
+  "in {left} {v}":
+    "dans {left} {v}",
+  "lower":
+    "plus bas",
+  "Nothing matches “{query}”.":
+    "Rien ne correspond à « {query} ».",
+  "Search by skin or brawler":
+    "Chercher par skin ou par brawler",
+  "Search icons by number":
+    "Chercher des icônes par numéro",
 };
