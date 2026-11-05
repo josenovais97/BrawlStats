@@ -125,6 +125,12 @@ const WINDOW_DAYS = 7;
  */
 export const POOL_TARGET = 10000;
 
+/** Share of each run's batch open to never-sampled players; known players get the rest. */
+const NEW_PLAYER_SHARE = 0.3;
+
+/** How long a never-sampled player is protected from eviction and kept out of POOL_TARGET. */
+const NEW_PLAYER_WAIT_MS = 24 * 3600_000;
+
 /*
  * 10,000 later the same day, paid for by reading each profile once a day
  * rather than every run: the same request rate covers ~1.7x the players.
@@ -1555,8 +1561,26 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   const prisma = getPrisma();
   if (!prisma) return 0;
 
-  const total = await prisma.sampledPlayer.count();
-  const excess = total - POOL_TARGET;
+  /*
+   * Never-sampled players are protected for a day, not for ever, and while
+   * protected they do not count toward POOL_TARGET (2026-11-05).
+   *
+   * Seeding adds ~3,600 leaderboard players and up to 2,400 recruits a run.
+   * Before the November 2026 update cleared every battle log, nearly all of
+   * them were read on their first run and stamped. Since, ~65% of leaderboard
+   * seeds return an empty log, and protected for ever they piled up (23,760
+   * on 5 Nov) while eviction, needing to bring the pool to its target, could
+   * only remove known players: productive ones included, 3-6k a run. Counting
+   * the day-old waiting room apart keeps that flood from pushing out players
+   * who produce battles; after a day an untried seed is just a silent member,
+   * first out.
+   */
+  const waitingCutoff = new Date(Date.now() - NEW_PLAYER_WAIT_MS);
+  const [total, waiting] = await Promise.all([
+    prisma.sampledPlayer.count(),
+    prisma.sampledPlayer.count({ where: { lastSampledAt: null, createdAt: { gte: waitingCutoff } } }),
+  ]);
+  const excess = total - waiting - POOL_TARGET;
   if (excess <= 0) return 0;
 
   const since = windowStartUtc(INACTIVE_AFTER_DAYS);
@@ -1628,7 +1652,7 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
    * Diamond pool to make room is the opposite of what the pool is for.
    */
   const pool = await prisma.sampledPlayer.findMany({
-    select: { tag: true, trophies: true, rankedRankName: true, lastSampledAt: true },
+    select: { tag: true, trophies: true, rankedRankName: true, lastSampledAt: true, createdAt: true },
   });
   const perBracket = new Map<number, number>();
   for (const row of pool) {
@@ -1637,7 +1661,7 @@ export async function evictStalePool(protectedTags: string[]): Promise<number> {
   }
   for (const row of pool) {
     const bracket = bracketForRankName(row.rankedRankName);
-    if (row.lastSampledAt === null) keep.add(row.tag);
+    if (row.lastSampledAt === null && row.createdAt >= waitingCutoff) keep.add(row.tag);
     else if (bracket && (perBracket.get(bracket.id) ?? 0) < BRACKET_QUOTA) keep.add(row.tag);
   }
   const evictable = pool.filter((row) => !keep.has(row.tag));
@@ -2334,11 +2358,34 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
 
     // Least-recently-sampled first, so the pool rotates instead of re-reading
     // the same players every day.
-    const targets = await prisma.sampledPlayer.findMany({
-      orderBy: [{ lastSampledAt: { sort: 'asc', nulls: 'first' } }],
-      take: batchSize,
-      select: { tag: true, lastSampledAt: true },
-    });
+    /*
+     * Newcomers get at most NEW_PLAYER_SHARE of the batch (2026-11-05); known
+     * players fill the rest, least recently sampled first. NULLS FIRST alone
+     * gave every slot to never-sampled players whenever there were more of
+     * them than the batch, which since the November update meant runs of
+     * mostly empty logs and known players not revisited at all. Among
+     * newcomers, players met in recent battles go before leaderboard seeds:
+     * they have just played, so their logs are full.
+     */
+    const [fresh, known] = await Promise.all([
+      prisma.sampledPlayer.findMany({
+        where: { lastSampledAt: null },
+        select: { tag: true, lastSampledAt: true, source: true, createdAt: true },
+      }),
+      prisma.sampledPlayer.findMany({
+        where: { lastSampledAt: { not: null } },
+        orderBy: { lastSampledAt: 'asc' },
+        take: batchSize,
+        select: { tag: true, lastSampledAt: true },
+      }),
+    ]);
+    const sourceRank = (source: string) => (source === 'recruit' || source === 'lookup' ? 0 : source === 'ranking' || source === 'club' ? 1 : 2);
+    fresh.sort((a, b) => sourceRank(a.source) - sourceRank(b.source) || b.createdAt.getTime() - a.createdAt.getTime());
+    const freshTake = Math.min(fresh.length, Math.max(Math.round(batchSize * NEW_PLAYER_SHARE), batchSize - known.length));
+    const targets = [
+      ...fresh.slice(0, freshTake).map(({ tag, lastSampledAt }) => ({ tag, lastSampledAt })),
+      ...known.slice(0, batchSize - freshTake),
+    ];
 
     // Leave room for aggregation and the ranking pass: sampling stops early
     // rather than starving the steps that turn samples into readable data.
