@@ -4445,4 +4445,434 @@ export const FR: Record<string, string> = {
     "participation",
   "giveaway rules":
     "règlement du concours",
+  "Tick the box to confirm your age and the rules.":
+    "Coche la case pour confirmer ton âge et le règlement.",
+  "That email does not look right.":
+    "Cette adresse e-mail n'a pas l'air correcte.",
+  "No Brawl Stars account has that tag. Check it under your name in game.":
+    "Aucun compte Brawl Stars n'a ce tag. Vérifie-le sous ton nom en jeu.",
+  "This tag is already entered. Lost your page? Write to contact@brawlzone.net.":
+    "Ce tag participe déjà. Tu as perdu ta page ? Écris à contact@brawlzone.net.",
+  "This email is already entered. One entry per person.":
+    "Cet e-mail participe déjà. Une participation par personne.",
+  "Too many entries from this network today. Try again tomorrow.":
+    "Trop de participations depuis ce réseau aujourd'hui. Réessaie demain.",
+  "Something went wrong on our side. Try again in a minute.":
+    "Un problème est survenu de notre côté. Réessaie dans une minute.",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), and +1 for each friend who enters with your link, with no limit. Following or subscribing on any platform is welcome but never gives points.":
+    "1 point pour participer, +{discord} pour confirmer ta participation avec /giveaway sur le serveur Discord de BrawlZone (un compte Discord par participation), et +1 pour chaque ami qui participe avec ton lien, sans limite. S'abonner ou suivre sur une plateforme fait plaisir, mais ne donne jamais de points.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The leaders are checked before the winner is announced.":
+    "Les faux tags, les fausses adresses e-mail, les tags d'autres personnes ou plusieurs participations pour une seule personne sont supprimés, avec tous les points qu'ils ont rapportés. Au maximum {n} participations par jour sont acceptées depuis un même réseau. Les meneurs sont vérifiés avant l'annonce du gagnant.",
+  "Nothing is left to luck: whoever has the most points when entries close wins. If two entrants have the same points, whoever entered first wins. The winner is announced in a video and on brawlzone.net.":
+    "Rien n'est laissé au hasard : celui qui a le plus de points à la clôture des participations gagne. Si deux participants ont autant de points, celui qui a participé en premier gagne. Le gagnant est annoncé dans une vidéo et sur brawlzone.net.",
+  "Points":
+    "Points",
+  "The winner":
+    "Le gagnant",
+  "We email the winner from {email}. If there is no reply within 14 days, or the winner breaks these rules, the prize goes to the next entrant on the leaderboard.":
+    "Nous écrivons au gagnant depuis {email}. S'il n'y a pas de réponse sous 14 jours, ou si le gagnant enfreint ce règlement, le lot revient au participant suivant du classement.",
+  "Every friend who enters with your link. No limit.":
+    "Chaque ami qui participe avec ton lien. Sans limite.",
+  "Follow so you see it the moment it is out. Following does not change your points.":
+    "Suis-nous pour le voir dès sa sortie. Suivre ne change pas tes points.",
+  "Free to enter with your player tag. Get points on Discord and for every friend you bring. Most points wins.":
+    "Participation gratuite avec ton tag de joueur. Gagne des points sur Discord et pour chaque ami que tu amènes. Le plus de points gagne.",
+  "How to get points":
+    "Comment gagner des points",
+  "No luck involved: whoever has the most points when it ends wins. A tie goes to whoever entered first.":
+    "Pas de hasard : celui qui a le plus de points à la fin gagne. En cas d'égalité, celui qui a participé en premier l'emporte.",
+  "Nobody yet. Enter now and you are first.":
+    "Personne pour l'instant. Participe maintenant et tu es premier.",
+  "Top recruiters right now":
+    "Meilleurs recruteurs en ce moment",
+  "Updated every few minutes. Leaders are checked for fake or duplicate friends before the winner is announced.":
+    "Mis à jour toutes les quelques minutes. Les meneurs sont vérifiés pour les faux amis ou les doublons avant l'annonce du gagnant.",
+  "{n} pts":
+    "{n} pts",
+  "A friend sent you: entering gives them +1 point.":
+    "Un ami t'a envoyé : participer lui donne +1 point.",
+  "Friends who entered with your link: {n}":
+    "Amis qui ont participé avec ton lien : {n}",
+  "Your friend link: +1 point for every friend who enters with it":
+    "Ton lien ami : +1 point pour chaque ami qui participe avec",
+  "point":
+    "point",
+  "points":
+    "points",
+  "1 point for entering, +{discord} for confirming your entry with /giveaway in the BrawlZone Discord server (one Discord account per entry), +1 each for subscribing on YouTube, following on TikTok and following on Instagram, and +1 for each friend who enters with your link, with no limit. Follow points are taken on your word, and we may check the winner's.":
+    "1 point pour participer, +{discord} pour confirmer ta participation avec /giveaway sur le serveur Discord de BrawlZone (un compte Discord par participation), +1 chacun pour t'abonner sur YouTube, suivre sur TikTok et suivre sur Instagram, et +1 pour chaque ami qui participe avec ton lien, sans limite. Les points d'abonnement sont accordés sur parole, et nous pouvons vérifier ceux du gagnant.",
+  "Each follow":
+    "Chaque abonnement",
+  "Follow so you see it the moment it is out, and claim your follow points on your entry page above.":
+    "Suis-nous pour le voir dès sa sortie, et récupère tes points d'abonnement sur ta page de participation ci-dessus.",
+  "Subscribe on YouTube, follow on TikTok and on Instagram: +1 each.":
+    "Abonne-toi sur YouTube, suis-nous sur TikTok et sur Instagram : +1 chacun.",
+  "Follow":
+    "Suivre",
+  "Follow on Instagram":
+    "Suivre sur Instagram",
+  "Follow on TikTok":
+    "Suivre sur TikTok",
+  "Subscribe on YouTube":
+    "S'abonner sur YouTube",
+  "Subscribed on YouTube":
+    "Abonné sur YouTube",
+  "Following on TikTok":
+    "Abonné sur TikTok",
+  "Following on Instagram":
+    "Abonné sur Instagram",
+  "Giveaway: win a €10 gift card":
+    "Concours : gagne une carte cadeau de 10 €",
+  "Free to enter. Most points wins. Bring your friends.":
+    "Participation gratuite. Le plus de points gagne. Amène tes amis.",
+  "Enter free":
+    "Participer gratuitement",
+  "Entries open at {time}.":
+    "Les participations ouvrent à {time}.",
+  "Brawl Pass":
+    "Pass Brawl",
+  "Every point is a ticket in the draw: someone with 10 points is 10 times as likely to win as someone with 1.":
+    "Chaque point est un ticket pour le tirage : quelqu'un avec 10 points a 10 fois plus de chances de gagner que quelqu'un avec 1.",
+  "Most points right now":
+    "Le plus de points en ce moment",
+  "More points, more chances. The winner is drawn at random when it ends, with a public random number nobody can know in advance, so nobody can rig it, us included.":
+    "Plus de points, plus de chances. Le gagnant est tiré au sort à la fin, avec un nombre aléatoire public que personne ne peut connaître à l'avance, donc personne ne peut truquer le tirage, pas même nous.",
+  "Free to enter with your player tag. Get points on Discord, for following and for every friend you bring. More points, more chances.":
+    "Participation gratuite avec ton tag de joueur. Gagne des points sur Discord, en nous suivant et pour chaque ami que tu amènes. Plus de points, plus de chances.",
+  "Free to enter. More points, more chances. Bring your friends.":
+    "Participation gratuite. Plus de points, plus de chances. Amène tes amis.",
+  "After entries close, one winner is drawn at random, weighted by points (each point is one ticket), using the first drand public randomness round after the close (drand.love). The entry list (tags and points, no emails) and the round used are published so anyone can check it. The winner is announced in a video and on brawlzone.net.":
+    "Une fois les participations closes, un gagnant est tiré au sort, pondéré par les points (chaque point est un ticket), avec le premier tirage public d'aléa drand après la clôture (drand.love). La liste des participants (tags et points, sans e-mails) et le tirage utilisé sont publiés pour que tout le monde puisse vérifier. Le gagnant est annoncé dans une vidéo et sur brawlzone.net.",
+  "Fake tags, fake email addresses, other people's tags or several entries for one person are removed, along with any points they brought. At most {n} entries a day are accepted from one network. The winner is checked before being announced.":
+    "Les faux tags, les fausses adresses e-mail, les tags d'autres personnes ou plusieurs participations pour une seule personne sont supprimés, avec tous les points qu'ils ont rapportés. Au maximum {n} participations par jour sont acceptées depuis un même réseau. Le gagnant est vérifié avant d'être annoncé.",
+  "Where's my tag?":
+    "Où est mon tag ?",
+  "Is this you?":
+    "C'est toi ?",
+  "Your name":
+    "Ton nom",
+  "Open Brawl Stars and tap your profile picture, top left.":
+    "Ouvre Brawl Stars et touche ta photo de profil, en haut à gauche.",
+  "Your tag is right under your name. It starts with #.":
+    "Ton tag est juste sous ton nom. Il commence par #.",
+  "Type it here, with or without the #.":
+    "Tape-le ici, avec ou sans le #.",
+  "Win the Brawl Pass: free giveaway, more points = more chances.":
+    "Gagne le Pass Brawl : concours gratuit, plus de points = plus de chances.",
+  "Enter now":
+    "Participer maintenant",
+  "Get a notification on this phone, or follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Reçois une notification sur ce téléphone, ou suis une chaîne : un nouveau lien part dès qu'il est trouvé, souvent des heures avant que d'autres sites l'aient.",
+  "If you enter the giveaway, we store your player tag, the email you give and a scrambled, daily-changing code made from your network address (to stop one network creating fake entries). The email is used only to contact the winner, is never published or shared, and is deleted once the prize is delivered.":
+    "Si tu participes au concours, nous stockons ton tag de joueur, l'e-mail que tu donnes et un code brouillé, qui change chaque jour, tiré de ton adresse réseau (pour empêcher un même réseau de créer de fausses participations). L'e-mail ne sert qu'à contacter le gagnant, n'est jamais publié ni partagé, et est supprimé une fois le lot remis.",
+  "If you tap \"Notify me\" on the free rewards page, your browser gives us an address at its own push service (Google's, Apple's or Mozilla's) and two keys, and we store them with the page's language. They identify a browser, not a person, and are used only to tell you about new free rewards. Tap \"Turn off\" on the same page, or block notifications in your browser, and the subscription is deleted.":
+    "Si tu touches « Me prévenir » sur la page des récompenses gratuites, ton navigateur nous donne une adresse chez son propre service de notifications (celui de Google, d'Apple ou de Mozilla) et deux clés, que nous stockons avec la langue de la page. Elles identifient un navigateur, pas une personne, et servent uniquement à te prévenir des nouvelles récompenses gratuites. Touche « Désactiver » sur la même page, ou bloque les notifications dans ton navigateur, et l'abonnement est supprimé.",
+  "Notifications and the giveaway":
+    "Notifications et concours",
+  "Only if you ask for them, and only what they need.":
+    "Seulement si tu les demandes, et seulement ce dont ils ont besoin.",
+  "Notifications are blocked for this site. Allow them in your browser settings to get new rewards.":
+    "Les notifications sont bloquées pour ce site. Autorise-les dans les réglages de ton navigateur pour recevoir les nouvelles récompenses.",
+  "Notifications: open this page in Chrome on Android, or add the site to your home screen on iPhone.":
+    "Notifications : ouvre cette page dans Chrome sur Android, ou ajoute le site à ton écran d'accueil sur iPhone.",
+  "Notify me when a new reward drops":
+    "Préviens-moi quand une nouvelle récompense tombe",
+  "Turn off":
+    "Désactiver",
+  "You will be notified":
+    "Tu seras prévenu",
+  "Checked for new rewards {when}. New ones show up here within minutes.":
+    "Nouvelles récompenses vérifiées {when}. Les nouvelles apparaissent ici en quelques minutes.",
+  "BrawlZone Bubble is on Google Play":
+    "BrawlZone Bubble est sur Google Play",
+  "New on Google Play":
+    "Nouveau sur Google Play",
+  "The best picks for your map and what beats the enemy, floating over Brawl Stars while you draft. Free, no ads.":
+    "Les meilleurs picks pour ta carte et ce qui bat l'ennemi, par-dessus Brawl Stars pendant que tu draftes. Gratuit, sans pub.",
+  "Already in the group? You are not counted yet.":
+    "Déjà dans le groupe ? Tu n'es pas encore compté.",
+  "Google only counts you after step 2: tap here and then \"Become a tester\".":
+    "Google ne te compte qu'après l'étape 2 : touche ici puis « Devenir testeur ».",
+  "Open the group and tap \"Join group\". Use the same Google account as the Play Store on your phone. Then come back to this page: you are not a tester until step 2.":
+    "Ouvre le groupe et touche « Rejoindre le groupe ». Utilise le même compte Google que celui du Play Store sur ton téléphone. Puis reviens sur cette page : tu n'es testeur qu'après l'étape 2.",
+  "Joined the group? You are not a tester yet.":
+    "Tu as rejoint le groupe ? Tu n'es pas encore testeur.",
+  "One more tap: Google only counts you after step 2.":
+    "Encore un tap : Google ne te compte qu'après l'étape 2.",
+  "Step 2: Become a tester":
+    "Étape 2 : devenir testeur",
+  "Get a notification on this phone the moment a new free reward appears, often hours before other sites have it. No account, turn it off any time.":
+    "Reçois une notification sur ce téléphone dès qu'une nouvelle récompense gratuite apparaît, souvent des heures avant que d'autres sites l'aient. Pas de compte, désactivable à tout moment.",
+  "Not now":
+    "Pas maintenant",
+  "🎁 Claimed! Want the next one first?":
+    "🎁 Récupéré ! Tu veux la prochaine en premier ?",
+  "Enter your name or tag to search.":
+    "Entre ton nom ou ton tag pour chercher.",
+  "No player with that name here yet. Search once with your tag, and your name will work next time.":
+    "Aucun joueur avec ce nom ici pour l'instant. Cherche une fois avec ton tag, et ton nom marchera la prochaine fois.",
+  "Pick your profile from the list below.":
+    "Choisis ton profil dans la liste ci-dessous.",
+  "Player name or tag":
+    "Nom de joueur ou tag",
+  "Search by name or tag. Your tag is on your in-game profile, just below your profile icon.":
+    "Cherche par nom ou par tag. Ton tag est sur ton profil en jeu, juste sous ton icône de profil.",
+  "Your name or tag":
+    "Ton nom ou ton tag",
+  "Tick this box to enter.":
+    "Coche cette case pour participer.",
+  "1 in {n}":
+    "1 sur {n}",
+  "A Chaos Drop starts at Super Rare: {list}.":
+    "Un Prix du chaos commence à Super rare : {list}.",
+  "A Chaos Drop starts at Super Rare: {list}. That makes {p} of them Legendary or better, against {s} for a Starr Drop.":
+    "Un Prix du chaos commence à Super rare : {list}. Ça en fait {p} Légendaires ou mieux, contre {s} pour un Prix Starr.",
+  "About {d} days on average, at {n} Starr Drops a day from Daily Wins. The chance of at least one is {w} in a week and {m} in a month.":
+    "Environ {d} jours en moyenne, à {n} Prix Starr par jour avec les Victoires du jour. La chance d'en avoir au moins un est de {w} en une semaine et de {m} en un mois.",
+  "Are these drop rates official?":
+    "Ces taux d'obtention sont-ils officiels ?",
+  "Brawl Stars Starr Drops: daily schedule, drop rates and rewards":
+    "Prix Starr de Brawl Stars : programme du jour, taux d'obtention et récompenses",
+  "Chaos Drops are better odds: {p} of them are Legendary or rarer.":
+    "Les Prix du chaos ont de meilleures chances : {p} d'entre eux sont Légendaires ou plus rares.",
+  "Daily schedule":
+    "Programme du jour",
+  "Every Starr Drop starts Rare and can upgrade. The chance it ends as each:":
+    "Chaque Prix Starr commence Rare et peut s'améliorer. La chance qu'il finisse :",
+  "How long does it take to get a Legendary Starr Drop?":
+    "Combien de temps faut-il pour avoir un Prix Starr légendaire ?",
+  "How many Starr Drops do you get a day?":
+    "Combien de Prix Starr peut-on avoir par jour ?",
+  "On average one Starr Drop in {k} is Legendary.":
+    "En moyenne, un Prix Starr sur {k} est Légendaire.",
+  "On average one Starr Drop in {k} is Legendary: about one every {d} days of Daily Wins.":
+    "En moyenne, un Prix Starr sur {k} est Légendaire : environ un tous les {d} jours de Victoires du jour.",
+  "On this page":
+    "Sur cette page",
+  "One of: {list}.":
+    "L'un de : {list}.",
+  "Quick answers":
+    "Réponses rapides",
+  "Starr Drops on a normal day":
+    "Les Prix Starr d'un jour normal",
+  "The chance of at least one Legendary Starr Drop from your Daily Wins, at {n} Starr Drops a day.":
+    "La chance d'avoir au moins un Prix Starr légendaire avec tes Victoires du jour, à {n} Prix Starr par jour.",
+  "The chance of at least one Legendary in that many Starr Drops.":
+    "La chance d'avoir au moins un Légendaire sur autant de Prix Starr.",
+  "They come from the Brawl Stars Wiki, which the community keeps up to date from datamines and in-game observation. Supercell publishes no drop-rate API. This page reads the wiki twice a day, so it changes when the game does.":
+    "Ils viennent du Brawl Stars Wiki, que la communauté tient à jour à partir de dataminages et d'observations en jeu. Supercell ne publie aucune API de taux d'obtention. Cette page lit le wiki deux fois par jour, donc elle change quand le jeu change.",
+  "This month":
+    "Ce mois-ci",
+  "This season's Starr Drop schedule, your chance of a Legendary today, this week and this month, and every reward inside each drop and box. Updated twice a day.":
+    "Le programme des Prix Starr de cette saison, ta chance d'avoir un Légendaire aujourd'hui, cette semaine et ce mois-ci, et chaque récompense de chaque prix et boîte. Mis à jour deux fois par jour.",
+  "This season's daily schedule, the chance of every rarity, and every reward inside each drop and box. Read from the Brawl Stars Wiki twice a day, so it changes when the game does.":
+    "Le programme du jour de cette saison, la chance de chaque rareté, et chaque récompense de chaque prix et boîte. Lu depuis le Brawl Stars Wiki deux fois par jour, donc il change quand le jeu change.",
+  "This week":
+    "Cette semaine",
+  "Updated {date}":
+    "Mis à jour le {date}",
+  "What are the Chaos Drop chances?":
+    "Quelles sont les chances d'un Prix du chaos ?",
+  "What are the chances of a Legendary Starr Drop?":
+    "Quelle est la chance d'avoir un Prix Starr légendaire ?",
+  "What can you get from a Legendary Starr Drop?":
+    "Que peut-on obtenir d'un Prix Starr légendaire ?",
+  "Your Legendary odds":
+    "Tes chances de Légendaire",
+  "Your chance of a Legendary":
+    "Ta chance d'avoir un Légendaire",
+  "Your first {wins} wins of the day each give a reward, and this season all {wins} are Starr Drops on a normal day.":
+    "Tes {wins} premières victoires du jour donnent chacune une récompense, et cette saison, les {wins} sont des Prix Starr un jour normal.",
+  "Your first {wins} wins of the day each give a reward. On a normal day this season {n} of them are Starr Drops, and the rest are the other drops and boxes in the schedule above.":
+    "Tes {wins} premières victoires du jour donnent chacune une récompense. Un jour normal de cette saison, {n} d'entre elles sont des Prix Starr, et le reste, ce sont les autres prix et boîtes du programme ci-dessus.",
+  "next special day":
+    "prochain jour spécial",
+  "no special day announced yet":
+    "aucun jour spécial annoncé pour l'instant",
+  "of Chaos Drops are Legendary or better":
+    "des Prix du chaos sont Légendaires ou mieux",
+  "wins a day give a reward":
+    "victoires par jour donnent une récompense",
+  "{n} Starr Drops":
+    "{n} Prix Starr",
+  "{n} drops":
+    "{n} prix",
+  "{p} per Starr Drop, about 1 in {k}. Every Starr Drop starts Rare and can upgrade; the chance it ends as each rarity is {list}.":
+    "{p} par Prix Starr, environ 1 sur {k}. Chaque Prix Starr commence Rare et peut s'améliorer ; la chance qu'il finisse dans chaque rareté est {list}.",
+  "Chaos Drops":
+    "Prix du chaos",
+  "Your player tag or name":
+    "Ton tag de joueur ou ton nom",
+  "#2PQ8LJ9V or your name":
+    "#2PQ8LJ9V ou ton nom",
+  "Tap your account in the list under the box, or type your tag.":
+    "Touche ton compte dans la liste sous le champ, ou tape ton tag.",
+  "No player found with that name. Type your tag instead: it starts with # and is under your name in game.":
+    "Aucun joueur trouvé avec ce nom. Tape plutôt ton tag : il commence par # et se trouve sous ton nom en jeu.",
+  "Daily schedule and every reward":
+    "Programme du jour et toutes les récompenses",
+  "It rolls a rarity first, then one reward of that rarity. The chance of each rarity:":
+    "Il tire d'abord une rareté, puis une récompense de cette rareté. La chance de chaque rareté :",
+  "The best rewards, and your chance in one {drop}":
+    "Les meilleures récompenses, et ta chance dans un {drop}",
+  "What can a {drop} give you?":
+    "Que peut te donner un {drop} ?",
+  "Your Daily Wins give {n} Starr Drops a day: a {d} chance of at least one Legendary today, {w} this week and {m} this month.":
+    "Tes Victoires du jour donnent {n} Prix Starr par jour : {d} de chances d'au moins un Légendaire aujourd'hui, {w} cette semaine et {m} ce mois-ci.",
+  "{n}-gem skin":
+    "Skin à {n} gemmes",
+  "Star Power":
+    "Pouvoir star",
+  "Epic Brawler":
+    "Brawler épique",
+  "Mythic Brawler":
+    "Brawler mythique",
+  "Legendary Brawler":
+    "Brawler légendaire",
+  "Ultra Brawler":
+    "Brawler ultra",
+  "Open a Starr Drop":
+    "Ouvre un Prix Starr",
+  "Open a drop":
+    "Ouvre un prix",
+  "Tap it like in the game and see what the real odds give you.":
+    "Touche-le comme dans le jeu et vois ce que donnent les vraies chances.",
+  "Try opening one":
+    "Essaie d'en ouvrir un",
+  "A simulation with the real odds from the Brawl Stars Wiki. Nothing is added to your game account.":
+    "Une simulation avec les vraies chances du Brawl Stars Wiki. Rien n'est ajouté à ton compte de jeu.",
+  "Copied!":
+    "Copié !",
+  "Keep tapping!":
+    "Continue de toucher !",
+  "Open 10 at once":
+    "En ouvrir 10 d'un coup",
+  "Open another":
+    "En ouvrir un autre",
+  "Open another {drop}":
+    "Ouvrir un autre {drop}",
+  "Share my best":
+    "Partager mon meilleur",
+  "Tap the drop to open it":
+    "Touche le prix pour l'ouvrir",
+  "Tap the {drop}":
+    "Touche le {drop}",
+  "Which drop":
+    "Quel prix",
+  "Your best so far: {best} ({rarity}).":
+    "Ton meilleur jusqu'ici : {best} ({rarity}).",
+  "{n} drops opened on BrawlZone, best pull: {best} ({rarity}). Try your luck:":
+    "{n} prix ouverts sur BrawlZone, meilleur tirage : {best} ({rarity}). Tente ta chance :",
+  "{n} opened · {k} Legendary or better":
+    "{n} ouverts · {k} Légendaires ou mieux",
+  "{p} chance per drop, 1 in {n}":
+    "{p} de chances par prix, 1 sur {n}",
+  "{rarity} {drop}":
+    "{drop} {rarity}",
+  "The full patch notes are on supercell.com:":
+    "Les notes de mise à jour complètes sont sur supercell.com :",
+  "What the latest update changed, which brawlers it touched, and what is coming next.":
+    "Ce que la dernière mise à jour a changé, les brawlers qu'elle a touchés, et ce qui arrive ensuite.",
+  " to measure visits in aggregate, which advertising partners use to judge the site. It may set cookies. Visitors in the EEA, the UK and Switzerland are asked first, through the same Google consent message as the ads below; until they agree, no analytics cookies are set. The Bubble panel and the Android app do not load it.":
+    " pour mesurer les visites de façon agrégée, ce que les partenaires publicitaires utilisent pour juger le site. Il peut poser des cookies. Les visiteurs de l'EEE, du Royaume-Uni et de la Suisse sont d'abord consultés via le même message de consentement de Google que pour les publicités ci-dessous ; tant qu'ils n'ont pas accepté, aucun cookie de statistiques n'est posé. Le panneau de la Bubble et l'appli Android ne le chargent pas.",
+  ", running on the same server as the site rather than at a third party. It sets no cookies and stores no personal data, so it needs no consent.":
+    ", qui tourne sur le même serveur que le site plutôt que chez un tiers. Il ne pose aucun cookie et ne stocke aucune donnée personnelle, donc il n'a pas besoin de consentement.",
+  "Google Analytics":
+    "Google Analytics",
+  "Our own counter, plus Google Analytics.":
+    "Notre propre compteur, plus Google Analytics.",
+  "The website also uses":
+    "Le site utilise aussi",
+  "Follow a channel: a new link goes out the moment it is found, often hours before other sites have it.":
+    "Suis une chaîne : un nouveau lien part dès qu'il est trouvé, souvent des heures avant que d'autres sites l'aient.",
+  "On iPhone, notifications work once BrawlZone is on your home screen: tap":
+    "Sur iPhone, les notifications marchent une fois BrawlZone ajouté à ton écran d'accueil : touche",
+  "Or follow a channel: a new link goes out the moment it is found.":
+    "Ou suis une chaîne : un nouveau lien part dès qu'il est trouvé.",
+  "Share, then \"Add to Home Screen\", and open BrawlZone from there.":
+    "Partager, puis « Sur l'écran d'accueil », et ouvre BrawlZone depuis là.",
+  "BrawlZone is made and run by":
+    "BrawlZone est fait et géré par",
+  ", a one-person studio in Portugal that also develops the BrawlZone Bubble app for Android. Questions go to the address below.":
+    ", un studio d'une seule personne au Portugal qui développe aussi l'appli BrawlZone Bubble pour Android. Les questions vont à l'adresse ci-dessous.",
+  "Your in-game name or #tag.":
+    "Ton nom en jeu ou ton #tag.",
+  "Best in Ranked right now":
+    "Les meilleurs en Classé en ce moment",
+  "Full tier list":
+    "Tier list complète",
+  "Pick the brawler you keep losing to.":
+    "Choisis le brawler contre qui tu perds tout le temps.",
+  "{rate} win":
+    "{rate} de victoires",
+  "Claim it":
+    "Récupérer",
+  "Free rewards":
+    "Récompenses gratuites",
+  "Get the next one":
+    "Recevoir la prochaine",
+  "Giveaway":
+    "Concours",
+  "Guess":
+    "Deviner",
+  "New every day":
+    "Nouveau chaque jour",
+  "No free link live right now":
+    "Aucun lien gratuit actif en ce moment",
+  "Today in Brawl Stars":
+    "Aujourd'hui dans Brawl Stars",
+  "Who is this brawler?":
+    "Qui est ce brawler ?",
+  "{n} live":
+    "{n} actifs",
+  "From {battles} battles of {players} players we sampled ourselves.":
+    "D'après {battles} combats de {players} joueurs que nous avons collectés nous-mêmes.",
+  "Updated":
+    "Mis à jour",
+  "November 2026 update":
+    "Mise à jour de novembre 2026",
+  "Ranked Refresh: what changed":
+    "Refonte du Classé : ce qui a changé",
+  "The biggest change to Ranked since the 2025 rework.":
+    "Le plus grand changement du Classé depuis la refonte de 2025.",
+  "The first season reset under the new rules is on {date}.":
+    "La première réinitialisation de saison sous les nouvelles règles a lieu le {date}.",
+  "Unlocks at 5,000 trophies":
+    "Se débloque à 5 000 trophées",
+  "Up from 1,000. If you already have Ranked you keep it, and get a Chaos Drop at 5,000 trophies instead.":
+    "Contre 1 000 avant. Si tu as déjà le Classé, tu le gardes, et tu reçois à la place un Prix du chaos à 5 000 trophées.",
+  "Power 11 at every rank":
+    "Niveau de pouvoir 11 à chaque rang",
+  "Bronze to Diamond used to take Power 9. Diamond now needs 12 brawlers, the same as Mythic, up from 9.":
+    "De Bronze à Diamant, il fallait le niveau de pouvoir 9. Diamant demande maintenant 12 brawlers, comme Mythique, au lieu de 9.",
+  "6 free maxed brawlers a season":
+    "6 brawlers gratuits au max par saison",
+  "Up from 3, to make up for the stricter requirements.":
+    "Contre 3 avant, pour compenser des exigences plus strictes.",
+  "The season reset drops you 2 ranks":
+    "La réinitialisation de saison te fait descendre de 2 rangs",
+  "Down from 6, so you start each season much closer to your best. No change to the boost.":
+    "Au lieu de 6, donc chaque saison commence bien plus près de ton meilleur niveau. Aucun changement au bonus.",
+  "A 2-0 win earns more Elo":
+    "Une victoire 2-0 rapporte plus d'elo",
+  "An Epic Win (2-0) gives extra Elo and a Close Match loss (1-2) costs less. Early and middle ranks climb faster.":
+    "Une victoire écrasante (2-0) donne de l'elo en plus et une défaite serrée (1-2) en coûte moins. Les rangs bas et moyens montent plus vite.",
+  "No teams from Masters I up":
+    "Plus d'équipes à partir de Maîtres I",
+  "From Masters I and above, Ranked is played without a premade team.":
+    "À partir de Maîtres I, le Classé se joue sans équipe formée à l'avance.",
+  "A new Pick & Ban screen":
+    "Un nouvel écran de choix et de bans",
+  "A bigger brawler grid with filters, ban suggestions, pick-order swaps and quick chat while you draft.":
+    "Une grille de brawlers plus grande avec des filtres, des suggestions de bans, l'échange de l'ordre des picks et un chat rapide pendant le draft.",
+  "Pro no longer qualifies for BSC":
+    "Pro ne qualifie plus pour les BSC",
+  "Reaching Pro does not qualify you for BSC 2027. The way in is the Championship Challenge.":
+    "Atteindre Pro ne qualifie pas pour les BSC 2027. La voie d'accès, c'est le Championship Challenge.",
+  "Source:":
+    "Source :",
+  "Supercell’s November 2026 release notes":
+    "Les notes de mise à jour de novembre 2026 de Supercell",
+  "Every balance change in this update":
+    "Tous les équilibrages de cette mise à jour",
 };

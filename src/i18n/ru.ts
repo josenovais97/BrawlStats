@@ -760,7 +760,7 @@ export const RU: Record<string, string> = {
   "community and read from it automatically, so a new event appears here without the site being changed. Text is CC BY-SA.":
     ", и отсюда они читаются автоматически, поэтому новое событие появляется здесь без изменений на сайте. Текст по лицензии CC BY-SA.",
   "'s own Ranked average; small samples are pulled toward it. The same trios, with your roster ticked, are in the":
-    " — собственного среднего в ранговых боях; малые выборки подтягиваются к нему. Те же тройки, с отмеченными твоими бойцами, есть в приложении",
+    "); малые выборки подтягиваются к нему. Те же тройки, с отмеченными твоими бойцами, есть в приложении",
   "Best Ranked trios in {modeLabel}":
     "Лучшие тройки ранговых боёв: {modeLabel}",
   "Best Ranked trios on {mapName}":
@@ -768,7 +768,7 @@ export const RU: Record<string, string> = {
   "The three brawlers that win most together on this map, from sampled Ranked battles in the last 14 days.":
     "Три бойца, которые чаще всего побеждают вместе на этой карте, по собранным ранговым боям за последние 14 дней.",
   "Win rate against this":
-    "Процент побед против этого",
+    "Процент побед относительно среднего в ранговых боях (",
   "app's Team comp tab.":
     ", во вкладке «Составы команд».",
   "mode":
