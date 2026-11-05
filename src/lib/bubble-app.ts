@@ -475,7 +475,7 @@ export function releasesSince(versionCode: number): BubbleRelease[] {
  * redirects /bubble/test to /bubble, and keeps the APK as the fallback for
  * phones without Play.
  */
-export const PLAY_LIVE = false;
+export const PLAY_LIVE = true;
 
 export const PLAY_TEST = {
   open: !PLAY_LIVE,
