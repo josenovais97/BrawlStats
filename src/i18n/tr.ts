@@ -1948,16 +1948,10 @@ export const TR: Record<string, string> = {
     "Taşımak için sürükle",
   "Earlier versions (":
     "Önceki sürümler (",
-  "Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map":
-    "Banları, takımının ve rakibin aldıklarını gir; liste üçüne göre yeniden sıralanır. Sadece haritada güçlü olan bir savaşçı, haritada güçlü olup aynı zamanda",
-  "Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.":
-    "Her satır hesabını gösterir: bu haritadaki form, yazdığın rakiplere karşı üstünlük, takım arkadaşlarının yanında üstünlük. Kontrol edemediğin bir öneri, yüzdeye bürünmüş bir tahmindir; draft ortasında da genelde sebep karar verdirir.",
   "Five steps, and the fourth is where Android gets in your way.":
     "Beş adım; dördüncüsünde Android araya girer.",
   "Free Android app":
     "Ücretsiz Android uygulaması",
-  "Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.":
-    "Ücretsiz, {v}, hesap gerekmez. Gösterdiği her şey sitede de var; uygulama sadece uygulama değiştirme zahmetini kurtarır, draftı kaybettiren de o kısım.",
   "Get it on":
     "Şuradan al:",
   "Get it on your phone":
@@ -1974,8 +1968,6 @@ export const TR: Record<string, string> = {
     "Metayı gösterir; onu önündeki drafta sen uyarlarsın. Oyuna dokunmaz, hesabını okumaz, hiçbir yere bir şey göndermez: hesap yok, uygulamada analiz yok, giriş yapılacak bir şey yok.",
   "Latest":
     "En yeni",
-  "Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.":
-    "Ne bu, ne de herhangi biri. Bir tarayıcı sekmesi başka bir uygulamanın üzerine çizemez; her telefonda korumalı alan buna izin vermez. Tier listesine tarayıcıdan bakmak drafttan çıkmak demektir, seçimi kaybettiren de drafttan çıkmaktır.",
   "On a computer?":
     "Bilgisayarda mısın?",
   "One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.":
@@ -2020,8 +2012,6 @@ export const TR: Record<string, string> = {
     "Oyunun üzerinde yüzen Aşamalı tier listesi. Ücretsiz indir, reklam yok, hesap yok.",
   "The app finds your account. Brawlers you do not own are greyed out in the panel.":
     "Uygulama hesabını bulur. Sahip olmadığın savaşçılar panelde gri görünür.",
-  "The app updates by downloading again — it installs over the top and keeps your permission.":
-    "Uygulama yeniden indirilerek güncellenir: üzerine yüklenir ve iznini korur.",
   "The bubble appears straight away and stays on top of whatever you open next, including the game.":
     "Baloncuk hemen çıkar ve sonra açtığın her şeyin, oyun dahil, üzerinde kalır.",
   "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.":
@@ -2046,8 +2036,6 @@ export const TR: Record<string, string> = {
     "Tier listesi,",
   "Then the map you are on":
     "Sonra bulunduğun harita",
-  "Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.":
-    "Zayıf kanıt gizlenmez, işaretlenir. Bu haritada on bir maçla desteklenen bir savaşçı bunu kırmızıyla belirtir, çünkü on bir maçtan %52 ile iki yüz maçtan %52 aynı iddia değildir.",
   "Three gestures. There is nothing else to learn.":
     "Üç hareket. Öğrenilecek başka bir şey yok.",
   "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.":
@@ -2072,8 +2060,6 @@ export const TR: Record<string, string> = {
     "Yüklemeden önce bilmeye değer, sonra değil.",
   "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.":
     "Tarayıcın bu tür bir dosyayı tutup tutmayacağını sorar. Bu bir uygulama yükleyicisi; Chrome da Android de önce sana sorar, bu uyarı normaldir.",
-  "answers what they just picked.":
-    "rakibin az önce seçtiğine de cevap veren bir savaşçıdan farklı bir karardır.",
   "on top of the game":
     "oyunun üzerinde",
   "sha256sum brawlzone-bubble.apk":
@@ -3600,8 +3586,6 @@ export const TR: Record<string, string> = {
     "Oyuncu etiketini bir kez ekle: sahip olduğun savaşçılar işaretlenir, diğerleri gri ya da gizli olur ve Güç 11 veya hiperşarjlılara daraltabilirsin.",
   "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
     "Bir uygulama yapabilir. Baloncuk ekranın kenarında durur, oyunun üzerinde bir dokunuşla açılır ve tekrar kapanır.",
-  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
-    "Brawl Stars seçim için sana saniyeler verir. Bir tier listesine bakmak için oyundan çıkmak elindekinden fazlasını yer; bu yüzden cevap sana gelir: rütbendeki meta, haritan için en iyi seçimler ve rakibi neyin yendiği, oyunun üzerinde bir dokunuş uzaklıkta.",
   "Coming to Google Play":
     "Google Play'e geliyor",
   "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
@@ -4870,4 +4854,18 @@ export const TR: Record<string, string> = {
     "Profilinin takip ettiğimiz tüm oyuncularla nasıl karşılaştırıldığını gör.",
   "Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.":
     "Aşamalı ve kupa merdiveni ayrı puanlanır; bir savaşçı birinde ilk seçim, diğerinde tuzak olabilir.",
+  "Brawl Stars gives you seconds to pick, so the bubble brings the answer to you: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "Brawl Stars seçim için sana saniyeler verir, bu yüzden baloncuk cevabı sana getirir: rütbendeki meta, haritan için en iyi seçimler ve rakibi yenenler, oyunun üzerinde bir dokunuş uzakta.",
+  "No website can. A browser cannot draw on top of another app, on any phone, so checking a tier list there means leaving the draft.":
+    "Hiçbir site yapamaz. Tarayıcı hiçbir telefonda başka bir uygulamanın üzerine çizim yapamaz, yani orada tier listesine bakmak drafttan çıkmak demek.",
+  "Enter the bans, your team’s picks and theirs, and the list reorders around all three.":
+    "Yasakları, kendi takımının ve rakibin seçimlerini gir; liste üçüne göre yeniden sıralanır.",
+  "Every row shows why: form on this map, edge against the enemies you named, and edge with your team-mates.":
+    "Her satır nedenini gösterir: bu haritadaki form, seçtiğin rakiplere karşı avantaj ve takım arkadaşlarınla avantaj.",
+  "Brawlers with only a few battles on the map are marked in red.":
+    "Haritada az maçı olan savaşçılar kırmızıyla işaretlenir.",
+  "To update, download it again. It installs over the old one and keeps its permission.":
+    "Güncellemek için tekrar indir. Eskisinin üzerine kurulur ve iznini korur.",
+  "Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
+    "Ücretsiz, {v}, hesap yok. İçindeki her şey sitede de var. Uygulama yalnızca draft ortasında uygulama değiştirmeni önler.",
 };

@@ -1949,16 +1949,10 @@ export const RU: Record<string, string> = {
     "Потяни, чтобы переместить",
   "Earlier versions (":
     "Прошлые версии (",
-  "Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map":
-    "Укажи запреты, кого взяла твоя команда и кого их, и список перестроится под все три условия. Боец, который просто силён на карте, — это другой выбор, чем тот, кто силён на карте и",
-  "Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.":
-    "Каждая строка показывает расчёт: форма на этой карте, преимущество против названных врагов, преимущество рядом с союзниками. Подсказка, которую нельзя проверить, — это догадка в обёртке процента, а посреди драфта решает обычно именно причина.",
   "Five steps, and the fourth is where Android gets in your way.":
     "Пять шагов, и на четвёртом Android встаёт у тебя на пути.",
   "Free Android app":
     "Бесплатное приложение для Android",
-  "Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.":
-    "Бесплатно, {v}, без аккаунта. Всё, что оно показывает, есть и на сайте: приложение лишь избавляет от переключения, а именно оно стоит тебе драфта.",
   "Get it on":
     "Доступно в",
   "Get it on your phone":
@@ -1975,8 +1969,6 @@ export const RU: Record<string, string> = {
     "Оно показывает мету, а сопоставить её с драфтом перед тобой — твоя задача. Оно не трогает игру, не читает твой аккаунт и никуда ничего не отправляет: нет аккаунта, нет аналитики в приложении и некуда входить.",
   "Latest":
     "Последняя",
-  "Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.":
-    "Ни этот, ни какой-либо другой. Вкладка браузера не может рисовать поверх другого приложения: песочница это запрещает на любом телефоне. Смотреть тир-лист в браузере значит выйти из драфта, а выход из драфта стоит тебе пика.",
   "On a computer?":
     "На компьютере?",
   "One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.":
@@ -2021,8 +2013,6 @@ export const RU: Record<string, string> = {
     "Тир-лист ранговых боёв поверх игры. Бесплатно, без рекламы, без аккаунта.",
   "The app finds your account. Brawlers you do not own are greyed out in the panel.":
     "Приложение находит твой аккаунт. Бойцы, которых у тебя нет, в панели серые.",
-  "The app updates by downloading again — it installs over the top and keeps your permission.":
-    "Приложение обновляется повторной загрузкой: оно ставится поверх и сохраняет разрешение.",
   "The bubble appears straight away and stays on top of whatever you open next, including the game.":
     "Пузырь появляется сразу и остаётся поверх всего, что ты откроешь дальше, включая игру.",
   "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.":
@@ -2047,8 +2037,6 @@ export const RU: Record<string, string> = {
     "Тир-лист,",
   "Then the map you are on":
     "Потом карта, на которой ты играешь",
-  "Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.":
-    "Недостаток данных отмечается, а не скрывается. Боец, за которым одиннадцать боёв на этой карте, помечен красным, потому что 52% на одиннадцати боях и 52% на двухстах — не одно и то же утверждение.",
   "Three gestures. There is nothing else to learn.":
     "Три жеста. Больше учить нечего.",
   "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.":
@@ -2073,8 +2061,6 @@ export const RU: Record<string, string> = {
     "Это стоит знать до установки, а не после.",
   "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.":
     "Браузер спросит, сохранить ли файл такого типа. Это установщик приложения, поэтому и Chrome, и Android сначала уточняют у тебя: это обычный запрос.",
-  "answers what they just picked.":
-    "отвечает на то, что они только что взяли.",
   "on top of the game":
     "поверх игры",
   "sha256sum brawlzone-bubble.apk":
@@ -3601,8 +3587,6 @@ export const RU: Record<string, string> = {
     "Добавь тег игрока один раз: твои бойцы отмечены, остальные серые или скрыты, а список можно сузить до 11-го уровня силы или гиперзаряда.",
   "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
     "А приложение может. Пузырь сидит у края экрана, открывается по нажатию поверх игры и снова сворачивается.",
-  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
-    "Brawl Stars даёт на выбор считаные секунды. Выйти из игры, чтобы посмотреть тир-лист, стоит больше, чем у тебя есть, поэтому ответ приходит к тебе: мета на твоём ранге, лучшие пики для твоей карты и кто побеждает врага — в одном касании поверх игры.",
   "Coming to Google Play":
     "Скоро в Google Play",
   "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
@@ -4871,4 +4855,18 @@ export const RU: Record<string, string> = {
     "Посмотрите, как ваш профиль выглядит на фоне всех игроков, которых мы отслеживаем.",
   "Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.":
     "Ранговые бои и бои за трофеи оцениваются отдельно, поэтому боец может быть топ-пиком в одних и ловушкой в других.",
+  "Brawl Stars gives you seconds to pick, so the bubble brings the answer to you: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "В Brawl Stars на выбор есть считаные секунды, поэтому пузырь сам приносит ответ: мету на вашем ранге, лучшие пики для карты и то, что побеждает соперника, в одном нажатии поверх игры.",
+  "No website can. A browser cannot draw on top of another app, on any phone, so checking a tier list there means leaving the draft.":
+    "Ни один сайт так не умеет. Браузер ни на одном телефоне не может рисовать поверх другого приложения, поэтому смотреть там тир-лист — значит выйти из драфта.",
+  "Enter the bans, your team’s picks and theirs, and the list reorders around all three.":
+    "Укажите баны, пики своей команды и соперников, и список перестроится с учётом всего этого.",
+  "Every row shows why: form on this map, edge against the enemies you named, and edge with your team-mates.":
+    "Каждая строка объясняет почему: форма на этой карте, преимущество против выбранных соперников и с вашими союзниками.",
+  "Brawlers with only a few battles on the map are marked in red.":
+    "Бойцы, у которых на карте мало боёв, отмечены красным.",
+  "To update, download it again. It installs over the old one and keeps its permission.":
+    "Чтобы обновить, скачайте приложение снова. Оно установится поверх старого и сохранит разрешение.",
+  "Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
+    "Бесплатно, {v}, без аккаунта. Всё это есть и на сайте. Приложение лишь избавляет от переключения посреди драфта.",
 };

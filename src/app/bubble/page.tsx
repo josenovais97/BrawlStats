@@ -196,7 +196,7 @@ export default function BubblePage() {
                 <span className="text-brand">{t('on top of the game')}</span>
               </h1>
 
-              <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.')}</p>
+              <p className="max-w-2xl text-lg leading-relaxed text-muted">{t('Brawl Stars gives you seconds to pick, so the bubble brings the answer to you: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.')}</p>
             </div>
 
             {/*
@@ -333,7 +333,7 @@ export default function BubblePage() {
 
           <div className="card card-glow space-y-4 p-6 sm:p-8">
             <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('A website cannot do this')}</h2>
-            <p className="leading-relaxed text-muted">{t('Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.')}</p>
+            <p className="leading-relaxed text-muted">{t('No website can. A browser cannot draw on top of another app, on any phone, so checking a tier list there means leaving the draft.')}</p>
             <p className="leading-relaxed text-muted">{t('An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.')}</p>
             <figure className="space-y-2 pt-2">
               <Image
@@ -430,12 +430,11 @@ export default function BubblePage() {
           </div>
 
           <div className="space-y-4 text-muted">
-            <p className="leading-relaxed">{t('Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map')}{' '}<em>{t('and')}</em>{' '}{t('answers what they just picked.')}</p>
-            <p className="leading-relaxed">{t('Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.')}</p>
+            <p className="leading-relaxed">{t('Enter the bans, your team’s picks and theirs, and the list reorders around all three.')}</p>
+            <p className="leading-relaxed">{t('Every row shows why: form on this map, edge against the enemies you named, and edge with your team-mates.')}</p>
             <p className="leading-relaxed">{t('Tap an enemy pick to see the five brawlers that beat it most often at your rank, with a link to the full counters page on the site.')}</p>
             <p className="leading-relaxed">
-              {/* Said plainly because the alternative is a reader trusting a
-                  number that a dozen battles produced. */}{t('Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.')}</p>
+{t('Brawlers with only a few battles on the map are marked in red.')}</p>
           </div>
         </div>
       </section>
@@ -601,7 +600,7 @@ export default function BubblePage() {
       <section id="changelog" className="space-y-5 scroll-mt-24">
         <SectionHeading
           title={t('What\'s new')}
-          subtitle={t('The app updates by downloading again — it installs over the top and keeps your permission.')}
+          subtitle={t('To update, download it again. It installs over the old one and keeps its permission.')}
         />
 
         {/*
@@ -683,7 +682,7 @@ export default function BubblePage() {
 
       <section className="card card-glow p-6 text-center sm:p-10">
         <h2 className="display text-game-stroke text-2xl sm:text-3xl">{t('Get it on your phone')}</h2>
-        <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.', { v: bubbleAppSize() })}</p>
+        <p className="mx-auto mt-3 max-w-xl leading-relaxed text-muted">{t('Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.', { v: bubbleAppSize() })}</p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           {PLAY_LIVE ? (
             <a href={PLAY_TEST.listingUrl} rel="noopener" data-umami-event="play_store" data-umami-event-from="bubble-cta" aria-label={t('Get it on Google Play')} className="transition-transform hover:-translate-y-0.5">

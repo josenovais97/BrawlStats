@@ -1949,16 +1949,10 @@ export const FR: Record<string, string> = {
     "Glisse pour déplacer",
   "Earlier versions (":
     "Versions précédentes (",
-  "Enter the bans, what your team has taken and what theirs has, and the list reorders around all three. A brawler that is merely strong on the map is a different call from one that is strong on the map":
-    "Indique les bans, ce que ton équipe a pris et ce que la leur a pris, et la liste se réorganise selon les trois. Un brawler simplement fort sur la carte, ce n'est pas le même choix qu'un brawler fort sur la carte et qui",
-  "Every row shows its working: form on this map, edge against the enemies you named, edge alongside your team-mates. A suggestion you cannot check is a guess dressed up in a percentage — and mid-draft the reason is usually what decides it.":
-    "Chaque ligne montre son calcul : forme sur cette carte, avantage contre les ennemis indiqués, avantage aux côtés de tes coéquipiers. Une suggestion que tu ne peux pas vérifier, c'est une supposition déguisée en pourcentage, et en plein draft c'est souvent la raison qui décide.",
   "Five steps, and the fourth is where Android gets in your way.":
     "Cinq étapes, et c'est à la quatrième qu'Android te barre la route.",
   "Free Android app":
     "Appli Android gratuite",
-  "Free, {v}, no account. Everything it shows is on the site too — the app only saves you the app switch, which is the part that costs you the draft.":
-    "Gratuit, {v}, sans compte. Tout ce qu'elle affiche est aussi sur le site : l'appli t'évite juste de changer d'appli, et c'est ça qui te coûte le draft.",
   "Get it on":
     "Disponible sur",
   "Get it on your phone":
@@ -1975,8 +1969,6 @@ export const FR: Record<string, string> = {
     "Elle montre la méta ; c'est toi qui l'appliques au draft devant toi. Elle ne touche pas au jeu, ne lit pas ton compte et n'envoie rien nulle part : pas de compte, pas de statistiques d'usage dans l'appli, rien à quoi se connecter.",
   "Latest":
     "Dernière",
-  "Not this one, not any of them. A browser tab cannot draw on top of another app — the sandbox forbids it, on every phone. Checking a tier list in a browser means leaving the draft, and leaving the draft is what costs you the pick.":
-    "Ni celui-ci, ni aucun autre. Un onglet de navigateur ne peut pas s'afficher par-dessus une autre appli : le bac à sable l'interdit, sur tous les téléphones. Regarder une tier list dans un navigateur, c'est quitter le draft, et quitter le draft, c'est ce qui te coûte le pick.",
   "On a computer?":
     "Sur un ordinateur ?",
   "One unedited take on a phone: queueing into Bounty on Hideout, opening the bubble mid-draft, narrowing to that map, reading Brock’s build — then picking Brock and giving him the star power the panel pointed at.":
@@ -2021,8 +2013,6 @@ export const FR: Record<string, string> = {
     "La tier list Classé, par-dessus le jeu. Téléchargement gratuit, sans pub, sans compte.",
   "The app finds your account. Brawlers you do not own are greyed out in the panel.":
     "L'appli trouve ton compte. Les brawlers que tu n'as pas sont grisés dans le panneau.",
-  "The app updates by downloading again — it installs over the top and keeps your permission.":
-    "L'appli se met à jour en la retéléchargeant : elle s'installe par-dessus et garde ton autorisation.",
   "The bubble appears straight away and stays on top of whatever you open next, including the game.":
     "La bulle apparaît tout de suite et reste au-dessus de tout ce que tu ouvres ensuite, jeu compris.",
   "The bubble does not read your screen, your match, or which map you are on. It asks to draw over other apps, and to show a notification — the one that says it is running, and the download progress when you update it. No screen capture, no storage access, nothing else.":
@@ -2047,8 +2037,6 @@ export const FR: Record<string, string> = {
     "La tier list,",
   "Then the map you are on":
     "Puis la carte où tu joues",
-  "Thin evidence is flagged rather than hidden. A brawler backed by eleven battles on this map says so in red, because 52% off eleven battles and 52% off two hundred are not the same claim.":
-    "Les données trop minces sont signalées plutôt que cachées. Un brawler qui ne s'appuie que sur onze combats sur cette carte l'affiche en rouge, parce que 52 % sur onze combats et 52 % sur deux cents ne disent pas la même chose.",
   "Three gestures. There is nothing else to learn.":
     "Trois gestes. Il n'y a rien d'autre à apprendre.",
   "Turn on Hide unavailable brawlers and they leave the list entirely, so every pick shown is one you can make.":
@@ -2073,8 +2061,6 @@ export const FR: Record<string, string> = {
     "À savoir avant de l'installer, pas après.",
   "Your browser asks whether to keep a file of this type. It is an app installer, so Chrome and Android both check with you first — that prompt is normal.":
     "Ton navigateur demande s'il faut garder un fichier de ce type. C'est un installateur d'appli, donc Chrome et Android te demandent d'abord : cette question est normale.",
-  "answers what they just picked.":
-    "répond à ce qu'ils viennent de prendre.",
   "on top of the game":
     "par-dessus le jeu",
   "sha256sum brawlzone-bubble.apk":
@@ -3601,8 +3587,6 @@ export const FR: Record<string, string> = {
     "Ajoute ton tag de joueur une fois : les brawlers que tu possèdes sont marqués, les autres grisés ou masqués, et tu peux te limiter au pouvoir 11 ou aux hyperchargés.",
   "An app can. The bubble sits on the edge of the screen, opens on a tap over the game, and folds away again.":
     "Une appli, si. La bulle reste au bord de l'écran, s'ouvre d'un tap par-dessus le jeu et se replie ensuite.",
-  "Brawl Stars gives you seconds to pick. Leaving the game to check a tier list costs more of them than you have, so the answer comes to you instead: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
-    "Brawl Stars te laisse quelques secondes pour choisir. Quitter le jeu pour regarder une tier list t'en coûte plus que tu n'en as, alors c'est la réponse qui vient à toi : la méta à ton rang, les meilleurs picks pour ta carte et ce qui bat l'ennemi, à un tap par-dessus le jeu.",
   "Coming to Google Play":
     "Bientôt sur Google Play",
   "Diamond, Mythic, Legendary and Masters play different metas, so the list is split by rank and opens on yours. Every Ranked mode, refreshed every two hours from real competitive battles.":
@@ -4871,4 +4855,18 @@ export const FR: Record<string, string> = {
     "Vois comment ton profil se situe face à tous les joueurs que nous suivons.",
   "Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.":
     "Le Classé et l'échelle des trophées sont notés séparément, donc un brawler peut être un premier choix dans l'un et un piège dans l'autre.",
+  "Brawl Stars gives you seconds to pick, so the bubble brings the answer to you: the meta at your rank, the best picks for your map and what beats the enemy, one tap away over the game.":
+    "Brawl Stars te laisse quelques secondes pour choisir, alors la bulle t'apporte la réponse : la méta à ton rang, les meilleurs choix pour ta carte et ce qui bat l'adversaire, à un toucher par-dessus le jeu.",
+  "No website can. A browser cannot draw on top of another app, on any phone, so checking a tier list there means leaving the draft.":
+    "Aucun site ne peut. Un navigateur ne peut pas s'afficher par-dessus une autre appli, sur aucun téléphone, donc consulter une tier list là-bas veut dire quitter le draft.",
+  "Enter the bans, your team’s picks and theirs, and the list reorders around all three.":
+    "Entre les bans, les choix de ton équipe et ceux de l'adversaire, et la liste se réordonne selon les trois.",
+  "Every row shows why: form on this map, edge against the enemies you named, and edge with your team-mates.":
+    "Chaque ligne montre pourquoi : forme sur cette carte, avantage contre les adversaires choisis et avec tes coéquipiers.",
+  "Brawlers with only a few battles on the map are marked in red.":
+    "Les brawlers avec peu de combats sur la carte sont marqués en rouge.",
+  "To update, download it again. It installs over the old one and keeps its permission.":
+    "Pour mettre à jour, télécharge-la à nouveau. Elle s'installe par-dessus l'ancienne et garde son autorisation.",
+  "Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
+    "Gratuit, {v}, sans compte. Tout ce qu'elle affiche est aussi sur le site. L'appli t'évite juste de changer d'appli en plein draft.",
 };
