@@ -4059,6 +4059,35 @@ function mapConfidence(decided: number): MapConfidence {
 }
 
 /**
+ * Brawler id and name for every brawler with battles since `since`.
+ *
+ * Was `battleDailyStat.findMany({ distinct: ['brawlerId'] })` in three
+ * places, and Prisma does `distinct` in memory: it fetched every daily row in
+ * the window (369,446 for 14 days on 2026-11-05) to keep 108 names, 1-2.5 s a
+ * call, and the precompute makes ~40 of those calls a run. GROUP BY returns
+ * the 108 rows from the database, and names barely change, so each process
+ * keeps them for ten minutes.
+ */
+const BRAWLER_NAMES_TTL_MS = 10 * 60_000;
+const brawlerNamesMemo = new Map<string, { at: number; names: Promise<{ brawlerId: number; brawlerName: string }[]> }>();
+
+function brawlerNamesSince(
+  prisma: NonNullable<ReturnType<typeof getPrisma>>,
+  since: Date,
+): Promise<{ brawlerId: number; brawlerName: string }[]> {
+  const key = since.toISOString();
+  const hit = brawlerNamesMemo.get(key);
+  if (hit && Date.now() - hit.at < BRAWLER_NAMES_TTL_MS) return hit.names;
+  const names = prisma.battleDailyStat
+    .groupBy({ by: ['brawlerId', 'brawlerName'], where: { day: { gte: since } } })
+    .then((rows) => rows.map((r) => ({ brawlerId: r.brawlerId, brawlerName: r.brawlerName })));
+  // A failed read is not kept: the next caller asks again.
+  names.catch(() => brawlerNamesMemo.delete(key));
+  brawlerNamesMemo.set(key, { at: Date.now(), names });
+  return names;
+}
+
+/**
  * Best brawlers per map, from competitive (Ranked) battles only.
  *
  * Map is recorded per battle sample, so this can only see battles collected
@@ -4145,11 +4174,7 @@ async function computeRankedMapPicks(
         by: ['mapName', 'eventId'],
         where: { ...competitive, mapName: only ? only.mapName : { not: null }, eventId: { not: null } },
       }),
-      prisma.battleDailyStat.findMany({
-        where: { day: { gte: since } },
-        distinct: ['brawlerId'],
-        select: { brawlerId: true, brawlerName: true },
-      }),
+      brawlerNamesSince(prisma, since),
     ]);
     const eventOf = new Map(eventRows.map((r) => [r.mapName, r.eventId]));
     const nameOf = new Map(names.map((n) => [n.brawlerId, n.brawlerName]));
@@ -4476,11 +4501,36 @@ function cachedRead<A extends unknown[], R>(
        * and then swallowed a second time.
        */
       if (error instanceof Error && error.message.includes('incrementalCache missing')) {
-        return fn(...args);
+        if (!scriptReads) return fn(...args);
+        const memoKey = `${key}:${JSON.stringify(args)}`;
+        let hit = scriptReads.get(memoKey) as Promise<R> | undefined;
+        if (!hit) {
+          hit = fn(...args);
+          scriptReads.set(memoKey, hit);
+          hit.catch(() => scriptReads?.delete(memoKey));
+        }
+        // A copy each time, as the data cache gives the site: callers sort
+        // and slice what they get.
+        return structuredClone(await hit);
       }
       throw error;
     }
   };
+}
+
+/*
+ * "Running uncached is exactly right for a script" held for scripts that read
+ * each thing once. The precompute does not: its 28 bracket-roster jobs each
+ * began with getSkillEdge('ranked'), ~4 s computed fresh every time, about
+ * 110 of the run's 176 s for those keys (2026-11-05). A script that reads
+ * the same things many times, and writes nothing in between, opts in here and
+ * shares each read for the rest of the process. Opt-in, not default: the
+ * sampler writes between its reads and must see its own writes.
+ */
+let scriptReads: Map<string, Promise<unknown>> | null = null;
+
+export function shareReadsInThisScript(): void {
+  scriptReads ??= new Map();
 }
 
 
@@ -4656,11 +4706,7 @@ async function computeLineupStats(
         },
         _sum: { wins: true, losses: true },
       }),
-      prisma.battleDailyStat.findMany({
-        where: { day: { gte: since } },
-        distinct: ['brawlerId'],
-        select: { brawlerId: true, brawlerName: true },
-      }),
+      brawlerNamesSince(prisma, since),
     ]);
 
     const nameOf = new Map(names.map((n) => [n.brawlerId, n.brawlerName]));
@@ -4771,11 +4817,7 @@ async function computeBracketMapPicks(
         _sum: { wins: true, losses: true },
         _max: { lastBattleTime: true },
       }),
-      prisma.battleDailyStat.findMany({
-        where: { day: { gte: since } },
-        distinct: ['brawlerId'],
-        select: { brawlerId: true, brawlerName: true },
-      }),
+      brawlerNamesSince(prisma, since),
       prisma.battleDailyStat.groupBy({
         by: ['mapName', 'eventId'],
         where: { day: { gte: since }, mapName: { not: null }, eventId: { not: null } },
