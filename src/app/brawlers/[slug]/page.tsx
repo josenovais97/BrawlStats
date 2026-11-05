@@ -330,7 +330,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
    */
   const lead = [recommendation, performance].filter(Boolean).join(' ');
   const tail = t('Gears, best modes and maps, updated daily.');
-  const description = lead.length + tail.length + 1 <= 160 ? `${lead} ${tail}`.trim() : lead || tail;
+  // A brawler with no data yet (just released) has no lead; the bare tail was
+  // the same nameless sentence on every such page.
+  const description = !lead
+    ? t('{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.', { name })
+    : lead.length + tail.length + 1 <= 160 ? `${lead} ${tail}` : lead;
 
   return {
     /*

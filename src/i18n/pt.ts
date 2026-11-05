@@ -4890,4 +4890,6 @@ export const PT: Record<string, string> = {
     "O maior elo do Ranqueado entre os jogadores que o BrawlZone amostra. A API do jogo não publica um ranking do Ranqueado, então este é montado com as nossas próprias amostras diárias, em vez de copiado da Supercell.",
   "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
     "Quais visuais e ícones de perfil os jogadores de Brawl Stars realmente usam, contados a partir das amostras diárias do BrawlZone.",
+  "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
+    "{name} no Brawl Stars: acessórios, poderes de estrela, engrenagens, melhores modos e mapas, atualizado todos os dias.",
 };

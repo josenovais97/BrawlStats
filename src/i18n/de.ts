@@ -4891,4 +4891,6 @@ export const DE: Record<string, string> = {
     "Die höchste Ranked-Elo unter den Spielern, die BrawlZone erfasst. Die Spiel-API veröffentlicht keine Ranked-Bestenliste, deshalb entsteht diese aus unseren eigenen täglichen Stichproben, statt von Supercell übernommen zu werden.",
   "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
     "Welche Skins und Profil-Icons Brawl-Stars-Spieler wirklich ausrüsten, gezählt aus BrawlZones eigenen täglichen Stichproben.",
+  "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
+    "{name} in Brawl Stars: Gadgets, Starpowers, Ausrüstung, beste Modi und Maps, täglich aktualisiert.",
 };

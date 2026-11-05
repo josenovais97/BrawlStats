@@ -4891,4 +4891,6 @@ export const RU: Record<string, string> = {
     "Самое высокое Эло в ранговых боях среди игроков, которых собирает BrawlZone. API игры не публикует рейтинг ранговых боёв, поэтому этот рейтинг построен на наших собственных ежедневных выборках, а не скопирован у Supercell.",
   "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
     "Какие скины и иконки профиля игроки Brawl Stars ставят на самом деле — по ежедневным выборкам BrawlZone.",
+  "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
+    "{name} в Brawl Stars: гаджеты, звёздные силы, снаряжение, лучшие режимы и карты, обновляются ежедневно.",
 };

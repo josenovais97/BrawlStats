@@ -4890,4 +4890,6 @@ export const ES: Record<string, string> = {
     "El elo de Competitivo más alto entre los jugadores que muestrea BrawlZone. La API del juego no publica una clasificación de Competitivo, así que esta se construye con nuestras propias muestras diarias en lugar de copiarse de Supercell.",
   "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
     "Qué aspectos e iconos de perfil usan de verdad los jugadores de Brawl Stars, contados a partir de las muestras diarias de BrawlZone.",
+  "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
+    "{name} en Brawl Stars: gadgets, habilidades estelares, refuerzos, mejores modos y mapas, actualizado cada día.",
 };

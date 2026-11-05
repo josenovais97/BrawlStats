@@ -4890,4 +4890,6 @@ export const TR: Record<string, string> = {
     "BrawlZone'un örneklediği oyuncular arasındaki en yüksek Aşamalı elo. Oyun API'si Aşamalı sıralaması yayınlamıyor, bu yüzden bu sıralama Supercell'den kopyalanmak yerine kendi günlük örneklerimizden oluşturuluyor.",
   "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
     "Brawl Stars oyuncularının gerçekten kullandığı kostümler ve profil simgeleri, BrawlZone'un oyuncu havuzundan aldığı günlük örneklerle sayıldı.",
+  "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
+    "Brawl Stars'ta {name}: aksesuarlar, yıldız güçleri, eşyalar, en iyi modlar ve haritalar, her gün güncellenir.",
 };

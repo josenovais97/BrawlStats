@@ -4891,4 +4891,6 @@ export const FR: Record<string, string> = {
     "L'elo Classé le plus élevé parmi les joueurs qu'échantillonne BrawlZone. L'API du jeu ne publie aucun classement Classé, donc celui-ci est construit à partir de nos propres échantillons quotidiens au lieu d'être copié de Supercell.",
   "Which skins and profile icons Brawl Stars players actually equip, counted from BrawlZone's own daily samples of the player pool.":
     "Les skins et icônes de profil que les joueurs de Brawl Stars équipent vraiment, comptés à partir des échantillons quotidiens de BrawlZone.",
+  "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
+    "{name} sur Brawl Stars : gadgets, pouvoirs star, équipements, meilleurs modes et cartes, mis à jour chaque jour.",
 };
