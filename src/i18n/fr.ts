@@ -4893,6 +4893,4 @@ export const FR: Record<string, string> = {
     "Les skins et icônes de profil que les joueurs de Brawl Stars équipent vraiment, comptés à partir des échantillons quotidiens de BrawlZone.",
   "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
     "{name} sur Brawl Stars : gadgets, pouvoirs star, équipements, meilleurs modes et cartes, mis à jour chaque jour.",
-  "No battle log to show. Either this account has not played lately, or Supercell is not sharing its log: since the game’s November update, the API hides the battle log of many accounts. The rest of the profile is unaffected.":
-    "Aucun journal de combat à afficher. Soit ce compte n'a pas joué récemment, soit Supercell ne partage pas son journal : depuis la mise à jour de novembre du jeu, l'API masque le journal de combat de nombreux comptes. Le reste du profil n'est pas concerné.",
 };

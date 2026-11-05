@@ -4892,6 +4892,4 @@ export const TR: Record<string, string> = {
     "Brawl Stars oyuncularının gerçekten kullandığı kostümler ve profil simgeleri, BrawlZone'un oyuncu havuzundan aldığı günlük örneklerle sayıldı.",
   "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
     "Brawl Stars'ta {name}: aksesuarlar, yıldız güçleri, eşyalar, en iyi modlar ve haritalar, her gün güncellenir.",
-  "No battle log to show. Either this account has not played lately, or Supercell is not sharing its log: since the game’s November update, the API hides the battle log of many accounts. The rest of the profile is unaffected.":
-    "Gösterilecek maç geçmişi yok. Ya bu hesap son zamanlarda oynamadı ya da Supercell geçmişini paylaşmıyor: oyunun Kasım güncellemesinden beri API birçok hesabın maç geçmişini gizliyor. Profilin geri kalanı etkilenmez.",
 };

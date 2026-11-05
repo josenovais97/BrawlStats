@@ -2426,10 +2426,11 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
      * takes its turn at the back of the queue like everyone else.
      *
      * Only successes used to stamp `lastSampledAt`. That was harmless while a
-     * 404 meant a deleted account (a dozen a run), but since the game's
-     * November 2026 update (3 Nov, new stats in the battle log) the API
-     * answers 404 for the battle logs of thousands of accounts whose profiles
-     * still load, the global top four among them. Unstamped, they stayed
+     * 404 meant a deleted account (a dozen a run), but the game's November
+     * 2026 update (3 Nov) cleared every battle log, and the API answers 404
+     * for an empty one: every account that has not played since, the global
+     * top four trophy holders among them, now 404s while its profile loads
+     * (checked: no log reached back before 3 Nov 11:48). Unstamped, they stayed
      * "never sampled": first in every run's queue, protected from
      * `evictStalePool`, and 5,600-7,100 of each run's 10,000 visits went to
      * the same unreadable players while eviction removed players who did

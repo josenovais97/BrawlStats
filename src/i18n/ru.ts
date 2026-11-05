@@ -4893,6 +4893,4 @@ export const RU: Record<string, string> = {
     "Какие скины и иконки профиля игроки Brawl Stars ставят на самом деле — по ежедневным выборкам BrawlZone.",
   "{name} in Brawl Stars: gadgets, star powers, gears, best modes and maps, updated daily.":
     "{name} в Brawl Stars: гаджеты, звёздные силы, снаряжение, лучшие режимы и карты, обновляются ежедневно.",
-  "No battle log to show. Either this account has not played lately, or Supercell is not sharing its log: since the game’s November update, the API hides the battle log of many accounts. The rest of the profile is unaffected.":
-    "Истории боёв нет. Либо этот аккаунт давно не играл, либо Supercell не открывает его историю: после ноябрьского обновления игры API скрывает историю боёв многих аккаунтов. Остальной профиль это не затрагивает.",
 };
