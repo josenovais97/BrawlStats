@@ -59,9 +59,11 @@ at 09:00, so that debt is paid — but it lives on the workstation, not here, an
 nothing on the box would notice if it stopped.
 
 **Storage stopped being someone else's plan limit.** `STORAGE_LIMIT_BYTES` is
-now 8 GB, a slice of the 45 GB volume rather than a free tier, and is ~50x the
-measured plateau. Raising it did not lengthen retention: the `ok` row of
-`RETENTION_UNDER_PRESSURE` bounds history, and the valve is idle at ~100 MB.
+32 GB (2026-11-05) on a 193 GB volume. At 12 GB the valve sat at "high" for
+three weeks and the site ran on half its designed windows (raw battles 7 days,
+snapshots 4); the `ok`-row plateau was re-derived at ~24 GB, under the 25.6 GB
+high-water mark. The `ok` row of `RETENTION_UNDER_PRESSURE` bounds history; the
+limit only decides whether that row is ever in force.
 
 **Docker build cache is not covered by `docker image prune`.** It reached
 11.77 GB — a quarter of the disk — in a single day of rebuilds before anyone

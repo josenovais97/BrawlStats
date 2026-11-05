@@ -792,7 +792,23 @@ export async function seedSamplePool(): Promise<{ seeded: number; ranked: string
  * 40%. If sampler runs start brushing their timeout as the raw tables grow
  * back, that is the cost to weigh, not the disk.
  */
-const STORAGE_LIMIT_BYTES = 12 * 1024 * 1024 * 1024;
+/*
+ * 32 GB since 2026-11-05, when the volume had grown to 193 GB (46 GB used).
+ * At 12 GB the valve had fired on 150 runs since 2026-10-15 (107 high, 43
+ * critical) and sat at high for good, so the site served raw battles at 7
+ * days instead of 14, roster snapshots at 4 instead of 8, pairs at 30 instead
+ * of 45 and roll-ups at 60 instead of 120 -- the `ok` row was never in force.
+ *
+ * Plateau re-derived for the `ok` row, from that day's per-table sizes and
+ * spans: raw battles 4.5 GB over 7 days -> ~11 GB at 14 with sampling back at
+ * ~90k battles a run; snapshots 3.1 GB over 4 days -> ~6.5 GB at 8; the player
+ * roll-up 1.2 GB over 30 days -> ~4.7 GB once it reaches 120 (about three
+ * months out); the rest ~1.9 GB. ~19 GB within two weeks, ~24 GB at maturity,
+ * against a high-water mark of 25.6 GB: the valve goes back to being an
+ * emergency brake. Nightly dumps leave the raw tables out, so they grow from
+ * ~0.3 GB to roughly 0.8 GB. storage-pressure.test.ts pins the 24 GB.
+ */
+const STORAGE_LIMIT_BYTES = 32 * 1024 * 1024 * 1024;
 
 /**
  * Two levels, because there is no useful third one at the top.

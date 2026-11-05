@@ -12,17 +12,46 @@
 # than one at a time on our account. English pages first (they also fill the
 # data cache the translations share), then the translations, until the time
 # runs out.
+#
+# Most-visited first since 2026-11-05. Seven languages made the sitemaps 2,387
+# pages and the 900 s budget ran out at ~1,750, always on the same tail (the
+# last translations; the maps and compare sitemaps were never walked at all),
+# so first visits there rendered cold: 30-50 s for a map page. Now every
+# sitemap page that people opened in the last 7 days (Umami pageviews, all
+# languages) goes first, busiest first, then the rest of the sitemaps. Only
+# sitemap URLs are ever warmed: Umami decides the order, never the set.
 set -uo pipefail
 SITE=https://brawlzone.net
 budget=${1:-900}
 end=$(( $(date +%s) + budget ))
 n=0; slow=0
-for map in core intl; do
-  urls=$(curl -s -m 60 "$SITE/sitemaps/sitemap/$map.xml" | grep -o '<loc>[^<]*</loc>' | sed 's#</\?loc>##g')
-  for u in $urls; do
-    [ "$(date +%s)" -lt "$end" ] || { echo "warmed $n pages ($slow slow) before the ${budget}s budget ran out"; exit 0; }
-    t=$(curl -s -o /dev/null -m 60 -A 'BrawlZone warm-up (https://brawlzone.net)' -w '%{time_total}' "$u")
-    n=$((n + 1)); [ "${t%.*}" -ge 5 ] && slow=$((slow + 1))
-  done
+REPO=/home/ubuntu/brawlstats
+all=$(for map in core maps compare intl; do
+  curl -s -m 60 "$SITE/sitemaps/sitemap/$map.xml" | grep -o '<loc>[^<]*</loc>' | sed 's#</\?loc>##g'
+done)
+# Paths by pageviews over the last week; empty (and harmless) if Umami is down.
+popular=$(cd "$REPO" && docker compose exec -T db psql -U brawlzone -d umami -Atc \
+  "select split_part(url_path, '#', 1) p, count(*) from website_event
+   where created_at > now() - interval '7 days' and event_type = 1
+   group by 1 order by 2 desc limit 2000;" 2>/dev/null | cut -d'|' -f1)
+urls=$(python3 - <(printf '%s\n' "$all") <(printf '%s\n' "$popular") <<'PY'
+import sys
+site = 'https://brawlzone.net'
+urls = [u.strip() for u in open(sys.argv[1]) if u.strip()]
+path = lambda u: (u[len(site):] or '/').rstrip('/') or '/'
+known = {path(u): u for u in urls}
+first, seen = [], set()
+for p in open(sys.argv[2]):
+    p = (p.strip().rstrip('/') or '/')
+    if p in known and p not in seen:
+        first.append(known[p]); seen.add(p)
+print('\n'.join(first + [u for u in urls if path(u) not in seen]))
+PY
+)
+hot=$(printf '%s\n' "$popular" | grep -c . || true)
+for u in $urls; do
+  [ "$(date +%s)" -lt "$end" ] || { echo "warmed $n pages ($slow slow) before the ${budget}s budget ran out (busiest first, $hot visited paths)"; exit 0; }
+  t=$(curl -s -o /dev/null -m 60 -A 'BrawlZone warm-up (https://brawlzone.net)' -w '%{time_total}' "$u")
+  n=$((n + 1)); [ "${t%.*}" -ge 5 ] && slow=$((slow + 1))
 done
-echo "warmed $n pages ($slow took 5s or more)"
+echo "warmed $n pages ($slow took 5s or more; busiest first, $hot visited paths)"

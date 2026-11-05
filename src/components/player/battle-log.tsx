@@ -52,7 +52,13 @@ export async function BattleLog({
     return (
       <div className="card p-6 text-sm text-muted">
         {code === 'notFound'
-          ? t('No recent battles. The battle log only covers roughly the last 25 matches and expires after a while.')
+          ? /*
+             * 404 used to mean an inactive or deleted account. Since the
+             * game's November 2026 update the API also answers 404 for the
+             * logs of thousands of active accounts (the global top four
+             * among them) whose profiles load fine, so say both.
+             */
+            t('No battle log to show. Either this account has not played lately, or Supercell is not sharing its log: since the game’s November update, the API hides the battle log of many accounts. The rest of the profile is unaffected.')
           : t('The battle log is unavailable right now. Try refreshing in a moment.')}
       </div>
     );

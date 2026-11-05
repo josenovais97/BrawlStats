@@ -44,6 +44,9 @@ test('a comfortable database is left alone', () => {
   assert.equal(pressureFor(100 * MB), 'ok');
   // The 2026-08-24 post-reclaim size, which must not be treated as pressure.
   assert.equal(pressureFor(310 * MB), 'ok');
+  // The `ok`-row plateau re-derived on 2026-11-05 (see STORAGE_LIMIT_BYTES):
+  // the designed windows must fit without the valve firing.
+  assert.equal(pressureFor(24 * 1024 * MB), 'ok');
 });
 
 test('the thresholds are exclusive at the boundary', () => {
