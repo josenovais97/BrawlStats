@@ -914,16 +914,12 @@ export const TR: Record<string, string> = {
     "Harita",
   "Map page":
     "Harita sayfası",
-  "Map score is a brawler’s adjusted win rate here, weighed against its overall Ranked form. The matchup figure is its win rate when one of the brawlers you named was on the other team, minus its own average. So a brawler that simply wins a lot does not appear to counter everything.":
-    "Harita puanı bir savaşçının buradaki düzeltilmiş kazanma oranıdır ve genel Aşamalı formuyla tartılır. Eşleşme rakamı, yazdığın savaşçılardan biri karşı takımdayken kazanma oranından kendi ortalamasının çıkarılmasıdır. Böylece çok kazanan bir savaşçı her şeye counter gibi görünmez.",
   "Map score plus how each candidate does against the brawlers you named.":
     "Harita puanı ve her adayın yazdığın savaşçılara karşı performansı.",
   "Map score plus how each candidate does beside your team-mates.":
     "Harita puanı ve her adayın takım arkadaşlarının yanındaki performansı.",
   "Map score, plus how each candidate does against their picks and beside yours.":
     "Harita puanı ve her adayın onların seçimlerine karşı ve seninkilerin yanındaki performansı.",
-  "No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
-    "Henüz hiçbir Aşamalı haritasında yeterli incelenmiş maç yok. Sistem sıralama havuzunu sürekli tarar; önümüzdeki bir iki günde dolar.",
   "No sampled battles for this map or mode yet.":
     "Bu harita veya mod için henüz incelenmiş maç yok.",
   "Nothing banned yet":
@@ -932,8 +928,6 @@ export const TR: Record<string, string> = {
     "Aşamalı haritasını seç, rakibin draft ettiği savaşçıları ekle ve o haritada tam o kadroya karşı en iyi kayda sahip seçimleri al. Ücretsiz, hesap gerekmez.",
   "Pick the map":
     "Haritayı seç",
-  "Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen.":
-    "Haritayı seç, rakibin aldıklarını yaz; liste ikisine göre yeniden sıralanır. Her durumun kendi adresi vardır, böylece bir draft paylaşılabilir ya da ikinci bir ekranda açık tutulabilir.",
   "Ranked by record on this map. Name either team above to reweigh it.":
     "Bu haritadaki kayda göre sıralı. Yeniden tartmak için yukarıda takımlardan birini yaz.",
   "Ranked pool":
@@ -946,12 +940,8 @@ export const TR: Record<string, string> = {
     "Güncel Aşamalı rotasyonu. Bu adımdan sonraki her şey buna göre belirlenir.",
   "Un-ban {v}":
     "{v} banını kaldır",
-  "Up to {MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.":
-    "En fazla {MAX_ALLIES}. Her biri listeyi adayların onun *yanında* gerçekte nasıl oynadığına göre yeniden tartar; bu counter seçmekten farklı bir sorudur.",
   "Up to {MAX_BANS}. Banned brawlers disappear from every suggestion below.":
     "En fazla {MAX_BANS}. Banlanan savaşçılar aşağıdaki tüm önerilerden kaybolur.",
-  "Up to {MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.":
-    "En fazla {MAX_ENEMIES}. Her biri listeyi adayların ona karşı gerçekte nasıl oynadığına göre yeniden tartar.",
   "Your pick":
     "Senin seçimin",
   "Your team":
@@ -2610,12 +2600,6 @@ export const TR: Record<string, string> = {
     "+{v} puan",
   ". Only maps currently in rotation are included.":
     ". Yalnızca şu an rotasyondaki haritalar dahildir.",
-  "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.":
-    "Buradaki her savaşçının en az 300 sonuçlanmış Aşamalı maçı var. Bu listeler seçilmiş uç değerlerdir ve birçok küçük örneklemden maksimum seçmek, liyakatle değil tesadüfen uç değerler üretir; bunu durduran alt sınırdır.",
-  "Everybody picks them and the results do not justify it — over {highUsage} pick rate.":
-    "Herkes onları seçiyor ama sonuçlar bunu haklı çıkarmıyor: {highUsage} üstü seçilme oranı.",
-  "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.":
-    "Bir haritada genel formlarının gösterdiğinden çok daha iyiler. Sayı kendi ortalamalarının üstündeki kazanma oranı puanıdır, yani genel güç zaten çıkarılmıştır.",
   "Fine overall, but losing win-rate points on a map that is in rotation right now.":
     "Genelde iyi ama şu an rotasyondaki bir haritada kazanma oranı puanı kaybediyor.",
   "Hidden gems":
@@ -2624,10 +2608,6 @@ export const TR: Record<string, string> = {
     "Buna nasıl karar veriliyor",
   "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the":
     "Harita cevherleri ve tuzakları, bir savaşçının bir haritadaki puanını kendi genel formuyla karşılaştırır; böylece liste şunun ikinci bir kopyası olmaz:",
-  "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.":
-    "Bunu dürüstçe cevaplamak için henüz yeterli incelenmiş maç yok. Yeterli savaşçı örneklem alt sınırını geçince dolar.",
-  "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.":
-    "Bu hafta hiçbir şey çıtayı geçmiyor; bu da metanın kabaca ölçüldüğü gibi oynandığı anlamına gelir.",
   "Overrated":
     "Abartılanlar",
   "See every pick on {mapName}":
@@ -2644,8 +2624,6 @@ export const TR: Record<string, string> = {
     "Hafife alınan ve abartılan Brawl Stars savaşçıları",
   "Who is everyone sleeping on, measured from sampled ranked battles.":
     "Herkes kimi gözden kaçırıyor, incelenen Aşamalı maçlarından ölçüldü.",
-  "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.":
-    "Herkes kimi gözden kaçırıyor. Son {windowDays} günde değerlendirilecek kadar Aşamalı maçı olan {rated} savaşçıdan okundu.",
   "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.":
     "Herkes kimi gözden kaçırıyor. Neredeyse kimsenin seçmediği güçlü savaşçılar, sonuçların haklı çıkarmadığı popüler savaşçılar ve genel tier listesinin gizlediği haritaya özel cevherler ve tuzaklar; görüşlerden değil incelenen Aşamalı maçlarından ölçüldü.",
   "tier list":
@@ -2654,8 +2632,6 @@ export const TR: Record<string, string> = {
     "{v} veya daha iyi.",
   "{v} pts":
     "{v} puan",
-  "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of":
-    "“Düşük seçilme oranı” ve “güçlü”, canlı kadronun yüzdelik dilimleridir, sabit sayılar değil; böylece soru aynı kalır, cevaplar değişir. Bugün bunlar {lowUsage} altında seçilme ve şu puana denk geliyor:",
   ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the":
     ", CC-BY-SA. Supercell bir hediye oranı API'si yayınlamaz, bu yüzden bunlar resmi rakamlar değil; topluluk tarafından oyun dosyalarından ve oyun içi gözlemden derlenir. Savaşçılar elinde olunca metanın neye benzediği için bak:",
   "Brawl Stars Starr Drop chances: every drop rate and reward":
@@ -2706,18 +2682,12 @@ export const TR: Record<string, string> = {
     "ödül",
   "{event} · limited time":
     "{event} · sınırlı süre",
-  ", so it moves with the meta and always matches what the rest of the site says.":
-    "; böylece metayla birlikte değişir ve sitenin geri kalanıyla her zaman uyuşur.",
   "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.":
     "Her gün tahmin edilecek yeni bir Brawl Stars savaşçısı. Her tahmin nadirlik, sınıf, hareket, menzil, şarjör dolumu, çıkış sırası ve tier'da ne kadar yakın olduğunu söyler. Ücretsiz, hesap gerekmez, günde bir bulmaca.",
-  "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
-    "Dört tahminden sonra tahta cevabın yıldız gücünü, sekizden sonra aksesuarını gösterir; oyundaki gerçek simgeler, adları gizli, çünkü bir ad aranabilir ama bir resim hafıza testidir.",
   "Amber":
     "Sarı",
   "Brawl Stars daily challenge — guess the brawler":
     "Brawl Stars günlük bulmacası: savaşçıyı tahmin et",
-  "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
-    "Sınıfın oku yok, çünkü Keskin Nişancı'dan Tank'a bir yön yok. Tier'a girecek kadar Aşamalı maçı olmayan bir savaşçı tahmin yerine bir tire gösterir.",
   "Daily challenge":
     "Günlük bulmaca",
   "Green":
@@ -2736,14 +2706,10 @@ export const TR: Record<string, string> = {
     "Bugünün bulmacası hazırlanamadı. Savaşçı kataloğuna tekrar ulaşılınca geri gelir.",
   "Your progress is kept in this browser only. No account, nothing stored on our side.":
     "İlerlemen yalnızca bu tarayıcıda tutulur. Hesap yok, bizim tarafımızda hiçbir şey saklanmaz.",
-  "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.":
-    "oyunun kullandığı adlandırılmış kademelerdir (Çok Yavaş'tan Çok Hızlı'ya, Çok Kısa'dan Çok Uzun'a), ham sayılar değil; çünkü kimse 855'in hızlı olup olmadığını bilmez ama herkes Çok Hızlı'nın Hızlı'yı geçtiğini bilir.",
   "comes from the live":
     "canlı şu listeden gelir:",
   "is exact.":
     "tam doğru.",
-  "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.":
-    "bir adım uzakta: komşu bir nadirlik, yanındaki tier ya da cevaptan en fazla beş sıra önce veya sonra çıkmış bir savaşçı. Bir ok cevabı gösterir: ▲ daha yüksek, ▼ daha düşük demek.",
   "is the brawler’s place in release order, not a date.":
     "savaşçının çıkış sırasındaki yeridir, bir tarih değil.",
   "range":
@@ -4090,8 +4056,6 @@ export const TR: Record<string, string> = {
     "Bugünkü Klasik'i {n} oyuncu çözdü",
   "{pct}% of players solved today’s {mode}":
     "Oyuncuların %{pct}'i bugünkü {mode} bulmacasını çözdü",
-  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
-    "İlerlemen yalnızca bu tarayıcıda tutulur. Hesap yok. Bir bulmacayı bitirdiğinde sunucu o tahmin sayısı için bir sayaca bir ekler; oyuncuların ne kadarının çözdüğünü böyle bilir, senin hakkında hiçbir şey saklanmaz.",
   "Yesterday’s answers":
     "Dünkü cevaplar",
   "finish one puzzle today to keep it":
@@ -4102,8 +4066,6 @@ export const TR: Record<string, string> = {
     "Faydalı bir ipucu: her seferinde tek bir mod veya tek bir rütbe için sırala. Elmas Kapmaca'da baskın olan bir savaşçı Nakavt'ta yük olabilir ve Ustalar'daki meta Altın'daki meta değildir; her şey için tek bir tahta kimsenin oyununu sıralamamış olur.",
   "How the draft helper works":
     "Draft yardımcısı nasıl çalışır",
-  "Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.":
-    "Her sayı, BrawlZone'un kendisinin incelediği gerçek Aşamalı maçlarından gelir ve iki saatte bir yenilenir. Bir harita seçmek, savaşçıları tüm modlarda sezon boyu bir ortalamaya göre değil, son üç haftada o haritada gerçekte nasıl oynadıklarına göre sıralar.",
   "Then follow the game's own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.":
     "Ardından oyunun kendi sırasını izle. Banlar bir savaşçıyı her listeden çıkarır. Her rakip seçimi önerileri her adayın ona karşı nasıl oynadığına göre, her takım arkadaşı seçimi de onun yanında nasıl oynadığına göre yeniden tartar; bu counter seçmekten farklı bir sorudur. Her öneri arkasında kaç maç olduğunu gösterir, böylece az bir örneklem kolayca fark edilir.",
   "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
@@ -4870,4 +4832,42 @@ export const TR: Record<string, string> = {
     "İncelediğimiz oyunculardan, bu yüzden aktif hesaplara biraz kayar. Bu sezon Aşamalı oynamamış oyuncular sayılmaz.",
   "The map pool is fixed for the whole season.":
     "Harita havuzu sezon boyunca sabittir.",
+  "is close: a nearby rarity, tier or release. ▲ means the answer is higher, ▼ means lower.":
+    "yakın: komşu bir nadirlik, kademe ya da çıkış sırası. ▲ cevabın daha yüksek, ▼ daha düşük olduğunu gösterir.",
+  "use the game’s own labels, from Very Slow to Very Fast.":
+    "oyunun kendi etiketlerini kullanır, Çok Yavaş'tan Çok Hızlı'ya.",
+  ", so it changes with the meta.":
+    ", bu yüzden metayla birlikte değişir.",
+  "Class has no arrow. A brawler without a tier shows a dash.":
+    "Sınıfta ok yok. Kademesi olmayan bir savaşçıda çizgi görünür.",
+  "After four guesses you see the answer’s star power icon, and after eight its gadget.":
+    "Dört tahminden sonra cevabın yıldız gücü simgesini, sekizden sonra aksesuarını görürsün.",
+  "Your progress stays in this browser. No account needed. We only count how many guesses each solve took.":
+    "İlerlemen bu tarayıcıda kalır. Hesap gerekmez. Yalnızca her çözümün kaç tahmin sürdüğünü sayarız.",
+  "Pick the map and the enemy brawlers, and the list reorders. Every draft has its own link you can share.":
+    "Haritayı ve rakip savaşçıları seç, liste yeniden sıralanır. Her draftın paylaşabileceğin kendi bağlantısı var.",
+  "No Ranked maps have enough battles yet. This fills in within a day or two.":
+    "Henüz hiçbir Aşamalı haritasında yeterli maç yok. Bir iki gün içinde dolar.",
+  "Up to {MAX_ENEMIES}. The list adjusts to what beats them.":
+    "En fazla {MAX_ENEMIES}. Liste onları yenenlere göre ayarlanır.",
+  "Up to {MAX_ALLIES}. The list adjusts to who plays well with them.":
+    "En fazla {MAX_ALLIES}. Liste onlarla iyi oynayanlara göre ayarlanır.",
+  "Map score is how well a brawler does on this map. The matchup figure is how much better or worse it does against the brawlers you named.":
+    "Harita puanı bir savaşçının bu haritada ne kadar iyi olduğudur. Eşleşme rakamı, seçtiğin savaşçılara karşı ne kadar iyi ya da kötü olduğunu gösterir.",
+  "Every number comes from Ranked battles we sample ourselves, refreshed every two hours, over the last three weeks on that map.":
+    "Her rakam kendi incelediğimiz Aşamalı maçlardan gelir, iki saatte bir güncellenir ve o haritadaki son üç haftayı kapsar.",
+  "Nothing stands out this week.":
+    "Bu hafta öne çıkan bir şey yok.",
+  "Not enough battles yet. This fills in soon.":
+    "Henüz yeterli maç yok. Yakında dolar.",
+  "Who is everyone sleeping on? From {rated} brawlers over the last {windowDays} days.":
+    "Herkes kimi gözden kaçırıyor? Son {windowDays} günde {rated} savaşçıdan.",
+  "Everybody picks them, but the results do not back it up. Over {highUsage} pick rate.":
+    "Herkes onları seçiyor ama sonuçlar bunu desteklemiyor. {highUsage} üzeri seçilme.",
+  "Much better on one map than usual. The number is win-rate points above their own average.":
+    "Bir haritada her zamankinden çok daha iyi. Rakam, kendi ortalamalarının üzerindeki kazanma puanıdır.",
+  "Every brawler here has at least 300 Ranked battles, so a lucky streak cannot put it on a list.":
+    "Buradaki her savaşçının en az 300 Aşamalı maçı var, yani şanslı bir seri onu listeye sokamaz.",
+  "Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of":
+    "Bugün “düşük seçilme” {lowUsage} altı, “güçlü” ise şu puan demek:",
 };

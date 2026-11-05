@@ -100,7 +100,7 @@ function Section({
         /* An empty section is a real answer and says so, rather than being
            hidden. "Nothing qualifies this week" is information: it means the
            meta is being played roughly the way it measures. */
-        <p className="card p-4 text-sm leading-relaxed text-muted">{t('Nothing clears the bar this week, which means the meta is being played roughly the way it measures.')}</p>
+        <p className="card p-4 text-sm leading-relaxed text-muted">{t('Nothing stands out this week.')}</p>
       ) : (
         <ul className="card divide-y divide-border overflow-hidden">{children}</ul>
       )}
@@ -125,7 +125,7 @@ export default async function HiddenMetaPage() {
           title={t('The hidden meta')}
           subtitle={t('Who is everyone sleeping on, measured from sampled ranked battles.')}
         />
-        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.')}</p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Not enough battles yet. This fills in soon.')}</p>
       </div>
     );
   }
@@ -143,7 +143,7 @@ export default async function HiddenMetaPage() {
 
       <PageHeading
         title={t('The hidden meta')}
-        subtitle={t('Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.', { rated: rated, windowDays: windowDays })}
+        subtitle={t('Who is everyone sleeping on? From {rated} brawlers over the last {windowDays} days.', { rated: rated, windowDays: windowDays })}
       />
 
       {/*
@@ -179,7 +179,7 @@ export default async function HiddenMetaPage() {
 
       <Section
         title={t('Overrated')}
-        subtitle={t('Everybody picks them and the results do not justify it — over {highUsage} pick rate.', { highUsage: formatPercent(cuts.highUsage) })}
+        subtitle={t('Everybody picks them, but the results do not back it up. Over {highUsage} pick rate.', { highUsage: formatPercent(cuts.highUsage) })}
         empty={overrated.length === 0}
       >
         {overrated.map((p) => (
@@ -198,7 +198,7 @@ export default async function HiddenMetaPage() {
 
       <Section
         title={t('Hidden gems')}
-        subtitle={t('Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.')}
+        subtitle={t('Much better on one map than usual. The number is win-rate points above their own average.')}
         empty={gems.length === 0}
       >
         {gems.map((e) => (
@@ -236,8 +236,8 @@ export default async function HiddenMetaPage() {
       <section className="space-y-3">
         <SectionHeading title={t('How this is decided')} />
         <div className="card space-y-2 p-5 text-sm leading-relaxed text-muted">
-          <p>{t('Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.')}</p>
-          <p>{t('“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of', { lowUsage: formatPercent(cuts.lowUsage) })}{' '}{t('{v} or better.', { v: cuts.strong.toFixed(1) })}</p>
+          <p>{t('Every brawler here has at least 300 Ranked battles, so a lucky streak cannot put it on a list.')}</p>
+          <p>{t('Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of', { lowUsage: formatPercent(cuts.lowUsage) })}{' '}{t('{v} or better.', { v: cuts.strong.toFixed(1) })}</p>
           <p>{t('Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the')}{' '}
             <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('tier list')}</Link>{t('. Only maps currently in rotation are included.')}</p>
           <p>

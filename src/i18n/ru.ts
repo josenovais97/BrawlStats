@@ -915,16 +915,12 @@ export const RU: Record<string, string> = {
     "Карта",
   "Map page":
     "Страница карты",
-  "Map score is a brawler’s adjusted win rate here, weighed against its overall Ranked form. The matchup figure is its win rate when one of the brawlers you named was on the other team, minus its own average. So a brawler that simply wins a lot does not appear to counter everything.":
-    "Рейтинг на карте — это скорректированный процент побед бойца здесь с учётом его общей ранговой формы. Число матчапа — его процент побед, когда один из названных тобой бойцов был в другой команде, минус его собственное среднее. Так боец, который просто много побеждает, не выглядит контрпиком против всех.",
   "Map score plus how each candidate does against the brawlers you named.":
     "Рейтинг на карте плюс то, как каждый кандидат играет против названных тобой бойцов.",
   "Map score plus how each candidate does beside your team-mates.":
     "Рейтинг на карте плюс то, как каждый кандидат играет рядом с твоими союзниками.",
   "Map score, plus how each candidate does against their picks and beside yours.":
     "Рейтинг на карте плюс то, как каждый кандидат играет против их пиков и рядом с твоими.",
-  "No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
-    "Ни на одной карте ранговых боёв пока недостаточно собранных боёв. Сборщик постоянно проходит пул рейтинга, так что это заполнится за следующий день-два.",
   "No sampled battles for this map or mode yet.":
     "По этой карте или режиму пока нет собранных боёв.",
   "Nothing banned yet":
@@ -933,8 +929,6 @@ export const RU: Record<string, string> = {
     "Выбери карту ранговых боёв, добавь бойцов, которых взял враг, и получи пики с лучшим результатом против именно этого состава на этой карте. Бесплатно, без аккаунта.",
   "Pick the map":
     "Выбери карту",
-  "Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen.":
-    "Выбери карту, укажи, кого взял враг, и список перестроится под оба условия. У каждого состояния свой адрес, так что драфтом можно поделиться или держать его открытым на втором экране.",
   "Ranked by record on this map. Name either team above to reweigh it.":
     "По результату на этой карте. Укажи любую команду выше, чтобы пересчитать.",
   "Ranked pool":
@@ -947,12 +941,8 @@ export const RU: Record<string, string> = {
     "Текущая ротация ранговых боёв. Всё после этого шага исходит из неё.",
   "Un-ban {v}":
     "Снять запрет с {v}",
-  "Up to {MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.":
-    "До {MAX_ALLIES}. Каждый пересчитывает список по тому, как кандидаты реально играют *рядом* с ним, а это другой вопрос, чем контрпик.",
   "Up to {MAX_BANS}. Banned brawlers disappear from every suggestion below.":
     "До {MAX_BANS}. Запрещённые бойцы исчезают из всех подсказок ниже.",
-  "Up to {MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.":
-    "До {MAX_ENEMIES}. Каждый пересчитывает список по тому, как кандидаты реально играют против него.",
   "Your pick":
     "Твой пик",
   "Your team":
@@ -2611,12 +2601,6 @@ export const RU: Record<string, string> = {
     "+{v} п.",
   ". Only maps currently in rotation are included.":
     ". Учитываются только карты, которые сейчас в ротации.",
-  "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.":
-    "У каждого бойца здесь не меньше 300 решённых ранговых боёв. Эти списки — отобранные крайности, а выбор максимума среди множества маленьких выборок даёт крайности случайно, а не по заслугам: именно порог это и предотвращает.",
-  "Everybody picks them and the results do not justify it — over {highUsage} pick rate.":
-    "Их берут все, а результаты этого не оправдывают: частота выбора выше {highUsage}.",
-  "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.":
-    "На одной карте гораздо лучше, чем подсказывает общая форма. Число — пункты процента побед сверх собственного среднего, так что общая сила уже вычтена.",
   "Fine overall, but losing win-rate points on a map that is in rotation right now.":
     "В целом неплохо, но теряет пункты процента побед на карте, которая сейчас в ротации.",
   "Hidden gems":
@@ -2625,10 +2609,6 @@ export const RU: Record<string, string> = {
     "Как это решается",
   "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the":
     "Жемчужины и ловушки карт сравнивают рейтинг бойца на одной карте с его собственной общей формой, поэтому список — не вторая копия",
-  "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.":
-    "Пока недостаточно собранных боёв, чтобы честно ответить. Это заполнится, когда достаточно бойцов пройдут порог выборки.",
-  "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.":
-    "На этой неделе порог никто не прошёл, а значит, мету играют примерно так, как она измеряется.",
   "Overrated":
     "Переоценённые",
   "See every pick on {mapName}":
@@ -2645,8 +2625,6 @@ export const RU: Record<string, string> = {
     "Недооценённые и переоценённые бойцы Brawl Stars",
   "Who is everyone sleeping on, measured from sampled ranked battles.":
     "Кого все недооценивают, по собранным ранговым боям.",
-  "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.":
-    "Кого все недооценивают. По бойцам, у которых достаточно ранговых боёв для оценки ({rated}), за последние {windowDays} {windowDays|one:день|few:дня|many:дней|other:дня}.",
   "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.":
     "Кого все недооценивают. Сильные бойцы, которых почти никто не берёт, популярные бойцы, чьи результаты этого не оправдывают, и жемчужины и ловушки отдельных карт, которые прячет общий тир-лист, — по собранным ранговым боям, а не по мнениям.",
   "tier list":
@@ -2655,8 +2633,6 @@ export const RU: Record<string, string> = {
     "{v} или лучше.",
   "{v} pts":
     "{v} п.",
-  "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of":
-    "«Низкая частота выбора» и «сильный» — это процентили текущего состава, а не фиксированные числа, поэтому вопрос остаётся тем же, а ответы меняются. Сегодня это значит: выбирают реже {lowUsage} и рейтинг",
   ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the":
     ", CC-BY-SA. Supercell не публикует API шансов выпадения, поэтому их поддерживает сообщество по данным датамайнов и наблюдениям в игре, это не официальные цифры. Как выглядит мета, когда бойцы у тебя уже есть, смотри в",
   "Brawl Stars Starr Drop chances: every drop rate and reward":
@@ -2707,18 +2683,12 @@ export const RU: Record<string, string> = {
     "награды",
   "{event} · limited time":
     "{event} · ограниченное время",
-  ", so it moves with the meta and always matches what the rest of the site says.":
-    ", поэтому он меняется вместе с метой и всегда совпадает с остальным сайтом.",
   "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.":
     "Новый боец Brawl Stars для угадывания каждый день. Каждая попытка показывает, насколько ты близок по редкости, классу, скорости, дальности, перезарядке, порядку выхода и тиру. Бесплатно, без аккаунта, одна загадка в день.",
-  "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
-    "После четырёх попыток доска показывает звёздную силу ответа, а после восьми — его гаджет: настоящие иконки из игры без названий, потому что название можно найти, а картинка — проверка памяти.",
   "Amber":
     "Жёлтый",
   "Brawl Stars daily challenge — guess the brawler":
     "Загадка дня Brawl Stars — угадай бойца",
-  "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
-    "У класса нет стрелки, потому что от Стрелка к Танку нет направления. Боец, у которого слишком мало ранговых боёв для тира, показан прочерком, а не догадкой.",
   "Daily challenge":
     "Загадка дня",
   "Green":
@@ -2737,14 +2707,10 @@ export const RU: Record<string, string> = {
     "Сегодняшнюю загадку не удалось подготовить. Она вернётся, как только каталог бойцов снова станет доступен.",
   "Your progress is kept in this browser only. No account, nothing stored on our side.":
     "Твой прогресс хранится только в этом браузере. Без аккаунта, у нас ничего не сохраняется.",
-  "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.":
-    "— это именованные уровни из игры (от «очень низкой» до «очень высокой», от «очень малой» до «очень большой»), а не сырые числа, потому что никто не знает, быстро ли 855, а все знают, что «очень высокая» быстрее «высокой».",
   "comes from the live":
     "берётся из текущего",
   "is exact.":
     "— точное совпадение.",
-  "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.":
-    "— на шаг в стороне: соседняя редкость, соседний тир или боец, вышедший не дальше чем через пять от ответа. Стрелка указывает на ответ: ▲ значит выше, ▼ значит ниже.",
   "is the brawler’s place in release order, not a date.":
     "— место бойца в порядке выхода, а не дата.",
   "range":
@@ -4091,8 +4057,6 @@ export const RU: Record<string, string> = {
     "Сегодняшнюю Классику разгадали игроков: {n}",
   "{pct}% of players solved today’s {mode}":
     "{pct}% игроков разгадали сегодняшний режим «{mode}»",
-  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
-    "Твой прогресс хранится только в этом браузере. Без аккаунта. Когда ты заканчиваешь загадку, сервер добавляет единицу к счётчику для этого числа попыток — так он знает, какая доля игроков её разгадала; ничего о тебе при этом не сохраняется.",
   "Yesterday’s answers":
     "Вчерашние ответы",
   "finish one puzzle today to keep it":
@@ -4103,8 +4067,6 @@ export const RU: Record<string, string> = {
     "Полезный совет: расставляй для одного режима или одного ранга за раз. Боец, который доминирует в «Захвате кристаллов», может быть обузой в «Нокауте», а мета на Мастере — не мета на Золотом, поэтому одна доска на всё в итоге не описывает ничью игру.",
   "How the draft helper works":
     "Как работает помощник драфта",
-  "Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.":
-    "Каждое число взято из настоящих ранговых боёв, которые BrawlZone собирает сам, с обновлением каждые два часа. Выбор карты сортирует бойцов по тому, как они на самом деле играют на этой карте за последние три недели, а не по среднему за сезон по всем режимам.",
   "Then follow the game's own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.":
     "Дальше следуй порядку игры. Запреты убирают бойца из всех списков. Каждый пик врага пересчитывает подсказки по тому, как каждый кандидат играет против него, а каждый пик союзника — по тому, как кандидат играет рядом с ним, а это другой вопрос, чем контрпик. У каждой подсказки указано, сколько боёв за ней стоит, так что малую выборку легко заметить.",
   "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
@@ -4871,4 +4833,42 @@ export const RU: Record<string, string> = {
     "По игрокам из нашей выборки, поэтому с перекосом к активным аккаунтам. Кто не играл в ранговых боях в этом сезоне, не учитывается.",
   "The map pool is fixed for the whole season.":
     "Пул карт не меняется весь сезон.",
+  "is close: a nearby rarity, tier or release. ▲ means the answer is higher, ▼ means lower.":
+    "— близко: соседняя редкость, тир или место в порядке выхода. ▲ значит, что ответ выше, ▼ — ниже.",
+  "use the game’s own labels, from Very Slow to Very Fast.":
+    "указаны ярлыками из игры, от «Очень медленно» до «Очень быстро».",
+  ", so it changes with the meta.":
+    ", поэтому меняется вместе с метой.",
+  "Class has no arrow. A brawler without a tier shows a dash.":
+    "У класса нет стрелки. У бойца без тира стоит прочерк.",
+  "After four guesses you see the answer’s star power icon, and after eight its gadget.":
+    "После четырёх попыток появится иконка звёздной силы ответа, после восьми — гаджета.",
+  "Your progress stays in this browser. No account needed. We only count how many guesses each solve took.":
+    "Прогресс хранится только в этом браузере. Аккаунт не нужен. Мы считаем лишь, за сколько попыток решают загадку.",
+  "Pick the map and the enemy brawlers, and the list reorders. Every draft has its own link you can share.":
+    "Выберите карту и бойцов соперника, и список перестроится. У каждого драфта своя ссылка, которой можно поделиться.",
+  "No Ranked maps have enough battles yet. This fills in within a day or two.":
+    "Ни на одной ранговой карте пока нет достаточно боёв. Данные появятся через день-два.",
+  "Up to {MAX_ENEMIES}. The list adjusts to what beats them.":
+    "До {MAX_ENEMIES}. Список подстраивается под тех, кто их побеждает.",
+  "Up to {MAX_ALLIES}. The list adjusts to who plays well with them.":
+    "До {MAX_ALLIES}. Список подстраивается под тех, кто хорошо с ними играет.",
+  "Map score is how well a brawler does on this map. The matchup figure is how much better or worse it does against the brawlers you named.":
+    "Оценка на карте — насколько хорошо боец играет на ней. Показатель противостояния — насколько лучше или хуже он против выбранных вами бойцов.",
+  "Every number comes from Ranked battles we sample ourselves, refreshed every two hours, over the last three weeks on that map.":
+    "Все цифры — из ранговых боёв, которые мы собираем сами, обновляются каждые два часа и охватывают последние три недели на этой карте.",
+  "Nothing stands out this week.":
+    "На этой неделе ничего не выделяется.",
+  "Not enough battles yet. This fills in soon.":
+    "Пока мало боёв. Данные скоро появятся.",
+  "Who is everyone sleeping on? From {rated} brawlers over the last {windowDays} days.":
+    "Кого все недооценивают? По {rated} бойцам за последние {windowDays} дн.",
+  "Everybody picks them, but the results do not back it up. Over {highUsage} pick rate.":
+    "Их берут все, но результаты этого не оправдывают. Частота выбора выше {highUsage}.",
+  "Much better on one map than usual. The number is win-rate points above their own average.":
+    "На одной карте намного сильнее обычного. Число — пункты процента побед выше их собственного среднего.",
+  "Every brawler here has at least 300 Ranked battles, so a lucky streak cannot put it on a list.":
+    "У каждого бойца здесь не меньше 300 ранговых боёв, так что случайная удачная серия не попадёт в список.",
+  "Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of":
+    "Сейчас «редко берут» значит меньше {lowUsage}, а «сильный» — рейтинг",
 };

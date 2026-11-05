@@ -66,21 +66,21 @@ export default async function DailyChallengePage() {
         <div className="card space-y-2 p-5 text-sm leading-relaxed text-muted">
           <p>
             <span className="font-semibold text-emerald-300">{t('Green')}</span>{' '}{t('is exact.')}{' '}
-            <span className="font-semibold text-amber-300">{t('Amber')}</span>{' '}{t('is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.')}</p>
+            <span className="font-semibold text-amber-300">{t('Amber')}</span>{' '}{t('is close: a nearby rarity, tier or release. ▲ means the answer is higher, ▼ means lower.')}</p>
           <p>
             <strong className="text-foreground">{t('Movement')}</strong>,{' '}
             <strong className="text-foreground">{t('range')}</strong>{' '}{t('and')}{' '}
-            <strong className="text-foreground">{t('reload')}</strong>{' '}{t('are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.')}</p>
+            <strong className="text-foreground">{t('reload')}</strong>{' '}{t('use the game’s own labels, from Very Slow to Very Fast.')}</p>
           <p>
             <strong className="text-foreground">{t('Released')}</strong>{' '}{t('is the brawler’s place in release order, not a date.')}{' '}<strong className="text-foreground">{t('Tier')}</strong>{' '}{t('comes from the live')}{' '}
-            <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('ranked tier list')}</Link>{t(', so it moves with the meta and always matches what the rest of the site says.')}</p>
-          <p>{t('Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.')}</p>
+            <Link href={lp('/tier-list/ranked')} className="font-medium text-brand hover:underline">{t('ranked tier list')}</Link>{t(', so it changes with the meta.')}</p>
+          <p>{t('Class has no arrow. A brawler without a tier shows a dash.')}</p>
           <p>
-            <strong className="text-foreground">{t('Stuck?')}</strong>{' '}{t('After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.')}</p>
+            <strong className="text-foreground">{t('Stuck?')}</strong>{' '}{t('After four guesses you see the answer’s star power icon, and after eight its gadget.')}</p>
           <p>
             <strong className="text-foreground">{t('Shadow')}</strong>{' '}{t('shows only the brawler’s outline, and')}{' '}
             <strong className="text-foreground">{t('Zoom')}</strong>{' '}{t('an extreme close-up that pulls back a little after every wrong guess. Both give you six guesses.')}</p>
-          <p>{t('Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.')}</p>
+          <p>{t('Your progress stays in this browser. No account needed. We only count how many guesses each solve took.')}</p>
         </div>
       </section>
     </div>

@@ -246,7 +246,7 @@ export default async function DraftPage({ params }: PageProps) {
 
       <PageHeading
         title={t('Draft helper')}
-        subtitle={t('Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen.')}
+        subtitle={t('Pick the map and the enemy brawlers, and the list reorders. Every draft has its own link you can share.')}
         aside={
           <Link
             href={lp('/ranked')}
@@ -257,7 +257,7 @@ export default async function DraftPage({ params }: PageProps) {
       />
 
       {pool.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">{t('No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.')}</p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('No Ranked maps have enough battles yet. This fills in within a day or two.')}</p>
       ) : !selected ? (
         <>
           <MapChooser pool={pool} artFor={artFor} modeMeta={modeMeta} />
@@ -350,7 +350,7 @@ export default async function DraftPage({ params }: PageProps) {
             <StepHeading
               step={3}
               title={t('Enemy team')}
-              hint={t('Up to {MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.', { MAX_ENEMIES: MAX_ENEMIES })}
+              hint={t('Up to {MAX_ENEMIES}. The list adjusts to what beats them.', { MAX_ENEMIES: MAX_ENEMIES })}
             />
 
             <div className="card p-4">
@@ -428,7 +428,7 @@ export default async function DraftPage({ params }: PageProps) {
             <StepHeading
               step={4}
               title={t('Your team')}
-              hint={t('Up to {MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.', { MAX_ALLIES: MAX_ALLIES })}
+              hint={t('Up to {MAX_ALLIES}. The list adjusts to who plays well with them.', { MAX_ALLIES: MAX_ALLIES })}
             />
 
             <div className="card p-4">
@@ -547,7 +547,7 @@ export default async function DraftPage({ params }: PageProps) {
               />
             )}
 
-            <p className="mt-3 text-xs leading-relaxed text-muted">{t('Map score is a brawler’s adjusted win rate here, weighed against its overall Ranked form. The matchup figure is its win rate when one of the brawlers you named was on the other team, minus its own average. So a brawler that simply wins a lot does not appear to counter everything.')}</p>
+            <p className="mt-3 text-xs leading-relaxed text-muted">{t('Map score is how well a brawler does on this map. The matchup figure is how much better or worse it does against the brawlers you named.')}</p>
           </section>
         </>
       )}
@@ -740,7 +740,7 @@ function DraftHowItWorks() {
   return (
     <section className="card space-y-3 p-6 text-sm leading-relaxed text-muted">
       <h2 className="text-base font-bold text-foreground">{t('How the draft helper works')}</h2>
-      <p>{t('Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.')}</p>
+      <p>{t('Every number comes from Ranked battles we sample ourselves, refreshed every two hours, over the last three weeks on that map.')}</p>
       <p>{t('Then follow the game\'s own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.')}</p>
       <p>{t('The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.')}</p>
     </section>

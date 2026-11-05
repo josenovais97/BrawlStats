@@ -914,16 +914,12 @@ export const PT: Record<string, string> = {
     "Mapa",
   "Map page":
     "Página do mapa",
-  "Map score is a brawler’s adjusted win rate here, weighed against its overall Ranked form. The matchup figure is its win rate when one of the brawlers you named was on the other team, minus its own average. So a brawler that simply wins a lot does not appear to counter everything.":
-    "A pontuação do mapa é a taxa de vitória ajustada de um brawler aqui, ponderada pelo nível geral dele no Ranqueado. O número do confronto é a taxa de vitória dele quando um dos brawlers que você indicou estava no outro time, menos a própria média. Assim um brawler que simplesmente ganha muito não parece counter de tudo.",
   "Map score plus how each candidate does against the brawlers you named.":
     "Pontuação do mapa mais como cada opção se sai contra os brawlers que você indicou.",
   "Map score plus how each candidate does beside your team-mates.":
     "Pontuação do mapa mais como cada opção se sai ao lado dos seus aliados.",
   "Map score, plus how each candidate does against their picks and beside yours.":
     "Pontuação do mapa, mais como cada opção se sai contra as escolhas deles e ao lado das suas.",
-  "No Ranked maps have enough sampled battles yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
-    "Nenhum mapa do Ranqueado tem partidas suficientes ainda. Coletamos partidas o tempo todo, então isso é preenchido em um ou dois dias.",
   "No sampled battles for this map or mode yet.":
     "Ainda não há partidas deste mapa ou modo.",
   "Nothing banned yet":
@@ -932,8 +928,6 @@ export const PT: Record<string, string> = {
     "Escolha o mapa do Ranqueado, adicione os brawlers que o inimigo pegou e veja os que têm melhor resultado contra essa formação exata naquele mapa. Grátis e sem conta.",
   "Pick the map":
     "Escolha o mapa",
-  "Pick the map, name what the enemy has taken, and the list reorders around both. Every state is its own URL, so a draft can be shared or kept open on a second screen.":
-    "Escolha o mapa, diga o que o inimigo pegou e a lista se reorganiza pelos dois. Cada estado tem a própria URL, então dá para compartilhar um draft ou deixar aberto em outra tela.",
   "Ranked by record on this map. Name either team above to reweigh it.":
     "Ordenados pelo resultado neste mapa. Indique qualquer um dos times acima para recalcular.",
   "Ranked pool":
@@ -946,12 +940,8 @@ export const PT: Record<string, string> = {
     "A rotação atual do Ranqueado. Tudo depois deste passo depende disso.",
   "Un-ban {v}":
     "Desbanir {v}",
-  "Up to {MAX_ALLIES}. Each one reweighs the list by how candidates actually do *beside* it, which is a different question from countering.":
-    "Até {MAX_ALLIES}. Cada um recalcula a lista por como as opções se saem *ao lado* dele, que é uma pergunta diferente de counterar.",
   "Up to {MAX_BANS}. Banned brawlers disappear from every suggestion below.":
     "Até {MAX_BANS}. Brawlers banidos somem de todas as sugestões abaixo.",
-  "Up to {MAX_ENEMIES}. Each one reweighs the list by how candidates actually do against it.":
-    "Até {MAX_ENEMIES}. Cada um recalcula a lista por como as opções se saem contra ele.",
   "Your pick":
     "Sua escolha",
   "Your team":
@@ -2610,12 +2600,6 @@ export const PT: Record<string, string> = {
     "+{v} pts",
   ". Only maps currently in rotation are included.":
     ". Só entram os mapas em rotação agora.",
-  "Every brawler here has at least 300 decided ranked battles. These lists are selected extremes, and picking a maximum out of many small samples produces extremes by accident rather than by merit — the floor is what stops that.":
-    "Cada brawler aqui tem pelo menos 300 partidas ranqueadas decididas. Estas listas são extremos escolhidos, e tirar um máximo de muitas amostras pequenas gera extremos por acaso, e não por mérito: o mínimo é o que evita isso.",
-  "Everybody picks them and the results do not justify it — over {highUsage} pick rate.":
-    "Todo mundo escolhe e os resultados não justificam: mais de {highUsage} de escolha.",
-  "Far better on one map than their overall form suggests. The number is win-rate points above their own average, so general strength is already taken out.":
-    "Muito melhores num mapa do que o nível geral deles sugere. O número são pontos de taxa de vitória acima da própria média, então a força geral já está descontada.",
   "Fine overall, but losing win-rate points on a map that is in rotation right now.":
     "Bem no geral, mas perdem pontos de taxa de vitória num mapa que está em rotação agora.",
   "Hidden gems":
@@ -2624,10 +2608,6 @@ export const PT: Record<string, string> = {
     "Como isso é decidido",
   "Map gems and traps compare a brawler’s score on one map against its own overall form, so the list is not a second copy of the":
     "As joias e armadilhas por mapa comparam a pontuação de um brawler num mapa com o próprio nível geral, então a lista não é uma segunda cópia da",
-  "Not enough sampled battles yet to answer this honestly. It fills in once enough brawlers clear the sample floor.":
-    "Ainda não há partidas suficientes para responder isso com honestidade. Isso é preenchido quando brawlers suficientes passam do mínimo.",
-  "Nothing clears the bar this week, which means the meta is being played roughly the way it measures.":
-    "Nada passa do limite nesta semana, o que significa que o meta está sendo jogado mais ou menos como é medido.",
   "Overrated":
     "Superestimados",
   "See every pick on {mapName}":
@@ -2644,8 +2624,6 @@ export const PT: Record<string, string> = {
     "Brawlers subestimados e superestimados do Brawl Stars",
   "Who is everyone sleeping on, measured from sampled ranked battles.":
     "Quem todo mundo está ignorando, medido com partidas ranqueadas.",
-  "Who is everyone sleeping on. Read from {rated} brawlers with enough ranked battles to judge, over the last {windowDays} days.":
-    "Quem todo mundo está ignorando. Com {rated} brawlers com partidas ranqueadas suficientes para avaliar, nos últimos {windowDays} dias.",
   "Who is everyone sleeping on. Strong brawlers almost nobody picks, popular brawlers the results do not justify, and the map-specific gems and traps the overall tier list hides — measured from sampled ranked battles, not opinion.":
     "Quem todo mundo está ignorando. Brawlers fortes que quase ninguém escolhe, brawlers populares que os resultados não justificam e as joias e armadilhas por mapa que a tier list geral esconde, medido com partidas ranqueadas, e não com opiniões.",
   "tier list":
@@ -2654,8 +2632,6 @@ export const PT: Record<string, string> = {
     "{v} ou mais.",
   "{v} pts":
     "{v} pts",
-  "“Low pick rate” and “strong” are percentiles of the live roster, not fixed numbers, so the question stays the same while the answers move. Today they resolve to under {lowUsage} picked and a rating of":
-    "“Pouco escolhido” e “forte” são percentis dos brawlers atuais, e não números fixos, então a pergunta é a mesma mesmo com as respostas mudando. Hoje significam menos de {lowUsage} de escolha e uma pontuação de",
   ", CC-BY-SA. Supercell publishes no drop-rate API, so these are community-maintained from datamines and in-game observation rather than official figures. For what the meta looks like once you have the brawlers, see the":
     ", CC-BY-SA. A Supercell não publica as chances em nenhuma API, então a comunidade mantém esses números a partir de datamines e do que se vê no jogo, e eles não são oficiais. Para ver como está o meta depois que você tiver os brawlers, veja a",
   "Brawl Stars Starr Drop chances: every drop rate and reward":
@@ -2706,18 +2682,12 @@ export const PT: Record<string, string> = {
     "recompensas",
   "{event} · limited time":
     "{event} · tempo limitado",
-  ", so it moves with the meta and always matches what the rest of the site says.":
-    ", então muda com o meta e sempre bate com o que o resto do site diz.",
   "A new Brawl Stars brawler to guess every day. Each guess tells you how close you are on rarity, class, movement, range, reload, release order and tier. Free, no account, one puzzle a day.":
     "Um brawler do Brawl Stars novo para adivinhar todo dia. Cada palpite mostra quão perto você está em raridade, classe, movimento, alcance, recarga, ordem de lançamento e tier. Grátis, sem conta, um desafio por dia.",
-  "After four guesses the board shows the answer’s star power, and after eight its gadget — the real icons from the game, with the names withheld, because a name is searchable and a picture is a memory test.":
-    "Depois de quatro palpites o quadro mostra o poder de estrela da resposta, e depois de oito o acessório: os ícones reais do jogo, sem os nomes, porque um nome dá para pesquisar e uma imagem é um teste de memória.",
   "Amber":
     "Âmbar",
   "Brawl Stars daily challenge — guess the brawler":
     "Desafio diário do Brawl Stars: adivinhe o brawler",
-  "Class has no arrow, because there is no direction from Marksman to Tank. A brawler with too few ranked battles to be tiered shows a dash rather than a guess.":
-    "A classe não tem seta, porque não existe direção de Atirador para Tanque. Um brawler com poucas partidas ranqueadas para ter tier mostra um traço em vez de um chute.",
   "Daily challenge":
     "Desafio diário",
   "Green":
@@ -2736,14 +2706,10 @@ export const PT: Record<string, string> = {
     "Não foi possível preparar o desafio de hoje. Ele volta quando o catálogo de brawlers responder de novo.",
   "Your progress is kept in this browser only. No account, nothing stored on our side.":
     "Seu progresso fica só neste navegador. Sem conta, não guardamos nada.",
-  "are the named tiers the game uses — Very Slow through Very Fast, Very Short through Very Long — not raw numbers, because nobody knows whether 855 is fast and everybody knows Very Fast beats Fast.":
-    "são os níveis com nome que o jogo usa (de Muito lento a Muito rápido, de Muito curto a Muito longo), e não números, porque ninguém sabe se 855 é rápido e todo mundo sabe que Muito rápido ganha de Rápido.",
   "comes from the live":
     "vem da",
   "is exact.":
     "é exato.",
-  "is one step away — an adjacent rarity, a neighbouring tier, or a brawler released within five of the answer. An arrow points toward the answer: ▲ means higher, ▼ means lower.":
-    "está a um passo: uma raridade vizinha, um tier ao lado ou um brawler lançado a até cinco da resposta. Uma seta aponta para a resposta: ▲ significa mais alto, ▼ mais baixo.",
   "is the brawler’s place in release order, not a date.":
     "é a posição do brawler na ordem de lançamento, e não uma data.",
   "range":
@@ -4090,8 +4056,6 @@ export const PT: Record<string, string> = {
     "{n} jogadores resolveram o Clássico de hoje",
   "{pct}% of players solved today’s {mode}":
     "{pct}% dos jogadores resolveram o desafio {mode} de hoje",
-  "Your progress is kept in this browser only. No account. When you finish a puzzle, the server adds one to a counter for that number of guesses, which is how it knows what share of players solved it; nothing about you is stored with it.":
-    "Seu progresso fica salvo apenas neste navegador. Sem conta. Quando você termina um desafio, o servidor soma um a um contador para aquele número de palpites, e assim sabe quantos jogadores resolveram; nada sobre você é guardado.",
   "Yesterday’s answers":
     "Respostas de ontem",
   "finish one puzzle today to keep it":
@@ -4102,8 +4066,6 @@ export const PT: Record<string, string> = {
     "Uma dica útil: monte a lista para um modo ou um rank de cada vez. Um brawler que domina um modo pode atrapalhar em outro, e o meta no Mestres não é o meta no Ouro, então um quadro só para tudo acaba não refletindo o jogo de ninguém.",
   "How the draft helper works":
     "Como funciona o assistente de draft",
-  "Every number comes from real Ranked battles that BrawlZone samples itself, refreshed every two hours. Picking a map ranks the brawlers by how they actually do on that map over the last three weeks, not by a season-long average across every mode.":
-    "Cada número vem de batalhas reais do Ranqueado que o BrawlZone coleta por conta própria e atualiza a cada duas horas. Ao escolher um mapa, os brawlers são ordenados pelo desempenho real naquele mapa nas últimas três semanas, não por uma média da temporada inteira em todos os modos.",
   "Then follow the game's own order. Bans take a brawler out of every list. Each enemy pick reweighs the suggestions by how each candidate does against it, and each ally pick by how it does beside it, which is a different question from countering. Every suggestion shows how many battles are behind it, so a thin sample is easy to spot.":
     "Depois siga a mesma ordem do jogo. Os banimentos tiram um brawler de todas as listas. Cada escolha inimiga reordena as sugestões pelo desempenho de cada candidato contra ela, e cada escolha aliada pelo desempenho ao lado dela, que é uma pergunta diferente de fazer counter. Cada sugestão mostra quantas batalhas há por trás, então uma amostra pequena fica fácil de notar.",
   "The same picks float over the game itself in the BrawlZone Bubble app, so you can check them mid-draft without leaving Brawl Stars.":
@@ -4870,4 +4832,42 @@ export const PT: Record<string, string> = {
     "Vem dos jogadores que analisamos, então pende para contas ativas. Quem não jogou Ranqueado nesta temporada não é contado.",
   "The map pool is fixed for the whole season.":
     "O conjunto de mapas é fixo durante a temporada inteira.",
+  "is close: a nearby rarity, tier or release. ▲ means the answer is higher, ▼ means lower.":
+    "está perto: uma raridade, tier ou lançamento próximo. ▲ quer dizer que a resposta é maior, ▼ que é menor.",
+  "use the game’s own labels, from Very Slow to Very Fast.":
+    "usam os rótulos do próprio jogo, de Muito lento a Muito rápido.",
+  ", so it changes with the meta.":
+    ", então muda com o meta.",
+  "Class has no arrow. A brawler without a tier shows a dash.":
+    "A classe não tem seta. Um brawler sem tier mostra um traço.",
+  "After four guesses you see the answer’s star power icon, and after eight its gadget.":
+    "Depois de quatro palpites você vê o ícone do poder de estrela da resposta, e depois de oito, o acessório.",
+  "Your progress stays in this browser. No account needed. We only count how many guesses each solve took.":
+    "Seu progresso fica neste navegador. Sem conta. Só contamos quantos palpites cada acerto levou.",
+  "Pick the map and the enemy brawlers, and the list reorders. Every draft has its own link you can share.":
+    "Escolha o mapa e os brawlers inimigos, e a lista se reorganiza. Cada draft tem o próprio link para compartilhar.",
+  "No Ranked maps have enough battles yet. This fills in within a day or two.":
+    "Nenhum mapa do Ranqueado tem batalhas suficientes ainda. Isso é preenchido em um ou dois dias.",
+  "Up to {MAX_ENEMIES}. The list adjusts to what beats them.":
+    "Até {MAX_ENEMIES}. A lista se ajusta ao que vence eles.",
+  "Up to {MAX_ALLIES}. The list adjusts to who plays well with them.":
+    "Até {MAX_ALLIES}. A lista se ajusta a quem joga bem com eles.",
+  "Map score is how well a brawler does on this map. The matchup figure is how much better or worse it does against the brawlers you named.":
+    "A pontuação de mapa é o quanto um brawler vai bem neste mapa. O número do confronto é o quanto ele vai melhor ou pior contra os brawlers que você escolheu.",
+  "Every number comes from Ranked battles we sample ourselves, refreshed every two hours, over the last three weeks on that map.":
+    "Cada número vem de batalhas do Ranqueado que nós mesmos analisamos, atualizadas a cada duas horas, das últimas três semanas naquele mapa.",
+  "Nothing stands out this week.":
+    "Nada se destaca nesta semana.",
+  "Not enough battles yet. This fills in soon.":
+    "Ainda não há batalhas suficientes. Isso é preenchido em breve.",
+  "Who is everyone sleeping on? From {rated} brawlers over the last {windowDays} days.":
+    "Quem todo mundo está ignorando? De {rated} brawlers nos últimos {windowDays} dias.",
+  "Everybody picks them, but the results do not back it up. Over {highUsage} pick rate.":
+    "Todo mundo escolhe, mas os resultados não justificam. Mais de {highUsage} de escolha.",
+  "Much better on one map than usual. The number is win-rate points above their own average.":
+    "Muito melhores num mapa do que o normal. O número são pontos de vitória acima da própria média.",
+  "Every brawler here has at least 300 Ranked battles, so a lucky streak cannot put it on a list.":
+    "Cada brawler aqui tem pelo menos 300 batalhas do Ranqueado, então uma sequência de sorte não basta para entrar numa lista.",
+  "Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of":
+    "Hoje, “pouco escolhido” significa menos de {lowUsage} de escolha, e “forte”, uma nota de",
 };
