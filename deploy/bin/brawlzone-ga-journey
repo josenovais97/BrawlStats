@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Journey by Mediavine readiness, from Google Analytics (2026-11-05).
+#
+#   brawlzone-ga-journey      # prints: tier1_30d<TAB>tier1_last7<TAB>sessions_30d
+#
+# Journey (Mediavine's entry programme) takes a site once Google Analytics
+# shows 1,000 sessions from the US, UK, Canada and Australia within 30 days,
+# and it requires exclusivity: AdSense comes off when Journey goes on. GA4
+# was added on 2026-10-29, so its 30-day window only fills at the end of
+# November. The daily digest prints this so the owner sees the day it crosses.
+#
+# GA counts far less than Umami: in the EEA and the UK it records only
+# visitors who accept the consent banner (the UK showed 1 session to Umami's
+# ~20 in the first week), and ad blockers drop the tag. Journey judges by GA,
+# so this is the number that matters for it, not Umami's.
+#
+# Reads the GA4 Data API with the read-only service account the search report
+# uses (~/.brawlzone-search.json), added as a Viewer of property 561473172.
+# Prints nothing and exits 1 on any failure, so a mail row shows "?".
+set -uo pipefail
+
+KEY=/home/ubuntu/.brawlzone-search.json
+[ -r "$KEY" ] || exit 1
+
+python3 - "$KEY" <<'PY'
+import base64, json, os, subprocess, sys, tempfile, time, urllib.parse, urllib.request
+
+PROPERTY = '561473172'
+TIER1 = ['United States', 'United Kingdom', 'Canada', 'Australia']
+
+k = json.load(open(sys.argv[1]))
+b64 = lambda b: base64.urlsafe_b64encode(b).rstrip(b'=')
+now = int(time.time())
+head = b64(json.dumps({'alg': 'RS256', 'typ': 'JWT'}).encode())
+claim = b64(json.dumps({'iss': k['client_email'], 'scope': 'https://www.googleapis.com/auth/analytics.readonly',
+                        'aud': k['token_uri'], 'iat': now, 'exp': now + 3600}).encode())
+fd, kp = tempfile.mkstemp(); os.write(fd, k['private_key'].encode()); os.close(fd)
+try:
+    sig = subprocess.run(['openssl', 'dgst', '-sha256', '-sign', kp], input=head + b'.' + claim, capture_output=True, check=True).stdout
+finally:
+    os.unlink(kp)
+tok = json.load(urllib.request.urlopen(urllib.request.Request(k['token_uri'], data=urllib.parse.urlencode(
+    {'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion': (head + b'.' + claim + b'.' + b64(sig)).decode()}).encode()), timeout=60))['access_token']
+
+def report(start, tier1_only):
+    body = {'dateRanges': [{'startDate': start, 'endDate': 'today'}], 'metrics': [{'name': 'sessions'}]}
+    if tier1_only:
+        body['dimensionFilter'] = {'filter': {'fieldName': 'country', 'inListFilter': {'values': TIER1}}}
+    req = urllib.request.Request(f'https://analyticsdata.googleapis.com/v1beta/properties/{PROPERTY}:runReport',
+                                 data=json.dumps(body).encode(), headers={'Authorization': f'Bearer {tok}', 'Content-Type': 'application/json'})
+    rows = json.load(urllib.request.urlopen(req, timeout=60)).get('rows', [])
+    return int(rows[0]['metricValues'][0]['value']) if rows else 0
+
+print(f"{report('29daysAgo', True)}\t{report('6daysAgo', True)}\t{report('29daysAgo', False)}")
+PY
