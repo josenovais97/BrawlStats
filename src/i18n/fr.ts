@@ -3205,4 +3205,404 @@ export const FR: Record<string, string> = {
     "Chercher par skin ou par brawler",
   "Search icons by number":
     "Chercher des icônes par numéro",
+  "Search profile icons":
+    "Chercher des icônes de profil",
+  "Search skins":
+    "Chercher des skins",
+  "of":
+    "sur",
+  "{stats} first-guess solve":
+    "{stats} trouvée du premier coup",
+  "{stats} first-guess solves":
+    "{stats} trouvées du premier coup",
+  "% of the score. That weight is measured, not chosen: against an estimator that controls for player skill exactly, the adjusted win rate scores r = +0.77 and pick rate r = +0.22, so popularity is a weak but real strength signal rather than noise — and its share of the combined signal is about a fifth, which is the weight it now carries. It was 35%, where it produced 45% of the actual spread and moved brawlers forty places on popularity alone. Even so, a popular brawler with a mediocre record will still outscore an unpopular one with a better record. Both numbers are printed on every row so you can weigh them yourself.":
+    "% du score. Ce poids est mesuré, pas choisi : face à un estimateur qui neutralise exactement le niveau des joueurs, le taux de victoire ajusté obtient r = +0,77 et le taux de sélection r = +0,22, donc la popularité est un signal de force faible mais réel, pas du bruit, et sa part dans le signal combiné tourne autour d'un cinquième, soit le poids qu'elle a maintenant. Elle était à 35 %, où elle produisait 45 % de l'écart réel et faisait bouger des brawlers de quarante places sur la seule popularité. Malgré ça, un brawler populaire au bilan moyen dépassera encore un brawler impopulaire au meilleur bilan. Les deux chiffres sont affichés sur chaque ligne pour que tu puisses les peser toi-même.",
+  "The two agree closely (r = +0.77) and disagree where it matters. Bibi ranked 96th on win rate alone and 16th once every player was compared against their own average, because she is played mostly by weaker accounts and their results were being read as hers.":
+    "Les deux concordent de près (r = +0,77) et divergent là où ça compte. Bibi était 96e sur le seul taux de victoire et 16e une fois chaque joueur comparé à sa propre moyenne, parce qu'elle est surtout jouée par des comptes plus faibles et que leurs résultats lui étaient attribués.",
+  "A map page ranks brawlers from battles played on that map. When a map has too few sampled battles to say anything, it falls back to the mode’s picks and says so on the page. A recommendation is never presented as map-specific when it is not.":
+    "Une page de carte classe les brawlers d'après les combats joués sur cette carte. Quand une carte a trop peu de combats collectés pour dire quoi que ce soit, elle se rabat sur les picks du mode et le dit sur la page. Une recommandation n'est jamais présentée comme propre à une carte quand elle ne l'est pas.",
+  "Almost nobody picks {name}. It is winning anyway.":
+    "Presque personne ne prend {name}. Il gagne quand même.",
+  "Back to brawlers":
+    "Retour aux brawlers",
+  "Battle history only goes back ~25 matches":
+    "L'historique des combats ne remonte qu'à ~25 matchs",
+  "Best here":
+    "Le meilleur ici",
+  "Best picks for your map":
+    "Les meilleurs picks pour ta carte",
+  "Brawl Stars data is temporarily unavailable. Try again shortly.":
+    "Les données Brawl Stars sont temporairement indisponibles. Réessaie dans un instant.",
+  "Brawl-O-Ween":
+    "Brawl-O-Ween",
+  "Claim by pressing and holding Loony once all 6 daily wins are done.":
+    "Récupère-les en maintenant Loony appuyé une fois les 6 victoires du jour obtenues.",
+  "Coins, power points and playtime are estimates":
+    "Les pièces, les points de pouvoir et le temps de jeu sont des estimations",
+  "Could not check that guess.":
+    "Impossible de vérifier cet essai.",
+  "Could not copy. Select the grid and copy it by hand.":
+    "Impossible de copier. Sélectionne la grille et copie-la à la main.",
+  "Could not reach the server. Try again.":
+    "Impossible de joindre le serveur. Réessaie.",
+  "Could not read this club right now.":
+    "Impossible de lire ce club pour le moment.",
+  "Decide what to upgrade":
+    "Décide quoi améliorer",
+  "Derived from published upgrade costs and victory counts. Bling is not exposed by the API at all, so we do not show it.":
+    "Calculé à partir des coûts d'amélioration publiés et du nombre de victoires. Les blings ne sont pas du tout exposés par l'API, donc nous ne les affichons pas.",
+  "Enter bans and picks, get the answer":
+    "Indique les bans et les picks, obtiens la réponse",
+  "Every daily win adds a reward to Loony, up to 6 wins a day.":
+    "Chaque victoire du jour ajoute une récompense à Loony, jusqu'à 6 victoires par jour.",
+  "Every map still in the game. Around four hundred. This is deliberately not called a rotation: the artwork source publishes no last-played date, so nothing in it can say which of those maps are actually live today.":
+    "Toutes les cartes encore dans le jeu. Environ quatre cents. Ce n'est volontairement pas appelé une rotation : la source des images ne publie pas de date de dernière apparition, donc rien ne peut y dire lesquelles de ces cartes sont vraiment en jeu aujourd'hui.",
+  "Every ranked mode is covered, with a pick spare":
+    "Chaque mode Classé est couvert, avec un pick de réserve",
+  "Every top-tier brawler you own is at power 11.":
+    "Chaque brawler de haut tier que tu possèdes est au niveau de pouvoir 11.",
+  "Fielded at Power 11 with every Gadget, Star Power, Gear, Buffie and their Hypercharge, exactly as in Friendly Battles.":
+    "Alignés au niveau de pouvoir 11 avec tous leurs gadgets, pouvoirs star, équipements, buffies et leur hypercharge, exactement comme en combat amical.",
+  "Find roster weaknesses":
+    "Trouve les faiblesses de ton roster",
+  "Forgot to claim? The rewards are granted automatically the next day.":
+    "Oublié de récupérer ? Les récompenses sont données automatiquement le lendemain.",
+  "Gears, star powers, gadgets, best modes and maps, updated daily from real battles.":
+    "Équipements, pouvoirs star, gadgets, meilleurs modes et cartes, mis à jour chaque jour d'après de vrais combats.",
+  "How the meta score works":
+    "Comment marche le meta score",
+  "Leaderboards stop at 200":
+    "Les classements s'arrêtent à 200",
+  "Loadouts are not published":
+    "Les builds en combat ne sont pas publiés",
+  "Map picks vs mode picks":
+    "Picks de la carte et picks du mode",
+  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
+    "Meta score de {from} à {to} en une seule journée, sur assez de combats pour que le mouvement soit réel et pas du bruit.",
+  "Most likely bans here":
+    "Bans les plus probables ici",
+  "Most likely picks here":
+    "Picks les plus probables ici",
+  "Most {name} owners buy the {gadget} gadget and the {starPower} star power first.":
+    "La plupart des propriétaires de {name} achètent d'abord le gadget {gadget} et le pouvoir star {starPower}.",
+  "Most {name} owners buy the {gadget} gadget first.":
+    "La plupart des propriétaires de {name} achètent d'abord le gadget {gadget}.",
+  "Most {name} owners buy the {starPower} star power first.":
+    "La plupart des propriétaires de {name} achètent d'abord le pouvoir star {starPower}.",
+  "None of your most-played brawlers are struggling right now.":
+    "Aucun de tes brawlers les plus joués n'est à la peine en ce moment.",
+  "Not enough sampled battles to judge this draft":
+    "Pas assez de combats collectés pour juger ce draft",
+  "On 1 global brawler leaderboard":
+    "Dans 1 classement mondial de brawler",
+  "One score, comparable to everyone we sample.":
+    "Un seul score, comparable à tous ceux que nous collectons.",
+  "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.":
+    "Notre échantillon penche vers les joueurs à beaucoup de trophées, qui gagnent plus avec n'importe quoi. Les taux de victoire sont recentrés sur cette base pour que la comparaison entre brawlers reste juste.",
+  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
+    "Choisi dans {picks} des combats collectés pour un résultat ajusté de {rate} : en dessous de la moyenne des joueurs mêmes qui le prennent.",
+  "Playable in Ranked even if you have not unlocked them.":
+    "Jouables en Classé même si tu ne les as pas débloqués.",
+  "Progress resets every day, like Daily Wins.":
+    "La progression se remet à zéro chaque jour, comme les Victoires du jour.",
+  "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
+    "Les récompenses sont des Prix Starr ou des Prix du chaos, avec jusqu'à 2 Prix Starr par jour.",
+  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
+    "Ensemble, {name} gagne {rate} — {edge} de mieux que sinon. Aucun des deux n'est pris pour l'autre.",
+  "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
+    "C'est tout ce que l'API garde. Tout ce qui est marqué « récent » l'est vraiment. Il n'y a pas d'historique de carrière à montrer.",
+  "That is not a current brawler.":
+    "Ce n'est pas un brawler actuel.",
+  "The API refuses to return more, so top-200 is the deepest placement that exists. There is no top-500.":
+    "L'API refuse d'en renvoyer plus, donc le top 200 est le classement le plus profond qui existe. Il n'y a pas de top 500.",
+  "The API reports which star powers, gadgets and gears a player owns, and nothing about what they took into a match. No endpoint exposes an equipped loadout. So the brawler pages show upgrade ownership, never a usage or pick rate. A gear owned by 78% of a brawler’s owners is exactly that: owned by 78%. Ownership usually tracks usage, but it is not a measurement of it.":
+    "L'API indique quels pouvoirs star, gadgets et équipements un joueur possède, et rien sur ce qu'il a emporté en combat. Aucun point d'accès ne montre un build équipé. Les pages des brawlers montrent donc la possession des améliorations, jamais un taux d'utilisation ou de sélection. Un équipement possédé par 78 % des propriétaires d'un brawler, c'est exactement ça : possédé par 78 %. La possession suit généralement l'usage, mais ce n'est pas une mesure de l'usage.",
+  "The Ranked meta, map by map":
+    "La méta Classé, carte par carte",
+  "The best trio to take together":
+    "Le meilleur trio à jouer ensemble",
+  "The competitive map pool for the current Ranked season, published per season. Fixed until the season turns over.":
+    "Le pool de cartes compétitives de la saison Classé actuelle, publié pour chaque saison. Fixe jusqu'au changement de saison.",
+  "The drafts were close to even":
+    "Les drafts étaient presque à égalité",
+  "The maps in the event rotation this minute, straight from the game API. This is the only list that is literally “right now”.":
+    "Les cartes dans la rotation des événements en ce moment, directement depuis l'API du jeu. C'est la seule liste qui soit littéralement « en ce moment ».",
+  "The two windows were sampled at very different rates — {before} decided Ranked battles before against {after} after, a factor of {ratio}. Any difference would be partly the sampling and not the update, so nothing is scored.":
+    "Les deux périodes ont été collectées à des rythmes très différents : {before} combats Classé décisifs avant contre {after} après, un facteur de {ratio}. Toute différence viendrait en partie de la collecte et non de la mise à jour, donc rien n'est noté.",
+  "They count toward the Power 11 brawler requirement for each rank, Mythic and above need more than 12.":
+    "Ils comptent dans l'exigence de brawlers au niveau de pouvoir 11 de chaque rang ; Mythique et au-delà en demandent plus de 12.",
+  "Thin sample, Building and Well sampled describe how many battles are behind a map’s ranking. Nothing more. A thin map is not hidden; it is labelled, because a caveat you can read beats a number you cannot check.":
+    "Peu de données, En cours et Bien échantillonné décrivent combien de combats soutiennent le classement d'une carte. Rien de plus. Une carte peu échantillonnée n'est pas cachée, elle est signalée, parce qu'une mise en garde qu'on peut lire vaut mieux qu'un chiffre qu'on ne peut pas vérifier.",
+  "Tier list percentages are adjusted":
+    "Les pourcentages de la tier list sont ajustés",
+  "Too little was sampled either side of this update to measure it: {before} decided Ranked battles before and {after} after.":
+    "Trop peu de combats ont été collectés de part et d'autre de cette mise à jour pour la mesurer : {before} combats Classé décisifs avant et {after} après.",
+  "Too many scans at once. Give it a minute.":
+    "Trop d'analyses en même temps. Laisse-lui une minute.",
+  "Totals unavailable right now":
+    "Totaux indisponibles pour le moment",
+  "Understand your level":
+    "Comprends ton niveau",
+  "We couldn’t find that player. Check the tag in-game under your profile.":
+    "Impossible de trouver ce joueur. Vérifie le tag en jeu sous ton profil.",
+  "Where the next coins actually change a match.":
+    "Là où les prochaines pièces changent vraiment un match.",
+  "Which of your brawlers the meta has left behind.":
+    "Ceux de tes brawlers que la méta a laissés derrière.",
+  "Your brawlers ticked, your icon on the bubble":
+    "Tes brawlers cochés, ton icône sur la bulle",
+  "adjusted win rate":
+    "taux de victoire ajusté",
+  "meta score, 1 day":
+    "meta score, 1 jour",
+  "of all picks":
+    "de tous les picks",
+  "on {map}":
+    "sur {map}",
+  "this map":
+    "cette carte",
+  "vs its usual form":
+    "vs sa forme habituelle",
+  "when paired":
+    "en duo",
+  "{map} · {battles} battles on this map":
+    "{map} · {battles} combats sur cette carte",
+  "{name} and {other} belong together.":
+    "{name} et {other} vont ensemble.",
+  "{name} climbed overnight.":
+    "{name} a grimpé en une nuit.",
+  "{name} is a different brawler on {map}.":
+    "{name} est un autre brawler sur {map}.",
+  "{name} is everywhere, and losing.":
+    "{name} est partout, et il perd.",
+  "{name} is picked constantly and losing.":
+    "{name} est choisi sans arrêt et il perd.",
+  "{name} moved more than anything else since yesterday.":
+    "{name} a plus bougé que tout le reste depuis hier.",
+  "{name} owns {other}.":
+    "{name} domine {other}.",
+  "{rate} adjusted win rate on just {picks} of picks — one of the strongest records on the roster, from a brawler most drafts never consider.":
+    "Taux de victoire ajusté de {rate} pour seulement {picks} des picks : un des meilleurs bilans du roster, pour un brawler que la plupart des drafts n'envisagent jamais.",
+  "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
+    "{rate} contre {other} en particulier, {edge} au-dessus du bilan propre de {name}. Le matchup le plus déséquilibré de l'échantillon.",
+  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
+    "{rate} ici contre {other} sur toutes les autres cartes : le plus grand écart entre un brawler et un bout de terrain.",
+  "{winRate} win rate · {pickRate} picked · {battles} battles":
+    "{winRate} de victoires · {pickRate} de sélection · {battles} combats",
+  "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.":
+    "Le meta score est un chiffre de 0 à 10 qui combine deux mesures : un taux de victoire ajusté, qui compte pour 75 %, et un taux de sélection en échelle logarithmique, qui compte pour 25 %. Les deux viennent de vrais combats collectés toutes les deux heures auprès de joueurs du classement mondial, et la liste Classé ne compte que les combats compétitifs.",
+  "Every win rate is pulled toward the average by 50 pseudo-battles, so a brawler needs roughly that many decided battles before its own record outweighs the prior. Without it the top of the list was whichever rarely-played brawler had a lucky week. Anything under 20 decided battles is not rated at all.":
+    "Chaque taux de victoire est tiré vers la moyenne par 50 pseudo-combats, donc un brawler a besoin d'à peu près autant de combats décisifs avant que son propre bilan l'emporte sur l'a priori. Sans ça, le haut de la liste était le brawler peu joué qui avait eu une semaine de chance. En dessous de 20 combats décisifs, rien n'est noté.",
+  "Make the bubble yours: choose its size, how faint it gets when you leave it alone, and whether it tucks half off the edge. A touch always brings it straight back.":
+    "Personnalise ta bulle : choisis sa taille, à quel point elle s'estompe quand tu ne la touches pas, et si elle se cache à moitié contre le bord. Un simple contact la ramène toujours tout de suite.",
+  "The app now speaks your language: all 22 languages of the game, with a flag picker at the top. The app and this panel share one language setting.":
+    "L'appli parle maintenant ta langue : les 22 langues du jeu, avec un sélecteur de drapeaux en haut. L'appli et ce panneau partagent le même réglage de langue.",
+  "“What to upgrade next” comes in your language too, with brawler and mode names as the game writes them.":
+    "« Quoi améliorer ensuite » est aussi dans ta langue, avec les noms des brawlers et des modes tels que le jeu les écrit.",
+  "A new look: chunky 3D buttons, bold display type and game-style panels throughout the app.":
+    "Un nouveau look : des boutons 3D épais, des titres bien gras et des panneaux façon jeu dans toute l'appli.",
+  "The bubble wears your own player icon once your tag is set (open the app once after updating).":
+    "La bulle porte ta propre icône de joueur dès que ton tag est renseigné (ouvre l'appli une fois après la mise à jour).",
+  "Set-up is easier: until your player tag is added, the app says what it unlocks and takes you straight to the field.":
+    "La configuration est plus simple : tant que ton tag de joueur n'est pas ajouté, l'appli dit ce qu'il débloque et t'emmène directement au champ.",
+  "The panel filter is a clear choice now: All my brawlers, Power 11 only, or Power 11 + hypercharge, each with what it does and how many brawlers it leaves.":
+    "Le filtre du panneau est maintenant un choix clair : Tous mes brawlers, Pouvoir 11 uniquement, ou Pouvoir 11 + hypercharge, chacun avec ce qu'il fait et le nombre de brawlers qu'il laisse.",
+  "The panel opens instantly. It used to load the page again on every tap, so it opened on a spinner mid-draft; it now keeps the page between opens and starts loading as soon as the bubble appears.":
+    "Le panneau s'ouvre instantanément. Avant, il rechargeait la page à chaque tap, donc il s'ouvrait sur un chargement en plein draft ; maintenant il garde la page entre deux ouvertures et commence à charger dès que la bulle apparaît.",
+  "No signal? The panel shows the last saved list, marked “Offline”, instead of an error.":
+    "Pas de réseau ? Le panneau affiche la dernière liste enregistrée, marquée « Hors ligne », au lieu d'une erreur.",
+  "Each mode chip carries the mode’s own icon, the badge the game shows in the corner of the draft.":
+    "Chaque puce de mode porte l'icône du mode, le badge que le jeu affiche dans le coin du draft.",
+  "The three counts are the filter now. Tap owned, power 11 or hypercharge and the tile lights up — so the number the panel is using is the one you can see, instead of something to work out from two switches.":
+    "Les trois compteurs sont maintenant le filtre. Touche possédés, pouvoir 11 ou hypercharge et la tuile s'allume : le chiffre que le panneau utilise est celui que tu vois, au lieu d'un calcul à faire à partir de deux interrupteurs.",
+  "Those two switches are gone with it. They encoded three settings in four combinations, and the spare one was impossible: a hypercharge cannot be unlocked below power 11, so “hypercharge without power 11” had to be quietly rewritten every time it was set.":
+    "Ces deux interrupteurs disparaissent du même coup. Ils codaient trois réglages en quatre combinaisons, et celle en trop était impossible : une hypercharge ne peut pas être débloquée sous le niveau de pouvoir 11, donc « hypercharge sans pouvoir 11 » devait être discrètement réécrit à chaque fois.",
+  "The tag box has a label, and the filter says in words what it is doing underneath the tiles.":
+    "Le champ du tag a une étiquette, et le filtre dit en toutes lettres ce qu'il fait sous les tuiles.",
+  "The account tiles use the game’s own art: the brawler mark on what you own, the power 11 badge, the hypercharge symbol, and a trophy beside your count. A number under an icon you already recognise reads faster than a number under a word.":
+    "Les tuiles du compte utilisent les images du jeu : la marque de brawler sur ce que tu possèdes, le badge pouvoir 11, le symbole d'hypercharge et un trophée à côté de ton nombre. Un chiffre sous une icône que tu reconnais déjà se lit plus vite qu'un chiffre sous un mot.",
+  "The app screen is rebuilt. State and action share one card instead of four stacked full-width blocks, Stop and Quick Settings sit side by side, and the screen ends on a footer rather than stopping mid-list.":
+    "L'écran de l'appli est refait. L'état et l'action partagent une seule carte au lieu de quatre blocs empilés, Arrêter et Réglages rapides sont côte à côte, et l'écran se termine par un pied de page au lieu de s'arrêter au milieu d'une liste.",
+  "Your tag now resolves to a name and your player icon, with the counts each filter produces — owned, power 11, hypercharged. A tag is a string nobody can check by reading it, and one wrong character is a valid tag belonging to a stranger whose only symptom is that every filter looks broken.":
+    "Ton tag affiche maintenant un nom et ton icône de joueur, avec les compteurs de chaque filtre : possédés, pouvoir 11, hyperchargés. Un tag est une suite de caractères que personne ne peut vérifier en la lisant, et un seul caractère faux donne un tag valide appartenant à un inconnu, dont le seul symptôme est que tous les filtres ont l'air cassés.",
+  "Pick and Ban tabs on every map. Pick is the list you already had, narrowed to what you can field. Ban is every brawler, whoever owns them, with how often it is actually taken here — because banning something nobody picks spends the ban for nothing.":
+    "Des onglets Pick et Ban sur chaque carte. Pick, c'est la liste que tu avais déjà, réduite à ce que tu peux aligner. Ban, c'est chaque brawler, à qui qu'il appartienne, avec la fréquence à laquelle il est vraiment pris ici, parce que bannir un brawler que personne ne prend, c'est gâcher son ban.",
+  "A third switch on the app screen: hide the brawlers you cannot use instead of greying them out. Off by default — greying keeps the tier counts honest and keeps a brawler you are one upgrade away from in view.":
+    "Un troisième interrupteur sur l'écran de l'appli : masquer les brawlers que tu ne peux pas utiliser au lieu de les griser. Désactivé par défaut : griser garde les compteurs de tiers honnêtes et garde en vue un brawler à qui il ne manque qu'une amélioration.",
+  "Add your player tag on the app screen and the panel marks what you can actually field. The tier list stops being a list of brawlers you might not own: anything you cannot take is dimmed, and each map names your best available pick.":
+    "Ajoute ton tag de joueur sur l'écran de l'appli et le panneau marque ce que tu peux vraiment aligner. La tier list n'est plus une liste de brawlers que tu n'as peut-être pas : tout ce que tu ne peux pas prendre est assombri, et chaque carte nomme ton meilleur pick disponible.",
+  "Two filters beside it — power 11 only, and power 11 with a hypercharge — for when a pick is only worth making at full strength.":
+    "Deux filtres à côté, pouvoir 11 uniquement et pouvoir 11 avec hypercharge, pour quand un pick ne vaut le coup qu'à pleine puissance.",
+  "Your roster is read once a day and kept on the phone, so none of this costs anything mid-draft. Leave the tag blank and the panel behaves exactly as it did before.":
+    "Ton roster est lu une fois par jour et gardé sur le téléphone, donc rien de tout ça ne coûte quoi que ce soit en plein draft. Laisse le tag vide et le panneau se comporte exactement comme avant.",
+  "A BrawlZone tile for Quick Settings: swipe down from inside the game and tap it to put the bubble up or take it down, without opening the app. Android 13 and up can add it with one tap from the app screen; older versions find it by editing Quick Settings.":
+    "Une tuile BrawlZone pour les Réglages rapides : glisse vers le bas depuis le jeu et touche-la pour afficher ou retirer la bulle, sans ouvrir l'appli. Android 13 et plus peut l'ajouter d'un tap depuis l'écran de l'appli ; les versions plus anciennes la trouvent en modifiant les Réglages rapides.",
+  "The notification has a Panel button, so the panel can be opened or closed from the shade when the bubble is under your thumb or behind the game’s own UI.":
+    "La notification a un bouton Panneau, pour ouvrir ou fermer le panneau depuis le volet quand la bulle est sous ton pouce ou derrière l'interface du jeu.",
+  "The draft scan is gone. It never worked reliably enough across phones to keep, and an app that asks to record your screen for a feature that does not work is worse than one that does not ask. The app no longer requests screen capture at all.":
+    "Le scan du draft est retiré. Il n'a jamais marché de façon assez fiable sur les différents téléphones pour être gardé, et une appli qui demande d'enregistrer ton écran pour une fonction qui ne marche pas est pire qu'une appli qui ne demande rien. L'appli ne demande plus du tout la capture d'écran.",
+  "The draft board stays: pick the map and enter the bans and picks by hand, and it ranks the remaining brawlers as before.":
+    "Le tableau de draft reste : choisis la carte, entre les bans et les picks à la main, et il classe les brawlers restants comme avant.",
+  "Smaller and simpler for it — the text-recognition library is gone too.":
+    "Plus légère et plus simple du coup : la bibliothèque de reconnaissance de texte est partie aussi.",
+  "The draft scan is back, rebuilt: each scan owns its result, so a slow scan can no longer overwrite the next one, and a result that arrives while the panel is closed is shown when it reopens.":
+    "Le scan du draft revient, refait : chaque scan possède son résultat, donc un scan lent ne peut plus écraser le suivant, et un résultat qui arrive quand le panneau est fermé s'affiche à sa réouverture.",
+  "Every slot now says why it is what it is — read, empty, unknown, or covered by the panel — and a later scan corrects a misread in place without touching anything you typed in.":
+    "Chaque emplacement dit maintenant pourquoi il est comme il est (lu, vide, inconnu ou caché par le panneau), et un scan suivant corrige une erreur de lecture sur place sans toucher à ce que tu as tapé.",
+  "The screen is found from the picture itself, including the map name plate, so black bars, insets and other screen shapes no longer read the wrong pixels.":
+    "L'écran est repéré à partir de l'image elle-même, plaque du nom de la carte comprise, donc les bandes noires, les marges et les autres formes d'écran ne font plus lire les mauvais pixels.",
+  "Diagnostics can export the exact frame a scan used, so a misread on your phone can be fixed without guessing.":
+    "Le diagnostic peut exporter l'image exacte utilisée par un scan, pour corriger une erreur de lecture sur ton téléphone sans deviner.",
+  "The scan now finds the draft screen in the picture instead of assuming where it is, so it works the same on any screen size or shape rather than only the one it was measured on.":
+    "Le scan trouve maintenant l'écran de draft dans l'image au lieu de supposer où il se trouve, donc il marche pareil sur n'importe quelle taille ou forme d'écran, et plus seulement sur celle où il a été mesuré.",
+  "The scan now matches the screen it is capturing. A session started while the phone was a different shape kept producing frames of that shape, so everything was read from the wrong place — the timer instead of the map name, and picks in the wrong slots.":
+    "Le scan correspond maintenant à l'écran qu'il capture. Une session lancée pendant que le téléphone avait une autre orientation continuait à produire des images de cette forme, donc tout était lu au mauvais endroit : le minuteur au lieu du nom de la carte, et des picks dans les mauvais emplacements.",
+  "Ban artwork that a phone refuses to decode the preferred way now falls back instead of failing — which left the ban list empty with nothing to say why.":
+    "Les images de bans qu'un téléphone refuse de décoder de la façon préférée passent maintenant par une solution de repli au lieu d'échouer, ce qui laissait la liste des bans vide sans aucune explication.",
+  "Tapping Scan while the app is still loading shows the progress instead of asking to share your screen for a scan that could not run yet.":
+    "Toucher Scanner pendant que l'appli charge encore affiche la progression, au lieu de demander à partager ton écran pour un scan qui ne pouvait pas encore tourner.",
+  "Bans are matched against their own artwork, which is decoded correctly now — transparent edges were being darkened twice, which affected the ban icons and nothing else.":
+    "Les bans sont comparés à leurs propres images, désormais décodées correctement : les bords transparents étaient assombris deux fois, ce qui touchait les icônes de bans et rien d'autre.",
+  "The app no longer reports itself ready to scan until the ban artwork has loaded too, instead of only the portraits.":
+    "L'appli ne se dit plus prête à scanner tant que les images des bans ne sont pas chargées aussi, et pas seulement les portraits.",
+  "Scanning no longer asks to share your screen over and over. Permission is a button you press, never something a scan asks for on its own, and it stops asking if Android keeps refusing.":
+    "Le scan ne demande plus sans arrêt à partager ton écran. L'autorisation est un bouton que tu touches, jamais une chose qu'un scan demande tout seul, et il arrête de demander si Android continue de refuser.",
+  "Loading the portraits is about eight times faster, and shows how far along it is.":
+    "Le chargement des portraits est environ huit fois plus rapide, et montre où il en est.",
+  "A scan can no longer run against a half-loaded set of portraits, which made recognition look unreliable when it was simply not ready.":
+    "Un scan ne peut plus tourner sur un jeu de portraits à moitié chargé, ce qui faisait paraître la reconnaissance peu fiable alors qu'elle n'était simplement pas prête.",
+  "Scanning is back, and the bans work for the first time — the game draws them from a different artwork set, which is why they never matched before.":
+    "Le scan revient, et les bans marchent pour la première fois : le jeu les dessine à partir d'un autre jeu d'images, c'est pourquoi ils ne correspondaient jamais avant.",
+  "One tap reads the mode, the map, both teams’ picks and all six bans, then scores the picks for that map.":
+    "Un seul tap lit le mode, la carte, les picks des deux équipes et les six bans, puis note les picks pour cette carte.",
+  "The recognition is now tested against real captures of a real draft on every build, instead of only on your phone.":
+    "La reconnaissance est maintenant testée sur de vraies captures d'un vrai draft à chaque build, et plus seulement sur ton téléphone.",
+  "Starting the bubble no longer asks to share your screen. That prompt fired on every start once it had been allowed.":
+    "Lancer la bulle ne demande plus à partager ton écran. Cette demande s'affichait à chaque lancement une fois autorisée.",
+  "The update download now opens the installer itself when it finishes, instead of relying on a notification that may be switched off.":
+    "Le téléchargement de mise à jour ouvre maintenant l'installateur lui-même quand il se termine, au lieu de compter sur une notification qui peut être désactivée.",
+  "The app finally asks for notification permission. Without it the update download finished invisibly and the bubble’s Stop control was hidden — both looked like features that did nothing.":
+    "L'appli demande enfin l'autorisation pour les notifications. Sans elle, le téléchargement de mise à jour se terminait sans qu'on le voie et le bouton Arrêter de la bulle était caché : deux fonctions qui semblaient ne rien faire.",
+  "The download now says which folder the file landed in, so it is findable even with notifications turned off.":
+    "Le téléchargement indique maintenant dans quel dossier le fichier a atterri, pour le retrouver même avec les notifications désactivées.",
+  "Allowing screen sharing could ask again, and again, forever. Android was destroying the permission screen before it could receive your answer.":
+    "Autoriser le partage d'écran pouvait redemander, encore et encore, sans fin. Android détruisait l'écran d'autorisation avant qu'il ne reçoive ta réponse.",
+  "A second scan sometimes did nothing at all. One scan that never finished left the button jammed for the rest of the session.":
+    "Un deuxième scan ne faisait parfois rien du tout. Un scan qui ne se terminait jamais bloquait le bouton pour le reste de la session.",
+  "The Download button in this notice finally downloads. Every version until now was blocked by Android from opening it, silently.":
+    "Le bouton Télécharger de cet avis télécharge enfin. Jusqu'ici, Android l'empêchait de s'ouvrir, sans rien dire, dans toutes les versions.",
+  "The screen-capture prompt no longer interrupts a match. Once you have allowed it, it is asked as the bubble starts instead of on your first scan.":
+    "La demande de capture d'écran n'interrompt plus un match. Une fois autorisée, elle est posée au lancement de la bulle plutôt qu'à ton premier scan.",
+  "The prompt can no longer be answered with \"Share one app\", which captured the wrong thing.":
+    "On ne peut plus répondre à la demande par « Partager une appli », ce qui capturait la mauvaise chose.",
+  "The Download button in the update notice works. It was a dead button inside the app.":
+    "Le bouton Télécharger de l'avis de mise à jour fonctionne. C'était un bouton mort dans l'appli.",
+  "The map is read from the screen on the first scan, instead of only after you had confirmed it once.":
+    "La carte est lue à l'écran dès le premier scan, au lieu de seulement après que tu l'as confirmée une fois.",
+  "A map it still cannot place falls back to the old behaviour — pick it once and it is remembered.":
+    "Une carte qu'il ne sait pas encore situer revient à l'ancien comportement : choisis-la une fois et elle est mémorisée.",
+  "Scanning recognised about one brawler in six. It now matches each brawler on the framing that suits it, and reads the picks on both teams.":
+    "Le scan reconnaissait environ un brawler sur six. Maintenant, il compare chaque brawler avec le cadrage qui lui convient, et lit les picks des deux équipes.",
+  "Bans are still left blank rather than guessed at — the game draws them with artwork nothing public matches. Tap one in and it is remembered.":
+    "Les bans restent vides plutôt que devinés : le jeu les dessine avec des images auxquelles rien de public ne correspond. Indique-en un et il est mémorisé.",
+  "The update notice now says which version you have, so you can tell a real update from a stuck banner.":
+    "L'avis de mise à jour indique maintenant quelle version tu as, pour distinguer une vraie mise à jour d'une bannière bloquée.",
+  "Scanning read only half the draft. The frame was often captured before the panel had got out of the way, so the panel itself covered the enemy picks — it now waits for a frame taken after the overlay is hidden.":
+    "Le scan ne lisait que la moitié du draft. L'image était souvent capturée avant que le panneau se soit écarté, donc le panneau lui-même cachait les picks ennemis ; il attend maintenant une image prise après que la couche est masquée.",
+  "What the scan found now shows immediately, instead of staying hidden until you had picked the map by hand.":
+    "Ce que le scan a trouvé s'affiche maintenant tout de suite, au lieu de rester caché jusqu'à ce que tu choisisses la carte à la main.",
+  "The panel says how many brawlers it read, so a scan that worked no longer looks like one that did nothing.":
+    "Le panneau dit combien de brawlers il a lus, donc un scan qui a marché ne ressemble plus à un scan qui n'a rien fait.",
+  "Scan works again. It could get stuck on “Loading portraits…” with the button disabled for the rest of the session, and never recover.":
+    "Le scan marche à nouveau. Il pouvait rester bloqué sur « Chargement des portraits… » avec le bouton désactivé pour le reste de la session, sans jamais s'en remettre.",
+  "Tapping Scan before the portraits have finished downloading now waits and then scans, instead of doing nothing.":
+    "Toucher Scanner avant la fin du téléchargement des portraits attend puis scanne, au lieu de ne rien faire.",
+  "Fixes 1.8, which crashed on launch and could not start the bubble at all. If you installed it, download again — this installs over the top.":
+    "Corrige la 1.8, qui plantait au lancement et ne pouvait pas du tout lancer la bulle. Si tu l'as installée, retélécharge : ça s'installe par-dessus.",
+  "Scan the draft instead of typing it: one tap reads the bans and picks off your screen and fills the board.":
+    "Scanne le draft au lieu de le taper : un seul tap lit les bans et les picks sur ton écran et remplit le tableau.",
+  "The map is remembered. Confirm it once and every later scan on that map fills it in for you.":
+    "La carte est mémorisée. Confirme-la une fois et chaque scan suivant sur cette carte la remplit pour toi.",
+  "Anything it is not sure about is left blank rather than guessed at — and correcting it teaches it that brawler for next time.":
+    "Tout ce dont il n'est pas sûr reste vide plutôt que deviné, et le corriger lui apprend ce brawler pour la prochaine fois.",
+  "The keyboard no longer buries the draft picker: the panel moves above it, and searching is opt-in so the shortlist of likely picks is visible first.":
+    "Le clavier ne cache plus le sélecteur du draft : le panneau passe au-dessus, et la recherche est optionnelle pour que la liste courte des picks probables soit visible en premier.",
+  "In landscape the keyboard no longer takes over the whole screen.":
+    "En paysage, le clavier ne prend plus tout l'écran.",
+  "The panel says when it cannot reach the site, with a tap to retry, instead of spinning forever on a dropped connection.":
+    "Le panneau dit quand il n'arrive pas à joindre le site, avec un tap pour réessayer, au lieu de tourner sans fin sur une connexion perdue.",
+  "The update notice downloads the new version directly, instead of sending you to the site to find the button.":
+    "L'avis de mise à jour télécharge directement la nouvelle version, au lieu de t'envoyer sur le site chercher le bouton.",
+  "Links in the panel now open in your browser rather than inside the overlay.":
+    "Les liens du panneau s'ouvrent maintenant dans ton navigateur plutôt que dans la couche.",
+  "The panel now tells you when a newer version of the app is out, and what changed in it.":
+    "Le panneau te dit maintenant quand une nouvelle version de l'appli est sortie, et ce qui a changé.",
+  "Fixed the panel in landscape, which is how the game is actually played — it was arriving a third of its intended height.":
+    "Le panneau est corrigé en paysage, qui est la façon dont on joue vraiment : il arrivait à un tiers de sa hauteur prévue.",
+  "The bubble and panel now follow the screen when you rotate, instead of keeping coordinates from the previous orientation.":
+    "La bulle et le panneau suivent maintenant l'écran quand tu tournes le téléphone, au lieu de garder les coordonnées de l'orientation précédente.",
+  "The panel no longer lands on top of the bubble in landscape, which had been swallowing every tap meant for it.":
+    "Le panneau ne se pose plus sur la bulle en paysage, ce qui avalait chaque tap qui lui était destiné.",
+  "Filter the tier list by game mode, and the choice is remembered next time you open it.":
+    "Filtre la tier list par mode de jeu, et le choix est mémorisé pour la prochaine fois.",
+  "Tap any brawler for the star power, gadget and gears its owners run.":
+    "Touche n'importe quel brawler pour voir le pouvoir star, le gadget et les équipements de ses propriétaires.",
+  "The panel opens on the Ranked tier list, built for the overlay, instead of loading the full site into a small window.":
+    "Le panneau s'ouvre sur la tier list Classé, faite pour la couche, au lieu de charger tout le site dans une petite fenêtre.",
+  "Rebuilt the app screen: real spacing, the site’s palette, and system bars that match.":
+    "L'écran de l'appli est refait : de vrais espacements, les couleurs du site et des barres système assorties.",
+  "First release. Tapping the bubble opens and closes the panel, dragging moves it, and dropping it on the target at the bottom closes it.":
+    "Première version. Toucher la bulle ouvre et ferme le panneau, la faire glisser la déplace, et la lâcher sur la cible en bas la ferme.",
+  "Brawl Stars|hero-1":
+    "Brawl Stars",
+  "stats that show|hero-2":
+    "des stats qui montrent",
+  "where you stand|hero-3":
+    "où tu en es",
+  "{rate} adjusted win rate and {pick} pick rate over {battles} sampled battles.":
+    "Taux de victoire ajusté de {rate} et taux de sélection de {pick} sur {battles} combats collectés.",
+  "{name} has a {rate} adjusted win rate and {pick} pick rate over {battles} sampled battles{tier}{date}.":
+    "{name} a un taux de victoire ajusté de {rate} et un taux de sélection de {pick} sur {battles} combats collectés{tier}{date}.",
+  ", {tier} tier in Ranked":
+    ", tier {tier} en Classé",
+  ", as of {date}":
+    ", au {date}",
+  "The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
+    "Les brawlers avec les meilleurs bilans sur {name}, une carte {mode}. Classés d'après les combats collectés dans le pool du classement mondial, par rapport à la moyenne de tout l'échantillon plutôt qu'à celle de la carte. Un pick doit donc battre tout le monde, pas seulement le lobby.",
+  "Common":
+    "Commun",
+  "Rare":
+    "Rare",
+  "Super Rare":
+    "Super rare",
+  "Epic":
+    "Épique",
+  "Mythic":
+    "Mythique",
+  "Legendary":
+    "Légendaire",
+  "Ultra Legendary":
+    "Ultra légendaire",
+  "Starting Brawler":
+    "Premier brawler",
+  "Damage Dealer":
+    "Dégâts bruts",
+  "Tank":
+    "Tank",
+  "Marksman":
+    "Tir d'élite",
+  "Support":
+    "Soutien",
+  "Controller":
+    "Contrôle",
+  "Assassin":
+    "Assassinat",
+  "Artillery":
+    "Artillerie",
+  "Play your rank, beat the meta":
+    "Joue à ton rang, bats la méta",
+  "The meta at your rank is not the meta at the top. And every pick has an answer.":
+    "La méta à ton rang n'est pas celle du sommet. Et chaque pick a une réponse.",
+  "Tier list at your rank":
+    "Tier list à ton rang",
 };
