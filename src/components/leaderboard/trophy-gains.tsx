@@ -50,7 +50,7 @@ export async function TrophyGains({ limit = 5 }: { limit?: number }) {
             missing below is the expected case rather than a bug.
           */}
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('From our own daily snapshots of the')}{' '}
-            <Link href={lp('/about')} className="font-medium text-brand hover:underline">{t('sampled player pool')}</Link>{t(', ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.')}</p>
+            <Link href={lp('/about')} className="font-medium text-brand hover:underline">{t('sampled player pool')}</Link>{t(', ranked by trophies per day since we last checked them. These are different players from the official top 100 below.')}</p>
         </div>
       </div>
 

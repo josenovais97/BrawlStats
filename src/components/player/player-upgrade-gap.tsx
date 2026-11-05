@@ -117,7 +117,7 @@ export function PlayerUpgradeGap({
           </Disclosure>
         ) : null}
 
-        <Disclosure tone="bare" className="mt-1" summary={t('Why this matters')}>{t('A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.', { MAX_POWER_LEVEL: MAX_POWER_LEVEL })}</Disclosure>
+        <Disclosure tone="bare" className="mt-1" summary={t('Why this matters')}>{t('A hypercharge only pays off on a strong brawler. Ordered by how close each one is to power {MAX_POWER_LEVEL}, cheapest to finish first.', { MAX_POWER_LEVEL: MAX_POWER_LEVEL })}</Disclosure>
       </div>
     </Panel>
   );

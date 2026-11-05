@@ -1017,10 +1017,6 @@ export const DE: Record<string, string> = {
     "{length} Maps",
   "Collecting Ranked standings":
     "Ranked-Stände werden gesammelt",
-  "Current season standing. The game API publishes no Ranked leaderboard, so this one is built from the {pool} sampled players who have played Ranked this season. The top":
-    "Stand der aktuellen Saison. Die Spiel-API veröffentlicht keine Ranked-Bestenliste, deshalb wird diese aus den {pool} erfassten Spielern gebildet, die diese Saison Ranked gespielt haben. Die oberen",
-  "Elo is recorded as the sampler works through the player pool, and as people look profiles up. This board fills in over the next day or two.":
-    "Elo wird gespeichert, während die Erfassung den Spieler-Pool durchgeht und Leute Profile aufrufen. Diese Liste füllt sich in den nächsten ein, zwei Tagen.",
   "peak {peakElo}":
     "Höchststand {peakElo}",
   "{length} of those, not a global board. Looking up a profile adds it to the pool.":
@@ -1029,8 +1025,6 @@ export const DE: Record<string, string> = {
     "Wo alle wirklich stehen",
   "{atOrAbove} here or above":
     "{atOrAbove} hier oder darüber",
-  "How this combination of roles performs in Ranked, measured across both teams of sampled battles. 50% is average for the sample, not a coin flip — every shape is adjusted against the same baseline the tier list uses.":
-    "Wie diese Rollenkombination im Ranked abschneidet, gemessen über beide Teams erfasster Matches. 50 % ist der Durchschnitt der Stichprobe, kein Münzwurf: Jede Aufstellung wird an derselben Basis bereinigt wie die Tierlist.",
   "Shapes that lose":
     "Aufstellungen, die verlieren",
   "Shapes that win":
@@ -1103,8 +1097,6 @@ export const DE: Record<string, string> = {
     " (bereits abgedeckt)",
   ", with a second pick spare in":
     ", mit einem zweiten Pick als Reserve in",
-  "Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.":
-    "Abdeckung heißt, in einem gerade aktiven Modus einen Top-3-Pick auf Power 9 oder höher zu besitzen. Freischaltungen sind bewusst ausgeschlossen: Ein Brawler, den du nicht besitzt, ist keine Ausgabe, die du heute machen kannst, deshalb kannst du jeden Schritt hier sofort angehen.",
   "Covers {v}":
     "Deckt {v} ab",
   "Ranked coverage goes from":
@@ -1135,8 +1127,6 @@ export const DE: Record<string, string> = {
     "Letzte {days} Tage",
   "Now":
     "Jetzt",
-  "One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.":
-    "Ein Punkt pro Tag, gespeichert, wenn dieses Profil aufgerufen wird, er umfasst also die Tage, an denen jemand nachgesehen hat, nicht jeden gespielten Tag.",
   "Recent progress":
     "Letzter Fortschritt",
   "Tracked {tracked}":
@@ -1155,14 +1145,10 @@ export const DE: Record<string, string> = {
     "{unit} insgesamt",
   " This account has no Ranked elo on record, so that weight is spread across the rest{v}.":
     " Dieser Account hat keine Ranked-Elo gespeichert, deshalb wird dieses Gewicht auf den Rest verteilt{v}.",
-  ", the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.":
-    ", dem einzigen Modus, in dem das Matchmaking vergleichbare Gegner zusammenbringt, der Score spiegelt also wider, wie der Account spielt, und nicht, wie viel hineingesteckt wurde. Deshalb zählt der Fortschritt höchstens 15 %.",
   "Weighted toward":
     "Gewichtet in Richtung",
   " today":
     " heute",
-  ", ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.":
-    ", sortiert nach Trophäen pro Tag seit dem letzten Abruf jedes Spielers. Eine andere Gruppe als die offiziellen Top 100 unten, deshalb tauchen diese Namen dort meist nicht auf.",
   "Biggest trophy gains":
     "Größte Trophäengewinne",
   "Climbing fastest":
@@ -1285,8 +1271,6 @@ export const DE: Record<string, string> = {
     "Gesamttrophäen geteilt durch freigeschaltete Brawler. Ein grobes Maß für Tiefe statt Breite.",
   "Trophies":
     "Trophäen",
-  "A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.":
-    "Eine Hyperladung braucht keinen maximierten Brawler, deshalb hat man schnell das beste Upgrade auf etwas, das den Kampf verliert, bevor es auflädt. Sortiert danach, wie nah jeder an Power {MAX_POWER_LEVEL} ist, die günstigsten zuerst.",
   "Finishing":
     "Fertigstellen:",
   "One brawler carries":
@@ -1321,8 +1305,6 @@ export const DE: Record<string, string> = {
     "Hyperladung",
   "A shareable summary of a Brawl Stars player’s last twenty-five battles.":
     "Eine teilbare Zusammenfassung der letzten fünfundzwanzig Matches eines Brawl-Stars-Spielers.",
-  "Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.":
-    "Alles hier stammt aus dem Match-Verlauf, den das Spiel bereitstellt, und der umfasst ungefähr die letzten fünfundzwanzig Spiele, nicht mehr. Einen Verlaufs-Endpunkt gibt es nicht, das ist also eine Momentaufnahme einer Phase und keine Saison: Öffne es nach dem Spielen wieder, und es hat sich verändert.",
   "Recent run":
     "Letzte Phase",
   "The last twenty-five battles, summed up. Built to screenshot.":
@@ -1437,8 +1419,6 @@ export const DE: Record<string, string> = {
     "Erfasste Matches",
   "Side by side":
     "Nebeneinander",
-  "These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.":
-    "Diese beiden haben sich in erfassten Matches noch nicht oft genug getroffen, um eine Bilanz zu nennen. Matchup-Daten kommen nur aus Team-Modi und brauchen eine Weile für jede einzelne Paarung.",
   "Tier":
     "Tier",
   "What is the {nameA} vs {nameB} head-to-head record?":
@@ -1573,8 +1553,6 @@ export const DE: Record<string, string> = {
     "Die {length} größten Bewegungen von {changedTotal} veränderten Brawlern in deinem Besitz. ",
   "What the update did to you":
     "Was das Update mit dir gemacht hat",
-  "Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.":
-    "Siegquoten sind am Durchschnitt der Stichprobe bereinigt, eine Verschiebung hier ist also der Brawler und nicht die Gruppe. Ein Brawler erscheint, sobald ein paar Tage Messungen hinter ihm stehen: Eine Zwei-Tage-Stichprobe schwankt stärker als jede Balance-Änderung.",
   "pts since":
     "Pkt. seit",
   "{categoryLabel} · your power {power}":
@@ -1637,16 +1615,12 @@ export const DE: Record<string, string> = {
     "Typ",
   "Collecting cosmetics":
     "Kosmetik wird gesammelt",
-  "Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.":
-    "Ausgerüstete Skins und Icons werden gespeichert, während die Erfassung den Spieler-Pool durchgeht. Diese Liste füllt sich in den nächsten ein, zwei Tagen.",
   "Most worn profile icons":
     "Am häufigsten genutzte Profil-Icons",
   "Profile icons are still being recorded.":
     "Profil-Icons werden noch erfasst.",
   "Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.":
     "Anteil der erfassten Accounts, die jedes Icon nutzen. Jeder hat eins, die Anteile beziehen sich also auf den ganzen Pool.",
-  "Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.":
-    "Anteil der erfassten Brawler mit jedem Skin. Standard-Skins sind nicht in der Liste, zählen aber zur Gesamtzahl, ein Anteil von 2 % heißt also zwei von hundert gesehenen Brawlern, nicht zwei von hundert mit irgendeinem Skin.",
   "Compare Brawl Stars players and brawlers ({v})":
     "Brawl-Stars-Spieler und -Brawler vergleichen ({v})",
   "Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.":
@@ -1843,8 +1817,6 @@ export const DE: Record<string, string> = {
     "Niemand kann aufstellen:",
   "Rank this club":
     "Diesen Club bewerten",
-  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
-    "Sortiert nach der Hyperladungs-Abdeckung des Top-Tiers, dann danach, was sie überhaupt aufstellen können. Trophäen entscheiden nur bei Gleichstand, so sortiert das Spiel die Mitgliederliste ohnehin.",
   "Reading rosters…":
     "Kader werden gelesen…",
   "Reads all":
@@ -2523,8 +2495,6 @@ export const DE: Record<string, string> = {
     " – {up} hoch, {down} runter",
   ", not what the update":
     ", nicht, was das Update",
-  ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.":
-    ". Ein Brawler kann gebufft und ignoriert werden, generft werden und trotzdem steigen, oder durch einen Rotationswechsel in denselben zwei Wochen bewegt werden. Neben jeder Zeile stehen die Stichprobengrößen, damit du selbst abwägen kannst, und alles unter {PATCH_MIN_DECIDED} entschiedenen Matches auf einer Seite wird weggelassen statt geraten.",
   ". The rest stayed where they were.":
     ". Der Rest blieb, wo er war.",
   "Did the Brawl Stars balance changes work?":
@@ -2697,10 +2667,6 @@ export const DE: Record<string, string> = {
     "Ranked-Tierlist",
   "reload":
     "Nachladen",
-  ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.":
-    ". Diese Erkenntnisse lassen sich später nicht neu berechnen, deshalb beginnt das Archiv an dem Tag, an dem es gebaut wurde, statt zurückzureichen.",
-  "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.":
-    "Jede Karte ist das Maximum einer genannten Größe über eine genannte Gruppe: die höchste Siegquote unter Brawlern mit unter 1 % Nutzung, die größte Lücke zwischen einem Brawler und einer Map und so weiter. Dieselben Daten ergeben immer dieselbe Auswahl, nichts hier wird von einem Modell geschrieben oder von Hand ausgesucht. Siegquoten sind am Durchschnitt der Stichprobe bereinigt, eine Woche mit stärkeren erfassten Spielern lässt also nicht jeden Brawler gebufft aussehen.",
   "Every day is kept at its own address —":
     "Jeder Tag bleibt unter seiner eigenen Adresse:",
   "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.":
@@ -2757,8 +2723,6 @@ export const DE: Record<string, string> = {
     "{winRateNow} Siegquote",
   "· mode average {baseline}":
     "· Modus-Durchschnitt {baseline}",
-  "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.":
-    "Der Anteil eines Skins bezieht sich auf erfasste Spieler-Brawler-Plätze, der eines Icons auf erfasste Spieler. Standard-Skins sind ausgelassen: Den Skin mit dem Namen des Brawlers hat niemand ausgesucht. Die Nutzung pro Brawler, einschließlich Standard, steht auf der Seite jedes Brawlers.",
   "Brawl Stars cosmetics: which skins and icons players actually use":
     "Brawl-Stars-Kosmetik: welche Skins und Icons Spieler wirklich nutzen",
   "Browse every icon →":
@@ -2771,8 +2735,6 @@ export const DE: Record<string, string> = {
     "So wird gezählt",
   "Most worn skins":
     "Am häufigsten getragene Skins",
-  "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.":
-    "Die Zahlen stammen aus der wechselnden Momentaufnahmen-Stichprobe, die jeden Tag ein Viertel des erfassten Spieler-Pools speichert, das ist also eine Umfrage und keine Vollerhebung. Für Anteile reicht das, und mehr wird nicht gemeldet, deshalb ist eine Zahl hier nie die Anzahl der Leute, die etwas im Spiel besitzen.",
   "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.":
     "Anteil an allen erfassten Spieler-Brawler-Plätzen, Skins verschiedener Brawler sind also direkt vergleichbar.",
   "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.":
@@ -2949,10 +2911,6 @@ export const DE: Record<string, string> = {
     "Das geheime Duo",
   "The secret pick":
     "Der Geheimtipp",
-  "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.":
-    "Nichts hat die Belegschwelle geschafft. Jede Erkenntnis braucht mindestens 300 erfasste Matches, und die Seite zeigt lieber nichts als einen Zufall.",
-  "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.":
-    "Dinge, die die erfassten Matches sagen und eine Rangtabelle nicht. Jede ist die größte Lücke ihrer Art in den Daten dieses Tages: keine Meinung und keine Liste, die nach der offensichtlichen Spalte sortiert ist.",
   "What we found":
     "Was wir gefunden haben",
   "What we found today":
@@ -3005,8 +2963,6 @@ export const DE: Record<string, string> = {
     "schwächste 40 %",
   "win rate ·":
     "Siegquote ·",
-  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
-    "{count} Brawler mit genug Ranked-Matches für eine Bewertung über {windowDays} Tage. Die Blasengröße ist die Stichprobe hinter jedem, die unsichersten Punkte sind also die kleinsten. Tippe auf einen für seine Zahlen.",
   "{haveMeta} of the {length}":
     "{haveMeta} von {length}",
   "{haveSleepers} of the {length}":
@@ -3133,8 +3089,6 @@ export const DE: Record<string, string> = {
     "Ausrüstungen im Match werden nicht veröffentlicht",
   "Map picks vs mode picks":
     "Map-Picks vs. Modus-Picks",
-  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
-    "Meta-Score von {from} auf {to} an einem einzigen Tag, mit genug Matches, damit die Bewegung echt ist und kein Rauschen.",
   "Most likely bans here":
     "Wahrscheinlichste Bans hier",
   "Most likely picks here":
@@ -3155,8 +3109,6 @@ export const DE: Record<string, string> = {
     "Ein Score, vergleichbar mit allen, die wir erfassen.",
   "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.":
     "Unsere Stichprobe neigt zu Spielern mit vielen Trophäen, die mit allem öfter gewinnen. Siegquoten werden auf diese Basis zentriert, damit der Vergleich zwischen Brawlern fair bleibt.",
-  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
-    "In {picks} der erfassten Matches gepickt und bereinigt nur {rate}: unter dem Durchschnitt genau der Spieler, die ihn picken.",
   "Playable in Ranked even if you have not unlocked them.":
     "Im Ranked spielbar, auch wenn du sie nicht freigeschaltet hast.",
   "Progress resets every day, like Daily Wins.":
@@ -3241,8 +3193,6 @@ export const DE: Record<string, string> = {
     "{rate} bereinigte Siegquote bei nur {picks} der Picks: eine der stärksten Bilanzen im Kader, von einem Brawler, an den die meisten Drafts nie denken.",
   "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
     "{rate} speziell gegen {other}, {edge} über der eigenen Bilanz von {name}. Das einseitigste Matchup in der Stichprobe.",
-  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
-    "{rate} hier gegen {other} auf allen anderen Maps: die größte Lücke zwischen einem Brawler und einem Stück Gelände.",
   "{winRate} win rate · {pickRate} picked · {battles} battles":
     "{winRate} Siegquote · {pickRate} gepickt · {battles} Matches",
   "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.":
@@ -4869,4 +4819,52 @@ export const DE: Record<string, string> = {
     "Zum Aktualisieren lädst du sie einfach neu. Sie installiert sich über die alte und behält ihre Berechtigung.",
   "Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
     "Kostenlos, {v}, kein Konto. Alles darin gibt es auch auf der Website. Die App erspart dir nur den App-Wechsel mitten im Draft.",
+  "Shares come from a daily sample of the players we track, not a full count of the game.":
+    "Die Anteile stammen aus einer täglichen Stichprobe der Spieler, die wir erfassen, nicht aus einer Zählung des ganzen Spiels.",
+  "Skin shares are per brawler, icon shares per player. Default skins are left out.":
+    "Skin-Anteile gelten pro Brawler, Icon-Anteile pro Spieler. Standard-Skins sind nicht dabei.",
+  "Each card is the biggest number of its kind that day: the highest win rate among rarely picked brawlers, the widest gap between a brawler and one map, and so on.":
+    "Jede Karte ist die größte Zahl ihrer Art an diesem Tag: die höchste Siegquote unter selten gepickten Brawlern, die größte Lücke zwischen einem Brawler und einer Map und so weiter.",
+  ". The archive starts on the day this page launched.":
+    ". Das Archiv beginnt mit dem Starttag dieser Seite.",
+  ". Map rotation moves win rates too. Rows with under {PATCH_MIN_DECIDED} battles on either side are left out.":
+    ". Auch die Map-Rotation bewegt Siegquoten. Zeilen mit weniger als {PATCH_MIN_DECIDED} Matches auf einer Seite fehlen.",
+  "Built from your battle log, which only holds about your last 25 games. Play more and open it again.":
+    "Gebaut aus deinem Match-Verlauf, der nur etwa deine letzten 25 Spiele enthält. Spiel weiter und öffne es erneut.",
+  "This season’s standing among the {pool} Ranked players we track. The top":
+    "Stand dieser Saison unter den {pool} Ranked-Spielern, die wir erfassen. Die oberen",
+  "A brawler shows up here once it has a few days of data.":
+    "Ein Brawler erscheint hier, sobald es ein paar Tage Daten gibt.",
+  "Coverage means owning a top-3 pick at power 9 or higher in a mode that is live now. Only brawlers you already own count.":
+    "Abdeckung heißt: einen Top-3-Pick auf Power 9 oder höher in einem Modus besitzen, der gerade läuft. Es zählen nur Brawler, die du schon hast.",
+  "A hypercharge only pays off on a strong brawler. Ordered by how close each one is to power {MAX_POWER_LEVEL}, cheapest to finish first.":
+    "Eine Hyperladung lohnt sich nur auf einem starken Brawler. Sortiert danach, wie nah jeder an Power {MAX_POWER_LEVEL} ist, die günstigsten zuerst.",
+  ", where matchmaking pairs players of similar skill, so the score is about how you play, not how much you have spent. Progression counts for at most 15%.":
+    ", wo das Matchmaking Spieler auf ähnlichem Niveau zusammenbringt, der Score misst also, wie du spielst, nicht wie viel du investiert hast. Fortschritt zählt höchstens 15 %.",
+  "Things the battles show that a normal table does not. Each one is the biggest gap of its kind that day.":
+    "Was die Matches zeigen und eine normale Tabelle nicht. Jedes ist die größte Lücke ihrer Art an diesem Tag.",
+  "Nothing stood out today. Each finding needs at least 300 battles behind it.":
+    "Heute stach nichts heraus. Jede Erkenntnis braucht mindestens 300 Matches.",
+  "How this mix of roles does in Ranked. 50% is the average.":
+    "Wie sich diese Rollen-Mischung in Ranked schlägt. 50 % ist der Durchschnitt.",
+  "Share of brawlers we saw wearing each skin. Default skins count in the total but are not listed.":
+    "Anteil der gesehenen Brawler mit diesem Skin. Standard-Skins zählen zur Gesamtzahl, stehen aber nicht in der Liste.",
+  "These two have not met often enough in our battles to show a record yet.":
+    "Die beiden sind in unseren Matches noch nicht oft genug aufeinandergetroffen, um eine Bilanz zu zeigen.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Sortiert nach hypergeladener Abdeckung der Top-Stufe, dann danach, was sie überhaupt aufstellen können. Trophäen entscheiden bei Gleichstand.",
+  ", ranked by trophies per day since we last checked them. These are different players from the official top 100 below.":
+    ", sortiert nach Trophäen pro Tag seit unserem letzten Check. Das sind andere Spieler als die offiziellen Top 100 unten.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{count} Brawler, bewertet über {windowDays} Tage. Größere Blasen haben mehr Matches dahinter. Tippe eine an für ihre Zahlen.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "In {picks} der Matches gepickt, gewinnt aber nur {rate}, unter dem Schnitt der Spieler, die ihn wählen.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "{rate} hier gegenüber {other} auf allen anderen Maps. Die größte Lücke zwischen einem Brawler und einer Map.",
+  "Meta score went from {from} to {to} in a single day.":
+    "Der Meta-Score ging an einem einzigen Tag von {from} auf {to}.",
+  "This board fills in over the next day or two.":
+    "Diese Tabelle füllt sich in den nächsten ein, zwei Tagen.",
+  "One point for each day this profile was viewed.":
+    "Ein Punkt für jeden Tag, an dem dieses Profil aufgerufen wurde.",
 };

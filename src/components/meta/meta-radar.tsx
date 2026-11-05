@@ -490,7 +490,7 @@ function Hint({
   const t = useT();
   if (!owned) {
     return (
-      <p className="text-sm text-muted">{t('{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.', { count: count, windowDays: windowDays })}</p>
+      <p className="text-sm text-muted">{t('{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.', { count: count, windowDays: windowDays })}</p>
     );
   }
 

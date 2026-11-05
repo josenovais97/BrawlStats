@@ -118,7 +118,7 @@ export function PlayerRosterPlan({
             ))}
           </ol>
 
-          <p className="text-xs leading-relaxed text-muted">{t('Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.')}</p>
+          <p className="text-xs leading-relaxed text-muted">{t('Coverage means owning a top-3 pick at power 9 or higher in a mode that is live now. Only brawlers you already own count.')}</p>
         </div>
       </div>
     </Panel>

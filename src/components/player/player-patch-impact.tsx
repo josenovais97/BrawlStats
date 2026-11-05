@@ -110,7 +110,7 @@ export function PlayerPatchImpact({
       <p className="text-xs leading-relaxed text-muted">
         {changedTotal > rows.length
           ? t('The {length} biggest moves of {changedTotal} changed brawlers you own. ', { length: rows.length, changedTotal: changedTotal })
-          : ''}{t('Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.')}</p>
+          : ''}{t('A brawler shows up here once it has a few days of data.')}</p>
     </Panel>
   );
 }

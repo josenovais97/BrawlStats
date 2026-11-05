@@ -1017,10 +1017,6 @@ export const RU: Record<string, string> = {
     "Карт: {length}",
   "Collecting Ranked standings":
     "Собираем положение в ранговых боях",
-  "Current season standing. The game API publishes no Ranked leaderboard, so this one is built from the {pool} sampled players who have played Ranked this season. The top":
-    "Положение в текущем сезоне. API игры не публикует рейтинг ранговых боёв, поэтому этот составлен из игроков нашей выборки, игравших в ранговые бои в этом сезоне ({pool}). Топ",
-  "Elo is recorded as the sampler works through the player pool, and as people look profiles up. This board fills in over the next day or two.":
-    "Эло записывается по мере того, как сборщик проходит пул игроков и когда люди открывают профили. Этот рейтинг заполнится за следующий день-два.",
   "peak {peakElo}":
     "пик {peakElo}",
   "{length} of those, not a global board. Looking up a profile adds it to the pool.":
@@ -1029,8 +1025,6 @@ export const RU: Record<string, string> = {
     "Где на самом деле все",
   "{atOrAbove} here or above":
     "Здесь или выше: {atOrAbove}",
-  "How this combination of roles performs in Ranked, measured across both teams of sampled battles. 50% is average for the sample, not a coin flip — every shape is adjusted against the same baseline the tier list uses.":
-    "Как это сочетание ролей играет в ранговых боях, по обеим командам собранных боёв. 50% — среднее для выборки, а не подброшенная монетка: каждая схема скорректирована по той же базе, что и тир-лист.",
   "Shapes that lose":
     "Схемы, которые проигрывают",
   "Shapes that win":
@@ -1103,8 +1097,6 @@ export const RU: Record<string, string> = {
     " (уже покрыто)",
   ", with a second pick spare in":
     ", и ещё один запасной пик есть в",
-  "Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.":
-    "Покрытие — это наличие пика из топ-3 на 9-м уровне силы или выше в режиме, который сейчас в игре. Открытие новых бойцов намеренно не учитывается: бойца, которого у тебя нет, нельзя прокачать сегодня, поэтому каждый шаг здесь можно начать сразу.",
   "Covers {v}":
     "Покрывает: {v}",
   "Ranked coverage goes from":
@@ -1135,8 +1127,6 @@ export const RU: Record<string, string> = {
     "Последние дни: {days}",
   "Now":
     "Сейчас",
-  "One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.":
-    "Одна точка в день, записывается при просмотре этого профиля, поэтому покрывает дни, когда кто-то заходил, а не все сыгранные дни.",
   "Recent progress":
     "Недавний прогресс",
   "Tracked {tracked}":
@@ -1155,14 +1145,10 @@ export const RU: Record<string, string> = {
     "{unit} всего",
   " This account has no Ranked elo on record, so that weight is spread across the rest{v}.":
     " У этого аккаунта нет записанного Эло в ранговых боях, поэтому этот вес распределён по остальному{v}.",
-  ", the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.":
-    " — единственный режим, где подбор сводит соперников одного уровня, поэтому оценка отражает то, как играет аккаунт, а не сколько в него вложено. По той же причине прогресс ограничен 15%.",
   "Weighted toward":
     "С упором на",
   " today":
     " сегодня",
-  ", ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.":
-    ", по трофеям в день с момента последнего чтения каждого игрока. Это другая выборка, чем официальная сотня лучших ниже, поэтому эти имена там в основном не встречаются.",
   "Biggest trophy gains":
     "Самый большой прирост трофеев",
   "Climbing fastest":
@@ -1285,8 +1271,6 @@ export const RU: Record<string, string> = {
     "Все трофеи, делённые на число открытых бойцов. Грубая мера глубины, а не ширины.",
   "Trophies":
     "Трофеи",
-  "A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.":
-    "Гиперзаряд не требует прокачанного до максимума бойца, поэтому легко оказаться с лучшим доступным улучшением на том, кто проигрывает драку раньше, чем он зарядится. По тому, насколько каждый близок к {MAX_POWER_LEVEL}-му уровню силы, самые дешёвые — первыми.",
   "Finishing":
     "Довести",
   "One brawler carries":
@@ -1321,8 +1305,6 @@ export const RU: Record<string, string> = {
     "Гиперзаряд",
   "A shareable summary of a Brawl Stars player’s last twenty-five battles.":
     "Сводка последних двадцати пяти боёв игрока Brawl Stars, которой можно поделиться.",
-  "Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.":
-    "Всё здесь измерено по истории боёв, которую отдаёт игра, а она хранит примерно последние двадцать пять игр и не больше. Эндпоинта истории нет, поэтому это снимок отрезка, а не сезона: открой снова после игры, и он изменится.",
   "Recent run":
     "Недавний отрезок",
   "The last twenty-five battles, summed up. Built to screenshot.":
@@ -1437,8 +1419,6 @@ export const RU: Record<string, string> = {
     "Собранные бои",
   "Side by side":
     "Бок о бок",
-  "These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.":
-    "Эти двое встречались в собранных боях слишком редко, чтобы показать счёт. Данные матчапов собираются только в командных режимах, и для конкретной пары им нужно время.",
   "Tier":
     "Тир",
   "What is the {nameA} vs {nameB} head-to-head record?":
@@ -1573,8 +1553,6 @@ export const RU: Record<string, string> = {
     "Самые большие сдвиги ({length}) из {changedTotal} изменённых бойцов, которые у тебя есть. ",
   "What the update did to you":
     "Что обновление сделало с тобой",
-  "Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.":
-    "Процент побед скорректирован по среднему выборки, так что сдвиг здесь — это движение бойца, а не состава игроков. Боец появляется, когда за ним есть несколько дней замеров: двухдневная выборка колеблется сильнее, чем любое изменение баланса.",
   "pts since":
     "пункта с",
   "{categoryLabel} · your power {power}":
@@ -1637,16 +1615,12 @@ export const RU: Record<string, string> = {
     "Тип",
   "Collecting cosmetics":
     "Собираем косметику",
-  "Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.":
-    "Надетые скины и иконки записываются по мере того, как сборщик проходит пул игроков. Этот рейтинг заполнится за следующий день-два.",
   "Most worn profile icons":
     "Самые популярные иконки профиля",
   "Profile icons are still being recorded.":
     "Иконки профиля ещё записываются.",
   "Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.":
     "Доля аккаунтов выборки с каждой иконкой. Иконка есть у всех, поэтому доли считаются от всего пула.",
-  "Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.":
-    "Доля бойцов выборки в каждом скине. Стандартные скины не показаны в списке, но учтены в сумме, поэтому доля 2% значит два из каждых ста бойцов, которых мы видели. А не два из ста тех, у кого вообще был скин.",
   "Compare Brawl Stars players and brawlers ({v})":
     "Сравнение игроков и бойцов Brawl Stars ({v})",
   "Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.":
@@ -1843,8 +1817,6 @@ export const RU: Record<string, string> = {
     "Никто не может выставить:",
   "Rank this club":
     "Оценить этот клуб",
-  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
-    "По охвату верхних тиров с гиперзарядом, затем по тому, кого вообще можно выставить. Трофеи решают только при равенстве: игра и так сортирует участников по ним.",
   "Reading rosters…":
     "Читаем составы…",
   "Reads all":
@@ -2523,8 +2495,6 @@ export const RU: Record<string, string> = {
     " — {up} вверх, {down} вниз",
   ", not what the update":
     ", а не что обновление",
-  ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.":
-    ". Бойца могут усилить, а его будут игнорировать, ослабить, а он всё равно поднимется, или сдвинуть сменой ротации карт за те же две недели. Размер выборки указан рядом с каждой строкой, чтобы ты мог взвесить сам, а всё, где с одной из сторон меньше {PATCH_MIN_DECIDED} решённых боёв, не показывается, а не угадывается.",
   ". The rest stayed where they were.":
     ". Остальные остались на месте.",
   "Did the Brawl Stars balance changes work?":
@@ -2697,10 +2667,6 @@ export const RU: Record<string, string> = {
     "тир-листа ранговых боёв",
   "reload":
     "перезарядка",
-  ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.":
-    ". Эти находки нельзя пересчитать позже, поэтому архив начинается со дня, когда его создали, а не уходит в прошлое.",
-  "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.":
-    "Каждая карточка — максимум указанной величины по указанной группе: самый высокий процент побед среди бойцов с долей выбора ниже 1%, самый большой разрыв между бойцом и одной картой и так далее. Одни и те же данные всегда дают один и тот же набор, поэтому ничего здесь не написано моделью и не выбрано вручную. Процент побед скорректирован по среднему выборки, поэтому неделя, когда игроки в выборке сильнее, не делает всех бойцов усиленными на вид.",
   "Every day is kept at its own address —":
     "Каждый день хранится по своему адресу —",
   "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.":
@@ -2757,8 +2723,6 @@ export const RU: Record<string, string> = {
     "{winRateNow} побед",
   "· mode average {baseline}":
     "· среднее режима {baseline}",
-  "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.":
-    "Доля скина считается от собранных слотов «игрок–боец»; доля иконки — от собранных игроков. Стандартные скины не учитываются: тот, что носит имя самого бойца, никто не выбирал. Популярность по каждому бойцу, включая стандартный, — на странице бойца.",
   "Brawl Stars cosmetics: which skins and icons players actually use":
     "Косметика Brawl Stars: какие скины и иконки игроки реально используют",
   "Browse every icon →":
@@ -2771,8 +2735,6 @@ export const RU: Record<string, string> = {
     "Как это считается",
   "Most worn skins":
     "Самые популярные скины",
-  "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.":
-    "Числа берутся из сменяющейся выборки срезов, которая каждый день записывает четверть игроков выборки, так что это опрос, а не перепись. Для долей этого достаточно, а ничего, кроме долей, здесь и не показывается, поэтому число здесь никогда не означает, сколько людей чем-то владеют в игре.",
   "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.":
     "Доля от всех собранных слотов «игрок–боец», поэтому скины разных бойцов напрямую сравнимы.",
   "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.":
@@ -2949,10 +2911,6 @@ export const RU: Record<string, string> = {
     "Тайный дуэт",
   "The secret pick":
     "Тайный пик",
-  "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.":
-    "Ничто не прошло порог доказательств. Каждой находке нужно не меньше 300 собранных боёв, и страница лучше покажет ничего, чем совпадение.",
-  "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.":
-    "То, что говорят собранные бои и чего не скажет таблица рейтинга. Каждая находка — самый большой разрыв своего вида в данных этого дня: не мнение и не список, отсортированный по очевидной колонке.",
   "What we found":
     "Что мы нашли",
   "What we found today":
@@ -3005,8 +2963,6 @@ export const RU: Record<string, string> = {
     "слабейшие 40%",
   "win rate ·":
     "побед ·",
-  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
-    "Бойцов с достаточным числом ранговых боёв для оценки за {windowDays} {windowDays|one:день|few:дня|many:дней|other:дня}: {count}. Размер пузыря — выборка за каждым, поэтому самые неуверенные точки — самые маленькие. Нажми на точку, чтобы увидеть числа.",
   "{haveMeta} of the {length}":
     "{haveMeta} из {length}",
   "{haveSleepers} of the {length}":
@@ -3133,8 +3089,6 @@ export const RU: Record<string, string> = {
     "Сборки в бою не публикуются",
   "Map picks vs mode picks":
     "Пики карты и пики режима",
-  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
-    "Мета-рейтинг с {from} до {to} за один день, на достаточном числе боёв, чтобы сдвиг был настоящим, а не шумом.",
   "Most likely bans here":
     "Самые вероятные запреты здесь",
   "Most likely picks here":
@@ -3155,8 +3109,6 @@ export const RU: Record<string, string> = {
     "Одна оценка, сопоставимая со всеми, кого мы собираем.",
   "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.":
     "Наша выборка смещена к игрокам с большим числом трофеев, которые чаще побеждают на ком угодно. Процент побед центрируется на этой базе, чтобы сравнение бойцов оставалось честным.",
-  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
-    "Берут в {picks} собранных боёв, а результат с поправкой — {rate}: ниже среднего тех самых игроков, которые его берут.",
   "Playable in Ranked even if you have not unlocked them.":
     "Доступны в ранговых боях, даже если ты их не открыл.",
   "Progress resets every day, like Daily Wins.":
@@ -3241,8 +3193,6 @@ export const RU: Record<string, string> = {
     "Скорректированный процент побед {rate} при доле выбора всего {picks}: один из сильнейших результатов в составе у бойца, о котором большинство драфтов даже не думает.",
   "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
     "{rate} именно против {other}, на {edge} выше собственного результата {name}. Самый односторонний матчап в выборке.",
-  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
-    "{rate} здесь против {other} на всех остальных картах: самый большой разрыв между бойцом и одним участком местности.",
   "{winRate} win rate · {pickRate} picked · {battles} battles":
     "{winRate} побед · выбор {pickRate} · боёв: {battles}",
   "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.":
@@ -4869,4 +4819,52 @@ export const RU: Record<string, string> = {
     "Чтобы обновить, скачайте приложение снова. Оно установится поверх старого и сохранит разрешение.",
   "Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
     "Бесплатно, {v}, без аккаунта. Всё это есть и на сайте. Приложение лишь избавляет от переключения посреди драфта.",
+  "Shares come from a daily sample of the players we track, not a full count of the game.":
+    "Доли взяты из ежедневной выборки игроков, которых мы отслеживаем, а не из подсчёта по всей игре.",
+  "Skin shares are per brawler, icon shares per player. Default skins are left out.":
+    "Доли скинов считаются по бойцам, иконок — по игрокам. Стандартные скины не учитываются.",
+  "Each card is the biggest number of its kind that day: the highest win rate among rarely picked brawlers, the widest gap between a brawler and one map, and so on.":
+    "Каждая карточка — самый большой показатель своего рода за день: лучший процент побед среди редко выбираемых бойцов, самый большой разрыв между бойцом и картой и так далее.",
+  ". The archive starts on the day this page launched.":
+    ". Архив начинается со дня запуска этой страницы.",
+  ". Map rotation moves win rates too. Rows with under {PATCH_MIN_DECIDED} battles on either side are left out.":
+    ". Ротация карт тоже влияет на процент побед. Строки, где с одной из сторон меньше {PATCH_MIN_DECIDED} боёв, не показаны.",
+  "Built from your battle log, which only holds about your last 25 games. Play more and open it again.":
+    "Собрано из истории боёв, где хранятся примерно последние 25 игр. Сыграйте ещё и откройте снова.",
+  "This season’s standing among the {pool} Ranked players we track. The top":
+    "Положение в этом сезоне среди игроков ранговых боёв, которых мы отслеживаем ({pool}). Топ",
+  "A brawler shows up here once it has a few days of data.":
+    "Боец появится здесь, когда по нему наберётся несколько дней данных.",
+  "Coverage means owning a top-3 pick at power 9 or higher in a mode that is live now. Only brawlers you already own count.":
+    "Покрытие — это пик из топ-3 на силе 9 или выше в режиме, который сейчас доступен. Учитываются только бойцы, которые у вас уже есть.",
+  "A hypercharge only pays off on a strong brawler. Ordered by how close each one is to power {MAX_POWER_LEVEL}, cheapest to finish first.":
+    "Гиперзаряд окупается только на сильном бойце. Порядок — по близости к силе {MAX_POWER_LEVEL}, сначала те, кого дешевле всего прокачать.",
+  ", where matchmaking pairs players of similar skill, so the score is about how you play, not how much you have spent. Progression counts for at most 15%.":
+    " — там подбор сводит игроков одного уровня, поэтому оценка показывает, как вы играете, а не сколько вложили. Прогресс даёт не больше 15%.",
+  "Things the battles show that a normal table does not. Each one is the biggest gap of its kind that day.":
+    "То, что видно по боям, но не по обычной таблице. Каждый пункт — самый большой разрыв своего рода за день.",
+  "Nothing stood out today. Each finding needs at least 300 battles behind it.":
+    "Сегодня ничего не выделилось. Для каждой находки нужно минимум 300 боёв.",
+  "How this mix of roles does in Ranked. 50% is the average.":
+    "Как это сочетание ролей играет в ранговых боях. 50% — среднее.",
+  "Share of brawlers we saw wearing each skin. Default skins count in the total but are not listed.":
+    "Доля бойцов, которых мы видели в каждом скине. Стандартные скины входят в общее число, но не показаны в списке.",
+  "These two have not met often enough in our battles to show a record yet.":
+    "Эти двое пока слишком редко встречались в наших боях, чтобы показать результат.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Порядок — по покрытию верхнего тира с гиперзарядом, затем по тому, кого вообще можно выставить. При равенстве решают трофеи.",
+  ", ranked by trophies per day since we last checked them. These are different players from the official top 100 below.":
+    ", по трофеям в день с нашей последней проверки. Это другие игроки, не те, что в официальной сотне ниже.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{count} бойцов с оценкой за {windowDays} дн. Чем больше пузырь, тем больше за ним боёв. Нажмите на любой, чтобы увидеть цифры.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "Берут в {picks} боёв, но побеждает лишь в {rate} — ниже среднего у тех, кто его выбирает.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "{rate} здесь против {other} на всех остальных картах. Самый большой разрыв между бойцом и одной картой.",
+  "Meta score went from {from} to {to} in a single day.":
+    "Мета-оценка за один день изменилась с {from} до {to}.",
+  "This board fills in over the next day or two.":
+    "Эта таблица заполнится в ближайшие день-два.",
+  "One point for each day this profile was viewed.":
+    "Одна точка за каждый день, когда открывали этот профиль.",
 };

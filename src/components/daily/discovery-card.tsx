@@ -60,7 +60,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
     tone: 'bad',
     headline: (d, t) => t('{name} is everywhere, and losing.', { name: name(d, 0) }),
     detail: (d, t) =>
-      t('Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.', {
+      t('Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.', {
         picks: formatPercent(d.comparison),
         rate: formatPercent(d.value),
       }),
@@ -101,7 +101,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
     tone: 'good',
     headline: (d, t) => t('{name} is a different brawler on {map}.', { name: name(d, 0), map: d.context ?? t('this map') }),
     detail: (d, t) =>
-      t('{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.', {
+      t('{rate} here against {other} on every other map. The biggest gap between a brawler and one map.', {
         rate: formatPercent(d.value),
         other: formatPercent(d.comparison),
       }),
@@ -113,7 +113,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
     tone: 'good',
     headline: (d, t) => t('{name} moved more than anything else since yesterday.', { name: name(d, 0) }),
     detail: (d, t) =>
-      t('Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.', {
+      t('Meta score went from {from} to {to} in a single day.', {
         from: dec(d.comparison),
         to: dec(d.value),
       }),

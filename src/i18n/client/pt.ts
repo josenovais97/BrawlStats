@@ -327,8 +327,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Ninguém pode usar:",
   "Rank this club":
     "Analisar este clube",
-  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
-    "Ordenados por quantos dos melhores tiers têm com hipercarga, e depois pelos que podem usar. Os troféus só desempatam: o jogo já ordena a lista de membros assim.",
   "Reading rosters…":
     "Lendo os brawlers…",
   "Reads all":
@@ -489,8 +487,6 @@ export const CLIENT_PT: Record<string, string> = {
     "os 40% mais fracos",
   "win rate ·":
     "de vitórias ·",
-  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
-    "{count} brawlers com partidas ranqueadas suficientes para pontuar em {windowDays} dias. O tamanho de cada bolha é a amostra por trás dela, então os pontos menos certos são os menores. Toque num para ver os números.",
   "{haveMeta} of the {length}":
     "{haveMeta} dos {length}",
   "{haveSleepers} of the {length}":
@@ -651,10 +647,6 @@ export const CLIENT_PT: Record<string, string> = {
     "Não foi possível falar com o servidor. Tente de novo.",
   "Could not read this club right now.":
     "Não foi possível ler este clube agora.",
-  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
-    "Pontuação meta de {from} para {to} em um único dia, com partidas suficientes para a mudança ser real, e não ruído.",
-  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
-    "Escolhido em {picks} das partidas e com {rate} ajustado: abaixo da média dos próprios jogadores que o escolhem.",
   "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
     "Juntos, {name} vence {rate}: {edge} a mais do que o normal. Nenhum dos dois é escolhido pensando no outro.",
   "That is not a current brawler.":
@@ -693,8 +685,6 @@ export const CLIENT_PT: Record<string, string> = {
     "{rate} de vitórias ajustadas com só {picks} de escolha: um dos melhores resultados de todos os brawlers, de um brawler que quase nenhum draft considera.",
   "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
     "{rate} contra {other} especificamente, {edge} acima do resultado próprio de {name}. O confronto mais desigual da amostra.",
-  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
-    "{rate} aqui contra {other} em todos os outros mapas: a maior diferença entre um brawler e um terreno.",
   "Common":
     "Comum",
   "Rare":
@@ -998,4 +988,14 @@ export const CLIENT_PT: Record<string, string> = {
     "Compartilhar, depois em \"Adicionar à Tela de Início\", e abra o BrawlZone por lá.",
   "Your in-game name or #tag.":
     "Seu nome no jogo ou sua #tag.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Ordenados pela cobertura com hipercarga da tier de cima e depois pelo que conseguem usar. Troféus desempatam.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{count} brawlers avaliados em {windowDays} dias. Bolhas maiores têm mais batalhas por trás. Toque numa para ver os números.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "Escolhido em {picks} das batalhas, mas vence só {rate}, abaixo da média de quem o escolhe.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "{rate} aqui contra {other} em todos os outros mapas. A maior diferença entre um brawler e um mapa.",
+  "Meta score went from {from} to {to} in a single day.":
+    "A nota meta foi de {from} para {to} em um único dia.",
 };

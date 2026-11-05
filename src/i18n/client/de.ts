@@ -510,4 +510,14 @@ export const CLIENT_DE: Record<string, string> = {
   "Or follow a channel: a new link goes out the moment it is found.": "Oder folge einem Kanal: Ein neuer Link geht raus, sobald er gefunden wird.",
   "Share, then \"Add to Home Screen\", and open BrawlZone from there.": "Teilen, dann „Zum Home-Bildschirm“, und öffne BrawlZone von dort.",
   "Your in-game name or #tag.": "Dein Name im Spiel oder #Tag.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Sortiert nach hypergeladener Abdeckung der Top-Stufe, dann danach, was sie überhaupt aufstellen können. Trophäen entscheiden bei Gleichstand.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{count} Brawler, bewertet über {windowDays} Tage. Größere Blasen haben mehr Matches dahinter. Tippe eine an für ihre Zahlen.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "In {picks} der Matches gepickt, gewinnt aber nur {rate}, unter dem Schnitt der Spieler, die ihn wählen.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "{rate} hier gegenüber {other} auf allen anderen Maps. Die größte Lücke zwischen einem Brawler und einer Map.",
+  "Meta score went from {from} to {to} in a single day.":
+    "Der Meta-Score ging an einem einzigen Tag von {from} auf {to}.",
 };

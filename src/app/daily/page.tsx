@@ -73,10 +73,10 @@ export default async function DailyPage() {
 
       <section className="card mt-8 p-5 text-sm leading-relaxed text-muted">
         <p>
-          <strong className="text-foreground">{t('How these are chosen.')}</strong>{' '}{t('Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.')}</p>
+          <strong className="text-foreground">{t('How these are chosen.')}</strong>{' '}{t('Each card is the biggest number of its kind that day: the highest win rate among rarely picked brawlers, the widest gap between a brawler and one map, and so on.')}</p>
         <p className="mt-3">{t('Every day is kept at its own address —')}{' '}
           <Link href={lp('/daily/archive')} className="text-brand hover:underline">{t('browse the archive')}</Link>{' '}{t('or')}{' '}
-          <Link href={lp('/daily/feed.xml')} className="text-brand hover:underline">{t('subscribe by RSS')}</Link>{t('. These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.')}</p>
+          <Link href={lp('/daily/feed.xml')} className="text-brand hover:underline">{t('subscribe by RSS')}</Link>{t('. The archive starts on the day this page launched.')}</p>
       </section>
     </>
   );

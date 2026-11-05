@@ -315,7 +315,7 @@ export default async function ComparePage({ params }: PageProps) {
             />
           </div>
         ) : (
-          <p className="card p-6 text-sm leading-relaxed text-muted">{t('These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.')}</p>
+          <p className="card p-6 text-sm leading-relaxed text-muted">{t('These two have not met often enough in our battles to show a record yet.')}</p>
         )}
       </section>
 

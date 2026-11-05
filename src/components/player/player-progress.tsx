@@ -53,7 +53,7 @@ export function PlayerProgress({
       {/* The caveat the history always needs: it is only as dense as the
           times someone opened this profile, which keeps "tracked 2 days"
           from reading as "played 2 days". */}
-      <p className="mt-5 text-xs text-muted">{t('One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.')}</p>
+      <p className="mt-5 text-xs text-muted">{t('One point for each day this profile was viewed.')}</p>
     </Panel>
   );
 }

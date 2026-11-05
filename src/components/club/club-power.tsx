@@ -224,7 +224,7 @@ function Result({
       </ol>
 
       {carried ? (
-        <p className="text-xs text-muted">{t('Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.')}</p>
+        <p className="text-xs text-muted">{t('Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.')}</p>
       ) : null}
     </div>
   );

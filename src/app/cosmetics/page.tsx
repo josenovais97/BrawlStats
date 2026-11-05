@@ -105,8 +105,8 @@ export default async function CosmeticsPage() {
       <section>
         <SectionHeading title={t('How this is counted')} />
         <div className="card space-y-3 p-5 text-sm leading-relaxed text-muted">
-          <p>{t('Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.')}</p>
-          <p>{t('A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.')}</p>
+          <p>{t('Shares come from a daily sample of the players we track, not a full count of the game.')}</p>
+          <p>{t('Skin shares are per brawler, icon shares per player. Default skins are left out.')}</p>
         </div>
       </section>
     </div>

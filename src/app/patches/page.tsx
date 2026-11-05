@@ -100,7 +100,7 @@ export default async function PatchesPage() {
         support on its own, and the map rotation turns over in the same weeks.
       */}
       <p className="card border-border-strong p-5 text-sm leading-relaxed text-muted">{t('This shows what each number')}{' '}<em>{t('did')}</em>{t(', not what the update')}{' '}
-        <em>{t('caused')}</em>{t('. A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.', { PATCH_MIN_DECIDED: formatNumber(PATCH_MIN_DECIDED) })}</p>
+        <em>{t('caused')}</em>{t('. Map rotation moves win rates too. Rows with under {PATCH_MIN_DECIDED} battles on either side are left out.', { PATCH_MIN_DECIDED: formatNumber(PATCH_MIN_DECIDED) })}</p>
 
       {impacts.length === 0 ? (
         <p className="card p-6 text-sm leading-relaxed text-muted">{t('No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.')}</p>

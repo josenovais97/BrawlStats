@@ -510,4 +510,14 @@ export const CLIENT_TR: Record<string, string> = {
   "Or follow a channel: a new link goes out the moment it is found.": "Ya da bir kanalı takip et: yeni bir bağlantı bulunduğu anda paylaşılır.",
   "Share, then \"Add to Home Screen\", and open BrawlZone from there.": "Paylaş, sonra \"Ana Ekrana Ekle\", ve BrawlZone'u oradan aç.",
   "Your in-game name or #tag.": "Oyundaki adın veya #etiketin.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Üst kademenin hiper şarjlı kapsamına, sonra genel olarak oynayabildiklerine göre sıralı. Eşitliği kupalar bozar.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{windowDays} gün içinde puanlanan {count} savaşçı. Büyük baloncukların arkasında daha çok maç var. Sayılar için birine dokun.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "Maçların {picks} kadarında seçiliyor ama yalnızca {rate} kazanıyor; onu seçen oyuncuların ortalamasının altında.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "Burada {rate}, diğer tüm haritalarda {other}. Bir savaşçı ile bir harita arasındaki en büyük fark.",
+  "Meta score went from {from} to {to} in a single day.":
+    "Meta puanı tek günde {from} değerinden {to} değerine çıktı.",
 };

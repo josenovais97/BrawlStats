@@ -185,7 +185,7 @@ export function PlayerSkillScore({ skill }: { skill: SkillScore }) {
       ) : null}
 
       <p className="mt-5 text-xs leading-relaxed text-muted">{t('Weighted toward')}{' '}
-          <Link href={lp('/leaderboard')} className="font-medium text-brand hover:underline">{t('Ranked')}</Link>{t(', the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.')}{skill.rankedUnavailable
+          <Link href={lp('/leaderboard')} className="font-medium text-brand hover:underline">{t('Ranked')}</Link>{t(', where matchmaking pairs players of similar skill, so the score is about how you play, not how much you have spent. Progression counts for at most 15%.')}{skill.rankedUnavailable
             ? t(' This account has no Ranked elo on record, so that weight is spread across the rest{v}.', { v: skill.capped
                   ? ' and the score is held at 6.5. Without a Ranked record there is nothing here that can certify more'
                   : '' })

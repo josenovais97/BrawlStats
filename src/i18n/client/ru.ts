@@ -510,4 +510,14 @@ export const CLIENT_RU: Record<string, string> = {
   "Or follow a channel: a new link goes out the moment it is found.": "Или подпишись на канал: новая ссылка выходит в момент, когда её находят.",
   "Share, then \"Add to Home Screen\", and open BrawlZone from there.": "«Поделиться», затем «На экран „Домой“», и открывай BrawlZone оттуда.",
   "Your in-game name or #tag.": "Твоё имя в игре или #тег.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Порядок — по покрытию верхнего тира с гиперзарядом, затем по тому, кого вообще можно выставить. При равенстве решают трофеи.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{count} бойцов с оценкой за {windowDays} дн. Чем больше пузырь, тем больше за ним боёв. Нажмите на любой, чтобы увидеть цифры.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "Берут в {picks} боёв, но побеждает лишь в {rate} — ниже среднего у тех, кто его выбирает.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "{rate} здесь против {other} на всех остальных картах. Самый большой разрыв между бойцом и одной картой.",
+  "Meta score went from {from} to {to} in a single day.":
+    "Мета-оценка за один день изменилась с {from} до {to}.",
 };

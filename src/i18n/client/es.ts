@@ -327,8 +327,6 @@ export const CLIENT_ES: Record<string, string> = {
     "Nadie puede sacar:",
   "Rank this club":
     "Analizar este club",
-  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
-    "Ordenados por cuántos de los mejores tiers tienen con hipercarga, y luego por los que pueden sacar. Los trofeos solo desempatan: el juego ya ordena así la lista de miembros.",
   "Reading rosters…":
     "Leyendo brawlers…",
   "Reads all":
@@ -489,8 +487,6 @@ export const CLIENT_ES: Record<string, string> = {
     "el 40% más débil",
   "win rate ·":
     "de victorias ·",
-  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
-    "{count} brawlers con suficientes partidas de Competitivo para puntuarlos en {windowDays} días. El tamaño de cada burbuja es la muestra que tiene detrás, así que los puntos menos seguros son los más pequeños. Toca uno para ver sus números.",
   "{haveMeta} of the {length}":
     "{haveMeta} de los {length}",
   "{haveSleepers} of the {length}":
@@ -651,10 +647,6 @@ export const CLIENT_ES: Record<string, string> = {
     "No se pudo conectar con el servidor. Inténtalo de nuevo.",
   "Could not read this club right now.":
     "No se pudo leer este club ahora mismo.",
-  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
-    "Puntuación meta de {from} a {to} en un solo día, con suficientes partidas para que el cambio sea real y no ruido.",
-  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
-    "Elegido en el {picks} de las partidas y con un {rate} ajustado: por debajo de la media de los propios jugadores que lo eligen.",
   "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
     "Juntos, {name} gana el {rate}: {edge} más de lo normal. Ninguno de los dos se elige pensando en el otro.",
   "That is not a current brawler.":
@@ -693,8 +685,6 @@ export const CLIENT_ES: Record<string, string> = {
     "{rate} de victorias ajustadas con solo el {picks} de uso: uno de los mejores récords de todos los brawlers, de un brawler que casi ningún draft tiene en cuenta.",
   "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
     "{rate} contra {other} en concreto, {edge} por encima del récord propio de {name}. El enfrentamiento más desigual de la muestra.",
-  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
-    "{rate} aquí frente al {other} en el resto de mapas: la mayor diferencia entre un brawler y un terreno concreto.",
   "Common":
     "Común",
   "Rare":
@@ -998,4 +988,14 @@ export const CLIENT_ES: Record<string, string> = {
     "Compartir, luego \"Agregar a inicio\", y abre BrawlZone desde ahí.",
   "Your in-game name or #tag.":
     "Tu nombre en el juego o tu #tag.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Ordenados por cobertura con hipercarga del nivel alto y luego por lo que pueden sacar. Los trofeos deshacen empates.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{count} brawlers valorados en {windowDays} días. Las burbujas más grandes tienen más batallas detrás. Toca una para ver sus números.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "Elegido en el {picks} de las batallas pero gana solo el {rate}, por debajo de la media de quienes lo eligen.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "{rate} aquí frente a {other} en el resto de mapas. La mayor diferencia entre un brawler y un mapa.",
+  "Meta score went from {from} to {to} in a single day.":
+    "La puntuación meta pasó de {from} a {to} en un solo día.",
 };

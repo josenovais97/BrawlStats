@@ -1016,10 +1016,6 @@ export const TR: Record<string, string> = {
     "{length} harita",
   "Collecting Ranked standings":
     "Aşamalı sıralaması toplanıyor",
-  "Current season standing. The game API publishes no Ranked leaderboard, so this one is built from the {pool} sampled players who have played Ranked this season. The top":
-    "Güncel sezon sıralaması. Oyun API'si Aşamalı sıralaması yayınlamaz; bu tablo bu sezon Aşamalı oynamış {pool} incelenen oyuncudan oluşturulur. Gösterilen ilk",
-  "Elo is recorded as the sampler works through the player pool, and as people look profiles up. This board fills in over the next day or two.":
-    "Elo, sistem oyuncu havuzunu taradıkça ve insanlar profillere baktıkça kaydedilir. Bu tablo önümüzdeki bir iki günde dolar.",
   "peak {peakElo}":
     "zirve {peakElo}",
   "{length} of those, not a global board. Looking up a profile adds it to the pool.":
@@ -1028,8 +1024,6 @@ export const TR: Record<string, string> = {
     "Herkes gerçekte nerede",
   "{atOrAbove} here or above":
     "{atOrAbove} bu seviyede veya üstünde",
-  "How this combination of roles performs in Ranked, measured across both teams of sampled battles. 50% is average for the sample, not a coin flip — every shape is adjusted against the same baseline the tier list uses.":
-    "Bu rol kombinasyonunun Aşamalı'da nasıl performans gösterdiği, incelenen maçların iki takımı genelinde ölçüldü. %50 örneklemin ortalamasıdır, yazı tura değil: her dizilim tipi tier listesinin kullandığı temele göre düzeltilir.",
   "Shapes that lose":
     "Kaybettiren dizilimler",
   "Shapes that win":
@@ -1102,8 +1096,6 @@ export const TR: Record<string, string> = {
     " (zaten karşılandı)",
   ", with a second pick spare in":
     ", ikinci bir yedek seçim de var:",
-  "Coverage means owning a top-3 pick at power 9 or above in a mode that is live right now. Unlocks are deliberately excluded — a brawler you do not own is not a spend you can make today, so every step here is one you could start immediately.":
-    "Kapsam, şu an aktif bir modda Güç 9 veya üstünde ilk 3'ten bir seçime sahip olmak demektir. Kilit açımları bilerek hariç tutulur: sahip olmadığın bir savaşçı bugün yapabileceğin bir harcama değildir, bu yüzden buradaki her adıma hemen başlayabilirsin.",
   "Covers {v}":
     "Kapsadığı: {v}",
   "Ranked coverage goes from":
@@ -1134,8 +1126,6 @@ export const TR: Record<string, string> = {
     "Son {days} gün",
   "Now":
     "Şimdi",
-  "One point per day, recorded when this profile is viewed, so it covers the days someone checked rather than every day played.":
-    "Günde bir nokta; bu profile bakıldığında kaydedilir, yani oynanan her günü değil birinin baktığı günleri kapsar.",
   "Recent progress":
     "Son ilerleme",
   "Tracked {tracked}":
@@ -1154,14 +1144,10 @@ export const TR: Record<string, string> = {
     "genel {unit}",
   " This account has no Ranked elo on record, so that weight is spread across the rest{v}.":
     " Bu hesabın kayıtlı Aşamalı elosu yok, bu yüzden o ağırlık geri kalanlara dağıtılır{v}.",
-  ", the only mode where matchmaking pairs comparable opponents, so the score reflects how the account plays rather than how much has been poured into it. Progression is capped at 15% for that reason.":
-    "; eşleştirmenin birbirine yakın rakipleri karşılaştırdığı tek mod, bu yüzden puan hesaba ne kadar yatırım yapıldığını değil nasıl oynandığını yansıtır. Bu nedenle ilerlemenin payı %15 ile sınırlıdır.",
   "Weighted toward":
     "Ağırlık şuna veriliyor:",
   " today":
     " bugün",
-  ", ranked by trophies per day since each player was last read. A different population from the official top 100 below, so these names mostly do not appear there.":
-    "; her oyuncunun son okunmasından bu yana günlük kupa artışına göre sıralı. Aşağıdaki resmi ilk 100'den farklı bir topluluk, bu yüzden bu isimler çoğunlukla orada görünmez.",
   "Biggest trophy gains":
     "En büyük kupa artışları",
   "Climbing fastest":
@@ -1284,8 +1270,6 @@ export const TR: Record<string, string> = {
     "Toplam kupaların açılan savaşçı sayısına bölümü. Genişlikten çok derinliğin kaba bir ölçüsü.",
   "Trophies":
     "Kupalar",
-  "A hypercharge does not require a maxed brawler, so it is easy to end up holding the best upgrade available on something that loses the fight before it charges. Ordered by how close each one is to power {MAX_POWER_LEVEL}, so the cheapest to finish are first.":
-    "Bir hiperşarj maksimum seviyede savaşçı gerektirmez; bu yüzden en iyi yükseltmeyi, şarj olmadan dövüşü kaybeden bir savaşçıda tutmak kolaydır. Her birinin Güç {MAX_POWER_LEVEL} seviyesine ne kadar yakın olduğuna göre sıralı, yani bitirmesi en ucuz olanlar önce.",
   "Finishing":
     "Tamamlama:",
   "One brawler carries":
@@ -1320,8 +1304,6 @@ export const TR: Record<string, string> = {
     "Hiperşarj",
   "A shareable summary of a Brawl Stars player’s last twenty-five battles.":
     "Bir Brawl Stars oyuncusunun son yirmi beş maçının paylaşılabilir özeti.",
-  "Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.":
-    "Buradaki her şey oyunun sunduğu maç geçmişinden ölçülür; bu geçmiş yaklaşık son yirmi beş maçı tutar, daha fazlasını değil. Geçmiş için bir uç nokta yok, bu yüzden bu bir sezonun değil bir dönemin anlık görüntüsüdür: oynadıktan sonra tekrar aç, değişmiş olacak.",
   "Recent run":
     "Son dönem",
   "The last twenty-five battles, summed up. Built to screenshot.":
@@ -1436,8 +1418,6 @@ export const TR: Record<string, string> = {
     "İncelenen maçlar",
   "Side by side":
     "Yan yana",
-  "These two have not met often enough in sampled battles to report a record. Matchup data is collected from team modes only and needs a while to build up for any specific pairing.":
-    "Bu ikisi, bir kayıt bildirecek kadar sık incelenen maçlarda karşılaşmadı. Eşleşme verileri yalnızca takım modlarından toplanır ve belirli bir eşleşme için birikmesi zaman alır.",
   "Tier":
     "Tier",
   "What is the {nameA} vs {nameB} head-to-head record?":
@@ -1572,8 +1552,6 @@ export const TR: Record<string, string> = {
     "Sahip olduğun {changedTotal} değişen savaşçının en büyük {length} hareketi. ",
   "What the update did to you":
     "Güncelleme sana ne yaptı",
-  "Win rates are adjusted against the sample average, so a shift here is the brawler moving rather than the cohort. A brawler appears once there are a few days of snapshots behind it — a two-day sample swings further than any balance change does.":
-    "Kazanma oranları örneklem ortalamasına göre düzeltilir, bu yüzden buradaki bir değişim grubun değil savaşçının hareketidir. Bir savaşçı arkasında birkaç günlük ölçüm olunca görünür: iki günlük bir örneklem herhangi bir denge değişikliğinden daha fazla oynar.",
   "pts since":
     "puan, şu tarihten beri:",
   "{categoryLabel} · your power {power}":
@@ -1636,16 +1614,12 @@ export const TR: Record<string, string> = {
     "Tür",
   "Collecting cosmetics":
     "Kozmetikler toplanıyor",
-  "Equipped skins and icons are recorded as the sampler works through the player pool. This board fills in over the next day or two.":
-    "Takılı kostümler ve simgeler, sistem oyuncu havuzunu taradıkça kaydedilir. Bu tablo önümüzdeki bir iki günde dolar.",
   "Most worn profile icons":
     "En çok kullanılan profil simgeleri",
   "Profile icons are still being recorded.":
     "Profil simgeleri hâlâ kaydediliyor.",
   "Share of sampled accounts using each icon. Everyone has one, so these shares are out of the whole pool.":
     "Her simgeyi kullanan incelenen hesapların payı. Herkesin bir simgesi var, bu yüzden bu paylar tüm havuzdan.",
-  "Share of sampled brawlers wearing each skin. Default skins are left out of the list but still counted in the total, so a 2% share means two in every hundred brawlers we saw. Not two in every hundred that had a skin on at all.":
-    "Her kostümü giyen incelenen savaşçıların payı. Varsayılan kostümler listede gösterilmez ama toplamda sayılır; yani %2'lik bir pay, gördüğümüz her yüz savaşçıdan ikisi demektir. Kostüm takmış her yüz savaşçıdan ikisi değil.",
   "Compare Brawl Stars players and brawlers ({v})":
     "Brawl Stars oyuncularını ve savaşçılarını karşılaştır ({v})",
   "Put two Brawl Stars players or two brawlers side by side, {v}: trophies, Ranked, skill score, account completion, win rates and head-to-head records.":
@@ -1842,8 +1816,6 @@ export const TR: Record<string, string> = {
     "Kimsenin sahaya süremediği:",
   "Rank this club":
     "Bu kulübü değerlendir",
-  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies only break a tie — the game already sorts the member list that way.":
-    "Önce üst tier'ın hiperşarjlı kapsamına, sonra hiç sahaya sürebildiklerine göre sıralı. Kupalar yalnızca eşitliği bozar; oyun üye listesini zaten öyle sıralıyor.",
   "Reading rosters…":
     "Kadrolar okunuyor…",
   "Reads all":
@@ -2522,8 +2494,6 @@ export const TR: Record<string, string> = {
     " — {up} yükseldi, {down} düştü",
   ", not what the update":
     "; güncellemenin neye",
-  ". A brawler can be buffed and ignored, nerfed and still climb, or moved by the map rotation turning over in the same fortnight. Sample sizes are printed next to every row so you can weigh them yourself, and anything under {PATCH_MIN_DECIDED} decided battles on either side is left out rather than guessed at.":
-    ". Bir savaşçı güçlendirilip görmezden gelinebilir, zayıflatılıp yine de yükselebilir ya da aynı iki haftada dönen harita rotasyonuyla hareket edebilir. Her satırın yanında örneklem büyüklükleri yazar, böylece kendin tartabilirsin; iki taraftan birinde {PATCH_MIN_DECIDED} sonuçlanmış maçın altında olanlar tahmin edilmek yerine dışarıda bırakılır.",
   ". The rest stayed where they were.":
     ". Geri kalanlar yerinde kaldı.",
   "Did the Brawl Stars balance changes work?":
@@ -2696,10 +2666,6 @@ export const TR: Record<string, string> = {
     "Aşamalı tier listesi",
   "reload":
     "şarjör dolumu",
-  ". These findings cannot be recomputed later, so the archive starts from the day it was built rather than reaching backwards.":
-    ". Bu bulgular sonradan yeniden hesaplanamaz, bu yüzden arşiv geriye doğru uzanmak yerine oluşturulduğu günden başlar.",
-  "Each card is the argmax of a stated quantity over a stated population — the highest win rate among brawlers under 1% usage, the widest gap between a brawler and one map, and so on. The same data always produces the same set, so nothing here is written by a model or picked by hand. Win rates are adjusted against the sample average, so a week where the sampled players are stronger does not make every brawler look buffed.":
-    "Her kart, belirtilen bir topluluk üzerinde belirtilen bir niceliğin en büyük değeridir: %1'in altında kullanılan savaşçılar arasında en yüksek kazanma oranı, bir savaşçı ile bir harita arasındaki en büyük fark vb. Aynı veri her zaman aynı seti üretir; yani buradaki hiçbir şey bir model tarafından yazılmaz ya da elle seçilmez. Kazanma oranları örneklem ortalamasına göre düzeltilir, böylece incelenen oyuncuların daha güçlü olduğu bir hafta her savaşçıyı güçlendirilmiş gibi göstermez.",
   "Every day is kept at its own address —":
     "Her gün kendi adresinde saklanır:",
   "Findings pulled from today’s sampled Brawl Stars battles: the pick nobody uses that keeps winning, the popular pick that loses, the most one-sided matchup, and the brawler that behaves differently on one map.":
@@ -2756,8 +2722,6 @@ export const TR: Record<string, string> = {
     "{winRateNow} kazanma oranı",
   "· mode average {baseline}":
     "· mod ortalaması {baseline}",
-  "A skin’s share is of sampled player-brawler slots; an icon’s is of sampled players. Default skins are left out — the one carrying the brawler’s own name is not something anyone chose. Per-brawler adoption, including the default, is on each brawler’s own page.":
-    "Bir kostümün payı incelenen oyuncu-savaşçı yerlerine, bir simgeninki incelenen oyunculara göredir. Varsayılan kostümler dışarıda bırakılır: savaşçının kendi adını taşıyan kostüm kimsenin seçtiği bir şey değildir. Varsayılan dahil savaşçı bazlı kullanım her savaşçının kendi sayfasında.",
   "Brawl Stars cosmetics: which skins and icons players actually use":
     "Brawl Stars kozmetikleri: oyuncuların gerçekten kullandığı kostümler ve simgeler",
   "Browse every icon →":
@@ -2770,8 +2734,6 @@ export const TR: Record<string, string> = {
     "Bu nasıl sayılıyor",
   "Most worn skins":
     "En çok giyilen kostümler",
-  "Numbers come from the rotating snapshot sample, which records a quarter of the sampled player pool each day, so this is a survey rather than a census. That is enough for shares, which is all it reports, and it is why a number here is never a count of how many people own something in the game.":
-    "Sayılar dönen ölçüm örnekleminden gelir; bu örneklem her gün incelenen oyuncu havuzunun dörtte birini kaydeder, yani bu bir sayım değil bir ankettir. Bildirdiği tek şey olan paylar için bu yeterli ve buradaki bir sayının asla oyunda bir şeye kaç kişinin sahip olduğunun sayısı olmamasının sebebi de bu.",
   "Share of every sampled player-brawler slot, so skins on different brawlers are directly comparable.":
     "İncelenen tüm oyuncu-savaşçı yerlerinin payı; böylece farklı savaşçılardaki kostümler doğrudan karşılaştırılabilir.",
   "Which skins and profile icons players actually equip, measured from the sampled pool rather than listed from a catalogue.":
@@ -2948,10 +2910,6 @@ export const TR: Record<string, string> = {
     "Gizli ikili",
   "The secret pick":
     "Gizli seçim",
-  "Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.":
-    "Hiçbir şey kanıt alt sınırını geçmedi. Her bulgunun arkasında en az 300 incelenmiş maç olmalı ve sayfa bir tesadüf göstermektense hiçbir şey göstermemeyi tercih eder.",
-  "Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.":
-    "İncelenen maçların bir sıralama tablosunun söylemediği şeyler. Her biri o gün verideki türünün en büyük farkıdır: bir görüş değil ve bariz sütuna göre sıralanmış bir liste değil.",
   "What we found":
     "Ne bulduk",
   "What we found today":
@@ -3004,8 +2962,6 @@ export const TR: Record<string, string> = {
     "en zayıf %40",
   "win rate ·":
     "kazanma oranı ·",
-  "{count} brawlers with enough ranked battles to rate over {windowDays} days. Bubble size is the sample behind each one, so the least certain points are the smallest. Tap one for its numbers.":
-    "{windowDays} gün boyunca puanlanacak kadar Aşamalı maçı olan {count} savaşçı. Baloncuk boyutu her birinin arkasındaki örneklemdir, yani en belirsiz noktalar en küçükleridir. Rakamları için birine dokun.",
   "{haveMeta} of the {length}":
     "{length} tanenin {haveMeta} tanesi",
   "{haveSleepers} of the {length}":
@@ -3132,8 +3088,6 @@ export const TR: Record<string, string> = {
     "Dizilimler yayınlanmaz",
   "Map picks vs mode picks":
     "Harita seçimleri ve mod seçimleri",
-  "Meta score {from} to {to} in a single day, on enough battles for the move to be real rather than noise.":
-    "Tek bir günde meta puanı {from} → {to}; hareketin gürültü değil gerçek olması için yeterli maçla.",
   "Most likely bans here":
     "Burada en olası banlar",
   "Most likely picks here":
@@ -3154,8 +3108,6 @@ export const TR: Record<string, string> = {
     "Tek bir puan, incelediğimiz herkesle karşılaştırılabilir.",
   "Our sample skews toward high-trophy players, who win more with anything. Win rates are re-centred on that baseline so the comparison between brawlers stays fair.":
     "Örneklemimiz yüksek kupalı oyunculara kayar; onlar her şeyle daha çok kazanır. Kazanma oranları bu temele göre yeniden ortalanır, böylece savaşçılar arası karşılaştırma adil kalır.",
-  "Picked in {picks} of sampled battles and returning {rate} adjusted — below the average of the very players picking it.":
-    "İncelenen maçların {picks} kadarında seçiliyor ve düzeltilmiş {rate} getiriyor: onu seçen oyuncuların kendi ortalamasının altında.",
   "Playable in Ranked even if you have not unlocked them.":
     "Kilidini açmamış olsan bile Aşamalı'da oynanabilir.",
   "Progress resets every day, like Daily Wins.":
@@ -3240,8 +3192,6 @@ export const TR: Record<string, string> = {
     "Seçimlerin yalnızca {picks} kadarında {rate} düzeltilmiş kazanma oranı: kadronun en güçlü kayıtlarından biri, çoğu draftın hiç düşünmediği bir savaşçıdan.",
   "{rate} against {other} specifically, {edge} above {name}'s own record. The most lopsided matchup in the sample.":
     "Özellikle {other} karşısında {rate}, {name} savaşçısının kendi kaydının {edge} üstünde. Örneklemdeki en tek taraflı eşleşme.",
-  "{rate} here against {other} across every other map — the widest gap between a brawler and one piece of terrain.":
-    "Burada {other} karşısında {rate}, diğer tüm haritalarda: bir savaşçı ile bir arazi arasındaki en büyük fark.",
   "{winRate} win rate · {pickRate} picked · {battles} battles":
     "{winRate} kazanma oranı · {pickRate} seçilme · {battles} maç",
   "The meta score is a 0-10 number combining two measurements: an adjusted win rate, worth 75%, and a log-scaled pick rate, worth 25%. Both come from real battles sampled from global-leaderboard players every two hours, and the Ranked list counts competitive battles only.":
@@ -4868,4 +4818,52 @@ export const TR: Record<string, string> = {
     "Güncellemek için tekrar indir. Eskisinin üzerine kurulur ve iznini korur.",
   "Free, {v}, no account. Everything in it is on the site too. The app just saves you switching apps mid-draft.":
     "Ücretsiz, {v}, hesap yok. İçindeki her şey sitede de var. Uygulama yalnızca draft ortasında uygulama değiştirmeni önler.",
+  "Shares come from a daily sample of the players we track, not a full count of the game.":
+    "Paylar takip ettiğimiz oyunculardan alınan günlük bir örneklemden gelir, oyunun tam sayımından değil.",
+  "Skin shares are per brawler, icon shares per player. Default skins are left out.":
+    "Kostüm payları savaşçı başına, simge payları oyuncu başınadır. Varsayılan kostümler dahil değil.",
+  "Each card is the biggest number of its kind that day: the highest win rate among rarely picked brawlers, the widest gap between a brawler and one map, and so on.":
+    "Her kart o günün türündeki en büyük rakamıdır: az seçilen savaşçılar arasındaki en yüksek kazanma oranı, bir savaşçı ile bir harita arasındaki en büyük fark gibi.",
+  ". The archive starts on the day this page launched.":
+    ". Arşiv bu sayfanın yayına girdiği gün başlar.",
+  ". Map rotation moves win rates too. Rows with under {PATCH_MIN_DECIDED} battles on either side are left out.":
+    ". Harita rotasyonu da kazanma oranlarını değiştirir. Herhangi bir tarafta {PATCH_MIN_DECIDED} maçtan azı olan satırlar dahil edilmez.",
+  "Built from your battle log, which only holds about your last 25 games. Play more and open it again.":
+    "Yalnızca yaklaşık son 25 maçını tutan maç geçmişinden hazırlanır. Biraz daha oyna ve tekrar aç.",
+  "This season’s standing among the {pool} Ranked players we track. The top":
+    "Takip ettiğimiz {pool} Aşamalı oyuncusu arasında bu sezonun sıralaması. Gösterilen ilk",
+  "A brawler shows up here once it has a few days of data.":
+    "Bir savaşçı birkaç günlük verisi olunca burada görünür.",
+  "Coverage means owning a top-3 pick at power 9 or higher in a mode that is live now. Only brawlers you already own count.":
+    "Kapsam, şu an aktif bir modda güç 9 veya üstünde ilk 3'ten bir seçime sahip olmak demek. Yalnızca sahip olduğun savaşçılar sayılır.",
+  "A hypercharge only pays off on a strong brawler. Ordered by how close each one is to power {MAX_POWER_LEVEL}, cheapest to finish first.":
+    "Hiper şarj yalnızca güçlü bir savaşçıda işe yarar. Her birinin güç {MAX_POWER_LEVEL} seviyesine ne kadar yakın olduğuna göre sıralı, bitirmesi en ucuz olanlar önce.",
+  ", where matchmaking pairs players of similar skill, so the score is about how you play, not how much you have spent. Progression counts for at most 15%.":
+    "; eşleştirmenin benzer seviyedeki oyuncuları buluşturduğu mod, bu yüzden puan ne kadar harcadığını değil nasıl oynadığını ölçer. İlerleme en fazla %15 sayılır.",
+  "Things the battles show that a normal table does not. Each one is the biggest gap of its kind that day.":
+    "Normal bir tablonun göstermediği, maçlardan çıkan şeyler. Her biri o günün türündeki en büyük farkı.",
+  "Nothing stood out today. Each finding needs at least 300 battles behind it.":
+    "Bugün öne çıkan bir şey yok. Her bulgu en az 300 maça dayanmalı.",
+  "How this mix of roles does in Ranked. 50% is the average.":
+    "Bu rol karışımının Aşamalı'daki durumu. %50 ortalamadır.",
+  "Share of brawlers we saw wearing each skin. Default skins count in the total but are not listed.":
+    "Gördüğümüz savaşçılar arasında her kostümü giyenlerin payı. Varsayılan kostümler toplama dahil ama listede yok.",
+  "These two have not met often enough in our battles to show a record yet.":
+    "Bu ikisi henüz bir sonuç göstermek için maçlarımızda yeterince karşılaşmadı.",
+  "Ranked by hypercharged coverage of the top tier, then by what they can field at all. Trophies break ties.":
+    "Üst kademenin hiper şarjlı kapsamına, sonra genel olarak oynayabildiklerine göre sıralı. Eşitliği kupalar bozar.",
+  ", ranked by trophies per day since we last checked them. These are different players from the official top 100 below.":
+    "; son kontrolümüzden bu yana günlük kupa artışına göre sıralı. Bunlar aşağıdaki resmi ilk 100'den farklı oyuncular.",
+  "{count} brawlers rated over {windowDays} days. Bigger bubbles have more battles behind them. Tap one for its numbers.":
+    "{windowDays} gün içinde puanlanan {count} savaşçı. Büyük baloncukların arkasında daha çok maç var. Sayılar için birine dokun.",
+  "Picked in {picks} of battles but winning only {rate}, below the average of the players picking it.":
+    "Maçların {picks} kadarında seçiliyor ama yalnızca {rate} kazanıyor; onu seçen oyuncuların ortalamasının altında.",
+  "{rate} here against {other} on every other map. The biggest gap between a brawler and one map.":
+    "Burada {rate}, diğer tüm haritalarda {other}. Bir savaşçı ile bir harita arasındaki en büyük fark.",
+  "Meta score went from {from} to {to} in a single day.":
+    "Meta puanı tek günde {from} değerinden {to} değerine çıktı.",
+  "This board fills in over the next day or two.":
+    "Bu tablo bir iki gün içinde dolar.",
+  "One point for each day this profile was viewed.":
+    "Bu profilin görüntülendiği her gün için bir nokta.",
 };

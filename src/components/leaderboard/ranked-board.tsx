@@ -38,14 +38,14 @@ export async function RankedBoard() {
           <RankedIcon className="size-7" />
         </span>
         <h2 className="mt-4 text-xl font-bold">{t('Collecting Ranked standings')}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{t('Elo is recorded as the sampler works through the player pool, and as people look profiles up. This board fills in over the next day or two.')}</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{t('This board fills in over the next day or two.')}</p>
       </div>
     );
   }
 
   return (
     <section>
-      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">{t('Current season standing. The game API publishes no Ranked leaderboard, so this one is built from the {pool} sampled players who have played Ranked this season. The top', { pool: formatNumber(pool) })}{' '}{t('{length} of those, not a global board. Looking up a profile adds it to the pool.', { length: players.length })}</p>
+      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted">{t('This season’s standing among the {pool} Ranked players we track. The top', { pool: formatNumber(pool) })}{' '}{t('{length} of those, not a global board. Looking up a profile adds it to the pool.', { length: players.length })}</p>
 
       <ol className="space-y-1.5">
         {players.map((player, index) => {

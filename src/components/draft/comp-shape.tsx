@@ -59,7 +59,7 @@ export function CompShape({
     <section className="space-y-3" aria-labelledby="comp-shape">
       <div>
         <h2 id="comp-shape" className="display text-game-stroke text-xl">{t('Team shape')}</h2>
-        <p className="mt-1 text-sm leading-relaxed text-muted">{t('How this combination of roles performs in Ranked, measured across both teams of sampled battles. 50% is average for the sample, not a coin flip — every shape is adjusted against the same baseline the tier list uses.')}</p>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{t('How this mix of roles does in Ranked. 50% is the average.')}</p>
       </div>
 
       {yours ? (

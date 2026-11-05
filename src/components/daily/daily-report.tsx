@@ -37,11 +37,11 @@ export function DailyReport({
       <PageHeading
         eyebrow={dateLabel}
         title={isToday ? t('What we found today') : t('What we found')}
-        subtitle={t('Things the sampled battles say that a ranked table does not. Every one is the largest gap of its kind in the data that day — not an opinion, and not a list sorted by the obvious column.')}
+        subtitle={t('Things the battles show that a normal table does not. Each one is the biggest gap of its kind that day.')}
       />
 
       {discoveries.length === 0 ? (
-        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Nothing cleared the evidence floor. Each finding needs at least 300 sampled battles behind it, and the page would rather show nothing than a coincidence.')}</p>
+        <p className="card p-6 text-sm leading-relaxed text-muted">{t('Nothing stood out today. Each finding needs at least 300 battles behind it.')}</p>
       ) : (
         <div className="space-y-4">
           {discoveries.map((discovery, index) => (

@@ -88,7 +88,7 @@ export default async function WrappedPage({ params }: PageProps) {
         modeMeta={modeMeta}
       />
 
-      <p className="text-xs leading-relaxed text-muted">{t('Everything here is measured from the battle log the game exposes, which holds roughly the last twenty-five games and no further. There is no history endpoint, so this is a snapshot of a run rather than a season — open it again after playing and it will have moved.')}</p>
+      <p className="text-xs leading-relaxed text-muted">{t('Built from your battle log, which only holds about your last 25 games. Play more and open it again.')}</p>
     </div>
   );
 }
