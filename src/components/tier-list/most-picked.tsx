@@ -26,7 +26,7 @@ const WORDS = {
   en: {
     title: 'Most picked brawlers',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `The brawlers appearing in the most sampled ${battles}${mode ? ` in ${mode}` : ''} over the ${w} window. This is popularity, not strength — the tiers above rank how well a brawler performs, and the two disagree often. A pick rate is a share of all battles sampled, so it sums across the roster rather than to 100% per battle.`,
+      `The brawlers appearing in the most sampled ${battles}${mode ? ` in ${mode}` : ''} over the ${w} window. Most picked is not the same as strongest.`,
     tier: (t: string) => `Tier ${t} on this list`,
     battles: 'battles',
     win: 'win',
@@ -35,7 +35,7 @@ const WORDS = {
   es: {
     title: 'Los brawlers más elegidos',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `Los brawlers que más aparecen en las ${battles}${mode ? ` de ${mode}` : ''} recogidas en los últimos ${w}. Esto es popularidad, no fuerza: los tiers de arriba ordenan lo bien que rinde cada brawler, y las dos cosas no suelen coincidir. La tasa de uso es una parte de todas las partidas recogidas, así que se suma entre todos los brawlers y no da 100% por partida.`,
+      `Los brawlers que más aparecen en las ${battles}${mode ? ` de ${mode}` : ''} recogidas en los últimos ${w}. El más elegido no es lo mismo que el más fuerte.`,
     tier: (t: string) => `Tier ${t} en esta lista`,
     battles: 'partidas',
     win: 'victorias',
@@ -44,7 +44,7 @@ const WORDS = {
   pt: {
     title: 'Brawlers mais escolhidos',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `Os brawlers que mais aparecem nas ${battles}${mode ? ` de ${mode}` : ''} coletadas nos últimos ${w}. Isto é popularidade, não força: os tiers acima mostram o quanto cada brawler rende, e as duas coisas costumam não bater. A taxa de escolha é uma parte de todas as partidas coletadas, então soma entre todos os brawlers e não dá 100% por partida.`,
+      `Os brawlers que mais aparecem nas ${battles}${mode ? ` de ${mode}` : ''} coletadas nos últimos ${w}. Mais escolhido não é o mesmo que mais forte.`,
     tier: (t: string) => `Tier ${t} nesta lista`,
     battles: 'partidas',
     win: 'vitórias',
@@ -53,7 +53,7 @@ const WORDS = {
   tr: {
     title: 'En çok seçilen savaşçılar',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `Son ${w} içinde incelenen ${battles}${mode ? ` (${mode})` : ''} arasında en sık görülen savaşçılar. Bu güç değil popülerlik: yukarıdaki tier'lar bir savaşçının ne kadar iyi performans gösterdiğini sıralar ve ikisi çoğu zaman uyuşmaz. Seçilme oranı incelenen tüm maçların bir payıdır, yani maç başına %100 değil, tüm savaşçılar boyunca toplanır.`,
+      `Son ${w} içinde incelenen ${battles}${mode ? ` (${mode})` : ''} arasında en sık görülen savaşçılar. En çok seçilen, en güçlü demek değil.`,
     tier: (t: string) => `Bu listede ${t} tier`,
     battles: 'maç',
     win: 'kazanma',
@@ -62,7 +62,7 @@ const WORDS = {
   de: {
     title: 'Die meistgepickten Brawler',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `Die Brawler, die in den meisten erfassten ${battles}${mode ? ` in ${mode}` : ''} der letzten ${w} auftauchen. Das ist Beliebtheit, nicht Stärke: Die Tiers oben ordnen, wie gut ein Brawler abschneidet, und beides weicht oft voneinander ab. Eine Pickrate ist ein Anteil an allen erfassten Matches, sie summiert sich also über den Kader und nicht auf 100 % pro Match.`,
+      `Die Brawler, die in den meisten erfassten ${battles}${mode ? ` in ${mode}` : ''} der letzten ${w} auftauchen. Am meisten gepickt heißt nicht am stärksten.`,
     tier: (t: string) => `Tier ${t} auf dieser Liste`,
     battles: 'Matches',
     win: 'Siege',
@@ -71,7 +71,7 @@ const WORDS = {
   ru: {
     title: 'Самые популярные бойцы',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `Бойцы, которые чаще всего встречаются среди собранных ${battles}${mode ? ` в режиме «${mode}»` : ''} за последние ${w}. Это популярность, а не сила: тиры выше показывают, насколько хорошо боец играет, и эти списки часто расходятся. Частота выбора — это доля от всех собранных боёв, поэтому она суммируется по всему составу, а не до 100% за бой.`,
+      `Бойцы, которые чаще всего встречаются среди собранных ${battles}${mode ? ` в режиме «${mode}»` : ''} за последние ${w}. Самый популярный — не обязательно самый сильный.`,
     tier: (t: string) => `Тир ${t} в этом списке`,
     battles: 'бои',
     win: 'победы',
@@ -80,7 +80,7 @@ const WORDS = {
   fr: {
     title: 'Les brawlers les plus choisis',
     body: (battles: string, mode: string | undefined, w: string) =>
-      `Les brawlers qui apparaissent dans le plus de ${battles} collectés${mode ? ` en ${mode}` : ''} ces ${w} derniers. C'est de la popularité, pas de la force : les tiers ci-dessus classent ce que vaut un brawler, et les deux divergent souvent. Un taux de sélection est une part de tous les combats collectés, donc il s'additionne sur tout le roster et pas à 100 % par combat.`,
+      `Les brawlers qui apparaissent dans le plus de ${battles} collectés${mode ? ` en ${mode}` : ''} ces ${w} derniers. Le plus choisi n'est pas forcément le plus fort.`,
     tier: (t: string) => `Tier ${t} dans cette liste`,
     battles: 'combats',
     win: 'victoires',

@@ -4,8 +4,6 @@
  * aksesuar, eşya, hiperşarj, Starr Hediyesi.
  */
 export const TR: Record<string, string> = {
-  "A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads yours against every player we sample and tells you what it means.":
-    "Bir Brawl Stars profili bağlamı olmayan bir yığın sayıdır. BrawlZone seninkini incelediğimiz tüm oyuncularla karşılaştırır ve ne anlama geldiğini söyler.",
   "Account completion, coins invested, and what finishing the rest would cost.":
     "Hesap tamamlanma oranı, harcanan altın ve geri kalanını bitirmenin maliyeti.",
   "After you search":
@@ -220,8 +218,6 @@ export const TR: Record<string, string> = {
     "Çoğu site ikisi için tek bir liste verir.",
   "One tier apart":
     "Bir tier farkla",
-  "Ranked drafts and bans between comparable opponents. The ladder does neither. We score them from separate halves of our own sample, so a brawler can be a first-pick in one and a trap in the other.":
-    "Aşamalı'da birbirine yakın rakipler arasında draft ve ban yapılır. Kupa maçlarında ikisi de yok. Bunları kendi örneklemimizin ayrı yarılarından puanlıyoruz; bu yüzden bir savaşçı birinde ilk seçim, diğerinde tuzak olabilir.",
   "Ranked list":
     "Aşamalı listesi",
   "Trophy":
@@ -874,8 +870,6 @@ export const TR: Record<string, string> = {
     "— düzeltilmiş %{v} kazanır",
   "— {v} points below its usual record, over {v2} battles.":
     "— {v2} maçta normal kaydının {v} puan altında.",
-  "A comp appears here once at least fifteen different players have used it across at least forty decided battles. The player floor matters more than the battle count: a squad that queues together brings the same trio every game, so without it the list ranks strong teams rather than strong comps. Ranked and ladder battles both count.":
-    "Bir dizilim, en az kırk sonuçlanmış maçta en az on beş farklı oyuncu tarafından kullanıldığında burada görünür. Oyuncu alt sınırı maç sayısından daha önemlidir: birlikte sıraya giren bir ekip her maçta aynı üçlüyü getirir, bu sınır olmasa liste güçlü dizilimleri değil güçlü takımları sıralardı. Aşamalı ve kupa maçlarının ikisi de sayılır.",
   "All modes":
     "Tüm modlar",
   "Best {label} comps":
@@ -980,8 +974,6 @@ export const TR: Record<string, string> = {
     "Henüz hiçbir dizilimin yeterli verisi yok. Maçlar incelendikçe dolar.",
   "No data yet.":
     "Henüz veri yok.",
-  "The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it.":
-    "Moda göre gerçekten kazanan üç savaşçılık kombinasyonlar. Buradaki her dizilim kırk maç boyunca en az on beş farklı oyuncu tarafından kullanıldı; yani okuduğun şey onu seven ekip değil, dizilimin kendisi.",
   "The three-brawler compositions with the best records in each Brawl Stars mode, measured from sampled battles and filtered so one strong premade team cannot skew a comp.":
     "Her Brawl Stars modunda en iyi kayıtlara sahip üç savaşçılık dizilimler; incelenen maçlardan ölçülür ve tek bir güçlü hazır takımın bir dizilimi çarpıtamayacağı şekilde filtrelenir.",
   "{sampleSize} sampled battles · mode average":
@@ -4870,4 +4862,12 @@ export const TR: Record<string, string> = {
     "Buradaki her savaşçının en az 300 Aşamalı maçı var, yani şanslı bir seri onu listeye sokamaz.",
   "Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of":
     "Bugün “düşük seçilme” {lowUsage} altı, “güçlü” ise şu puan demek:",
+  "A comp is listed once 15 different players have used it in at least 40 battles, so one strong squad cannot carry it. Ranked and ladder battles both count.":
+    "Bir kadro, 15 farklı oyuncu onu en az 40 maçta kullandığında listelenir; tek bir güçlü takım onu taşıyamaz. Aşamalı ve kupa maçlarının ikisi de sayılır.",
+  "The three-brawler combinations that win, by mode. Each one was used by at least 15 different players in 40 battles.":
+    "Kazanan üçlü savaşçı kombinasyonları, moda göre. Her biri en az 15 farklı oyuncu tarafından 40 maçta kullanıldı.",
+  "See how your profile stacks up against every player we track.":
+    "Profilinin takip ettiğimiz tüm oyuncularla nasıl karşılaştırıldığını gör.",
+  "Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.":
+    "Aşamalı ve kupa merdiveni ayrı puanlanır; bir savaşçı birinde ilk seçim, diğerinde tuzak olabilir.",
 };

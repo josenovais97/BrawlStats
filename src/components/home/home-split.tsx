@@ -50,7 +50,7 @@ export async function HomeSplit() {
               id="split"
               className="display text-game-stroke mt-2.5 text-2xl sm:text-4xl"
             >{t('Two games.')}<br />{t('Two answers.')}</h2>
-            <p className="mt-3.5 leading-relaxed text-muted">{t('Ranked drafts and bans between comparable opponents. The ladder does neither. We score them from separate halves of our own sample, so a brawler can be a first-pick in one and a trap in the other.')}</p>
+            <p className="mt-3.5 leading-relaxed text-muted">{t('Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.')}</p>
             <p className="mt-3 text-sm leading-relaxed text-muted/85">{t('Most sites give you one list for both.')}</p>
 
             <div className="mt-5 flex flex-wrap gap-2">

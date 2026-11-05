@@ -52,7 +52,7 @@ export default async function CompsPage() {
 
       <PageHeading
         title={t('Best team comps')}
-        subtitle={t('The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it.')}
+        subtitle={t('The three-brawler combinations that win, by mode. Each one was used by at least 15 different players in 40 battles.')}
       />
 
       {withComps.length === 0 ? (

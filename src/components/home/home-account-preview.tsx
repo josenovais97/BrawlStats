@@ -42,7 +42,7 @@ export async function HomeAccountPreview() {
       <div className="mb-6 max-w-2xl">
         <p className="eyebrow text-accent">{t('After you search')}</p>
         <h2 id="account-preview" className="display text-game-stroke mt-2.5 text-2xl sm:text-4xl">{t('Your account, explained')}</h2>
-        <p className="mt-3 leading-relaxed text-muted">{t('A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads yours against every player we sample and tells you what it means.')}</p>
+        <p className="mt-3 leading-relaxed text-muted">{t('See how your profile stacks up against every player we track.')}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">

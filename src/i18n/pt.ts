@@ -4,8 +4,6 @@
  * de estrela, acessório, engrenagens.
  */
 export const PT: Record<string, string> = {
-  "A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads yours against every player we sample and tells you what it means.":
-    "Um perfil de Brawl Stars é um monte de números sem contexto. O BrawlZone compara o seu com todos os jogadores que analisamos e diz o que isso significa.",
   "Account completion, coins invested, and what finishing the rest would cost.":
     "Quanto da conta você já completou, as moedas investidas e quanto custaria terminar o resto.",
   "After you search":
@@ -220,8 +218,6 @@ export const PT: Record<string, string> = {
     "A maioria dos sites dá uma lista só para os dois.",
   "One tier apart":
     "Um tier de diferença",
-  "Ranked drafts and bans between comparable opponents. The ladder does neither. We score them from separate halves of our own sample, so a brawler can be a first-pick in one and a trap in the other.":
-    "No Ranqueado há draft e banimentos entre adversários de nível parecido. Nos troféus não há nenhum dos dois. Pontuamos cada um com uma parte separada da nossa amostra, então um brawler pode ser primeira escolha em um e uma armadilha no outro.",
   "Ranked list":
     "Lista do Ranqueado",
   "Trophy":
@@ -874,8 +870,6 @@ export const PT: Record<string, string> = {
     "ganha {v}% ajustado",
   "— {v} points below its usual record, over {v2} battles.":
     ": {v} pontos abaixo do resultado normal dele, em {v2} partidas.",
-  "A comp appears here once at least fifteen different players have used it across at least forty decided battles. The player floor matters more than the battle count: a squad that queues together brings the same trio every game, so without it the list ranks strong teams rather than strong comps. Ranked and ladder battles both count.":
-    "Um time aparece aqui quando pelo menos quinze jogadores diferentes o usaram em pelo menos quarenta partidas decididas. O mínimo de jogadores importa mais que o de partidas: um grupo que joga junto leva o mesmo trio toda partida, e sem esse mínimo a lista mostraria times fortes, e não combinações fortes. Contam partidas ranqueadas e de troféus.",
   "All modes":
     "Todos os modos",
   "Best {label} comps":
@@ -980,8 +974,6 @@ export const PT: Record<string, string> = {
     "Nenhum time tem dados suficientes ainda. Isso vai sendo preenchido conforme as partidas são coletadas.",
   "No data yet.":
     "Ainda não há dados.",
-  "The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it.":
-    "As combinações de três brawlers que realmente ganham, por modo. Cada time aqui foi usado por pelo menos quinze jogadores diferentes em quarenta partidas, então o que você vê é a combinação, e não o grupo que gosta dela.",
   "The three-brawler compositions with the best records in each Brawl Stars mode, measured from sampled battles and filtered so one strong premade team cannot skew a comp.":
     "As combinações de três brawlers com melhor resultado em cada modo do Brawl Stars, medidas com partidas reais e filtradas para que um time forte que joga junto não distorça o resultado.",
   "{sampleSize} sampled battles · mode average":
@@ -4870,4 +4862,12 @@ export const PT: Record<string, string> = {
     "Cada brawler aqui tem pelo menos 300 batalhas do Ranqueado, então uma sequência de sorte não basta para entrar numa lista.",
   "Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of":
     "Hoje, “pouco escolhido” significa menos de {lowUsage} de escolha, e “forte”, uma nota de",
+  "A comp is listed once 15 different players have used it in at least 40 battles, so one strong squad cannot carry it. Ranked and ladder battles both count.":
+    "Uma composição aparece quando 15 jogadores diferentes a usaram em pelo menos 40 batalhas, então um único time forte não a sustenta. Contam batalhas do Ranqueado e de troféus.",
+  "The three-brawler combinations that win, by mode. Each one was used by at least 15 different players in 40 battles.":
+    "As combinações de três brawlers que vencem, por modo. Cada uma foi usada por pelo menos 15 jogadores diferentes em 40 batalhas.",
+  "See how your profile stacks up against every player we track.":
+    "Veja como seu perfil se compara com todos os jogadores que acompanhamos.",
+  "Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.":
+    "O Ranqueado e a escada de troféus são pontuados separadamente, então um brawler pode ser primeira escolha num e armadilha no outro.",
 };

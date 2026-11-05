@@ -5,8 +5,6 @@
  * are written "боёв: 12" so a number never needs a plural ending.
  */
 export const RU: Record<string, string> = {
-  "A Brawl Stars profile is a pile of numbers with no context. BrawlZone reads yours against every player we sample and tells you what it means.":
-    "Профиль в Brawl Stars — это куча чисел без контекста. BrawlZone сравнивает твой с каждым игроком из нашей выборки и объясняет, что это значит.",
   "Account completion, coins invested, and what finishing the rest would cost.":
     "Прогресс аккаунта, вложенные монеты и сколько стоит доделать остальное.",
   "After you search":
@@ -221,8 +219,6 @@ export const RU: Record<string, string> = {
     "Большинство сайтов дают один список на всё.",
   "One tier apart":
     "Разница в один тир",
-  "Ranked drafts and bans between comparable opponents. The ladder does neither. We score them from separate halves of our own sample, so a brawler can be a first-pick in one and a trap in the other.":
-    "В ранговых боях есть драфт и запреты между соперниками одного уровня. На пути к славе нет ни того, ни другого. Мы считаем их по разным половинам нашей выборки, поэтому боец может быть первым пиком в одном и ловушкой в другом.",
   "Ranked list":
     "Список ранговых боёв",
   "Trophy":
@@ -875,8 +871,6 @@ export const RU: Record<string, string> = {
     "— побеждает в {v}% с поправкой",
   "— {v} points below its usual record, over {v2} battles.":
     "— на {v} пункта ниже своего обычного результата, боёв: {v2}.",
-  "A comp appears here once at least fifteen different players have used it across at least forty decided battles. The player floor matters more than the battle count: a squad that queues together brings the same trio every game, so without it the list ranks strong teams rather than strong comps. Ranked and ladder battles both count.":
-    "Состав появляется здесь, когда его использовали минимум пятнадцать разных игроков минимум в сорока решённых боях. Порог по игрокам важнее числа боёв: группа, которая играет вместе, приносит одну и ту же тройку каждый бой, и без порога список ранжировал бы сильные команды, а не сильные составы. Учитываются и ранговые бои, и путь к славе.",
   "All modes":
     "Все режимы",
   "Best {label} comps":
@@ -981,8 +975,6 @@ export const RU: Record<string, string> = {
     "Ни у одного состава пока нет достаточно данных. Это заполнится по мере сбора боёв.",
   "No data yet.":
     "Пока нет данных.",
-  "The three-brawler combinations that actually win, by mode. Every comp here was used by at least fifteen different players across forty battles, so what you are reading is the comp rather than the squad that likes it.":
-    "Сочетания из трёх бойцов, которые действительно побеждают, по режимам. Каждый состав здесь использовали минимум пятнадцать разных игроков в сорока боях, так что ты читаешь про состав, а не про группу, которая его любит.",
   "The three-brawler compositions with the best records in each Brawl Stars mode, measured from sampled battles and filtered so one strong premade team cannot skew a comp.":
     "Составы из трёх бойцов с лучшими результатами в каждом режиме Brawl Stars, по собранным боям, с фильтром, чтобы одна сильная заранее собранная команда не исказила состав.",
   "{sampleSize} sampled battles · mode average":
@@ -4871,4 +4863,12 @@ export const RU: Record<string, string> = {
     "У каждого бойца здесь не меньше 300 ранговых боёв, так что случайная удачная серия не попадёт в список.",
   "Today “low pick rate” means under {lowUsage} picked, and “strong” means a rating of":
     "Сейчас «редко берут» значит меньше {lowUsage}, а «сильный» — рейтинг",
+  "A comp is listed once 15 different players have used it in at least 40 battles, so one strong squad cannot carry it. Ranked and ladder battles both count.":
+    "Связка попадает в список, когда её сыграли 15 разных игроков минимум в 40 боях, так что одна сильная команда её не вытянет. Учитываются и ранговые бои, и бои за трофеи.",
+  "The three-brawler combinations that win, by mode. Each one was used by at least 15 different players in 40 battles.":
+    "Связки из трёх бойцов, которые побеждают, по режимам. Каждую использовали минимум 15 разных игроков в 40 боях.",
+  "See how your profile stacks up against every player we track.":
+    "Посмотрите, как ваш профиль выглядит на фоне всех игроков, которых мы отслеживаем.",
+  "Ranked and the trophy ladder are scored separately, so a brawler can be a top pick in one and a trap in the other.":
+    "Ранговые бои и бои за трофеи оцениваются отдельно, поэтому боец может быть топ-пиком в одних и ловушкой в других.",
 };

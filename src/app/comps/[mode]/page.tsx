@@ -130,7 +130,7 @@ export default async function ModeCompsPage({ params }: PageProps) {
         emptyLabel={t('Not enough data for this mode yet.')}
       />
 
-      <p className="text-xs leading-relaxed text-muted">{t('A comp appears here once at least fifteen different players have used it across at least forty decided battles. The player floor matters more than the battle count: a squad that queues together brings the same trio every game, so without it the list ranks strong teams rather than strong comps. Ranked and ladder battles both count.')}</p>
+      <p className="text-xs leading-relaxed text-muted">{t('A comp is listed once 15 different players have used it in at least 40 battles, so one strong squad cannot carry it. Ranked and ladder battles both count.')}</p>
     </div>
   );
 }
