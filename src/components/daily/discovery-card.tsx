@@ -88,7 +88,7 @@ const COPY: Record<DiscoveryKind, Copy> = {
     pair: '+',
     headline: (d, t) => t('{name} and {other} belong together.', { name: name(d, 0), other: name(d, 1) }),
     detail: (d, t) =>
-      t('Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.', {
+      t('Teamed up, {name} wins {rate}, {edge} better than it does otherwise.', {
         name: name(d, 0),
         rate: formatPercent(d.value),
         edge: pts(d.value - d.comparison),

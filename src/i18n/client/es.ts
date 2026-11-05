@@ -405,8 +405,6 @@ export const CLIENT_ES: Record<string, string> = {
     "Volver a buscar",
   "Something went wrong":
     "Algo salió mal",
-  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
-    "No se pudo cargar esta página. Normalmente es la API del juego, que va lenta o limita las peticiones, y se arregla sola: volver a intentarlo suele funcionar.",
   "Try again":
     "Intentar de nuevo",
   "Save":
@@ -505,8 +503,6 @@ export const CLIENT_ES: Record<string, string> = {
     "Lo sacaste en {length}",
   "Guess a brawler":
     "Adivina un brawler",
-  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
-    "Adivina el brawler de hoy. Cada intento muestra lo cerca que estás en cinco pistas: verde es exacto, ámbar está a un paso, y una flecha apunta hacia la respuesta.",
   "Guesses to solve":
     "Intentos para resolver",
   "Next brawler in":
@@ -647,8 +643,6 @@ export const CLIENT_ES: Record<string, string> = {
     "No se pudo conectar con el servidor. Inténtalo de nuevo.",
   "Could not read this club right now.":
     "No se pudo leer este club ahora mismo.",
-  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
-    "Juntos, {name} gana el {rate}: {edge} más de lo normal. Ninguno de los dos se elige pensando en el otro.",
   "That is not a current brawler.":
     "Ese no es un brawler actual.",
   "Too many scans at once. Give it a minute.":
@@ -998,4 +992,10 @@ export const CLIENT_ES: Record<string, string> = {
     "{rate} aquí frente a {other} en el resto de mapas. La mayor diferencia entre un brawler y un mapa.",
   "Meta score went from {from} to {to} in a single day.":
     "La puntuación meta pasó de {from} a {to} en un solo día.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Juntos, {name} gana el {rate}, {edge} más que en otros casos.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Adivina el brawler de hoy. Cada intento muestra lo cerca que estás en cinco pistas: verde es exacto, ámbar es cerca y una flecha apunta hacia la respuesta.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "No se pudo cargar esta página. Seguramente la API del juego va lenta ahora mismo. Vuelve a intentarlo en un momento.",
 };

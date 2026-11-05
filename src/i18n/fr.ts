@@ -15,8 +15,6 @@ export const FR: Record<string, string> = {
     "Hypercharges bloquées sous le niveau de pouvoir 11, les moins chères à finir en premier.",
   "Live":
     "En direct",
-  "Out of 10, weighted toward Ranked — how you play, not how long you have played.":
-    "Sur 10, avec plus de poids pour le Classé : comment tu joues, pas depuis combien de temps.",
   "Progression":
     "Progression",
   "Roster vs the meta":
@@ -1545,8 +1543,6 @@ export const FR: Record<string, string> = {
     "{name} mène de {gap}",
   "{v} to go":
     "encore {v}",
-  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
-    "Encore {v} pour le meneur. Recharge après que l'un de vous a joué : les deux profils sont lus en direct.",
   "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
     "Les brawlers que tu possèdes et que la mise à jour du {date} a modifiés, et comment ils ont réellement bougé depuis{v}.",
   "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
@@ -2065,8 +2061,6 @@ export const FR: Record<string, string> = {
     "Retour à la recherche",
   "Something went wrong":
     "Un problème est survenu",
-  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
-    "Cette page n'a pas pu être chargée. C'est généralement l'API du jeu qui est lente ou limitée, ce qui se règle tout seul : réessayer suffit souvent.",
   "Try again":
     "Réessayer",
   "Save":
@@ -2507,8 +2501,6 @@ export const FR: Record<string, string> = {
     "Chaque brawler modifié par chaque mise à jour de Brawl Stars, et ce que son taux de victoire a vraiment fait dans la quinzaine qui a suivi, mesuré sur les combats Classé collectés.",
   "It changed {length} brawlers.":
     "Elle a modifié {length} brawlers.",
-  "Listed rather than hidden — an absence with a reason is a finding too.":
-    "Listés plutôt que cachés : une absence avec une raison, c'est aussi un résultat.",
   "Measured, not announced":
     "Mesuré, pas annoncé",
   "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
@@ -2563,8 +2555,6 @@ export const FR: Record<string, string> = {
     "Voir tous les picks sur {mapName}",
   "Sleeper picks":
     "Picks dormants",
-  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
-    "Forts, et presque personne ne les prend : moins de {lowUsage} de sélection.",
   "The hidden meta":
     "La méta cachée",
   "Trap picks":
@@ -2601,8 +2591,6 @@ export const FR: Record<string, string> = {
     "Tous les taux d'obtention",
   "How to get them: the daily schedule":
     "Comment les obtenir : le programme du jour",
-  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
-    "Prix à durée limitée d'événements passés. Gardés pour référence : la plupart ne s'obtiennent plus.",
   "No table":
     "Pas de tableau",
   "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
@@ -2981,8 +2969,6 @@ export const FR: Record<string, string> = {
     "Trouvé en {length}",
   "Guess a brawler":
     "Devine un brawler",
-  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
-    "Devine le brawler du jour. Chaque essai montre à quel point tu es proche sur cinq indices : vert, c'est exact, orange, c'est à un pas, et une flèche indique la réponse.",
   "Guesses to solve":
     "Essais pour trouver",
   "Next brawler in":
@@ -3115,8 +3101,6 @@ export const FR: Record<string, string> = {
     "La progression se remet à zéro chaque jour, comme les Victoires du jour.",
   "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
     "Les récompenses sont des Prix Starr ou des Prix du chaos, avec jusqu'à 2 Prix Starr par jour.",
-  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
-    "Ensemble, {name} gagne {rate} — {edge} de mieux que sinon. Aucun des deux n'est pris pour l'autre.",
   "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
     "C'est tout ce que l'API garde. Tout ce qui est marqué « récent » l'est vraiment. Il n'y a pas d'historique de carrière à montrer.",
   "That is not a current brawler.":
@@ -4867,4 +4851,20 @@ export const FR: Record<string, string> = {
     "Ce tableau se remplit d'ici un ou deux jours.",
   "One point for each day this profile was viewed.":
     "Un point pour chaque jour où ce profil a été consulté.",
+  "Strong, and almost nobody picks them. Under {lowUsage} pick rate.":
+    "Forts, et presque personne ne les prend. Moins de {lowUsage} de sélection.",
+  "Listed here so you know why they are missing.":
+    "Listés ici pour que tu saches pourquoi ils manquent.",
+  "Limited-time drops from past events. Most can no longer be won.":
+    "Drops à durée limitée d'anciens événements. La plupart ne sont plus disponibles.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Ensemble, {name} gagne {rate}, {edge} de mieux que d'habitude.",
+  "{v} to go for the leader. Reload after either of you plays.":
+    "Encore {v} pour le premier. Recharge après qu'un de vous deux a joué.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Devine le brawler du jour. Chaque essai montre à quel point tu es proche sur cinq indices : vert c'est exact, ambre c'est proche, et une flèche pointe vers la réponse.",
+  "Out of 10, weighted toward Ranked: how you play, not how long you have played.":
+    "Sur 10, centré sur le Classé : comment tu joues, pas depuis combien de temps.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Cette page n'a pas pu se charger. L'API du jeu est sûrement lente en ce moment. Réessaie dans un instant.",
 };

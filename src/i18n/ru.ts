@@ -15,8 +15,6 @@ export const RU: Record<string, string> = {
     "Гиперзаряды, застрявшие ниже 11-го уровня силы, самые дешёвые — первыми.",
   "Live":
     "Онлайн",
-  "Out of 10, weighted toward Ranked — how you play, not how long you have played.":
-    "Из 10, с упором на ранговые бои: как ты играешь, а не как долго.",
   "Progression":
     "Прогресс",
   "Roster vs the meta":
@@ -1545,8 +1543,6 @@ export const RU: Record<string, string> = {
     "{name} впереди на {gap}",
   "{v} to go":
     "Осталось {v}",
-  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
-    "Лидеру осталось {v}. Обнови страницу после того, как кто-то из вас сыграет: профили читаются вживую.",
   "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
     "Твои бойцы, которых изменило обновление от {date}, и как они на самом деле сдвинулись с тех пор{v}.",
   "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
@@ -2065,8 +2061,6 @@ export const RU: Record<string, string> = {
     "Назад к поиску",
   "Something went wrong":
     "Что-то пошло не так",
-  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
-    "Не удалось загрузить эту страницу. Обычно это API игры тормозит или упирается в лимит запросов, и это проходит само — повторная попытка часто просто срабатывает.",
   "Try again":
     "Попробовать снова",
   "Save":
@@ -2507,8 +2501,6 @@ export const RU: Record<string, string> = {
     "Каждый боец, которого меняло каждое обновление Brawl Stars, и что на самом деле стало с его процентом побед за две недели после, по собранным ранговым боям.",
   "It changed {length} brawlers.":
     "Оно изменило {length} {length|one:бойца|few:бойцов|many:бойцов|other:бойцов}.",
-  "Listed rather than hidden — an absence with a reason is a finding too.":
-    "Перечислены, а не скрыты: отсутствие с причиной — тоже находка.",
   "Measured, not announced":
     "Измерено, а не объявлено",
   "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
@@ -2563,8 +2555,6 @@ export const RU: Record<string, string> = {
     "Все пики на карте {mapName}",
   "Sleeper picks":
     "Тёмные лошадки",
-  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
-    "Сильные, а их почти никто не берёт: частота выбора ниже {lowUsage}.",
   "The hidden meta":
     "Скрытая мета",
   "Trap picks":
@@ -2601,8 +2591,6 @@ export const RU: Record<string, string> = {
     "Все шансы выпадения",
   "How to get them: the daily schedule":
     "Как их получить: расписание на день",
-  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
-    "Призы ограниченных событий прошлого. Оставлены для справки — большинство уже не получить.",
   "No table":
     "Нет таблицы",
   "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
@@ -2981,8 +2969,6 @@ export const RU: Record<string, string> = {
     "Угадано за {length}",
   "Guess a brawler":
     "Угадай бойца",
-  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
-    "Угадай бойца дня. Каждая попытка показывает, насколько ты близок по пяти подсказкам: зелёный — точно, жёлтый — на шаг в стороне, а стрелка указывает на ответ.",
   "Guesses to solve":
     "Попыток до ответа",
   "Next brawler in":
@@ -3115,8 +3101,6 @@ export const RU: Record<string, string> = {
     "Прогресс сбрасывается каждый день, как и «Победы дня».",
   "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
     "Награды — Призы Старр или Призы хаоса, до 2 Призов Старр в день.",
-  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
-    "В команде {name} побеждает в {rate} — на {edge} лучше, чем обычно. Ни один не берётся ради другого.",
   "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
     "Это всё, что хранит API. Всё, что помечено как «недавнее», действительно недавнее. Истории матчей за всю карьеру нет.",
   "That is not a current brawler.":
@@ -4867,4 +4851,20 @@ export const RU: Record<string, string> = {
     "Эта таблица заполнится в ближайшие день-два.",
   "One point for each day this profile was viewed.":
     "Одна точка за каждый день, когда открывали этот профиль.",
+  "Strong, and almost nobody picks them. Under {lowUsage} pick rate.":
+    "Сильные, но их почти никто не берёт. Частота выбора ниже {lowUsage}.",
+  "Listed here so you know why they are missing.":
+    "Перечислены здесь, чтобы было понятно, почему их нет.",
+  "Limited-time drops from past events. Most can no longer be won.":
+    "Призы ограниченного времени из прошлых событий. Большинство уже не получить.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Вместе {name} побеждает в {rate}, на {edge} лучше, чем обычно.",
+  "{v} to go for the leader. Reload after either of you plays.":
+    "До лидера осталось {v}. Обновите страницу, когда кто-то из вас сыграет.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Угадайте бойца дня. Каждая попытка показывает, насколько вы близки по пяти подсказкам: зелёный — точно, жёлтый — близко, стрелка указывает на ответ.",
+  "Out of 10, weighted toward Ranked: how you play, not how long you have played.":
+    "Из 10, с упором на ранговые бои: как вы играете, а не как долго.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Не удалось загрузить страницу. Похоже, API игры сейчас тормозит. Попробуйте ещё раз чуть позже.",
 };

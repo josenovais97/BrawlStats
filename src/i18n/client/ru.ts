@@ -520,4 +520,10 @@ export const CLIENT_RU: Record<string, string> = {
     "{rate} здесь против {other} на всех остальных картах. Самый большой разрыв между бойцом и одной картой.",
   "Meta score went from {from} to {to} in a single day.":
     "Мета-оценка за один день изменилась с {from} до {to}.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Вместе {name} побеждает в {rate}, на {edge} лучше, чем обычно.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Угадайте бойца дня. Каждая попытка показывает, насколько вы близки по пяти подсказкам: зелёный — точно, жёлтый — близко, стрелка указывает на ответ.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Не удалось загрузить страницу. Похоже, API игры сейчас тормозит. Попробуйте ещё раз чуть позже.",
 };

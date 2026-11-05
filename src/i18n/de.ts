@@ -15,8 +15,6 @@ export const DE: Record<string, string> = {
     "Hyperladungen unter Power 11, die günstigsten zuerst.",
   "Live":
     "Live",
-  "Out of 10, weighted toward Ranked — how you play, not how long you have played.":
-    "Von 10, mit Fokus auf Ranked: wie du spielst, nicht wie lange.",
   "Progression":
     "Fortschritt",
   "Roster vs the meta":
@@ -1545,8 +1543,6 @@ export const DE: Record<string, string> = {
     "{name} führt mit {gap}",
   "{v} to go":
     "noch {v}",
-  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
-    "Noch {v} für den Führenden. Neu laden, nachdem einer von euch gespielt hat: Das liest beide Profile live.",
   "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
     "Brawler in deinem Besitz, die das Update vom {date} verändert hat, und wie sie sich seitdem wirklich bewegt haben{v}.",
   "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
@@ -2065,8 +2061,6 @@ export const DE: Record<string, string> = {
     "Zurück zur Suche",
   "Something went wrong":
     "Etwas ist schiefgelaufen",
-  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
-    "Diese Seite konnte nicht geladen werden. Meistens ist die Spiel-API langsam oder gedrosselt, das legt sich von selbst: Einfach noch mal versuchen hilft oft.",
   "Try again":
     "Erneut versuchen",
   "Save":
@@ -2507,8 +2501,6 @@ export const DE: Record<string, string> = {
     "Jeder Brawler, den jedes Brawl-Stars-Update verändert hat, und was seine Siegquote in den zwei Wochen danach wirklich gemacht hat, gemessen an erfassten Ranked-Matches.",
   "It changed {length} brawlers.":
     "Es hat {length} Brawler verändert.",
-  "Listed rather than hidden — an absence with a reason is a finding too.":
-    "Aufgelistet statt versteckt: Ein Fehlen mit Grund ist auch ein Ergebnis.",
   "Measured, not announced":
     "Gemessen, nicht angekündigt",
   "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
@@ -2563,8 +2555,6 @@ export const DE: Record<string, string> = {
     "Alle Picks auf {mapName} ansehen",
   "Sleeper picks":
     "Geheimtipps",
-  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
-    "Stark, und fast niemand pickt sie: unter {lowUsage} Pickrate.",
   "The hidden meta":
     "Das versteckte Meta",
   "Trap picks":
@@ -2601,8 +2591,6 @@ export const DE: Record<string, string> = {
     "Jede Drop-Rate",
   "How to get them: the daily schedule":
     "So bekommst du sie: der tägliche Plan",
-  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
-    "Zeitlich begrenzte Drops aus vergangenen Events. Zum Nachschlagen aufbewahrt, die meisten gibt es nicht mehr.",
   "No table":
     "Keine Tabelle",
   "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
@@ -2981,8 +2969,6 @@ export const DE: Record<string, string> = {
     "Gelöst in {length}",
   "Guess a brawler":
     "Rate einen Brawler",
-  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
-    "Errate den heutigen Brawler. Jeder Tipp zeigt, wie nah du bei fünf Hinweisen bist: Grün ist exakt, Gelb ist einen Schritt entfernt, und ein Pfeil zeigt zur Lösung.",
   "Guesses to solve":
     "Tipps bis zur Lösung",
   "Next brawler in":
@@ -3115,8 +3101,6 @@ export const DE: Record<string, string> = {
     "Der Fortschritt wird jeden Tag zurückgesetzt, wie bei Tägliche Siege.",
   "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
     "Belohnungen sind Starr-Drops oder Chaos-Drops, bis zu 2 Starr-Drops am Tag.",
-  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
-    "Zusammen gewinnt {name} {rate}, {edge} besser als sonst. Keiner der beiden wird für den anderen gepickt.",
   "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
     "Das ist alles, was die API speichert. Alles mit „aktuell“ ist es wirklich. Einen Karriere-Match-Verlauf gibt es nicht.",
   "That is not a current brawler.":
@@ -4867,4 +4851,20 @@ export const DE: Record<string, string> = {
     "Diese Tabelle füllt sich in den nächsten ein, zwei Tagen.",
   "One point for each day this profile was viewed.":
     "Ein Punkt für jeden Tag, an dem dieses Profil aufgerufen wurde.",
+  "Strong, and almost nobody picks them. Under {lowUsage} pick rate.":
+    "Stark, und fast niemand pickt sie. Unter {lowUsage} Pickrate.",
+  "Listed here so you know why they are missing.":
+    "Hier aufgeführt, damit du weißt, warum sie fehlen.",
+  "Limited-time drops from past events. Most can no longer be won.":
+    "Zeitlich begrenzte Drops aus früheren Events. Die meisten gibt es nicht mehr.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Im Team gewinnt {name} {rate}, {edge} mehr als sonst.",
+  "{v} to go for the leader. Reload after either of you plays.":
+    "Noch {v} bis zur Spitze. Neu laden, sobald einer von euch gespielt hat.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Errate den Brawler des Tages. Jeder Versuch zeigt bei fünf Hinweisen, wie nah du bist: Grün ist exakt, Bernstein ist nah, und ein Pfeil zeigt zur Antwort.",
+  "Out of 10, weighted toward Ranked: how you play, not how long you have played.":
+    "Von 10, mit Fokus auf Ranked: wie du spielst, nicht wie lange du schon spielst.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Diese Seite konnte nicht geladen werden. Die Spiel-API ist gerade wohl langsam. Versuch es gleich noch einmal.",
 };

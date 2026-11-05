@@ -38,7 +38,7 @@ export default function Error({
   return (
     <FullPageMessage
       title={t('Something went wrong')}
-      body={t('This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.')}
+      body={t('This page could not be loaded. The game API is probably slow right now. Try again in a moment.')}
     >
       <button
         type="button"

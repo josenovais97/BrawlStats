@@ -14,8 +14,6 @@ export const TR: Record<string, string> = {
     "Güç 11'in altında kalmış hiperşarjlar, en ucuzdan başlayarak.",
   "Live":
     "Canlı",
-  "Out of 10, weighted toward Ranked — how you play, not how long you have played.":
-    "10 üzerinden, Aşamalı ağırlıklı: ne kadar süredir değil, nasıl oynadığın.",
   "Progression":
     "İlerleme",
   "Roster vs the meta":
@@ -1544,8 +1542,6 @@ export const TR: Record<string, string> = {
     "{name} {gap} farkla önde",
   "{v} to go":
     "{v} kaldı",
-  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
-    "Öndeki için {v} kaldı. İkinizden biri oynadıktan sonra yenile; bu iki profili de canlı okur.",
   "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
     "{date} güncellemesinin değiştirdiği, sahip olduğun savaşçılar ve o zamandan beri gerçekte nasıl hareket ettikleri{v}.",
   "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
@@ -2064,8 +2060,6 @@ export const TR: Record<string, string> = {
     "Aramaya dön",
   "Something went wrong":
     "Bir şeyler ters gitti",
-  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
-    "Bu sayfa yüklenemedi. Genelde oyun API'si yavaştır ya da istek sınırına takılmıştır, bu kendiliğinden geçer; tekrar denemek çoğu zaman işe yarar.",
   "Try again":
     "Tekrar dene",
   "Save":
@@ -2506,8 +2500,6 @@ export const TR: Record<string, string> = {
     "Her Brawl Stars güncellemesinin değiştirdiği her savaşçı ve kazanma oranının sonraki iki haftada gerçekte ne yaptığı, incelenen Aşamalı maçlarından ölçüldü.",
   "It changed {length} brawlers.":
     "{length} savaşçıyı değiştirdi.",
-  "Listed rather than hidden — an absence with a reason is a finding too.":
-    "Gizlenmek yerine listelendi: sebebi olan bir yokluk da bir bulgudur.",
   "Measured, not announced":
     "Duyurulmadı, ölçüldü",
   "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
@@ -2562,8 +2554,6 @@ export const TR: Record<string, string> = {
     "{mapName} haritasındaki tüm seçimleri gör",
   "Sleeper picks":
     "Uykudaki seçimler",
-  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
-    "Güçlüler ve neredeyse kimse onları seçmiyor: {lowUsage} altı seçilme oranı.",
   "The hidden meta":
     "Gizli meta",
   "Trap picks":
@@ -2600,8 +2590,6 @@ export const TR: Record<string, string> = {
     "Her hediye oranı",
   "How to get them: the daily schedule":
     "Nasıl alınır: günlük takvim",
-  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
-    "Geçmiş etkinliklerden sınırlı süreli hediyeler. Referans için tutuluyor; çoğu artık alınamıyor.",
   "No table":
     "Tablo yok",
   "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
@@ -2980,8 +2968,6 @@ export const TR: Record<string, string> = {
     "{length} tahminde bildin",
   "Guess a brawler":
     "Bir savaşçı tahmin et",
-  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
-    "Bugünün savaşçısını tahmin et. Her tahmin beş ipucunda ne kadar yakın olduğunu gösterir: yeşil tam doğru, sarı bir adım uzakta ve bir ok cevabı gösterir.",
   "Guesses to solve":
     "Çözmek için tahmin",
   "Next brawler in":
@@ -3114,8 +3100,6 @@ export const TR: Record<string, string> = {
     "İlerleme Günlük Galibiyetler gibi her gün sıfırlanır.",
   "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
     "Ödüller Starr Hediyeleri veya Kaos Hediyeleridir; günde en fazla 2 Starr Hediyesi.",
-  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
-    "Birlikte oynadığında {name} {rate} kazanıyor: diğer durumlardan {edge} daha iyi. Hiçbiri diğeri için seçilmiyor.",
   "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
     "API'nin tuttuğu her şey bu. “Son” diye etiketlenen her şey gerçekten son. Gösterilecek bir kariyer maç geçmişi yok.",
   "That is not a current brawler.":
@@ -4866,4 +4850,20 @@ export const TR: Record<string, string> = {
     "Bu tablo bir iki gün içinde dolar.",
   "One point for each day this profile was viewed.":
     "Bu profilin görüntülendiği her gün için bir nokta.",
+  "Strong, and almost nobody picks them. Under {lowUsage} pick rate.":
+    "Güçlüler ve neredeyse kimse seçmiyor. {lowUsage} altı seçilme.",
+  "Listed here so you know why they are missing.":
+    "Neden eksik olduklarını bil diye burada listeleniyorlar.",
+  "Limited-time drops from past events. Most can no longer be won.":
+    "Geçmiş etkinliklerden süreli hediyeler. Çoğu artık kazanılamıyor.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Birlikte {name} {rate} kazanıyor, diğer durumlardan {edge} daha iyi.",
+  "{v} to go for the leader. Reload after either of you plays.":
+    "Lidere {v} kaldı. Biriniz oynadıktan sonra sayfayı yenile.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Günün savaşçısını tahmin et. Her tahmin beş ipucunda ne kadar yakın olduğunu gösterir: yeşil tam, kehribar yakın, ok da cevabı gösterir.",
+  "Out of 10, weighted toward Ranked: how you play, not how long you have played.":
+    "10 üzerinden, Aşamalı ağırlıklı: ne kadar süredir değil, nasıl oynadığın.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Bu sayfa yüklenemedi. Oyun API'si şu an muhtemelen yavaş. Biraz sonra tekrar dene.",
 };

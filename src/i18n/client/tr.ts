@@ -520,4 +520,10 @@ export const CLIENT_TR: Record<string, string> = {
     "Burada {rate}, diğer tüm haritalarda {other}. Bir savaşçı ile bir harita arasındaki en büyük fark.",
   "Meta score went from {from} to {to} in a single day.":
     "Meta puanı tek günde {from} değerinden {to} değerine çıktı.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Birlikte {name} {rate} kazanıyor, diğer durumlardan {edge} daha iyi.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Günün savaşçısını tahmin et. Her tahmin beş ipucunda ne kadar yakın olduğunu gösterir: yeşil tam, kehribar yakın, ok da cevabı gösterir.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Bu sayfa yüklenemedi. Oyun API'si şu an muhtemelen yavaş. Biraz sonra tekrar dene.",
 };

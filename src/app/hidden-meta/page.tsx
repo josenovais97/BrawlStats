@@ -160,7 +160,7 @@ export default async function HiddenMetaPage() {
 
       <Section
         title={t('Sleeper picks')}
-        subtitle={t('Strong, and almost nobody picks them — under {lowUsage} pick rate.', { lowUsage: formatPercent(cuts.lowUsage) })}
+        subtitle={t('Strong, and almost nobody picks them. Under {lowUsage} pick rate.', { lowUsage: formatPercent(cuts.lowUsage) })}
         empty={sleepers.length === 0}
       >
         {sleepers.map((p) => (

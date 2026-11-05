@@ -560,7 +560,7 @@ export function ChallengeBoard({
           ))}
         </div>
       ) : (
-        <p className="card p-4 text-sm leading-relaxed text-muted">{t('Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.')}</p>
+        <p className="card p-4 text-sm leading-relaxed text-muted">{t('Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.')}</p>
       )}
 
       {solved ? (

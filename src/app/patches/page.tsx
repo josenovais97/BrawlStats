@@ -114,7 +114,7 @@ export default async function PatchesPage() {
         <section className="space-y-4">
           <SectionHeading
             title={t('Updates that cannot be measured')}
-            subtitle={t('Listed rather than hidden — an absence with a reason is a finding too.')}
+            subtitle={t('Listed here so you know why they are missing.')}
           />
           <ul className="card divide-y divide-border overflow-hidden">
             {unscored.map((impact) => (

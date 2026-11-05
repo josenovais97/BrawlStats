@@ -520,4 +520,10 @@ export const CLIENT_FR: Record<string, string> = {
     "{rate} ici contre {other} sur toutes les autres cartes. Le plus grand écart entre un brawler et une carte.",
   "Meta score went from {from} to {to} in a single day.":
     "Le score méta est passé de {from} à {to} en une seule journée.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Ensemble, {name} gagne {rate}, {edge} de mieux que d'habitude.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Devine le brawler du jour. Chaque essai montre à quel point tu es proche sur cinq indices : vert c'est exact, ambre c'est proche, et une flèche pointe vers la réponse.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "Cette page n'a pas pu se charger. L'API du jeu est sûrement lente en ce moment. Réessaie dans un instant.",
 };

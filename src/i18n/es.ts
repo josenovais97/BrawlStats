@@ -14,8 +14,6 @@ export const ES: Record<string, string> = {
     "Hipercargas atascadas por debajo de fuerza 11, primero las más baratas de terminar.",
   "Live":
     "En vivo",
-  "Out of 10, weighted toward Ranked — how you play, not how long you have played.":
-    "Sobre 10, con más peso en Competitivo: cómo juegas, no cuánto tiempo llevas jugando.",
   "Progression":
     "Progreso",
   "Roster vs the meta":
@@ -1544,8 +1542,6 @@ export const ES: Record<string, string> = {
     "{name} va ganando por {gap}",
   "{v} to go":
     "Faltan {v}",
-  "{v} to go for the leader. Reload after either of you plays — this reads both profiles live.":
-    "Le faltan {v} al que va primero. Recarga después de que juegue cualquiera de los dos: esto lee los dos perfiles en vivo.",
   "Brawlers you own that the {date} update changed, and how they have actually moved since{v}.":
     "Los brawlers que tienes y que cambió la actualización del {date}, y cómo se han movido desde entonces{v}.",
   "The {length} biggest moves of {changedTotal} changed brawlers you own. ":
@@ -2064,8 +2060,6 @@ export const ES: Record<string, string> = {
     "Volver a buscar",
   "Something went wrong":
     "Algo salió mal",
-  "This page could not be loaded. It is usually the game API being slow or rate-limited, which clears on its own — trying again often just works.":
-    "No se pudo cargar esta página. Normalmente es la API del juego, que va lenta o limita las peticiones, y se arregla sola: volver a intentarlo suele funcionar.",
   "Try again":
     "Intentar de nuevo",
   "Save":
@@ -2506,8 +2500,6 @@ export const ES: Record<string, string> = {
     "Cada brawler que cambió cada actualización de Brawl Stars y qué hizo de verdad su tasa de victorias en las dos semanas siguientes, medido con partidas de Competitivo.",
   "It changed {length} brawlers.":
     "Cambió {length} brawlers.",
-  "Listed rather than hidden — an absence with a reason is a finding too.":
-    "Aparecen en vez de esconderse: una ausencia con motivo también es un dato.",
   "Measured, not announced":
     "Medido, no anunciado",
   "No update inside the retained window could be read. This fills in as the release notes and the daily roll-ups line up.":
@@ -2562,8 +2554,6 @@ export const ES: Record<string, string> = {
     "Ver todos los brawlers en {mapName}",
   "Sleeper picks":
     "Elecciones dormidas",
-  "Strong, and almost nobody picks them — under {lowUsage} pick rate.":
-    "Fuertes, y casi nadie los elige: menos del {lowUsage} de uso.",
   "The hidden meta":
     "El meta oculto",
   "Trap picks":
@@ -2600,8 +2590,6 @@ export const ES: Record<string, string> = {
     "Todas las probabilidades",
   "How to get them: the daily schedule":
     "Cómo conseguirlos: el horario diario",
-  "Limited-time drops from past events. Kept for reference — most are no longer obtainable.":
-    "Premios por tiempo limitado de eventos pasados. Se mantienen como referencia: la mayoría ya no se pueden conseguir.",
   "No table":
     "Sin tabla",
   "Obtainable right now, from Daily Wins, Trophy Road, the Brawl Pass and the Shop.":
@@ -2980,8 +2968,6 @@ export const ES: Record<string, string> = {
     "Lo sacaste en {length}",
   "Guess a brawler":
     "Adivina un brawler",
-  "Guess today’s brawler. Each guess shows how close you are on five clues — green is exact, amber is one step away, and an arrow points toward the answer.":
-    "Adivina el brawler de hoy. Cada intento muestra lo cerca que estás en cinco pistas: verde es exacto, ámbar está a un paso, y una flecha apunta hacia la respuesta.",
   "Guesses to solve":
     "Intentos para resolver",
   "Next brawler in":
@@ -3114,8 +3100,6 @@ export const ES: Record<string, string> = {
     "El progreso se reinicia cada día, como las Victorias diarias.",
   "Rewards are Starr Drops or Chaos Drops, with up to 2 Starr Drops a day.":
     "Las recompensas son Premios Starr o Premios del caos, con hasta 2 Premios Starr al día.",
-  "Teamed up, {name} wins {rate} — {edge} better than it does otherwise. Neither is picked for the other.":
-    "Juntos, {name} gana el {rate}: {edge} más de lo normal. Ninguno de los dos se elige pensando en el otro.",
   "That is everything the API keeps. Anything labelled “recent” genuinely is. There is no career match history to show.":
     "Es todo lo que guarda la API. Lo que pone «reciente» de verdad lo es. No hay historial de partidas de toda la carrera que mostrar.",
   "That is not a current brawler.":
@@ -4866,4 +4850,20 @@ export const ES: Record<string, string> = {
     "Esta tabla se completa en uno o dos días.",
   "One point for each day this profile was viewed.":
     "Un punto por cada día en que se vio este perfil.",
+  "Strong, and almost nobody picks them. Under {lowUsage} pick rate.":
+    "Fuertes, y casi nadie los elige. Menos del {lowUsage} de uso.",
+  "Listed here so you know why they are missing.":
+    "Aparecen aquí para que sepas por qué faltan.",
+  "Limited-time drops from past events. Most can no longer be won.":
+    "Drops de tiempo limitado de eventos pasados. La mayoría ya no se pueden conseguir.",
+  "Teamed up, {name} wins {rate}, {edge} better than it does otherwise.":
+    "Juntos, {name} gana el {rate}, {edge} más que en otros casos.",
+  "{v} to go for the leader. Reload after either of you plays.":
+    "Le faltan {v} al líder. Recarga cuando cualquiera de los dos juegue.",
+  "Guess today’s brawler. Each guess shows how close you are on five clues: green is exact, amber is close, and an arrow points toward the answer.":
+    "Adivina el brawler de hoy. Cada intento muestra lo cerca que estás en cinco pistas: verde es exacto, ámbar es cerca y una flecha apunta hacia la respuesta.",
+  "Out of 10, weighted toward Ranked: how you play, not how long you have played.":
+    "Sobre 10, con más peso en Competitivo: cómo juegas, no cuánto tiempo llevas jugando.",
+  "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
+    "No se pudo cargar esta página. Seguramente la API del juego va lenta ahora mismo. Vuelve a intentarlo en un momento.",
 };

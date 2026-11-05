@@ -237,7 +237,7 @@ export default async function StarrDropsPage() {
         <section id="event" className="scroll-mt-24 space-y-3">
           <SectionHeading
             title={t('Event drops')}
-            subtitle={t('Limited-time drops from past events. Kept for reference — most are no longer obtainable.')}
+            subtitle={t('Limited-time drops from past events. Most can no longer be won.')}
             count={event.length}
           />
           {event.map((type) => (

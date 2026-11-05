@@ -64,7 +64,7 @@ export async function HomeAccountPreview() {
             <Module
               icon={<TrophyIcon className="size-5" />}
               title={t('Skill score')}
-              body={t('Out of 10, weighted toward Ranked — how you play, not how long you have played.')}
+              body={t('Out of 10, weighted toward Ranked: how you play, not how long you have played.')}
             />
             <Module
               icon={<Power11Icon className="size-5" />}

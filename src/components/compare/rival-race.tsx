@@ -47,7 +47,7 @@ export function RivalRace({ a, b }: { a: PlayerSide; b: PlayerSide }) {
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
           {gap === 0
             ? t('Both accounts are on exactly the same trophy count.')
-            : t('{v} to go for the leader. Reload after either of you plays — this reads both profiles live.', { v: formatNumber(target - leader.player.trophies) })}
+            : t('{v} to go for the leader. Reload after either of you plays.', { v: formatNumber(target - leader.player.trophies) })}
         </p>
       </div>
 
