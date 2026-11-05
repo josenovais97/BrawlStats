@@ -809,7 +809,7 @@ export const ES: Record<string, string> = {
   "maps in the pool":
     "mapas en el pool",
   "{length} trial brawler":
-    "{length} brawler de prueba",
+    "{length} {length|one:brawler de prueba|other:brawlers de prueba}",
   ", CC-BY-SA. The rankings above are our own.":
     ", CC-BY-SA. Las clasificaciones de arriba son nuestras.",
   "All {modeLabel} maps":
