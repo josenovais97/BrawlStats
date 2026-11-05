@@ -163,14 +163,14 @@ export default async function ModeMapsPage({ params }: PageProps) {
           </p>
           {popular && popular.brawlerId !== ranked[0].brawlerId ? (
             <p>
-              {t('The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.', {
+              {t('The most played of these is {name}, in {rate} of battles. Most played is not the same as strongest.', {
                 name: bn(popular),
                 rate: pct(popular.pickRate),
               })}
             </p>
           ) : null}
           <p>
-            {t('Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.')}
+            {t('Each map has its own page with picks for that map alone. Open one below.')}
           </p>
         </section>
       ) : null}

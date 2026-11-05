@@ -636,8 +636,6 @@ export const TR: Record<string, string> = {
     "İkinci savaşçı",
   " (as of {startedAt})":
     " ({startedAt} itibarıyla)",
-  " {v} of {length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.":
-    " {length} haritanın {v} tanesi henüz bir seçimi destekleyemiyor ve yine de birini söylemek hiç söylememekten kötü olurdu.",
   ", across every map in the pool. {brawlerName} leads with a":
     ", havuzdaki tüm haritalar genelinde. {brawlerName} önde:",
   "Best trio":
@@ -648,14 +646,10 @@ export const TR: Record<string, string> = {
     "Harita verileri toplanıyor",
   "Competitive only":
     "Sadece rekabetçi",
-  "Every map is scored against the same {baseline} sample-wide Ranked average, and each brawler’s handful of battles on one map is weighed against its overall Ranked form. A map needs real evidence to move a brawler off that.":
-    "Her harita aynı {baseline} örneklem geneli Aşamalı ortalamasına göre puanlanır ve her savaşçının bir haritadaki birkaç maçı genel Aşamalı formuyla tartılır. Bir haritanın bir savaşçıyı bundan uzaklaştırması için gerçek kanıt gerekir.",
   "How these picks are chosen":
     "Bu seçimler nasıl yapılıyor",
   "Jump to a mode":
     "Bir moda git",
-  "Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.":
-    "Harita adları yalnızca yeni incelenen maçlarda kaydedilir ve maç geçmişi yaklaşık 25 maç geriye gider; bu yüzden sistem havuzu taradıkça önümüzdeki bir iki günde dolar.",
   "No brawler is clearly above average here yet. The map has been sampled":
     "Burada henüz hiçbir savaşçı ortalamanın belirgin şekilde üstünde değil. Harita",
   "Ranked battles":
@@ -670,10 +664,6 @@ export const TR: Record<string, string> = {
     "Güncel Aşamalı rotasyonundaki her harita için en iyi savaşçılar, {v}. İncelenen rekabetçi maçlardan, birkaç saatte bir güncellenir.",
   "The strongest brawlers on each map in the current Ranked rotation, from sampled competitive battles only.":
     "Güncel Aşamalı rotasyonunda her haritadaki en güçlü savaşçılar, yalnızca incelenen rekabetçi maçlardan.",
-  "Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.":
-    "Kupa maçları tamamen hariç tutulur. Aşamalı eşleştirmesi birbirine yakın rakipleri karşılaştırır, bu yüzden geriye kalan savaşçıyı oynayanı değil savaşçının kendisini yansıtır; ayrıca Şubat 2025 yenilemesinden beri Aşamalı'da değiştirici yok, yani burada sayılan her maç sade haritada sade moddur.",
-  "Which maps appear is taken from the season’s published pool rather than from our own samples, so the board matches the rotation the day it changes. Map names are recorded on newly sampled battles only and a battle log reaches back about 25 matches, so a map that has just entered the pool carries no picks for a day or two after it does.":
-    "Hangi haritaların görüneceği kendi örneklerimizden değil, sezonun yayınlanan havuzundan alınır; böylece tablo rotasyon değiştiği gün ona uyar. Harita adları yalnızca yeni incelenen maçlarda kaydedilir ve maç geçmişi yaklaşık 25 maç geriye gider; bu yüzden havuza yeni giren bir harita sonraki bir iki gün seçim göstermez.",
   "brawlers. Not enough for any one of them to separate from the pack.":
     "savaşçıya dağıldı. Hiçbiri sürüden ayrılacak kadar değil.",
   "{brawlerName} are the best brawlers in Ranked right now":
@@ -748,8 +738,6 @@ export const TR: Record<string, string> = {
     "Sezon devam ediyor",
   "Season {number} ended on {endsOn}. A new season started that day, but its number and trial brawlers have not been published yet.":
     "{number}. sezon {endsOn} tarihinde bitti. O gün yeni bir sezon başladı ama numarası ve deneme savaşçıları henüz yayınlanmadı.",
-  "The pool is fixed for the season. Modifiers were removed from Ranked in the February 2025 rework, so every battle counted here is the plain mode on the plain map.":
-    "Havuz sezon boyunca sabittir. Değiştiriciler Şubat 2025 yenilemesinde Aşamalı'dan kaldırıldı, bu yüzden burada sayılan her maç sade haritada sade moddur.",
   "Trial brawlers: {v}":
     "Deneme savaşçıları: {v}",
   "Turnover date from the published schedule (third Thursday); the next line-up has not been announced.":
@@ -770,8 +758,6 @@ export const TR: Record<string, string> = {
     "Burada en iyi savaşçılar",
   "Best brawlers in {modeLabel}":
     "{modeLabel} modunda en iyi savaşçılar",
-  "Each row is measured against that brawler’s own record on this map, so a map that simply favours a brawler does not make all of its matchups look winning. Only matchups with at least 40 sampled battles appear.":
-    "Her satır o savaşçının bu haritadaki kendi kaydına göre ölçülür; böylece bir savaşçıyı basitçe kayıran bir harita, tüm eşleşmelerini kazanıyor gibi göstermez. Yalnızca en az 40 incelenmiş maçı olan eşleşmeler görünür.",
   "From {sampleSize} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.":
     "Bu haritada incelenen {sampleSize} Aşamalı maçından, her savaşçının genel Aşamalı formuyla tartılarak.",
   "How is {name} laid out?":
@@ -788,8 +774,6 @@ export const TR: Record<string, string> = {
     "Bu haritadaki eşleşmeler",
   "New":
     "Yeni",
-  "No sampled battles for {modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
-    "{modeLabel} için henüz incelenmiş maç yok. Sistem sıralama havuzunu sürekli tarar; önümüzdeki bir iki günde dolar.",
   "Other {modeLabel} maps":
     "Diğer {modeLabel} haritaları",
   "Retired":
@@ -806,12 +790,8 @@ export const TR: Record<string, string> = {
     "{name} haritasında en iyi savaşçılar hangileri?",
   "What game mode is {name}?":
     "{name} hangi oyun modunun haritası?",
-  "Where a brawler does measurably better or worse against a specific opponent here than it does on {name} generally.":
-    "Bir savaşçının burada belirli bir rakibe karşı, {name} haritasındaki genel performansından ölçülebilir şekilde daha iyi veya kötü olduğu yerler.",
   "map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
     "haritası. Küresel sıralama havuzundan incelenen maçlarla sıralanır ve haritanın kendi ortalamasına değil örneklem geneli ortalamaya göre puanlanır; yani bir seçim sadece lobiyi değil tüm alanı yenmelidir.",
-  "sample-wide Ranked average. A brawler with a handful of battles here is pulled toward its overall Ranked form, so the map has to produce real evidence before it moves anyone.":
-    "örneklem geneli Aşamalı ortalaması. Burada birkaç maçı olan bir savaşçı genel Aşamalı formuna yaklaştırılır; bu yüzden haritanın birini hareket ettirmesi için gerçek kanıt üretmesi gerekir.",
   "{brawlersSeen} brawlers seen":
     "{brawlersSeen} savaşçı görüldü",
   "{modeLabel} tier list":
@@ -822,20 +802,12 @@ export const TR: Record<string, string> = {
     "{name} en iyi savaşçılar",
   "{name} best brawlers, {modeLabel} ({v})":
     "{name} en iyi savaşçılar, {modeLabel} ({v})",
-  "{name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the closest answer.":
-    "{name} Brawl Stars'tan kaldırıldı ve artık oynanamıyor, bu yüzden üzerinde savaşçıları sıralayacak güncel maç yok. En yakın cevap, genel olarak {modeLabel} modundaki en güçlü savaşçılar.",
   "{name} has been retired from Brawl Stars, so these are {modeLabel} picks across every map in the mode instead.":
     "{name} Brawl Stars'tan kaldırıldı, bu yüzden bunlar moddaki tüm haritalar genelinde {modeLabel} seçimleri.",
-  "{name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in {modeLabel} overall are the best available answer until it fills in.":
-    "{name} harita bazında savaşçıları sıralayacak kadar henüz incelenmedi. Dolana kadar en iyi cevap, genel olarak {modeLabel} modundaki en güçlü savaşçılar.",
   "{name} has too few sampled battles to rank on its own yet, so these are {modeLabel} picks across every map in the mode.":
     "{name} tek başına sıralanacak kadar incelenmiş maça henüz sahip değil, bu yüzden bunlar moddaki tüm haritalar genelinde {modeLabel} seçimleri.",
-  "{name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the best available answer while it is out.":
-    "{name} güncel Aşamalı rotasyonunda değil, bu yüzden üzerinde savaşçıları sıralayacak yeni rekabetçi maç yok. Rotasyon dışındayken en iyi cevap, genel olarak {modeLabel} modundaki en güçlü savaşçılar.",
   "{name} is not in the current Ranked rotation, so these are {modeLabel} picks across every map in the mode instead.":
     "{name} güncel Aşamalı rotasyonunda değil, bu yüzden bunlar moddaki tüm haritalar genelinde {modeLabel} seçimleri.",
-  "{name} was a {modeLabel} map and has been retired from Brawl Stars, so it can no longer be played. Its layout and environment are below, along with the brawlers that perform best in {modeLabel2} as a whole — the closest thing to a ranking now that the map itself sees no battles.":
-    "{name} bir {modeLabel} haritasıydı ve Brawl Stars'tan kaldırıldı, artık oynanamıyor. Düzeni ve ortamı aşağıda; yanında genel olarak {modeLabel2} modunda en iyi performans gösteren savaşçılar var: haritanın kendisi artık maç görmediğine göre sıralamaya en yakın şey bu.",
   "{name} was a {modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in {modeLabel2} generally.":
     "{name}, Brawl Stars'ta bir {modeLabel} haritasıydı ve daha sonra kaldırıldı. Harita düzeni, ortamı ve genel olarak {modeLabel2} modunda en iyi performans gösteren savaşçılar.",
   "{v} has the strongest adjusted win rate on {name}, from {sampleSize} sampled Ranked battles on the map.":
@@ -1042,8 +1014,6 @@ export const TR: Record<string, string> = {
     "Brawl Stars haritaları ve en iyi savaşçılar ({v})",
   "Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, {v}.":
     "Her aktif Brawl Stars haritası, oyun moduna göre gruplu; her birindeki en güçlü savaşçılar incelenen maçlara göre sıralı, {v}.",
-  "Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can.":
-    "Oyunda hâlâ bulunan her harita, moda göre. Ada göre ara ya da haritalarını görmek için bir modu aç. Bu bir rotasyon değil: görsel kaynağı son oynanma tarihini yayınlamaz, bu yüzden hangilerinin bugün aktif olduğunu söyleyemez. Yukarıdaki iki bölüm söyleyebilir.",
   "Full catalogue":
     "Tam katalog",
   "In the event rotation this minute, straight from the game API.":
@@ -1072,10 +1042,6 @@ export const TR: Record<string, string> = {
     "zirve {peakElo}",
   "{length} of those, not a global board. Looking up a profile adds it to the pool.":
     "{length} oyuncu bunlar arasındandır; küresel bir tablo değildir. Bir profile bakmak onu havuza ekler.",
-  "Every rung of the Ranked ladder across {population} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.":
-    "İncelenen {population} oyuncu genelinde Aşamalı merdiveninin her basamağı. Oyun bir rütbe dağılımı yayınlamaz; bu, sistemin gördüklerinden ölçülür.",
-  "Sampled from players reachable through the global leaderboards and their recent opponents, so it leans slightly toward more active accounts than the game as a whole. Players who have not played Ranked this season are excluded rather than counted at the bottom.":
-    "Küresel sıralamalar ve son rakipleri üzerinden ulaşılabilen oyunculardan incelenir; bu yüzden oyunun geneline göre biraz daha aktif hesaplara kayar. Bu sezon Aşamalı oynamamış oyuncular en alta sayılmak yerine dışarıda bırakılır.",
   "Where everyone actually is":
     "Herkes gerçekte nerede",
   "{atOrAbove} here or above":
@@ -2954,8 +2920,6 @@ export const TR: Record<string, string> = {
     "{label} tarihinde incelenen Brawl Stars maçlarından {findings} bulgu; kimsenin kullanmadığı en güçlü seçim ve günün en tek taraflı eşleşmesi dahil.",
   "Brawl Stars tier list maker. Build and share your own":
     "Brawl Stars tier listesi yapıcı. Kendi listeni yap ve paylaş",
-  "Nothing here is saved on a server — the link":
-    "Burada hiçbir şey bir sunucuya kaydedilmez: bağlantı",
   "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.":
     "Yüz küsur savaşçının hepsini kendin sırala, sonra tahtayı tek bir bağlantıyla paylaş. Bir savaşçıya ve bir tier'a dokun ya da bilgisayardaysan sürükle.",
   "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.":
@@ -2970,8 +2934,6 @@ export const TR: Record<string, string> = {
     "zaten",
   "or the":
     "veya",
-  "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the":
-    "tier listesinin kendisidir, bu yüzden biri ona sahip olduğu sürece çalışır. Görüşten değil incelenen maçlardan oluşturulan ölçülmüş sürüm için bak:",
   "trophy list":
     "kupa listesi",
   "Cosmetics":
@@ -3516,8 +3478,6 @@ export const TR: Record<string, string> = {
     ", Aşamalı'da {tier} tier",
   ", as of {date}":
     ", {date} itibarıyla",
-  "The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
-    "Bir {mode} haritası olan {name} haritasında en iyi kayıtlara sahip savaşçılar. Küresel sıralama havuzundan incelenen maçlarla sıralanır ve haritanın kendi ortalamasına değil örneklem geneli ortalamaya göre puanlanır; yani bir seçim sadece lobiyi değil tüm alanı yenmelidir.",
   "Common":
     "Sıradan",
   "Rare":
@@ -4008,10 +3968,6 @@ export const TR: Record<string, string> = {
     "Şu anda {label} modunda en iyi kayıt {first} savaşçısında: {n} sonuçlanmış maçta {score} düzeltilmiş kazanma oranı; arkasında {second} ve {third}.",
   "Across every brawler, the mode has {total} sampled battles from the last 7 days on {maps} maps in rotation, and the average brawler wins {base} of them.":
     "Tüm savaşçılar genelinde modda, rotasyondaki {maps} haritada son 7 günden {total} incelenmiş maç var ve ortalama bir savaşçı bunların {base} kadarını kazanıyor.",
-  "The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.":
-    "Bunlardan en çok oynanan {name}; maçların {rate} kadarında. Popülerlik ve güç aynı şey değil: yukarıdaki sıra, her savaşçının ne sıklıkla seçildiğine ve onu seçen oyunculara göre düzelten düzeltilmiş kazanma oranına göredir.",
-  "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
-    "Her haritanın yalnızca o haritanın seçimleriyle kendi sayfası var ve bunlar modun genelinden çok farklı olabilir: aşağıdan birini aç.",
   "See how it ranks against other players":
     "Diğer oyunculara karşı nasıl sıralandığını gör",
   "Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors' YouTube or Google accounts. YouTube's use of data is covered by the":
@@ -4142,10 +4098,6 @@ export const TR: Record<string, string> = {
     "korumak için bugün bir bulmaca bitir",
   "How to make a Brawl Stars tier list":
     "Brawl Stars tier listesi nasıl yapılır",
-  "Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.":
-    "Oyundaki her savaşçı tahtanın altındaki havuzda başlar. Birine dokun, sonra ait olduğu tier'a dokun; bilgisayarda onun yerine sürükleyebilirsin. Yerleştirilmiş bir savaşçıyı havuza geri göndermek için ona dokun ya da sıfırdan başlamak yerine tek düğmeyle canlı Aşamalı listesinden başla ve metayla tartış.",
-  "When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.":
-    "Bitince bağlantıyı kopyala ya da tahtayı görsel olarak kaydet ve paylaş. Bağlantıyı açan herkes senin tahtanı tam olarak görür ve kendininkini yapmak için değiştirebilir; kulüp sohbetlerindeki tier listesi tartışmalarının çoğu böyle başlar.",
   "A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody's game.":
     "Faydalı bir ipucu: her seferinde tek bir mod veya tek bir rütbe için sırala. Elmas Kapmaca'da baskın olan bir savaşçı Nakavt'ta yük olabilir ve Ustalar'daki meta Altın'daki meta değildir; her şey için tek bir tahta kimsenin oyununu sıralamamış olur.",
   "How the draft helper works":
@@ -4870,4 +4822,52 @@ export const TR: Record<string, string> = {
     "Henüz maç yok. {name} istatistikleri çıkıştan bir iki gün sonra görünür.",
   "· Stats from the Brawl Stars Wiki. They may change before release.":
     "· İstatistikler Brawl Stars Wiki'den. Çıkıştan önce değişebilir.",
+  "{name} has been retired, so the best {modeLabel} brawlers overall are the closest answer.":
+    "{name} oyundan kaldırıldı, bu yüzden en yakın cevap genel olarak en iyi {modeLabel} savaşçıları.",
+  "{name} is not in the current Ranked rotation. Until it returns, the best {modeLabel} brawlers overall are the best answer.":
+    "{name} şu anki Aşamalı rotasyonunda değil. Geri dönene kadar en iyi cevap genel olarak en iyi {modeLabel} savaşçıları.",
+  "{name} needs more battles before it can be ranked. Until then, the best {modeLabel} brawlers overall are the best answer.":
+    "{name} sıralanabilmek için daha fazla maça ihtiyaç duyuyor. O zamana kadar en iyi cevap genel olarak en iyi {modeLabel} savaşçıları.",
+  "{name} was a {modeLabel} map and has been retired. Below: its layout and the best {modeLabel2} brawlers overall.":
+    "{name} bir {modeLabel} haritasıydı ve oyundan kaldırıldı. Aşağıda: düzeni ve genel olarak en iyi {modeLabel2} savaşçıları.",
+  "The brawlers with the best records on {name}, a {mode} map.":
+    "Bir {mode} haritası olan {name} üzerinde en iyi sonuçları alan savaşçılar.",
+  "No battles for {modeLabel} yet. This fills in within a day or two.":
+    "Henüz {modeLabel} maçı yok. Bir iki gün içinde dolar.",
+  "Ranked average.":
+    "örneklem geneli Aşamalı ortalaması.",
+  "Matchups where a brawler does better or worse on {name} than usual.":
+    "Bir savaşçının {name} üzerinde her zamankinden iyi ya da kötü oynadığı eşleşmeler.",
+  "Only matchups with at least 40 battles are shown.":
+    "Yalnızca en az 40 maçı olan eşleşmeler gösterilir.",
+  "The most played of these is {name}, in {rate} of battles. Most played is not the same as strongest.":
+    "Bunların en çok oynananı {name}, maçların {rate} kadarında. En çok oynanan, en güçlü demek değil.",
+  "Each map has its own page with picks for that map alone. Open one below.":
+    "Her haritanın yalnızca o haritaya özel seçimleri olan kendi sayfası var. Aşağıdan birini aç.",
+  "Every map still in the game, by mode. Search by name or open a mode. For what is live today, see the two sections above.":
+    "Oyunda hâlâ bulunan tüm haritalar, moda göre. İsimle ara ya da bir mod aç. Bugün aktif olanlar için yukarıdaki iki bölüme bak.",
+  "Map data fills in over the next day or two.":
+    "Harita verileri bir iki gün içinde dolar.",
+  "Ranked battles only, no trophy ladder games.":
+    "Yalnızca Aşamalı maçlar, kupa maçları yok.",
+  "Each map is compared with the {baseline} Ranked average.":
+    "Her harita {baseline} Aşamalı ortalamasıyla karşılaştırılır.",
+  " {v} of {length} maps do not have enough battles yet.":
+    " {length} haritadan {v} tanesinde henüz yeterli maç yok.",
+  "The map list follows the season’s official pool. A new map gets its picks a day or two after it enters.":
+    "Harita listesi sezonun resmi harita havuzunu izler. Yeni bir haritanın seçimleri girdikten bir iki gün sonra gelir.",
+  "Every brawler starts in the pool under the board. Tap one, then tap a tier, or drag it on a computer. Tap a placed brawler to send it back, or start from the live Ranked list with one button.":
+    "Tüm savaşçılar tablonun altındaki havuzda başlar. Birine dokun, sonra bir kademeye dokun ya da bilgisayarda sürükle. Yerleştirilmiş bir savaşçıya dokunup geri gönder ya da tek tuşla güncel Aşamalı listesinden başla.",
+  "When you are done, copy the link or save the board as an image. Anyone who opens the link sees your board and can make their own from it.":
+    "Bitirince bağlantıyı kopyala ya da tabloyu resim olarak kaydet. Bağlantıyı açan herkes tablonu görür ve ondan kendi tablosunu yapabilir.",
+  "Nothing here is saved on a server: the link":
+    "Burada hiçbir şey bir sunucuya kaydedilmez: bağlantı",
+  "the tier list. For the measured version, see the":
+    "tier listesinin kendisidir. Ölçülmüş sürüm için bak:",
+  "How {population} sampled players spread across the Ranked ranks.":
+    "İncelenen {population} oyuncunun Aşamalı rütbelerine dağılımı.",
+  "From the players we sample, so it leans toward active accounts. Players who have not played Ranked this season are not counted.":
+    "İncelediğimiz oyunculardan, bu yüzden aktif hesaplara biraz kayar. Bu sezon Aşamalı oynamamış oyuncular sayılmaz.",
+  "The map pool is fixed for the whole season.":
+    "Harita havuzu sezon boyunca sabittir.",
 };

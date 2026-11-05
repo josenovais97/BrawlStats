@@ -637,8 +637,6 @@ export const FR: Record<string, string> = {
     "Deuxième brawler",
   " (as of {startedAt})":
     " (au {startedAt})",
-  " {v} of {length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.":
-    " {v} des {length} cartes ne permettent pas encore de désigner un pick, et en nommer un quand même serait pire que de n'en nommer aucun.",
   ", across every map in the pool. {brawlerName} leads with a":
     ", sur toutes les cartes du pool. {brawlerName} mène avec un",
   "Best trio":
@@ -649,14 +647,10 @@ export const FR: Record<string, string> = {
     "Collecte des données des cartes",
   "Competitive only":
     "Compétitif uniquement",
-  "Every map is scored against the same {baseline} sample-wide Ranked average, and each brawler’s handful of battles on one map is weighed against its overall Ranked form. A map needs real evidence to move a brawler off that.":
-    "Chaque carte est comparée à la même moyenne Classé de {baseline} sur tout l'échantillon, et les quelques combats d'un brawler sur une carte sont pondérés par sa forme générale en Classé. Une carte doit fournir de vraies preuves pour l'en écarter.",
   "How these picks are chosen":
     "Comment ces picks sont choisis",
   "Jump to a mode":
     "Aller à un mode",
-  "Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.":
-    "Les noms des cartes ne sont enregistrés que dans les nouveaux combats collectés, et le journal de combat remonte à environ 25 matchs, donc ça se remplira dans un jour ou deux à mesure que la collecte parcourt le pool.",
   "No brawler is clearly above average here yet. The map has been sampled":
     "Aucun brawler n'est encore nettement au-dessus de la moyenne ici. La carte a été échantillonnée",
   "Ranked battles":
@@ -671,10 +665,6 @@ export const FR: Record<string, string> = {
     "Les meilleurs brawlers pour chaque carte de la rotation Classé actuelle, {v}. D'après les combats compétitifs collectés, mis à jour toutes les quelques heures.",
   "The strongest brawlers on each map in the current Ranked rotation, from sampled competitive battles only.":
     "Les brawlers les plus forts sur chaque carte de la rotation Classé actuelle, d'après les seuls combats compétitifs collectés.",
-  "Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.":
-    "Les combats de la Voie des trophées sont entièrement exclus. Le matchmaking Classé oppose des adversaires de même niveau, donc ce qui reste reflète le brawler plutôt que celui qui le jouait, et le Classé n'a plus de modificateurs depuis la refonte de février 2025 : chaque combat compté ici est le mode normal sur la carte normale.",
-  "Which maps appear is taken from the season’s published pool rather than from our own samples, so the board matches the rotation the day it changes. Map names are recorded on newly sampled battles only and a battle log reaches back about 25 matches, so a map that has just entered the pool carries no picks for a day or two after it does.":
-    "Les cartes affichées viennent du pool publié pour la saison et non de nos échantillons, donc le tableau correspond à la rotation le jour où elle change. Les noms des cartes ne sont enregistrés que dans les nouveaux combats collectés et un journal de combat remonte à environ 25 matchs, donc une carte qui vient d'entrer dans le pool n'a pas de picks pendant un jour ou deux.",
   "brawlers. Not enough for any one of them to separate from the pack.":
     "brawlers. Pas assez pour qu'un seul se détache du lot.",
   "{brawlerName} are the best brawlers in Ranked right now":
@@ -749,8 +739,6 @@ export const FR: Record<string, string> = {
     "Saison en cours",
   "Season {number} ended on {endsOn}. A new season started that day, but its number and trial brawlers have not been published yet.":
     "La saison {number} s'est terminée le {endsOn}. Une nouvelle saison a commencé ce jour-là, mais son numéro et ses brawlers à l'essai n'ont pas encore été publiés.",
-  "The pool is fixed for the season. Modifiers were removed from Ranked in the February 2025 rework, so every battle counted here is the plain mode on the plain map.":
-    "Le pool est fixe pour la saison. Les modificateurs ont été retirés du Classé lors de la refonte de février 2025, donc chaque combat compté ici est le mode normal sur la carte normale.",
   "Trial brawlers: {v}":
     "Brawlers à l'essai : {v}",
   "Turnover date from the published schedule (third Thursday); the next line-up has not been announced.":
@@ -771,8 +759,6 @@ export const FR: Record<string, string> = {
     "Meilleurs brawlers ici",
   "Best brawlers in {modeLabel}":
     "Meilleurs brawlers en {modeLabel}",
-  "Each row is measured against that brawler’s own record on this map, so a map that simply favours a brawler does not make all of its matchups look winning. Only matchups with at least 40 sampled battles appear.":
-    "Chaque ligne est mesurée par rapport au bilan de ce brawler sur cette carte, donc une carte qui avantage simplement un brawler ne rend pas tous ses matchups gagnants. Seuls les matchups avec au moins 40 combats collectés apparaissent.",
   "From {sampleSize} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.":
     "D'après {sampleSize} combats Classé collectés sur cette carte, pondérés par la forme générale en Classé de chaque brawler.",
   "How is {name} laid out?":
@@ -789,8 +775,6 @@ export const FR: Record<string, string> = {
     "Matchups sur cette carte",
   "New":
     "Nouvelle",
-  "No sampled battles for {modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
-    "Pas encore de combats collectés en {modeLabel}. La collecte parcourt le pool du classement en continu, donc ça se remplira dans un jour ou deux.",
   "Other {modeLabel} maps":
     "Autres cartes {modeLabel}",
   "Retired":
@@ -807,12 +791,8 @@ export const FR: Record<string, string> = {
     "Quels sont les meilleurs brawlers sur {name} ?",
   "What game mode is {name}?":
     "Quel est le mode de jeu de {name} ?",
-  "Where a brawler does measurably better or worse against a specific opponent here than it does on {name} generally.":
-    "Là où un brawler fait mesurablement mieux ou moins bien contre un adversaire précis ici que sur {name} en général.",
   "map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
     ". Classés d'après les combats collectés dans le pool du classement mondial, par rapport à la moyenne de tout l'échantillon plutôt qu'à celle de la carte. Un pick doit donc battre tout le monde, pas seulement le lobby.",
-  "sample-wide Ranked average. A brawler with a handful of battles here is pulled toward its overall Ranked form, so the map has to produce real evidence before it moves anyone.":
-    ". Un brawler qui n'a que quelques combats ici est rapproché de sa forme générale en Classé, donc la carte doit fournir de vraies preuves avant de faire bouger qui que ce soit.",
   "{brawlersSeen} brawlers seen":
     "{brawlersSeen} brawlers vus",
   "{modeLabel} tier list":
@@ -823,20 +803,12 @@ export const FR: Record<string, string> = {
     "Meilleurs brawlers sur {name}",
   "{name} best brawlers, {modeLabel} ({v})":
     "Meilleurs brawlers sur {name}, {modeLabel} ({v})",
-  "{name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the closest answer.":
-    "{name} a été retirée de Brawl Stars et ne peut plus être jouée, donc il n'y a pas de combats actuels pour y classer les brawlers. Les brawlers les plus forts en {modeLabel} en général sont la réponse la plus proche.",
   "{name} has been retired from Brawl Stars, so these are {modeLabel} picks across every map in the mode instead.":
     "{name} a été retirée de Brawl Stars, donc voici les picks {modeLabel} sur toutes les cartes du mode.",
-  "{name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in {modeLabel} overall are the best available answer until it fills in.":
-    "{name} n'a pas encore été assez échantillonnée pour classer les brawlers sur la carte elle-même. Les brawlers les plus forts en {modeLabel} en général sont la meilleure réponse disponible en attendant.",
   "{name} has too few sampled battles to rank on its own yet, so these are {modeLabel} picks across every map in the mode.":
     "{name} a encore trop peu de combats collectés pour un classement à part, donc voici les picks {modeLabel} sur toutes les cartes du mode.",
-  "{name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the best available answer while it is out.":
-    "{name} n'est pas dans la rotation Classé actuelle, donc il n'y a pas de combats compétitifs récents pour y classer les brawlers. Les brawlers les plus forts en {modeLabel} en général sont la meilleure réponse disponible tant qu'elle est absente.",
   "{name} is not in the current Ranked rotation, so these are {modeLabel} picks across every map in the mode instead.":
     "{name} n'est pas dans la rotation Classé actuelle, donc voici les picks {modeLabel} sur toutes les cartes du mode.",
-  "{name} was a {modeLabel} map and has been retired from Brawl Stars, so it can no longer be played. Its layout and environment are below, along with the brawlers that perform best in {modeLabel2} as a whole — the closest thing to a ranking now that the map itself sees no battles.":
-    "{name} était une carte {modeLabel} et a été retirée de Brawl Stars, elle ne peut donc plus être jouée. Son plan et son environnement sont ci-dessous, avec les brawlers qui performent le mieux en {modeLabel2} en général : ce qui se rapproche le plus d'un classement maintenant que la carte elle-même ne voit plus de combats.",
   "{name} was a {modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in {modeLabel2} generally.":
     "{name} était une carte {modeLabel} dans Brawl Stars, retirée depuis. Le plan de la carte, son environnement et les brawlers qui performent le mieux en {modeLabel2} en général.",
   "{v} has the strongest adjusted win rate on {name}, from {sampleSize} sampled Ranked battles on the map.":
@@ -1043,8 +1015,6 @@ export const FR: Record<string, string> = {
     "Cartes Brawl Stars et meilleurs brawlers ({v})",
   "Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, {v}.":
     "Toutes les cartes actives de Brawl Stars, par mode de jeu, avec les brawlers les plus forts sur chacune, classés d'après les combats collectés, {v}.",
-  "Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can.":
-    "Toutes les cartes encore dans le jeu, par mode. Cherche par nom, ou ouvre un mode pour voir ses cartes. Ce n'est pas une rotation : la source des images ne publie pas de date de dernière apparition, donc rien ici ne dit lesquelles sont en jeu aujourd'hui. Les deux sections ci-dessus, si.",
   "Full catalogue":
     "Catalogue complet",
   "In the event rotation this minute, straight from the game API.":
@@ -1073,10 +1043,6 @@ export const FR: Record<string, string> = {
     "record {peakElo}",
   "{length} of those, not a global board. Looking up a profile adds it to the pool.":
     "{length} parmi eux, ce n'est pas un classement mondial. Consulter un profil l'ajoute au pool.",
-  "Every rung of the Ranked ladder across {population} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.":
-    "Chaque échelon de l'échelle Classé sur {population} joueurs de l'échantillon. Le jeu ne publie pas la répartition des rangs ; elle est mesurée à partir de ce que voit la collecte.",
-  "Sampled from players reachable through the global leaderboards and their recent opponents, so it leans slightly toward more active accounts than the game as a whole. Players who have not played Ranked this season are excluded rather than counted at the bottom.":
-    "Échantillon tiré des joueurs accessibles via les classements mondiaux et leurs adversaires récents, donc il penche légèrement vers des comptes plus actifs que l'ensemble du jeu. Les joueurs qui n'ont pas joué en Classé cette saison sont exclus plutôt que comptés tout en bas.",
   "Where everyone actually is":
     "Où se trouve vraiment tout le monde",
   "{atOrAbove} here or above":
@@ -2955,8 +2921,6 @@ export const FR: Record<string, string> = {
     "{findings} découvertes tirées des combats Brawl Stars collectés le {label}, dont le pick le plus fort que personne n'a pris et le matchup le plus déséquilibré du jour.",
   "Brawl Stars tier list maker. Build and share your own":
     "Créateur de tier list Brawl Stars. Crée et partage la tienne",
-  "Nothing here is saved on a server — the link":
-    "Rien n'est enregistré sur un serveur : le lien",
   "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.":
     "Classe toi-même la centaine de brawlers, puis partage le tableau avec un seul lien. Touche un brawler puis un tier, ou fais glisser si tu es sur ordinateur.",
   "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.":
@@ -2971,8 +2935,6 @@ export const FR: Record<string, string> = {
     "est",
   "or the":
     "ou la",
-  "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the":
-    "la tier list, donc il marche tant que quelqu'un l'a. Pour la version mesurée, construite à partir de combats collectés plutôt que d'avis, vois la",
   "trophy list":
     "liste des trophées",
   "Cosmetics":
@@ -3517,8 +3479,6 @@ export const FR: Record<string, string> = {
     ", tier {tier} en Classé",
   ", as of {date}":
     ", au {date}",
-  "The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
-    "Les brawlers avec les meilleurs bilans sur {name}, une carte {mode}. Classés d'après les combats collectés dans le pool du classement mondial, par rapport à la moyenne de tout l'échantillon plutôt qu'à celle de la carte. Un pick doit donc battre tout le monde, pas seulement le lobby.",
   "Common":
     "Commun",
   "Rare":
@@ -4009,10 +3969,6 @@ export const FR: Record<string, string> = {
     "{first} a le meilleur bilan en {label} en ce moment, avec un taux de victoire ajusté de {score} sur {n} combats décisifs, devant {second} et {third}.",
   "Across every brawler, the mode has {total} sampled battles from the last 7 days on {maps} maps in rotation, and the average brawler wins {base} of them.":
     "Tous brawlers confondus, le mode compte {total} combats collectés sur les 7 derniers jours, sur {maps} cartes en rotation, et le brawler moyen en gagne {base}.",
-  "The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.":
-    "Le plus joué d'entre eux est {name}, dans {rate} des combats. Popularité et force ne sont pas la même chose : l'ordre ci-dessus suit le taux de victoire ajusté, qui corrige la fréquence de sélection de chaque brawler et les joueurs qui le prennent.",
-  "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
-    "Chaque carte a sa propre page avec les picks pour cette carte seulement, qui peuvent beaucoup différer du mode dans son ensemble : ouvre-en une ci-dessous.",
   "See how it ranks against other players":
     "Vois où il se situe par rapport aux autres joueurs",
   "Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors' YouTube or Google accounts. YouTube's use of data is covered by the":
@@ -4143,10 +4099,6 @@ export const FR: Record<string, string> = {
     "résous une énigme aujourd'hui pour la garder",
   "How to make a Brawl Stars tier list":
     "Comment faire une tier list Brawl Stars",
-  "Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.":
-    "Chaque brawler du jeu commence dans la réserve sous le tableau. Touche-en un, puis touche le tier où il va ; sur ordinateur, tu peux le faire glisser. Touche un brawler placé pour le renvoyer dans la réserve, ou pars de la liste Classé actuelle d'un seul bouton et conteste la méta au lieu de partir de zéro.",
-  "When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.":
-    "Quand c'est fini, copie le lien ou enregistre le tableau en image et publie-le. Celui qui ouvre le lien voit exactement ton tableau et peut le modifier pour faire le sien : c'est comme ça que commencent la plupart des débats de tier list dans un chat de club.",
   "A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody's game.":
     "Un conseil utile : classe pour un seul mode ou un seul rang à la fois. Un brawler qui domine en Razzia de gemmes peut être un boulet en Hors-jeu, et la méta en Maîtres n'est pas celle en Or, donc un seul tableau pour tout finit par ne correspondre au jeu de personne.",
   "How the draft helper works":
@@ -4871,4 +4823,52 @@ export const FR: Record<string, string> = {
     "Pas encore de combats. Les stats de {name} arrivent un ou deux jours après la sortie.",
   "· Stats from the Brawl Stars Wiki. They may change before release.":
     "· Stats issues du Brawl Stars Wiki. Elles peuvent changer avant la sortie.",
+  "{name} has been retired, so the best {modeLabel} brawlers overall are the closest answer.":
+    "{name} a été retirée du jeu, donc les meilleurs brawlers en {modeLabel} en général sont la réponse la plus proche.",
+  "{name} is not in the current Ranked rotation. Until it returns, the best {modeLabel} brawlers overall are the best answer.":
+    "{name} n'est pas dans la rotation Classé actuelle. En attendant son retour, les meilleurs brawlers en {modeLabel} en général sont la meilleure réponse.",
+  "{name} needs more battles before it can be ranked. Until then, the best {modeLabel} brawlers overall are the best answer.":
+    "{name} a besoin de plus de combats pour être classée. D'ici là, les meilleurs brawlers en {modeLabel} en général sont la meilleure réponse.",
+  "{name} was a {modeLabel} map and has been retired. Below: its layout and the best {modeLabel2} brawlers overall.":
+    "{name} était une carte {modeLabel} et a été retirée du jeu. Ci-dessous : sa disposition et les meilleurs brawlers en {modeLabel2} en général.",
+  "The brawlers with the best records on {name}, a {mode} map.":
+    "Les brawlers avec les meilleurs résultats sur {name}, une carte {mode}.",
+  "No battles for {modeLabel} yet. This fills in within a day or two.":
+    "Pas encore de combats en {modeLabel}. Ça se remplit en un ou deux jours.",
+  "Ranked average.":
+    ".",
+  "Matchups where a brawler does better or worse on {name} than usual.":
+    "Les affrontements où un brawler fait mieux ou moins bien que d'habitude sur {name}.",
+  "Only matchups with at least 40 battles are shown.":
+    "Seuls les affrontements avec au moins 40 combats sont affichés.",
+  "The most played of these is {name}, in {rate} of battles. Most played is not the same as strongest.":
+    "Le plus joué d'entre eux est {name}, dans {rate} des combats. Le plus joué n'est pas forcément le plus fort.",
+  "Each map has its own page with picks for that map alone. Open one below.":
+    "Chaque carte a sa propre page avec les choix pour cette carte seule. Ouvre-en une ci-dessous.",
+  "Every map still in the game, by mode. Search by name or open a mode. For what is live today, see the two sections above.":
+    "Toutes les cartes encore dans le jeu, par mode. Cherche par nom ou ouvre un mode. Pour ce qui tourne aujourd'hui, regarde les deux sections au-dessus.",
+  "Map data fills in over the next day or two.":
+    "Les données des cartes se remplissent d'ici un ou deux jours.",
+  "Ranked battles only, no trophy ladder games.":
+    "Uniquement des combats Classé, aucune partie à trophées.",
+  "Each map is compared with the {baseline} Ranked average.":
+    "Chaque carte est comparée à la moyenne Classé de {baseline}.",
+  " {v} of {length} maps do not have enough battles yet.":
+    " {v} cartes sur {length} n'ont pas encore assez de combats.",
+  "The map list follows the season’s official pool. A new map gets its picks a day or two after it enters.":
+    "La liste des cartes suit la sélection officielle de la saison. Une nouvelle carte a ses choix un ou deux jours après son arrivée.",
+  "Every brawler starts in the pool under the board. Tap one, then tap a tier, or drag it on a computer. Tap a placed brawler to send it back, or start from the live Ranked list with one button.":
+    "Tous les brawlers démarrent dans la réserve sous le tableau. Touche-en un, puis un rang, ou fais-le glisser sur ordinateur. Touche un brawler placé pour le renvoyer, ou pars de la liste Classé actuelle en un bouton.",
+  "When you are done, copy the link or save the board as an image. Anyone who opens the link sees your board and can make their own from it.":
+    "Quand tu as fini, copie le lien ou enregistre le tableau en image. Toute personne qui ouvre le lien voit ton tableau et peut en faire le sien.",
+  "Nothing here is saved on a server: the link":
+    "Rien n'est enregistré sur un serveur : le lien",
+  "the tier list. For the measured version, see the":
+    "la tier list. Pour la version mesurée, vois la",
+  "How {population} sampled players spread across the Ranked ranks.":
+    "La répartition de {population} joueurs étudiés entre les rangs Classé.",
+  "From the players we sample, so it leans toward active accounts. Players who have not played Ranked this season are not counted.":
+    "D'après les joueurs que nous étudions, donc un peu biaisé vers les comptes actifs. Ceux qui n'ont pas joué en Classé cette saison ne sont pas comptés.",
+  "The map pool is fixed for the whole season.":
+    "La sélection de cartes est fixe pour toute la saison.",
 };

@@ -212,7 +212,7 @@ export function SeasonPanel({
             {/* Both facts matter to how the rankings above should be read: the
                 pool is fixed for the season, and nothing is modifying the
                 games. */}
-            <p className="mt-4 text-xs leading-relaxed">{t('The pool is fixed for the season. Modifiers were removed from Ranked in the February 2025 rework, so every battle counted here is the plain mode on the plain map.')}{' '}
+            <p className="mt-4 text-xs leading-relaxed">{t('The map pool is fixed for the whole season.')}{' '}
               {state.source === 'wiki' ? (
                 <>{t('Season and pool data from the')}{' '}
                   <a

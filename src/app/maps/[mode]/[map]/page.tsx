@@ -201,7 +201,7 @@ export default async function MapPage({ params }: PageProps) {
     {
       question: t('What are the best brawlers on {name}?', { name: nm(entry.map.name) }),
       answer: entry.retired
-        ? t('{name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the closest answer.', { name: nm(entry.map.name), modeLabel: modeLabel })
+        ? t('{name} has been retired, so the best {modeLabel} brawlers overall are the closest answer.', { name: nm(entry.map.name), modeLabel: modeLabel })
         : hasMapPicks
         ? t(
             mapPicks!.picks.length === 1
@@ -210,8 +210,8 @@ export default async function MapPage({ params }: PageProps) {
             { v: listOf(mapPicks!.picks.slice(0, 3).map((p) => titleCase(p.brawlerName))), name: nm(entry.map.name), sampleSize: formatNumber(mapPicks!.sampleSize) },
           )
         : mapPicks && !inRotation
-          ? t('{name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the best available answer while it is out.', { name: nm(entry.map.name), modeLabel: modeLabel })
-          : t('{name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in {modeLabel} overall are the best available answer until it fills in.', { name: nm(entry.map.name), modeLabel: modeLabel }),
+          ? t('{name} is not in the current Ranked rotation. Until it returns, the best {modeLabel} brawlers overall are the best answer.', { name: nm(entry.map.name), modeLabel: modeLabel })
+          : t('{name} needs more battles before it can be ranked. Until then, the best {modeLabel} brawlers overall are the best answer.', { name: nm(entry.map.name), modeLabel: modeLabel }),
     },
     {
       question: t('What game mode is {name}?', { name: nm(entry.map.name) }),
@@ -306,9 +306,9 @@ export default async function MapPage({ params }: PageProps) {
           </h1>
           <p className="mt-3 max-w-3xl leading-relaxed text-muted">
             {entry.retired ? (
-              <>{t('{name} was a {modeLabel} map and has been retired from Brawl Stars, so it can no longer be played. Its layout and environment are below, along with the brawlers that perform best in {modeLabel2} as a whole — the closest thing to a ranking now that the map itself sees no battles.', { name: nm(entry.map.name), modeLabel: modeLabel, modeLabel2: modeLabel })}</>
+              <>{t('{name} was a {modeLabel} map and has been retired. Below: its layout and the best {modeLabel2} brawlers overall.', { name: nm(entry.map.name), modeLabel: modeLabel, modeLabel2: modeLabel })}</>
             ) : (
-              <>{t('The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.', { name: nm(entry.map.name), mode: modeLabel })}</>
+              <>{t('The brawlers with the best records on {name}, a {mode} map.', { name: nm(entry.map.name), mode: modeLabel })}</>
             )}
           </p>
           {entry.map.credit ? (
@@ -355,12 +355,12 @@ export default async function MapPage({ params }: PageProps) {
         <MapPickList
           picks={hasMapPicks ? mapPicks!.picks : (modePicks?.picks ?? [])}
           brawlerMeta={brawlerMeta}
-          emptyLabel={t('No sampled battles for {modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.', { modeLabel: modeLabel })}
+          emptyLabel={t('No battles for {modeLabel} yet. This fills in within a day or two.', { modeLabel: modeLabel })}
         />
         </div>
 
         {hasMapPicks ? (
-          <p className="mt-3 text-xs leading-relaxed text-muted">{t('Scores are shown against a')}{' '}{formatPercent(mapPicks!.baselineWinRate)}{' '}{t('sample-wide Ranked average. A brawler with a handful of battles here is pulled toward its overall Ranked form, so the map has to produce real evidence before it moves anyone.')}</p>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{t('Scores are shown against a')}{' '}{formatPercent(mapPicks!.baselineWinRate)}{' '}{t('Ranked average.')}</p>
         ) : null}
       </section>
 
@@ -378,10 +378,10 @@ export default async function MapPage({ params }: PageProps) {
         <section>
           <SectionHeading
             title={t('Matchups on this map')}
-            subtitle={t('Where a brawler does measurably better or worse against a specific opponent here than it does on {name} generally.', { name: nm(entry.map.name) })}
+            subtitle={t('Matchups where a brawler does better or worse on {name} than usual.', { name: nm(entry.map.name) })}
           />
           <MapMatchups matchups={matchups} brawlerMeta={brawlerMeta} />
-          <p className="mt-3 text-xs leading-relaxed text-muted">{t('Each row is measured against that brawler’s own record on this map, so a map that simply favours a brawler does not make all of its matchups look winning. Only matchups with at least 40 sampled battles appear.')}</p>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{t('Only matchups with at least 40 battles are shown.')}</p>
         </section>
       ) : null}
 

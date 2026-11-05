@@ -637,8 +637,6 @@ export const RU: Record<string, string> = {
     "Второй боец",
   " (as of {startedAt})":
     " (на {startedAt})",
-  " {v} of {length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.":
-    " Карт, где пока нельзя назвать пик: {v} из {length}, и назвать его всё равно было бы хуже, чем не называть.",
   ", across every map in the pool. {brawlerName} leads with a":
     " по всем картам пула. {brawlerName} лидирует:",
   "Best trio":
@@ -649,14 +647,10 @@ export const RU: Record<string, string> = {
     "Собираем данные по картам",
   "Competitive only":
     "Только ранговые",
-  "Every map is scored against the same {baseline} sample-wide Ranked average, and each brawler’s handful of battles on one map is weighed against its overall Ranked form. A map needs real evidence to move a brawler off that.":
-    "Каждая карта сравнивается с одним и тем же средним по всей выборке ранговых боёв ({baseline}), а немногие бои бойца на одной карте взвешиваются с его общей ранговой формой. Чтобы сдвинуть бойца с неё, карте нужны настоящие доказательства.",
   "How these picks are chosen":
     "Как выбираются эти пики",
   "Jump to a mode":
     "Перейти к режиму",
-  "Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.":
-    "Названия карт записываются только в новых собранных боях, а история боёв охватывает около 25 матчей, поэтому это заполнится за следующий день-два, по мере того как сборщик проходит пул.",
   "No brawler is clearly above average here yet. The map has been sampled":
     "Здесь пока ни один боец явно не выше среднего. Боёв на карте собрано:",
   "Ranked battles":
@@ -671,10 +665,6 @@ export const RU: Record<string, string> = {
     "Лучшие бойцы для каждой карты текущей ротации ранговых боёв, {v}. По собранным соревновательным боям, обновляется каждые несколько часов.",
   "The strongest brawlers on each map in the current Ranked rotation, from sampled competitive battles only.":
     "Сильнейшие бойцы на каждой карте текущей ротации ранговых боёв, только по собранным соревновательным боям.",
-  "Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.":
-    "Бои на пути к славе исключены полностью. Подбор в ранговых боях сводит соперников одного уровня, поэтому результат отражает бойца, а не того, кто за него играл, а модификаторов в ранговых боях нет с обновления февраля 2025 года: каждый учтённый здесь бой — обычный режим на обычной карте.",
-  "Which maps appear is taken from the season’s published pool rather than from our own samples, so the board matches the rotation the day it changes. Map names are recorded on newly sampled battles only and a battle log reaches back about 25 matches, so a map that has just entered the pool carries no picks for a day or two after it does.":
-    "Какие карты показаны, берётся из опубликованного пула сезона, а не из наших выборок, поэтому доска совпадает с ротацией в день её смены. Названия карт записываются только в новых собранных боях, а история боёв охватывает около 25 матчей, поэтому у карты, только что вошедшей в пул, первые день-два нет пиков.",
   "brawlers. Not enough for any one of them to separate from the pack.":
     "бойцами. Этого мало, чтобы кто-то выделился.",
   "{brawlerName} are the best brawlers in Ranked right now":
@@ -749,8 +739,6 @@ export const RU: Record<string, string> = {
     "Сезон идёт",
   "Season {number} ended on {endsOn}. A new season started that day, but its number and trial brawlers have not been published yet.":
     "Сезон {number} закончился {endsOn}. В тот же день начался новый, но его номер и пробные бойцы ещё не опубликованы.",
-  "The pool is fixed for the season. Modifiers were removed from Ranked in the February 2025 rework, so every battle counted here is the plain mode on the plain map.":
-    "Пул фиксирован на весь сезон. Модификаторы убрали из ранговых боёв в обновлении февраля 2025 года, поэтому каждый учтённый здесь бой — обычный режим на обычной карте.",
   "Trial brawlers: {v}":
     "Пробные бойцы: {v}",
   "Turnover date from the published schedule (third Thursday); the next line-up has not been announced.":
@@ -771,8 +759,6 @@ export const RU: Record<string, string> = {
     "Лучшие бойцы здесь",
   "Best brawlers in {modeLabel}":
     "Лучшие бойцы: {modeLabel}",
-  "Each row is measured against that brawler’s own record on this map, so a map that simply favours a brawler does not make all of its matchups look winning. Only matchups with at least 40 sampled battles appear.":
-    "Каждая строка сравнивается с собственным результатом этого бойца на этой карте, поэтому карта, которая просто подходит бойцу, не делает все его матчапы выигрышными. Показаны только матчапы, где собрано не меньше 40 боёв.",
   "From {sampleSize} sampled Ranked battles on this map, weighed against each brawler's overall Ranked form.":
     "По собранным ранговым боям на этой карте ({sampleSize}), с учётом общей ранговой формы каждого бойца.",
   "How is {name} laid out?":
@@ -789,8 +775,6 @@ export const RU: Record<string, string> = {
     "Матчапы на этой карте",
   "New":
     "Новая",
-  "No sampled battles for {modeLabel} yet. The sampler works through the leaderboard pool continuously, so this fills in over the next day or two.":
-    "По режиму «{modeLabel}» пока нет собранных боёв. Сборщик постоянно проходит пул рейтинга, так что это заполнится за следующий день-два.",
   "Other {modeLabel} maps":
     "Другие карты: {modeLabel}",
   "Retired":
@@ -807,12 +791,8 @@ export const RU: Record<string, string> = {
     "Кто лучшие бойцы на карте {name}?",
   "What game mode is {name}?":
     "Какой режим на карте {name}?",
-  "Where a brawler does measurably better or worse against a specific opponent here than it does on {name} generally.":
-    "Где боец заметно лучше или хуже играет против конкретного соперника здесь, чем на карте {name} в целом.",
   "map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
     ". Рейтинг по боям из пула мирового рейтинга, относительно среднего по всей выборке, а не по карте. Так что пик должен обойти всё поле, а не только лобби.",
-  "sample-wide Ranked average. A brawler with a handful of battles here is pulled toward its overall Ranked form, so the map has to produce real evidence before it moves anyone.":
-    "среднего по всей выборке ранговых боёв. Боец с немногими боями здесь подтягивается к своей общей ранговой форме, поэтому карта должна дать настоящие доказательства, прежде чем кого-то сдвинуть.",
   "{brawlersSeen} brawlers seen":
     "встречено бойцов: {brawlersSeen}",
   "{modeLabel} tier list":
@@ -823,20 +803,12 @@ export const RU: Record<string, string> = {
     "Лучшие бойцы на карте {name}",
   "{name} best brawlers, {modeLabel} ({v})":
     "Лучшие бойцы на карте {name}, {modeLabel} ({v})",
-  "{name} has been retired from Brawl Stars and can no longer be played, so there are no current battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the closest answer.":
-    "Карту {name} убрали из Brawl Stars, и на ней больше нельзя играть, поэтому текущих боёв для рейтинга нет. Ближайший ответ — сильнейшие бойцы режима «{modeLabel}» в целом.",
   "{name} has been retired from Brawl Stars, so these are {modeLabel} picks across every map in the mode instead.":
     "Карту {name} убрали из Brawl Stars, поэтому здесь пики режима «{modeLabel}» по всем его картам.",
-  "{name} has not been sampled enough yet to rank brawlers on the map itself. The strongest brawlers in {modeLabel} overall are the best available answer until it fills in.":
-    "По карте {name} пока собрано слишком мало боёв для отдельного рейтинга. Пока данные копятся, лучший ответ — сильнейшие бойцы режима «{modeLabel}» в целом.",
   "{name} has too few sampled battles to rank on its own yet, so these are {modeLabel} picks across every map in the mode.":
     "На карте {name} пока слишком мало собранных боёв для отдельного рейтинга, поэтому здесь пики режима «{modeLabel}» по всем его картам.",
-  "{name} is not in the current Ranked rotation, so there are no recent competitive battles to rank brawlers on it. The strongest brawlers in {modeLabel} overall are the best available answer while it is out.":
-    "Карты {name} нет в текущей ротации ранговых боёв, поэтому недавних соревновательных боёв для рейтинга нет. Пока её нет, лучший ответ — сильнейшие бойцы режима «{modeLabel}» в целом.",
   "{name} is not in the current Ranked rotation, so these are {modeLabel} picks across every map in the mode instead.":
     "Карты {name} нет в текущей ротации ранговых боёв, поэтому здесь пики режима «{modeLabel}» по всем его картам.",
-  "{name} was a {modeLabel} map and has been retired from Brawl Stars, so it can no longer be played. Its layout and environment are below, along with the brawlers that perform best in {modeLabel2} as a whole — the closest thing to a ranking now that the map itself sees no battles.":
-    "{name} — карта режима «{modeLabel}», которую убрали из Brawl Stars, и на ней больше нельзя играть. Ниже её схема и окружение, а также бойцы, которые лучше всего играют в режиме «{modeLabel2}» в целом: самое близкое к рейтингу, раз на самой карте больше нет боёв.",
   "{name} was a {modeLabel} map in Brawl Stars and has since been retired. The map layout, its environment, and the brawlers that perform best in {modeLabel2} generally.":
     "{name} — бывшая карта режима «{modeLabel}» в Brawl Stars, которую потом убрали. Схема карты, её окружение и бойцы, которые лучше всего играют в режиме «{modeLabel2}» в целом.",
   "{v} has the strongest adjusted win rate on {name}, from {sampleSize} sampled Ranked battles on the map.":
@@ -1043,8 +1015,6 @@ export const RU: Record<string, string> = {
     "Карты Brawl Stars и лучшие бойцы ({v})",
   "Every active Brawl Stars map, grouped by game mode, with the strongest brawlers on each one ranked from sampled battles, {v}.":
     "Все активные карты Brawl Stars по режимам, с сильнейшими бойцами на каждой по собранным боям, {v}.",
-  "Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can.":
-    "Все карты, которые ещё есть в игре, по режимам. Ищи по названию или открой режим, чтобы увидеть его карты. Это не ротация: источник изображений не публикует дату последнего появления, поэтому нельзя сказать, какие из них в игре сегодня. Это показывают два раздела выше.",
   "Full catalogue":
     "Полный каталог",
   "In the event rotation this minute, straight from the game API.":
@@ -1073,10 +1043,6 @@ export const RU: Record<string, string> = {
     "пик {peakElo}",
   "{length} of those, not a global board. Looking up a profile adds it to the pool.":
     "{length} из них, это не мировой рейтинг. Открытие профиля добавляет его в пул.",
-  "Every rung of the Ranked ladder across {population} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.":
-    "Все ступени ранговой лестницы среди игроков нашей выборки ({population}). Игра не публикует распределение рангов; это измерено по тому, что видит сборщик.",
-  "Sampled from players reachable through the global leaderboards and their recent opponents, so it leans slightly toward more active accounts than the game as a whole. Players who have not played Ranked this season are excluded rather than counted at the bottom.":
-    "Выборка — игроки, до которых можно дойти через мировые рейтинги и их недавних соперников, поэтому она немного смещена к более активным аккаунтам, чем игра в целом. Игроки, не игравшие в ранговые бои в этом сезоне, не учитываются, а не записываются в самый низ.",
   "Where everyone actually is":
     "Где на самом деле все",
   "{atOrAbove} here or above":
@@ -2955,8 +2921,6 @@ export const RU: Record<string, string> = {
     "{findings} {findings|one:находка|few:находки|many:находок|other:находки} по боям Brawl Stars, собранным за {label}, включая самый сильный пик, который никто не брал, и самый односторонний матчап дня.",
   "Brawl Stars tier list maker. Build and share your own":
     "Конструктор тир-листов Brawl Stars. Составь и поделись своим",
-  "Nothing here is saved on a server — the link":
-    "Здесь ничего не сохраняется на сервере: ссылка",
   "Rank all 100-odd brawlers yourself, then share the board with one link. Tap a brawler and tap a tier, or drag if you are on a desktop.":
     "Расставь сам всех сто с лишним бойцов, а потом поделись доской одной ссылкой. Нажми на бойца и на тир или перетаскивай, если ты за компьютером.",
   "Rank every Brawl Stars brawler yourself and share it with one link. Start from a blank board or from the live Ranked meta, then argue with it.":
@@ -2971,8 +2935,6 @@ export const RU: Record<string, string> = {
     "и есть",
   "or the":
     "или",
-  "the tier list, so it keeps working for as long as anyone has it. For the measured version, built from sampled battles rather than opinion, see the":
-    "тир-лист, поэтому она работает, пока она у кого-то есть. Измеренная версия, по собранным боям, а не по мнениям, —",
   "trophy list":
     "список по трофеям",
   "Cosmetics":
@@ -3517,8 +3479,6 @@ export const RU: Record<string, string> = {
     ", тир {tier} в ранговых боях",
   ", as of {date}":
     ", на {date}",
-  "The brawlers with the best records on {name}, a {mode} map. Ranked from battles sampled off the global leaderboard pool, scored against the sample-wide average rather than the map’s own. So a pick has to beat the field, not just the lobby.":
-    "Бойцы с лучшими результатами на карте {name}, карте режима «{mode}». По боям из пула мирового рейтинга, относительно среднего по всей выборке, а не по карте. Так что пик должен обойти всё поле, а не только лобби.",
   "Common":
     "Обычный",
   "Rare":
@@ -4009,10 +3969,6 @@ export const RU: Record<string, string> = {
     "Лучший результат в режиме «{label}» сейчас у {first}: скорректированный процент побед {score}, решённых боёв: {n}. Следом идут {second} и {third}.",
   "Across every brawler, the mode has {total} sampled battles from the last 7 days on {maps} maps in rotation, and the average brawler wins {base} of them.":
     "По всем бойцам у режима {total} собранных боёв за последние 7 дней на картах в ротации ({maps}), и средний боец побеждает в {base} из них.",
-  "The most played of these is {name}, in {rate} of battles. Popularity and strength are not the same thing: the order above is by adjusted win rate, which corrects for how often each brawler is picked and for the players picking it.":
-    "Чаще всех из них играют за {name}, в {rate} боёв. Популярность и сила — не одно и то же: порядок выше — по скорректированному проценту побед, который учитывает, как часто берут каждого бойца и кто его берёт.",
-  "Each map has its own page with the picks for that map alone, which can differ a lot from the mode as a whole: open one below.":
-    "У каждой карты своя страница с пиками только для неё, и они могут сильно отличаться от режима в целом: открой одну ниже.",
   "See how it ranks against other players":
     "Узнай, как он выглядит на фоне других игроков",
   "Our TikTok and YouTube channels are published from our own server: BrawlZone uses YouTube API Services only to upload its own videos to its own channel, and reads no data from visitors' YouTube or Google accounts. YouTube's use of data is covered by the":
@@ -4143,10 +4099,6 @@ export const RU: Record<string, string> = {
     "разгадай сегодня хотя бы одну загадку, чтобы сохранить её",
   "How to make a Brawl Stars tier list":
     "Как составить тир-лист Brawl Stars",
-  "Every brawler in the game starts in the pool under the board. Tap one, then tap the tier it belongs in; on a computer you can drag it instead. Tap a placed brawler to send it back to the pool, or start from the live Ranked list with one button and argue with the meta instead of starting from scratch.":
-    "Все бойцы игры начинают в пуле под доской. Нажми на бойца, затем на тир, в который он попадает; на компьютере можно перетаскивать. Нажми на поставленного бойца, чтобы вернуть его в пул, или начни одной кнопкой с текущего списка ранговых боёв и поспорь с метой, а не начинай с нуля.",
-  "When it is done, copy the link or save the board as an image and post it. Whoever opens the link sees your exact board and can change it to make their own, which is how most tier list arguments in a club chat start.":
-    "Когда закончишь, скопируй ссылку или сохрани доску картинкой и опубликуй. Кто откроет ссылку, увидит именно твою доску и сможет переделать её в свою — так начинается большинство споров о тир-листах в чате клуба.",
   "A useful tip: rank for one mode or one rank at a time. A brawler that dominates Gem Grab can be a liability in Knockout, and the meta in Masters is not the meta in Gold, so a single board for everything ends up ranking nobody's game.":
     "Полезный совет: расставляй для одного режима или одного ранга за раз. Боец, который доминирует в «Захвате кристаллов», может быть обузой в «Нокауте», а мета на Мастере — не мета на Золотом, поэтому одна доска на всё в итоге не описывает ничью игру.",
   "How the draft helper works":
@@ -4871,4 +4823,52 @@ export const RU: Record<string, string> = {
     "Боёв пока нет. Статистика по {name} появится через день-два после выхода.",
   "· Stats from the Brawl Stars Wiki. They may change before release.":
     "· Характеристики из Brawl Stars Wiki. До выхода они могут измениться.",
+  "{name} has been retired, so the best {modeLabel} brawlers overall are the closest answer.":
+    "{name} убрали из игры, поэтому ближайший ответ — лучшие бойцы режима {modeLabel} в целом.",
+  "{name} is not in the current Ranked rotation. Until it returns, the best {modeLabel} brawlers overall are the best answer.":
+    "{name} нет в текущей ротации ранговых боёв. Пока карта не вернётся, лучший ответ — лучшие бойцы режима {modeLabel} в целом.",
+  "{name} needs more battles before it can be ranked. Until then, the best {modeLabel} brawlers overall are the best answer.":
+    "Для {name} пока мало боёв, чтобы составить рейтинг. До тех пор лучший ответ — лучшие бойцы режима {modeLabel} в целом.",
+  "{name} was a {modeLabel} map and has been retired. Below: its layout and the best {modeLabel2} brawlers overall.":
+    "{name} — карта режима {modeLabel}, которую убрали из игры. Ниже: её устройство и лучшие бойцы режима {modeLabel2} в целом.",
+  "The brawlers with the best records on {name}, a {mode} map.":
+    "Бойцы с лучшими результатами на карте {name} ({mode}).",
+  "No battles for {modeLabel} yet. This fills in within a day or two.":
+    "Боёв в режиме {modeLabel} пока нет. Данные появятся через день-два.",
+  "Ranked average.":
+    "среднего по ранговым боям.",
+  "Matchups where a brawler does better or worse on {name} than usual.":
+    "Противостояния, в которых боец на карте {name} играет лучше или хуже обычного.",
+  "Only matchups with at least 40 battles are shown.":
+    "Показаны только противостояния, где было не меньше 40 боёв.",
+  "The most played of these is {name}, in {rate} of battles. Most played is not the same as strongest.":
+    "Чаще всех из них играют за {name}: {rate} боёв. Самый популярный — не обязательно самый сильный.",
+  "Each map has its own page with picks for that map alone. Open one below.":
+    "У каждой карты своя страница с пиками только для неё. Откройте любую ниже.",
+  "Every map still in the game, by mode. Search by name or open a mode. For what is live today, see the two sections above.":
+    "Все карты, которые ещё есть в игре, по режимам. Ищите по названию или откройте режим. Что доступно сегодня — в двух разделах выше.",
+  "Map data fills in over the next day or two.":
+    "Данные по картам появятся в ближайшие день-два.",
+  "Ranked battles only, no trophy ladder games.":
+    "Только ранговые бои, без боёв за трофеи.",
+  "Each map is compared with the {baseline} Ranked average.":
+    "Каждая карта сравнивается со средним по ранговым боям: {baseline}.",
+  " {v} of {length} maps do not have enough battles yet.":
+    " На {v} из {length} карт пока мало боёв.",
+  "The map list follows the season’s official pool. A new map gets its picks a day or two after it enters.":
+    "Список карт следует официальному пулу сезона. Пики для новой карты появляются через день-два после её добавления.",
+  "Every brawler starts in the pool under the board. Tap one, then tap a tier, or drag it on a computer. Tap a placed brawler to send it back, or start from the live Ranked list with one button.":
+    "Все бойцы начинают в пуле под доской. Нажмите на бойца, затем на тир, или перетащите его на компьютере. Нажмите на поставленного бойца, чтобы вернуть его, или начните с текущего рангового списка одной кнопкой.",
+  "When you are done, copy the link or save the board as an image. Anyone who opens the link sees your board and can make their own from it.":
+    "Когда закончите, скопируйте ссылку или сохраните доску как картинку. Любой, кто откроет ссылку, увидит вашу доску и сможет сделать свою на её основе.",
+  "Nothing here is saved on a server: the link":
+    "Здесь ничего не сохраняется на сервере: ссылка",
+  "the tier list. For the measured version, see the":
+    "тир-лист. Измеренная версия —",
+  "How {population} sampled players spread across the Ranked ranks.":
+    "Как {population} игроков из выборки распределены по рангам.",
+  "From the players we sample, so it leans toward active accounts. Players who have not played Ranked this season are not counted.":
+    "По игрокам из нашей выборки, поэтому с перекосом к активным аккаунтам. Кто не играл в ранговых боях в этом сезоне, не учитывается.",
+  "The map pool is fixed for the whole season.":
+    "Пул карт не меняется весь сезон.",
 };

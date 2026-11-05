@@ -128,7 +128,7 @@ export default async function MapsIndexPage() {
         <div>
           <SectionHeading
             title={t('Full catalogue')}
-            subtitle={t('Every map still in the game, by mode. Search by name, or open a mode to see its maps. Not a rotation: the artwork source publishes no last-played date, so this cannot say which of these are live today. The two sections above can.')}
+            subtitle={t('Every map still in the game, by mode. Search by name or open a mode. For what is live today, see the two sections above.')}
           />
           {/*
             Only the fields a card draws cross to the client. The full BAMap

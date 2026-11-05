@@ -337,7 +337,7 @@ export default async function RankedPage() {
       {shown.length === 0 ? (
         <div className="card card-glow mx-auto max-w-xl p-8 text-center">
           <h2 className="display text-game-stroke text-xl">{t('Collecting map data')}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{t('Map names are recorded on newly sampled battles only, and the battle log reaches back about 25 matches, so this fills in over the next day or two as the sampler works through the pool.')}</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">{t('Map data fills in over the next day or two.')}</p>
           <Link
             href={lp('/tier-list/ranked')}
             className="mt-6 inline-flex rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-brand/50 hover:text-foreground"
@@ -397,14 +397,14 @@ export default async function RankedPage() {
       <YoutubeCard />
 
       <Disclosure summary={t('How these picks are chosen')}>
-        <p>{t('Trophy-ladder games are excluded entirely. Ranked matchmaking pairs comparable opponents, so what is left reflects the brawler rather than who was holding it, and Ranked has carried no modifiers since the February 2025 rework — every battle counted here is the plain mode on the plain map.')}</p>
+        <p>{t('Ranked battles only, no trophy ladder games.')}</p>
         {onBoard.length > 0 ? (
-          <p className="mt-2">{t('Every map is scored against the same {baseline} sample-wide Ranked average, and each brawler’s handful of battles on one map is weighed against its overall Ranked form. A map needs real evidence to move a brawler off that.', { baseline: formatPercent(baseline) })}{rated < onBoard.length
-              ? t(' {v} of {length} maps cannot support a pick yet, and naming one anyway would be worse than naming none.', { v: onBoard.length - rated, length: onBoard.length })
+          <p className="mt-2">{t('Each map is compared with the {baseline} Ranked average.', { baseline: formatPercent(baseline) })}{rated < onBoard.length
+              ? t(' {v} of {length} maps do not have enough battles yet.', { v: onBoard.length - rated, length: onBoard.length })
               : ''}
           </p>
         ) : null}
-        <p className="mt-2">{t('Which maps appear is taken from the season’s published pool rather than from our own samples, so the board matches the rotation the day it changes. Map names are recorded on newly sampled battles only and a battle log reaches back about 25 matches, so a map that has just entered the pool carries no picks for a day or two after it does.')}</p>
+        <p className="mt-2">{t('The map list follows the season’s official pool. A new map gets its picks a day or two after it enters.')}</p>
       </Disclosure>
     </div>
   );

@@ -31,7 +31,7 @@ export function RankedLadder({ ladder }: { ladder: RankedRung[] }) {
     <section className="space-y-4">
       <SectionHeading
         title={t('Where everyone actually is')}
-        subtitle={t('Every rung of the Ranked ladder across {population} sampled players. The game publishes no rank distribution; this is measured from what the sampler sees.', { population: formatNumber(population) })}
+        subtitle={t('How {population} sampled players spread across the Ranked ranks.', { population: formatNumber(population) })}
       />
 
       <ol className="card divide-y divide-border overflow-hidden">
@@ -67,7 +67,7 @@ export function RankedLadder({ ladder }: { ladder: RankedRung[] }) {
         ))}
       </ol>
 
-      <p className="px-1 text-xs leading-relaxed text-muted">{t('Sampled from players reachable through the global leaderboards and their recent opponents, so it leans slightly toward more active accounts than the game as a whole. Players who have not played Ranked this season are excluded rather than counted at the bottom.')}</p>
+      <p className="px-1 text-xs leading-relaxed text-muted">{t('From the players we sample, so it leans toward active accounts. Players who have not played Ranked this season are not counted.')}</p>
     </section>
   );
 }
