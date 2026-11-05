@@ -3181,50 +3181,58 @@ async function compute_getTeamComps(limit = 12): Promise<ModeComps[]> {
       `,
     ]);
 
-    const baselines = new Map(
-      totals.map((row) => [
-        row.mode,
-        {
-          baseline: Number(row.decided) > 0 ? Number(row.wins) / Number(row.decided) : 0.5,
-          sampleSize: Number(row.decided),
-        },
-      ]),
-    );
-
-    const byMode = new Map<string, TeamComp[]>();
-    for (const row of trios) {
-      const base = baselines.get(row.mode);
-      if (!base) continue;
-
-      const battles = Number(row.decided);
-      const winRate = Number(row.wins) / battles;
-      const list = byMode.get(row.mode) ?? [];
-      list.push({
-        brawlerIds: row.trio,
-        battles,
-        players: Number(row.players),
-        winRate,
-        normalizedWinRate: normalizeWinRate(winRate, base.baseline, battles),
-        edge: winRate - base.baseline,
-      });
-      byMode.set(row.mode, list);
-    }
-
-    return [...byMode.entries()]
-      .map(([mode, comps]) => ({
-        mode,
-        baseline: baselines.get(mode)?.baseline ?? 0.5,
-        sampleSize: baselines.get(mode)?.sampleSize ?? 0,
-        comps: comps
-          .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))
-          .slice(0, limit),
-      }))
-      // Most-played mode first: it is the one most readers came for.
-      .sort((a, b) => b.sampleSize - a.sampleSize);
+    return assembleTeamComps(totals, trios, limit);
   } catch (error) {
     swallow('compute_getTeamComps', error);
     return [];
   }
+}
+
+type TeamCompTotalRow = { mode: string; wins: bigint; decided: bigint };
+type TeamCompTrioRow = { mode: string; trio: number[]; wins: bigint; decided: bigint; players: bigint };
+
+/** Team-comp rows into per-mode lists: shared by the live query and the precompute's single pass. */
+function assembleTeamComps(totals: TeamCompTotalRow[], trios: TeamCompTrioRow[], limit: number): ModeComps[] {
+  const baselines = new Map(
+    totals.map((row) => [
+      row.mode,
+      {
+        baseline: Number(row.decided) > 0 ? Number(row.wins) / Number(row.decided) : 0.5,
+        sampleSize: Number(row.decided),
+      },
+    ]),
+  );
+
+  const byMode = new Map<string, TeamComp[]>();
+  for (const row of trios) {
+    const base = baselines.get(row.mode);
+    if (!base) continue;
+
+    const battles = Number(row.decided);
+    const winRate = Number(row.wins) / battles;
+    const list = byMode.get(row.mode) ?? [];
+    list.push({
+      brawlerIds: row.trio,
+      battles,
+      players: Number(row.players),
+      winRate,
+      normalizedWinRate: normalizeWinRate(winRate, base.baseline, battles),
+      edge: winRate - base.baseline,
+    });
+    byMode.set(row.mode, list);
+  }
+
+  return [...byMode.entries()]
+    .map(([mode, comps]) => ({
+      mode,
+      baseline: baselines.get(mode)?.baseline ?? 0.5,
+      sampleSize: baselines.get(mode)?.sampleSize ?? 0,
+      comps: comps
+        .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))
+        .slice(0, limit),
+    }))
+    // Most-played mode first: it is the one most readers came for.
+    .sort((a, b) => b.sampleSize - a.sampleSize);
 }
 
 export interface MapMatchup {
@@ -5277,62 +5285,205 @@ async function compute_getRankedComps(limit = 8, bracket?: number): Promise<Rank
       `,
     ]);
 
-    const keyOf = (r: { mode: string; map_name: string | null; per_mode: number }) =>
-      Number(r.per_mode) === 1 ? `${r.mode}|` : `${r.mode}|${r.map_name ?? ''}`;
-
-    const baselines = new Map<string, { baseline: number; decided: number }>();
-    for (const t of totals) {
-      const decided = Number(t.decided);
-      baselines.set(keyOf(t), {
-        baseline: decided > 0 ? Number(t.wins) / decided : 0.5,
-        decided,
-      });
-    }
-
-    const lists = new Map<string, TeamComp[]>();
-    for (const r of trios) {
-      const key = keyOf(r);
-      const base = baselines.get(key)?.baseline ?? 0.5;
-      const battles = Number(r.decided);
-      const winRate = Number(r.wins) / battles;
-      const list = lists.get(key) ?? [];
-      list.push({
-        brawlerIds: r.trio,
-        battles,
-        players: Number(r.players),
-        winRate,
-        normalizedWinRate: normalizeWinRate(winRate, base, battles),
-        edge: winRate - base,
-      });
-      lists.set(key, list);
-    }
-
-    const best = (comps: TeamComp[]) =>
-      comps
-        .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))
-        .slice(0, limit);
-
-    const maps: RankedComps['maps'] = [];
-    const modes: ModeComps[] = [];
-    for (const [key, comps] of lists) {
-      const [mode, mapName] = key.split('|');
-      const base = baselines.get(key);
-      if (mapName) {
-        if (comps.length < MIN_RANKED_MAP_COMPS) continue;
-        maps.push({ mode, mapName, baseline: base?.baseline ?? 0.5, comps: best(comps) });
-      } else {
-        modes.push({
-          mode,
-          baseline: base?.baseline ?? 0.5,
-          sampleSize: base?.decided ?? 0,
-          comps: best(comps),
-        });
-      }
-    }
-    return { maps, modes };
+    return assembleRankedComps(totals, trios, limit);
   } catch (error) {
     swallow('compute_getRankedComps', error);
     return { maps: [], modes: [] };
+  }
+}
+
+type RankedCompTotalRow = { mode: string; map_name: string | null; per_mode: number; wins: bigint; decided: bigint };
+type RankedCompTrioRow = RankedCompTotalRow & { trio: number[]; players: bigint };
+
+/** Ranked-comp rows into per-map and per-mode lists: shared by the live query and the precompute's single pass. */
+function assembleRankedComps(totals: RankedCompTotalRow[], trios: RankedCompTrioRow[], limit: number): RankedComps {
+  const keyOf = (r: { mode: string; map_name: string | null; per_mode: number }) =>
+    Number(r.per_mode) === 1 ? `${r.mode}|` : `${r.mode}|${r.map_name ?? ''}`;
+
+  const baselines = new Map<string, { baseline: number; decided: number }>();
+  for (const t of totals) {
+    // A per-map row for battles with no recorded map would key as the mode
+    // total ("mode|") and could overwrite it.
+    if (Number(t.per_mode) === 0 && t.map_name === null) continue;
+    const decided = Number(t.decided);
+    baselines.set(keyOf(t), {
+      baseline: decided > 0 ? Number(t.wins) / decided : 0.5,
+      decided,
+    });
+  }
+
+  const lists = new Map<string, TeamComp[]>();
+  for (const r of trios) {
+    const key = keyOf(r);
+    const base = baselines.get(key)?.baseline ?? 0.5;
+    const battles = Number(r.decided);
+    const winRate = Number(r.wins) / battles;
+    const list = lists.get(key) ?? [];
+    list.push({
+      brawlerIds: r.trio,
+      battles,
+      players: Number(r.players),
+      winRate,
+      normalizedWinRate: normalizeWinRate(winRate, base, battles),
+      edge: winRate - base,
+    });
+    lists.set(key, list);
+  }
+
+  const best = (comps: TeamComp[]) =>
+    comps
+      .sort((a, b) => (b.normalizedWinRate ?? 0) - (a.normalizedWinRate ?? 0))
+      .slice(0, limit);
+
+  const maps: RankedComps['maps'] = [];
+  const modes: ModeComps[] = [];
+  for (const [key, comps] of lists) {
+    const [mode, mapName] = key.split('|');
+    const base = baselines.get(key);
+    if (mapName) {
+      if (comps.length < MIN_RANKED_MAP_COMPS) continue;
+      maps.push({ mode, mapName, baseline: base?.baseline ?? 0.5, comps: best(comps) });
+    } else {
+      modes.push({
+        mode,
+        baseline: base?.baseline ?? 0.5,
+        sampleSize: base?.decided ?? 0,
+        comps: best(comps),
+      });
+    }
+  }
+  return { maps, modes };
+}
+
+/**
+ * Every comps list the precompute stores, from one pass over the raw rows
+ * (2026-11-05).
+ *
+ * The precompute used to run `compute_getTeamComps` once and
+ * `compute_getRankedComps` six times (all ranks at 8 and 30, then each of the
+ * four brackets), and each of those ran two queries that rebuilt the same
+ * trio observations: fourteen scans of fourteen days of team rows, ~760 s of
+ * a two-core box every two hours. Here they are built once, with the lobby's
+ * bracket attached, and every list is a grouping of that one set: 175 s on
+ * the same data.
+ *
+ * The bracket comes from a join to battle_samples. Postgres estimates the
+ * team rows at ~0.5% of their real number (it cannot see through
+ * `array_length(...) = 2`), so it chose a nested loop: one index probe per
+ * row, 4.4 million per bracket. Nested loops are off for this transaction so
+ * it hashes the join instead, and parallel workers too: a parallel hash this
+ * size needs more shared memory than the container's 64 MB /dev/shm.
+ *
+ * Same rows and floors as the two functions above. One difference, by
+ * construction: a battle seen by several pool players is kept once across
+ * all battle types, preferring a copy that carries a lobby rank, rather than
+ * once per query.
+ */
+interface CompsBundle {
+  team: (limit: number) => ModeComps[];
+  ranked: (bracket: number, limit: number) => RankedComps;
+}
+
+type CompsBundleRow = {
+  kind: 'ranked-total' | 'ranked-trio' | 'team-total' | 'team-trio';
+  bracket: number | null;
+  all_ranks: number;
+  mode: string;
+  map_name: string | null;
+  per_mode: number;
+  trio: number[] | null;
+  wins: bigint;
+  decided: bigint;
+  players: bigint | null;
+};
+
+const EMPTY_COMPS_BUNDLE: CompsBundle = { team: () => [], ranked: () => ({ maps: [], modes: [] }) };
+
+export async function computeCompsBundle(): Promise<CompsBundle> {
+  const prisma = getPrisma();
+  if (!prisma) return EMPTY_COMPS_BUNDLE;
+
+  try {
+    const since = windowStartUtc(COMP_WINDOW_DAYS);
+    const [, , rows] = await prisma.$transaction([
+      prisma.$executeRaw`SET LOCAL enable_nestloop = off`,
+      prisma.$executeRaw`SET LOCAL max_parallel_workers_per_gather = 0`,
+      prisma.$queryRaw<CompsBundleRow[]>`
+        WITH obs AS MATERIALIZED (
+          SELECT DISTINCT ON (o.battle_time, o.map_name, o.trio) o.*
+          FROM (
+            SELECT t.battle_time, t.battle_type, t.mode, COALESCE(t.map_name, '') AS map_name, t.player_tag AS observer,
+                   (SELECT array_agg(x ORDER BY x) FROM unnest(t.ally_brawler_ids || t.brawler_id) x) AS trio,
+                   t.result = 'victory' AS won, s.lobby_rank
+            FROM battle_team_samples t
+            LEFT JOIN battle_samples s ON s.battle_key = t.battle_key
+            WHERE t.battle_time >= ${since}
+              AND t.battle_type = ANY(${[...TEAM_BATTLE_TYPES]}::text[])
+              AND array_length(t.ally_brawler_ids, 1) = 2
+              AND t.result IN ('victory', 'defeat')
+            UNION ALL
+            SELECT t.battle_time, t.battle_type, t.mode, COALESCE(t.map_name, ''), t.player_tag,
+                   (SELECT array_agg(x ORDER BY x) FROM unnest(t.enemy_brawler_ids) x),
+                   t.result = 'defeat', s.lobby_rank
+            FROM battle_team_samples t
+            LEFT JOIN battle_samples s ON s.battle_key = t.battle_key
+            WHERE t.battle_time >= ${since}
+              AND t.battle_type = 'soloRanked'
+              AND array_length(t.enemy_brawler_ids, 1) = 3
+              AND t.result IN ('victory', 'defeat')
+          ) o
+          ORDER BY o.battle_time, o.map_name, o.trio, o.lobby_rank NULLS LAST
+        ),
+        ranked AS (
+          SELECT mode, NULLIF(map_name, '') AS map_name, observer, trio, won,
+                 CASE WHEN lobby_rank IS NULL THEN NULL WHEN lobby_rank <= 12 THEN 1 WHEN lobby_rank <= 15 THEN 2
+                      WHEN lobby_rank <= 18 THEN 3 ELSE 4 END AS bracket
+          FROM obs
+          WHERE battle_type = ANY(${[...COMPETITIVE_BATTLE_TYPES]}::text[])
+        )
+        SELECT 'ranked-total' AS kind, bracket, GROUPING(bracket) AS all_ranks, mode, map_name,
+               GROUPING(map_name) AS per_mode, NULL::int[] AS trio,
+               COUNT(*) FILTER (WHERE won) AS wins, COUNT(*) AS decided, NULL::bigint AS players
+        FROM ranked
+        GROUP BY GROUPING SETS ((bracket, mode, map_name), (bracket, mode), (mode, map_name), (mode))
+        UNION ALL
+        SELECT 'ranked-trio', bracket, GROUPING(bracket), mode, map_name, GROUPING(map_name), trio,
+               COUNT(*) FILTER (WHERE won), COUNT(*), COUNT(DISTINCT observer)
+        FROM ranked
+        GROUP BY GROUPING SETS ((bracket, mode, map_name, trio), (bracket, mode, trio), (mode, map_name, trio), (mode, trio))
+        HAVING (GROUPING(map_name) = 0 AND map_name IS NOT NULL
+                AND COUNT(*) >= ${MIN_RANKED_MAP_COMP_BATTLES}
+                AND COUNT(DISTINCT observer) >= ${MIN_RANKED_MAP_COMP_PLAYERS})
+            OR (GROUPING(map_name) = 1
+                AND COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
+                AND COUNT(DISTINCT observer) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP})
+        UNION ALL
+        SELECT 'team-total', NULL, 1, mode, NULL, 1, NULL, COUNT(*) FILTER (WHERE won), COUNT(*), NULL
+        FROM obs
+        GROUP BY mode
+        UNION ALL
+        SELECT 'team-trio', NULL, 1, mode, NULL, 1, trio, COUNT(*) FILTER (WHERE won), COUNT(*), COUNT(DISTINCT observer)
+        FROM obs
+        GROUP BY mode, trio
+        HAVING COUNT(*) >= ${MIN_SAMPLE_FOR_COMP}
+           AND COUNT(DISTINCT observer) >= ${MIN_DISTINCT_PLAYERS_FOR_COMP}
+      `,
+    ]);
+
+    // 0 is every rank; a bracket-level row without a lobby rank belongs to none.
+    const bracketOf = (r: CompsBundleRow) => (Number(r.all_ranks) === 1 ? 0 : r.bracket);
+    const of = (kind: CompsBundleRow['kind'], bracket = 0) =>
+      rows.filter((r) => r.kind === kind && bracketOf(r) === bracket);
+    const trioRows = (rs: CompsBundleRow[]) =>
+      rs.map((r) => ({ ...r, trio: r.trio ?? [], players: r.players ?? BigInt(0) }));
+
+    return {
+      team: (limit) => assembleTeamComps(of('team-total'), trioRows(of('team-trio')), limit),
+      ranked: (bracket, limit) => assembleRankedComps(of('ranked-total', bracket), trioRows(of('ranked-trio', bracket)), limit),
+    };
+  } catch (error) {
+    swallow('computeCompsBundle', error);
+    return EMPTY_COMPS_BUNDLE;
   }
 }
 
@@ -5389,13 +5540,16 @@ const BRACKET_IDS = [1, 2, 3, 4];
  */
 export async function precomputeJobs(): Promise<{ key: string; run: () => Promise<unknown>; keepEmpty?: boolean }[]> {
   const modes = (await computeFilterableModes(30, 150, 'ranked').catch(() => [])).map((m) => m.mode);
+  // Every comps list from one pass, built by whichever job asks first.
+  let bundle: Promise<CompsBundle> | undefined;
+  const comps = () => (bundle ??= computeCompsBundle());
   return [
-    { key: 'team-comps:12', run: () => compute_getTeamComps(12) },
+    { key: 'team-comps:12', run: async () => (await comps()).team(12) },
     { key: 'indexable-pairs', run: computeStickyIndexablePairs },
     { key: 'account-value-dist', run: computeAccountValueDistribution },
     { key: 'brawler-buffies:7', run: () => computeAllBrawlerBuffies(7) },
-    ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: () => compute_getRankedComps(limit) })),
-    ...BRACKET_IDS.map((b) => ({ key: rankedCompsKey(8, b), run: () => compute_getRankedComps(8, b) })),
+    ...[8, 30].map((limit) => ({ key: rankedCompsKey(limit), run: async () => (await comps()).ranked(0, limit) })),
+    ...BRACKET_IDS.map((b) => ({ key: rankedCompsKey(8, b), run: async () => (await comps()).ranked(b, 8) })),
     // A rank too thin to list is stored as 'none', so the page shows every
     // rank straight away instead of recomputing the same null each time.
     ...BRACKET_IDS.flatMap((b) =>

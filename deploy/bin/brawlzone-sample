@@ -74,10 +74,16 @@ notes = result.get("notes") or ""
 size = re.search(r"db (\d+)MB \((\d+)% of data budget", notes)
 if size:
     print(f"Database {size.group(1)} MB, {size.group(2)}% of its budget")
-failed = re.search(r"(\d+) of (\d+) player samples failed", notes)
+# Since 2026-11-05 the players the time limit cut off are reported apart from
+# real failures; before, both read "player lookups failed (deleted or renamed
+# accounts -- normal)", and ~80% of a run looked like dead accounts.
+reach = re.search(r"(\d+) of (\d+) pool players not reached", notes)
+if reach:
+    done = int(reach.group(2)) - int(reach.group(1))
+    print(f"Reached {done:,} of {int(reach.group(2)):,} pool players before the time limit")
+failed = re.search(r"(\d+) of (\d+) player samples failed \(([^)]*)\)", notes)
 if failed:
-    print(f"{failed.group(1)} of {failed.group(2)} player lookups failed "
-          f"(deleted or renamed accounts -- normal)")
+    print(f"{failed.group(1)} of {failed.group(2)} lookups failed ({failed.group(3)})")
 # Says why the pool shrank. Without this the count just drops by twelve one
 # run and nothing on the page accounts for it.
 dropped = re.search(r"(\d+) deleted account\(s\) removed from the pool", notes)

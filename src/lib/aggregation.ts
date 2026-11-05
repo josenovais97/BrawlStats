@@ -2275,6 +2275,9 @@ const RANKING_MIN_BUDGET_MS = 15_000;
  */
 const RECOMPUTE_RESERVE_MS = 55_000 * (DEFAULT_BATCH_SIZE / 1000);
 
+/** Thrown for pool players the run's time limit cut off before they were asked for. */
+class NotReached extends Error {}
+
 export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<AggregationResult> {
   const deadline = Date.now() + RUN_BUDGET_MS;
   const prisma = getPrisma();
@@ -2348,9 +2351,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
     let circuitOpen = false;
 
     const results = await mapLimit(targets, CONCURRENCY, async (t) => {
-      if (Date.now() > samplingDeadline) {
-        throw new BrawlApiError('timeout', 'Run budget exhausted before sampling this player');
-      }
+      if (Date.now() > samplingDeadline) throw new NotReached();
       if (circuitOpen) {
         throw new BrawlApiError('upstreamDown', 'Upstream is down; run abandoned early');
       }
@@ -2376,13 +2377,20 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       (sum, r) => sum + (r as PromiseFulfilledResult<{ battles: number }>).value.battles,
       0,
     );
-    const failures = results.length - fulfilled.length;
+    // Players the time limit cut off were never asked for: not failures.
+    // Counted as 'timeout' failures until 2026-11-05, which made every run
+    // read "7,910 of 10,000 player lookups failed (deleted or renamed
+    // accounts)" when ~8,000 of them were simply the part of the pool the run
+    // did not reach.
+    const notReached = results.filter((r) => r.status === 'rejected' && r.reason instanceof NotReached).length;
+    const failures = results.length - fulfilled.length - notReached;
 
     // Group failure reasons so a bad run says *why*, not just how many.
     const reasons = new Map<string, number>();
     const gone: string[] = [];
     for (const [index, result] of results.entries()) {
       if (result.status === 'rejected') {
+        if (result.reason instanceof NotReached) continue;
         const code = toApiError(result.reason).code;
         reasons.set(code, (reasons.get(code) ?? 0) + 1);
         // `withRetry` already treats these as permanent: a 404 for a deleted
@@ -2471,9 +2479,12 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
       ? `upstream down — run abandoned after ${UPSTREAM_FAILURE_STREAK} consecutive failures`
       : null;
 
+    const reachNote =
+      notReached > 0 ? `${notReached} of ${results.length} pool players not reached before the time limit` : null;
+
     const failureNote =
       failures > 0
-        ? `${failures} of ${results.length} player samples failed (${[...reasons]
+        ? `${failures} of ${results.length - notReached} player samples failed (${[...reasons]
             .map(([code, count]) => `${code}: ${count}`)
             .join(', ')})` +
           (evictedMissing > 0 ? ` · ${evictedMissing} deleted account(s) removed from the pool` : '') +
@@ -2481,7 +2492,7 @@ export async function runAggregation(batchSize = DEFAULT_BATCH_SIZE): Promise<Ag
         : null;
 
     const notes =
-      [rollUpNote, failureNote, storage].filter(Boolean).join(' · ') || undefined;
+      [rollUpNote, failureNote, reachNote, storage].filter(Boolean).join(' · ') || undefined;
 
     await prisma.aggregationRun.update({
       where: { id: run.id },
