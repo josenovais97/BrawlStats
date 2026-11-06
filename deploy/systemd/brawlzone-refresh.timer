@@ -4,9 +4,11 @@ Description=Monthly rebuild so page titles carry the current month
 [Timer]
 # Page titles read "(August 2026)" and are baked into prerendered HTML at build
 # time, so without this a month with no pushes would serve last month's date on
-# every indexed page. 00:20 on the 1st, after midnight UTC has actually turned
-# the month over.
-OnCalendar=*-*-01 00:20:00
+# every indexed page. 01:05 on the 1st (00:20 until 2026-11-06): after
+# midnight UTC has turned the month over, and in an odd hour, clear of the
+# sampler (:17 of even hours) and the precompute (:47), which the deploy
+# waits for. At 00:20 it always queued behind the 00:17 sampler.
+OnCalendar=*-*-01 01:05:00
 # Fires on the next boot if the box was down on the 1st, which matters here:
 # a missed run means a whole month of stale dates.
 Persistent=true

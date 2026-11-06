@@ -10,4 +10,7 @@ Type=oneshot
 User=ubuntu
 WorkingDirectory=/home/ubuntu/brawlstats
 ExecStart=/usr/local/bin/brawlzone-run deploy /home/ubuntu/auto-deploy.sh --force
-TimeoutStartSec=900
+# The same script as brawlzone-deploy.service, so the same 45 minutes. At 900
+# it was killed on 2026-11-01: it waits for a running sampler, builds (5-12
+# min) and warms (up to 15), which does not fit in a quarter of an hour.
+TimeoutStartSec=2700
