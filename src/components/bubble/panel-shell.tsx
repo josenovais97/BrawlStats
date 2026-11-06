@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
+import { PanelCounters } from '@/components/bubble/panel-counters';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
@@ -30,7 +31,7 @@ import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 
 const STORED_TAB = 'brawlzone.bubble.tab';
 
-type Tab = 'meta' | 'comps' | 'draft';
+type Tab = 'meta' | 'comps' | 'draft' | 'counters';
 
 export function PanelShell({
   modes,
@@ -56,7 +57,7 @@ export function PanelShell({
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORED_TAB);
-      if (saved === 'meta' || saved === 'draft' || saved === 'comps') {
+      if (saved === 'meta' || saved === 'draft' || saved === 'comps' || saved === 'counters') {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setTab(saved);
       }
@@ -152,6 +153,7 @@ export function PanelShell({
             ['meta', t('tab.meta')],
             ['comps', t('tab.comps')],
             ['draft', t('tab.draft')],
+            ['counters', t('tab.counters')],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -160,7 +162,7 @@ export function PanelShell({
             role="tab"
             aria-selected={tab === key}
             onClick={() => choose(key)}
-            className={`flex-1 px-2 py-1.5 text-[13px] leading-tight ${
+            className={`min-w-0 flex-1 truncate px-1.5 py-1.5 text-[12px] leading-tight ${
               tab === key
                 ? 'bz-chip-on'
                 : 'bz-chip'
@@ -181,6 +183,7 @@ export function PanelShell({
                 ['meta', t('tab.meta'), t('chooser.meta')],
                 ['comps', t('tab.comps'), t('chooser.comps')],
                 ['draft', t('tab.draft'), t('chooser.draft')],
+                ['counters', t('tab.counters'), t('chooser.counters')],
               ] as const
             ).map(([key, label, hint]) => (
               <li key={key}>
@@ -207,6 +210,8 @@ export function PanelShell({
         <PanelTiers modes={modes} windowDays={windowDays} />
       ) : tab === 'comps' ? (
         <PanelComps modes={modes} comps={comps} />
+      ) : tab === 'counters' ? (
+        <PanelCounters modes={modes} roster={roster} />
       ) : (
         <PanelDraft modes={modes} roster={roster} />
       )}

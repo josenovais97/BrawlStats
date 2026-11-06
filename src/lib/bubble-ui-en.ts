@@ -27,6 +27,8 @@ export const UI_EN = {
   'chooser.meta': 'Who is strong in Ranked right now, by mode and map',
   'chooser.comps': 'The best three to take together on your map',
   'chooser.draft': 'Enter bans and picks, get the counter',
+  'tab.counters': "Counters",
+  'chooser.counters': "Tap any brawler to see what beats it",
 
   'mode.all': 'All',
   'chips.change': 'Change',
@@ -95,6 +97,8 @@ export const UI_EN = {
   'draft.safeTitle': "Safe first picks",
   'draft.safeHint': "Strong here, hard to counter",
   'draft.worst': "worst",
+  'counters.allRanks': "All ranks: too few battles at your rank yet",
+  'counters.search': "Find a brawler…",
   'draft.withEdge': 'with {n}',
   'draft.beats': "Who beats {name}",
   'draft.noCounters': "Not enough battles against {name} yet.",

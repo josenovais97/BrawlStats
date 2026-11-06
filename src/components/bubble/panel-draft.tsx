@@ -7,6 +7,7 @@ import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useEffect, useMemo, useState } from 'react';
 
 import { recall, remember, STORED_MAP, STORED_MODE, useModeLabel } from '@/components/bubble/panel-chips';
+import { sitePrefix } from '@/components/bubble/panel-counters';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { UiKey } from '@/lib/bubble-ui-en';
 import { panelTrack } from '@/lib/panel-telemetry';
@@ -921,7 +922,7 @@ function EnemyCounters({
   const [counters, setCounters] = useState<Counter[] | null>(null);
   // The site's full counters page, in the panel's language where the site has
   // it. The app opens any link outside the panel in the phone's browser.
-  const sitePrefix = lang.startsWith('es') ? '/es' : lang.startsWith('pt') ? '/pt' : '';
+  const prefix = sitePrefix(lang);
   const english = byId.get(id)?.brawlerName;
   const name = byId.get(id)?.localName ?? String(id);
 
@@ -991,7 +992,7 @@ function EnemyCounters({
       )}
       {english ? (
         <a
-          href={`${sitePrefix}/brawlers/${slugify(english)}/counters`}
+          href={`${prefix}/brawlers/${slugify(english)}/counters`}
           className="block text-[10px] font-semibold text-brand"
         >
           {t('draft.allCounters')}
