@@ -119,9 +119,31 @@ feed = {'updatedAt': now, 'items': (new + [i for i in feed['items'] if i['id'] n
 json.dump(feed, open(path + '.tmp', 'w'), indent=1, ensure_ascii=False); os.replace(path + '.tmp', path)
 PY
 
+# Nothing goes out until brawlzone.net/rewards shows the batch (owner,
+# 2026-11-06). The page caches the feed for up to ~10 minutes, and the 10x
+# Gems push landed people on the old list. So: ask the site to refresh the
+# page in every language, then wait until each one links every new reward.
+# If it never does, stop here: no push, no Discord, no videos.
+CRON_SECRET="$(sed -n 's/^CRON_SECRET=//p' "$ENV_FILE" | head -1 | sed 's/^["'"'"']//; s/["'"'"']$//')"
+mapfile -t IDS < <(python3 -c 'import json,sys; [print(r["url"].rstrip("/").rsplit("/",1)[-1].split("=")[-1]) for r in json.load(open(sys.argv[1]))]' "$OUT/rewards.json")
+curl -s -o /dev/null -w 'revalidate: HTTP %{http_code}\n' --max-time 30 -X POST \
+  -H "Authorization: Bearer $CRON_SECRET" "$SITE/api/cron/revalidate-rewards" || echo "::warning::revalidate not reached"
+shown=0
+for attempt in $(seq 1 60); do
+  missing=0
+  for path in rewards es/rewards pt/rewards tr/rewards de/rewards ru/rewards fr/rewards; do
+    page="$(curl -s --max-time 20 "$SITE/$path?r=$ID-$attempt")" || { missing=1; break; }
+    for id in "${IDS[@]}"; do grep -qF "$id" <<<"$page" || { missing=1; break 2; }; done
+  done
+  [ "$missing" = 0 ] && { shown=1; break; }
+  sleep 15
+done
+[ "$shown" = 1 ] || die "::error::brawlzone.net/rewards still does not show ${IDS[*]} after 15 minutes; nothing was notified or posted (rerun with FORCE=1 once the page shows it)"
+echo "site: /rewards shows the batch in all 7 languages"
+
 # Browsers that asked to be told (2026-10-28), before anything else: a
 # notification is the quickest way from the drop to the claim button, and
-# brawlzone.net/rewards already lists the batch (latest.json above).
+# brawlzone.net/rewards now lists the batch (checked just above).
 mapfile -t NAMES < <(python3 -c 'import json,sys; [print(r["name"]) for r in json.load(open(sys.argv[1]))]' "$OUT/rewards.json")
 (cd "$REPO" && docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/push-rewards.ts "${NAMES[@]}") 2>&1 \
   | grep -E '^push:' || echo "::warning::push notifications not sent (not fatal)"
