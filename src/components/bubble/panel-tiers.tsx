@@ -293,39 +293,6 @@ export function PanelTiers({
         </span>
       </p>
 
-      {/* The rank row: the game's league badges, the player's own lit. */}
-      <div role="group" aria-label={t('bracket.title')} className="flex flex-wrap items-center gap-1 px-1 pb-2 text-[11px]">
-        <button
-          type="button"
-          onClick={() => chooseBracket(null)}
-          aria-pressed={bracket === null}
-          className={`px-2 py-1 leading-tight ${bracket === null ? 'bz-chip-on' : 'bz-chip'}`}
-        >
-          {t('bracket.all')}
-        </button>
-        {RANK_BRACKETS.map((b) => {
-          const on = bracket === b.slug;
-          return (
-            <button
-              key={b.slug}
-              type="button"
-              onClick={() => chooseBracket(b.slug)}
-              aria-pressed={on}
-              className={`inline-flex items-center gap-1 px-1.5 py-1 leading-tight ${on ? 'bz-chip-on' : 'bz-chip'}`}
-            >
-              <Image
-                src={bracketIconUrl(b)}
-                alt=""
-                width={16}
-                height={16}
-                className={`size-4 shrink-0 object-contain ${on ? '' : 'opacity-85'}`}
-                unoptimized
-              />
-              {bracketLabel(b)}
-            </button>
-          );
-        })}
-      </div>
       {bracketThin && activeBracket && !currentMap ? (
         <p className="mx-1 mb-2 text-[10px] leading-snug text-muted">
           {t('bracket.thin', { rank: bracketLabel(activeBracket) })}
@@ -341,6 +308,58 @@ export function PanelTiers({
         map={currentMap?.mapName ?? null}
         onMode={choose}
         onMap={chooseMap}
+        rank={{
+          // The rank row folds into the picker's line (owner, 2026-11-06):
+          // the game's league badge and name, the whole row behind Change.
+          summary: activeBracket ? (
+            <>
+              <Image src={bracketIconUrl(activeBracket)} alt="" width={16} height={16} className="size-4 shrink-0 object-contain" unoptimized />
+              {bracketLabel(activeBracket)}
+            </>
+          ) : (
+            t('bracket.all')
+          ),
+          row: (close) => (
+      <div role="group" aria-label={t('bracket.title')} className="flex flex-wrap items-center gap-1 px-1 pb-2 text-[11px]">
+          <button
+            type="button"
+            onClick={() => {
+              chooseBracket(null);
+              close();
+            }}
+            aria-pressed={bracket === null}
+            className={`px-2 py-1 leading-tight ${bracket === null ? 'bz-chip-on' : 'bz-chip'}`}
+          >
+            {t('bracket.all')}
+          </button>
+          {RANK_BRACKETS.map((b) => {
+            const on = bracket === b.slug;
+            return (
+              <button
+                key={b.slug}
+                type="button"
+                onClick={() => {
+                  chooseBracket(b.slug);
+                  close();
+                }}
+                aria-pressed={on}
+                className={`inline-flex items-center gap-1 px-1.5 py-1 leading-tight ${on ? 'bz-chip-on' : 'bz-chip'}`}
+              >
+                <Image
+                  src={bracketIconUrl(b)}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={`size-4 shrink-0 object-contain ${on ? '' : 'opacity-85'}`}
+                  unoptimized
+                />
+                {bracketLabel(b)}
+              </button>
+            );
+          })}
+        </div>
+          ),
+        }}
       />
 
       {currentMap && bracket && activeBracket ? (

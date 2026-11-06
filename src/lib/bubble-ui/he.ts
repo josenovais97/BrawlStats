@@ -88,6 +88,8 @@ const he: UiStrings = {
   'record.last': "{n} אחרונים",
   'record.starTitle': "שחקן כוכב ב-{n} מתוך {g} המשחקים האחרונים",
   'record.streakTitle': "{n} ניצחונות ברצף",
+  'record.elo': "{n} אלו",
+  'record.toNext': "{n} עד {rank}",
   'season.ends': "עונה {n} · מסתיימת {date}",
   'season.trial': "ניסיון",
   'draft.withEdge': 'עם {n}',

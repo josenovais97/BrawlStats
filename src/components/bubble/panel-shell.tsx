@@ -4,13 +4,15 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
+import { useModeLabel } from '@/components/bubble/panel-chips';
 import { PanelCounters } from '@/components/bubble/panel-counters';
 import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
-import { Check, X } from 'lucide-react';
+import { Check, ChevronDown, X } from 'lucide-react';
+import { rankProgress } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 
 /**
@@ -84,6 +86,10 @@ export function PanelShell({
   const account = useBubbleAccount();
   const { t, lang } = usePanelI18n();
   const { record, form } = useSinceTagRecord(account.tag);
+  // The player card opens a small drawer: rank progress and form by mode.
+  const [cardOpen, setCardOpen] = useState(false);
+  const progress = rankProgress(account.elo);
+  const modeName = useModeLabel();
   const shortDate = (iso: string) => new Date(iso).toLocaleDateString(lang, { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
   // One open per panel, with the tab it opened on and whether a tag is set --
@@ -128,8 +134,18 @@ export function PanelShell({
           ) : (
             <span className="size-8 shrink-0 rounded-lg border-2 border-brand bg-surface-2" />
           )}
-          <span className="min-w-0 flex-1 leading-tight">
-            <span className="display block truncate text-sm">{account.name ?? `#${account.tag}`}</span>
+          <button
+            type="button"
+            onClick={() => setCardOpen((v) => !v)}
+            aria-expanded={cardOpen}
+            className="min-w-0 flex-1 text-start leading-tight"
+          >
+            <span className="flex items-center gap-1">
+              <span className="display truncate text-sm">{account.name ?? `#${account.tag}`}</span>
+              {progress || (form && form.byMode.length > 0) ? (
+                <ChevronDown className={`size-3.5 shrink-0 text-muted transition-transform ${cardOpen ? 'rotate-180' : ''}`} aria-hidden />
+              ) : null}
+            </span>
             {/* Recent form from the battle log (2026-11-06), in place of the
                 tag once it has loaded: results, win rate, star player, streak. */}
             {form && form.games > 0 ? (
@@ -154,7 +170,7 @@ export function PanelShell({
             ) : (
               <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
             )}
-          </span>
+          </button>
           <span className="bz-chip-on shrink-0 px-1.5 py-0.5 text-[10px]">
             {filterLabel}
             {account.hide ? ` · ${t('filter.hiding')}` : ''}
@@ -169,6 +185,43 @@ export function PanelShell({
           <LanguagePicker />
         </div>
       )}
+      {account.tag && cardOpen && (progress || (form && form.byMode.length > 0)) ? (
+        <div className="bz-panel mx-1 -mt-1 mb-2.5 space-y-1.5 px-2 py-1.5 text-[10px]">
+          {progress ? (
+            <div className="flex items-center gap-2">
+              <span className="shrink-0 font-bold">{progress.rank}</span>
+              <span className="shrink-0 tabular-nums text-muted">{t('record.elo', { n: progress.elo.toLocaleString(lang) })}</span>
+              <span className="relative h-1.5 min-w-8 flex-1 overflow-hidden rounded-full bg-black/30">
+                <span className="absolute inset-y-0 start-0 rounded-full bg-brand" style={{ width: `${Math.round(progress.share * 100)}%` }} />
+              </span>
+              {progress.next && progress.toNext !== null ? (
+                <span className="shrink-0 tabular-nums text-muted">
+                  {t('record.toNext', { n: progress.toNext.toLocaleString(lang), rank: progress.next })}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+          {form && form.byMode.length > 0 ? (
+            <ul className="flex flex-wrap gap-1">
+              {form.byMode.map((m) => {
+                const pm = modes.find((x) => x.key === m.mode);
+                return (
+                  <li
+                    key={m.mode}
+                    className="inline-flex items-center gap-1 rounded-md bg-surface-2/70 px-1.5 py-0.5"
+                    title={pm ? modeName(pm) : m.mode}
+                  >
+                    {pm?.icon ? <Image src={pm.icon} alt="" width={14} height={14} className="size-3.5 object-contain" unoptimized /> : null}
+                    <span className={`font-bold tabular-nums ${m.wins > m.losses ? 'text-victory' : m.wins < m.losses ? 'text-defeat' : 'text-foreground'}`}>
+                      {m.wins}–{m.losses}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
       </div>
 
       {/*

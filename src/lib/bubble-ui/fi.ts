@@ -88,6 +88,8 @@ const fi: UiStrings = {
   'record.last': "Viimeiset {n}",
   'record.starTitle': "Tähtipelaaja {n} kertaa viimeisistä {g} pelistä",
   'record.streakTitle': "{n} voittoa putkeen",
+  'record.elo': "{n} elo",
+  'record.toNext': "{n} rankiin {rank}",
   'season.ends': "Kausi {n} · päättyy {date}",
   'season.trial': "Kokeilu",
   'draft.withEdge': 'kanssa {n}',

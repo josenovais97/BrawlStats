@@ -88,6 +88,8 @@ const ar: UiStrings = {
   'record.last': "آخر {n}",
   'record.starTitle': "لاعب النجم في {n} من آخر {g} مباراة",
   'record.streakTitle': "{n} انتصارات متتالية",
+  'record.elo': "{n} إيلو",
+  'record.toNext': "{n} حتى {rank}",
   'season.ends': "الموسم {n} · ينتهي {date}",
   'season.trial': "تجربة",
   'draft.withEdge': 'مع {n}',

@@ -88,6 +88,8 @@ const ja: UiStrings = {
   'record.last': "直近{n}戦",
   'record.starTitle': "直近{g}戦中{n}回スタープレイヤー",
   'record.streakTitle': "{n}連勝",
+  'record.elo': "{n} elo",
+  'record.toNext': "{rank}まであと{n}",
   'season.ends': "シーズン{n} · {date}まで",
   'season.trial': "お試し",
   'draft.withEdge': '共{n}',

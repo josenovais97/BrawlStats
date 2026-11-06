@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { PanelMode } from '@/components/bubble/panel-tiers';
@@ -63,6 +63,7 @@ export function ModeMapChips({
   onMap,
   allMapsLabel,
   hasData,
+  rank,
 }: {
   modes: PanelMode[];
   mode: PanelMode;
@@ -72,6 +73,12 @@ export function ModeMapChips({
   allMapsLabel?: string;
   /** Marks maps with no data for this tab, so a chip never opens on nothing. */
   hasData?: (mapName: string) => boolean;
+  /**
+   * The Meta tab's rank row, folded into the same line and reopened by the
+   * same Change (owner, 2026-11-06): `summary` sits in the collapsed lines,
+   * `row` draws the chips while the picker is open and closes it on a choice.
+   */
+  rank?: { summary: ReactNode; row: (close: () => void) => ReactNode };
 }) {
   const [changing, setChanging] = useState(false);
   // Picking a mode hides the others behind a Change (owner, 2026-11-06): a
@@ -94,6 +101,7 @@ export function ModeMapChips({
         }}
         className="bz-panel mx-1 mb-2.5 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-start text-[11px]"
       >
+        {rank ? <span className="flex shrink-0 items-center gap-1 text-muted">{rank.summary}<span>·</span></span> : null}
         {mode.icon ? (
           <Image
             src={mode.icon}
@@ -119,6 +127,11 @@ export function ModeMapChips({
     <>
       {modeChosen ? (
         <div className="flex items-center gap-1.5 px-1 pb-2 text-[11px]">
+          {rank ? (
+            <button type="button" onClick={() => setPickingMode(true)} className="bz-chip inline-flex items-center gap-1 px-2 py-1 leading-tight">
+              {rank.summary}
+            </button>
+          ) : null}
           {/* The chosen mode is itself a way back to the other modes. */}
           <button type="button" onClick={() => setPickingMode(true)} className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
             {mode.icon ? (
@@ -131,6 +144,13 @@ export function ModeMapChips({
           </button>
         </div>
       ) : (
+      <>
+      {rank
+        ? rank.row(() => {
+            setChanging(false);
+            setPickingMode(false);
+          })
+        : null}
       <div role="group" aria-label="Game mode" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
         {modes.map((m) => {
           const on = m.key === mode.key;
@@ -162,6 +182,7 @@ export function ModeMapChips({
           );
         })}
       </div>
+      </>
       )}
 
       {mode.key !== null && mode.maps.length > 0 ? (

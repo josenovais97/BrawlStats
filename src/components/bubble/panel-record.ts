@@ -44,6 +44,8 @@ export interface RecentForm {
   stars: number;
   /** Consecutive results from the newest battle back: +3 is three wins, -2 two losses. */
   streak: number;
+  /** Wins and losses per game mode (the API's key, e.g. "gemGrab"), most played first. */
+  byMode: { mode: string; wins: number; losses: number }[];
 }
 
 const STORED_RECORD = 'brawlzone-bubble-record';
@@ -72,11 +74,16 @@ function battleDate(value: string): number {
   return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : NaN;
 }
 
-type LogEntry = { battleTime: string; battle?: { result?: string; starPlayer?: { tag?: string } | null } };
+type LogEntry = {
+  battleTime: string;
+  event?: { mode?: string };
+  battle?: { mode?: string; result?: string; starPlayer?: { tag?: string } | null };
+};
 
 function formOf(items: LogEntry[], tag: string): RecentForm {
   const own = `#${tag.replace(/^#/, '').toUpperCase()}`;
-  const form: RecentForm = { games: 0, wins: 0, losses: 0, stars: 0, streak: 0 };
+  const form: RecentForm = { games: 0, wins: 0, losses: 0, stars: 0, streak: 0, byMode: [] };
+  const modes = new Map<string, { mode: string; wins: number; losses: number }>();
   let streakOpen = true;
   for (const entry of items) {
     const result = entry.battle?.result;
@@ -85,6 +92,13 @@ function formOf(items: LogEntry[], tag: string): RecentForm {
     if (result === 'victory') form.wins += 1;
     else form.losses += 1;
     if (entry.battle?.starPlayer?.tag?.toUpperCase() === own) form.stars += 1;
+    const mode = entry.event?.mode ?? entry.battle?.mode;
+    if (mode) {
+      const m = modes.get(mode) ?? { mode, wins: 0, losses: 0 };
+      if (result === 'victory') m.wins += 1;
+      else m.losses += 1;
+      modes.set(mode, m);
+    }
     // Newest first: the streak is the run at the top of the log.
     if (streakOpen) {
       const step = result === 'victory' ? 1 : -1;
@@ -92,6 +106,7 @@ function formOf(items: LogEntry[], tag: string): RecentForm {
       else streakOpen = false;
     }
   }
+  form.byMode = [...modes.values()].sort((a, b) => b.wins + b.losses - (a.wins + a.losses));
   return form;
 }
 

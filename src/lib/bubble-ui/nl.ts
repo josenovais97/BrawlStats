@@ -88,6 +88,8 @@ const nl: UiStrings = {
   'record.last': "Laatste {n}",
   'record.starTitle': "Sterspeler in {n} van de laatste {g} potjes",
   'record.streakTitle': "{n} overwinningen op rij",
+  'record.elo': "{n} elo",
+  'record.toNext': "{n} tot {rank}",
   'season.ends': "Seizoen {n} · eindigt {date}",
   'season.trial': "Proef",
   'draft.withEdge': 'met {n}',

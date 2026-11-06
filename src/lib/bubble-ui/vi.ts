@@ -88,6 +88,8 @@ const vi: UiStrings = {
   'record.last': "{n} trận gần nhất",
   'record.starTitle': "Ngôi sao trận đấu {n}/{g} trận gần nhất",
   'record.streakTitle': "{n} trận thắng liên tiếp",
+  'record.elo': "{n} elo",
+  'record.toNext': "còn {n} tới {rank}",
   'season.ends': "Mùa {n} · kết thúc {date}",
   'season.trial': "Dùng thử",
   'draft.withEdge': 'cùng {n}',

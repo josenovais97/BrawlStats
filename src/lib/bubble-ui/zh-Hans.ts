@@ -88,6 +88,8 @@ const zhHans: UiStrings = {
   'record.last': "最近{n}场",
   'record.starTitle': "最近{g}场中{n}次获得明星玩家",
   'record.streakTitle': "{n}连胜",
+  'record.elo': "{n} elo",
+  'record.toNext': "距{rank}还差{n}",
   'season.ends': "第{n}赛季 · {date}结束",
   'season.trial': "试用",
   'draft.withEdge': '搭配 {n}',

@@ -88,6 +88,8 @@ const fr: UiStrings = {
   'record.last': "{n} derniers",
   'record.starTitle': "Joueur star dans {n} des {g} derniers matchs",
   'record.streakTitle': "{n} victoires d'affilée",
+  'record.elo': "{n} élo",
+  'record.toNext': "{n} avant {rank}",
   'season.ends': "Saison {n} · se termine le {date}",
   'season.trial': "Essai",
   'draft.withEdge': 'avec {n}',

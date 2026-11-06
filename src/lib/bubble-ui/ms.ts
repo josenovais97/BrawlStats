@@ -88,6 +88,8 @@ const ms: UiStrings = {
   'record.last': "{n} terakhir",
   'record.starTitle': "Pemain bintang dalam {n} daripada {g} perlawanan terakhir",
   'record.streakTitle': "{n} kemenangan berturut-turut",
+  'record.elo': "{n} elo",
+  'record.toNext': "{n} lagi ke {rank}",
   'season.ends': "Musim {n} · tamat {date}",
   'season.trial': "Percubaan",
   'draft.withEdge': 'bersama {n}',

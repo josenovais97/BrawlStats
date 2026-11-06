@@ -88,6 +88,8 @@ const th: UiStrings = {
   'record.last': "{n} เกมล่าสุด",
   'record.starTitle': "ผู้เล่นดาวเด่น {n} จาก {g} เกมล่าสุด",
   'record.streakTitle': "ชนะติดกัน {n} เกม",
+  'record.elo': "{n} elo",
+  'record.toNext': "อีก {n} ถึง {rank}",
   'season.ends': "ซีซั่น {n} · จบ {date}",
   'season.trial': "ทดลอง",
   'draft.withEdge': 'คู่ {n}',

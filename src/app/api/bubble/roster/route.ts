@@ -78,6 +78,8 @@ export async function GET(request: Request) {
       trophies: player.trophies,
       // Current Ranked rank, so the panel can open on the player's bracket.
       rankName: player.rankedRankName ?? null,
+      // For the panel's rank progress ("80 to Mythic III"), 2026-11-06.
+      elo: player.rankedElo ?? null,
       brawlers: player.brawlers.map((b) => ({
         id: b.id,
         power: b.power,

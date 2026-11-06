@@ -88,6 +88,8 @@ const ru: UiStrings = {
   'record.last': "Последние {n}",
   'record.starTitle': "Лучший игрок в {n} из последних {g} боёв",
   'record.streakTitle': "{n} побед подряд",
+  'record.elo': "{n} эло",
+  'record.toNext': "{n} до {rank}",
   'season.ends': "Сезон {n} · до {date}",
   'season.trial': "Пробные",
   'draft.withEdge': 'вместе {n}',

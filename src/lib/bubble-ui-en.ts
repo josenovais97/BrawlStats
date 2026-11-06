@@ -104,6 +104,8 @@ export const UI_EN = {
   'record.last': "Last {n}",
   'record.starTitle': "Star player in {n} of the last {g} games",
   'record.streakTitle': "{n} wins in a row",
+  'record.elo': "{n} elo",
+  'record.toNext': "{n} to {rank}",
   'season.ends': "Season {n} · ends {date}",
   'season.trial': "Trial",
   'draft.withEdge': 'with {n}',

@@ -88,6 +88,8 @@ const tr: UiStrings = {
   'record.last': "Son {n}",
   'record.starTitle': "Son {g} maçın {n} tanesinde yıldız oyuncu",
   'record.streakTitle': "Üst üste {n} galibiyet",
+  'record.elo': "{n} elo",
+  'record.toNext': "{rank} için {n}",
   'season.ends': "Sezon {n} · {date} bitiyor",
   'season.trial': "Deneme",
   'draft.withEdge': 'birlikte {n}',

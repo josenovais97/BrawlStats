@@ -42,6 +42,8 @@ export interface CachedRoster {
   iconUrl?: string;
   /** Current Ranked rank ("MYTHIC II"), for the default bracket. Absent on old caches. */
   rankName?: string | null;
+  /** Current Ranked elo, for rank progress. Absent on caches from before 2026-11-06. */
+  elo?: number | null;
   brawlers: OwnedBrawler[];
   /** When this was fetched, so the panel can refresh it without a timer. */
   fetchedAt: number;

@@ -88,6 +88,8 @@ const ko: UiStrings = {
   'record.last': "최근 {n}판",
   'record.starTitle': "최근 {g}판 중 {n}번 스타 플레이어",
   'record.streakTitle': "{n}연승",
+  'record.elo': "{n} elo",
+  'record.toNext': "{rank}까지 {n}",
   'season.ends': "시즌 {n} · {date} 종료",
   'season.trial': "체험",
   'draft.withEdge': '함께 {n}',
