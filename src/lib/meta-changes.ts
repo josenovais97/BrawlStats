@@ -114,3 +114,17 @@ export function spanLabel(from: string, to: string): string {
   if (days === 7) return 'in the last week';
   return `in the last ${days} days`;
 }
+
+/**
+ * The Bubble panel's trend arrows (2026-11-06): the three biggest risers and
+ * fallers of the week, and only moves that crossed a tier by a full point of
+ * meta score. Just after the November update 88 of 107 brawlers passed
+ * `isNotable`; arrows on all of them would be noise, so this is capped.
+ */
+export function panelTrend(movers: MetaMover[], perSide = 3, minDelta = 1): Record<number, 1 | -1> {
+  const big = movers.filter((m) => m.tierBefore !== m.tierNow && Math.abs(m.metaScoreDelta) >= minDelta);
+  const out: Record<number, 1 | -1> = {};
+  for (const m of [...big].filter((x) => x.metaScoreDelta > 0).sort((a, b) => b.metaScoreDelta - a.metaScoreDelta).slice(0, perSide)) out[m.brawlerId] = 1;
+  for (const m of [...big].filter((x) => x.metaScoreDelta < 0).sort((a, b) => a.metaScoreDelta - b.metaScoreDelta).slice(0, perSide)) out[m.brawlerId] = -1;
+  return out;
+}

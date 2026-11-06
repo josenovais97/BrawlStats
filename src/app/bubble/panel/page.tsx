@@ -19,11 +19,14 @@ import {
   getRankedComps,
   getRankedMapPicks,
   getRankedRecentMaps,
+  getMetaMovers,
+  getRankedEloRates,
   scoreBrawlers,
   type TeamComp,
 } from '@/lib/stats';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import { getSeasonState } from '@/lib/ranked-seasons';
+import { panelTrend } from '@/lib/meta-changes';
 import { rotationKey, rotationMaps } from '@/lib/ranked-rotation';
 
 /**
@@ -226,6 +229,13 @@ export default async function BubblePanelPage() {
    * card's form-by-mode chips: a player's last games are not limited to the
    * modes the Meta tab lists.
    */
+  // "≈ N wins" in the player drawer, and the Meta tab's few trend arrows.
+  const [eloRates, movers] = await Promise.all([
+    getRankedEloRates().catch(() => ({})),
+    getMetaMovers(7).catch(() => []),
+  ]);
+  const trend = panelTrend(movers);
+
   const modeArt: Record<string, { label: string; icon: string | null }> = {};
   for (const [key, mode] of modeMeta) {
     const nameKey = mode.name.toLowerCase().replace(/\s+/g, '');
@@ -288,6 +298,8 @@ export default async function BubblePanelPage() {
             windowDays={WINDOW_DAYS}
             comps={comps}
             modeArt={modeArt}
+            eloRates={eloRates}
+            trend={trend}
             season={
               season?.current
                 ? {

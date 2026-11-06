@@ -40,6 +40,12 @@ model SampledPlayer {
   highestRankedElo      Int?      @map("highest_ranked_elo")
   highestRankedRankName String?   @map("highest_ranked_rank_name")
   lastSampledAt         DateTime? @map("last_sampled_at")
+  /// When `rankedElo` was read (the profile is read once a day), so the next
+  /// read can say how far elo moved over the Ranked games in between.
+  rankedEloAt           DateTime? @map("ranked_elo_at")
+  /// Ranked wins and losses seen in battle logs since `rankedEloAt`.
+  rankedWins            Int       @default(0) @map("ranked_wins")
+  rankedLosses          Int       @default(0) @map("ranked_losses")
   createdAt             DateTime  @default(now()) @map("created_at")
 
   @@index([lastSampledAt])
@@ -765,4 +771,22 @@ model PlayerName {
 
   @@index([seenAt])
   @@map("player_names")
+}
+
+/// What a Ranked win and loss are worth in elo, per rank (2026-11-06). The
+/// battle log has no elo change for Ranked games, so each daily profile read
+/// adds its elo change and the Ranked wins and losses since the last read to
+/// these running least-squares sums (lib/ranked-elo). A few rows a day.
+model RankedEloRate {
+  day  DateTime @db.Date
+  rank String
+  n    Int
+  sww  Float
+  swl  Float
+  sll  Float
+  swy  Float
+  sly  Float
+
+  @@id([day, rank])
+  @@map("ranked_elo_rates")
 }

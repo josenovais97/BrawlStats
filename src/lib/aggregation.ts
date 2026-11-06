@@ -14,6 +14,7 @@ import { isOptedOut } from '@/lib/opted-out';
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
 import { getPrisma } from '@/lib/prisma';
+import { eloObservation, rankGroup } from '@/lib/ranked-elo';
 import { bracketForRankName, bracketForTier, lobbyTier, RANK_BRACKETS } from '@/lib/rank-brackets';
 import { COMPETITIVE_BATTLE_TYPES, windowStartUtc } from '@/lib/stats';
 import { ALL_REGIONS, POPULAR_REGION_CODES } from '@/lib/regions';
@@ -1451,6 +1452,9 @@ export async function pruneOldSamples(): Promise<number> {
       where: { seenAt: { lt: new Date(Date.now() - 365 * day) } },
     });
 
+    // Elo per win, per rank and day (2026-11-06): a few rows a day; the panel reads 14 days.
+    await prisma.$executeRaw`DELETE FROM ranked_elo_rates WHERE day < current_date - 60`;
+
     // The roll-ups themselves age out on the window the site reads. Nothing
     // guards these: they are derived, and a lost day costs a thinner average
     // rather than an unrecoverable observation.
@@ -1804,6 +1808,7 @@ async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
    * nothing new, and those calls now go to a bigger pool instead.
    */
   const needsProfile = !lastSampledAt || lastSampledAt < snapshotDate;
+  const visitStarted = new Date();
   const [player, log] = await Promise.all([
     needsProfile ? withRetry(() => getPlayer(normalized)) : Promise.resolve(null),
     withRetry(() => getBattleLog(normalized)),
@@ -1935,6 +1940,16 @@ async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
     recorded = result.count;
   }
 
+  // The elo reading this profile replaces, for recordEloStep below.
+  const previousElo =
+    player && typeof player.rankedElo === 'number'
+      ? (
+          await prisma.$queryRaw<{ ranked_elo: number | null; ranked_elo_at: Date | null; ranked_wins: number; ranked_losses: number }[]>`
+            SELECT ranked_elo, ranked_elo_at, ranked_wins, ranked_losses FROM sampled_players WHERE tag = ${normalized}
+          `.catch(() => [])
+        )[0] ?? null
+      : null;
+
   await prisma.sampledPlayer.update({
     where: { tag: normalized },
     data: player
@@ -1951,7 +1966,80 @@ async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
       : { lastSampledAt: new Date() },
   });
 
+  await recordEloStep(normalized, log.items, lastSampledAt, player, previousElo, visitStarted).catch((error) =>
+    console.warn(`[elo] ${normalized}: ${(error as Error).message}`),
+  );
+
   return { battles: recorded, recruits };
+}
+
+/**
+ * What a Ranked win is worth, one player-day at a time (2026-11-06).
+ *
+ * The battle log has no elo change for Ranked games, and the profile (with
+ * the elo) is read once a day. So every visit adds the Ranked results that are
+ * new since the last visit to a running count on the player's row, and each
+ * daily profile read pairs the elo change since the previous read with that
+ * count, adds it to the rank's sums in `ranked_elo_rates`, and starts over.
+ * An interval is dropped (and restarted) when it cannot be trusted: no
+ * previous visit, a log full of battles all newer than the last visit (some
+ * were missed), or an elo written in between by a profile lookup.
+ */
+async function recordEloStep(
+  tag: string,
+  items: BSBattleLogEntry[],
+  lastSampledAt: Date | null,
+  player: { rankedElo?: number | null } | null,
+  previous: { ranked_elo: number | null; ranked_elo_at: Date | null; ranked_wins: number; ranked_losses: number } | null,
+  readAt: Date,
+) {
+  const prisma = getPrisma();
+  if (!prisma) return;
+  const competitive = COMPETITIVE_BATTLE_TYPES as readonly string[];
+  let wins = 0;
+  let losses = 0;
+  let oldest = Infinity;
+  for (const entry of items) {
+    const at = parseApiDate(entry.battleTime)?.getTime() ?? NaN;
+    if (Number.isFinite(at)) oldest = Math.min(oldest, at);
+    if (!lastSampledAt || !(at > lastSampledAt.getTime())) continue;
+    if (!competitive.includes(entry.battle.type ?? '')) continue;
+    if (entry.battle.result === 'victory') wins += 1;
+    else if (entry.battle.result === 'defeat') losses += 1;
+  }
+  const missedSome = !lastSampledAt || (items.length >= 25 && oldest > lastSampledAt.getTime());
+  const elo = typeof player?.rankedElo === 'number' ? player.rankedElo : null;
+
+  if (elo === null) {
+    // No profile this visit: count, or drop the interval if games were missed.
+    if (missedSome) {
+      await prisma.$executeRaw`UPDATE sampled_players SET ranked_elo_at = NULL, ranked_wins = 0, ranked_losses = 0 WHERE tag = ${tag}`;
+    } else if (wins + losses > 0) {
+      await prisma.$executeRaw`UPDATE sampled_players SET ranked_wins = ranked_wins + ${wins}, ranked_losses = ranked_losses + ${losses} WHERE tag = ${tag}`;
+    }
+    return;
+  }
+
+  const prevAt = previous?.ranked_elo_at ?? null;
+  const hours = prevAt ? (readAt.getTime() - prevAt.getTime()) / 3_600_000 : NaN;
+  if (!missedSome && previous && previous.ranked_elo !== null && hours >= 6 && hours <= 48) {
+    const step = eloObservation(elo - previous.ranked_elo, previous.ranked_wins + wins, previous.ranked_losses + losses);
+    if (step) {
+      await prisma.$executeRaw`
+        INSERT INTO ranked_elo_rates (day, rank, n, sww, swl, sll, swy, sly)
+        VALUES (${todayUtc()}::date, ${rankGroup(previous.ranked_elo)}, 1, ${step.sww}, ${step.swl}, ${step.sll}, ${step.swy}, ${step.sly})
+        ON CONFLICT (day, rank) DO UPDATE SET
+          n = ranked_elo_rates.n + 1,
+          sww = ranked_elo_rates.sww + EXCLUDED.sww,
+          swl = ranked_elo_rates.swl + EXCLUDED.swl,
+          sll = ranked_elo_rates.sll + EXCLUDED.sll,
+          swy = ranked_elo_rates.swy + EXCLUDED.swy,
+          sly = ranked_elo_rates.sly + EXCLUDED.sly
+      `;
+    }
+  }
+  // This reading starts the next interval.
+  await prisma.$executeRaw`UPDATE sampled_players SET ranked_elo_at = ${readAt}, ranked_wins = 0, ranked_losses = 0 WHERE tag = ${tag}`;
 }
 
 /* ------------------------------- aggregation ------------------------------ */

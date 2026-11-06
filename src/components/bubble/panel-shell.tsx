@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PanelComps, type PanelModeComps } from '@/components/bubble/panel-comps';
 import { useModeLabel } from '@/components/bubble/panel-chips';
@@ -10,9 +10,9 @@ import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
-import { useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
+import { useLastRankedGame, useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
 import { Check, ChevronDown, X } from 'lucide-react';
-import { rankProgress } from '@/lib/ranked-elo';
+import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 
 /**
@@ -44,6 +44,8 @@ export function PanelShell({
   comps,
   season = null,
   modeArt = {},
+  eloRates = {},
+  trend = {},
 }: {
   modes: PanelMode[];
   roster: DraftBrawler[];
@@ -52,6 +54,10 @@ export function PanelShell({
   season?: PanelSeason | null;
   /** Every mode's name and art by lower-cased battle-log key, for the form chips. */
   modeArt?: Record<string, { label: string; icon: string | null }>;
+  /** Elo per Ranked win and loss by rank group, for "≈ N wins" (lib/ranked-elo). */
+  eloRates?: Record<string, EloRate>;
+  /** The week's biggest risers (1) and fallers (-1) for the Meta arrows. */
+  trend?: Record<number, 1 | -1>;
 }) {
   /*
    * Nothing until the reader chooses.
@@ -92,6 +98,9 @@ export function PanelShell({
   // The player card opens a small drawer: rank progress and form by mode.
   const [cardOpen, setCardOpen] = useState(false);
   const progress = rankProgress(account.elo);
+  const winsNeeded = winsToNext(progress, eloRates);
+  const lastGame = useLastRankedGame(account.tag, cardOpen);
+  const portrait = useMemo(() => new Map(roster.map((b) => [b.brawlerId, b])), [roster]);
   const modeName = useModeLabel();
   const shortDate = (iso: string) => new Date(iso).toLocaleDateString(lang, { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
@@ -188,7 +197,7 @@ export function PanelShell({
           <LanguagePicker />
         </div>
       )}
-      {account.tag && cardOpen && (progress || (form && form.byMode.length > 0)) ? (
+      {account.tag && cardOpen && (progress || (form && form.byMode.length > 0) || lastGame) ? (
         <div className="bz-panel mx-1 -mt-1 mb-2.5 space-y-1.5 px-2 py-1.5 text-[10px]">
           {progress ? (
             <div className="flex items-center gap-2">
@@ -200,6 +209,9 @@ export function PanelShell({
               {progress.next && progress.toNext !== null ? (
                 <span className="shrink-0 tabular-nums text-muted">
                   {t('record.toNext', { n: progress.toNext.toLocaleString(lang), rank: progress.next })}
+                  {winsNeeded !== null && winsNeeded >= 2 ? (
+                    <span className="font-bold text-foreground"> · {t('record.winsToNext', { n: winsNeeded.toLocaleString(lang) })}</span>
+                  ) : null}
                 </span>
               ) : null}
             </div>
@@ -229,6 +241,45 @@ export function PanelShell({
                 );
               })}
             </ul>
+          ) : null}
+          {lastGame ? (
+            <div className="space-y-1 border-t border-border/60 pt-1.5">
+              <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                <span className={`font-black ${lastGame.result === 'victory' ? 'text-victory' : 'text-defeat'}`}>
+                  {lastGame.result === 'victory' ? '✓' : '✗'}
+                </span>
+                <span className="font-bold">{t('review.last')}</span>
+                {lastGame.mode && modeArt[lastGame.mode.toLowerCase()]?.icon ? (
+                  <Image src={modeArt[lastGame.mode.toLowerCase()]!.icon!} alt="" width={12} height={12} className="size-3 object-contain" unoptimized />
+                ) : null}
+                <span className="text-muted">{lastGame.mapName ? name(lastGame.mapName) : ''}</span>
+                {lastGame.winChance !== null ? (
+                  lastGame.winChance >= 0.45 && lastGame.winChance <= 0.55 ? (
+                    <span className="text-muted">· {t('review.even')}</span>
+                  ) : (
+                    <span className={lastGame.winChance > 0.55 ? 'text-victory' : 'text-defeat'}>
+                      · {t('review.chance', { pct: `${Math.round(lastGame.winChance * 100)}%` })}
+                    </span>
+                  )
+                ) : null}
+              </p>
+              {lastGame.worst ? (
+                <p className="flex items-center gap-1 text-muted">
+                  {t('review.worst')}
+                  {[lastGame.worst.brawlerId, lastGame.worst.againstId].map((id, i) => {
+                    const b = portrait.get(id);
+                    return (
+                      <span key={id} className="inline-flex items-center gap-0.5">
+                        {i === 1 ? <span className="px-0.5">vs</span> : null}
+                        {b ? <Image src={b.imageUrl} alt="" width={16} height={16} className="size-4 rounded" unoptimized /> : null}
+                        <span className="font-semibold text-foreground">{b ? name(b.brawlerName) : id}</span>
+                      </span>
+                    );
+                  })}
+                  <span className="font-bold tabular-nums text-defeat">{lastGame.worst.edge.toFixed(1)}</span>
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
       ) : null}
@@ -328,7 +379,7 @@ export function PanelShell({
           </div>
         </div>
       ) : tab === 'meta' ? (
-        <PanelTiers modes={modes} windowDays={windowDays} />
+        <PanelTiers modes={modes} windowDays={windowDays} trend={trend} />
       ) : tab === 'comps' ? (
         <PanelComps modes={modes} comps={comps} />
       ) : tab === 'counters' ? (

@@ -118,9 +118,12 @@ type BracketLists = BracketData;
 export function PanelTiers({
   modes,
   windowDays,
+  trend = {},
 }: {
   modes: PanelMode[];
   windowDays: number;
+  /** The week's biggest risers (1) and fallers (-1); see lib/meta-changes panelTrend. */
+  trend?: Record<number, 1 | -1>;
 }) {
   const [active, setActive] = useState<string | null>(null);
   const [map, setMap] = useState<string | null>(null);
@@ -415,6 +418,7 @@ export function PanelTiers({
                 openId={openId}
                 fieldable={fieldable}
                 hiding={hiding}
+                trend={trend}
               />
             );
           })}
@@ -448,6 +452,7 @@ function TierStrip({
   openId,
   fieldable,
   hiding,
+  trend,
 }: {
   tier: Tier;
   entries: PanelEntry[];
@@ -457,9 +462,10 @@ function TierStrip({
   fieldable: (brawlerId: number) => boolean;
   /** Remove what cannot be fielded rather than dimming it. */
   hiding: boolean;
+  trend: Record<number, 1 | -1>;
 }) {
   const color = TIER_COLOR[tier];
-  const { name } = usePanelI18n();
+  const { t, name } = usePanelI18n();
 
   /*
    * Hiding filters the row, and the count beside the tier letter counts what
@@ -519,6 +525,14 @@ function TierStrip({
               </p>
               <p className="text-[10px] font-black tabular-nums leading-none" style={{ color }}>
                 {entry.metaScore?.toFixed(1) ?? '–'}
+                {trend[entry.brawlerId] ? (
+                  <span
+                    className={trend[entry.brawlerId] === 1 ? 'text-victory' : 'text-defeat'}
+                    title={t(trend[entry.brawlerId] === 1 ? 'trend.up' : 'trend.down')}
+                  >
+                    {trend[entry.brawlerId] === 1 ? '↑' : '↓'}
+                  </span>
+                ) : null}
               </p>
             </button>
           ))}

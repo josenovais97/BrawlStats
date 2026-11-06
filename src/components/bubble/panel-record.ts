@@ -168,3 +168,37 @@ export function useSinceTagRecord(tag: string | null): { record: SinceTagRecord 
     form: tag && form?.tag === tag ? form.form : null,
   };
 }
+
+/** The panel's review of the newest Ranked game (api/bubble/last-game). */
+export interface LastRankedGame {
+  battleTime: string;
+  mapName: string | null;
+  mode: string | null;
+  result: 'victory' | 'defeat';
+  winChance: number | null;
+  worst: { brawlerId: number; againstId: number; edge: number } | null;
+}
+
+/**
+ * Fetched the first time the drawer opens for a tag, then kept for this
+ * panel open: the drawer is opened on purpose, so the panel itself never
+ * pays for it.
+ */
+export function useLastRankedGame(tag: string | null, open: boolean): LastRankedGame | null {
+  const [state, setState] = useState<{ tag: string; game: LastRankedGame | null } | null>(null);
+  const wanted = open && tag !== null && state?.tag !== tag;
+
+  useEffect(() => {
+    if (!wanted || !tag) return;
+    const controller = new AbortController();
+    fetch(`/api/bubble/last-game?tag=${encodeURIComponent(tag)}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((d: { game: LastRankedGame | null }) => setState({ tag, game: d.game }))
+      .catch((err) => {
+        if ((err as Error).name !== 'AbortError') setState({ tag, game: null });
+      });
+    return () => controller.abort();
+  }, [wanted, tag]);
+
+  return tag && state?.tag === tag ? state.game : null;
+}

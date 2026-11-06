@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { isListedMode } from '@/lib/battle-mode';
+import { solveEloRate, type EloRate } from '@/lib/ranked-elo';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 
 import { unstable_cache } from 'next/cache';
@@ -1135,6 +1136,11 @@ export async function recordLookup(reading: {
       create: { tag, name, trophies, source: 'lookup', ...standing },
       update: { name, trophies, ...standing },
     });
+    // An elo written between two sampler readings breaks the pairing of elo
+    // change and Ranked games (lib/aggregation recordEloStep): restart it.
+    if (typeof rankedElo === 'number') {
+      await prisma.$executeRaw`UPDATE sampled_players SET ranked_elo_at = NULL, ranked_wins = 0, ranked_losses = 0 WHERE tag = ${tag}`;
+    }
 
     // The row above is overwritten on every visit, so it can only say "how
     // many now". This one keeps the history: one point per day, last reading
@@ -5690,6 +5696,35 @@ export function mapCountersKey(mapName: string): string {
 export async function getMapCounters(mapName: string): Promise<Record<number, MapCounter[]> | null> {
   return precomputed<Record<number, MapCounter[]>>(mapCountersKey(mapName));
 }
+
+/**
+ * Elo per Ranked win and loss for each rank, from the last 14 days of the
+ * sampler's daily readings (lib/ranked-elo, lib/aggregation recordEloStep).
+ * Ranks with too few player-days are left out.
+ */
+async function compute_getRankedEloRates(): Promise<Record<string, EloRate>> {
+  const prisma = getPrisma();
+  const out: Record<string, EloRate> = {};
+  if (!prisma) return out;
+  try {
+    const rows = await prisma.$queryRaw<{ rank: string; n: bigint; sww: number; swl: number; sll: number; swy: number; sly: number }[]>`
+      SELECT rank, SUM(n) AS n, SUM(sww) AS sww, SUM(swl) AS swl, SUM(sll) AS sll, SUM(swy) AS swy, SUM(sly) AS sly
+      FROM ranked_elo_rates
+      WHERE day >= current_date - 14
+      GROUP BY rank
+    `;
+    for (const r of rows) {
+      const rate = solveEloRate({ n: Number(r.n), sww: Number(r.sww), swl: Number(r.swl), sll: Number(r.sll), swy: Number(r.swy), sly: Number(r.sly) });
+      if (rate) out[r.rank] = rate;
+    }
+    return out;
+  } catch (error) {
+    swallow('compute_getRankedEloRates', error);
+    return out;
+  }
+}
+
+export const getRankedEloRates = cachedRead('ranked-elo-rates', compute_getRankedEloRates);
 
 const cachedRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
 
