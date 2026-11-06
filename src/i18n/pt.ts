@@ -4026,6 +4026,8 @@ export const PT: Record<string, string> = {
     "Existem códigos de Brawl Stars para gemas grátis?",
   "Are these links safe?":
     "Esses links são seguros?",
+  "Opens the Supercell Store. Sign in with Supercell ID to claim it.":
+    "Abre a Supercell Store. Entre com seu Supercell ID para resgatar.",
   "Claim":
     "Resgatar",
   "Discord server":

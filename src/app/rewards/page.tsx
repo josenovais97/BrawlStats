@@ -94,6 +94,9 @@ export default async function RewardsPage() {
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="display text-game-stroke truncate text-xl text-white">{r.name}</p>
                   <p className="text-xs text-muted">{t('Found {when}', { when: relativeTime(new Date(r.postedAt)) })}</p>
+                  {isStoreFreebie(r.url) ? (
+                    <p className="text-xs text-muted">{t('Opens the Supercell Store. Sign in with Supercell ID to claim it.')}</p>
+                  ) : null}
                   <ClaimButton url={r.url} small />
                 </div>
               </li>
@@ -188,7 +191,11 @@ function RewardStage({ reward, total }: { reward: FreeReward; total: number }) {
         <div className="mt-8 w-full max-w-xs">
           <ClaimButton url={reward.url} />
         </div>
-        <p className="mt-3 text-xs text-white/60">{t('Opens Brawl Stars. An official Supercell link.')}</p>
+        <p className="mt-3 text-xs text-white/60">
+          {isStoreFreebie(reward.url)
+            ? t('Opens the Supercell Store. Sign in with Supercell ID to claim it.')
+            : t('Opens Brawl Stars. An official Supercell link.')}
+        </p>
       </div>
     </section>
   );
@@ -240,6 +247,15 @@ function FollowButtons() {
       </a>
     </>
   );
+}
+
+/**
+ * A free product in the Supercell Store (2026-11-06, the first was 10x Gems):
+ * claimed on the store's website with Supercell ID, not by a voucher link
+ * that opens the game, so its card says so.
+ */
+function isStoreFreebie(url: string): boolean {
+  return /^https:\/\/store\.supercell\.com\/(?:[^?#]*\/)?product\//.test(url);
 }
 
 /** The game's green claim button, in the site's btn-game shape. */

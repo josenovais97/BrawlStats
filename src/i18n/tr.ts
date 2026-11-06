@@ -4026,6 +4026,8 @@ export const TR: Record<string, string> = {
     "Ücretsiz elmas için Brawl Stars kodları var mı?",
   "Are these links safe?":
     "Bu bağlantılar güvenli mi?",
+  "Opens the Supercell Store. Sign in with Supercell ID to claim it.":
+    "Supercell Store'u açar. Almak için Supercell ID ile giriş yap.",
   "Claim":
     "Al",
   "Discord server":

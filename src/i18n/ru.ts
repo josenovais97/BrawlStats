@@ -4027,6 +4027,8 @@ export const RU: Record<string, string> = {
     "Есть ли коды Brawl Stars на бесплатные кристаллы?",
   "Are these links safe?":
     "Эти ссылки безопасны?",
+  "Opens the Supercell Store. Sign in with Supercell ID to claim it.":
+    "Откроется Supercell Store. Войди через Supercell ID, чтобы забрать награду.",
   "Claim":
     "Забрать",
   "Discord server":
