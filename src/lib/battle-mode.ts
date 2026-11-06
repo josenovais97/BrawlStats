@@ -25,7 +25,14 @@ export const VARIANT_MODES: ReadonlySet<string> = new Set([
  * polluting the modes they were filed under. Remove an entry to list it (it
  * stays filed apart either way).
  */
-export const UNLISTED_MODES: ReadonlySet<string> = new Set(VARIANT_MODES);
+export const UNLISTED_MODES: ReadonlySet<string> = new Set([
+  ...VARIANT_MODES,
+  // Internal names for Wipeout and Duels that one sampler run (14:17 UTC,
+  // 2026-11-06) wrote as modes before f217fe1; hidden until those ~550 rows
+  // age out (raw rows 14 days, roll-ups 30).
+  'deathmatch',
+  'tagTeam',
+]);
 
 export function isListedMode(mode: string): boolean {
   return !UNLISTED_MODES.has(mode);

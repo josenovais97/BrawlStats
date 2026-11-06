@@ -24,6 +24,8 @@ test('matching modes, a missing event and an unknown event keep the battle mode'
 test('variants stay unlisted, the regular modes stay listed', () => {
   assert.equal(isListedMode('airHockey'), false);
   assert.equal(isListedMode('trioShowdown'), false);
+  assert.equal(isListedMode('deathmatch'), false);
+  assert.equal(isListedMode('tagTeam'), false);
   for (const mode of ['brawlBall', 'soloShowdown', 'duoShowdown', 'knockout', 'siege', 'wipeout', 'basketBrawl', 'duels']) {
     assert.equal(isListedMode(mode), true, mode);
   }
