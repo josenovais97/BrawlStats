@@ -9,6 +9,7 @@ import {
   getPlayer,
   getPlayerRankings,
 } from '@/lib/bs-api';
+import { battleModeOf } from '@/lib/battle-mode';
 import { isOptedOut } from '@/lib/opted-out';
 import { snapshotAndDiffCatalog } from '@/lib/catalog';
 import { BrawlApiError, toApiError } from '@/lib/errors';
@@ -1888,7 +1889,7 @@ async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
       // so it counts toward usage but never toward win rate.
       result: entry.battle.result ?? 'rank',
       rank: entry.battle.rank ?? null,
-      mode: entry.battle.mode ?? entry.event.mode ?? 'unknown',
+      mode: battleModeOf(entry),
       // Recorded so the ranked map pages can rank brawlers per map. Older
       // rows predate this and stay null, which those pages filter out.
       mapName: entry.event.map ?? null,
@@ -1908,7 +1909,7 @@ async function samplePlayer(tag: string, lastSampledAt: Date | null = null) {
         playerTag: normalized,
         brawlerId: brawler.id,
         result: entry.battle.result,
-        mode: entry.battle.mode ?? entry.event.mode ?? 'unknown',
+        mode: battleModeOf(entry),
         mapName: entry.event.map ?? null,
         battleType: type,
         allyBrawlerIds: sides.allies,

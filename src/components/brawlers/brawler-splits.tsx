@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { isListedMode } from '@/lib/battle-mode';
 import { formatNumber, formatPercent, humanizeMode } from '@/lib/format';
 import { slugify } from '@/lib/slugs';
 import type { BrawlerSplit } from '@/lib/stats';
@@ -36,7 +37,7 @@ export function BrawlerSplits({
       <SplitList
         title={t('Best modes')}
         empty={t('Not enough battles in any one mode yet.')}
-        rows={modes.slice(0, 6).map((split) => ({
+        rows={modes.filter((split) => isListedMode(split.mode)).slice(0, 6).map((split) => ({
           key: split.mode,
           label: humanizeMode(split.mode),
           href: `/tier-list/trophy/${slugify(split.mode)}`,

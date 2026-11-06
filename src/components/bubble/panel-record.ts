@@ -33,8 +33,8 @@ export interface SinceTagRecord {
 }
 
 /**
- * Form over the battles the game still holds (~25), shown the moment a tag is
- * in rather than after new games (owner, 2026-11-06): wins and losses in 3v3,
+ * Form over the Ranked battles the game still holds (of the last ~25), shown
+ * the moment a tag is in rather than after new games (owner, 2026-11-06): wins and losses,
  * how often the player was star player, and the current streak.
  */
 export interface RecentForm {
@@ -48,11 +48,20 @@ export interface RecentForm {
   byMode: { mode: string; wins: number; losses: number }[];
 }
 
-const STORED_RECORD = 'brawlzone-bubble-record';
+/*
+ * Ranked games only (owner, 2026-11-06): the panel is a Ranked tool and the
+ * rank bar is Ranked elo. The battle log calls trophy games "ranked" and real
+ * Ranked "soloRanked"/"teamRanked". The key moved to -v2 because records
+ * started that morning had counted trophy games.
+ */
+const RANKED_TYPES: ReadonlySet<string> = new Set(['soloRanked', 'teamRanked']);
+const STORED_RECORD = 'brawlzone-bubble-record-v2';
+const OLD_RECORD = 'brawlzone-bubble-record';
 const SEEN_CAP = 200;
 
 function load(): SinceTagRecord | null {
   try {
+    window.localStorage.removeItem(OLD_RECORD);
     const raw = window.localStorage.getItem(STORED_RECORD);
     return raw ? (JSON.parse(raw) as SinceTagRecord) : null;
   } catch {
@@ -77,7 +86,7 @@ function battleDate(value: string): number {
 type LogEntry = {
   battleTime: string;
   event?: { mode?: string };
-  battle?: { mode?: string; result?: string; starPlayer?: { tag?: string } | null };
+  battle?: { mode?: string; type?: string; result?: string; starPlayer?: { tag?: string } | null };
 };
 
 function formOf(items: LogEntry[], tag: string): RecentForm {
@@ -88,6 +97,7 @@ function formOf(items: LogEntry[], tag: string): RecentForm {
   for (const entry of items) {
     const result = entry.battle?.result;
     if (result !== 'victory' && result !== 'defeat') continue;
+    if (!RANKED_TYPES.has(entry.battle?.type ?? '')) continue;
     form.games += 1;
     if (result === 'victory') form.wins += 1;
     else form.losses += 1;
@@ -135,6 +145,7 @@ export function useSinceTagRecord(tag: string | null): { record: SinceTagRecord 
         for (const entry of [...(log.items ?? [])].reverse()) {
           const result = entry.battle?.result;
           if (result !== 'victory' && result !== 'defeat') continue;
+          if (!RANKED_TYPES.has(entry.battle?.type ?? '')) continue;
           if (seen.has(entry.battleTime) || !(battleDate(entry.battleTime) >= since)) continue;
           if (result === 'victory') wins += 1;
           else losses += 1;

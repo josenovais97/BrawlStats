@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { isListedMode } from '@/lib/battle-mode';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 
 import { unstable_cache } from 'next/cache';
@@ -2256,7 +2257,8 @@ async function computeFilterableModes(
 
     return groups
       .map((g) => ({ mode: g.mode, battles: g._sum.battles ?? 0 }))
-      .filter((m) => m.battles >= minBattles)
+      // Event variants filed apart since 2026-11-06 are not listed yet (lib/battle-mode).
+      .filter((m) => m.battles >= minBattles && isListedMode(m.mode))
       .sort((a, b) => b.battles - a.battles);
   } catch (error) {
     swallow('computeFilterableModes', error);

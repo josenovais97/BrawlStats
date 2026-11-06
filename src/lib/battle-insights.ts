@@ -1,3 +1,4 @@
+import { battleModeOf } from '@/lib/battle-mode';
 import { parseApiDate } from '@/lib/format';
 import { normalizeTag } from '@/lib/tags';
 import type { BSBattleLogEntry, BSBattlePlayer } from '@/types/brawlstars';
@@ -160,7 +161,7 @@ export function computeBattleInsights(
     }
 
     // Mode usage
-    const modeName = entry.battle.mode ?? entry.event.mode ?? 'unknown';
+    const modeName = battleModeOf(entry);
     const modeEntry = modes.get(modeName) ?? {
       mode: modeName,
       battles: 0,
