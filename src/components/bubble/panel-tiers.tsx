@@ -405,7 +405,22 @@ export function PanelTiers({
         </ul>
       )}
 
-      {open ? <BuildCard ref={cardRef} entry={open} build={build} /> : null}
+      {open ? (
+        <BuildCard
+          ref={cardRef}
+          entry={open}
+          build={build}
+          modes={modes}
+          onPickBrawler={(id) => {
+            const next = modes.find((m) => m.key === null)?.entries.find((e) => e.brawlerId === id);
+            if (next) toggle(next);
+          }}
+          onPickMap={(modeKey, mapName) => {
+            choose(modeKey);
+            chooseMap(mapName);
+          }}
+        />
+      ) : null}
     </>
   );
 }

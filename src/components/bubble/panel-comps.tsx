@@ -270,7 +270,7 @@ export function PanelComps({
       {shown.length > 0 ? (
         <p className="px-2 pt-2 text-center text-[10px] text-muted">{t('comps.tapBuild')}</p>
       ) : null}
-      {open ? <BuildCard ref={cardRef} entry={open} build={build} /> : null}
+      {open ? <BuildCard ref={cardRef} entry={open} build={build} modes={modes} /> : null}
     </>
   );
 }

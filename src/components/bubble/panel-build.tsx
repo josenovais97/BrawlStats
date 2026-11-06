@@ -1,9 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { panelBracket } from '@/components/bubble/bracket-data';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
+import type { PanelMode } from '@/components/bubble/panel-tiers';
+import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 
 /**
  * A brawler's most-owned build, as a card under whatever was tapped.
@@ -81,10 +84,17 @@ export function BuildCard({
   ref,
   entry,
   build,
+  modes,
+  onPickBrawler,
+  onPickMap,
 }: {
   ref: React.Ref<HTMLElement>;
   entry: BuildBrawler;
   build: BuildResponse | 'error' | undefined;
+  /** With the panel's modes, the card adds who counters it and its best maps. */
+  modes?: PanelMode[];
+  onPickBrawler?: (brawlerId: number) => void;
+  onPickMap?: (modeKey: string, mapName: string) => void;
 }) {
   const { t, name, lang } = usePanelI18n();
   return (
@@ -139,7 +149,139 @@ export function BuildCard({
           </p>
         </div>
       )}
+
+      {modes ? <BrawlerExtras id={entry.brawlerId} modes={modes} onPickBrawler={onPickBrawler} onPickMap={onPickMap} /> : null}
     </section>
+  );
+}
+
+interface Counter {
+  brawlerId: number;
+  winRate: number;
+  edge: number;
+  games: number;
+}
+
+/** Counters per brawler and rank, for the life of the panel. */
+const countersCache = new Map<string, Counter[]>();
+
+/**
+ * Everything else about a pick, under its build (owner, 2026-11-06): the
+ * three brawlers that beat it at your rank, and the Ranked maps where it
+ * ranks highest right now. The maps come from the lists the panel already
+ * holds, so only the counters cost a request, and only once per brawler.
+ * Tapping a counter opens its card; tapping a map opens that map's list.
+ */
+function BrawlerExtras({
+  id,
+  modes,
+  onPickBrawler,
+  onPickMap,
+}: {
+  id: number;
+  modes: PanelMode[];
+  onPickBrawler?: (brawlerId: number) => void;
+  onPickMap?: (modeKey: string, mapName: string) => void;
+}) {
+  const { t, name } = usePanelI18n();
+  const ownRank = useBubbleAccount().rankName;
+  const [counters, setCounters] = useState<Counter[] | null>(null);
+
+  useEffect(() => {
+    const rank = panelBracket(ownRank);
+    const key = `${id}|${rank ?? ''}`;
+    const hit = countersCache.get(key);
+    if (hit) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCounters(hit);
+      return;
+    }
+    setCounters(null);
+    const params = new URLSearchParams({ brawler: String(id) });
+    if (rank) params.set('rank', rank);
+    const controller = new AbortController();
+    fetch(`/api/v1/counters?${params}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((d: { counters: Counter[] }) => {
+        const top = d.counters.slice(0, 3);
+        countersCache.set(key, top);
+        setCounters(top);
+      })
+      .catch((err) => {
+        if ((err as Error).name !== 'AbortError') setCounters([]);
+      });
+    return () => controller.abort();
+  }, [id, ownRank]);
+
+  const portraits = useMemo(
+    () => new Map((modes.find((m) => m.key === null)?.entries ?? []).map((e) => [e.brawlerId, e])),
+    [modes],
+  );
+  const bestMaps = useMemo(
+    () =>
+      modes
+        .filter((m) => m.key !== null)
+        .flatMap((m) =>
+          m.maps.map((map) => {
+            const order = [...map.picks].sort((a, b) => b.score - a.score);
+            const at = order.findIndex((p) => p.brawlerId === id);
+            return at < 0 ? null : { modeKey: m.key as string, icon: m.icon, mapName: map.mapName, place: at + 1, score: order[at].score };
+          }),
+        )
+        .filter((x): x is NonNullable<typeof x> => x !== null)
+        .sort((a, b) => a.place - b.place || b.score - a.score)
+        .slice(0, 3),
+    [modes, id],
+  );
+
+  if ((counters === null || counters.length === 0) && bestMaps.length === 0) return null;
+
+  return (
+    <div className="space-y-2 border-t border-border p-2.5">
+      {counters && counters.length > 0 ? (
+        <div>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-muted">{t('card.counteredBy')}</p>
+          <ul className="flex flex-wrap gap-1">
+            {counters.map((c) => {
+              const b = portraits.get(c.brawlerId);
+              return (
+                <li key={c.brawlerId}>
+                  <button
+                    type="button"
+                    onClick={() => onPickBrawler?.(c.brawlerId)}
+                    className="flex items-center gap-1 rounded bg-surface-2/70 py-0.5 pe-1.5 ps-0.5"
+                  >
+                    {b ? <Image src={b.imageUrl} alt="" width={22} height={22} className="size-[22px] rounded bg-surface-2" unoptimized /> : null}
+                    <span className="text-[10px] font-bold leading-none">{b ? name(b.brawlerName) : c.brawlerId}</span>
+                    <span className="text-[10px] font-black tabular-nums leading-none text-victory">{(c.winRate * 100).toFixed(0)}%</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+      {bestMaps.length > 0 ? (
+        <div>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-muted">{t('card.bestMaps')}</p>
+          <ul className="flex flex-wrap gap-1">
+            {bestMaps.map((m) => (
+              <li key={`${m.modeKey}|${m.mapName}`}>
+                <button
+                  type="button"
+                  onClick={() => onPickMap?.(m.modeKey, m.mapName)}
+                  className="flex items-center gap-1 rounded bg-surface-2/70 px-1.5 py-0.5 text-[10px] leading-none"
+                >
+                  {m.icon ? <Image src={m.icon} alt="" width={14} height={14} className="size-3.5 object-contain" unoptimized /> : null}
+                  <span className="font-black tabular-nums text-brand">#{m.place}</span>
+                  <span className="font-semibold">{name(m.mapName)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

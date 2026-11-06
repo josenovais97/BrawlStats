@@ -5599,6 +5599,96 @@ export async function computeCompsBundle(): Promise<CompsBundle> {
   }
 }
 
+/**
+ * Who beats each brawler on each Ranked map (2026-11-06), for the Bubble's
+ * Counters tab when a map is chosen.
+ *
+ * getMapMatchups keeps the eight most extreme matchups per map, which suits a
+ * map page and is far too sparse for "who beats X here". This keeps, per map
+ * and per brawler, up to five counters: brawlers whose Ranked win rate
+ * against it on that map is at least 50% and at least two points above their
+ * own rate on the map, on 25 or more battles. Measured on Belle's Rock that
+ * gives 68 of 85 brawlers three or more. One pass over the raw team rows for
+ * every map, run by the precompute and stored per map, because one map alone
+ * is an 11 s scan.
+ */
+export interface MapCounter {
+  brawlerId: number;
+  winRate: number;
+  edge: number;
+  games: number;
+}
+
+const MAP_COUNTER_MIN_GAMES = 25;
+const MAP_COUNTER_MIN_EDGE = 0.02;
+const MAP_COUNTER_RETURN = 5;
+
+export async function computeMapCounters(): Promise<Map<string, Record<number, MapCounter[]>>> {
+  const prisma = getPrisma();
+  const out = new Map<string, Record<number, MapCounter[]>>();
+  if (!prisma) return out;
+  try {
+    const since = windowStartUtc(COMP_WINDOW_DAYS);
+    const [, rows] = await prisma.$transaction([
+      prisma.$executeRaw`SET LOCAL max_parallel_workers_per_gather = 0`,
+      prisma.$queryRaw<{ map_name: string; a: number; b: number; wins: bigint; decided: bigint; base_wins: bigint; base_decided: bigint }[]>`
+        WITH faced AS (
+          SELECT map_name, brawler_id AS a, unnest(enemy_brawler_ids) AS b, (result = 'victory')::int AS win
+          FROM battle_team_samples
+          WHERE battle_time >= ${since}
+            AND map_name IS NOT NULL
+            AND result IN ('victory', 'defeat')
+            AND battle_type = ANY(${[...COMPETITIVE_BATTLE_TYPES]}::text[])
+        ),
+        base AS (
+          SELECT map_name, a, SUM(win) AS wins, COUNT(*) AS decided FROM faced GROUP BY map_name, a
+        )
+        SELECT f.map_name, f.a, f.b, SUM(f.win) AS wins, COUNT(*) AS decided,
+               MAX(base.wins) AS base_wins, MAX(base.decided) AS base_decided
+        FROM faced f
+        JOIN base ON base.map_name = f.map_name AND base.a = f.a
+        GROUP BY f.map_name, f.a, f.b
+        HAVING COUNT(*) >= ${MAP_COUNTER_MIN_GAMES}
+      `,
+    ]);
+    const lists = new Map<string, Map<number, MapCounter[]>>();
+    for (const row of rows) {
+      const decided = Number(row.decided);
+      const baseDecided = Number(row.base_decided);
+      if (decided === 0 || baseDecided === 0) continue;
+      const winRate = Number(row.wins) / decided;
+      const edge = winRate - Number(row.base_wins) / baseDecided;
+      if (winRate < 0.5 || edge < MAP_COUNTER_MIN_EDGE) continue;
+      const key = mapNameKey(row.map_name);
+      const byTarget = lists.get(key) ?? new Map<number, MapCounter[]>();
+      const list = byTarget.get(row.b) ?? [];
+      list.push({ brawlerId: row.a, winRate, edge, games: decided });
+      byTarget.set(row.b, list);
+      lists.set(key, byTarget);
+    }
+    for (const [key, byTarget] of lists) {
+      const record: Record<number, MapCounter[]> = {};
+      for (const [target, list] of byTarget) {
+        record[target] = list.sort((x, y) => y.edge - x.edge).slice(0, MAP_COUNTER_RETURN);
+      }
+      out.set(key, record);
+    }
+    return out;
+  } catch (error) {
+    swallow('computeMapCounters', error);
+    return out;
+  }
+}
+
+export function mapCountersKey(mapName: string): string {
+  return `map-counters:${mapNameKey(mapName)}`;
+}
+
+/** The precomputed counters for one map, or null when there are none yet. */
+export async function getMapCounters(mapName: string): Promise<Record<number, MapCounter[]> | null> {
+  return precomputed<Record<number, MapCounter[]>>(mapCountersKey(mapName));
+}
+
 const cachedRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
 
 /** Ranked trios, all ranks or one: the precomputed row, else computed live. */
@@ -5655,6 +5745,12 @@ export async function precomputeJobs(): Promise<{ key: string; run: () => Promis
   // Every comps list from one pass, built by whichever job asks first.
   let bundle: Promise<CompsBundle> | undefined;
   const comps = () => (bundle ??= computeCompsBundle());
+  // Per-map counters from one pass, stored per Ranked map (the Bubble reads one map at a time).
+  let mapCounterBundle: Promise<Map<string, Record<number, MapCounter[]>>> | undefined;
+  const mapCounters = () => (mapCounterBundle ??= computeMapCounters());
+  const rankedMapNames = await getRankedMapPicks(60, RANKED_MAP_WINDOW_DAYS)
+    .then((maps) => [...new Set(maps.map((m) => m.mapName))])
+    .catch(() => [] as string[]);
   return [
     { key: 'team-comps:12', run: async () => (await comps()).team(12) },
     { key: 'indexable-pairs', run: computeStickyIndexablePairs },
@@ -5671,6 +5767,10 @@ export async function precomputeJobs(): Promise<{ key: string; run: () => Promis
         keepEmpty: true,
       })),
     ),
+    ...rankedMapNames.map((mapName) => ({
+      key: mapCountersKey(mapName),
+      run: async () => (await mapCounters()).get(mapNameKey(mapName)) ?? {},
+    })),
     ...BRACKET_IDS.flatMap((b) =>
       PRECOMPUTED_MAP_DEPTHS.map((depth) => ({
         key: `bracket-map-picks:${b}:${depth}`,

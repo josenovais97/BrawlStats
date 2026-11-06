@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 import { panelBracket } from '@/components/bubble/bracket-data';
+import { recall } from '@/components/bubble/panel-chips';
 import type { DraftBrawler } from '@/components/bubble/panel-draft';
 import { usePanelI18n } from '@/components/bubble/panel-i18n';
 import type { PanelMode } from '@/components/bubble/panel-tiers';
@@ -52,6 +53,12 @@ export function PanelCounters({ modes, roster }: { modes: PanelMode[]; roster: D
   const [selected, setSelected] = useState<number | null>(null);
   const [everyone, setEveryone] = useState(false);
   const [query, setQuery] = useState('');
+  // The map chosen on any tab (shared in storage), so counters can be for it.
+  const [mapName, setMapName] = useState<string | null>(null);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMapName(recall().map);
+  }, []);
 
   const byId = useMemo(
     () => new Map<number, LocalBrawler>(roster.map((b) => [b.brawlerId, { ...b, localName: name(b.brawlerName) }])),
@@ -84,7 +91,7 @@ export function PanelCounters({ modes, roster }: { modes: PanelMode[]; roster: D
   return (
     <div className="space-y-2">
       {selected !== null ? (
-        <CounterCard id={selected} ownRank={ownRank} byId={byId} tier={tierOf.get(selected) ?? null} lang={lang} onPick={choose} />
+        <CounterCard id={selected} ownRank={ownRank} byId={byId} tier={tierOf.get(selected) ?? null} lang={lang} onPick={choose} mapName={mapName} onAllMaps={() => setMapName(null)} />
       ) : (
         <p className="px-2 text-[11px] leading-snug text-muted">{t('chooser.counters')}</p>
       )}
@@ -160,6 +167,8 @@ function CounterCard({
   tier,
   lang,
   onPick,
+  mapName,
+  onAllMaps,
 }: {
   id: number;
   ownRank: string | null;
@@ -167,26 +176,37 @@ function CounterCard({
   tier: Tier | null;
   lang: string;
   onPick: (id: number) => void;
+  mapName: string | null;
+  onAllMaps: () => void;
 }) {
-  const { t } = usePanelI18n();
-  const [data, setData] = useState<{ counters: Counter[]; allRanks: boolean } | null>(null);
+  const { t, name } = usePanelI18n();
+  const [data, setData] = useState<{ counters: Counter[]; allRanks: boolean; map: string | null; mapThin: boolean } | null>(null);
   const brawler = byId.get(id);
 
   useEffect(() => {
     const params = new URLSearchParams({ brawler: String(id) });
     const rank = panelBracket(ownRank);
     if (rank) params.set('rank', rank);
+    if (mapName) params.set('map', mapName);
     const controller = new AbortController();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setData(null);
     fetch(`/api/v1/counters?${params}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((d: { counters: Counter[]; allRanks: boolean }) => setData({ counters: d.counters, allRanks: d.allRanks && rank !== null }))
+      .then((d: { counters: Counter[]; allRanks: boolean; map?: string | null; mapThin?: boolean }) =>
+        setData({
+          counters: d.counters,
+          // Map counters span every rank by design; only the rank answer's fallback is worth a note.
+          allRanks: !d.map && d.allRanks && rank !== null,
+          map: d.map ?? null,
+          mapThin: Boolean(d.mapThin),
+        }),
+      )
       .catch((err) => {
-        if ((err as Error).name !== 'AbortError') setData({ counters: [], allRanks: false });
+        if ((err as Error).name !== 'AbortError') setData({ counters: [], allRanks: false, map: null, mapThin: false });
       });
     return () => controller.abort();
-  }, [id, ownRank]);
+  }, [id, ownRank, mapName]);
 
   const maxEdge = Math.max(0.01, ...(data?.counters ?? []).map((c) => c.edge));
   const medal = ['bg-brand text-brand-ink', 'bg-[#c9d3ee] text-[#1b2350]', 'bg-[#8a5a2b] text-[#ffe6c7]'];
@@ -216,7 +236,18 @@ function CounterCard({
           <h3 className="display truncate text-[15px] uppercase leading-tight text-game-stroke">
             {t('draft.beats', { name: brawler?.localName ?? String(id) })}
           </h3>
-          {data?.allRanks ? <p className="text-[9px] leading-tight text-muted">{t('counters.allRanks')}</p> : null}
+          {data?.map ? (
+            <p className="flex items-center gap-1.5 text-[10px] leading-tight text-[#a3eaff]">
+              {t('counters.onMap', { map: name(data.map) })}
+              <button type="button" onClick={onAllMaps} className="bz-chip px-1.5 py-0 text-[9px] leading-tight">
+                {t('chips.allMaps')}
+              </button>
+            </p>
+          ) : data?.mapThin && mapName ? (
+            <p className="text-[9px] leading-tight text-muted">{t('counters.mapThin', { map: name(mapName) })}</p>
+          ) : data?.allRanks ? (
+            <p className="text-[9px] leading-tight text-muted">{t('counters.allRanks')}</p>
+          ) : null}
         </div>
       </header>
 

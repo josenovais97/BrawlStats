@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 
 import { bracketBySlug } from '@/lib/rank-brackets';
 import { errorResponse, okResponse } from '@/lib/route-helpers';
-import { getRankedCounterScores, type CounterScore } from '@/lib/stats';
+import { getMapCounters, getRankedCounterScores, type CounterScore } from '@/lib/stats';
 
 /**
  * Who beats one brawler in Ranked, for the Bubble's draft tab: tap an enemy
@@ -37,13 +37,24 @@ export async function GET(request: NextRequest) {
     const id = Number(params.get('brawler'));
     if (!Number.isInteger(id) || id <= 0) return okResponse({ brawlerId: null, counters: [], allRanks: true });
     const bracket = bracketBySlug(params.get('rank'))?.id;
+    /*
+     * On a map (2026-11-06): who beats this brawler there, from the
+     * precompute's per-map counters, when at least three are measured;
+     * otherwise the rank answer below, flagged `mapThin` so the panel says so.
+     */
+    const mapName = params.get('map')?.trim() || null;
+    if (mapName) {
+      const onMap = ((await getMapCounters(mapName).catch(() => null)) ?? {})[id] ?? [];
+      if (onMap.length >= 3) return okResponse({ brawlerId: id, counters: onMap, allRanks: true, map: mapName }, 600);
+    }
+    const thin = mapName !== null;
 
     if (bracket) {
       const atRank = top(await getRankedCounterScores([id], WINDOW_DAYS, bracket).catch(() => new Map()), id, MIN_GAMES_AT_RANK);
-      if (atRank.length >= 3) return okResponse({ brawlerId: id, counters: atRank, allRanks: false }, 600);
+      if (atRank.length >= 3) return okResponse({ brawlerId: id, counters: atRank, allRanks: false, map: null, mapThin: thin }, 600);
     }
     const all = top(await getRankedCounterScores([id], WINDOW_DAYS).catch(() => new Map()), id, MIN_GAMES);
-    return okResponse({ brawlerId: id, counters: all, allRanks: true }, 600);
+    return okResponse({ brawlerId: id, counters: all, allRanks: true, map: null, mapThin: thin }, 600);
   } catch (error) {
     return errorResponse(error);
   }
