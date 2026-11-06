@@ -220,6 +220,19 @@ export default async function BubblePanelPage() {
     entry.maps[m.mapName] = m.comps.map(toComp);
   }
 
+  /*
+   * Every game mode's name and art, keyed by the battle log's lower-cased mode
+   * (aliases included, so `airHockey` finds Brawl Hockey), for the player
+   * card's form-by-mode chips: a player's last games are not limited to the
+   * modes the Meta tab lists.
+   */
+  const modeArt: Record<string, { label: string; icon: string | null }> = {};
+  for (const [key, mode] of modeMeta) {
+    const nameKey = mode.name.toLowerCase().replace(/\s+/g, '');
+    if (key === nameKey && mode.scHash && mode.scHash.toLowerCase() !== key) continue;
+    modeArt[key] = { label: mode.name, icon: mode.imageUrl ?? null };
+  }
+
   const modes: PanelMode[] = [
     // No maps on the combined list: the full pool is around thirty, which is
     // more chips than this window can show without becoming the whole panel.
@@ -274,6 +287,7 @@ export default async function BubblePanelPage() {
             roster={roster}
             windowDays={WINDOW_DAYS}
             comps={comps}
+            modeArt={modeArt}
             season={
               season?.current
                 ? {

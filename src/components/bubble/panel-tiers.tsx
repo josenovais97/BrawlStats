@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   bracketLabel as leagueLabel,
@@ -258,6 +258,22 @@ export function PanelTiers({
   const bracketThin = bracket !== null && loadedLists !== undefined && !bracketList;
   const entries = bracketList?.entries ?? current.entries;
   const activeBracket = bracketBySlug(bracket);
+  // The brawler card's "Best maps" reads the same per-rank map lists the Meta
+  // tab shows, so a brawler at #1 on a map at your rank says so there too.
+  const cardModes = useMemo(() => {
+    if (!loadedLists || loadedLists === 'error') return modes;
+    return modes.map((m) =>
+      m.key === null
+        ? m
+        : {
+            ...m,
+            maps: m.maps.map((mp) => {
+              const picks = loadedLists.maps[`${mp.mode}|${mp.mapName}`];
+              return picks && picks.length > 0 ? { ...mp, picks } : mp;
+            }),
+          },
+    );
+  }, [modes, loadedLists]);
 
   /*
    * The tapped brawler's build, fetched rather than pre-rendered.
@@ -410,7 +426,7 @@ export function PanelTiers({
           ref={cardRef}
           entry={open}
           build={build}
-          modes={modes}
+          modes={cardModes}
           onPickBrawler={(id) => {
             const next = modes.find((m) => m.key === null)?.entries.find((e) => e.brawlerId === id);
             if (next) toggle(next);

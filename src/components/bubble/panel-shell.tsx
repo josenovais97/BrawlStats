@@ -43,12 +43,15 @@ export function PanelShell({
   windowDays,
   comps,
   season = null,
+  modeArt = {},
 }: {
   modes: PanelMode[];
   roster: DraftBrawler[];
   windowDays: number;
   comps: Record<string, PanelModeComps>;
   season?: PanelSeason | null;
+  /** Every mode's name and art by lower-cased battle-log key, for the form chips. */
+  modeArt?: Record<string, { label: string; icon: string | null }>;
 }) {
   /*
    * Nothing until the reader chooses.
@@ -84,7 +87,7 @@ export function PanelShell({
   };
 
   const account = useBubbleAccount();
-  const { t, lang } = usePanelI18n();
+  const { t, lang, name } = usePanelI18n();
   const { record, form } = useSinceTagRecord(account.tag);
   // The player card opens a small drawer: rank progress and form by mode.
   const [cardOpen, setCardOpen] = useState(false);
@@ -205,13 +208,20 @@ export function PanelShell({
             <ul className="flex flex-wrap gap-1">
               {form.byMode.map((m) => {
                 const pm = modes.find((x) => x.key === m.mode);
+                const art = modeArt[m.mode.toLowerCase()];
+                const icon = pm?.icon ?? art?.icon ?? null;
+                const label = pm ? modeName(pm) : art ? name(art.label) : m.mode;
                 return (
                   <li
                     key={m.mode}
                     className="inline-flex items-center gap-1 rounded-md bg-surface-2/70 px-1.5 py-0.5"
-                    title={pm ? modeName(pm) : m.mode}
+                    title={label}
                   >
-                    {pm?.icon ? <Image src={pm.icon} alt="" width={14} height={14} className="size-3.5 object-contain" unoptimized /> : null}
+                    {icon ? (
+                      <Image src={icon} alt={label} width={14} height={14} className="size-3.5 object-contain" unoptimized />
+                    ) : (
+                      <span className="text-muted">{label}</span>
+                    )}
                     <span className={`font-bold tabular-nums ${m.wins > m.losses ? 'text-victory' : m.wins < m.losses ? 'text-defeat' : 'text-foreground'}`}>
                       {m.wins}–{m.losses}
                     </span>
