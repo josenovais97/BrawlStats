@@ -138,6 +138,11 @@ export default function HomePage() {
         }
       />
 
+      {/* The Google Play launch banner (or the tester card while a closed test
+          recruits), right under the hero where every visitor sees it. It sat
+          above the footer until 2026-11-06, past where most people scroll. */}
+      <HomePlayTest />
+
       {/* Renders nothing until the visitor has saved someone. */}
       <FavoritesList />
 
@@ -181,9 +186,6 @@ export default function HomePage() {
       </HomeBand>
 
       <HomeBubble />
-
-      {/* While the Google Play closed test is recruiting; nothing otherwise. */}
-      <HomePlayTest />
     </div>
   );
 }
