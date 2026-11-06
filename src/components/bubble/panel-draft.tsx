@@ -1,5 +1,6 @@
 'use client';
 
+import { ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { panelBracket } from '@/components/bubble/bracket-data';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
@@ -51,6 +52,15 @@ interface Suggestion {
   counterEdge: number | null;
   allyEdge: number | null;
   total: number;
+}
+
+/** A safe first pick: strong on the map, and its worst answer there. See getSafePicks. */
+interface SafePick {
+  brawlerId: number;
+  brawlerName: string;
+  mapScore: number;
+  safety: number;
+  worst: { brawlerId: number; brawlerName: string; edge: number } | null;
 }
 
 type Slot = 'bans' | 'allies' | 'enemies';
@@ -118,6 +128,7 @@ export function PanelDraft({
   const [changing, setChanging] = useState(false);
   const [query, setQuery] = useState('');
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
+  const [safe, setSafe] = useState<SafePick[]>([]);
   const [loading, setLoading] = useState(false);
 
   const { t, name, lang } = usePanelI18n();
@@ -239,9 +250,15 @@ export function PanelDraft({
       setLoading(true);
       fetch(`/api/v1/draft-suggest?${params}`, { signal: controller.signal })
         .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-        .then((data: { picks: Suggestion[] }) => setPicks(data.picks))
+        .then((data: { picks: Suggestion[]; safe?: SafePick[] }) => {
+          setPicks(data.picks);
+          setSafe(data.safe ?? []);
+        })
         .catch((err) => {
-          if ((err as Error).name !== 'AbortError') setPicks([]);
+          if ((err as Error).name !== 'AbortError') {
+            setPicks([]);
+            setSafe([]);
+          }
         })
         .finally(() => setLoading(false));
     }, 220);
@@ -262,6 +279,7 @@ export function PanelDraft({
     // Cleared here rather than in the effect: a new map invalidates the old
     // answer, and that is a consequence of the tap, not of the fetch.
     setPicks(null);
+    setSafe([]);
     setPicked({ bans: [], allies: [], enemies: [] });
   };
 
@@ -270,6 +288,7 @@ export function PanelDraft({
     setPicked({ bans: [], allies: [], enemies: [] });
     setPicking(null);
     setPicks(null);
+    setSafe([]);
   };
 
   const add = (slot: Slot, id: number) => {
@@ -550,6 +569,9 @@ export function PanelDraft({
             />
           ) : null}
 
+          {/* Before the enemy has picked: what is hard to punish here. */}
+          {picked.enemies.length === 0 && safe.length > 0 ? <SafePicks safe={safe} byId={byId} /> : null}
+
           <Suggestions picks={picks} loading={loading} byId={byId} />
         </>
       )}
@@ -692,6 +714,67 @@ function PickerTile({
  * that is merely strong here is a different call from one that is strong here
  * *and* answers what they just took.
  */
+/**
+ * The first-pick strip (2026-11-06): three brawlers that are strong on this
+ * map and whose worst answer here costs the least, each with that answer.
+ * Shown only until the first enemy is entered; after that the suggestion list
+ * already weighs the real counters.
+ */
+function SafePicks({ safe, byId }: { safe: SafePick[]; byId: Map<number, LocalBrawler> }) {
+  const { t } = usePanelI18n();
+  const signed = (edge: number) => `${edge >= 0 ? '+' : '−'}${Math.abs(edge * 100).toFixed(1)}`;
+  return (
+    <section className="bz-panel overflow-hidden">
+      <header className="flex items-center justify-between gap-2 px-2 pt-1.5">
+        <h3 className="flex shrink-0 items-center gap-1 text-[11px] font-black uppercase tracking-wide text-victory">
+          <ShieldCheck className="size-3.5" aria-hidden />
+          {t('draft.safeTitle')}
+        </h3>
+        <span className="truncate text-[9px] text-muted">{t('draft.safeHint')}</span>
+      </header>
+      <ul className="grid grid-cols-3 gap-1.5 p-1.5">
+        {safe.map((pick) => {
+          const b = byId.get(pick.brawlerId);
+          const w = pick.worst ? byId.get(pick.worst.brawlerId) : undefined;
+          return (
+            <li key={pick.brawlerId} className="flex min-w-0 flex-col items-center gap-0.5 rounded-lg bg-surface-2/60 px-1 py-1.5 text-center">
+              <Image
+                src={b?.imageUrl ?? ''}
+                alt=""
+                width={32}
+                height={32}
+                className="size-8 rounded bg-surface-2 ring-2 ring-victory/40"
+                loading="lazy"
+                unoptimized
+              />
+              <span className="w-full truncate text-[11px] font-bold leading-tight">{b?.localName ?? pick.brawlerName}</span>
+              <span className="text-[9px] leading-tight text-muted">{t('draft.map', { n: (pick.mapScore * 100).toFixed(0) })}</span>
+              {pick.worst ? (
+                <span
+                  className={`flex items-center gap-1 text-[9px] leading-tight ${pick.worst.edge < 0 ? 'text-defeat/80' : 'text-victory/80'}`}
+                  title={w?.localName ?? pick.worst.brawlerName}
+                >
+                  {t('draft.worst')}
+                  <Image
+                    src={w?.imageUrl ?? ''}
+                    alt={w?.localName ?? pick.worst.brawlerName}
+                    width={12}
+                    height={12}
+                    className="size-3 rounded-sm bg-surface-2"
+                    loading="lazy"
+                    unoptimized
+                  />
+                  {signed(pick.worst.edge)}
+                </span>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 function Suggestions({
   picks,
   loading,

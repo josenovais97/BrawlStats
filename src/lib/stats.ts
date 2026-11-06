@@ -3846,6 +3846,76 @@ async function pairingScores(
 }
 
 /** `compute_pairingMatrix` for one Ranked bracket, from `ranked_pair_daily`. */
+/**
+ * Safe first picks for one map (2026-11-06): strong here and hard to punish.
+ *
+ * A first pick is made before the enemy has shown anything, so the question
+ * is not "who beats their team" but "how good is their best answer to me".
+ * The answer is taken from the map's strongest picks, because those are what
+ * a sensible enemy counter-picks with here: for each candidate, its worst
+ * matchup among them. Safety is the candidate's map score plus that worst
+ * edge, so a brawler that is strong but has one brutal answer on this map
+ * drops below one that is slightly weaker and has none.
+ *
+ * Each edge is shrunk toward zero by its sample before the worst is chosen:
+ * the minimum of ten noisy numbers is mostly noise otherwise, and a
+ * thinly-measured "hard counter" would decide the list. Candidates with too
+ * few measured matchups are left out rather than looking safe for want of
+ * evidence. Everything comes from the cached pairing matrices, so this adds
+ * in-memory passes, not queries.
+ */
+export interface SafePick {
+  brawlerId: number;
+  brawlerName: string;
+  mapScore: number;
+  safety: number;
+  worst: { brawlerId: number; brawlerName: string; edge: number } | null;
+}
+
+const SAFE_CANDIDATES = 20;
+const SAFE_THREATS = 10;
+const SAFE_MIN_MAP_BATTLES = 30;
+const SAFE_MIN_THREATS_MEASURED = 4;
+const SAFE_EDGE_SHRINK = 60;
+const SAFE_RETURN = 3;
+
+export async function getSafePicks(
+  picks: { brawlerId: number; brawlerName: string; score: number; decidedSampleSize: number }[],
+  bracket?: number,
+  windowDays = 21,
+): Promise<SafePick[]> {
+  const solid = picks
+    .filter((p) => p.decidedSampleSize >= SAFE_MIN_MAP_BATTLES)
+    .sort((a, b) => b.score - a.score);
+  if (solid.length < 2) return [];
+  const threats = solid.slice(0, SAFE_THREATS);
+  const against = await Promise.all(
+    threats.map(async (threat) => [threat, await pairingScores([threat.brawlerId], 'enemy', windowDays, bracket)] as const),
+  );
+  const out: SafePick[] = [];
+  for (const candidate of solid.slice(0, SAFE_CANDIDATES)) {
+    let worst: SafePick['worst'] = null;
+    let measured = 0;
+    for (const [threat, scores] of against) {
+      if (threat.brawlerId === candidate.brawlerId) continue;
+      const score = scores.get(candidate.brawlerId);
+      if (!score) continue;
+      measured += 1;
+      const edge = (score.edge * score.decidedSampleSize) / (score.decidedSampleSize + SAFE_EDGE_SHRINK);
+      if (!worst || edge < worst.edge) worst = { brawlerId: threat.brawlerId, brawlerName: threat.brawlerName, edge };
+    }
+    if (measured < SAFE_MIN_THREATS_MEASURED) continue;
+    out.push({
+      brawlerId: candidate.brawlerId,
+      brawlerName: candidate.brawlerName,
+      mapScore: candidate.score,
+      safety: candidate.score + Math.min(0, worst?.edge ?? 0),
+      worst,
+    });
+  }
+  return out.sort((a, b) => b.safety - a.safety).slice(0, SAFE_RETURN);
+}
+
 async function compute_rankedPairingMatrix(
   side: 'enemy' | 'ally',
   windowDays: number,

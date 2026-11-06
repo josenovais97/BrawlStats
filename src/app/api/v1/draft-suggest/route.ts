@@ -8,6 +8,7 @@ import {
   getBracketMapPicks,
   getCounterScores,
   getRankedMapPicks,
+  getSafePicks,
 } from '@/lib/stats';
 
 /**
@@ -106,7 +107,17 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.total - a.total)
       .slice(0, RETURN);
 
-    return okResponse({ mapName: map.mapName, mode: map.mode, picks }, 300);
+    /*
+     * Safe first picks, only while the enemy has picked nothing: once they
+     * have, the counter edges above answer the real question. Bans and
+     * team-mates are out of the running on both sides: nobody can pick them.
+     */
+    const safe =
+      enemies.length === 0
+        ? await getSafePicks(map.picks.filter((p) => !taken.has(p.brawlerId)), bracket).catch(() => [])
+        : [];
+
+    return okResponse({ mapName: map.mapName, mode: map.mode, picks, safe }, 300);
   } catch (error) {
     return errorResponse(error);
   }
