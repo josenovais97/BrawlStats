@@ -269,7 +269,21 @@ export default async function BubblePanelPage() {
             <PanelText k="page.empty" />
           </p>
         ) : (
-          <PanelShell modes={modes} roster={roster} windowDays={WINDOW_DAYS} comps={comps} />
+          <PanelShell
+            modes={modes}
+            roster={roster}
+            windowDays={WINDOW_DAYS}
+            comps={comps}
+            season={
+              season?.current
+                ? {
+                    number: season.current.number,
+                    endsOn: season.current.endsOn,
+                    trial: season.current.brawlers.map((b) => ({ name: b.name, imageUrl: brawlerIconUrl(b.id) })),
+                  }
+                : null
+            }
+          />
         )}
 
         {/* Donation ask, site build only (see the component). */}

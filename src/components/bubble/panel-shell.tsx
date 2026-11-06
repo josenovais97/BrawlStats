@@ -9,6 +9,8 @@ import { PanelDraft, type DraftBrawler } from '@/components/bubble/panel-draft';
 import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
+import { useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
+import { Check, X } from 'lucide-react';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
 
 /**
@@ -38,11 +40,13 @@ export function PanelShell({
   roster,
   windowDays,
   comps,
+  season = null,
 }: {
   modes: PanelMode[];
   roster: DraftBrawler[];
   windowDays: number;
   comps: Record<string, PanelModeComps>;
+  season?: PanelSeason | null;
 }) {
   /*
    * Nothing until the reader chooses.
@@ -79,6 +83,8 @@ export function PanelShell({
 
   const account = useBubbleAccount();
   const { t, lang } = usePanelI18n();
+  const record = useSinceTagRecord(account.tag);
+  const shortDate = (iso: string) => new Date(iso).toLocaleDateString(lang, { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
   // One open per panel, with the tab it opened on and whether a tag is set --
   // a yes/no, never the tag. Read after the saved tab has been restored.
@@ -124,7 +130,22 @@ export function PanelShell({
           )}
           <span className="min-w-0 flex-1 leading-tight">
             <span className="display block truncate text-sm">{account.name ?? `#${account.tag}`}</span>
-            <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
+            {/* Wins and losses since the tag went in (2026-11-06), in place
+                of the tag itself once there is a record to show. */}
+            {record && record.wins + record.losses > 0 ? (
+              <span
+                className="flex items-center gap-1 truncate text-[10px] text-muted"
+                title={t('record.title', { w: record.wins, l: record.losses })}
+              >
+                <Check className="size-3 text-victory" aria-hidden />
+                <span className="font-bold tabular-nums text-victory">{record.wins}</span>
+                <X className="size-3 text-defeat" aria-hidden />
+                <span className="font-bold tabular-nums text-defeat">{record.losses}</span>
+                <span className="truncate">· {t('record.since', { date: shortDate(record.since) })}</span>
+              </span>
+            ) : (
+              <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
+            )}
           </span>
           <span className="bz-chip-on shrink-0 px-1.5 py-0.5 text-[10px]">
             {filterLabel}
@@ -147,6 +168,23 @@ export function PanelShell({
         tab bar. A full-width segmented control would cost a row of a window
         that is only ~375dp tall in the orientation the game is played in.
       */}
+      {/* The Ranked season in one line: when it ends, and its trial brawlers. */}
+      {season ? (
+        <div className="mx-1 mb-2 flex items-center gap-1.5 overflow-hidden text-[10px] text-muted">
+          <span className="truncate font-semibold">
+            {season.endsOn ? t('season.ends', { n: season.number, date: shortDate(season.endsOn) }) : `S${season.number}`}
+          </span>
+          {season.trial.length > 0 ? (
+            <>
+              <span className="shrink-0">· {t('season.trial')}</span>
+              {season.trial.slice(0, 4).map((b) => (
+                <Image key={b.name} src={b.imageUrl} alt={b.name} title={b.name} width={16} height={16} className="size-4 shrink-0 rounded-sm bg-surface-2" unoptimized />
+              ))}
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
       <div role="tablist" aria-label="Panel view" className="mb-2.5 flex gap-1.5 px-1">
         {(
           [
