@@ -373,7 +373,10 @@ export function PanelDraft({
       {map && !changing ? (
         <button
           type="button"
-          onClick={() => setChanging(true)}
+          onClick={() => {
+            setChanging(true);
+            setPickingMode(true);
+          }}
           className="flex w-full items-center gap-1.5 px-1 pb-1 text-start text-[11px]"
         >
           {currentMode?.icon ? (
@@ -396,12 +399,12 @@ export function PanelDraft({
         <>
           {currentMode && !pickingMode ? (
             <div className="flex items-center gap-1.5 px-1 text-[11px]">
-              <span className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
+              <button type="button" onClick={() => setPickingMode(true)} className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
                 {currentMode.icon ? (
                   <Image src={currentMode.icon} alt="" width={16} height={16} className="size-4 shrink-0 object-contain" unoptimized />
                 ) : null}
                 {modeName(currentMode)}
-              </span>
+              </button>
               <button type="button" onClick={() => setPickingMode(true)} className="bz-chip ms-auto shrink-0 px-2 py-0.5">
                 {t('chips.change')}
               </button>
@@ -442,7 +445,7 @@ export function PanelDraft({
           </div>
           )}
 
-          {currentMode && !pickingMode ? (
+          {currentMode ? (
             <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 text-[11px]">
               {[...currentMode.maps]
                 .sort((a, b) => name(a.mapName).localeCompare(name(b.mapName), lang))

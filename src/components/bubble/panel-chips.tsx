@@ -87,7 +87,11 @@ export function ModeMapChips({
     return (
       <button
         type="button"
-        onClick={() => setChanging(true)}
+        onClick={() => {
+          // Change reopens the modes too, not just this mode's maps (owner).
+          setChanging(true);
+          setPickingMode(true);
+        }}
         className="bz-panel mx-1 mb-2.5 flex w-[calc(100%-0.5rem)] items-center gap-1.5 px-2 py-1.5 text-start text-[11px]"
       >
         {mode.icon ? (
@@ -115,12 +119,13 @@ export function ModeMapChips({
     <>
       {modeChosen ? (
         <div className="flex items-center gap-1.5 px-1 pb-2 text-[11px]">
-          <span className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
+          {/* The chosen mode is itself a way back to the other modes. */}
+          <button type="button" onClick={() => setPickingMode(true)} className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
             {mode.icon ? (
               <Image src={mode.icon} alt="" width={16} height={16} className="size-4 shrink-0 object-contain" unoptimized />
             ) : null}
             {modeName(mode)}
-          </span>
+          </button>
           <button type="button" onClick={() => setPickingMode(true)} className="bz-chip ms-auto shrink-0 px-2 py-0.5">
             {t('chips.change')}
           </button>
@@ -159,7 +164,7 @@ export function ModeMapChips({
       </div>
       )}
 
-      {modeChosen && mode.maps.length > 0 ? (
+      {mode.key !== null && mode.maps.length > 0 ? (
         <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
           <button
             type="button"

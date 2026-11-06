@@ -101,6 +101,9 @@ export const UI_EN = {
   'counters.search': "Find a brawler…",
   'record.since': "since {date}",
   'record.title': "{w} wins and {l} losses since you added your tag",
+  'record.last': "Last {n}",
+  'record.starTitle': "Star player in {n} of the last {g} games",
+  'record.streakTitle': "{n} wins in a row",
   'season.ends': "Season {n} · ends {date}",
   'season.trial': "Trial",
   'draft.withEdge': 'with {n}',
@@ -130,7 +133,7 @@ export const UI_EN = {
   'bracket.mapsAdjusted': 'Picks for {rank}: this map’s results from every rank, adjusted to how each brawler does at {rank}.',
 
   'page.empty': 'Not enough sampled Ranked battles yet. This fills in as more battles are sampled.',
-  'page.footer': 'Meta score combines adjusted win rate and pick rate across sampled Ranked battles. Brawlers without enough battles are left out rather than guessed at.',
+  'page.footer': "Meta score combines win rate and pick rate from sampled Ranked battles. Brawlers with too few battles are left out.",
 } as const;
 
 export type UiKey = keyof typeof UI_EN;

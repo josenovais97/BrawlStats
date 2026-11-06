@@ -83,7 +83,7 @@ export function PanelShell({
 
   const account = useBubbleAccount();
   const { t, lang } = usePanelI18n();
-  const record = useSinceTagRecord(account.tag);
+  const { record, form } = useSinceTagRecord(account.tag);
   const shortDate = (iso: string) => new Date(iso).toLocaleDateString(lang, { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
   // One open per panel, with the tab it opened on and whether a tag is set --
@@ -130,18 +130,26 @@ export function PanelShell({
           )}
           <span className="min-w-0 flex-1 leading-tight">
             <span className="display block truncate text-sm">{account.name ?? `#${account.tag}`}</span>
-            {/* Wins and losses since the tag went in (2026-11-06), in place
-                of the tag itself once there is a record to show. */}
-            {record && record.wins + record.losses > 0 ? (
-              <span
-                className="flex items-center gap-1 truncate text-[10px] text-muted"
-                title={t('record.title', { w: record.wins, l: record.losses })}
-              >
-                <Check className="size-3 text-victory" aria-hidden />
-                <span className="font-bold tabular-nums text-victory">{record.wins}</span>
-                <X className="size-3 text-defeat" aria-hidden />
-                <span className="font-bold tabular-nums text-defeat">{record.losses}</span>
-                <span className="truncate">· {t('record.since', { date: shortDate(record.since) })}</span>
+            {/* Recent form from the battle log (2026-11-06), in place of the
+                tag once it has loaded: results, win rate, star player, streak. */}
+            {form && form.games > 0 ? (
+              <span className="flex items-center gap-1 truncate text-[10px] text-muted">
+                <span className="shrink-0">{t('record.last', { n: form.games })}</span>
+                <Check className="size-3 shrink-0 text-victory" aria-hidden />
+                <span className="font-bold tabular-nums text-victory">{form.wins}</span>
+                <X className="size-3 shrink-0 text-defeat" aria-hidden />
+                <span className="font-bold tabular-nums text-defeat">{form.losses}</span>
+                <span className="shrink-0 font-bold tabular-nums text-foreground">· {Math.round((form.wins / form.games) * 100)}%</span>
+                {form.stars > 0 ? (
+                  <span className="shrink-0 font-bold tabular-nums text-brand" title={t('record.starTitle', { n: form.stars, g: form.games })}>
+                    · ★{form.stars}
+                  </span>
+                ) : null}
+                {form.streak >= 2 ? (
+                  <span className="shrink-0 font-bold tabular-nums text-[#ff9b3d]" title={t('record.streakTitle', { n: form.streak })}>
+                    · 🔥{form.streak}
+                  </span>
+                ) : null}
               </span>
             ) : (
               <span className="block truncate text-[10px] text-muted">#{account.tag}</span>
@@ -181,6 +189,18 @@ export function PanelShell({
                 <Image key={b.name} src={b.imageUrl} alt={b.name} title={b.name} width={16} height={16} className="size-4 shrink-0 rounded-sm bg-surface-2" unoptimized />
               ))}
             </>
+          ) : null}
+          {record && record.wins + record.losses > 0 ? (
+            <span
+              className="ms-auto flex shrink-0 items-center gap-0.5"
+              title={t('record.title', { w: record.wins, l: record.losses })}
+            >
+              <Check className="size-3 text-victory" aria-hidden />
+              <span className="font-bold tabular-nums text-victory">{record.wins}</span>
+              <X className="size-3 text-defeat" aria-hidden />
+              <span className="font-bold tabular-nums text-defeat">{record.losses}</span>
+              <span>&nbsp;{t('record.since', { date: shortDate(record.since) })}</span>
+            </span>
           ) : null}
         </div>
       ) : null}

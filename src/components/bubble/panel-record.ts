@@ -32,6 +32,20 @@ export interface SinceTagRecord {
   seen: string[];
 }
 
+/**
+ * Form over the battles the game still holds (~25), shown the moment a tag is
+ * in rather than after new games (owner, 2026-11-06): wins and losses in 3v3,
+ * how often the player was star player, and the current streak.
+ */
+export interface RecentForm {
+  games: number;
+  wins: number;
+  losses: number;
+  stars: number;
+  /** Consecutive results from the newest battle back: +3 is three wins, -2 two losses. */
+  streak: number;
+}
+
 const STORED_RECORD = 'brawlzone-bubble-record';
 const SEEN_CAP = 200;
 
@@ -58,8 +72,32 @@ function battleDate(value: string): number {
   return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : NaN;
 }
 
-export function useSinceTagRecord(tag: string | null): SinceTagRecord | null {
+type LogEntry = { battleTime: string; battle?: { result?: string; starPlayer?: { tag?: string } | null } };
+
+function formOf(items: LogEntry[], tag: string): RecentForm {
+  const own = `#${tag.replace(/^#/, '').toUpperCase()}`;
+  const form: RecentForm = { games: 0, wins: 0, losses: 0, stars: 0, streak: 0 };
+  let streakOpen = true;
+  for (const entry of items) {
+    const result = entry.battle?.result;
+    if (result !== 'victory' && result !== 'defeat') continue;
+    form.games += 1;
+    if (result === 'victory') form.wins += 1;
+    else form.losses += 1;
+    if (entry.battle?.starPlayer?.tag?.toUpperCase() === own) form.stars += 1;
+    // Newest first: the streak is the run at the top of the log.
+    if (streakOpen) {
+      const step = result === 'victory' ? 1 : -1;
+      if (form.streak === 0 || Math.sign(form.streak) === step) form.streak += step;
+      else streakOpen = false;
+    }
+  }
+  return form;
+}
+
+export function useSinceTagRecord(tag: string | null): { record: SinceTagRecord | null; form: RecentForm | null } {
   const [record, setRecord] = useState<SinceTagRecord | null>(null);
+  const [form, setForm] = useState<{ tag: string; form: RecentForm } | null>(null);
 
   useEffect(() => {
     if (!tag) return;
@@ -73,7 +111,8 @@ export function useSinceTagRecord(tag: string | null): SinceTagRecord | null {
     const controller = new AbortController();
     fetch(`/api/player/${encodeURIComponent(tag)}/battlelog`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((log: { items?: { battleTime: string; battle?: { result?: string } }[] }) => {
+      .then((log: { items?: LogEntry[] }) => {
+        setForm({ tag, form: formOf(log.items ?? [], tag) });
         const since = Date.parse(current.since);
         const seen = new Set(current.seen);
         let { wins, losses } = current;
@@ -98,5 +137,8 @@ export function useSinceTagRecord(tag: string | null): SinceTagRecord | null {
     return () => controller.abort();
   }, [tag]);
 
-  return tag && record?.tag === tag ? record : null;
+  return {
+    record: tag && record?.tag === tag ? record : null,
+    form: tag && form?.tag === tag ? form.form : null,
+  };
 }
