@@ -203,7 +203,8 @@ function BrawlerExtras({
     fetch(`/api/v1/counters?${params}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((d: { counters: Counter[] }) => {
-        const top = d.counters.slice(0, 3);
+        // The three strongest counters, shown by win rate (the only number on the chip).
+        const top = d.counters.slice(0, 3).sort((a, b) => b.winRate - a.winRate);
         countersCache.set(key, top);
         setCounters(top);
       })
@@ -228,7 +229,8 @@ function BrawlerExtras({
             return at < 0 ? null : { modeKey: m.key as string, icon: m.icon, mapName: map.mapName, place: at + 1, score: order[at].score };
           }),
         )
-        .filter((x): x is NonNullable<typeof x> => x !== null)
+        // A #18 is not a best map: top ten on the map only.
+        .filter((x): x is NonNullable<typeof x> => x !== null && x.place <= 10)
         .sort((a, b) => a.place - b.place || b.score - a.score)
         .slice(0, 3),
     [modes, id],
