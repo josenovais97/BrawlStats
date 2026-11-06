@@ -74,6 +74,9 @@ export function ModeMapChips({
   hasData?: (mapName: string) => boolean;
 }) {
   const [changing, setChanging] = useState(false);
+  // Picking a mode hides the others behind a Change (owner, 2026-11-06): a
+  // chosen mode plus all six alternatives was two rows restating one choice.
+  const [pickingMode, setPickingMode] = useState(false);
   const { t, name, lang } = usePanelI18n();
   const modeName = useModeLabel();
   // Alphabetical in the reader's language, so the chips read in order. The
@@ -106,8 +109,23 @@ export function ModeMapChips({
     );
   }
 
+  const modeChosen = mode.key !== null && !pickingMode;
+
   return (
     <>
+      {modeChosen ? (
+        <div className="flex items-center gap-1.5 px-1 pb-2 text-[11px]">
+          <span className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
+            {mode.icon ? (
+              <Image src={mode.icon} alt="" width={16} height={16} className="size-4 shrink-0 object-contain" unoptimized />
+            ) : null}
+            {modeName(mode)}
+          </span>
+          <button type="button" onClick={() => setPickingMode(true)} className="bz-chip ms-auto shrink-0 px-2 py-0.5">
+            {t('chips.change')}
+          </button>
+        </div>
+      ) : (
       <div role="group" aria-label="Game mode" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
         {modes.map((m) => {
           const on = m.key === mode.key;
@@ -115,7 +133,10 @@ export function ModeMapChips({
             <button
               key={m.key ?? 'all'}
               type="button"
-              onClick={() => onMode(m.key)}
+              onClick={() => {
+                onMode(m.key);
+                setPickingMode(false);
+              }}
               aria-pressed={on}
               className={`inline-flex items-center gap-1 px-2 py-1 leading-tight ${
                 on ? 'bz-chip-on' : 'bz-chip'
@@ -136,8 +157,9 @@ export function ModeMapChips({
           );
         })}
       </div>
+      )}
 
-      {mode.maps.length > 0 ? (
+      {modeChosen && mode.maps.length > 0 ? (
         <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 pb-2 text-[11px]">
           <button
             type="button"

@@ -126,6 +126,8 @@ export function PanelDraft({
   // The enemy whose counters are open, if any.
   const [inspect, setInspect] = useState<number | null>(null);
   const [changing, setChanging] = useState(false);
+  // As on the other tabs: a chosen mode hides the rest behind a Change.
+  const [pickingMode, setPickingMode] = useState(false);
   const [query, setQuery] = useState('');
   const [picks, setPicks] = useState<Suggestion[] | null>(null);
   const [safe, setSafe] = useState<SafePick[]>([]);
@@ -391,6 +393,19 @@ export function PanelDraft({
         </button>
       ) : (
         <>
+          {currentMode && !pickingMode ? (
+            <div className="flex items-center gap-1.5 px-1 text-[11px]">
+              <span className="bz-chip-on inline-flex items-center gap-1 px-2 py-1 leading-tight">
+                {currentMode.icon ? (
+                  <Image src={currentMode.icon} alt="" width={16} height={16} className="size-4 shrink-0 object-contain" unoptimized />
+                ) : null}
+                {modeName(currentMode)}
+              </span>
+              <button type="button" onClick={() => setPickingMode(true)} className="bz-chip ms-auto shrink-0 px-2 py-0.5">
+                {t('chips.change')}
+              </button>
+            </div>
+          ) : (
           <div role="group" aria-label="Mode" className="flex flex-wrap gap-1 px-1 text-[11px]">
             {withMaps.map((m) => (
               <button
@@ -399,6 +414,7 @@ export function PanelDraft({
                 onClick={() => {
                   setMode(m.key);
                   setMap(null);
+                  setPickingMode(false);
                 }}
                 aria-pressed={m.key === mode}
                 className={`inline-flex items-center gap-1 px-2 py-1 leading-tight ${
@@ -423,8 +439,9 @@ export function PanelDraft({
               </button>
             ))}
           </div>
+          )}
 
-          {currentMode ? (
+          {currentMode && !pickingMode ? (
             <div role="group" aria-label="Map" className="flex flex-wrap gap-1 px-1 text-[11px]">
               {[...currentMode.maps]
                 .sort((a, b) => name(a.mapName).localeCompare(name(b.mapName), lang))
