@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The rewards and meta widget (1.40). Refreshed by the hourly check
-     (AlertJob), so the launcher's own timer is off. -->
+<!-- Medium widget (1.40): free reward and top pick. Refreshed by the hourly check (AlertJob), so the
+     launcher's own timer is off. Settings open on placement (optional) and
+     again from the widget's long-press menu. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="net.brawlzone.bubble.WidgetConfigActivity"
     android:description="@string/widget_description"
     android:initialLayout="@layout/widget_rewards"
     android:minWidth="250dp"
@@ -14,4 +16,5 @@
     android:targetCellWidth="4"
     android:targetCellHeight="2"
     android:updatePeriodMillis="0"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable|configuration_optional" />

@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
          * A shortcut, the widget or a season notification asked for the bubble
          * (1.40). When it could start, there is nothing to show here.
          */
-        if (Shortcuts.handle(this, intent?.action)) {
+        if (Shortcuts.handle(this, intent)) {
             finish()
             return
         }
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (Shortcuts.handle(this, intent.action)) moveTaskToBack(true)
+        if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
     override fun onDestroy() {

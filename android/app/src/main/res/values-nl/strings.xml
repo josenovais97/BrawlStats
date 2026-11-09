@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Instellen overslaan</string>
     <string name="onb_no_game">Brawl Stars is niet geïnstalleerd op deze telefoon.</string>
     <string name="alerts_caption">MELDINGEN</string>
-    <string name="alerts_title">Gratis beloningen en seizoensmeldingen</string>
-    <string name="alerts_body">Als er een gratis beloning is, als een seizoen in de laddermodus begint en twee dagen voordat het eindigt.</string>
+    <string name="alerts_title">Beloningen, seizoenen en je voortgang</string>
+    <string name="alerts_body">Gratis beloningen zodra ze er zijn, begin en einde van het ladderseizoen, je rangstijgingen en elke zondag een overzicht van je week.</string>
     <string name="update_ready_title">Update klaar</string>
     <string name="update_ready_body">De nieuwe versie is gedownload.</string>
     <string name="update_restart">Opnieuw starten</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">BESTE KEUZE VANDAAG</string>
     <string name="widget_pick_line">Tier %1$s · %2$s winst</string>
     <string name="widget_loading">Laden…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Gratis beloning</string>
+    <string name="widget_small_description">De nieuwste gratis beloning met een ophaalknop.</string>
+    <string name="widget_meta_name">Laddermeta</string>
+    <string name="widget_meta_description">De top 5 keuzes in de laddermodus voor alle modi of één modus, de gratis beloning en het aftellen van het seizoen.</string>
+    <string name="widget_rank_name">Mijn rang</string>
+    <string name="widget_rank_description">Je rang in de laddermodus, elo, voortgang naar de volgende rang en recente potjes.</string>
+    <string name="widget_meta_label">BESTE KEUZES</string>
+    <string name="widget_mode_label">BESTE · %1$s</string>
+    <string name="widget_mode_pick_label">BESTE KEUZE · %1$s</string>
+    <string name="widget_season_ends">Seizoen %1$d · eindigt op %2$s</string>
+    <string name="widget_updated">Bijgewerkt %1$s</string>
+    <string name="widget_rank_none">Voeg je spelerstag toe in de app om hier je rang te zien.</string>
+    <string name="widget_rank_wins">≈%1$d overwinningen tot %2$s</string>
+    <string name="widget_rank_elo_to">%1$s elo tot %2$s</string>
+    <string name="widget_rank_top">Hoogste rang bereikt</string>
+    <string name="widget_rank_last">Laatste %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Widgetinstellingen</string>
+    <string name="wcfg_mode">BESTE KEUZES VOOR</string>
+    <string name="wcfg_all_modes">Alle modi</string>
+    <string name="wcfg_reward">Gratis beloning tonen</string>
+    <string name="wcfg_background">ACHTERGROND</string>
+    <string name="wcfg_solid">Dekkend</string>
+    <string name="wcfg_save">Opslaan</string>
+    <string name="channel_progress">Je voortgang</string>
+    <string name="alert_rankup_title">🎉 Je hebt %1$s bereikt!</string>
+    <string name="alert_rankup_text">≈%1$d overwinningen tot %2$s. Ga zo door!</string>
+    <string name="alert_rankup_plain">Blijf klimmen met de beste keuzes voor elke kaart.</string>
+    <string name="alert_week_title">📊 Jouw week in de laddermodus</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Beste: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

@@ -100,8 +100,8 @@
     <string name="onb_skip_all">تخطي الإعداد</string>
     <string name="onb_no_game">لعبة Brawl Stars غير مثبتة على هذا الهاتف.</string>
     <string name="alerts_caption">الإشعارات</string>
-    <string name="alerts_title">المكافآت المجانية وتنبيهات الموسم</string>
-    <string name="alerts_body">عند ظهور مكافأة مجانية، وعند بدء موسم المصنف، وقبل نهايته بيومين.</string>
+    <string name="alerts_title">المكافآت والمواسم وتقدمك</string>
+    <string name="alerts_body">المكافآت المجانية فور ظهورها، وبداية موسم المصنف ونهايته، وترقيات رتبتك، وملخص أسبوعك كل يوم أحد.</string>
     <string name="update_ready_title">التحديث جاهز</string>
     <string name="update_ready_body">تم تنزيل الإصدار الجديد.</string>
     <string name="update_restart">إعادة التشغيل</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">أفضل اختيار اليوم</string>
     <string name="widget_pick_line">المستوى %1$s · فوز %2$s</string>
     <string name="widget_loading">جارٍ التحميل…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">مكافأة مجانية</string>
+    <string name="widget_small_description">أحدث مكافأة مجانية مع زر الاستلام.</string>
+    <string name="widget_meta_name">ميتا المصنف</string>
+    <string name="widget_meta_description">أفضل 5 اختيارات في المصنف لكل الأطوار أو لطور واحد، والمكافأة المجانية والعد التنازلي للموسم.</string>
+    <string name="widget_rank_name">رتبتي</string>
+    <string name="widget_rank_description">رتبتك في المصنف ونقاط الإيلو وتقدمك نحو الرتبة التالية وآخر مبارياتك.</string>
+    <string name="widget_meta_label">أفضل اختيارات المصنف</string>
+    <string name="widget_mode_label">الأفضل · %1$s</string>
+    <string name="widget_mode_pick_label">أفضل اختيار · %1$s</string>
+    <string name="widget_season_ends">الموسم %1$d · ينتهي %2$s</string>
+    <string name="widget_updated">تم التحديث %1$s</string>
+    <string name="widget_rank_none">أضف وسم اللاعب في التطبيق لترى رتبتك هنا.</string>
+    <string name="widget_rank_wins">الانتصارات حتى %2$s: ≈%1$d</string>
+    <string name="widget_rank_elo_to">الإيلو حتى %2$s: %1$s</string>
+    <string name="widget_rank_top">وصلت إلى أعلى رتبة</string>
+    <string name="widget_rank_last">آخر %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s إيلو</string>
+    <string name="wcfg_title">إعدادات الأداة</string>
+    <string name="wcfg_mode">أفضل الاختيارات لـ</string>
+    <string name="wcfg_all_modes">كل الأطوار</string>
+    <string name="wcfg_reward">إظهار المكافأة المجانية</string>
+    <string name="wcfg_background">الخلفية</string>
+    <string name="wcfg_solid">معتمة</string>
+    <string name="wcfg_save">حفظ</string>
+    <string name="channel_progress">تقدمك</string>
+    <string name="alert_rankup_title">🎉 وصلت إلى %1$s!</string>
+    <string name="alert_rankup_text">الانتصارات حتى %2$s: ≈%1$d. واصل الصعود!</string>
+    <string name="alert_rankup_plain">واصل الصعود بأفضل الاختيارات لكل خريطة.</string>
+    <string name="alert_week_title">📊 أسبوعك في المصنف</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s إيلو · الأفضل: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s إيلو</string>
 </resources>

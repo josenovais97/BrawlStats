@@ -244,8 +244,12 @@ class BubbleService : Service() {
     /** A tab the panel should switch to once its page can hear it (1.40). */
     private var pendingTab: String? = null
 
-    private fun openPanelOn(tab: String?) {
+    /** With the Counters tab: the brawler a widget tap asked for. */
+    private var pendingBrawler: Int? = null
+
+    private fun openPanelOn(tab: String?, brawler: Int? = null) {
         pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters") }
+        pendingBrawler = brawler
         if (panel == null) showPanel()
         if (panelLoaded) applyPendingTab()
     }
@@ -257,10 +261,16 @@ class BubbleService : Service() {
      */
     private fun applyPendingTab() {
         val tab = pendingTab ?: return
+        val brawler = pendingBrawler ?: 0
         pendingTab = null
-        val script = "(function(t){var n=0;var i=setInterval(function(){" +
+        pendingBrawler = null
+        // The brawler goes first: the Counters tab reads it as it mounts, and
+        // takes it through its hook when it is already showing.
+        val script = "(function(t,b){if(b>0){window.__bzPendingCounter=b;" +
+            "if(window.__bzOpenCounter)window.__bzOpenCounter(b)}" +
+            "var n=0;var i=setInterval(function(){" +
             "if(window.__bzOpenTab){window.__bzOpenTab(t);clearInterval(i)}" +
-            "else if(++n>50){clearInterval(i)}},100)})(" + org.json.JSONObject.quote(tab) + ")"
+            "else if(++n>50){clearInterval(i)}},100)})(" + org.json.JSONObject.quote(tab) + "," + brawler + ")"
         panelWeb?.evaluateJavascript(script, null)
     }
 
@@ -276,7 +286,9 @@ class BubbleService : Service() {
             // the bubble, for a reader whose hand is already in the shade.
             ACTION_TOGGLE_PANEL -> if (bubble != null) togglePanel()
             // The "Counters" shortcut (1.40): the panel open on that tab.
-            ACTION_OPEN_PANEL -> if (bubble != null) openPanelOn(intent?.getStringExtra(EXTRA_TAB))
+            ACTION_OPEN_PANEL -> if (bubble != null) {
+                openPanelOn(intent?.getStringExtra(EXTRA_TAB), intent?.getIntExtra(EXTRA_BRAWLER, 0)?.takeIf { it > 0 })
+            }
         }
         return START_NOT_STICKY
     }
@@ -1692,6 +1704,7 @@ class BubbleService : Service() {
         const val ACTION_TOGGLE_PANEL = "net.brawlzone.bubble.TOGGLE_PANEL"
         const val ACTION_OPEN_PANEL = "net.brawlzone.bubble.OPEN_PANEL"
         const val EXTRA_TAB = "tab"
+        const val EXTRA_BRAWLER = "brawler"
 
         /**
          * Whether the bubble is up, for anything outside the service that has

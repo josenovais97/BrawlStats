@@ -100,8 +100,8 @@
     <string name="onb_skip_all">略過設定</string>
     <string name="onb_no_game">這支手機沒有安裝 Brawl Stars。</string>
     <string name="alerts_caption">通知</string>
-    <string name="alerts_title">免費獎勵和賽季提醒</string>
-    <string name="alerts_body">有免費獎勵時、排位賽賽季開始時，以及賽季結束前兩天。</string>
+    <string name="alerts_title">獎勵、賽季和你的進度</string>
+    <string name="alerts_body">有免費獎勵時、排位賽賽季開始和結束時、你升段時，以及每週日的本週總結。</string>
     <string name="update_ready_title">更新已就緒</string>
     <string name="update_ready_body">新版本已下載。</string>
     <string name="update_restart">重新啟動</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">今日最佳選擇</string>
     <string name="widget_pick_line">%1$s 級 · 勝率 %2$s</string>
     <string name="widget_loading">載入中…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">免費獎勵</string>
+    <string name="widget_small_description">最新的免費獎勵，附領取按鈕。</string>
+    <string name="widget_meta_name">排位賽強勢角色</string>
+    <string name="widget_meta_description">全部模式或單一模式的排位賽前 5 名選擇、免費獎勵和賽季倒數。</string>
+    <string name="widget_rank_name">我的段位</string>
+    <string name="widget_rank_description">你的排位賽段位、分數、離下一段位的進度和最近對局。</string>
+    <string name="widget_meta_label">排位賽最佳選擇</string>
+    <string name="widget_mode_label">最佳選擇 · %1$s</string>
+    <string name="widget_mode_pick_label">最佳選擇 · %1$s</string>
+    <string name="widget_season_ends">第 %1$d 賽季 · %2$s 結束</string>
+    <string name="widget_updated">更新於 %1$s</string>
+    <string name="widget_rank_none">在應用程式中新增玩家標籤後，這裡會顯示你的段位。</string>
+    <string name="widget_rank_wins">距離%2$s約%1$d勝</string>
+    <string name="widget_rank_elo_to">距離%2$s還差 %1$s 分</string>
+    <string name="widget_rank_top">已達最高段位</string>
+    <string name="widget_rank_last">最近 %1$d 場：%2$d 勝 %3$d 負 · ★%4$d</string>
+    <string name="widget_elo">%1$s 分</string>
+    <string name="wcfg_title">小工具設定</string>
+    <string name="wcfg_mode">最佳選擇的模式</string>
+    <string name="wcfg_all_modes">全部模式</string>
+    <string name="wcfg_reward">顯示免費獎勵</string>
+    <string name="wcfg_background">背景</string>
+    <string name="wcfg_solid">不透明</string>
+    <string name="wcfg_save">儲存</string>
+    <string name="channel_progress">你的進度</string>
+    <string name="alert_rankup_title">🎉 你升到了%1$s！</string>
+    <string name="alert_rankup_text">距離%2$s約%1$d勝。繼續加油！</string>
+    <string name="alert_rankup_plain">用每張地圖的最佳選擇繼續爬分。</string>
+    <string name="alert_week_title">📊 你本週的排位賽</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s 分 · 最佳：%4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s 分</string>
 </resources>

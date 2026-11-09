@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "My rank" progress to the next rank (1.40): a dark track, a gold fill. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="#66050A1F" />
+            <corners android:radius="5dp" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <gradient android:type="linear" android:angle="0"
+                    android:startColor="#FFAB00" android:endColor="#FFE37A" />
+                <corners android:radius="5dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

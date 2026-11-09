@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Пропустить настройку</string>
     <string name="onb_no_game">Brawl Stars не установлена на этом телефоне.</string>
     <string name="alerts_caption">УВЕДОМЛЕНИЯ</string>
-    <string name="alerts_title">Бесплатные награды и сезон</string>
-    <string name="alerts_body">Когда выходит бесплатная награда, когда начинается сезон ранговых боёв и за два дня до его конца.</string>
+    <string name="alerts_title">Награды, сезоны и твой прогресс</string>
+    <string name="alerts_body">Бесплатные награды, как только они выходят, начало и конец сезона ранговых боёв, повышения ранга и итоги недели каждое воскресенье.</string>
     <string name="update_ready_title">Обновление готово</string>
     <string name="update_ready_body">Новая версия загружена.</string>
     <string name="update_restart">Перезапустить</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">ЛУЧШИЙ ВЫБОР ДНЯ</string>
     <string name="widget_pick_line">Тир %1$s · %2$s побед</string>
     <string name="widget_loading">Загрузка…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Бесплатная награда</string>
+    <string name="widget_small_description">Свежая бесплатная награда с кнопкой «Забрать».</string>
+    <string name="widget_meta_name">Мета ранговых боёв</string>
+    <string name="widget_meta_description">Топ-5 выборов в ранговых боях для всех режимов или одного, бесплатная награда и отсчёт до конца сезона.</string>
+    <string name="widget_rank_name">Мой ранг</string>
+    <string name="widget_rank_description">Твой ранг в ранговых боях, эло, прогресс до следующего ранга и последние бои.</string>
+    <string name="widget_meta_label">ЛУЧШИЕ ВЫБОРЫ</string>
+    <string name="widget_mode_label">ЛУЧШИЕ · %1$s</string>
+    <string name="widget_mode_pick_label">ЛУЧШИЙ ВЫБОР · %1$s</string>
+    <string name="widget_season_ends">Сезон %1$d · до %2$s</string>
+    <string name="widget_updated">Обновлено %1$s</string>
+    <string name="widget_rank_none">Добавь тег игрока в приложении, чтобы видеть здесь свой ранг.</string>
+    <string name="widget_rank_wins">Побед до %2$s: ≈%1$d</string>
+    <string name="widget_rank_elo_to">Эло до %2$s: %1$s</string>
+    <string name="widget_rank_top">Достигнут высший ранг</string>
+    <string name="widget_rank_last">Последние %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">Эло: %1$s</string>
+    <string name="wcfg_title">Настройки виджета</string>
+    <string name="wcfg_mode">ЛУЧШИЕ ВЫБОРЫ ДЛЯ</string>
+    <string name="wcfg_all_modes">Все режимы</string>
+    <string name="wcfg_reward">Показывать бесплатную награду</string>
+    <string name="wcfg_background">ФОН</string>
+    <string name="wcfg_solid">Сплошной</string>
+    <string name="wcfg_save">Сохранить</string>
+    <string name="channel_progress">Твой прогресс</string>
+    <string name="alert_rankup_title">🎉 Ты достиг ранга %1$s!</string>
+    <string name="alert_rankup_text">Побед до %2$s: ≈%1$d. Продолжай!</string>
+    <string name="alert_rankup_plain">Поднимайся дальше с лучшими выборами для каждой карты.</string>
+    <string name="alert_week_title">📊 Твоя неделя в ранговых боях</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s эло · Лучший: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s эло</string>
 </resources>

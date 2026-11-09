@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Einrichtung überspringen</string>
     <string name="onb_no_game">Brawl Stars ist auf diesem Handy nicht installiert.</string>
     <string name="alerts_caption">BENACHRICHTIGUNGEN</string>
-    <string name="alerts_title">Gratis-Belohnungen und Saison-Hinweise</string>
-    <string name="alerts_body">Wenn es eine Gratis-Belohnung gibt, wenn eine Ranglisten-Saison startet und zwei Tage vor ihrem Ende.</string>
+    <string name="alerts_title">Belohnungen, Saisons und dein Fortschritt</string>
+    <string name="alerts_body">Gratis-Belohnungen, sobald es sie gibt, Start und Ende der Ranglisten-Saison, deine Aufstiege und sonntags deine Woche im Überblick.</string>
     <string name="update_ready_title">Update bereit</string>
     <string name="update_ready_body">Die neue Version ist heruntergeladen.</string>
     <string name="update_restart">Neu starten</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">TOP-RANGLISTEN-PICK HEUTE</string>
     <string name="widget_pick_line">%1$s-Tier · %2$s Siegrate</string>
     <string name="widget_loading">Lädt …</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Gratis-Belohnung</string>
+    <string name="widget_small_description">Die neueste Gratis-Belohnung mit Abholen-Button.</string>
+    <string name="widget_meta_name">Ranglisten-Meta</string>
+    <string name="widget_meta_description">Die Top 5 der Ranglisten-Picks für alle Modi oder einen Modus, die Gratis-Belohnung und der Saison-Countdown.</string>
+    <string name="widget_rank_name">Mein Rang</string>
+    <string name="widget_rank_description">Dein Ranglisten-Rang, Elo, Fortschritt zum nächsten Rang und letzte Spiele.</string>
+    <string name="widget_meta_label">TOP-RANGLISTEN-PICKS</string>
+    <string name="widget_mode_label">TOP-PICKS · %1$s</string>
+    <string name="widget_mode_pick_label">TOP-PICK · %1$s</string>
+    <string name="widget_season_ends">Saison %1$d · endet am %2$s</string>
+    <string name="widget_updated">Aktualisiert %1$s</string>
+    <string name="widget_rank_none">Gib in der App deine Spieler-ID ein, um hier deinen Rang zu sehen.</string>
+    <string name="widget_rank_wins">≈%1$d Siege bis %2$s</string>
+    <string name="widget_rank_elo_to">%1$s Elo bis %2$s</string>
+    <string name="widget_rank_top">Höchster Rang erreicht</string>
+    <string name="widget_rank_last">Letzte %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s Elo</string>
+    <string name="wcfg_title">Widget-Einstellungen</string>
+    <string name="wcfg_mode">TOP-PICKS FÜR</string>
+    <string name="wcfg_all_modes">Alle Modi</string>
+    <string name="wcfg_reward">Gratis-Belohnung zeigen</string>
+    <string name="wcfg_background">HINTERGRUND</string>
+    <string name="wcfg_solid">Deckend</string>
+    <string name="wcfg_save">Speichern</string>
+    <string name="channel_progress">Dein Fortschritt</string>
+    <string name="alert_rankup_title">🎉 Du hast %1$s erreicht!</string>
+    <string name="alert_rankup_text">≈%1$d Siege bis %2$s. Weiter so!</string>
+    <string name="alert_rankup_plain">Klettere weiter mit den besten Picks für jede Map.</string>
+    <string name="alert_week_title">📊 Deine Woche in der Rangliste</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s Elo · Bester: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s Elo</string>
 </resources>

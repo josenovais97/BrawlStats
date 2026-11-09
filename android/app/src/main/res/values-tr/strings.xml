@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Kurulumu geç</string>
     <string name="onb_no_game">Bu telefonda Brawl Stars yüklü değil.</string>
     <string name="alerts_caption">BİLDİRİMLER</string>
-    <string name="alerts_title">Ücretsiz ödüller ve sezon uyarıları</string>
-    <string name="alerts_body">Ücretsiz bir ödül çıktığında, bir Aşamalı sezon başladığında ve bitmesine iki gün kala.</string>
+    <string name="alerts_title">Ödüller, sezonlar ve ilerlemen</string>
+    <string name="alerts_body">Ücretsiz ödüller çıktığında, Aşamalı sezonun başı ve sonu, rütbe atlamaların ve her pazar haftanın özeti.</string>
     <string name="update_ready_title">Güncelleme hazır</string>
     <string name="update_ready_body">Yeni sürüm indirildi.</string>
     <string name="update_restart">Yeniden başlat</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">BUGÜNÜN EN İYİ SEÇİMİ</string>
     <string name="widget_pick_line">%1$s kademe · %2$s kazanma oranı</string>
     <string name="widget_loading">Yükleniyor…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Ücretsiz ödül</string>
+    <string name="widget_small_description">Al düğmesiyle en yeni ücretsiz ödül.</string>
+    <string name="widget_meta_name">Aşamalı meta</string>
+    <string name="widget_meta_description">Tüm modlar ya da tek bir mod için en iyi 5 Aşamalı seçim, ücretsiz ödül ve sezon geri sayımı.</string>
+    <string name="widget_rank_name">Rütbem</string>
+    <string name="widget_rank_description">Aşamalı rütben, elo puanın, bir sonraki rütbeye ilerlemen ve son maçların.</string>
+    <string name="widget_meta_label">EN İYİ AŞAMALI SEÇİMLER</string>
+    <string name="widget_mode_label">EN İYİLER · %1$s</string>
+    <string name="widget_mode_pick_label">EN İYİ SEÇİM · %1$s</string>
+    <string name="widget_season_ends">Sezon %1$d · %2$s tarihinde biter</string>
+    <string name="widget_updated">Güncellendi %1$s</string>
+    <string name="widget_rank_none">Rütbeni burada görmek için uygulamada oyuncu etiketini ekle.</string>
+    <string name="widget_rank_wins">%2$s için ≈%1$d galibiyet</string>
+    <string name="widget_rank_elo_to">%2$s için %1$s elo</string>
+    <string name="widget_rank_top">En yüksek rütbeye ulaştın</string>
+    <string name="widget_rank_last">Son %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Widget ayarları</string>
+    <string name="wcfg_mode">EN İYİ SEÇİMLER</string>
+    <string name="wcfg_all_modes">Tüm modlar</string>
+    <string name="wcfg_reward">Ücretsiz ödülü göster</string>
+    <string name="wcfg_background">ARKA PLAN</string>
+    <string name="wcfg_solid">Opak</string>
+    <string name="wcfg_save">Kaydet</string>
+    <string name="channel_progress">İlerlemen</string>
+    <string name="alert_rankup_title">🎉 %1$s rütbesine ulaştın!</string>
+    <string name="alert_rankup_text">%2$s için ≈%1$d galibiyet. Yükselmeye devam!</string>
+    <string name="alert_rankup_plain">Her harita için en iyi seçimlerle yükselmeye devam et.</string>
+    <string name="alert_week_title">📊 Aşamalı modda haftan</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · En iyisi: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

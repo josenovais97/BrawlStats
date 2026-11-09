@@ -100,8 +100,8 @@
     <string name="onb_skip_all">セットアップをスキップ</string>
     <string name="onb_no_game">このスマホにはBrawl Starsがインストールされていません。</string>
     <string name="alerts_caption">通知</string>
-    <string name="alerts_title">無料報酬とシーズンのお知らせ</string>
-    <string name="alerts_body">無料報酬が出たとき、ガチバトルのシーズンが始まったとき、終了の2日前に通知します。</string>
+    <string name="alerts_title">報酬、シーズン、あなたの成績</string>
+    <string name="alerts_body">無料報酬が出たとき、ガチバトルのシーズン開始と終了、ランクアップ、毎週日曜の1週間のまとめ。</string>
     <string name="update_ready_title">アップデートの準備完了</string>
     <string name="update_ready_body">新しいバージョンをダウンロードしました。</string>
     <string name="update_restart">再起動</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">今日のトップピック</string>
     <string name="widget_pick_line">%1$sティア · 勝率%2$s</string>
     <string name="widget_loading">読み込み中…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">無料報酬</string>
+    <string name="widget_small_description">受け取りボタン付きの最新の無料報酬。</string>
+    <string name="widget_meta_name">ガチバトルのメタ</string>
+    <string name="widget_meta_description">全モードまたは1モードのガチバトルのトップ5ピック、無料報酬、シーズンのカウントダウン。</string>
+    <string name="widget_rank_name">自分のランク</string>
+    <string name="widget_rank_description">ガチバトルのランク、エロ、次のランクまでの進み具合、最近の試合。</string>
+    <string name="widget_meta_label">ガチバトルのトップピック</string>
+    <string name="widget_mode_label">トップピック · %1$s</string>
+    <string name="widget_mode_pick_label">トップピック · %1$s</string>
+    <string name="widget_season_ends">シーズン%1$d · %2$sに終了</string>
+    <string name="widget_updated">%1$s に更新</string>
+    <string name="widget_rank_none">アプリでプレイヤータグを追加すると、ここにランクが表示されます。</string>
+    <string name="widget_rank_wins">%2$sまであと約%1$d勝</string>
+    <string name="widget_rank_elo_to">%2$sまであと%1$sエロ</string>
+    <string name="widget_rank_top">最高ランクに到達</string>
+    <string name="widget_rank_last">直近%1$d試合: %2$d勝%3$d敗 · ★%4$d</string>
+    <string name="widget_elo">%1$sエロ</string>
+    <string name="wcfg_title">ウィジェットの設定</string>
+    <string name="wcfg_mode">トップピックのモード</string>
+    <string name="wcfg_all_modes">すべてのモード</string>
+    <string name="wcfg_reward">無料報酬を表示</string>
+    <string name="wcfg_background">背景</string>
+    <string name="wcfg_solid">不透明</string>
+    <string name="wcfg_save">保存</string>
+    <string name="channel_progress">あなたの成績</string>
+    <string name="alert_rankup_title">🎉 %1$sに到達！</string>
+    <string name="alert_rankup_text">%2$sまであと約%1$d勝。この調子で！</string>
+    <string name="alert_rankup_plain">全マップのベストピックで上を目指そう。</string>
+    <string name="alert_week_title">📊 今週のガチバトル</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$sエロ · ベスト: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$sエロ</string>
 </resources>

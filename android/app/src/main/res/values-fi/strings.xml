@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Ohita käyttöönotto</string>
     <string name="onb_no_game">Brawl Starsia ei ole asennettu tähän puhelimeen.</string>
     <string name="alerts_caption">ILMOITUKSET</string>
-    <string name="alerts_title">Ilmaiset palkinnot ja kausimuistutukset</string>
-    <string name="alerts_body">Kun ilmainen palkinto ilmestyy, kun rankattu kausi alkaa ja kaksi päivää ennen sen loppua.</string>
+    <string name="alerts_title">Palkinnot, kaudet ja edistymisesi</string>
+    <string name="alerts_body">Ilmaiset palkinnot heti kun niitä tulee, rankatun kauden alku ja loppu, tasonnoususi ja sunnuntaisin viikkosi yhteenveto.</string>
     <string name="update_ready_title">Päivitys valmis</string>
     <string name="update_ready_body">Uusi versio on ladattu.</string>
     <string name="update_restart">Käynnistä uudelleen</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">PÄIVÄN PARAS VALINTA</string>
     <string name="widget_pick_line">Taso %1$s · %2$s voitoista</string>
     <string name="widget_loading">Ladataan…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Ilmainen palkinto</string>
+    <string name="widget_small_description">Uusin ilmainen palkinto ja Lunasta-painike.</string>
+    <string name="widget_meta_name">Rankattu meta</string>
+    <string name="widget_meta_description">Rankatun pelin 5 parasta valintaa kaikille tiloille tai yhdelle, ilmainen palkinto ja kauden lähtölaskenta.</string>
+    <string name="widget_rank_name">Oma taso</string>
+    <string name="widget_rank_description">Rankattu tasosi, elo, eteneminen seuraavalle tasolle ja viime pelit.</string>
+    <string name="widget_meta_label">PARHAAT VALINNAT</string>
+    <string name="widget_mode_label">PARHAAT · %1$s</string>
+    <string name="widget_mode_pick_label">PARAS VALINTA · %1$s</string>
+    <string name="widget_season_ends">Kausi %1$d · päättyy %2$s</string>
+    <string name="widget_updated">Päivitetty %1$s</string>
+    <string name="widget_rank_none">Lisää pelaajatunnuksesi sovelluksessa nähdäksesi tasosi tässä.</string>
+    <string name="widget_rank_wins">%2$s: ≈%1$d voittoa</string>
+    <string name="widget_rank_elo_to">%2$s: %1$s eloa</string>
+    <string name="widget_rank_top">Korkein taso saavutettu</string>
+    <string name="widget_rank_last">Viimeiset %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s eloa</string>
+    <string name="wcfg_title">Widgetin asetukset</string>
+    <string name="wcfg_mode">PARHAAT VALINNAT</string>
+    <string name="wcfg_all_modes">Kaikki tilat</string>
+    <string name="wcfg_reward">Näytä ilmainen palkinto</string>
+    <string name="wcfg_background">TAUSTA</string>
+    <string name="wcfg_solid">Peittävä</string>
+    <string name="wcfg_save">Tallenna</string>
+    <string name="channel_progress">Edistymisesi</string>
+    <string name="alert_rankup_title">🎉 Saavutit tason %1$s!</string>
+    <string name="alert_rankup_text">%2$s: ≈%1$d voittoa. Jatka nousua!</string>
+    <string name="alert_rankup_plain">Jatka nousua parhailla valinnoilla jokaiselle kartalle.</string>
+    <string name="alert_week_title">📊 Viikkosi rankatussa</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s eloa · Paras: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s eloa</string>
 </resources>

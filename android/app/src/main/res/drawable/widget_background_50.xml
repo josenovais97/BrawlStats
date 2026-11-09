@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget card at 50% (1.40, widget settings: Background). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#80050A1F" />
+            <corners android:radius="24dp" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="3dp">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#8022337A" android:endColor="#800A1233" />
+            <corners android:radius="22dp" />
+            <stroke android:width="1dp" android:color="#804A62B8" />
+        </shape>
+    </item>
+</layer-list>

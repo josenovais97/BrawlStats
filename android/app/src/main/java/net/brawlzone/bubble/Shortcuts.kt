@@ -27,6 +27,9 @@ object Shortcuts {
     /** Starts the bubble with the panel open on the Counters tab. */
     const val ACTION_COUNTERS = "net.brawlzone.bubble.COUNTERS"
 
+    /** With ACTION_COUNTERS: open that brawler's counters (a widget tap). */
+    const val EXTRA_BRAWLER = "brawler"
+
     private const val BRAWL_STARS = "com.supercell.brawlstars"
 
     fun publish(context: Context) {
@@ -55,14 +58,14 @@ object Shortcuts {
      * Handles the app's own actions. Returns true when the screen has nothing
      * left to show and should get out of the way.
      */
-    fun handle(activity: Activity, action: String?): Boolean = when (action) {
+    fun handle(activity: Activity, intent: Intent?): Boolean = when (intent?.action) {
         ACTION_PLAY -> {
             if (startBubble(activity, null)) {
                 openGame(activity)
                 true
             } else false
         }
-        ACTION_COUNTERS -> startBubble(activity, "counters")
+        ACTION_COUNTERS -> startBubble(activity, "counters", intent?.getIntExtra(EXTRA_BRAWLER, 0)?.takeIf { it > 0 })
         else -> false
     }
 
@@ -71,12 +74,13 @@ object Shortcuts {
      * (and leaves the app screen up) when the overlay permission is missing,
      * because that screen is where the player can grant it.
      */
-    fun startBubble(activity: Activity, tab: String?): Boolean {
+    fun startBubble(activity: Activity, tab: String?, brawler: Int? = null): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) return false
         val intent = Intent(activity, BubbleService::class.java)
         if (tab != null) {
             intent.action = BubbleService.ACTION_OPEN_PANEL
             intent.putExtra(BubbleService.EXTRA_TAB, tab)
+            if (brawler != null) intent.putExtra(BubbleService.EXTRA_BRAWLER, brawler)
         }
         return runCatching { activity.startForegroundService(intent) }.isSuccess
     }

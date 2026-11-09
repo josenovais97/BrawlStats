@@ -106,8 +106,8 @@
     <string name="onb_skip_all">Skip setup</string>
     <string name="onb_no_game">Brawl Stars isn\'t installed on this phone.</string>
     <string name="alerts_caption">NOTIFICATIONS</string>
-    <string name="alerts_title">Free rewards and season alerts</string>
-    <string name="alerts_body">When a free reward drops, when a Ranked season starts, and two days before it ends.</string>
+    <string name="alerts_title">Rewards, seasons and your progress</string>
+    <string name="alerts_body">Free rewards when they drop, Ranked season start and end, your rank-ups, and a Sunday recap of your week.</string>
     <string name="update_ready_title">Update ready</string>
     <string name="update_ready_body">The new version is downloaded.</string>
     <string name="update_restart">Restart</string>
@@ -132,4 +132,36 @@
     <string name="widget_pick_label">TOP RANKED PICK TODAY</string>
     <string name="widget_pick_line">%1$s tier · %2$s win rate</string>
     <string name="widget_loading">Loading…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Free reward</string>
+    <string name="widget_small_description">The newest free reward with a Claim button.</string>
+    <string name="widget_meta_name">Ranked meta</string>
+    <string name="widget_meta_description">The top 5 Ranked picks for all modes or one mode, the free reward and the season countdown.</string>
+    <string name="widget_rank_name">My rank</string>
+    <string name="widget_rank_description">Your Ranked rank, elo, progress to the next rank and recent games.</string>
+    <string name="widget_meta_label">TOP RANKED PICKS</string>
+    <string name="widget_mode_label">TOP PICKS · %1$s</string>
+    <string name="widget_mode_pick_label">TOP PICK · %1$s</string>
+    <string name="widget_season_ends">Season %1$d · ends %2$s</string>
+    <string name="widget_updated">Updated %1$s</string>
+    <string name="widget_rank_none">Add your player tag in the app to see your rank here.</string>
+    <string name="widget_rank_wins">≈%1$d wins to %2$s</string>
+    <string name="widget_rank_elo_to">%1$s elo to %2$s</string>
+    <string name="widget_rank_top">Top rank reached</string>
+    <string name="widget_rank_last">Last %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Widget settings</string>
+    <string name="wcfg_mode">TOP PICKS FOR</string>
+    <string name="wcfg_all_modes">All modes</string>
+    <string name="wcfg_reward">Show the free reward</string>
+    <string name="wcfg_background">BACKGROUND</string>
+    <string name="wcfg_solid">Solid</string>
+    <string name="wcfg_save">Save</string>
+    <string name="channel_progress">Your progress</string>
+    <string name="alert_rankup_title">🎉 You reached %1$s!</string>
+    <string name="alert_rankup_text">≈%1$d wins to %2$s. Keep climbing!</string>
+    <string name="alert_rankup_plain">Keep climbing with the best picks for every map.</string>
+    <string name="alert_week_title">📊 Your week in Ranked</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Best: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

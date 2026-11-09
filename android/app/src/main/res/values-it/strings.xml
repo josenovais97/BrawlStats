@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Salta la configurazione</string>
     <string name="onb_no_game">Brawl Stars non è installato su questo telefono.</string>
     <string name="alerts_caption">NOTIFICHE</string>
-    <string name="alerts_title">Ricompense gratis e avvisi di stagione</string>
-    <string name="alerts_body">Quando esce una ricompensa gratis, quando inizia una stagione di Classificata e due giorni prima che finisca.</string>
+    <string name="alerts_title">Ricompense, stagioni e i tuoi progressi</string>
+    <string name="alerts_body">Ricompense gratis appena escono, inizio e fine della stagione Classificata, i tuoi passaggi di grado e un riepilogo della settimana ogni domenica.</string>
     <string name="update_ready_title">Aggiornamento pronto</string>
     <string name="update_ready_body">La nuova versione è stata scaricata.</string>
     <string name="update_restart">Riavvia</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">SCELTA MIGLIORE DI OGGI</string>
     <string name="widget_pick_line">Tier %1$s · %2$s di vittorie</string>
     <string name="widget_loading">Caricamento…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Ricompensa gratis</string>
+    <string name="widget_small_description">L\'ultima ricompensa gratis con un pulsante per riscattarla.</string>
+    <string name="widget_meta_name">Meta Classificata</string>
+    <string name="widget_meta_description">Le 5 scelte migliori in Classificata per tutte le modalità o una, la ricompensa gratis e il conto alla rovescia della stagione.</string>
+    <string name="widget_rank_name">Il mio grado</string>
+    <string name="widget_rank_description">Il tuo grado in Classificata, l\'elo, i progressi verso il grado successivo e le ultime partite.</string>
+    <string name="widget_meta_label">SCELTE MIGLIORI</string>
+    <string name="widget_mode_label">MIGLIORI · %1$s</string>
+    <string name="widget_mode_pick_label">SCELTA MIGLIORE · %1$s</string>
+    <string name="widget_season_ends">Stagione %1$d · finisce il %2$s</string>
+    <string name="widget_updated">Aggiornato %1$s</string>
+    <string name="widget_rank_none">Aggiungi il tuo ID giocatore nell\'app per vedere qui il tuo grado.</string>
+    <string name="widget_rank_wins">≈%1$d vittorie per %2$s</string>
+    <string name="widget_rank_elo_to">%1$s elo per %2$s</string>
+    <string name="widget_rank_top">Grado massimo raggiunto</string>
+    <string name="widget_rank_last">Ultime %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Impostazioni del widget</string>
+    <string name="wcfg_mode">SCELTE MIGLIORI PER</string>
+    <string name="wcfg_all_modes">Tutte le modalità</string>
+    <string name="wcfg_reward">Mostra la ricompensa gratis</string>
+    <string name="wcfg_background">SFONDO</string>
+    <string name="wcfg_solid">Pieno</string>
+    <string name="wcfg_save">Salva</string>
+    <string name="channel_progress">I tuoi progressi</string>
+    <string name="alert_rankup_title">🎉 Hai raggiunto %1$s!</string>
+    <string name="alert_rankup_text">≈%1$d vittorie per %2$s. Continua a salire!</string>
+    <string name="alert_rankup_plain">Continua a salire con le scelte migliori per ogni mappa.</string>
+    <string name="alert_week_title">📊 La tua settimana in Classificata</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Migliore: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

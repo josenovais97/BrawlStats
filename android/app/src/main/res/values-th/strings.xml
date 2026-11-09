@@ -100,8 +100,8 @@
     <string name="onb_skip_all">ข้ามการตั้งค่า</string>
     <string name="onb_no_game">โทรศัพท์เครื่องนี้ไม่ได้ติดตั้ง Brawl Stars</string>
     <string name="alerts_caption">การแจ้งเตือน</string>
-    <string name="alerts_title">รางวัลฟรีและการแจ้งเตือนซีซัน</string>
-    <string name="alerts_body">เมื่อมีรางวัลฟรี เมื่อซีซันโหมดจัดอันดับเริ่ม และสองวันก่อนซีซันจบ</string>
+    <string name="alerts_title">รางวัล ซีซัน และความคืบหน้าของคุณ</string>
+    <string name="alerts_body">รางวัลฟรีเมื่อมี การเริ่มและจบซีซันโหมดจัดอันดับ การเลื่อนแรงก์ และสรุปสัปดาห์ของคุณทุกวันอาทิตย์</string>
     <string name="update_ready_title">อัปเดตพร้อมแล้ว</string>
     <string name="update_ready_body">ดาวน์โหลดเวอร์ชันใหม่แล้ว</string>
     <string name="update_restart">รีสตาร์ต</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">ตัวเลือกที่ดีที่สุดวันนี้</string>
     <string name="widget_pick_line">เทียร์ %1$s · ชนะ %2$s</string>
     <string name="widget_loading">กำลังโหลด…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">รางวัลฟรี</string>
+    <string name="widget_small_description">รางวัลฟรีล่าสุดพร้อมปุ่มรับ</string>
+    <string name="widget_meta_name">เมต้าโหมดจัดอันดับ</string>
+    <string name="widget_meta_description">5 ตัวเลือกยอดนิยมในโหมดจัดอันดับสำหรับทุกโหมดหรือโหมดเดียว รางวัลฟรี และนับถอยหลังซีซัน</string>
+    <string name="widget_rank_name">แรงก์ของฉัน</string>
+    <string name="widget_rank_description">แรงก์โหมดจัดอันดับ เอโล ความคืบหน้าสู่แรงก์ถัดไป และเกมล่าสุดของคุณ</string>
+    <string name="widget_meta_label">ตัวเลือกยอดนิยม</string>
+    <string name="widget_mode_label">ยอดนิยม · %1$s</string>
+    <string name="widget_mode_pick_label">ตัวเลือกที่ดีที่สุด · %1$s</string>
+    <string name="widget_season_ends">ซีซัน %1$d · จบ %2$s</string>
+    <string name="widget_updated">อัปเดต %1$s</string>
+    <string name="widget_rank_none">เพิ่มแท็กผู้เล่นในแอปเพื่อดูแรงก์ของคุณที่นี่</string>
+    <string name="widget_rank_wins">อีก ≈%1$d ชนะถึง %2$s</string>
+    <string name="widget_rank_elo_to">อีก %1$s เอโลถึง %2$s</string>
+    <string name="widget_rank_top">ถึงแรงก์สูงสุดแล้ว</string>
+    <string name="widget_rank_last">ล่าสุด %1$d เกม: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s เอโล</string>
+    <string name="wcfg_title">ตั้งค่าวิดเจ็ต</string>
+    <string name="wcfg_mode">ตัวเลือกยอดนิยมของ</string>
+    <string name="wcfg_all_modes">ทุกโหมด</string>
+    <string name="wcfg_reward">แสดงรางวัลฟรี</string>
+    <string name="wcfg_background">พื้นหลัง</string>
+    <string name="wcfg_solid">ทึบ</string>
+    <string name="wcfg_save">บันทึก</string>
+    <string name="channel_progress">ความคืบหน้าของคุณ</string>
+    <string name="alert_rankup_title">🎉 คุณถึง %1$s แล้ว!</string>
+    <string name="alert_rankup_text">อีก ≈%1$d ชนะถึง %2$s ไปต่อเลย!</string>
+    <string name="alert_rankup_plain">ไต่แรงก์ต่อด้วยตัวเลือกที่ดีที่สุดสำหรับทุกแผนที่</string>
+    <string name="alert_week_title">📊 สัปดาห์ของคุณในโหมดจัดอันดับ</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s เอโล · ดีที่สุด: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s เอโล</string>
 </resources>

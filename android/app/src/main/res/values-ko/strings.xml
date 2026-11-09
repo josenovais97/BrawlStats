@@ -100,8 +100,8 @@
     <string name="onb_skip_all">설정 건너뛰기</string>
     <string name="onb_no_game">이 휴대폰에 Brawl Stars가 설치되어 있지 않아요.</string>
     <string name="alerts_caption">알림</string>
-    <string name="alerts_title">무료 보상과 시즌 알림</string>
-    <string name="alerts_body">무료 보상이 나왔을 때, 경쟁전 시즌이 시작될 때, 끝나기 이틀 전에 알려드려요.</string>
+    <string name="alerts_title">보상, 시즌, 내 성장</string>
+    <string name="alerts_body">무료 보상이 나올 때, 경쟁전 시즌 시작과 종료, 랭크 업, 그리고 매주 일요일 한 주 요약.</string>
     <string name="update_ready_title">업데이트 준비 완료</string>
     <string name="update_ready_body">새 버전을 다운로드했어요.</string>
     <string name="update_restart">다시 시작</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">오늘의 최고 픽</string>
     <string name="widget_pick_line">%1$s 티어 · 승률 %2$s</string>
     <string name="widget_loading">불러오는 중…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">무료 보상</string>
+    <string name="widget_small_description">받기 버튼이 있는 최신 무료 보상.</string>
+    <string name="widget_meta_name">경쟁전 메타</string>
+    <string name="widget_meta_description">모든 모드 또는 한 모드의 경쟁전 상위 5픽, 무료 보상, 시즌 카운트다운.</string>
+    <string name="widget_rank_name">내 랭크</string>
+    <string name="widget_rank_description">경쟁전 랭크, 엘로, 다음 랭크까지의 진행도와 최근 게임.</string>
+    <string name="widget_meta_label">경쟁전 최고의 픽</string>
+    <string name="widget_mode_label">최고의 픽 · %1$s</string>
+    <string name="widget_mode_pick_label">최고의 픽 · %1$s</string>
+    <string name="widget_season_ends">시즌 %1$d · %2$s 종료</string>
+    <string name="widget_updated">%1$s 업데이트</string>
+    <string name="widget_rank_none">앱에서 플레이어 태그를 추가하면 여기에 랭크가 보여요.</string>
+    <string name="widget_rank_wins">%2$s까지 약 %1$d승</string>
+    <string name="widget_rank_elo_to">%2$s까지 %1$s 엘로</string>
+    <string name="widget_rank_top">최고 랭크 달성</string>
+    <string name="widget_rank_last">최근 %1$d판: %2$d승 %3$d패 · ★%4$d</string>
+    <string name="widget_elo">%1$s 엘로</string>
+    <string name="wcfg_title">위젯 설정</string>
+    <string name="wcfg_mode">최고의 픽 모드</string>
+    <string name="wcfg_all_modes">모든 모드</string>
+    <string name="wcfg_reward">무료 보상 보기</string>
+    <string name="wcfg_background">배경</string>
+    <string name="wcfg_solid">불투명</string>
+    <string name="wcfg_save">저장</string>
+    <string name="channel_progress">내 성장</string>
+    <string name="alert_rankup_title">🎉 %1$s 달성!</string>
+    <string name="alert_rankup_text">%2$s까지 약 %1$d승. 계속 올라가세요!</string>
+    <string name="alert_rankup_plain">모든 맵의 최고의 픽으로 계속 올라가세요.</string>
+    <string name="alert_week_title">📊 이번 주 경쟁전</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s 엘로 · 최고: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s 엘로</string>
 </resources>

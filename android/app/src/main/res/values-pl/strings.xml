@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Pomiń konfigurację</string>
     <string name="onb_no_game">Brawl Stars nie jest zainstalowane na tym telefonie.</string>
     <string name="alerts_caption">POWIADOMIENIA</string>
-    <string name="alerts_title">Darmowe nagrody i alerty sezonu</string>
-    <string name="alerts_body">Gdy pojawi się darmowa nagroda, gdy zaczyna się sezon rankingowy i dwa dni przed jego końcem.</string>
+    <string name="alerts_title">Nagrody, sezony i twoje postępy</string>
+    <string name="alerts_body">Darmowe nagrody, gdy się pojawią, początek i koniec sezonu rankingowego, twoje awanse i podsumowanie tygodnia w każdą niedzielę.</string>
     <string name="update_ready_title">Aktualizacja gotowa</string>
     <string name="update_ready_body">Nowa wersja jest pobrana.</string>
     <string name="update_restart">Uruchom ponownie</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">NAJLEPSZY WYBÓR DZIŚ</string>
     <string name="widget_pick_line">Tier %1$s · %2$s wygranych</string>
     <string name="widget_loading">Ładowanie…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Darmowa nagroda</string>
+    <string name="widget_small_description">Najnowsza darmowa nagroda z przyciskiem odbioru.</string>
+    <string name="widget_meta_name">Meta rankingowa</string>
+    <string name="widget_meta_description">Top 5 wyborów w trybie rankingowym dla wszystkich trybów lub jednego, darmowa nagroda i odliczanie sezonu.</string>
+    <string name="widget_rank_name">Moja ranga</string>
+    <string name="widget_rank_description">Twoja ranga w trybie rankingowym, elo, postęp do następnej rangi i ostatnie mecze.</string>
+    <string name="widget_meta_label">NAJLEPSZE WYBORY</string>
+    <string name="widget_mode_label">NAJLEPSZE · %1$s</string>
+    <string name="widget_mode_pick_label">NAJLEPSZY WYBÓR · %1$s</string>
+    <string name="widget_season_ends">Sezon %1$d · koniec %2$s</string>
+    <string name="widget_updated">Zaktualizowano %1$s</string>
+    <string name="widget_rank_none">Dodaj swój tag gracza w aplikacji, aby zobaczyć tu swoją rangę.</string>
+    <string name="widget_rank_wins">Wygranych do %2$s: ≈%1$d</string>
+    <string name="widget_rank_elo_to">Elo do %2$s: %1$s</string>
+    <string name="widget_rank_top">Osiągnięto najwyższą rangę</string>
+    <string name="widget_rank_last">Ostatnie %1$d: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Ustawienia widżetu</string>
+    <string name="wcfg_mode">NAJLEPSZE WYBORY DLA</string>
+    <string name="wcfg_all_modes">Wszystkie tryby</string>
+    <string name="wcfg_reward">Pokazuj darmową nagrodę</string>
+    <string name="wcfg_background">TŁO</string>
+    <string name="wcfg_solid">Pełne</string>
+    <string name="wcfg_save">Zapisz</string>
+    <string name="channel_progress">Twoje postępy</string>
+    <string name="alert_rankup_title">🎉 Osiągnąłeś %1$s!</string>
+    <string name="alert_rankup_text">Wygranych do %2$s: ≈%1$d. Wspinaj się dalej!</string>
+    <string name="alert_rankup_plain">Wspinaj się dalej z najlepszymi wyborami na każdą mapę.</string>
+    <string name="alert_week_title">📊 Twój tydzień w trybie rankingowym</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Najlepszy: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

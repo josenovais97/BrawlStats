@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Langkau persediaan</string>
     <string name="onb_no_game">Brawl Stars tidak dipasang pada telefon ini.</string>
     <string name="alerts_caption">PEMBERITAHUAN</string>
-    <string name="alerts_title">Ganjaran percuma dan amaran musim</string>
-    <string name="alerts_body">Apabila ada ganjaran percuma, apabila musim Berperingkat bermula dan dua hari sebelum ia tamat.</string>
+    <string name="alerts_title">Ganjaran, musim dan kemajuan anda</string>
+    <string name="alerts_body">Ganjaran percuma sebaik keluar, permulaan dan akhir musim Berperingkat, kenaikan peringkat anda dan ringkasan minggu anda setiap Ahad.</string>
     <string name="update_ready_title">Kemas kini sedia</string>
     <string name="update_ready_body">Versi baharu sudah dimuat turun.</string>
     <string name="update_restart">Mula semula</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">PILIHAN TERBAIK HARI INI</string>
     <string name="widget_pick_line">Tier %1$s · %2$s menang</string>
     <string name="widget_loading">Memuatkan…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Ganjaran percuma</string>
+    <string name="widget_small_description">Ganjaran percuma terbaharu dengan butang Tuntut.</string>
+    <string name="widget_meta_name">Meta Berperingkat</string>
+    <string name="widget_meta_description">5 pilihan Berperingkat teratas untuk semua mod atau satu mod, ganjaran percuma dan kiraan detik musim.</string>
+    <string name="widget_rank_name">Peringkat saya</string>
+    <string name="widget_rank_description">Peringkat Berperingkat, elo, kemajuan ke peringkat seterusnya dan perlawanan terkini anda.</string>
+    <string name="widget_meta_label">PILIHAN TERBAIK</string>
+    <string name="widget_mode_label">TERBAIK · %1$s</string>
+    <string name="widget_mode_pick_label">PILIHAN TERBAIK · %1$s</string>
+    <string name="widget_season_ends">Musim %1$d · tamat %2$s</string>
+    <string name="widget_updated">Dikemas kini %1$s</string>
+    <string name="widget_rank_none">Tambah tag pemain dalam apl untuk melihat peringkat anda di sini.</string>
+    <string name="widget_rank_wins">≈%1$d kemenangan lagi ke %2$s</string>
+    <string name="widget_rank_elo_to">%1$s elo lagi ke %2$s</string>
+    <string name="widget_rank_top">Peringkat tertinggi dicapai</string>
+    <string name="widget_rank_last">%1$d terakhir: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Tetapan widget</string>
+    <string name="wcfg_mode">PILIHAN TERBAIK UNTUK</string>
+    <string name="wcfg_all_modes">Semua mod</string>
+    <string name="wcfg_reward">Tunjuk ganjaran percuma</string>
+    <string name="wcfg_background">LATAR</string>
+    <string name="wcfg_solid">Penuh</string>
+    <string name="wcfg_save">Simpan</string>
+    <string name="channel_progress">Kemajuan anda</string>
+    <string name="alert_rankup_title">🎉 Anda mencapai %1$s!</string>
+    <string name="alert_rankup_text">≈%1$d kemenangan lagi ke %2$s. Teruskan!</string>
+    <string name="alert_rankup_plain">Terus naik dengan pilihan terbaik untuk setiap peta.</string>
+    <string name="alert_week_title">📊 Minggu anda dalam Berperingkat</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Terbaik: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

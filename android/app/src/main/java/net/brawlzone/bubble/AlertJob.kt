@@ -53,14 +53,26 @@ class AlertJob : JobService() {
             Thread { runCatching { run(app) } }.start()
         }
 
-        private fun run(context: Context) {
-            val body = runCatching { Http.text(Alerts.URL) }.getOrNull() ?: return
-            val data = runCatching { Alerts.parse(body) }.getOrNull() ?: return
-            Alerts.remember(context, body)
+        /**
+         * The check itself, on the calling thread (never the main one): the
+         * shared alerts, the player's own standing when a tag is set, then
+         * notifications and every widget.
+         */
+        fun runNow(context: Context) {
+            val body = runCatching { Http.text(Alerts.url(context)) }.getOrNull()
+            val data = body?.let { runCatching { Alerts.parse(it) }.getOrNull() }
+            if (body != null && data != null) Alerts.remember(context, body)
+            val me = Me.fetch(context) ?: Me.last(context)
             val post = Alerts.enabled(context)
-            Notify.rewards(context, data.rewards, post)
-            Notify.season(context, data, post)
-            RewardsWidget.update(context, data)
+            if (data != null) {
+                Notify.rewards(context, data.rewards, post)
+                Notify.season(context, data, post)
+            }
+            if (me != null) Progress.check(context, me, (data ?: Alerts.last(context))?.season?.number, post)
+            Widgets.prefetch(context, data ?: Alerts.last(context), me)
+            Widgets.updateAll(context)
         }
+
+        private fun run(context: Context) = runNow(context)
     }
 }

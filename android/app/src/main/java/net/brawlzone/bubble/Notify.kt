@@ -28,6 +28,7 @@ object Notify {
 
     private const val CH_REWARDS = "brawlzone-rewards"
     private const val CH_SEASON = "brawlzone-season"
+    private const val CH_PROGRESS = "brawlzone-progress"
 
     private const val KEY_SEEN = "seen_rewards"
     private const val KEY_SEASON_START = "season_start_sent"
@@ -45,6 +46,31 @@ object Notify {
         m.createNotificationChannel(
             NotificationChannel(CH_SEASON, local.getString(R.string.channel_season), NotificationManager.IMPORTANCE_DEFAULT),
         )
+        m.createNotificationChannel(
+            NotificationChannel(CH_PROGRESS, local.getString(R.string.channel_progress), NotificationManager.IMPORTANCE_DEFAULT),
+        )
+    }
+
+    /** Rank-ups and the Sunday recap (1.40, Progress). Tapping opens Brawl Stars with the bubble. */
+    fun postProgress(context: Context, id: Int, title: String, text: String) {
+        if (manager(context)?.areNotificationsEnabled() != true) return
+        channels(context)
+        val play = PendingIntent.getActivity(
+            context,
+            id,
+            Intent(context, MainActivity::class.java).setAction(Shortcuts.ACTION_PLAY).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val notification = Notification.Builder(context, CH_PROGRESS)
+            .setSmallIcon(R.drawable.bubble_glyph)
+            .setColor(context.getColor(R.color.brand))
+            .setContentTitle(title)
+            .setContentText(text)
+            .setStyle(Notification.BigTextStyle().bigText(text))
+            .setContentIntent(play)
+            .setAutoCancel(true)
+            .build()
+        runCatching { manager(context)?.notify(id, notification) }
     }
 
     /** New rewards since the last check, at most three at once. Runs off the main thread. */
@@ -164,6 +190,7 @@ object Notify {
         postReward(context, reward.copy(id = "test-" + reward.id))
         postSeason(context, number + 1, start = true, daysLeft = null)
         postSeason(context, number, start = false, daysLeft = 2L)
+        Progress.test(context)
     }
 
     private fun picture(url: String?): Bitmap? = url?.let {

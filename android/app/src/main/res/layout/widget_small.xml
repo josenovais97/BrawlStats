@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Small widget (1.40): the newest free reward and Claim. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/bubble_badge"
+            android:contentDescription="@null"
+            android:padding="4dp"
+            android:src="@drawable/ic_gift" />
+
+        <TextView
+            android:id="@+id/widget_reward_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.08"
+            android:maxLines="1"
+            android:text="@string/widget_reward_label"
+            android:textColor="@color/brand"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/widget_reward_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="2"
+        android:text="@string/widget_no_reward"
+        android:textColor="@color/foreground"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/widget_claim"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/widget_claim"
+        android:fontFamily="sans-serif-black"
+        android:gravity="center"
+        android:paddingTop="7dp"
+        android:paddingBottom="9dp"
+        android:text="@string/widget_claim"
+        android:textColor="#0B2A14"
+        android:textSize="14sp" />
+</LinearLayout>

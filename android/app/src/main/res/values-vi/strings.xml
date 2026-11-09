@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Bỏ qua thiết lập</string>
     <string name="onb_no_game">Điện thoại này chưa cài Brawl Stars.</string>
     <string name="alerts_caption">THÔNG BÁO</string>
-    <string name="alerts_title">Phần thưởng miễn phí và thông báo mùa</string>
-    <string name="alerts_body">Khi có phần thưởng miễn phí, khi mùa Xếp hạng bắt đầu và hai ngày trước khi kết thúc.</string>
+    <string name="alerts_title">Phần thưởng, mùa và tiến độ của bạn</string>
+    <string name="alerts_body">Phần thưởng miễn phí khi vừa có, lúc mùa Xếp hạng bắt đầu và kết thúc, khi bạn lên hạng và tổng kết tuần mỗi Chủ nhật.</string>
     <string name="update_ready_title">Bản cập nhật đã sẵn sàng</string>
     <string name="update_ready_body">Phiên bản mới đã được tải xuống.</string>
     <string name="update_restart">Khởi động lại</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">LỰA CHỌN TỐT NHẤT HÔM NAY</string>
     <string name="widget_pick_line">Hạng %1$s · tỉ lệ thắng %2$s</string>
     <string name="widget_loading">Đang tải…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Phần thưởng miễn phí</string>
+    <string name="widget_small_description">Phần thưởng miễn phí mới nhất kèm nút Nhận.</string>
+    <string name="widget_meta_name">Meta Xếp hạng</string>
+    <string name="widget_meta_description">5 lựa chọn Xếp hạng hàng đầu cho mọi chế độ hoặc một chế độ, phần thưởng miễn phí và đếm ngược mùa.</string>
+    <string name="widget_rank_name">Hạng của tôi</string>
+    <string name="widget_rank_description">Hạng Xếp hạng, elo, tiến độ lên hạng tiếp theo và các trận gần đây của bạn.</string>
+    <string name="widget_meta_label">LỰA CHỌN HÀNG ĐẦU</string>
+    <string name="widget_mode_label">HÀNG ĐẦU · %1$s</string>
+    <string name="widget_mode_pick_label">LỰA CHỌN TỐT NHẤT · %1$s</string>
+    <string name="widget_season_ends">Mùa %1$d · kết thúc %2$s</string>
+    <string name="widget_updated">Cập nhật %1$s</string>
+    <string name="widget_rank_none">Thêm thẻ người chơi trong ứng dụng để xem hạng của bạn ở đây.</string>
+    <string name="widget_rank_wins">Còn ≈%1$d trận thắng lên %2$s</string>
+    <string name="widget_rank_elo_to">Còn %1$s elo lên %2$s</string>
+    <string name="widget_rank_top">Đã đạt hạng cao nhất</string>
+    <string name="widget_rank_last">%1$d trận gần nhất: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Cài đặt tiện ích</string>
+    <string name="wcfg_mode">LỰA CHỌN HÀNG ĐẦU CHO</string>
+    <string name="wcfg_all_modes">Mọi chế độ</string>
+    <string name="wcfg_reward">Hiện phần thưởng miễn phí</string>
+    <string name="wcfg_background">NỀN</string>
+    <string name="wcfg_solid">Đặc</string>
+    <string name="wcfg_save">Lưu</string>
+    <string name="channel_progress">Tiến độ của bạn</string>
+    <string name="alert_rankup_title">🎉 Bạn đã lên %1$s!</string>
+    <string name="alert_rankup_text">Còn ≈%1$d trận thắng lên %2$s. Tiếp tục nào!</string>
+    <string name="alert_rankup_plain">Tiếp tục leo hạng với lựa chọn tốt nhất cho mọi bản đồ.</string>
+    <string name="alert_week_title">📊 Tuần Xếp hạng của bạn</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Tốt nhất: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

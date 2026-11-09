@@ -100,8 +100,8 @@
     <string name="onb_skip_all">דילוג על ההגדרה</string>
     <string name="onb_no_game">Brawl Stars לא מותקן בטלפון הזה.</string>
     <string name="alerts_caption">התראות</string>
-    <string name="alerts_title">פרסים חינמיים והתראות עונה</string>
-    <string name="alerts_body">כשיוצא פרס חינמי, כשעונה מדורגת מתחילה ויומיים לפני שהיא נגמרת.</string>
+    <string name="alerts_title">פרסים, עונות וההתקדמות שלכם</string>
+    <string name="alerts_body">פרסים חינמיים כשהם יוצאים, תחילת העונה המדורגת וסופה, עליות הדרגה שלכם וסיכום השבוע בכל יום ראשון.</string>
     <string name="update_ready_title">העדכון מוכן</string>
     <string name="update_ready_body">הגרסה החדשה הורדה.</string>
     <string name="update_restart">הפעלה מחדש</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">הבחירה המובילה היום</string>
     <string name="widget_pick_line">דרג %1$s · %2$s ניצחונות</string>
     <string name="widget_loading">טוען…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">פרס חינמי</string>
+    <string name="widget_small_description">הפרס החינמי החדש ביותר עם כפתור קבלה.</string>
+    <string name="widget_meta_name">מטא מדורג</string>
+    <string name="widget_meta_description">5 הבחירות המובילות במצב המדורג לכל המצבים או למצב אחד, הפרס החינמי וספירה לאחור לסוף העונה.</string>
+    <string name="widget_rank_name">הדרגה שלי</string>
+    <string name="widget_rank_description">הדרגה שלכם במצב המדורג, אלו, התקדמות לדרגה הבאה ומשחקים אחרונים.</string>
+    <string name="widget_meta_label">הבחירות המובילות</string>
+    <string name="widget_mode_label">מובילים · %1$s</string>
+    <string name="widget_mode_pick_label">הבחירה המובילה · %1$s</string>
+    <string name="widget_season_ends">עונה %1$d · נגמרת ב־%2$s</string>
+    <string name="widget_updated">עודכן %1$s</string>
+    <string name="widget_rank_none">הוסיפו את תג השחקן באפליקציה כדי לראות כאן את הדרגה שלכם.</string>
+    <string name="widget_rank_wins">ניצחונות עד %2$s: ≈%1$d</string>
+    <string name="widget_rank_elo_to">אלו עד %2$s: %1$s</string>
+    <string name="widget_rank_top">הגעתם לדרגה הגבוהה ביותר</string>
+    <string name="widget_rank_last">%1$d אחרונים: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s אלו</string>
+    <string name="wcfg_title">הגדרות הווידג׳ט</string>
+    <string name="wcfg_mode">הבחירות המובילות עבור</string>
+    <string name="wcfg_all_modes">כל המצבים</string>
+    <string name="wcfg_reward">הצגת הפרס החינמי</string>
+    <string name="wcfg_background">רקע</string>
+    <string name="wcfg_solid">אטום</string>
+    <string name="wcfg_save">שמירה</string>
+    <string name="channel_progress">ההתקדמות שלכם</string>
+    <string name="alert_rankup_title">🎉 הגעתם ל־%1$s!</string>
+    <string name="alert_rankup_text">ניצחונות עד %2$s: ≈%1$d. המשיכו לטפס!</string>
+    <string name="alert_rankup_plain">המשיכו לטפס עם הבחירות הטובות ביותר לכל מפה.</string>
+    <string name="alert_week_title">📊 השבוע שלכם במצב המדורג</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s אלו · הכי טוב: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s אלו</string>
 </resources>

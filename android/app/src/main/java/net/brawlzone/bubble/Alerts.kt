@@ -18,14 +18,23 @@ object Alerts {
 
     data class Season(val number: Int, val startsOn: String, val endsOn: String?)
 
-    data class TopPick(val name: String, val tier: String, val winRate: Double, val imageUrl: String?)
+    /** A brawler in a top list: the medium widget's pick, the large widget's five. */
+    data class TopPick(val brawlerId: Int, val name: String, val tier: String, val winRate: Double, val imageUrl: String?)
+
+    /** One Ranked mode's top five, for a widget set to that mode. */
+    data class ModeTop(val key: String, val label: String, val icon: String?, val top: List<TopPick>)
 
     data class Data(
         val rewards: List<Reward>,
         val season: Season?,
         val nextStartsOn: String?,
         val topPick: TopPick?,
-    )
+        /** Top five over the panel's window, all modes. */
+        val metaAll: List<TopPick> = emptyList(),
+        val modes: List<ModeTop> = emptyList(),
+    ) {
+        fun mode(key: String?): ModeTop? = key?.let { k -> modes.firstOrNull { it.key == k } }
+    }
 
     private const val PREFS = "brawlzone-alerts"
     private const val KEY_ENABLED = "enabled"
@@ -33,6 +42,9 @@ object Alerts {
     private const val KEY_LAST_AT = "last_at"
 
     const val URL = "${Http.SITE}/api/bubble/alerts"
+
+    /** With the app's language, so brawler and mode names read like the panel. */
+    fun url(context: Context): String = URL + "?lang=" + AppLang.current(context)
 
     fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -84,16 +96,33 @@ object Alerts {
         }
         val nextStartsOn = json.optJSONObject("nextSeason")?.optString("startsOn")
             ?.takeIf { it.isNotEmpty() && it != "null" }
-        val top = json.optJSONObject("topPick")?.let {
-            TopPick(
-                name = it.optString("name"),
-                tier = it.optString("tier"),
-                winRate = it.optDouble("winRate", 0.0),
-                imageUrl = it.optString("imageUrl").takeIf { u -> u.startsWith("https://") },
-            )
-        }
-        return Data(rewards, season, nextStartsOn, top)
+        val top = json.optJSONObject("topPick")?.let(::pick)
+        val meta = json.optJSONObject("meta")
+        val all = meta?.optJSONArray("all")?.let(::picks).orEmpty()
+        val modes = meta?.optJSONArray("modes")?.let { array ->
+            (0 until array.length()).mapNotNull { i ->
+                val o = array.optJSONObject(i) ?: return@mapNotNull null
+                ModeTop(
+                    key = o.optString("key"),
+                    label = o.optString("label"),
+                    icon = o.optString("icon").takeIf { it.startsWith("https://") },
+                    top = o.optJSONArray("top")?.let(::picks).orEmpty(),
+                )
+            }
+        }.orEmpty()
+        return Data(rewards, season, nextStartsOn, top, all, modes)
     }
+
+    private fun pick(o: JSONObject) = TopPick(
+        brawlerId = o.optInt("brawlerId"),
+        name = o.optString("name"),
+        tier = o.optString("tier"),
+        winRate = o.optDouble("winRate", 0.0),
+        imageUrl = o.optString("imageUrl").takeIf { it.startsWith("https://") },
+    )
+
+    private fun picks(array: org.json.JSONArray): List<TopPick> =
+        (0 until array.length()).mapNotNull { i -> array.optJSONObject(i)?.let(::pick) }
 
     // ------------------------------------------------------------- reviews
 

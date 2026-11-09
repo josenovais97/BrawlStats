@@ -100,8 +100,8 @@
     <string name="onb_skip_all">Lewati penyiapan</string>
     <string name="onb_no_game">Brawl Stars tidak terpasang di ponsel ini.</string>
     <string name="alerts_caption">NOTIFIKASI</string>
-    <string name="alerts_title">Hadiah gratis dan pengingat musim</string>
-    <string name="alerts_body">Saat ada hadiah gratis, saat musim Berperingkat dimulai, dan dua hari sebelum berakhir.</string>
+    <string name="alerts_title">Hadiah, musim, dan kemajuanmu</string>
+    <string name="alerts_body">Hadiah gratis saat muncul, awal dan akhir musim Berperingkat, kenaikan peringkatmu, dan ringkasan minggumu setiap Minggu.</string>
     <string name="update_ready_title">Pembaruan siap</string>
     <string name="update_ready_body">Versi baru sudah diunduh.</string>
     <string name="update_restart">Mulai ulang</string>
@@ -126,4 +126,36 @@
     <string name="widget_pick_label">PILIHAN TERBAIK HARI INI</string>
     <string name="widget_pick_line">Tier %1$s · %2$s menang</string>
     <string name="widget_loading">Memuat…</string>
+    <!-- 1.40: more widgets, widget settings, rank-ups and the weekly recap -->
+    <string name="widget_small_name">Hadiah gratis</string>
+    <string name="widget_small_description">Hadiah gratis terbaru dengan tombol Klaim.</string>
+    <string name="widget_meta_name">Meta Berperingkat</string>
+    <string name="widget_meta_description">5 pilihan Berperingkat teratas untuk semua mode atau satu mode, hadiah gratis, dan hitung mundur musim.</string>
+    <string name="widget_rank_name">Peringkatku</string>
+    <string name="widget_rank_description">Peringkat Berperingkat, elo, kemajuan ke peringkat berikutnya, dan game terakhirmu.</string>
+    <string name="widget_meta_label">PILIHAN TERBAIK</string>
+    <string name="widget_mode_label">TERBAIK · %1$s</string>
+    <string name="widget_mode_pick_label">PILIHAN TERBAIK · %1$s</string>
+    <string name="widget_season_ends">Musim %1$d · berakhir %2$s</string>
+    <string name="widget_updated">Diperbarui %1$s</string>
+    <string name="widget_rank_none">Tambahkan tag pemainmu di aplikasi untuk melihat peringkatmu di sini.</string>
+    <string name="widget_rank_wins">≈%1$d kemenangan lagi ke %2$s</string>
+    <string name="widget_rank_elo_to">%1$s elo lagi ke %2$s</string>
+    <string name="widget_rank_top">Peringkat tertinggi tercapai</string>
+    <string name="widget_rank_last">%1$d terakhir: %2$d–%3$d · ★%4$d</string>
+    <string name="widget_elo">%1$s elo</string>
+    <string name="wcfg_title">Pengaturan widget</string>
+    <string name="wcfg_mode">PILIHAN TERBAIK UNTUK</string>
+    <string name="wcfg_all_modes">Semua mode</string>
+    <string name="wcfg_reward">Tampilkan hadiah gratis</string>
+    <string name="wcfg_background">LATAR</string>
+    <string name="wcfg_solid">Penuh</string>
+    <string name="wcfg_save">Simpan</string>
+    <string name="channel_progress">Kemajuanmu</string>
+    <string name="alert_rankup_title">🎉 Kamu mencapai %1$s!</string>
+    <string name="alert_rankup_text">≈%1$d kemenangan lagi ke %2$s. Terus naik!</string>
+    <string name="alert_rankup_plain">Terus naik dengan pilihan terbaik untuk setiap peta.</string>
+    <string name="alert_week_title">📊 Minggumu di Berperingkat</string>
+    <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Terbaik: %4$s</string>
+    <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
 </resources>

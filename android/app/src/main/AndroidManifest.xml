@@ -80,6 +80,56 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!--
+          Widget settings (1.40): which mode the top picks are for, the free
+          reward on or off, and the background. Opened by the launcher when a
+          widget is placed or reconfigured, so it must be exported.
+        -->
+        <activity
+            android:name=".WidgetConfigActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BrawlZone">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".SmallRewardWidget"
+            android:exported="false"
+            android:label="@string/widget_small_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_small_info" />
+        </receiver>
+
+        <receiver
+            android:name=".MetaWidget"
+            android:exported="false"
+            android:label="@string/widget_meta_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_meta_info" />
+        </receiver>
+
+        <receiver
+            android:name=".RankWidget"
+            android:exported="false"
+            android:label="@string/widget_rank_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_rank_info" />
+        </receiver>
+
         <!-- Home-screen widget: the newest free reward and today's top pick. -->
         <receiver
             android:name=".RewardsWidget"
