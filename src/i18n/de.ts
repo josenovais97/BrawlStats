@@ -4899,4 +4899,8 @@ export const DE: Record<string, string> = {
     "Elo diese Saison",
   "Best brawler":
     "Bester Brawler",
+  "Privacy Policy":
+    "Datenschutzerklärung",
+  "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
+    "Wir erheben sehr wenig, und diese Seite sagt genau was. Jede Aussage unten kannst du im Quellcode nachprüfen.",
 };

@@ -4899,4 +4899,8 @@ export const RU: Record<string, string> = {
     "Эло за сезон",
   "Best brawler":
     "Лучший боец",
+  "Privacy Policy":
+    "Политика конфиденциальности",
+  "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
+    "Мы собираем очень мало, и эта страница говорит, что именно. Каждое утверждение ниже можно проверить в исходном коде.",
 };

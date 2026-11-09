@@ -4898,4 +4898,8 @@ export const TR: Record<string, string> = {
     "Bu sezon elo",
   "Best brawler":
     "En iyi savaşçı",
+  "Privacy Policy":
+    "Gizlilik Politikası",
+  "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
+    "Çok az veri topluyoruz ve bu sayfa tam olarak neleri topladığımızı söylüyor. Aşağıdaki her iddia kaynak kodda kontrol edebileceğin bir şey.",
 };

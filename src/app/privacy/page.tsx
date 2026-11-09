@@ -25,7 +25,7 @@ import { requestLocale } from '@/lib/request-locale';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
-  title: 'Privacy',
+  title: 'Privacy Policy',
   description:
     'What BrawlZone and the BrawlZone Bubble app store, what they do not, and what the app sends. No accounts, and ads only on the website.',
 };
@@ -42,9 +42,10 @@ export default function PrivacyPage() {
   const lp = (path: string) => localePath(requestLocale(), path);
   return (
     <div className="space-y-12">
+      {/* "Privacy Policy" by name, at the top: Google Play rejects a policy page without that heading (2026-11-09). */}
       <PageHeading
-        title={t('What we collect')}
-        subtitle={t('Very little, and this page says exactly what. Every claim below is something you can check in the source.')}
+        title={t('Privacy Policy')}
+        subtitle={t('We collect very little, and this page says exactly what. Every claim below is something you can check in the source.')}
       />
       {/* A translation of a legal page is a courtesy; the English is the text. */}
       {requestLocale() !== 'en' ? (
