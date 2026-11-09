@@ -32,26 +32,46 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     defaults:
       run:
         working-directory: android
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      # The SDK straight from Google (android-actions/setup-android@v3 failed
+      # on the current runners): the runner's own copy when it has one, else
+      # the command-line tools. Logged, so a failure here is readable too.
+      - name: Android SDK
+        run: |
+          set -o pipefail
+          {
+            SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+            if [ -z "$SDK" ] || [ ! -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
+              SDK="$HOME/android-sdk"
+              mkdir -p "$SDK/cmdline-tools"
+              curl -fsSL -o /tmp/cmdline.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+              unzip -q /tmp/cmdline.zip -d "$SDK/cmdline-tools"
+              mv "$SDK/cmdline-tools/cmdline-tools" "$SDK/cmdline-tools/latest"
+            fi
+            echo "SDK at $SDK"
+            yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+            "$SDK/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0" "platform-tools"
+            echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+            echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          } 2>&1 | tee build.log
 
       - name: Build the test APK and run the unit tests
         run: |
           chmod +x gradlew
           set -o pipefail
-          ./gradlew --no-daemon --stacktrace assemblePlayQa testPlayQaUnitTest 2>&1 | tee build.log
+          ./gradlew --no-daemon --stacktrace assemblePlayQa testPlayQaUnitTest 2>&1 | tee -a build.log
 
       - name: Publish the test APK
         if: success()
