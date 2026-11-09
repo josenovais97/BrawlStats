@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity() {
         wireLook()
         wireLanguage()
         wireAlerts()
+        wireFollow()
 
         findViewById<TextView>(R.id.update_restart).setOnClickListener { Store.completeUpdate() }
         Shortcuts.publish(this)
@@ -261,6 +262,22 @@ class MainActivity : AppCompatActivity() {
         chip.setOnClickListener {
             field.setText("#$found")
             chip.visibility = View.GONE
+        }
+    }
+
+    /** Follow BrawlZone (1.40): each button opens the profile in its own app or the browser. */
+    private fun wireFollow() {
+        val links = mapOf(
+            R.id.follow_tiktok to "https://www.tiktok.com/@brawlzone.net",
+            // Opens YouTube's subscribe dialog straight away.
+            R.id.follow_youtube to "https://www.youtube.com/@brawlzonenet?sub_confirmation=1",
+            R.id.follow_instagram to "https://www.instagram.com/brawlzonenet",
+            R.id.follow_discord to "https://discord.gg/964EMQBBUJ",
+        )
+        for ((id, url) in links) {
+            findViewById<View>(id)?.setOnClickListener {
+                runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+            }
         }
     }
 

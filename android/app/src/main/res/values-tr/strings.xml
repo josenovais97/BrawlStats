@@ -158,4 +158,7 @@
     <string name="alert_week_title">📊 Aşamalı modda haftan</string>
     <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · En iyisi: %4$s</string>
     <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
+    <!-- 1.40: follow BrawlZone -->
+    <string name="follow_caption">BRAWLZONE\'U TAKİP ET</string>
+    <string name="follow_body">Ücretsiz ödüller çıkar çıkmaz, her gün yeni videolar ve topluluk.</string>
 </resources>

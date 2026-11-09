@@ -158,4 +158,7 @@
     <string name="alert_week_title">📊 你本周的排位赛</string>
     <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s 分 · 最佳：%4$s</string>
     <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s 分</string>
+    <!-- 1.40: follow BrawlZone -->
+    <string name="follow_caption">关注 BRAWLZONE</string>
+    <string name="follow_body">第一时间的免费奖励、每天的新视频和社区。</string>
 </resources>

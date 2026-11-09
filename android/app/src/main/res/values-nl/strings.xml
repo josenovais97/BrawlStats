@@ -158,4 +158,7 @@
     <string name="alert_week_title">📊 Jouw week in de laddermodus</string>
     <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Beste: %4$s</string>
     <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
+    <!-- 1.40: follow BrawlZone -->
+    <string name="follow_caption">VOLG BRAWLZONE</string>
+    <string name="follow_body">Gratis beloningen zodra ze er zijn, elke dag nieuwe video\'s en de community.</string>
 </resources>

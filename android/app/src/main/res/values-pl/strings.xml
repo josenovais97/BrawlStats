@@ -158,4 +158,7 @@
     <string name="alert_week_title">📊 Twój tydzień w trybie rankingowym</string>
     <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Najlepszy: %4$s</string>
     <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
+    <!-- 1.40: follow BrawlZone -->
+    <string name="follow_caption">OBSERWUJ BRAWLZONE</string>
+    <string name="follow_body">Darmowe nagrody, gdy tylko się pojawią, nowe filmy codziennie i społeczność.</string>
 </resources>

@@ -164,4 +164,7 @@
     <string name="alert_week_title">📊 Your week in Ranked</string>
     <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Best: %4$s</string>
     <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
+    <!-- 1.40: follow BrawlZone -->
+    <string name="follow_caption">FOLLOW BRAWLZONE</string>
+    <string name="follow_body">Free rewards the moment they drop, new videos every day, and the community.</string>
 </resources>

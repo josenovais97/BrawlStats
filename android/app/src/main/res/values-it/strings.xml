@@ -158,4 +158,7 @@
     <string name="alert_week_title">📊 La tua settimana in Classificata</string>
     <string name="alert_week_full">✓ %1$d  ✗ %2$d · %3$s elo · Migliore: %4$s</string>
     <string name="alert_week_short">✓ %1$d  ✗ %2$d · %3$s elo</string>
+    <!-- 1.40: follow BrawlZone -->
+    <string name="follow_caption">SEGUI BRAWLZONE</string>
+    <string name="follow_body">Ricompense gratis appena escono, nuovi video ogni giorno e la community.</string>
 </resources>
