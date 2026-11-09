@@ -181,7 +181,7 @@
     <string name="share_text">Theo dõi bằng BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">BẠN BÈ VÀ ĐỐI THỦ</string>
     <string name="friends_body">Thêm tối đa 5 bạn để xem ai leo hạng nhanh hơn. Bạn sẽ được báo khi có người lên hạng.</string>
-    <string name="friends_hint">Thẻ người chơi của bạn bè</string>
+    <string name="friends_hint">Tên hoặc #thẻ của bạn bè</string>
     <string name="friends_add">+ Thêm bạn</string>
     <string name="friends_add_button">Thêm</string>
     <string name="friends_remove_hint">Nhấn giữ một người bạn để xóa.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Đến lượt bạn!</string>
     <string name="alert_wrapped_title">🎁 Tổng kết Mùa %1$d của bạn đã sẵn sàng</string>
     <string name="alert_wrapped_text">Hạng cao nhất, số trận, tỉ lệ thắng và brawler tốt nhất. Chạm để chia sẻ.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Tên của bạn hoặc #thẻ</string>
+    <string name="name_searching">Đang tìm người chơi có tên đó…</string>
+    <string name="name_pick">Chạm vào tài khoản của bạn bên dưới.</string>
+    <string name="name_none">BrawlZone chưa có người chơi tên đó. Hãy dùng #thẻ của bạn: nằm dưới tên trong hồ sơ trò chơi.</string>
+    <string name="name_pick_friend">Chọn bạn bè trong danh sách hoặc nhập #thẻ của họ.</string>
+    <string name="friends_none">BrawlZone chưa có người chơi tên đó. Thử #thẻ của họ.</string>
 </resources>

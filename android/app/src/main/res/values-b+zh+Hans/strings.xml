@@ -181,7 +181,7 @@
     <string name="share_text">用 BrawlZone Bubble 记录：brawlzone.net/bubble</string>
     <string name="friends_caption">好友与对手</string>
     <string name="friends_body">最多添加 5 位好友，看看谁升得更快。好友升段时会通知你。</string>
-    <string name="friends_hint">好友的玩家标签</string>
+    <string name="friends_hint">好友名字或 #标签</string>
     <string name="friends_add">+ 添加好友</string>
     <string name="friends_add_button">添加</string>
     <string name="friends_remove_hint">长按好友即可移除。</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">轮到你了！</string>
     <string name="alert_wrapped_title">🎁 你的第%1$d赛季回顾已就绪</string>
     <string name="alert_wrapped_text">最高段位、场次、胜率和最佳英雄。点按即可分享。</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">你的名字或 #标签</string>
+    <string name="name_searching">正在查找这个名字的玩家…</string>
+    <string name="name_pick">点按下方你的账号。</string>
+    <string name="name_none">BrawlZone 上还没有这个名字的玩家。请使用你的 #标签：在游戏个人资料里名字下方。</string>
+    <string name="name_pick_friend">从列表中选择好友，或输入对方的 #标签。</string>
+    <string name="friends_none">BrawlZone 上还没有这个名字的玩家。试试对方的 #标签。</string>
 </resources>

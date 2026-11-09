@@ -654,6 +654,15 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <!-- Players found by name: tap one to add them. -->
+            <LinearLayout
+                android:id="@+id/friends_matches"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/friends_add"
                 android:layout_width="match_parent"
@@ -1373,7 +1382,7 @@
                 android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:background="@drawable/field"
-                android:hint="#2RLCPVGUG"
+                android:hint="@string/tag_hint"
                 android:importantForAutofill="no"
                 android:inputType="textCapCharacters|textNoSuggestions"
                 android:maxLength="16"
@@ -1385,6 +1394,15 @@
                 android:textColor="@color/foreground"
                 android:textColorHint="@color/muted"
                 android:textSize="16sp" />
+
+            <!-- 1.40: players found by name, tap one to use its tag. -->
+            <LinearLayout
+                android:id="@+id/tag_matches"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tag_status"

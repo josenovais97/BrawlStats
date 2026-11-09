@@ -4902,4 +4902,14 @@ export const ES: Record<string, string> = {
     "Política de privacidad",
   "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
     "Recogemos muy poco, y esta página dice exactamente qué. Todo lo de abajo se puede comprobar en el código.",
+  "Top brawlers":
+    "Mejores brawlers",
+  "{n} win":
+    "{n} victoria",
+  "{n} wins":
+    "{n} victorias",
+  "{n} loss":
+    "{n} derrota",
+  "{n} losses":
+    "{n} derrotas",
 };

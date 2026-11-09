@@ -4903,4 +4903,14 @@ export const RU: Record<string, string> = {
     "Политика конфиденциальности",
   "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
     "Мы собираем очень мало, и эта страница говорит, что именно. Каждое утверждение ниже можно проверить в исходном коде.",
+  "Top brawlers":
+    "Лучшие бойцы",
+  "{n} win":
+    "{n} победа",
+  "{n} wins":
+    "{n} {n|one:победа|few:победы|many:побед|other:победы}",
+  "{n} loss":
+    "{n} поражение",
+  "{n} losses":
+    "{n} {n|one:поражение|few:поражения|many:поражений|other:поражения}",
 };

@@ -181,7 +181,7 @@
     <string name="share_text">Bijgehouden met BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">VRIENDEN EN RIVALEN</string>
     <string name="friends_body">Voeg tot 5 vrienden toe en zie wie sneller klimt. Je hoort het als een van hen een rang stijgt.</string>
-    <string name="friends_hint">Spelerstag van je vriend</string>
+    <string name="friends_hint">Naam of #tag van je vriend</string>
     <string name="friends_add">+ Vriend toevoegen</string>
     <string name="friends_add_button">Toevoegen</string>
     <string name="friends_remove_hint">Houd een vriend ingedrukt om die te verwijderen.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Jouw beurt!</string>
     <string name="alert_wrapped_title">🎁 Je overzicht van seizoen %1$d staat klaar</string>
     <string name="alert_wrapped_text">Hoogste rang, games, winpercentage en beste brawler. Tik om te delen.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Je naam of #tag</string>
+    <string name="name_searching">Spelers met die naam zoeken…</string>
+    <string name="name_pick">Tik hieronder op je account.</string>
+    <string name="name_none">Nog geen speler met die naam op BrawlZone. Gebruik je #tag: die staat onder je naam in je spelprofiel.</string>
+    <string name="name_pick_friend">Kies je vriend uit de lijst of typ de #tag.</string>
+    <string name="friends_none">Nog geen speler met die naam op BrawlZone. Probeer de #tag.</string>
 </resources>

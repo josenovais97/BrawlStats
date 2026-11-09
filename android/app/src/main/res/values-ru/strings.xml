@@ -181,7 +181,7 @@
     <string name="share_text">Отслеживаю с BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">ДРУЗЬЯ И СОПЕРНИКИ</string>
     <string name="friends_body">Добавь до 5 друзей и смотри, кто растёт быстрее. Мы сообщим, когда кто-то из них повысит ранг.</string>
-    <string name="friends_hint">Тег друга</string>
+    <string name="friends_hint">Ник или #тег друга</string>
     <string name="friends_add">+ Добавить друга</string>
     <string name="friends_add_button">Добавить</string>
     <string name="friends_remove_hint">Удерживай друга, чтобы удалить.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Твой ход!</string>
     <string name="alert_wrapped_title">🎁 Итоги сезона %1$d готовы</string>
     <string name="alert_wrapped_text">Лучший ранг, бои, процент побед и лучший боец. Нажми, чтобы поделиться.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Твой ник или #тег</string>
+    <string name="name_searching">Ищем игроков с таким ником…</string>
+    <string name="name_pick">Нажми на свой аккаунт ниже.</string>
+    <string name="name_none">На BrawlZone пока нет игрока с таким ником. Введи свой #тег: он под ником в профиле в игре.</string>
+    <string name="name_pick_friend">Выбери друга из списка или введи его #тег.</string>
+    <string name="friends_none">На BrawlZone пока нет игрока с таким ником. Попробуй его #тег.</string>
 </resources>

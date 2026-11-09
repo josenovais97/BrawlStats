@@ -181,7 +181,7 @@
     <string name="share_text">Seurattu BrawlZone Bubblella: brawlzone.net/bubble</string>
     <string name="friends_caption">KAVERIT JA KILPAILIJAT</string>
     <string name="friends_body">Lisää enintään 5 kaveria ja katso, kuka nousee nopeimmin. Saat tiedon, kun joku heistä nousee tasolla.</string>
-    <string name="friends_hint">Kaverin pelaajatunnus</string>
+    <string name="friends_hint">Kaverin nimi tai #pelaajatunnus</string>
     <string name="friends_add">+ Lisää kaveri</string>
     <string name="friends_add_button">Lisää</string>
     <string name="friends_remove_hint">Poista kaveri painamalla pitkään.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Sinun vuorosi!</string>
     <string name="alert_wrapped_title">🎁 Kauden %1$d koosteesi on valmis</string>
     <string name="alert_wrapped_text">Paras taso, pelit, voittoprosentti ja paras brawler. Jaa napauttamalla.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Nimesi tai #pelaajatunnus</string>
+    <string name="name_searching">Etsitään pelaajia tällä nimellä…</string>
+    <string name="name_pick">Napauta tiliäsi alta.</string>
+    <string name="name_none">BrawlZonessa ei vielä ole pelaajaa tällä nimellä. Käytä #pelaajatunnustasi: se on nimesi alla pelin profiilissa.</string>
+    <string name="name_pick_friend">Valitse kaveri listalta tai kirjoita hänen #pelaajatunnuksensa.</string>
+    <string name="friends_none">BrawlZonessa ei vielä ole pelaajaa tällä nimellä. Kokeile #pelaajatunnusta.</string>
 </resources>

@@ -181,7 +181,7 @@
     <string name="share_text">Śledzone z BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">ZNAJOMI I RYWALE</string>
     <string name="friends_body">Dodaj do 5 znajomych i zobacz, kto szybciej się wspina. Dostaniesz powiadomienie, gdy ktoś z nich awansuje.</string>
-    <string name="friends_hint">Tag znajomego</string>
+    <string name="friends_hint">Nick lub #tag znajomego</string>
     <string name="friends_add">+ Dodaj znajomego</string>
     <string name="friends_add_button">Dodaj</string>
     <string name="friends_remove_hint">Przytrzymaj znajomego, aby go usunąć.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Twój ruch!</string>
     <string name="alert_wrapped_title">🎁 Podsumowanie sezonu %1$d jest gotowe</string>
     <string name="alert_wrapped_text">Najwyższa ranga, mecze, procent wygranych i najlepszy zadymiarz. Dotknij, aby udostępnić.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Twój nick lub #tag</string>
+    <string name="name_searching">Szukam graczy o tym nicku…</string>
+    <string name="name_pick">Dotknij swojego konta poniżej.</string>
+    <string name="name_none">Na BrawlZone nie ma jeszcze gracza o tym nicku. Użyj swojego #tagu: jest pod nickiem w profilu w grze.</string>
+    <string name="name_pick_friend">Wybierz znajomego z listy lub wpisz jego #tag.</string>
+    <string name="friends_none">Na BrawlZone nie ma jeszcze gracza o tym nicku. Spróbuj jego #tagu.</string>
 </resources>

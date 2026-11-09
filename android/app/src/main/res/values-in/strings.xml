@@ -181,7 +181,7 @@
     <string name="share_text">Dipantau dengan BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">TEMAN DAN RIVAL</string>
     <string name="friends_body">Tambahkan hingga 5 teman untuk melihat siapa yang naik lebih cepat. Kamu akan diberi tahu saat salah satunya naik peringkat.</string>
-    <string name="friends_hint">Tag pemain temanmu</string>
+    <string name="friends_hint">Nama atau #tag teman</string>
     <string name="friends_add">+ Tambah teman</string>
     <string name="friends_add_button">Tambah</string>
     <string name="friends_remove_hint">Tekan lama teman untuk menghapusnya.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Giliranmu!</string>
     <string name="alert_wrapped_title">🎁 Rekap Musim %1$d kamu sudah siap</string>
     <string name="alert_wrapped_text">Peringkat tertinggi, pertandingan, rasio menang, dan brawler terbaik. Ketuk untuk membagikan.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Namamu atau #tag</string>
+    <string name="name_searching">Mencari pemain dengan nama itu…</string>
+    <string name="name_pick">Ketuk akunmu di bawah.</string>
+    <string name="name_none">Belum ada pemain dengan nama itu di BrawlZone. Pakai #tag-mu: ada di bawah namamu di profil game.</string>
+    <string name="name_pick_friend">Pilih temanmu dari daftar, atau ketik #tag-nya.</string>
+    <string name="friends_none">Belum ada pemain dengan nama itu di BrawlZone. Coba #tag-nya.</string>
 </resources>

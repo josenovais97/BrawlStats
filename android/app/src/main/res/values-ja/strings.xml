@@ -181,7 +181,7 @@
     <string name="share_text">BrawlZone Bubbleで記録：brawlzone.net/bubble</string>
     <string name="friends_caption">フレンドとライバル</string>
     <string name="friends_body">フレンドを5人まで追加して、誰が早く上がるか比べよう。ランクアップしたらお知らせします。</string>
-    <string name="friends_hint">フレンドのプレイヤータグ</string>
+    <string name="friends_hint">フレンドの名前または#タグ</string>
     <string name="friends_add">+ フレンドを追加</string>
     <string name="friends_add_button">追加</string>
     <string name="friends_remove_hint">長押しでフレンドを削除できます。</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">あなたの番！</string>
     <string name="alert_wrapped_title">🎁 シーズン%1$dのまとめができました</string>
     <string name="alert_wrapped_text">最高ランク、試合数、勝率、ベストキャラ。タップしてシェア。</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">名前または#タグ</string>
+    <string name="name_searching">その名前のプレイヤーを検索中…</string>
+    <string name="name_pick">下からあなたのアカウントをタップしてください。</string>
+    <string name="name_none">BrawlZoneにはまだその名前のプレイヤーがいません。#タグを使ってください。ゲームのプロフィールで名前の下にあります。</string>
+    <string name="name_pick_friend">リストからフレンドを選ぶか、#タグを入力してください。</string>
+    <string name="friends_none">BrawlZoneにはまだその名前のプレイヤーがいません。#タグで試してください。</string>
 </resources>

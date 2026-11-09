@@ -187,7 +187,7 @@
     <string name="share_text">Tracked with BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">FRIENDS AND RIVALS</string>
     <string name="friends_body">Add up to 5 friends to see who climbs faster. You\'ll hear about it when one of them ranks up.</string>
-    <string name="friends_hint">Friend\'s tag</string>
+    <string name="friends_hint">Friend\'s name or #tag</string>
     <string name="friends_add">+ Add a friend</string>
     <string name="friends_add_button">Add</string>
     <string name="friends_remove_hint">Long-press a friend to remove them.</string>
@@ -220,4 +220,11 @@
     <string name="alert_wrapped_title">🎁 Your Season %1$d Wrapped is ready</string>
     <string name="alert_wrapped_text">Peak rank, games, win rate and best brawler. Tap to share it.</string>
     <string name="friends_checking" translatable="false">…</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Your name or #tag</string>
+    <string name="name_searching">Looking for players with that name…</string>
+    <string name="name_pick">Tap your account below.</string>
+    <string name="name_none">No player with that name on BrawlZone yet. Use your #tag: it\'s under your name in your game profile.</string>
+    <string name="name_pick_friend">Pick your friend from the list, or type their #tag.</string>
+    <string name="friends_none">No player with that name on BrawlZone yet. Try their #tag.</string>
 </resources>

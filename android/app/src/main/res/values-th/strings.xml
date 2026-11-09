@@ -181,7 +181,7 @@
     <string name="share_text">ติดตามด้วย BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">เพื่อนและคู่แข่ง</string>
     <string name="friends_body">เพิ่มเพื่อนได้สูงสุด 5 คน เพื่อดูว่าใครไต่แรงก์ได้เร็วกว่า เราจะแจ้งเมื่อมีคนเลื่อนแรงก์</string>
-    <string name="friends_hint">แท็กผู้เล่นของเพื่อน</string>
+    <string name="friends_hint">ชื่อหรือ #แท็ก ของเพื่อน</string>
     <string name="friends_add">+ เพิ่มเพื่อน</string>
     <string name="friends_add_button">เพิ่ม</string>
     <string name="friends_remove_hint">กดค้างที่เพื่อนเพื่อลบออก</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">ตาคุณแล้ว!</string>
     <string name="alert_wrapped_title">🎁 สรุปซีซัน %1$d ของคุณพร้อมแล้ว</string>
     <string name="alert_wrapped_text">แรงก์สูงสุด จำนวนเกม อัตราชนะ และบรอว์เลอร์ที่ดีที่สุด แตะเพื่อแชร์</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">ชื่อของคุณหรือ #แท็ก</string>
+    <string name="name_searching">กำลังค้นหาผู้เล่นชื่อนี้…</string>
+    <string name="name_pick">แตะบัญชีของคุณด้านล่าง</string>
+    <string name="name_none">ยังไม่มีผู้เล่นชื่อนี้ใน BrawlZone ใช้ #แท็ก ของคุณ อยู่ใต้ชื่อในโปรไฟล์เกม</string>
+    <string name="name_pick_friend">เลือกเพื่อนจากรายการ หรือพิมพ์ #แท็ก ของเพื่อน</string>
+    <string name="friends_none">ยังไม่มีผู้เล่นชื่อนี้ใน BrawlZone ลองใช้ #แท็ก</string>
 </resources>

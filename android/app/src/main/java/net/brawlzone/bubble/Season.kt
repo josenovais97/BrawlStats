@@ -34,6 +34,8 @@ object Season {
         val gain: Int?,
         val peak: Int,
         val best: String?,
+        /** The top three by wins: name, games, wins. */
+        val top: List<Triple<String, Int, Int>> = emptyList(),
     )
 
     private const val PREFS = "brawlzone-season"
@@ -123,6 +125,7 @@ object Season {
             gain = if (eloStart >= 0 && eloLast != null) eloLast - eloStart else null,
             peak = j.optInt("peak", -1),
             best = best(j.optJSONObject("brawlers")),
+            top = top(j.optJSONObject("brawlers")),
         )
     }
 
@@ -165,6 +168,15 @@ object Season {
         return best
     }
 
+    private fun top(brawlers: JSONObject?): List<Triple<String, Int, Int>> {
+        if (brawlers == null) return emptyList()
+        return brawlers.keys().asSequence().mapNotNull { name ->
+            val row = brawlers.optJSONArray(name) ?: return@mapNotNull null
+            Triple(name, row.optInt(0), row.optInt(1)).takeIf { it.second > 0 }
+        }.sortedWith(compareByDescending<Triple<String, Int, Int>> { it.third }.thenByDescending { it.second })
+            .take(3).toList()
+    }
+
     /** The card's address, with what the phone counted for the server to merge. */
     fun cardUrl(context: Context, tag: String, s: Stats?): String {
         val b = Uri.parse("${Http.SITE}/api/bubble/card").buildUpon()
@@ -181,6 +193,11 @@ object Season {
             s.gain?.let { b.appendQueryParameter("gain", it.toString()) }
             if (s.peak >= 0) b.appendQueryParameter("peak", s.peak.toString())
             s.best?.let { b.appendQueryParameter("best", it) }
+            if (s.top.isNotEmpty()) {
+                val top = JSONArray()
+                for ((name, games, wins) in s.top) top.put(JSONArray().put(name).put(games).put(wins))
+                b.appendQueryParameter("top", top.toString())
+            }
         }
         return b.build().toString()
     }

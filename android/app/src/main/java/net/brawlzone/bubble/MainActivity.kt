@@ -468,6 +468,10 @@ class MainActivity : AppCompatActivity() {
         fun submit() {
             val raw = field.text.toString()
             if (raw.isBlank()) return
+            if (!Account.isValid(raw)) {
+                android.widget.Toast.makeText(this, R.string.name_pick_friend, android.widget.Toast.LENGTH_SHORT).show()
+                return
+            }
             go.isEnabled = false
             go.text = getString(R.string.friends_checking)
             val app = applicationContext
@@ -498,6 +502,24 @@ class MainActivity : AppCompatActivity() {
                 }
             }.start()
         }
+        // Find by name (1.40): the same search as the tag field; tapping a player adds them.
+        val friendSearch = NameSearch(
+            this,
+            findViewById(R.id.friends_matches),
+            onPick = { picked, _ ->
+                field.setText("#$picked")
+                submit()
+            },
+            emptyText = getString(R.string.friends_none),
+        )
+        field.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val raw = s?.toString().orEmpty()
+                if (raw.trim().startsWith("#")) friendSearch.clear() else friendSearch.query(raw)
+            }
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+        })
         go.setOnClickListener { submit() }
         field.setOnEditorActionListener { _, _, _ ->
             submit()
@@ -655,6 +677,27 @@ class MainActivity : AppCompatActivity() {
         val savedRow = findViewById<LinearLayout>(R.id.saved_row)
         val setupPrompt = findViewById<LinearLayout>(R.id.setup_prompt)
         val scroll = findViewById<android.widget.ScrollView>(R.id.scroll)
+
+        /*
+         * Find by name (1.40): typing a name instead of a tag lists matching
+         * players, like the website's search; tapping one fills in its tag.
+         */
+        val nameSearch = NameSearch(
+            this,
+            findViewById(R.id.tag_matches),
+            onPick = { picked, _ ->
+                tag.setText("#$picked")
+                tag.setSelection(tag.text.length)
+            },
+            onState = { state ->
+                when (state) {
+                    NameSearch.State.SEARCHING -> status.setText(R.string.name_searching)
+                    NameSearch.State.FOUND -> status.setText(R.string.name_pick)
+                    NameSearch.State.NONE -> status.setText(R.string.name_none)
+                    NameSearch.State.IDLE -> Unit
+                }
+            },
+        )
 
         var filter = Account.filter(this)
         /* The tag the plan on screen belongs to, so it is fetched once. */
@@ -860,17 +903,27 @@ class MainActivity : AppCompatActivity() {
                 raw.isBlank() -> {
                     AccountLookup.cancel()
                     showAccount(null)
+                    nameSearch.clear()
                     status.setText(R.string.tag_optional)
                 }
                 !Account.isValid(raw) -> {
                     AccountLookup.cancel()
                     showAccount(null)
-                    status.setText(R.string.tag_invalid)
+                    // Not a tag: a name, unless it was typed as one.
+                    if (raw.trim().startsWith("#") || raw.trim().length < 2) {
+                        nameSearch.clear()
+                        status.setText(R.string.tag_invalid)
+                    } else {
+                        status.setText(R.string.name_searching)
+                        nameSearch.query(raw)
+                    }
                 }
                 else -> {
                     status.setText(R.string.tag_checking)
                     AccountLookup.lookup(Account.normalise(raw)) { result ->
                         showAccount(result)
+                        // A name that happens to look like a tag: search by name when no account has it.
+                        if (result == null && !raw.trim().startsWith("#")) nameSearch.query(raw) else nameSearch.clear()
                         status.text = if (result == null) {
                             /*
                              * A saved tag that does not resolve reopens the

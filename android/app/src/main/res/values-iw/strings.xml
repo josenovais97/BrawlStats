@@ -181,7 +181,7 @@
     <string name="share_text">במעקב עם BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">חברים ויריבים</string>
     <string name="friends_body">הוסיפו עד 5 חברים כדי לראות מי מטפס מהר יותר. נעדכן אתכם כשאחד מהם עולה דרגה.</string>
-    <string name="friends_hint">תג השחקן של החבר</string>
+    <string name="friends_hint">שם או #תג של החבר</string>
     <string name="friends_add">+ הוספת חבר</string>
     <string name="friends_add_button">הוספה</string>
     <string name="friends_remove_hint">לחיצה ארוכה על חבר כדי להסיר.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">תורכם!</string>
     <string name="alert_wrapped_title">🎁 סיכום עונה %1$d שלכם מוכן</string>
     <string name="alert_wrapped_text">דרגת שיא, משחקים, אחוז ניצחונות והבראולר הכי טוב. הקישו כדי לשתף.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">השם שלכם או #תג</string>
+    <string name="name_searching">מחפשים שחקנים בשם הזה…</string>
+    <string name="name_pick">הקישו על החשבון שלכם למטה.</string>
+    <string name="name_none">עדיין אין ב־BrawlZone שחקן בשם הזה. השתמשו ב־#תג שלכם: הוא מתחת לשם בפרופיל במשחק.</string>
+    <string name="name_pick_friend">בחרו את החבר מהרשימה או הקלידו את ה־#תג שלו.</string>
+    <string name="friends_none">עדיין אין ב־BrawlZone שחקן בשם הזה. נסו את ה־#תג שלו.</string>
 </resources>

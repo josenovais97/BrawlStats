@@ -181,7 +181,7 @@
     <string name="share_text">أتابع تقدمي مع BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">الأصدقاء والمنافسون</string>
     <string name="friends_body">أضف حتى 5 أصدقاء لترى من يصعد أسرع. سنخبرك عندما يرتقي أحدهم رتبة.</string>
-    <string name="friends_hint">وسم اللاعب لصديقك</string>
+    <string name="friends_hint">اسم صديقك أو #وسمه</string>
     <string name="friends_add">+ أضف صديقًا</string>
     <string name="friends_add_button">إضافة</string>
     <string name="friends_remove_hint">اضغط مطولًا على صديق لإزالته.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">دورك!</string>
     <string name="alert_wrapped_title">🎁 ملخص الموسم %1$d جاهز</string>
     <string name="alert_wrapped_text">أعلى رتبة والمباريات ونسبة الفوز وأفضل مقاتل. اضغط لمشاركته.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">اسمك أو #الوسم</string>
+    <string name="name_searching">نبحث عن لاعبين بهذا الاسم…</string>
+    <string name="name_pick">اضغط على حسابك أدناه.</string>
+    <string name="name_none">لا يوجد لاعب بهذا الاسم على BrawlZone بعد. استخدم #وسمك: تجده تحت اسمك في ملفك في اللعبة.</string>
+    <string name="name_pick_friend">اختر صديقك من القائمة أو اكتب #وسمه.</string>
+    <string name="friends_none">لا يوجد لاعب بهذا الاسم على BrawlZone بعد. جرّب #وسمه.</string>
 </resources>

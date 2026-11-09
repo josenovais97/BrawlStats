@@ -181,7 +181,7 @@
     <string name="share_text">BrawlZone Bubble로 기록 중: brawlzone.net/bubble</string>
     <string name="friends_caption">친구와 라이벌</string>
     <string name="friends_body">친구를 최대 5명까지 추가해 누가 더 빨리 올라가는지 확인하세요. 친구가 랭크를 올리면 알려 드려요.</string>
-    <string name="friends_hint">친구의 플레이어 태그</string>
+    <string name="friends_hint">친구 이름 또는 #태그</string>
     <string name="friends_add">+ 친구 추가</string>
     <string name="friends_add_button">추가</string>
     <string name="friends_remove_hint">친구를 길게 눌러 삭제하세요.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">내 차례!</string>
     <string name="alert_wrapped_title">🎁 시즌 %1$d 결산이 준비됐어요</string>
     <string name="alert_wrapped_text">최고 랭크, 경기 수, 승률, 최고의 브롤러. 탭해서 공유하세요.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">이름 또는 #태그</string>
+    <string name="name_searching">그 이름의 플레이어를 찾는 중…</string>
+    <string name="name_pick">아래에서 내 계정을 탭하세요.</string>
+    <string name="name_none">아직 BrawlZone에 그 이름의 플레이어가 없어요. #태그를 사용하세요. 게임 프로필에서 이름 아래에 있어요.</string>
+    <string name="name_pick_friend">목록에서 친구를 고르거나 #태그를 입력하세요.</string>
+    <string name="friends_none">아직 BrawlZone에 그 이름의 플레이어가 없어요. #태그로 해 보세요.</string>
 </resources>

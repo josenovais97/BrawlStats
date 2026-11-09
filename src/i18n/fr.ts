@@ -4903,4 +4903,14 @@ export const FR: Record<string, string> = {
     "Politique de confidentialité",
   "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
     "Nous collectons très peu, et cette page dit exactement quoi. Chaque affirmation ci-dessous est vérifiable dans le code source.",
+  "Top brawlers":
+    "Meilleurs brawlers",
+  "{n} win":
+    "{n} victoire",
+  "{n} wins":
+    "{n} victoires",
+  "{n} loss":
+    "{n} défaite",
+  "{n} losses":
+    "{n} défaites",
 };

@@ -13,6 +13,7 @@ import { BG, BODY, BRAND, DIM, DISPLAY, FG, loadIcon, loadLogo, slideFonts } fro
 import { getPlayerSeasonStats, getRankedEloRates } from '@/lib/stats';
 import { translate } from '@/lib/t';
 import { normalizeTag } from '@/lib/tags';
+import type { BABrawler } from '@/types/brawlapi';
 
 /**
  * Share cards for the Bubble app (1.40): a phone-story image (1080x1920) the
@@ -133,13 +134,42 @@ export async function GET(request: NextRequest) {
     const useDb = db !== null && db.games >= (appGames ?? 0);
     const games = useDb ? db.games : (appGames ?? 0);
     const wins = useDb ? db.wins : (appWins ?? 0);
-    const art = await getBrawlerArtMap().catch(() => new Map());
-    const bestRow = useDb ? db.byBrawler[0] : null;
-    const bestName = bestRow ? name(art.get(bestRow.brawlerId)?.name ?? '') : q.get('best');
-    const bestIcon = bestRow ? await loadIcon(art.get(bestRow.brawlerId)?.imageUrl ?? brawlerIconUrl(bestRow.brawlerId), 220) : null;
+    const art = await getBrawlerArtMap().catch(() => new Map<number, BABrawler>());
+
+    /*
+     * The top three by wins. From the database for sampled players; otherwise
+     * what the app counted (`top`: [[name, games, wins], ...] in the app's
+     * language), matched back to a brawler by its localized name for the art.
+     */
+    const byLocalName = new Map([...art.entries()].map(([id, b]) => [name(b.name).toLowerCase(), id] as const));
+    type TopRow = { id: number | null; label: string; games: number; wins: number };
+    let top: TopRow[] = [];
+    if (useDb) {
+      top = db.byBrawler.slice(0, 3).map((r) => ({ id: r.brawlerId, label: name(art.get(r.brawlerId)?.name ?? ''), games: r.games, wins: r.wins }));
+    } else {
+      try {
+        const raw = JSON.parse(q.get('top') ?? '[]') as unknown;
+        if (Array.isArray(raw)) {
+          top = raw
+            .filter((r): r is [string, number, number] => Array.isArray(r) && typeof r[0] === 'string' && Number.isFinite(r[1]) && Number.isFinite(r[2]))
+            .map(([label, g, w]) => ({ id: byLocalName.get(label.toLowerCase()) ?? null, label: label.slice(0, 24), games: Math.max(0, Math.round(g)), wins: Math.max(0, Math.round(w)) }))
+            .filter((r) => r.games > 0)
+            .sort((a, b) => b.wins - a.wins || b.games - a.games)
+            .slice(0, 3);
+        }
+      } catch {
+        top = [];
+      }
+      const best = q.get('best');
+      if (top.length === 0 && best) top = [{ id: byLocalName.get(best.toLowerCase()) ?? null, label: best.slice(0, 24), games: 0, wins: 0 }];
+    }
+    const topIcons = await Promise.all(
+      top.map((r) => (r.id !== null ? loadIcon(art.get(r.id)?.imageUrl ?? brawlerIconUrl(r.id), 200) : Promise.resolve(null))),
+    );
+
     const peakIndex = Math.max(indexOf(player.highestSeasonRankedRankName ?? null), int(q.get('peak')) ?? -1, rankIndex);
     const peakName = peakIndex >= 0 ? localRank(rankProgress(RANK_ELO_FLOORS[peakIndex][1])?.rank, name) : null;
-    const peakBadge = peakIndex >= 0 ? await loadIcon(rankedTierIconUrl(peakIndex + 1) ?? '', 300) : null;
+    const peakBadge = peakIndex >= 0 ? await loadIcon(rankedTierIconUrl(peakIndex + 1) ?? '', 200) : null;
     const gain = int(q.get('gain'));
     const streak = int(q.get('streak'));
     const tile = (value: string, label: string) => (
@@ -150,34 +180,44 @@ export async function GET(request: NextRequest) {
           alignItems: 'center',
           justifyContent: 'center',
           width: 420,
-          height: 196,
+          height: 168,
           padding: '0 18px',
-          borderRadius: 36,
+          borderRadius: 32,
           background: 'rgba(255,255,255,0.07)',
           border: '3px solid rgba(255,255,255,0.12)',
         }}
       >
-        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 88, color: FG }}>{value}</div>
-        <div style={{ display: 'flex', fontSize: 32, color: DIM, textAlign: 'center', justifyContent: 'center' }}>{label}</div>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 80, color: FG, lineHeight: 1.05 }}>{value}</div>
+        <div style={{ display: 'flex', fontSize: 30, color: DIM, textAlign: 'center', justifyContent: 'center' }}>{label}</div>
       </div>
     );
+    const winsText = (n: number) => t(n === 1 ? '{n} win' : '{n} wins', { n: n.toLocaleString(locale) });
+    const lossText = (n: number) => t(n === 1 ? '{n} loss' : '{n} losses', { n: n.toLocaleString(locale) });
+    const medal = ['#FFC53D', '#D7DEEE', '#E59A5C'];
+
     body = (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, marginTop: 30, width: '100%' }}>
-        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 100, color: BRAND, lineHeight: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, marginTop: 26, width: '100%' }}>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 92, color: BRAND, lineHeight: 1 }}>
           {seasonNo ? t('SEASON {n}', { n: seasonNo }) : t('MY SEASON')}
         </div>
-        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 100, color: FG, lineHeight: 1 }}>{t('WRAPPED')}</div>
-        <div style={{ display: 'flex', marginTop: 10 }}>{who}</div>
-        {peakName ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
-            {peakBadge ? <img alt="" src={peakBadge} width={200} height={200} /> : null}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', fontSize: 40, color: DIM }}>{t('Peak')}</div>
-              <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 92, color: FG }}>{peakName}</div>
-            </div>
+        <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 92, color: FG, lineHeight: 1 }}>{t('WRAPPED')}</div>
+
+        {/* Who, and the best rank of the season, in one row. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginTop: 8 }}>
+          {icon ? <img alt="" src={icon} width={116} height={116} style={{ borderRadius: 26, border: `5px solid ${BRAND}` }} /> : null}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 64, color: FG, lineHeight: 1.05 }}>{player.name}</div>
+            {peakName ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                {peakBadge ? <img alt="" src={peakBadge} width={64} height={64} /> : null}
+                <div style={{ display: 'flex', fontSize: 36, color: DIM }}>{t('Peak')}</div>
+                <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 44, color: FG }}>{peakName}</div>
+              </div>
+            ) : null}
           </div>
-        ) : null}
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24, width: 900 }}>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 22, width: 900, marginTop: 6 }}>
           {tile(games.toLocaleString(locale), t('Ranked games'))}
           {tile(games > 0 ? `${Math.round((wins / games) * 100)}%` : '–', t('Win rate'))}
           {/* Elo gained is only known when the app counted from the season's start; otherwise today's elo. */}
@@ -188,18 +228,48 @@ export async function GET(request: NextRequest) {
               : null}
           {streak !== null && streak > 0 ? tile(String(streak), t('Longest win streak')) : null}
         </div>
-        {bestName ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 26, marginTop: 8 }}>
-            {bestIcon ? <img alt="" src={bestIcon} width={150} height={150} style={{ borderRadius: 32, border: `5px solid ${BRAND}` }} /> : null}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', fontSize: 40, color: DIM }}>{t('Best brawler')}</div>
-              <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 80, color: FG }}>{bestName}</div>
-              {bestRow ? (
-                <div style={{ display: 'flex', fontSize: 38, color: BRAND }}>
-                  {`${bestRow.wins}–${bestRow.games - bestRow.wins}  ·  ${Math.round((bestRow.wins / bestRow.games) * 100)}%`}
+
+        {/* The season's top three brawlers, spelled out: wins, losses, win rate. */}
+        {top.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', width: 900, gap: 14, marginTop: 8 }}>
+            <div style={{ display: 'flex', fontSize: 34, fontWeight: 700, color: DIM, letterSpacing: 2 }}>{t('Top brawlers').toUpperCase()}</div>
+            {top.map((r, i) => (
+              <div
+                key={`${r.label}-${i}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 22,
+                  padding: '12px 22px 12px 14px',
+                  borderRadius: 28,
+                  background: i === 0 ? 'rgba(255,197,61,0.13)' : 'rgba(255,255,255,0.06)',
+                  border: `3px solid ${i === 0 ? 'rgba(255,197,61,0.55)' : 'rgba(255,255,255,0.10)'}`,
+                }}
+              >
+                <div style={{ display: 'flex', width: 44, justifyContent: 'center', fontFamily: DISPLAY, fontSize: 52, color: medal[i] }}>{i + 1}</div>
+                {topIcons[i] ? (
+                  <img alt="" src={topIcons[i]!} width={100} height={100} style={{ borderRadius: 22, border: `4px solid ${medal[i]}` }} />
+                ) : (
+                  <div style={{ display: 'flex', width: 100, height: 100, borderRadius: 22, background: 'rgba(255,255,255,0.08)' }} />
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 52, color: FG, lineHeight: 1.05 }}>{r.label}</div>
+                  {r.games > 0 ? (
+                    <div style={{ display: 'flex', fontSize: 32, color: DIM, marginTop: 2 }}>
+                      {`${winsText(r.wins)} · ${lossText(r.games - r.wins)}`}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
+                {r.games > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <div style={{ display: 'flex', fontFamily: DISPLAY, fontSize: 58, color: BRAND, lineHeight: 1 }}>
+                      {`${Math.round((r.wins / r.games) * 100)}%`}
+                    </div>
+                    <div style={{ display: 'flex', fontSize: 26, color: DIM }}>{t('Win rate')}</div>
+                  </div>
+                ) : null}
+              </div>
+            ))}
           </div>
         ) : null}
       </div>
@@ -215,7 +285,7 @@ export async function GET(request: NextRequest) {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '90px 70px 300px 70px',
+          padding: '80px 70px 260px 70px',
           background: BG,
           color: FG,
           fontFamily: BODY,

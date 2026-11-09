@@ -181,7 +181,7 @@
     <string name="share_text">Getrackt mit BrawlZone Bubble: brawlzone.net/bubble</string>
     <string name="friends_caption">FREUNDE UND RIVALEN</string>
     <string name="friends_body">Füge bis zu 5 Freunde hinzu und sieh, wer schneller aufsteigt. Du erfährst es, wenn jemand von ihnen aufsteigt.</string>
-    <string name="friends_hint">Spieler-ID des Freundes</string>
+    <string name="friends_hint">Name oder #Spieler-ID des Freundes</string>
     <string name="friends_add">+ Freund hinzufügen</string>
     <string name="friends_add_button">Hinzufügen</string>
     <string name="friends_remove_hint">Halte einen Freund gedrückt, um ihn zu entfernen.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Du bist dran!</string>
     <string name="alert_wrapped_title">🎁 Dein Rückblick auf Saison %1$d ist fertig</string>
     <string name="alert_wrapped_text">Bester Rang, Spiele, Siegquote und bester Brawler. Tippe zum Teilen.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Dein Name oder #Spieler-ID</string>
+    <string name="name_searching">Suche Spieler mit diesem Namen…</string>
+    <string name="name_pick">Tippe unten auf dein Konto.</string>
+    <string name="name_none">Noch kein Spieler mit diesem Namen bei BrawlZone. Nimm deine #Spieler-ID: Sie steht in deinem Spielprofil unter deinem Namen.</string>
+    <string name="name_pick_friend">Wähle deinen Freund aus der Liste oder gib seine #Spieler-ID ein.</string>
+    <string name="friends_none">Noch kein Spieler mit diesem Namen bei BrawlZone. Versuch es mit der #Spieler-ID.</string>
 </resources>

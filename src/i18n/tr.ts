@@ -4902,4 +4902,14 @@ export const TR: Record<string, string> = {
     "Gizlilik Politikası",
   "We collect very little, and this page says exactly what. Every claim below is something you can check in the source.":
     "Çok az veri topluyoruz ve bu sayfa tam olarak neleri topladığımızı söylüyor. Aşağıdaki her iddia kaynak kodda kontrol edebileceğin bir şey.",
+  "Top brawlers":
+    "En iyi savaşçılar",
+  "{n} win":
+    "{n} galibiyet",
+  "{n} wins":
+    "{n} galibiyet",
+  "{n} loss":
+    "{n} mağlubiyet",
+  "{n} losses":
+    "{n} mağlubiyet",
 };

@@ -181,7 +181,7 @@
     <string name="share_text">BrawlZone Bubble ile takip ediliyor: brawlzone.net/bubble</string>
     <string name="friends_caption">ARKADAŞLAR VE RAKİPLER</string>
     <string name="friends_body">Kimin daha hızlı yükseldiğini görmek için 5 arkadaşa kadar ekle. Biri rütbe atladığında haber alırsın.</string>
-    <string name="friends_hint">Arkadaşın etiketi</string>
+    <string name="friends_hint">Arkadaşının adı veya #etiketi</string>
     <string name="friends_add">+ Arkadaş ekle</string>
     <string name="friends_add_button">Ekle</string>
     <string name="friends_remove_hint">Kaldırmak için arkadaşa basılı tut.</string>
@@ -213,4 +213,11 @@
     <string name="friend_rankup_plain">Sıra sende!</string>
     <string name="alert_wrapped_title">🎁 %1$d. Sezon Özetin hazır</string>
     <string name="alert_wrapped_text">En yüksek rütbe, maçlar, galibiyet oranı ve en iyi savaşçı. Paylaşmak için dokun.</string>
+    <!-- 1.40: find a player by name -->
+    <string name="tag_hint">Adın veya #etiketin</string>
+    <string name="name_searching">Bu isimde oyuncular aranıyor…</string>
+    <string name="name_pick">Aşağıdan hesabına dokun.</string>
+    <string name="name_none">BrawlZone\'da henüz bu isimde oyuncu yok. #Etiketini kullan: oyundaki profilinde adının altında.</string>
+    <string name="name_pick_friend">Listeden arkadaşını seç veya #etiketini yaz.</string>
+    <string name="friends_none">BrawlZone\'da henüz bu isimde oyuncu yok. #Etiketini dene.</string>
 </resources>
