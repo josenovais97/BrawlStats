@@ -193,7 +193,7 @@
     <string name="friends_full">Puedes añadir hasta 5 amigos.</string>
     <string name="friends_already">Ya está en tu lista.</string>
     <string name="friends_failed">No se pudo buscar. Inténtalo de nuevo.</string>
-    <string name="rate_title">¿Te gusta Bubble?</string>
+    <string name="rate_title">Ayuda a otros jugadores a encontrar Bubble</string>
     <string name="rate_button">⭐ Valóralo en Google Play</string>
     <string name="widget_friends_name">Amigos</string>
     <string name="widget_friends_description">Tú y hasta 5 amigos por elo, con el récord de esta semana.</string>

@@ -193,7 +193,7 @@
     <string name="friends_full">Bạn có thể thêm tối đa 5 bạn.</string>
     <string name="friends_already">Đã có trong danh sách.</string>
     <string name="friends_failed">Không tìm được. Thử lại nhé.</string>
-    <string name="rate_title">Bạn thích Bubble chứ?</string>
+    <string name="rate_title">Giúp người chơi khác tìm thấy Bubble</string>
     <string name="rate_button">⭐ Đánh giá trên Google Play</string>
     <string name="widget_friends_name">Bạn bè</string>
     <string name="widget_friends_description">Bạn và tối đa 5 bạn bè theo elo, kèm thành tích tuần này.</string>

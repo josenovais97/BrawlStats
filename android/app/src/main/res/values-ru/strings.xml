@@ -193,7 +193,7 @@
     <string name="friends_full">Можно добавить до 5 друзей.</string>
     <string name="friends_already">Уже в твоём списке.</string>
     <string name="friends_failed">Не удалось найти. Попробуй ещё раз.</string>
-    <string name="rate_title">Нравится Bubble?</string>
+    <string name="rate_title">Помоги другим игрокам найти Bubble</string>
     <string name="rate_button">⭐ Оцени в Google Play</string>
     <string name="widget_friends_name">Друзья</string>
     <string name="widget_friends_description">Ты и до 5 друзей по эло, с результатом за неделю.</string>

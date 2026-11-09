@@ -237,6 +237,9 @@ export default function PrivacyPage() {
             <div className="space-y-3 text-sm leading-relaxed text-muted">
               <p>{t('The bubble needs')}{' '}<span className="font-semibold text-foreground">{t('Display over other apps')}</span>{' '}{t('so it can draw on top of the game. That permission lets it put pixels on your screen; it does not let it read them. The app never captures or reads your screen, and does not read your game account, your files, your contacts or your other apps.')}</p>
               <p>{t('If you enter your player tag, the app sends it to brawlzone.net to show your profile, your brawlers and what to upgrade next, exactly as the site does for a search (see above). The tags you have used, with their player names, and your settings are kept on your phone so you can switch accounts; they are removed when you uninstall the app or clear its data, and a long press removes one.')}</p>
+              {/* What the 1.40 app sends on its own (2026-11-09): the hourly check, the post-game check, friends, name search, share cards. */}
+              <p>{t("With a tag set, the app asks brawlzone.net for that player's public Ranked standing about once an hour, and for the newest Ranked game every two minutes while the bubble is on screen. The widgets, the daily goal, the post-game review and the notifications are made from those answers; the notifications are created on your phone, with no push service.")}</p>
+              <p>{t("Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.")}</p>
               <p>{t('Its panel is a web view of')}{' '}
                 <Link
                   href={lp('/bubble/panel')}

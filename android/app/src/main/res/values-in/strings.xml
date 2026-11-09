@@ -193,7 +193,7 @@
     <string name="friends_full">Kamu bisa menambahkan hingga 5 teman.</string>
     <string name="friends_already">Sudah ada di daftarmu.</string>
     <string name="friends_failed">Gagal mencari. Coba lagi.</string>
-    <string name="rate_title">Suka Bubble?</string>
+    <string name="rate_title">Bantu pemain lain menemukan Bubble</string>
     <string name="rate_button">⭐ Beri nilai di Google Play</string>
     <string name="widget_friends_name">Teman</string>
     <string name="widget_friends_description">Kamu dan hingga 5 teman menurut elo, dengan rekor minggu ini.</string>

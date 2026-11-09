@@ -193,7 +193,7 @@
     <string name="friends_full">เพิ่มเพื่อนได้สูงสุด 5 คน</string>
     <string name="friends_already">อยู่ในรายชื่อแล้ว</string>
     <string name="friends_failed">ค้นหาไม่สำเร็จ ลองอีกครั้ง</string>
-    <string name="rate_title">ชอบ Bubble ไหม</string>
+    <string name="rate_title">ช่วยให้ผู้เล่นคนอื่นได้รู้จัก Bubble</string>
     <string name="rate_button">⭐ ให้คะแนนบน Google Play</string>
     <string name="widget_friends_name">เพื่อน</string>
     <string name="widget_friends_description">คุณและเพื่อนสูงสุด 5 คน เรียงตามเอโล พร้อมผลงานสัปดาห์นี้</string>

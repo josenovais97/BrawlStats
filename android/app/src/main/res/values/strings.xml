@@ -199,7 +199,7 @@
     <string name="friends_full">You can add up to 5 friends.</string>
     <string name="friends_already">Already on your list.</string>
     <string name="friends_failed">Couldn\'t look that up. Try again.</string>
-    <string name="rate_title">Enjoying Bubble?</string>
+    <string name="rate_title">Help other players find Bubble</string>
     <string name="rate_button">⭐ Rate it on Google Play</string>
     <string name="widget_friends_name">Friends</string>
     <string name="widget_friends_description">You and up to 5 friends by elo, with this week\'s record.</string>

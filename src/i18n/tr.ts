@@ -4912,4 +4912,8 @@ export const TR: Record<string, string> = {
     "{n} mağlubiyet",
   "{n} losses":
     "{n} mağlubiyet",
+  "With a tag set, the app asks brawlzone.net for that player's public Ranked standing about once an hour, and for the newest Ranked game every two minutes while the bubble is on screen. The widgets, the daily goal, the post-game review and the notifications are made from those answers; the notifications are created on your phone, with no push service.":
+    "Bir etiket kayıtlıyken uygulama, o oyuncunun herkese açık Aşamalı sıralamasını yaklaşık saatte bir, baloncuk ekrandayken de en son Aşamalı maçını iki dakikada bir brawlzone.net'ten ister. Widget'lar, günlük hedef, maç sonu analizi ve bildirimler bu yanıtlardan oluşturulur; bildirimler telefonunda oluşturulur, hiçbir anlık bildirim hizmeti kullanılmaz.",
+  "Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.":
+    "Eklediğin arkadaşlar da oyuncu etiketleridir, aynı şekilde sorgulanır ve yalnızca telefonunda saklanır. Bir etiket alanına yazılan isim, etiketi bulmak için sitenin oyuncu aramasına gönderilir. Paylaşım kartlarını brawlzone.net aynı herkese açık oyun verilerinden çizer.",
 };

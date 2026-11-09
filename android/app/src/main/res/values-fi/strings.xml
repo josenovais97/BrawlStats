@@ -193,7 +193,7 @@
     <string name="friends_full">Voit lisätä enintään 5 kaveria.</string>
     <string name="friends_already">On jo listallasi.</string>
     <string name="friends_failed">Haku epäonnistui. Yritä uudelleen.</string>
-    <string name="rate_title">Pidätkö Bubblesta?</string>
+    <string name="rate_title">Auta muita pelaajia löytämään Bubble</string>
     <string name="rate_button">⭐ Arvioi Google Playssa</string>
     <string name="widget_friends_name">Kaverit</string>
     <string name="widget_friends_description">Sinä ja enintään 5 kaveria elon mukaan, viikon tuloksineen.</string>

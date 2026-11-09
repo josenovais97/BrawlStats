@@ -193,7 +193,7 @@
     <string name="friends_full">Możesz dodać do 5 znajomych.</string>
     <string name="friends_already">Już jest na twojej liście.</string>
     <string name="friends_failed">Nie udało się wyszukać. Spróbuj ponownie.</string>
-    <string name="rate_title">Podoba ci się Bubble?</string>
+    <string name="rate_title">Pomóż innym graczom znaleźć Bubble</string>
     <string name="rate_button">⭐ Oceń w Google Play</string>
     <string name="widget_friends_name">Znajomi</string>
     <string name="widget_friends_description">Ty i do 5 znajomych według elo, z bilansem tygodnia.</string>

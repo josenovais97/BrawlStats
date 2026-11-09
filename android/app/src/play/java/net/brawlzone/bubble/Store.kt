@@ -21,12 +21,13 @@ import com.google.android.play.core.review.ReviewManagerFactory
  * downloads, and a "Restart" card finishes the install. Asked at most once per
  * new version, so declining is respected.
  *
- * The review is asked for once, ever, with a player tag set, after three
- * drafts played with the bubble or a good moment (a rank-up or the daily goal
- * reached, 1.40), on the next visit to the app screen. Google decides whether
- * the dialog actually shows, and it never says; the test build shows a toast
- * when it was asked for, because a test install from outside Play never
- * shows the dialog at all.
+ * The review is asked for at most three times, at least two months apart,
+ * with a player tag set, after three drafts played with the bubble or a good
+ * moment (a rank-up or the daily goal reached, 1.40), on the next visit to
+ * the app screen. Google decides whether the dialog actually shows and never
+ * says, and its own limit stops it from repeating sooner, so one ask could
+ * simply be one nobody saw. The test build shows a toast when it was asked
+ * for, because a test install from outside Play never shows the dialog.
  */
 object Store {
 
@@ -34,6 +35,10 @@ object Store {
     private const val KEY_ASKED_VERSION = "update_asked_version"
     private const val KEY_REVIEWED = "review_asked"
     private const val KEY_HAPPY = "happy_moment"
+    private const val KEY_ASKS = "review_asks"
+    private const val KEY_ASKED_AT = "review_asked_at"
+    private const val MAX_ASKS = 3
+    private const val ASK_GAP_MS = 60L * 24 * 60 * 60 * 1000
     private const val DRAFTS_BEFORE_REVIEW = 3
 
     private var manager: AppUpdateManager? = null
@@ -86,7 +91,13 @@ object Store {
 
     fun maybeAskForReview(activity: Activity) {
         val p = prefs(activity)
-        if (p.getBoolean(KEY_REVIEWED, false)) return
+        // The earlier one-ask flag counts as one ask, made now.
+        if (p.getBoolean(KEY_REVIEWED, false) && !p.contains(KEY_ASKS)) {
+            p.edit().putInt(KEY_ASKS, 1).putLong(KEY_ASKED_AT, System.currentTimeMillis()).apply()
+        }
+        val asks = p.getInt(KEY_ASKS, 0)
+        if (asks >= MAX_ASKS) return
+        if (asks > 0 && System.currentTimeMillis() - p.getLong(KEY_ASKED_AT, 0L) < ASK_GAP_MS) return
         val ready = Alerts.drafts(activity) >= DRAFTS_BEFORE_REVIEW || p.getBoolean(KEY_HAPPY, false)
         if (!ready || Account.tag(activity).isEmpty()) return
         val qa = BuildConfig.BUILD_TYPE == "qa"
@@ -99,7 +110,11 @@ object Store {
             }
             if (qa) toast(activity, "Review prompt requested. Google Play shows it only for Play installs.")
             reviews.launchReviewFlow(activity, request.result).addOnCompleteListener {
-                p.edit().putBoolean(KEY_REVIEWED, true).apply()
+                p.edit()
+                    .putInt(KEY_ASKS, p.getInt(KEY_ASKS, 0) + 1)
+                    .putLong(KEY_ASKED_AT, System.currentTimeMillis())
+                    .putBoolean(KEY_HAPPY, false)
+                    .apply()
             }
         }
     }

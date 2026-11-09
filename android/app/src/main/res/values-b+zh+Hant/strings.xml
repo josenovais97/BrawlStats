@@ -193,7 +193,7 @@
     <string name="friends_full">最多可新增 5 位好友。</string>
     <string name="friends_already">已在你的清單中。</string>
     <string name="friends_failed">查詢失敗，請重試。</string>
-    <string name="rate_title">喜歡 Bubble 嗎？</string>
+    <string name="rate_title">幫助其他玩家發現 Bubble</string>
     <string name="rate_button">⭐ 在 Google Play 上評分</string>
     <string name="widget_friends_name">好友</string>
     <string name="widget_friends_description">你和最多 5 位好友按分數排名，附本週戰績。</string>

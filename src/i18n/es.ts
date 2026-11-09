@@ -4912,4 +4912,8 @@ export const ES: Record<string, string> = {
     "{n} derrota",
   "{n} losses":
     "{n} derrotas",
+  "With a tag set, the app asks brawlzone.net for that player's public Ranked standing about once an hour, and for the newest Ranked game every two minutes while the bubble is on screen. The widgets, the daily goal, the post-game review and the notifications are made from those answers; the notifications are created on your phone, with no push service.":
+    "Con un tag guardado, la app pide a brawlzone.net la clasificación pública de Competitivo de ese jugador más o menos una vez por hora, y la última partida de Competitivo cada dos minutos mientras la burbuja está en pantalla. Con esas respuestas se hacen los widgets, el objetivo diario, la revisión de después de la partida y las notificaciones; las notificaciones se crean en tu móvil, sin ningún servicio push.",
+  "Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.":
+    "Los amigos que añades también son tags de jugador, se consultan igual y solo se guardan en tu móvil. Un nombre escrito en un campo de tag se envía al buscador de jugadores del sitio para encontrar el tag. Las tarjetas para compartir las dibuja brawlzone.net con los mismos datos públicos del juego.",
 };
