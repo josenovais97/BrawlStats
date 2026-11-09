@@ -272,6 +272,16 @@ class MainActivity : AppCompatActivity() {
             Alerts.setEnabled(this, on)
             if (on) askForNotifications()
         }
+        // The test build only: show every notification now, to check how they look.
+        val test = findViewById<TextView>(R.id.alerts_test)
+        if (BuildConfig.BUILD_TYPE == "qa") {
+            test.visibility = View.VISIBLE
+            test.setOnClickListener {
+                askForNotifications()
+                Thread { Notify.test(applicationContext) }.start()
+                android.widget.Toast.makeText(this, "Sending test notifications…", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onResume() {

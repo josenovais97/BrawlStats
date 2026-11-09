@@ -62,9 +62,13 @@ object Notify {
         if (fresh.isEmpty()) return
         prefs.edit().putStringSet(KEY_SEEN, (seen + fresh.map { it.id }).toList().takeLast(MAX_SEEN).toSet()).apply()
         if (!post || manager(context)?.areNotificationsEnabled() != true) return
+        for (reward in fresh.take(3)) postReward(context, reward)
+    }
+
+    private fun postReward(context: Context, reward: Alerts.Reward) {
         channels(context)
         val local = AppLang.wrap(context)
-        for (reward in fresh.take(3)) {
+        run {
             val open = PendingIntent.getActivity(
                 context,
                 reward.id.hashCode(),
@@ -112,6 +116,10 @@ object Notify {
             if (endDue) putInt(KEY_SEASON_END, season.number)
         }.apply()
         if (!post || manager(context)?.areNotificationsEnabled() != true) return
+        postSeason(context, season.number, startDue, daysLeft)
+    }
+
+    private fun postSeason(context: Context, number: Int, start: Boolean, daysLeft: Long?) {
         channels(context)
         val local = AppLang.wrap(context)
 
@@ -124,8 +132,8 @@ object Notify {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val (title, text) = if (startDue) {
-            local.getString(R.string.alert_season_start_title, season.number) to
+        val (title, text) = if (start) {
+            local.getString(R.string.alert_season_start_title, number) to
                 local.getString(R.string.alert_season_start_text)
         } else {
             local.getString(if (daysLeft == 1L) R.string.alert_season_end1_title else R.string.alert_season_end2_title) to
@@ -140,7 +148,22 @@ object Notify {
             .setContentIntent(play)
             .setAutoCancel(true)
             .build()
-        runCatching { manager(context)?.notify(if (startDue) 7001 else 7002, notification) }
+        runCatching { manager(context)?.notify(if (start) 7001 else 7002, notification) }
+    }
+
+    /**
+     * The test build's "Send test notifications" (1.40, qa only): the newest
+     * reward and both season notifications, posted now, through the same code
+     * players get, without touching what has been announced. Off the main thread.
+     */
+    fun test(context: Context) {
+        val data = Alerts.last(context) ?: runCatching { Alerts.parse(Http.text(Alerts.URL)) }.getOrNull()
+        val reward = data?.rewards?.firstOrNull()
+            ?: Alerts.Reward("test", "10x Gems", "${Http.SITE}/rewards", null)
+        val number = data?.season?.number ?: 50
+        postReward(context, reward.copy(id = "test-" + reward.id))
+        postSeason(context, number + 1, start = true, daysLeft = null)
+        postSeason(context, number, start = false, daysLeft = 2L)
     }
 
     private fun picture(url: String?): Bitmap? = url?.let {
