@@ -28,7 +28,8 @@ async function displayableNames(): Promise<string[]> {
       .catch(() => []),
   ]);
   // Rank league names too, for the panel's bracket chips.
-  const names: string[] = ['Star Power', 'Gadget', 'Gear', 'Diamond', 'Mythic', 'Legendary', 'Masters', 'Pro'];
+  // Bronze, Silver and Gold too since 1.40: the app's rank widget and rank-up notification name every rank.
+  const names: string[] = ['Star Power', 'Gadget', 'Gear', 'Bronze', 'Silver', 'Gold', 'Diamond', 'Mythic', 'Legendary', 'Masters', 'Pro'];
   for (const m of maps) names.push(m.name);
   for (const m of modes) names.push(m.name);
   for (const b of brawlers.values()) {
@@ -43,7 +44,7 @@ async function displayableNames(): Promise<string[]> {
 
 const cachedNames = unstable_cache(
   async (file: string, locale: string) => buildGameNames(file, locale, await displayableNames()),
-  ['bubble-l10n-names-v2'],
+  ['bubble-l10n-names-v3'],
   { revalidate: DAY },
 );
 

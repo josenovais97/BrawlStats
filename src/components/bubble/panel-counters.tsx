@@ -88,6 +88,27 @@ export function PanelCounters({ modes, roster }: { modes: PanelMode[]; roster: D
     panelTrack('panel_counters', { brawler: byId.get(id)?.brawlerName ?? String(id) });
   };
 
+  /*
+   * The app's widgets (1.40): tapping a brawler there opens the bubble on this
+   * tab with that brawler's counters. The app sets a pending id before the
+   * tab mounts, or calls the hook when it is already showing.
+   */
+  useEffect(() => {
+    const w = window as unknown as { __bzPendingCounter?: number | null; __bzOpenCounter?: (id: number) => void };
+    w.__bzOpenCounter = (id: number) => {
+      if (Number.isInteger(id) && id > 0) setSelected(id);
+    };
+    const pending = w.__bzPendingCounter;
+    if (typeof pending === 'number' && pending > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelected(pending);
+      w.__bzPendingCounter = null;
+    }
+    return () => {
+      delete w.__bzOpenCounter;
+    };
+  }, []);
+
   return (
     <div className="space-y-2">
       {selected !== null ? (
