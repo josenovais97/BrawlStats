@@ -16,6 +16,8 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Icon
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -25,6 +27,7 @@ import android.os.Handler
 import android.os.Environment
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
@@ -239,6 +242,125 @@ class BubbleService : Service() {
 
         // The hourly reward and season check (1.40), in case the app screen never ran.
         AlertJob.schedule(this)
+
+        // The post-game review (1.40): a look at the battle log every two minutes.
+        handler.postDelayed(reviewLoop, REVIEW_FIRST_MS)
+    }
+
+    // ------------------------------------------------------- post-game review
+
+    /** The review the panel has not shown yet, as the JSON it is handed. */
+    private var reviewPending: String? = null
+    private var reviewWin = false
+    private var reviewBadge: View? = null
+    private val reviewBusy = java.util.concurrent.atomic.AtomicBoolean(false)
+
+    private val reviewLoop = object : Runnable {
+        override fun run() {
+            pollReview()
+            handler.postDelayed(this, Review.POLL_MS)
+        }
+    }
+
+    /** Skipped with the screen off or no tag: nobody is about to look. */
+    private fun pollReview() {
+        if (bubble == null || Account.tag(this).isEmpty()) return
+        if (getSystemService(PowerManager::class.java)?.isInteractive == false) return
+        if (!reviewBusy.compareAndSet(false, true)) return
+        val app = applicationContext
+        Thread {
+            val found = try {
+                runCatching { Review.poll(app) }.getOrNull()
+            } finally {
+                reviewBusy.set(false)
+            }
+            if (found != null) handler.post { onNewReview(found) }
+        }.start()
+    }
+
+    private fun onNewReview(found: Review.Found) {
+        if (bubble == null) return
+        reviewPending = found.json.toString()
+        reviewWin = found.win
+        paintReviewBadge()
+        pulseBubble(found.win)
+        // Already open (rare: the game just ended with the panel up): show it now.
+        if (panel != null && panelLoaded) applyPendingReview()
+    }
+
+    private fun resultColor(win: Boolean) = if (win) 0xFF35D07F.toInt() else 0xFFFF5C72.toInt()
+
+    /** A small ✓ or ✗ on the bubble's corner until the review has been seen. */
+    private fun paintReviewBadge() {
+        val host = bubble as? FrameLayout ?: return
+        reviewBadge?.let { host.removeView(it) }
+        reviewBadge = null
+        if (reviewPending == null) return
+        host.clipToPadding = false
+        host.clipChildren = false
+        val size = dp(18)
+        val dot = TextView(this).apply {
+            text = if (reviewWin) "✓" else "✗"
+            setTextColor(Color.WHITE)
+            textSize = 10f
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            includeFontPadding = false
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(resultColor(reviewWin))
+                setStroke(dp(2), 0xFF050A1F.toInt())
+            }
+            elevation = dp(9).toFloat()
+        }
+        val lp = FrameLayout.LayoutParams(size, size, Gravity.TOP or Gravity.END).apply {
+            topMargin = -dp(5)
+            marginEnd = -dp(5)
+        }
+        host.addView(dot, lp)
+        reviewBadge = dot
+    }
+
+    /** One pulse: a bounce, and a ring in the result's colour growing out and fading. */
+    private fun pulseBubble(win: Boolean) {
+        val art = bubbleArt ?: return
+        val host = bubble as? FrameLayout ?: return
+        wakeBubble(animate = true)
+        host.clipToPadding = false
+        host.clipChildren = false
+        val size = art.layoutParams.width
+        val ring = View(this).apply {
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setStroke(dp(3), resultColor(win))
+            }
+            // Behind the bubble and without a shadow: only the part growing past it shows.
+            outlineProvider = null
+        }
+        host.addView(ring, 0, FrameLayout.LayoutParams(size, size))
+        ring.animate().scaleX(1.22f).scaleY(1.22f).alpha(0f).setDuration(750)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction { host.removeView(ring) }
+            .start()
+        art.animate().cancel()
+        art.alpha = 1f
+        art.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction {
+            art.animate().scaleX(0.94f).scaleY(0.94f).setDuration(130).withEndAction {
+                art.animate().scaleX(1.08f).scaleY(1.08f).setDuration(110).withEndAction {
+                    art.animate().scaleX(1f).scaleY(1f).setDuration(130).start()
+                }.start()
+            }.start()
+        }.start()
+        scheduleRest()
+    }
+
+    /** Hands the review to the page, which reports back once it is on screen. */
+    private fun applyPendingReview() {
+        val json = reviewPending ?: return
+        val script = "(function(r){var n=0;var i=setInterval(function(){" +
+            "if(window.__bzShowReview){window.__bzShowReview(r);clearInterval(i)}" +
+            "else if(++n>50){clearInterval(i)}},100)})(" + json + ")"
+        panelWeb?.evaluateJavascript(script, null)
     }
 
     /** A tab the panel should switch to once its page can hear it (1.40). */
@@ -288,6 +410,15 @@ class BubbleService : Service() {
             // The "Counters" shortcut (1.40): the panel open on that tab.
             ACTION_OPEN_PANEL -> if (bubble != null) {
                 openPanelOn(intent?.getStringExtra(EXTRA_TAB), intent?.getIntExtra(EXTRA_BRAWLER, 0)?.takeIf { it > 0 })
+            }
+            ACTION_TEST_REVIEW -> if (bubble != null && BuildConfig.BUILD_TYPE == "qa") {
+                val app = applicationContext
+                Thread {
+                    val found = runCatching { Review.test(app) }.getOrNull()
+                    handler.post {
+                        if (found != null) onNewReview(found) else toast("No Ranked game in the battle log to review")
+                    }
+                }.start()
             }
         }
         return START_NOT_STICKY
@@ -468,7 +599,10 @@ class BubbleService : Service() {
         bubbleArt = art
         resting = false
         runCatching { windows.addView(host, params) }
-            .onSuccess { scheduleRest() }
+            .onSuccess {
+                scheduleRest()
+                paintReviewBadge()
+            }
             .onFailure {
                 bubble = null
                 bubbleParams = null
@@ -530,7 +664,8 @@ class BubbleService : Service() {
         if (panel != null || touching || closeTarget != null) return
         resting = true
         art.animate().alpha(BubbleLook.idle(this) / 100f).setDuration(400).start()
-        if (BubbleLook.tuck(this)) slideTo(params, tuckedX(params), 260)
+        // Not tucked while a review waits: the badge would be off the screen.
+        if (BubbleLook.tuck(this) && reviewPending == null) slideTo(params, tuckedX(params), 260)
     }
 
     /** Full strength and fully on screen. */
@@ -1025,6 +1160,7 @@ class BubbleService : Service() {
                     if (panelFailed) return
                     panelLoaded = true
                     applyPendingTab()
+                    applyPendingReview()
                     offline.visibility = if (panelFromCache) View.VISIBLE else View.GONE
                     // Back to normal caching for the next load: the cache-only
                     // mode is for this one fallback, never a setting that sticks.
@@ -1254,7 +1390,8 @@ class BubbleService : Service() {
             runCatching { windows.removeView(root) }
         }
 
-        if (panelNeedsRefresh()) {
+        val reloading = panelNeedsRefresh()
+        if (reloading) {
             if (!panelLoaded) {
                 panelRetry?.visibility = View.GONE
                 panelWeb?.visibility = View.VISIBLE
@@ -1265,6 +1402,8 @@ class BubbleService : Service() {
             // The page kept from earlier is the saved list now; say so.
             panelOffline?.visibility = View.VISIBLE
         }
+        // A waiting post-game review (1.40); a page being reloaded gets it when it finishes.
+        if (!reloading && panelLoaded) applyPendingReview()
 
         val (width, height) = panelSize()
 
@@ -1595,6 +1734,15 @@ class BubbleService : Service() {
          * moved along with it: otherwise the next open would see a changed
          * account key and reload a page that is already right.
          */
+        /** The panel put the post-game review on screen (1.40): the badge can go. */
+        @JavascriptInterface
+        fun reviewSeen() {
+            handler.post {
+                reviewPending = null
+                paintReviewBadge()
+            }
+        }
+
         @JavascriptInterface
         fun setLanguage(code: String) {
             handler.post {
@@ -1703,6 +1851,9 @@ class BubbleService : Service() {
         const val ACTION_STOP = "net.brawlzone.bubble.STOP"
         const val ACTION_TOGGLE_PANEL = "net.brawlzone.bubble.TOGGLE_PANEL"
         const val ACTION_OPEN_PANEL = "net.brawlzone.bubble.OPEN_PANEL"
+
+        /** The test build's button: replay the newest Ranked game as a post-game review. */
+        const val ACTION_TEST_REVIEW = "net.brawlzone.bubble.TEST_REVIEW"
         const val EXTRA_TAB = "tab"
         const val EXTRA_BRAWLER = "brawler"
 
@@ -1740,6 +1891,9 @@ class BubbleService : Service() {
 
         /** How long after the bubble appears the panel starts loading. */
         private const val PANEL_PRELOAD_DELAY_MS = 1200L
+
+        /** The review's first look, after the bubble has settled (1.40). */
+        private const val REVIEW_FIRST_MS = 15_000L
 
         private const val TAG = "BrawlZoneBubble"
 

@@ -234,6 +234,7 @@ export function draftAutopsy({
   roles,
   shapes,
   roster,
+  swapOnly,
 }: {
   entry: BSBattleLogEntry;
   tag: string;
@@ -251,6 +252,11 @@ export function draftAutopsy({
   roles: Map<number, string | null>;
   shapes: { comps: RoleComposition[]; baseline: number } | null;
   roster: BSPlayerBrawler[];
+  /**
+   * Only consider swapping out this brawler (the player's own pick), for a
+   * reader who could not have changed a teammate's. Every slot when absent.
+   */
+  swapOnly?: number;
 }): DraftAutopsy | null {
   const me = normalizeTag(tag);
   const teams = entry.battle.teams;
@@ -346,7 +352,7 @@ export function draftAutopsy({
   let betterPick: DraftAutopsy['betterPick'] = null;
   if (mine.edge !== null) {
     const maxed = roster.filter((b) => b.power >= 11 && !myIds.includes(b.id));
-    for (const outId of myIds) {
+    for (const outId of swapOnly !== undefined ? [swapOnly] : myIds) {
       for (const candidate of maxed) {
         const swapped = myIds.map((id) => (id === outId ? candidate.id : id));
         const next = sideEdge(swapped, mapForm);

@@ -24,7 +24,7 @@ import { errorResponse, okResponse } from '@/lib/route-helpers';
  */
 
 /** Bumped when the shape changes, so panels drop a stored pack of the old one. */
-const PACK_VERSION = 2;
+const PACK_VERSION = 3;
 
 const DAY = 86_400;
 

@@ -11,6 +11,7 @@ import { LanguagePicker, usePanelI18n } from '@/components/bubble/panel-i18n';
 import { PanelTiers, type PanelMode } from '@/components/bubble/panel-tiers';
 import { useBubbleAccount } from '@/components/bubble/use-bubble-account';
 import { useLastRankedGame, useSinceTagRecord, type PanelSeason } from '@/components/bubble/panel-record';
+import { PanelReview, type PostGameReview } from '@/components/bubble/panel-review';
 import { Check, ChevronDown, X } from 'lucide-react';
 import { rankProgress, winsToNext, type EloRate } from '@/lib/ranked-elo';
 import { panelTrack, panelTrackOpen } from '@/lib/panel-telemetry';
@@ -113,6 +114,37 @@ export function PanelShell({
     };
   }, []);
 
+  /*
+   * The post-game review (1.40): the app hands it over when the bubble that
+   * pulsed after a Ranked game is tapped, and it covers the panel until closed.
+   */
+  const [review, setReview] = useState<PostGameReview | null>(null);
+  useEffect(() => {
+    const w = window as unknown as { __bzShowReview?: (r: PostGameReview) => void };
+    w.__bzShowReview = (r) => {
+      if (r && Array.isArray(r.mine) && Array.isArray(r.theirs)) {
+        setReview(r);
+        panelTrack('panel_review', { result: r.result });
+        // Tells the app the bubble's badge can go.
+        try {
+          (window as unknown as { BrawlZoneApp?: { reviewSeen?: () => void } }).BrawlZoneApp?.reviewSeen?.();
+        } catch {
+          // An older app without the hook.
+        }
+      }
+    };
+    return () => {
+      delete w.__bzShowReview;
+    };
+  }, []);
+  const reviewCounters = (brawlerId: number) => {
+    const w = window as unknown as { __bzPendingCounter?: number; __bzOpenCounter?: (id: number) => void };
+    w.__bzPendingCounter = brawlerId;
+    w.__bzOpenCounter?.(brawlerId);
+    setReview(null);
+    choose('counters');
+  };
+
   const account = useBubbleAccount();
   const { t, lang, name } = usePanelI18n();
   const { record, form } = useSinceTagRecord(account.tag);
@@ -139,6 +171,12 @@ export function PanelShell({
       : account.filter === 'hypercharge'
         ? t('filter.hypercharge')
         : t('filter.owned');
+
+  if (review) {
+    return (
+      <PanelReview review={review} roster={roster} modeArt={modeArt} onClose={() => setReview(null)} onCounters={reviewCounters} />
+    );
+  }
 
   return (
     <>

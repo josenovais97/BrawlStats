@@ -304,7 +304,15 @@ class MainActivity : AppCompatActivity() {
             test.setOnClickListener {
                 askForNotifications()
                 Thread { Notify.test(applicationContext) }.start()
-                android.widget.Toast.makeText(this, "Sending test notifications…", android.widget.Toast.LENGTH_SHORT).show()
+                // With the bubble up: the newest Ranked game as a post-game review (pulse, badge, panel).
+                if (BubbleService.running) {
+                    runCatching { startService(Intent(this, BubbleService::class.java).setAction(BubbleService.ACTION_TEST_REVIEW)) }
+                }
+                android.widget.Toast.makeText(
+                    this,
+                    if (BubbleService.running) "Sending test notifications and a test post-game review…" else "Sending test notifications… (start the bubble to test the post-game review)",
+                    android.widget.Toast.LENGTH_LONG,
+                ).show()
             }
         }
     }
