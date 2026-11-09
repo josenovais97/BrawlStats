@@ -408,7 +408,8 @@ object Widgets {
 
     private fun file(context: Context, url: String): File {
         val dir = File(context.filesDir, IMAGES).apply { mkdirs() }
-        val hash = MessageDigest.getInstance("SHA-1").digest(url.toByteArray()).joinToString("") { "%02x".format(it) }
+        // "v2:" since badges keep their shape (1.40): the stretched copies saved before are never read again.
+        val hash = MessageDigest.getInstance("SHA-1").digest(("v2:" + url).toByteArray()).joinToString("") { "%02x".format(it) }
         return File(dir, "$hash.png")
     }
 
@@ -416,7 +417,7 @@ object Widgets {
         val target = file(context, url)
         if (target.exists()) return
         val bitmap = runCatching { Http.open(url).use { BitmapFactory.decodeStream(it) } }.getOrNull() ?: return
-        val out = if (round) rounded(bitmap) else Bitmap.createScaledBitmap(bitmap, 160, 160, true)
+        val out = if (round) rounded(bitmap) else fit(bitmap, 160)
         runCatching { target.outputStream().use { out.compress(Bitmap.CompressFormat.PNG, 100, it) } }
     }
 
@@ -435,6 +436,18 @@ object Widgets {
         } else {
             v.setViewVisibility(viewId, if (hideWhenMissing) View.GONE else View.INVISIBLE)
         }
+    }
+
+    /** Scaled to fit a box, keeping its shape: rank badges are taller than they are wide. */
+    private fun fit(source: Bitmap, box: Int): Bitmap {
+        val scale = box.toFloat() / maxOf(source.width, source.height)
+        if (scale >= 1f) return source
+        return Bitmap.createScaledBitmap(
+            source,
+            (source.width * scale).toInt().coerceAtLeast(1),
+            (source.height * scale).toInt().coerceAtLeast(1),
+            true,
+        )
     }
 
     private fun rounded(source: Bitmap): Bitmap {
