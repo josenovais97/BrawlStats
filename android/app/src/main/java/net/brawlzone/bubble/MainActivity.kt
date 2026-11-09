@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
         wireFriends()
         findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
         // 1.40: the Season Wrapped notification makes the card straight away.
-        if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this)
+        if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this) { busy -> shareBusy(null, busy) }
 
         findViewById<TextView>(R.id.update_restart).setOnClickListener { Store.completeUpdate() }
         Shortcuts.publish(this)
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.action == Share.ACTION_WRAPPED) {
-            Share.wrapped(this)
+            Share.wrapped(this) { busy -> shareBusy(null, busy) }
             return
         }
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
@@ -365,9 +365,31 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
+    /**
+     * While a card is being drawn: the tapped button says so, both are
+     * disabled, and a bar runs under them until the share sheet opens.
+     */
+    private fun shareBusy(tapped: TextView?, busy: Boolean) {
+        val buttons = listOf(
+            findViewById<TextView>(R.id.share_rank) to R.string.share_rank,
+            findViewById<TextView>(R.id.share_wrapped) to R.string.share_wrapped,
+        )
+        for ((button, label) in buttons) {
+            button.isEnabled = !busy
+            button.alpha = if (busy && button !== tapped) 0.5f else 1f
+            button.setText(if (busy && button === tapped) R.string.share_making else label)
+        }
+        findViewById<View>(R.id.share_progress).visibility = if (busy) View.VISIBLE else View.GONE
+        if (busy && tapped == null) {
+            android.widget.Toast.makeText(this, R.string.share_making, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun wireSeason() {
-        findViewById<View>(R.id.share_rank).setOnClickListener { Share.rank(this) }
-        findViewById<View>(R.id.share_wrapped).setOnClickListener { Share.wrapped(this) }
+        val rank = findViewById<TextView>(R.id.share_rank)
+        val wrapped = findViewById<TextView>(R.id.share_wrapped)
+        rank.setOnClickListener { Share.rank(this) { busy -> shareBusy(rank, busy) } }
+        wrapped.setOnClickListener { Share.wrapped(this) { busy -> shareBusy(wrapped, busy) } }
         findViewById<View>(R.id.season_goal_row).setOnClickListener {
             val choices = Goal.CHOICES
             val labels = choices.map { if (it == 0) getString(R.string.goal_off) else it.toString() }.toTypedArray()
@@ -395,6 +417,8 @@ class MainActivity : AppCompatActivity() {
         }
         caption.visibility = View.VISIBLE
         card.visibility = View.VISIBLE
+        // Both share cards drawn ahead of a tap, so Share usually opens at once.
+        Share.prefetch(this)
         val fmt = java.text.NumberFormat.getIntegerInstance()
         findViewById<TextView>(R.id.season_rank).text = me.rank
         findViewById<TextView>(R.id.season_elo).text = me.elo?.let { getString(R.string.widget_elo, fmt.format(it)) } ?: ""
