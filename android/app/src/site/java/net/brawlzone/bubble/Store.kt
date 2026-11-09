@@ -1,6 +1,7 @@
 package net.brawlzone.bubble
 
 import android.app.Activity
+import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 
@@ -23,4 +24,7 @@ object Store {
 
     @Suppress("UNUSED_PARAMETER")
     fun maybeAskForReview(activity: Activity) = Unit
+
+    @Suppress("UNUSED_PARAMETER")
+    fun happyMoment(context: Context) = Unit
 }

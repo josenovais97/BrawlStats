@@ -118,6 +118,34 @@
                     android:textColor="@color/brand"
                     android:textSize="12sp" />
             </LinearLayout>
+
+            <!-- 1.40: the daily goal's streak and today's wins. Hidden when the goal is off. -->
+            <LinearLayout
+                android:id="@+id/widget_rank_goal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/widget_rank_streak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:maxLines="1"
+                    android:textColor="@color/foreground"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/widget_rank_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="@color/muted"
+                    android:textSize="10sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <ProgressBar

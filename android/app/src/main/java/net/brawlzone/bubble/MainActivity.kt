@@ -115,11 +115,15 @@ class MainActivity : AppCompatActivity() {
         wireLanguage()
         wireAlerts()
         wireFollow()
+        wireSeason()
+        wireFriends()
+        findViewById<View>(R.id.rate_button).setOnClickListener { Rate.open(this) }
+        // 1.40: the Season Wrapped notification makes the card straight away.
+        if (intent?.action == Share.ACTION_WRAPPED) Share.wrapped(this)
 
         findViewById<TextView>(R.id.update_restart).setOnClickListener { Store.completeUpdate() }
         Shortcuts.publish(this)
         AlertJob.schedule(this)
-        AlertJob.runSoon(this)
 
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
@@ -235,6 +239,10 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (intent.action == Share.ACTION_WRAPPED) {
+            Share.wrapped(this)
+            return
+        }
         if (Shortcuts.handle(this, intent)) moveTaskToBack(true)
     }
 
@@ -312,6 +320,7 @@ class MainActivity : AppCompatActivity() {
             findViewById<View>(R.id.update_card)?.visibility = View.VISIBLE
         }
         Store.maybeAskForReview(this)
+        refreshStanding()
         val granted =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 
@@ -323,6 +332,226 @@ class MainActivity : AppCompatActivity() {
         tintDot(if (granted) getColor(R.color.victory) else getColor(R.color.muted))
 
         restricted.visibility = if (!granted && asked) View.VISIBLE else View.GONE
+    }
+
+    // ---------------------------------------------------------- 1.40: season, goal, friends
+
+    private val standingAfterTag = Runnable { refreshStanding(force = true) }
+
+    /**
+     * Draws the season and friends cards from saved answers at once, then
+     * again after a fresh check when the saved one is old.
+     */
+    private fun refreshStanding(force: Boolean = false) {
+        paintSeason()
+        paintFriends()
+        if (!force && !AlertJob.isStale(this)) return
+        val app = applicationContext
+        Thread {
+            runCatching { AlertJob.runNow(app) }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                paintSeason()
+                paintFriends()
+            }
+        }.start()
+    }
+
+    private fun wireSeason() {
+        findViewById<View>(R.id.share_rank).setOnClickListener { Share.rank(this) }
+        findViewById<View>(R.id.share_wrapped).setOnClickListener { Share.wrapped(this) }
+        findViewById<View>(R.id.season_goal_row).setOnClickListener {
+            val choices = Goal.CHOICES
+            val labels = choices.map { if (it == 0) getString(R.string.goal_off) else it.toString() }.toTypedArray()
+            val current = choices.indexOf(Goal.goal(this))
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.goal_pick_title)
+                .setSingleChoiceItems(labels, current) { dialog, which ->
+                    Goal.setGoal(this, choices[which])
+                    dialog.dismiss()
+                    paintSeason()
+                    Thread { Widgets.updateAll(applicationContext) }.start()
+                }
+                .show()
+        }
+    }
+
+    private fun paintSeason() {
+        val caption = findViewById<View>(R.id.season_caption)
+        val card = findViewById<View>(R.id.season_card)
+        val me = Me.last(this)
+        if (me == null || me.rank == null) {
+            caption.visibility = View.GONE
+            card.visibility = View.GONE
+            return
+        }
+        caption.visibility = View.VISIBLE
+        card.visibility = View.VISIBLE
+        val fmt = java.text.NumberFormat.getIntegerInstance()
+        findViewById<TextView>(R.id.season_rank).text = me.rank
+        findViewById<TextView>(R.id.season_elo).text = me.elo?.let { getString(R.string.widget_elo, fmt.format(it)) } ?: ""
+        findViewById<android.widget.ProgressBar>(R.id.season_bar).progress =
+            ((me.share ?: 1.0) * 100).toInt().coerceIn(0, 100)
+        findViewById<TextView>(R.id.season_next).text = when {
+            me.next == null -> getString(R.string.widget_rank_top)
+            me.winsToNext != null && me.winsToNext >= 2 -> getString(R.string.widget_rank_wins, me.winsToNext, me.next)
+            me.toNext != null -> getString(R.string.widget_rank_elo_to, fmt.format(me.toNext), me.next)
+            else -> ""
+        }
+        val badge = findViewById<ImageView>(R.id.season_badge)
+        val app = applicationContext
+        Thread {
+            val bitmap = Widgets.badge(app, me.rankIcon)
+            runOnUiThread { if (bitmap != null) badge.setImageBitmap(bitmap) }
+        }.start()
+
+        val goal = Goal.goal(this)
+        val wins = Goal.todayWins(this, me.tag)
+        val streakBox = findViewById<View>(R.id.season_streak_box)
+        val count = findViewById<TextView>(R.id.season_goal_count)
+        val line = findViewById<TextView>(R.id.season_goal_line)
+        if (goal > 0) {
+            streakBox.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.season_streak).text = "\uD83D\uDD25 " + Goal.streak(this, me.tag)
+            count.visibility = View.VISIBLE
+            count.text = "${wins.coerceAtMost(goal)}/$goal"
+            line.text = if (Goal.doneToday(this, me.tag)) getString(R.string.goal_line_done)
+            else getString(R.string.goal_line, goal)
+        } else {
+            streakBox.visibility = View.GONE
+            count.visibility = View.GONE
+            line.text = getString(R.string.goal_line_off)
+        }
+
+        val stats = Season.current(this, me.tag)
+        val number = stats?.number ?: Alerts.last(this)?.season?.number
+        val seasonLine = findViewById<TextView>(R.id.season_line)
+        seasonLine.text = when {
+            number == null -> ""
+            stats == null || stats.games == 0 -> getString(R.string.season_line_empty, number)
+            stats.best != null -> getString(
+                R.string.season_line_best, number, stats.wins, stats.games - stats.wins,
+                "${Math.round(stats.wins * 100.0 / stats.games)}%", stats.best,
+            )
+            else -> getString(
+                R.string.season_line, number, stats.wins, stats.games - stats.wins,
+                "${Math.round(stats.wins * 100.0 / stats.games)}%",
+            )
+        }
+        seasonLine.visibility = if (seasonLine.text.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun wireFriends() {
+        val editor = findViewById<View>(R.id.friends_editor)
+        val add = findViewById<TextView>(R.id.friends_add)
+        val field = findViewById<EditText>(R.id.friends_field)
+        val go = findViewById<TextView>(R.id.friends_go)
+        add.setOnClickListener {
+            if (Friends.tags(this).size >= Friends.MAX) {
+                android.widget.Toast.makeText(this, R.string.friends_full, android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            editor.visibility = View.VISIBLE
+            add.visibility = View.GONE
+            field.requestFocus()
+            getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+                ?.showSoftInput(field, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        }
+        fun submit() {
+            val raw = field.text.toString()
+            if (raw.isBlank()) return
+            go.isEnabled = false
+            go.text = getString(R.string.friends_checking)
+            val app = applicationContext
+            Thread {
+                val result = Friends.add(app, raw)
+                runOnUiThread {
+                    if (isFinishing || isDestroyed) return@runOnUiThread
+                    go.isEnabled = true
+                    go.text = getString(R.string.friends_add_button)
+                    val message = when (result) {
+                        Friends.AddResult.ADDED -> null
+                        Friends.AddResult.NOT_FOUND -> R.string.friends_not_found
+                        Friends.AddResult.FULL -> R.string.friends_full
+                        Friends.AddResult.ALREADY -> R.string.friends_already
+                        Friends.AddResult.FAILED -> R.string.friends_failed
+                    }
+                    if (message != null) {
+                        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+                        return@runOnUiThread
+                    }
+                    field.setText("")
+                    editor.visibility = View.GONE
+                    add.visibility = View.VISIBLE
+                    getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+                        ?.hideSoftInputFromWindow(field.windowToken, 0)
+                    paintFriends()
+                    Thread { Widgets.updateAll(app) }.start()
+                }
+            }.start()
+        }
+        go.setOnClickListener { submit() }
+        field.setOnEditorActionListener { _, _, _ ->
+            submit()
+            true
+        }
+    }
+
+    private fun paintFriends() {
+        val caption = findViewById<View>(R.id.friends_caption)
+        val card = findViewById<View>(R.id.friends_card)
+        if (Account.tag(this).isEmpty()) {
+            caption.visibility = View.GONE
+            card.visibility = View.GONE
+            return
+        }
+        caption.visibility = View.VISIBLE
+        card.visibility = View.VISIBLE
+        val rows = findViewById<LinearLayout>(R.id.friends_rows)
+        rows.removeAllViews()
+        val ladder = Friends.ladder(this)
+        val hasFriends = ladder.any { !it.you }
+        findViewById<View>(R.id.friends_body).visibility = if (hasFriends) View.GONE else View.VISIBLE
+        findViewById<View>(R.id.friends_remove_hint).visibility = if (hasFriends) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.friends_add).visibility =
+            if (Friends.tags(this).size >= Friends.MAX) View.GONE
+            else if (findViewById<View>(R.id.friends_editor).visibility == View.VISIBLE) View.GONE
+            else View.VISIBLE
+        if (!hasFriends) return
+        val fmt = java.text.NumberFormat.getIntegerInstance()
+        val app = applicationContext
+        for ((index, row) in ladder.withIndex()) {
+            val view = layoutInflater.inflate(R.layout.row_friend, rows, false)
+            view.findViewById<TextView>(R.id.friend_pos).text = (index + 1).toString()
+            val name = view.findViewById<TextView>(R.id.friend_name)
+            name.text = if (row.you) getString(R.string.friends_you, row.data.name) else row.data.name
+            if (row.you) name.setTextColor(getColor(R.color.brand))
+            view.findViewById<TextView>(R.id.friend_rank).text = row.data.rank ?: ""
+            view.findViewById<TextView>(R.id.friend_elo).text = row.data.elo?.let { fmt.format(it) } ?: "–"
+            view.findViewById<TextView>(R.id.friend_week).text =
+                if (row.weekWins + row.weekLosses > 0) getString(R.string.friends_week, row.weekWins, row.weekLosses) else ""
+            val badge = view.findViewById<ImageView>(R.id.friend_badge)
+            Thread {
+                val bitmap = Widgets.badge(app, row.data.rankIcon)
+                runOnUiThread { if (bitmap != null) badge.setImageBitmap(bitmap) }
+            }.start()
+            if (!row.you) {
+                view.setOnLongClickListener {
+                    androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.friends_remove_confirm, row.data.name))
+                        .setPositiveButton(R.string.friends_remove) { _, _ ->
+                            Friends.remove(this, row.data.tag)
+                            paintFriends()
+                            Thread { Widgets.updateAll(app) }.start()
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                    true
+                }
+            }
+            rows.addView(view)
+            gameType(view)
+        }
     }
 
     /** The dot is a shared drawable, so it is mutated rather than restyled. */
@@ -644,6 +873,11 @@ class MainActivity : AppCompatActivity() {
                             setEditing(true)
                             getString(R.string.tag_not_found)
                         } else {
+                            // 1.40: a new tag's rank and friends card, once typing settles.
+                            if (Me.last(this) == null) {
+                                window.decorView.removeCallbacks(standingAfterTag)
+                                window.decorView.postDelayed(standingAfterTag, 1500)
+                            }
                             getString(R.string.tag_ok)
                         }
                     }

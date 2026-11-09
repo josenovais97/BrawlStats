@@ -57,6 +57,7 @@ object Progress {
         }
         if (me.rankIndex <= best) return
         p.edit().putInt(KEY_BEST, me.rankIndex).apply()
+        Store.happyMoment(context)
         if (!post) return
         val local = AppLang.wrap(context)
         val wins = me.winsToNext

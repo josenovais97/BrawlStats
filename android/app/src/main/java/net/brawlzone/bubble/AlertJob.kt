@@ -46,6 +46,10 @@ class AlertJob : JobService() {
             runCatching { scheduler.schedule(job) }.onFailure { Log.w(TAG, "schedule refused", it) }
         }
 
+        /** Whether the saved answers are older than half an hour (1.40, the app screen). */
+        fun isStale(context: Context): Boolean =
+            System.currentTimeMillis() - Alerts.lastFetchedAt(context) >= STALE_MS
+
         /** A check now, off the main thread, unless one ran in the last half hour. */
         fun runSoon(context: Context, force: Boolean = false) {
             val app = context.applicationContext
@@ -55,8 +59,8 @@ class AlertJob : JobService() {
 
         /**
          * The check itself, on the calling thread (never the main one): the
-         * shared alerts, the player's own standing when a tag is set, then
-         * notifications and every widget.
+         * shared alerts, the player's own standing when a tag is set, the
+         * friends (1.40), then notifications and every widget.
          */
         fun runNow(context: Context) {
             val body = runCatching { Http.text(Alerts.url(context)) }.getOrNull()
@@ -68,8 +72,18 @@ class AlertJob : JobService() {
                 Notify.rewards(context, data.rewards, post)
                 Notify.season(context, data, post)
             }
-            if (me != null) Progress.check(context, me, (data ?: Alerts.last(context))?.season?.number, post)
-            Widgets.prefetch(context, data ?: Alerts.last(context), me)
+            val alerts = data ?: Alerts.last(context)
+            val season = alerts?.season?.number
+            if (me != null) {
+                Progress.check(context, me, season, post)
+                // 1.40: the player's own games, then the goal, the season and the friends.
+                val firstLook = !Tally.known(context, me.tag)
+                val fresh = Tally.merge(context, me.tag, me.list)
+                Goal.record(context, me.tag, fresh, firstLook, post)
+                Season.update(context, me, alerts, fresh, post)
+            }
+            Friends.refresh(context, me, season, post)
+            Widgets.prefetch(context, alerts, me)
             Widgets.updateAll(context)
         }
 

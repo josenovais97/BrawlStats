@@ -180,8 +180,13 @@ export async function GET(request: NextRequest) {
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24, width: 900 }}>
           {tile(games.toLocaleString(locale), t('Ranked games'))}
           {tile(games > 0 ? `${Math.round((wins / games) * 100)}%` : '–', t('Win rate'))}
-          {tile(gain !== null ? `${gain > 0 ? '+' : gain < 0 ? '−' : '±'}${Math.abs(gain).toLocaleString(locale)}` : '–', t('Elo this season'))}
-          {tile(streak !== null && streak > 0 ? String(streak) : '–', t('Longest win streak'))}
+          {/* Elo gained is only known when the app counted from the season's start; otherwise today's elo. */}
+          {gain !== null
+            ? tile(`${gain > 0 ? '+' : gain < 0 ? '−' : '±'}${Math.abs(gain).toLocaleString(locale)}`, t('Elo this season'))
+            : player.rankedElo
+              ? tile(player.rankedElo.toLocaleString(locale), 'Elo')
+              : null}
+          {streak !== null && streak > 0 ? tile(String(streak), t('Longest win streak')) : null}
         </div>
         {bestName ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 26, marginTop: 8 }}>

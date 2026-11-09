@@ -52,3 +52,6 @@ class MetaWidget : BubbleWidget(Widgets.Kind.LARGE)
 
 /** "My rank": rank, elo, progress and recent record. */
 class RankWidget : BubbleWidget(Widgets.Kind.RANK)
+
+/** Friends (1.40): the player and up to five friends by elo, with this week's record. */
+class FriendsWidget : BubbleWidget(Widgets.Kind.FRIENDS)

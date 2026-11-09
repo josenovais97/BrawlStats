@@ -28,9 +28,10 @@ import java.util.Locale
 /**
  * Every home-screen widget (1.40), drawn from the hourly check's saved answers.
  *
- * Four kinds share one renderer: small (free reward), medium (reward and the
+ * Five kinds share one renderer: small (free reward), medium (reward and the
  * top pick), large (Ranked meta: the top five for all modes or one mode, the
- * reward and the season countdown) and "My rank". Each widget keeps its own
+ * reward and the season countdown), "My rank" (with the daily goal's streak
+ * since 1.40) and Friends (1.40). Each widget keeps its own
  * settings (mode, reward on/off, background opacity), set when it is placed.
  *
  * Pictures are downloaded by the check, off the main thread, and kept in files
@@ -40,7 +41,7 @@ object Widgets {
 
     const val ACTION_REFRESH = "net.brawlzone.bubble.WIDGET_REFRESH"
 
-    enum class Kind { SMALL, MEDIUM, LARGE, RANK }
+    enum class Kind { SMALL, MEDIUM, LARGE, RANK, FRIENDS }
 
     data class Settings(val mode: String?, val reward: Boolean, val opacity: Int)
 
@@ -52,6 +53,7 @@ object Widgets {
         RewardsWidget::class.java to Kind.MEDIUM,
         MetaWidget::class.java to Kind.LARGE,
         RankWidget::class.java to Kind.RANK,
+        FriendsWidget::class.java to Kind.FRIENDS,
     )
 
     private val TIER_COLORS = mapOf(
@@ -114,6 +116,7 @@ object Widgets {
             Kind.MEDIUM -> medium(context, id, alerts)
             Kind.LARGE -> large(context, id, alerts)
             Kind.RANK -> rank(context, id, me)
+            Kind.FRIENDS -> friends(context, id)
         }
         runCatching { manager.updateAppWidget(id, views) }
     }
@@ -240,8 +243,59 @@ object Widgets {
             R.id.widget_rank_last,
             if (me.games > 0) local.getString(R.string.widget_rank_last, me.games, me.wins, me.losses, me.stars) else "",
         )
+        // 1.40: the daily goal's streak and today's wins.
+        val goal = Goal.goal(context)
+        if (goal > 0) {
+            v.setViewVisibility(R.id.widget_rank_goal, View.VISIBLE)
+            v.setTextViewText(R.id.widget_rank_streak, "\uD83D\uDD25 " + Goal.streak(context, me.tag))
+            v.setTextViewText(
+                R.id.widget_rank_today,
+                local.getString(R.string.widget_today, Goal.todayWins(context, me.tag).coerceAtMost(goal), goal),
+            )
+        } else {
+            v.setViewVisibility(R.id.widget_rank_goal, View.GONE)
+        }
         return v
     }
+
+    /** Friends (1.40): the player and up to five friends by elo, each with this week's record. */
+    private fun friends(context: Context, id: Int): RemoteViews {
+        val local = AppLang.wrap(context)
+        val v = RemoteViews(context.packageName, R.layout.widget_friends)
+        background(v, settings(context, id))
+        header(context, v, id, FriendsWidget::class.java, local)
+        v.setOnClickPendingIntent(R.id.widget_root, openApp(context, id))
+        v.setTextViewText(R.id.widget_friends_label, local.getString(R.string.widget_friends_label))
+        val ladder = Friends.ladder(context)
+        val rows = listOf(
+            FriendRow(R.id.widget_friend_1, R.id.widget_friend_pos_1, R.id.widget_friend_badge_1, R.id.widget_friend_name_1, R.id.widget_friend_elo_1, R.id.widget_friend_week_1),
+            FriendRow(R.id.widget_friend_2, R.id.widget_friend_pos_2, R.id.widget_friend_badge_2, R.id.widget_friend_name_2, R.id.widget_friend_elo_2, R.id.widget_friend_week_2),
+            FriendRow(R.id.widget_friend_3, R.id.widget_friend_pos_3, R.id.widget_friend_badge_3, R.id.widget_friend_name_3, R.id.widget_friend_elo_3, R.id.widget_friend_week_3),
+            FriendRow(R.id.widget_friend_4, R.id.widget_friend_pos_4, R.id.widget_friend_badge_4, R.id.widget_friend_name_4, R.id.widget_friend_elo_4, R.id.widget_friend_week_4),
+            FriendRow(R.id.widget_friend_5, R.id.widget_friend_pos_5, R.id.widget_friend_badge_5, R.id.widget_friend_name_5, R.id.widget_friend_elo_5, R.id.widget_friend_week_5),
+            FriendRow(R.id.widget_friend_6, R.id.widget_friend_pos_6, R.id.widget_friend_badge_6, R.id.widget_friend_name_6, R.id.widget_friend_elo_6, R.id.widget_friend_week_6),
+        )
+        val lonely = ladder.none { !it.you }
+        v.setViewVisibility(R.id.widget_friends_empty, if (lonely) View.VISIBLE else View.GONE)
+        val fmt = NumberFormat.getIntegerInstance()
+        rows.forEachIndexed { i, row ->
+            val entry = ladder.getOrNull(i)
+            if (entry == null || lonely) {
+                v.setViewVisibility(row.root, View.GONE)
+                return@forEachIndexed
+            }
+            v.setViewVisibility(row.root, View.VISIBLE)
+            v.setTextViewText(row.pos, (i + 1).toString())
+            v.setTextViewText(row.name, if (entry.you) local.getString(R.string.friends_you, entry.data.name) else entry.data.name)
+            v.setTextColor(row.name, if (entry.you) Color.parseColor("#FFC53D") else Color.parseColor("#EEF1FA"))
+            v.setTextViewText(row.elo, entry.data.elo?.let { fmt.format(it) } ?: "–")
+            v.setTextViewText(row.week, if (entry.weekWins + entry.weekLosses > 0) "${entry.weekWins}–${entry.weekLosses}" else "")
+            portrait(context, v, row.badge, entry.data.rankIcon, hideWhenMissing = false)
+        }
+        return v
+    }
+
+    private data class FriendRow(val root: Int, val pos: Int, val badge: Int, val name: Int, val elo: Int, val week: Int)
 
     private data class Row(val root: Int, val icon: Int, val name: Int, val tier: Int, val rate: Int)
 
@@ -328,18 +382,28 @@ object Widgets {
     fun prefetch(context: Context, alerts: Alerts.Data?, me: Me.Data?) {
         val manager = AppWidgetManager.getInstance(context) ?: return
         val urls = mutableSetOf<String>()
+        val badges = mutableSetOf<String>()
         for ((cls, kind) in PROVIDERS) {
             for (id in manager.getAppWidgetIds(ComponentName(context, cls))) {
                 val s = settings(context, id)
                 when (kind) {
                     Kind.MEDIUM -> (alerts?.mode(s.mode)?.top?.firstOrNull() ?: alerts?.topPick)?.imageUrl?.let(urls::add)
                     Kind.LARGE -> (alerts?.mode(s.mode)?.top ?: alerts?.metaAll.orEmpty()).mapNotNullTo(urls) { it.imageUrl }
-                    Kind.RANK -> me?.rankIcon?.let(urls::add)
+                    Kind.RANK -> me?.rankIcon?.let(badges::add)
+                    Kind.FRIENDS -> Friends.ladder(context).mapNotNullTo(badges) { it.data.rankIcon }
                     Kind.SMALL -> Unit
                 }
             }
         }
-        for (url in urls) download(context, url, round = url != me?.rankIcon)
+        for (url in urls) download(context, url, round = true)
+        for (url in badges) download(context, url, round = false)
+    }
+
+    /** A rank badge for the app screen (1.40): the widget's copy, else fetched and kept. Off the main thread. */
+    fun badge(context: Context, url: String?): Bitmap? {
+        if (url == null) return null
+        download(context, url, round = false)
+        return cached(context, url)
     }
 
     private fun file(context: Context, url: String): File {

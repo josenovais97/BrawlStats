@@ -21,15 +21,19 @@ import com.google.android.play.core.review.ReviewManagerFactory
  * downloads, and a "Restart" card finishes the install. Asked at most once per
  * new version, so declining is respected.
  *
- * The review is asked for once, ever, after three drafts played with the
- * bubble and a player tag set: by then the player knows whether it helps.
- * Google decides whether the dialog actually shows, and it never says.
+ * The review is asked for once, ever, with a player tag set, after three
+ * drafts played with the bubble or a good moment (a rank-up or the daily goal
+ * reached, 1.40), on the next visit to the app screen. Google decides whether
+ * the dialog actually shows, and it never says; the test build shows a toast
+ * when it was asked for, because a test install from outside Play never
+ * shows the dialog at all.
  */
 object Store {
 
     private const val PREFS = "brawlzone-store"
     private const val KEY_ASKED_VERSION = "update_asked_version"
     private const val KEY_REVIEWED = "review_asked"
+    private const val KEY_HAPPY = "happy_moment"
     private const val DRAFTS_BEFORE_REVIEW = 3
 
     private var manager: AppUpdateManager? = null
@@ -75,17 +79,31 @@ object Store {
         listener = null
     }
 
+    /** A rank-up or the daily goal reached: the next app visit may ask for a review. */
+    fun happyMoment(context: Context) {
+        prefs(context).edit().putBoolean(KEY_HAPPY, true).apply()
+    }
+
     fun maybeAskForReview(activity: Activity) {
         val p = prefs(activity)
         if (p.getBoolean(KEY_REVIEWED, false)) return
-        if (Alerts.drafts(activity) < DRAFTS_BEFORE_REVIEW || Account.tag(activity).isEmpty()) return
+        val ready = Alerts.drafts(activity) >= DRAFTS_BEFORE_REVIEW || p.getBoolean(KEY_HAPPY, false)
+        if (!ready || Account.tag(activity).isEmpty()) return
+        val qa = BuildConfig.BUILD_TYPE == "qa"
         val reviews = ReviewManagerFactory.create(activity)
         reviews.requestReviewFlow().addOnCompleteListener { request ->
-            if (!request.isSuccessful) return@addOnCompleteListener
             if (activity.isFinishing || activity.isDestroyed) return@addOnCompleteListener
+            if (!request.isSuccessful) {
+                if (qa) toast(activity, "Review prompt: Google Play refused (normal outside a Play install)")
+                return@addOnCompleteListener
+            }
+            if (qa) toast(activity, "Review prompt requested. Google Play shows it only for Play installs.")
             reviews.launchReviewFlow(activity, request.result).addOnCompleteListener {
                 p.edit().putBoolean(KEY_REVIEWED, true).apply()
             }
         }
     }
+
+    private fun toast(activity: Activity, text: String) =
+        android.widget.Toast.makeText(activity, text, android.widget.Toast.LENGTH_LONG).show()
 }

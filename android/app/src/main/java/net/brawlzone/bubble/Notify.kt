@@ -29,6 +29,8 @@ object Notify {
     private const val CH_REWARDS = "brawlzone-rewards"
     private const val CH_SEASON = "brawlzone-season"
     private const val CH_PROGRESS = "brawlzone-progress"
+    private const val CH_GOAL = "brawlzone-goal"
+    private const val CH_FRIENDS = "brawlzone-friends"
 
     private const val KEY_SEEN = "seen_rewards"
     private const val KEY_SEASON_START = "season_start_sent"
@@ -49,25 +51,57 @@ object Notify {
         m.createNotificationChannel(
             NotificationChannel(CH_PROGRESS, local.getString(R.string.channel_progress), NotificationManager.IMPORTANCE_DEFAULT),
         )
+        m.createNotificationChannel(
+            NotificationChannel(CH_GOAL, local.getString(R.string.channel_goal), NotificationManager.IMPORTANCE_DEFAULT),
+        )
+        m.createNotificationChannel(
+            NotificationChannel(CH_FRIENDS, local.getString(R.string.channel_friends), NotificationManager.IMPORTANCE_DEFAULT),
+        )
     }
 
     /** Rank-ups and the Sunday recap (1.40, Progress). Tapping opens Brawl Stars with the bubble. */
-    fun postProgress(context: Context, id: Int, title: String, text: String) {
+    fun postProgress(context: Context, id: Int, title: String, text: String) =
+        post(context, CH_PROGRESS, id, title, text, Shortcuts.ACTION_PLAY)
+
+    /** The daily goal and streak (1.40, Goal). Tapping opens Brawl Stars with the bubble. */
+    fun postGoal(context: Context, id: Int, title: String, text: String) =
+        post(context, CH_GOAL, id, title, text, Shortcuts.ACTION_PLAY)
+
+    /** A friend's rank-up (1.40, Friends). Tapping opens the app, where the ladder is. */
+    fun postFriend(context: Context, id: Int, title: String, text: String) =
+        post(context, CH_FRIENDS, id, title, text, null)
+
+    /** A finished season's Wrapped (1.40, Season). Tapping makes the card and opens the share sheet. */
+    fun postWrapped(context: Context, number: Int) {
+        val local = AppLang.wrap(context)
+        post(
+            context,
+            CH_SEASON,
+            7003,
+            local.getString(R.string.alert_wrapped_title, number),
+            local.getString(R.string.alert_wrapped_text),
+            Share.ACTION_WRAPPED,
+        )
+    }
+
+    private fun post(context: Context, channel: String, id: Int, title: String, text: String, action: String?) {
         if (manager(context)?.areNotificationsEnabled() != true) return
         channels(context)
-        val play = PendingIntent.getActivity(
+        val intent = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (action != null) intent.action = action
+        val open = PendingIntent.getActivity(
             context,
             id,
-            Intent(context, MainActivity::class.java).setAction(Shortcuts.ACTION_PLAY).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val notification = Notification.Builder(context, CH_PROGRESS)
+        val notification = Notification.Builder(context, channel)
             .setSmallIcon(R.drawable.bubble_glyph)
             .setColor(context.getColor(R.color.brand))
             .setContentTitle(title)
             .setContentText(text)
             .setStyle(Notification.BigTextStyle().bigText(text))
-            .setContentIntent(play)
+            .setContentIntent(open)
             .setAutoCancel(true)
             .build()
         runCatching { manager(context)?.notify(id, notification) }
@@ -191,6 +225,9 @@ object Notify {
         postSeason(context, number + 1, start = true, daysLeft = null)
         postSeason(context, number, start = false, daysLeft = 2L)
         Progress.test(context)
+        Goal.test(context)
+        Friends.test(context)
+        postWrapped(context, number)
     }
 
     private fun picture(url: String?): Bitmap? = url?.let {

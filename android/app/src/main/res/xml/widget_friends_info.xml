@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Friends widget (1.40). Refreshed by the hourly check (AlertJob), so the
+     launcher's own timer is off. Settings open on placement (optional) and
+     again from the widget's long-press menu. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="net.brawlzone.bubble.WidgetConfigActivity"
+    android:description="@string/widget_friends_description"
+    android:initialLayout="@layout/widget_friends"
+    android:minWidth="250dp"
+    android:minHeight="180dp"
+    android:minResizeWidth="200dp"
+    android:minResizeHeight="150dp"
+    android:previewImage="@mipmap/ic_launcher"
+    android:previewLayout="@layout/widget_friends"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="4"
+    android:targetCellHeight="3"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable|configuration_optional" />

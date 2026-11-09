@@ -14,4 +14,10 @@
     <string name="how_3">Arrástrala a la ✕ de abajo para cerrarla, usa Detener en la notificación o el mosaico de BrawlZone en Configuración rápida — ese mosaico también la inicia, desde el juego.</string>
     <string name="notification_text">Toca la burbuja para ver elecciones en vivo · arrástrala a la ✕ para cerrarla</string>
     <string name="toast_downloaded">Actualización descargada — ábrela desde tu carpeta Descargas</string>
+    <!-- 1.40 -->
+    <string name="friends_body">Agrega hasta 5 amigos para ver quién sube más rápido. Te avisaremos cuando alguno suba de rango.</string>
+    <string name="friends_add">+ Agregar un amigo</string>
+    <string name="friends_add_button">Agregar</string>
+    <string name="friends_full">Puedes agregar hasta 5 amigos.</string>
+    <string name="widget_friends_none">Agrega amigos en la app para ver aquí tu clasificación.</string>
 </resources>

@@ -19,12 +19,15 @@ object Http {
 
     const val SITE = "https://brawlzone.net"
 
-    fun open(url: String): InputStream =
+    fun open(url: String, readTimeoutMs: Int = 10_000): InputStream =
         (URL(url).openConnection() as HttpURLConnection).apply {
             connectTimeout = 10_000
-            readTimeout = 10_000
+            readTimeout = readTimeoutMs
             setRequestProperty("User-Agent", "BrawlZoneBubble")
         }.inputStream
 
     fun text(url: String): String = open(url).use { it.readBytes().decodeToString() }
+
+    /** A drawn share card can take several seconds on the server (1.40). */
+    fun bytes(url: String): ByteArray = open(url, readTimeoutMs = 30_000).use { it.readBytes() }
 }
