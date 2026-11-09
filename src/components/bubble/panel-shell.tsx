@@ -92,6 +92,27 @@ export function PanelShell({
     }
   };
 
+  /*
+   * The app's shortcuts (1.40): long-press the icon, "Counters", and the
+   * bubble opens the panel on that tab. A fresh page reads `tab=` from the
+   * hash; a page the app already holds is switched through this hook.
+   */
+  const chooseRef = useRef(choose);
+  useEffect(() => {
+    chooseRef.current = choose;
+  });
+  useEffect(() => {
+    const open = (next: string) => {
+      if (next === 'meta' || next === 'draft' || next === 'comps' || next === 'counters') chooseRef.current(next);
+    };
+    (window as unknown as { __bzOpenTab?: (t: string) => void }).__bzOpenTab = open;
+    const fromHash = new URLSearchParams(window.location.hash.slice(1)).get('tab');
+    if (fromHash) open(fromHash);
+    return () => {
+      delete (window as unknown as { __bzOpenTab?: (t: string) => void }).__bzOpenTab;
+    };
+  }, []);
+
   const account = useBubbleAccount();
   const { t, lang, name } = usePanelI18n();
   const { record, form } = useSinceTagRecord(account.tag);

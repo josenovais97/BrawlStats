@@ -51,7 +51,7 @@ keep request rates reasonable.
 | `GET /api/v1/draft-suggest?map=<name>[&bans=][&enemies=][&allies=][&rank=]` | Picks for a draft (ids comma-separated) |
 | `GET /api/v1/comps` | Winning team comps |
 | `GET /api/v1/brawler-build/<id>` | A brawler's most-owned build |
-| `GET /api/v1/health` | Service health |
+| `GET /api/v1/health/sources` | Health of the data sources |
 
 ## How the data works
 
