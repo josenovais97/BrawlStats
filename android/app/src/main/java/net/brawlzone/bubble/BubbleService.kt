@@ -236,6 +236,32 @@ class BubbleService : Service() {
          * and skipped if the service is already gone.
          */
         handler.postDelayed({ if (bubble != null) buildPanel() }, PANEL_PRELOAD_DELAY_MS)
+
+        // The hourly reward and season check (1.40), in case the app screen never ran.
+        AlertJob.schedule(this)
+    }
+
+    /** A tab the panel should switch to once its page can hear it (1.40). */
+    private var pendingTab: String? = null
+
+    private fun openPanelOn(tab: String?) {
+        pendingTab = tab?.takeIf { it in setOf("meta", "draft", "comps", "counters") }
+        if (panel == null) showPanel()
+        if (panelLoaded) applyPendingTab()
+    }
+
+    /**
+     * Asks the page to switch tab. The page registers its hook once React has
+     * mounted, which can be after `onPageFinished`, so the script waits for it
+     * (up to five seconds) instead of assuming.
+     */
+    private fun applyPendingTab() {
+        val tab = pendingTab ?: return
+        pendingTab = null
+        val script = "(function(t){var n=0;var i=setInterval(function(){" +
+            "if(window.__bzOpenTab){window.__bzOpenTab(t);clearInterval(i)}" +
+            "else if(++n>50){clearInterval(i)}},100)})(" + org.json.JSONObject.quote(tab) + ")"
+        panelWeb?.evaluateJavascript(script, null)
     }
 
     /**
@@ -249,6 +275,8 @@ class BubbleService : Service() {
             // From the notification's Panel action: the same thing as tapping
             // the bubble, for a reader whose hand is already in the shade.
             ACTION_TOGGLE_PANEL -> if (bubble != null) togglePanel()
+            // The "Counters" shortcut (1.40): the panel open on that tab.
+            ACTION_OPEN_PANEL -> if (bubble != null) openPanelOn(intent?.getStringExtra(EXTRA_TAB))
         }
         return START_NOT_STICKY
     }
@@ -984,6 +1012,7 @@ class BubbleService : Service() {
                     spinner.visibility = View.GONE
                     if (panelFailed) return
                     panelLoaded = true
+                    applyPendingTab()
                     offline.visibility = if (panelFromCache) View.VISIBLE else View.GONE
                     // Back to normal caching for the next load: the cache-only
                     // mode is for this one fallback, never a setting that sticks.
@@ -1196,6 +1225,8 @@ class BubbleService : Service() {
      */
     private fun showPanel() {
         val params = bubbleParams ?: return
+        // One more draft with the bubble, for the review prompt (1.40).
+        Alerts.countDraft(this)
         // On the edge and solid before anything is placed against it: the panel
         // sits beside the bubble, and beside a tucked one is half off-screen.
         wakeBubble(animate = false)
@@ -1659,6 +1690,8 @@ class BubbleService : Service() {
         private const val NOTIFICATION_ID = 1
         const val ACTION_STOP = "net.brawlzone.bubble.STOP"
         const val ACTION_TOGGLE_PANEL = "net.brawlzone.bubble.TOGGLE_PANEL"
+        const val ACTION_OPEN_PANEL = "net.brawlzone.bubble.OPEN_PANEL"
+        const val EXTRA_TAB = "tab"
 
         /**
          * Whether the bubble is up, for anything outside the service that has

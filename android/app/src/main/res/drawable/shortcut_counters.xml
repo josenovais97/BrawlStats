@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App shortcut icon (1.40): the gold badge with a glyph, sized so the
+     launcher has an intrinsic size to scale from. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <size android:width="48dp" android:height="48dp" />
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#FFD96B" android:endColor="#F2A81C" />
+            <stroke android:width="2dp" android:color="#6B4A00" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_versus"
+        android:left="10dp" android:top="10dp" android:right="10dp" android:bottom="10dp" />
+</layer-list>

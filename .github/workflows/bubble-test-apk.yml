@@ -1,0 +1,80 @@
+# Builds "Bubble Test", the side-by-side test build of the Android app (1.40).
+#
+# The server that runs the site is an ARM machine, where Google's Android
+# build tools do not run, so the APK is built here on GitHub's x86 runners.
+# Every push that touches android/ produces a fresh APK, published as the
+# `bubble-test` pre-release so it can be downloaded straight to a phone:
+#
+#   https://github.com/josenovais97/BrawlStats/releases/download/bubble-test/bubble-test.apk
+#
+# "Bubble Test" has its own package (net.brawlzone.bubble.test) and a test key
+# committed in the repo, so it installs next to the real app and cannot update
+# or impersonate it. The real releases are still built and signed by hand.
+#
+# When a build fails, the Gradle log is published as `bubble-test-log`, so the
+# error can be read without signing in.
+name: Bubble test APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/bubble-test-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bubble-test-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Build the test APK and run the unit tests
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace assemblePlayQa testPlayQaUnitTest 2>&1 | tee build.log
+
+      - name: Publish the test APK
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK=$(ls app/build/outputs/apk/play/qa/*.apk | head -1)
+          cp "$APK" bubble-test.apk
+          gh release delete bubble-test --cleanup-tag --yes || true
+          gh release delete bubble-test-log --cleanup-tag --yes || true
+          gh release create bubble-test bubble-test.apk \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Bubble test build ($(git rev-parse --short HEAD))" \
+            --notes "Test build of BrawlZone Bubble from $GITHUB_SHA. Installs as a separate app called Bubble Test. Not a release."
+
+      - name: Publish the build log
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f build.log ]; then tail -c 300000 build.log > build-log.txt; else echo "no build log" > build-log.txt; fi
+          gh release delete bubble-test-log --cleanup-tag --yes || true
+          gh release create bubble-test-log build-log.txt \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Bubble test build failed ($(git rev-parse --short HEAD))" \
+            --notes "Gradle log of the failed test build."

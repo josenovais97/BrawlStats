@@ -36,8 +36,12 @@ android {
      * to edge (see MainActivity.fitSystemBars).
      */
     targetSdk = 36
-    versionCode = 52
-    versionName = "1.30"
+    versionCode = 53
+    versionName = "1.40"
+
+    // The launcher name. The test build (qa, below) overrides it so it can sit
+    // next to the real app on the same phone without looking identical.
+    manifestPlaceholders["appLabel"] = "@string/app_name"
 
     /*
      * Where the panel is served from. The site, always, in a release; a
@@ -84,6 +88,18 @@ android {
   }
 
   signingConfigs {
+    /*
+     * The side-by-side test build (1.40). Its keystore is committed on
+     * purpose: it signs nothing but `net.brawlzone.bubble.test`, which can
+     * never update or impersonate the real app, and a fixed key is what lets
+     * one test build install over the previous one.
+     */
+    create("qa") {
+      storeFile = rootProject.file("qa.keystore")
+      storePassword = "bubbletest"
+      keyAlias = "qa"
+      keyPassword = "bubbletest"
+    }
     if (hasSigning) {
       create("release") {
         storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
@@ -105,6 +121,21 @@ android {
        */
       isMinifyEnabled = false
       if (hasSigning) signingConfig = signingConfigs.getByName("release")
+    }
+    /*
+     * "Bubble Test" (1.40): a release build under its own package and name,
+     * built by GitHub Actions (.github/workflows/bubble-test-apk.yml) so a
+     * change can be tried on a phone without uninstalling the real app.
+     *
+     *   ./gradlew assemblePlayQa   # what the workflow builds
+     */
+    create("qa") {
+      initWith(getByName("release"))
+      applicationIdSuffix = ".test"
+      versionNameSuffix = "-test"
+      signingConfig = signingConfigs.getByName("qa")
+      manifestPlaceholders["appLabel"] = "Bubble Test"
+      matchingFallbacks += listOf("release")
     }
   }
   /*
@@ -132,4 +163,11 @@ dependencies {
   testImplementation("junit:junit:4.13.2")
   implementation("androidx.core:core-ktx:1.13.1")
   implementation("androidx.appcompat:appcompat:1.7.0")
+  /*
+   * Google Play's in-app review and in-app update (1.40). Play build only:
+   * the site APK is not installed from Play, and both would do nothing there
+   * but add Google's libraries to an app that promises not to need them.
+   */
+  "playImplementation"("com.google.android.play:review:2.0.2")
+  "playImplementation"("com.google.android.play:app-update:2.1.0")
 }

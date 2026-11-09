@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A finished setup step (1.40): the badge turns green. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient android:type="linear" android:angle="270"
+        android:startColor="#5BE69A" android:endColor="@color/victory" />
+    <stroke android:width="2dp" android:color="@color/outline" />
+</shape>

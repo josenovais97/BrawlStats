@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget's Claim button (1.40): the game's green claim, outlined. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A7A33" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="@color/outline" />
+        </shape>
+    </item>
+    <item android:left="2dp" android:right="2dp" android:top="2dp" android:bottom="4dp">
+        <shape android:shape="rectangle">
+            <gradient android:type="linear" android:angle="270"
+                android:startColor="#6CF08F" android:endColor="#3DDC63" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+</layer-list>

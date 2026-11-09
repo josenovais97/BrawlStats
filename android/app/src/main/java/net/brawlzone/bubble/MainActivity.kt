@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat.Type
 
@@ -56,6 +57,10 @@ class MainActivity : AppCompatActivity() {
      */
     private var asked = false
 
+    /** Google Play's update dialog reports back here (1.40, Play build only). */
+    private val updateLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { }
+
     /** Every string on this screen in the app's language, not the phone's. */
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(AppLang.wrap(newBase))
@@ -69,6 +74,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        /*
+         * A shortcut, the widget or a season notification asked for the bubble
+         * (1.40). When it could start, there is nothing to show here.
+         */
+        if (Shortcuts.handle(this, intent?.action)) {
+            finish()
+            return
+        }
+        // First run: the three-step setup instead of this whole screen.
+        if (Onboarding.needed(this)) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            finish()
+            return
+        }
         setContentView(R.layout.activity_main)
         gameType(findViewById(R.id.scroll))
         fitSystemBars()
@@ -94,6 +113,12 @@ class MainActivity : AppCompatActivity() {
         wireAccount()
         wireLook()
         wireLanguage()
+        wireAlerts()
+
+        findViewById<TextView>(R.id.update_restart).setOnClickListener { Store.completeUpdate() }
+        Shortcuts.publish(this)
+        AlertJob.schedule(this)
+        AlertJob.runSoon(this)
 
         findViewById<Button>(R.id.start).setOnClickListener { startBubble() }
         findViewById<Button>(R.id.stop).setOnClickListener {
@@ -207,12 +232,59 @@ class MainActivity : AppCompatActivity() {
      * Re-read the permission every time the screen comes forward, because the
      * only way it changes is the user leaving for Settings and coming back.
      */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (Shortcuts.handle(this, intent.action)) moveTaskToBack(true)
+    }
+
+    override fun onDestroy() {
+        Store.release()
+        super.onDestroy()
+    }
+
+    /**
+     * A tag copied in Brawl Stars, offered above an empty tag field (1.40).
+     * Android allows reading the clipboard only while the window has focus.
+     */
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) return
+        val chip = findViewById<TextView>(R.id.clip_chip) ?: return
+        val field = findViewById<EditText>(R.id.tag) ?: return
+        if (Account.tag(this).isNotEmpty() || field.text.isNotBlank()) {
+            chip.visibility = View.GONE
+            return
+        }
+        val found = ClipTag.find(this) ?: return
+        chip.text = getString(R.string.clip_chip, "#$found")
+        chip.visibility = View.VISIBLE
+        chip.setOnClickListener {
+            field.setText("#$found")
+            chip.visibility = View.GONE
+        }
+    }
+
+    /** One switch for free reward and season notifications (1.40). */
+    private fun wireAlerts() {
+        val toggle = findViewById<Switch>(R.id.alerts_switch)
+        toggle.isChecked = Alerts.enabled(this)
+        toggle.setOnCheckedChangeListener { _, on ->
+            Alerts.setEnabled(this, on)
+            if (on) askForNotifications()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         if (drawnIn != null && drawnIn != AppLang.current(this)) {
             recreate()
             return
         }
+        // Play build: offer a waiting update, and the one-time review ask.
+        Store.checkForUpdate(this, updateLauncher) {
+            findViewById<View>(R.id.update_card)?.visibility = View.VISIBLE
+        }
+        Store.maybeAskForReview(this)
         val granted =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 

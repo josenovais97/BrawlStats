@@ -20,6 +20,22 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!--
+      Keeps the hourly reward and season check scheduled after a restart
+      (1.40). A normal permission: no prompt, and it only lets the job
+      scheduler bring back the one periodic job this app registers.
+    -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!--
+      "Open Brawl Stars" (1.40). Since Android 11 an app can see another app
+      only if it names it here; without this the launch intent comes back
+      empty and the button would always say the game is not installed.
+    -->
+    <queries>
+        <package android:name="com.supercell.brawlstars" />
+    </queries>
+
+    <!--
       Needed to hand a downloaded APK to the package installer ourselves.
       Without it the app can fetch its own update and then not offer it, which
       leaves the file sitting in Downloads with nothing pointing at it — the
@@ -32,7 +48,7 @@
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:label="@string/app_name"
+        android:label="${appLabel}"
         android:theme="@style/Theme.BrawlZone">
 
         <activity
@@ -44,6 +60,38 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          First-run setup (1.40): three steps instead of a long screen, because
+          most installs never finished setting up (34 installs, 8 first opens).
+        -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!--
+          The hourly check for free rewards and Ranked season dates (1.40),
+          which also refreshes the home-screen widget. Only the system's job
+          scheduler can bind to it.
+        -->
+        <service
+            android:name=".AlertJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- Home-screen widget: the newest free reward and today's top pick. -->
+        <receiver
+            android:name=".RewardsWidget"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_rewards_info" />
+        </receiver>
 
         <!--
           A foreground service, not a background one. An overlay that Android
