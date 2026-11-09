@@ -4869,4 +4869,34 @@ export const FR: Record<string, string> = {
     "Sur 10, centré sur le Classé : comment tu joues, pas depuis combien de temps.",
   "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
     "Cette page n'a pas pu se charger. L'API du jeu est sûrement lente en ce moment. Réessaie dans un instant.",
+  "Track yours with BrawlZone Bubble":
+    "Suis le tien avec BrawlZone Bubble",
+  "Free on Google Play · brawlzone.net":
+    "Gratuit sur Google Play · brawlzone.net",
+  "Top rank reached":
+    "Rang maximum atteint",
+  "≈{n} wins to {rank}":
+    "≈{n} victoires avant {rank}",
+  "{n} elo to {rank}":
+    "{n} elo avant {rank}",
+  "MY RANK":
+    "MON RANG",
+  "Ranked · Season {n}":
+    "Classé · Saison {n}",
+  "Last {n}: {w}–{l}":
+    "Dernières {n} : {w}–{l}",
+  "SEASON {n}":
+    "SAISON {n}",
+  "MY SEASON":
+    "MA SAISON",
+  "WRAPPED":
+    "RÉCAP",
+  "Peak":
+    "Meilleur rang",
+  "Ranked games":
+    "Parties Classé",
+  "Elo this season":
+    "Elo cette saison",
+  "Best brawler":
+    "Meilleur brawler",
 };

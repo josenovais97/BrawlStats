@@ -5726,6 +5726,39 @@ async function compute_getRankedEloRates(): Promise<Record<string, EloRate>> {
 
 export const getRankedEloRates = cachedRead('ranked-elo-rates', compute_getRankedEloRates);
 
+/**
+ * One player's Ranked games over a date range, per brawler (1.40), for the
+ * Bubble app's Season Wrapped card. From player_battle_daily (kept 45 days,
+ * so a whole season), so only for players the sampler has visited. About 3 s:
+ * the table is keyed by day first, and this is asked once per shared card.
+ */
+export async function getPlayerSeasonStats(
+  tag: string,
+  from: string,
+  to: string,
+): Promise<{ games: number; wins: number; byBrawler: { brawlerId: number; games: number; wins: number }[] } | null> {
+  const prisma = getPrisma();
+  if (!prisma) return null;
+  try {
+    const rows = await prisma.$queryRaw<{ brawler_id: number; games: bigint; wins: bigint }[]>`
+      SELECT brawler_id, SUM(competitive_decided) AS games, SUM(competitive_wins) AS wins
+      FROM player_battle_daily
+      WHERE player_tag = ${tag} AND day >= ${from}::date AND day < ${to}::date
+      GROUP BY brawler_id
+    `;
+    const byBrawler = rows
+      .map((r) => ({ brawlerId: r.brawler_id, games: Number(r.games), wins: Number(r.wins) }))
+      .filter((r) => r.games > 0)
+      .sort((a, b) => b.wins - a.wins || b.games - a.games);
+    const games = byBrawler.reduce((n, r) => n + r.games, 0);
+    if (games === 0) return null;
+    return { games, wins: byBrawler.reduce((n, r) => n + r.wins, 0), byBrawler };
+  } catch (error) {
+    swallow('getPlayerSeasonStats', error);
+    return null;
+  }
+}
+
 const cachedRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
 
 /** Ranked trios, all ranks or one: the precomputed row, else computed live. */

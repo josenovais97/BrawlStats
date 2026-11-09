@@ -4869,4 +4869,34 @@ export const RU: Record<string, string> = {
     "Из 10, с упором на ранговые бои: как вы играете, а не как долго.",
   "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
     "Не удалось загрузить страницу. Похоже, API игры сейчас тормозит. Попробуйте ещё раз чуть позже.",
+  "Track yours with BrawlZone Bubble":
+    "Следи за своим в BrawlZone Bubble",
+  "Free on Google Play · brawlzone.net":
+    "Бесплатно в Google Play · brawlzone.net",
+  "Top rank reached":
+    "Достигнут высший ранг",
+  "≈{n} wins to {rank}":
+    "Побед до {rank}: ≈{n}",
+  "{n} elo to {rank}":
+    "Эло до {rank}: {n}",
+  "MY RANK":
+    "МОЙ РАНГ",
+  "Ranked · Season {n}":
+    "Ранговые бои · Сезон {n}",
+  "Last {n}: {w}–{l}":
+    "Последние {n}: {w}–{l}",
+  "SEASON {n}":
+    "СЕЗОН {n}",
+  "MY SEASON":
+    "МОЙ СЕЗОН",
+  "WRAPPED":
+    "ИТОГИ",
+  "Peak":
+    "Пик",
+  "Ranked games":
+    "Ранговые бои",
+  "Elo this season":
+    "Эло за сезон",
+  "Best brawler":
+    "Лучший боец",
 };

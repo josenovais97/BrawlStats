@@ -126,7 +126,7 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * The most expensive single render left — 3.4s — and no measured demand at
    * all, which is the combination that deserves the tightest allowance.
    */
-  '/wrapped/': { perSecond: 1, burst: 10 },
+  '/wrapped/': { perSecond: 0.5, burst: 10 },
 
   /*
    * The account value calculator (2026-10-16): one live player fetch per page
@@ -149,6 +149,14 @@ export const ALLOWANCES: Record<string, Allowance> = {
    * budget at launch by lowering something else, not the ceiling.
    */
   '/roast/': { perSecond: 0.5, burst: 5 },
+
+  /*
+   * The Bubble app's share cards (2026-11-09): a player fetch, a battle log or
+   * a season query over `player_battle_daily` (~3s, no index), then a drawn
+   * image. Asked for only when a player taps Share. Half of `/wrapped/`'s 1/s,
+   * which still has no measured demand.
+   */
+  '/api/bubble/card/': { perSecond: 0.5, burst: 5 },
 };
 
 /**
@@ -238,6 +246,7 @@ export const LIMITED_PREFIXES = [
   '/account-value/',
   '/tier-list/maker/image/',
   '/roast/',
+  '/api/bubble/card/',
 ] as const;
 
 export function isLimitedPath(pathname: string): boolean {

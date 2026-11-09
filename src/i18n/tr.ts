@@ -4868,4 +4868,34 @@ export const TR: Record<string, string> = {
     "10 üzerinden, Aşamalı ağırlıklı: ne kadar süredir değil, nasıl oynadığın.",
   "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
     "Bu sayfa yüklenemedi. Oyun API'si şu an muhtemelen yavaş. Biraz sonra tekrar dene.",
+  "Track yours with BrawlZone Bubble":
+    "Seninkini BrawlZone Bubble ile takip et",
+  "Free on Google Play · brawlzone.net":
+    "Google Play'de ücretsiz · brawlzone.net",
+  "Top rank reached":
+    "En yüksek rütbeye ulaşıldı",
+  "≈{n} wins to {rank}":
+    "{rank} için ≈{n} galibiyet",
+  "{n} elo to {rank}":
+    "{rank} için {n} elo",
+  "MY RANK":
+    "RÜTBEM",
+  "Ranked · Season {n}":
+    "Aşamalı · Sezon {n}",
+  "Last {n}: {w}–{l}":
+    "Son {n}: {w}–{l}",
+  "SEASON {n}":
+    "SEZON {n}",
+  "MY SEASON":
+    "SEZONUM",
+  "WRAPPED":
+    "ÖZETİ",
+  "Peak":
+    "En yüksek",
+  "Ranked games":
+    "Aşamalı maç",
+  "Elo this season":
+    "Bu sezon elo",
+  "Best brawler":
+    "En iyi savaşçı",
 };
