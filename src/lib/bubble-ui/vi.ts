@@ -152,6 +152,13 @@ const vi: UiStrings = {
   'bracket.thin': 'Chế độ này chưa đủ trận ở hạng {rank} — đang hiện mọi hạng.',
   'bracket.mapsAllRanks': 'Gợi ý theo bản đồ tính mọi hạng: một hạng riêng có quá ít trận mỗi bản đồ.',
   'bracket.mapsAdjusted': 'Lựa chọn cho {rank}: kết quả bản đồ này ở mọi hạng, điều chỉnh theo phong độ của từng chiến binh ở {rank}.',
+  'sheet.close': "Đóng",
+  'sheet.notOwned': "Chưa có",
+  'sheet.owned': "Của bạn · sức mạnh {n}",
+  'sheet.strongAgainst': "Mạnh khi gặp",
+  'sheet.bestWith': "Hợp nhất với",
+  'sheet.trend': "Tỉ lệ thắng, 30 ngày qua",
+  'sheet.counterIt': "Xem ai khắc chế",
 };
 
 export default vi;

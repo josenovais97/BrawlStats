@@ -152,6 +152,13 @@ const ja: UiStrings = {
   'bracket.thin': 'このモードの{rank}のバトルがまだ足りないため、全ランクを表示しています。',
   'bracket.mapsAllRanks': 'マップ別のおすすめは全ランクで集計：1つのランクだけではマップごとのバトルが少なすぎます。',
   'bracket.mapsAdjusted': '{rank}向けのピック：このマップの全ランクの結果を、各キャラの{rank}での成績に合わせて補正しています。',
+  'sheet.close': "閉じる",
+  'sheet.notOwned': "未所持",
+  'sheet.owned': "所持 · パワー{n}",
+  'sheet.strongAgainst': "得意な相手",
+  'sheet.bestWith': "相性の良い味方",
+  'sheet.trend': "勝率（過去30日）",
+  'sheet.counterIt': "苦手な相手を見る",
 };
 
 export default ja;

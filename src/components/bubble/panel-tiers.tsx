@@ -285,7 +285,7 @@ export function PanelTiers({
    * get tapped repeatedly across a draft and a second request would show a
    * spinner for something already on screen a moment ago.
    */
-  const { open, build, cardRef, toggle } = useBuildCard<PanelEntry>();
+  const { open, build, cardRef, toggle, close } = useBuildCard<PanelEntry>();
   const show = (entry: PanelEntry) => {
     if (open?.brawlerId !== entry.brawlerId) {
       panelTrack('panel_build', { tab: 'meta', brawler: entry.brawlerName });
@@ -436,9 +436,11 @@ export function PanelTiers({
             if (next) toggle(next);
           }}
           onPickMap={(modeKey, mapName) => {
+            close();
             choose(modeKey);
             chooseMap(mapName);
           }}
+          onClose={close}
         />
       ) : null}
     </>

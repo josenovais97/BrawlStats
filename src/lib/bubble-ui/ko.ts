@@ -152,6 +152,13 @@ const ko: UiStrings = {
   'bracket.thin': '이 모드의 {rank} 전투가 아직 부족해 전체 랭크를 보여드려요.',
   'bracket.mapsAllRanks': '맵별 추천은 전체 랭크 기준이에요. 한 랭크만으로는 맵당 전투가 너무 적어요.',
   'bracket.mapsAdjusted': '{rank} 추천 픽: 이 맵의 모든 랭크 결과를 각 브롤러의 {rank} 성적에 맞게 보정했어요.',
+  'sheet.close': "닫기",
+  'sheet.notOwned': "미보유",
+  'sheet.owned': "보유 · 파워 {n}",
+  'sheet.strongAgainst': "강한 상대",
+  'sheet.bestWith': "최고의 조합",
+  'sheet.trend': "승률, 최근 30일",
+  'sheet.counterIt': "카운터 보기",
 };
 
 export default ko;

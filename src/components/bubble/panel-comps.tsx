@@ -78,7 +78,7 @@ export function PanelComps({
   const { t, tx, name } = usePanelI18n();
   const modeName = useModeLabel();
   // Tap any brawler in a trio for its build: the same card the Meta tab opens.
-  const { open, build, cardRef, toggle } = useBuildCard<PanelComp['brawlers'][number]>();
+  const { open, build, cardRef, toggle, close } = useBuildCard<PanelComp['brawlers'][number]>();
   const owns = (id: number) => account.owned !== null && canField(account.owned, id, account.filter);
 
   // Same saved mode and map as the Meta tab: the draft is on one map, and
@@ -270,7 +270,7 @@ export function PanelComps({
       {shown.length > 0 ? (
         <p className="px-2 pt-2 text-center text-[10px] text-muted">{t('comps.tapBuild')}</p>
       ) : null}
-      {open ? <BuildCard ref={cardRef} entry={open} build={build} modes={modes} /> : null}
+      {open ? <BuildCard ref={cardRef} entry={open} build={build} modes={modes} onClose={close} /> : null}
     </>
   );
 }

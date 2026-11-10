@@ -152,6 +152,13 @@ const ar: UiStrings = {
   'bracket.thin': 'لا توجد معارك {rank} كافية في هذا النمط بعد — نعرض كل الرتب.',
   'bracket.mapsAllRanks': 'اختيارات الخرائط تحسب كل الرتب: رتبة واحدة فيها معارك قليلة جدًا لكل خريطة.',
   'bracket.mapsAdjusted': 'اختيارات {rank}: نتائج هذه الخريطة في كل الرتب، معدّلة حسب أداء كل بطل في {rank}.',
+  'sheet.close': "إغلاق",
+  'sheet.notOwned': "غير مملوك",
+  'sheet.owned': "لديك · القوة {n}",
+  'sheet.strongAgainst': "قوي ضد",
+  'sheet.bestWith': "الأفضل مع",
+  'sheet.trend': "نسبة الفوز، آخر 30 يومًا",
+  'sheet.counterIt': "اعرض من يتفوق عليه",
 };
 
 export default ar;

@@ -152,6 +152,13 @@ const pl: UiStrings = {
   'bracket.thin': 'Za mało walk na randze {rank} w tym trybie — pokazujemy wszystkie rangi.',
   'bracket.mapsAllRanks': 'Wybory na mapie liczą wszystkie rangi: jedna ranga ma za mało walk na mapę.',
   'bracket.mapsAdjusted': 'Wybory dla {rank}: wyniki tej mapy ze wszystkich rang, dostosowane do formy każdego zadymiarza w {rank}.',
+  'sheet.close': "Zamknij",
+  'sheet.notOwned': "Nie masz",
+  'sheet.owned': "Twój · moc {n}",
+  'sheet.strongAgainst': "Silny przeciw",
+  'sheet.bestWith': "Najlepiej z",
+  'sheet.trend': "Odsetek wygranych, 30 dni",
+  'sheet.counterIt': "Pokaż, kto go kontruje",
 };
 
 export default pl;

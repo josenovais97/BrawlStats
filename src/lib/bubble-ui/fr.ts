@@ -152,6 +152,13 @@ const fr: UiStrings = {
   'bracket.thin': 'Pas encore assez de combats {rank} dans ce mode — tous les rangs affichés.',
   'bracket.mapsAllRanks': 'Les choix par carte comptent tous les rangs : un seul rang a trop peu de combats par carte.',
   'bracket.mapsAdjusted': 'Choix pour {rank} : les résultats de cette carte à tous les rangs, ajustés selon la forme de chaque brawler en {rank}.',
+  'sheet.close': "Fermer",
+  'sheet.notOwned': "Pas débloqué",
+  'sheet.owned': "À toi · puissance {n}",
+  'sheet.strongAgainst': "Fort contre",
+  'sheet.bestWith': "Meilleur avec",
+  'sheet.trend': "Victoires, 30 derniers jours",
+  'sheet.counterIt': "Voir qui le bat",
 };
 
 export default fr;

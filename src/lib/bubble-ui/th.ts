@@ -152,6 +152,13 @@ const th: UiStrings = {
   'bracket.thin': 'โหมดนี้ยังมีการต่อสู้ระดับ {rank} ไม่พอ — กำลังแสดงทุกแรงก์',
   'bracket.mapsAllRanks': 'ตัวเลือกตามแผนที่นับทุกแรงก์: แรงก์เดียวมีการต่อสู้ต่อแผนที่น้อยเกินไป',
   'bracket.mapsAdjusted': 'ตัวเลือกสำหรับ {rank}: ผลของแผนที่นี้จากทุกแรงก์ ปรับตามผลงานของบรอว์เลอร์แต่ละตัวที่ {rank}',
+  'sheet.close': "ปิด",
+  'sheet.notOwned': "ยังไม่มี",
+  'sheet.owned': "ของคุณ · พลัง {n}",
+  'sheet.strongAgainst': "เก่งเมื่อเจอ",
+  'sheet.bestWith': "เข้าคู่ดีกับ",
+  'sheet.trend': "อัตราชนะ 30 วันล่าสุด",
+  'sheet.counterIt': "ดูตัวที่แก้ทาง",
 };
 
 export default th;

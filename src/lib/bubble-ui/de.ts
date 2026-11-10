@@ -152,6 +152,13 @@ const de: UiStrings = {
   'bracket.thin': 'Noch zu wenige {rank}-Kämpfe in diesem Modus – alle Ränge werden gezeigt.',
   'bracket.mapsAllRanks': 'Map-Picks zählen alle Ränge: Ein Rang allein hat zu wenige Kämpfe pro Map.',
   'bracket.mapsAdjusted': 'Picks für {rank}: die Ergebnisse dieser Map aus allen Rängen, angepasst daran, wie jeder Brawler in {rank} abschneidet.',
+  'sheet.close': "Schließen",
+  'sheet.notOwned': "Nicht freigeschaltet",
+  'sheet.owned': "Deiner · Stufe {n}",
+  'sheet.strongAgainst': "Stark gegen",
+  'sheet.bestWith': "Am besten mit",
+  'sheet.trend': "Siegquote, letzte 30 Tage",
+  'sheet.counterIt': "Zeig, was ihn kontert",
 };
 
 export default de;

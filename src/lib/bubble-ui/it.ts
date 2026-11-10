@@ -152,6 +152,13 @@ const it: UiStrings = {
   'bracket.thin': 'Non ci sono ancora abbastanza battaglie {rank} in questa modalità: mostriamo tutti i gradi.',
   'bracket.mapsAllRanks': 'Le scelte per mappa contano tutti i gradi: un solo grado ha troppe poche battaglie per mappa.',
   'bracket.mapsAdjusted': 'Scelte per {rank}: i risultati di questa mappa a tutti i ranghi, adattati a come rende ogni brawler in {rank}.',
+  'sheet.close': "Chiudi",
+  'sheet.notOwned': "Non sbloccato",
+  'sheet.owned': "Tuo · livello {n}",
+  'sheet.strongAgainst': "Forte contro",
+  'sheet.bestWith': "Meglio con",
+  'sheet.trend': "Vittorie, ultimi 30 giorni",
+  'sheet.counterIt': "Mostra chi lo batte",
 };
 
 export default it;

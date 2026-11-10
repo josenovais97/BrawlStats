@@ -152,6 +152,13 @@ const tr: UiStrings = {
   'bracket.thin': 'Bu modda henüz yeterli {rank} maçı yok — tüm rütbeler gösteriliyor.',
   'bracket.mapsAllRanks': 'Harita seçimleri tüm rütbeleri sayar: tek bir rütbede harita başına çok az maç var.',
   'bracket.mapsAdjusted': '{rank} için seçimler: bu haritanın tüm rütbelerdeki sonuçları, her savaşçının {rank} seviyesindeki performansına göre ayarlandı.',
+  'sheet.close': "Kapat",
+  'sheet.notOwned': "Sende yok",
+  'sheet.owned': "Senin · Güç {n}",
+  'sheet.strongAgainst': "Güçlü olduğu rakipler",
+  'sheet.bestWith': "En iyi uyum",
+  'sheet.trend': "Kazanma oranı, son 30 gün",
+  'sheet.counterIt': "Onu yeneni göster",
 };
 
 export default tr;

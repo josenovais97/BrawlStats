@@ -157,6 +157,13 @@ const es: UiStrings = {
   'bracket.thin': 'Aún no hay suficientes combates de {rank} en este modo: se muestran todos los rangos.',
   'bracket.mapsAllRanks': 'Las elecciones por mapa cuentan todos los rangos: un solo rango tiene muy pocos combates por mapa.',
   'bracket.mapsAdjusted': 'Elecciones para {rank}: los resultados de este mapa en todos los rangos, ajustados a cómo rinde cada brawler en {rank}.',
+  'sheet.close': "Cerrar",
+  'sheet.notOwned': "No lo tienes",
+  'sheet.owned': "Tuyo · nivel {n}",
+  'sheet.strongAgainst': "Fuerte contra",
+  'sheet.bestWith': "Mejor con",
+  'sheet.trend': "Victorias, últimos 30 días",
+  'sheet.counterIt': "Ver quién le gana",
 };
 
 export default es;

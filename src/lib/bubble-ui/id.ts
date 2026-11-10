@@ -152,6 +152,13 @@ const id: UiStrings = {
   'bracket.thin': 'Belum cukup pertarungan {rank} di mode ini — menampilkan semua peringkat.',
   'bracket.mapsAllRanks': 'Pilihan peta menghitung semua peringkat: satu peringkat saja terlalu sedikit pertarungan per peta.',
   'bracket.mapsAdjusted': 'Pilihan untuk {rank}: hasil peta ini dari semua rank, disesuaikan dengan performa tiap jagoan di {rank}.',
+  'sheet.close': "Tutup",
+  'sheet.notOwned': "Belum punya",
+  'sheet.owned': "Punyamu · power {n}",
+  'sheet.strongAgainst': "Kuat melawan",
+  'sheet.bestWith': "Terbaik bersama",
+  'sheet.trend': "Win rate, 30 hari terakhir",
+  'sheet.counterIt': "Lihat counter-nya",
 };
 
 export default id;

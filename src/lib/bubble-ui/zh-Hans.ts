@@ -152,6 +152,13 @@ const zhHans: UiStrings = {
   'bracket.thin': '此模式下{rank}段位的对战还不够，正在显示全部段位。',
   'bracket.mapsAllRanks': '地图推荐统计全部段位：单一段位每张地图的对战太少。',
   'bracket.mapsAdjusted': '{rank} 推荐：此地图所有段位的结果，并按每个英雄在 {rank} 的表现调整。',
+  'sheet.close': "关闭",
+  'sheet.notOwned': "未拥有",
+  'sheet.owned': "已拥有 · {n} 级",
+  'sheet.strongAgainst': "克制",
+  'sheet.bestWith': "最佳搭档",
+  'sheet.trend': "胜率（近 30 天）",
+  'sheet.counterIt': "查看谁克制它",
 };
 
 export default zhHans;

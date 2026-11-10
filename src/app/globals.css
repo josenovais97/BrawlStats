@@ -1366,3 +1366,13 @@ html.fx-ready [data-fx='stamp'].fx-in:not(.fx-instant) { animation-name: fx-stam
     animation: none;
   }
 }
+
+/* The Bubble panel's brawler sheet slides up from the bottom (2026-11-10). */
+@keyframes bz-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+.bz-sheet { animation: bz-sheet-up 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .bz-sheet { animation: none; }
+}

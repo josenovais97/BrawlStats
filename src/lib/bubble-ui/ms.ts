@@ -152,6 +152,13 @@ const ms: UiStrings = {
   'bracket.thin': 'Belum cukup pertempuran {rank} dalam mod ini — menunjukkan semua pangkat.',
   'bracket.mapsAllRanks': 'Pilihan peta mengira semua pangkat: satu pangkat sahaja terlalu sedikit pertempuran setiap peta.',
   'bracket.mapsAdjusted': 'Pilihan untuk {rank}: keputusan peta ini dari semua pangkat, dilaraskan mengikut prestasi setiap brawler di {rank}.',
+  'sheet.close': "Tutup",
+  'sheet.notOwned': "Belum dimiliki",
+  'sheet.owned': "Milik anda · kuasa {n}",
+  'sheet.strongAgainst': "Kuat menentang",
+  'sheet.bestWith': "Terbaik bersama",
+  'sheet.trend': "Kadar menang, 30 hari lalu",
+  'sheet.counterIt': "Tunjuk yang mengalahkannya",
 };
 
 export default ms;

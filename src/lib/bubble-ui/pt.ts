@@ -153,6 +153,13 @@ const pt: UiStrings = {
   'bracket.thin': 'Ainda não há batalhas {rank} suficientes neste modo — mostrando todos os ranks.',
   'bracket.mapsAllRanks': 'As escolhas por mapa contam todos os ranks: um rank sozinho tem poucas batalhas por mapa.',
   'bracket.mapsAdjusted': 'Escolhas para {rank}: os resultados deste mapa em todos os ranks, ajustados ao desempenho de cada brawler em {rank}.',
+  'sheet.close': "Fechar",
+  'sheet.notOwned': "Você não tem",
+  'sheet.owned': "Seu · nível {n}",
+  'sheet.strongAgainst': "Forte contra",
+  'sheet.bestWith': "Melhor com",
+  'sheet.trend': "Vitórias, últimos 30 dias",
+  'sheet.counterIt': "Ver quem ganha dele",
 };
 
 export default pt;

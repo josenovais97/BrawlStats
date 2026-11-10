@@ -152,6 +152,13 @@ const ru: UiStrings = {
   'bracket.thin': 'В этом режиме пока мало боёв ранга «{rank}» — показаны все ранги.',
   'bracket.mapsAllRanks': 'Выбор по картам учитывает все ранги: на одном ранге слишком мало боёв на карту.',
   'bracket.mapsAdjusted': 'Выборы для ранга {rank}: результаты этой карты на всех рангах с поправкой на то, как каждый боец играет в {rank}.',
+  'sheet.close': "Закрыть",
+  'sheet.notOwned': "Нет у тебя",
+  'sheet.owned': "Твой · сила {n}",
+  'sheet.strongAgainst': "Силён против",
+  'sheet.bestWith': "Лучше всего с",
+  'sheet.trend': "Процент побед, 30 дней",
+  'sheet.counterIt': "Показать контрпики",
 };
 
 export default ru;

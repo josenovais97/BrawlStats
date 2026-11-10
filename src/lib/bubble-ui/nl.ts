@@ -152,6 +152,13 @@ const nl: UiStrings = {
   'bracket.thin': 'Nog niet genoeg {rank}-potjes in deze modus – alle rangen worden getoond.',
   'bracket.mapsAllRanks': 'Kaartkeuzes tellen alle rangen: één rang alleen heeft te weinig potjes per kaart.',
   'bracket.mapsAdjusted': 'Keuzes voor {rank}: de resultaten van deze kaart over alle rangen, aangepast aan hoe elke knokker het doet in {rank}.',
+  'sheet.close': "Sluiten",
+  'sheet.notOwned': "Niet vrijgespeeld",
+  'sheet.owned': "Van jou · kracht {n}",
+  'sheet.strongAgainst': "Sterk tegen",
+  'sheet.bestWith': "Beste met",
+  'sheet.trend': "Winstratio, laatste 30 dagen",
+  'sheet.counterIt': "Laat zien wat hem verslaat",
 };
 
 export default nl;

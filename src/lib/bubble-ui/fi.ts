@@ -152,6 +152,13 @@ const fi: UiStrings = {
   'bracket.thin': 'Tässä tilassa ei ole vielä tarpeeksi {rank}-otteluita – näytetään kaikki tasot.',
   'bracket.mapsAllRanks': 'Karttavalinnat laskevat kaikki tasot: yhdellä tasolla on liian vähän otteluita karttaa kohden.',
   'bracket.mapsAdjusted': 'Valinnat tasolle {rank}: tämän kartan tulokset kaikilta tasoilta, sovitettuna kunkin rämäpään menestykseen tasolla {rank}.',
+  'sheet.close': "Sulje",
+  'sheet.notOwned': "Ei avattu",
+  'sheet.owned': "Sinun · voima {n}",
+  'sheet.strongAgainst': "Vahva vastaan",
+  'sheet.bestWith': "Paras parina",
+  'sheet.trend': "Voitto-%, 30 päivää",
+  'sheet.counterIt': "Näytä, mikä voittaa sen",
 };
 
 export default fi;

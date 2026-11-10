@@ -152,6 +152,13 @@ const he: UiStrings = {
   'bracket.thin': 'אין עדיין מספיק קרבות {rank} במצב הזה — מוצגות כל הדרגות.',
   'bracket.mapsAllRanks': 'בחירות המפה סופרות את כל הדרגות: לדרגה אחת יש מעט מדי קרבות לכל מפה.',
   'bracket.mapsAdjusted': 'בחירות ל-{rank}: התוצאות של המפה הזו מכל הדרגות, מותאמות לביצועים של כל בראולר ב-{rank}.',
+  'sheet.close': "סגירה",
+  'sheet.notOwned': "לא בבעלותך",
+  'sheet.owned': "שלך · עוצמה {n}",
+  'sheet.strongAgainst': "חזק נגד",
+  'sheet.bestWith': "הכי טוב עם",
+  'sheet.trend': "אחוז ניצחונות, 30 הימים האחרונים",
+  'sheet.counterIt': "הצג מי מנצח אותו",
 };
 
 export default he;
