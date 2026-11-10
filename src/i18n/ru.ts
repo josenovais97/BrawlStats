@@ -5077,4 +5077,6 @@ export const RU: Record<string, string> = {
     "За 30 дней: {n} {n|one:бой|few:боя|many:боёв|other:боя}",
   "{n} games in 30 days":
     "{n} {n|one:бой|few:боя|many:боёв|other:боя} за 30 дней",
+  "See the whole season":
+    "Весь сезон",
 };

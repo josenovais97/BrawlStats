@@ -42,9 +42,15 @@ export function ProfileTabs({ tabs }: { tabs: ProfileTab[] }) {
       const id = window.location.hash.replace('#', '');
       if (tabs.some((t) => t.id === id)) setActive(id);
     };
+    // A link to a tab from inside the page (the Overview's season card)
+    // switches the tab and starts it from the top.
+    const onChange = () => {
+      fromHash();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
     fromHash();
-    window.addEventListener('hashchange', fromHash);
-    return () => window.removeEventListener('hashchange', fromHash);
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
   }, [tabs]);
 
   /*

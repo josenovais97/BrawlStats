@@ -5076,4 +5076,6 @@ export const TR: Record<string, string> = {
     "Son 30 gün: {n} savaş",
   "{n} games in 30 days":
     "30 günde {n} maç",
+  "See the whole season":
+    "Tüm sezonu gör",
 };

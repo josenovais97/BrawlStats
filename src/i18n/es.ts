@@ -5076,4 +5076,6 @@ export const ES: Record<string, string> = {
     "Últimos 30 días: {n} batallas",
   "{n} games in 30 days":
     "{n} partidas en 30 días",
+  "See the whole season":
+    "Ver toda la temporada",
 };

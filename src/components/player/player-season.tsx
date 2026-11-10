@@ -1,6 +1,6 @@
-import { Download, Flame, Snowflake } from 'lucide-react';
+import { ChevronRight, Download, Flame, Snowflake } from 'lucide-react';
 import Image from 'next/image';
-import type { ReactNode } from 'react';
+import { cache, type ReactNode } from 'react';
 import Link from 'next/link';
 
 import { CrownIcon, RankedIcon } from '@/components/game-icons';
@@ -34,6 +34,96 @@ import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import type { BSPlayer } from '@/types/brawlstars';
 
 /**
+ * The season's reads and the view built from them, once per request: the
+ * Ranked tab and the Overview teaser both ask.
+ */
+export const seasonFor = cache(async (tag: string, playerTag: string) => {
+  const state = await getSeasonState().catch(() => null);
+  const season = state?.current ?? state?.latest ?? null;
+  const from = season?.startsOn ?? null;
+  const to = season?.endsOn ?? null;
+  const data = from && to ? await getPlayerRankedSeason(tag, from, to) : null;
+  const log = await getBattleLog(tag)
+    .then((r) => r.items)
+    .catch(() => []);
+  const fromMs = from ? Date.parse(`${from}T00:00:00Z`) : 0;
+  const toMs = to ? Date.parse(`${to}T00:00:00Z`) : Infinity;
+  const logGames = gamesFromLog(log, playerTag).filter((g) => g.time >= fromMs && g.time < toMs);
+  const view = seasonView(data?.rows ?? [], data?.games ?? [], logGames);
+  return { state, season, from, to, data, view };
+});
+
+/**
+ * A card on the Overview tab pointing at the Ranked tab, so the season is
+ * found from the tab people land on. Nothing without Ranked games.
+ */
+export async function SeasonTeaser({
+  player,
+  tag,
+  brawlerMeta,
+}: {
+  player: BSPlayer;
+  tag: string;
+  brawlerMeta: Map<number, BABrawler>;
+}) {
+  const { state, season, view } = await seasonFor(tag, player.tag);
+  if (view.games === 0) return null;
+  const t = getT(requestLocale());
+  const top = view.brawlers[0];
+  const days = state?.current ? state.daysUntilNext : null;
+  return (
+    <a
+      href="#ranked"
+      className="card card-interactive relative isolate flex flex-col gap-4 overflow-hidden p-5 sm:flex-row sm:items-center sm:p-6"
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{ background: 'radial-gradient(70% 120% at 0% 0%, rgb(255 197 61 / 0.2), transparent 60%), radial-gradient(60% 100% at 100% 100%, rgb(139 107 255 / 0.18), transparent 60%)' }}
+      />
+      <div className="min-w-0 flex-1">
+        <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
+          <RankedIcon className="size-4" />
+          {season?.number ? t('Ranked · Season {n}', { n: season.number }) : t('Ranked')}
+          {days !== null && days !== undefined ? (
+            <span className="rounded-full border-2 border-ink bg-brand px-2 py-0.5 text-[11px] text-brand-ink">
+              {days <= 1 ? t('Ends tomorrow') : t('Ends in {n} days', { n: days })}
+            </span>
+          ) : null}
+        </p>
+        <p className="display text-game-stroke mt-1 text-3xl leading-none sm:text-4xl">
+          {season?.number ? t('SEASON {n}', { n: season.number }) : t('MY SEASON')}{' '}
+          <span className="text-brand">{t('WRAPPED')}</span>
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div>
+          <p className="text-xs text-muted">{t('Ranked games')}</p>
+          <p className="display text-2xl leading-none tabular-nums">{formatNumber(view.games)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted">{t('Win rate')}</p>
+          <p className="display text-2xl leading-none text-brand tabular-nums">{formatPercentWhole(view.wins / view.games)}</p>
+        </div>
+        {top ? (
+          <div className="flex items-center gap-2">
+            <BrawlerFace id={top.brawlerId} meta={brawlerMeta} size={40} />
+            <div>
+              <p className="text-xs text-muted">{t('Most played')}</p>
+              <p className="label-game text-base leading-tight">{brawlerName(top.brawlerId, brawlerMeta)}</p>
+            </div>
+          </div>
+        ) : null}
+        <span className="btn-game inline-flex items-center gap-1.5 bg-brand px-4 py-2 text-sm text-brand-ink">
+          {t('See the whole season')}
+          <ChevronRight className="size-4" />
+        </span>
+      </div>
+    </a>
+  );
+}
+
+/**
  * The profile's Ranked tab (2026-11-10): the Bubble app's Season Wrapped as
  * a page. Ranked games only.
  *
@@ -64,24 +154,8 @@ export async function PlayerSeason({
   const fmtDay = (day: string) =>
     new Date(`${day}T00:00:00Z`).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
-  const state = await getSeasonState().catch(() => null);
-  const season = state?.current ?? state?.latest ?? null;
-  const from = season?.startsOn ?? null;
-  const to = season?.endsOn ?? null;
-
-  const data = from && to ? await getPlayerRankedSeason(tag, from, to) : null;
-  const log = await getBattleLog(tag)
-    .then((r) => r.items)
-    .catch(() => []);
-  const fromMs = from ? Date.parse(`${from}T00:00:00Z`) : 0;
-  const toMs = to ? Date.parse(`${to}T00:00:00Z`) : Infinity;
-  const logGames = gamesFromLog(log, player.tag).filter((g) => g.time >= fromMs && g.time < toMs);
-
-  const { hasSeason, brawlers, days, games, wins, recent, detail, detailDays } = seasonView(
-    data?.rows ?? [],
-    data?.games ?? [],
-    logGames,
-  );
+  const { state, season, from, to, data, view } = await seasonFor(tag, player.tag);
+  const { hasSeason, brawlers, days, games, wins, recent, detail, detailDays } = view;
 
   const hasRank = Boolean(player.rankedElo || player.highestAllTimeRankedElo);
   const seasonNo = season?.number ?? null;
