@@ -35,6 +35,7 @@ import { RosterRecorder } from '@/components/player/roster-recorder';
 import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
+import { PlayerSeason } from '@/components/player/player-season';
 import {
   getEventRotation,
   getOfficialBrawlers,
@@ -406,6 +407,39 @@ export default async function PlayerPage({ params }: PageProps) {
         ) : null}            </ProfileGroup>
           ),
         },
+        /*
+         * The Bubble app's Season Wrapped as a tab (2026-11-10): Ranked games
+         * only. Second, because it is the tab people share. Left out for an
+         * account that has never played Ranked rather than shown empty.
+         * Streamed: its reads must never hold up the tab people land on.
+         */
+        ...(player.rankedElo || player.highestAllTimeRankedElo
+          ? [
+              {
+                id: 'ranked',
+                label: t('Ranked'),
+                content: (
+                  <ProfileGroup title={t('Ranked')}>
+                    <Suspense fallback={<div className="skeleton h-[34rem] rounded-2xl" />}>
+                      <PlayerSeason
+                        player={player}
+                        tag={normalizedTag}
+                        brawlerMeta={brawlerMeta}
+                        modeMeta={modeMeta}
+                        averageRate={
+                          new Map(
+                            (hidden?.points ?? [])
+                              .filter((p) => p.winRate !== null)
+                              .map((p) => [p.brawlerId, p.winRate as number]),
+                          )
+                        }
+                      />
+                    </Suspense>
+                  </ProfileGroup>
+                ),
+              },
+            ]
+          : []),
         {
           id: 'account',
           label: t('Account'),

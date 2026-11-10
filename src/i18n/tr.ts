@@ -4916,4 +4916,130 @@ export const TR: Record<string, string> = {
     "Bir etiket kayıtlıyken uygulama, o oyuncunun herkese açık Aşamalı sıralamasını yaklaşık saatte bir, baloncuk ekrandayken de en son Aşamalı maçını iki dakikada bir brawlzone.net'ten ister. Widget'lar, günlük hedef, maç sonu analizi ve bildirimler bu yanıtlardan oluşturulur; bildirimler telefonunda oluşturulur, hiçbir anlık bildirim hizmeti kullanılmaz.",
   "Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.":
     "Eklediğin arkadaşlar da oyuncu etiketleridir, aynı şekilde sorgulanır ve yalnızca telefonunda saklanır. Bir etiket alanına yazılan isim, etiketi bulmak için sitenin oyuncu aramasına gönderilir. Paylaşım kartlarını brawlzone.net aynı herkese açık oyun verilerinden çizer.",
+  "A story-sized card with your rank, record and top brawlers.":
+    "Rütben, skorun ve en iyi savaşçılarınla hikâye boyutunda bir kart.",
+  "All {n} brawlers":
+    "{n} savaşçının hepsi",
+  "Best hour: {hour} ({rate} won)":
+    "En iyi saat: {hour} ({rate} galibiyet)",
+  "Best map":
+    "En iyi harita",
+  "Best teammate":
+    "En iyi takım arkadaşı",
+  "Best teammates":
+    "En iyi takım arkadaşları",
+  "Brawlers on your team, at least 3 games":
+    "Takımındaki savaşçılar, en az 3 maç",
+  "Brawlers played":
+    "Oynanan savaşçılar",
+  "Ends in {n} days":
+    "{n} gün sonra bitiyor",
+  "Ends tomorrow":
+    "Yarın bitiyor",
+  "Enemy brawlers, at least 3 games":
+    "Rakip savaşçılar, en az 3 maç",
+  "From the last {n} Ranked games in the battle log.":
+    "Savaş kaydındaki son {n} Aşamalı maçtan.",
+  "Get the card":
+    "Kartı al",
+  "Last {n} Ranked games":
+    "Son {n} Aşamalı maç",
+  "Last {n} Ranked games, your time":
+    "Son {n} Aşamalı maç, senin saatine göre",
+  "Last {n} days":
+    "Son {n} gün",
+  "Longest losing streak":
+    "En uzun kaybetme serisi",
+  "Loss":
+    "Mağlubiyet",
+  "Win":
+    "Galibiyet",
+  "Modes":
+    "Modlar",
+  "Most games: {hour}":
+    "En çok maç: {hour}",
+  "Most played in Ranked this season":
+    "Bu sezon Aşamalı'da en çok oynananlar",
+  "No Ranked games recorded this season yet.":
+    "Bu sezon henüz kayıtlı Aşamalı maç yok.",
+  "No Ranked games this season yet":
+    "Bu sezon henüz Aşamalı maç yok",
+  "Recorded since {date}.":
+    "{date} tarihinden beri kaydediliyor.",
+  "Season awards":
+    "Sezon ödülleri",
+  "Season over":
+    "Sezon bitti",
+  "Season totals show up here within a few hours.":
+    "Sezon toplamları birkaç saat içinde burada görünür.",
+  "Share your season":
+    "Sezonunu paylaş",
+  "Top 10 brawlers":
+    "En iyi 10 savaşçı",
+  "Toughest opponent":
+    "En zorlu rakip",
+  "Toughest opponents":
+    "En zorlu rakipler",
+  "When you play":
+    "Ne zaman oynuyorsun",
+  "Win rate by day":
+    "Güne göre kazanma oranı",
+  "Your rank and season over the game, live:":
+    "Rütben ve sezonun oyunun üstünde, canlı:",
+  "{games} games":
+    "{games} maç",
+  "{games} games against":
+    "Rakip olarak {games} maç",
+  "{games} games together":
+    "Birlikte {games} maç",
+  "{games} games, {rate} won":
+    "{games} maç, {rate} galibiyet",
+  "{name}: Season Wrapped":
+    "{name}: sezon özeti",
+  "{n} losses in a row":
+    "Üst üste {n} mağlubiyet",
+  "{n} wins in a row":
+    "Üst üste {n} galibiyet",
+  "{n} pts vs average":
+    "Ortalamaya göre {n} puan",
+  "{rate} won against":
+    "Karşısında {rate} galibiyet",
+  "{rate} won together":
+    "Birlikte {rate} galibiyet",
+  "{rate} won · {games} games":
+    "{rate} galibiyet · {games} maç",
+  "{v} elo":
+    "{v} elo",
+  "{w}–{l} · {games} games":
+    "{w}–{l} · {games} maç",
+  "Best day":
+    "En iyi gün",
+  "Busiest day":
+    "En yoğun gün",
+  "Days in a row":
+    "Üst üste gün",
+  "Days played":
+    "Oynanan gün",
+  "Deeper colour: more games":
+    "Koyu renk: daha çok maç",
+  "Longest run of days with a game":
+    "Maç yapılan en uzun gün serisi",
+  "More losses":
+    "Daha çok mağlubiyet",
+  "More wins":
+    "Daha çok galibiyet",
+  "Season calendar":
+    "Sezon takvimi",
+  "{date}: no Ranked games":
+    "{date}: Aşamalı maç yok",
+  "{date}: {games} games, {w}–{l}":
+    "{date}: {games} maç, {w}–{l}",
+  "{games} games, {w}–{l}":
+    "{games} maç, {w}–{l}",
+  "{n} of {total} days played":
+    "{total} günün {n} günü oynandı",
+  "Rank road":
+    "Rütbe yolu",
+  "{change} since {date}":
+    "{date} tarihinden beri {change}",
 };

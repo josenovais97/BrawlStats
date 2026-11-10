@@ -228,6 +228,14 @@ export function partitionRotation<T extends { startTime: string }>(
   return { active, upcoming };
 }
 
+/** Whole percentage in the page's style: "54%", "%54" (tr), "54 %" (fr). */
+export function formatPercentWhole(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return '–';
+  const locale = requestLocale();
+  const n = String(Math.round(value * 100));
+  return locale === 'tr' ? `%${n}` : locale === 'fr' ? `${n} %` : `${n}%`;
+}
+
 /** Percentage with one decimal, e.g. 0.5432 -> "54.3%". */
 export function formatPercent(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '–';

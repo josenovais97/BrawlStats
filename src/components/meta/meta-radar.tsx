@@ -82,7 +82,6 @@ export function MetaRadar({
   bare?: boolean;
 }) {
   const t = useT();
-  const lp = useLp();
   const [openId, setOpenId] = useState<number | null>(null);
 
   const layout = useMemo(() => {
@@ -406,7 +405,7 @@ export function MetaRadar({
                 */}
                 {face && point.imageUrl ? (
                   <image
-                    href={lp(point.imageUrl)}
+                    href={point.imageUrl}
                     x={cx - r}
                     y={cy - r}
                     width={r * 2}

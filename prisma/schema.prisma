@@ -189,6 +189,9 @@ model BattleTeamSample {
   createdAt       DateTime @default(now()) @map("created_at")
 
   @@index([battleTime])
+  // Plus battle_team_samples_ranked_player_idx (player_tag, battle_time) WHERE
+  // battle_type is Ranked, for the profile's Ranked tab. Partial, so it is
+  // only in migration 20261110120000; Prisma cannot describe it here.
   @@map("battle_team_samples")
 }
 

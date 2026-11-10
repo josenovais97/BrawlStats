@@ -4916,4 +4916,130 @@ export const ES: Record<string, string> = {
     "Con un tag guardado, la app pide a brawlzone.net la clasificación pública de Competitivo de ese jugador más o menos una vez por hora, y la última partida de Competitivo cada dos minutos mientras la burbuja está en pantalla. Con esas respuestas se hacen los widgets, el objetivo diario, la revisión de después de la partida y las notificaciones; las notificaciones se crean en tu móvil, sin ningún servicio push.",
   "Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.":
     "Los amigos que añades también son tags de jugador, se consultan igual y solo se guardan en tu móvil. Un nombre escrito en un campo de tag se envía al buscador de jugadores del sitio para encontrar el tag. Las tarjetas para compartir las dibuja brawlzone.net con los mismos datos públicos del juego.",
+  "A story-sized card with your rank, record and top brawlers.":
+    "Una tarjeta tamaño historia con tu rango, tu récord y tus mejores brawlers.",
+  "All {n} brawlers":
+    "Los {n} brawlers",
+  "Best hour: {hour} ({rate} won)":
+    "Mejor hora: {hour} ({rate} ganadas)",
+  "Best map":
+    "Mejor mapa",
+  "Best teammate":
+    "Mejor compañero",
+  "Best teammates":
+    "Mejores compañeros",
+  "Brawlers on your team, at least 3 games":
+    "Brawlers de tu equipo, mínimo 3 partidas",
+  "Brawlers played":
+    "Brawlers usados",
+  "Ends in {n} days":
+    "Termina en {n} días",
+  "Ends tomorrow":
+    "Termina mañana",
+  "Enemy brawlers, at least 3 games":
+    "Brawlers rivales, mínimo 3 partidas",
+  "From the last {n} Ranked games in the battle log.":
+    "De las últimas {n} partidas de Competitivo del registro de batallas.",
+  "Get the card":
+    "Descargar tarjeta",
+  "Last {n} Ranked games":
+    "Últimas {n} partidas de Competitivo",
+  "Last {n} Ranked games, your time":
+    "Últimas {n} partidas de Competitivo, en tu hora",
+  "Last {n} days":
+    "Últimos {n} días",
+  "Longest losing streak":
+    "Racha de derrotas más larga",
+  "Loss":
+    "Derrota",
+  "Win":
+    "Victoria",
+  "Modes":
+    "Modos",
+  "Most games: {hour}":
+    "Más partidas: {hour}",
+  "Most played in Ranked this season":
+    "Los más jugados en Competitivo esta temporada",
+  "No Ranked games recorded this season yet.":
+    "Todavía no hay partidas de Competitivo registradas esta temporada.",
+  "No Ranked games this season yet":
+    "Aún no hay partidas de Competitivo esta temporada",
+  "Recorded since {date}.":
+    "Registrado desde el {date}.",
+  "Season awards":
+    "Premios de la temporada",
+  "Season over":
+    "Temporada terminada",
+  "Season totals show up here within a few hours.":
+    "Los totales de la temporada aparecen aquí en unas horas.",
+  "Share your season":
+    "Comparte tu temporada",
+  "Top 10 brawlers":
+    "Top 10 brawlers",
+  "Toughest opponent":
+    "Rival más duro",
+  "Toughest opponents":
+    "Rivales más duros",
+  "When you play":
+    "Cuándo juegas",
+  "Win rate by day":
+    "Tasa de victorias por día",
+  "Your rank and season over the game, live:":
+    "Tu rango y tu temporada sobre el juego, en vivo:",
+  "{games} games":
+    "{games} partidas",
+  "{games} games against":
+    "{games} partidas como rival",
+  "{games} games together":
+    "{games} partidas juntos",
+  "{games} games, {rate} won":
+    "{games} partidas, {rate} ganadas",
+  "{name}: Season Wrapped":
+    "{name}: la temporada en resumen",
+  "{n} losses in a row":
+    "{n} derrotas seguidas",
+  "{n} wins in a row":
+    "{n} victorias seguidas",
+  "{n} pts vs average":
+    "{n} pts vs. promedio",
+  "{rate} won against":
+    "{rate} ganadas contra él",
+  "{rate} won together":
+    "{rate} ganadas juntos",
+  "{rate} won · {games} games":
+    "{rate} ganadas · {games} partidas",
+  "{v} elo":
+    "{v} elo",
+  "{w}–{l} · {games} games":
+    "{w}–{l} · {games} partidas",
+  "Best day":
+    "Mejor día",
+  "Busiest day":
+    "Día con más partidas",
+  "Days in a row":
+    "Días seguidos",
+  "Days played":
+    "Días jugados",
+  "Deeper colour: more games":
+    "Color más intenso: más partidas",
+  "Longest run of days with a game":
+    "La racha más larga de días con alguna partida",
+  "More losses":
+    "Más derrotas",
+  "More wins":
+    "Más victorias",
+  "Season calendar":
+    "Calendario de la temporada",
+  "{date}: no Ranked games":
+    "{date}: sin partidas de Competitivo",
+  "{date}: {games} games, {w}–{l}":
+    "{date}: {games} partidas, {w}–{l}",
+  "{games} games, {w}–{l}":
+    "{games} partidas, {w}–{l}",
+  "{n} of {total} days played":
+    "{n} de {total} días jugados",
+  "Rank road":
+    "Camino de rangos",
+  "{change} since {date}":
+    "{change} desde el {date}",
 };

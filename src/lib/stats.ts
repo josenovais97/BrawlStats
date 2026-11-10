@@ -2,6 +2,7 @@ import 'server-only';
 
 import { isListedMode } from '@/lib/battle-mode';
 import { solveEloRate, type EloRate } from '@/lib/ranked-elo';
+import { dayBefore, dayRange, type RankedGame } from '@/lib/ranked-season';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 
 import { unstable_cache } from 'next/cache';
@@ -5729,8 +5730,12 @@ export const getRankedEloRates = cachedRead('ranked-elo-rates', compute_getRanke
 /**
  * One player's Ranked games over a date range, per brawler (1.40), for the
  * Bubble app's Season Wrapped card. From player_battle_daily (kept 45 days,
- * so a whole season), so only for players the sampler has visited. About 3 s:
- * the table is keyed by day first, and this is asked once per shared card.
+ * so a whole season), so only for players the sampler has visited.
+ *
+ * The days are listed (`day = ANY`) rather than given as a range: the key is
+ * (day, player_tag, ...), and a range made Postgres read every player's rows
+ * for the whole season, ~5.5 s, where a list is one index probe per day,
+ * ~80 ms (measured 2026-11-10).
  */
 export async function getPlayerSeasonStats(
   tag: string,
@@ -5740,10 +5745,12 @@ export async function getPlayerSeasonStats(
   const prisma = getPrisma();
   if (!prisma) return null;
   try {
+    const days = seasonDays(from, to);
+    if (days.length === 0) return null;
     const rows = await prisma.$queryRaw<{ brawler_id: number; games: bigint; wins: bigint }[]>`
       SELECT brawler_id, SUM(competitive_decided) AS games, SUM(competitive_wins) AS wins
       FROM player_battle_daily
-      WHERE player_tag = ${tag} AND day >= ${from}::date AND day < ${to}::date
+      WHERE day = ANY(${days}::date[]) AND player_tag = ${tag}
       GROUP BY brawler_id
     `;
     const byBrawler = rows
@@ -5755,6 +5762,100 @@ export async function getPlayerSeasonStats(
     return { games, wins: byBrawler.reduce((n, r) => n + r.wins, 0), byBrawler };
   } catch (error) {
     swallow('getPlayerSeasonStats', error);
+    return null;
+  }
+}
+
+/** Days from `from` up to today or the exclusive `to`, whichever is first. */
+function seasonDays(from: string, to: string): string[] {
+  const today = new Date().toISOString().slice(0, 10);
+  const last = dayBefore(to) < today ? dayBefore(to) : today;
+  return last < from ? [] : dayRange(from, last);
+}
+
+export interface PlayerRankedSeasonData {
+  /** Season totals per day and brawler (Ranked games only). */
+  rows: { day: string; brawlerId: number; games: number; wins: number }[];
+  /** First season day the sampler saw this account play anything at all. */
+  firstSeen: string | null;
+  /** Single Ranked games kept raw (about two weeks), newest first. */
+  games: RankedGame[];
+  /** Daily elo readings from profile views this season. */
+  elo: { day: string; elo: number }[];
+  /** Whether the account is in the sampling pool. */
+  sampled: boolean;
+}
+
+/**
+ * Everything the profile's Ranked tab reads for one player (2026-11-10).
+ *
+ * Four small reads, one after another so the page keeps to one connection:
+ * the day totals by listed days (see getPlayerSeasonStats), the raw games
+ * through the partial index on battle_team_samples (player_tag, battle_time)
+ * for Ranked rows, the elo readings by their (player_tag, recorded_on) key,
+ * and the pool row by its key. Measured well under 100 ms together.
+ */
+export async function getPlayerRankedSeason(tag: string, from: string, to: string): Promise<PlayerRankedSeasonData | null> {
+  const prisma = getPrisma();
+  if (!prisma || isOptedOut(tag)) return null;
+  try {
+    const days = seasonDays(from, to);
+    if (days.length === 0) return null;
+    const daily = await prisma.$queryRaw<{ day: string; brawler_id: number; battles: number; games: number; wins: number }[]>`
+      SELECT day::text AS day, brawler_id, battles, competitive_decided AS games, competitive_wins AS wins
+      FROM player_battle_daily
+      WHERE day = ANY(${days}::date[]) AND player_tag = ${tag}
+    `;
+    // Raw rows are kept about two weeks; never earlier than the season.
+    const since = new Date(Math.max(Date.parse(`${from}T00:00:00Z`), Date.now() - 20 * 86_400_000));
+    // The battle_type list is written out, not passed in: Postgres only uses
+    // a partial index when it can see the query asks for the same rows.
+    const raw = await prisma.$queryRaw<{
+      battle_time: Date;
+      brawler_id: number;
+      result: string;
+      mode: string;
+      map_name: string | null;
+      ally_brawler_ids: number[];
+      enemy_brawler_ids: number[];
+    }[]>`
+      SELECT battle_time, brawler_id, result, mode, map_name, ally_brawler_ids, enemy_brawler_ids
+      FROM battle_team_samples
+      WHERE player_tag = ${tag}
+        AND battle_type IN ('soloRanked', 'teamRanked')
+        AND battle_time >= ${since}
+        AND result IN ('victory', 'defeat')
+      ORDER BY battle_time DESC
+      LIMIT 2000
+    `;
+    const elo = await prisma.$queryRaw<{ day: string; elo: number }[]>`
+      SELECT recorded_on::text AS day, ranked_elo AS elo
+      FROM player_trophy_points
+      WHERE player_tag = ${tag} AND recorded_on >= ${from}::date AND ranked_elo IS NOT NULL
+      ORDER BY recorded_on
+    `;
+    const member = await prisma.sampledPlayer.findUnique({ where: { tag }, select: { tag: true } });
+
+    const seen = daily.filter((r) => Number(r.battles) > 0).map((r) => r.day).sort();
+    return {
+      rows: daily
+        .filter((r) => Number(r.games) > 0)
+        .map((r) => ({ day: r.day, brawlerId: r.brawler_id, games: Number(r.games), wins: Number(r.wins) })),
+      firstSeen: seen[0] ?? null,
+      games: raw.map((r) => ({
+        time: r.battle_time.getTime(),
+        brawlerId: r.brawler_id,
+        win: r.result === 'victory',
+        mode: r.mode,
+        map: r.map_name,
+        allies: r.ally_brawler_ids ?? [],
+        enemies: r.enemy_brawler_ids ?? [],
+      })),
+      elo: elo.map((r) => ({ day: r.day, elo: Number(r.elo) })),
+      sampled: member !== null,
+    };
+  } catch (error) {
+    swallow('getPlayerRankedSeason', error);
     return null;
   }
 }

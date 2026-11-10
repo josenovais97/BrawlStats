@@ -4917,4 +4917,130 @@ export const RU: Record<string, string> = {
     "Если тег сохранён, приложение примерно раз в час запрашивает у brawlzone.net публичный ранговый статус этого игрока, а пока пузырь на экране — каждые две минуты последний ранговый бой. Из этих ответов строятся виджеты, дневная цель, разбор после боя и уведомления; уведомления создаются на твоём телефоне, без push-сервиса.",
   "Friends you add are player tags too, looked up the same way and kept only on your phone. A name typed into a tag field is sent to the site's player search to find the tag. Share cards are drawn by brawlzone.net from the same public game data.":
     "Друзья, которых ты добавляешь, — это тоже теги игроков: они запрашиваются так же и хранятся только на твоём телефоне. Ник, введённый в поле тега, отправляется в поиск игроков на сайте, чтобы найти тег. Карточки для публикации рисует brawlzone.net из тех же публичных игровых данных.",
+  "A story-sized card with your rank, record and top brawlers.":
+    "Карточка для сторис с твоим рангом, результатами и лучшими бойцами.",
+  "All {n} brawlers":
+    "Все бойцы ({n})",
+  "Best hour: {hour} ({rate} won)":
+    "Лучший час: {hour} ({rate} побед)",
+  "Best map":
+    "Лучшая карта",
+  "Best teammate":
+    "Лучший союзник",
+  "Best teammates":
+    "Лучшие союзники",
+  "Brawlers on your team, at least 3 games":
+    "Бойцы в твоей команде, от 3 боёв",
+  "Brawlers played":
+    "Разных бойцов",
+  "Ends in {n} days":
+    "Конец через {n} {n|one:день|few:дня|many:дней|other:дня}",
+  "Ends tomorrow":
+    "Заканчивается завтра",
+  "Enemy brawlers, at least 3 games":
+    "Бойцы соперников, от 3 боёв",
+  "From the last {n} Ranked games in the battle log.":
+    "По последним ранговым боям в журнале: {n}.",
+  "Get the card":
+    "Скачать карточку",
+  "Last {n} Ranked games":
+    "Последние ранговые бои: {n}",
+  "Last {n} Ranked games, your time":
+    "Последние ранговые бои: {n}, по твоему времени",
+  "Last {n} days":
+    "Последние {n} {n|one:день|few:дня|many:дней|other:дня}",
+  "Longest losing streak":
+    "Самая длинная серия поражений",
+  "Loss":
+    "Поражение",
+  "Win":
+    "Победа",
+  "Modes":
+    "Режимы",
+  "Most games: {hour}":
+    "Больше всего боёв: {hour}",
+  "Most played in Ranked this season":
+    "Чаще всего в ранговых боях за сезон",
+  "No Ranked games recorded this season yet.":
+    "В этом сезоне ранговых боёв пока не записано.",
+  "No Ranked games this season yet":
+    "В этом сезоне ещё нет ранговых боёв",
+  "Recorded since {date}.":
+    "Записывается с {date}.",
+  "Season awards":
+    "Награды сезона",
+  "Season over":
+    "Сезон окончен",
+  "Season totals show up here within a few hours.":
+    "Итоги сезона появятся здесь через несколько часов.",
+  "Share your season":
+    "Поделись сезоном",
+  "Top 10 brawlers":
+    "Топ-10 бойцов",
+  "Toughest opponent":
+    "Самый трудный соперник",
+  "Toughest opponents":
+    "Самые трудные соперники",
+  "When you play":
+    "Когда ты играешь",
+  "Win rate by day":
+    "Процент побед по дням",
+  "Your rank and season over the game, live:":
+    "Твой ранг и сезон поверх игры, вживую:",
+  "{games} games":
+    "{games} {games|one:бой|few:боя|many:боёв|other:боя}",
+  "{games} games against":
+    "{games} {games|one:бой|few:боя|many:боёв|other:боя} в команде соперника",
+  "{games} games together":
+    "{games} {games|one:бой|few:боя|many:боёв|other:боя} вместе",
+  "{games} games, {rate} won":
+    "Боёв: {games}, побед {rate}",
+  "{name}: Season Wrapped":
+    "{name}: итоги сезона",
+  "{n} losses in a row":
+    "{n} {n|one:поражение|few:поражения|many:поражений|other:поражения} подряд",
+  "{n} wins in a row":
+    "{n} {n|one:победа|few:победы|many:побед|other:победы} подряд",
+  "{n} pts vs average":
+    "{n} п. к среднему",
+  "{rate} won against":
+    "{rate} побед против него",
+  "{rate} won together":
+    "{rate} побед вместе",
+  "{rate} won · {games} games":
+    "{rate} побед · {games} {games|one:бой|few:боя|many:боёв|other:боя}",
+  "{v} elo":
+    "{v} эло",
+  "{w}–{l} · {games} games":
+    "{w}–{l} · {games} {games|one:бой|few:боя|many:боёв|other:боя}",
+  "Best day":
+    "Лучший день",
+  "Busiest day":
+    "Самый активный день",
+  "Days in a row":
+    "Дней подряд",
+  "Days played":
+    "Игровых дней",
+  "Deeper colour: more games":
+    "Ярче цвет: больше боёв",
+  "Longest run of days with a game":
+    "Самая длинная серия дней с боями",
+  "More losses":
+    "Больше поражений",
+  "More wins":
+    "Больше побед",
+  "Season calendar":
+    "Календарь сезона",
+  "{date}: no Ranked games":
+    "{date}: ранговых боёв нет",
+  "{date}: {games} games, {w}–{l}":
+    "{date}: {games} {games|one:бой|few:боя|many:боёв|other:боя}, {w}–{l}",
+  "{games} games, {w}–{l}":
+    "{games} {games|one:бой|few:боя|many:боёв|other:боя}, {w}–{l}",
+  "{n} of {total} days played":
+    "Сыграно {n} из {total} дн.",
+  "Rank road":
+    "Путь по рангам",
+  "{change} since {date}":
+    "{change} с {date}",
 };
