@@ -5079,4 +5079,26 @@ export const RU: Record<string, string> = {
     "{n} {n|one:бой|few:боя|many:боёв|other:боя} за 30 дней",
   "See the whole season":
     "Весь сезон",
+  "Meta at a glance":
+    "Мета с первого взгляда",
+  "Tier spread":
+    "Распределение по тирам",
+  "{n} brawlers rated":
+    "Оценено бойцов: {n}",
+  "Classes in S and A":
+    "Классы в тирах S и A",
+  "Best pick in each mode":
+    "Лучший пик в каждом режиме",
+  "Best with":
+    "Лучше всего с",
+  "Could not load the details. Try again in a moment.":
+    "Не удалось загрузить подробности. Попробуй чуть позже.",
+  "Full brawler page":
+    "Полная страница бойца",
+  "Most used build":
+    "Самая популярная сборка",
+  "Worst maps":
+    "Худшие карты",
+  "{change} win rate":
+    "{change} к проценту побед",
 };

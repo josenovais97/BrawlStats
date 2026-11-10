@@ -3,7 +3,7 @@
 import { ArrowDown, LayoutGrid, Rows3, Search, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useMemo, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, useSyncExternalStore, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 
 import { useLocale } from '@/components/i18n/use-locale';
 import { useLp } from '@/components/i18n/use-lp';
@@ -12,7 +12,10 @@ import { NUMBER_LOCALE, type Locale } from '@/lib/i18n';
 import { readRosters, saveRoster, serverRosters, subscribeRosters } from '@/lib/roster';
 import { normalizeTag } from '@/lib/tags';
 import { TIER_COLOR, TIER_ORDER } from '@/lib/tiers';
+import type { TierBrawlerDetail } from '@/lib/tier-brawler';
 import type { Tier } from '@/types/stats';
+
+import { TierDrawer } from './tier-drawer';
 
 /** What the toolbar needs of each rated brawler. */
 export interface TierToolEntry {
@@ -47,7 +50,16 @@ function percent(value: number | null, locale: Locale): string {
  * drawn here from the same numbers. Owned brawlers come from the rosters the
  * profile page saves in this browser (lib/roster), or from a tag typed here.
  */
-export function TierTools({ entries, children }: { entries: TierToolEntry[]; children: ReactNode }) {
+export function TierTools({
+  entries,
+  modes,
+  children,
+}: {
+  entries: TierToolEntry[];
+  /** On the Ranked list, its modes: the panel leaves the rest out. */
+  modes?: string[];
+  children: ReactNode;
+}) {
   const t = useT();
   const lp = useLp();
   const locale = useLocale();
@@ -60,6 +72,8 @@ export function TierTools({ entries, children }: { entries: TierToolEntry[]; chi
   const [tag, setTag] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [sort, setSort] = useState<SortKey>('score');
+  const [openId, setOpenId] = useState<number | null>(null);
+  const [details, setDetails] = useState<Record<number, TierBrawlerDetail | 'failed'>>({});
 
   const roster = rosters.find((r) => r.tag === chosen) ?? rosters[0] ?? null;
   const owned = useMemo(() => {
@@ -108,6 +122,29 @@ export function TierTools({ entries, children }: { entries: TierToolEntry[]; chi
   }, [visible, sort]);
   const rank = useMemo(() => new Map([...entries].sort((a, b) => (b.score ?? -1) - (a.score ?? -1)).map((e, i) => [e.id, i + 1])), [entries]);
 
+  const byId = useMemo(() => new Map(entries.map((e) => [e.id, e])), [entries]);
+  const close = useCallback(() => setOpenId(null), []);
+
+  /* The panel opens on a plain tap of a chip or a table name; a tap with a
+     modifier key, or no script at all, still follows the link. */
+  function open(id: number) {
+    setOpenId(id);
+    if (details[id]) return;
+    fetch(`/api/tier-brawler/${id}?lang=${locale}${modes?.length ? `&modes=${modes.join(',')}` : ''}`)
+      .then((r) => (r.ok ? (r.json() as Promise<TierBrawlerDetail>) : Promise.reject(new Error(String(r.status)))))
+      .then((d) => setDetails((prev) => ({ ...prev, [id]: d })))
+      .catch(() => setDetails((prev) => ({ ...prev, [id]: 'failed' })));
+  }
+  function onClickCapture(event: MouseEvent<HTMLDivElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const el = (event.target as HTMLElement).closest<HTMLElement>('[data-bid]');
+    const id = el ? Number(el.dataset.bid) : NaN;
+    if (!el || !byId.has(id)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    open(id);
+  }
+
   async function addTag(event: FormEvent) {
     event.preventDefault();
     const clean = normalizeTag(tag);
@@ -134,7 +171,7 @@ export function TierTools({ entries, children }: { entries: TierToolEntry[]; chi
   }
 
   return (
-    <div id="tier-tools" className="space-y-4">
+    <div id="tier-tools" className="space-y-4" onClickCapture={onClickCapture}>
       {rule ? <style>{rule}</style> : null}
 
       <div className="card flex flex-col gap-3 p-3 sm:p-4 lg:flex-row lg:items-center">
@@ -259,7 +296,7 @@ export function TierTools({ entries, children }: { entries: TierToolEntry[]; chi
                 <tr key={e.id} className="border-b border-border/40 last:border-0 hover:bg-surface-2/50">
                   <td className="py-1.5 pl-3 pr-1 tabular-nums text-muted">{rank.get(e.id)}</td>
                   <td className="px-2 py-1.5">
-                    <Link href={lp(e.href)} className="flex items-center gap-2.5 font-bold hover:text-brand">
+                    <Link href={lp(e.href)} data-bid={e.id} className="flex min-w-0 items-center gap-2.5 font-bold hover:text-brand">
                       {e.image ? (
                         <Image
                           src={e.image}
@@ -290,6 +327,17 @@ export function TierTools({ entries, children }: { entries: TierToolEntry[]; chi
           </table>
           {rows.length === 0 ? <p className="p-6 text-center text-sm text-muted">{t('No brawlers match “{query}”.', { query })}</p> : null}
         </div>
+      ) : null}
+
+      {openId !== null && byId.has(openId) ? (
+        <TierDrawer
+          entry={byId.get(openId)!}
+          detail={details[openId] && details[openId] !== 'failed' ? (details[openId] as TierBrawlerDetail) : null}
+          failed={details[openId] === 'failed'}
+          locale={locale}
+          href={lp(byId.get(openId)!.href)}
+          onClose={close}
+        />
       ) : null}
     </div>
   );

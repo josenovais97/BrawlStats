@@ -6566,6 +6566,36 @@ export async function getLadderMapForm(): Promise<Map<string, MapForm[]>> {
 }
 export const getDailyDiscoveries = cachedRead('daily-discoveries', compute_getDailyDiscoveries);
 export const getBrawlerTrend = cachedRead('brawler-trend', compute_getBrawlerTrend);
+
+/**
+ * Every brawler's adjusted Ranked win rate per day, for the tier list's
+ * trend lines (2026-11-10): one read of the stored daily snapshots
+ * (competitive only, like getBrawlerTrend) instead of a hundred.
+ */
+async function compute_getRankedTrends(days = 14): Promise<Record<number, [string, number][]>> {
+  const prisma = getPrisma();
+  const out: Record<number, [string, number][]> = {};
+  if (!prisma) return out;
+  try {
+    const since = new Date(Date.now() - days * 86_400_000);
+    const rows = await prisma.brawlerStat.findMany({
+      where: { snapshotDate: { gte: since } },
+      orderBy: { snapshotDate: 'asc' },
+      select: { brawlerId: true, snapshotDate: true, winRate: true, baselineWinRate: true, decidedSampleSize: true },
+    });
+    for (const row of rows) {
+      const adjusted = normalizeWinRate(row.winRate, row.baselineWinRate, row.decidedSampleSize);
+      if (adjusted === null) continue;
+      (out[row.brawlerId] ??= []).push([toIsoDate(row.snapshotDate), adjusted]);
+    }
+    return out;
+  } catch (error) {
+    swallow('compute_getRankedTrends', error);
+    return out;
+  }
+}
+
+export const getRankedTrends = cachedRead('ranked-trends', compute_getRankedTrends);
 const cachedBrawlerBuffies = cachedRead('brawler-buffies', compute_getBrawlerBuffies);
 
 /** A brawler's buffies: from the precomputed table of all of them, else live. */

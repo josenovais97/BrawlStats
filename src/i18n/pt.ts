@@ -5078,4 +5078,26 @@ export const PT: Record<string, string> = {
     "{n} partidas em 30 dias",
   "See the whole season":
     "Ver a temporada toda",
+  "Meta at a glance":
+    "O meta num relance",
+  "Tier spread":
+    "Distribuição por tier",
+  "{n} brawlers rated":
+    "{n} brawlers avaliados",
+  "Classes in S and A":
+    "Classes no S e no A",
+  "Best pick in each mode":
+    "A melhor escolha de cada modo",
+  "Best with":
+    "Melhor com",
+  "Could not load the details. Try again in a moment.":
+    "Não foi possível carregar os detalhes. Tente de novo daqui a pouco.",
+  "Full brawler page":
+    "Página completa do brawler",
+  "Most used build":
+    "Build mais usada",
+  "Worst maps":
+    "Piores mapas",
+  "{change} win rate":
+    "{change} na taxa de vitória",
 };

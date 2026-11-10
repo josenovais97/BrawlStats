@@ -544,4 +544,28 @@ export const CLIENT_RU: Record<string, string> = {
     "За 30 дней: {n} {n|one:бой|few:боя|many:боёв|other:боя}",
   "{n} games in 30 days":
     "{n} {n|one:бой|few:боя|many:боёв|other:боя} за 30 дней",
+  "Best with":
+    "Лучше всего с",
+  "Could not load the details. Try again in a moment.":
+    "Не удалось загрузить подробности. Попробуй чуть позже.",
+  "Full brawler page":
+    "Полная страница бойца",
+  "Most used build":
+    "Самая популярная сборка",
+  "Worst maps":
+    "Худшие карты",
+  "{change} win rate":
+    "{change} к проценту побед",
+  "Best modes":
+    "Лучшие режимы",
+  "Best maps":
+    "Лучшие карты",
+  "Strong against":
+    "Силён против",
+  "Weak against":
+    "Слаб против",
+  "Last 30 days":
+    "Последние 30 дней",
+  "Pick rate":
+    "Частота выбора",
 };

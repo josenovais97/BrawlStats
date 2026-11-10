@@ -544,4 +544,28 @@ export const CLIENT_TR: Record<string, string> = {
     "Son 30 gün: {n} savaş",
   "{n} games in 30 days":
     "30 günde {n} maç",
+  "Best with":
+    "En iyi uyum",
+  "Could not load the details. Try again in a moment.":
+    "Ayrıntılar yüklenemedi. Biraz sonra tekrar dene.",
+  "Full brawler page":
+    "Savaşçının tam sayfası",
+  "Most used build":
+    "En çok kullanılan build",
+  "Worst maps":
+    "En kötü haritalar",
+  "{change} win rate":
+    "Kazanma oranı {change}",
+  "Best modes":
+    "En iyi modlar",
+  "Best maps":
+    "En iyi haritalar",
+  "Strong against":
+    "Güçlü olduğu rakipler",
+  "Weak against":
+    "Zayıf olduğu rakipler",
+  "Last 30 days":
+    "Son 30 gün",
+  "Pick rate":
+    "Seçilme oranı",
 };

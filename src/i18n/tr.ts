@@ -5078,4 +5078,26 @@ export const TR: Record<string, string> = {
     "30 günde {n} maç",
   "See the whole season":
     "Tüm sezonu gör",
+  "Meta at a glance":
+    "Bir bakışta meta",
+  "Tier spread":
+    "Kademe dağılımı",
+  "{n} brawlers rated":
+    "{n} savaşçı puanlandı",
+  "Classes in S and A":
+    "S ve A'daki sınıflar",
+  "Best pick in each mode":
+    "Her modda en iyi seçim",
+  "Best with":
+    "En iyi uyum",
+  "Could not load the details. Try again in a moment.":
+    "Ayrıntılar yüklenemedi. Biraz sonra tekrar dene.",
+  "Full brawler page":
+    "Savaşçının tam sayfası",
+  "Most used build":
+    "En çok kullanılan build",
+  "Worst maps":
+    "En kötü haritalar",
+  "{change} win rate":
+    "Kazanma oranı {change}",
 };

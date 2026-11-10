@@ -1016,4 +1016,28 @@ export const CLIENT_PT: Record<string, string> = {
     "Últimos 30 dias: {n} batalhas",
   "{n} games in 30 days":
     "{n} partidas em 30 dias",
+  "Best with":
+    "Melhor com",
+  "Could not load the details. Try again in a moment.":
+    "Não foi possível carregar os detalhes. Tente de novo daqui a pouco.",
+  "Full brawler page":
+    "Página completa do brawler",
+  "Most used build":
+    "Build mais usada",
+  "Worst maps":
+    "Piores mapas",
+  "{change} win rate":
+    "{change} na taxa de vitória",
+  "Best modes":
+    "Melhores modos",
+  "Best maps":
+    "Melhores mapas",
+  "Strong against":
+    "Forte contra",
+  "Weak against":
+    "Fraco contra",
+  "Last 30 days":
+    "Últimos 30 dias",
+  "Pick rate":
+    "Taxa de escolha",
 };

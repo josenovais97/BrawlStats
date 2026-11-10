@@ -36,7 +36,7 @@ import { LanguageLinks } from '@/components/i18n/language-links';
 import { fmtDate, fmtDecimal, fmtNumber, fmtPercent, localePath, rankLabel, ruPlural, spanText, type Locale } from '@/lib/i18n';
 import { gameWords } from '@/lib/i18n-game';
 import { RankedMapSwitch, type MapRows } from '@/components/tier-list/ranked-map-switch';
-import { brawlerIconUrl, getGameModeMap } from '@/lib/brawlapi';
+import { brawlerIconUrl, getGameModeMap, realBrawlerClass } from '@/lib/brawlapi';
 import { isFramedTile } from '@/lib/brawlapi';
 import { brawlerPath } from '@/lib/slugs';
 import { bracketTierListHref, tierListHref } from '@/lib/tier-list-route';
@@ -59,14 +59,16 @@ import {
   getBrawlerStatsForWindow,
   getFilterableModes,
   getLastAggregationRun,
+  getBestPicksByMode,
   getMetaMovers,
   getRankedMapPicks,
+  getRankedTrends,
   getScoredRoster,
   type TierFormat,
   type TierWindowKey,
 } from '@/lib/stats';
 import type { BABrawler } from '@/types/brawlapi';
-import type { Tier, TierListEntry } from '@/types/stats';
+import type { ModeBestPicks, Tier, TierListEntry } from '@/types/stats';
 import { getBrawlerArtMap } from '@/lib/brawler-catalog';
 import { YoutubeCard } from '@/components/youtube-card';
 
@@ -223,6 +225,16 @@ export async function TierListView({
         ? spanLabel(movers[0].fromDate, movers[0].toDate)
         : spanText(movers[0].fromDate, movers[0].toDate, locale)
       : '';
+
+  /*
+   * The overall Ranked list's extras (2026-11-10): every brawler's 14-day
+   * trend from the stored daily snapshots (competitive only, so not on the
+   * trophy list, and sample-wide, so not on a mode or rank page), and the
+   * best pick in each Ranked mode for the "at a glance" strip.
+   */
+  const overallRanked = format === 'ranked' && !mode && !bracket;
+  const trends = overallRanked ? await getRankedTrends(14).catch(() => ({}) as Record<number, [string, number][]>) : {};
+  const bestByMode = overallRanked ? await getBestPicksByMode(1).catch(() => new Map<string, ModeBestPicks>()) : new Map<string, ModeBestPicks>();
 
   // `scoreBrawlers` leaves `tier` null below the sample floor, which is what
   // splits the page: rated brawlers get a row, the rest get the progress list.
@@ -480,6 +492,19 @@ export async function TierListView({
         <WhatChanged movers={movers} changes={changes} brawlerMeta={brawlerMeta} locale={locale} />
       ) : null}
 
+      {rated.length > 0 ? (
+        <MetaGlance
+          rated={rated}
+          bestByMode={bestByMode}
+          modeIcons={modeIcons}
+          modeNames={modeNames}
+          brawlerMeta={brawlerMeta}
+          format={format}
+          windowKey={windowKey}
+          locale={locale}
+        />
+      ) : null}
+
       {/* On a Ranked mode page the tiers sit inside the map switch, so a map
           chip can swap them for that map's ranking without a request. */}
       <PendingArea>
@@ -488,6 +513,7 @@ export async function TierListView({
           <EmptyState windowLabel={scopeLabel} copy={t} />
         ) : (
           <TierTools
+            modes={format === 'ranked' ? Object.keys(modeNames) : undefined}
             entries={rated.map((e) => ({
               id: e.brawlerId,
               name: e.brawlerName,
@@ -516,6 +542,7 @@ export async function TierListView({
                   span={changeSpan}
                   copy={t}
                   locale={locale}
+                  trends={trends}
                 />
               );
             })}
@@ -626,6 +653,7 @@ function TierRow({
   span,
   copy,
   locale,
+  trends,
 }: {
   tier: Tier;
   entries: TierListEntry[];
@@ -633,6 +661,7 @@ function TierRow({
   span: string;
   copy: TierCopy;
   locale: Locale;
+  trends: Record<number, [string, number][]>;
 }) {
   const color = TIER_COLOR[tier];
 
@@ -738,6 +767,7 @@ function TierRow({
                     {fmtPercent(entry.usageRate, locale)}
                   </span>
                 </p>
+                <Sparkline points={trends[entry.brawlerId]} />
                 {/* Only when it actually moved. A badge on every chip saying
                   "+0.0" would be noise wearing the costume of information. */}
                 {change && isNotableInTier(change, tier) ? (
@@ -747,6 +777,154 @@ function TierRow({
             );
           })}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Fourteen days of adjusted win rate under a tile (2026-11-10): green when it
+ * rose more than half a point, red when it fell as much, grey otherwise.
+ */
+function Sparkline({ points }: { points?: [string, number][] }) {
+  if (!points || points.length < 3) return null;
+  const values = points.map(([, v]) => v);
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const span = Math.max(hi - lo, 0.01);
+  const d = values
+    .map((v, i) => `${i ? 'L' : 'M'}${((i / (values.length - 1)) * 100).toFixed(1)},${(2 + (1 - (v - lo) / span) * 16).toFixed(1)}`)
+    .join(' ');
+  const change = values[values.length - 1] - values[0];
+  const color = change > 0.005 ? 'var(--victory)' : change < -0.005 ? 'var(--defeat)' : 'var(--muted)';
+  return (
+    <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="mx-auto mt-1 block h-4 w-full" aria-hidden>
+      <path d={d} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+/**
+ * The list summed up before the rows (2026-11-10): how the tiers are spread,
+ * which classes hold S and A, and, on the overall Ranked list, the best pick
+ * in each mode.
+ */
+function MetaGlance({
+  rated,
+  bestByMode,
+  modeIcons,
+  modeNames,
+  brawlerMeta,
+  format,
+  windowKey,
+  locale,
+}: {
+  rated: TierListEntry[];
+  bestByMode: Map<string, ModeBestPicks>;
+  modeIcons: Record<string, string>;
+  modeNames: Record<string, string>;
+  brawlerMeta: Map<number, BABrawler>;
+  format: TierFormat;
+  windowKey: TierWindowKey;
+  locale: Locale;
+}) {
+  const tr = getT(locale);
+  const counts = TIER_ORDER.map((tier) => ({ tier, n: rated.filter((e) => e.tier === tier).length })).filter((x) => x.n > 0);
+  const top = rated.filter((e) => e.tier === 'S' || e.tier === 'A');
+  const classes = new Map<string, TierListEntry[]>();
+  for (const e of top) {
+    const c = realBrawlerClass(e.className);
+    if (!c) continue;
+    classes.set(c, [...(classes.get(c) ?? []), e]);
+  }
+  const classRows = [...classes.entries()].sort((a, b) => b[1].length - a[1].length);
+  // Ranked modes only: the page's mode chips are the list.
+  const modes = [...bestByMode.values()]
+    .filter((m) => m.picks.length > 0 && m.mode in modeNames)
+    .sort((a, b) => b.sampleSize - a.sampleSize);
+
+  return (
+    <section className="card p-5 sm:p-6">
+      <h2 className="display mb-4 text-xl leading-none sm:text-2xl">{tr('Meta at a glance')}</h2>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div>
+          <p className="label-game mb-2 text-sm text-muted">{tr('Tier spread')}</p>
+          <div className="flex h-10 overflow-hidden rounded-xl border-2 border-ink">
+            {counts.map(({ tier, n }) => (
+              <div
+                key={tier}
+                className="display text-game-stroke grid place-items-center text-sm text-white"
+                style={{ flexGrow: n, flexBasis: 0, background: TIER_COLOR[tier] }}
+                title={`${tier}: ${n}`}
+              >
+                {n >= 4 ? `${tier} ${n}` : tier}
+              </div>
+            ))}
+          </div>
+          <p className="mt-1.5 text-xs text-muted">{tr('{n} brawlers rated', { n: rated.length })}</p>
+
+          {classRows.length > 0 ? (
+            <>
+              <p className="label-game mb-2 mt-5 text-sm text-muted">{tr('Classes in S and A')}</p>
+              <ul className="grid gap-1.5">
+                {classRows.map(([c, list]) => (
+                  <li key={c} className="flex items-center gap-3">
+                    <span className="w-28 shrink-0 truncate text-sm font-bold">{tr(c)}</span>
+                    <span className="flex min-w-0 flex-1 items-center gap-1">
+                      {list.slice(0, 8).map((e) => (
+                        <Image
+                          key={e.brawlerId}
+                          src={e.imageUrl ?? brawlerIconUrl(e.brawlerId)}
+                          alt={e.brawlerName}
+                          title={e.brawlerName}
+                          width={28}
+                          height={28}
+                          unoptimized
+                          className="size-7 rounded-md border-2 border-ink object-cover"
+                        />
+                      ))}
+                    </span>
+                    <span className="label-game w-6 shrink-0 text-right text-sm tabular-nums">{list.length}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </div>
+
+        {modes.length > 0 ? (
+          <div>
+            <p className="label-game mb-2 text-sm text-muted">{tr('Best pick in each mode')}</p>
+            <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {modes.map((m) => {
+                const pick = m.picks[0];
+                const art = brawlerMeta.get(pick.brawlerId);
+                return (
+                  <li key={m.mode}>
+                    <Link
+                      href={localePath(locale, tierListHref(format, windowKey, m.mode))}
+                      className="flex h-full flex-col items-center gap-1 rounded-2xl border-2 border-ink bg-surface-2/60 p-2.5 text-center shadow-[0_3px_0_var(--ink)] transition-transform hover:-translate-y-0.5"
+                    >
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-muted">
+                        {modeIcons[m.mode] ? <Image src={modeIcons[m.mode]} alt="" width={16} height={16} unoptimized className="size-4" /> : null}
+                        <span className="truncate">{modeNames[m.mode] ?? m.mode}</span>
+                      </span>
+                      <Image
+                        src={art?.imageUrl ?? brawlerIconUrl(pick.brawlerId)}
+                        alt=""
+                        width={56}
+                        height={56}
+                        unoptimized
+                        className="size-14 rounded-xl border-2 border-ink object-cover"
+                      />
+                      <span className="label-game truncate text-sm capitalize">{pick.brawlerName.toLowerCase()}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
       </div>
     </section>
   );
