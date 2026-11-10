@@ -36,6 +36,7 @@ import { PlayerInsights } from '@/components/player/player-insights';
 import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { PlayerSeason } from '@/components/player/player-season';
+import { PlayerActivity } from '@/components/player/player-activity';
 import {
   getEventRotation,
   getOfficialBrawlers,
@@ -528,6 +529,12 @@ export default async function PlayerPage({ params }: PageProps) {
           label: t('Battles'),
           content: (
             <ProfileGroup title={t('Battles')}>
+        {/* The month first (2026-11-10): every mode, for accounts the
+            sampler visits; renders nothing for the rest. */}
+        <Suspense fallback={null}>
+          <PlayerActivity tag={normalizedTag} brawlerMeta={brawlerMeta} />
+        </Suspense>
+
         {/* Above the log rather than below it: this is the same subject read one
             level up, and the reader should meet the conclusion before scrolling
             twenty-five rows of evidence. */}
@@ -598,7 +605,7 @@ export default async function PlayerPage({ params }: PageProps) {
         {/* Portraits first, then the same grid in full-body skin art once the
             cached wiki sweep answers -- the tab never waits on it. */}
         <Suspense fallback={<PlayerBrawlers brawlers={player.brawlers} meta={tileMeta} />}>
-          <PlayerBrawlersWithArt brawlers={player.brawlers} meta={tileMeta} />
+          <PlayerBrawlersWithArt brawlers={player.brawlers} meta={tileMeta} tag={normalizedTag} />
         </Suspense>            </ProfileGroup>
           ),
         },

@@ -27,6 +27,7 @@ import { RelativeTime } from '@/components/ui/relative-time';
 import { TierListControls } from '@/components/tier-list/tier-list-controls';
 import { PendingArea, TierNav } from '@/components/tier-list/tier-nav';
 import type { RankBracket } from '@/lib/rank-brackets';
+import { TierTools } from '@/components/tier-list/tier-tools';
 import { TierPodium } from '@/components/tier-list/tier-podium';
 import { ShareImageButton } from '@/components/share-image-button';
 import { getT } from '@/lib/t';
@@ -486,6 +487,20 @@ export async function TierListView({
         {rated.length === 0 ? (
           <EmptyState windowLabel={scopeLabel} copy={t} />
         ) : (
+          <TierTools
+            entries={rated.map((e) => ({
+              id: e.brawlerId,
+              name: e.brawlerName,
+              href: brawlerPath(e.brawlerId, e.brawlerName),
+              image: e.imageUrl ?? null,
+              framed: e.imageUrl ? isFramedTile(e.imageUrl) : false,
+              tier: e.tier,
+              score: e.metaScore ?? null,
+              winRate: e.normalizedWinRate ?? null,
+              pickRate: e.usageRate ?? null,
+              games: e.decidedSampleSize ?? 0,
+            }))}
+          >
           <div className="space-y-4">
             {TIER_ORDER.map((tier) => {
               const inTier = rated
@@ -505,6 +520,7 @@ export async function TierListView({
               );
             })}
           </div>
+          </TierTools>
         )}
       </RankedMapSwitch>
       </PendingArea>
@@ -653,6 +669,7 @@ function TierRow({
             return (
               <Link
                 key={entry.brawlerId}
+                data-bid={entry.brawlerId}
                 href={brawlerPath(entry.brawlerId, entry.brawlerName)}
                 style={{ '--tier': color } as React.CSSProperties}
                 className="tier-chip group min-w-0 p-2 sm:w-[92px]"

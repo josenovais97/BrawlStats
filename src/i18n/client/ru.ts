@@ -526,4 +526,22 @@ export const CLIENT_RU: Record<string, string> = {
     "Угадайте бойца дня. Каждая попытка показывает, насколько вы близки по пяти подсказкам: зелёный — точно, жёлтый — близко, стрелка указывает на ответ.",
   "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
     "Не удалось загрузить страницу. Похоже, API игры сейчас тормозит. Попробуйте ещё раз чуть позже.",
+  "Find a brawler":
+    "Найти бойца",
+  "Mark my brawlers":
+    "Отметить моих бойцов",
+  "Score":
+    "Оценка",
+  "Table":
+    "Таблица",
+  "Tiers":
+    "Тиры",
+  "View":
+    "Вид",
+  "{name} has":
+    "У {name}:",
+  "Last 30 days: {n} battles":
+    "За 30 дней: {n} {n|one:бой|few:боя|many:боёв|other:боя}",
+  "{n} games in 30 days":
+    "{n} {n|one:бой|few:боя|many:боёв|other:боя} за 30 дней",
 };

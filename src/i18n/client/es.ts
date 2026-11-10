@@ -998,4 +998,22 @@ export const CLIENT_ES: Record<string, string> = {
     "Adivina el brawler de hoy. Cada intento muestra lo cerca que estás en cinco pistas: verde es exacto, ámbar es cerca y una flecha apunta hacia la respuesta.",
   "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
     "No se pudo cargar esta página. Seguramente la API del juego va lenta ahora mismo. Vuelve a intentarlo en un momento.",
+  "Find a brawler":
+    "Busca un brawler",
+  "Mark my brawlers":
+    "Marcar mis brawlers",
+  "Score":
+    "Puntuación",
+  "Table":
+    "Tabla",
+  "Tiers":
+    "Tiers",
+  "View":
+    "Vista",
+  "{name} has":
+    "{name} tiene",
+  "Last 30 days: {n} battles":
+    "Últimos 30 días: {n} batallas",
+  "{n} games in 30 days":
+    "{n} partidas en 30 días",
 };

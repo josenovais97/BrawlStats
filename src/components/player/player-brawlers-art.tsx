@@ -1,4 +1,6 @@
+import { activityFor } from '@/components/player/player-activity';
 import { PlayerBrawlers, type BrawlerMetaLite } from '@/components/player/player-brawlers';
+import { brawlerTotals } from '@/lib/player-activity';
 import { brawlerModelUrl } from '@/lib/brawlapi';
 import { fankitBody, fankitSkin } from '@/lib/fankit';
 import { skinLabel } from '@/lib/player-showcase';
@@ -16,17 +18,26 @@ import type { BSPlayerBrawler } from '@/types/brawlstars';
 export async function PlayerBrawlersWithArt({
   brawlers,
   meta,
+  tag,
 }: {
   brawlers: BSPlayerBrawler[];
   meta: Record<string, BrawlerMetaLite>;
+  /** For the last 30 days per brawler (the grid's "Played" sort). */
+  tag?: string;
 }) {
   const withArt: Record<string, BrawlerMetaLite> = { ...meta };
+  const totals = tag ? brawlerTotals((await activityFor(tag)) ?? []) : new Map();
   for (const b of brawlers) {
     const label = skinLabel(b);
     const skin = label ? fankitSkin(b.id, b.name, label) : null;
     const base = meta[b.id];
     if (!base) continue;
-    withArt[b.id] = { ...base, artUrl: skin ?? fankitBody(b.id) ?? brawlerModelUrl(b.id) };
+    const played = totals.get(b.id);
+    withArt[b.id] = {
+      ...base,
+      artUrl: skin ?? fankitBody(b.id) ?? brawlerModelUrl(b.id),
+      ...(played && played.battles > 0 ? { played } : {}),
+    };
   }
 
   return <PlayerBrawlers brawlers={brawlers} meta={withArt} />;

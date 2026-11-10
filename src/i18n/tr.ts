@@ -5042,4 +5042,38 @@ export const TR: Record<string, string> = {
     "Rütbe yolu",
   "{change} since {date}":
     "{date} tarihinden beri {change}",
+  "Battles per day, last 30 days":
+    "Günlük savaşlar, son 30 gün",
+  "Last 30 days":
+    "Son 30 gün",
+  "Trophy games":
+    "Kupa maçları",
+  "{date}: no battles":
+    "{date}: savaş yok",
+  "{date}: {n} battles, {ranked} Ranked":
+    "{date}: {n} savaş, {ranked} Aşamalı",
+  "{n} of 30 days played":
+    "30 günün {n} günü oynandı",
+  "{rate} won":
+    "{rate} galibiyet",
+  "From {v} sampled battles on this map.":
+    "Bu haritada kaydedilen {v} savaştan.",
+  "Find a brawler":
+    "Savaşçı ara",
+  "Mark my brawlers":
+    "Savaşçılarımı işaretle",
+  "Score":
+    "Puan",
+  "Table":
+    "Tablo",
+  "Tiers":
+    "Kademeler",
+  "View":
+    "Görünüm",
+  "{name} has":
+    "{name} sahip:",
+  "Last 30 days: {n} battles":
+    "Son 30 gün: {n} savaş",
+  "{n} games in 30 days":
+    "30 günde {n} maç",
 };

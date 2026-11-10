@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { brawlerIconUrl, modeLabel } from '@/lib/brawlapi';
 import { draftWasTheProblem, type DraftAutopsy } from '@/lib/draft-autopsy';
-import { titleCase } from '@/lib/format';
+import { formatNumber, titleCase } from '@/lib/format';
 import { brawlerPath, slugify } from '@/lib/slugs';
 import type { BABrawler, BAGameMode } from '@/types/brawlapi';
 import { getT } from '@/lib/t';
@@ -177,34 +177,14 @@ export function DraftAutopsyCard({
           ) : null}
         </ul>
 
-        {/*
-          The limit, stated rather than implied. It is the difference between a
-          tool that explains what it measured and one that pretends to have
-          watched the game.
-        */}
+        {/* One line on the evidence (2026-11-10). It used to be a paragraph
+            explaining the method, which the owner asked to cut site-wide. */}
         <p className="border-t border-border pt-3 text-xs leading-relaxed text-muted">
           {unclear
             ? t('Too few sampled battles on this map to compare the drafts. ')
-            : blamed
-              ? t('This explains the draft only. ')
-              : t('The draft does not explain this loss. ')}
-          {/*
-            What the percentage is, said plainly.
-
-            It combines each side's measured record on this map with how those
-            brawlers fare against each other, then compares the two — so it is
-            the chance the *draft* had, not the chance you had. Aim,
-            positioning and gadget timing are not in the battle log and are not
-            guessed at here.
-          */}{t('The percentage is the drafts compared:')}{' '}
-          {autopsy.confidence === 'low'
-            ? t('mostly each side’s overall Ranked form, because this map has too little data on these brawlers yet')
-            : t('each side’s measured record on this map')}{t(', adjusted for how those brawlers fare against each other. It is the draft\'s chance, not yours — aim, positioning and gadget timing are not in the battle log and are not guessed at. Confidence:')}{' '}
-          <span className="font-semibold">{autopsy.confidence}</span>
-          {autopsy.supportingBattles > 0
-            ? t(', from {v} sampled battles on this map', { v: autopsy.supportingBattles.toLocaleString('en-US') })
-            : ''}
-          .
+            : autopsy.supportingBattles > 0
+              ? t('From {v} sampled battles on this map.', { v: formatNumber(autopsy.supportingBattles) })
+              : null}
         </p>
       </div>
     </article>

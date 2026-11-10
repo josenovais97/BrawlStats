@@ -526,4 +526,22 @@ export const CLIENT_TR: Record<string, string> = {
     "Günün savaşçısını tahmin et. Her tahmin beş ipucunda ne kadar yakın olduğunu gösterir: yeşil tam, kehribar yakın, ok da cevabı gösterir.",
   "This page could not be loaded. The game API is probably slow right now. Try again in a moment.":
     "Bu sayfa yüklenemedi. Oyun API'si şu an muhtemelen yavaş. Biraz sonra tekrar dene.",
+  "Find a brawler":
+    "Savaşçı ara",
+  "Mark my brawlers":
+    "Savaşçılarımı işaretle",
+  "Score":
+    "Puan",
+  "Table":
+    "Tablo",
+  "Tiers":
+    "Kademeler",
+  "View":
+    "Görünüm",
+  "{name} has":
+    "{name} sahip:",
+  "Last 30 days: {n} battles":
+    "Son 30 gün: {n} savaş",
+  "{n} games in 30 days":
+    "30 günde {n} maç",
 };

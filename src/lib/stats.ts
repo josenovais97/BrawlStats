@@ -5860,6 +5860,65 @@ export async function getPlayerRankedSeason(tag: string, from: string, to: strin
   }
 }
 
+/** One day of one player's battles with one brawler (player_battle_daily). */
+export interface PlayerActivityRow {
+  day: string;
+  brawlerId: number;
+  /** Every battle, Showdown included. */
+  battles: number;
+  /** Wins and decided (win or loss) battles; Showdown places count in neither. */
+  wins: number;
+  decided: number;
+  rankedBattles: number;
+  rankedWins: number;
+  rankedDecided: number;
+}
+
+/**
+ * The last `days` days of one player's battles, per day and brawler, for the
+ * profile's 30-day panels (2026-11-10). Days listed, like
+ * getPlayerRankedSeason, so it is one index probe per day. Null without a
+ * database or for an opted-out tag; empty for a player the sampler has not
+ * visited in that time.
+ */
+export async function getPlayerActivity(tag: string, days = 30): Promise<PlayerActivityRow[] | null> {
+  const prisma = getPrisma();
+  if (!prisma || isOptedOut(tag)) return null;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const from = new Date(Date.now() - (days - 1) * 86_400_000).toISOString().slice(0, 10);
+    const list = dayRange(from, today);
+    const rows = await prisma.$queryRaw<{
+      day: string;
+      brawler_id: number;
+      battles: number;
+      wins: number;
+      decided: number;
+      competitive_battles: number;
+      competitive_wins: number;
+      competitive_decided: number;
+    }[]>`
+      SELECT day::text AS day, brawler_id, battles, wins, decided,
+             competitive_battles, competitive_wins, competitive_decided
+      FROM player_battle_daily
+      WHERE day = ANY(${list}::date[]) AND player_tag = ${tag}
+    `;
+    return rows.map((r) => ({
+      day: r.day,
+      brawlerId: r.brawler_id,
+      battles: Number(r.battles),
+      wins: Number(r.wins),
+      decided: Number(r.decided),
+      rankedBattles: Number(r.competitive_battles),
+      rankedWins: Number(r.competitive_wins),
+      rankedDecided: Number(r.competitive_decided),
+    }));
+  } catch (error) {
+    swallow('getPlayerActivity', error);
+    return null;
+  }
+}
+
 const cachedRankedComps = cachedRead('ranked-comps', compute_getRankedComps);
 
 /** Ranked trios, all ranks or one: the precomputed row, else computed live. */

@@ -5043,4 +5043,38 @@ export const RU: Record<string, string> = {
     "Путь по рангам",
   "{change} since {date}":
     "{change} с {date}",
+  "Battles per day, last 30 days":
+    "Боёв в день за последние 30 дней",
+  "Last 30 days":
+    "Последние 30 дней",
+  "Trophy games":
+    "Бои за кубки",
+  "{date}: no battles":
+    "{date}: боёв нет",
+  "{date}: {n} battles, {ranked} Ranked":
+    "{date}: {n} {n|one:бой|few:боя|many:боёв|other:боя}, ранговых {ranked}",
+  "{n} of 30 days played":
+    "Сыграно {n} из 30 дн.",
+  "{rate} won":
+    "{rate} побед",
+  "From {v} sampled battles on this map.":
+    "По {v} записанным боям на этой карте.",
+  "Find a brawler":
+    "Найти бойца",
+  "Mark my brawlers":
+    "Отметить моих бойцов",
+  "Score":
+    "Оценка",
+  "Table":
+    "Таблица",
+  "Tiers":
+    "Тиры",
+  "View":
+    "Вид",
+  "{name} has":
+    "У {name}:",
+  "Last 30 days: {n} battles":
+    "За 30 дней: {n} {n|one:бой|few:боя|many:боёв|other:боя}",
+  "{n} games in 30 days":
+    "{n} {n|one:бой|few:боя|many:боёв|other:боя} за 30 дней",
 };

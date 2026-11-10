@@ -22,6 +22,8 @@ import type { BSPlayerBrawler } from '@/types/brawlstars';
 import type { Tier } from '@/types/stats';
 import { useT } from '@/components/i18n/use-t';
 import { useLp } from '@/components/i18n/use-lp';
+import { useLocale } from '@/components/i18n/use-locale';
+import type { Locale } from '@/lib/i18n';
 
 /** How far below its own record a brawler currently sits. Never negative. */
 function peakGap(brawler: BSPlayerBrawler): number {
@@ -46,6 +48,8 @@ export interface BrawlerMetaLite {
    * the tile draws the portrait instead.
    */
   artUrl?: string;
+  /** Last 30 days with this brawler, every mode; absent when not sampled. */
+  played?: { battles: number; wins: number; decided: number };
 }
 
 interface PlayerBrawlersProps {
@@ -53,10 +57,12 @@ interface PlayerBrawlersProps {
   meta: Record<string, BrawlerMetaLite>;
 }
 
-type SortKey = 'trophies' | 'meta' | 'streak' | 'prestige' | 'peak' | 'rank' | 'power' | 'name';
+type SortKey = 'trophies' | 'played' | 'meta' | 'streak' | 'prestige' | 'peak' | 'rank' | 'power' | 'name';
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: 'trophies', label: 'Trophies' },
+  // Games in the last 30 days, for accounts the sampler visits (2026-11-10).
+  { key: 'played', label: 'Played' },
   // The reason the tier list exists, applied to the roster: "which of mine are
   // actually good right now".
   { key: 'meta', label: 'Meta' },
@@ -84,6 +90,12 @@ const SORTS: { key: SortKey; label: string }[] = [
  */
 const FIRST_LOOK = 24;
 
+/** "54%", "%54" in Turkish, "54 %" in French, like the server's formatPercentWhole. */
+function percent(value: number, locale: Locale): string {
+  const n = String(Math.round(value * 100));
+  return locale === 'tr' ? `%${n}` : locale === 'fr' ? `${n}\u202f%` : `${n}%`;
+}
+
 export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
   const t = useT();
   const [sort, setSort] = useState<SortKey>('trophies');
@@ -92,6 +104,7 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
 
   // A search is already a request for a subset, so it is never capped again.
   const searching = query.trim().length > 0;
+  const hasPlayed = useMemo(() => Object.values(meta).some((m) => m?.played), [meta]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -105,6 +118,8 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
           return a.name.localeCompare(b.name);
         case 'power':
           return b.power - a.power || b.trophies - a.trophies;
+        case 'played':
+          return (meta[b.id]?.played?.battles ?? 0) - (meta[a.id]?.played?.battles ?? 0) || b.trophies - a.trophies;
         case 'rank':
           return b.rank - a.rank || b.trophies - a.trophies;
         case 'meta': {
@@ -146,7 +161,7 @@ export function PlayerBrawlers({ brawlers, meta }: PlayerBrawlersProps) {
 
         <div className="flex items-center gap-1 overflow-x-auto">
           <ArrowUpDown className="mr-1 size-4 shrink-0 text-muted" />
-          {SORTS.map(({ key, label }) => (
+          {SORTS.filter(({ key }) => key !== 'played' || hasPlayed).map(({ key, label }) => (
             <button
               key={key}
               type="button"
@@ -199,6 +214,7 @@ function BrawlerTile({
 }) {
   const t = useT();
   const lp = useLp();
+  const locale = useLocale();
   const accent = meta?.rarityColor ?? '#8b95b8';
   const gap = peakGap(brawler);
   const tier = meta?.tier;
@@ -331,6 +347,24 @@ function BrawlerTile({
             title={t('Best win streak {best}', { best: best })}
           >
             <WinStreakIcon className="size-3.5" />{t('best {best}', { best: best })}</p>
+        ) : null}
+
+        {/* Last 30 days, every mode, when the sampler has them (2026-11-10).
+            The rate only from five decided games: Showdown places are not
+            wins or losses. */}
+        {meta?.played ? (
+          <p
+            className="text-[11px] tabular-nums text-muted"
+            title={t('Last 30 days: {n} battles', { n: meta.played.battles })}
+          >
+            {t('{n} games in 30 days', { n: meta.played.battles })}
+            {meta.played.decided >= 5 ? (
+              <span className={`font-bold ${meta.played.wins / meta.played.decided >= 0.55 ? 'text-victory' : meta.played.wins / meta.played.decided < 0.45 ? 'text-defeat' : 'text-foreground'}`}>
+                {' · '}
+                {percent(meta.played.wins / meta.played.decided, locale)}
+              </span>
+            ) : null}
+          </p>
         ) : null}
 
         {/* The kit as the game's own icons with a count, in place of

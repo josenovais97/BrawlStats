@@ -145,14 +145,19 @@ export async function PlayerInsights({ tag, playerTag, brawlerMeta }: Props) {
                           : ''}
                       </p>
                     </div>
-                    <span
-                      className={`shrink-0 text-sm font-bold tabular-nums ${
-                        brawler.trophyChange >= 0 ? 'text-victory' : 'text-defeat'
-                      }`}
-                    >
-                      {brawler.trophyChange > 0 ? '+' : ''}
-                      {brawler.trophyChange}
-                    </span>
+                    {/* Ranked games move no trophies, so a Ranked-only
+                        brawler would read "0"; nothing is shown instead. */}
+                    {brawler.trophyChange !== 0 ? (
+                      <span
+                        className={`flex shrink-0 items-center gap-1 text-sm font-bold tabular-nums ${
+                          brawler.trophyChange > 0 ? 'text-victory' : 'text-defeat'
+                        }`}
+                      >
+                        <TrophyGainIcon className="size-3.5" />
+                        {brawler.trophyChange > 0 ? '+' : ''}
+                        {brawler.trophyChange}
+                      </span>
+                    ) : null}
                   </Link>
                 </li>
               );

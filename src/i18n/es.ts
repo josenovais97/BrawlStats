@@ -5042,4 +5042,38 @@ export const ES: Record<string, string> = {
     "Camino de rangos",
   "{change} since {date}":
     "{change} desde el {date}",
+  "Battles per day, last 30 days":
+    "Batallas por día, últimos 30 días",
+  "Last 30 days":
+    "Últimos 30 días",
+  "Trophy games":
+    "Partidas de trofeos",
+  "{date}: no battles":
+    "{date}: sin batallas",
+  "{date}: {n} battles, {ranked} Ranked":
+    "{date}: {n} batallas, {ranked} de Competitivo",
+  "{n} of 30 days played":
+    "{n} de 30 días jugados",
+  "{rate} won":
+    "{rate} ganadas",
+  "From {v} sampled battles on this map.":
+    "Según {v} batallas registradas en este mapa.",
+  "Find a brawler":
+    "Busca un brawler",
+  "Mark my brawlers":
+    "Marcar mis brawlers",
+  "Score":
+    "Puntuación",
+  "Table":
+    "Tabla",
+  "Tiers":
+    "Tiers",
+  "View":
+    "Vista",
+  "{name} has":
+    "{name} tiene",
+  "Last 30 days: {n} battles":
+    "Últimos 30 días: {n} batallas",
+  "{n} games in 30 days":
+    "{n} partidas en 30 días",
 };

@@ -5043,4 +5043,38 @@ export const FR: Record<string, string> = {
     "Parcours des rangs",
   "{change} since {date}":
     "{change} depuis le {date}",
+  "Battles per day, last 30 days":
+    "Combats par jour, 30 derniers jours",
+  "Last 30 days":
+    "30 derniers jours",
+  "Trophy games":
+    "Parties à trophées",
+  "{date}: no battles":
+    "{date} : aucun combat",
+  "{date}: {n} battles, {ranked} Ranked":
+    "{date} : {n} combats, dont {ranked} en Classé",
+  "{n} of 30 days played":
+    "{n} jours joués sur 30",
+  "{rate} won":
+    "{rate} de victoires",
+  "From {v} sampled battles on this map.":
+    "D'après {v} combats relevés sur cette carte.",
+  "Find a brawler":
+    "Chercher un brawler",
+  "Mark my brawlers":
+    "Marquer mes brawlers",
+  "Score":
+    "Score",
+  "Table":
+    "Tableau",
+  "Tiers":
+    "Tiers",
+  "View":
+    "Affichage",
+  "{name} has":
+    "{name} a",
+  "Last 30 days: {n} battles":
+    "30 derniers jours : {n} combats",
+  "{n} games in 30 days":
+    "{n} parties en 30 jours",
 };
