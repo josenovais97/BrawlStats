@@ -50,7 +50,12 @@ export function getPrisma(): PrismaClient | null {
        * Three roll-ups failed in two days that way. A failed fold is redone on
        * the next run, so the cost was alert mail and two-hour-old stats.
        */
-      transactionOptions: { maxWait: 10_000, timeout: 300_000 },
+      /*
+       * The precompute job may take longer (PRISMA_TX_TIMEOUT_MS, set in
+       * deploy/bin/brawlzone-precompute, 2026-11-10): its comps query grew
+       * past five minutes and was being cut off, storing nothing.
+       */
+      transactionOptions: { maxWait: 10_000, timeout: Number(process.env.PRISMA_TX_TIMEOUT_MS) || 300_000 },
     });
   }
   return globalForPrisma.prisma;

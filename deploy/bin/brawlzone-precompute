@@ -30,7 +30,9 @@ if [ "$(docker inspect -f '{{.State.Running}}' brawlzone-sampler-job 2>/dev/null
   fi
   echo "Sampler run still going, but the stored reads are $((${age:-999999} / 60)) minutes old: running anyway"
 fi
-if ! docker compose run --rm -T sampler node --import tsx --conditions=react-server scripts/precompute.ts >"$out" 2>&1; then
+# 20 minutes per transaction for this job only (2026-11-10): the comps query
+# grew past the default five and was cut off, so comps stopped being stored.
+if ! docker compose run --rm -T -e PRISMA_TX_TIMEOUT_MS=1200000 sampler node --import tsx --conditions=react-server scripts/precompute.ts >"$out" 2>&1; then
   echo "Precompute FAILED. Output:"
   tail -25 "$out"
   exit 1

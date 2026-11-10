@@ -5941,7 +5941,19 @@ export function rankedCompsKey(limit: number, bracket?: number): string {
  * at once and the site stopped answering. A stale row is a cosmetic problem;
  * computing live under load is an outage.
  */
-const PRECOMPUTED_MAX_AGE_MS = 24 * 3600_000;
+const PRECOMPUTED_MAX_AGE_MS = 7 * 24 * 3600_000;
+/*
+ * A week since 2026-11-10. At a day, the comps job (which had grown past the
+ * 300 s transaction limit and had been storing nothing since the 9th) let
+ * its rows age out at 12:53, and from then every /comps and Bubble panel
+ * render, and every deploy build, ran the 5-10 minute comps query live: the
+ * box sat at load 12-17 and two builds failed. Serving a day-old comp list
+ * costs nothing; recomputing it per visitor costs the site. Rows older than
+ * a day are still served, with a warning in the log, so a job that keeps
+ * failing is visible without taking pages down.
+ */
+const PRECOMPUTED_STALE_WARN_MS = 24 * 3600_000;
+const warnedStale = new Set<string>();
 
 /**
  * A read computed after the last sampler run (scripts/precompute.ts), or null
@@ -5953,7 +5965,13 @@ async function precomputed<T>(key: string): Promise<T | null> {
   if (!prisma) return null;
   try {
     const row = await prisma.precomputedRead.findUnique({ where: { key } });
-    if (!row || Date.now() - row.computedAt.getTime() > PRECOMPUTED_MAX_AGE_MS) return null;
+    if (!row) return null;
+    const age = Date.now() - row.computedAt.getTime();
+    if (age > PRECOMPUTED_MAX_AGE_MS) return null;
+    if (age > PRECOMPUTED_STALE_WARN_MS && !warnedStale.has(key)) {
+      warnedStale.add(key);
+      console.warn(`[stats] precomputed ${key} is ${Math.round(age / 3600_000)} h old; serving it rather than computing live`);
+    }
     return row.value as T;
   } catch {
     return null;
