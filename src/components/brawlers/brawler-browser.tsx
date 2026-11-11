@@ -40,7 +40,15 @@ export interface BrawlerCardData {
    */
   tier: Tier | null;
   metaScore: number | null;
+  /** Ranked win rate (mode-adjusted) and pick rate this week (2026-11-11). */
+  winRate?: number | null;
+  pickRate?: number | null;
+  /** Meta score change over 7 days, and the tier a week ago. */
+  delta?: number | null;
+  tierBefore?: Tier | null;
 }
+
+const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 
 /** Ordered by in-game progression so the filter row reads naturally. */
 const RARITY_ORDER = [
@@ -74,6 +82,21 @@ const SORTS = {
   newest: {
     label: 'Newest first',
     compare: (a: BrawlerCardData, b: BrawlerCardData) => b.id - a.id,
+  },
+  winRate: {
+    label: 'Win rate',
+    compare: (a: BrawlerCardData, b: BrawlerCardData) =>
+      (b.winRate ?? -1) - (a.winRate ?? -1) || a.id - b.id,
+  },
+  pickRate: {
+    label: 'Most picked',
+    compare: (a: BrawlerCardData, b: BrawlerCardData) =>
+      (b.pickRate ?? -1) - (a.pickRate ?? -1) || a.id - b.id,
+  },
+  rising: {
+    label: 'Rising',
+    compare: (a: BrawlerCardData, b: BrawlerCardData) =>
+      (b.delta ?? -99) - (a.delta ?? -99) || a.id - b.id,
   },
   name: {
     label: 'Name A–Z',
@@ -157,6 +180,24 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
       )
       .sort(SORTS[sort].compare);
   }, [brawlers, query, rarity, brawlerClass, tier, sort]);
+
+  /*
+   * Under "Strongest" the grid reads as a tier list (2026-11-11): one block
+   * per tier with its badge and count, unrated brawlers last. Any other sort,
+   * a search or a tier filter is one plain grid.
+   */
+  const groups = useMemo(() => {
+    if (sort !== 'meta' || tier !== 'all' || query.trim() !== '') return null;
+    const out: { tier: Tier | null; items: BrawlerCardData[]; first: number }[] = [];
+    let first = 0;
+    for (const t of [...TIER_ORDER, null] as (Tier | null)[]) {
+      const items = visible.filter((b) => b.tier === t);
+      if (items.length === 0) continue;
+      out.push({ tier: t, items, first });
+      first += items.length;
+    }
+    return out.length > 1 ? out : null;
+  }, [visible, sort, tier, query]);
 
   const filtered =
     query.trim() !== '' || rarity !== 'all' || brawlerClass !== 'all' || tier !== 'all';
@@ -310,6 +351,30 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
           >{tx('Clear filters')}</button>
         </div>
       ) : (
+        groups ? (
+          <div className="mt-4 space-y-6">
+            {groups.map((group) => (
+              <section key={group.tier ?? 'none'}>
+                <h3 className="mb-2.5 flex items-center gap-2.5">
+                  {group.tier ? (
+                    <span className="tier-badge tier-badge-sm" style={{ '--tier': TIER_COLOR[group.tier] } as CSSProperties}>
+                      <span className="display text-game-stroke text-lg leading-none">{group.tier}</span>
+                    </span>
+                  ) : null}
+                  <span className="display text-xl leading-none">{group.tier ? tx('{tier} tier', { tier: group.tier }) : tx('Not rated yet')}</span>
+                  <span className="text-sm text-muted">{group.items.length}</span>
+                </h3>
+                <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5">
+                  {group.items.map((brawler) => (
+                    <li key={brawler.id}>
+                      <BrawlerCard brawler={brawler} eager={group.first + group.items.indexOf(brawler) < 10} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        ) : (
         <ul className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5">
           {visible.map((brawler, index) => (
             <li key={brawler.id}>
@@ -321,6 +386,7 @@ export function BrawlerBrowser({ brawlers }: { brawlers: BrawlerCardData[] }) {
             </li>
           ))}
         </ul>
+        )
       )}
     </div>
   );
@@ -432,6 +498,21 @@ function BrawlerCard({ brawler, eager }: { brawler: BrawlerCardData; eager: bool
             </span>
           ) : null}
         </span>
+        {/* This week in Ranked (2026-11-11): win rate, and which way it moved. */}
+        {typeof brawler.winRate === 'number' ? (
+          <span
+            className="mt-1.5 flex items-center justify-center gap-1.5 rounded-md bg-black/30 px-1.5 py-0.5 text-xs font-bold tabular-nums"
+            title={tx('Ranked win rate this week')}
+          >
+            <span className={brawler.winRate >= 0.5 ? 'text-victory' : 'text-white/90'}>{pct(brawler.winRate)}</span>
+            {typeof brawler.delta === 'number' && Math.abs(brawler.delta) >= 0.5 ? (
+              <span className={brawler.delta > 0 ? 'text-victory' : 'text-defeat'}>
+                {brawler.delta > 0 ? '▲' : '▼'}
+                {brawler.tierBefore && brawler.tier && brawler.tierBefore !== brawler.tier ? ` ${brawler.tierBefore}→${brawler.tier}` : ''}
+              </span>
+            ) : null}
+          </span>
+        ) : null}
       </span>
     </Link>
   );

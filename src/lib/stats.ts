@@ -5067,6 +5067,15 @@ export async function getBracketMapPicks(
  * `battle_daily_stats` is at most a handful of monthly patches, two ranges
  * each.
  */
+/**
+ * One rank's per-map picks from the precompute only, or null (2026-11-11).
+ * For the map pages' "By rank" panel: hundreds of ISR map pages must never
+ * fall through to the live per-rank lineup reads.
+ */
+export async function getStoredBracketMapPicks(bracket: number): Promise<RankedMapPicks[] | null> {
+  return precomputed<RankedMapPicks[]>(`bracket-map-picks:${bracket}:20`);
+}
+
 const cachedBrawlerStatsForRange = cachedRead(
   'brawler-stats-for-range',
   async (startIso: string, endIso: string, format: TierFormat) =>

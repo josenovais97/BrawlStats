@@ -10,6 +10,8 @@ import { BrawlerSkins } from '@/components/brawlers/brawler-skins';
 import { BrawlerMatchups } from '@/components/brawlers/brawler-matchups';
 import { BrawlerSplits } from '@/components/brawlers/brawler-splits';
 import { BrawlerByRank } from '@/components/brawlers/brawler-by-rank';
+import { BrawlerLiveMaps } from '@/components/brawlers/brawler-live-maps';
+import { liveSlots } from '@/lib/live-slots';
 import { BrawlerTrend } from '@/components/brawlers/brawler-trend';
 import { BuildAndUpgrades } from '@/components/brawlers/build-upgrades';
 import { RecommendedBuild } from '@/components/brawlers/recommended-build';
@@ -54,7 +56,7 @@ import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
 import { UpcomingBrawlerPage } from '@/components/brawlers/upcoming-brawler';
 import { currentMonth } from '@/lib/site';
 import { getActiveMaps } from '@/lib/game-maps';
-import { getOfficialBrawlers } from '@/lib/bs-api';
+import { getEventRotation, getOfficialBrawlers } from '@/lib/bs-api';
 import { slugify } from '@/lib/slugs';
 import {
   MIN_SAMPLE_FOR_TIER,
@@ -71,9 +73,11 @@ import {
   getBrawlerSkins,
   getIndexablePairs,
   getMetaIndex,
+  getMetaMovers,
   normalizeWinRate,
 } from '@/lib/stats';
 import type { BAAccessory, BABrawler, BAGameMode } from '@/types/brawlapi';
+import type { MetaMover } from '@/types/stats';
 import type { BSAccessory } from '@/types/brawlstars';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
@@ -586,6 +590,15 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
     .filter((s) => s.metaScore !== null)
     .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0));
   const metaPlace = metaRated.findIndex((s) => s.brawlerId === brawlerId) + 1;
+  const pickPlace =
+    [...metaIndex.values()]
+      .filter((s) => s.usageRate !== null)
+      .sort((a, b) => (b.usageRate ?? 0) - (a.usageRate ?? 0))
+      .findIndex((s) => s.brawlerId === brawlerId) + 1;
+  const mover = (await getMetaMovers(7).catch(() => [] as MetaMover[])).find((m) => m.brawlerId === brawlerId) ?? null;
+  // Live trophy maps, cached as long as the page itself: the default 120 s
+  // would pin this whole route to two-minute renders (AGENTS.md trap 2).
+  const live = liveSlots(await getEventRotation(revalidate).catch(() => []));
 
 
   // Cleaned at the source now — see `rarityColor` — so this only picks the
@@ -1106,14 +1119,20 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               icon={BarChart3}
               label={t('Win rate')}
               value={formatPercent(normalizedWinRate)}
-              hint={t('{decidedSampleSize} battles', { decidedSampleSize: formatNumber(stat.decidedSampleSize) })}
+              hint={
+                normalizedWinRate !== null
+                  ? t('{diff} vs average', {
+                      diff: `${normalizedWinRate >= 0.5 ? '+' : '−'}${Math.abs((normalizedWinRate - 0.5) * 100).toFixed(1)}`,
+                    })
+                  : t('{decidedSampleSize} battles', { decidedSampleSize: formatNumber(stat.decidedSampleSize) })
+              }
               tone="text-victory"
             />
             <StatCard
               node={<PlayersIcon className="size-6" />}
               label={t('Pick rate')}
               value={formatPercent(stat.usageRate)}
-              hint={t('Last 7 days')}
+              hint={pickPlace > 0 ? t('#{n} most picked this week', { n: pickPlace }) : t('Last 7 days')}
               tone="text-accent"
             />
             <StatCard
@@ -1122,12 +1141,28 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
               value={stat.avgTrophies === null ? ', ' : formatNumber(Math.round(stat.avgTrophies))}
               hint={t('Across tracked players')}
             />
-            <StatCard
-              icon={Sparkles}
-              label={t('Avg rank')}
-              value={stat.avgRank === null ? ', ' : stat.avgRank.toFixed(1)}
-              hint={t('Across tracked players')}
-            />
+            {mover ? (
+              /* The week's move, where there is one (2026-11-11): the meta
+                 score change and the tier it came from. */
+              <StatCard
+                icon={Sparkles}
+                label={t('This week')}
+                value={`${mover.metaScoreDelta >= 0 ? '▲ +' : '▼ −'}${Math.abs(mover.metaScoreDelta).toFixed(1)}`}
+                hint={
+                  mover.tierBefore !== mover.tierNow
+                    ? t('{from} tier to {to} tier', { from: mover.tierBefore, to: mover.tierNow })
+                    : t('Meta score, still {tier} tier', { tier: mover.tierNow })
+                }
+                tone={mover.metaScoreDelta >= 0 ? 'text-victory' : 'text-defeat'}
+              />
+            ) : (
+              <StatCard
+                icon={Sparkles}
+                label={t('Avg rank')}
+                value={stat.avgRank === null ? ', ' : stat.avgRank.toFixed(1)}
+                hint={t('Across tracked players')}
+              />
+            )}
           </div>
         ) : (
           /* An empty state that ends the visit is a wasted one. This says what
@@ -1153,6 +1188,9 @@ export default async function BrawlerDetailPage({ params }: PageProps) {
           </div>
         ) : null}
       </section>
+
+      {/* Live maps where it is strong (2026-11-11). */}
+      <BrawlerLiveMaps name={name} live={live} maps={splits.maps} activeMaps={activeMaps} modeMeta={modeMeta} />
 
       {/* Tier and place at each Ranked rank (2026-11-11). */}
       <BrawlerByRank brawlerId={brawlerId} name={name} />

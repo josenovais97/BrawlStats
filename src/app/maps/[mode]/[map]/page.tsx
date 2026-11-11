@@ -12,6 +12,10 @@ import { JsonLd, breadcrumbSchema, faqSchema } from '@/components/seo/structured
 import { SectionHeading } from '@/components/ui/section-heading';
 import { BrawlerPodium } from '@/components/brawlers/brawler-podium';
 import { MapTrios } from '@/components/maps/map-trios';
+import { MapByRank } from '@/components/maps/map-by-rank';
+import { MapWhatWins } from '@/components/maps/map-what-wins';
+import { getEventRotation } from '@/lib/bs-api';
+import { liveSlots } from '@/lib/live-slots';
 import { currentMonth } from '@/lib/site';
 
 import { formatNumber, formatPercent, minutesSince,
@@ -191,6 +195,12 @@ export default async function MapPage({ params }: PageProps) {
     sinceLastSeen !== null &&
     sinceLastSeen < MAP_ROTATION_GRACE_DAYS * 24 * 60;
   const hasMapPicks = inRotation && (mapPicks?.picks.length ?? 0) > 0;
+  // Live trophy slots, cached as long as the page: the default 120 s would
+  // pin this route to two-minute renders (AGENTS.md trap 2).
+  const liveNow =
+    liveSlots(await getEventRotation(revalidate).catch(() => [])).find(
+      (slot) => slot.mode === entry.scHash && slugify(slot.map) === entry.mapSlug,
+    ) ?? null;
   const siblings = await getActiveMaps()
     .then((all) =>
       all.filter((m) => m.modeSlug === entry.modeSlug && m.mapSlug !== entry.mapSlug),
@@ -299,6 +309,13 @@ export default async function MapPage({ params }: PageProps) {
             {entry.retired ? (
               <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold uppercase text-muted">{t('Retired')}</span>
             ) : null}
+            {/* On in the trophy rotation right now (2026-11-11). */}
+            {liveNow ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-victory px-3 py-0.5 text-xs font-black uppercase text-ink">
+                <span aria-hidden className="size-2 animate-pulse rounded-full bg-ink" />
+                {liveNow.hoursLeft !== null ? t('Live now, {h}h left', { h: liveNow.hoursLeft }) : t('Live now')}
+              </span>
+            ) : null}
           </div>
 
           <h1 className="display text-game-stroke mt-3 text-3xl sm:text-4xl">
@@ -363,6 +380,12 @@ export default async function MapPage({ params }: PageProps) {
           <p className="mt-3 text-xs leading-relaxed text-muted">{t('Scores are shown against a')}{' '}{formatPercent(mapPicks!.baselineWinRate)}{' '}{t('Ranked average.')}</p>
         ) : null}
       </section>
+
+      {/* The classes the map rewards, then its best picks at each rank (2026-11-11). */}
+      {hasMapPicks ? <MapWhatWins picks={mapPicks!.picks} brawlerMeta={brawlerMeta} mapName={nm(entry.map.name)} /> : null}
+      {entry.scHash && inRotation ? (
+        <MapByRank mode={entry.scHash} dataMapName={dataMapName} mapName={nm(entry.map.name)} brawlerMeta={brawlerMeta} />
+      ) : null}
 
       {entry.scHash ? (
         <MapTrios

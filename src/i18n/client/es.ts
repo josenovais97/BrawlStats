@@ -1040,4 +1040,14 @@ export const CLIENT_ES: Record<string, string> = {
     "Últimos 30 días",
   "Pick rate":
     "Tasa de uso",
+  "Most picked":
+    "El más elegido",
+  "Rising":
+    "Subiendo",
+  "{tier} tier":
+    "Tier {tier}",
+  "Not rated yet":
+    "Sin valorar aún",
+  "Ranked win rate this week":
+    "Tasa de victorias en Competitivo esta semana",
 };

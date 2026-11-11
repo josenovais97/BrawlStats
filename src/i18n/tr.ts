@@ -5172,4 +5172,46 @@ export const TR: Record<string, string> = {
     "Bu rütbede henüz yeterli maç yok.",
   "of {n} in Ranked this week":
     "bu hafta Aşamalı'da {n} içinde",
+  "Not rated yet":
+    "Henüz derecelendirilmedi",
+  "Ranked win rate this week":
+    "Bu hafta Aşamalı kazanma oranı",
+  "#{n} most picked this week":
+    "Bu hafta en çok seçilen #{n}",
+  "Meta score, still {tier} tier":
+    "Meta puanı, hâlâ {tier} seviyesi",
+  "{from} tier to {to} tier":
+    "{from} seviyesinden {to} seviyesine",
+  "Best picks by rank":
+    "Rütbeye göre en iyi seçimler",
+  "What wins on {map} changes with the rank.":
+    "{map} haritasında kazananlar rütbeye göre değişiyor.",
+  "{names}: top five at every rank on {map}.":
+    "{names}: {map} haritasında her rütbede ilk beşte.",
+  "Falling this week":
+    "Bu hafta düşenler",
+  "Ranked win rate":
+    "Aşamalı kazanma oranı",
+  "Rising this week":
+    "Bu hafta yükselenler",
+  "Strongest right now":
+    "Şu an en güçlüler",
+  "{n} rated brawlers in Ranked this week":
+    "Bu hafta Aşamalı'da {n} brawler derecelendirildi",
+  "Live maps where {name} beats the map average.":
+    "{name} karakterinin harita ortalamasını geçtiği aktif haritalar.",
+  "Play {name} right now":
+    "{name} ile şimdi oyna",
+  "{h}h left":
+    "{h} sa kaldı",
+  "Live now, {h}h left":
+    "Şu an aktif, {h} sa kaldı",
+  "No one class owns {map}: the top {total} picks are spread across {k} classes.":
+    "{map} haritasına tek bir sınıf hakim değil: ilk {total} seçim {k} sınıfa dağılmış.",
+  "What wins here":
+    "Burada ne kazanır",
+  "{map} is a {class} map: {n} of the top {total} picks.":
+    "{map} bir {class} haritası: ilk {total} seçimin {n} tanesi.",
+  "{diff} vs average":
+    "Ortalamaya göre {diff}",
 };

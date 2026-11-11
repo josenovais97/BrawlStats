@@ -6,7 +6,9 @@ import { PageHeading } from '@/components/ui/section-heading';
 import { getBrawlerCatalog } from '@/lib/brawler-catalog';
 import { currentMonth } from '@/lib/site';
 import { getUpcomingBrawlers, type UpcomingBrawler } from '@/lib/announced';
-import { getMetaIndex } from '@/lib/stats';
+import { BrawlersPulse } from '@/components/brawlers/brawlers-pulse';
+import { getMetaIndex, getMetaMovers, type ScoredBrawler } from '@/lib/stats';
+import type { MetaMover } from '@/types/stats';
 import { getT } from '@/lib/t';
 import { requestLocale } from '@/lib/request-locale';
 
@@ -57,7 +59,10 @@ export default async function BrawlersPage() {
    * is still a brawler index, and the artwork source and the database fail
    * independently of each other.
    */
-  const meta = await getMetaIndex('ranked', 7).catch(() => new Map());
+  const meta: Map<number, ScoredBrawler> = await getMetaIndex('ranked', 7).catch(() => new Map());
+  const movers = await getMetaMovers(7).catch(() => [] as MetaMover[]);
+  const moverBy = new Map(movers.map((m) => [m.brawlerId, m]));
+  const images = new Map(catalog.all.map((b) => [b.id, { name: b.name, image: b.imageUrl || null }]));
 
   /*
    * Revealed but not shipped. Fetched here so the index can list them: this is
@@ -82,6 +87,9 @@ export default async function BrawlersPage() {
             : '.' })}
       />
 
+      {/* The week at a glance before the grid (2026-11-11). */}
+      <BrawlersPulse meta={meta} movers={movers} images={images} />
+
       <BrawlerBrowser
         brawlers={[
           ...catalog.all.map((b) => ({
@@ -97,6 +105,10 @@ export default async function BrawlersPage() {
             status: b.status,
             tier: meta.get(b.id)?.tier ?? null,
             metaScore: meta.get(b.id)?.metaScore ?? null,
+            winRate: meta.get(b.id)?.normalizedWinRate ?? null,
+            pickRate: meta.get(b.id)?.usageRate ?? null,
+            delta: moverBy.get(b.id)?.metaScoreDelta ?? null,
+            tierBefore: moverBy.get(b.id)?.tierBefore ?? null,
           })),
           /*
            * Revealed but not shipped. Listed because searching the name here

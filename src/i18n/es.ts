@@ -5172,4 +5172,46 @@ export const ES: Record<string, string> = {
     "Aún no hay suficientes partidas en este rango.",
   "of {n} in Ranked this week":
     "de {n} en Competitivo esta semana",
+  "Not rated yet":
+    "Sin valorar aún",
+  "Ranked win rate this week":
+    "Tasa de victorias en Competitivo esta semana",
+  "#{n} most picked this week":
+    "#{n} más elegido esta semana",
+  "Meta score, still {tier} tier":
+    "Puntuación meta, sigue en tier {tier}",
+  "{from} tier to {to} tier":
+    "De tier {from} a tier {to}",
+  "Best picks by rank":
+    "Mejores elecciones por rango",
+  "What wins on {map} changes with the rank.":
+    "Lo que gana en {map} cambia con el rango.",
+  "{names}: top five at every rank on {map}.":
+    "{names}: entre los cinco mejores en todos los rangos en {map}.",
+  "Falling this week":
+    "Bajan esta semana",
+  "Ranked win rate":
+    "Victorias en Competitivo",
+  "Rising this week":
+    "Suben esta semana",
+  "Strongest right now":
+    "Los más fuertes ahora",
+  "{n} rated brawlers in Ranked this week":
+    "{n} brawlers valorados en Competitivo esta semana",
+  "Live maps where {name} beats the map average.":
+    "Mapas activos donde {name} supera la media del mapa.",
+  "Play {name} right now":
+    "Juega con {name} ahora",
+  "{h}h left":
+    "Quedan {h} h",
+  "Live now, {h}h left":
+    "En juego, quedan {h} h",
+  "No one class owns {map}: the top {total} picks are spread across {k} classes.":
+    "Ninguna clase domina {map}: los {total} mejores se reparten entre {k} clases.",
+  "What wins here":
+    "Qué gana aquí",
+  "{map} is a {class} map: {n} of the top {total} picks.":
+    "{map} es un mapa de {class}: {n} de los {total} mejores.",
+  "{diff} vs average":
+    "{diff} sobre la media",
 };

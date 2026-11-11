@@ -568,4 +568,14 @@ export const CLIENT_RU: Record<string, string> = {
     "Последние 30 дней",
   "Pick rate":
     "Частота выбора",
+  "Most picked":
+    "Чаще всего выбирают",
+  "Rising":
+    "Растут",
+  "{tier} tier":
+    "Тир {tier}",
+  "Not rated yet":
+    "Пока без оценки",
+  "Ranked win rate this week":
+    "Процент побед в ранговых боях за неделю",
 };

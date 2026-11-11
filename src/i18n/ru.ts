@@ -5173,4 +5173,46 @@ export const RU: Record<string, string> = {
     "Пока мало игр на этом ранге.",
   "of {n} in Ranked this week":
     "из {n} в ранговых боях на этой неделе",
+  "Not rated yet":
+    "Пока без оценки",
+  "Ranked win rate this week":
+    "Процент побед в ранговых боях за неделю",
+  "#{n} most picked this week":
+    "#{n} по популярности на этой неделе",
+  "Meta score, still {tier} tier":
+    "Мета-рейтинг, всё ещё тир {tier}",
+  "{from} tier to {to} tier":
+    "С тира {from} на тир {to}",
+  "Best picks by rank":
+    "Лучшие бойцы по рангам",
+  "What wins on {map} changes with the rank.":
+    "Что побеждает на карте {map}, зависит от ранга.",
+  "{names}: top five at every rank on {map}.":
+    "{names}: в топ-5 на всех рангах на карте {map}.",
+  "Falling this week":
+    "Падают на этой неделе",
+  "Ranked win rate":
+    "Победы в ранговых",
+  "Rising this week":
+    "Растут на этой неделе",
+  "Strongest right now":
+    "Сильнейшие сейчас",
+  "{n} rated brawlers in Ranked this week":
+    "Бойцов с оценкой в ранговых за неделю: {n}",
+  "Live maps where {name} beats the map average.":
+    "Текущие карты, где {name} выше среднего по карте.",
+  "Play {name} right now":
+    "Играй за {name} прямо сейчас",
+  "{h}h left":
+    "Осталось {h} ч",
+  "Live now, {h}h left":
+    "Сейчас в игре, осталось {h} ч",
+  "No one class owns {map}: the top {total} picks are spread across {k} classes.":
+    "Ни один класс не правит картой {map}: топ-{total} разделён между классами ({k}).",
+  "What wins here":
+    "Что здесь побеждает",
+  "{map} is a {class} map: {n} of the top {total} picks.":
+    "{map} — карта для класса «{class}»: {n} из топ-{total}.",
+  "{diff} vs average":
+    "{diff} к среднему",
 };

@@ -568,4 +568,14 @@ export const CLIENT_TR: Record<string, string> = {
     "Son 30 gün",
   "Pick rate":
     "Seçilme oranı",
+  "Most picked":
+    "En çok seçilen",
+  "Rising":
+    "Yükselenler",
+  "{tier} tier":
+    "{tier} tier",
+  "Not rated yet":
+    "Henüz derecelendirilmedi",
+  "Ranked win rate this week":
+    "Bu hafta Aşamalı kazanma oranı",
 };

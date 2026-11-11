@@ -568,4 +568,14 @@ export const CLIENT_DE: Record<string, string> = {
     "Letzte 30 Tage",
   "Pick rate":
     "Pickrate",
+  "Most picked":
+    "Meistgepickt",
+  "Rising":
+    "Im Aufwind",
+  "{tier} tier":
+    "Tier {tier}",
+  "Not rated yet":
+    "Noch nicht bewertet",
+  "Ranked win rate this week":
+    "Ranked-Siegquote diese Woche",
 };
