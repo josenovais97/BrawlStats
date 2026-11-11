@@ -5100,4 +5100,40 @@ export const TR: Record<string, string> = {
     "En kötü haritalar",
   "{change} win rate":
     "Kazanma oranı {change}",
+  "Awards":
+    "Ödüller",
+  "Best {n}":
+    "Rekor {n}",
+  "Biggest climb":
+    "En büyük yükseliş",
+  "LAST 30 DAYS":
+    "SON 30 GÜN",
+  "Last {n} trophy games, your time":
+    "Son {n} kupa maçı, senin saatine göre",
+  "Most played on the trophy road, last 30 days":
+    "Kupa maçlarında en çok oynananlar, son 30 gün",
+  "Net trophies":
+    "Net kupa",
+  "No trophy games in the last 30 days":
+    "Son 30 günde kupa maçı yok",
+  "Showdown":
+    "Hesaplaşma",
+  "TROPHIES":
+    "KUPALAR",
+  "Trophies lost":
+    "Kaybedilen kupa",
+  "Trophies won":
+    "Kazanılan kupa",
+  "Trophy road":
+    "Kupa Yolu",
+  "The week in short":
+    "Haftanın özeti",
+  "{a}, {b} and {c} are the top three in Ranked right now.":
+    "Şu anda Aşamalı'da ilk üç: {a}, {b} ve {c}.",
+  "{name} fell the most, down {delta} points to {tier} tier.":
+    "En çok düşen {name}: {delta} puan düştü, şimdi {tier} kademesinde.",
+  "{name} rose the most, up {delta} points to {tier} tier.":
+    "En çok yükselen {name}: {delta} puan arttı, şimdi {tier} kademesinde.",
+  "{n} brawlers changed tier: {up} up and {down} down.":
+    "{n} savaşçının kademesi değişti: {up} yükseldi, {down} düştü.",
 };

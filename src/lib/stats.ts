@@ -5526,9 +5526,16 @@ export async function computeCompsBundle(): Promise<CompsBundle> {
 
   try {
     const since = windowStartUtc(COMP_WINDOW_DAYS);
-    const [, , rows] = await prisma.$transaction([
+    /*
+     * 256 MB of sort memory for this one transaction (2026-11-11). At the
+     * server's 16 MB default its DISTINCT ON and grouping sorts spilled to
+     * disk: measured on three days of data, 95 s at 16 MB against 57 s at
+     * 256 MB, warm. The full fortnight had grown past five minutes.
+     */
+    const [, , , rows] = await prisma.$transaction([
       prisma.$executeRaw`SET LOCAL enable_nestloop = off`,
       prisma.$executeRaw`SET LOCAL max_parallel_workers_per_gather = 0`,
+      prisma.$executeRaw`SET LOCAL work_mem = '256MB'`,
       prisma.$queryRaw<CompsBundleRow[]>`
         WITH obs AS MATERIALIZED (
           SELECT DISTINCT ON (o.battle_time, o.map_name, o.trio) o.*
@@ -5915,6 +5922,62 @@ export async function getPlayerActivity(tag: string, days = 30): Promise<PlayerA
     }));
   } catch (error) {
     swallow('getPlayerActivity', error);
+    return null;
+  }
+}
+
+/** One trophy-ladder game from the player's side (battle_samples). */
+export interface TrophyGameRow {
+  time: number;
+  brawlerId: number;
+  /** 'victory' | 'defeat' | 'draw', or null in Showdown. */
+  result: string | null;
+  /** Showdown place, else null. */
+  rank: number | null;
+  mode: string;
+  map: string | null;
+  trophyChange: number | null;
+}
+
+/**
+ * One player's trophy games kept raw (about two weeks), newest first, for the
+ * profile's Trophies tab (2026-11-11). Through the partial index on
+ * battle_samples (player_tag, battle_time) WHERE battle_type = 'ranked'; the
+ * type is written out so Postgres can use it.
+ */
+export async function getPlayerTrophyGames(tag: string, days = 20): Promise<TrophyGameRow[] | null> {
+  const prisma = getPrisma();
+  if (!prisma || isOptedOut(tag)) return null;
+  try {
+    const since = new Date(Date.now() - days * 86_400_000);
+    const rows = await prisma.$queryRaw<{
+      battle_time: Date;
+      brawler_id: number;
+      result: string | null;
+      rank: number | null;
+      mode: string;
+      map_name: string | null;
+      trophy_change: number | null;
+    }[]>`
+      SELECT battle_time, brawler_id, result, rank, mode, map_name, trophy_change
+      FROM battle_samples
+      WHERE player_tag = ${tag}
+        AND battle_type = 'ranked'
+        AND battle_time >= ${since}
+      ORDER BY battle_time DESC
+      LIMIT 3000
+    `;
+    return rows.map((r) => ({
+      time: r.battle_time.getTime(),
+      brawlerId: r.brawler_id,
+      result: r.result,
+      rank: r.rank,
+      mode: r.mode,
+      map: r.map_name,
+      trophyChange: r.trophy_change,
+    }));
+  } catch (error) {
+    swallow('getPlayerTrophyGames', error);
     return null;
   }
 }

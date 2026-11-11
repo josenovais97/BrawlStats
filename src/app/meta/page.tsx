@@ -8,12 +8,14 @@ import { PageHeading, SectionHeading } from '@/components/ui/section-heading';
 
 import { brawlerIconUrl, getGameModeMap, modeLabel } from '@/lib/brawlapi';
 import { getBrawlerArtMap, getBrawlerCatalog } from '@/lib/brawler-catalog';
-import { formatNumber, formatPercent } from '@/lib/format';
+import { formatNumber, formatPercent, titleCase } from '@/lib/format';
 import { CHANGE_LABEL, changesFromNotes, getLatestReleaseNotes } from '@/lib/release-notes';
 import { brawlerPath, slugify } from '@/lib/slugs';
-import { TIER_COLOR, getMetaMovers, getTeamComps } from '@/lib/stats';
+import { DEFAULT_TIER_WINDOW, TIER_COLOR, getBestPicksByMode, getFilterableModes, getMetaIndex, getMetaMovers, getRankedTrends, getTeamComps } from '@/lib/stats';
+import { modeNamer } from '@/lib/i18n-game';
+import { tierListHref } from '@/lib/tier-list-route';
 import type { BABrawler } from '@/types/brawlapi';
-import type { MetaMover, Tier } from '@/types/stats';
+import type { MetaMover, ModeBestPicks, Tier } from '@/types/stats';
 import { getT } from '@/lib/t';
 import { localePath } from '@/lib/i18n';
 import { requestLocale } from '@/lib/request-locale';
@@ -53,6 +55,23 @@ export default async function MetaReportPage() {
     getBrawlerArtMap().catch(() => new Map<number, BABrawler>()),
     getBrawlerCatalog().catch(() => null),
   ]);
+
+  /*
+   * 2026-11-11: the week in plain sentences, the best pick per Ranked mode
+   * and a 14-day line per mover, from reads the tier list already caches.
+   */
+  const index = await getMetaIndex('ranked', 7).catch(() => new Map());
+  const trends = await getRankedTrends(14).catch(() => ({}) as Record<number, [string, number][]>);
+  const rankedModes = new Set((await getFilterableModes(30, 150, 'ranked').catch(() => [])).map((m) => m.mode));
+  const bestByMode = await getBestPicksByMode(1).catch(() => new Map<string, ModeBestPicks>());
+  const modeName = await modeNamer();
+  const leaders = [...index.values()]
+    .filter((b) => b.metaScore !== null && b.tier !== null)
+    .sort((a, b) => (b.metaScore ?? 0) - (a.metaScore ?? 0))
+    .slice(0, 3);
+  const modePicks = [...bestByMode.values()]
+    .filter((m) => m.picks.length > 0 && rankedModes.has(m.mode))
+    .sort((a, b) => b.sampleSize - a.sampleSize);
 
   const notes = await getLatestReleaseNotes().catch(() => null);
   const changes = notes
@@ -103,6 +122,79 @@ export default async function MetaReportPage() {
         }
       />
 
+      {/* The week in short: the reading, before the rows it comes from. */}
+      {leaders.length === 3 || risers.length > 0 || fallers.length > 0 ? (
+        <section className="card card-glow relative isolate overflow-hidden p-5 sm:p-6">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10"
+            style={{ background: 'radial-gradient(60% 90% at 0% 0%, rgb(255 197 61 / 0.18), transparent 60%)' }}
+          />
+          <h2 className="display text-xl leading-none sm:text-2xl">{t('The week in short')}</h2>
+          <ul className="mt-4 space-y-2.5 text-[15px] leading-relaxed">
+            {leaders.length === 3 ? (
+              <li className="flex gap-2.5">
+                <span aria-hidden className="text-brand">●</span>
+                <span>{t('{a}, {b} and {c} are the top three in Ranked right now.', { a: titleCase(leaders[0].brawlerName), b: titleCase(leaders[1].brawlerName), c: titleCase(leaders[2].brawlerName) })}</span>
+              </li>
+            ) : null}
+            {risers[0] ? (
+              <li className="flex gap-2.5">
+                <span aria-hidden className="text-victory">▲</span>
+                <span>{t('{name} rose the most, up {delta} points to {tier} tier.', { name: titleCase(risers[0].brawlerName), delta: risers[0].metaScoreDelta.toFixed(1), tier: risers[0].tierNow })}</span>
+              </li>
+            ) : null}
+            {fallers[0] ? (
+              <li className="flex gap-2.5">
+                <span aria-hidden className="text-defeat">▼</span>
+                <span>{t('{name} fell the most, down {delta} points to {tier} tier.', { name: titleCase(fallers[0].brawlerName), delta: Math.abs(fallers[0].metaScoreDelta).toFixed(1), tier: fallers[0].tierNow })}</span>
+              </li>
+            ) : null}
+            {crossings.length > 0 ? (
+              <li className="flex gap-2.5">
+                <span aria-hidden className="text-accent-2">◆</span>
+                <span>{t('{n} brawlers changed tier: {up} up and {down} down.', { n: movers.filter((m) => m.tierNow !== m.tierBefore).length, up: movers.filter((m) => m.tierNow !== m.tierBefore && m.metaScoreDelta > 0).length, down: movers.filter((m) => m.tierNow !== m.tierBefore && m.metaScoreDelta < 0).length })}</span>
+              </li>
+            ) : null}
+          </ul>
+        </section>
+      ) : null}
+
+      {modePicks.length > 0 ? (
+        <section className="space-y-3">
+          <SectionHeading title={t('Best pick in each mode')} />
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {modePicks.map((m) => {
+              const pick = m.picks[0];
+              const icon = modeMeta.get(m.mode.toLowerCase())?.imageUrl;
+              return (
+                <li key={m.mode}>
+                  <Link
+                    href={lp(tierListHref('ranked', DEFAULT_TIER_WINDOW, m.mode))}
+                    prefetch={false}
+                    className="card card-interactive flex h-full flex-col items-center gap-1.5 p-3 text-center"
+                  >
+                    <span className="flex items-center gap-1 text-[11px] font-bold text-muted">
+                      {icon ? <Image src={icon} alt="" width={16} height={16} unoptimized className="size-4" /> : null}
+                      <span className="truncate">{modeName(modeLabel(modeMeta, m.mode))}</span>
+                    </span>
+                    <Image
+                      src={brawlerMeta.get(pick.brawlerId)?.imageUrl ?? brawlerIconUrl(pick.brawlerId)}
+                      alt=""
+                      width={64}
+                      height={64}
+                      unoptimized
+                      className="size-16 rounded-xl border-2 border-ink object-cover"
+                    />
+                    <span className="label-game truncate text-sm capitalize">{pick.brawlerName.toLowerCase()}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
       {movers.length === 0 ? (
         <p className="card p-6 text-sm leading-relaxed text-muted">{t('Not enough comparable snapshots yet. This fills in once a week of daily snapshots has been collected under a stable sample.')}</p>
       ) : null}
@@ -148,8 +240,8 @@ export default async function MetaReportPage() {
       ) : null}
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <MoverColumn title={t('Rising')} movers={risers} brawlerMeta={brawlerMeta} up />
-        <MoverColumn title={t('Falling')} movers={fallers} brawlerMeta={brawlerMeta} up={false} />
+        <MoverColumn title={t('Rising')} movers={risers} brawlerMeta={brawlerMeta} trends={trends} up />
+        <MoverColumn title={t('Falling')} movers={fallers} brawlerMeta={brawlerMeta} trends={trends} up={false} />
       </div>
 
       {changes.length > 0 && notes ? (
@@ -214,11 +306,13 @@ function MoverColumn({
   title,
   movers,
   brawlerMeta,
+  trends,
   up,
 }: {
   title: string;
   movers: MetaMover[];
   brawlerMeta: Map<number, BABrawler>;
+  trends: Record<number, [string, number][]>;
   up: boolean;
 }) {
   const t = getT(requestLocale());
@@ -252,6 +346,7 @@ function MoverColumn({
                   </span>
                   <span className="block text-xs tabular-nums text-muted">{t('{sampleSize} battles · {winRateNow} win rate', { sampleSize: formatNumber(mover.sampleSize), winRateNow: formatPercent(mover.winRateNow) })}</span>
                 </span>
+                <Trend points={trends[mover.brawlerId]} up={up} />
                 <span
                   className={`shrink-0 text-sm font-bold tabular-nums ${
                     up ? 'text-victory' : 'text-defeat'
@@ -282,5 +377,19 @@ function TierPill({ tier, muted = false }: { tier: Tier; muted?: boolean }) {
     >
       {tier}
     </span>
+  );
+}
+
+/** Fourteen days of adjusted Ranked win rate beside a mover (2026-11-11). */
+function Trend({ points, up }: { points?: [string, number][]; up: boolean }) {
+  if (!points || points.length < 3) return null;
+  const v = points.map(([, x]) => x);
+  const lo = Math.min(...v);
+  const span = Math.max(Math.max(...v) - lo, 0.01);
+  const d = v.map((x, i) => `${i ? 'L' : 'M'}${((i / (v.length - 1)) * 100).toFixed(1)},${(2 + (1 - (x - lo) / span) * 16).toFixed(1)}`).join(' ');
+  return (
+    <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="h-6 w-16 shrink-0" aria-hidden>
+      <path d={d} fill="none" stroke={up ? 'var(--victory)' : 'var(--defeat)'} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+    </svg>
   );
 }

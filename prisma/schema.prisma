@@ -151,6 +151,9 @@ model BattleSample {
   // brawler and per-map indexes (1.1 GB) were dropped on 2026-10-19 after two
   // weeks at 0-1 scans -- the per-map tier list reads ranked_pair_daily.
   @@index([battleTime])
+  // Plus battle_samples_trophy_player_idx (player_tag, battle_time) WHERE
+  // battle_type = 'ranked' (the trophy ladder), for the profile's Trophies
+  // tab. Partial, so it is only in migration 20261111090000.
   @@map("battle_samples")
 }
 

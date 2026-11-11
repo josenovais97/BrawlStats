@@ -5101,4 +5101,40 @@ export const FR: Record<string, string> = {
     "Pires cartes",
   "{change} win rate":
     "{change} de taux de victoire",
+  "Awards":
+    "Récompenses",
+  "Best {n}":
+    "Record {n}",
+  "Biggest climb":
+    "Plus grosse montée",
+  "LAST 30 DAYS":
+    "30 DERNIERS JOURS",
+  "Last {n} trophy games, your time":
+    "{n} dernières parties à trophées, à ton heure",
+  "Most played on the trophy road, last 30 days":
+    "Les plus joués à trophées, 30 derniers jours",
+  "Net trophies":
+    "Bilan de trophées",
+  "No trophy games in the last 30 days":
+    "Aucune partie à trophées ces 30 derniers jours",
+  "Showdown":
+    "Survivant",
+  "TROPHIES":
+    "TROPHÉES",
+  "Trophies lost":
+    "Trophées perdus",
+  "Trophies won":
+    "Trophées gagnés",
+  "Trophy road":
+    "Voie des trophées",
+  "The week in short":
+    "La semaine en bref",
+  "{a}, {b} and {c} are the top three in Ranked right now.":
+    "{a}, {b} et {c} forment le top 3 du Classé en ce moment.",
+  "{name} fell the most, down {delta} points to {tier} tier.":
+    "{name} a le plus chuté : {delta} points de moins, désormais tier {tier}.",
+  "{name} rose the most, up {delta} points to {tier} tier.":
+    "{name} a le plus progressé : {delta} points de plus, désormais tier {tier}.",
+  "{n} brawlers changed tier: {up} up and {down} down.":
+    "{n} brawlers ont changé de tier : {up} en hausse et {down} en baisse.",
 };

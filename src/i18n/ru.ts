@@ -5101,4 +5101,40 @@ export const RU: Record<string, string> = {
     "Худшие карты",
   "{change} win rate":
     "{change} к проценту побед",
+  "Awards":
+    "Награды",
+  "Best {n}":
+    "Рекорд {n}",
+  "Biggest climb":
+    "Лучший рост",
+  "LAST 30 DAYS":
+    "ЗА 30 ДНЕЙ",
+  "Last {n} trophy games, your time":
+    "Последние бои за кубки: {n}, по твоему времени",
+  "Most played on the trophy road, last 30 days":
+    "Чаще всего в боях за кубки за 30 дней",
+  "Net trophies":
+    "Итог по кубкам",
+  "No trophy games in the last 30 days":
+    "Нет боёв за кубки за последние 30 дней",
+  "Showdown":
+    "Столкновение",
+  "TROPHIES":
+    "КУБКИ",
+  "Trophies lost":
+    "Кубков потеряно",
+  "Trophies won":
+    "Кубков получено",
+  "Trophy road":
+    "Путь к славе",
+  "The week in short":
+    "Неделя вкратце",
+  "{a}, {b} and {c} are the top three in Ranked right now.":
+    "Сейчас в ранговых боях лучшие трое: {a}, {b} и {c}.",
+  "{name} fell the most, down {delta} points to {tier} tier.":
+    "Сильнее всех упал {name}: минус {delta} очка, теперь тир {tier}.",
+  "{name} rose the most, up {delta} points to {tier} tier.":
+    "Сильнее всех вырос {name}: плюс {delta} очка, теперь тир {tier}.",
+  "{n} brawlers changed tier: {up} up and {down} down.":
+    "Тир сменили бойцов: {n}, {up} вверх и {down} вниз.",
 };

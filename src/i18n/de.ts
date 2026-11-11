@@ -5101,4 +5101,40 @@ export const DE: Record<string, string> = {
     "Schlechteste Maps",
   "{change} win rate":
     "{change} Siegquote",
+  "Awards":
+    "Auszeichnungen",
+  "Best {n}":
+    "Rekord {n}",
+  "Biggest climb":
+    "Größter Aufstieg",
+  "LAST 30 DAYS":
+    "LETZTE 30 TAGE",
+  "Last {n} trophy games, your time":
+    "Letzte {n} Trophäenspiele, deine Uhrzeit",
+  "Most played on the trophy road, last 30 days":
+    "Am meisten gespielt auf dem Trophäenpfad, letzte 30 Tage",
+  "Net trophies":
+    "Trophäen netto",
+  "No trophy games in the last 30 days":
+    "Keine Trophäenspiele in den letzten 30 Tagen",
+  "Showdown":
+    "Showdown",
+  "TROPHIES":
+    "TROPHÄEN",
+  "Trophies lost":
+    "Verlorene Trophäen",
+  "Trophies won":
+    "Gewonnene Trophäen",
+  "Trophy road":
+    "Trophäenpfad",
+  "The week in short":
+    "Die Woche in Kürze",
+  "{a}, {b} and {c} are the top three in Ranked right now.":
+    "{a}, {b} und {c} sind gerade die Top 3 in Ranked.",
+  "{name} fell the most, down {delta} points to {tier} tier.":
+    "{name} ist am stärksten gefallen: {delta} Punkte weniger, jetzt Tier {tier}.",
+  "{name} rose the most, up {delta} points to {tier} tier.":
+    "{name} ist am stärksten gestiegen: {delta} Punkte mehr, jetzt Tier {tier}.",
+  "{n} brawlers changed tier: {up} up and {down} down.":
+    "{n} Brawler haben das Tier gewechselt: {up} hoch, {down} runter.",
 };

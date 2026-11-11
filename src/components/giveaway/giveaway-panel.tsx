@@ -157,6 +157,12 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
     };
   }, [query]);
 
+  async function searchNames(q: string): Promise<NameMatch[]> {
+    const r = await fetch(`/api/players/search?q=${encodeURIComponent(q)}`).catch(() => null);
+    const d = r?.ok ? ((await r.json().catch(() => null)) as { players?: NameMatch[] } | null) : null;
+    return d?.players ?? [];
+  }
+
   function pick(m: NameMatch) {
     setTag(`#${m.tag}`);
     setMatches(null);
@@ -171,23 +177,44 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
       window.umami?.track('giveaway_error', { code: 'consent-local' });
       return;
     }
+    let entryTag = tag;
     if (!isValidTag(tag)) {
-      // A name, not a tag: sending it would only come back as "no such tag".
-      setError(matches?.length
-        ? t('Tap your account in the list under the box, or type your tag.')
-        : t('No player found with that name. Type your tag instead: it starts with # and is under your name in game.'));
-      // Four visitors tried a name 27 times in a week (2026-10-30): with no
-      // match, open the picture of where the tag is rather than repeat the line.
-      if (!matches?.length) setHelp(true);
-      window.umami?.track('giveaway_error', { code: 'name-unpicked' });
-      return;
+      /*
+       * A name, not a tag (2026-11-11). 50-80 entries a day failed here as
+       * "name-unpicked": people pressed Enter before the name search had
+       * answered (so it read "no player found"), or did not tap the one
+       * account the list showed. Wait for the search, and when one account is
+       * the obvious answer -- the only match, or the only exact name -- use it.
+       */
+      setBusy(true);
+      const found = matches ?? (await searchNames(query));
+      setBusy(false);
+      setMatches(found);
+      const lower = query.toLowerCase();
+      const exact = found.filter((m) => m.name.trim().toLowerCase() === lower);
+      const only = exact.length === 1 ? exact[0] : found.length === 1 ? found[0] : null;
+      if (only) {
+        entryTag = `#${only.tag}`;
+        setTag(entryTag);
+        window.umami?.track('giveaway_name_auto');
+      } else {
+        // A name, not a tag: sending it would only come back as "no such tag".
+        setError(found.length
+          ? t('Tap your account in the list under the box, or type your tag.')
+          : t('No player found with that name. Type your tag instead: it starts with # and is under your name in game.'));
+        // Four visitors tried a name 27 times in a week (2026-10-30): with no
+        // match, open the picture of where the tag is rather than repeat the line.
+        if (!found.length) setHelp(true);
+        window.umami?.track('giveaway_error', { code: 'name-unpicked' });
+        return;
+      }
     }
     setBusy(true);
     setError(null);
     const res = await fetch('/api/giveaway/enter', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ tag: normalizeTag(tag), email, consent, ref: referredBy }),
+      body: JSON.stringify({ tag: normalizeTag(entryTag), email, consent, ref: referredBy }),
     }).catch(() => null);
     const body = res ? await res.json().catch(() => null) : null;
     if (body?.ok) {
@@ -231,7 +258,7 @@ function EntryForm({ referredBy, onEntered }: { referredBy: string | null; onEnt
           />
         </label>
         {matches?.length ? (
-          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface-2">
+          <ul className={`divide-y divide-border overflow-hidden rounded-xl border bg-surface-2 ${error ? 'border-brand ring-2 ring-brand/60' : 'border-border'}`}>
             {matches.map((m) => (
               <li key={m.tag}>
                 <button type="button" onClick={() => pick(m)} className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-surface-3">

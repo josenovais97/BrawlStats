@@ -37,6 +37,7 @@ import { PlayerPlacements } from '@/components/player/player-placements';
 import { PlayerRanked } from '@/components/player/player-ranked';
 import { PlayerSeason, SeasonTeaser } from '@/components/player/player-season';
 import { PlayerActivity } from '@/components/player/player-activity';
+import { PlayerTrophies } from '@/components/player/player-trophies';
 import {
   getEventRotation,
   getOfficialBrawlers,
@@ -448,6 +449,18 @@ export default async function PlayerPage({ params }: PageProps) {
               },
             ]
           : []),
+        /* The trophy road's version of the Ranked tab (2026-11-11). */
+        {
+          id: 'trophies',
+          label: t('Trophies'),
+          content: (
+            <ProfileGroup title={t('Trophies')}>
+              <Suspense fallback={<div className="skeleton h-[34rem] rounded-2xl" />}>
+                <PlayerTrophies player={player} tag={normalizedTag} brawlerMeta={brawlerMeta} modeMeta={modeMeta} />
+              </Suspense>
+            </ProfileGroup>
+          ),
+        },
         {
           id: 'account',
           label: t('Account'),

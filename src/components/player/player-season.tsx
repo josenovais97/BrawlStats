@@ -596,7 +596,7 @@ function eloPoints(readings: { day: string; elo: number }[], now: number | null,
   return points;
 }
 
-function Tile({ label, value, tone, hint, children }: { label: string; value: string; tone?: string; hint?: string; children?: ReactNode }) {
+export function Tile({ label, value, tone, hint, children }: { label: string; value: string; tone?: string; hint?: string; children?: ReactNode }) {
   return (
     <div className="rounded-2xl border-2 border-ink bg-surface-2/70 px-4 py-3 shadow-[inset_0_2px_0_rgb(255_255_255/0.08),0_3px_0_var(--ink)]">
       <p className="text-xs text-muted">{label}</p>
@@ -655,7 +655,7 @@ function BrawlerRow({
   );
 }
 
-function Award({ label, art, children }: { label: string; art: ReactNode; children: ReactNode }) {
+export function Award({ label, art, children }: { label: string; art: ReactNode; children: ReactNode }) {
   return (
     <div className="card flex flex-col gap-3 p-4">
       <p className="label-game text-sm text-brand">{label}</p>
@@ -667,7 +667,7 @@ function Award({ label, art, children }: { label: string; art: ReactNode; childr
   );
 }
 
-function AwardValue({ main, sub }: { main: string; sub?: string | null }) {
+export function AwardValue({ main, sub }: { main: string; sub?: string | null }) {
   return (
     <>
       <p className="label-game line-clamp-2 break-words text-base leading-tight sm:text-lg">{main}</p>
@@ -676,7 +676,7 @@ function AwardValue({ main, sub }: { main: string; sub?: string | null }) {
   );
 }
 
-function BigNumber({ value, tone }: { value: number; tone: string }) {
+export function BigNumber({ value, tone }: { value: number; tone: string }) {
   return (
     <span className={`display text-game-stroke grid size-14 shrink-0 place-items-center rounded-xl border-2 border-ink bg-surface-3 text-3xl ${tone}`}>
       {value}
@@ -684,7 +684,7 @@ function BigNumber({ value, tone }: { value: number; tone: string }) {
   );
 }
 
-function ModeArt({ url, small = false }: { url: string | null; small?: boolean }) {
+export function ModeArt({ url, small = false }: { url: string | null; small?: boolean }) {
   const size = small ? 28 : 56;
   return url ? (
     <Image src={url} alt="" width={size} height={size} unoptimized className="shrink-0 object-contain" style={{ width: size, height: size }} />
@@ -693,7 +693,7 @@ function ModeArt({ url, small = false }: { url: string | null; small?: boolean }
   );
 }
 
-function MapArt({ map, small = false }: { map: GameMap | undefined; small?: boolean }) {
+export function MapArt({ map, small = false }: { map: GameMap | undefined; small?: boolean }) {
   const w = small ? 44 : 56;
   const h = small ? 44 : 56;
   return map?.map.imageUrl ? (

@@ -10,7 +10,7 @@ import { SeasonHeading } from './shared';
  * The season as a calendar, one square a day: green when the day had more
  * wins than losses, red when it had fewer, deeper with more games.
  */
-export function SeasonCalendar({ days, from, last }: { days: SeasonDay[]; from: string; last: string }) {
+export function SeasonCalendar({ days, from, last, title }: { days: SeasonDay[]; from: string; last: string; title?: string }) {
   const locale = requestLocale();
   const t = getT(locale);
   const dateLocale = DATE_LOCALE[locale];
@@ -31,7 +31,7 @@ export function SeasonCalendar({ days, from, last }: { days: SeasonDay[]; from: 
   return (
     <section className="card p-5 sm:p-6">
       <SeasonHeading
-        title={t('Season calendar')}
+        title={title ?? t('Season calendar')}
         aside={t('{n} of {total} days played', { n: facts.played, total: all.filter((d) => d <= today).length })}
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,26rem)_1fr]">
